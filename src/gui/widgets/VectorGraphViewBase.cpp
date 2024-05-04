@@ -79,11 +79,12 @@ void VectorGraphViewBase::connectToAutomationTrack(QMouseEvent* me, FloatModel* 
 
 void VectorGraphViewBase::showContextMenu(const QPoint point, FloatModel* automationModel, QString displayName, QString controlName)
 {
+	m_curAutomationModel = automationModel;
 	CaptionMenu contextMenu(displayName + QString(" - ") + controlName);
-	addDefaultActions(&contextMenu, automationModel, controlName);
+	addDefaultActions(&contextMenu, controlName);
 	contextMenu.exec(point);
 }
-void VectorGraphViewBase::addDefaultActions(QMenu* menu, FloatModel* automationModel, QString controlDisplayText)
+void VectorGraphViewBase::addDefaultActions(QMenu* menu, QString controlDisplayText)
 {
 	// context menu settings
 	menu->addAction(embed::getIconPixmap("reload"),
@@ -98,11 +99,11 @@ void VectorGraphViewBase::addDefaultActions(QMenu* menu, FloatModel* automationM
 
 	menu->addAction(embed::getIconPixmap("controller"),
 		tr("Connect to controller..."),
-		this, SLOT(execConnectionDialog(automationModel)));
-	if(automationModel != nullptr && automationModel->controllerConnection() != nullptr)
+		this, SLOT(contextMenuExecConnectionDialog()));
+	if(m_curAutomationModel != nullptr && m_curAutomationModel->controllerConnection() != nullptr)
 	{
 		
-		Controller* cont = automationModel->controllerConnection()->getController();
+		Controller* cont = m_curAutomationModel->controllerConnection()->getController();
 		if(cont)
 		{
 			controllerTxt = AutomatableModel::tr( "Connected to %1" ).arg( cont->name() );
@@ -121,11 +122,11 @@ void VectorGraphViewBase::addDefaultActions(QMenu* menu, FloatModel* automationM
 	}
 }
 
-void VectorGraphViewBase::contextMenuExecConnectionDialog(FloatModel* automationModel)
+void VectorGraphViewBase::contextMenuExecConnectionDialog()
 {
-	if (automationModel != nullptr)
+	if (m_curAutomationModel != nullptr)
 	{
-		gui::ControllerConnectionDialog dialog(getGUI()->mainWindow(), automationModel);
+		gui::ControllerConnectionDialog dialog(getGUI()->mainWindow(), m_curAutomationModel);
 
 		if (dialog.exec() == 1)
 		{
@@ -133,15 +134,15 @@ void VectorGraphViewBase::contextMenuExecConnectionDialog(FloatModel* automation
 			if (dialog.chosenController() != nullptr)
 			{
 				// Update
-				if (automationModel->controllerConnection() != nullptr)
+				if (m_curAutomationModel->controllerConnection() != nullptr)
 				{
-					automationModel->controllerConnection()->setController(dialog.chosenController());
+					m_curAutomationModel->controllerConnection()->setController(dialog.chosenController());
 				}
 				else
 				{
 					// New
 					auto cc = new ControllerConnection(dialog.chosenController());
-					automationModel->setControllerConnection(cc);
+					m_curAutomationModel->setControllerConnection(cc);
 				}
 			}
 			else

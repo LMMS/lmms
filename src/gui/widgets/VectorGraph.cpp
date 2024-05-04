@@ -486,6 +486,9 @@ qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray)
 			}
 		}
 		//qDebug("mouseRelease select new array final:", m_selectedArray);
+
+		// hint text
+		hideHintText();
 	}
 	m_mousePress = false;
 	m_addition = false;
@@ -1028,17 +1031,21 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 
 			if (m_addition == false)
 			{
-				// if the right mouse button was pressed
-				// get context menu input text
-				QString controlDisplayText = m_controlText[location];
-				controlDisplayText = controlDisplayText + getTextForAutomatableEffectableOrType(location);
+				if (location >= 1 && location <= 4)
+				{
+					// if the right mouse button was pressed on a automatabel attribute
+					// get context menu input text
+					QString controlDisplayText = m_controlText[location];
+					controlDisplayText = controlDisplayText + getTextForAutomatableEffectableOrType(location);
+					setInputAttribValue(6, location - 1, false);
 
-				// getting the currently selected point's FloatModel
-				model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
-				FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
+					// getting the currently selected point's FloatModel
+					model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
+					FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
 
-				// show context menu
-				showContextMenu(QCursor::pos(), curAutomationModel, model()->displayName(), controlDisplayText);
+					// show context menu
+					showContextMenu(QCursor::pos(), curAutomationModel, model()->displayName(), controlDisplayText);
+				}
 			}
 			else if (isDragging == false && m_controlIsFloat[location] == false)
 			{
