@@ -271,7 +271,7 @@ float Lb302Filter3Pole::process(const float& samp)
 static float computeDecayFactor(float decayTimeInSeconds, float targetedAttenuation)
 {
 	// This is the number of samples that correspond to the decay time in seconds
-	auto samplesNeededForDecay = decayTimeInSeconds * Engine::audioEngine()->processingSampleRate();
+	auto samplesNeededForDecay = decayTimeInSeconds * Engine::audioEngine()->outputSampleRate();
 
 	// This computes the factor that's needed to make a signal with a value of 1 decay to the
 	// targeted attenuation over the time in number of samples.
