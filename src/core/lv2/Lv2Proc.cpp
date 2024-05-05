@@ -439,7 +439,7 @@ void Lv2Proc::initPlugin()
 	m_features.createFeatureVectors();
 
 	m_instance = lilv_plugin_instantiate(m_plugin,
-		Engine::audioEngine()->processingSampleRate(),
+		Engine::audioEngine()->outputSampleRate(),
 		m_features.featurePointers());
 
 	if (m_instance)
@@ -507,7 +507,7 @@ void Lv2Proc::initMOptions()
 		re-initialize, and this code section will be
 		executed again, creating a new option vector.
 	*/
-	float sampleRate = Engine::audioEngine()->processingSampleRate();
+	float sampleRate = Engine::audioEngine()->outputSampleRate();
 	int32_t blockLength = Engine::audioEngine()->framesPerPeriod();
 	int32_t sequenceSize = defaultEvbufSize();
 
@@ -568,7 +568,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 			{
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
 				QString dispName = lilv_node_as_string(node.get());
-				sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+				sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 				if(meta.def() < meta.min(sr) || meta.def() > meta.max(sr))
 				{
 					qWarning()	<< "Warning: Plugin"
@@ -871,7 +871,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);
 	if (port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
 	{
-		sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+		sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 		qDebug() << "  default:" << port.def();
 		qDebug() << "  min:" << port.min(sr);
 		qDebug() << "  max:" << port.max(sr);

@@ -88,7 +88,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; }
 	speedRatio *= pitchRatio;
-	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
+	speedRatio *= Engine::audioEngine()->outputSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
 	float sliceStart, sliceEnd;
 	if (noteIndex == 0) // full sample at base note
@@ -132,7 +132,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		playbackState->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
-		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->processingSampleRate();
+		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
 		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
 		for (int i = 0; i < frames; i++)
 		{

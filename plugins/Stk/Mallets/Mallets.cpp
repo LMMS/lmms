@@ -342,7 +342,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 						m_vibratoFreqModel.value(),
 						p,
 						(uint8_t) m_spreadModel.value(),
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -355,7 +355,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 		}
 		else
 		{
@@ -368,7 +368,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 						m_strikeModel.value() * 128.0,
 						speed,
 						(uint8_t) m_spreadModel.value(),
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 		}
 		m.unlock();
 		static_cast<MalletsSynth *>(_n->m_pluginData)->setPresetIndex(p);

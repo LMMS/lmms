@@ -289,7 +289,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 
 	if (!_n->m_pluginData)
 	{

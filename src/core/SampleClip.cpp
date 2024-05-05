@@ -307,7 +307,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
-			Engine::audioEngine()->processingSampleRate();
+			Engine::audioEngine()->outputSampleRate();
 
 		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
 		m_sample = Sample(std::move(buffer));

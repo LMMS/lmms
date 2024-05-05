@@ -74,7 +74,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+						sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 						auto pMin = port.min(sr);
 						auto pMax = port.max(sr);
 						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
