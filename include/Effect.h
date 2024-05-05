@@ -208,6 +208,8 @@ protected:
 	}
 	void reinitSRC();
 
+	virtual void onEnabledChanged() {}
+
 
 private:
 	EffectChain * m_parent;
