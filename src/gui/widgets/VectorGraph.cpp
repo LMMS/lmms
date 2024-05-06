@@ -2398,9 +2398,50 @@ int VectorGraphDataArray::getNearestLocation(float searchXIn, bool* foundOut, bo
 void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, std::vector<float>* sampleBufferOut)
 {
 	qDebug("getSamplesA1");
-	m_parent->lockGetSamplesAccess();
-	getSamples(targetSizeIn, nullptr, nullptr, sampleBufferOut);
-	m_parent->unlockGetSamplesAccess();
+
+	float stepSize = 1.0f / static_cast<float>(targetSizeIn);
+
+
+	// calculating the relative X locations (in lines) of the output samples
+	// sampleXLocations[sample_location] is equal to 0.0f if it is at the start of a line
+	// and it is equal to 1.0f if it is at the end of a line
+	std::vector<float> sampleXLocations(targetSizeIn);
+	for (unsigned int i = 0; i < m_dataArray.size(); i++)
+	{
+		unsigned int start = static_cast<unsigned int>
+			(std::ceil(m_dataArray[i].m_x / stepSize));
+		if (i + 1 < m_dataArray.size())
+		{
+			unsigned int end = static_cast<unsigned int>
+				(std::ceil(m_dataArray[i + 1].m_x / stepSize));
+			for (unsigned int j = start; j < end; j++)
+			{
+				sampleXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
+			}
+		}
+	}
+
+	if (sampleBufferOut != nullptr)
+	{
+		if (sampleBufferOut->size() != targetSizeIn)
+		{
+			sampleBufferOut->resize(targetSizeIn);
+		}
+
+		m_parent->lockGetSamplesAccess();
+		getSamplesInner(targetSizeIn, &sampleXLocations, nullptr, nullptr, sampleBufferOut);
+		m_parent->unlockGetSamplesAccess();
+	}
+	else
+	{
+		// this needs to be allocated for getSamplesInner to work
+		// because every effector VectorGraphDataArray uses this to return its m_bakedValues directly
+		std::vector<float> updatingSampleArray(targetSizeIn);
+
+		m_parent->lockGetSamplesAccess();
+		getSamplesInner(targetSizeIn, &sampleXLocations, nullptr, nullptr, &updatingSampleArray);
+		m_parent->unlockGetSamplesAccess();
+	}
 	qDebug("getSamplesA3 finished");
 }
 void VectorGraphDataArray::getLastSamples(std::vector<float>* sampleBufferOut)
@@ -3506,19 +3547,19 @@ void VectorGraphDataArray::getUpdatingOriginals()
 		qDebug("getUpatingOriginals final: [%d] -> %d", i, m_needsUpdating[i]);
 	}
 }
-void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
+void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, std::vector<float>* sampleXLocationsIn, bool* isChangedOut,
+		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
 {
 	bool effectorIsChanged = false;
 	//std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
 	std::vector<unsigned int> effectorUpdatingValues;
-	std::vector<float> effectorOutput;
-	std::vector<float> outputXLocations(targetSizeIn);
+	// sampleBufferOut will serve as the effector's sampleBufferOut until the new m_bakedSamples gets made
 	bool isEffected = m_effectorLocation >= 0;
 	if (isEffected == true)
 	{
-		m_parent->getDataArray(m_effectorLocation)->getSamples(targetSizeIn, &effectorIsChanged, &effectorUpdatingValues, &effectorOutput);
+		m_parent->getDataArray(m_effectorLocation)->getSamplesInner(targetSizeIn, sampleXLocationsIn, &effectorIsChanged, &effectorUpdatingValues, sampleBufferOut);
 	}
-	qDebug("getSamplesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
+	qDebug("getSamplesB1, size: %ld    - id: %d", sampleXLocationsIn->size(), m_id);
 
 	m_isDataChanged = m_isDataChanged || targetSizeIn != m_updatingBakedSamples.size();
 
@@ -3578,30 +3619,6 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChanged
 	// calculating point data and lines
 	if (m_needsUpdating.size() > 0 && m_updatingBakedSamples.size() > 0)
 	{
-		if (effectorOutput.size() != targetSizeIn)
-		{
-			effectorOutput.resize(targetSizeIn);
-		}
-		
-		// calculating relative X locations (in lines) of the output values
-		// for later use in the line calculations
-		// outputXLocations[sample_location] is equal to 0.0f if it is at the start of a line,
-		// it is equal to 1.0f if it is at the end of a line
-		for (unsigned int i = 0; i < m_dataArray.size(); i++)
-		{
-			unsigned int start = static_cast<unsigned int>
-				(std::ceil(m_dataArray[i].m_x / stepSize));
-			if (i + 1 < m_dataArray.size())
-			{
-				unsigned int end = static_cast<unsigned int>
-					(std::ceil(m_dataArray[i + 1].m_x / stepSize));
-				for (unsigned int j = start; j < end; j++)
-				{
-					outputXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
-					//qDebug("getSamplesB outputXLocations: [%d] [%d] %f", i, j, outputXLocations[j]);
-				}
-			}
-		}
 		// getting effectorDataArray pointer
 		VectorGraphDataArray* effector = nullptr;
 		if (m_effectorLocation >= 0 && m_parent->getDataArray(m_effectorLocation)->size() > 0)
@@ -3614,7 +3631,8 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChanged
 		// calculate final lines
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 		{
-			getSamplesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
+			// sampleBufferOut contains the effector m_bakedValues here
+			getSamplesUpdateLines(effector, sampleBufferOut, sampleXLocationsIn, i, stepSize);
 		}
 
 		m_parent->lockBakedSamplesAccess();
@@ -3637,18 +3655,15 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChanged
 		// clearing the updated values
 		m_needsUpdating.clear();
 	}
-	if (sampleBufferOut != nullptr)
-	{
-		m_parent->lockBakedSamplesAccess();
-		*sampleBufferOut = m_bakedSamples;
-		m_parent->unlockBakedSamplesAccess();
-	}
+	m_parent->lockBakedSamplesAccess();
+	*sampleBufferOut = m_bakedSamples;
+	m_parent->unlockBakedSamplesAccess();
 
 	m_isDataChanged = false;
 	qDebug("getSamplesB9");
 }
 void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
-	std::vector<float>* outputXLocations, unsigned int pointLocation, float stepSize)
+	std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize)
 {
 	qDebug("getSamplesD6.1  m_needsUpdating[%d]: %d", pointLocation, m_needsUpdating[pointLocation]);
 	unsigned int effectYLocation = static_cast<unsigned int>
@@ -3722,7 +3737,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// calculate curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*outputXLocations)[j]);
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*sampleXLocations)[j]);
 		}
 		// no line type
 	}
@@ -3731,50 +3746,50 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*outputXLocations)[j]);
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*sampleXLocations)[j]);
 		}
 		// line type
-		processLineTypeArraySine(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, fadeInStart);
+		processLineTypeArraySine(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, fadeInStart);
 	}
 	else if (type == 2)
 	{
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*outputXLocations)[j]);
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*sampleXLocations)[j]);
 		}
 		// line type
-		processLineTypeArraySineB(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
+		processLineTypeArraySineB(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	else if (type == 3)
 	{
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*outputXLocations)[j]);
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*sampleXLocations)[j]);
 		}
 		// line type
-		processLineTypeArrayPeak(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
+		processLineTypeArrayPeak(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	else if (type == 4)
 	{
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*outputXLocations)[j]);
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*sampleXLocations)[j]);
 		}
 		// line type
-		processLineTypeArraySteps(&m_updatingBakedSamples, outputXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
+		processLineTypeArraySteps(&m_updatingBakedSamples, sampleXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
 	}
 	else if (type == 5)
 	{
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*outputXLocations)[j]);
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*sampleXLocations)[j]);
 		}
 		// line type
-		processLineTypeArrayRandom(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
+		processLineTypeArrayRandom(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	if (effector != nullptr && getEffectLines(m_needsUpdating[pointLocation]) == true)
 	{

@@ -658,10 +658,11 @@ private:
 	void getUpdatingOriginals();
 
 	// real getSamples processing
-	void getSamples(unsigned int targetSizeIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
+	void getSamplesInner(unsigned int targetSizeIn, std::vector<float>* sampleXLocationsIn, bool* isChangedOut,
+		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// redraw lines
 	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
-		std::vector<float>* outputXLocations, unsigned int pointLocation, float stepSize);
+		std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize);
 	bool isEffectedPoint(unsigned int pointLocation);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
