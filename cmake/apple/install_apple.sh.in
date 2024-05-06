@@ -16,6 +16,9 @@ echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 qtpath="$(dirname "@QT_QMAKE_EXECUTABLE@")"
 export PATH="$PATH:$qtpath"
 
+# Qt6: Fix @rpath bug https://github.com/orgs/Homebrew/discussions/2823
+ln -sf "$qtpath/../lib" "@CMAKE_BINARY_DIR@/lib"
+
 # Remove any old .app bundles
 rm -Rf "$APP"
 
@@ -93,6 +96,25 @@ for file in "$APP/Contents/lib/lmms/"libcarla*; do
        "$_thisfile"
      rm -f "$APP/Contents/Frameworks/lib${lib}.dylib"
    done
+done
+
+# Fix libsndfile still linking to homebrew
+for _thisfile in "$APP/Contents/Frameworks/"libsndfile*.dylib; do
+    lines="$(otool -L "$_thisfile")"
+    while IFS= read -r line; do
+        # Trim off trailing "... (compatiblity version...""
+        _oldpath=$(echo "$line" | cut -d "(" -f 1)
+        if [[ $_oldpath == *"@loader_path/"* ]]; then
+            # Isolate lib name (may contain trailing whitespace)
+            lib=$(echo "$_oldpath" | rev | cut -d "/" -f 1| rev)
+            _newpath="@executable_path/../Frameworks/"$lib
+            if ! test -f "$_newpath"; then
+              # Copy any files that are missing
+              cp "$(brew --prefix)/lib/"$lib "$APP/Contents/Frameworks/"$lib
+            fi
+            install_name_tool -change $_oldpath $_newpath $_thisfile
+        fi
+    done <<< "$lines"
 done
 
 # Cleanup
