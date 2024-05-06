@@ -1,5 +1,5 @@
 /*
- * VectorGraph.cpp - Vector graph widget, model, helper class implementation
+ * VectorGraphViewBase.cpp - contains implementations of lmms widget classes for VectorGraph
  *
  * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
  *
