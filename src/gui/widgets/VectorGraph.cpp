@@ -560,50 +560,16 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, height() - 1, width() - 1, height() - 1);
 	p.drawLine(0, 0, 0, height() - 1);
 
-	std::vector<int> effectArrays;
 	std::vector<float> sampleBuffer;
 
 	// updating the VectorGraphDataArray samples before draw
 	if (m_useGetLastSamples == false)
 	{
-		// getting arrays that effect other arrays
-		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
-		{
-			// getting the current array's effector array
-			int curArrayEffector = model()->getDataArray(i)->getEffectorArrayLocation();
-
-			if (curArrayEffector != -1)
-			{
-				bool found = false;
-				// checking if it is already in the list
-				for (unsigned int k = 0; k < effectArrays.size(); k++)
-				{
-					if (curArrayEffector == effectArrays[k])
-					{
-						found = true;
-						break;
-					}
-				}
-				if (found == false)
-				{
-					effectArrays.push_back(curArrayEffector);
-				}
-			}
-		}
-
 		// updating arrays that do not effect other arrays first
+		// (this step will run getSamples() on effector arrays (-> every array will be updated about once))
 		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 		{
-			bool found = false;
-			for (unsigned int j = 0; j < effectArrays.size(); j++)
-			{
-				if (i == effectArrays[j])
-				{
-					found = true;
-					break;
-				}
-			}
-			if (found == false)
+			if (model()->getDataArray(i)->getIsAnEffector() == false)
 			{
 				// this updates the array and its effector arrays
 				// with width() sample count
@@ -647,6 +613,7 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 			posA = startPos;
 			pt.moveTo(startPos.first + 1, m_graphHeight - startPos.second);
 
+			// get the currently drawed VectorGraphDataArray samples
 			dataArray->getLastSamples(sampleBuffer);
 
 			qDebug("paint sampleBuffer size: %ld", sampleBuffer->size());
@@ -1600,7 +1567,7 @@ VectorGraphModel::~VectorGraphModel()
 	qDebug("VectorGraphModel dstc end");
 }
 
-unsigned int VectorGraphModel::addArray()
+unsigned int VectorGraphModel::addDataArray()
 {
 	VectorGraphDataArray tempArray(
 		false, false, false, false, false, false, false,
@@ -1610,9 +1577,9 @@ unsigned int VectorGraphModel::addArray()
 	return m_dataArrays.size() - 1;
 }
 
-void VectorGraphModel::delArray(unsigned int arrayLocation)
+void VectorGraphModel::deleteDataArray(unsigned int arrayLocation)
 {
-	qDebug("delArray");
+	qDebug("deleteDataArray");
 	std::vector<int> effectorArrayLocations(m_dataArrays.size());
 	for (unsigned int i = arrayLocation; i < m_dataArrays.size() - 1; i++)
 	{
@@ -1639,7 +1606,7 @@ void VectorGraphModel::delArray(unsigned int arrayLocation)
 	// setting updated locations
 	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
 	{
-		//qDebug("delArray end: set effector location: [%d], %d", i, effectorArrayLocations[i]);
+		//qDebug("deleteDataArray end: set effector location: [%d], %d", i, effectorArrayLocations[i]);
 		m_dataArrays[i].setEffectorArrayLocation(effectorArrayLocations[i], false);
 	}
 	emit dataChanged();
@@ -1896,6 +1863,7 @@ VectorGraphDataArray::VectorGraphDataArray(
 	m_fillColor = QColor(0, 0, 0, 0);
 
 	m_effectorLocation = -1;
+	m_isAnEffector = false;
 
 	// m_dataArray;
 	m_isDataChanged = false;
@@ -2050,6 +2018,7 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool call
 		if (found == false)
 		{
 			m_effectorLocation = arrayLocation;
+			m_parent->getDataArray(m_effectorLocation)->setIsAnEffector(true);
 			getUpdatingFromPoint(-1);
 			if (callDataChanged == true)
 			{
@@ -2061,7 +2030,20 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool call
 	{
 		if (m_effectorLocation != -1)
 		{
+			// checking if this VectorGraphDataArray's effector is an effector for an other VectorGraphDataArray
+			bool found = false;
+			for (unsigned int i = 0; i < m_parent->getDataArraySize(); i++)
+			{
+				if (m_parent->getDataArray(i)->getId() != m_id && m_parent->getDataArray(i)->getEffectorArrayLocation() == m_effectorLocation)
+				{
+					found = true;
+					break;
+				}
+			}
+			// setting the correct state for the effector array's m_isAnEffector
+			m_parent->getDataArray(m_effectorLocation)->setIsAnEffector(found);
 			m_effectorLocation = -1;
+
 			getUpdatingFromPoint(-1);
 			if (callDataChanged == true)
 			{
@@ -2070,6 +2052,11 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool call
 		}
 	}
 	return !found;
+}
+void VectorGraphDataArray::setIsAnEffector(bool bValue)
+{
+	m_isAnEffector = bValue;
+	// do not need to update anything after
 }
 
 bool VectorGraphDataArray::getIsFixedSize()
@@ -2127,6 +2114,10 @@ QColor* VectorGraphDataArray::getAutomatedColor()
 int VectorGraphDataArray::getEffectorArrayLocation()
 {
 	return m_effectorLocation;
+}
+bool VectorGraphDataArray::getIsAnEffector()
+{
+	return m_isAnEffector;
 }
 int VectorGraphDataArray::getId()
 {

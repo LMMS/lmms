@@ -284,11 +284,11 @@ public:
 		}
 	}
 	// returns added VectorGraphDataArray location
-	unsigned int addArray();
+	unsigned int addDataArray();
 	// deletes VectorGraphDataArray at arrayLocation
 	// preservs the order
-	void delArray(unsigned int arrayLocation);
-	inline void clearArray()
+	void deleteDataArray(unsigned int arrayLocation);
+	inline void clearDataArray()
 	{
 		m_dataArrays.clear();
 		emit dataChanged();
@@ -368,6 +368,7 @@ public:
 	// returns true if successful
 	// if callDataChanged then it will call dataChanged() --> paintEvent()
 	bool setEffectorArrayLocation(int arrayLocation, bool callDataChanged);
+	void setIsAnEffector(bool bValue);
 
 	bool getIsFixedSize();
 	bool getIsFixedX();
@@ -385,6 +386,7 @@ public:
 	// returns -1 if it has no effector
 
 	int getEffectorArrayLocation();
+	bool getIsAnEffector();
 	int getId();
 
 
@@ -690,6 +692,8 @@ private:
 
 	// which VectorGraphDataArray can effect this one, -1 if not effected
 	int m_effectorLocation;
+	// is this VectorGraphDataArray effects others?
+	bool m_isAnEffector;
 
 	// ordered array of VectorGraphPoints
 	std::vector<VectorGraphPoint> m_dataArray;
