@@ -49,7 +49,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_clipModel( false, this ),
 	m_vectorGraphSampleBuffer(200)
 {
-	unsigned int arrayLocation = m_vectorGraphModel.addArray();
+	unsigned int arrayLocation = m_vectorGraphModel.addDataArray();
 	// see other settings avalible for VectorGraphDataArray in VectorGraph.h
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
@@ -57,7 +57,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
 
-	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
+	unsigned int arrayLocationB = m_vectorGraphModel.addDataArray();
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
