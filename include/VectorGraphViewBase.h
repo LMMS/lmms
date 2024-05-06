@@ -1,5 +1,5 @@
 /*
- * VecorGraph.h - Vector graph widget and model implementation
+ * VectorGraphViewBase.h - contains implementations of lmms widget classes for VectorGraph
  *
  * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
  *
@@ -48,13 +48,14 @@ public:
 	VectorGraphViewBase(QWidget* parent);
 	~VectorGraphViewBase();
 
-
 protected slots:
 	virtual void contextMenuRemoveAutomation() = 0;
 	virtual void contextMenuExecConnectionDialog();
 protected:
+	// hints, SimpleTextFloat
 	void showHintText(QWidget* thisWidget, QString hintText, int msecBeforeDesplay, int msecDisplayTime);
 	void hideHintText();
+	// AutomationTrack
 	void connectToAutomationTrack(QMouseEvent* me, FloatModel* automationModel, QWidget* thisWidget);
 
 	// context menu
@@ -65,6 +66,7 @@ protected:
 	float showInputDialog(float curInputValue);
 
 private:
+	// context menu
 	void addDefaultActions(QMenu* menu,  QString controlDisplayText);
 
 	SimpleTextFloat* m_hintText;
