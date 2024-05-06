@@ -70,6 +70,8 @@ public:
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
 
+	void setViewWidth(int px);
+
 public slots:
 	void editControls();
 	void moveUp();
@@ -96,9 +98,9 @@ private:
 	QLabel* m_label;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
+	int m_viewWidth;
 	
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;

@@ -54,63 +54,55 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView(nullptr),
 	m_dragging(false)
 {
-	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
+	setViewWidth(EffectView::DEFAULT_WIDTH);
 
 	m_mainLayout = new QHBoxLayout();
 	m_mainLayout->setContentsMargins(8, 2, 8, 2);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
-	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
-	m_bypass->setEnabled( isEnabled );
+	m_bypass = new LedCheckBox(this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red);
+	m_bypass->setEnabled(isEnabled);
 	m_bypass->setToolTip(tr("On/Off"));
 	m_mainLayout->addWidget(m_bypass);
 
 	QFont labelFont = adjustedToPixelSize(font(), 10);
-	labelFont.setBold( true );
+	labelFont.setBold(true);
 	m_label = new QLabel(this);
 	m_label->setText(model()->displayName());
 	m_label->setFont(labelFont);
 	m_mainLayout->addWidget(m_label);
 
-	m_wetDry = new Knob( KnobType::Small17, this );
-	m_wetDry->setEnabled( isEnabled );
-	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
+	m_wetDry = new Knob(KnobType::Small17, this);
+	m_wetDry->setEnabled(isEnabled);
+	m_wetDry->setHintText(tr("Wet Level:"), "");
 	m_mainLayout->addWidget(m_wetDry);
 
-	m_autoQuit = new TempoSyncKnob( KnobType::Small17, this );
-	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
-	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
-	m_autoQuit->setVisible(!effect()->m_autoQuitDisabled);
+	m_autoQuit = new TempoSyncKnob(KnobType::Small17, this);
+	m_autoQuit->setEnabled(isEnabled && !effect()->m_autoQuitDisabled);
+	m_autoQuit->setHintText(tr( "Stop after:" ), "ms");
 	m_mainLayout->addWidget(m_autoQuit);
 
-	m_gate = new Knob( KnobType::Small17, this );
-	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
-	m_gate->setHintText( tr( "Gate:" ), "" );
-	m_gate->setVisible(!effect()->m_autoQuitDisabled);
-	m_mainLayout->addWidget(m_gate);
+	setModel(_model);
 
-
-	setModel( _model );
-
-	if( effect()->controls()->controlCount() > 0 )
+	if(effect()->controls()->controlCount() > 0)
 	{
 		auto ctls_btn = new QPushButton(tr("UI"), this);
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont(adjustedToPixelSize(f, 10));
 		ctls_btn->setFixedSize(20, 20);
 		m_mainLayout->addWidget(ctls_btn);
-		connect( ctls_btn, SIGNAL(clicked()),
+		connect(ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if( m_controlView )
+		if(m_controlView)
 		{
-			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controlView);
 
-			if ( !m_controlView->isResizable() )
+			if (!m_controlView->isResizable())
 			{
-				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+				m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 				if (m_subWindow->layout())
 				{
 					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -119,9 +111,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 			Qt::WindowFlags flags = m_subWindow->windowFlags();
 			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags( flags );
+			m_subWindow->setWindowFlags(flags);
 
-			connect( m_controlView, SIGNAL(closed()),
+			connect(m_controlView, SIGNAL(closed()),
 					this, SLOT(closeEffects()));
 
 			m_subWindow->hide();
@@ -265,10 +257,10 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	QPainterPath path;
-	path.addRoundedRect(QRectF(2, 2, EffectView::DEFAULT_WIDTH - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
-	QPen pen(Qt::black, 2);
+	path.addRoundedRect(QRectF(2, 2, m_viewWidth - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
+	QPen pen(Qt::black, 1);
 	p.setPen(pen);
-	p.fillPath(path, QColor(32, 34, 36));
+	p.fillPath(path, QColor(0x3b, 0x42, 0x4a));
 	p.drawPath(path);
 }
 
@@ -280,7 +272,12 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
-	m_gate->setModel( &effect()->m_gateModel );
+}
+
+void EffectView::setViewWidth(int px)
+{
+	m_viewWidth = px;
+	setFixedSize(m_viewWidth, EffectView::DEFAULT_HEIGHT);
 }
 
 } // namespace lmms::gui

@@ -48,7 +48,6 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_bufferCount( 0 ),
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
-	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Gate" ) ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
 	m_autoQuitDisabled( false )
 {
@@ -89,7 +88,6 @@ void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_enabledModel.saveSettings( _doc, _this, "on" );
 	m_wetDryModel.saveSettings( _doc, _this, "wet" );
 	m_autoQuitModel.saveSettings( _doc, _this, "autoquit" );
-	m_gateModel.saveSettings( _doc, _this, "gate" );
 	controls()->saveState( _doc, _this );
 }
 
@@ -101,7 +99,6 @@ void Effect::loadSettings( const QDomElement & _this )
 	m_enabledModel.loadSettings( _this, "on" );
 	m_wetDryModel.loadSettings( _this, "wet" );
 	m_autoQuitModel.loadSettings( _this, "autoquit" );
-	m_gateModel.loadSettings( _this, "gate" );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
@@ -144,19 +141,19 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate( double _out_sum )
+void Effect::checkGate(double _out_sum)
 {
-	if( m_autoQuitDisabled )
+	if(m_autoQuitDisabled)
 	{
 		return;
 	}
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum - gate() <= typeInfo<float>::minEps() )
+	if(_out_sum <= typeInfo<float>::minEps())
 	{
 		incrementBufferCount();
-		if( bufferCount() > timeout() )
+		if(bufferCount() > timeout())
 		{
 			stopRunning();
 			resetBufferCount();

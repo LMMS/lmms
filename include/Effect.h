@@ -125,12 +125,6 @@ public:
 		return 1.0f - m_wetDryModel.value();
 	}
 
-	inline float gate() const
-	{
-		const float level = m_gateModel.value();
-		return level*level * m_processors;
-	}
-
 	inline f_cnt_t bufferCount() const
 	{
 		return m_bufferCount;
@@ -227,7 +221,6 @@ private:
 
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;
-	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
 	
 	bool m_autoQuitDisabled;
