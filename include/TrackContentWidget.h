@@ -49,17 +49,17 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	Q_OBJECT
 
 	// qproperties for track background gradients
-	Q_PROPERTY( QBrush darkerColor READ darkerColor WRITE setDarkerColor )
-	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
-	Q_PROPERTY( QBrush coarseGridColor READ coarseGridColor WRITE setCoarseGridColor )
-	Q_PROPERTY( QBrush fineGridColor READ fineGridColor WRITE setFineGridColor )
-	Q_PROPERTY( QBrush horizontalColor READ horizontalColor WRITE setHorizontalColor )
-	Q_PROPERTY( QBrush embossColor READ embossColor WRITE setEmbossColor )
+	Q_PROPERTY(QBrush darkerColor READ darkerColor WRITE setDarkerColor)
+	Q_PROPERTY(QBrush lighterColor READ lighterColor WRITE setLighterColor)
+	Q_PROPERTY(QBrush coarseGridColor READ coarseGridColor WRITE setCoarseGridColor)
+	Q_PROPERTY(QBrush fineGridColor READ fineGridColor WRITE setFineGridColor)
+	Q_PROPERTY(QBrush horizontalColor READ horizontalColor WRITE setHorizontalColor)
+	Q_PROPERTY(QBrush embossColor READ embossColor WRITE setEmbossColor)
 
-	Q_PROPERTY( int coarseGridWidth READ coarseGridWidth WRITE setCoarseGridWidth )
-	Q_PROPERTY( int fineGridWidth READ fineGridWidth WRITE setFineGridWidth )
-	Q_PROPERTY( int horizontalWidth READ horizontalWidth WRITE setHorizontalWidth )
-	Q_PROPERTY( int embossWidth READ embossWidth WRITE setEmbossWidth )
+	Q_PROPERTY(int coarseGridWidth READ coarseGridWidth WRITE setCoarseGridWidth)
+	Q_PROPERTY(int fineGridWidth READ fineGridWidth WRITE setFineGridWidth)
+	Q_PROPERTY(int horizontalWidth READ horizontalWidth WRITE setHorizontalWidth)
+	Q_PROPERTY(int embossWidth READ embossWidth WRITE setEmbossWidth)
 
 	Q_PROPERTY(int embossOffset READ embossOffset WRITE setEmbossOffset)
 
@@ -100,12 +100,12 @@ public:
 
 	int embossOffset() const;
 
-	void setDarkerColor( const QBrush & c );
-	void setLighterColor( const QBrush & c );
-	void setCoarseGridColor( const QBrush & c );
-	void setFineGridColor( const QBrush & c );
-	void setHorizontalColor( const QBrush & c );
-	void setEmbossColor( const QBrush & c);
+	void setDarkerColor(const QBrush & c);
+	void setLighterColor(const QBrush & c);
+	void setCoarseGridColor(const QBrush & c);
+	void setFineGridColor(const QBrush & c);
+	void setHorizontalColor(const QBrush & c);
+	void setEmbossColor(const QBrush & c);
 
 	void setCoarseGridWidth(const int & c);
 	void setFineGridWidth(const int & c);
