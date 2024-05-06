@@ -658,7 +658,7 @@ private:
 	void getUpdatingOriginals();
 
 	// real getSamples processing
-	void getSamplesInner(unsigned int targetSizeIn, std::vector<float>* sampleXLocationsIn, bool* isChangedOut,
+	void getSamplesInner(unsigned int targetSizeIn, bool* isChangedOut,
 		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// redraw lines
 	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
