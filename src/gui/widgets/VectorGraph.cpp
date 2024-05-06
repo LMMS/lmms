@@ -1119,33 +1119,36 @@ float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation, bo
 				output = model()->getDataArray(m_selectedArray)->getEffectedAttribLocation(m_selectedLocation);
 				break;
 			case 8:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffectOnlyPoints(m_selectedLocation);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffectPoints(m_selectedLocation);
 				break;
 			case 9:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 0);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffectLines(m_selectedLocation);
 				break;
 			case 10:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 1);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 0);
 				break;
 			case 11:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 2);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 1);
 				break;
 			case 12:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 3);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 2);
 				break;
 			case 13:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 4);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 3);
 				break;
 			case 14:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 5);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 4);
 				break;
 			case 15:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 6);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 5);
 				break;
 			case 16:
-				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 7);
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 6);
 				break;
 			case 17:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 7);
+				break;
+			case 18:
 				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 8);
 				break;
 		}
@@ -1228,33 +1231,36 @@ void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, flo
 				model()->getDataArray(m_selectedArray)->setEffectedAttrib(m_selectedLocation, clampedValueB);
 				break;
 			case 8:
-				model()->getDataArray(m_selectedArray)->setEffectOnlyPoints(m_selectedLocation, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffectPoints(m_selectedLocation, boolValue);
 				break;
 			case 9:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffectLines(m_selectedLocation, boolValue);
 				break;
 			case 10:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, boolValue);
 				break;
 			case 11:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, boolValue);
 				break;
 			case 12:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 3, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, boolValue);
 				break;
 			case 13:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 4, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 3, boolValue);
 				break;
 			case 14:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 5, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 4, boolValue);
 				break;
 			case 15:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 6, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 5, boolValue);
 				break;
 			case 16:
-				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 7, boolValue);
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 6, boolValue);
 				break;
 			case 17:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 7, boolValue);
+				break;
+			case 18:
 				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 8, boolValue);
 				break;
 		}
@@ -1333,7 +1339,7 @@ QString VectorGraphView::getTextFromDisplayLength(QString text, unsigned int dis
 QString VectorGraphView::getTextForAutomatableEffectableOrType(unsigned int controlLocation)
 {
 	QString output;
-	if (controlLocation >= 0 && controlLocation <= 7)
+	if (controlLocation >= 5 && controlLocation <= 7)
 	{
 		bool isTrue = false;
 		int typeVal = static_cast<int>(getInputAttribValue(controlLocation, &isTrue));
@@ -2653,9 +2659,9 @@ void VectorGraphDataArray::setEffectedAttrib(unsigned int pointLocation, unsigne
 		m_dataArray[pointLocation].m_automatedEffectedAttribLocations = attribLocation + getAutomatedAttribLocation(pointLocation);
 
 		getUpdatingFromPoint(pointLocation);
-		// if the current point can effect line before it
+		// if the current point can effect the line before it
 		// update the point before it
-		if (getEffectOnlyPoints(pointLocation) == false && pointLocation > 0)
+		if (getEffectPoints(pointLocation) == false && pointLocation > 0)
 		{
 			getUpdatingFromPoint(pointLocation - 1);
 		}
@@ -2670,31 +2676,58 @@ unsigned int VectorGraphDataArray::getEffectedAttribLocation(unsigned int pointL
 {
 	return m_dataArray[pointLocation].m_automatedEffectedAttribLocations % 4;
 }
-bool VectorGraphDataArray::getEffectOnlyPoints(unsigned int pointLocation)
+bool VectorGraphDataArray::getEffectPoints(unsigned int pointLocation)
 {
-	return (m_dataArray[pointLocation].m_effectOnlyPoints == true || getEffectedAttribLocation(pointLocation) > 0);
+	// be careful with changing this
+	return (m_dataArray[pointLocation].m_effectPoints == true || getEffectedAttribLocation(pointLocation) > 0);
 }
-void VectorGraphDataArray::setEffectOnlyPoints(unsigned int pointLocation, bool bValue)
+bool VectorGraphDataArray::getEffectLines(unsigned int pointLocation)
+{
+	// be careful with changing this
+	// m_effectLines ought to be false if lines (each sample) can not be changed
+	return (m_dataArray[pointLocation].m_effectLines == true && getEffectedAttribLocation(pointLocation) == 0);
+}
+void VectorGraphDataArray::setEffectPoints(unsigned int pointLocation, bool bValue)
 {
 	if (m_isAutomatableEffectable == true && m_isEditableAttrib == true)
 	{
-		if (m_dataArray[pointLocation].m_effectOnlyPoints != bValue)
+		if (m_dataArray[pointLocation].m_effectPoints != bValue)
 		{
-			// getEffectOnlyPoints does not return m_effecteOnlyPoints
-			bool dataChangedValue = getEffectOnlyPoints(pointLocation);
-			m_dataArray[pointLocation].m_effectOnlyPoints = bValue;
+			// getEffectPoints does not return m_effectePoints
+			bool dataChangedValue = getEffectPoints(pointLocation);
+			m_dataArray[pointLocation].m_effectPoints = bValue;
 			// this change does effect the main output if this
 			// data array is an effector of an other so dataChanged() 
 			// and getUpdatingFromPoint is called
-			if (dataChangedValue != getEffectOnlyPoints(pointLocation))
+			if (dataChangedValue != getEffectPoints(pointLocation))
 			{
 				getUpdatingFromPoint(pointLocation);
-				// if the current point can effect line before it
+				// if the current point can effect the line before it
 				// update the point before it
-				if (getEffectedAttribLocation(pointLocation) <= 0&& pointLocation > 0)
+				if (getEffectedAttribLocation(pointLocation) <= 0 && pointLocation > 0)
 				{
 					getUpdatingFromPoint(pointLocation - 1);
 				}
+			}
+			dataChanged();
+		}
+	}
+}
+void VectorGraphDataArray::setEffectLines(unsigned int pointLocation, bool bValue)
+{
+	if (m_isAutomatableEffectable == true && m_isEditableAttrib == true)
+	{
+		if (m_dataArray[pointLocation].m_effectLines != bValue)
+		{
+			// getEffectLines does not return m_effectLines
+			bool dataChangedValue = getEffectLines(pointLocation);
+			m_dataArray[pointLocation].m_effectLines = bValue;
+			// this change does effect the main output if this
+			// data array is an effector of an other so dataChanged() 
+			// and getUpdatingFromPoint is called
+			if (dataChangedValue != getEffectLines(pointLocation))
+			{
+				getUpdatingFromPoint(pointLocation);
 			}
 			dataChanged();
 		}
@@ -2769,9 +2802,9 @@ void VectorGraphDataArray::setEffect(unsigned int pointLocation, unsigned int ef
 				break;
 		}
 		getUpdatingFromPoint(pointLocation);
-		// if the current point can effect line before it
+		// if the current point can effect the line before it
 		// update the point before it
-		if (getEffectOnlyPoints(pointLocation) == false && pointLocation > 0)
+		if (getEffectPoints(pointLocation) == true && pointLocation > 0)
 		{
 			getUpdatingFromPoint(pointLocation - 1);
 		}
@@ -3315,21 +3348,24 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		// translating the effector data array locations to m_dataArray locations
 		bool found = false;
 		bool isBefore = false;
+		// this can return -1
 		int locationBefore = getNearestLocation(effector->getX((*updatingPointLocations)[i]), &found, &isBefore);
 		qDebug("getUpdatingFromEffector getNearestLocation before: %d, i: %d", locationBefore, i);
-		if (isBefore == false && locationBefore >= 0 && getEffectOnlyPoints(locationBefore) == true)
+		if (isBefore == true && locationBefore > 0 && getEffectPoints(locationBefore) == true)
 		{
 			qDebug("getUpdatingFromEffector locationBefore = %d - 1", locationBefore);
-			// lines before could be effected eaven if the current nearest point
-			// can only be effected (its line can not be effected)
+			// the line (or point) before might be effected if the current nearest point
+			// is effected in some way
 			// so subtract 1
 			// remember points control the line after (connected to) them
 			// but in this case changes in the points position can effect the line before it
 			locationBefore--;
+			// now (here) locationBefore is Always before (*updatingPointLocations)[i]
 		}
 		// clamp
 		locationBefore = locationBefore < 0 ? 0 :
 			m_dataArray.size() - 1 < locationBefore ? m_dataArray.size() - 1 : locationBefore;
+
 		isBefore = false;
 		int locationAfter = getNearestLocation(effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), &found, &isBefore);
 		qDebug("getUpdatingFromEffector getNearestLocation after: %d, updatingEnd: %d (+ %d), ex: %f, dx: %f", locationAfter, updatingEnd, updatingEndSlide, effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
@@ -3357,13 +3393,26 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			m_dataArray.size() - 1 < locationAfter ? m_dataArray.size() - 1 : locationAfter;
 
 		qDebug("getUpdatingFromEffector start: %d, end: %d", locationBefore, locationAfter);
+
+		// if the last point was updated (ture in case of j = 0)
+		bool lastUpdated = true;
 		// adding the values between locationBefore, locationAfter
 		for (unsigned int j = locationBefore; j <= locationAfter; j++)
 		{
-			if (isEffectedPoint(j) == true)
+			// update only if effected
+			if (isEffectedPoint(j) == true && (getEffectPoints(j) == true || getEffectLines(j) == true))
 			{
 				qDebug("getUpdatingFromEffector: [%d] -> %d", i, j);
 				m_needsUpdating.push_back(j);
+				if (lastUpdated == false && getEffectPoints(j) == true)
+				{
+					m_needsUpdating.push_back(j - 1);
+				}
+				lastUpdated = true;
+			}
+			else
+			{
+				lastUpdated = false;
 			}
 		}
 		if (i < updatingEnd)
@@ -3626,7 +3675,7 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 	float curC = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_c, 1);
 	float curValA = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_valA, 2);
 	float curValB = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_valB, 3);
-	if (effector != nullptr && getEffectOnlyPoints(m_needsUpdating[pointLocation]) == true)
+	if (effector != nullptr && getEffectPoints(m_needsUpdating[pointLocation]) == true && getEffectLines(m_needsUpdating[pointLocation]) == false)
 	{
 		curY = processEffect(m_needsUpdating[pointLocation], curY, 0, curEffectY);
 		curC = processEffect(m_needsUpdating[pointLocation], curC, 1, curEffectY);
@@ -3647,12 +3696,11 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 		end = effectYLocation;
 		nextY = processAutomation(m_needsUpdating[pointLocation] + 1, m_dataArray[m_needsUpdating[pointLocation] + 1].m_y, 0);
 
-		// if the current point can only be effected (and not its line)
-		// and the next point can only be effected
-		// this is done to avoid adding effectorSamples to the line and to the next point (line's end point) at the same time
-		if (effector != nullptr && getEffectOnlyPoints(m_needsUpdating[pointLocation] + 1) == true &&
-			((getEffectOnlyPoints(m_needsUpdating[pointLocation]) == true && isEffectedPoint(m_needsUpdating[pointLocation]) == true) ||
-			isEffectedPoint(m_needsUpdating[pointLocation]) == false))
+		bool isCurEffected = isEffectedPoint(m_needsUpdating[pointLocation]);
+		// if the next point (y location) can be effected
+		// and the current point's line is uneffected
+		if (effector != nullptr && getEffectPoints(m_needsUpdating[pointLocation] + 1) == true &&
+			(getEffectLines(m_needsUpdating[pointLocation]) == false || isCurEffected == false))
 		{
 			nextEffectY = (*effectorSamples)[effectYLocation];
 			nextY = processEffect(m_needsUpdating[pointLocation] + 1, nextY, 0, nextEffectY);
@@ -3740,7 +3788,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// line type
 		processLineTypeArrayRandom(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
-	if (effector != nullptr && getEffectOnlyPoints(m_needsUpdating[pointLocation]) == false)
+	if (effector != nullptr && getEffectLines(m_needsUpdating[pointLocation]) == true)
 	{
 		int startB = m_needsUpdating[pointLocation] == 0 ? 0 : start;
 		int endB = m_needsUpdating[pointLocation] >= m_dataArray.size() - 1 ? m_updatingBakedSamples.size() : end;
