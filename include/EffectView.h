@@ -35,6 +35,8 @@ class QGroupBox;
 class QLabel;
 class QPushButton;
 class QMdiSubWindow;
+class QHBoxLayout;
+class QLabel;
 
 namespace lmms::gui
 {
@@ -62,7 +64,7 @@ public:
 	}
 
 	static constexpr int DEFAULT_WIDTH = 215;
-	static constexpr int DEFAULT_HEIGHT = 60;
+	static constexpr int DEFAULT_HEIGHT = 35;
 	
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
@@ -89,8 +91,9 @@ protected:
 
 
 private:
-	QPixmap m_bg;
+	QHBoxLayout* m_mainLayout;
 	LedCheckBox * m_bypass;
+	QLabel* m_label;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
 	Knob * m_gate;

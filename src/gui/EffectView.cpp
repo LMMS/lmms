@@ -28,6 +28,9 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
+#include <QPainterPath>
+#include <QBoxLayout>
+#include <QLabel>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -47,51 +50,56 @@ namespace lmms::gui
 
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
-	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( nullptr ),
 	m_controlView(nullptr),
 	m_dragging(false)
 {
 	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
 
+	m_mainLayout = new QHBoxLayout();
+	m_mainLayout->setContentsMargins(8, 2, 8, 2);
+
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
-	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
-
 	m_bypass->setToolTip(tr("On/Off"));
+	m_mainLayout->addWidget(m_bypass);
 
+	QFont labelFont = adjustedToPixelSize(font(), 10);
+	labelFont.setBold( true );
+	m_label = new QLabel(this);
+	m_label->setText(model()->displayName());
+	m_label->setFont(labelFont);
+	m_mainLayout->addWidget(m_label);
 
-	m_wetDry = new Knob( KnobType::Bright26, this );
-	m_wetDry->setLabel( tr( "W/D" ) );
-	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
+	m_wetDry = new Knob( KnobType::Small17, this );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
+	m_mainLayout->addWidget(m_wetDry);
 
-
-	m_autoQuit = new TempoSyncKnob( KnobType::Bright26, this );
-	m_autoQuit->setLabel( tr( "DECAY" ) );
-	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
+	m_autoQuit = new TempoSyncKnob( KnobType::Small17, this );
 	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
+	m_autoQuit->setVisible(!effect()->m_autoQuitDisabled);
+	m_mainLayout->addWidget(m_autoQuit);
 
-
-	m_gate = new Knob( KnobType::Bright26, this );
-	m_gate->setLabel( tr( "GATE" ) );
-	m_gate->move( 116 - m_gate->width() / 2, 5 );
+	m_gate = new Knob( KnobType::Small17, this );
 	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
+	m_gate->setVisible(!effect()->m_autoQuitDisabled);
+	m_mainLayout->addWidget(m_gate);
 
 
 	setModel( _model );
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		auto ctls_btn = new QPushButton(tr("Controls"), this);
+		auto ctls_btn = new QPushButton(tr("UI"), this);
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont(adjustedToPixelSize(f, 10));
-		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		ctls_btn->setFixedSize(20, 20);
+		m_mainLayout->addWidget(ctls_btn);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
@@ -123,7 +131,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
-
+	setLayout(m_mainLayout);
 	//move above vst effect view creation
 	//setModel( _model );
 }
@@ -255,18 +263,13 @@ void EffectView::mouseMoveEvent(QMouseEvent* event)
 void EffectView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-	p.drawPixmap( 0, 0, m_bg );
 
-	QFont f = adjustedToPixelSize(font(), 10);
-	f.setBold( true );
-	p.setFont( f );
-
-	QString elidedText = p.fontMetrics().elidedText( model()->displayName(), Qt::ElideRight, width() - 22 );
-
-	p.setPen( palette().shadow().color() );
-	p.drawText( 6, 55, elidedText );
-	p.setPen( palette().text().color() );
-	p.drawText( 5, 54, elidedText );
+	QPainterPath path;
+	path.addRoundedRect(QRectF(2, 2, EffectView::DEFAULT_WIDTH - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
+	QPen pen(Qt::black, 2);
+	p.setPen(pen);
+	p.fillPath(path, QColor(32, 34, 36));
+	p.drawPath(path);
 }
 
 
