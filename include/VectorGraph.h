@@ -213,13 +213,13 @@ private:
 	unsigned int m_controlDisplayCount;
 	unsigned int m_controlDisplayPage;
 	bool m_isEditingActive;
-	std::array<QString, 18> m_controlText =
+	std::array<QString, 19> m_controlText =
 	{
 		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
 		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
-		tr("switch graph effected value"), tr("can only effect graph points"), tr("\"add\" effect"), tr("\"subtract\" effect"),
-		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
-		tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
+		tr("switch graph effected value"), tr("can this point be effected"), tr("can this line be effected"), tr("\"add\" effect"),
+		tr("\"subtract\" effect"), tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"),
+		tr("\"log\" effect"), tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
 	std::array<QString, 6> m_controlLineTypeText = {
 		tr("none"),
@@ -229,12 +229,12 @@ private:
 		tr("steps"),
 		tr("random")
 	};
-	std::array<bool, 18> m_controlIsFloat = {
+	std::array<bool, 19> m_controlIsFloat = {
 		true, true, true, true,
 		true, false, false,
 		false, false, false, false,
 		false, false, false, false,
-		false, false, false
+		false, false, false, false
 	};
 
 	std::pair<int, int> m_lastTrackPoint;
@@ -446,10 +446,12 @@ public:
 	// returns attribLocation: 0 = m_y, 1 = m_c, 2 = m_valA, 3 = m_valB (int VectorGraphPoint)
 	unsigned int getAutomatedAttribLocation(unsigned int pointLocation);
 	unsigned int getEffectedAttribLocation(unsigned int pointLocation);
-	// returns true when m_effectOnlyPoints is true or
-	// when getEffectedAttribLocation > 0 (y is uneffected)
-	// -> when the current point CAN effect lines before it
-	bool getEffectOnlyPoints(unsigned int pointLocation);
+	// returns true when m_effectPoints is true or
+	// when getEffectedAttribLocation() > 0 (y is uneffected)
+	bool getEffectPoints(unsigned int pointLocation);
+	// returns true when m_effectLines is true and
+	// when getEffectedAttribLocation() == 0 (y is effected)
+	bool getEffectLines(unsigned int pointLocation);
 	// returns if the effectId-th effect is active
 	bool getEffect(unsigned int pointLocation, unsigned int effectId);
 	// true when the automationModel's value changed since last check
@@ -485,6 +487,7 @@ public:
 	// sort -> sort input positions
 	// callDataChanged -> call dataChanged() after -> paintEvent()
 	// PointF = std::pair<float, float>
+	// ()the std::vector<PointF>* inputDataArray modifies the array)
 	void setDataArray(std::vector<PointF>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
 	void setDataArray(std::vector<float>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
 	void setDataArray(float* inputDataArray, unsigned int size, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
@@ -517,8 +520,11 @@ public:
 	// sets what attribute gets effected (by effector array)
 	void setEffectedAttrib(unsigned int pointLocation, unsigned int attribLocation);
 	// checks m_isAutomatableEffectable and m_isEditableAttrib
-	// if bValue is true then the effector array will not effect the line's individual samples
-	void setEffectOnlyPoints(unsigned int pointLocation, bool bValue);
+	// if bValue is true then the effector array will effect the point's attributes
+	void setEffectPoints(unsigned int pointLocation, bool bValue);
+	// checks m_isAutomatableEffectable and m_isEditableAttribs
+	// if bValue is true then the effector array will effect the line's individual samples (only when y is effected)
+	void setEffectLines(unsigned int pointLocation, bool bValue);
 	// checks m_isAutomatableEffectable and m_isEditableAttrib
 	// sets the point's effect type
 	void setEffect(unsigned int pointLocation, unsigned int effectId, bool bValue);
@@ -580,10 +586,12 @@ private:
 		// use getAutomatedAttrib or getEffectedAttrib to get it
 		unsigned int m_automatedEffectedAttribLocations = 0;
 
-		// if the point's line should effect only pointss
-		// getEffectOnlyPoints() will return true when
+		// if the point attributes should be effected,
+		// getEffectPoints() will return true when
 		// effected attrib location > 0
-		bool m_effectOnlyPoints = false;
+		bool m_effectPoints = false;
+		// if the line (each sample) should be effected (only works when y is effected)
+		bool m_effectLines = true;
 
 		bool m_effectAdd = false;
 		bool m_effectSubtract = false;
