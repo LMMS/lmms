@@ -3458,13 +3458,7 @@ void VectorGraphDataArray::getUpdatingFromAutomation()
 }
 void VectorGraphDataArray::getUpdatingOriginals()
 {
-	// selecting only original values
-	// TODO this might be faster if the sort happens before
-	std::vector<unsigned int> originalValues;
-	if (m_needsUpdating.size() > 0)
-	{
-		originalValues.push_back(m_needsUpdating[0]);
-	}
+	// selecting only original values and sorting
 
 	// Debug testing
 	for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
@@ -3472,51 +3466,45 @@ void VectorGraphDataArray::getUpdatingOriginals()
 		qDebug("getUpatingOriginals: [%d] -> %d", i, m_needsUpdating[i]);
 	}
 
-	for (unsigned int i = 1; i < m_needsUpdating.size(); i++)
-	{
-		bool found = false;
-		for (unsigned int j = 0; j < originalValues.size(); j++)
-		{
-			if (m_needsUpdating[i] == originalValues[j])
-			{
-				found = true;
-				break;
-			}
-		}
-		if (found == false)
-		{
-			originalValues.push_back(m_needsUpdating[i]);
-		}
-	}
-
 	// sorting the array
-	// this is done to optimize the functions that use
-	// m_needsUpdating in getSamples()
-	std::sort(originalValues.begin(), originalValues.end(),
+	// this is done becaues functions that use m_needsUpdating
+	// are optimized for a sorted array
+	std::sort(m_needsUpdating.begin(), m_needsUpdating.end(),
 		[](unsigned int a, unsigned int b)
 		{
 			return a < b;
 		});
 
-	// removing invalid locations
-	// because sometimes deleted locations can be in originalValues
-	for (unsigned int i = 0; i < originalValues.size(); i++)
+	// removing duplicates
+	int sizeDiff = 0;
+	for (int i = 1; i < m_needsUpdating.size(); i++)
 	{
-		if (originalValues[i] >= m_dataArray.size())
+		if (m_needsUpdating[i - 1 + sizeDiff] == m_needsUpdating[i + sizeDiff])
 		{
-			originalValues.resize(i);
+			for (unsigned int j = i + sizeDiff; j < m_needsUpdating.size() - 1 + sizeDiff; j++)
+			{
+				m_needsUpdating[j] = m_needsUpdating[j + 1];
+			}
+			sizeDiff--;
+		}
+	}
+	m_needsUpdating.resize(m_needsUpdating.size() + sizeDiff);
+
+	// removing invalid locations
+	// because sometimes deleted locations can be in m_needsUpdating
+	for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+	{
+		if (m_needsUpdating[i] >= m_dataArray.size())
+		{
+			m_needsUpdating.resize(i);
 			break;
 		}
 	}
 	
-
-	m_needsUpdating = originalValues;
-	/*
 	for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 	{
 		qDebug("getUpatingOriginals final: [%d] -> %d", i, m_needsUpdating[i]);
 	}
-	*/
 }
 void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
 {
