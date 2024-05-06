@@ -563,7 +563,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	std::vector<float> sampleBuffer;
 
 	// updating the VectorGraphDataArray samples before draw
-	if (m_useGetLastSamples == false)
+	if (m_useGetLastSamples == false || m_isSimplified == true)
 	{
 		// updating arrays that do not effect other arrays first
 		// (this step will run getSamples() on effector arrays (-> every array will be updated about once))
@@ -3240,30 +3240,34 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 	{
 		count = 0;
 	}
-	std::vector<float> randomValues(static_cast<int>(50.0f * (randomCount + 1.0f)) * 2);
 
-	float blend = 10.0f + randomSeed * 10.0f;
-	int randomSeedB = static_cast<int>(blend);
-	blend = blend - randomSeedB;
-	std::srand(randomSeedB);
+	unsigned int randomValuesSize = static_cast<unsigned int>(50.0f * (randomCount + 1.0f)) * 2;
 
-	// getting the random values
-	// generating 2 seeds and blending in between them
-	for (unsigned int i = 0; i < randomValues.size() / 2; i++)
+	if (randomValuesSize > 0)
 	{
-		randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
-	}
-	std::srand(randomSeedB + 1);
-	for (unsigned int i = randomValues.size() / 2; i < randomValues.size(); i++)
-	{
-		randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
-	}
+		float randomValues[randomValuesSize];
 
-	// blending
-	if (randomValues.size() > 0)
-	{
+		float blend = 10.0f + randomSeed * 10.0f;
+		int randomSeedB = static_cast<int>(blend);
+		blend = blend - randomSeedB;
+
+		std::srand(randomSeedB);
+
+		// getting the random values
+		// generating 2 seeds and blending in between them
+		for (unsigned int i = 0; i < randomValuesSize / 2; i++)
+		{
+			randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
+		}
+		std::srand(randomSeedB + 1);
+		for (unsigned int i = randomValuesSize / 2; i < randomValuesSize; i++)
+		{
+			randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
+		}
+
+		// blending
 		// real size
-		float size = static_cast<float>(randomValues.size() / 2);
+		float size = static_cast<float>(randomValuesSize / 2);
 		for (unsigned int i = 0; i < count; i++)
 		{
 			float randomValueX = (*xArray)[startLoc + i] * size;
