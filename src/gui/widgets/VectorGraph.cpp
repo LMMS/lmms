@@ -2399,37 +2399,19 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, std::vector<flo
 {
 	qDebug("getSamplesA1");
 
-	float stepSize = 1.0f / static_cast<float>(targetSizeIn);
-
-
-	// calculating the relative X locations (in lines) of the output samples
-	// sampleXLocations[sample_location] is equal to 0.0f if it is at the start of a line
-	// and it is equal to 1.0f if it is at the end of a line
-	std::vector<float> sampleXLocations(targetSizeIn);
-	for (unsigned int i = 0; i < m_dataArray.size(); i++)
-	{
-		unsigned int start = static_cast<unsigned int>
-			(std::ceil(m_dataArray[i].m_x / stepSize));
-		if (i + 1 < m_dataArray.size())
-		{
-			unsigned int end = static_cast<unsigned int>
-				(std::ceil(m_dataArray[i + 1].m_x / stepSize));
-			for (unsigned int j = start; j < end; j++)
-			{
-				sampleXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
-			}
-		}
-	}
-
 	if (sampleBufferOut != nullptr)
 	{
 		if (sampleBufferOut->size() != targetSizeIn)
 		{
 			sampleBufferOut->resize(targetSizeIn);
 		}
+		for (unsigned int i = 0; i < targetSizeIn; i++)
+		{
+			(*sampleBufferOut)[i] = 0;
+		}
 
 		m_parent->lockGetSamplesAccess();
-		getSamplesInner(targetSizeIn, &sampleXLocations, nullptr, nullptr, sampleBufferOut);
+		getSamplesInner(targetSizeIn, nullptr, nullptr, sampleBufferOut);
 		m_parent->unlockGetSamplesAccess();
 	}
 	else
@@ -2439,7 +2421,7 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, std::vector<flo
 		std::vector<float> updatingSampleArray(targetSizeIn);
 
 		m_parent->lockGetSamplesAccess();
-		getSamplesInner(targetSizeIn, &sampleXLocations, nullptr, nullptr, &updatingSampleArray);
+		getSamplesInner(targetSizeIn, nullptr, nullptr, &updatingSampleArray);
 		m_parent->unlockGetSamplesAccess();
 	}
 	qDebug("getSamplesA3 finished");
@@ -3547,7 +3529,7 @@ void VectorGraphDataArray::getUpdatingOriginals()
 		qDebug("getUpatingOriginals final: [%d] -> %d", i, m_needsUpdating[i]);
 	}
 }
-void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, std::vector<float>* sampleXLocationsIn, bool* isChangedOut,
+void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isChangedOut,
 		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
 {
 	bool effectorIsChanged = false;
@@ -3557,9 +3539,9 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, std::vecto
 	bool isEffected = m_effectorLocation >= 0;
 	if (isEffected == true)
 	{
-		m_parent->getDataArray(m_effectorLocation)->getSamplesInner(targetSizeIn, sampleXLocationsIn, &effectorIsChanged, &effectorUpdatingValues, sampleBufferOut);
+		m_parent->getDataArray(m_effectorLocation)->getSamplesInner(targetSizeIn, &effectorIsChanged, &effectorUpdatingValues, sampleBufferOut);
 	}
-	qDebug("getSamplesB1, size: %ld    - id: %d", sampleXLocationsIn->size(), m_id);
+	qDebug("getSamplesB1, size: %d    - id: %d", targetSizeIn, m_id);
 
 	m_isDataChanged = m_isDataChanged || targetSizeIn != m_updatingBakedSamples.size();
 
@@ -3619,6 +3601,25 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, std::vecto
 	// calculating point data and lines
 	if (m_needsUpdating.size() > 0 && m_updatingBakedSamples.size() > 0)
 	{
+		// calculating the relative X locations (in lines) of the output samples
+		// sampleXLocations[sample_location] is equal to 0.0f if it is at the start of a line
+		// and it is equal to 1.0f if it is at the end of a line
+		std::vector<float> sampleXLocations(targetSizeIn);
+		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		{
+			unsigned int start = static_cast<unsigned int>
+				(std::ceil(m_dataArray[i].m_x / stepSize));
+			if (i + 1 < m_dataArray.size())
+			{
+				unsigned int end = static_cast<unsigned int>
+					(std::ceil(m_dataArray[i + 1].m_x / stepSize));
+				for (unsigned int j = start; j < end; j++)
+				{
+					sampleXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
+				}
+			}
+		}
+
 		// getting effectorDataArray pointer
 		VectorGraphDataArray* effector = nullptr;
 		if (m_effectorLocation >= 0 && m_parent->getDataArray(m_effectorLocation)->size() > 0)
@@ -3632,7 +3633,7 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, std::vecto
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 		{
 			// sampleBufferOut contains the effector m_bakedValues here
-			getSamplesUpdateLines(effector, sampleBufferOut, sampleXLocationsIn, i, stepSize);
+			getSamplesUpdateLines(effector, sampleBufferOut, &sampleXLocations, i, stepSize);
 		}
 
 		m_parent->lockBakedSamplesAccess();
