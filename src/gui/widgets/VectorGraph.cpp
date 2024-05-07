@@ -1877,6 +1877,7 @@ VectorGraphDataArray::VectorGraphDataArray(
 	// m_updatingBakedSamples
 	// m_needsUpdating;
 	// m_automationModelArray;
+	// m_universalSampleBuffer
 
 	m_id = arrayId;
 	updateConnections(parent);
@@ -3184,15 +3185,20 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 	{
 		end = end > count ? count : end + 1;
 	}
-	// allocate 1 part of a sine wave on the stack
-	float oneWave[end];
+	// "allocate" "end" amount of floats
+	// for 1 whole sine wave
+	// in the universal buffer
+	if (m_universalSampleBuffer.size() < end)
+	{
+		m_universalSampleBuffer.resize(end);
+	}
 
 	// calculate 1 wave of sine
 	for (unsigned int i = 0; i < end; i++)
 	{
 		// 628.318531f = 100.0f * 2.0f * pi
 		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
-		oneWave[i] = sineAmp * std::sin(
+		m_universalSampleBuffer[i] = sineAmp * std::sin(
 			(*xArray)[startLoc + i] * 628.318531f * tValB + sinePhase * 100.0f);
 	}
 	//qDebug("sineB_2");
@@ -3204,7 +3210,7 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 		for (unsigned int j = 0; j < endB; j++)
 		{
 			//qDebug("sineB_2.5: i: %d, %d, %d", endB, j, i + j);
-			(*samplesOut)[startLoc + j + i] += oneWave[j];
+			(*samplesOut)[startLoc + j + i] += m_universalSampleBuffer[j];
 		}
 	}
 
@@ -3301,7 +3307,13 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 
 	if (randomValuesSize > 0)
 	{
-		float randomValues[randomValuesSize];
+		// "allocate" "randomValuesSize" amount of floats
+		// for generating random values
+		// in the universal buffer
+		if (m_universalSampleBuffer.size() < randomValuesSize)
+		{
+			m_universalSampleBuffer.resize(randomValuesSize);
+		}
 
 		float blend = 10.0f + randomSeed * 10.0f;
 		int randomSeedB = static_cast<int>(blend);
@@ -3313,12 +3325,12 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 		// generating 2 seeds and blending in between them
 		for (unsigned int i = 0; i < randomValuesSize / 2; i++)
 		{
-			randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
+			m_universalSampleBuffer[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
 		}
 		std::srand(randomSeedB + 1);
 		for (unsigned int i = randomValuesSize / 2; i < randomValuesSize; i++)
 		{
-			randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
+			m_universalSampleBuffer[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
 		}
 
 		// blending
@@ -3329,7 +3341,7 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 			float randomValueX = (*xArray)[startLoc + i] * size;
 			float randomValueLocation = std::floor(randomValueX);
 			(*samplesOut)[startLoc + i] += -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
-				(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) * randomAmp;
+				(m_universalSampleBuffer[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + m_universalSampleBuffer[static_cast<int>(randomValueLocation + size)] * blend) * randomAmp;
 		}
 	}
 }
@@ -3541,7 +3553,7 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 	{
 		m_parent->getDataArray(m_effectorLocation)->getSamplesInner(targetSizeIn, &effectorIsChanged, &effectorUpdatingValues, sampleBufferOut);
 	}
-	qDebug("getSamplesB1, size: %d    - id: %d", targetSizeIn, m_id);
+	qDebug("getSamplesInnerB1, size: %d    - id: %d", targetSizeIn, m_id);
 
 	m_isDataChanged = m_isDataChanged || targetSizeIn != m_updatingBakedSamples.size();
 
@@ -3570,12 +3582,12 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 			// before use (in this case it is already sorted)
 			getUpdatingFromEffector(&effectorUpdatingValues);
 		}
-	qDebug("getSamplesB2");
+	qDebug("getSamplesInnerB2");
 		getUpdatingFromAutomation();
 		// sort and select only original
 		// values
 		getUpdatingOriginals();
-	qDebug("getSamplesB3");
+	qDebug("getSamplesInnerB3");
 	}
 	else
 	{
@@ -3594,7 +3606,7 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 		{
 			m_needsUpdating[i] = i;
 		}
-		qDebug("getSamplesB4, needsUpdating size: %ld", m_needsUpdating.size());
+		qDebug("getSamplesInnerB4, needsUpdating size: %ld", m_needsUpdating.size());
 	}
 
 	float stepSize = 1.0f / static_cast<float>(targetSizeIn);
@@ -3627,7 +3639,7 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 			effector = m_parent->getDataArray(m_effectorLocation);
 		}
 
-		qDebug("getSamplesB6, updatingsize: %ld", m_needsUpdating.size());
+		qDebug("getSamplesInnerB6, updatingsize: %ld", m_needsUpdating.size());
 
 		// calculate final lines
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
@@ -3661,7 +3673,7 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 	m_parent->unlockBakedSamplesAccess();
 
 	m_isDataChanged = false;
-	qDebug("getSamplesB9");
+	qDebug("getSamplesInnerB9");
 }
 void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
 	std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize)

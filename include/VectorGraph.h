@@ -737,6 +737,10 @@ private:
 	// used for automation
 	std::vector<FloatModel*> m_automationModelArray;
 
+	// used in lineType calculations to store
+	// large amount of floats without reallocation
+	std::vector<float> m_universalSampleBuffer;
+
 	// used for saving
 	friend class lmms::VectorGraphModel;
 };
