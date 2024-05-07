@@ -96,7 +96,7 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 
 void TrackContentWidget::updateBackground()
-{
+{		
 	// use snapSize to determine number of lines to draw
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 
@@ -106,14 +106,17 @@ void TrackContentWidget::updateBackground()
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 
 	// Coarse grid appears every bar (less frequently if quantization > 1 bar)
-	// Fine grid handles smaller grids
 	float coarseGridResolution = (snapSize >= 1) ? snapSize : 1;
+	// Fine grid appears within bars
 	float fineGridResolution = snapSize;
-	// Decrease fine grid resolution if it results in less than
-	// 4 pixels between each line
-	while ((ppb * fineGridResolution) < MIN_PIXELS_BETWEEN_LINES)
-	{
-		fineGridResolution *= 2;
+	// Increase fine grid resolution (size between lines) if it results in less than	
+	// 4 pixels between each line to avoid cluttering
+	float pixelsBetweenLines = ppb * snapSize;
+	if (pixelsBetweenLines < MIN_PIXELS_BETWEEN_LINES) {
+		// Scale fineGridResolution so that there are enough pixels between lines
+		// scaleFactor should be a power of 2
+		int scaleFactor = 1 << static_cast<int>( std::ceil( std::log2( MIN_PIXELS_BETWEEN_LINES / pixelsBetweenLines ) ) );
+		fineGridResolution *= scaleFactor;
 	}
 
 	int w = ppb * BARS_PER_GROUP;
@@ -127,14 +130,14 @@ void TrackContentWidget::updateBackground()
 	// draw lines
 	// draw fine grid
 	pmp.setPen( QPen( fineGridColor(), fineGridWidth() ) );
-	for( float x = 0; x < w * 2; x += ppb * fineGridResolution )
+	for (float x = 0; x < w * 2; x += ppb * fineGridResolution)
 	{
-		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
+		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
 	// draw coarse grid
 	pmp.setPen( QPen( coarseGridColor(), coarseGridWidth() ) );
-	for( float x = 0; x < w * 2; x += ppb * coarseGridResolution )
+	for (float x = 0; x < w * 2; x += ppb * coarseGridResolution)
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
