@@ -98,28 +98,6 @@ for file in "$APP/Contents/lib/lmms/"libcarla*; do
    done
 done
 
-# Fix libsndfile still linking to homebrew
-for _thisfile in "$APP/Contents/Frameworks/"libsndfile*.dylib; do
-    lines="$(otool -L "$_thisfile")"
-    while IFS= read -r line; do
-        # Trim off trailing "... (compatiblity version...""
-        _oldpath=$(echo "$line" | cut -d "(" -f 1)
-        if [[ $_oldpath == *"@loader_path/"* ]]; then
-            # Isolate lib name (may contain trailing whitespace)
-            lib=$(echo "$_oldpath" | rev | cut -d "/" -f 1| rev)
-            # shellcheck disable=SC2086
-            _newpath="@executable_path/../Frameworks/"$lib
-            if ! test -f "$_newpath"; then
-              # Copy any files that are missing
-              # shellcheck disable=SC2086
-              cp "$(brew --prefix)/lib/"$lib "$APP/Contents/Frameworks/"$lib
-            fi
-            # shellcheck disable=SC2086
-            install_name_tool -change $_oldpath $_newpath $_thisfile
-        fi
-    done <<< "$lines"
-done
-
 # Cleanup
 rm -rf "$APP/Contents/bin"
 
