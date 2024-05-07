@@ -186,6 +186,10 @@ void VectorGraphView::setIsSimplified(bool isSimplified)
 {
 	m_isSimplified = isSimplified;
 }
+bool VectorGraphView::getIsSimplified()
+{
+	return m_isSimplified;
+}
 
 PointF VectorGraphView::getSelectedData()
 {
