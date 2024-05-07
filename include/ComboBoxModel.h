@@ -47,10 +47,7 @@ public:
 	{
 	}
 
-	~ComboBoxModel() override
-	{
-		clear();
-	}
+	~ComboBoxModel() override {}
 
 	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
 
