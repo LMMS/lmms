@@ -90,6 +90,7 @@ public:
 	// draws estimated line, does not call getSamples()
 	// does not fill graphs with VectorGraphDataArray FillColor
 	void setIsSimplified(bool isSimplified);
+	bool getIsSimplified();
 
 	// returns -1.0f at .first when nothing is selected
 	PointF getSelectedData();
