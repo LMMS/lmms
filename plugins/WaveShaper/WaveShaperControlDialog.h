@@ -46,8 +46,11 @@ public:
 	~WaveShaperControlDialog() override = default;
 
 
+private slots:
+	void simplifyClicked();
 private:
-
+	
+	VectorGraphView* m_vectorGraphWidget;
 } ;
 
 

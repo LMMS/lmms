@@ -67,8 +67,6 @@ public:
 
 	std::vector<float>* getGraphSamples();
 
-
-
 private slots:
 	void resetClicked();
 
@@ -82,7 +80,6 @@ private:
 	WaveShaperEffect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
-	//graphModel m_wavegraphModel;
 	VectorGraphModel m_vectorGraphModel;
 	BoolModel  m_clipModel;
 
