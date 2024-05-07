@@ -29,6 +29,7 @@
 #include "AutomatableModel.h"
 #include "PluginView.h"
 #include "Effect.h"
+#include "EffectLabelButton.h"
 
 class QGraphicsOpacityEffect;
 class QGroupBox;
@@ -37,6 +38,7 @@ class QPushButton;
 class QMdiSubWindow;
 class QHBoxLayout;
 class QLabel;
+class QToolButton;
 
 namespace lmms::gui
 {
@@ -95,7 +97,7 @@ protected:
 private:
 	QHBoxLayout* m_mainLayout;
 	LedCheckBox * m_bypass;
-	QLabel* m_label;
+	EffectLabelButton* m_label;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
 	QMdiSubWindow * m_subWindow;
@@ -105,6 +107,7 @@ private:
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;
 
+	friend class EffectLabelButton;
 } ;
 
 

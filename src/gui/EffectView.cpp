@@ -31,6 +31,7 @@
 #include <QPainterPath>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QToolButton>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -59,6 +60,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_mainLayout = new QHBoxLayout();
 	m_mainLayout->setContentsMargins(8, 2, 8, 2);
 
+	auto hasControls = effect()->controls()->controlCount() > 0;
+
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
 	m_bypass = new LedCheckBox(this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red);
@@ -67,10 +70,15 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_mainLayout->addWidget(m_bypass);
 
 	QFont labelFont = adjustedToPixelSize(font(), 10);
-	labelFont.setBold(true);
-	m_label = new QLabel(this);
+	m_label = new EffectLabelButton(this, this);
 	m_label->setText(model()->displayName());
 	m_label->setFont(labelFont);
+	m_label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+
+	if(hasControls)
+	{
+		connect(m_label, SIGNAL(clicked()), this, SLOT(editControls()));
+	}
 	m_mainLayout->addWidget(m_label);
 
 	m_wetDry = new Knob(KnobType::Small17, this);
@@ -81,20 +89,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit = new TempoSyncKnob(KnobType::Small17, this);
 	m_autoQuit->setEnabled(isEnabled && !effect()->m_autoQuitDisabled);
 	m_autoQuit->setHintText(tr( "Stop after:" ), "ms");
+	m_autoQuit->setVisible(!effect()->m_autoQuitDisabled);
 	m_mainLayout->addWidget(m_autoQuit);
 
 	setModel(_model);
 
-	if(effect()->controls()->controlCount() > 0)
+	if(hasControls)
 	{
-		auto ctls_btn = new QPushButton(tr("UI"), this);
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont(adjustedToPixelSize(f, 10));
-		ctls_btn->setFixedSize(20, 20);
-		m_mainLayout->addWidget(ctls_btn);
-		connect(ctls_btn, SIGNAL(clicked()),
-					this, SLOT(editControls()));
-
 		m_controlView = effect()->controls()->createView();
 		if(m_controlView)
 		{
@@ -124,8 +125,6 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
 	setLayout(m_mainLayout);
-	//move above vst effect view creation
-	//setModel( _model );
 }
 
 
@@ -148,11 +147,13 @@ void EffectView::editControls()
 			m_subWindow->show();
 			m_subWindow->raise();
 			effect()->controls()->setViewVisible( true );
+			m_label->setDown(true);
 		}
 		else
 		{
 			m_subWindow->hide();
 			effect()->controls()->setViewVisible( false );
+			m_label->setDown(false);
 		}
 	}
 }
@@ -255,9 +256,10 @@ void EffectView::mouseMoveEvent(QMouseEvent* event)
 void EffectView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-
 	QPainterPath path;
+	
 	path.addRoundedRect(QRectF(2, 2, m_viewWidth - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
+
 	QPen pen(Qt::black, 1);
 	p.setPen(pen);
 	p.fillPath(path, QColor(0x3b, 0x42, 0x4a));
