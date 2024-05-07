@@ -162,6 +162,8 @@ void WaveShaperControls::setDefaultShape()
 	}
 }
 
+
+
 void WaveShaperControls::resetClicked()
 {
 	setDefaultShape();
