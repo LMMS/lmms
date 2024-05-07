@@ -222,12 +222,7 @@ IF(LMMS_BUILD_LINUX AND WANT_VST)
 ENDIF()
 
 # Resolve qmake to full path for use in packaging scripts
-if(WANT_QT6)
-	find_program(QT_QMAKE_EXECUTABLE NAME qmake.exe
-		PATHS "${CMAKE_PREFIX_PATH}/bin" /opt/Qt6/bin) # TODO: add more paths here
-else()
-	get_target_property(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
-endif()
+get_target_property(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
 
 # Find the location of Qt translation files
 execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
