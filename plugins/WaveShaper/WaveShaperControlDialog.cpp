@@ -40,7 +40,8 @@ namespace lmms::gui
 
 WaveShaperControlDialog::WaveShaperControlDialog(
 					WaveShaperControls * _controls ) :
-	EffectControlDialog( _controls )
+	EffectControlDialog(_controls),
+	m_vectorGraphWidget(nullptr)
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -49,17 +50,14 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	auto curGraph = new VectorGraphView(this, 204, 205, 8, 30, 3, false);
-	curGraph->setModel(&_controls->m_vectorGraphModel);
-	curGraph->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
+	m_vectorGraphWidget = new VectorGraphView(this, 204, 205, 8, 30, 3, false);
+	m_vectorGraphWidget->setModel(&_controls->m_vectorGraphModel);
+	m_vectorGraphWidget->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
 	// this can cause problems with custom colors
-	curGraph->applyDefaultColors();
+	m_vectorGraphWidget->applyDefaultColors();
 	// custom colors can be set this way (but this garph uses applyDefaultColros()):
-	//curGraph->setLineColor(QColor(210, 50, 50, 255), arrayLocation);
-	//curGraph->setActiveColor(QColor(210, 50, 50, 255), arrayLocation);
-	//curGraph->setFillColor(QColor(210, 50, 50, 255), arrayLocation);
-	//curGraph->setAutomatedColor(QColor(210, 50, 50, 255), arrayLocation);
-	curGraph->move(10, 6);
+	// example: m_vectorGraphWidget->setLineColor(QColor(210, 50, 50, 255), arrayLocation);
+	m_vectorGraphWidget->move(10, 6);
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);
 	inputKnob -> setVolumeKnob( true );
@@ -78,11 +76,18 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
-	resetButton -> move(142, 225);
+	resetButton -> move(162, 225);
 	resetButton -> resize( 13, 46 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	resetButton->setToolTip(tr("Reset wavegraph"));
+
+	auto simplifyButton = new PixmapButton(this, tr("Simplify graph displayed"));
+	simplifyButton->move(112, 225);
+	simplifyButton->resize(13, 46);
+	simplifyButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("simplify_active"));
+	simplifyButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("simplify_inactive"));
+	simplifyButton->setToolTip(tr("Simplify the graph display for performance"));
 
 	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::LedColor::Green);
 	clipInputToggle -> move( 131, 252 );
@@ -91,7 +96,19 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 
 	connect( resetButton, SIGNAL (clicked () ),
 			_controls, SLOT ( resetClicked() ) );
+	connect(simplifyButton, SIGNAL(clicked()),
+			this, SLOT(simplifyClicked()));
 }
 
+void WaveShaperControlDialog::simplifyClicked()
+{
+	qDebug("simplifyClicked run");
+	if (m_vectorGraphWidget != nullptr)
+	{
+		qDebug("simplifyClicked turn on");
+		m_vectorGraphWidget->setIsSimplified(!m_vectorGraphWidget->getIsSimplified());
+		m_vectorGraphWidget->model()->updateGraphModel(true);
+	}
+}
 
 } // namespace lmms::gui
