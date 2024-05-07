@@ -57,7 +57,6 @@ Plugin::Descriptor PLUGIN_EXPORT phaser_plugin_descriptor =
 constexpr float PHA_NOISE_FLOOR = 0.00001f;
 constexpr double PHA_LOG = 2.2;
 
-
 PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&phaser_plugin_descriptor, parent, key),
 	m_phaserControls(this)
