@@ -95,27 +95,58 @@ for file in "$APP/Contents/lib/lmms/"libcarla*; do
    done
 done
 
-# Fix libsndfile still linking to homebrew
-for _thisfile in "$APP/Contents/Frameworks/"libsndfile*.dylib; do
-    lines="$(otool -L "$_thisfile")"
+# Attempts to fix a "Frameworks" library which uses @loader_path instead of
+# @executable_path.  Despite the function parameter using a the system library
+# location, this will only attempt to repair the matching filename in the app
+# bundle.
+#
+# See also: https://github.com/LMMS/lmms/issues/7244
+#
+# Usage:
+#    fix_linking "@SndFile_LIBRARY@"
+#
+fix_framework() {
+    sys_lib="$1"
+
+    # Sadly, the lib names are inconsistent (e.g. foo.1.2.3.dylib vs foo.1.dylib ).  Use globbing to guess.
+    lib_name=$(basename "$1")
+    # Remove file extension
+    match=$(echo "$lib_name" | cut -d "." -f1 )
+    # Hope there's only one match
+    app_lib="$(ls "$APP/Contents/Frameworks/"$match*.dylib)"
+    otool_lines="$(otool -L "$app_lib")"
+
+    is_debug=0
+    is_fixed=0
     while IFS= read -r line; do
         # Trim off trailing "... (compatiblity version...""
-        _oldpath=$(echo "$line" | cut -d "(" -f 1)
-        if [[ $_oldpath == *"@loader_path/"* ]]; then
-            # Isolate lib name (may contain trailing whitespace)
-            lib=$(echo "$_oldpath" | rev | cut -d "/" -f 1| rev)
-            # shellcheck disable=SC2086
-            _newpath="@executable_path/../Frameworks/"$lib
-            if ! test -f "$_newpath"; then
-              # Copy any files that are missing
-              # shellcheck disable=SC2086
-              cp "$(brew --prefix)/lib/"$lib "$APP/Contents/Frameworks/"$lib
+        rpath_orig=$(echo "$line" | cut -d "(" -f 1 | xargs)
+        if [[ $rpath_orig == *"@loader_path/"* ]]; then
+            # Isolate dependency lib name (xargs removes trailing whitespace)
+            dep_lib="$(echo "$rpath_orig" | rev | cut -d "/" -f 1 | rev | xargs)"
+            if [ $is_debug -eq 1 ]; then
+                echo "-- Fixing $(basename "$1") @loader_path entry for $dep_lib..."
             fi
-            # shellcheck disable=SC2086
-            install_name_tool -change $_oldpath $_newpath $_thisfile
+            rpath_new="@executable_path/../Frameworks/$dep_lib"
+            app_lib_dep="$APP/Contents/Frameworks/$dep_lib"
+            if ! test -f "$app_lib_dep"; then
+                # Assuming any missing files can be found adjacent
+                sys_lib_dep="$(dirname "$sys_lib")/$dep_lib"
+                cp "$sys_lib_dep" "$app_lib_dep"
+            fi
+            install_name_tool -change "$rpath_orig" "$rpath_new" "$app_lib" 2>/dev/null
+            is_fixed=1
         fi
-    done <<< "$lines"
-done
+    done <<< "$otool_lines"
+
+    if [ $is_debug -eq 1 ] && [ $is_fixed -eq 1 ]; then
+        echo -e "\nBEFORE/AFTER:"
+        # diff returns non-zero exit code
+        diff -u --color=always <(echo "$otool_lines" ) <(otool -L "$app_lib") || true
+    fi
+}
+
+fix_framework "@SndFile_LIBRARY@"
 
 # Cleanup
 rm -rf "$APP/Contents/bin"
