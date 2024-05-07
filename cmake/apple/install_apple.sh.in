@@ -113,6 +113,7 @@ fix_framework() {
     # Remove file extension
     match=$(echo "$lib_name" | cut -d "." -f1 )
     # Hope there's only one match
+    # shellcheck disable=SC2086
     app_lib="$(ls "$APP/Contents/Frameworks/"$match*.dylib)"
     otool_lines="$(otool -L "$app_lib")"
 
