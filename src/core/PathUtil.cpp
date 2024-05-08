@@ -204,7 +204,7 @@ namespace lmms::PathUtil
 	std::string cleanName(std::string_view path)
 	{
 		const auto fileInfo = QFileInfo{QString::fromUtf8(path.data(), path.size())};
-		return std::string{stripPrefix(fileInfo.baseName().toStdString())};
+		return stripPrefix(fileInfo.baseName()).toStdString();
 	}
 
 	QString oldRelativeUpgrade(const QString & input)
