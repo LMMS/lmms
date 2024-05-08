@@ -352,8 +352,8 @@ lmms--gui--TrackView > QWidget {
 /* track background config */
 lmms--gui--TrackContentWidget {
 	/* colors */
-	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
-	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(20, 20, 20), stop:1 rgb(15, 15, 15));
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(40, 40, 40), stop:1 rgb(30, 30, 30));
 	qproperty-coarseGridColor: rgba(0, 0, 0, 160);
 	qproperty-fineGridColor: rgba(0, 0, 0, 80);
 	qproperty-horizontalColor: rgba(0, 0, 0, 160);
