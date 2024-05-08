@@ -115,7 +115,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 		tr("Continue sample playback across notes"));
 
 	m_ampKnob = new Knob(KnobType::Bright26, this);
-	m_ampKnob->setVolumeKnob(true);
+	m_ampKnob->setVolKnobType(VolKnobType::AbsVol);
 	m_ampKnob->move(5, 108);
 	m_ampKnob->setHintText(tr("Amplify:"), "%");
 
