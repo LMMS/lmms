@@ -62,12 +62,14 @@ SET(LMMS_SRCS
 	gui/editors/TrackContainerView.cpp
 
 	gui/instrument/EnvelopeAndLfoView.cpp
+	gui/instrument/EnvelopeGraph.cpp
 	gui/instrument/InstrumentFunctionViews.cpp
 	gui/instrument/InstrumentMidiIOView.cpp
 	gui/instrument/InstrumentTuningView.cpp
 	gui/instrument/InstrumentSoundShapingView.cpp
 	gui/instrument/InstrumentTrackWindow.cpp
 	gui/instrument/InstrumentView.cpp
+	gui/instrument/LfoGraph.cpp
 	gui/instrument/PianoView.cpp
 
 	gui/menus/MidiPortMenu.cpp
@@ -129,10 +131,3 @@ SET(LMMS_SRCS
 	PARENT_SCOPE
 )
 
-set(LMMS_UIS
-	${LMMS_UIS}
-	gui/modals/about_dialog.ui
-	gui/modals/export_project.ui
-
-	PARENT_SCOPE
-)

@@ -48,9 +48,7 @@ public:
 	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 private:
-	void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain ) override;
+	void writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames) override;
 
 	using BufferList = QList<QPair<sampleFrame*, fpp_t>>;
 	BufferList m_buffers;

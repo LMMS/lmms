@@ -46,7 +46,7 @@ INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2023)
+SET(PROJECT_YEAR 2024)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -94,8 +94,8 @@ OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
-OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
-OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
+OPTION(WANT_VST_32	"Include 32-bit Windows VST support" ON)
+OPTION(WANT_VST_64	"Include 64-bit Windows VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
@@ -131,6 +131,9 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_WINMM ON)
 	SET(BUNDLE_QT_TRANSLATIONS ON)
 	SET(LMMS_HAVE_WINMM TRUE)
+	if(NOT LMMS_BUILD_WIN64)
+		set(WANT_VST_64 OFF)
+	endif()
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_OSS "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
@@ -176,7 +179,7 @@ check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.6.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
 FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
 INCLUDE_DIRECTORIES(
@@ -587,26 +590,42 @@ IF(WANT_SNDIO)
 ENDIF(WANT_SNDIO)
 
 # check for WINE
-IF(WANT_VST)
-	FIND_PACKAGE(Wine)
-	IF(WINE_FOUND)
-		SET(LMMS_SUPPORT_VST TRUE)
-		IF(WINE_LIBRARY_FIX)
-			SET(STATUS_VST "OK, with workaround linking ${WINE_LIBRARY_FIX}")
-		ELSE()
-			SET(STATUS_VST "OK")
-		ENDIF()
-	ELSEIF(WANT_VST_NOWINE)
-		SET(LMMS_SUPPORT_VST TRUE)
-		SET(STATUS_VST "OK")
-	ELSE(WINE_FOUND)
-		SET(STATUS_VST "not found, please install (lib)wine-dev (or similar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
-	ENDIF(WINE_FOUND)
-ENDIF(WANT_VST)
-IF(LMMS_BUILD_WIN32)
-	SET(LMMS_SUPPORT_VST TRUE)
-	SET(STATUS_VST "OK")
-ENDIF(LMMS_BUILD_WIN32)
+if(WANT_VST)
+	if((WANT_VST_32 OR WANT_VST_64) AND NOT LMMS_BUILD_WIN32)
+		find_package(Wine)
+		include(CheckWineGcc)
+	endif()
+	macro(check_vst bits)
+		if(NOT WANT_VST_${bits})
+			set(STATUS_VST_${bits} "Not built, as requested")
+		elseif(LMMS_BUILD_WIN32)
+			set(STATUS_VST_${bits} "OK")
+			set(LMMS_HAVE_VST_${bits} TRUE)
+		elseif(NOT WINE_FOUND)
+			set(STATUS_VST_${bits} "not found, please install (lib)wine-dev (or similar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
+		else()
+			CheckWineGcc("${bits}" "${WINEGCC}" WINEGCC_WORKING)
+			if(WINEGCC_WORKING)
+				set(LMMS_HAVE_VST_${bits} TRUE)
+				if(WINE_LIBRARY_FIX)
+					set(STATUS_VST_${bits} "OK, with workaround linking ${WINE_LIBRARY_FIX}")
+				else()
+					set(STATUS_VST_${bits} "OK")
+				endif()
+			else()
+				set(STATUS_VST_${bits} "winegcc fails to compile ${bits}-bit binaries, please make sure you have ${bits}-bit GCC libraries")
+			endif()
+		endif()
+	endmacro()
+	check_vst(32)
+	check_vst(64)
+	if(LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64 OR LMMS_BUILD_LINUX)
+		set(LMMS_HAVE_VST TRUE)
+		set(STATUS_VST "OK")
+	else()
+		set(STATUS_VST "No hosts selected and available")
+	endif()
+endif()
 
 IF(WANT_DEBUG_FPE)
 	IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -852,8 +871,9 @@ MESSAGE(
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Sid instrument              : ${STATUS_SID}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
-"* VST-instrument hoster       : ${STATUS_VST}\n"
-"* VST-effect hoster           : ${STATUS_VST}\n"
+"* VST plugin host             : ${STATUS_VST}\n"
+"  * 32-bit Windows host       : ${STATUS_VST_32}\n"
+"  * 64-bit Windows host       : ${STATUS_VST_64}\n"
 "* CALF LADSPA plugins         : ${STATUS_CALF}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"

@@ -234,7 +234,9 @@ lmms--gui--GroupBox {
 lmms--gui--Oscilloscope {
 	background: none;
 	border: none;
-	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-leftChannelColor: rgb(71, 253, 133);
+	qproperty-rightChannelColor: rgb(238, 253, 71);
+	qproperty-otherChannelsColor: rgb(71, 235, 253);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -692,9 +694,9 @@ lmms--gui--MixerChannelView QGraphicsView {
 
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
-	qproperty-peakGreen: #0ad45c;
-	qproperty-peakYellow: #d6ec52;
-	qproperty-peakRed: #c12038;
+	qproperty-peakOk: #0ad45c;
+	qproperty-peakWarn: #d6ec52;
+	qproperty-peakClip: #c12038;
 }
 
 lmms--gui--TimeLineWidget {
@@ -1038,6 +1040,7 @@ lmms--gui--CompressorControlDialog {
 	qproperty-textColor: rgba(209, 216, 228, 50);
 	qproperty-graphColor: rgba(209, 216, 228, 50);
 	qproperty-resetColor: rgba(200, 100, 15, 200);
+	qproperty-backgroundColor: rgba(7, 8, 9, 255);
 }
 
 lmms--gui--CompressorControlDialog lmms--gui--Knob {

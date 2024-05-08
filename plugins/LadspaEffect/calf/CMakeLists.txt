@@ -35,12 +35,14 @@ SET_TARGET_PROPERTIES(veal PROPERTIES PREFIX "")
 TARGET_COMPILE_DEFINITIONS(veal PRIVATE DISABLE_OSC=1)
 
 SET(INLINE_FLAGS "")
+SET(OTHER_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
+	SET(OTHER_FLAGS -Wno-format-overflow)
 ENDIF()
 
 IF(NOT MSVC)
-	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
+	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS} ${OTHER_FLAGS})
 endif()
 
 if(MSVC)

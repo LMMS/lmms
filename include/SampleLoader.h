@@ -39,7 +39,7 @@ public:
 	static QString openWaveformFile(const QString& previousFile = "");
 	static std::shared_ptr<const SampleBuffer> createBufferFromFile(const QString& filePath);
 	static std::shared_ptr<const SampleBuffer> createBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
+		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 private:
 	static void displayError(const QString& message);
 };

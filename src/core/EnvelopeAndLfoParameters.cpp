@@ -410,7 +410,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	QMutexLocker m(&m_paramMutex);
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
 	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
@@ -509,7 +509,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayModel.value() ) );
 	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *

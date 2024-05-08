@@ -88,7 +88,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; }
 	speedRatio *= pitchRatio;
-	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
+	speedRatio *= Engine::audioEngine()->outputSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
 	float sliceStart, sliceEnd;
 	if (noteIndex == 0) // full sample at base note
@@ -132,7 +132,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		playbackState->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
-		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->processingSampleRate();
+		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
 		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
 		for (int i = 0; i < frames; i++)
 		{
@@ -143,8 +143,6 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 			workingBuffer[i + offset][0] *= fadeValue;
 			workingBuffer[i + offset][1] *= fadeValue;
 		}
-
-		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
 
 		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
@@ -200,7 +198,6 @@ void SlicerT::findSlices()
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
 	float prevFlux = 1E-10; // small value, no divison by zero
-	float real, imag, magnitude, diff;
 
 	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
 	{
@@ -211,12 +208,12 @@ void SlicerT::findSlices()
 		// calculate spectral flux in regard to last window
 		for (int j = 0; j < windowSize / 2; j++) // only use niquistic frequencies
 		{
-			real = fftOut[j][0];
-			imag = fftOut[j][1];
-			magnitude = std::sqrt(real * real + imag * imag);
+			float real = fftOut[j][0];
+			float imag = fftOut[j][1];
+			float magnitude = std::sqrt(real * real + imag * imag);
 
 			// using L2-norm (euclidean distance)
-			diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
+			float diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
 			spectralFlux += diff;
 
 			prevMags[j] = magnitude;
@@ -237,8 +234,9 @@ void SlicerT::findSlices()
 
 	for (float& sliceValue : m_slicePoints)
 	{
-		int closestZeroCrossing = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
-		if (std::abs(sliceValue - closestZeroCrossing) < windowSize) { sliceValue = closestZeroCrossing; }
+		auto closestZeroCrossing = std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
+		if (closestZeroCrossing == zeroCrossings.end()) { continue; }
+		if (std::abs(sliceValue - *closestZeroCrossing) < windowSize) { sliceValue = *closestZeroCrossing; }
 	}
 
 	float beatsPerMin = m_originalBPM.value() / 60.0f;

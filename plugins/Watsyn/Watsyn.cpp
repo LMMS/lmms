@@ -332,7 +332,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	if (!_n->m_pluginData)
 	{
 		auto w = new WatsynObject(&A1_wave[0], &A2_wave[0], &B1_wave[0], &B2_wave[0], m_amod.value(), m_bmod.value(),
-			Engine::audioEngine()->processingSampleRate(), _n, Engine::audioEngine()->framesPerPeriod(), this);
+			Engine::audioEngine()->outputSampleRate(), _n, Engine::audioEngine()->framesPerPeriod(), this);
 
 		_n->m_pluginData = w;
 	}
