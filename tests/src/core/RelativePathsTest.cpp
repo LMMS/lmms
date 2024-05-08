@@ -87,24 +87,28 @@ private slots:
 		std::string fuzPath = absPath;
 		replace(fuzPath, relPath, "drums/.///kick01.ogg");
 
+		const QString relPathQ = QString::fromStdString(relPath);
+		const QString absPathQ = QString::fromStdString(absPath);
+
 		//Test nicely formatted paths
-		QCOMPARE(PathUtil::toShortestRelative(absPath), relPath);
-		QCOMPARE(PathUtil::toAbsolute(relPath).value(), absPath);
+		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(absPath)), relPathQ);
+		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(relPath).value()), absPathQ);
 
 		//Test upgrading old paths
-		QCOMPARE(PathUtil::toShortestRelative(oldRelPath), relPath);
-		QCOMPARE(PathUtil::toAbsolute(oldRelPath).value(), absPath);
+		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(oldRelPath)), relPathQ);
+		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(oldRelPath).value()), absPathQ);
 
 		//Test weird but valid paths
-		QCOMPARE(PathUtil::toShortestRelative(fuzPath), relPath);
-		QCOMPARE(PathUtil::toAbsolute(fuzPath).value(), absPath);
+		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(fuzPath)), relPathQ);
+		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(fuzPath).value()), absPathQ);
 
 		//Empty paths should stay empty
 		const auto empty = std::string_view{""};
-		QCOMPARE(PathUtil::stripPrefix(empty), empty);
-		QCOMPARE(PathUtil::cleanName(empty), empty);
-		QCOMPARE(PathUtil::toAbsolute(empty).value(), empty);
-		QCOMPARE(PathUtil::toShortestRelative(empty), empty);
+		const std::string_view prefixStripped = PathUtil::stripPrefix(empty);
+		QCOMPARE(QString::fromUtf8(prefixStripped.data(), prefixStripped.size()), QString{""});
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(empty)), QString{""});
+		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(empty).value()), QString{""});
+		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(empty)), QString{""});
 	}
 };
 
