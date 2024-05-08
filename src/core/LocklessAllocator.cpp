@@ -33,6 +33,9 @@
 #include <strings.h>
 #endif
 
+namespace lmms
+{
+
 static const size_t SIZEOF_SET = sizeof( int ) * 8;
 
 
@@ -162,3 +165,6 @@ invalid:
 	}
 	++m_available;
 }
+
+
+} // namespace lmms

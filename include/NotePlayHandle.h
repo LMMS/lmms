@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef NOTE_PLAY_HANDLE_H
-#define NOTE_PLAY_HANDLE_H
+#ifndef LMMS_NOTE_PLAY_HANDLE_H
+#define LMMS_NOTE_PLAY_HANDLE_H
 
 #include <memory>
 
@@ -32,19 +32,20 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "MemoryManager.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
-typedef QList<NotePlayHandle *> NotePlayHandleList;
-typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
-
+using NotePlayHandleList = QList<NotePlayHandle*>;
+using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
-	MM_OPERATORS
 public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
@@ -53,15 +54,13 @@ public:
 	fpp_t m_fadeInLength;
 
 	// specifies origin of NotePlayHandle
-	enum Origins
+	enum class Origin
 	{
-		OriginMidiClip,		/*! playback of a note from a MIDI clip */
-		OriginMidiInput,	/*! playback of a MIDI note input event */
-		OriginNoteStacking,	/*! created by note stacking instrument function */
-		OriginArpeggio,		/*! created by arpeggio instrument function */
-		OriginCount
+		MidiClip,		/*! playback of a note from a MIDI clip */
+		MidiInput,	/*! playback of a MIDI note input event */
+		NoteStacking,	/*! created by note stacking instrument function */
+		Arpeggio,		/*! created by arpeggio instrument function */
 	};
-	typedef Origins Origin;
 
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
@@ -69,8 +68,8 @@ public:
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					Origin origin = OriginMidiClip );
-	virtual ~NotePlayHandle();
+					Origin origin = Origin::MidiClip );
+	~NotePlayHandle() override;
 
 	void * operator new ( size_t size, void * p )
 	{
@@ -106,6 +105,9 @@ public:
 	{
 		return m_unpitchedFrequency;
 	}
+
+	//! Get the current per-note detuning for this note
+	float currentDetuning() const { return m_baseDetuning->value(); }
 
 	/*! Renders one chunk using the attached instrument into the buffer */
 	void play( sampleFrame* buffer ) override;
@@ -244,7 +246,7 @@ public:
 	}
 
 	/*! Process note detuning automation */
-	void processTimePos( const TimePos& time );
+	void processTimePos(const TimePos& time, float pitchValue, bool isRecording);
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
@@ -269,7 +271,6 @@ public:
 private:
 	class BaseDetuning
 	{
-		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -337,7 +338,6 @@ const int NPH_CACHE_INCREMENT = 16;
 
 class NotePlayHandleManager
 {
-	MM_OPERATORS
 public:
 	static void init();
 	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
@@ -346,7 +346,7 @@ public:
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginMidiClip );
+					NotePlayHandle::Origin origin = NotePlayHandle::Origin::MidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
 	static void free();
@@ -359,4 +359,6 @@ private:
 };
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_NOTE_PLAY_HANDLE_H

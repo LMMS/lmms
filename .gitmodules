@@ -1,15 +1,12 @@
 [submodule "src/3rdparty/qt5-x11embed"]
 	path = src/3rdparty/qt5-x11embed
 	url = https://github.com/Lukas-W/qt5-x11embed.git
-[submodule "src/3rdparty/rpmalloc/rpmalloc"]
-	path = src/3rdparty/rpmalloc/rpmalloc
-	url = https://github.com/mjansson/rpmalloc.git
-[submodule "plugins/zynaddsubfx/zynaddsubfx"]
-	path = plugins/zynaddsubfx/zynaddsubfx
+[submodule "plugins/ZynAddSubFx/zynaddsubfx"]
+	path = plugins/ZynAddSubFx/zynaddsubfx
 	url = https://github.com/lmms/zynaddsubfx.git
 [submodule "plugins/FreeBoy/game-music-emu"]
 	path = plugins/FreeBoy/game-music-emu
-	url = https://bitbucket.org/mpyne/game-music-emu.git
+	url = https://github.com/libgme/game-music-emu.git
 [submodule "plugins/OpulenZ/adplug"]
 	path = plugins/OpulenZ/adplug
 	url = https://github.com/adplug/adplug.git
@@ -24,7 +21,7 @@
 	url = https://github.com/swh/ladspa
 [submodule "plugins/LadspaEffect/tap/tap-plugins"]
 	path = plugins/LadspaEffect/tap/tap-plugins
-	url = https://github.com/tomszilagyi/tap-plugins
+	url = https://github.com/lmms/tap-plugins
 [submodule "src/3rdparty/weakjack/weakjack"]
 	path = src/3rdparty/weakjack/weakjack
 	url = https://github.com/x42/weakjack.git
@@ -37,15 +34,18 @@
 [submodule "src/3rdparty/ringbuffer"]
 	path = src/3rdparty/ringbuffer
 	url = https://github.com/JohannesLorenz/ringbuffer.git
-[submodule "plugins/carlabase/carla"]
-	path = plugins/carlabase/carla
+[submodule "plugins/CarlaBase/carla"]
+	path = plugins/CarlaBase/carla
 	url = https://github.com/falktx/carla
-[submodule "plugins/sid/resid"]
-	path = plugins/Sid/resid
-	url = https://github.com/simonowen/resid
+[submodule "plugins/Sid/resid/resid"]
+	path = plugins/Sid/resid/resid
+	url = https://github.com/libsidplayfp/resid
 [submodule "src/3rdparty/jack2"]
 	path = src/3rdparty/jack2
 	url = https://github.com/jackaudio/jack2
 [submodule "plugins/LadspaEffect/cmt/cmt"]
 	path = plugins/LadspaEffect/cmt/cmt
 	url = https://github.com/lmms/cmt
+[submodule "src/3rdparty/hiir/hiir"]
+	path = src/3rdparty/hiir/hiir
+	url = https://github.com/LostRobotMusic/hiir

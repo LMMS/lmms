@@ -32,36 +32,39 @@
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
+namespace lmms
+{
+
 
 class MidiImport : public ImportFilter
 {
 	Q_OBJECT
 public:
 	MidiImport( const QString & _file );
-	virtual ~MidiImport();
+	~MidiImport() override = default;
 
-	virtual PluginView * instantiateView( QWidget * )
+	gui::PluginView* instantiateView( QWidget * ) override
 	{
 		return( nullptr );
 	}
 
 
 private:
-	virtual bool tryImport( TrackContainer* tc );
+	bool tryImport( TrackContainer* tc ) override;
 
 	bool readSMF( TrackContainer* tc );
 	bool readRIFF( TrackContainer* tc );
 	bool readTrack( int _track_end, QString & _track_name );
 
-	void error( void );
+	void error();
 
 
 	inline int readInt( int _bytes )
 	{
-		int c, value = 0;
+		int value = 0;
 		do
 		{
-			c = readByte();
+			int c = readByte();
 			if( c == -1 )
 			{
 				return( -1 );
@@ -117,12 +120,13 @@ private:
 		}
 	}
 
-
-	typedef QVector<QPair<int, MidiEvent> > EventVector;
+	using EventVector = QVector<QPair<int, MidiEvent>>;
 	EventVector m_events;
 	int m_timingDivision;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

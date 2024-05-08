@@ -29,6 +29,10 @@
 #include "EffectControls.h"
 #include "BitcrushControlDialog.h"
 
+namespace lmms
+{
+
+
 class BitcrushEffect;
 
 class BitcrushControls : public EffectControls
@@ -36,23 +40,23 @@ class BitcrushControls : public EffectControls
 	Q_OBJECT
 public:
 	BitcrushControls( BitcrushEffect * eff );
-	virtual ~BitcrushControls();
+	~BitcrushControls() override = default;
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & elem );
-	virtual void loadSettings( const QDomElement & elem );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & doc, QDomElement & elem ) override;
+	void loadSettings( const QDomElement & elem ) override;
+	inline QString nodeName() const override
 	{
 		return( "bitcrushcontrols" );
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 9 );
 	}
 
-	virtual EffectControlDialog * createView()
+	gui::EffectControlDialog * createView() override
 	{
-		return( new BitcrushControlDialog( this ) );
+		return( new gui::BitcrushControlDialog( this ) );
 	}
 
 private slots:
@@ -75,8 +79,11 @@ private:
 	BoolModel m_rateEnabled;
 	BoolModel m_depthEnabled;
 	
-	friend class BitcrushControlDialog;
+	friend class gui::BitcrushControlDialog;
 	friend class BitcrushEffect;
 };
+
+
+} // namespace lmms
 
 #endif

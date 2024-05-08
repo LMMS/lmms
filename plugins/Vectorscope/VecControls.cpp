@@ -29,6 +29,9 @@
 #include "VecControlsDialog.h"
 #include "Vectorscope.h"
 
+namespace lmms
+{
+
 
 VecControls::VecControls(Vectorscope *effect) :
 	EffectControls(effect),
@@ -48,9 +51,9 @@ VecControls::VecControls(Vectorscope *effect) :
 
 
 // Create the VecControlDialog widget which handles display of GUI elements.
-EffectControlDialog* VecControls::createView()
+gui::EffectControlDialog* VecControls::createView()
 {
-	return new VecControlsDialog(this);
+	return new gui::VecControlsDialog(this);
 }
 
 
@@ -68,3 +71,6 @@ void VecControls::saveSettings(QDomDocument &document, QDomElement &element)
 	m_logarithmicModel.saveSettings(document, element, "Logarithmic");
 	m_highQualityModel.saveSettings(document, element, "HighQuality");
 }
+
+
+} // namespace lmms

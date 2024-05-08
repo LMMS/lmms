@@ -28,7 +28,7 @@
 #include <QResource>
 #include "embed.h"
 
-namespace embed
+namespace lmms::embed
 {
 
 QPixmap getIconPixmap(const QString& pixmapName,
@@ -86,6 +86,4 @@ QString getText( const char * name )
 }
 
 
-}
-
-
+} // namespace lmms::embed

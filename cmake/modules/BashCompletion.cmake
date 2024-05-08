@@ -24,7 +24,7 @@
 # - Windows does not support bash completion
 # - macOS support should eventually be added for Homebrew (TODO)
 IF(WIN32)
-	MESSAGE(STATUS "Bash competion is not supported on this platform.")
+	MESSAGE(STATUS "Bash completion is not supported on this platform.")
 ELSEIF(APPLE)
 	MESSAGE(STATUS "Bash completion is not yet implemented for this platform.")
 ELSE()

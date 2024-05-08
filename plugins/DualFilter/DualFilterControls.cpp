@@ -32,6 +32,10 @@
 #include "embed.h"
 #include "Engine.h"
 
+namespace lmms
+{
+
+
 DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	EffectControls( effect ),
 	m_effect( effect ),
@@ -107,8 +111,8 @@ void DualFilterControls::updateFilters()
 	
 	delete m_effect->m_filter1;
 	delete m_effect->m_filter2;
-	m_effect->m_filter1 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
-	m_effect->m_filter2 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
+	m_effect->m_filter1 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
+	m_effect->m_filter2 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
 	
 	// flag filters as needing recalculation
 	
@@ -156,6 +160,4 @@ void DualFilterControls::saveSettings( QDomDocument& _doc, QDomElement& _this )
 }
 
 
-
-
-
+} // namespace lmms

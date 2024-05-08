@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_SDL_H
-#define AUDIO_SDL_H
+#ifndef LMMS_AUDIO_SDL_H
+#define LMMS_AUDIO_SDL_H
 
 #include "lmmsconfig.h"
 
@@ -41,12 +41,14 @@
 
 class QLineEdit;
 
+namespace lmms
+{
 
 class AudioSdl : public AudioDevice
 {
 public:
 	AudioSdl( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioSdl();
+	~AudioSdl() override;
 
 	inline static QString name()
 	{
@@ -55,11 +57,11 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		~setupWidget() override;
+		~setupWidget() override = default;
 
 		void saveSettings() override;
 
@@ -72,7 +74,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );
@@ -108,6 +109,9 @@ private:
 
 } ;
 
-#endif
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_SDL
+
+#endif // LMMS_AUDIO_SDL_H

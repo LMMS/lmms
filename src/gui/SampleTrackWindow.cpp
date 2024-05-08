@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrackWindow.h"
 
 #include <QCloseEvent>
@@ -33,17 +33,18 @@
 
 #include "EffectRackView.h"
 #include "embed.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "SampleTrackView.h"
 #include "Song.h"
 #include "SubWindow.h"
-#include "TabWidget.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
+
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
@@ -51,29 +52,34 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	m_track(tv->model()),
 	m_stv(tv)
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
-	QVBoxLayout * vlayout = new QVBoxLayout(this);
-	vlayout->setMargin(0);
+	auto vlayout = new QVBoxLayout(this);
+	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing(0);
 
-	TabWidget* generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
+	auto generalSettingsWidget = new QWidget(this);
+	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
 
-	QVBoxLayout* generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
-
-	generalSettingsLayout->setContentsMargins(8, 18, 8, 8);
-	generalSettingsLayout->setSpacing(6);
-
-	QWidget* nameWidget = new QWidget(generalSettingsWidget);
-	QHBoxLayout* nameLayout = new QHBoxLayout(nameWidget);
+	auto nameWidget = new QWidget(generalSettingsWidget);
+	auto nameLayout = new QHBoxLayout(nameWidget);
 	nameLayout->setContentsMargins(0, 0, 0, 0);
 	nameLayout->setSpacing(2);
 
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
-	connect(m_nameLineEdit, SIGNAL(textChanged(const QString &)),
-				this, SLOT(textChanged(const QString &)));
+	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
+				this, SLOT(textChanged(const QString&)));
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameLayout->addWidget(m_nameLineEdit);
@@ -81,8 +87,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addWidget(nameWidget);
 
-
-	QGridLayout* basicControlsLayout = new QGridLayout;
+	auto basicControlsLayout = new QGridLayout;
 	basicControlsLayout->setHorizontalSpacing(3);
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
@@ -92,21 +97,21 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob(knobBright_26, nullptr, tr("Sample volume"));
+	m_volumeKnob = new Knob(KnobType::Bright26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setVolumeKnob(true);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 0);
 	basicControlsLayout->setAlignment(m_volumeKnob, widgetAlignment);
 
-	QLabel *label = new QLabel(tr("VOL"), this);
+	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 0);
 	basicControlsLayout->setAlignment(label, labelAlignment);
 
 
 	// set up panning knob
-	m_panningKnob = new Knob(knobBright_26, nullptr, tr("Panning"));
+	m_panningKnob = new Knob(KnobType::Bright26, nullptr, tr("Panning"));
 	m_panningKnob->setHintText(tr("Panning:"), "");
 
 	basicControlsLayout->addWidget(m_panningKnob, 0, 1);
@@ -122,7 +127,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
 	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
 	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);
@@ -159,11 +164,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	subWin->setFixedSize(subWin->size());
 	subWin->hide();
 }
-
-SampleTrackWindow::~SampleTrackWindow()
-{
-}
-
 
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
@@ -271,3 +271,6 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
+
+
+} // namespace lmms::gui

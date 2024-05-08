@@ -1,7 +1,7 @@
 /*
  * Lv2ViewBase.cpp - base class for Lv2 plugin views
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -39,6 +39,7 @@
 #include "GuiApplication.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "lmms_math.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
@@ -47,15 +48,17 @@
 #include "SubWindow.h"
 
 
-
-
-Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
-	LinkedModelGroupView (parent, ctrlBase, colNum)
+namespace lmms::gui
 {
-	class SetupWidget : public Lv2Ports::ConstVisitor
+
+
+Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
+	LinkedModelGroupView (parent, proc, colNum)
+{
+	class SetupTheWidget : public Lv2Ports::ConstVisitor
 	{
 	public:
-		QWidget* m_par; // input
+		QWidget* m_parent; // input
 		const LilvNode* m_commentUri; // input
 		Control* m_control = nullptr; // output
 		void visit(const Lv2Ports::Control& port) override
@@ -67,20 +70,22 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 				switch (port.m_vis)
 				{
 					case PortVis::Generic:
-						m_control = new KnobControl(m_par);
+						m_control = new KnobControl(m_parent);
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
-						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
-													m_par);
+						sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
+						auto pMin = port.min(sr);
+						auto pMax = port.max(sr);
+						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
+						m_control = new LcdControl(numDigits, m_parent);
 						break;
 					}
 					case PortVis::Enumeration:
-						m_control = new ComboControl(m_par);
+						m_control = new ComboControl(m_parent);
 						break;
 					case PortVis::Toggled:
-						m_control = new CheckControl(m_par);
+						m_control = new CheckControl(m_parent);
 						break;
 				}
 				m_control->setText(port.name());
@@ -98,14 +103,14 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 	};
 
 	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
-	ctrlBase->foreach_port(
+	proc->foreach_port(
 		[this, &commentUri](const Lv2Ports::PortBase* port)
 		{
 			if(!lilv_port_has_property(port->m_plugin, port->m_port,
 										uri(LV2_PORT_PROPS__notOnGUI).get()))
 			{
-				SetupWidget setup;
-				setup.m_par = this;
+				SetupTheWidget setup;
+				setup.m_parent = this;
 				setup.m_commentUri = commentUri.get();
 				port->accept(setup);
 
@@ -124,11 +129,6 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 
 
 
-Lv2ViewProc::~Lv2ViewProc() {}
-
-
-
-
 AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 {
 	return Engine::getLv2Manager()->uri(uriStr);
@@ -137,11 +137,12 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 
 
-Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
+Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
+	m_helpWindowEventFilter(this)
 {
-	QGridLayout* grid = new QGridLayout(meAsWidget);
+	auto grid = new QGridLayout(meAsWidget);
 
-	QHBoxLayout* btnBox = new QHBoxLayout();
+	auto btnBox = new QHBoxLayout();
 	if (/* DISABLES CODE */ (false))
 	{
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
@@ -156,8 +157,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(
-			pointSize<8>(m_toggleUIButton->font()));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 	btnBox->addStretch(1);
@@ -172,7 +172,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	LILV_FOREACH(nodes, itr, props.get())
 	{
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		QLabel* infoLabel = new QLabel(lilv_node_as_string(node));
+		auto infoLabel = new QLabel(QString(lilv_node_as_string(node)).trimmed() + "\n");
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -181,8 +181,9 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		btnBox->addWidget(m_helpButton);
 
 		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
-		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
+		m_helpWindow->setSizePolicy(QSizePolicy::Expanding,
 									QSizePolicy::Expanding);
+		m_helpWindow->installEventFilter(&m_helpWindowEventFilter);
 		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 		m_helpWindow->hide();
 
@@ -203,6 +204,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 
 Lv2ViewBase::~Lv2ViewBase() {
+	closeHelpWindow();
 	// TODO: hide UI if required
 }
 
@@ -228,6 +230,14 @@ void Lv2ViewBase::toggleHelp(bool visible)
 
 
 
+void Lv2ViewBase::closeHelpWindow()
+{
+	if (m_helpWindow) { m_helpWindow->close(); }
+}
+
+
+
+
 void Lv2ViewBase::modelChanged(Lv2ControlBase *ctrlBase)
 {
 	// reconnect models
@@ -247,5 +257,33 @@ AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+
+
+void Lv2ViewBase::onHelpWindowClosed()
+{
+	m_helpButton->setChecked(true);
+}
+
+
+
+
+HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
+	m_viewBase(viewBase) {}
+
+
+
+
+bool HelpWindowEventFilter::eventFilter(QObject* , QEvent* event)
+{
+	if (event->type() == QEvent::Close) {
+		m_viewBase->m_helpButton->setChecked(false);
+		return true;
+	}
+	return false;
+}
+
+
+} // namespace lmms::gui
 
 #endif // LMMS_HAVE_LV2

@@ -35,15 +35,22 @@ SET_TARGET_PROPERTIES(veal PROPERTIES PREFIX "")
 TARGET_COMPILE_DEFINITIONS(veal PRIVATE DISABLE_OSC=1)
 
 SET(INLINE_FLAGS "")
+SET(OTHER_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET(INLINE_FLAGS "-finline-functions-called-once -finline-limit=80")
+	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
+	SET(OTHER_FLAGS -Wno-format-overflow)
 ENDIF()
-SET_TARGET_PROPERTIES(veal PROPERTIES COMPILE_FLAGS "-fexceptions -O2 -finline-functions ${INLINE_FLAGS}")
+target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS} ${OTHER_FLAGS})
 
-# Don't strip if "Debug" or "RelWithDebInfo"
-IF(LMMS_BUILD_WIN32 AND NOT CMAKE_BUILD_TYPE MATCHES "Deb")
-	ADD_CUSTOM_COMMAND(TARGET veal POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:veal>")
-ENDIF()
+if(LMMS_BUILD_WIN32)
+	add_custom_command(
+		TARGET veal
+		POST_BUILD
+		COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:veal>"
+		VERBATIM
+		COMMAND_EXPAND_LISTS
+	)
+endif()
 IF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)
-	SET_TARGET_PROPERTIES(veal PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined")
+	target_link_libraries(veal PRIVATE -shared)
 ENDIF()

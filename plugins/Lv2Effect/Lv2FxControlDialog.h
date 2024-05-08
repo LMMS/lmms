@@ -1,7 +1,7 @@
 /*
  * Lv2FxControlDialog.h - Lv2FxControlDialog implementation
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,8 +28,13 @@
 #include "EffectControlDialog.h"
 #include "Lv2ViewBase.h"
 
+namespace lmms
+{
+
 class Lv2FxControls;
 
+namespace gui
+{
 
 class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
 {
@@ -40,8 +45,13 @@ public:
 
 private:
 	Lv2FxControls *lv2Controls();
-	void modelChanged() override;
+	void modelChanged() final;
+	void hideEvent(QHideEvent *event) override;
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

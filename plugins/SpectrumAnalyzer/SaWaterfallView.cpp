@@ -40,6 +40,10 @@
 #include "SaProcessor.h"
 
 
+namespace lmms::gui
+{
+
+
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
 	m_controls(controls),
@@ -209,7 +213,6 @@ float SaWaterfallView::yPixelToTime(float position, int height)
 std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 {
 	std::vector<std::pair<float, std::string>> result;
-	float i;
 
 	// get time value of the last line
 	float limit = yPixelToTime(m_displayBottom, m_displayHeight);
@@ -219,7 +222,7 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 	if (increment < 0.1) {increment = 0.1;}
 
 	// NOTE: labels positions are rounded to match the (rounded) label value
-	for (i = 0; i <= limit; i += increment)
+	for (float i = 0; i <= limit; i += increment)
 	{
 		if (i > 99)
 		{
@@ -341,3 +344,6 @@ void SaWaterfallView::resizeEvent(QResizeEvent *event)
 {
 	m_timeTics = makeTimeTics();
 }
+
+
+} // namespace lmms::gui

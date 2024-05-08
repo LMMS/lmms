@@ -21,11 +21,14 @@
  *
  */
 
-
-#ifndef MEMORY_HELPER_H
-#define MEMORY_HELPER_H
+#ifndef LMMS_MEMORY_HELPER_H
+#define LMMS_MEMORY_HELPER_H
 
 #include <cstddef>
+
+namespace lmms
+{
+
 
 /**
  * Helper class to alocate aligned memory and free it.
@@ -40,5 +43,7 @@ public:
 private:
 };
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_MEMORY_HELPER_H

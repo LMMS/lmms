@@ -1,0 +1,51 @@
+---
+Checks: >
+  bugprone-macro-parentheses,
+  bugprone-macro-repeated-side-effects,
+  modernize-avoid-c-arrays,
+  modernize-loop-convert,
+  modernize-redundant-void-arg,
+  modernize-use-auto,
+  modernize-use-bool-literals,
+  modernize-use-emplace,
+  modernize-use-equals-default,
+  modernize-use-equals-delete,
+  modernize-use-override,
+  modernize-use-using,
+  performance-trivially-destructible,
+  readability-braces-around-statements,
+  readability-const-return-type,
+  readability-identifier-naming,
+  readability-misleading-indentation,
+  readability-simplify-boolean-expr
+WarningsAsErrors: ''
+HeaderFilterRegex: '' # don't show errors from headers
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
+User:            user
+CheckOptions:    
+  - key:             readability-identifier-naming.ClassCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.EnumCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.TypedefCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.UnionCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.StructCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.UnionCase
+    value:           CamelCase
+# not yet working, as it currently applies both for static and object members
+# - key:             readability-identifier-naming.MemberPrefix
+#   value:           'm_'
+  # currently only working for local static variables:
+  - key:             readability-identifier-naming.StaticVariablePrefix
+    value:           's_'
+# not yet working
+# - key:             readability-identifier-naming.VariableCase
+#   value:           camelBack
+  - key:             readability-identifier-naming.FunctionCase
+    value:           camelBack
+...
+

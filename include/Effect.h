@@ -23,29 +23,37 @@
  *
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef LMMS_EFFECT_H
+#define LMMS_EFFECT_H
 
 #include "Plugin.h"
 #include "Engine.h"
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-#include "MemoryManager.h"
+
+namespace lmms
+{
 
 class EffectChain;
 class EffectControls;
 
+namespace gui
+{
+
+class EffectView;
+
+} // namespace gui
+
 
 class LMMS_EXPORT Effect : public Plugin
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~Effect();
+	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -103,7 +111,7 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::audioEngine()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		const float samples = Engine::audioEngine()->outputSampleRate() * m_autoQuitModel.value() / 1000.0f;
 		return 1 + ( static_cast<int>( samples ) / Engine::audioEngine()->framesPerPeriod() );
 	}
 
@@ -147,6 +155,11 @@ public:
 	{
 		m_noRun = _state;
 	}
+	
+	inline TempoSyncKnobModel* autoQuitModel()
+	{
+		return &m_autoQuitModel;
+	}
 
 	EffectChain * effectChain() const
 	{
@@ -170,7 +183,7 @@ protected:
 	*/
 	void checkGate( double _out_sum );
 
-	PluginView * instantiateView( QWidget * ) override;
+	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
@@ -179,7 +192,7 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::audioEngine()->processingSampleRate(),
+				Engine::audioEngine()->outputSampleRate(),
 					_dst_buf, _dst_sr,
 					Engine::audioEngine()->framesPerPeriod() );
 	}
@@ -189,11 +202,13 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->processingSampleRate(),
+				Engine::audioEngine()->outputSampleRate(),
 			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 	}
 	void reinitSRC();
+
+	virtual void onEnabledChanged() {}
 
 
 private:
@@ -221,14 +236,14 @@ private:
 	SRC_STATE * m_srcState[2];
 
 
-	friend class EffectView;
+	friend class gui::EffectView;
 	friend class EffectChain;
 
 } ;
 
+using EffectKey = Effect::Descriptor::SubPluginFeatures::Key;
+using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
-typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
-typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
+} // namespace lmms
 
-
-#endif
+#endif // LMMS_EFFECT_H

@@ -22,23 +22,25 @@
  *
  */
 
-#include "QTestSuite.h"
-
 #include "ProjectVersion.h"
 
-class ProjectVersionTest : QTestSuite
+#include <QtTest/QtTest>
+
+class ProjectVersionTest : public QObject
 {
 	Q_OBJECT
 private slots:
 	void ProjectVersionComparisonTests()
 	{
-		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) > "1.0.3");
-		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Major) < "2.1.0");
-		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Release) > "0.2.1");
-		QVERIFY(ProjectVersion("1.1.4", ProjectVersion::Release) < "1.1.10");
-		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) == "1.1.5");
-		QVERIFY( ! ( ProjectVersion("3.1.0", ProjectVersion::Minor) < "2.2.5" ) );
-		QVERIFY( ! ( ProjectVersion("2.5.0", ProjectVersion::Release) < "2.2.5" ) );
+		using namespace lmms;
+
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::CompareType::Minor) > "1.0.3");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::CompareType::Major) < "2.1.0");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::CompareType::Release) > "0.2.1");
+		QVERIFY(ProjectVersion("1.1.4", ProjectVersion::CompareType::Release) < "1.1.10");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::CompareType::Minor) == "1.1.5");
+		QVERIFY( ! ( ProjectVersion("3.1.0", ProjectVersion::CompareType::Minor) < "2.2.5" ) );
+		QVERIFY( ! ( ProjectVersion("2.5.0", ProjectVersion::CompareType::Release) < "2.2.5" ) );
 		//A pre-release version has lower precedence than a normal version
 		QVERIFY(ProjectVersion("1.1.0") > "1.1.0-alpha");
 		//But higher precedence than the previous version
@@ -60,7 +62,7 @@ private slots:
 		QVERIFY(ProjectVersion("1.2.3.42") == "1.2.3");
 		//CompareVersion "All" should compare every identifier
 		QVERIFY(
-			ProjectVersion("1.0.0-a.b.c.d.e.f.g.h.i.j.k.l", ProjectVersion::All)
+			ProjectVersion("1.0.0-a.b.c.d.e.f.g.h.i.j.k.l", ProjectVersion::CompareType::All)
 			< "1.0.0-a.b.c.d.e.f.g.h.i.j.k.m"
 		);
 		//Prerelease identifiers may contain hyphens
@@ -73,6 +75,7 @@ private slots:
 		//An identifier of the form "-x" is non-numeric, not negative
 		QVERIFY(ProjectVersion("1.0.0-alpha.-1") > "1.0.0-alpha.1");
 	}
-} ProjectVersionTests;
+};
 
+QTEST_GUILESS_MAIN(ProjectVersionTest)
 #include "ProjectVersionTest.moc"

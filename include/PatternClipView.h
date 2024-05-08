@@ -21,25 +21,28 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef PATTERN_CLIP_VIEW_H
-#define PATTERN_CLIP_VIEW_H
-
+#ifndef LMMS_GUI_PATTERN_CLIP_VIEW_H
+#define LMMS_GUI_PATTERN_CLIP_VIEW_H
 
 #include <QStaticText>
 
 #include "ClipView.h"
 
+namespace lmms
+{
+
 class PatternClip;
 
+namespace gui
+{
 
 class PatternClipView : public ClipView
 {
 	Q_OBJECT
 public:
 	PatternClipView(Clip* clip, TrackView* tv);
-	virtual ~PatternClipView() = default;
+	~PatternClipView() override = default;
 
 
 public slots:
@@ -65,5 +68,8 @@ private:
 } ;
 
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_PATTERN_CLIP_VIEW_H

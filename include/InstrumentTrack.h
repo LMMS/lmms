@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_H
-#define INSTRUMENT_TRACK_H
+#ifndef LMMS_INSTRUMENT_TRACK_H
+#define LMMS_INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
@@ -39,18 +39,31 @@
 #include "Track.h"
 
 
+namespace lmms
+{
+
+
 class Instrument;
 class DataFile;
+
+namespace gui
+{
+
+class InstrumentTrackView;
+class InstrumentTrackWindow;
+class InstrumentTuningView;
+class MidiCCRackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	InstrumentTrack( TrackContainer* tc );
-	virtual ~InstrumentTrack();
+	~InstrumentTrack() override;
 
 	// used by instrument
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
@@ -108,17 +121,17 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
-	TrackView * createView( TrackContainerView* tcv ) override;
+	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
 
 	// create new track-content-object = clip
 	Clip* createClip(const TimePos & pos) override;
 
 
 	// called by track
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
+	void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
@@ -210,6 +223,11 @@ public:
 		return &m_mixerChannelModel;
 	}
 
+	BoolModel* useMasterPitchModel()
+	{
+		return &m_useMasterPitchModel;
+	}
+
 	void setPreviewMode( const bool );
 
 	bool isPreviewMode() const
@@ -223,9 +241,8 @@ public:
 
 signals:
 	void instrumentChanged();
-	void midiNoteOn( const Note& );
-	void midiNoteOff( const Note& );
-	void nameChanged();
+	void midiNoteOn( const lmms::Note& );
+	void midiNoteOff( const lmms::Note& );
 	void newNote();
 	void endNote();
 
@@ -294,12 +311,16 @@ private:
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
-	friend class InstrumentTrackView;
-	friend class InstrumentTrackWindow;
+	friend class gui::InstrumentTrackView;
+	friend class gui::InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class InstrumentMiscView;
-	friend class MidiCCRackView;
+	friend class gui::InstrumentTuningView;
+	friend class gui::MidiCCRackView;
 
 } ;
 
-#endif
+
+
+} // namespace lmms
+
+#endif // LMMS_INSTRUMENT_TRACK_H

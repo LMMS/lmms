@@ -11,10 +11,15 @@ FOREACH(_item ${PLUGIN_SOURCES})
 	ENDIF()
 	INSTALL(TARGETS "${_plugin}" LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES PREFIX "")
-	# Don't strip if "Debug" or "RelWithDebInfo"
-	IF(LMMS_BUILD_WIN32 AND NOT CMAKE_BUILD_TYPE MATCHES "Deb")
-		ADD_CUSTOM_COMMAND(TARGET "${_plugin}" POST_BUILD COMMAND "${STRIP}" \"$<TARGET_FILE:${_plugin}>\")
-	ENDIF()
+	if(LMMS_BUILD_WIN32)
+		add_custom_command(
+			TARGET "${_plugin}"
+			POST_BUILD
+			COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:${_plugin}>"
+			VERBATIM
+			COMMAND_EXPAND_LISTS
+		)
+	endif()
 	IF(NOT MSVC)
 		TARGET_LINK_LIBRARIES("${_plugin}" m)
 	ENDIF()

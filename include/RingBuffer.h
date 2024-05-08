@@ -23,21 +23,24 @@
  *
  */
 
-
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
+#ifndef LMMS_RING_BUFFER_H
+#define LMMS_RING_BUFFER_H
 
 #include <cmath>
 #include <QObject>
 #include "lmms_basics.h"
-#include "MemoryManager.h"
+#include "lmms_export.h"
+
+
+namespace lmms
+{
+
 
 /** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
 */
 class LMMS_EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 /** \brief Constructs a ringbuffer of specified size, will not care about samplerate changes
  * 	\param size The size of the buffer in frames. The actual size will be size + period size
@@ -48,7 +51,7 @@ public:
  * 	\param size The size of the buffer in milliseconds. The actual size will be size + period size
  */
 	RingBuffer( float size );
-	virtual ~RingBuffer();
+	~RingBuffer() override;
 
 
 
@@ -216,4 +219,8 @@ private:
 	volatile unsigned int m_position;
 
 };
-#endif
+
+
+} // namespace lmms
+
+#endif // LMMS_RING_BUFFER_H

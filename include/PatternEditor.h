@@ -22,16 +22,20 @@
  *
  */
 
-
-#ifndef PATTERN_EDITOR_H
-#define PATTERN_EDITOR_H
-
+#ifndef LMMS_GUI_PATTERN_EDITOR_H
+#define LMMS_GUI_PATTERN_EDITOR_H
 
 #include "Editor.h"
 #include "TrackContainerView.h"
 
+namespace lmms
+{
 
 class PatternStore;
+
+namespace gui
+{
+
 class ComboBox;
 
 
@@ -69,14 +73,12 @@ private:
 };
 
 
-
-
 class PatternEditorWindow : public Editor
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	PatternEditorWindow(PatternStore* ps);
-	~PatternEditorWindow();
+	~PatternEditorWindow() = default;
 
 	QSize sizeHint() const override;
 
@@ -90,4 +92,9 @@ private:
 	ComboBox* m_patternComboBox;
 };
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_PATTERN_EDITOR_H

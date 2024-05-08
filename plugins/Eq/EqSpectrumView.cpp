@@ -33,6 +33,10 @@
 #include "MainWindow.h"
 #include "lmms_constants.h"
 
+namespace lmms
+{
+
+
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),
 	m_energy ( 0 ),
@@ -98,7 +102,7 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 			return;
 		}
 
-		m_sampleRate = Engine::audioEngine()->processingSampleRate();
+		m_sampleRate = Engine::audioEngine()->outputSampleRate();
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
 
@@ -176,10 +180,13 @@ void EqAnalyser::clear()
 
 
 
+namespace gui
+{
 
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
 	m_analyser( b ),
+	m_peakSum(0.),
 	m_periodicalUpdate( false )
 {
 	setFixedSize( 450, 200 );
@@ -187,7 +194,7 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
 	float totalLength = log10( 20000 );
-	m_pixelsPerUnitWidth = width( ) / totalLength ;
+	m_pixelsPerUnitWidth = width() / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
 	for ( int i = 0 ; i < MAX_BANDS ; i++ )
@@ -201,12 +208,8 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
-	const float energy =  m_analyser->getEnergy();
-	if( energy <= 0 && m_peakSum <= 0 )
-	{		
-		//dont draw anything
-		return;
-	}
+	const float energy = m_analyser->getEnergy();
+	if (energy <= 0. && m_peakSum <= 0) { return; }
 
 	const int fh = height();
 	const int LOWER_Y = -36;	// dB
@@ -225,13 +228,13 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	//Now we calculate the path
 	m_path = QPainterPath();
 	float *bands = m_analyser->m_bands;
-	float peak;
 	m_path.moveTo( 0, height() );
 	m_peakSum = 0;
 	const float fallOff = 1.07;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
-		peak = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *bands / energy ) ) - LOWER_Y ) / ( - LOWER_Y ) );
+		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
+
 		if( peak < 0 )
 		{
 			peak = 0;
@@ -298,3 +301,8 @@ void EqSpectrumView::periodicalUpdate()
 	m_analyser->setActive( isVisible() );
 	update();
 }
+
+
+} // namespace gui
+
+} // namespace lmms

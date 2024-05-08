@@ -31,22 +31,28 @@
 #include "LadspaManager.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
 
 class LadspaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	LadspaSubPluginFeatures( Plugin::PluginTypes _type );
+	LadspaSubPluginFeatures( Plugin::Type _type );
 
 	QString displayName(const Key& k) const override;
 	void fillDescriptionWidget( QWidget * _parent,
 												const Key * _key ) const override;
 
-	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
+	void listSubPluginKeys( const Plugin::Descriptor * _desc,
 												KeyList & _kl ) const override;
 
 
 	static ladspa_key_t subPluginKeyToLadspaKey( const Key * _key );
 
-} ;
+};
+
+
+} // namespace lmms
 
 #endif

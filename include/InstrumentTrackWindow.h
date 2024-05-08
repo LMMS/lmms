@@ -22,23 +22,33 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_WINDOW_H
-#define INSTRUMENT_TRACK_WINDOW_H
+#ifndef LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H
+#define LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H
 
 #include <QWidget>
 
 #include "ModelView.h"
 #include "SerializingObject.h"
 
+class QLabel;
+class QLineEdit;
+class QWidget;
+
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class EffectRackView;
-class MixerLineLcdSpinBox;
+class MixerChannelLcdSpinBox;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
-class InstrumentMiscView;
+class InstrumentTuningView;
 class InstrumentSoundShapingView;
-class InstrumentTrack;
 class InstrumentTrackShapingView;
 class InstrumentTrackView;
 class Knob;
@@ -46,9 +56,6 @@ class LcdSpinBox;
 class LeftRightNav;
 class PianoView;
 class PluginView;
-class QLabel;
-class QLineEdit;
-class QWidget;
 class TabWidget;
 
 
@@ -58,7 +65,7 @@ class InstrumentTrackWindow : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	InstrumentTrackWindow( InstrumentTrackView * _tv );
-	virtual ~InstrumentTrackWindow();
+	~InstrumentTrackWindow() override;
 
 	// parent for all internal tab-widgets
 	TabWidget * tabWidgetParent()
@@ -135,7 +142,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	MixerLineLcdSpinBox * m_mixerChannelNumber;
+	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 
 
@@ -147,7 +154,7 @@ private:
 	InstrumentFunctionArpeggioView* m_arpeggioView;
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
-	InstrumentMiscView *m_miscView;
+	InstrumentTuningView *m_tuningView;
 
 
 	// test-piano at the bottom of every instrument-settings-window
@@ -157,5 +164,9 @@ private:
 	friend class InstrumentTrackView;
 } ;
 
-#endif
 
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H

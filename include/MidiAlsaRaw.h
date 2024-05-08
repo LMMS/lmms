@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_ALSA_RAW_H
-#define MIDI_ALSA_RAW_H
+#ifndef LMMS_MIDI_ALSA_RAW_H
+#define LMMS_MIDI_ALSA_RAW_H
 
 #include "lmmsconfig.h"
 
@@ -40,12 +40,15 @@
 struct pollfd;
 
 
+namespace lmms
+{
+
 class MidiAlsaRaw : public QThread, public MidiClientRaw
 {
 	Q_OBJECT
 public:
 	MidiAlsaRaw();
-	virtual ~MidiAlsaRaw();
+	~MidiAlsaRaw() override;
 
 	static QString probeDevice();
 
@@ -77,6 +80,9 @@ private:
 
 } ;
 
-#endif
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
+
+#endif // LMMS_MIDI_ALSA_RAW_H

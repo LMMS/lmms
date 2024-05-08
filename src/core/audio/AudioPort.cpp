@@ -31,6 +31,8 @@
 #include "MixHelpers.h"
 #include "BufferManager.h"
 
+namespace lmms
+{
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
@@ -119,7 +121,7 @@ void AudioPort::doProcessing()
 		if( ph->buffer() )
 		{
 			if( ph->usesBuffer()
-				&& ( ph->type() == PlayHandle::TypeNotePlayHandle
+				&& ( ph->type() == PlayHandle::Type::NotePlayHandle
 					|| !MixHelpers::isSilent( ph->buffer(), fpp ) ) )
 			{
 				m_bufferUsage = true;
@@ -247,3 +249,5 @@ void AudioPort::removePlayHandle( PlayHandle * handle )
 		}
 	m_playHandleLock.unlock();
 }
+
+} // namespace lmms

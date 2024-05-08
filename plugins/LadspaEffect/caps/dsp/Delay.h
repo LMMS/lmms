@@ -154,9 +154,6 @@ class DelayTapA
 				int n;
 				fistp (f, n); /* read: n = (int) f; relies on FPTruncateMode */
 				f -= n;
-				if (0 && f < .5)
-					f += 1,
-					n -= 1;
 
 				sample_t x = d[n];
 				f = (1 - f) / (1 + f);

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef COMBOBOX_MODEL_H
-#define COMBOBOX_MODEL_H
+#ifndef LMMS_COMBOBOX_MODEL_H
+#define LMMS_COMBOBOX_MODEL_H
 
 #include <memory>
 #include <utility>
@@ -32,6 +32,8 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT ComboBoxModel : public IntModel
 {
@@ -45,7 +47,7 @@ public:
 	{
 	}
 
-	virtual ~ComboBoxModel()
+	~ComboBoxModel() override
 	{
 		clear();
 	}
@@ -70,12 +72,12 @@ public:
 
 	const QString & itemText( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
+		return m_items[std::clamp(i, minValue(), maxValue())].first;
 	}
 
 	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
+		return m_items[std::clamp(i, minValue(), maxValue())].second.get();
 	}
 
 	int size() const
@@ -85,11 +87,12 @@ public:
 
 
 private:
-	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
+	using Item = std::pair<QString, std::unique_ptr<PixmapLoader>>;
 
 	std::vector<Item> m_items;
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_COMBOBOX_MODEL_H

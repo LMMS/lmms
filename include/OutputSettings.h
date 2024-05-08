@@ -23,27 +23,30 @@
  *
  */
 
-#ifndef OUTPUT_SETTINGS_H
-#define OUTPUT_SETTINGS_H
+#ifndef LMMS_OUTPUT_SETTINGS_H
+#define LMMS_OUTPUT_SETTINGS_H
 
 #include "lmms_basics.h"
+
+namespace lmms
+{
+
 
 class OutputSettings
 {
 public:
-	enum BitDepth
+	enum class BitDepth
 	{
-		Depth_16Bit,
-		Depth_24Bit,
-		Depth_32Bit,
-		NumDepths
+		Depth16Bit,
+		Depth24Bit,
+		Depth32Bit
 	};
 
-	enum StereoMode
+	enum class StereoMode
 	{
-		StereoMode_Stereo,
-		StereoMode_JointStereo,
-		StereoMode_Mono
+		Stereo,
+		JointStereo,
+		Mono
 	};
 
 	class BitRateSettings
@@ -81,7 +84,7 @@ public:
 	OutputSettings( sample_rate_t sampleRate,
 			BitRateSettings const & bitRateSettings,
 			BitDepth bitDepth ) :
-		OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo )
+		OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode::Stereo )
 	{
 	}
 
@@ -112,4 +115,7 @@ private:
 	double m_compressionLevel;
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_OUTPUT_SETTINGS_H
