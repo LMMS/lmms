@@ -507,7 +507,8 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					}
 
 					// Update attribute path to point to the bundle file
-					QString newAtt = PathUtil::basePrefix(PathUtil::Base::LocalDir) + "resources/" + finalFileName;
+					QString newAtt = PathUtil::basePrefixQString(PathUtil::Base::LocalDir)
+						+ "resources/" + finalFileName;
 					el.setAttribute(*res, newAtt);
 				}
 				++res;
@@ -567,12 +568,7 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 			for (int i = 0; i < attributes.size(); ++i)
 			{
 				QDomNode attribute = attributes.item(i);
-				QDomAttr attr = attribute.toAttr();
-				if (attr.value().startsWith(PathUtil::basePrefix(PathUtil::Base::LocalDir),
-					Qt::CaseInsensitive))
-				{
-					return true;
-				}
+				if (PathUtil::hasBase(attribute.toAttr().value(), PathUtil::Base::LocalDir)) { return true; }
 			}
 		}
 
