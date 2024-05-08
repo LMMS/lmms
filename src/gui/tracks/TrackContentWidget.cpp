@@ -784,23 +784,23 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setCoarseGridWidth(const int & c)
+void TrackContentWidget::setCoarseGridWidth(int c)
 { m_coarseGridWidth = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setFineGridWidth(const int & c)
+void TrackContentWidget::setFineGridWidth(int c)
 { m_fineGridWidth = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setHorizontalWidth(const int & c)
+void TrackContentWidget::setHorizontalWidth(int c)
 { m_horizontalWidth = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setEmbossWidth(const int & c)
+void TrackContentWidget::setEmbossWidth(int c)
 { m_embossWidth = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setEmbossOffset(const int& c)
+void TrackContentWidget::setEmbossOffset(int c)
 { m_embossOffset = c; }
 
 } // namespace lmms::gui

@@ -107,12 +107,12 @@ public:
 	void setHorizontalColor(const QBrush & c);
 	void setEmbossColor(const QBrush & c);
 
-	void setCoarseGridWidth(const int & c);
-	void setFineGridWidth(const int & c);
-	void setHorizontalWidth(const int & c);
-	void setEmbossWidth(const int & c);
+	void setCoarseGridWidth(int c);
+	void setFineGridWidth(int c);
+	void setHorizontalWidth(int c);
+	void setEmbossWidth(int c);
 
-	void setEmbossOffset(const int& c);
+	void setEmbossOffset(int c);
 
 public slots:
 	void update();
