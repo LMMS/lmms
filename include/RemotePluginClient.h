@@ -58,8 +58,7 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	virtual void process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf ) = 0;
+	virtual void process(float* _in_buf, float* _out_buf) = 0;
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
@@ -342,9 +341,8 @@ void RemotePluginClient::doProcessing()
 {
 	if (m_audioBuffer)
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
-				(sampleFrame *)( m_audioBuffer.get() +
-					( m_inputCount*m_bufferSize ) ) );
+		process(m_inputCount > 0 ? m_audioBuffer.get() : nullptr,
+			m_audioBuffer.get() + m_inputCount * m_bufferSize);
 	}
 	else
 	{
