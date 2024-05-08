@@ -143,7 +143,6 @@ void PluginPortConfig::loadSettings(const QDomElement& elem)
 auto PluginPortConfig::instantiateView(QWidget* parent) -> gui::ComboBox*
 {
 	auto view = new gui::ComboBox{parent};
-	view->setFixedSize(96, gui::ComboBox::DEFAULT_HEIGHT);
 
 	QString inputType;
 	switch (inputPortType())

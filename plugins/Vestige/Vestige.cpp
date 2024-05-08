@@ -41,6 +41,7 @@
 
 
 #include "AudioEngine.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CustomTextKnob.h"
 #include "Engine.h"
@@ -482,10 +483,17 @@ gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 }
 
 
+PluginPortConfig* VestigeInstrument::portConfig()
+{
+	if (!m_plugin) { return nullptr; }
+	return &m_plugin->portConfig();
+}
+
+
 namespace gui
 {
 
-VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
+VestigeInstrumentView::VestigeInstrumentView( VestigeInstrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
@@ -602,7 +610,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							SLOT( noteOffAll() ) );
 
 	setAcceptDrops( true );
-	_instrument2 = _instrument;
+	m_instrument2 = _instrument;
 	_parent2 = _parent;
 }
 
@@ -610,7 +618,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 void VestigeInstrumentView::managePlugin( void )
 {
 	if ( m_vi->m_plugin != nullptr && m_vi->m_subWindow == nullptr ) {
-		m_vi->p_subWindow = new ManageVestigeInstrumentView( _instrument2, _parent2, m_vi);
+		m_vi->p_subWindow = new ManageVestigeInstrumentView( m_instrument2, _parent2, m_vi);
 	} else if (m_vi->m_subWindow != nullptr) {
 		if (m_vi->m_subWindow->widget()->isVisible() == false ) {
 			m_vi->m_scrollArea->show();
@@ -912,8 +920,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 
 
-ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrument,
-							QWidget * _parent, VestigeInstrument * m_vi2 ) :
+ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _instrument,
+							QWidget * _parent, VestigeInstrument * _vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
 #if QT_VERSION < 0x50C00
@@ -927,7 +935,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 #endif
 
-	m_vi = m_vi2;
+	m_vi = _vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
@@ -960,13 +968,12 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
-
-	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
-	connect( m_closeButton, SIGNAL( clicked() ), this,
-							SLOT( closeWindow() ) );
-
-	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
-
+	if (m_vi->portConfig()->hasMonoPort())
+	{
+		m_portConfig = m_vi->portConfig()->instantiateView(this);
+		m_portConfig->setFixedSize(108, gui::ComboBox::DEFAULT_HEIGHT);
+		l->addWidget(m_portConfig, 0, 2, 1, 3, Qt::AlignLeft);
+	}
 
 	for( int i = 0; i < 10; i++ )
 	{

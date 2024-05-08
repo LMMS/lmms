@@ -365,13 +365,44 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	{
 		if( m_splitChannels )
 		{
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
+			// NOTE: VST plugins always use split channels
+			switch (m_portConfig.portConfig<true>())
 			{
-				for( fpp_t frame = 0; frame < frames; ++frame )
-				{
-					m_audioBuffer[ch * frames + frame] =
-							_in_buf[frame][ch];
-				}
+				case PluginPortConfig::Config::MonoMix:
+					assert(m_inputCount == 1);
+					for (fpp_t frame = 0; frame < frames; ++frame)
+					{
+						// mix stereo to mono for mono plugin input
+						m_audioBuffer[frame] = (_in_buf[frame][0] + _in_buf[frame][1]) / 2;
+					}
+					break;
+				case PluginPortConfig::Config::LeftOnly:
+					assert(m_inputCount == 1);
+					for (fpp_t frame = 0; frame < frames; ++frame)
+					{
+						m_audioBuffer[frame] = _in_buf[frame][0];
+						_out_buf[frame][1] = _in_buf[frame][1]; // right bypass
+					}
+					break;
+				case PluginPortConfig::Config::RightOnly:
+					assert(m_inputCount == 1);
+					for (fpp_t frame = 0; frame < frames; ++frame)
+					{
+						_out_buf[frame][0] = _in_buf[frame][0]; // left bypass
+						m_audioBuffer[frame] = _in_buf[frame][1];
+					}
+					break;
+				case PluginPortConfig::Config::Stereo:
+					assert(m_inputCount == 2);
+					for (ch_cnt_t ch = 0; ch < inputs; ++ch)
+					{
+						for (fpp_t frame = 0; frame < frames; ++frame)
+						{
+							m_audioBuffer[ch * frames + frame] = _in_buf[frame][ch];
+						}
+					}
+					break;
+				default: throw std::runtime_error{"Invalid input port config"};
 			}
 		}
 		else if( inputs == DEFAULT_CHANNELS )
@@ -407,13 +438,41 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 							DEFAULT_CHANNELS);
 	if( m_splitChannels )
 	{
-		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
+		// NOTE: VST plugins always use split channels
+		switch (m_portConfig.portConfig<false>())
 		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
-								frames + frame];
-			}
+			case PluginPortConfig::Config::MonoMix:
+				assert(m_outputCount == 1);
+				for (fpp_t frame = 0; frame < frames; ++frame)
+				{
+					_out_buf[frame][0] = _out_buf[frame][1] = m_audioBuffer[m_inputCount * frames + frame];
+				}
+				break;
+			case PluginPortConfig::Config::LeftOnly:
+				assert(m_outputCount == 1);
+				for (fpp_t frame = 0; frame < frames; ++frame)
+				{
+					_out_buf[frame][0] = m_audioBuffer[m_inputCount * frames + frame];
+				}
+				break;
+			case PluginPortConfig::Config::RightOnly:
+				assert(m_outputCount == 1);
+				for (fpp_t frame = 0; frame < frames; ++frame)
+				{
+					_out_buf[frame][1] = m_audioBuffer[m_inputCount * frames + frame];
+				}
+				break;
+			case PluginPortConfig::Config::Stereo:
+				assert(m_outputCount == 2);
+				for (ch_cnt_t ch = 0; ch < outputs; ++ch)
+				{
+					for (fpp_t frame = 0; frame < frames; ++frame)
+					{
+						_out_buf[frame][ch] = m_audioBuffer[(m_inputCount + ch) * frames + frame];
+					}
+				}
+				break;
+			default: throw std::runtime_error{"Invalid output port config"};
 		}
 	}
 	else if( outputs == DEFAULT_CHANNELS )
@@ -545,17 +604,20 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdChangeInputCount:
 			m_inputCount = _m.getInt( 0 );
+			m_portConfig.setPortType(static_cast<unsigned>(m_inputCount), static_cast<unsigned>(m_outputCount));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeOutputCount:
 			m_outputCount = _m.getInt( 0 );
+			m_portConfig.setPortType(static_cast<unsigned>(m_inputCount), static_cast<unsigned>(m_outputCount));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeInputOutputCount:
 			m_inputCount = _m.getInt( 0 );
 			m_outputCount = _m.getInt( 1 );
+			m_portConfig.setPortType(static_cast<unsigned>(m_inputCount), static_cast<unsigned>(m_outputCount));
 			resizeSharedProcessingMemory();
 			break;
 

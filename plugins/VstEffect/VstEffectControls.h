@@ -39,11 +39,12 @@ class QScrollArea;
 namespace lmms
 {
 
-
+class PluginPortConfig;
 class VstEffect;
 
 namespace gui
 {
+class ComboBox;
 class CustomTextKnob;
 class ManageVSTEffectView;
 class VstEffectControlDialog;
@@ -68,6 +69,7 @@ public:
 
 	gui::EffectControlDialog* createView() override;
 
+	PluginPortConfig* portConfig();
 
 protected slots:
 	void updateMenu();
@@ -138,7 +140,7 @@ private:
 
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
-	QPushButton * m_closeButton;
+	ComboBox* m_portConfig;
 	CustomTextKnob ** vstKnobs;
 
 } ;

@@ -26,6 +26,8 @@
 #define LMMS_REMOTE_PLUGIN_H
 
 #include "RemotePluginBase.h"
+
+#include "PluginPortConfig.h"
 #include "SharedMemory.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -140,6 +142,11 @@ public:
 		m_commMutex.unlock();
 	}
 
+	PluginPortConfig& portConfig()
+	{
+		return m_portConfig;
+	}
+
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
@@ -174,6 +181,8 @@ private:
 
 	int m_inputCount;
 	int m_outputCount;
+
+	PluginPortConfig m_portConfig;
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;
