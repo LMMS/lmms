@@ -26,68 +26,72 @@
 
 namespace lmms::gui {
 
-void SampleWaveform::visualize(const Sample& sample, QPainter& p, const QRect& dr, int fromFrame, int toFrame)
+void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const QRect& rect)
 {
-	if (sample.sampleSize() == 0) { return; }
+	const int x = rect.x();
+	const int height = rect.height();
+	const int width = rect.width();
+	const int centerY = rect.center().y();
 
-	const auto x = dr.x();
-	const auto height = dr.height();
-	const auto width = dr.width();
-	const auto centerY = dr.center().y();
+	const int halfHeight = height / 2;
 
-	const auto halfHeight = height / 2;
-	const auto buffer = sample.data() + fromFrame;
-
-	const auto color = p.pen().color();
+	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	auto numFrames = toFrame - fromFrame;
-	if (numFrames == 0) { numFrames = sample.sampleSize(); }
+	const float framesPerPixel = std::max(1.0f, static_cast<float>(parameters.size) / width);
 
-	const auto framesPerPixel = std::max(1, numFrames / width);
+	constexpr float maxFramesPerPixel = 512.0f;
+	const float resolution = std::max(1.0f, framesPerPixel / maxFramesPerPixel);
+	const float framesPerResolution = framesPerPixel / resolution;
 
-	constexpr auto maxFramesPerPixel = 512;
-	const auto resolution = std::max(1, framesPerPixel / maxFramesPerPixel);
-	const auto framesPerResolution = framesPerPixel / resolution;
-
-	const auto numPixels = std::min(numFrames, width);
+	const size_t numPixels = std::min<size_t>(parameters.size, width);
 	auto min = std::vector<float>(numPixels, 1);
 	auto max = std::vector<float>(numPixels, -1);
-	auto squared = std::vector<float>(numPixels);
+	auto squared = std::vector<float>(numPixels, 0);
 
-	const auto maxFrames = numPixels * framesPerPixel;
+	const size_t maxFrames = numPixels * static_cast<size_t>(framesPerPixel);
+
+	int pixelIndex = 0;
+
 	for (int i = 0; i < maxFrames; i += resolution)
 	{
-		const auto pixelIndex = i / framesPerPixel;
-		const auto value = std::accumulate(buffer[i].begin(), buffer[i].end(), 0.0f) / buffer[i].size();
+		pixelIndex = i / framesPerPixel;
+		const int frameIndex = !parameters.reversed ? i : maxFrames - i;
+
+		const auto& frame = parameters.buffer[frameIndex];
+		const float value = std::accumulate(frame.begin(), frame.end(), 0.0f) / frame.size();
+
 		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
 		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
+
 		squared[pixelIndex] += value * value;
 	}
-
-	const auto amplification = sample.amplification();
-	const auto reversed = sample.reversed();
+	
+	while (pixelIndex < numPixels)
+	{
+		max[pixelIndex] = 0.0;
+		min[pixelIndex] = 0.0;
+		
+		pixelIndex++;
+	}
 
 	for (int i = 0; i < numPixels; i++)
 	{
-		const auto lineY1 = centerY - max[i] * halfHeight * amplification;
-		const auto lineY2 = centerY - min[i] * halfHeight * amplification;
+		const int lineY1 = centerY - max[i] * halfHeight * parameters.amplification;
+		const int lineY2 = centerY - min[i] * halfHeight * parameters.amplification;
+		const int lineX = i + x;
+		painter.drawLine(lineX, lineY1, lineX, lineY2);
 
-		auto lineX = i + x;
-		if (reversed) { lineX = width - lineX; }
+		const float rms = std::sqrt(squared[i] / framesPerResolution);
+		const float maxRMS = std::clamp(rms, min[i], max[i]);
+		const float minRMS = std::clamp(-rms, min[i], max[i]);
 
-		p.drawLine(lineX, lineY1, lineX, lineY2);
+		const int rmsLineY1 = centerY - maxRMS * halfHeight * parameters.amplification;
+		const int rmsLineY2 = centerY - minRMS * halfHeight * parameters.amplification;
 
-		const auto rms = std::sqrt(squared[i] / framesPerResolution);
-		const auto maxRMS = std::clamp(rms, min[i], max[i]);
-		const auto minRMS = std::clamp(-rms, min[i], max[i]);
-
-		const auto rmsLineY1 = centerY - maxRMS * halfHeight * amplification;
-		const auto rmsLineY2 = centerY - minRMS * halfHeight * amplification;
-
-		p.setPen(rmsColor);
-		p.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
-		p.setPen(color);
+		painter.setPen(rmsColor);
+		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
+		painter.setPen(color);
 	}
 }
 

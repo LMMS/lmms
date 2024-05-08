@@ -24,6 +24,7 @@
 
 #include "AudioEngine.h"
 
+#include "MixHelpers.h"
 #include "denormals.h"
 
 #include "lmmsconfig.h"
@@ -82,7 +83,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings( qualitySettings::Mode::Draft ),
+	m_qualitySettings(qualitySettings::Interpolation::Linear),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
@@ -276,17 +277,6 @@ sample_rate_t AudioEngine::inputSampleRate() const
 							baseSampleRate();
 }
 
-
-
-
-sample_rate_t AudioEngine::processingSampleRate() const
-{
-	return outputSampleRate() * m_qualitySettings.sampleRateMultiplier();
-}
-
-
-
-
 bool AudioEngine::criticalXRuns() const
 {
 	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
@@ -433,6 +423,8 @@ void AudioEngine::renderStageMix()
 	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);
 
+	MixHelpers::multiply(m_outputBufferWrite, m_masterGain, m_framesPerPeriod);
+
 	emit nextAudioBuffer(m_outputBufferRead);
 
 	// and trigger LFOs
@@ -456,7 +448,7 @@ const surroundSampleFrame *AudioEngine::renderNextBuffer()
 	renderStageMix();           // STAGE 3: do master mix in mixer
 
 	s_renderingThread = false;
-	m_profiler.finishPeriod(processingSampleRate(), m_framesPerPeriod);
+	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 
 	return m_outputBufferRead;
 }
@@ -594,7 +586,6 @@ void AudioEngine::changeQuality(const struct qualitySettings & qs)
 	stopProcessing();
 
 	m_qualitySettings = qs;
-	m_audioDev->applyQualitySettings();
 
 	emit sampleRateChanged();
 	emit qualitySettingsChanged();

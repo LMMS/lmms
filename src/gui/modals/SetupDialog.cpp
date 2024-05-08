@@ -37,7 +37,6 @@
 #include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
-#include "gui_templates.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"
@@ -143,10 +142,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "disableautoquit", "1").toInt()),
 	m_NaNHandler(ConfigManager::inst()->value(
 			"app", "nanhandler", "1").toInt()),
-	m_hqAudioDev(ConfigManager::inst()->value(
-			"audioengine", "hqaudio").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
+	m_midiAutoQuantize(ConfigManager::inst()->value(
+			"midi", "autoquantize", "0").toInt() != 0),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
@@ -160,8 +159,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
-	// TODO: Equivalent to the new setWindowFlag(Qt::WindowContextHelpButtonHint, false)
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	setModal(true);
 
 	Engine::projectJournal()->setJournalling(false);
@@ -560,10 +558,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// audio_layout->addWidget(useNaNHandler);
 	// useNaNHandler->setChecked(m_NaNHandler);
 
-	// HQ mode checkbox
-	auto hqaudio = addCheckBox(tr("HQ mode for output audio device"), audioInterfaceBox, nullptr,
-		m_hqAudioDev, SLOT(toggleHQAudioDev(bool)), false);
-
 	// Buffer size group
 	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
@@ -605,7 +599,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
-	audio_layout->addWidget(hqaudio);
 	audio_layout->addWidget(bufferSizeBox);
 	audio_layout->addStretch();
 
@@ -717,10 +710,22 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_assignableMidiDevices->setCurrentIndex(current);
 	}
 
+	// MIDI Recording tab
+	auto* midiRecordingTab = new QGroupBox(tr("Behavior when recording"), midi_w);
+	auto* midiRecordingLayout = new QVBoxLayout(midiRecordingTab);
+	{
+		auto *box = addCheckBox(tr("Auto-quantize notes in Piano Roll"),
+								midiRecordingTab, midiRecordingLayout,
+								m_midiAutoQuantize, SLOT(toggleMidiAutoQuantization(bool)),
+								false);
+		box->setToolTip(tr("If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution."));
+	}
+
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiInterfaceBox);
 	midi_layout->addWidget(ms_w);
 	midi_layout->addWidget(midiAutoAssignBox);
+	midi_layout->addWidget(midiRecordingTab);
 	midi_layout->addStretch();
 
 
@@ -958,14 +963,13 @@ void SetupDialog::accept()
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("app", "nanhandler",
 					QString::number(m_NaNHandler));
-	ConfigManager::inst()->setValue("audioengine", "hqaudio",
-					QString::number(m_hqAudioDev));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
 					m_assignableMidiDevices->currentText());
+	ConfigManager::inst()->setValue("midi", "autoquantize", QString::number(m_midiAutoQuantize));
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -1161,17 +1165,6 @@ void SetupDialog::toggleDisableAutoQuit(bool enabled)
 	m_disableAutoQuit = enabled;
 }
 
-
-
-
-// Audio settings slots.
-
-void SetupDialog::toggleHQAudioDev(bool enabled)
-{
-	m_hqAudioDev = enabled;
-}
-
-
 void SetupDialog::audioInterfaceChanged(const QString & iface)
 {
 	for(AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -1230,7 +1223,7 @@ void SetupDialog::setBufferSize(int value)
 
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
-		1000.0f * m_bufferSize / Engine::audioEngine()->processingSampleRate(), 0, 'f', 1));
+		1000.0f * m_bufferSize / Engine::audioEngine()->outputSampleRate(), 0, 'f', 1));
 	updateBufferSizeWarning(m_bufferSize);
 }
 
@@ -1252,6 +1245,11 @@ void SetupDialog::midiInterfaceChanged(const QString & iface)
 	}
 
 	m_midiIfaceSetupWidgets[m_midiIfaceNames[iface]]->show();
+}
+
+void SetupDialog::toggleMidiAutoQuantization(bool enabled)
+{
+	m_midiAutoQuantize = enabled;
 }
 
 

@@ -29,7 +29,6 @@
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "ComboBox.h"
-#include "gui_templates.h"
 
 namespace lmms::gui
 {
@@ -76,12 +75,10 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	auto m_filter1ComboBox = new ComboBox(this);
 	m_filter1ComboBox->setGeometry( 19, 70, 137, ComboBox::DEFAULT_HEIGHT );
-	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
 	auto m_filter2ComboBox = new ComboBox(this);
 	m_filter2ComboBox->setGeometry( 217, 70, 137, ComboBox::DEFAULT_HEIGHT );
-	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
 

@@ -34,23 +34,23 @@ namespace lmms
 
 
 #ifdef SYNC_WITH_SHM_FIFO
-RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
-	m_in( _in ),
-	m_out( _out )
+RemotePluginBase::RemotePluginBase(shmFifo * _in, shmFifo * _out) :
+	m_in(_in),
+	m_out(_out)
 #else
 RemotePluginBase::RemotePluginBase() :
-	m_socket( -1 ),
-	m_invalid( false )
+	m_socket(-1),
+	m_invalid(false)
 #endif
 {
 #ifdef LMMS_HAVE_LOCALE_H
 	// make sure, we're using common ways to print/scan
 	// floats to/from strings (',' vs. '.' for decimal point etc.)
-	setlocale( LC_NUMERIC, "C" );
+	setlocale(LC_NUMERIC, "C");
 #endif
 #ifndef SYNC_WITH_SHM_FIFO
-	pthread_mutex_init( &m_receiveMutex, nullptr );
-	pthread_mutex_init( &m_sendMutex, nullptr );
+	pthread_mutex_init(&m_receiveMutex, nullptr);
+	pthread_mutex_init(&m_sendMutex, nullptr);
 #endif
 }
 
@@ -63,39 +63,39 @@ RemotePluginBase::~RemotePluginBase()
 	delete m_in;
 	delete m_out;
 #else
-	pthread_mutex_destroy( &m_receiveMutex );
-	pthread_mutex_destroy( &m_sendMutex );
+	pthread_mutex_destroy(&m_receiveMutex);
+	pthread_mutex_destroy(&m_sendMutex);
 #endif
 }
 
 
 
 
-int RemotePluginBase::sendMessage( const message & _m )
+int RemotePluginBase::sendMessage(const message & _m)
 {
 #ifdef SYNC_WITH_SHM_FIFO
 	m_out->lock();
-	m_out->writeInt( _m.id );
-	m_out->writeInt( _m.data.size() );
+	m_out->writeInt(_m.id);
+	m_out->writeInt(_m.data.size());
 	int j = 8;
-	for( unsigned int i = 0; i < _m.data.size(); ++i )
+	for (unsigned int i = 0; i < _m.data.size(); ++i)
 	{
-		m_out->writeString( _m.data[i] );
+		m_out->writeString(_m.data[i]);
 		j += 4 + _m.data[i].size();
 	}
 	m_out->unlock();
 	m_out->messageSent();
 #else
-	pthread_mutex_lock( &m_sendMutex );
-	writeInt( _m.id );
-	writeInt( _m.data.size() );
+	pthread_mutex_lock(&m_sendMutex);
+	writeInt(_m.id);
+	writeInt(_m.data.size());
 	int j = 8;
 	for (const auto& str : _m.data)
 	{
 		writeString(str);
 		j += 4 + str.size();
 	}
-	pthread_mutex_unlock( &m_sendMutex );
+	pthread_mutex_unlock(&m_sendMutex);
 #endif
 
 	return j;
@@ -112,21 +112,21 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	message m;
 	m.id = m_in->readInt();
 	const int s = m_in->readInt();
-	for( int i = 0; i < s; ++i )
+	for (int i = 0; i < s; ++i)
 	{
-		m.data.push_back( m_in->readString() );
+		m.data.push_back(m_in->readString());
 	}
 	m_in->unlock();
 #else
-	pthread_mutex_lock( &m_receiveMutex );
+	pthread_mutex_lock(&m_receiveMutex);
 	message m;
 	m.id = readInt();
 	const int s = readInt();
-	for( int i = 0; i < s; ++i )
+	for (int i = 0; i < s; ++i)
 	{
-		m.data.push_back( readString() );
+		m.data.push_back(readString());
 	}
-	pthread_mutex_unlock( &m_receiveMutex );
+	pthread_mutex_unlock(&m_receiveMutex);
 #endif
 	return m;
 }
@@ -136,10 +136,10 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 
 RemotePluginBase::message RemotePluginBase::waitForMessage(
 							const message & _wm,
-							bool _busy_waiting )
+							bool _busy_waiting)
 {
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-	if( _busy_waiting )
+	if (_busy_waiting)
 	{
 		// No point processing events outside of the main thread
 		_busy_waiting = QThread::currentThread() ==
@@ -148,41 +148,41 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 
 	struct WaitDepthCounter
 	{
-		WaitDepthCounter( int & depth, bool busy ) :
-			m_depth( depth ),
-			m_busy( busy )
+		WaitDepthCounter(int & depth, bool busy) :
+			m_depth(depth),
+			m_busy(busy)
 		{
-			if( m_busy ) { ++m_depth; }
+			if (m_busy) { ++m_depth; }
 		}
 
 		~WaitDepthCounter()
 		{
-			if( m_busy ) { --m_depth; }
+			if (m_busy) { --m_depth; }
 		}
 
 		int & m_depth;
 		bool m_busy;
 	};
 
-	WaitDepthCounter wdc( waitDepthCounter(), _busy_waiting );
+	WaitDepthCounter wdc(waitDepthCounter(), _busy_waiting);
 #endif
-	while( !isInvalid() )
+	while (!isInvalid())
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-		if( _busy_waiting && !messagesLeft() )
+		if (_busy_waiting && !messagesLeft())
 		{
 			QCoreApplication::processEvents(
-				QEventLoop::ExcludeUserInputEvents, 50 );
+				QEventLoop::ExcludeUserInputEvents, 50);
 			continue;
 		}
 #endif
 		message m = receiveMessage();
-		processMessage( m );
-		if( m.id == _wm.id )
+		processMessage(m);
+		if (m.id == _wm.id)
 		{
 			return m;
 		}
-		else if( m.id == IdUndefined )
+		else if (m.id == IdUndefined)
 		{
 			return m;
 		}

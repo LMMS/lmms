@@ -41,10 +41,6 @@
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
 #endif
-
-#include <QtGlobal>
-#include <QSystemSemaphore>
-#include <QUuid>
 #else // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -75,6 +71,7 @@
 #include <QProcess>
 #include <QThread>
 #include <QString>
+#include <QUuid>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
@@ -85,6 +82,7 @@
 
 #ifdef SYNC_WITH_SHM_FIFO
 #include "SharedMemory.h"
+#include "SystemSemaphore.h"
 #endif
 
 namespace lmms
@@ -120,12 +118,11 @@ class shmFifo
 	} ;
 
 public:
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	// constructor for master-side
 	shmFifo() :
 		m_invalid( false ),
 		m_master( true ),
-		m_dataSem( QString() ),
-		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 		m_data.create(QUuid::createUuid().toString().toStdString());
@@ -133,26 +130,21 @@ public:
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
 		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
-		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ),
-						1, QSystemSemaphore::Create );
-		m_messageSem.setKey( QString::number(
-						m_data->messageSem.semKey ),
-						0, QSystemSemaphore::Create );
+		m_dataSem = SystemSemaphore{std::to_string(m_data->dataSem.semKey), 1u};
+		m_messageSem = SystemSemaphore{std::to_string(m_data->messageSem.semKey), 0u};
 	}
+#endif
 
 	// constructor for remote-/client-side - use _shm_key for making up
 	// the connection to master
 	shmFifo(const std::string& shmKey) :
 		m_invalid( false ),
 		m_master( false ),
-		m_dataSem( QString() ),
-		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 		m_data.attach(shmKey);
-		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
-		m_messageSem.setKey( QString::number(
-						m_data->messageSem.semKey ) );
+		m_dataSem = SystemSemaphore{std::to_string(m_data->dataSem.semKey)};
+		m_messageSem = SystemSemaphore{std::to_string(m_data->messageSem.semKey)};
 	}
 
 	inline bool isInvalid() const
@@ -336,11 +328,10 @@ private:
 	volatile bool m_invalid;
 	bool m_master;
 	SharedMemory<shmData> m_data;
-	QSystemSemaphore m_dataSem;
-	QSystemSemaphore m_messageSem;
+	SystemSemaphore m_dataSem;
+	SystemSemaphore m_messageSem;
 	std::atomic_int m_lockDepth;
-
-} ;
+};
 #endif // SYNC_WITH_SHM_FIFO
 
 

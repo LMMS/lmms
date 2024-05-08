@@ -388,13 +388,13 @@ void FloatModelEditorBase::enterValue()
 	if (volKnobType() != VolKnobType::Normal &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
-		new_val = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr(volKnobType() == VolKnobType::AbsVol ?
-				"Please enter a new value between -96.0 dBFS and 6.0 dBFS:"
-				: "Please enter a new value between -96.0 dB and 6.0 dB:"),
-				ampToDbfs(model()->getRoundedValue() / 100.0),
-							-96.0, 6.0, model()->getDigitCount(), &ok);
+		auto const initalValue = model()->getRoundedValue() / 100.0;
+		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+		new_val = QInputDialog::getDouble(this, tr("Set value"),
+			tr(volKnobType() == VolKnobType::AbsVol ? "Please enter a new value between -96.0 dBFS and 6.0 dBFS:"
+													: "Please enter a new value between -96.0 dB and 6.0 dB:"),
+			initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
 		if (new_val <= -96.0)
 		{
 			new_val = 0.0f;
@@ -440,9 +440,13 @@ QString FloatModelEditorBase::displayValue() const
 	if (volKnobType() != VolKnobType::Normal &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
-		return m_description.trimmed() + QString(volKnobType() == VolKnobType::AbsVol ? " %1 dBFS" : " %1 dB").
-				arg(ampToDbfs(model()->getRoundedValue() / volumeRatio()),
-								3, 'f', 2);
+		const auto dbLabel = QString{volKnobType() == VolKnobType::AbsVol ? " %1 dBFS" : " %1 dB"};
+		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
+		return m_description.trimmed() + (
+			valueToVolumeRatio == 0.
+			? QString(" -∞ " + dbLabel)
+			: QString(" %1 " + dbLabel).arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
+		);
 	}
 
 	return m_description.trimmed() + QString(" %1").

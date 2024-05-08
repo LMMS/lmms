@@ -208,16 +208,30 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-void MidiClip::removeNote( Note * _note_to_del )
+NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
+{
+	instrumentTrack()->lock();
+	delete *it;
+	auto new_it = m_notes.erase(it);
+	instrumentTrack()->unlock();
+
+	checkType();
+	updateLength();
+
+	emit dataChanged();
+	return new_it;
+}
+
+NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
+	auto it = std::find(m_notes.begin(), m_notes.end(), note);
+	if (it != m_notes.end())
 	{
-		auto shouldRemove = note == _note_to_del;
-		if (shouldRemove) { delete note; }
-		return shouldRemove;
-	}), m_notes.end());
+		delete *it;
+		it = m_notes.erase(it);
+	}
 
 	instrumentTrack()->unlock();
 
@@ -225,6 +239,7 @@ void MidiClip::removeNote( Note * _note_to_del )
 	updateLength();
 
 	emit dataChanged();
+	return it;
 }
 
 
