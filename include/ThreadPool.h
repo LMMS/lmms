@@ -57,20 +57,26 @@ public:
 	auto enqueue(Fn&& fn, Args&&... args) -> std::future<std::invoke_result_t<Fn, Args...>>
 	{
 		using ReturnType = std::invoke_result_t<Fn, Args...>;
-		using PackagedTaskType = std::packaged_task<ReturnType()>;
 
-		auto packagedTask = std::make_shared<PackagedTaskType>(
-			[fn = std::forward<Fn>(fn), args = std::make_tuple(std::forward<Args>(args)...)] {
-				return std::apply(fn, args);
-			});
+		auto promise = std::make_shared<std::promise<ReturnType>>();
+		auto task = [promise, fn = std::forward<Fn>(fn), args = std::make_tuple(std::forward<Args>(args)...)] 
+		{
+			if constexpr (!std::is_same_v<ReturnType, void>)
+			{
+				promise->set_value(std::apply(fn, args));
+				return;
+			}
+			std::apply(fn, args);
+			promise->set_value();
+		};
 
 		{
 			const auto lock = std::unique_lock{m_runMutex};
-			m_queue.push([packagedTask] { (*packagedTask)(); });
+			m_queue.push([task = std::move(task)] { task(); });
 		}
 
 		m_runCond.notify_one();
-		return packagedTask->get_future();
+		return promise->get_future();
 	}
 
 	//! Return the number of worker threads used.
