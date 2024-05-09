@@ -292,6 +292,24 @@ inline void zeroSampleFrames(sampleFrame* buffer, fpp_t frames)
 	}
 }
 
+inline void copyToSampleFrames(sampleFrame* target, const float* source, fpp_t frames)
+{
+	for (fpp_t i = 0; i < frames; ++i)
+	{
+		target[i].setLeft(source[2*i]);
+		target[i].setRight(source[2*i + 1]);
+	}
+}
+
+inline void copyFromSampleFrames(float* target, const sampleFrame* source, fpp_t frames)
+{
+	for (fpp_t i = 0; i < frames; ++i)
+	{
+		target[2*i] = source[i].left();
+		target[2*i + 1] = source[i].right();
+	}
+}
+
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 

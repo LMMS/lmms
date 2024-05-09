@@ -376,7 +376,8 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		}
 		else if( inputs == DEFAULT_CHANNELS )
 		{
-			memcpy( m_audioBuffer.get(), _in_buf, frames * BYTES_PER_FRAME );
+			auto target = m_audioBuffer.get();
+			copyFromSampleFrames(target, _in_buf, frames);
 		}
 		else
 		{
@@ -418,8 +419,8 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	}
 	else if( outputs == DEFAULT_CHANNELS )
 	{
-		memcpy( _out_buf, m_audioBuffer.get() + m_inputCount * frames,
-						frames * BYTES_PER_FRAME );
+		auto source = m_audioBuffer.get() + m_inputCount * frames;
+		copyToSampleFrames(_out_buf, source, frames);
 	}
 	else
 	{
