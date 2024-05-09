@@ -79,13 +79,13 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 	// Update background if snap size changes
 	connect( getGUI()->songEditor()->m_editor->snappingModel(),
-			SIGNAL( dataChanged() ),
-			this, SLOT( updateBackground() ) );
+			&Model::dataChanged,
+			this, &TrackContentWidget::updateBackground );
 
 	// Also update background if proportional snap is enabled/disabled
 	connect( getGUI()->songEditor()->m_editor,
-			SIGNAL( proportionalSnapChanged() ),
-			this, SLOT( updateBackground() ) );
+			&SongEditor::proportionalSnapChanged,
+			this, &TrackContentWidget::updateBackground );
 
 	setStyle( QApplication::style() );
 
