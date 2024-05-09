@@ -31,6 +31,8 @@
 #include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
 
+#include <QMutex>
+
 namespace lmms
 {
 
@@ -220,6 +222,10 @@ private:
 	ComboBoxModel m_arpDirectionModel;
 	ComboBoxModel m_arpModeModel;
 
+	// used for arp mode: sort
+	// contains all of the sorted note chords
+	std::vector<int> m_sortedChords;
+	QMutex m_sortedChordsLocker;
 
 	friend class InstrumentTrack;
 	friend class gui::InstrumentFunctionArpeggioView;

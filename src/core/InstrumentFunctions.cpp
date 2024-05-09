@@ -31,8 +31,8 @@
 #include "InstrumentTrack.h"
 #include "PresetPreviewPlayHandle.h"
 
-#include <algorithm>
 #include <vector>
+#include <QMutex>
 
 namespace lmms
 {
@@ -311,7 +311,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpTimeModel( 200.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
-	m_arpModeModel( this, tr( "Arpeggio mode" ) )
+	m_arpModeModel( this, tr( "Arpeggio mode" ) ),
+	m_sortedChords(0)
 {
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	for (auto& chord : chord_table.chords())
@@ -372,6 +373,12 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
 	const int total_range = range * cnphv.size();
 
+	// resize m_sortedChords array
+	if (static_cast<ArpMode>(m_arpModeModel.value()) == ArpMode::Sort && m_sortedChords.size() != total_chord_size)
+	{
+		//m_sortedChords.resize(total_chord_size);
+	}
+
 	// number of frames that every note should be played
 	const auto arp_frames = (f_cnt_t)(m_arpTimeModel.value() / 1000.0f * Engine::audioEngine()->processingSampleRate());
 	const auto gated_frames = (f_cnt_t)(m_arpGateModel.value() * arp_frames / 100.0f);
@@ -404,24 +411,79 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// offsetRange offsets range to account for
 		// the arp getting bigger if arpmode = sort
 		int offsetRange = range;
+		std::vector<int> sortedChordsB;
 		// this array will contain the combined, sorted keys
-		std::vector<int> noteKeysArray(total_chord_size);
 		if (static_cast<ArpMode>(m_arpModeModel.value()) == ArpMode::Sort)
 		{
+			sortedChordsB.resize(total_chord_size);
 			int minIndex = _n->index();
 
-			// combining all of the chord keys
+			// sortedChordsB contains a combination of keys
+			// from all the currently played notes
+
+			// firstly the order of the base notes are decided
+			// and because we want to sort base notes,
+			// only every chord's first location gets used
+
+			// soting the base notes
 			for (int i = 0; i < cnphv.size(); i++)
 			{
-				for (int j = 0; j < cur_chord_size; j++)
+				if (i <= 0)
 				{
-					// get the value of the chord's selected note (j)
-					// + the base note's value
-					noteKeysArray[i * cur_chord_size + j] = cnphv[i]->key() + chord_table.chords()[selected_arp][j];
+					// at start only the base notes get filled in at
+					// every start of a chord
+					sortedChordsB[i * cur_chord_size] = cnphv[i]->key();
 				}
+				else
+				{
+					// firstly decide the order of the base notes
+					unsigned int sortedLocation = 0;
+					for (unsigned int j = 0; j < i; j++)
+					{
+						// if [j] base note is bigger than the current one
+						if (sortedChordsB[j * cur_chord_size] > cnphv[i]->key())
+						{
+							sortedLocation = j;
+							break;
+						}
+					}
+					qDebug("sortedLocation = %d", sortedLocation);
+					// offset everything left (after sortedLocation)
+					for (unsigned int j = i; j > sortedLocation; j--)
+					{
+						qDebug("offset base notes: [%d] %d, %d", i, j, (j - 1));
+						sortedChordsB[j * cur_chord_size] = sortedChordsB[(j - 1) * cur_chord_size];
+					}
+					// lastly set the location of the current base note
+					qDebug("set base note: [%d] %d", i, sortedLocation * cur_chord_size);
+					sortedChordsB[sortedLocation * cur_chord_size] = cnphv[i]->key();
+				}
+
 				if (cnphv[i]->index() < minIndex)
 				{
 					minIndex = cnphv[i]->index();
+				}
+			}
+
+			// making the final keys
+			// from the sorted base notes
+			for (int i = 0; i < cnphv.size(); i++)
+			{
+				//qDebug("sorted base notes: [%d] %d, size: %ld", i, sortedChordsB[i * cur_chord_size], sortedChordsB.size());
+				qDebug(" --- ");
+				for (unsigned int j = 0; j < cur_chord_size; j++)
+				{
+					qDebug("notes: [%d] %d", i * cur_chord_size + j, sortedChordsB[i * cur_chord_size + j]);
+				}
+				qDebug(" --- ");
+				for (unsigned int j = cur_chord_size - 1; j > 0; j--)
+				{
+					// copy the base note ([i * cur_chord_size]) to every key in the chord
+					// then add the chord values
+					//qDebug("sorted key locations: [%d] b:[%d]", i * cur_chord_size + j, i * cur_chord_size);
+					sortedChordsB[i * cur_chord_size + j] = sortedChordsB[i * cur_chord_size] + chord_table.chords()[selected_arp][j];
+					//qDebug("sorted keys: [%d] b:[%d] %d", i * cur_chord_size + j, i * cur_chord_size, sortedChordsB[i * cur_chord_size + j]);
+
 				}
 			}
 
@@ -432,8 +494,10 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				break;
 			}
 
+			/*
 			// sorting:
-			std::sort(noteKeysArray.begin(), noteKeysArray.end(), std::less{});
+			std::sort(sortedChordsB.begin(), sortedChordsB.end(), std::less{});
+			*/
 
 			// we need to account for a bigger arp
 			// offsetRange will make range greater
@@ -520,7 +584,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// if we are sorting, we already have the base note key and the chord key
 			// getting the mod and div of cur_arp_idx and total_chord_size
 			auto divResult = std::div(cur_arp_idx, total_chord_size);
-			sub_note_key = noteKeysArray[divResult.rem] + divResult.quot * KeysPerOctave;
+			sub_note_key = sortedChordsB[divResult.rem] + divResult.quot * KeysPerOctave;
 			// limiting the played key so it does not get out of NumKeys range
 			if (sub_note_key >= NumKeys)
 			{
