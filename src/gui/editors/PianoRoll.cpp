@@ -3774,13 +3774,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			int step = we->angleDelta().y() > 0 ? 1 : -1;
-#if QT_VERSION >= 0x050700
-			if (we->inverted()) {
-				// Handle "natural" scrolling, which is common on trackpads and touch devices
-				step = -step;
-			}
-#endif
+			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
 
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{

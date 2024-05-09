@@ -141,14 +141,7 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	int direction = we->angleDelta().y() > 0 ? 1 : -1;
-
-#if QT_VERSION >= 0x050700
-	if (we->inverted()) {
-		// Handle "natural" scrolling, which is common on trackpads and touch devices
-		direction = -direction;
-	}
-#endif
+	const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
 
 	model()->setValue(model()->value() + direction * model()->step<int>());
 	emit manualChange();

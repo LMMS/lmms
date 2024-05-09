@@ -332,13 +332,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 		}
 
 		Note * n = m_clip->noteAtStep( step );
-		int direction = we->angleDelta().y() > 0 ? 1 : -1;
-#if QT_VERSION >= 0x050700
-		if (we->inverted()) {
-			// Handle "natural" scrolling, which is common on trackpads and touch devices
-			direction = -direction;
-		}
-#endif
+		const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
 		if(!n && direction > 0)
 		{
 			n = m_clip->addStepNote( step );

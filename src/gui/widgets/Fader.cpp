@@ -193,14 +193,7 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 void Fader::wheelEvent (QWheelEvent* ev)
 {
 	ev->accept();
-	int direction = ev->angleDelta().y() > 0 ? 1 : -1;
-
-#if QT_VERSION >= 0x050700
-	if (ev->inverted()) {
-		// Handle "natural" scrolling, which is common on trackpads and touch devices
-		direction = -direction;
-	}
-#endif
+	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
 	model()->incValue(direction);
 	updateTextFloat();
