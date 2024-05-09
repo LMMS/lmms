@@ -229,24 +229,6 @@ void AudioJack::stopProcessing()
 	m_stopped = true;
 }
 
-
-
-
-void AudioJack::applyQualitySettings()
-{
-	if (hqAudio())
-	{
-		setSampleRate(Engine::audioEngine()->processingSampleRate());
-
-		if (jack_get_sample_rate(m_client) != sampleRate()) { setSampleRate(jack_get_sample_rate(m_client)); }
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioJack::registerPort(AudioPort* port)
 {
 #ifdef AUDIO_PORT_SUPPORT

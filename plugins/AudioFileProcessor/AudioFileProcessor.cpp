@@ -284,7 +284,7 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 	// Otherwise, use the remaining sample duration
 	const auto baseFreq = instrumentTrack()->baseFreq();
 	const auto freqFactor = baseFreq / note->frequency()
-		* Engine::audioEngine()->processingSampleRate()
+		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
 
 	const auto startFrame = m_nextPlayStartPoint >= m_sample.endFrame()

@@ -102,13 +102,13 @@ private slots:
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
-	void toggleHQAudioDev(bool enabled);
 	void updateBufferSizeWarning(int value);
 	void setBufferSize(int value);
 	void resetBufferSize();
 
 	// MIDI settings widget.
 	void midiInterfaceChanged(const QString & driver);
+	void toggleMidiAutoQuantization(bool enabled);
 
 	// Paths settings widget.
 	void openWorkingDir();
@@ -179,7 +179,6 @@ private:
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
 	bool m_NaNHandler;
-	bool m_hqAudioDev;
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
@@ -190,6 +189,7 @@ private:
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 	QComboBox * m_assignableMidiDevices;
+	bool m_midiAutoQuantize;
 
 	// Paths settings widgets.
 	QString m_workingDir;

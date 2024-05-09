@@ -265,7 +265,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 					const_cast<float*>( m_graph.samples() ),
 					_n,
 					m_interpolation.value(), factor,
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();

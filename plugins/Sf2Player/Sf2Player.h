@@ -80,16 +80,6 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0;
-	}
-
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 	
 	QString getCurrentPatchName();
