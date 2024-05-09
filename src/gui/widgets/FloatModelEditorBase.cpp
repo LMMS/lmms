@@ -326,6 +326,13 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 		}
 	}
 
+#if QT_VERSION >= 0x050700
+	// Handle "natural" scrolling, which is common on trackpads and touch devices
+	if (we->inverted()) {
+		direction = -direction;
+	}
+#endif
+
 	// Compute the number of steps but make sure that we always do at least one step
 	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
 	const int inc = direction * stepMult;

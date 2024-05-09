@@ -220,7 +220,14 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
+		int direction = event->angleDelta().y() < 0 ? 1 : -1;
+#if QT_VERSION >= 0x050700
+		if (event->inverted()) {
+			// Handle "natural" scrolling, which is common on trackpads and touch devices
+			direction = -direction;
+		}
+#endif
+		model()->setInitValue(model()->value() + direction);
 		update();
 		event->accept();
 	}
