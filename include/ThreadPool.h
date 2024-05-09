@@ -72,7 +72,7 @@ public:
 
 		{
 			const auto lock = std::unique_lock{m_runMutex};
-			m_queue.push([task = std::move(task)] { task(); });
+			m_queue.push(std::move(task));
 		}
 
 		m_runCond.notify_one();
