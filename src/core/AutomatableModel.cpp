@@ -32,6 +32,7 @@
 #include "LocaleHelper.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include <interpolation.h>
 
 namespace lmms
 {
@@ -513,7 +514,7 @@ void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* m
 		if (model1->valueBuffer() && model2->valueBuffer())
 		{
 			std::copy_n(model2->valueBuffer()->data(),
-				model1->valueBuffer()->length(),
+				model1->valueBuffer()->size(),
 				model1->valueBuffer()->data());
 		}
 		// send dataChanged() before linking (because linking will
@@ -600,7 +601,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 }
 
 
-ValueBuffer * AutomatableModel::valueBuffer()
+std::vector<float> * AutomatableModel::valueBuffer()
 {
 	QMutexLocker m( &m_valueBufferMutex );
 	// if we've already calculated the valuebuffer this period, return the cached buffer
@@ -612,24 +613,25 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	}
 
 	float val = m_value; // make sure our m_value doesn't change midway
-
+  
+	std::vector<float> * vb;
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
 		auto vb = m_controllerConnection->valueBuffer();
 		if( vb )
 		{
-			float * values = vb->values();
-			float * nvalues = m_valueBuffer.values();
+			float * values = vb->data();
+			float * nvalues = m_valueBuffer.data();
 			switch( m_scaleType )
 			{
 			case ScaleType::Linear:
-				for( int i = 0; i < m_valueBuffer.length(); i++ )
+				for( int i = 0; i < m_valueBuffer.size(); i++ )
 				{
 					nvalues[i] = minValue<float>() + ( range() * values[i] );
 				}
 				break;
 			case ScaleType::Logarithmic:
-				for( int i = 0; i < m_valueBuffer.length(); i++ )
+				for( int i = 0; i < m_valueBuffer.size(); i++ )
 				{
 					nvalues[i] = logToLinearScale( values[i] );
 				}
@@ -655,10 +657,10 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
 				lm->controllerConnection()->getController()->isSampleExact())
 		{
-			auto vb = lm->valueBuffer();
-			float * values = vb->values();
-			float * nvalues = m_valueBuffer.values();
-			for (int i = 0; i < vb->length(); i++)
+			vb = lm->valueBuffer();
+			float * values = vb->data();
+			float * nvalues = m_valueBuffer.data();
+			for (int i = 0; i < vb->size(); i++)
 			{
 				nvalues[i] = fittedValue(values[i]);
 			}
@@ -670,7 +672,10 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	if( m_oldValue != val )
 	{
-		m_valueBuffer.interpolate( m_oldValue, val );
+		float i = 0;
+		std::generate(m_valueBuffer.begin(), m_valueBuffer.end(), [&]() {
+			return linearInterpolate( m_oldValue, val, i++ / m_valueBuffer.size());
+		});
 		m_oldValue = val;
 		m_lastUpdatedPeriod = s_periodCounter;
 		m_hasSampleExactData = true;

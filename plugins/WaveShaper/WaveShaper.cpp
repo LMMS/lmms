@@ -85,14 +85,14 @@ bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
-	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
-	ValueBuffer *outputBufer = m_wsControls.m_outputModel.valueBuffer();
+	auto *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
+	auto *outputBufer = m_wsControls.m_outputModel.valueBuffer();
 
 	int inputInc = inputBuffer ? 1 : 0;
 	int outputInc = outputBufer ? 1 : 0;
 
-	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
-	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
+	const float *inputPtr = inputBuffer ? &( inputBuffer->data()[ 0 ] ) : &input;
+	const float *outputPtr = outputBufer ? &( outputBufer->data()[ 0 ] ) : &output;
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{

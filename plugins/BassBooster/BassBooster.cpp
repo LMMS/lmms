@@ -85,18 +85,18 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
 
 	const float const_gain = m_bbControls.m_gainModel.value();
-	const ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
+	const auto *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
 
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for( size_t f = 0; f < frames; ++f )
 	{
 		float gain = const_gain;
 		if (gainBuffer) {
 			//process period using sample exact data
-			gain = gainBuffer->value( f );
+			gain = gainBuffer->at(std::clamp(f, (size_t) 0, gainBuffer->size()));
 		}
 		//float gain = gainBuffer ? gainBuffer[f] : gain;
 		m_bbFX.leftFX().setGain( gain );

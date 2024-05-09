@@ -27,6 +27,7 @@
 
 #include "AudioEngine.h"
 #include "MidiController.h"
+#include <interpolation.h>
 
 namespace lmms
 {
@@ -51,12 +52,15 @@ void MidiController::updateValueBuffer()
 {
 	if( m_previousValue != m_lastValue )
 	{
-		m_valueBuffer.interpolate( m_previousValue, m_lastValue );
+		float i = 0;
+		std::generate(m_valueBuffer.begin(), m_valueBuffer.end(), [&]() {
+			return linearInterpolate( m_previousValue, m_lastValue, i++ / m_valueBuffer.size());
+		});
 		m_previousValue = m_lastValue;
 	}
 	else
 	{
-		m_valueBuffer.fill( m_lastValue );
+		std::fill(m_valueBuffer.begin(), m_valueBuffer.end(), m_lastValue);
 	}
 	m_bufferLastUpdated = s_periods;
 }

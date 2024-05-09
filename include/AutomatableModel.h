@@ -33,7 +33,6 @@
 #include "JournallingObject.h"
 #include "Model.h"
 #include "TimePos.h"
-#include "ValueBuffer.h"
 #include "ModelVisitor.h"
 
 
@@ -174,7 +173,7 @@ public:
 
 	//! @brief Function that returns sample-exact data as a ValueBuffer
 	//! @return pointer to model's valueBuffer when s.ex.data exists, NULL otherwise
-	ValueBuffer * valueBuffer();
+	std::vector<float> * valueBuffer();
 
 	template<class T>
 	T initValue() const
@@ -406,7 +405,7 @@ private:
 	ControllerConnection* m_controllerConnection;
 
 
-	ValueBuffer m_valueBuffer;
+	std::vector<float> m_valueBuffer;
 	long m_lastUpdatedPeriod;
 	static long s_periodCounter;
 
