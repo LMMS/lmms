@@ -82,10 +82,6 @@ public:
 	//! Return the number of worker threads used.
 	auto numWorkers() const -> size_t;
 
-	//! Initializes the global `ThreadPool` instance with `numWorkers` worker threads.
-	//! This can only have an effect the first time it is called.
-	static void init(size_t numWorkers);
-
 	//! Return the global `ThreadPool` instance.
 	static auto instance() -> ThreadPool&;
 

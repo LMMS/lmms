@@ -76,11 +76,6 @@ void ThreadPool::run()
 	}
 }
 
-void ThreadPool::init(size_t numWorkers)
-{
-	s_numWorkers = numWorkers;
-}
-
 auto ThreadPool::instance() -> ThreadPool&
 {
 	static auto s_pool = ThreadPool{s_numWorkers};
