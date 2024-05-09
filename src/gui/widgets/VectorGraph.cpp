@@ -1908,6 +1908,7 @@ VectorGraphDataArray::~VectorGraphDataArray()
 
 void VectorGraphDataArray::updateConnections(VectorGraphModel* parent)
 {
+	qDebug("VectorGrahDataArray updateConnections");
 	// call VectorGraphModel signals without qt
 	m_parent = parent;
 	m_id = m_parent->getDataArrayNewId();
@@ -1998,7 +1999,7 @@ void VectorGraphDataArray::setAutomatedColor(QColor color)
 }
 bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool callDataChanged)
 {
-	qDebug("setEffectorArrayLocation start");
+	qDebug("setEffectorArrayLocation start %d", arrayLocation);
 	bool found = true;
 	if (arrayLocation >= 0)
 	{
@@ -2042,17 +2043,17 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool call
 		if (m_effectorLocation != -1)
 		{
 			// checking if this VectorGraphDataArray's effector is an effector for an other VectorGraphDataArray
-			bool found = false;
+			bool foundB = false;
 			for (unsigned int i = 0; i < m_parent->getDataArraySize(); i++)
 			{
 				if (m_parent->getDataArray(i)->getId() != m_id && m_parent->getDataArray(i)->getEffectorArrayLocation() == m_effectorLocation)
 				{
-					found = true;
+					foundB = true;
 					break;
 				}
 			}
 			// setting the correct state for the effector array's m_isAnEffector
-			m_parent->getDataArray(m_effectorLocation)->setIsAnEffector(found);
+			m_parent->getDataArray(m_effectorLocation)->setIsAnEffector(foundB);
 			m_effectorLocation = -1;
 
 			getUpdatingFromPoint(-1);
