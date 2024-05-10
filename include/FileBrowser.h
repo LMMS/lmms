@@ -77,9 +77,9 @@ public:
 
 	~FileBrowser() override = default;
 
-	static QStringList directoryBlacklist()
+	static QStringList excludedPaths()
 	{
-		static auto s_blacklist = QStringList{
+		static auto s_excludedPaths = QStringList{
 #ifdef LMMS_BUILD_LINUX
 			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
 			"/sys"
@@ -88,7 +88,7 @@ public:
 			"C:\\Windows"
 #endif
 		};
-		return s_blacklist;
+		return s_excludedPaths;
 	}
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }

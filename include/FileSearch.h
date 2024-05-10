@@ -40,10 +40,10 @@ public:
 
 	//! Create a `FileSearch` object that uses the specified string filter `filter` and extension filters in
 	//! `extensions` to search within the given `paths`.
-	//! `blacklist`, `dirFilters`, and `sortFlags` can optionally be specified to blacklist certain directories, filter
+	//! `excludedPaths`, `dirFilters`, and `sortFlags` can optionally be specified to exclude certain directories, filter
 	//! out certain types of entries, and sort the matches.
 	FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions,
-		const QStringList& blacklist = {}, QDir::Filters dirFilters = QDir::Filters{},
+		const QStringList& excludedPaths = {}, QDir::Filters dirFilters = QDir::Filters{},
 		QDir::SortFlags sortFlags = QDir::SortFlags{});
 
 	//! Execute the search, emitting the `foundResult` signal when matches are found.
@@ -60,11 +60,11 @@ signals:
 	void searchCompleted(FileSearch* search);
 
 private:
-	static auto pathInBlacklist(const QString& path) -> bool;
+	static auto isPathExcluded(const QString& path) -> bool;
 	QString m_filter;
 	QStringList m_paths;
 	QStringList m_extensions;
-	QStringList m_blacklist;
+	QStringList m_excludedPaths;
 	QDir::Filters m_dirFilters;
 	QDir::SortFlags m_sortFlags;
 	std::atomic<bool> m_cancel = false;

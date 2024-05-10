@@ -36,11 +36,11 @@
 
 namespace lmms {
 FileSearch::FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions,
-	const QStringList& blacklist, QDir::Filters dirFilters, QDir::SortFlags sortFlags)
+	const QStringList& excludedPaths, QDir::Filters dirFilters, QDir::SortFlags sortFlags)
 	: m_filter(filter)
 	, m_paths(paths)
 	, m_extensions(extensions)
-	, m_blacklist(blacklist)
+	, m_excludedPaths(excludedPaths)
 	, m_dirFilters(dirFilters)
 	, m_sortFlags(sortFlags)
 {
@@ -51,7 +51,7 @@ void FileSearch::operator()()
 	auto stack = QFileInfoList{};
 	for (const auto& path : m_paths)
 	{
-		if (m_blacklist.contains(path)) { continue; }
+		if (m_excludedPaths.contains(path)) { continue; }
 
 		auto dir = QDir{path};
 		stack.append(dir.entryInfoList(m_dirFilters, m_sortFlags));
@@ -62,7 +62,7 @@ void FileSearch::operator()()
 
 			const auto info = stack.takeFirst();
 			const auto entryPath = info.absoluteFilePath();
-			if (m_blacklist.contains(entryPath)) { continue; }
+			if (m_excludedPaths.contains(entryPath)) { continue; }
 
 			const auto name = info.fileName();
 			const auto validFile = info.isFile() && m_extensions.contains(info.suffix(), Qt::CaseInsensitive);
