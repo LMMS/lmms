@@ -27,7 +27,6 @@
 #include <atomic>
 #include <chrono>
 #include <lmmsconfig.h>
-#include <ratio>
 
 #ifdef __MINGW32__
 #include <mingw.thread.h>
@@ -68,9 +67,14 @@ void FileSearch::operator()()
 			const auto name = info.fileName();
 			const auto validFile = info.isFile() && m_extensions.contains(info.suffix(), Qt::CaseInsensitive);
 			const auto passesFilter = name.contains(m_filter, Qt::CaseInsensitive);
+			
+			if ((validFile || info.isDir()) && passesFilter)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds{MillisecondsBetweenResults});
+				emit foundMatch(this, entryPath);
+			}
 
-			// Only when a directory doesn't pass the filter should we search further
-			if (info.isDir() && !passesFilter)
+			if (info.isDir())
 			{
 				dir.setPath(entryPath);
 				auto entries = dir.entryInfoList(m_dirFilters, m_sortFlags);
@@ -82,11 +86,6 @@ void FileSearch::operator()()
 				{
 					stack.push_front(entry);
 				}
-			}
-			else if ((validFile || info.isDir()) && passesFilter)
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds{MillisecondsBetweenResults});
-				emit foundMatch(this, entryPath);
 			}
 		}
 	}
