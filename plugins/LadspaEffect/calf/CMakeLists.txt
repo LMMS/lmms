@@ -41,7 +41,9 @@ IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(OTHER_FLAGS -Wno-format-overflow)
 ENDIF()
 
-IF(NOT MSVC)
+if(MSVC)
+	target_compile_options(veal PRIVATE /wd4099 /wd4244 /wd4305)
+else()
 	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS} ${OTHER_FLAGS})
 endif()
 
