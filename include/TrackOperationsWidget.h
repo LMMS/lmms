@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_OPERATIONS_WIDGET_H
-#define TRACK_OPERATIONS_WIDGET_H
+#ifndef LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
+#define LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
 
 #include <QWidget>
 
@@ -80,4 +80,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TRACK_OPERATIONS_WIDGET_H

@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -58,8 +58,8 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
 	m_delayControls( this )
 {
 	m_delay = 0;
-	m_delay = new StereoDelay( 20, Engine::audioEngine()->processingSampleRate() );
-	m_lfo = new Lfo( Engine::audioEngine()->processingSampleRate() );
+	m_delay = new StereoDelay( 20, Engine::audioEngine()->outputSampleRate() );
+	m_lfo = new Lfo( Engine::audioEngine()->outputSampleRate() );
 	m_outGain = 1.0;
 }
 
@@ -88,10 +88,10 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		return( false );
 	}
 	double outSum = 0.0;
-	const float sr = Engine::audioEngine()->processingSampleRate();
+	const float sr = Engine::audioEngine()->outputSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	float lPeak = 0.0;
 	float rPeak = 0.0;
 	float length = m_delayControls.m_delayTimeModel.value();
@@ -115,7 +115,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
-	int sampleLength;
+
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		dryS[0] = buf[f][0];
@@ -123,8 +123,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
-		sampleLength = *lengthPtr * Engine::audioEngine()->processingSampleRate();
-		m_currentLength = sampleLength;
+		m_currentLength = static_cast<int>(*lengthPtr * Engine::audioEngine()->outputSampleRate());
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
 
@@ -152,8 +151,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 void DelayEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::audioEngine()->processingSampleRate() );
-	m_delay->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+	m_lfo->setSampleRate( Engine::audioEngine()->outputSampleRate() );
+	m_delay->setSampleRate( Engine::audioEngine()->outputSampleRate() );
 }
 
 

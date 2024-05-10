@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_WAVE_H
-#define AUDIO_FILE_WAVE_H
+#ifndef LMMS_AUDIO_FILE_WAVE_H
+#define LMMS_AUDIO_FILE_WAVE_H
 
 #include "lmmsconfig.h"
 #include "AudioFileDevice.h"
@@ -56,9 +56,7 @@ public:
 
 
 private:
-	void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						float _master_gain ) override;
+	void writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames) override;
 
 	bool startEncoding();
 	void finishEncoding();
@@ -71,4 +69,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_WAVE_H

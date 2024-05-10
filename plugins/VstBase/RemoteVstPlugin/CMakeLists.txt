@@ -22,6 +22,9 @@ FOREACH( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 	SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 ENDFOREACH()
 
+# Import of windows.h breaks min()/max()
+add_definitions(-DNOMINMAX)
+
 ADD_SUBDIRECTORY("${LMMS_SOURCE_DIR}/src/common" common)
 
 if(NOT IS_WIN)
@@ -64,12 +67,6 @@ if(MSVC)
 )
 endif()
 
-
-if(WIN32)
-	find_package(Qt5Core REQUIRED)
-	target_link_libraries(${EXE_NAME} Qt5::Core)
-endif()
-
 if(IS_MINGW)
 	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
 
@@ -89,9 +86,27 @@ if(IS_MINGW)
 	endif()
 endif()
 
-IF(STRIP)
-	ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME} POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:${EXE_NAME}>")
-ENDIF()
+if(LMMS_BUILD_WIN32)
+	if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+		set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
+	else()
+		set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
+	endif()
+	if(STRIP)
+		# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
+		# multiple configurations, combine the OR into a single CONFIG expression.
+		set(STRIP_COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,${NOOP_COMMAND},${STRIP}>")
+	else()
+		set(STRIP_COMMAND "${NOOP_COMMAND}")
+	endif()
+	add_custom_command(
+		TARGET "${EXE_NAME}"
+		POST_BUILD
+		COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:${EXE_NAME}>"
+		VERBATIM
+		COMMAND_EXPAND_LISTS
+	)
+endif()
 
 if(BITNESS EQUAL 32)
 	INSTALL(TARGETS ${EXE_NAME} RUNTIME DESTINATION "${PLUGIN_DIR}/32")

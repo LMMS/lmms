@@ -150,7 +150,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
-    : Instrument(instrumentTrack, descriptor),
+    : Instrument(instrumentTrack, descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable),
       kIsPatchbay(isPatchbay),
       fHandle(nullptr),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
@@ -194,8 +194,8 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
         fDescriptor->activate(fHandle);
 
     // we need a play-handle which cares for calling play()
-    InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    Engine::audioEngine()->addPlayHandle( iph );
+	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
+	Engine::audioEngine()->addPlayHandle( iph );
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
     // text filter completion
@@ -220,7 +220,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
 
     if (fHost.resourceDir != nullptr)
     {
@@ -259,7 +259,7 @@ uint32_t CarlaInstrument::handleGetBufferSize() const
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::audioEngine()->processingSampleRate();
+    return Engine::audioEngine()->outputSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -342,11 +342,6 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 }
 
 // -------------------------------------------------------------------
-
-Instrument::Flags CarlaInstrument::flags() const
-{
-    return IsSingleStreamed|IsMidiBased|IsNotBendable;
-}
 
 QString CarlaInstrument::nodeName() const
 {
@@ -508,7 +503,6 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 
     if (fHandle == nullptr)
     {
-        instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
         return;
     }
 
@@ -556,8 +550,6 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
         workingBuffer[i][0] = buf1[i];
         workingBuffer[i][1] = buf2[i];
     }
-
-    instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
 }
 
 bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)
@@ -625,8 +617,8 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
     setPalette(pal);
 
-    QHBoxLayout* l = new QHBoxLayout(this);
-    l->setContentsMargins( 20, 180, 10, 10 );
+	auto l = new QHBoxLayout(this);
+	l->setContentsMargins( 20, 180, 10, 10 );
     l->setSpacing(3);
     l->setAlignment(Qt::AlignTop);
 
@@ -635,7 +627,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
     m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-    m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
+    m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
     m_toggleUIButton->setToolTip(
@@ -645,7 +637,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
     m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
     m_toggleParamsWindowButton->setCheckable(true);
-    m_toggleParamsWindowButton->setFont(pointSize<8>(m_toggleParamsWindowButton->font()));
+    m_toggleParamsWindowButton->setFont(adjustedToPixelSize(m_toggleParamsWindowButton->font(), 8));
 #if CARLA_VERSION_HEX < CARLA_MIN_PARAM_VERSION
     m_toggleParamsWindowButton->setEnabled(false);
     m_toggleParamsWindowButton->setToolTip(tr("Available from Carla version 2.1 and up."));
@@ -750,8 +742,8 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_curOutColumn(0),
 	m_curOutRow(0)
 {
-	QWidget* centralWidget = new QWidget(this);
-	QVBoxLayout* verticalLayout = new QVBoxLayout(centralWidget);
+	auto centralWidget = new QWidget(this);
+	auto verticalLayout = new QVBoxLayout(centralWidget);
 
 	// -- Toolbar
 	m_toolBarLayout = new QHBoxLayout();
@@ -794,9 +786,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_toolBarLayout->addWidget(m_groupFilterCombo);
 
 	// -- Input params
-	QFrame* inputFrame = new QFrame(this);
-	QVBoxLayout* inputLayout = new QVBoxLayout(inputFrame);
-	QLabel* inputLabel = new QLabel("Input parameters", inputFrame);
+	auto inputFrame = new QFrame(this);
+	auto inputLayout = new QVBoxLayout(inputFrame);
+	auto inputLabel = new QLabel("Input parameters", inputFrame);
 
 	m_inputScrollArea = new QScrollArea(inputFrame);
 	m_inputScrollAreaWidgetContent = new QWidget();
@@ -820,9 +812,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	inputLayout->addWidget(m_inputScrollArea);
 
 	// -- Output params
-	QFrame* outputFrame = new QFrame(this);
-	QVBoxLayout* outputLayout = new QVBoxLayout(outputFrame);
-	QLabel* outputLabel = new QLabel("Output parameters", outputFrame);
+	auto outputFrame = new QFrame(this);
+	auto outputLayout = new QVBoxLayout(outputFrame);
+	auto outputLabel = new QLabel("Output parameters", outputFrame);
 
 	m_outputScrollArea = new QScrollArea(outputFrame);
 	m_outputScrollAreaWidgetContent = new QWidget();
@@ -846,7 +838,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	outputLayout->addWidget(m_outputScrollArea);
 
 	// -- QSplitter
-	QSplitter* splitter = new QSplitter(Qt::Vertical, this);
+	auto splitter = new QSplitter(Qt::Vertical, this);
 
 	// -- Add layout and widgets.
 	verticalLayout->addLayout(m_toolBarLayout);
@@ -866,8 +858,8 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 #endif
 
 	// -- Sub window
-	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
-		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+	auto win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(),
+		Qt::SubWindow | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_carlaInstrumentView->m_paramsSubWindow = getGUI()->mainWindow()->workspace()->addSubWindow(win);
 	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(
 		QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -976,7 +968,7 @@ void CarlaParamsView::filterKnobs()
 	}
 
 	// Add spacer so all knobs go to top
-	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	auto verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_inputScrollAreaLayout->addItem(verticalSpacer, m_curRow+1, 0, 1, 1);
 }
 
@@ -1015,7 +1007,7 @@ void CarlaParamsView::refreshKnobs()
 	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
 	{
 		bool enabled = m_carlaInstrument->m_paramModels[i]->enabled();
-		m_knobs.push_back(new Knob(knobDark_28, m_inputScrollAreaWidgetContent));
+		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
 		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
 		m_knobs[i]->setHintText(name, "");
 		m_knobs[i]->setLabel(name);
@@ -1119,16 +1111,15 @@ void CarlaParamsView::clearKnobs()
 	}
 
 	// Remove spacers
-	QLayoutItem* item;
 	for (int16_t i=m_inputScrollAreaLayout->count() - 1; i > 0; i--)
 	{
-		item = m_inputScrollAreaLayout->takeAt(i);
+		auto item = m_inputScrollAreaLayout->takeAt(i);
 		if (item->widget()) {continue;}
 		delete item;
 	}
 	for (int16_t i=m_outputScrollAreaLayout->count() - 1; i > 0; i--)
 	{
-		item = m_outputScrollAreaLayout->takeAt(i);
+		auto item = m_outputScrollAreaLayout->takeAt(i);
 		if (item->widget()) {continue;}
 		delete item;
 	}

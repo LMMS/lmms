@@ -91,11 +91,11 @@ GuiApplication::GuiApplication()
 	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultThemeDir());
 	QDir::addSearchPath("artwork", ":/artwork");
 
-	LmmsStyle* lmmsstyle = new LmmsStyle();
+	auto lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
-	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
-	QPalette* lpal = new QPalette(lmmspal->palette());
+	auto lmmspal = new LmmsPalette(nullptr, lmmsstyle);
+	auto lpal = new QPalette(lmmspal->palette());
 
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;
@@ -148,7 +148,7 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_mixerView = new MixerView;
+	m_mixerView = new MixerView(Engine::mixer());
 	connect(m_mixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));

@@ -57,7 +57,7 @@
 #include <wine/exception.h>
 #endif
 
-#endif
+#endif // LMMS_BUILD_LINUX
 
 #ifndef NATIVE_LINUX_VST
 #define USE_WS_PREFIX
@@ -127,7 +127,7 @@ struct ERect
 
 using namespace std;
 
-static lmms::VstHostLanguages hlang = lmms::LanguageEnglish;
+static lmms::VstHostLanguage hlang = lmms::VstHostLanguage::English;
 
 static bool EMBED = false;
 static bool EMBED_X11 = false;
@@ -390,7 +390,7 @@ public:
 #endif
 
 private:
-	enum GuiThreadMessages
+	enum class GuiThreadMessage
 	{
 		None,
 		ProcessPluginMessage,
@@ -628,7 +628,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstSetLanguage:
-			hlang = static_cast<VstHostLanguages>( _m.getInt() );
+			hlang = static_cast<VstHostLanguage>( _m.getInt() );
 			break;
 
 		case IdVstGetParameterDump:
@@ -883,7 +883,7 @@ void RemoteVstPlugin::initEditor()
 	
 	pluginDispatch(effEditTop);
 	m_x11WindowVisible = true;
-#endif
+#endif // NATIVE_LINUX_VST
 }
 
 
@@ -1048,7 +1048,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 					return a.deltaFrames < b.deltaFrames;
 				} );
 
-		VstEvents* events = (VstEvents *) eventsBuffer;
+		auto events = (VstEvents*)eventsBuffer;
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
 
@@ -1090,16 +1090,16 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
-#endif
 		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
 								bufferSize() );
-#ifdef OLD_VST_SDK
 	}
 	else
 	{
 		m_plugin->process( m_plugin, m_inputs, m_outputs,
 								bufferSize() );
 	}
+#else
+	m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
 #endif
 
 	unlockShm();
@@ -1425,7 +1425,7 @@ struct sBank
 void RemoteVstPlugin::savePreset( const std::string & _file )
 {
 	unsigned int chunk_size = 0;
-	sBank * pBank = ( sBank* ) new char[ sizeof( sBank ) ];
+	auto pBank = (sBank*)new char[sizeof(sBank)];
 	char progName[ 128 ] = { 0 };
 	char* data = nullptr;
 	const bool chunky = ( m_plugin->flags & ( 1 << 5 ) ) != 0;
@@ -1444,11 +1444,11 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 		if (isPreset) {
 			chunk_size = m_plugin->numParams * sizeof( float );
 			data = new char[ chunk_size ];
-			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( data );
+			auto toUIntArray = reinterpret_cast<unsigned int*>(data);
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				float value = m_plugin->getParameter( m_plugin, i );
-				unsigned int * pValue = ( unsigned int * ) &value;
+				auto pValue = (unsigned int*)&value;
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
 		} else chunk_size = (((m_plugin->numParams * sizeof( float )) + 56)*m_plugin->numPrograms);
@@ -1463,7 +1463,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) pBank->fxMagic = 0x6B427846;
 
 	pBank->version = 0x01000000;
-	unsigned int uIntToFile = (unsigned int) m_plugin->uniqueID;
+	auto uIntToFile = (unsigned int)m_plugin->uniqueID;
 	pBank->fxID = endian_swap( uIntToFile );
 	uIntToFile = (unsigned int) pluginVersion();
 	pBank->fxVersion = endian_swap( uIntToFile );
@@ -1526,9 +1526,9 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 {
 	void * chunk = nullptr;
-	unsigned int * pLen = new unsigned int[ 1 ];
+	auto pLen = new unsigned int[1];
 	unsigned int len = 0;
-	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
+	auto pBank = (sBank*)new char[sizeof(sBank)];
 	FILE * stream = F_OPEN_UTF8( _file, "rb" );
 	if (!stream)
 	{
@@ -1580,7 +1580,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			pluginDispatch( 24, 1, len, chunk );
 		else
 		{
-			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( chunk );
+			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk);
 			for (int i = 0; i < pBank->numPrograms; i++ )
 			{
 				toUInt = endian_swap( toUIntArray[ i ] );
@@ -1634,7 +1634,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
-	char * chunk = new char[_len];
+	auto chunk = new char[_len];
 
 	FILE* fp = F_OPEN_UTF8( _file, "rb" );
 	if (!fp)
@@ -1763,7 +1763,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too)
 #ifndef NATIVE_LINUX_VST
-			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::GiveIdle), 0 );
 #else
 			__plugin->sendX11Idle();
 #endif
@@ -1937,7 +1937,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// TODO
 			// close window, platform specific handle in <ptr>
 			return 0;
-#endif
+#endif // OLD_VST_SDK
 
 		case audioMasterSizeWindow:
 		{
@@ -2066,7 +2066,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterGetLanguage:
 			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
-			return hlang;
+			return static_cast<std::intptr_t>(hlang);
 
 		case audioMasterGetDirectory:
 			SHOW_CALLBACK( "amc: audioMasterGetDirectory\n" );
@@ -2077,7 +2077,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
 #ifndef NATIVE_LINUX_VST
-			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::GiveIdle), 0 );
 #else
 			__plugin->sendX11Idle();
 #endif
@@ -2234,7 +2234,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 #ifndef NATIVE_LINUX_VST
 			PostMessage( __MessageHwnd,
 					WM_USER,
-					ProcessPluginMessage,
+					static_cast<WPARAM>(GuiThreadMessage::ProcessPluginMessage),
 					(LPARAM) new message( m ) );
 #else
 		_this->queueMessage( m );
@@ -2244,7 +2244,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 
 	// notify GUI thread about shutdown
 #ifndef NATIVE_LINUX_VST
-	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
+	PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::ClosePlugin), 0 );
 
 	return 0;
 #else
@@ -2334,7 +2334,7 @@ void RemoteVstPlugin::guiEventLoop()
 		}
 	}
 }
-#endif
+#endif // NATIVE_LINUX_VST
 
 
 #ifndef NATIVE_LINUX_VST
@@ -2349,9 +2349,9 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 	}
 	else if( uMsg == WM_USER )
 	{
-		switch( wParam )
+		switch( static_cast<GuiThreadMessage>(wParam) )
 		{
-			case ProcessPluginMessage:
+			case GuiThreadMessage::ProcessPluginMessage:
 			{
 				message * m = (message *) lParam;
 				__plugin->queueMessage( *m );
@@ -2363,11 +2363,11 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 				return 0;
 			}
 
-			case GiveIdle:
+			case GuiThreadMessage::GiveIdle:
 				__plugin->idle();
 				return 0;
 
-			case ClosePlugin:
+			case GuiThreadMessage::ClosePlugin:
 				PostQuitMessage(0);
 				return 0;
 
@@ -2385,7 +2385,7 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 }
 
 
-#endif
+#endif // NATIVE_LINUX_VST
 
 } // namespace lmms
 
@@ -2421,7 +2421,7 @@ int main( int _argc, char * * _argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	sched_setscheduler( 0, SCHED_FIFO, &sparam );
 #endif
-#endif
+#endif // LMMS_BUILD_LINUX
 
 #ifdef LMMS_BUILD_WIN32
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )

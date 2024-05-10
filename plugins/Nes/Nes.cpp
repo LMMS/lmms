@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 				"A NES-like synthesizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -385,9 +385,9 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		//	                          //
 		//  final stage - mixing      //
 		//                            //
-		////////////////////////////////			
-		
-		float pin1 = static_cast<float>( ch1 + ch2 ); 
+		////////////////////////////////
+
+		auto pin1 = static_cast<float>(ch1 + ch2);
 		// add dithering noise
 		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin1 = pin1 / 30.0f;
@@ -405,8 +405,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		
 		pin1 *= NES_MIXING_12;
 
-		
-		float pin2 = static_cast<float>( ch3 + ch4 ); 
+		auto pin2 = static_cast<float>(ch3 + ch4);
 		// add dithering noise
 		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin2 = pin2 / 30.0f;
@@ -483,53 +482,53 @@ void NesObject::updatePitch()
 
 NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	Instrument( instrumentTrack, &nes_plugin_descriptor ),
-	m_ch1Enabled( true, this ),
+	m_ch1Enabled(true, this, tr("Channel 1 enable")),
 	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 coarse detune" ) ),
 	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 volume" ) ),
 	
-	m_ch1EnvEnabled( false, this ),
-	m_ch1EnvLooped( false, this ),
+	m_ch1EnvEnabled(false, this, tr("Channel 1 envelope enable")),
+	m_ch1EnvLooped(false, this, tr("Channel 1 envelope loop")),
 	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 envelope length" ) ),
 	
 	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 duty cycle" ) ),
 	
-	m_ch1SweepEnabled( false, this ),
+	m_ch1SweepEnabled(false, this, tr("Channel 1 sweep enable")),
 	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 sweep amount" ) ),
 	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 sweep rate" ) ),
 	
-	m_ch2Enabled( true, this ),
-	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 Coarse detune" ) ),
-	m_ch2Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 Volume" ) ),
+	m_ch2Enabled(true, this, tr("Channel 2 enable")),
+	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 coarse detune" ) ),
+	m_ch2Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 volume" ) ),
 	
-	m_ch2EnvEnabled( false, this ),
-	m_ch2EnvLooped( false, this ),
+	m_ch2EnvEnabled(false, this, tr("Channel 2 envelope enable")),
+	m_ch2EnvLooped(false, this, tr("Channel 2 envelope loop")),
 	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 envelope length" ) ),
 	
 	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 duty cycle" ) ),
 	
-	m_ch2SweepEnabled( false, this ),
+	m_ch2SweepEnabled(false, this, tr("Channel 2 sweep enable")),
 	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 sweep amount" ) ),
 	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 sweep rate" ) ),
 	
 	//channel 3
-	m_ch3Enabled( true, this ),
+	m_ch3Enabled(true, this, tr("Channel 3 enable")),
 	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 coarse detune" ) ),
 	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 volume" ) ),
 
 	//channel 4
-	m_ch4Enabled( false, this ),
+	m_ch4Enabled(false, this, tr("Channel 4 enable")),
 	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 volume" ) ),
 	
-	m_ch4EnvEnabled( false, this ),
-	m_ch4EnvLooped( false, this ),
+	m_ch4EnvEnabled(false, this, tr("Channel 4 envelope enable")),
+	m_ch4EnvLooped(false, this, tr("Channel 4 envelope loop")),
 	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 envelope length" ) ),
 	
-	m_ch4NoiseMode( false, this ),
-	m_ch4NoiseFreqMode( false, this ),
+	m_ch4NoiseMode(false, this, tr("Channel 4 noise mode")),
+	m_ch4NoiseFreqMode(false, this, tr("Channel 4 frequency mode")),
 	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 noise frequency" ) ),
 	
 	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 noise frequency sweep" ) ),
-	m_ch4NoiseQuantize( true, this ),
+	m_ch4NoiseQuantize(true, this, tr("Channel 4 quantize")),
 	
 	//master
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
@@ -551,19 +550,17 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
-	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr )
-	{	
-		NesObject * nes = new NesObject( this, Engine::audioEngine()->processingSampleRate(), n );
+	if (!n->m_pluginData)
+	{
+		auto nes = new NesObject(this, Engine::audioEngine()->outputSampleRate(), n);
 		n->m_pluginData = nes;
 	}
-	
-	NesObject * nes = static_cast<NesObject *>( n->m_pluginData );
-	
+
+	auto nes = static_cast<NesObject*>(n->m_pluginData);
+
 	nes->renderOutput( workingBuffer + offset, frames );
 	
 	applyRelease( workingBuffer, n );
-
-	instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, n );
 }
 
 
@@ -722,7 +719,6 @@ namespace gui
 {
 
 
-QPixmap * NesInstrumentView::s_artwork = nullptr;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
@@ -731,12 +727,8 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	}
-
-	pal.setBrush( backgroundRole(),	*s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	pal.setBrush(backgroundRole(), s_artwork);
 	setPalette( pal );
 
 	const int KNOB_Y1 = 24;
@@ -846,7 +838,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 void NesInstrumentView::modelChanged()
 {
-	NesInstrument * nes = castModel<NesInstrument>();	
+	auto nes = castModel<NesInstrument>();
 
 	m_ch1EnabledBtn->setModel( &nes->m_ch1Enabled );
 	m_ch1CrsKnob->setModel( &nes->m_ch1Crs );

@@ -35,8 +35,8 @@ const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
 const float CUTOFF_RATIO = 0.353553391f;
 const int SILENCEFRAMES = 10;
-const float OS_RESAMPLE [5] = { 0.0001490062883964112, 0.1645978376763992, 0.6705063120704088,
-		0.1645978376763992, 0.0001490062883964112 };
+const auto OS_RESAMPLE = std::array{0.0001490062883964112f, 0.1645978376763992f, 0.6705063120704088f,
+		0.1645978376763992f, 0.0001490062883964112f };
 
 extern "C"
 {
@@ -48,7 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "An oversampling bitcrusher" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -59,31 +59,31 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
 	Effect( &bitcrush_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() * OS_RATE );
+	m_buffer = new sampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
-	
+
 	m_bitCounterL = 0.0f;
 	m_bitCounterR = 0.0f;
-	
+
 	m_left = 0.0f;
 	m_right = 0.0f;
-	
+
 	m_silenceCounter = 0;
 }
 
 BitcrushEffect::~BitcrushEffect()
 {
-	MM_FREE( m_buffer );
+	delete[] m_buffer;
 }
 
 
 void BitcrushEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
@@ -125,7 +125,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		m_rateCoeffL = ( m_sampleRate * OS_RATE ) / ( rate - diff );
 		m_rateCoeffR = ( m_sampleRate * OS_RATE ) / ( rate + diff );
-		
+
 		m_bitCounterL = 0.0f;
 		m_bitCounterR = 0.0f;
 	}
@@ -147,9 +147,9 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		m_outClip = dbfsToAmp( m_controls.m_outClip.value() );
 	}
 	m_needsUpdate = false;
-	
+
 	const float noiseAmt = m_controls.m_inNoise.value() * 0.01f;
-	
+
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
 	{
@@ -164,15 +164,15 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 				if( m_bitCounterL > m_rateCoeffL )
 				{
 					m_bitCounterL -= m_rateCoeffL;
-					m_left = m_depthEnabled 
-						? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) ) 
+					m_left = m_depthEnabled
+						? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) )
 						: buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt );
 				}
 				if( m_bitCounterR > m_rateCoeffR )
 				{
 					m_bitCounterR -= m_rateCoeffR;
-					m_right = m_depthEnabled 
-						? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) ) 
+					m_right = m_depthEnabled
+						? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) )
 						: buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt );
 				}
 			}
@@ -185,17 +185,17 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 			for( int o = 0; o < OS_RATE; ++o )
 			{
 				m_buffer[f * OS_RATE + o][0] = m_depthEnabled
-					? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) ) 
+					? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) )
 					: buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt );
 				m_buffer[f * OS_RATE + o][1] = m_depthEnabled
-					? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) ) 
+					? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) )
 					: buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt );
 			}
 		}
 	}
-	
+
 	// the oversampled buffer is now written, so filter it to reduce aliasing
-	
+
 	for( int f = 0; f < frames * OS_RATE; ++f )
 	{
 		if( qMax( qAbs( m_buffer[f][0] ), qAbs( m_buffer[f][1] ) ) >= 1.0e-10f )
@@ -218,10 +218,10 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 			}
 		}
 	}
-	
-	
+
+
 	// now downsample and write it back to main buffer
-	
+
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -238,7 +238,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		buf[f][1] = d * buf[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	
+
 	checkGate( outSum / frames );
 
 	return isRunning();

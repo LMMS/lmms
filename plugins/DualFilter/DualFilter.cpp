@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -57,8 +57,8 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
-	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
-	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
+	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
+	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
 
 	// ensure filters get updated
 	m_filter1changed = true;
@@ -90,12 +90,12 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
     if( m_dfControls.m_filter1Model.isValueChanged() || m_filter1changed )
 	{
-		m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
+		m_filter1->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter1Model.value()) );
 		m_filter1changed = true;
 	}
     if( m_dfControls.m_filter2Model.isValueChanged() || m_filter2changed )
 	{
-		m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+		m_filter2->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter2Model.value()) );
 		m_filter2changed = true;
 	}
 
@@ -134,8 +134,8 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	const bool enabled1 = m_dfControls.m_enabled1Model.value();
 	const bool enabled2 = m_dfControls.m_enabled2Model.value();
 
-	
-	
+
+
 
 	// buffer processing loop
 	for( fpp_t f = 0; f < frames; ++f )
@@ -145,9 +145,9 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		const float mix1 = 1.0f - mix2;
 		const float gain1 = *gain1Ptr * 0.01f;
 		const float gain2 = *gain2Ptr * 0.01f;
-		sample_t s[2] = { 0.0f, 0.0f };	// mix
-		sample_t s1[2] = { buf[f][0], buf[f][1] };	// filter 1
-		sample_t s2[2] = { buf[f][0], buf[f][1] };	// filter 2
+		auto s = std::array{0.0f, 0.0f};	// mix
+		auto s1 = std::array{buf[f][0], buf[f][1]};	// filter 1
+		auto s2 = std::array{buf[f][0], buf[f][1]};	// filter 2
 
 		// update filter 1
 		if( enabled1 )
@@ -218,6 +218,11 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	return isRunning();
 }
 
+void DualFilterEffect::onEnabledChanged()
+{
+	m_filter1->clearHistory();
+	m_filter2->clearHistory();
+}
 
 
 

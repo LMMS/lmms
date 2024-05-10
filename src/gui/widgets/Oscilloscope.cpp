@@ -45,7 +45,9 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_background( embed::getIconPixmap( "output_graph" ) ),
 	m_points( new QPointF[Engine::audioEngine()->framesPerPeriod()] ),
 	m_active( false ),
-	m_normalColor(71, 253, 133),
+	m_leftChannelColor(71, 253, 133),
+	m_rightChannelColor(71, 253, 133),
+	m_otherChannelsColor(71, 253, 133),
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
@@ -112,14 +114,34 @@ void Oscilloscope::setActive( bool _active )
 }
 
 
-QColor const & Oscilloscope::normalColor() const
+QColor const & Oscilloscope::leftChannelColor() const
 {
-	return m_normalColor;
+	return m_leftChannelColor;
 }
 
-void Oscilloscope::setNormalColor(QColor const & normalColor)
+void Oscilloscope::setLeftChannelColor(QColor const & leftChannelColor)
 {
-	m_normalColor = normalColor;
+	m_leftChannelColor = leftChannelColor;
+}
+
+QColor const & Oscilloscope::rightChannelColor() const
+{
+	return m_rightChannelColor;
+}
+
+void Oscilloscope::setRightChannelColor(QColor const & rightChannelColor)
+{
+	m_rightChannelColor = rightChannelColor;
+}
+
+QColor const & Oscilloscope::otherChannelsColor() const
+{
+	return m_otherChannelsColor;
+}
+
+void Oscilloscope::setOtherChannelsColor(QColor const & otherChannelsColor)
+{
+	m_otherChannelsColor = otherChannelsColor;
 }
 
 QColor const & Oscilloscope::clippingColor() const
@@ -143,27 +165,31 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	{
 		AudioEngine const * audioEngine = Engine::audioEngine();
 
-		float master_output = audioEngine->masterGain();
+		float masterOutput = audioEngine->masterGain();
 
 		const fpp_t frames = audioEngine->framesPerPeriod();
 		AudioEngine::StereoSample peakValues = audioEngine->getPeakValues(m_buffer, frames);
-		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
-		// Set the color of the line according to the maximum level
-		float const maxLevelWithAppliedMasterGain = max_level * master_output;
-		p.setPen(QPen(determineLineColor(maxLevelWithAppliedMasterGain), 0.7));
+		auto const leftChannelClips = clips(peakValues.left * masterOutput);
+		auto const rightChannelClips = clips(peakValues.right * masterOutput);
 
 		p.setRenderHint( QPainter::Antialiasing );
 
 		// now draw all that stuff
 		int w = width() - 4;
 		const qreal xd = static_cast<qreal>(w) / frames;
-		const qreal half_h = -( height() - 6 ) / 3.0 * static_cast<qreal>(master_output) - 1;
+		const qreal half_h = -(height() - 6) / 3.0 * static_cast<qreal>(masterOutput) - 1;
 		int x_base = 2;
 		const qreal y_base = height() / 2 - 0.5;
 
+		qreal const width = 0.7;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
+			QColor color = ch == 0 ? (leftChannelClips ? clippingColor() : leftChannelColor()) : // Check left channel
+				ch == 1 ? (rightChannelClips ? clippingColor() : rightChannelColor()) : // Check right channel
+				otherChannelsColor(); // Any other channel
+			p.setPen(QPen(color, width));
+
 			for( int frame = 0; frame < frames; ++frame )
 			{
 				sample_t const clippedSample = AudioEngine::clip(m_buffer[frame][ch]);
@@ -177,7 +203,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	else
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont( pointSize<7>( p.font() ) );
+		p.setFont(adjustedToPixelSize(p.font(), 10));
 		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }
@@ -193,17 +219,9 @@ void Oscilloscope::mousePressEvent( QMouseEvent * _me )
 	}
 }
 
-
-QColor const & Oscilloscope::determineLineColor(float level) const
+bool Oscilloscope::clips(float level) const
 {
-	if( level <= 1.0f )
-	{
-		return normalColor();
-	}
-	else
-	{
-		return clippingColor();
-	}
+	return level > 1.0f;
 }
 
 

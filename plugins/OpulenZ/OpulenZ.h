@@ -64,11 +64,6 @@ public:
 	QString nodeName() const override;
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	Flags flags() const override
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
-
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override;
 	void play( sampleFrame * _working_buffer ) override;
 

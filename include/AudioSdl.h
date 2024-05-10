@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_SDL_H
-#define AUDIO_SDL_H
+#ifndef LMMS_AUDIO_SDL_H
+#define LMMS_AUDIO_SDL_H
 
 #include "lmmsconfig.h"
 
@@ -74,7 +74,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );
@@ -115,4 +114,4 @@ private:
 
 #endif // LMMS_HAVE_SDL
 
-#endif
+#endif // LMMS_AUDIO_SDL_H

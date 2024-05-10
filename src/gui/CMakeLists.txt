@@ -14,6 +14,7 @@ SET(LMMS_SRCS
 	gui/EffectView.cpp
 	gui/embed.cpp
 	gui/FileBrowser.cpp
+	gui/FileBrowserSearcher.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -26,14 +27,16 @@ SET(LMMS_SRCS
 	gui/MicrotunerConfig.cpp
 	gui/MidiCCRackView.cpp
 	gui/MidiSetupWidget.cpp
-	gui/MixerLine.cpp
+	gui/MixerChannelView.cpp
 	gui/MixerView.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PluginBrowser.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
+	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
+	gui/SampleWaveform.cpp
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
 	gui/SideBarWidget.cpp
@@ -59,12 +62,14 @@ SET(LMMS_SRCS
 	gui/editors/TrackContainerView.cpp
 
 	gui/instrument/EnvelopeAndLfoView.cpp
+	gui/instrument/EnvelopeGraph.cpp
 	gui/instrument/InstrumentFunctionViews.cpp
 	gui/instrument/InstrumentMidiIOView.cpp
-	gui/instrument/InstrumentMiscView.cpp
+	gui/instrument/InstrumentTuningView.cpp
 	gui/instrument/InstrumentSoundShapingView.cpp
 	gui/instrument/InstrumentTrackWindow.cpp
 	gui/instrument/InstrumentView.cpp
+	gui/instrument/LfoGraph.cpp
 	gui/instrument/PianoView.cpp
 
 	gui/menus/MidiPortMenu.cpp
@@ -94,11 +99,13 @@ SET(LMMS_SRCS
 
 	gui/widgets/AutomatableButton.cpp
 	gui/widgets/AutomatableSlider.cpp
+	gui/widgets/BarModelEditor.cpp
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
 	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/Fader.cpp
+	gui/widgets/FloatModelEditorBase.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/Knob.cpp
@@ -108,12 +115,14 @@ SET(LMMS_SRCS
 	gui/widgets/LedCheckBox.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/MeterDialog.cpp
-	gui/widgets/MixerLineLcdSpinBox.cpp
+	gui/widgets/MixerChannelLcdSpinBox.cpp
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
+	gui/widgets/SimpleTextFloat.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
+	gui/widgets/TempoSyncBarModelEditor.cpp
 	gui/widgets/TempoSyncKnob.cpp
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
@@ -122,11 +131,3 @@ SET(LMMS_SRCS
 	PARENT_SCOPE
 )
 
-set(LMMS_UIS
-	${LMMS_UIS}
-	gui/modals/about_dialog.ui
-	gui/modals/EffectSelectDialog.ui
-	gui/modals/export_project.ui
-
-	PARENT_SCOPE
-)

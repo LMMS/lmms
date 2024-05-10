@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_H
-#define MIXER_H
+#ifndef LMMS_MIXER_H
+#define LMMS_MIXER_H
 
 #include "Model.h"
 #include "EffectChain.h"
@@ -31,7 +31,7 @@
 #include "ThreadableJob.h"
 
 #include <atomic>
-
+#include <optional>
 #include <QColor>
 
 namespace lmms
@@ -39,7 +39,7 @@ namespace lmms
 
 
 class MixerRoute;
-using MixerRouteVector = QVector<MixerRoute*>;
+using MixerRouteVector = std::vector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
 {
@@ -76,61 +76,53 @@ class MixerChannel : public ThreadableJob
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
 
+		auto color() const -> const std::optional<QColor>& { return m_color; }
+		void setColor(const std::optional<QColor>& color) { m_color = color; }
 
-		void setColor (QColor newColor)
-		{
-			m_color = newColor;
-			m_hasColor = true;
-		}
-
-		// TODO C++17 and above: use std::optional instead
-		QColor m_color;
-		bool m_hasColor;
-
-	
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		
 	private:
 		void doProcessing() override;
-};
 
+		std::optional<QColor> m_color;
+};
 
 class MixerRoute : public QObject
 {
 	Q_OBJECT
-	public:		
-		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
-		~MixerRoute() override = default;
-		
+public:
+	MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
+	~MixerRoute() override = default;
+
 	mix_ch_t senderIndex() const
 	{
 		return m_from->m_channelIndex;
 	}
-	
+
 	mix_ch_t receiverIndex() const
 	{
 		return m_to->m_channelIndex;
 	}
-	
+
 	FloatModel * amount()
 	{
 		return &m_amount;
 	}
-	
+
 	MixerChannel * sender() const
 	{
 		return m_from;
 	}
-	
+
 	MixerChannel * receiver() const
 	{
 		return m_to;
 	}
-	
+
 	void updateName();
-		
+
 	private:
 		MixerChannel * m_from;
 		MixerChannel * m_to;
@@ -202,6 +194,10 @@ public:
 	// rename channels when moving etc. if they still have their original name
 	void validateChannelName( int index, int oldIndex );
 
+	// check if the index channel receives audio from any other channel
+	// or from any instrument or sample track
+	bool isChannelInUse(int index);
+
 	void toggledSolo();
 	void activateSolo();
 	void deactivateSolo();
@@ -215,7 +211,7 @@ public:
 
 private:
 	// the mixer channels in the mixer. index 0 is always master.
-	QVector<MixerChannel *> m_mixerChannels;
+	std::vector<MixerChannel*> m_mixerChannels;
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
@@ -226,4 +222,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIXER_H

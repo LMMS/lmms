@@ -121,7 +121,7 @@ bool sanitize( sampleFrame * src, int frames )
 			}
 			else
 			{
-				src[f][c] = qBound( -1000.0f, src[f][c], 1000.0f );
+				src[f][c] = std::clamp(src[f][c], -1000.0f, 1000.0f);
 			}
 		}
 	}
@@ -177,6 +177,15 @@ struct AddSwappedMultipliedOp
 
 	const float m_coeff;
 };
+
+void multiply(sampleFrame* dst, float coeff, int frames)
+{
+	for (int i = 0; i < frames; ++i)
+	{
+		dst[i][0] *= coeff;
+		dst[i][1] *= coeff;
+	}
+}
 
 void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
 {
@@ -281,7 +290,7 @@ struct AddMultipliedStereoOp
 		dst[1] += src[1] * m_coeffs[1];
 	}
 
-	float m_coeffs[2];
+	std::array<float, 2> m_coeffs;
 } ;
 
 
@@ -309,7 +318,7 @@ struct MultiplyAndAddMultipliedOp
 		dst[1] = dst[1]*m_coeffs[0] + src[1]*m_coeffs[1];
 	}
 
-	float m_coeffs[2];
+	std::array<float, 2> m_coeffs;
 } ;
 
 

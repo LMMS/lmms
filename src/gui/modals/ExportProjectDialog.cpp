@@ -66,7 +66,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			// Add to combo box.
 			fileFormatCB->addItem( ProjectRenderer::tr(
 				ProjectRenderer::fileEncodeDevices[i].m_description ),
-				QVariant( ProjectRenderer::fileEncodeDevices[i].m_fileFormat ) // Format tag; later used for identification.
+				QVariant( static_cast<int>(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) ) // Format tag; later used for identification.
 			);
 
 			// If this is our extension, select it.
@@ -79,14 +79,14 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			cbIndex++;
 		}
 	}
-	
+
 	int const MAX_LEVEL=8;
 	for(int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
 		if ( i==0 ){ info = tr( "( Fastest - biggest )" ); }
 		else if ( i==MAX_LEVEL ){ info = tr( "( Slowest - smallest )" ); }
-		
+
 		compLevelCB->addItem(
 			QString::number(i)+" "+info,
 			QVariant(i/static_cast<double>(MAX_LEVEL))
@@ -142,25 +142,22 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 	switch (index)
 	{
 	case 0:
-		return OutputSettings::StereoMode_Mono;
+		return OutputSettings::StereoMode::Mono;
 	case 1:
-		return OutputSettings::StereoMode_Stereo;
+		return OutputSettings::StereoMode::Stereo;
 	case 2:
-		return OutputSettings::StereoMode_JointStereo;
+		return OutputSettings::StereoMode::JointStereo;
 	default:
-		return OutputSettings::StereoMode_Stereo;
+		return OutputSettings::StereoMode::Stereo;
 	}
 }
 
 void ExportProjectDialog::startExport()
 {
-	AudioEngine::qualitySettings qs =
-			AudioEngine::qualitySettings(
-					static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<AudioEngine::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
-
-	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
-	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };
+	auto qs = AudioEngine::qualitySettings(
+		static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()));
+	const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
+	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
 	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
 
@@ -216,27 +213,27 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	// and adjust the UI properly.
 	QVariant format_tag = fileFormatCB->itemData(index);
 	bool successful_conversion = false;
-	auto exportFormat = static_cast<ProjectRenderer::ExportFileFormats>(
+	auto exportFormat = static_cast<ProjectRenderer::ExportFileFormat>(
 		format_tag.toInt(&successful_conversion)
 	);
 	Q_ASSERT(successful_conversion);
 
-	bool stereoModeVisible = (exportFormat == ProjectRenderer::MP3File);
+	bool stereoModeVisible = (exportFormat == ProjectRenderer::ExportFileFormat::MP3);
 
-	bool sampleRateControlsVisible = (exportFormat != ProjectRenderer::MP3File);
+	bool sampleRateControlsVisible = (exportFormat != ProjectRenderer::ExportFileFormat::MP3);
 
 	bool bitRateControlsEnabled =
-			(exportFormat == ProjectRenderer::OggFile ||
-			 exportFormat == ProjectRenderer::MP3File);
+			(exportFormat == ProjectRenderer::ExportFileFormat::Ogg ||
+			 exportFormat == ProjectRenderer::ExportFileFormat::MP3);
 
 	bool bitDepthControlEnabled =
-			(exportFormat == ProjectRenderer::WaveFile ||
-			 exportFormat == ProjectRenderer::FlacFile);
+			(exportFormat == ProjectRenderer::ExportFileFormat::Wave ||
+			 exportFormat == ProjectRenderer::ExportFileFormat::Flac);
 
-	bool variableBitrateVisible = !(exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile);
+	bool variableBitrateVisible = !(exportFormat == ProjectRenderer::ExportFileFormat::MP3 || exportFormat == ProjectRenderer::ExportFileFormat::Flac);
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL
-	bool compressionLevelVisible = (exportFormat == ProjectRenderer::FlacFile);
+	bool compressionLevelVisible = (exportFormat == ProjectRenderer::ExportFileFormat::Flac);
 	compressionWidget->setVisible(compressionLevelVisible);
 #endif
 
@@ -251,12 +248,12 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 void ExportProjectDialog::startBtnClicked()
 {
-	m_ft = ProjectRenderer::NumFileFormats;
+	m_ft = ProjectRenderer::ExportFileFormat::Count;
 
 	// Get file format from current menu selection.
 	bool successful_conversion = false;
 	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
-	m_ft = static_cast<ProjectRenderer::ExportFileFormats>(
+	m_ft = static_cast<ProjectRenderer::ExportFileFormat>(
 			tag.toInt(&successful_conversion)
 	);
 

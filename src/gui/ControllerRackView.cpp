@@ -53,7 +53,7 @@ ControllerRackView::ControllerRackView() :
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
-	QWidget * scrollAreaWidget = new QWidget( m_scrollArea );
+	auto scrollAreaWidget = new QWidget(m_scrollArea);
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
 	m_scrollAreaLayout->addStretch();
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
@@ -71,7 +71,7 @@ ControllerRackView::ControllerRackView() :
 	connect( song, SIGNAL(controllerAdded(lmms::Controller*)), SLOT(onControllerAdded(lmms::Controller*)));
 	connect( song, SIGNAL(controllerRemoved(lmms::Controller*)), SLOT(onControllerRemoved(lmms::Controller*)));
 
-	QVBoxLayout * layout = new QVBoxLayout();
+	auto layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
@@ -139,7 +139,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 
-	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
+	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 
 	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
 		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );

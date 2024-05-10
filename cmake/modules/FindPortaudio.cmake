@@ -1,36 +1,34 @@
-# - Try to find Portaudio
-# Once done this will define
-#
-#  PORTAUDIO_FOUND - system has Portaudio
-#  PORTAUDIO_INCLUDE_DIRS - the Portaudio include directory
-#  PORTAUDIO_LIBRARIES - Link these to use Portaudio
-#  PORTAUDIO_DEFINITIONS - Compiler switches required for using Portaudio
-#
-#  Copyright (c) 2006 Andreas Schneider <mail@cynapses.org>
+# Copyright (c) 2023 Dominic Clark
 #
 # Redistribution and use is allowed according to the terms of the New BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-#
 
+include(ImportedTargetHelpers)
 
-if (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
-  # in cache already
-  set(PORTAUDIO_FOUND TRUE)
-else (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
-   include(FindPkgConfig)
-   pkg_check_modules(PORTAUDIO portaudio-2.0)
-  if (PORTAUDIO_FOUND)
-    if (NOT Portaudio_FIND_QUIETLY)
-      message(STATUS "Found Portaudio: ${PORTAUDIO_LIBRARIES}")
-    endif (NOT Portaudio_FIND_QUIETLY)
-  else (PORTAUDIO_FOUND)
-    if (Portaudio_FIND_REQUIRED)
-      message(FATAL_ERROR "Could not find Portaudio")
-    endif (Portaudio_FIND_REQUIRED)
-  endif (PORTAUDIO_FOUND)
+find_package_config_mode_with_fallback(portaudio portaudio
+	LIBRARY_NAMES "portaudio"
+	INCLUDE_NAMES "portaudio.h"
+	PKG_CONFIG portaudio-2.0
+	PREFIX Portaudio
+)
 
-  # show the PORTAUDIO_INCLUDE_DIRS and PORTAUDIO_LIBRARIES variables only in the advanced view
-  mark_as_advanced(PORTAUDIO_INCLUDE_DIRS PORTAUDIO_LIBRARIES)
+determine_version_from_source(Portaudio_VERSION portaudio [[
+	#include <iostream>
+	#include "portaudio.h"
 
-endif (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
+	auto main() -> int
+	{
+		// Version number has the format 0xMMmmpp
+		const auto version = Pa_GetVersion();
+		std::cout << ((version >> 16) & 0xff)
+			<< "." << ((version >> 8) & 0xff)
+			<< "." << ((version >> 0) & 0xff);
+	}
+]])
 
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(Portaudio
+	REQUIRED_VARS Portaudio_LIBRARY Portaudio_INCLUDE_DIRS
+	VERSION_VAR Portaudio_VERSION
+)

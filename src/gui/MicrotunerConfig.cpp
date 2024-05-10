@@ -31,7 +31,7 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 
 #include "ComboBox.h"
@@ -56,32 +56,42 @@ namespace lmms::gui
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
-	m_scaleComboModel(nullptr, tr("Selected scale")),
-	m_keymapComboModel(nullptr, tr("Selected keymap")),
+	m_scaleComboModel(nullptr, tr("Selected scale slot")),
+	m_keymapComboModel(nullptr, tr("Selected keymap slot")),
 	m_firstKeyModel(0, 0, NumKeys - 1, nullptr, tr("First key")),
 	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, nullptr, tr("Last key")),
 	m_middleKeyModel(DefaultMiddleKey, 0, NumKeys - 1, nullptr, tr("Middle key")),
 	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, nullptr, tr("Base key")),
 	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, nullptr, tr("Base note frequency"))
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	setWindowIcon(embed::getIconPixmap("microtuner"));
-	setWindowTitle(tr("Microtuner"));
+	setWindowTitle(tr("Microtuner Configuration"));
 
 	// Organize into 2 main columns: scales and keymaps
-	QGridLayout *microtunerLayout = new QGridLayout();
+	auto microtunerLayout = new QGridLayout();
 	microtunerLayout->setSpacing(2);
 
 	// ----------------------------------
 	// Scale sub-column
 	//
-	QLabel *scaleLabel = new QLabel(tr("Scale:"));
+	auto scaleLabel = new QLabel(tr("Scale slot to edit:"));
 	microtunerLayout->addWidget(scaleLabel, 0, 0, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
 	{
 		m_scaleComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
 	}
-	ComboBox *scaleCombo = new ComboBox();
+	auto scaleCombo = new ComboBox();
 	scaleCombo->setModel(&m_scaleComboModel);
 	microtunerLayout->addWidget(scaleCombo, 1, 0, 1, 2);
 	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, [=] {updateScaleForm();});
@@ -90,8 +100,10 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleNameEdit->setToolTip(tr("Scale description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_scaleNameEdit, 2, 0, 1, 2);
 
-	QPushButton *loadScaleButton = new QPushButton(tr("Load"));
-	QPushButton *saveScaleButton = new QPushButton(tr("Save"));
+	auto loadScaleButton = new QPushButton(tr("Load"));
+	auto saveScaleButton = new QPushButton(tr("Save"));
+	loadScaleButton->setToolTip(tr("Load scale definition from a file."));
+	saveScaleButton->setToolTip(tr("Save scale definition to a file."));
 	microtunerLayout->addWidget(loadScaleButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(saveScaleButton, 3, 1, 1, 1);
 	connect(loadScaleButton, &QPushButton::clicked, [=] {loadScaleFromFile();});
@@ -102,21 +114,22 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2);
 
-	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
+	auto applyScaleButton = new QPushButton(tr("Apply scale changes"));
+	applyScaleButton->setToolTip(tr("Verify and apply changes made to the selected scale. To use the scale, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
 	// ----------------------------------
 	// Mapping sub-column
 	//
-	QLabel *keymapLabel = new QLabel(tr("Keymap:"));
+	auto keymapLabel = new QLabel(tr("Keymap slot to edit:"));
 	microtunerLayout->addWidget(keymapLabel, 0, 2, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
 	{
 		m_keymapComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 	}
-	ComboBox *keymapCombo = new ComboBox();
+	auto keymapCombo = new ComboBox();
 	keymapCombo->setModel(&m_keymapComboModel);
 	microtunerLayout->addWidget(keymapCombo, 1, 2, 1, 2);
 	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, [=] {updateKeymapForm();});
@@ -125,8 +138,10 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapNameEdit->setToolTip(tr("Keymap description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_keymapNameEdit, 2, 2, 1, 2);
 
-	QPushButton *loadKeymapButton = new QPushButton(tr("Load"));
-	QPushButton *saveKeymapButton = new QPushButton(tr("Save"));
+	auto loadKeymapButton = new QPushButton(tr("Load"));
+	auto saveKeymapButton = new QPushButton(tr("Save"));
+	loadKeymapButton->setToolTip(tr("Load key mapping definition from a file."));
+	saveKeymapButton->setToolTip(tr("Save key mapping definition to a file."));
 	microtunerLayout->addWidget(loadKeymapButton, 3, 2, 1, 1);
 	microtunerLayout->addWidget(saveKeymapButton, 3, 3, 1, 1);
 	connect(loadKeymapButton, &QPushButton::clicked, [=] {loadKeymapFromFile();});
@@ -138,40 +153,41 @@ MicrotunerConfig::MicrotunerConfig() :
 	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2);
 
 	// Mapping ranges
-	QGridLayout *keymapRangeLayout = new QGridLayout();
+	auto keymapRangeLayout = new QGridLayout();
 	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 1, 2, Qt::AlignCenter | Qt::AlignTop);
 
-	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, nullptr, tr("First key"));
+	auto firstKeySpin = new LcdSpinBox(3, nullptr, tr("First key"));
 	firstKeySpin->setLabel(tr("FIRST"));
 	firstKeySpin->setToolTip(tr("First MIDI key that will be mapped"));
 	firstKeySpin->setModel(&m_firstKeyModel);
 	keymapRangeLayout->addWidget(firstKeySpin, 0, 0);
 
-	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, nullptr, tr("Last key"));
+	auto lastKeySpin = new LcdSpinBox(3, nullptr, tr("Last key"));
 	lastKeySpin->setLabel(tr("LAST"));
 	lastKeySpin->setToolTip(tr("Last MIDI key that will be mapped"));
 	lastKeySpin->setModel(&m_lastKeyModel);
 	keymapRangeLayout->addWidget(lastKeySpin, 0, 1);
 
-	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, nullptr, tr("Middle key"));
+	auto middleKeySpin = new LcdSpinBox(3, nullptr, tr("Middle key"));
 	middleKeySpin->setLabel(tr("MIDDLE"));
 	middleKeySpin->setToolTip(tr("First line in the keymap refers to this MIDI key"));
 	middleKeySpin->setModel(&m_middleKeyModel);
 	keymapRangeLayout->addWidget(middleKeySpin, 0, 2);
 
-	LcdSpinBox *baseKeySpin = new LcdSpinBox(3, nullptr, tr("Base key"));
+	auto baseKeySpin = new LcdSpinBox(3, nullptr, tr("Base key"));
 	baseKeySpin->setLabel(tr("BASE N."));
 	baseKeySpin->setToolTip(tr("Base note frequency will be assigned to this MIDI key"));
 	baseKeySpin->setModel(&m_baseKeyModel);
 	keymapRangeLayout->addWidget(baseKeySpin, 1, 0);
 
-	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, tr("Base note frequency"));
+	auto baseFreqSpin = new LcdFloatSpinBox(4, 3, tr("Base note frequency"));
 	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
 	keymapRangeLayout->addWidget(baseFreqSpin, 1, 1, 1, 2);
 
-	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
+	auto applyKeymapButton = new QPushButton(tr("Apply keymap changes"));
+	applyKeymapButton->setToolTip(tr("Verify and apply changes made to the selected key mapping. To use the mapping, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
@@ -286,9 +302,9 @@ void MicrotunerConfig::updateKeymapForm()
 
 	m_keymapTextEdit->setPlainText("");
 	const std::vector<int> &map = newMap->getMap();
-	for (std::size_t i = 0; i < map.size(); i++)
+	for (int value : map)
 	{
-		if (map[i] >= 0) {m_keymapTextEdit->appendPlainText(QString::number(map[i]));}
+		if (value >= 0) {m_keymapTextEdit->appendPlainText(QString::number(value));}
 		else {m_keymapTextEdit->appendPlainText("x");}
 	}
 	QTextCursor tmp = m_keymapTextEdit->textCursor();
@@ -326,7 +342,7 @@ bool MicrotunerConfig::validateScaleForm()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}		// comment
-		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
 			bool ok = true;
@@ -341,7 +357,7 @@ bool MicrotunerConfig::validateScaleForm()
 			if (!ok) {fail(tr("Numerator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (line.contains('/'))
 			{
-				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
+				den = line.split('/').at(1).section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
 			}
 			if (!ok) {fail(tr("Denominator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (num * den < 0) {fail(tr("Interval defined as a ratio cannot be negative")); return false;}
@@ -374,7 +390,7 @@ bool MicrotunerConfig::validateKeymapForm()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}			// comment
-		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection == "x") {continue;}	// not mapped
 		// otherwise must contain a number
 		bool ok = true;
@@ -408,7 +424,7 @@ bool MicrotunerConfig::applyScale()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}		// comment
-		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
 			newIntervals.emplace_back(firstSection.toFloat());
@@ -419,7 +435,7 @@ bool MicrotunerConfig::applyScale()
 			num = firstSection.toInt();
 			if (line.contains('/'))
 			{
-				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
+				den = line.split('/').at(1).section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
 			}
 			newIntervals.emplace_back(num, den);
 		}
@@ -454,7 +470,7 @@ bool MicrotunerConfig::applyKeymap()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}			// comment
-		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection == "x")
 		{
 			newMap.push_back(-1);				// not mapped

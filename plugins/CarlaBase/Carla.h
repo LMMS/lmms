@@ -33,6 +33,7 @@
 #include <QCloseEvent>
 #include <QDomElement>
 #include <QMutex>
+#include <QRegularExpression>
 
 // carla/source/includes
 #include "carlabase_export.h"
@@ -89,8 +90,8 @@ public:
 	// From AutomatableModel.h, it's private there.
 	inline static bool mustQuoteName(const QString &name)
 	{
-		QRegExp reg("^[A-Za-z0-9._-]+$");
-		return !reg.exactMatch(name);
+		QRegularExpression reg("^[A-Za-z0-9._-]+$");
+		return !reg.match(name).hasMatch();
 	}
 
 	inline void loadSettings(const QDomElement& element, const QString& name = QString("value")) override
@@ -189,7 +190,6 @@ public:
     intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
 
     // LMMS functions
-    Flags flags() const override;
     QString nodeName() const override;
     void saveSettings(QDomDocument& doc, QDomElement& parent) override;
     void loadSettings(const QDomElement& elem) override;

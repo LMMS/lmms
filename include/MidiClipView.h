@@ -21,12 +21,13 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-#ifndef MIDI_CLIP_VIEW_H
-#define MIDI_CLIP_VIEW_H
- 
+
+#ifndef LMMS_GUI_MIDI_CLIP_VIEW_H
+#define LMMS_GUI_MIDI_CLIP_VIEW_H
+
 #include <QStaticText>
 #include "ClipView.h"
+#include "embed.h"
 
 namespace lmms
 {
@@ -43,7 +44,7 @@ class MidiClipView : public ClipView
 
 public:
 	MidiClipView( MidiClip* clip, TrackView* parent );
- 	~MidiClipView() override = default;
+	~MidiClipView() override = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
@@ -70,6 +71,7 @@ public slots:
 protected slots:
 	void openInPianoRoll();
 	void setGhostInPianoRoll();
+	void setGhostInAutomationEditor();
 
 	void resetName();
 	void changeName();
@@ -85,10 +87,10 @@ protected:
 
 
 private:
-	static QPixmap * s_stepBtnOn0;
-	static QPixmap * s_stepBtnOn200;
-	static QPixmap * s_stepBtnOff;
-	static QPixmap * s_stepBtnOffLight;
+	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
+	QPixmap m_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
+	QPixmap m_stepBtnOff = embed::getIconPixmap("step_btn_off");
+	QPixmap m_stepBtnOffLight = embed::getIconPixmap("step_btn_off_light");
 
 	MidiClip* m_clip;
 	QPixmap m_paintPixmap;
@@ -99,7 +101,7 @@ private:
 	QColor m_mutedNoteBorderColor;
 
 	QStaticText m_staticTextName;
-	
+
 	bool m_legacySEPattern;
 } ;
 
@@ -107,5 +109,5 @@ private:
 } // namespace gui
 
 } // namespace lmms
- 
- #endif
+
+#endif // LMMS_GUI_MIDI_CLIP_VIEW_H

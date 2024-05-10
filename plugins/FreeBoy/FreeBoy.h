@@ -1,8 +1,8 @@
 /*
- * FreeBoyInstrument.h - GameBoy papu based instrument
+ * FreeBoy.h - GameBoy papu based instrument
  *
- * Copyright (c) 2008 <Attila Herman <attila589/at/gmail.com>
- *				Csaba Hruska <csaba.hruska/at/gmail.com>
+ * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
+ *                    Csaba Hruska <csaba.hruska/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef FREEBOY_H
-#define FREEBOY_H
+#ifndef LMMS_FREEBOY_H
+#define LMMS_FREEBOY_H
 
 #include "AutomatableModel.h"
 #include "Blip_Buffer.h"
@@ -54,17 +54,15 @@ public:
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
 	~FreeBoyInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
-	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
+	void playNote(NotePlayHandle* nph, sampleFrame* workingBuffer) override;
+	void deleteNotePluginData(NotePlayHandle* nph) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override;
+	float desiredReleaseTimeMs() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
@@ -112,12 +110,8 @@ private:
 
 	graphModel  m_graphModel;
 
-	// Fake CPU timing
-	blip_time_t m_time;
-	blip_time_t fakeClock() { return m_time += 4; }
-
 	friend class gui::FreeBoyInstrumentView;
-} ;
+};
 
 
 namespace gui
@@ -172,11 +166,11 @@ private:
 /*protected slots:
 	void updateKnobHint();
 	void updateKnobToolTip();*/
-} ;
+};
 
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_FREEBOY_H

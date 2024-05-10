@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MICROTUNER_H
-#define MICROTUNER_H
+#ifndef LMMS_MICROTUNER_H
+#define LMMS_MICROTUNER_H
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
@@ -54,6 +54,7 @@ public:
 	float baseFreq() const;
 
 	float keyToFreq(int key, int userBaseNote) const;
+	int octaveSize() const;
 
 	QString nodeName() const override {return "microtuner";}
 	void saveSettings(QDomDocument & document, QDomElement &element) override;
@@ -73,4 +74,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MICROTUNER_H

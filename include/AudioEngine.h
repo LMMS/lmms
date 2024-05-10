@@ -22,20 +22,19 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_H
-#define AUDIO_ENGINE_H
+#ifndef LMMS_AUDIO_ENGINE_H
+#define LMMS_AUDIO_ENGINE_H
 
-#include <QMutex>
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
+#ifdef __MINGW32__
+#include <mingw.mutex.h>
+#else
+#include <mutex>
 #endif
 
 #include <QThread>
-#include <QVector>
-#include <QWaitCondition>
 #include <samplerate.h>
 
+#include <vector>
 
 #include "lmms_basics.h"
 #include "LocklessList.h"
@@ -109,81 +108,32 @@ public:
 
 	struct qualitySettings
 	{
-		enum Mode
+		enum class Interpolation
 		{
-			Mode_Draft,
-			Mode_HighQuality,
-			Mode_FinalMix
-		} ;
-
-		enum Interpolation
-		{
-			Interpolation_Linear,
-			Interpolation_SincFastest,
-			Interpolation_SincMedium,
-			Interpolation_SincBest
-		} ;
-
-		enum Oversampling
-		{
-			Oversampling_None,
-			Oversampling_2x,
-			Oversampling_4x,
-			Oversampling_8x
+			Linear,
+			SincFastest,
+			SincMedium,
+			SincBest
 		} ;
 
 		Interpolation interpolation;
-		Oversampling oversampling;
 
-		qualitySettings(Mode m)
+		qualitySettings(Interpolation i) :
+			interpolation(i)
 		{
-			switch (m)
-			{
-				case Mode_Draft:
-					interpolation = Interpolation_Linear;
-					oversampling = Oversampling_None;
-					break;
-				case Mode_HighQuality:
-					interpolation =
-						Interpolation_SincFastest;
-					oversampling = Oversampling_2x;
-					break;
-				case Mode_FinalMix:
-					interpolation = Interpolation_SincBest;
-					oversampling = Oversampling_8x;
-					break;
-			}
-		}
-
-		qualitySettings(Interpolation i, Oversampling o) :
-			interpolation(i),
-			oversampling(o)
-		{
-		}
-
-		int sampleRateMultiplier() const
-		{
-			switch( oversampling )
-			{
-				case Oversampling_None: return 1;
-				case Oversampling_2x: return 2;
-				case Oversampling_4x: return 4;
-				case Oversampling_8x: return 8;
-			}
-			return 1;
 		}
 
 		int libsrcInterpolation() const
 		{
 			switch( interpolation )
 			{
-				case Interpolation_Linear:
+				case Interpolation::Linear:
 					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation_SincFastest:
+				case Interpolation::SincFastest:
 					return SRC_SINC_FASTEST;
-				case Interpolation_SincMedium:
+				case Interpolation::SincMedium:
 					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation_SincBest:
+				case Interpolation::SincBest:
 					return SRC_SINC_BEST_QUALITY;
 			}
 			return SRC_LINEAR;
@@ -197,6 +147,7 @@ public:
 
 	// audio-device-stuff
 
+	bool renderOnly() const { return m_renderOnly; }
 	// Returns the current audio device's name. This is not necessarily
 	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const
@@ -255,7 +206,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandlesOfTypes(Track * track, const quint8 types);
+	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
 
 	// methods providing information for other classes
@@ -275,6 +226,11 @@ public:
 		return m_profiler.cpuLoad();
 	}
 
+	int detailLoad(const AudioEngineProfiler::DetailType type) const
+	{
+		return m_profiler.detailLoad(type);
+	}
+
 	const qualitySettings & currentQualitySettings() const
 	{
 		return m_qualitySettings;
@@ -284,8 +240,6 @@ public:
 	sample_rate_t baseSampleRate() const;
 	sample_rate_t outputSampleRate() const;
 	sample_rate_t inputSampleRate() const;
-	sample_rate_t processingSampleRate() const;
-
 
 	inline float masterGain() const
 	{
@@ -401,6 +355,10 @@ private:
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
 
+	void renderStageNoteSetup();
+	void renderStageInstruments();
+	void renderStageEffects();
+	void renderStageMix();
 
 	const surroundSampleFrame * renderNextBuffer();
 
@@ -410,13 +368,9 @@ private:
 
 	void clearInternal();
 
-	//! Called by the audio thread to give control to other threads,
-	//! such that they can do changes in the model (like e.g. removing effects)
-	void runChangesInModel();
-
 	bool m_renderOnly;
 
-	QVector<AudioPort *> m_audioPorts;
+	std::vector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 
@@ -430,7 +384,7 @@ private:
 	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
-	QVector<AudioEngineWorkerThread *> m_workers;
+	std::vector<AudioEngineWorkerThread *> m_workers;
 	int m_numWorkers;
 
 	// playhandle stuff
@@ -442,8 +396,6 @@ private:
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
-
-	bool m_isProcessing;
 
 	// audio device stuff
 	void doSetAudioDevice( AudioDevice *_dev );
@@ -466,19 +418,7 @@ private:
 
 	bool m_clearSignal;
 
-	bool m_changesSignal;
-	unsigned int m_changes;
-	QMutex m_changesMutex;
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	QRecursiveMutex m_doChangesMutex;
-#else
-	QMutex m_doChangesMutex;
-#endif
-	QMutex m_waitChangesMutex;
-	QWaitCondition m_changesAudioEngineCondition;
-	QWaitCondition m_changesRequestCondition;
-
-	bool m_waitingForWrite;
+	std::mutex m_changeMutex;
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
@@ -487,4 +427,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_ENGINE_H

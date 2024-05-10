@@ -78,10 +78,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	m_quit( false ),
 	m_portListUpdateTimer( this )
 {
-	int err;
-	if( ( err = snd_seq_open( &m_seqHandle,
-					probeDevice().toLatin1().constData(),
-						SND_SEQ_OPEN_DUPLEX, 0 ) ) < 0 )
+	if (int err = snd_seq_open(&m_seqHandle, probeDevice().toLatin1().constData(), SND_SEQ_OPEN_DUPLEX, 0); err < 0)
 	{
 		fprintf( stderr, "cannot open sequencer: %s\n",
 							snd_strerror( err ) );
@@ -164,7 +161,7 @@ void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const TimePos& time, 
 	// HACK!!! - need a better solution which isn't that easy since we
 	// cannot store const-ptrs in our map because we need to call non-const
 	// methods of MIDI-port - it's a mess...
-	MidiPort* p = const_cast<MidiPort *>( port );
+	auto p = const_cast<MidiPort*>(port);
 
 	snd_seq_event_t ev;
 	snd_seq_ev_clear( &ev );
@@ -241,20 +238,20 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 	m_seqMutex.lock();
 
 	// determine port-capabilities
-	unsigned int caps[2] = { 0, 0 };
+	auto caps = std::array<unsigned int, 2>{};
 
 	switch( _port->mode() )
 	{
-		case MidiPort::Duplex:
+		case MidiPort::Mode::Duplex:
 			caps[1] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 
-		case MidiPort::Input:
+		case MidiPort::Mode::Input:
 			caps[0] |= SND_SEQ_PORT_CAP_WRITE |
 						SND_SEQ_PORT_CAP_SUBS_WRITE;
 			break;
 
-		case MidiPort::Output:
+		case MidiPort::Mode::Output:
 			caps[1] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 			break;
@@ -353,8 +350,7 @@ QString MidiAlsaSeq::sourcePortName( const MidiEvent & _event ) const
 {
 	if( _event.sourcePort() )
 	{
-		const snd_seq_addr_t * addr =
-			static_cast<const snd_seq_addr_t *>( _event.sourcePort() );
+		const auto addr = static_cast<const snd_seq_addr_t*>(_event.sourcePort());
 		return portName( m_seqHandle, addr );
 	}
 	return MidiClient::sourcePortName( _event );
@@ -462,7 +458,7 @@ void MidiAlsaSeq::run()
 	// watch the pipe and sequencer input events
 	int pollfd_count = snd_seq_poll_descriptors_count( m_seqHandle,
 								POLLIN );
-	struct pollfd * pollfd_set = new struct pollfd[pollfd_count + 1];
+	auto pollfd_set = new struct pollfd[pollfd_count + 1];
 	snd_seq_poll_descriptors( m_seqHandle, pollfd_set + 1, pollfd_count,
 								POLLIN );
 	pollfd_set[0].fd = m_pipe[0];

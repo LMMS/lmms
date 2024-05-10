@@ -47,12 +47,12 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_rpBtn( nullptr ),
 	m_wpBtn( nullptr )
 {
-	QVBoxLayout* layout = new QVBoxLayout( this );
-	layout->setMargin( 5 );
+	auto layout = new QVBoxLayout(this);
+	layout->setContentsMargins(5, 5, 5, 5);
 	m_midiInputGroupBox = new GroupBox( tr( "ENABLE MIDI INPUT" ) );
 	layout->addWidget( m_midiInputGroupBox );
 
-	QHBoxLayout* midiInputLayout = new QHBoxLayout( m_midiInputGroupBox );
+	auto midiInputLayout = new QHBoxLayout(m_midiInputGroupBox);
 	midiInputLayout->setContentsMargins( 8, 18, 8, 8 );
 	midiInputLayout->setSpacing( 4 );
 
@@ -83,7 +83,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_midiOutputGroupBox = new GroupBox( tr( "ENABLE MIDI OUTPUT" ) );
 	layout->addWidget( m_midiOutputGroupBox );
 
-	QHBoxLayout* midiOutputLayout = new QHBoxLayout( m_midiOutputGroupBox );
+	auto midiOutputLayout = new QHBoxLayout(m_midiOutputGroupBox);
 	midiOutputLayout->setContentsMargins( 8, 18, 8, 8 );
 	midiOutputLayout->setSpacing( 4 );
 
@@ -144,26 +144,18 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
-	GroupBox* baseVelocityGroupBox = new GroupBox( tr( "CUSTOM BASE VELOCITY" ) );
+	auto baseVelocityGroupBox = new GroupBox(tr("VELOCITY MAPPING"));
+	baseVelocityGroupBox->setLedButtonShown(false);
 	layout->addWidget( baseVelocityGroupBox );
 
-	QVBoxLayout* baseVelocityLayout = new QVBoxLayout( baseVelocityGroupBox );
+	auto baseVelocityLayout = new QVBoxLayout(baseVelocityGroupBox);
 	baseVelocityLayout->setContentsMargins( 8, 18, 8, 8 );
 	baseVelocityLayout->setSpacing( 6 );
 
-	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at 100% note velocity." ) );
-	baseVelocityHelp->setWordWrap( true );
-    baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
-
-	baseVelocityLayout->addWidget( baseVelocityHelp );
-
 	m_baseVelocitySpinBox = new LcdSpinBox( 3, baseVelocityGroupBox );
-	m_baseVelocitySpinBox->setLabel( tr( "BASE VELOCITY" ) );
-	m_baseVelocitySpinBox->setEnabled( false );
+	m_baseVelocitySpinBox->setLabel(tr("MIDI VELOCITY"));
+	m_baseVelocitySpinBox->setToolTip(tr("MIDI notes at this velocity correspond to 100% note velocity."));
 	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
-
-	connect( baseVelocityGroupBox->ledButton(), SIGNAL(toggled(bool)),
-			m_baseVelocitySpinBox, SLOT(setEnabled(bool)));
 
 	layout->addStretch();
 }
@@ -174,7 +166,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 void InstrumentMidiIOView::modelChanged()
 {
-	MidiPort * mp = castModel<MidiPort>();
+	auto mp = castModel<MidiPort>();
 
 	m_midiInputGroupBox->setModel( &mp->m_readableModel );
 	m_inputChannelSpinBox->setModel( &mp->m_inputChannelModel );

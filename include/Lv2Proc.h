@@ -1,7 +1,7 @@
 /*
  * Lv2Proc.h - Lv2 processor class
  *
- * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2022 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2PROC_H
-#define LV2PROC_H
+#ifndef LMMS_LV2_PROC_H
+#define LMMS_LV2_PROC_H
 
 #include "lmmsconfig.h"
 
@@ -31,11 +31,14 @@
 
 #include <lilv/lilv.h>
 #include <memory>
+#include <optional>
 
+#include "LinkedModelGroups.h"
+#include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
 #include "Lv2Options.h"
-#include "LinkedModelGroups.h"
+#include "Lv2Worker.h"
 #include "Plugin.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
@@ -59,21 +62,22 @@ namespace Lv2Ports
 }
 
 
-//! Class representing one Lv2 processor, i.e. one Lv2 handle
-//! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc
+//! Class representing one Lv2 processor, i.e. one Lv2 handle.
+//! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc.
 class Lv2Proc : public LinkedModelGroup
 {
+	friend class Lv2ProcSuspender;
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* plugin,
+	static Plugin::Type check(const LilvPlugin* plugin,
 		std::vector<PluginIssue> &issues);
 
 	/*
-		ctor/dtor
+		ctor/dtor/reload
 	*/
 	Lv2Proc(const LilvPlugin* plugin, Model *parent);
 	~Lv2Proc() override;
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_valid; }
+	void reload();
+	void onSampleRateChanged();
 
 	/*
 		port access
@@ -167,12 +171,16 @@ protected:
 	void shutdownPlugin();
 
 private:
-	bool m_valid = true;
-
 	const LilvPlugin* m_plugin;
-	LilvInstance* m_instance;
+	LilvInstance* m_instance = nullptr;
 	Lv2Features m_features;
+
+	// options
 	Lv2Options m_options;
+
+	// worker
+	std::optional<Lv2Worker> m_worker;
+	Semaphore m_workLock; // this must be shared by different workers
 
 	// full list of ports
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;
@@ -195,6 +203,8 @@ private:
 	static int32_t defaultEvbufSize() { return 1 << 15; /* ardour uses this*/ }
 
 	//! models for the controls, sorted by port symbols
+	//! @note These are not owned, but rather link to the models in
+	//!   ControlPorts in `m_ports`
 	std::map<std::string, AutomatableModel *> m_connectedModels;
 
 	void initMOptions(); //!< initialize m_options
@@ -220,4 +230,5 @@ private:
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2PROC_H
+
+#endif // LMMS_LV2_PROC_H

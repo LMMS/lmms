@@ -32,8 +32,8 @@ FIND_PROGRAM(WINE_CXX
 FIND_PROGRAM(WINE_BUILD NAMES winebuild)
 # Detect wine paths and handle linking problems
 IF(WINE_CXX)
-	EXEC_PROGRAM(${WINE_CXX} ARGS "-m32 -v /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT_32)
-	EXEC_PROGRAM(${WINE_CXX} ARGS "-m64 -v /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT_64)
+	execute_process(COMMAND ${WINE_CXX} -m32 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_32)
+	execute_process(COMMAND ${WINE_CXX} -m64 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_64)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem/usr/include$" BUGGED_WINEGCC)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem" WINEGCC_INCLUDE_DIR)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "libwinecrt0\\.a.*" WINECRT_32)

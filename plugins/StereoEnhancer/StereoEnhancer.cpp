@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 				"Plugin for enhancing stereo separation of a stereo input file" ),
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -85,15 +85,11 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
-	
+
 	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
+	// audio with this effect
 	double out_sum = 0.0;
-	
-	float width;
-	int frameIndex = 0;
-	
-	
+
 	if( !isEnabled() || !isRunning() )
 	{
 		return( false );
@@ -104,16 +100,16 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		
+
 		// copy samples into the delay buffer
 		m_delayBuffer[m_currFrame][0] = _buf[f][0];
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];
 
 		// Get the width knob value from the Stereo Enhancer effect
-		width = m_seFX.wideCoeff();
+		float width = m_seFX.wideCoeff();
 
 		// Calculate the correct sample frame for processing
-		frameIndex = m_currFrame - width;
+		int frameIndex = m_currFrame - width;
 
 		if( frameIndex < 0 )
 		{
@@ -122,7 +118,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 
 		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
-		sample_t s[2] = { _buf[f][0], m_delayBuffer[frameIndex][1] };	//Chocolate
+		auto s = std::array{_buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
 
 		m_seFX.nextSample( s[0], s[1] );
 
@@ -149,8 +145,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
-	int i;
-	for (i = 0; i < DEFAULT_BUFFER_SIZE; i++)
+	for (int i = 0; i < DEFAULT_BUFFER_SIZE; i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;
 		m_delayBuffer[i][1] = 0.0f;

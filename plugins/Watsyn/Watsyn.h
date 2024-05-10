@@ -32,21 +32,20 @@
 #include "AutomatableModel.h"
 #include "TempoSyncKnob.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
 
 namespace lmms
 {
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, this ); 				\
+	name = new Knob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 19, 19 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( knobStyled, this ); 				\
+	name = new TempoSyncKnob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -88,7 +87,6 @@ class WatsynView;
 
 class WatsynObject
 {
-	MM_OPERATORS
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
@@ -152,9 +150,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 64 );
+		return 1.5f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

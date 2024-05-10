@@ -53,7 +53,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 			m_toggledModel.setInitValue(
 				static_cast<bool>( m_port->def ) );
 			connect( &m_toggledModel, SIGNAL(dataChanged()),
@@ -66,8 +66,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			m_toggledModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
-		case INTEGER:
-		case ENUM:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
 			m_knobModel.setRange( static_cast<int>( m_port->max ),
 					  static_cast<int>( m_port->min ),
 					  1 + static_cast<int>( m_port->max -
@@ -80,7 +80,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
-		case FLOATING:
+		case BufferDataType::Floating:
 			m_knobModel.setRange( m_port->min, m_port->max,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
@@ -93,7 +93,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
-		case TIME:
+		case BufferDataType::Time:
 			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max,
 					  ( m_port->max -
 						m_port->min ) / 800.0f );
@@ -116,13 +116,13 @@ LADSPA_Data LadspaControl::value()
 {
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 			return static_cast<LADSPA_Data>( m_toggledModel.value() );
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
+		case BufferDataType::Floating:
 			return static_cast<LADSPA_Data>( m_knobModel.value() );
-		case TIME:
+		case BufferDataType::Time:
 			return static_cast<LADSPA_Data>( m_tempoSyncKnobModel.value() );
 		default:
 			qWarning( "LadspaControl::value(): BAD BAD BAD\n" );
@@ -137,13 +137,13 @@ ValueBuffer * LadspaControl::valueBuffer()
 {
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
-		case INTEGER:
-		case ENUM:
+		case BufferDataType::Toggled:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
 			return nullptr;
-		case FLOATING:
+		case BufferDataType::Floating:
 			return m_knobModel.valueBuffer();
-		case TIME:
+		case BufferDataType::Time:
 			return m_tempoSyncKnobModel.valueBuffer();
 		default:
 			qWarning( "LadspaControl::valueBuffer(): BAD BAD BAD\n" );
@@ -159,17 +159,17 @@ void LadspaControl::setValue( LADSPA_Data _value )
 {
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 			m_toggledModel.setValue( static_cast<bool>( _value ) );
 			break;
-		case INTEGER:
-		case ENUM:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
 			m_knobModel.setValue( static_cast<int>( _value ) );
 			break;
-		case FLOATING:
+		case BufferDataType::Floating:
 			m_knobModel.setValue( static_cast<float>( _value ) );
 			break;
-		case TIME:
+		case BufferDataType::Time:
 			m_tempoSyncKnobModel.setValue( static_cast<float>(
 								_value ) );
 			break;
@@ -194,15 +194,15 @@ void LadspaControl::saveSettings( QDomDocument& doc,
 	}
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 			m_toggledModel.saveSettings( doc, e, "data" );
 			break;
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
+		case BufferDataType::Floating:
 			m_knobModel.saveSettings( doc, e, "data" );
 			break;
-		case TIME:
+		case BufferDataType::Time:
 			m_tempoSyncKnobModel.saveSettings( doc, e, "data" );
 			break;
 		default:
@@ -230,15 +230,15 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 			m_linkEnabledModel.setValue(m_linkEnabledModel.initValue());
 		switch( m_port->data_type )
 		{
-			case TOGGLED:
+			case BufferDataType::Toggled:
 				m_toggledModel.setValue(m_toggledModel.initValue());
 				break;
-			case INTEGER:
-			case ENUM:
-			case FLOATING:
+			case BufferDataType::Integer:
+			case BufferDataType::Enum:
+			case BufferDataType::Floating:
 				m_knobModel.setValue(m_knobModel.initValue());
 				break;
-			case TIME:
+			case BufferDataType::Time:
 				m_tempoSyncKnobModel.setValue(m_tempoSyncKnobModel.initValue());
 				break;
 			default:
@@ -265,15 +265,15 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 
 		switch( m_port->data_type )
 		{
-			case TOGGLED:
+			case BufferDataType::Toggled:
 				m_toggledModel.loadSettings( e, dataModelName );
 				break;
-			case INTEGER:
-			case ENUM:
-			case FLOATING:
+			case BufferDataType::Integer:
+			case BufferDataType::Enum:
+			case BufferDataType::Floating:
 				m_knobModel.loadSettings( e, dataModelName );
 				break;
-			case TIME:
+			case BufferDataType::Time:
 				m_tempoSyncKnobModel.loadSettings( e, dataModelName );
 				break;
 			default:
@@ -290,15 +290,15 @@ void LadspaControl::linkControls( LadspaControl * _control )
 {
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 			BoolModel::linkModels( &m_toggledModel, _control->toggledModel() );
 			break;
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
+		case BufferDataType::Floating:
 			FloatModel::linkModels( &m_knobModel, _control->knobModel() );
 			break;
-		case TIME:
+		case BufferDataType::Time:
 			TempoSyncKnobModel::linkModels( &m_tempoSyncKnobModel,
 					_control->tempoSyncKnobModel() );
 			break;
@@ -341,15 +341,15 @@ void LadspaControl::unlinkControls( LadspaControl * _control )
 {
 	switch( m_port->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 			BoolModel::unlinkModels( &m_toggledModel, _control->toggledModel() );
 			break;
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
+		case BufferDataType::Floating:
 			FloatModel::unlinkModels( &m_knobModel, _control->knobModel() );
 			break;
-		case TIME:
+		case BufferDataType::Time:
 			TempoSyncKnobModel::unlinkModels( &m_tempoSyncKnobModel,
 					_control->tempoSyncKnobModel() );
 			break;

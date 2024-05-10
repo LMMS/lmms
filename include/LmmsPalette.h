@@ -23,12 +23,11 @@
  *
  */
 
+#ifndef LMMS_GUI_LMMS_PALETTE_H
+#define LMMS_GUI_LMMS_PALETTE_H
+
 #include <QWidget>
 #include "lmms_export.h"
-
-#ifndef LMMSPALETTE_H
-#define LMMSPALETTE_H
-
 
 namespace lmms::gui
 {
@@ -86,7 +85,6 @@ private:
 };
 
 
-
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LMMS_PALETTE_H

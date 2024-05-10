@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef STRING_PAIR_DRAG_H
-#define STRING_PAIR_DRAG_H
+#ifndef LMMS_GUI_STRING_PAIR_DRAG_H
+#define LMMS_GUI_STRING_PAIR_DRAG_H
 
 #include <QDrag>
 #include <QDragEnterEvent>
@@ -55,4 +55,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_STRING_PAIR_DRAG_H

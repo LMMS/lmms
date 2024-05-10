@@ -24,9 +24,8 @@
  *
  */
 
-
-#ifndef VERSIONEDSAVEDIALOG_H
-#define VERSIONEDSAVEDIALOG_H
+#ifndef LMMS_GUI_VERSIONED_SAVE_DIALOG_H
+#define LMMS_GUI_VERSIONED_SAVE_DIALOG_H
 
 #include "FileDialog.h"
 #include "Song.h"
@@ -69,4 +68,4 @@ public slots:
 
 } // namespace lmms::gui
 
-#endif // VERSIONEDSAVEDIALOG_H
+#endif // LMMS_GUI_VERSIONED_SAVE_DIALOG_H

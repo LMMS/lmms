@@ -59,19 +59,15 @@ LadspaManager::LadspaManager()
 	ladspaDirectories.push_back( "/Library/Audio/Plug-Ins/LADSPA" );
 #endif
 
-	for( QStringList::iterator it = ladspaDirectories.begin(); 
-			 		   it != ladspaDirectories.end(); ++it )
+	for (const auto& ladspaDirectory : ladspaDirectories)
 	{
 		// Skip empty entries as QDir will interpret it as the working directory
-		if ((*it).isEmpty()) { continue; }
-		QDir directory( ( *it ) );
+		if (ladspaDirectory.isEmpty()) { continue; }
+		QDir directory(ladspaDirectory);
 		QFileInfoList list = directory.entryInfoList();
-		for( QFileInfoList::iterator file = list.begin();
-						file != list.end(); ++file )
+		for (const auto& f : list)
 		{
-			const QFileInfo & f = *file;
-			if( !f.isFile() ||
-				 f.fileName().right( 3 ).toLower() !=
+				if(!f.isFile() || f.fileName().right( 3 ).toLower() !=
 #ifdef LMMS_BUILD_WIN32
 													"dll"
 #else
@@ -86,9 +82,7 @@ LadspaManager::LadspaManager()
 
 			if( plugin_lib.load() == true )
 			{
-				LADSPA_Descriptor_Function descriptorFunction =
-			( LADSPA_Descriptor_Function ) plugin_lib.resolve(
-							"ladspa_descriptor" );
+				auto descriptorFunction = (LADSPA_Descriptor_Function)plugin_lib.resolve("ladspa_descriptor");
 				if( descriptorFunction != nullptr )
 				{
 					addPlugins( descriptorFunction,
@@ -103,10 +97,9 @@ LadspaManager::LadspaManager()
 	}
 	
 	l_ladspa_key_t keys = m_ladspaManagerMap.keys();
-	for( l_ladspa_key_t::iterator it = keys.begin();
-			it != keys.end(); ++it )
+	for (const auto& key : keys)
 	{
-		m_sortedPlugins.append( qMakePair( getName( *it ), *it ) );
+		m_sortedPlugins.append(qMakePair(getName(key), key));
 	}
 	std::sort( m_sortedPlugins.begin(), m_sortedPlugins.end() );
 }
@@ -129,14 +122,8 @@ LadspaManager::~LadspaManager()
 LadspaManagerDescription * LadspaManager::getDescription(
 						const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		return( m_ladspaManagerMap[_plugin] );
-	}
-	else
-	{
-		return( nullptr );
-	}
+	auto const it = m_ladspaManagerMap.find(_plugin);
+	return it != m_ladspaManagerMap.end() ? *it : nullptr;
 }
 
 
@@ -146,11 +133,7 @@ void LadspaManager::addPlugins(
 		LADSPA_Descriptor_Function _descriptor_func,
 						const QString & _file )
 {
-	const LADSPA_Descriptor * descriptor;
-
-	for( long pluginIndex = 0;
-		( descriptor = _descriptor_func( pluginIndex ) ) != nullptr;
-								++pluginIndex )
+	for (long pluginIndex = 0; const auto descriptor = _descriptor_func(pluginIndex); ++pluginIndex)
 	{
 		ladspa_key_t key( _file, QString( descriptor->Label ) );
 		if( m_ladspaManagerMap.contains( key ) )
@@ -158,8 +141,7 @@ void LadspaManager::addPlugins(
 			continue;
 		}
 
-		LadspaManagerDescription * plugIn = 
-				new LadspaManagerDescription;
+		auto plugIn = new LadspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
 		plugIn->index = pluginIndex;
 		plugIn->inputChannels = getPluginInputs( descriptor );
@@ -167,21 +149,21 @@ void LadspaManager::addPlugins(
 
 		if( plugIn->inputChannels == 0 && plugIn->outputChannels > 0 )
 		{
-			plugIn->type = SOURCE;
+			plugIn->type = LadspaPluginType::Source;
 		}
 		else if( plugIn->inputChannels > 0 &&
 				       plugIn->outputChannels > 0 )
 		{
-			plugIn->type = TRANSFER;
+			plugIn->type = LadspaPluginType::Transfer;
 		}
 		else if( plugIn->inputChannels > 0 &&
 				       plugIn->outputChannels == 0 )
 		{
-			plugIn->type = SINK;
+			plugIn->type = LadspaPluginType::Sink;
 		}
 		else
 		{
-			plugIn->type = OTHER;
+			plugIn->type = LadspaPluginType::Other;
 		}
 
 		m_ladspaManagerMap[key] = plugIn;
@@ -531,24 +513,16 @@ bool LadspaManager::isInteger( const ladspa_key_t & _plugin,
 
 bool LadspaManager::isEnum( const ladspa_key_t & _plugin, uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin )
-		   && _port < getPortCount( _plugin ) )
+	auto const * desc = getDescriptor(_plugin);
+	if (desc && _port < desc->PortCount)
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
 		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
+			desc->PortRangeHints[_port].HintDescriptor;
 		// This is an LMMS extension to ladspa
-		return( LADSPA_IS_HINT_INTEGER( hintDescriptor ) &&
-			LADSPA_IS_HINT_TOGGLED( hintDescriptor ) );
+		return LADSPA_IS_HINT_INTEGER(hintDescriptor) && LADSPA_IS_HINT_TOGGLED(hintDescriptor);
 	}
-	else
-	{
-		return( false );
-	}
+
+	return false;
 }
 
 
@@ -574,22 +548,20 @@ const void * LadspaManager::getImplementationData(
 
 
 
-const LADSPA_Descriptor * LadspaManager::getDescriptor(
-						const ladspa_key_t & _plugin )
+const LADSPA_Descriptor * LadspaManager::getDescriptor(const ladspa_key_t & _plugin)
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	auto const it = m_ladspaManagerMap.find(_plugin);
+	if (it != m_ladspaManagerMap.end())
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( descriptor );
+		auto const plugin = *it;
+
+		LADSPA_Descriptor_Function descriptorFunction = plugin->descriptorFunction;
+		const LADSPA_Descriptor* descriptor = descriptorFunction(plugin->index);
+
+		return descriptor;
 	}
-	else
-	{
-		return( nullptr );
-	}
+
+	return nullptr;
 }
 
 

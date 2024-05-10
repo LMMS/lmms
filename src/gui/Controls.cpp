@@ -72,7 +72,7 @@ ComboControl::ComboControl(QWidget *parent) :
 	m_label(new QLabel(m_widget))
 {
 	m_combo->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
-	QVBoxLayout* vbox = new QVBoxLayout(m_widget);
+	auto vbox = new QVBoxLayout(m_widget);
 	vbox->addWidget(m_combo);
 	vbox->addWidget(m_label);
 	m_combo->repaint();
@@ -95,10 +95,10 @@ AutomatableModelView* CheckControl::modelView() { return m_checkBox; }
 
 CheckControl::CheckControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
-	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::Green)),
+	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::LedColor::Green)),
 	m_label(new QLabel(m_widget))
 {
-	QVBoxLayout* vbox = new QVBoxLayout(m_widget);
+	auto vbox = new QVBoxLayout(m_widget);
 	vbox->addWidget(m_checkBox);
 	vbox->addWidget(m_label);
 }

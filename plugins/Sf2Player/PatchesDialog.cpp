@@ -154,7 +154,7 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 			fluid_preset_t preset;
 			fluid_preset_t *pCurPreset = &preset;
 #else
-			fluid_preset_t *pCurPreset;
+			fluid_preset_t *pCurPreset = nullptr;
 #endif
 			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
 				int iBank = fluid_preset_get_banknum(pCurPreset);
@@ -328,7 +328,7 @@ void PatchesDialog::bankChanged ()
 			fluid_preset_t preset;
 			fluid_preset_t *pCurPreset = &preset;
 #else
-			fluid_preset_t *pCurPreset;
+			fluid_preset_t *pCurPreset = nullptr;
 #endif
 			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
 				int iBank = fluid_preset_get_banknum(pCurPreset);

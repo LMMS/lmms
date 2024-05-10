@@ -1,7 +1,7 @@
 /*
  * Lv2ControlBase.cpp - Lv2 control base class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -39,7 +39,7 @@ namespace lmms
 {
 
 
-Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
+Plugin::Type Lv2ControlBase::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue> &issues)
 {
 	// for some reason, all checks can be done by one processor...
@@ -54,35 +54,12 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 {
 	if (m_plugin)
 	{
-		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
-		while (channelsLeft > 0)
-		{
-			std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, that);
-			if (newOne->isValid())
-			{
-				channelsLeft -= std::max(
-					1 + static_cast<bool>(newOne->inPorts().m_right),
-					1 + static_cast<bool>(newOne->outPorts().m_right));
-				Q_ASSERT(channelsLeft >= 0);
-				m_procs.push_back(std::move(newOne));
-			}
-			else
-			{
-				qCritical() << "Failed instantiating LV2 processor";
-				m_valid = false;
-				channelsLeft = 0;
-			}
-		}
-		if (m_valid)
-		{
-			m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-			linkAllModels();
-		}
+		init(that);
 	}
 	else
 	{
 		qCritical() << "No Lv2 plugin found for URI" << uri;
-		m_valid = false;
+		throw std::runtime_error("No Lv2 plugin found for given URI");
 	}
 }
 
@@ -90,6 +67,41 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 
 
 Lv2ControlBase::~Lv2ControlBase() = default;
+
+
+
+
+void Lv2ControlBase::init(Model* meAsModel)
+{
+	int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
+	while (channelsLeft > 0)
+	{
+		std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, meAsModel);
+		channelsLeft -= std::max(
+			1 + static_cast<bool>(newOne->inPorts().m_right),
+			1 + static_cast<bool>(newOne->outPorts().m_right));
+		Q_ASSERT(channelsLeft >= 0);
+		m_procs.push_back(std::move(newOne));
+	}
+	m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
+	linkAllModels();
+}
+
+
+
+
+void Lv2ControlBase::shutdown()
+{
+	// currently nothing to do here
+}
+
+
+
+
+void Lv2ControlBase::reload()
+{
+	for (const auto& c : m_procs) { c->reload(); }
+}
 
 
 
@@ -111,7 +123,7 @@ const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
 
 
 void Lv2ControlBase::copyModelsFromLmms() {
-	for (auto& c : m_procs) { c->copyModelsFromCore(); }
+	for (const auto& c : m_procs) { c->copyModelsFromCore(); }
 }
 
 
@@ -119,7 +131,7 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 void Lv2ControlBase::copyModelsToLmms() const
 {
-	for (auto& c : m_procs) { c->copyModelsToCore(); }
+	for (const auto& c : m_procs) { c->copyModelsToCore(); }
 }
 
 
@@ -127,7 +139,8 @@ void Lv2ControlBase::copyModelsToLmms() const
 
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
-	for (auto& c : m_procs) {
+	for (const auto& c : m_procs) 
+	{
 		c->copyBuffersFromCore(buf, firstChan, m_channelsPerProc, frames);
 		firstChan += m_channelsPerProc;
 	}
@@ -148,7 +161,7 @@ void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 
 
 void Lv2ControlBase::run(fpp_t frames) {
-	for (auto& c : m_procs) { c->run(frames); }
+	for (const auto& c : m_procs) { c->run(frames); }
 }
 
 
@@ -182,14 +195,6 @@ void Lv2ControlBase::loadFile(const QString &file)
 
 
 
-void Lv2ControlBase::reloadPlugin()
-{
-	// TODO
-}
-
-
-
-
 std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
 	for (const auto& c : m_procs) { res += c->controlCount(); }
@@ -211,7 +216,7 @@ bool Lv2ControlBase::hasNoteInput() const
 void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
 	const TimePos &time, f_cnt_t offset)
 {
-	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
+	for (const auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }
 
 

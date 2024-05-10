@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef LED_CHECKBOX_H
-#define LED_CHECKBOX_H
+#ifndef LMMS_GUI_LED_CHECKBOX_H
+#define LMMS_GUI_LED_CHECKBOX_H
 
 #include "AutomatableButton.h"
 
@@ -39,23 +38,21 @@ class LMMS_EXPORT LedCheckBox : public AutomatableButton
 {
 	Q_OBJECT
 public:
-	enum LedColors
+	enum class LedColor
 	{
 		Yellow,
 		Green,
-		Red,
-		NumColors
+		Red
 	} ;
 
 	LedCheckBox( const QString & _txt, QWidget * _parent,
 				const QString & _name = QString(),
-						LedColors _color = Yellow );
+						LedColor _color = LedColor::Yellow,
+						bool legacyMode = true);
 	LedCheckBox( QWidget * _parent,
 				const QString & _name = QString(),
-						LedColors _color = Yellow );
-
-	~LedCheckBox() override;
-
+						LedColor _color = LedColor::Yellow,
+						bool legacyMode = true);
 
 	inline const QString & text()
 	{
@@ -71,17 +68,22 @@ protected:
 
 
 private:
-	QPixmap * m_ledOnPixmap;
-	QPixmap * m_ledOffPixmap;
+	QPixmap m_ledOnPixmap;
+	QPixmap m_ledOffPixmap;
 
 	QString m_text;
 
-	void initUi( LedColors _color ); //!< to be called by ctors
+	bool m_legacyMode;
+	
+	void initUi( LedColor _color ); //!< to be called by ctors
+
 	void onTextUpdated(); //!< to be called when you updated @a m_text
+	void paintLegacy(QPaintEvent * p);
+	void paintNonLegacy(QPaintEvent * p);
 
 } ;
 
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LED_CHECKBOX_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EMBED_H
-#define EMBED_H
+#ifndef LMMS_EMBED_H
+#define LMMS_EMBED_H
 
 #include <QPixmap>
 #include <QString>
@@ -65,7 +65,7 @@ inline QPixmap getIconPixmap( const QString&  _name,
 }
 //QString getText( const char * _name );
 
-}
+} // namespace PLUGIN_NAME
 
 #endif // PLUGIN_NAME
 
@@ -139,4 +139,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EMBED_H

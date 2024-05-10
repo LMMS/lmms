@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef KICKER_H
-#define KICKER_H
+#ifndef LMMS_KICKER_H
+#define LMMS_KICKER_H
 
 #include "AutomatableModel.h"
 #include "Instrument.h"
@@ -60,19 +59,14 @@ public:
 						sampleFrame * _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
 
-	Flags flags() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return IsNotBendable;
-	}
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return( 512 );
+		return 12.f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
@@ -135,4 +129,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_KICKER_H

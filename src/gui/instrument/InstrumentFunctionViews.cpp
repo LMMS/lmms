@@ -44,20 +44,20 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob( new Knob( knobBright_26 ) )
+	m_chordRangeKnob( new Knob( KnobType::Bright26 ) )
 {
-	QHBoxLayout* topLayout = new QHBoxLayout( this );
-	topLayout->setMargin( 0 );
+	auto topLayout = new QHBoxLayout(this);
+	topLayout->setContentsMargins(0, 0, 0, 0);
 	topLayout->addWidget( m_chordsGroupBox );
 
-	QGridLayout* mainLayout = new QGridLayout( m_chordsGroupBox );
+	auto mainLayout = new QGridLayout(m_chordsGroupBox);
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
 	mainLayout->setHorizontalSpacing( 20 );
 	mainLayout->setVerticalSpacing( 1 );
 
-	QLabel* chordLabel = new QLabel( tr( "Chord:" ) );
-	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
+	auto chordLabel = new QLabel(tr("Chord:"));
+	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), 10));
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
@@ -98,21 +98,21 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_a( arp ),
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
-	m_arpRangeKnob( new Knob( knobBright_26 ) ),
-	m_arpRepeatsKnob( new Knob( knobBright_26 ) ),
-	m_arpCycleKnob( new Knob( knobBright_26 ) ),
-	m_arpSkipKnob( new Knob( knobBright_26 ) ),
-	m_arpMissKnob( new Knob( knobBright_26 ) ),
-	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
-	m_arpGateKnob( new Knob( knobBright_26 ) ),
+	m_arpRangeKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpRepeatsKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpCycleKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpSkipKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpMissKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpTimeKnob( new TempoSyncKnob( KnobType::Bright26 ) ),
+	m_arpGateKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {
-	QHBoxLayout* topLayout = new QHBoxLayout( this );
-	topLayout->setMargin( 0 );
+	auto topLayout = new QHBoxLayout(this);
+	topLayout->setContentsMargins(0, 0, 0, 0);
 	topLayout->addWidget( m_arpGroupBox );
 
-	QGridLayout* mainLayout = new QGridLayout( m_arpGroupBox );
+	auto mainLayout = new QGridLayout(m_arpGroupBox);
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
 	mainLayout->setHorizontalSpacing( 20 );
@@ -145,15 +145,15 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
+	constexpr int labelFontSize = 10;
+	auto arpChordLabel = new QLabel(tr("Chord:"));
+	arpChordLabel->setFont(adjustedToPixelSize(arpChordLabel->font(), labelFontSize));
 
-	QLabel* arpChordLabel = new QLabel( tr( "Chord:" ) );
-	arpChordLabel->setFont( pointSize<8>( arpChordLabel->font() ) );
+	auto arpDirectionLabel = new QLabel(tr("Direction:"));
+	arpDirectionLabel->setFont(adjustedToPixelSize(arpDirectionLabel->font(), labelFontSize));
 
-	QLabel* arpDirectionLabel = new QLabel( tr( "Direction:" ) );
-	arpDirectionLabel->setFont( pointSize<8>( arpDirectionLabel->font() ) );
-
-	QLabel* arpModeLabel = new QLabel( tr( "Mode:" ) );
-	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
+	auto arpModeLabel = new QLabel(tr("Mode:"));
+	arpModeLabel->setFont(adjustedToPixelSize(arpModeLabel->font(), labelFontSize));
 
 	mainLayout->addWidget( arpChordLabel, 0, 0 );
 	mainLayout->addWidget( m_arpComboBox, 1, 0 );

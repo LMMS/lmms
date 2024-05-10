@@ -34,7 +34,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
-#include "MemoryManager.h"
 
 class QLabel;
 
@@ -81,16 +80,6 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0;
-	}
-
-	Flags flags() const override
-	{
-		return IsSingleStreamed;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 	
 	QString getCurrentPatchName();
@@ -111,19 +100,15 @@ public slots:
 	void updateChorusOn();
 	void updateChorus();
 	void updateGain();
-
+	void updateTuning();
 
 private:
-	static QMutex s_fontsMutex;
-	static QMap<QString, Sf2Font*> s_fonts;
-	static int (* s_origFree)( fluid_sfont_t * );
-
 	SRC_STATE * m_srcState;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
-	Sf2Font* m_font;
+	fluid_sfont_t* m_font;
 
 	int m_fontId;
 	QString m_filename;
@@ -135,7 +120,7 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 
-	int m_notesRunning[128];
+	std::array<int, 128> m_notesRunning = {};
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
 	int m_lastMidiPitchRange;
@@ -175,22 +160,6 @@ signals:
 	void patchChanged();
 
 } ;
-
-
-
-// A soundfont in our font-map
-class Sf2Font
-{
-	MM_OPERATORS
-public:
-	Sf2Font( fluid_sfont_t * f ) :
-		fluidFont( f ),
-		refCount( 1 )
-	{};
-
-	fluid_sfont_t * fluidFont;
-	int refCount;
-};
 
 
 namespace gui

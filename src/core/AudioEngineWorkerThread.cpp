@@ -30,7 +30,6 @@
 
 #include "denormals.h"
 #include "AudioEngine.h"
-#include "MemoryManager.h"
 #include "ThreadableJob.h"
 
 #if __SSE__
@@ -91,7 +90,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 			}
 		}
 		// always exit loop if we're not in dynamic mode
-		processedJob = processedJob && ( m_opMode == Dynamic );
+		processedJob = processedJob && ( m_opMode == OperationMode::Dynamic );
 	}
 }
 
@@ -167,7 +166,6 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 void AudioEngineWorkerThread::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;

@@ -58,8 +58,8 @@ bool AudioFileFlac::startEncoding()
 
 	switch (getOutputSettings().getBitDepth())
 	{
-		case OutputSettings::Depth_24Bit:
-		case OutputSettings::Depth_32Bit:
+		case OutputSettings::BitDepth::Depth24Bit:
+		case OutputSettings::BitDepth::Depth32Bit:
 			// FLAC does not support 32bit sampling, so take it as 24.
 			m_sfinfo.format |= SF_FORMAT_PCM_24;
 			break;
@@ -89,14 +89,14 @@ bool AudioFileFlac::startEncoding()
 	return true;
 }
 
-void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const frames, float master_gain)
+void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const frames)
 {
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
-	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
+	if (depth == OutputSettings::BitDepth::Depth24Bit || depth == OutputSettings::BitDepth::Depth32Bit) // Float encoding
 	{
-		std::unique_ptr<sample_t[]> buf{ new sample_t[frames*channels()] };
+		auto buf = std::vector<sample_t>(frames * channels());
 		for(fpp_t frame = 0; frame < frames; ++frame)
 		{
 			for(ch_cnt_t channel=0; channel<channels(); ++channel)
@@ -104,16 +104,16 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 				// Clip the negative side to just above -1.0 in order to prevent it from changing sign
 				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
 				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
-				buf[frame*channels() + channel] = qMax( clipvalue, _ab[frame][channel] * master_gain );
+				buf[frame*channels() + channel] = std::max(clipvalue, _ab[frame][channel]);
 			}
 		}
-		sf_writef_float(m_sf,static_cast<float*>(buf.get()),frames);
+		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
 	}
 	else // integer PCM encoding
 	{
-		std::unique_ptr<int_sample_t[]> buf{ new int_sample_t[frames*channels()] };
-		convertToS16(_ab, frames, master_gain, buf.get(), !isLittleEndian());
-		sf_writef_short(m_sf, static_cast<short*>(buf.get()), frames);
+		auto buf = std::vector<int_sample_t>(frames * channels());
+		convertToS16(_ab, frames, buf.data(), !isLittleEndian());
+		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 
 }

@@ -44,8 +44,6 @@
 namespace lmms::gui
 {
 
-QPixmap * AutomationClipView::s_clip_rec = nullptr;
-
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
 	ClipView( _clip, _parent ),
@@ -61,10 +59,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
-
-	if( s_clip_rec == nullptr ) { s_clip_rec = new QPixmap( embed::getIconPixmap(
-							"clip_rec" ) ); }
-
 	update();
 }
 
@@ -166,8 +160,7 @@ void AutomationClipView::flipX()
 
 void AutomationClipView::constructContextMenu( QMenu * _cm )
 {
-	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
-				tr( "Open in Automation editor" ), _cm );
+	auto a = new QAction(embed::getIconPixmap("automation"), tr("Open in Automation editor"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
 	_cm->insertSeparator( _cm->actions()[1] );
@@ -192,20 +185,16 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
-	if( !m_clip->m_objects.isEmpty() )
+	if (!m_clip->m_objects.empty())
 	{
 		_cm->addSeparator();
-		QMenu * m = new QMenu( tr( "%1 Connections" ).
-				arg( m_clip->m_objects.count() ), _cm );
-		for( AutomationClip::objectVector::iterator it =
-						m_clip->m_objects.begin();
-					it != m_clip->m_objects.end(); ++it )
+		auto m = new QMenu(tr("%1 Connections").arg(m_clip->m_objects.size()), _cm);
+		for (const auto& object : m_clip->m_objects)
 		{
-			if( *it )
+			if (object)
 			{
-				a = new QAction( tr( "Disconnect \"%1\"" ).
-					arg( ( *it )->fullDisplayName() ), m );
-				a->setData( ( *it )->id() );
+				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
+				a->setData(object->id());
 				m->addAction( a );
 			}
 		}
@@ -276,8 +265,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 				/ (float) m_clip->timeMapLength().getBar() :
 								pixelsPerBar();
 
-	const float min = m_clip->firstObject()->minValue<float>();
-	const float max = m_clip->firstObject()->maxValue<float>();
+	const auto min = m_clip->firstObject()->minValue<float>();
+	const auto max = m_clip->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
@@ -303,7 +292,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		if( it+1 == m_clip->getTimeMap().end() )
 		{
 			const float x1 = POS(it) * ppTick;
-			const float x2 = (float)( width() - BORDER_WIDTH );
+			const auto x2 = (float)(width() - BORDER_WIDTH);
 			if( x1 > ( width() - BORDER_WIDTH ) ) break;
 			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
@@ -325,24 +314,17 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		// the outValue of the current node). When we have nodes with linear or cubic progression
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
-		float nextValue;
-		if( m_clip->progressionType() == AutomationClip::DiscreteProgression )
-		{
-			nextValue = OUTVAL(it);
-		}
-		else
-		{
-			nextValue = INVAL(it + 1);
-		}
+		float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
+			? OUTVAL(it)
+			: INVAL(it + 1);
 
 		QPainterPath path;
 		QPointF origin = QPointF(POS(it) * ppTick, 0.0f);
 		path.moveTo( origin );
 		path.moveTo(QPointF(POS(it) * ppTick,values[0]));
-		float x;
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
-			x = i * ppTick;
+			float x = i * ppTick;
 			if( x > ( width() - BORDER_WIDTH ) ) break;
 			float value = values[i - POS(it)];
 			path.lineTo( QPointF( x, value ) );
@@ -384,7 +366,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// recording icon for when recording automation
 	if( m_clip->isRecording() )
 	{
-		p.drawPixmap( 1, rect().bottom() - s_clip_rec->height(), *s_clip_rec );
+		static auto s_clipRec = embed::getIconPixmap("clip_rec");
+		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
 	// clip name
@@ -434,9 +417,7 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )
 		{
 			bool added = m_clip->addObject( mod );

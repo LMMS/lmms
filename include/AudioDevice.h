@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_DEVICE_H
-#define AUDIO_DEVICE_H
+#ifndef LMMS_AUDIO_DEVICE_H
+#define LMMS_AUDIO_DEVICE_H
 
 #include <QMutex>
 #include <samplerate.h>
@@ -89,18 +89,10 @@ public:
 
 	virtual void stopProcessing();
 
-	virtual void applyQualitySettings();
-
-
-
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/,
-						const float /*_master_gain*/ )
-	{
-	}
+	virtual void writeBuffer(const surroundSampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
 	fpp_t getNextBuffer( surroundSampleFrame * _ab );
@@ -109,20 +101,12 @@ protected:
 	// returns num of bytes in outbuf
 	int convertToS16( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
-						const float _master_gain,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
 
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,
 							const fpp_t _frames );
-
-	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	fpp_t resample( const surroundSampleFrame * _src,
-					const fpp_t _frames,
-					surroundSampleFrame * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
 
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
@@ -133,8 +117,6 @@ protected:
 	{
 		return m_audioEngine;
 	}
-
-	bool hqAudio() const;
 
 	static void stopProcessingThread( QThread * thread );
 
@@ -151,13 +133,10 @@ private:
 
 	QMutex m_devMutex;
 
-	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
-
 	surroundSampleFrame * m_buffer;
 
 };
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DEVICE_H
