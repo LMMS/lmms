@@ -244,7 +244,16 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 	if( m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->isUsed() )
 	{
 		QVarLengthArray<float> volBuffer(frames);
-		m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel( volBuffer.data(), envTotalFrames, envReleaseBegin, frames );
+		if (n->hasParent() == true)
+		{
+			f_cnt_t parentEnvelopeTotalFrames = n->getParentTotalFramesPlayed();
+			f_cnt_t parentEnvelopeReleaseBegin = parentEnvelopeTotalFrames - n->getParentReleaseFramesDone() + n->getParentFramesBeforeRelease();
+			m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel(volBuffer.data(), parentEnvelopeTotalFrames, parentEnvelopeReleaseBegin, frames);
+		}
+		else
+		{
+			m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel(volBuffer.data(), envTotalFrames, envReleaseBegin, frames);
+		}
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
