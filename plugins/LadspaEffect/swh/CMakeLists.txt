@@ -38,9 +38,8 @@ FOREACH(_item ${XML_SOURCES})
 	# Add a library target for this C file, which depends on success of makestup.pl
 	ADD_LIBRARY("${_plugin}" MODULE "${_out_file}")
 
-	# For MSVC, we need to "export" the plugins to work properly
-		if(MSVC)
-		target_link_options(${_plugin} PRIVATE "/EXPORT:ladspa_descriptor")
+	if(MSVC)
+		target_link_options("${_plugin}" PRIVATE "/EXPORT:ladspa_descriptor")
 	endif()
 
 	# Vocoder does not use fftw

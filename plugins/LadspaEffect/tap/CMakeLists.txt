@@ -10,7 +10,7 @@ FOREACH(_item ${PLUGIN_SOURCES})
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
 	ADD_LIBRARY("${_plugin}" MODULE "${_item}")
 	if(MSVC)
-		target_link_options(${_plugin} PRIVATE "/EXPORT:ladspa_descriptor")
+		target_link_options("${_plugin}" PRIVATE "/EXPORT:ladspa_descriptor")
 	endif()
 	# TAP pinknoise will re-init srand(); use existing seed instead
 	IF("${_plugin}" MATCHES "tap_pinknoise")

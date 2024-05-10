@@ -29,7 +29,7 @@
 	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
-// #include <sys/time.h> needed if using the commented seed function
+// #include <sys/time.h>
 
 #include "basics.h"
 
@@ -140,10 +140,11 @@ ladspa_descriptor (unsigned long i)
 	return 0;
 }
 
-struct CapsSoInit {
+struct CapsSoInit
+{
 	CapsSoInit() { caps_so_init(); } 
 	~CapsSoInit() { caps_so_fini(); } 
-}; 
+};
 static CapsSoInit capsSoInit;
 
 }; /* extern "C" */

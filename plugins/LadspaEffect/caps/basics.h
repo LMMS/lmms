@@ -38,9 +38,6 @@
 #define _ISOC99_SOURCE 1
 #define _ISOC9X_SOURCE 1
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,6 +46,9 @@
 #endif
 #include <math.h>
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdint.h>
 
 #include <ladspa.h> 	 
 
@@ -79,7 +79,7 @@
 
 #define MIN_GAIN .000001 /* -120 dB */
 
-/* smallest non-denormal 32 bit IEEE float is 1.18x10^-38 */
+/* smallest non-denormal 32 bit IEEE float is 1.18×10^-38 */
 #define NOISE_FLOOR .00000000000005 /* -266 dB */
 
 typedef int8_t			int8;
