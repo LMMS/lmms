@@ -77,15 +77,10 @@ void FileSearch::operator()()
 			if (info.isDir())
 			{
 				dir.setPath(entryPath);
-				auto entries = dir.entryInfoList(m_dirFilters, m_sortFlags);
+				const auto entries = dir.entryInfoList(m_dirFilters, m_sortFlags);
 
 				// Reverse to maintain the sorting within this directory when popped
-				std::reverse(entries.begin(), entries.end());
-
-				for (const auto& entry : entries)
-				{
-					stack.push_front(entry);
-				}
+				std::for_each(entries.rbegin(), entries.rend(), [&stack](const auto& entry) { stack.push_front(entry); });
 			}
 		}
 	}
