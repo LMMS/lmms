@@ -512,7 +512,7 @@ void Lv2Proc::run(fpp_t frames)
 	// Check if it's time to send updates to the UI
 	m_eventDeltaT += frames;
 	bool sendUiUpdates = false;
-	uint32_t updateFrames = (uint32_t)(Engine::audioEngine()->processingSampleRate() / lv2UiRefreshRate());
+	uint32_t updateFrames = (uint32_t)(Engine::audioEngine()->outputSampleRate() / lv2UiRefreshRate());
 	if (!m_uiEventsReader
 		// missing UI events reader on our sides implies
 		// missing plugin events reader on UI side (see Lv2ViewBase.cpp)
