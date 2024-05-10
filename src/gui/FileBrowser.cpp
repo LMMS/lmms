@@ -256,11 +256,7 @@ void FileBrowser::searchCompleted(FileSearch* search)
 
 void FileBrowser::onSearch(const QString& filter)
 {
-	if (m_currentSearch)
-	{
-		m_currentSearch->cancel();
-		m_currentSearch.reset();
-	}
+	if (m_currentSearch) { m_currentSearch->cancel(); }
 
 	if (filter.isEmpty())
 	{
