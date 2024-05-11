@@ -145,16 +145,6 @@ ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
 
-
-# TODO: Fix linking issues with msys debug builds
-IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-	SET(WANT_GIG OFF)
-	SET(WANT_STK OFF)
-	SET(WANT_SWH OFF)
-	SET(STATUS_GIG "not built as requested")
-	SET(STATUS_STK "not built as requested")
-ENDIF()
-
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
