@@ -136,7 +136,11 @@ Lv2Manager::Lv2Manager() :
 
 	auto supportOpt = [this](Lv2UridCache::Id id)
 	{
-		Lv2Options::supportOption(uridCache()[id]);
+		uint32_t urid = uridCache()[id];
+		if(urid != Lv2UridCache::noUrid())
+		{
+			Lv2Options::supportOption(urid);
+		}
 	};
 	supportOpt(Lv2UridCache::Id::param_sampleRate);
 	supportOpt(Lv2UridCache::Id::bufsz_maxBlockLength);

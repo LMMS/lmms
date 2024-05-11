@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <cstdint>
+#include <lv2/lv2plug.in/ns/ext/urid/urid.h>
 
 
 namespace lmms
@@ -60,13 +61,15 @@ public:
 	template<typename T>
 	struct IdForType;
 
+	static LV2_URID noUrid() { return 0; }
+
 	//! Return URID for a cache ID
-	uint32_t operator[](Id id) const;
+	LV2_URID operator[](Id id) const;
 
 	Lv2UridCache(class UridMap& mapper);
 
 private:
-	uint32_t m_cache[static_cast<int>(Id::size)];
+	LV2_URID m_cache[static_cast<int>(Id::size)];
 };
 
 template<> struct Lv2UridCache::IdForType<float> { static constexpr auto value = Id::atom_Float; };

@@ -44,7 +44,7 @@ namespace lmms
 {
 
 
-uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
+LV2_URID Lv2UridCache::operator[](Lv2UridCache::Id id) const
 {
 	Q_ASSERT(id != Id::size);
 	return m_cache[static_cast<std::size_t>(id)];
@@ -52,8 +52,8 @@ uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
 
 Lv2UridCache::Lv2UridCache(UridMap &mapper)
 {
-	const uint32_t noIdYet = 0;
-	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noIdYet);
+	const LV2_URID noUridYet = noUrid();
+	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noUridYet);
 
 	auto init = [this, &mapper](Id id, const char* uridStr)
 	{
@@ -69,9 +69,11 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 	init(Id::midi_MidiEvent, LV2_MIDI__MidiEvent);
 	init(Id::param_sampleRate, LV2_PARAMETERS__sampleRate);
 	init(Id::ui_updateRate, LV2_UI__updateRate);
+#ifdef LV2_UI__scaleFactor
 	init(Id::ui_scaleFactor, LV2_UI__scaleFactor);
+#endif
 
-	for(uint32_t urid : m_cache) { Q_ASSERT(urid != noIdYet); }
+	for(LV2_URID urid : m_cache) { Q_ASSERT(urid != noUridYet); }
 }
 
 

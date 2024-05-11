@@ -24,12 +24,10 @@
 
 #include "Lv2Basics.h"
 
-#include <unistd.h>
-
 #include <QGuiApplication>
 #include <QScreen>
 
-#ifdef LMMS_HAVE_LV2
+#ifdef  LMMS_HAVE_LV2
 
 namespace lmms
 {

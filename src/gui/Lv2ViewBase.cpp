@@ -84,13 +84,13 @@ void Lv2ViewProc::uiPortEvent(
 	uint32_t protocol,
 	const void* buffer)
 {
+#ifdef LMMS_HAVE_SUIL
 	if (m_uiInstance)
 	{
-#ifdef LMMS_HAVE_SUIL
 		suil_instance_port_event(m_uiInstance, port_index, buffer_size, protocol, buffer);
-#endif
 	}
 	else
+#endif
 	{
 		// LMMS UI is updated automatically
 	}
