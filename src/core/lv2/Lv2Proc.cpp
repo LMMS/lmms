@@ -284,6 +284,7 @@ void Lv2Proc::applyUiEvents(uint32_t nframes)
 						}
 					}
 					assert(bestIdx != std::numeric_limits<std::size_t>::max());
+					(void)bestIdx;
 					m.setValue(static_cast<float>(m.value()));
 				}
 			};
