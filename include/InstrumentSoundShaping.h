@@ -75,6 +75,9 @@ public:
 
 
 private:
+	void calculateFillLevel(float* buffer, Target enumTarget,
+		NotePlayHandle* n, f_cnt_t totalFrames, f_cnt_t releaseBegin, fpp_t bufferSize);
+
 	EnvelopeAndLfoParameters * m_envLfoParameters[NumTargets];
 	InstrumentTrack * m_instrumentTrack;
 
