@@ -80,6 +80,7 @@ OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_WEAKJACK	"Loosely link JACK libraries" ON)
 OPTION(WANT_LV2		"Include Lv2 plugins" ON)
 OPTION(WANT_SUIL	"Include SUIL for LV2 plugin UIs" ON)
+OPTION(WANT_SERD	"Include SERD for LV2 debugging" ON)
 OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
@@ -275,6 +276,22 @@ IF(WANT_SUIL)
 ELSE(WANT_SUIL)
 	SET(STATUS_SUIL "not built as requested")
 ENDIF(WANT_SUIL)
+
+IF(WANT_SERD)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(SERD serd-0)
+		IF(SERD_FOUND)
+			SET(LMMS_HAVE_SERD TRUE)
+			SET(STATUS_SERD "OK")
+		ELSE()
+			SET(STATUS_SERD "not found, install it or set PKG_CONFIG_PATH appropriately")
+		ENDIF()
+	ELSE()
+		SET(STATUS_SERD "not found, requires pkg-config")
+	ENDIF()
+ELSE(WANT_SERD)
+	SET(STATUS_SERD "not built as requested")
+ENDIF(WANT_SERD)
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -891,6 +908,7 @@ MESSAGE(
 "----------------\n"
 "* Lv2 plugins                 : ${STATUS_LV2}\n"
 "* SUIL for plugin UIs         : ${STATUS_SUIL}\n"
+"* SERD for Lv2 debugging      : ${STATUS_SERD}\n"
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"

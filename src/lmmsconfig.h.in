@@ -22,6 +22,7 @@
 #cmakedefine LMMS_HAVE_WEAKJACK
 #cmakedefine LMMS_HAVE_LV2
 #cmakedefine LMMS_HAVE_SUIL
+#cmakedefine LMMS_HAVE_SERD
 #cmakedefine LMMS_HAVE_MP3LAME
 #cmakedefine LMMS_HAVE_SNDFILE_MP3
 #cmakedefine LMMS_HAVE_OGGVORBIS

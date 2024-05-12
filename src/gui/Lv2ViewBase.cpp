@@ -144,7 +144,8 @@ void Lv2ViewProc::writeToPlugin(uint32_t port_index,
 		qWarning() << "UI write to out of range port index" << port_index;
 		return;
 	}
-	
+
+#ifdef LMMS_HAVE_SERD
 	if (lv2Dump && protocol == m_atomEventTransfer)
 	{
 		const LV2_Atom* atom = (const LV2_Atom*)buffer;
@@ -157,6 +158,7 @@ void Lv2ViewProc::writeToPlugin(uint32_t port_index,
 		qDebug("\n## UI => Plugin (%u bytes) ##\n%s\n", atom->size, str);
 		free(str);
 	}
+#endif
 	
 	char buf[Lv2Proc::uiEventsBufsize()];
 	Lv2UiControlChange* ev = (Lv2UiControlChange*)buf;
@@ -437,7 +439,8 @@ void Lv2ViewProc::update()
 			break;
 		}
 		m_pluginEventsReader->read(ev.size).copy((char*)buf, ev.size);
-		
+
+#ifdef LMMS_HAVE_SERD
 		if (lv2Dump && ev.protocol == m_atomEventTransfer)
 		{
 			Lv2Manager* mgr = Engine::getLv2Manager();
@@ -451,7 +454,8 @@ void Lv2ViewProc::update()
 			qDebug("\n## Plugin => UI (%u bytes) ##\n%s\n", atom->size, str);
 			free(str);
 		}
-		
+#endif
+
 		uiPortEvent(ev.index, ev.size, ev.protocol, buf);
 
 		if (lv2Dump && ev.protocol == 0)
