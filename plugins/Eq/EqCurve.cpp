@@ -185,9 +185,9 @@ QPainterPath EqHandle::getCurvePath()
 
 void EqHandle::loadPixmap()
 {
-	QString fileName = "handle" + QString::number(m_numb+1);
-	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
-	m_circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
+	auto fileName = "handle" + std::to_string(m_numb + 1);
+	if (!isActiveHandle()) { fileName += "inactive"; }
+	m_circlePixmap = PLUGIN_NAME::getIconPixmap(fileName);
 }
 
 bool EqHandle::mousePressed() const

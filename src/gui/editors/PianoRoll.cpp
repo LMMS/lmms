@@ -342,7 +342,7 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
-	const auto pixmaps = std::array<QString, 11>{"whole", "half", "quarter", "eighth",
+	const auto pixmaps = std::array<std::string, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
 						"tripletsixteenth", "tripletthirtysecond"};
