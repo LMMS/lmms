@@ -74,7 +74,7 @@ private:
 	Lv2Proc* proc() { return (Lv2Proc*)model(); }
 	const Lv2Proc* proc() const { return (const Lv2Proc*)model(); }
 
-	static const char* hostUiTypeUri() { return "http://lv2plug.in/ns/extensions/ui#Qt5UI"; }
+	static const char* hostUiTypeUri();
 	bool calculateIsResizable() const;
 	
 	void initUi();

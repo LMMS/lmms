@@ -170,6 +170,11 @@ void Lv2ViewProc::writeToPlugin(uint32_t port_index,
 
 
 
+const char* Lv2ViewProc::hostUiTypeUri() { return LV2_UI__Qt5UI; }
+
+
+
+
 bool Lv2ViewProc::calculateIsResizable() const
 {
 	if (!m_ui) { return false; }
@@ -275,7 +280,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		m_uiInstance =
 			suil_instance_new(m_uiHost,
 				this,
-				"http://lv2plug.in/ns/extensions/ui#Qt5UI",
+				hostUiTypeUri(),
 				proc->pluginUri(),
 				lilv_node_as_uri(lilv_ui_get_uri(m_ui)),
 				lilv_node_as_uri(m_uiType),
@@ -310,7 +315,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		m_timer->start(1000 / lv2UiRefreshRate());
 	}
 	else
-#endif
+#endif // LMMS_HAVE_SUIL
 	{
 		class SetupTheWidget : public Lv2Ports::ConstVisitor
 		{

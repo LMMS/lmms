@@ -52,13 +52,18 @@ LV2_URID Lv2UridCache::operator[](Lv2UridCache::Id id) const
 
 Lv2UridCache::Lv2UridCache(UridMap &mapper)
 {
-	const LV2_URID noUridYet = noUrid();
+	const LV2_URID noUridYet = std::numeric_limits<LV2_URID>::max();
 	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noUridYet);
 
 	auto init = [this, &mapper](Id id, const char* uridStr)
 	{
 		m_cache[static_cast<std::size_t>(id)] = mapper.map(uridStr);
 	};
+	auto initNoUrid = [this](Id id)
+	{
+		m_cache[static_cast<std::size_t>(id)] = noUrid();
+	};
+	(void)initNoUrid;
 
 	init(Id::atom_Float, LV2_ATOM__Float);
 	init(Id::atom_Int, LV2_ATOM__Int);
@@ -71,6 +76,8 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 	init(Id::ui_updateRate, LV2_UI__updateRate);
 #ifdef LV2_UI__scaleFactor
 	init(Id::ui_scaleFactor, LV2_UI__scaleFactor);
+#else
+	initNoUrid(Id::ui_scaleFactor);
 #endif
 
 	for(LV2_URID urid : m_cache) { Q_ASSERT(urid != noUridYet); }
