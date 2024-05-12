@@ -20,16 +20,17 @@ CONFIGURE_FILE("appdmg.json.in"  "${CMAKE_BINARY_DIR}/appdmg.json" @ONLY)
 
 # CPack vars
 set(CPACK_GENERATOR "DragNDrop" PARENT_SCOPE)
-# Strip causes missing symbols on macOS
+# Disable strip, it causes missing symbols on macOS
 set(CPACK_STRIP_FILES false PARENT_SCOPE)
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION}" PARENT_SCOPE)
-# Creates a staging directory to create our bundle from
 set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackApple.cmake" PARENT_SCOPE)
 set(CPACK_DMG_VOLUME_NAME "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg" PARENT_SCOPE)
 # tiff file is multi-resource (1x & 2x) created programatically using convert
 set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_BINARY_DIR}/dmg_branding.tiff" PARENT_SCOPE)
 # DS_Store contains the Finder layout
-# this file can be recreated using appdmg: Copy .DS_Store from the root of the DMG file
+# - .DS_Store can be recreated using appdmg appdmg.json lmms.dmg
+# - Update path to point to _CPack_Packages/Darwin/DragNDrop/lmms-x-x-x/LMMS.app
+# - Find new .DS_Store from the root of the DMG file
 set(CPACK_DMG_DS_STORE "${CMAKE_SOURCE_DIR}/cmake/apple/DS_Store" PARENT_SCOPE)
 unset(CPACK_RESOURCE_FILE_LICENSE PARENT_SCOPE)
 
