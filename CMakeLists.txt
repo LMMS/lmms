@@ -81,6 +81,7 @@ OPTION(WANT_WEAKJACK	"Loosely link JACK libraries" ON)
 OPTION(WANT_LV2		"Include Lv2 plugins" ON)
 OPTION(WANT_SUIL	"Include SUIL for LV2 plugin UIs" ON)
 OPTION(WANT_SERD	"Include SERD for LV2 debugging" ON)
+OPTION(WANT_SRATOM	"Include SRATOM for LV2 debugging" ON)
 OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
@@ -292,6 +293,22 @@ IF(WANT_SERD)
 ELSE(WANT_SERD)
 	SET(STATUS_SERD "not built as requested")
 ENDIF(WANT_SERD)
+
+IF(WANT_SRATOM)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(SRATOM sratom-0)
+		IF(SRATOM_FOUND)
+			SET(LMMS_HAVE_SRATOM TRUE)
+			SET(STATUS_SRATOM "OK")
+		ELSE()
+			SET(STATUS_SRATOM "not found, install it or set PKG_CONFIG_PATH appropriately")
+		ENDIF()
+	ELSE()
+		SET(STATUS_SRATOM "not found, requires pkg-config")
+	ENDIF()
+ELSE(WANT_SRATOM)
+	SET(STATUS_SRATOM "not built as requested")
+ENDIF(WANT_SRATOM)
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -909,6 +926,7 @@ MESSAGE(
 "* Lv2 plugins                 : ${STATUS_LV2}\n"
 "* SUIL for plugin UIs         : ${STATUS_SUIL}\n"
 "* SERD for Lv2 debugging      : ${STATUS_SERD}\n"
+"* SRATOM for Lv2 debugging    : ${STATUS_SRATOM}\n"
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"

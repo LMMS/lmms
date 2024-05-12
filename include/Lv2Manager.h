@@ -33,8 +33,13 @@
 #include <set>
 #include <string_view>
 #include <lilv/lilv.h>
+
+#ifdef LMMS_HAVE_SERD
 #include "serd/serd.h"
+#ifdef LMMS_HAVE_SRATOM
 #include "sratom/sratom.h"
+#endif
+#endif
 
 #include "Lv2Basics.h"
 #include "Lv2UridCache.h"
@@ -142,9 +147,10 @@ public:
 		return pluginBlacklistBuffersizeLessThan32;
 	}
 
-	SerdEnv* env;
+#if defined(LMMS_HAVE_SRATOM) && defined(LMMS_HAVE_SERD)
 	Sratom* sratom; //!< Atom serialiser
 	Sratom* ui_sratom; //!< Atom serialiser for UI thread
+#endif
 
 private:
 	// general data
@@ -152,6 +158,9 @@ private:
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
 	std::set<std::string_view> m_supportedFeatureURIs;
+#ifdef LMMS_HAVE_SERD
+	SerdEnv* env;
+#endif
 
 	// feature data that are common for all Lv2Proc
 	UridMap m_uridMap;

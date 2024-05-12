@@ -145,7 +145,7 @@ void Lv2ViewProc::writeToPlugin(uint32_t port_index,
 		return;
 	}
 
-#ifdef LMMS_HAVE_SERD
+#if defined(LMMS_HAVE_SERD) && defined(LMMS_HAVE_SRATOM)
 	if (lv2Dump && protocol == m_atomEventTransfer)
 	{
 		const LV2_Atom* atom = (const LV2_Atom*)buffer;
@@ -440,7 +440,7 @@ void Lv2ViewProc::update()
 		}
 		m_pluginEventsReader->read(ev.size).copy((char*)buf, ev.size);
 
-#ifdef LMMS_HAVE_SERD
+#if defined(LMMS_HAVE_SERD) && defined(LMMS_HAVE_SRATOM)
 		if (lv2Dump && ev.protocol == m_atomEventTransfer)
 		{
 			Lv2Manager* mgr = Engine::getLv2Manager();

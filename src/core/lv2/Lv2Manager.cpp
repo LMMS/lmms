@@ -108,6 +108,7 @@ Lv2Manager::Lv2Manager() :
 	m_world = lilv_world_new();
 	lilv_world_load_all(m_world);
 
+#ifdef LMMS_HAVE_SERD
 	env = serd_env_new(nullptr);
 	serd_env_set_prefix_from_strings(
 		env, (const uint8_t*)"patch", (const uint8_t*)LV2_PATCH_PREFIX);
@@ -115,11 +116,13 @@ Lv2Manager::Lv2Manager() :
 		env, (const uint8_t*)"time", (const uint8_t*)LV2_TIME_PREFIX);
 	serd_env_set_prefix_from_strings(
 		env, (const uint8_t*)"xsd", (const uint8_t*)NS_XSD);
-
+#ifdef LMMS_HAVE_SRATOM
 	sratom    = sratom_new(uridMap().mapFeature());
 	ui_sratom = sratom_new(uridMap().mapFeature());
 	sratom_set_env(sratom, env);
 	sratom_set_env(ui_sratom, env);
+#endif
+#endif
 
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
