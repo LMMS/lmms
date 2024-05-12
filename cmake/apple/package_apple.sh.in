@@ -32,7 +32,7 @@ mkdir -p "$APP/Contents/Frameworks"
 mkdir -p "$APP/Contents/Resources"
 cd "$1"
 for file in *; do
-    if [ $(basename $file) != "@PROJECT_NAME_UCASE@.app" ]; then
+    if [ "$(basename $file)" != "@PROJECT_NAME_UCASE@.app" ]; then
     	mv "$file" "$APP/Contents/"
     fi
 done
@@ -47,6 +47,7 @@ find . -type f -print0 | xargs -0 chmod u+w
 
 # Move lmms binary
 mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/MacOS/@CMAKE_PROJECT_NAME@"
+# shellcheck disable=SC2115
 rm -rf "$APP/bin"
 
 # Fix zyn linking
