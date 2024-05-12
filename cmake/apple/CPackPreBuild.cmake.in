@@ -6,6 +6,9 @@ file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/Info.plist" DESTINATION "${CPACK_TEMPOR
 file(INSTALL "@CMAKE_CURRENT_SOURCE_DIR@/icon.icns" DESTINATION "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/Resources")
 file(INSTALL "@CMAKE_CURRENT_SOURCE_DIR@/project.icns" DESTINATION "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/Resources")
 
+# tiff file is multi-resource (1x & 2x) created programatically using convert
+execute_process(COMMAND convert "@CMAKE_CURRENT_SOURCE_DIR@/*.png" "@CMAKE_CURRENT_BINARY_DIR@/background.tiff")
+
 # Updates appdmg.json with CPACK_TEMPORARY_INSTALL_DIRECTORY
 # - .DS_Store can be recreated using appdmg appdmg.json lmms.dmg
 # - Find new .DS_Store from the root of the DMG file

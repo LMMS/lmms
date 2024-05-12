@@ -20,7 +20,7 @@ configure_file("package_apple.sh.in"    "package_apple.sh" @ONLY)
 configure_file("appdmg.json.in"         "_appdmg.json.in" @ONLY)
 
 # CPack settings/scripts
-configure_file("CPackOptions.cmake.in"  "CPackOptions.cmake")
+configure_file("CPackOptions.cmake.in"  "CPackOptions.cmake" @ONLY)
 configure_file("CPackPreBuild.cmake.in" "CPackPreBuild.cmake" @ONLY)
 
 set(CPACK_GENERATOR "DragNDrop" PARENT_SCOPE)
