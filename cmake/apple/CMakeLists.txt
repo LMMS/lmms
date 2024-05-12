@@ -26,6 +26,7 @@ set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION}" PARENT_SCOPE)
 set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackApple.cmake" PARENT_SCOPE)
 set(CPACK_DMG_VOLUME_NAME "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg" PARENT_SCOPE)
 # tiff file is multi-resource (1x & 2x) created programatically using convert
+execute_process(COMMAND convert "${CMAKE_SOURCE_DIR}/cmake/apple/*.png" "${CMAKE_BINARY_DIR}/dmg_branding.tiff")
 set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_BINARY_DIR}/dmg_branding.tiff" PARENT_SCOPE)
 # DS_Store contains the Finder layout
 # - .DS_Store can be recreated using appdmg appdmg.json lmms.dmg
@@ -35,6 +36,5 @@ set(CPACK_DMG_DS_STORE "${CMAKE_SOURCE_DIR}/cmake/apple/DS_Store" PARENT_SCOPE)
 unset(CPACK_RESOURCE_FILE_LICENSE PARENT_SCOPE)
 
 # Additional vars otherwise unexposed to CPack
-set(CPACK_DMG_BACKGROUND_PNGS "${CMAKE_SOURCE_DIR}/cmake/apple/*.png" PARENT_SCOPE)
 set(CPACK_BINARY_DIR "${CMAKE_BINARY_DIR}" PARENT_SCOPE)
 set(CPACK_DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg" PARENT_SCOPE)

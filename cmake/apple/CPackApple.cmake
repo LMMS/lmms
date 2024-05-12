@@ -5,6 +5,3 @@ execute_process(COMMAND ${CPACK_BINARY_DIR}/install_apple.sh ${CPACK_TEMPORARY_I
 if(NOT EXIT_CODE EQUAL 0)
 	message(FATAL_ERROR "Execution of package_apple.sh failed")
 endif()
-
-# Create tiff from two pngs
-execute_process(COMMAND convert "${CPACK_DMG_BACKGROUND_PNGS}" "${CPACK_DMG_BACKGROUND_IMAGE}")
