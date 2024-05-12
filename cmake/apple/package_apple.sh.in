@@ -32,7 +32,7 @@ mkdir -p "$APP/Contents/Frameworks"
 mkdir -p "$APP/Contents/Resources"
 cd "$1"
 for file in *; do
-    if [ "$(basename $file)" != "@PROJECT_NAME_UCASE@.app" ]; then
+    if [ "$(basename "$file")" != "@PROJECT_NAME_UCASE@.app" ]; then
     	mv "$file" "$APP/Contents/"
     fi
 done
