@@ -21,12 +21,14 @@ CONFIGURE_FILE("package_apple.json.in"  "${CMAKE_BINARY_DIR}/package_apple.json"
 # Generators "Bundle" and "DragNDrop" don't support macdeployqt, use "External" instead
 
 # CPack vars
+set(CPACK_GENERATOR "External" PARENT_SCOPE)
+# Strip causes missing symbols on macOS
 set(CPACK_STRIP_FILES false PARENT_SCOPE)
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION}" PARENT_SCOPE)
-set(CPACK_GENERATOR "External" PARENT_SCOPE)
+# Creates a staging directory to create our bundle from
 set(CPACK_EXTERNAL_ENABLE_STAGING true PARENT_SCOPE)
 set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackApple.cmake" PARENT_SCOPE)
 
-# Additional vars that aren't exposed to CPack
+# Additional vars otherwise unexposed to CPack
 set(CPACK_BINARY_DIR "${CMAKE_BINARY_DIR}" PARENT_SCOPE)
 set(CPACK_DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg" PARENT_SCOPE)
