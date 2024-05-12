@@ -445,29 +445,38 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				else
 				{
 					// firstly decide the order of the base notes
-					unsigned int sortedLocation = 0;
+					unsigned int sortedAddLocation = i;
+					// loop through every base note before this
 					for (unsigned int j = 0; j < i; j++)
 					{
-						// if [j] base note is bigger than the current one
+						// if [j] base note is bigger than the one that will be added
 						if (m_sortedChords[j * cur_chord_size] > cnphv[i]->key())
 						{
-							sortedLocation = j;
+							sortedAddLocation = j;
 							break;
 						}
 					}
-					// offset everything left (after sortedLocation)
-					for (unsigned int j = i; j > sortedLocation; j--)
+					// offset everything left to make place
+					// for the new note at [sortAddLocation]
+					for (unsigned int j = i; j > sortedAddLocation; j--)
 					{
 						m_sortedChords[j * cur_chord_size] = m_sortedChords[(j - 1) * cur_chord_size];
 					}
-					// lastly set the location of the current base note
-					m_sortedChords[sortedLocation * cur_chord_size] = cnphv[i]->key();
+					// lastly set the location of the new base note
+					m_sortedChords[sortedAddLocation * cur_chord_size] = cnphv[i]->key();
 				}
 
 				if (cnphv[i]->index() < minIndex)
 				{
 					minIndex = cnphv[i]->index();
 				}
+			}
+
+			// avoid playing same key for all
+			// currently playing notes
+			if (minIndex != _n->index())
+			{
+				break;
 			}
 
 			// making the final keys
@@ -480,13 +489,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 					// then add the chord values
 					m_sortedChords[i * cur_chord_size + j] = m_sortedChords[i * cur_chord_size] + chord_table.chords()[selected_arp][j];
 				}
-			}
-
-			// avoid playing same key for all
-			// currently playing notes
-			if (minIndex != _n->index())
-			{
-				break;
 			}
 
 			// we need to account for a bigger arp
