@@ -11,25 +11,22 @@ SET(MACOSX_BUNDLE_MIMETYPE_ID           "io.lmms")
 SET(MACOSX_BUNDLE_PROJECT_URL           "${PROJECT_URL}")
 SET(MACOSX_BUNDLE_DMG_TITLE             "${MACOSX_BUNDLE_BUNDLE_NAME} ${MACOSX_BUNDLE_LONG_VERSION_STRING}")
 
-# FIXME: appdmg won't allow volume names > 27 char
-# See also https://github.com/LinusU/node-appdmg/issues/48
+# appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
 STRING(SUBSTRING "${MACOSX_BUNDLE_DMG_TITLE}" 0 27 MACOSX_BUNDLE_DMG_TITLE)
 
 CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_BINARY_DIR}/Info.plist")
 CONFIGURE_FILE("install_apple.sh.in"    "${CMAKE_BINARY_DIR}/install_apple.sh" @ONLY)
 CONFIGURE_FILE("package_apple.json.in"  "${CMAKE_BINARY_DIR}/package_apple.json" @ONLY)
 
-# DMG creation target
-SET(DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg")
-FILE(REMOVE "${DMG_FILE}")
-ADD_CUSTOM_TARGET(removedmg
-	COMMAND touch "\"${DMG_FILE}\"" && rm "\"${DMG_FILE}\""
-	COMMENT "Removing old DMG")
-ADD_CUSTOM_TARGET(dmg 
-	COMMAND appdmg "\"${CMAKE_BINARY_DIR}/package_apple.json\"" "\"${DMG_FILE}\""
-	DEPENDS "${CMAKE_BINARY_DIR}/package_apple.json"
-	COMMENT "Generating DMG")
-ADD_DEPENDENCIES(dmg removedmg)
+# Generators "Bundle" and "DragNDrop" don't support macdeployqt, use "External" instead
 
-# see also ../postinstall/CMakeLists.txt
+# CPack vars
+set(CPACK_STRIP_FILES false PARENT_SCOPE)
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION}" PARENT_SCOPE)
+set(CPACK_GENERATOR "External" PARENT_SCOPE)
+set(CPACK_EXTERNAL_ENABLE_STAGING true PARENT_SCOPE)
+set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackApple.cmake" PARENT_SCOPE)
 
+# Additional vars that aren't exposed to CPack
+set(CPACK_BINARY_DIR "${CMAKE_BINARY_DIR}" PARENT_SCOPE)
+set(CPACK_DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg" PARENT_SCOPE)
