@@ -6,11 +6,9 @@
 
 set -e
 
-# Place to create ".app" bundle
-APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
-
 MSG_COLOR='\x1B[1;36m'
 COLOR_RESET='\x1B[0m'
+APP="$1/@PROJECT_NAME_UCASE@.app"
 echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 
 qtpath="$(dirname "@QT_QMAKE_EXECUTABLE@")"
@@ -28,30 +26,31 @@ else
 	echo "Provided directory '$1' does not exist"
 fi
 
-# Remove any old .app bundles
-rm -Rf "$APP"
-
 # Create .app bundle containing contents from CPack's "External" install directory
 mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Frameworks"
 mkdir -p "$APP/Contents/Resources"
 cd "$1"
-cp -R ./* "$APP/Contents"
-cp "@CMAKE_BINARY_DIR@/Info.plist" "$APP/Contents/"
-cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
+for file in *; do
+    if [ $(basename $file) != "@PROJECT_NAME_UCASE@.app" ]; then
+    	mv "$file" "$APP/Contents/"
+    fi
+done
+
+
+cp "@CMAKE_BINARY_DIR@/Info.plist" "$APP/Contents/" # TODO: MOVE TO INSTALL
+cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/" # TODO: MOVE TO INSTALL
 
 # Make all libraries writable for macdeployqt
 cd "$APP"
 find . -type f -print0 | xargs -0 chmod u+w
 
-lmmsbin="MacOS/@CMAKE_PROJECT_NAME@"
-zynbin="MacOS/RemoteZynAddSubFx"
-
 # Move lmms binary
-mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/$lmmsbin"
+mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/MacOS/@CMAKE_PROJECT_NAME@"
+rm -rf "$APP/bin"
 
 # Fix zyn linking
-mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" "$APP/Contents/$zynbin"
+mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" "$APP/Contents/MacOS/RemoteZynAddSubFx"
   
 # Replace @rpath with @loader_path for Carla
 # See also plugins/CarlaBase/CMakeLists.txt
@@ -65,7 +64,7 @@ install_name_tool -change @rpath/libcarlabase.dylib \
   "$APP/Contents/lib/lmms/libcarlarack.so"
 
 # Link lmms binary
-_executables="${_executables} -executable=$APP/Contents/$zynbin"
+_executables="${_executables} -executable=$APP/Contents/MacOS/RemoteZynAddSubFx"
 
 # Build a list of shared objects in target/lib/lmms
 for file in "$APP/Contents/lib/lmms/"*.so; do
@@ -104,9 +103,6 @@ for file in "$APP/Contents/lib/lmms/"libcarla*; do
      rm -f "$APP/Contents/Frameworks/lib${lib}.dylib"
    done
 done
-
-# Cleanup
-rm -rf "$APP/Contents/bin"
 
 # Codesign
 codesign --force --deep --sign - "$APP"
