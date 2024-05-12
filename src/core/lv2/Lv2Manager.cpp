@@ -122,7 +122,7 @@ Lv2Manager::Lv2Manager() :
 	sratom_set_env(sratom, env);
 	sratom_set_env(ui_sratom, env);
 #endif
-#endif
+#endif // LMMS_HAVE_SERD
 
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);

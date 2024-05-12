@@ -38,8 +38,8 @@
 #include "serd/serd.h"
 #ifdef LMMS_HAVE_SRATOM
 #include "sratom/sratom.h"
-#endif
-#endif
+#endif // LMMS_HAVE_SRATOM
+#endif // LMMS_HAVE_SERD
 
 #include "Lv2Basics.h"
 #include "Lv2UridCache.h"
