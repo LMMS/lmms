@@ -42,6 +42,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	constexpr float maxFramesPerPixel = 512.0f;
 	const float resolution = std::max(1.0f, framesPerPixel / maxFramesPerPixel);
+	const int resolutionInt = static_cast<int>(resolution);
 	const float framesPerResolution = framesPerPixel / resolution;
 
 	const size_t numPixels = std::min<size_t>(parameters.size, width);
@@ -53,7 +54,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	int pixelIndex = 0;
 
-	for (int i = 0; i < maxFrames; i += resolution)
+	for (int i = 0; i < maxFrames; i += resolutionInt)
 	{
 		pixelIndex = i / framesPerPixel;
 		const int frameIndex = !parameters.reversed ? i : maxFrames - i;
