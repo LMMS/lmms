@@ -114,7 +114,7 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 {
 	if(eventType == "windows_generic_MSG")
 	{
-		return winEventFilter(static_cast<MSG*>(message), static_cast<long*>(result));
+		return winEventFilter(static_cast<MSG*>(message), reinterpret_cast<long*>(result));
 	}
 	return false;
 }
