@@ -20,7 +20,8 @@ set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}" PARENT_SCOPE)
 set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackPreBuild.cmake" PARENT_SCOPE)
 set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackPostBuild.cmake" PARENT_SCOPE)
-set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME_UCASE} ${VERSION}" PARENT_SCOPE)
+set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME_UCASE} ${VERSION}")
+set(CPACK_DMG_VOLUME_NAME "${CPACK_DMG_VOLUME_NAME}" PARENT_SCOPE)
 set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_BINARY_DIR}/${SUBDIR}/background.tiff" PARENT_SCOPE)
 set(CPACK_DMG_DS_STORE "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}/DS_Store" PARENT_SCOPE)
 
@@ -34,15 +35,18 @@ set(CPACK_QMAKE_EXECUTABLE "${QT_QMAKE_EXECUTABLE}" PARENT_SCOPE)
 set(CPACK_CARLA_LIBRARIES "${CARLA_LIBRARIES}" PARENT_SCOPE)
 set(CPACK_PROJECT_NAME_UCASE "${PROJECT_NAME_UCASE}" PARENT_SCOPE)
 
-# appdmg is no longer required, but needed for creating a new .DS_Store file
-# make package appdmg
+# appdmg is no longer required unless a new .DS_Store file is needed
+# Usage:
+#    make package
+#    make appdmg
+#    ... manually copy .DS_Store file
 # appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
 string(SUBSTRING "${CPACK_DMG_VOLUME_NAME}" 0 27 "${PROJECT_NAME_UCASE} ${VERSION}")
 configure_file("appdmg.json.in" "_appdmg.json.in" @ONLY)
 add_custom_target(appdmg
-	COMMAND touch "${CPACK_PACKAGE_FILE_NAME}.dmg" &&
-		rm "${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	COMMAND appdmg appdmg.json "${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	COMMAND touch "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg"
+	COMMAND rm "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg"
+	COMMAND appdmg appdmg.json "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg"
 	DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/appdmg.json"
 	COMMENT "Generating DMG")
 

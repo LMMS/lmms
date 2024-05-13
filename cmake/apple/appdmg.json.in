@@ -1,5 +1,5 @@
 {
- "title": "@APPDMG_VOLUME_NAME@",
+ "title": "@CPACK_DMG_VOLUME_NAME@",
  "background": "@CMAKE_SOURCE_DIR@/cmake/apple/background.png",
  "icon-size": 128,
  "contents": [
