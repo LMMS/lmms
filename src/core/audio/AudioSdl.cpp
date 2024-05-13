@@ -191,37 +191,6 @@ void AudioSdl::stopProcessing()
 	}
 }
 
-
-
-
-void AudioSdl::applyQualitySettings()
-{
-	// Better than if (0)
-#if 0
-	if( 0 )//hqAudio() )
-	{
-		SDL_CloseAudio();
-
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		m_audioHandle.freq = sampleRate();
-
-		SDL_AudioSpec actual; 
-
-		// open the audio device, forcing the desired format
-		if( SDL_OpenAudio( &m_audioHandle, &actual ) < 0 )
-		{
-			qCritical( "Couldn't open SDL-audio: %s\n", SDL_GetError() );
-		}
-	}
-#endif
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 {
 	auto _this = static_cast<AudioSdl*>(_udata);

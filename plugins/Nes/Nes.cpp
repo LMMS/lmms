@@ -552,7 +552,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	
 	if (!n->m_pluginData)
 	{
-		auto nes = new NesObject(this, Engine::audioEngine()->processingSampleRate(), n);
+		auto nes = new NesObject(this, Engine::audioEngine()->outputSampleRate(), n);
 		n->m_pluginData = nes;
 	}
 

@@ -73,7 +73,13 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 
 Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 	Descriptor::SubPluginFeatures::Key *key) :
-	Instrument(instrumentTrackArg, &lv2instrument_plugin_descriptor, key),
+	Instrument(instrumentTrackArg, &lv2instrument_plugin_descriptor, key,
+#ifdef LV2_INSTRUMENT_USE_MIDI
+		Flag::IsSingleStreamed | Flag::IsMidiBased
+#else
+		Flag::IsSingleStreamed
+#endif
+	),
 	Lv2ControlBase(this, key->attributes["uri"])
 {
 	clearRunningNotes();

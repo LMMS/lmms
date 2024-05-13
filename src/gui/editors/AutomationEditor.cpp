@@ -1040,8 +1040,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	// set font-size to 8
-	p.setFont(pointSize(p.font(), 8));
+	p.setFont(adjustedToPixelSize(p.font(), 10));
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 
@@ -1383,9 +1382,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 	else
 	{
-		QFont f = p.font();
+		QFont f = font();
 		f.setBold( true );
-		p.setFont(pointSize(f, 14));
+		p.setFont(f);
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,

@@ -30,7 +30,6 @@
 #include "ComboBox.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "gui_templates.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 
@@ -1327,12 +1326,11 @@ QString MonstroInstrument::nodeName() const
 	return monstro_plugin_descriptor.name;
 }
 
-
-f_cnt_t MonstroInstrument::desiredReleaseFrames() const
+float MonstroInstrument::desiredReleaseTimeMs() const
 {
-	return qMax( 64, qMax( m_env1_relF, m_env2_relF ) );
+	const auto maxEnvelope = std::max(m_env1_rel, m_env2_rel);
+	return std::max(1.5f, maxEnvelope);
 }
-
 
 gui::PluginView* MonstroInstrument::instantiateView( QWidget * _parent )
 {
@@ -1449,7 +1447,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::audioEngine()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->outputSampleRate();
 
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
@@ -1694,7 +1692,6 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc2WaveBox = new ComboBox( view );
 	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc2WaveBox->setFont(pointSize(m_osc2WaveBox->font(), 8));
 
 	maketinyled( m_osc2SyncHButton, 212, O2ROW - 3, tr( "Hard sync oscillator 2" ) )
 	maketinyled( m_osc2SyncRButton, 191, O2ROW - 3, tr( "Reverse sync oscillator 2" ) )
@@ -1709,18 +1706,15 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc3Wave1Box->setFont(pointSize(m_osc3Wave1Box->font(), 8));
 
 	m_osc3Wave2Box = new ComboBox( view );
 	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc3Wave2Box->setFont(pointSize(m_osc3Wave2Box->font(), 8));
 
 	maketinyled( m_osc3SyncHButton, 212, O3ROW - 3, tr( "Hard sync oscillator 3" ) )
 	maketinyled( m_osc3SyncRButton, 191, O3ROW - 3, tr( "Reverse sync oscillator 3" ) )
 
 	m_lfo1WaveBox = new ComboBox( view );
 	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_lfo1WaveBox->setFont(pointSize(m_lfo1WaveBox->font(), 8));
 
 	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
 	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, tr( "Rate" ), " ms", "lfoKnob" )
@@ -1728,7 +1722,6 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_lfo2WaveBox = new ComboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_lfo2WaveBox->setFont(pointSize(m_lfo2WaveBox->font(), 8));
 
 	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
 	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")

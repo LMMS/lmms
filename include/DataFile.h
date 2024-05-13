@@ -129,6 +129,7 @@ private:
 	void upgrade_midiCCIndexing();
 	void upgrade_loopsRename();
 	void upgrade_noteTypes();
+	void upgrade_fixCMTDelays();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;

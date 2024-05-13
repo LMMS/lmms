@@ -388,12 +388,15 @@ void FloatModelEditorBase::enterValue()
 	if (isVolumeKnob() &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
+		auto const initalValue = model()->getRoundedValue() / 100.0;
+		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
 		new_val = QInputDialog::getDouble(
 			this, tr("Set value"),
 			tr("Please enter a new value between "
 					"-96.0 dBFS and 6.0 dBFS:"),
-				ampToDbfs(model()->getRoundedValue() / 100.0),
-							-96.0, 6.0, model()->getDigitCount(), &ok);
+				initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
+
 		if (new_val <= -96.0)
 		{
 			new_val = 0.0f;
@@ -439,9 +442,12 @@ QString FloatModelEditorBase::displayValue() const
 	if (isVolumeKnob() &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
-		return m_description.trimmed() + QString(" %1 dBFS").
-				arg(ampToDbfs(model()->getRoundedValue() / volumeRatio()),
-								3, 'f', 2);
+		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
+		return m_description.trimmed() + (
+			valueToVolumeRatio == 0.
+			? QString(" -∞ dBFS")
+			: QString(" %1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
+		);
 	}
 
 	return m_description.trimmed() + QString(" %1").
