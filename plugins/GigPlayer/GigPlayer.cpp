@@ -81,7 +81,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
+	Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
 	m_instance( nullptr ),
 	m_instrument( nullptr ),
 	m_filename( "" ),

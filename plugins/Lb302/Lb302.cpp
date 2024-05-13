@@ -269,7 +269,7 @@ float Lb302Filter3Pole::process(const float& samp)
 //
 
 Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &lb302_plugin_descriptor ),
+	Instrument(_instrumentTrack, &lb302_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
 	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
 	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),

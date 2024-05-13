@@ -56,9 +56,9 @@ public:
 
 	auto beatLen(NotePlayHandle* note) const -> int override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return 128;
+		return 3.f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

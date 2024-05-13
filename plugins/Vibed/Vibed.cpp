@@ -97,7 +97,7 @@ private:
 };
 
 Vibed::Vibed(InstrumentTrack* instrumentTrack) :
-	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor)
+	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor, nullptr, Flag::IsNotBendable)
 {
 	for (int harm = 0; harm < s_stringCount; ++harm)
 	{

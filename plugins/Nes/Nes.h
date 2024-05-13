@@ -222,9 +222,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 8 );
+		return 0.2f;
 	}
 	
 	gui::PluginView* instantiateView( QWidget * parent ) override;

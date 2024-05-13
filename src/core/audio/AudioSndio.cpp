@@ -139,20 +139,6 @@ void AudioSndio::stopProcessing()
 	stopProcessingThread( this );
 }
 
-
-void AudioSndio::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		/* change sample rate to sampleRate() */
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
 void AudioSndio::run()
 {
 	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
