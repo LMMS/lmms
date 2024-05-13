@@ -163,16 +163,6 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed;
-	}
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0; //4048;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 private:
@@ -230,7 +220,6 @@ private:
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
 
 	float vca_attack,       // Amp attack
-	      vca_decay,        // Amp decay
 	      vca_a0,           // Initial amplifier coefficient
 	      vca_a;            // Amplifier coefficient.
 

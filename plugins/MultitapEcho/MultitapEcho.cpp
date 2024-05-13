@@ -55,7 +55,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
 	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];

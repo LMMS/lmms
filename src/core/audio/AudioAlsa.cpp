@@ -240,48 +240,6 @@ void AudioAlsa::stopProcessing()
 	stopProcessingThread( this );
 }
 
-
-
-
-void AudioAlsa::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		if( m_handle != nullptr )
-		{
-			snd_pcm_close( m_handle );
-		}
-
-		if (int err = snd_pcm_open(&m_handle, probeDevice().toLatin1().constData(), SND_PCM_STREAM_PLAYBACK, 0);
-			err < 0)
-		{
-			printf( "Playback open error: %s\n",
-							snd_strerror( err ) );
-			return;
-		}
-
-		if (int err = setHWParams(channels(), SND_PCM_ACCESS_RW_INTERLEAVED); err < 0)
-		{
-			printf( "Setting of hwparams failed: %s\n",
-							snd_strerror( err ) );
-			return;
-		}
-		if (int err = setSWParams(); err < 0)
-		{
-			printf( "Setting of swparams failed: %s\n",
-							snd_strerror( err ) );
-			return;
-		}
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioAlsa::run()
 {
 	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];

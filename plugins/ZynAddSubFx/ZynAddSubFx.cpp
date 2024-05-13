@@ -40,7 +40,6 @@
 #include "DataFile.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "gui_templates.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
@@ -104,7 +103,7 @@ bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
 
 ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
+	Instrument(_instrumentTrack, &zynaddsubfx_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_hasGUI( false ),
 	m_plugin( nullptr ),
 	m_remotePlugin( nullptr ),
@@ -452,7 +451,7 @@ void ZynAddSubFxInstrument::initPlugin()
 						QDir( ConfigManager::inst()->factoryPresetsDir() +
 								"/ZynAddSubFX" ).absolutePath() ) ) );
 
-		m_remotePlugin->updateSampleRate( Engine::audioEngine()->processingSampleRate() );
+		m_remotePlugin->updateSampleRate( Engine::audioEngine()->outputSampleRate() );
 
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
@@ -464,7 +463,7 @@ void ZynAddSubFxInstrument::initPlugin()
 	else
 	{
 		m_plugin = new LocalZynAddSubFx;
-		m_plugin->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+		m_plugin->setSampleRate( Engine::audioEngine()->outputSampleRate() );
 		m_plugin->setBufferSize( Engine::audioEngine()->framesPerPeriod() );
 	}
 
@@ -541,7 +540,10 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleUIButton->setFont(pointSize(m_toggleUIButton->font(), 8));
+	QFont f = m_toggleUIButton->font();
+	f.setPointSizeF(12);
+	m_toggleUIButton->setFont(f);
+
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
 

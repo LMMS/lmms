@@ -79,7 +79,6 @@ class setupWidget : public gui::AudioDeviceSetupWidget
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 	void run() override;
 
 	int m_audioFD;

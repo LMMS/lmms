@@ -143,13 +143,13 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	sampleFrame * o_buf = nullptr;
 	QVarLengthArray<sample_t> sBuf(_frames * DEFAULT_CHANNELS);
 
-	if( m_maxSampleRate < Engine::audioEngine()->processingSampleRate() )
+	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
 		o_buf = _buf;
 		_buf = reinterpret_cast<sampleFrame*>(sBuf.data());
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
@@ -587,7 +587,7 @@ sample_rate_t LadspaEffect::maxSamplerate( const QString & _name )
 	{
 		return( __buggy_plugins[_name] );
 	}
-	return( Engine::audioEngine()->processingSampleRate() );
+	return( Engine::audioEngine()->outputSampleRate() );
 }
 
 
