@@ -1,27 +1,48 @@
-# TODO: Re-evaluate these
-set(MACOSX_BUNDLE_ICON_FILE             "icon.icns")
-set(MACOSX_BUNDLE_GUI_IDENTIFIER        "${PROJECT_NAME_UCASE}")
-set(MACOSX_BUNDLE_LONG_VERSION_STRING   "${VERSION}")
-set(MACOSX_BUNDLE_BUNDLE_NAME           "${PROJECT_NAME_UCASE}")
-set(MACOSX_BUNDLE_SHORT_VERSION_STRING  "${VERSION}")
-set(MACOSX_BUNDLE_BUNDLE_VERSION        "${VERSION}")
-set(MACOSX_BUNDLE_COPYRIGHT             "${PROJECT_COPYRIGHT}")
-set(MACOSX_BUNDLE_MIMETYPE              "application/x-lmms-project")
-set(MACOSX_BUNDLE_MIMETYPE_ICON         "project.icns")
-set(MACOSX_BUNDLE_MIMETYPE_ID           "io.lmms")
-set(MACOSX_BUNDLE_PROJECT_URL           "${PROJECT_URL}")
-set(MACOSX_BUNDLE_DMG_TITLE             "${MACOSX_BUNDLE_BUNDLE_NAME} ${MACOSX_BUNDLE_LONG_VERSION_STRING}")
+# Info.plist
+set(MACOS_ICON "${PROJECT_NAME_UCASE}.icns")
+set(MACOS_MIMETYPE "application/x-lmms-project")
+set(MACOS_MIMETYPE_ICON "project.icns")
+set(MACOS_MIMETYPE_ID "io.lmms")
+configure_file("lmms.plist.in" "Info.plist" @ONLY)
+
+# "Bundle"-specific CPack options
+set(CPACK_GENERATOR "Bundle" PARENT_SCOPE)
+set(CPACK_BUNDLE_NAME "${PROJECT_NAME_UCASE}" PARENT_SCOPE)
+set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" PARENT_SCOPE)
+set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns" PARENT_SCOPE)
+
+# Standard CPack options
+# supress license popup
+unset(CPACK_RESOURCE_FILE_LICENSE PARENT_SCOPE)
+# strip causes missing symbols on macOS
+set(CPACK_STRIP_FILES false PARENT_SCOPE)
+set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}" PARENT_SCOPE)
+set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackPreBuild.cmake" PARENT_SCOPE)
+set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackPostBuild.cmake" PARENT_SCOPE)
+set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME_UCASE} ${VERSION}" PARENT_SCOPE)
+set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_BINARY_DIR}/${SUBDIR}/background.tiff" PARENT_SCOPE)
+set(CPACK_DMG_DS_STORE "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}/DS_Store" PARENT_SCOPE)
+
+# Custom vars to expose to Cpack
+# must be prefixed with "CPACK_" per https://stackoverflow.com/a/46526757/3196753)
+set(CPACK_CURRENT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" PARENT_SCOPE)
+set(CPACK_CURRENT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" PARENT_SCOPE)
+set(CPACK_BINARY_DIR "${CMAKE_BINARY_DIR}" PARENT_SCOPE)
+set(CPACK_SOURCE_DIR "${CMAKE_SOURCE_DIR}" PARENT_SCOPE)
+set(CPACK_QMAKE_EXECUTABLE "${QT_QMAKE_EXECUTABLE}" PARENT_SCOPE)
+set(CPACK_CARLA_LIBRARIES "${CARLA_LIBRARIES}" PARENT_SCOPE)
+set(CPACK_PROJECT_NAME_UCASE "${PROJECT_NAME_UCASE}" PARENT_SCOPE)
+
+# appdmg is no longer required, but needed for creating a new .DS_Store file
+# make package appdmg
 # appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
-string(SUBSTRING "${MACOSX_BUNDLE_DMG_TITLE}" 0 27 MACOSX_BUNDLE_DMG_TITLE)
+string(SUBSTRING "${CPACK_DMG_VOLUME_NAME}" 0 27 "${PROJECT_NAME_UCASE} ${VERSION}")
+configure_file("appdmg.json.in" "_appdmg.json.in" @ONLY)
+add_custom_target(appdmg
+	COMMAND touch "${CPACK_PACKAGE_FILE_NAME}.dmg" &&
+		rm "${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	COMMAND appdmg appdmg.json "${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/appdmg.json"
+	COMMENT "Generating DMG")
 
-# Resource files
-configure_file("lmms.plist.in"          "Info.plist")
-configure_file("package_apple.sh.in"    "package_apple.sh" @ONLY)
-configure_file("appdmg.json.in"         "_appdmg.json.in" @ONLY)
-
-# CPack settings/scripts
-configure_file("CPackOptions.cmake.in"  "CPackOptions.cmake" @ONLY)
-configure_file("CPackPreBuild.cmake.in" "CPackPreBuild.cmake" @ONLY)
-
-set(CPACK_GENERATOR "DragNDrop" PARENT_SCOPE)
-set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/CPackOptions.cmake" PARENT_SCOPE)
