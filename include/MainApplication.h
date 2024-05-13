@@ -50,8 +50,12 @@ public:
 	bool event(QEvent* event) override;
 #ifdef LMMS_BUILD_WIN32
 	bool winEventFilter(MSG* msg, long* result);
-	bool nativeEventFilter(const QByteArray& eventType, void* message,
-				long* result);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+	using EventFilter = long;
+#else
+	using EventFilter = qintptr;
+#endif
+	bool nativeEventFilter(const QByteArray& eventType, void* message, EventFilter* result);
 #endif
 	inline QString& queuedFile()
 	{
