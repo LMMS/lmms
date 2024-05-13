@@ -44,71 +44,68 @@ namespace lmms::PathUtil
 	//! or not.
 	QString LMMS_EXPORT baseLocation(const Base base, bool* error = nullptr);
 
-	//! Return the directory associated with a given base as a std::string.
+	//! Return the directory associated with a given base as a UTF-8 encoded std::string.
 	//! Will return std::nullopt if the prefix could not be resolved.
 	std::optional<std::string> LMMS_EXPORT getBaseLocation(Base base);
 
 	//! Return the directory associated with a given base as a QDir.
 	//! Optional pointer to boolean to indicate if the prefix could
 	//! be resolved properly.
-	QDir LMMS_EXPORT baseQDir (const Base base, bool* error = nullptr);
+	QDir LMMS_EXPORT baseQDir(const Base base, bool* error = nullptr);
 
-	//! Return the prefix used to denote this base in path strings
-	QString LMMS_EXPORT basePrefixQString(const Base base);
-
-	//! Return the prefix used to denote this base in path strings
+	//! Return the UTF-8 encoded prefix used to denote this base in path strings
 	std::string_view LMMS_EXPORT basePrefix(const Base base);
 
 	//! Return whether the path uses the `base` prefix
 	bool LMMS_EXPORT hasBase(const QString& path, Base base);
 
-	//! Return whether the path uses the `base` prefix
+	//! Return whether the UTF-8 encoded `path` uses the `base` prefix
 	bool LMMS_EXPORT hasBase(std::string_view path, Base base);
 
-	//! Check the prefix of a path and return the base it corresponds to
+	//! Check the prefix of a path and return the base it corresponds to.
 	//! Defaults to Base::Absolute
-	Base LMMS_EXPORT baseLookup(const QString & path);
+	Base LMMS_EXPORT baseLookup(const QString& path);
 
-	//! Check the prefix of a path and return the base it corresponds to
+	//! Check the prefix of a UTF-8 encoded path and return the base it corresponds to.
 	//! Defaults to Base::Absolute
 	Base LMMS_EXPORT baseLookup(std::string_view path);
 
 	//! Remove the prefix from a path, iff there is one
-	QString LMMS_EXPORT stripPrefix(const QString & path);
+	QString LMMS_EXPORT stripPrefix(const QString& path);
 
-	//! Remove the prefix from a path, iff there is one
+	//! Remove the prefix from a UTF-8 encoded path, iff there is one
 	std::string_view LMMS_EXPORT stripPrefix(std::string_view path);
 
-	//! Return the results of baseLookup() and stripPrefix()
+	//! Return the results of baseLookup() and stripPrefix(). All strings are UTF-8 encoded.
 	std::pair<Base, std::string_view> LMMS_EXPORT parsePath(std::string_view path);
 
 	//! Get the filename for a path, handling prefixed paths correctly
-	QString LMMS_EXPORT cleanName(const QString & path);
+	QString LMMS_EXPORT cleanName(const QString& path);
 
-	//! Get the filename for a path, handling prefixed paths correctly
+	//! Get the filename for a UTF-8 encoded path, handling prefixed paths correctly
 	std::string LMMS_EXPORT cleanName(std::string_view path);
 
 	//! Upgrade prefix-less relative paths to the new format
-	QString LMMS_EXPORT oldRelativeUpgrade(const QString & input);
+	QString LMMS_EXPORT oldRelativeUpgrade(const QString& input);
 
 	//! Make this path absolute. If a pointer to boolean is given
 	//! it will indicate whether the path was converted successfully
-	QString LMMS_EXPORT toAbsolute(const QString & input, bool* error = nullptr);
+	QString LMMS_EXPORT toAbsolute(const QString& input, bool* error = nullptr);
 
-	//! Make this path absolute. Returns std::nullopt upon failure.
+	//! Make this path absolute. Returns std::nullopt upon failure. All strings are UTF-8 encoded.
 	std::optional<std::string> LMMS_EXPORT toAbsolute(std::string_view input);
 
 	//! Make this path relative to a given base, return an absolute path if that fails
-	QString LMMS_EXPORT relativeOrAbsolute(const QString & input, const Base base);
+	QString LMMS_EXPORT relativeOrAbsolute(const QString& input, const Base base);
 
 	//! Make this path relative to any base, choosing the shortest if there are
 	//! multiple options. allowLocal defines whether local paths should be considered.
 	//! Defaults to an absolute path if all bases fail.
-	QString LMMS_EXPORT toShortestRelative(const QString & input, bool allowLocal = false);
+	QString LMMS_EXPORT toShortestRelative(const QString& input, bool allowLocal = false);
 
 	//! Make this path relative to any base, choosing the shortest if there are
 	//! multiple options. allowLocal defines whether local paths should be considered.
-	//! Defaults to an absolute path if all bases fail.
+	//! Defaults to an absolute path if all bases fail. All strings are UTF-8 encoded.
 	std::string LMMS_EXPORT toShortestRelative(std::string_view input, bool allowLocal = false);
 } // namespace lmms::PathUtil
 

@@ -507,7 +507,8 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					}
 
 					// Update attribute path to point to the bundle file
-					QString newAtt = PathUtil::basePrefixQString(PathUtil::Base::LocalDir)
+					const std::string_view localBasePrefix = PathUtil::basePrefix(PathUtil::Base::LocalDir);
+					QString newAtt = QString::fromUtf8(localBasePrefix.data(), localBasePrefix.size())
 						+ "resources/" + finalFileName;
 					el.setAttribute(*res, newAtt);
 				}

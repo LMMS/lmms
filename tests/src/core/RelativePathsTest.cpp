@@ -43,7 +43,8 @@ private slots:
 
 		QString absPath = fi.absoluteFilePath();
 		QString oldRelPath = "drums/kick01.ogg";
-		QString relPath = PathUtil::basePrefixQString(PathUtil::Base::FactorySample) + "drums/kick01.ogg";
+		const std::string_view basePrefix = PathUtil::basePrefix(PathUtil::Base::FactorySample);
+		QString relPath = QString::fromUtf8(basePrefix.data(), basePrefix.size()) + "drums/kick01.ogg";
 		QString fuzPath = absPath;
 		fuzPath.replace(relPath, "drums/.///kick01.ogg");
 

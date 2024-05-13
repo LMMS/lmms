@@ -103,12 +103,6 @@ namespace lmms::PathUtil
 		return QDir(baseLocation(base, error));
 	}
 
-	QString basePrefixQString(const Base base)
-	{
-		const auto prefix = basePrefix(base);
-		return QString::fromLatin1(prefix.data(), prefix.size());
-	}
-
 	std::string_view basePrefix(const Base base)
 	{
 		switch (base)
@@ -137,7 +131,8 @@ namespace lmms::PathUtil
 			return baseLookup(path) == base;
 		}
 
-		return path.startsWith(basePrefixQString(base), Qt::CaseInsensitive);
+		const auto bp = basePrefix(base);
+		return path.startsWith(QString::fromUtf8(bp.data(), bp.size()), Qt::CaseInsensitive);
 	}
 
 	bool hasBase(std::string_view path, Base base)
@@ -151,11 +146,12 @@ namespace lmms::PathUtil
 		return path.rfind(prefix, 0) == 0;
 	}
 
-	Base baseLookup(const QString & path)
+	Base baseLookup(const QString& path)
 	{
 		for (auto base : relativeBases)
 		{
-			QString prefix = basePrefixQString(base);
+			const auto bp = basePrefix(base);
+			const auto prefix = QString::fromUtf8(bp.data(), bp.size());
 			if ( path.startsWith(prefix) ) { return base; }
 		}
 		return Base::Absolute;
@@ -171,9 +167,9 @@ namespace lmms::PathUtil
 		return Base::Absolute;
 	}
 
-	QString stripPrefix(const QString & path)
+	QString stripPrefix(const QString& path)
 	{
-		return path.mid( basePrefix(baseLookup(path)).length() );
+		return path.mid(basePrefix(baseLookup(path)).length());
 	}
 
 	std::string_view stripPrefix(std::string_view path)
@@ -196,7 +192,7 @@ namespace lmms::PathUtil
 		return { Base::Absolute, path };
 	}
 
-	QString cleanName(const QString & path)
+	QString cleanName(const QString& path)
 	{
 		return stripPrefix(QFileInfo(path).baseName());
 	}
@@ -207,7 +203,7 @@ namespace lmms::PathUtil
 		return stripPrefix(fileInfo.baseName()).toStdString();
 	}
 
-	QString oldRelativeUpgrade(const QString & input)
+	QString oldRelativeUpgrade(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
 
@@ -225,7 +221,8 @@ namespace lmms::PathUtil
 		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
 
 		//Assume we've found the correct base location, return the full path
-		return basePrefixQString(assumedBase) + input;
+		const auto bp = basePrefix(assumedBase);
+		return QString::fromUtf8(bp.data(), bp.size()) + input;
 	}
 
 	QString toAbsolute(const QString & input, bool* error /* = nullptr*/)
@@ -256,7 +253,7 @@ namespace lmms::PathUtil
 		return str.toStdString();
 	}
 
-	QString relativeOrAbsolute(const QString & input, const Base base)
+	QString relativeOrAbsolute(const QString& input, const Base base)
 	{
 		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
@@ -270,7 +267,7 @@ namespace lmms::PathUtil
 			: relativePath;
 	}
 
-	QString toShortestRelative(const QString & input, bool allowLocal /* = false*/)
+	QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
 	{
 		if (hasBase(input, Base::Internal)) { return input; }
 
@@ -292,7 +289,9 @@ namespace lmms::PathUtil
 				shortestPath = otherPath;
 			}
 		}
-		return basePrefixQString(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
+
+		const auto bp = basePrefix(shortestBase);
+		return QString::fromUtf8(bp.data(), bp.size()) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
 	std::string toShortestRelative(std::string_view input, bool allowLocal)
@@ -319,7 +318,7 @@ namespace lmms::PathUtil
 			}
 		}
 
-		return (basePrefixQString(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase)).toStdString();
+		return std::string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase).toStdString();
 	}
 
 } // namespace lmms::PathUtil
