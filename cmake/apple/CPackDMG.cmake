@@ -9,7 +9,12 @@ set(COMMAND_ECHO NONE)
 # Detect release|debug build
 if(NOT CPACK_STRIP_FILES_ORIG)
     # -use-debug-libs implies -no-strip
-    set(USE_DEBUG_LIBS -use-debug-libs)
+    if(CPACK_QMAKE_EXECUTABLE MATCHES "/homebrew/|/usr/local")
+    	message(STATUS "Homebrew does not provide debug qt libraries, replacing \"-use-debug-libs\" with \"-no-strip\" instead")
+    	set(USE_DEBUG_LIBS -no-strip)
+    else()
+    	set(USE_DEBUG_LIBS -use-debug-libs)
+    endif()
 endif()
 
 if(CPACK_DEBUG)
