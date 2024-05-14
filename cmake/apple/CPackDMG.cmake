@@ -2,7 +2,7 @@
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
 
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
-set(MACDEPLOYQT_VERBOSITY 2)
+set(VERBOSITY 2)
 # Set to "STDOUT" to show all verbose commands
 set(COMMAND_ECHO NONE)
 
@@ -13,7 +13,7 @@ if(NOT CPACK_STRIP_FILES_ORIG)
 endif()
 
 if(CPACK_DEBUG)
-    set(MACDEPLOYQT_VERBOSITY 3)
+    set(VERBOSITY 3)
     set(COMMAND_ECHO STDOUT)
 endif()
 
@@ -87,7 +87,7 @@ endforeach()
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 message(STATUS "Calling ${QTBIN}/macdeployqt ${APP} [... executables]")
 execute_process(COMMAND "${QTBIN}/macdeployqt" "${APP}" ${EXECUTABLES}
-	-verbose=${MACDEPLOYQT_VERBOSITY}
+	-verbose=${VERBOSITY}
 	${USE_DEBUG_LIBS}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)

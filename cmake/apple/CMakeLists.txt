@@ -12,7 +12,7 @@ set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" PARENT_SCOPE)
 set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns" PARENT_SCOPE)
 
 # Standard CPack options
-# supress license popup
+# suppress license popup
 unset(CPACK_RESOURCE_FILE_LICENSE PARENT_SCOPE)
 # disable cpack's strip: causes missing symbols on macOS
 set(CPACK_STRIP_FILES_ORIG "${CPACK_STRIP_FILES}" PARENT_SCOPE)

@@ -5,7 +5,7 @@ set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.AppDir
 set(APPIMAGE_FILE "${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.AppImage")
 
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
-set(LINUXDEPLOYQT_VERBOSITY 2)
+set(VERBOSITY 2)
 # Set to "STDOUT" to show all verbose commands
 set(COMMAND_ECHO NONE)
 
@@ -15,7 +15,7 @@ if(NOT CPACK_STRIP_FILES)
 endif()
 
 if(CPACK_DEBUG)
-    set(LINUXDEPLOYQT_VERBOSITY 3)
+    set(VERBOSITY 3)
     set(COMMAND_ECHO STDOUT)
 endif()
 
@@ -161,7 +161,7 @@ endforeach()
 message(STATUS "Calling linuxdeployqt ${DESKTOP_FILE} [... executables]")
 execute_process(COMMAND linuxdeployqt "${DESKTOP_FILE}" ${EXECUTABLES}
 	-bundle-non-qt-libs
-	-verbose=${LINUXDEPLOYQT_VERBOSITY}
+	-verbose=${VERBOSITY}
 	${NO_STRIP}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
