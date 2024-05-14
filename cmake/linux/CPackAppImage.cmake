@@ -140,12 +140,17 @@ endif()
 # Patch desktop file
 file(READ "${DESKTOP_FILE}" DESKTOP_FILE_CONTENTS)
 string(REPLACE "Exec=${LMMS}" "Exec=${LMMS}.real" DESKTOP_FILE_CONTENTS "${DESKTOP_FILE_CONTENTS}")
+file(WRITE "${DESKTOP_FILE}" "${DESKTOP_FILE_CONTENTS}")
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
 # Build list of executables to inform linuxdeployqt about
 # e.g. -executable=foo.dylib -executable=bar.dylib
 file(GLOB LIBS "${APP}/usr/lib/${LMMS}/*.so")
-file(GLOB LADSPA "${APP}/usr/lib/${LMMS}/ladspa/*.so")
+#file(GLOB LADSPA "${APP}/usr/lib/${LMMS}/ladspa/*.so")
+list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imp_1199.so")
+list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imbeq_1197.so")
+list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1193.so")
+list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1194.so")
 list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS "${BIN_ZYN}")
 list(APPEND LIBS "${BIN_VST32}")
@@ -158,13 +163,14 @@ foreach(_LIB IN LISTS LIBS)
 endforeach()
 
 # Call linuxdeployqt
-message(STATUS "Calling linuxdeployqt ${DESKTOP_FILE} [... executables]")
-execute_process(COMMAND linuxdeployqt "${DESKTOP_FILE}" ${EXECUTABLES}
+message(STATUS "Calling ${LINUXDEPLOYQT_BIN} ${DESKTOP_FILE} [... executables]")
+execute_process(COMMAND "${LINUXDEPLOYQT_BIN}" "${DESKTOP_FILE}" ${EXECUTABLES}
 	-bundle-non-qt-libs
 	-verbose=${VERBOSITY}
 	${NO_STRIP}
-	COMMAND_ECHO ${COMMAND_ECHO}
+	COMMAND_ECHO ${COMMAND_ECHO})
 	COMMAND_ERROR_IS_FATAL ANY)
+	#-unsupported-allow-new-glibc
 
 # Remove libraries that are normally sytem-provided
 file(GLOB UNWANTED_LIBS
@@ -194,7 +200,7 @@ install_symlink("${APP}/${LMMS}.png" "${APP}/.DirIcon")
 
 # Create AppImage
 message(STATUS "Finishing the AppImage...")
-execute_process(COMMAND appimagetool
+execute_process(COMMAND "${APPIMAGETOOL_BIN}"
 	"${APP}"
 	"${APPIMAGE_FILE}"
 	COMMAND_ECHO ${COMMAND_ECHO}
