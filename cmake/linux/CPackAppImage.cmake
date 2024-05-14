@@ -89,7 +89,7 @@ endif()
 
 # Create a wrapper script which calls the lmms executable
 file(RENAME "${APP}/usr/bin/${LMMS}" "${APP}/usr/bin/${LMMS}.real")
-file(COPY "${CPACK_CURRENT_SOURCE_DIR}/launch_lmms.sh" DESTINATION "${APP}/usr/bin/${LMMS}")
+file(RENAME "${APP}/usr/bin/launch_lmms.sh" "${APP}/usr/bin/${LMMS}")
 # Ensure the file is executable
 file(CHMOD "${APP}/usr/bin/${LMMS}" PERMISSIONS
 	OWNER_EXECUTE OWNER_WRITE OWNER_READ
@@ -200,4 +200,8 @@ execute_process(COMMAND appimagetool
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
-message(STATUS "AppImage create: ${APPIMAGE_FILE}")
+if(EXISTS "${APPIMAGE_FILE}")
+	message(STATUS "AppImage create: ${APPIMAGE_FILE}")
+else()
+	message(FATAL_ERROR "An error occured generating the AppImage")
+endif()

@@ -1,15 +1,18 @@
 install(DIRECTORY icons DESTINATION "${DATA_DIR}/icons/hicolor")
 install(FILES lmms.desktop DESTINATION "${DATA_DIR}/applications")
 install(FILES lmms.xml DESTINATION "${DATA_DIR}/mime/packages")
-# Copy rawwaves into bundle
-file(GLOB RAWWAVES "${STK_RAWWAVE_ROOT}/*.raw")
-install(FILES ${RAWWAVES} DESTINATION "usr/share/stk")
 
 # Preserve old CPack behavior
 if(WANT_CPACK_TARBALL)
-	message(STATUS "Skipping AppImage creation")
-	return()
+    message(STATUS "Skipping AppImage creation")
+    return()
 endif()
+
+# Copy rawwaves into bundle
+file(GLOB RAWWAVES "${STK_RAWWAVE_ROOT}/*.raw")
+install(FILES ${RAWWAVES} DESTINATION share/stk)
+
+install(FILES launch_lmms.sh DESTINATION bin)
 
 # Standard CPack options
 set(CPACK_GENERATOR "External" PARENT_SCOPE)
@@ -34,11 +37,11 @@ set(CPACK_CMAKE_COMMAND "${CMAKE_COMMAND}" PARENT_SCOPE)
 
 # TODO: Canidate for DetectMachine.cmake
 if(IS_X86_64)
-	set(CPACK_TARGET_ARCH x86_64 PARENT_SCOPE)
+    set(CPACK_TARGET_ARCH x86_64 PARENT_SCOPE)
 elseif(IS_ARM64)
-	set(CPACK_TARGET_ARCH arm64 PARENT_SCOPE)
+    set(CPACK_TARGET_ARCH arm64 PARENT_SCOPE)
 else()
-	set(CPACK_TARGET_ARCH unknown PARENT_SCOPE)
+    set(CPACK_TARGET_ARCH unknown PARENT_SCOPE)
 endif()
 
 set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackAppImage.cmake" PARENT_SCOPE)

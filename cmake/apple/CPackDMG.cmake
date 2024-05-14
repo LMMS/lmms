@@ -8,8 +8,8 @@ set(COMMAND_ECHO NONE)
 
 # Detect release|debug build
 if(NOT CPACK_STRIP_FILES_ORIG)
-	# -use-debug-libs implies -no-strip
-	set(USE_DEBUG_LIBS -use-debug-libs)
+    # -use-debug-libs implies -no-strip
+    set(USE_DEBUG_LIBS -use-debug-libs)
 endif()
 
 if(CPACK_DEBUG)
@@ -18,10 +18,10 @@ if(CPACK_DEBUG)
 endif()
 
 execute_process(COMMAND convert
-	"${CPACK_CURRENT_SOURCE_DIR}/*.png"
-	"${CPACK_CURRENT_BINARY_DIR}/background.tiff"
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
+    "${CPACK_CURRENT_SOURCE_DIR}/*.png"
+    "${CPACK_CURRENT_BINARY_DIR}/background.tiff"
+    COMMAND_ECHO ${COMMAND_ECHO}
+    COMMAND_ERROR_IS_FATAL ANY)
 
 # Copy missing files
 file(COPY "${CPACK_CURRENT_SOURCE_DIR}/project.icns" DESTINATION "${APP}/Contents/Resources")
@@ -40,9 +40,9 @@ file(MAKE_DIRECTORY "${APP}/Contents/Resources")
 
 # Make all libraries writable for macdeployqt
 file(CHMOD_RECURSE "${APP}/Contents" PERMISSIONS
-	OWNER_EXECUTE OWNER_WRITE OWNER_READ
-	GROUP_EXECUTE GROUP_WRITE GROUP_READ
-	WORLD_READ)
+    OWNER_EXECUTE OWNER_WRITE OWNER_READ
+    GROUP_EXECUTE GROUP_WRITE GROUP_READ
+    WORLD_READ)
 
 # Fix layout
 file(RENAME "${APP}/Contents/Resources/lib" "${APP}/Contents/lib")
@@ -58,17 +58,17 @@ file(REMOVE_RECURSE "${APP}/Contents/include")
 
 # Replace @rpath with @loader_path for Carla
 execute_process(COMMAND install_name_tool -change
-	"@rpath/libcarlabase.dylib"
-	"@loader_path/libcarlabase.dylib"
-	"${APP}/Contents/lib/lmms/libcarlapatchbay.so"
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
+    "@rpath/libcarlabase.dylib"
+    "@loader_path/libcarlabase.dylib"
+    "${APP}/Contents/lib/lmms/libcarlapatchbay.so"
+    COMMAND_ECHO ${COMMAND_ECHO}
+    COMMAND_ERROR_IS_FATAL ANY)
 execute_process(COMMAND install_name_tool -change
-	"@rpath/libcarlabase.dylib"
-	"@loader_path/libcarlabase.dylib"
-	"${APP}/Contents/lib/lmms/libcarlarack.so"
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
+    "@rpath/libcarlabase.dylib"
+    "@loader_path/libcarlabase.dylib"
+    "${APP}/Contents/lib/lmms/libcarlarack.so"
+    COMMAND_ECHO ${COMMAND_ECHO}
+    COMMAND_ERROR_IS_FATAL ANY)
 
 # Build list of executables to inform macdeployqt about
 # e.g. -executable=foo.dylib -executable=bar.dylib
@@ -80,36 +80,36 @@ list(SORT LIBS)
 
 # Construct macdeployqt parameters
 foreach(_LIB IN LISTS LIBS)
-	list(APPEND EXECUTABLES "-executable=${_LIB}")
+    list(APPEND EXECUTABLES "-executable=${_LIB}")
 endforeach()
 
 # Call macdeployqt
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 message(STATUS "Calling ${QTBIN}/macdeployqt ${APP} [... executables]")
 execute_process(COMMAND "${QTBIN}/macdeployqt" "${APP}" ${EXECUTABLES}
-	-verbose=${VERBOSITY}
-	${USE_DEBUG_LIBS}
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
+    -verbose=${VERBOSITY}
+    ${USE_DEBUG_LIBS}
+    COMMAND_ECHO ${COMMAND_ECHO}
+    COMMAND_ERROR_IS_FATAL ANY)
 
 # Remove dummy carla libs, relink to a sane location (e.g. /Applications/Carla.app/...)
 # (must be done after calling macdeployqt)
 file(GLOB CARLALIBS "${APP}/Contents/lib/lmms/libcarla*")
 foreach(_CARLALIB IN LISTS CARLALIBS)
-	foreach(_LIB "${CPACK_CARLA_LIBRARIES}")
-		set(_OLDPATH "../../Frameworks/lib${_LIB}.dylib")
-		set(_NEWPATH "Carla.app/Contents/MacOS/lib${_LIB}.dylib")
-		execute_process(COMMAND install_name_tool -change
-        	"@loader_path/${_OLDPATH}"
-        	"@executable_path/../../../${_NEWPATH}"
-        	"${_CARLALIB}"
-        	COMMAND_ECHO ${COMMAND_ECHO}
-        	COMMAND_ERROR_IS_FATAL ANY)
+    foreach(_LIB "${CPACK_CARLA_LIBRARIES}")
+        set(_OLDPATH "../../Frameworks/lib${_LIB}.dylib")
+        set(_NEWPATH "Carla.app/Contents/MacOS/lib${_LIB}.dylib")
+        execute_process(COMMAND install_name_tool -change
+            "@loader_path/${_OLDPATH}"
+            "@executable_path/../../../${_NEWPATH}"
+            "${_CARLALIB}"
+            COMMAND_ECHO ${COMMAND_ECHO}
+            COMMAND_ERROR_IS_FATAL ANY)
         file(REMOVE "${APP}/Contents/Frameworks/lib${_LIB}.dylib")
-	endforeach()
+    endforeach()
 endforeach()
 
 # Call ad-hoc codesign manually (CMake offers this as well)
 execute_process(COMMAND codesign --force --deep --sign - "${APP}"
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
+    COMMAND_ECHO ${COMMAND_ECHO}
+    COMMAND_ERROR_IS_FATAL ANY)

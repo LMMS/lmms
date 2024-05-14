@@ -46,9 +46,10 @@ macro(BASHCOMP_INSTALL SCRIPT_NAME)
     else()
 		install(FILES "${SCRIPT_NAME}" DESTINATION "${BASHCOMP_USER_PATH}")
 		if(BASHCOMP_PKG_PATH)
+			# TODO: CMake 3.21 Use "file(COPY_FILE ...)"
 			install(CODE "
-					file(COPY_FILE \"${SCRIPT_NAME}\" \"${BASHCOMP_PKG_PATH}\" RESULT result)
-					if(NOT result EQUAL \"0\")
+					execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"${SCRIPT_NAME}\" \"${BASHCOMP_PKG_PATH}\" ERROR_QUIET RESULT_VARIABLE result)
+					if(NOT result EQUAL 0)
 						message(STATUS \"Unable to install bash-completion support system-wide: ${BASHCOMP_USER_PATH}/${SCRIPT_NAME}.  This is normal for user-space installs.\")
 					else()
 						message(STATUS \"Bash completion-support has been installed to ${BASHCOMP_USER_PATH}/${SCRIPT_NAME}\")
