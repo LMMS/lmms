@@ -29,6 +29,7 @@
 
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "lmms_filesystem.h"
 #include "Song.h"
 
 namespace lmms::PathUtil
@@ -38,21 +39,56 @@ namespace lmms::PathUtil
 		constexpr auto relativeBases = std::array{ Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
 			Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
 			Base::LocalDir, Base::Internal };
+
+		std::string oldRelativeUpgrade(std::string_view input)
+		{
+			auto inputStr = std::string{input};
+			if (input.empty()) { return inputStr; }
+
+			// Start by assuming that the file is a user sample
+			Base assumedBase = Base::UserSample;
+
+			// Check if it's a factory sample
+			const auto factoryPath = fs::u8path(baseLocation(Base::FactorySample).value() + inputStr);
+			if (std::error_code ec; fs::exists(factoryPath, ec)) { assumedBase = Base::FactorySample; }
+
+			// Check if it's a VST
+			const auto vstPath = fs::u8path(baseLocation(Base::UserVST).value() + inputStr);
+			if (std::error_code ec; fs::exists(vstPath, ec)) { assumedBase = Base::UserVST; }
+
+			// Assume we've found the correct base location, return the full path
+			return std::string{basePrefix(assumedBase)} + inputStr;
+		}
+
+		//! Return the directory associated with a given base as a QDir.
+		//! Will return std::nullopt if the prefix could not be resolved.
+		std::optional<fs::path> baseDir(const Base base)
+		{
+			if (base == Base::Absolute)
+			{
+				return fs::current_path().root_path();
+			}
+
+			if (auto loc = baseLocation(base))
+			{
+				return fs::u8path(*loc);
+			}
+
+			return std::nullopt;
+		}
 	} // namespace
 
-	QString baseLocation(const Base base, bool* error /* = nullptr*/)
+	std::optional<std::string> baseLocation(Base base)
 	{
-		// error is false unless something goes wrong
-		if (error) { *error = false; }
-
-		QString loc = "";
+		QString loc;
 		switch (base)
 		{
 			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
 			case Base::FactorySample    :
 			{
-				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
-				loc = fsd.absolutePath(); break;
+				const auto fsd = QDir{ConfigManager::inst()->factorySamplesDir()};
+				loc = fsd.absolutePath();
+				break;
 			}
 			case Base::UserSample       : loc = ConfigManager::inst()->userSamplesDir(); break;
 			case Base::UserVST          : loc = ConfigManager::inst()->userVstDir(); break;
@@ -66,41 +102,22 @@ namespace lmms::PathUtil
 			case Base::LocalDir:
 			{
 				const Song* s = Engine::getSong();
-				QString projectPath;
-				if (s)
-				{
-					projectPath = s->projectFileName();
-					loc = QFileInfo(projectPath).path();
-				}
+				if (!s) { return std::nullopt; }
+
+				QString projectPath = s->projectFileName();
+				if (projectPath.isEmpty()) { return std::nullopt; }
+
 				// We resolved it properly if we had an open Song and the project
 				// filename wasn't empty
-				if (error) { *error = (!s || projectPath.isEmpty()); }
+				loc = QFileInfo{projectPath}.path();
 				break;
 			}
 			case Base::Internal:
-				if (error) { *error = true; }
-				[[fallthrough]];
-			default                   : return QString("");
+				return std::nullopt;
+			default:
+				return std::string{};
 		}
-		return QDir::cleanPath(loc) + "/";
-	}
-
-	std::optional<std::string> getBaseLocation(Base base)
-	{
-		bool error = false;
-		const auto str = baseLocation(base, &error);
-		if (error) { return std::nullopt; }
-		return str.toStdString();
-	}
-
-	QDir baseQDir (const Base base, bool* error /* = nullptr*/)
-	{
-		if (base == Base::Absolute)
-		{
-			if (error) { *error = false; }
-			return QDir::root();
-		}
-		return QDir(baseLocation(base, error));
+		return (QDir::cleanPath(loc) + "/").toStdString();
 	}
 
 	std::string_view basePrefix(const Base base)
@@ -124,17 +141,6 @@ namespace lmms::PathUtil
 		}
 	}
 
-	bool hasBase(const QString& path, Base base)
-	{
-		if (base == Base::Absolute)
-		{
-			return baseLookup(path) == base;
-		}
-
-		const auto bp = basePrefix(base);
-		return path.startsWith(QString::fromUtf8(bp.data(), bp.size()), Qt::CaseInsensitive);
-	}
-
 	bool hasBase(std::string_view path, Base base)
 	{
 		if (base == Base::Absolute)
@@ -146,17 +152,6 @@ namespace lmms::PathUtil
 		return path.rfind(prefix, 0) == 0;
 	}
 
-	Base baseLookup(const QString& path)
-	{
-		for (auto base : relativeBases)
-		{
-			const auto bp = basePrefix(base);
-			const auto prefix = QString::fromUtf8(bp.data(), bp.size());
-			if ( path.startsWith(prefix) ) { return base; }
-		}
-		return Base::Absolute;
-	}
-
 	Base baseLookup(std::string_view path)
 	{
 		for (auto base : relativeBases)
@@ -165,11 +160,6 @@ namespace lmms::PathUtil
 			if (path.rfind(prefix, 0) == 0) { return base; }
 		}
 		return Base::Absolute;
-	}
-
-	QString stripPrefix(const QString& path)
-	{
-		return path.mid(basePrefix(baseLookup(path)).length());
 	}
 
 	std::string_view stripPrefix(std::string_view path)
@@ -194,123 +184,106 @@ namespace lmms::PathUtil
 
 	QString cleanName(const QString& path)
 	{
-		return stripPrefix(QFileInfo(path).baseName());
+		return QString::fromStdString(cleanName(path.toStdString()));
 	}
 
 	std::string cleanName(std::string_view path)
 	{
-		const auto fileInfo = QFileInfo{QString::fromUtf8(path.data(), path.size())};
-		return stripPrefix(fileInfo.baseName()).toStdString();
+		auto filename = fs::u8path(path).filename().string();
+
+		// filename.stem() would return the name up until the last '.' but
+		//   Qt's QFileInfo.baseName() returns up until the *first* '.'
+		return filename.substr(0, filename.find('.'));
 	}
 
-	QString oldRelativeUpgrade(const QString& input)
+	QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 	{
-		if (input.isEmpty()) { return input; }
-
-		//Start by assuming that the file is a user sample
-		Base assumedBase = Base::UserSample;
-
-		//Check if it's a factory sample
-		QString factoryPath = baseLocation(Base::FactorySample) + input;
-		QFileInfo factoryInfo(factoryPath);
-		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
-
-		//Check if it's a VST
-		QString vstPath = baseLocation(Base::UserVST) + input;
-		QFileInfo vstInfo(vstPath);
-		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
-
-		//Assume we've found the correct base location, return the full path
-		const auto bp = basePrefix(assumedBase);
-		return QString::fromUtf8(bp.data(), bp.size()) + input;
-	}
-
-	QString toAbsolute(const QString & input, bool* error /* = nullptr*/)
-	{
-		// First, check if it's Internal
-		if (hasBase(input, Base::Internal)) { return input; }
-
-		// Secondly, do no harm to absolute paths
-		QFileInfo inputFileInfo = QFileInfo(input);
-		if (inputFileInfo.isAbsolute())
+		if (const auto result = toAbsolute(input.toStdString()))
 		{
 			if (error) { *error = false; }
-			return input;
+			return QString::fromStdString(*result);
 		}
 
-		// Next, handle old relative paths with no prefix
-		QString upgraded = input.contains(":") ? input : oldRelativeUpgrade(input);
-
-		Base base = baseLookup(upgraded);
-		return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
+		if (error) { *error = true; }
+		return QString{};
 	}
 
 	std::optional<std::string> toAbsolute(std::string_view input)
 	{
-		bool error = false;
-		const auto str = toAbsolute(QString::fromUtf8(input.data(), input.size()), &error);
-		if (error) { return std::nullopt; }
-		return str.toStdString();
+		// First, check if it's Internal
+		auto inputStr = std::string{input};
+		if (hasBase(input, Base::Internal)) { return inputStr; }
+
+		// Secondly, do no harm to absolute paths
+		auto inputPath = fs::u8path(input);
+		if (inputPath.is_absolute())
+		{
+			return inputStr;
+		}
+
+		// Next, handle old relative paths with no prefix
+		const std::string upgraded = input.find(':') != std::string_view::npos
+			? inputStr
+			: oldRelativeUpgrade(input);
+
+		const Base base = baseLookup(upgraded);
+		if (auto loc = baseLocation(base))
+		{
+			const auto noPrefix = stripPrefix(upgraded);
+			return loc->append(noPrefix.data(), noPrefix.size());
+		}
+
+		return std::nullopt;
 	}
 
 	QString relativeOrAbsolute(const QString& input, const Base base)
 	{
-		if (input.isEmpty()) { return input; }
-		QString absolutePath = toAbsolute(input);
+		return QString::fromStdString(relativeOrAbsolute(input.toStdString(), base));
+	}
+
+	std::string relativeOrAbsolute(std::string_view input, const Base base)
+	{
+		if (input.empty()) { return std::string{input}; }
+
+		std::string absolutePath = toAbsolute(input).value_or(std::string{});
 		if (base == Base::Absolute || base == Base::Internal) { return absolutePath; }
-		bool error;
-		QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
-		// Return the relative path if it didn't result in a path starting with ..
-		// and the baseQDir was resolved properly
-		return (relativePath.startsWith("..") || error)
+
+		auto bd = baseDir(base);
+		if (!bd) { return absolutePath; }
+
+		std::error_code ec;
+		auto relativePath = fs::relative(absolutePath, *bd, ec).string();
+		if (ec) { return absolutePath; }
+
+		// Return the relative path if it didn't result in a path starting with ".."
+		// and the baseDir was resolved properly
+		return relativePath.rfind("..", 0) != std::string::npos
 			? absolutePath
 			: relativePath;
 	}
 
 	QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
 	{
-		if (hasBase(input, Base::Internal)) { return input; }
-
-		QFileInfo inputFileInfo = QFileInfo(input);
-		QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
-
-		Base shortestBase = Base::Absolute;
-		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
-		for (auto base: relativeBases)
-		{
-			// Skip local paths when searching for the shortest relative if those
-			// are not allowed for that resource
-			if (base == Base::LocalDir && !allowLocal) { continue; }
-
-			QString otherPath = relativeOrAbsolute(absolutePath, base);
-			if (otherPath.length() < shortestPath.length())
-			{
-				shortestBase = base;
-				shortestPath = otherPath;
-			}
-		}
-
-		const auto bp = basePrefix(shortestBase);
-		return QString::fromUtf8(bp.data(), bp.size()) + relativeOrAbsolute(absolutePath, shortestBase);
+		return QString::fromStdString(toShortestRelative(input.toStdString(), allowLocal));
 	}
 
-	std::string toShortestRelative(std::string_view input, bool allowLocal)
+	std::string toShortestRelative(std::string_view input, bool allowLocal /* = false*/)
 	{
-		if (hasBase(input, Base::Internal)) { return std::string{input}; }
+		auto inputStr = std::string{input};
+		if (hasBase(input, Base::Internal)) { return inputStr; }
 
-		const auto qstr = QString::fromUtf8(input.data(), input.size());
-		QFileInfo inputFileInfo = QFileInfo(qstr);
-		QString absolutePath = inputFileInfo.isAbsolute() ? qstr : toAbsolute(qstr);
+		const auto inputPath = fs::u8path(input);
+		std::string absolutePath = toAbsolute(input).value();
 
 		Base shortestBase = Base::Absolute;
-		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
+		std::string shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base : relativeBases)
 		{
 			// Skip local paths when searching for the shortest relative if those
 			// are not allowed for that resource
 			if (base == Base::LocalDir && !allowLocal) { continue; }
 
-			QString otherPath = relativeOrAbsolute(absolutePath, base);
+			std::string otherPath = relativeOrAbsolute(absolutePath, base);
 			if (otherPath.length() < shortestPath.length())
 			{
 				shortestBase = base;
@@ -318,7 +291,7 @@ namespace lmms::PathUtil
 			}
 		}
 
-		return std::string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase).toStdString();
+		return std::string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
 } // namespace lmms::PathUtil

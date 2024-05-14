@@ -62,7 +62,6 @@ private slots:
 
 		//Empty paths should stay empty
 		const QString empty = QString("");
-		QCOMPARE(PathUtil::stripPrefix(empty), empty);
 		QCOMPARE(PathUtil::cleanName(empty), empty);
 		QCOMPARE(PathUtil::toAbsolute(empty), empty);
 		QCOMPARE(PathUtil::toShortestRelative(empty), empty);

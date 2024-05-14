@@ -569,7 +569,10 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 			for (int i = 0; i < attributes.size(); ++i)
 			{
 				QDomNode attribute = attributes.item(i);
-				if (PathUtil::hasBase(attribute.toAttr().value(), PathUtil::Base::LocalDir)) { return true; }
+				if (PathUtil::hasBase(attribute.toAttr().value().toStdString(), PathUtil::Base::LocalDir))
+				{
+					return true;
+				}
 			}
 		}
 
