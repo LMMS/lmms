@@ -47,8 +47,7 @@ jobs:
           ctest --output-on-failure -j2
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target appimage
+          cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
