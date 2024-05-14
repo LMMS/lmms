@@ -103,6 +103,8 @@ option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
+option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
+option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -628,6 +630,17 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
+if(WANT_DEBUG_CPACK)
+	if(LMMS_BUILD_WIN32 OR WANT_CPACK_TARBALL)
+        set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
+	else()
+		set(CPACK_DEBUG TRUE)
+		set(STATUS_DEBUG_CPACK "Enabled")
+	endif()
+else()
+	set(STATUS_DEBUG_CPACK "Enabled")
+endif()
+
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
@@ -777,7 +790,7 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
-		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
+		DESTINATION "include/lmms/")
 ENDIF(LMMS_BUILD_LINUX)
 
 #
@@ -881,6 +894,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 )
 
 MESSAGE(

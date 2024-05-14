@@ -1,8 +1,26 @@
 # Variables must be prefixed with "CPACK_" to be visible here
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
+
+# 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
+set(MACDEPLOYQT_VERBOSITY 2)
+# Set to "STDOUT" to show all verbose commands
+set(COMMAND_ECHO NONE)
+
+# Detect release|debug build
+if(NOT CPACK_STRIP_FILES_ORIG)
+	# -use-debug-libs implies -no-strip
+	set(USE_DEBUG_LIBS -use-debug-libs)
+endif()
+
+if(CPACK_DEBUG)
+    set(MACDEPLOYQT_VERBOSITY 3)
+    set(COMMAND_ECHO STDOUT)
+endif()
+
 execute_process(COMMAND convert
 	"${CPACK_CURRENT_SOURCE_DIR}/*.png"
 	"${CPACK_CURRENT_BINARY_DIR}/background.tiff"
+	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
 # Copy missing files
@@ -35,25 +53,29 @@ file(RENAME "${APP}/Contents/Resources/bin" "${APP}/Contents/bin")
 file(RENAME "${APP}/Contents/bin/lmms" "${APP}/Contents/MacOS/lmms")
 file(RENAME "${APP}/Contents/lib/lmms/RemoteZynAddSubFx" "${APP}/Contents/MacOS/RemoteZynAddSubFx")
 file(REMOVE_RECURSE "${APP}/Contents/bin")
+file(REMOVE_RECURSE "${APP}/Contents/share/man1")
+file(REMOVE_RECURSE "${APP}/Contents/include")
 
 # Replace @rpath with @loader_path for Carla
 execute_process(COMMAND install_name_tool -change
 	"@rpath/libcarlabase.dylib"
 	"@loader_path/libcarlabase.dylib"
 	"${APP}/Contents/lib/lmms/libcarlapatchbay.so"
+	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 execute_process(COMMAND install_name_tool -change
 	"@rpath/libcarlabase.dylib"
 	"@loader_path/libcarlabase.dylib"
 	"${APP}/Contents/lib/lmms/libcarlarack.so"
+	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
 # Build list of executables to inform macdeployqt about
 # e.g. -executable=foo.dylib -executable=bar.dylib
 file(GLOB LIBS "${APP}/Contents/lib/lmms/*.so")
 file(GLOB LADSPA "${APP}/Contents/lib/lmms/ladspa/*.so")
-list(APPEND LIBS "${APP}/Contents/MacOS/RemoteZynAddSubFx")
 list(APPEND LIBS ${LADSPA})
+list(APPEND LIBS "${APP}/Contents/MacOS/RemoteZynAddSubFx")
 list(SORT LIBS)
 
 # Construct macdeployqt parameters
@@ -64,7 +86,11 @@ endforeach()
 # Call macdeployqt
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 message(STATUS "Calling ${QTBIN}/macdeployqt ${APP} [... executables]")
-execute_process(COMMAND "${QTBIN}/macdeployqt" "${APP}" ${EXECUTABLES} COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND "${QTBIN}/macdeployqt" "${APP}" ${EXECUTABLES}
+	-verbose=${MACDEPLOYQT_VERBOSITY}
+	${USE_DEBUG_LIBS}
+	COMMAND_ECHO ${COMMAND_ECHO}
+	COMMAND_ERROR_IS_FATAL ANY)
 
 # Remove dummy carla libs, relink to a sane location (e.g. /Applications/Carla.app/...)
 # (must be done after calling macdeployqt)
@@ -77,10 +103,13 @@ foreach(_CARLALIB IN LISTS CARLALIBS)
         	"@loader_path/${_OLDPATH}"
         	"@executable_path/../../../${_NEWPATH}"
         	"${_CARLALIB}"
+        	COMMAND_ECHO ${COMMAND_ECHO}
         	COMMAND_ERROR_IS_FATAL ANY)
         file(REMOVE "${APP}/Contents/Frameworks/lib${_LIB}.dylib")
 	endforeach()
 endforeach()
 
 # Call ad-hoc codesign manually (CMake offers this as well)
-execute_process(COMMAND codesign --force --deep --sign - "${APP}" COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND codesign --force --deep --sign - "${APP}"
+	COMMAND_ECHO ${COMMAND_ECHO}
+	COMMAND_ERROR_IS_FATAL ANY)
