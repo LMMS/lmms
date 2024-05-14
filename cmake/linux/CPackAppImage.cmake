@@ -15,8 +15,8 @@ if(NOT CPACK_STRIP_FILES)
 endif()
 
 if(CPACK_DEBUG)
-    set(VERBOSITY 3)
-    set(COMMAND_ECHO STDOUT)
+	set(VERBOSITY 3)
+	set(COMMAND_ECHO STDOUT)
 endif()
 
 set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/")
@@ -28,7 +28,7 @@ message(STATUS "Creating AppDir ${APP}...")
 
 # Offer symlink support via "cmake -E create_symlink"
 macro(install_symlink filepath sympath)
-    execute_process(COMMAND ${CPACK_CMAKE_COMMAND} -E create_symlink "${filepath}" "${sympath}" COMMAND_ECHO ${COMMAND_ECHO})
+	execute_process(COMMAND ${CPACK_CMAKE_COMMAND} -E create_symlink "${filepath}" "${sympath}" COMMAND_ECHO ${COMMAND_ECHO})
 endmacro()
 
 file(REMOVE_RECURSE "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/include")
@@ -60,31 +60,31 @@ if(NOT LINUXDEPLOYQT_BIN OR NOT APPIMAGETOOL_BIN)
 		"${LINUXDEPLOYQT_URL}"
 		"${LINUXDEPLOYQT_APPIMAGE}"
 		STATUS DOWNLOAD_STATUS)
-    # Check if download was successful.
-    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
-    list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
-    if(NOT ${STATUS_CODE} EQUAL 0)
-    	file(REMOVE "${LINUXDEPLOYQT_APPIMAGE}")
+	# Check if download was successful.
+	list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+	list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
+	if(NOT ${STATUS_CODE} EQUAL 0)
+		file(REMOVE "${LINUXDEPLOYQT_APPIMAGE}")
 		message(FATAL_ERROR "Error downloading ${LINUXDEPLOYQT_URL} ${ERROR_MESSAGE}")
-    endif()
+	endif()
 
 	# Ensure the file is executable
 	file(CHMOD "${LINUXDEPLOYQT_APPIMAGE}" PERMISSIONS
 		OWNER_EXECUTE OWNER_WRITE OWNER_READ
-        GROUP_EXECUTE GROUP_WRITE GROUP_READ)
-    # Extract linuxdeployqt to a predictable location ("bash -c" avoids syntax errors)
-    execute_process(COMMAND bash -c "\"${LINUXDEPLOYQT_APPIMAGE}\" --appimage-extract"
-    	WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
-    	COMMAND_ECHO ${COMMAND_ECHO}
-    	RESULT_VARIABLE STATUS_CODE)
-    # Check if execution was successful
+		GROUP_EXECUTE GROUP_WRITE GROUP_READ)
+	# Extract linuxdeployqt to a predictable location ("bash -c" avoids syntax errors)
+	execute_process(COMMAND bash -c "\"${LINUXDEPLOYQT_APPIMAGE}\" --appimage-extract"
+		WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
+		COMMAND_ECHO ${COMMAND_ECHO}
+		RESULT_VARIABLE STATUS_CODE)
+	# Check if execution was successful
 	if(NOT ${STATUS_CODE} EQUAL 0)
 		file(REMOVE "${LINUXDEPLOYQT_APPIMAGE}")
 		message(FATAL_ERROR "Error code ${STATUS_CODE} executing ${LINUXDEPLOYQT_APPIMAGE}")
 	endif()
 
-    find_program(LINUXDEPLOYQT_BIN linuxdeployqt REQUIRED)
-    find_program(APPIMAGETOOL_BIN appimagetool REQUIRED)
+	find_program(LINUXDEPLOYQT_BIN linuxdeployqt REQUIRED)
+	find_program(APPIMAGETOOL_BIN appimagetool REQUIRED)
 endif()
 
 # Create a wrapper script which calls the lmms executable
@@ -110,31 +110,31 @@ set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${LMMS}/:${APP}/usr/lib/${LMMS}/optiona
 # Handle wine linking
 if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
 	execute_process(COMMAND ldd "${BIN_VST32}"
-        	OUTPUT_VARIABLE LDD_OUTPUT
-        	OUTPUT_STRIP_TRAILING_WHITESPACE
-        	COMMAND_ECHO ${COMMAND_ECHO}
-        	COMMAND_ERROR_IS_FATAL ANY)
-    string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
-    foreach(line ${LDD_LIST})
-    	if(line MATCHES "libwine.so" AND line MATCHES "not found")
-    		set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_32_LIBRARY_DIR}")
-    		continue()
-    	endif()
-    endforeach()
+			OUTPUT_VARIABLE LDD_OUTPUT
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			COMMAND_ECHO ${COMMAND_ECHO}
+			COMMAND_ERROR_IS_FATAL ANY)
+	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
+	foreach(line ${LDD_LIST})
+		if(line MATCHES "libwine.so" AND line MATCHES "not found")
+			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_32_LIBRARY_DIR}")
+			continue()
+		endif()
+	endforeach()
 endif()
 if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
 	execute_process(COMMAND ldd "${BIN_VST64}"
-        	OUTPUT_VARIABLE LDD_OUTPUT
-        	OUTPUT_STRIP_TRAILING_WHITESPACE
-        	COMMAND_ECHO ${COMMAND_ECHO}
-        	COMMAND_ERROR_IS_FATAL ANY)
-    string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
-    foreach(line ${LDD_LIST})
-    	if(line MATCHES "libwine.so" AND line MATCHES "not found")
-    		set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_64_LIBRARY_DIR}")
-    		continue()
-    	endif()
-    endforeach()
+			OUTPUT_VARIABLE LDD_OUTPUT
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			COMMAND_ECHO ${COMMAND_ECHO}
+			COMMAND_ERROR_IS_FATAL ANY)
+	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
+	foreach(line ${LDD_LIST})
+		if(line MATCHES "libwine.so" AND line MATCHES "not found")
+			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_64_LIBRARY_DIR}")
+			continue()
+		endif()
+	endforeach()
 endif()
 
 # Patch desktop file

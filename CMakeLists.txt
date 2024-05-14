@@ -632,7 +632,7 @@ ENDIF(WANT_DEBUG_FPE)
 
 if(WANT_DEBUG_CPACK)
 	if(LMMS_BUILD_WIN32 OR WANT_CPACK_TARBALL)
-        set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
+		set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
 	else()
 		set(CPACK_DEBUG TRUE)
 		set(STATUS_DEBUG_CPACK "Enabled")
