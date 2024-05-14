@@ -110,6 +110,35 @@ private slots:
 		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(empty).value()), QString{""});
 		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(empty)), QString{""});
 	}
+
+	void cleanNameTests()
+	{
+		using namespace lmms;
+
+		auto kickQ = ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg";
+		auto kick = kickQ.toStdString();
+
+		QCOMPARE(PathUtil::cleanName(kickQ), "kick01");
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(kick)), "kick01");
+
+		auto testQ = QString{"usersample:foo/success.abc.def.ghi"};
+		auto test = testQ.toStdString();
+
+		QCOMPARE(PathUtil::cleanName(testQ), "success");
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(test)), "success");
+
+		auto noNameQ = QString{"foo/bar/.extension"};
+		auto noName = noNameQ.toStdString();
+
+		QCOMPARE(PathUtil::cleanName(noNameQ), "");
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(noName)), "");
+
+		auto noExtensionQ = QString{"../../meow"};
+		auto noExtension = noExtensionQ.toStdString();
+
+		QCOMPARE(PathUtil::cleanName(noExtensionQ), "meow");
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(noExtension)), "meow");
+	}
 };
 
 QTEST_GUILESS_MAIN(RelativePathsTest)
