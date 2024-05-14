@@ -189,7 +189,7 @@ namespace lmms::PathUtil
 
 	std::string cleanName(std::string_view path)
 	{
-		auto filename = fs::u8path(path).filename().string();
+		auto filename = fs::u8path(path).filename().u8string(); // TODO: Fix in C++20?
 
 		// filename.stem() would return the name up until the last '.' but
 		//   Qt's QFileInfo.baseName() returns up until the *first* '.'
@@ -251,8 +251,9 @@ namespace lmms::PathUtil
 		auto bd = baseDir(base);
 		if (!bd) { return absolutePath; }
 
+#if __cpp_lib_filesystem >= 201703
 		std::error_code ec;
-		auto relativePath = fs::relative(absolutePath, *bd, ec).string();
+		auto relativePath = fs::relative(absolutePath, *bd, ec).u8string(); // TODO: Fix in C++20
 		if (ec) { return absolutePath; }
 
 		// Return the relative path if it didn't result in a path starting with ".."
@@ -260,6 +261,14 @@ namespace lmms::PathUtil
 		return relativePath.rfind("..", 0) != std::string::npos
 			? absolutePath
 			: relativePath;
+#else
+		const auto bdQStr = QString::fromStdString(bd->u8string());
+		QString relativePath = QDir{bdQStr}.relativeFilePath(QString::fromStdString(absolutePath));
+
+		return relativePath.startsWith("..")
+			? absolutePath
+			: relativePath.toStdString();
+#endif
 	}
 
 	QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
