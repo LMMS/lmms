@@ -119,8 +119,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 	}
 
 	float level;
-
-	calculateFillLevel(&level, Target::Volume, n, frame, envReleaseBegin, 1);
+	m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel( &level, frame, envReleaseBegin, 1 );
 
 	return level;
 }
@@ -165,11 +164,11 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 		if( m_envLfoParameters[static_cast<std::size_t>(Target::Cut)]->isUsed() )
 		{
-			calculateFillLevel(cutBuffer.data(), Target::Cut, n, envTotalFrames, envReleaseBegin, frames);
+			m_envLfoParameters[static_cast<std::size_t>(Target::Cut)]->fillLevel( cutBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 		}
 		if( m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)]->isUsed() )
 		{
-			calculateFillLevel(resBuffer.data(), Target::Resonance, n, envTotalFrames, envReleaseBegin, frames);
+			m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)]->fillLevel( resBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 		}
 
 		const float fcv = m_filterCutModel.value();
@@ -245,7 +244,16 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 	if( m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->isUsed() )
 	{
 		QVarLengthArray<float> volBuffer(frames);
-		calculateFillLevel(volBuffer.data(), Target::Volume, n, envTotalFrames, envReleaseBegin, frames);
+		if (n->hasParent() == true)
+		{
+			f_cnt_t parentEnvelopeTotalFrames = n->getParentTotalFramesPlayed();
+			f_cnt_t parentEnvelopeReleaseBegin = parentEnvelopeTotalFrames - n->getParentReleaseFramesDone() + n->getParentFramesBeforeRelease();
+			m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel(volBuffer.data(), parentEnvelopeTotalFrames, parentEnvelopeReleaseBegin, frames);
+		}
+		else
+		{
+			m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel(volBuffer.data(), envTotalFrames, envReleaseBegin, frames);
+		}
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
@@ -270,6 +278,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		}
 	}*/
 }
+
 
 
 
@@ -373,30 +382,6 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 
 
 
-void InstrumentSoundShaping::calculateFillLevel(float* buffer, Target enumTarget,
-		NotePlayHandle* n, f_cnt_t totalFrames, f_cnt_t releaseBegin, fpp_t bufferSize)
-{
-	// if this note is in a chord and the useNoteParentModel checkbox is active
-	if (n->hasParent() == true && m_envLfoParameters[static_cast<std::size_t>(enumTarget)]->getUseNoteParentModel().value() == true)
-	{
-		// get the parent note's parameters
-		f_cnt_t parentEnvelopeTotalFrames = n->getParentTotalFramesPlayed();
-		f_cnt_t parentEnvelopeReleaseBegin = parentEnvelopeTotalFrames - n->getParentReleaseFramesDone() + n->getParentFramesBeforeRelease();
-		// for some reason parentEnvelopeTotalFrames could be equal to parentEnvelopeReleaseBegin
-		// fixing this issue
-		if (parentEnvelopeTotalFrames == parentEnvelopeReleaseBegin)
-		{
-			parentEnvelopeTotalFrames = parentEnvelopeTotalFrames - (releaseBegin - totalFrames);
-		}
-		m_envLfoParameters[static_cast<std::size_t>(enumTarget)]->fillLevel(buffer, parentEnvelopeTotalFrames, parentEnvelopeReleaseBegin, bufferSize);
-	}
-	else
-	{
-		// if this note is not in a chord
-		// fill normally
-		m_envLfoParameters[static_cast<std::size_t>(enumTarget)]->fillLevel(buffer, totalFrames, releaseBegin, bufferSize);
-	}
-}
 
 
 } // namespace lmms
