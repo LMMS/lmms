@@ -45,3 +45,7 @@ else()
 endif()
 
 set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CPackAppImage.cmake" PARENT_SCOPE)
+
+if(CMAKE_VERSION VERSION_LESS "3.19")
+    message(WARNING "DMG creation requires at least CMake 3.19")
+endif()
