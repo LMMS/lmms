@@ -34,7 +34,8 @@
 #include <QLocale>
 #include <QTemporaryFile>
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
+// x11 embedding is currently unsupported on qt6
 #	include <QX11Info>
 #	include "X11EmbedContainer.h"
 #endif
@@ -416,7 +417,7 @@ bool VstPlugin::processMessage( const message & _m )
 					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
 					gui::getGUI()->mainWindow()->winId() );
