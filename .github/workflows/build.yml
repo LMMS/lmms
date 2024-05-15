@@ -22,6 +22,7 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Update cmake
         run: |
+          apt install snap
           snap install cmake --classic
           alias cmake='snap run cmake'
       - name: Check out

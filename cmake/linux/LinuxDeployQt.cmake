@@ -157,7 +157,7 @@ list(APPEND LIBS "${BIN_VST32}")
 list(APPEND LIBS "${BIN_VST64}")
 list(SORT LIBS)
 
-# Construct macdeployqt parameters
+# Construct linuxdeployqt parameters
 foreach(_LIB IN LISTS LIBS)
 	list(APPEND EXECUTABLES "-executable=${_LIB}")
 endforeach()
@@ -183,13 +183,32 @@ foreach(_LIB UNWANTED_LIBS)
 	file(REMOVE "${_LIB}")
 endforeach()
 
-# TODO FIX LIBJACK :/
-# Bundle jack out of LD_LIBRARY_PATH
-#JACK_LIB=$(ldd "${APPDIR}/usr/bin/lmms.real" | sed -n 's/\tlibjack\.so\.0 => \(.\+\) (0x[0-9a-f]\+)/\1/p')
-#if [ -e "$JACK_LIB" ]; then
-#   mkdir -p "${APPDIR}usr/lib/lmms/optional/"
-#   cp "$JACK_LIB" "${APPDIR}usr/lib/lmms/optional/"
-#fi
+# Bundle jack to avoid crash for systems without it
+# See https://github.com/LMMS/lmms/pull/4186
+execute_process(COMMAND ldd "${APP}/usr/bin/${LMMS}.real"
+			OUTPUT_VARIABLE LDD_OUTPUT
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			COMMAND_ECHO ${COMMAND_ECHO}
+			COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
+foreach(line ${LDD_LIST})
+	if(line MATCHES "libjack\\.so")
+		# Assume format "libjack.so.0 => /lib/x86_64-linux-gnu/libjack.so.0 (0x00007f48d0b0e000)"
+		string(REPLACE " " ";" parts "${line}")
+		list(LENGTH parts len)
+		math(EXPR index "${len}-2")
+		list(GET parts ${index} lib)
+		# Get symlink target
+		file(REAL_PATH "${lib}" libreal)
+		get_filename_component(symname "${lib}" NAME)
+		get_filename_component(realname "${libreal}" NAME)
+		file(MAKE_DIRECTORY "${APP}/usr/lib/lmms/optional/")
+		# Copy, but with original symlink name
+		file(COPY "${libreal}" DESTINATION "${APP}/usr/lib/lmms/optional/")
+		file(RENAME "${APP}/usr/lib/lmms/optional/${realname}" "${APP}/usr/lib/lmms/optional/${symname}")
+		continue()
+	endif()
+endforeach()
 
 # Point the AppRun to the wrapper script
 file(REMOVE "${APP}/AppRun")
