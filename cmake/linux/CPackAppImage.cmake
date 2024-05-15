@@ -168,7 +168,7 @@ execute_process(COMMAND "${LINUXDEPLOYQT_BIN}" "${DESKTOP_FILE}" ${EXECUTABLES}
 	-bundle-non-qt-libs
 	-verbose=${VERBOSITY}
 	${NO_STRIP}
-	COMMAND_ECHO ${COMMAND_ECHO})
+	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 	#-unsupported-allow-new-glibc
 
