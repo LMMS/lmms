@@ -2,7 +2,7 @@
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
 
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
-set(VERBOSITY 2)
+set(VERBOSITY 1)
 # Set to "STDOUT" to show all verbose commands
 set(COMMAND_ECHO NONE)
 
@@ -18,7 +18,7 @@ if(NOT CPACK_STRIP_FILES_ORIG)
 endif()
 
 if(CPACK_DEBUG)
-	set(VERBOSITY 3)
+	set(VERBOSITY 2)
 	set(COMMAND_ECHO STDOUT)
 endif()
 
