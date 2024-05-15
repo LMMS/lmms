@@ -196,7 +196,7 @@ QStringList ConfigManager::availableVstEmbedMethods()
 #ifdef LMMS_BUILD_WIN32
 	methods.append("win32");
 #endif
-#if defined(LMMS_BUILD_LINUX && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	if (static_cast<QGuiApplication*>(QApplication::instance())->
 		platformName() == "xcb")
 	{

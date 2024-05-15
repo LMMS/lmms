@@ -774,7 +774,7 @@ void VstPlugin::createUI( QWidget * parent )
 	} else
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	if (m_embedMethod == "xembed" )
 	{
 		if (parent)
