@@ -26,6 +26,7 @@
 
 #include <QBitmap>
 
+#include "SampleWaveform.h"
 #include "SlicerT.h"
 #include "SlicerTView.h"
 #include "embed.h"
@@ -84,12 +85,14 @@ SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instr
 void SlicerTWaveform::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(s_waveformBgColor);
-	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
 	QPainter brush(&m_seekerWaveform);
 	brush.setPen(s_waveformColor);
 
-	m_slicerTParent->m_originalSample.visualize(brush, QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height()),
-		0, m_slicerTParent->m_originalSample.frames());
+	const auto& sample = m_slicerTParent->m_originalSample;
+	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+	const auto rect = QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height());
+	SampleWaveform::visualize(waveform, brush, rect);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -100,7 +103,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 void SlicerTWaveform::drawSeeker()
 {
 	m_seeker.fill(s_emptyColor);
-	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
 	QPainter brush(&m_seeker);
 
 	brush.setPen(s_sliceColor);
@@ -134,16 +137,19 @@ void SlicerTWaveform::drawSeeker()
 void SlicerTWaveform::drawEditorWaveform()
 {
 	m_editorWaveform.fill(s_emptyColor);
-	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
 
 	QPainter brush(&m_editorWaveform);
-	float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
-	float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
+	size_t startFrame = m_seekerStart * m_slicerTParent->m_originalSample.sampleSize();
+	size_t endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.sampleSize();
 
 	brush.setPen(s_waveformColor);
 	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
-	m_slicerTParent->m_originalSample.visualize(
-		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
+
+	const auto& sample = m_slicerTParent->m_originalSample;
+	const auto waveform = SampleWaveform::Parameters{sample.data() + startFrame, endFrame - startFrame, sample.amplification(), sample.reversed()};
+	const auto rect = QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight);
+	SampleWaveform::visualize(waveform, brush, rect);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -157,7 +163,7 @@ void SlicerTWaveform::drawEditor()
 	QPainter brush(&m_sliceEditor);
 
 	// No sample loaded
-	if (m_slicerTParent->m_originalSample.frames() <= 1)
+	if (m_slicerTParent->m_originalSample.sampleSize() <= 1)
 	{
 		brush.setPen(s_playHighlightColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
@@ -306,7 +312,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		drawEditorWaveform();
 		break;
 	case Qt::MouseButton::LeftButton:
-		if (m_slicerTParent->m_originalSample.frames() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
+		if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
 		// update seeker middle for correct movement
 		m_seekerMiddle = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
 		break;

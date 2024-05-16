@@ -32,8 +32,9 @@
 #include "AutomationEditor.h"
 #include "embed.h"
 #include "PathUtil.h"
-#include "SampleBuffer.h"
 #include "SampleClip.h"
+#include "SampleLoader.h"
+#include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -62,9 +63,11 @@ void SampleClipView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	setToolTip(m_clip->m_sampleBuffer->audioFile() != "" ?
-					PathUtil::toAbsolute(m_clip->m_sampleBuffer->audioFile()) :
-					tr( "Double-click to open sample" ) );
+	setToolTip(
+		!m_clip->m_sample.sampleFile().isEmpty()
+			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+			: tr("Double-click to open sample")
+	);
 }
 
 
@@ -120,12 +123,10 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) );
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
-		Engine::getSong()->setModified();
 	}
 	else
 	{
@@ -179,18 +180,21 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = m_clip->m_sampleBuffer->openAudioFile();
+	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if ( af == m_clip->m_sampleBuffer->audioFile() )
-	{	//Instead of reloading the existing file, just reset the size
-		int length = (int) ( m_clip->m_sampleBuffer->frames() / Engine::framesPerTick() );
-		m_clip->changeLength(length);
+	if (selectedAudioFile.isEmpty()) { return; }
+	
+	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
+	{
+		m_clip->changeLengthToSampleLength();
 	}
 	else
-	{	//Otherwise load the new file as ususal
-		m_clip->setSampleFile( af );
-		Engine::getSong()->setModified();
+	{
+		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		if (sampleBuffer != SampleBuffer::emptyBuffer())
+		{
+			m_clip->setSampleBuffer(sampleBuffer);
+		}
 	}
 }
 
@@ -267,9 +271,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	m_clip->m_sampleBuffer->visualize( p, r, pe->rect() );
 
-	QString name = PathUtil::cleanName(m_clip->m_sampleBuffer->audioFile());
+	const auto& sample = m_clip->m_sample;
+	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+	SampleWaveform::visualize(waveform, p, r);
+
+	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -322,7 +329,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 void SampleClipView::reverseSample()
 {
-	m_clip->sampleBuffer()->setReversed(!m_clip->sampleBuffer()->reversed());
+	m_clip->m_sample.setReversed(!m_clip->m_sample.reversed());
 	Engine::getSong()->setModified();
 	update();
 }

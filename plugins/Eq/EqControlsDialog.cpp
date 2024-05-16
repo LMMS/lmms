@@ -72,18 +72,16 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High-shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR,0,0,0,0,0,0 );
 	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255 ,255, 255), tr( "LP" ) ,0,0,0,0,0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
 
-	static auto s_faderBg = PLUGIN_NAME::getIconPixmap("faderback");
-	static auto s_faderLeds = PLUGIN_NAME::getIconPixmap("faderleds");
-	static auto s_faderKnob = PLUGIN_NAME::getIconPixmap("faderknob");
+	QSize const faderSize(23, 80);
 
-	auto GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &s_faderBg, &s_faderLeds, &s_faderKnob,
-		&controls->m_inPeakL, &controls->m_inPeakR);
+	auto GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &controls->m_inPeakL, &controls->m_inPeakR);
+	GainFaderIn->setFixedSize(faderSize);
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
 	GainFaderIn->setHintText( tr( "Gain" ), "dBv");
 
-	auto GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, &s_faderBg, &s_faderLeds, &s_faderKnob,
-		&controls->m_outPeakL, &controls->m_outPeakR);
+	auto GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, &controls->m_outPeakL, &controls->m_outPeakR);
+	GainFaderOut->setFixedSize(faderSize);
 	GainFaderOut->move( 453, 295);
 	GainFaderOut->setDisplayConversion( false );
 	GainFaderOut->setHintText( tr( "Gain" ), "dBv" );
@@ -92,8 +90,9 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	int distance = 126;
 	for( int i = 1; i < m_parameterWidget->bandCount() - 1; i++ )
 	{
-		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, &s_faderBg, &s_faderLeds,
-			&s_faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
+		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this,
+			m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
+		gainFader->setFixedSize(faderSize);
 		gainFader->move( distance, 295 );
 		distance += 44;
 		gainFader->setMinimumHeight(80);
@@ -124,10 +123,10 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		activeButton->setCheckable(true);
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 
-		QString iconActiveFileName = "bandLabel" + QString::number(i+1);
-		QString iconInactiveFileName = "bandLabel" + QString::number(i+1) + "off";
-		activeButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( iconActiveFileName.toLatin1() ) );
-		activeButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( iconInactiveFileName.toLatin1() ) );
+		const auto iconActiveFileName = "bandLabel" + std::to_string(i + 1);
+		const auto iconInactiveFileName = iconActiveFileName + "off";
+		activeButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(iconActiveFileName));
+		activeButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(iconInactiveFileName));
 		activeButton->move( distance - 2, 276 );
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 

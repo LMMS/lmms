@@ -78,8 +78,6 @@ public:
 	~Lv2Proc() override;
 	void reload();
 	void onSampleRateChanged();
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_valid; }
 
 	/*
 		port access
@@ -173,8 +171,6 @@ protected:
 	void shutdownPlugin();
 
 private:
-	bool m_valid = true;
-
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance = nullptr;
 	Lv2Features m_features;

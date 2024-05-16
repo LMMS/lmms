@@ -22,6 +22,9 @@ FOREACH( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 	SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 ENDFOREACH()
 
+# Import of windows.h breaks min()/max()
+add_definitions(-DNOMINMAX)
+
 ADD_SUBDIRECTORY("${LMMS_SOURCE_DIR}/src/common" common)
 
 if(NOT IS_WIN)
@@ -64,12 +67,6 @@ if(MSVC)
 )
 endif()
 
-
-if(WIN32)
-	find_package(Qt5Core REQUIRED)
-	target_link_libraries(${EXE_NAME} Qt5::Core)
-endif()
-
 if(IS_MINGW)
 	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
 
@@ -96,7 +93,9 @@ if(LMMS_BUILD_WIN32)
 		set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 	endif()
 	if(STRIP)
-		set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+		# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
+		# multiple configurations, combine the OR into a single CONFIG expression.
+		set(STRIP_COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,${NOOP_COMMAND},${STRIP}>")
 	else()
 		set(STRIP_COMMAND "${NOOP_COMMAND}")
 	endif()

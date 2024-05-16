@@ -283,10 +283,9 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	while( !m_clips.empty() )
 	{
-		delete m_clips.front();
-//		m_clips.erase( m_clips.begin() );
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		deleteClips();
 	}
 
 	QDomNode node = element.firstChild();
@@ -636,6 +635,21 @@ void Track::setColor(const std::optional<QColor>& color)
 BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
+}
+
+void Track::setName(const QString& newName)
+{
+	if (m_name != newName)
+	{
+		m_name = newName;
+
+		if (auto song = Engine::getSong())
+		{
+			song->setModified();
+		}
+		
+		emit nameChanged();
+	}
 }
 
 } // namespace lmms

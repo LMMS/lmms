@@ -149,7 +149,7 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return runningFrames() / Engine::audioEngine()->processingSampleRate();
+	return runningFrames() / Engine::audioEngine()->outputSampleRate();
 }
 
 
@@ -220,24 +220,12 @@ Controller * Controller::create( ControllerType _ct, Model * _parent )
 
 Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
-	Controller * c;
-	if( static_cast<ControllerType>(_this.attribute( "type" ).toInt()) == ControllerType::Peak )
-	{
-		c = PeakController::getControllerBySetting( _this );
-	}
-	else
-	{
-		c = create(
-			static_cast<ControllerType>( _this.attribute( "type" ).toInt() ),
-										_parent );
-	}
-
-	if( c != nullptr )
-	{
-		c->restoreState( _this );
-	}
-
-	return( c );
+	const auto controllerType = static_cast<ControllerType>(_this.attribute("type").toInt());
+	auto controller = controllerType == ControllerType::Peak
+		? PeakController::getControllerBySetting(_this)
+		: create(controllerType, _parent);
+	if (controller) { controller->restoreState(_this); }
+	return controller;
 }
 
 

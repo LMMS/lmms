@@ -46,7 +46,7 @@
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
-#include "SampleBuffer.h"
+#include "Sample.h"
 #include "Song.h"
 
 #include "PatchesDialog.h"
@@ -81,7 +81,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
+	Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
 	m_instance( nullptr ),
 	m_instrument( nullptr ),
 	m_filename( "" ),
@@ -323,7 +323,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	const int rate = Engine::audioEngine()->processingSampleRate();
+	const int rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -437,7 +437,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + MARGIN[m_interpolation];
+				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
 			// Load this note's data
@@ -746,7 +746,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->outputSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 

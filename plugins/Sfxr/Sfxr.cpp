@@ -444,7 +444,7 @@ QString SfxrInstrument::nodeName() const
 
 void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	float currentSampleRate = Engine::audioEngine()->processingSampleRate();
+	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 
 	fpp_t frameNum = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
