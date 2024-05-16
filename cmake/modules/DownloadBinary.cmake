@@ -2,12 +2,11 @@
 # and adds it to the PATH
 #
 # Assumes:
-# - ${CMAKE_CURRENT_BINARY_DIR}/[${_name}]
-# - ${CPACK_CURRENT_BINARY_DIR}/[${_name}]
-# - Fallback to $ENV{_tmpdir}/[RANDOM]/[${_name}]
-# - For verbose, set ${COMMAND_ECHO} to STDOUT in calling script
+# - CMAKE_CURRENT_BINARY_DIR/[${_name}]
+# - CPACK_CURRENT_BINARY_DIR/[${_name}]
+# - Fallback to $ENV{TMPDIR}/[RANDOM]/[${_name}]
+# - For verbose, set COMMAND_ECHO to STDOUT in calling script
 #
-# Use with caution, this will impact the PATH
 macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 	if(NOT COMMAND_ECHO)
 		set(_command_echo STDOUT)
@@ -38,14 +37,14 @@ macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 			find_program(MKTEMP mktemp)
 			if(MKTEMP)
 				execute_process(COMMAND mktemp
-							OUTPUT_VARIABLE _working_dir
-							OUTPUT_STRIP_TRAILING_WHITESPACE
-							${_output_quiet}
-							COMMAND_ECHO ${_command_echo})
-                # mktemp is already formatted how we want it
+					OUTPUT_VARIABLE _working_dir
+					OUTPUT_STRIP_TRAILING_WHITESPACE
+					${_output_quiet}
+					COMMAND_ECHO ${_command_echo})
+					# mktemp formats it how we want it
 			else()
 				# Ummm... Linux you can do better!
-                set(_tmpdir "/tmp")
+				set(_tmpdir "/tmp")
             endif()
 		endif()
 		if(NOT DEFINED _working_dir)
@@ -92,17 +91,17 @@ macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 		find_program(_${RESULT_VARIABLE} "${_name}" HINTS "${_working_dir}" REQUIRED)
 	endif()
 
-	# TODO:
-	# - Handle bad binaries that set "$?" to an error code for no good reason
-	# - Handle binaries on Windows expecting "/?" instead of "--help"
+	# Test the binary
+	# - TODO: Add support for bad binaries that set "$?" to an error code for no good reason
+	# - TODO: Add support for Windows binaries expecting "/?" instead of "--help"
 	message(STATUS "Testing that ${_name} works on this system...")
 	set(_test_param "--help")
 
 	execute_process(COMMAND "${_${RESULT_VARIABLE}}" ${_test_param}
-			COMMAND_ECHO ${_command_echo}
-			${_output_quiet}
-			${_error_quiet}
-			COMMAND_ERROR_IS_FATAL ANY)
+		COMMAND_ECHO ${_command_echo}
+		${_output_quiet}
+		${_error_quiet}
+		COMMAND_ERROR_IS_FATAL ANY)
 
 	message(STATUS "The binary \"${_${RESULT_VARIABLE}}\" is now available")
 	set(${RESULT_VARIABLE} "${_${RESULT_VARIABLE}}")
