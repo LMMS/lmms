@@ -38,13 +38,33 @@ set(CPACK_CMAKE_COMMAND "${CMAKE_COMMAND}" PARENT_SCOPE)
 # TODO: Canidate for DetectMachine.cmake
 if(IS_X86_64)
 	set(CPACK_TARGET_ARCH x86_64 PARENT_SCOPE)
+elseif(IS_X86)
+    set(CPACK_TARGET_ARCH i386 PARENT_SCOPE)
 elseif(IS_ARM64)
-	set(CPACK_TARGET_ARCH arm64 PARENT_SCOPE)
+	set(CPACK_TARGET_ARCH aarch64 PARENT_SCOPE)
+elseif(IS_ARM32)
+	set(CPACK_TARGET_ARCH armhf PARENT_SCOPE)
 else()
 	set(CPACK_TARGET_ARCH unknown PARENT_SCOPE)
 endif()
 
-set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeployQt.cmake" PARENT_SCOPE)
+# Build tool "linuxdeployqt" is VERY difficult to work with due to Ubuntu 20.04 requirement
+# - See myriad of complaints and issues here: https://github.com/probonopd/linuxdeployqt/issues/340
+# - Build tool "linuxdeploy" (without the "qt") does NOT have these limitations
+#
+# If viable:
+# - The below "WANT_LINUXDEPLOY_QT" can be removed, we move away from "linuxdeployqt" forever
+#
+# If not viable:
+# - We can keep them both (yuck) and document the toggle/flag in root /CMakeLists.txt
+#
+# TODO: Remove this check; Default to LinuxDeploy; Remove LinuxDeployQt.cmake
+#
+if(WANT_LINUXDEPLOY_QT)
+	set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeployQt.cmake" PARENT_SCOPE)
+else()
+	set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeploy.cmake" PARENT_SCOPE)
+endif()
 
 if(CMAKE_VERSION VERSION_LESS "3.19")
     message(WARNING "DMG creation requires at least CMake 3.19")

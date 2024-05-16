@@ -1,37 +1,53 @@
 # Variables must be prefixed with "CPACK_" to be visible here
-set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.AppDir")
+set(lmms "${CPACK_PROJECT_NAME}")
+set(LMMS "${CPACK_PROJECT_NAME_UCASE}")
+set(ARCH "${CPACK_TARGET_ARCH}")
+set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${LMMS}.AppDir")
 
 # Target AppImage file
 set(APPIMAGE_FILE "${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.AppImage")
+set(APPIMAGE_BEFORE_RENAME "${CPACK_BINARY_DIR}/${LMMS}-${ARCH}.AppImage")
+
+set(DESKTOP_FILE "${APP}/usr/share/applications/${lmms}.desktop")
 
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
 set(VERBOSITY 1)
 # Set to "STDOUT" to show all verbose commands
 set(COMMAND_ECHO NONE)
 
-# Detect release|debug build
-if(NOT CPACK_STRIP_FILES)
-	set(NO_STRIP -no-strip)
-endif()
-
 if(CPACK_DEBUG)
 	set(VERBOSITY 2)
 	set(COMMAND_ECHO STDOUT)
 endif()
 
+include("${CPACK_SOURCE_DIR}/cmake/modules/DownloadBinary.cmake")
 include("${CPACK_SOURCE_DIR}/cmake/modules/CreateSymlink.cmake")
 
-set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/")
-string(APPEND LINUXDEPLOYQT_URL "linuxdeployqt-continuous-${CPACK_TARGET_ARCH}.AppImage")
-set(DESKTOP_FILE "${APP}/usr/share/applications/${CPACK_PROJECT_NAME}.desktop")
-set(LMMS "${CPACK_PROJECT_NAME}")
+# Cleanup CPack "External" json files, old AppImage files
+file(GLOB cleanup "${CPACK_BINARY_DIR}/lmms-*.json"
+	"${CPACK_BINARY_DIR}/${LMMS}-*.AppImage"
+	"${CPACK_BINARY_DIR}/${CPACK_PROJECT_NAME_UCASE}-*.AppImage"
+	"${CPACK_BINARY_DIR}/install_manifest.txt")
+file(REMOVE ${cleanup})
+
+# Download linuxdeploy
+download_binary(LINUXDEPLOY_BIN
+	"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
+	linuxdeploy-${ARCH}.AppImage
+	false)
+
+# Download linuxdeploy-plugin-qt
+download_binary(LINUXDEPLOY_PLUGIN_BIN
+	"https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${ARCH}.AppImage"
+	linuxdeploy-plugin-qt-${ARCH}.AppImage
+	false)
 
 message(STATUS "Creating AppDir ${APP}...")
 
 file(REMOVE_RECURSE "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/include")
 file(MAKE_DIRECTORY "${APP}/usr")
 
-# Setup AppDir structure (/usr/bin, /usr/lib, ... etc)
+# Setup AppDir structure (/usr/bin, /usr/lib, /usr/share... etc)
 file(GLOB files "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/*")
 foreach(_file ${files})
 	get_filename_component(_filename "${_file}" NAME)
@@ -44,65 +60,20 @@ endforeach()
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
 
-# Ensure "linuxdeployqt" binary (in extracted form) is first on the PATH
-set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}/squashfs-root/usr/bin:$ENV{PATH}")
-
-find_program(LINUXDEPLOYQT_BIN linuxdeployqt)
-find_program(APPIMAGETOOL_BIN appimagetool)
-
-set(LINUXDEPLOYQT_APPIMAGE "${CPACK_CURRENT_BINARY_DIR}/linuxdeployqt.AppImage")
-if(NOT LINUXDEPLOYQT_BIN OR NOT APPIMAGETOOL_BIN)
-	message(STATUS "Downloading linuxdeployqt...")
-	file(DOWNLOAD
-		"${LINUXDEPLOYQT_URL}"
-		"${LINUXDEPLOYQT_APPIMAGE}"
-		STATUS DOWNLOAD_STATUS)
-	# Check if download was successful.
-	list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
-	list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
-	if(NOT ${STATUS_CODE} EQUAL 0)
-		file(REMOVE "${LINUXDEPLOYQT_APPIMAGE}")
-		message(FATAL_ERROR "Error downloading ${LINUXDEPLOYQT_URL} ${ERROR_MESSAGE}")
-	endif()
-
-	# Ensure the file is executable
-	file(CHMOD "${LINUXDEPLOYQT_APPIMAGE}" PERMISSIONS
-		OWNER_EXECUTE OWNER_WRITE OWNER_READ
-		GROUP_EXECUTE GROUP_WRITE GROUP_READ)
-	# Extract linuxdeployqt to a predictable location ("bash -c" avoids syntax errors)
-	execute_process(COMMAND bash -c "\"${LINUXDEPLOYQT_APPIMAGE}\" --appimage-extract"
-		WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
-		COMMAND_ECHO ${COMMAND_ECHO}
-		RESULT_VARIABLE STATUS_CODE)
-	# Check if execution was successful
-	if(NOT ${STATUS_CODE} EQUAL 0)
-		file(REMOVE "${LINUXDEPLOYQT_APPIMAGE}")
-		message(FATAL_ERROR "Error code ${STATUS_CODE} executing ${LINUXDEPLOYQT_APPIMAGE}")
-	endif()
-
-	find_program(LINUXDEPLOYQT_BIN linuxdeployqt REQUIRED)
-	find_program(APPIMAGETOOL_BIN appimagetool REQUIRED)
-endif()
-
-# Create a wrapper script which calls the lmms executable
-file(RENAME "${APP}/usr/bin/${LMMS}" "${APP}/usr/bin/${LMMS}.real")
-file(RENAME "${APP}/usr/bin/launch_lmms.sh" "${APP}/usr/bin/${LMMS}")
-# Ensure the file is executable
-file(CHMOD "${APP}/usr/bin/${LMMS}" PERMISSIONS
-	OWNER_EXECUTE OWNER_WRITE OWNER_READ
-	GROUP_EXECUTE GROUP_WRITE GROUP_READ)
+# Ensure "linuxdeploy.AppImage" binary is first on the PATH
+set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}:$ENV{PATH}")
 
 # Symlink executables so linuxdeployqt can find them
 set(BIN_ZYN "${APP}/usr/bin/RemoteZynAddSubFx")
 set(BIN_VST32 "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
 set(BIN_VST64 "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
 
-create_symlink("${APP}/usr/lib/${LMMS}/RemoteZynAddSubFx" "${BIN_ZYN}")
-create_symlink("${APP}/usr/lib/${LMMS}/32/RemoteVstPlugin32.exe.so" "${BIN_VST32}")
-create_symlink("${APP}/usr/lib/${LMMS}/RemoteVstPlugin64.exe.so" "${BIN_VST64}")
+create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${BIN_ZYN}")
+create_symlink("${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so" "${BIN_VST32}")
+create_symlink("${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so" "${BIN_VST64}")
 
 # Deliberatly clobber LD_LIBRARY_PATH per https://github.com/probonopd/linuxdeployqt/issues/129
-set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${LMMS}/:${APP}/usr/lib/${LMMS}/optional")
+set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional")
 
 # Handle wine linking
 if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
@@ -136,14 +107,19 @@ endif()
 
 # Patch desktop file
 file(READ "${DESKTOP_FILE}" DESKTOP_FILE_CONTENTS)
-string(REPLACE "Exec=${LMMS}" "Exec=${LMMS}.real" DESKTOP_FILE_CONTENTS "${DESKTOP_FILE_CONTENTS}")
+#string(REPLACE "Exec=${lmms}" "Exec=${lmms}.real" DESKTOP_FILE_CONTENTS "${DESKTOP_FILE_CONTENTS}")
 file(WRITE "${DESKTOP_FILE}" "${DESKTOP_FILE_CONTENTS}")
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
-# Build list of executables to inform linuxdeployqt about
+# TODO: Fix launch_lmms.sh to point directly to /usr/bin/lmms
+# linuxdeploy supports wrappers natively; linuxdeployqt didn't; keep until linuxdeployqt is removed
+create_symlink("${APP}/usr/bin/${lmms}" "${APP}/usr/bin/${lmms}.real")
+
+# Build list of executables to inform linuxdeploy about
 # e.g. -executable=foo.dylib -executable=bar.dylib
-file(GLOB LIBS "${APP}/usr/lib/${LMMS}/*.so")
-#file(GLOB LADSPA "${APP}/usr/lib/${LMMS}/ladspa/*.so")
+file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
+#file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
+# TODO: Both Linux and Mac have LADPSA plugins in this listing, but why?
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imp_1199.so")
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imbeq_1197.so")
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1193.so")
@@ -154,20 +130,22 @@ list(APPEND LIBS "${BIN_VST32}")
 list(APPEND LIBS "${BIN_VST64}")
 list(SORT LIBS)
 
-# Construct linuxdeployqt parameters
+# Construct linuxdeploy parameters
 foreach(_LIB IN LISTS LIBS)
 	list(APPEND EXECUTABLES "-executable=${_LIB}")
 endforeach()
 
-# Call linuxdeployqt
-message(STATUS "Calling ${LINUXDEPLOYQT_BIN} ${DESKTOP_FILE} [... executables]")
-execute_process(COMMAND "${LINUXDEPLOYQT_BIN}" "${DESKTOP_FILE}" ${EXECUTABLES}
-	-bundle-non-qt-libs
-	-verbose=${VERBOSITY}
-	${NO_STRIP}
+# Call linuxdeploy
+message(STATUS "Calling ${LINUXDEPLOY_BIN} ${DESKTOP_FILE} [... executables]")
+execute_process(COMMAND "${LINUXDEPLOY_BIN}"
+	--appdir "${APP}"
+	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/scalable/apps/${lmms}.svg"
+	--desktop-file "${APP}/usr/share/applications/${lmms}.desktop"
+	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
+	--plugin qt
+	--verbosity ${VERBOSITY}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
-	#-unsupported-allow-new-glibc
 
 # Remove libraries that are normally sytem-provided
 file(GLOB UNWANTED_LIBS
@@ -182,7 +160,7 @@ endforeach()
 
 # Bundle jack to avoid crash for systems without it
 # See https://github.com/LMMS/lmms/pull/4186
-execute_process(COMMAND ldd "${APP}/usr/bin/${LMMS}.real"
+execute_process(COMMAND ldd "${APP}/usr/bin/${lmms}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 			COMMAND_ECHO ${COMMAND_ECHO}
@@ -207,22 +185,19 @@ foreach(line ${LDD_LIST})
 	endif()
 endforeach()
 
-# Point the AppRun to the wrapper script
-file(REMOVE "${APP}/AppRun")
-create_symlink("${APP}/usr/bin/${LMMS}" "${APP}/AppRun")
-
-# Add AppDir icon
-create_symlink("${APP}/${LMMS}.png" "${APP}/.DirIcon")
-
 # Create AppImage
 message(STATUS "Finishing the AppImage...")
-execute_process(COMMAND "${APPIMAGETOOL_BIN}"
-	"${APP}"
-	"${APPIMAGE_FILE}"
+execute_process(COMMAND "${LINUXDEPLOY_BIN}"
+	--appdir "${APP}"
+	--output appimage
+	--verbosity ${VERBOSITY}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
-if(EXISTS "${APPIMAGE_FILE}")
+message(STATUS "AppImage created successfully... renaming...")
+
+if(EXISTS "${APPIMAGE_BEFORE_RENAME}")
+	file(RENAME "${APPIMAGE_BEFORE_RENAME}" "${APPIMAGE_FILE}")
 	message(STATUS "AppImage create: ${APPIMAGE_FILE}")
 else()
 	message(FATAL_ERROR "An error occured generating the AppImage")
