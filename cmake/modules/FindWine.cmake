@@ -27,7 +27,7 @@ LIST(APPEND CMAKE_PREFIX_PATH /opt/wine-stable /opt/wine-devel /opt/wine-staging
 
 FIND_PROGRAM(WINE_CXX
 	NAMES wineg++ winegcc winegcc64 winegcc32 winegcc-stable
-	PATHS /usr/lib/wine
+	PATHS /usr/lib/wine /usr/bin/
 )
 FIND_PROGRAM(WINE_BUILD NAMES winebuild)
 # Detect wine paths and handle linking problems
@@ -83,7 +83,10 @@ IF(WINE_CXX)
 ENDIF()
 
 FIND_PATH(WINE_INCLUDE_DIR wine/exception.h
-	HINTS ${WINE_INCLUDE_HINT}
+	HINTS ${WINE_INCLUDE_HINT} 
+	/usr/bin/wine/ 
+	/opt/wine-staging/lib/wine/i386-unix
+	/usr/include/wine/
 )
 
 SET(_ARCHITECTURE ${CMAKE_LIBRARY_ARCHITECTURE})
