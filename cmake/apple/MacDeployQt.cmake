@@ -1,4 +1,5 @@
 # Variables must be prefixed with "CPACK_" to be visible here
+set(lmms "${CPACK_PROJECT_NAME}")
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
 
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
@@ -55,8 +56,8 @@ file(RENAME "${APP}/Contents/Resources/share" "${APP}/Contents/share")
 file(RENAME "${APP}/Contents/Resources/bin" "${APP}/Contents/bin")
 
 # Move binaries into Contents/MacOS
-file(RENAME "${APP}/Contents/bin/lmms" "${APP}/Contents/MacOS/lmms")
-file(RENAME "${APP}/Contents/lib/lmms/RemoteZynAddSubFx" "${APP}/Contents/MacOS/RemoteZynAddSubFx")
+file(RENAME "${APP}/Contents/bin/${lmms}" "${APP}/Contents/MacOS/${lmms}")
+file(RENAME "${APP}/Contents/lib/${lmms}/RemoteZynAddSubFx" "${APP}/Contents/MacOS/RemoteZynAddSubFx")
 file(REMOVE_RECURSE "${APP}/Contents/bin")
 file(REMOVE_RECURSE "${APP}/Contents/share/man1")
 file(REMOVE_RECURSE "${APP}/Contents/include")
@@ -65,27 +66,27 @@ file(REMOVE_RECURSE "${APP}/Contents/include")
 execute_process(COMMAND install_name_tool -change
 	"@rpath/libcarlabase.dylib"
 	"@loader_path/libcarlabase.dylib"
-	"${APP}/Contents/lib/lmms/libcarlapatchbay.so"
+	"${APP}/Contents/lib/${lmms}/libcarlapatchbay.so"
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 execute_process(COMMAND install_name_tool -change
 	"@rpath/libcarlabase.dylib"
 	"@loader_path/libcarlabase.dylib"
-	"${APP}/Contents/lib/lmms/libcarlarack.so"
+	"${APP}/Contents/lib/${lmms}/libcarlarack.so"
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
 # Build list of executables to inform macdeployqt about
 # e.g. -executable=foo.dylib -executable=bar.dylib
-file(GLOB LIBS "${APP}/Contents/lib/lmms/*.so")
-file(GLOB LADSPA "${APP}/Contents/lib/lmms/ladspa/*.so")
+file(GLOB LIBS "${APP}/Contents/lib/${lmms}/*.so")
+file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
 list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS "${APP}/Contents/MacOS/RemoteZynAddSubFx")
 list(SORT LIBS)
 
 # Construct macdeployqt parameters
-foreach(_LIB IN LISTS LIBS)
-	list(APPEND EXECUTABLES "-executable=${_LIB}")
+foreach(_lib IN LISTS LIBS)
+	list(APPEND EXECUTABLES "-executable=${_lib}")
 endforeach()
 
 # Call macdeployqt
@@ -99,18 +100,18 @@ execute_process(COMMAND "${QTBIN}/macdeployqt" "${APP}" ${EXECUTABLES}
 
 # Remove dummy carla libs, relink to a sane location (e.g. /Applications/Carla.app/...)
 # (must be done after calling macdeployqt)
-file(GLOB CARLALIBS "${APP}/Contents/lib/lmms/libcarla*")
-foreach(_CARLALIB IN LISTS CARLALIBS)
-	foreach(_LIB "${CPACK_CARLA_LIBRARIES}")
-		set(_OLDPATH "../../Frameworks/lib${_LIB}.dylib")
-		set(_NEWPATH "Carla.app/Contents/MacOS/lib${_LIB}.dylib")
+file(GLOB CARLALIBS "${APP}/Contents/lib/${lmms}/libcarla*")
+foreach(_carlalib IN LISTS CARLALIBS)
+	foreach(_lib "${CPACK_CARLA_LIBRARIES}")
+		set(_oldpath "../../Frameworks/lib${_lib}.dylib")
+		set(_newpath "Carla.app/Contents/MacOS/lib${_lib}.dylib")
 		execute_process(COMMAND install_name_tool -change
-			"@loader_path/${_OLDPATH}"
-			"@executable_path/../../../${_NEWPATH}"
-			"${_CARLALIB}"
+			"@loader_path/${_oldpath}"
+			"@executable_path/../../../${_newpath}"
+			"${_carlalib}"
 			COMMAND_ECHO ${COMMAND_ECHO}
 			COMMAND_ERROR_IS_FATAL ANY)
-		file(REMOVE "${APP}/Contents/Frameworks/lib${_LIB}.dylib")
+		file(REMOVE "${APP}/Contents/Frameworks/lib${_lib}.dylib")
 	endforeach()
 endforeach()
 

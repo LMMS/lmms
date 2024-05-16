@@ -64,20 +64,20 @@ set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
 set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}:$ENV{PATH}")
 
 # Symlink executables so linuxdeployqt can find them
-set(BIN_ZYN "${APP}/usr/bin/RemoteZynAddSubFx")
-set(BIN_VST32 "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
-set(BIN_VST64 "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
+set(ZYN_BIN "${APP}/usr/bin/RemoteZynAddSubFx")
+set(VST32_BIN "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
+set(VST64_BIN "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
 
-create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${BIN_ZYN}")
-create_symlink("${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so" "${BIN_VST32}")
-create_symlink("${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so" "${BIN_VST64}")
+create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${ZYN_BIN}")
+create_symlink("${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so" "${VST32_BIN}")
+create_symlink("${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so" "${VST64_BIN}")
 
 # Deliberatly clobber LD_LIBRARY_PATH per https://github.com/probonopd/linuxdeployqt/issues/129
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional")
 
 # Handle wine linking
 if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
-	execute_process(COMMAND ldd "${BIN_VST32}"
+	execute_process(COMMAND ldd "${VST32_BIN}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 			COMMAND_ECHO ${COMMAND_ECHO}
@@ -91,7 +91,7 @@ if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
 	endforeach()
 endif()
 if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
-	execute_process(COMMAND ldd "${BIN_VST64}"
+	execute_process(COMMAND ldd "${VST64_BIN}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 			COMMAND_ECHO ${COMMAND_ECHO}
@@ -111,8 +111,9 @@ file(READ "${DESKTOP_FILE}" DESKTOP_FILE_CONTENTS)
 file(WRITE "${DESKTOP_FILE}" "${DESKTOP_FILE_CONTENTS}")
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
-# TODO: Fix launch_lmms.sh to point directly to /usr/bin/lmms
-# linuxdeploy supports wrappers natively; linuxdeployqt didn't; keep until linuxdeployqt is removed
+# TODO: Keep this symlink until LinuxDeployQt.cmake is removed
+# - First, edit launch_lmms.sh to point directly to /usr/bin/lmms (instead of lmms.real)
+# - Second, delete the below symlink; linuxdeploy supports wrappers natively; linuxdeployqt didn't;
 create_symlink("${APP}/usr/bin/${lmms}" "${APP}/usr/bin/${lmms}.real")
 
 # Build list of executables to inform linuxdeploy about
@@ -125,9 +126,9 @@ list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imbeq_1197.so")
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1193.so")
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1194.so")
 list(APPEND LIBS ${LADSPA})
-list(APPEND LIBS "${BIN_ZYN}")
-list(APPEND LIBS "${BIN_VST32}")
-list(APPEND LIBS "${BIN_VST64}")
+list(APPEND LIBS "${ZYN_BIN}")
+list(APPEND LIBS "${VST32_BIN}")
+list(APPEND LIBS "${VST64_BIN}")
 list(SORT LIBS)
 
 # Construct linuxdeploy parameters
