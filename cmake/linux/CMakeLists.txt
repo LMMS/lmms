@@ -67,5 +67,5 @@ else()
 endif()
 
 if(CMAKE_VERSION VERSION_LESS "3.19")
-    message(WARNING "DMG creation requires at least CMake 3.19")
+    message(WARNING "AppImage creation requires at least CMake 3.19")
 endif()
