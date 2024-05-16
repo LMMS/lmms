@@ -41,6 +41,7 @@ set(CPACK_PROJECT_NAME_UCASE "${PROJECT_NAME_UCASE}" PARENT_SCOPE)
 #    ... manually copy .DS_Store file
 # appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
 string(SUBSTRING "${PROJECT_NAME_UCASE} ${VERSION}" 0 27 APPDMG_VOLUME_NAME)
+# We'll configure this file twice (again in MacDeployQt.cmake once we know CPACK_TEMPORARY_INSTALL_DIRECTORY)
 configure_file("appdmg.json.in" "_appdmg.json.in" @ONLY)
 add_custom_target(appdmg
 	COMMAND touch "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}-appdmg.dmg"
