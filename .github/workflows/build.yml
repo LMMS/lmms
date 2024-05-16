@@ -38,7 +38,7 @@ jobs:
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          cmake .. $CMAKE_OPTS -DWANT_DEBUG_CPACK=true
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -110,8 +110,8 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX="../target" \
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+                -DWANT_DEBUG_CPACK=true \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
