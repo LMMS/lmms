@@ -55,15 +55,6 @@ auto loadPixmap(const QString& name, int width, int height, const char* const* x
 auto getIconPixmap(std::string_view name, int width, int height, const char* const* xpm) -> QPixmap
 {
 	if (name.empty()) { return QPixmap{}; }
-	QString cacheName;
-	if (width > 0 && height > 0)
-	{
-		cacheName = QString("%1_%2_%3").arg(pixmapName).arg(width).arg(height);
-	}
-	else
-	{
-		cacheName = pixmapName;
-	}
 
 	const auto pixmapName = QString::fromUtf8(name.data(), name.size());
 	const auto cacheName = (width > 0 && height > 0)
