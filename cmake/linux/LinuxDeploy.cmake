@@ -63,46 +63,51 @@ set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
 # Ensure "linuxdeploy.AppImage" binary is first on the PATH
 set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}:$ENV{PATH}")
 
-# Symlink executables so linuxdeployqt can find them
-set(ZYN_BIN "${APP}/usr/bin/RemoteZynAddSubFx")
-set(VST32_BIN "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
-set(VST64_BIN "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
-
-create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${ZYN_BIN}")
-
-# Promote the finding of our libraries first
+# Promote finding our own libraries first
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional:$ENV{LD_LIBRARY_PATH}")
 
-# Handle wine linking
-if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
-	execute_process(COMMAND ldd "${VST32_BIN}"
+# Symlink executables so linuxdeploy can find them
+set(ZYN "${APP}/usr/bin/RemoteZynAddSubFx")
+create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${ZYN}")
+
+# Handle wine32 linking
+set(VST32_BEFORE "${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so")
+set(VST32 "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
+if(EXISTS "${VST32_BEFORE}")
+	create_symlink("${VST32_BEFORE}" "${VST32}")
+	execute_process(COMMAND ldd "${VST32}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 			COMMAND_ECHO ${COMMAND_ECHO}
 			COMMAND_ERROR_IS_FATAL ANY)
-	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
+	string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_32_LIBRARY_DIR}:$ENV{LD_LIBRARY_PATH}")
+			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_32_LIBRARY_DIRS}:$ENV{LD_LIBRARY_PATH}")
+			message(STATUS "Prepended ${CPACK_WINE_32_LIBRARY_DIRS} to LD_LIBRARY_PATH: $ENV{LD_LIBRARY_PATH}")
 			continue()
 		endif()
 	endforeach()
-	create_symlink("${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so" "${VST32_BIN}")
 endif()
-if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
-	execute_process(COMMAND ldd "${VST64_BIN}"
+
+# Handle wine64 linking
+set(VST64_BEFORE "${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so")
+set(VST64 "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
+if(EXISTS "${VST64_BEFORE}")
+	create_symlink("${VST64_BEFORE}" "${VST64}")
+	execute_process(COMMAND ldd "${VST64}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 			COMMAND_ECHO ${COMMAND_ECHO}
 			COMMAND_ERROR_IS_FATAL ANY)
-	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
+	string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_64_LIBRARY_DIR}:$ENV{LD_LIBRARY_PATH}")
+			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_64_LIBRARY_DIRS}:$ENV{LD_LIBRARY_PATH}")
+			message(STATUS "Prepended ${CPACK_WINE_64_LIBRARY_DIRS} to LD_LIBRARY_PATH: $ENV{LD_LIBRARY_PATH}")
 			continue()
 		endif()
 	endforeach()
-	create_symlink("${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so" "${VST64_BIN}")
 endif()
 
 # Patch desktop file
@@ -126,9 +131,9 @@ list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imbeq_1197.so")
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1193.so")
 list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1194.so")
 list(APPEND LIBS ${LADSPA})
-list(APPEND LIBS "${ZYN_BIN}")
-list(APPEND LIBS "${VST32_BIN}")
-list(APPEND LIBS "${VST64_BIN}")
+list(APPEND LIBS "${ZYN}")
+list(APPEND LIBS "${VST32}")
+list(APPEND LIBS "${VST64}")
 list(SORT LIBS)
 
 # Construct linuxdeploy parameters

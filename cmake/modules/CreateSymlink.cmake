@@ -25,7 +25,6 @@ macro(create_symlink filepath sympath)
 
 	# Calculate the working directory
 	get_filename_component(sympath_parent "${sympath}" DIRECTORY)
-	message(STATUS "WORKING_DIRECTORY: ${sympath_parent}")
 
 	# Create the symbolic link
 	execute_process(COMMAND "${_cmake_command}" -E create_symlink "${reldir}" "${symname}"

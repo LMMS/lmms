@@ -105,7 +105,7 @@ create_symlink("${APP}/usr/lib/${LMMS}/RemoteVstPlugin64.exe.so" "${BIN_VST64}")
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${LMMS}/:${APP}/usr/lib/${LMMS}/optional")
 
 # Handle wine linking
-if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
+if(EXISTS "{APP}/usr/lib/${LMMS}/32/RemoteVstPlugin32.exe.so")
 	execute_process(COMMAND ldd "${BIN_VST32}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -114,12 +114,12 @@ if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
 	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_32_LIBRARY_DIR}")
+			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_32_LIBRARY_DIRS}")
 			continue()
 		endif()
 	endforeach()
 endif()
-if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
+if(EXISTS "${APP}/usr/lib/${LMMS}/RemoteVstPlugin64.exe.so")
 	execute_process(COMMAND ldd "${BIN_VST64}"
 			OUTPUT_VARIABLE LDD_OUTPUT
 			OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -128,7 +128,7 @@ if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
 	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_64_LIBRARY_DIR}")
+			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_64_LIBRARY_DIRS}")
 			continue()
 		endif()
 	endforeach()
