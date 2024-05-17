@@ -638,7 +638,7 @@ if(WANT_DEBUG_CPACK)
 		set(STATUS_DEBUG_CPACK "Enabled")
 	endif()
 else()
-	set(STATUS_DEBUG_CPACK "Enabled")
+	set(STATUS_DEBUG_CPACK "Disabled")
 endif()
 
 # check for libsamplerate

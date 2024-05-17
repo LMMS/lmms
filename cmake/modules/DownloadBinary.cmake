@@ -8,7 +8,7 @@
 # - For verbose, set COMMAND_ECHO to STDOUT in calling script
 #
 macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
-	if(NOT COMMAND_ECHO)
+	if(NOT COMMAND_ECHO OR "${COMMAND_ECHO}" STREQUAL "NONE")
 		set(_command_echo NONE)
 		set(_output_quiet OUTPUT_QUIET)
 		set(_error_quiet ERROR_QUIET)
@@ -35,6 +35,9 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 			set(_FUSED_CHECKED TRUE)
 			if(_status_code EQUAL 0)
 				set(_FUSE_FOUND true)
+				message("FUSE is available")
+			else()
+				message("FUSE is NOT available, we'll extract the AppImage before using")
 			endif()
 		endif()
 	endif()

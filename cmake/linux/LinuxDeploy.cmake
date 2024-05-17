@@ -14,10 +14,12 @@ set(DESKTOP_FILE "${APP}/usr/share/applications/${lmms}.desktop")
 set(VERBOSITY 1)
 # Set to "STDOUT" to show all verbose commands
 set(COMMAND_ECHO NONE)
+set(OUTPUT_QUIET OUTPUT_QUIET)
 
 if(CPACK_DEBUG)
 	set(VERBOSITY 2)
 	set(COMMAND_ECHO STDOUT)
+	unset(OUTPUT_QUIET)
 endif()
 
 include("${CPACK_SOURCE_DIR}/cmake/modules/DownloadBinary.cmake")
@@ -142,7 +144,7 @@ foreach(_LIB IN LISTS LIBS)
 endforeach()
 
 # Call linuxdeploy
-message(STATUS "Calling ${LINUXDEPLOY_BIN} ${DESKTOP_FILE} [... executables]")
+message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir "${APP}" ... [... executables]")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/scalable/apps/${lmms}.svg"
@@ -150,6 +152,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
 	--verbosity ${VERBOSITY}
+	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
@@ -199,6 +202,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--output appimage
 	--verbosity ${VERBOSITY}
+	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
