@@ -84,9 +84,7 @@ ENDIF()
 
 FIND_PATH(WINE_INCLUDE_DIR wine/exception.h
 	HINTS ${WINE_INCLUDE_HINT} 
-	/usr/bin/wine/ 
-	/opt/wine-staging/lib/wine/i386-unix
-	/usr/include/wine/
+	/usr/include/wine/ # Fallback for not finding the header in variable
 )
 
 SET(_ARCHITECTURE ${CMAKE_LIBRARY_ARCHITECTURE})
