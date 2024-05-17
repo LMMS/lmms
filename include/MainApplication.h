@@ -54,8 +54,13 @@ public:
 #else
 	using FilterResult = qintptr;
 #endif // QT6 check
+<<<<<<< HEAD
 	bool winEventFilter(MSG* msg, FilterResult* result);
 	bool nativeEventFilter(const QByteArray& eventType, void* message, FilterResult* result);
+=======
+	bool winEventFilter(MSG* msg, long* result);
+	bool nativeEventFilter(const QByteArray& eventType, void* message, EventFilter* result);
+>>>>>>> 488e07eb6 (fixed dom's comment)
 #endif // LMMS_BUILD_WIN32
 	inline QString& queuedFile()
 	{
