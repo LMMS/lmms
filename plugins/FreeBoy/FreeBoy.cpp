@@ -231,7 +231,7 @@ float FreeBoyInstrument::desiredReleaseTimeMs() const
 void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 

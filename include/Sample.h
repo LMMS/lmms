@@ -77,8 +77,8 @@ public:
 	};
 
 	Sample() = default;
-	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	Sample(const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	Sample(const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other);
 	explicit Sample(const QString& audioFile);

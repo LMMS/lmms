@@ -8,7 +8,7 @@ jobs:
   linux:
     name: linux
     runs-on: ubuntu-latest
-    container: lmmsci/linux.gcc:18.04
+    container: ghcr.io/lmms/linux.gcc:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -18,12 +18,8 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Update and configure Git
-        run: |
-          add-apt-repository ppa:git-core/ppa
-          apt-get update
-          apt-get --yes install git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
@@ -62,7 +58,7 @@ jobs:
         run: |
           ccache --cleanup
           echo "[ccache config]"
-          ccache --print-config
+          ccache --show-config
           echo "[ccache stats]"
           ccache --show-stats
         env:
@@ -118,7 +114,7 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_INSTALL_PREFIX="../target" \
-                -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build

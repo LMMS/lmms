@@ -605,10 +605,10 @@ void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf( 2.0f, OrganicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				+ (float)m_detuneModel.value() * CENT ) /
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 	m_detuningRight = powf( 2.0f, OrganicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				- (float)m_detuneModel.value() * CENT ) /
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 }
 
 

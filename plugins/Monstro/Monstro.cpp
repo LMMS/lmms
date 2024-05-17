@@ -1447,7 +1447,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::audioEngine()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->outputSampleRate();
 
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;

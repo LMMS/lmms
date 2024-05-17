@@ -140,7 +140,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -231,7 +231,7 @@ OpulenzInstrument::~OpulenzInstrument() {
 void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();

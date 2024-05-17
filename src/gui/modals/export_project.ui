@@ -405,37 +405,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Oversampling:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="oversamplingCB">
-          <item>
-           <property name="text">
-            <string>1x (None)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2x</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>4x</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>8x</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
          <spacer>
           <property name="orientation">
            <enum>Qt::Vertical</enum>

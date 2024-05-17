@@ -5,7 +5,12 @@ ADD_LIBRARY(cmt MODULE ${SOURCES})
 INSTALL(TARGETS cmt LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 
 SET_TARGET_PROPERTIES(cmt PROPERTIES PREFIX "")
-target_compile_options(cmt PRIVATE -Wall -O3 -fno-strict-aliasing)
+
+if(MSVC)
+	target_compile_options(cmt PRIVATE /wd4244 /wd4305)
+else()
+	target_compile_options(cmt PRIVATE -Wall -O3 -fno-strict-aliasing)
+endif()
 
 if(LMMS_BUILD_WIN32)
 	add_custom_command(
@@ -15,6 +20,10 @@ if(LMMS_BUILD_WIN32)
 		VERBATIM
 		COMMAND_EXPAND_LISTS
 	)
+endif()
+
+if(MSVC)
+	target_link_options(cmt PRIVATE "/EXPORT:ladspa_descriptor")
 endif()
 
 if(NOT LMMS_BUILD_WIN32)
