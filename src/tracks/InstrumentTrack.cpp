@@ -233,8 +233,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// We could do that in all other cases as well but the overhead for silence test is bigger than
 	// what we potentially save. While playing a note, a NotePlayHandle-driven instrument will produce sound in
 	// 99 of 100 cases so that test would be a waste of time.
-	if( m_instrument->flags().testFlag( Instrument::Flag::IsSingleStreamed ) &&
-		MixHelpers::isSilent( buf, frames ) )
+	if (m_instrument->isSingleStreamed() && MixHelpers::isSilent(buf, frames))
 	{
 		// at least pass one silent buffer to allow
 		if( m_silentBuffersProcessed )
@@ -263,7 +262,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
-	if( m_instrument->flags().testFlag( Instrument::Flag::IsSingleStreamed ) == false && n != nullptr )
+	if (!m_instrument->isSingleStreamed() && n != nullptr)
 	{
 		const f_cnt_t offset = n->noteOffset();
 		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
@@ -772,17 +771,17 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			}
 		}
 
-		Note * cur_note;
-		while( nit != notes.end() &&
-					( cur_note = *nit )->pos() == cur_start )
+		while (nit != notes.end() && (*nit)->pos() == cur_start)
 		{
+			const auto currentNote = *nit;
+
 			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
 			// plays for the whole length of the sample
-			const auto note_frames = cur_note->type() == Note::Type::Step
+			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
-				: cur_note->length().frames(frames_per_tick);
+				: currentNote->length().frames(frames_per_tick);
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )

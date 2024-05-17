@@ -75,7 +75,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 	void run() override;
 
 	struct sio_hdl *m_hdl;

@@ -226,8 +226,8 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	}
 	else
 	{
-		InstantiationHook instantiationHook;
-		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
+		auto instantiationHook = reinterpret_cast<InstantiationHook>(pi.library->resolve("lmms_plugin_main"));
+		if (instantiationHook)
 		{
 			inst = instantiationHook(parent, data);
 			if(!inst) {

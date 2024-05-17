@@ -78,20 +78,26 @@ void LcdWidget::setValue(int value)
 		}
 	}
 
-	m_display = s;
+	if (m_display != s)
+	{
+		m_display = s;
 
-	update();
+		update();
+	}
 }
 
 void LcdWidget::setValue(float value)
 {
-	if (value < 0 && value > -1)
+	if (-1 < value && value < 0)
 	{
 		QString s = QString::number(static_cast<int>(value));
 		s.prepend('-');
 		
-		m_display = s;
-		update();
+		if (m_display != s)
+		{
+			m_display = s;
+			update();
+		}
 	}
 	else
 	{
@@ -203,7 +209,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Label
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6.5 ) );
+		p.setFont(adjustedToPixelSize(p.font(), 10));
 		p.setPen( textShadowColor() );
 		p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1,
@@ -255,7 +261,7 @@ void LcdWidget::updateSize()
 		setFixedSize(
 			qMax<int>(
 				m_cellWidth * m_numDigits + marginX1 + marginX2,
-				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)
+				horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), 10)), m_label)
 			),
 			m_cellHeight + (2 * marginY) + 9
 		);

@@ -1,0 +1,90 @@
+# yamllint disable-file rule:line-length
+name: Bug Report
+description: File a bug report to help us improve
+labels:
+  - bug
+body:
+  - type: input
+    id: system-information
+    attributes:
+      label: System Information
+      description: |
+        - The operating system you use to run LMMS.
+        - When relevant, also include your hardware information.
+      placeholder: ex. Fedora Linux 39, KDE Plasma 5.27.10 - 13th Gen Intel® Core™ i9-13950HX, 32GB RAM
+    validations:
+      required: true
+  - type: input
+    id: affected-version
+    attributes:
+      label: LMMS Version(s)
+      description: |
+        - The version of LMMS affected by the bug.
+        - Can be an official version number, nightly release identifier, or commit hash.
+        - The version number can be found under the Help > About menu.
+      placeholder: ex. 1.2.2, 1.3.0-alpha.1.518+gdd53bec31, 2d185df
+    validations:
+      required: true
+  - type: input
+    id: working-version
+    attributes:
+      label: Most Recent Working Version
+      description: |
+        - If there is a previous version of LMMS that did not exhibit the bug, include it here.
+      placeholder: ex. 1.2.2, 1.3.0-alpha.1.518+gdd53bec31, 2d185df
+    validations:
+      required: false
+  - type: textarea
+    id: bug-summary
+    attributes:
+      label: Bug Summary
+      description: Briefly describe the bug.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected Behaviour
+      description: Describe what should have happened.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps To Reproduce
+      description: |
+        - Describe the minimum set of steps required to reproduce this bug.
+        - If you included a minimum reproducible project below, you can describe here how it should be used.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        - Copy and paste any relevant log output here.
+      value: |
+        <details>
+        <summary>Click to expand</summary>
+        <pre>
+          <!-- paste logs here -->
+        </pre>
+        </details>
+    validations:
+      required: false
+  - type: textarea
+    id: supporting-files
+    attributes:
+      label: Screenshots / Minimum Reproducible Project
+      description: |
+        - Upload any screenshots showing the bug in action.
+        - If possible, also include a .mmp/.mmpz project containing the simplest possible setup needed to reproduce the bug.
+
+        ***Note:** To upload a project file to GitHub, it will need to be placed in a .zip archive.*
+  - type: checkboxes
+    id: search-for-existing
+    attributes:
+      label: Please search the issue tracker for existing bug reports before submitting your own.
+      options:
+        - label: I have searched all existing issues and confirmed that this is not a duplicate.
+          required: true

@@ -452,7 +452,6 @@ void ManageVSTEffectView::syncPlugin()
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
-	float f_value;
 
 	for( int i = 0; i < m_vi2->paramCount; i++ )
 	{
@@ -463,7 +462,7 @@ void ManageVSTEffectView::syncPlugin()
 		{
 			sprintf(paramStr.data(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
-			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
+			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}

@@ -25,9 +25,10 @@
 #ifndef LMMS_AUTOMATABLE_MODEL_H
 #define LMMS_AUTOMATABLE_MODEL_H
 
+#include <cmath>
 #include <QMap>
 #include <QMutex>
-#include <cmath>
+#include <QRegularExpression>
 
 #include "JournallingObject.h"
 #include "Model.h"

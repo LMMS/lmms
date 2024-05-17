@@ -25,47 +25,19 @@
 #ifndef LMMS_GUI_TEMPLATES_H
 #define LMMS_GUI_TEMPLATES_H
 
-#include "lmmsconfig.h"
-
 #include <QApplication>
 #include <QFont>
-#include <QDesktopWidget>
 
-namespace lmms
+namespace lmms::gui
 {
 
-
-// return DPI-independent font-size - font with returned font-size has always
-// the same size in pixels
-template<int SIZE>
-inline QFont pointSize( QFont _f )
+// Convenience method to set the font size in pixels
+inline QFont adjustedToPixelSize(QFont font, int size)
 {
-	static const float DPI = 96;
-#ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( ((float) SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#else
-	_f.setPointSizeF( (float) SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#endif
-	return( _f );
+	font.setPixelSize(size);
+	return font;
 }
 
-
-inline QFont pointSizeF( QFont _f, float SIZE )
-{
-	static const float DPI = 96;
-#ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( (SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#else
-	_f.setPointSizeF( SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#endif
-	return( _f );
-}
-
-
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // LMMS_GUI_TEMPLATES_H

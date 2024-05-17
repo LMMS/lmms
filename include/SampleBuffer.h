@@ -56,7 +56,7 @@ public:
 	SampleBuffer(const QString& base64, int sampleRate);
 	SampleBuffer(std::vector<sampleFrame> data, int sampleRate);
 	SampleBuffer(
-		const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+		const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
@@ -91,7 +91,7 @@ public:
 private:
 	std::vector<sampleFrame> m_data;
 	QString m_audioFile;
-	sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
 };
 
 } // namespace lmms

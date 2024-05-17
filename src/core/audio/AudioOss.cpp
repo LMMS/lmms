@@ -34,7 +34,6 @@
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -255,41 +254,6 @@ void AudioOss::stopProcessing()
 	stopProcessingThread( this );
 }
 
-
-
-
-void AudioOss::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		unsigned int value = sampleRate();
-		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
-		{
-			perror( "SNDCTL_DSP_SPEED" );
-			printf( "Couldn't set audio frequency\n" );
-			return;
-		}
-		if( value != sampleRate() )
-		{
-			value = audioEngine()->baseSampleRate();
-			if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
-			{
-				perror( "SNDCTL_DSP_SPEED" );
-				printf( "Couldn't set audio frequency\n" );
-				return;
-			}
-			setSampleRate( value );
-		}
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioOss::run()
 {
 	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
@@ -303,7 +267,7 @@ void AudioOss::run()
 			break;
 		}
 
-		int bytes = convertToS16( temp, frames, audioEngine()->masterGain(), outbuf, m_convertEndian );
+		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;

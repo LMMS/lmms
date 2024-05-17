@@ -32,7 +32,6 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 namespace lmms
 {
@@ -192,37 +191,6 @@ void AudioSdl::stopProcessing()
 	}
 }
 
-
-
-
-void AudioSdl::applyQualitySettings()
-{
-	// Better than if (0)
-#if 0
-	if( 0 )//hqAudio() )
-	{
-		SDL_CloseAudio();
-
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		m_audioHandle.freq = sampleRate();
-
-		SDL_AudioSpec actual; 
-
-		// open the audio device, forcing the desired format
-		if( SDL_OpenAudio( &m_audioHandle, &actual ) < 0 )
-		{
-			qCritical( "Couldn't open SDL-audio: %s\n", SDL_GetError() );
-		}
-	}
-#endif
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 {
 	auto _this = static_cast<AudioSdl*>(_udata);
@@ -261,13 +229,6 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 										  m_currentBufferFramesCount
 										- m_currentBufferFramePos);
 
-		const float gain = audioEngine()->masterGain();
-		for (uint f = 0; f < min_frames_count; f++)
-		{
-			(m_outBuf + m_currentBufferFramePos)[f][0] *= gain;
-			(m_outBuf + m_currentBufferFramePos)[f][1] *= gain;
-		}
-
 		memcpy( _buf, m_outBuf + m_currentBufferFramePos, min_frames_count*sizeof(sampleFrame) );
 		_buf += min_frames_count*sizeof(sampleFrame);
 		_len -= min_frames_count*sizeof(sampleFrame);
@@ -291,10 +252,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 			m_convertedBufSize = frames * channels()
 						* sizeof( int_sample_t );
 
-			convertToS16( m_outBuf, frames,
-						audioEngine()->masterGain(),
-						(int_sample_t *)m_convertedBuf,
-						m_outConvertEndian );
+			convertToS16(m_outBuf, frames, reinterpret_cast<int_sample_t*>(m_convertedBuf), m_outConvertEndian);
 		}
 		const int min_len = std::min(_len, m_convertedBufSize
 							- m_convertedBufPos);
