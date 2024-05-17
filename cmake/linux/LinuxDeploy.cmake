@@ -69,11 +69,9 @@ set(VST32_BIN "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
 set(VST64_BIN "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
 
 create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${ZYN_BIN}")
-create_symlink("${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so" "${VST32_BIN}")
-create_symlink("${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so" "${VST64_BIN}")
 
-# Deliberatly clobber LD_LIBRARY_PATH per https://github.com/probonopd/linuxdeployqt/issues/129
-set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional")
+# Promote the finding of our libraries first
+set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional:$ENV{LD_LIBRARY_PATH}")
 
 # Handle wine linking
 if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
@@ -85,10 +83,11 @@ if(IS_DIRECTORY "${CPACK_WINE_32_LIBRARY_DIR}")
 	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_32_LIBRARY_DIR}")
+			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_32_LIBRARY_DIR}:$ENV{LD_LIBRARY_PATH}")
 			continue()
 		endif()
 	endforeach()
+	create_symlink("${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so" "${VST32_BIN}")
 endif()
 if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
 	execute_process(COMMAND ldd "${VST64_BIN}"
@@ -99,10 +98,11 @@ if(IS_DIRECTORY "${CPACK_WINE_64_LIBRARY_DIR}")
 	string(replace "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CPACK_WINE_64_LIBRARY_DIR}")
+			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_64_LIBRARY_DIR}:$ENV{LD_LIBRARY_PATH}")
 			continue()
 		endif()
 	endforeach()
+	create_symlink("${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so" "${VST64_BIN}")
 endif()
 
 # Patch desktop file
