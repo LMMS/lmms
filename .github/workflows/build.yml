@@ -14,6 +14,7 @@ jobs:
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
+        -DWANT_DEBUG_CPACK=true
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -38,7 +39,7 @@ jobs:
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DWANT_DEBUG_CPACK=true
+          cmake .. $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Run tests

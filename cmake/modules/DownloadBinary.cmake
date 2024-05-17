@@ -9,12 +9,13 @@
 #
 macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 	if(NOT COMMAND_ECHO)
-		set(_command_echo STDOUT)
+		set(_command_echo NONE)
 		set(_output_quiet OUTPUT_QUIET)
+		set(_error_quiet ERROR_QUIET)
 	else()
 		set(_command_echo "${COMMAND_ECHO}")
 		set(_output_quiet "")
-		set(_error_quiet "ERROR_QUIET")
+		set(_error_quiet "")
 	endif()
 
 	# Determine a suitable working directory
