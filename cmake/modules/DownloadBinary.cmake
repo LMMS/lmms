@@ -1,5 +1,5 @@
 # Downloads an executable from the provided URL for use in a build system
-# and adds it to the PATH
+# and optionally prepends it to the PATH
 #
 # Assumes:
 # - CMAKE_CURRENT_BINARY_DIR/[${_name}]
@@ -7,7 +7,7 @@
 # - Fallback to $ENV{TMPDIR}/[RANDOM]/[${_name}]
 # - For verbose, set COMMAND_ECHO to STDOUT in calling script
 #
-macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
+macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 	if(NOT COMMAND_ECHO)
 		set(_command_echo NONE)
 		set(_output_quiet OUTPUT_QUIET)
@@ -78,7 +78,7 @@ macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 		endif()
 	endif()
 
-	if(_append_to_path)
+	if(_prepend_to_path)
 		# Ensure the PATH is configured
 		string(FIND "$ENV{PATH}" "${_working_dir}" _pathloc)
 		if(NOT $_pathloc EQUAL 0)
