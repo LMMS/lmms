@@ -49,12 +49,12 @@ public:
 	MainApplication(int& argc, char** argv);
 	bool event(QEvent* event) override;
 #ifdef LMMS_BUILD_WIN32
-	bool winEventFilter(MSG* msg, long* result);
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
-	using EventFilter = long;
+	using FilterResult = long;
 #else
-	using EventFilter = qintptr;
+	using FilterResult = qintptr;
 #endif // QT6 check
+	bool winEventFilter(MSG* msg, long* result);
 	bool nativeEventFilter(const QByteArray& eventType, void* message, EventFilter* result);
 #endif // LMMS_BUILD_WIN32
 	inline QString& queuedFile()
