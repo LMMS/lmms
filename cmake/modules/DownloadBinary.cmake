@@ -18,6 +18,27 @@ macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 		set(_error_quiet "")
 	endif()
 
+	# Check if fuse is needed
+	if("${RESULT_VARIABLE}" MATCHES "\\.AppImage$" OR "${_name}" MATCHES "\\.AppImage$")
+		message("Checking if FUSE is available to the kernel...")
+		set(_${RESULT_VARIABLE}_NEEDS_FUSE true)
+    endif()
+
+	# Check if fuse is available
+    if(_${RESULT_VARIABLE}_NEEDS_FUSE)
+    	# Ensure we only check on first call
+		if(NOT _FUSE_CHECKED)
+			execute_process(COMMAND fusermount -V
+				${_output_quiet}
+				COMMAND_ECHO ${_command_echo}
+				RESULT_VARIABLE _status_code)
+			set(_FUSED_CHECKED TRUE)
+			if(_status_code EQUAL 0)
+				set(_FUSE_FOUND true)
+			endif()
+		endif()
+	endif()
+
 	# Determine a suitable working directory
 	if(CMAKE_CURRENT_BINARY_DIR)
 		# Assume we're called from configure step
@@ -70,7 +91,7 @@ macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 
 	set(_binary_path "${_working_dir}/${_name}")
 	if(NOT _${RESULT_VARIABLE})
-		message(STATUS "Downloading ${_name}...")
+		message(STATUS "Downloading ${_name} from ${_url}...")
 		file(DOWNLOAD
 			"${_url}"
 			"${_binary_path}"
@@ -90,6 +111,31 @@ macro(download_binary RESULT_VARIABLE _url _name _append_to_path)
 
 		# Ensure it's found
 		find_program(_${RESULT_VARIABLE} "${_name}" HINTS "${_working_dir}" REQUIRED)
+	endif()
+
+	# We need to create a subdirectory for this binary and symlink it's AppRun to where it's expected
+	if(_${RESULT_VARIABLE}_NEEDS_FUSE AND NOT _FUSE_FOUND)
+		if(NOT COMMAND create_symlink)
+			include("${CMAKE_SOURCE_DIR}/cmake/modules/CreateSymlink.cmake")
+		endif()
+
+		# extract appimage
+		execute_process(COMMAND "${_${RESULT_VARIABLE}}" --appimage-extract
+			WORKING_DIRECTORY "${_working_dir}"
+			COMMAND_ECHO ${_command_echo}
+			${_output_quiet}
+			${_error_quiet}
+			COMMAND_ERROR_IS_FATAL ANY)
+
+		# move extracted files to dedicated location (e.g. "linuxdeploy-x86_64.AppImage")
+		file(MAKE_DIRECTORY "${_working_dir}/.${_name}/")
+		file(RENAME "${_working_dir}/squashfs-root/" "${_working_dir}/.${_name}/squashfs-root/")
+
+		# remove the unusable binary
+		file(REMOVE "${_${RESULT_VARIABLE}}")
+
+		# symlink the expected binary name to the AppRun file
+		create_symlink("${_working_dir}/.${_name}/squashfs-root/AppRun" "${_${RESULT_VARIABLE}}")
 	endif()
 
 	# Test the binary
