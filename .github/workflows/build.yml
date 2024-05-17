@@ -14,7 +14,6 @@ jobs:
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-        -DWANT_DEBUG_CPACK=true
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -112,7 +111,6 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
-                -DWANT_DEBUG_CPACK=true \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
