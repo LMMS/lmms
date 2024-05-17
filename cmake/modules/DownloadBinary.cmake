@@ -127,7 +127,7 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 			${_error_quiet}
 			COMMAND_ERROR_IS_FATAL ANY)
 
-		# move extracted files to dedicated location (e.g. "linuxdeploy-x86_64.AppImage")
+		# move extracted files to dedicated location (e.g. ".linuxdeploy-x86_64.AppImage/squashfs-root/")
 		file(MAKE_DIRECTORY "${_working_dir}/.${_name}/")
 		file(RENAME "${_working_dir}/squashfs-root/" "${_working_dir}/.${_name}/squashfs-root/")
 

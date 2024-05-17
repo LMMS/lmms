@@ -192,6 +192,8 @@ foreach(line ${LDD_LIST})
 endforeach()
 
 # Create AppImage
+# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
+set(ENV{ARCH} "${ARCH}")
 message(STATUS "Finishing the AppImage...")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
