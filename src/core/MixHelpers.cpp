@@ -98,7 +98,6 @@ bool sanitize( SampleFrame * src, int frames )
 		return false;
 	}
 
-	bool found = false;
 	for (int f = 0; f < frames; ++f)
 	{
 		auto& currentFrame = src[f];
@@ -110,8 +109,11 @@ bool sanitize( SampleFrame * src, int frames )
 					printf("Bad data, clearing buffer. frame: ");
 					printf("%d: value %f, %f\n", f, currentFrame.left(), currentFrame.right());
 			#endif
-			found = true;
-			break;
+
+			// Clear the whole buffer if a problem is found
+			zeroSampleFrames(src, frames);
+
+			return true;
 		}
 		else
 		{
@@ -119,13 +121,7 @@ bool sanitize( SampleFrame * src, int frames )
 		}
 	};
 
-	if (found)
-	{
-		// Clear the whole buffer if a problem is found
-		zeroSampleFrames(src, frames);
-	}
-
-	return found;
+	return false;
 }
 
 
