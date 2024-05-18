@@ -119,7 +119,7 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 	# We need to create a subdirectory for this binary and symlink it's AppRun to where it's expected
 	if(_${RESULT_VARIABLE}_NEEDS_FUSE AND NOT _FUSE_FOUND)
 		if(NOT COMMAND create_symlink)
-			include("${CMAKE_SOURCE_DIR}/cmake/modules/CreateSymlink.cmake")
+			include(CreateSymlink)
 		endif()
 
 		# extract appimage

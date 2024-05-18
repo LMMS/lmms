@@ -19,7 +19,7 @@ if(CPACK_DEBUG)
 	set(COMMAND_ECHO STDOUT)
 endif()
 
-include("${CPACK_SOURCE_DIR}/cmake/modules/CreateSymlink.cmake")
+include(CreateSymlink)
 
 set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/")
 string(APPEND LINUXDEPLOYQT_URL "linuxdeployqt-continuous-${CPACK_TARGET_ARCH}.AppImage")

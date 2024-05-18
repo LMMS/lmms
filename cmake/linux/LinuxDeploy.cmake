@@ -22,8 +22,8 @@ if(CPACK_DEBUG)
 	unset(OUTPUT_QUIET)
 endif()
 
-include("${CPACK_SOURCE_DIR}/cmake/modules/DownloadBinary.cmake")
-include("${CPACK_SOURCE_DIR}/cmake/modules/CreateSymlink.cmake")
+include(DownloadBinary)
+include(CreateSymlink)
 
 # Cleanup CPack "External" json files, old AppImage files
 file(GLOB cleanup "${CPACK_BINARY_DIR}/lmms-*.json"
