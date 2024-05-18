@@ -205,7 +205,7 @@ float Instrument::computeReleaseTimeMsByFrameCount(f_cnt_t frames) const
 
 sample_rate_t Instrument::getSampleRate() const
 {
-	return Engine::audioEngine()->processingSampleRate();
+	return Engine::audioEngine()->outputSampleRate();
 }
 
 

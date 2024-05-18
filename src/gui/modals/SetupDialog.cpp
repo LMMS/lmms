@@ -1223,7 +1223,7 @@ void SetupDialog::setBufferSize(int value)
 
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
-		1000.0f * m_bufferSize / Engine::audioEngine()->processingSampleRate(), 0, 'f', 1));
+		1000.0f * m_bufferSize / Engine::audioEngine()->outputSampleRate(), 0, 'f', 1));
 	updateBufferSizeWarning(m_bufferSize);
 }
 

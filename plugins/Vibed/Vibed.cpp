@@ -206,7 +206,7 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 	if (!n->m_pluginData)
 	{
 		const auto newContainer = new StringContainer{n->frequency(),
-			Engine::audioEngine()->processingSampleRate(), s_sampleLength};
+			Engine::audioEngine()->outputSampleRate(), s_sampleLength};
 
 		n->m_pluginData = newContainer;
 

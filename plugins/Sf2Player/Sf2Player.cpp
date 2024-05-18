@@ -574,7 +574,7 @@ void Sf2Instrument::reloadSynth()
 	double tempRate;
 
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->processingSampleRate() );
+	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->outputSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
@@ -616,7 +616,7 @@ void Sf2Instrument::reloadSynth()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() )
+	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
 		m_synthMutex.lock();
 		if( m_srcState != nullptr )
@@ -872,10 +872,10 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
-	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() &&
+	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() &&
 							m_srcState != nullptr )
 	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->processingSampleRate();
+		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
 #ifdef __GNUC__
 		sampleFrame tmp[f];
 #else

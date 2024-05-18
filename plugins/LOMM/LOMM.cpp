@@ -50,7 +50,7 @@ extern "C"
 LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&lomm_plugin_descriptor, parent, key),
 	m_lommControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp1(m_sampleRate),
 	m_lp2(m_sampleRate),
 	m_hp1(m_sampleRate),
@@ -76,7 +76,7 @@ LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 
 void LOMMEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_lp1.setSampleRate(m_sampleRate);
 	m_lp2.setSampleRate(m_sampleRate);
 	m_hp1.setSampleRate(m_sampleRate);

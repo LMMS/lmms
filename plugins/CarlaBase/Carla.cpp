@@ -259,7 +259,7 @@ uint32_t CarlaInstrument::handleGetBufferSize() const
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::audioEngine()->processingSampleRate();
+    return Engine::audioEngine()->outputSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const

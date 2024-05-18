@@ -323,7 +323,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	const int rate = Engine::audioEngine()->processingSampleRate();
+	const int rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -746,7 +746,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->outputSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
