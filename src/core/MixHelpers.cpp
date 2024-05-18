@@ -123,11 +123,7 @@ bool sanitize( SampleFrame * src, int frames )
 	if (found)
 	{
 		// Clear the whole buffer if a problem is found
-		for (int f = 0; f < frames; ++f)
-		{
-			auto & currentFrame = src[f];
-			currentFrame = SampleFrame();
-		}
+		zeroSampleFrames(src, frames);
 	}
 
 	return found;
