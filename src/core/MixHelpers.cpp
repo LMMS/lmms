@@ -115,7 +115,6 @@ bool sanitize( SampleFrame * src, int frames )
 		}
 		else
 		{
-			// TODO What is this supposed to do? This corresponds to saying: "Pushing a signal with 60 dbFS is no problem".
 			currentFrame.clamp(sample_t(-1000.0), sample_t(1000.0));
 		}
 	};
