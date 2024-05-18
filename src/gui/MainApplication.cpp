@@ -86,7 +86,7 @@ bool MainApplication::event(QEvent* event)
 }
 
 #ifdef LMMS_BUILD_WIN32
-// Should have been a part of nativeEventFilter but keeping here for readability
+// Helper function for nativeEventFilter
 bool MainApplication::winEventFilter(MSG* msg, FilterResult* result)
 {
 	switch(msg->message)
