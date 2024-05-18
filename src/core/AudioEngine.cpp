@@ -554,21 +554,6 @@ void AudioEngine::clearInternal()
 
 
 
-SampleFrame AudioEngine::getPeakValues(SampleFrame* ab, const f_cnt_t frames) const
-{
-	SampleFrame peaks;
-
-	for (f_cnt_t f = 0; f < frames; ++f)
-	{
-		peaks.max(ab[f].abs());
-	}
-
-	return peaks;
-}
-
-
-
-
 void AudioEngine::changeQuality(const struct qualitySettings & qs)
 {
 	// don't delete the audio-device

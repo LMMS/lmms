@@ -168,7 +168,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 		float masterOutput = audioEngine->masterGain();
 
 		const fpp_t frames = audioEngine->framesPerPeriod();
-		SampleFrame peakValues = audioEngine->getPeakValues(m_buffer, frames);
+		SampleFrame peakValues = getAbsPeakValues(m_buffer, frames);
 
 		auto const leftChannelClips = clips(peakValues.left() * masterOutput);
 		auto const rightChannelClips = clips(peakValues.right() * masterOutput);

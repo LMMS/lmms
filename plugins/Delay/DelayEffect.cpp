@@ -131,7 +131,7 @@ bool DelayEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		currentFrame *= m_outGain;
 
 		// Calculate peak of wet signal
-		peak.max(currentFrame);
+		peak = peak.absMax(currentFrame);
 
 		// Dry/wet mix
 		currentFrame = dryS * d + currentFrame * w;

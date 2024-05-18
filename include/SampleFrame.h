@@ -155,17 +155,12 @@ public:
 		return SampleFrame{std::abs(this->left()), std::abs(this->right())};
 	}
 
-	void max(const SampleFrame& other)
+	SampleFrame absMax(const SampleFrame& other)
 	{
-		if (other.left() > left())
-		{
-			setLeft(other.left());
-		}
+		const auto a = abs();
+		const auto b = other.abs();
 
-		if (other.right() > right())
-		{
-			setRight(other.right());
-		}
+		return SampleFrame(std::max(a.left(), b.left()), std::max(a.right(), b.right()));
 	}
 
 	sample_t average() const
@@ -202,6 +197,18 @@ inline void zeroSampleFrames(SampleFrame* buffer, fpp_t frames)
 	// memset(buffer, 0, sizeof(SampleFrame) * frames);
 
 	std::fill(buffer, buffer + frames, SampleFrame());
+}
+
+inline SampleFrame getAbsPeakValues(SampleFrame* buffer, fpp_t frames)
+{
+	SampleFrame peaks;
+
+	for (f_cnt_t i = 0; i < frames; ++i)
+	{
+		peaks = peaks.absMax(buffer[i]);
+	}
+
+	return peaks;
 }
 
 inline void copyToSampleFrames(SampleFrame* target, const float* source, fpp_t frames)

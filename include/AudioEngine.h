@@ -266,9 +266,6 @@ public:
 	}
 
 
-	SampleFrame getPeakValues(SampleFrame* ab, const f_cnt_t _frames) const;
-
-
 	bool criticalXRuns() const;
 
 	inline bool hasFifoWriter() const
