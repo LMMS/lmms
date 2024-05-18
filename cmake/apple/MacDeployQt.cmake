@@ -23,6 +23,12 @@ if(CPACK_DEBUG)
 	set(COMMAND_ECHO STDOUT)
 endif()
 
+# Qt6: Fix @rpath bug https://github.com/orgs/Homebrew/discussions/2823
+include(CreateSymlink)
+get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
+get_filename_component(QTDIR "${QTBIN}" DIRECTORY)
+create_symlink("${QTDIR}/lib" "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/lib")
+
 execute_process(COMMAND convert
 	"${CPACK_CURRENT_SOURCE_DIR}/*.png"
 	"${CPACK_CURRENT_BINARY_DIR}/background.tiff"
