@@ -46,7 +46,7 @@ public:
 	{
 	}
 
-	SampleFrame(sample_t value) : SampleFrame(value, value)
+	explicit SampleFrame(sample_t value) : SampleFrame(value, value)
 	{
 	}
 
@@ -103,14 +103,6 @@ public:
 	const sample_t& operator[](size_t index) const
 	{
 		return m_samples[index];
-	}
-
-	SampleFrame& operator=(float v)
-	{
-		left() = v;
-		right() = v;
-
-		return *this;
 	}
 
 	SampleFrame operator+(const SampleFrame& other) const
