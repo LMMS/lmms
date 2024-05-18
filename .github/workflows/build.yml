@@ -50,7 +50,7 @@ jobs:
           cmake --build build --target install
           cmake --build build --target appimage
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: build/lmms-*.AppImage
@@ -128,7 +128,7 @@ jobs:
           cmake --build build --target install
           cmake --build build --target dmg
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos
           path: build/lmms-*.dmg
@@ -189,7 +189,7 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mingw${{ matrix.arch }}
           path: build/lmms-*.exe
@@ -281,7 +281,7 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: msvc-${{ matrix.arch }}
           path: build\lmms-*.exe
