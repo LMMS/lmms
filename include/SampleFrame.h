@@ -201,10 +201,7 @@ inline void zeroSampleFrames(SampleFrame* buffer, fpp_t frames)
 	// The equivalent of the following operation which yields compiler warnings
 	// memset(buffer, 0, sizeof(SampleFrame) * frames);
 
-	for (fpp_t i = 0; i < frames; ++i)
-	{
-		buffer[i] = SampleFrame();
-	}
+	std::fill(buffer, buffer + frames, SampleFrame());
 }
 
 inline void copyToSampleFrames(SampleFrame* target, const float* source, fpp_t frames)
