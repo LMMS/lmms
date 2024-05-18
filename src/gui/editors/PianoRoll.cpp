@@ -4927,7 +4927,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
-	m_chordComboBox->setFixedSize( 125, ComboBox::DEFAULT_HEIGHT );
+	m_chordComboBox->setFixedSize(125, ComboBox::DEFAULT_HEIGHT);
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// setup snap-stuff
