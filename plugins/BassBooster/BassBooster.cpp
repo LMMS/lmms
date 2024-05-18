@@ -103,7 +103,7 @@ bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 		// Dry/wet mix
 		currentFrame = currentFrame * d + s * w;
 
-		outSum += currentFrame.scalarProduct(currentFrame);
+		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
 	checkGate( outSum / frames );

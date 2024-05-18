@@ -145,9 +145,9 @@ public:
 		right() *= other.right();
 	}
 
-	sample_t scalarProduct(const SampleFrame& other) const
+	sample_t sumOfSquaredAmplitudes() const
 	{
-		return left() * other.left() + right() * other.right();
+		return left() * left() + right() * right();
 	}
 
 	SampleFrame abs() const

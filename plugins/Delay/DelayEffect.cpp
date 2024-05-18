@@ -136,7 +136,7 @@ bool DelayEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		// Dry/wet mix
 		currentFrame = dryS * d + currentFrame * w;
 		
-		outSum += currentFrame.scalarProduct(currentFrame);
+		outSum += currentFrame.sumOfSquaredAmplitudes();
 
 		lengthPtr += lengthInc;
 		amplitudePtr += amplitudeInc;
