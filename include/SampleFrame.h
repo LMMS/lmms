@@ -118,13 +118,15 @@ public:
 		return SampleFrame(left() + other.left(), right() + other.right());
 	}
 
-	void operator+=(const SampleFrame& other)
+	SampleFrame& operator+=(const SampleFrame& other)
 	{
 		auto & l = left();
 		auto & r = right();
 
 		l += other.left();
 		r += other.right();
+
+		return *this;
 	}
 
 	SampleFrame operator*(float value) const
@@ -132,10 +134,12 @@ public:
 		return SampleFrame(left() * value, right() * value);
 	}
 
-	void operator*=(float value)
+	SampleFrame& operator*=(float value)
 	{
 		setLeft(left() * value);
 		setRight(right() * value);
+
+		return *this;
 	}
 
 	SampleFrame operator*(const SampleFrame& other) const
