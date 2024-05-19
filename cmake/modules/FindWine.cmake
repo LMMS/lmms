@@ -70,10 +70,9 @@ FIND_PROGRAM(WINE_GCC NAMES
 FIND_PROGRAM(WINE_BUILD NAMES winebuild PATHS ${WINE_CXX_LOCATIONS} NO_DEFAULT_PATH)
 # Detect wine paths and handle linking problems
 IF(WINE_CXX)
-	# call winegcc to obtain implied includes and libs
+	# call wineg++ to obtain implied includes and libs
 	execute_process(COMMAND ${WINE_CXX} -m32 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_32)
 	execute_process(COMMAND ${WINE_CXX} -m64 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_64)
-
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem/usr/include$" BUGGED_WINEGCC)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem" WINEGCC_INCLUDE_DIR)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "libwinecrt0\\.a.*" WINECRT_32)
@@ -174,6 +173,6 @@ message(STATUS "  WINE_GCC:             ${WINE_GCC}")
 message(STATUS "  WINE_32_FLAGS:        ${WINE_32_FLAGS}")
 message(STATUS "  WINE_64_FLAGS:        ${WINE_64_FLAGS}")
 
-# Create winegcc wrapper
+# Create winegcc (technically, wineg++) wrapper
 configure_file(${CMAKE_CURRENT_LIST_DIR}/winegcc_wrapper.in winegcc_wrapper @ONLY)
 SET(WINEGCC "${CMAKE_CURRENT_BINARY_DIR}/winegcc_wrapper")
