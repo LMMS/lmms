@@ -6,10 +6,10 @@
 #  WINE_INCLUDE_DIR - Wine include directory
 #  WINE_BUILD - Path to winebuild
 #  WINE_CXX - Path to wineg++
-#  WINE_CPP - Path to winegcc
+#  WINE_GCC - Path to winegcc
 #  WINE_32_LIBRARY_DIRS - Path(s) to 32-bit wine libs
 #  WINE_32_FLAGS - 32-bit linker flags
-#  WINE_64_LIBRARY_DIRS - Path to 64-bit wine libs
+#  WINE_64_LIBRARY_DIRS - Path(s) to 64-bit wine libs
 #  WINE_64_FLAGS - 64-bit linker flags
 #
 
