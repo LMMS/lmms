@@ -11,11 +11,6 @@ QMdiArea {
 	background-image: url("resources:background_artwork.png");
 }
 
-QPushButton:focus{
-	border: 2px solid #000;
-	background-color: #c9c9c9;
-}
-
 lmms--gui--Knob {
 	qproperty-lineInactiveColor: rgb(120, 120, 120);
 	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);

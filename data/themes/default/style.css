@@ -40,11 +40,6 @@ QMdiArea {
 	background-color: #111314;
 }
 
-QPushButton:focus {
-	border: 1px solid #d1d8e4;
-	border-radius: 4px;
-}
-
 lmms--gui--FileBrowser QCheckBox
 {
 	font-size: 8pt;
