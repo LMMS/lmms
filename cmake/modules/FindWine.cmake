@@ -71,8 +71,8 @@ FIND_PROGRAM(WINE_BUILD NAMES winebuild PATHS ${WINE_CXX_LOCATIONS} NO_DEFAULT_P
 # Detect wine paths and handle linking problems
 IF(WINE_CXX)
 	# call winegcc to obtain implied includes and libs
-	execute_process(COMMAND ${WINE_CXX} -m32 -v /dev/null OUTPUT_VARIABLE WINEBUILD_OUTPUT_32 ERROR_VARIABLE WINEBUILD_OUTPUT_32B)
-	execute_process(COMMAND ${WINE_CXX} -m64 -v /dev/null OUTPUT_VARIABLE WINEBUILD_OUTPUT_64 ERROR_VARIABLE WINEBUILD_OUTPUT_64B)
+	execute_process(COMMAND ${WINE_CXX} -m32 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_32)
+	execute_process(COMMAND ${WINE_CXX} -m64 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_64)
 
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem/usr/include$" BUGGED_WINEGCC)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem" WINEGCC_INCLUDE_DIR)
