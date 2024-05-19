@@ -1654,7 +1654,7 @@ float AutomationEditor::getLevel(int y )
 	// some range-checking-stuff
 	level = qBound( m_bottomLevel, level, m_topLevel );
 
-	return (roundf(level));
+	return std::roundf(level);
 }
 
 
