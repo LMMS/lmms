@@ -535,7 +535,7 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::audioEngine()->processingSampleRate() );
+			reply_message.addInt( Engine::audioEngine()->outputSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:

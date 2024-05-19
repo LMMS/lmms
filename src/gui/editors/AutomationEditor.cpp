@@ -27,8 +27,6 @@
 
 #include "AutomationEditor.h"
 
-#include <cmath>
-
 #include <QApplication>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -38,6 +36,10 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <cmath>
+
+#include "SampleClip.h"
+#include "SampleWaveform.h"
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -46,33 +48,27 @@
 #include "ActionGroup.h"
 #include "AutomationNode.h"
 #include "ComboBox.h"
-#include "debug.h"
 #include "DeprecationHelper.h"
-#include "embed.h"
+#include "DetuningHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
+#include "debug.h"
+#include "embed.h"
+#include "gui_templates.h"
 
 
 namespace lmms::gui
 {
-
-QPixmap * AutomationEditor::s_toolDraw = nullptr;
-QPixmap * AutomationEditor::s_toolErase = nullptr;
-QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
-QPixmap * AutomationEditor::s_toolEditTangents = nullptr;
-QPixmap * AutomationEditor::s_toolMove = nullptr;
-QPixmap * AutomationEditor::s_toolYFlip = nullptr;
-QPixmap * AutomationEditor::s_toolXFlip = nullptr;
-
 const std::array<float, 7> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
@@ -110,7 +106,8 @@ AutomationEditor::AutomationEditor() :
 	m_nodeTangentLineColor(0, 0, 0),
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
-	m_backgroundShade(0, 0, 0)
+	m_backgroundShade(0, 0, 0),
+	m_ghostNoteColor(0, 0, 0)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -135,25 +132,13 @@ AutomationEditor::AutomationEditor() :
 					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
-	if (s_toolYFlip == nullptr)
-	{
-		s_toolYFlip = new QPixmap( embed::getIconPixmap(
-							"flip_y" ) );
-	}
-	if (s_toolXFlip == nullptr)
-	{
-		s_toolXFlip = new QPixmap( embed::getIconPixmap(
-							"flip_x" ) );
-	}
-
 	// add time-line
-	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
-				Engine::getSong()->getPlayPos(
-					Song::PlayMode::AutomationClip ),
-					m_currentPosition,
-					Song::PlayMode::AutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
+		Engine::getSong()->getPlayPos(Song::PlayMode::AutomationClip),
+		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
+		m_currentPosition, Song::PlayMode::AutomationClip, this
+	);
+	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
@@ -168,28 +153,6 @@ AutomationEditor::AutomationEditor() :
 	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
 						SLOT(verScrolled(int)));
-
-	// init pixmaps
-	if (s_toolDraw == nullptr)
-	{
-		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
-	}
-	if (s_toolErase == nullptr)
-	{
-		s_toolErase= new QPixmap(embed::getIconPixmap("edit_erase"));
-	}
-	if (s_toolDrawOut == nullptr)
-	{
-		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
-	}
-	if (s_toolEditTangents == nullptr)
-	{
-		s_toolEditTangents = new QPixmap(embed::getIconPixmap("edit_tangent"));
-	}
-	if (s_toolMove == nullptr)
-	{
-		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
-	}
 
 	setCurrentClip(nullptr);
 
@@ -357,8 +320,6 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
-	int xstep;
-	int ystep;
 
 	if( deltax < AutomationClip::quantization() )
 	{
@@ -369,34 +330,14 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( x0 < x1 )
-	{
-		xstep = AutomationClip::quantization();
-	}
-	else
-	{
-		xstep = -( AutomationClip::quantization() );
-	}
+	int xstep = (x0 < x1 ? 1 : -1) * AutomationClip::quantization();
+	int ystep = y0 < y1 ? 1 : -1;
+	float lineAdjust = ystep * yscale;
 
-	float lineAdjust;
-	if( y0 < y1 )
-	{
-		ystep = 1;
-		lineAdjust = yscale;
-	}
-	else
-	{
-		ystep = -1;
-		lineAdjust = -( yscale );
-	}
-
-	int i = 0;
-	while( i < deltax )
+	for (int i = 0; i < deltax; ++i)
 	{
 		y = y0 + ( ystep * yscale * i ) + lineAdjust;
-
 		x += xstep;
-		i += 1;
 		m_clip->removeNode(TimePos(x));
 		m_clip->putValue( TimePos( x ), y );
 	}
@@ -1016,7 +957,6 @@ inline void AutomationEditor::drawCross( QPainter & p )
 inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
-	int y;
 	// Below (m_ppb * AutomationClip::quantization() / 576) is used because:
 	// 1 bar equals to 192/quantization() notes. Hence, to calculate the number of pixels
 	// per note we would have (m_ppb * 1 bar / (192/quantization()) notes per bar), or
@@ -1025,7 +965,7 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 	const int outerRadius = qBound(3, (m_ppb * AutomationClip::quantization()) / 576, 5);
 
 	// Draw a circle for the outValue
-	y = yCoordOfLevel(OUTVAL(it));
+	int y = yCoordOfLevel(OUTVAL(it));
 	p.setPen(QPen(m_nodeOutValueColor.lighter(200)));
 	p.setBrush(QBrush(m_nodeOutValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
@@ -1043,7 +983,6 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
-	int y, tx, ty;
 
 	// The tangent value correlates the variation in the node value related to the increase
 	// in ticks. So to have a proportionate drawing of the tangent line, we need to find the
@@ -1057,9 +996,9 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 	p.setPen(QPen(m_nodeTangentLineColor));
 	p.setBrush(QBrush(m_nodeTangentLineColor));
 
-	y = yCoordOfLevel(INVAL(it));
-	tx = x - 20;
-	ty = y + 20 * INTAN(it) * proportion;
+	int y = yCoordOfLevel(INVAL(it));
+	int tx = x - 20;
+	int ty = y + 20 * INTAN(it) * proportion;
 	p.drawLine(x, y, tx, ty);
 	p.setBrush(QBrush(m_nodeTangentLineColor.darker(200)));
 	p.drawEllipse(tx - 3, ty - 3, 6, 6);
@@ -1074,8 +1013,19 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 	p.drawEllipse(tx - 3, ty - 3, 6, 6);
 }
 
+void AutomationEditor::setGhostMidiClip(MidiClip* newMidiClip)
+{
+	// Expects a pointer to a MIDI clip or nullptr.
+	m_ghostNotes = newMidiClip;
+	m_renderSample = false;
+}
 
-
+void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
+{
+	// Expects a pointer to a Sample buffer or nullptr.
+	m_ghostSample = newGhostSample;
+	m_renderSample = true;
+}
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
@@ -1090,8 +1040,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	// set font-size to 8
-	p.setFont( pointSize<8>( p.font() ) );
+	p.setFont(adjustedToPixelSize(p.font(), 10));
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 
@@ -1127,7 +1076,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			int y;
 			int level = (int) m_bottomLevel;
 			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
@@ -1142,7 +1090,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			{
 				const QString & label = m_clip->firstObject()
 							->displayValue( level );
-				y = yCoordOfLevel( level );
+				int y = yCoordOfLevel(level);
 				p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::Shadow ) );
 				p.drawText( 1, y - font_height + 1,
@@ -1165,7 +1113,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( m_clip )
 	{
-		int tick, x, q;
+		int q;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
@@ -1189,10 +1137,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = m_currentPosition - m_currentPosition % q,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += q, x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick(tick); x <= width();
+			 tick += q, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_lineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1213,10 +1159,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			float y;
 			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
-				y =  yCoordOfLevel( (float)level );
+				float y = yCoordOfLevel(static_cast<float>(level));
 
 				p.setPen(level % 10 == 0 ? m_beatLineColor : m_lineColor);
 
@@ -1252,20 +1197,96 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
-		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % ticksPerBeat, x = xCoordOfTick(tick); x <= width();
+			 tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
+		// draw ghost sample
+		if (m_ghostSample != nullptr && m_ghostSample->sample().sampleSize() > 1 && m_renderSample)
+		{
+			int sampleFrames = m_ghostSample->sample().sampleSize();
+			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
+			int editorHeight = grid_bottom - TOP_MARGIN;
+
+			int startPos = xCoordOfTick(0);
+			int sampleWidth = xCoordOfTick(length) - startPos;
+			int sampleHeight = std::min(editorHeight - SAMPLE_MARGIN, MAX_SAMPLE_HEIGHT);
+			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
+
+			p.setPen(m_ghostSampleColor);
+			
+			const auto& sample = m_ghostSample->sample();
+			const auto waveform = SampleWaveform::Parameters{
+				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
+			SampleWaveform::visualize(waveform, p, rect);
+		}
+
+		// draw ghost notes
+		if (m_ghostNotes != nullptr && !m_renderSample)
+		{
+			const NoteVector& notes = m_ghostNotes->notes();
+			int minKey = 128;
+			int maxKey = 0;
+			int detuningOffset = 0;
+			const Note* detuningNote = nullptr;
+
+			for (const Note* note : notes)
+			{
+				int noteKey = note->key();
+
+				if (note->detuning()->automationClip() == m_clip) {
+					detuningOffset = note->pos();
+					detuningNote = note;
+				}
+
+				maxKey = std::max(maxKey, noteKey);
+				minKey = std::min(minKey, noteKey);
+			}
+
+			for (const Note* note : notes)
+			{
+				int lenTicks = note->length();
+				int notePos = note->pos();
+
+				// offset note if detuning
+				if (notePos+lenTicks < detuningOffset) { continue; }
+				notePos -= detuningOffset;
+
+				// remove/change after #5902
+				if (lenTicks == 0) { continue; }
+				else if (lenTicks < 0) { lenTicks = 4; }
+
+				int note_width = lenTicks * m_ppb / TimePos::ticksPerBar();
+				int keyRange = maxKey - minKey;
+
+				if (keyRange < MIN_NOTE_RANGE) 
+				{
+					int padding = (MIN_NOTE_RANGE - keyRange) / 2.0f;
+					maxKey += padding;
+					minKey -= padding;
+					keyRange = MIN_NOTE_RANGE;
+				}
+
+				float absNoteHeight = static_cast<float>(note->key() - minKey) / (maxKey - minKey);
+				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
+				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
+				const int x = xCoordOfTick(notePos);
+
+				if (note == detuningNote) {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_detuningNoteColor);
+				} else {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
+				}
+			}
+		}
+
 		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += TimePos::ticksPerBar(), x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
+			 x <= width(); tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1311,15 +1332,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the outValue of the current node). When we have nodes with linear or cubic progression
 				// the value of the end of the shape between the two nodes will be the inValue of
 				// the next node.
-				float nextValue;
-				if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
-				{
-					nextValue = OUTVAL(it);
-				}
-				else
-				{
-					nextValue = INVAL(it + 1);
-				}
+				float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
+					? OUTVAL(it)
+					: INVAL(it + 1);
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
@@ -1367,16 +1382,16 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 	else
 	{
-		QFont f = p.font();
+		QFont f = font();
 		f.setBold( true );
-		p.setFont( pointSize<14>( f ) );
+		p.setFont(f);
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
 				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation clip with "
-					"the context menu of a control!" ) );
+				tr( "Please open an automation clip by "
+					"double-clicking on it!" ) );
 	}
 
 	// TODO: Get this out of paint event
@@ -1400,26 +1415,26 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		case EditMode::Draw:
 		{
-			if (m_action == Action::EraseValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDraw; }
+			if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDraw; }
 			break;
 		}
 		case EditMode::Erase:
 		{
-			cursor = s_toolErase;
+			cursor = &m_toolErase;
 			break;
 		}
 		case EditMode::DrawOutValues:
 		{
-			if (m_action == Action::ResetOutValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDrawOut; }
+			if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDrawOut; }
 			break;
 		}
 		case EditMode::EditTangents:
 		{
-			cursor = m_action == Action::MoveTangent ? s_toolMove : s_toolEditTangents;
+			cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
 			break;
 		}
 	}
@@ -1469,25 +1484,11 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 			|| ( value > m_topLevel && m_topLevel >= 0 )
 			|| ( value < m_bottomLevel && m_bottomLevel <= 0 ) )
 	{
-		int y_start = yCoordOfLevel( value );
-		int rect_height;
-
-		if( m_y_auto )
-		{
-			int y_end = (int)( grid_bottom
-						+ ( grid_bottom - TOP_MARGIN )
-						* m_minLevel
-						/ ( m_maxLevel - m_minLevel ) );
-
-			rect_height = y_end - y_start;
-		}
-		else
-		{
-			rect_height = (int)( value * m_y_delta );
-		}
+		const int y_start = yCoordOfLevel(value);
+		const int y_end = grid_bottom + (grid_bottom - TOP_MARGIN) * m_minLevel / (m_maxLevel - m_minLevel);
+		const int rect_height = m_y_auto ? y_end - y_start : value * m_y_delta;
 
 		QBrush currentColor = m_graphColor;
-
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
 #ifdef LMMS_DEBUG
@@ -1553,11 +1554,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 	}
 	centerTopBottomScroll();
 
-	if( Engine::getSong() )
-	{
-		Engine::getSong()->getPlayPos( Song::PlayMode::AutomationClip
-					).m_timeLine->setFixedWidth( width() );
-	}
+	m_timeLine->setFixedWidth(width());
 
 	updateTopBottomLevels();
 	update();
@@ -2159,8 +2156,18 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 
+	m_resetGhostNotes = new QPushButton(m_toolBar);
+	m_resetGhostNotes->setIcon(embed::getIconPixmap("clear_ghost_note"));
+	m_resetGhostNotes->setToolTip(tr("Clear ghost notes"));
+	m_resetGhostNotes->setEnabled(true);
+
+	connect(m_resetGhostNotes, &QPushButton::pressed, m_editor, &AutomationEditor::resetGhostNotes);
+
+	quantizationActionsToolBar->addSeparator();
+	quantizationActionsToolBar->addWidget(m_resetGhostNotes);
+
 	// Setup our actual window
-	setFocusPolicy( Qt::StrongFocus );
+	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );

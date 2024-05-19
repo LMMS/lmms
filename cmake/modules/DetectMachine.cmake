@@ -12,11 +12,6 @@ ELSE()
 	SET(LMMS_BUILD_LINUX 1)
 ENDIF(WIN32)
 
-# LMMS_BUILD_MSYS also set in build_winXX.sh
-IF(LMMS_BUILD_WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND DEFINED ENV{MSYSCON})
-	SET(LMMS_BUILD_MSYS TRUE)
-ENDIF()
-
 MESSAGE("PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 SET(LMMS_HOST_X86 FALSE)
 SET(LMMS_HOST_X86_64 FALSE)
@@ -92,7 +87,7 @@ IF(WIN32)
 	endif()
 ELSE()
 	# Detect target architecture based on compiler target triple e.g. "x86_64-pc-linux"
-	EXEC_PROGRAM( ${CMAKE_C_COMPILER} ARGS "-dumpmachine ${CMAKE_C_FLAGS}" OUTPUT_VARIABLE Machine )
+	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpmachine ${CMAKE_C_FLAGS} OUTPUT_VARIABLE Machine)
 	MESSAGE("Machine: ${Machine}")
 	STRING(REGEX MATCH "i.86" IS_X86 "${Machine}")
 	STRING(REGEX MATCH "86_64|amd64" IS_X86_64 "${Machine}")

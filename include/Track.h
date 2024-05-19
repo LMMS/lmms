@@ -67,7 +67,6 @@ char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
@@ -189,15 +188,9 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	
-	QColor color()
-	{
-		return m_color.value();
-	}
-	bool useColor()
-	{
-		return m_color.has_value();
-	}
+
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
 
 	bool isMutedBeforeSolo() const
 	{
@@ -207,11 +200,7 @@ public:
 	BoolModel* getMutedModel();
 
 public slots:
-	virtual void setName( const QString & newName )
-	{
-		m_name = newName;
-		emit nameChanged();
-	}
+	virtual void setName(const QString& newName);
 
 	void setMutedBeforeSolo(const bool muted)
 	{
@@ -219,9 +208,6 @@ public slots:
 	}
 
 	void toggleSolo();
-
-	void setColor(const QColor& c);
-	void resetColor();
 
 private:
 	TrackContainer* m_trackContainer;

@@ -86,6 +86,7 @@ private slots:
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
+	void loopMarkerModeChanged();
 	void setLanguage(int lang);
 
 	// Performance settings widget.
@@ -101,13 +102,13 @@ private slots:
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
-	void toggleHQAudioDev(bool enabled);
 	void updateBufferSizeWarning(int value);
 	void setBufferSize(int value);
 	void resetBufferSize();
 
 	// MIDI settings widget.
 	void midiInterfaceChanged(const QString & driver);
+	void toggleMidiAutoQuantization(bool enabled);
 
 	// Paths settings widget.
 	void openWorkingDir();
@@ -147,6 +148,8 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	QString m_loopMarkerMode;
+	QComboBox* m_loopMarkerComboBox;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -176,7 +179,6 @@ private:
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
 	bool m_NaNHandler;
-	bool m_hqAudioDev;
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
@@ -187,6 +189,7 @@ private:
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 	QComboBox * m_assignableMidiDevices;
+	bool m_midiAutoQuantize;
 
 	// Paths settings widgets.
 	QString m_workingDir;

@@ -364,9 +364,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Resize )
 	{
-		setFixedHeight( qMax<int>( me->y(), MINIMAL_TRACK_HEIGHT ) );
-		m_trackContainerView->realignTracks();
-		m_track->setHeight( height() );
+		resizeToHeight(me->y());
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
@@ -391,6 +389,23 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 	m_trackOperationsWidget.update();
 
 	QWidget::mouseReleaseEvent( me );
+}
+
+void TrackView::wheelEvent(QWheelEvent* we)
+{
+	// Note: we add the values because one of them will be 0. If the alt modifier
+	// is pressed x is non-zero and otherwise y.
+	const int deltaY = we->angleDelta().x() + we->angleDelta().y();
+	int const direction = deltaY < 0 ? -1 : 1;
+
+	auto const modKeys = we->modifiers();
+	int stepSize = modKeys == (Qt::ControlModifier | Qt::AltModifier) ? 1 : modKeys == (Qt::ShiftModifier | Qt::AltModifier) ? 5 : 0;
+
+	if (stepSize != 0)
+	{
+		resizeToHeight(height() + stepSize * direction);
+		we->accept();
+	}
 }
 
 
@@ -442,6 +457,14 @@ void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 {
 	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
 	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
+}
+
+
+void TrackView::resizeToHeight(int h)
+{
+	setFixedHeight(qMax<int>(h, MINIMAL_TRACK_HEIGHT));
+	m_trackContainerView->realignTracks();
+	m_track->setHeight(height());
 }
 
 

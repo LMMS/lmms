@@ -26,16 +26,18 @@
 #ifndef LMMS_GUI_AUTOMATION_EDITOR_H
 #define LMMS_GUI_AUTOMATION_EDITOR_H
 
+#include <QPushButton>
 #include <QWidget>
 #include <array>
 
-#include "Editor.h"
-
-#include "lmms_basics.h"
-#include "JournallingObject.h"
-#include "TimePos.h"
 #include "AutomationClip.h"
 #include "ComboBoxModel.h"
+#include "Editor.h"
+#include "JournallingObject.h"
+#include "MidiClip.h"
+#include "SampleClip.h"
+#include "TimePos.h"
+#include "lmms_basics.h"
 
 class QPainter;
 class QPixmap;
@@ -68,8 +70,13 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
 	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
+	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
+	Q_PROPERTY(QColor detuningNoteColor MEMBER m_detuningNoteColor)
+	Q_PROPERTY(QColor ghostSampleColor MEMBER m_ghostSampleColor)
 public:
 	void setCurrentClip(AutomationClip * new_clip);
+	void setGhostMidiClip(MidiClip* newMidiClip);
+	void setGhostSample(SampleClip* newSample);
 
 	inline const AutomationClip * currentClip() const
 	{
@@ -159,6 +166,13 @@ protected slots:
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
+	void resetGhostNotes()
+	{
+		m_ghostNotes = nullptr;
+		m_ghostSample = nullptr;
+		update();
+	}
+
 private:
 
 	enum class Action
@@ -183,17 +197,23 @@ private:
 
 	static const int VALUES_WIDTH = 64;
 
+	static const int NOTE_HEIGHT = 10; // height of individual notes
+	static const int NOTE_MARGIN = 40; // total border margin for notes
+	static const int MIN_NOTE_RANGE = 20; // min number of keys for fixed size
+	static const int SAMPLE_MARGIN = 40;
+	static constexpr int MAX_SAMPLE_HEIGHT = 400; // constexpr for use in min
+
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
 	~AutomationEditor() override;
 
-	static QPixmap * s_toolDraw;
-	static QPixmap * s_toolErase;
-	static QPixmap * s_toolDrawOut;
-	static QPixmap * s_toolEditTangents;
-	static QPixmap * s_toolMove;
-	static QPixmap * s_toolYFlip;
-	static QPixmap * s_toolXFlip;
+	QPixmap m_toolDraw = embed::getIconPixmap("edit_draw");
+	QPixmap m_toolErase = embed::getIconPixmap("edit_erase");
+	QPixmap m_toolDrawOut = embed::getIconPixmap("edit_draw_outvalue");
+	QPixmap m_toolEditTangents = embed::getIconPixmap("edit_tangent");
+	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
+	QPixmap m_toolYFlip = embed::getIconPixmap("flip_y");
+	QPixmap m_toolXFlip = embed::getIconPixmap("flip_x");
 
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
@@ -210,6 +230,10 @@ private:
 	float m_scrollLevel;
 	float m_bottomLevel;
 	float m_topLevel;
+
+	MidiClip* m_ghostNotes = nullptr;
+	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
@@ -261,6 +285,9 @@ private:
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;
+	QColor m_ghostNoteColor;
+	QColor m_detuningNoteColor;
+	QColor m_ghostSampleColor;
 
 	friend class AutomationEditorWindow;
 
@@ -284,6 +311,9 @@ public:
 	~AutomationEditorWindow() override = default;
 
 	void setCurrentClip(AutomationClip* clip);
+	void setGhostMidiClip(MidiClip* clip) { m_editor->setGhostMidiClip(clip); };
+	void setGhostSample(SampleClip* newSample) { m_editor->setGhostSample(newSample); };
+
 	const AutomationClip* currentClip();
 
 	void dropEvent( QDropEvent * _de ) override;
@@ -337,6 +367,8 @@ private:
 	ComboBox * m_zoomingXComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
+
+	QPushButton* m_resetGhostNotes;
 };
 
 } // namespace gui

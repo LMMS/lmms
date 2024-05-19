@@ -33,6 +33,10 @@ lmms--gui--AutomationEditor {
 	qproperty-scaleColor: qlineargradient(spread:reflect,
                      x1:0, y1:0.5, x2:1, y2:0.5,
                      stop:0 #333, stop:1 #202020);
+	
+	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
+	qproperty-detuningNoteColor: rgba(248, 11, 11, 125);
+	qproperty-ghostSampleColor: rgba(125, 125, 125, 125);
 }
 
 /* text box */
@@ -143,6 +147,7 @@ lmms--gui--PianoRoll {
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-stepNoteColor: #9b1313;
 	qproperty-noteTextColor: rgb( 255, 255, 255 );
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
@@ -184,6 +189,7 @@ lmms--gui--TabWidget {
 	qproperty-tabText: rgba(255, 255, 255, 180);
 	qproperty-tabTitleText: #fff;
 	qproperty-tabSelected: #61666b;
+	qproperty-tabTextSelected: rgba(255, 255, 255, 180);
 	qproperty-tabBackground: #3c434b;
 	qproperty-tabBorder: #3c434b;
 }
@@ -197,7 +203,9 @@ lmms--gui--GroupBox {
 lmms--gui--Oscilloscope {
 	background: none;
 	border: none;
-	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-leftChannelColor: rgb(71, 253, 133);
+	qproperty-rightChannelColor: rgb(238, 253, 71);
+	qproperty-otherChannelsColor: rgb(71, 235, 253);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -627,7 +635,7 @@ lmms--gui--ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
-lmms--gui--MixerLine {
+lmms--gui--MixerChannelView {
 	background: #5b6571;
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
@@ -638,11 +646,16 @@ lmms--gui--MixerLine {
 	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );
 }
 
+lmms--gui--MixerChannelView QGraphicsView {
+	background: transparent;
+	border-style: none;
+}
+
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
-	qproperty-peakGreen: rgb( 74, 253, 133);
-	qproperty-peakYellow: rgb(224, 222, 18);
-	qproperty-peakRed: rgb( 255, 100, 100);
+	qproperty-peakOk: rgb( 74, 253, 133);
+	qproperty-peakWarn: rgb(224, 222, 18);
+	qproperty-peakClip: rgb( 255, 100, 100);
 }
 
 lmms--gui--TimeLineWidget {
@@ -658,15 +671,25 @@ lmms--gui--TimeLineWidget {
         background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
 	                                   stop: 0 #8796a7, stop: 1.0 #3e454e );
 
-        qproperty-inactiveLoopColor: rgba( 52, 63, 53, 64 );
+	qproperty-inactiveLoopColor: rgba( 52, 63, 53, 64 );
 	qproperty-inactiveLoopBrush: rgba( 255, 255, 255, 32 );
 	qproperty-inactiveLoopInnerColor: rgba( 255, 255, 255, 32 );
+	qproperty-inactiveLoopHandleColor: rgba( 192, 192, 192, 100 );
 	qproperty-activeLoopColor: rgba( 52, 63, 53, 255 );
 	qproperty-activeLoopBrush: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
 	                                            stop: 0 #378d59, stop: 1.0 #297e36 );
 	qproperty-activeLoopInnerColor: rgba( 74, 155, 100, 255 );
+	qproperty-activeLoopHandleColor: rgba( 192, 192, 192, 200 );
+
+	/* Width of loop marker handles (when handle mode is active) */
+	qproperty-loopHandleWidth: 8;
+
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
+
+	/* Cursor hotspots for loop marker adjustment */
+	qproperty-mouseHotspotSelLeft: 0px 16px;
+	qproperty-mouseHotspotSelRight: 32px 16px;
 }
 
 QTreeView {
@@ -975,6 +998,7 @@ lmms--gui--CompressorControlDialog {
 	qproperty-textColor: rgba(209, 216, 228, 50);
 	qproperty-graphColor: rgba(209, 216, 228, 50);
 	qproperty-resetColor: rgba(200, 100, 15, 200);
+	qproperty-backgroundColor: rgba(7, 8, 9, 255);
 }
 
 lmms--gui--CompressorControlDialog lmms--gui--Knob {

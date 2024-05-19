@@ -31,6 +31,7 @@
 #include "DataFile.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "SampleLoader.h"
 #include "SlicerT.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -108,7 +109,7 @@ Knob* SlicerTView::createStyledKnob()
 void SlicerTView::exportMidi()
 {
 	using namespace Clipboard;
-	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
 
 	DataFile dataFile(DataFile::Type::ClipboardData);
 	QDomElement noteList = dataFile.createElement("note-list");
@@ -129,7 +130,7 @@ void SlicerTView::exportMidi()
 
 void SlicerTView::openFiles()
 {
-	QString audioFile = m_slicerTParent->m_originalSample.openAudioFile();
+	const auto audioFile = SampleLoader::openAudioFile();
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);
 }

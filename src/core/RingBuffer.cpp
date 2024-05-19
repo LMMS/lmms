@@ -34,7 +34,7 @@ namespace lmms
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
 	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
-	m_samplerate( Engine::audioEngine()->processingSampleRate() ),
+	m_samplerate( Engine::audioEngine()->outputSampleRate() ),
 	m_size( size + m_fpp )
 {
 	m_buffer = new sampleFrame[ m_size ];
@@ -45,7 +45,7 @@ RingBuffer::RingBuffer( f_cnt_t size ) :
 
 RingBuffer::RingBuffer( float size ) : 
 	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
-	m_samplerate( Engine::audioEngine()->processingSampleRate() )
+	m_samplerate( Engine::audioEngine()->outputSampleRate() )
 {
 	m_size = msToFrames( size ) + m_fpp;
 	m_buffer = new sampleFrame[ m_size ];
@@ -307,9 +307,9 @@ void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, float offset, 
 
 void RingBuffer::updateSamplerate()
 {
-	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::audioEngine()->processingSampleRate() ) / m_samplerate;
+	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::audioEngine()->outputSampleRate() ) / m_samplerate;
 	m_size = static_cast<f_cnt_t>( ceilf( newsize ) ) + m_fpp;
-	m_samplerate = Engine::audioEngine()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->outputSampleRate();
 	delete[] m_buffer;
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );

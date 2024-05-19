@@ -27,7 +27,6 @@
 #ifndef CROSSOVEREQ_CONTROL_DIALOG_H
 #define CROSSOVEREQ_CONTROL_DIALOG_H
 
-#include <QPixmap>
 #include "EffectControlDialog.h"
 
 namespace lmms
@@ -46,11 +45,6 @@ class CrossoverEQControlDialog : public EffectControlDialog
 public:
 	CrossoverEQControlDialog( CrossoverEQControls * controls );
 	~CrossoverEQControlDialog() override = default;
-	
-private:
-	QPixmap m_fader_bg;
-	QPixmap m_fader_empty;
-	QPixmap m_fader_knob;
 };
 
 

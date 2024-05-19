@@ -50,11 +50,12 @@ extern "C"
 LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&lomm_plugin_descriptor, parent, key),
 	m_lommControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp1(m_sampleRate),
 	m_lp2(m_sampleRate),
 	m_hp1(m_sampleRate),
 	m_hp2(m_sampleRate),
+	m_ap(m_sampleRate),
 	m_needsUpdate(true),
 	m_coeffPrecalc(-0.05),
 	m_crestTimeConst(0.999),
@@ -67,17 +68,20 @@ LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 	m_yL[1][0] = m_yL[1][1] = LOMM_MIN_FLOOR;
 	m_yL[2][0] = m_yL[2][1] = LOMM_MIN_FLOOR;
 	
+	m_ap.setFilterType(BasicFilters<2>::FilterType::AllPass);
+	
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	emit changeSampleRate();
 }
 
 void LOMMEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_lp1.setSampleRate(m_sampleRate);
 	m_lp2.setSampleRate(m_sampleRate);
 	m_hp1.setSampleRate(m_sampleRate);
 	m_hp2.setSampleRate(m_sampleRate);
+	m_ap.setSampleRate(m_sampleRate);
 	
 	m_coeffPrecalc = -2.2f / (m_sampleRate * 0.001f);
 	m_needsUpdate = true;
@@ -95,16 +99,6 @@ void LOMMEffect::changeSampleRate()
 	}
 }
 
-void LOMMEffect::clearFilterHistories()
-{
-	m_lp1.clearHistory();
-	m_lp2.clearHistory();
-	m_hp1.clearHistory();
-	m_hp2.clearHistory();
-}
-
-
-
 
 bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
@@ -117,6 +111,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		m_lp1.setLowpass(m_lommControls.m_split1Model.value());
 		m_hp1.setHighpass(m_lommControls.m_split1Model.value());
+		m_ap.calcFilterCoeffs(m_lommControls.m_split1Model.value(), 0.70710678118);
 	}
 	if (m_needsUpdate || m_lommControls.m_split2Model.isValueChanged())
 	{
@@ -224,9 +219,11 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			float crestFactorValTemp = ((m_crestFactorVal[i] - LOMM_AUTO_TIME_ADJUST) * autoTime) + LOMM_AUTO_TIME_ADJUST;
 		
 			// Crossover filters
-			bands[0][i] = m_hp1.update(s[i], i);
-			bands[1][i] = m_hp2.update(m_lp1.update(s[i], i), i);
 			bands[2][i] = m_lp2.update(s[i], i);
+			bands[1][i] = m_hp2.update(s[i], i);
+			bands[0][i] = m_hp1.update(bands[1][i], i);
+			bands[1][i] = m_lp1.update(bands[1][i], i);
+			bands[2][i] = m_ap.update(bands[2][i], i);
 			
 			if (!split1Enabled)
 			{

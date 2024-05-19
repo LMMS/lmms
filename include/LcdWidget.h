@@ -47,8 +47,6 @@ public:
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
 		bool leadingZero = false);
 
-	~LcdWidget() override;
-
 	void setValue(int value);
 	void setValue(float value);
 	void setLabel(const QString& label);
@@ -98,7 +96,7 @@ private:
 	QString m_display;
 
 	QString m_label;
-	QPixmap* m_lcdPixmap;
+	QPixmap m_lcdPixmap;
 
 	QColor m_textColor;
 	QColor m_textShadowColor;

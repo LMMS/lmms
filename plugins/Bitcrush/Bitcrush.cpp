@@ -59,10 +59,10 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
 	Effect( &bitcrush_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() * OS_RATE );
+	m_buffer = new sampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 
@@ -77,13 +77,13 @@ BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatu
 
 BitcrushEffect::~BitcrushEffect()
 {
-	MM_FREE( m_buffer );
+	delete[] m_buffer;
 }
 
 
 void BitcrushEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;

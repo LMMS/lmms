@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AMPLIFIER_CONTROL_DIALOG_H
-#define AMPLIFIER_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_AMPLIFIER_CONTROL_DIALOG_H
+#define LMMS_GUI_AMPLIFIER_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 
@@ -32,23 +32,23 @@ namespace lmms
 {
 
 class AmplifierControls;
-
+class FloatModel;
 
 namespace gui
 {
+
+class Knob;
 
 class AmplifierControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	AmplifierControlDialog( AmplifierControls* controls );
+	AmplifierControlDialog(AmplifierControls* controls);
 	~AmplifierControlDialog() override = default;
-
-} ;
-
+};
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AMPLIFIER_CONTROL_DIALOG_H
