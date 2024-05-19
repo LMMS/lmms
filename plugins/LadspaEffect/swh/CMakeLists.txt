@@ -9,9 +9,13 @@ ELSE()
 ENDIF()
 
 # Additional compile flags
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
+if(MSVC)
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} /wd4244 /wd4273 /wd4305")
+else()
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
+endif()
 
 # Loop over every XML file
 FILE(GLOB XML_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/*.xml")
@@ -33,6 +37,10 @@ FOREACH(_item ${XML_SOURCES})
 
 	# Add a library target for this C file, which depends on success of makestup.pl
 	ADD_LIBRARY("${_plugin}" MODULE "${_out_file}")
+
+	if(MSVC)
+		target_link_options("${_plugin}" PRIVATE "/EXPORT:ladspa_descriptor")
+	endif()
 
 	# Vocoder does not use fftw
 	IF(NOT ("${_plugin}" STREQUAL "vocoder_1337"))
