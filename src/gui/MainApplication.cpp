@@ -86,8 +86,8 @@ bool MainApplication::event(QEvent* event)
 }
 
 #ifdef LMMS_BUILD_WIN32
-// This can be moved into nativeEventFilter once Qt4 support has been dropped
-bool MainApplication::winEventFilter(MSG* msg, long* result)
+// Helper function for nativeEventFilter
+bool MainApplication::win32EventFilter(MSG* msg, FilterResult* result)
 {
 	switch(msg->message)
 	{
@@ -110,11 +110,11 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 }
 
 bool MainApplication::nativeEventFilter(const QByteArray& eventType,
-					void* message, long* result)
+					void* message, FilterResult* result)
 {
 	if(eventType == "windows_generic_MSG")
 	{
-		return winEventFilter(static_cast<MSG *>(message), result);
+		return win32EventFilter(static_cast<MSG*>(message), result);
 	}
 	return false;
 }
