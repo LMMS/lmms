@@ -283,10 +283,14 @@ QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-	background: #d1d8e4;
+	background: #5d6b77;
 	border: none;
 	border-radius: 4px;
 	min-width: 24px;
+}
+
+QScrollBar::handle:horizontal:hover {
+	background: #b8c4d1;
 }
 
 QScrollBar::handle:horizontal:pressed {
@@ -294,10 +298,14 @@ QScrollBar::handle:horizontal:pressed {
 }
 
 QScrollBar::handle:vertical {
-	background: #d1d8e4;
+	background: #5d6b77;
 	border: none;
 	border-radius: 4px;
 	min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+	background: #b8c4d1;
 }
 
 QScrollBar::handle:vertical:pressed {
