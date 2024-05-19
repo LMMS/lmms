@@ -54,7 +54,7 @@ public:
 #else
 	using FilterResult = qintptr;
 #endif // QT6 check
-	bool winEventFilter(MSG* msg, FilterResult* result);
+	bool win32EventFilter(MSG* msg, FilterResult* result);
 	bool nativeEventFilter(const QByteArray& eventType, void* message, FilterResult* result);
 #endif // LMMS_BUILD_WIN32
 	inline QString& queuedFile()
