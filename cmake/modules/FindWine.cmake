@@ -54,8 +54,6 @@ list(APPEND WINE_CXX_LOCATIONS "/usr/bin")
 FIND_PROGRAM(WINE_CXX NAMES
 		wineg++
 		wineg++-stable
-		winecpp
-		winecpp-stable
 	PATHS
 		${WINE_CXX_LOCATIONS}
 	NO_DEFAULT_PATH
