@@ -171,12 +171,12 @@ private:
 	QBrush m_horizontalColor;
 	QBrush m_embossColor;
 
-	int m_coarseGridWidth;
-	int m_fineGridWidth;
-	int m_horizontalWidth;
-	int m_embossWidth;
+	int m_coarseGridWidth{0};
+	int m_fineGridWidth{0};
+	int m_horizontalWidth{0};
+	int m_embossWidth{0};
 
-	int m_embossOffset;
+	int m_embossOffset{0};
 } ;
 
 
