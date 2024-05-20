@@ -69,7 +69,12 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	m_coarseGridColor( Qt::SolidPattern ),
 	m_fineGridColor( Qt::SolidPattern ),
 	m_horizontalColor( Qt::SolidPattern ),
-	m_embossColor( Qt::SolidPattern )
+	m_embossColor( Qt::SolidPattern ),
+	m_coarseGridWidth(2),
+	m_fineGridWidth(1),
+	m_horizontalWidth(1),
+	m_embossWidth(0),
+	m_embossOffset(0)
 {
 	setAcceptDrops( true );
 
