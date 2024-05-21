@@ -3774,7 +3774,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->angleDelta().y() > 0 ? 1 : -1;
+			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{
 				for ( Note * n : nv )
