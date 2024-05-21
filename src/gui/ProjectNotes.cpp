@@ -147,8 +147,12 @@ void ProjectNotes::setupActions()
 	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
-	connect( m_comboFont, SIGNAL( activated( const QString& ) ),
-			m_edit, SLOT( setFontFamily( const QString& ) ) );
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+	connect(m_comboFont, SIGNAL(activated(const QString&)), m_edit,
+#else
+	connect(m_comboFont, SIGNAL(textActivated(const QString&)), m_edit,
+#endif
+			SLOT(setFontFamily(const QString&)));
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
 	m_comboSize = new QComboBox( tb );
@@ -159,8 +163,12 @@ void ProjectNotes::setupActions()
 	{
 		m_comboSize->addItem( QString::number( *it ) );
 	}
-	connect( m_comboSize, SIGNAL( activated( const QString& ) ),
-		     this, SLOT( textSize( const QString& ) ) );
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+	connect(m_comboSize, SIGNAL(activated(const QString&)), this, 
+#else
+	connect(m_comboSize, SIGNAL(textActivated(const QString&)), this, 
+#endif
+		    SLOT( textSize( const QString& ) ) );
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );
 
