@@ -446,7 +446,8 @@ void Lv2Proc::initPlugin()
 	{
 		const auto iface = static_cast<const LV2_Worker_Interface*>(
 			lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
-		if (iface) {
+		if (iface)
+		{
 			m_worker->setHandle(lilv_instance_get_handle(m_instance));
 			m_worker->setInterface(iface);
 		}
@@ -531,7 +532,8 @@ void Lv2Proc::initPluginSpecificFeatures()
 
 	// worker (if plugin has worker extension)
 	Lv2Manager* mgr = Engine::getLv2Manager();
-	if (lilv_plugin_has_extension_data(m_plugin, mgr->uri(LV2_WORKER__interface).get())) {
+	if (lilv_plugin_has_extension_data(m_plugin, mgr->uri(LV2_WORKER__interface).get()))
+	{
 		bool threaded = !Engine::audioEngine()->renderOnly();
 		m_worker.emplace(&m_workLock, threaded);
 		m_features[LV2_WORKER__schedule] = m_worker->feature();
@@ -685,7 +687,8 @@ void Lv2Proc::createPort(std::size_t portNum)
 				AutoLilvNode rszMinimumSize = mgr->uri(LV2_RESIZE_PORT__minimumSize);
 				AutoLilvNodes minSizeV(lilv_port_get_value(m_plugin, lilvPort, rszMinimumSize.get()));
 				LilvNode* minSize = minSizeV ? lilv_nodes_get_first(minSizeV.get()) : nullptr;
-				if (minSize && lilv_node_is_int(minSize)) {
+				if (minSize && lilv_node_is_int(minSize))
+				{
 					minimumSize = std::max(minimumSize, lilv_node_as_int(minSize));
 				}
 			}
@@ -847,7 +850,8 @@ void Lv2Proc::dumpPort(std::size_t num)
 {
 	struct DumpPortDetail : public Lv2Ports::ConstVisitor
 	{
-		void visit(const Lv2Ports::Control& ctrl) override {
+		void visit(const Lv2Ports::Control& ctrl) override
+		{
 			qDebug() << "  control port";
 			// output ports may be uninitialized yet, only print inputs
 			if (ctrl.m_flow == Lv2Ports::Flow::Input)
@@ -855,7 +859,8 @@ void Lv2Proc::dumpPort(std::size_t num)
 				qDebug() << "    value:" << ctrl.m_val;
 			}
 		}
-		void visit(const Lv2Ports::Audio& audio) override {
+		void visit(const Lv2Ports::Audio& audio) override
+		{
 			qDebug() << (audio.isSideChain()	? "  audio port (sidechain)"
 												: "  audio port");
 			qDebug() << "    buffer size:" << audio.bufferSize();
