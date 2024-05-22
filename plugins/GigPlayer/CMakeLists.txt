@@ -8,7 +8,7 @@ if(LMMS_HAVE_GIG)
 
 	# disable deprecated check for mingw-x-libgig
 	if(LMMS_BUILD_WIN32)
-		add_compile_options()("-Wno-deprecated")
+		add_compile_options("-Wno-deprecated")
 	endif(LMMS_BUILD_WIN32)
 
 	link_directories(${GIG_LIBRARY_DIRS})
