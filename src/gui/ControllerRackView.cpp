@@ -137,17 +137,10 @@ void ControllerRackView::moveUp(ControllerView* view)
 {
 	if (view == m_controllerViews.first()) { return; }
 	
-	int i = 0;
-	for (auto it = m_controllerViews.begin(); it != m_controllerViews.end(); ++it, ++i)
-	{
-		if (*it == view) { break; }
-	}
-	ControllerView* temp = m_controllerViews[i - 1];
-	m_controllerViews[i - 1] = view;
-	m_controllerViews[i] = temp;
-
+	const auto index = std::distance(m_controllerViews.begin(), view);
+	std::swap(m_controllerViews[index - 1], m_controllerViews[index]);
 	m_scrollAreaLayout->removeWidget(view);
-	m_scrollAreaLayout->insertWidget(i - 1, view);
+	m_scrollAreaLayout->insertWidget(index - 1, view);
 }
 
 void ControllerRackView::moveDown(ControllerView* view)
