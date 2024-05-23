@@ -193,15 +193,9 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 void Fader::wheelEvent (QWheelEvent* ev)
 {
 	ev->accept();
+	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	if (ev->angleDelta().y() > 0)
-	{
-		model()->incValue(1);
-	}
-	else
-	{
-		model()->incValue(-1);
-	}
+	model()->incValue(direction);
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut(1000);
 }

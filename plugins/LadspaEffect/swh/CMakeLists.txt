@@ -113,6 +113,6 @@ TARGET_LINK_LIBRARIES(se4_1883 rms db)
 
 ADD_LIBRARY(pitchscale STATIC ladspa/util/pitchscale.c)
 TARGET_COMPILE_OPTIONS(pitchscale PUBLIC "${PIC_FLAGS}")
-TARGET_LINK_LIBRARIES(pitchscale -lfftw3f)
+TARGET_LINK_LIBRARIES(pitchscale ${FFTW3F_LIBRARIES})
 TARGET_LINK_LIBRARIES(pitch_scale_1193 pitchscale)
 TARGET_LINK_LIBRARIES(pitch_scale_1194 pitchscale)
