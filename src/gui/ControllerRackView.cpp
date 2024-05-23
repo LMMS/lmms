@@ -145,11 +145,8 @@ void ControllerRackView::moveUp(ControllerView* view)
 
 void ControllerRackView::moveDown(ControllerView* view)
 {
-	if(view != m_controllerViews.last())
-	{
-		// moving next controller up is the same
-		moveUp(*(std::find(m_controllerViews.begin(), m_controllerViews.end(), view) + 1));
-	}
+	if (view == m_controllerViews.last()) { return; }
+	moveUp(++view);
 }
 
 
