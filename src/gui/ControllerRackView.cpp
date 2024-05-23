@@ -158,23 +158,21 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 
-	connect(controllerView, SIGNAL(moveUp(lmms::gui::ControllerView* )), this, 
-		SLOT(moveUp(lmms::gui::ControllerView* )), Qt::QueuedConnection);
-	connect(controllerView, SIGNAL(moveDown(lmms::gui::ControllerView* )), this, 
-		SLOT(moveDown(lmms::gui::ControllerView* )), Qt::QueuedConnection);
+	connect(controllerView, &ControllerView::moveUp, this, &ControllerRackView::moveUp);
+	connect(controllerView, &ControllerView::moveDown, this, &ControllerRackView::moveDown);
 	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
 		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );
 
 	QAction* moveUpAction = new QAction(controllerView);
 	moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
 	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
-	connect(moveUpAction, SIGNAL(triggered()), controllerView, SLOT(moveUp()));
+	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
 	controllerView->addAction( moveUpAction );
 
 	QAction* moveDownAction = new QAction(controllerView);
 	moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
 	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
-	connect(moveDownAction, SIGNAL(triggered()), controllerView, SLOT(moveDown()));
+	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
 	controllerView->addAction(moveDownAction);
 
 

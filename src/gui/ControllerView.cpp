@@ -179,8 +179,8 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	Controller* c = castModel<Controller>();
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
-	contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, SLOT(moveUp()));
-	contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, SLOT(moveDown()));
+	contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, &ControllerView::moveUp);
+	contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, &ControllerView::moveDown);
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this controller" ),

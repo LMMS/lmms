@@ -182,13 +182,13 @@ void EffectRackView::update()
 			QAction* moveUpAction = new QAction(view);
 			moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
 			moveUpAction->setShortcutContext(Qt::WidgetShortcut);
-			connect(moveUpAction, SIGNAL(triggered()), view, SLOT(moveUp()));
+			connect(moveUpAction, &QAction::triggered, view, &EffectView::moveUp);
 			view->addAction(moveUpAction);
 
 			QAction* moveDownAction = new QAction(view);
 			moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
 			moveDownAction->setShortcutContext(Qt::WidgetShortcut);
-			connect(moveDownAction, SIGNAL(triggered()), view, SLOT(moveDown()));
+			connect(moveDownAction, &QAction::triggered, view, &EffectView::moveDown);
 			view->addAction(moveDownAction);
 
 			view->show();
