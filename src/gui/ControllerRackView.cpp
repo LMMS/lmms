@@ -135,7 +135,6 @@ void ControllerRackView::deleteController( ControllerView * _view )
 
 void ControllerRackView::moveUp(ControllerView* view)
 {
-	// cannot move the first module further up
 	if (view == m_controllerViews.first()) { return; }
 	
 	int i = 0;

@@ -53,7 +53,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 {
 	this->setFrameStyle( QFrame::StyledPanel );
 	this->setFrameShadow( QFrame::Raised );
-	this->setFocusPolicy(Qt::StrongFocus);
+	setFocusPolicy(Qt::StrongFocus);
 
 	auto vBoxLayout = new QVBoxLayout(this);
 
