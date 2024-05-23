@@ -3774,7 +3774,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->angleDelta().y() > 0 ? 1 : -1;
+			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{
 				for ( Note * n : nv )
@@ -4894,7 +4895,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
+	m_quantizeComboBox->setFixedSize(85, ComboBox::DEFAULT_HEIGHT);
 	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
@@ -4918,7 +4919,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
-	m_scaleComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
+	m_scaleComboBox->setFixedSize(155, ComboBox::DEFAULT_HEIGHT);
 	m_scaleComboBox->setToolTip( tr( "Scale") );
 
 	// setup chord-stuff
@@ -4927,7 +4928,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
-	m_chordComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
+	m_chordComboBox->setFixedSize(125, ComboBox::DEFAULT_HEIGHT);
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// setup snap-stuff
@@ -4936,7 +4937,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_snapComboBox = new ComboBox(m_toolBar);
 	m_snapComboBox->setModel(&m_editor->m_snapModel);
-	m_snapComboBox->setFixedSize(105, ComboBox::DEFAULT_HEIGHT);
+	m_snapComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
 	// -- Clear ghost MIDI clip button

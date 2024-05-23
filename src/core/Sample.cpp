@@ -170,6 +170,8 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 
 void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const
 {
+	if (m_buffer->size() < 1) { return; }
+
 	auto index = state->m_frameIndex;
 	auto backwards = state->m_backwards;
 

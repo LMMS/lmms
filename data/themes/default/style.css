@@ -388,12 +388,24 @@ lmms--gui--TrackView > QWidget {
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-/* track background colors */
+/* track background config */
 lmms--gui--TrackContentWidget {
+	/* colors */
 	qproperty-darkerColor: #0C0E0F;
 	qproperty-lighterColor: #14151A;
-	qproperty-gridColor: #262B30;
-	qproperty-embossColor: rgba( 0, 0, 0, 0 );
+	qproperty-coarseGridColor: #3C444C;
+	qproperty-fineGridColor: #262B30;
+	qproperty-horizontalColor: #3C444C;
+	qproperty-embossColor: rgba(0, 0, 0, 0);
+	
+	/* line widths */
+	qproperty-coarseGridWidth: 2;
+	qproperty-fineGridWidth: 1;
+	qproperty-horizontalWidth: 1;
+	qproperty-embossWidth: 0;
+	
+	/* positive offset shifts emboss to the right */
+	qproperty-embossOffset: 0;
 }
 
 
