@@ -1647,14 +1647,14 @@ float AutomationEditor::getLevel(int y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
+	float level = ( ( m_bottomLevel + ( m_y_auto ?
 			( m_maxLevel - m_minLevel ) * ( level_line_y - y )
 					/ (float)( level_line_y - ( TOP_MARGIN + 2 ) ) :
 			( level_line_y - y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
 	level = qBound( m_bottomLevel, level, m_topLevel );
 
-	return( level );
+	return std::roundf(level);
 }
 
 
