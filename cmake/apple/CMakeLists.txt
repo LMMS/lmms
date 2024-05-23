@@ -19,8 +19,15 @@ CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_BINARY_DIR}/Info.plist")
 CONFIGURE_FILE("install_apple.sh.in"    "${CMAKE_BINARY_DIR}/install_apple.sh" @ONLY)
 CONFIGURE_FILE("package_apple.json.in"  "${CMAKE_BINARY_DIR}/package_apple.json" @ONLY)
 
+# Append foriegn arch
+IF(CMAKE_APPLE_SILICON_PROCESSOR)
+	SET(DMG_ARCH "-${CMAKE_APPLE_SILICON_PROCESSOR}")
+ELSEIF(CMAKE_OSX_ARCHITECTURES)
+	SET(DMG_ARCH "-${CMAKE_OSX_ARCHITECTURES}")
+ENDIF()
+
 # DMG creation target
-SET(DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}.dmg")
+SET(DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}${DMG_ARCH}.dmg")
 FILE(REMOVE "${DMG_FILE}")
 ADD_CUSTOM_TARGET(removedmg
 	COMMAND touch "\"${DMG_FILE}\"" && rm "\"${DMG_FILE}\""

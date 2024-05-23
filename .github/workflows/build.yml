@@ -146,6 +146,88 @@ jobs:
         with:
           key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
           path: ~/Library/Caches/Homebrew/downloads
+  macos-arm64:
+    name: macos-arm64
+    runs-on: macos-14
+    env:
+      CMAKE_OPTS: >-
+        -DUSE_WERROR=ON
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j3
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Clean up Homebrew download cache
+        run: rm -rf ~/Library/Caches/Homebrew/downloads
+      - name: Restore Homebrew download cache
+        uses: actions/cache/restore@v3
+        with:
+          key: n/a - only restore from restore-keys
+          restore-keys: |
+            homebrew-
+          path: ~/Library/Caches/Homebrew/downloads
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~/Library/Caches/ccache
+      - name: Install dependencies
+        run: |
+          wget -O /usr/local/bin/wrongbrew https://gist.github.com/tresf/9a45e1400a91f4c9c14a2240967094ff/raw/wrongbrew.sh 
+          chmod +x /usr/local/bin/wrongbrew
+          wrongbrew install --link-bin ccache curl qt@5 fltk pkg-config
+          wrongbrew bundle install
+          npm update -g npm
+          npm install --location=global appdmg
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_UPGRADE: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+      - name: Configure
+        run: |
+          ccache --zero-stats
+          mkdir build
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX="../target" \
+                -DCMAKE_OSX_ARCHITECTURES=arm64 \
+                -DCMAKE_PREFIX_PATH="$(wrongbrew --prefix);$(wrongbrew --prefix qt@5)" \
+                $CMAKE_OPTS \
+                -DUSE_WERROR=OFF
+      - name: Build
+        run: cmake --build build
+      - name: Package
+        run: |
+          cmake --build build --target install
+          cmake --build build --target dmg
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-arm64
+          path: build/lmms-*.dmg
+      - name: Trim ccache and print statistics
+        run: |
+          ccache --cleanup
+          echo "[ccache config]"
+          ccache --show-config
+          echo "[ccache stats]"
+          ccache --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB
+      - name: Save Homebrew download cache
+        uses: actions/cache/save@v3
+        with:
+          key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          path: ~/Library/Caches/Homebrew/downloads
   mingw:
     strategy:
       fail-fast: false
