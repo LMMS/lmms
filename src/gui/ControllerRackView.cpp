@@ -167,7 +167,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 	moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
 	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
-	controllerView->addAction( moveUpAction );
+	controllerView->addAction(moveUpAction);
 
 	QAction* moveDownAction = new QAction(controllerView);
 	moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
