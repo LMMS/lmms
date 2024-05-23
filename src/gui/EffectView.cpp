@@ -163,7 +163,7 @@ void EffectView::editControls()
 
 void EffectView::moveUp()
 {
-	emit moveUp( this );
+	emit movedUp(this);
 }
 
 
@@ -171,14 +171,14 @@ void EffectView::moveUp()
 
 void EffectView::moveDown()
 {
-	emit moveDown( this );
+	emit movedDown(this);
 }
 
 
 
 void EffectView::deletePlugin()
 {
-	emit deletePlugin( this );
+	emit deletedPlugin(this);
 }
 
 

@@ -133,14 +133,11 @@ void ControllerView::closeControls()
 	m_show = true;
 }
 
-void ControllerView::moveUp() { emit moveUp(this); }
+void ControllerView::moveUp() { emit movedUp(this); }
 
-void ControllerView::moveDown() { emit moveDown(this); }
+void ControllerView::moveDown() { emit movedDown(this); }
 
-void ControllerView::deleteController()
-{
-	emit( deleteController( this ) );
-}
+void ControllerView::removeController() { emit removedController(this); }
 
 void ControllerView::renameController()
 {
@@ -182,9 +179,8 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, &ControllerView::moveUp);
 	contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, &ControllerView::moveDown);
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this controller" ),
-						this, SLOT(deleteController()));
+	contextMenu->addAction(
+		embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, &ControllerView::removeController);
 	contextMenu->addAction( tr("Re&name this controller"), this, SLOT(renameController()));
 	contextMenu->addSeparator();
 	contextMenu->exec( QCursor::pos() );

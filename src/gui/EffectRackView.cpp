@@ -171,13 +171,9 @@ void EffectRackView::update()
 		if( i >= m_effectViews.size() )
 		{
 			auto view = new EffectView(effect, w);
-			connect( view, SIGNAL(moveUp(lmms::gui::EffectView*)),
-					this, SLOT(moveUp(lmms::gui::EffectView*)));
-			connect( view, SIGNAL(moveDown(lmms::gui::EffectView*)),
-				this, SLOT(moveDown(lmms::gui::EffectView*)));
-			connect( view, SIGNAL(deletePlugin(lmms::gui::EffectView*)),
-				this, SLOT(deletePlugin(lmms::gui::EffectView*)),
-							Qt::QueuedConnection );
+			connect(view, &EffectView::movedUp, this, &EffectRackView::moveUp);
+			connect(view, &EffectView::movedDown, this, &EffectRackView::moveDown);
+			connect(view, &EffectView::deletedPlugin, this, &EffectRackView::deletePlugin, Qt::QueuedConnection);
 
 			QAction* moveUpAction = new QAction(view);
 			moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);

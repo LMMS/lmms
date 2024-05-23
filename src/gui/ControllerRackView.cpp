@@ -69,8 +69,8 @@ ControllerRackView::ControllerRackView() :
 			this, SLOT(addController()));
 
 	Song * song = Engine::getSong();
-	connect( song, SIGNAL(controllerAdded(lmms::Controller*)), SLOT(onControllerAdded(lmms::Controller*)));
-	connect( song, SIGNAL(controllerRemoved(lmms::Controller*)), SLOT(onControllerRemoved(lmms::Controller*)));
+	connect(song, &Song::controllerAdded, this, qOverload<Controller*>(&ControllerRackView::addController));
+	connect(song, &Song::controllerRemoved, this, &ControllerRackView::removeController);
 
 	auto layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
@@ -136,8 +136,12 @@ void ControllerRackView::deleteController( ControllerView * _view )
 void ControllerRackView::moveUp(ControllerView* view)
 {
 	if (view == m_controllerViews.first()) { return; }
-	
-	const auto index = std::distance(m_controllerViews.begin(), view);
+
+	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
+	assert(storedView != m_controllerViews.end());
+
+	const auto index = std::distance(m_controllerViews.begin(), storedView);
+
 	std::swap(m_controllerViews[index - 1], m_controllerViews[index]);
 	m_scrollAreaLayout->removeWidget(view);
 	m_scrollAreaLayout->insertWidget(index - 1, view);
@@ -146,30 +150,29 @@ void ControllerRackView::moveUp(ControllerView* view)
 void ControllerRackView::moveDown(ControllerView* view)
 {
 	if (view == m_controllerViews.last()) { return; }
-	moveUp(++view);
+
+	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
+	assert(storedView != m_controllerViews.end());
+	moveUp(*std::next(storedView));
 }
 
-
-
-
-void ControllerRackView::onControllerAdded( Controller * controller )
+void ControllerRackView::addController(Controller* controller)
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 
 	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 
-	connect(controllerView, &ControllerView::moveUp, this, &ControllerRackView::moveUp);
-	connect(controllerView, &ControllerView::moveDown, this, &ControllerRackView::moveDown);
-	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
-		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );
+	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveUp);
+	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveDown);
+	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
 
-	QAction* moveUpAction = new QAction(controllerView);
+	auto moveUpAction = new QAction(controllerView);
 	moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
 	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
 	controllerView->addAction(moveUpAction);
 
-	QAction* moveDownAction = new QAction(controllerView);
+	auto moveDownAction = new QAction(controllerView);
 	moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
 	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
@@ -185,7 +188,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 
 
-void ControllerRackView::onControllerRemoved( Controller * removedController )
+void ControllerRackView::removeController(Controller* removedController)
 {
 	ControllerView * viewOfRemovedController = 0;
 

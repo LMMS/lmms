@@ -63,16 +63,16 @@ public:
 
 public slots:
 	void editControls();
-	void deleteController();
+	void removeController();
 	void closeControls();
 	void renameController();
 	void moveUp();
 	void moveDown();
 
 signals:
-	void moveUp(lmms::gui::ControllerView* _view);
-	void moveDown(lmms::gui::ControllerView* _view);
-	void deleteController( lmms::gui::ControllerView * _view );
+	void movedUp(ControllerView* view);
+	void movedDown(ControllerView* view);
+	void removedController(ControllerView* view);
 
 
 protected:
