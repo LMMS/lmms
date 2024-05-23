@@ -109,22 +109,6 @@ void AudioPulseAudio::stopProcessing()
 }
 
 
-
-
-void AudioPulseAudio::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-//		setSampleRate( engine::audioEngine()->processingSampleRate() );
-
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 /* This routine is called whenever the stream state changes */
 static void stream_state_callback( pa_stream *s, void * userdata )
 {

@@ -111,7 +111,7 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::audioEngine()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		const float samples = Engine::audioEngine()->outputSampleRate() * m_autoQuitModel.value() / 1000.0f;
 		return 1 + ( static_cast<int>( samples ) / Engine::audioEngine()->framesPerPeriod() );
 	}
 
@@ -192,7 +192,7 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::audioEngine()->processingSampleRate(),
+				Engine::audioEngine()->outputSampleRate(),
 					_dst_buf, _dst_sr,
 					Engine::audioEngine()->framesPerPeriod() );
 	}
@@ -202,11 +202,13 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->processingSampleRate(),
+				Engine::audioEngine()->outputSampleRate(),
 			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 	}
 	void reinitSRC();
+
+	virtual void onEnabledChanged() {}
 
 
 private:

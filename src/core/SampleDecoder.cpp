@@ -101,7 +101,7 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	int_sample_t* dataPtr = nullptr;
 
 	auto ds = DrumSynth{};
-	const auto engineRate = Engine::audioEngine()->processingSampleRate();
+	const auto engineRate = Engine::audioEngine()->outputSampleRate();
 	const auto frames = ds.GetDSFileSamples(audioFile, dataPtr, DEFAULT_CHANNELS, engineRate);
 	const auto data = std::unique_ptr<int_sample_t[]>{dataPtr}; // NOLINT, we have to use a C-style array here
 
