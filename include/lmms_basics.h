@@ -30,9 +30,10 @@
 
 #include "lmmsconfig.h"
 
-#include <cstdint>
 #include <array>
-
+#include <cstdint>
+#include <string>
+#include <string_view>
 
 namespace lmms
 {
@@ -125,7 +126,6 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
-
 using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
 using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
@@ -142,6 +142,8 @@ constexpr const char* UI_CTRL_KEY =
 "Ctrl";
 #endif
 
+using u8string = std::string;
+using u8string_view = std::string_view;
 
 } // namespace lmms
 
