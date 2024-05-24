@@ -89,7 +89,6 @@ namespace lmms::PathUtil
 			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
 			case Base::FactorySample    :
 			{
-				fs::absolute(fs::u8path(ConfigManager::inst()->factorySamplesDir().toStdString())).u;
 				const auto fsd = QDir{ConfigManager::inst()->factorySamplesDir()};
 				loc = fsd.absolutePath();
 				break;
