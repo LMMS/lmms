@@ -164,7 +164,7 @@ SET_PROPERTY(GLOBAL APPEND PROPERTY PLUGINS_BUILT "RemoteZynAddSubFx")
 TARGET_COMPILE_DEFINITIONS(RemoteZynAddSubFx PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 IF(LMMS_BUILD_WIN32)
-	target_link_options(RemoteZynAddSubFx PUBLIC "-mwindows")
+	target_link_options(RemoteZynAddSubFx PRIVATE "-mwindows")
 ENDIF()
 
 # Remove useless dependencies from FLTK. Use fltk-config to avoid static library
