@@ -182,7 +182,7 @@ jobs:
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
-          wget -O /usr/local/bin/wrongbrew https://gist.github.com/tresf/9a45e1400a91f4c9c14a2240967094ff/raw/wrongbrew.sh 
+          wget -O /usr/local/bin/wrongbrew https://gist.github.com/tresf/9a45e1400a91f4c9c14a2240967094ff/raw/wrongbrew.sh?$(date +%s) 
           chmod +x /usr/local/bin/wrongbrew
           wrongbrew install --link-bin ccache curl qt@5 fltk pkg-config
           wrongbrew bundle install
