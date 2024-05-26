@@ -1808,6 +1808,13 @@ void DataFile::upgrade_1_3_0()
 						};
 						iterate_ladspa_ports(effect, fn);
 					}
+
+					else if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "ToneStackLT" )
+					{
+						attribute.setAttribute( "value", "ToneStack" );
+					}
+
 					/*
 						SWH
 					*/
