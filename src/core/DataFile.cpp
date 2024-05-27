@@ -1279,6 +1279,36 @@ QDebug operator<<(QDebug dbg, const QDomNode& node)
 	return dbg;
 }
 
+// Convert from 0.4 to 0.9 version caps ToneStack model
+int toneStack(int data)
+{
+	int model = 0;
+	switch (data)
+	{
+		case 0:
+			model = 0;
+			break;
+		case 1:
+			model = 5;
+			break;
+		case 2:
+			model = 1;
+			break;
+		case 3:
+			model = 4;
+			break;
+		case 4:
+			model = 2;
+			break;
+		case 5:
+			model = 3;
+			break;
+		default:
+			model = 0; // default amp.
+	}
+	return model;
+}
+
 void DataFile::upgrade_1_3_0()
 {
 	QDomNodeList list = elementsByTagName( "instrument" );
@@ -1800,13 +1830,40 @@ void DataFile::upgrade_1_3_0()
 					else if( attribute.attribute( "name" ) == "plugin" &&
 						attribute.attribute( "value" ) == "ToneStack" )
 					{
-						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>& )
+						// Head back up the DOM to upgrade ports
+						QDomNodeList ladspacontrols = effect.elementsByTagName("ladspacontrols");
+						for (int m = 0; !ladspacontrols.item(m).isNull(); ++m)
 						{
-							// all ports move down by one
-							QString new_number = QString::number(proc) + QString::number(num - 1);
-							port.setTagName( "port" + new_number );
-						};
-						iterate_ladspa_ports(effect, fn);
+							QDomElement ladspacontrol = ladspacontrols.item(m).toElement();
+							for (QDomElement port = ladspacontrol.firstChild().toElement();
+							!port.isNull(); port = port.nextSibling().toElement())
+							{
+								if (port.tagName() == "port01")
+								{
+									port.setTagName("port00");
+									Q_ASSERT(port.hasAttribute("data"));
+									port.setAttribute("data", toneStack(port.attribute("data").toInt()));
+								}
+								else if (port.tagName() == "port02")
+										port.setTagName("port01");
+								else if (port.tagName() == "port03")
+										port.setTagName("port02");
+								else if (port.tagName() == "port04")
+										port.setTagName("port03");
+								if (port.tagName() == "port11")
+								{
+									port.setTagName("port10");
+									Q_ASSERT(port.hasAttribute("data"));
+									port.setAttribute("data", toneStack(port.attribute("data").toInt()));
+								}
+								else if (port.tagName() == "port12")
+										port.setTagName("port11");
+								else if (port.tagName() == "port13")
+										port.setTagName("port12");
+								else if (port.tagName() == "port14")
+										port.setTagName("port13");
+							}
+						}
 					}
 
 					else if( attribute.attribute( "name" ) == "plugin" &&
