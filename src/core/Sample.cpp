@@ -124,14 +124,14 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	assert(numFrames > 0);
 	assert(frequency > 0);
 
-	const auto pastBounds = state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards);
+	const auto pastBounds = state->frameIndex >= m_endFrame || (state->frameIndex < 0 && state->backwards);
 	if (m_buffer->empty() || (loopMode == Loop::Off && pastBounds)) { return false; }
 
 	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / frequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
 
-	state->m_frameIndex = std::max<float>(m_startFrame, state->m_frameIndex);
+	state->frameIndex = std::max<float>(m_startFrame, state->frameIndex);
 	render(dst, numFrames, state, loopMode, resampleRatio);
 
 	if (m_amplification != 1.0f)
@@ -164,32 +164,32 @@ void Sample::render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Lo
 		switch (loopMode)
 		{
 		case Loop::Off:
-			if (state->m_frameIndex < 0 || state->m_frameIndex >= m_endFrame) { return; }
+			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame) { return; }
 			break;
 		case Loop::On:
-			if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+			if (state->frameIndex < m_loopStartFrame && state->backwards)
 			{
-				state->m_frameIndex = m_loopEndFrame - 1;
+				state->frameIndex = m_loopEndFrame - 1;
 			}
-			else if (state->m_frameIndex >= m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
+			else if (state->frameIndex >= m_loopEndFrame) { state->frameIndex = m_loopStartFrame; }
 			break;
 		case Loop::PingPong:
-			if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+			if (state->frameIndex < m_loopStartFrame && state->backwards)
 			{
-				state->m_frameIndex = m_loopStartFrame;
-				state->m_backwards = false;
+				state->frameIndex = m_loopStartFrame;
+				state->backwards = false;
 			}
-			else if (state->m_frameIndex >= m_loopEndFrame)
+			else if (state->frameIndex >= m_loopEndFrame)
 			{
-				state->m_frameIndex = m_loopEndFrame - 1;
-				state->m_backwards = true;
+				state->frameIndex = m_loopEndFrame - 1;
+				state->backwards = true;
 			}
 			break;
 		default:
 			break;
 		}
 
-		const auto srcIndex = static_cast<int>(state->m_frameIndex);
+		const auto srcIndex = static_cast<int>(state->frameIndex);
 		const auto leftX1Index = srcIndex * DEFAULT_CHANNELS;
 		const auto rightX1Index = leftX1Index + 1;
 
@@ -214,12 +214,12 @@ void Sample::render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Lo
 		const auto rightX2 = (rightX2Index < 0 || rightX2Index >= srcSize) ? 0.0f : src[rightX2Index];
 		const auto rightX3 = (rightX3Index < 0 || rightX3Index >= srcSize) ? 0.0f : src[rightX3Index];
 
-		const auto fractionalPosition = state->m_frameIndex - srcIndex;
+		const auto fractionalPosition = state->frameIndex - srcIndex;
 		const auto leftSample = hermiteInterpolate(leftX0, leftX1, leftX2, leftX3, fractionalPosition);
 		const auto rightSample = hermiteInterpolate(rightX0, rightX1, rightX2, rightX3, fractionalPosition);
 
 		dst[i] = {leftSample, rightSample};
-		state->m_frameIndex += (state->m_backwards ? -1.0 : 1.0)  / resampleRatio;
+		state->frameIndex += (state->backwards ? -1.0 : 1.0)  / resampleRatio;
 	}
 }
 

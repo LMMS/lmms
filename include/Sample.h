@@ -48,27 +48,10 @@ public:
 		PingPong
 	};
 
-	class LMMS_EXPORT PlaybackState
+	struct LMMS_EXPORT PlaybackState
 	{
-	public:
-		PlaybackState(bool varyingPitch = false)
-			: m_varyingPitch(varyingPitch)
-		{
-		}
-
-		auto frameIndex() const -> double { return m_frameIndex; }
-		auto varyingPitch() const -> bool { return m_varyingPitch; }
-		auto backwards() const -> bool { return m_backwards; }
-
-		void setFrameIndex(double frameIndex) { m_frameIndex = frameIndex; }
-		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
-		void setBackwards(bool backwards) { m_backwards = backwards; }
-
-	private:
-		double m_frameIndex = 0;
-		bool m_varyingPitch = false;
-		bool m_backwards = false;
-		friend class Sample;
+		double frameIndex = 0;
+		bool backwards = false;
 	};
 
 	Sample() = default;
