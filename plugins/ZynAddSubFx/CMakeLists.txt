@@ -111,12 +111,6 @@ set_target_properties(zynaddsubfx_nio PROPERTIES SYSTEM TRUE)
 set_target_properties(zynaddsubfx_gui PROPERTIES SYSTEM TRUE)
 set_target_properties(zynaddsubfx_synth PROPERTIES SYSTEM TRUE)
 
-if(MINGW)
-	target_link_libraries(zynaddsubfx_nio PUBLIC mingw_stdthreads)
-	target_link_libraries(zynaddsubfx_gui PUBLIC mingw_stdthreads)
-	target_link_libraries(zynaddsubfx_synth PUBLIC mingw_stdthreads)
-endif()
-
 # Relative include paths don't work automatically for the GUI, because the
 # generated C++ files aren't in the source directory. Thus, add the expected
 # source directory as an additional include directory.

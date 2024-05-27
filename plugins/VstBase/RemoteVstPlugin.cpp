@@ -87,11 +87,7 @@
 #undef Unsorted
 #endif
 
-#ifdef USE_MINGW_THREADS_REPLACEMENT
-#	include <mingw.mutex.h>
-#else
-#	include <mutex>
-#endif
+#include <mutex>
 
 #include <algorithm>
 #include <vector>
