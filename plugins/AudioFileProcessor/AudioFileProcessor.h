@@ -72,8 +72,6 @@ public:
 	BoolModel & reverseModel() { return m_reverseModel; }
 	IntModel & loopModel() { return m_loopModel; }
 	BoolModel & stutterModel() { return m_stutterModel; }
-	ComboBoxModel & interpolationModel() { return m_interpolationModel; }
-
 
 public slots:
 	void setAudioFile(const QString& _audio_file, bool _rename = true);
@@ -102,7 +100,6 @@ private:
 	BoolModel m_reverseModel;
 	IntModel m_loopModel;
 	BoolModel m_stutterModel;
-	ComboBoxModel m_interpolationModel;
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;

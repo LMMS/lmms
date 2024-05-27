@@ -75,7 +75,6 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
 	m_loopModel( 0, 0, 2, this, tr( "Loop mode" ) ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
-	m_interpolationModel( this, tr( "Interpolation mode" ) ),
 	m_nextPlayStartPoint( 0 ),
 	m_nextPlayBackwards( false )
 {
@@ -91,12 +90,6 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ), Qt::DirectConnection );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 				this, SLOT( stutterModelChanged() ), Qt::DirectConnection );
-
-//interpolation modes
-	m_interpolationModel.addItem( tr( "None" ) );
-	m_interpolationModel.addItem( tr( "Linear" ) );
-	m_interpolationModel.addItem( tr( "Sinc" ) );
-	m_interpolationModel.setValue( 1 );
 
 	pointChanged();
 }
@@ -129,21 +122,8 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 			m_nextPlayStartPoint = m_sample.startFrame();
 			m_nextPlayBackwards = false;
 		}
-		// set interpolation mode for libsamplerate
-		int srcmode = SRC_LINEAR;
-		switch( m_interpolationModel.value() )
-		{
-			case 0:
-				srcmode = SRC_ZERO_ORDER_HOLD;
-				break;
-			case 1:
-				srcmode = SRC_LINEAR;
-				break;
-			case 2:
-				srcmode = SRC_SINC_MEDIUM_QUALITY;
-				break;
-		}
-		_n->m_pluginData = new Sample::PlaybackState(_n->hasDetuningInfo(), srcmode);
+
+		_n->m_pluginData = new Sample::PlaybackState(_n->hasDetuningInfo());
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->setFrameIndex(m_nextPlayStartPoint);
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->setBackwards(m_nextPlayBackwards);
 
@@ -205,7 +185,6 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 	m_endPointModel.saveSettings(doc, elem, "eframe");
 	m_loopPointModel.saveSettings(doc, elem, "lframe");
 	m_stutterModel.saveSettings(doc, elem, "stutter");
-	m_interpolationModel.saveSettings(doc, elem, "interp");
 }
 
 
@@ -242,16 +221,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 
 	m_reverseModel.loadSettings(elem, "reversed");
-
 	m_stutterModel.loadSettings(elem, "stutter");
-	if (elem.hasAttribute("interp") || !elem.firstChildElement("interp").isNull())
-	{
-		m_interpolationModel.loadSettings(elem, "interp");
-	}
-	else
-	{
-		m_interpolationModel.setValue(1.0f); // linear by default
-	}
 
 	pointChanged();
 	emit sampleUpdated();

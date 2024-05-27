@@ -131,11 +131,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	m_loopKnob->move(85, 108);
 	m_loopKnob->setHintText(tr("Loopback point:"), "");
 
-// interpolation selector
-	m_interpBox = new ComboBox(this);
-	m_interpBox->setGeometry(142, 62, 82, ComboBox::DEFAULT_HEIGHT);
-
-// wavegraph
+	// wavegraph
 	m_waveView = 0;
 	newWaveView();
 
@@ -276,7 +272,6 @@ void AudioFileProcessorView::modelChanged()
 	m_reverseButton->setModel(&a->reverseModel());
 	m_loopGroup->setModel(&a->loopModel());
 	m_stutterButton->setModel(&a->stutterModel());
-	m_interpBox->setModel(&a->interpolationModel());
 	sampleUpdated();
 }
 

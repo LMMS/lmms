@@ -75,7 +75,6 @@ private:
 	PixmapButton* m_reverseButton;
 	automatableButtonGroup* m_loopGroup;
 	PixmapButton* m_stutterButton;
-	ComboBox* m_interpBox;
 } ;
 
 } // namespace gui

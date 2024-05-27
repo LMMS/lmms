@@ -100,7 +100,7 @@ void VibratingString::resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstF
 		const float srcFrameFloat = frame * static_cast<float>(srcFrames) / dstFrames;
 		const float fracPos = srcFrameFloat - static_cast<f_cnt_t>(srcFrameFloat);
 		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), 1, srcFrames - 3);
-		m_impulse[frame] = cubicInterpolate(
+		m_impulse[frame] = hermiteInterpolate(
 			src[srcFrame - 1],
 			src[srcFrame + 0],
 			src[srcFrame + 1],

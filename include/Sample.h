@@ -25,10 +25,8 @@
 #ifndef LMMS_SAMPLE_H
 #define LMMS_SAMPLE_H
 
-#include <cmath>
 #include <memory>
 
-#include "AudioResampler.h"
 #include "Note.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
@@ -53,24 +51,21 @@ public:
 	class LMMS_EXPORT PlaybackState
 	{
 	public:
-		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
-			: m_resampler(interpolationMode, DEFAULT_CHANNELS)
-			, m_varyingPitch(varyingPitch)
+		PlaybackState(bool varyingPitch = false)
+			: m_varyingPitch(varyingPitch)
 		{
 		}
 
-		auto resampler() -> AudioResampler& { return m_resampler; }
-		auto frameIndex() const -> int { return m_frameIndex; }
+		auto frameIndex() const -> double { return m_frameIndex; }
 		auto varyingPitch() const -> bool { return m_varyingPitch; }
 		auto backwards() const -> bool { return m_backwards; }
 
-		void setFrameIndex(int frameIndex) { m_frameIndex = frameIndex; }
+		void setFrameIndex(double frameIndex) { m_frameIndex = frameIndex; }
 		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
-		AudioResampler m_resampler;
-		int m_frameIndex = 0;
+		double m_frameIndex = 0;
 		bool m_varyingPitch = false;
 		bool m_backwards = false;
 		friend class Sample;
@@ -87,7 +82,7 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) -> Sample&;
 
-	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
+	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, double frequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
@@ -117,17 +112,14 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	void playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
-	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
-
-private:
+	void render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Loop loopMode, double resampleRatio) const;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
 	std::atomic<int> m_loopStartFrame = 0;
 	std::atomic<int> m_loopEndFrame = 0;
 	std::atomic<float> m_amplification = 1.0f;
-	std::atomic<float> m_frequency = DefaultBaseFreq;
+	std::atomic<double> m_frequency = DefaultBaseFreq;
 	std::atomic<bool> m_reversed = false;
 };
 } // namespace lmms

@@ -36,48 +36,14 @@
 namespace lmms
 {
 
-inline float hermiteInterpolate( float x0, float x1, float x2, float x3,
-								float frac_pos )
+inline float hermiteInterpolate(float v0, float v1, float v2, float v3, float x)
 {
-	const float frsq = frac_pos*frac_pos;
-	const float frsq2 = 2*frsq;
-	return( ( (x2-x0) *0.5f ) * ( frac_pos * (frsq+1) -frsq2 ) +
-				( frsq2*frac_pos - 3*frsq ) * ( x1-x2 ) +
-			frsq2 * (frac_pos-1) * ( ( x3-x1 ) * 0.25f ) + x1 );
-
-/*
-   const float frsq	= frac_pos*frac_pos;
-   //const float frsq2	= 2*frsq;
-   frac_pos *= 0.5;
-   const float frcu	= frsq*frac_pos;
-   return (
-   
-   (frcu - frsq + frac_pos) * ((x2 - x0)) +
-   
-   (4*frcu - 3*frsq) * (x1 - x2)
-   //frsq*(2*frac_pos-3) * (x1 - x2)
-   
-   + (frcu - 0.5*frsq)*((x3 - x1))  
-    
-   + x1
-   
-   );
-*/
+	float c0 = v1;
+	float c1 = 1 / 2.0 * (v2 - v0);
+	float c2 = v0 - 5 / 2.0 * v1 + 2 * v2 - 1 / 2.0 * v3;
+	float c3 = 1 / 2.0 * (v3 - v0) + 3 / 2.0 * (v1 - v2);
+	return fastFmaf(fastFmaf(fastFmaf(c3, x, c2), x, c1), x, c0);
 }
-
-
-
-inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
-{
-	float frsq = x*x;
-	float frcu = frsq*v0;
-	float t1 = v3 + 3*v1;
-
-	return( v1 + fastFmaf( 0.5f, frcu, x ) * ( v2 - frcu * ( 1.0f/6.0f ) -
-		fastFmaf( t1, ( 1.0f/6.0f ), -v0 ) * ( 1.0f/3.0f ) ) + frsq * x * ( t1 *
-		( 1.0f/6.0f ) - 0.5f * v2 ) + frsq * fastFmaf( 0.5f, v2, -v1 ) );
-}
-
 
 
 inline float cosinusInterpolate( float v0, float v1, float x )
