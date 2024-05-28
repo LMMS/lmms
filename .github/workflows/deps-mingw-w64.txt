@@ -1,7 +1,6 @@
 binutils
 ca-certificates
 ccache
-cmake
 dirmngr
 file
 git
