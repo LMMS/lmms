@@ -81,11 +81,6 @@
 			"default-features": false
 		},
 		{
-			"name": "vcpkg-qmake",
-			"default-features": false,
-			"platform": "linux | mingw"
-		},
-		{
 			"name": "zlib",
 			"default-features": false
 		}

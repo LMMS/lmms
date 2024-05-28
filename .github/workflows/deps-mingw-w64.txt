@@ -20,6 +20,7 @@ mingw-w64
 mingw-w64-tools
 nsis
 perl
+qt5-qmake
 software-properties-common
 ssh-client
 wget
