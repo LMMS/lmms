@@ -303,6 +303,8 @@ jobs:
         run: xargs -a .github/workflows/deps-mingw-w64.txt sudo apt-get install --yes
       - name: Install CMake
         run: .github/workflows/install-cmake.sh
+      - name: Install PowerShell
+        run: .github/workflows/install-powershell.sh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
