@@ -61,6 +61,10 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	{
 		m_autoQuitDisabled = true;
 	}
+
+	// Call the virtual method onEnabledChanged so that effects can react to changes,
+	// e.g. by resetting state.
+	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
 

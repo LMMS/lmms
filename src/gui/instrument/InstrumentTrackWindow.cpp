@@ -350,7 +350,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_mixerChannelNumber->setModel( &m_track->m_mixerChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
-	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::Flag::IsNotBendable ) == false )
+	if (m_track->instrument() && m_track->instrument()->isBendable())
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
@@ -368,7 +368,7 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchRangeLabel->hide();
 	}
 
-	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::Flag::IsMidiBased))
+	if (m_track->instrument() && m_track->instrument()->isMidiBased())
 	{
 		m_tuningView->microtunerNotSupportedLabel()->show();
 		m_tuningView->microtunerGroupBox()->hide();
@@ -462,7 +462,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
-		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::Flag::IsSingleStreamed ) );
+		m_ssView->setFunctionsHidden(m_track->m_instrument->isSingleStreamed());
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change

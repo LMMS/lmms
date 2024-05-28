@@ -80,7 +80,7 @@ void PeakController::updateValueBuffer()
 {
 	if( m_coeffNeedsUpdate )
 	{
-		const float ratio = 44100.0f / Engine::audioEngine()->processingSampleRate();
+		const float ratio = 44100.0f / Engine::audioEngine()->outputSampleRate();
 		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
 		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
 		m_coeffNeedsUpdate = false;

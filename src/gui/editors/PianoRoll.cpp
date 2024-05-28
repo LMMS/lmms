@@ -160,6 +160,7 @@ PianoRoll::PianoRoll() :
 	m_midiClip( nullptr ),
 	m_currentPosition(),
 	m_recording( false ),
+	m_doAutoQuantization(ConfigManager::inst()->value("midi", "autoquantize").toInt() != 0),
 	m_currentNote( nullptr ),
 	m_action( Action::None ),
 	m_noteEditMode( NoteEditMode::Volume ),
@@ -240,6 +241,15 @@ PianoRoll::PianoRoll() :
 	connect( markChordAction, &QAction::triggered, [this](){ markSemiTone(SemiToneMarkerAction::MarkCurrentChord); });
 	connect( unmarkAllAction, &QAction::triggered, [this](){ markSemiTone(SemiToneMarkerAction::UnmarkAll); });
 	connect( copyAllNotesAction, &QAction::triggered, [this](){ markSemiTone(SemiToneMarkerAction::CopyAllNotesOnKey); });
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged,
+		[this](QString const& cls, QString const& attribute, QString const& value)
+		{
+			if (!(cls == "midi" && attribute == "autoquantize"))
+			{
+				return;
+			}
+			this->m_doAutoQuantization = (value.toInt() != 0);
+		});
 
 	markScaleAction->setEnabled( false );
 	markChordAction->setEnabled( false );
@@ -332,7 +342,7 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
-	const auto pixmaps = std::array<QString, 11>{"whole", "half", "quarter", "eighth",
+	const auto pixmaps = std::array<std::string, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
 						"tripletsixteenth", "tripletthirtysecond"};
@@ -3764,7 +3774,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->angleDelta().y() > 0 ? 1 : -1;
+			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{
 				for ( Note * n : nv )
@@ -4108,8 +4119,13 @@ void PianoRoll::finishRecordNote(const Note & n )
 					Note n1(n.length(), it->pos(),
 							it->key(), it->getVolume(),
 							it->getPanning(), n.detuning());
-					n1.quantizeLength( quantization() );
-					m_midiClip->addNote( n1 );
+
+					if (m_doAutoQuantization)
+					{
+						n1.quantizeLength(quantization());
+						n1.quantizePos(quantization());
+					}
+					m_midiClip->addNote(n1, false);
 					update();
 					m_recordingNotes.erase( it );
 					break;
@@ -4879,7 +4895,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
+	m_quantizeComboBox->setFixedSize(85, ComboBox::DEFAULT_HEIGHT);
 	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
@@ -4903,7 +4919,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
-	m_scaleComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
+	m_scaleComboBox->setFixedSize(155, ComboBox::DEFAULT_HEIGHT);
 	m_scaleComboBox->setToolTip( tr( "Scale") );
 
 	// setup chord-stuff
@@ -4912,7 +4928,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
-	m_chordComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
+	m_chordComboBox->setFixedSize(125, ComboBox::DEFAULT_HEIGHT);
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// setup snap-stuff
@@ -4921,7 +4937,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_snapComboBox = new ComboBox(m_toolBar);
 	m_snapComboBox->setModel(&m_editor->m_snapModel);
-	m_snapComboBox->setFixedSize(105, ComboBox::DEFAULT_HEIGHT);
+	m_snapComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
 	// -- Clear ghost MIDI clip button

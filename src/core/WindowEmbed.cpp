@@ -35,10 +35,8 @@ namespace lmms
 
 auto WindowEmbed::availableMethods() -> std::vector<Method>
 {
-	auto methods = std::vector{
-#if QT_VERSION >= 0x050100
+	auto methods = std::vector {
 		Method::Qt,
-#endif
 #ifdef LMMS_BUILD_APPLE
 		Method::Cocoa,
 #endif

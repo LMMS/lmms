@@ -102,7 +102,7 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 			return;
 		}
 
-		m_sampleRate = Engine::audioEngine()->processingSampleRate();
+		m_sampleRate = Engine::audioEngine()->outputSampleRate();
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
 

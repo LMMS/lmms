@@ -339,7 +339,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::audioEngine()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->outputSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }
@@ -736,14 +736,12 @@ void VstPlugin::createUI( QWidget * parent )
 
 	QWidget* container = nullptr;
 
-#if QT_VERSION >= 0x050100
 	if (m_embedMethod == WindowEmbed::Method::Qt)
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
 		container = QWidget::createWindowContainer(vw, parent );
 		container->installEventFilter(this);
 	} else
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 	if (m_embedMethod == WindowEmbed::Method::Win32)
@@ -802,7 +800,6 @@ void VstPlugin::createUI( QWidget * parent )
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 {
-#if QT_VERSION >= 0x050100
 	if (embedMethod() == WindowEmbed::Method::Qt && obj == m_pluginWidget)
 	{
 		if (event->type() == QEvent::Show) {
@@ -810,7 +807,6 @@ bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 		}
 		qDebug() << obj << event;
 	}
-#endif
 	return false;
 }
 

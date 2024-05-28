@@ -83,7 +83,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
-	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes
+	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
+	&DataFile::upgrade_fixCMTDelays
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1680,6 +1681,44 @@ void DataFile::upgrade_noteTypes()
 	}
 }
 
+void DataFile::upgrade_fixCMTDelays()
+{
+	static const QMap<QString, QString> nameMap {
+		{ "delay_0,01s", "delay_0.01s" },
+		{ "delay_0,1s", "delay_0.1s" },
+		{ "fbdelay_0,01s", "fbdelay_0.01s" },
+		{ "fbdelay_0,1s", "fbdelay_0.1s" }
+	};
+
+	const auto effects = elementsByTagName("effect");
+
+	for (int i = 0; i < effects.size(); ++i)
+	{
+		auto effect = effects.item(i).toElement();
+
+		// We are only interested in LADSPA plugins
+		if (effect.attribute("name") != "ladspaeffect") { continue; }
+
+		// Fetch all attributes (LMMS) beneath the LADSPA effect so that we can check the value of the plugin attribute (XML)
+		auto attributes = effect.elementsByTagName("attribute");
+		for (int j = 0; j < attributes.size(); ++j)
+		{
+			auto attribute = attributes.item(j).toElement();
+
+			if (attribute.attribute("name") == "plugin")
+			{
+				const auto attributeValue = attribute.attribute("value");
+
+				const auto it = nameMap.constFind(attributeValue);
+				if (it != nameMap.constEnd())
+				{
+					attribute.setAttribute("value", *it);
+				}
+			}
+		}
+	}
+}
+
 
 /** \brief Note range has been extended to match MIDI specification
  *
@@ -1831,38 +1870,41 @@ void DataFile::upgrade_sampleAndHold()
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	static constexpr auto loopBPMs = std::array{
-		std::pair{"bassloops/briff01", "140"},
-		std::pair{"bassloops/rave_bass01", "180"},
-		std::pair{"bassloops/rave_bass02", "180"},
-		std::pair{"bassloops/tb303_01", "123"},
-		std::pair{"bassloops/techno_bass01", "140"},
-		std::pair{"bassloops/techno_bass02", "140"},
-		std::pair{"bassloops/techno_synth01", "140"},
-		std::pair{"bassloops/techno_synth02", "140"},
-		std::pair{"bassloops/techno_synth03", "130"},
-		std::pair{"bassloops/techno_synth04", "140"},
-		std::pair{"beats/909beat01", "122"},
-		std::pair{"beats/break01", "168"},
-		std::pair{"beats/break02", "141"},
-		std::pair{"beats/break03", "168"},
-		std::pair{"beats/electro_beat01", "120"},
-		std::pair{"beats/electro_beat02", "119"},
-		std::pair{"beats/house_loop01", "142"},
-		std::pair{"beats/jungle01", "168"},
-		std::pair{"beats/rave_hihat01", "180"},
-		std::pair{"beats/rave_hihat02", "180"},
-		std::pair{"beats/rave_kick01", "180"},
-		std::pair{"beats/rave_kick02", "180"},
-		std::pair{"beats/rave_snare01", "180"},
-		std::pair{"latin/latin_brass01", "140"},
-		std::pair{"latin/latin_guitar01", "126"},
-		std::pair{"latin/latin_guitar02", "140"},
-		std::pair{"latin/latin_guitar03", "120"},
+	auto createEntry = [](const QString& originalName, const QString& bpm, const QString& extension = "ogg")
+	{
+		const QString replacement = originalName + " - " + bpm + " BPM." + extension;
+		return std::pair{originalName + "." + extension, replacement};
 	};
 
-	const QString prefix = "factorysample:",
-		  extension = ".ogg";
+	static const QMap<QString, QString> namesToNamesWithBPMsMap {
+		{ createEntry("bassloops/briff01", "140") },
+		{ createEntry("bassloops/rave_bass01", "180") },
+		{ createEntry("bassloops/rave_bass02", "180") },
+		{ createEntry("bassloops/tb303_01", "123") },
+		{ createEntry("bassloops/techno_bass01", "140") },
+		{ createEntry("bassloops/techno_bass02", "140") },
+		{ createEntry("bassloops/techno_synth01", "140") },
+		{ createEntry("bassloops/techno_synth02", "140") },
+		{ createEntry("bassloops/techno_synth03", "130") },
+		{ createEntry("bassloops/techno_synth04", "140") },
+		{ createEntry("beats/909beat01", "122") },
+		{ createEntry("beats/break01", "168") },
+		{ createEntry("beats/break02", "141") },
+		{ createEntry("beats/break03", "168") },
+		{ createEntry("beats/electro_beat01", "120") },
+		{ createEntry("beats/electro_beat02", "119") },
+		{ createEntry("beats/house_loop01", "142") },
+		{ createEntry("beats/jungle01", "168") },
+		{ createEntry("beats/rave_hihat01", "180") },
+		{ createEntry("beats/rave_hihat02", "180") },
+		{ createEntry("beats/rave_kick01", "180") },
+		{ createEntry("beats/rave_kick02", "180") },
+		{ createEntry("beats/rave_snare01", "180") },
+		{ createEntry("latin/latin_brass01", "140") },
+		{ createEntry("latin/latin_guitar01", "126") },
+		{ createEntry("latin/latin_guitar02", "140") },
+		{ createEntry("latin/latin_guitar03", "120") }
+	};
 
 	// Replace loop sample names
 	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
@@ -1876,20 +1918,13 @@ void DataFile::upgrade_loopsRename()
 				auto item = elements.item(i).toElement();
 
 				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
-				for (const auto& cur : loopBPMs)
-				{
-					QString x = cur.first, // loop name
-						y = cur.second,    // BPM
-						srcVal = item.attribute(srcAttr),
-						pattern = prefix + x + extension;
 
-					if (srcVal == pattern)
-					{
-						// Add " - X BPM" to filename
-						item.setAttribute(srcAttr, 
-								prefix + x + " - " + y + " BPM" +
-								extension);
-					}
+				const QString srcVal = item.attribute(srcAttr);
+
+				const auto it = namesToNamesWithBPMsMap.constFind(srcVal);
+				if (it != namesToNamesWithBPMsMap.constEnd())
+				{
+					item.setAttribute(srcAttr, *it);
 				}
 			}
 		}

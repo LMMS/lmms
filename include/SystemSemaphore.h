@@ -1,8 +1,7 @@
 /*
- * LfoGraph.h - Displays LFO graphs
+ * SystemSemaphore.h
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2024-     Michael Gregorius
+ * Copyright (c) 2024 Dominic Clark
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -20,46 +19,43 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
-#ifndef LMMS_GUI_LFO_GRAPH_H
-#define LMMS_GUI_LFO_GRAPH_H
+#ifndef LMMS_SYSTEM_SEMAPHORE_H
+#define LMMS_SYSTEM_SEMAPHORE_H
 
-#include <QWidget>
+#include <memory>
+#include <string>
 
-#include "ModelView.h"
-#include "embed.h"
+namespace lmms {
 
-namespace lmms
-{
+namespace detail {
 
-class EnvelopeAndLfoParameters;
+class SystemSemaphoreImpl;
 
-namespace gui
-{
+} // namespace detail
 
-class LfoGraph : public QWidget, public ModelView
+class SystemSemaphore
 {
 public:
-	LfoGraph(QWidget* parent);
+	SystemSemaphore() noexcept;
+	SystemSemaphore(std::string key, unsigned int value);
+	explicit SystemSemaphore(std::string key);
+	~SystemSemaphore();
 
-protected:
-	void mousePressEvent(QMouseEvent* me) override;
-	void paintEvent(QPaintEvent* pe) override;
+	SystemSemaphore(SystemSemaphore&& other) noexcept;
+	auto operator=(SystemSemaphore&& other) noexcept -> SystemSemaphore&;
+
+	auto acquire() noexcept -> bool;
+	auto release() noexcept -> bool;
+
+	auto key() const noexcept -> const std::string& { return m_key; }
 
 private:
-	void drawInfoText(const EnvelopeAndLfoParameters&);
-	void toggleAmountModel();
-
-private:
-	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
-
-	float m_randomGraph {0.};
+	std::string m_key;
+	std::unique_ptr<detail::SystemSemaphoreImpl> m_impl;
 };
-
-} // namespace gui
 
 } // namespace lmms
 
-#endif // LMMS_GUI_LFO_GRAPH_H
+#endif // LMMS_SYSTEM_SEMAPHORE_H

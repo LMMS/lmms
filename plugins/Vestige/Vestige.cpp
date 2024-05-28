@@ -152,7 +152,7 @@ private:
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &vestige_plugin_descriptor ),
+	Instrument(_instrument_track, &vestige_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_plugin( nullptr ),
 	m_pluginMutex(),
 	m_subWindow( nullptr ),

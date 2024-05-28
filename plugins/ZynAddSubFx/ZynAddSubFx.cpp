@@ -103,7 +103,7 @@ bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
 
 ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
+	Instrument(_instrumentTrack, &zynaddsubfx_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_hasGUI( false ),
 	m_plugin( nullptr ),
 	m_remotePlugin( nullptr ),
@@ -451,7 +451,7 @@ void ZynAddSubFxInstrument::initPlugin()
 						QDir( ConfigManager::inst()->factoryPresetsDir() +
 								"/ZynAddSubFX" ).absolutePath() ) ) );
 
-		m_remotePlugin->updateSampleRate( Engine::audioEngine()->processingSampleRate() );
+		m_remotePlugin->updateSampleRate( Engine::audioEngine()->outputSampleRate() );
 
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
@@ -463,7 +463,7 @@ void ZynAddSubFxInstrument::initPlugin()
 	else
 	{
 		m_plugin = new LocalZynAddSubFx;
-		m_plugin->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+		m_plugin->setSampleRate( Engine::audioEngine()->outputSampleRate() );
 		m_plugin->setBufferSize( Engine::audioEngine()->framesPerPeriod() );
 	}
 
