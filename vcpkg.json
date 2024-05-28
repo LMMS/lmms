@@ -55,7 +55,8 @@
 		},
 		{
 			"name": "mp3lame",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "portaudio",
