@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <codecvt>
 #include <cstdlib>
 #include <string>
 
@@ -128,14 +129,14 @@ void ClapManager::findSearchPaths()
 	// Use LMMS_CLAP_PATH to override all of CLAP's default search paths
 	if (auto paths = _wgetenv(L"LMMS_CLAP_PATH"))
 	{
-		parsePaths(toUtf8(paths));
+		parsePaths(toUtf8(paths).c_str());
 		return;
 	}
 
 	// Get CLAP_PATH paths
 	if (auto paths = _wgetenv(L"CLAP_PATH"))
 	{
-		parsePaths(toUtf8(paths));
+		parsePaths(toUtf8(paths).c_str());
 	}
 #else
 	// Use LMMS_CLAP_PATH to override all of CLAP's default search paths
