@@ -210,7 +210,6 @@ void printHelp()
 		"  -p, --profile <out>            Dump profiling information to file <out>\n"
 		"  -s, --samplerate <samplerate>  Specify output samplerate in Hz\n"
 		"          Range: 44100 (default) to 192000\n"
-		"  -x, --oversampling <value>     Specify oversampling\n"
 		"          Possible values: 1, 2, 4, 8\n"
 		"          Default: 2\n\n",
 		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
@@ -361,7 +360,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
 
-	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode::HighQuality );
+	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
@@ -644,36 +643,6 @@ int main( int argc, char * * argv )
 			else
 			{
 				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
-			}
-		}
-		else if( arg == "--oversampling" || arg == "-x" )
-		{
-			++i;
-
-			if( i == argc )
-			{
-				return usageError( "No oversampling specified" );
-			}
-
-
-			int o = QString( argv[i] ).toUInt();
-
-			switch( o )
-			{
-				case 1:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling::None;
-		break;
-				case 2:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling::X2;
-		break;
-				case 4:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling::X4;
-		break;
-				case 8:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling::X8;
-		break;
-				default:
-				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--import" )

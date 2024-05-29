@@ -1,7 +1,7 @@
 /*
- * SampleLoader.h - Load audio and waveform files
+ * SystemSemaphore.h
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 Dominic Clark
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -19,30 +19,43 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
-#ifndef LMMS_GUI_SAMPLE_LOADER_H
-#define LMMS_GUI_SAMPLE_LOADER_H
+#ifndef LMMS_SYSTEM_SEMAPHORE_H
+#define LMMS_SYSTEM_SEMAPHORE_H
 
-#include <QString>
 #include <memory>
+#include <string>
 
-#include "SampleBuffer.h"
-#include "lmms_export.h"
+namespace lmms {
 
-namespace lmms::gui {
-class LMMS_EXPORT SampleLoader
+namespace detail {
+
+class SystemSemaphoreImpl;
+
+} // namespace detail
+
+class SystemSemaphore
 {
 public:
-	static QString openAudioFile(const QString& previousFile = "");
-	static QString openWaveformFile(const QString& previousFile = "");
-	static std::shared_ptr<const SampleBuffer> createBufferFromFile(const QString& filePath);
-	static std::shared_ptr<const SampleBuffer> createBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
-private:
-	static void displayError(const QString& message);
-};
-} // namespace lmms::gui
+	SystemSemaphore() noexcept;
+	SystemSemaphore(std::string key, unsigned int value);
+	explicit SystemSemaphore(std::string key);
+	~SystemSemaphore();
 
-#endif // LMMS_GUI_SAMPLE_LOADER_H
+	SystemSemaphore(SystemSemaphore&& other) noexcept;
+	auto operator=(SystemSemaphore&& other) noexcept -> SystemSemaphore&;
+
+	auto acquire() noexcept -> bool;
+	auto release() noexcept -> bool;
+
+	auto key() const noexcept -> const std::string& { return m_key; }
+
+private:
+	std::string m_key;
+	std::unique_ptr<detail::SystemSemaphoreImpl> m_impl;
+};
+
+} // namespace lmms
+
+#endif // LMMS_SYSTEM_SEMAPHORE_H

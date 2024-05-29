@@ -338,7 +338,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::audioEngine()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->outputSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }

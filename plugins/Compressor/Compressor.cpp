@@ -56,7 +56,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	Effect(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
@@ -560,7 +560,7 @@ inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &out
 
 void CompressorEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 
