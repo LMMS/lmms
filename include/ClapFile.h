@@ -30,12 +30,12 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <QLibrary>
+#include <filesystem>
 #include <memory>
 #include <vector>
 
 #include "ClapPluginInfo.h"
 #include "ClapPresetDatabase.h"
-#include "lmms_filesystem.h"
 #include "lmms_export.h"
 
 namespace lmms
@@ -56,7 +56,7 @@ public:
 		Access(const Access&) = default;
 	};
 
-	explicit ClapFile(fs::path filename);
+	explicit ClapFile(std::filesystem::path filename);
 	~ClapFile();
 
 	ClapFile(const ClapFile&) = delete;
@@ -84,7 +84,7 @@ public:
 private:
 	void unload() noexcept;
 
-	fs::path m_filename;
+	std::filesystem::path m_filename;
 
 	std::unique_ptr<QLibrary> m_library;
 

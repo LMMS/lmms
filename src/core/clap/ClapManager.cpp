@@ -41,7 +41,7 @@ namespace lmms
 
 namespace
 {
-	auto expandHomeDir(std::string_view dir) -> fs::path
+	auto expandHomeDir(std::string_view dir) -> std::filesystem::path
 	{
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE)
 		if (!dir.empty() && dir[0] == '~')
@@ -51,11 +51,11 @@ namespace
 				const auto pos = dir.find_first_not_of(R"(/\)", 1);
 				if (pos == std::string_view::npos) { return home; }
 				dir.remove_prefix(pos);
-				return fs::path{home} / dir;
+				return std::filesystem::u8path(home) / dir;
 			}
 		}
 #endif
-		return dir;
+		return std::filesystem::u8path(dir);
 	}
 } // namespace
 
@@ -110,15 +110,34 @@ void ClapManager::findSearchPaths()
 			pos = paths.find(LADSPA_PATH_SEPERATOR);
 			if (pos == 0) { continue; }
 			auto path = expandHomeDir(paths.substr(0, pos));
-			if (std::error_code ec; fs::is_directory(path, ec))
+			if (std::error_code ec; std::filesystem::is_directory(path, ec))
 			{
-				path = fs::canonical(path.make_preferred(), ec);
+				path = std::filesystem::canonical(path.make_preferred(), ec);
 				if (ec) { continue; }
 				m_searchPaths.emplace(std::move(path));
 			}
 		} while (pos++ != std::string_view::npos);
 	};
 
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
+	auto toUtf8 = [](const std::wstring& str) -> std::string {
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+		return conv.to_bytes(str);
+	};
+
+	// Use LMMS_CLAP_PATH to override all of CLAP's default search paths
+	if (auto paths = _wgetenv(L"LMMS_CLAP_PATH"))
+	{
+		parsePaths(toUtf8(paths));
+		return;
+	}
+
+	// Get CLAP_PATH paths
+	if (auto paths = _wgetenv(L"CLAP_PATH"))
+	{
+		parsePaths(toUtf8(paths));
+	}
+#else
 	// Use LMMS_CLAP_PATH to override all of CLAP's default search paths
 	if (auto paths = std::getenv("LMMS_CLAP_PATH"))
 	{
@@ -128,6 +147,7 @@ void ClapManager::findSearchPaths()
 
 	// Get CLAP_PATH paths
 	parsePaths(std::getenv("CLAP_PATH"));
+#endif
 
 	// Add OS-dependent search paths
 #ifdef LMMS_BUILD_LINUX
@@ -135,12 +155,12 @@ void ClapManager::findSearchPaths()
 	// /usr/lib/clap
 	std::error_code ec;
 	auto path = expandHomeDir("~/.clap");
-	if (fs::is_directory(path, ec))
+	if (std::filesystem::is_directory(path, ec))
 	{
 		m_searchPaths.emplace(std::move(path));
 	}
 	path = "/usr/lib/clap";
-	if (fs::is_directory(path, ec))
+	if (std::filesystem::is_directory(path, ec))
 	{
 		m_searchPaths.emplace(std::move(path));
 	}
@@ -148,18 +168,18 @@ void ClapManager::findSearchPaths()
 	// %COMMONPROGRAMFILES%\CLAP
 	// %LOCALAPPDATA%\Programs\Common\CLAP
 	std::error_code ec;
-	if (auto commonProgFiles = std::getenv("COMMONPROGRAMFILES"))
+	if (auto commonProgFiles = _wgetenv(L"COMMONPROGRAMFILES")) // TODO: Use wstring
 	{
-		auto path = fs::path{commonProgFiles} / "CLAP";
-		if (fs::is_directory(path, ec))
+		auto path = std::filesystem::path{commonProgFiles} / "CLAP";
+		if (std::filesystem::is_directory(path, ec))
 		{
 			m_searchPaths.emplace(std::move(path.make_preferred()));
 		}
 	}
-	if (auto localAppData = std::getenv("LOCALAPPDATA"))
+	if (auto localAppData = _wgetenv(L"LOCALAPPDATA"))
 	{
-		auto path = fs::path{localAppData} / "Programs/Common/CLAP";
-		if (fs::is_directory(path, ec))
+		auto path = std::filesystem::path{localAppData} / "Programs/Common/CLAP";
+		if (std::filesystem::is_directory(path, ec))
 		{
 			m_searchPaths.emplace(std::move(path.make_preferred()));
 		}
@@ -168,13 +188,13 @@ void ClapManager::findSearchPaths()
 	// /Library/Audio/Plug-Ins/CLAP
 	// ~/Library/Audio/Plug-Ins/CLAP
 	std::error_code ec;
-	auto path = fs::path{"/Library/Audio/Plug-Ins/CLAP"};
-	if (fs::is_directory(path, ec))
+	auto path = std::filesystem::path{"/Library/Audio/Plug-Ins/CLAP"};
+	if (std::filesystem::is_directory(path, ec))
 	{
 		m_searchPaths.emplace(std::move(path));
 	}
 	path = expandHomeDir("~/Library/Audio/Plug-Ins/CLAP");
-	if (fs::is_directory(path, ec))
+	if (std::filesystem::is_directory(path, ec))
 	{
 		m_searchPaths.emplace(std::move(path));
 	}
@@ -197,16 +217,15 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	int totalPlugins = 0;
 	for (const auto& path : searchPaths)
 	{
-		for (const auto& entry : fs::recursive_directory_iterator{path})
+		for (const auto& entry : std::filesystem::recursive_directory_iterator{path})
 		{
-			const auto& entryPath = entry.path();
-
 #if defined(LMMS_BUILD_APPLE)
 			// NOTE: macOS uses a bundle rather than a regular file
-			if (std::error_code ec; !fs::is_directory(entryPath, ec)) { continue; }
+			if (std::error_code ec; !entry.is_directory(ec)) { continue; }
 #else
-			if (std::error_code ec; !fs::is_regular_file(entryPath, ec)) { continue; }
+			if (std::error_code ec; !entry.is_regular_file(ec)) { continue; }
 #endif
+			const auto& entryPath = entry.path();
 			if (entryPath.extension() != ".clap") { continue; }
 
 			++totalClapFiles;
@@ -214,7 +233,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			if (debugging())
 			{
 				std::string msg = "\n\n~~~CLAP FILE~~~\nfilename: ";
-				msg += entryPath.string();
+				msg += entryPath.u8string();
 				ClapLog::plainLog(msg);
 			}
 
@@ -222,7 +241,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			if (!file.load())
 			{
 				std::string msg = "Failed to load '";
-				msg += file.filename().string();
+				msg += file.filename().u8string();
 				msg += "'";
 				ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 				m_files.pop_back(); // Remove/unload invalid clap file

@@ -28,10 +28,10 @@
 
 #include <QObject>
 #include <cassert>
+#include <filesystem>
 #include <clap/entry.h>
 
 #include "ClapLog.h"
-#include "lmms_filesystem.h"
 #include "lmmsversion.h"
 #include "PathUtil.h"
 
@@ -215,7 +215,7 @@ auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Pres
 	}
 
 	// First handle case where location is a file
-	if (std::error_code ec; fs::is_regular_file(fullPath, ec))
+	if (std::error_code ec; std::filesystem::is_regular_file(fullPath, ec))
 	{
 		// Use preferred indexer if possible
 		if (preferredIndexer)
@@ -245,7 +245,7 @@ auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Pres
 	}
 
 	// Location is a directory - need to search for preset files
-	if (std::error_code ec; !fs::is_directory(fullPath, ec))
+	if (std::error_code ec; !std::filesystem::is_directory(fullPath, ec))
 	{
 		ClapLog::globalLog(CLAP_LOG_WARNING, "Preset directory \"" + fullPath + "\" does not exist");
 		return false;
@@ -255,12 +255,11 @@ auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Pres
 	auto getPresets = [&](Indexer& indexer) -> bool {
 		bool success = false;
 
-		for (const auto& entry : fs::recursive_directory_iterator{fullPath})
+		for (const auto& entry : std::filesystem::recursive_directory_iterator{fullPath})
 		{
 			const auto entryPath = entry.path().string();
 
-			// NOTE: Using is_regular_file() free function workaround due to std::experimental::filesystem
-			if (std::error_code ec; !fs::is_regular_file(entry, ec)) { continue; }
+			if (std::error_code ec; !entry.is_regular_file(ec)) { continue; }
 
 			if (!indexer.filetypeSupported(entryPath)) { continue; }
 
@@ -297,10 +296,11 @@ auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Pres
 auto ClapPresetDatabase::loadPresets(const Location& location, std::string_view file,
 	std::set<Preset>& presets) -> std::vector<const Preset*>
 {
-	if (std::error_code ec; !fs::is_regular_file(file, ec)) { return {}; }
+	const auto filePath = std::filesystem::u8path(file);
+	if (std::error_code ec; !std::filesystem::is_regular_file(filePath, ec)) { return {}; }
 
 	auto getPresets = [&](Indexer& indexer) -> std::vector<const Preset*> {
-		if (!indexer.filetypeSupported(file)) { return {}; }
+		if (!indexer.filetypeSupported(filePath)) { return {}; }
 
 		auto newPresets = indexer.query(file, location.flags);
 		if (!newPresets) { return {}; }
@@ -468,7 +468,7 @@ auto ClapPresetDatabase::Indexer::query(std::string_view file, PresetMetadata::F
 	return receiver.query(file, flags);
 }
 
-auto ClapPresetDatabase::Indexer::filetypeSupported(fs::path path) const -> bool
+auto ClapPresetDatabase::Indexer::filetypeSupported(const std::filesystem::path& path) const -> bool
 {
 	if (m_filetypes.empty() || m_filetypes[0].extension.empty()) { return true; }
 
@@ -542,7 +542,7 @@ auto ClapPresetDatabase::Indexer::clapDeclareLocation(const clap_preset_discover
 			}
 
 			// A FILE location could be a directory or a file
-			if (std::error_code ec; !fs::exists(location->location, ec))
+			if (std::error_code ec; !std::filesystem::exists(location->location, ec))
 			{
 				std::string msg = "Preset location \"" + std::string{location->location} + "\" does not exist";
 				ClapLog::globalLog(CLAP_LOG_WARNING, msg);

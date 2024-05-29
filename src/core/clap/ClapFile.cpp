@@ -32,7 +32,7 @@
 namespace lmms
 {
 
-ClapFile::ClapFile(fs::path filename)
+ClapFile::ClapFile(std::filesystem::path filename)
 	: m_filename{std::move(filename.make_preferred())}
 {
 }

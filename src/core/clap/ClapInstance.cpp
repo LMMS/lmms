@@ -404,7 +404,7 @@ auto ClapInstance::activate() -> bool
 	if (isErrorState()) { return false; }
 	assert(isCurrentStateValid(PluginState::Inactive));
 
-	const auto sampleRate = static_cast<double>(Engine::audioEngine()->processingSampleRate());
+	const auto sampleRate = static_cast<double>(Engine::audioEngine()->outputSampleRate());
 	static_assert(DEFAULT_BUFFER_SIZE > MINIMUM_BUFFER_SIZE);
 
 	assert(!isActive());

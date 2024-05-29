@@ -74,13 +74,13 @@ private:
 	//! For hashing since std::hash<std::filesystem::path> is not available until C++23's LWG issue 3657 for god knows why
 	struct PathHash
 	{
-		auto operator()(const fs::path& path) const noexcept -> std::size_t
+		auto operator()(const std::filesystem::path& path) const noexcept -> std::size_t
 		{
-			return fs::hash_value(path);
+			return std::filesystem::hash_value(path);
 		}
 	};
 
-	using UniquePaths = std::unordered_set<fs::path, PathHash>;
+	using UniquePaths = std::unordered_set<std::filesystem::path, PathHash>;
 
 	//! Finds all CLAP search paths and populates m_searchPaths
 	void findSearchPaths();

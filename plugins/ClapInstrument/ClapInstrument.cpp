@@ -75,7 +75,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
  */
 
 ClapInstrument::ClapInstrument(InstrumentTrack* track, Descriptor::SubPluginFeatures::Key* key)
-	: Instrument{track, &clapinstrument_plugin_descriptor, key}
+	: Instrument{track, &clapinstrument_plugin_descriptor, key, Flag::IsSingleStreamed | Flag::IsMidiBased}
 	, m_instance{ClapInstance::create(key->attributes["uri"].toStdString(), this)}
 	, m_idleTimer{this}
 {

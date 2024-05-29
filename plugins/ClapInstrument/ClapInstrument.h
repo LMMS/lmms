@@ -75,14 +75,6 @@ public:
 	auto handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) -> bool override;
 	void play(sampleFrame* buffer) override;
 
-	/*
-	 * Misc
-	 */
-	auto flags() const -> Flags override
-	{
-		return Flag::IsSingleStreamed | Flag::IsMidiBased;
-	}
-
 	auto instantiateView(QWidget* parent) -> gui::PluginView* override;
 
 signals:

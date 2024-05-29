@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <optional>
@@ -37,7 +38,6 @@
 #include <clap/factory/preset-discovery.h>
 
 #include "ClapExtension.h"
-#include "lmms_filesystem.h"
 #include "PresetDatabase.h"
 
 struct clap_plugin_entry;
@@ -89,7 +89,7 @@ private:
 		auto query(std::string_view file,
 			PresetMetadata::Flags flags = PresetMetadata::Flag::None) -> std::optional<std::vector<Preset>>;
 
-		auto filetypeSupported(fs::path path) const -> bool;
+		auto filetypeSupported(const std::filesystem::path& path) const -> bool;
 
 		auto provider() const -> const clap_preset_discovery_provider* { return m_provider.get(); }
 
