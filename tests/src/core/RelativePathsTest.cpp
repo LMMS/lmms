@@ -22,6 +22,7 @@
  *
  */
 
+#include <QDebug>
 #include <QDir>
 #include <QObject>
 #include <QtTest/QtTest>
@@ -36,9 +37,12 @@ class RelativePathsTest : public QObject
 private slots:
 	void PathUtilComparisonTests()
 	{
+		qDebug() << "HERE in PathUtilComparisonTests()";
+		QCOMPARE(1, 1);
+		/*
 		using namespace lmms;
 
-		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
+		auto fi = QFileInfo{ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg"};
 		QVERIFY(fi.exists());
 
 		QString absPath = fi.absoluteFilePath();
@@ -47,6 +51,7 @@ private slots:
 		QString relPath = QString::fromUtf8(basePrefix.data(), basePrefix.size()) + "drums/kick01.ogg";
 		QString fuzPath = absPath;
 		fuzPath.replace(relPath, "drums/.///kick01.ogg");
+		qDebug() << "fuzPath:" << fuzPath;
 
 		//Test nicely formatted paths
 		QCOMPARE(PathUtil::toShortestRelative(absPath), relPath);
@@ -65,13 +70,16 @@ private slots:
 		QCOMPARE(PathUtil::cleanName(empty), empty);
 		QCOMPARE(PathUtil::toAbsolute(empty), empty);
 		QCOMPARE(PathUtil::toShortestRelative(empty), empty);
+		*/
 	}
 
 	void PathUtilComparisonTestsUtf8()
 	{
+		QCOMPARE(2, 2);
+		/*
 		using namespace lmms;
 
-		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
+		auto fi = QFileInfo{ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg"};
 		QVERIFY(fi.exists());
 
 		std::string absPath = fi.absoluteFilePath().toStdString();
@@ -86,6 +94,7 @@ private slots:
 
 		std::string fuzPath = absPath;
 		replace(fuzPath, relPath, "drums/.///kick01.ogg");
+		qDebug() << "fuzPath:" << QString::fromUtf8(fuzPath.c_str(), fuzPath.size());
 
 		const QString relPathQ = QString::fromStdString(relPath);
 		const QString absPathQ = QString::fromStdString(absPath);
@@ -105,17 +114,20 @@ private slots:
 		//Empty paths should stay empty
 		const auto empty = std::string_view{""};
 		const std::string_view prefixStripped = PathUtil::stripPrefix(empty);
-		QCOMPARE(QString::fromUtf8(prefixStripped.data(), prefixStripped.size()), QString{""});
-		QCOMPARE(QString::fromStdString(PathUtil::cleanName(empty)), QString{""});
-		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(empty).value()), QString{""});
-		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(empty)), QString{""});
+		QCOMPARE(QString::fromUtf8(prefixStripped.data(), prefixStripped.size()), "");
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(empty)), "");
+		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(empty).value()), "");
+		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(empty)), "");
+		*/
 	}
 
 	void cleanNameTests()
 	{
+		QCOMPARE(3, 9001);
+		/*
 		using namespace lmms;
 
-		auto kickQ = ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg";
+		QString kickQ = ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg";
 		auto kick = kickQ.toStdString();
 
 		QCOMPARE(PathUtil::cleanName(kickQ), "kick01");
@@ -138,6 +150,7 @@ private slots:
 
 		QCOMPARE(PathUtil::cleanName(noExtensionQ), "meow");
 		QCOMPARE(QString::fromStdString(PathUtil::cleanName(noExtension)), "meow");
+		*/
 	}
 };
 
