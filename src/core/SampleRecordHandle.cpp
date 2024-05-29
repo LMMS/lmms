@@ -64,9 +64,9 @@ SampleRecordHandle::~SampleRecordHandle()
 
 
 
-void SampleRecordHandle::play( SampleFrame * /*_working_buffer*/ )
+void SampleRecordHandle::play( SampleFrame* /*_working_buffer*/ )
 {
-	const SampleFrame * recbuf = Engine::audioEngine()->inputBuffer();
+	const SampleFrame* recbuf = Engine::audioEngine()->inputBuffer();
 	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
@@ -127,7 +127,7 @@ std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 
 
 
-void SampleRecordHandle::writeBuffer( const SampleFrame * _ab, const f_cnt_t _frames )
+void SampleRecordHandle::writeBuffer( const SampleFrame* _ab, const f_cnt_t _frames )
 {
 	auto buf = new SampleFrame[_frames];
 	for( f_cnt_t frame = 0; frame < _frames; ++frame )

@@ -76,11 +76,11 @@ public:
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per audio engine period
-	virtual void play( SampleFrame * _working_buffer );
+	virtual void play( SampleFrame* _working_buffer );
 
 	// to be implemented by actual plugin
 	virtual void playNote( NotePlayHandle * /* _note_to_play */,
-					SampleFrame * /* _working_buf */ )
+					SampleFrame* /* _working_buf */ )
 	{
 	}
 
@@ -161,12 +161,12 @@ public:
 
 protected:
 	// fade in to prevent clicks
-	void applyFadeIn(SampleFrame * buf, NotePlayHandle * n);
+	void applyFadeIn(SampleFrame* buf, NotePlayHandle * n);
 
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
-	void applyRelease( SampleFrame * buf, const NotePlayHandle * _n );
+	void applyRelease( SampleFrame* buf, const NotePlayHandle * _n );
 
 	float computeReleaseTimeMsByFrameCount(f_cnt_t frames) const;
 

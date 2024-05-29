@@ -42,18 +42,18 @@ void BufferManager::init( fpp_t fpp )
 }
 
 
-SampleFrame * BufferManager::acquire()
+SampleFrame* BufferManager::acquire()
 {
 	return new SampleFrame[s_framesPerPeriod];
 }
 
-void BufferManager::clear( SampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
+void BufferManager::clear( SampleFrame* ab, const f_cnt_t frames, const f_cnt_t offset )
 {
 	zeroSampleFrames(ab + offset, frames);
 }
 
 
-void BufferManager::release( SampleFrame * buf )
+void BufferManager::release( SampleFrame* buf )
 {
 	delete[] buf;
 }

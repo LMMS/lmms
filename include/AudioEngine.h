@@ -273,9 +273,9 @@ public:
 		return m_fifoWriter != nullptr;
 	}
 
-	void pushInputFrames( SampleFrame * _ab, const f_cnt_t _frames );
+	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
 
-	inline const SampleFrame * inputBuffer()
+	inline const SampleFrame* inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
 	}
@@ -365,7 +365,7 @@ private:
 
 	fpp_t m_framesPerPeriod;
 
-	SampleFrame * m_inputBuffer[2];
+	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;

@@ -45,7 +45,7 @@ public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Analyzer() override;
 
-	bool processAudioBuffer(SampleFrame *buffer, const fpp_t frame_count) override;
+	bool processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
 
 	SaProcessor *getProcessor() {return &m_processor;}

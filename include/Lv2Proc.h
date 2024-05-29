@@ -134,7 +134,7 @@ public:
 	 * @param num Number of channels we must read from @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersFromCore(const SampleFrame *buf,
+	void copyBuffersFromCore(const SampleFrame* buf,
 								unsigned firstChan, unsigned num, fpp_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
@@ -147,7 +147,7 @@ public:
 	 * @param num Number of channels we must write to @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersToCore(SampleFrame *buf, unsigned firstChan, unsigned num,
+	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num,
 								fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);

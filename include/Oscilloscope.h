@@ -83,7 +83,7 @@ private:
 	QPixmap m_background;
 	QPointF * m_points;
 
-	SampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 	bool m_active;
 
 	QColor m_leftChannelColor;

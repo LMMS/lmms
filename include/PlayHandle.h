@@ -146,7 +146,7 @@ public:
 	
 	void releaseBuffer();
 	
-	SampleFrame * buffer();
+	SampleFrame* buffer();
 
 private:
 	Type m_type;

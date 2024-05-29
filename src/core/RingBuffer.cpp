@@ -72,7 +72,7 @@ void RingBuffer::reset()
 void RingBuffer::changeSize( f_cnt_t size )
 {
 	size += m_fpp;
-	SampleFrame * tmp = m_buffer;
+	SampleFrame* tmp = m_buffer;
 	m_size = size;
 	m_buffer = new SampleFrame[ m_size ];
 	zeroSampleFrames(m_buffer, m_size);
@@ -118,7 +118,7 @@ void RingBuffer::movePosition( float amount )
 }
 
 
-void RingBuffer::pop( SampleFrame * dst )
+void RingBuffer::pop( SampleFrame* dst )
 {
 	if( m_position + m_fpp <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
@@ -141,7 +141,7 @@ void RingBuffer::pop( SampleFrame * dst )
 }
 
 
-void RingBuffer::read( SampleFrame * dst, f_cnt_t offset )
+void RingBuffer::read( SampleFrame* dst, f_cnt_t offset )
 {
 	f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( pos < 0 ) { pos += m_size; }
@@ -162,13 +162,13 @@ void RingBuffer::read( SampleFrame * dst, f_cnt_t offset )
 }
 
 
-void RingBuffer::read( SampleFrame * dst, float offset )
+void RingBuffer::read( SampleFrame* dst, float offset )
 {
 	read( dst, msToFrames( offset ) );
 }
 
 
-void RingBuffer::read( SampleFrame * dst, f_cnt_t offset, f_cnt_t length )
+void RingBuffer::read( SampleFrame* dst, f_cnt_t offset, f_cnt_t length )
 {
 	f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( pos < 0 ) { pos += m_size; }
@@ -189,13 +189,13 @@ void RingBuffer::read( SampleFrame * dst, f_cnt_t offset, f_cnt_t length )
 }
 
 
-void RingBuffer::read( SampleFrame * dst, float offset, f_cnt_t length )
+void RingBuffer::read( SampleFrame* dst, float offset, f_cnt_t length )
 {
 	read( dst, msToFrames( offset ), length );
 }
 
 
-void RingBuffer::write( SampleFrame * src, f_cnt_t offset, f_cnt_t length )
+void RingBuffer::write( SampleFrame* src, f_cnt_t offset, f_cnt_t length )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
@@ -216,13 +216,13 @@ void RingBuffer::write( SampleFrame * src, f_cnt_t offset, f_cnt_t length )
 }
 
 
-void RingBuffer::write( SampleFrame * src, float offset, f_cnt_t length )
+void RingBuffer::write( SampleFrame* src, float offset, f_cnt_t length )
 {
 	write( src, msToFrames( offset ), length );
 }
 
 
-void RingBuffer::writeAdding( SampleFrame * src, f_cnt_t offset, f_cnt_t length )
+void RingBuffer::writeAdding( SampleFrame* src, f_cnt_t offset, f_cnt_t length )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
@@ -243,13 +243,13 @@ void RingBuffer::writeAdding( SampleFrame * src, f_cnt_t offset, f_cnt_t length 
 }
 
 
-void RingBuffer::writeAdding( SampleFrame * src, float offset, f_cnt_t length )
+void RingBuffer::writeAdding( SampleFrame* src, float offset, f_cnt_t length )
 {
 	writeAdding( src, msToFrames( offset ), length );
 }
 
 
-void RingBuffer::writeAddingMultiplied( SampleFrame * src, f_cnt_t offset, f_cnt_t length, float level )
+void RingBuffer::writeAddingMultiplied( SampleFrame* src, f_cnt_t offset, f_cnt_t length, float level )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	//qDebug( "pos %d m_pos %d ofs %d siz %d", pos, m_position, offset, m_size );
@@ -271,14 +271,14 @@ void RingBuffer::writeAddingMultiplied( SampleFrame * src, f_cnt_t offset, f_cnt
 }
 
 
-void RingBuffer::writeAddingMultiplied( SampleFrame * src, float offset, f_cnt_t length, float level )
+void RingBuffer::writeAddingMultiplied( SampleFrame* src, float offset, f_cnt_t length, float level )
 {
 	f_cnt_t ofs = msToFrames( offset );
 	writeAddingMultiplied( src, ofs, length, level );
 }
 
 
-void RingBuffer::writeSwappedAddingMultiplied( SampleFrame * src, f_cnt_t offset, f_cnt_t length, float level )
+void RingBuffer::writeSwappedAddingMultiplied( SampleFrame* src, f_cnt_t offset, f_cnt_t length, float level )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
@@ -299,7 +299,7 @@ void RingBuffer::writeSwappedAddingMultiplied( SampleFrame * src, f_cnt_t offset
 }
 
 
-void RingBuffer::writeSwappedAddingMultiplied( SampleFrame * src, float offset, f_cnt_t length, float level )
+void RingBuffer::writeSwappedAddingMultiplied( SampleFrame* src, float offset, f_cnt_t length, float level )
 {
 	writeSwappedAddingMultiplied( src, msToFrames( offset ), length, level );
 }

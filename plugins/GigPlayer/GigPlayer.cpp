@@ -289,7 +289,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame * )
+void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	const float LOG440 = 2.643452676f;
 
@@ -320,7 +320,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame * )
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::play( SampleFrame * _working_buffer )
+void GigInstrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	const int rate = Engine::audioEngine()->outputSampleRate();

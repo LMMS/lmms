@@ -327,7 +327,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 
 
 void WatsynInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if (!_n->m_pluginData)
 	{
@@ -339,12 +339,12 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	SampleFrame * buffer = _working_buffer + offset;
+	SampleFrame* buffer = _working_buffer + offset;
 
 	auto w = static_cast<WatsynObject*>(_n->m_pluginData);
 
-	SampleFrame * abuf = w->abuf();
-	SampleFrame * bbuf = w->bbuf();
+	SampleFrame* abuf = w->abuf();
+	SampleFrame* bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
 

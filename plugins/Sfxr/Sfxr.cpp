@@ -157,7 +157,7 @@ void SfxrSynth::resetSample( bool restart )
 
 
 
-void SfxrSynth::update( SampleFrame * buffer, const int32_t frameNum )
+void SfxrSynth::update( SampleFrame* buffer, const int32_t frameNum )
 {
 	for(int i=0;i<frameNum;i++)
 	{
@@ -442,7 +442,7 @@ QString SfxrInstrument::nodeName() const
 
 
 
-void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame * _working_buffer )
+void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 {
 	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 

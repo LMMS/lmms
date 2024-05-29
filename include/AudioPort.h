@@ -46,7 +46,7 @@ public:
 		BoolModel * mutedModel = nullptr );
 	virtual ~AudioPort();
 
-	inline SampleFrame * buffer()
+	inline SampleFrame* buffer()
 	{
 		return m_portBuffer;
 	}
@@ -112,7 +112,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	SampleFrame * m_portBuffer;
+	SampleFrame* m_portBuffer;
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;

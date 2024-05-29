@@ -42,7 +42,7 @@ bool useNaNHandler();
 
 void setNaNHandler( bool use );
 
-bool sanitize( SampleFrame * src, int frames );
+bool sanitize( SampleFrame* src, int frames );
 
 /*! \brief Add samples from src to dst */
 void add( SampleFrame* dst, const SampleFrame* src, int frames );

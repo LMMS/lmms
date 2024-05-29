@@ -324,7 +324,7 @@ void Lv2Proc::copyModelsToCore()
 
 
 
-void Lv2Proc::copyBuffersFromCore(const SampleFrame *buf,
+void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 									unsigned firstChan, unsigned num,
 									fpp_t frames)
 {

@@ -76,7 +76,7 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-bool VstEffect::processAudioBuffer( SampleFrame * _buf, const fpp_t _frames )
+bool VstEffect::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -89,7 +89,7 @@ bool VstEffect::processAudioBuffer( SampleFrame * _buf, const fpp_t _frames )
 #ifdef __GNUC__
 		SampleFrame buf[_frames];
 #else
-		SampleFrame * buf = new SampleFrame[_frames];
+		SampleFrame* buf = new SampleFrame[_frames];
 #endif
 		memcpy( buf, _buf, sizeof( SampleFrame ) * _frames );
 		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))

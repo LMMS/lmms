@@ -48,7 +48,7 @@ public:
 	SampleRecordHandle( SampleClip* clip );
 	~SampleRecordHandle() override;
 
-	void play( SampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;
@@ -58,7 +58,7 @@ public:
 
 
 private:
-	virtual void writeBuffer( const SampleFrame * _ab,
+	virtual void writeBuffer( const SampleFrame* _ab,
 						const f_cnt_t _frames );
 
 	using bufferList = QList<QPair<SampleFrame*, f_cnt_t>>;

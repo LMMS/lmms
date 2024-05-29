@@ -49,7 +49,7 @@ public:
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
 	~InstrumentSoundShaping() override = default;
 
-	void processAudioBuffer( SampleFrame * _ab, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
 
 	enum class Target

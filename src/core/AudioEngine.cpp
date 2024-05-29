@@ -285,13 +285,13 @@ bool AudioEngine::criticalXRuns() const
 
 
 
-void AudioEngine::pushInputFrames( SampleFrame * _ab, const f_cnt_t _frames )
+void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 {
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
 	int size = m_inputBufferSize[ m_inputBufferWrite ];
-	SampleFrame * buf = m_inputBuffer[ m_inputBufferWrite ];
+	SampleFrame* buf = m_inputBuffer[ m_inputBufferWrite ];
 
 	if( frames + _frames > size )
 	{

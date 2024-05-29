@@ -243,10 +243,10 @@ public:
 	GigInstrument( InstrumentTrack * _instrument_track );
 	~GigInstrument() override;
 
-	void play( SampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						SampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

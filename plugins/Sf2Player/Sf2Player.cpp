@@ -647,7 +647,7 @@ void Sf2Instrument::reloadSynth()
 
 
 
-void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame * )
+void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -782,7 +782,7 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::play( SampleFrame * _working_buffer )
+void Sf2Instrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -868,7 +868,7 @@ void Sf2Instrument::play( SampleFrame * _working_buffer )
 }
 
 
-void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame * buf )
+void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
@@ -879,7 +879,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame * buf )
 #ifdef __GNUC__
 		SampleFrame tmp[f];
 #else
-		SampleFrame * tmp = new SampleFrame[f];
+		SampleFrame* tmp = new SampleFrame[f];
 #endif
 		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
 

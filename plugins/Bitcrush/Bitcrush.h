@@ -55,7 +55,7 @@ private:
 
 	BitcrushControls m_controls;
 	
-	SampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 	float m_sampleRate;
 	StereoLinkwitzRiley m_filter;
 	

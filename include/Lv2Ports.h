@@ -185,15 +185,15 @@ struct Audio : public VisitablePort<Audio, PortBase>
 
 	//! Copy buffer passed by LMMS into our ports
 	//! @param channel channel index into each sample frame
-	void copyBuffersFromCore(const SampleFrame *lmmsBuf,
+	void copyBuffersFromCore(const SampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Add buffer passed by LMMS into our ports, and halve the result
 	//! @param channel channel index into each sample frame
-	void averageWithBuffersFromCore(const SampleFrame *lmmsBuf,
+	void averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
 	//! @param channel channel index into each sample frame
-	void copyBuffersToCore(SampleFrame *lmmsBuf,
+	void copyBuffersToCore(SampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames) const;
 
 	bool isSideChain() const { return m_sidechain; }

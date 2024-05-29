@@ -134,7 +134,7 @@ void MixerChannel::doProcessing()
 				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
-				SampleFrame * ch_buf = sender->m_buffer;
+				SampleFrame* ch_buf = sender->m_buffer;
 
 				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
@@ -596,7 +596,7 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 
 
-void Mixer::mixToChannel( const SampleFrame * _buf, mix_ch_t _ch )
+void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 {
 	if( m_mixerChannels[_ch]->m_muteModel.value() == false )
 	{
@@ -618,7 +618,7 @@ void Mixer::prepareMasterMix()
 
 
 
-void Mixer::masterMix( SampleFrame * _buf )
+void Mixer::masterMix( SampleFrame* _buf )
 {
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
 

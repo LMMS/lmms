@@ -69,9 +69,9 @@ private:
 	StereoLinkwitzRiley m_hp3;
 	StereoLinkwitzRiley m_hp4;
 	
-	SampleFrame * m_tmp1;
-	SampleFrame * m_tmp2;
-	SampleFrame * m_work;
+	SampleFrame* m_tmp1;
+	SampleFrame* m_tmp2;
+	SampleFrame* m_work;
 	
 	bool m_needsUpdate;
 	

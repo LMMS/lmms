@@ -82,7 +82,7 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-bool StereoEnhancerEffect::processAudioBuffer( SampleFrame * _buf,
+bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 

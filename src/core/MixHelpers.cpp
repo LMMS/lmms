@@ -91,7 +91,7 @@ void setNaNHandler( bool use )
 }
 
 /*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
-bool sanitize( SampleFrame * src, int frames )
+bool sanitize( SampleFrame* src, int frames )
 {
 	if( !useNaNHandler() )
 	{

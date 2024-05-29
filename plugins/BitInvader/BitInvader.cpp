@@ -256,7 +256,7 @@ QString BitInvader::nodeName() const
 
 
 void BitInvader::playNote( NotePlayHandle * _n,
-						SampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if (!_n->m_pluginData)
 	{

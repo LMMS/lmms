@@ -49,7 +49,7 @@ public:
 
 private:
 	void updateFilters( int begin, int end );
-	void runFilter( SampleFrame * dst, SampleFrame * src, StereoOnePole & filter, const fpp_t frames );
+	void runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames );
 
 	inline void setFilterFreq( float fc, StereoOnePole & f )
 	{
@@ -70,7 +70,7 @@ private:
 	float m_sampleRate;
 	float m_sampleRatio;
 	
-	SampleFrame * m_work;
+	SampleFrame* m_work;
 
 	friend class MultitapEchoControls;
 

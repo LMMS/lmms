@@ -97,7 +97,7 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	bool process( const SampleFrame * _in_buf, SampleFrame * _out_buf );
+	bool process( const SampleFrame* _in_buf, SampleFrame* _out_buf );
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 

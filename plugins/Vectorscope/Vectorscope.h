@@ -39,7 +39,7 @@ public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Vectorscope() override = default;
 
-	bool processAudioBuffer(SampleFrame *buffer, const fpp_t frame_count) override;
+	bool processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
 	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 

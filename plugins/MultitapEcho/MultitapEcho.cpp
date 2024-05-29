@@ -83,7 +83,7 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 }
 
 
-void MultitapEchoEffect::runFilter( SampleFrame * dst, SampleFrame * src, StereoOnePole & filter, const fpp_t frames )
+void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames )
 {
 	for( int f = 0; f < frames; ++f )
 	{
@@ -93,7 +93,7 @@ void MultitapEchoEffect::runFilter( SampleFrame * dst, SampleFrame * src, Stereo
 }
 
 
-bool MultitapEchoEffect::processAudioBuffer( SampleFrame * buf, const fpp_t frames )
+bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{

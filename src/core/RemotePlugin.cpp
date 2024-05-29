@@ -325,7 +325,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf )
+bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
