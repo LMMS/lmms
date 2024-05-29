@@ -16,6 +16,7 @@
 #cmakedefine LMMS_HOST_PPC64
 
 #cmakedefine LMMS_HAVE_ALSA
+#cmakedefine LMMS_HAVE_CLAP
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
 #cmakedefine LMMS_HAVE_JACK
 #cmakedefine LMMS_HAVE_JACK_PRENAME

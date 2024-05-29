@@ -32,11 +32,13 @@
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
 #include "Knob.h"
+#include "CustomTextKnob.h"
 
 
 namespace lmms::gui
 {
 
+// KnobControl
 
 void KnobControl::setText(const QString &text) { m_knob->setLabel(text); }
 
@@ -54,6 +56,27 @@ AutomatableModelView* KnobControl::modelView() { return m_knob; }
 KnobControl::KnobControl(QWidget *parent) :
 	m_knob(new Knob(parent)) {}
 
+
+// CustomTextKnobControl
+
+void CustomTextKnobControl::setText(const QString &text) { m_knob->setLabel(text); }
+
+QWidget *CustomTextKnobControl::topWidget() { return m_knob; }
+
+void CustomTextKnobControl::setModel(AutomatableModel *model)
+{
+	m_knob->setModel(model->dynamicCast<FloatModel>(true));
+}
+
+FloatModel *CustomTextKnobControl::model() { return m_knob->model(); }
+
+AutomatableModelView* CustomTextKnobControl::modelView() { return m_knob; }
+
+CustomTextKnobControl::CustomTextKnobControl(QWidget *parent) :
+	m_knob(new CustomTextKnob(parent)) {}
+
+
+// ComboControl
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }
 
@@ -79,6 +102,7 @@ ComboControl::ComboControl(QWidget *parent) :
 }
 
 
+// CheckControl
 
 void CheckControl::setText(const QString &text) { m_label->setText(text); }
 
@@ -104,7 +128,7 @@ CheckControl::CheckControl(QWidget *parent) :
 }
 
 
-
+// LcdControl
 
 void LcdControl::setText(const QString &text) { m_lcd->setLabel(text); }
 

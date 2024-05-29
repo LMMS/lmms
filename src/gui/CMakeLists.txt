@@ -4,6 +4,7 @@ SET(LMMS_SRCS
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
+	gui/ClapViewBase.cpp
 	gui/ControlLayout.cpp
 	gui/ControllerDialog.cpp
 	gui/ControllerRackView.cpp
@@ -32,6 +33,7 @@ SET(LMMS_SRCS
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PluginBrowser.cpp
+	gui/PresetSelector.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
 	gui/SampleLoader.cpp

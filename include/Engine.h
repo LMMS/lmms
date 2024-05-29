@@ -90,6 +90,13 @@ public:
 	}
 #endif
 
+#ifdef LMMS_HAVE_CLAP
+	static class ClapManager* getClapManager()
+	{
+		return s_clapManager;
+	}
+#endif
+
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
@@ -142,6 +149,9 @@ private:
 
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager* s_lv2Manager;
+#endif
+#ifdef LMMS_HAVE_CLAP
+	static class ClapManager* s_clapManager;
 #endif
 	static Ladspa2LMMS* s_ladspaManager;
 	static void* s_dndPluginKey;
