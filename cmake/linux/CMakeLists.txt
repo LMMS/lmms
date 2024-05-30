@@ -48,23 +48,7 @@ else()
 	set(CPACK_TARGET_ARCH unknown PARENT_SCOPE)
 endif()
 
-# Build tool "linuxdeployqt" is VERY difficult to work with due to Ubuntu 20.04 requirement
-# - See myriad of complaints and issues here: https://github.com/probonopd/linuxdeployqt/issues/340
-# - Build tool "linuxdeploy" (without the "qt") does NOT have these limitations
-#
-# If viable:
-# - The below "WANT_LINUXDEPLOY_QT" can be removed, we move away from "linuxdeployqt" forever
-#
-# If not viable:
-# - We can keep them both (yuck) and document the toggle/flag in root /CMakeLists.txt
-#
-# TODO: Remove this check; Default to LinuxDeploy; Remove LinuxDeployQt.cmake
-#
-if(WANT_LINUXDEPLOY_QT)
-	set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeployQt.cmake" PARENT_SCOPE)
-else()
-	set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeploy.cmake" PARENT_SCOPE)
-endif()
+set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeploy.cmake" PARENT_SCOPE)
 
 if(CMAKE_VERSION VERSION_LESS "3.19")
 	message(WARNING "AppImage creation requires at least CMake 3.19")
