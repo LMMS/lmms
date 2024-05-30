@@ -86,11 +86,6 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 

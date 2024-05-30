@@ -34,6 +34,7 @@
 #include <QMoveEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QStyleOption>
 
 #include "embed.h"
 
@@ -41,11 +42,11 @@ namespace lmms::gui
 {
 
 
-SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
-	QMdiSubWindow( parent, windowFlags ),
-	m_buttonSize( 17, 17 ),
-	m_titleBarHeight( 24 ),
-	m_hasFocus( false )
+SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
+	QMdiSubWindow(parent, windowFlags),
+	m_buttonSize(17, 17),
+	m_titleBarHeight(titleBarHeight()),
+	m_hasFocus(false)
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -237,6 +238,27 @@ void SubWindow::setBorderColor( const QColor &c )
 {
 	m_borderColor = c;
 }
+
+
+
+
+int SubWindow::titleBarHeight() const
+{
+	QStyleOptionTitleBar so;
+	so.titleBarState = Qt::WindowActive; // kThemeStateActiv
+	so.titleBarFlags = Qt::Window;
+	return style()->pixelMetric(QStyle::PM_TitleBarHeight, &so, this);
+}
+
+
+
+
+int SubWindow::frameWidth() const
+{
+	QStyleOptionFrame so;
+	return style()->pixelMetric(QStyle::PM_MdiSubWindowFrameWidth, &so, this);
+}
+
 
 
 

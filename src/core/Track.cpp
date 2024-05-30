@@ -56,7 +56,7 @@ namespace lmms
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-Track::Track( TrackTypes type, TrackContainer * tc ) :
+Track::Track( Type type, TrackContainer * tc ) :
 	Model( tc ),                   /*!< The track Model */
 	m_trackContainer( tc ),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
@@ -65,10 +65,8 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
 	m_clips(),        /*!< The clips (segments) */
-	m_color( 0, 0, 0 ),
-	m_hasColor(false),
 	m_length(0)
-{
+{	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
@@ -85,9 +83,9 @@ Track::~Track()
 	lock();
 	emit destroyedTrack();
 
-	while( !m_clips.isEmpty() )
+	while (!m_clips.empty())
 	{
-		delete m_clips.last();
+		delete m_clips.back();
 	}
 
 	m_trackContainer->removeTrack( this );
@@ -102,7 +100,7 @@ Track::~Track()
  *  \param tt The type of track to create
  *  \param tc The track container to attach to
  */
-Track * Track::create( TrackTypes tt, TrackContainer * tc )
+Track * Track::create( Type tt, TrackContainer * tc )
 {
 	Engine::audioEngine()->requestChangeInModel();
 
@@ -110,13 +108,13 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 
 	switch( tt )
 	{
-		case InstrumentTrack: t = new class InstrumentTrack( tc ); break;
-		case PatternTrack: t = new class PatternTrack( tc ); break;
-		case SampleTrack: t = new class SampleTrack( tc ); break;
-//		case EVENT_TRACK:
-//		case VIDEO_TRACK:
-		case AutomationTrack: t = new class AutomationTrack( tc ); break;
-		case HiddenAutomationTrack:
+		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
+		case Type::Pattern: t = new class PatternTrack( tc ); break;
+		case Type::Sample: t = new class SampleTrack( tc ); break;
+//		case Type::Event:
+//		case Type::Video:
+		case Type::Automation: t = new class AutomationTrack( tc ); break;
+		case Type::HiddenAutomation:
 						t = new class AutomationTrack( tc, true ); break;
 		default: break;
 	}
@@ -146,7 +144,7 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 	Engine::audioEngine()->requestChangeInModel();
 
 	Track * t = create(
-		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
+		static_cast<Type>( element.attribute( "type" ).toInt() ),
 									tc );
 	if( t != nullptr )
 	{
@@ -198,7 +196,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		element.setTagName( "track" );
 	}
-	element.setAttribute( "type", type() );
+	element.setAttribute( "type", static_cast<int>(type()) );
 	element.setAttribute( "name", name() );
 	m_mutedModel.saveSettings( doc, element, "muted" );
 	m_soloModel.saveSettings( doc, element, "solo" );
@@ -210,9 +208,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		element.setAttribute( "trackheight", m_height );
 	}
 	
-	if( m_hasColor )
+	if (m_color.has_value())
 	{
-		element.setAttribute( "color", m_color.name() );
+		element.setAttribute("color", m_color->name());
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -250,7 +248,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
  */
 void Track::loadSettings( const QDomElement & element )
 {
-	if( element.attribute( "type" ).toInt() != type() )
+	if( static_cast<Type>(element.attribute( "type" ).toInt()) != type() )
 	{
 		qWarning( "Current track-type does not match track-type of "
 							"settings-node!\n" );
@@ -265,14 +263,9 @@ void Track::loadSettings( const QDomElement & element )
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
-	if( element.hasAttribute( "color" ) )
+	if (element.hasAttribute("color"))
 	{
-		QColor newColor = QColor(element.attribute("color"));
-		setColor(newColor);
-	}
-	else
-	{
-		resetColor();
+		setColor(QColor{element.attribute("color")});
 	}
 
 	if( m_simpleSerializingMode )
@@ -291,10 +284,9 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	while( !m_clips.empty() )
 	{
-		delete m_clips.front();
-//		m_clips.erase( m_clips.begin() );
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		deleteClips();
 	}
 
 	QDomNode node = element.firstChild();
@@ -365,9 +357,9 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	while( ! m_clips.isEmpty() )
+	while (!m_clips.empty())
 	{
-		delete m_clips.first();
+		delete m_clips.front();
 	}
 }
 
@@ -612,7 +604,7 @@ void Track::toggleSolo()
 			{
 				track->setMuted(false);
 			}
-			else if (soloLegacyBehavior || track->type() != AutomationTrack)
+			else if (soloLegacyBehavior || track->type() != Type::Automation)
 			{
 				track->setMuted(true);
 			}
@@ -625,7 +617,7 @@ void Track::toggleSolo()
 		{
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
-			if (soloLegacyBehavior || track->type() != AutomationTrack)
+			if (soloLegacyBehavior || track->type() != Type::Automation)
 			{
 				track->setMuted(track->m_mutedBeforeSolo);
 			}
@@ -633,23 +625,30 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::setColor(const QColor& c)
+void Track::setColor(const std::optional<QColor>& color)
 {
-	m_hasColor = true;
-	m_color = c;
+	m_color = color;
 	emit colorChanged();
 }
-
-void Track::resetColor()
-{
-	m_hasColor = false;
-	emit colorChanged();
-}
-
 
 BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
+}
+
+void Track::setName(const QString& newName)
+{
+	if (m_name != newName)
+	{
+		m_name = newName;
+
+		if (auto song = Engine::getSong())
+		{
+			song->setModified();
+		}
+		
+		emit nameChanged();
+	}
 }
 
 } // namespace lmms

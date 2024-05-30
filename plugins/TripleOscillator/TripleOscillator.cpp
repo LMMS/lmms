@@ -23,8 +23,8 @@
  */
 
 
-
 #include <QDomElement>
+#include <QFileInfo>
 
 #include "TripleOscillator.h"
 #include "AudioEngine.h"
@@ -35,9 +35,11 @@
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
-
+#include "SampleLoader.h"
+#include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -57,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 				"in several ways" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0110,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -84,10 +86,10 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
 			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
-	m_waveShapeModel( Oscillator::SineWave, 0,
+	m_waveShapeModel( static_cast<int>(Oscillator::WaveShape::Sine), 0,
 			Oscillator::NumWaveShapes-1, this,
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
-	m_modulationAlgoModel( Oscillator::SignalMix, 0,
+	m_modulationAlgoModel( static_cast<int>(Oscillator::ModulationAlgo::SignalMix), 0,
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 	m_useWaveTableModel(true),
@@ -133,22 +135,13 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 }
 
-
-
-
-OscillatorObject::~OscillatorObject()
-{
-	sharedObject::unref( m_sampleBuffer );
-}
-
-
-
-
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	QString af = m_sampleBuffer->openAndSetWaveformFile();
+	auto af = gui::SampleLoader::openWaveformFile();
 	if( af != "" )
 	{
+		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
+		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 	}
@@ -184,7 +177,7 @@ void OscillatorObject::updateDetuningLeft()
 {
 	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-				/ Engine::audioEngine()->processingSampleRate();
+				/ Engine::audioEngine()->outputSampleRate();
 }
 
 
@@ -194,7 +187,7 @@ void OscillatorObject::updateDetuningRight()
 {
 	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineRightModel.value() ) / 1200.0f )
-				/ Engine::audioEngine()->processingSampleRate();
+				/ Engine::audioEngine()->outputSampleRate();
 }
 
 
@@ -289,8 +282,16 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.loadSettings( _this,
 							"useWaveTable" + QString::number (i+1 ) );
-		m_osc[i]->m_sampleBuffer->setAudioFile( _this.attribute(
-							"userwavefile" + is ) );
+
+		if (auto userWaveFile = _this.attribute("userwavefile" + is); !userWaveFile.isEmpty())
+		{
+			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
+			{
+				m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(userWaveFile);
+				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
+			}
+			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
+		}
 	}
 }
 
@@ -308,7 +309,7 @@ QString TripleOscillator::nodeName() const
 void TripleOscillator::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		auto oscs_l = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
 		auto oscs_r = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
@@ -360,7 +361,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
 			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
-
+			oscs_l[i]->setUserAntiAliasWaveTable(m_osc[i]->m_userAntiAliasWaveTable);
+			oscs_r[i]->setUserAntiAliasWaveTable(m_osc[i]->m_userAntiAliasWaveTable);
 		}
 
 		_n->m_pluginData = new oscPtr;
@@ -380,8 +382,6 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 	applyFadeIn(_working_buffer, _n);
 	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -426,7 +426,7 @@ class TripleOscKnob : public Knob
 {
 public:
 	TripleOscKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 28, 35 );
 	}
@@ -554,7 +554,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		int knob_y = osc_y + i * osc_h;
 
 		// setup volume-knob
-		auto vk = new Knob(knobStyled, this);
+		auto vk = new Knob(KnobType::Styled, this);
 		vk->setVolumeKnob( true );
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );

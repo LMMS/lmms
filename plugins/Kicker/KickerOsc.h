@@ -31,7 +31,6 @@
 
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -40,7 +39,6 @@ namespace lmms
 template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {
-	MM_OPERATORS
 public:
 	KickerOsc( const FX & fx, const float start, const float end, const float noise, const float offset, 
 		const float slope, const float env, const float diststart, const float distend, const float length ) :

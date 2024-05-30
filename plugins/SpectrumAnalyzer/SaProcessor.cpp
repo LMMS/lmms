@@ -41,6 +41,9 @@
 #include "LocklessRingBuffer.h"
 #include "SaControls.h"
 
+#include <cassert>
+#include <limits>
+
 namespace lmms
 {
 
@@ -50,7 +53,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_terminate(false),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
 	m_fftBlockSize(FFT_BLOCK_SIZES[0]),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_framesFilledUp(0),
 	m_spectrumActive(false),
 	m_waterfallActive(false),
@@ -58,7 +61,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_reallocating(false)
 {
 	m_fftWindow.resize(m_inBlockSize, 1.0);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, BLACKMAN_HARRIS);
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, FFTWindow::BlackmanHarris);
 
 	m_bufferL.resize(m_inBlockSize, 0);
 	m_bufferR.resize(m_inBlockSize, 0);
@@ -163,7 +166,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				#endif
 
 				// update sample rate
-				m_sampleRate = Engine::audioEngine()->processingSampleRate();
+				m_sampleRate = Engine::audioEngine()->outputSampleRate();
 
 				// apply FFT window
 				for (unsigned int i = 0; i < m_inBlockSize; i++)
@@ -206,7 +209,6 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					memset(pixel, 0, waterfallWidth() * sizeof (QRgb));
 
 					// add newest result on top
-					int target;		// pixel being constructed
 					float accL = 0;	// accumulators for merging multiple bins
 					float accR = 0;
 					for (unsigned int i = 0; i < binCount(); i++)
@@ -230,7 +232,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
+								for (int target = std::max(static_cast<int>(band_start), 0);
+									 target < band_end && target < waterfallWidth(); target++)
 								{
 									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
@@ -242,7 +245,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							else
 							{
 								// sub-pixel drawing; add contribution of current band
-								target = (int)band_start;
+								int target = static_cast<int>(band_start);
 								if ((int)band_start == (int)band_end)
 								{
 									// band ends within current target pixel, accumulate
@@ -267,7 +270,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
+							for (int target = std::max(static_cast<int>(band_start), 0);
+								 target < band_end && target < waterfallWidth(); target++)
 							{
 								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 							}
@@ -358,30 +362,20 @@ void SaProcessor::setWaterfallActive(bool active)
 // Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers()
 {
-	unsigned int new_size_index = m_controls->m_blockSizeModel.value();
-	unsigned int new_in_size, new_fft_size;
-	unsigned int new_bins;
+	m_zeroPadFactor = m_controls->m_zeroPaddingModel.value();
 
 	// get new block sizes and bin count based on selected index
-	if (new_size_index < FFT_BLOCK_SIZES.size())
-	{
-		new_in_size = FFT_BLOCK_SIZES[new_size_index];
-	}
-	else
-	{
-		new_in_size = FFT_BLOCK_SIZES.back();
-	}
-	m_zeroPadFactor = m_controls->m_zeroPaddingModel.value();
-	if (new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size())
-	{
-		new_fft_size = FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor];
-	}
-	else
-	{
-		new_fft_size = FFT_BLOCK_SIZES.back();
-	}
+	const unsigned int new_size_index = m_controls->m_blockSizeModel.value();
 
-	new_bins = new_fft_size / 2 +1;
+	const unsigned int new_in_size = new_size_index < FFT_BLOCK_SIZES.size()
+		? FFT_BLOCK_SIZES[new_size_index]
+		: FFT_BLOCK_SIZES.back();
+
+	const unsigned int new_fft_size = (new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size())
+		? FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor]
+		: FFT_BLOCK_SIZES.back();
+
+	const unsigned int new_bins = new_fft_size / 2 + 1;
 
 	// Use m_reallocating to tell analyze() to avoid asking for the lock. This
 	// is needed because under heavy load the FFT thread requests data lock so
@@ -402,7 +396,7 @@ void SaProcessor::reallocateBuffers()
 
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
-	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), new_in_size, (FFTWindow) m_controls->m_windowModel.value());
 	m_bufferL.resize(new_in_size, 0);
 	m_bufferR.resize(new_in_size, 0);
 	m_filteredBufferL.resize(new_fft_size, 0);
@@ -448,7 +442,7 @@ void SaProcessor::rebuildWindow()
 {
 	// computation is done in fft_helpers
 	QMutexLocker lock(&m_dataAccess);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFTWindow) m_controls->m_windowModel.value());
 }
 
 
@@ -545,28 +539,28 @@ float SaProcessor::binBandwidth() const
 
 float SaProcessor::getFreqRangeMin(bool linear) const
 {
-	switch (m_controls->m_freqRangeModel.value())
+	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_START;
-		case FRANGE_BASS: return FRANGE_BASS_START;
-		case FRANGE_MIDS: return FRANGE_MIDS_START;
-		case FRANGE_HIGH: return FRANGE_HIGH_START;
+		case FrequencyRange::Audible: return FRANGE_AUDIBLE_START;
+		case FrequencyRange::Bass: return FRANGE_BASS_START;
+		case FrequencyRange::Mids: return FRANGE_MIDS_START;
+		case FrequencyRange::High: return FRANGE_HIGH_START;
 		default:
-		case FRANGE_FULL: return linear ? 0 : LOWEST_LOG_FREQ;
+		case FrequencyRange::Full: return linear ? 0 : LOWEST_LOG_FREQ;
 	}
 }
 
 
 float SaProcessor::getFreqRangeMax() const
 {
-	switch (m_controls->m_freqRangeModel.value())
+	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_END;
-		case FRANGE_BASS: return FRANGE_BASS_END;
-		case FRANGE_MIDS: return FRANGE_MIDS_END;
-		case FRANGE_HIGH: return FRANGE_HIGH_END;
+		case FrequencyRange::Audible: return FRANGE_AUDIBLE_END;
+		case FrequencyRange::Bass: return FRANGE_BASS_END;
+		case FrequencyRange::Mids: return FRANGE_MIDS_END;
+		case FrequencyRange::High: return FRANGE_HIGH_END;
 		default:
-		case FRANGE_FULL: return getNyquistFreq();
+		case FrequencyRange::Full: return getNyquistFreq();
 	}
 }
 
@@ -619,26 +613,26 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 {
 	// return very low limit to make sure zero gets included at linear grid
 	if (linear) {return -900;}
-	switch (m_controls->m_ampRangeModel.value())
+	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
-		case ARANGE_SILENT: return ARANGE_SILENT_START;
-		case ARANGE_LOUD: return ARANGE_LOUD_START;
+		case AmplitudeRange::Extended: return ARANGE_EXTENDED_START;
+		case AmplitudeRange::Silent: return ARANGE_SILENT_START;
+		case AmplitudeRange::Loud: return ARANGE_LOUD_START;
 		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
+		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_START;
 	}
 }
 
 
 float SaProcessor::getAmpRangeMax() const
 {
-	switch (m_controls->m_ampRangeModel.value())
+	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
-		case ARANGE_SILENT: return ARANGE_SILENT_END;
-		case ARANGE_LOUD: return ARANGE_LOUD_END;
+		case AmplitudeRange::Extended: return ARANGE_EXTENDED_END;
+		case AmplitudeRange::Silent: return ARANGE_SILENT_END;
+		case AmplitudeRange::Loud: return ARANGE_LOUD_END;
 		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
+		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_END;
 	}
 }
 
@@ -650,7 +644,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	if (m_controls->m_logYModel.value())
 	{
 		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
-		float amplitude_dB = 10 * log10(amplitude);
+		assert (amplitude >= 0);
+		float amplitude_dB = 10 * std::log10(std::max(amplitude, std::numeric_limits<float>::min()));
 		if (amplitude_dB < getAmpRangeMin())
 		{
 			return height;

@@ -38,9 +38,9 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
 	m_effect ( effect ),
 	m_delayTimeModel(0.001, 0.0001, 0.050, 0.0001,  this, tr( "Delay samples" ) ),
 	m_lfoFrequencyModel( 0.25, 0.01, 60, 0.0001, 60000.0, this, tr( "LFO frequency" ) ),
-	m_lfoAmountModel( 0.0, 0.0, 0.0025, 0.0001, this, tr( "Seconds" ) ),
+	m_lfoAmountModel( 0.0, 0.0, 0.0025, 0.0001, this, tr( "Amount" ) ),
 	m_lfoPhaseModel( 90.0, 0.0, 360.0, 0.0001, this, tr( "Stereo phase" ) ),
-	m_feedbackModel( 0.0, -1.0, 1.0, 0.0001, this, tr( "Regen" ) ),
+	m_feedbackModel( 0.0, -1.0, 1.0, 0.0001, this, tr( "Feedback" ) ),
 	m_whiteNoiseAmountModel( 0.0, 0.0, 0.05, 0.0001, this, tr( "Noise" ) ),
 	m_invertFeedbackModel ( false, this, tr( "Invert" ) )
 

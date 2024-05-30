@@ -1,32 +1,33 @@
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
-INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}")
-INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/src")
+include(CTest)
 
-SET(CMAKE_CXX_STANDARD 17)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
 
-SET(CMAKE_AUTOMOC ON)
-
-# FIXME: remove this once we export include directories for LMMS
-IF(LMMS_BUILD_APPLE)
-INCLUDE_DIRECTORIES("/usr/local/include")
-ENDIF()
-
-ADD_EXECUTABLE(tests
-	EXCLUDE_FROM_ALL
-	main.cpp
-	QTestSuite.cpp
-	$<TARGET_OBJECTS:lmmsobjs>
-
+set(LMMS_TESTS
+	src/core/ArrayVectorTest.cpp
 	src/core/AutomatableModelTest.cpp
+	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
-
 	src/tracks/AutomationTrackTest.cpp
 )
-TARGET_COMPILE_DEFINITIONS(tests
-	PRIVATE $<TARGET_PROPERTY:lmmsobjs,INTERFACE_COMPILE_DEFINITIONS>
-)
-TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
-TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})
+
+foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
+	# TODO CMake 3.20: Use cmake_path
+	get_filename_component(LMMS_TEST_NAME ${LMMS_TEST_SRC} NAME_WE)
+
+	add_executable(${LMMS_TEST_NAME} $<TARGET_OBJECTS:lmmsobjs> ${LMMS_TEST_SRC})
+	add_test(NAME ${LMMS_TEST_NAME} COMMAND ${LMMS_TEST_NAME})
+
+	# TODO CMake 3.12: Propagate usage requirements by linking to lmmsobjs
+	target_include_directories(${LMMS_TEST_NAME} PRIVATE $<TARGET_PROPERTY:lmmsobjs,INCLUDE_DIRECTORIES>)
+
+	target_link_libraries(${LMMS_TEST_NAME} PRIVATE
+		${LMMS_REQUIRED_LIBS}
+		${QT_LIBRARIES}
+		${QT_QTTEST_LIBRARY}
+	)
+
+	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_17)
+	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE $<TARGET_PROPERTY:lmmsobjs,INTERFACE_COMPILE_DEFINITIONS>)
+endforeach()

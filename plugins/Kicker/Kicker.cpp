@@ -23,11 +23,10 @@
  *
  */
 
-
+#include "Kicker.h"
 
 #include <QDomElement>
 
-#include "Kicker.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -55,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -65,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 
 
 KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &kicker_plugin_descriptor ),
+	Instrument(_instrument_track, &kicker_plugin_descriptor, nullptr, Flag::IsNotBendable),
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 440.0f, 5.0f, 5000.0f, 1.0f, 5000.0f, this, tr( "Length" ) ),
@@ -85,65 +84,64 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-void KickerInstrument::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void KickerInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	m_startFreqModel.saveSettings( _doc, _this, "startfreq" );
-	m_endFreqModel.saveSettings( _doc, _this, "endfreq" );
-	m_decayModel.saveSettings( _doc, _this, "decay" );
-	m_distModel.saveSettings( _doc, _this, "dist" );
-	m_distEndModel.saveSettings( _doc, _this, "distend" );
-	m_gainModel.saveSettings( _doc, _this, "gain" );
-	m_envModel.saveSettings( _doc, _this, "env" );
-	m_noiseModel.saveSettings( _doc, _this, "noise" );
-	m_clickModel.saveSettings( _doc, _this, "click" );
-	m_slopeModel.saveSettings( _doc, _this, "slope" );
-	m_startNoteModel.saveSettings( _doc, _this, "startnote" );
-	m_endNoteModel.saveSettings( _doc, _this, "endnote" );
-	m_versionModel.saveSettings( _doc, _this, "version" );
+	m_startFreqModel.saveSettings(doc, elem, "startfreq");
+	m_endFreqModel.saveSettings(doc, elem, "endfreq");
+	m_decayModel.saveSettings(doc, elem, "decay");
+	m_distModel.saveSettings(doc, elem, "dist");
+	m_distEndModel.saveSettings(doc, elem, "distend");
+	m_gainModel.saveSettings(doc, elem, "gain");
+	m_envModel.saveSettings(doc, elem, "env");
+	m_noiseModel.saveSettings(doc, elem, "noise");
+	m_clickModel.saveSettings(doc, elem, "click");
+	m_slopeModel.saveSettings(doc, elem, "slope");
+	m_startNoteModel.saveSettings(doc, elem, "startnote");
+	m_endNoteModel.saveSettings(doc, elem, "endnote");
+	m_versionModel.saveSettings(doc, elem, "version");
 }
 
 
 
 
-void KickerInstrument::loadSettings( const QDomElement & _this )
+void KickerInstrument::loadSettings(const QDomElement& elem)
 {
-	m_versionModel.loadSettings( _this, "version" );
+	m_versionModel.loadSettings(elem, "version");
 
-	m_startFreqModel.loadSettings( _this, "startfreq" );
-	m_endFreqModel.loadSettings( _this, "endfreq" );
-	m_decayModel.loadSettings( _this, "decay" );
-	m_distModel.loadSettings( _this, "dist" );
-	if( _this.hasAttribute( "distend" ) )
+	m_startFreqModel.loadSettings(elem, "startfreq");
+	m_endFreqModel.loadSettings(elem, "endfreq");
+	m_decayModel.loadSettings(elem, "decay");
+	m_distModel.loadSettings(elem, "dist");
+	if (elem.hasAttribute("distend") || !elem.firstChildElement("distend").isNull())
 	{
-		m_distEndModel.loadSettings( _this, "distend" );
+		m_distEndModel.loadSettings(elem, "distend");
 	}
 	else
 	{
-		m_distEndModel.setValue( m_distModel.value() );
+		m_distEndModel.setValue(m_distModel.value());
 	}
-	m_gainModel.loadSettings( _this, "gain" );
-	m_envModel.loadSettings( _this, "env" );
-	m_noiseModel.loadSettings( _this, "noise" );
-	m_clickModel.loadSettings( _this, "click" );
-	m_slopeModel.loadSettings( _this, "slope" );
-	m_startNoteModel.loadSettings( _this, "startnote" );
-	if( m_versionModel.value() < 1 )
+	m_gainModel.loadSettings(elem, "gain");
+	m_envModel.loadSettings(elem, "env");
+	m_noiseModel.loadSettings(elem, "noise");
+	m_clickModel.loadSettings(elem, "click");
+	m_slopeModel.loadSettings(elem, "slope");
+	m_startNoteModel.loadSettings(elem, "startnote");
+	if (m_versionModel.value() < 1)
 	{
-		m_startNoteModel.setValue( false );
+		m_startNoteModel.setValue(false);
 	}
-	m_endNoteModel.loadSettings( _this, "endnote" );
+	m_endNoteModel.loadSettings(elem, "endnote");
 
 	// Try to maintain backwards compatibility
-	if( !_this.hasAttribute( "version" ) )
+	if (!elem.hasAttribute("version"))
 	{
-		m_startNoteModel.setValue( false );
-		m_decayModel.setValue( m_decayModel.value() * 1.33f );
-		m_envModel.setValue( 1.0f );
-		m_slopeModel.setValue( 1.0f );
-		m_clickModel.setValue( 0.0f );
+		m_startNoteModel.setValue(false);
+		m_decayModel.setValue(m_decayModel.value() * 1.33f);
+		m_envModel.setValue(1.0f);
+		m_slopeModel.setValue(1.0f);
+		m_clickModel.setValue(0.0f);
 	}
-	m_versionModel.setValue( KICKER_PRESET_VERSION );
+	m_versionModel.setValue(KICKER_PRESET_VERSION);
 }
 
 
@@ -162,10 +160,10 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	const float decfr = m_decayModel.value() * Engine::audioEngine()->processingSampleRate() / 1000.0f;
+	const float decfr = m_decayModel.value() * Engine::audioEngine()->outputSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),
@@ -186,21 +184,28 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	auto so = static_cast<SweepOsc*>(_n->m_pluginData);
-	so->update( _working_buffer + offset, frames, Engine::audioEngine()->processingSampleRate() );
+	so->update( _working_buffer + offset, frames, Engine::audioEngine()->outputSampleRate() );
 
 	if( _n->isReleased() )
 	{
-		const float done = _n->releaseFramesDone();
+		// We need this to check if the release has ended
 		const float desired = desiredReleaseFrames();
-		for( fpp_t f = 0; f < frames; ++f )
+
+		// This can be considered the current release frame in the "global" context of the release.
+		// We need it with the desired number of release frames to compute the linear decay.
+		fpp_t currentReleaseFrame = _n->releaseFramesDone();
+
+		// Start applying the release at the correct frame
+		const float framesBeforeRelease = _n->framesBeforeRelease();
+		for (fpp_t f = framesBeforeRelease; f < frames; ++f, ++currentReleaseFrame)
 		{
-			const float fac = ( done+f < desired ) ? ( 1.0f - ( ( done+f ) / desired ) ) : 0;
-			_working_buffer[f+offset][0] *= fac;
-			_working_buffer[f+offset][1] *= fac;
+			const bool releaseStillActive = currentReleaseFrame < desired;
+			const float attenuation = releaseStillActive ? (1.0f - (currentReleaseFrame / desired)) : 0.f;
+
+			_working_buffer[f + offset][0] *= attenuation;
+			_working_buffer[f + offset][1] *= attenuation;
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -228,7 +233,7 @@ class KickerKnob : public Knob
 {
 public:
 	KickerKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -240,7 +245,7 @@ class KickerEnvKnob : public TempoSyncKnob
 {
 public:
 	KickerEnvKnob( QWidget * _parent ) :
-			TempoSyncKnob( knobStyled, _parent )
+			TempoSyncKnob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -252,7 +257,7 @@ class KickerLargeKnob : public Knob
 {
 public:
 	KickerLargeKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 34, 34 );
 		setObjectName( "largeKnob" );
@@ -317,10 +322,10 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 	m_distEndKnob->setHintText( tr( "End distortion:" ), "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
-	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
+	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
 	m_startNoteToggle->move( COL1 + 8, LED_ROW );
 
-	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
+	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
 	m_endNoteToggle->move( END_COL + 8, LED_ROW );
 
 	setAutoFillBackground( true );

@@ -9,13 +9,18 @@ ELSE()
 ENDIF()
 
 # Additional compile flags
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
+if(MSVC)
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} /wd4244 /wd4273 /wd4305")
+else()
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
+endif()
 
 # Loop over every XML file
 FILE(GLOB XML_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/*.xml")
 LIST(SORT XML_SOURCES)
+
 FOREACH(_item ${XML_SOURCES})
 	# Get library name and (soon to be) C file
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
@@ -24,7 +29,7 @@ FOREACH(_item ${XML_SOURCES})
 	# Coerce XML source file to C
 	ADD_CUSTOM_COMMAND(
 		OUTPUT "${_out_file}"
-		COMMAND ./makestub.pl "${_item}" > "${_out_file}"
+		COMMAND "${PERL_EXECUTABLE}" ./makestub.pl "${_item}" > "${_out_file}"
 		DEPENDS "${_item}"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ladspa"
 		VERBATIM
@@ -32,6 +37,10 @@ FOREACH(_item ${XML_SOURCES})
 
 	# Add a library target for this C file, which depends on success of makestup.pl
 	ADD_LIBRARY("${_plugin}" MODULE "${_out_file}")
+
+	if(MSVC)
+		target_link_options("${_plugin}" PRIVATE "/EXPORT:ladspa_descriptor")
+	endif()
 
 	# Vocoder does not use fftw
 	IF(NOT ("${_plugin}" STREQUAL "vocoder_1337"))
@@ -103,6 +112,6 @@ TARGET_LINK_LIBRARIES(se4_1883 rms db)
 
 ADD_LIBRARY(pitchscale STATIC ladspa/util/pitchscale.c)
 SET_TARGET_PROPERTIES(pitchscale PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
-TARGET_LINK_LIBRARIES(pitchscale -lfftw3f)
+TARGET_LINK_LIBRARIES(pitchscale ${FFTW3F_LIBRARIES})
 TARGET_LINK_LIBRARIES(pitch_scale_1193 pitchscale)
 TARGET_LINK_LIBRARIES(pitch_scale_1194 pitchscale)

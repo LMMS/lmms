@@ -28,14 +28,13 @@
 #ifdef LMMS_HAVE_SNDIO
 
 #include <cstdlib>
-#include <QLabel>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
 #include "ConfigManager.h"
 
@@ -44,10 +43,10 @@ namespace lmms
 {
 
 AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audiosndio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_convertEndian ( false )
 {
 	_success_ful = false;
@@ -140,20 +139,6 @@ void AudioSndio::stopProcessing()
 	stopProcessingThread( this );
 }
 
-
-void AudioSndio::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		/* change sample rate to sampleRate() */
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
 void AudioSndio::run()
 {
 	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
@@ -167,8 +152,7 @@ void AudioSndio::run()
 			break;
 		}
 
-		uint bytes = convertToS16( temp, frames,
-		    audioEngine()->masterGain(), outbuf, m_convertEndian );
+		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;
@@ -183,12 +167,10 @@ void AudioSndio::run()
 AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSndio::name(), _parent )
 {
-	m_device = new QLineEdit( "", this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	QFormLayout * form = new QFormLayout(this);
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	m_device = new QLineEdit( "", this );
+	form->addRow(tr("Device"), m_device);
 
 	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -198,9 +180,8 @@ AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 

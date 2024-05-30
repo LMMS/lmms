@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A multitap echo delay plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -55,10 +55,10 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
@@ -67,7 +67,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 
 MultitapEchoEffect::~MultitapEchoEffect()
 {
-	MM_FREE( m_work );
+	delete[] m_work;
 }
 
 

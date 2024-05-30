@@ -53,10 +53,9 @@ public:
 
 public slots:
 	void clearViews();
-	void moveUp( lmms::gui::EffectView* view );
-	void moveDown( lmms::gui::EffectView* view );
-	void deletePlugin( lmms::gui::EffectView* view );
-
+	void moveUp(EffectView* view);
+	void moveDown(EffectView* view);
+	void deletePlugin(EffectView* view);
 
 private slots:
 	virtual void update();

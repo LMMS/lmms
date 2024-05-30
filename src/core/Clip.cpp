@@ -48,9 +48,7 @@ Clip::Clip( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false ),
-	m_color( 128, 128, 128 ),
-	m_useCustomClipColor( false )
+	m_selectViewOnCreate{false}
 {
 	if( getTrack() )
 	{
@@ -92,7 +90,7 @@ Clip::~Clip()
  */
 void Clip::movePosition( const TimePos & pos )
 {
-	TimePos newPos = qMax(0, pos.getTicks());
+	TimePos newPos = std::max(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
 		Engine::audioEngine()->requestChangeInModel();
@@ -185,19 +183,10 @@ void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
-
-
-void Clip::useCustomClipColor( bool b )
+void Clip::setColor(const std::optional<QColor>& color)
 {
-	if (b == m_useCustomClipColor) { return; }
-	m_useCustomClipColor = b;
+	m_color = color;
 	emit colorChanged();
-}
-
-
-bool Clip::hasColor()
-{
-	return usesCustomClipColor() || getTrack()->useColor();
 }
 
 } // namespace lmms

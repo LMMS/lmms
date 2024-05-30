@@ -50,20 +50,15 @@ PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 
 
 
-void PixmapButton::paintEvent( QPaintEvent * )
+void PixmapButton::paintEvent(QPaintEvent*)
 {
-	QPainter p( this );
+	QPainter p(this);
 
-	if( ( model() != nullptr && model()->value() ) || m_pressed )
+	QPixmap* pixmapToDraw = isActive() ? &m_activePixmap : &m_inactivePixmap;
+
+	if (!pixmapToDraw->isNull())
 	{
-		if( !m_activePixmap.isNull() )
-		{
-			p.drawPixmap( 0, 0, m_activePixmap );
-		}
-	}
-	else if( !m_inactivePixmap.isNull() )
-	{
-		p.drawPixmap( 0, 0, m_inactivePixmap );
+		p.drawPixmap(0, 0, *pixmapToDraw);
 	}
 }
 
@@ -129,15 +124,20 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 QSize PixmapButton::sizeHint() const
 {
-	if( ( model() != nullptr && model()->value() ) || m_pressed )
+	if (isActive())
 	{
-		return m_activePixmap.size() / devicePixelRatio();
+		return m_activePixmap.size();
 	}
 	else 
 	{
-		return m_inactivePixmap.size() / devicePixelRatio();
+		return m_inactivePixmap.size();
 	}
 }
 
+
+bool PixmapButton::isActive() const
+{
+	return (model() != nullptr && model()->value()) || m_pressed;
+}
 
 } // namespace lmms::gui

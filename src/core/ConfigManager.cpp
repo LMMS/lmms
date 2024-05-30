@@ -77,9 +77,9 @@ ConfigManager::ConfigManager() :
 	m_sf2Dir = m_workingDir + SF2_PATH;
 	m_gigDir = m_workingDir + GIG_PATH;
 	m_themeDir = defaultThemeDir();
-	if (!qgetenv("LMMS_DATA_DIR").isEmpty())
+	if (std::getenv("LMMS_DATA_DIR"))
 	{
-		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
+		QDir::addSearchPath("data", QString::fromLocal8Bit(std::getenv("LMMS_DATA_DIR")));
 	}
 	initDevelopmentWorkingDir();
 
@@ -173,7 +173,7 @@ void ConfigManager::upgrade()
 	ProjectVersion createdWith = m_version;
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
-	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
+	if (createdWith.setCompareType(ProjectVersion::CompareType::Minor) != LMMS_VERSION)
 	{
 		m_themeDir = defaultThemeDir();
 	}
@@ -192,9 +192,7 @@ QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;
 	methods.append("none");
-#if QT_VERSION >= 0x050100
 	methods.append("qt");
-#endif
 #ifdef LMMS_BUILD_WIN32
 	methods.append("win32");
 #endif
@@ -334,10 +332,9 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-const QString & ConfigManager::value(const QString & cls,
-					const QString & attribute) const
+QString ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
 {
-	if(m_settings.contains(cls))
+	if (m_settings.find(cls) != m_settings.end())
 	{
 		for (const auto& setting : m_settings[cls])
 		{
@@ -347,18 +344,7 @@ const QString & ConfigManager::value(const QString & cls,
 			}
 		}
 	}
-	static QString empty;
-	return empty;
-}
-
-
-
-const QString & ConfigManager::value(const QString & cls,
-				      const QString & attribute,
-				      const QString & defaultVal) const
-{
-	const QString & val = value(cls, attribute);
-	return val.isEmpty() ? defaultVal : val;
+	return defaultVal;
 }
 
 
@@ -569,8 +555,8 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	upgrade();
 
 	QStringList searchPaths;
-	if(! qgetenv("LMMS_THEME_PATH").isNull())
-		searchPaths << qgetenv("LMMS_THEME_PATH");
+	if (std::getenv("LMMS_THEME_PATH"))
+		searchPaths << std::getenv("LMMS_THEME_PATH");
 	searchPaths << themeDir() << defaultThemeDir();
 	QDir::setSearchPaths("resources", searchPaths);
 
@@ -719,7 +705,7 @@ unsigned int ConfigManager::legacyConfigVersion()
 {
 	ProjectVersion createdWith = m_version;
 
-	createdWith.setCompareType(ProjectVersion::Build);
+	createdWith.setCompareType(ProjectVersion::CompareType::Build);
 
 	if( createdWith < "1.1.90" )
 	{
