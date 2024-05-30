@@ -1,7 +1,7 @@
 /*
- * AudioResampler.cpp - wrapper for libsamplerate
+ * AudioResampler.cpp
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,40 +25,44 @@
 #include "AudioResampler.h"
 
 #include <samplerate.h>
-#include <stdexcept>
-#include <string>
+
+#include "interpolation.h"
 
 namespace lmms {
 
-AudioResampler::AudioResampler(int interpolationMode, int channels)
-	: m_interpolationMode(interpolationMode)
-	, m_channels(channels)
-	, m_state(src_new(interpolationMode, channels, &m_error))
+void AudioResampler::resample(float* dst, const float* src, size_t numDstFrames, size_t numSrcFrames, double ratio)
 {
-	if (!m_state)
+	const auto numSrcSamples = numSrcFrames * DEFAULT_CHANNELS;
+	for (size_t dstFrameIndex = 0; dstFrameIndex < numDstFrames; ++dstFrameIndex)
 	{
-		const auto errorMessage = std::string{src_strerror(m_error)};
-		const auto fullMessage = std::string{"Failed to create an AudioResampler: "} + errorMessage;
-		throw std::runtime_error{fullMessage};
+		const auto srcFrameIndex = static_cast<double>(dstFrameIndex) / ratio;
+		const auto truncatedSrcFrameIndex = static_cast<int>(srcFrameIndex);
+		const auto fractionalOffset = srcFrameIndex - truncatedSrcFrameIndex;
+
+		const auto leftX = truncatedSrcFrameIndex * DEFAULT_CHANNELS;
+		const auto rightX = leftX + 1;
+
+		dst[leftX] = interpolate(src, numSrcSamples, leftX, fractionalOffset, m_prevSamples.data());
+		dst[rightX] = interpolate(src, numSrcSamples, rightX, fractionalOffset, m_prevSamples.data());
 	}
+
+	m_prevSamples[0] = dst[numDstFrames * DEFAULT_CHANNELS - 2];
+	m_prevSamples[1] = dst[numDstFrames * DEFAULT_CHANNELS - 1];
 }
 
-AudioResampler::~AudioResampler()
+float AudioResampler::interpolate(const float* src, size_t size, int index, float fractionalOffset, float* prev)
 {
-	src_delete(m_state);
-}
+	const auto x0 = index - DEFAULT_CHANNELS;
+	const auto x1 = index;
+	const auto x2 = index + DEFAULT_CHANNELS;
+	const auto x3 = index + DEFAULT_CHANNELS * 2;
 
-auto AudioResampler::resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio)
-	-> ProcessResult
-{
-	auto data = SRC_DATA{};
-	data.data_in = in;
-	data.input_frames = inputFrames;
-	data.data_out = out;
-	data.output_frames = outputFrames;
-	data.src_ratio = ratio;
-	data.end_of_input = 0;
-	return {src_process(m_state, &data), data.input_frames_used, data.output_frames_gen};
+	const auto y0 = (x0 < 0 && prev) ? prev[index] : (x0 < 0 || x0 >= size) ? 0.0f : src[x0];
+	const auto y1 = (x1 < 0 || x1 >= size) ? 0.0f : src[x1];
+	const auto y2 = (x2 < 0 || x2 >= size) ? 0.0f : src[x2];
+	const auto y3 = (x3 < 0 || x3 >= size) ? 0.0f : src[x3];
+
+	return hermiteInterpolate(y0, y1, y2, y3, fractionalOffset);
 }
 
 } // namespace lmms

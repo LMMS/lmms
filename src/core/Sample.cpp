@@ -26,8 +26,8 @@
 
 #include <cassert>
 
+#include "AudioResampler.h"
 #include "MixHelpers.h"
-#include "interpolation.h"
 
 namespace lmms {
 
@@ -134,10 +134,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	state->frameIndex = std::max<float>(m_startFrame, state->frameIndex);
 	render(dst, numFrames, state, loopMode, resampleRatio);
 
-	if (m_amplification != 1.0f)
-	{
-		MixHelpers::multiply(dst, m_amplification, numFrames);
-	}
+	if (m_amplification != 1.0f) { MixHelpers::multiply(dst, m_amplification, numFrames); }
 
 	return true;
 }
@@ -167,10 +164,7 @@ void Sample::render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Lo
 			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame) { return; }
 			break;
 		case Loop::On:
-			if (state->frameIndex < m_loopStartFrame && state->backwards)
-			{
-				state->frameIndex = m_loopEndFrame - 1;
-			}
+			if (state->frameIndex < m_loopStartFrame && state->backwards) { state->frameIndex = m_loopEndFrame - 1; }
 			else if (state->frameIndex >= m_loopEndFrame) { state->frameIndex = m_loopStartFrame; }
 			break;
 		case Loop::PingPong:
@@ -189,37 +183,20 @@ void Sample::render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Lo
 			break;
 		}
 
-		const auto srcIndex = static_cast<int>(state->frameIndex);
-		const auto leftX1Index = srcIndex * DEFAULT_CHANNELS;
-		const auto rightX1Index = leftX1Index + 1;
-
-		const auto leftX0Index = leftX1Index - DEFAULT_CHANNELS;
-		const auto leftX2Index = leftX1Index + DEFAULT_CHANNELS;
-		const auto leftX3Index = leftX1Index + DEFAULT_CHANNELS * 2;
-
-		const auto rightX0Index = rightX1Index - DEFAULT_CHANNELS;
-		const auto rightX2Index = rightX1Index + DEFAULT_CHANNELS;
-		const auto rightX3Index = rightX1Index + DEFAULT_CHANNELS * 2;
-
 		const auto src = m_buffer->data()->data();
 		const auto srcSize = m_buffer->size() * DEFAULT_CHANNELS;
+	
+		const auto frameIndex = static_cast<int>(state->frameIndex);
+		const auto fractionalOffset = state->frameIndex - frameIndex;
 
-		const auto leftX0 = (leftX0Index < 0 || leftX0Index >= srcSize) ? 0.0f : src[leftX0Index];
-		const auto leftX1 = (leftX1Index < 0 || leftX1Index >= srcSize) ? 0.0f : src[leftX1Index];
-		const auto leftX2 = (leftX2Index < 0 || leftX2Index >= srcSize) ? 0.0f : src[leftX2Index];
-		const auto leftX3 = (leftX3Index < 0 || leftX3Index >= srcSize) ? 0.0f : src[leftX3Index];
+		const auto leftX = frameIndex * DEFAULT_CHANNELS;
+		const auto rightX = leftX + 1;
 
-		const auto rightX0 = (rightX0Index < 0 || rightX0Index >= srcSize) ? 0.0f : src[rightX0Index];
-		const auto rightX1 = (rightX1Index < 0 || rightX1Index >= srcSize) ? 0.0f : src[rightX1Index];
-		const auto rightX2 = (rightX2Index < 0 || rightX2Index >= srcSize) ? 0.0f : src[rightX2Index];
-		const auto rightX3 = (rightX3Index < 0 || rightX3Index >= srcSize) ? 0.0f : src[rightX3Index];
-
-		const auto fractionalPosition = state->frameIndex - srcIndex;
-		const auto leftSample = hermiteInterpolate(leftX0, leftX1, leftX2, leftX3, fractionalPosition);
-		const auto rightSample = hermiteInterpolate(rightX0, rightX1, rightX2, rightX3, fractionalPosition);
+		const auto leftSample = AudioResampler::interpolate(src, srcSize, leftX, fractionalOffset);
+		const auto rightSample = AudioResampler::interpolate(src, srcSize, rightX, fractionalOffset);
 
 		dst[i] = {leftSample, rightSample};
-		state->frameIndex += (state->backwards ? -1.0 : 1.0)  / resampleRatio;
+		state->frameIndex += (state->backwards ? -1.0 : 1.0) / resampleRatio;
 	}
 }
 

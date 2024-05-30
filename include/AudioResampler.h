@@ -25,39 +25,30 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
+#include <cstddef>
 #include <samplerate.h>
 
+#include "lmms_basics.h"
 #include "lmms_export.h"
 
 namespace lmms {
-
 class LMMS_EXPORT AudioResampler
 {
 public:
-	struct ProcessResult
-	{
-		int error;
-		long inputFramesUsed;
-		long outputFramesGenerated;
-	};
+	//! Resample `numSrcFrames` sample frames from `src` to `numDstFrames` sample frames in `dst` with a ratio of
+	//! `ratio = output_sample_rate/input_sample_rate`. Callers are expected to provide some margin of sample values (at
+	//! least 4 extra samples) at the end of `src` to ensure correct interpolation of sample values. Returns an error
+	//! when this function completes, if any.
+	void resample(float* dst, const float* src, size_t numDstFrames, size_t numSrcFrames, double ratio);
 
-	AudioResampler(int interpolationMode, int channels);
-	AudioResampler(const AudioResampler&) = delete;
-	AudioResampler(AudioResampler&&) = delete;
-	~AudioResampler();
-
-	AudioResampler& operator=(const AudioResampler&) = delete;
-	AudioResampler& operator=(AudioResampler&&) = delete;
-
-	auto resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio) -> ProcessResult;
-	auto interpolationMode() const -> int { return m_interpolationMode; }
-	auto channels() const -> int { return m_channels; }
+	//! Interpolates the sample value at position `index` within `src` containing `size` samples.
+	//! Assumes that `src` represents an array of sample frames containing two samples each.
+	//! `prev` can be provided to provide the sample frame that occurs at `index - 1`.
+	static float interpolate(
+		const float* src, size_t size, int index, float fractionalOffset, float* prev = nullptr);
 
 private:
-	int m_interpolationMode = -1;
-	int m_channels = 0;
-	int m_error = 0;
-	SRC_STATE* m_state = nullptr;
+	std::array<float, DEFAULT_CHANNELS> m_prevSamples{0.0f, 0.0f};
 };
 } // namespace lmms
 
