@@ -28,6 +28,7 @@
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
+#include "PeakIndicator.h"
 #include "Song.h"
 #include "ConfigManager.h"
 
@@ -123,6 +124,9 @@ namespace lmms::gui
 
         m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), this};
 
+        m_peakIndicator = new PeakIndicator(this);
+        connect(m_fader, &Fader::peakChanged, m_peakIndicator, &PeakIndicator::updatePeak);
+
         m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
         m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
 
@@ -136,6 +140,7 @@ namespace lmms::gui
         mainLayout->addStretch();
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
         mainLayout->addLayout(soloMuteLayout, 0);
+        mainLayout->addWidget(m_peakIndicator);
         mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
@@ -341,6 +346,11 @@ namespace lmms::gui
     void MixerChannelView::setStrokeInnerInactive(const QColor& c)
     {
         m_strokeInnerInactive = c;
+    }
+
+    void MixerChannelView::reset()
+    {
+        m_peakIndicator->resetPeakToMinusInf();
     }
 
     void MixerChannelView::renameChannel()
