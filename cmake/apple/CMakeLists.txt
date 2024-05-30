@@ -19,21 +19,18 @@ CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_BINARY_DIR}/Info.plist")
 CONFIGURE_FILE("install_apple.sh.in"    "${CMAKE_BINARY_DIR}/install_apple.sh" @ONLY)
 CONFIGURE_FILE("package_apple.json.in"  "${CMAKE_BINARY_DIR}/package_apple.json" @ONLY)
 
-IF(CMAKE_APPLE_SILICON_PROCESSOR)
-	# Target arch is provided to cmake (M-series only)
-	SET(DMG_ARCH "-${CMAKE_APPLE_SILICON_PROCESSOR}")
-ELSEIF(CMAKE_OSX_ARCHITECTURES)
-	SET(DMG_ARCH "-${CMAKE_OSX_ARCHITECTURES}")
+IF(CMAKE_OSX_ARCHITECTURES)
+	SET(DMG_ARCH "${CMAKE_OSX_ARCHITECTURES}")
 ELSEIF(IS_ARM64)
     # Target arch is host arch
-	SET(DMG_ARCH "-arm64")
+	SET(DMG_ARCH "arm64")
 ELSE()
 	# Fallback to Intel
-	SET(DMG_ARCH "-x86_64")
+	SET(DMG_ARCH "x86_64")
 ENDIF()
 
 # DMG creation target
-SET(DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}${DMG_ARCH}.dmg")
+SET(DMG_FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}-mac${APPLE_OS_VER}-${DMG_ARCH}.dmg")
 
 FILE(REMOVE "${DMG_FILE}")
 ADD_CUSTOM_TARGET(removedmg
