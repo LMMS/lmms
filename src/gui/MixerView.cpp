@@ -168,9 +168,6 @@ MixerView::MixerView(Mixer* mixer) :
 
 	// add ourself to workspace
 	QMdiSubWindow* subWin = mainWindow->addWindowedWidget(this);
-	Qt::WindowFlags flags = subWin->windowFlags();
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags(flags);
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
 	subWin->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
