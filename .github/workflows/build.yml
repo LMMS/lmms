@@ -64,8 +64,19 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   macos:
-    name: macos
-    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x86_64, arm64 ]
+        include:
+          - arch: x86_64
+            os: macos-12
+            xcode: "13.1"
+          - arch: arm64
+            os: macos-14
+            xcode: "14.3.1"
+    name: macos-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -74,7 +85,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j3
-      DEVELOPER_DIR: /Applications/Xcode_13.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -115,6 +126,7 @@ jobs:
                 -B build \
                 -DCMAKE_INSTALL_PREFIX="../target" \
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+                -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
@@ -130,7 +142,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos
+          name: macos-${{ matrix.arch }}
           path: build/lmms-*.dmg
       - name: Trim ccache and print statistics
         run: |
