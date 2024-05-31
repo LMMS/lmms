@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Halt on first error
+set -e
+
+DESTDIR="/opt/@CPACK_PROJECT_NAME@"
+if [ "$(id -u)" != "0" ]; then
+	# Prepend "$HOME" so we can install to a writable location
+	DESTDIR="${HOME}${DESTDIR}"
+	echo "Installing as a regular user to $DESTDIR..."
+else
+	echo "Installing as elevated user to $DESTDIR..."
+fi
+
+# Deploy @CPACK_PROJECT_NAME_UCASE@
+mkdir -p "${DESTDIR}"
+unalias cp &> /dev/null || true
+cp -rf ./* "${DESTDIR}"
+
+# Test LMMS
+LMMS="${DESTDIR}/usr/bin/@CPACK_PROJECT_NAME@"
+echo "Installation complete... Testing \"$LMMS\"..."
+"$LMMS" --version
+
+# TODO: Register file associations, desktop icon, etc
+
+echo "@CPACK_PROJECT_NAME_UCASE@ was installed successfully to ${DESTDIR}.  To run:"
+echo "  $LMMS"

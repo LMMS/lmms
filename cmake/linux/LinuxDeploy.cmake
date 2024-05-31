@@ -144,7 +144,7 @@ foreach(_LIB IN LISTS LIBS)
 endforeach()
 
 # Call linuxdeploy
-message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir "${APP}" ... [... executables]")
+message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... executables]")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/scalable/apps/${lmms}.svg"
@@ -194,23 +194,66 @@ foreach(line ${LDD_LIST})
 	endif()
 endforeach()
 
-# Create AppImage
-# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
-set(ENV{ARCH} "${ARCH}")
-message(STATUS "Finishing the AppImage...")
-execute_process(COMMAND "${LINUXDEPLOY_BIN}"
-	--appdir "${APP}"
-	--output appimage
-	--verbosity ${VERBOSITY}
-	${OUTPUT_QUIET}
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
+if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
+	find_program(MAKESELF_BIN makeself REQUIRED)
 
-message(STATUS "AppImage created successfully... renaming...")
+	# Create self-extracting ".run" script using makeself
+	message(STATUS "Finishing the .run file using ${MAKESELF_BIN}...")
+	string(REPLACE ".AppImage" ".run" RUN_FILE "${APPIMAGE_FILE}")
+	configure_file(
+		"${CPACK_SOURCE_DIR}/cmake/linux/makeself_setup.sh.in" "${CPACK_CURRENT_BINARY_DIR}/setup.sh" @ONLY
+		FILE_PERMISSIONS
+			OWNER_EXECUTE OWNER_WRITE OWNER_READ
+			GROUP_EXECUTE GROUP_WRITE GROUP_READ
+			WORLD_READ)
 
-if(EXISTS "${APPIMAGE_BEFORE_RENAME}")
-	file(RENAME "${APPIMAGE_BEFORE_RENAME}" "${APPIMAGE_FILE}")
-	message(STATUS "AppImage create: ${APPIMAGE_FILE}")
+	if(OUTPUT_QUIET)
+		set(MAKESELF_QUIET "--quiet")
+		set(ERROR_QUIET ERROR_QUIET)
+	endif()
+
+	file(REMOVE "${RUN_FILE}")
+
+	# makeself.sh [args] archive_dir file_name label startup_script [script_args]
+	execute_process(COMMAND makeself
+	    --nox11
+	    ${MAKESELF_QUIET}
+		"${APP}"
+		"${RUN_FILE}"
+		"${LMMS} Installer"
+		"${CPACK_CURRENT_BINARY_DIR}/setup.sh"
+		${OUTPUT_QUIET}
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
+
+	# ensure the installer can be executed as a script file
+	execute_process(COMMAND "${RUN_FILE}" --help
+    		${OUTPUT_QUIET}
+    		${ERROR_QUIET}
+    		COMMAND_ECHO ${COMMAND_ECHO}
+    		COMMAND_ERROR_IS_FATAL ANY)
+
+    message(STATUS "Installer created: ${RUN_FILE}")
 else()
-	message(FATAL_ERROR "An error occured generating the AppImage")
+	# Create AppImage (default)
+    # appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
+    set(ENV{ARCH} "${ARCH}")
+    message(STATUS "Finishing the AppImage...")
+    execute_process(COMMAND "${LINUXDEPLOY_BIN}"
+    	--appdir "${APP}"
+    	--output appimage
+    	--verbosity ${VERBOSITY}
+    	${OUTPUT_QUIET}
+    	COMMAND_ECHO ${COMMAND_ECHO}
+    	COMMAND_ERROR_IS_FATAL ANY)
+
+    message(STATUS "AppImage created successfully... renaming...")
+
+    if(EXISTS "${APPIMAGE_BEFORE_RENAME}")
+    	file(RENAME "${APPIMAGE_BEFORE_RENAME}" "${APPIMAGE_FILE}")
+    	message(STATUS "AppImage created: ${APPIMAGE_FILE}")
+    else()
+    	message(FATAL_ERROR "An error occured generating the AppImage")
+    endif()
 endif()
+
