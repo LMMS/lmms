@@ -149,7 +149,7 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return runningFrames() / Engine::audioEngine()->processingSampleRate();
+	return runningFrames() / Engine::audioEngine()->outputSampleRate();
 }
 
 

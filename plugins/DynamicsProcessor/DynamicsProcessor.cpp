@@ -64,8 +64,8 @@ DynProcEffect::DynProcEffect( Model * _parent,
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
-	m_rms[1] = new RmsHelper( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
+	m_rms[0] = new RmsHelper( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
+	m_rms[1] = new RmsHelper( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
 	calcAttack();
 	calcRelease();
 }
@@ -82,12 +82,12 @@ DynProcEffect::~DynProcEffect()
 
 inline void DynProcEffect::calcAttack()
 {
-	m_attCoeff = std::exp((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
+	m_attCoeff = std::exp((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::audioEngine()->outputSampleRate());
 }
 
 inline void DynProcEffect::calcRelease()
 {
-	m_relCoeff = std::exp((DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
+	m_relCoeff = std::exp((DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::audioEngine()->outputSampleRate());
 }
 
 
@@ -122,8 +122,8 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_needsUpdate )
 	{
-		m_rms[0]->setSize( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
-		m_rms[1]->setSize( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
+		m_rms[0]->setSize( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
+		m_rms[1]->setSize( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;

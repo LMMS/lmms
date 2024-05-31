@@ -155,7 +155,7 @@ void LfoController::updatePhase()
 
 void LfoController::updateDuration()
 {
-	float newDurationF = Engine::audioEngine()->processingSampleRate() * m_speedModel.value();
+	float newDurationF = Engine::audioEngine()->outputSampleRate() * m_speedModel.value();
 
 	switch(m_multiplierModel.value() )
 	{

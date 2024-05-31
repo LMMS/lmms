@@ -150,7 +150,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
-    : Instrument(instrumentTrack, descriptor),
+    : Instrument(instrumentTrack, descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable),
       kIsPatchbay(isPatchbay),
       fHandle(nullptr),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
@@ -259,7 +259,7 @@ uint32_t CarlaInstrument::handleGetBufferSize() const
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::audioEngine()->processingSampleRate();
+    return Engine::audioEngine()->outputSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -342,11 +342,6 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 }
 
 // -------------------------------------------------------------------
-
-Instrument::Flags CarlaInstrument::flags() const
-{
-    return Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable;
-}
 
 QString CarlaInstrument::nodeName() const
 {
@@ -632,7 +627,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
     m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-    m_toggleUIButton->setFont(pointSize(m_toggleUIButton->font(), 8));
+    m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
     m_toggleUIButton->setToolTip(
@@ -642,7 +637,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
     m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
     m_toggleParamsWindowButton->setCheckable(true);
-    m_toggleParamsWindowButton->setFont(pointSize(m_toggleParamsWindowButton->font(), 8));
+    m_toggleParamsWindowButton->setFont(adjustedToPixelSize(m_toggleParamsWindowButton->font(), 8));
 #if CARLA_VERSION_HEX < CARLA_MIN_PARAM_VERSION
     m_toggleParamsWindowButton->setEnabled(false);
     m_toggleParamsWindowButton->setToolTip(tr("Available from Carla version 2.1 and up."));
