@@ -53,6 +53,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_dragging(false)
 {
 	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
+	setFocusPolicy(Qt::StrongFocus);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
@@ -162,7 +163,7 @@ void EffectView::editControls()
 
 void EffectView::moveUp()
 {
-	emit moveUp( this );
+	emit movedUp(this);
 }
 
 
@@ -170,14 +171,14 @@ void EffectView::moveUp()
 
 void EffectView::moveDown()
 {
-	emit moveDown( this );
+	emit movedDown(this);
 }
 
 
 
 void EffectView::deletePlugin()
 {
-	emit deletePlugin( this );
+	emit deletedPlugin(this);
 }
 
 

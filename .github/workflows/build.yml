@@ -49,7 +49,7 @@ jobs:
         run: |
           cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: build/lmms-*.AppImage
@@ -63,8 +63,19 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   macos:
-    name: macos
-    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x86_64, arm64 ]
+        include:
+          - arch: x86_64
+            os: macos-12
+            xcode: "13.1"
+          - arch: arm64
+            os: macos-14
+            xcode: "14.3.1"
+    name: macos-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -73,7 +84,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j3
-      DEVELOPER_DIR: /Applications/Xcode_13.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -111,6 +122,7 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+                -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
@@ -123,9 +135,9 @@ jobs:
         run: |
           cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: macos
+          name: macos-${{ matrix.arch }}
           path: build/lmms-*.dmg
       - name: Trim ccache and print statistics
         run: |
@@ -148,7 +160,7 @@ jobs:
         arch: ['32', '64']
     name: mingw${{ matrix.arch }}
     runs-on: ubuntu-latest
-    container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
+    container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -158,12 +170,8 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Update and configure Git
-        run: |
-          add-apt-repository ppa:git-core/ppa
-          apt-get update
-          apt-get --yes install git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
@@ -188,7 +196,7 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mingw${{ matrix.arch }}
           path: build/lmms-*.exe
@@ -196,7 +204,7 @@ jobs:
         run: |
           ccache --cleanup
           echo "[ccache config]"
-          ccache --print-config
+          ccache --show-config
           echo "[ccache stats]"
           ccache --show-stats
         env:
@@ -280,7 +288,7 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: msvc-${{ matrix.arch }}
           path: build\lmms-*.exe
