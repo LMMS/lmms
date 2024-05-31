@@ -98,6 +98,9 @@ execute_process(COMMAND "${QTBIN}/macdeployqt" "${APP}" ${EXECUTABLES}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
+# Cleanup symlink
+file(REMOVE "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/lib")
+
 # Remove dummy carla libs, relink to a sane location (e.g. /Applications/Carla.app/...)
 # (must be done after calling macdeployqt)
 file(GLOB CARLALIBS "${APP}/Contents/lib/${lmms}/libcarla*")
