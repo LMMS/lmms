@@ -52,8 +52,6 @@ namespace lmms::gui
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)
     {
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-
         auto retainSizeWhenHidden = [](QWidget* widget)
         {
             auto sizePolicy = widget->sizePolicy();
@@ -137,11 +135,10 @@ namespace lmms::gui
         mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
-        mainLayout->addStretch();
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
         mainLayout->addLayout(soloMuteLayout, 0);
         mainLayout->addWidget(m_peakIndicator);
-        mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
     }
