@@ -310,15 +310,31 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if (m_clip->isRecord())
 	{
-		p.setFont(adjustedToPixelSize(p.font(), 7));
+		p.setFont(adjustedToPixelSize(p.font(), 10));
 
-		p.setPen( textShadowColor() );
-		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( textColor() );
-		p.drawText( 9, p.fontMetrics().height(), "Rec" );
+		const auto fontHeight = p.fontMetrics().height();
 
-		p.setBrush( QBrush( textColor() ) );
-		p.drawEllipse( 4, 5, 4, 4 );
+		const auto baseLine = height() - 3;
+
+		const int recordSymbolRadius = 3;
+		const int recordSymbolCenterX = recordSymbolRadius + 4;
+		const int recordSymbolCenterY = baseLine - fontHeight / 2 + 1;
+
+		const int textStartX = recordSymbolCenterX + recordSymbolRadius + 4;
+
+		auto textPos = QPoint(textStartX, baseLine);
+
+		const auto rec = tr("Rec");
+
+		p.setPen(textShadowColor());
+		p.drawText(textPos + QPoint(1, 1), rec);
+
+		p.setPen(textColor());
+		p.drawText(textPos, rec);
+
+		p.setBrush(QBrush(textColor()));
+
+		p.drawEllipse(QPoint(recordSymbolCenterX, recordSymbolCenterY), recordSymbolRadius, recordSymbolRadius);
 	}
 
 	p.end();
