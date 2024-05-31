@@ -30,6 +30,7 @@ file(GLOB cleanup "${CPACK_BINARY_DIR}/lmms-*.json"
 	"${CPACK_BINARY_DIR}/${LMMS}-*.AppImage"
 	"${CPACK_BINARY_DIR}/${CPACK_PROJECT_NAME_UCASE}-*.AppImage"
 	"${CPACK_BINARY_DIR}/install_manifest.txt")
+list(SORT cleanup)
 file(REMOVE ${cleanup})
 
 # Download linuxdeploy
@@ -51,6 +52,7 @@ file(MAKE_DIRECTORY "${APP}/usr")
 
 # Setup AppDir structure (/usr/bin, /usr/lib, /usr/share... etc)
 file(GLOB files "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/*")
+list(SORT files)
 foreach(_file ${files})
 	get_filename_component(_filename "${_file}" NAME)
 	if(NOT _filename MATCHES ".AppDir")
@@ -163,6 +165,7 @@ file(GLOB UNWANTED_LIBS
 	"${APP}/usr/lib/optional/libcarla*"
 	"${APP}/usr/lib/libjack*")
 
+list(SORT UNWANTED_LIBS)
 foreach(_LIB UNWANTED_LIBS)
 	file(REMOVE "${_LIB}")
 endforeach()

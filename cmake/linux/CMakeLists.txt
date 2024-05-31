@@ -10,6 +10,7 @@ endif()
 
 # Copy rawwaves into bundle
 file(GLOB RAWWAVES "${STK_RAWWAVE_ROOT}/*.raw")
+list(SORT RAWWAVES)
 install(FILES ${RAWWAVES} DESTINATION share/stk)
 
 install(FILES launch_lmms.sh DESTINATION bin)
