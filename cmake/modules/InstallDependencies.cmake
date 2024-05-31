@@ -1,7 +1,8 @@
 include(GetPrerequisites)
 include(CMakeParseArguments)
 
-# Project's cmake_minimum_required doesn't always propagate
+# Project's cmake_minimum_required doesn't propagate to install scripts
+cmake_policy(PUSH)
 cmake_policy(SET CMP0057 NEW) # Support new if() IN_LIST operator.
 
 function(make_absolute var)
@@ -182,3 +183,5 @@ function(FIND_PREREQUISITES target RESULT_VAR exclude_system recurse
 
 	set(${RESULT_VAR} ${RESULTS} PARENT_SCOPE)
 endfunction()
+
+cmake_policy(POP)

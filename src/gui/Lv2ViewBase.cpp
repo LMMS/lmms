@@ -31,7 +31,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <lilv/lilv.h>
-#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
+#include <lv2/port-props/port-props.h>
 
 #include "AudioEngine.h"
 #include "Controls.h"
@@ -74,7 +74,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+						sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 						auto pMin = port.min(sr);
 						auto pMax = port.max(sr);
 						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
@@ -137,7 +137,8 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 
 
-Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
+Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
+	m_helpWindowEventFilter(this)
 {
 	auto grid = new QGridLayout(meAsWidget);
 
@@ -156,8 +157,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(
-			pointSize<8>(m_toggleUIButton->font()));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 	btnBox->addStretch(1);
@@ -172,7 +172,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	LILV_FOREACH(nodes, itr, props.get())
 	{
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		auto infoLabel = new QLabel(lilv_node_as_string(node));
+		auto infoLabel = new QLabel(QString(lilv_node_as_string(node)).trimmed() + "\n");
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -181,8 +181,9 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		btnBox->addWidget(m_helpButton);
 
 		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
-		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
+		m_helpWindow->setSizePolicy(QSizePolicy::Expanding,
 									QSizePolicy::Expanding);
+		m_helpWindow->installEventFilter(&m_helpWindowEventFilter);
 		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 		m_helpWindow->hide();
 
@@ -203,6 +204,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 
 Lv2ViewBase::~Lv2ViewBase() {
+	closeHelpWindow();
 	// TODO: hide UI if required
 }
 
@@ -228,6 +230,14 @@ void Lv2ViewBase::toggleHelp(bool visible)
 
 
 
+void Lv2ViewBase::closeHelpWindow()
+{
+	if (m_helpWindow) { m_helpWindow->close(); }
+}
+
+
+
+
 void Lv2ViewBase::modelChanged(Lv2ControlBase *ctrlBase)
 {
 	// reconnect models
@@ -245,6 +255,32 @@ void Lv2ViewBase::modelChanged(Lv2ControlBase *ctrlBase)
 AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
 {
 	return Engine::getLv2Manager()->uri(uriStr);
+}
+
+
+
+
+void Lv2ViewBase::onHelpWindowClosed()
+{
+	m_helpButton->setChecked(true);
+}
+
+
+
+
+HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
+	m_viewBase(viewBase) {}
+
+
+
+
+bool HelpWindowEventFilter::eventFilter(QObject* , QEvent* event)
+{
+	if (event->type() == QEvent::Close) {
+		m_viewBase->m_helpButton->setChecked(false);
+		return true;
+	}
+	return false;
 }
 
 

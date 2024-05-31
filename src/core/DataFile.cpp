@@ -35,6 +35,8 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QSaveFile>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -42,6 +44,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
+#include "Note.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
@@ -79,7 +82,9 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
-	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing
+	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
+	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
+	&DataFile::upgrade_fixCMTDelays
 };
 
 // Vector of all versions that have upgrade routines.
@@ -231,8 +236,11 @@ bool DataFile::validate( QString extension )
 		{
 			return true;
 		}
-		if( extension == "wav" || extension == "ogg" ||
-				extension == "ds" )
+		if( extension == "wav" || extension == "ogg" || extension == "ds"
+#ifdef LMMS_HAVE_SNDFILE_MP3
+				|| extension == "mp3"
+#endif
+				)
 		{
 			return true;
 		}
@@ -376,12 +384,12 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 	}
 
-	QFile outfile (fullNameTemp);
+	QSaveFile outfile(fullNameTemp);
 
 	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to"
+			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to "
 				"write to this file. Please make sure you have write-access to "
 				"the file and try again.").arg(fullName));
 
@@ -402,30 +410,29 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		write( ts );
 	}
 
-	outfile.close();
-
-	// make sure the file has been written correctly
-	if( QFileInfo( outfile.fileName() ).size() > 0 )
+	if (!outfile.commit())
 	{
-		if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
-		{
-			// remove current file
-			QFile::remove( fullName );
-		}
-		else
-		{
-			// remove old backup file
-			QFile::remove( fullNameBak );
-			// move current file to backup file
-			QFile::rename( fullName, fullNameBak );
-		}
-		// move temporary file to current file
-		QFile::rename( fullNameTemp, fullName );
-
-		return true;
+		showError(SongEditor::tr("Could not write file"),
+			SongEditor::tr("An unknown error has occured and the file could not be saved."));
+		return false;
 	}
 
-	return false;
+	if (ConfigManager::inst()->value("app", "disablebackup").toInt())
+	{
+		// remove current file
+		QFile::remove(fullName);
+	}
+	else
+	{
+		// remove old backup file
+		QFile::remove(fullNameBak);
+		// move current file to backup file
+		QFile::rename(fullName, fullNameBak);
+	}
+	// move temporary file to current file
+	QFile::rename(fullNameTemp, fullName);
+
+	return true;
 }
 
 
@@ -978,8 +985,7 @@ void DataFile::upgrade_0_4_0_20080622()
 	{
 		QDomElement el = list.item( i ).toElement();
 		QString s = el.attribute( "name" );
-		s.replace( QRegExp( "^Beat/Baseline " ),
-						"Beat/Bassline " );
+		s.replace(QRegularExpression("^Beat/Baseline "), "Beat/Bassline");
 		el.setAttribute( "name", s );
 	}
 }
@@ -1114,7 +1120,7 @@ void DataFile::upgrade_1_1_91()
 	{
 		QDomElement el = list.item( i ).toElement();
 		QString s = el.attribute( "src" );
-		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
+		s.replace(QRegularExpression("/samples/bassloopes/"), "/samples/bassloops/");
 		el.setAttribute( "src", s );
 	}
 
@@ -1199,12 +1205,11 @@ void DataFile::upgrade_1_2_0_rc3()
 								"pattern" );
 		for( int j = 0; !patterns.item( j ).isNull(); ++j )
 		{
-			int patternLength, steps;
 			QDomElement el = patterns.item( j ).toElement();
 			if( el.attribute( "len" ) != "" )
 			{
-				patternLength = el.attribute( "len" ).toInt();
-				steps = patternLength / 12;
+				int patternLength = el.attribute( "len" ).toInt();
+				int steps = patternLength / 12;
 				el.setAttribute( "steps", steps );
 			}
 		}
@@ -1461,7 +1466,7 @@ void DataFile::upgrade_1_3_0()
 							if(num == 4)
 							{
 								// don't modify port 4, but some other ones:
-								int zoom_port;
+								int zoom_port = 0;
 								if (plugin == "Equalizer5Band")
 									zoom_port = 36;
 								else if (plugin == "Equalizer8Band")
@@ -1672,6 +1677,62 @@ void DataFile::upgrade_automationNodes()
 	}
 }
 
+// Convert the negative length notes to StepNotes
+void DataFile::upgrade_noteTypes()
+{
+	const auto notes = elementsByTagName("note");
+
+	for (int i = 0; i < notes.size(); ++i)
+	{
+		auto note = notes.item(i).toElement();
+
+		const auto noteSize = note.attribute("len").toInt();
+		if (noteSize < 0)
+		{
+			note.setAttribute("len", DefaultTicksPerBar / 16);
+			note.setAttribute("type", static_cast<int>(Note::Type::Step));
+		}
+	}
+}
+
+void DataFile::upgrade_fixCMTDelays()
+{
+	static const QMap<QString, QString> nameMap {
+		{ "delay_0,01s", "delay_0.01s" },
+		{ "delay_0,1s", "delay_0.1s" },
+		{ "fbdelay_0,01s", "fbdelay_0.01s" },
+		{ "fbdelay_0,1s", "fbdelay_0.1s" }
+	};
+
+	const auto effects = elementsByTagName("effect");
+
+	for (int i = 0; i < effects.size(); ++i)
+	{
+		auto effect = effects.item(i).toElement();
+
+		// We are only interested in LADSPA plugins
+		if (effect.attribute("name") != "ladspaeffect") { continue; }
+
+		// Fetch all attributes (LMMS) beneath the LADSPA effect so that we can check the value of the plugin attribute (XML)
+		auto attributes = effect.elementsByTagName("attribute");
+		for (int j = 0; j < attributes.size(); ++j)
+		{
+			auto attribute = attributes.item(j).toElement();
+
+			if (attribute.attribute("name") == "plugin")
+			{
+				const auto attributeValue = attribute.attribute("value");
+
+				const auto it = nameMap.constFind(attributeValue);
+				if (it != nameMap.constEnd())
+				{
+					attribute.setAttribute("value", *it);
+				}
+			}
+		}
+	}
+}
+
 
 /** \brief Note range has been extended to match MIDI specification
  *
@@ -1814,7 +1875,72 @@ void DataFile::upgrade_sampleAndHold()
 		// Correct old random wave LFO speeds
 		if (e.attribute("wave").toInt() == 6)
 		{
-			e.setAttribute("speed",0.01f);
+			e.setAttribute("speed", 0.01f);
+		}
+	}
+}
+
+
+// Change loops' filenames in <sampleclip>s
+void DataFile::upgrade_loopsRename()
+{
+	auto createEntry = [](const QString& originalName, const QString& bpm, const QString& extension = "ogg")
+	{
+		const QString replacement = originalName + " - " + bpm + " BPM." + extension;
+		return std::pair{originalName + "." + extension, replacement};
+	};
+
+	static const QMap<QString, QString> namesToNamesWithBPMsMap {
+		{ createEntry("bassloops/briff01", "140") },
+		{ createEntry("bassloops/rave_bass01", "180") },
+		{ createEntry("bassloops/rave_bass02", "180") },
+		{ createEntry("bassloops/tb303_01", "123") },
+		{ createEntry("bassloops/techno_bass01", "140") },
+		{ createEntry("bassloops/techno_bass02", "140") },
+		{ createEntry("bassloops/techno_synth01", "140") },
+		{ createEntry("bassloops/techno_synth02", "140") },
+		{ createEntry("bassloops/techno_synth03", "130") },
+		{ createEntry("bassloops/techno_synth04", "140") },
+		{ createEntry("beats/909beat01", "122") },
+		{ createEntry("beats/break01", "168") },
+		{ createEntry("beats/break02", "141") },
+		{ createEntry("beats/break03", "168") },
+		{ createEntry("beats/electro_beat01", "120") },
+		{ createEntry("beats/electro_beat02", "119") },
+		{ createEntry("beats/house_loop01", "142") },
+		{ createEntry("beats/jungle01", "168") },
+		{ createEntry("beats/rave_hihat01", "180") },
+		{ createEntry("beats/rave_hihat02", "180") },
+		{ createEntry("beats/rave_kick01", "180") },
+		{ createEntry("beats/rave_kick02", "180") },
+		{ createEntry("beats/rave_snare01", "180") },
+		{ createEntry("latin/latin_brass01", "140") },
+		{ createEntry("latin/latin_guitar01", "126") },
+		{ createEntry("latin/latin_guitar02", "140") },
+		{ createEntry("latin/latin_guitar03", "120") }
+	};
+
+	// Replace loop sample names
+	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	{
+		auto elements = elementsByTagName(elem);
+
+		for (const auto& srcAttr : srcAttrs)
+		{
+			for (int i = 0; i < elements.length(); ++i)
+			{
+				auto item = elements.item(i).toElement();
+
+				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
+
+				const QString srcVal = item.attribute(srcAttr);
+
+				const auto it = namesToNamesWithBPMsMap.constFind(srcVal);
+				if (it != namesToNamesWithBPMsMap.constEnd())
+				{
+					item.setAttribute(srcAttr, *it);
+				}
+			}
 		}
 	}
 }
@@ -1990,6 +2116,5 @@ unsigned int DataFile::legacyFileVersion()
 	// Convert the iterator to an index, which is our file version (starting at 0)
 	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }
-
 
 } // namespace lmms

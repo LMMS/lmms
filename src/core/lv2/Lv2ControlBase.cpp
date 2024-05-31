@@ -59,7 +59,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 	else
 	{
 		qCritical() << "No Lv2 plugin found for URI" << uri;
-		m_valid = false;
+		throw std::runtime_error("No Lv2 plugin found for given URI");
 	}
 }
 
@@ -77,26 +77,14 @@ void Lv2ControlBase::init(Model* meAsModel)
 	while (channelsLeft > 0)
 	{
 		std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, meAsModel);
-		if (newOne->isValid())
-		{
-			channelsLeft -= std::max(
-				1 + static_cast<bool>(newOne->inPorts().m_right),
-				1 + static_cast<bool>(newOne->outPorts().m_right));
-			Q_ASSERT(channelsLeft >= 0);
-			m_procs.push_back(std::move(newOne));
-		}
-		else
-		{
-			qCritical() << "Failed instantiating LV2 processor";
-			m_valid = false;
-			channelsLeft = 0;
-		}
+		channelsLeft -= std::max(
+			1 + static_cast<bool>(newOne->inPorts().m_right),
+			1 + static_cast<bool>(newOne->outPorts().m_right));
+		Q_ASSERT(channelsLeft >= 0);
+		m_procs.push_back(std::move(newOne));
 	}
-	if (m_valid)
-	{
-		m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-		linkAllModels();
-	}
+	m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
+	linkAllModels();
 }
 
 

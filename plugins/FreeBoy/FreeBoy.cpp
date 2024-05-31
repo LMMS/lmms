@@ -220,22 +220,10 @@ QString FreeBoyInstrument::nodeName() const
 
 
 
-/*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
+float FreeBoyInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
-	int maxrel = 0;
-	for( int i = 0 ; i < 3 ; ++i )
-	{
-		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = m_voice[i]->m_releaseModel.value();
-	}
-
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
-}*/
-
-f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
-{
-	return f_cnt_t( 1000 );
+	// Previous implementation was 1000 samples. At 44.1 kHz this is somewhat shy of 23. ms.
+	return 23.f;
 }
 
 
@@ -243,7 +231,7 @@ f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 

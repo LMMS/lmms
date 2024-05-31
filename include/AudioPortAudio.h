@@ -109,7 +109,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 
 #ifdef PORTAUDIO_V19
 	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,

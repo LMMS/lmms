@@ -47,6 +47,8 @@ public:
 		return &m_dfControls;
 	}
 
+protected:
+	void onEnabledChanged() override;
 
 private:
 	DualFilterControls m_dfControls;

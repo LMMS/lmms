@@ -25,14 +25,13 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#include <QMutex>
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
+#ifdef __MINGW32__
+#include <mingw.mutex.h>
+#else
+#include <mutex>
 #endif
 
 #include <QThread>
-#include <QWaitCondition>
 #include <samplerate.h>
 
 #include <vector>
@@ -109,13 +108,6 @@ public:
 
 	struct qualitySettings
 	{
-		enum class Mode
-		{
-			Draft,
-			HighQuality,
-			FinalMix
-		} ;
-
 		enum class Interpolation
 		{
 			Linear,
@@ -124,53 +116,11 @@ public:
 			SincBest
 		} ;
 
-		enum class Oversampling
-		{
-			None,
-			X2,
-			X4,
-			X8
-		} ;
-
 		Interpolation interpolation;
-		Oversampling oversampling;
 
-		qualitySettings(Mode m)
+		qualitySettings(Interpolation i) :
+			interpolation(i)
 		{
-			switch (m)
-			{
-				case Mode::Draft:
-					interpolation = Interpolation::Linear;
-					oversampling = Oversampling::None;
-					break;
-				case Mode::HighQuality:
-					interpolation =
-						Interpolation::SincFastest;
-					oversampling = Oversampling::X2;
-					break;
-				case Mode::FinalMix:
-					interpolation = Interpolation::SincBest;
-					oversampling = Oversampling::X8;
-					break;
-			}
-		}
-
-		qualitySettings(Interpolation i, Oversampling o) :
-			interpolation(i),
-			oversampling(o)
-		{
-		}
-
-		int sampleRateMultiplier() const
-		{
-			switch( oversampling )
-			{
-				case Oversampling::None: return 1;
-				case Oversampling::X2: return 2;
-				case Oversampling::X4: return 4;
-				case Oversampling::X8: return 8;
-			}
-			return 1;
 		}
 
 		int libsrcInterpolation() const
@@ -290,8 +240,6 @@ public:
 	sample_rate_t baseSampleRate() const;
 	sample_rate_t outputSampleRate() const;
 	sample_rate_t inputSampleRate() const;
-	sample_rate_t processingSampleRate() const;
-
 
 	inline float masterGain() const
 	{
@@ -420,10 +368,6 @@ private:
 
 	void clearInternal();
 
-	//! Called by the audio thread to give control to other threads,
-	//! such that they can do changes in the model (like e.g. removing effects)
-	void runChangesInModel();
-
 	bool m_renderOnly;
 
 	std::vector<AudioPort *> m_audioPorts;
@@ -453,8 +397,6 @@ private:
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
-	bool m_isProcessing;
-
 	// audio device stuff
 	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
@@ -476,19 +418,7 @@ private:
 
 	bool m_clearSignal;
 
-	bool m_changesSignal;
-	unsigned int m_changes;
-	QMutex m_changesMutex;
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	QRecursiveMutex m_doChangesMutex;
-#else
-	QMutex m_doChangesMutex;
-#endif
-	QMutex m_waitChangesMutex;
-	QWaitCondition m_changesAudioEngineCondition;
-	QWaitCondition m_changesRequestCondition;
-
-	bool m_waitingForWrite;
+	std::mutex m_changeMutex;
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;

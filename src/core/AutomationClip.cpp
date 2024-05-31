@@ -830,10 +830,10 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
-	
-	if( usesCustomClipColor() )
+
+	if (const auto& c = color())
 	{
-		_this.setAttribute( "color", color().name() );
+		_this.setAttribute("color", c->name());
 	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
@@ -919,10 +919,9 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 	}
 	
-	if( _this.hasAttribute( "color" ) )
+	if (_this.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( _this.attribute( "color" ) );
+		setColor(QColor{_this.attribute("color")});
 	}
 
 	int len = _this.attribute( "len" ).toInt();
@@ -1223,11 +1222,9 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			// TODO: This behavior means that a very small difference between the inValue and outValue can
 			// result in a big change in the curve. In the future, allowing the user to manually adjust
 			// the tangents would be better.
-			float inTangent;
-			float outTangent;
 			if (OFFSET(it) == 0)
 			{
-				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
+				float inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
 				it.value().setInTangent(inTangent);
 				// inTangent == outTangent in this case
 				it.value().setOutTangent(inTangent);
@@ -1235,9 +1232,9 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			else
 			{
 				// Calculate the left side of the curve
-				inTangent = (INVAL(it) - OUTVAL(it - 1)) / (POS(it) - POS(it - 1));
+				float inTangent = (INVAL(it) - OUTVAL(it - 1)) / (POS(it) - POS(it - 1));
 				// Calculate the right side of the curve
-				outTangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
+				float outTangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
 				it.value().setInTangent(inTangent);
 				it.value().setOutTangent(outTangent);
 			}

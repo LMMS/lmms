@@ -66,6 +66,7 @@ namespace Lv2Ports
 //! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc.
 class Lv2Proc : public LinkedModelGroup
 {
+	friend class Lv2ProcSuspender;
 public:
 	static Plugin::Type check(const LilvPlugin* plugin,
 		std::vector<PluginIssue> &issues);
@@ -77,8 +78,6 @@ public:
 	~Lv2Proc() override;
 	void reload();
 	void onSampleRateChanged();
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_valid; }
 
 	/*
 		port access
@@ -172,10 +171,8 @@ protected:
 	void shutdownPlugin();
 
 private:
-	bool m_valid = true;
-
 	const LilvPlugin* m_plugin;
-	LilvInstance* m_instance;
+	LilvInstance* m_instance = nullptr;
 	Lv2Features m_features;
 
 	// options

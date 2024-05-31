@@ -45,23 +45,12 @@ namespace lmms::gui
 
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	EffectControlDialog(controls),
-	m_controls(controls),
-	m_inVolAreaColor(209, 216, 228, 17),
-	m_inVolColor(209, 216, 228, 100),
-	m_outVolAreaColor(209, 216, 228, 30),
-	m_outVolColor(209, 216, 228, 240),
-	m_gainReductionColor(180, 100, 100, 210),
-	m_kneeColor(39, 171, 95, 255),
-	m_kneeColor2(9, 171, 160, 255),
-	m_threshColor(39, 171, 95, 100),
-	m_textColor(209, 216, 228, 50),
-	m_graphColor(209, 216, 228, 50),
-	m_resetColor(200, 100, 15, 200)
+	m_controls(controls)
 {
-	setAutoFillBackground(true);
-	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
-	setPalette(pal);
+	setAutoFillBackground(false);
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setAttribute(Qt::WA_NoSystemBackground, true);
+	
 	setMinimumSize(MIN_COMP_SCREEN_X, MIN_COMP_SCREEN_Y);
 	resize(COMP_SCREEN_X, COMP_SCREEN_Y);
 
@@ -358,6 +347,7 @@ void CompressorControlDialog::lookaheadChanged()
 {
 	m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
 	m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+	feedbackButton->setVisible(!m_controls->m_lookaheadModel.value());
 }
 
 
@@ -611,7 +601,7 @@ void CompressorControlDialog::paintEvent(QPaintEvent *event)
 	m_p.begin(this);
 
 	m_p.setCompositionMode(QPainter::CompositionMode_Source);
-	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, m_backgroundColor);
 	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 	m_p.drawPixmap(0, 0, m_graphPixmap);
@@ -679,7 +669,7 @@ void CompressorControlDialog::drawGraph()
 
 	// Redraw graph
 	m_p.setPen(QPen(m_graphColor, 1));
-	for (int i = 1; i < m_dbRange / COMP_GRID_SPACING + 1; ++i)
+	for (int i = 0; i < m_dbRange / COMP_GRID_SPACING + 1; ++i)
 	{
 		m_p.drawLine(0, dbfsToYPoint(-COMP_GRID_SPACING * i), m_windowSizeX, dbfsToYPoint(-COMP_GRID_SPACING * i));
 		m_p.drawLine(dbfsToXPoint(-COMP_GRID_SPACING * i), 0, dbfsToXPoint(-COMP_GRID_SPACING * i), m_kneeWindowSizeY);
@@ -687,6 +677,79 @@ void CompressorControlDialog::drawGraph()
 	}
 
 	m_p.end();
+}
+
+
+void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	setGuiVisibility(!m_guiVisibility);
+}
+
+
+void CompressorControlDialog::setGuiVisibility(bool isVisible)
+{
+	if (!isVisible)
+	{
+		m_rmsKnob->setVisible(isVisible);
+		m_rmsEnabledLabel->setVisible(isVisible);
+
+		m_lookaheadLengthKnob->setVisible(isVisible);
+		m_lookaheadEnabledLabel->setVisible(isVisible);
+
+		m_blendKnob->setVisible(isVisible);
+		m_blendEnabledLabel->setVisible(isVisible);
+
+		m_ratioKnob->setVisible(isVisible);
+		m_ratioEnabledLabel->setVisible(isVisible);
+	}
+	else
+	{
+		m_rmsKnob->setVisible(!m_controls->m_peakmodeModel.value());
+		m_rmsEnabledLabel->setVisible(!m_controls->m_peakmodeModel.value());
+
+		m_blendKnob->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+		m_blendEnabledLabel->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+
+		m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
+		m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+
+		m_ratioKnob->setVisible(!m_controls->m_limiterModel.value());
+		m_ratioEnabledLabel->setVisible(!m_controls->m_limiterModel.value());
+	}
+	m_controlsBoxLabel->setVisible(isVisible);
+	m_thresholdKnob->setVisible(isVisible);
+	m_attackKnob->setVisible(isVisible);
+	m_releaseKnob->setVisible(isVisible);
+	m_kneeKnob->setVisible(isVisible);
+	m_rangeKnob->setVisible(isVisible);
+	m_holdKnob->setVisible(isVisible);
+	m_inBalanceKnob->setVisible(isVisible);
+	m_outBalanceKnob->setVisible(isVisible);
+	m_stereoBalanceKnob->setVisible(isVisible);
+	m_tiltKnob->setVisible(isVisible);
+	m_tiltFreqKnob->setVisible(isVisible);
+	m_mixKnob->setVisible(isVisible);
+	m_autoAttackKnob->setVisible(isVisible);
+	m_autoReleaseKnob->setVisible(isVisible);
+	m_outFader->setVisible(isVisible);
+	m_inFader->setVisible(isVisible);
+	rmsButton->setVisible(isVisible);
+	peakButton->setVisible(isVisible);
+	rmsPeakGroup->setVisible(isVisible);
+	leftRightButton->setVisible(isVisible);
+	midSideButton->setVisible(isVisible);
+	compressButton->setVisible(isVisible);
+	limitButton->setVisible(isVisible);
+	unlinkedButton->setVisible(isVisible);
+	maximumButton->setVisible(isVisible);
+	averageButton->setVisible(isVisible);
+	minimumButton->setVisible(isVisible);
+	blendButton->setVisible(isVisible);
+	autoMakeupButton->setVisible(isVisible);
+	auditionButton->setVisible(isVisible);
+	feedbackButton->setVisible(isVisible);
+	lookaheadButton->setVisible(isVisible);
+	m_guiVisibility = isVisible;
 }
 
 
