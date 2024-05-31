@@ -29,12 +29,6 @@ get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 get_filename_component(QTDIR "${QTBIN}" DIRECTORY)
 create_symlink("${QTDIR}/lib" "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/lib")
 
-execute_process(COMMAND convert
-	"${CPACK_CURRENT_SOURCE_DIR}/*.png"
-	"${CPACK_CURRENT_BINARY_DIR}/background.tiff"
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
-
 # Copy missing files
 file(COPY "${CPACK_CURRENT_SOURCE_DIR}/project.icns" DESTINATION "${APP}/Contents/Resources")
 

@@ -45,6 +45,17 @@ set(CPACK_CARLA_LIBRARIES "${CARLA_LIBRARIES}" PARENT_SCOPE)
 set(CPACK_PROJECT_NAME "${PROJECT_NAME}" PARENT_SCOPE)
 set(CPACK_PROJECT_NAME_UCASE "${PROJECT_NAME_UCASE}" PARENT_SCOPE)
 
+# Create retina-compatible tiff during install step
+INSTALL(CODE "
+	file(GLOB PNGS \"${CMAKE_CURRENT_SOURCE_DIR}/background*.png\")
+	list(SORT PNGS)
+	execute_process(COMMAND tiffutil
+		-cathidpicheck \${PNGS}
+		-out \"${CMAKE_CURRENT_BINARY_DIR}/background.tiff\"
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+")
+
 # appdmg is no longer required unless a new .DS_Store file is needed
 # Usage:
 #    make package
