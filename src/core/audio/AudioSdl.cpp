@@ -79,11 +79,19 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
   	SDL_AudioSpec actual; 
 
 #ifdef LMMS_HAVE_SDL2
-	m_outputDevice = SDL_OpenAudioDevice (nullptr,
-										  0,
-										  &m_audioHandle,
-										  &actual,
-										  0);
+	const QString playbackDevice = ConfigManager::inst()->value("audiosdl", "device");
+	const bool isDefaultPlayback = playbackDevice.isEmpty();
+
+	// Try with the configured device
+	const auto playbackDeviceCStr = isDefaultPlayback ? nullptr : playbackDevice.toLocal8Bit().data();
+	m_outputDevice = SDL_OpenAudioDevice(playbackDeviceCStr, 0, &m_audioHandle, &actual, 0);
+
+	// If we did not get a device ID try again with the default device if we did not try that before
+	if (m_outputDevice == 0 && !isDefaultPlayback)
+	{
+		m_outputDevice = SDL_OpenAudioDevice(nullptr, 0, &m_audioHandle, &actual, 0);
+	}
+
 	if (m_outputDevice == 0) {
 		qCritical( "Couldn't open SDL-audio: %s\n", SDL_GetError() );
 		return;
@@ -292,22 +300,42 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 
 #endif
 
-QString AudioSdl::setupWidget::s_defaultInputDevice = QObject::tr("[System Default]");
+QString AudioSdl::setupWidget::s_systemDefaultDevice = QObject::tr("[System Default]");
 
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
 {
 	QFormLayout * form = new QFormLayout(this);
 
-	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
-	m_device = new QLineEdit( dev, this );
+	m_playbackDeviceComboBox = new QComboBox(this);
 
-	form->addRow(tr("Device"), m_device);
+#ifdef LMMS_HAVE_SDL2
+	m_playbackDeviceComboBox->addItem(s_systemDefaultDevice);
+
+	const int numberOfPlaybackDevices = SDL_GetNumAudioDevices(0);
+	for (int i = 0; i < numberOfPlaybackDevices; ++i)
+	{
+		const QString deviceName = SDL_GetAudioDeviceName(i, 0);
+		m_playbackDeviceComboBox->addItem(deviceName);
+	}
+
+	QString playbackDevice = ConfigManager::inst()->value("audiosdl", "device");
+	if (playbackDevice.isEmpty())
+	{
+		m_playbackDeviceComboBox->setCurrentText(s_systemDefaultDevice);
+	}
+	else
+	{
+		m_playbackDeviceComboBox->setCurrentText(playbackDevice);
+	}
+#endif
+
+	form->addRow(tr("Device"), m_playbackDeviceComboBox);
 
 	m_inputDeviceComboBox = new QComboBox(this);
 
 #ifdef LMMS_HAVE_SDL2
-	m_inputDeviceComboBox->addItem(s_defaultInputDevice);
+	m_inputDeviceComboBox->addItem(s_systemDefaultDevice);
 
 	const int numberOfInputDevices = SDL_GetNumAudioDevices(1);
 	for (int i = 0; i < numberOfInputDevices; ++i)
@@ -320,7 +348,7 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	const auto inputDevice = ConfigManager::inst()->value("audiosdl", "inputdevice");
 	if (inputDevice.isEmpty())
 	{
-		m_inputDeviceComboBox->setCurrentText(s_defaultInputDevice);
+		m_inputDeviceComboBox->setCurrentText(s_systemDefaultDevice);
 	}
 	else
 	{
@@ -336,11 +364,19 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 void AudioSdl::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue( "audiosdl", "device",
-							m_device->text() );
+	const auto currentPlaybackDevice = m_playbackDeviceComboBox->currentText();
+	if (currentPlaybackDevice == s_systemDefaultDevice)
+	{
+		// Represent the default input device with an empty string
+		ConfigManager::inst()->setValue("audiosdl", "device", "");
+	}
+	else if (!currentPlaybackDevice.isEmpty())
+	{
+		ConfigManager::inst()->setValue("audiosdl", "device", currentPlaybackDevice);
+	}
 
 	const auto currentInputDevice = m_inputDeviceComboBox->currentText();
-	if (currentInputDevice == s_defaultInputDevice)
+	if (currentInputDevice == s_systemDefaultDevice)
 	{
 		// Represent the default input device with an empty string
 		ConfigManager::inst()->setValue("audiosdl", "inputdevice", "");
