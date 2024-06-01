@@ -331,7 +331,7 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	}
 #endif
 
-	form->addRow(tr("Device"), m_playbackDeviceComboBox);
+	form->addRow(tr("Playback device"), m_playbackDeviceComboBox);
 
 	m_inputDeviceComboBox = new QComboBox(this);
 
