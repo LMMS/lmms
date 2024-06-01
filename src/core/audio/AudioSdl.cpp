@@ -29,6 +29,7 @@
 
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QComboBox>
 #include <SDL.h>
 
 #include "AudioEngine.h"
@@ -108,11 +109,18 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
-	m_inputDevice = SDL_OpenAudioDevice (nullptr,
-										 1,
-										 &m_inputAudioHandle,
-										 &actual,
-										 0);
+	const QString inputDevice = ConfigManager::inst()->value("audiosdl", "inputdevice");
+
+	// Try with the configured device
+	const auto inputDeviceCStr = inputDevice.toLocal8Bit().data();
+	m_inputDevice = SDL_OpenAudioDevice (inputDeviceCStr, 1, &m_inputAudioHandle, &actual, 0);
+
+	// If we did not get a device ID try again with the default device
+	if (m_inputDevice == 0)
+	{
+		m_inputDevice = SDL_OpenAudioDevice(nullptr, 1, &m_inputAudioHandle, &actual, 0);
+	}
+
 	if (m_inputDevice != 0) {
 		m_supportsCapture = true;
 	} else {
@@ -292,6 +300,23 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( dev, this );
 
 	form->addRow(tr("Device"), m_device);
+
+	m_inputDeviceComboBox = new QComboBox(this);
+
+#ifdef LMMS_HAVE_SDL2
+	const int numberOfInputDevices = SDL_GetNumAudioDevices(1);
+	for (int i = 0; i < numberOfInputDevices; ++i)
+	{
+		const QString deviceName = SDL_GetAudioDeviceName(i, 1);
+		m_inputDeviceComboBox->addItem(deviceName);
+	}
+
+	// Set the current device to the one in the configuration
+	const auto inputDevice = ConfigManager::inst()->value("audiosdl", "inputdevice");
+	m_inputDeviceComboBox->setCurrentText(inputDevice);
+#endif
+
+	form->addRow(tr("Input device"), m_inputDeviceComboBox);
 }
 
 
@@ -301,6 +326,12 @@ void AudioSdl::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audiosdl", "device",
 							m_device->text() );
+
+	const auto currentInputDevice = m_inputDeviceComboBox->currentText();
+	if (!currentInputDevice.isEmpty())
+	{
+		ConfigManager::inst()->setValue("audiosdl", "inputdevice", currentInputDevice);
+	}
 }
 
 

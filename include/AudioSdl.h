@@ -40,6 +40,7 @@
 #include "AudioDeviceSetupWidget.h"
 
 class QLineEdit;
+class QComboBox;
 
 namespace lmms
 {
@@ -67,7 +68,7 @@ public:
 
 	private:
 		QLineEdit * m_device;
-
+		QComboBox* m_inputDeviceComboBox = nullptr;
 	} ;
 
 
