@@ -562,6 +562,8 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 
 void Song::updateLength()
 {
+	if (m_loadingProject) { return; }
+
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
@@ -945,13 +947,12 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	Track * t;
-	t = Track::create( Track::Type::Instrument, this );
-	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
-					"tripleoscillator" );
-	t = Track::create(Track::Type::Instrument, Engine::patternStore());
-	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
-						"kicker" );
+	auto tripleOscTrack = Track::create(Track::Type::Instrument, this);
+	dynamic_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
+
+	auto kickerTrack = Track::create(Track::Type::Instrument, Engine::patternStore());
+	dynamic_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
+
 	Track::create( Track::Type::Sample, this );
 	Track::create( Track::Type::Pattern, this );
 	Track::create( Track::Type::Automation, this );
@@ -964,7 +965,7 @@ void Song::createNewProject()
 	QCoreApplication::instance()->processEvents();
 
 	m_loadingProject = false;
-
+	updateLength();
 	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
@@ -1207,6 +1208,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
+	updateLength();
 	setModified(false);
 	m_loadOnLaunch = false;
 }

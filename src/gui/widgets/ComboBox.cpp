@@ -26,15 +26,19 @@
 
 #include "ComboBox.h"
 
-#include <QApplication>
-#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOptionFrame>
+#include <QScreen>
 
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "gui_templates.h"
+
+#define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#if !QT_SUPPORTS_WIDGET_SCREEN
+#include <QApplication>
+#include <QDesktopWidget>
+#endif
 
 namespace lmms::gui
 {
@@ -49,7 +53,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	setFont( pointSize<9>( font() ) );
+	setFont(adjustedToPixelSize(font(), 10));
 
 	connect( &m_menu, SIGNAL(triggered(QAction*)),
 				this, SLOT(setItem(QAction*)));
@@ -116,15 +120,23 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 				a->setData( i );
 			}
 
-			QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
-			if( gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height() )
+			QPoint gpos = mapToGlobal(QPoint(0, height()));
+
+			#if (QT_SUPPORTS_WIDGET_SCREEN)
+			bool const menuCanBeFullyShown = screen()->geometry().contains(QRect(gpos, m_menu.sizeHint()));
+			#else
+			bool const menuCanBeFullyShown = gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height();
+			#endif
+
+			if (menuCanBeFullyShown)
 			{
-				m_menu.exec( gpos );
+				m_menu.exec(gpos);
 			}
 			else
 			{
-				m_menu.exec( mapToGlobal( QPoint( width(), 0 ) ) );
+				m_menu.exec(mapToGlobal(QPoint(width(), 0)));
 			}
+
 			m_pressed = false;
 			update();
 		}
@@ -208,7 +220,8 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
+		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
+		model()->setInitValue(model()->value() + direction);
 		update();
 		event->accept();
 	}

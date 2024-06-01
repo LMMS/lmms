@@ -67,7 +67,6 @@ char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
@@ -201,11 +200,7 @@ public:
 	BoolModel* getMutedModel();
 
 public slots:
-	virtual void setName( const QString & newName )
-	{
-		m_name = newName;
-		emit nameChanged();
-	}
+	virtual void setName(const QString& newName);
 
 	void setMutedBeforeSolo(const bool muted)
 	{

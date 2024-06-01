@@ -298,17 +298,16 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 		SKIP_BYTES( 2 + 2 + 36 );
 
 		f_cnt_t frames;
-		sample_t * wave_samples;
+		std::unique_ptr<sample_t[]> wave_samples;
 		if( modes & MODES_16BIT )
 		{
 			frames = data_length >> 1;
-			wave_samples = new sample_t[frames];
+			wave_samples = std::make_unique<sample_t[]>(frames);
 			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
 				short sample;
 				if ( fread( &sample, 2, 1, fd ) != 1 )
 				{
-					delete[] wave_samples;
 					fclose( fd );
 					return( LoadError::IO );
 				}
@@ -326,13 +325,12 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 		else
 		{
 			frames = data_length;
-			wave_samples = new sample_t[frames];
+			wave_samples = std::make_unique<sample_t[]>(frames);
 			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
 				char sample;
 				if ( fread( &sample, 1, 1, fd ) != 1 )
 				{
-					delete[] wave_samples;
 					fclose( fd );
 					return( LoadError::IO );
 				}
@@ -366,7 +364,6 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 
 		m_patchSamples.push_back(psample);
 
-		delete[] wave_samples;
 		delete[] data;
 	}
 	fclose( fd );
@@ -548,7 +545,7 @@ void PatmanView::updateFilename()
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
 
-	QFontMetrics fm( pointSize<8>( font() ) );
+	QFontMetrics fm(adjustedToPixelSize(font(), 8));
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
@@ -618,7 +615,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.setFont( pointSize<8>( font() ) );
+	p.setFont(adjustedToPixelSize(font() ,8));
 	p.drawText( 8, 116, 235, 16,
 			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );

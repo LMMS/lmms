@@ -118,19 +118,19 @@ public:
 	};
 
 	SampleBuffer() = delete;
-	SampleBuffer(Access) {}
+	explicit SampleBuffer(Access) {}
 	SampleBuffer(Access, const QString& audioFile);
-	SampleBuffer(Access, const QString& base64, sample_rate_t sampleRate);
-	SampleBuffer(Access, std::vector<sampleFrame> data, sample_rate_t sampleRate);
-	SampleBuffer(Access, const sampleFrame* data, int numFrames, sample_rate_t sampleRate);
+	SampleBuffer(Access, const QString& base64, int sampleRate);
+	SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate);
+	SampleBuffer(Access, const sampleFrame* data, size_t numFrames, int sampleRate);
 
 	static auto create() -> std::shared_ptr<const SampleBuffer>;
 	static auto create(const QString& audioFile) -> std::shared_ptr<const SampleBuffer>;
-	static auto create(const QString& base64, sample_rate_t sampleRate) -> std::shared_ptr<const SampleBuffer>;
-	static auto create(std::vector<sampleFrame> data, sample_rate_t sampleRate)
+	static auto create(const QString& base64, int sampleRate) -> std::shared_ptr<const SampleBuffer>;
+	static auto create(std::vector<sampleFrame> data, int sampleRate)
 		-> std::shared_ptr<const SampleBuffer>;
-	static auto create(const sampleFrame* data, int numFrames,
-		sample_rate_t sampleRate = Engine::audioEngine()->processingSampleRate())
+	static auto create(const sampleFrame* data, size_t numFrames,
+		int sampleRate = Engine::audioEngine()->outputSampleRate())
 		-> std::shared_ptr<const SampleBuffer>;
 
 	~SampleBuffer() = default;
@@ -168,7 +168,7 @@ public:
 
 private:
 	std::vector<sampleFrame> m_data;
-	sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	Source m_source;
 };
 

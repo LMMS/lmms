@@ -7,7 +7,16 @@ IF(LMMS_BUILD_WIN64)
 ADD_DEFINITIONS(-DLMMS_BUILD_WIN64)
 ENDIF(LMMS_BUILD_WIN64)
 SET_TARGET_PROPERTIES(caps PROPERTIES PREFIX "")
-SET_TARGET_PROPERTIES(caps PROPERTIES COMPILE_FLAGS "-O2 -funroll-loops -Wno-write-strings")
+
+if(MSVC)
+	target_compile_options(caps PRIVATE /wd4244 /wd4305)
+else()
+	target_compile_options(caps PRIVATE -O2 -funroll-loops -Wno-write-strings)
+endif()
+
+if(MSVC)
+	target_link_options(caps PRIVATE "/EXPORT:ladspa_descriptor")
+endif()
 
 IF(LMMS_BUILD_WIN32)
 	add_custom_command(
@@ -18,6 +27,7 @@ IF(LMMS_BUILD_WIN32)
 		COMMAND_EXPAND_LISTS
 	)
 ENDIF(LMMS_BUILD_WIN32)
+
 IF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)
 	SET_TARGET_PROPERTIES(caps PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined")
 ENDIF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)

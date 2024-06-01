@@ -102,7 +102,7 @@ auto SampleLoader::fromFile(const QString& filePath, bool cache)
 	}
 }
 
-auto SampleLoader::fromBase64(const QString& base64, sample_rate_t sampleRate, bool cache)
+auto SampleLoader::fromBase64(const QString& base64, int sampleRate, bool cache)
 	-> std::shared_ptr<const SampleBuffer>
 {
 	try
@@ -137,7 +137,7 @@ auto SampleLoader::fromBase64(const QString& base64, sample_rate_t sampleRate, b
 auto SampleLoader::fromBase64(const QString& base64, bool cache)
 	-> std::shared_ptr<const SampleBuffer>
 {
-	return fromBase64(base64, Engine::audioEngine()->processingSampleRate(), cache);
+	return fromBase64(base64, Engine::audioEngine()->outputSampleRate(), cache);
 }
 
 auto SampleLoader::get(const SampleBuffer::Source& source) -> std::shared_ptr<const SampleBuffer>

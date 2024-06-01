@@ -77,7 +77,7 @@ SampleBuffer::SampleBuffer(Access, const QString& audioFile)
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
-SampleBuffer::SampleBuffer(Access, const QString& base64, sample_rate_t sampleRate)
+SampleBuffer::SampleBuffer(Access, const QString& base64, int sampleRate)
 	: m_sampleRate(sampleRate)
 	, m_source(base64, sampleRate)
 {
@@ -87,14 +87,14 @@ SampleBuffer::SampleBuffer(Access, const QString& base64, sample_rate_t sampleRa
 	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(sampleFrame));
 }
 
-SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, sample_rate_t sampleRate)
+SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate)
 	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
 	, m_source()
 {
 }
 
-SampleBuffer::SampleBuffer(Access, const sampleFrame* data, int numFrames, sample_rate_t sampleRate)
+SampleBuffer::SampleBuffer(Access, const sampleFrame* data, size_t numFrames, int sampleRate)
 	: m_data(data, data + numFrames)
 	, m_sampleRate(sampleRate)
 {

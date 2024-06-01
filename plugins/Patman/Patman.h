@@ -31,7 +31,6 @@
 #include "Sample.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -72,9 +71,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 128 );
+		return 3.f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
@@ -87,7 +86,6 @@ public slots:
 private:
 	struct handle_data
 	{
-		MM_OPERATORS
 		Sample::PlaybackState* state;
 		bool tuned;
 		std::shared_ptr<Sample> sample;

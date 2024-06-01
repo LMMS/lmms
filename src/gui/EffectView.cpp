@@ -53,6 +53,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_dragging(false)
 {
 	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
+	setFocusPolicy(Qt::StrongFocus);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
@@ -90,7 +91,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<8>( f ) );
+		ctls_btn->setFont(adjustedToPixelSize(f, 10));
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
@@ -162,7 +163,7 @@ void EffectView::editControls()
 
 void EffectView::moveUp()
 {
-	emit moveUp( this );
+	emit movedUp(this);
 }
 
 
@@ -170,14 +171,14 @@ void EffectView::moveUp()
 
 void EffectView::moveDown()
 {
-	emit moveDown( this );
+	emit movedDown(this);
 }
 
 
 
 void EffectView::deletePlugin()
 {
-	emit deletePlugin( this );
+	emit deletedPlugin(this);
 }
 
 
@@ -257,7 +258,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_bg );
 
-	QFont f = pointSizeF( font(), 7.5f );
+	QFont f = adjustedToPixelSize(font(), 10);
 	f.setBold( true );
 	p.setFont( f );
 

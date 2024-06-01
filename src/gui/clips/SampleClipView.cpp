@@ -128,7 +128,6 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 		m_clip->updateLength();
 		update();
 		_de->accept();
-		Engine::getSong()->setModified();
 	}
 	else
 	{
@@ -182,19 +181,21 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = SampleLoaderDialog::openAudioFile();
+	const QString selectedAudioFile = SampleLoaderDialog::openAudioFile();
 
-	if (af.isEmpty()) { return; } //Don't do anything if no file is loaded
+	if (selectedAudioFile.isEmpty()) { return; }
 
-	if (af == PathUtil::toShortestRelative(m_clip->sampleFile()))
-	{	//Instead of reloading the existing file, just reset the size
-		int length = static_cast<int>(m_clip->m_sample.sampleSize() / Engine::framesPerTick());
-		m_clip->changeLength(length);
+	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
+	{
+		m_clip->changeLengthToSampleLength();
 	}
 	else
-	{	//Otherwise load the new file as ususal
-		m_clip->setSampleFile( af );
-		Engine::getSong()->setModified();
+	{
+		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		if (sampleBuffer != SampleBuffer::emptyBuffer())
+		{
+			m_clip->setSampleBuffer(sampleBuffer);
+		}
 	}
 }
 
@@ -271,7 +272,10 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	SampleWaveform::visualize(m_clip->m_sample, p, r);
+
+	const auto& sample = m_clip->m_sample;
+	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+	SampleWaveform::visualize(waveform, p, r);
 
 	QString name = PathUtil::cleanName(m_clip->sampleFile());
 	paintTextLabel(name, p);

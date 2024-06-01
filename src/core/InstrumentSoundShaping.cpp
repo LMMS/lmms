@@ -158,7 +158,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 		if( n->m_filter == nullptr )
 		{
-			n->m_filter = std::make_unique<BasicFilters<>>( Engine::audioEngine()->processingSampleRate() );
+			n->m_filter = std::make_unique<BasicFilters<>>( Engine::audioEngine()->outputSampleRate() );
 		}
 		n->m_filter->setFilterType( static_cast<BasicFilters<>::FilterType>(m_filterModel.value()) );
 
@@ -303,7 +303,7 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 
 	f_cnt_t ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
 
-	if( m_instrumentTrack->instrument()->flags().testFlag( Instrument::Flag::IsSingleStreamed ) )
+	if (m_instrumentTrack->instrument()->isSingleStreamed())
 	{
 		return ret_val;
 	}

@@ -204,7 +204,7 @@ public:
 					control.f1 + 1 :
 					0;
 		control.band = waveTableBandFromFreq(
-			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->processingSampleRate());
+			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->outputSampleRate());
 		return control;
 	}
 

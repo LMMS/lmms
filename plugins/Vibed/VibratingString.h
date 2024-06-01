@@ -49,8 +49,6 @@ public:
 
 	sample_t nextSample()
 	{
-		sample_t ym0;
-		sample_t ypM;
 		for (int i = 0; i < m_oversample; ++i)
 		{
 			// Output at pickup position
@@ -58,9 +56,9 @@ public:
 			m_outsamp[i] += toBridgeAccess(m_toBridge.get(), m_pickupLoc);
 
 			// Sample traveling into "bridge"
-			ym0 = toBridgeAccess(m_toBridge.get(), 1);
+			sample_t ym0 = toBridgeAccess(m_toBridge.get(), 1);
 			// Sample to "nut"
-			ypM = fromBridgeAccess(m_fromBridge.get(), m_fromBridge->length - 2);
+			sample_t ypM = fromBridgeAccess(m_fromBridge.get(), m_fromBridge->length - 2);
 
 			// String state update
 
@@ -105,21 +103,18 @@ private:
 	 */
 	void setDelayLine(DelayLine* dl, int pick, const float* values, int len, float scale, bool state)
 	{
-		float r;
-		float offset;
-
 		if (!state)
 		{
 			for (int i = 0; i < pick; ++i)
 			{
-				r = static_cast<float>(std::rand()) / RAND_MAX;
-				offset = (m_randomize / 2.0f - m_randomize) * r;
+				float r = static_cast<float>(std::rand()) / RAND_MAX;
+				float offset = (m_randomize / 2.0f - m_randomize) * r;
 				dl->data[i] = scale * values[dl->length - i - 1] + offset;
 			}
 			for (int i = pick; i < dl->length; ++i)
 			{
-				r = static_cast<float>(std::rand()) / RAND_MAX;
-				offset = (m_randomize / 2.0f - m_randomize) * r;
+				float r = static_cast<float>(std::rand()) / RAND_MAX;
+				float offset = (m_randomize / 2.0f - m_randomize) * r;
 				dl->data[i] = scale * values[i - pick]  + offset;
 			}
 		}
@@ -129,8 +124,8 @@ private:
 			{
 				for (int i = pick; i < dl->length; ++i)
 				{
-					r = static_cast<float>(std::rand()) / RAND_MAX;
-					offset = (m_randomize / 2.0f - m_randomize) * r;
+					float r = static_cast<float>(std::rand()) / RAND_MAX;
+					float offset = (m_randomize / 2.0f - m_randomize) * r;
 					dl->data[i] = scale * values[i - pick] + offset;
 				}
 			}
@@ -138,8 +133,8 @@ private:
 			{
 				for (int i = 0; i < len; ++i)
 				{
-					r = static_cast<float>(std::rand()) / RAND_MAX;
-					offset = (m_randomize / 2.0f - m_randomize) * r;
+					float r = static_cast<float>(std::rand()) / RAND_MAX;
+					float offset = (m_randomize / 2.0f - m_randomize) * r;
 					dl->data[i+pick] = scale * values[i] + offset;
 				}
 			}
