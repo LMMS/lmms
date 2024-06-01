@@ -544,6 +544,8 @@ void MixerView::clear()
 	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i); }
 	getMixer()->clearChannel(0);
 
+	m_mixerChannelViews[0]->reset();
+
 	refreshDisplay();
 }
 
