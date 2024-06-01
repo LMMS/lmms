@@ -123,7 +123,7 @@ namespace lmms::gui
         QLabel* m_receiveArrow;
         PixmapButton* m_muteButton;
         PixmapButton* m_soloButton;
-        PeakIndicator* m_peakIndicator = 0;
+        PeakIndicator* m_peakIndicator = nullptr;
         Fader* m_fader;
         EffectRackView* m_effectRackView;
         MixerView* m_mixerView;

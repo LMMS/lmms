@@ -214,7 +214,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 		{
 			persistentPeak = targetPeak;
 			lastPeakTimer.restart();
-			peakChanged(persistentPeak);
+			emit peakChanged(persistentPeak);
 		}
 		update();
 	}
@@ -222,7 +222,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
 		persistentPeak = qMax<float>(0, persistentPeak-0.05);
-		peakChanged(persistentPeak);
+		emit peakChanged(persistentPeak);
 		update();
 	}
 }
