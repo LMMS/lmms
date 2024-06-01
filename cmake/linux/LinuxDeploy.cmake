@@ -204,7 +204,7 @@ if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
 	message(STATUS "Finishing the .run file using ${MAKESELF_BIN}...")
 	string(REPLACE ".AppImage" ".run" RUN_FILE "${APPIMAGE_FILE}")
 	configure_file(
-		"${CPACK_SOURCE_DIR}/cmake/linux/makeself_setup.sh.in" "${CPACK_CURRENT_BINARY_DIR}/setup.sh" @ONLY
+		"${CPACK_SOURCE_DIR}/cmake/linux/makeself_setup.sh.in" "${APP}/setup.sh" @ONLY
 		FILE_PERMISSIONS
 			OWNER_EXECUTE OWNER_WRITE OWNER_READ
 			GROUP_EXECUTE GROUP_WRITE GROUP_READ
@@ -215,16 +215,16 @@ if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
 		set(ERROR_QUIET ERROR_QUIET)
 	endif()
 
-	file(REMOVE "${RUN_FILE}")
-
 	# makeself.sh [args] archive_dir file_name label startup_script [script_args]
+	file(REMOVE "${RUN_FILE}")
 	execute_process(COMMAND makeself
+		--keep-umask
 	    --nox11
 	    ${MAKESELF_QUIET}
 		"${APP}"
 		"${RUN_FILE}"
 		"${LMMS} Installer"
-		"${CPACK_CURRENT_BINARY_DIR}/setup.sh"
+		"./setup.sh"
 		${OUTPUT_QUIET}
 		COMMAND_ECHO ${COMMAND_ECHO}
 		COMMAND_ERROR_IS_FATAL ANY)

@@ -16,13 +16,14 @@ fi
 mkdir -p "${DESTDIR}"
 unalias cp &> /dev/null || true
 cp -rf ./* "${DESTDIR}"
+rm -f "${DESTDIR}/setup.sh"
+mv "${DESTDIR}/AppRun" "${DESTDIR}/lmms"
 
 # Test LMMS
-LMMS="${DESTDIR}/usr/bin/@CPACK_PROJECT_NAME@"
 echo "Installation complete... Testing \"$LMMS\"..."
-"$LMMS" --version
+"${DESTDIR}/lmms" --allowroot --version &> /dev/null
 
 # TODO: Register file associations, desktop icon, etc
 
 echo "@CPACK_PROJECT_NAME_UCASE@ was installed successfully to ${DESTDIR}.  To run:"
-echo "  $LMMS"
+echo "  ${DESTDIR}/lmms"
