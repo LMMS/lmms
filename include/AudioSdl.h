@@ -69,6 +69,8 @@ public:
 	private:
 		QLineEdit * m_device;
 		QComboBox* m_inputDeviceComboBox = nullptr;
+
+		static QString s_defaultInputDevice;
 	} ;
 
 

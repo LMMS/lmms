@@ -109,13 +109,14 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
 	const QString inputDevice = ConfigManager::inst()->value("audiosdl", "inputdevice");
+	const bool isDefaultInput = inputDevice.isEmpty();
 
 	// Try with the configured device
-	const auto inputDeviceCStr = inputDevice.toLocal8Bit().data();
+	const auto inputDeviceCStr = isDefaultInput ? nullptr : inputDevice.toLocal8Bit().data();
 	m_inputDevice = SDL_OpenAudioDevice (inputDeviceCStr, 1, &m_inputAudioHandle, &actual, 0);
 
-	// If we did not get a device ID try again with the default device
-	if (m_inputDevice == 0)
+	// If we did not get a device ID try again with the default device if we did not try that before
+	if (m_inputDevice == 0 && !isDefaultInput)
 	{
 		m_inputDevice = SDL_OpenAudioDevice(nullptr, 1, &m_inputAudioHandle, &actual, 0);
 	}
@@ -290,6 +291,8 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 
 #endif
 
+QString AudioSdl::setupWidget::s_defaultInputDevice = QObject::tr("[System Default]");
+
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
 {
@@ -303,6 +306,8 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	m_inputDeviceComboBox = new QComboBox(this);
 
 #ifdef LMMS_HAVE_SDL2
+	m_inputDeviceComboBox->addItem(s_defaultInputDevice);
+
 	const int numberOfInputDevices = SDL_GetNumAudioDevices(1);
 	for (int i = 0; i < numberOfInputDevices; ++i)
 	{
@@ -312,7 +317,14 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 	// Set the current device to the one in the configuration
 	const auto inputDevice = ConfigManager::inst()->value("audiosdl", "inputdevice");
-	m_inputDeviceComboBox->setCurrentText(inputDevice);
+	if (inputDevice.isEmpty())
+	{
+		m_inputDeviceComboBox->setCurrentText(s_defaultInputDevice);
+	}
+	else
+	{
+		m_inputDeviceComboBox->setCurrentText(inputDevice);
+	}
 #endif
 
 	form->addRow(tr("Input device"), m_inputDeviceComboBox);
@@ -327,7 +339,12 @@ void AudioSdl::setupWidget::saveSettings()
 							m_device->text() );
 
 	const auto currentInputDevice = m_inputDeviceComboBox->currentText();
-	if (!currentInputDevice.isEmpty())
+	if (currentInputDevice == s_defaultInputDevice)
+	{
+		// Represent the default input device with an empty string
+		ConfigManager::inst()->setValue("audiosdl", "inputdevice", "");
+	}
+	else if (!currentInputDevice.isEmpty())
 	{
 		ConfigManager::inst()->setValue("audiosdl", "inputdevice", currentInputDevice);
 	}
