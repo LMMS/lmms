@@ -305,6 +305,7 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
 {
 	QFormLayout * form = new QFormLayout(this);
+	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
 	m_playbackDeviceComboBox = new QComboBox(this);
 
