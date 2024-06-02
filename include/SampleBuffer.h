@@ -78,11 +78,11 @@ public:
 
 		auto hash() const -> std::size_t { return m_hash; }
 
-		//! The audio file full path or an empty string
-		auto audioFileAbsolute() const -> const QString&;
-
 		//! The audio file relative path or an empty string
-		auto audioFileRelative() const -> QString;
+		auto audioFileRelative() const -> const QString&;
+
+		//! The audio file full path or an empty string
+		auto audioFileAbsolute() const -> QString;
 
 		struct Hasher
 		{
@@ -101,7 +101,7 @@ public:
 
 	private:
 		Type m_type = Type::Unknown;
-		QString m_identifier;
+		QString m_identifier; // TODO: Store the relative path instead..
 		std::size_t m_hash = 0;
 	};
 
@@ -120,17 +120,17 @@ public:
 	SampleBuffer() = delete;
 	explicit SampleBuffer(Access) {}
 	SampleBuffer(Access, const QString& audioFile);
-	SampleBuffer(Access, const QString& base64, int sampleRate);
-	SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate);
-	SampleBuffer(Access, const sampleFrame* data, size_t numFrames, int sampleRate);
+	SampleBuffer(Access, const QString& base64, sample_rate_t sampleRate);
+	SampleBuffer(Access, std::vector<sampleFrame> data, sample_rate_t sampleRate);
+	SampleBuffer(Access, const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate);
 
 	static auto create() -> std::shared_ptr<const SampleBuffer>;
 	static auto create(const QString& audioFile) -> std::shared_ptr<const SampleBuffer>;
-	static auto create(const QString& base64, int sampleRate) -> std::shared_ptr<const SampleBuffer>;
-	static auto create(std::vector<sampleFrame> data, int sampleRate)
+	static auto create(const QString& base64, sample_rate_t sampleRate) -> std::shared_ptr<const SampleBuffer>;
+	static auto create(std::vector<sampleFrame> data, sample_rate_t sampleRate)
 		-> std::shared_ptr<const SampleBuffer>;
 	static auto create(const sampleFrame* data, size_t numFrames,
-		int sampleRate = Engine::audioEngine()->outputSampleRate())
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate())
 		-> std::shared_ptr<const SampleBuffer>;
 
 	~SampleBuffer() = default;

@@ -40,7 +40,7 @@ public:
 	struct Result
 	{
 		std::vector<sampleFrame> data;
-		int sampleRate;
+		sample_rate_t sampleRate;
 	};
 
 	struct AudioType

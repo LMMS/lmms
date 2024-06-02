@@ -122,12 +122,12 @@ void SampleClip::changeLengthToSampleLength()
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.source().audioFileAbsolute();
+	return m_sample.source().audioFileRelative();
 }
 
-bool SampleClip::hasSampleFileLoaded(const QString & filename) const
+bool SampleClip::hasSampleFileLoaded(const QString& filename) const
 {
-	return m_sample.sampleFile() == filename;
+	return m_sample.source().audioFileRelative() == filename;
 }
 
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
@@ -266,7 +266,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 
-	const auto sampleFile = sample().source().audioFileRelative();
+	const auto& sampleFile = sample().source().audioFileRelative();
 	_this.setAttribute("src", sampleFile);
 	_this.setAttribute( "off", startTimeOffset() );
 	if (sampleFile.isEmpty())
@@ -308,7 +308,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
-		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
+		sample_rate_t sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toUInt() :
 			Engine::audioEngine()->outputSampleRate();
 
 		auto buffer = SampleLoader::fromBase64(_this.attribute("data"), sampleRate);

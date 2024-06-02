@@ -46,7 +46,7 @@ Sample::Sample(const QByteArray& base64, sample_rate_t sampleRate)
 {
 }
 
-Sample::Sample(const sampleFrame* data, size_t numFrames, int sampleRate)
+Sample::Sample(const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
 	: m_buffer(SampleBuffer::create(data, numFrames, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -127,7 +127,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
-	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
+	const auto marginSize = InterpolationMargins[state->resampler().interpolationMode()];
 
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 

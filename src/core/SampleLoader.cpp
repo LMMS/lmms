@@ -102,7 +102,7 @@ auto SampleLoader::fromFile(const QString& filePath, bool cache)
 	}
 }
 
-auto SampleLoader::fromBase64(const QString& base64, int sampleRate, bool cache)
+auto SampleLoader::fromBase64(const QString& base64, sample_rate_t sampleRate, bool cache)
 	-> std::shared_ptr<const SampleBuffer>
 {
 	try

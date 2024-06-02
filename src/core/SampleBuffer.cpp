@@ -38,7 +38,7 @@ SampleBuffer::Source::Source(const QString& filePath)
 {
 	if (filePath.isEmpty()) { throw std::runtime_error{"Audio file path is empty."}; }
 
-	m_identifier = PathUtil::toAbsolute(filePath);
+	m_identifier = PathUtil::toShortestRelative(filePath);
 	m_hash = qHash(m_identifier, static_cast<unsigned int>(m_type));
 }
 
@@ -51,15 +51,15 @@ SampleBuffer::Source::Source(const QString& base64, sample_rate_t sampleRate)
 	m_hash = qHash(base64, sampleRate);
 }
 
-auto SampleBuffer::Source::audioFileAbsolute() const -> const QString&
+auto SampleBuffer::Source::audioFileRelative() const -> const QString&
 {
-	static QString empty;
+	static const QString empty;
 	return m_type == Type::AudioFile ? m_identifier : empty;
 }
 
-auto SampleBuffer::Source::audioFileRelative() const -> QString
+auto SampleBuffer::Source::audioFileAbsolute() const -> QString
 {
-	return m_type == Type::AudioFile ? PathUtil::toShortestRelative(m_identifier) : QString{};
+	return m_type == Type::AudioFile ? PathUtil::toAbsolute(m_identifier) : QString{};
 }
 
 SampleBuffer::SampleBuffer(Access, const QString& audioFile)
@@ -77,7 +77,7 @@ SampleBuffer::SampleBuffer(Access, const QString& audioFile)
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
-SampleBuffer::SampleBuffer(Access, const QString& base64, int sampleRate)
+SampleBuffer::SampleBuffer(Access, const QString& base64, sample_rate_t sampleRate)
 	: m_sampleRate(sampleRate)
 	, m_source(base64, sampleRate)
 {
@@ -87,14 +87,14 @@ SampleBuffer::SampleBuffer(Access, const QString& base64, int sampleRate)
 	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(sampleFrame));
 }
 
-SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate)
+SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, sample_rate_t sampleRate)
 	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
 	, m_source()
 {
 }
 
-SampleBuffer::SampleBuffer(Access, const sampleFrame* data, size_t numFrames, int sampleRate)
+SampleBuffer::SampleBuffer(Access, const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
 	: m_data(data, data + numFrames)
 	, m_sampleRate(sampleRate)
 {
@@ -121,7 +121,7 @@ auto SampleBuffer::create(std::vector<sampleFrame> data, sample_rate_t sampleRat
 	return std::make_shared<SampleBuffer>(Access{}, std::move(data), sampleRate);
 }
 
-auto SampleBuffer::create(const sampleFrame* data, int numFrames, sample_rate_t sampleRate)
+auto SampleBuffer::create(const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
 	-> std::shared_ptr<const SampleBuffer>
 {
 	return std::make_shared<SampleBuffer>(Access{}, data, numFrames, sampleRate);

@@ -165,7 +165,7 @@ void SlicerT::findSlices()
 	const int windowSize = 512;
 	const float minBeatLength = 0.05f; // in seconds, ~ 1/4 length at 220 bpm
 
-	int sampleRate = m_originalSample.sampleRate();
+	sample_rate_t sampleRate = m_originalSample.sampleRate();
 	int minDist = sampleRate * minBeatLength;
 
 	float maxMag = -1;
@@ -339,7 +339,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("version", "1");
 
-	const auto sampleFile = m_originalSample.source().audioFileRelative();
+	const auto& sampleFile = m_originalSample.source().audioFileRelative();
 	element.setAttribute("src", sampleFile);
 	if (sampleFile.isEmpty())
 	{

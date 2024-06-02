@@ -43,12 +43,15 @@ public:
 
 	static auto instance() -> SampleLoader&;
 
+	//! Returns nullptr upon failure
 	static auto fromFile(const QString& filePath, bool cache = true)
 		-> std::shared_ptr<const SampleBuffer>;
 
-	static auto fromBase64(const QString& base64, int sampleRate, bool cache = true)
+	//! Returns nullptr upon failure
+	static auto fromBase64(const QString& base64, sample_rate_t sampleRate, bool cache = true)
 		-> std::shared_ptr<const SampleBuffer>;
 
+	//! Returns nullptr upon failure
 	static auto fromBase64(const QString& base64, bool cache = true)
 		-> std::shared_ptr<const SampleBuffer>;
 

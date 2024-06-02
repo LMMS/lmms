@@ -195,7 +195,7 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	auto sampleFile = m_sample.source().audioFileRelative();
+	const auto& sampleFile = m_sample.source().audioFileRelative();
 	elem.setAttribute("src", sampleFile);
 	if (sampleFile.isEmpty())
 	{
