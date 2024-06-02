@@ -32,11 +32,11 @@ jobs:
           sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
           . /etc/os-release
           sudo wget -NP /etc/apt/sources.list.d/ "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
-          # Workaround for Wine issue -- https://github.com/actions/runner-images/issues/4589#issuecomment-980506595
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86B72ED9
-          sudo add-apt-repository 'deb [arch=amd64] https://mirror.mxe.cc/repos/apt focal main'
           sudo apt-get update
-          sudo apt-get install --yes --allow-downgrades libpcre2-8-0=10.34-7
+          # Remove ppa:ondrej/php since it breaks i386 packages -- https://github.com/oerdnj/deb.sury.org/issues/1745
+          sudo add-apt-repository ppa:ondrej/php
+          sudo apt-get install --yes ppa-purge
+          sudo ppa-purge -y ppa:ondrej/php
           # Install Wine
           sudo apt-get install --yes aptitude
           sudo aptitude install --verbose --with-recommends wine-staging-dev winehq-staging
