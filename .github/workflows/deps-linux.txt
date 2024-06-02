@@ -23,5 +23,3 @@ software-properties-common
 ssh-client
 stk
 wget
-wine-staging-dev
-winehq-staging
