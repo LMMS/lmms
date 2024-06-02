@@ -600,15 +600,7 @@ void Sf2Instrument::reloadSynth()
 	}
 
 	m_synthMutex.lock();
-	if( Engine::audioEngine()->currentQualitySettings().interpolation >=
-			AudioEngine::qualitySettings::Interpolation::SincFastest )
-	{
-		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
-	}
-	else
-	{
-		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
-	}
+	fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_DEFAULT);
 	m_synthMutex.unlock();
 
 	updateReverb();

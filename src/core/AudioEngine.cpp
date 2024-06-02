@@ -83,7 +83,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings(qualitySettings::Interpolation::Linear),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
@@ -577,25 +576,6 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 	return StereoSample(peakLeft, peakRight);
 }
 
-
-
-
-void AudioEngine::changeQuality(const struct qualitySettings & qs)
-{
-	// don't delete the audio-device
-	stopProcessing();
-
-	m_qualitySettings = qs;
-
-	emit sampleRateChanged();
-	emit qualitySettingsChanged();
-
-	startProcessing();
-}
-
-
-
-
 void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 {
 	// TODO: Use shared_ptr here in the future.
@@ -616,23 +596,11 @@ void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 	}
 }
 
-
-
-
-void AudioEngine::setAudioDevice(AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow)
+void AudioEngine::setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow)
 {
 	stopProcessing();
-
-	m_qualitySettings = _qs;
-
-	doSetAudioDevice( _dev );
-
-	emit qualitySettingsChanged();
+	doSetAudioDevice(_dev);
 	emit sampleRateChanged();
-
 	if (startNow) {startProcessing( _needs_fifo );}
 }
 
