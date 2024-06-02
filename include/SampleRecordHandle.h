@@ -45,7 +45,7 @@ class Track;
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	explicit SampleRecordHandle(SampleClip* clip, TimePos startRecordTimeOffset);
+	SampleRecordHandle(SampleClip* clip, TimePos startRecordTimeOffset);
 	~SampleRecordHandle() override;
 
 	void play( sampleFrame * _working_buffer ) override;

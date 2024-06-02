@@ -118,7 +118,8 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
 
 					// In case we are recoding, "play" the whole TCO.
-					if (sClip->isRecord()) {
+					if (sClip->isRecord())
+					{
 						samplePlayLength = clipFrameLength;
 					}
 

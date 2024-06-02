@@ -31,6 +31,7 @@
 #include <QPainter>
 
 #include "AudioEngine.h"
+#include "ClipView.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
@@ -63,7 +64,7 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 
 	// To simplify the code we always create the widget but we do not always show it
-	m_recordWidget = buildRecordWidget(_clip->getRecordModel());
+	m_recordWidget = buildRecordWidget(_clip->recordModel());
 	m_recordWidget->setVisible(recordingCapabilitiesAvailable());
 
 	adjustRecordWidget();
@@ -91,7 +92,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 	QAction* recordToggleAction = cm->addAction(embed::getIconPixmap("record"),
                           tr("Toggle record"),
-                          m_clip, SLOT(toggleRecord()));
+                          m_clip, &SampleClip::toggleRecord);
 	
 	recordToggleAction->setEnabled(recordingCapabilitiesAvailable());
 
@@ -328,7 +329,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 void SampleClipView::resizeEvent(QResizeEvent *event)
 {
 	adjustRecordWidget();
-
 	ClipView::resizeEvent(event);
 }
 
