@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Setup Wine
+      - name: Set up Wine
         run: |
           sudo dpkg --add-architecture i386
           # Add WineHQ repo
@@ -37,8 +37,13 @@ jobs:
           sudo add-apt-repository ppa:ondrej/php
           sudo apt-get install --yes ppa-purge
           sudo ppa-purge -y ppa:ondrej/php
+      - name: Set environment
+        run: echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-linux.txt)" >> "$GITHUB_ENV"
       - name: Install APT dependencies
-        run: xargs -a .github/workflows/deps-linux.txt sudo apt-get install --no-install-recommends --yes
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: ${{ env.APT_DEPENDENCIES }}
+          version: 1.0
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
