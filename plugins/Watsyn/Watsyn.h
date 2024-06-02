@@ -190,7 +190,6 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy( float * _dst, float * _src )
 	{
-		int err;
 		const int margin = 64;
 		
 		// copy to temp array
