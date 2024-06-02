@@ -198,6 +198,14 @@ if [ -e "$JACK_LIB" ]; then
    cp "$JACK_LIB" "${APPDIR}usr/lib/lmms/optional/"
 fi
 
+# Suil dynamically loads multiple libraries, so we cannot automatically detect those
+# => Copy them all
+if [ -d "/usr/lib/suil-0" ]
+then
+  mkdir -p "${APPDIR}usr/lib/suil-0/"
+  cp /usr/lib/suil-0/* "${APPDIR}usr/lib/suil-0/"
+fi
+
 # Point the AppRun to the shim launcher
 rm -f "${APPDIR}/AppRun"
 ln -sr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
