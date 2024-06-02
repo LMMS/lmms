@@ -31,7 +31,6 @@
 #include <QPainter>
 
 #include "AudioEngine.h"
-#include "ClipView.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
