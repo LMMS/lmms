@@ -43,7 +43,7 @@ public:
 
 	//! Interpolates the sample value at position `index` within `src` containing `size` samples.
 	//! Assumes that `src` represents an array of sample frames containing two samples each.
-	//! `prev` can be provided to provide the sample frame that occurs at `index - 1 < 0`.
+	//! `prev` can be provided to provide the sample frame that occurs at `index - 1`.
 	static float interpolate(
 		const float* src, size_t size, int index, float fractionalOffset, float* prev = nullptr);
 
