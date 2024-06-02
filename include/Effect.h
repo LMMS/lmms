@@ -26,6 +26,7 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
+#include "AudioResampler.h"
 #include "Plugin.h"
 #include "Engine.h"
 #include "AudioEngine.h"
@@ -53,7 +54,6 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -191,33 +191,25 @@ protected:
 							sampleFrame * _dst_buf,
 							sample_rate_t _dst_sr )
 	{
-		resample( 0, _src_buf,
-				Engine::audioEngine()->outputSampleRate(),
-					_dst_buf, _dst_sr,
-					Engine::audioEngine()->framesPerPeriod() );
+		const auto fpp = Engine::audioEngine()->framesPerPeriod();
+		m_resamplers[0].resample(&_dst_buf[0][0], &_src_buf[0][0], fpp, fpp,
+			static_cast<double>(_dst_sr) / Engine::audioEngine()->outputSampleRate());
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
 							sampleFrame * _dst_buf,
 							sample_rate_t _src_sr )
 	{
-		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->outputSampleRate(),
-			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->outputSampleRate() );
+		const auto fpp = Engine::audioEngine()->framesPerPeriod();
+		m_resamplers[1].resample(&_dst_buf[0][0], &_src_buf[0][0], fpp,
+			fpp * _src_sr / Engine::audioEngine()->outputSampleRate(),
+			static_cast<double>(Engine::audioEngine()->outputSampleRate()) / _src_sr);
 	}
-	void reinitSRC();
-
 	virtual void onEnabledChanged() {}
 
 
 private:
 	EffectChain * m_parent;
-	void resample( int _i, const sampleFrame * _src_buf,
-					sample_rate_t _src_sr,
-					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
-					const f_cnt_t _frames );
-
 	ch_cnt_t m_processors;
 
 	bool m_okay;
@@ -232,8 +224,7 @@ private:
 	
 	bool m_autoQuitDisabled;
 
-	SRC_DATA m_srcData[2];
-	SRC_STATE * m_srcState[2];
+	std::array<AudioResampler, 2> m_resamplers;
 
 
 	friend class gui::EffectView;

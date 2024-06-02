@@ -123,7 +123,6 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_srcState( nullptr ),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -235,11 +234,6 @@ Sf2Instrument::~Sf2Instrument()
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
-	if( m_srcState != nullptr )
-	{
-		src_delete( m_srcState );
-	}
-
 }
 
 
@@ -616,21 +610,7 @@ void Sf2Instrument::reloadSynth()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() )
-	{
-		m_synthMutex.lock();
-		if( m_srcState != nullptr )
-		{
-			src_delete( m_srcState );
-		}
-		int error;
-		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
-		if( m_srcState == nullptr || error )
-		{
-			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
-		}
-		m_synthMutex.unlock();
-	}
+
 	updateReverb();
 	updateChorus();
 	updateReverbOn();
@@ -872,8 +852,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() &&
-							m_srcState != nullptr )
+	if (m_internalSampleRate < Engine::audioEngine()->outputSampleRate())
 	{
 		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
 #ifdef __GNUC__
@@ -882,26 +861,10 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 		sampleFrame * tmp = new sampleFrame[f];
 #endif
 		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
-
-		SRC_DATA src_data;
-		src_data.data_in = (float *)tmp;
-		src_data.data_out = (float *)buf;
-		src_data.input_frames = f;
-		src_data.output_frames = frames;
-		src_data.src_ratio = (double) frames / f;
-		src_data.end_of_input = 0;
-		int error = src_process( m_srcState, &src_data );
+		m_resampler.resample(&buf[0][0], &tmp[0][0], frames, f, static_cast<double>(frames) / f);
 #ifndef __GNUC__
 		delete[] tmp;
 #endif
-		if( error )
-		{
-			qCritical( "Sf2Instrument: error while resampling: %s", src_strerror( error ) );
-		}
-		if( src_data.output_frames_gen > frames )
-		{
-			qCritical( "Sf2Instrument: not enough frames: %ld / %d", src_data.output_frames_gen, frames );
-		}
 	}
 	else
 	{

@@ -31,6 +31,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
@@ -103,8 +104,6 @@ public slots:
 	void updateTuning();
 
 private:
-	SRC_STATE * m_srcState;
-
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
@@ -145,6 +144,8 @@ private:
 
 	QVector<NotePlayHandle *> m_playingNotes;
 	QMutex m_playingNotesMutex;
+
+	AudioResampler m_resampler;
 
 private:
 	void freeFont();

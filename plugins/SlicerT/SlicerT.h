@@ -25,16 +25,13 @@
 #ifndef LMMS_SLICERT_H
 #define LMMS_SLICERT_H
 
-#include <algorithm>
 #include <fftw3.h>
-#include <stdexcept>
 
+#include "AudioResampler.h"
 #include "AutomatableModel.h"
 #include "Instrument.h"
-#include "InstrumentView.h"
 #include "Note.h"
 #include "Sample.h"
-#include "SampleBuffer.h"
 #include "SlicerTView.h"
 #include "lmms_basics.h"
 
@@ -45,20 +42,16 @@ class PlaybackState
 public:
 	explicit PlaybackState(float startFrame)
 		: m_currentNoteDone(startFrame)
-		, m_resamplingState(src_new(SRC_LINEAR, DEFAULT_CHANNELS, nullptr))
 	{
-		if (!m_resamplingState) { throw std::runtime_error{"Failed to create sample rate converter object"}; }
 	}
-	~PlaybackState() noexcept { src_delete(m_resamplingState); }
 
 	float noteDone() const { return m_currentNoteDone; }
 	void setNoteDone(float newNoteDone) { m_currentNoteDone = newNoteDone; }
-
-	SRC_STATE* resamplingState() const { return m_resamplingState; }
+	AudioResampler& resampler() { return m_resampler; }
 
 private:
+	AudioResampler m_resampler;
 	float m_currentNoteDone;
-	SRC_STATE* m_resamplingState;
 };
 
 class SlicerT : public Instrument

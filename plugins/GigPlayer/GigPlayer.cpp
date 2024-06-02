@@ -461,13 +461,13 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				sampleFrame convertBuf[frames];
 
 				// Only output if resampling is successful (note that "used" is output)
-				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
+				m_resampler.resample(&convertBuf[0][0], &sampleData[0][0], frames, samples, freq_factor);
+				used = samples;
+
+				for( f_cnt_t i = 0; i < frames; ++i )
 				{
-					for( f_cnt_t i = 0; i < frames; ++i )
-					{
-						_working_buffer[i][0] += convertBuf[i][0];
-						_working_buffer[i][1] += convertBuf[i][1];
-					}
+					_working_buffer[i][0] += convertBuf[i][0];
+					_working_buffer[i][1] += convertBuf[i][1];
 				}
 			}
 			else
@@ -1086,7 +1086,7 @@ void GigInstrumentView::showPatchDialog()
 GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 		float attenuation, int interpolation, float desiredFreq )
 	: sample( pSample ), region( pDimRegion ), attenuation( attenuation ),
-	  pos( 0 ), interpolation( interpolation ), srcState( nullptr ),
+	  pos( 0 ),
 	  sampleFreq( 0 ), freqFactor( 1 )
 {
 	if( sample != nullptr && region != nullptr )
@@ -1116,25 +1116,11 @@ GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 
 
 
-
-GigSample::~GigSample()
-{
-	if( srcState != nullptr )
-	{
-		src_delete( srcState );
-	}
-}
-
-
-
-
 GigSample::GigSample( const GigSample& g )
 	: sample( g.sample ), region( g.region ), attenuation( g.attenuation ),
-	  adsr( g.adsr ), pos( g.pos ), interpolation( g.interpolation ),
-	  srcState( nullptr ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
+	  adsr( g.adsr ), pos( g.pos ),
+	  sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
 {
-	// On the copy, we want to create the object
-	updateSampleRate();
 }
 
 
@@ -1147,86 +1133,10 @@ GigSample& GigSample::operator=( const GigSample& g )
 	attenuation = g.attenuation;
 	adsr = g.adsr;
 	pos = g.pos;
-	interpolation = g.interpolation;
-	srcState = nullptr;
 	sampleFreq = g.sampleFreq;
 	freqFactor = g.freqFactor;
-
-	if( g.srcState != nullptr )
-	{
-		updateSampleRate();
-	}
-
 	return *this;
 }
-
-
-
-
-void GigSample::updateSampleRate()
-{
-	if( srcState != nullptr )
-	{
-		src_delete( srcState );
-	}
-
-	int error = 0;
-	srcState = src_new( interpolation, DEFAULT_CHANNELS, &error );
-
-	if( srcState == nullptr || error != 0 )
-	{
-		qCritical( "error while creating libsamplerate data structure in GigSample" );
-	}
-}
-
-
-
-
-bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
-{
-	if( srcState == nullptr )
-	{
-		return false;
-	}
-
-	SRC_DATA src_data;
-	src_data.data_in = &oldBuf[0];
-	src_data.data_out = &newBuf[0];
-	src_data.input_frames = oldSize;
-	src_data.output_frames = newSize;
-	src_data.src_ratio = freq_factor;
-	src_data.end_of_input = 0;
-
-	// We don't need to lock this assuming that we're only outputting the
-	// samples in one thread
-	int error = src_process( srcState, &src_data );
-
-	used = src_data.input_frames_used;
-
-	if( error != 0 )
-	{
-		qCritical( "GigInstrument: error while resampling: %s", src_strerror( error ) );
-		return false;
-	}
-
-	if( oldSize != 0 && src_data.output_frames_gen == 0 )
-	{
-		qCritical( "GigInstrument: could not resample, no frames generated" );
-		return false;
-	}
-
-	if( src_data.output_frames_gen > 0 && src_data.output_frames_gen < newSize )
-	{
-		qCritical() << "GigInstrument: not enough frames, wanted"
-			<< newSize << "generated" << src_data.output_frames_gen;
-		return false;
-	}
-
-	return true;
-}
-
-
 
 
 ADSR::ADSR()
