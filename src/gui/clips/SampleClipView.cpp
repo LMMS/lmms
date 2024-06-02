@@ -25,6 +25,8 @@
 #include "SampleClipView.h"
 
 #include <QApplication>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QMenu>
 #include <QPainter>
 
@@ -33,6 +35,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "PathUtil.h"
+#include "PixmapButton.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
 #include "SampleWaveform.h"
@@ -57,6 +60,11 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+
+	m_recordWidget = buildRecordWidget(_clip->getRecordModel());
+	m_recordWidget->setVisible(true);
+
+	adjustRecordWidget();
 }
 
 void SampleClipView::updateSample()
@@ -306,36 +314,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	{
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
-	// recording sample tracks is not possible at the moment
-
-	if (m_clip->isRecord())
-	{
-		p.setFont(adjustedToPixelSize(p.font(), 10));
-
-		const auto fontHeight = p.fontMetrics().height();
-
-		const auto baseLine = height() - 3;
-
-		const int recordSymbolRadius = 3;
-		const int recordSymbolCenterX = recordSymbolRadius + 4;
-		const int recordSymbolCenterY = baseLine - fontHeight / 2 + 1;
-
-		const int textStartX = recordSymbolCenterX + recordSymbolRadius + 4;
-
-		auto textPos = QPoint(textStartX, baseLine);
-
-		const auto rec = tr("Rec");
-
-		p.setPen(textShadowColor());
-		p.drawText(textPos + QPoint(1, 1), rec);
-
-		p.setPen(textColor());
-		p.drawText(textPos, rec);
-
-		p.setBrush(QBrush(textColor()));
-
-		p.drawEllipse(QPoint(recordSymbolCenterX, recordSymbolCenterY), recordSymbolRadius, recordSymbolRadius);
-	}
 
 	p.end();
 
@@ -343,6 +321,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 }
 
 
+void SampleClipView::resizeEvent(QResizeEvent *event)
+{
+	adjustRecordWidget();
+
+	ClipView::resizeEvent(event);
+}
 
 
 void SampleClipView::reverseSample()
@@ -393,5 +377,32 @@ bool SampleClipView::splitClip( const TimePos pos )
 	else { return false; }
 }
 
+QWidget* SampleClipView::buildRecordWidget(BoolModel& recordModel)
+{
+	auto recordWidget = new QWidget(this);
+	
+	auto recordButton = new PixmapButton(recordWidget);
+	recordButton->setActiveGraphic(embed::getIconPixmap("led_red"));
+	recordButton->setToolTip(tr("Enable/disable recording"));
+	recordButton->setCheckable(true);
+	recordButton->setModel(&recordModel);
+
+	auto recordLabel = new QLabel(tr("Rec"), recordWidget);
+	recordLabel->setFont(adjustedToPixelSize(recordLabel->font(), 10));
+
+	// Now layout everything
+	QHBoxLayout* recordLayout = new QHBoxLayout(recordWidget);
+	recordLayout->setContentsMargins(0, 0, 0, 0);
+
+	recordLayout->addWidget(recordButton);
+	recordLayout->addWidget(recordLabel);
+
+	return recordWidget;
+}
+
+void SampleClipView::adjustRecordWidget()
+{
+	m_recordWidget->move(1, height() - m_recordWidget->height() - 1);
+}
 
 } // namespace lmms::gui

@@ -27,10 +27,13 @@
 
 #include "ClipView.h"
 
+class QWidget;
+
 namespace lmms
 {
 
 class SampleClip;
+class BoolModel;
 
 namespace gui
 {
@@ -59,12 +62,18 @@ protected:
 	void dropEvent( QDropEvent * _de ) override;
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
+	void resizeEvent(QResizeEvent *event) override;
 
+private:
+	QWidget* buildRecordWidget(BoolModel& recordModel);
+	void adjustRecordWidget();
 
 private:
 	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
 	bool splitClip( const TimePos pos ) override;
+
+	QWidget* m_recordWidget;
 } ;
 
 
