@@ -7,8 +7,7 @@ concurrency:
 jobs:
   linux:
     name: linux
-    runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.gcc:20.04
+    runs-on: ubuntu-20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -25,6 +24,22 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Add WineHQ repo
+        run: |
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+          . /etc/os-release
+          wget -NP /etc/apt/sources.list.d/ "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
+      - name: Install APT dependencies
+        run: xargs -a .github/workflows/deps-linux.txt sudo apt-get install --yes
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-linux-
+          path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -38,7 +53,14 @@ jobs:
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          cmake -S . \
+                -B build \
+                --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+                -DVCPKG_TARGET_TRIPLET="x64-linux" \
+                -DVCPKG_HOST_TRIPLET="x64-linux" \
+                -DVCPKG_MANIFEST_INSTALL="YES" \
+                -DCMAKE_INSTALL_PREFIX=./build/install \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Run tests

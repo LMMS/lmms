@@ -22,6 +22,16 @@
 			]
 		},
 		{
+			"name": "jack2",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
+			"name": "libgig",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
 			"name": "libogg",
 			"default-features": false
 		},
@@ -46,6 +56,16 @@
 			"default-features": false
 		},
 		{
+			"name": "libxft",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
+			"name": "libxinerama",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
 			"name": "lilv",
 			"default-features": false
 		},
@@ -62,8 +82,38 @@
 			"default-features": false
 		},
 		{
+			"name": "qt5-base",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
+			"name": "qt5-svg",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
+			"name": "qt5-tools",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
+			"name": "qt5-x11extras",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
 			"name": "sdl2",
 			"default-features": false
+		},
+		{
+			"name": "xcb-keysyms",
+			"default-features": false,
+			"platform": "linux"
+		},
+		{
+			"name": "xcb-util",
+			"default-features": false,
+			"platform": "linux"
 		},
 		{
 			"name": "zlib",
