@@ -60,8 +60,10 @@ struct SampleLoader::AutoEvictor
 
 SampleLoader::SampleLoader()
 {
-	connect(&m_watcher, &QFileSystemWatcher::fileChanged, this,
-		[this](const QString& path){ m_entries.erase(path); });
+	connect(&m_watcher, &QFileSystemWatcher::fileChanged, this, [&](const QString& path) {
+		auto lock = std::scoped_lock{m_access};
+		m_entries.erase(path);
+	});
 }
 
 auto SampleLoader::instance() -> SampleLoader&
@@ -142,6 +144,7 @@ auto SampleLoader::fromBase64(const QString& base64, bool cache)
 
 auto SampleLoader::get(const SampleBuffer::Source& source) -> std::shared_ptr<const SampleBuffer>
 {
+	auto lock = std::scoped_lock{m_access};
 	if (auto it = m_entries.find(source); it != m_entries.end())
 	{
 		return it->second.lock();
@@ -157,6 +160,7 @@ void SampleLoader::add(const std::shared_ptr<const SampleBuffer>& buffer)
 		throw std::runtime_error{"Unsupported sample buffer source"};
 	}
 
+	auto lock = std::scoped_lock{m_access};
 	const bool added = m_entries.try_emplace(buffer->source(), buffer).second;
 
 	if (added && buffer->source().type() == SampleBuffer::Source::Type::AudioFile)
@@ -167,6 +171,7 @@ void SampleLoader::add(const std::shared_ptr<const SampleBuffer>& buffer)
 
 auto SampleLoader::remove(const SampleBuffer& buffer) -> bool
 {
+	auto lock = std::scoped_lock{m_access};
 	const bool removed = m_entries.erase(buffer.source()) > 0;
 
 	if (removed && buffer.source().type() == SampleBuffer::Source::Type::AudioFile)

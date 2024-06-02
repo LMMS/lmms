@@ -30,6 +30,12 @@
 #include <QObject>
 #include <unordered_map>
 
+#ifdef __MINGW32__
+#include <mingw.mutex.h>
+#else
+#include <mutex>
+#endif
+
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
@@ -70,6 +76,8 @@ private:
 
 	std::unordered_map<Key, Value, Key::Hasher> m_entries;
 	QFileSystemWatcher m_watcher;
+
+	std::mutex m_access;
 };
 
 } // namespace lmms
