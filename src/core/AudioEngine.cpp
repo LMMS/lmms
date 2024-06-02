@@ -666,6 +666,10 @@ void AudioEngine::restoreAudioDevice()
 }
 
 
+bool AudioEngine::captureDeviceAvailable() const
+{
+	return audioDev()->supportsCapture();
+}
 
 
 void AudioEngine::removeAudioPort(AudioPort * port)

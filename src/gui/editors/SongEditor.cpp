@@ -35,7 +35,6 @@
 #include <QTimeLine>
 
 #include "ActionGroup.h"
-#include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ClipView.h"
@@ -1025,7 +1024,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// In case our current audio device does not support capture,
 	// disable the record buttons.
-	if(!Engine::audioEngine()->audioDev()->supportsCapture()) {
+	if(!Engine::audioEngine()->captureDeviceAvailable()) {
 		for (auto &recordAction : {m_recordAccompanyAction, m_recordAction}) {
 			recordAction->setEnabled(false);
 			recordAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));

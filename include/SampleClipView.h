@@ -67,6 +67,7 @@ protected:
 private:
 	QWidget* buildRecordWidget(BoolModel& recordModel);
 	void adjustRecordWidget();
+	bool recordingCapabilitiesAvailable() const;
 
 private:
 	SampleClip * m_clip;

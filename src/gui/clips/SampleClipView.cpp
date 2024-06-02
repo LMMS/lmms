@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QPainter>
 
+#include "AudioEngine.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
@@ -61,8 +62,9 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 
 	setStyle( QApplication::style() );
 
+	// To simplify the code we always create the widget but we do not always show it
 	m_recordWidget = buildRecordWidget(_clip->getRecordModel());
-	m_recordWidget->setVisible(true);
+	m_recordWidget->setVisible(recordingCapabilitiesAvailable());
 
 	adjustRecordWidget();
 }
@@ -87,9 +89,11 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	cm->addSeparator();
 
 
-	cm->addAction(embed::getIconPixmap("record"),
-                          tr("Set/clear record"),
+	QAction* recordToggleAction = cm->addAction(embed::getIconPixmap("record"),
+                          tr("Toggle record"),
                           m_clip, SLOT(toggleRecord()));
+	
+	recordToggleAction->setEnabled(recordingCapabilitiesAvailable());
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -403,6 +407,11 @@ QWidget* SampleClipView::buildRecordWidget(BoolModel& recordModel)
 void SampleClipView::adjustRecordWidget()
 {
 	m_recordWidget->move(1, height() - m_recordWidget->height() - 1);
+}
+
+bool SampleClipView::recordingCapabilitiesAvailable() const
+{
+	return Engine::audioEngine()->captureDeviceAvailable();
 }
 
 } // namespace lmms::gui
