@@ -25,10 +25,9 @@ endif()
 include(DownloadBinary)
 include(CreateSymlink)
 
-# Cleanup CPack "External" json files, old AppImage files
-file(GLOB cleanup "${CPACK_BINARY_DIR}/lmms-*.json"
-	"${CPACK_BINARY_DIR}/${LMMS}-*.AppImage"
-	"${CPACK_BINARY_DIR}/${CPACK_PROJECT_NAME_UCASE}-*.AppImage"
+# Cleanup CPack "External" json, txt files, old AppImage files
+file(GLOB cleanup "${CPACK_BINARY_DIR}/${lmms}-*.json"
+	"${CPACK_BINARY_DIR}/${lmms}-*.AppImage"
 	"${CPACK_BINARY_DIR}/install_manifest.txt")
 list(SORT cleanup)
 file(REMOVE ${cleanup})

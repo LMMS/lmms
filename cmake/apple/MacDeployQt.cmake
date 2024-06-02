@@ -23,6 +23,13 @@ if(CPACK_DEBUG)
 	set(COMMAND_ECHO STDOUT)
 endif()
 
+# Cleanup CPack "External" json, txt files, old DMG files
+file(GLOB cleanup "${CPACK_BINARY_DIR}/${lmms}-*.json"
+	"${CPACK_BINARY_DIR}/${lmms}-*.dmg"
+	"${CPACK_BINARY_DIR}/install_manifest.txt")
+list(SORT cleanup)
+file(REMOVE ${cleanup})
+
 # Create bundle structure
 file(MAKE_DIRECTORY "${APP}/Contents/MacOS")
 file(MAKE_DIRECTORY "${APP}/Contents/Frameworks")
@@ -133,7 +140,6 @@ string(SUBSTRING "${CPACK_PROJECT_NAME_UCASE} ${CPACK_PROJECT_VERSION}" 0 27 APP
 # We'll configure this file twice (again in MacDeployQt.cmake once we know CPACK_TEMPORARY_INSTALL_DIRECTORY)
 configure_file("${CPACK_CURRENT_SOURCE_DIR}/appdmg.json.in" "${CPACK_CURRENT_BINARY_DIR}/appdmg.json" @ONLY)
 
-file(REMOVE "${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg")
 execute_process(COMMAND "${APPDMG_BIN}"
 	"${CPACK_CURRENT_BINARY_DIR}/appdmg.json"
 	"${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg"
