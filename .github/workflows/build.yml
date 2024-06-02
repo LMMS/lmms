@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Install Wine
+      - name: Setup Wine
         run: |
           sudo dpkg --add-architecture i386
           # Add WineHQ repo
@@ -37,10 +37,6 @@ jobs:
           sudo add-apt-repository ppa:ondrej/php
           sudo apt-get install --yes ppa-purge
           sudo ppa-purge -y ppa:ondrej/php
-          # Install Wine
-          #sudo apt-get install --yes aptitude
-          #sudo aptitude install --verbose --with-recommends wine-staging-dev winehq-staging
-          sudo apt-get install --install-recommends --yes wine-staging-dev winehq-staging
       - name: Install APT dependencies
         run: xargs -a .github/workflows/deps-linux.txt sudo apt-get install --no-install-recommends --yes
       - name: Cache vcpkg dependencies

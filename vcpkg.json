@@ -27,11 +27,6 @@
 			"platform": "linux"
 		},
 		{
-			"name": "libgig",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
 			"name": "libogg",
 			"default-features": false
 		},

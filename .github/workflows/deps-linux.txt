@@ -10,6 +10,7 @@ gpg
 libasound2-dev
 libc6-dev
 libc6-dev-i386
+libgig-dev
 liblist-moreutils-perl
 libsdl2-dev
 libsuil-dev
@@ -23,3 +24,5 @@ software-properties-common
 ssh-client
 stk
 wget
+wine-staging-dev
+winehq-staging
