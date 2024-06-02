@@ -42,12 +42,16 @@ void AudioResampler::resample(float* dst, const float* src, size_t numDstFrames,
 		const auto leftX = truncatedSrcFrameIndex * DEFAULT_CHANNELS;
 		const auto rightX = leftX + 1;
 
-		dst[leftX] = interpolate(src, numSrcSamples, leftX, fractionalOffset, m_prevSamples.data());
-		dst[rightX] = interpolate(src, numSrcSamples, rightX, fractionalOffset, m_prevSamples.data());
+		const auto dstLeftIndex = dstFrameIndex * DEFAULT_CHANNELS;
+		const auto dstRightIndex = dstLeftIndex + 1;
+
+		dst[dstLeftIndex] = interpolate(src, numSrcSamples, leftX, fractionalOffset, m_prevSamples.data());
+		dst[dstRightIndex] = interpolate(src, numSrcSamples, rightX, fractionalOffset, m_prevSamples.data());
 	}
 
-	m_prevSamples[0] = dst[numDstFrames * DEFAULT_CHANNELS - 2];
-	m_prevSamples[1] = dst[numDstFrames * DEFAULT_CHANNELS - 1];
+	const auto endFrame = numDstFrames * DEFAULT_CHANNELS;
+	m_prevSamples[0] = dst[endFrame - 2];
+	m_prevSamples[1] = dst[endFrame - 1];
 }
 
 float AudioResampler::interpolate(const float* src, size_t size, int index, float fractionalOffset, float* prev)
