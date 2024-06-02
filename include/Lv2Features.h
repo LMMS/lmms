@@ -33,7 +33,7 @@
 #include <string_view>
 #include <vector>
 #include "Lv2Manager.h"
-#include <lv2/lv2plug.in/ns/ext/data-access/data-access.h>
+#include <lv2/data-access/data-access.h>
 
 
 namespace lmms

@@ -33,8 +33,8 @@
 #include <lv2/options/options.h>
 #include <lv2/worker/worker.h>
 
-#include <lv2/lv2plug.in/ns/ext/patch/patch.h>
-#include <lv2/lv2plug.in/ns/ext/time/time.h>
+#include <lv2/patch/patch.h>
+#include <lv2/time/time.h>
 #define NS_XSD "http://www.w3.org/2001/XMLSchema#"
 
 #include <QDebug>
