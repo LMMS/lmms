@@ -101,11 +101,6 @@
 			"default-features": false
 		},
 		{
-			"name": "xcb-keysyms",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
 			"name": "xcb-util",
 			"default-features": false,
 			"platform": "linux"
