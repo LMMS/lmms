@@ -26,6 +26,8 @@ jobs:
           submodules: recursive
       - name: Install Wine
         run: |
+          cat /etc/apt/sources.list
+          ls /etc/apt/sources.list.d
           sudo apt-get install ppa-purge && sudo ppa-purge -y ppa:ubuntu-toolchain-r/test
           sudo dpkg --add-architecture i386
           sudo mkdir -pm755 /etc/apt/keyrings
