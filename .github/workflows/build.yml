@@ -32,7 +32,9 @@ jobs:
           . /etc/os-release
           sudo wget -NP /etc/apt/sources.list.d/ "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
           sudo apt-get update
-          sudo apt-get install --install-recommends --yes wine-staging-dev winehq-staging
+          grep -R '^deb' /etc/apt/sources.list{,.d/*.list}
+          sudo apt-get install --yes aptitude
+          sudo aptitude install --verbose --with-recommends wine-staging-dev winehq-staging
       - name: Install APT dependencies
         run: xargs -a .github/workflows/deps-linux.txt sudo apt-get install --yes
       - name: Cache vcpkg dependencies
