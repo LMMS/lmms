@@ -38,10 +38,11 @@ jobs:
           sudo apt-get install --yes ppa-purge
           sudo ppa-purge -y ppa:ondrej/php
           # Install Wine
-          sudo apt-get install --yes aptitude
-          sudo aptitude install --verbose --with-recommends wine-staging-dev winehq-staging
+          #sudo apt-get install --yes aptitude
+          #sudo aptitude install --verbose --with-recommends wine-staging-dev winehq-staging
+          sudo apt-get install --install-recommends --yes wine-staging-dev winehq-staging
       - name: Install APT dependencies
-        run: xargs -a .github/workflows/deps-linux.txt sudo apt-get install --yes
+        run: xargs -a .github/workflows/deps-linux.txt sudo apt-get install --no-install-recommends --yes
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
