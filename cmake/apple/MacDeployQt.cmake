@@ -23,37 +23,15 @@ if(CPACK_DEBUG)
 	set(COMMAND_ECHO STDOUT)
 endif()
 
-# Qt6: Fix @rpath bug https://github.com/orgs/Homebrew/discussions/2823
-include(CreateSymlink)
-get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
-get_filename_component(QTDIR "${QTBIN}" DIRECTORY)
-create_symlink("${QTDIR}/lib" "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/lib")
-
-# Copy missing files
-file(COPY "${CPACK_CURRENT_SOURCE_DIR}/project.icns" DESTINATION "${APP}/Contents/Resources")
-
-# Updates appdmg.json with CPACK_TEMPORARY_INSTALL_DIRECTORY
-# - .DS_Store can be recreated using appdmg appdmg.json lmms.dmg
-# - Find new .DS_Store from the root of the DMG file
-# - cp /Volumes/lmms-x.x.x/.DS_Store ../cmake/apple/DS_Store
-configure_file("${CPACK_CURRENT_BINARY_DIR}/_appdmg.json.in" "${CPACK_CURRENT_BINARY_DIR}/appdmg.json")
-file(REMOVE "${CPACK_CURRENT_BINARY_DIR}/_appdmg.json.in")
-
 # Create bundle structure
 file(MAKE_DIRECTORY "${APP}/Contents/MacOS")
 file(MAKE_DIRECTORY "${APP}/Contents/Frameworks")
 file(MAKE_DIRECTORY "${APP}/Contents/Resources")
 
-# Make all libraries writable for macdeployqt
-file(CHMOD_RECURSE "${APP}/Contents" PERMISSIONS
-	OWNER_EXECUTE OWNER_WRITE OWNER_READ
-	GROUP_EXECUTE GROUP_WRITE GROUP_READ
-	WORLD_READ)
-
 # Fix layout
-file(RENAME "${APP}/Contents/Resources/lib" "${APP}/Contents/lib")
-file(RENAME "${APP}/Contents/Resources/share" "${APP}/Contents/share")
-file(RENAME "${APP}/Contents/Resources/bin" "${APP}/Contents/bin")
+file(RENAME "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/lib" "${APP}/Contents/lib")
+file(RENAME "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/share" "${APP}/Contents/share")
+file(RENAME "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/bin" "${APP}/Contents/bin")
 
 # Move binaries into Contents/MacOS
 file(RENAME "${APP}/Contents/bin/${lmms}" "${APP}/Contents/MacOS/${lmms}")
@@ -61,6 +39,31 @@ file(RENAME "${APP}/Contents/lib/${lmms}/RemoteZynAddSubFx" "${APP}/Contents/Mac
 file(REMOVE_RECURSE "${APP}/Contents/bin")
 file(REMOVE_RECURSE "${APP}/Contents/share/man1")
 file(REMOVE_RECURSE "${APP}/Contents/include")
+
+# Copy missing files
+# Convert https://lmms.io to io.lmms
+string(REPLACE "." ";" mime_parts "${CPACK_PROJECT_URL}")
+string(REPLACE ":" ";" mime_parts "${mime_parts}")
+string(REPLACE "/" "" mime_parts "${mime_parts}")
+list(REMOVE_AT mime_parts 0)
+list(REVERSE mime_parts)
+list(JOIN mime_parts "." MACOS_MIMETYPE_ID)
+configure_file("${CPACK_CURRENT_SOURCE_DIR}/lmms.plist.in" "${APP}/Contents/Info.plist" @ONLY)
+file(COPY "${CPACK_CURRENT_SOURCE_DIR}/project.icns" DESTINATION "${APP}/Contents/Resources")
+file(COPY "${CPACK_CURRENT_SOURCE_DIR}/icon.icns" DESTINATION "${APP}/Contents/Resources")
+file(RENAME "${APP}/Contents/Resources/icon.icns" "${APP}/Contents/Resources/${lmms}.icns")
+
+# Make all libraries writable for macdeployqt
+file(CHMOD_RECURSE "${APP}/Contents" PERMISSIONS
+	OWNER_EXECUTE OWNER_WRITE OWNER_READ
+	GROUP_EXECUTE GROUP_WRITE GROUP_READ
+	WORLD_READ)
+
+# Qt6: Fix @rpath bug https://github.com/orgs/Homebrew/discussions/2823
+include(CreateSymlink)
+get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
+get_filename_component(QTDIR "${QTBIN}" DIRECTORY)
+create_symlink("${QTDIR}/lib" "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/lib")
 
 # Replace @rpath with @loader_path for Carla
 execute_process(COMMAND install_name_tool -change
@@ -122,3 +125,17 @@ endforeach()
 execute_process(COMMAND codesign --force --deep --sign - "${APP}"
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
+
+# Create DMG
+# appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
+find_program(APPDMG_BIN appdmg REQUIRED)
+string(SUBSTRING "${CPACK_PROJECT_NAME_UCASE} ${CPACK_PROJECT_VERSION}" 0 27 APPDMG_VOLUME_NAME)
+# We'll configure this file twice (again in MacDeployQt.cmake once we know CPACK_TEMPORARY_INSTALL_DIRECTORY)
+configure_file("${CPACK_CURRENT_SOURCE_DIR}/appdmg.json.in" "${CPACK_CURRENT_BINARY_DIR}/appdmg.json" @ONLY)
+
+file(REMOVE "${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg")
+execute_process(COMMAND "${APPDMG_BIN}"
+	"${CPACK_CURRENT_BINARY_DIR}/appdmg.json"
+	"${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg"
+	COMMAND_ECHO ${COMMAND_ECHO}
+    COMMAND_ERROR_IS_FATAL ANY)

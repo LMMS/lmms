@@ -20,6 +20,7 @@ set(CPACK_GENERATOR "External" PARENT_SCOPE)
 set(CPACK_EXTERNAL_ENABLE_STAGING true PARENT_SCOPE)
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION}-linux-${CMAKE_SYSTEM_PROCESSOR}")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}" PARENT_SCOPE)
+set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeploy.cmake" PARENT_SCOPE)
 
 # Custom vars to expose to Cpack
 # must be prefixed with "CPACK_" per https://stackoverflow.com/a/46526757/3196753)
@@ -48,8 +49,6 @@ elseif(IS_ARM32)
 else()
 	set(CPACK_TARGET_ARCH unknown PARENT_SCOPE)
 endif()
-
-set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/LinuxDeploy.cmake" PARENT_SCOPE)
 
 if(CMAKE_VERSION VERSION_LESS "3.19")
 	message(WARNING "AppImage creation requires at least CMake 3.19")

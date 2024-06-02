@@ -111,6 +111,8 @@ jobs:
       - name: Install dependencies
         run: |
           brew bundle install --verbose
+          npm update -g npm
+          npm install --location=global appdmg
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_UPGRADE: 1

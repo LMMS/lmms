@@ -7,13 +7,13 @@
     <string>English</string>
 
     <key>CFBundleIconFile</key>
-    <string>@MACOS_ICON@</string>
+    <string>@CPACK_PROJECT_NAME@</string>
 
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 
     <key>CFBundleGetInfoString</key>
-    <string>@PROJECT_NAME_UCASE@ @VERSION@</string>
+    <string>@CPACK_PROJECT_NAME_UCASE@ @CPACK_PROJECT_VERSION@</string>
 
 <!--
     #############################################################
@@ -29,19 +29,19 @@
     #############################################################
 -->
     <key>CFBundleSignature</key>
-    <string>@PROJECT_NAME_UCASE@</string>
+    <string>@CPACK_PROJECT_NAME_UCASE@</string>
 
     <key>CFBundleExecutable</key>
-    <string>@PROJECT_NAME_UCASE@</string>
+    <string>@CPACK_PROJECT_NAME@</string>
 
     <key>CFBundleVersion</key>
-    <string>@VERSION@</string>
+    <string>@CPACK_PROJECT_VERSION@</string>
 
     <key>CFBundleShortVersionString</key>
-    <string>@VERSION@</string>
+    <string>@VERSIONCPACK_PROJECT_VERSION@</string>
 
     <key>CFBundleName</key>
-    <string>@PROJECT_NAME_UCASE@</string>
+    <string>@CPACK_PROJECT_NAME_UCASE@</string>
 
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
@@ -58,9 +58,9 @@
             <string>mmpz</string>
           </array>
         <key>CFBundleTypeIconFile</key>
-        <string>@MACOS_MIMETYPE_ICON@</string>
+        <string>project</string>
         <key>CFBundleTypeName</key>
-        <string>@PROJECT_NAME_UCASE@ Project</string>
+        <string>@CPACK_PROJECT_NAME_UCASE@ Project</string>
         <key>CFBundleTypeOSTypes</key>
            <array>
              <string>mmpz</string>
@@ -69,7 +69,7 @@
         <string>Editor</string>
         <key>CFBundleTypeMIMETypes</key>
         <array>
-           <string>@MACOS_MIMETYPE@</string>
+           <string>application/x-@CPACK_PROJECT_NAME@-project</string>
         </array>
       </dict>
 
@@ -79,9 +79,9 @@
             <string>mmp</string>
           </array>
         <key>CFBundleTypeIconFile</key>
-        <string>@MACOS_MIMETYPE_ICON@</string>
+        <string>project</string>
         <key>CFBundleTypeName</key>
-        <string>@PROJECT_NAME_UCASE@ Project (uncompressed)</string>
+        <string>@CPACK_PROJECT_NAME_UCASE@ Project (uncompressed)</string>
         <key>CFBundleTypeOSTypes</key>
            <array>
              <string>mmp</string>
@@ -90,7 +90,7 @@
         <string>Editor</string>
         <key>CFBundleTypeMIMETypes</key>
         <array>
-           <string>@MACOS_MIMETYPE@</string>
+           <string>application/x-@CPACK_PROJECT_NAME@-project</string>
         </array>
       </dict>
 
@@ -102,11 +102,11 @@
                 <key>UTTypeIdentifier</key>
                 <string>@MACOS_MIMETYPE_ID@.mmpz</string>
                 <key>UTTypeReferenceURL</key>
-                <string>@PROJECT_URL@</string>
+                <string>@CPACK_PROJECT_URL@</string>
                 <key>UTTypeDescription</key>
-                <string>@PROJECT_NAME_UCASE@ Project</string>
+                <string>@CPACK_PROJECT_VERSIONPROJECT_NAME_UCASE@ Project</string>
                 <key>UTTypeIconFile</key>
-                <string>@MACOS_MIMETYPE_ICON@</string>
+                <string>project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -124,11 +124,11 @@
                 <key>UTTypeIdentifier</key>
                 <string>@MACOS_MIMETYPE_ID@.mmp</string>
                 <key>UTTypeReferenceURL</key>
-                <string>@PROJECT_URL@</string>
+                <string>@CPACK_PROJECT_URL@</string>
                 <key>UTTypeDescription</key>
-                <string>@PROJECT_NAME_UCASE@ Project (uncompressed)</string>
+                <string>@CPACK_PROJECT_NAME_UCASE@ Project (uncompressed)</string>
                 <key>UTTypeIconFile</key>
-                <string>@MACOS_MIMETYPE_ICON@</string>
+                <string>project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.xml</string>
