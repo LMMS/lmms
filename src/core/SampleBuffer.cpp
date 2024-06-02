@@ -135,11 +135,6 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	swap(first.m_source, second.m_source);
 }
 
-auto SampleBuffer::shared() const -> std::shared_ptr<const SampleBuffer>
-{
-	return shared_from_this();
-}
-
 auto SampleBuffer::toBase64() const -> QString
 {
 	// TODO: Replace with non-Qt equivalent

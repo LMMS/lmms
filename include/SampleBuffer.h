@@ -39,7 +39,6 @@
 
 namespace lmms {
 class LMMS_EXPORT SampleBuffer
-	: public std::enable_shared_from_this<SampleBuffer>
 {
 public:
 	using value_type = sampleFrame;
@@ -68,7 +67,7 @@ public:
 
 		/**
 		 * A unique string identifying the SampleBuffer's source.
-		 *   - For audio files, this is the absolute file path.
+		 *   - For audio files, this is the shortest relative path from PathUtil.
 		 *   - For base64, this is a string encoding the hash of the base64 data + the sample rate.
 		 *   - For anything else, this is empty.
 		*/
@@ -101,7 +100,7 @@ public:
 
 	private:
 		Type m_type = Type::Unknown;
-		QString m_identifier; // TODO: Store the relative path instead..
+		QString m_identifier;
 		std::size_t m_hash = 0;
 	};
 
@@ -136,8 +135,6 @@ public:
 	~SampleBuffer() = default;
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
-
-	auto shared() const -> std::shared_ptr<const SampleBuffer>;
 
 	auto toBase64() const -> QString;
 
