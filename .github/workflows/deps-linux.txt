@@ -4,7 +4,9 @@ ccache
 cmake
 file
 fluid
+g++
 g++-multilib
+gcc
 gcc-multilib
 git
 gpg
