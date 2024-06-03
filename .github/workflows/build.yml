@@ -32,6 +32,7 @@ jobs:
         run: |
           .github/workflows/setup-wine.sh
           .github/workflows/setup-cmake.sh
+          sudo add-apt-repository ppa:apt-fast/stable && sudo apt update
           echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-linux.txt)" >> "$GITHUB_ENV"
       - name: Install APT dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
