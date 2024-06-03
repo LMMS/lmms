@@ -130,6 +130,7 @@ private:
 	void upgrade_loopsRename();
 	void upgrade_noteTypes();
 	void upgrade_fixCMTDelays();
+	void findProblematicLadspaPlugins();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
