@@ -2,6 +2,7 @@ binutils
 ca-certificates
 ccache
 cmake
+curl
 file
 fluid
 g++
@@ -35,6 +36,9 @@ perl
 software-properties-common
 ssh-client
 stk
+tar
+unzip
 wget
 wine-staging-dev
 winehq-staging
+zip

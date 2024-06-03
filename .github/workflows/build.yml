@@ -29,11 +29,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Download and bootstrap vcpkg
-        run: |
-          git clone --branch 2024.05.24 https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.sh
-          echo "VCPKG_INSTALLATION_ROOT=${GITHUB_WORKSPACE}/vcpkg" >> "$GITHUB_ENV"
       - name: Prepare to install APT dependencies
         run: |
           echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-linux.txt)" >> "$GITHUB_ENV"
@@ -50,6 +45,11 @@ jobs:
         with:
           packages: ${{ env.APT_DEPENDENCIES }}
           version: 1.0
+      - name: Download and bootstrap vcpkg
+        run: |
+          git clone --branch 2024.05.24 https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_INSTALLATION_ROOT=${GITHUB_WORKSPACE}/vcpkg" >> "$GITHUB_ENV"
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
