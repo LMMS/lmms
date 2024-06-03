@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Configure git
         run: |
+          apt update && apt install sudo
           sudo apt-get install --yes git
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
