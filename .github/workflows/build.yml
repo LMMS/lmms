@@ -7,7 +7,8 @@ concurrency:
 jobs:
   linux:
     name: linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: ubuntu:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -18,27 +19,19 @@ jobs:
       MAKEFLAGS: -j2
     steps:
       - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        run: |
+          sudo apt-get install --yes git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Set up Wine
+      - name: Prepare to install APT dependencies
         run: |
-          sudo dpkg --add-architecture i386
-          # Add WineHQ repo
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          . /etc/os-release
-          sudo wget -NP /etc/apt/sources.list.d/ "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
-          sudo apt-get update
-          # Remove ppa:ondrej/php since it breaks i386 packages -- https://github.com/oerdnj/deb.sury.org/issues/1745
-          sudo add-apt-repository ppa:ondrej/php
-          sudo apt-get install --yes ppa-purge
-          sudo ppa-purge -y ppa:ondrej/php
-      - name: Set environment
-        run: echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-linux.txt)" >> "$GITHUB_ENV"
+          .github/workflows/setup-wine.sh
+          .github/workflows/setup-cmake.sh
+          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-linux.txt)" >> "$GITHUB_ENV"
       - name: Install APT dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:

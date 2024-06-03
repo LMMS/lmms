@@ -1,6 +1,7 @@
 binutils
 ca-certificates
 ccache
+cmake
 file
 fluid
 g++-multilib
@@ -13,7 +14,6 @@ libc6-dev-i386
 libgig-dev
 libgl1-mesa-dev
 liblist-moreutils-perl
-libsdl2-dev
 libsuil-dev
 libx11-dev
 libx11-xcb-dev

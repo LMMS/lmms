@@ -101,11 +101,6 @@
 			"default-features": false
 		},
 		{
-			"name": "xcb-util",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
 			"name": "zlib",
 			"default-features": false
 		}
