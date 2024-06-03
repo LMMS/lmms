@@ -17,6 +17,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
         run: |
@@ -37,7 +38,7 @@ jobs:
           sudo apt-get install -y software-properties-common
           sudo add-apt-repository -y ppa:apt-fast/stable
           sudo apt update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y apt-fast
+          sudo apt-get install -y apt-fast
       - name: Install APT dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
