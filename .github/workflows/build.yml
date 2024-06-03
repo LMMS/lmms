@@ -34,6 +34,7 @@ jobs:
           .github/workflows/setup-wine.sh
           .github/workflows/setup-cmake.sh
           # Manually install apt-fast to fix awalsh128/cache-apt-pkgs-action
+          sudo apt-get install -y software-properties-common
           sudo add-apt-repository -y ppa:apt-fast/stable
           sudo apt update
           DEBIAN_FRONTEND=noninteractive sudo apt-get install -y apt-fast
