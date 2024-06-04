@@ -47,14 +47,14 @@ public:
 		// keep it alphabetically (except "size" at the end)
 		atom_Float,
 		atom_Int,
-		bufsz_minBlockLength,
 		bufsz_maxBlockLength,
+		bufsz_minBlockLength,
 		bufsz_nominalBlockLength,
 		bufsz_sequenceSize,
 		midi_MidiEvent,
 		param_sampleRate,
-		ui_updateRate,
 		ui_scaleFactor,
+		ui_updateRate,
 		// exception to alphabetic ordering - keep at the end:
 		size
 	};
