@@ -26,6 +26,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <cassert>
 #include <lv2/atom/atom.h>
 #include <lv2/buf-size/buf-size.h>
 #include <lv2/midi/midi.h>
@@ -50,8 +51,13 @@ LV2_URID Lv2UridCache::operator[](Lv2UridCache::Id id) const
 	return m_cache[static_cast<std::size_t>(id)];
 }
 
+
+
+
 Lv2UridCache::Lv2UridCache(UridMap &mapper)
 {
+	checkIdNamesConsistency();
+
 	const LV2_URID noUridYet = std::numeric_limits<LV2_URID>::max();
 	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noUridYet);
 
@@ -81,6 +87,22 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 #endif
 
 	for(LV2_URID urid : m_cache) { Q_ASSERT(urid != noUridYet); }
+}
+
+
+
+
+void Lv2UridCache::checkIdNamesConsistency()
+{
+	// make sure sizes match
+	static_assert(sizeof(s_idNames)/sizeof(std::string_view) == static_cast<std::size_t>(Id::size));
+	// all array elements are (non-default-)initialized
+	assert(s_idNames[static_cast<std::size_t>(Id::size)][0]);
+	// alphabetical order
+	for(std::size_t i = 1; i < static_cast<std::size_t>(Id::size); ++i)
+	{
+		assert(s_idNames[i-1]<s_idNames[i]);
+	}
 }
 
 
