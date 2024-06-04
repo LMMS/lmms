@@ -17,7 +17,8 @@ ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
 	QTestSuite.cpp
-	$<TARGET_OBJECTS:lmmsobjs>
+	$<TARGET_OBJECTS:lmms_core>
+	$<TARGET_OBJECTS:lmms_gui>
 
 	src/core/AutomatableModelTest.cpp
 	src/core/ProjectVersionTest.cpp
@@ -26,7 +27,7 @@ ADD_EXECUTABLE(tests
 	src/tracks/AutomationTrackTest.cpp
 )
 TARGET_COMPILE_DEFINITIONS(tests
-	PRIVATE $<TARGET_PROPERTY:lmmsobjs,INTERFACE_COMPILE_DEFINITIONS>
+	PRIVATE $<TARGET_PROPERTY:lmms_core,INTERFACE_COMPILE_DEFINITIONS>
 )
 TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})

@@ -1,6 +1,4 @@
-set(LMMS_SRCS
-	${LMMS_SRCS}
-
+set(LMMS_CORE_SRCS
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
