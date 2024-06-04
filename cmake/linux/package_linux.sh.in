@@ -202,8 +202,8 @@ fi
 # => Copy them all
 if [ -d "/usr/lib/suil-0" ]
 then
-  mkdir -p "${APPDIR}usr/lib/x86_64-linux-gnu/suil-0/"
-  cp /usr/lib/suil-0/* "${APPDIR}usr/lib/x86_64-linux-gnu/suil-0/"
+  mkdir -p "${APPDIR}usr/lib/suil-0/"
+  cp /usr/lib/suil-0/* "${APPDIR}usr/lib/suil-0/"
 fi
 
 # Point the AppRun to the shim launcher
