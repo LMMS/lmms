@@ -22,7 +22,6 @@ libgig-dev
 libgl1-mesa-dev
 liblilv-dev
 liblist-moreutils-perl
-libqt5x11extras5-dev
 libsndio-dev
 libsuil-dev
 libtool
@@ -45,14 +44,10 @@ nasm
 perl
 python3-distutils
 python3-jinja2
-qt5-qmake
-qtbase5-dev
-qtbase5-dev-tools
-qtbase5-private-dev
-qttools5-dev-tools
 software-properties-common
 ssh-client
 stk
+sudo
 tar
 unzip
 wget

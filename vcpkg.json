@@ -70,7 +70,8 @@
 		},
 		{
 			"name": "pulseaudio",
-			"default-features": false
+			"default-features": false,
+			"platform": "linux"
 		},
 		{
 			"name": "sdl2",

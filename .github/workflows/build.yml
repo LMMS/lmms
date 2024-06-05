@@ -45,6 +45,13 @@ jobs:
         with:
           packages: ${{ env.APT_DEPENDENCIES }}
           version: 1.0
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '5.15.2'
+          arch: 'gcc_64'
+          archives: qtbase qtsvg qttools qtx11extras
+          cache: true
       - name: Download and bootstrap vcpkg
         run: |
           git clone --branch 2024.05.24 https://github.com/microsoft/vcpkg.git
