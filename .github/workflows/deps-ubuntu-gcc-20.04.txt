@@ -21,6 +21,7 @@ libc6-dev-i386
 libgig-dev
 libgl1-mesa-dev
 liblist-moreutils-perl
+libsndio-dev
 libsuil-dev
 libtool
 libx11-dev
