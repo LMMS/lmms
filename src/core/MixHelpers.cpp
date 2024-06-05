@@ -194,8 +194,8 @@ void addMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeff
 {
 	for (int f = 0; f < frames; ++f)
 	{
-		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf[std::clamp(f, 0, bufferSize)];
-		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf[std::clamp(f, 0, bufferSize)];
+		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf[std::clamp(static_cast<size_t>(f), 0, bufferSize)];
+		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf[std::clamp(static_cast<size_t>(f), 0, bufferSize)];
 	}
 }
 
@@ -205,8 +205,12 @@ void addMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
 {
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += src[f][0] * coeffSrcBuf1[std::clamp(f, 0, buffSize1)] * coeffSrcBuf2[std::clamp(f, 0, buffSize2)];
-		dst[f][1] += src[f][1] * coeffSrcBuf1[std::clamp(f, 0, buffSize1)] * coeffSrcBuf2[std::clamp(f, 0, buffSize2)];
+		dst[f][0] += src[f][0] 
+			* coeffSrcBuf1[std::clamp(static_cast<size_t>(f), 0, buffSize1)] 
+			* coeffSrcBuf2[std::clamp(static_cast<size_t>(f), 0, buffSize2)];
+		dst[f][1] += src[f][1] 
+			* coeffSrcBuf1[std::clamp(static_cast<size_t>(f), 0, buffSize1)] 
+			* coeffSrcBuf2[std::clamp(static_cast<size_t>(f), 0, buffSize2)];
 	}
 
 }
@@ -223,9 +227,11 @@ void addSanitizedMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, fl
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += ( std::isinf(src[f][0]) || std::isnan(src[f][0])) 
-					? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf[std::clamp(f, 0, bufferSize)];
+					? 0.0f : src[f][0] * coeffSrc 
+			* coeffSrcBuf[std::clamp(static_cast<size_t>(f), 0, bufferSize)];
 		dst[f][1] += (std::isinf(src[f][1]) || std::isnan(src[f][1])) 
-					? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf[std::clamp(f, 0, bufferSize)];
+					? 0.0f : src[f][1] * coeffSrc 
+			* coeffSrcBuf[std::clamp(static_cast<size_t>(f), 0, bufferSize)];
 	}
 }
 
@@ -243,10 +249,10 @@ void addSanitizedMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
 	{
 		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) )
 			? 0.0f
-			: src[f][0] * coeffSrcBuf1[std::clamp(f, 0, buffSize1)] * coeffSrcBuf2[std::clamp(f, 0, buffSize2)];
+			: src[f][0] * coeffSrcBuf1[std::clamp(static_cast<size_t>(f), 0, buffSize1)] * coeffSrcBuf2[std::clamp(static_cast<size_t>(f), 0, buffSize2)];
 		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) )
 			? 0.0f
-			: src[f][1] * coeffSrcBuf1[std::clamp(f, 0, buffSize1)] * coeffSrcBuf2[std::clamp(f, 0, buffSize2)];
+			: src[f][1] * coeffSrcBuf1[std::clamp(static_cast<size_t>(f), 0, buffSize1)] * coeffSrcBuf2[std::clamp(static_cast<size_t>(f), 0, buffSize2)];
 	}
 
 }
