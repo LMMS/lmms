@@ -10,6 +10,7 @@ else
    echo "Carla does not appear to be installed.  That's OK, please ignore any related library errors." >&2
 fi
 export LD_LIBRARY_PATH=$DIR/usr/lib/:$DIR/usr/lib/lmms:$LD_LIBRARY_PATH
+export SUIL_MODULE_DIR="$DIR/usr/lib/suil-0"
 # Prevent segfault on VirualBox
 if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering." >&2

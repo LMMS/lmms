@@ -158,11 +158,11 @@ if [ -f "@SUIL_LINK_LIBRARIES@" ]; then
 	# SUIL_LIBRARIES: @SUIL_LIBRARIES@
 	SUIL_MODULES="$(dirname "@SUIL_LINK_LIBRARIES@")/@SUIL_LIBRARIES@"
 	if [ -d "$SUIL_MODULES" ]; then
-		mkdir -p "${APPDIR}usr/lib/"
+		mkdir -p "${APPDIR}usr/lib/suil-0"
 		for file in "$SUIL_MODULES/"*.so; do
 			# Copy to a predictable location
-			cp "$file" "${APPDIR}usr/lib/"
-			_executables="${_executables} -executable=${APPDIR}usr/lib/$(basename "$file")"
+			cp "$file" "${APPDIR}usr/lib/suil-0"
+			_executables="${_executables} -executable=${APPDIR}usr/lib/suil-0/$(basename "$file")"
 		done
 	fi
 fi
