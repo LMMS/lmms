@@ -189,47 +189,51 @@ void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeff
 }
 
 
-void addMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, std::vector<float> * coeffSrcBuf, int frames )
+void addMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeffSrc, 
+							float* coeffSrcBuf, int frames)
 {
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf->data()[f];
-		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf->data()[f];
+		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf[f];
+		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf[f];
 	}
 }
 
-void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, std::vector<float> * coeffSrcBuf1, std::vector<float> * coeffSrcBuf2, int frames )
+void addMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
+							float* coeffSrcBuf1, float* coeffSrcBuf2, int frames)
 {
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += src[f][0] * coeffSrcBuf1->data()[f] * coeffSrcBuf2->data()[f];
-		dst[f][1] += src[f][1] * coeffSrcBuf1->data()[f] * coeffSrcBuf2->data()[f];
+		dst[f][0] += src[f][0] * coeffSrcBuf1[f] * coeffSrcBuf2[f];
+		dst[f][1] += src[f][1] * coeffSrcBuf1[f] * coeffSrcBuf2-[f];
 	}
 
 }
 
-void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, std::vector<float> * coeffSrcBuf, int frames )
+void addSanitizedMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeffSrc,
+									float* coeffSrcBuf, int frames)
 {
 	if ( !useNaNHandler() )
 	{
-		addMultipliedByBuffer( dst, src, coeffSrc, coeffSrcBuf,
-								frames );
+		addMultipliedByBuffer(dst, src, coeffSrc, coeffSrcBuf, frames);
 		return;
 	}
 
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->data()[f];
-		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) ) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->data()[f];
+		dst[f][0] += ( std::isinf(src[f][0]) || std::isnan(src[f][0])) 
+					? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf[f];
+		dst[f][1] += (std::isinf(src[f][1]) || std::isnan(src[f][1])) 
+					? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf[f];
 	}
 }
 
-void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, std::vector<float> * coeffSrcBuf1, std::vector<float> * coeffSrcBuf2, int frames )
+void addSanitizedMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
+									float* coeffSrcBuf1, float* coeffSrcBuf2, int frames)
 {
 	if ( !useNaNHandler() )
 	{
-		addMultipliedByBuffers( dst, src, coeffSrcBuf1, coeffSrcBuf2,
-								frames );
+		addMultipliedByBuffers(dst, src, coeffSrcBuf1, coeffSrcBuf2, frames);
 		return;
 	}
 
@@ -237,10 +241,10 @@ void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, 
 	{
 		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) )
 			? 0.0f
-			: src[f][0] * coeffSrcBuf1->data()[f] * coeffSrcBuf2->data()[f];
+			: src[f][0] * coeffSrcBuf1[f] * coeffSrcBuf2[f];
 		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) )
 			? 0.0f
-			: src[f][1] * coeffSrcBuf1->data()[f] * coeffSrcBuf2->data()[f];
+			: src[f][1] * coeffSrcBuf1[f] * coeffSrcBuf2[f];
 	}
 
 }
