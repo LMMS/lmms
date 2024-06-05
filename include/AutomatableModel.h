@@ -173,7 +173,7 @@ public:
 
 	//! @brief Function that returns sample-exact data as a ValueBuffer
 	//! @return pointer to model's valueBuffer when s.ex.data exists, NULL otherwise
-	std::vector<float> * valueBuffer();
+	std::vector<float>* valueBuffer();
 
 	template<class T>
 	T initValue() const

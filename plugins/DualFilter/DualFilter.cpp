@@ -123,13 +123,13 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	int gain2Inc = gain2Buffer ? 1 : 0;
 	int mixInc = mixBuffer ? 1 : 0;
 
-	float *cut1Ptr = cut1Buffer ? &( cut1Buffer->data()[ 0 ] ) : &cut1;
-	float *res1Ptr = res1Buffer ? &( res1Buffer->data()[ 0 ] ) : &res1;
-	float *gain1Ptr = gain1Buffer ? &( gain1Buffer->data()[ 0 ] ) : &gain1;
-	float *cut2Ptr = cut2Buffer ? &( cut2Buffer->data()[ 0 ] ) : &cut2;
-	float *res2Ptr = res2Buffer ? &( res2Buffer->data()[ 0 ] ) : &res2;
-	float *gain2Ptr = gain2Buffer ? &( gain2Buffer->data()[ 0 ] ) : &gain2;
-	float *mixPtr = mixBuffer ? &( mixBuffer->data()[ 0 ] ) : &mix;
+	float* cut1Ptr = cut1Buffer ? &(cut1Buffer->data()[0]) : &cut1;
+	float* res1Ptr = res1Buffer ? &(res1Buffer->data()[0]) : &res1;
+	float* gain1Ptr = gain1Buffer ? &(gain1Buffer->data()[0]) : &gain1;
+	float* cut2Ptr = cut2Buffer ? &(cut2Buffer->data()[0]) : &cut2;
+	float* res2Ptr = res2Buffer ? &(res2Buffer->data()[0]) : &res2;
+	float* gain2Ptr = gain2Buffer ? &(gain2Buffer->data()[0]) : &gain2;
+	float* mixPtr = mixBuffer ? &(mixBuffer->data()[0]) : &mix;
 
 	const bool enabled1 = m_dfControls.m_enabled1Model.value();
 	const bool enabled2 = m_dfControls.m_enabled2Model.value();

@@ -72,7 +72,7 @@ public:
 		return m_controller->currentValue( _offset );
 	}
 	
-	std::vector<float> * valueBuffer()
+	std::vector<float>* valueBuffer()
 	{
 		return m_controller->valueBuffer();
 	}

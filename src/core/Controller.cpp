@@ -117,11 +117,11 @@ float Controller::value( int offset )
 	{
 		updateValueBuffer();
 	}
-	return m_valueBuffer.data()[ offset ];
+	return m_valueBuffer.data()[offset];
 }
 	
 
-std::vector<float> * Controller::valueBuffer()
+std::vector<float>* Controller::valueBuffer()
 {
 	if( m_bufferLastUpdated != s_periods )
 	{

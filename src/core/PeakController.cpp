@@ -92,7 +92,7 @@ void PeakController::updateValueBuffer()
 		if( m_currentSample != targetSample )
 		{
 			const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
-			float * values = m_valueBuffer.data();
+			float* values = m_valueBuffer.data();
 
 			for( f_cnt_t f = 0; f < frames; ++f )
 			{

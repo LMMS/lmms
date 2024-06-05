@@ -54,7 +54,7 @@ public:
 	~LadspaControl() override = default;
 
 	LADSPA_Data value();
-	std::vector<float> * valueBuffer();
+	std::vector<float>* valueBuffer();
 	void setValue( LADSPA_Data _value );
 	void setLink( bool _state );
 

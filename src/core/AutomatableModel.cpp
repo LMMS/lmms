@@ -601,7 +601,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 }
 
 
-std::vector<float> * AutomatableModel::valueBuffer()
+std::vector<float>* AutomatableModel::valueBuffer()
 {
 	QMutexLocker m( &m_valueBufferMutex );
 	// if we've already calculated the valuebuffer this period, return the cached buffer
@@ -613,25 +613,24 @@ std::vector<float> * AutomatableModel::valueBuffer()
 	}
 
 	float val = m_value; // make sure our m_value doesn't change midway
-  
-	std::vector<float> * vb;
+	std::vector<float>* vb;
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
 		auto vb = m_controllerConnection->valueBuffer();
 		if( vb )
 		{
-			float * values = vb->data();
-			float * nvalues = m_valueBuffer.data();
+			float* values = vb->data();
+			float* nvalues = m_valueBuffer.data();
 			switch( m_scaleType )
 			{
 			case ScaleType::Linear:
-				for( int i = 0; i < m_valueBuffer.size(); i++ )
+				for(int i = 0; i < m_valueBuffer.size(); i++)
 				{
 					nvalues[i] = minValue<float>() + ( range() * values[i] );
 				}
 				break;
 			case ScaleType::Logarithmic:
-				for( int i = 0; i < m_valueBuffer.size(); i++ )
+				for(int i = 0; i < m_valueBuffer.size(); i++)
 				{
 					nvalues[i] = logToLinearScale( values[i] );
 				}
@@ -658,8 +657,8 @@ std::vector<float> * AutomatableModel::valueBuffer()
 				lm->controllerConnection()->getController()->isSampleExact())
 		{
 			vb = lm->valueBuffer();
-			float * values = vb->data();
-			float * nvalues = m_valueBuffer.data();
+			float* values = vb->data();
+			float* nvalues = m_valueBuffer.data();
 			for (int i = 0; i < vb->size(); i++)
 			{
 				nvalues[i] = fittedValue(values[i]);

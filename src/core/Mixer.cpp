@@ -130,8 +130,8 @@ void MixerChannel::doProcessing()
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
 				// figure out if we're getting sample-exact input
-				auto * sendBuf = sendModel->valueBuffer();
-				auto * volBuf = sender->m_volumeModel.valueBuffer();
+				auto* sendBuf = sendModel->valueBuffer();
+				auto* volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
 				sampleFrame * ch_buf = sender->m_buffer;
@@ -665,7 +665,7 @@ void Mixer::masterMix( sampleFrame * _buf )
 	}
 
 	// handle sample-exact data in master volume fader
-	auto * volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
+	auto* volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
 
 	if( volBuf )
 	{

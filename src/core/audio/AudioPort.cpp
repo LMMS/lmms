@@ -138,8 +138,8 @@ void AudioPort::doProcessing()
 		// has both vol and pan models
 		if( m_volumeModel && m_panningModel )
 		{
-			auto * volBuf = m_volumeModel->valueBuffer();
-			auto * panBuf = m_panningModel->valueBuffer();
+			auto* volBuf = m_volumeModel->valueBuffer();
+			auto* panBuf = m_panningModel->valueBuffer();
 
 			// both vol and pan have s.ex.data:
 			if( volBuf && panBuf )
@@ -195,7 +195,7 @@ void AudioPort::doProcessing()
 		// has vol model only
 		else if( m_volumeModel )
 		{
-			auto * volBuf = m_volumeModel->valueBuffer();
+			auto* volBuf = m_volumeModel->valueBuffer();
 
 			if( volBuf )
 			{

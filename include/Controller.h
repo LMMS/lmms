@@ -69,7 +69,7 @@ public:
 
 	virtual float currentValue( int _offset );
 	// The per-controller get-value-in-buffers function
-	virtual std::vector<float> * valueBuffer();
+	virtual std::vector<float>* valueBuffer();
 
 	inline bool isSampleExact() const
 	{

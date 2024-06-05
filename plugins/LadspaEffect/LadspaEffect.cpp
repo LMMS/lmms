@@ -172,10 +172,10 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					break;
 				case BufferRate::AudioRateInput:
 				{
-					auto * vb = pp->control->valueBuffer();
+					auto* vb = pp->control->valueBuffer();
 					if( vb )
 					{
-						memcpy( pp->buffer, vb->data(), frames * sizeof(float) );
+						memcpy(pp->buffer, vb->data(), frames * sizeof(float));
 					}
 					else
 					{
