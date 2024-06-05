@@ -46,6 +46,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <QtGlobal>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -102,6 +103,16 @@ GuiApplication::GuiApplication()
 
 #ifdef LMMS_BUILD_APPLE
 	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, true);
+#endif
+
+#ifdef LMMS_HAVE_SUIL
+#ifdef LMMS_BUILD_APPLE
+	// Ensure running from bundle
+	if(qApp->applicationDirPath().endsWith("/Contents/MacOS")) {
+		// Inform Suil to load modules from a bundled application
+		qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../Frameworks/suil-0/").toUtf8());
+	}
+#endif
 #endif
 
 	// Show splash screen
