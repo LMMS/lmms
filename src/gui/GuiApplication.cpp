@@ -113,7 +113,7 @@ GuiApplication::GuiApplication()
 		qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../Frameworks/suil-0/").toUtf8());
 	}
 #endif
-#endif
+#endif // LMMS_HAVE_SUIL
 
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
