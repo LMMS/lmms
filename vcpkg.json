@@ -73,26 +73,6 @@
 			"default-features": false
 		},
 		{
-			"name": "qt5-base",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
-			"name": "qt5-svg",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
-			"name": "qt5-tools",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
-			"name": "qt5-x11extras",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
 			"name": "sdl2",
 			"default-features": false
 		},
