@@ -31,7 +31,7 @@ jobs:
           submodules: recursive
       - name: Prepare to install APT dependencies
         run: |
-          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-linux.txt)" >> "$GITHUB_ENV"
+          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-ubuntu-gcc-20.04.txt)" >> "$GITHUB_ENV"
           .github/workflows/setup-wine.sh
           .github/workflows/setup-cmake.sh
           # Manually install apt-fast to fix awalsh128/cache-apt-pkgs-action
@@ -75,9 +75,12 @@ jobs:
                 --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
                 -DVCPKG_TARGET_TRIPLET="x64-linux" \
                 -DVCPKG_HOST_TRIPLET="x64-linux" \
-                -DVCPKG_MANIFEST_INSTALL="YES" \
+                -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
                 -DCMAKE_INSTALL_PREFIX=./build/install \
                 $CMAKE_OPTS
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Run tests
