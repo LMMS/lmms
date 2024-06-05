@@ -20,27 +20,9 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 
 	# Check if fuse is needed
 	if("${RESULT_VARIABLE}" MATCHES "\\.AppImage$" OR "${_name}" MATCHES "\\.AppImage$")
-		message("Checking if FUSE is available to the kernel...")
-		set(_${RESULT_VARIABLE}_NEEDS_FUSE true)
+		message(STATUS "AppImage detected, we'll extract the AppImage before using")
+		set(_${RESULT_VARIABLE}_IS_APPIMAGE true)
     endif()
-
-	# Check if fuse is available
-    if(_${RESULT_VARIABLE}_NEEDS_FUSE)
-    	# Ensure we only check on first call
-		if(NOT _FUSE_CHECKED)
-			execute_process(COMMAND fusermount -V
-				${_output_quiet}
-				COMMAND_ECHO ${_command_echo}
-				RESULT_VARIABLE _status_code)
-			set(_FUSED_CHECKED TRUE)
-			if(_status_code EQUAL 0)
-				set(_FUSE_FOUND true)
-				message("FUSE is available")
-			else()
-				message("FUSE is NOT available, we'll extract the AppImage before using")
-			endif()
-		endif()
-	endif()
 
 	# Determine a suitable working directory
 	if(CMAKE_CURRENT_BINARY_DIR)
@@ -117,10 +99,12 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 	endif()
 
 	# We need to create a subdirectory for this binary and symlink it's AppRun to where it's expected
-	if(_${RESULT_VARIABLE}_NEEDS_FUSE AND NOT _FUSE_FOUND)
+	if(_${RESULT_VARIABLE}_IS_APPIMAGE)
 		if(NOT COMMAND create_symlink)
 			include(CreateSymlink)
 		endif()
+
+		message(STATUS "Extracting ${_${RESULT_VARIABLE}} to ${_working_dir}/.${_name}/")
 
 		# extract appimage
 		execute_process(COMMAND "${_${RESULT_VARIABLE}}" --appimage-extract
@@ -138,6 +122,7 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 		file(REMOVE "${_${RESULT_VARIABLE}}")
 
 		# symlink the expected binary name to the AppRun file
+		message(STATUS "Creating a symbolic link ${_${RESULT_VARIABLE}} which points to ${_working_dir}/.${_name}/squashfs-root/AppRun")
 		create_symlink("${_working_dir}/.${_name}/squashfs-root/AppRun" "${_${RESULT_VARIABLE}}")
 	endif()
 
