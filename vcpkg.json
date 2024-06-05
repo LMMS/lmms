@@ -77,6 +77,10 @@
 			"default-features": false
 		},
 		{
+			"name": "pulseaudio",
+			"default-features": false
+		},
+		{
 			"name": "qt5-base",
 			"default-features": false,
 			"platform": "linux"

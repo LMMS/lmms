@@ -1,10 +1,12 @@
 autoconf
 binutils
+bison
 ca-certificates
 ccache
 cmake
 curl
 file
+flex
 fluid
 g++
 g++-multilib
@@ -35,6 +37,7 @@ libxml-perl
 libxml2-utils
 lsb-release
 make
+nasm
 perl
 python3-distutils
 python3-jinja2
