@@ -20,6 +20,7 @@ libc6-dev
 libc6-dev-i386
 libgig-dev
 libgl1-mesa-dev
+liblilv-dev
 liblist-moreutils-perl
 libsndio-dev
 libsuil-dev
@@ -37,6 +38,7 @@ libxtst-dev
 libxml-perl
 libxml2-utils
 lsb-release
+lv2-dev
 make
 nasm
 perl
