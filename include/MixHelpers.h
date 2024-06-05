@@ -61,7 +61,7 @@ void addMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeff
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
 void addMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src, 
-                            float* coeffSrcBuf1, float* coeffSrcBuf2, size_t buffSize1, size_t buffSize2
+                            float* coeffSrcBuf1, float* coeffSrcBuf2, size_t buffSize1, size_t buffSize2, 
                             int frames);
 
 /*! \brief Same as addMultiplied, but sanitize output (strip out infs/nans) */
