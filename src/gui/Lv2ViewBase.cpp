@@ -203,6 +203,8 @@ std::tuple<const LilvUI*, const LilvNode*> Lv2ViewProc::selectPluginUi(LilvUIs *
 	{
 		// Try to find an embeddable UI
 		AutoLilvNode hostUi = uri(hostUiTypeUri());
+		qDebug() << "Searching for plugin UI matching Host UI" << hostUiTypeUri() << "...";
+
 		LILV_FOREACH (uis, u, uis)
 		{
 			const LilvUI* pluginUi = lilv_uis_get(uis, u);
@@ -212,9 +214,13 @@ std::tuple<const LilvUI*, const LilvNode*> Lv2ViewProc::selectPluginUi(LilvUIs *
 			{
 				if (pluginUiType)
 				{
-					qDebug() << "Found supported UI" << lilv_node_as_uri(pluginUiType);
+					qDebug() << "Found supported plugin UI" << lilv_node_as_uri(pluginUiType);
 				}
 				return std::make_tuple(pluginUi, pluginUiType);
+			}
+			else
+			{
+				qDebug() << "Skipping plugin UI" << lilv_node_as_uri(lilv_ui_get_uri(pluginUi)) << "- not supported";
 			}
 		}
 	}
