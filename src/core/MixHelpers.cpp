@@ -200,8 +200,7 @@ void addMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeff
 }
 
 void addMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
-							float* coeffSrcBuf1, float* coeffSrcBuf2, size_t buffSize1, size_t buffSize2,
-							int frames)
+							float* coeffSrcBuf1, float* coeffSrcBuf2, int frames)
 {
 	for( int f = 0; f < frames; ++f )
 	{
@@ -212,11 +211,11 @@ void addMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
 }
 
 void addSanitizedMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeffSrc,
-									float* coeffSrcBuf, size_t bufferSize, int frames)
+									float* coeffSrcBuf, int frames)
 {
 	if ( !useNaNHandler() )
 	{
-		addMultipliedByBuffer(dst, src, coeffSrc, coeffSrcBuf, bufferSize, frames);
+		addMultipliedByBuffer(dst, src, coeffSrc, coeffSrcBuf, frames);
 		return;
 	}
 
@@ -230,12 +229,11 @@ void addSanitizedMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, fl
 }
 
 void addSanitizedMultipliedByBuffers(sampleFrame* dst, const sampleFrame* src,
-									float* coeffSrcBuf1, float* coeffSrcBuf2,size_t buffSize1, size_t buffSize2,
-									int frames)
+									float* coeffSrcBuf1, float* coeffSrcBuf2, int frames)
 {
 	if ( !useNaNHandler() )
 	{
-		addMultipliedByBuffers(dst, src, coeffSrcBuf1, coeffSrcBuf2, buffSize1, buffSize2, frames);
+		addMultipliedByBuffers(dst, src, coeffSrcBuf1, coeffSrcBuf2, frames);
 		return;
 	}
 

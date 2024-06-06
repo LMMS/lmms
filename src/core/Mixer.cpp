@@ -145,20 +145,19 @@ void MixerChannel::doProcessing()
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
 					MixHelpers::addSanitizedMultipliedByBuffers(m_buffer, ch_buf,
-									volBuf->data(), sendBuf->data(),
-									volBuf->size(), sendBuf->size(), fpp);
+									volBuf->data(), sendBuf->data(), fpp);
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
 					MixHelpers::addSanitizedMultipliedByBuffer(m_buffer, ch_buf, v,
-									volBuf->data(), volBuf->size(), fpp);
+									volBuf->data(), fpp);
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
 					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v,
-									sendBuf->data(), sendBuf->size(), fpp );
+									sendBuf->data(), fpp );
 				}
 				m_hasInput = true;
 			}
