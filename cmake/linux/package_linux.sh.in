@@ -162,7 +162,7 @@ if [ -f "@SUIL_LINK_LIBRARIES@" ]; then
 		for file in "$SUIL_MODULES/"*.so; do
 			# Copy to a predictable location
 			cp "$file" "${APPDIR}usr/lib/suil-0"
-			_executables="${_executables} -executable=${APPDIR}usr/lib/suil-0/$(basename "$file")"
+			executables="${executables} -executable=${APPDIR}usr/lib/suil-0/$(basename "$file")"
 		done
 	fi
 fi
