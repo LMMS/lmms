@@ -190,7 +190,7 @@ void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeff
 
 
 void addMultipliedByBuffer(sampleFrame* dst, const sampleFrame* src, float coeffSrc, 
-							float* coeffSrcBuf, size_t bufferSize, int frames)
+							float* coeffSrcBuf, int frames)
 {
 	for (int f = 0; f < frames; ++f)
 	{
