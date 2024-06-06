@@ -60,6 +60,13 @@ file(COPY "${CPACK_CURRENT_SOURCE_DIR}/project.icns" DESTINATION "${APP}/Content
 file(COPY "${CPACK_CURRENT_SOURCE_DIR}/icon.icns" DESTINATION "${APP}/Contents/Resources")
 file(RENAME "${APP}/Contents/Resources/icon.icns" "${APP}/Contents/Resources/${lmms}.icns")
 
+# Copy Suil modules
+if(CPACK_SUIL_MODULES)
+	set(SUIL_MODULES_TARGET "${APP}/Contents/Frameworks/${CPACK_SUIL_MODULES_PREFIX}")
+	file(MAKE_DIRECTORY "${SUIL_MODULES_TARGET}")
+	file(COPY ${CPACK_SUIL_MODULES} DESTINATION "${SUIL_MODULES_TARGET}")
+endif()
+
 # Make all libraries writable for macdeployqt
 file(CHMOD_RECURSE "${APP}/Contents" PERMISSIONS
 	OWNER_EXECUTE OWNER_WRITE OWNER_READ

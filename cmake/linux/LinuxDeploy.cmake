@@ -59,6 +59,13 @@ foreach(_file ${files})
 	endif()
 endforeach()
 
+# Copy Suil modules
+if(CPACK_SUIL_MODULES)
+	set(SUIL_MODULES_TARGET "${APP}/usr/lib/${CPACK_SUIL_MODULES_PREFIX}")
+	file(MAKE_DIRECTORY "${SUIL_MODULES_TARGET}")
+	file(COPY ${CPACK_SUIL_MODULES} DESTINATION "${SUIL_MODULES_TARGET}")
+endif()
+
 # Ensure project's "qmake" executable is first on the PATH
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
