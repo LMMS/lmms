@@ -106,13 +106,24 @@ GuiApplication::GuiApplication()
 #endif
 
 #ifdef LMMS_HAVE_SUIL
-#ifdef LMMS_BUILD_APPLE
-	// Ensure running from bundle
-	if(qApp->applicationDirPath().endsWith("/Contents/MacOS")) {
-		// Inform Suil to load modules from a bundled application
-		qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../Frameworks/suil-0/").toUtf8());
-	}
+	if(qgetenv("SUIL_MODULE_DIR").isEmpty()) {
+// Load Suil modules from a bundled application
+#if defined(LMMS_BUILD_WIN32)
+		if(qApp->applicationDirPath().contains("/Program Files/")) {
+			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../suil-0/").toUtf8());
+		}
+#elif defined(LMMS_BUILD_APPLE)
+		if(qApp->applicationDirPath().endsWith("/Contents/MacOS")) {
+			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../Frameworks/suil-0/").toUtf8());
+		}
+#else
+		if(qApp->applicationDirPath().contains("/squashfs_root/") ||
+				qApp->applicationDirPath().contains("/.mount_lmms-") ||
+				qApp->applicationDirPath().startsWith("/opt/lmms/")) {
+			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../lib/suil-0/").toUtf8());
+		}
 #endif
+	}
 #endif // LMMS_HAVE_SUIL
 
 	// Show splash screen
