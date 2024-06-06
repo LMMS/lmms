@@ -54,3 +54,4 @@ wget
 wine-staging-dev
 winehq-staging
 zip
+zstd
