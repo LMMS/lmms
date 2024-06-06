@@ -107,13 +107,13 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	float gain2 = m_dfControls.m_gain2Model.value();
 	float mix = m_dfControls.m_mixModel.value();
 
-	auto *cut1Buffer = m_dfControls.m_cut1Model.valueBuffer();
-	auto *res1Buffer = m_dfControls.m_res1Model.valueBuffer();
-	auto *gain1Buffer = m_dfControls.m_gain1Model.valueBuffer();
-	auto *cut2Buffer = m_dfControls.m_cut2Model.valueBuffer();
-	auto *res2Buffer = m_dfControls.m_res2Model.valueBuffer();
-	auto *gain2Buffer = m_dfControls.m_gain2Model.valueBuffer();
-	auto *mixBuffer = m_dfControls.m_mixModel.valueBuffer();
+	auto* cut1Buffer = m_dfControls.m_cut1Model.valueBuffer();
+	auto* res1Buffer = m_dfControls.m_res1Model.valueBuffer();
+	auto* gain1Buffer = m_dfControls.m_gain1Model.valueBuffer();
+	auto* cut2Buffer = m_dfControls.m_cut2Model.valueBuffer();
+	auto* res2Buffer = m_dfControls.m_res2Model.valueBuffer();
+	auto* gain2Buffer = m_dfControls.m_gain2Model.valueBuffer();
+	auto* mixBuffer = m_dfControls.m_mixModel.valueBuffer();
 
 	int cut1Inc = cut1Buffer ? 1 : 0;
 	int res1Inc = res1Buffer ? 1 : 0;
