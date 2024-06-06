@@ -144,6 +144,7 @@ list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS "${ZYN}")
 list(APPEND LIBS "${VST32}")
 list(APPEND LIBS "${VST64}")
+list(APPEND LIBS ${CPACK_SUIL_MODULES})
 list(SORT LIBS)
 
 # Construct linuxdeploy parameters

@@ -99,6 +99,7 @@ file(GLOB LIBS "${APP}/Contents/lib/${lmms}/*.so")
 file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
 list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS "${APP}/Contents/MacOS/RemoteZynAddSubFx")
+list(APPEND LIBS ${CPACK_SUIL_MODULES})
 list(SORT LIBS)
 
 # Construct macdeployqt parameters
