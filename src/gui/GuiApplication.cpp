@@ -117,7 +117,7 @@ GuiApplication::GuiApplication()
 			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../Frameworks/suil-0/").toUtf8());
 		}
 #else
-		if(qApp->applicationDirPath().contains("/squashfs_root/") ||
+		if(qApp->applicationDirPath().contains("/squashfs-root/") ||
 				qApp->applicationDirPath().contains("/.mount_lmms-") ||
 				qApp->applicationDirPath().startsWith("/opt/lmms/")) {
 			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../lib/suil-0/").toUtf8());
