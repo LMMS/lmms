@@ -253,7 +253,6 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 			vol_level = vol_level * vol_level;
 			buffer[frame][0] = vol_level * buffer[frame][0];
 			buffer[frame][1] = vol_level * buffer[frame][1];
-			avg = avg + std::abs(volBuffer[frame]);
 		}
 	}
 
