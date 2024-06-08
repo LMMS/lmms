@@ -87,5 +87,38 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
 }
 
+void SideBarWidget::addContentCheckBox(bool user_checkbox, bool factory, bool hidden)
+{
+	auto filterWidget = new QWidget(contentParent());
+	filterWidget->setFixedHeight(15);
+	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
+	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
+	filterWidgetLayout->setSpacing(0);
+
+	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
+	{
+		box->setCheckState(Qt::Checked);
+		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+		filterWidgetLayout->addWidget(box);
+	};
+
+	if (user_checkbox) {
+		m_showUserContent = new QCheckBox(tr("User content"));
+		configCheckBox(m_showUserContent);
+	}
+
+	if (factory) {
+		m_showFactoryContent = new QCheckBox(tr("Factory content"));
+		configCheckBox(m_showFactoryContent);
+	}
+
+	if (hidden) {
+		m_showHiddenContent = new QCheckBox(tr("Hidden content"));
+		configCheckBox(m_showHiddenContent);
+	}
+
+	addContentWidget(filterWidget);
+};
+
 
 } // namespace lmms::gui

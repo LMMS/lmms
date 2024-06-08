@@ -25,6 +25,7 @@
 #ifndef LMMS_GUI_SIDE_BAR_WIDGET_H
 #define LMMS_GUI_SIDE_BAR_WIDGET_H
 
+#include <QCheckBox>
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -71,6 +72,11 @@ protected:
 	{
 		m_layout->addWidget( _w );
 	}
+
+	void addContentCheckBox(bool user_checkbox = false, bool factory = false, bool hidden = true);
+	QCheckBox* m_showUserContent = nullptr;
+	QCheckBox* m_showFactoryContent = nullptr;
+	QCheckBox* m_showHiddenContent = nullptr;
 
 	void addContentLayout( QLayout * _l )
 	{
