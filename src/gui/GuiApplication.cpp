@@ -41,6 +41,7 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QDir>
 #include <QtGlobal>
 #include <QLabel>
@@ -106,7 +107,9 @@ GuiApplication::GuiApplication()
 #endif
 
 #ifdef LMMS_HAVE_SUIL
-	if(qgetenv("SUIL_MODULE_DIR").isEmpty()) {
+	if(qgetenv("SUIL_MODULE_DIR").isEmpty())
+	{
+		qDebug() << "ApplicationDirPath:" << qApp->applicationDirPath();
 // Load Suil modules from a bundled application
 #if defined(LMMS_BUILD_WIN32)
 		if(qApp->applicationDirPath().contains("/Program Files/")) {
@@ -124,6 +127,7 @@ GuiApplication::GuiApplication()
 		}
 #endif
 	}
+	else { qDebug() << "SUIL_MODULE_DIR already set to" << qgetenv("SUIL_MODULE_DIR"); }
 #endif // LMMS_HAVE_SUIL
 
 	// Show splash screen
