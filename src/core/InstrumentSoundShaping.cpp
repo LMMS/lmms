@@ -253,6 +253,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 			vol_level = vol_level * vol_level;
 			buffer[frame][0] = vol_level * buffer[frame][0];
 			buffer[frame][1] = vol_level * buffer[frame][1];
+			avg = avg + std::abs(volBuffer[frame]);
 		}
 	}
 
@@ -382,12 +383,6 @@ void InstrumentSoundShaping::calculateFillLevel(float* buffer, Target enumTarget
 		// get the parent note's parameters
 		f_cnt_t parentEnvelopeTotalFrames = n->getParentTotalFramesPlayed();
 		f_cnt_t parentEnvelopeReleaseBegin = parentEnvelopeTotalFrames - n->getParentReleaseFramesDone() + n->getParentFramesBeforeRelease();
-		// for some reason parentEnvelopeTotalFrames could be equal to parentEnvelopeReleaseBegin
-		// fixing this issue
-		if (parentEnvelopeTotalFrames == parentEnvelopeReleaseBegin)
-		{
-			parentEnvelopeTotalFrames = parentEnvelopeTotalFrames - (releaseBegin - totalFrames);
-		}
 		m_envLfoParameters[static_cast<std::size_t>(enumTarget)]->fillLevel(buffer, parentEnvelopeTotalFrames, parentEnvelopeReleaseBegin, bufferSize);
 	}
 	else
