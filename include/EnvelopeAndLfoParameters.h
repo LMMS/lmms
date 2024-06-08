@@ -170,7 +170,7 @@ private:
 	FloatModel m_sustainModel;
 	FloatModel m_releaseModel;
 	FloatModel m_amountModel;
-	// used in chores where the envelope is applyed
+	// used in chords where the envelope is applyed
 	// to the whole chord instead of one note (if active)
 	BoolModel m_useNoteParentModel;
 
