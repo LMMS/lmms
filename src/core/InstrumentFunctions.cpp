@@ -32,6 +32,7 @@
 #include "PresetPreviewPlayHandle.h"
 
 #include <vector>
+#include <algorithm>
 #include <QMutex>
 #include <QMutexLocker>
 
@@ -424,70 +425,52 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		int offsetRange = range;
 		if (static_cast<ArpMode>(m_arpModeModel.value()) == ArpMode::Sort)
 		{
-			int minIndex = _n->index();
+			bool notMinIndex = false;
 
 			// m_sortedChords contains a combination of keys
 			// from all the currently played notes
 
 			// firstly the order of the base notes are decided
-			// and because we want to sort base notes,
-			// only every chord's first location gets used
-
-			// soting the base notes
-			for (int i = 0; i < cnphv.size(); i++)
+			// adding the base notes
+			for (size_t i = 0; i < cnphv.size(); i++)
 			{
-				if (i <= 0)
+				m_sortedChords[i] = cnphv[i]->key();
+				if (cnphv[i]->index() < _n->index())
 				{
-					// at start only the base notes get filled in at
-					// every start of a chord
-					m_sortedChords[i * cur_chord_size] = cnphv[i]->key();
-				}
-				else
-				{
-					// firstly decide the order of the base notes
-					unsigned int sortedAddLocation = i;
-					// loop through every base note before this
-					for (unsigned int j = 0; j < i; j++)
-					{
-						// if [j] base note is bigger than the one that will be added
-						if (m_sortedChords[j * cur_chord_size] > cnphv[i]->key())
-						{
-							sortedAddLocation = j;
-							break;
-						}
-					}
-					// offset everything left to make place
-					// for the new note at [sortAddLocation]
-					for (unsigned int j = i; j > sortedAddLocation; j--)
-					{
-						m_sortedChords[j * cur_chord_size] = m_sortedChords[(j - 1) * cur_chord_size];
-					}
-					// lastly set the location of the new base note
-					m_sortedChords[sortedAddLocation * cur_chord_size] = cnphv[i]->key();
-				}
-
-				if (cnphv[i]->index() < minIndex)
-				{
-					minIndex = cnphv[i]->index();
+					notMinIndex = true;
+					break;
 				}
 			}
 
 			// avoid playing same key for all
 			// currently playing notes
-			if (minIndex != _n->index())
+			if (notMinIndex == true)
 			{
 				break;
 			}
 
+			// fill the remaining spaces with the max note value
+			// (these will be overwritten later)
+			for (size_t i = cnphv.size(); i < m_sortedChords.size(); i++)
+			{
+				m_sortedChords[i] = NumKeys + 1;
+			}
+
+			// sorting:
+			std::sort(m_sortedChords.begin(), m_sortedChords.end(), std::less{});
+
+
 			// making the final keys
 			// from the sorted base notes
-			for (int i = 0; i < cnphv.size(); i++)
+			for (size_t i = cnphv.size(); i < m_sortedChords.size(); i++)
 			{
-				for (unsigned int j = cur_chord_size - 1; j > 0; j--)
+				m_sortedChords[i] = m_sortedChords[i - cnphv.size()];
+			}
+			for (unsigned int i = 0; i < cur_chord_size; i++)
+			{
+				for (size_t j = 0; j < cnphv.size(); j++)
 				{
-					// copy the base note ([i * cur_chord_size]) to every key in the chord
-					// then add the chord values
-					m_sortedChords[i * cur_chord_size + j] = m_sortedChords[i * cur_chord_size] + chord_table.chords()[selected_arp][j];
+					m_sortedChords[i * cnphv.size() + j] += chord_table.chords()[selected_arp][i];
 				}
 			}
 
