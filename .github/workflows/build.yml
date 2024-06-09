@@ -31,7 +31,7 @@ jobs:
           submodules: recursive
       - name: Prepare to install APT dependencies
         run: |
-          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-ubuntu-gcc-20.04.txt)" >> "$GITHUB_ENV"
+          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-ubuntu-20.04-gcc.txt)" >> "$GITHUB_ENV"
           .github/workflows/setup-wine.sh
           .github/workflows/setup-cmake.sh
           # Manually install apt-fast to fix awalsh128/cache-apt-pkgs-action
@@ -52,6 +52,7 @@ jobs:
           arch: 'gcc_64'
           archives: qtbase qtsvg qttools qtx11extras
           cache: true
+          setup-python: false
       - name: Download and bootstrap vcpkg
         run: |
           git clone --branch 2024.05.24 https://github.com/microsoft/vcpkg.git
