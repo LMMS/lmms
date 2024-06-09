@@ -753,6 +753,8 @@ void Lv2Proc::initMOptions()
 	float sampleRate = Engine::audioEngine()->outputSampleRate();
 	int32_t blockLength = Engine::audioEngine()->framesPerPeriod();
 	int32_t sequenceSize = defaultEvbufSize();
+	int32_t backgroundColor = 0xff000000;
+	int32_t foregroundColor = 0xffff0000;
 
 	using Id = Lv2UridCache::Id;
 	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
@@ -762,6 +764,8 @@ void Lv2Proc::initMOptions()
 	m_options.initOption<int32_t>(Id::bufsz_sequenceSize, sequenceSize);
 	m_options.initOption<float>(Id::ui_updateRate, lv2UiRefreshRate());
 	m_options.initOption<float>(Id::ui_scaleFactor, lv2UiScaleFactor());
+	m_options.initOption<int32_t>(Id::ui_backgroundColor, backgroundColor);
+	m_options.initOption<int32_t>(Id::ui_foregroundColor, foregroundColor);
 	m_options.createOptionVectors();
 }
 

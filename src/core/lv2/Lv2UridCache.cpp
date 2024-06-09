@@ -79,6 +79,8 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 	init(Id::bufsz_sequenceSize, LV2_BUF_SIZE__sequenceSize);
 	init(Id::midi_MidiEvent, LV2_MIDI__MidiEvent);
 	init(Id::param_sampleRate, LV2_PARAMETERS__sampleRate);
+	init(Id::ui_backgroundColor, LV2_UI__backgroundColor);
+	init(Id::ui_foregroundColor, LV2_UI__foregroundColor);
 	init(Id::ui_updateRate, LV2_UI__updateRate);
 #ifdef LV2_UI__scaleFactor
 	init(Id::ui_scaleFactor, LV2_UI__scaleFactor);

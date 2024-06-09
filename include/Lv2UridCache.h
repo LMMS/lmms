@@ -53,6 +53,8 @@ public:
 		bufsz_sequenceSize,
 		midi_MidiEvent,
 		param_sampleRate,
+		ui_backgroundColor,
+		ui_foregroundColor,
 		ui_scaleFactor,
 		ui_updateRate,
 		// exception to alphabetic ordering - keep at the end:
@@ -88,6 +90,8 @@ private:
 		"bufsz_sequenceSize",
 		"midi_MidiEvent",
 		"param_sampleRate",
+		"ui_backgroundColor",
+		"ui_foregroundColor",
 		"ui_scaleFactor",
 		"ui_updateRate"
 	};

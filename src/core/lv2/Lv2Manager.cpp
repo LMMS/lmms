@@ -152,6 +152,8 @@ Lv2Manager::Lv2Manager() :
 	supportOpt(Lv2UridCache::Id::bufsz_sequenceSize);
 	supportOpt(Lv2UridCache::Id::ui_updateRate);
 	supportOpt(Lv2UridCache::Id::ui_scaleFactor);
+	supportOpt(Lv2UridCache::Id::ui_backgroundColor);
+	supportOpt(Lv2UridCache::Id::ui_foregroundColor);
 }
 
 
