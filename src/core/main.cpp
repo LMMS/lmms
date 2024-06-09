@@ -61,10 +61,6 @@
 
 #include <csignal>
 
-#ifdef LMMS_HAVE_SUIL
-	#include <suil/suil.h>
-#endif
-
 #include "MainApplication.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -325,11 +321,6 @@ int main( int argc, char * * argv )
 	bool renderLoop = false;
 	bool renderTracks = false;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
-
-	// Arguments shall always be passed to suil before anything else
-#ifdef LMMS_HAVE_SUIL
-	suil_init(&argc, &argv, SUIL_ARG_NONE);
-#endif
 
 	// first of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -847,7 +838,7 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
-		new GuiApplication();
+		new GuiApplication(&argc, &argv);
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
