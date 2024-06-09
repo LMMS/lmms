@@ -77,44 +77,49 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
 }
 
-
-
 void SideBarWidget::resizeEvent( QResizeEvent * )
 {
 	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
 						height() - MARGIN * 2 - 40 );
 	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
+
+	if(!filterWidgetLayout) return;
+
+	if(width() < 300) {
+		filterWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
+	} else {
+		filterWidgetLayout->setDirection(QBoxLayout::Direction::LeftToRight);
+	}
 }
 
 void SideBarWidget::addContentCheckBox(bool user_checkbox, bool factory, bool hidden)
 {
 	auto filterWidget = new QWidget(contentParent());
-	filterWidget->setFixedHeight(15);
-	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
+	filterWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight, filterWidget);
 	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	filterWidgetLayout->setSpacing(0);
 
-	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
+	auto configCheckBox = [this](QCheckBox* box, Qt::CheckState checkState)
 	{
-		box->setCheckState(Qt::Checked);
+		box->setCheckState(checkState);
 		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
-		filterWidgetLayout->addWidget(box);
+		this->filterWidgetLayout->addWidget(box);
 	};
 
 	if (user_checkbox) {
 		m_showUserContent = new QCheckBox(tr("User content"));
-		configCheckBox(m_showUserContent);
+		configCheckBox(m_showUserContent, Qt::Checked);
 	}
 
 	if (factory) {
 		m_showFactoryContent = new QCheckBox(tr("Factory content"));
-		configCheckBox(m_showFactoryContent);
+		configCheckBox(m_showFactoryContent, Qt::Checked);
 	}
 
 	if (hidden) {
 		m_showHiddenContent = new QCheckBox(tr("Hidden content"));
-		configCheckBox(m_showHiddenContent);
+		configCheckBox(m_showHiddenContent, Qt::Unchecked);
 	}
 
 	addContentWidget(filterWidget);
