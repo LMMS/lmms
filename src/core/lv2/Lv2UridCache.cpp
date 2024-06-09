@@ -86,7 +86,11 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 	initNoUrid(Id::ui_scaleFactor);
 #endif
 
-	for(LV2_URID urid : m_cache) { Q_ASSERT(urid != noUridYet); }
+	for(LV2_URID urid : m_cache)
+	{
+		// If you hit this assert, then you added an ID for which you did not call "init"
+		Q_ASSERT(urid != noUridYet);
+	}
 }
 
 
