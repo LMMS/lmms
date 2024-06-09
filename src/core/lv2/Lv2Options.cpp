@@ -74,7 +74,7 @@ void Lv2Options::createOptionVectors()
 
 
 
-void Lv2Options::initOption(Lv2UridCache::Id keyAsId, LV2_URID keyAsUrid, uint32_t size, LV2_URID type,
+void Lv2Options::initOption(LV2_URID keyAsUrid, uint32_t size, LV2_URID type,
 	std::shared_ptr<void> value,
 	LV2_Options_Context context, uint32_t subject)
 {
@@ -96,7 +96,8 @@ void Lv2Options::initOption(Lv2UridCache::Id keyAsId, LV2_URID keyAsUrid, uint32
 	else
 	{
 		// Lv2Manager did not call supportOpt with this key
-		qDebug() << "Note: Lv2 Option " << Lv2UridCache::nameOfId(keyAsId) << "supported by LMMS, but not by your system";
+		UridMap& uridMap = Engine::getLv2Manager()->uridMap();
+		qDebug() << "Note: Lv2 Option " << uridMap.unmap(keyAsUrid) << " supported by LMMS, but not by your system";
 	}
 }
 
