@@ -44,6 +44,7 @@ nasm
 perl
 python3-distutils
 python3-jinja2
+python3-pip
 software-properties-common
 ssh-client
 stk
