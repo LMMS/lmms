@@ -3596,7 +3596,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
-					note, m_stepRecorder.curStepNoteColor(), m_noteTextColor, m_selectedNoteColor,
+					note, m_curStepNoteColor, m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
 		}
