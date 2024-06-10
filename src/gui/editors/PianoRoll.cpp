@@ -197,7 +197,7 @@ PianoRoll::PianoRoll() :
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
 	m_stepNoteColor( 0, 0, 0 ),
-	m_curStepNoteColor( 0, 0, 0 ),
+	m_curStepNoteColor(245,3,139),
 	m_noteTextColor( 0, 0, 0 ),
 	m_ghostNoteColor( 0, 0, 0 ),
 	m_ghostNoteTextColor( 0, 0, 0 ),
