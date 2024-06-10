@@ -807,6 +807,12 @@ lmms--gui--EnvelopeGraph {
 	qproperty-markerOutlineColor: rgb(0, 0, 0);
 }
 
+/* LFO graph */
+lmms--gui--LfoGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+}
+
 /* Plugins */
 
 lmms--gui--TripleOscillatorView lmms--gui--Knob {
