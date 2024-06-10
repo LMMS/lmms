@@ -18,6 +18,7 @@ gpg
 libasound2-dev
 libc6-dev
 libc6-dev-i386
+libfltk1.3-dev
 libgig-dev
 libgl1-mesa-dev
 liblilv-dev

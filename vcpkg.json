@@ -12,7 +12,8 @@
 		},
 		{
 			"name": "fltk",
-			"default-features": false
+			"default-features": false,
+			"platform": "!linux"
 		},
 		{
 			"name": "fluidsynth",
