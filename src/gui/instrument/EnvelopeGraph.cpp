@@ -206,9 +206,7 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 
 	// Compute the color of the lines based on the amount of the envelope
 	const float absAmount = std::abs(amount);
-	const QColor noAmountColor{96, 91, 96};
-	const QColor fullAmountColor{0, 255, 128};
-	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
+	const QColor lineColor{ColorHelper::interpolateInRgb(m_noAmountColor, m_fullAmountColor, absAmount)};
 
 	// Determine the line width so that it scales with the widget
 	// Use the minimum value of the current width and height to compute it.
@@ -221,14 +219,11 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	p.drawPolyline(linePoly);
 
 	// Now draw all marker on top of the lines
-	const QColor markerFillColor{153, 175, 255};
-	const QColor markerOutlineColor{0, 0, 0};
-
 	QPen pen;
 	pen.setWidthF(lineWidth * 0.75);
-	pen.setBrush(markerOutlineColor);
+	pen.setBrush(m_markerOutlineColor);
 	p.setPen(pen);
-	p.setBrush(markerFillColor);
+	p.setBrush(m_markerFillColor);
 
 	// Compute the size of the circle we will draw based on the line width
 	const qreal baseRectSize = lineWidth * 3;

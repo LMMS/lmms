@@ -797,6 +797,15 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-radius: 2px;
 }
 
+/* Instrument */
+
+/* Envelope graph */
+lmms--gui--EnvelopeGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+	qproperty-markerFillColor: rgb(153, 175, 255);
+	qproperty-markerOutlineColor: rgb(0, 0, 0);
+}
 
 /* Plugins */
 
