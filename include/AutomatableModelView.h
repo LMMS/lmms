@@ -28,9 +28,14 @@
 
 #include "ModelView.h"
 #include "AutomatableModel.h"
+#include "AutomationTrack.h"
+#include "AutomationClip.h"
+#include "SongEditor.h"
+#include "Song.h"
 
 class QMenu;
 class QMouseEvent;
+class Song;
 
 namespace lmms::gui
 {
@@ -83,6 +88,7 @@ protected:
 	QString m_description;
 	QString m_unit;
 	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
+
 } ;
 
 
@@ -97,10 +103,17 @@ public:
 public slots:
 	void execConnectionDialog();
 	void removeConnection();
+	void addSongAutomationPoint();
+	void addSongAutomationPointAndClip();
+	void removeSongNearestAutomationPoint();
 	void editSongGlobalAutomation();
 	void unlinkAllModels();
 	void removeSongGlobalAutomation();
 
+private:
+	AutomationTrack* getCurrentAutomationTrack(std::vector<AutomationClip*>* clips);
+	AutomationClip* getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip);
+	AutomationClip* makeNewClip(AutomationTrack* track, TimePos position, bool canSnap);
 private slots:
 	/// Copy the model's value to the clipboard.
 	void copyToClipboard();
