@@ -50,7 +50,7 @@ jobs:
         with:
           version: '5.15.2'
           arch: 'gcc_64'
-          archives: qtbase qtsvg qttools qtx11extras
+          archives: qtbase qtsvg qttools qtx11extras icu
           cache: true
           setup-python: false
       - name: Download and bootstrap vcpkg
