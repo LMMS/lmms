@@ -2404,7 +2404,7 @@ int main( int _argc, char * * _argv )
 		return -1;
 	}
 
-#ifndef LMMS_BUILD_WIN32
+#if !defined(LMMS_BUILD_WIN32) && !defined(__WINE__)
 	const auto pollParentThread = lmms::PollParentThread{};
 #endif
 
