@@ -44,7 +44,11 @@ namespace gui
 
 EnvelopeGraph::EnvelopeGraph(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this)
+	ModelView(nullptr, this),
+	m_noAmountColor(96, 91, 96),
+	m_fullAmountColor(0, 255, 128),
+	m_markerFillColor(153, 175, 255),
+	m_markerOutlineColor(0,0,0)
 {
 	setMinimumSize(m_envGraph.size());
 }
