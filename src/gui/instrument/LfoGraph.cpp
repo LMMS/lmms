@@ -44,7 +44,9 @@ namespace gui
 
 LfoGraph::LfoGraph(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this)
+	ModelView(nullptr, this),
+	m_noAmountColor(96, 91, 96),
+	m_fullAmountColor(0, 255, 128)
 {
 	setMinimumSize(m_lfoGraph.size());
 }
