@@ -44,6 +44,7 @@ class LfoGraph : public QWidget, public ModelView
 	Q_OBJECT
 	Q_PROPERTY(QColor noAmountColor MEMBER m_noAmountColor)
 	Q_PROPERTY(QColor fullAmountColor MEMBER m_fullAmountColor)
+
 public:
 	LfoGraph(QWidget* parent);
 
