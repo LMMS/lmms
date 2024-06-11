@@ -27,7 +27,6 @@
 #include <cassert>
 
 #include "AudioResampler.h"
-#include "MixHelpers.h"
 
 namespace lmms {
 
@@ -182,7 +181,7 @@ void Sample::render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Lo
 
 		const auto src = m_buffer->data()->data();
 		const auto srcSize = m_buffer->size() * DEFAULT_CHANNELS;
-	
+
 		const auto frameIndex = static_cast<int>(state->frameIndex);
 		const auto fractionalOffset = state->frameIndex - frameIndex;
 
