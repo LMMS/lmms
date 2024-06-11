@@ -133,9 +133,6 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 
 	state->frameIndex = std::max<float>(m_startFrame, state->frameIndex);
 	render(dst, numFrames, state, loopMode, resampleRatio);
-
-	if (m_amplification != 1.0f) { MixHelpers::multiply(dst, m_amplification, numFrames); }
-
 	return true;
 }
 
@@ -195,7 +192,7 @@ void Sample::render(sampleFrame* dst, size_t numFrames, PlaybackState* state, Lo
 		const auto leftSample = AudioResampler::interpolate(src, srcSize, leftX, fractionalOffset);
 		const auto rightSample = AudioResampler::interpolate(src, srcSize, rightX, fractionalOffset);
 
-		dst[i] = {leftSample, rightSample};
+		dst[i] = {leftSample * m_amplification, rightSample * m_amplification};
 		state->frameIndex += (state->backwards ? -1.0 : 1.0) / resampleRatio;
 	}
 }
