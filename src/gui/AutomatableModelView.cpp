@@ -27,6 +27,7 @@
 
 #include "AutomatableModelView.h"
 #include "AutomationClip.h"
+#include "AutomationNode.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -85,17 +86,21 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 	menu->addSeparator();
 
 	menu->addAction(embed::getIconPixmap("automation"),
-		AutomatableModel::tr("add automation point"),
+		AutomatableModel::tr("add automation node"),
 		amvSlots,
-		SLOT(addSongAutomationPoint()));
+		SLOT(addSongAutomationNode()));
 	menu->addAction(embed::getIconPixmap("automation"),
-		AutomatableModel::tr("add automation point to new clip"),
+		AutomatableModel::tr("add automation node to new clip"),
 		amvSlots,
-		SLOT(addSongAutomationPointAndClip()));
+		SLOT(addSongAutomationNodeAndClip()));
 	menu->addAction(embed::getIconPixmap("automation"),
-		AutomatableModel::tr("remove closest automation point"),
+		AutomatableModel::tr("update closest automation node"),
 		amvSlots,
-		SLOT(editSongGlobalAutomation()));
+		SLOT(updateSongNearestAutomationNode()));
+	menu->addAction(embed::getIconPixmap("automation"),
+		AutomatableModel::tr("remove closest automation node"),
+		amvSlots,
+		SLOT(removeSongNearestAutomationNode()));
 
 	menu->addSeparator();
 
@@ -274,11 +279,11 @@ void AutomatableModelViewSlots::removeConnection()
 }
 
 
-void AutomatableModelViewSlots::addSongAutomationPoint()
+void AutomatableModelViewSlots::addSongAutomationNode()
 {
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
-	AutomationTrack* track = getCurrentAutomationTrack(&clips);
-	AutomationClip* clip = getCurrentAutomationClip(track, true);
+	AutomationTrack* track = getCurrentAutomationTrack(&clips, true);
+	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
 
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());// getGUI()->songEditor()->m_editor->currentPosition();
 	qDebug("timepos: %d", timePos.getTicks());
@@ -289,11 +294,11 @@ void AutomatableModelViewSlots::addSongAutomationPoint()
 	clip->recordValue(timePos, m_amv->modelUntyped()->getTrueValue());
 	clip->setAutoResize(autoResize);
 }
-void AutomatableModelViewSlots::addSongAutomationPointAndClip()
+void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 {
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
-	AutomationTrack* track = getCurrentAutomationTrack(&clips);
-	AutomationClip* clip = getCurrentAutomationClip(track, true);
+	AutomationTrack* track = getCurrentAutomationTrack(&clips, true);
+	AutomationClip* clip = getCurrentAutomationClip(track, false, false);
 
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());// getGUI()->songEditor()->m_editor->currentPosition();
 	qDebug("timepos: %d", timePos.getTicks());
@@ -310,30 +315,136 @@ void AutomatableModelViewSlots::addSongAutomationPointAndClip()
 	}
 	else
 	{
-		addSongAutomationPoint();
+		addSongAutomationNode();
 	}
 }
-void AutomatableModelViewSlots::removeSongNearestAutomationPoint()
+void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 {
 
+	qDebug("\nupdate nearest");
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
-	AutomationTrack* track = getCurrentAutomationTrack(&clips);
-	AutomationClip* clip = getCurrentAutomationClip(track, true);
-
-
-	tick_t minDistance = 0;
-	QMap<int, AutomationNode> timeMap;
-	for(QMap<int, AutomationNode>::iterator it = timeMap.begin();
-				it != timeMap.end(); ++it )
+	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
+	if (track != nullptr)
 	{
-		//if ()
-		// Copies the automation node (in/out values and in/out tangents)
-		//timeMap[POS(it)] = it.value();
-		// Sets the node's clip to this one
-		//timeMap[POS(it)].setClip(this);
+		AutomationClip* nodeClip = nullptr;
+		TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
+		if (nodeClip != nullptr)
+		{
+			nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTrueValue());
+		}
+		/*
+		AutomationClip* clipBefore = getCurrentAutomationClip(track, false, false);
+		AutomationClip* clipAfter = getCurrentAutomationClip(track, false, true);
+
+		TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+
+		bool validBefore = clipBefore != nullptr && clipBefore->hasAutomation();
+		bool validAfter = clipAfter != nullptr && clipAfter->hasAutomation();
+
+		if (validBefore == true && validAfter == false)
+		{
+			clipBefore->recordValue(getNearestAutomationNode(clipBefore, false), m_amv->modelUntyped()->getTrueValue());
+		}
+		else if (validBefore == false && validAfter == true)
+		{
+			clipAfter->recordValue(getNearestAutomationNode(clipAfter, true), m_amv->modelUntyped()->getTrueValue());
+		}
+		else if (validBefore == true && validAfter == true)
+		{
+			TimePos timeBefore = getNearestAutomationNode(clipBefore, false);
+			TimePos timeAfter = getNearestAutomationNode(clipAfter, true);
+
+			if (timePos.getTicks() - timeBefore.getTicks() - clipBefore->startPosition()
+				> timeAfter.getTicks() + clipAfter->startPosition() - timePos.getTicks())
+			{
+				clipBefore->recordValue(getNearestAutomationNode(clipBefore, false), m_amv->modelUntyped()->getTrueValue());
+			}
+			else
+			{
+				clipAfter->recordValue(getNearestAutomationNode(clipAfter, true), m_amv->modelUntyped()->getTrueValue());
+			}
+		}
+		*/
 	}
 }
-AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vector<AutomationClip*>* clips)
+void AutomatableModelViewSlots::removeSongNearestAutomationNode()
+{
+
+	qDebug("\nremove nearest");
+	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
+	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
+	if (track != nullptr)
+	{
+		AutomationClip* nodeClip = nullptr;
+		TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
+		if (nodeClip != nullptr)
+		{
+			nodeClip->removeNode(nodePos);
+			if (nodeClip->hasAutomation() == false)
+			{
+				delete nodeClip;
+			}
+		}
+		/*
+		qDebug("clip before");
+		AutomationClip* clipBefore = getCurrentAutomationClip(track, false, false);
+		qDebug("clip after");
+		AutomationClip* clipAfter = getCurrentAutomationClip(track, false, true);
+
+		TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+
+		bool validBefore = clipBefore != nullptr && clipBefore->hasAutomation();
+		bool validAfter = clipAfter != nullptr && clipAfter->hasAutomation();
+
+		if (validBefore == true && validAfter == false)
+		{
+			clipBefore->removeNode(getNearestAutomationNode(clipBefore, false));
+			qDebug("removed before");
+			if (clipBefore->hasAutomation() == false)
+			{
+				delete clipBefore;
+			}
+		}
+		else if (validBefore == false && validAfter == true)
+		{
+			clipAfter->removeNode(getNearestAutomationNode(clipAfter, true));
+			qDebug("removed after");
+			if (clipAfter->hasAutomation() == false)
+			{
+				delete clipAfter;
+			}
+		}
+		else if (validBefore == true && validAfter == true)
+		{
+			TimePos timeBefore = getNearestAutomationNode(clipBefore, false);
+			TimePos timeAfter = getNearestAutomationNode(clipAfter, true);
+
+			qDebug("timePos: %d, before: %d, before_start: %d, after: %d, after_start: %d", timePos.getTicks(), timeBefore.getTicks(), clipBefore->startPosition().getTicks(), timeAfter.getTicks(), clipAfter->startPosition().getTicks());
+
+			if (timePos.getTicks() - timeBefore.getTicks() - clipBefore->startPosition().getTicks()
+				< timeAfter.getTicks() + clipAfter->startPosition().getTicks() - timePos.getTicks())
+			{
+				qDebug("removed before");
+				clipBefore->removeNode(timeBefore);
+				if (clipBefore->hasAutomation() == false)
+				{
+					delete clipBefore;
+				}
+			}
+			else
+			{
+				qDebug("removed after");
+				clipAfter->removeNode(timeAfter);
+				if (clipAfter->hasAutomation() == false)
+				{
+					delete clipAfter;
+				}
+			}
+		}
+		*/
+	}
+}
+AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vector<AutomationClip*>* clips, bool canAddNewTrack)
 {
 	AutomationTrack* output = nullptr;
 	// getting all of the clips that are connected to this model
@@ -362,38 +473,126 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 		}
 		output = maxTrack;
 	}
-	else
+	else if (canAddNewTrack == true)
 	{
 		// adding new track
 		output = new AutomationTrack(getGUI()->songEditor()->m_editor->model(), false);
 	}
 	return output;
 }
-AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip)
+AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip, bool searchAfter)
 {
 	AutomationClip* output = nullptr;
 	std::vector<Clip*> trackClips = track->getClips();
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+	
+
+	bool tryAdding = false;
 	if (trackClips.size() > 0)
 	{
 		// getting the closest clip
-		tick_t closestTime = trackClips[0]->startPosition().getTicks();
-		int closestClipLocation = 0;
-		for (size_t i = 1; i < trackClips.size(); i++)
+		tick_t closestTime = -1; //trackClips[0]->startPosition().getTicks();
+		int closestClipLocation = -1;
+		for (size_t i = 0; i < trackClips.size(); i++)
 		{
-			if (trackClips[i]->startPosition().getTicks() > closestTime && timePos.getTicks() > trackClips[i]->startPosition().getTicks())
+			tick_t currentTime = trackClips[i]->startPosition().getTicks();
+			qDebug("current time: %d, closest: %d, i: %d, timepos: %d", currentTime, closestTime, i, timePos.getTicks());
+			if ((searchAfter == false && currentTime > closestTime && timePos.getTicks() > currentTime)
+				|| (searchAfter == true && (currentTime < closestTime || closestTime < 0) && timePos.getTicks() < currentTime))
 			{
 				closestTime = trackClips[i]->startPosition().getTicks();
 				closestClipLocation = i;
 			}
 		}
-		output = dynamic_cast<AutomationClip*>(trackClips[closestClipLocation]);
+
+		qDebug("closest clip: %d", closestClipLocation);
+		// in some cases the current time position can be before or after every clip
+		// if this is the case, try adding
+		if (closestClipLocation < 0)
+		{
+			tryAdding = true;
+			qDebug("return nullptr");
+		}
+		else
+		{
+			output = dynamic_cast<AutomationClip*>(trackClips[closestClipLocation]);
+		}
 	}
-	else if (canAddNewClip == true)
+	else
+	{
+		tryAdding = true;
+	}
+	if (tryAdding == true && canAddNewClip == true)
 	{
 		// adding a new clip
 		output = makeNewClip(track, timePos, true);
 	}
+	return output;
+}
+const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrack* track, AutomationClip** clipOut)
+{
+	TimePos output;
+	AutomationClip* minClip = nullptr;
+	int minDistance = -1;
+
+	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+	qDebug("clip before");
+	AutomationClip* clipBefore = getCurrentAutomationClip(track, false, false);
+	qDebug("clip after");
+	AutomationClip* clipAfter = getCurrentAutomationClip(track, false, true);
+
+	if (clipBefore != nullptr && clipBefore->hasAutomation() == true)
+	{
+		for(AutomationClip::timeMap::const_iterator it = clipBefore->getTimeMap().begin(); it != clipBefore->getTimeMap().end(); ++it)
+		{
+			int curDistance = std::abs(static_cast<int>(POS(it) + clipBefore->startPosition().getTicks()) - static_cast<int>(timePos.getTicks()));
+			if (curDistance < minDistance || minDistance < 0)
+			{
+				minDistance = curDistance;
+				output = TimePos(POS(it));
+				minClip = clipBefore;
+				qDebug("nearest before key: %d, %d", POS(it), timePos.getTicks());
+			}
+		}
+		/*
+		for(AutomationClip::timeMap::const_iterator it = clip->getTimeMap().end() - 1; it != clip->getTimeMap().begin() - 1; --it)
+		{
+			qDebug("nearest before key: %d, %d", POS(it), timePos.getTicks());
+			output = TimePos(POS(it));
+			if (POS(it) + clip->startPosition().getTicks() < timePos.getTicks())
+			{
+				break;
+			}
+		}
+		*/
+	}
+	if (clipAfter != nullptr && clipAfter->hasAutomation() == true)
+	{
+		//AutomationClip::timeMap::const_iterator it = clipAfter->getTimeMap().begin();
+		int curDistance = static_cast<int>(POS(clipAfter->getTimeMap().begin()) + clipAfter->startPosition().getTicks()) - static_cast<int>(timePos.getTicks());
+		if (curDistance < minDistance || minDistance < 0)
+		{
+			minDistance = curDistance;
+			output = TimePos(POS(clipAfter->getTimeMap().begin()));
+			minClip = clipAfter;
+			qDebug("nearest after key: %d, %d", output.getTicks(), timePos.getTicks());
+		}
+		/*
+		for(AutomationClip::timeMap::const_iterator it = clipAfter->getTimeMap().begin(); it != clipAfter->getTimeMap().end(); ++it)
+		{
+			qDebug("nearest after key: %d, %d", POS(it), timePos.getTicks());
+			output = TimePos(POS(it));
+			if (POS(it) + clipAfter->startPosition().getTicks() > timePos.getTicks())
+			{
+				break;
+			}
+			
+		}
+		*/
+	}
+
+	*clipOut = minClip;
+
 	return output;
 }
 AutomationClip* AutomatableModelViewSlots::makeNewClip(AutomationTrack* track, TimePos position, bool canSnap)

@@ -103,16 +103,18 @@ public:
 public slots:
 	void execConnectionDialog();
 	void removeConnection();
-	void addSongAutomationPoint();
-	void addSongAutomationPointAndClip();
-	void removeSongNearestAutomationPoint();
+	void addSongAutomationNode();
+	void addSongAutomationNodeAndClip();
+	void updateSongNearestAutomationNode();
+	void removeSongNearestAutomationNode();
 	void editSongGlobalAutomation();
 	void unlinkAllModels();
 	void removeSongGlobalAutomation();
 
 private:
-	AutomationTrack* getCurrentAutomationTrack(std::vector<AutomationClip*>* clips);
-	AutomationClip* getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip);
+	AutomationTrack* getCurrentAutomationTrack(std::vector<AutomationClip*>* clips, bool canAddNewTrack);
+	AutomationClip* getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip, bool searchAfter);
+	const TimePos getNearestAutomationNode(AutomationTrack* track, AutomationClip** clipOut);
 	AutomationClip* makeNewClip(AutomationTrack* track, TimePos position, bool canSnap);
 private slots:
 	/// Copy the model's value to the clipboard.
