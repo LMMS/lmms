@@ -112,9 +112,18 @@ public slots:
 	void removeSongGlobalAutomation();
 
 private:
+	// gets the automationTrack with the most amount of clips connected to it
+	// if this track doesn't exists and "canAddNewTrack", then add a new one else return nullptr
+	// "clips" = clips that are connected to this model
 	AutomationTrack* getCurrentAutomationTrack(std::vector<AutomationClip*>* clips, bool canAddNewTrack);
+	// gets the clip that start before or after the song time position (playback pos)
+	// if this clip doesn't exists and "canAddNewClip", then add a new one else return nullptr
 	AutomationClip* getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip, bool searchAfter);
+	// gets the automationNode closest to the song time position (playback pos)
+	// "clipOut" is the clip that has the node
+	// can return nullptr on "clipOut"
 	const TimePos getNearestAutomationNode(AutomationTrack* track, AutomationClip** clipOut);
+	// makes new clip and connects it to this model
 	AutomationClip* makeNewClip(AutomationTrack* track, TimePos position, bool canSnap);
 private slots:
 	/// Copy the model's value to the clipboard.
