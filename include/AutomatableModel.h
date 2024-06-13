@@ -176,10 +176,8 @@ public:
 		{
 			return m_value;
 		}
-		else
-		{
-			return controllerValue(frameOffset);
-		}
+
+		return controllerValue(frameOffset);
 	}
 
 	float controllerValue( int frameOffset ) const;
