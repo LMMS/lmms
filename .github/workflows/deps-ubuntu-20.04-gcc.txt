@@ -20,7 +20,7 @@ libc6-dev
 libc6-dev-i386
 libfltk1.3-dev
 libgig-dev
-libjack-dev
+libjack-jackd2-dev
 liblilv-dev
 liblist-moreutils-perl
 libsndio-dev
