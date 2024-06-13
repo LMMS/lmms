@@ -77,7 +77,7 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          mkdir build
+          mkdir build 2> /dev/null
           cmake -S . \
                 -B build \
                 --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
