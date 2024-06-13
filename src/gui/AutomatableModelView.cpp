@@ -308,7 +308,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
 
-	if (clip != nullptr && clip->endPosition().getTicks() < timePos.getTicks())
+	if (clip && clip->endPosition().getTicks() < timePos.getTicks())
 	{
 		AutomationClip* newClip = makeNewClip(track, timePos, true);
 		// copying the progressionType of the clip before
@@ -333,12 +333,12 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
-	if (track == nullptr) { return; }
+	if (!track) { return; }
 
 	// getting nearest node position
 	AutomationClip* nodeClip = nullptr;
 	TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
-	if (nodeClip != nullptr)
+	if (nodeClip)
 	{
 		// modifying its value
 		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTrueValue());
@@ -353,11 +353,11 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
-	if (track == nullptr) { return; }
+	if (!track) { return; }
 
 	AutomationClip* nodeClip = nullptr;
 	TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
-	if (nodeClip != nullptr)
+	if (nodeClip)
 	{
 		nodeClip->removeNode(nodePos);
 		// if there is no node left, the automationClip will be deleted
@@ -395,7 +395,7 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 		}
 		output = maxTrack;
 	}
-	else if (canAddNewTrack == true)
+	else if (canAddNewTrack)
 	{
 		// adding new track
 		output = new AutomationTrack(getGUI()->songEditor()->m_editor->model(), false);
@@ -418,8 +418,11 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 		for (Clip* currentClip : trackClips)
 		{
 			tick_t currentTime = currentClip->startPosition().getTicks();
-			if ((searchAfter == false && (currentTime > closestTime || closestTime < 0) && timePos.getTicks() > currentTime)
-				|| (searchAfter == true && (currentTime < closestTime || closestTime < 0) && timePos.getTicks() <= currentTime))
+			bool smallerCheck = currentTime > closestTime || closestTime < 0;
+			bool biggerCheck = currentTime < closestTime || closestTime < 0;
+
+			if ((!searchAfter && smallerCheck && timePos.getTicks() > currentTime)
+				|| (searchAfter && biggerCheck && timePos.getTicks() <= currentTime))
 			{
 				closestTime = currentTime;
 				closestClip = currentClip;
@@ -429,7 +432,7 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 		// in some cases there could be no clips before or after the global time position
 		// if this is the case, try adding a new one
 		// (if this fails, return nullptr)
-		if (closestClip == nullptr)
+		if (!closestClip)
 		{
 			tryAdding = true;
 		}
@@ -442,7 +445,7 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 	{
 		tryAdding = true;
 	}
-	if (tryAdding == true && canAddNewClip == true)
+	if (tryAdding && canAddNewClip)
 	{
 		// adding a new clip
 		output = makeNewClip(track, timePos, true);
@@ -461,7 +464,7 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 	AutomationClip* clipBefore = getCurrentAutomationClip(track, false, false);
 	AutomationClip* clipAfter = getCurrentAutomationClip(track, false, true);
 
-	if (clipBefore != nullptr && clipBefore->hasAutomation() == true)
+	if (clipBefore && clipBefore->hasAutomation())
 	{
 		// getting nearest node
 		// in the clip that starts before this
@@ -476,7 +479,7 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 			}
 		}
 	}
-	if (clipAfter != nullptr && clipAfter->hasAutomation() == true)
+	if (clipAfter && clipAfter->hasAutomation())
 	{
 		// getting the nearest node
 		// in the clip that starts after this
@@ -496,7 +499,7 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 
 AutomationClip* AutomatableModelViewSlots::makeNewClip(AutomationTrack* track, TimePos position, bool canSnap)
 {
-	if (canSnap == true)
+	if (canSnap)
 	{
 		// snapping to the bar before
 		position.setTicks(position.getTicks() - position.getTickWithinBar(TimeSig(Engine::getSong()->getTimeSigModel())));
