@@ -21,6 +21,7 @@ endif()
 add_library(ringbuffer OBJECT
 	ringbuffer/src/lib/ringbuffer.cpp
 )
+target_compile_features(ringbuffer PUBLIC cxx_std_17)
 target_include_directories(ringbuffer PUBLIC
 	ringbuffer/include
 	"${CMAKE_CURRENT_BINARY_DIR}"
@@ -41,5 +42,5 @@ ELSE()
     SET(USE_MLOCK OFF)
 ENDIF()
 # Generate ringbuffer configuration headers
-CONFIGURE_FILE(ringbuffer/src/ringbuffer-config.h.in  ringbuffer-config.h)
-CONFIGURE_FILE(ringbuffer/src/ringbuffer-version.h.in ringbuffer-version.h)
+configure_file(ringbuffer/src/ringbuffer-config.h.in  ringbuffer-config.h)
+configure_file(ringbuffer/src/ringbuffer-version.h.in ringbuffer-version.h)
