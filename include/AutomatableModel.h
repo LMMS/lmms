@@ -172,19 +172,14 @@ public:
 
 	inline float getTrueValue(int frameOffset = 0) const
 	{
-		if (m_controllerConnection != nullptr)
+		if (m_controllerConnection == nullptr && hasLinkedModels() == false)
 		{
-			if (m_useControllerValue == true)
-			{
-				return controllerValue(frameOffset);
-			}
+			return m_value;
 		}
-		else if (hasLinkedModels() == true)
+		else
 		{
 			return controllerValue(frameOffset);
 		}
-
-		return m_value;
 	}
 
 	float controllerValue( int frameOffset ) const;
