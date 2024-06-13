@@ -299,6 +299,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 	clip->recordValue(timePos, m_amv->modelUntyped()->getTrueValue());
 	clip->setAutoResize(autoResize);
 }
+
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 {
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
@@ -324,6 +325,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 		addSongAutomationNode();
 	}
 }
+
 void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 {
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
@@ -342,6 +344,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTrueValue());
 	}
 }
+
 void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 {
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
@@ -364,6 +367,7 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 		}
 	}
 }
+
 AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vector<AutomationClip*>* clips, bool canAddNewTrack)
 {
 	AutomationTrack* output = nullptr;
@@ -398,6 +402,7 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 	}
 	return output;
 }
+
 AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip, bool searchAfter)
 {
 	AutomationClip* output = nullptr;
@@ -445,6 +450,7 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 	}
 	return output;
 }
+
 const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrack* track, AutomationClip** clipOut)
 {
 	TimePos output;
@@ -460,7 +466,7 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 	{
 		// getting nearest node
 		// in the clip that starts before this
-		for(AutomationClip::timeMap::const_iterator it = clipBefore->getTimeMap().begin(); it != clipBefore->getTimeMap().end(); ++it)
+		for (auto it = clipBefore->getTimeMap().begin(); it != clipBefore->getTimeMap().end(); ++it)
 		{
 			int curDistance = std::abs(static_cast<int>(POS(it) + clipBefore->startPosition().getTicks()) - static_cast<int>(timePos.getTicks()));
 			if (curDistance < minDistance || minDistance < 0)
@@ -488,6 +494,7 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 
 	return output;
 }
+
 AutomationClip* AutomatableModelViewSlots::makeNewClip(AutomationTrack* track, TimePos position, bool canSnap)
 {
 	if (canSnap == true)
