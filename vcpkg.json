@@ -23,11 +23,6 @@
 			]
 		},
 		{
-			"name": "jack2",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
 			"name": "libogg",
 			"default-features": false
 		},
@@ -63,10 +58,6 @@
 		},
 		{
 			"name": "mp3lame",
-			"default-features": false
-		},
-		{
-			"name": "portaudio",
 			"default-features": false
 		},
 		{
