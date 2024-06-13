@@ -415,8 +415,8 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 		for (size_t i = 0; i < trackClips.size(); i++)
 		{
 			tick_t currentTime = trackClips[i]->startPosition().getTicks();
-			if ((searchAfter == false && currentTime > closestTime && timePos.getTicks() > currentTime)
-				|| (searchAfter == true && (currentTime < closestTime || closestTime < 0) && timePos.getTicks() < currentTime))
+			if ((searchAfter == false && (currentTime > closestTime || closestTime < 0) && timePos.getTicks() > currentTime)
+				|| (searchAfter == true && (currentTime < closestTime || closestTime < 0) && timePos.getTicks() <= currentTime))
 			{
 				closestTime = trackClips[i]->startPosition().getTicks();
 				closestClipLocation = i;
