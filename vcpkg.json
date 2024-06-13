@@ -57,8 +57,23 @@
 			"platform": "linux"
 		},
 		{
+			"name": "lilv",
+			"default-features": false,
+			"platform": "!linux"
+		},
+		{
+			"name": "lv2",
+			"default-features": false,
+			"platform": "!linux"
+		},
+		{
 			"name": "mp3lame",
 			"default-features": false
+		},
+		{
+			"name": "portaudio",
+			"default-features": false,
+			"platform": "!linux"
 		},
 		{
 			"name": "pulseaudio",
