@@ -133,7 +133,6 @@ private slots:
 
 protected:
 	AutomatableModelView* m_amv;
-
 } ;
 
 

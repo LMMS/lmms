@@ -411,28 +411,28 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 	{
 		// getting the closest clip that start before or after the global time position
 		tick_t closestTime = -1;
-		int closestClipLocation = -1;
-		for (size_t i = 0; i < trackClips.size(); i++)
+		Clip* closestClip = nullptr;
+		for (Clip* currentClip : trackClips)
 		{
-			tick_t currentTime = trackClips[i]->startPosition().getTicks();
+			tick_t currentTime = currentClip->startPosition().getTicks();
 			if ((searchAfter == false && (currentTime > closestTime || closestTime < 0) && timePos.getTicks() > currentTime)
 				|| (searchAfter == true && (currentTime < closestTime || closestTime < 0) && timePos.getTicks() <= currentTime))
 			{
-				closestTime = trackClips[i]->startPosition().getTicks();
-				closestClipLocation = i;
+				closestTime = currentTime;
+				closestClip = currentClip;
 			}
 		}
 
 		// in some cases there could be no clips before or after the global time position
-		// if this is the case, try adding a new
+		// if this is the case, try adding a new one
 		// (if this fails, return nullptr)
-		if (closestClipLocation < 0)
+		if (closestClip == nullptr)
 		{
 			tryAdding = true;
 		}
 		else
 		{
-			output = dynamic_cast<AutomationClip*>(trackClips[closestClipLocation]);
+			output = dynamic_cast<AutomationClip*>(closestClip);
 		}
 	}
 	else
