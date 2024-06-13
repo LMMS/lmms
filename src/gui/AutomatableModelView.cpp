@@ -331,16 +331,15 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
-	if (track != nullptr)
+	if (track == nullptr) { return; }
+
+	// getting nearest node position
+	AutomationClip* nodeClip = nullptr;
+	TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
+	if (nodeClip != nullptr)
 	{
-		// getting nearest node position
-		AutomationClip* nodeClip = nullptr;
-		TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
-		if (nodeClip != nullptr)
-		{
-			// modifying its value
-			nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTrueValue());
-		}
+		// modifying its value
+		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTrueValue());
 	}
 }
 void AutomatableModelViewSlots::removeSongNearestAutomationNode()
@@ -348,20 +347,20 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
 	// getting the track without adding a new one if no track was found
 	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
+
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
-	if (track != nullptr)
+	if (track == nullptr) { return; }
+
+	AutomationClip* nodeClip = nullptr;
+	TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
+	if (nodeClip != nullptr)
 	{
-		AutomationClip* nodeClip = nullptr;
-		TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
-		if (nodeClip != nullptr)
+		nodeClip->removeNode(nodePos);
+		// if there is no node left, the automationClip will be deleted
+		if (nodeClip->hasAutomation() == false)
 		{
-			nodeClip->removeNode(nodePos);
-			// if there is no node left, the automationClip will be deleted
-			if (nodeClip->hasAutomation() == false)
-			{
-				delete nodeClip;
-			}
+			delete nodeClip;
 		}
 	}
 }
