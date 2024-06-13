@@ -120,7 +120,7 @@ endif()
 # source directory as an additional include directory.
 target_include_directories(zynaddsubfx_gui PUBLIC zynaddsubfx/src/UI)
 
-add_library(ZynAddSubFxCore STATIC
+add_library(ZynAddSubFxCore OBJECT
 	LocalZynAddSubFx.cpp
 )
 target_include_directories(ZynAddSubFxCore SYSTEM PUBLIC
