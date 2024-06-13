@@ -380,9 +380,9 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 		for (size_t i = 1; i < clips->size(); i++)
 		{
 			int currentCount = 0;
-			for (size_t j = 0; j < clips->size(); j++)
+			for (AutomationClip* j : (*clips))
 			{
-				if ((*clips)[i]->getTrack() == (*clips)[j]->getTrack())
+				if ((*clips)[i]->getTrack() == j->getTrack())
 				{
 					currentCount++;
 				}
@@ -406,10 +406,9 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip, bool searchAfter)
 {
 	AutomationClip* output = nullptr;
-	std::vector<Clip*> trackClips = track->getClips();
+	const std::vector<Clip*>& trackClips = track->getClips();
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
 	
-
 	bool tryAdding = false;
 	if (trackClips.size() > 0)
 	{
