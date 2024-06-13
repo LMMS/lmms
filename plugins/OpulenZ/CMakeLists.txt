@@ -1,6 +1,6 @@
 include(BuildPlugin)
 
-add_library(adplug OBJECT
+add_library(adplug STATIC
 	adplug/src/fmopl.c
 	adplug/src/temuopl.cpp
 )

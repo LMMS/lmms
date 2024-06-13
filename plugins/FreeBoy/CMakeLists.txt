@@ -1,6 +1,6 @@
 include(BuildPlugin)
 
-add_library(gme OBJECT
+add_library(gme STATIC
 	game-music-emu/gme/Gb_Apu.cpp
 	game-music-emu/gme/Gb_Oscs.cpp
 	game-music-emu/gme/Blip_Buffer.cpp
