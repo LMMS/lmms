@@ -72,6 +72,9 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 
 }
 
+static constexpr bool HasEffectGroups =
+	FLUIDSYNTH_VERSION_MAJOR >= 2 && FLUIDSYNTH_VERSION_MINOR >= 2;
+
 /**
  * A non-owning reference to a single FluidSynth voice. Captures some initial
  * properties of the referenced voice to help manage changes to it over time.
@@ -504,7 +507,14 @@ void Sf2Instrument::updateGain()
 
 void Sf2Instrument::updateReverbOn()
 {
-	fluid_synth_reverb_on(m_synth, 0, m_reverbOn.value() ? 1 : 0);
+	if constexpr (HasEffectGroups)
+	{
+		fluid_synth_reverb_on(m_synth, 0, m_reverbOn.value() ? 1 : 0);
+	}
+	else
+	{
+		fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0);
+	}
 }
 
 
@@ -512,10 +522,19 @@ void Sf2Instrument::updateReverbOn()
 
 void Sf2Instrument::updateReverb()
 {
-	fluid_synth_set_reverb_group_roomsize(m_synth, 0, m_reverbRoomSize.value());
-	fluid_synth_set_reverb_group_damp(m_synth, 0, m_reverbDamping.value());
-	fluid_synth_set_reverb_group_width(m_synth, 0, m_reverbWidth.value());
-	fluid_synth_set_reverb_group_level(m_synth, 0, m_reverbLevel.value());
+	if constexpr (HasEffectGroups)
+	{
+		fluid_synth_set_reverb_group_roomsize(m_synth, 0, m_reverbRoomSize.value());
+		fluid_synth_set_reverb_group_damp(m_synth, 0, m_reverbDamping.value());
+		fluid_synth_set_reverb_group_width(m_synth, 0, m_reverbWidth.value());
+		fluid_synth_set_reverb_group_level(m_synth, 0, m_reverbLevel.value());
+	}
+	else
+	{
+		fluid_synth_set_reverb(m_synth, m_reverbRoomSize.value(),
+			m_reverbDamping.value(), m_reverbWidth.value(),
+			m_reverbLevel.value());
+	}
 }
 
 
@@ -523,7 +542,14 @@ void Sf2Instrument::updateReverb()
 
 void  Sf2Instrument::updateChorusOn()
 {
-	fluid_synth_chorus_on(m_synth, 0, m_chorusOn.value() ? 1 : 0);
+	if constexpr (HasEffectGroups)
+	{
+		fluid_synth_chorus_on(m_synth, 0, m_chorusOn.value() ? 1 : 0);
+	}
+	else
+	{
+		fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0);
+	}
 }
 
 
@@ -531,11 +557,20 @@ void  Sf2Instrument::updateChorusOn()
 
 void  Sf2Instrument::updateChorus()
 {
-	fluid_synth_set_chorus_group_nr(m_synth, 0, static_cast<int>(m_chorusNum.value()));
-	fluid_synth_set_chorus_group_level(m_synth, 0, m_chorusLevel.value());
-	fluid_synth_set_chorus_group_speed(m_synth, 0, m_chorusSpeed.value());
-	fluid_synth_set_chorus_group_depth(m_synth, 0, m_chorusDepth.value());
-	fluid_synth_set_chorus_group_type(m_synth, 0, FLUID_CHORUS_MOD_SINE);
+	if constexpr (HasEffectGroups)
+	{
+		fluid_synth_set_chorus_group_nr(m_synth, 0, static_cast<int>(m_chorusNum.value()));
+		fluid_synth_set_chorus_group_level(m_synth, 0, m_chorusLevel.value());
+		fluid_synth_set_chorus_group_speed(m_synth, 0, m_chorusSpeed.value());
+		fluid_synth_set_chorus_group_depth(m_synth, 0, m_chorusDepth.value());
+		fluid_synth_set_chorus_group_type(m_synth, 0, FLUID_CHORUS_MOD_SINE);
+	}
+	else
+	{
+		fluid_synth_set_chorus(m_synth, static_cast<int>(m_chorusNum.value()),
+			m_chorusLevel.value(), m_chorusSpeed.value(),
+			m_chorusDepth.value(), FLUID_CHORUS_MOD_SINE);
+	}
 }
 
 
