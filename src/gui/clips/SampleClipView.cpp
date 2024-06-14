@@ -81,7 +81,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 
 	QAction* recordToggleAction = cm->addAction(embed::getIconPixmap("record"),
-                          tr("Toggle record"),
+                          tr("Set/clear record"),
                           m_clip, &SampleClip::toggleRecord);
 	
 	recordToggleAction->setEnabled(recordingCapabilitiesAvailable());
