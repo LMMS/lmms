@@ -32,6 +32,7 @@
 
 #include "ArrayVector.h"
 #include "AudioEngine.h"
+#include "AudioResampler.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "Engine.h"
@@ -846,7 +847,8 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 	if (m_internalSampleRate < Engine::audioEngine()->outputSampleRate())
 	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
+		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate()
+			+ AudioResampler::MinimumResampleMargin;
 #ifdef __GNUC__
 		sampleFrame tmp[f];
 #else

@@ -37,6 +37,7 @@
 #include <QDomDocument>
 
 #include "AudioEngine.h"
+#include "AudioResampler.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
@@ -46,7 +47,6 @@
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
-#include "Sample.h"
 #include "Song.h"
 
 #include "PatchesDialog.h"
@@ -437,7 +437,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + 4;
+				samples = frames / freq_factor + AudioResampler::MinimumResampleMargin;
 			}
 
 			// Load this note's data

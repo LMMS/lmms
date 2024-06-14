@@ -28,13 +28,13 @@
 #include <cmath>
 #include <fftw3.h>
 
+#include "AudioResampler.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
-#include "lmms_constants.h"
 #include "plugin_export.h"
 
 namespace lmms {
@@ -118,9 +118,13 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	{
 		int noteFrame = noteDone * m_originalSample.sampleSize();
 
-		playbackState->resampler().resample((workingBuffer + offset)->data(),
-			(m_originalSample.data() + noteFrame)->data(), frames, noteLeft + m_originalSample.sampleSize(),
-			speedRatio);
+		const auto dst = (workingBuffer + offset)->data();
+		const auto src = (m_originalSample.data() + noteFrame)->data();
+		const auto numDstFrames = frames;
+		const auto numSrcFrames = noteLeft * m_originalSample.sampleSize() + AudioResampler::MinimumResampleMargin;
+
+		auto& resampler = playbackState->resampler();
+		resampler.resample(dst, src, numDstFrames, numSrcFrames, speedRatio);
 
 		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.sampleSize();
 		playbackState->setNoteDone(nextNoteDone);

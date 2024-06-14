@@ -1,7 +1,7 @@
 /*
- * AudioResampler.h - wrapper around libsamplerate
+ * AudioResampler.h
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -35,6 +35,8 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
+	static constexpr auto MinimumResampleMargin = 4;
+
 	//! Resample `numSrcFrames` sample frames from `src` to `numDstFrames` sample frames in `dst` with a ratio of
 	//! `ratio = output_sample_rate/input_sample_rate`. Callers are expected to provide some margin of sample values (at
 	//! least 4 extra samples) at the end of `src` to ensure correct interpolation of sample values. Returns an error
