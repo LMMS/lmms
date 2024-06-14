@@ -268,7 +268,7 @@ void Lv2Proc::applyUiEvents(uint32_t nframes)
 			{
 				const std::vector<float>* m_scalePointMap; // in
 				float m_val; // in
-				void visit(FloatModel& m) override { m.setValue(m_val); }
+				void visit(FloatModel& m) override { m.setValue(m_val); qDebug() << "set val" << m_val; }
 				void visit(IntModel& m) override { m.setValue(m_val); }
 				void visit(BoolModel& m) override { m.setValue(m_val); }
 				void visit(ComboBoxModel& m) override
@@ -285,18 +285,19 @@ void Lv2Proc::applyUiEvents(uint32_t nframes)
 						}
 					}
 					assert(bestIdx != std::numeric_limits<std::size_t>::max());
-					(void)bestIdx;
-					m.setValue(static_cast<float>(m.value()));
+					m.setValue(static_cast<float>(bestIdx));
 				}
 			};
 			Lv2Ports::Control* ctrl = Lv2Ports::dcast<Lv2Ports::Control>(&port);
 			// update value in port
 			ctrl->m_val = *(float*)body;
 			// update value in model
-			FloatToModelVisitor ftm;
-			ftm.m_scalePointMap = &ctrl->m_scalePointMap;
-			ftm.m_val = *(float*)body;
-			ctrl->m_connectedModel->accept(ftm);
+			FloatToModelVisitor ftmv;
+			ftmv.m_scalePointMap = &ctrl->m_scalePointMap;
+			ftmv.m_val = *(float*)body;
+			ctrl->m_connectedModel->accept(ftmv);
+			qDebug() << m_ports[ev.index]->uri();
+			qDebug() << m_ports[ev.index]->name();
 		}
 		else if (ev.protocol == atom_eventTransfer)
 		{
