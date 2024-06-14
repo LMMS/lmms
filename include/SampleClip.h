@@ -81,8 +81,6 @@ public:
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
-	BoolModel& recordModel() { return m_recordModel; }
-
 public slots:
 	void setSampleFile(const QString& sf);
 	void updateLength();
