@@ -47,6 +47,7 @@
 #include "MidiEvent.h"
 #include "MidiEventToByteSeq.h"
 #include "NoCopyNoMove.h"
+#include "SubWindow.h"
 
 
 namespace lmms
@@ -753,9 +754,12 @@ void Lv2Proc::initMOptions()
 	float sampleRate = Engine::audioEngine()->outputSampleRate();
 	int32_t blockLength = Engine::audioEngine()->framesPerPeriod();
 	int32_t sequenceSize = defaultEvbufSize();
-	int32_t backgroundColor = 0xff000000;
-	int32_t foregroundColor = 0xffff0000;
-
+	// Create dummy object to find out the color
+	// I wish there was a more clean way...
+	gui::SubWindow tmpSubWindow;
+	int32_t backgroundColor = tmpSubWindow.palette().color(QPalette::Window).rgba();
+	int32_t foregroundColor = tmpSubWindow.palette().color(QPalette::WindowText).rgba();
+	qDebug() << backgroundColor << " <-> " << foregroundColor;
 	using Id = Lv2UridCache::Id;
 	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
 	m_options.initOption<int32_t>(Id::bufsz_maxBlockLength, blockLength);
