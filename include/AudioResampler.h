@@ -43,6 +43,9 @@ public:
 	//! least 4 extra samples) at the end of `src` to ensure correct interpolation of sample values.
 	void resample(float* dst, const float* src, size_t numDstFrames, size_t numSrcFrames, double ratio);
 
+	//! Clear previous sample state from the resampler.
+	void clear();
+
 	//! Interpolates the sample value at position `index` within `src` containing `size` samples.
 	//! Assumes that `src` represents an array of sample frames containing two samples each.
 	//! `prev` can be provided to provide the sample frame that occurs at `index - 1`.

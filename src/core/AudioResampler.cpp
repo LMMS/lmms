@@ -24,6 +24,7 @@
 
 #include "AudioResampler.h"
 
+#include <algorithm>
 #include <samplerate.h>
 
 #include "interpolation.h"
@@ -67,6 +68,11 @@ float AudioResampler::interpolate(const float* src, size_t size, int index, floa
 	const auto y3 = (x3 < 0 || x3 >= size) ? 0.0f : src[x3];
 
 	return hermiteInterpolate(y0, y1, y2, y3, fractionalOffset);
+}
+
+void AudioResampler::clear()
+{
+	std::fill(m_prevSamples.begin(), m_prevSamples.end(), 0.0f);
 }
 
 } // namespace lmms

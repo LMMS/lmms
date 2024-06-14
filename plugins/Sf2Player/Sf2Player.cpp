@@ -604,6 +604,13 @@ void Sf2Instrument::reloadSynth()
 	fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_DEFAULT);
 	m_synthMutex.unlock();
 
+	if (m_internalSampleRate < Engine::audioEngine()->outputSampleRate())
+	{
+		m_synthMutex.lock();
+		m_resampler.clear();
+		m_synthMutex.unlock();
+	}
+
 	updateReverb();
 	updateChorus();
 	updateReverbOn();
