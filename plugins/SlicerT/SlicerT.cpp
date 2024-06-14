@@ -121,7 +121,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		const auto dst = (workingBuffer + offset)->data();
 		const auto src = (m_originalSample.data() + noteFrame)->data();
 		const auto numDstFrames = frames;
-		const auto numSrcFrames = noteLeft * m_originalSample.sampleSize() + AudioResampler::MinimumResampleMargin;
+		const auto numSrcFrames = noteLeft * m_originalSample.sampleSize();
 
 		auto& resampler = playbackState->resampler();
 		resampler.resample(dst, src, numDstFrames, numSrcFrames, speedRatio);
