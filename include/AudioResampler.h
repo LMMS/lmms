@@ -35,12 +35,12 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
+	//! Minimum number of samples that should be added to the end of the source buffer when resampling.
 	static constexpr auto MinimumResampleMargin = 4;
 
 	//! Resample `numSrcFrames` sample frames from `src` to `numDstFrames` sample frames in `dst` with a ratio of
 	//! `ratio = output_sample_rate/input_sample_rate`. Callers are expected to provide some margin of sample values (at
-	//! least 4 extra samples) at the end of `src` to ensure correct interpolation of sample values. Returns an error
-	//! when this function completes, if any.
+	//! least 4 extra samples) at the end of `src` to ensure correct interpolation of sample values.
 	void resample(float* dst, const float* src, size_t numDstFrames, size_t numSrcFrames, double ratio);
 
 	//! Interpolates the sample value at position `index` within `src` containing `size` samples.

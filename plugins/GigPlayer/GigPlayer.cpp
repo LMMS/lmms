@@ -460,7 +460,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			{
 				sampleFrame convertBuf[frames];
 
-				// Only output if resampling is successful (note that "used" is output)
 				m_resampler.resample(&convertBuf[0][0], &sampleData[0][0], frames, samples, freq_factor);
 				used = samples;
 
