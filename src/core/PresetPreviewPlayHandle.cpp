@@ -48,7 +48,7 @@ public:
 		m_dataMutex()
 	{
 		setJournalling( false );
-		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, this ) );
+		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::Type::Instrument, this ) );
 		m_previewInstrumentTrack->setJournalling( false );
 		m_previewInstrumentTrack->setPreviewMode( true );
 	}
@@ -116,7 +116,7 @@ PreviewTrackContainer * PresetPreviewPlayHandle::s_previewTC;
 
 
 PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, bool _load_by_plugin, DataFile *dataFile ) :
-	PlayHandle( TypePresetPreviewHandle ),
+	PlayHandle( Type::PresetPreviewHandle ),
 	m_previewNote(nullptr)
 {
 	setUsesBuffer( false );
@@ -169,7 +169,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
 	s_previewTC->previewInstrumentTrack()->
-				midiPort()->setMode( MidiPort::Disabled );
+				midiPort()->setMode( MidiPort::Mode::Disabled );
 
 	Engine::audioEngine()->requestChangeInModel();
 	// create note-play-handle for it

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef ORGANIC_H
-#define ORGANIC_H
+#ifndef LMMS_ORGANIC_H
+#define LMMS_ORGANIC_H
 
 #include <QString>
 
@@ -85,7 +84,6 @@ const float CENT = 1.0f / 1200.0f;
 class OscillatorObject : public Model
 {
 	Q_OBJECT
-	MM_OPERATORS
 private:
 	int m_numOscillators;
 	IntModel m_waveShape;
@@ -131,8 +129,8 @@ public:
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
 
@@ -160,7 +158,6 @@ private:
 
 	struct oscPtr
 	{
-		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
 		float phaseOffsetLeft[NUM_OSCILLATORS];
@@ -197,7 +194,6 @@ private:
 
 	struct OscillatorKnobs
 	{
-		MM_OPERATORS
 		OscillatorKnobs( 
 					Knob * h,
 					Knob * v,
@@ -228,7 +224,6 @@ private:
 
 	int m_numOscillators;
 
-	static QPixmap * s_artwork;
 	
 protected slots:
 	void updateKnobHint();
@@ -239,4 +234,4 @@ protected slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_ORGANIC_H

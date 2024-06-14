@@ -43,14 +43,14 @@
 //
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, view ); 				\
+	name = new Knob( KnobType::Styled, view ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );             \
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( knobStyled, view ); 				\
+	name = new TempoSyncKnob( KnobType::Styled, view ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -173,7 +173,6 @@ class ComboBox;
 
 class MonstroSynth
 {
-	MM_OPERATORS
 public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
@@ -211,19 +210,19 @@ private:
 				break;
 			case WAVE_TRI:
 				//return Oscillator::triangleSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLTriangle );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLTriangle );
 				break;
 			case WAVE_SAW:
 				//return Oscillator::sawSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSaw );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLSaw );
 				break;
 			case WAVE_RAMP:
 				//return Oscillator::sawSample( _ph ) * -1.0;
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSaw ) * -1.0;
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLSaw ) * -1.0;
 				break;
 			case WAVE_SQR:
 				//return Oscillator::squareSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSquare );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLSquare );
 				break;
 			case WAVE_SQRSOFT:
 			{
@@ -236,7 +235,7 @@ private:
 			}
 			case WAVE_MOOG:
 				//return Oscillator::moogSawSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLMoog );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLMoog );
 				break;
 			case WAVE_SINABS:
 				return qAbs( Oscillator::sinSample( _ph ) );
@@ -367,7 +366,7 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override;
+	float desiredReleaseTimeMs() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

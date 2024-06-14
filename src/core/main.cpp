@@ -210,7 +210,6 @@ void printHelp()
 		"  -p, --profile <out>            Dump profiling information to file <out>\n"
 		"  -s, --samplerate <samplerate>  Specify output samplerate in Hz\n"
 		"          Range: 44100 (default) to 192000\n"
-		"  -x, --oversampling <value>     Specify oversampling\n"
 		"          Possible values: 1, 2, 4, 8\n"
 		"          Default: 2\n\n",
 		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
@@ -356,16 +355,14 @@ int main( int argc, char * * argv )
 	// don't let OS steal the menu bar. FIXME: only effective on Qt4
 	QCoreApplication::setAttribute( Qt::AA_DontUseNativeMenuBar );
 #endif
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
 
-	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
-	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
-	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
+	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
+	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
+	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -517,23 +514,23 @@ int main( int argc, char * * argv )
 
 			if( ext == "wav" )
 			{
-				eff = ProjectRenderer::WaveFile;
+				eff = ProjectRenderer::ExportFileFormat::Wave;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = ProjectRenderer::OggFile;
+				eff = ProjectRenderer::ExportFileFormat::Ogg;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
 			else if( ext == "mp3" )
 			{
-				eff = ProjectRenderer::MP3File;
+				eff = ProjectRenderer::ExportFileFormat::MP3;
 			}
 #endif
 			else if (ext == "flac")
 			{
-				eff = ProjectRenderer::FlacFile;
+				eff = ProjectRenderer::ExportFileFormat::Flac;
 			}
 			else
 			{
@@ -596,15 +593,15 @@ int main( int argc, char * * argv )
 
 			if( mode == "s" )
 			{
-				os.setStereoMode(OutputSettings::StereoMode_Stereo);
+				os.setStereoMode(OutputSettings::StereoMode::Stereo);
 			}
 			else if( mode == "j" )
 			{
-				os.setStereoMode(OutputSettings::StereoMode_JointStereo);
+				os.setStereoMode(OutputSettings::StereoMode::JointStereo);
 			}
 			else if( mode == "m" )
 			{
-				os.setStereoMode(OutputSettings::StereoMode_Mono);
+				os.setStereoMode(OutputSettings::StereoMode::Mono);
 			}
 			else
 			{
@@ -613,7 +610,7 @@ int main( int argc, char * * argv )
 		}
 		else if( arg =="--float" || arg == "-a" )
 		{
-			os.setBitDepth(OutputSettings::Depth_32Bit);
+			os.setBitDepth(OutputSettings::BitDepth::Depth32Bit);
 		}
 		else if( arg == "--interpolation" || arg == "-i" )
 		{
@@ -629,53 +626,23 @@ int main( int argc, char * * argv )
 
 			if( ip == "linear" )
 			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation_Linear;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::Linear;
 			}
 			else if( ip == "sincfastest" )
 			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincFastest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincFastest;
 			}
 			else if( ip == "sincmedium" )
 			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincMedium;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincMedium;
 			}
 			else if( ip == "sincbest" )
 			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincBest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincBest;
 			}
 			else
 			{
 				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
-			}
-		}
-		else if( arg == "--oversampling" || arg == "-x" )
-		{
-			++i;
-
-			if( i == argc )
-			{
-				return usageError( "No oversampling specified" );
-			}
-
-
-			int o = QString( argv[i] ).toUInt();
-
-			switch( o )
-			{
-				case 1:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling_None;
-		break;
-				case 2:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling_2x;
-		break;
-				case 4:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling_4x;
-		break;
-				case 8:
-		qs.oversampling = AudioEngine::qualitySettings::Oversampling_8x;
-		break;
-				default:
-				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--import" )
@@ -906,19 +873,13 @@ int main( int argc, char * * argv )
 			mb.setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
-			QPushButton * recover;
-			QPushButton * discard;
-			QPushButton * exit;
-
 			// setting all buttons to the same roles allows us
 			// to have a custom layout
-			discard = mb.addButton( MainWindow::tr( "Discard" ),
-								QMessageBox::AcceptRole );
-			recover = mb.addButton( MainWindow::tr( "Recover" ),
-								QMessageBox::AcceptRole );
+			auto discard = mb.addButton(MainWindow::tr("Discard"), QMessageBox::AcceptRole);
+			auto recover = mb.addButton(MainWindow::tr("Recover"), QMessageBox::AcceptRole);
 
 			// have a hidden exit button
-			exit = mb.addButton( "", QMessageBox::RejectRole);
+			auto exit = mb.addButton("", QMessageBox::RejectRole);
 			exit->setVisible(false);
 
 			// set icons

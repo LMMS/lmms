@@ -29,7 +29,7 @@ if(NOT MSVC)
 endif()
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "6.0.0")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation -Wno-format-truncation")
 ENDIF()
 
 IF(MINGW_PREFIX)
@@ -164,8 +164,8 @@ SET_PROPERTY(GLOBAL APPEND PROPERTY PLUGINS_BUILT "RemoteZynAddSubFx")
 TARGET_COMPILE_DEFINITIONS(RemoteZynAddSubFx PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 IF(LMMS_BUILD_WIN32)
-	SET_TARGET_PROPERTIES(RemoteZynAddSubFx PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
-ENDIF(LMMS_BUILD_WIN32)
+	target_link_options(RemoteZynAddSubFx PRIVATE "-mwindows")
+ENDIF()
 
 # Remove useless dependencies from FLTK. Use fltk-config to avoid static library
 # in older environments

@@ -63,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 	"Attila Herman <attila589/at/gmail.com>"
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 } ;
@@ -220,22 +220,10 @@ QString FreeBoyInstrument::nodeName() const
 
 
 
-/*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
+float FreeBoyInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
-	int maxrel = 0;
-	for( int i = 0 ; i < 3 ; ++i )
-	{
-		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = m_voice[i]->m_releaseModel.value();
-	}
-
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
-}*/
-
-f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
-{
-	return f_cnt_t( 1000 );
+	// Previous implementation was 1000 samples. At 44.1 kHz this is somewhat shy of 23. ms.
+	return 23.f;
 }
 
 
@@ -243,14 +231,14 @@ f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
 	int data = 0;
 	int freq = nph->frequency();
 
-	if ( tfp == 0 )
+	if (!nph->m_pluginData)
 	{
 		auto papu = new GbApuWrapper{};
 		papu->setSampleRate(samplerate, CLOCK_RATE);
@@ -419,7 +407,6 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		}
 		framesLeft -= count;
 	}
-	instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, nph);
 }
 
 
@@ -446,7 +433,7 @@ class FreeBoyKnob : public Knob
 {
 public:
 	FreeBoyKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 30, 30 );
 		setCenterPointX( 15.0 );
@@ -677,7 +664,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 
 
 	m_graph = new Graph( this );
-	m_graph->setGraphStyle( Graph::NearestStyle );
+	m_graph->setGraphStyle( Graph::Style::Nearest );
 	m_graph->setGraphColor( QColor(0x4E, 0x83, 0x2B) );
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);

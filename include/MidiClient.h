@@ -26,7 +26,7 @@
 #define LMMS_MIDI_CLIENT_H
 
 #include <QStringList>
-#include <QVector>
+#include <vector>
 
 
 #include "MidiEvent.h"
@@ -111,7 +111,7 @@ public:
 	static MidiClient * openMidiClient();
 
 protected:
-	QVector<MidiPort *> m_midiPorts;
+	std::vector<MidiPort *> m_midiPorts;
 
 } ;
 

@@ -31,16 +31,16 @@
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
 
 
-enum SfxrWaves
+enum class SfxrWave
 {
-	SQR_WAVE, SAW_WAVE, SINE_WAVE, NOISE_WAVE, WAVES_NUM
+	Square, Saw, Sine, Noise, Count
 };
+constexpr auto NumSfxrWaves = static_cast<std::size_t>(SfxrWave::Count);
 
 const int WAVEFORM_BASE_X = 20;
 const int WAVEFORM_BASE_Y = 15;
@@ -77,7 +77,6 @@ class SfxrInstrumentView;
 
 class SfxrSynth
 {
-	MM_OPERATORS
 public:
 	SfxrSynth( const SfxrInstrument * s );
 	virtual ~SfxrSynth() = default;

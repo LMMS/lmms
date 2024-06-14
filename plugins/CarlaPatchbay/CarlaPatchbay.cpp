@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
                        "Carla Patchbay Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,
-    Plugin::Instrument,
+    Plugin::Type::Instrument,
     new PluginPixmapLoader( "logo" ),
     nullptr,
     nullptr,

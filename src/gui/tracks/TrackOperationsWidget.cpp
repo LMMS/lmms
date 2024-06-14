@@ -38,7 +38,6 @@
 #include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
 #include "InstrumentTrackView.h"
 #include "PixmapButton.h"
 #include "Song.h"
@@ -64,7 +63,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	auto toMenu = new QMenu(this);
-	toMenu->setFont( pointSize<9>( toMenu->font() ) );
 	connect( toMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenu()));
 
 
@@ -137,12 +135,12 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
 	if( me->button() == Qt::LeftButton &&
 		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::PatternTrack)
+			m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
-		DataFile dataFile( DataFile::DragNDropData );
+		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
 		new StringPairDrag( QString( "track_%1" ).arg(
-					m_trackView->getTrack()->type() ),
+					static_cast<int>(m_trackView->getTrack()->type()) ),
 			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
 									this );
 	}
@@ -173,11 +171,11 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 	p.fillRect(rect(), palette().brush(QPalette::Window));
 
-	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
+	if (m_trackView->getTrack()->color().has_value() && !m_trackView->getTrack()->getMutedModel()->value()) 
 	{
 		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
-		
-		p.fillRect( coloredRect, m_trackView->getTrack()->color() );
+
+		p.fillRect(coloredRect, m_trackView->getTrack()->color().value());
 	}
 
 	p.drawPixmap(2, 2, embed::getIconPixmap(m_trackView->isMovingTrack() ? "track_op_grip_c" : "track_op_grip"));
@@ -196,7 +194,7 @@ bool TrackOperationsWidget::confirmRemoval()
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state){
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state){
 		// Invert button state, if it's checked we *shouldn't* ask again
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
 	});
@@ -266,15 +264,15 @@ void TrackOperationsWidget::removeTrack()
 
 void TrackOperationsWidget::selectTrackColor()
 {
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
-		getColor( m_trackView->getTrack()->color() );
+	const auto newColor = ColorChooser{this}
+		.withPalette(ColorChooser::Palette::Track)
+		->getColor(m_trackView->getTrack()->color().value_or(Qt::white));
 
-	if( ! new_color.isValid() )
-	{ return; }
+	if (!newColor.isValid()) { return; }
 
-	auto track = m_trackView->getTrack();
+	const auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->setColor(new_color);
+	track->setColor(newColor);
 	Engine::getSong()->setModified();
 }
 
@@ -282,7 +280,7 @@ void TrackOperationsWidget::resetTrackColor()
 {
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->resetColor();
+	track->setColor(std::nullopt);
 	Engine::getSong()->setModified();
 }
 
@@ -299,15 +297,12 @@ void TrackOperationsWidget::resetClipColors()
 {
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	for (auto clip: track->getClips())
+	for (auto clip : track->getClips())
 	{
-		clip->useCustomClipColor(false);
+		clip->setColor(std::nullopt);
 	}
 	Engine::getSong()->setModified();
 }
-
-
-
 
 /*! \brief Update the trackOperationsWidget context menu
  *

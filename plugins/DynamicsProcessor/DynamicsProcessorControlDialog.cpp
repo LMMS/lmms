@@ -47,7 +47,7 @@ DynProcControlDialog::DynProcControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 319 );
 
-	auto waveGraph = new Graph(this, Graph::LinearNonCyclicStyle, 204, 205);
+	auto waveGraph = new Graph(this, Graph::Style::LinearNonCyclic, 204, 205);
 	waveGraph -> move( 10, 6 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
@@ -58,7 +58,7 @@ DynProcControlDialog::DynProcControlDialog(
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
-	auto inputKnob = new Knob(knobBright_26, this);
+	auto inputKnob = new Knob(KnobType::Bright26, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 223 );
@@ -66,7 +66,7 @@ DynProcControlDialog::DynProcControlDialog(
 	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	auto outputKnob = new Knob(knobBright_26, this);
+	auto outputKnob = new Knob(KnobType::Bright26, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 223 );
@@ -74,13 +74,13 @@ DynProcControlDialog::DynProcControlDialog(
 	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ) , "" );
 
-	auto attackKnob = new Knob(knobBright_26, this);
+	auto attackKnob = new Knob(KnobType::Bright26, this);
 	attackKnob -> move( 24, 268 );
 	attackKnob->setModel( &_controls->m_attackModel );
 	attackKnob->setLabel( tr( "ATTACK" ) );
 	attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
 
-	auto releaseKnob = new Knob(knobBright_26, this);
+	auto releaseKnob = new Knob(KnobType::Bright26, this);
 	releaseKnob -> move( 74, 268 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
 	releaseKnob->setLabel( tr( "RELEASE" ) );

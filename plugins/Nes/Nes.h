@@ -31,11 +31,10 @@
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 #include "PixmapButton.h"
-#include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, this ); 				\
+	name = new Knob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -92,7 +91,6 @@ class NesInstrumentView;
 
 class NesObject
 {
-	MM_OPERATORS
 public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject() = default;
@@ -224,9 +222,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 8 );
+		return 0.2f;
 	}
 	
 	gui::PluginView* instantiateView( QWidget * parent ) override;
@@ -372,7 +370,6 @@ private:
 	Knob *			m_masterVolKnob;
 	Knob *			m_vibratoKnob;	
 	
-	static QPixmap *	s_artwork;
 };
 
 

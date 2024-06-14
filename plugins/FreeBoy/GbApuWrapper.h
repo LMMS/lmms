@@ -26,7 +26,6 @@
 
 #include "Gb_Apu.h"
 #include "Multi_Buffer.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -34,7 +33,6 @@ namespace lmms
 
 class GbApuWrapper : private Gb_Apu
 {
-	MM_OPERATORS
 public:
 	GbApuWrapper() = default;
 	~GbApuWrapper() = default;

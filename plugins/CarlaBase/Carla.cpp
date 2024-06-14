@@ -150,7 +150,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
-    : Instrument(instrumentTrack, descriptor),
+    : Instrument(instrumentTrack, descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable),
       kIsPatchbay(isPatchbay),
       fHandle(nullptr),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
@@ -220,7 +220,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
 
     if (fHost.resourceDir != nullptr)
     {
@@ -259,7 +259,7 @@ uint32_t CarlaInstrument::handleGetBufferSize() const
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::audioEngine()->processingSampleRate();
+    return Engine::audioEngine()->outputSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -342,11 +342,6 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 }
 
 // -------------------------------------------------------------------
-
-Instrument::Flags CarlaInstrument::flags() const
-{
-    return IsSingleStreamed|IsMidiBased|IsNotBendable;
-}
 
 QString CarlaInstrument::nodeName() const
 {
@@ -508,7 +503,6 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 
     if (fHandle == nullptr)
     {
-        instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
         return;
     }
 
@@ -556,8 +550,6 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
         workingBuffer[i][0] = buf1[i];
         workingBuffer[i][1] = buf2[i];
     }
-
-    instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
 }
 
 bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)
@@ -635,7 +627,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
     m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-    m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
+    m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
     m_toggleUIButton->setToolTip(
@@ -645,7 +637,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
     m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
     m_toggleParamsWindowButton->setCheckable(true);
-    m_toggleParamsWindowButton->setFont(pointSize<8>(m_toggleParamsWindowButton->font()));
+    m_toggleParamsWindowButton->setFont(adjustedToPixelSize(m_toggleParamsWindowButton->font(), 8));
 #if CARLA_VERSION_HEX < CARLA_MIN_PARAM_VERSION
     m_toggleParamsWindowButton->setEnabled(false);
     m_toggleParamsWindowButton->setToolTip(tr("Available from Carla version 2.1 and up."));
@@ -1015,7 +1007,7 @@ void CarlaParamsView::refreshKnobs()
 	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
 	{
 		bool enabled = m_carlaInstrument->m_paramModels[i]->enabled();
-		m_knobs.push_back(new Knob(knobDark_28, m_inputScrollAreaWidgetContent));
+		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
 		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
 		m_knobs[i]->setHintText(name, "");
 		m_knobs[i]->setLabel(name);
@@ -1119,16 +1111,15 @@ void CarlaParamsView::clearKnobs()
 	}
 
 	// Remove spacers
-	QLayoutItem* item;
 	for (int16_t i=m_inputScrollAreaLayout->count() - 1; i > 0; i--)
 	{
-		item = m_inputScrollAreaLayout->takeAt(i);
+		auto item = m_inputScrollAreaLayout->takeAt(i);
 		if (item->widget()) {continue;}
 		delete item;
 	}
 	for (int16_t i=m_outputScrollAreaLayout->count() - 1; i > 0; i--)
 	{
-		item = m_outputScrollAreaLayout->takeAt(i);
+		auto item = m_outputScrollAreaLayout->takeAt(i);
 		if (item->widget()) {continue;}
 		delete item;
 	}

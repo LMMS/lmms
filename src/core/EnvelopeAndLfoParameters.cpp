@@ -22,13 +22,17 @@
  *
  */
 
-#include <QDomElement>
-
 #include "EnvelopeAndLfoParameters.h"
+
+#include <QDomElement>
+#include <QFileInfo>
+
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Oscillator.h"
-
+#include "PathUtil.h"
+#include "SampleLoader.h"
+#include "Song.h"
 
 namespace lmms
 {
@@ -113,12 +117,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 				SECS_PER_LFO_OSCILLATION * 1000.0, this,
 							tr( "LFO frequency" ) ),
 	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
+	m_lfoWaveModel( static_cast<int>(LfoShape::SineWave), 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
 	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( false ),
-	m_lfoShapeData( nullptr )
+	m_lfoShapeData(nullptr)
 {
 	m_amountModel.setCenterValue( 0 );
 	m_lfoAmountModel.setCenterValue( 0 );
@@ -209,28 +213,28 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 	const float phase = frame / static_cast<float>(
 						m_lfoOscillationFrames );
 	sample_t shape_sample;
-	switch( m_lfoWaveModel.value()  )
+	switch( static_cast<LfoShape>(m_lfoWaveModel.value())  )
 	{
-		case TriangleWave:
+		case LfoShape::TriangleWave:
 			shape_sample = Oscillator::triangleSample( phase );
 			break;
-		case SquareWave:
+		case LfoShape::SquareWave:
 			shape_sample = Oscillator::squareSample( phase );
 			break;
-		case SawWave:
+		case LfoShape::SawWave:
 			shape_sample = Oscillator::sawSample( phase );
 			break;
-		case UserDefinedWave:
-			shape_sample = m_userWave.userWaveSample( phase );
+		case LfoShape::UserDefinedWave:
+			shape_sample = Oscillator::userWaveSample(m_userWave.get(), phase);
 			break;
-		case RandomWave:
+		case LfoShape::RandomWave:
 			if( frame == 0 )
 			{
 				m_random = Oscillator::noiseSample( 0.0f );
 			}
 			shape_sample = m_random;
 			break;
-		case SineWave:
+		case LfoShape::SineWave:
 		default:
 			shape_sample = Oscillator::sinSample( phase );
 			break;
@@ -274,7 +278,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	const float lafI = 1.0f / qMax( minimumFrames, m_lfoAttackFrames );
+	const float lafI = 1.0f / std::max(minimumFrames, m_lfoAttackFrames);
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
@@ -354,7 +358,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
+	_parent.setAttribute("userwavefile", m_userWave->audioFile());
 }
 
 
@@ -386,7 +390,14 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
 
-	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
+	if (const auto userWaveFile = _this.attribute("userwavefile"); !userWaveFile.isEmpty())
+	{
+		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
+		{
+			m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+		}
+		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
+	}
 
 	updateSampleVars();
 }
@@ -399,21 +410,21 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	QMutexLocker m(&m_paramMutex);
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
 	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
 
-	const f_cnt_t attack_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) ) );
+	const f_cnt_t attack_frames = std::max(minimumFrames,
+					static_cast<f_cnt_t>(frames_per_env_seg *
+					expKnobVal(m_attackModel.value())));
 
 	const auto hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
 
-	const f_cnt_t decay_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_decayModel.value() *
-					( 1 - m_sustainModel.value() ) ) ) );
+	const f_cnt_t decay_frames = std::max(minimumFrames,
+					static_cast<f_cnt_t>(frames_per_env_seg *
+					expKnobVal(m_decayModel.value() *
+					(1 - m_sustainModel.value()))));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -430,7 +441,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 								decay_frames;
 	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseModel.value() ) );
-	m_rFrames = qMax( minimumFrames, m_rFrames );
+	m_rFrames = std::max(minimumFrames, m_rFrames);
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 	{
@@ -498,7 +509,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-				Engine::audioEngine()->processingSampleRate();
+				Engine::audioEngine()->outputSampleRate();
 	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayModel.value() ) );
 	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *

@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A 4-band Crossover Equalizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &crossovereq_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_lp1( m_sampleRate ),
 	m_lp2( m_sampleRate ),
 	m_lp3( m_sampleRate ),
@@ -64,21 +64,21 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp1 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
-	m_tmp2 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
-	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_tmp2 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_tmp1 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
 {
-	MM_FREE( m_tmp1 );
-	MM_FREE( m_tmp2 );
-	MM_FREE( m_work );
+	delete[] m_tmp1;
+	delete[] m_tmp2;
+	delete[] m_work;
 }
 
 void CrossoverEQEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_lp1.setSampleRate( m_sampleRate );
 	m_lp2.setSampleRate( m_sampleRate );
 	m_lp3.setSampleRate( m_sampleRate );

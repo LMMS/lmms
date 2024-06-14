@@ -156,7 +156,6 @@ bool AudioFileOgg::startEncoding()
 	ogg_packet header_main;
 	ogg_packet header_comments;
 	ogg_packet header_codebooks;
-	int result;
 
 	// Build the packets
 	vorbis_analysis_headerout( &m_vd, m_comments, &header_main,
@@ -167,14 +166,9 @@ bool AudioFileOgg::startEncoding()
 	ogg_stream_packetin( &m_os, &header_comments );
 	ogg_stream_packetin( &m_os, &header_codebooks );
 
-	while( ( result = ogg_stream_flush( &m_os, &m_og ) ) )
+	while (ogg_stream_flush(&m_os, &m_og))
 	{
-		if( !result )
-		{
-			break;
-		}
-		int ret = writePage();
-		if( ret != m_og.header_len + m_og.body_len )
+		if (int ret = writePage(); ret != m_og.header_len + m_og.body_len)
 		{
 			// clean up
 			finishEncoding();
@@ -185,12 +179,7 @@ bool AudioFileOgg::startEncoding()
 	return true;
 }
 
-
-
-
-void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain )
+void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames)
 {
 	int eos = 0;
 
@@ -201,7 +190,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	{
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
-			buffer[chnl][frame] = _ab[frame][chnl] * _master_gain;
+			buffer[chnl][frame] = _ab[frame][chnl];
 		}
 	}
 
@@ -258,7 +247,7 @@ void AudioFileOgg::finishEncoding()
 	if( m_ok )
 	{
 		// just for flushing buffers...
-		writeBuffer( nullptr, 0, 0.0f );
+		writeBuffer(nullptr, 0);
 
 		// clean up
 		ogg_stream_clear( &m_os );

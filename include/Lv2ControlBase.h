@@ -74,7 +74,7 @@ class PluginIssue;
 class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
+	static Plugin::Type check(const LilvPlugin* m_plugin,
 		std::vector<PluginIssue> &issues);
 
 	void shutdown();
@@ -101,9 +101,6 @@ protected:
 	void reload();
 
 	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
-
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_valid; }
 
 	/*
 		overrides
@@ -149,7 +146,6 @@ private:
 	//! fulfill LMMS' requirement of having stereo input and output
 	std::vector<std::unique_ptr<Lv2Proc>> m_procs;
 
-	bool m_valid = true;
 	bool m_hasGUI = false;
 	unsigned m_channelsPerProc;
 

@@ -70,11 +70,6 @@ public:
 
 	virtual void loadFile( const QString & _file );
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
-
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
 	virtual gui::PluginView* instantiateView( QWidget * _parent );
@@ -131,8 +126,6 @@ protected:
 
 
 private:
-	static QPixmap * s_artwork;
-
 	VestigeInstrument * m_vi;
 
 	QWidget *widget;
@@ -175,7 +168,6 @@ protected:
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
 
 	VestigeInstrument * m_vi;
 

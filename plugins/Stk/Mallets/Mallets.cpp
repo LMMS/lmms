@@ -37,7 +37,6 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 
@@ -59,7 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 				"Tuneful things to bang on" ),
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -85,8 +84,9 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 //	TODO: m_vibratoModel
 	m_velocityModel(64.0f, 0.1f, 128.0f, 0.1f, this, tr( "Speed" )),
 	m_strikeModel( true, this, tr( "Bowed" ) ),
-	m_presetsModel(this),
+	m_presetsModel(this, tr("Instrument")),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
+	m_randomModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Randomness")),
 	m_versionModel( MALLETS_PRESET_VERSION, 0, MALLETS_PRESET_VERSION, this, "" ),
 	m_isOldVersionModel( false, this, "" ),
 	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
@@ -155,6 +155,7 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	m_presetsModel.saveSettings( _doc, _this, "preset" );
 	m_spreadModel.saveSettings( _doc, _this, "spread" );
+	m_randomModel.saveSettings(_doc, _this, "randomness");
 	m_versionModel.saveSettings( _doc, _this, "version" );
 	m_isOldVersionModel.saveSettings( _doc, _this, "oldversion" );
 }
@@ -189,6 +190,7 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 
 	m_presetsModel.loadSettings( _this, "preset" );
 	m_spreadModel.loadSettings( _this, "spread" );
+	m_randomModel.loadSettings(_this, "randomness");
 	m_isOldVersionModel.loadSettings( _this, "oldversion" );
 
 	// To maintain backward compatibility
@@ -284,14 +286,47 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	int p = m_presetsModel.value();
-	
+
 	const float freq = _n->frequency();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		// If newer projects, adjust velocity to within stk's limits
 		float velocityAdjust =
 			m_isOldVersionModel.value() ? 100.0 : 200.0;
 		const float vel = _n->getVolume() / velocityAdjust;
+
+		const float random = m_randomModel.value();
+		float hardness = m_hardnessModel.value();
+		float position = m_positionModel.value();
+		float modulator = m_modulatorModel.value();
+		float crossfade = m_crossfadeModel.value();
+		float pressure = m_pressureModel.value();
+		float speed = m_velocityModel.value();
+
+		if (p < 9)
+		{
+			hardness += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			hardness = std::clamp(hardness, 0.0f, 128.0f);
+
+			position += random * (static_cast<float>(fast_rand() % 64) - 32.0);
+			position = std::clamp(position, 0.0f, 64.0f);
+		}
+		else if (p == 9)
+		{
+			modulator += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			modulator = std::clamp(modulator, 0.0f, 128.0f);
+
+			crossfade += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
+		}
+		else
+		{
+			pressure += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			pressure = std::clamp(pressure, 0.0f, 128.0f);
+
+			speed += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			speed = std::clamp(speed, 0.0f, 128.0f);
+		}
 
 		// critical section as STK is not thread-safe
 		static QMutex m;
@@ -301,13 +336,13 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 			_n->m_pluginData = new MalletsSynth( freq,
 						vel,
 						m_stickModel.value(),
-						m_hardnessModel.value(),
-						m_positionModel.value(),
+						hardness,
+						position,
 						m_vibratoGainModel.value(),
 						m_vibratoFreqModel.value(),
 						p,
 						(uint8_t) m_spreadModel.value(),
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -315,25 +350,25 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 						vel,
 						p,
 						m_lfoDepthModel.value(),
-						m_modulatorModel.value(),
-						m_crossfadeModel.value(),
+						modulator,
+						crossfade,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 		}
 		else
 		{
 			_n->m_pluginData = new MalletsSynth( freq,
 						vel,
-						m_pressureModel.value(),
+						pressure,
 						m_motionModel.value(),
 						m_vibratoModel.value(),
 						p - 10,
 						m_strikeModel.value() * 128.0,
-						m_velocityModel.value(),
+						speed,
 						(uint8_t) m_spreadModel.value(),
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 		}
 		m.unlock();
 		static_cast<MalletsSynth *>(_n->m_pluginData)->setPresetIndex(p);
@@ -343,8 +378,20 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto ps = static_cast<MalletsSynth*>(_n->m_pluginData);
-	ps->setFrequency( freq );
+	ps->setFrequency(freq);
+
 	p = ps->presetIndex();
+	if (p < 9) // ModalBar updates
+	{
+		ps->setVibratoGain(m_vibratoGainModel.value());
+		ps->setVibratoFreq(m_vibratoFreqModel.value());
+	}
+	else if (p == 9) // Tubular Bells updates
+	{
+		ps->setADSR(m_adsrModel.value());
+		ps->setLFODepth(m_lfoDepthModel.value());
+		ps->setLFOSpeed(m_lfoSpeedModel.value());
+	}
 
 	sample_t add_scale = 0.0f;
 	if( p == 10 && m_isOldVersionModel.value() == true )
@@ -359,8 +406,6 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		_working_buffer[frame][1] = ps->nextSampleRight() *
 				( m_scalers[p] + add_scale );
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -404,15 +449,19 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
 	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
-	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
 	
-	m_spreadKnob = new Knob( knobVintage_32, this );
+	m_spreadKnob = new Knob( KnobType::Vintage32, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
+
+	m_randomKnob = new Knob(KnobType::Vintage32, this);
+	m_randomKnob->setLabel(tr("Random"));
+	m_randomKnob->move(190, 190);
+	m_randomKnob->setHintText(tr("Random:"), "");
 
 	// try to inform user about missing Stk-installation
 	if( _instrument->m_filesMissing && getGUI() != nullptr )
@@ -445,31 +494,31 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 		
-	m_hardnessKnob = new Knob( knobVintage_32, widget );
+	m_hardnessKnob = new Knob( KnobType::Vintage32, widget );
 	m_hardnessKnob->setLabel( tr( "Hardness" ) );
 	m_hardnessKnob->move( 30, 90 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ), "" );
 
-	m_positionKnob = new Knob( knobVintage_32, widget );
+	m_positionKnob = new Knob( KnobType::Vintage32, widget );
 	m_positionKnob->setLabel( tr( "Position" ) );
 	m_positionKnob->move( 110, 90 );
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
-	m_vibratoGainKnob = new Knob( knobVintage_32, widget );
+	m_vibratoGainKnob = new Knob( KnobType::Vintage32, widget );
 	m_vibratoGainKnob->setLabel( tr( "Vibrato gain" ) );
 	m_vibratoGainKnob->move( 30, 140 );
 	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
-	m_vibratoFreqKnob = new Knob( knobVintage_32, widget );
+	m_vibratoFreqKnob = new Knob( KnobType::Vintage32, widget );
 	m_vibratoFreqKnob->setLabel( tr( "Vibrato frequency" ) );
 	m_vibratoFreqKnob->move( 110, 140 );
 	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
 
-	m_stickKnob = new Knob( knobVintage_32, widget );
+	m_stickKnob = new Knob( KnobType::Vintage32, widget );
 	m_stickKnob->setLabel( tr( "Stick mix" ) );
 	m_stickKnob->move( 190, 90 );
 	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
-	
+
 	return( widget );
 }
 
@@ -481,27 +530,27 @@ QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 	
-	m_modulatorKnob = new Knob( knobVintage_32, widget );
+	m_modulatorKnob = new Knob( KnobType::Vintage32, widget );
 	m_modulatorKnob->setLabel( tr( "Modulator" ) );
 	m_modulatorKnob->move( 30, 90 );
 	m_modulatorKnob->setHintText( tr( "Modulator:" ), "" );
 
-	m_crossfadeKnob = new Knob( knobVintage_32, widget );
+	m_crossfadeKnob = new Knob( KnobType::Vintage32, widget );
 	m_crossfadeKnob->setLabel( tr( "Crossfade" ) );
 	m_crossfadeKnob->move( 110, 90 );
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
 	
-	m_lfoSpeedKnob = new Knob( knobVintage_32, widget );
+	m_lfoSpeedKnob = new Knob( KnobType::Vintage32, widget );
 	m_lfoSpeedKnob->setLabel( tr( "LFO speed" ) );
 	m_lfoSpeedKnob->move( 30, 140 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
 	
-	m_lfoDepthKnob = new Knob( knobVintage_32, widget );
+	m_lfoDepthKnob = new Knob( KnobType::Vintage32, widget );
 	m_lfoDepthKnob->setLabel( tr( "LFO depth" ) );
 	m_lfoDepthKnob->move( 110, 140 );
 	m_lfoDepthKnob->setHintText( tr( "LFO depth:" ), "" );
 	
-	m_adsrKnob = new Knob( knobVintage_32, widget );
+	m_adsrKnob = new Knob( KnobType::Vintage32, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
 	m_adsrKnob->move( 190, 90 );
 	m_adsrKnob->setHintText( tr( "ADSR:" ), "" );
@@ -521,22 +570,22 @@ QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 /*	m_strikeLED = new LedCheckBox( tr( "Bowed" ), widget );
 	m_strikeLED->move( 138, 25 );*/
 
-	m_pressureKnob = new Knob( knobVintage_32, widget );
+	m_pressureKnob = new Knob( KnobType::Vintage32, widget );
 	m_pressureKnob->setLabel( tr( "Pressure" ) );
 	m_pressureKnob->move( 30, 90 );
 	m_pressureKnob->setHintText( tr( "Pressure:" ), "" );
 
-/*	m_motionKnob = new Knob( knobVintage_32, widget );
+/*	m_motionKnob = new Knob( KnobType::Vintage32, widget );
 	m_motionKnob->setLabel( tr( "Motion" ) );
 	m_motionKnob->move( 110, 90 );
 	m_motionKnob->setHintText( tr( "Motion:" ), "" );*/
 
-	m_velocityKnob = new Knob( knobVintage_32, widget );
+	m_velocityKnob = new Knob( KnobType::Vintage32, widget );
 	m_velocityKnob->setLabel( tr( "Speed" ) );
 	m_velocityKnob->move( 30, 140 );
 	m_velocityKnob->setHintText( tr( "Speed:" ), "" );
 	
-/*	m_vibratoKnob = new Knob( knobVintage_32, widget, tr( "Vibrato" ) );
+/*	m_vibratoKnob = new Knob( KnobType::Vintage32, widget, tr( "Vibrato" ) );
 	m_vibratoKnob->setLabel( tr( "Vibrato" ) );
 	m_vibratoKnob->move( 110, 140 );
 	m_vibratoKnob->setHintText( tr( "Vibrato:" ), "" );*/
@@ -567,6 +616,7 @@ void MalletsInstrumentView::modelChanged()
 //	m_strikeLED->setModel( &inst->m_strikeModel );
 	m_presetsCombo->setModel( &inst->m_presetsModel );
 	m_spreadKnob->setModel( &inst->m_spreadModel );
+	m_randomKnob->setModel(&inst->m_randomModel);
 }
 
 

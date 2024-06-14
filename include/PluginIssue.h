@@ -33,32 +33,32 @@ namespace lmms
 
 //! Types of issues that can cause LMMS to not load a plugin
 //! LMMS Plugins should use this to indicate errors
-enum PluginIssueType
+enum class PluginIssueType
 {
 	// port flow & type
-	unknownPortFlow,
-	unknownPortType,
+	UnknownPortFlow,
+	UnknownPortType,
 	// channel count
-	tooManyInputChannels,
-	tooManyOutputChannels,
-	tooManyMidiInputChannels,
-	tooManyMidiOutputChannels,
-	noOutputChannel,
+	TooManyInputChannels,
+	TooManyOutputChannels,
+	TooManyMidiInputChannels,
+	TooManyMidiOutputChannels,
+	NoOutputChannel,
 	// port metadata
-	portHasNoDef,
-	portHasNoMin,
-	portHasNoMax,
-	minGreaterMax,
-	defaultValueNotInRange,
-	logScaleMinMissing,
-	logScaleMaxMissing,
-	logScaleMinMaxDifferentSigns,
+	PortHasNoDef,
+	PortHasNoMin,
+	PortHasNoMax,
+	MinGreaterMax,
+	DefaultValueNotInRange,
+	LogScaleMinMissing,
+	LogScaleMaxMissing,
+	LogScaleMinMaxDifferentSigns,
 	// features
-	featureNotSupported, //!< plugin requires functionality LMMS can't offer
+	FeatureNotSupported, //!< plugin requires functionality LMMS can't offer
 	// misc
-	badPortType, //!< port type not supported
-	blacklisted,
-	noIssue
+	BadPortType, //!< port type not supported
+	Blacklisted,
+	NoIssue
 };
 
 //! Issue type bundled with informational string

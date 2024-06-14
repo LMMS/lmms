@@ -57,7 +57,7 @@ extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { LMMS_STRINGIFY(
 	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser",
 	"Mathematical expression parser"), "Orr Dvori", 0x0100,
-	Plugin::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
+	Plugin::Type::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
 
 }
 
@@ -201,17 +201,17 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
 
-	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == nullptr) {
+	if (!nph->m_pluginData) {
 
 		auto exprO1 = new ExprFront(m_outputExpression[0].constData(),
-			Engine::audioEngine()->processingSampleRate()); // give the "last" function a whole second
-		auto exprO2 = new ExprFront(m_outputExpression[1].constData(), Engine::audioEngine()->processingSampleRate());
+			Engine::audioEngine()->outputSampleRate()); // give the "last" function a whole second
+		auto exprO2 = new ExprFront(m_outputExpression[1].constData(), Engine::audioEngine()->outputSampleRate());
 
 		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
 			e->add_constant("key", nph->key());//the key that was pressed.
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
-			e->add_constant("srate", Engine::audioEngine()->processingSampleRate());// sample rate of the audio engine
+			e->add_constant("srate", Engine::audioEngine()->outputSampleRate());// sample rate of the audio engine
 			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
 			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
 			e->add_variable("A1", m_A1);//A1,A2,A3: general purpose input controls.
@@ -225,7 +225,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 		m_W2.setInterpolate(m_interpolateW2.value());
 		m_W3.setInterpolate(m_interpolateW3.value());
 		nph->m_pluginData = new ExprSynth(&m_W1, &m_W2, &m_W3, exprO1, exprO2, nph,
-				Engine::audioEngine()->processingSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
+				Engine::audioEngine()->outputSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
 	}
 
 	auto ps = static_cast<ExprSynth*>(nph->m_pluginData);
@@ -233,8 +233,6 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	const f_cnt_t offset = nph->noteOffset();
 
 	ps->renderOutput(frames, working_buffer + offset);
-
-	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, nph);
 }
 
 void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {
@@ -258,13 +256,12 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;
-		int i;
-		for (i = 0; i < guass_size; i++ )
+		for (int i = 0; i < guass_size; i++)
 		{
 			temp = (i - guass_center) / delta;
 			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
 		}
-		for (i = 0; i < guass_size; i++ )
+		for (int i = 0; i < guass_size; i++)
 		{
 			guassian[i] = guassian[i] / sum;
 		}
@@ -291,11 +288,11 @@ public:
 		setLineWidth(3);
 	}
 	XpressiveKnob(QWidget * _parent, const QString & _name) :
-		Knob(knobStyled, _parent,_name) {
+		Knob(KnobType::Styled, _parent,_name) {
 		setStyle();
 	}
 	XpressiveKnob(QWidget * _parent) :
-		Knob(knobStyled, _parent) {
+		Knob(KnobType::Styled, _parent) {
 		setStyle();
 	}
 
@@ -325,7 +322,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
-	m_graph = new Graph(this, Graph::LinearStyle, 180, 81);
+	m_graph = new Graph(this, Graph::Style::Linear, 180, 81);
 	m_graph->move(3, BASE_START + 1);
 	m_graph->setAutoFillBackground(true);
 	m_graph->setGraphColor(QColor(255, 255, 255));
@@ -337,13 +334,6 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	pal = QPalette();
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
 	m_graph->setPalette(pal);
-
-	PixmapButton * m_w1Btn;
-	PixmapButton * m_w2Btn;
-	PixmapButton * m_w3Btn;
-	PixmapButton * m_o1Btn;
-	PixmapButton * m_o2Btn;
-	PixmapButton * m_helpBtn;
 
 	m_w1Btn = new PixmapButton(this, nullptr);
 	m_w1Btn->move(3, ROW_BTN);
@@ -447,11 +437,11 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 
 
 	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
-										 LedCheckBox::Green);
+										 LedCheckBox::LedColor::Green);
 	m_waveInterpolate->move(2, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
-											  LedCheckBox::Red);
+											  LedCheckBox::LedColor::Red);
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
 	m_expressionValidToggle->setEnabled( false );
 
@@ -485,7 +475,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 
 
 
-	m_smoothKnob=new Knob(knobStyled, this, "Smoothness");
+	m_smoothKnob=new Knob(KnobType::Styled, this, "Smoothness");
 	m_smoothKnob->setFixedSize(25, 25);
 	m_smoothKnob->setCenterPointX(12.5);
 	m_smoothKnob->setCenterPointY(12.5);
