@@ -67,17 +67,12 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	const auto* volumeBuf = m_ampControls.m_volumeModel.valueBuffer();
-	const auto* panBuf = m_ampControls.m_panModel.valueBuffer();
-	const auto* leftBuf = m_ampControls.m_leftModel.valueBuffer();
-	const auto* rightBuf = m_ampControls.m_rightModel.valueBuffer();
-
 	for (size_t f = 0; f < frames; ++f)
 	{
-		const float volume = (volumeBuf ? volumeBuf->at(std::clamp<std::size_t>(f, 0, volumeBuf->size())) : m_ampControls.m_volumeModel.value()) * 0.01f;
-		const float pan = (panBuf ? panBuf->at(std::clamp<std::size_t>(f, 0, panBuf->size())) : m_ampControls.m_panModel.value()) * 0.01f;
-		const float left = (leftBuf ? leftBuf->at(std::clamp<std::size_t>(f, 0, leftBuf->size())) : m_ampControls.m_leftModel.value()) * 0.01f;
-		const float right = (rightBuf ? rightBuf->at(std::clamp<std::size_t>(f, 0, rightBuf->size())) : m_ampControls.m_rightModel.value()) * 0.01f;
+		const float volume = m_ampControls.m_volumeModel.valueAt(f) * 0.01f;
+		const float pan = m_ampControls.m_panModel.valueAt(f) * 0.01f;
+		const float left = m_ampControls.m_leftModel.valueAt(f) * 0.01f;
+		const float right = m_ampControls.m_rightModel.valueAt(f) * 0.01f;
 
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);

@@ -89,29 +89,20 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	SPFLOAT tmpL, tmpR;
 	SPFLOAT dcblkL, dcblkR;
 
-	auto* inGainBuf = m_reverbSCControls.m_inputGainModel.valueBuffer();
-	auto* sizeBuf = m_reverbSCControls.m_sizeModel.valueBuffer();
-	auto* colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
-	auto* outGainBuf = m_reverbSCControls.m_outputGainModel.valueBuffer();
-
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
 		const auto inGain
-			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->data()[f] : m_reverbSCControls.m_inputGainModel.value()));
+			= static_cast<SPFLOAT>(DB2LIN(m_reverbSCControls.m_inputGainModel.valueAt(f)));
 		const auto outGain
-			= (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->data()[f] : m_reverbSCControls.m_outputGainModel.value()));
+			= static_cast<SPFLOAT>(m_reverbSCControls.m_outputGainModel.valueAt(f));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
-		revsc->feedback = (SPFLOAT)(sizeBuf ?
-			sizeBuf->data()[f]
-			: m_reverbSCControls.m_sizeModel.value());
+		revsc->feedback = static_cast<SPFLOAT>(m_reverbSCControls.m_sizeModel.valueAt(f));
 
-		revsc->lpfreq = (SPFLOAT)(colorBuf ?
-			colorBuf->data()[f]
-			: m_reverbSCControls.m_colorModel.value());
+		revsc->lpfreq = static_cast<SPFLOAT>(m_reverbSCControls.m_colorModel.valueAt(f));
 
 
 		sp_revsc_compute(sp, revsc, &s[0], &s[1], &tmpL, &tmpR);

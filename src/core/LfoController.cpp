@@ -101,9 +101,8 @@ void LfoController::updateValueBuffer()
 	}
 
 	float amount = m_amountModel.value();
-	auto* amountBuffer = m_amountModel.valueBuffer();
 	int amountInc = amountBuffer ? 1 : 0;
-	float* amountPtr = amountBuffer ? &(amountBuffer->data()[0]) : &amount;
+	float* amountPtr = &(m_amountModel.valueAt(0));
 	Oscillator::WaveShape waveshape = static_cast<Oscillator::WaveShape>(m_waveModel.value());
 
 	for( float& f : m_valueBuffer )

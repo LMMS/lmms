@@ -326,6 +326,11 @@ void AutomatableModel::setValue( const float value )
 }
 
 
+float AutomatableModel::valueAt(size_t index)
+{
+	const auto buffer = valueBuffer();
+	return buffer ? buffer->data[index] : value();
+}
 
 
 template<class T> T AutomatableModel::logToLinearScale( T value ) const

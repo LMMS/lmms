@@ -98,18 +98,16 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	float amplitude = m_delayControls.m_lfoAmountModel.value() * sr;
 	float lfoTime = 1.0 / m_delayControls.m_lfoTimeModel.value();
 	float feedback =  m_delayControls.m_feedbackModel.value();
-	auto* lengthBuffer = m_delayControls.m_delayTimeModel.valueBuffer();
-	auto* feedbackBuffer = m_delayControls.m_feedbackModel.valueBuffer();
-	auto* lfoTimeBuffer = m_delayControls.m_lfoTimeModel.valueBuffer();
-	auto* lfoAmountBuffer = m_delayControls.m_lfoAmountModel.valueBuffer();
+	auto* lfoTimeBuffer = ;
+	auto* lfoAmountBuffer = Buffer();
 	int lengthInc = lengthBuffer ? 1 : 0;
 	int amplitudeInc = lfoAmountBuffer ? 1 : 0;
 	int lfoTimeInc = lfoTimeBuffer ? 1 : 0;
 	int feedbackInc = feedbackBuffer ? 1 : 0;
-	float* lengthPtr = lengthBuffer ? &(lengthBuffer->data()[0]) : &length;
-	float* amplitudePtr = lfoAmountBuffer ? &(lfoAmountBuffer->data()[0]) : &amplitude;
-	float* lfoTimePtr = lfoTimeBuffer ? &(lfoTimeBuffer->data()[0]) : &lfoTime;
-	float* feedbackPtr = feedbackBuffer ? &(feedbackBuffer->data()[0]) : &feedback;
+	float* lengthPtr = &(m_delayControls.m_delayTimeModel.valueAt(0));
+	float* amplitudePtr = &(m_delayControls.m_lfoAmountModel.valueAt(0));
+	float* lfoTimePtr = &(m_delayControls.m_lfoTimeModel.valueAt(0));
+	float* feedbackPtr = &(m_delayControls.m_feedbackModel.valueAt(0));
 
 	if( m_delayControls.m_outGainModel.isValueChanged() )
 	{

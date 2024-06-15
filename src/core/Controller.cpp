@@ -117,7 +117,7 @@ float Controller::value( int offset )
 	{
 		updateValueBuffer();
 	}
-	return m_valueBuffer.data()[offset];
+	return m_valueBuffer[offset];
 }
 	
 
