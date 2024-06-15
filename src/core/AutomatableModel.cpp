@@ -329,7 +329,7 @@ void AutomatableModel::setValue( const float value )
 float AutomatableModel::valueAt(size_t index)
 {
 	const auto buffer = valueBuffer();
-	return buffer ? buffer->data[index] : value();
+	return buffer ? (*buffer)[index] : value();
 }
 
 
