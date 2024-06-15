@@ -382,6 +382,13 @@ void InstrumentSoundShaping::calculateFillLevel(float* buffer, Target enumTarget
 		// get the parent note's parameters
 		f_cnt_t parentEnvelopeTotalFrames = n->getParentTotalFramesPlayed();
 		f_cnt_t parentEnvelopeReleaseBegin = parentEnvelopeTotalFrames - n->getParentReleaseFramesDone() + n->getParentFramesBeforeRelease();
+
+		if(!n->isReleased()
+			|| (n->instrumentTrack()->isSustainPedalPressed() && !n->isReleaseStarted()))
+		{
+			parentEnvelopeReleaseBegin += bufferSize;
+		}
+
 		m_envLfoParameters[static_cast<std::size_t>(enumTarget)]->fillLevel(buffer, parentEnvelopeTotalFrames, parentEnvelopeReleaseBegin, bufferSize);
 	}
 	else
