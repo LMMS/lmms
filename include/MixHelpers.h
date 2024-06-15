@@ -27,7 +27,6 @@
 
 #include "lmms_basics.h"
 
-#include <vector>
 
 namespace lmms
 {
