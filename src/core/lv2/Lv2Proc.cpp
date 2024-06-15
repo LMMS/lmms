@@ -757,9 +757,11 @@ void Lv2Proc::initMOptions()
 	int32_t sequenceSize = defaultEvbufSize();
 	// Create dummy object to find out the color
 	// I wish there was a more clean way...
-	gui::SubWindow tmpSubWindow;
+	/*gui::SubWindow tmpSubWindow;
 	int32_t backgroundColor = tmpSubWindow.palette().color(QPalette::Window).rgba();
-	int32_t foregroundColor = tmpSubWindow.palette().color(QPalette::WindowText).rgba();
+	int32_t foregroundColor = tmpSubWindow.palette().color(QPalette::WindowText).rgba();*/
+	int32_t backgroundColor = 0xffffffff;
+	int32_t foregroundColor = 0x000000ff;
 	qDebug() << backgroundColor << " <-> " << foregroundColor;
 	using Id = Lv2UridCache::Id;
 	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
