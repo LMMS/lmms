@@ -33,8 +33,6 @@
 
 #include <vector>
 #include <algorithm>
-#include <QMutex>
-#include <QMutexLocker>
 
 namespace lmms
 {
@@ -313,8 +311,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpTimeModel( 200.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
-	m_arpModeModel( this, tr( "Arpeggio mode" ) ),
-	m_sortedChords(0)
+	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	for (auto& chord : chord_table.chords())
@@ -354,10 +351,11 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	_n->setMasterNote();
 
 	const int selected_arp = m_arpModel.value();
+	const auto arpMode = static_cast<ArpMode>(m_arpModeModel.value());
 
-	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
+	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack(_n->instrumentTrack());
 
-	if( static_cast<ArpMode>(m_arpModeModel.value()) != ArpMode::Free && cnphv.size() == 0 )
+	if(arpMode != ArpMode::Free && cnphv.size() == 0 )
 	{
 		// maybe we're playing only a preset-preview-note?
 		cnphv = PresetPreviewPlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
@@ -369,10 +367,10 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 	}
 
-	const auto arpMode = static_cast<ArpMode>(m_arpModeModel.value());
 	// avoid playing same key for all
 	// currently playing notes if sort mode is enabled
 	if (arpMode == ArpMode::Sort && _n != cnphv.first()) { return; }
+
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table.chords()[selected_arp].size();
 	const int total_chord_size = cur_chord_size * cnphv.size();
@@ -381,21 +379,12 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	// how many notes are in the final chord
 	const int range = arpMode == ArpMode::Sort ? singleNoteRange * cnphv.size() : singleNoteRange;
 
-	// locking access to this funcion (only when sorted)
-	QMutexLocker sortedMutex(&m_sortedChordsLocker);
-	// resize m_sortedChords array
 	if (arpMode == ArpMode::Sort)
 	{
-		if (m_sortedChords.size() != total_chord_size)
+		std::sort(cnphv.begin(), cnphv.end(), [](const NotePlayHandle* a, const NotePlayHandle* b)
 		{
-			m_sortedChords.resize(total_chord_size);
-		}
-	}
-	else
-	{
-		// do not use this mutex
-		// if the mode is not sort
-		sortedMutex.unlock();
+			return a->key() < b->key();
+		});
 	}
 
 	// number of frames that every note should be played
@@ -424,45 +413,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		frames_processed += remaining_frames_for_cur_arp;
-
-		// for sort mode, we sort and combine all of the chord's keys
-		if (arpMode == ArpMode::Sort)
-		{
-			// m_sortedChords contains a combination of keys
-			// from all the currently played notes
-
-			// firstly the order of the base notes are decided
-
-			// adding the base notes
-			for (size_t i = 0; i < cnphv.size(); i++)
-			{
-				m_sortedChords[i] = cnphv[i]->key();
-			}
-			// fill the remaining spaces with the max note value
-			// (these will be overwritten later)
-			for (size_t i = cnphv.size(); i < m_sortedChords.size(); i++)
-			{
-				m_sortedChords[i] = NumKeys + 1;
-			}
-
-			// sorting:
-			std::sort(m_sortedChords.begin(), m_sortedChords.end(), std::less{});
-
-
-			// making the final keys
-			// from the sorted base notes
-			for (size_t i = cnphv.size(); i < m_sortedChords.size(); i++)
-			{
-				m_sortedChords[i] = m_sortedChords[i - cnphv.size()];
-			}
-			for (unsigned int i = 0; i < cur_chord_size; i++)
-			{
-				for (size_t j = 0; j < cnphv.size(); j++)
-				{
-					m_sortedChords[i * cnphv.size() + j] += chord_table.chords()[selected_arp][i];
-				}
-			}
-		}
 
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
@@ -540,10 +490,14 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 		else
 		{
-			// if we are sorting, we already have the base note key and the chord key
-			// getting the mod and div of cur_arp_idx and total_chord_size
-			auto divResult = std::div(cur_arp_idx, total_chord_size);
-			sub_note_key = m_sortedChords[divResult.rem] + divResult.quot * KeysPerOctave;
+			const auto octaveDiv = std::div(cur_arp_idx, total_chord_size);
+			const int octave = octaveDiv.quot;
+			const auto arpDiv = std::div(octaveDiv.rem, cnphv.size());
+			const int arpIndex = arpDiv.rem;
+			const int chordIndex = arpDiv.quot;
+			sub_note_key = cnphv[arpIndex]->key()
+				+ chord_table.chords()[selected_arp][chordIndex]
+				+ octave * KeysPerOctave;
 		}
 
 		// range-checking
