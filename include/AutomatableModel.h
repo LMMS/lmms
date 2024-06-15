@@ -437,6 +437,12 @@ public:
 		return AutomatableModel::value<T>( frameOffset );
 	}
 
+	float valueAt(size_t index, int frameOffset = 0)
+    {
+		const auto buffer = valueBuffer();
+		return buffer ? (*buffer)[index] : value(frameOffset);
+    }
+
 	T initValue() const
 	{
 		return AutomatableModel::initValue<T>();
