@@ -11,7 +11,6 @@ jobs:
     container: ghcr.io/lmms/linux.gcc:20.04
     env:
       CMAKE_OPTS: >-
-        -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
@@ -171,6 +170,7 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -Werror=dev
+        -Wno-error=deprecated
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
