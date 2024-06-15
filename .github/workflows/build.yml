@@ -278,6 +278,7 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DUSE_COMPILE_CACHE=ON `
+            -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_HOST_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"

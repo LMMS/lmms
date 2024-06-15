@@ -675,6 +675,11 @@ elseif(MSVC)
 		"/external:W0" # Don't emit warnings for third-party code
 		"/external:anglebrackets" # Consider headers included with angle brackets to be third-party
 		"/external:templates-" # Still emit warnings from first-party instantiations of third-party templates
+		# Silence "class X needs to have DLL-interface to be used by clients of
+		# class Y" warnings. These aren't trivial to address, and don't pose a
+		# problem for us since we build all modules with the same compiler and
+		# options, and dynamically link the CRT.
+		"/wd4251"
 	)
 	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
 		"/W0" # Disable all warnings

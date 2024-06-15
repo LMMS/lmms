@@ -135,7 +135,7 @@ class SfxrZeroToOneFloatModel : public FloatModel
 {
 public:
 	SfxrZeroToOneFloatModel( float val, Model * parent, const QString& displayName ):
-		FloatModel( val, 0.0, 1.0, 0.001, parent, displayName )
+		FloatModel(val, 0.f, 1.f, 0.001f, parent, displayName)
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
@@ -156,7 +156,7 @@ class SfxrNegPosOneFloatModel : public FloatModel
 {
 public:
 	SfxrNegPosOneFloatModel(float val, Model * parent, const QString& displayName ):
-		FloatModel( val, -1.0, 1.0, 0.001, parent, displayName )
+		FloatModel(val, -1.f, 1.f, 0.001f, parent, displayName)
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
