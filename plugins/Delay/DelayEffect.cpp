@@ -101,6 +101,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	auto* lengthBuffer = m_delayControls.m_delayTimeModel.valueBuffer();
 	auto* lfoAmountBuffer = m_delayControls.m_lfoAmountModel.valueBuffer();
 	auto* feedbackBuffer = m_delayControls.m_feedbackModel.valueBuffer();
+	auto* lfoTimeBuffer = m_delayControls.m_lfoTimeModel.valueBuffer();
 	int lengthInc = lengthBuffer ? 1 : 0;
 	int amplitudeInc = lfoAmountBuffer ? 1 : 0;
 	int lfoTimeInc = lfoTimeBuffer ? 1 : 0;
