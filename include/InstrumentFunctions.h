@@ -31,8 +31,6 @@
 #include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
 
-#include <QMutex>
-
 namespace lmms
 {
 
@@ -221,6 +219,7 @@ private:
 	FloatModel m_arpGateModel;
 	ComboBoxModel m_arpDirectionModel;
 	ComboBoxModel m_arpModeModel;
+
 
 	friend class InstrumentTrack;
 	friend class gui::InstrumentFunctionArpeggioView;
