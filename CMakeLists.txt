@@ -15,8 +15,6 @@ function(enable_policy_if_exists id)
 	endif()
 endfunction()
 
-# Needed for the SWH Ladspa plugins. See below.
-enable_policy_if_exists(CMP0074) # find_package() uses <PackageName>_ROOT variables.
 # Needed for ccache support with MSVC
 enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
 
