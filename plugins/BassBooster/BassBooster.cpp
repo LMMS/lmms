@@ -85,6 +85,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
 
 	const float const_gain = m_bbControls.m_gainModel.value();
+	const auto* gainBuffer = m_bbControls.m_gainModel.valueBuffer();
 
 	double outSum = 0.0;
 	const float d = dryLevel();
