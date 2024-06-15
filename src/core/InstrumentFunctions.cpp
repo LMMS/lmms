@@ -374,11 +374,12 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const int total_chord_size = cur_chord_size * cnphv.size();
 	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
 	const int total_range = range * cnphv.size();
+	const auto arpMode = static_cast<ArpMode>(m_arpModeModel.value());
 
 	// locking access to this funcion (only when sorted)
 	QMutexLocker sortedMutex(&m_sortedChordsLocker);
 	// resize m_sortedChords array
-	if (static_cast<ArpMode>(m_arpModeModel.value()) == ArpMode::Sort)
+	if (arpMode == ArpMode::Sort)
 	{
 		if (m_sortedChords.size() != total_chord_size)
 		{
@@ -399,11 +400,11 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
-	int cur_frame = ( ( static_cast<ArpMode>(m_arpModeModel.value()) != ArpMode::Free ) ?
+	int cur_frame = (arpMode != ArpMode::Free ?
 						cnphv.first()->totalFramesPlayed() :
-						_n->totalFramesPlayed() ) + arp_frames - 1;
+						_n->totalFramesPlayed()) + arp_frames - 1;
 	// used for loop
-	f_cnt_t frames_processed = ( static_cast<ArpMode>(m_arpModeModel.value()) != ArpMode::Free ) ? cnphv.first()->noteOffset() : _n->noteOffset();
+	f_cnt_t frames_processed = arpMode != ArpMode::Free ? cnphv.first()->noteOffset() : _n->noteOffset();
 
 	while( frames_processed < Engine::audioEngine()->framesPerPeriod() )
 	{
@@ -423,7 +424,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// offsetRange offsets range to account for
 		// the arp getting bigger if arpmode = sort
 		int offsetRange = range;
-		if (static_cast<ArpMode>(m_arpModeModel.value()) == ArpMode::Sort)
+		if (arpMode == ArpMode::Sort)
 		{
 			bool notMinIndex = false;
 
@@ -548,7 +549,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// now calculate final key for our arp-note
 		int sub_note_key = 0;
-		if (static_cast<ArpMode>(m_arpModeModel.value()) != ArpMode::Sort)
+		if (arpMode != ArpMode::Sort)
 		{
 			sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size) *
 							KeysPerOctave + chord_table.chords()[selected_arp][cur_arp_idx % cur_chord_size];
@@ -559,11 +560,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// getting the mod and div of cur_arp_idx and total_chord_size
 			auto divResult = std::div(cur_arp_idx, total_chord_size);
 			sub_note_key = m_sortedChords[divResult.rem] + divResult.quot * KeysPerOctave;
-			// limiting the played key so it does not get out of NumKeys range
-			if (sub_note_key >= NumKeys)
-			{
-				sub_note_key = NumKeys - 1;
-			}
 		}
 
 		// range-checking
