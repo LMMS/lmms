@@ -1,5 +1,5 @@
-# StaticLinking.cmake - adds features similar to interface properties that are
-#                       only transitive over static dependencies.
+# StaticDependencies.cmake - adds features similar to interface properties that
+#                            are only transitive over static dependencies.
 #
 # Copyright (c) 2024 Dominic Clark
 #
