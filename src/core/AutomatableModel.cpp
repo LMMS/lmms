@@ -326,6 +326,11 @@ void AutomatableModel::setValue( const float value )
 }
 
 
+float AutomatableModel::valueAt(size_t index)
+{
+	const auto buffer = valueBuffer();
+	return buffer ? (*buffer)[index] : value();
+}
 
 
 template<class T> T AutomatableModel::logToLinearScale( T value ) const
@@ -371,21 +376,7 @@ void AutomatableModel::roundAt( T& value, const T& where ) const
 	lmms::roundAt(value, where, m_step);
 }
 
-template <typename T> class LMMS_EXPORT TypedAutomatableModel : public AutomatableModel
-{
-public:
-	using AutomatableModel::AutomatableModel;
-	T value( int frameOffset = 0 ) const
-	{
-		return AutomatableModel::value<T>( frameOffset );
-	}
 
-    float valueAt(size_t index, int frameOffset = 0)
-    {
-        const auto buffer = valueBuffer();
-        return buffer ? (*buffer)[index] : value(frameOffset);
-    }
-};
 
 
 void AutomatableModel::setAutomatedValue( const float value )
