@@ -319,11 +319,11 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 		const auto baseLine = height() - 3;
 
-		const int recordSymbolRadius = 3;
-		const int recordSymbolCenterX = recordSymbolRadius + 4;
+		constexpr int recordSymbolRadius = 3;
+		constexpr int recordSymbolCenterX = recordSymbolRadius + 4;
 		const int recordSymbolCenterY = baseLine - fontHeight / 2 + 1;
 
-		const int textStartX = recordSymbolCenterX + recordSymbolRadius + 4;
+		constexpr int textStartX = recordSymbolCenterX + recordSymbolRadius + 4;
 
 		auto textPos = QPoint(textStartX, baseLine);
 

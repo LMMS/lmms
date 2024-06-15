@@ -82,11 +82,11 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
   	SDL_AudioSpec actual; 
 
 #ifdef LMMS_HAVE_SDL2
-	const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL);
-	const bool isDefaultPlayback = playbackDevice.isEmpty();
+	const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL).toStdString();
+	const bool isDefaultPlayback = playbackDevice.empty();
 
 	// Try with the configured device
-	const auto playbackDeviceCStr = isDefaultPlayback ? nullptr : playbackDevice.toLocal8Bit().data();
+	const auto playbackDeviceCStr = isDefaultPlayback ? nullptr : playbackDevice.c_str();
 	m_outputDevice = SDL_OpenAudioDevice(playbackDeviceCStr, 0, &m_audioHandle, &actual, 0);
 
 	// If we did not get a device ID try again with the default device if we did not try that before
@@ -120,11 +120,11 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
-	const auto inputDevice = ConfigManager::inst()->value(SectionSDL, InputDeviceSDL);
-	const bool isDefaultInput = inputDevice.isEmpty();
+	const auto inputDevice = ConfigManager::inst()->value(SectionSDL, InputDeviceSDL).toStdString();
+	const bool isDefaultInput = inputDevice.empty();
 
 	// Try with the configured device
-	const auto inputDeviceCStr = isDefaultInput ? nullptr : inputDevice.toLocal8Bit().data();
+	const auto inputDeviceCStr = isDefaultInput ? nullptr : inputDevice.c_str();
 	m_inputDevice = SDL_OpenAudioDevice (inputDeviceCStr, 1, &m_inputAudioHandle, &actual, 0);
 
 	// If we did not get a device ID try again with the default device if we did not try that before

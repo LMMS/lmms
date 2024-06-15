@@ -357,7 +357,7 @@ private:
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
 
-	inline const AudioDevice* audioDev() const
+	const AudioDevice* audioDev() const
 	{
 		return m_audioDev;
 	}

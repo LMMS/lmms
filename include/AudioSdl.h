@@ -66,7 +66,7 @@ public:
 		void saveSettings() override;
 
 	private:
-		QComboBox* m_playbackDeviceComboBox;
+		QComboBox* m_playbackDeviceComboBox = nullptr;
 		QComboBox* m_inputDeviceComboBox = nullptr;
 
 		static QString s_systemDefaultDevice;

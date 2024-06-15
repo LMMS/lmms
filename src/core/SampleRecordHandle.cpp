@@ -54,7 +54,7 @@ SampleRecordHandle::~SampleRecordHandle()
 {
 	if (!m_buffers.empty()) { m_clip->setSampleBuffer(createSampleBuffer()); }
 
-		m_clip->setStartTimeOffset(m_startRecordTimeOffset);
+	m_clip->setStartTimeOffset(m_startRecordTimeOffset);
 
 	while( !m_buffers.empty() )
 	{
