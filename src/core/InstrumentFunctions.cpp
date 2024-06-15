@@ -370,6 +370,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	}
 
 	const auto arpMode = static_cast<ArpMode>(m_arpModeModel.value());
+	// avoid playing same key for all
+	// currently playing notes if sort mode is enabled
 	if (arpMode == ArpMode::Sort && _n != cnphv.first()) { return; }
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table.chords()[selected_arp].size();
@@ -426,35 +428,16 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// for sort mode, we sort and combine all of the chord's keys
 		if (arpMode == ArpMode::Sort)
 		{
-			bool notMinIndex = false;
-
-			qDebug("new");
 			// m_sortedChords contains a combination of keys
 			// from all the currently played notes
 
 			// firstly the order of the base notes are decided
+
 			// adding the base notes
 			for (size_t i = 0; i < cnphv.size(); i++)
 			{
 				m_sortedChords[i] = cnphv[i]->key();
-				/*
-				if (cnphv[i]->index() < _n->index())
-				{
-					notMinIndex = true;
-					break;
-				}
-				*/
 			}
-
-			// avoid playing same key for all
-			// currently playing notes
-			/*
-			if (notMinIndex == true)
-			{
-				break;
-			}
-			*/
-
 			// fill the remaining spaces with the max note value
 			// (these will be overwritten later)
 			for (size_t i = cnphv.size(); i < m_sortedChords.size(); i++)
