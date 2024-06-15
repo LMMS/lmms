@@ -99,22 +99,19 @@ void Lv2ViewProc::uiPortEvent(
 
 
 
-// TODO: call me
-// TODO: not RT-safe!
-#if 0
 void Lv2ViewProc::initUi()
 {
 	// Set initial control port values
 	int i = 0;
-	(proc())->foreach_port([&i,this](Lv2Ports::PortBase* port){
+	proc()->foreach_port([&i,this](Lv2Ports::PortBase* port){
 		auto ctrl = Lv2Ports::dcast<Lv2Ports::Control>(port);
 		if(ctrl)
 		{
 			uiPortEvent(i, sizeof(float), 0, &ctrl->m_val);
 		}
+		i++;
 	});
 }
-#endif
 
 
 
@@ -315,7 +312,9 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 
 		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
 		m_uiInstanceWidget->setParent(parent);
-		
+
+		initUi();
+
 		m_isResizable = calculateIsResizable();
 		qDebug() << "RESIZABLE? " << m_isResizable;
 
