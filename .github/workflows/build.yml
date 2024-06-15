@@ -169,8 +169,8 @@ jobs:
     container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
+        -Wdeprecated
         -Werror=dev
-        -Wno-error=deprecated
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
