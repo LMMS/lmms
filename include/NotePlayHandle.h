@@ -71,11 +71,6 @@ public:
 					Origin origin = Origin::MidiClip );
 	~NotePlayHandle() override;
 
-	void * operator new ( size_t size, void * p )
-	{
-		return p;
-	}
-
 	void setVolume( volume_t volume ) override;
 	void setPanning( panning_t panning ) override;
 
@@ -331,33 +326,6 @@ private:
 
 	bool m_frequencyNeedsUpdate;				// used to update pitch
 } ;
-
-
-const int INITIAL_NPH_CACHE = 256;
-const int NPH_CACHE_INCREMENT = 16;
-
-class NotePlayHandleManager
-{
-public:
-	static void init();
-	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
-					const f_cnt_t offset,
-					const f_cnt_t frames,
-					const Note& noteToPlay,
-					NotePlayHandle* parent = nullptr,
-					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::Origin::MidiClip );
-	static void release( NotePlayHandle * nph );
-	static void extend( int i );
-	static void free();
-
-private:
-	static NotePlayHandle ** s_available;
-	static QReadWriteLock s_mutex;
-	static std::atomic_int s_availableIndex;
-	static int s_size;
-};
-
 
 } // namespace lmms
 

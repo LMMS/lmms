@@ -26,6 +26,8 @@
 
 #include "InstrumentFunctions.h"
 #include "AudioEngine.h"
+#include "NotePlayHandle.h"
+#include "TimePos.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -261,10 +263,9 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				Engine::audioEngine()->addPlayHandle(
-						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
-									_n, -1, NotePlayHandle::Origin::NoteStacking )
-						);
+				const auto handle = new NotePlayHandle(_n->instrumentTrack(), _n->offset(), _n->frames(), note_copy, _n,
+					-1, NotePlayHandle::Origin::NoteStacking);
+				Engine::audioEngine()->addPlayHandle(handle);
 			}
 		}
 	}
@@ -489,14 +490,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		Engine::audioEngine()->addPlayHandle(
-				NotePlayHandleManager::acquire( _n->instrumentTrack(),
-							frames_processed,
-							gated_frames,
-							Note( TimePos( 0 ), TimePos( 0 ), sub_note_key, _n->getVolume(),
-									_n->getPanning(), _n->detuning() ),
-							_n, -1, NotePlayHandle::Origin::Arpeggio )
-				);
+		const auto note = Note{TimePos{0}, TimePos{0}, sub_note_key, _n->getVolume()};
+		const auto handle = new NotePlayHandle(_n->instrumentTrack(), frames_processed, gated_frames, std::move(note), _n, -1, NotePlayHandle::Origin::Arpeggio);
+		Engine::audioEngine()->addPlayHandle(handle);
 
 		// update counters
 		frames_processed += arp_frames;

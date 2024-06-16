@@ -29,9 +29,12 @@
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "Note.h"
+#include "NotePlayHandle.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
+#include "lmms_basics.h"
 
 #include <atomic>
 
@@ -172,11 +175,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 				midiPort()->setMode( MidiPort::Mode::Disabled );
 
 	Engine::audioEngine()->requestChangeInModel();
-	// create note-play-handle for it
-	m_previewNote = NotePlayHandleManager::acquire(
-			s_previewTC->previewInstrumentTrack(), 0,
-			typeInfo<f_cnt_t>::max() / 2,
-				Note( 0, 0, DefaultKey, 100 ) );
+	m_previewNote = new NotePlayHandle(
+		s_previewTC->previewInstrumentTrack(), 0, typeInfo<f_cnt_t>::max() / 2, Note{0, 0, DefaultKey, 100});
 
 	setAudioPort( s_previewTC->previewInstrumentTrack()->audioPort() );
 

@@ -36,11 +36,14 @@
 #include "MidiClient.h"
 #include "MidiClip.h"
 #include "MixHelpers.h"
+#include "NotePlayHandle.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "PianoRoll.h"
 #include "Pitch.h"
 #include "Song.h"
+#include "TimePos.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {
@@ -339,19 +342,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 				// play a note only if it is not already playing and if it is within configured bounds
 				if (m_notes[event.key()] == nullptr && event.key() >= firstKey() && event.key() <= lastKey())
 				{
-					NotePlayHandle* nph =
-						NotePlayHandleManager::acquire(
-								this, offset,
-								typeInfo<f_cnt_t>::max() / 2,
-								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
-										event.key(), event.volume(midiPort()->baseVelocity())),
-								nullptr, event.channel(),
-								NotePlayHandle::Origin::MidiInput);
-					m_notes[event.key()] = nph;
-					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
-					{
-						m_notes[event.key()] = nullptr;
-					}
+					const auto note = Note{TimePos{}, Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
+						event.key(), event.volume(midiPort()->baseVelocity())};
+					const auto handle = new NotePlayHandle(this, offset, typeInfo<f_cnt_t>::max() / 2, std::move(note),
+						nullptr, event.channel(), NotePlayHandle::Origin::MidiInput);
+					m_notes[event.key()] = handle;
+					if (!Engine::audioEngine()->addPlayHandle(handle)) { m_notes[event.key()] = nullptr; }
 				}
 				eventHandled = true;
 				break;
@@ -781,7 +777,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				? 0
 				: currentNote->length().frames(frames_per_tick);
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
+			auto notePlayHandle = new NotePlayHandle(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )
