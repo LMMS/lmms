@@ -193,15 +193,9 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 void Fader::wheelEvent (QWheelEvent* ev)
 {
 	ev->accept();
+	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	if (ev->angleDelta().y() > 0)
-	{
-		model()->incValue(1);
-	}
-	else
-	{
-		model()->incValue(-1);
-	}
+	model()->incValue(direction);
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut(1000);
 }
@@ -213,8 +207,6 @@ void Fader::wheelEvent (QWheelEvent* ev)
 ///
 void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer)
 {
-	fPeak = std::clamp(fPeak, m_fMinPeak, m_fMaxPeak);
-
 	if (targetPeak != fPeak)
 	{
 		targetPeak = fPeak;
@@ -222,6 +214,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 		{
 			persistentPeak = targetPeak;
 			lastPeakTimer.restart();
+			emit peakChanged(persistentPeak);
 		}
 		update();
 	}
@@ -229,6 +222,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
 		persistentPeak = qMax<float>(0, persistentPeak-0.05);
+		emit peakChanged(persistentPeak);
 		update();
 	}
 }

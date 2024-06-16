@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
 
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
@@ -144,16 +144,6 @@ IF(LMMS_BUILD_WIN32)
 ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
-
-
-# TODO: Fix linking issues with msys debug builds
-IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-	SET(WANT_GIG OFF)
-	SET(WANT_STK OFF)
-	SET(WANT_SWH OFF)
-	SET(STATUS_GIG "not built as requested")
-	SET(STATUS_STK "not built as requested")
-ENDIF()
 
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -655,6 +645,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	ENDIF()
 ELSEIF(MSVC)
 	# Remove any existing /W flags
+	string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
 	STRING(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 	SET(WERROR_FLAGS "/W2")
 	IF(${USE_WERROR})

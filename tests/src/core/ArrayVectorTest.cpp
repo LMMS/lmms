@@ -226,9 +226,17 @@ private slots:
 	{
 		{
 			// Self-assignment should not change the contents
+			//// Please note the following:
+			//// https://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#2468
+			//// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81159
 			auto v = ArrayVector<int, 5>{1, 2, 3};
 			const auto oldValue = v;
+#pragma GCC diagnostic push
+#if __GNUC__ >= 13
+# pragma GCC diagnostic ignored "-Wself-move"
+#endif
 			v = std::move(v);
+#pragma GCC diagnostic pop
 			QCOMPARE(v, oldValue);
 		}
 		{

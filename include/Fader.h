@@ -105,6 +105,9 @@ public:
 		setUnit(txt_after);
 	}
 
+signals:
+	void peakChanged(float peak);
+
 private:
 	void contextMenuEvent(QContextMenuEvent* me) override;
 	void mousePressEvent(QMouseEvent* ev) override;
