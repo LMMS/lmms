@@ -84,15 +84,6 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 						height() - MARGIN * 2 - 40 );
 	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
 
-	if(!filterWidgetLayout) return;
-
-	if(width() < 260) {
-		filterWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
-		hiddenWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
-	} else {
-		filterWidgetLayout->setDirection(QBoxLayout::Direction::LeftToRight);
-		hiddenWidgetLayout->setDirection(QBoxLayout::Direction::LeftToRight);
-	}
 }
 
 void SideBarWidget::addContentCheckBox(bool user_checkbox, bool factory, bool hidden)
