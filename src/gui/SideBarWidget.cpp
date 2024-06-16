@@ -86,7 +86,7 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 
 	if(!filterWidgetLayout) return;
 
-	if(width() < 300) {
+	if(width() < 260) {
 		filterWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
 		hiddenWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
 	} else {
