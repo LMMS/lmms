@@ -180,7 +180,8 @@ void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 void Lv2ControlBase::loadSettings(const QDomElement &that)
 {
 	LinkedModelGroups::loadSettings(that);
-	
+	qDebug() << "Lv2ControlBase::loadSettings";
+	for(const auto& p : m_procs) { p->onSettingsLoaded(); }
 	// TODO: load state if supported by plugin
 }
 

@@ -53,9 +53,11 @@ class PluginIssue;
 // forward declare port structs/enums
 namespace Lv2Ports
 {
-	struct Audio;
 	struct PortBase;
+
 	struct AtomSeq;
+	struct Audio;
+	struct Control;
 
 	enum class Type;
 	enum class Flow;
@@ -79,6 +81,7 @@ public:
 	~Lv2Proc() override;
 	void reload();
 	void onSampleRateChanged();
+	void onSettingsLoaded();
 
 	/*
 		port access
@@ -247,6 +250,7 @@ private:
 	static bool initWantUi();
 	void applyUiEvents(uint32_t nframes);
 	bool sendToUi(uint32_t port_index, uint32_t type, uint32_t size, const void* body);
+	bool sendToUi(uint32_t port_index, const Lv2Ports::Control* ctrl);
 	uint32_t m_eventDeltaT;
 
 	// other

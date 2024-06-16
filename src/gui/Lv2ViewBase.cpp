@@ -107,6 +107,7 @@ void Lv2ViewProc::initUi()
 		auto ctrl = Lv2Ports::dcast<Lv2Ports::Control>(port);
 		if(ctrl)
 		{
+			qDebug() << "Setting port" << i << "to" << ctrl->m_val;
 			uiPortEvent(i, sizeof(float), 0, &ctrl->m_val);
 		}
 		i++;
@@ -220,6 +221,7 @@ std::tuple<const LilvUI*, const LilvNode*> Lv2ViewProc::selectPluginUi(LilvUIs *
 				qDebug() << "Skipping plugin UI" << lilv_node_as_uri(lilv_ui_get_uri(pluginUi)) << "- not supported";
 			}
 		}
+		qDebug() << "... no matching UI found. Defaulting to LMMS UI.";
 	}
 #endif
 	return std::make_tuple(nullptr, nullptr);;
@@ -292,7 +294,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 				bundlePath,
 				binaryPath,
 				uiFeatures);
-		if (!m_uiInstance)
+		if (!m_uiInstance)  // TODO: fallback to default UI
 		{
 			qWarning() << "Failed to load UI";
 		}
@@ -313,7 +315,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
 		m_uiInstanceWidget->setParent(parent);
 
-		initUi();
+		initUi();  // send all control values to UI once
 
 		m_isResizable = calculateIsResizable();
 		qDebug() << "RESIZABLE? " << m_isResizable;

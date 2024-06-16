@@ -218,6 +218,26 @@ void Lv2Proc::reload() { Lv2ProcSuspender(this); }
 
 
 
+void Lv2Proc::onSettingsLoaded()
+{
+	// Savefile has been loaded into models, but not into corresponding ports yet
+	copyModelsFromCore();
+
+	// All control ports may have changed -> Tell UI
+	for (uint32_t p = 0; p < portNum(); ++p)
+	{
+		const Lv2Ports::PortBase& port = *m_ports[p];
+		if (port.m_flow == Lv2Ports::Flow::Input &&
+			port.m_type == Lv2Ports::Type::Control)
+		{
+			sendToUi(p, Lv2Ports::dcast<Lv2Ports::Control>(&port));
+		}
+	}
+}
+
+
+
+
 void Lv2Proc::dumpPorts()
 {
 	std::size_t num = 0;
@@ -480,15 +500,41 @@ bool Lv2Proc::sendToUi(uint32_t port_index,
 	atom->type = type;
 	atom->size = size;
 	
-	if (m_pluginEvents.capacity() >= sizeof(evbuf) + size)
+	const bool enoughSpace = m_pluginEvents.capacity() >= sizeof(evbuf) + size;
+	if (enoughSpace)
 	{
 		m_pluginEvents.write(evbuf, sizeof(evbuf));
 		m_pluginEvents.write((const char*)body, size);
-		return true;
 	}
-	
-	qWarning() << "Plugin => UI buffer overflow!";
-	return false;
+	else { qWarning() << "Plugin => UI buffer overflow for port" << port_index << "!"; }
+	return enoughSpace;
+}
+
+
+
+
+bool Lv2Proc::sendToUi(uint32_t port_index, const Lv2Ports::Control* ctrl)
+{
+		qDebug () << "sendToUi(): Want to set float port" << port_index << "to" << ctrl->m_val;
+
+	if (!m_uiEventsReader)
+	{
+		// missing UI events reader on our sides implies
+		// missing plugin events reader on UI side (see Lv2ViewBase.cpp)
+		return false;
+	}
+	assert(ctrl);
+	char buf[sizeof(Lv2UiControlChange) + sizeof(float)];
+	Lv2UiControlChange* ev = (Lv2UiControlChange*)buf;
+	ev->index = port_index;
+	ev->protocol = 0;  // = float value
+	ev->size = sizeof(float);
+	*(float*)(ev + 1) = ctrl->m_val;
+	const bool enoughSpace = m_pluginEvents.capacity() >= sizeof(buf);
+	qDebug () << "sendToUi(): Setting float port" << port_index << "to" << ctrl->m_val;
+	if (enoughSpace) { m_pluginEvents.write(buf, sizeof(buf)); }
+	else { qWarning() << "Plugin => UI buffer overflow for port" << port_index << "!"; }
+	return enoughSpace;
 }
 
 

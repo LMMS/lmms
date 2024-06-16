@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <optional>
+#include <QDebug>
 #ifdef LMMS_HAVE_SUIL
 	#include <suil/suil.h>
 #endif
