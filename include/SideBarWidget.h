@@ -79,6 +79,8 @@ protected:
 	QCheckBox* m_showHiddenContent = nullptr;
 
 	QBoxLayout *filterWidgetLayout = nullptr;
+	QBoxLayout *hiddenWidgetLayout = nullptr;
+	QBoxLayout *outerLayout = nullptr;
 
 	void addContentLayout( QLayout * _l )
 	{

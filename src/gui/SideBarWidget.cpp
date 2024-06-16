@@ -88,42 +88,58 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 
 	if(width() < 300) {
 		filterWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
+		hiddenWidgetLayout->setDirection(QBoxLayout::Direction::TopToBottom);
 	} else {
 		filterWidgetLayout->setDirection(QBoxLayout::Direction::LeftToRight);
+		hiddenWidgetLayout->setDirection(QBoxLayout::Direction::LeftToRight);
 	}
 }
 
 void SideBarWidget::addContentCheckBox(bool user_checkbox, bool factory, bool hidden)
 {
 	auto filterWidget = new QWidget(contentParent());
-	filterWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight, filterWidget);
-	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
-	filterWidgetLayout->setSpacing(0);
 
-	auto configCheckBox = [this](QCheckBox* box, Qt::CheckState checkState)
+	outerLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom, filterWidget);
+	outerLayout->setSpacing(0);
+
+	if (user_checkbox || factory){
+		filterWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+		filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
+		filterWidgetLayout->setSpacing(0);
+
+		outerLayout->addLayout(filterWidgetLayout);
+	}
+
+	hiddenWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+	hiddenWidgetLayout->setContentsMargins(0, 0, 0, 0);
+	hiddenWidgetLayout->setSpacing(0);
+
+	outerLayout->addLayout(hiddenWidgetLayout);
+
+	auto configCheckBox = [this](QBoxLayout* boxLayout, QCheckBox* box, Qt::CheckState checkState)
 	{
 		box->setCheckState(checkState);
 		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
-		this->filterWidgetLayout->addWidget(box);
+		boxLayout->addWidget(box);
 	};
 
 	if (user_checkbox) {
 		m_showUserContent = new QCheckBox(tr("User content"));
-		configCheckBox(m_showUserContent, Qt::Checked);
+		configCheckBox(filterWidgetLayout, m_showUserContent, Qt::Checked);
 	}
 
 	if (factory) {
 		m_showFactoryContent = new QCheckBox(tr("Factory content"));
-		configCheckBox(m_showFactoryContent, Qt::Checked);
+		configCheckBox(filterWidgetLayout, m_showFactoryContent, Qt::Checked);
 	}
 
 	if (hidden) {
 		m_showHiddenContent = new QCheckBox(tr("Hidden content"));
-		configCheckBox(m_showHiddenContent, Qt::Unchecked);
+		configCheckBox(hiddenWidgetLayout, m_showHiddenContent, Qt::Unchecked);
 	}
 
 	addContentWidget(filterWidget);
-};
+}
 
 
 } // namespace lmms::gui
