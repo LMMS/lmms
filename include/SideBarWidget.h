@@ -25,7 +25,6 @@
 #ifndef LMMS_GUI_SIDE_BAR_WIDGET_H
 #define LMMS_GUI_SIDE_BAR_WIDGET_H
 
-#include <QCheckBox>
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
