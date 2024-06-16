@@ -373,7 +373,7 @@ void FileBrowser::addItems(const QString & path )
 		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
 
 		QString fileName = entry.fileName();
-		if (fileName.startsWith(".") && m_showHiddenContent && !m_showHiddenContent->isChecked()) continue;
+		if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) continue;
 		if (entry.isDir())
 		{
 			// Merge dir's together
