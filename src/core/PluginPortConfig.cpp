@@ -42,74 +42,81 @@ PluginPortConfig::PluginPortConfig(Model* parent)
 {
 }
 
-PluginPortConfig::PluginPortConfig(PortType in, PortType out, Model* parent)
+PluginPortConfig::PluginPortConfig(int inCount, int outCount, Model* parent)
 	: QObject{parent}
-	, m_inPort{in}
-	, m_outPort{out}
+	, m_portCountIn{inCount}
+	, m_portCountOut{outCount}
 	, m_config{parent, tr("L/R channel configuration")}
 {
 }
 
 auto PluginPortConfig::hasMonoPort() const -> bool
 {
-	return m_inPort == PortType::Mono || m_outPort == PortType::Mono;
+	return m_portCountIn == 1 || m_portCountOut == 1;
 }
 
 auto PluginPortConfig::monoPluginType() const -> MonoPluginType
 {
-	if (m_inPort == PortType::Mono)
+	if (m_portCountIn == 1)
 	{
-		if (m_outPort == PortType::Mono)
+		if (m_portCountOut == 1)
 		{
 			return MonoPluginType::Both;
 		}
 		return MonoPluginType::Input;
 	}
-	else if (m_outPort == PortType::Mono)
+	else if (m_portCountOut == 1)
 	{
 		return MonoPluginType::Output;
 	}
 	return MonoPluginType::None;
 }
 
-void PluginPortConfig::setPortType(unsigned inCount, unsigned outCount)
+void PluginPortConfig::setPortCounts(int inCount, int outCount)
 {
-	PortType in;
-	PortType out;
-	switch (inCount)
+	if (inCount < 0 || inCount > DEFAULT_CHANNELS)
 	{
-		case 0: in = PortType::None; break;
-		case 1: in = PortType::Mono; break;
-		case 2: in = PortType::Stereo; break;
-		default: throw std::invalid_argument{"Invalid input count"};
+		throw std::invalid_argument{"Invalid input count"};
 	}
-	switch (outCount)
+
+	if (outCount < 0 || outCount > DEFAULT_CHANNELS)
 	{
-		case 0: out = PortType::None; break;
-		case 1: out = PortType::Mono; break;
-		case 2: out = PortType::Stereo; break;
-		default: throw std::invalid_argument{"Invalid output count"};
+		throw std::invalid_argument{"Invalid output count"};
 	}
-	setPortType(in, out);
-}
 
-void PluginPortConfig::setPortType(PortType in, PortType out)
-{
-	if (in == PortType::None && out == PortType::None) { return; }
-	if (m_inPort == in && m_outPort == out) { return; }
+	if (inCount == 0 && outCount == 0)
+	{
+		throw std::invalid_argument{"At least one port count must be non-zero"};
+	}
 
-	m_inPort = in;
-	m_outPort = out;
+	if (m_portCountIn == inCount && m_portCountOut == outCount)
+	{
+		// No action needed
+		return;
+	}
+
+	m_portCountIn = inCount;
+	m_portCountOut = outCount;
 
 	updateOptions();
 
 	emit portsChanged();
 }
 
+void PluginPortConfig::setPortCountIn(int inCount)
+{
+	setPortCounts(inCount, m_portCountOut);
+}
+
+void PluginPortConfig::setPortCountOut(int outCount)
+{
+	setPortCounts(m_portCountIn, outCount);
+}
+
 auto PluginPortConfig::setPortConfig(Config config) -> bool
 {
 	assert(config != Config::None);
-	if (m_inPort != PortType::Mono && m_outPort != PortType::Mono)
+	if (m_portCountIn != 1 && m_portCountOut != 1)
 	{
 		if (config != Config::Stereo) { return false; }
 		m_config.setValue(0);
@@ -126,17 +133,18 @@ auto PluginPortConfig::setPortConfig(Config config) -> bool
 void PluginPortConfig::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	// Only plugins with a mono in/out need to be saved
-	//if (m_inPort != PortType::Mono && m_outPort != PortType::Mono) { return; }
+	//if (m_portCountIn != 1 && m_portCountOut != 1) { return; }
 
-	elem.setAttribute("in", static_cast<int>(m_inPort));   // probably not needed, but just in case
-	elem.setAttribute("out", static_cast<int>(m_outPort)); // ditto
+	elem.setAttribute("in", m_portCountIn);   // probably not needed, but just in case
+	elem.setAttribute("out", m_portCountOut); // ditto
 	m_config.saveSettings(doc, elem, "config");
 }
 
 void PluginPortConfig::loadSettings(const QDomElement& elem)
 {
-	//const auto inPort = static_cast<PortType>(elem.attribute("in", "0").toInt());
-	//const auto outPort = static_cast<PortType>(elem.attribute("out", "0").toInt());
+	// TODO: Assert port counts are what was expected?
+	//const auto portCountIn = elem.attribute("in", "0").toInt();
+	//const auto portCountOut = elem.attribute("out", "0").toInt();
 	m_config.loadSettings(elem, "config");
 }
 
@@ -145,33 +153,29 @@ auto PluginPortConfig::instantiateView(QWidget* parent) -> gui::ComboBox*
 	auto view = new gui::ComboBox{parent};
 
 	QString inputType;
-	switch (inputPortType())
+	switch (m_portCountIn)
 	{
-		case PluginPortConfig::PortType::None: break;
-		case PluginPortConfig::PortType::Mono:
-			inputType += QObject::tr("mono in"); break;
-		case PluginPortConfig::PortType::Stereo:
-			inputType += QObject::tr("stereo in"); break;
+		case 0: break;
+		case 1: inputType += tr("mono in"); break;
+		case 2: inputType += tr("stereo in"); break;
 		default: break;
 	}
 
 	QString outputType;
-	switch (outputPortType())
+	switch (m_portCountOut)
 	{
-		case PluginPortConfig::PortType::None: break;
-		case PluginPortConfig::PortType::Mono:
-			outputType += QObject::tr("mono out"); break;
-		case PluginPortConfig::PortType::Stereo:
-			outputType += QObject::tr("stereo out"); break;
+		case 0: break;
+		case 1: outputType += tr("mono out"); break;
+		case 2: outputType += tr("stereo out"); break;
 		default: break;
 	}
 
 	QString pluginType;
 	if (inputType.isEmpty()) { pluginType = outputType; }
 	else if (outputType.isEmpty()) { pluginType = inputType; }
-	else { pluginType = QString{"%1, %2"}.arg(inputType, outputType); }
+	else { pluginType = tr("%1, %2").arg(inputType, outputType); }
 
-	view->setToolTip(QObject::tr("L/R channel config for %1 plugin").arg(pluginType));
+	view->setToolTip(tr("L/R channel config for %1 plugin").arg(pluginType));
 	view->setModel(model());
 
 	return view;
@@ -182,24 +186,24 @@ void PluginPortConfig::updateOptions()
 	m_config.clear();
 
 	const auto monoType = monoPluginType();
-	if (monoType == PluginPortConfig::MonoPluginType::None)
+	if (monoType == MonoPluginType::None)
 	{
 		m_config.addItem(tr("Stereo"));
 		return;
 	}
 
-	const auto hasInputPort = inputPortType() != PluginPortConfig::PortType::None;
-	const auto hasOutputPort = outputPortType() != PluginPortConfig::PortType::None;
+	const auto hasInputPort = m_portCountIn != 0;
+	const auto hasOutputPort = m_portCountOut != 0;
 
 	// 1. Mono mix
 	QString itemText;
 	switch (monoType)
 	{
-		case PluginPortConfig::MonoPluginType::Input:
+		case MonoPluginType::Input:
 			itemText = tr("Downmix to mono"); break;
-		case PluginPortConfig::MonoPluginType::Output:
+		case MonoPluginType::Output:
 			itemText = tr("Upmix to stereo"); break;
-		case PluginPortConfig::MonoPluginType::Both:
+		case MonoPluginType::Both:
 			itemText = tr("Mono mix"); break;
 		default: break;
 	}
@@ -209,17 +213,17 @@ void PluginPortConfig::updateOptions()
 	itemText = QString{};
 	switch (monoType)
 	{
-		case PluginPortConfig::MonoPluginType::Input:
+		case MonoPluginType::Input:
 			itemText = hasOutputPort
 				? tr("L in (R bypass)")
 				: tr("Left in");
 			break;
-		case PluginPortConfig::MonoPluginType::Output:
+		case MonoPluginType::Output:
 			itemText = hasInputPort
 				? tr("L out (R bypass)")
 				: tr("Left only");
 			break;
-		case PluginPortConfig::MonoPluginType::Both:
+		case MonoPluginType::Both:
 			itemText = tr("L only (R bypass)");
 			break;
 		default: break;
@@ -230,17 +234,17 @@ void PluginPortConfig::updateOptions()
 	itemText = QString{};
 	switch (monoType)
 	{
-		case PluginPortConfig::MonoPluginType::Input:
+		case MonoPluginType::Input:
 			itemText = hasOutputPort
 				? tr("R in (L bypass)")
 				: tr("Right in");
 			break;
-		case PluginPortConfig::MonoPluginType::Output:
+		case MonoPluginType::Output:
 			itemText = hasInputPort
 				? tr("R out (L bypass)")
 				: tr("Right only");
 			break;
-		case PluginPortConfig::MonoPluginType::Both:
+		case MonoPluginType::Both:
 			itemText = tr("R only (L bypass)");
 			break;
 		default: break;

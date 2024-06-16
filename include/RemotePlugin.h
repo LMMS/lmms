@@ -44,7 +44,7 @@ class ProcessWatcher : public QThread
 {
 	Q_OBJECT
 public:
-	ProcessWatcher( RemotePlugin * );
+	explicit ProcessWatcher(RemotePlugin* plugin);
 	~ProcessWatcher() override = default;
 
 	void stop()
@@ -71,7 +71,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:
-	RemotePlugin();
+	explicit RemotePlugin(Model* parent = nullptr);
 	~RemotePlugin() override;
 
 	inline bool isRunning()
@@ -178,9 +178,6 @@ private:
 
 	SharedMemory<float[]> m_audioBuffer;
 	std::size_t m_audioBufferSize;
-
-	int m_inputCount;
-	int m_outputCount;
 
 	PluginPortConfig m_portConfig;
 

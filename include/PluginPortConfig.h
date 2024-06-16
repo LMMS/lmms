@@ -52,20 +52,13 @@ class LMMS_EXPORT PluginPortConfig
 	Q_OBJECT
 
 public:
-	enum class PortType
-	{
-		None,
-		Mono,
-		Stereo
-	};
-
 	enum class Config
 	{
-		None = -1,
-		MonoMix,    // mono ports only
-		LeftOnly,   // mono ports only
-		RightOnly,  // mono ports only
-		Stereo
+		None       = -1,
+		MonoMix    =  0, // mono ports only
+		LeftOnly   =  1, // mono ports only
+		RightOnly  =  2, // mono ports only
+		Stereo     =  3
 	};
 
 	enum class MonoPluginType
@@ -77,42 +70,33 @@ public:
 	};
 
 	PluginPortConfig(Model* parent = nullptr);
-	PluginPortConfig(PortType in, PortType out, Model* parent = nullptr);
+	PluginPortConfig(int inCount, int outCount, Model* parent = nullptr);
 
 	/**
 	 * Getters
 	 */
-	auto inputPortType() const { return m_inPort; }
-	auto outputPortType() const { return m_outPort; }
+	auto portCountIn() const -> int { return m_portCountIn; }
+	auto portCountOut() const -> int { return m_portCountOut; }
 
-	template<bool isInput>
-	auto portConfig() const -> Config
+	auto portConfigIn() const -> Config
 	{
-		if constexpr (isInput)
+		switch (m_portCountIn)
 		{
-			switch (m_inPort)
-			{
-				default: [[fallthrough]];
-				case PortType::None:
-					return Config::None;
-				case PortType::Mono:
-					return static_cast<Config>(m_config.value());
-				case PortType::Stereo:
-					return Config::Stereo;
-			}
+			default: [[fallthrough]];
+			case 0: return Config::None;
+			case 1: return static_cast<Config>(m_config.value());
+			case 2: return Config::Stereo;
 		}
-		else
+	}
+
+	auto portConfigOut() const -> Config
+	{
+		switch (m_portCountOut)
 		{
-			switch (m_outPort)
-			{
-				default: [[fallthrough]];
-				case PortType::None:
-					return Config::None;
-				case PortType::Mono:
-					return static_cast<Config>(m_config.value());
-				case PortType::Stereo:
-					return Config::Stereo;
-			}
+			default: [[fallthrough]];
+			case 0: return Config::None;
+			case 1: return static_cast<Config>(m_config.value());
+			case 2: return Config::Stereo;
 		}
 	}
 
@@ -123,8 +107,9 @@ public:
 	/**
 	 * Setters
 	 */
-	void setPortType(unsigned inCount, unsigned outCount);
-	void setPortType(PortType in, PortType out);
+	void setPortCounts(int inCount, int outCount);
+	void setPortCountIn(int inCount);
+	void setPortCountOut(int outCount);
 	auto setPortConfig(Config config) -> bool;
 
 	/**
@@ -142,8 +127,8 @@ signals:
 private:
 	void updateOptions();
 
-	PortType m_inPort = PortType::None;
-	PortType m_outPort = PortType::None;
+	int m_portCountIn = DEFAULT_CHANNELS;
+	int m_portCountOut = DEFAULT_CHANNELS;
 
 	//! Value is 0..2, which represents { MonoMix, LeftOnly, RightOnly } for non-Stereo plugins
 	ComboBoxModel m_config;
