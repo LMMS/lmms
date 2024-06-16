@@ -73,15 +73,6 @@ protected:
 		m_layout->addWidget( _w );
 	}
 
-	void addContentCheckBox(bool user_checkbox = false, bool factory = false, bool hidden = true);
-	QCheckBox* m_showUserContent = nullptr;
-	QCheckBox* m_showFactoryContent = nullptr;
-	QCheckBox* m_showHiddenContent = nullptr;
-
-	QBoxLayout *filterWidgetLayout = nullptr;
-	QBoxLayout *hiddenWidgetLayout = nullptr;
-	QBoxLayout *outerLayout = nullptr;
-
 	void addContentLayout( QLayout * _l )
 	{
 		m_layout->addLayout( _l );

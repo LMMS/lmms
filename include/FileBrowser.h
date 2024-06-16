@@ -124,6 +124,14 @@ private:
 
 	bool m_dirsAsItems;
 
+	void addContentCheckBox(bool user_checkbox = false, bool factory = false, bool hidden = true);
+	QCheckBox* m_showUserContent = nullptr;
+	QCheckBox* m_showFactoryContent = nullptr;
+	QCheckBox* m_showHiddenContent = nullptr;
+
+	QBoxLayout *filterWidgetLayout = nullptr;
+	QBoxLayout *hiddenWidgetLayout = nullptr;
+	QBoxLayout *outerLayout = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
 	QList<QString> m_savedExpandedDirs;
