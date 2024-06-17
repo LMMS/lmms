@@ -87,6 +87,7 @@ public:
 
 	bool hasGui() const { return m_hasGUI; }
 	void setHasGui(bool val) { m_hasGUI = val; }
+	bool wantsUi() const;
 
 protected:
 	/*

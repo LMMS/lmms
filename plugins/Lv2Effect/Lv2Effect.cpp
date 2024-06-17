@@ -63,6 +63,9 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 	m_controls(this, key->attributes["uri"]),
 	m_tmpOutputSmps(Engine::audioEngine()->framesPerPeriod())
 {
+	// even if no input, we may need to force this effect to run permanently
+	// this is required for permanent DSP<->UI communication
+	if(m_controls.wantsUi()) { startRunning(); }
 }
 
 
@@ -70,7 +73,10 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
+	// LMMS wants to avoid calling run if not necessary
+	// However, in case of UI, run() must be called to keep up the DSP<->UI communication
+	if ((!isEnabled() || !isRunning()) && !m_controls.wantsUi()) { return false; }
+
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
 	m_controls.copyBuffersFromLmms(buf, frames);
@@ -95,10 +101,12 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		auto r = static_cast<double>(buf[f][1]);
 		outSum += l*l + r*r;
 	}
-	/*checkGate(outSum / frames);
+	checkGate(outSum / frames);
 
-	return isRunning();*/
-	return true;
+	// keep DSP<->UI communication active, but return a useful value
+	bool producedOutput = isRunning();
+	if(m_controls.wantsUi()) { startRunning(); }
+	return producedOutput;
 }
 
 
