@@ -248,6 +248,7 @@ private:
 	std::optional<LocklessRingBufferReader<char>> m_uiEventsReader;
 	bool m_wantUi;
 	static bool initWantUi();
+	bool isUiActive() const;
 	void applyUiEvents(uint32_t nframes);
 	bool sendToUi(uint32_t port_index, uint32_t type, uint32_t size, const void* body);
 	bool sendToUi(uint32_t port_index, const Lv2Ports::Control* ctrl);

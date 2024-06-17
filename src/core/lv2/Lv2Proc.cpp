@@ -224,13 +224,16 @@ void Lv2Proc::onSettingsLoaded()
 	copyModelsFromCore();
 
 	// All control ports may have changed -> Tell UI
-	for (uint32_t p = 0; p < portNum(); ++p)
+	if (isUiActive())
 	{
-		const Lv2Ports::PortBase& port = *m_ports[p];
-		if (port.m_flow == Lv2Ports::Flow::Input &&
-			port.m_type == Lv2Ports::Type::Control)
+		for (uint32_t p = 0; p < portNum(); ++p)
 		{
-			sendToUi(p, Lv2Ports::dcast<Lv2Ports::Control>(&port));
+			const Lv2Ports::PortBase& port = *m_ports[p];
+			if (port.m_flow == Lv2Ports::Flow::Input &&
+				port.m_type == Lv2Ports::Type::Control)
+			{
+				sendToUi(p, Lv2Ports::dcast<Lv2Ports::Control>(&port));
+			}
 		}
 	}
 }
@@ -253,7 +256,7 @@ void Lv2Proc::dumpPorts()
 
 void Lv2Proc::applyUiEvents(uint32_t nframes)
 {
-	if (!m_uiEventsReader) { return; }
+	if (!isUiActive()) { return; }
 	Lv2UiControlChange ev;
 	const size_t space = m_uiEventsReader->read_space();
 	Lv2Manager* mgr = Engine::getLv2Manager();
@@ -483,12 +486,7 @@ void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
 bool Lv2Proc::sendToUi(uint32_t port_index,
 						uint32_t type, uint32_t size, const void* body)
 {
-	if (!m_uiEventsReader)
-	{
-		// missing UI events reader on our sides implies
-		// missing plugin events reader on UI side (see Lv2ViewBase.cpp)
-		return false;
-	}
+	if (!isUiActive()) { return false; }
 
 	char evbuf[sizeof(Lv2UiControlChange) + sizeof(LV2_Atom)];
 	Lv2UiControlChange* ev = (Lv2UiControlChange*)evbuf;
@@ -517,12 +515,7 @@ bool Lv2Proc::sendToUi(uint32_t port_index, const Lv2Ports::Control* ctrl)
 {
 		qDebug () << "sendToUi(): Want to set float port" << port_index << "to" << ctrl->m_val;
 
-	if (!m_uiEventsReader)
-	{
-		// missing UI events reader on our sides implies
-		// missing plugin events reader on UI side (see Lv2ViewBase.cpp)
-		return false;
-	}
+	if (!isUiActive()) { return false; }
 	assert(ctrl);
 	char buf[sizeof(Lv2UiControlChange) + sizeof(float)];
 	Lv2UiControlChange* ev = (Lv2UiControlChange*)buf;
@@ -562,10 +555,7 @@ void Lv2Proc::run(fpp_t frames)
 	m_eventDeltaT += frames;
 	bool sendUiUpdates = false;
 	uint32_t updateFrames = (uint32_t)(Engine::audioEngine()->outputSampleRate() / lv2UiRefreshRate());
-	if (m_uiEventsReader
-		// missing UI events reader on our sides implies
-		// missing plugin events reader on UI side (see Lv2ViewBase.cpp)
-		&& (m_eventDeltaT > updateFrames))
+	if (isUiActive() && (m_eventDeltaT > updateFrames))
 	{
 		sendUiUpdates = true;
 		m_eventDeltaT = 0;
@@ -781,6 +771,17 @@ bool Lv2Proc::initWantUi()
 #else
 	return false;
 #endif
+}
+
+
+
+
+bool Lv2Proc::isUiActive() const
+{
+	// m_uiEventsReader is connected in Lv2ViewProc CTOR
+	// not connected => Lv2ViewProc CTOR has not been completed
+	// connected => Lv2ViewProc CTOR has not been completed "sufficiently"
+	return !!m_uiEventsReader;
 }
 
 

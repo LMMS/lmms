@@ -306,14 +306,16 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		lilv_free(binaryPath);
 		lilv_free(bundlePath);
 
+		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
+		m_uiInstanceWidget->setParent(parent);
+
 		// connect UI ringbuffers
 		// about the order: Lv2Proc can reject sending plugin events as long as
 		//                  its UI reader is not connected
 		proc->connectToPluginEvents(m_pluginEventsReader);
 		proc->connectUiEventsReaderTo(m_uiEvents);
 
-		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
-		m_uiInstanceWidget->setParent(parent);
+		// <--- This marks the entry point after which the UI can be used
 
 		initUi();  // send all control values to UI once
 
