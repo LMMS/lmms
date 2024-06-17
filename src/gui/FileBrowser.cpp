@@ -92,8 +92,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 {
 	setWindowTitle( tr( "Browser" ) );
 
-	// user dir and factory dir checkboxes will display individually depending on whether they are empty.
-	addContentCheckBox(!userDir.isEmpty(), !factoryDir.isEmpty());
+	addContentCheckBox();
 
 	auto searchWidget = new QWidget(contentParent());
 	searchWidget->setFixedHeight( 24 );
@@ -141,8 +140,12 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	show();
 }
 
-void FileBrowser::addContentCheckBox(bool user_checkbox, bool factory, bool hidden)
+void FileBrowser::addContentCheckBox()
 {
+	// user dir and factory dir checkboxes will display individually depending on whether they are empty.
+	const bool user_checkbox = !m_userDir.isEmpty();
+	const bool factory = !m_factoryDir.isEmpty();
+
 	auto filterWidget = new QWidget(contentParent());
 
 	outerLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom, filterWidget);
@@ -179,10 +182,8 @@ void FileBrowser::addContentCheckBox(bool user_checkbox, bool factory, bool hidd
 		configCheckBox(filterWidgetLayout, m_showFactoryContent, Qt::Checked);
 	}
 
-	if (hidden) {
-		m_showHiddenContent = new QCheckBox(tr("Hidden content"));
-		configCheckBox(hiddenWidgetLayout, m_showHiddenContent, Qt::Unchecked);
-	}
+	m_showHiddenContent = new QCheckBox(tr("Hidden content"));
+	configCheckBox(hiddenWidgetLayout, m_showHiddenContent, Qt::Unchecked);
 
 	addContentWidget(filterWidget);
 }

@@ -111,6 +111,8 @@ private:
 	void onSearch(const QString& filter);
 	void displaySearch(bool on);
 
+	void addContentCheckBox();
+
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 	FileBrowserTreeWidget * m_searchTreeWidget;
 
@@ -124,7 +126,6 @@ private:
 
 	bool m_dirsAsItems;
 
-	void addContentCheckBox(bool user_checkbox = false, bool factory = false, bool hidden = true);
 	QCheckBox* m_showUserContent = nullptr;
 	QCheckBox* m_showFactoryContent = nullptr;
 	QCheckBox* m_showHiddenContent = nullptr;
