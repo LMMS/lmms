@@ -99,15 +99,16 @@ jobs:
         with:
           key: n/a - only restore from restore-keys
           restore-keys: |
-            homebrew-
+            homebrew-${{ matrix.arch }}-
           path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ github.ref }}-
-            ccache-${{ github.job }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
@@ -156,7 +157,8 @@ jobs:
       - name: Save Homebrew download cache
         uses: actions/cache/save@v3
         with:
-          key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          key: "homebrew-${{ matrix.arch }}\
+            -${{ hashFiles('Brewfile.lock.json') }}"
           path: ~/Library/Caches/Homebrew/downloads
   mingw:
     strategy:
