@@ -1,3 +1,5 @@
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 FILE(GLOB SOURCES *.cc)
 LIST(SORT SOURCES)
@@ -8,10 +10,8 @@ ADD_DEFINITIONS(-DLMMS_BUILD_WIN64)
 ENDIF(LMMS_BUILD_WIN64)
 SET_TARGET_PROPERTIES(caps PROPERTIES PREFIX "")
 
-if(MSVC)
-	target_compile_options(caps PRIVATE /wd4244 /wd4305)
-else()
-	target_compile_options(caps PRIVATE -O2 -funroll-loops -Wno-write-strings)
+if(NOT MSVC)
+	target_compile_options(caps PRIVATE -O2 -funroll-loops)
 endif()
 
 if(MSVC)

@@ -37,13 +37,13 @@
 
 // carla/source/includes
 #include "carlabase_export.h"
-#include "CarlaDefines.h"
+#include <CarlaDefines.h>
 #if CARLA_VERSION_HEX >= 0x010911
-    #include "CarlaNativePlugin.h"
+    #include <CarlaNativePlugin.h>
 #else
-    #include "CarlaBackend.h"
-    #include "CarlaNative.h"
-    #include "CarlaUtils.h"
+    #include <CarlaBackend.h>
+    #include <CarlaNative.h>
+    #include <CarlaUtils.h>
     CARLA_EXPORT
     const NativePluginDescriptor* carla_get_native_patchbay_plugin();
 

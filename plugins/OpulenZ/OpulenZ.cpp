@@ -46,9 +46,9 @@
 #include <cassert>
 #include <cmath>
 
-#include "opl.h"
-#include "temuopl.h"
-#include "mididata.h"
+#include <opl.h>
+#include <temuopl.h>
+#include <mididata.h>
 
 #include "embed.h"
 #include "debug.h"
