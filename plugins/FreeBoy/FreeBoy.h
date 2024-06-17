@@ -26,8 +26,9 @@
 #ifndef LMMS_FREEBOY_H
 #define LMMS_FREEBOY_H
 
+#include <Blip_Buffer.h>
+
 #include "AutomatableModel.h"
-#include "Blip_Buffer.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
