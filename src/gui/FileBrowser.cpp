@@ -413,8 +413,7 @@ void FileBrowser::addItems(const QString & path )
 	QFileInfoList entries = cdir.entryInfoList(
 		m_filter.split(' '),
 		dirFilters(),
-		QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase
-		);
+		QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
 		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
@@ -592,9 +591,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	}
 
 	// When space is pressed, start a preview of the selected item
-	if (preview) {
-		previewFileItem(file);
-	}
+	if (preview) { previewFileItem(file); }
 }
 
 
