@@ -77,13 +77,15 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
 }
 
+
+
 void SideBarWidget::resizeEvent( QResizeEvent * )
 {
 	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
 						height() - MARGIN * 2 - 40 );
 	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
-
 }
+
 
 } // namespace lmms::gui
