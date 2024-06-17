@@ -15,6 +15,7 @@ function(enable_policy_if_exists id)
 	endif()
 endfunction()
 
+enable_policy_if_exists(CMP0092) # MSVC warning flags are not in CMAKE_<LANG>_FLAGS by default.
 # Needed for ccache support with MSVC
 enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
 
@@ -41,6 +42,7 @@ INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
 INCLUDE(GenerateExportHeader)
+include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
@@ -170,7 +172,7 @@ LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
 FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
-INCLUDE_DIRECTORIES(
+include_directories(SYSTEM
 	${Qt5Core_INCLUDE_DIRS}
 	${Qt5Gui_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
@@ -408,7 +410,7 @@ IF(WANT_SOUNDIO)
   IF(SOUNDIO_FOUND)
 	SET(LMMS_HAVE_SOUNDIO TRUE)
 	SET(STATUS_SOUNDIO "OK")
-	INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
+	include_directories(SYSTEM "${SOUNDIO_INCLUDE_DIR}")
   ELSE(SOUNDIO_FOUND)
 	SET(SOUNDIO_INCLUDE_DIR "")
 	SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
@@ -489,11 +491,9 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 IF(WANT_JACK)
 	IF(WANT_WEAKJACK)
 		SET(LMMS_HAVE_WEAKJACK TRUE)
-		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-		SET(JACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/jack2/common)
 		SET(STATUS_JACK "OK (weak linking enabled)")
-		# use dlsym instead
-		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+		set(JACK_INCLUDE_DIRS "")
+		set(JACK_LIBRARIES weakjack)
 		SET(LMMS_HAVE_JACK TRUE)
 		SET(LMMS_HAVE_JACK_PRENAME TRUE)
 		SET(JACK_FOUND TRUE)
@@ -629,28 +629,63 @@ ENDIF(WANT_DEBUG_FPE)
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
-# set compiler flags
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
-	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
-	IF(${USE_WERROR})
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
-	ENDIF()
+# Shim the SYSTEM property for older CMake versions
+if(CMAKE_VERSION VERSION_LESS "3.25")
+	define_property(TARGET
+		PROPERTY SYSTEM
+		INHERITED
+		BRIEF_DOCS "Shim of built-in SYSTEM property for CMake versions less than 3.25"
+		FULL_DOCS "Non-functional, but allows the property to be inherited properly."
+			"See the CMake documentation at https://cmake.org/cmake/help/latest/prop_tgt/SYSTEM.html."
+	)
+endif()
+
+# Add warning and error flags
+option(USE_WERROR "Treat compiler warnings as errors" OFF)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	set(COMPILE_ERROR_FLAGS
+		"-Wall" # Enable most warnings by default
+		"-Werror=unused-function" # Unused functions are an error
+		# TODO: Fix the code and remove the following:
+		"-Wno-sign-compare" # Permit comparisons between signed and unsigned integers
+		"-Wno-strict-overflow" # Permit optimisations assuming no signed overflow
+	)
+	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
+		"-w" # Disable all warnings
+	)
 
 	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds -Wno-attributes")
-	ENDIF()
-ELSEIF(MSVC)
-	# Remove any existing /W flags
-	string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
-	STRING(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	SET(WERROR_FLAGS "/W2")
-	IF(${USE_WERROR})
-		SET(WERROR_FLAGS "${WERROR_FLAGS} /WX")
-	ENDIF()
-ENDIF()
+	# TODO: Is this still necessary?
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		list(APPEND COMPILE_ERROR_FLAGS
+			"-Wno-array-bounds" # Permit out-of-bounds array subscripts
+			"-Wno-attributes" # Permit unrecognised attributes
+		)
+	endif()
 
+	if(USE_WERROR)
+		list(APPEND COMPILE_ERROR_FLAGS
+			"-Werror" # Treat warnings as errors
+		)
+	endif()
+elseif(MSVC)
+	set(COMPILE_ERROR_FLAGS
+		"/W2" # Enable some warnings by default
+		"/external:W0" # Don't emit warnings for third-party code
+		"/external:anglebrackets" # Consider headers included with angle brackets to be third-party
+		"/external:templates-" # Still emit warnings from first-party instantiations of third-party templates
+	)
+	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
+		"/W0" # Disable all warnings
+	)
+
+	if(USE_WERROR)
+		list(APPEND COMPILE_ERROR_FLAGS
+			"/WX" # Treat warnings as errors
+		)
+	endif()
+endif()
+add_compile_options("$<IF:$<BOOL:$<TARGET_PROPERTY:SYSTEM>>,${THIRD_PARTY_COMPILE_ERROR_FLAGS},${COMPILE_ERROR_FLAGS}>")
 
 IF(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -660,8 +695,6 @@ IF(NOT CMAKE_BUILD_TYPE)
 		"MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
-SET(CMAKE_C_FLAGS "${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
@@ -703,12 +736,9 @@ ENDIF()
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	IF(WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
-	ELSE(WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
-	ENDIF(WIN32)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND NOT WIN32)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DPIC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 elseif(MSVC)
 	# Use UTF-8 as the source and execution character set
 	add_compile_options("/utf-8")

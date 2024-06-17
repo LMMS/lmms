@@ -76,7 +76,7 @@ if(IS_MINGW)
 	" HAS_STD_MUTEX)
 
 	if(NOT HAS_STD_MUTEX)
-		target_include_directories(${EXE_NAME} PRIVATE
+		target_include_directories(${EXE_NAME} SYSTEM PRIVATE
 			"${LMMS_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
 		target_compile_definitions(${EXE_NAME} PRIVATE
 			-DUSE_MINGW_THREADS_REPLACEMENT)

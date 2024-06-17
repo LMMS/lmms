@@ -134,6 +134,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
 	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
 
+	state->resampler().setRatio(resampleRatio);
+
 	const auto resampleResult
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
 	advance(state, resampleResult.inputFramesUsed, loopMode);

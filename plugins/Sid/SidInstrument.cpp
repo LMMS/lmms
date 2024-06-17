@@ -29,7 +29,7 @@
 #include <cmath>
 #include <cstdio>
 
-#include "sid.h"
+#include <sid.h>
 
 #include "SidInstrument.h"
 #include "AudioEngine.h"
