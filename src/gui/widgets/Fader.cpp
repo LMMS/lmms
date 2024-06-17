@@ -125,7 +125,7 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
 	if (mouseEvent->button() == Qt::LeftButton &&
-			!(mouseEvent->modifiers() & Qt::ControlModifier)
+			!(mouseEvent->modifiers() & Qt::ControlModifier) &&
 			!(mouseEvent->modifiers() & Qt::AltModifier))
 	{
 		AutomatableModel* thisModel = model();
