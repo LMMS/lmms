@@ -633,7 +633,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
+#ifdef LMMS_BUILD_APPLE
+		if ( me->modifiers() & Qt::AltModifier &&
+#else
+		if ( me->modifiers() & Qt::ControlModifier &&
+#endif
+			!(sClip && knifeMode) )
 		{
 			if( isSelected() )
 			{
@@ -726,7 +731,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ),
+#ifdef LMMS_BUILD_APPLE
+			hint.arg(UI_ALT_KEY),
+#else
+			hint.arg(UI_CTRL_KEY),
+#endif
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -824,7 +834,11 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
+#ifdef LMMS_BUILD_APPLE
+	if( me->modifiers() & Qt::AltModifier )
+#else
 	if( me->modifiers() & Qt::ControlModifier )
+#endif
 	{
 		delete m_hint;
 		m_hint = nullptr;

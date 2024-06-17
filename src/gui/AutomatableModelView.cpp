@@ -171,7 +171,12 @@ void AutomatableModelView::unsetModel()
 
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
-	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
+	if( event->button() == Qt::LeftButton &&
+#ifdef LMMS_BUILD_APPLE
+		event->modifiers() & Qt::AltModifier )
+#else
+		event->modifiers() & Qt::ControlModifier )
+#endif
 	{
 		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();

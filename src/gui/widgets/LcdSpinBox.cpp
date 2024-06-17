@@ -80,6 +80,7 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton &&
 		! ( event->modifiers() & Qt::ControlModifier ) &&
+		! ( event->modifiers() & Qt::AltModifier ) &&
 						event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;

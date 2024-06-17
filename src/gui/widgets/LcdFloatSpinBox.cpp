@@ -140,6 +140,7 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 
 	if (event->button() == Qt::LeftButton &&
 		!(event->modifiers() & Qt::ControlModifier) &&
+		!(event->modifiers() & Qt::AltModifier) &&
 		event->y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;
