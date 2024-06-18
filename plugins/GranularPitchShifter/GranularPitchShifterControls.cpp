@@ -60,9 +60,9 @@ GranularPitchShifterControls::GranularPitchShifterControls(GranularPitchShifterE
 	
 	m_rangeModel.addItem(tr("5 seconds"));
 	m_rangeModel.addItem(tr("10 seconds (size)"));
-	m_rangeModel.addItem(tr("40 seconds (pitch)"));
-	m_rangeModel.addItem(tr("40 seconds (spray)"));
-	m_rangeModel.addItem(tr("80 seconds (spray and jitter)"));
+	m_rangeModel.addItem(tr("40 seconds (size and pitch)"));
+	m_rangeModel.addItem(tr("40 seconds (size and spray and jitter)"));
+	m_rangeModel.addItem(tr("120 seconds (all of the above)"));
 	
 	connect(&m_rangeModel, &ComboBoxModel::dataChanged, this, &GranularPitchShifterControls::updateRange);
 }
@@ -86,7 +86,7 @@ void GranularPitchShifterControls::updateRange() {
 			m_jitterModel.setRange(0.f, 1.f, 0.0001f);
 			break;
 		}
-		case 2:// 40 seconds (pitch)
+		case 2:// 40 seconds (size and pitch)
 		{
 			m_sizeModel.setRange(2.f, 1000.f, 0.001f);
 			m_pitchModel.setRange(-48.f, 48.f, 0.01f);
@@ -94,19 +94,19 @@ void GranularPitchShifterControls::updateRange() {
 			m_jitterModel.setRange(0.f, 1.f, 0.0001f);
 			break;
 		}
-		case 3:// 40 seconds (spray)
+		case 3:// 40 seconds (size and spray and jitter)
 		{
 			m_sizeModel.setRange(2.f, 1000.f, 0.001f);
 			m_pitchModel.setRange(-48.f, 24.f, 0.01f);
-			m_sprayModel.setRange(0.f, 2.f, 0.0001f);
-			m_jitterModel.setRange(0.f, 1.f, 0.0001f);
+			m_sprayModel.setRange(0.f, 20.f, 0.0001f);
+			m_jitterModel.setRange(0.f, 2.f, 0.0001f);
 			break;
 		}
-		case 4:// 80 seconds (spray & jitter)
+		case 4:// 120 seconds (all of the above)
 		{
 			m_sizeModel.setRange(2.f, 1000.f, 0.001f);
-			m_pitchModel.setRange(-48.f, 24.f, 0.01f);
-			m_sprayModel.setRange(0.f, 2.f, 0.0001f);
+			m_pitchModel.setRange(-48.f, 48.f, 0.01f);
+			m_sprayModel.setRange(0.f, 40.f, 0.0001f);
 			m_jitterModel.setRange(0.f, 2.f, 0.0001f);
 			break;
 		}
