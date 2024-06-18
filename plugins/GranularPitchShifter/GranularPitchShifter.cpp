@@ -91,7 +91,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 	}
 	
 	const float shapeK = cosWindowApproxK(shape);
-	const int sizeSamples = static_cast<int>((m_sampleRate / size) * 0.5) * 2;
+	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
 
 	for (fpp_t f = 0; f < frames; ++f)
@@ -117,7 +117,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 		{
 			m_updatePitches = false;
 			
-			const double speed[2] = {std::exp2(m_truePitch[0] * (1. / 12.)), std::exp2(m_truePitch[1] * (1. / 12.))};
+			std::array<double, 2> speed = {std::exp2(m_truePitch[0] * (1. / 12.)), std::exp2(m_truePitch[1] * (1. / 12.))};
 			std::array<double, 2> ratio = {speed[0] / m_speed[0], speed[1] / m_speed[1]};
 			
 			for (int i = 0; i < m_grainCount; ++i)
