@@ -56,7 +56,7 @@ class PrefilterLowpass
 public:
 	inline void setCoefs(float sampleRate, float cutoff)
 	{
-		const float g = std::tan(M_PI * cutoff / sampleRate);
+		const float g = std::tan(F_PI * cutoff / sampleRate);
 		const float ginv = g / (1.0f + g * (g + 1.414213562));
 		m_g1 = ginv;
 		m_g2 = 2.0f * (g + 1.414213562) * ginv;
