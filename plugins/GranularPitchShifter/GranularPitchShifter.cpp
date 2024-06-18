@@ -34,7 +34,6 @@ namespace lmms
 
 extern "C"
 {
-
 Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
@@ -47,7 +46,6 @@ Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 	nullptr,
 	nullptr,
 } ;
-
 }
 
 
@@ -261,13 +259,11 @@ void GranularPitchShifterEffect::changeSampleRate()
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
 	return new GranularPitchShifterEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
-
 }
 
 } // namespace lmms
