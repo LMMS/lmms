@@ -41,7 +41,7 @@ GranularPitchShifterControls::GranularPitchShifterControls(GranularPitchShifterE
 	m_pitchSpreadModel(0.f, -24.f, 24.f, 0.01f, this, tr("Pitch Stereo Spread")),
 	m_spraySpreadModel(0.f, 0.f, 1.f, 0.0001f, this, tr("Spray Stereo")),
 	m_shapeModel(2.f, 1.f, 2.f, 0.0001f, this, tr("Shape")),
-	m_fadeLengthModel(1.f, 0.f, 1.f, 0.00001f, this, tr("Fade Length")),
+	m_fadeLengthModel(1.f, 0.001f, 1.f, 0.00001f, this, tr("Fade Length")),
 	m_feedbackModel(0.f, 0.f, 1.f, 0.00001f, this, tr("Feedback")),
 	m_minLatencyModel(0.01f, 0.f, 1.f, 0.00001f, this, tr("Minimum Allowed Latency")),
 	m_prefilterModel(true, this, tr("Prefilter")),
