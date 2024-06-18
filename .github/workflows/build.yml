@@ -95,19 +95,21 @@ jobs:
       - name: Clean up Homebrew download cache
         run: rm -rf ~/Library/Caches/Homebrew/downloads
       - name: Restore Homebrew download cache
+        id: cache-homebrew
         uses: actions/cache/restore@v3
         with:
           key: n/a - only restore from restore-keys
           restore-keys: |
-            homebrew-
+            homebrew-${{ matrix.arch }}-
           path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ github.ref }}-
-            ccache-${{ github.job }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
@@ -154,10 +156,14 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500MB
       - name: Save Homebrew download cache
+        if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
         uses: actions/cache/save@v3
         with:
-          key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          key: ${{ env.key }} 
           path: ~/Library/Caches/Homebrew/downloads
+        env:
+          key: "homebrew-${{ matrix.arch }}\
+            -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
     strategy:
       fail-fast: false
