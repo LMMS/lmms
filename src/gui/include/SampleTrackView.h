@@ -28,6 +28,7 @@
 
 #include "MixerChannelLcdSpinBox.h"
 #include "TrackView.h"
+#include "SampleTrack.h"
 
 namespace lmms
 {
