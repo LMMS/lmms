@@ -96,7 +96,7 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		const auto inGain
 			= static_cast<SPFLOAT>(DB2LIN(m_reverbSCControls.m_inputGainModel.valueAt(f)));
 		const auto outGain
-			= static_cast<SPFLOAT>(m_reverbSCControls.m_outputGainModel.valueAt(f));
+			= static_cast<SPFLOAT>(DB2LIN(m_reverbSCControls.m_outputGainModel.valueAt(f)));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
