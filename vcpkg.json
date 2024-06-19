@@ -22,6 +22,10 @@
 			]
 		},
 		{
+			"name": "libflac",
+			"default-features": false
+		},
+		{
 			"name": "libogg",
 			"default-features": false
 		},
@@ -36,6 +40,10 @@
 				"external-libs",
 				"mpeg"
 			]
+		},
+		{
+			"name": "libsoundio",
+			"default-features": false
 		},
 		{
 			"name": "libstk",
@@ -61,21 +69,6 @@
 		{
 			"name": "portaudio",
 			"default-features": false
-		},
-		{
-			"name": "qt5-base",
-			"default-features": false,
-			"platform": "linux | mingw"
-		},
-		{
-			"name": "qt5-svg",
-			"default-features": false,
-			"platform": "linux | mingw"
-		},
-		{
-			"name": "qt5-tools",
-			"default-features": false,
-			"platform": "linux | mingw"
 		},
 		{
 			"name": "sdl2",

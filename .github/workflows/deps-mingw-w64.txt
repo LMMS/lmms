@@ -1,6 +1,8 @@
 binutils
+binutils-mingw-w64
 ca-certificates
 ccache
+cmake
 dirmngr
 file
 git
@@ -22,4 +24,5 @@ perl
 qt5-qmake
 software-properties-common
 ssh-client
+sudo
 wget
