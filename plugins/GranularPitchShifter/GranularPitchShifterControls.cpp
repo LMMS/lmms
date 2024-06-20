@@ -49,10 +49,8 @@ GranularPitchShifterControls::GranularPitchShifterControls(GranularPitchShifterE
 	m_glideModel(0.01f, 0.f, 1.f, 0.0001f, this, tr("Glide")),
 	m_rangeModel(this, tr("Ring Buffer Length"))
 {
-	m_pitchModel.setScaleLogarithmic(true);
 	m_sizeModel.setScaleLogarithmic(true);
 	m_sprayModel.setScaleLogarithmic(true);
-	m_pitchSpreadModel.setScaleLogarithmic(true);
 	m_spraySpreadModel.setScaleLogarithmic(true);
 	m_minLatencyModel.setScaleLogarithmic(true);
 	m_densityModel.setScaleLogarithmic(true);
