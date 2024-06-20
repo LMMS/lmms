@@ -277,7 +277,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( generalSettingsWidget );
 	// Use QWidgetItem explicitly to make the size hint change on instrument changes
 	// QLayout::addWidget() uses QWidgetItemV2 with size hint caching
-	vlayout->insertItem(1, new QWidgetItem(m_tabWidget));
+	auto widgetItem = new QWidgetItem(m_tabWidget);
+	vlayout->insertItem(1, widgetItem);
+	m_tabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	//vlayout->addWidget( m_tabWidget, 1 );
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
@@ -468,6 +471,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_track->dataChanged(); // Get the text on the trackButton to change
 
 		adjustTabSize(m_instrumentView);
+		m_instrumentView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
 		// adjust window size
 		layout()->invalidate();
