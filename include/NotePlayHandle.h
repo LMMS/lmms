@@ -136,10 +136,23 @@ public:
 		return m_framesBeforeRelease;
 	}
 
+	// returns the parent's framesBeforeRelease() (or 0 if the note does not hava a parent)
+	inline f_cnt_t getParentFramesBeforeRelease()
+	{
+		return m_hasParent == true ? m_parent->framesBeforeRelease() : 0;
+	}
+
+
 	/*! Returns how many frames were played since release */
 	f_cnt_t releaseFramesDone() const
 	{
 		return m_releaseFramesDone;
+	}
+
+	// returns the parent's releaseFramesDone() (or 0 if the note does not hava a parent)
+	inline f_cnt_t getParentReleaseFramesDone()
+	{
+		return m_hasParent == true ? m_parent->releaseFramesDone() : 0;
 	}
 
 	/*! Returns the number of frames to be played after release according to
@@ -172,6 +185,13 @@ public:
 		return m_totalFramesPlayed;
 	}
 
+	// returns the parent's totalFramesPlayed() (or 0 if the note does not hava a parent)
+	inline f_cnt_t getParentTotalFramesPlayed()
+	{
+		return m_hasParent == true ? m_parent->totalFramesPlayed() : 0;
+	}
+
+
 	/*! Returns volume level at given frame (envelope/LFO) */
 	float volumeLevel( const f_cnt_t frame );
 
@@ -192,6 +212,7 @@ public:
 	{
 		return m_hasParent;
 	}
+
 
 	/*! Returns origin of note */
 	Origin origin() const

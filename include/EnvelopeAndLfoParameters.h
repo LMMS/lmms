@@ -134,6 +134,7 @@ public:
 	const FloatModel& getReleaseModel() const { return m_releaseModel; }
 	const FloatModel& getAmountModel() const { return m_amountModel; }
 	FloatModel& getAmountModel() { return m_amountModel; }
+	const BoolModel& getUseNoteParentModel() const { return m_useNoteParentModel; }
 
 
 	// LFO
@@ -169,6 +170,9 @@ private:
 	FloatModel m_sustainModel;
 	FloatModel m_releaseModel;
 	FloatModel m_amountModel;
+	// used in chords where the envelope is applyed
+	// to the whole chord instead of one note (if active)
+	BoolModel m_useNoteParentModel;
 
 	float  m_sustainLevel;
 	float  m_amount;

@@ -111,6 +111,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_releaseKnob = buildKnob(tr("REL"), tr("Release:"));
 	envKnobsLayout->addWidget(m_releaseKnob);
 
+	m_useNoteParentCb = new LedCheckBox("", this);
+	m_useNoteParentCb->setToolTip(tr("Apply envelope to whole chord"));
+	envKnobsLayout->addWidget(m_useNoteParentCb);
 
 	// Add some space between the envelope and LFO section
 	mainLayout->addSpacing(10);
@@ -212,6 +215,7 @@ void EnvelopeAndLfoView::modelChanged()
 	m_sustainKnob->setModel( &m_params->m_sustainModel );
 	m_releaseKnob->setModel( &m_params->m_releaseModel );
 	m_amountKnob->setModel( &m_params->m_amountModel );
+	m_useNoteParentCb->setModel(&m_params->m_useNoteParentModel);
 
 	m_lfoGraph->setModel(m_params);
 	m_lfoPredelayKnob->setModel( &m_params->m_lfoPredelayModel );
