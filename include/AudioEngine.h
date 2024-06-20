@@ -140,6 +140,9 @@ public:
 		}
 	} ;
 
+	AudioEngine(bool renderOnly);
+	~AudioEngine() override;
+
 	void initDevices();
 	void clear();
 	void clearNewPlayHandles();
@@ -345,8 +348,6 @@ private:
 	} ;
 
 
-	AudioEngine( bool renderOnly );
-	~AudioEngine() override;
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
