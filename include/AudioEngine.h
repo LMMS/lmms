@@ -42,19 +42,6 @@
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
 
-#ifdef WIN32
-// windows doesn't support std::aligned_alloc and using free
-// so have to introduce a wrapper to fix it
-#include <malloc.h>
-void* alignedMalloc(size_t byteNum){ return _aligned_malloc(byteNum, 16); }
-
-void alignedFree(void* ptr){ _aligned_free(ptr); }
-#else
-void* alignedMalloc(size_t byteNum){ return std::aligned_alloc(16, byteNum); }
-
-void alignedFree(void* ptr){ std::free(ptr); }
-#endif
-
 
 namespace lmms
 {
@@ -277,6 +264,19 @@ public:
 		}
 		return s;
 	}
+
+#ifdef WIN32
+	// windows doesn't support std::aligned_alloc and using free
+	// so have to introduce a wrapper to fix it
+	#include <malloc.h>
+	inline void* alignedMalloc(size_t byteNum){ return _aligned_malloc(byteNum, 16); }
+
+	inline void alignedFree(void* ptr){ _aligned_free(ptr); }
+#else
+	inline void* alignedMalloc(size_t byteNum){ return std::aligned_alloc(16, byteNum); }
+
+	inline void alignedFree(void* ptr){ std::free(ptr); }
+#endif
 
 
 	struct StereoSample
