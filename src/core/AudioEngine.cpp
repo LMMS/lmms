@@ -138,8 +138,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	BufferManager::init( m_framesPerPeriod );
 
 	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
-	m_outputBufferRead = static_cast<surroundSampleFrame *>(std::aligned_malloc(16, outputBufferSize));
-	m_outputBufferWrite = static_cast<surroundSampleFrame *>(std::aligned_malloc(16, outputBufferSize));
+	m_outputBufferRead = static_cast<surroundSampleFrame *>(std::aligned_alloc(16, outputBufferSize));
+	m_outputBufferWrite = static_cast<surroundSampleFrame *>(std::aligned_alloc(16, outputBufferSize));
 
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
