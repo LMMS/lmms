@@ -88,7 +88,6 @@ protected:
 	QString m_description;
 	QString m_unit;
 	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
-
 } ;
 
 

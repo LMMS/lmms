@@ -420,9 +420,10 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 			tick_t currentTime = currentClip->startPosition().getTicks();
 			bool smallerCheck = currentTime > closestTime || closestTime < 0;
 			bool biggerCheck = currentTime < closestTime || closestTime < 0;
+			bool searchBeforeCheck = !searchAfter && smallerCheck && timePos.getTicks() > currentTime;
+			bool searchAfterCheck = searchAfter && biggerCheck && timePos.getTicks() <= currentTime;
 
-			if ((!searchAfter && smallerCheck && timePos.getTicks() > currentTime)
-				|| (searchAfter && biggerCheck && timePos.getTicks() <= currentTime))
+			if (searchBeforeCheck || searchAfterCheck)
 			{
 				closestTime = currentTime;
 				closestClip = currentClip;
