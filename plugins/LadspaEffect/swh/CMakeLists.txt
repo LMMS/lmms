@@ -1,3 +1,5 @@
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
 # Create blank config.h
 FILE(WRITE ladspa/config.h "")
 
@@ -9,10 +11,8 @@ ELSE()
 ENDIF()
 
 # Additional compile flags
-if(MSVC)
-	set(COMPILE_FLAGS ${COMPILE_FLAGS} /wd4244 /wd4273 /wd4305)
-else()
-	set(COMPILE_FLAGS ${COMPILE_FLAGS} -O3 -Wall -c
+if(NOT MSVC)
+	set(COMPILE_FLAGS ${COMPILE_FLAGS} -O3 -c
 		-fomit-frame-pointer -funroll-loops -ffast-math -fno-strict-aliasing
 		${PIC_FLAGS}
 	)
