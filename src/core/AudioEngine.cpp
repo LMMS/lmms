@@ -181,8 +181,8 @@ AudioEngine::~AudioEngine()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	MemoryHelper::alignedFree(m_outputBufferRead);
-	MemoryHelper::alignedFree(m_outputBufferWrite);
+	std::free(m_outputBufferRead);
+	std::free(m_outputBufferWrite);
 
 	for (const auto& input : m_inputBuffer)
 	{
