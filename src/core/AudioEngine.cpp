@@ -24,8 +24,6 @@
 
 #include "AudioEngine.h"
 
-#include <cstdlib>
-
 #include "MixHelpers.h"
 #include "denormals.h"
 
@@ -139,8 +137,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	BufferManager::init( m_framesPerPeriod );
 
 	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
-	m_outputBufferRead = static_cast<surroundSampleFrame *>(std::aligned_alloc(16, outputBufferSize));
-	m_outputBufferWrite = static_cast<surroundSampleFrame *>(std::aligned_alloc(16, outputBufferSize));
+	m_outputBufferRead = static_cast<surroundSampleFrame *>(alignedMalloc(outputBufferSize));
+	m_outputBufferWrite = static_cast<surroundSampleFrame *>(alignedMalloc(outputBufferSize));
 
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
@@ -182,8 +180,8 @@ AudioEngine::~AudioEngine()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	std::free(m_outputBufferRead);
-	std::free(m_outputBufferWrite);
+	alignedFree(m_outputBufferRead);
+	alignedFree(m_outputBufferWrite);
 
 	for (const auto& input : m_inputBuffer)
 	{
