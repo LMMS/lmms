@@ -31,6 +31,10 @@
 #include <mutex>
 #endif
 
+#ifdef WIN32
+#include <malloc.h>
+#endif
+
 #include <QThread>
 #include <samplerate.h>
 
@@ -268,7 +272,6 @@ public:
 #ifdef WIN32
 	// windows doesn't support std::aligned_alloc and using free
 	// so have to introduce a wrapper to fix it
-	#include <malloc.h>
 	inline void* alignedMalloc(size_t byteNum){ return _aligned_malloc(byteNum, 16); }
 
 	inline void alignedFree(void* ptr){ _aligned_free(ptr); }
