@@ -127,7 +127,6 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 		m_clip->updateLength();
 		update();
 		_de->accept();
-		Engine::getSong()->setModified();
 	}
 	else
 	{
@@ -181,18 +180,21 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if (af == m_clip->m_sample.sampleFile())
-	{	//Instead of reloading the existing file, just reset the size
-		int length = static_cast<int>(m_clip->m_sample.sampleSize() / Engine::framesPerTick());
-		m_clip->changeLength(length);
+	if (selectedAudioFile.isEmpty()) { return; }
+	
+	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
+	{
+		m_clip->changeLengthToSampleLength();
 	}
 	else
-	{	//Otherwise load the new file as ususal
-		m_clip->setSampleFile( af );
-		Engine::getSong()->setModified();
+	{
+		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		if (sampleBuffer != SampleBuffer::emptyBuffer())
+		{
+			m_clip->setSampleBuffer(sampleBuffer);
+		}
 	}
 }
 

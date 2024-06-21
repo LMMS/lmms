@@ -46,9 +46,9 @@
 #include <cassert>
 #include <cmath>
 
-#include "opl.h"
-#include "temuopl.h"
-#include "mididata.h"
+#include <opl.h>
+#include <temuopl.h>
+#include <mididata.h>
 
 #include "embed.h"
 #include "debug.h"
@@ -95,7 +95,7 @@ QMutex OpulenzInstrument::emulatorMutex;
 const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
+	Instrument(_instrument_track, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
 	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 attack" )  ),
 	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 decay" )   ),
@@ -140,7 +140,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -231,7 +231,7 @@ OpulenzInstrument::~OpulenzInstrument() {
 void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();

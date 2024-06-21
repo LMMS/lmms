@@ -54,6 +54,7 @@
 
 #include "AutomatableModelView.h"
 #include "embed.h"
+#include "lmms_math.h"
 
 
 namespace lmms::gui
@@ -66,21 +67,21 @@ class LMMS_EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
-	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
-	Q_PROPERTY( QColor peakYellow READ peakYellow WRITE setPeakYellow )
-	Q_PROPERTY( bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS )
+	Q_PROPERTY(QColor peakOk MEMBER m_peakOk)
+	Q_PROPERTY(QColor peakClip MEMBER m_peakClip)
+	Q_PROPERTY(QColor peakWarn MEMBER m_peakWarn)
+	Q_PROPERTY(bool levelsDisplayedInDBFS MEMBER m_levelsDisplayedInDBFS)
+	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
+	Q_PROPERTY(QColor unityMarker MEMBER m_unityMarker)
 
-	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
-	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
+	Fader(FloatModel* model, const QString& name, QWidget* parent);
+	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
 	~Fader() override = default;
 
-	void init(FloatModel * model, QString const & name);
-
-	void setPeak_L( float fPeak );
+	void setPeak_L(float fPeak);
 	float getPeak_L() {	return m_fPeakValue_L;	}
 
-	void setPeak_R( float fPeak );
+	void setPeak_R(float fPeak);
 	float getPeak_R() {	return m_fPeakValue_R;	}
 
 	inline float getMinPeak() const { return m_fMinPeak; }
@@ -89,43 +90,34 @@ public:
 	inline float getMaxPeak() const { return m_fMaxPeak; }
 	inline void setMaxPeak(float maxPeak) { m_fMaxPeak = maxPeak; }
 
-	QColor const & peakGreen() const;
-	void setPeakGreen( const QColor & c );
+	inline bool getRenderUnityLine() const { return m_renderUnityLine; }
+	inline void setRenderUnityLine(bool value = true) { m_renderUnityLine = value; }
 
-	QColor const & peakRed() const;
-	void setPeakRed( const QColor & c );
-
-	QColor const & peakYellow() const;
-	void setPeakYellow( const QColor & c );
-
-	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
-	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
-
-	void setDisplayConversion( bool b )
+	void setDisplayConversion(bool b)
 	{
 		m_conversionFactor = b ? 100.0 : 1.0;
 	}
 
-	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
+	inline void setHintText(const QString& txt_before,
+						const QString& txt_after)
 	{
-		setDescription( _txt_before );
-		setUnit( _txt_after );
+		setDescription(txt_before);
+		setUnit(txt_after);
 	}
 
+signals:
+	void peakChanged(float peak);
+
 private:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void mousePressEvent( QMouseEvent *ev ) override;
-	void mouseDoubleClickEvent( QMouseEvent* mouseEvent ) override;
-	void mouseMoveEvent( QMouseEvent *ev ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void wheelEvent( QWheelEvent *ev ) override;
-	void paintEvent( QPaintEvent *ev ) override;
+	void contextMenuEvent(QContextMenuEvent* me) override;
+	void mousePressEvent(QMouseEvent* ev) override;
+	void mouseDoubleClickEvent(QMouseEvent* mouseEvent) override;
+	void mouseMoveEvent(QMouseEvent* ev) override;
+	void mouseReleaseEvent(QMouseEvent* me) override;
+	void wheelEvent(QWheelEvent* ev) override;
+	void paintEvent(QPaintEvent* ev) override;
 
-	inline bool clips(float const & value) const { return value >= 1.0f; }
-
-	void paintDBFSLevels(QPaintEvent *ev, QPainter & painter);
-	void paintLinearLevels(QPaintEvent *ev, QPainter & painter);
+	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
 
 	int knobPosY() const
 	{
@@ -135,37 +127,37 @@ private:
 		return height() - ((height() - m_knob.height()) * (realVal / fRange));
 	}
 
-	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
-	int calculateDisplayPeak( float fPeak );
+	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
 
 	void updateTextFloat();
 
 	// Private members
 private:
-	float m_fPeakValue_L;
-	float m_fPeakValue_R;
-	float m_persistentPeak_L;
-	float m_persistentPeak_R;
-	float m_fMinPeak;
-	float m_fMaxPeak;
+	float m_fPeakValue_L {0.};
+	float m_fPeakValue_R {0.};
+	float m_persistentPeak_L {0.};
+	float m_persistentPeak_R {0.};
+	float m_fMinPeak {dbfsToAmp(-42)};
+	float m_fMaxPeak {dbfsToAmp(9)};
 
 	QElapsedTimer m_lastPeakTimer_L;
 	QElapsedTimer m_lastPeakTimer_R;
 
-	QPixmap m_back;
-	QPixmap m_leds;
-	QPixmap m_knob;
+	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
 
-	bool m_levelsDisplayedInDBFS;
+	bool m_levelsDisplayedInDBFS {true};
 
-	int m_moveStartPoint;
-	float m_startValue;
+	int m_moveStartPoint {-1};
+	float m_startValue {0.};
 
-	static SimpleTextFloat * s_textFloat;
+	static SimpleTextFloat* s_textFloat;
 
-	QColor m_peakGreen;
-	QColor m_peakRed;
-	QColor m_peakYellow;
+	QColor m_peakOk {10, 212, 92};
+	QColor m_peakClip {193, 32, 56};
+	QColor m_peakWarn {214, 236, 82};
+	QColor m_unityMarker {63, 63, 63, 255};
+
+	bool m_renderUnityLine {true};
 } ;
 
 

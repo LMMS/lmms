@@ -229,38 +229,6 @@ void AudioPortAudio::stopProcessing()
 }
 
 
-
-
-void AudioPortAudio::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-		int samples = audioEngine()->framesPerPeriod();
-
-		PaError err = Pa_OpenStream(
-			&m_paStream,
-			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
-			&m_outputParameters,	// The outputparameter
-			sampleRate(),
-			samples,
-			paNoFlag,		// Don't use any flags
-			_process_callback, 	// our callback function
-			this );
-	
-		if( err != paNoError )
-		{
-			printf( "Couldn't open PortAudio: %s\n", Pa_GetErrorText( err ) );
-			return;
-		}
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
 int AudioPortAudio::process_callback(
 	const float *_inputBuffer,
 	float * _outputBuffer,

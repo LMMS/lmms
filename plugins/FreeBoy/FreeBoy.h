@@ -26,8 +26,9 @@
 #ifndef LMMS_FREEBOY_H
 #define LMMS_FREEBOY_H
 
+#include <Blip_Buffer.h>
+
 #include "AutomatableModel.h"
-#include "Blip_Buffer.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
@@ -62,7 +63,7 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override;
+	float desiredReleaseTimeMs() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

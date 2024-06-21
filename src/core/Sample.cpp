@@ -124,7 +124,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto pastBounds = state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards);
 	if (loopMode == Loop::Off && pastBounds) { return false; }
 
-	const auto outputSampleRate = Engine::audioEngine()->processingSampleRate() * m_frequency / desiredFrequency;
+	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
 	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
@@ -133,6 +133,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
 	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
+
+	state->resampler().setRatio(resampleRatio);
 
 	const auto resampleResult
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
@@ -170,6 +172,8 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 
 void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const
 {
+	if (m_buffer->size() < 1) { return; }
+
 	auto index = state->m_frameIndex;
 	auto backwards = state->m_backwards;
 

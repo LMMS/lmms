@@ -83,7 +83,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
-	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes
+	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
+	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -636,6 +637,32 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 			}
 		}
 		node = node.nextSibling();
+	}
+}
+
+void DataFile::mapSrcAttributeInElementsWithResources(const QMap<QString, QString>& map)
+{
+	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	{
+		auto elements = elementsByTagName(elem);
+
+		for (const auto& srcAttr : srcAttrs)
+		{
+			for (int i = 0; i < elements.length(); ++i)
+			{
+				auto item = elements.item(i).toElement();
+
+				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
+
+				const QString srcVal = item.attribute(srcAttr);
+
+				const auto it = map.constFind(srcVal);
+				if (it != map.constEnd())
+				{
+					item.setAttribute(srcAttr, *it);
+				}
+			}
+		}
 	}
 }
 
@@ -1684,6 +1711,44 @@ void DataFile::upgrade_noteTypes()
 	}
 }
 
+void DataFile::upgrade_fixCMTDelays()
+{
+	static const QMap<QString, QString> nameMap {
+		{ "delay_0,01s", "delay_0.01s" },
+		{ "delay_0,1s", "delay_0.1s" },
+		{ "fbdelay_0,01s", "fbdelay_0.01s" },
+		{ "fbdelay_0,1s", "fbdelay_0.1s" }
+	};
+
+	const auto effects = elementsByTagName("effect");
+
+	for (int i = 0; i < effects.size(); ++i)
+	{
+		auto effect = effects.item(i).toElement();
+
+		// We are only interested in LADSPA plugins
+		if (effect.attribute("name") != "ladspaeffect") { continue; }
+
+		// Fetch all attributes (LMMS) beneath the LADSPA effect so that we can check the value of the plugin attribute (XML)
+		auto attributes = effect.elementsByTagName("attribute");
+		for (int j = 0; j < attributes.size(); ++j)
+		{
+			auto attribute = attributes.item(j).toElement();
+
+			if (attribute.attribute("name") == "plugin")
+			{
+				const auto attributeValue = attribute.attribute("value");
+
+				const auto it = nameMap.constFind(attributeValue);
+				if (it != nameMap.constEnd())
+				{
+					attribute.setAttribute("value", *it);
+				}
+			}
+		}
+	}
+}
+
 
 /** \brief Note range has been extended to match MIDI specification
  *
@@ -1832,10 +1897,10 @@ void DataFile::upgrade_sampleAndHold()
 }
 
 
-// Change loops' filenames in <sampleclip>s
-void DataFile::upgrade_loopsRename()
+static QMap<QString, QString> buildReplacementMap()
 {
 	static constexpr auto loopBPMs = std::array{
+		std::pair{"bassloops/briff01", "140"},
 		std::pair{"bassloops/briff01", "140"},
 		std::pair{"bassloops/rave_bass01", "180"},
 		std::pair{"bassloops/rave_bass02", "180"},
@@ -1865,39 +1930,31 @@ void DataFile::upgrade_loopsRename()
 		std::pair{"latin/latin_guitar03", "120"},
 	};
 
-	const QString prefix = "factorysample:",
-		  extension = ".ogg";
+	QMap<QString, QString> namesToNamesWithBPMsMap;
 
-	// Replace loop sample names
-	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	auto insertEntry = [&namesToNamesWithBPMsMap](const QString& originalName, const QString& bpm, const QString& prefix = "", const QString& extension = "ogg")
 	{
-		auto elements = elementsByTagName(elem);
+		const QString original = prefix + originalName + "." + extension;
+		const QString replacement = prefix + originalName + " - " + bpm + " BPM." + extension;
 
-		for (const auto& srcAttr : srcAttrs)
-		{
-			for (int i = 0; i < elements.length(); ++i)
-			{
-				auto item = elements.item(i).toElement();
+		namesToNamesWithBPMsMap.insert(original, replacement);
+	};
 
-				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
-				for (const auto& cur : loopBPMs)
-				{
-					QString x = cur.first, // loop name
-						y = cur.second,    // BPM
-						srcVal = item.attribute(srcAttr),
-						pattern = prefix + x + extension;
-
-					if (srcVal == pattern)
-					{
-						// Add " - X BPM" to filename
-						item.setAttribute(srcAttr, 
-								prefix + x + " - " + y + " BPM" +
-								extension);
-					}
-				}
-			}
-		}
+	for (const auto & loopBPM : loopBPMs)
+	{
+		insertEntry(loopBPM.first, loopBPM.second);
+		insertEntry(loopBPM.first, loopBPM.second, "factorysample:");
 	}
+
+	return namesToNamesWithBPMsMap;
+}
+
+// Change loops' filenames in <sampleclip>s
+void DataFile::upgrade_loopsRename()
+{
+	static const QMap<QString, QString> namesToNamesWithBPMsMap = buildReplacementMap();
+
+	mapSrcAttributeInElementsWithResources(namesToNamesWithBPMsMap);
 }
 
 //! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
@@ -1920,6 +1977,24 @@ void DataFile::upgrade_midiCCIndexing()
 			}
 		}
 	}
+}
+
+void DataFile::upgrade_fixBassLoopsTypo()
+{
+	static const QMap<QString, QString> replacementMap = {
+		{ "bassloopes/briff01.ogg", "bassloops/briff01 - 140 BPM.ogg" },
+		{ "bassloopes/rave_bass01.ogg", "bassloops/rave_bass01 - 180 BPM.ogg" },
+		{ "bassloopes/rave_bass02.ogg", "bassloops/rave_bass02 - 180 BPM.ogg" },
+		{ "bassloopes/tb303_01.ogg","bassloops/tb303_01 - 123 BPM.ogg" },
+		{ "bassloopes/techno_bass01.ogg", "bassloops/techno_bass01 - 140 BPM.ogg" },
+		{ "bassloopes/techno_bass02.ogg", "bassloops/techno_bass02 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth01.ogg", "bassloops/techno_synth01 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth02.ogg", "bassloops/techno_synth02 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth03.ogg", "bassloops/techno_synth03 - 130 BPM.ogg" },
+		{ "bassloopes/techno_synth04.ogg", "bassloops/techno_synth04 - 140 BPM.ogg" }
+	};
+
+	mapSrcAttributeInElementsWithResources(replacementMap);
 }
 
 void DataFile::upgrade()

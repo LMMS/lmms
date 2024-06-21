@@ -192,9 +192,7 @@ QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;
 	methods.append("none");
-#if QT_VERSION >= 0x050100
 	methods.append("qt");
-#endif
 #ifdef LMMS_BUILD_WIN32
 	methods.append("win32");
 #endif

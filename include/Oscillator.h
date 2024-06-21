@@ -163,11 +163,7 @@ public:
 
 	static inline sample_t noiseSample( const float )
 	{
-		// Precise implementation
-//		return 1.0f - rand() * 2.0f / RAND_MAX;
-
-		// Fast implementation
-		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
+		return 1.0f - rand() * 2.0f / RAND_MAX;
 	}
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
@@ -204,7 +200,7 @@ public:
 					control.f1 + 1 :
 					0;
 		control.band = waveTableBandFromFreq(
-			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->processingSampleRate());
+			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->outputSampleRate());
 		return control;
 	}
 

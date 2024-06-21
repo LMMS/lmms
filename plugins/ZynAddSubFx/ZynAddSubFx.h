@@ -28,12 +28,12 @@
 #include <QMap>
 #include <QMutex>
 
+#include <globals.h>
+
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
-#include "zynaddsubfx/src/globals.h"
-
 
 class QPushButton;
 
@@ -85,11 +85,6 @@ public:
 
 
 	QString nodeName() const override;
-
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed | Flag::IsMidiBased;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

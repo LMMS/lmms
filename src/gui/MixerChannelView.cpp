@@ -28,6 +28,7 @@
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
+#include "PeakIndicator.h"
 #include "Song.h"
 #include "ConfigManager.h"
 
@@ -51,8 +52,6 @@ namespace lmms::gui
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)
     {
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-
         auto retainSizeWhenHidden = [](QWidget* widget)
         {
             auto sizePolicy = widget->sizePolicy();
@@ -76,7 +75,7 @@ namespace lmms::gui
 
         m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
-        m_renameLineEdit->setFont(pointSize(font(), 7.5f));
+        m_renameLineEdit->setFont(adjustedToPixelSize(font(), 12));
         m_renameLineEdit->setReadOnly(true);
         m_renameLineEdit->installEventFilter(this);
 
@@ -122,9 +121,9 @@ namespace lmms::gui
         soloMuteLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
 
         m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), this};
-        m_fader->setLevelsDisplayedInDBFS();
-        m_fader->setMinPeak(dbfsToAmp(-42));
-        m_fader->setMaxPeak(dbfsToAmp(9));
+
+        m_peakIndicator = new PeakIndicator(this);
+        connect(m_fader, &Fader::peakChanged, m_peakIndicator, &PeakIndicator::updatePeak);
 
         m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
         m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
@@ -136,10 +135,10 @@ namespace lmms::gui
         mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
-        mainLayout->addStretch();
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
         mainLayout->addLayout(soloMuteLayout, 0);
-        mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_peakIndicator);
+        mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
     }
@@ -344,6 +343,11 @@ namespace lmms::gui
     void MixerChannelView::setStrokeInnerInactive(const QColor& c)
     {
         m_strokeInnerInactive = c;
+    }
+
+    void MixerChannelView::reset()
+    {
+        m_peakIndicator->resetPeakToMinusInf();
     }
 
     void MixerChannelView::renameChannel()

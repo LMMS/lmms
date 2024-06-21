@@ -1,10 +1,16 @@
-INCLUDE(BuildPlugin)
+include(BuildPlugin)
 
-INCLUDE_DIRECTORIES(${FFTW3F_INCLUDE_DIRS})
-LINK_LIBRARIES(${FFTW3F_LIBRARIES})
+include_directories(SYSTEM ${FFTW3F_INCLUDE_DIRS})
+link_libraries(${FFTW3F_LIBRARIES})
 
-INCLUDE_DIRECTORIES(${SAMPLERATE_INCLUDE_DIRS})
-LINK_DIRECTORIES(${SAMPLERATE_LIBRARY_DIRS})
-LINK_LIBRARIES(${SAMPLERATE_LIBRARIES})
-
-BUILD_PLUGIN(slicert SlicerT.cpp SlicerT.h SlicerTView.cpp SlicerTView.h SlicerTWaveform.cpp SlicerTWaveform.h MOCFILES SlicerT.h SlicerTView.h SlicerTWaveform.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+build_plugin(slicert
+	SlicerT.cpp
+	SlicerT.h
+	SlicerTView.cpp
+	SlicerTView.h
+	SlicerTWaveform.cpp
+	SlicerTWaveform.h
+	MOCFILES SlicerT.h SlicerTView.h SlicerTWaveform.h
+	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
+)
+target_link_libraries(slicert SampleRate::samplerate)

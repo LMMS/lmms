@@ -112,12 +112,22 @@ void SampleClip::changeLength( const TimePos & _length )
 	Clip::changeLength(std::max(static_cast<int>(_length), 1));
 }
 
+void SampleClip::changeLengthToSampleLength()
+{
+	int length = m_sample.sampleSize() / Engine::framesPerTick();
+	changeLength(length);
+}
 
 
 
 const QString& SampleClip::sampleFile() const
 {
 	return m_sample.sampleFile();
+}
+
+bool SampleClip::hasSampleFileLoaded(const QString & filename) const
+{
+	return m_sample.sampleFile() == filename;
 }
 
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
@@ -129,6 +139,8 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	updateLength();
 
 	emit sampleChanged();
+
+	Engine::getSong()->setModified();
 }
 
 void SampleClip::setSampleFile(const QString& sf)
@@ -210,6 +222,8 @@ void SampleClip::setIsPlaying(bool isPlaying)
 void SampleClip::updateLength()
 {
 	emit sampleChanged();
+
+	Engine::getSong()->setModified();
 }
 
 
@@ -293,7 +307,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
-			Engine::audioEngine()->processingSampleRate();
+			Engine::audioEngine()->outputSampleRate();
 
 		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
 		m_sample = Sample(std::move(buffer));
