@@ -103,11 +103,13 @@ private:
 	SuilHost*     m_uiHost;     ///< Plugin UI host support
 	SuilInstance* m_uiInstance; ///< Plugin UI instance (shared library)
 	QWidget*      m_uiInstanceWidget = nullptr;
+#ifdef LMMS_HAVE_LV2_1_17_2
 	LV2UI_Request_Value m_requestValue;
 	LV2UI_Request_Value_Status requestValue(
 		LV2_URID key,
 		LV2_URID type,
 		const LV2_Feature* const* features);
+#endif
 #endif
 };
 

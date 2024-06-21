@@ -231,14 +231,16 @@ std::tuple<const LilvUI*, const LilvNode*> Lv2ViewProc::selectPluginUi(LilvUIs *
 
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 	LinkedModelGroupView (parent, proc, colNum),
-	m_uiEvents(Lv2Proc::uiMidiBufsize() * Lv2Proc::uiNBufferCycles()),
-	m_requestValue { this, [] (LV2UI_Feature_Handle handle,
+	m_uiEvents(Lv2Proc::uiMidiBufsize() * Lv2Proc::uiNBufferCycles())
+#ifdef LMMS_HAVE_LV2_1_17_2
+	, m_requestValue { this, [] (LV2UI_Feature_Handle handle,
 								LV2_URID key,
 								LV2_URID type,
 								const LV2_Feature* const* features)
 								-> LV2UI_Request_Value_Status
 								{ return static_cast<Lv2ViewProc*>(handle)->
 									requestValue(key, type, features); } }
+#endif
 {
 #ifdef LMMS_HAVE_SUIL
 	if(proc->wantUi())
@@ -274,8 +276,10 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 			lilv_instance_get_handle(proc->getInstanceForInstanceFeatureOnly())};
 		const LV2_Feature dataFeature = {LV2_DATA_ACCESS_URI,
 											proc->extdataFeature()};
+#ifdef LMMS_HAVE_LV2_1_17_2
 		const LV2_Feature requestValueFeature = {LV2_UI__requestValue,
 												&m_requestValue};
+#endif
 
 		const LV2_Feature* uiFeatures[] = {
 			proc->mapFeature(),
@@ -284,7 +288,9 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 			&dataFeature,
 			&parentFeature,
 			proc->optionsFeature(),
+#ifdef LMMS_HAVE_LV2_1_17_2
 			&requestValueFeature,
+#endif
 			nullptr};
 		
 		const char* bundleUri  = lilv_node_as_uri(lilv_ui_get_bundle_uri(m_ui));
@@ -495,6 +501,7 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 
 
+#ifdef LMMS_HAVE_LV2_1_17_2
 LV2UI_Request_Value_Status Lv2ViewProc::requestValue(
 	LV2_URID /*key*/,
 	LV2_URID /*type*/,
@@ -504,6 +511,7 @@ LV2UI_Request_Value_Status Lv2ViewProc::requestValue(
 	// - which LMMS does not support at the moment
 	return LV2UI_REQUEST_VALUE_ERR_UNSUPPORTED;
 }
+#endif
 
 
 
