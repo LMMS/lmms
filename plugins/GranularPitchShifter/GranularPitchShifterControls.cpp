@@ -56,11 +56,11 @@ GranularPitchShifterControls::GranularPitchShifterControls(GranularPitchShifterE
 	m_densityModel.setScaleLogarithmic(true);
 	m_glideModel.setScaleLogarithmic(true);
 	
-	m_rangeModel.addItem(tr("5 seconds"));
-	m_rangeModel.addItem(tr("10 seconds (size)"));
-	m_rangeModel.addItem(tr("40 seconds (size and pitch)"));
-	m_rangeModel.addItem(tr("40 seconds (size and spray and jitter)"));
-	m_rangeModel.addItem(tr("120 seconds (all of the above)"));
+	m_rangeModel.addItem(tr("5 Seconds"));
+	m_rangeModel.addItem(tr("10 Seconds (Size)"));
+	m_rangeModel.addItem(tr("40 Seconds (Size and Pitch)"));
+	m_rangeModel.addItem(tr("40 Seconds (Size and Spray and Jitter)"));
+	m_rangeModel.addItem(tr("120 Seconds (All of the above)"));
 	
 	connect(&m_rangeModel, &ComboBoxModel::dataChanged, this, &GranularPitchShifterControls::updateRange);
 }
