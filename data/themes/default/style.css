@@ -710,6 +710,11 @@ lmms--gui--MixerChannelView QGraphicsView {
 	border-style: none;
 }
 
+lmms--gui--PeakIndicator {
+	background-color: #111811;
+	font-size: 7pt;
+}
+
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
 	qproperty-peakOk: #0ad45c;

@@ -93,7 +93,7 @@ void PositionLine::zoomChange(float zoom)
 {
 	int playHeadPos = x() + width() - 1;
 
-	resize(8.0 * zoom, height());
+	resize(std::max(8.0 * zoom, 1.0), height());
 	move(playHeadPos - width() + 1, y());
 
 	update();

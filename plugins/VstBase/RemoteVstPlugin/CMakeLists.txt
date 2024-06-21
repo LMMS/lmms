@@ -61,10 +61,7 @@ target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 # Workaround for missing WinMain
 if(MSVC)
-	set_property(TARGET ${EXE_NAME}
-	APPEND
-	PROPERTY LINK_FLAGS "/entry:mainCRTStartup"
-)
+	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
 endif()
 
 if(IS_MINGW)
@@ -79,7 +76,7 @@ if(IS_MINGW)
 	" HAS_STD_MUTEX)
 
 	if(NOT HAS_STD_MUTEX)
-		target_include_directories(${EXE_NAME} PRIVATE
+		target_include_directories(${EXE_NAME} SYSTEM PRIVATE
 			"${LMMS_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
 		target_compile_definitions(${EXE_NAME} PRIVATE
 			-DUSE_MINGW_THREADS_REPLACEMENT)
