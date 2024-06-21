@@ -440,7 +440,7 @@ public:
 	float valueAt(size_t index, int frameOffset = 0)
     {
 		const auto buffer = valueBuffer();
-		size_t clampedIndex = std::clamp(index, 0, buffer->size())
+		size_t clampedIndex = std::clamp(index, 0, buffer->size());
 		return buffer ? (*buffer)[clampedIndex] : value(frameOffset);
     }
 
