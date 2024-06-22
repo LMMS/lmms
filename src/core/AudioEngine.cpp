@@ -24,20 +24,19 @@
 
 #include "AudioEngine.h"
 
-#include "MixHelpers.h"
-#include "denormals.h"
-
 #include "lmmsconfig.h"
+#include "denormals.h"
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
-#include "Mixer.h"
-#include "Song.h"
-#include "EnvelopeAndLfoParameters.h"
-#include "NotePlayHandle.h"
 #include "ConfigManager.h"
-#include "SamplePlayHandle.h"
+#include "EnvelopeAndLfoParameters.h"
 #include "MemoryHelper.h"
+#include "Mixer.h"
+#include "MixHelpers.h"
+#include "NotePlayHandle.h"
+#include "Song.h"
+#include "SamplePlayHandle.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -138,8 +137,8 @@ AudioEngine::AudioEngine(bool renderOnly) :
 	BufferManager::init(m_framesPerPeriod);
 
 	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
-	m_outputBufferRead = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
-	m_outputBufferWrite = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferRead = static_cast<surroundSampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferWrite = static_cast<surroundSampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
 
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
@@ -301,7 +300,7 @@ void AudioEngine::pushInputFrames(sampleFrame* _ab, const f_cnt_t _frames)
 		size = std::max(size * 2, frames + _frames);
 		auto ab = new sampleFrame[size];
 		memcpy(ab, buf, frames * sizeof(sampleFrame));
-		delete [] buf;
+		delete[] buf;
 
 		m_inputBufferSize[m_inputBufferWrite] = size;
 		m_inputBuffer[m_inputBufferWrite] = ab;
@@ -342,10 +341,7 @@ void AudioEngine::renderStageNoteSetup()
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
 			}
-			else
-			{
-				delete *it;
-			}
+			else { delete *it; }
 			m_playHandles.erase(it);
 		}
 
@@ -355,7 +351,7 @@ void AudioEngine::renderStageNoteSetup()
 	swapBuffers();
 
 	// prepare master mix (clear internal buffers etc.)
-	Mixer * mixer = Engine::mixer();
+	Mixer* mixer = Engine::mixer();
 	mixer->prepareMasterMix();
 
 	handleMetronome();
@@ -396,8 +392,7 @@ void AudioEngine::renderStageEffects()
 	// removed all play handles which are done
 	for (PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end();)
 	{
-		if ((*it)->affinityMatters() &&
-			(*it)->affinity() != QThread::currentThread())
+		if ((*it)->affinityMatters() && (*it)->affinity() != QThread::currentThread())
 		{
 			++it;
 			continue;
@@ -409,13 +404,10 @@ void AudioEngine::renderStageEffects()
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
 			}
-			else delete *it;
+			else { delete *it; }
 			it = m_playHandles.erase(it);
 		}
-		else
-		{
-			++it;
-		}
+		else { ++it; }
 	}
 }
 
@@ -425,7 +417,7 @@ void AudioEngine::renderStageMix()
 {
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
-	Mixer *mixer = Engine::mixer();
+	Mixer* mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);
 
 	MixHelpers::multiply(m_outputBufferWrite, m_masterGain, m_framesPerPeriod);
@@ -440,7 +432,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const surroundSampleFrame *AudioEngine::renderNextBuffer()
+const surroundSampleFrame* AudioEngine::renderNextBuffer()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -478,7 +470,7 @@ void AudioEngine::handleMetronome()
 {
 	static tick_t lastMetroTicks = -1;
 
-	Song * song = Engine::getSong();
+	Song* song = Engine::getSong();
 	Song::PlayMode currentPlayMode = song->playMode();
 
 	bool metronomeSupported =
@@ -492,19 +484,13 @@ void AudioEngine::handleMetronome()
 	}
 
 	// stop crash with metronome if empty project
-	if (song->countTracks() == 0)
-	{
-		return;
-	}
+	if (song->countTracks() == 0) { return; }
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
 	tick_t ticksPerBar = TimePos::ticksPerBar();
 	int numerator = song->getTimeSigModel().getNumerator();
 
-	if (ticks == lastMetroTicks)
-	{
-		return;
-	}
+	if (ticks == lastMetroTicks) { return; }
 
 	if (ticks % (ticksPerBar / 1) == 0)
 	{
@@ -559,7 +545,7 @@ void AudioEngine::clearInternal()
 
 
 
-AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_cnt_t frames) const
+AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame* ab, const f_cnt_t frames) const
 {
 	sample_t peakLeft = 0.0f;
 	sample_t peakRight = 0.0f;
@@ -585,7 +571,7 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 
 
 
-void AudioEngine::changeQuality(const struct qualitySettings & qs)
+void AudioEngine::changeQuality(const struct qualitySettings& qs)
 {
 	// don't delete the audio-device
 	stopProcessing();
@@ -601,7 +587,7 @@ void AudioEngine::changeQuality(const struct qualitySettings & qs)
 
 
 
-void AudioEngine::doSetAudioDevice(AudioDevice* _dev)
+void AudioEngine::doSetAudioDevice(AudioDevice* device)
 {
 	// TODO: Use shared_ptr here in the future.
 	// Currently, this is safe, because this is only called by
@@ -609,9 +595,9 @@ void AudioEngine::doSetAudioDevice(AudioDevice* _dev)
 	// it does not access the old device anymore.
 	if (m_audioDev != m_oldAudioDev) { delete m_audioDev; }
 
-	if (_dev)
+	if (device)
 	{
-		m_audioDev = _dev;
+		m_audioDev = device;
 	}
 	else
 	{
@@ -624,16 +610,14 @@ void AudioEngine::doSetAudioDevice(AudioDevice* _dev)
 
 
 
-void AudioEngine::setAudioDevice(AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow)
+void AudioEngine::setAudioDevice(AudioDevice* device, const struct qualitySettings& qs,
+				bool _needs_fifo, bool startNow)
 {
 	stopProcessing();
 
-	m_qualitySettings = _qs;
+	m_qualitySettings = qs;
 
-	doSetAudioDevice(_dev);
+	doSetAudioDevice(device);
 
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
@@ -673,7 +657,7 @@ void AudioEngine::restoreAudioDevice()
 
 
 
-void AudioEngine::removeAudioPort(AudioPort * port)
+void AudioEngine::removeAudioPort(AudioPort* port)
 {
 	requestChangeInModel();
 
@@ -702,13 +686,13 @@ bool AudioEngine::addPlayHandle(PlayHandle* handle)
 	{
 		NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(handle));
 	}
-	else delete handle;
+	else { delete handle; }
 
 	return false;
 }
 
 
-void AudioEngine::removePlayHandle(PlayHandle * ph)
+void AudioEngine::removePlayHandle(PlayHandle* ph)
 {
 	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
@@ -782,10 +766,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 			else { delete *it; }
 			it = m_playHandles.erase(it);
 		}
-		else
-		{
-			++it;
-		}
+		else { ++it; }
 	}
 	doneChangeInModel();
 }
@@ -930,10 +911,10 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 	return false;
 }
 
-AudioDevice * AudioEngine::tryAudioDevices()
+AudioDevice* AudioEngine::tryAudioDevices()
 {
 	bool success_ful = false;
-	AudioDevice * dev = nullptr;
+	AudioDevice* dev = nullptr;
 	QString dev_name = ConfigManager::inst()->value("audioengine", "audiodev");
 	if (!isAudioDevNameValid(dev_name))
 	{

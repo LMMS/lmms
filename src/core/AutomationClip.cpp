@@ -79,7 +79,7 @@ AutomationClip::AutomationClip(AutomationTrack* auto_track) :
 
 
 
-AutomationClip::AutomationClip(const AutomationClip & clip_to_copy) :
+AutomationClip::AutomationClip(const AutomationClip& clip_to_copy) :
 	Clip(clip_to_copy.m_autoTrack),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
@@ -115,11 +115,11 @@ AutomationClip::AutomationClip(const AutomationClip & clip_to_copy) :
 	}
 }
 
-bool AutomationClip::addObject(AutomatableModel* _obj, bool _search_dup)
+bool AutomationClip::addObject(AutomatableModel* obj, bool _search_dup)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
+	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), obj) != m_objects.end())
 	{
 		return false;
 	}
@@ -128,14 +128,13 @@ bool AutomationClip::addObject(AutomatableModel* _obj, bool _search_dup)
 	if (m_objects.empty() && hasAutomation() == false)
 	{
 		// then initialize first value
-		putValue(TimePos(0), _obj->inverseScaledValue(_obj->value<float>()), false);
+		putValue(TimePos(0), obj->inverseScaledValue(obj->value<float>()), false);
 	}
 
-	m_objects.push_back(_obj);
+	m_objects.push_back(obj);
 
-	connect(_obj, SIGNAL(destroyed(lmms::jo_id_t)),
-			this, SLOT(objectDestroyed(lmms::jo_id_t)),
-						Qt::DirectConnection);
+	connect(obj, SIGNAL(destroyed(lmms::jo_id_t)),
+			this, SLOT(objectDestroyed(lmms::jo_id_t)), Qt::DirectConnection);
 
 	emit dataChanged();
 
@@ -161,12 +160,12 @@ void AutomationClip::setProgressionType(ProgressionType new_progression_type)
 
 
 
-void AutomationClip::setTension(QString _new_tension)
+void AutomationClip::setTension(QString new_tension)
 {
 	QMutexLocker m(&m_clipMutex);
 
 	bool ok;
-	float nt = LocaleHelper::toFloat(_new_tension, & ok);
+	float nt = LocaleHelper::toFloat(new_tension, &ok);
 
 	if (ok && nt > -0.01 && nt < 1.01)
 	{
@@ -177,7 +176,7 @@ void AutomationClip::setTension(QString _new_tension)
 
 
 
-const AutomatableModel * AutomationClip::firstObject() const
+const AutomatableModel* AutomationClip::firstObject() const
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -345,10 +344,7 @@ void AutomationClip::removeNode(const TimePos & time)
 
 	m_timeMap.remove(time);
 	timeMap::iterator it = m_timeMap.lowerBound(time);
-	if (it != m_timeMap.begin())
-	{
-		--it;
-	}
+	if (it != m_timeMap.begin()) { --it; }
 	generateTangents(it, 3);
 
 	updateLength();
@@ -965,20 +961,19 @@ bool AutomationClip::isAutomated(const AutomatableModel* model)
 	auto l = combineAllTracks();
 	for (const auto track : l)
 	{
-		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
+		if (track->type() != Track::Type::Automation || track->type() != Track::Type::HiddenAutomation)
+		{ continue; } // todo: move the continue to the line above once hidden automation is removed
+
+		for (const auto& clip : track->getClips())
 		{
-			for (const auto& clip : track->getClips())
+			const auto a = dynamic_cast<const AutomationClip*>(clip);
+			if (!a && !(a->hasAutomation())) { continue; }
+
+			for (const auto& object : a->m_objects)
 			{
-				const auto a = dynamic_cast<const AutomationClip*>(clip);
-				if (a && a->hasAutomation())
+				if (object == model)
 				{
-					for (const auto& object : a->m_objects)
-					{
-						if (object == model)
-						{
-							return true;
-						}
-					}
+					return true;
 				}
 			}
 		}
@@ -993,7 +988,7 @@ bool AutomationClip::isAutomated(const AutomatableModel* model)
  */
 std::vector<AutomationClip*> AutomationClip::clipsForModel(const AutomatableModel* model)
 {
-	std::vector<AutomationClip *> clips;
+	std::vector<AutomationClip*> clips;
 	auto l = combineAllTracks();
 
 	// go through all tracks...

@@ -193,10 +193,7 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 			setValue(p->valueAt(0));
 			// in older projects we sometimes have odd automations
 			// with just one value in - eliminate if necessary
-			if (!p->hasAutomation())
-			{
-				delete p;
-			}
+			if (!p->hasAutomation()) { delete p; }
 			return;
 		}
 		// logscales were not existing at this point of time
@@ -357,8 +354,7 @@ float AutomatableModel::inverseScaledValue(float value) const
 template<class T>
 void roundAt(T& value, const T& where, const T& step_size)
 {
-	if (std::abs(value - where)
-		< typeInfo<float>::minEps() * std::abs(step_size))
+	if (std::abs(value - where) < (typeInfo<float>::minEps() * std::abs(step_size)))
 	{
 		value = where;
 	}
@@ -475,16 +471,15 @@ float AutomatableModel::fittedValue(float value) const
 
 void AutomatableModel::linkModel(AutomatableModel* model)
 {
-	auto containsModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model) != m_linkedModels.end();
-	if (!containsModel && model != this)
-	{
-		m_linkedModels.push_back(model);
+	auto findModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model)
+	auto containsModel = findModel != m_linkedModels.end();
+	if (containsModel && model == this) { return; }
 
-		if (!model->hasLinkedModels())
-		{
-			QObject::connect(this, SIGNAL(dataChanged()),
-					model, SIGNAL(dataChanged()), Qt::DirectConnection);
-		}
+	m_linkedModels.push_back(model);
+	if (!model->hasLinkedModels())
+	{
+		QObject::connect(this, SIGNAL(dataChanged()), model, 
+				SIGNAL(dataChanged()), Qt::DirectConnection);
 	}
 }
 
@@ -557,7 +552,8 @@ void AutomatableModel::setControllerConnection(ControllerConnection* c)
 	{
 		QObject::connect(m_controllerConnection, SIGNAL(valueChanged()),
 				this, SIGNAL(dataChanged()), Qt::DirectConnection);
-		QObject::connect(m_controllerConnection, SIGNAL(destroyed()), this, SLOT(unlinkControllerConnection()));
+		QObject::connect(m_controllerConnection, SIGNAL(destroyed()), this, 
+				SLOT(unlinkControllerConnection()));
 		m_valueChanged = true;
 		emit dataChanged();
 	}
@@ -617,7 +613,6 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
-
 		auto vb = m_controllerConnection->valueBuffer();
 
 		if (vb)
