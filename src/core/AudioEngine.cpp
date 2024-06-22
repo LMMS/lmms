@@ -412,11 +412,11 @@ void AudioEngine::renderStageMix()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
 	Mixer *mixer = Engine::mixer();
-	mixer->masterMix(m_outputBufferWrite->get());
+	mixer->masterMix(m_outputBufferWrite.get());
 
-	MixHelpers::multiply(m_outputBufferWrite->get(), m_masterGain, m_framesPerPeriod);
+	MixHelpers::multiply(m_outputBufferWrite.get(), m_masterGain, m_framesPerPeriod);
 
-	emit nextAudioBuffer(m_outputBufferRead->get());
+	emit nextAudioBuffer(m_outputBufferRead.get());
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -441,7 +441,7 @@ const surroundSampleFrame* AudioEngine::renderNextBuffer()
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 
-	return m_outputBufferRead->get();
+	return m_outputBufferRead.get();
 }
 
 
@@ -454,7 +454,7 @@ void AudioEngine::swapBuffers()
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
-	std::fill(m_outputBufferWrite->begin(), m_outputBufferWrite->end(), 0);
+	std::fill(m_outputBufferWrite.begin(), m_outputBufferWrite.end(), 0);
 }
 
 
