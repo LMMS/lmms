@@ -165,4 +165,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_GRANULAR_PITCH_SHIFTER_H
+#endif // LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
