@@ -101,23 +101,23 @@ public:
 private:
 	struct PrefilterLowpass
 	{
-		float m_v0z = 0.0f, m_v1 = 0.0f, m_v2 = 0.0f;
+		float m_v0z = 0.f, m_v1 = 0.f, m_v2 = 0.f;
 		float m_g1, m_g2, m_g3, m_g4;
 
 		void setCoefs(float sampleRate, float cutoff)
 		{
 		    const float g = std::tan(F_PI * cutoff / sampleRate);
-		    const float ginv = g / (1.0f + g * (g + 1.414213562));
+		    const float ginv = g / (1.f + g * (g + F_SQRT_2));
 		    m_g1 = ginv;
-		    m_g2 = 2.0f * (g + 1.414213562) * ginv;
+		    m_g2 = 2.f * (g + F_SQRT_2) * ginv;
 		    m_g3 = g * ginv;
-		    m_g4 = 2.0f * ginv;
+		    m_g4 = 2.f * ginv;
 		}
 
 		float process(float input)
 		{
 		    const float v1z = m_v1;
-		    const float v3 = input + m_v0z - 2.0f * m_v2;
+		    const float v3 = input + m_v0z - 2.f * m_v2;
 		    m_v1 += m_g1 * v3 - m_g2 * v1z;
 		    m_v2 += m_g3 * v3 + m_g4 * v1z;
 		    m_v0z = input;
