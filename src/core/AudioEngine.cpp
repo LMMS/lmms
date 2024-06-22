@@ -454,7 +454,7 @@ void AudioEngine::swapBuffers()
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
-	std::fill_n(m_outputBufferWrite.get(), m_framesPerPeriod, 0);
+	std::fill_n(m_outputBufferWrite.get(), static_cast<size_t>(m_framesPerPeriod), 0);
 }
 
 
