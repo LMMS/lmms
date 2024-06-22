@@ -24,8 +24,6 @@
 
 #include "AudioEngine.h"
 
-#include <memory.h>
-
 #include "MixHelpers.h"
 #include "denormals.h"
 

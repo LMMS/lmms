@@ -34,6 +34,7 @@
 #include <QThread>
 #include <samplerate.h>
 
+#include <memory>
 #include <vector>
 
 #include "lmms_basics.h"
