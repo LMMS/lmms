@@ -412,11 +412,11 @@ void AudioEngine::renderStageMix()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
 	Mixer *mixer = Engine::mixer();
-	mixer->masterMix(m_outputBufferWrite);
+	mixer->masterMix(m_outputBufferWrite->get());
 
-	MixHelpers::multiply(m_outputBufferWrite, m_masterGain, m_framesPerPeriod);
+	MixHelpers::multiply(m_outputBufferWrite->get(), m_masterGain, m_framesPerPeriod);
 
-	emit nextAudioBuffer(m_outputBufferRead);
+	emit nextAudioBuffer(m_outputBufferRead->get());
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -426,7 +426,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const surroundSampleFrame *AudioEngine::renderNextBuffer()
+const surroundSampleFrame* AudioEngine::renderNextBuffer()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -441,7 +441,7 @@ const surroundSampleFrame *AudioEngine::renderNextBuffer()
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 
-	return m_outputBufferRead;
+	return m_outputBufferRead->get();
 }
 
 
