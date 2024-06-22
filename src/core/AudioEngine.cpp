@@ -136,8 +136,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_outputBufferRead = new std::array<surroundSampleFrame, m_framesPerPeriod>;
 	m_outputBufferWrite = new std::array<surroundSampleFrame, m_framesPerPeriod>;
 
-	std::fill(m_outputBufferRead.begin(), m_outputBufferRead.end(), 0);
-	std::fill(m_outputBufferWrite.begin(), m_outputBufferWrite.end(), 0);
+	std::fill(m_outputBufferRead->begin(), m_outputBufferRead->end(), 0);
+	std::fill(m_outputBufferWrite->begin(), m_outputBufferWrite->end(), 0);
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
@@ -458,7 +458,7 @@ void AudioEngine::swapBuffers()
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
-	std::fill(m_outputBufferWrite.begin(), m_outputBufferWrite.end(), 0);
+	std::fill(m_outputBufferWrite->begin(), m_outputBufferWrite->end(), 0);
 }
 
 
