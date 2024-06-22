@@ -42,7 +42,7 @@ GranularPitchShifterControlDialog::GranularPitchShifterControlDialog(GranularPit
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
-	setFixedSize(295, 184);
+	setFixedSize(305, 180);
 	
 	auto makeKnob = [this](KnobType style, int x, int y, const QString& hintText, const QString& unit, FloatModel* model)
 	{
@@ -53,26 +53,26 @@ GranularPitchShifterControlDialog::GranularPitchShifterControlDialog(GranularPit
 		return newKnob;
 	};
 
-	makeKnob(KnobType::Bright26, 20, 81, tr("Grain Size:"), " Hz", &controls->m_sizeModel);
-	makeKnob(KnobType::Bright26, 110, 10, tr("Spray:"), " seconds", &controls->m_sprayModel);
-	makeKnob(KnobType::Bright26, 148, 10, tr("Jitter:"), " octaves", &controls->m_jitterModel);
-	makeKnob(KnobType::Bright26, 190, 10, tr("Twitch:"), " octaves", &controls->m_twitchModel);
-	makeKnob(KnobType::Bright26, 184, 63, tr("Spray Stereo Spread:"), "", &controls->m_spraySpreadModel);
-	makeKnob(KnobType::Bright26, 131, 116, tr("Grain Shape:"), "", &controls->m_shapeModel);
-	makeKnob(KnobType::Bright26, 184, 116, tr("Fade Length:"), "", &controls->m_fadeLengthModel);
-	makeKnob(KnobType::Bright26, 248, 48, tr("Feedback:"), "", &controls->m_feedbackModel);
-	makeKnob(KnobType::Bright26, 248, 95, tr("Minimum Allowed Latency:"), " seconds", &controls->m_minLatencyModel);
-	makeKnob(KnobType::Small17, 67, 162, tr("Density:"), "x", &controls->m_densityModel);
-	makeKnob(KnobType::Small17, 9, 162, tr("Glide:"), " seconds", &controls->m_glideModel);
+	makeKnob(KnobType::Bright26, 19, 78, tr("Grain Size:"), " Hz", &controls->m_sizeModel);
+	makeKnob(KnobType::Bright26, 116, 10, tr("Spray:"), " seconds", &controls->m_sprayModel);
+	makeKnob(KnobType::Bright26, 158, 10, tr("Jitter:"), " octaves", &controls->m_jitterModel);
+	makeKnob(KnobType::Bright26, 200, 10, tr("Twitch:"), " octaves", &controls->m_twitchModel);
+	makeKnob(KnobType::Bright26, 188, 60, tr("Spray Stereo Spread:"), "", &controls->m_spraySpreadModel);
+	makeKnob(KnobType::Bright26, 135, 110, tr("Grain Shape:"), "", &controls->m_shapeModel);
+	makeKnob(KnobType::Bright26, 188, 110, tr("Fade Length:"), "", &controls->m_fadeLengthModel);
+	makeKnob(KnobType::Bright26, 258, 45, tr("Feedback:"), "", &controls->m_feedbackModel);
+	makeKnob(KnobType::Bright26, 258, 92, tr("Minimum Allowed Latency:"), " seconds", &controls->m_minLatencyModel);
+	makeKnob(KnobType::Small17, 66, 157, tr("Density:"), "x", &controls->m_densityModel);
+	makeKnob(KnobType::Small17, 8, 157, tr("Glide:"), " seconds", &controls->m_glideModel);
 	
 	LcdFloatSpinBox* pitchBox = new LcdFloatSpinBox(3, 2, "11green", tr("Pitch"), this);
-	pitchBox->move(16, 44);
+	pitchBox->move(15, 41);
 	pitchBox->setModel(&controls->m_pitchModel);
 	pitchBox->setToolTip(tr("Pitch"));
 	pitchBox->setSeamless(true, true);
 	
 	LcdFloatSpinBox* pitchSpreadBox = new LcdFloatSpinBox(3, 2, "11green", tr("Pitch Stereo Spread"), this);
-	pitchSpreadBox->move(129, 69);
+	pitchSpreadBox->move(133, 66);
 	pitchSpreadBox->setModel(&controls->m_pitchSpreadModel);
 	pitchSpreadBox->setToolTip(tr("Pitch Stereo Spread"));
 	pitchSpreadBox->setSeamless(true, true);
@@ -81,14 +81,14 @@ GranularPitchShifterControlDialog::GranularPitchShifterControlDialog(GranularPit
 	connect(&button, &QPushButton::clicked, this, &GranularPitchShifterControlDialog::showHelpWindow);
 	
 	PixmapButton* m_helpBtn = new PixmapButton(this, nullptr);
-	m_helpBtn->move(272, 164);
+	m_helpBtn->move(278, 159);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
 	m_helpBtn->setToolTip(tr("Open help window"));
 	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(showHelpWindow()));
 	
 	PixmapButton* prefilterButton = new PixmapButton(this, tr("Prefilter"));
-	prefilterButton->move(8, 139);
+	prefilterButton->move(8, 133);
 	prefilterButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("prefilter_active"));
 	prefilterButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("prefilter_inactive"));
 	prefilterButton->setCheckable(true);
@@ -96,7 +96,7 @@ GranularPitchShifterControlDialog::GranularPitchShifterControlDialog(GranularPit
 	prefilterButton->setToolTip(tr("Prefilter"));
 	
 	ComboBox* rangeBox = new ComboBox(this);
-	rangeBox->setGeometry(181, 160, 83, 22);
+	rangeBox->setGeometry(189, 155, 80, 22);
 	rangeBox->setModel(&controls->m_rangeModel);
 	controls->updateRange();
 }
