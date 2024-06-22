@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef GRANULARPITCHSHIFTER_CONTROL_DIALOG_H
-#define GRANULARPITCHSHIFTER_CONTROL_DIALOG_H
+#ifndef LMMS_GRANULAR_PITCH_SHIFTER_CONTROLS_H
+#define LMMS_GRANULAR_PITCH_SHIFTER_CONTROLS_H
 
 #include "EffectControlDialog.h"
 
@@ -72,4 +72,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GRANULAR_PITCH_SHIFTER_CONTROLS_H
