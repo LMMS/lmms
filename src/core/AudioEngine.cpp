@@ -133,11 +133,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// allocte the FIFO from the determined size
 	m_fifo = new Fifo( fifoSize );
 
-	m_outputBufferRead = new std::array<surroundSampleFrame, m_framesPerPeriod>;
-	m_outputBufferWrite = new std::array<surroundSampleFrame, m_framesPerPeriod>;
+	m_outputBufferRead = std::make_unique<surroundSampleFrame[]>(m_framesPerPeriod);
+	m_outputBufferWrite = std::make_unique<surroundSampleFrame[]>(m_framesPerPeriod);
 
-	std::fill(m_outputBufferRead->begin(), m_outputBufferRead->end(), 0);
-	std::fill(m_outputBufferWrite->begin(), m_outputBufferWrite->end(), 0);
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
@@ -176,8 +174,6 @@ AudioEngine::~AudioEngine()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	delete[] m_outputBufferRead;
-	delete[] m_outputBufferWrite;
 
 	for (const auto& input : m_inputBuffer)
 	{
