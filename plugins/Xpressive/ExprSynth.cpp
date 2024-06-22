@@ -36,7 +36,7 @@
 #include "NotePlayHandle.h"
 
 
-#include "exprtk.hpp"
+#include <exprtk.hpp>
 
 #define WARN_EXPRTK qWarning("ExprTk exception")
 
