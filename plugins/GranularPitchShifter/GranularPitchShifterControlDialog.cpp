@@ -124,7 +124,7 @@ QString GranularPitchShifterHelpView::s_helpText=
 "<b>Pitch</b> - The total distance in pitch between both stereo channels, in 12EDO semitones.<br>  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.<br>"
 "<b>Spray</b> - The allowed distance between each channel's randomized position with the Spray feature in the Random category.  <br>A value of 1 makes the Spray values in each channel entirely unlinked."
 "<br><h3>Shape:</h3>"
-"<b>Shape</b> - The shape of each grain's fades.  In most cases, 2 is the optimal value, providing equal-power fades.  <br>However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  <br>All fades are designed for 50\% grain overlap.<br>"
+"<b>Shape</b> - The shape of each grain's fades.  In most cases, 2 is the optimal value, providing equal-power fades.  <br>However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  <br>All fades are designed for 50% grain overlap.<br>"
 "<b>Fade</b> - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  <br>Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  <br>A value of 0 will result in clicking sounds due to the fades no longer being present.<br>"
 "<br><h3>Delay:</h3>"
 "<b>Feedback</b> - The amount of feedback for the pitch shifter.<br>  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.<br>"
