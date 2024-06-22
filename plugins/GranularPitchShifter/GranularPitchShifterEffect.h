@@ -39,59 +39,6 @@ constexpr double GlideSnagRadius = 0.001;
 constexpr int SafetyLatency = 3;
 constexpr float RangeSeconds[5] = {5, 10, 40, 40, 120};
 
-// adapted from signalsmith's crossfade approximation:
-// https://signalsmith-audio.co.uk/writing/2021/cheap-energy-crossfade
-inline float cosHalfWindowApprox(float x, float k) {
-	float A = x * (1 - x);
-	float B = A * (1 + k * A);
-	float C = (B + x);
-	return C * C;
-}
-// 1-2 fades between equal-gain and equal-power
-inline float cosWindowApproxK(float p) {
-	return -6.0026608f + p * (6.8773512f - 1.5838104f * p);
-}
-
-class PrefilterLowpass
-{
-public:
-	inline void setCoefs(float sampleRate, float cutoff)
-	{
-		const float g = std::tan(F_PI * cutoff / sampleRate);
-		const float ginv = g / (1.0f + g * (g + 1.414213562));
-		m_g1 = ginv;
-		m_g2 = 2.0f * (g + 1.414213562) * ginv;
-		m_g3 = g * ginv;
-		m_g4 = 2.0f * ginv;
-	}
-
-	inline float process(float input)
-	{
-		const float v1z = m_v1;
-		const float v3 = input + m_v0z - 2.0f * m_v2;
-		m_v1 += m_g1 * v3 - m_g2 * v1z;
-		m_v2 += m_g3 * v3 + m_g4 * v1z;
-		m_v0z = input;
-		return m_v2;
-	}
-
-private:
-	float m_v0z = 0.0f, m_v1 = 0.0f, m_v2 = 0.0f;
-	float m_g1, m_g2, m_g3, m_g4;
-};
-
-struct GranularPitchShifterGrain
-{
-	GranularPitchShifterGrain(double grainSpeedL, double grainSpeedR, double phaseSpeedL, double phaseSpeedR, double readPointL, double readPointR) :
-		readPoint{readPointL, readPointR},
-		phaseSpeed{phaseSpeedL, phaseSpeedR},
-		grainSpeed{grainSpeedL, grainSpeedR},
-		phase{0} {}
-	std::array<double, 2> readPoint;
-	std::array<double, 2> phaseSpeed;
-	std::array<double, 2> grainSpeed;
-	double phase;
-};
 
 class GranularPitchShifterEffect : public Effect
 {
@@ -106,7 +53,7 @@ public:
 	}
 	
 	// double index and fraction are required for good quality
-	inline float getHermiteSample(double index, int ch) {
+	float getHermiteSample(double index, int ch) {
 		const int index_floor = static_cast<int>(index);
 		const double fraction = index - index_floor;
 		
@@ -131,15 +78,67 @@ public:
 		return hermiteInterpolate(v0, v1, v2, v3, static_cast<float>(fraction));
 	}
 	
+	// adapted from signalsmith's crossfade approximation:
+	// https://signalsmith-audio.co.uk/writing/2021/cheap-energy-crossfade
+	float cosHalfWindowApprox(float x, float k) {
+		float A = x * (1 - x);
+		float B = A * (1 + k * A);
+		float C = (B + x);
+		return C * C;
+	}
+	// 1-2 fades between equal-gain and equal-power
+	float cosWindowApproxK(float p) {
+		return -6.0026608f + p * (6.8773512f - 1.5838104f * p);
+	}
+	
 	void sampleRateNeedsUpdate() { m_sampleRateNeedsUpdate = true; }
 	
 	void changeSampleRate();
 
 private:
+	struct PrefilterLowpass
+	{
+		float m_v0z = 0.0f, m_v1 = 0.0f, m_v2 = 0.0f;
+		float m_g1, m_g2, m_g3, m_g4;
+
+		void setCoefs(float sampleRate, float cutoff)
+		{
+		    const float g = std::tan(F_PI * cutoff / sampleRate);
+		    const float ginv = g / (1.0f + g * (g + 1.414213562));
+		    m_g1 = ginv;
+		    m_g2 = 2.0f * (g + 1.414213562) * ginv;
+		    m_g3 = g * ginv;
+		    m_g4 = 2.0f * ginv;
+		}
+
+		float process(float input)
+		{
+		    const float v1z = m_v1;
+		    const float v3 = input + m_v0z - 2.0f * m_v2;
+		    m_v1 += m_g1 * v3 - m_g2 * v1z;
+		    m_v2 += m_g3 * v3 + m_g4 * v1z;
+		    m_v0z = input;
+		    return m_v2;
+		}
+	};
+
+	struct Grain
+	{
+		Grain(double grainSpeedL, double grainSpeedR, double phaseSpeedL, double phaseSpeedR, double readPointL, double readPointR) :
+			readPoint{readPointL, readPointR},
+			phaseSpeed{phaseSpeedL, phaseSpeedR},
+			grainSpeed{grainSpeedL, grainSpeedR},
+			phase{0} {}
+		std::array<double, 2> readPoint;
+		std::array<double, 2> phaseSpeed;
+		std::array<double, 2> grainSpeed;
+		double phase;
+	};
+	
 	GranularPitchShifterControls m_granularpitchshifterControls;
 	
 	std::vector<std::array<float, 2>> m_ringBuf;
-	std::vector<GranularPitchShifterGrain> m_grains;
+	std::vector<Grain> m_grains;
 
 	std::array<PrefilterLowpass, 2> m_prefilter;
 	std::array<double, 2> m_speed = {1, 1};

@@ -172,7 +172,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 				if (readPoint[i] < 0) {readPoint[i] += m_ringBufLength;}
 			}
 			const double phaseInc = 1. / sizeSamples;
-			m_grains.push_back(GranularPitchShifterGrain(grainSpeed * m_speed[0], grainSpeed * m_speed[1], phaseInc, phaseInc, readPoint[0], readPoint[1]));
+			m_grains.push_back(Grain(grainSpeed * m_speed[0], grainSpeed * m_speed[1], phaseInc, phaseInc, readPoint[0], readPoint[1]));
 			++m_grainCount;
 		}
 		
