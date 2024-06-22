@@ -116,7 +116,7 @@ AutomationClip::AutomationClip(const AutomationClip & _clip_to_copy) :
 	}
 }
 
-bool AutomationClip::addObject(AutomatableModel * _obj, bool _search_dup)
+bool AutomationClip::addObject(AutomatableModel* _obj, bool _search_dup)
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -836,8 +836,7 @@ void AutomationClip::saveSettings(QDomDocument & _doc, QDomElement & _this)
 		_this.setAttribute("color", c->name());
 	}
 
-	for (timeMap::const_iterator it = m_timeMap.begin();
-						it != m_timeMap.end(); ++it)
+	for (timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it)
 	{
 		QDomElement element = _doc.createElement("time");
 		element.setAttribute("pos", POS(it));
@@ -880,8 +879,7 @@ void AutomationClip::loadSettings(const QDomElement & _this)
 	setTension(_this.attribute("tens"));
 	setMuted(_this.attribute("mute", QString::number(false)).toInt());
 
-	for (QDomNode node = _this.firstChild(); !node.isNull();
-						node = node.nextSibling())
+	for (QDomNode node = _this.firstChild(); !node.isNull(); node = node.nextSibling())
 	{
 		QDomElement element = node.toElement();
 		if (element.isNull())
@@ -958,18 +956,18 @@ QString AutomationClip::name() const
 
 
 
-gui::ClipView * AutomationClip::createView(gui::TrackView * _tv)
+gui::ClipView* AutomationClip::createView(gui::TrackView* tv)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	return new gui::AutomationClipView(this, _tv);
+	return new gui::AutomationClipView(this, tv);
 }
 
 
 
 
 
-bool AutomationClip::isAutomated(const AutomatableModel * _m)
+bool AutomationClip::isAutomated(const AutomatableModel* _m)
 {
 	auto l = combineAllTracks();
 	for (const auto track : l)
@@ -1078,27 +1076,27 @@ void AutomationClip::resolveAllIDs()
 					for (const auto& id : a->m_idsToResolve)
 					{
 						JournallingObject* o = Engine::projectJournal()->journallingObject(id);
-						if (o && dynamic_cast<AutomatableModel *>(o))
+						if (o && dynamic_cast<AutomatableModel*>(o))
 						{
-							a->addObject(dynamic_cast<AutomatableModel *>(o), false);
+							a->addObject(dynamic_cast<AutomatableModel*>(o), false);
 						}
 						else
 						{
 							// FIXME: Remove this block once the automation system gets fixed
 							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
 							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(id));
-							if (o && dynamic_cast<AutomatableModel *>(o))
+							if (o && dynamic_cast<AutomatableModel*>(o))
 							{
-								a->addObject(dynamic_cast<AutomatableModel *>(o), false);
+								a->addObject(dynamic_cast<AutomatableModel*>(o), false);
 							}
 							else
 							{
 								// FIXME: Remove this block once the automation system gets fixed
 								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
 								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(id));
-								if (o && dynamic_cast<AutomatableModel *>(o))
+								if (o && dynamic_cast<AutomatableModel*>(o))
 								{
-									a->addObject(dynamic_cast<AutomatableModel *>(o), false);
+									a->addObject(dynamic_cast<AutomatableModel*>(o), false);
 								}
 							}
 						}

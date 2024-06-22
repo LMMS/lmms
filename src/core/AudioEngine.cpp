@@ -288,7 +288,7 @@ bool AudioEngine::criticalXRuns() const
 
 
 
-void AudioEngine::pushInputFrames(sampleFrame * _ab, const f_cnt_t _frames)
+void AudioEngine::pushInputFrames(sampleFrame* _ab, const f_cnt_t _frames)
 {
 	requestChangeInModel();
 
@@ -337,7 +337,7 @@ void AudioEngine::renderStageNoteSetup()
 
 		if (it != m_playHandles.end())
 		{
-			(*it)->audioPort()->removePlayHandle((*it));
+			(*it)->audioPort()->removePlayHandle(*it);
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
@@ -364,7 +364,7 @@ void AudioEngine::renderStageNoteSetup()
 	Engine::getSong()->processNextBuffer();
 
 	// add all play-handles that have to be added
-	for (LocklessListElement * e = m_newPlayHandles.popList(); e;)
+	for (LocklessListElement* e = m_newPlayHandles.popList(); e;)
 	{
 		m_playHandles += e->value;
 		LocklessListElement * next = e->next;
@@ -394,8 +394,7 @@ void AudioEngine::renderStageEffects()
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
-	for (PlayHandleList::Iterator it = m_playHandles.begin();
-						it != m_playHandles.end();)
+	for (PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end();)
 	{
 		if ((*it)->affinityMatters() &&
 			(*it)->affinity() != QThread::currentThread())
@@ -405,7 +404,7 @@ void AudioEngine::renderStageEffects()
 		}
 		if ((*it)->isFinished())
 		{
-			(*it)->audioPort()->removePlayHandle((*it));
+			(*it)->audioPort()->removePlayHandle(*it);
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
@@ -532,7 +531,7 @@ void AudioEngine::clear()
 void AudioEngine::clearNewPlayHandles()
 {
 	requestChangeInModel();
-	for (LocklessListElement * e = m_newPlayHandles.popList(); e;)
+	for (LocklessListElement* e = m_newPlayHandles.popList(); e;)
 	{
 		LocklessListElement * next = e->next;
 		m_newPlayHandles.free(e);
@@ -602,7 +601,7 @@ void AudioEngine::changeQuality(const struct qualitySettings & qs)
 
 
 
-void AudioEngine::doSetAudioDevice(AudioDevice * _dev)
+void AudioEngine::doSetAudioDevice(AudioDevice* _dev)
 {
 	// TODO: Use shared_ptr here in the future.
 	// Currently, this is safe, because this is only called by
@@ -720,8 +719,8 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		for (LocklessListElement * e = m_newPlayHandles.first(),
-				* ePrev = nullptr; e; ePrev = e, e = e->next)
+		for (LocklessListElement* e = m_newPlayHandles.first(), *ePrev = nullptr;
+			e; ePrev = e, e = e->next)
 		{
 			if (e->value == ph)
 			{
@@ -775,7 +774,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			(*it)->audioPort()->removePlayHandle((*it));
+			(*it)->audioPort()->removePlayHandle(*it);
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
@@ -1201,7 +1200,7 @@ MidiClient * AudioEngine::tryMidiClients()
 
 
 
-AudioEngine::fifoWriter::fifoWriter(AudioEngine* audioEngine, Fifo * fifo) :
+AudioEngine::fifoWriter::fifoWriter(AudioEngine* audioEngine, Fifo* fifo) :
 	m_audioEngine(audioEngine),
 	m_fifo(fifo),
 	m_writing(true)

@@ -42,7 +42,7 @@ long AutomatableModel::s_periodCounter = 0;
 
 AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
-						Model* parent, const QString & displayName, bool defaultConstructed) :
+						Model* parent, const QString& displayName, bool defaultConstructed) :
 	Model(parent, displayName, defaultConstructed),
 	m_scaleType(ScaleType::Linear),
 	m_minValue(min),
@@ -188,7 +188,7 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 		node = node.namedItem(name);
 		if (node.isElement())
 		{
-			AutomationClip * p = AutomationClip::globalAutomationClip(this);
+			AutomationClip* p = AutomationClip::globalAutomationClip(this);
 			p->loadSettings(node.toElement());
 			setValue(p->valueAt(0));
 			// in older projects we sometimes have odd automations
@@ -408,8 +408,7 @@ void AutomatableModel::setAutomatedValue(const float value)
 
 
 
-void AutomatableModel::setRange(const float min, const float max,
-							const float step)
+void AutomatableModel::setRange(const float min, const float max, const float step)
 {
 	if ((m_maxValue != max) || (m_minValue != min))
 	{
