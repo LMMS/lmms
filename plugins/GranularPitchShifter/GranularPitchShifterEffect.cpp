@@ -67,8 +67,8 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
-	const ValueBuffer * pitchBuf = m_granularpitchshifterControls.m_pitchModel.valueBuffer();
-	const ValueBuffer * pitchSpreadBuf = m_granularpitchshifterControls.m_pitchSpreadModel.valueBuffer();
+	const ValueBuffer* pitchBuf = m_granularpitchshifterControls.m_pitchModel.valueBuffer();
+	const ValueBuffer* pitchSpreadBuf = m_granularpitchshifterControls.m_pitchSpreadModel.valueBuffer();
 
 	const float size = m_granularpitchshifterControls.m_sizeModel.value();
 	const float shape = m_granularpitchshifterControls.m_shapeModel.value();
@@ -117,8 +117,14 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 		{
 			m_updatePitches = false;
 			
-			std::array<double, 2> speed = {std::exp2(m_truePitch[0] * (1. / 12.)), std::exp2(m_truePitch[1] * (1. / 12.))};
-			std::array<double, 2> ratio = {speed[0] / m_speed[0], speed[1] / m_speed[1]};
+			std::array<double, 2> speed = {
+				std::exp2(m_truePitch[0] * (1. / 12.)),
+				std::exp2(m_truePitch[1] * (1. / 12.))
+			};
+			std::array<double, 2> ratio = {
+				speed[0] / m_speed[0],
+				speed[1] / m_speed[1]
+			};
 			
 			for (int i = 0; i < m_grainCount; ++i)
 			{
@@ -159,17 +165,18 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			if (spray > 0)
 			{
 				sprayResult[0] = (fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate;
-				sprayResult[1] = linearInterpolate(sprayResult[0],
-									(fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate,
-									spraySpread);
+				sprayResult[1] = linearInterpolate(
+					sprayResult[0],
+					(fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate,
+					spraySpread);
 			}
 			
 			std::array<int, 2> readPoint;
-			int latency = std::max(int(std::max(sizeSamples * (std::max(m_speed[0], m_speed[1]) * grainSpeed - 1.), 0.) + SafetyLatency), minLatency);
+			int latency = std::max(static_cast<int>(std::max(sizeSamples * (std::max(m_speed[0], m_speed[1]) * grainSpeed - 1.), 0.) + SafetyLatency), minLatency);
 			for (int i = 0; i < 2; ++i)
 			{
 				readPoint[i] = m_writePoint - latency - sprayResult[i];
-				if (readPoint[i] < 0) {readPoint[i] += m_ringBufLength;}
+				if (readPoint[i] < 0) { readPoint[i] += m_ringBufLength; }
 			}
 			const double phaseInc = 1. / sizeSamples;
 			m_grains.push_back(Grain(grainSpeed * m_speed[0], grainSpeed * m_speed[1], phaseInc, phaseInc, readPoint[0], readPoint[1]));

@@ -87,7 +87,7 @@ GranularPitchShifterControlDialog::GranularPitchShifterControlDialog(GranularPit
 	m_helpBtn->setToolTip(tr("Open help window"));
 	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(showHelpWindow()));
 	
-	PixmapButton * prefilterButton = new PixmapButton(this, tr("Prefilter"));
+	PixmapButton* prefilterButton = new PixmapButton(this, tr("Prefilter"));
 	prefilterButton->move(8, 139);
 	prefilterButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("prefilter_active"));
 	prefilterButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("prefilter_inactive"));

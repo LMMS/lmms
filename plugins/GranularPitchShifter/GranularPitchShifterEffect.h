@@ -53,24 +53,25 @@ public:
 	}
 	
 	// double index and fraction are required for good quality
-	float getHermiteSample(double index, int ch) {
+	float getHermiteSample(double index, int ch)
+	{
 		const int index_floor = static_cast<int>(index);
 		const double fraction = index - index_floor;
 		
 		float v0, v1, v2, v3;
 
-		if (index_floor == 0) {
-			v0 = m_ringBuf[m_ringBuf.size() - 1][ch];
-		} else {
-			v0 = m_ringBuf[index_floor - 1][ch];
-		}
+		if (index_floor == 0) { v0 = m_ringBuf[m_ringBuf.size() - 1][ch]; }
+		else { v0 = m_ringBuf[index_floor - 1][ch]; }
 		
 		v1 = m_ringBuf[index_floor][ch];
 		
-		if(index_floor >= m_ringBuf.size() - 2) {
+		if(index_floor >= m_ringBuf.size() - 2)
+		{
 			v2 = m_ringBuf[(index_floor + 1) % m_ringBuf.size()][ch];
 			v3 = m_ringBuf[(index_floor + 2) % m_ringBuf.size()][ch];
-		} else {
+		}
+		else
+		{
 			v2 = m_ringBuf[index_floor + 1][ch];
 			v3 = m_ringBuf[index_floor + 2][ch];
 		}
@@ -80,14 +81,16 @@ public:
 	
 	// adapted from signalsmith's crossfade approximation:
 	// https://signalsmith-audio.co.uk/writing/2021/cheap-energy-crossfade
-	float cosHalfWindowApprox(float x, float k) {
+	float cosHalfWindowApprox(float x, float k)
+	{
 		float A = x * (1 - x);
 		float B = A * (1 + k * A);
 		float C = (B + x);
 		return C * C;
 	}
 	// 1-2 fades between equal-gain and equal-power
-	float cosWindowApproxK(float p) {
+	float cosWindowApproxK(float p)
+	{
 		return -6.0026608f + p * (6.8773512f - 1.5838104f * p);
 	}
 	
@@ -128,7 +131,8 @@ private:
 			readPoint{readPointL, readPointR},
 			phaseSpeed{phaseSpeedL, phaseSpeedR},
 			grainSpeed{grainSpeedL, grainSpeedR},
-			phase{0} {}
+			phase{0}
+		{}
 		std::array<double, 2> readPoint;
 		std::array<double, 2> phaseSpeed;
 		std::array<double, 2> grainSpeed;
