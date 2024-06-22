@@ -22,7 +22,7 @@
  *
  */
 
-#include "GranularPitchShifter.h"
+#include "GranularPitchShifterEffect.h"
 
 #include <cmath>
 #include "embed.h"
@@ -109,7 +109,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			
 			m_truePitch[i] = m_glideCoef * m_truePitch[i] + (1. - m_glideCoef) * targetVal;
 			// we crudely lock the pitch to the target value once it gets close enough, so we can save on CPU
-			if (std::abs(targetVal - m_truePitch[i]) < GPS_GLIDE_SNAG_RADIUS) { m_truePitch[i] = targetVal; }
+			if (std::abs(targetVal - m_truePitch[i]) < GlideSnagRadius) { m_truePitch[i] = targetVal; }
 		}
 		
 		// this stuff is computationally expensive, so we should only do it when necessary
@@ -124,15 +124,15 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					m_grains[i].m_grainSpeed[j] *= ratio[j];
+					m_grains[i].grainSpeed[j] *= ratio[j];
 					
 					// we unfortunately need to do extra stuff to ensure these don't shoot past the write index...
-					if (m_grains[i].m_grainSpeed[j] > 1)
+					if (m_grains[i].grainSpeed[j] > 1)
 					{
-						double distance = m_writePoint - m_grains[i].m_readPoint[j] - GPS_SAFETY_LATENCY;
+						double distance = m_writePoint - m_grains[i].readPoint[j] - SafetyLatency;
 						if (distance <= 0) { distance += m_ringBufLength; }
-						double grainSpeedRequired = ((m_grains[i].m_grainSpeed[j] - 1.) / distance) * (1. - m_grains[i].m_phase);
-						m_grains[i].m_phaseSpeed[j] = std::max(m_grains[i].m_phaseSpeed[j], grainSpeedRequired);
+						double grainSpeedRequired = ((m_grains[i].grainSpeed[j] - 1.) / distance) * (1. - m_grains[i].phase);
+						m_grains[i].phaseSpeed[j] = std::max(m_grains[i].phaseSpeed[j], grainSpeedRequired);
 					}
 				}
 			}
@@ -140,8 +140,8 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			m_speed[1] = speed[1];
 			
 			// prevent aliasing by lowpassing frequencies that the pitch shifting would push above nyquist
-			m_prefilter[0].setCoefs(m_sampleRate, std::min(m_nyquist / static_cast<float>(speed[0]), m_nyquist) * GPS_PREFILTER_BW);
-			m_prefilter[1].setCoefs(m_sampleRate, std::min(m_nyquist / static_cast<float>(speed[1]), m_nyquist) * GPS_PREFILTER_BW);
+			m_prefilter[0].setCoefs(m_sampleRate, std::min(m_nyquist / static_cast<float>(speed[0]), m_nyquist) * PrefilterBandwidth);
+			m_prefilter[1].setCoefs(m_sampleRate, std::min(m_nyquist / static_cast<float>(speed[1]), m_nyquist) * PrefilterBandwidth);
 		}
 		
 		std::array<float, 2> s = {0, 0};
@@ -165,7 +165,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			}
 			
 			std::array<int, 2> readPoint;
-			int latency = std::max(int(std::max(sizeSamples * (std::max(m_speed[0], m_speed[1]) * grainSpeed - 1.), 0.) + GPS_SAFETY_LATENCY), minLatency);
+			int latency = std::max(int(std::max(sizeSamples * (std::max(m_speed[0], m_speed[1]) * grainSpeed - 1.), 0.) + SafetyLatency), minLatency);
 			for (int i = 0; i < 2; ++i)
 			{
 				readPoint[i] = m_writePoint - latency - sprayResult[i];
@@ -178,8 +178,8 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 		
 		for (int i = 0; i < m_grainCount; ++i)
 		{
-			m_grains[i].m_phase += std::max(m_grains[i].m_phaseSpeed[0], m_grains[i].m_phaseSpeed[1]);
-			if (m_grains[i].m_phase >= 1)
+			m_grains[i].phase += std::max(m_grains[i].phaseSpeed[0], m_grains[i].phaseSpeed[1]);
+			if (m_grains[i].phase >= 1)
 			{
 				// grain is done, delete it
 				std::swap(m_grains[i], m_grains[m_grainCount-1]);
@@ -189,15 +189,15 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 				continue;
 			}
 			
-			m_grains[i].m_readPoint[0] += m_grains[i].m_grainSpeed[0];
-			m_grains[i].m_readPoint[1] += m_grains[i].m_grainSpeed[1];
-			if (m_grains[i].m_readPoint[0] >= m_ringBufLength) { m_grains[i].m_readPoint[0] -= m_ringBufLength; }
-			if (m_grains[i].m_readPoint[1] >= m_ringBufLength) { m_grains[i].m_readPoint[1] -= m_ringBufLength; }
+			m_grains[i].readPoint[0] += m_grains[i].grainSpeed[0];
+			m_grains[i].readPoint[1] += m_grains[i].grainSpeed[1];
+			if (m_grains[i].readPoint[0] >= m_ringBufLength) { m_grains[i].readPoint[0] -= m_ringBufLength; }
+			if (m_grains[i].readPoint[1] >= m_ringBufLength) { m_grains[i].readPoint[1] -= m_ringBufLength; }
 			
-			const float fadePos = std::clamp((-std::fabs(-2.f * static_cast<float>(m_grains[i].m_phase) + 1.f) + 0.5f) * fadeLength + 0.5f, 0.f, 1.f);
+			const float fadePos = std::clamp((-std::fabs(-2.f * static_cast<float>(m_grains[i].phase) + 1.f) + 0.5f) * fadeLength + 0.5f, 0.f, 1.f);
 			const float windowVal = cosHalfWindowApprox(fadePos, shapeK);
-			s[0] += getHermiteSample(m_grains[i].m_readPoint[0], 0) * windowVal;
-			s[1] += getHermiteSample(m_grains[i].m_readPoint[1], 1) * windowVal;
+			s[0] += getHermiteSample(m_grains[i].readPoint[0], 0) * windowVal;
+			s[1] += getHermiteSample(m_grains[i].readPoint[1], 1) * windowVal;
 		}
 		
 		// note that adding two signals together, when uncorrelated, results in a signal power multiplication of sqrt(2), not 2
@@ -233,7 +233,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 void GranularPitchShifterEffect::changeSampleRate()
 {
 	const int range = m_granularpitchshifterControls.m_rangeModel.value();
-	const float ringBufLength = GPS_RANGE_SECONDS[range];
+	const float ringBufLength = RangeSeconds[range];
 	
 	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_nyquist = m_sampleRate / 2;

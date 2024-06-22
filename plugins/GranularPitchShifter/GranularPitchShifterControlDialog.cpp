@@ -142,16 +142,16 @@ GranularPitchShifterHelpView::GranularPitchShifterHelpView():QTextEdit(s_helpTex
 	// Bug workaround: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 	using ::operator|;
 #endif
-	setWindowTitle ( "Granular Pitch Shifter Help" );
-	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
-	getGUI()->mainWindow()->addWindowedWidget( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	setWindowTitle("Granular Pitch Shifter Help");
+	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
+	getGUI()->mainWindow()->addWindowedWidget(this);
+	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
+	parentWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
 	
 	// No maximize button
 	Qt::WindowFlags flags = parentWidget()->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
-	parentWidget()->setWindowFlags( flags );
+	parentWidget()->setWindowFlags(flags);
 }
 
 

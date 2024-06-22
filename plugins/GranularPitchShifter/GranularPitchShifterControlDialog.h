@@ -62,9 +62,6 @@ public:
 		static GranularPitchShifterHelpView instance;
 		return &instance;
 	}
-	static void finalize()
-	{
-	}
 
 private:
 	GranularPitchShifterHelpView();

@@ -25,7 +25,7 @@
 #include <QDomElement>
 
 #include "GranularPitchShifterControls.h"
-#include "GranularPitchShifter.h"
+#include "GranularPitchShifterEffect.h"
 
 namespace lmms
 {
@@ -108,7 +108,8 @@ void GranularPitchShifterControls::updateRange() {
 			m_jitterModel.setRange(0.f, 2.f, 0.0001f);
 			break;
 		}
-		default: {}
+		default:
+			break;
 	}
 	m_effect->sampleRateNeedsUpdate();
 }

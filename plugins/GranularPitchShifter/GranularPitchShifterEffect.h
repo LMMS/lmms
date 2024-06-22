@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef GRANULARPITCHSHIFTER_H
-#define GRANULARPITCHSHIFTER_H
+#ifndef LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
+#define LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 
 #include "Effect.h"
 #include "GranularPitchShifterControls.h"
@@ -34,9 +34,10 @@
 namespace lmms
 {
 
-constexpr float GPS_PREFILTER_BW = 0.96f;// 96% of nyquist
-constexpr double GPS_GLIDE_SNAG_RADIUS = 0.001;
-constexpr int GPS_SAFETY_LATENCY = 3;
+constexpr float PrefilterBandwidth = 0.96f;// 96% of nyquist
+constexpr double GlideSnagRadius = 0.001;
+constexpr int SafetyLatency = 3;
+constexpr float RangeSeconds[5] = {5, 10, 40, 40, 120};
 
 // adapted from signalsmith's crossfade approximation:
 // https://signalsmith-audio.co.uk/writing/2021/cheap-energy-crossfade
@@ -79,17 +80,17 @@ private:
 	float m_g1, m_g2, m_g3, m_g4;
 };
 
-class GranularPitchShifterGrain final {
-public:
+struct GranularPitchShifterGrain
+{
 	GranularPitchShifterGrain(double grainSpeedL, double grainSpeedR, double phaseSpeedL, double phaseSpeedR, double readPointL, double readPointR) :
-		m_readPoint({readPointL, readPointR}),
-		m_phaseSpeed({phaseSpeedL, phaseSpeedR}),
-		m_grainSpeed({grainSpeedL, grainSpeedR}),
-		m_phase(0) {}
-	std::array<double, 2> m_readPoint;
-	std::array<double, 2> m_phaseSpeed;
-	std::array<double, 2> m_grainSpeed;
-	double m_phase;
+		readPoint{readPointL, readPointR},
+		phaseSpeed{phaseSpeedL, phaseSpeedR},
+		grainSpeed{grainSpeedL, grainSpeedR},
+		phase{0} {}
+	std::array<double, 2> readPoint;
+	std::array<double, 2> phaseSpeed;
+	std::array<double, 2> grainSpeed;
+	double phase;
 };
 
 class GranularPitchShifterEffect : public Effect
@@ -165,4 +166,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GRANULAR_PITCH_SHIFTER_H

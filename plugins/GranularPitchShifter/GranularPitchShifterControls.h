@@ -28,8 +28,6 @@
 #include "EffectControls.h"
 #include "GranularPitchShifterControlDialog.h"
 
-constexpr float GPS_RANGE_SECONDS[5] = {5, 10, 40, 40, 120};
-
 namespace lmms
 {
 
