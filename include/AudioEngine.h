@@ -31,10 +31,6 @@
 #include <mutex>
 #endif
 
-#ifdef WIN32
-#include <malloc.h>
-#endif
-
 #include <QThread>
 #include <samplerate.h>
 
@@ -268,18 +264,6 @@ public:
 		}
 		return s;
 	}
-
-#ifdef WIN32
-	// windows doesn't support std::aligned_alloc and using free
-	// so have to introduce a wrapper to fix it
-	inline void* alignedMalloc(size_t byteNum){ return _aligned_malloc(byteNum, 16); }
-
-	inline void alignedFree(void* ptr){ _aligned_free(ptr); }
-#else
-	inline void* alignedMalloc(size_t byteNum){ return std::aligned_alloc(16, byteNum); }
-
-	inline void alignedFree(void* ptr){ std::free(ptr); }
-#endif
 
 
 	struct StereoSample

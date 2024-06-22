@@ -136,12 +136,11 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
-	m_outputBufferRead = static_cast<surroundSampleFrame *>(alignedMalloc(outputBufferSize));
-	m_outputBufferWrite = static_cast<surroundSampleFrame *>(alignedMalloc(outputBufferSize));
+	m_outputBufferRead = new std::array<surroundSampleFrame, m_framesPerPeriod>;
+	m_outputBufferWrite = new std::array<surroundSampleFrame, m_framesPerPeriod>;
 
-	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
-	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
+	std::fill(m_outputBufferRead, m_framesPerPeriod, 0);
+	std::fill(m_outputBufferWrite, m_framesPerPeriod, 0);
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
@@ -180,8 +179,8 @@ AudioEngine::~AudioEngine()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	alignedFree(m_outputBufferRead);
-	alignedFree(m_outputBufferWrite);
+	delete[] m_outputBufferRead;
+	delete[] m_outputBufferWrite;
 
 	for (const auto& input : m_inputBuffer)
 	{
@@ -462,7 +461,7 @@ void AudioEngine::swapBuffers()
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
-	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
+	std::fill(m_outputBufferWrite, m_framesPerPeriod, 0);
 }
 
 
