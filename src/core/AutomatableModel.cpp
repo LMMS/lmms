@@ -471,7 +471,7 @@ float AutomatableModel::fittedValue(float value) const
 
 void AutomatableModel::linkModel(AutomatableModel* model)
 {
-	auto findModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model)
+	auto findModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model);
 	auto containsModel = findModel != m_linkedModels.end();
 	if (containsModel && model == this) { return; }
 
