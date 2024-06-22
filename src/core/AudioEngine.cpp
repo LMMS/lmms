@@ -108,7 +108,7 @@ AudioEngine::AudioEngine(bool renderOnly) :
 	if (renderOnly == false)
 	{
 		m_framesPerPeriod =
-			(fpp_t) ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toInt();
+			static_cast<fpp_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toInt());
 
 		// if the value read from user configuration is not set or
 		// lower than the minimum allowed, use the default value and
@@ -340,7 +340,7 @@ void AudioEngine::renderStageNoteSetup()
 			(*it)->audioPort()->removePlayHandle((*it));
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release((NotePlayHandle*) *it);
+				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
 			}
 			else
 			{
@@ -408,7 +408,7 @@ void AudioEngine::renderStageEffects()
 			(*it)->audioPort()->removePlayHandle((*it));
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release((NotePlayHandle*) *it);
+				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
 			}
 			else delete *it;
 			it = m_playHandles.erase(it);
@@ -701,7 +701,7 @@ bool AudioEngine::addPlayHandle(PlayHandle* handle)
 
 	if (handle->type() == PlayHandle::Type::NotePlayHandle)
 	{
-		NotePlayHandleManager::release((NotePlayHandle*)handle);
+		NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(handle));
 	}
 	else delete handle;
 
@@ -778,7 +778,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 			(*it)->audioPort()->removePlayHandle((*it));
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release((NotePlayHandle*) *it);
+				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(*it));
 			}
 			else { delete *it; }
 			it = m_playHandles.erase(it);

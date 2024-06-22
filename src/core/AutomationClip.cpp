@@ -876,8 +876,7 @@ void AutomationClip::loadSettings(const QDomElement & _this)
 
 	movePosition(_this.attribute("pos").toInt());
 	setName(_this.attribute("name"));
-	setProgressionType(static_cast<ProgressionType>(_this.attribute(
-							"prog").toInt()));
+	setProgressionType(static_cast<ProgressionType>(_this.attribute("prog").toInt()));
 	setTension(_this.attribute("tens"));
 	setMuted(_this.attribute("mute", QString::number(false)).toInt());
 
