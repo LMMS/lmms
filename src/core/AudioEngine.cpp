@@ -135,9 +135,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// allocte the FIFO from the determined size
 	m_fifo = new Fifo( fifoSize );
 
-	// now that framesPerPeriod is fixed initialize global BufferManager
-	BufferManager::init( m_framesPerPeriod );
-
 	m_outputBufferRead = new std::array<surroundSampleFrame, m_framesPerPeriod>;
 	m_outputBufferWrite = new std::array<surroundSampleFrame, m_framesPerPeriod>;
 
