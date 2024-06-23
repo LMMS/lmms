@@ -252,7 +252,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 #ifdef LMMS_HAVE_SUIL
 	if(m_ui)
 	{
-		LinkedModelGroupView::hide();
+		//LinkedModelGroupView::hide();
 
 		Lv2Manager* mgr = Engine::getLv2Manager();
 		m_atomEventTransfer = mgr->uridMap().map(LV2_ATOM__eventTransfer);
@@ -321,7 +321,8 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		lilv_free(bundlePath);
 
 		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
-		m_uiInstanceWidget->setParent(parent);
+		m_uiInstanceWidget->setParent(this);
+		layout()->addWidget(m_uiInstanceWidget);
 
 		// connect UI ringbuffers
 		// about the order: Lv2Proc can reject sending plugin events as long as

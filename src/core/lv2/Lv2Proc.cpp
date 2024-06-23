@@ -579,7 +579,7 @@ void Lv2Proc::run(fpp_t frames)
 				jack_midi_clear_buffer(buf);
 			}*/
 			for (LV2_Evbuf_Iterator i = lv2_evbuf_begin(&*atomSeq->m_buf);
-					lv2_evbuf_is_valid(i);
+					lv2_evbuf_is_valid(i);  // see note (*) on bottom of file
 					i = lv2_evbuf_next(i))
 			{
 				// Get event from LV2 buffer
@@ -1216,5 +1216,24 @@ AutoLilvNode Lv2Proc::uri(const char *uriStr)
 
 
 } // namespace lmms
+
+/*
+	*Note:	lv2_evbuf_is_valid is called only for output ports here
+			output ports are created with "evbuf->buf.atom.type == evbuf->atom_Chunk",
+			so lv2_evbuf_is_valid would always return false
+						
+			However, the atom.type can get overwritten by the plugin, e.g. like
+			in the following backtrace:
+
+			memcpy
+			lv2_atom_forge_raw
+			lv2_atom_forge_write
+			lv2_atom_forge_sequence_head
+			lsp::lv2::Extensions::forge_sequence_head
+			lsp::lv2::Wrapper::transmit_atoms
+			lsp::lv2::Wrapper::run
+			lsp::lv2::run
+			lilv_instance_run
+*/
 
 #endif // LMMS_HAVE_LV2
