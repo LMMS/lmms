@@ -4,6 +4,8 @@ set(COMMON_SRCS
 	SystemSemaphore.cpp
 )
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 foreach(SRC ${COMMON_SRCS})
 	list(APPEND LMMS_COMMON_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/${SRC}")
 endforeach()

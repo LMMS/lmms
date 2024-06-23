@@ -26,7 +26,7 @@
 #define LMMS_GUI_LEFT_RIGHT_NAV_H
 
 #include "PixmapButton.h"
-
+#include <QHBoxLayout>
 
 namespace lmms::gui
 {
