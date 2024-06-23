@@ -42,8 +42,9 @@ class QLibrary;
 namespace lmms
 {
 
-class LMMS_EXPORT PluginFactory
+class LMMS_EXPORT PluginFactory : public QObject
 {
+	Q_OBJECT
 public:
 	struct PluginInfo
 	{

@@ -131,5 +131,12 @@ set(LMMS_SRCS
 	core/midi/MidiPort.cpp
 	core/midi/MidiWinMM.cpp
 
+	core/tracks/AutomationTrack.cpp
+	core/tracks/InstrumentTrack.cpp
+	core/tracks/MidiClip.cpp
+	core/tracks/PatternTrack.cpp
+	core/tracks/SampleTrack.cpp
+	
+
 	PARENT_SCOPE
 )
