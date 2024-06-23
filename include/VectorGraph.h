@@ -44,6 +44,7 @@ namespace lmms
 {
 
 //class VectorGraphViewBase;
+class VectorGraphView;
 class VectorGraphModel;
 class VectorGraphDataArray;
 class FloatModel;
@@ -328,6 +329,9 @@ public slots:
 	void dataArrayClearedEvent(int arrayId);
 	void dataArrayStyleChanged();
 private:
+	// addJournalCheckpoint
+	void modelAddJournalCheckPoint();
+
 	std::vector<VectorGraphDataArray> m_dataArrays;
 	unsigned int m_maxLength;
 
@@ -335,6 +339,7 @@ private:
 	// a dataArray's getSamples() at the same time
 	QMutex m_getSamplesAccess;
 	QMutex m_bakedSamplesAccess;
+	friend class lmms::gui::VectorGraphView;
 };
 
 class LMMS_EXPORT VectorGraphDataArray
@@ -366,6 +371,7 @@ public:
 	void setFillColor(QColor color);
 	void setAutomatedColor(QColor color);
 
+	// sets a dataArray as an effector to this dataArray
 	// returns true if successful
 	// if callDataChanged then it will call dataChanged() --> paintEvent()
 	bool setEffectorArrayLocation(int arrayLocation, bool callDataChanged);
@@ -541,7 +547,7 @@ public:
 	void clearedEvent();
 	// color
 	void styleChanged();
-protected:
+private:
 	// returns m_automationModelArray
 	std::vector<FloatModel*>* getAutomationModelArray();
 	// delete automationModels in m_automationModelArray
@@ -550,8 +556,8 @@ protected:
 	// encodes m_dataArray to QString
 	QString getSavedDataArray();
 	// decodes and sets m_dataArray from QString
-	void loadDataArray(QString data, unsigned int arraySize);
-private:
+	void loadDataArray(QString data, unsigned int arraySize, bool callDataChanged);
+
 	class VectorGraphPoint
 	{
 	public:
@@ -734,7 +740,7 @@ private:
 	// sorted in getUpdatingOriginals() because some functions need this to be sorted
 	std::vector<unsigned int> m_needsUpdating;
 
-	// this stores all the FloatModels
+	// this stores all the FloatModels, unsorted, should only contain currently used FloatModels
 	// used for automation
 	std::vector<FloatModel*> m_automationModelArray;
 

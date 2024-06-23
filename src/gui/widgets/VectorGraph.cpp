@@ -32,7 +32,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
-#include <QInputDialog> // showInputDialog()
 #include <QMenu> // context menu
 #include <QMutex> // locking when getSamples
 
@@ -50,6 +49,8 @@
 #include "JournallingObject.h"
 #include "base64.h"
 
+//#define VECTORGRAPH_DEBUG_USER_INTERACTION
+//#define VECTORGRAPH_DEBUG_PAINT_EVENT
 
 namespace lmms
 {
@@ -111,8 +112,6 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 }
 VectorGraphView::~VectorGraphView()
 {
-	qDebug("VectorGraphView dstc");
-	qDebug("VectorGraphView dstc end");
 }
 
 void VectorGraphView::setLineColor(QColor color, unsigned int dataArrayLocation)
@@ -185,6 +184,9 @@ void VectorGraphView::setControlDisplayCount(unsigned int controlDisplayCount)
 void VectorGraphView::setIsSimplified(bool isSimplified)
 {
 	m_isSimplified = isSimplified;
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("setIsSimplified %d", m_isSimplified);
+#endif
 }
 bool VectorGraphView::getIsSimplified()
 {
@@ -213,11 +215,11 @@ void VectorGraphView::setSelectedData(PointF data)
 {
 	if (m_isSelected == true)
 	{
-		qDebug("setSelectedData");
 		model()->getDataArray(m_selectedArray)->setY(m_selectedLocation, data.second);
-		qDebug("set value done");
 		m_selectedLocation = model()->getDataArray(m_selectedArray)->setX(m_selectedLocation, data.first);
-		qDebug("set position done (%f)", data.first);
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+		qDebug("setSelectedData (x, y): %f, %f", data.first, data.second);
+#endif
 	}
 }
 void VectorGraphView::setBackground(const QPixmap background)
@@ -231,7 +233,9 @@ void VectorGraphView::useGetLastSamples()
 
 void VectorGraphView::mousePressEvent(QMouseEvent* me)
 {
-	qDebug("\n\nmousePressStart ---------");
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("\n\nmousePressEvent start ---------");
+#endif
 	// get position
 	int x = me->x();
 	int y = me->y();
@@ -240,7 +244,9 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 
 	if(me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier && m_isSelected == true)
 	{
-			qDebug("mousePress automation started");
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+		qDebug("mousePressEvent automation connecting");
+#endif
 		// connect to AutomationTrack
 		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
 		FloatModel* curFloatModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
@@ -311,6 +317,8 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 		{
 			m_mousePress = false;
 			startMoving = true;
+
+			model()->modelAddJournalCheckPoint();
 		}
 	}
 
@@ -323,6 +331,9 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			{
 				if (m_isCurveSelected == false)
 				{
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+					qDebug("mouseMoveEvent point drag");
+#endif
 					// dragging point
 					PointF convertedCoords = mapMousePos(x, m_graphHeight - y);
 					convertedCoords.first = std::clamp(convertedCoords.first, 0.0f, 1.0f);
@@ -331,6 +342,9 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 				}
 				else if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == true)
 				{
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+					qDebug("mouseMoveEvent curve drag");
+#endif
 					// dragging curve
 					PointF convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second);
 					float curveValue = convertedCoords.second + convertedCoords.first * 0.1f;
@@ -407,19 +421,24 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 
 void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 {
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("mouseReleaseEvent start");
+#endif
 	// get position
 	int x = me->x();
 	int y = me->y();
 	// if did not drag and graph is pressed
 	if (m_mousePress == true && isGraphPressed(x, m_graphHeight - y) == true)
 	{
-	qDebug("mouseMove graphPressed: %d", m_lastTrackPoint.first);
+		model()->modelAddJournalCheckPoint();
 		// add/delete point
 		if (m_isSelected == false && m_addition == true)
 		{
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+			qDebug("mouseReleaseEvent add point, dataArray count: %d", static_cast<int>(model()->getDataArraySize()));
+#endif
 			// if selection failed and addition
 			// get the first editable daraArray and add value
-			qDebug("release size: %ld", model()->getDataArraySize());
 			bool success = false;
 			if (m_isLastSelectedArray == true)
 			{
@@ -443,6 +462,9 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 		}
 		else if (m_isSelected == true && m_addition == false)
 		{
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+			qDebug("mouseReleaseEvent delete point");
+#endif
 			// if selection was successful -> deletion
 			model()->getDataArray(m_selectedArray)->deletePoint(m_selectedLocation);
 			m_isSelected = false;
@@ -451,12 +473,11 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 	}
 	else if (m_mousePress == true && isControlWindowPressed(m_graphHeight - y) == true)
 	{
-		qDebug("Mouse Release event try running processControlWindowPressed");
+		model()->modelAddJournalCheckPoint();
 		processControlWindowPressed(x, m_graphHeight - y, false, false, 0, 0);
 	}
 	else if (isGraphPressed(x, m_graphHeight - y) == false)
 	{
-qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray);
 		// if the "switch graph" button was pressed in editing mode
 		unsigned int oldSelectedArray = m_selectedArray;
 		m_selectedLocation = 0;
@@ -470,7 +491,9 @@ qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray)
 		// selected data array
 		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 		{
-			//qDebug("mouseRelease select new array: [%d], m_selectedArray: %d, old: %d", i, m_selectedArray, oldSelectedArray);
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+			qDebug("mouseReleaseEvent select dataArray: i: [%d], m_selectedArray: %d, oldSelectedArray: %d", i, m_selectedArray, oldSelectedArray);
+#endif
 			if (model()->getDataArray(i)->getIsSelectable() == true)
 			{
 				// if this data array is the first one that is selectable
@@ -489,7 +512,9 @@ qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray)
 				}
 			}
 		}
-		//qDebug("mouseRelease select new array final:", m_selectedArray);
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+		qDebug("mouseReleaseEvent select dataArray final: %d", m_selectedArray);
+#endif
 
 		// hint text
 		hideHintText();
@@ -499,17 +524,21 @@ qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray)
 	// reset trackpoint
 	m_lastTrackPoint.first = -1;
 	updateGraph(false);
-	qDebug("mouseReleaseEnd");
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("mouseReleaseEvent end");
+#endif
 }
 
 void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 {
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("mouseDoubleClickEvent start");
+#endif
 	// get position
 	int x = me->x();
 	int y = me->y();
 
 	// if a data/sample is selected then show input dialog to change the data
-	qDebug("mouseDoubleClickEvent");
 	if (isGraphPressed(x, m_graphHeight - y) == true)
 	{
 		if (m_isSelected == true && me->button() == Qt::LeftButton)
@@ -545,10 +574,12 @@ void VectorGraphView::leaveEvent(QEvent *event)
 
 void VectorGraphView::paintEvent(QPaintEvent* pe)
 {
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("paintEvent start");
+#endif
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing, true);
 
-	qDebug("paintEvent");
 	m_graphHeight = m_isEditingActive == true ? height() - m_controlHeight : height();
 
 	// paint background
@@ -594,12 +625,17 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	paintEditing(&p);
 
 	m_useGetLastSamples = false;
-	qDebug("paint event end");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("paintEvent end");
+#endif
 	emit drawn();
 }
 
 void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::vector<float>* sampleBuffer)
 {
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("paintGraph start: data arrayLocation: %d", arrayLocation);
+#endif
 	VectorGraphDataArray* dataArray = model()->getDataArray(arrayLocation);
 	unsigned int length = dataArray->size();
 	if (length > 0)
@@ -620,7 +656,6 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 			// get the currently drawed VectorGraphDataArray samples
 			dataArray->getLastSamples(sampleBuffer);
 
-			qDebug("paint sampleBuffer size: %ld", sampleBuffer->size());
 			for (unsigned int j = 0; j < sampleBuffer->size(); j++)
 			{
 				// if nonNegative then only the dataArray output (getDataValues)
@@ -850,6 +885,9 @@ void VectorGraphView::updateDefaultColors()
 }
 void VectorGraphView::contextMenuRemoveAutomation()
 {
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("contextMenuRemoveAutomation: m_isSelected: %d, m_selectedArray: %d, m_selectedLocation: %d", m_isSelected, m_selectedArray, m_selectedLocation);
+#endif
 	if (m_isSelected == true)
 	{
 		// deleting the floatmodel will delete the connecitons
@@ -908,6 +946,9 @@ float VectorGraphView::getDistanceF(float xA, float yA, float xB, float yB)
 
 bool VectorGraphView::addPoint(unsigned int arrayLocation, int mouseX, int mouseY)
 {
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("addPoint: arrayLocation: %d, position (x, y): %d, %d", arrayLocation, mouseX, mouseY);
+#endif
 	// mouseY is calculated like this:
 	// m_graphHeight - y
 	bool output = false;
@@ -919,10 +960,12 @@ bool VectorGraphView::addPoint(unsigned int arrayLocation, int mouseX, int mouse
 	if (location >= 0)
 	{
 		output = true;
-		qDebug("addPoint point added: array: %d location: %d   %f,%d", arrayLocation, location, curMouseCoords.second, m_graphHeight);
 		model()->getDataArray(arrayLocation)->setY(location, curMouseCoords.second);
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+		qDebug("addPoint: point location: %d, positionF (x, y): %f, %f, new dataArray size: %d",
+			location, curMouseCoords.first, curMouseCoords.second, static_cast<int>(model()->getDataArray(arrayLocation)->size()));
+#endif
 	}
-	qDebug("addPoint Location: %d", location);
 	return output;
 }
 
@@ -934,7 +977,6 @@ bool VectorGraphView::isGraphPressed(int mouseX, int mouseY)
 	if (m_isEditingActive == true && m_graphHeight - mouseY < m_controlHeight && mouseX < m_controlHeight)
 	{
 		// if switch selected data array was pressed
-		//qDebug("isGraphPressed switch selected dataArray");
 		output = false;
 	}
 	else if (isControlWindowPressed(mouseY) == true)
@@ -951,7 +993,6 @@ bool VectorGraphView::isControlWindowPressed(int mouseY)
 	// m_graphHeight - y
 	if (m_isEditingActive == true && mouseY <= 0)
 	{
-		//qDebug("isGraphPressed control window was pressed");
 		output = true;
 	}
 	return output;
@@ -962,11 +1003,16 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 	// m_graphHeight - y
 	setCursor(Qt::ArrowCursor);
 
-	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("processControlWindowPressed: mouse (x, y): %d, %d, isDragging: %d, startMoving: %d, tracked position (x, y): %d, %d", mouseX, mouseY, isDragging, startMoving, curX, curY);
+#endif
 	if (m_isEditingActive == true)
 	{
 		int pressLocation = getPressedControlInput(mouseX, m_graphHeight - mouseY, m_controlDisplayCount + 1);
 		int location = m_controlDisplayCount * m_controlDisplayPage + pressLocation;
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+		qDebug("processControlWindowPressed: pressLocation: %d, control window location: %d, controlDiyplayPage: %d", pressLocation, location, m_controlDisplayPage);
+#endif
 		if (isDragging == false && pressLocation == m_controlDisplayCount)
 		{
 			// if the last button was pressed
@@ -992,7 +1038,6 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 			{
 				m_controlDisplayPage = 0;
 			}
-			qDebug("mouseRelease controlPage: %d", m_controlDisplayPage);
 			hideHintText();
 		}
 		else if (pressLocation >= 0 && location < m_controlText.size())
@@ -1052,13 +1097,16 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 
 					m_lastTrackPoint.first = curX;
 					m_lastTrackPoint.second = curY;
-	qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, curX, (curY), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
 				}
 				PointF convertedCoords = mapMousePos(0,
 					m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2);
-				qDebug("dragging ... %d, %f", (m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2), convertedCoords.second);
 				setInputAttribValue(location, convertedCoords.second, false);
 
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+				qDebug("processControlWindowPressed dragging float: m_lastTrackPoint (x, y): %d, %d, m_lastScndTrackPoint (x, y): %d, %d,\n final coords (x, y): %f, %f",
+					m_lastTrackPoint.first, m_lastTrackPoint.second, m_lastScndTrackPoint.first,
+					m_lastScndTrackPoint.second, convertedCoords.first, convertedCoords.second);
+#endif
 
 				// hint text
 				showHintText(widget(), m_controlText[location], 5, 3500);
@@ -1076,7 +1124,6 @@ int VectorGraphView::getPressedControlInput(int mouseX, int mouseY, unsigned int
 	if (output > controlCount)
 	{
 		output = controlCount;
-qDebug("getPressedControlInput x location ERRROR: %d", mouseX);
 	}
 	return output;
 }
@@ -1161,7 +1208,9 @@ float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation, bo
 }
 void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, float floatValue, bool boolValue)
 {
-	qDebug("setInputAttribValue started");
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("setInputAttribute start: control input: %d, set floatValue: %f, set boolValue: %d", controlArrayLocation, floatValue, boolValue);
+#endif
 	if (m_isSelected == true)
 	{
 		float clampedValue = std::clamp(floatValue, -1.0f, 1.0f);
@@ -1269,7 +1318,6 @@ void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, flo
 				break;
 		}
 	}
-	qDebug("setInputAttribValue finished");
 }
 QColor VectorGraphView::getTextColorFromBaseColor(QColor baseColor)
 {
@@ -1300,7 +1348,6 @@ QColor VectorGraphView::getFillColorFromBaseColor(QColor baseColor)
 	if (colorSum > 382)
 	{
 		// (red * 0.6f + avg * 0.4f / 3.0f) * 0.7
-		//qDebug("getFillColorFromBaseColor bigger, %d", brighten);
 		output = QColor(static_cast<int>(static_cast<float>(baseColor.red()) * 0.42f + colorSum * 0.09f) - brighten,
 			static_cast<int>(static_cast<float>(baseColor.green()) * 0.42f + colorSum * 0.09f) - brighten,
 			static_cast<int>(static_cast<float>(baseColor.blue()) * 0.42f + colorSum * 0.09f) - brighten, 255);
@@ -1364,7 +1411,9 @@ QString VectorGraphView::getTextForAutomatableEffectableOrType(unsigned int cont
 
 void VectorGraphView::selectData(int mouseX, int mouseY)
 {
-	qDebug("selectData");
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("selectData start: mouse (x, y): %d, %d", mouseX, mouseY);
+#endif
 
 	m_isSelected = false;
 
@@ -1402,10 +1451,8 @@ void VectorGraphView::selectData(int mouseX, int mouseY)
 				int location = searchForData(mouseX, mouseY, static_cast<float>(m_pointSize) / width(), dataArray, false);
 				if (location > -1)
 				{
-		//qDebug("selected data!");
 					m_selectedLocation = location;
 					m_selectedArray = i;
-		//qDebug("selected data location: %d, %d", location, i);
 					m_isSelected = true;
 					m_isCurveSelected = false;
 					m_isLastSelectedArray = true;
@@ -1424,10 +1471,8 @@ void VectorGraphView::selectData(int mouseX, int mouseY)
 					int location = searchForData(mouseX, mouseY, static_cast<float>(m_pointSize) / width(), dataArray, true);
 					if (location > -1)
 					{
-			//qDebug("selected data curve!");
 						m_selectedLocation = location;
 						m_selectedArray = i;
-			//qDebug("selected data curve location: %d, %d", location, i);
 						m_isSelected = true;
 						m_isCurveSelected = true;
 						m_isLastSelectedArray = true;
@@ -1438,14 +1483,15 @@ void VectorGraphView::selectData(int mouseX, int mouseY)
 			}
 		}
 	}
-	qDebug("selectDataEnd, Arr: %d, location: %d", m_selectedArray, m_selectedLocation);
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+	qDebug("selectData end: m_selectedArray: %d, m_selectedLocation %d", m_selectedArray, m_selectedLocation);
+#endif
 }
 
 int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, VectorGraphDataArray* dataArray, bool isCurved)
 {
 	int output = -1;
 	maxDistance = maxDistance * 2.0f;
-	qDebug("searchData");
 
 	PointF transformedMouse = mapMousePos(mouseX, mouseY);
 
@@ -1454,7 +1500,6 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 	bool isBefore = false;
 	// get the nearest data to the mouse pos (x) in an optimalized way
 	int location = dataArray->getNearestLocation(transformedMouse.first, &found, &isBefore);
-	//qDebug("selected location: %d", location);
 
 	// if getNearestLocation was successful
 	if (location >= 0)
@@ -1482,17 +1527,14 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 			}
 		}
 		// check distance against x coord
-		//qDebug("selected x distance: %f", std::abs(dataX - transformedMouse.first));
 		if (std::abs(dataX - transformedMouse.first) <= maxDistance)
 		{
 			// calculate real distance (x and y)
 			float curDistance = getDistanceF(transformedMouse.first * 2.0f, transformedMouse.second,
 				dataX * 2.0f, dataY);
 
-			//qDebug("selected full distance: %f  (%d, %d)", curDistance, location, (location - curvedBefore));
 			if (curDistance <= maxDistance)
 			{
-				//qDebug("search successful");
 				output = location - curvedBefore;
 			}
 			else
@@ -1513,7 +1555,6 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 						break;
 					}
 				}
-				//qDebug("search V2AAA temp, start: %d, end: %d", searchStart, searchEnd);
 				// getting where the search needs to end
 				for (int i = location - curvedBefore + 1; i < dataArray->size(); i++)
 				{
@@ -1523,7 +1564,6 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 						break;
 					}
 				}
-							//qDebug("search V2, start: %d, end: %d", searchStart, searchEnd);
 				// calculating real distances from the point coords
 				for (int i = searchStart; i <= searchEnd; i++)
 				{
@@ -1544,10 +1584,8 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 						}
 						curDistance = getDistanceF(transformedMouse.first * 2.0f, transformedMouse.second,
 							dataX * 2.0f, dataY);
-			//qDebug("search v2 full distance %d: %f  / %f     y: %f, my: %f    y:%f  size:%ld", i, curDistance, maxDistance, dataY, transformedMouse.second, dataArray->getY(i), dataArray->size());
 						if (curDistance <= maxDistance)
 						{
-							//qDebug("search successful V2");
 							output = i;
 							break;
 						}
@@ -1556,7 +1594,6 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 			}
 		}
 	}
-	qDebug("searchDataEnd");
 	return output;
 }
 
@@ -1571,10 +1608,7 @@ VectorGraphModel::VectorGraphModel(unsigned int arrayMaxLength, Model* parent, b
 
 VectorGraphModel::~VectorGraphModel()
 {
-	qDebug("VectorGraphModel dstc");
 	m_dataArrays.clear();
-
-	qDebug("VectorGraphModel dstc end");
 }
 
 unsigned int VectorGraphModel::addDataArray()
@@ -1589,11 +1623,9 @@ unsigned int VectorGraphModel::addDataArray()
 
 void VectorGraphModel::deleteDataArray(unsigned int arrayLocation)
 {
-	qDebug("deleteDataArray");
 	std::vector<int> effectorArrayLocations(m_dataArrays.size());
 	for (unsigned int i = arrayLocation; i < m_dataArrays.size() - 1; i++)
 	{
-		//qDebug("copyed [%d] to [%d]", i + 1, i);
 		m_dataArrays[i] = m_dataArrays[i + 1];
 	}
 	m_dataArrays.pop_back();
@@ -1616,7 +1648,6 @@ void VectorGraphModel::deleteDataArray(unsigned int arrayLocation)
 	// setting updated locations
 	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
 	{
-		//qDebug("deleteDataArray end: set effector location: [%d], %d", i, effectorArrayLocations[i]);
 		m_dataArrays[i].setEffectorArrayLocation(effectorArrayLocations[i], false);
 	}
 	emit dataChanged();
@@ -1677,7 +1708,9 @@ int VectorGraphModel::getDataArrayNewId()
 }
 void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, const QString& name)
 {
-	qDebug("saveSettings");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("saveSettings start");
+#endif
 
 	// getting the models saving name
 	QString saveName("VectorGraphModel");
@@ -1719,7 +1752,9 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 			// saving the FloatModels
 			for (unsigned int j = 0; j < automationModels->size(); j++)
 			{
-				qDebug("saveSettings saved automatinModel %d, %d", i, j);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+				qDebug("saveSettings saved automatinModel dataArray (i): %d, model (j): %d", i, j);
+#endif
 				QString readLocationB = QString::number(j) + "-";
 				(*automationModels)[j]->saveSettings(doc, me, readLocation + readLocationB + "AutomationModel");
 			}
@@ -1729,6 +1764,9 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 }
 void VectorGraphModel::loadSettings(const QDomElement& element, const QString& name)
 {
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("loadSettings start");
+#endif
 	QString loadName("VectorGraphModel");
 	if (name.size() > 0)
 	{
@@ -1753,14 +1791,11 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 	}
 
 	QDomElement curElement = node.toElement();
-	qDebug("loadSettings");
 	if (curElement.hasAttribute("DataArrayCount") == true)
 	{
-		qDebug("loadSettings 2");
 		unsigned int loadSize = curElement.attribute("DataArrayCount").toInt();
 		for (unsigned int i = 0; i < loadSize; i++)
 		{
-			qDebug("loadSettings 3");
 			// getting the start of the attribute name
 			QString readLocation = "a" + QString::number(i) + "-";
 			if (i < m_dataArrays.size() && curElement.hasAttribute(readLocation + "DataArraySize") == true)
@@ -1770,20 +1805,20 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 				// load m_dataArray
 				if (dataArraySize > 0)
 				{
-					qDebug("loadSettings 4");
-					m_dataArrays[i].loadDataArray(curElement.attribute(readLocation + "DataArray"), dataArraySize);
+					m_dataArrays[i].loadDataArray(curElement.attribute(readLocation + "DataArray"), dataArraySize, true);
 				}
 
 				// load automationModelDataArray
 				std::vector<FloatModel*>* automationModels = m_dataArrays[i].getAutomationModelArray();
 				for (unsigned int j = 0; j < automationSize; j++)
 				{
-					qDebug("loadSettings 5");
 					QString readLocationB = QString::number(j) + "-";
 					FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, this, QString(), false);
 					curModel->loadSettings(curElement, readLocation + readLocationB + "AutomationModel");
 					automationModels->push_back(curModel);
-					qDebug("loaded automatinModel %d, %d, size: %ld", i, j, automationModels->size());
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+					qDebug("loadSettings loaded automatinModel: arrayLocation (i): %d, model (j): %d", i, j);
+#endif
 				}
 			}
 			else
@@ -1816,6 +1851,10 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 void VectorGraphModel::loadSettings(const QDomElement& element)
 {
 	loadSettings(element, QString(""));
+}
+void VectorGraphModel::modelAddJournalCheckPoint()
+{
+	addJournalCheckPoint();
 }
 
 // VectorGraphDataArray ------
@@ -1889,7 +1928,6 @@ VectorGraphDataArray::VectorGraphDataArray(
 
 VectorGraphDataArray::~VectorGraphDataArray()
 {
-	qDebug("VectorGraphDataArray dstc");
 	//m_dataArray.clear();
 	//m_bakedSamples.clear();
 	//m_needsUpdating.clear();
@@ -1902,13 +1940,10 @@ VectorGraphDataArray::~VectorGraphDataArray()
 		}
 	}
 	m_automationModelArray.clear();
-
-	qDebug("VectorGraphDataArray dstc end");
 }
 
 void VectorGraphDataArray::updateConnections(VectorGraphModel* parent)
 {
-	qDebug("VectorGrahDataArray updateConnections");
 	// call VectorGraphModel signals without qt
 	m_parent = parent;
 	m_id = m_parent->getDataArrayNewId();
@@ -1999,7 +2034,6 @@ void VectorGraphDataArray::setAutomatedColor(QColor color)
 }
 bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool callDataChanged)
 {
-	qDebug("setEffectorArrayLocation start %d", arrayLocation);
 	bool found = true;
 	if (arrayLocation >= 0)
 	{
@@ -2008,7 +2042,6 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int arrayLocation, bool call
 		{
 			m_id = m_parent->getDataArrayNewId();
 		}
-		qDebug("setEffectorArrayLocation cur_id %d", m_id);
 		int searchArrayLocation = arrayLocation;
 		found = false;
 		// checking if the effector chain has this dataArray in it
@@ -2144,19 +2177,16 @@ int VectorGraphDataArray::add(float newX)
 	int location = -1;
 	if (m_isFixedSize == false && m_dataArray.size() < m_parent->getMaxLength())
 	{
-	qDebug("add 1. success");
 		bool found = false;
 		bool isBefore = false;
 		location = getNearestLocation(newX, &found, &isBefore);
 		if (found == false)
 		{
-	qDebug("add 2. success, nearest: %d", location);
 			int targetLocation = -1;
 			bool dataChangedVal = false;
 			// if getNearestLocation returned a value
 			if (location >= 0)
 			{
-	qDebug("add 3. success, nearest: %d", location);
 				targetLocation = location;
 				// shift the new data if the closest data x is bigger
 				// (done for swaping)
@@ -2169,18 +2199,15 @@ int VectorGraphDataArray::add(float newX)
 					}
 				}
 				m_dataArray.push_back(VectorGraphPoint(newX, 0.0f));
-	qDebug("add 4. success, target: %d", targetLocation);
 				swap(m_dataArray.size() - 1, targetLocation, true);
 				dataChangedVal = true;
 			}
 			else if (m_dataArray.size() <= 0)
 			{
-	qDebug("add 5. success");
 				m_dataArray.push_back(VectorGraphPoint(newX, 0.0f));
 				targetLocation = 0;
 				dataChangedVal = true;
 			}
-	qDebug("add size: %ld", m_dataArray.size());
 			location = targetLocation;
 
 			if (m_dataArray.size() <= 2)
@@ -2254,12 +2281,10 @@ void VectorGraphDataArray::formatArray(std::vector<PointF>* dataArrayOut, bool s
 				maxY = (*dataArrayOut)[i].second;
 			}
 		}
-		//qDebug("formatArray 1: minx: %f maxx: %f miny: %f maxy: %f", minX, maxX, minY, maxY);
 		maxX = (maxX - minX);
 		minX = -minX;
 		maxY = (maxY - minY) * 0.5f;
 		minY = -minY;
-		//qDebug("formatArray 2: minx: %f maxx: %f miny: %f maxy: %f", minX, maxX, minY, maxY);
 		if (minX != 0.0f || maxX != 1.0f)
 		{
 			for (unsigned int i = 0; i < dataArrayOut->size(); i++)
@@ -2360,8 +2385,6 @@ int VectorGraphDataArray::getNearestLocation(float searchXIn, bool* foundOut, bo
 		while (start < end)
 		{
 			mid = start + (end - start) / 2;
-	//qDebug("getNearestLocation, mid: %d, start: %d, end: %d", mid, start, end);
-	//qDebug("getNearestLocation, val: %f, pos: %f", m_dataArray[mid].m_x, searchXIn);
 			if (m_dataArray[mid].m_x == searchXIn)
 			{
 				*foundOut = true;
@@ -2388,14 +2411,11 @@ int VectorGraphDataArray::getNearestLocation(float searchXIn, bool* foundOut, bo
 			std::abs(m_dataArray[mid + 1].m_x - searchXIn))
 		{
 			outputDif = 1;
-			//*isBeforeOut = false;
 		}
-	//qDebug("getNearestLocation, outputDif: %d", outputDif);
 		*foundOut = searchXIn == m_dataArray[mid + outputDif].m_x;
 		*isBeforeOut = searchXIn >= m_dataArray[mid + outputDif].m_x;
 		return mid + outputDif;
 	}
-	//qDebug("getNearestLocation, searchXIn: %f", searchXIn);
 	*foundOut = false;
 	*isBeforeOut = false;
 	return -1;
@@ -2403,7 +2423,9 @@ int VectorGraphDataArray::getNearestLocation(float searchXIn, bool* foundOut, bo
 
 void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, std::vector<float>* sampleBufferOut)
 {
-	qDebug("getSamplesA1");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("getSamples start: targetSizeIn: %d", targetSizeIn);
+#endif
 
 	if (sampleBufferOut != nullptr)
 	{
@@ -2430,7 +2452,9 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, std::vector<flo
 		getSamplesInner(targetSizeIn, nullptr, nullptr, &updatingSampleArray);
 		m_parent->unlockGetSamplesAccess();
 	}
-	qDebug("getSamplesA3 finished");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("getSamples end");
+#endif
 }
 void VectorGraphDataArray::getLastSamples(std::vector<float>* sampleBufferOut)
 {
@@ -2461,7 +2485,9 @@ std::vector<int> VectorGraphDataArray::getEffectorArrayLocations()
 void VectorGraphDataArray::setDataArray(std::vector<PointF>* inputDataArray,
 	bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged)
 {
-	qDebug("setDataArray size: %ld", inputDataArray->size());
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("setDataArray start");
+#endif
 	if (shouldClear == true)
 	{
 		m_dataArray.clear();
@@ -2479,7 +2505,6 @@ void VectorGraphDataArray::setDataArray(std::vector<PointF>* inputDataArray,
 	bool isNegativeBefore = false;
 	for (unsigned int i = 0; i < m_dataArray.size(); i++)
 	{
-		//qDebug("setDataArray 1, x: %f, y: %f", (*inputDataArray)[i].first, (*inputDataArray)[i].second);
 		m_dataArray[i].m_x = (*inputDataArray)[i].first;
 		m_dataArray[i].m_y = (*inputDataArray)[i].second;
 		// calculating curves
@@ -2505,7 +2530,6 @@ void VectorGraphDataArray::setDataArray(std::vector<PointF>* inputDataArray,
 
 			noneBefore = diff < 0.1f && diff > -0.1f;
 			isNegativeBefore = isNegative;
-			//qDebug("setDataArray curve: %f", m_dataArray[i].m_c);
 		}
 	}
 	// the whole m_dataArray needs to be updated
@@ -2559,7 +2583,6 @@ unsigned int VectorGraphDataArray::setX(unsigned int pointLocation, float newX)
 			// if getNearestLocation returned a value
 			if (location >= 0)
 			{
-	qDebug("set 3. success, location: %d", targetLocation);
 				if (location < pointLocation && isBefore == true)
 				{
 					if (targetLocation + 1 < m_dataArray.size())
@@ -2574,7 +2597,6 @@ unsigned int VectorGraphDataArray::setX(unsigned int pointLocation, float newX)
 						targetLocation--;
 					}
 				}
-	qDebug("set 4. success, target: %d", targetLocation);
 				m_dataArray[pointLocation].m_x = newX;
 				swap(pointLocation, targetLocation, true);
 				location = targetLocation;
@@ -2852,15 +2874,19 @@ bool VectorGraphDataArray::getIsAutomationValueChanged(unsigned int pointLocatio
 }
 void VectorGraphDataArray::setAutomated(unsigned int pointLocation, bool bValue)
 {
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 	qDebug("setAutomated start");
+#endif
 	if (m_isAutomatableEffectable == true)
 	{
 		if (bValue == true)
 		{
-			qDebug("setAutomated make");
 			// if it is not already automated
 			if (m_dataArray[pointLocation].m_automationModel == -1)
 			{
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+				qDebug("setAutomated: make new floatModel");
+#endif
 				m_automationModelArray.push_back(new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, m_parent, QString(), false));
 				m_dataArray[pointLocation].m_automationModel = m_automationModelArray.size() - 1;
 				getUpdatingFromPoint(pointLocation);
@@ -2869,14 +2895,14 @@ void VectorGraphDataArray::setAutomated(unsigned int pointLocation, bool bValue)
 		}
 		else
 		{
-			qDebug("setAutomated delete");
-
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+			qDebug("setAutomated: delete floatModel");
+#endif
 			// dataChanged() is called in this function
 			// this function check if the current point has an automationModel
 			deleteAutomationModel(m_dataArray[pointLocation].m_automationModel, true);
 		}
 	}
-	qDebug("setAutomated end");
 }
 FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int pointLocation)
 {
@@ -2887,7 +2913,7 @@ FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int pointLocation)
 	return nullptr;
 }
 
-// protected:
+// private:
 std::vector<FloatModel*>* VectorGraphDataArray::getAutomationModelArray()
 {
 	return &m_automationModelArray;
@@ -2934,9 +2960,11 @@ QString VectorGraphDataArray::getSavedDataArray()
 			m_dataArray.size() * sizeof(VectorGraphPoint), output);
 		return output;
 }
-void VectorGraphDataArray::loadDataArray(QString data, unsigned int arraySize)
+void VectorGraphDataArray::loadDataArray(QString data, unsigned int arraySize, bool callDataChanged)
 {
-	qDebug("loadDatatArray start");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("loadDatatArray start: arraySize: %d", arraySize);
+#endif
 	int size = 0;
 	char* dst = 0;
 	base64::decode(data, &dst, &size);
@@ -2953,13 +2981,16 @@ void VectorGraphDataArray::loadDataArray(QString data, unsigned int arraySize)
 	}
 
 	delete[] dst;
-	qDebug("loadDatatArray end");
+	getUpdatingFromPoint(-1);
+	if (callDataChanged == true)
+	{
+		dataChanged();
+	}
 }
 
-// private:
 void VectorGraphDataArray::deleteAutomationModel(unsigned int modelLocation, bool callDataChanged)
 {
-	if (modelLocation != -1)
+	if (modelLocation > -1)
 	{
 		FloatModel* curModel = m_automationModelArray[modelLocation];
 
@@ -3008,15 +3039,14 @@ void VectorGraphDataArray::swap(unsigned int pointLocationA, unsigned int pointL
 	{
 		if (shouldShiftBetween == true)
 		{
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 			qDebug("swap:    -------");
-			qDebug("first.: %d, second.: %d", pointLocationA, pointLocationB);
-			
-			/*
+			qDebug("first point location: %d, second point locaiton: %d", pointLocationA, pointLocationB);
 			for (unsigned int i = 0; i < m_dataArray.size(); i++)
 			{
 				qDebug("   - i: %d  -  x: %f", i, m_dataArray[i].m_x);
 			}
-			*/
+#endif
 			
 			if (pointLocationA < pointLocationB)
 			{
@@ -3037,13 +3067,13 @@ void VectorGraphDataArray::swap(unsigned int pointLocationA, unsigned int pointL
 				m_dataArray[pointLocationB] = swap;
 			}
 			
-			/*
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 			qDebug(" --------- ");
 			for (unsigned int i = 0; i < m_dataArray.size(); i++)
 			{
 				qDebug("   - i: %d  -  x: %f", i, m_dataArray[i].m_x);
 			}
-			*/
+#endif
 		}
 		else
 		{
@@ -3181,7 +3211,6 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 	// calculating how many samples are needed to 1 complete wave
 	// we have "count" amount of samples and "tValB * 100.0f" amount of waves
 	int end = static_cast<int>(std::floor(count / (tValB * 100.0f)));
-	qDebug("sineB_1, %f, %d", (count / (tValB * 100.0f)), end);
 	if (count <= 0)
 	{
 		end = 0;
@@ -3206,20 +3235,16 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 		m_universalSampleBuffer[i] = sineAmp * std::sin(
 			(*xArray)[startLoc + i] * 628.318531f * tValB + sinePhase * 100.0f);
 	}
-	//qDebug("sineB_2");
 	// copy the first wave until the end
 	for (int i = 0; i < count; i += end)
 	{
-		//qDebug("sineB_2.4: i: %d, end: %d count - i: %d, count: %d", i, end, count - i, count);
 		int endB = i + end >= count ? count - i : end;
 		for (unsigned int j = 0; j < endB; j++)
 		{
-			//qDebug("sineB_2.5: i: %d, %d, %d", endB, j, i + j);
 			(*samplesOut)[startLoc + j + i] += m_universalSampleBuffer[j];
 		}
 	}
 
-	//qDebug("sineB_3");
 	// fade in
 	unsigned int fadeInEndLoc = static_cast<unsigned int>(fadeInStartVal * static_cast<float>(count));
 	for (unsigned int i = startLoc; i < startLoc + fadeInEndLoc; i++)
@@ -3276,7 +3301,6 @@ void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samples
 	}
 
 	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
-	//qDebug("stepsA - stepCount = %f", stepCount);
 	for (unsigned int i = 0; i < count; i++)
 	{
 		float y = (*yArray)[startLoc + i] + 1.0f;
@@ -3369,11 +3393,16 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 					(*updatingPointLocations)[j])
 			{
 				updatingEnd = j;
-				qDebug("getUpdatingFromEffector new updatingEnd: %d, i: %d", updatingEnd, i);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+				qDebug("getUpdatingFromEffector: new updatingEnd: %d, start (i): %d", updatingEnd, i);
+#endif
 			}
 			else
 			{
-				qDebug("getUpdatingFromEffector updatingEnd %d brake: %d < %d [j = %d]", updatingEnd, ((*updatingPointLocations)[updatingEnd] + 1), (*updatingPointLocations)[j], j);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+				qDebug("getUpdatingFromEffector: updatingEnd: %d brake: %d < %d [j = %d]", updatingEnd,
+					((*updatingPointLocations)[updatingEnd] + 1), (*updatingPointLocations)[j], j);
+#endif
 				break;
 			}
 		}
@@ -3381,7 +3410,9 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		int updatingEndSlide = 0;
 		if (updatingEnd + 1 < effector->size())
 		{
-			qDebug("getUpdatingFromEffector updatingEndSlide = 1");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+			qDebug("getUpdatingFromEffector: updatingEndSlide = 1");
+#endif
 			updatingEndSlide = 1;
 		}
 
@@ -3390,10 +3421,14 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		bool isBefore = false;
 		// this can return -1
 		int locationBefore = getNearestLocation(effector->getX((*updatingPointLocations)[i]), &found, &isBefore);
-		qDebug("getUpdatingFromEffector getNearestLocation before: %d, i: %d", locationBefore, i);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+		qDebug("getUpdatingFromEffector: getNearestLocation before: %d, i: %d", locationBefore, i);
+#endif
 		if (isBefore == true && locationBefore > 0 && getEffectPoints(locationBefore) == true)
 		{
-			qDebug("getUpdatingFromEffector locationBefore = %d - 1", locationBefore);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+			qDebug("getUpdatingFromEffector: locationBefore = %d - 1", locationBefore);
+#endif
 			// the line (or point) before might be effected if the current nearest point
 			// is effected in some way
 			// so subtract 1
@@ -3408,31 +3443,42 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 
 		isBefore = false;
 		int locationAfter = getNearestLocation(effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), &found, &isBefore);
-		qDebug("getUpdatingFromEffector getNearestLocation after: %d, updatingEnd: %d (+ %d), ex: %f, dx: %f", locationAfter, updatingEnd, updatingEndSlide, effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+		qDebug("getUpdatingFromEffector: getNearestLocation after: %d, updatingEnd: %d (+ %d), effector x: %f, dataArray x: %f", locationAfter, updatingEnd, updatingEndSlide,
+			effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
+#endif
 		if (isBefore == false)
 		{
-			qDebug("getUpdatingFromEffector locationAfter = %d - 1", locationAfter);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+			qDebug("getUpdatingFromEffector: locationAfter = %d - 1", locationAfter);
+#endif
 			// if the nearest point is after ([updatingEnd] + upadtingEndSlide) (where updating ends)
 			locationAfter--;
 		}
 		// updating everything before if i -> 0
 		if ((*updatingPointLocations)[i] == 0)
 		{
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector updating everything before");
+#endif
 			locationBefore = 0;
 		}
 		// if updatingEnd is the last point in effecor, then
 		// update everithing after
 		if ((*updatingPointLocations)[updatingEnd] + updatingEndSlide + 1 >= effector->size())
 		{
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector updating everything after");
+#endif
 			locationAfter = m_dataArray.size() - 1;
 		}
 		// clamp
 		locationAfter = locationAfter < 0 ? 0 :
 			m_dataArray.size() - 1 < locationAfter ? m_dataArray.size() - 1 : locationAfter;
 
-		qDebug("getUpdatingFromEffector start: %d, end: %d", locationBefore, locationAfter);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+		qDebug("getUpdatingFromEffector: final start: %d, final end: %d, i: %d", locationBefore, locationAfter, i);
+#endif
 
 		// if the last point was updated (ture in case of j = 0)
 		bool lastUpdated = true;
@@ -3442,7 +3488,9 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			// update only if effected
 			if (isEffectedPoint(j) == true && (getEffectPoints(j) == true || getEffectLines(j) == true))
 			{
-				qDebug("getUpdatingFromEffector: [%d] -> %d", i, j);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+				qDebug("getUpdatingFromEffector: i: %d, updating: %d", i, j);
+#endif
 				m_needsUpdating.push_back(j);
 				if (lastUpdated == false && getEffectPoints(j) == true)
 				{
@@ -3485,7 +3533,9 @@ void VectorGraphDataArray::getUpdatingFromAutomation()
 	{
 		if (getIsAutomationValueChanged(i) == true)
 		{
-			qDebug("getUpdatingFromAutomation: %d, attrib location: %d", i, getAutomatedAttribLocation(i));
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+			qDebug("getUpdatingFromAutomation: point location: %d, attrib location: %d", i, getAutomatedAttribLocation(i));
+#endif
 			m_needsUpdating.push_back(i);
 			// if the automatable value effects the y (so the position)
 			// the point before this is updated too
@@ -3500,11 +3550,12 @@ void VectorGraphDataArray::getUpdatingOriginals()
 {
 	// selecting only original values and sorting
 
-	// Debug testing
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 	for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 	{
-		qDebug("getUpatingOriginals: [%d] -> %d", i, m_needsUpdating[i]);
+		qDebug("getUpatingOriginals before: m_needsUpdating[%d] -> %d  (point)", i, m_needsUpdating[i]);
 	}
+#endif
 
 	// sorting the array
 	// this is done becaues functions that use m_needsUpdating
@@ -3541,10 +3592,12 @@ void VectorGraphDataArray::getUpdatingOriginals()
 		}
 	}
 	
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 	for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 	{
-		qDebug("getUpatingOriginals final: [%d] -> %d", i, m_needsUpdating[i]);
+		qDebug("getUpatingOriginals final: m_needsUpdating[%d] -> %d  (point)", i, m_needsUpdating[i]);
 	}
+#endif
 }
 void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isChangedOut,
 		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
@@ -3558,7 +3611,9 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 	{
 		m_parent->getDataArray(m_effectorLocation)->getSamplesInner(targetSizeIn, &effectorIsChanged, &effectorUpdatingValues, sampleBufferOut);
 	}
-	qDebug("getSamplesInnerB1, size: %d    - id: %d", targetSizeIn, m_id);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("getSamplesInner: id: %d", m_id);
+#endif
 
 	m_isDataChanged = m_isDataChanged || targetSizeIn != m_updatingBakedSamples.size();
 
@@ -3580,6 +3635,9 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 	// updating m_needsUpdating
 	if (m_isDataChanged == false && targetSizeIn == m_updatingBakedSamples.size())
 	{
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+		qDebug("getSamplesInner: get updating");
+#endif
 		if (isEffected == true && effectorUpdatingValues.size() > 0 &&
 			(effectorIsChanged == false || effectedCount > 0))
 		{
@@ -3587,15 +3645,16 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 			// before use (in this case it is already sorted)
 			getUpdatingFromEffector(&effectorUpdatingValues);
 		}
-	qDebug("getSamplesInnerB2");
 		getUpdatingFromAutomation();
 		// sort and select only original
 		// values
 		getUpdatingOriginals();
-	qDebug("getSamplesInnerB3");
 	}
 	else
 	{
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+		qDebug("getSamplesInner: update all points");
+#endif
 		m_parent->lockBakedSamplesAccess();
 		if (targetSizeIn != m_bakedSamples.size())
 		{
@@ -3611,7 +3670,6 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 		{
 			m_needsUpdating[i] = i;
 		}
-		qDebug("getSamplesInnerB4, needsUpdating size: %ld", m_needsUpdating.size());
 	}
 
 	float stepSize = 1.0f / static_cast<float>(targetSizeIn);
@@ -3644,7 +3702,9 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 			effector = m_parent->getDataArray(m_effectorLocation);
 		}
 
-		qDebug("getSamplesInnerB6, updatingsize: %ld", m_needsUpdating.size());
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+		qDebug("getSamplesInner: updatingsize: %d", static_cast<int>(m_needsUpdating.size()));
+#endif
 
 		// calculate final lines
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
@@ -3678,15 +3738,18 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 	m_parent->unlockBakedSamplesAccess();
 
 	m_isDataChanged = false;
-	qDebug("getSamplesInnerB9");
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("getSamplesInner end");
+#endif
 }
 void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
 	std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize)
 {
-	qDebug("getSamplesD6.1  m_needsUpdating[%d]: %d", pointLocation, m_needsUpdating[pointLocation]);
 	unsigned int effectYLocation = static_cast<unsigned int>
 		(std::ceil(m_dataArray[m_needsUpdating[pointLocation]].m_x / stepSize));
-	qDebug("getSamplesD6.2  effectYlocation: %d, %ld", effectYLocation, effectorSamples->size());
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("getSamplesUpdatinLines: m_needsUpdating[%d]: %d   (point)\neffectYLocation: %d", pointLocation, m_needsUpdating[pointLocation], effectYLocation);
+#endif
 	// current effector output Y near m_needsUpdating[pointLocation] point
 	float curEffectY = (*effectorSamples)[effectYLocation];
 	float nextEffectY = (*effectorSamples)[effectYLocation];
@@ -3747,7 +3810,10 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 
 	float fadeInStart = 0.05f;
 	unsigned int type = m_dataArray[m_needsUpdating[pointLocation]].m_type;
-qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f, AB: %f, %f", pointLocation, start, end, type, curY, nextY, curC, curValA, curValB);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+	qDebug("getSamplesUpdatinLines: point: [%d] start: %d, end: %d, line type: %d,      ---     attribs: y: %f, next y: %f, curve %f, valA %f, valB %f",
+		pointLocation, start, end, type, curY, nextY, curC, curValA, curValB);
+#endif
 
 	// calculate final updated line
 	if (type == 0)
@@ -3815,7 +3881,6 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		int endB = m_needsUpdating[pointLocation] >= m_dataArray.size() - 1 ? m_updatingBakedSamples.size() : end;
 		// process line effect
 		// if it is enabled
-		qDebug("getSamples run prucessEffect run prucessEffect run prucessEffect run prucessEffect");
 		for (int j = startB; j < endB; j++)
 		{
 			m_updatingBakedSamples[j] = processEffect(m_needsUpdating[pointLocation], m_updatingBakedSamples[j], 0, (*effectorSamples)[j]);
