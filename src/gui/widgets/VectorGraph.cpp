@@ -2970,9 +2970,9 @@ void VectorGraphDataArray::loadDataArray(QString data, unsigned int arraySize, b
 	}
 }
 
-void VectorGraphDataArray::deleteAutomationModel(unsigned int modelLocation, bool callDataChanged)
+void VectorGraphDataArray::deleteAutomationModel(int modelLocation, bool callDataChanged)
 {
-	if (modelLocation >= m_automationModelArray.size()) { return; }
+	if (modelLocation < 0 || modelLocation >= m_automationModelArray.size()) { return; }
 
 	FloatModel* curModel = m_automationModelArray[modelLocation];
 
