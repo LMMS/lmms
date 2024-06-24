@@ -60,6 +60,8 @@ public:
 
 	LedCheckBox *rangeImportCheckbox() {return m_rangeImportCheckbox;}
 
+	GroupBox *grooveGroupBox() {return m_grooveGroupBox;}
+
 private:
 	GroupBox *m_pitchGroupBox;
 	GroupBox *m_microtunerGroupBox;
@@ -70,6 +72,8 @@ private:
 	ComboBox *m_keymapCombo;
 
 	LedCheckBox *m_rangeImportCheckbox;
+
+	GroupBox * m_grooveGroupBox;
 };
 
 

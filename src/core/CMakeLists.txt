@@ -25,6 +25,11 @@ set(LMMS_SRCS
 	core/fft_helpers.cpp
 	core/FileSearch.cpp
 	core/Mixer.cpp
+	core/Groove.cpp
+	core/GrooveExperiments.cpp
+	core/GrooveFactory.cpp
+	core/HalfSwing.cpp
+	core/HydrogenSwing.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
 	core/Instrument.cpp
@@ -40,6 +45,7 @@ set(LMMS_SRCS
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
+	core/MidiSwing.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
 	core/MixHelpers.cpp
