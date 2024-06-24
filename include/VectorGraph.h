@@ -242,7 +242,8 @@ private:
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
 
-	
+	VectorGraphCotnrolDialog* m_controlDialog;
+
 	// default VectorGraphDataArray colors
 	// applyed in constructor
 	QColor m_vectorGraphDefaultAutomatedColor;
@@ -617,7 +618,7 @@ private:
 	};
 	// deletes the point's automation model
 	// if modelLocation == point location
-	void deleteAutomationModel(unsigned int modelLocation, bool callDataChanged);
+	void deleteAutomationModel(int modelLocation, bool callDataChanged);
 	// swapping values, "shouldShiftBetween" moves the values (between) once left or right to keep the order
 	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool shouldShiftBetween);
