@@ -35,7 +35,7 @@
 namespace lmms
 {
 
-constexpr inline float LOMM_MIN_FLOOR = 0.00012589;// -72 dBFS
+constexpr inline float LOMM_MIN_FLOOR = 0.00012589f;// -72 dBFS
 constexpr inline float LOMM_MAX_LOOKAHEAD = 20.f;
 constexpr inline float LOMM_AUTO_TIME_ADJUST = 5.f;
 

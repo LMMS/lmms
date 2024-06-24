@@ -210,8 +210,6 @@ void Fader::wheelEvent (QWheelEvent* ev)
 ///
 void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer)
 {
-	fPeak = std::clamp(fPeak, m_fMinPeak, m_fMaxPeak);
-
 	if (targetPeak != fPeak)
 	{
 		targetPeak = fPeak;
@@ -219,6 +217,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 		{
 			persistentPeak = targetPeak;
 			lastPeakTimer.restart();
+			emit peakChanged(persistentPeak);
 		}
 		update();
 	}
@@ -226,6 +225,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
 		persistentPeak = qMax<float>(0, persistentPeak-0.05);
+		emit peakChanged(persistentPeak);
 		update();
 	}
 }
@@ -285,7 +285,7 @@ void Fader::paintEvent(QPaintEvent* ev)
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 {
-	std::function<float(float value)> mapper = [this](float value) { return ampToDbfs(qMax<float>(0.0001, value)); };
+	std::function<float(float value)> mapper = [this](float value) { return ampToDbfs(qMax(0.0001f, value)); };
 
 	if (linear)
 	{
@@ -379,7 +379,7 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// is the minimum value and that all other values lie inbetween. Otherwise
 	// there will be warnings when the gradient is defined.
 	const float mappedClipStarts(mapper(dbfsToAmp(0.f)));
-	const float mappedWarnEnd(mapper(dbfsToAmp(-0.01)));
+	const float mappedWarnEnd(mapper(dbfsToAmp(-0.01f)));
 	const float mappedWarnStart(mapper(dbfsToAmp(-6.f)));
 	const float mappedOkEnd(mapper(dbfsToAmp(-12.f)));
 

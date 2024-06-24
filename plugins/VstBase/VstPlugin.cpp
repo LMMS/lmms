@@ -36,7 +36,7 @@
 
 #if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 #	include <QX11Info>
-#	include "X11EmbedContainer.h"
+#	include <X11EmbedContainer.h>
 #endif
 
 #include <QWindow>

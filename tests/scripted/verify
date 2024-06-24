@@ -37,8 +37,6 @@ class ScriptTest():
 		set_git_config()
 		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
 		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
-		create_file('debian/lmms-common.docs', '')
-		create_file('debian/copyright', '')
 		create_file('data/locale/de.ts',
 					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
 					'    <context>\n'
@@ -129,24 +127,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
 					'}')
 		test.run()
 		test.expect('Error: data/themes/classic/style.css: Class does not exist in source code: NonExistentClass')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/patches/clang.patch', '/plugins/non-existent-file')
-		test.run()
-		test.expect('Error: debian/patches/clang.patch: Source file does not exist: plugins/non-existent-file')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/lmms-common.docs', '/plugins/caps.html')
-		test.run()
-		test.expect('Error: debian/lmms-common.docs: Path does not exist: /plugins/caps.html')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/copyright', 'Files: NonExistent')
-		test.run()
-		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
 		test.expect('1 errors')
 
 	with ScriptTest(check_namespace) as test:

@@ -14,7 +14,6 @@ SET(LMMS_SRCS
 	gui/EffectView.cpp
 	gui/embed.cpp
 	gui/FileBrowser.cpp
-	gui/FileBrowserSearcher.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -118,6 +117,7 @@ SET(LMMS_SRCS
 	gui/widgets/MixerChannelLcdSpinBox.cpp
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
+	gui/widgets/PeakIndicator.cpp
 	gui/widgets/PixmapButton.cpp
 	gui/widgets/SimpleTextFloat.cpp
 	gui/widgets/TabBar.cpp

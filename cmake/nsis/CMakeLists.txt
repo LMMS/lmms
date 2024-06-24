@@ -3,10 +3,9 @@ if(LMMS_MSVC_YEAR)
 	SET(WIN_PLATFORM "msvc${LMMS_MSVC_YEAR}")
 endif()
 
-SET(CPACK_PACKAGE_ICON                  "${CMAKE_SOURCE_DIR}/cmake/nsis/nsis_branding.bmp")
-IF(MSVC)
-	STRING(REPLACE "/" "\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
-ENDIF(MSVC)
+# the final slash needs to be flipped for CPACK_PACKAGE_ICON to work:
+#   https://cmake.org/pipermail/cmake/2008-June/022085.html
+SET(CPACK_PACKAGE_ICON                  "${CMAKE_SOURCE_DIR}/cmake/nsis\\\\nsis_branding.bmp")
 SET(CPACK_NSIS_MUI_ICON                 "${CMAKE_SOURCE_DIR}/cmake/nsis/icon.ico")
 SET(CPACK_NSIS_INSTALLED_ICON_NAME      "${CMAKE_PROJECT_NAME}.exe" PARENT_SCOPE)
 SET(CPACK_NSIS_DISPLAY_NAME             "${PROJECT_NAME_UCASE} ${VERSION}" PARENT_SCOPE)
