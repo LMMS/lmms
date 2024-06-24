@@ -61,8 +61,6 @@
 
 #include "BufferManager.h"
 
-#include <iostream>
-
 namespace lmms
 {
 
@@ -138,14 +136,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	try{
-		m_outputBufferRead = std::make_unique<surroundSampleFrame[]>(m_framesPerPeriod);
-		m_outputBufferWrite = std::make_unique<surroundSampleFrame[]>(m_framesPerPeriod);
-	}
-	catch(const std::exception& e){
-		std::cerr << "Memory Handling exception " << e.what() << std::endl;
-	}
-
+	m_outputBufferRead = std::make_unique<surroundSampleFrame[]>(m_framesPerPeriod);
+	m_outputBufferWrite = std::make_unique<surroundSampleFrame[]>(m_framesPerPeriod);
 
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
@@ -422,17 +414,12 @@ void AudioEngine::renderStageMix()
 {
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
-	try{
 	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite.get());
 
 	MixHelpers::multiply(m_outputBufferWrite.get(), m_masterGain, m_framesPerPeriod);
 
 	emit nextAudioBuffer(m_outputBufferRead.get());
-	} 
-	catch(const std::exception& e){
-		std::cerr << "buffer related exception in renderStageMix " << e.what() << std::endl;
-	}
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
