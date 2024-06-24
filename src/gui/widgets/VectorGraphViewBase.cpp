@@ -102,7 +102,6 @@ void VectorGraphViewBase::addDefaultActions(QMenu* menu, QString controlDisplayT
 		this, SLOT(contextMenuExecConnectionDialog()));
 	if(m_curAutomationModel != nullptr && m_curAutomationModel->controllerConnection() != nullptr)
 	{
-		
 		Controller* cont = m_curAutomationModel->controllerConnection()->getController();
 		if(cont)
 		{
