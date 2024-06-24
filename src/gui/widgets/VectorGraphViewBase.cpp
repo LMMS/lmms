@@ -199,5 +199,174 @@ float VectorGraphViewBase::showInputDialog(float curInputValue)
 }
 
 
+VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraphView* targetVectorGraphModel) :
+	QMdiSubWindow(_parent)
+{
+	/*
+	setWindowIcon(embed::getIconPixmap("setup_audio"));
+	setWindowTitle(tr("Connection Settings"));
+	//setModal(true);
+*/
+
+	setWindowTitle(tr("vector graph settings"));
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	qDebug("VectorGraphControllerDialog Running");
+
+	/*
+	// Midi stuff
+	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
+	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
+	connect( m_midiGroupBox->model(), SIGNAL(dataChanged()),
+			this, SLOT(midiToggled()));
+	
+	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
+			tr( "Input channel" ) );
+	m_midiChannelSpinBox->addTextForValue( 0, "--" );
+	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
+	m_midiChannelSpinBox->move( 8, 24 );
+
+	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
+			tr( "Input controller" ) );
+	m_midiControllerSpinBox->addTextForValue(MidiController::NONE, "---" );
+	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
+	m_midiControllerSpinBox->move( 68, 24 );
+	
+
+	m_midiAutoDetectCheckBox =
+			new LedCheckBox( tr("Auto Detect"),
+				m_midiGroupBox, tr("Auto Detect") );
+	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
+	m_midiAutoDetectCheckBox->move( 8, 60 );
+	connect( &m_midiAutoDetect, SIGNAL(dataChanged()),
+			this, SLOT(autoDetectToggled()));
+
+	// when using with non-raw-clients we can provide buttons showing
+	// our port-menus when being clicked
+	if( !Engine::audioEngine()->midiClient()->isRaw() )
+	{
+		m_readablePorts = new MidiPortMenu( MidiPort::Mode::Input );
+		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
+				this, SLOT(enableAutoDetect(QAction*)));
+		auto rp_btn = new ToolButton(m_midiGroupBox);
+		rp_btn->setText( tr( "MIDI-devices to receive "
+						"MIDI-events from" ) );
+		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
+		rp_btn->setGeometry( 160, 24, 32, 32 );
+		rp_btn->setMenu( m_readablePorts );
+		rp_btn->setPopupMode( QToolButton::InstantPopup );
+	}
+
+
+	// User stuff
+	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
+	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
+	connect( m_userGroupBox->model(), SIGNAL(dataChanged()),
+			this, SLOT(userToggled()));
+
+	m_userController = new ComboBox( m_userGroupBox, "Controller" );
+	m_userController->setGeometry( 10, 24, 200, ComboBox::DEFAULT_HEIGHT );
+	for (Controller * c : Engine::getSong()->controllers())
+	{
+		m_userController->model()->addItem( c->name() );
+	}
+	connect( m_userController->model(), SIGNAL(dataUnchanged()),
+			this, SLOT(userSelected()));
+	connect( m_userController->model(), SIGNAL(dataChanged()),
+			this, SLOT(userSelected()));
+
+
+	// Mapping functions
+	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
+	m_mappingBox->setGeometry( 8, 170, 240, 64 );
+	m_mappingFunction = new QLineEdit( m_mappingBox );
+	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
+	m_mappingFunction->setText( "input" );
+	m_mappingFunction->setReadOnly( true );
+
+
+	// Buttons
+	auto buttons = new QWidget(this);
+	buttons->setGeometry( 8, 240, 240, 32 );
+
+	auto btn_layout = new QHBoxLayout(buttons);
+	btn_layout->setSpacing( 0 );
+	btn_layout->setContentsMargins(0, 0, 0, 0);
+
+	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
+	connect( select_btn, SIGNAL(clicked()), 
+				this, SLOT(selectController()));
+
+	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), buttons);
+	connect( cancel_btn, SIGNAL(clicked()),
+				this, SLOT(reject()));
+
+	btn_layout->addStretch();
+	btn_layout->addSpacing( 10 );
+	btn_layout->addWidget( select_btn );
+	btn_layout->addSpacing( 10 );
+	btn_layout->addWidget( cancel_btn );
+	btn_layout->addSpacing( 10 );
+
+	setFixedSize( 256, 280 );
+
+	// Crazy MIDI View stuff
+	
+	// TODO, handle by making this a model for the Dialog "view"
+	ControllerConnection * cc = nullptr;
+	if( m_targetModel )
+	{
+		cc = m_targetModel->controllerConnection();
+
+		if( cc && cc->getController()->type() != Controller::ControllerType::Dummy && Engine::getSong() )
+		{
+			if ( cc->getController()->type() == Controller::ControllerType::Midi )
+			{
+				m_midiGroupBox->model()->setValue( true );
+				// ensure controller is created
+				midiToggled();
+
+				auto cont = (MidiController*)(cc->getController());
+				m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
+				m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
+
+				m_midiController->subscribeReadablePorts( static_cast<MidiController*>( cc->getController() )->m_midiPort.readablePorts() );
+			}
+			else
+			{
+				auto& controllers = Engine::getSong()->controllers();
+				auto it = std::find(controllers.begin(), controllers.end(), cc->getController());
+
+				if (it != controllers.end())
+				{
+					int idx = std::distance(controllers.begin(), it);
+					m_userGroupBox->model()->setValue( true );
+					m_userController->model()->setValue( idx );
+				}
+			}
+		}
+	}
+
+	if( !cc )
+	{
+		m_midiGroupBox->model()->setValue( true );
+	}
+*/
+	show();
+}
+VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
+{
+
+}
+void VectorGraphCotnrolDialog::hideControls()
+{
+
+}
+void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned int selectedLocation)
+{
+
+}
+
+
 } // namespace gui
 } // namespace lmms

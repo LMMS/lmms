@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QCursor>
 #include <QMenu>
+#include <QMdiSubWindow>
 
 #include "ModelView.h"
 #include "SimpleTextFloat.h"
@@ -67,11 +68,35 @@ protected:
 
 private:
 	// context menu
-	void addDefaultActions(QMenu* menu,  QString controlDisplayText);
+	void addDefaultActions(QMenu* menu, QString controlDisplayText);
 
 	SimpleTextFloat* m_hintText;
 	FloatModel* m_curAutomationModel;
 };
+
+class VectorGraphView;
+
+class LMMS_EXPORT VectorGraphCotnrolDialog : public QMdiSubWindow
+{
+	Q_OBJECT
+public:
+	VectorGraphCotnrolDialog(QWidget* parent, VectorGraphView* targetVectorGraphView);
+	~VectorGraphCotnrolDialog();
+
+	void hideControls();
+	void switchPoint(unsigned int selectedArray, unsigned int selectedLocation);
+
+signals:
+	void controlValueChanged();
+
+private:
+	VectorGraphView* m_vectorGraphView;
+
+	FloatModel* m_curAutomationModel;
+
+	std::vector<FloatModel*> m_controlModelArray;
+};
+
 } // namespace gui
 } // namespace lmms
 
