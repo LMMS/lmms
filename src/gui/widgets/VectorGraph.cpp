@@ -109,9 +109,15 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 	{
 		applyDefaultColors();
 	}
+
+	m_controlDialog = nullptr;
 }
 VectorGraphView::~VectorGraphView()
 {
+	if (m_controlDialog == nullptr)
+	{
+		delete m_controlDialog;
+	}
 }
 
 void VectorGraphView::setLineColor(QColor color, unsigned int dataArrayLocation)
@@ -997,6 +1003,17 @@ bool VectorGraphView::isControlWindowPressed(int mouseY)
 }
 void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving, int curX, int curY)
 {
+	if (m_controlDialog == nullptr)
+	{
+		m_controlDialog = new VectorGraphCotnrolDialog(getGUI()->mainWindow(), this);
+	}
+	/*/
+	if (dialogB.exec() == 1)
+	{
+
+	}
+	*/
+
 	// mouseY is calculated like this:
 	// m_graphHeight - y
 	setCursor(Qt::ArrowCursor);
