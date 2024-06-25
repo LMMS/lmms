@@ -670,8 +670,15 @@ void NotePlayHandleManager::extend( int c )
 
 void NotePlayHandleManager::free()
 {
-	delete[] s_available;
+	if (s_available != nullptr) {
+		if (s_available[0] != nullptr) {
+			std::free(s_available[0]); // Free the block of NotePlayHandle objects
+		}
+		delete[] s_available; // Then free the array of pointers
+		s_available = nullptr;
+	}
 }
+
 
 
 } // namespace lmms
