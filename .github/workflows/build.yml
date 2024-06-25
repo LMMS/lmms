@@ -38,7 +38,7 @@ jobs:
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          cmake .. $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -47,8 +47,7 @@ jobs:
           ctest --output-on-failure -j2
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target appimage
+          cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -126,7 +125,6 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX="../target" \
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
@@ -139,8 +137,7 @@ jobs:
           ctest --output-on-failure -j3
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target dmg
+          cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
