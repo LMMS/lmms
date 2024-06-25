@@ -38,7 +38,9 @@ constexpr float PrefilterBandwidth = 0.96f;// 96% of nyquist
 constexpr double GlideSnagRadius = 0.001;
 constexpr int SafetyLatency = 3;
 constexpr float RangeSeconds[5] = {5, 10, 40, 40, 120};
-constexpr float DcRemovalHz = 7;
+constexpr float DcRemovalHz = 7.f;
+constexpr float SatuSafeVol = 16.f;
+constexpr float SatuStrength = 0.001f;
 
 
 class GranularPitchShifterEffect : public Effect
@@ -99,7 +101,8 @@ public:
 	float safetySaturate(float input)
 	{
 		float absInput = std::abs(input);
-		return absInput <= 16 ? input : std::copysign((absInput - 16) / (1 + (absInput - 16) * 0.001f) + 16, input);
+		return absInput <= SatuSafeVol ? input :
+			std::copysign((absInput - SatuSafeVol) / (1 + (absInput - SatuSafeVol) * SatuStrength) + SatuSafeVol, input);
 	}
 	
 	void sampleRateNeedsUpdate() { m_sampleRateNeedsUpdate = true; }
