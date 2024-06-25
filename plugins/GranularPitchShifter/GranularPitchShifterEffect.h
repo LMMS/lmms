@@ -38,6 +38,7 @@ constexpr float PrefilterBandwidth = 0.96f;// 96% of nyquist
 constexpr double GlideSnagRadius = 0.001;
 constexpr int SafetyLatency = 3;
 constexpr float RangeSeconds[5] = {5, 10, 40, 40, 120};
+constexpr float DcRemovalHz = 7;
 
 
 class GranularPitchShifterEffect : public Effect
@@ -94,6 +95,13 @@ public:
 		return -6.0026608f + p * (6.8773512f - 1.5838104f * p);
 	}
 	
+	// designed to use minimal CPU if the input isn't loud
+	float safetySaturate(float input)
+	{
+		float absInput = std::abs(input);
+		return absInput <= 16 ? input : std::copysign((absInput - 16) / (1 + (absInput - 16) * 0.001f) + 16, input);
+	}
+	
 	void sampleRateNeedsUpdate() { m_sampleRateNeedsUpdate = true; }
 	
 	void changeSampleRate();
@@ -147,10 +155,12 @@ private:
 	std::array<PrefilterLowpass, 2> m_prefilter;
 	std::array<double, 2> m_speed = {1, 1};
 	std::array<double, 2> m_truePitch = {0, 0};
+	std::array<float, 2> m_dcVal = {0, 0};
 
 	float m_sampleRate;
 	float m_nyquist;
 	float m_nextWaitRandomization = 1;
+	float m_dcCoeff;
 
 	int m_ringBufLength = 0;
 	int m_writePoint = 0;

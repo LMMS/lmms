@@ -80,7 +80,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 	const float glide = m_granularpitchshifterControls.m_glideModel.value();
 	const int minLatency = m_granularpitchshifterControls.m_minLatencyModel.value() * m_sampleRate;
 	const float densityInvRoot = std::sqrt(1.f / density);
-	const float feedback = m_granularpitchshifterControls.m_feedbackModel.value() * densityInvRoot;
+	const float feedback = m_granularpitchshifterControls.m_feedbackModel.value();
 	const float fadeLength = 1.f / m_granularpitchshifterControls.m_fadeLengthModel.value();
 	const bool prefilter = m_granularpitchshifterControls.m_prefilterModel.value();
 	
@@ -201,7 +201,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			if (m_grains[i].readPoint[0] >= m_ringBufLength) { m_grains[i].readPoint[0] -= m_ringBufLength; }
 			if (m_grains[i].readPoint[1] >= m_ringBufLength) { m_grains[i].readPoint[1] -= m_ringBufLength; }
 			
-			const float fadePos = std::clamp((-std::fabs(-2.f * static_cast<float>(m_grains[i].phase) + 1.f) + 0.5f) * fadeLength + 0.5f, 0.f, 1.f);
+			const float fadePos = std::clamp((-std::abs(-2.f * static_cast<float>(m_grains[i].phase) + 1.f) + 0.5f) * fadeLength + 0.5f, 0.f, 1.f);
 			const float windowVal = cosHalfWindowApprox(fadePos, shapeK);
 			s[0] += getHermiteSample(m_grains[i].readPoint[0], 0) * windowVal;
 			s[1] += getHermiteSample(m_grains[i].readPoint[1], 1) * windowVal;
@@ -210,6 +210,17 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 		// note that adding two signals together, when uncorrelated, results in a signal power multiplication of sqrt(2), not 2
 		s[0] *= densityInvRoot;
 		s[1] *= densityInvRoot;
+		
+		// 1-pole highpass for DC offset removal, to make feedback safer
+		s[0] -= (m_dcVal[0] = (1.f - m_dcCoeff) * s[0] + m_dcCoeff * m_dcVal[0]);
+		s[1] -= (m_dcVal[1] = (1.f - m_dcCoeff) * s[1] + m_dcCoeff * m_dcVal[1]);
+		
+		// cheap safety saturator to protect against infinite feedback
+		if (feedback > 0)
+		{
+			s[0] = safetySaturate(s[0]);
+			s[1] = safetySaturate(s[1]);
+		}
 		
 		if (++m_writePoint >= m_ringBufLength)
 		{
@@ -261,6 +272,8 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_grains.clear();
 	m_grainCount = 0;
 	m_grains.reserve(8);// arbitrary
+	
+	m_dcCoeff = std::exp(-2.0 * M_PI * DcRemovalHz / m_sampleRate);
 }
 
 
