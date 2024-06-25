@@ -273,7 +273,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_grainCount = 0;
 	m_grains.reserve(8);// arbitrary
 	
-	m_dcCoeff = std::exp(-2.0 * M_PI * DcRemovalHz / m_sampleRate);
+	m_dcCoeff = std::exp(-2.0 * F_PI * DcRemovalHz / m_sampleRate);
 }
 
 
