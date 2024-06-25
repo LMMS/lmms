@@ -128,7 +128,6 @@ constexpr char LADSPA_PATH_SEPERATOR =
 
 using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
 using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
-constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
 #define LMMS_STRINGIFY(s) LMMS_STR(s)

@@ -28,12 +28,12 @@
 #include <QMap>
 #include <QMutex>
 
+#include <globals.h>
+
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
-#include "zynaddsubfx/src/globals.h"
-
 
 class QPushButton;
 

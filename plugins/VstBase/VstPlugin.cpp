@@ -36,7 +36,7 @@
 
 #ifdef LMMS_BUILD_LINUX
 #	include <QX11Info>
-#	include "X11EmbedContainer.h"
+#	include <X11EmbedContainer.h>
 #endif
 
 #include <QWindow>

@@ -37,10 +37,10 @@
 
 #include "MidiEvent.h"
 
-#include "zynaddsubfx/src/Nio/NulEngine.h"
-#include "zynaddsubfx/src/Misc/Master.h"
-#include "zynaddsubfx/src/Misc/Part.h"
-#include "zynaddsubfx/src/Misc/Util.h"
+#include <Nio/NulEngine.h>
+#include <Misc/Master.h>
+#include <Misc/Part.h>
+#include <Misc/Util.h>
 
 // Global variable in zynaddsubfx/src/globals.h
 SYNTH_T* synth = nullptr;

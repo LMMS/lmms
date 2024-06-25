@@ -49,10 +49,10 @@ EqAnalyser::EqAnalyser() :
 
 	//initialize Blackman-Harris window, constants taken from
 	//https://en.wikipedia.org/wiki/Window_function#A_list_of_window_functions
-	const float a0 = 0.35875;
-	const float a1 = 0.48829;
-	const float a2 = 0.14128;
-	const float a3 = 0.01168;
+	const float a0 = 0.35875f;
+	const float a1 = 0.48829f;
+	const float a2 = 0.14128f;
+	const float a3 = 0.01168f;
 
 	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
 	{
@@ -230,7 +230,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	float *bands = m_analyser->m_bands;
 	m_path.moveTo( 0, height() );
 	m_peakSum = 0;
-	const float fallOff = 1.07;
+	const float fallOff = 1.07f;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
 		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
