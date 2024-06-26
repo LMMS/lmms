@@ -87,7 +87,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 	if (glide != m_oldGlide)
 	{
 		m_oldGlide = glide;
-		m_glideCoef = std::exp(-1 / (glide * m_sampleRate));
+		m_glideCoef = glide > 0 ? std::exp(-1 / (glide * m_sampleRate)) : 0;
 	}
 	
 	const float shapeK = cosWindowApproxK(shape);
