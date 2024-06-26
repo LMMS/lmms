@@ -24,10 +24,14 @@
 
 
 #include "VectorGraphViewBase.h"
+#include "VectorGraph.h"
 
 #include <vector>
 #include <QInputDialog> // showInputDialog()
 #include <QMenu> // context menu
+#include <QLayout>
+#include <QLabel>
+#include <QPushButton>
 
 
 #include "StringPairDrag.h"
@@ -39,6 +43,8 @@
 #include "AutomatableModel.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
+#include "Knob.h"
+#include "ComboBox.h"
 
 
 namespace lmms
@@ -200,18 +206,171 @@ float VectorGraphViewBase::showInputDialog(float curInputValue)
 
 
 VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraphView* targetVectorGraphModel) :
-	QMdiSubWindow(_parent)
+	QMdiSubWindow(_parent),
+	m_vectorGraphView(targetVectorGraphModel),
+	m_curAutomationModel(nullptr),
+	m_curAutomationModelKnob(nullptr),
+	m_automationLayout(nullptr),
+	m_lineTypeModel(nullptr, "", false),
+	m_automatedAttribModel(nullptr, "", false),
+	m_effectedAttribModel(nullptr, "", false),
+	m_effectModelA(nullptr, "", false),
+	m_effectModelB(nullptr, "", false),
+	m_effectModelC(nullptr, "", false)
 {
+
+	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model)
+	{
+        Knob* newKnob = new Knob(KnobType::Bright26, this);
+        newKnob->setModel(model);
+        newKnob->setLabel(label);
+        newKnob->setHintText(hintText, unit);
+        newKnob->setVolumeKnob(false);
+        return newKnob;
+    };
+
 	/*
 	setWindowIcon(embed::getIconPixmap("setup_audio"));
 	setWindowTitle(tr("Connection Settings"));
 	//setModal(true);
 */
-
 	setWindowTitle(tr("vector graph settings"));
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 	qDebug("VectorGraphControllerDialog Running");
+
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	resize(300, 500);
+
+	if (layout() != nullptr)
+	{
+		delete layout();
+		//m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+	}
+
+	QHBoxLayout* mainLayout = new QHBoxLayout(this);
+	mainLayout->setContentsMargins(5, 5, 5, 5);
+	setLayout(mainLayout);
+
+	QVBoxLayout* knobLayout = new QVBoxLayout(nullptr);
+	mainLayout->addLayout(knobLayout);
+	
+	for (size_t i = 0; i < m_controlFloatText.size(); i += 2)
+	{
+		FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, nullptr, QString(), false);
+		m_controlModelArray.push_back(curModel);
+		Knob* newKnob = makeKnob(m_controlFloatText[i + 1], m_controlFloatText[i], "%", curModel);
+		knobLayout->addWidget(newKnob);
+		knobLayout->setAlignment(newKnob, Qt::AlignHCenter);
+	}
+	
+	QVBoxLayout* settingLayout = new QVBoxLayout(nullptr);
+	mainLayout->addLayout(settingLayout);
+
+	for (size_t i = 0; i < m_controlLineTypeText.size(); i++)
+	{
+		m_lineTypeModel.addItem(m_controlLineTypeText[i], nullptr);
+	}
+	m_automatedAttribModel.addItem(m_controlFloatText[2], nullptr);
+	m_automatedAttribModel.addItem(m_controlFloatText[4], nullptr);
+	m_automatedAttribModel.addItem(m_controlFloatText[6], nullptr);
+	m_automatedAttribModel.addItem(m_controlFloatText[8], nullptr);
+	m_effectedAttribModel.addItem(m_controlFloatText[2], nullptr);
+	m_effectedAttribModel.addItem(m_controlFloatText[4], nullptr);
+	m_effectedAttribModel.addItem(m_controlFloatText[6], nullptr);
+	m_effectedAttribModel.addItem(m_controlFloatText[8], nullptr);
+	for (size_t i = 0; i < m_controlLineEffectText.size(); i++)
+	{
+		m_effectModelA.addItem(m_controlLineEffectText[i], nullptr);
+		m_effectModelB.addItem(m_controlLineEffectText[i], nullptr);
+		m_effectModelC.addItem(m_controlLineEffectText[i], nullptr);
+	}
+
+
+
+	QLabel* lineTypeLabel = new QLabel(tr("line type:"));
+	lineTypeLabel->setFixedSize(100, 20);
+	settingLayout->addWidget(lineTypeLabel);
+	settingLayout->setAlignment(lineTypeLabel, Qt::AlignHCenter);
+	ComboBox* lineTypeComboBox = new ComboBox(this);
+	lineTypeComboBox->setModel(&m_lineTypeModel);
+	lineTypeComboBox->setFixedSize(100, 20);
+	lineTypeComboBox->show();
+	settingLayout->addWidget(lineTypeComboBox);
+	settingLayout->setAlignment(lineTypeComboBox, Qt::AlignHCenter);
+
+	QLabel* automatedAttribLabel = new QLabel(tr("automated attribute:"));
+	automatedAttribLabel->setFixedSize(130, 20);
+	settingLayout->addWidget(automatedAttribLabel);
+	settingLayout->setAlignment(automatedAttribLabel, Qt::AlignHCenter);
+	ComboBox* automatedAttribComboBox = new ComboBox(this);
+	automatedAttribComboBox->setModel(&m_automatedAttribModel);
+	automatedAttribComboBox->setFixedSize(100, 20);
+	automatedAttribComboBox->show();
+	settingLayout->addWidget(automatedAttribComboBox);
+	settingLayout->setAlignment(automatedAttribComboBox, Qt::AlignHCenter);
+
+	QLabel* effectedAttribLabel = new QLabel(tr("effected attribute:"));
+	effectedAttribLabel->setFixedSize(130, 20);
+	settingLayout->addWidget(effectedAttribLabel);
+	settingLayout->setAlignment(effectedAttribLabel, Qt::AlignHCenter);
+	ComboBox* effectedAttribComboBox = new ComboBox(this);
+	effectedAttribComboBox->setModel(&m_effectedAttribModel);
+	effectedAttribComboBox->setFixedSize(100, 20);
+	effectedAttribComboBox->show();
+	settingLayout->addWidget(effectedAttribComboBox);
+	settingLayout->setAlignment(effectedAttribComboBox, Qt::AlignHCenter);
+
+	QLabel* effectedLabelA = new QLabel(tr("1. effect:"));
+	effectedLabelA->setFixedSize(100, 20);
+	settingLayout->addWidget(effectedLabelA);
+	settingLayout->setAlignment(effectedLabelA, Qt::AlignHCenter);
+	ComboBox* effectedComboBoxA = new ComboBox(this);
+	effectedComboBoxA->setModel(&m_effectModelA);
+	effectedComboBoxA->setFixedSize(100, 20);
+	effectedComboBoxA->show();
+	settingLayout->addWidget(effectedComboBoxA);
+	settingLayout->setAlignment(effectedComboBoxA, Qt::AlignHCenter);
+
+	QLabel* effectedLabelB = new QLabel(tr("2. effect:"));
+	effectedLabelB->setFixedSize(100, 20);
+	settingLayout->addWidget(effectedLabelB);
+	settingLayout->setAlignment(effectedLabelB, Qt::AlignHCenter);
+	ComboBox* effectedComboBoxB = new ComboBox(this);
+	effectedComboBoxB->setModel(&m_effectModelB);
+	effectedComboBoxB->setFixedSize(100, 20);
+	effectedComboBoxB->show();
+	settingLayout->addWidget(effectedComboBoxB);
+	settingLayout->setAlignment(effectedComboBoxB, Qt::AlignHCenter);
+
+	QLabel* effectedLabelC = new QLabel(tr("3. effect:"));
+	effectedLabelC->setFixedSize(100, 20);
+	settingLayout->addWidget(effectedLabelC);
+	settingLayout->setAlignment(effectedLabelC, Qt::AlignHCenter);
+	ComboBox* effectedComboBoxC = new ComboBox(this);
+	effectedComboBoxC->setModel(&m_effectModelC);
+	effectedComboBoxC->setFixedSize(100, 20);
+	effectedComboBoxC->show();
+	settingLayout->addWidget(effectedComboBoxC);
+	settingLayout->setAlignment(effectedComboBoxC, Qt::AlignHCenter);
+
+
+	m_automationLayout = new QVBoxLayout(nullptr);
+	mainLayout->addLayout(m_automationLayout);
+
+	QPushButton* effectPointButton = new QPushButton(tr("effect point"), this);
+	m_automationLayout->addWidget(effectPointButton);
+	m_automationLayout->setAlignment(effectPointButton, Qt::AlignHCenter);
+
+	QPushButton* effectLineButton = new QPushButton(tr("effect line"), this);
+	m_automationLayout->addWidget(effectLineButton);
+	m_automationLayout->setAlignment(effectLineButton, Qt::AlignHCenter);
+
+	QLabel* automationModelLabel = new QLabel(tr("only this\nkonb can be\nautomated:"));
+	automationModelLabel->setFixedSize(100, 60);
+	m_automationLayout->addWidget(automationModelLabel);
+	m_automationLayout->setAlignment(automationModelLabel, Qt::AlignHCenter);
+
 
 	/*
 	// Midi stuff
@@ -356,15 +515,57 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 }
 VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 {
+	for (auto i : m_controlModelArray)
+	{
+		if (i != nullptr)
+		{
+			delete i;
+		}
+	}
 
 }
-void VectorGraphCotnrolDialog::hideControls()
+void VectorGraphCotnrolDialog::hideAutomation()
 {
 
+	if (m_curAutomationModelKnob != nullptr)
+	{
+		m_automationLayout->removeWidget(m_curAutomationModelKnob);
+		delete m_curAutomationModelKnob;
+		m_curAutomationModelKnob = nullptr;
+	}
 }
 void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned int selectedLocation)
 {
+	qDebug("switch point 0: %d, %d", selectedArray, selectedLocation);
+	m_vectorGraphView->model()->getDataArray(selectedArray)->setAutomated(selectedLocation, true);
+	qDebug("switch point 0.5");
+	m_curAutomationModel = m_vectorGraphView->model()->getDataArray(selectedArray)->getAutomationModel(selectedLocation);
+	qDebug("switch point 1");
 
+	if (m_curAutomationModel == nullptr) { hideAutomation(); return; }
+
+	qDebug("switch point 2");
+	if (m_curAutomationModelKnob != nullptr)
+	{
+		if (m_curAutomationModel != m_curAutomationModelKnob->model())
+		{
+			qDebug("switch point 3");
+			m_curAutomationModelKnob->setModel(m_curAutomationModel);
+		}
+	}
+	else
+	{
+		qDebug("switch point 4");
+		m_curAutomationModelKnob = new Knob(KnobType::Bright26, this);
+		m_curAutomationModelKnob->setModel(m_curAutomationModel);
+		m_curAutomationModelKnob->setLabel(tr("automation knob"));
+		m_curAutomationModelKnob->setHintText(tr("automate this to automate a value of the vector graph"), "%");
+		m_curAutomationModelKnob->setVolumeKnob(false);
+
+		m_automationLayout->addWidget(m_curAutomationModelKnob);
+		m_automationLayout->setAlignment(m_curAutomationModelKnob, Qt::AlignHCenter);
+		//m_curAutomationModelKnob->show();
+	}
 }
 
 
