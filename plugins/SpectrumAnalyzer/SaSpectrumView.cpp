@@ -742,7 +742,7 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 
 	// Generate n dB increments, start checking at -90 dB. Limits are tweaked
 	// just a little bit to make sure float comparisons do not miss edges.
-	for (float i = 0.000000001; 10 * log10(i) <= (high + 0.001); i *= increment)
+	for (float i = 0.000000001f; 10 * log10(i) <= (high + 0.001); i *= increment)
 	{
 		if (10 * log10(i) >= (low - 0.001))
 		{

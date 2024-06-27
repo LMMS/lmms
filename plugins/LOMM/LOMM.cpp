@@ -57,8 +57,8 @@ LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 	m_hp2(m_sampleRate),
 	m_ap(m_sampleRate),
 	m_needsUpdate(true),
-	m_coeffPrecalc(-0.05),
-	m_crestTimeConst(0.999),
+	m_coeffPrecalc(-0.05f),
+	m_crestTimeConst(0.999f),
 	m_lookWrite(0),
 	m_lookBufLength(2)
 {
@@ -111,7 +111,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		m_lp1.setLowpass(m_lommControls.m_split1Model.value());
 		m_hp1.setHighpass(m_lommControls.m_split1Model.value());
-		m_ap.calcFilterCoeffs(m_lommControls.m_split1Model.value(), 0.70710678118);
+		m_ap.calcFilterCoeffs(m_lommControls.m_split1Model.value(), 0.70710678118f);
 	}
 	if (m_needsUpdate || m_lommControls.m_split2Model.isValueChanged())
 	{
