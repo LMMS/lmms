@@ -96,8 +96,8 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		const double pitch = pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value();
-		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * 0.5f;
+		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
+		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
 		
 		// interpolate pitch depending on glide
 		for (int i = 0; i < 2; ++i)
@@ -118,8 +118,8 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 			m_updatePitches = false;
 			
 			std::array<double, 2> speed = {
-				std::exp2(m_truePitch[0] * (1. / 12.)),
-				std::exp2(m_truePitch[1] * (1. / 12.))
+				std::exp2(m_truePitch[0]),
+				std::exp2(m_truePitch[1])
 			};
 			std::array<double, 2> ratio = {
 				speed[0] / m_speed[0],
@@ -275,12 +275,12 @@ void GranularPitchShifterEffect::changeSampleRate()
 	
 	m_dcCoeff = std::exp(-2.0 * F_PI * DcRemovalHz / m_sampleRate);
 
-	const float pitch = m_granularpitchshifterControls.m_pitchModel.value();
-	const float pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value() * 0.5f;
+	const float pitch = m_granularpitchshifterControls.m_pitchModel.value() * (1. / 12.);
+	const float pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value() * (1. / 24.);
 	m_truePitch[0] = pitch - pitchSpread;
 	m_truePitch[1] = pitch + pitchSpread;
-	m_speed[0] = std::exp2(m_truePitch[0] * (1. / 12.));
-	m_speed[1] = std::exp2(m_truePitch[1] * (1. / 12.));
+	m_speed[0] = std::exp2(m_truePitch[0]);
+	m_speed[1] = std::exp2(m_truePitch[1]);
 }
 
 
