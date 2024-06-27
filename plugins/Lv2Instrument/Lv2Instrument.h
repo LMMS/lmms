@@ -96,8 +96,6 @@ private:
 	std::array<int, NumKeys> m_runningNotes = {};
 #endif
 	void clearRunningNotes();
-
-	friend class gui::Lv2InsView;
 };
 
 
