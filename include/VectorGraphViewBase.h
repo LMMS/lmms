@@ -53,9 +53,6 @@ public:
 	VectorGraphViewBase(QWidget* parent);
 	~VectorGraphViewBase();
 
-protected slots:
-	virtual void contextMenuRemoveAutomation() = 0;
-	virtual void contextMenuExecConnectionDialog();
 protected:
 	// hints, SimpleTextFloat
 	void showHintText(QWidget* thisWidget, QString hintText, int msecBeforeDesplay, int msecDisplayTime);
@@ -64,18 +61,16 @@ protected:
 	void connectToAutomationTrack(QMouseEvent* me, FloatModel* automationModel, QWidget* thisWidget);
 
 	// context menu
-	void showContextMenu(const QPoint point, FloatModel* automationModel, QString displayName, QString controlName);
+	//void showContextMenu(const QPoint point, FloatModel* automationModel, QString displayName, QString controlName);
 
 	// inputDialog
 	std::pair<float, float> showCoordInputDialog(std::pair<float, float> pointPosition);
-	float showInputDialog(float curInputValue);
 
 private:
 	// context menu
-	void addDefaultActions(QMenu* menu, QString controlDisplayText);
+	//void addDefaultActions(QMenu* menu, QString controlDisplayText);
 
 	SimpleTextFloat* m_hintText;
-	FloatModel* m_curAutomationModel;
 };
 
 class VectorGraphView;
@@ -94,6 +89,7 @@ public slots:
 	void controlValueChanged();
 	void effectedPointClicked(bool isChecked);
 	void effectedLineClicked(bool isChecked);
+	void deleteAutomationClicked(bool isChecked);
 
 private:
 	void updateControls();

@@ -28,16 +28,13 @@
 
 #include <vector>
 #include <QInputDialog> // showInputDialog()
-#include <QMenu> // context menu
 #include <QLayout>
 #include <QLabel>
 #include <QPushButton>
 
 
 #include "StringPairDrag.h"
-#include "CaptionMenu.h" // context menu
 #include "embed.h" // context menu
-#include "MainWindow.h" // getting main window for context menu
 #include "GuiApplication.h" // getGUI
 #include "SimpleTextFloat.h"
 #include "AutomatableModel.h"
@@ -77,90 +74,8 @@ void VectorGraphViewBase::connectToAutomationTrack(QMouseEvent* me, FloatModel* 
 {
 	if (automationModel != nullptr)
 	{
-		qDebug("mousePress automation sent");
 		new gui::StringPairDrag("automatable_model", QString::number(automationModel->id()), QPixmap(), thisWidget);
 		me->accept();
-	}
-}
-
-void VectorGraphViewBase::showContextMenu(const QPoint point, FloatModel* automationModel, QString displayName, QString controlName)
-{
-	m_curAutomationModel = automationModel;
-	CaptionMenu contextMenu(displayName + QString(" - ") + controlName);
-	addDefaultActions(&contextMenu, controlName);
-	contextMenu.exec(point);
-}
-void VectorGraphViewBase::addDefaultActions(QMenu* menu, QString controlDisplayText)
-{
-	// context menu settings
-	menu->addAction(embed::getIconPixmap("reload"),
-		tr("name: ") + controlDisplayText,
-		this, SLOT(contextMenuRemoveAutomation()));
-	menu->addAction(embed::getIconPixmap("reload"),
-		tr("remove automation"),
-		this, SLOT(contextMenuRemoveAutomation()));
-	menu->addSeparator();
-
-	QString controllerTxt;
-
-	menu->addAction(embed::getIconPixmap("controller"),
-		tr("Connect to controller..."),
-		this, SLOT(contextMenuExecConnectionDialog()));
-	if(m_curAutomationModel != nullptr && m_curAutomationModel->controllerConnection() != nullptr)
-	{
-		Controller* cont = m_curAutomationModel->controllerConnection()->getController();
-		if(cont)
-		{
-			controllerTxt = AutomatableModel::tr( "Connected to %1" ).arg( cont->name() );
-		}
-		else
-		{
-			controllerTxt = AutomatableModel::tr( "Connected to controller" );
-		}
-
-
-		QMenu* contMenu = menu->addMenu(embed::getIconPixmap("controller"), controllerTxt);
-
-		contMenu->addAction(embed::getIconPixmap("cancel"),
-			tr("Remove connection"),
-			this, SLOT(contextMenuRemoveAutomation()));
-	}
-}
-
-void VectorGraphViewBase::contextMenuExecConnectionDialog()
-{
-	if (m_curAutomationModel != nullptr)
-	{
-		gui::ControllerConnectionDialog dialog(getGUI()->mainWindow(), m_curAutomationModel);
-
-		if (dialog.exec() == 1)
-		{
-			// Actually chose something
-			if (dialog.chosenController() != nullptr)
-			{
-				// Update
-				if (m_curAutomationModel->controllerConnection() != nullptr)
-				{
-					m_curAutomationModel->controllerConnection()->setController(dialog.chosenController());
-				}
-				else
-				{
-					// New
-					auto cc = new ControllerConnection(dialog.chosenController());
-					m_curAutomationModel->setControllerConnection(cc);
-				}
-			}
-			else
-			{
-				// no controller, so delete existing connection
-				contextMenuRemoveAutomation();
-			}
-		}
-		else
-		{
-			// did not return 1 -> delete the created floatModel
-			contextMenuRemoveAutomation();
-		}
 	}
 }
 
@@ -187,23 +102,6 @@ std::pair<float, float> VectorGraphViewBase::showCoordInputDialog(std::pair<floa
 	}
 	return pointPosition;
 }
-float VectorGraphViewBase::showInputDialog(float curInputValue)
-{
-	float output = 0.0f;
-
-	bool ok;
-	double changedPos = QInputDialog::getDouble(this, tr("Set value"),
-		tr("Please enter a new value between -100 and 100"),
-		static_cast<double>(curInputValue * 100.0f),
-		-100.0, 100.0, 2, &ok);
-	if (ok == true)
-	{
-		output = static_cast<float>(changedPos) / 100.0f;
-	}
-
-	return output;
-}
-
 
 VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraphView* targetVectorGraphModel) :
 	QMdiSubWindow(_parent),
@@ -235,12 +133,13 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 	//setModal(true);
 */
 	setWindowTitle(tr("vector graph settings"));
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-	qDebug("VectorGraphControllerDialog Running");
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	resize(300, 500);
+	setFixedSize(300, 500);
+
+	Qt::WindowFlags flags = windowFlags();
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	setWindowFlags(flags);
 
 	if (layout() != nullptr)
 	{
@@ -265,10 +164,6 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 
 		connect(curModel, &AutomatableModel::setValueEvent,
 				this, &VectorGraphCotnrolDialog::controlValueChanged);
-		/*
-		connect(curModel, SIGNAL(setValueEvent()),
-				this, SLOT(controlValueChanged()));
-				*/
 	}
 	
 	QVBoxLayout* settingLayout = new QVBoxLayout(nullptr);
@@ -373,6 +268,10 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 	m_automationLayout->addWidget(effectLineButton);
 	m_automationLayout->setAlignment(effectLineButton, Qt::AlignHCenter);
 
+	QPushButton* deleteAutomationButton = new QPushButton(tr("delete\nautomation"), this);
+	m_automationLayout->addWidget(deleteAutomationButton);
+	m_automationLayout->setAlignment(deleteAutomationButton, Qt::AlignHCenter);
+
 	QLabel* automationModelLabel = new QLabel(tr("only this\nkonb can be\nautomated:"));
 	automationModelLabel->setFixedSize(100, 60);
 	m_automationLayout->addWidget(automationModelLabel);
@@ -393,40 +292,17 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 	connect(&m_effectModelC, &AutomatableModel::setValueEvent,
 			this, &VectorGraphCotnrolDialog::controlValueChanged);
 
-	/*
-	connect(m_lineTypeModel, SIGNAL(setValueEvent()),
-			this, SLOT(controlValueChanged()));
-	connect(m_automatedAttribModel, SIGNAL(setValueEvent()),
-			this, SLOT(controlValueChanged()));
-	connect(m_effectedAttribModel, SIGNAL(setValueEvent()),
-			this, SLOT(controlValueChanged()));
-	connect(m_effectModelA, SIGNAL(setValueEvent()),
-			this, SLOT(controlValueChanged()));
-	connect(m_effectModelB, SIGNAL(setValueEvent()),
-			this, SLOT(controlValueChanged()));
-	connect(m_effectModelC, SIGNAL(setValueEvent()),
-			this, SLOT(controlValueChanged()));
-			*/
-
-		/*
-	connect(effectPointButton, SIGNAL(clicked()),
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
-			*/
 	QObject::connect(effectPointButton, SIGNAL(clicked(bool)),
-			//this, &VectorGraphCotnrolDialog::effectedPointClicked);
 			this, SLOT(effectedPointClicked(bool)));
 	QObject::connect(effectLineButton, SIGNAL(clicked(bool)),
 			this, SLOT(effectedLineClicked(bool)));
-	/*
-	QObject::connect(effectPointButton, SIGNAL(clicked()),
-			this, SLOT(pointEffectedButton));
-	QObject::connect(effectLineButton, SIGNAL(clicked()),
-			this, SLOT(lineEffectedButton)); //&VectorGraphCotnrolDialog::lineEffectedButton);
-			*/
+	QObject::connect(deleteAutomationButton, SIGNAL(clicked(bool)),
+			this, SLOT(deleteAutomationClicked(bool)));
 }
 
 VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 {
+	hideAutomation();
 	for (auto i : m_controlModelArray)
 	{
 		if (i != nullptr)
@@ -438,6 +314,7 @@ VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 
 void VectorGraphCotnrolDialog::hideAutomation()
 {
+	m_curAutomationModel = nullptr;
 	if (m_curAutomationModelKnob != nullptr)
 	{
 		// taking control of m_curAutomationModelKnob
@@ -478,49 +355,61 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 
 void VectorGraphCotnrolDialog::controlValueChanged()
 {
-	qDebug("val changed B");
 	updateVectorGraphAttribs();
 }
 
 void VectorGraphCotnrolDialog::effectedPointClicked(bool isChecked)
 {
-	qDebug("clikced A");
+	float currentValue = m_vectorGraphView->getInputAttribValue(11);
+	m_vectorGraphView->setInputAttribValue(11, currentValue >= 0.5f ? 0.0f : 1.0f);
 }
 
 void VectorGraphCotnrolDialog::effectedLineClicked(bool isChecked)
 {
-	qDebug("clikced B");
+	float currentValue = m_vectorGraphView->getInputAttribValue(12);
+	m_vectorGraphView->setInputAttribValue(12, currentValue >= 0.5f ? 0.0f : 1.0f);
+}
+void VectorGraphCotnrolDialog::deleteAutomationClicked(bool isChecked)
+{
+	if (m_curAutomationModel == nullptr) { return; }
+	
+	hideAutomation();
+	m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->setAutomated(m_curSelectedLocation, false);
 }
 
 void VectorGraphCotnrolDialog::updateControls()
 {
 	if (m_curAutomationModel == nullptr) { return; }
 
-	bool unusedBool = false;
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
-		m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i, &unusedBool));
+		m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i));
 	}
 
-	m_lineTypeModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(5, &unusedBool));
-	m_automatedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(6, &unusedBool));
-	m_effectedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(7, &unusedBool));
-	//m_effectModelA;
-	//m_effectModelB;
-	//m_effectModelC;
+	m_lineTypeModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(5));
+	m_automatedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(6));
+	m_effectedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(7));
+	m_effectModelA.setAutomatedValue(m_vectorGraphView->getInputAttribValue(8));
+	m_effectModelB.setAutomatedValue(m_vectorGraphView->getInputAttribValue(9));
+	m_effectModelC.setAutomatedValue(m_vectorGraphView->getInputAttribValue(10));
 }
 
 void VectorGraphCotnrolDialog::updateVectorGraphAttribs()
 {
 	if (m_curAutomationModel == nullptr) { return; }
 
-	qDebug("set input attrib value");
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
-		m_vectorGraphView->setInputAttribValue(static_cast<unsigned int>(i), m_controlModelArray[i]->value(), false);
+		m_vectorGraphView->setInputAttribValue(static_cast<unsigned int>(i), m_controlModelArray[i]->value());
 		//m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i, &unusedBool));
 	}
 
+	m_vectorGraphView->setInputAttribValue(5, m_lineTypeModel.value());
+	m_vectorGraphView->setInputAttribValue(6, m_automatedAttribModel.value());
+	m_vectorGraphView->setInputAttribValue(7, m_effectedAttribModel.value());
+	m_vectorGraphView->setInputAttribValue(8, m_effectModelA.value());
+	m_vectorGraphView->setInputAttribValue(9, m_effectModelB.value());
+	m_vectorGraphView->setInputAttribValue(10, m_effectModelC.value());
 }
 
 
