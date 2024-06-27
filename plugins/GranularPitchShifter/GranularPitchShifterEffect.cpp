@@ -276,7 +276,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_dcCoeff = std::exp(-2.0 * F_PI * DcRemovalHz / m_sampleRate);
 
 	const float pitch = m_granularpitchshifterControls.m_pitchModel.value();
-	const float pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value();
+	const float pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value() * 0.5f;
 	m_truePitch[0] = pitch - pitchSpread;
 	m_truePitch[1] = pitch + pitchSpread;
 	m_speed[0] = std::exp2(m_truePitch[0] * (1. / 12.));
