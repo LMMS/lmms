@@ -228,6 +228,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	m_tabWidget = new TabWidget( "", this, true, true );
+	m_tabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	// "-1" :
 	// in "TabWidget::addTab", under "Position tab's window", the widget is
 	// moved up by 1 pixel
@@ -277,18 +278,33 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( generalSettingsWidget );
 	// Use QWidgetItem explicitly to make the size hint change on instrument changes
 	// QLayout::addWidget() uses QWidgetItemV2 with size hint caching
-	auto widgetItem = new QWidgetItem(m_tabWidget);
-	vlayout->insertItem(1, widgetItem);
+
+	vlayout->addWidget( m_tabWidget, 1 );
 	m_tabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-	//vlayout->addWidget( m_tabWidget, 1 );
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
-	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
+	if (true)
+	{
+		subWin->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+		if (subWin->layout())
+		{
+			subWin->layout()->setSizeConstraint(QLayout::SetNoConstraint);
+		}
+	}
+	else
+	{
+		subWin->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+		if (subWin->layout())
+		{
+			subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+		}
+		Qt::WindowFlags flags = subWin->windowFlags();
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		flags &= ~Qt::WindowMaximizeButtonHint;
+		subWin->setWindowFlags( flags );
+	}
 
 	updateInstrumentView();
 

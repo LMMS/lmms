@@ -67,7 +67,15 @@ void InstrumentView::setModel( Model * _model, bool )
 	qDebug() << "SETMODEL";
 	InstrumentTrackWindow* itw = instrumentTrackWindow();
 	SubWindow* subWindow = qobject_cast<SubWindow*>(itw->parent());
-	if ( !isResizable() )
+	if ( isResizable() )
+	{
+		subWindow->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+		if (subWindow->layout())
+		{
+			subWindow->layout()->setSizeConstraint(QLayout::SetNoConstraint);
+		}
+	}
+	else
 	{
 		subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 		if (subWindow->layout())

@@ -297,7 +297,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		const char* binaryUri  = lilv_node_as_uri(lilv_ui_get_binary_uri(m_ui));
 		char* bundlePath = lilv_file_uri_parse(bundleUri, NULL);
 		char* binaryPath = lilv_file_uri_parse(binaryUri, NULL);
-		
+		qDebug() << "A";
 		m_uiInstance =
 			suil_instance_new(m_uiHost,
 				this,
@@ -316,13 +316,18 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		{
 			qDebug() << "Created new UI" << lilv_node_as_uri(lilv_ui_get_uri(m_ui)) << lilv_node_as_uri(m_uiType);
 		}
+		qDebug() << "B";
 	
 		lilv_free(binaryPath);
 		lilv_free(bundlePath);
 
 		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
-		m_uiInstanceWidget->setParent(this);
+		assert(m_uiInstanceWidget);
+		//m_uiInstanceWidget->setParent(this);
+		//layout()->addWidget(m_uiInstanceWidget);
+		m_uiInstanceWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		layout()->addWidget(m_uiInstanceWidget);
+		layout()->setSizeConstraint(QLayout::SetNoConstraint);
 
 		// connect UI ringbuffers
 		// about the order: Lv2Proc can reject sending plugin events as long as
@@ -335,6 +340,11 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 		initUi();  // send all control values to UI once
 
 		m_isResizable = calculateIsResizable();
+		if(m_isResizable) {
+			m_uiInstanceWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+			setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+			parent->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+		}
 		qDebug() << "RESIZABLE? " << m_isResizable;
 
 		m_timer = new Timer(this);

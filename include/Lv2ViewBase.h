@@ -69,7 +69,9 @@ public:
 	~Lv2ViewProc() override;
 
 	QSize uiWidgetSize() const;
-	bool isResizable() const { return true; /*m_isResizable;*/ /* TODO: temporary fix, see Discord, asked H-S */ }
+	bool isResizable() const {
+		qDebug() << "isResizable?" << m_isResizable;
+		return m_isResizable; /*m_isResizable;*/ /* TODO: temporary fix, see Discord, asked H-S */ }
 	void update();
 
 private:

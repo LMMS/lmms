@@ -48,7 +48,7 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	m_layout(new ControlLayout(this))
 {
 	setLayout(m_vbox);
-	m_vbox->addLayout(m_layout);
+	m_vbox->addLayout(m_layout, 0);
 	// This is required to remove the focus of the line edit
 	// when e.g. another spin box is being clicked.
 	// Removing the focus is wanted because in many cases, the user wants to
