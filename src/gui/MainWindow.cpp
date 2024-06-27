@@ -135,7 +135,7 @@ MainWindow::MainWindow() :
 		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
-	QString title = tr( "Root Directory" );
+	QString title = tr("Root Directory");
 	bool dirs_as_items = false;
 
 #ifdef LMMS_BUILD_APPLE
