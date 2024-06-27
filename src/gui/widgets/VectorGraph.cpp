@@ -32,15 +32,12 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
-#include <QMenu> // context menu
 #include <QMutex> // locking when getSamples
 
 
 #include "VectorGraphViewBase.h"
 #include "StringPairDrag.h"
-#include "CaptionMenu.h" // context menu
-#include "embed.h" // context menu
-#include "MainWindow.h" // getting main window for context menu
+#include "MainWindow.h" // getting main window for control dialog
 #include "GuiApplication.h" // getGUI
 #include "AutomatableModel.h"
 #include "ControllerConnectionDialog.h"
@@ -58,12 +55,14 @@ namespace lmms
 namespace gui
 {
 VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
-	unsigned int controlHeight, unsigned int controlDisplayCount, bool shouldApplyDefaultVectorGraphColors) :
+	unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors) :
 		VectorGraphViewBase(parent),
 		//QWidget(parent),
-		ModelView(new VectorGraphModel(2048, nullptr, false), this)
+		ModelView(new VectorGraphModel(2048, nullptr, false), this),
+		m_controlDialog(getGUI()->mainWindow(), this)
 {
 	resize(widgetWidth, widgetHeight);
+	m_controlDialog.hide();
 
 	m_mousePress = false;
 	m_addition = false;
@@ -84,8 +83,7 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 
 	m_graphHeight = height();
 	m_controlHeight = controlHeight;
-	m_controlDisplayCount = controlDisplayCount;
-	m_controlDisplayPage = 0;
+	m_controlDisplayCount = 2;
 	m_isEditingActive = false;
 	// set in .h
 	//m_controlText
@@ -109,15 +107,9 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 	{
 		applyDefaultColors();
 	}
-
-	m_controlDialog = nullptr;
 }
 VectorGraphView::~VectorGraphView()
 {
-	if (m_controlDialog == nullptr)
-	{
-		delete m_controlDialog;
-	}
 }
 
 void VectorGraphView::setLineColor(QColor color, unsigned int dataArrayLocation)
@@ -183,6 +175,7 @@ void VectorGraphView::setControlHeight(unsigned int controlHeight)
 }
 void VectorGraphView::setControlDisplayCount(unsigned int controlDisplayCount)
 {
+	// TODO remove
 	m_controlDisplayCount = controlDisplayCount;
 	updateGraph();
 }
@@ -248,6 +241,19 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 	m_addition = false;
 	m_mousePress = false;
 
+	// a point's FloatModel might be deleted after this
+	// cleaning up connected Knob in the dialog
+	m_controlDialog.hideAutomation();
+	m_controlDialog.hide();
+	if (m_isSelected == true)
+	{
+		FloatModel* curFloatModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
+		if (curFloatModel != nullptr && curFloatModel->isAutomatedOrControlled() == false)
+		{
+			model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, false);
+		}
+	}
+
 	if(me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier && m_isSelected == true)
 	{
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
@@ -273,7 +279,7 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 			m_addition = false;
 			m_mousePress = true;
 		}
-		if (isGraphPressed(x, m_graphHeight - y) == true)
+		if (isGraphPressed(m_graphHeight - y) == true)
 		{
 			// try selecting the clicked point (if it is near)
 			selectData(x, m_graphHeight - y);
@@ -331,7 +337,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 	// if the mouse was not moved a lot
 	if (m_mousePress == true) { return; }
 
-	if (isGraphPressed(x, m_lastScndTrackPoint.second) == true)
+	if (isGraphPressed(m_lastScndTrackPoint.second) == true)
 	{
 		if (m_isSelected == true && m_addition == true)
 		{
@@ -420,7 +426,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 	}
 	else if (isControlWindowPressed(m_lastScndTrackPoint.second) == true)
 	{
-		processControlWindowPressed(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, true, startMoving, x, m_graphHeight - y);
+		processControlWindowPressed(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, true, startMoving);
 	}
 }
 
@@ -433,7 +439,7 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 	int x = me->x();
 	int y = me->y();
 	// if did not drag and graph is pressed
-	if (m_mousePress == true && isGraphPressed(x, m_graphHeight - y) == true)
+	if (m_mousePress == true && isGraphPressed(m_graphHeight - y) == true)
 	{
 		model()->modelAddJournalCheckPoint();
 		// add/delete point
@@ -479,50 +485,7 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 	else if (m_mousePress == true && isControlWindowPressed(m_graphHeight - y) == true)
 	{
 		model()->modelAddJournalCheckPoint();
-		processControlWindowPressed(x, m_graphHeight - y, false, false, 0, 0);
-	}
-	else if (isGraphPressed(x, m_graphHeight - y) == false)
-	{
-		// if the "switch graph" button was pressed in editing mode
-		unsigned int oldSelectedArray = m_selectedArray;
-		m_selectedLocation = 0;
-		m_selectedArray = 0;
-		m_isLastSelectedArray = false;
-		m_isSelected = false;
-		m_isEditingActive = false;
-		m_isCurveSelected = false;
-
-		// looping throught the data arrays to get a new
-		// selected data array
-		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
-		{
-#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-			qDebug("mouseReleaseEvent select dataArray: i: [%d], m_selectedArray: %d, oldSelectedArray: %d", i, m_selectedArray, oldSelectedArray);
-#endif
-			if (model()->getDataArray(i)->getIsSelectable() == true)
-			{
-				// if this data array is the first one that is selectable
-				if (m_isLastSelectedArray == false)
-				{
-					m_selectedArray = i;
-					m_isLastSelectedArray = true;
-				}
-				// if this data array's location is bigger than the old location
-				// if this is false then m_selectedArray will equal to the first selectable array
-				if (i > oldSelectedArray)
-				{
-					m_selectedArray = i;
-					m_isLastSelectedArray = true;
-					break;
-				}
-			}
-		}
-#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-		qDebug("mouseReleaseEvent select dataArray final: %d", m_selectedArray);
-#endif
-
-		// hint text
-		hideHintText();
+		processControlWindowPressed(x, m_graphHeight - y, false, false);
 	}
 	m_mousePress = false;
 	m_addition = false;
@@ -540,11 +503,11 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 	qDebug("mouseDoubleClickEvent start");
 #endif
 	// get position
-	int x = me->x();
+	//int x = me->x();
 	int y = me->y();
 
 	// if a data/sample is selected then show input dialog to change the data
-	if (isGraphPressed(x, m_graphHeight - y) == true)
+	if (isGraphPressed(m_graphHeight - y) == true)
 	{
 		if (m_isSelected == true && me->button() == Qt::LeftButton)
 		{
@@ -552,23 +515,6 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 			PointF curData = showCoordInputDialog(getSelectedData());
 			// change data
 			setSelectedData(curData);
-		}
-	}
-	else if (isControlWindowPressed(m_graphHeight - y) == true)
-	{
-		m_mousePress = true;
-		int pressLocation = getPressedControlInput(x, m_graphHeight - y, m_controlDisplayCount + 1);
-		if (pressLocation >= 0 && pressLocation != m_controlDisplayCount)
-		{
-			unsigned int location = m_controlDisplayCount * m_controlDisplayPage + pressLocation;
-			if (location < m_controlText.size() && m_controlIsFloat[location] == true)
-			{
-				// unused bool
-				bool isTrue = false;
-				// set m_lastScndTrackPoint.first to the current input value
-				float curValue = getInputAttribValue(location, &isTrue);
-				setInputAttribValue(location, showInputDialog(curValue), isTrue);
-			}
 		}
 	}
 }
@@ -772,7 +718,6 @@ void VectorGraphView::paintEditing(QPainter* p)
 		VectorGraphDataArray* dataArray = model()->getDataArray(m_selectedArray);
 		QColor textColor = getTextColorFromBaseColor(*dataArray->getLineColor());
 		// background of float values
-		QColor backColor(getFillColorFromBaseColor(*dataArray->getFillColor()));
 		QColor foreColor = *dataArray->getLineColor();
 		if (dataArray->getFillColor()->alpha() > 0)
 		{
@@ -791,64 +736,22 @@ void VectorGraphView::paintEditing(QPainter* p)
 			controlTextCount = 6;
 		}
 
-		int segmentLength = width() / (m_controlDisplayCount + 1);
+		int segmentLength = width() / (m_controlDisplayCount);
 		// draw inputs
 		p->setPen(QPen(textColor, 1));
 		for (unsigned int i = 0; i < m_controlDisplayCount; i++)
 		{
-			int controlLocation = m_controlDisplayCount * m_controlDisplayPage + i;
-			if (controlLocation < controlTextCount)
-			{
-				if (m_controlIsFloat[controlLocation] == true)
-				{
-					QColor curBackColor = backColor;
-					QColor curForeColor = foreColor;
-					// unused bool
-					bool isTrue = false;
-					float inputValue = getInputAttribValue(controlLocation, &isTrue);
-					if (dataArray->getAutomationModel(m_selectedLocation) != nullptr  && static_cast<int>(getInputAttribValue(6, &isTrue)) == controlLocation - 1)
-					{
-						curForeColor = *dataArray->getAutomatedColor();
-						curBackColor = getFillColorFromBaseColor(curForeColor);
-					}
-					else if (dataArray->getIsAutomatableEffectable() == true && static_cast<int>(getInputAttribValue(7, &isTrue)) == controlLocation - 1)
-					{
-						curForeColor = *dataArray->getActiveColor();
-						curBackColor = getFillColorFromBaseColor(curForeColor);
-					}
-					p->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curBackColor);
-					p->fillRect(i * segmentLength, m_graphHeight, mapControlInputX(inputValue, segmentLength), m_controlHeight, curForeColor);
-					p->drawText(i * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize,
-						getTextFromDisplayLength(m_controlText[controlLocation], segmentLength));
-				}
-				else
-				{
-					QColor curForeColor = *dataArray->getFillColor();
-					bool isTrue = false;
-					getInputAttribValue(controlLocation, &isTrue);
-					if (isTrue == true)
-					{
-						curForeColor = *dataArray->getActiveColor();
-					}
-					p->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curForeColor);
-					p->drawText(i * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize,
-						getTextFromDisplayLength(m_controlText[controlLocation], segmentLength));
-				}
-			}
+			QColor curForeColor = *dataArray->getFillColor();
+			p->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curForeColor);
+			p->drawText(i * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize, m_controlText[i]);
 		}
 
-		// draw "next page" button
-		p->fillRect(m_controlDisplayCount * segmentLength, m_graphHeight, segmentLength, m_controlHeight, *dataArray->getFillColor());
-		p->setPen(textColor);
-		p->drawText(m_controlDisplayCount * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize, ">>");
-		// draw selected array display outline
-		p->setPen(*dataArray->getLineColor());
-		p->drawRect(0, 0, m_controlHeight, m_controlHeight);
 		// draw outline
+		p->setPen(QPen(*dataArray->getLineColor(), 1));
 		p->drawLine(0, m_graphHeight, width(), m_graphHeight);
-		for (unsigned int i = 1; i < m_controlDisplayCount + 1; i++)
+		for (unsigned int i = 1; i < m_controlDisplayCount; i++)
 		{
-			if (m_controlDisplayCount * m_controlDisplayPage + i < controlTextCount || i >= m_controlDisplayCount)
+			if (i < controlTextCount || i >= m_controlDisplayCount)
 			{
 				p->drawLine(i * segmentLength, m_graphHeight, i * segmentLength, height());
 			}
@@ -885,17 +788,6 @@ void VectorGraphView::updateDefaultColors()
 	if (m_isDefaultColorsApplyed == true)
 	{
 		applyDefaultColors();
-	}
-}
-void VectorGraphView::contextMenuRemoveAutomation()
-{
-#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-	qDebug("contextMenuRemoveAutomation: m_isSelected: %d, m_selectedArray: %d, m_selectedLocation: %d", m_isSelected, m_selectedArray, m_selectedLocation);
-#endif
-	if (m_isSelected == true)
-	{
-		// deleting the floatmodel will delete the connecitons
-		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, false);
 	}
 }
 
@@ -973,22 +865,9 @@ bool VectorGraphView::addPoint(unsigned int arrayLocation, int mouseX, int mouse
 	return output;
 }
 
-bool VectorGraphView::isGraphPressed(int mouseX, int mouseY)
+bool VectorGraphView::isGraphPressed(int mouseY)
 {
-	bool output = true;
-	// mouseY is calculated like this:
-	// m_graphHeight - y
-	if (m_isEditingActive == true && m_graphHeight - mouseY < m_controlHeight && mouseX < m_controlHeight)
-	{
-		// if switch selected data array was pressed
-		output = false;
-	}
-	else if (isControlWindowPressed(mouseY) == true)
-	{
-		// if the control window was pressed
-		output = false;
-	}
-	return output;
+	return !isControlWindowPressed(mouseY);
 }
 bool VectorGraphView::isControlWindowPressed(int mouseY)
 {
@@ -1001,131 +880,82 @@ bool VectorGraphView::isControlWindowPressed(int mouseY)
 	}
 	return output;
 }
-void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving, int curX, int curY)
+void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving)
 {
-	if (m_controlDialog == nullptr)
-	{
-		m_controlDialog = new VectorGraphCotnrolDialog(getGUI()->mainWindow(), this);
-	}
-	/*/
-	if (dialogB.exec() == 1)
-	{
-
-	}
-	*/
-
 	// mouseY is calculated like this:
 	// m_graphHeight - y
 	setCursor(Qt::ArrowCursor);
 
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-	qDebug("processControlWindowPressed: mouse (x, y): %d, %d, isDragging: %d, startMoving: %d, tracked position (x, y): %d, %d", mouseX, mouseY, isDragging, startMoving, curX, curY);
+	qDebug("processControlWindowPressed: mouse (x, y): %d, %d, isDragging: %d, startMoving: %d", mouseX, mouseY, isDragging, startMoving);
 #endif
 
 	if (m_isEditingActive == false) { return; }
 
-	int pressLocation = getPressedControlInput(mouseX, m_graphHeight - mouseY, m_controlDisplayCount + 1);
-	int location = m_controlDisplayCount * m_controlDisplayPage + pressLocation;
+	int pressLocation = getPressedControlInput(mouseX, m_graphHeight - mouseY, m_controlDisplayCount);
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-	qDebug("processControlWindowPressed: pressLocation: %d, control window location: %d, controlDiyplayPage: %d", pressLocation, location, m_controlDisplayPage);
+	qDebug("processControlWindowPressed: pressLocation: %d", pressLocation);
 #endif
-	if (isDragging == false && pressLocation == m_controlDisplayCount)
+	if (isDragging == false || (isDragging == true && startMoving == false))
 	{
-		// if the last button was pressed
-
-		// how many inputs are there
-		int controlTextCount = m_controlText.size();
-		if (m_isSelected == true)
+		if (pressLocation == 0)
 		{
-			if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == false)
+			m_controlDialog.show();
+			if (m_isSelected == true)
 			{
-				// x, y
-				controlTextCount = 2;
+				m_controlDialog.switchPoint(m_selectedArray, m_selectedLocation);
 			}
-			else if (model()->getDataArray(m_selectedArray)->getIsAutomatableEffectable() == false)
-			{
-				// x, y, curve, valA, valB, switch type
-				controlTextCount = 6;
-			}
+			hideHintText();
 		}
-
-		m_controlDisplayPage++;
-		if (m_controlDisplayCount * m_controlDisplayPage >= controlTextCount)
+		else if (pressLocation == 1)
 		{
-			m_controlDisplayPage = 0;
-		}
-		hideHintText();
-	}
-	else if (pressLocation >= 0 && location < m_controlText.size())
-	{
-		// pressLocation should always be bigger than -1
-		// if the control window was pressed
+			// if the "switch graph" button was pressed in editing mode
+			unsigned int oldSelectedArray = m_selectedArray;
+			m_selectedLocation = 0;
+			m_selectedArray = 0;
+			m_isLastSelectedArray = false;
+			m_isSelected = false;
+			m_isEditingActive = false;
+			m_isCurveSelected = false;
 
-		if (m_addition == false)
-		{
-			if (location >= 1 && location <= 4)
+			// looping throught the data arrays to get a new
+			// selected data array
+			for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 			{
-				// if the right mouse button was pressed on a automatabel attribute
-				// get context menu input text
-				QString controlDisplayText = m_controlText[location];
-				controlDisplayText = controlDisplayText + getTextForAutomatableEffectableOrType(location);
-				setInputAttribValue(6, location - 1, false);
-
-				// getting the currently selected point's FloatModel
-				model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
-				FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
-
-				// show context menu
-				showContextMenu(QCursor::pos(), curAutomationModel, model()->displayName(), controlDisplayText);
-			}
-		}
-		else if (isDragging == false && m_controlIsFloat[location] == false)
-		{
-			// if the input type is a bool
-
-			bool curBoolValue = true;
-			// if location is not at "set type" or "set automation location" or "set effect location"
-			// (else curBoolValue = true -> setInputAttribValue will add 1 to the attribute)
-			if (location < 5 || location > 7)
-			{
-				getInputAttribValue(location, &curBoolValue);
-				curBoolValue = !curBoolValue;
-			}
-			setInputAttribValue(location, 0.0f, curBoolValue);
-
-
-			// hint text
-			QString hintText = m_controlText[location];
-			hintText = hintText + getTextForAutomatableEffectableOrType(location);
-			showHintText(widget(), hintText, 5, 3500);
-		}
-		else if (isDragging == true && m_controlIsFloat[location] == true)
-		{
-			// if the input type is a float
-
-			// if the user just started to move the mouse it is pressed
-			if (startMoving == true)
-			{
-				// unused bool
-				bool isTrue = false;
-				// set m_lastScndTrackPoint.first to the current input value
-				m_lastScndTrackPoint.first = mapControlInputX(getInputAttribValue(location, &isTrue), m_graphHeight);
-
-				m_lastTrackPoint.first = curX;
-				m_lastTrackPoint.second = curY;
-			}
-			PointF convertedCoords = mapMousePos(0,
-				m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2);
-			setInputAttribValue(location, convertedCoords.second, false);
-
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-			qDebug("processControlWindowPressed dragging float: m_lastTrackPoint (x, y): %d, %d, m_lastScndTrackPoint (x, y): %d, %d,\n final coords (x, y): %f, %f",
-				m_lastTrackPoint.first, m_lastTrackPoint.second, m_lastScndTrackPoint.first,
-				m_lastScndTrackPoint.second, convertedCoords.first, convertedCoords.second);
+				qDebug("mouseReleaseEvent select dataArray: i: [%d], m_selectedArray: %d, oldSelectedArray: %d", i, m_selectedArray, oldSelectedArray);
+#endif
+				if (model()->getDataArray(i)->getIsSelectable() == true)
+				{
+					// if this data array is the first one that is selectable
+					if (m_isLastSelectedArray == false)
+					{
+						m_selectedArray = i;
+						m_isLastSelectedArray = true;
+					}
+					// if this data array's location is bigger than the old location
+					// if this is false then m_selectedArray will equal to the first selectable array
+					if (i > oldSelectedArray)
+					{
+						m_selectedArray = i;
+						m_isLastSelectedArray = true;
+						break;
+					}
+				}
+			}
+#ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
+			qDebug("mouseReleaseEvent select dataArray final: %d", m_selectedArray);
 #endif
 
 			// hint text
-			showHintText(widget(), m_controlText[location], 5, 3500);
+			if (m_selectedArray != oldSelectedArray)
+			{
+				showHintText(widget(), tr("selected graph changed"), 5, 3500);
+			}
+			else
+			{
+				showHintText(widget(), tr("unable to select other graph"), 5, 3500);
+			}
 		}
 	}
 }
@@ -1142,7 +972,7 @@ int VectorGraphView::getPressedControlInput(int mouseX, int mouseY, unsigned int
 	}
 	return output;
 }
-float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation, bool* valueOut)
+float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation)
 {
 	float output = 0.0f;
 	if (m_isSelected == false) { return output; }
@@ -1150,80 +980,54 @@ float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation, bo
 	switch (controlArrayLocation)
 	{
 		case 0:
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getX(m_selectedLocation);
 			break;
 		case 1:
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getY(m_selectedLocation);
 			break;
 		case 2:
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getC(m_selectedLocation);
 			break;
 		case 3:
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getValA(m_selectedLocation);
 			break;
 		case 4:
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getValB(m_selectedLocation);
 			break;
 		case 5:
 			// type
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getType(m_selectedLocation);
 			break;
 		case 6:
 			// automation location
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getAutomatedAttribLocation(m_selectedLocation);
 			break;
 		case 7:
 			// effect location
-			*valueOut = false;
 			output = model()->getDataArray(m_selectedArray)->getEffectedAttribLocation(m_selectedLocation);
 			break;
 		case 8:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffectPoints(m_selectedLocation);
+			output = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 0);
 			break;
 		case 9:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffectLines(m_selectedLocation);
+			output = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 1);
 			break;
 		case 10:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 0);
+			output = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 2);
 			break;
 		case 11:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 1);
+			output = model()->getDataArray(m_selectedArray)->getEffectPoints(m_selectedLocation) ? 1.0f : 0.0f;
 			break;
 		case 12:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 2);
-			break;
-		case 13:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 3);
-			break;
-		case 14:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 4);
-			break;
-		case 15:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 5);
-			break;
-		case 16:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 6);
-			break;
-		case 17:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 7);
-			break;
-		case 18:
-			*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 8);
+			output = model()->getDataArray(m_selectedArray)->getEffectLines(m_selectedLocation) ? 1.0f : 0.0f;
 			break;
 	}
 	return output;
 }
-void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, float floatValue, bool boolValue)
+void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, float floatValue)
 {
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-	qDebug("setInputAttribute start: control input: %d, set floatValue: %f, set boolValue: %d", controlArrayLocation, floatValue, boolValue);
+	qDebug("setInputAttribute start: control input: %d, set floatValue: %f", controlArrayLocation, floatValue);
 #endif
 	if (m_isSelected == false) { return; }
 
@@ -1248,87 +1052,36 @@ void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, flo
 			break;
 		case 5:
 			// type
-			clampedValueB = 0;
-			if (boolValue == true)
-			{
-				clampedValueB = model()->getDataArray(m_selectedArray)->getType(m_selectedLocation) + 1;
-				if (clampedValueB > 5)
-				{
-					clampedValueB = 0;
-				}
-			}
-			else
-			{
-				clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 5.0f));
-			}
+			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 5.0f));
 			model()->getDataArray(m_selectedArray)->setType(m_selectedLocation, clampedValueB);
 			break;
 		case 6:
 			// automation location
-			clampedValueB = 0;
-			if (boolValue == true)
-			{
-				clampedValueB = model()->getDataArray(m_selectedArray)->getAutomatedAttribLocation(m_selectedLocation) + 1;
-				if (clampedValueB > 4)
-				{
-					clampedValueB = 0;
-				}
-			}
-			else
-			{
-				clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 4.0f));
-			}
+			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 4.0f));
 			model()->getDataArray(m_selectedArray)->setAutomatedAttrib(m_selectedLocation, clampedValueB);
 			break;
 		case 7:
 			// effect location
-			clampedValueB = 0;
-			if (boolValue == true)
-			{
-				clampedValueB = model()->getDataArray(m_selectedArray)->getEffectedAttribLocation(m_selectedLocation) + 1;
-				if (clampedValueB > 4)
-				{
-					clampedValueB = 0;
-				}
-			}
-			else
-			{
-				clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 4.0f));
-			}
+			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 4.0f));
 			model()->getDataArray(m_selectedArray)->setEffectedAttrib(m_selectedLocation, clampedValueB);
 			break;
 		case 8:
-			model()->getDataArray(m_selectedArray)->setEffectPoints(m_selectedLocation, boolValue);
+			clampedValueB = static_cast<unsigned int>(floatValue);
+			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, clampedValueB);
 			break;
 		case 9:
-			model()->getDataArray(m_selectedArray)->setEffectLines(m_selectedLocation, boolValue);
+			clampedValueB = static_cast<unsigned int>(floatValue);
+			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, clampedValueB);
 			break;
 		case 10:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, boolValue);
+			clampedValueB = static_cast<unsigned int>(floatValue);
+			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, clampedValueB);
 			break;
 		case 11:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, boolValue);
+			model()->getDataArray(m_selectedArray)->setEffectPoints(m_selectedLocation, floatValue >= 0.5f);
 			break;
 		case 12:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, boolValue);
-			break;
-		case 13:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 3, boolValue);
-			break;
-		case 14:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 4, boolValue);
-			break;
-		case 15:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 5, boolValue);
-			break;
-		case 16:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 6, boolValue);
-			break;
-		case 17:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 7, boolValue);
-			break;
-		case 18:
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 8, boolValue);
+			model()->getDataArray(m_selectedArray)->setEffectLines(m_selectedLocation, floatValue >= 0.5f);
 			break;
 	}
 }
@@ -1371,53 +1124,6 @@ QColor VectorGraphView::getFillColorFromBaseColor(QColor baseColor)
 		output = QColor(static_cast<int>(static_cast<float>(baseColor.red()) * 0.78f + colorSum * 0.17f) + brighten,
 			static_cast<int>(static_cast<float>(baseColor.green()) * 0.78f + colorSum * 0.17f) + brighten,
 			static_cast<int>(static_cast<float>(baseColor.blue()) * 0.78f + colorSum * 0.17f) + brighten, 255);
-	}
-	return output;
-}
-QString VectorGraphView::getTextFromDisplayLength(QString text, unsigned int displayLength)
-{
-	// estimating text length
-	int charLength = static_cast<int>(m_fontSize * 0.65f);
-	QString output = "";
-	int targetSize = displayLength / charLength < text.size() ? displayLength / charLength : text.size();
-	if (targetSize != text.size())
-	{
-		for (unsigned int i = 0; i < targetSize; i++)
-		{
-			if (i + 2 < targetSize)
-			{
-				output = output + text[i];
-			}
-			else
-			{
-				output = output + QString(".");
-			}
-		}
-	}
-	else
-	{
-		output = text;
-	}
-	return output;
-}
-QString VectorGraphView::getTextForAutomatableEffectableOrType(unsigned int controlLocation)
-{
-	QString output;
-	if (controlLocation >= 5 && controlLocation <= 7)
-	{
-		bool isTrue = false;
-		int typeVal = static_cast<int>(getInputAttribValue(controlLocation, &isTrue));
-		if (controlLocation == 5)
-		{
-			if (typeVal < m_controlLineTypeText.size())
-			{
-				output = QString(" (") + m_controlLineTypeText[typeVal] + QString(")");
-			}
-		}
-		else
-		{
-			output = QString(tr(" (controls: ")) + m_controlText[1 + typeVal] + QString(")");
-		}
 	}
 	return output;
 }
@@ -2711,7 +2417,7 @@ void VectorGraphDataArray::setEffectedAttrib(unsigned int pointLocation, unsigne
 	// clamp only 4 attributes can be automated (y, c, valA, valB)
 	attribLocation = attribLocation > 3 ? 0 : attribLocation;
 	// set effected location correctly
-	m_dataArray[pointLocation].m_automatedEffectedAttribLocations = attribLocation + getAutomatedAttribLocation(pointLocation);
+	m_dataArray[pointLocation].m_automatedEffectedAttribLocations = attribLocation + getAutomatedAttribLocation(pointLocation) * 4;
 
 	getUpdatingFromPoint(pointLocation);
 	// if the current point can effect the line before it
@@ -2785,72 +2491,33 @@ void VectorGraphDataArray::setEffectLines(unsigned int pointLocation, bool bValu
 		dataChanged();
 	}
 }
-bool VectorGraphDataArray::getEffect(unsigned int pointLocation, unsigned int effectId)
+unsigned int VectorGraphDataArray::getEffect(unsigned int pointLocation, unsigned int effectSlot)
 {
-	switch (effectId)
+	switch (effectSlot)
 	{
 		case 0:
-			return m_dataArray[pointLocation].m_effectAdd;
-			break;
+			return m_dataArray[pointLocation].m_effectTypeA;
 		case 1:
-			return m_dataArray[pointLocation].m_effectSubtract;
-			break;
+			return m_dataArray[pointLocation].m_effectTypeB;
 		case 2:
-			return m_dataArray[pointLocation].m_effectMultiply;
-			break;
-		case 3:
-			return m_dataArray[pointLocation].m_effectDivide;
-			break;
-		case 4:
-			return m_dataArray[pointLocation].m_effectPower;
-			break;
-		case 5:
-			return m_dataArray[pointLocation].m_effectLog;
-			break;
-		case 6:
-			return m_dataArray[pointLocation].m_effectSine;
-			break;
-		case 7:
-			return m_dataArray[pointLocation].m_effectClampLower;
-			break;
-		case 8:
-			return m_dataArray[pointLocation].m_effectClampUpper;
-			break;
+			return m_dataArray[pointLocation].m_effectTypeC;
 	}
-	return false;
+	return 0;
 }
-void VectorGraphDataArray::setEffect(unsigned int pointLocation, unsigned int effectId, bool bValue)
+void VectorGraphDataArray::setEffect(unsigned int pointLocation, unsigned int effectSlot, unsigned int effectType)
 {
 	if (m_isAutomatableEffectable == false || m_isEditableAttrib == false) { return; }
 
-	switch (effectId)
+	switch (effectSlot)
 	{
 		case 0:
-			m_dataArray[pointLocation].m_effectAdd = bValue;
+			m_dataArray[pointLocation].m_effectTypeA = effectType;
 			break;
 		case 1:
-			m_dataArray[pointLocation].m_effectSubtract = bValue;
+			m_dataArray[pointLocation].m_effectTypeB = effectType;
 			break;
 		case 2:
-			m_dataArray[pointLocation].m_effectMultiply = bValue;
-			break;
-		case 3:
-			m_dataArray[pointLocation].m_effectDivide = bValue;
-			break;
-		case 4:
-			m_dataArray[pointLocation].m_effectPower = bValue;
-			break;
-		case 5:
-			m_dataArray[pointLocation].m_effectLog = bValue;
-			break;
-		case 6:
-			m_dataArray[pointLocation].m_effectSine = bValue;
-			break;
-		case 7:
-			m_dataArray[pointLocation].m_effectClampLower = bValue;
-			break;
-		case 8:
-			m_dataArray[pointLocation].m_effectClampUpper = bValue;
+			m_dataArray[pointLocation].m_effectTypeC = effectType;
 			break;
 	}
 	getUpdatingFromPoint(pointLocation);
@@ -3115,6 +2782,10 @@ float VectorGraphDataArray::processEffect(unsigned int pointLocation, float attr
 	// effects
 	if (getEffectedAttribLocation(pointLocation) == attribLocation)
 	{
+		output = processSingleEffect(pointLocation, 0, output, effectValue);
+		output = processSingleEffect(pointLocation, 1, output, effectValue);
+		output = processSingleEffect(pointLocation, 2, output, effectValue);
+		/*
 		if (getEffect(pointLocation, 6) == true)
 		{
 			// sine
@@ -3163,12 +2834,74 @@ float VectorGraphDataArray::processEffect(unsigned int pointLocation, float attr
 			// clamp upper
 			output = std::min(effectValue, output);
 		}
+		*/
 
 		// clamp
 		output = std::clamp(output, -1.0f, 1.0f);
 	}
 	return output;
 }
+
+float VectorGraphDataArray::processSingleEffect(unsigned int pointLocation, unsigned int effectSlot,
+	float attribValue, float effectValue)
+{
+	// calculating an effect on attribValue
+	float output = attribValue;
+
+	// none
+	if (getEffect(pointLocation, effectSlot) == 0) { return output; }
+
+	// effects
+	if (getEffect(pointLocation, effectSlot) == 1)
+	{
+		// add
+		output += effectValue;
+	}
+	else if (getEffect(pointLocation, effectSlot) == 2)
+	{
+		// subtract
+		output -= effectValue;
+	}
+	else if (getEffect(pointLocation, effectSlot) == 3)
+	{
+		// multiply
+		output = output * 5.0f * effectValue;
+	}
+	else if (getEffect(pointLocation, effectSlot) == 4 && effectValue != 0.0f)
+	{
+		// divide
+		output = output / 5.0f / effectValue;
+	}
+	else if (getEffect(pointLocation, effectSlot) == 5 && output > 0.0f)
+	{
+		// power
+		output = std::pow(output, effectValue * 5.0f);
+		output = std::clamp(output, -1.0f, 1.0f);
+	}
+	else if (getEffect(pointLocation, effectSlot) == 6 && output > 0.0f && effectValue > 0.0f)
+	{
+		// log
+		output = std::log(output) / std::log(effectValue);
+		output = std::clamp(output, -1.0f, 1.0f);
+	}
+	else if (getEffect(pointLocation, effectSlot) == 7)
+	{
+		// sine
+		output = output + std::sin(effectValue * 100.0f);
+	}
+	else if (getEffect(pointLocation, effectSlot) == 8)
+	{
+		// clamp lower
+		output = std::max(effectValue, output);
+	}
+	else if (getEffect(pointLocation, effectSlot) == 9)
+	{
+		// clamp upper
+		output = std::min(effectValue, output);
+	}
+	return output;
+}
+
 float VectorGraphDataArray::processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation)
 {
 	// adding the automation value to attribValue
