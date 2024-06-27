@@ -281,6 +281,9 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_truePitch[1] = pitch + pitchSpread;
 	m_speed[0] = std::exp2(m_truePitch[0]);
 	m_speed[1] = std::exp2(m_truePitch[1]);
+
+	// "warm up" the plugin by spawning in all of the grains immediately
+	startRunning();
 }
 
 
