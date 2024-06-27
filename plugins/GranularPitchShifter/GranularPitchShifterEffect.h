@@ -168,7 +168,7 @@ private:
 	int m_ringBufLength = 0;
 	int m_writePoint = 0;
 	int m_grainCount = 0;
-	int m_timeSinceLastGrain = 0;
+	int m_timeSinceLastGrain = 999999999;
 
 	double m_oldGlide = -1;
 	double m_glideCoef = 0;
