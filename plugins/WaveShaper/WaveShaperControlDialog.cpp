@@ -102,10 +102,8 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 
 void WaveShaperControlDialog::simplifyClicked()
 {
-	qDebug("simplifyClicked run");
 	if (m_vectorGraphWidget != nullptr)
 	{
-		qDebug("simplifyClicked turn on");
 		m_vectorGraphWidget->setIsSimplified(!m_vectorGraphWidget->getIsSimplified());
 		m_vectorGraphWidget->model()->updateGraphModel(true);
 	}
