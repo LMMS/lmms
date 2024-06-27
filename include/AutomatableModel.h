@@ -437,7 +437,7 @@ public:
 		return AutomatableModel::value<T>( frameOffset );
 	}
 
-	float valueAt(size_t index, int frameOffset = 0)
+	T valueAt(size_t index, int frameOffset = 0)
     {
 		const auto buffer = valueBuffer();
 		size_t clampedIndex = std::clamp<size_t>(index, 0, buffer->size());
