@@ -257,11 +257,18 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 	
 	for (size_t i = 0; i < m_controlFloatText.size(); i += 2)
 	{
-		FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, nullptr, QString(), false);
+		FloatModel* curModel = new FloatModel(0.0f, (i == 0 ? 0.0f : -1.0f), 1.0f, 0.01f, nullptr, QString(), false);
 		m_controlModelArray.push_back(curModel);
 		Knob* newKnob = makeKnob(m_controlFloatText[i + 1], m_controlFloatText[i], "%", curModel);
 		knobLayout->addWidget(newKnob);
 		knobLayout->setAlignment(newKnob, Qt::AlignHCenter);
+
+		connect(curModel, &AutomatableModel::setValueEvent,
+				this, &VectorGraphCotnrolDialog::controlValueChanged);
+		/*
+		connect(curModel, SIGNAL(setValueEvent()),
+				this, SLOT(controlValueChanged()));
+				*/
 	}
 	
 	QVBoxLayout* settingLayout = new QVBoxLayout(nullptr);
@@ -371,148 +378,53 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 	m_automationLayout->addWidget(automationModelLabel);
 	m_automationLayout->setAlignment(automationModelLabel, Qt::AlignHCenter);
 
+	show();
+
+	connect(&m_lineTypeModel, &AutomatableModel::setValueEvent,
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
+	connect(&m_automatedAttribModel, &AutomatableModel::setValueEvent,
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
+	connect(&m_effectedAttribModel, &AutomatableModel::setValueEvent,
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
+	connect(&m_effectModelA, &AutomatableModel::setValueEvent,
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
+	connect(&m_effectModelB, &AutomatableModel::setValueEvent,
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
+	connect(&m_effectModelC, &AutomatableModel::setValueEvent,
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
 
 	/*
-	// Midi stuff
-	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
-	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
-	connect( m_midiGroupBox->model(), SIGNAL(dataChanged()),
-			this, SLOT(midiToggled()));
-	
-	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
-			tr( "Input channel" ) );
-	m_midiChannelSpinBox->addTextForValue( 0, "--" );
-	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_midiChannelSpinBox->move( 8, 24 );
+	connect(m_lineTypeModel, SIGNAL(setValueEvent()),
+			this, SLOT(controlValueChanged()));
+	connect(m_automatedAttribModel, SIGNAL(setValueEvent()),
+			this, SLOT(controlValueChanged()));
+	connect(m_effectedAttribModel, SIGNAL(setValueEvent()),
+			this, SLOT(controlValueChanged()));
+	connect(m_effectModelA, SIGNAL(setValueEvent()),
+			this, SLOT(controlValueChanged()));
+	connect(m_effectModelB, SIGNAL(setValueEvent()),
+			this, SLOT(controlValueChanged()));
+	connect(m_effectModelC, SIGNAL(setValueEvent()),
+			this, SLOT(controlValueChanged()));
+			*/
 
-	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
-			tr( "Input controller" ) );
-	m_midiControllerSpinBox->addTextForValue(MidiController::NONE, "---" );
-	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
-	m_midiControllerSpinBox->move( 68, 24 );
-	
-
-	m_midiAutoDetectCheckBox =
-			new LedCheckBox( tr("Auto Detect"),
-				m_midiGroupBox, tr("Auto Detect") );
-	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
-	m_midiAutoDetectCheckBox->move( 8, 60 );
-	connect( &m_midiAutoDetect, SIGNAL(dataChanged()),
-			this, SLOT(autoDetectToggled()));
-
-	// when using with non-raw-clients we can provide buttons showing
-	// our port-menus when being clicked
-	if( !Engine::audioEngine()->midiClient()->isRaw() )
-	{
-		m_readablePorts = new MidiPortMenu( MidiPort::Mode::Input );
-		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
-				this, SLOT(enableAutoDetect(QAction*)));
-		auto rp_btn = new ToolButton(m_midiGroupBox);
-		rp_btn->setText( tr( "MIDI-devices to receive "
-						"MIDI-events from" ) );
-		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
-		rp_btn->setGeometry( 160, 24, 32, 32 );
-		rp_btn->setMenu( m_readablePorts );
-		rp_btn->setPopupMode( QToolButton::InstantPopup );
-	}
-
-
-	// User stuff
-	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
-	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
-	connect( m_userGroupBox->model(), SIGNAL(dataChanged()),
-			this, SLOT(userToggled()));
-
-	m_userController = new ComboBox( m_userGroupBox, "Controller" );
-	m_userController->setGeometry( 10, 24, 200, ComboBox::DEFAULT_HEIGHT );
-	for (Controller * c : Engine::getSong()->controllers())
-	{
-		m_userController->model()->addItem( c->name() );
-	}
-	connect( m_userController->model(), SIGNAL(dataUnchanged()),
-			this, SLOT(userSelected()));
-	connect( m_userController->model(), SIGNAL(dataChanged()),
-			this, SLOT(userSelected()));
-
-
-	// Mapping functions
-	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
-	m_mappingBox->setGeometry( 8, 170, 240, 64 );
-	m_mappingFunction = new QLineEdit( m_mappingBox );
-	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
-	m_mappingFunction->setText( "input" );
-	m_mappingFunction->setReadOnly( true );
-
-
-	// Buttons
-	auto buttons = new QWidget(this);
-	buttons->setGeometry( 8, 240, 240, 32 );
-
-	auto btn_layout = new QHBoxLayout(buttons);
-	btn_layout->setSpacing( 0 );
-	btn_layout->setContentsMargins(0, 0, 0, 0);
-
-	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
-	connect( select_btn, SIGNAL(clicked()), 
-				this, SLOT(selectController()));
-
-	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), buttons);
-	connect( cancel_btn, SIGNAL(clicked()),
-				this, SLOT(reject()));
-
-	btn_layout->addStretch();
-	btn_layout->addSpacing( 10 );
-	btn_layout->addWidget( select_btn );
-	btn_layout->addSpacing( 10 );
-	btn_layout->addWidget( cancel_btn );
-	btn_layout->addSpacing( 10 );
-
-	setFixedSize( 256, 280 );
-
-	// Crazy MIDI View stuff
-	
-	// TODO, handle by making this a model for the Dialog "view"
-	ControllerConnection * cc = nullptr;
-	if( m_targetModel )
-	{
-		cc = m_targetModel->controllerConnection();
-
-		if( cc && cc->getController()->type() != Controller::ControllerType::Dummy && Engine::getSong() )
-		{
-			if ( cc->getController()->type() == Controller::ControllerType::Midi )
-			{
-				m_midiGroupBox->model()->setValue( true );
-				// ensure controller is created
-				midiToggled();
-
-				auto cont = (MidiController*)(cc->getController());
-				m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
-				m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
-
-				m_midiController->subscribeReadablePorts( static_cast<MidiController*>( cc->getController() )->m_midiPort.readablePorts() );
-			}
-			else
-			{
-				auto& controllers = Engine::getSong()->controllers();
-				auto it = std::find(controllers.begin(), controllers.end(), cc->getController());
-
-				if (it != controllers.end())
-				{
-					int idx = std::distance(controllers.begin(), it);
-					m_userGroupBox->model()->setValue( true );
-					m_userController->model()->setValue( idx );
-				}
-			}
-		}
-	}
-
-	if( !cc )
-	{
-		m_midiGroupBox->model()->setValue( true );
-	}
-*/
-	show();
+		/*
+	connect(effectPointButton, SIGNAL(clicked()),
+			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			*/
+	QObject::connect(effectPointButton, SIGNAL(clicked(bool)),
+			//this, &VectorGraphCotnrolDialog::effectedPointClicked);
+			this, SLOT(effectedPointClicked(bool)));
+	QObject::connect(effectLineButton, SIGNAL(clicked(bool)),
+			this, SLOT(effectedLineClicked(bool)));
+	/*
+	QObject::connect(effectPointButton, SIGNAL(clicked()),
+			this, SLOT(pointEffectedButton));
+	QObject::connect(effectLineButton, SIGNAL(clicked()),
+			this, SLOT(lineEffectedButton)); //&VectorGraphCotnrolDialog::lineEffectedButton);
+			*/
 }
+
 VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 {
 	for (auto i : m_controlModelArray)
@@ -522,13 +434,13 @@ VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 			delete i;
 		}
 	}
-
 }
+
 void VectorGraphCotnrolDialog::hideAutomation()
 {
-
 	if (m_curAutomationModelKnob != nullptr)
 	{
+		// taking control of m_curAutomationModelKnob
 		m_automationLayout->removeWidget(m_curAutomationModelKnob);
 		delete m_curAutomationModelKnob;
 		m_curAutomationModelKnob = nullptr;
@@ -536,26 +448,22 @@ void VectorGraphCotnrolDialog::hideAutomation()
 }
 void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned int selectedLocation)
 {
-	qDebug("switch point 0: %d, %d", selectedArray, selectedLocation);
+	m_curSelectedArray = selectedArray;
+	m_curSelectedLocation = selectedLocation;
 	m_vectorGraphView->model()->getDataArray(selectedArray)->setAutomated(selectedLocation, true);
-	qDebug("switch point 0.5");
 	m_curAutomationModel = m_vectorGraphView->model()->getDataArray(selectedArray)->getAutomationModel(selectedLocation);
-	qDebug("switch point 1");
 
 	if (m_curAutomationModel == nullptr) { hideAutomation(); return; }
 
-	qDebug("switch point 2");
 	if (m_curAutomationModelKnob != nullptr)
 	{
 		if (m_curAutomationModel != m_curAutomationModelKnob->model())
 		{
-			qDebug("switch point 3");
 			m_curAutomationModelKnob->setModel(m_curAutomationModel);
 		}
 	}
 	else
 	{
-		qDebug("switch point 4");
 		m_curAutomationModelKnob = new Knob(KnobType::Bright26, this);
 		m_curAutomationModelKnob->setModel(m_curAutomationModel);
 		m_curAutomationModelKnob->setLabel(tr("automation knob"));
@@ -564,8 +472,55 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 
 		m_automationLayout->addWidget(m_curAutomationModelKnob);
 		m_automationLayout->setAlignment(m_curAutomationModelKnob, Qt::AlignHCenter);
-		//m_curAutomationModelKnob->show();
 	}
+	updateControls();
+}
+
+void VectorGraphCotnrolDialog::controlValueChanged()
+{
+	qDebug("val changed B");
+	updateVectorGraphAttribs();
+}
+
+void VectorGraphCotnrolDialog::effectedPointClicked(bool isChecked)
+{
+	qDebug("clikced A");
+}
+
+void VectorGraphCotnrolDialog::effectedLineClicked(bool isChecked)
+{
+	qDebug("clikced B");
+}
+
+void VectorGraphCotnrolDialog::updateControls()
+{
+	if (m_curAutomationModel == nullptr) { return; }
+
+	bool unusedBool = false;
+	for (size_t i = 0; i < m_controlModelArray.size(); i++)
+	{
+		m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i, &unusedBool));
+	}
+
+	m_lineTypeModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(5, &unusedBool));
+	m_automatedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(6, &unusedBool));
+	m_effectedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(7, &unusedBool));
+	//m_effectModelA;
+	//m_effectModelB;
+	//m_effectModelC;
+}
+
+void VectorGraphCotnrolDialog::updateVectorGraphAttribs()
+{
+	if (m_curAutomationModel == nullptr) { return; }
+
+	qDebug("set input attrib value");
+	for (size_t i = 0; i < m_controlModelArray.size(); i++)
+	{
+		m_vectorGraphView->setInputAttribValue(static_cast<unsigned int>(i), m_controlModelArray[i]->value(), false);
+		//m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i, &unusedBool));
+	}
+
 }
 
 

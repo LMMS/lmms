@@ -90,19 +90,26 @@ public:
 	void hideAutomation();
 	void switchPoint(unsigned int selectedArray, unsigned int selectedLocation);
 
-signals:
+public slots:
 	void controlValueChanged();
-	void pointEffectedButton();
-	void lineEffectedButton();
+	void effectedPointClicked(bool isChecked);
+	void effectedLineClicked(bool isChecked);
 
 private:
 	void updateControls();
+	void updateVectorGraphAttribs();
 
 	VectorGraphView* m_vectorGraphView;
 
 	FloatModel* m_curAutomationModel;
 	Knob* m_curAutomationModelKnob;
 	QVBoxLayout* m_automationLayout;
+	// VectorGraphView should run hideAutomation()
+	// to notify that these are invalid
+	// selected VectorGraphDataArray
+	unsigned int m_curSelectedArray;
+	// selected VectorGraphPoint
+	unsigned int m_curSelectedLocation;
 
 	ComboBoxModel m_lineTypeModel;
 	ComboBoxModel m_automatedAttribModel;
@@ -115,14 +122,6 @@ private:
 	{
 		tr("x coordinate"), "x",  tr("y coordinate"), "y", tr("curve"), tr("curve"), tr("1. attribute value"), tr("1. attribute"),
 		tr("2. attribute value"), tr("2. attribute")
-	};
-	const std::array<QString, 19> m_controlFloatTextB =
-	{
-		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
-		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
-		tr("switch graph effected value"), tr("can this point be effected"), tr("can this line be effected"), tr("\"add\" effect"),
-		tr("\"subtract\" effect"), tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"),
-		tr("\"log\" effect"), tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
 	const std::array<QString, 6> m_controlLineTypeText = {
 		tr("none"),
