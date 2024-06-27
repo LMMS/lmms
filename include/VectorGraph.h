@@ -69,7 +69,7 @@ class LMMS_EXPORT VectorGraphView : public VectorGraphViewBase, public ModelView
 public:
 
 	VectorGraphView(QWidget* parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
-		unsigned int controlHeight, unsigned int controlDisplayCount, bool shouldApplyDefaultVectorGraphColors);
+		unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors);
 	~VectorGraphView();
 
 	void setLineColor(QColor color, unsigned int dataArrayLocation);
@@ -123,13 +123,13 @@ protected slots:
 	void updateGraph();
 	void updateGraph(bool shouldUseGetLastSamples);
 	void updateDefaultColors();
-
-	void contextMenuRemoveAutomation();
 private:
 	void paintGraph(QPainter* p, unsigned int arrayLocation, std::vector<float>* sampleBuffer);
 	void paintEditing(QPainter* p);
 
 	void modelChanged() override;
+
+	VectorGraphCotnrolDialog m_controlDialog;
 
 	// utility
 	// calculate graph coords from screen space coords
@@ -151,25 +151,21 @@ private:
 
 	// editing menu / controls
 	// returns true if the graph was clicked
-	bool isGraphPressed(int mouseX, int mouseY);
+	bool isGraphPressed(int mouseY);
 	// returns true if the control window was clicked while in editing mode
 	bool isControlWindowPressed(int mouseY);
-	void processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving, int curX, int curY);
+	void processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving);
 	// returns -1 if no control / input was clicked
 	// returns displayed absolute control / input location based on inputCount
 	int getPressedControlInput(int mouseX, int mouseY, unsigned int controlCount);
-	// returns a float attrib value, valueOut = attrib value if it is a bool
-	float getInputAttribValue(unsigned int controlArrayLocation, bool* valueOut);
-	// sets the selected point's attrib to floatValue it it is float, else it sets the attrib to boolValue
-	void setInputAttribValue(unsigned int controlArrayLocation, float floatValue, bool boolValue);
+	// returns a float attrib value
+	float getInputAttribValue(unsigned int controlArrayLocation);
+	// sets the selected point's attrib (controlArrayLocation) to floatValue
+	void setInputAttribValue(unsigned int controlArrayLocation, float floatValue);
 	// calculates the ideal text color
 	QColor getTextColorFromBaseColor(QColor baseColor);
 	// calculates a replacement background fill color
 	QColor getFillColorFromBaseColor(QColor baseColor);
-	// cuts the string to displayedLength(in px) size (estimated)
-	QString getTextFromDisplayLength(QString text, unsigned int displayLength);
-	// outputs m_controlText for the line type or the switch autmated location or effected location control
-	QString getTextForAutomatableEffectableOrType(unsigned int controlLocation);
 
 	// selection
 	// searches VectorGraphDataArray-s to select
@@ -213,9 +209,8 @@ private:
 	unsigned int m_controlHeight;
 	// displayed control count (+1 because of the ">>" button in editing mode)
 	unsigned int m_controlDisplayCount;
-	unsigned int m_controlDisplayPage;
 	bool m_isEditingActive;
-	std::array<QString, 19> m_controlText =
+	const std::array<QString, 19> m_controlTextB =
 	{
 		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
 		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
@@ -223,7 +218,11 @@ private:
 		tr("\"subtract\" effect"), tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"),
 		tr("\"log\" effect"), tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
-	std::array<QString, 6> m_controlLineTypeText = {
+	const std::array<QString, 19> m_controlText =
+	{
+		tr("edit point"), tr("switch graph")
+	};
+	const std::array<QString, 6> m_controlLineTypeText = {
 		tr("none"),
 		tr("sine"),
 		tr("phase changable sine"),
@@ -231,7 +230,7 @@ private:
 		tr("steps"),
 		tr("random")
 	};
-	std::array<bool, 19> m_controlIsFloat = {
+	const std::array<bool, 19> m_controlIsFloat = {
 		true, true, true, true,
 		true, false, false,
 		false, false, false, false,
@@ -241,8 +240,6 @@ private:
 
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
-
-	VectorGraphCotnrolDialog* m_controlDialog;
 
 	// default VectorGraphDataArray colors
 	// applyed in constructor
@@ -254,6 +251,8 @@ private:
 	QColor m_vectorGraphSecondaryLineColor;
 	QColor m_vectorGraphSecondaryActiveColor;
 	QColor m_vectorGraphSecondaryFillColor;
+
+	friend class lmms::gui::VectorGraphCotnrolDialog;
 };
 
 } // namespace gui
@@ -460,12 +459,13 @@ public:
 	// returns true when m_effectLines is true and
 	// when getEffectedAttribLocation() == 0 (y is effected)
 	bool getEffectLines(unsigned int pointLocation);
-	// returns if the effectId-th effect is active
-	bool getEffect(unsigned int pointLocation, unsigned int effectId);
+	// returns the effect type of the selected id or slot
+	// effectSlot: which effect slot (m_effectTypeA / B / C)
+	unsigned int getEffect(unsigned int pointLocation, unsigned int effectSlot);
 	// true when the automationModel's value changed since last check
 	bool getIsAutomationValueChanged(unsigned int pointLocation);
 	// can return nullptr
-	inline FloatModel* getAutomationModel(unsigned int pointLocation);
+	FloatModel* getAutomationModel(unsigned int pointLocation);
 
 
 	// get: -------------------
@@ -535,7 +535,8 @@ public:
 	void setEffectLines(unsigned int pointLocation, bool bValue);
 	// checks m_isAutomatableEffectable and m_isEditableAttrib
 	// sets the point's effect type
-	void setEffect(unsigned int pointLocation, unsigned int effectId, bool bValue);
+	// effectSlot: which effect slot (m_effectTypeA / B / C), effectType: what kind of effect (add, exct)
+	void setEffect(unsigned int pointLocation, unsigned int effectSlot, unsigned int effectType);
 	// checks m_isAutomatableEffectable
 	// if bValue is true then make a new FloatModel and connect it, else delete
 	// the currently used FloatModel
@@ -594,6 +595,22 @@ private:
 		// use getAutomatedAttrib or getEffectedAttrib to get it
 		unsigned int m_automatedEffectedAttribLocations = 0;
 
+		// what effect will be applyed if effected
+		// effects:
+		// 0 - none
+		// 1 - add
+		// 2 - subtract
+		// 3 - multiply
+		// 4 - divide
+		// 5 - power
+		// 6 - log
+		// 7 - sine
+		// 8 - lower clamp
+		// 9 - upper clamp
+		unsigned int m_effectTypeA = 0;
+		unsigned int m_effectTypeB = 0;
+		unsigned int m_effectTypeC = 0;
+
 		// if the point attributes should be effected,
 		// getEffectPoints() will return true when
 		// effected attrib location > 0
@@ -601,6 +618,7 @@ private:
 		// if the line (each sample) should be effected (only works when y is effected)
 		bool m_effectLines = true;
 
+		/*
 		bool m_effectAdd = false;
 		bool m_effectSubtract = false;
 		bool m_effectMultiply = false;
@@ -610,6 +628,7 @@ private:
 		bool m_effectSine = false;
 		bool m_effectClampLower = false;
 		bool m_effectClampUpper = false;
+		*/
 
 		// stores m_automationModel->value(), used in getSamples() when updating
 		float m_bufferedAutomationValue = 0.0f;
@@ -625,8 +644,9 @@ private:
 	// returns the curve value at a given x coord, does clamp
 	float processCurve(float yBefore, float yAfter, float curve, float xIn);
 	// returns effected attribute value from base attribValue (input attribute value), does clamp
-	// this function applies the point Effects (like m_effectAdd) based on attribValue and effectValue
+	// this function applies the point Effects (like add effect) based on attribValue and effectValue
 	float processEffect(unsigned int pointLocation, float attribValue, unsigned int attribLocation, float effectValue);
+	float processSingleEffect(unsigned int pointLocation, unsigned int effectSlot, float attribValue, float effectValue);
 	// returns automated attribute value from base attribValue (input attribute value), does clamp
 	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
 
@@ -727,7 +747,7 @@ private:
 	// updating a line means recalculating m_bakedSamples in getSamples()
 	// based on the changed points (stored in m_needsUpdating)
 	// changes in a point will causes its line to update (line started by the point)
-	// changes in position needs to cause multiple lines to update
+	// changes in position needs to cause the line before to update too
 	// addition or deletion needs to cause all the lines to update
 
 	// if we want to update all (the full line in getSamples())
