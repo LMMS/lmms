@@ -66,9 +66,6 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
-	const ValueBuffer* pitchBuf = m_granularpitchshifterControls.m_pitchModel.valueBuffer();
-	const ValueBuffer* pitchSpreadBuf = m_granularpitchshifterControls.m_pitchSpreadModel.valueBuffer();
 
 	const float size = m_granularpitchshifterControls.m_sizeModel.value();
 	const float shape = m_granularpitchshifterControls.m_shapeModel.value();
@@ -96,8 +93,8 @@ bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
-		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
+		const double pitch =  m_granularpitchshifterControls.m_pitchModel.valueAt(f) * (1. / 12.);
+		const double pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.valueAt(f) * (1. / 24.);
 		
 		// interpolate pitch depending on glide
 		for (int i = 0; i < 2; ++i)
