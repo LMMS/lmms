@@ -50,7 +50,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	m_vectorGraphWidget = new VectorGraphView(this, 204, 205, 8, 30, 3, false);
+	m_vectorGraphWidget = new VectorGraphView(this, 204, 205, 8, 30, false);
 	m_vectorGraphWidget->setModel(&_controls->m_vectorGraphModel);
 	m_vectorGraphWidget->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
 	// this can cause problems with custom colors
