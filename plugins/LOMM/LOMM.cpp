@@ -94,7 +94,7 @@ void LOMMEffect::changeSampleRate()
 		}
 	}
 
-	m_yL[0][0] = m_yL[0][1] = m_yL[1][0] = m_yL[1][1] = m_yL[2][0] = m_yL[2][1] = LOMM_MIN_FLOOR;
+	std::fill(m_yL.begin(), m_yL.end(), std::array<float, 2>{LOMM_MIN_FLOOR, LOMM_MIN_FLOOR});
 	m_rms = m_gainResult = m_displayIn = m_displayOut = m_prevOut = m_yL;
 	m_crestPeakVal[0] = m_crestPeakVal[1] = LOMM_MIN_FLOOR;
 	m_crestRmsVal = m_crestFactorVal = m_crestPeakVal;
