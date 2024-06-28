@@ -905,6 +905,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 	{
 		if (pressLocation == 0)
 		{
+			m_isEditingActive = false;
 			m_controlDialog->show();
 			if (m_isSelected == true)
 			{
@@ -3057,6 +3058,16 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 
 void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations)
 {
+	/*
+	 * here m_needsUpdating points are decided
+	 * firstly we get changed points from the effector graph (updatingPointLocations)
+	 * we get a segment consisting of changed effector points that come after each other
+	 * this will be useful because we can update the current graph's points between this segment (segment start = i, segment end = updatingEnd)
+	 * secondly we get a (current graph's) point before the segment start and after the segment end
+	 * so we get locationBefore and locationAfter which will be added to m_needsUpdating
+	 * thirdly we finalyze locationBefore and locationAfter, clamp them and start adding the points between them to m_needsUpdating
+	 * if the (current graph's) point is not effected, we avoid adding it to m_needsUpdating
+	*/
 	VectorGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
 	for (unsigned int i = 0; i < updatingPointLocations->size(); i++)
 	{
@@ -3087,6 +3098,8 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			}
 		}
 		// getting the point that comes after updatingEnd
+		// this is done because updatingEnd was changed so the line directly after updatingEnd point was changed
+		// so every (current graph's) point before updatingEnd + 1 needs to be changed
 		int updatingEndSlide = 0;
 		if (updatingEnd + 1 < effector->size())
 		{
