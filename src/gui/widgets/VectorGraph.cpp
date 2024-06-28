@@ -57,12 +57,15 @@ namespace gui
 VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
 	unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors) :
 		VectorGraphViewBase(parent),
-		//QWidget(parent),
 		ModelView(new VectorGraphModel(2048, nullptr, false), this),
-		m_controlDialog(getGUI()->mainWindow(), this)
+		m_controlDialog(getGUI()->mainWindow()->addWindowedWidget(new VectorGraphCotnrolDialog(getGUI()->mainWindow(), this)))
 {
 	resize(widgetWidth, widgetHeight);
-	m_controlDialog.hide();
+
+	m_controlDialog->hide();
+	Qt::WindowFlags flags = m_controlDialog->windowFlags();
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	m_controlDialog->setWindowFlags(flags);
 
 	m_mousePress = false;
 	m_addition = false;
@@ -110,6 +113,10 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 }
 VectorGraphView::~VectorGraphView()
 {
+	if (m_controlDialog != nullptr)
+	{
+		delete m_controlDialog;
+	}
 }
 
 void VectorGraphView::setLineColor(QColor color, unsigned int dataArrayLocation)
@@ -243,8 +250,8 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 
 	// a point's FloatModel might be deleted after this
 	// cleaning up connected Knob in the dialog
-	m_controlDialog.hideAutomation();
-	m_controlDialog.hide();
+	reinterpret_cast<VectorGraphCotnrolDialog*>(m_controlDialog->widget())->hideAutomation();
+	m_controlDialog->hide();
 	if (m_isSelected == true)
 	{
 		FloatModel* curFloatModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
@@ -900,10 +907,10 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 	{
 		if (pressLocation == 0)
 		{
-			m_controlDialog.show();
+			m_controlDialog->show();
 			if (m_isSelected == true)
 			{
-				m_controlDialog.switchPoint(m_selectedArray, m_selectedLocation);
+				reinterpret_cast<VectorGraphCotnrolDialog*>(m_controlDialog->widget())->switchPoint(m_selectedArray, m_selectedLocation);
 			}
 			hideHintText();
 		}

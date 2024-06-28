@@ -39,6 +39,7 @@
 #include "lmms_basics.h"
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
+#include "SubWindow.h"
 
 namespace lmms
 {
@@ -129,8 +130,6 @@ private:
 
 	void modelChanged() override;
 
-	VectorGraphCotnrolDialog m_controlDialog;
-
 	// utility
 	// calculate graph coords from screen space coords
 	PointF mapMousePos(int x, int y);
@@ -166,6 +165,8 @@ private:
 	QColor getTextColorFromBaseColor(QColor baseColor);
 	// calculates a replacement background fill color
 	QColor getFillColorFromBaseColor(QColor baseColor);
+
+	SubWindow* m_controlDialog;
 
 	// selection
 	// searches VectorGraphDataArray-s to select
@@ -210,32 +211,9 @@ private:
 	// displayed control count (+1 because of the ">>" button in editing mode)
 	unsigned int m_controlDisplayCount;
 	bool m_isEditingActive;
-	const std::array<QString, 19> m_controlTextB =
-	{
-		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
-		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
-		tr("switch graph effected value"), tr("can this point be effected"), tr("can this line be effected"), tr("\"add\" effect"),
-		tr("\"subtract\" effect"), tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"),
-		tr("\"log\" effect"), tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
-	};
 	const std::array<QString, 19> m_controlText =
 	{
 		tr("edit point"), tr("switch graph")
-	};
-	const std::array<QString, 6> m_controlLineTypeText = {
-		tr("none"),
-		tr("sine"),
-		tr("phase changable sine"),
-		tr("peak"),
-		tr("steps"),
-		tr("random")
-	};
-	const std::array<bool, 19> m_controlIsFloat = {
-		true, true, true, true,
-		true, false, false,
-		false, false, false, false,
-		false, false, false, false,
-		false, false, false, false
 	};
 
 	std::pair<int, int> m_lastTrackPoint;
