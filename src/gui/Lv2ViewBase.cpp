@@ -223,7 +223,7 @@ std::tuple<const LilvUI*, const LilvNode*> Lv2ViewProc::selectPluginUi(LilvUIs *
 		qDebug() << "... no matching UI found. Defaulting to LMMS UI.";
 	}
 #endif
-	return std::make_tuple(nullptr, nullptr);;
+	return std::make_tuple(nullptr, nullptr);
 }
 
 

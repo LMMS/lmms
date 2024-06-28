@@ -87,8 +87,6 @@ protected:
 
 	const LinkedModelGroup* model() const { return m_model; }
 
-	QVBoxLayout* layout() { return m_vbox; }
-
 private:
 	class LinkedModelGroup* m_model;
 
