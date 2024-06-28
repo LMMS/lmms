@@ -601,9 +601,9 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 	p->setPen(QPen(*dataArray->getLineColor(), 2));
 	p->setBrush(QBrush(*dataArray->getLineColor(), Qt::NoBrush));
 
-	std::pair<int, int> posA(0, 0);
-	std::pair<int, int> posB(0, 0);
-	std::pair<int, int> startPos(mapDataPos(0.0f, dataArray->getY(0), false));
+	PointInt posA(0, 0);
+	PointInt posB(0, 0);
+	PointInt startPos(mapDataPos(0.0f, dataArray->getY(0), false));
 	// draw line
 	if (m_isSimplified == false)
 	{
@@ -696,7 +696,7 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 				{
 					if (dataArray->getIsEditableAttrib() == true)
 					{
-						std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
+						PointInt posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
 						p->drawRect(posC.first - squareSize / 2,
 							m_graphHeight - posC.second - squareSize / 2, squareSize, squareSize);
 					}
@@ -805,18 +805,18 @@ PointF VectorGraphView::mapMousePos(int x, int y)
 		static_cast<float>(x / static_cast<float>(width())),
 		static_cast<float>(y) * 2.0f / static_cast<float>(m_graphHeight) - 1.0f);
 }
-std::pair<int, int> VectorGraphView::mapDataPos(float x, float y, bool isNonNegative)
+PointInt VectorGraphView::mapDataPos(float x, float y, bool isNonNegative)
 {
 	// mapping the point/sample positon to mouse/view position
 	if (isNonNegative == true)
 	{
-		return std::pair<int, int>(
+		return PointInt(
 			static_cast<int>(x * width()),
 			static_cast<int>(y * m_graphHeight));
 	}
 	else
 	{
-		return std::pair<int, int>(
+		return PointInt(
 			static_cast<int>(x * width()),
 			static_cast<int>((y + 1.0f) * static_cast<float>(m_graphHeight) / 2.0f));
 	}
@@ -827,9 +827,9 @@ PointF VectorGraphView::mapDataCurvePosF(float xA, float yA, float xB, float yB,
 		(xA + xB) / 2.0f,
 		yA + (curve / 2.0f + 0.5f) * (yB - yA));
 }
-std::pair<int, int> VectorGraphView::mapDataCurvePos(int xA, int yA, int xB, int yB, float curve)
+PointInt VectorGraphView::mapDataCurvePos(int xA, int yA, int xB, int yB, float curve)
 {
-	return std::pair<int, int>(
+	return PointInt(
 		(xA + xB) / 2,
 		yA + static_cast<int>((curve / 2.0f + 0.5f) * (yB - yA)));
 }

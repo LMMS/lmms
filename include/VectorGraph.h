@@ -51,6 +51,7 @@ class VectorGraphDataArray;
 class FloatModel;
 
 using PointF = std::pair<float, float>;
+using PointInt = std::pair<int, int>;
 
 namespace gui
 {
@@ -135,10 +136,10 @@ private:
 	PointF mapMousePos(int x, int y);
 	// calculate gui curve point's position
 	PointF mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve);
-	std::pair<int, int> mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
+	PointInt mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
 	// calculate screen space coords from graph coords
 	// isNonNegative can only be true when graph line / getSamples() is mapped
-	std::pair<int, int> mapDataPos(float x, float y, bool isNonNegative);
+	PointInt mapDataPos(float x, float y, bool isNonNegative);
 	// map where each Control is displayed when m_isEdtitingActive is true
 	int mapControlInputX(float inputValue, unsigned int displayLength);
 
@@ -216,8 +217,8 @@ private:
 		tr("edit point"), tr("switch graph")
 	};
 
-	std::pair<int, int> m_lastTrackPoint;
-	std::pair<int, int> m_lastScndTrackPoint;
+	PointInt m_lastTrackPoint;
+	PointInt m_lastScndTrackPoint;
 
 	// default VectorGraphDataArray colors
 	// applyed in constructor
