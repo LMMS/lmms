@@ -45,7 +45,7 @@
 #include "ProjectJournal.h"
 
 //#define VECTORGRAPH_DEBUG_USER_INTERACTION
-#define VECTORGRAPH_DEBUG_PAINT_EVENT
+//#define VECTORGRAPH_DEBUG_PAINT_EVENT
 
 namespace lmms
 {
