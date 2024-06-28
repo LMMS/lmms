@@ -103,12 +103,14 @@ std::pair<float, float> VectorGraphViewBase::showCoordInputDialog(std::pair<floa
 	return pointPosition;
 }
 
-VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraphView* targetVectorGraphModel) :
-	QMdiSubWindow(_parent),
+VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphView* targetVectorGraphModel) :
+	QWidget(parent),
+	ModelView(nullptr, this),
 	m_vectorGraphView(targetVectorGraphModel),
 	m_curAutomationModel(nullptr),
 	m_curAutomationModelKnob(nullptr),
 	m_automationLayout(nullptr),
+	m_isValidSelection(false),
 	m_lineTypeModel(nullptr, "", false),
 	m_automatedAttribModel(nullptr, "", false),
 	m_effectedAttribModel(nullptr, "", false),
@@ -136,10 +138,6 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* _parent, VectorGraph
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setFixedSize(300, 500);
-
-	Qt::WindowFlags flags = windowFlags();
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	setWindowFlags(flags);
 
 	if (layout() != nullptr)
 	{
@@ -314,6 +312,7 @@ VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 
 void VectorGraphCotnrolDialog::hideAutomation()
 {
+	m_isValidSelection = false;
 	m_curAutomationModel = nullptr;
 	if (m_curAutomationModelKnob != nullptr)
 	{
@@ -327,6 +326,7 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 {
 	m_curSelectedArray = selectedArray;
 	m_curSelectedLocation = selectedLocation;
+	m_isValidSelection = true;
 	m_vectorGraphView->model()->getDataArray(selectedArray)->setAutomated(selectedLocation, true);
 	m_curAutomationModel = m_vectorGraphView->model()->getDataArray(selectedArray)->getAutomationModel(selectedLocation);
 
@@ -371,15 +371,27 @@ void VectorGraphCotnrolDialog::effectedLineClicked(bool isChecked)
 }
 void VectorGraphCotnrolDialog::deleteAutomationClicked(bool isChecked)
 {
-	if (m_curAutomationModel == nullptr) { return; }
+	if (m_isValidSelection == false) {  hideAutomation(); return; }
 	
+	bool swapIsValidSelection = m_isValidSelection;
 	hideAutomation();
 	m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->setAutomated(m_curSelectedLocation, false);
+	m_isValidSelection = swapIsValidSelection;
+}
+
+void VectorGraphCotnrolDialog::closeEvent(QCloseEvent * ce)
+{
+	// we need to ignore this event
+	// because Qt::WA_DeleteOnClose was activated by MainWindow::addWindowedWidget
+	// or else this widget will be deleted
+	ce->ignore();
+
+	parentWidget()->hide();
 }
 
 void VectorGraphCotnrolDialog::updateControls()
 {
-	if (m_curAutomationModel == nullptr) { return; }
+	if (m_isValidSelection == false) { hideAutomation(); return; }
 
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
@@ -396,12 +408,11 @@ void VectorGraphCotnrolDialog::updateControls()
 
 void VectorGraphCotnrolDialog::updateVectorGraphAttribs()
 {
-	if (m_curAutomationModel == nullptr) { return; }
+	if (m_isValidSelection == false) { hideAutomation(); return; }
 
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
 		m_vectorGraphView->setInputAttribValue(static_cast<unsigned int>(i), m_controlModelArray[i]->value());
-		//m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i, &unusedBool));
 	}
 
 	m_vectorGraphView->setInputAttribValue(5, m_lineTypeModel.value());
