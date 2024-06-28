@@ -45,7 +45,7 @@
 #include "ProjectJournal.h"
 
 //#define VECTORGRAPH_DEBUG_USER_INTERACTION
-//#define VECTORGRAPH_DEBUG_PAINT_EVENT
+#define VECTORGRAPH_DEBUG_PAINT_EVENT
 
 namespace lmms
 {
@@ -3591,18 +3591,8 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 
 bool VectorGraphDataArray::isEffectedPoint(unsigned int pointLocation)
 {
-	// loops througth all the effects
 	// return true when 1 or more effects are active
-	bool output = false;
-	for (unsigned int i = 0; i <= 8; i++)
-	{
-		if (getEffect(pointLocation, i) == true)
-		{
-			output = true;
-			break;
-		}
-	}
-	return output;
+	return (getEffect(pointLocation, 0) + getEffect(pointLocation, 1) + getEffect(pointLocation, 2)) != 0;
 }
 void VectorGraphDataArray::formatDataArrayEndPoints()
 {
