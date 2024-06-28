@@ -28,7 +28,6 @@
 #include <QWidget>
 #include <QCursor>
 #include <QMenu>
-#include <QMdiSubWindow>
 #include <QLayout>
 
 #include "ModelView.h"
@@ -75,7 +74,7 @@ private:
 
 class VectorGraphView;
 
-class LMMS_EXPORT VectorGraphCotnrolDialog : public QMdiSubWindow
+class LMMS_EXPORT VectorGraphCotnrolDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -90,7 +89,8 @@ public slots:
 	void effectedPointClicked(bool isChecked);
 	void effectedLineClicked(bool isChecked);
 	void deleteAutomationClicked(bool isChecked);
-
+protected slots:
+	void closeEvent(QCloseEvent * ce);
 private:
 	void updateControls();
 	void updateVectorGraphAttribs();
@@ -106,6 +106,7 @@ private:
 	unsigned int m_curSelectedArray;
 	// selected VectorGraphPoint
 	unsigned int m_curSelectedLocation;
+	bool m_isValidSelection;
 
 	ComboBoxModel m_lineTypeModel;
 	ComboBoxModel m_automatedAttribModel;
