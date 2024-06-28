@@ -23,28 +23,26 @@
  */
 
 #include "VectorGraph.h"
+#include "VectorGraphViewBase.h"
 
-#include <vector>
+#include <algorithm> // sort
 #include <array>
 #include <cmath> // sine
-#include <algorithm> // sort
 #include <cstdlib> // rand
-#include <QPainter>
-#include <QPainterPath>
+#include <vector>
 #include <QMouseEvent>
 #include <QMutex> // locking when getSamples
+#include <QPainter>
+#include <QPainterPath>
 
-
-#include "VectorGraphViewBase.h"
-#include "StringPairDrag.h"
-#include "MainWindow.h" // getting main window for control dialog
-#include "GuiApplication.h" // getGUI
 #include "AutomatableModel.h"
-#include "ControllerConnectionDialog.h"
-#include "ControllerConnection.h"
-#include "ProjectJournal.h"
-#include "JournallingObject.h"
 #include "base64.h"
+#include "ControllerConnection.h"
+#include "ControllerConnectionDialog.h"
+#include "GuiApplication.h" // getGUI
+#include "JournallingObject.h"
+#include "MainWindow.h" // getting main window for control dialog
+#include "ProjectJournal.h"
 
 //#define VECTORGRAPH_DEBUG_USER_INTERACTION
 //#define VECTORGRAPH_DEBUG_PAINT_EVENT
