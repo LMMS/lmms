@@ -26,6 +26,7 @@
 #define LMMS_GUI_VECTORGRAPH_H
 
 #include <vector>
+#include <set>
 #include <array>
 #include <QPainterPath>
 #include <QWidget>
@@ -651,7 +652,7 @@ private:
 	// adds the m_dataArray points that are
 	// effected by the changed effector array points.
 	// ONLY WORKS IN SORTED ARRAYS
-	void getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations);
+	void getUpdatingFromEffector(std::set<unsigned int>* updatingPointLocations);
 	// if pointLocation >= 0 -> adds the location to m_needsUpdating
 	// else it will update the whole m_dataArray and m_bakedSamples
 	// changes in the size of m_dataArray (addtition, deletion, ect.)
@@ -666,10 +667,10 @@ private:
 
 	// real getSamples processing
 	void getSamplesInner(unsigned int targetSizeIn, bool* isChangedOut,
-		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
+		std::set<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// redraw lines
 	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
-		std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize);
+		std::vector<float>* sampleXLocations, unsigned int curPoint, float stepSize);
 	bool isEffectedPoint(unsigned int pointLocation);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
@@ -738,7 +739,7 @@ private:
 	// unsorted array of locations in m_dataArray
 	// that need to be updated
 	// sorted in getUpdatingOriginals() because some functions need this to be sorted
-	std::vector<unsigned int> m_needsUpdating;
+	std::set<unsigned int> m_needsUpdating;
 
 	// this stores all the FloatModels, unsorted, should only contain currently used FloatModels
 	// used for automation
