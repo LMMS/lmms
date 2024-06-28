@@ -29,6 +29,8 @@
 #include <array>
 #include <cmath> // sine
 #include <cstdlib> // rand
+#include <set> // m_needsUpdating
+#include <iterator> // std::set
 #include <vector>
 #include <QMouseEvent>
 #include <QMutex> // locking when getSamples
@@ -1651,10 +1653,6 @@ VectorGraphDataArray::VectorGraphDataArray(
 
 VectorGraphDataArray::~VectorGraphDataArray()
 {
-	//m_dataArray.clear();
-	//m_bakedSamples.clear();
-	//m_needsUpdating.clear();
-
 	for (unsigned int i = 0; i < m_automationModelArray.size(); i++)
 	{
 		if (m_automationModelArray[i] != nullptr)
@@ -3109,40 +3107,42 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 	}
 }
 
-void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations)
+void VectorGraphDataArray::getUpdatingFromEffector(std::set<unsigned int>* updatingPointLocations)
 {
 	VectorGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
-	for (unsigned int i = 0; i < updatingPointLocations->size(); i++)
+	for (std::set<unsigned int>::iterator i = updatingPointLocations->begin(); i != updatingPointLocations->end(); ++i)
 	{
 		// since updatingPointLocations is a sorted list, we can get the end
 		// location and update everithing between them
 		// starting effector location is i, end effector location is updatingEnd
-		unsigned int updatingEnd = i;
-		for (unsigned int j = i + 1; j < updatingPointLocations->size(); j++)
+		std::set<unsigned int>::iterator updatingEnd = i;
+		bool updatingEndChanged = false;
+		for (std::set<unsigned int>::iterator j = (++i); j != updatingPointLocations->end(); ++j)
 		{
 			// we can not skip gaps because
 			// every updatingPointLocations point effects their line only
 			// (the line that starts with the point)
-			if ((*updatingPointLocations)[updatingEnd] + 1 >=
-					(*updatingPointLocations)[j])
+			if ((*updatingEnd) + 1 >= *j)
 			{
 				updatingEnd = j;
+				updatingEndChanged = true;
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
-				qDebug("getUpdatingFromEffector: new updatingEnd: %d, start (i): %d", updatingEnd, i);
+				qDebug("getUpdatingFromEffector: new updatingEnd: %d, start (i): %d", *updatingEnd, *i);
 #endif
 			}
 			else
 			{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
-				qDebug("getUpdatingFromEffector: updatingEnd: %d brake: %d < %d [j = %d]", updatingEnd,
-					((*updatingPointLocations)[updatingEnd] + 1), (*updatingPointLocations)[j], j);
+				qDebug("getUpdatingFromEffector: updatingEnd: %d brake: %d < [j = %d]", updatingEnd,
+					(*updatingEnd) + 1, *j);
 #endif
 				break;
 			}
 		}
+		--i;
 		// getting the point that comes after updatingEnd
 		int updatingEndSlide = 0;
-		if (updatingEnd + 1 < effector->size())
+		if (updatingEnd != --(updatingPointLocations->end()))
 		{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector: updatingEndSlide = 1");
@@ -3154,7 +3154,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		bool found = false;
 		bool isBefore = false;
 		// this can return -1
-		int locationBefore = getNearestLocation(effector->getX((*updatingPointLocations)[i]), &found, &isBefore);
+		int locationBefore = getNearestLocation(effector->getX((*i), &found, &isBefore);
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 		qDebug("getUpdatingFromEffector: getNearestLocation before: %d, i: %d", locationBefore, i);
 #endif
@@ -3169,17 +3169,17 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			// remember points control the line after (connected to) them
 			// but in this case changes in the points position can effect the line before it
 			locationBefore--;
-			// now (here) locationBefore is Always before (*updatingPointLocations)[i]
+			// now (here) locationBefore is Always before *i
 		}
 		// clamp
 		locationBefore = locationBefore < 0 ? 0 :
 			m_dataArray.size() - 1 < locationBefore ? m_dataArray.size() - 1 : locationBefore;
 
 		isBefore = false;
-		int locationAfter = getNearestLocation(effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), &found, &isBefore);
+		int locationAfter = getNearestLocation(effector->getX((*updatingEnd) + updatingEndSlide), &found, &isBefore);
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 		qDebug("getUpdatingFromEffector: getNearestLocation after: %d, updatingEnd: %d (+ %d), effector x: %f, dataArray x: %f", locationAfter, updatingEnd, updatingEndSlide,
-			effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
+			effector->getX(((*updatingEnd) + updatingEndSlide), m_dataArray[locationAfter].m_x);
 #endif
 		if (isBefore == false)
 		{
@@ -3190,7 +3190,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			locationAfter--;
 		}
 		// updating everything before if i -> 0
-		if ((*updatingPointLocations)[i] == 0)
+		if (*i == 0)
 		{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector updating everything before");
@@ -3199,7 +3199,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		}
 		// if updatingEnd is the last point in effecor, then
 		// update everithing after
-		if ((*updatingPointLocations)[updatingEnd] + updatingEndSlide + 1 >= effector->size())
+		if (*updatingEnd + updatingEndSlide + 1 >= effector->size())
 		{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector updating everything after");
@@ -3225,10 +3225,10 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 				qDebug("getUpdatingFromEffector: i: %d, updating: %d", i, j);
 #endif
-				m_needsUpdating.push_back(j);
+				m_needsUpdating.insert(j);
 				if (lastUpdated == false && getEffectPoints(j) == true)
 				{
-					m_needsUpdating.push_back(j - 1);
+					m_needsUpdating.insert(j - 1);
 				}
 				lastUpdated = true;
 			}
@@ -3237,7 +3237,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 				lastUpdated = false;
 			}
 		}
-		if (i < updatingEnd)
+		if (updatingEndChanged == true)
 		{
 			i = updatingEnd;
 		}
@@ -3249,7 +3249,7 @@ void VectorGraphDataArray::getUpdatingFromPoint(int pointLocation)
 	// changes in m_dataArray.size() needs to cause getUpdatingFromPoint(-1)
 	if (m_isDataChanged == false && pointLocation >= 0)
 	{
-		m_needsUpdating.push_back(pointLocation);
+		m_needsUpdating.insert(pointLocation);
 		if (m_needsUpdating.size() > m_dataArray.size() * 3)
 		{
 			m_isDataChanged = true;
@@ -3270,18 +3270,19 @@ void VectorGraphDataArray::getUpdatingFromAutomation()
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromAutomation: point location: %d, attrib location: %d", i, getAutomatedAttribLocation(i));
 #endif
-			m_needsUpdating.push_back(i);
+			m_needsUpdating.insert(i);
 			// if the automatable value effects the y (so the position)
 			// the point before this is updated too
 			if (i > 0 && getAutomatedAttribLocation(i) == 0)
 			{
-				m_needsUpdating.push_back(i - 1);
+				m_needsUpdating.insert(i - 1);
 			}
 		}
 	}
 }
 void VectorGraphDataArray::getUpdatingOriginals()
 {
+	/*
 	// selecting only original values and sorting
 
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
@@ -3332,13 +3333,14 @@ void VectorGraphDataArray::getUpdatingOriginals()
 		qDebug("getUpatingOriginals final: m_needsUpdating[%d] -> %d  (point)", i, m_needsUpdating[i]);
 	}
 #endif
+*/
 }
 void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isChangedOut,
-		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
+		std::set<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
 {
 	bool effectorIsChanged = false;
 	//std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
-	std::vector<unsigned int> effectorUpdatingValues;
+	std::set<unsigned int> effectorUpdatingValues;
 	// sampleBufferOut will serve as the effector's sampleBufferOut until the new m_bakedSamples gets made
 	bool isEffected = m_effectorLocation >= 0;
 	if (isEffected == true)
@@ -3399,10 +3401,10 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 		{
 			m_updatingBakedSamples.resize(targetSizeIn);
 		}
-		m_needsUpdating.resize(m_dataArray.size());
+		m_needsUpdating.clear();
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 		{
-			m_needsUpdating[i] = i;
+			m_needsUpdating.insert(i);
 		}
 	}
 
@@ -3441,10 +3443,10 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 #endif
 
 		// calculate final lines
-		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+		for (std::set<unsigned int>::iterator i = m_needsUpdating.begin(); i != m_needsUpdating.end(); ++i)
 		{
 			// sampleBufferOut contains the effector m_bakedValues here
-			getSamplesUpdateLines(effector, sampleBufferOut, &sampleXLocations, i, stepSize);
+			getSamplesUpdateLines(effector, sampleBufferOut, &sampleXLocations, *i, stepSize);
 		}
 
 		m_parent->lockBakedSamplesAccess();
@@ -3477,28 +3479,28 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 #endif
 }
 void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
-	std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize)
+	std::vector<float>* sampleXLocations, unsigned int curPoint, float stepSize)
 {
 	unsigned int effectYLocation = static_cast<unsigned int>
-		(std::ceil(m_dataArray[m_needsUpdating[pointLocation]].m_x / stepSize));
+		(std::ceil(m_dataArray[curPoint].m_x / stepSize));
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
-	qDebug("getSamplesUpdatinLines: m_needsUpdating[%d]: %d   (point)\neffectYLocation: %d", pointLocation, m_needsUpdating[pointLocation], effectYLocation);
+	qDebug("getSamplesUpdatinLines: m_needsUpdating[%d]: %d   (point)\neffectYLocation: %d", pointLocation, curPoint, effectYLocation);
 #endif
-	// current effector output Y near m_needsUpdating[pointLocation] point
+	// current effector output Y near curPoint point
 	float curEffectY = (*effectorSamples)[effectYLocation];
 	float nextEffectY = (*effectorSamples)[effectYLocation];
 
 	// getting the final automatable / effectable point values
-	float curY = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_y, 0);
-	float curC = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_c, 1);
-	float curValA = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_valA, 2);
-	float curValB = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_valB, 3);
-	if (effector != nullptr && getEffectPoints(m_needsUpdating[pointLocation]) == true && getEffectLines(m_needsUpdating[pointLocation]) == false)
+	float curY = processAutomation(curPoint, m_dataArray[curPoint].m_y, 0);
+	float curC = processAutomation(curPoint, m_dataArray[curPoint].m_c, 1);
+	float curValA = processAutomation(curPoint, m_dataArray[curPoint].m_valA, 2);
+	float curValB = processAutomation(curPoint, m_dataArray[curPoint].m_valB, 3);
+	if (effector != nullptr && getEffectPoints(curPoint) == true && getEffectLines(curPoint) == false)
 	{
-		curY = processEffect(m_needsUpdating[pointLocation], curY, 0, curEffectY);
-		curC = processEffect(m_needsUpdating[pointLocation], curC, 1, curEffectY);
-		curValA = processEffect(m_needsUpdating[pointLocation], curValA, 2, curEffectY);
-		curValB = processEffect(m_needsUpdating[pointLocation], curValB, 3, curEffectY);
+		curY = processEffect(curPoint, curY, 0, curEffectY);
+		curC = processEffect(curPoint, curC, 1, curEffectY);
+		curValA = processEffect(curPoint, curValA, 2, curEffectY);
+		curValB = processEffect(curPoint, curValB, 3, curEffectY);
 	}
 	// from where to update line
 	int start = effectYLocation;
@@ -3506,26 +3508,26 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 
 	float nextY = curY;
 
-	if (m_needsUpdating[pointLocation] + 1 < m_dataArray.size())
+	if (curPoint + 1 < m_dataArray.size())
 	{
 		effectYLocation = static_cast<unsigned int>
-			(std::ceil(m_dataArray[m_needsUpdating[pointLocation] + 1].m_x / stepSize));
+			(std::ceil(m_dataArray[curPoint + 1].m_x / stepSize));
 		// where updating line ends (+1)
 		end = effectYLocation;
-		nextY = processAutomation(m_needsUpdating[pointLocation] + 1, m_dataArray[m_needsUpdating[pointLocation] + 1].m_y, 0);
+		nextY = processAutomation(curPoint + 1, m_dataArray[curPoint + 1].m_y, 0);
 
-		bool isCurEffected = isEffectedPoint(m_needsUpdating[pointLocation]);
+		bool isCurEffected = isEffectedPoint(curPoint);
 		// if the next point (y location) can be effected
 		// and the current point's line is uneffected
-		if (effector != nullptr && getEffectPoints(m_needsUpdating[pointLocation] + 1) == true &&
-			(getEffectLines(m_needsUpdating[pointLocation]) == false || isCurEffected == false))
+		if (effector != nullptr && getEffectPoints(curPoint + 1) == true &&
+			(getEffectLines(curPoint) == false || isCurEffected == false))
 		{
 			nextEffectY = (*effectorSamples)[effectYLocation];
-			nextY = processEffect(m_needsUpdating[pointLocation] + 1, nextY, 0, nextEffectY);
+			nextY = processEffect(curPoint + 1, nextY, 0, nextEffectY);
 		}
 	}
 	// calculating line ends
-	if (m_needsUpdating[pointLocation] + 1 >= m_dataArray.size())
+	if (curPoint + 1 >= m_dataArray.size())
 	{
 		// if this point is at the last location in m_dataArray
 		for (int j = end; j < m_updatingBakedSamples.size(); j++)
@@ -3533,7 +3535,7 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 			m_updatingBakedSamples[j] = curY;
 		}
 	}
-	if (m_needsUpdating[pointLocation] == 0)
+	if (curPoint == 0)
 	{
 		// if this point is at the 0 location in m_dataArray
 		for (int j = 0; j < start; j++)
@@ -3543,7 +3545,7 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 	}
 
 	float fadeInStart = 0.05f;
-	unsigned int type = m_dataArray[m_needsUpdating[pointLocation]].m_type;
+	unsigned int type = m_dataArray[curPoint].m_type;
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 	qDebug("getSamplesUpdatinLines: point: [%d] start: %d, end: %d, line type: %d,      ---     attribs: y: %f, next y: %f, curve %f, valA %f, valB %f",
 		pointLocation, start, end, type, curY, nextY, curC, curValA, curValB);
@@ -3609,15 +3611,15 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 		// line type
 		processLineTypeArrayRandom(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
-	if (effector != nullptr && getEffectLines(m_needsUpdating[pointLocation]) == true)
+	if (effector != nullptr && getEffectLines(curPoint) == true)
 	{
-		int startB = m_needsUpdating[pointLocation] == 0 ? 0 : start;
-		int endB = m_needsUpdating[pointLocation] >= m_dataArray.size() - 1 ? m_updatingBakedSamples.size() : end;
+		int startB = curPoint == 0 ? 0 : start;
+		int endB = curPoint >= m_dataArray.size() - 1 ? m_updatingBakedSamples.size() : end;
 		// process line effect
 		// if it is enabled
 		for (int j = startB; j < endB; j++)
 		{
-			m_updatingBakedSamples[j] = processEffect(m_needsUpdating[pointLocation], m_updatingBakedSamples[j], 0, (*effectorSamples)[j]);
+			m_updatingBakedSamples[j] = processEffect(curPoint, m_updatingBakedSamples[j], 0, (*effectorSamples)[j]);
 		}
 	}
 	// clamp
@@ -3634,8 +3636,8 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 	}
 	if (m_isNonNegative == true)
 	{
-		int startB = m_needsUpdating[pointLocation] == 0 ? 0 : start;
-		int endB = m_needsUpdating[pointLocation] >= m_dataArray.size() - 1 ? m_updatingBakedSamples.size() : end;
+		int startB = curPoint == 0 ? 0 : start;
+		int endB = curPoint >= m_dataArray.size() - 1 ? m_updatingBakedSamples.size() : end;
 		for (int j = startB; j < endB; j++)
 		{
 			m_updatingBakedSamples[j] = m_updatingBakedSamples[j] / 2.0f + 0.5f;
