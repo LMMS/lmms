@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # Add Kitware APT repo for latest CMake --- See: https://apt.kitware.com/
-# As of 5/21/2024, only focal and jammy are supported
+# As of 6/29/2024, only focal, jammy, and noble are supported
 . /etc/os-release
-if [ "$UBUNTU_CODENAME" = "focal" ] || [ "$UBUNTU_CODENAME" = "jammy" ]; then
-    sudo apt-get install --yes wget gpg
+if [ "$UBUNTU_CODENAME" = "focal" ] || [ "$UBUNTU_CODENAME" = "jammy" ] || [ "$UBUNTU_CODENAME" = "noble" ]; then
+    sudo apt-get install -y wget gpg
     test -f /usr/share/doc/kitware-archive-keyring/copyright || \
         wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
         | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
