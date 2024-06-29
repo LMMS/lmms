@@ -32,9 +32,9 @@ namespace lmms
 StereoDelay::StereoDelay( int maxTime, int sampleRate )
 {
 	m_buffer = 0;
-	m_maxTime = maxTime;
+	m_maxTime = static_cast<float>(maxTime);
 	m_maxLength = maxTime * sampleRate;
-	m_length = m_maxLength;
+	m_length = static_cast<float>(m_maxLength);
 
 	m_writeIndex = 0;
 	m_feedback = 0.0f;
@@ -58,7 +58,7 @@ StereoDelay::~StereoDelay()
 void StereoDelay::tick( sampleFrame& frame )
 {
 	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
-	int readIndex = m_writeIndex - m_length;
+	int readIndex = m_writeIndex - static_cast<int>(m_length);
 	if (readIndex < 0 ) { readIndex += m_maxLength; }
 	float lOut = m_buffer[ readIndex ][ 0 ];
 	float rOut = m_buffer[ readIndex ] [1 ];
