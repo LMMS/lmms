@@ -23,6 +23,8 @@
  */
 
 #include "SampleBuffer.h"
+
+#include <QHash>
 #include <cstring>
 
 #include "PathUtil.h"
@@ -31,23 +33,43 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const sampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(data, data + numFrames)
-	, m_sampleRate(sampleRate)
+SampleBuffer::Source::Source(const QString& filePath)
+	: m_type(Type::AudioFile)
 {
+	if (filePath.isEmpty()) { throw std::runtime_error{"Audio file path is empty."}; }
+
+	m_identifier = PathUtil::toShortestRelative(filePath);
+	m_hash = qHash(m_identifier, static_cast<unsigned int>(m_type));
 }
 
-SampleBuffer::SampleBuffer(const QString& audioFile)
+SampleBuffer::Source::Source(const QString& base64, sample_rate_t sampleRate)
+	: m_type(Type::Base64)
 {
-	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	const auto absolutePath = PathUtil::toAbsolute(audioFile);
+	if (base64.isEmpty()) { throw std::runtime_error{"Base64 string is empty."}; }
 
-	if (auto decodedResult = SampleDecoder::decode(absolutePath))
+	m_identifier = base64 + " " + QString::number(sampleRate);
+	m_hash = qHash(base64, sampleRate);
+}
+
+auto SampleBuffer::Source::audioFileRelative() const -> const QString&
+{
+	static const QString empty;
+	return m_type == Type::AudioFile ? m_identifier : empty;
+}
+
+auto SampleBuffer::Source::audioFileAbsolute() const -> QString
+{
+	return m_type == Type::AudioFile ? PathUtil::toAbsolute(m_identifier) : QString{};
+}
+
+SampleBuffer::SampleBuffer(Access, const QString& audioFile)
+	: m_source(audioFile)
+{
+	if (auto decodedResult = SampleDecoder::decode(m_source.audioFileAbsolute()))
 	{
 		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::move(data);
 		m_sampleRate = sampleRate;
-		m_audioFile = PathUtil::toShortestRelative(audioFile);
 		return;
 	}
 
@@ -55,8 +77,9 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
-SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
+SampleBuffer::SampleBuffer(Access, const QString& base64, sample_rate_t sampleRate)
 	: m_sampleRate(sampleRate)
+	, m_source(base64, sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
@@ -64,33 +87,61 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(sampleFrame));
 }
 
-SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
+SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, sample_rate_t sampleRate)
 	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
+	, m_source()
 {
+}
+
+SampleBuffer::SampleBuffer(Access, const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
+	: m_data(data, data + numFrames)
+	, m_sampleRate(sampleRate)
+{
+}
+
+auto SampleBuffer::create() -> std::shared_ptr<const SampleBuffer>
+{
+	return std::make_shared<SampleBuffer>(Access{});
+}
+
+auto SampleBuffer::create(const QString& audioFile) -> std::shared_ptr<const SampleBuffer>
+{
+	return std::make_shared<SampleBuffer>(Access{}, audioFile);
+}
+
+auto SampleBuffer::create(const QString& base64, sample_rate_t sampleRate) -> std::shared_ptr<const SampleBuffer>
+{
+	return std::make_shared<SampleBuffer>(Access{}, base64, sampleRate);
+}
+
+auto SampleBuffer::create(std::vector<sampleFrame> data, sample_rate_t sampleRate)
+	-> std::shared_ptr<const SampleBuffer>
+{
+	return std::make_shared<SampleBuffer>(Access{}, std::move(data), sampleRate);
+}
+
+auto SampleBuffer::create(const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
+	-> std::shared_ptr<const SampleBuffer>
+{
+	return std::make_shared<SampleBuffer>(Access{}, data, numFrames, sampleRate);
 }
 
 void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 {
 	using std::swap;
 	swap(first.m_data, second.m_data);
-	swap(first.m_audioFile, second.m_audioFile);
 	swap(first.m_sampleRate, second.m_sampleRate);
+	swap(first.m_source, second.m_source);
 }
 
-QString SampleBuffer::toBase64() const
+auto SampleBuffer::toBase64() const -> QString
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto data = reinterpret_cast<const char*>(m_data.data());
 	const auto size = static_cast<int>(m_data.size() * sizeof(sampleFrame));
 	const auto byteArray = QByteArray{data, size};
 	return byteArray.toBase64();
-}
-
-auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
-{
-	static auto s_buffer = std::make_shared<const SampleBuffer>();
-	return s_buffer;
 }
 
 } // namespace lmms

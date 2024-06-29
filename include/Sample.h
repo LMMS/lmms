@@ -41,7 +41,7 @@ public:
 	// the array positions correspond to the converter_type parameter values in libsamplerate
 	// if there appears problems with playback on some interpolation mode, then the value for that mode
 	// may need to be higher - conversely, to optimize, some may work with lower values
-	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
+	static constexpr auto InterpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
 
 	enum class Loop
 	{
@@ -77,23 +77,24 @@ public:
 	};
 
 	Sample() = default;
-	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
-	Sample(const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	Sample(const QByteArray& base64, sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
+	Sample(const sampleFrame* data, size_t numFrames,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
-	Sample(Sample&& other);
+	Sample(Sample&& other) noexcept;
 	explicit Sample(const QString& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
-	auto operator=(Sample&&) -> Sample&;
+	auto operator=(Sample&&) noexcept -> Sample&;
 
 	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
-	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
+	auto sampleRate() const -> sample_rate_t { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> size_t { return m_buffer->size(); }
+	auto source() const -> const SampleBuffer::Source& { return m_buffer->source(); }
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
@@ -121,7 +122,7 @@ private:
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:
-	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
+	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::create();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
 	std::atomic<int> m_loopStartFrame = 0;

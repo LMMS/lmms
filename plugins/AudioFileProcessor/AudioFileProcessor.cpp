@@ -28,6 +28,8 @@
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
 #include "SampleLoader.h"
+#include "SampleLoaderDialog.h"
+#include "SampleWaveform.h"
 #include "Song.h"
 
 #include "plugin_export.h"
@@ -193,8 +195,9 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("src", m_sample.sampleFile());
-	if (m_sample.sampleFile().isEmpty())
+	const auto& sampleFile = m_sample.source().audioFileRelative();
+	elem.setAttribute("src", sampleFile);
+	if (sampleFile.isEmpty())
 	{
 		elem.setAttribute("sampledata", m_sample.toBase64());
 	}
@@ -223,7 +226,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(sampleData));
+		m_sample = Sample(SampleLoader::fromBase64(sampleData));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -308,15 +311,15 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
-			QFileInfo(m_sample.sampleFile()).fileName() ||
-				m_sample.sampleFile().isEmpty()))
+			QFileInfo(m_sample.source().audioFileAbsolute()).fileName() ||
+				m_sample.source().audioFileAbsolute().isEmpty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
+	m_sample = Sample(SampleLoader::fromFile(_audio_file));
 	loopPointChanged();
 	emit sampleUpdated();
 }

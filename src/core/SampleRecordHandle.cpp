@@ -121,7 +121,7 @@ std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 	}
 
 	// create according sample-buffer out of big buffer
-	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), Engine::audioEngine()->inputSampleRate());
+	return SampleBuffer::create(std::move(bigBuffer), Engine::audioEngine()->inputSampleRate());
 }
 
 

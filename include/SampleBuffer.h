@@ -51,18 +51,95 @@ public:
 	using reverse_iterator = std::vector<sampleFrame>::reverse_iterator;
 	using const_reverse_iterator = std::vector<sampleFrame>::const_reverse_iterator;
 
-	SampleBuffer() = default;
-	explicit SampleBuffer(const QString& audioFile);
-	SampleBuffer(const QString& base64, int sampleRate);
-	SampleBuffer(std::vector<sampleFrame> data, int sampleRate);
-	SampleBuffer(
-		const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	class LMMS_EXPORT Source
+	{
+	public:
+		enum class Type
+		{
+			Unknown,
+			AudioFile,
+			Base64
+		};
+
+		Source() = default;
+		Source(const QString& filePath);
+		Source(const QString& base64, sample_rate_t sampleRate);
+
+		/**
+		 * A unique string identifying the SampleBuffer's source.
+		 *   - For audio files, this is the shortest relative path from PathUtil.
+		 *   - For base64, this is a string encoding the hash of the base64 data + the sample rate.
+		 *   - For anything else, this is empty.
+		*/
+		auto identifier() const -> const QString& { return m_identifier; }
+
+		auto type() const -> Type { return m_type; }
+
+		auto hash() const -> std::size_t { return m_hash; }
+
+		//! The audio file relative path or an empty string
+		auto audioFileRelative() const -> const QString&;
+
+		//! The audio file full path or an empty string
+		auto audioFileAbsolute() const -> QString;
+
+		struct Hasher
+		{
+			auto operator()(const Source& src) const noexcept -> std::size_t
+			{
+				return src.hash();
+			}
+		};
+
+		friend auto operator==(const Source& lhs, const Source& rhs) noexcept -> bool
+		{
+			return lhs.m_type == rhs.m_type
+				&& lhs.m_hash == rhs.m_hash
+				&& lhs.m_identifier == rhs.m_identifier;
+		}
+
+	private:
+		Type m_type = Type::Unknown;
+		QString m_identifier;
+		std::size_t m_hash = 0;
+	};
+
+	//! passkey idiom
+	class Access
+	{
+	public:
+		friend class SampleBuffer;
+		friend class SampleLoader;
+		Access(Access&&) = default;
+	private:
+		Access() {}
+		Access(const Access&) = default;
+	};
+
+	SampleBuffer() = delete;
+	explicit SampleBuffer(Access) {}
+	SampleBuffer(Access, const QString& audioFile);
+	SampleBuffer(Access, const QString& base64, sample_rate_t sampleRate);
+	SampleBuffer(Access, std::vector<sampleFrame> data, sample_rate_t sampleRate);
+	SampleBuffer(Access, const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate);
+
+	static auto create() -> std::shared_ptr<const SampleBuffer>;
+	static auto create(const QString& audioFile) -> std::shared_ptr<const SampleBuffer>;
+	static auto create(const QString& base64, sample_rate_t sampleRate) -> std::shared_ptr<const SampleBuffer>;
+	static auto create(std::vector<sampleFrame> data, sample_rate_t sampleRate)
+		-> std::shared_ptr<const SampleBuffer>;
+	static auto create(const sampleFrame* data, size_t numFrames,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate())
+		-> std::shared_ptr<const SampleBuffer>;
+
+	~SampleBuffer() = default;
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
+
 	auto toBase64() const -> QString;
 
-	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
+	auto source() const -> const Source& { return m_source; }
 
 	auto begin() -> iterator { return m_data.begin(); }
 	auto end() -> iterator { return m_data.end(); }
@@ -86,12 +163,10 @@ public:
 	auto size() const -> size_type { return m_data.size(); }
 	auto empty() const -> bool { return m_data.empty(); }
 
-	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
-
 private:
 	std::vector<sampleFrame> m_data;
-	QString m_audioFile;
 	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
+	Source m_source;
 };
 
 } // namespace lmms

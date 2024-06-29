@@ -29,7 +29,7 @@
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
-	: m_buffer(std::make_shared<SampleBuffer>(audioFile))
+	: m_buffer(SampleBuffer::create(audioFile))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -37,8 +37,8 @@ Sample::Sample(const QString& audioFile)
 {
 }
 
-Sample::Sample(const QByteArray& base64, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(base64, sampleRate))
+Sample::Sample(const QByteArray& base64, sample_rate_t sampleRate)
+	: m_buffer(SampleBuffer::create(base64, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -46,8 +46,8 @@ Sample::Sample(const QByteArray& base64, int sampleRate)
 {
 }
 
-Sample::Sample(const sampleFrame* data, size_t numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
+Sample::Sample(const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
+	: m_buffer(SampleBuffer::create(data, numFrames, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -56,7 +56,7 @@ Sample::Sample(const sampleFrame* data, size_t numFrames, int sampleRate)
 }
 
 Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
-	: m_buffer(buffer)
+	: m_buffer(buffer ? std::move(buffer) : SampleBuffer::create())
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -76,7 +76,7 @@ Sample::Sample(const Sample& other)
 {
 }
 
-Sample::Sample(Sample&& other)
+Sample::Sample(Sample&& other) noexcept
 	: m_buffer(std::move(other.m_buffer))
 	, m_startFrame(other.startFrame())
 	, m_endFrame(other.endFrame())
@@ -102,7 +102,7 @@ auto Sample::operator=(const Sample& other) -> Sample&
 	return *this;
 }
 
-auto Sample::operator=(Sample&& other) -> Sample&
+auto Sample::operator=(Sample&& other) noexcept -> Sample&
 {
 	m_buffer = std::move(other.m_buffer);
 	m_startFrame = other.startFrame();
@@ -127,7 +127,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
-	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
+	const auto marginSize = InterpolationMargins[state->resampler().interpolationMode()];
 
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 

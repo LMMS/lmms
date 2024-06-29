@@ -1,5 +1,5 @@
 /*
- * SampleDecoder.h - Decodes audio files in various formats
+ * SampleLoaderDialog.h - Load audio and waveform files
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
@@ -22,36 +22,26 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_DECODER_H
-#define LMMS_SAMPLE_DECODER_H
+#ifndef LMMS_GUI_SAMPLE_LOADER_DIALOG_H
+#define LMMS_GUI_SAMPLE_LOADER_DIALOG_H
 
 #include <QString>
-#include <functional>
-#include <optional>
-#include <string>
-#include <vector>
 
-#include "lmms_basics.h"
+#include "SampleLoader.h"
+#include "lmms_export.h"
 
-namespace lmms {
-class SampleDecoder
+namespace lmms::gui {
+
+class LMMS_EXPORT SampleLoaderDialog
 {
 public:
-	struct Result
-	{
-		std::vector<sampleFrame> data;
-		sample_rate_t sampleRate;
-	};
+	//! Returns relative path
+	static auto openAudioFile(const QString& previousFile = "") -> QString;
 
-	struct AudioType
-	{
-		std::string name;
-		std::string extension;
-	};
-
-	static auto decode(const QString& audioFile) -> std::optional<Result>;
-	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
+	//! Returns relative path
+	static auto openWaveformFile(const QString& previousFile = "") -> QString;
 };
-} // namespace lmms
 
-#endif // LMMS_SAMPLE_DECODER_H
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SAMPLE_LOADER_DIALOG_H
