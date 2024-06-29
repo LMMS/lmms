@@ -29,7 +29,7 @@
 
 #include "Effect.h"
 #include "WaveShaperControls.h"
-#include "VectorGraph.h"
+#include "VectorGraphModel.h"
 
 namespace lmms
 {
