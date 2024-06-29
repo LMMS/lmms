@@ -44,7 +44,7 @@ class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	explicit VstPlugin(const QString& plugin, Model* parent = nullptr);
 	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
