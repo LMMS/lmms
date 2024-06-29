@@ -24,7 +24,7 @@
 
 
 #include "VectorGraphViewBase.h"
-#include "VectorGraph.h"
+#include "VectorGraphView.h"
 
 #include <vector>
 #include <QInputDialog> // showInputDialog()
@@ -38,8 +38,6 @@
 #include "GuiApplication.h" // getGUI
 #include "SimpleTextFloat.h"
 #include "AutomatableModel.h"
-#include "ControllerConnectionDialog.h"
-#include "ControllerConnection.h"
 #include "Knob.h"
 #include "ComboBox.h"
 

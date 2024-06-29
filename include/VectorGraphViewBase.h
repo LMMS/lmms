@@ -40,7 +40,7 @@
 namespace lmms
 {
 
-class VectorGraphModel;
+class VectorGraphView;
 class FloatModel;
 
 namespace gui
