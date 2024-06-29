@@ -29,7 +29,7 @@
 
 #include "WaveShaperControls.h"
 #include "WaveShaper.h"
-#include "VectorGraph.h"
+#include "VectorGraphModel.h"
 #include "Engine.h"
 #include "Song.h"
 #include "base64.h"
