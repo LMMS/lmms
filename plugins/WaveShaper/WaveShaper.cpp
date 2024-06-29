@@ -28,7 +28,7 @@
 #include "lmms_math.h"
 #include "embed.h"
 #include "interpolation.h"
-#include "VectorGraph.h"
+#include "VectorGraphModel.h"
 
 #include "plugin_export.h"
 
