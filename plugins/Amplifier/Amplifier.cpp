@@ -33,7 +33,7 @@
 namespace lmms
 {
 
-template class LMMS_EXPORT TypedAutomatableModel<float>;
+template class PLUGIN_EXPORT TypedAutomatableModel<float>;
 
 extern "C"
 {
