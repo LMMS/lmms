@@ -23,17 +23,12 @@
  *
  */
 
-#pragma once
-
-#ifndef SAMPLEFRAME_H
-#define SAMPLEFRAME_H
+#ifndef LMMS_SAMPLEFRAME_H
+#define LMMS_SAMPLEFRAME_H
 
 #include "lmms_basics.h"
 
 #include <array>
-
-#include <cmath>
-#include <algorithm>
 
 
 namespace lmms
@@ -231,4 +226,4 @@ inline void copyFromSampleFrames(float* target, const SampleFrame* source, fpp_t
 
 } // namespace lmms
 
-#endif // SAMPLEFRAME_H
+#endif // LMMS_SAMPLEFRAME_H
