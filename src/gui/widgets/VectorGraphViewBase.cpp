@@ -116,7 +116,6 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	m_effectModelB(nullptr, "", false),
 	m_effectModelC(nullptr, "", false)
 {
-
 	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model)
 	{
         Knob* newKnob = new Knob(KnobType::Bright26, this);
@@ -127,11 +126,10 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
         return newKnob;
     };
 
-	/*
-	setWindowIcon(embed::getIconPixmap("setup_audio"));
-	setWindowTitle(tr("Connection Settings"));
-	//setModal(true);
-*/
+	//m_controlModelArray
+	//m_hideableKnobs
+	//m_hideableComboBoxes
+
 	setWindowTitle(tr("vector graph settings"));
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -157,6 +155,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 		Knob* newKnob = makeKnob(m_controlFloatText[i + 1], m_controlFloatText[i], "%", curModel);
 		knobLayout->addWidget(newKnob);
 		knobLayout->setAlignment(newKnob, Qt::AlignHCenter);
+		m_hideableKnobs.push_back(newKnob);
 
 		connect(curModel, &AutomatableModel::setValueEvent,
 				this, &VectorGraphCotnrolDialog::controlValueChanged);
@@ -196,6 +195,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	lineTypeComboBox->show();
 	settingLayout->addWidget(lineTypeComboBox);
 	settingLayout->setAlignment(lineTypeComboBox, Qt::AlignHCenter);
+	m_hideableComboBoxes.push_back(lineTypeComboBox);
 
 	QLabel* automatedAttribLabel = new QLabel(tr("automated attribute:"));
 	automatedAttribLabel->setFixedSize(130, 20);
@@ -207,6 +207,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	automatedAttribComboBox->show();
 	settingLayout->addWidget(automatedAttribComboBox);
 	settingLayout->setAlignment(automatedAttribComboBox, Qt::AlignHCenter);
+	m_hideableComboBoxes.push_back(automatedAttribComboBox);
 
 	QLabel* effectedAttribLabel = new QLabel(tr("effected attribute:"));
 	effectedAttribLabel->setFixedSize(130, 20);
@@ -218,6 +219,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	effectedAttribComboBox->show();
 	settingLayout->addWidget(effectedAttribComboBox);
 	settingLayout->setAlignment(effectedAttribComboBox, Qt::AlignHCenter);
+	m_hideableComboBoxes.push_back(effectedAttribComboBox);
 
 	QLabel* effectedLabelA = new QLabel(tr("1. effect:"));
 	effectedLabelA->setFixedSize(100, 20);
@@ -229,6 +231,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	effectedComboBoxA->show();
 	settingLayout->addWidget(effectedComboBoxA);
 	settingLayout->setAlignment(effectedComboBoxA, Qt::AlignHCenter);
+	m_hideableComboBoxes.push_back(effectedComboBoxA);
 
 	QLabel* effectedLabelB = new QLabel(tr("2. effect:"));
 	effectedLabelB->setFixedSize(100, 20);
@@ -240,6 +243,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	effectedComboBoxB->show();
 	settingLayout->addWidget(effectedComboBoxB);
 	settingLayout->setAlignment(effectedComboBoxB, Qt::AlignHCenter);
+	m_hideableComboBoxes.push_back(effectedComboBoxB);
 
 	QLabel* effectedLabelC = new QLabel(tr("3. effect:"));
 	effectedLabelC->setFixedSize(100, 20);
@@ -251,6 +255,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	effectedComboBoxC->show();
 	settingLayout->addWidget(effectedComboBoxC);
 	settingLayout->setAlignment(effectedComboBoxC, Qt::AlignHCenter);
+	m_hideableComboBoxes.push_back(effectedComboBoxC);
 
 
 	m_automationLayout = new QVBoxLayout(nullptr);
@@ -320,6 +325,7 @@ void VectorGraphCotnrolDialog::hideAutomation()
 		m_curAutomationModelKnob = nullptr;
 	}
 }
+
 void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned int selectedLocation)
 {
 	m_curSelectedArray = selectedArray;
@@ -328,25 +334,31 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 	m_vectorGraphView->model()->getDataArray(selectedArray)->setAutomated(selectedLocation, true);
 	m_curAutomationModel = m_vectorGraphView->model()->getDataArray(selectedArray)->getAutomationModel(selectedLocation);
 
-	if (m_curAutomationModel == nullptr) { hideAutomation(); return; }
-
-	if (m_curAutomationModelKnob != nullptr)
+	if (m_curAutomationModel != nullptr)
 	{
-		if (m_curAutomationModel != m_curAutomationModelKnob->model())
+		if (m_curAutomationModelKnob != nullptr)
 		{
+			if (m_curAutomationModel != m_curAutomationModelKnob->model())
+			{
+				m_curAutomationModelKnob->setModel(m_curAutomationModel);
+			}
+		}
+		else
+		{
+			m_curAutomationModelKnob = new Knob(KnobType::Bright26, this);
 			m_curAutomationModelKnob->setModel(m_curAutomationModel);
+			m_curAutomationModelKnob->setLabel(tr("automation knob"));
+			m_curAutomationModelKnob->setHintText(tr("automate this to automate a value of the vector graph"), "%");
+			m_curAutomationModelKnob->setVolumeKnob(false);
+
+			m_automationLayout->addWidget(m_curAutomationModelKnob);
+			m_automationLayout->setAlignment(m_curAutomationModelKnob, Qt::AlignHCenter);
 		}
 	}
 	else
 	{
-		m_curAutomationModelKnob = new Knob(KnobType::Bright26, this);
-		m_curAutomationModelKnob->setModel(m_curAutomationModel);
-		m_curAutomationModelKnob->setLabel(tr("automation knob"));
-		m_curAutomationModelKnob->setHintText(tr("automate this to automate a value of the vector graph"), "%");
-		m_curAutomationModelKnob->setVolumeKnob(false);
-
-		m_automationLayout->addWidget(m_curAutomationModelKnob);
-		m_automationLayout->setAlignment(m_curAutomationModelKnob, Qt::AlignHCenter);
+		hideAutomation();
+		m_isValidSelection = true;
 	}
 	updateControls();
 }
@@ -367,9 +379,10 @@ void VectorGraphCotnrolDialog::effectedLineClicked(bool isChecked)
 	float currentValue = m_vectorGraphView->getInputAttribValue(12);
 	m_vectorGraphView->setInputAttribValue(12, currentValue >= 0.5f ? 0.0f : 1.0f);
 }
+
 void VectorGraphCotnrolDialog::deleteAutomationClicked(bool isChecked)
 {
-	if (m_isValidSelection == false) {  hideAutomation(); return; }
+	if (m_isValidSelection == false) { hideAutomation(); return; }
 	
 	bool swapIsValidSelection = m_isValidSelection;
 	hideAutomation();
@@ -394,6 +407,50 @@ void VectorGraphCotnrolDialog::updateControls()
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
 		m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i));
+	}
+
+	for (Knob* i : m_hideableKnobs)
+	{
+		if (i != nullptr)
+		{
+			i->show();
+		}
+	}
+	for (ComboBox* i : m_hideableComboBoxes)
+	{
+		if (i != nullptr)
+		{
+			i->show();
+		}
+	}
+
+	// hiding different parts of the gui
+	// to not confuse the user
+	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsFixedX() == true && m_hideableKnobs[0] != nullptr)
+	{
+		m_hideableKnobs[0]->hide();
+	}
+	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsFixedY() == true && m_hideableKnobs[1] != nullptr)
+	{
+		m_hideableKnobs[1]->hide();
+	}
+	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsEditableAttrib() == false)
+	{
+		if (m_hideableKnobs[1] != nullptr) { m_hideableKnobs[1]->hide(); }
+		if (m_hideableKnobs[2] != nullptr) { m_hideableKnobs[2]->hide(); }
+		if (m_hideableKnobs[3] != nullptr) { m_hideableKnobs[3]->hide(); }
+		if (m_hideableKnobs[4] != nullptr) { m_hideableKnobs[4]->hide(); }
+		if (m_hideableComboBoxes[0] != nullptr) { m_hideableComboBoxes[0]->hide(); }
+		if (m_hideableComboBoxes[1] != nullptr) { m_hideableComboBoxes[1]->hide(); }
+		if (m_hideableComboBoxes[2] != nullptr) { m_hideableComboBoxes[2]->hide(); }
+	}
+	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsAutomatableEffectable() == false)
+	{
+		if (m_hideableComboBoxes[1] != nullptr) { m_hideableComboBoxes[1]->hide(); }
+		if (m_hideableComboBoxes[2] != nullptr) { m_hideableComboBoxes[2]->hide(); }
+		if (m_hideableComboBoxes[3] != nullptr) { m_hideableComboBoxes[3]->hide(); }
+		if (m_hideableComboBoxes[4] != nullptr) { m_hideableComboBoxes[4]->hide(); }
+		if (m_hideableComboBoxes[5] != nullptr) { m_hideableComboBoxes[5]->hide(); }
 	}
 
 	m_lineTypeModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(5));
