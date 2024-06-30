@@ -135,6 +135,8 @@ private:
 
 
 	std::vector<FloatModel*> m_controlModelArray;
+	std::vector<Knob*> m_hideableKnobs;
+	std::vector<ComboBox*> m_hideableComboBoxes;
 };
 
 } // namespace gui
