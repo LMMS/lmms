@@ -85,7 +85,7 @@ namespace lmms
 
 
 //! Class to keep track of all LV2 plugins
-class Lv2Manager
+class LMMS_EXPORT Lv2Manager
 {
 public:
 	void initPlugins();
