@@ -71,11 +71,6 @@
 			"default-features": false
 		},
 		{
-			"name": "pulseaudio",
-			"default-features": false,
-			"platform": "mingw"
-		},
-		{
 			"name": "sdl2",
 			"default-features": false
 		},
