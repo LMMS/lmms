@@ -46,7 +46,6 @@
 #include "MidiEvent.h"
 #include "MidiEventToByteSeq.h"
 #include "NoCopyNoMove.h"
-#include "SubWindow.h"
 
 
 namespace lmms
