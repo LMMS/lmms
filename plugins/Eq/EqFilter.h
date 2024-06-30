@@ -432,7 +432,7 @@ public:
 
 
 
-	virtual void processBuffer( sampleFrame* buf, const fpp_t frames )
+	virtual void processBuffer( SampleFrame* buf, const fpp_t frames )
 	{
 		for ( fpp_t f = 0 ; f < frames ; ++f)
 		{

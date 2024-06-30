@@ -183,7 +183,7 @@ int NotePlayHandle::midiKey() const
 
 
 
-void NotePlayHandle::play( sampleFrame * _working_buffer )
+void NotePlayHandle::play( SampleFrame* _working_buffer )
 {
 	if (m_muted)
 	{

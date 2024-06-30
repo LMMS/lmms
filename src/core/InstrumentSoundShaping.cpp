@@ -127,7 +127,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 
 
 
-void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
+void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 							const fpp_t frames,
 							NotePlayHandle* n )
 {

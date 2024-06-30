@@ -43,7 +43,7 @@ class CompressorEffect : public Effect
 public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~CompressorEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -105,7 +105,7 @@ private:
 
 	float m_coeffPrecalc;
 
-	sampleFrame m_maxLookaheadVal;
+	SampleFrame m_maxLookaheadVal;
 
 	int m_maxLookaheadTimer[2] = {1, 1};
 	

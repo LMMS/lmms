@@ -75,7 +75,7 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{

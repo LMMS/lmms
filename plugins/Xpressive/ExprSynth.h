@@ -37,6 +37,7 @@ namespace lmms
 
 class ExprFrontData;
 class NotePlayHandle;
+class SampleFrame;
 
 namespace gui
 {
@@ -106,7 +107,7 @@ public:
 			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
 	virtual ~ExprSynth();
 
-	void renderOutput(fpp_t frames, sampleFrame* buf );
+	void renderOutput(fpp_t frames, SampleFrame* buf );
 
 
 private:

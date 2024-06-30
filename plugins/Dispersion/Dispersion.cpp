@@ -58,7 +58,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool DispersionEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning())
 	{

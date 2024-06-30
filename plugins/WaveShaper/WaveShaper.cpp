@@ -66,7 +66,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
+bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )

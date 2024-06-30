@@ -64,7 +64,7 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-bool StereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
+bool StereoMatrixEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	

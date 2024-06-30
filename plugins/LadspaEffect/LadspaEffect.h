@@ -47,7 +47,7 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~LadspaEffect() override;
 
-	bool processAudioBuffer( sampleFrame * _buf,
+	bool processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames ) override;
 	
 	void setControl( int _control, LADSPA_Data _data );

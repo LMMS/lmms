@@ -57,7 +57,7 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool AmplifierEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false ; }
 
@@ -80,14 +80,14 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
 
-		auto s = std::array{buf[f][0], buf[f][1]};
+		auto& currentFrame = buf[f];
 
-		s[0] *= volume * left * panLeft;
-		s[1] *= volume * right * panRight;
+		const auto s = currentFrame * SampleFrame(left * panLeft, right * panRight) * volume;
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		// Dry/wet mix
+		currentFrame = currentFrame * d + s * w;
+
+		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
 	checkGate(outSum / frames);

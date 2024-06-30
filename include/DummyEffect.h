@@ -107,7 +107,7 @@ public:
 		return &m_controls;
 	}
 
-	bool processAudioBuffer( sampleFrame *, const fpp_t ) override
+	bool processAudioBuffer( SampleFrame*, const fpp_t ) override
 	{
 		return false;
 	}

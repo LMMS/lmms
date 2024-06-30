@@ -105,7 +105,7 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 
 
 void AudioFileProcessor::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -165,7 +165,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 		}
 		else
 		{
-			memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
+			zeroSampleFrames(_working_buffer, frames + offset);
 			emit isPlaying( 0 );
 		}
 	}

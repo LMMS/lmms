@@ -90,7 +90,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
+bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{

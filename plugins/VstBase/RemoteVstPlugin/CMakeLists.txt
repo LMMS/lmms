@@ -66,21 +66,6 @@ endif()
 
 if(IS_MINGW)
 	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
-
-	CHECK_CXX_SOURCE_COMPILES("
-	#include <mutex>
-	int main(int argc, const char* argv[]) {
-		std::mutex m;
-		return 0;
-	}
-	" HAS_STD_MUTEX)
-
-	if(NOT HAS_STD_MUTEX)
-		target_include_directories(${EXE_NAME} SYSTEM PRIVATE
-			"${LMMS_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
-		target_compile_definitions(${EXE_NAME} PRIVATE
-			-DUSE_MINGW_THREADS_REPLACEMENT)
-	endif()
 endif()
 
 if(LMMS_BUILD_WIN32)

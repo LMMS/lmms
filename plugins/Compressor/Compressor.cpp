@@ -233,7 +233,7 @@ void CompressorEffect::calcMix()
 
 
 
-bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool CompressorEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning())
 	{
