@@ -173,7 +173,7 @@ jobs:
         arch: ['32', '64']
     name: mingw${{ matrix.arch }}
     runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.mingw:20.04
+    container: ghcr.io/lmms/base:24.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -183,7 +183,40 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Enable POSIX MinGW
+      - name: Prepare container
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            dirmngr                             \
+            gnupg
+          echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" >> /etc/apt/sources.list
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            nsis                                \
+            libmpc3                             \
+            mingw-w64                           \
+            mingw-w64-tools                     \
+            glib2-mingw-w64                     \
+            fftw-mingw-w64                      \
+            flac-mingw-w64                      \
+            fluidsynth-mingw-w64                \
+            lame-mingw-w64                      \
+            libgig-mingw-w64                    \
+            libsamplerate-mingw-w64             \
+            libsndfile-mingw-w64                \
+            libsoundio-mingw-w64                \
+            libvorbis-mingw-w64                 \
+            libz-mingw-w64-dev                  \
+            portaudio-mingw-w64                 \
+            qt5base-mingw-w64                   \
+            sdl2-mingw-w64                      \
+            fltk-mingw-w64                      \
+            stk-mingw-w64                       \
+            file
+      - name: APT cleanup
+        run: rm -rf /var/lib/apt/lists/*
+      - name: enable POSIX MinGW
         run: |
           update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
           update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
@@ -205,6 +238,14 @@ jobs:
             ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
             ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/.ccache
+      - name: Install 32-bit POSIX MinGW
+        if: ${{ matrix.arch == '32' }}
+        run: |
+          apt-get install g++-mingw-w64-i686-posix
+      - name: Install 64-bit POSIX MinGW
+        if: ${{ matrix.arch == '64' }}
+        run: |
+          apt-get install g++-mingw-w64-x86-64-posix
       - name: Configure
         run: |
           ccache --zero-stats
