@@ -121,23 +121,23 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	assert(numFrames > 0);
 	assert(desiredFrequency > 0);
 
-	const auto pastBounds = state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards);
+	const auto pastBounds = state->frameIndex >= m_endFrame || (state->frameIndex < 0 && state->backwards);
 	if (loopMode == Loop::Off && pastBounds) { return false; }
 
 	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
-	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
+	const auto marginSize = s_interpolationMargins[state->resampler.interpolationMode()];
 
-	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
+	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
 	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
 
-	state->resampler().setRatio(resampleRatio);
+	state->resampler.setRatio(resampleRatio);
 
 	const auto resampleResult
-		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
+		= state->resampler.resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
 	advance(state, resampleResult.inputFramesUsed, loopMode);
 
 	const auto outputFrames = resampleResult.outputFramesGenerated;
@@ -174,8 +174,8 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 {
 	if (m_buffer->size() < 1) { return; }
 
-	auto index = state->m_frameIndex;
-	auto backwards = state->m_backwards;
+	auto index = state->frameIndex;
+	auto backwards = state->backwards;
 
 	for (size_t i = 0; i < numFrames; ++i)
 	{
@@ -211,36 +211,36 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 
 void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
 {
-	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+	state->frameIndex += (state->backwards ? -1 : 1) * advanceAmount;
 	if (loopMode == Loop::Off) { return; }
 
-	const auto distanceFromLoopStart = std::abs(state->m_frameIndex - m_loopStartFrame);
-	const auto distanceFromLoopEnd = std::abs(state->m_frameIndex - m_loopEndFrame);
+	const auto distanceFromLoopStart = std::abs(state->frameIndex - m_loopStartFrame);
+	const auto distanceFromLoopEnd = std::abs(state->frameIndex - m_loopEndFrame);
 	const auto loopSize = m_loopEndFrame - m_loopStartFrame;
 	if (loopSize == 0) { return; }
 
 	switch (loopMode)
 	{
 	case Loop::On:
-		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+		if (state->frameIndex < m_loopStartFrame && state->backwards)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % loopSize;
+			state->frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % loopSize;
 		}
-		else if (state->m_frameIndex >= m_loopEndFrame)
+		else if (state->frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopStartFrame + distanceFromLoopEnd % loopSize;
+			state->frameIndex = m_loopStartFrame + distanceFromLoopEnd % loopSize;
 		}
 		break;
 	case Loop::PingPong:
-		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+		if (state->frameIndex < m_loopStartFrame && state->backwards)
 		{
-			state->m_frameIndex = m_loopStartFrame + distanceFromLoopStart % loopSize;
-			state->m_backwards = false;
+			state->frameIndex = m_loopStartFrame + distanceFromLoopStart % loopSize;
+			state->backwards = false;
 		}
-		else if (state->m_frameIndex >= m_loopEndFrame)
+		else if (state->frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % loopSize;
-			state->m_backwards = true;
+			state->frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % loopSize;
+			state->backwards = true;
 		}
 		break;
 	default:

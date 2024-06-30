@@ -50,30 +50,16 @@ public:
 		PingPong
 	};
 
-	class LMMS_EXPORT PlaybackState
+	struct LMMS_EXPORT PlaybackState
 	{
-	public:
-		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
-			: m_resampler(interpolationMode, DEFAULT_CHANNELS)
-			, m_varyingPitch(varyingPitch)
+		PlaybackState(int interpolationMode = SRC_LINEAR)
+			: resampler(interpolationMode, DEFAULT_CHANNELS)
 		{
 		}
 
-		auto resampler() -> AudioResampler& { return m_resampler; }
-		auto frameIndex() const -> int { return m_frameIndex; }
-		auto varyingPitch() const -> bool { return m_varyingPitch; }
-		auto backwards() const -> bool { return m_backwards; }
-
-		void setFrameIndex(int frameIndex) { m_frameIndex = frameIndex; }
-		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
-		void setBackwards(bool backwards) { m_backwards = backwards; }
-
-	private:
-		AudioResampler m_resampler;
-		int m_frameIndex = 0;
-		bool m_varyingPitch = false;
-		bool m_backwards = false;
-		friend class Sample;
+		AudioResampler resampler;
+		int frameIndex = 0;
+		bool backwards = false;
 	};
 
 	Sample() = default;
