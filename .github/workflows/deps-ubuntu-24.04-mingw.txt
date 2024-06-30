@@ -5,6 +5,7 @@ ccache
 cmake
 dirmngr
 fftw-mingw-w64
+fltk-mingw-w64
 file
 git
 gnupg
@@ -26,6 +27,7 @@ mingw-w64
 mingw-w64-tools
 nsis
 perl
+portaudio-mingw-w64
 qt5-qmake
 qt5base-mingw-w64
 qt5svg-mingw-w64
