@@ -70,9 +70,9 @@ void PlayHandle::releaseBuffer()
 	m_bufferReleased = true;
 }
 
-sampleFrame* PlayHandle::buffer()
+SampleFrame* PlayHandle::buffer()
 {
-	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
+	return m_bufferReleased ? nullptr : m_playHandleBuffer;
 };
 
 } // namespace lmms

@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "lmms_basics.h"
+#include "SampleFrame.h"
 
 namespace lmms {
 class SampleDecoder
@@ -39,7 +40,7 @@ class SampleDecoder
 public:
 	struct Result
 	{
-		std::vector<sampleFrame> data;
+		std::vector<SampleFrame> data;
 		int sampleRate;
 	};
 

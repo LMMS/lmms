@@ -60,7 +60,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false; }
 

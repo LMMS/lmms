@@ -40,7 +40,7 @@ class MultitapEchoEffect : public Effect
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~MultitapEchoEffect() override;
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
 
 	EffectControls* controls() override
 	{
@@ -49,7 +49,7 @@ public:
 
 private:
 	void updateFilters( int begin, int end );
-	void runFilter( sampleFrame * dst, sampleFrame * src, StereoOnePole & filter, const fpp_t frames );
+	void runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames );
 
 	inline void setFilterFreq( float fc, StereoOnePole & f )
 	{
@@ -70,7 +70,7 @@ private:
 	float m_sampleRate;
 	float m_sampleRatio;
 	
-	sampleFrame * m_work;
+	SampleFrame* m_work;
 
 	friend class MultitapEchoControls;
 
