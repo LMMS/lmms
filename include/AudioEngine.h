@@ -410,7 +410,7 @@ private:
 
 	bool m_clearSignal;
 
-	std::mutex m_changeMutex;
+	std::recursive_mutex m_changeMutex;
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
