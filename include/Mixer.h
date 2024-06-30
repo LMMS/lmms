@@ -41,8 +41,9 @@ namespace lmms
 class MixerRoute;
 using MixerRouteVector = std::vector<MixerRoute*>;
 
-class MixerChannel : public ThreadableJob
+class MixerChannel : public QObject, public ThreadableJob
 {
+	Q_OBJECT
 	public:
 		MixerChannel( int idx, Model * _parent );
 		virtual ~MixerChannel();
@@ -82,11 +83,18 @@ class MixerChannel : public ThreadableJob
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
-		
+		void sanitizeOutput();
+
+		static void setMuteInvalidOutput(bool mute);
+
+	signals:
+		void hasInvalidOutput(bool invalid);
+
 	private:
 		void doProcessing() override;
-
 		std::optional<QColor> m_color;
+		bool m_hasInvalidOutput = false;
+		inline static bool s_muteInvalidOutput = false;
 };
 
 class MixerRoute : public QObject

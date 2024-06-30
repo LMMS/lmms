@@ -23,6 +23,7 @@
  *
  */
 
+#include "Mixer.h"
 #include "lmmsconfig.h"
 #include "lmmsversion.h"
 #include "versioninfo.h"
@@ -722,8 +723,7 @@ int main( int argc, char * * argv )
 	ConfigManager::inst()->loadConfigFile(configFile);
 
 	// Hidden settings
-	MixHelpers::setNaNHandler( ConfigManager::inst()->value( "app",
-						"nanhandler", "1" ).toInt() );
+	MixerChannel::setMuteInvalidOutput(ConfigManager::inst()->value("app", "muteinvalidoutput", "1").toInt());
 
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );

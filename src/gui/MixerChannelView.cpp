@@ -33,7 +33,6 @@
 #include "ConfigManager.h"
 
 #include "gui_templates.h"
-#include "lmms_math.h"
 
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
@@ -141,6 +140,7 @@ namespace lmms::gui
         mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
+        connect(mixerChannel, &MixerChannel::hasInvalidOutput, this, &MixerChannelView::onInvalidOutput);
     }
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -490,6 +490,20 @@ namespace lmms::gui
     MixerChannel* MixerChannelView::mixerChannel() const
     {
         return Engine::mixer()->mixerChannel(m_channelIndex);
+    }
+
+    void MixerChannelView::onInvalidOutput(bool invalid)
+    {
+        if (invalid)
+        {
+            m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_red"));
+            m_muteButton->setToolTip(tr("Mixer channel is muted because of invalid output"));
+        }
+        else
+        {
+            m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
+            m_muteButton->setToolTip(tr("Mute this channel"));
+        }
     }
 
 } // namespace lmms::gui

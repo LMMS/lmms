@@ -36,12 +36,6 @@ namespace MixHelpers
 
 bool isSilent( const sampleFrame* src, int frames );
 
-bool useNaNHandler();
-
-void setNaNHandler( bool use );
-
-bool sanitize( sampleFrame * src, int frames );
-
 /*! \brief Add samples from src to dst */
 void add( sampleFrame* dst, const sampleFrame* src, int frames );
 
@@ -59,15 +53,6 @@ void addMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coef
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
 void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
-
-/*! \brief Same as addMultiplied, but sanitize output (strip out infs/nans) */
-void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
-
-/*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst - sanitized version */
-void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
-
-/*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst - sanitized version */
-void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
 void addMultipliedStereo( sampleFrame* dst, const sampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
