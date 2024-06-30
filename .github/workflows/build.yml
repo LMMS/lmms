@@ -311,7 +311,7 @@ jobs:
         run: |
           sudo apt-get update
           .github/workflows/setup-cmake.sh
-          .github/workflows/setup-mingw-packages.sh
+          sudo .github/workflows/setup-mingw-packages.sh
           sudo apt-get install -y $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Cache vcpkg dependencies
         if: ${{ !env.ACT }} # skip during local actions testing
