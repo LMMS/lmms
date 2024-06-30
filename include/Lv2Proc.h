@@ -33,6 +33,8 @@
 #include <memory>
 #include <optional>
 
+#include <ringbuffer/ringbuffer.h>
+
 #include "LinkedModelGroups.h"
 #include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
@@ -40,7 +42,6 @@
 #include "Lv2Options.h"
 #include "Lv2Worker.h"
 #include "Plugin.h"
-#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
 
 

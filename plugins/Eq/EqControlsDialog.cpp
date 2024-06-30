@@ -123,10 +123,10 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		activeButton->setCheckable(true);
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 
-		QString iconActiveFileName = "bandLabel" + QString::number(i+1);
-		QString iconInactiveFileName = "bandLabel" + QString::number(i+1) + "off";
-		activeButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( iconActiveFileName.toLatin1() ) );
-		activeButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( iconInactiveFileName.toLatin1() ) );
+		const auto iconActiveFileName = "bandLabel" + std::to_string(i + 1);
+		const auto iconInactiveFileName = iconActiveFileName + "off";
+		activeButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(iconActiveFileName));
+		activeButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(iconInactiveFileName));
 		activeButton->move( distance - 2, 276 );
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 

@@ -119,7 +119,6 @@ constexpr char LADSPA_PATH_SEPERATOR =
 ':';
 #endif
 
-constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
 #define LMMS_STRINGIFY(s) LMMS_STR(s)

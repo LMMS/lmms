@@ -120,7 +120,7 @@ AutomationEditor::AutomationEditor() :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
-	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
+	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
@@ -1647,14 +1647,14 @@ float AutomationEditor::getLevel(int y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
+	float level = std::roundf( ( m_bottomLevel + ( m_y_auto ?
 			( m_maxLevel - m_minLevel ) * ( level_line_y - y )
 					/ (float)( level_line_y - ( TOP_MARGIN + 2 ) ) :
 			( level_line_y - y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
-	level = qBound( m_bottomLevel, level, m_topLevel );
+	level = qBound(std::roundf(m_bottomLevel), level, std::roundf(m_topLevel));
 
-	return( level );
+	return level;
 }
 
 
@@ -2107,7 +2107,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
 	{
-		m_editor->m_zoomingXModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_editor->m_zoomingXModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_editor->m_zoomingXModel.setValue( m_editor->m_zoomingXModel.findText( "100%" ) );
 

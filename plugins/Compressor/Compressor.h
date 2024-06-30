@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-constexpr float COMP_LOG = -2.2;
+constexpr float COMP_LOG = -2.2f;
 
 class CompressorEffect : public Effect
 {

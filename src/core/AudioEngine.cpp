@@ -37,7 +37,6 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "MemoryHelper.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -137,12 +136,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	int outputBufferSize = m_framesPerPeriod * sizeof(SampleFrame);
-	m_outputBufferRead = static_cast<SampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
-	m_outputBufferWrite = static_cast<SampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferRead = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
+	m_outputBufferWrite = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 
-	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
-	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
@@ -181,8 +177,6 @@ AudioEngine::~AudioEngine()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	MemoryHelper::alignedFree(m_outputBufferRead);
-	MemoryHelper::alignedFree(m_outputBufferWrite);
 
 	for (const auto& input : m_inputBuffer)
 	{
@@ -421,11 +415,11 @@ void AudioEngine::renderStageMix()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
 	Mixer *mixer = Engine::mixer();
-	mixer->masterMix(m_outputBufferWrite);
+	mixer->masterMix(m_outputBufferWrite.get());
 
-	MixHelpers::multiply(m_outputBufferWrite, m_masterGain, m_framesPerPeriod);
+	MixHelpers::multiply(m_outputBufferWrite.get(), m_masterGain, m_framesPerPeriod);
 
-	emit nextAudioBuffer(m_outputBufferRead);
+	emit nextAudioBuffer(m_outputBufferRead.get());
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -450,7 +444,7 @@ const SampleFrame* AudioEngine::renderNextBuffer()
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 
-	return m_outputBufferRead;
+	return m_outputBufferRead.get();
 }
 
 
@@ -463,7 +457,7 @@ void AudioEngine::swapBuffers()
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
-	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
+	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
 }
 
 

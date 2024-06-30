@@ -37,8 +37,10 @@ jobs:
         run: |
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
-          mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX=./install \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -50,7 +52,7 @@ jobs:
           cmake --build build --target install
           cmake --build build --target appimage
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: build/lmms-*.AppImage
@@ -64,8 +66,19 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   macos:
-    name: macos
-    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x86_64, arm64 ]
+        include:
+          - arch: x86_64
+            os: macos-12
+            xcode: "13.1"
+          - arch: arm64
+            os: macos-14
+            xcode: "14.3.1"
+    name: macos-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -74,7 +87,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j3
-      DEVELOPER_DIR: /Applications/Xcode_13.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -84,19 +97,21 @@ jobs:
       - name: Clean up Homebrew download cache
         run: rm -rf ~/Library/Caches/Homebrew/downloads
       - name: Restore Homebrew download cache
+        id: cache-homebrew
         uses: actions/cache/restore@v3
         with:
           key: n/a - only restore from restore-keys
           restore-keys: |
-            homebrew-
+            homebrew-${{ matrix.arch }}-
           path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ github.ref }}-
-            ccache-${{ github.job }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
@@ -114,7 +129,8 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_INSTALL_PREFIX="../target" \
-                -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+                -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
@@ -128,9 +144,9 @@ jobs:
           cmake --build build --target install
           cmake --build build --target dmg
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: macos
+          name: macos-${{ matrix.arch }}
           path: build/lmms-*.dmg
       - name: Trim ccache and print statistics
         run: |
@@ -142,10 +158,14 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500MB
       - name: Save Homebrew download cache
+        if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
         uses: actions/cache/save@v3
         with:
-          key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          key: ${{ env.key }} 
           path: ~/Library/Caches/Homebrew/downloads
+        env:
+          key: "homebrew-${{ matrix.arch }}\
+            -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
     strategy:
       fail-fast: false
@@ -153,7 +173,7 @@ jobs:
         arch: ['32', '64']
     name: mingw${{ matrix.arch }}
     runs-on: ubuntu-latest
-    container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
+    container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -163,12 +183,8 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Update and configure Git
-        run: |
-          add-apt-repository ppa:git-core/ppa
-          apt-get update
-          apt-get --yes install git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
@@ -186,14 +202,17 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          mkdir build && cd build
-          ../cmake/build_win${{ matrix.arch }}.sh
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX=./install \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-${{ matrix.arch }}.cmake" \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mingw${{ matrix.arch }}
           path: build/lmms-*.exe
@@ -201,7 +220,7 @@ jobs:
         run: |
           ccache --cleanup
           echo "[ccache config]"
-          ccache --print-config
+          ccache --show-config
           echo "[ccache stats]"
           ccache --show-stats
         env:
@@ -270,6 +289,7 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DUSE_COMPILE_CACHE=ON `
+            -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_HOST_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
@@ -285,7 +305,7 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: msvc-${{ matrix.arch }}
           path: build\lmms-*.exe

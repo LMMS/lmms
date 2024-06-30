@@ -31,7 +31,7 @@
 #ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #else
-#include "weak_libjack.h"
+#include <weak_libjack.h>
 #endif
 
 #include <atomic>

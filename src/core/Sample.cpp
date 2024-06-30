@@ -134,6 +134,8 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	auto playBuffer = std::vector<SampleFrame>(numFrames / resampleRatio + marginSize);
 	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
 
+	state->resampler().setRatio(resampleRatio);
+
 	const auto resampleResult
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
 	advance(state, resampleResult.inputFramesUsed, loopMode);
@@ -170,6 +172,8 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 
 void Sample::playRaw(SampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const
 {
+	if (m_buffer->size() < 1) { return; }
+
 	auto index = state->m_frameIndex;
 	auto backwards = state->m_backwards;
 

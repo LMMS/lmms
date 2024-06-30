@@ -356,7 +356,7 @@ void ClipView::selectColor()
 	// Get a color from the user
 	const auto newColor = ColorChooser{this}
 		.withPalette(ColorChooser::Palette::Track)
-		->getColor(m_clip->color().value_or(palette().background().color()));
+		->getColor(m_clip->color().value_or(palette().window().color()));
 	if (newColor.isValid()) { setColor(newColor); }
 }
 

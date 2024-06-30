@@ -89,6 +89,7 @@ MixerView::MixerView(Mixer* mixer) :
 	chLayout->setSizeConstraint(QLayout::SetMinimumSize);
 	chLayout->setSpacing(0);
 	chLayout->setContentsMargins(0, 0, 0, 0);
+	chLayout->setAlignment(Qt::AlignLeft);
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// create rack layout before creating the first channel
@@ -105,7 +106,7 @@ MixerView::MixerView(Mixer* mixer) :
 
 	m_racksLayout->addWidget(m_mixerChannelViews[0]->m_effectRackView);
 
-	ml->addWidget(masterView, 0, Qt::AlignTop);
+	ml->addWidget(masterView, 0);
 
 	auto mixerChannelSize = masterView->sizeHint();
 
@@ -137,18 +138,20 @@ MixerView::MixerView(Mixer* mixer) :
 	channelArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	channelArea->setFrameStyle(QFrame::NoFrame);
 	channelArea->setMinimumWidth(mixerChannelSize.width() * 6);
+	channelArea->setWidgetResizable(true);
 
 	int const scrollBarExtent = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-	channelArea->setFixedHeight(mixerChannelSize.height() + scrollBarExtent);
+	channelArea->setMinimumHeight(mixerChannelSize.height() + scrollBarExtent);
 
-	ml->addWidget(channelArea, 1, Qt::AlignTop);
+	ml->addWidget(channelArea, 1);
 
 	// show the add new mixer channel button
 	auto newChannelBtn = new QPushButton(embed::getIconPixmap("new_channel"), QString(), this);
 	newChannelBtn->setObjectName("newChannelBtn");
-	newChannelBtn->setFixedSize(mixerChannelSize);
+	newChannelBtn->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
+	newChannelBtn->setFixedWidth(mixerChannelSize.width());
 	connect(newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
-	ml->addWidget(newChannelBtn, 0, Qt::AlignTop);
+	ml->addWidget(newChannelBtn, 0);
 
 
 	// add the stacked layout for the effect racks of mixer channels
@@ -165,9 +168,6 @@ MixerView::MixerView(Mixer* mixer) :
 
 	// add ourself to workspace
 	QMdiSubWindow* subWin = mainWindow->addWindowedWidget(this);
-	Qt::WindowFlags flags = subWin->windowFlags();
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags(flags);
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
 	subWin->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
@@ -543,6 +543,8 @@ void MixerView::clear()
 {
 	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i); }
 	getMixer()->clearChannel(0);
+
+	m_mixerChannelViews[0]->reset();
 
 	refreshDisplay();
 }

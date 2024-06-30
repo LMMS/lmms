@@ -590,6 +590,9 @@ void CompressorEffect::changeSampleRate()
 	calcInGain();
 	calcTiltCoeffs();
 	calcMix();
+
+	calcAutoAttack();
+	calcAutoRelease();
 }
 
 

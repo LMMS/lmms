@@ -34,6 +34,7 @@
 #include <QThread>
 #include <samplerate.h>
 
+#include <memory>
 #include <vector>
 
 #include "lmms_basics.h"
@@ -371,8 +372,8 @@ private:
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	SampleFrame* m_outputBufferRead;
-	SampleFrame* m_outputBufferWrite;
+	std::unique_ptr<SampleFrame[]> m_outputBufferRead;
+	std::unique_ptr<SampleFrame[]> m_outputBufferWrite;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;
