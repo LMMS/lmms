@@ -346,10 +346,10 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			else if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == true)
 			{
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
-				qDebug("mouseMoveEvent curve drag");
+				qDebug("mouseMoveEvent curve drag: mouse (x, y): (%d, %d), last track point (x, y): (%d, %d)", x, (m_graphHeight - y), m_lastTrackPoint.first, m_lastTrackPoint.second);
 #endif
 				// dragging curve
-				PointF convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second);
+				PointF convertedCoords = mapMousePos(x - m_lastTrackPoint.first, (m_graphHeight - y) - m_lastTrackPoint.second + m_graphHeight / 2);
 				float curveValue = convertedCoords.second + convertedCoords.first * 0.1f;
 				curveValue = std::clamp(curveValue, -1.0f, 1.0f);
 				model()->getDataArray(m_selectedArray)->setC(m_selectedLocation, curveValue);
