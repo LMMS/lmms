@@ -13,6 +13,7 @@ g++-mingw-w64-i686-posix
 g++-mingw-w64-x86-64-posix
 libc6-dev
 libfltk1.3-dev
+libgig-mingw-w64
 libglx-dev
 liblist-moreutils-perl
 libmpc3
