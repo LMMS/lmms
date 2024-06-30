@@ -243,8 +243,11 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 #endif
 {
 #ifdef LMMS_HAVE_SUIL
-	if(proc->wantUi())
+	if(Lv2Manager::wantUi())
 	{
+		// User wants UI and we support it in general
+		// Select a suiting UI type.
+		// Note: It may be possible there is no suiting UI type.
 		std::tie(m_ui, m_uiType) = selectPluginUi(proc->getUis());
 	}
 #endif

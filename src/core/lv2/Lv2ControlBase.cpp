@@ -90,11 +90,6 @@ void Lv2ControlBase::init(Model* meAsModel)
 
 
 
-bool Lv2ControlBase::wantsUi() const { return m_procs[0]->wantUi(); }
-
-
-
-
 void Lv2ControlBase::shutdown()
 {
 	// currently nothing to do here

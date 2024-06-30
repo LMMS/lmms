@@ -38,7 +38,6 @@
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Lv2Features.h"
 #include "Lv2Manager.h"
@@ -82,15 +81,18 @@ Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 	if (!Engine::ignorePluginBlacklist())
 	{
 		const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
+		const auto& pluginsOnlyUsefulWithUi = Lv2Manager::getPluginsOnlyUsefulWithUi();
 		const auto& pluginBlacklist32 = Lv2Manager::getPluginBlacklistBuffersizeLessThan32();
-		if(pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+		if( // plugin unstable?
+			pluginBlacklist.find(pluginUri) != pluginBlacklist.end() ||
+			// plugins only useful with UI?
+			(!Lv2Manager::wantUi() &&
+			pluginsOnlyUsefulWithUi.find(pluginUri) != pluginsOnlyUsefulWithUi.end()) ||
+			// plugin unstable with 32 or less fpp?
+			(Engine::audioEngine()->framesPerPeriod() <= 32 &&
+			pluginBlacklist32.find(pluginUri) != pluginBlacklist32.end()) )
 		{
 			issues.emplace_back(PluginIssueType::Blacklisted);
-		}
-		else if(Engine::audioEngine()->framesPerPeriod() <= 32 &&
-			pluginBlacklist32.find(pluginUri) != pluginBlacklist32.end())
-		{
-			issues.emplace_back(PluginIssueType::Blacklisted);  // currently no special blacklist category
 		}
 	}
 
@@ -198,8 +200,7 @@ Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	m_workLock(1),
 	m_midiInputBuf(m_maxMidiInputEvents),
 	m_midiInputReader(m_midiInputBuf),
-	m_pluginEvents(uiMidiBufsize() * uiNBufferCycles()),
-	m_wantUi(initWantUi())
+	m_pluginEvents(uiMidiBufsize() * uiNBufferCycles())
 {
 	createPorts();
 	initPlugin();
@@ -759,18 +760,6 @@ QString Lv2Proc::portname(std::size_t idx) const { return m_ports[idx].get()->na
 uint32_t Lv2Proc::portNum() const
 {
 	return m_ports.size();
-}
-
-
-
-
-bool Lv2Proc::initWantUi()
-{
-#ifdef LMMS_HAVE_SUIL
-	return (ConfigManager::inst()->vstEmbedMethod() != "none");
-#else
-	return false;
-#endif
 }
 
 

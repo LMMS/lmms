@@ -153,7 +153,6 @@ public:
 	/*
 		ui
 	 */
-	bool wantUi() const { return m_wantUi; }  // true if the user wants a UI (and we support it)
 	void connectUiEventsReaderTo(LocklessRingBuffer<char>& uiEvents)
 	{
 		m_uiEventsReader.emplace(uiEvents);
@@ -246,8 +245,6 @@ private:
 	// ui
 	LocklessRingBuffer<char> m_pluginEvents;
 	std::optional<LocklessRingBufferReader<char>> m_uiEventsReader;
-	bool m_wantUi;
-	static bool initWantUi();
 	bool isUiActive() const;
 	void applyUiEvents(uint32_t nframes);
 	bool sendToUi(uint32_t port_index, uint32_t type, uint32_t size, const void* body);

@@ -26,6 +26,7 @@
 
 #include <QDebug>
 
+#include "Lv2Manager.h"
 #include "Lv2SubPluginFeatures.h"
 
 #include "embed.h"
@@ -65,7 +66,7 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 {
 	// even if no input, we may need to force this effect to run permanently
 	// this is required for permanent DSP<->UI communication
-	if(m_controls.wantsUi()) { startRunning(); }
+	if(Lv2Manager::wantUi()) { startRunning(); }
 }
 
 
@@ -73,9 +74,11 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
+	const bool wantUi = Lv2Manager::wantUi();
+
 	// LMMS wants to avoid calling run if not necessary
 	// However, in case of UI, run() must be called to keep up the DSP<->UI communication
-	if ((!isEnabled() || !isRunning()) && !m_controls.wantsUi()) { return false; }
+	if ((!isEnabled() || !isRunning()) && !wantUi) { return false; }
 
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
@@ -105,7 +108,7 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 
 	// keep DSP<->UI communication active, but return a useful value
 	bool producedOutput = isRunning();
-	if(m_controls.wantsUi()) { startRunning(); }
+	if(wantUi) { startRunning(); }
 	return producedOutput;
 }
 

@@ -142,10 +142,18 @@ public:
 	{
 		return pluginBlacklist;
 	}
+	static const std::set<std::string_view>& getPluginsOnlyUsefulWithUi()
+	{
+		return pluginsOnlyUsefulWithUi;
+	}
 	static const std::set<std::string_view>& getPluginBlacklistBuffersizeLessThan32()
 	{
 		return pluginBlacklistBuffersizeLessThan32;
 	}
+
+	//! Whether the user generally wants a UI (and we generally support that)
+	//! Note that specific UIs may still not be available, even if "wanted"
+	static bool wantUi();
 
 #if defined(LMMS_HAVE_SRATOM) && defined(LMMS_HAVE_SERD)
 	Sratom* sratom; //!< Atom serialiser
@@ -170,7 +178,7 @@ private:
 
 	// static
 	static const std::set<std::string_view>
-		pluginBlacklist, pluginBlacklistBuffersizeLessThan32;
+		pluginBlacklist, pluginsOnlyUsefulWithUi, pluginBlacklistBuffersizeLessThan32;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
