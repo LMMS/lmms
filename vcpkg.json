@@ -13,7 +13,8 @@
 		},
 		{
 			"name": "fltk",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "fluidsynth",
@@ -68,7 +69,8 @@
 		},
 		{
 			"name": "portaudio",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "sdl2",
