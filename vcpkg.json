@@ -25,15 +25,18 @@
 		},
 		{
 			"name": "libflac",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "libogg",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "libsamplerate",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "libsndfile",
@@ -45,15 +48,18 @@
 		},
 		{
 			"name": "libsoundio",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "libstk",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "libvorbis",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "lilv",
@@ -65,7 +71,8 @@
 		},
 		{
 			"name": "mp3lame",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "portaudio",
@@ -74,11 +81,13 @@
 		},
 		{
 			"name": "sdl2",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		},
 		{
 			"name": "zlib",
-			"default-features": false
+			"default-features": false,
+			"platform": "!mingw"
 		}
 	]
 }
