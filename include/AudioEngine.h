@@ -25,11 +25,7 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#ifdef __MINGW32__
-#include <mingw.mutex.h>
-#else
 #include <mutex>
-#endif
 
 #include <QThread>
 #include <samplerate.h>
