@@ -67,7 +67,6 @@ namespace lmms
 using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
-static thread_local bool s_runningChange;
 
 
 
@@ -784,16 +783,14 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 
 void AudioEngine::requestChangeInModel()
 {
-	if (s_renderingThread || s_runningChange) { return; }
+	if (s_renderingThread) { return; }
 	m_changeMutex.lock();
-	s_runningChange = true;
 }
 
 void AudioEngine::doneChangeInModel()
 {
-	if (s_renderingThread || !s_runningChange) { return; }
+	if (s_renderingThread) { return; }
 	m_changeMutex.unlock();
-	s_runningChange = false;
 }
 
 bool AudioEngine::isAudioDevNameValid(QString name)
