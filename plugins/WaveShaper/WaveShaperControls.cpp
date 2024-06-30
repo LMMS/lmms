@@ -50,7 +50,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphSampleBuffer(200)
 {
 	unsigned int arrayLocation = m_vectorGraphModel.addDataArray();
-	// see other settings avalible for VectorGraphDataArray in VectorGraph.h
+	// see other settings avalible for VectorGraphDataArray in VectorGraphModel.h
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
