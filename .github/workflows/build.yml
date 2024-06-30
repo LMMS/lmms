@@ -299,13 +299,22 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Install APT dependencies
-        run: xargs -a .github/workflows/deps-mingw-w64.txt sudo apt-get install --yes
-      - name: Install CMake
-        run: .github/workflows/install-cmake.sh
-      - name: Install PowerShell
-        run: .github/workflows/install-powershell.sh
+      - name: Download vcpkg for ACT
+        if: ${{ env.ACT }} # ACT apparently doesn't have vcpkg installed
+        run: |
+          cd /usr/local/share
+          sudo git clone --recursive https://github.com/microsoft/vcpkg.git
+          sudo ./vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_INSTALLATION_ROOT=$(pwd)/vcpkg" >> "$GITHUB_ENV"
+          export VCPKG_INSTALLATION_ROOT="$(pwd)/vcpkg"
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          .github/workflows/setup-cmake.sh
+          .github/workflows/setup-mingw-packages.sh
+          sudo apt-get install -y $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Cache vcpkg dependencies
+        if: ${{ !env.ACT }} # skip during local actions testing
         id: cache-deps
         uses: actions/cache@v3
         with:
@@ -314,6 +323,7 @@ jobs:
             vcpkg-mingw${{ matrix.arch }}-
           path: build/vcpkg_installed
       - name: Cache ccache data
+        if: ${{ !env.ACT }} # skip during local actions testing
         uses: actions/cache@v3
         with:
           key: "ccache-${{ github.job }}-64-${{ github.ref }}\
@@ -344,6 +354,7 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
+        if: ${{ !env.ACT }} # skip during local actions testing
         uses: actions/upload-artifact@v4
         with:
           name: mingw64
@@ -357,6 +368,11 @@ jobs:
           ccache --show-stats
         env:
           CCACHE_MAXSIZE: 500M
+      - name: Keep container running on failure
+        if: ${{ env.ACT && failure() }}
+        run: |
+          echo "Build failed. Dropping into an interactive shell."
+          tail -f /dev/null
   msvc:
     name: msvc-x64
     runs-on: windows-2019

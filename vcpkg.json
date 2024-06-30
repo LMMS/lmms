@@ -8,7 +8,8 @@
 			"features": [
 				"sse",
 				"sse2"
-			]
+			],
+			"platform": "!mingw"
 		},
 		{
 			"name": "fltk",
@@ -63,12 +64,16 @@
 		},
 		{
 			"name": "mp3lame",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "portaudio",
 			"default-features": false
+		},
+		{
+			"name": "pulseaudio",
+			"default-features": false,
+			"platform": "mingw"
 		},
 		{
 			"name": "sdl2",
