@@ -177,8 +177,9 @@ private:
 	Lv2UridCache m_uridCache;
 
 	// static
-	static const std::set<std::string_view>
-		pluginBlacklist, pluginsOnlyUsefulWithUi, pluginBlacklistBuffersizeLessThan32;
+	static const std::set<std::string_view> pluginBlacklist;
+	static const std::set<std::string_view> pluginsOnlyUsefulWithUi;
+	static const std::set<std::string_view> pluginBlacklistBuffersizeLessThan32;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
