@@ -437,8 +437,10 @@ public:
 	float valueAt(size_t index, int frameOffset = 0)
     {
 		const auto buffer = valueBuffer();
+		if (!buffer) { return value(frameOffset); }
+		
 		size_t clampedIndex = std::clamp<size_t>(index, 0, buffer->size());
-		return buffer ? (*buffer)[clampedIndex] : value(frameOffset);
+		return (*buffer)[clampedIndex];
     }
 
 	T initValue() const
