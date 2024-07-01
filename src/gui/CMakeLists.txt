@@ -127,6 +127,8 @@ SET(LMMS_SRCS
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
 	gui/widgets/ToolButton.cpp
+	gui/widgets/VectorGraphView.cpp
+	gui/widgets/VectorGraphViewBase.cpp
 
 	PARENT_SCOPE
 )
