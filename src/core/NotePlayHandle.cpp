@@ -670,8 +670,8 @@ void NotePlayHandleManager::extend( int c )
 
 void NotePlayHandleManager::free()
 {
-	delete s_available[0]; // Free the block of NotePlayHandle objects
-	delete[] s_available; // Then free the array of pointers
+	delete s_available[0];
+	delete[] s_available;
 	s_available = nullptr;
 }
 
