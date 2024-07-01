@@ -209,8 +209,6 @@ public:
 	//! @brief Returns value applied with the inverse of this model's scale type
 	float inverseScaledValue( float value ) const;
 
-	//! @brief Returns the value at a buffer, if buffer not exists, returns fixed value
-	float valueAt(size_t index);
 
 	void setInitValue( const float value );
 
