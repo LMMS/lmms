@@ -54,7 +54,7 @@ void MidiController::updateValueBuffer()
 	{
 		float i = 0;
 		std::generate(m_valueBuffer.begin(), m_valueBuffer.end(), [&]() {
-			return linearInterpolate( m_previousValue, m_lastValue, i++ / m_valueBuffer.size());
+			return linearInterpolate(m_previousValue, m_lastValue, i++ / m_valueBuffer.size());
 		});
 		m_previousValue = m_lastValue;
 	}

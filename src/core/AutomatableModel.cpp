@@ -624,13 +624,13 @@ std::vector<float>* AutomatableModel::valueBuffer()
 			switch( m_scaleType )
 			{
 			case ScaleType::Linear:
-				for(int i = 0; i < m_valueBuffer.size(); i++)
+				for (int i = 0; i < m_valueBuffer.size(); i++)
 				{
 					nvalues[i] = minValue<float>() + ( range() * values[i] );
 				}
 				break;
 			case ScaleType::Logarithmic:
-				for(int i = 0; i < m_valueBuffer.size(); i++)
+				for (int i = 0; i < m_valueBuffer.size(); i++)
 				{
 					nvalues[i] = logToLinearScale( values[i] );
 				}
@@ -673,7 +673,7 @@ std::vector<float>* AutomatableModel::valueBuffer()
 	{
 		float i = 0;
 		std::generate(m_valueBuffer.begin(), m_valueBuffer.end(), [&]() {
-			return linearInterpolate( m_oldValue, val, i++ / m_valueBuffer.size());
+			return linearInterpolate(m_oldValue, val, i++ / m_valueBuffer.size());
 		});
 		m_oldValue = val;
 		m_lastUpdatedPeriod = s_periodCounter;

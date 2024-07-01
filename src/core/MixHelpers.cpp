@@ -213,7 +213,7 @@ void addSanitizedMultipliedByBuffer(SampleFrame* dst, const SampleFrame* src, fl
 
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += ( std::isinf(src[f][0]) || std::isnan(src[f][0])) 
+		dst[f][0] += (std::isinf(src[f][0]) || std::isnan(src[f][0])) 
 					? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf[f];
 		dst[f][1] += (std::isinf(src[f][1]) || std::isnan(src[f][1])) 
 					? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf[f];

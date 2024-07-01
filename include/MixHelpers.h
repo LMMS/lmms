@@ -31,7 +31,6 @@ namespace lmms
 {
 
 class SampleFrame;
-                
 namespace MixHelpers
 {
 
