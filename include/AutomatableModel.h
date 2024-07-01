@@ -439,7 +439,7 @@ public:
 		const auto buffer = valueBuffer();
 		if (!buffer) { return value(); }
 
-		assert(0 < index < buffer->size());
+		assert(0 < index && index < buffer->size());
 		return (*buffer)[index];
     }
 
