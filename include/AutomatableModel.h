@@ -25,6 +25,7 @@
 #ifndef LMMS_AUTOMATABLE_MODEL_H
 #define LMMS_AUTOMATABLE_MODEL_H
 
+#include <cassert>
 #include <cmath>
 #include <QMap>
 #include <QMutex>
