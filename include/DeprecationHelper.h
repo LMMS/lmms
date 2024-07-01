@@ -64,6 +64,36 @@ inline QPoint position(QWheelEvent *wheelEvent)
 #endif
 }
 
+/**
+ * @brief position is a backwards-compatible adapter for
+ * QMouseEvent::position and pos functions.
+ * @param me
+ * @return the position of the mouse event
+ */
+inline QPoint position(QMouseEvent* me)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return me->position().toPoint();
+#else
+	return me->pos();
+#endif
+}
+
+/**
+ * @brief position is a backwards-compatible adapter for
+ * QDropEvent::position and pos functions.
+ * @param me
+ * @return the position of the drop event
+ */
+inline QPoint position(QDropEvent* de)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return de->position().toPoint();
+#else
+	return de->pos();
+#endif
+}
+
 } // namespace lmms
 
 #endif // LMMS_DEPRECATIONHELPER_H
