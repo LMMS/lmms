@@ -121,7 +121,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	assert(numFrames > 0);
 	assert(frequency > 0);
 
-	if (m_buffer->empty() || src_error(state->resampleState)) { return false; }
+	if (m_buffer->empty()) { return false; }
 
 	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / frequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
@@ -132,8 +132,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	state->loop = &loopMode;
 
 	src_set_ratio(state->resampleState, resampleRatio);
-	src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]);
-	return true;
+	return src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]) != 0;
 }
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
