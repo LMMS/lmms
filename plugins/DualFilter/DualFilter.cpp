@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool DualFilterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{

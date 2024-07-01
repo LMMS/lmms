@@ -55,7 +55,7 @@ public:
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
 	~FreeBoyInstrument() override = default;
 
-	void playNote(NotePlayHandle* nph, sampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* nph, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* nph) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;

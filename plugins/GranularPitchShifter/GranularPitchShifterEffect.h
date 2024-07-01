@@ -48,7 +48,7 @@ class GranularPitchShifterEffect : public Effect
 public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~GranularPitchShifterEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

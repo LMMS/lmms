@@ -128,7 +128,7 @@ void LadspaEffect::changeSampleRate()
 
 
 
-bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
+bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	m_pluginMutex.lock();
@@ -139,13 +139,13 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	int frames = _frames;
-	sampleFrame * o_buf = nullptr;
-	QVarLengthArray<sample_t> sBuf(_frames * DEFAULT_CHANNELS);
+	SampleFrame* o_buf = nullptr;
+	QVarLengthArray<SampleFrame> sBuf(_frames);
 
 	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = reinterpret_cast<sampleFrame*>(sBuf.data());
+		_buf = sBuf.data();
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
 				Engine::audioEngine()->outputSampleRate();

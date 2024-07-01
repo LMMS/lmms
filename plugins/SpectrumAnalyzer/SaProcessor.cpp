@@ -98,9 +98,9 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
+void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 {
-	LocklessRingBufferReader<sampleFrame> reader(ring_buffer);
+	LocklessRingBufferReader<SampleFrame> reader(ring_buffer);
 
 	// Processing thread loop
 	while (!m_terminate)

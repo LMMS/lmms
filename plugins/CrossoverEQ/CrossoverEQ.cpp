@@ -64,9 +64,9 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp2 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
-	m_tmp1 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
-	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_tmp2 = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_tmp1 = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_work = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
@@ -89,7 +89,7 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool CrossoverEQEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -139,7 +139,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	
 	m_needsUpdate = false;
 	
-	memset( m_work, 0, sizeof( sampleFrame ) * frames );
+	zeroSampleFrames(m_work, frames);
 	
 	// run temp bands
 	for( int f = 0; f < frames; ++f )
