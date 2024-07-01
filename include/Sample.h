@@ -26,10 +26,11 @@
 #define LMMS_SAMPLE_H
 
 #include <memory>
+#include <samplerate.h>
 
-#include "AudioResampler.h"
 #include "Note.h"
 #include "SampleBuffer.h"
+#include "lmms_basics.h"
 #include "lmms_export.h"
 
 namespace lmms {
@@ -52,12 +53,16 @@ public:
 	struct LMMS_EXPORT PlaybackState
 	{
 		PlaybackState(int interpolationMode = SRC_LINEAR)
-			: resampler(interpolationMode, DEFAULT_CHANNELS)
+			: resampleState(src_callback_new(&Sample::render, interpolationMode, DEFAULT_CHANNELS, &error, this))
 		{
+			assert(resampleState && src_strerror(error));
 		}
 
-		AudioResampler resampler;
+		const Sample* sample = nullptr;
+		Loop* loop = nullptr;
+		SRC_STATE* resampleState;
 		int frameIndex = 0;
+		int error = 0;
 		bool backwards = false;
 	};
 
@@ -102,10 +107,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	void playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
-	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
-
-private:
+	static auto render(void* callbackData, float** data) -> long;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
