@@ -434,10 +434,10 @@ public:
 		return AutomatableModel::value<T>( frameOffset );
 	}
 
-	float valueAt(size_t index, int frameOffset = 0)
+	float valueAt(size_t index)
     {
 		const auto buffer = valueBuffer();
-		if (!buffer) { return value(frameOffset); }
+		if (!buffer) { return value(); }
 
 		assert(0 < index < buffer->size());
 		return (*buffer)[index];
