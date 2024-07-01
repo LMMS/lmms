@@ -34,6 +34,7 @@
 #include "SampleFrame.h"
 
 
+
 static bool s_NaNHandler;
 
 
@@ -183,8 +184,6 @@ void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeff
 	run<>( dst, src, frames, AddSwappedMultipliedOp(coeffSrc) );
 }
 
-
-
 void addMultipliedByBuffer(SampleFrame* dst, const SampleFrame* src, float coeffSrc, float* coeffSrcBuf, int frames)
 {
 	for (int f = 0; f < frames; ++f)
@@ -193,7 +192,6 @@ void addMultipliedByBuffer(SampleFrame* dst, const SampleFrame* src, float coeff
 		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf[f];
 	}
 }
-
 
 void addMultipliedByBuffers(SampleFrame* dst, const SampleFrame* src, float* coeffSrcBuf1, float* coeffSrcBuf2, int frames)
 {

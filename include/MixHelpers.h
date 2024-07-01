@@ -27,10 +27,11 @@
 
 #include "lmms_basics.h"
 
-
 namespace lmms
 {
+
 class SampleFrame;
+                
 namespace MixHelpers
 {
 

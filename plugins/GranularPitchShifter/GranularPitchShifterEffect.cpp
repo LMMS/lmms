@@ -95,7 +95,6 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 	{
 		const double pitch =  m_granularpitchshifterControls.m_pitchModel.valueAt(f) * (1. / 12.);
 		const double pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.valueAt(f) * (1. / 24.);
-
 		
 		// interpolate pitch depending on glide
 		for (int i = 0; i < 2; ++i)

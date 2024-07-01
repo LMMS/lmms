@@ -209,7 +209,6 @@ public:
 	//! @brief Returns value applied with the inverse of this model's scale type
 	float inverseScaledValue( float value ) const;
 
-
 	void setInitValue( const float value );
 
 	void setAutomatedValue( const float value );

@@ -89,7 +89,6 @@ bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-
 	for (fpp_t f = 0; f < frames; ++f)
 	{
 		auto& currentFrame = buf[f];
