@@ -116,14 +116,14 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loopMode) const
+bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, double frequency, Loop loopMode) const
 {
 	assert(numFrames > 0);
-	assert(desiredFrequency > 0);
+	assert(frequency > 0);
 
 	if (m_buffer->empty() || src_error(state->resampleState)) { return false; }
 
-	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
+	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / frequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
 

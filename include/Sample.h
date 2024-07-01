@@ -77,7 +77,7 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) -> Sample&;
 
-	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
+	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, double frequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
@@ -114,7 +114,7 @@ private:
 	std::atomic<int> m_loopStartFrame = 0;
 	std::atomic<int> m_loopEndFrame = 0;
 	std::atomic<float> m_amplification = 1.0f;
-	std::atomic<float> m_frequency = DefaultBaseFreq;
+	std::atomic<double> m_frequency = DefaultBaseFreq;
 	std::atomic<bool> m_reversed = false;
 };
 } // namespace lmms
