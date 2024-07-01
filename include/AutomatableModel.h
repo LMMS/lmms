@@ -438,9 +438,9 @@ public:
     {
 		const auto buffer = valueBuffer();
 		if (!buffer) { return value(frameOffset); }
-		
-		size_t clampedIndex = std::clamp<size_t>(index, 0, buffer->size());
-		return (*buffer)[clampedIndex];
+
+		assert(0 < index < buffer->size());
+		return (*buffer)[index];
     }
 
 	T initValue() const
