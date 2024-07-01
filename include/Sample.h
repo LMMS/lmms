@@ -37,12 +37,6 @@ namespace lmms {
 class LMMS_EXPORT Sample
 {
 public:
-	// values for buffer margins, used for various libsamplerate interpolation modes
-	// the array positions correspond to the converter_type parameter values in libsamplerate
-	// if there appears problems with playback on some interpolation mode, then the value for that mode
-	// may need to be higher - conversely, to optimize, some may work with lower values
-	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
-
 	enum class Loop
 	{
 		Off,
