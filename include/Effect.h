@@ -64,7 +64,7 @@ public:
 	}
 
 	
-	virtual bool processAudioBuffer( sampleFrame * _buf,
+	virtual bool processAudioBuffer( SampleFrame* _buf,
 						const fpp_t _frames ) = 0;
 
 	inline ch_cnt_t processorCount() const
@@ -187,8 +187,8 @@ protected:
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
-	inline void sampleDown( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
+	inline void sampleDown( const SampleFrame* _src_buf,
+							SampleFrame* _dst_buf,
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
@@ -197,8 +197,8 @@ protected:
 					Engine::audioEngine()->framesPerPeriod() );
 	}
 
-	inline void sampleBack( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
+	inline void sampleBack( const SampleFrame* _src_buf,
+							SampleFrame* _dst_buf,
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
@@ -213,9 +213,9 @@ protected:
 
 private:
 	EffectChain * m_parent;
-	void resample( int _i, const sampleFrame * _src_buf,
+	void resample( int _i, const SampleFrame* _src_buf,
 					sample_rate_t _src_sr,
-					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
 
 	ch_cnt_t m_processors;

@@ -64,10 +64,10 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine),
+		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
+	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
@@ -236,7 +236,7 @@ int AudioPortAudio::process_callback(
 {
 	if( supportsCapture() )
 	{
-		audioEngine()->pushInputFrames( (sampleFrame*)_inputBuffer, _framesPerBuffer );
+		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
 	if( m_stopped )
@@ -387,7 +387,7 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	form->addRow(tr("Device"), m_device);
 	
 /*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audioportaudio",
 							"channels" ).toInt() );

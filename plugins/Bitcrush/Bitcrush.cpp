@@ -62,7 +62,7 @@ BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatu
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = new sampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
+	m_buffer = new SampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 
@@ -100,7 +100,7 @@ inline float BitcrushEffect::noise( float amt )
 	return fastRandf( amt * 2.0f ) - amt;
 }
 
-bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{

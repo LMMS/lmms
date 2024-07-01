@@ -109,7 +109,7 @@ public:
 		m_userAntiAliasWaveTable = waveform;
 	}
 
-	void update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
+	void update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
 
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
@@ -282,40 +282,40 @@ private:
 	/* End Multiband wavetable */
 
 
-	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+	void updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updatePM( sampleFrame * _ab, const fpp_t _frames,
+	void updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateAM( sampleFrame * _ab, const fpp_t _frames,
+	void updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateMix( sampleFrame * _ab, const fpp_t _frames,
+	void updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateSync( sampleFrame * _ab, const fpp_t _frames,
+	void updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateFM( sampleFrame * _ab, const fpp_t _frames,
+	void updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	float syncInit( sampleFrame * _ab, const fpp_t _frames,
+	float syncInit( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
 	template<WaveShape W>
-	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+	void updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updatePM( sampleFrame * _ab, const fpp_t _frames,
+	void updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateAM( sampleFrame * _ab, const fpp_t _frames,
+	void updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateMix( sampleFrame * _ab, const fpp_t _frames,
+	void updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateSync( sampleFrame * _ab, const fpp_t _frames,
+	void updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateFM( sampleFrame * _ab, const fpp_t _frames,
+	void updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
 	template<WaveShape W>
