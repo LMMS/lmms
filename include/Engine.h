@@ -81,7 +81,7 @@ public:
 		return s_projectJournal;
 	}
 
-	static bool ignorePluginBlacklist();
+	static bool enableBlockedPlugins();
 
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager * getLv2Manager()

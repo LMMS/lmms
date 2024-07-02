@@ -126,9 +126,9 @@ void Engine::destroy()
 
 
 
-bool Engine::ignorePluginBlacklist()
+bool Engine::enableBlockedPlugins()
 {
-	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
+	const char* envVar = getenv("LMMS_BLOCKED_PLUGINS");
 	return (envVar && *envVar);
 }
 
