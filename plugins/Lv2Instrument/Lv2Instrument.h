@@ -96,8 +96,6 @@ private:
 	std::array<int, NumKeys> m_runningNotes = {};
 #endif
 	void clearRunningNotes();
-
-	friend class gui::Lv2InsView;
 };
 
 
@@ -118,6 +116,9 @@ protected:
 
 private:
 	void modelChanged() override;
+	bool isResizable() const final { return Lv2ViewBase::isResizable(); }
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 };
 
 

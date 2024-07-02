@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,6 +33,13 @@
 #include <set>
 #include <string_view>
 #include <lilv/lilv.h>
+
+#ifdef LMMS_HAVE_SERD
+#include "serd/serd.h"
+#ifdef LMMS_HAVE_SRATOM
+#include "sratom/sratom.h"
+#endif // LMMS_HAVE_SRATOM
+#endif // LMMS_HAVE_SERD
 
 #include "Lv2Basics.h"
 #include "Lv2UridCache.h"
@@ -78,7 +85,7 @@ namespace lmms
 
 
 //! Class to keep track of all LV2 plugins
-class Lv2Manager
+class LMMS_EXPORT Lv2Manager
 {
 public:
 	void initPlugins();
@@ -135,10 +142,23 @@ public:
 	{
 		return pluginBlacklist;
 	}
+	static const std::set<std::string_view>& getPluginsOnlyUsefulWithUi()
+	{
+		return pluginsOnlyUsefulWithUi;
+	}
 	static const std::set<std::string_view>& getPluginBlacklistBuffersizeLessThan32()
 	{
 		return pluginBlacklistBuffersizeLessThan32;
 	}
+
+	//! Whether the user generally wants a UI (and we generally support that)
+	//! Note that specific UIs may still not be available, even if "wanted"
+	static bool wantUi();
+
+#if defined(LMMS_HAVE_SRATOM) && defined(LMMS_HAVE_SERD)
+	Sratom* sratom; //!< Atom serialiser
+	Sratom* ui_sratom; //!< Atom serialiser for UI thread
+#endif
 
 private:
 	// general data
@@ -146,6 +166,9 @@ private:
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
 	std::set<std::string_view> m_supportedFeatureURIs;
+#ifdef LMMS_HAVE_SERD
+	SerdEnv* env;
+#endif
 
 	// feature data that are common for all Lv2Proc
 	UridMap m_uridMap;
@@ -154,8 +177,9 @@ private:
 	Lv2UridCache m_uridCache;
 
 	// static
-	static const std::set<std::string_view>
-		pluginBlacklist, pluginBlacklistBuffersizeLessThan32;
+	static const std::set<std::string_view> pluginBlacklist;
+	static const std::set<std::string_view> pluginsOnlyUsefulWithUi;
+	static const std::set<std::string_view> pluginBlacklistBuffersizeLessThan32;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);

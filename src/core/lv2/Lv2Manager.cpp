@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.cpp - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -32,10 +32,16 @@
 #include <lv2/buf-size/buf-size.h>
 #include <lv2/options/options.h>
 #include <lv2/worker/worker.h>
+
+#include <lv2/patch/patch.h>
+#include <lv2/time/time.h>
+#define NS_XSD "http://www.w3.org/2001/XMLSchema#"
+
 #include <QDebug>
 #include <QElapsedTimer>
 
 #include "AudioEngine.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
 #include "Lv2ControlBase.h"
@@ -67,7 +73,72 @@ const std::set<std::string_view> Lv2Manager::pluginBlacklist =
 	"http://drobilla.net/plugins/blop/square",
 	"http://drobilla.net/plugins/blop/triangle",
 
-	// Visualization, meters, and scopes etc., won't work until we have gui support
+	// LSP mono effects have no advantage over stereo effects,
+	// since LMMS is always stereo (if you want different effects
+	// for both sides, these effects offer "lr" variants)
+	"http://lsp-plug.in/plugins/lv2/ab_tester_x2_mono",
+	"http://lsp-plug.in/plugins/lv2/ab_tester_x4_mono",
+	"http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono",
+	"http://lsp-plug.in/plugins/lv2/art_delay_mono",
+	"http://lsp-plug.in/plugins/lv2/autogain_mono",
+	"http://lsp-plug.in/plugins/lv2/beat_breather_mono",
+	"http://lsp-plug.in/plugins/lv2/chorus_mono",
+	"http://lsp-plug.in/plugins/lv2/clipper_mono",
+	"http://lsp-plug.in/plugins/lv2/comp_delay_mono",
+	"http://lsp-plug.in/plugins/lv2/compressor_mono",
+	"http://lsp-plug.in/plugins/lv2/crossover_mono",
+	"http://lsp-plug.in/plugins/lv2/dyna_processor_mono",
+	"http://lsp-plug.in/plugins/lv2/expander_mono",
+	"http://lsp-plug.in/plugins/lv2/filter_mono",
+	"http://lsp-plug.in/plugins/lv2/flanger_mono",
+	"http://lsp-plug.in/plugins/lv2/gate_mono",
+	"http://lsp-plug.in/plugins/lv2/gott_compressor_mono",
+	"http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_mono",
+	"http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_mono",
+	"http://lsp-plug.in/plugins/lv2/impulse_responses_mono",
+	"http://lsp-plug.in/plugins/lv2/impulse_reverb_mono",
+	"http://lsp-plug.in/plugins/lv2/limiter_mono",
+	"http://lsp-plug.in/plugins/lv2/loud_comp_mono",
+	"http://lsp-plug.in/plugins/lv2/mb_clipper_mono",
+	"http://lsp-plug.in/plugins/lv2/mb_compressor_mono",
+	"http://lsp-plug.in/plugins/lv2/mb_dyna_processor_mono",
+	"http://lsp-plug.in/plugins/lv2/mb_expander_mono",
+	"http://lsp-plug.in/plugins/lv2/mb_gate_mono",
+	"http://lsp-plug.in/plugins/lv2/mb_limiter_mono",
+	"http://lsp-plug.in/plugins/lv2/mixer_x16_mono",
+	"http://lsp-plug.in/plugins/lv2/mixer_x4_mono",
+	"http://lsp-plug.in/plugins/lv2/mixer_x8_mono",
+	"http://lsp-plug.in/plugins/lv2/oscillator_mono",
+	"http://lsp-plug.in/plugins/lv2/para_equalizer_x16_mono",
+	"http://lsp-plug.in/plugins/lv2/para_equalizer_x32_mono",
+	"http://lsp-plug.in/plugins/lv2/para_equalizer_x8_mono",
+	"http://lsp-plug.in/plugins/lv2/profiler_mono",
+	"http://lsp-plug.in/plugins/lv2/room_builder_mono",
+	"http://lsp-plug.in/plugins/lv2/sampler_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_autogain_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_compressor_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_dyna_processor_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_expander_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_gate_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_gott_compressor_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_limiter_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_mb_compressor_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_mb_dyna_processor_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_mb_expander_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_mb_gate_mono",
+	"http://lsp-plug.in/plugins/lv2/sc_mb_limiter_mono",
+	"http://lsp-plug.in/plugins/lv2/slap_delay_mono",
+	"http://lsp-plug.in/plugins/lv2/surge_filter_mono",
+	"http://lsp-plug.in/plugins/lv2/trigger_midi_mono",
+	"http://lsp-plug.in/plugins/lv2/trigger_mono",
+
+	// unstable
+	"urn:juced:DrumSynth"
+};
+
+const std::set<std::string_view> Lv2Manager::pluginsOnlyUsefulWithUi =
+{
+	// Visualization, meters, and scopes etc., won't work if UI is disabled
 	"http://distrho.sf.net/plugins/ProM",
 	"http://distrho.sf.net/plugins/glBars",
 	"http://gareus.org/oss/lv2/meters#spectr30mono",
@@ -132,10 +203,7 @@ const std::set<std::string_view> Lv2Manager::pluginBlacklist =
 	"urn:juce:TalFilter2",
 	"urn:juce:Vex",
 	"http://zynaddsubfx.sourceforge.net",
-	"http://geontime.com/geonkick/single",
-
-	// unstable
-	"urn:juced:DrumSynth"
+	"http://geontime.com/geonkick/single"
 };
 
 const std::set<std::string_view> Lv2Manager::pluginBlacklistBuffersizeLessThan32 =
@@ -170,6 +238,22 @@ Lv2Manager::Lv2Manager() :
 	m_world = lilv_world_new();
 	lilv_world_load_all(m_world);
 
+#ifdef LMMS_HAVE_SERD
+	env = serd_env_new(nullptr);
+	serd_env_set_prefix_from_strings(
+		env, (const uint8_t*)"patch", (const uint8_t*)LV2_PATCH_PREFIX);
+	serd_env_set_prefix_from_strings(
+		env, (const uint8_t*)"time", (const uint8_t*)LV2_TIME_PREFIX);
+	serd_env_set_prefix_from_strings(
+		env, (const uint8_t*)"xsd", (const uint8_t*)NS_XSD);
+#ifdef LMMS_HAVE_SRATOM
+	sratom    = sratom_new(uridMap().mapFeature());
+	ui_sratom = sratom_new(uridMap().mapFeature());
+	sratom_set_env(sratom, env);
+	sratom_set_env(ui_sratom, env);
+#endif
+#endif // LMMS_HAVE_SERD
+
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
 	m_supportedFeatureURIs.insert(LV2_OPTIONS__options);
@@ -185,13 +269,21 @@ Lv2Manager::Lv2Manager() :
 
 	auto supportOpt = [this](Lv2UridCache::Id id)
 	{
-		Lv2Options::supportOption(uridCache()[id]);
+		uint32_t urid = uridCache()[id];
+		if(urid != Lv2UridCache::noUrid())
+		{
+			Lv2Options::supportOption(urid);
+		}
 	};
 	supportOpt(Lv2UridCache::Id::param_sampleRate);
 	supportOpt(Lv2UridCache::Id::bufsz_maxBlockLength);
 	supportOpt(Lv2UridCache::Id::bufsz_minBlockLength);
 	supportOpt(Lv2UridCache::Id::bufsz_nominalBlockLength);
 	supportOpt(Lv2UridCache::Id::bufsz_sequenceSize);
+	supportOpt(Lv2UridCache::Id::ui_updateRate);
+	supportOpt(Lv2UridCache::Id::ui_scaleFactor);
+	supportOpt(Lv2UridCache::Id::ui_backgroundColor);
+	supportOpt(Lv2UridCache::Id::ui_foregroundColor);
 }
 
 
@@ -326,6 +418,18 @@ AutoLilvNodes Lv2Manager::findNodes(const LilvNode *subject,
 	const LilvNode *predicate, const LilvNode *object)
 {
 	return AutoLilvNodes(lilv_world_find_nodes (m_world, subject, predicate, object));
+}
+
+
+
+
+bool Lv2Manager::wantUi()
+{
+#ifdef LMMS_HAVE_SUIL
+	return (ConfigManager::inst()->vstEmbedMethod() != "none");
+#else
+	return false;
+#endif
 }
 
 

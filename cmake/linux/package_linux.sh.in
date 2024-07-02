@@ -151,6 +151,22 @@ fi
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 echo "X-AppImage-Version=@VERSION@" >> "$DESKTOPFILE"
 
+# Build a list of shared objects in lib/suil-0
+if [ -f "@SUIL_LINK_LIBRARIES@" ]; then
+	# Try to guess where modules are located (e.g. lib/suil-0) based on lib name
+	# SUIL_LINK_LIBRARIES: @SUIL_LINK_LIBRARIES@
+	# SUIL_LIBRARIES: @SUIL_LIBRARIES@
+	SUIL_MODULES="$(dirname "@SUIL_LINK_LIBRARIES@")/@SUIL_LIBRARIES@"
+	if [ -d "$SUIL_MODULES" ]; then
+		mkdir -p "${APPDIR}usr/lib/suil-0"
+		for file in "$SUIL_MODULES/"*.so; do
+			# Copy to a predictable location
+			cp "$file" "${APPDIR}usr/lib/suil-0"
+			executables="${executables} -executable=${APPDIR}usr/lib/suil-0/$(basename "$file")"
+		done
+	fi
+fi
+
 # Fix linking for soft-linked plugins
 for file in "${APPDIR}usr/lib/lmms/"*.so; do
    thisfile="${APPDIR}usr/lib/lmms/${file##*/}"
