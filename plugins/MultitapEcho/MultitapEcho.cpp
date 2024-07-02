@@ -58,7 +58,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_work = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
@@ -83,7 +83,7 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 }
 
 
-void MultitapEchoEffect::runFilter( sampleFrame * dst, sampleFrame * src, StereoOnePole & filter, const fpp_t frames )
+void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames )
 {
 	for( int f = 0; f < frames; ++f )
 	{
@@ -93,7 +93,7 @@ void MultitapEchoEffect::runFilter( sampleFrame * dst, sampleFrame * src, Stereo
 }
 
 
-bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t frames )
+bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{

@@ -390,7 +390,7 @@ gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void OpulenzInstrument::play( sampleFrame * _working_buffer )
+void OpulenzInstrument::play( SampleFrame* _working_buffer )
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);

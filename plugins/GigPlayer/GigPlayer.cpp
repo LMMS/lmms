@@ -289,7 +289,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
+void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	const float LOG440 = 2.643452676f;
 
@@ -320,7 +320,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::play( sampleFrame * _working_buffer )
+void GigInstrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	const int rate = Engine::audioEngine()->outputSampleRate();
@@ -441,7 +441,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Load this note's data
-			sampleFrame sampleData[samples];
+			SampleFrame sampleData[samples];
 			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
@@ -458,7 +458,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Output the data resampling if needed
 			if( resample == true )
 			{
-				sampleFrame convertBuf[frames];
+				SampleFrame convertBuf[frames];
 
 				// Only output if resampling is successful (note that "used" is output)
 				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
@@ -499,7 +499,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 
 
-void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples )
+void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples )
 {
 	if( sampleData == nullptr || samples < 1 )
 	{
@@ -1182,7 +1182,7 @@ void GigSample::updateSampleRate()
 
 
 
-bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+bool GigSample::convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == nullptr )

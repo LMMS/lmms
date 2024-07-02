@@ -48,7 +48,7 @@ Sample::Sample(const QByteArray& base64, int sampleRate)
 {
 }
 
-Sample::Sample(const sampleFrame* data, size_t numFrames, int sampleRate)
+Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
 	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -118,7 +118,7 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, double frequency, Loop loopMode) const
+bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, double frequency, Loop loopMode) const
 {
 	assert(numFrames > 0);
 	assert(frequency > 0);
