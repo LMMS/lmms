@@ -438,9 +438,9 @@ public:
 	float valueAt(size_t index)
     {
 		const auto buffer = valueBuffer();
-		if (!buffer) { return value(); }
+		if (!buffer) { return value<T>(); }
 
-		assert(0 < index && index < buffer->size());
+		assert(0 <= index && index < buffer->size());
 		return (*buffer)[index];
     }
 
