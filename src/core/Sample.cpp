@@ -120,7 +120,6 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 {
 	assert(numFrames > 0);
 	assert(frequency > 0);
-
 	if (m_buffer->empty()) { return false; }
 
 	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / frequency;
@@ -152,14 +151,11 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 
 long Sample::render(void* callbackData, float** data)
 {
-	auto state = static_cast<PlaybackState*>(callbackData);
+	const auto state = static_cast<PlaybackState*>(callbackData);
 	const auto& loop = *state->loop;
 	const auto& sample = state->sample;
 	auto& index = state->frameIndex;
 	auto& backwards = state->backwards;
-
-	const auto pastBounds = state->frameIndex >= sample->m_endFrame || (state->frameIndex < 0 && state->backwards);
-	if (loop == Loop::Off && pastBounds) { return 0; }
 
 	switch (loop)
 	{
