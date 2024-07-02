@@ -54,7 +54,7 @@ public:
 
 		const Sample* sample = nullptr;
 		Loop* loop = nullptr;
-		SRC_STATE* resampleState;
+		SRC_STATE* resampleState = nullptr;
 		int frameIndex = 0;
 		int error = 0;
 		bool backwards = false;
