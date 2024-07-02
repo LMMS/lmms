@@ -26,6 +26,8 @@
 
 #include <cassert>
 
+#include "MixHelpers.h"
+
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
@@ -131,7 +133,13 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	state->loop = &loopMode;
 
 	src_set_ratio(state->resampleState, resampleRatio);
-	return src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]) != 0;
+	if (src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]) != 0)
+	{
+		MixHelpers::multiply(dst, m_amplification, numFrames);
+		return true;
+	}
+
+	return false;
 }
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
