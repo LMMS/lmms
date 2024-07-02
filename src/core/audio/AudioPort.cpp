@@ -138,16 +138,16 @@ void AudioPort::doProcessing()
 		// has both vol and pan models
 		if( m_volumeModel && m_panningModel )
 		{
-			ValueBuffer * volBuf = m_volumeModel->valueBuffer();
-			ValueBuffer * panBuf = m_panningModel->valueBuffer();
+			auto* volBuf = m_volumeModel->valueBuffer();
+			auto* panBuf = m_panningModel->valueBuffer();
 
 			// both vol and pan have s.ex.data:
 			if( volBuf && panBuf )
 			{
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float v = volBuf->values()[ f ] * 0.01f;
-					float p = panBuf->values()[ f ] * 0.01f;
+					float v = volBuf->data()[f] * 0.01f;
+					float p = panBuf->data()[f] * 0.01f;
 					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
 					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
 				}
@@ -161,7 +161,7 @@ void AudioPort::doProcessing()
 				float r = ( p >= 0 ? 1.0f : 1.0f + p );
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float v = volBuf->values()[ f ] * 0.01f;
+					float v = volBuf->data()[f] * 0.01f;
 					m_portBuffer[f][0] *= v * l;
 					m_portBuffer[f][1] *= v * r;
 				}
@@ -173,7 +173,7 @@ void AudioPort::doProcessing()
 				float v = m_volumeModel->value() * 0.01f;
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float p = panBuf->values()[ f ] * 0.01f;
+					float p = panBuf->data()[f] * 0.01f;
 					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
 					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
 				}
@@ -195,13 +195,13 @@ void AudioPort::doProcessing()
 		// has vol model only
 		else if( m_volumeModel )
 		{
-			ValueBuffer * volBuf = m_volumeModel->valueBuffer();
+			auto* volBuf = m_volumeModel->valueBuffer();
 
 			if( volBuf )
 			{
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float v = volBuf->values()[ f ] * 0.01f;
+					float v = (*volBuf)[f] * 0.01f;
 					m_portBuffer[f][0] *= v;
 					m_portBuffer[f][1] *= v;
 				}

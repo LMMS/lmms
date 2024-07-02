@@ -30,7 +30,6 @@
 
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-#include "ValueBuffer.h"
 
 namespace lmms
 {
@@ -55,7 +54,7 @@ public:
 	~LadspaControl() override = default;
 
 	LADSPA_Data value();
-	ValueBuffer * valueBuffer();
+	std::vector<float>* valueBuffer();
 	void setValue( LADSPA_Data _value );
 	void setLink( bool _state );
 

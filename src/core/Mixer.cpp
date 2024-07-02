@@ -130,8 +130,8 @@ void MixerChannel::doProcessing()
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
 				// figure out if we're getting sample-exact input
-				ValueBuffer * sendBuf = sendModel->valueBuffer();
-				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
+				auto* sendBuf = sendModel->valueBuffer();
+				auto* volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
 				SampleFrame* ch_buf = sender->m_buffer;
@@ -144,17 +144,20 @@ void MixerChannel::doProcessing()
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					MixHelpers::addSanitizedMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp );
+					MixHelpers::addSanitizedMultipliedByBuffers(m_buffer, ch_buf,
+									volBuf->data(), sendBuf->data(), fpp);
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp );
+					MixHelpers::addSanitizedMultipliedByBuffer(m_buffer, ch_buf, v,
+									volBuf->data(), fpp);
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
+					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v,
+									sendBuf->data(), fpp );
 				}
 				m_hasInput = true;
 			}
@@ -665,14 +668,14 @@ void Mixer::masterMix( SampleFrame* _buf )
 	}
 
 	// handle sample-exact data in master volume fader
-	ValueBuffer * volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
+	auto* volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
 
 	if( volBuf )
 	{
 		for( int f = 0; f < fpp; f++ )
 		{
-			m_mixerChannels[0]->m_buffer[f][0] *= volBuf->values()[f];
-			m_mixerChannels[0]->m_buffer[f][1] *= volBuf->values()[f];
+			m_mixerChannels[0]->m_buffer[f][0] *= volBuf->data()[f];
+			m_mixerChannels[0]->m_buffer[f][1] *= volBuf->data()[f];
 		}
 	}
 

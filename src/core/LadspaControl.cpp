@@ -133,7 +133,7 @@ LADSPA_Data LadspaControl::value()
 }
 
 
-ValueBuffer * LadspaControl::valueBuffer()
+std::vector<float>* LadspaControl::valueBuffer()
 {
 	switch( m_port->data_type )
 	{

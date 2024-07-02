@@ -28,8 +28,12 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+#include <cmath>
+
 namespace lmms
 {
+
+template class PLUGIN_EXPORT TypedAutomatableModel<float>;
 
 extern "C"
 {
@@ -65,17 +69,12 @@ bool AmplifierEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	const ValueBuffer* volumeBuf = m_ampControls.m_volumeModel.valueBuffer();
-	const ValueBuffer* panBuf = m_ampControls.m_panModel.valueBuffer();
-	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
-	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
-
-	for (fpp_t f = 0; f < frames; ++f)
+	for (size_t f = 0; f < frames; ++f)
 	{
-		const float volume = (volumeBuf ? volumeBuf->value(f) : m_ampControls.m_volumeModel.value()) * 0.01f;
-		const float pan = (panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value()) * 0.01f;
-		const float left = (leftBuf ? leftBuf->value(f) : m_ampControls.m_leftModel.value()) * 0.01f;
-		const float right = (rightBuf ? rightBuf->value(f) : m_ampControls.m_rightModel.value()) * 0.01f;
+		const float volume = m_ampControls.m_volumeModel.valueAt(f) * 0.01f;
+		const float pan = m_ampControls.m_panModel.valueAt(f) * 0.01f;
+		const float left = m_ampControls.m_leftModel.valueAt(f) * 0.01f;
+		const float right = m_ampControls.m_rightModel.valueAt(f) * 0.01f;
 
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
