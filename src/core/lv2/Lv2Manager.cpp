@@ -302,7 +302,7 @@ void Lv2Manager::initPlugins()
 	{
 		qWarning() <<
 			"WARNING! Blocked plugins enabled! If you want to disable them,\n"
-			"  please set environment variable \"LMMS_BLOCKED_PLUGINS\" to empty or\n"
+			"  please set environment variable \"LMMS_ENABLE_BLOCKED_PLUGINS\" to empty or\n"
 			"  do not set it.";
 	}
 	else if(blocked > 0)
@@ -310,7 +310,7 @@ void Lv2Manager::initPlugins()
 		qDebug() <<
 			"Blocked Lv2 Plugins:" << blocked << "of" << pluginCount << "\n"
 			"  If you want to enable them (dangerous!), please set\n"
-			"  environment variable \"LMMS_BLOCKED_PLUGINS\" to nonempty.";
+			"  environment variable \"LMMS_ENABLE_BLOCKED_PLUGINS\" to nonempty.";
 	}
 }
 

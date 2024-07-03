@@ -128,7 +128,7 @@ void Engine::destroy()
 
 bool Engine::enableBlockedPlugins()
 {
-	const char* envVar = getenv("LMMS_BLOCKED_PLUGINS");
+	const char* envVar = getenv("LMMS_ENABLE_BLOCKED_PLUGINS");
 	return (envVar && *envVar);
 }
 
