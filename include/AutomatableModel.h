@@ -435,13 +435,12 @@ public:
 		return AutomatableModel::value<T>( frameOffset );
 	}
 
-	float valueAt(size_t index)
+	T valueAt(size_t index)
     {
-		const auto buffer = valueBuffer();
-		if (!buffer) { return value(); }
-
+		const auto buffer = AutomatableModel::valueBuffer();
+		if (!buffer) { return AutomatableModel::value<T>(); }
 		assert(0 <= index && index < buffer->size());
-		return (*buffer)[index];
+		return AutomatableModel::castValue<T>((*buffer)[index]);
     }
 
 	T initValue() const
