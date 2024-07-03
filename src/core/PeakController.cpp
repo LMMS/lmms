@@ -91,10 +91,8 @@ void PeakController::updateValueBuffer()
 		float targetSample = m_peakEffect->lastSample();
 		if( m_currentSample != targetSample )
 		{
-			const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
-			float* values = m_valueBuffer.data();
-
-			for( f_cnt_t f = 0; f < frames; ++f )
+			const size_t frames = Engine::audioEngine()->framesPerPeriod();
+			for (size_t f = 0; f < frames; ++f)
 			{
 				const float diff = ( targetSample - m_currentSample );
 				if( m_currentSample < targetSample ) // going up...
@@ -105,7 +103,7 @@ void PeakController::updateValueBuffer()
 				{
 					m_currentSample += diff * m_decayCoeff;
 				}
-				values[f] = m_currentSample;
+				m_valuebuffer[f] = m_currentSample;
 			}
 		}
 		else
