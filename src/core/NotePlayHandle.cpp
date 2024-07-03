@@ -670,9 +670,7 @@ void NotePlayHandleManager::extend( int c )
 
 void NotePlayHandleManager::free()
 {
-	delete s_available[0];
 	delete[] s_available;
-	s_available = nullptr;
 }
 
 

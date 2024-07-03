@@ -188,7 +188,7 @@ private:
 	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
 };
 
-inline void zeroSampleFrames(SampleFrame* buffer, fpp_t frames)
+inline void zeroSampleFrames(SampleFrame* buffer, size_t frames)
 {
 	// The equivalent of the following operation which yields compiler warnings
 	// memset(buffer, 0, sizeof(SampleFrame) * frames);
@@ -196,7 +196,7 @@ inline void zeroSampleFrames(SampleFrame* buffer, fpp_t frames)
 	std::fill(buffer, buffer + frames, SampleFrame());
 }
 
-inline SampleFrame getAbsPeakValues(SampleFrame* buffer, fpp_t frames)
+inline SampleFrame getAbsPeakValues(SampleFrame* buffer, size_t frames)
 {
 	SampleFrame peaks;
 
@@ -208,18 +208,18 @@ inline SampleFrame getAbsPeakValues(SampleFrame* buffer, fpp_t frames)
 	return peaks;
 }
 
-inline void copyToSampleFrames(SampleFrame* target, const float* source, fpp_t frames)
+inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t frames)
 {
-	for (fpp_t i = 0; i < frames; ++i)
+	for (size_t i = 0; i < frames; ++i)
 	{
 		target[i].setLeft(source[2*i]);
 		target[i].setRight(source[2*i + 1]);
 	}
 }
 
-inline void copyFromSampleFrames(float* target, const SampleFrame* source, fpp_t frames)
+inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_t frames)
 {
-	for (fpp_t i = 0; i < frames; ++i)
+	for (size_t i = 0; i < frames; ++i)
 	{
 		target[2*i] = source[i].left();
 		target[2*i + 1] = source[i].right();
