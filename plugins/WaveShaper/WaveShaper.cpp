@@ -82,10 +82,10 @@ bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
-	auto* inputBuffer = m_wsControls.m_inputModel.valueBuffer();
-	auto* outputBuffer = m_wsControls.m_outputModel.valueBuffer();
 	const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
+	auto* inputBuffer = m_wsControls.m_inputModel.valueBuffer();
+	auto* outputBuffer = m_wsControls.m_outputModel.valueBuffer();
 
 	int inputInc = inputBuffer ? 1 : 0;
 	int outputInc = outputBuffer ? 1 : 0;
