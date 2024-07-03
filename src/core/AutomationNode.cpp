@@ -73,7 +73,7 @@ void AutomationNode::setInValue(float value)
 	m_inValue = value;
 
 	// Recalculate the tangents from neighbor nodes
-	AutomationClip::timeMap & tm = m_clip->getTimeMap();
+	AutomationClip::timeMap& tm = m_clip->getTimeMap();
 
 	// Get an iterator pointing to this node
 	AutomationClip::timeMap::iterator it = tm.lowerBound(m_pos);
@@ -93,7 +93,7 @@ void AutomationNode::setOutValue(float value)
 	m_outValue = value;
 
 	// Recalculate the tangents from neighbor nodes
-	AutomationClip::timeMap & tm = m_clip->getTimeMap();
+	AutomationClip::timeMap& tm = m_clip->getTimeMap();
 
 	// Get an iterator pointing to this node
 	AutomationClip::timeMap::iterator it = tm.lowerBound(m_pos);
