@@ -103,7 +103,7 @@ void PeakController::updateValueBuffer()
 				{
 					m_currentSample += diff * m_decayCoeff;
 				}
-				m_valuebuffer[f] = m_currentSample;
+				m_valueBuffer[f] = m_currentSample;
 			}
 		}
 		else
