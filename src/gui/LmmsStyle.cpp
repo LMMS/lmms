@@ -25,8 +25,9 @@
 
 #include <array>
 
-#include <QFile>
 #include <QApplication>
+#include <QFile>
+#include <QFileInfo>
 #include <QPainter>
 #include <QPainterPath>
 #include <QStyleFactory>
@@ -136,6 +137,22 @@ LmmsStyle::LmmsStyle() :
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
+
+	m_styleReloader.addPath(QFileInfo{file}.absoluteFilePath());
+	connect(&m_styleReloader, &QFileSystemWatcher::fileChanged, this,
+		[this](const QString& path)
+		{
+			if (auto file = QFile{path}; file.exists())
+			{
+				file.open(QIODevice::ReadOnly);
+				qApp->setStyleSheet(file.readAll());
+				if (!m_styleReloader.files().contains(path))
+				{
+					m_styleReloader.addPath(path);
+				}
+			}
+		}
+	);
 
 	if( s_palette != nullptr ) { qApp->setPalette( *s_palette ); }
 
