@@ -900,7 +900,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 		}
 		if( src_data.output_frames_gen > frames )
 		{
-			qCritical( "Sf2Instrument: not enough frames: %ld / %d", src_data.output_frames_gen, frames );
+			qCritical("Sf2Instrument: not enough frames: %ld / %zu", src_data.output_frames_gen, frames);
 		}
 	}
 	else
