@@ -170,8 +170,8 @@ void SlicerTWaveform::drawEditorWaveform()
 		.amplification = sample.amplification(),
 		.reversed = sample.reversed(),
 		
-		.sampleStartPercent = static_cast<float>(startFrame) / sample.sampleSize(),
-		.sampleEndPercent 	= static_cast<float>(  endFrame) / sample.sampleSize(),
+		.sampleStart	= static_cast<float>(startFrame) / sample.sampleSize(),
+		.sampleEnd 		= static_cast<float>(  endFrame) / sample.sampleSize(),
 		
 		.x = 0,
 		.y = zoomOffset,

@@ -348,8 +348,8 @@ void AudioFileProcessorWaveView::updateGraph()
 		.amplification = m_sample->amplification(),
 		.reversed = m_sample->reversed(),
 		
-		.sampleStartPercent = static_cast<float>(m_from) / m_sample->sampleSize(),
-		.sampleEndPercent 	= static_cast<float>(m_to  ) / m_sample->sampleSize(),
+		.sampleStart 	= static_cast<float>(m_from) / m_sample->sampleSize(),
+		.sampleEnd 		= static_cast<float>(m_to  ) / m_sample->sampleSize(),
 		
 		.x = 0,
 		.y = 0,

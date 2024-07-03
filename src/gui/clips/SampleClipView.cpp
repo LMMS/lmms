@@ -272,9 +272,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset_start 	=  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	float offset_end   	=  m_clip->sampleLength() * ppb / ticksPerBar;
-	float length = m_clip->length() * ppb / ticksPerBar;
+	float offsetStart 	=  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	float sampleLength  =  m_clip->sampleLength() * ppb / ticksPerBar;
+	float clipLength 	= m_clip->length() * ppb / ticksPerBar;
 	// qDebug("%d %d", (int) offset_start, (int) length);
 	
 	const auto& sample = m_clip->m_sample;
@@ -283,15 +283,18 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	
 	// qDebug("parent size %d %d", parentWidget()->width(), parentWidget()->height());
 	//~ qDebug("ratio %f", ratio);
-		
+	
+	//qDebug("%f %f", offset_end, length);
+	
 	const auto parameters = SampleThumbnailVisualizeParameters{
 		.amplification 			= sample.amplification(), 
 		.reversed 				= sample.reversed(),
-		
-		.x = static_cast<long>(offset_start),
+			
+		.x = static_cast<long>(offsetStart),
 		.y = spacing,
-		.width 	= std::max(static_cast<int>(offset_end), 1),
-		.height = rect().bottom() - 2 * spacing
+		.width 	= std::max<long>(static_cast<long>(sampleLength), 1),
+		.height = rect().bottom() - 2 * spacing,
+		.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart)
 	};
 	
 	m_thumbnaillist.visualize(parameters, p);

@@ -39,13 +39,13 @@ SampleThumbnailBit::SampleThumbnailBit(const SampleFrame& frame):
 	
 	if (l > r)
 	{
-		this->max = l;
-		this->min = r;
+		max = l;
+		min = r;
 	}
 	else
 	{
-		this->max = r;
-		this->min = l;
+		max = r;
+		min = l;
 	}
 }
 
@@ -59,21 +59,21 @@ SampleThumbnailBit::SampleThumbnailBit():
 
 void SampleThumbnailBit::merge(const SampleThumbnailBit& other)
 {
-	this->min = std::min(this->min, other.min);
-	this->max = std::max(this->max, other.max);
+	min = std::min(min, other.min);
+	max = std::max(max, other.max);
 	
-	this->minRMS = std::min(this->minRMS, other.minRMS);
-	this->maxRMS = std::max(this->maxRMS, other.maxRMS);
+	minRMS = std::min(minRMS, other.minRMS);
+	maxRMS = std::max(maxRMS, other.maxRMS);
 	
-	this->maxRMS = std::clamp(this->maxRMS, this->min, this->max);
-	this->minRMS = std::clamp(this->minRMS, this->min, this->max);
+	//maxRMS = std::clamp(maxRMS, min, max);
+	//minRMS = std::clamp(minRMS, min, max);
 }
 
 void SampleThumbnailBit::mergeFrame(const SampleFrame& frame) 
 {
 	const auto other = SampleThumbnailBit(frame);
-	this->min = std::min(this->min, other.min);
-	this->max = std::max(this->max, other.max);
+	min = std::min(min, other.min);
+	max = std::max(max, other.max);
 }
 
 SampleThumbnailListManager::SampleThumbnailListManager()
@@ -259,7 +259,7 @@ void SampleThumbnailListManager::visualize(
 	QPainter& painter
 ) const {
 	
-	const float sampleViewPercent = parameters.sampleEndPercent - parameters.sampleStartPercent;
+	const float sampleView = parameters.sampleEnd - parameters.sampleStart;
 	
 	// We specify that the existence of the original sample
 	// means we may need the sample to be drawn 
@@ -268,11 +268,11 @@ void SampleThumbnailListManager::visualize(
 	// For AFP and SlicerT where the sample isn't drawn a whole lot
 	// of times and waveform is required to be crisp.
 	// 
-	// However when the sample is small enough, we can still use thumbnails.
+	// However when the sample too large, we still use thumbnails.
 	if (parameters.originalSample)
 	{
 		const float sampleSize = static_cast<float>(parameters.originalSample->sampleSize());
-		const long sampleViewSize = static_cast<long>(sampleSize * sampleViewPercent);
+		const long sampleViewSize = static_cast<long>(sampleSize * sampleView);
 
 		if (sampleViewSize / parameters.width < 882)
 		{
@@ -302,7 +302,7 @@ void SampleThumbnailListManager::visualize(
 	auto list 			= this->list->end()-1;
 	const auto begin 	= this->list->begin();
 	
-	const long widthSelect = static_cast<long>(1.0f * width / sampleViewPercent);
+	const long widthSelect = static_cast<long>(1.0f * width / sampleView);
 	//qDebug("%ld", widthSelect);
 	
 	while (list != begin && list->size() < widthSelect)
@@ -313,11 +313,11 @@ void SampleThumbnailListManager::visualize(
 	const auto& thumbnail = *list;
 	
 	const long thumbnailSize = thumbnail.size();
-	const long thumbnailLastSample = std::max<long>(parameters.sampleEndPercent*thumbnailSize, 1) - 1;
+	const long thumbnailLastSample = std::max<long>(parameters.sampleEnd*thumbnailSize, 1) - 1;
 
 	//qDebug("Using thumbnail of size %ld", thumbnailSize);
 	
-	const long tStart = static_cast<long>(parameters.sampleStartPercent * thumbnailSize);
+	const long tStart = static_cast<long>(parameters.sampleStart * thumbnailSize);
 
 	const long thumbnailViewSize = thumbnailLastSample + 1 - tStart;
 	
@@ -326,8 +326,12 @@ void SampleThumbnailListManager::visualize(
 		
 	const long tChunk = (thumbnailSize + width) / width;
 	
+	const long pixelBound = std::min(width, parameters.clipWidthSinceSampleStart);
+	
 	// Don't draw out of bounds.
 	long pixelIndex = absXOr0;
+	
+	//qDebug("%ld", width);
 	
 	do
 	{
@@ -353,7 +357,7 @@ void SampleThumbnailListManager::visualize(
 		
 		pixelIndex++;
 	}
-	while (pixelIndex <= width && tIndex < tLast);
+	while (pixelIndex <= pixelBound && tIndex < tLast);
 	
 }
 
@@ -387,9 +391,9 @@ void SampleThumbnailListManager::visualize_original(
 	const auto originalSampleBuffer = parameters.originalSample->data();
 	const long originalSampleSize = parameters.originalSample->sampleSize();
 	
-	const long sampleStartFrame = static_cast<long>(parameters.sampleStartPercent * originalSampleSize);
+	const long sampleStartFrame = static_cast<long>(parameters.sampleStart * originalSampleSize);
 	const long sampleEndFrame = std::min<long>(
-		parameters.sampleEndPercent * originalSampleSize,
+		parameters.sampleEnd * originalSampleSize,
 		originalSampleSize
 	);
 	

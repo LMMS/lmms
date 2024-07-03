@@ -34,6 +34,8 @@ constexpr unsigned long long THUMBNAIL_SIZE_DIVISOR = 32;
 
 #include <QPainter>
 
+#include <limits>
+
 #include "Sample.h"
 #include "SampleBuffer.h"
 
@@ -44,18 +46,34 @@ namespace lmms {
 
 struct SampleThumbnailVisualizeParameters
 {
+	// Assign to this field when we need to render using the 
+	// original sample.
 	const Sample* originalSample = nullptr;
 	
 	const float amplification;
 	const bool reversed;
 	
-	const float sampleStartPercent = 0.0;
-	const float sampleEndPercent   = 1.0;
-		
+	// Sample clips in the song editor don't need to use these 2 fields.
+	// [0..1] Range
+ 	const float sampleStart = 0.0;
+	const float sampleEnd   = 1.0;
+	
+	// All the fields below are in pixel unit
 	const long x;
 	const long y;
+	
+	// The length of the rendered sample is proportional to the
+	// value of this field in the song editor.
+	//
+	// Must be fixed regardless of clip length because this  
+	// carries the zoom level information.
 	const long width;
 	const long height;
+	
+	// Clips shorter than the sample length (measuring from the start
+	// of the sample) can specify this field so rendering cuts 
+	// off early.
+	const long clipWidthSinceSampleStart = std::numeric_limits<long>::max();
 };
 
 struct SampleThumbnailBit 
