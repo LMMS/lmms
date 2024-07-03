@@ -27,6 +27,7 @@
 #include "MixHelpers.h"
 #include "denormals.h"
 
+#include "lmms_basics.h"
 #include "lmmsconfig.h"
 
 #include "AudioEngineWorkerThread.h"
@@ -288,7 +289,7 @@ void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 
 	if( frames + _frames > size )
 	{
-		size = std::max(size * 2, frames + _frames);
+		size = std::max<f_cnt_t>(size * 2, frames + _frames);
 		auto ab = new SampleFrame[size];
 		memcpy( ab, buf, frames * sizeof( SampleFrame ) );
 		delete [] buf;

@@ -276,7 +276,7 @@ QString AudioFileProcessor::nodeName() const
 
 
 
-auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
+auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 {
 	// If we can play indefinitely, use the default beat note duration
 	if (static_cast<Sample::Loop>(m_loopModel.value()) != Sample::Loop::Off) { return 0; }
@@ -292,7 +292,7 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;
 
-	return static_cast<int>(std::floor(duration * freqFactor));
+	return static_cast<f_cnt_t>(std::floor(duration * freqFactor));
 }
 
 

@@ -29,6 +29,7 @@
  */
 
 // Need to include this first to ensure we get M_PI in MinGW with C++11
+#include "lmms_basics.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -750,8 +751,8 @@ void Lb302Synth::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 		m_notes.prepend( _n );
 	}
 	m_notesMutex.unlock();
-	
-	release_frame = qMax( release_frame, _n->framesLeft() + _n->offset() );
+
+	release_frame = std::max<f_cnt_t>(release_frame, _n->framesLeft() + _n->offset());
 }
 
 

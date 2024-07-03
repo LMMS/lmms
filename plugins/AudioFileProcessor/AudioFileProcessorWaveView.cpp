@@ -27,6 +27,7 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "SampleWaveform.h"
+#include "lmms_basics.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -57,7 +58,7 @@ void AudioFileProcessorWaveView::setTo(f_cnt_t to)
 
 void AudioFileProcessorWaveView::setFrom(f_cnt_t from)
 {
-	m_from = std::max(from, 0);
+	m_from = std::max<f_cnt_t>(from, 0);
 }
 
 f_cnt_t AudioFileProcessorWaveView::range() const
@@ -347,19 +348,19 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 	const f_cnt_t d_from = start - m_from;
 	const f_cnt_t d_to = m_to - end;
 
-	const f_cnt_t step = qMax(1, qMax(d_from, d_to) / 10);
+	const f_cnt_t step = std::max<f_cnt_t>(1, std::max(d_from, d_to) / 10);
 	const f_cnt_t step_from = (out ? - step : step);
 	const f_cnt_t step_to = (out ? step : - step);
 
-	const double comp_ratio = double(qMin(d_from, d_to))
-								/ qMax(1, qMax(d_from, d_to));
+	const double comp_ratio = static_cast<double>(std::min(d_from, d_to)) / std::max<f_cnt_t>(1, qMax(d_from, d_to));
 
-	const auto boundedFrom = std::clamp(m_from + step_from, 0, start);
-	const auto boundedTo = std::clamp(m_to + step_to, end, frames);
+	const auto boundedFrom = std::clamp<f_cnt_t>(m_from + step_from, 0, start);
+	const auto boundedTo = std::clamp<f_cnt_t>(m_to + step_to, end, frames);
 
 	const auto toStep = static_cast<f_cnt_t>(step_from * (boundedTo == m_to ? 1 : comp_ratio));
-	const auto newFrom
-		= (out && d_from < d_to) || (!out && d_to < d_from) ? boundedFrom : std::clamp(m_from + toStep, 0, start);
+	const auto newFrom = (out && d_from < d_to) || (!out && d_to < d_from)
+		? boundedFrom
+		: std::clamp<f_cnt_t>(m_from + toStep, 0, start);
 
 	const auto fromStep = static_cast<f_cnt_t>(step_to * (boundedFrom == m_from ? 1 : comp_ratio));
 	const auto newTo
