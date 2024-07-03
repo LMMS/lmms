@@ -27,35 +27,34 @@
 
 namespace lmms {
 
-//~ SampleThumbnailBit::SampleThumbnailBit(float max, float min):
-	//~ max(max),
-	//~ min(min)
-//~ {}
+std::map<const QString, SharedSampleThumbnailList> 
+	SampleThumbnailListManager::SAMPLE_THUMBNAIL_MAP{};
 
-SampleThumbnailBit::SampleThumbnailBit(const sampleFrame& frame):
+SampleThumbnailBit::SampleThumbnailBit(const SampleFrame& frame):
 	maxRMS(-0.0),
 	minRMS( 0.0)
 {
-	if (frame[0] >= frame[1]) 
-	{	
-		this->max = frame[0];
-		this->min = frame[1];
-	} 
-	else 
+	const float l = frame.left();
+	const float r = frame.right();
+	
+	if (l > r)
 	{
-		this->max = frame[1];
-		this->min = frame[0];
+		this->max = l;
+		this->min = r;
+	}
+	else
+	{
+		this->max = r;
+		this->min = l;
 	}
 }
+
 
 SampleThumbnailBit::SampleThumbnailBit():
 	max(-100.0),
 	min( 100.0),
 	maxRMS(-0.0),
 	minRMS( 0.0)
-{}
-
-SampleThumbnailBit::~SampleThumbnailBit()
 {}
 
 void SampleThumbnailBit::merge(const SampleThumbnailBit& other)
@@ -70,77 +69,57 @@ void SampleThumbnailBit::merge(const SampleThumbnailBit& other)
 	this->minRMS = std::clamp(this->minRMS, this->min, this->max);
 }
 
-void SampleThumbnailBit::mergeFrame(const sampleFrame& frame) 
+void SampleThumbnailBit::mergeFrame(const SampleFrame& frame) 
 {
-	const auto newLine = SampleThumbnailBit(frame);
-	
-	this->merge(newLine);
-}
-
-SampleThumbnailBit SampleThumbnailBit::linear(const SampleThumbnailBit& other, float t) const 
-{
-	float t2 = 1.0 - t;
-	
-	SampleThumbnailBit o;
-	
-	o.max = this->max * t2 + other.max * t;
-	o.min = this->min * t2 + other.min * t;
-	
-	o.maxRMS = this->maxRMS * t2 + other.maxRMS * t;
-	o.minRMS = this->minRMS * t2 + other.minRMS * t;
-	
-	return o;
+	const auto other = SampleThumbnailBit(frame);
+	this->min = std::min(this->min, other.min);
+	this->max = std::max(this->max, other.max);
 }
 
 SampleThumbnailListManager::SampleThumbnailListManager()
 {
-	this->list = std::make_shared< SampleThumbnailList >( SampleThumbnailList() );
+	this->list = nullptr;
 }
 
 bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(
 	const Sample& inputSample
 )
 {
-	const auto samplePtr = inputSample.buffer();
-	const QString name = inputSample.sampleFile();
+	const auto samplePtr 	= inputSample.buffer();
+	const QString name 		= inputSample.sampleFile();
 	
 	const auto end = SAMPLE_THUMBNAIL_MAP.end();
-	auto list = SAMPLE_THUMBNAIL_MAP.begin();
+	auto list = SAMPLE_THUMBNAIL_MAP.find(name);
 	
-	while (list != end && list->first != name) list++; 
-	
-	if (list == end)
+	if (list != end)
 	{
-		this->list = std::make_shared< SampleThumbnailList >( SampleThumbnailList() );
-			
-		qDebug("Generating thumbnails for file: %s", qUtf8Printable(name));
-		
-		SAMPLE_THUMBNAIL_MAP.insert(
-			std::pair<const QString, SharedSampleThumbnailList>
-			(
-				name,
-				this->list
-			)
-		);
-		
-		return false;
-	}
-	else
-	{
-		this->list = list->second;
-				
+		this->list = list->second;			
 		return true;
 	}
+
+	this->list = std::make_shared<SampleThumbnailList>(SampleThumbnailList());
+	
+	qDebug("Generating thumbnails for file: %s", qUtf8Printable(name));
+	
+	SAMPLE_THUMBNAIL_MAP.insert(
+		std::pair<const QString, SharedSampleThumbnailList>
+		(
+			name,
+			this->list
+		)
+	);
+	
+	return false;
 }
 
 void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 {
 	auto map = SAMPLE_THUMBNAIL_MAP.begin();
 	while (map != SAMPLE_THUMBNAIL_MAP.end()) 
-	{		
+	{
 		// All instances of SampleThumbnailListManager are destroyed,
 		// a.k.a sample goes out of use
-		if (map->second.use_count() == 1) 
+		if (map->second.use_count() == 1)
 		{
 			qDebug("Deleting an orphaned thumbnaillist...");
 			SAMPLE_THUMBNAIL_MAP.erase(map);
@@ -154,6 +133,49 @@ void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 	qDebug("Now holding %lu thumbnaillists", SAMPLE_THUMBNAIL_MAP.size());
 }
 
+SampleThumbnail SampleThumbnailListManager::generate(
+	const size_t thumbnailSize, 
+	const SampleFrame* sampleBuffer,
+	const SampleFrame* sampleBufferEnd
+) {
+	const size_t sampleSize  = sampleBufferEnd - sampleBuffer;
+	
+	const size_t sampleChunk = (sampleSize + thumbnailSize) / thumbnailSize;
+	
+	SampleThumbnail thumbnail(thumbnailSize, SampleThumbnailBit());
+	
+	for (size_t tIndex = 0; tIndex < thumbnailSize; tIndex++)
+	{
+		size_t sampleIndex = tIndex * sampleSize / thumbnailSize;
+		
+		const size_t sampleChunkBound = std::min(
+			sampleIndex + sampleChunk,
+			sampleSize
+		);
+		
+		auto& bit = thumbnail[tIndex];
+		
+		float rms = 0.0;
+		
+		while (sampleIndex < sampleChunkBound)
+		{
+			const auto& frame = sampleBuffer[sampleIndex];
+			bit.mergeFrame(frame);
+			const float ave = frame.average();
+			rms += ave * ave;
+			
+			sampleIndex++;
+		}
+		
+		rms = std::sqrt(rms / sampleChunk);
+				
+		bit.maxRMS = std::clamp( rms, bit.min, bit.max);
+		bit.minRMS = std::clamp(-rms, bit.min, bit.max);
+	}
+	
+	return thumbnail;
+}
+
 SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample)
 {
 	if (selectFromGlobalThumbnailMap(inputSample)) { return; }
@@ -163,9 +185,10 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	const auto sampleBufferSize = inputSample.sampleSize();
 	const auto& buffer = inputSample.data();
 	
+	// For very small samples, use the sample size.
 	const size_t firstThumbnailSize = 
-		std::max<size_t>(
-			std::min<size_t>(sampleBufferSize, 1),
+		std::min<size_t>(
+			std::max<size_t>(sampleBufferSize, 1),
 			MAX_THUMBNAIL_SIZE
 		);
 		
@@ -174,60 +197,33 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	
 	auto& thumbnaillist = *this->list;
 	
-	SampleThumbnail firstThumbnail = std::vector(firstThumbnailSize, lmms::SampleThumbnailBit());
-	
-	size_t sampleFrameIndex = 0;
-	
-	float rms = 0.0;
-	
-	// Prepare the first thumbnail with the largest size.
-	for (; sampleFrameIndex < sampleBufferSize; sampleFrameIndex++)
-	{
-		size_t sampleThumbnailIndex = 
-			sampleFrameIndex *
-			firstThumbnailSize / 
-			sampleBufferSize
-		;
-		
-		const auto& frame = buffer[sampleFrameIndex];
-				
-		auto& bit = firstThumbnail[sampleThumbnailIndex];
-		
-		rms = rms*0.85 + std::abs(bit.max + bit.min)*0.1;
-		
-		bit.maxRMS = std::clamp( rms, bit.min, bit.max);
-		bit.minRMS = std::clamp(-rms, bit.min, bit.max);
-		
-		bit.mergeFrame(frame);
-	}
+	SampleThumbnail firstThumbnail = generate(
+		firstThumbnailSize, 
+		buffer, 
+		buffer + sampleBufferSize
+	);
 	
 	thumbnaillist.push_back(firstThumbnail);
 	
-	// Generate the remaining thumbnails using the first one, each one
-	// is half the size of the previous.
+	// Generate the remaining thumbnails using the first one, each one's
+	// size is the size of the previous one divided by THUMBNAIL_SIZE_DIVISOR
 	for (
 		size_t thumbnailSize = firstThumbnailSize / THUMBNAIL_SIZE_DIVISOR; 
 		thumbnailSize >= MIN_THUMBNAIL_SIZE;
 		thumbnailSize /= THUMBNAIL_SIZE_DIVISOR
-	)
-	{
+	) {
 		const auto& biggerThumbnail = thumbnaillist.back();
 		const auto biggerThumbnailSize = biggerThumbnail.size();
 		size_t bitIndex = 0;
 		
 		SampleThumbnail thumbnail = std::vector(thumbnailSize, lmms::SampleThumbnailBit());
 		
-		qDebug("Size %lu", thumbnail.size());
+		qDebug("Generating for size %lu", thumbnail.size());
 		
 		for (const auto& biggerBit: biggerThumbnail) 
 		{
 			auto& bit = thumbnail[bitIndex * thumbnailSize / biggerThumbnailSize];
-			
-			//~ rms = rms*0.5 + std::abs(bit.max + bit.min)*0.5;
-			
-			//~ bit.maxRMS = std::clamp( rms, bit.min, bit.max);
-			//~ bit.minRMS = std::clamp(-rms, bit.min, bit.max);
-			
+
 			bit.merge(biggerBit);
 			
 			++bitIndex;
@@ -237,79 +233,182 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	}
 }
 
-void SampleThumbnailListManager::visualize(
-	SampleThumbnailVisualizeParameters parameters, 
-	QPainter& painter, 
-	const QRect& rect
+void SampleThumbnailListManager::draw(
+		QPainter& painter, const SampleThumbnailBit& bit,
+		int lineX, int centerY, float scalingFactor, 
+		QColor color, QColor rmsColor
 ) {
-	const int x = rect.x();
-	// Prevent unnecessary out of bounds drawing.
-	const int absXOr0 = (x < 0) ? ( -x ) : ( 0 );
+	const int lengthY1 = bit.max * scalingFactor;
+	const int lengthY2 = bit.min * scalingFactor;
 	
-	const int height = rect.height();
-	const int width = rect.width();
-	const int centerY = rect.center().y();
+	const int lineY1 = centerY - lengthY1;
+	const int lineY2 = centerY - lengthY2;
 	
-	const auto color = painter.pen().color();
-	const auto rmsColor = color.lighter(123);
-	//qDebug("offset_end %d", parameters.offset_end);
+	const int rmsLineY1 = centerY - bit.maxRMS * scalingFactor;
+	const int rmsLineY2 = centerY - bit.minRMS * scalingFactor;
 
-	const int halfHeight = height / 2;
+	painter.drawLine(lineX, lineY1, lineX, lineY2);
+	painter.setPen(rmsColor);
+	painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
+	painter.setPen(color);
+}
+
+
+void SampleThumbnailListManager::visualize(
+	const SampleThumbnailVisualizeParameters& parameters, 
+	QPainter& painter
+) const {
+	
+	const float sampleViewPercent = parameters.sampleEndPercent - parameters.sampleStartPercent;
+	
+	// We specify that the existence of the original sample
+	// means we may need the sample to be drawn 
+	// with the highest quaility possible.
+	//
+	// For AFP and SlicerT where the sample isn't drawn a whole lot
+	// of times and waveform is required to be crisp.
+	// 
+	// However when the sample is small enough, we can still use thumbnails.
+	if (parameters.originalSample)
+	{
+		const float sampleSize = static_cast<float>(parameters.originalSample->sampleSize());
+		const long sampleViewSize = static_cast<long>(sampleSize * sampleViewPercent);
+
+		if (sampleViewSize / parameters.width < 882)
+		{
+			visualize_original(parameters, painter);
+			return;
+		}
+	}
+	
+	const long x = parameters.x;
+	
+	// If the clip extends to the left past the start of the sample,
+	// start starting at the start of the sample and skip the blank space. 
+	const long absXOr0 = (x < 0) ? -x : 0;
+	
+	const long height 		= parameters.height;
+	const long halfHeight 	= height / 2;
+	const long width 		= parameters.width;
+	const long centerY 		= parameters.y + halfHeight;
+	
+	const auto color 	= painter.pen().color();
+	const auto rmsColor = color.lighter(123);
+
+	const float scalingFactor = 
+		halfHeight * parameters.amplification 
+	;
+	
+	auto list 			= this->list->end()-1;
+	const auto begin 	= this->list->begin();
+	
+	const long widthSelect = static_cast<long>(1.0f * width / sampleViewPercent);
+	//qDebug("%ld", widthSelect);
+	
+	while (list != begin && list->size() < widthSelect)
+	{
+		list--;
+	}
+	
+	const auto& thumbnail = *list;
+	
+	const long thumbnailSize = thumbnail.size();
+	const long thumbnailLastSample = std::max<long>(parameters.sampleEndPercent*thumbnailSize, 1) - 1;
+
+	//qDebug("Using thumbnail of size %ld", thumbnailSize);
+	
+	const long tStart = static_cast<long>(parameters.sampleStartPercent * thumbnailSize);
+
+	const long thumbnailViewSize = thumbnailLastSample + 1 - tStart;
+	
+	const long tLast = std::min(thumbnailLastSample, thumbnailSize-1);
+	long tIndex = 0;
+		
+	const long tChunk = (thumbnailSize + width) / width;
+	
+	// Don't draw out of bounds.
+	long pixelIndex = absXOr0;
+	
+	do
+	{
+		tIndex = tStart + pixelIndex * thumbnailViewSize / width;
+		
+		auto thumbnailBit = SampleThumbnailBit();
+		
+		const long tChunkBound = tIndex + tChunk;
+		
+		while (tIndex < tChunkBound)
+		{
+			thumbnailBit.merge(thumbnail[
+				parameters.reversed ? tLast - tIndex : tIndex 
+			]);
+			tIndex += 1;
+		}
+		
+		draw(
+			painter, thumbnailBit, 
+			pixelIndex + x, centerY, scalingFactor, 
+			color, rmsColor
+		);
+		
+		pixelIndex++;
+	}
+	while (pixelIndex <= width && tIndex < tLast);
+	
+}
+
+// Method is made public to be easily accessed when 
+// one needs to quickly draw a sample without a thumbnail.
+//
+// As performant as the original SampleWaveform code.
+void SampleThumbnailListManager::visualize_original(
+	const SampleThumbnailVisualizeParameters& parameters, 
+	QPainter& painter
+) {	
+	const long x = parameters.x;
+	
+	// If the clip extends to the left past the start of the 
+	// sample, start drawing at the start of the sample and 
+	// skip the blank space.
+	const int absXOr0 = (x < 0) ? -x : 0;
+	
+	const long height 		= parameters.height;
+	const long halfHeight 	= height / 2;
+	const long width 		= parameters.width;
+	const long centerY 		= parameters.y + halfHeight;
 	
 	const float scalingFactor = 
 		halfHeight * parameters.amplification 
-		// static_cast<float>(parameters.numChannels)
 	;
 	
-	long last = this->list->size()-1;
-	long setIndex = 0;
-	while (setIndex < last && (*this->list)[setIndex].size() > width)
+	const auto color 	= painter.pen().color();
+	const auto rmsColor = color.lighter(123);
+	
+	const auto originalSampleBuffer = parameters.originalSample->data();
+	const long originalSampleSize = parameters.originalSample->sampleSize();
+	
+	const long sampleStartFrame = static_cast<long>(parameters.sampleStartPercent * originalSampleSize);
+	const long sampleEndFrame = std::min<long>(
+		parameters.sampleEndPercent * originalSampleSize,
+		originalSampleSize
+	);
+	
+	const auto thumbnail = generate(
+		width, 
+		originalSampleBuffer + sampleStartFrame, 
+		originalSampleBuffer + sampleEndFrame
+	);
+	
+	for (long pixelIndex = absXOr0; pixelIndex < width; pixelIndex++) 
 	{
-		setIndex++;
+		draw(
+			painter, 
+			thumbnail[pixelIndex], 
+			pixelIndex + x, centerY, scalingFactor, 
+			color, rmsColor
+		);
 	}
-	
-	const auto& thumbnail = (*this->list)[setIndex];
-	
-	//~ qDebug("Using thumbnail of size: %lu", thumbnail.size());
-	
-	const float thumbnailSize = static_cast<float>(thumbnail.size());
-	const long tS = thumbnail.size()-1;
-	//~ const float xThumbnail = (x - parameters.offset_start) * thumbnailSize / width;
-	
-	const long bound = std::min<long>(width, parameters.pixelsTillSampleEnd);
-	
-	const float ratio = thumbnailSize / static_cast<float>(width);
-	
-	long tI = 0;
-	// Don't draw out of bounds.
-	long pixelIndex = absXOr0;
-	do 
-	{
-		tI = static_cast<long>(pixelIndex * ratio);
-		
-		const auto thumbnailBit = thumbnail[
-			(parameters.reversed) ? ( tS - tI ) : ( tI )
-		];
-		
-		const int lengthY1 = thumbnailBit.max * scalingFactor;
-		const int lengthY2 = thumbnailBit.min * scalingFactor;
-		
-		const int lineY1 = centerY - lengthY1;
-		const int lineY2 = centerY - lengthY2;
-		const int lineX = pixelIndex + x;
-		painter.drawLine(lineX, lineY1, lineX, lineY2);
-		
-		const int rmsLineY1 = centerY - thumbnailBit.maxRMS * scalingFactor;
-		const int rmsLineY2 = centerY - thumbnailBit.minRMS * scalingFactor;
-
-		painter.setPen(rmsColor);
-		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
-		painter.setPen(color);
-		
-		pixelIndex++;
-	
-	} while (pixelIndex <= bound && tI < tS);
-	
 }
+
 
 }

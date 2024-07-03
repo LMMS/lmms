@@ -65,7 +65,7 @@ protected:
 
 private:
 	SampleClip * m_clip;
-	SampleThumbnailListManager thumbnaillist;
+	SampleThumbnailListManager m_thumbnaillist;
 	QPixmap m_paintPixmap;
 	bool splitClip( const TimePos pos ) override;
 } ;

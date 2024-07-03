@@ -25,9 +25,9 @@
 #ifndef LMMS_SAMPLE_THUMBNAIL_H
 #define LMMS_SAMPLE_THUMBNAIL_H
 
-constexpr unsigned long long MIN_THUMBNAIL_SIZE = 32;
+constexpr unsigned long long MIN_THUMBNAIL_SIZE = 1;
 constexpr unsigned long long MAX_THUMBNAIL_SIZE = 32768;
-constexpr unsigned long long THUMBNAIL_SIZE_DIVISOR = 2;
+constexpr unsigned long long THUMBNAIL_SIZE_DIVISOR = 32;
 
 #include<vector>
 #include<memory>
@@ -44,9 +44,18 @@ namespace lmms {
 
 struct SampleThumbnailVisualizeParameters
 {
-	float amplification;
-	bool reversed;
-	float pixelsTillSampleEnd;
+	const Sample* originalSample = nullptr;
+	
+	const float amplification;
+	const bool reversed;
+	
+	const float sampleStartPercent = 0.0;
+	const float sampleEndPercent   = 1.0;
+		
+	const long x;
+	const long y;
+	const long width;
+	const long height;
 };
 
 struct SampleThumbnailBit 
@@ -58,38 +67,48 @@ struct SampleThumbnailBit
 	
 	SampleThumbnailBit();
 	
-	SampleThumbnailBit(const sampleFrame& sample);
-		
-	~SampleThumbnailBit();
+	SampleThumbnailBit(const SampleFrame&);
 	
-	void merge(const SampleThumbnailBit& other);
+	void merge(const SampleThumbnailBit&);
 	
-	void mergeFrame(const sampleFrame& sample);
-	
-	SampleThumbnailBit linear(const SampleThumbnailBit& other, float t) const;
+	void mergeFrame(const SampleFrame&);
 };
 
 using SampleThumbnail = std::vector<SampleThumbnailBit>;
 using SampleThumbnailList = std::vector<SampleThumbnail>;
-using SharedSampleThumbnailList = std::shared_ptr< SampleThumbnailList >;
+using SharedSampleThumbnailList = std::shared_ptr<SampleThumbnailList>;
 
-static std::map<const QString, SharedSampleThumbnailList> SAMPLE_THUMBNAIL_MAP;
-
-class LMMS_EXPORT SampleThumbnailListManager 
+class LMMS_EXPORT SampleThumbnailListManager
 {
 private:
 	SharedSampleThumbnailList list;
+	static std::map<const QString, SharedSampleThumbnailList> SAMPLE_THUMBNAIL_MAP;
+	
+protected:
+	static void draw(
+		QPainter& painter, const SampleThumbnailBit& bit,
+		int lineX, int centerY, float scalingFactor, 
+		QColor color, QColor rmsColor
+	);
+	
+	static SampleThumbnail generate(
+		const size_t thumbnailsize, 
+		const SampleFrame* sampleBuffer,
+		const SampleFrame* sampleBufferEnd
+	);
 
 public:
 	SampleThumbnailListManager();
 
-	SampleThumbnailListManager(const Sample& inputSample);
+	SampleThumbnailListManager(const Sample&);
 
-	bool selectFromGlobalThumbnailMap(const Sample& inputSample); 
+	bool selectFromGlobalThumbnailMap(const Sample&); 
 	
 	void cleanUpGlobalThumbnailMap();
-	
-	void visualize(SampleThumbnailVisualizeParameters parameters, QPainter& painter, const QRect& rect);
+		
+	void visualize(const SampleThumbnailVisualizeParameters&, QPainter&) const;
+	static void visualize_original(const SampleThumbnailVisualizeParameters&, QPainter&);
+
 };
 	
 }

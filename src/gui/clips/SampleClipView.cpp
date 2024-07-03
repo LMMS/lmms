@@ -35,7 +35,6 @@
 #include "SampleClip.h"
 #include "SampleLoader.h"
 #include "SampleThumbnail.h"
-#include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -46,7 +45,7 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	thumbnaillist(  SampleThumbnailListManager() ),
+	m_thumbnaillist(  SampleThumbnailListManager() ),
 	m_paintPixmap()
 {
 	// update UI and tooltip
@@ -64,7 +63,7 @@ void SampleClipView::updateSample()
 {
 	update();
 	
-	thumbnaillist = SampleThumbnailListManager(m_clip->m_sample);
+	m_thumbnaillist = SampleThumbnailListManager(m_clip->m_sample);
 	
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
@@ -276,13 +275,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset_start 	=  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	float offset_end   	=  m_clip->sampleLength() * ppb / ticksPerBar;
 	float length = m_clip->length() * ppb / ticksPerBar;
-	QRect r = QRect(
-		offset_start, 
-		spacing,
-		qMax( static_cast<int>( offset_end ), 1 ), 
-		rect().bottom() - 2 * spacing
-	);
-	
 	// qDebug("%d %d", (int) offset_start, (int) length);
 	
 	const auto& sample = m_clip->m_sample;
@@ -295,11 +287,14 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	const auto parameters = SampleThumbnailVisualizeParameters{
 		.amplification 			= sample.amplification(), 
 		.reversed 				= sample.reversed(),
-		.pixelsTillSampleEnd 	= length - offset_start
+		
+		.x = static_cast<long>(offset_start),
+		.y = spacing,
+		.width 	= std::max(static_cast<int>(offset_end), 1),
+		.height = rect().bottom() - 2 * spacing
 	};
 	
-	
-	thumbnaillist.visualize(parameters, p, r);
+	m_thumbnaillist.visualize(parameters, p);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

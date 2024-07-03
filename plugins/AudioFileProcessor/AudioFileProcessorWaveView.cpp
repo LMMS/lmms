@@ -26,7 +26,7 @@
 
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "SampleWaveform.h"
+#include "SampleThumbnail.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -81,7 +81,8 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_isDragging(false),
 	m_reversed(false),
 	m_framesPlayed(0),
-	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
+	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt()),
+	m_thumbnaillist(SampleThumbnailListManager(*buf))
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
@@ -333,10 +334,30 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
-	const auto waveform = SampleWaveform::Parameters{
-		m_sample->data() + m_from, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
-	SampleWaveform::visualize(waveform, p, rect);
+	//const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
+	//const auto waveform = SampleWaveform::Parameters{
+		//m_sample->data() + m_from, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
+	//SampleWaveform::visualize(waveform, p, rect);
+	
+	// Performance hit is neglectable
+	m_thumbnaillist = SampleThumbnailListManager(*m_sample);
+	
+	const auto parameters = SampleThumbnailVisualizeParameters{
+		.originalSample = m_sample,
+		
+		.amplification = m_sample->amplification(),
+		.reversed = m_sample->reversed(),
+		
+		.sampleStartPercent = static_cast<float>(m_from) / m_sample->sampleSize(),
+		.sampleEndPercent 	= static_cast<float>(m_to  ) / m_sample->sampleSize(),
+		
+		.x = 0,
+		.y = 0,
+		.width 	= m_graph.width(),
+		.height = m_graph.height()
+	};
+	
+	m_thumbnaillist.visualize(parameters, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

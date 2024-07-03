@@ -39,7 +39,7 @@
 #include <cmath>
 
 #include "SampleClip.h"
-#include "SampleWaveform.h"
+#include "SampleThumbnail.h"
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -107,7 +107,8 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0),
-	m_ghostNoteColor(0, 0, 0)
+	m_ghostNoteColor(0, 0, 0),
+	m_thumbnaillist(SampleThumbnailListManager())
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -1025,6 +1026,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
+	m_thumbnaillist = SampleThumbnailListManager(newGhostSample->sample());
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1219,10 +1221,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			p.setPen(m_ghostSampleColor);
 			
 			const auto& sample = m_ghostSample->sample();
-			const auto waveform = SampleWaveform::Parameters{
-				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			SampleWaveform::visualize(waveform, p, rect);
+			//const auto waveform = SampleWaveform::Parameters{
+				//sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+			//const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
+			//SampleWaveform::visualize(waveform, p, rect);
+			
+			const auto parameters = SampleThumbnailVisualizeParameters{
+				.amplification = sample.amplification(),
+				.reversed = sample.reversed(),
+				
+				.x = startPos,
+				.y = yOffset,
+				.width 	= sampleWidth,
+				.height = sampleHeight
+			};
+
+			m_thumbnaillist.visualize(parameters, p);
 		}
 
 		// draw ghost notes
