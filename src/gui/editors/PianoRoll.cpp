@@ -949,7 +949,7 @@ void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 		--m_selectedKeys;
 	}
 
-	computeSelectedNotes( false );
+	computeSelectedNotes(SelectionReplace);
 }
 
 
@@ -1518,7 +1518,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			{
 				break;
 			}
-			computeSelectedNotes( ke->modifiers() & Qt::ShiftModifier);
+			computeSelectedNotes(ke->modifiers() & Qt::ShiftModifier ? SelectionInvert : SelectionReplace);
 			m_editMode = m_ctrlMode;
 			update();
 			break;
@@ -2041,6 +2041,28 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 			enterValue( &nv );
 		}
 	}
+	else if (m_editMode == ModeSelect
+			 && me->x() >= noteEditLeft() && me->x() < noteEditRight()
+			 && me->y() >= keyAreaTop() && me->y() < keyAreaBottom())
+	{
+		Note* clickedNote = noteUnderMouse();
+		if (!clickedNote) { return; }
+
+		SelectionMode mode = SelectionReplace;
+
+		// If shift is held, apply the clicked note's state on the rest
+		// (the first click have already toggled the clicked note's selection state)
+		if (me->modifiers() & Qt::ShiftModifier)
+		{
+			mode = clickedNote->selected() ? SelectionAdd : SelectionSubtract;
+		}
+
+		m_selectStartTick = (me->x() - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+		m_selectedTick = 1;
+		m_selectStartKey = 0;
+		m_selectedKeys = NumKeys;
+		computeSelectedNotes(mode);
+	}
 	else
 	{
 		QWidget::mouseDoubleClickEvent(me);
@@ -2173,7 +2195,7 @@ void PianoRoll::testPlayKey( int key, int velocity, int pan )
 
 
 
-void PianoRoll::computeSelectedNotes(bool shift)
+void PianoRoll::computeSelectedNotes(SelectionMode mode)
 {
 	if( m_selectStartTick == 0 &&
 		m_selectedTick == 0 &&
@@ -2204,8 +2226,7 @@ void PianoRoll::computeSelectedNotes(bool shift)
 	{
 		for( Note *note : m_midiClip->notes() )
 		{
-			// make a new selection unless they're holding shift
-			if( ! shift )
+			if (mode == SelectionReplace)
 			{
 				note->setSelected( false );
 			}
@@ -2231,9 +2252,19 @@ void PianoRoll::computeSelectedNotes(bool shift)
 				pos_ticks + len_ticks > sel_pos_start &&
 				pos_ticks < sel_pos_end )
 			{
-				// remove from selection when holding shift
-				bool selected = shift && note->selected();
-				note->setSelected( ! selected);
+				switch (mode)
+				{
+					case SelectionReplace:
+					case SelectionAdd:
+						note->setSelected(true);
+						break;
+					case SelectionSubtract:
+						note->setSelected(false);
+						break;
+					case SelectionInvert:
+						note->setSelected(!note->selected());
+						break;
+				}
 			}
 		}
 	}
@@ -2265,8 +2296,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		{
 			// select the notes within the selection rectangle and
 			// then destroy the selection rectangle
-			computeSelectedNotes(
-					me->modifiers() & Qt::ShiftModifier );
+			computeSelectedNotes(me->modifiers() & Qt::ShiftModifier ? SelectionInvert : SelectionReplace);
 		}
 		else if( m_action == Action::MoveNote )
 		{
@@ -4708,12 +4738,14 @@ Note * PianoRoll::noteUnderMouse()
 	// loop through whole note-vector...
 	for( Note* const& note : m_midiClip->notes() )
 	{
+		// treat drum notes as 4 ticks wide
+		TimePos endPos = note->length() > 0 ? note->endPos() : TimePos(note->pos() + 4);
 		// and check whether the cursor is over an
 		// existing note
 		if( pos_ticks >= note->pos()
-				&& pos_ticks <= note->endPos()
+				&& pos_ticks <= endPos
 				&& note->key() == key_num
-				&& note->length() > 0 )
+				&& note->length() != 0)
 		{
 			return note;
 		}
