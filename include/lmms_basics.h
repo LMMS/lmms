@@ -31,10 +31,7 @@
 #include "lmmsconfig.h"
 
 #include <cstdint>
-#include <array>
 
-#include <cmath>
-#include <algorithm>
 
 
 namespace lmms

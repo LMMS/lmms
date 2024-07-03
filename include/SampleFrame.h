@@ -28,7 +28,9 @@
 
 #include "lmms_basics.h"
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 
 
 namespace lmms
