@@ -146,8 +146,8 @@ void AudioPort::doProcessing()
 			{
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float v = volBuf->data()[f] * 0.01f;
-					float p = panBuf->data()[f] * 0.01f;
+					float v = (*volBuf)[f] * 0.01f;
+					float p = (*panBuf)[f] * 0.01f;
 					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
 					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
 				}
@@ -161,7 +161,7 @@ void AudioPort::doProcessing()
 				float r = ( p >= 0 ? 1.0f : 1.0f + p );
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float v = volBuf->data()[f] * 0.01f;
+					float v = (*volBuf)[f] * 0.01f;
 					m_portBuffer[f][0] *= v * l;
 					m_portBuffer[f][1] *= v * r;
 				}
@@ -173,7 +173,7 @@ void AudioPort::doProcessing()
 				float v = m_volumeModel->value() * 0.01f;
 				for( f_cnt_t f = 0; f < fpp; ++f )
 				{
-					float p = panBuf->data()[f] * 0.01f;
+					float p = (*panBuf)[f] * 0.01f;
 					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
 					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
 				}

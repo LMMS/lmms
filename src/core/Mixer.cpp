@@ -674,8 +674,8 @@ void Mixer::masterMix( SampleFrame* _buf )
 	{
 		for( int f = 0; f < fpp; f++ )
 		{
-			m_mixerChannels[0]->m_buffer[f][0] *= volBuf->data()[f];
-			m_mixerChannels[0]->m_buffer[f][1] *= volBuf->data()[f];
+			m_mixerChannels[0]->m_buffer[f][0] *= (*volBuf)[f];
+			m_mixerChannels[0]->m_buffer[f][1] *= (*volBuf)[f];
 		}
 	}
 
