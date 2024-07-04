@@ -33,6 +33,9 @@
 #include <cstdint>
 #include <array>
 
+#include <cmath>
+#include <algorithm>
+
 
 namespace lmms
 {
@@ -48,7 +51,7 @@ using int_sample_t = int16_t; // 16-bit-int-sample
 using sample_rate_t = uint32_t; // sample-rate
 using fpp_t = int16_t;			// frames per period (0-16384)
 using f_cnt_t = int32_t;		// standard frame-count
-using ch_cnt_t = uint8_t;		// channel-count (0-SURROUND_CHANNELS)
+using ch_cnt_t = uint8_t;		// channel-count (0-DEFAULT_CHANNELS)
 using bpm_t = uint16_t;			// tempo (MIN_BPM to MAX_BPM)
 using bitrate_t = uint16_t;		// bitrate in kbps
 using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
@@ -109,14 +112,6 @@ inline bool typeInfo<float>::isEqual( float x, float y )
 
 constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
-constexpr ch_cnt_t SURROUND_CHANNELS =
-#define LMMS_DISABLE_SURROUND
-#ifndef LMMS_DISABLE_SURROUND
-				4;
-#else
-				2;
-#endif
-
 constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
 ';';
@@ -124,11 +119,6 @@ constexpr char LADSPA_PATH_SEPERATOR =
 ':';
 #endif
 
-
-
-using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
-using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
-constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
 #define LMMS_STRINGIFY(s) LMMS_STR(s)

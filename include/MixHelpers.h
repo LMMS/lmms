@@ -31,37 +31,39 @@ namespace lmms
 {
 
 class ValueBuffer;
+class SampleFrame;
+
 namespace MixHelpers
 {
 
-bool isSilent( const sampleFrame* src, int frames );
+bool isSilent( const SampleFrame* src, int frames );
 
 /*! \brief Add samples from src to dst */
-void add( sampleFrame* dst, const sampleFrame* src, int frames );
+void add( SampleFrame* dst, const SampleFrame* src, int frames );
 
 /*! \brief Multiply samples from `dst` by `coeff` */
-void multiply(sampleFrame* dst, float coeff, int frames);
+void multiply(SampleFrame* dst, float coeff, int frames);
 
 /*! \brief Add samples from src multiplied by coeffSrc to dst */
-void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
+void addMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc to dst, swap inputs */
-void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
+void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
-void addMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
+void addMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
-void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
+void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
-void addMultipliedStereo( sampleFrame* dst, const sampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
+void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
 
 /*! \brief Multiply dst by coeffDst and add samples from src multiplied by coeffSrc */
-void multiplyAndAddMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffDst, float coeffSrc, int frames );
+void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffDst, float coeffSrc, int frames );
 
 /*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
-void multiplyAndAddMultipliedJoined( sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
+void multiplyAndAddMultipliedJoined( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
 
 } // namespace MixHelpers
 

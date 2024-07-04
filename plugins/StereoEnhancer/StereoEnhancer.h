@@ -40,7 +40,7 @@ public:
 	StereoEnhancerEffect( Model * parent,
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoEnhancerEffect() override;
-	bool processAudioBuffer( sampleFrame * _buf,
+	bool processAudioBuffer( SampleFrame* _buf,
 		                                          const fpp_t _frames ) override;
 
 	EffectControls * controls() override
@@ -54,7 +54,7 @@ public:
 private:
 	DspEffectLibrary::StereoEnhancer m_seFX;
 	
-	sampleFrame * m_delayBuffer;
+	SampleFrame* m_delayBuffer;
 	int m_currFrame;
 	
 	StereoEnhancerControls m_bbControls;

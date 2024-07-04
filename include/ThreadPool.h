@@ -31,17 +31,10 @@
 #include <type_traits>
 #include <vector>
 
-#ifdef __MINGW32__
-#include <mingw.condition_variable.h>
-#include <mingw.future.h>
-#include <mingw.mutex.h>
-#include <mingw.thread.h>
-#else
 #include <condition_variable>
 #include <future>
 #include <mutex>
 #include <thread>
-#endif
 
 namespace lmms {
 //! A thread pool that can be used for asynchronous processing.

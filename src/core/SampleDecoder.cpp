@@ -75,7 +75,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	sf_close(sndFile);
 	file.close();
 
-	auto result = std::vector<sampleFrame>(sfInfo.frames);
+	auto result = std::vector<SampleFrame>(sfInfo.frames);
 	for (int i = 0; i < static_cast<int>(result.size()); ++i)
 	{
 		if (sfInfo.channels == 1)
@@ -107,7 +107,7 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = std::vector<sampleFrame>(frames);
+	auto result = std::vector<SampleFrame>(frames);
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
 	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate)};
@@ -173,7 +173,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 		totalSamplesRead += samplesRead;
 	}
 
-	auto result = std::vector<sampleFrame>(totalSamplesRead / numChannels);
+	auto result = std::vector<SampleFrame>(totalSamplesRead / numChannels);
 	for (int i = 0; i < result.size(); ++i)
 	{
 		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }

@@ -314,7 +314,7 @@ PianoRoll::PianoRoll() :
 	// setup zooming-stuff
 	for( float const & zoomLevel : m_zoomLevels )
 	{
-		m_zoomingModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_zoomingModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
 	connect( &m_zoomingModel, SIGNAL(dataChanged()),
@@ -323,7 +323,7 @@ PianoRoll::PianoRoll() :
 	// zoom y
 	for (float const & zoomLevel : m_zoomYLevels)
 	{
-		m_zoomingYModel.addItem(QString( "%1\%" ).arg(zoomLevel * 100));
+		m_zoomingYModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_zoomingYModel.setValue(m_zoomingYModel.findText("100%"));
 	connect(&m_zoomingYModel, SIGNAL(dataChanged()),

@@ -228,7 +228,7 @@ float FreeBoyInstrument::desiredReleaseTimeMs() const
 
 
 
-void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
+void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
 	const int samplerate = Engine::audioEngine()->outputSampleRate();

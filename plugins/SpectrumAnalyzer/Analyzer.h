@@ -45,7 +45,7 @@ public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Analyzer() override;
 
-	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
+	bool processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
 
 	SaProcessor *getProcessor() {return &m_processor;}
@@ -63,7 +63,7 @@ private:
 	//m_processorThread = QThread::create([=]{m_processor.analyze(m_inputBuffer);});
 	DataprocLauncher m_processorThread;
 
-	LocklessRingBuffer<sampleFrame> m_inputBuffer;
+	LocklessRingBuffer<SampleFrame> m_inputBuffer;
 
 	#ifdef SA_DEBUG
 		int m_last_dump_time;

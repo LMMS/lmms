@@ -581,17 +581,8 @@ void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 
 	if( wevent->orientation() == Qt::Vertical )
 	{
-		m_resonance = m_resonance + ( numSteps );
+		m_resonance = std::clamp(m_resonance + numSteps, 0.1f, highestBandwich);
 
-		if( m_resonance < 0.1 )
-		{
-			m_resonance = 0.1;
-		}
-
-		if( m_resonance > highestBandwich )
-		{
-			m_resonance = highestBandwich;
-		}
 		emit positionChanged();
 	}
 	wevent->accept();

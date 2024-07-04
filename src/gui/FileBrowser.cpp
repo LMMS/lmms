@@ -78,31 +78,6 @@ enum TreeWidgetItemTypes
 } ;
 
 
-
-void FileBrowser::addContentCheckBox()
-{
-	auto filterWidget = new QWidget(contentParent());
-	filterWidget->setFixedHeight(15);
-	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
-	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
-	filterWidgetLayout->setSpacing(0);
-
-	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
-	{
-		box->setCheckState(Qt::Checked);
-		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
-		filterWidgetLayout->addWidget(box);
-	};
-
-	m_showUserContent = new QCheckBox(tr("User content"));
-	configCheckBox(m_showUserContent);
-	m_showFactoryContent = new QCheckBox(tr("Factory content"));
-	configCheckBox(m_showFactoryContent);
-
-	addContentWidget(filterWidget);
-};
-
-
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items,
@@ -117,10 +92,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 {
 	setWindowTitle( tr( "Browser" ) );
 
-	if (!userDir.isEmpty() && !factoryDir.isEmpty())
-	{
-		addContentCheckBox();
-	}
+	addContentCheckBox();
 
 	auto searchWidget = new QWidget(contentParent());
 	searchWidget->setFixedHeight( 24 );
@@ -166,6 +138,54 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	reloadTree();
 	show();
+}
+
+void FileBrowser::addContentCheckBox()
+{
+	// user dir and factory dir checkboxes will display individually depending on whether they are empty.
+	const bool user_checkbox = !m_userDir.isEmpty();
+	const bool factory = !m_factoryDir.isEmpty();
+
+	auto filterWidget = new QWidget(contentParent());
+
+	outerLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom, filterWidget);
+	outerLayout->setSpacing(0);
+
+	if (user_checkbox || factory){
+		filterWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+		filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
+		filterWidgetLayout->setSpacing(0);
+
+		outerLayout->addLayout(filterWidgetLayout);
+	}
+
+	hiddenWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+	hiddenWidgetLayout->setContentsMargins(0, 0, 0, 0);
+	hiddenWidgetLayout->setSpacing(0);
+
+	outerLayout->addLayout(hiddenWidgetLayout);
+
+	auto configCheckBox = [this](QBoxLayout* boxLayout, QCheckBox* box, Qt::CheckState checkState)
+	{
+		box->setCheckState(checkState);
+		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+		boxLayout->addWidget(box);
+	};
+
+	if (user_checkbox) {
+		m_showUserContent = new QCheckBox(tr("User content"));
+		configCheckBox(filterWidgetLayout, m_showUserContent, Qt::Checked);
+	}
+
+	if (factory) {
+		m_showFactoryContent = new QCheckBox(tr("Factory content"));
+		configCheckBox(filterWidgetLayout, m_showFactoryContent, Qt::Checked);
+	}
+
+	m_showHiddenContent = new QCheckBox(tr("Hidden content"));
+	configCheckBox(hiddenWidgetLayout, m_showHiddenContent, Qt::Unchecked);
+
+	addContentWidget(filterWidget);
 }
 
 void FileBrowser::saveDirectoriesStates()
@@ -391,12 +411,15 @@ void FileBrowser::addItems(const QString & path )
 	QDir cdir(path);
 	if (!cdir.isReadable()) { return; }
 	QFileInfoList entries = cdir.entryInfoList(
-		m_filter.split(' '), dirFilters(), QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+		m_filter.split(' '),
+		dirFilters(),
+		QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
 		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
 
 		QString fileName = entry.fileName();
+		if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) continue;
 		if (entry.isDir())
 		{
 			// Merge dir's together

@@ -48,7 +48,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 		std::clamp<int>(
 			ConfigManager::inst()->value("audiojack", "channels").toInt(),
 			DEFAULT_CHANNELS,
-			SURROUND_CHANNELS
+			DEFAULT_CHANNELS
 		),
 		// clang-format on
 		audioEngineParam)
@@ -56,7 +56,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_outBuf(new surroundSampleFrame[audioEngine()->framesPerPeriod()])
+	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
@@ -392,7 +392,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	form->addRow(tr("Client name"), m_clientName);
 
 	auto m = new gui::LcdSpinBoxModel(/* this */);
-	m->setRange(DEFAULT_CHANNELS, SURROUND_CHANNELS);
+	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep(2);
 	m->setValue(ConfigManager::inst()->value("audiojack", "channels").toInt());
 

@@ -39,16 +39,16 @@ public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Vectorscope() override = default;
 
-	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
+	bool processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
-	LocklessRingBuffer<sampleFrame> *getBuffer() {return &m_inputBuffer;}
+	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
 	VecControls m_controls;
 
 	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)
 	const unsigned int m_maxBufferSize = 4096;
-	LocklessRingBuffer<sampleFrame> m_inputBuffer;
+	LocklessRingBuffer<SampleFrame> m_inputBuffer;
 };
 
 

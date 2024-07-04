@@ -201,7 +201,7 @@ QString Vibed::nodeName() const
 	return vibedstrings_plugin_descriptor.name;
 }
 
-void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
+void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 {
 	if (!n->m_pluginData)
 	{

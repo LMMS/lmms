@@ -58,7 +58,7 @@ StereoEnhancerEffect::StereoEnhancerEffect(
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
 	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
-	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
+	m_delayBuffer( new SampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
 	m_bbControls( this )
 {
@@ -82,7 +82,7 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
+bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 

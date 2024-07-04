@@ -1,6 +1,6 @@
 if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
-	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
+	include_directories(SYSTEM ${GIG_INCLUDE_DIRS})
 	SET(CMAKE_AUTOUIC ON)
 
 	# Required for not crashing loading files with libgig

@@ -136,14 +136,14 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( false, this, tr( "Reverb" ) ),
 	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this, tr( "Reverb room size" ) ),
-	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this, tr( "Reverb damping" ) ),
+	m_reverbDamping(FLUID_REVERB_DEFAULT_DAMP, 0, 1.f, 0.01f, this, tr("Reverb damping")),
 	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this, tr( "Reverb width" ) ),
 	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this, tr( "Reverb level" ) ),
 	m_chorusOn( false, this, tr( "Chorus" ) ),
 	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr( "Chorus voices" ) ),
-	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr( "Chorus level" ) ),
-	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus speed" ) ),
-	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus depth" ) )
+	m_chorusLevel(FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.f, 0.01f, this, tr("Chorus level")),
+	m_chorusSpeed(FLUID_CHORUS_DEFAULT_SPEED, 0.29f, 5.f, 0.01f, this, tr("Chorus speed")),
+	m_chorusDepth(FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.f, 0.05f, this, tr("Chorus depth"))
 {
 
 
@@ -647,7 +647,7 @@ void Sf2Instrument::reloadSynth()
 
 
 
-void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
+void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -782,7 +782,7 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::play( sampleFrame * _working_buffer )
+void Sf2Instrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -868,7 +868,7 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 }
 
 
-void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
+void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
@@ -877,9 +877,9 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 	{
 		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
 #ifdef __GNUC__
-		sampleFrame tmp[f];
+		SampleFrame tmp[f];
 #else
-		sampleFrame * tmp = new sampleFrame[f];
+		SampleFrame* tmp = new SampleFrame[f];
 #endif
 		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
 

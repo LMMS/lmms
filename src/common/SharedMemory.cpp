@@ -132,9 +132,10 @@ private:
 
 namespace {
 
-auto sizeToHighAndLow(std::size_t size) -> std::pair<DWORD, DWORD>
+template<typename T>
+auto sizeToHighAndLow(T size) -> std::pair<DWORD, DWORD>
 {
-	if constexpr(sizeof(std::size_t) <= sizeof(DWORD)) {
+	if constexpr (sizeof(T) <= sizeof(DWORD)) {
 		return {0, size};
 	} else {
 		return {static_cast<DWORD>(size >> 32), static_cast<DWORD>(size)};

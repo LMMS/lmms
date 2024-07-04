@@ -31,7 +31,7 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const sampleFrame* data, size_t numFrames, int sampleRate)
+SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
 	: m_data(data, data + numFrames)
 	, m_sampleRate(sampleRate)
 {
@@ -60,11 +60,11 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
-	m_data.resize(bytes.size() / sizeof(sampleFrame));
-	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(sampleFrame));
+	m_data.resize(bytes.size() / sizeof(SampleFrame));
+	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(SampleFrame));
 }
 
-SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
+SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
 	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
 {
@@ -82,7 +82,7 @@ QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto data = reinterpret_cast<const char*>(m_data.data());
-	const auto size = static_cast<int>(m_data.size() * sizeof(sampleFrame));
+	const auto size = static_cast<int>(m_data.size() * sizeof(SampleFrame));
 	const auto byteArray = QByteArray{data, size};
 	return byteArray.toBase64();
 }

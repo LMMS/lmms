@@ -32,6 +32,7 @@
 namespace lmms
 {
 
+class SampleFrame;
 
 const int MAX_BANDS = 2048;
 class EqAnalyser
@@ -44,7 +45,7 @@ public:
 	bool getInProgress();
 	void clear();
 
-	void analyze( sampleFrame *buf, const fpp_t frames );
+	void analyze( SampleFrame* buf, const fpp_t frames );
 
 	float getEnergy() const;
 	int getSampleRate() const;

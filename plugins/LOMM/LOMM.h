@@ -35,7 +35,7 @@
 namespace lmms
 {
 
-constexpr inline float LOMM_MIN_FLOOR = 0.00012589;// -72 dBFS
+constexpr inline float LOMM_MIN_FLOOR = 0.00012589f;// -72 dBFS
 constexpr inline float LOMM_MAX_LOOKAHEAD = 20.f;
 constexpr inline float LOMM_AUTO_TIME_ADJUST = 5.f;
 
@@ -45,7 +45,7 @@ class LOMMEffect : public Effect
 public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

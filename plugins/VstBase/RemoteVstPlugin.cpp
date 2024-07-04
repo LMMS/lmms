@@ -87,11 +87,7 @@
 #undef Unsorted
 #endif
 
-#ifdef USE_MINGW_THREADS_REPLACEMENT
-#	include <mingw.mutex.h>
-#else
-#	include <mutex>
-#endif
+#include <mutex>
 
 #include <algorithm>
 #include <vector>
@@ -191,7 +187,7 @@ public:
 	void hideEditor();
 	void destroyEditor();
 
-	virtual void process( const sampleFrame * _in, sampleFrame * _out );
+	virtual void process( const SampleFrame* _in, SampleFrame* _out );
 
 
 	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
@@ -1027,7 +1023,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 
 
-void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
+void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )

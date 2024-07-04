@@ -37,13 +37,13 @@
 
 // carla/source/includes
 #include "carlabase_export.h"
-#include "CarlaDefines.h"
+#include <CarlaDefines.h>
 #if CARLA_VERSION_HEX >= 0x010911
-    #include "CarlaNativePlugin.h"
+    #include <CarlaNativePlugin.h>
 #else
-    #include "CarlaBackend.h"
-    #include "CarlaNative.h"
-    #include "CarlaUtils.h"
+    #include <CarlaBackend.h>
+    #include <CarlaNative.h>
+    #include <CarlaUtils.h>
     CARLA_EXPORT
     const NativePluginDescriptor* carla_get_native_patchbay_plugin();
 
@@ -81,7 +81,7 @@ class CarlaParamFloatModel : public FloatModel
 {
 public:
 	CarlaParamFloatModel(Model * parent):
-		FloatModel(0.0, 0.0, 1.0, 0.001, parent, "Unused"),
+		FloatModel(0.f, 0.f, 1.f, 0.001f, parent, "Unused"),
 		m_isOutput(false),
 		m_isEnabled(false)
 	{
@@ -193,7 +193,7 @@ public:
     QString nodeName() const override;
     void saveSettings(QDomDocument& doc, QDomElement& parent) override;
     void loadSettings(const QDomElement& elem) override;
-    void play(sampleFrame* workingBuffer) override;
+    void play(SampleFrame* workingBuffer) override;
     bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
     gui::PluginView* instantiateView(QWidget* parent) override;
 

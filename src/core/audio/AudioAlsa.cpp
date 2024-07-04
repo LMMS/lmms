@@ -39,7 +39,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audioalsa", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine),
+		DEFAULT_CHANNELS), _audioEngine),
 	m_handle( nullptr ),
 	m_hwParams( nullptr ),
 	m_swParams( nullptr ),
@@ -242,7 +242,7 @@ void AudioAlsa::stopProcessing()
 
 void AudioAlsa::run()
 {
-	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
 

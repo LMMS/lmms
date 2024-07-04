@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
+bool Analyzer::processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
