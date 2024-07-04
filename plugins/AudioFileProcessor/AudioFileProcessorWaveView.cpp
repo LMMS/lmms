@@ -45,7 +45,7 @@ void AudioFileProcessorWaveView::updateSampleRange()
 {
 	if (m_sample->sampleSize() > 1)
 	{
-		const auto marging = (m_sample->endFrame() - m_sample->startFrame()) * 0.1;
+		const f_cnt_t marging = (m_sample->endFrame() - m_sample->startFrame()) * 0.1;
 		setFrom(m_sample->startFrame() - marging);
 		setTo(m_sample->endFrame() + marging);
 	}
@@ -53,7 +53,7 @@ void AudioFileProcessorWaveView::updateSampleRange()
 
 void AudioFileProcessorWaveView::setTo(f_cnt_t to)
 {
-	m_to = std::min(to, static_cast<f_cnt_t>(m_sample->sampleSize()));
+	m_to = std::min(to, static_cast<lmms::f_cnt_t>(m_sample->sampleSize()));
 }
 
 void AudioFileProcessorWaveView::setFrom(f_cnt_t from)
@@ -375,13 +375,17 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 
 void AudioFileProcessorWaveView::slide(int px)
 {
-	const auto fact = std::abs(static_cast<double>(px) / width());
-	auto step = static_cast<int>(range() * fact);
-	if (px > 0) { step = -step; }
+	const double fact = qAbs(double(px) / width());
+	f_cnt_t step = range() * fact;
+	if (px > 0)
+	{
+		step = -step;
+	}
 
-	const auto stepFrom = std::clamp<int>(m_from + step, 0, m_sample->sampleSize()) - static_cast<int>(m_from);
-	const auto stepTo = std::clamp<int>(m_to + step, m_from + 1, m_sample->sampleSize()) - static_cast<int>(m_to);
-	step = std::abs(stepFrom) < std::abs(stepTo) ? stepFrom : stepTo;
+	f_cnt_t step_from = qBound<size_t>(0, m_from + step, m_sample->sampleSize()) - m_from;
+	f_cnt_t step_to = qBound<size_t>(m_from + 1, m_to + step, m_sample->sampleSize()) - m_to;
+
+	step = qAbs(step_from) < qAbs(step_to) ? step_from : step_to;
 
 	setFrom(m_from + step);
 	setTo(m_to + step);
