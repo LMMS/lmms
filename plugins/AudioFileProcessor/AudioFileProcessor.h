@@ -54,7 +54,7 @@ public:
 
 	QString nodeName() const override;
 
-	auto beatLen(NotePlayHandle* note) const -> f_cnt_t override;
+	auto beatLen(NotePlayHandle* note) const -> int override;
 
 	float desiredReleaseTimeMs() const override
 	{
@@ -89,7 +89,7 @@ private slots:
 
 
 signals:
-	void isPlaying(f_cnt_t _current_frame);
+	void isPlaying( lmms::f_cnt_t _current_frame );
 	void sampleUpdated();
 
 private:
