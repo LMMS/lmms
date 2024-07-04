@@ -276,8 +276,9 @@ void SampleThumbnailListManager::visualize(
 
 	const long x = parameters.x;
 
-	// If the clip extends to the left past the start of the sample,
-	// start starting at the start of the sample and skip the blank space.
+	// If the clip extends to the left past the start of the
+	// sample, start drawing at the start of the sample and
+	// skip the blank space.
 	const long absXOr0 = (x < 0) ? -x : 0;
 
 	const long height 		= parameters.height;
