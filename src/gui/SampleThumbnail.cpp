@@ -415,4 +415,4 @@ void SampleThumbnailListManager::visualize_original(
 }
 
 
-}
+} // namespace lmms

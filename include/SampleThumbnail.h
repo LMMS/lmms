@@ -129,7 +129,7 @@ public:
 
 };
 	
-}
+} // namespace lmms
 
 
 
