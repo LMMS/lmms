@@ -28,6 +28,7 @@
 
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
+#include "lmms_basics.h"
 #include "lmms_constants.h"
 
 
@@ -185,7 +186,7 @@ void Instrument::applyRelease( SampleFrame* buf, const NotePlayHandle * _n )
 	const auto releaseFrames = desiredReleaseFrames();
 
 	const auto endFrame = _n->framesLeft();
-	const auto startFrame = std::max(0, endFrame - releaseFrames);
+	const auto startFrame = std::max(0, static_cast<int>(endFrame) - static_cast<int>(releaseFrames));
 
 	for (auto f = startFrame; f < endFrame && f < fpp; f++)
 	{
