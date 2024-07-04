@@ -46,49 +46,52 @@ namespace lmms {
 
 struct SampleThumbnailVisualizeParameters
 {
-	// Assign to this field when we need to render using the 
+	// Assign to this field when we need to render using the
 	// original sample.
 	const Sample* originalSample = nullptr;
-	
+
 	const float amplification;
 	const bool reversed;
-	
-	// Sample clips in the song editor don't need to use these 2 fields.
+
+	// Not using these 2 fields in the Song editor clips.
 	// [0..1] Range
  	const float sampleStart = 0.0;
 	const float sampleEnd   = 1.0;
-	
-	// All the fields below are in pixel unit
+
+	// All the fields below are in pixel unit.
+
 	const long x;
 	const long y;
-	
+
 	// The length of the rendered sample is proportional to the
 	// value of this field in the song editor.
 	//
-	// Must be fixed regardless of clip length because this  
-	// carries the zoom level information.
+	// This carries the zoom level information in the Song Editor.
+	//
+	// In AFP, SlicerT or other places where the width and height
+	// is always fixed, the sampleStart and sampleEnd fields carries
+	// the zoom level information instead.
 	const long width;
 	const long height;
-	
-	// Clips shorter than the sample length (measuring from the start
-	// of the sample) can specify this field so rendering cuts 
-	// off early.
+
+	// Song editor clips shorter than the sample length (measuring
+	// from the start of the sample) can specify this field so
+	// rendering cuts off early, reducing computation cost.
 	const long clipWidthSinceSampleStart = std::numeric_limits<long>::max();
 };
 
-struct SampleThumbnailBit 
+struct SampleThumbnailBit
 {
 	float max;
 	float min;
-	float maxRMS;
-	float minRMS;
-	
+	float rms;
+
 	SampleThumbnailBit();
-	
+
 	SampleThumbnailBit(const SampleFrame&);
-	
+
 	void merge(const SampleThumbnailBit&);
-	
+
 	void mergeFrame(const SampleFrame&);
 };
 
@@ -96,21 +99,33 @@ using SampleThumbnail = std::vector<SampleThumbnailBit>;
 using SampleThumbnailList = std::vector<SampleThumbnail>;
 using SharedSampleThumbnailList = std::shared_ptr<SampleThumbnailList>;
 
+// Insert this into your class when you want to implement
+// thumbnails. This is optional, but without this class, there will be no
+// indication that this thumbnail list is being used and it will be destroyed
+// when you generate thumbnails somewhere else, and have to be regenerated
+// before being rendered, which is slower than rendering the sample directly.
+//
+// Doing
+//
+//		m_thumbnaillist = SampleThumbnailListManager(sample)
+//
+// every time you prepare to render the sample won't have a considerable
+// performance hit.
 class LMMS_EXPORT SampleThumbnailListManager
 {
 private:
-	SharedSampleThumbnailList list;
-	static std::map<const QString, SharedSampleThumbnailList> SAMPLE_THUMBNAIL_MAP;
-	
+	SharedSampleThumbnailList m_list;
+	static std::map<const QString, SharedSampleThumbnailList> SAMPLE_THUMBNAIL_LIST_MAP;
+
 protected:
 	static void draw(
 		QPainter& painter, const SampleThumbnailBit& bit,
-		int lineX, int centerY, float scalingFactor, 
-		QColor color, QColor rmsColor
+		int lineX, int centerY, float scalingFactor,
+		const QColor& color, const QColor& rmsColor
 	);
-	
+
 	static SampleThumbnail generate(
-		const size_t thumbnailsize, 
+		const size_t thumbnailsize,
 		const SampleFrame* sampleBuffer,
 		const SampleFrame* sampleBufferEnd
 	);
@@ -120,15 +135,15 @@ public:
 
 	SampleThumbnailListManager(const Sample&);
 
-	bool selectFromGlobalThumbnailMap(const Sample&); 
-	
+	bool selectFromGlobalThumbnailMap(const Sample&);
+
 	void cleanUpGlobalThumbnailMap();
-		
+
 	void visualize(const SampleThumbnailVisualizeParameters&, QPainter&) const;
 	static void visualize_original(const SampleThumbnailVisualizeParameters&, QPainter&);
 
 };
-	
+
 } // namespace lmms
 
 
