@@ -30,6 +30,7 @@
 #include "BufferManager.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
+#include "SampleFrame.h"
 #include "Song.h"
 
 #include "InstrumentTrack.h"
@@ -132,7 +133,7 @@ void MixerChannel::sanitizeOutput()
 
 	if (it != end)
 	{
-		std::fill_n(m_buffer, fpp, sampleFrame{});
+		std::fill_n(m_buffer, fpp, SampleFrame{});
 		m_peakLeft = 0.0f;
 		m_peakRight = 0.0f;
 
