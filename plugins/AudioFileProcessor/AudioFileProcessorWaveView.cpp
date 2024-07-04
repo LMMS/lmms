@@ -342,29 +342,29 @@ void AudioFileProcessorWaveView::updateGraph()
 
 void AudioFileProcessorWaveView::zoom(const bool out)
 {
-	const f_cnt_t start = m_sample->startFrame();
-	const f_cnt_t end = m_sample->endFrame();
-	const f_cnt_t frames = m_sample->sampleSize();
-	const f_cnt_t d_from = start - m_from;
-	const f_cnt_t d_to = m_to - end;
+	const auto start = m_sample->startFrame();
+	const auto end = m_sample->endFrame();
+	const auto frames = m_sample->sampleSize();
+	const auto d_from = static_cast<int>(start - m_from);
+	const auto d_to = static_cast<int>(m_to - end);
 
-	const f_cnt_t step = std::max<f_cnt_t>(1, std::max(d_from, d_to) / 10);
-	const f_cnt_t step_from = (out ? - step : step);
-	const f_cnt_t step_to = (out ? step : - step);
+	const auto step = std::max(1, std::max(d_from, d_to) / 10);
+	const auto step_from = (out ? - step : step);
+	const auto step_to = (out ? step : - step);
 
-	const double comp_ratio = static_cast<double>(std::min(d_from, d_to)) / std::max<f_cnt_t>(1, qMax(d_from, d_to));
+	const auto comp_ratio = static_cast<double>(std::min(d_from, d_to)) / std::max(1, std::max(d_from, d_to));
 
-	const auto boundedFrom = std::clamp<f_cnt_t>(m_from + step_from, 0, start);
-	const auto boundedTo = std::clamp<f_cnt_t>(m_to + step_to, end, frames);
+	const auto boundedFrom = std::clamp<int>(m_from + step_from, 0, start);
+	const auto boundedTo = std::clamp<int>(m_to + step_to, end, frames);
 
-	const auto toStep = static_cast<f_cnt_t>(step_from * (boundedTo == m_to ? 1 : comp_ratio));
+	const auto toStep = static_cast<int>(step_from * (boundedTo == m_to ? 1 : comp_ratio));
 	const auto newFrom = (out && d_from < d_to) || (!out && d_to < d_from)
 		? boundedFrom
-		: std::clamp<f_cnt_t>(m_from + toStep, 0, start);
+		: std::clamp<int>(m_from + toStep, 0, start);
 
-	const auto fromStep = static_cast<f_cnt_t>(step_to * (boundedFrom == m_from ? 1 : comp_ratio));
+	const auto fromStep = static_cast<int>(step_to * (boundedFrom == m_from ? 1 : comp_ratio));
 	const auto newTo
-		= (out && d_from < d_to) || (!out && d_to < d_from) ? std::clamp(m_to + fromStep, end, frames) : boundedTo;
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? std::clamp<int>(m_to + fromStep, end, frames) : boundedTo;
 
 	if (static_cast<double>(newTo - newFrom) / m_sample->sampleRate() > 0.05)
 	{
