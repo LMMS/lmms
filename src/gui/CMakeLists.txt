@@ -1,5 +1,4 @@
-SET(LMMS_SRCS
-	${LMMS_SRCS}
+SET(LMMS_GUI_SRCS
 	gui/ActionGroup.cpp
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
