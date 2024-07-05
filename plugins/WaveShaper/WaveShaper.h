@@ -40,7 +40,7 @@ public:
 	WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~WaveShaperEffect() override = default;
-	bool processAudioBuffer( sampleFrame * _buf,
+	bool processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames ) override;
 
 	EffectControls * controls() override

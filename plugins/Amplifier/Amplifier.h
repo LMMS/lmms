@@ -37,7 +37,7 @@ class AmplifierEffect : public Effect
 public:
 	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~AmplifierEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

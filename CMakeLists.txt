@@ -154,6 +154,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
+CHECK_INCLUDE_FILES(sys/prctl.h LMMS_HAVE_SYS_PRCTL_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -674,6 +675,11 @@ elseif(MSVC)
 		"/external:W0" # Don't emit warnings for third-party code
 		"/external:anglebrackets" # Consider headers included with angle brackets to be third-party
 		"/external:templates-" # Still emit warnings from first-party instantiations of third-party templates
+		# Silence "class X needs to have DLL-interface to be used by clients of
+		# class Y" warnings. These aren't trivial to address, and don't pose a
+		# problem for us since we build all modules with the same compiler and
+		# options, and dynamically link the CRT.
+		"/wd4251"
 	)
 	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
 		"/W0" # Disable all warnings

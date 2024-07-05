@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
+bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	PeakControllerEffectControls & c = m_peakControls;

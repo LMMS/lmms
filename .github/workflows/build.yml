@@ -37,8 +37,10 @@ jobs:
         run: |
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
-          mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX=./install \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -96,19 +98,21 @@ jobs:
       - name: Clean up Homebrew download cache
         run: rm -rf ~/Library/Caches/Homebrew/downloads
       - name: Restore Homebrew download cache
+        id: cache-homebrew
         uses: actions/cache/restore@v3
         with:
           key: n/a - only restore from restore-keys
           restore-keys: |
-            homebrew-
+            homebrew-${{ matrix.arch }}-
           path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ github.ref }}-
-            ccache-${{ github.job }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
@@ -155,10 +159,14 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500MB
       - name: Save Homebrew download cache
+        if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
         uses: actions/cache/save@v3
         with:
-          key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          key: ${{ env.key }} 
           path: ~/Library/Caches/Homebrew/downloads
+        env:
+          key: "homebrew-${{ matrix.arch }}\
+            -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
     strategy:
       fail-fast: false
@@ -178,6 +186,12 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
+      - name: Enable POSIX MinGW
+        run: |
+          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -197,8 +211,11 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          mkdir build && cd build
-          ../cmake/build_win${{ matrix.arch }}.sh
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX=./install \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-${{ matrix.arch }}.cmake" \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Package
@@ -282,6 +299,7 @@ jobs:
             -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DUSE_COMPILE_CACHE=ON `
+            -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_HOST_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
