@@ -286,18 +286,20 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	
 	//qDebug("%f %f", offset_end, length);
 	
-	const auto parameters = SampleThumbnailVisualizeParameters{
-		.amplification 			= sample.amplification(), 
-		.reversed 				= sample.reversed(),
-			
-		.x = static_cast<long>(offsetStart),
-		.y = spacing,
-		.width 	= std::max<long>(static_cast<long>(sampleLength), 1),
-		.height = rect().bottom() - 2 * spacing,
-		.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart)
-	};
-	
-	m_thumbnaillist.visualize(parameters, p);
+	auto param = SampleThumbnailVisualizeParameters();
+
+	param.amplification 	= sample.amplification();
+	param.reversed 		= sample.reversed();
+
+	param.x = static_cast<long>(offsetStart);
+	param.y = spacing;
+
+	param.width 	= std::max<long>(static_cast<long>(sampleLength), 1);
+	param.height 	= rect().bottom() - 2 * spacing;
+
+	param.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart);
+
+	m_thumbnaillist.visualize(param, p);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

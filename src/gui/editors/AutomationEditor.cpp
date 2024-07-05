@@ -1226,17 +1226,18 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			//const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
 			//SampleWaveform::visualize(waveform, p, rect);
 			
-			const auto parameters = SampleThumbnailVisualizeParameters{
-				.amplification = sample.amplification(),
-				.reversed = sample.reversed(),
-				
-				.x = startPos,
-				.y = yOffset,
-				.width 	= sampleWidth,
-				.height = sampleHeight
-			};
+			auto param = SampleThumbnailVisualizeParameters();
 
-			m_thumbnaillist.visualize(parameters, p);
+			param.amplification = sample.amplification();
+			param.reversed 		= sample.reversed();
+			
+			param.x = startPos;
+			param.y = yOffset;
+			
+			param.width 	= sampleWidth;
+			param.height 	= sampleHeight;
+
+			m_thumbnaillist.visualize(param, p);
 		}
 
 		// draw ghost notes

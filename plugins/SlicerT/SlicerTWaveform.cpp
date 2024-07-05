@@ -95,16 +95,18 @@ void SlicerTWaveform::drawSeekerWaveform()
 	//SampleWaveform::visualize(waveform, brush, rect);
 	
 	m_thumbnaillist = SampleThumbnailListManager(sample);
-	const auto parameters = SampleThumbnailVisualizeParameters{
-		.amplification = sample.amplification(),
-		.reversed = sample.reversed(),
-		
-		.x = 0,
-		.y = 0,
-		.width = m_seekerWaveform.width(),
-		.height = m_seekerWaveform.height()
-	};
-	m_thumbnaillist.visualize(parameters, brush);
+	auto param = SampleThumbnailVisualizeParameters();
+
+	param.amplification = sample.amplification();
+	param.reversed = sample.reversed();
+
+	param.x = 0;
+	param.y = 0;
+
+	param.width = m_seekerWaveform.width();
+	param.height = m_seekerWaveform.height();
+
+	m_thumbnaillist.visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -164,21 +166,23 @@ void SlicerTWaveform::drawEditorWaveform()
 	//SampleWaveform::visualize(waveform, brush, rect);
 	
 	m_thumbnaillist = SampleThumbnailListManager(sample);
-	const auto parameters = SampleThumbnailVisualizeParameters{
-		.originalSample = &sample,
-		
-		.amplification = sample.amplification(),
-		.reversed = sample.reversed(),
-		
-		.sampleStart	= static_cast<float>(startFrame) / sample.sampleSize(),
-		.sampleEnd 		= static_cast<float>(  endFrame) / sample.sampleSize(),
-		
-		.x = 0,
-		.y = zoomOffset,
-		.width = m_editorWidth,
-		.height = static_cast<long>(m_zoomLevel * m_editorHeight)
-	};
-	m_thumbnaillist.visualize(parameters, brush);
+	auto param = SampleThumbnailVisualizeParameters();
+
+	param.originalSample = &sample;
+
+	param.amplification = sample.amplification();
+	param.reversed = sample.reversed();
+
+	param.sampleStart	= static_cast<float>(startFrame) / sample.sampleSize();
+	param.sampleEnd 	= static_cast<float>(  endFrame) / sample.sampleSize();
+
+	param.x = 0;
+	param.y = zoomOffset;
+
+	param.width = m_editorWidth;
+	param.height = static_cast<long>(m_zoomLevel * m_editorHeight);
+
+	m_thumbnaillist.visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);

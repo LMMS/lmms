@@ -342,22 +342,23 @@ void AudioFileProcessorWaveView::updateGraph()
 	// Performance hit is neglectable
 	m_thumbnaillist = SampleThumbnailListManager(*m_sample);
 	
-	const auto parameters = SampleThumbnailVisualizeParameters{
-		.originalSample = m_sample,
-		
-		.amplification = m_sample->amplification(),
-		.reversed = m_sample->reversed(),
-		
-		.sampleStart 	= static_cast<float>(m_from) / m_sample->sampleSize(),
-		.sampleEnd 		= static_cast<float>(m_to  ) / m_sample->sampleSize(),
-		
-		.x = 0,
-		.y = 0,
-		.width 	= m_graph.width(),
-		.height = m_graph.height()
-	};
+	auto param = SampleThumbnailVisualizeParameters();
 	
-	m_thumbnaillist.visualize(parameters, p);
+	param.originalSample = m_sample,
+
+	param.amplification = m_sample->amplification();
+	param.reversed 		= m_sample->reversed();
+
+	param.sampleStart 	= static_cast<float>(m_from) / m_sample->sampleSize();
+	param.sampleEnd 	= static_cast<float>(m_to  ) / m_sample->sampleSize();
+
+	param.x = 0;
+	param.y = 0;
+
+	param.width  = m_graph.width();
+	param.height = m_graph.height();
+
+	m_thumbnaillist.visualize(param, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

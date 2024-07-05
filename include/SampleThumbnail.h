@@ -48,20 +48,20 @@ struct SampleThumbnailVisualizeParameters
 {
 	// Assign to this field when we need to render using the
 	// original sample.
-	const Sample* originalSample = nullptr;
+	Sample const* originalSample;
 
-	const float amplification;
-	const bool reversed;
+	float amplification;
+	bool reversed;
 
 	// Not using these 2 fields in the Song editor clips.
 	// [0..1] Range
- 	const float sampleStart = 0.0;
-	const float sampleEnd   = 1.0;
+ 	float sampleStart;
+	float sampleEnd;
 
 	// All the fields below are in pixel unit.
 
-	const long x;
-	const long y;
+	long x;
+	long y;
 
 	// The length of the rendered sample is proportional to the
 	// value of this field in the song editor.
@@ -71,13 +71,30 @@ struct SampleThumbnailVisualizeParameters
 	// In AFP, SlicerT or other places where the width and height
 	// is always fixed, the sampleStart and sampleEnd fields carries
 	// the zoom level information instead.
-	const long width;
-	const long height;
+	long width;
+	long height;
 
 	// Song editor clips shorter than the sample length (measuring
 	// from the start of the sample) can specify this field so
 	// rendering cuts off early, reducing computation cost.
-	const long clipWidthSinceSampleStart = std::numeric_limits<long>::max();
+	long clipWidthSinceSampleStart;
+	
+	SampleThumbnailVisualizeParameters()
+		: originalSample(nullptr)
+		, amplification(1.0)
+		, reversed(false)
+
+		, sampleStart(0.0)
+		, sampleEnd(1.0)
+
+		, x(0)
+		, y(0)
+
+		, width(0)
+		, height(0)
+
+		, clipWidthSinceSampleStart(std::numeric_limits<long>::max())
+	{}
 };
 
 struct SampleThumbnailBit
