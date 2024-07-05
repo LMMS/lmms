@@ -141,7 +141,6 @@ public:
 
 	void visualize(const SampleThumbnailVisualizeParameters&, QPainter&) const;
 	static void visualize_original(const SampleThumbnailVisualizeParameters&, QPainter&);
-
 };
 
 } // namespace lmms

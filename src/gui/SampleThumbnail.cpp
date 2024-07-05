@@ -250,8 +250,8 @@ void SampleThumbnailListManager::draw(
 void SampleThumbnailListManager::visualize(
 	const SampleThumbnailVisualizeParameters& parameters,
 	QPainter& painter
-) const {
-
+) const 
+{
 	const float sampleView = parameters.sampleEnd - parameters.sampleStart;
 
 	// We specify that the existence of the original sample
@@ -352,7 +352,6 @@ void SampleThumbnailListManager::visualize(
 		pixelIndex++;
 	}
 	while (pixelIndex <= pixelBound && tIndex < tLast);
-
 }
 
 // Method is made public to be easily accessed when
