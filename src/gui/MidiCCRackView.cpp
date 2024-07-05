@@ -31,7 +31,7 @@
 #include <QWidget>
 
 #include "embed.h"
-#include "GroupBox.h"
+#include "widgets/GroupBox.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"

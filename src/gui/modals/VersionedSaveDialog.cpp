@@ -29,7 +29,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 
-#include "DeprecationHelper.h"
+#include "gui/DeprecationHelper.h"
 #include "VersionedSaveDialog.h"
 #include "LedCheckBox.h"
 

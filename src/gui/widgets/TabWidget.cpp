@@ -31,7 +31,7 @@
 #include <QToolTip>
 #include <QWheelEvent>
 
-#include "DeprecationHelper.h"
+#include "gui/DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 

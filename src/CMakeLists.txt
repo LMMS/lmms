@@ -33,6 +33,7 @@ INCLUDE_DIRECTORIES(
 	"${CMAKE_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/src/core/include"
 	"${CMAKE_SOURCE_DIR}/src/gui/include"
+	"${CMAKE_SOURCE_DIR}/src"
 )
 
 IF(WIN32 AND MSVC)

@@ -36,7 +36,7 @@
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "SampleClip.h"
-#include "SampleTrackWindow.h"
+#include "gui/SampleTrackWindow.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"

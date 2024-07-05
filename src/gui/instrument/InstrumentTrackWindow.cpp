@@ -39,9 +39,9 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "Engine.h"
-#include "FileBrowser.h"
+#include "gui/FileBrowser.h"
 #include "FileDialog.h"
-#include "GroupBox.h"
+#include "gui/widgets/GroupBox.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
 #include "Instrument.h"
@@ -55,7 +55,7 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
-#include "LeftRightNav.h"
+#include "gui/widgets/LeftRightNav.h"
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
@@ -63,9 +63,9 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
-#include "TabWidget.h"
+#include "gui/widgets/TabWidget.h"
 #include "TrackContainerView.h"
-#include "TrackLabelButton.h"
+#include "gui/tracks/TrackLabelButton.h"
 
 
 namespace lmms::gui

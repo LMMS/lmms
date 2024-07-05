@@ -38,7 +38,7 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "MainWindow.h"
-#include "MidiSetupWidget.h"
+#include "gui/MidiSetupWidget.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
 #include "TabBar.h"
@@ -47,7 +47,7 @@
 
 // Platform-specific audio-interface classes.
 #include "AudioAlsa.h"
-#include "AudioAlsaSetupWidget.h"
+#include "gui/AudioAlsaSetupWidget.h"
 #include "AudioDummy.h"
 #include "AudioJack.h"
 #include "AudioOss.h"

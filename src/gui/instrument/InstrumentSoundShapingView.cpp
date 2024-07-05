@@ -30,10 +30,10 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
-#include "GroupBox.h"
+#include "gui/widgets/GroupBox.h"
 #include "gui_templates.h"
 #include "Knob.h"
-#include "TabWidget.h"
+#include "gui/widgets/TabWidget.h"
 
 
 namespace lmms::gui
