@@ -45,10 +45,10 @@
 #define __USE_XOPEN
 #endif
 
-#include "ActionGroup.h"
+#include "gui/ActionGroup.h"
 #include "AutomationNode.h"
 #include "ComboBox.h"
-#include "DeprecationHelper.h"
+#include "gui/DeprecationHelper.h"
 #include "DetuningHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"

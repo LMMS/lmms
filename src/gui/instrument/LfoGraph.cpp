@@ -30,7 +30,7 @@
 
 #include "EnvelopeAndLfoParameters.h"
 #include "Oscillator.h"
-#include "ColorHelper.h"
+#include "gui/ColorHelper.h"
 
 #include "FontHelper.h"
 

@@ -28,11 +28,11 @@
 #include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"
-#include "MidiPortMenu.h"
+#include "gui/menus/MidiPortMenu.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "embed.h"
-#include "GroupBox.h"
+#include "gui/widgets/GroupBox.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 

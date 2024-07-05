@@ -37,7 +37,7 @@
 #include "ConfigManager.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "NStateButton.h"
+#include "gui/widgets/NStateButton.h"
 #include "TextFloat.h"
 
 namespace lmms::gui

@@ -40,7 +40,7 @@
 #include "SampleTrackView.h"
 #include "Song.h"
 #include "SubWindow.h"
-#include "TrackLabelButton.h"
+#include "tracks/TrackLabelButton.h"
 
 namespace lmms::gui
 {

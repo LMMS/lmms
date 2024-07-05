@@ -33,14 +33,14 @@
 #include "ControllerConnection.h"
 #include "MidiController.h"
 #include "MidiClient.h"
-#include "MidiPortMenu.h"
+#include "gui/menus/MidiPortMenu.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
 #include "ComboBox.h"
-#include "GroupBox.h"
+#include "gui/widgets/GroupBox.h"
 #include "Song.h"
-#include "TabWidget.h"
-#include "ToolButton.h"
+#include "gui/widgets/TabWidget.h"
+#include "gui/widgets/ToolButton.h"
 
 #include "embed.h"
 

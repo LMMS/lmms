@@ -33,7 +33,7 @@
 #include "MainWindow.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
-#include "RenameDialog.h"
+#include "gui/modals/RenameDialog.h"
 
 namespace lmms::gui
 {

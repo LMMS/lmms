@@ -32,7 +32,7 @@
 #include "AudioDeviceSetupWidget.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
-#include "MidiSetupWidget.h"
+#include "gui/MidiSetupWidget.h"
 
 
 class QCheckBox;

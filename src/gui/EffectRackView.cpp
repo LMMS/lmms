@@ -30,9 +30,9 @@
 #include <QVBoxLayout>
 
 #include "EffectRackView.h"
-#include "EffectSelectDialog.h"
+#include "modals/EffectSelectDialog.h"
 #include "EffectView.h"
-#include "GroupBox.h"
+#include "widgets/GroupBox.h"
 
 
 namespace lmms::gui

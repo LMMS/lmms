@@ -28,7 +28,7 @@
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
-#include "PeakIndicator.h"
+#include "widgets/PeakIndicator.h"
 #include "Song.h"
 #include "ConfigManager.h"
 #include "FontHelper.h"

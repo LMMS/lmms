@@ -31,7 +31,7 @@
 #include <QVBoxLayout>
 
 #include "ComboBox.h"
-#include "GroupBox.h"
+#include "gui/widgets/GroupBox.h"
 #include "GuiApplication.h"
 #include "FontHelper.h"
 #include "InstrumentTrack.h"

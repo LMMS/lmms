@@ -29,7 +29,7 @@
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
 #include "ComboBox.h"
-#include "GroupBox.h"
+#include "gui/widgets/GroupBox.h"
 #include "FontHelper.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"

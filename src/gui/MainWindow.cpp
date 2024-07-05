@@ -35,7 +35,7 @@
 #include <QShortcut>
 #include <QSplitter>
 
-#include "AboutDialog.h"
+#include "modals/AboutDialog.h"
 #include "AutomationEditor.h"
 #include "ControllerRackView.h"
 #include "embed.h"
@@ -48,7 +48,7 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
-#include "InstrumentTrackWindow.h"
+#include "instrument/InstrumentTrackWindow.h"
 #include "MicrotunerConfig.h"
 #include "PatternEditor.h"
 #include "PianoRoll.h"
@@ -59,18 +59,18 @@
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
-#include "RecentProjectsMenu.h"
+#include "menus/RecentProjectsMenu.h"
 #include "RemotePlugin.h"
-#include "SetupDialog.h"
+#include "modals/SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
 #include "SubWindow.h"
-#include "TemplatesMenu.h"
+#include "menus/TemplatesMenu.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "ToolButton.h"
+#include "widgets/ToolButton.h"
 #include "ToolPlugin.h"
-#include "VersionedSaveDialog.h"
+#include "modals/VersionedSaveDialog.h"
 
 #include "lmmsversion.h"
 

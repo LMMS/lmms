@@ -33,7 +33,7 @@
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "RenameDialog.h"
+#include "gui/modals/RenameDialog.h"
 #include "TrackRenameLineEdit.h"
 #include "TrackView.h"
 #include "Track.h"

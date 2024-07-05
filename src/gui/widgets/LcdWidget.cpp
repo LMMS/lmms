@@ -29,7 +29,7 @@
 #include <QPainter>
 
 #include "LcdWidget.h"
-#include "DeprecationHelper.h"
+#include "gui/DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
 

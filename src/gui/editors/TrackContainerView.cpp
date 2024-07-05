@@ -33,7 +33,7 @@
 #include "AudioEngine.h"
 #include "DataFile.h"
 #include "MainWindow.h"
-#include "FileBrowser.h"
+#include "gui/FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
