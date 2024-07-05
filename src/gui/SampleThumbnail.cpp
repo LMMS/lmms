@@ -91,7 +91,7 @@ bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(
 
 	m_list = std::make_shared<SampleThumbnailList>(SampleThumbnailList());
 
-	qDebug("Generating thumbnails for file: %s", qUtf8Printable(name));
+	//qDebug("Generating thumbnails for file: %s", qUtf8Printable(name));
 
 	SAMPLE_THUMBNAIL_LIST_MAP.insert(
 		std::pair<const QString, SharedSampleThumbnailList>
@@ -113,7 +113,7 @@ void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 		// a.k.a sample goes out of use
 		if (map->second.use_count() == 1)
 		{
-			qDebug("Deleting an orphaned thumbnaillist...");
+			//qDebug("Deleting an orphaned thumbnaillist...");
 			SAMPLE_THUMBNAIL_LIST_MAP.erase(map);
 			map = SAMPLE_THUMBNAIL_LIST_MAP.begin();
 			continue;
@@ -122,7 +122,7 @@ void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 		map++;
 	}
 
-	qDebug("Now holding %lu thumbnaillists", SAMPLE_THUMBNAIL_LIST_MAP.size());
+	//qDebug("Now holding %lu thumbnaillists", SAMPLE_THUMBNAIL_LIST_MAP.size());
 }
 
 SampleThumbnail SampleThumbnailListManager::generate(
@@ -179,8 +179,8 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 			MAX_THUMBNAIL_SIZE
 		);
 
-	qDebug("Sample to be prepared is of size: %lu", sampleBufferSize);
-	qDebug("Max thumbnail size: %lu", firstThumbnailSize);
+	//qDebug("Sample to be prepared is of size: %lu", sampleBufferSize);
+	//qDebug("Max thumbnail size: %lu", firstThumbnailSize);
 
 	auto& thumbnaillist = *m_list;
 
@@ -205,7 +205,7 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 
 		SampleThumbnail thumbnail = std::vector(thumbnailSize, lmms::SampleThumbnailBit());
 
-		qDebug("Generating for size %lu", thumbnail.size());
+		//qDebug("Generating for size %lu", thumbnail.size());
 
 		for (const auto& biggerBit: biggerThumbnail)
 		{
