@@ -514,7 +514,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 		}
 		
 		sample_t O2R = 0.;
-		if (len_r != 0.)
+		if (pd_r != 0.)
 		{
 			len_r = BandLimitedWave::pdToLen(pd_r);
 			if (m_counter2r > 0)
