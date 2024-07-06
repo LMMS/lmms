@@ -119,7 +119,7 @@ bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frame
 	}
 	
 	// add dry buffer - never swap inputs for dry
-	m_buffer.writeAddingMultiplied(buf, static_cast<f_cnt_t>(0), frames, dryGain);
+	m_buffer.writeAddingMultiplied(buf, f_cnt_t{0}, frames, dryGain);
 
 	// swapped inputs?
 	if( swapInputs )
