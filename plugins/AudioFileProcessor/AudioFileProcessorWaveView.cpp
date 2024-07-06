@@ -378,8 +378,8 @@ void AudioFileProcessorWaveView::slide(int px)
 	const double fact = qAbs(double(px) / width());
 	auto step = range() * fact * (px > 0 ? -1 : 1);
 
-	const auto stepFrom = std::clamp<int>(m_from + step, 0, m_sample->sampleSize()) - m_from;
-	const auto stepTo = std::clamp<int>(m_to + step, m_from + 1, m_sample->sampleSize()) - m_to;
+	const auto stepFrom = std::clamp(m_from + step, 0.0, static_cast<double>(m_sample->sampleSize())) - m_from;
+	const auto stepTo = std::clamp(m_to + step, m_from + 1.0, static_cast<double>(m_sample->sampleSize())) - m_to;
 	step = std::abs(stepFrom) < std::abs(stepTo) ? stepFrom : stepTo;
 
 	setFrom(m_from + step);
