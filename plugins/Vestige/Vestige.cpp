@@ -971,7 +971,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 	auto m_searchBar = new QLineEdit(this);
 	m_searchBar->setPlaceholderText(tr("Search"));
-	m_searchBar->setMaxLength(64);
+	m_searchBar->setMaxLength(35);
 	m_searchBar->setClearButtonEnabled(true);
 	m_searchBar->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 	l->addWidget( m_searchBar, 0, 3, 1, 2, Qt::AlignLeft );

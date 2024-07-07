@@ -119,6 +119,8 @@ public:
 protected slots:
 	void syncPlugin();
 	void displayAutomatedOnly();
+	void onFilterChanged( const QString & filter );
+	void displayFilteredKnobs();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
@@ -138,8 +140,11 @@ private:
 
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
+	QPushButton * m_searchBar;
 	QPushButton * m_closeButton;
 	CustomTextKnob ** vstKnobs;
+	bool m_isAuto;
+	QString m_filter;
 
 } ;
 
