@@ -27,7 +27,7 @@
 
 #include "AutomatableModelView.h"
 #include "AutomationClip.h"
-#include "ControllerConnectionDialog.h"
+#include "modals/ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "GuiApplication.h"

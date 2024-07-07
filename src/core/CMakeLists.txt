@@ -1,6 +1,4 @@
-set(LMMS_SRCS
-	${LMMS_SRCS}
-
+set(LMMS_CORE_SRCS
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
@@ -130,6 +128,13 @@ set(LMMS_SRCS
 	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
 	core/midi/MidiWinMM.cpp
+
+	core/tracks/AutomationTrack.cpp
+	core/tracks/InstrumentTrack.cpp
+	core/tracks/MidiClip.cpp
+	core/tracks/PatternTrack.cpp
+	core/tracks/SampleTrack.cpp
+	
 
 	PARENT_SCOPE
 )

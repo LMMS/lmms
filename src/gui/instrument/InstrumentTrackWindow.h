@@ -29,6 +29,7 @@
 
 #include "ModelView.h"
 #include "SerializingObject.h"
+#include "InstrumentTrack.h"
 
 class QLabel;
 class QLineEdit;

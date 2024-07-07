@@ -36,11 +36,11 @@
 
 #include "AutomationEditor.h"
 #include "ConfigManager.h"
-#include "DeprecationHelper.h"
+#include "gui/DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "MidiClip.h"
 #include "PianoRoll.h"
-#include "RenameDialog.h"
+#include "gui/modals/RenameDialog.h"
 #include "TrackView.h"
 
 namespace lmms::gui

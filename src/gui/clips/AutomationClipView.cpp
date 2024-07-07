@@ -33,7 +33,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "ProjectJournal.h"
-#include "RenameDialog.h"
+#include "gui/modals/RenameDialog.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "Track.h"

@@ -51,7 +51,7 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "InstrumentTrackWindow.h"
+#include "instrument/InstrumentTrackWindow.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"

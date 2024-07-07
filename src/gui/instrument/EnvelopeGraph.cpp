@@ -31,7 +31,7 @@
 
 #include "EnvelopeAndLfoParameters.h"
 #include "lmms_math.h"
-#include "ColorHelper.h"
+#include "gui/ColorHelper.h"
 
 #include <cmath>
 
