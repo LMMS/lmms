@@ -188,6 +188,12 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
+bool ConfigManager::enableBlockedPlugins()
+{
+	const char* envVar = getenv("LMMS_ENABLE_BLOCKED_PLUGINS");
+	return (envVar && *envVar);
+}
+
 QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;

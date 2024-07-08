@@ -126,15 +126,6 @@ void Engine::destroy()
 
 
 
-bool Engine::enableBlockedPlugins()
-{
-	const char* envVar = getenv("LMMS_ENABLE_BLOCKED_PLUGINS");
-	return (envVar && *envVar);
-}
-
-
-
-
 float Engine::framesPerTick(sample_rate_t sampleRate)
 {
 	return sampleRate * 60.0f * 4 /

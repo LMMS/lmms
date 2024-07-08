@@ -36,6 +36,7 @@
 #include <QElapsedTimer>
 
 #include "AudioEngine.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
 #include "Lv2ControlBase.h"
@@ -298,7 +299,7 @@ void Lv2Manager::initPlugins()
 	}
 
 	// TODO: might be better in the LMMS core
-	if(Engine::enableBlockedPlugins())
+	if(ConfigManager::enableBlockedPlugins())
 	{
 		qWarning() <<
 			"WARNING! Blocked plugins enabled! If you want to disable them,\n"

@@ -38,6 +38,7 @@
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Lv2Features.h"
 #include "Lv2Manager.h"
@@ -77,7 +78,7 @@ Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 	// TODO: manage a global list of blocked plugins outside of the code
 	//       for now, this will help
 	//       this is only a fix for the meantime
-	if (!Engine::enableBlockedPlugins())
+	if (!ConfigManager::enableBlockedPlugins())
 	{
 		if( // plugin unstable?
 			Lv2Manager::pluginIsUnstable(pluginUri) ||
