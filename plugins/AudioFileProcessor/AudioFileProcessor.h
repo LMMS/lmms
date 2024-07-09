@@ -32,6 +32,7 @@
 
 #include "Instrument.h"
 #include "Sample.h"
+#include "lmms_basics.h"
 
 
 namespace lmms
@@ -54,7 +55,7 @@ public:
 
 	QString nodeName() const override;
 
-	auto beatLen(NotePlayHandle* note) const -> int override;
+	auto beatLen(NotePlayHandle* note) const -> f_cnt_t override;
 
 	float desiredReleaseTimeMs() const override
 	{

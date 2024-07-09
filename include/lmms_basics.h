@@ -31,10 +31,7 @@
 #include "lmmsconfig.h"
 
 #include <cstdint>
-#include <array>
 
-#include <cmath>
-#include <algorithm>
 
 
 namespace lmms
@@ -49,8 +46,8 @@ using sample_t = float;		  // standard sample-type
 using int_sample_t = int16_t; // 16-bit-int-sample
 
 using sample_rate_t = uint32_t; // sample-rate
-using fpp_t = int16_t;			// frames per period (0-16384)
-using f_cnt_t = int32_t;		// standard frame-count
+using fpp_t = size_t;			// frames per period (0-16384)
+using f_cnt_t = size_t;			// standard frame-count
 using ch_cnt_t = uint8_t;		// channel-count (0-DEFAULT_CHANNELS)
 using bpm_t = uint16_t;			// tempo (MIN_BPM to MAX_BPM)
 using bitrate_t = uint16_t;		// bitrate in kbps

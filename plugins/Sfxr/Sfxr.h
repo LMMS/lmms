@@ -28,6 +28,8 @@
 #ifndef SFXR_H
 #define SFXR_H
 
+#include <array>
+
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
