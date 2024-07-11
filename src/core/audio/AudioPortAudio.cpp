@@ -261,8 +261,7 @@ int AudioPortAudio::process_callback(
 			}
 			m_outBufSize = frames;
 		}
-		const int min_len = std::min(static_cast<int>(_framesPerBuffer),
-			m_outBufSize - m_outBufPos);
+		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{

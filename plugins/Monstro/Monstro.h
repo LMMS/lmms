@@ -184,7 +184,7 @@ private:
 	MonstroInstrument * m_parent;
 	NotePlayHandle * m_nph;
 
-	inline void updateModulators( float * env1, float * env2, float * lfo1, float * lfo2, int frames );
+	inline void updateModulators(float * env1, float * env2, float * lfo1, float * lfo2, f_cnt_t frames);
 
 	// linear interpolation
 /*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )

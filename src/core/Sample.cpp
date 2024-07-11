@@ -140,12 +140,12 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
 	advance(state, resampleResult.inputFramesUsed, loopMode);
 
-	const auto outputFrames = resampleResult.outputFramesGenerated;
+	const auto outputFrames = static_cast<f_cnt_t>(resampleResult.outputFramesGenerated);
 	if (outputFrames < numFrames) { std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{}); }
 
 	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
 	{
-		for (int i = 0; i < numFrames; ++i)
+		for (auto i = std::size_t{0}; i < numFrames; ++i)
 		{
 			dst[i][0] *= m_amplification;
 			dst[i][1] *= m_amplification;

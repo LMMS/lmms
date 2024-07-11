@@ -151,8 +151,8 @@ private:
 	bool m_wasPAInitError;
 
 	SampleFrame* m_outBuf;
-	int m_outBufPos;
-	int m_outBufSize;
+	std::size_t m_outBufPos;
+	fpp_t m_outBufSize;
 
 	bool m_stopped;
 

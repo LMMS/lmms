@@ -86,7 +86,7 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 
 void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames )
 {
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		dst[f][0] = filter.update( src[f][0], 0 );
 		dst[f][1] = filter.update( src[f][1], 1 );
@@ -152,7 +152,7 @@ bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frame
 	// pop the buffer and mix it into output
 	m_buffer.pop( m_work );
 
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];

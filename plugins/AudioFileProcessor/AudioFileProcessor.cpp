@@ -123,7 +123,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 
 	if( !_n->m_pluginData )
 	{
-		if (m_stutterModel.value() == true && m_nextPlayStartPoint >= m_sample.endFrame())
+		if (m_stutterModel.value() == true && m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame()))
 		{
 			// Restart playing the note if in stutter mode, not in loop mode,
 			// and we're at the end of the sample.
@@ -288,7 +288,7 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
 
-	const auto startFrame = m_nextPlayStartPoint >= m_sample.endFrame()
+	const auto startFrame = m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame())
 		? m_sample.startFrame()
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;

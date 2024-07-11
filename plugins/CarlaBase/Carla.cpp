@@ -205,9 +205,9 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     m_paramsCompleter->setCompletionMode(QCompleter::PopupCompletion);
 
     // Add static amount of CarlaParamFloatModel's.
-    int paramCount = fDescriptor->get_parameter_count(fHandle);
+    const auto paramCount = fDescriptor->get_parameter_count(fHandle);
     m_paramModels.reserve(paramCount);
-    for (int i=0; i < paramCount; ++i)
+    for (auto i = std::size_t{0}; i < paramCount; ++i)
     {
         m_paramModels.push_back(new CarlaParamFloatModel(this));
         connect(m_paramModels[i], &CarlaParamFloatModel::dataChanged,
@@ -274,7 +274,7 @@ const NativeTimeInfo* CarlaInstrument::handleGetTimeInfo() const
 
 void CarlaInstrument::handleUiParameterChanged(const uint32_t index, const float value) const
 {
-	if (m_paramModels.count() > index)
+	if (m_paramModels.size() > index)
 	{
 		m_paramModels[index]->setValue(value);
 	}
@@ -369,7 +369,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
     std::free(state);
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
-    for (uint32_t index = 0; index < m_paramModels.count(); ++index)
+    for (uint32_t index = 0; index < m_paramModels.size(); ++index)
     {
         QString idStr = CARLA_SETTING_PREFIX + QString::number(index);
         m_paramModels[index]->saveSettings(doc, parent, idStr);
@@ -439,7 +439,7 @@ void CarlaInstrument::refreshParams(bool init)
 void CarlaInstrument::clearParamModels()
 {
 	//Delete the models, this also disconnects all connections (automation and controller connections)
-	for (uint32_t index=0; index < m_paramModels.count(); ++index)
+	for (uint32_t index = 0; index < m_paramModels.size(); ++index)
 	{
 		delete m_paramModels[index];
 	}
@@ -899,7 +899,7 @@ CarlaParamsView::~CarlaParamsView()
 	m_carlaInstrumentView->m_paramsView = nullptr;
 
 	// Clear models
-	if (m_carlaInstrument->m_paramModels.isEmpty() == false)
+	if (!m_carlaInstrument->m_paramModels.empty())
 	{
 		m_carlaInstrument->clearParamModels();
 	}
@@ -930,7 +930,7 @@ void CarlaParamsView::filterKnobs()
 	m_maxColumns = m_inputScrollArea->width() / maxKnobWidth;
 
 	QString text = m_paramsFilterLineEdit->text();
-	for (uint32_t i=0; i < m_knobs.count(); ++i)
+	for (uint32_t i = 0; i < m_knobs.size(); ++i)
 	{
 		// Don't show disabled (unused) knobs.
 		if (!m_carlaInstrument->m_paramModels[i]->enabled())
@@ -975,7 +975,7 @@ void CarlaParamsView::filterKnobs()
 void CarlaParamsView::refreshKnobs()
 {
 	// Make sure all the knobs are deleted.
-	for (uint32_t i=0; i < m_knobs.count(); ++i)
+	for (uint32_t i = 0; i < m_knobs.size(); ++i)
 	{
 		delete m_knobs[i]; // Delete knob widgets itself.
 	}
@@ -996,15 +996,15 @@ void CarlaParamsView::refreshKnobs()
 		m_maxKnobWidthPerGroup[i] = 0;
 	}
 
-	if (!m_carlaInstrument->m_paramModels.count()) { return; }
+	if (m_carlaInstrument->m_paramModels.empty()) { return; }
 
 	// Make room in QList m_knobs
-	m_knobs.reserve(m_carlaInstrument->m_paramModels.count());
+	m_knobs.reserve(m_carlaInstrument->m_paramModels.size());
 
 	QStringList groupNameList;
 	groupNameList.reserve(m_carlaInstrument->m_paramGroupCount);
 
-	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
+	for (uint32_t i = 0; i < m_carlaInstrument->m_paramModels.size(); ++i)
 	{
 		bool enabled = m_carlaInstrument->m_paramModels[i]->enabled();
 		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
@@ -1105,7 +1105,7 @@ void CarlaParamsView::addKnob(uint32_t index)
 void CarlaParamsView::clearKnobs()
 {
 	// Remove knobs from layout.
-	for (uint16_t i=0; i < m_knobs.count(); ++i)
+	for (uint16_t i = 0; i < m_knobs.size(); ++i)
 	{
 		m_knobs[i]->close();
 	}
