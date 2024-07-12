@@ -166,16 +166,22 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 		case DraggingType::SampleLoop:
 			slideSamplePointByPx(Point::Loop, step);
 			break;
+		case DraggingType::SlideWave:
+			slide(step);
+			break;
+		case DraggingType::ZoomWave:
+			zoom(me->y() < m_draggingLastPoint.y());
+			break;
 		case DraggingType::Wave:
 		default:
 			if (qAbs(me->y() - m_draggingLastPoint.y())
 				< 2 * qAbs(me->x() - m_draggingLastPoint.x()))
 			{
-				slide(step);
+				m_draggingType = DraggingType::SlideWave;
 			}
 			else
 			{
-				zoom(me->y() < m_draggingLastPoint.y());
+				m_draggingType = DraggingType::ZoomWave;
 			}
 	}
 
@@ -376,14 +382,16 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 void AudioFileProcessorWaveView::slide(int px)
 {
 	const double fact = qAbs(double(px) / width());
-	auto step = range() * fact * (px > 0 ? -1 : 1);
+	double step = range() * fact * (px > 0 ? 1 : -1);
 
-	const auto stepFrom = std::clamp(m_from + step, 0.0, static_cast<double>(m_sample->sampleSize())) - m_from;
-	const auto stepTo = std::clamp(m_to + step, m_from + 1.0, static_cast<double>(m_sample->sampleSize())) - m_to;
+	// get the real start and end frame
+	const double sampleStart = static_cast<double>(m_sample->startFrame());
+	const double sampleEnd = static_cast<double>(m_sample->endFrame());
+
+	const double stepFrom = std::clamp(sampleStart + step, 0.0, static_cast<double>(m_sample->sampleSize())) - sampleStart;
+	const double stepTo = std::clamp(sampleEnd + step, sampleStart + 1.0, static_cast<double>(m_sample->sampleSize())) - sampleEnd;
 	step = std::abs(stepFrom) < std::abs(stepTo) ? stepFrom : stepTo;
 
-	setFrom(m_from + step);
-	setTo(m_to + step);
 	slideSampleByFrames(step);
 }
 
@@ -395,7 +403,7 @@ void AudioFileProcessorWaveView::slideSamplePointByPx(Point point, int px)
 	);
 }
 
-void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, f_cnt_t frames, bool slide_to)
+void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long frames, bool slide_to)
 {
 	knob * a_knob = m_startKnob;
 	switch(point)
@@ -430,7 +438,7 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, f_cnt_t f
 
 
 
-void AudioFileProcessorWaveView::slideSampleByFrames(f_cnt_t frames)
+void AudioFileProcessorWaveView::slideSampleByFrames(long frames)
 {
 	if (m_sample->sampleSize() <= 1)
 	{
@@ -499,6 +507,7 @@ void AudioFileProcessorWaveView::knob::slideTo(double v, bool check_bound)
 	{
 		return;
 	}
+
 	model()->setValue(v);
 	emit sliderMoved(model()->value());
 }

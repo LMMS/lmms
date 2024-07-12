@@ -118,6 +118,8 @@ private:
 	enum class DraggingType
 	{
 		Wave,
+		SlideWave,
+		ZoomWave,
 		SampleStart,
 		SampleEnd,
 		SampleLoop
@@ -125,7 +127,9 @@ private:
 
 	Sample const* m_sample;
 	QPixmap m_graph;
+	// display from
 	int m_from;
+	// display to
 	int m_to;
 	int m_last_from;
 	int m_last_to;
@@ -158,8 +162,9 @@ private:
 	void zoom(const bool out = false);
 	void slide(int px);
 	void slideSamplePointByPx(Point point, int px);
-	void slideSamplePointByFrames(Point point, f_cnt_t frames, bool slide_to = false);
-	void slideSampleByFrames(f_cnt_t frames);
+	// point: wihch knob to slide, frames: how mutch, can be negative, slide_to: should set the value instead of adding it
+	void slideSamplePointByFrames(Point point, long frames, bool slide_to = false);
+	void slideSampleByFrames(long frames);
 
 	void slideSamplePointToFrames(Point point, f_cnt_t frames)
 	{
