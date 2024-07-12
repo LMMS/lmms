@@ -334,12 +334,6 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	//const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
-	//const auto waveform = SampleWaveform::Parameters{
-		//m_sample->data() + m_from, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
-	//SampleWaveform::visualize(waveform, p, rect);
-	
-	// Performance hit is neglectable
 	m_thumbnaillist = SampleThumbnailListManager(*m_sample);
 	
 	auto param = SampleThumbnailVisualizeParameters();

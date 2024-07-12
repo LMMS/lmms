@@ -90,9 +90,6 @@ void SlicerTWaveform::drawSeekerWaveform()
 	brush.setPen(s_waveformColor);
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	//const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	//const auto rect = QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height());
-	//SampleWaveform::visualize(waveform, brush, rect);
 	
 	m_thumbnaillist = SampleThumbnailListManager(sample);
 	auto param = SampleThumbnailVisualizeParameters();
@@ -160,10 +157,8 @@ void SlicerTWaveform::drawEditorWaveform()
 	brush.setPen(s_waveformColor);
 	long zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
+	// Visualize
 	const auto& sample = m_slicerTParent->m_originalSample;
-	//const auto waveform = SampleWaveform::Parameters{sample.data() + startFrame, endFrame - startFrame, sample.amplification(), sample.reversed()};
-	//const auto rect = QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight);
-	//SampleWaveform::visualize(waveform, brush, rect);
 	
 	m_thumbnaillist = SampleThumbnailListManager(sample);
 	auto param = SampleThumbnailVisualizeParameters();

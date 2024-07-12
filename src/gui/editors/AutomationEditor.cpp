@@ -1221,10 +1221,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			p.setPen(m_ghostSampleColor);
 			
 			const auto& sample = m_ghostSample->sample();
-			//const auto waveform = SampleWaveform::Parameters{
-				//sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			//const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			//SampleWaveform::visualize(waveform, p, rect);
 			
 			auto param = SampleThumbnailVisualizeParameters();
 

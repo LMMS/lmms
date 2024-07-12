@@ -272,23 +272,16 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
+	// Visualize
 	float offsetStart 	=  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	float sampleLength  =  m_clip->sampleLength() * ppb / ticksPerBar;
 	float clipLength 	= m_clip->length() * ppb / ticksPerBar;
-	// qDebug("%d %d", (int) offset_start, (int) length);
 	
 	const auto& sample = m_clip->m_sample;
-	// const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	// SampleWaveform::visualize(waveform, p, r);
-	
-	// qDebug("parent size %d %d", parentWidget()->width(), parentWidget()->height());
-	//~ qDebug("ratio %f", ratio);
-	
-	//qDebug("%f %f", offset_end, length);
-	
+
 	auto param = SampleThumbnailVisualizeParameters();
 
-	param.amplification 	= sample.amplification();
+	param.amplification = sample.amplification();
 	param.reversed 		= sample.reversed();
 
 	param.x = static_cast<long>(offsetStart);
@@ -300,6 +293,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	param.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart);
 
 	m_thumbnaillist.visualize(param, p);
+	//
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
