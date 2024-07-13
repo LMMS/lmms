@@ -229,10 +229,7 @@ void AudioPortAudio::stopProcessing()
 }
 
 
-int AudioPortAudio::process_callback(
-	const float *_inputBuffer,
-	float * _outputBuffer,
-	unsigned long _framesPerBuffer )
+int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer)
 {
 	if( supportsCapture() )
 	{

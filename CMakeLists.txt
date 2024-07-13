@@ -653,13 +653,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		list(APPEND COMPILE_ERROR_FLAGS
-			# The following warnings generate false positives that are difficult
+			# The following warning generates false positives that are difficult
 			# to work around, in particular when inlining calls to standard
 			# algorithms performed on single-element arrays. See, for example,
 			# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111273.
 			"-Wno-array-bounds" # Permit out-of-bounds array subscripts
-			"-Wno-stringop-overread" # Permit string functions overreading the source
 		)
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "11")
+			list(APPEND COMPILE_ERROR_FLAGS
+				# This has the same problems described above for "array-bounds".
+				"-Wno-stringop-overread" # Permit string functions overreading the source
+			)
+		endif()
 	endif()
 
 	if(USE_WERROR)
