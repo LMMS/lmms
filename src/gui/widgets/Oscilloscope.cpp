@@ -57,7 +57,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new SampleFrame[frames];
 
-	BufferManager::clear( m_buffer, frames );
+	zeroSampleFrames(m_buffer, frames);
 
 
 	setToolTip(tr("Oscilloscope"));
