@@ -74,7 +74,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_queued( false ),
 	m_dependenciesMet(0)
 {
-	BufferManager::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
@@ -612,8 +612,7 @@ void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 
 void Mixer::prepareMasterMix()
 {
-	BufferManager::clear( m_mixerChannels[0]->m_buffer,
-					Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_mixerChannels[0]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
@@ -685,8 +684,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_mixerChannels[i]->m_buffer,
-				Engine::audioEngine()->framesPerPeriod() );
+		zeroSampleFrames(m_mixerChannels[i]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;
 		// also reset hasInput
