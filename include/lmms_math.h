@@ -360,6 +360,22 @@ static inline int numDigitsAsInt(float f)
 	return digits;
 }
 
+// Helper functions to 
+static inline float minEps()
+{
+	return 1.0e-10f;
+}
+
+static inline bool FloatIsEqual(float x, float y)
+{
+	if(x == y)
+	{
+		return true;
+	}
+	return std::abs(x - y) < minEps();
+}
+
+
 template <typename T>
 class LinearMap
 {

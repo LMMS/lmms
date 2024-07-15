@@ -154,7 +154,7 @@ void Effect::checkGate( double _out_sum )
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum - gate() <= typeInfo<float>::minEps() )
+	if(_out_sum - gate() <= minEps())
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
