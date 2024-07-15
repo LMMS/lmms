@@ -11,15 +11,6 @@ target_include_directories(jack_headers INTERFACE jack2/common)
 ADD_SUBDIRECTORY(hiir)
 ADD_SUBDIRECTORY(weakjack)
 
-<<<<<<< HEAD
-if(MINGW)
-	option(MINGW_STDTHREADS_GENERATE_STDHEADERS "" ON)
-	add_subdirectory(mingw-std-threads)
-	set(LMMS_USE_MINGW_STD_THREADS ON PARENT_SCOPE)
-endif()
-
-=======
->>>>>>> master
 # The lockless ring buffer library is linked as part of the core
 add_library(ringbuffer OBJECT
 	ringbuffer/src/lib/ringbuffer.cpp
