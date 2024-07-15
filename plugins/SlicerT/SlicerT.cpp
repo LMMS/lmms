@@ -75,7 +75,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.setValue(0);
 }
 
-void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
+void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
@@ -197,7 +197,7 @@ void SlicerT::findSlices()
 
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
-	float prevFlux = 1E-10; // small value, no divison by zero
+	float prevFlux = 1E-10f; // small value, no divison by zero
 
 	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
 	{
@@ -227,7 +227,7 @@ void SlicerT::findSlices()
 		}
 
 		prevFlux = spectralFlux;
-		spectralFlux = 1E-10; // again for no divison by zero
+		spectralFlux = 1E-10f; // again for no divison by zero
 	}
 
 	m_slicePoints.push_back(m_originalSample.sampleSize());

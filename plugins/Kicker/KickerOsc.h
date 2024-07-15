@@ -60,7 +60,7 @@ public:
 
 	virtual ~KickerOsc() = default;
 
-	void update( sampleFrame* buf, const fpp_t frames, const float sampleRate )
+	void update( SampleFrame* buf, const fpp_t frames, const float sampleRate )
 	{
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{

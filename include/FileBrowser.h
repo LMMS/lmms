@@ -90,7 +90,7 @@ public:
 		};
 		return s_excludedPaths;
 	}
-	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
+	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
 private slots:
@@ -111,6 +111,8 @@ private:
 	void onSearch(const QString& filter);
 	void displaySearch(bool on);
 
+	void addContentCheckBox();
+
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 	FileBrowserTreeWidget * m_searchTreeWidget;
 
@@ -124,9 +126,13 @@ private:
 
 	bool m_dirsAsItems;
 
-	void addContentCheckBox();
 	QCheckBox* m_showUserContent = nullptr;
 	QCheckBox* m_showFactoryContent = nullptr;
+	QCheckBox* m_showHiddenContent = nullptr;
+
+	QBoxLayout *filterWidgetLayout = nullptr;
+	QBoxLayout *hiddenWidgetLayout = nullptr;
+	QBoxLayout *outerLayout = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
 	QList<QString> m_savedExpandedDirs;

@@ -59,7 +59,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 		const int frameIndex = !parameters.reversed ? i : maxFrames - i;
 
 		const auto& frame = parameters.buffer[frameIndex];
-		const float value = std::accumulate(frame.begin(), frame.end(), 0.0f) / frame.size();
+		const auto value = frame.average();
 
 		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
 		if (value < min[pixelIndex]) { min[pixelIndex] = value; }

@@ -37,7 +37,7 @@ namespace lmms::gui
 {
 
 
-VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
+VectorView::VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
 	QWidget(parent),
 	m_controls(controls),
 	m_inputBuffer(inputBuffer),

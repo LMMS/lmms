@@ -656,37 +656,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	)
 
 	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-	# TODO: Is this still necessary?
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		list(APPEND COMPILE_ERROR_FLAGS
-			"-Wno-array-bounds" # Permit out-of-bounds array subscripts
-			"-Wno-attributes" # Permit unrecognised attributes
-		)
-	endif()
+	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
+		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds -Wno-attributes")
+	ENDIF()
+ELSEIF(MSVC)
+	# Remove any existing /W flags
+	string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+	STRING(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	SET(WERROR_FLAGS "/W2")
+	IF(${USE_WERROR})
+		SET(WERROR_FLAGS "${WERROR_FLAGS} /WX")
+	ENDIF()
+ENDIF()
 
-	if(USE_WERROR)
-		list(APPEND COMPILE_ERROR_FLAGS
-			"-Werror" # Treat warnings as errors
-		)
-	endif()
-elseif(MSVC)
-	set(COMPILE_ERROR_FLAGS
-		"/W2" # Enable some warnings by default
-		"/external:W0" # Don't emit warnings for third-party code
-		"/external:anglebrackets" # Consider headers included with angle brackets to be third-party
-		"/external:templates-" # Still emit warnings from first-party instantiations of third-party templates
-	)
-	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
-		"/W0" # Disable all warnings
-	)
-
-	if(USE_WERROR)
-		list(APPEND COMPILE_ERROR_FLAGS
-			"/WX" # Treat warnings as errors
-		)
-	endif()
-endif()
-add_compile_options("$<IF:$<BOOL:$<TARGET_PROPERTY:SYSTEM>>,${THIRD_PARTY_COMPILE_ERROR_FLAGS},${COMPILE_ERROR_FLAGS}>")
 
 IF(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Setting build type to 'Release' as none was specified.")

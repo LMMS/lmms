@@ -41,6 +41,7 @@
 namespace lmms
 {
 
+class SampleFrame;
 
 struct ConnectPortVisitor;
 using LV2_Evbuf = struct LV2_Evbuf_Impl;
@@ -184,15 +185,15 @@ struct Audio : public VisitablePort<Audio, PortBase>
 
 	//! Copy buffer passed by LMMS into our ports
 	//! @param channel channel index into each sample frame
-	void copyBuffersFromCore(const sampleFrame *lmmsBuf,
+	void copyBuffersFromCore(const SampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Add buffer passed by LMMS into our ports, and halve the result
 	//! @param channel channel index into each sample frame
-	void averageWithBuffersFromCore(const sampleFrame *lmmsBuf,
+	void averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
 	//! @param channel channel index into each sample frame
-	void copyBuffersToCore(sampleFrame *lmmsBuf,
+	void copyBuffersToCore(SampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames) const;
 
 	bool isSideChain() const { return m_sidechain; }

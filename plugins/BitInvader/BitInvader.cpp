@@ -256,7 +256,7 @@ QString BitInvader::nodeName() const
 
 
 void BitInvader::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if (!_n->m_pluginData)
 	{
@@ -274,11 +274,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 	auto ps = static_cast<BSynth*>(_n->m_pluginData);
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		const sample_t cur = ps->nextStringSample( m_graph.length() );
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			_working_buffer[frame][chnl] = cur;
-		}
+		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()));
 	}
 
 	applyRelease( _working_buffer, _n );

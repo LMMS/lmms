@@ -114,7 +114,7 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	
 	// TubeBell
 	m_presetsModel.addItem( tr( "Tubular bells" ) );
-	m_scalers.append( 1.8 );
+	m_scalers.append(1.8f);
 	
 	// BandedWG
 	m_presetsModel.addItem( tr( "Uniform bar" ) );
@@ -278,7 +278,7 @@ QString MalletsInstrument::nodeName() const
 
 
 void MalletsInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if( m_filesMissing )
 	{

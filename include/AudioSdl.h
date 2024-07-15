@@ -87,7 +87,7 @@ private:
 
 	SDL_AudioSpec m_audioHandle;
 
-	surroundSampleFrame * m_outBuf;
+	SampleFrame* m_outBuf;
 
 #ifdef LMMS_HAVE_SDL2
 	size_t m_currentBufferFramePos;

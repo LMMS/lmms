@@ -43,7 +43,7 @@ template<class T>
 class LocklessRingBuffer;
 
 class SaControls;
-
+class SampleFrame;
 
 
 //! Receives audio data, runs FFT analysis and stores the result.
@@ -54,7 +54,7 @@ public:
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
-	void analyze(LocklessRingBuffer<sampleFrame> &ring_buffer);
+	void analyze(LocklessRingBuffer<SampleFrame> &ring_buffer);
 	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required
