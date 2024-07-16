@@ -253,7 +253,8 @@ constexpr T lerp(T a, T b, F t)
 // @note Once we upgrade to C++20, we could probably use std::formatted_size
 static inline int numDigitsAsInt(float f)
 {
-	int asInt = std::abs(static_cast<int>(std::round(f)));
+	int asInt = static_cast<int>(std::round(f));
+	if (asInt < 0) { asInt = std::abs(asInt) + 1}
 	int digits = 1; // always at least 1
 	int power = 1;
 	for (int i = 1; i < 10; ++i)
