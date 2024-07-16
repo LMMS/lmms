@@ -125,18 +125,6 @@ static inline double fastFma( double a, double b, double c )
 #endif
 }
 
-// source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
-static inline double fastPow( double a, double b )
-{
-	union
-	{
-		double d;
-		int32_t x[2];
-	} u = { a };
-	u.x[1] = static_cast<int32_t>( b * ( u.x[1] - 1072632447 ) + 1072632447 );
-	u.x[0] = 0;
-	return u.d;
-}
 
 // sinc function
 static inline double sinc( double _x )
