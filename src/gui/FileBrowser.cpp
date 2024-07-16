@@ -189,10 +189,10 @@ void FileBrowser::addContentCheckBox()
 }
 
 void FileBrowser::saveDirectoriesStates()
-{
+{	
 	m_savedExpandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 }
-
+	
 void FileBrowser::restoreDirectoriesStates()
 {
 	expandItems(m_savedExpandedDirs);
@@ -313,7 +313,7 @@ void FileBrowser::displaySearch(bool on)
 		m_searchIndicator->setMaximum(0);
 		return;
 	}
-
+	
 	m_searchTreeWidget->hide();
 	m_fileBrowserTreeWidget->show();
 	m_searchIndicator->setMaximum(100);
@@ -324,7 +324,7 @@ void FileBrowser::reloadTree()
 {
 	if (m_filterEdit->text().isEmpty())
 	{
-		saveDirectoriesStates();
+		saveDirectoriesStates();	
 	}
 
 	m_fileBrowserTreeWidget->clear();
@@ -378,8 +378,8 @@ void FileBrowser::expandItems(const QList<QString>& expandedDirs, QTreeWidgetIte
 				expandItems(expandedDirs, it);
 			}
 		}
-
-		it->setHidden(false);
+		
+		it->setHidden(false);		
 	}
 }
 
@@ -566,17 +566,10 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// We should stop any running previews before we do anything new
 	else if (vertical || horizontal || preview || insert) { stopPreview(); }
 
-	QTreeWidgetItem* item = currentItem();
-
 	// Try to get the currently selected item as a FileItem
-	auto file = dynamic_cast<FileItem*>(item);
+	auto file = dynamic_cast<FileItem*>(currentItem());
 	// If it's null (folder, separator, etc.), there's nothing left for us to do
-	if (file == nullptr) {
-		if (preview) {
-			item->setExpanded(!item->isExpanded());
-		}
-		return;
-	}
+	if (file == nullptr) { return; }
 
 	// When moving to a new sound, preview it. Skip presets, they can play forever
 	if (vertical && file->type() == FileItem::FileType::Sample)
@@ -1125,9 +1118,9 @@ bool Directory::addItems(const QString& path)
 			addChild(fileItem);
 		}
 	}
-
+	
 	treeWidget()->setUpdatesEnabled(true);
-
+	
 	// return true if we added any child items
 	return childCount() > 0;
 }
@@ -1234,7 +1227,7 @@ void FileItem::determineFileType()
 	}
 	else if( ext == "dll"
 #ifdef LMMS_BUILD_LINUX
-		|| ext == "so"
+		|| ext == "so" 
 #endif
 	)
 	{
@@ -1287,7 +1280,7 @@ QString FileItem::defaultFilters()
 	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
 	const auto patchFilters = QStringList{"*.pat"};
 	const auto midiFilters = QStringList{"*.mid", "*.midi", "*.rmi"};
-
+	
 	auto vstPluginFilters = QStringList{"*.dll"};
 #ifdef LMMS_BUILD_LINUX
 	vstPluginFilters.append("*.so");
