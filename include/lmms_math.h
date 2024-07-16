@@ -36,20 +36,19 @@
 
 namespace lmms
 {
-
-#ifdef __INTEL_COMPILER
-
-static inline float absFraction( const float _x )
+/*!
+ * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
+ *
+ * fraction( 2.3) =>  0.3
+ * fraction(-2.3) => -0.3
+ *
+ * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
+ * negative phases.
+ */
+static inline float fraction(const float x)
 {
-	return( _x - floorf( _x ) );
+	return x - std::floor(x);
 }
-
-static inline float fraction( const float _x )
-{
-	return( _x - floorf( _x ) - ( _x >= 0.0f ? 0.0 : 1.0 ) );
-}
-
-#else
 
 /*!
  * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
@@ -61,66 +60,11 @@ static inline float fraction( const float _x )
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-static inline float absFraction( const float _x )
+static inline float absFraction(const float x)
 {
-	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
-						static_cast<int>( _x ) - 1 ) );
+	float dec = fraction(x);
+	return (dec >= 0 ? dec : dec + 1.0f);
 }
-
-/*!
- * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
- *
- * fraction( 2.3) =>  0.3
- * fraction(-2.3) => -0.3
- *
- * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
- * negative phases.
- */
-static inline float fraction( const float _x )
-{
-	return( _x - static_cast<int>( _x ) );
-}
-
-
-#if 0
-// SSE3-version
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"ftst\n\t"
-		"sahf\n\t"
-		"jae 1f\n\t"
-		"fld1\n\t"
-		"fsubrp %%st, %%st(1)\n\t"
-	"1:\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)", "cc" );
-	return( _x );
-}
-
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)" );
-	return( _x );
-}
-#endif
-
-#endif // __INTEL_COMPILER
-
 
 
 constexpr int FAST_RAND_MAX = 32767;
