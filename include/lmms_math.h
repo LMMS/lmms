@@ -255,23 +255,13 @@ constexpr T lerp(T a, T b, F t)
 // @note Once we upgrade to C++20, we could probably use std::formatted_size
 static inline int numDigitsAsInt(float f)
 {
-	// use rounding:
-	// LcdSpinBox sometimes uses roundf(), sometimes cast rounding
-	// we use rounding to be on the "safe side"
-	const float rounded = roundf(f);
-	int asInt = static_cast<int>(rounded);
+	int asInt = std::abs(static_cast<int>(std::round(f)));
 	int digits = 1; // always at least 1
-	if(asInt < 0)
-	{
-		++digits;
-		asInt = -asInt;
-	}
-	// "asInt" is positive from now
-	int32_t power = 1;
-	for(int32_t i = 1; i<10; ++i)
+	int power = 1;
+	for (int i = 1; i < 10; ++i)
 	{
 		power *= 10;
-		if(static_cast<int32_t>(asInt) >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
+		if (asInt >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
 		else { break; }
 	}
 	return digits;
