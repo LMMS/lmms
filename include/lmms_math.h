@@ -360,8 +360,7 @@ static inline int numDigitsAsInt(float f)
 	return digits;
 }
 
-// Helper functions to 
-static inline float minEps()
+static inline float minEpsilon()
 {
 	return 1.0e-10f;
 }
@@ -372,7 +371,7 @@ static inline bool floatCompare(float x, float y)
 	{
 		return true;
 	}
-	return std::abs(x - y) < minEps();
+	return std::abs(x - y) < minEpsilon();
 }
 
 
