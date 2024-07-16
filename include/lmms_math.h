@@ -244,20 +244,6 @@ static inline float sqrt_neg( float val )
 }
 
 
-//! returns value furthest from zero
-template<class T>
-static inline T absMax( T a, T b )
-{
-	return std::abs(a) > std::abs(b) ? a : b;
-}
-
-//! returns value nearest to zero
-template<class T>
-static inline T absMin( T a, T b )
-{
-	return std::abs(a) < std::abs(b) ? a : b;
-}
-
 //! Returns the linear interpolation of the two values
 template<class T, class F>
 constexpr T lerp(T a, T b, F t)
