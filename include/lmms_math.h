@@ -257,7 +257,7 @@ static inline int numDigitsAsInt(float f)
 	int digits = 1; // always at least 1
 	if (asInt < 0)
 	{
-		++digits
+		++digits;
 		asInt = -asInt;
 	}
 	int power = 1;
