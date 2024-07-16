@@ -568,7 +568,7 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool 
 	else
 	{
 		const float v = detuning()->automationClip()->valueAt(time - songGlobalParentOffset() - pos());
-		if (!floatIsEqual(v, m_baseDetuning->value()))
+		if (!floatCompare(v, m_baseDetuning->value()))
 		{
 			m_baseDetuning->setValue(v);
 			updateFrequency();

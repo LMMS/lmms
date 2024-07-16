@@ -366,7 +366,7 @@ static inline float minEps()
 	return 1.0e-10f;
 }
 
-static inline bool floatIsEqual(float x, float y)
+static inline bool floatCompare(float x, float y)
 {
 	if(x == y)
 	{

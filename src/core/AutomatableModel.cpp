@@ -582,7 +582,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 				"lacks implementation for a scale type");
 			break;
 		}
-		if (floatIsEqual(m_step, 1) && m_hasStrictStepSize)
+		if (floatCompare(m_step, 1) && m_hasStrictStepSize)
 		{
 			return std::round(v);
 		}
