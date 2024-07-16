@@ -255,9 +255,10 @@ static inline int numDigitsAsInt(float f)
 {
 	int asInt = static_cast<int>(std::round(f));
 	int digits = 1; // always at least 1
-	if (asInt < 0) {
+	if (asInt < 0)
+	{
 		++digits
-		asInt = -1 * asInt;
+		asInt = -asInt;
 	}
 	int power = 1;
 	for (int i = 1; i < 10; ++i)
