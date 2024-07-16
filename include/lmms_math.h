@@ -254,8 +254,11 @@ constexpr T lerp(T a, T b, F t)
 static inline int numDigitsAsInt(float f)
 {
 	int asInt = static_cast<int>(std::round(f));
-	if (asInt < 0) { asInt = std::abs(asInt) + 1; } // there's a rounding error with negative values
 	int digits = 1; // always at least 1
+	if (asInt < 0) {
+		++digits
+		asInt = -1 * asInt;
+	}
 	int power = 1;
 	for (int i = 1; i < 10; ++i)
 	{
