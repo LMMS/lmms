@@ -354,7 +354,7 @@ float AutomatableModel::inverseScaledValue( float value ) const
 template<class T>
 void AutomatableModel::roundAt( T& value, const T& where ) const
 {
-	roundAt(value, where, m_step);
+	lmms::roundAt(value, where, m_step);
 }
 
 
