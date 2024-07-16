@@ -125,6 +125,15 @@ static inline double fastFma( double a, double b, double c )
 #endif
 }
 
+// function to round 'value' depending on step size
+template<class T>
+static void roundAt(T& value, const T& where, const T& step_size)
+{
+	if (std::abs(value - where) < typeInfo<float>::minEps() * std::abs(step_size))
+	{
+		value = where;
+	}
+}
 
 // sinc function
 static inline double sinc( double _x )
