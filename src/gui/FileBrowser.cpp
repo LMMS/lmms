@@ -567,7 +567,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	else if (vertical || horizontal || preview || insert) { stopPreview(); }
 
 	// Try to get the currently selected item as a FileItem
-	QTreeWidgetItem* item = currentItem();
+	auto item = currentItem();
 
 	auto file = dynamic_cast<FileItem*>(item);
 
