@@ -571,12 +571,11 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 
 	auto file = dynamic_cast<FileItem*>(item);
 
-	// If it's not a file, try to expand it.
-	if (file == nullptr) {
-		if (preview) {
+	// If it's not a file and the item is being previewed, assume it's a directory and try to expand or shrink it
+	if (!file && preview)
+	{
 			item->setExpanded(!item->isExpanded());
-		}
-		return;
+			return;
 	}
 	// When moving to a new sound, preview it. Skip presets, they can play forever
 	if (vertical && file->type() == FileItem::FileType::Sample)
