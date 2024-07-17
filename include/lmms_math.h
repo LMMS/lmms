@@ -46,9 +46,9 @@ namespace lmms
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-static inline float fraction(const float x)
+static inline float fraction(float x)
 {
-	return x - std::floor(x);
+	return x - static_cast<int>(x);
 }
 
 /*!
@@ -63,8 +63,7 @@ static inline float fraction(const float x)
  */
 static inline float absFraction(const float x)
 {
-	float dec = fraction(x);
-	return (dec >= 0 ? dec : dec + 1.0f);
+	return x - std::floor(x);
 }
 
 
@@ -126,11 +125,11 @@ static inline double fastFma( double a, double b, double c )
 #endif
 }
 
-// function to round 'value' depending on step size
+//! Round `value` to `where` depending on step size
 template<class T>
-static void roundAt(T& value, const T& where, const T& step_size)
+static void roundAt(T& value, const T& where, const T& stepSize)
 {
-	if (std::abs(value - where) < typeInfo<float>::minEps() * std::abs(step_size))
+	if (std::abs(value - where) < typeInfo<float>::minEps() * std::abs(stepSize))
 	{
 		value = where;
 	}
