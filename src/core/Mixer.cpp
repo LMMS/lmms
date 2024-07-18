@@ -24,7 +24,6 @@
 
 #include <QDomElement>
 #include <algorithm>
-#include <iostream>
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
@@ -140,7 +139,6 @@ void MixerChannel::sanitizeOutput()
 
 		if (!m_hasInvalidOutput)
 		{
-			std::cerr << "Invalid output found at mixer channel " << m_channelIndex << '\n'; 
 			m_hasInvalidOutput = true;
 			emit hasInvalidOutput(true);
 		}

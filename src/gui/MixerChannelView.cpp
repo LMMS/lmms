@@ -43,6 +43,7 @@
 #include <QCheckBox>
 
 #include <cassert>
+#include <iostream>
 
 namespace lmms::gui
 {
@@ -496,6 +497,7 @@ namespace lmms::gui
     {
         if (invalid)
         {
+            std::cerr << "Mixer channel " << m_channelIndex << " is muted because of invalid output\n"; 
             m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_red"));
             m_muteButton->setToolTip(tr("Mixer channel is muted because of invalid output"));
         }
