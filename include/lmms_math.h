@@ -48,7 +48,7 @@ namespace lmms
  */
 static inline float fraction(const float x)
 {
-	return x - static_cast<int>(x);
+	return x - std::trunc(x);
 }
 
 /*!
