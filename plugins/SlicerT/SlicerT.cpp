@@ -62,6 +62,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
 	, m_sliceSnap(this, tr("Slice snap"))
 	, m_enableSync(false, this, tr("BPM sync"))
+	, m_enableLoop(false, this, tr("Loop"))
 	, m_originalSample()
 	, m_parentTrack(instrumentTrack)
 {
@@ -114,39 +115,48 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	float noteDone = playbackState->noteDone();
 	float noteLeft = sliceEnd - noteDone;
 
-	if (noteLeft > 0)
+	if (noteLeft<=0) 
 	{
-		int noteFrame = noteDone * m_originalSample.sampleSize();
-
-		SRC_STATE* resampleState = playbackState->resamplingState();
-		SRC_DATA resampleData;
-		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
-		resampleData.data_out = (workingBuffer + offset)->data();
-		resampleData.input_frames = noteLeft * m_originalSample.sampleSize();
-		resampleData.output_frames = frames;
-		resampleData.src_ratio = speedRatio;
-
-		src_process(resampleState, &resampleData);
-
-		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.sampleSize();
-		playbackState->setNoteDone(nextNoteDone);
-
-		// exponential fade out, applyRelease() not used since it extends the note length
-		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
-		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
-		for (int i = 0; i < frames; i++)
+		if (m_enableLoop.value())
 		{
-			float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
-			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
-			fadeValue = cosinusInterpolate(0, 1, fadeValue);
-
-			workingBuffer[i + offset][0] *= fadeValue;
-			workingBuffer[i + offset][1] *= fadeValue;
+			playbackState->setNoteDone(sliceStart);
+			noteDone = sliceStart;
+			noteLeft = sliceEnd - noteDone;
+		} else {
+			emit isPlaying(-1, 0, 0);
+			return;
 		}
-
-		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
-	else { emit isPlaying(-1, 0, 0); }
+
+	int noteFrame = noteDone * m_originalSample.sampleSize();
+
+	SRC_STATE* resampleState = playbackState->resamplingState();
+	SRC_DATA resampleData;
+	resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
+	resampleData.data_out = (workingBuffer + offset)->data();
+	resampleData.input_frames = noteLeft * m_originalSample.sampleSize();
+	resampleData.output_frames = frames;
+	resampleData.src_ratio = speedRatio;
+
+	src_process(resampleState, &resampleData);
+
+	float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.sampleSize();
+	playbackState->setNoteDone(nextNoteDone);
+
+	// exponential fade out, applyRelease() not used since it extends the note length
+	int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
+	int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
+	for (int i = 0; i < frames; i++)
+	{
+		float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
+		fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
+		fadeValue = cosinusInterpolate(0, 1, fadeValue);
+
+		workingBuffer[i + offset][0] *= fadeValue;
+		workingBuffer[i + offset][1] *= fadeValue;
+	}
+
+	emit isPlaying(noteDone, sliceStart, sliceEnd);
 }
 
 void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
@@ -351,6 +361,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	m_noteThreshold.saveSettings(document, element, "threshold");
 	m_originalBPM.saveSettings(document, element, "origBPM");
 	m_enableSync.saveSettings(document, element, "syncEnable");
+	m_enableLoop.saveSettings(document, element, "loopEnable");
 }
 
 void SlicerT::loadSettings(const QDomElement& element)
@@ -388,6 +399,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	m_noteThreshold.loadSettings(element, "threshold");
 	m_originalBPM.loadSettings(element, "origBPM");
 	m_enableSync.loadSettings(element, "syncEnable");
+	m_enableLoop.loadSettings(element, "loopEnable");
 
 	emit dataChanged();
 }
