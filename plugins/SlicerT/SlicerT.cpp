@@ -115,7 +115,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	float noteDone = playbackState->noteDone();
 	float noteLeft = sliceEnd - noteDone;
 
-	if (noteLeft<=0) 
+	if (noteLeft <= 0) 
 	{
 		if (m_enableLoop.value())
 		{
