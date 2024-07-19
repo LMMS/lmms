@@ -122,7 +122,9 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 			playbackState->setNoteDone(sliceStart);
 			noteDone = sliceStart;
 			noteLeft = sliceEnd - noteDone;
-		} else {
+		} 
+		else
+		{
 			emit isPlaying(-1, 0, 0);
 			return;
 		}
