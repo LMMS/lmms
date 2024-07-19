@@ -46,7 +46,7 @@ namespace lmms
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-static inline float fraction(float x)
+static inline float fraction(const float x)
 {
 	return x - static_cast<int>(x);
 }
