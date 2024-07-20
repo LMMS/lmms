@@ -72,6 +72,7 @@ private:
 	LcdSpinBox* m_bpmBox;
 	ComboBox* m_snapSetting;
 	LedCheckBox* m_syncToggle;
+	LedCheckBox* m_loopToggle;
 
 	QPushButton* m_resetButton;
 	QPushButton* m_midiExportButton;

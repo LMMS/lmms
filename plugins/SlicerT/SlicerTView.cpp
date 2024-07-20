@@ -68,6 +68,11 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
+	m_loopToggle = new LedCheckBox("Loop", this, tr("LoopToggle"), LedCheckBox::LedColor::Green);
+	m_loopToggle->move(185, 187);
+	m_loopToggle->setToolTip(tr("Enable Looping"));
+	m_loopToggle->setModel(&m_slicerTParent->m_enableLoop);
+
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
 	m_bpmBox->move(130, 201);
 	m_bpmBox->setToolTip(tr("Original sample BPM"));

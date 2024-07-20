@@ -95,6 +95,7 @@ private:
 	IntModel m_originalBPM;
 	ComboBoxModel m_sliceSnap;
 	BoolModel m_enableSync;
+	BoolModel m_enableLoop;
 
 	Sample m_originalSample;
 
