@@ -385,11 +385,11 @@ void AudioFileProcessorWaveView::slide(int px)
 	double step = range() * fact * (px > 0 ? 1 : -1);
 
 	// get the real start and end frame
-	const double sampleStart = static_cast<double>(m_sample->startFrame());
-	const double sampleEnd = static_cast<double>(m_sample->endFrame());
+	const auto sampleStart = static_cast<double>(m_sample->startFrame());
+	const auto sampleEnd = static_cast<double>(m_sample->endFrame());
 
-	const double stepFrom = std::clamp(sampleStart + step, 0.0, static_cast<double>(m_sample->sampleSize())) - sampleStart;
-	const double stepTo = std::clamp(sampleEnd + step, sampleStart + 1.0, static_cast<double>(m_sample->sampleSize())) - sampleEnd;
+	const auto stepFrom = std::clamp(sampleStart + step, 0.0, static_cast<double>(m_sample->sampleSize())) - sampleStart;
+	const auto stepTo = std::clamp(sampleEnd + step, sampleStart + 1.0, static_cast<double>(m_sample->sampleSize())) - sampleEnd;
 	step = std::abs(stepFrom) < std::abs(stepTo) ? stepFrom : stepTo;
 
 	slideSampleByFrames(step);
@@ -403,7 +403,7 @@ void AudioFileProcessorWaveView::slideSamplePointByPx(Point point, int px)
 	);
 }
 
-void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long frames, bool slide_to)
+void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long frameOffset, bool slideTo)
 {
 	knob * a_knob = m_startKnob;
 	switch(point)
@@ -423,8 +423,8 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long fram
 	}
 	else
 	{
-		const double v = static_cast<double>(frames) / m_sample->sampleSize();
-		if (slide_to)
+		const double v = static_cast<double>(frameOffset) / m_sample->sampleSize();
+		if (slideTo)
 		{
 			a_knob->slideTo(v);
 		}
@@ -438,13 +438,13 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long fram
 
 
 
-void AudioFileProcessorWaveView::slideSampleByFrames(long frames)
+void AudioFileProcessorWaveView::slideSampleByFrames(long frameOffset)
 {
 	if (m_sample->sampleSize() <= 1)
 	{
 		return;
 	}
-	const double v = static_cast<double>(frames) / m_sample->sampleSize();
+	const double v = static_cast<double>(frameOffset) / m_sample->sampleSize();
 	// update knobs in the right order
 	// to avoid them clamping each other
 	if (v < 0)
@@ -507,7 +507,6 @@ void AudioFileProcessorWaveView::knob::slideTo(double v, bool check_bound)
 	{
 		return;
 	}
-
 	model()->setValue(v);
 	emit sliderMoved(model()->value());
 }

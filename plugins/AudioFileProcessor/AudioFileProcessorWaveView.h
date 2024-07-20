@@ -127,9 +127,7 @@ private:
 
 	Sample const* m_sample;
 	QPixmap m_graph;
-	// display from
 	int m_from;
-	// display to
 	int m_to;
 	int m_last_from;
 	int m_last_to;
@@ -162,9 +160,8 @@ private:
 	void zoom(const bool out = false);
 	void slide(int px);
 	void slideSamplePointByPx(Point point, int px);
-	// point: wihch knob to slide, frames: how mutch, can be negative, slide_to: should set the value instead of adding it
-	void slideSamplePointByFrames(Point point, long frames, bool slide_to = false);
-	void slideSampleByFrames(long frames);
+	void slideSamplePointByFrames(Point point, long frameOffset, bool slideTo = false);
+	void slideSampleByFrames(long frameOffset);
 
 	void slideSamplePointToFrames(Point point, f_cnt_t frames)
 	{
