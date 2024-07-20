@@ -71,7 +71,7 @@ Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::Type type) :
 
 void addHbox(QWidget* parent, const char* left, QString right)
 {
-	if(right.isEmpty()) { return; }
+	if (right.isEmpty()) { return; }
 
 	auto container = new QWidget(parent);
 	auto l = new QHBoxLayout(container);
@@ -83,7 +83,7 @@ void addHbox(QWidget* parent, const char* left, QString right)
 	leftLabel->setAlignment(Qt::AlignTop);
 
 	auto rightLabel = new QLabel(container);
-	if(right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
+	if (right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
 	{
 		right = QString("<a href=\"%1\">%2</a>").arg(right, right);
 		rightLabel->setTextInteractionFlags(rightLabel->textInteractionFlags()
@@ -105,8 +105,8 @@ void addHbox(QWidget* parent, const char* left, QString right)
 void addLabel(QWidget* parent, const char* left, QString right)
 {
 	auto lbl = new QLabel(parent);
-	if(right.isEmpty()) { return; }
-	if(right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
+	if (right.isEmpty()) { return; }
+	if (right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
 	{
 		right = QString("<a href=\"%1\">%2</a>").arg(right, right);
 		lbl->setTextInteractionFlags(lbl->textInteractionFlags()
@@ -140,7 +140,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	{
 		AutoLilvNodes minorVersions = pluginGetValues(plug, LILV_NS_LV2 "minorVersion");
 		AutoLilvNodes microVersions = pluginGetValues(plug, LILV_NS_LV2 "microVersion");
-		if(minorVersions && microVersions)
+		if (minorVersions && microVersions)
 		{
 			QString min = lilv_node_as_string(lilv_nodes_get_first(minorVersions.get()));
 			QString mic = lilv_node_as_string(lilv_nodes_get_first(microVersions.get()));
@@ -151,7 +151,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	(new QLabel(parent))->setText(pluginNameAndVersion);
 	{
 		AutoLilvNodes comments = pluginGetValues(plug, LILV_NS_RDFS "comment");
-		if(comments)
+		if (comments)
 		{
 			QString description{lilv_node_as_string(lilv_nodes_get_first(comments.get()))};
 			auto descLabel = new QLabel(parent);
@@ -167,7 +167,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 		qStringFromPluginNode(plug, lilv_plugin_get_author_name));
 	{
 		AutoLilvNodes homepages = pluginGetValues(plug, LILV_NS_DOAP "homepage");
-		if(homepages)
+		if (homepages)
 		{
 			const char* homepage = lilv_node_as_uri(lilv_nodes_get_first(homepages.get()));
 			QString homepageStr{homepage};
@@ -185,7 +185,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 		const LilvNode* libraryUriNode = lilv_plugin_get_bundle_uri(plug);
 		const char* libraryUri = lilv_node_as_uri(libraryUriNode);
 		char* filename = lilv_file_uri_parse(libraryUri, nullptr);
-		if(filename)
+		if (filename)
 		{
 			new QLabel(QWidget::tr("File: %1").arg(filename), parent);
 			lilv_free(filename);
@@ -222,12 +222,12 @@ QString Lv2SubPluginFeatures::description(
 {
 	auto mgr = Engine::getLv2Manager();
 	const LilvPlugin *plug = mgr->getPlugin(k.attributes["uri"]);
-	if(plug)
+	if (plug)
 	{
 		QString result{lilv_node_as_uri(lilv_plugin_get_uri(plug))};
 		AutoLilvNode rdfs_comment{mgr->uri(LILV_NS_RDFS "comment")};
 		AutoLilvNodes comments{lilv_plugin_get_value(plug, rdfs_comment.get())};
-		if(comments)
+		if (comments)
 		{
 			result += "\n\n";
 			result += lilv_node_as_string(lilv_nodes_get_first(comments.get()));
