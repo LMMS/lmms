@@ -360,14 +360,10 @@ static inline int numDigitsAsInt(float f)
 	return digits;
 }
 
-static inline float minEpsilon()
-{
-	return 1.0e-10f;
-}
 
 static inline bool floatCompare(float x, float y)
 {
-	return x == y ? true : std::abs(x - y) < minEpsilon();
+	return x == y ? true : std::abs(x - y) < F_EPSILON;
 }
 
 
