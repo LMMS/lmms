@@ -56,4 +56,3 @@ Before coding a new big feature, please _always_
 suggestions about your feature and about the intended implementation on GitHub,
 or ask in one of the tech channels on Discord and wait for replies! Maybe there are different ideas, improvements, or hints, or
 maybe your feature is not welcome/needed at the moment.
-x
