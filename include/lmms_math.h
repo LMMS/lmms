@@ -362,7 +362,7 @@ static inline int numDigitsAsInt(float f)
 
 static inline float minEpsilon()
 {
-	return 1.0e - 10f;
+	return 1.0e-10f;
 }
 
 static inline bool floatCompare(float x, float y)
