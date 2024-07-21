@@ -291,7 +291,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
+void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	const float LOG440 = 2.643452676f;
 
@@ -322,7 +322,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::play( sampleFrame * _working_buffer )
+void GigInstrument::play( SampleFrame* _working_buffer )
 {
 	// These must remain thread_local or will cause collisions/bad data with play buffers
 	thread_local static std::vector<sampleFrame> sampleData(32768);
@@ -457,6 +457,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Output the data resampling if needed
 			// Only output if resampling is successful (note that "used" is output)
 			if (resample && sample.convertSampleRate(sampleData, convertBuf, samples, frames, freq_factor, used))
+
 			{
 				updateWorkingBufferByData(convertBuf);
 			}
@@ -482,7 +483,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 
 
-void GigInstrument::loadSample(GigSample& sample, std::vector<sampleFrame>& sampleData, gig::file_offset_t samples)
+void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& sampleData, gig::file_offset_t samples)
 {
 	// This must remain thread_local or will cause collisions/bad data with play buffers
 	thread_local static std::vector<int8_t> buffer(32768);
@@ -1150,7 +1151,7 @@ void GigSample::updateSampleRate()
 
 
 
-bool GigSample::convertSampleRate(std::vector<sampleFrame>& oldBuf, std::vector<sampleFrame>& newBuf,
+bool GigSample::convertSampleRate(std::vector<SampleFrame>& oldBuf, std::vector<SampleFrame>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == nullptr )

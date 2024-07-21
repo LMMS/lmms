@@ -55,6 +55,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef LMMS_HAVE_SYS_PRCTL_H
+#include <sys/prctl.h>
+#endif
+
 #include <csignal>
 
 #include "MainApplication.h"
@@ -291,6 +295,15 @@ int main( int argc, char * * argv )
 	}
 	// Make Qt's debug message handlers work
 	qInstallMessageHandler(consoleMessageHandler);
+#endif
+
+#if defined(LMMS_HAVE_SYS_PRCTL_H) && defined(PR_SET_CHILD_SUBREAPER)
+	// Set the "child subreaper" attribute so that plugin child processes remain as lmms'
+	// children even when some wrapper process exits, as it may happen with wine
+	if (prctl(PR_SET_CHILD_SUBREAPER, 1))
+	{
+		perror("prctl(PR_SET_CHILD_SUBREAPER)");
+	}
 #endif
 
 	// initialize memory managers

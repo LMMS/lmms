@@ -160,7 +160,7 @@ public:
 
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
-	bool convertSampleRate(std::vector<sampleFrame>& oldBuf, std::vector<sampleFrame>& newBuf,
+	bool convertSampleRate(std::vector<SampleFrame>& oldBuf, std::vector<SampleFrame>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
@@ -246,10 +246,10 @@ public:
 	GigInstrument( InstrumentTrack * _instrument_track );
 	~GigInstrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -315,7 +315,7 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample(GigSample& sample, std::vector<sampleFrame>& sampleData, gig::file_offset_t samples);
+	void loadSample(GigSample& sample, std::vector<SampleFrame>& sampleData, gig::file_offset_t samples);
 	gig::file_offset_t getLoopedIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const;
 	gig::file_offset_t getPingPongIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const;
 

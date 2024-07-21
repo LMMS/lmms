@@ -64,7 +64,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterEnabledModel( false, this ),
 	m_filterModel( this, tr( "Filter type" ) ),
 	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this, tr( "Cutoff frequency" ) ),
-	m_filterResModel( 0.5, BasicFilters<>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance" ) )
+	m_filterResModel(0.5f, BasicFilters<>::minQ(), 10.f, 0.01f, this, tr("Q/Resonance"))
 {
 	for( int i = 0; i < NumTargets; ++i )
 	{
@@ -127,7 +127,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 
 
 
-void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
+void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 							const fpp_t frames,
 							NotePlayHandle* n )
 {

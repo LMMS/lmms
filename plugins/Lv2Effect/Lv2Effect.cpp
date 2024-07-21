@@ -68,7 +68,7 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
+bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false; }
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
