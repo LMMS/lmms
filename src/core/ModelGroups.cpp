@@ -71,17 +71,24 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 {
 	model->setObjectName(name);
 	m_models.emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
-/*	QObject::connect(model, &AutomatableModel::destroyed,
+	/*
+	 * The following code is currently not used because Models can not be removed
+	 * in no kind of implementation that uses ModelGroups. The code is
+	 * deactivated because this is not a QObject anymore (an ugly connection
+	 * handler would be required for this)
+	 */
+# if 0
+	QObject::connect(model, &AutomatableModel::destroyed,
 				this, [this, model](jo_id_t){
 					if(containsModel(model->objectName()))
 					{
 						eraseModel(model->objectName());
 					}
 				},
-				Qt::DirectConnection);*/
-
+				Qt::DirectConnection); */
+#endif
 	// View needs to create another child view, e.g. a new knob:
-	// emit dataChanged();
+	emit m_parent->dataChanged();
 }
 
 
