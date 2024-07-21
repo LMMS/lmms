@@ -39,7 +39,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
-#include "Lv2ControlBase.h"
+#include "Lv2Proc.h"
 #include "Lv2Options.h"
 #include "PluginIssue.h"
 
@@ -247,7 +247,7 @@ void Lv2Manager::initPlugins()
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
 
 		std::vector<PluginIssue> issues;
-		Plugin::Type type = Lv2ControlBase::check(curPlug, issues);
+		Plugin::Type type = Lv2Proc::check(curPlug, issues);
 		std::sort(issues.begin(), issues.end());
 		auto last = std::unique(issues.begin(), issues.end());
 		issues.erase(last, issues.end());

@@ -1,7 +1,7 @@
 /*
  * Lv2FxControlDialog.h - Lv2FxControlDialog implementation
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,7 +26,7 @@
 #define LV2_FX_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
-#include "Lv2ViewBase.h"
+#include "Lv2ProcView.h"
 
 namespace lmms
 {
@@ -36,7 +36,7 @@ class Lv2FxControls;
 namespace gui
 {
 
-class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
+class Lv2FxControlDialog : public EffectControlDialog, public Lv2ProcView
 {
 	Q_OBJECT
 

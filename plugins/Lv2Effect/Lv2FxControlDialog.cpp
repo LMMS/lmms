@@ -1,7 +1,7 @@
 /*
  * Lv2FxControlDialog.cpp - Lv2FxControlDialog implementation
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -34,7 +34,7 @@ namespace lmms::gui
 
 Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 	EffectControlDialog(controls),
-	Lv2ViewBase(this, controls)
+	Lv2ProcView(this, controls)
 {
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
@@ -66,7 +66,7 @@ Lv2FxControls *Lv2FxControlDialog::lv2Controls()
 
 void Lv2FxControlDialog::modelChanged()
 {
-	Lv2ViewBase::modelChanged(lv2Controls());
+	Lv2ProcView::modelChanged(lv2Controls());
 	connect(lv2Controls(), &Lv2FxControls::modelChanged,
 		this, [this](){ this->modelChanged();} );
 }
