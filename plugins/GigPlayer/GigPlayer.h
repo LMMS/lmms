@@ -42,8 +42,9 @@
 #include <vector>
 #include <list>
 
-#include "lmms_gig.h"
-
+#ifndef _MSC_VER
+#include "lmms_gig.h" // version specific typedef disabled on msvc
+#endif
 class QLabel;
 
 
