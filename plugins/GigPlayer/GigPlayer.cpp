@@ -325,8 +325,8 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 void GigInstrument::play( SampleFrame* _working_buffer )
 {
 	// These must remain thread_local or will cause collisions/bad data with play buffers
-	thread_local static std::vector<sampleFrame> sampleData(32768);
-	thread_local static std::vector<sampleFrame> convertBuf(32768);
+	thread_local static std::vector<SampleFrame> sampleData(32768);
+	thread_local static std::vector<SampleFrame> convertBuf(32768);
 
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	const int rate = Engine::audioEngine()->outputSampleRate();
@@ -430,7 +430,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
-			const auto neededCapacity = static_cast<std::vector<sampleFrame>::size_type>(samples);
+			const auto neededCapacity = static_cast<std::vector<SampleFrame>::size_type>(samples);
 			sampleData.resize(std::max(neededCapacity, sampleData.capacity()));
 			convertBuf.resize(std::max(neededCapacity, convertBuf.capacity()));
 
