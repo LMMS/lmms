@@ -55,7 +55,7 @@ namespace lmms::gui
 
 
 Lv2ProcView::Lv2ProcView(QWidget* meAsWidget, Lv2Proc *proc) :
-	ModelGroupView(meAsWidget, proc),  // TODO: invalid: this is not the parent!
+	ModelGroupView(meAsWidget, proc),
 	m_helpWindowEventFilter(this)
 {
 	auto grid = new QGridLayout(meAsWidget);
