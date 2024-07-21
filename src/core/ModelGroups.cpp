@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroups.cpp - base classes for groups of linked models
+ * ModelGroups.cpp - base classes for groups of models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -36,7 +36,7 @@ namespace lmms
 {
 
 /*
-	LinkedModelGroup
+	ModelGroup
 */
 
 

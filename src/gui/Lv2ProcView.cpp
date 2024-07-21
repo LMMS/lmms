@@ -52,14 +52,6 @@
 
 namespace lmms::gui
 {
-#if 0
-Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
-	ModelGroupView (parent, proc)
-{
-
-}
-
-#endif
 
 
 Lv2ProcView::Lv2ProcView(QWidget* meAsWidget, Lv2Proc *proc) :

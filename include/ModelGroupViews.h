@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroupViews.h - view for groups of linkable models
+ * ModelGroupViews.h - view for groups of models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
-#define LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
+#ifndef LMMS_GUI_MODEL_GROUP_VIEWS_H
+#define LMMS_GUI_MODEL_GROUP_VIEWS_H
 
 #include <cstddef>
 #include <memory>
@@ -42,7 +42,7 @@ namespace gui
 class Control;
 
 /**
-	@file LinkedModelGroupViews.h
+	@file ModelGroupViews.h
 	See Lv2ViewBase.h for example usage
 */
 
@@ -50,14 +50,11 @@ class Control;
 class ModelGroupView
 {
 public:
-	/**
-		@param colNum numbers of columns for the controls
-			(link LEDs not counted)
-	*/
+	//! @param colNum numbers of columns for the controls
 	ModelGroupView(QWidget* parent, ModelGroup* model);
 
 	//! Reconnect models if model changed
-	void modelChanged(ModelGroup* linkedModelGroup);
+	void modelChanged(ModelGroup* modelGroup);
 
 protected:
 	//! Add a control to this widget
@@ -72,7 +69,7 @@ protected:
 private:
 	class ModelGroup* m_model;
 
-	//! column number in surrounding grid in LinkedModelGroupsView
+	//! column number in surrounding grid in ModelGroupsView
 	std::size_t m_colNum;
 	class ControlLayout* m_layout;
 	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
@@ -82,4 +79,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
+#endif // LMMS_GUI_MODEL_GROUP_VIEWS_H

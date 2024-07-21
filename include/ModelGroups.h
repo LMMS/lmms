@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroups.h - base classes for groups of linked models
+ * ModelGroups.h - base classes for groups of models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_LINKED_MODEL_GROUPS_H
-#define LMMS_LINKED_MODEL_GROUPS_H
+#ifndef LMMS_MODEL_GROUPS_H
+#define LMMS_MODEL_GROUPS_H
 
 #include <cstddef>
 
@@ -36,20 +36,19 @@ namespace lmms
 {
 
 /**
-	@file LinkedModelGroups.h
-	See Lv2ControlBase.h and Lv2Proc.h for example usage
+	@file ModelGroups.h
+	See Lv2Proc.h for example usage
 */
 
 class AutomatableModel;
 
 /**
-	Base class for a group of linked models
-
-	See the LinkedModelGroup class for explanations
+	Base class for a group of models
 
 	Features:
 	* Models are stored by their QObject::objectName
-	* Models are linked automatically
+	* Load/Save routines
+	* Add/Remove routines
 */
 class ModelGroup
 {
@@ -114,4 +113,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_LINKED_MODEL_GROUPS_H
+#endif // LMMS_MODEL_GROUPS_H

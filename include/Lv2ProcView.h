@@ -57,21 +57,6 @@ namespace gui
 
 class LedCheckBox;
 
-# if 0
-//! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
-class Lv2ViewProc : public ModelGroupView
-{
-public:
-	//! @param colNum numbers of columns for the controls
-	Lv2ViewProc(QWidget *parent, Lv2Proc *proc, int colNum);
-	~Lv2ViewProc() override = default;
-
-private:
-	static AutoLilvNode uri(const char *uriStr);
-};
-
-#endif
-
 
 class HelpWindowEventFilter : public QObject
 {

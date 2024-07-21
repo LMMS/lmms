@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroupViews.h - view for groups of linkable models
+ * ModelGroupViews.h - view for groups of models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -48,10 +48,10 @@ ModelGroupView::ModelGroupView(QWidget* parent,
 
 
 
-void ModelGroupView::modelChanged(ModelGroup *group)
+void ModelGroupView::modelChanged(ModelGroup *modelGroup)
 {
 	// reconnect models
-	group->foreach_model([this](const std::string& str,
+	modelGroup->foreach_model([this](const std::string& str,
 		const ModelGroup::ModelInfo& minf)
 	{
 		auto itr = m_widgets.find(str);
@@ -68,7 +68,7 @@ void ModelGroupView::modelChanged(ModelGroup *group)
 		}
 	});
 
-	m_model = group;
+	m_model = modelGroup;
 }
 
 
