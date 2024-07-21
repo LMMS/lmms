@@ -17,10 +17,10 @@ SET(LMMS_SRCS
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
-	gui/LinkedModelGroupViews.cpp
+	gui/ModelGroupViews.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
-	gui/Lv2ViewBase.cpp
+	gui/Lv2ProcView.cpp
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
 	gui/MicrotunerConfig.cpp

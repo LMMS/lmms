@@ -33,8 +33,7 @@ namespace lmms
 {
 
 
-class LinkedModelGroup;
-class LinkedModelGroups;
+class ModelGroup;
 
 
 namespace gui
@@ -48,71 +47,36 @@ class Control;
 */
 
 
-/**
-	View for a representative processor
-
-	Features:
-	* Remove button for removable models
-	* Simple handling of adding, removing and model changing
-
-	@note Neither this class, nor any inheriting classes, shall inherit
-		ModelView. The "view" in the name is just for consistency
-		with LinkedModelGroupsView.
-*/
-class LinkedModelGroupView : public QWidget
+class ModelGroupView
 {
 public:
 	/**
 		@param colNum numbers of columns for the controls
 			(link LEDs not counted)
 	*/
-	LinkedModelGroupView(QWidget* parent, LinkedModelGroup* model,
-		std::size_t colNum);
-	~LinkedModelGroupView() override = default;
+	ModelGroupView(QWidget* parent, ModelGroup* model);
 
 	//! Reconnect models if model changed
-	void modelChanged(LinkedModelGroup* linkedModelGroup);
+	void modelChanged(ModelGroup* linkedModelGroup);
 
 protected:
 	//! Add a control to this widget
 	//! @warning This widget will own this control, do not free it
-	void addControl(Control* ctrl, const std::string &id,
-					const std::string& display, bool removable);
+	void addControl(QWidget *parent, Control* ctrl, const std::string &id,
+		const std::string& display, bool removable);
 
 	void removeControl(const QString &key);
 
 	void removeFocusFromSearchBar();
 
 private:
-	class LinkedModelGroup* m_model;
+	class ModelGroup* m_model;
 
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
 	class ControlLayout* m_layout;
 	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
 };
-
-
-/**
-	Container class for one LinkedModelGroupView
-
-	@note It's intended this class does not inherit from ModelView.
-		Inheriting classes need to do that, see e.g. Lv2Instrument.h
-*/
-class LinkedModelGroupsView
-{
-protected:
-	~LinkedModelGroupsView() = default;
-
-	//! Reconnect models if model changed; to be called by child virtuals
-	void modelChanged(LinkedModelGroups* ctrlBase);
-
-private:
-	//! The base class must return the addressed group view,
-	//! which has the same value as "this"
-	virtual LinkedModelGroupView* getGroupView() = 0;
-};
-
 
 } // namespace gui
 

@@ -35,7 +35,7 @@
 
 #include <ringbuffer/ringbuffer.h>
 
-#include "LinkedModelGroups.h"
+#include "ModelGroups.h"
 #include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
@@ -63,10 +63,32 @@ namespace Lv2Ports
 	enum class Vis;
 }
 
+/**
+	Class representing one Lv2 processor, i.e. one Lv2 handle.
+	For mono plugins, L/R channel routing is being used
+	(this includes techniques like upmixing and downmixing).
 
-//! Class representing one Lv2 processor, i.e. one Lv2 handle.
-//! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc.
-class Lv2Proc : public LinkedModelGroup
+	This class provides everything Lv2 effect and instrument have in common.
+	It's not named Lv2Plugin, because
+	* it does not inherit Instrument
+	* the Plugin subclass Effect does not inherit this class
+
+	This class would usually be a Model subclass. However, Qt doesn't allow
+	this:
+	* inheriting only from Model will cause diamond inheritance for QObject,
+	  which will cause errors with Q_OBJECT
+	* making this a direct subclass of Instrument resp. EffectControls would
+	  require CRTP, which would make this class a template class, which would
+	  conflict with Q_OBJECT
+
+	The consequence is that this class can neither inherit QObject or Model, nor
+	Instrument or EffectControls, which means in fact:
+	* this class contains no signals or slots, but it offers stubs for slots
+	  that shall be called by child classes
+	* this class can not override virtuals of Instrument or EffectControls, so
+	  it will offer functions that must be called by virtuals in its child class
+*/
+class Lv2Proc : public ModelGroup
 {
 	friend class Lv2ProcSuspender;
 public:
@@ -76,8 +98,8 @@ public:
 	/*
 		ctor/dtor/reload
 	*/
-	Lv2Proc(const LilvPlugin* plugin, Model *parent);
-	~Lv2Proc() override;
+	Lv2Proc(Model *parent, const QString &uri);
+	~Lv2Proc();
 	void reload();
 	void onSampleRateChanged();
 
@@ -128,28 +150,14 @@ public:
 	 * Copy buffer passed by the core into our ports
 	 * @param buf buffer of sample frames, each sample frame is something like
 	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChan The offset for @p buf where we have to read our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we read from.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param num Number of channels we must read from @param buf (starting at
-	 *   @p offset)
 	 */
-	void copyBuffersFromCore(const SampleFrame* buf,
-								unsigned firstChan, unsigned num, fpp_t frames);
+	void copyBuffersFromCore(const SampleFrame* buf, fpp_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
 	 * @param buf buffer of sample frames, each sample frame is something like
 	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChan The offset for @p buf where we have to write our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we write to.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param num Number of channels we must write to @param buf (starting at
-	 *   @p offset)
 	 */
-	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num,
-								fpp_t frames) const;
+	void copyBuffersToCore(SampleFrame* buf, fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 
@@ -160,19 +168,19 @@ public:
 		misc
 	 */
 	class AutomatableModel *modelAtPort(const QString &uri); // unused currently
-	std::size_t controlCount() const { return LinkedModelGroup::modelNum(); }
+	std::size_t controlCount() const { return ModelGroup::size(); }
 	bool hasNoteInput() const;
+	const LilvPlugin* getPlugin() const { return m_plugin; }
+	bool hasGui() const { return m_hasGUI; }
 
 protected:
-	/*
-		load and save
-	*/
-	//! Create ports and instance, connect ports, activate plugin
-	void initPlugin();
-	//! Deactivate instance
-	void shutdownPlugin();
+	//! To be called by `Plugin::loadFile` overrides
+	void loadFile(const QString &file) { (void)file; }
+	//! XML DOM Node name
+	QString nodeName() const { return "lv2controls"; }
 
 private:
+	// lv2
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance = nullptr;
 	Lv2Features m_features;
@@ -203,6 +211,7 @@ private:
 
 	// other
 	static int32_t defaultEvbufSize() { return 1 << 15; /* ardour uses this*/ }
+	bool m_hasGUI = false;
 
 	//! models for the controls, sorted by port symbols
 	//! @note These are not owned, but rather link to the models in
@@ -212,6 +221,10 @@ private:
 	void initMOptions(); //!< initialize m_options
 	void initPluginSpecificFeatures();
 
+	//! Create ports and instance, connect ports, activate plugin
+	void initPlugin();
+	//! Deactivate instance
+	void shutdownPlugin();
 	//! load a file in the plugin, but don't do anything in LMMS
 	void loadFileInternal(const QString &file);
 	//! allocate m_ports, fill all with metadata, and assign meaning of ports

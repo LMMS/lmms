@@ -26,7 +26,7 @@
 #define LV2_FX_CONTROLS_H
 
 #include "EffectControls.h"
-#include "Lv2ControlBase.h"
+#include "Lv2Proc.h"
 
 namespace lmms
 {
@@ -40,7 +40,7 @@ class Lv2FxControlDialog;
 }
 
 
-class Lv2FxControls : public EffectControls, public Lv2ControlBase
+class Lv2FxControls : public EffectControls, public Lv2Proc
 {
 	Q_OBJECT
 signals:
@@ -53,7 +53,7 @@ public:
 	void loadSettings(const QDomElement &that) override;
 	inline QString nodeName() const override
 	{
-		return Lv2ControlBase::nodeName();
+		return Lv2Proc::nodeName();
 	}
 
 	int controlCount() override;

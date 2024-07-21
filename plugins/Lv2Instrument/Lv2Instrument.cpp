@@ -80,7 +80,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 		Flag::IsSingleStreamed
 #endif
 	),
-	Lv2ControlBase(this, key->attributes["uri"])
+	Lv2Proc(this, key->attributes["uri"])
 {
 	clearRunningNotes();
 
@@ -108,7 +108,7 @@ Lv2Instrument::~Lv2Instrument()
 
 void Lv2Instrument::reload()
 {
-	Lv2ControlBase::reload();
+	Lv2Proc::reload();
 	clearRunningNotes();
 	emit modelChanged();
 }
@@ -139,7 +139,7 @@ void Lv2Instrument::onSampleRateChanged()
 
 void Lv2Instrument::saveSettings(QDomDocument &doc, QDomElement &that)
 {
-	Lv2ControlBase::saveSettings(doc, that);
+	Lv2Proc::saveSettings(doc, that);
 }
 
 
@@ -147,7 +147,7 @@ void Lv2Instrument::saveSettings(QDomDocument &doc, QDomElement &that)
 
 void Lv2Instrument::loadSettings(const QDomElement &that)
 {
-	Lv2ControlBase::loadSettings(that);
+	Lv2Proc::loadSettings(that);
 }
 
 
@@ -155,7 +155,7 @@ void Lv2Instrument::loadSettings(const QDomElement &that)
 
 void Lv2Instrument::loadFile(const QString &file)
 {
-	Lv2ControlBase::loadFile(file);
+	Lv2Proc::loadFile(file);
 }
 
 
@@ -187,14 +187,14 @@ void Lv2Instrument::playNote(NotePlayHandle *nph, SampleFrame*)
 
 void Lv2Instrument::play(SampleFrame* buf)
 {
-	copyModelsFromLmms();
+	copyModelsFromCore();
 
 	fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	run(fpp);
 
-	copyModelsToLmms();
-	copyBuffersToLmms(buf, fpp);
+	copyModelsToCore();
+	copyBuffersToCore(buf, fpp);
 }
 
 
@@ -219,7 +219,7 @@ void Lv2Instrument::updatePitchRange()
 
 QString Lv2Instrument::nodeName() const
 {
-	return Lv2ControlBase::nodeName();
+	return Lv2Proc::nodeName();
 }
 
 
@@ -235,7 +235,7 @@ namespace gui
 
 Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 	InstrumentView(_instrument, _parent),
-	Lv2ViewBase(this, _instrument)
+	Lv2ProcView(this, _instrument)
 {
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
@@ -304,7 +304,7 @@ void Lv2InsView::hideEvent(QHideEvent *event)
 
 void Lv2InsView::modelChanged()
 {
-	Lv2ViewBase::modelChanged(castModel<Lv2Instrument>());
+	Lv2ProcView::modelChanged(castModel<Lv2Instrument>());
 	connect(castModel<Lv2Instrument>(), &Lv2Instrument::modelChanged,
 		this, [this](){ this->modelChanged();} );
 }

@@ -30,8 +30,8 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Lv2ControlBase.h"
-#include "Lv2ViewBase.h"
+#include "Lv2ProcView.h"
+#include "Lv2Proc.h"
 #include "Note.h"
 
 // whether to use MIDI vs playHandle
@@ -48,7 +48,7 @@ class Lv2InsView;
 
 }
 
-class Lv2Instrument : public Instrument, public Lv2ControlBase
+class Lv2Instrument : public Instrument, public Lv2Proc
 {
 	Q_OBJECT
 signals:
@@ -73,7 +73,7 @@ public:
 	/*
 		realtime funcs
 	*/
-	bool hasNoteInput() const override { return Lv2ControlBase::hasNoteInput(); }
+	bool hasNoteInput() const override { return Lv2Proc::hasNoteInput(); }
 #ifdef LV2_INSTRUMENT_USE_MIDI
 	bool handleMidiEvent(const MidiEvent &event,
 		const TimePos &time = TimePos(), f_cnt_t offset = 0) override;
@@ -106,7 +106,7 @@ namespace gui
 {
 
 
-class Lv2InsView : public InstrumentView, public Lv2ViewBase
+class Lv2InsView : public InstrumentView, public Lv2ProcView
 {
 Q_OBJECT
 public:

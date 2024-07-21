@@ -1,5 +1,5 @@
 /*
- * Lv2ViewBase.cpp - base class for Lv2 plugin views
+ * Lv2ProcView.cpp - base class for Lv2 plugin views
  *
  * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "Lv2ViewBase.h"
+#include "Lv2ProcView.h"
 
 #ifdef LMMS_HAVE_LV2
 
@@ -40,7 +40,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "lmms_math.h"
-#include "Lv2ControlBase.h"
+#include "Lv2Proc.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
 #include "Lv2Ports.h"
@@ -48,13 +48,80 @@
 #include "SubWindow.h"
 
 
+#include "ControlLayout.h"
+
 namespace lmms::gui
 {
-
-
+#if 0
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
-	LinkedModelGroupView (parent, proc, colNum)
+	ModelGroupView (parent, proc)
 {
+
+}
+
+#endif
+
+
+Lv2ProcView::Lv2ProcView(QWidget* meAsWidget, Lv2Proc *proc) :
+	ModelGroupView(meAsWidget, proc),  // TODO: invalid: this is not the parent!
+	m_helpWindowEventFilter(this)
+{
+	auto grid = new QGridLayout(meAsWidget);
+
+	auto btnBox = new QHBoxLayout();
+	if (/* DISABLES CODE */ (false))
+	{
+		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
+			meAsWidget);
+		btnBox->addWidget(m_reloadPluginButton, 0);
+	}
+
+	if (/* DISABLES CODE */ (false)) // TODO: check if the plugin has the UI extension
+	{
+		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"),
+											meAsWidget);
+		m_toggleUIButton->setCheckable(true);
+		m_toggleUIButton->setChecked(false);
+		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
+		btnBox->addWidget(m_toggleUIButton, 0);
+	}
+	btnBox->addStretch(1);
+
+	meAsWidget->setAcceptDrops(true);
+
+	// note: the lifetime of C++ objects ends after the top expression in the
+	// expression syntax tree, so the AutoLilvNode gets freed after the function
+	// has been called
+	AutoLilvNodes props(lilv_plugin_get_value(proc->getPlugin(),
+				uri(LILV_NS_RDFS "comment").get()));
+	LILV_FOREACH(nodes, itr, props.get())
+	{
+		const LilvNode* node = lilv_nodes_get(props.get(), itr);
+		auto infoLabel = new QLabel(QString(lilv_node_as_string(node)).trimmed() + "\n");
+		infoLabel->setWordWrap(true);
+		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+		m_helpButton = new QPushButton(QObject::tr("Help"));
+		m_helpButton->setCheckable(true);
+		btnBox->addWidget(m_helpButton);
+
+		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
+		m_helpWindow->setSizePolicy(QSizePolicy::Expanding,
+									QSizePolicy::Expanding);
+		m_helpWindow->installEventFilter(&m_helpWindowEventFilter);
+		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+		m_helpWindow->hide();
+
+		break;
+	}
+
+	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
+	{
+		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
+	}
+	else { delete btnBox; }
+
 	class SetupTheWidget : public Lv2Ports::ConstVisitor
 	{
 	public:
@@ -104,19 +171,19 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 
 	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
 	proc->foreach_port(
-		[this, &commentUri](const Lv2Ports::PortBase* port)
+		[this, &commentUri, &meAsWidget](const Lv2Ports::PortBase* port)
 		{
 			if(!lilv_port_has_property(port->m_plugin, port->m_port,
 										uri(LV2_PORT_PROPS__notOnGUI).get()))
 			{
 				SetupTheWidget setup;
-				setup.m_parent = this;
+				setup.m_parent = meAsWidget;
 				setup.m_commentUri = commentUri.get();
 				port->accept(setup);
 
 				if (setup.m_control)
 				{
-					addControl(setup.m_control,
+					addControl(meAsWidget, setup.m_control,
 						lilv_node_as_string(lilv_port_get_symbol(
 							port->m_plugin, port->m_port)),
 						port->name().toUtf8().data(),
@@ -129,81 +196,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 
 
 
-AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
-{
-	return Engine::getLv2Manager()->uri(uriStr);
-}
-
-
-
-
-Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
-	m_helpWindowEventFilter(this)
-{
-	auto grid = new QGridLayout(meAsWidget);
-
-	auto btnBox = new QHBoxLayout();
-	if (/* DISABLES CODE */ (false))
-	{
-		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
-			meAsWidget);
-		btnBox->addWidget(m_reloadPluginButton, 0);
-	}
-
-	if (/* DISABLES CODE */ (false)) // TODO: check if the plugin has the UI extension
-	{
-		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"),
-											meAsWidget);
-		m_toggleUIButton->setCheckable(true);
-		m_toggleUIButton->setChecked(false);
-		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
-		btnBox->addWidget(m_toggleUIButton, 0);
-	}
-	btnBox->addStretch(1);
-
-	meAsWidget->setAcceptDrops(true);
-
-	// note: the lifetime of C++ objects ends after the top expression in the
-	// expression syntax tree, so the AutoLilvNode gets freed after the function
-	// has been called
-	AutoLilvNodes props(lilv_plugin_get_value(ctrlBase->getPlugin(),
-				uri(LILV_NS_RDFS "comment").get()));
-	LILV_FOREACH(nodes, itr, props.get())
-	{
-		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		auto infoLabel = new QLabel(QString(lilv_node_as_string(node)).trimmed() + "\n");
-		infoLabel->setWordWrap(true);
-		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-		m_helpButton = new QPushButton(QObject::tr("Help"));
-		m_helpButton->setCheckable(true);
-		btnBox->addWidget(m_helpButton);
-
-		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
-		m_helpWindow->setSizePolicy(QSizePolicy::Expanding,
-									QSizePolicy::Expanding);
-		m_helpWindow->installEventFilter(&m_helpWindowEventFilter);
-		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
-		m_helpWindow->hide();
-
-		break;
-	}
-
-	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
-	{
-		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
-	}
-	else { delete btnBox; }
-
-	m_procView = new Lv2ViewProc(meAsWidget, ctrlBase->control(0), m_colNum);
-	grid->addWidget(m_procView, Rows::ProcRow, 0);
-}
-
-
-
-
-Lv2ViewBase::~Lv2ViewBase() {
+Lv2ProcView::~Lv2ProcView() {
 	closeHelpWindow();
 	// TODO: hide UI if required
 }
@@ -211,14 +204,14 @@ Lv2ViewBase::~Lv2ViewBase() {
 
 
 
-void Lv2ViewBase::toggleUI()
+void Lv2ProcView::toggleUI()
 {
 }
 
 
 
 
-void Lv2ViewBase::toggleHelp(bool visible)
+void Lv2ProcView::toggleHelp(bool visible)
 {
 	if (m_helpWindow)
 	{
@@ -230,7 +223,7 @@ void Lv2ViewBase::toggleHelp(bool visible)
 
 
 
-void Lv2ViewBase::closeHelpWindow()
+void Lv2ProcView::closeHelpWindow()
 {
 	if (m_helpWindow) { m_helpWindow->close(); }
 }
@@ -238,21 +231,21 @@ void Lv2ViewBase::closeHelpWindow()
 
 
 
-void Lv2ViewBase::modelChanged(Lv2ControlBase *ctrlBase)
+void Lv2ProcView::modelChanged(Lv2Proc *proc)
 {
 	// reconnect models
 	if (m_toggleUIButton)
 	{
-		m_toggleUIButton->setChecked(ctrlBase->hasGui());
+		m_toggleUIButton->setChecked(proc->hasGui());
 	}
 
-	LinkedModelGroupsView::modelChanged(ctrlBase);
+	ModelGroupView::modelChanged(proc);
 }
 
 
 
 
-AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
+AutoLilvNode Lv2ProcView::uri(const char *uriStr)
 {
 	return Engine::getLv2Manager()->uri(uriStr);
 }
@@ -260,7 +253,7 @@ AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
 
 
 
-void Lv2ViewBase::onHelpWindowClosed()
+void Lv2ProcView::onHelpWindowClosed()
 {
 	m_helpButton->setChecked(true);
 }
@@ -268,8 +261,8 @@ void Lv2ViewBase::onHelpWindowClosed()
 
 
 
-HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
-	m_viewBase(viewBase) {}
+HelpWindowEventFilter::HelpWindowEventFilter(Lv2ProcView* viewBase) :
+	m_procView(viewBase) {}
 
 
 
@@ -277,7 +270,7 @@ HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
 bool HelpWindowEventFilter::eventFilter(QObject* , QEvent* event)
 {
 	if (event->type() == QEvent::Close) {
-		m_viewBase->m_helpButton->setChecked(false);
+		m_procView->m_helpButton->setChecked(false);
 		return true;
 	}
 	return false;

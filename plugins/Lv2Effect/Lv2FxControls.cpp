@@ -36,7 +36,7 @@ namespace lmms
 
 Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 	EffectControls(effect),
-	Lv2ControlBase(this, uri)
+	Lv2Proc(this, uri)
 {
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
 		this, &Lv2FxControls::onSampleRateChanged);
@@ -47,7 +47,7 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 
 void Lv2FxControls::reload()
 {
-	Lv2ControlBase::reload();
+	Lv2Proc::reload();
 	emit modelChanged();
 }
 
@@ -67,7 +67,7 @@ void Lv2FxControls::onSampleRateChanged()
 
 void Lv2FxControls::saveSettings(QDomDocument &doc, QDomElement &that)
 {
-	Lv2ControlBase::saveSettings(doc, that);
+	Lv2Proc::saveSettings(doc, that);
 }
 
 
@@ -75,7 +75,7 @@ void Lv2FxControls::saveSettings(QDomDocument &doc, QDomElement &that)
 
 void Lv2FxControls::loadSettings(const QDomElement &that)
 {
-	Lv2ControlBase::loadSettings(that);
+	Lv2Proc::loadSettings(that);
 }
 
 
@@ -83,7 +83,7 @@ void Lv2FxControls::loadSettings(const QDomElement &that)
 
 int Lv2FxControls::controlCount()
 {
-	return static_cast<int>(Lv2ControlBase::controlCount());
+	return static_cast<int>(Lv2Proc::controlCount());
 }
 
 

@@ -26,7 +26,7 @@
 #define LV2_FX_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
-#include "Lv2ViewBase.h"
+#include "Lv2ProcView.h"
 
 namespace lmms
 {
@@ -36,7 +36,7 @@ class Lv2FxControls;
 namespace gui
 {
 
-class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
+class Lv2FxControlDialog : public EffectControlDialog, public Lv2ProcView
 {
 	Q_OBJECT
 

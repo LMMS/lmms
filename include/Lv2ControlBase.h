@@ -33,7 +33,7 @@
 #include <memory>
 
 #include "DataFile.h"
-#include "LinkedModelGroups.h"
+#include "ModelGroups.h"
 #include "lmms_export.h"
 #include "Plugin.h"
 
@@ -72,7 +72,7 @@ class SampleFrame;
 	* this class can not override virtuals of Instrument or EffectControls, so
 	  it will offer functions that must be called by virtuals in its child class
 */
-class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
+class LMMS_EXPORT Lv2ControlBase : public ModelGroup
 {
 public:
 	static Plugin::Type check(const LilvPlugin* m_plugin,
@@ -98,16 +98,10 @@ protected:
 	//! @param uri the Lv2 URI telling this class what plugin to construct
 	Lv2ControlBase(class Model *that, const QString& uri);
 	Lv2ControlBase(const Lv2ControlBase&) = delete;
-	~Lv2ControlBase() override;
+	~Lv2ControlBase();
 	void reload();
 
 	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
-
-	/*
-		overrides
-	*/
-	LinkedModelGroup* getGroup(std::size_t idx) override;
-	const LinkedModelGroup* getGroup(std::size_t idx) const override;
 
 	/*
 		utils for the run thread
