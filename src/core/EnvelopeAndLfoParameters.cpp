@@ -299,11 +299,6 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 {
 	QMutexLocker m(&m_paramMutex);
 
-	if( _frame < 0 || _release_begin < 0 )
-	{
-		return;
-	}
-
 	fillLfoLevel( _buf, _frame, _frames );
 
 	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
