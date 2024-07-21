@@ -21,7 +21,7 @@ if(LMMS_HAVE_GIG)
 	add_compile_options("-fexceptions")
 
 	# disable deprecated check for mingw-x-libgig
-	if(LMMS_BUILD_WIN32)
+	if(LMMS_BUILD_WIN32 AND NOT MSVC)
 		add_compile_options("-Wno-deprecated")
 	endif(LMMS_BUILD_WIN32)
 
