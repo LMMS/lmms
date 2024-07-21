@@ -88,7 +88,7 @@ namespace Lv2Ports
 	* this class can not override virtuals of Instrument or EffectControls, so
 	  it will offer functions that must be called by virtuals in its child class
 */
-class Lv2Proc : public ModelGroup
+class LMMS_EXPORT Lv2Proc : public ModelGroup
 {
 	friend class Lv2ProcSuspender;
 public:
