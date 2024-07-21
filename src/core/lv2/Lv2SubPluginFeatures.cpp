@@ -234,7 +234,7 @@ QString Lv2SubPluginFeatures::description(
 		}
 		return result.trimmed();
 	}
-	return QString::fromUtf8("failed to load description");
+	return QObject::tr("failed to load description");
 }
 
 
