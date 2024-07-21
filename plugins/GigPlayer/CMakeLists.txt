@@ -23,7 +23,7 @@ if(LMMS_HAVE_GIG)
 	# disable deprecated check for mingw-x-libgig
 	if(LMMS_BUILD_WIN32 AND NOT MSVC)
 		add_compile_options("-Wno-deprecated")
-	endif(LMMS_BUILD_WIN32)
+	endif()
 
 	build_plugin(gigplayer
 		GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui
