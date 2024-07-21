@@ -50,7 +50,7 @@ class AutomatableModel;
 	* Load/Save routines
 	* Add/Remove routines
 */
-class ModelGroup
+class LMMS_EXPORT ModelGroup
 {
 public:
 
