@@ -36,7 +36,7 @@ namespace lmms::gui {
 class Control;
 }
 
-#include "ModelGroupViews.h"
+#include "ModelGroupView.h"
 #include "lmms_export.h"
 #include "Lv2Basics.h"
 

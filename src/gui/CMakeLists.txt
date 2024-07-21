@@ -17,7 +17,7 @@ SET(LMMS_SRCS
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
-	gui/ModelGroupViews.cpp
+	gui/ModelGroupView.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
 	gui/Lv2ProcView.cpp

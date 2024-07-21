@@ -1,5 +1,5 @@
 /*
- * ModelGroups.cpp - base classes for groups of models
+ * ModelGroup.cpp - base classes for groups of models
  *
  * Copyright (c) 2019-2024 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -25,7 +25,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 
-#include "ModelGroups.h"
+#include "ModelGroup.h"
 
 
 #include "AutomatableModel.h"
@@ -73,7 +73,7 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 	m_models.emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
 	/*
 	 * The following code is currently not used because Models can not be removed
-	 * in no kind of implementation that uses ModelGroups. The code is
+	 * in no kind of implementation that uses ModelGroup. The code is
 	 * deactivated because this is not a QObject anymore (an ugly connection
 	 * handler would be required for this)
 	 */

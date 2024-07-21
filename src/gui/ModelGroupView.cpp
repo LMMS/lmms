@@ -1,5 +1,5 @@
 /*
- * ModelGroupViews.h - view for groups of models
+ * ModelGroupView.h - view for groups of models
  *
  * Copyright (c) 2019-2024 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -22,12 +22,12 @@
  *
  */
 
-#include "ModelGroupViews.h"
+#include "ModelGroupView.h"
 
 #include <QPushButton>
 #include "Controls.h"
 #include "ControlLayout.h"
-#include "ModelGroups.h"
+#include "ModelGroup.h"
 
 namespace lmms::gui
 {

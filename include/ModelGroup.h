@@ -1,5 +1,5 @@
 /*
- * ModelGroups.h - base classes for groups of models
+ * ModelGroup.h - base classes for groups of models
  *
  * Copyright (c) 2019-2024 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -36,7 +36,7 @@ namespace lmms
 {
 
 /**
-	@file ModelGroups.h
+	@file ModelGroup.h
 	See Lv2Proc.h for example usage
 */
 

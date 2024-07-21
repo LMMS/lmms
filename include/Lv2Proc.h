@@ -35,7 +35,7 @@
 
 #include <ringbuffer/ringbuffer.h>
 
-#include "ModelGroups.h"
+#include "ModelGroup.h"
 #include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
 #include "Lv2Features.h"

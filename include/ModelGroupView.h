@@ -1,5 +1,5 @@
 /*
- * ModelGroupViews.h - view for groups of models
+ * ModelGroupView.h - view for groups of models
  *
  * Copyright (c) 2019-2024 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -42,7 +42,7 @@ namespace gui
 class Control;
 
 /**
-	@file ModelGroupViews.h
+	@file ModelGroupView.h
 	See Lv2ViewBase.h for example usage
 */
 
@@ -69,7 +69,7 @@ protected:
 private:
 	class ModelGroup* m_model;
 
-	//! column number in surrounding grid in ModelGroupsView
+	//! column number in surrounding grid in ModelGroupView
 	std::size_t m_colNum;
 	class ControlLayout* m_layout;
 	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
