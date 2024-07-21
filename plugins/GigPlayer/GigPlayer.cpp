@@ -1162,8 +1162,8 @@ bool GigSample::convertSampleRate(std::vector<SampleFrame>& oldBuf, std::vector<
 	SRC_DATA src_data{
 		/* .data_in */ reinterpret_cast<const float*>(oldBuf.data()),
 		/* .data_out */ reinterpret_cast<float*>(newBuf.data()),
-		/* .input_frames */ oldSize,
-		/* .output_frames */ newSize,
+		/* .input_frames */ static_cast<long int>(oldSize),
+		/* .output_frames */ static_cast<long int>(newSize),
 		/* .input_frames_used */ 0,
 		/* .output_frames_gen */ 0,
 		/* .end_of_input */ 0,
