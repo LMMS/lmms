@@ -85,7 +85,7 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 						eraseModel(model->objectName());
 					}
 				},
-				Qt::DirectConnection); */
+				Qt::DirectConnection);
 #endif
 	// View needs to create another child view, e.g. a new knob:
 	emit m_parent->dataChanged();
