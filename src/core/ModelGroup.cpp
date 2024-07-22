@@ -80,9 +80,9 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 # if 0
 	QObject::connect(model, &AutomatableModel::destroyed,
 				this, [this, model](jo_id_t){
-					if(containsModel(model->objectName()))
+					if (const auto it = m_models.find(model->objectName().toStdString()); it != m_models.end())
 					{
-						eraseModel(model->objectName());
+						m_models.erase(it);
 					}
 				},
 				Qt::DirectConnection);
@@ -96,26 +96,11 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 
 void ModelGroup::removeModel(AutomatableModel* mdl)
 {
-	if(containsModel(mdl->objectName()))
+	if (const auto it = m_models.find(mdl->objectName().toStdString()); it != m_models.end())
 	{
-		eraseModel(mdl->objectName());
+		m_models.erase(it);
 	}
 }
 
-
-
-
-bool ModelGroup::eraseModel(const QString& name)
-{
-	return m_models.erase(name.toStdString()) > 0;
-}
-
-
-
-
-bool ModelGroup::containsModel(const QString &name) const
-{
-	return m_models.find(name.toStdString()) != m_models.end();
-}
 
 } // namespace lmms

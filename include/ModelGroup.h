@@ -97,11 +97,6 @@ protected:
 	void removeModel(AutomatableModel *);
 
 private:
-	//! Remove a model from the map, return true if a model was erased
-	bool eraseModel(const QString& name);
-	//! Returns whether a model named "name" exists in the map
-	bool containsModel(const QString &name) const;
-
 	//! models for the controls
 	//! @note The AutomatableModels behind the ModelInfo are not owned,
 	//!   but referenced after `addModel` is being called.
