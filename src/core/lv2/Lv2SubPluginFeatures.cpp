@@ -41,8 +41,8 @@ namespace lmms
 {
 
 
-const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k)
+const LilvPlugin* Lv2SubPluginFeatures::getPlugin(
+	const Plugin::Descriptor::SubPluginFeatures::Key& k)
 {
 	const LilvPlugin* result = Engine::getLv2Manager()->
 		getPlugin(k.attributes["uri"]);
@@ -53,7 +53,7 @@ const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
 
 
 
-QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
+QString Lv2SubPluginFeatures::pluginName(const LilvPlugin* plug)
 {
 	return qStringFromPluginNode(plug, lilv_plugin_get_name);
 }
@@ -89,7 +89,7 @@ static void addHbox(QWidget* parent, QString left, QString right)
 		rightLabel->setTextInteractionFlags(rightLabel->textInteractionFlags()
 			| Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 		rightLabel->setTextFormat(Qt::RichText);
-		QObject::connect(rightLabel, &QLabel::linkActivated, [](const QString & link){
+		QObject::connect(rightLabel, &QLabel::linkActivated, [](const QString& link){
 			QDesktopServices::openUrl(link);});
 	}
 	rightLabel->setText(right);
@@ -112,7 +112,7 @@ static void addLabel(QWidget* parent, QString left, QString right)
 		lbl->setTextInteractionFlags(lbl->textInteractionFlags()
 			| Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 		lbl->setTextFormat(Qt::RichText);
-		QObject::connect(lbl, &QLabel::linkActivated, [](const QString & link){
+		QObject::connect(lbl, &QLabel::linkActivated, [](const QString& link){
 			QDesktopServices::openUrl(link);});
 	}
 	lbl->setText(left + right);
@@ -121,7 +121,7 @@ static void addLabel(QWidget* parent, QString left, QString right)
 
 
 
-AutoLilvNodes pluginGetValues(const LilvPlugin *plug, const char* valueUri)
+AutoLilvNodes pluginGetValues(const LilvPlugin* plug, const char* valueUri)
 {
 	assert(plug);
 	AutoLilvNode valueUriNode{Engine::getLv2Manager()->uri(valueUri)};
@@ -131,10 +131,10 @@ AutoLilvNodes pluginGetValues(const LilvPlugin *plug, const char* valueUri)
 
 
 
-void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
-													const Key *k) const
+void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget* parent,
+													const Key* k) const
 {
-	const LilvPlugin *plug = getPlugin(*k);
+	const LilvPlugin* plug = getPlugin(*k);
 
 	QString pluginNameAndVersion = "<b>" + pluginName(plug) + "</b>";
 	{
@@ -197,7 +197,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 
 
 QString Lv2SubPluginFeatures::additionalFileExtensions(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k;
 	// lv2 only loads .lv2 files
@@ -209,7 +209,7 @@ QString Lv2SubPluginFeatures::additionalFileExtensions(
 
 
 QString Lv2SubPluginFeatures::displayName(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	return pluginName(getPlugin(k));
 }
@@ -218,10 +218,10 @@ QString Lv2SubPluginFeatures::displayName(
 
 
 QString Lv2SubPluginFeatures::description(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	auto mgr = Engine::getLv2Manager();
-	const LilvPlugin *plug = mgr->getPlugin(k.attributes["uri"]);
+	const LilvPlugin* plug = mgr->getPlugin(k.attributes["uri"]);
 	if (plug)
 	{
 		QString result{lilv_node_as_uri(lilv_plugin_get_uri(plug))};
@@ -240,8 +240,8 @@ QString Lv2SubPluginFeatures::description(
 
 
 
-const PixmapLoader *Lv2SubPluginFeatures::logo(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+const PixmapLoader* Lv2SubPluginFeatures::logo(
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k;
 	return nullptr; // Lv2 currently does not support this
@@ -250,11 +250,11 @@ const PixmapLoader *Lv2SubPluginFeatures::logo(
 
 
 
-void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
-												KeyList &kl) const
+void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc,
+												KeyList& kl) const
 {
-	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
-	for (const auto &uriInfoPair : *lv2Mgr)
+	Lv2Manager* lv2Mgr = Engine::getLv2Manager();
+	for (const auto& uriInfoPair : *lv2Mgr)
 	{
 		if (uriInfoPair.second.type() == m_type && uriInfoPair.second.isValid())
 		{
