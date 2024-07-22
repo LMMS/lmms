@@ -22,52 +22,38 @@
  *
  */
 
+#include "ModelGroup.h"
+
 #include <QDomDocument>
 #include <QDomElement>
 
-#include "ModelGroup.h"
-
-
 #include "AutomatableModel.h"
 
-
-
-namespace lmms
-{
+namespace lmms {
 
 /*
 	ModelGroup
 */
 
-
-void ModelGroup::saveSettings(QDomDocument &doc, QDomElement &that)
+void ModelGroup::saveSettings(QDomDocument& doc, QDomElement& that)
 {
 	QDomElement models = doc.createElement("models");
 	that.appendChild(models);
-	foreach_model([&doc, &models](const std::string& , ModelInfo& inf)
-	{
+	foreach_model([&doc, &models](const std::string&, ModelInfo& inf) {
 		inf.m_model->saveSettings(doc, models, inf.m_name); /* TODO: m_name useful */
 	});
 }
 
-
-
-
-void ModelGroup::loadSettings(const QDomElement &that)
+void ModelGroup::loadSettings(const QDomElement& that)
 {
 	QDomElement models = that.firstChildElement("models");
-	foreach_model([&models](const std::string& , ModelInfo& inf)
-	{
+	foreach_model([&models](const std::string&, ModelInfo& inf) {
 		// try to load, if it fails, this will load a sane initial value
 		inf.m_model->loadSettings(models, inf.m_name); /* TODO: m_name useful */
 	});
 }
 
-
-
-
-
-void ModelGroup::addModel(AutomatableModel *model, const QString &name)
+void ModelGroup::addModel(AutomatableModel* model, const QString& name)
 {
 	model->setObjectName(name);
 	m_models.emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
@@ -77,7 +63,7 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 	 * deactivated because this is not a QObject anymore (an ugly connection
 	 * handler would be required for this)
 	 */
-# if 0
+#if 0
 	QObject::connect(model, &AutomatableModel::destroyed,
 				this, [this, model](jo_id_t){
 					if (const auto it = m_models.find(model->objectName().toStdString()); it != m_models.end())
@@ -91,16 +77,9 @@ void ModelGroup::addModel(AutomatableModel *model, const QString &name)
 	emit m_parent->dataChanged();
 }
 
-
-
-
 void ModelGroup::removeModel(AutomatableModel* mdl)
 {
-	if (const auto it = m_models.find(mdl->objectName().toStdString()); it != m_models.end())
-	{
-		m_models.erase(it);
-	}
+	if (const auto it = m_models.find(mdl->objectName().toStdString()); it != m_models.end()) { m_models.erase(it); }
 }
-
 
 } // namespace lmms

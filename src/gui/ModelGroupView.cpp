@@ -25,35 +25,28 @@
 #include "ModelGroupView.h"
 
 #include <QPushButton>
-#include "Controls.h"
+
 #include "ControlLayout.h"
+#include "Controls.h"
 #include "ModelGroup.h"
 
-namespace lmms::gui
-{
+namespace lmms::gui {
 
-
-ModelGroupView::ModelGroupView(QWidget* parent,
-	lmms::ModelGroup *model) :
-	m_model(model),
-	m_layout(new ControlLayout(parent))
+ModelGroupView::ModelGroupView(QWidget* parent, lmms::ModelGroup* model)
+	: m_model(model)
+	, m_layout(new ControlLayout(parent))
 {
 	// This is required to remove the focus of the line edit
 	// when e.g. another spin box is being clicked.
 	// Removing the focus is wanted because in many cases, the user wants to
 	// quickly play notes on the virtual keyboard.
-	parent->setFocusPolicy( Qt::StrongFocus );  // TODO: here?
+	parent->setFocusPolicy(Qt::StrongFocus); // TODO: here?
 }
 
-
-
-
-void ModelGroupView::modelChanged(ModelGroup *modelGroup)
+void ModelGroupView::modelChanged(ModelGroup* modelGroup)
 {
 	// reconnect models
-	modelGroup->foreach_model([this](const std::string& str,
-		const ModelGroup::ModelInfo& minf)
-	{
+	modelGroup->foreach_model([this](const std::string& str, const ModelGroup::ModelInfo& minf) {
 		auto itr = m_widgets.find(str);
 		// in case there are new or deleted widgets, the subclass has already
 		// modified m_widgets, so this will go into the else case
@@ -62,20 +55,14 @@ void ModelGroupView::modelChanged(ModelGroup *modelGroup)
 			// no widget? this can happen when the whole view is being destroyed
 			// (for some strange reasons)
 		}
-		else
-		{
-			itr->second->setModel(minf.m_model);
-		}
+		else { itr->second->setModel(minf.m_model); }
 	});
 
 	m_model = modelGroup;
 }
 
-
-
-
-void ModelGroupView::addControl(QWidget* parent, Control* ctrl, const std::string& id,
-	const std::string &display, bool removable)
+void ModelGroupView::addControl(
+	QWidget* parent, Control* ctrl, const std::string& id, const std::string& display, bool removable)
 {
 	if (ctrl)
 	{
@@ -93,9 +80,6 @@ void ModelGroupView::addControl(QWidget* parent, Control* ctrl, const std::strin
 
 	if (parent->isHidden()) { parent->setHidden(false); }
 }
-
-
-
 
 void ModelGroupView::removeControl(const QString& key)
 {
@@ -118,13 +102,9 @@ void ModelGroupView::removeControl(const QString& key)
 	}
 }
 
-
-
-
 void ModelGroupView::removeFocusFromSearchBar()
 {
 	m_layout->removeFocusFromSearchBar();
 }
-
 
 } // namespace lmms::gui

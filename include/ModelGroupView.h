@@ -25,19 +25,15 @@
 #ifndef LMMS_GUI_MODEL_GROUP_VIEWS_H
 #define LMMS_GUI_MODEL_GROUP_VIEWS_H
 
+#include <QWidget>
 #include <cstddef>
 #include <memory>
-#include <QWidget>
 
-namespace lmms
-{
-
+namespace lmms {
 
 class ModelGroup;
 
-
-namespace gui
-{
+namespace gui {
 
 class Control;
 
@@ -45,7 +41,6 @@ class Control;
 	@file ModelGroupView.h
 	See Lv2ViewBase.h for example usage
 */
-
 
 class ModelGroupView
 {
@@ -59,10 +54,9 @@ public:
 protected:
 	//! Add a control to this widget
 	//! @warning This widget will own this control, do not free it
-	void addControl(QWidget *parent, Control* ctrl, const std::string &id,
-		const std::string& display, bool removable);
+	void addControl(QWidget* parent, Control* ctrl, const std::string& id, const std::string& display, bool removable);
 
-	void removeControl(const QString &key);
+	void removeControl(const QString& key);
 
 	void removeFocusFromSearchBar();
 

@@ -32,8 +32,7 @@
 class QDomDocument;
 class QDomElement;
 
-namespace lmms
-{
+namespace lmms {
 
 /**
 	@file ModelGroup.h
@@ -53,7 +52,6 @@ class AutomatableModel;
 class LMMS_EXPORT ModelGroup
 {
 public:
-
 	// models
 	struct ModelInfo
 	{
@@ -61,21 +59,22 @@ public:
 		AutomatableModel* m_model;
 		ModelInfo() { /* hopefully no one will use this */ } // TODO: remove?
 		ModelInfo(const QString& name, AutomatableModel* model)
-			: m_name(name), m_model(model) {}
+			: m_name(name)
+			, m_model(model)
+		{
+		}
 	};
 
 	// TODO: refactor those 2
-	template<class Functor>
-	void foreach_model(const Functor& ftor)
+	template <class Functor> void foreach_model(const Functor& ftor)
 	{
-		for (auto& [name, info] :  m_models)
+		for (auto& [name, info] : m_models)
 		{
 			ftor(name, info);
 		}
 	}
 
-	template<class Functor>
-	void foreach_model(const Functor& ftor) const
+	template <class Functor> void foreach_model(const Functor& ftor) const
 	{
 		for (const auto& [name, info] : m_models)
 		{
@@ -84,7 +83,10 @@ public:
 	}
 
 protected:
-	ModelGroup(Model *parent) : m_parent(parent) {}
+	ModelGroup(Model* parent)
+		: m_parent(parent)
+	{
+	}
 
 	void saveSettings(class QDomDocument& doc, class QDomElement& that);
 	void loadSettings(const class QDomElement& that);
@@ -94,7 +96,7 @@ protected:
 	//! Register a further model
 	void addModel(AutomatableModel* model, const QString& name);
 	//! Remove a model
-	void removeModel(AutomatableModel *);
+	void removeModel(AutomatableModel*);
 
 private:
 	//! models for the controls
@@ -104,7 +106,6 @@ private:
 
 	Model* m_parent;
 };
-
 
 } // namespace lmms
 
