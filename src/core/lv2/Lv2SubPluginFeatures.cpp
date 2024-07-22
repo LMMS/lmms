@@ -69,7 +69,7 @@ Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::Type type) :
 
 
 
-void addHbox(QWidget* parent, const char* left, QString right)
+static void addHbox(QWidget* parent, QString left, QString right)
 {
 	if (right.isEmpty()) { return; }
 
@@ -79,7 +79,7 @@ void addHbox(QWidget* parent, const char* left, QString right)
 	l->setSpacing(0);
 
 	auto leftLabel = new QLabel(container);
-	leftLabel->setText(QWidget::tr(left));
+	leftLabel->setText(left);
 	leftLabel->setAlignment(Qt::AlignTop);
 
 	auto rightLabel = new QLabel(container);
@@ -102,7 +102,7 @@ void addHbox(QWidget* parent, const char* left, QString right)
 
 
 
-void addLabel(QWidget* parent, const char* left, QString right)
+static void addLabel(QWidget* parent, QString left, QString right)
 {
 	auto lbl = new QLabel(parent);
 	if (right.isEmpty()) { return; }
@@ -115,7 +115,7 @@ void addLabel(QWidget* parent, const char* left, QString right)
 		QObject::connect(lbl, &QLabel::linkActivated, [](const QString & link){
 			QDesktopServices::openUrl(link);});
 	}
-	lbl->setText(QWidget::tr(left) + right);
+	lbl->setText(left + right);
 }
 
 
@@ -160,10 +160,10 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 		}
 	}
 
-	addLabel(parent, "URI: ", lilv_node_as_uri(lilv_plugin_get_uri(plug)));
-	addHbox(parent, "Project: ",
+	addLabel(parent, QObject::tr("URI: "), lilv_node_as_uri(lilv_plugin_get_uri(plug)));
+	addHbox(parent, QObject::tr("Project: "),
 		qStringFromPluginNode(plug, lilv_plugin_get_project));
-	addHbox(parent, "Maker: ",
+	addHbox(parent, QObject::tr("Maker: "),
 		qStringFromPluginNode(plug, lilv_plugin_get_author_name));
 	{
 		AutoLilvNodes homepages = pluginGetValues(plug, LILV_NS_DOAP "homepage");
@@ -171,12 +171,12 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 		{
 			const char* homepage = lilv_node_as_uri(lilv_nodes_get_first(homepages.get()));
 			QString homepageStr{homepage};
-			addLabel(parent, "Homepage: ", homepageStr);
+			addLabel(parent, QObject::tr("Homepage: "), homepageStr);
 		}
 	}
 	{
 		AutoLilvNodes licenses = pluginGetValues(plug, LILV_NS_DOAP "license");
-		addLabel(parent, "License: ",
+		addLabel(parent, QObject::tr("License: "),
 			licenses
 			? lilv_node_as_uri(lilv_nodes_get_first(licenses.get()))
 			: "<unknown>");
@@ -187,7 +187,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 		char* filename = lilv_file_uri_parse(libraryUri, nullptr);
 		if (filename)
 		{
-			new QLabel(QWidget::tr("File: %1").arg(filename), parent);
+			new QLabel(QObject::tr("File: %1").arg(filename), parent);
 			lilv_free(filename);
 		}
 	}
