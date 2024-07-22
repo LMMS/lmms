@@ -85,12 +85,11 @@ static void addHbox(QWidget* parent, QString left, QString right)
 	auto rightLabel = new QLabel(container);
 	if (right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
 	{
-		right = QString("<a href=\"%1\">%2</a>").arg(right, right);
+		right = QString("<a href=\"%1\">%1</a>").arg(right);
 		rightLabel->setTextInteractionFlags(rightLabel->textInteractionFlags()
 			| Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 		rightLabel->setTextFormat(Qt::RichText);
-		QObject::connect(rightLabel, &QLabel::linkActivated, [](const QString& link){
-			QDesktopServices::openUrl(link);});
+		rightLabel->setOpenExternalLinks(true);
 	}
 	rightLabel->setText(right);
 	rightLabel->setWordWrap(true);
@@ -108,12 +107,11 @@ static void addLabel(QWidget* parent, QString left, QString right)
 	if (right.isEmpty()) { return; }
 	if (right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
 	{
-		right = QString("<a href=\"%1\">%2</a>").arg(right, right);
+		right = QString("<a href=\"%1\">%1</a>").arg(right);
 		lbl->setTextInteractionFlags(lbl->textInteractionFlags()
 			| Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 		lbl->setTextFormat(Qt::RichText);
-		QObject::connect(lbl, &QLabel::linkActivated, [](const QString& link){
-			QDesktopServices::openUrl(link);});
+		lbl->setOpenExternalLinks(true);
 	}
 	lbl->setText(left + right);
 }
