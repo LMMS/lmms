@@ -88,8 +88,8 @@ protected:
 	{
 	}
 
-	void saveSettings(class QDomDocument& doc, class QDomElement& that);
-	void loadSettings(const class QDomElement& that);
+	void saveSettings(QDomDocument& doc, QDomElement& that);
+	void loadSettings(const QDomElement& that);
 
 	std::size_t size() const { return m_models.size(); }
 

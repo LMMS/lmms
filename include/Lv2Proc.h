@@ -48,6 +48,8 @@
 namespace lmms
 {
 
+class AutomatableModel;
+class MidiEvent;
 class PluginIssue;
 class SampleFrame;
 
@@ -161,13 +163,13 @@ public:
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 
-	void handleMidiInputEvent(const class MidiEvent &event,
+	void handleMidiInputEvent(const MidiEvent &event,
 		const TimePos &time, f_cnt_t offset);
 
 	/*
 		misc
 	 */
-	class AutomatableModel *modelAtPort(const QString &uri); // unused currently
+	AutomatableModel *modelAtPort(const QString &uri); // unused currently
 	std::size_t controlCount() const { return ModelGroup::size(); }
 	bool hasNoteInput() const;
 	const LilvPlugin* getPlugin() const { return m_plugin; }

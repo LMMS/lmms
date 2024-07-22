@@ -25,9 +25,13 @@
 #ifndef LMMS_GUI_MODEL_GROUP_VIEWS_H
 #define LMMS_GUI_MODEL_GROUP_VIEWS_H
 
-#include <QWidget>
 #include <cstddef>
+#include <map>
 #include <memory>
+#include <string>
+
+class QString;
+class QWidget;
 
 namespace lmms {
 
@@ -36,6 +40,7 @@ class ModelGroup;
 namespace gui {
 
 class Control;
+class ControlLayout;
 
 /**
 	@file ModelGroupView.h
@@ -61,12 +66,12 @@ protected:
 	void removeFocusFromSearchBar();
 
 private:
-	class ModelGroup* m_model;
+	ModelGroup* m_model;
 
 	//! column number in surrounding grid in ModelGroupView
 	std::size_t m_colNum;
-	class ControlLayout* m_layout;
-	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
+	ControlLayout* m_layout;
+	std::map<std::string, std::unique_ptr<Control>> m_widgets;
 };
 
 } // namespace gui
