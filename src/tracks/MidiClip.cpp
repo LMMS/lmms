@@ -474,6 +474,7 @@ MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
 	auto& clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
+	if (clipNum + offset < 0 || clipNum + offset > clips.size() - 1) { return nullptr; }
 	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
 }
 
