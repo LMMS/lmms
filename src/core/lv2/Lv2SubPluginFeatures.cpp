@@ -182,10 +182,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget* parent,
 	{
 		const LilvNode* libraryUriNode = lilv_plugin_get_bundle_uri(plug);
 		const char* libraryUri = lilv_node_as_uri(libraryUriNode);
-		auto filename = std::unique_ptr<char, void(*)(char*)>(
-			lilv_file_uri_parse(libraryUri, nullptr),
-			[](char* ptr) { lilv_free(ptr); }
-		);
+		auto filename = AutoLilvPtr<char>(lilv_file_uri_parse(libraryUri, nullptr));
 		if (filename)
 		{
 			new QLabel(QObject::tr("File: %1").arg(filename.get()), parent);

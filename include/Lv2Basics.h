@@ -37,6 +37,12 @@
 namespace lmms
 {
 
+template<class T>
+struct LilvPtrDeleter
+{
+	void operator()(T* n) { lilv_free(static_cast<void*>(n)); }
+};
+
 struct LilvNodeDeleter
 {
 	void operator()(LilvNode* n) { lilv_node_free(n); }
@@ -52,6 +58,8 @@ struct LilvScalePointsDeleter
 	void operator()(LilvScalePoints* s) { lilv_scale_points_free(s); }
 };
 
+template<class T>
+using AutoLilvPtr = std::unique_ptr<T, LilvPtrDeleter<T>>;
 using AutoLilvNode = std::unique_ptr<LilvNode, LilvNodeDeleter>;
 using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
 using AutoLilvScalePoints = std::unique_ptr<LilvScalePoints, LilvScalePointsDeleter>;
