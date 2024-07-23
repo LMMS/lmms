@@ -140,6 +140,11 @@ public:
 		return m_autoScroll;
 	}
 
+	AutoScrollState continuousAutoScroll() const
+	{
+		return m_continuousAutoScroll;
+	}
+
 	inline void setPixelsPerBar( float ppb )
 	{
 		m_ppb = ppb;
@@ -168,6 +173,7 @@ public slots:
 		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
+	void toggleContinuousAutoScroll( int _n );
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
@@ -213,6 +219,7 @@ private:
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
 	AutoScrollState m_autoScroll = AutoScrollState::Enabled;
+	AutoScrollState m_continuousAutoScroll = AutoScrollState::Disabled;
 
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;

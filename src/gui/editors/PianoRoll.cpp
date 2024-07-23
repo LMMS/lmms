@@ -41,6 +41,8 @@
 #include <QStyleOption>
 #include <QToolButton>
 
+#include <QDebug>
+
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -4476,6 +4478,13 @@ void PianoRoll::autoScroll( const TimePos & t )
 	m_scrollBack = false;
 }
 
+void PianoRoll::continuousAutoScroll( const TimePos & t )
+{
+	const int w = width() - m_whiteKeyWidth;
+	//m_leftRightScroll->setValue( t.getTicks() );
+	m_leftRightScroll->setValue( std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0 ) );
+	m_scrollBack = false;
+}
 
 
 
@@ -4487,6 +4496,13 @@ void PianoRoll::updatePosition( const TimePos & t )
 		) || m_scrollBack )
 	{
 		autoScroll( t );
+	}
+	if( ( Engine::getSong()->isPlaying()
+			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
+			&& m_timeLine->continuousAutoScroll() == TimeLineWidget::AutoScrollState::Enabled
+		) || m_scrollBack )
+	{
+		continuousAutoScroll( t );
 	}
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
