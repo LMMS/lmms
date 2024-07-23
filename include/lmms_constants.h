@@ -36,6 +36,7 @@ constexpr long double LD_PI_R = 1.0 / LD_PI;
 constexpr long double LD_PI_SQR = LD_PI * LD_PI;
 constexpr long double LD_E = 2.71828182845904523536028747135266249775724709369995;
 constexpr long double LD_E_R = 1.0 / LD_E;
+constexpr long double LD_SQRT_2 = 1.41421356237309504880168872420969807856967187537695;
 
 constexpr double D_PI = (double) LD_PI;
 constexpr double D_2PI = (double) LD_2PI;
@@ -44,6 +45,7 @@ constexpr double D_PI_R = (double) LD_PI_R;
 constexpr double D_PI_SQR = (double) LD_PI_SQR;
 constexpr double D_E = (double) LD_E;
 constexpr double D_E_R = (double) LD_E_R;
+constexpr double D_SQRT_2 = (double) LD_SQRT_2;
 
 constexpr float F_PI = (float) LD_PI;
 constexpr float F_2PI = (float) LD_2PI;
@@ -52,6 +54,7 @@ constexpr float F_PI_R = (float) LD_PI_R;
 constexpr float F_PI_SQR = (float) LD_PI_SQR;
 constexpr float F_E = (float) LD_E;
 constexpr float F_E_R = (float) LD_E_R;
+constexpr float F_SQRT_2 = (float) LD_SQRT_2;
 
 // Microtuner
 constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
@@ -62,13 +65,13 @@ constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per
 constexpr int LOWEST_LOG_FREQ = 5;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
-enum FREQUENCY_RANGES
+enum class FrequencyRange
 {
-	FRANGE_FULL = 0,
-	FRANGE_AUDIBLE,
-	FRANGE_BASS,
-	FRANGE_MIDS,
-	FRANGE_HIGH
+	Full = 0,
+	Audible,
+	Bass,
+	Mids,
+	High
 };
 
 constexpr int FRANGE_AUDIBLE_START = 20;
@@ -83,12 +86,12 @@ constexpr int FRANGE_HIGH_END = 20000;
 // Amplitude ranges (in dBFS).
 // Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
 // Doubling or halving the amplitude produces 3 dB difference.
-enum AMPLITUDE_RANGES
+enum class AmplitudeRange
 {
-	ARANGE_EXTENDED = 0,
-	ARANGE_AUDIBLE,
-	ARANGE_LOUD,
-	ARANGE_SILENT
+	Extended = 0,
+	Audible,
+	Loud,
+	Silent
 };
 
 constexpr int ARANGE_EXTENDED_START = -80;

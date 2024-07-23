@@ -43,8 +43,8 @@ namespace lmms
 MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
-	m_amount( amount, 0, 1, 0.001, nullptr,
-			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
+	m_amount(amount, 0, 1, 0.001f, nullptr,
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->m_channelIndex).arg(m_to->m_channelIndex))
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
@@ -64,18 +64,17 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
+	m_buffer( new SampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
 	m_soloModel( false, _parent ),
-	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
+	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
 	m_name(),
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
-	m_hasColor( false ),
 	m_dependenciesMet(0)
 {
-	BufferManager::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
@@ -100,7 +99,7 @@ inline void MixerChannel::processed()
 
 void MixerChannel::incrementDeps()
 {
-	int i = m_dependenciesMet++ + 1;
+	const auto i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
@@ -135,7 +134,7 @@ void MixerChannel::doProcessing()
 				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
-				sampleFrame * ch_buf = sender->m_buffer;
+				SampleFrame* ch_buf = sender->m_buffer;
 
 				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
@@ -172,9 +171,9 @@ void MixerChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		AudioEngine::StereoSample peakSamples = Engine::audioEngine()->getPeakValues(m_buffer, fpp);
-		m_peakLeft = qMax( m_peakLeft, peakSamples.left * v );
-		m_peakRight = qMax( m_peakRight, peakSamples.right * v );
+		SampleFrame peakSamples = getAbsPeakValues(m_buffer, fpp);
+		m_peakLeft = std::max(m_peakLeft, peakSamples[0] * v);
+		m_peakRight = std::max(m_peakRight, peakSamples[1] * v);
 	}
 	else
 	{
@@ -201,9 +200,9 @@ Mixer::Mixer() :
 
 Mixer::~Mixer()
 {
-	while( ! m_mixerRoutes.isEmpty() )
+	while (!m_mixerRoutes.empty())
 	{
-		deleteChannelSend( m_mixerRoutes.first() );
+		deleteChannelSend(m_mixerRoutes.front());
 	}
 	while( m_mixerChannels.size() )
 	{
@@ -236,7 +235,7 @@ int Mixer::createChannel()
 
 void Mixer::activateSolo()
 {
-	for (int i = 1; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		m_mixerChannels[i]->m_muteBeforeSolo = m_mixerChannels[i]->m_muteModel.value();
 		m_mixerChannels[i]->m_muteModel.setValue( true );
@@ -245,7 +244,7 @@ void Mixer::activateSolo()
 
 void Mixer::deactivateSolo()
 {
-	for (int i = 1; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		m_mixerChannels[i]->m_muteModel.setValue( m_mixerChannels[i]->m_muteBeforeSolo );
 	}
@@ -261,7 +260,7 @@ void Mixer::toggledSolo()
 		m_mixerChannels[m_lastSoloed]->m_soloModel.setValue( false );
 	}
 	//determine the soloed channel
-	for (int i = 0; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
 		if (m_mixerChannels[i]->m_soloModel.value() == true)
 			soloedChan = i;
@@ -293,12 +292,15 @@ void Mixer::deleteChannel( int index )
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+
+	auto& songTracks = Engine::getSong()->tracks();
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
+	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
 	for( Track* t : tracks )
 	{
-		if( t->type() == Track::InstrumentTrack )
+		if( t->type() == Track::Type::Instrument )
 		{
 			auto inst = dynamic_cast<InstrumentTrack*>(t);
 			int val = inst->mixerChannelModel()->value(0);
@@ -314,7 +316,7 @@ void Mixer::deleteChannel( int index )
 				inst->mixerChannelModel()->setValue(val-1);
 			}
 		}
-		else if( t->type() == Track::SampleTrack )
+		else if( t->type() == Track::Type::Sample )
 		{
 			auto strk = dynamic_cast<SampleTrack*>(t);
 			int val = strk->mixerChannelModel()->value(0);
@@ -335,13 +337,13 @@ void Mixer::deleteChannel( int index )
 	MixerChannel * ch = m_mixerChannels[index];
 
 	// delete all of this channel's sends and receives
-	while( ! ch->m_sends.isEmpty() )
+	while (!ch->m_sends.empty())
 	{
-		deleteChannelSend( ch->m_sends.first() );
+		deleteChannelSend(ch->m_sends.front());
 	}
-	while( ! ch->m_receives.isEmpty() )
+	while (!ch->m_receives.empty())
 	{
-		deleteChannelSend( ch->m_receives.first() );
+		deleteChannelSend(ch->m_receives.front());
 	}
 
 	// if m_lastSoloed was our index, reset it
@@ -350,10 +352,10 @@ void Mixer::deleteChannel( int index )
 	else if (m_lastSoloed > index) { --m_lastSoloed; }
 
 	// actually delete the channel
-	m_mixerChannels.remove(index);
+	m_mixerChannels.erase(m_mixerChannels.begin() + index);
 	delete ch;
 
-	for( int i = index; i < m_mixerChannels.size(); ++i )
+	for (auto i = static_cast<std::size_t>(index); i < m_mixerChannels.size(); ++i)
 	{
 		validateChannelName( i, i + 1 );
 
@@ -379,7 +381,7 @@ void Mixer::deleteChannel( int index )
 void Mixer::moveChannelLeft( int index )
 {
 	// can't move master or first channel
-	if( index <= 1 || index >= m_mixerChannels.size() )
+	if (index <= 1 || static_cast<std::size_t>(index) >= m_mixerChannels.size())
 	{
 		return;
 	}
@@ -391,14 +393,14 @@ void Mixer::moveChannelLeft( int index )
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& songTrackList = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& patternTrackList = Engine::patternStore()->tracks();
 
 	for (const auto& trackList : {songTrackList, patternTrackList})
 	{
 		for (const auto& track : trackList)
 		{
-			if (track->type() == Track::InstrumentTrack)
+			if (track->type() == Track::Type::Instrument)
 			{
 				auto inst = (InstrumentTrack*)track;
 				int val = inst->mixerChannelModel()->value(0);
@@ -411,7 +413,7 @@ void Mixer::moveChannelLeft( int index )
 					inst->mixerChannelModel()->setValue(a);
 				}
 			}
-			else if (track->type() == Track::SampleTrack)
+			else if (track->type() == Track::Type::Sample)
 			{
 				auto strk = (SampleTrack*)track;
 				int val = strk->mixerChannelModel()->value(0);
@@ -477,13 +479,13 @@ MixerRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float a
 	auto route = new MixerRoute(from, to, amount);
 
 	// add us to from's sends
-	from->m_sends.append( route );
+	from->m_sends.push_back(route);
 
 	// add us to to's receives
-	to->m_receives.append( route );
+	to->m_receives.push_back(route);
 
 	// add us to mixer's list
-	Engine::mixer()->m_mixerRoutes.append( route );
+	Engine::mixer()->m_mixerRoutes.push_back(route);
 	Engine::audioEngine()->doneChangeInModel();
 
 	return route;
@@ -512,12 +514,22 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 void Mixer::deleteChannelSend( MixerRoute * route )
 {
 	Engine::audioEngine()->requestChangeInModel();
+
+	auto removeFromMixerRoute = [route](MixerRouteVector& routeVec)
+	{
+		auto it = std::find(routeVec.begin(), routeVec.end(), route);
+		if (it != routeVec.end()) { routeVec.erase(it); }
+	};
+
 	// remove us from from's sends
-	route->sender()->m_sends.remove( route->sender()->m_sends.indexOf( route ) );
+	removeFromMixerRoute(route->sender()->m_sends);
+
 	// remove us from to's receives
-	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
+	removeFromMixerRoute(route->receiver()->m_receives);
+
 	// remove us from mixer's list
-	Engine::mixer()->m_mixerRoutes.remove( Engine::mixer()->m_mixerRoutes.indexOf( route ) );
+	removeFromMixerRoute(Engine::mixer()->m_mixerRoutes);
+
 	delete route;
 	Engine::audioEngine()->doneChangeInModel();
 }
@@ -584,7 +596,7 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 
 
-void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
+void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 {
 	if( m_mixerChannels[_ch]->m_muteModel.value() == false )
 	{
@@ -600,13 +612,12 @@ void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
 
 void Mixer::prepareMasterMix()
 {
-	BufferManager::clear( m_mixerChannels[0]->m_buffer,
-					Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_mixerChannels[0]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
 
-void Mixer::masterMix( sampleFrame * _buf )
+void Mixer::masterMix( SampleFrame* _buf )
 {
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
 
@@ -617,7 +628,7 @@ void Mixer::masterMix( sampleFrame * _buf )
 	// also instantly add all muted channels as they don't need to care
 	// about their senders, and can just increment the deps of their
 	// recipients right away.
-	AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::Dynamic );
+	AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::OperationMode::Dynamic );
 	for( MixerChannel * ch : m_mixerChannels )
 	{
 		ch->m_muted = ch->m_muteModel.value();
@@ -673,8 +684,7 @@ void Mixer::masterMix( sampleFrame * _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_mixerChannels[i]->m_buffer,
-				Engine::audioEngine()->framesPerPeriod() );
+		zeroSampleFrames(m_mixerChannels[i]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;
 		// also reset hasInput
@@ -709,14 +719,15 @@ void Mixer::clearChannel(mix_ch_t index)
 	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
 	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
 	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );
+	ch->setColor(std::nullopt);
 
 	// send only to master
 	if( index > 0)
 	{
 		// delete existing sends
-		while( ! ch->m_sends.isEmpty() )
+		while (!ch->m_sends.empty())
 		{
-			deleteChannelSend( ch->m_sends.first() );
+			deleteChannelSend(ch->m_sends.front());
 		}
 
 		// add send to master
@@ -724,16 +735,16 @@ void Mixer::clearChannel(mix_ch_t index)
 	}
 
 	// delete receives
-	while( ! ch->m_receives.isEmpty() )
+	while (!ch->m_receives.empty())
 	{
-		deleteChannelSend( ch->m_receives.first() );
+		deleteChannelSend(ch->m_receives.front());
 	}
 }
 
 void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// save channels
-	for( int i = 0; i < m_mixerChannels.size(); ++i )
+	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
 		MixerChannel * ch = m_mixerChannels[i];
 
@@ -744,9 +755,9 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
-		mixch.setAttribute( "num", i );
+		mixch.setAttribute("num", static_cast<qulonglong>(i));
 		mixch.setAttribute( "name", ch->m_name );
-		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
+		if (const auto& color = ch->color()) { mixch.setAttribute("color", color->name()); }
 
 		// add the channel sends
 		for (const auto& send : ch->m_sends)
@@ -763,7 +774,8 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 // make sure we have at least num channels
 void Mixer::allocateChannelsTo(int num)
 {
-	while( num > m_mixerChannels.size() - 1 )
+	if (num <= 0) { return; }
+	while (static_cast<std::size_t>(num) > m_mixerChannels.size() - 1)
 	{
 		createChannel();
 
@@ -792,10 +804,9 @@ void Mixer::loadSettings( const QDomElement & _this )
 		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
 		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
 		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
-		if( mixch.hasAttribute( "color" ) )
+		if (mixch.hasAttribute("color"))
 		{
-			m_mixerChannels[num]->m_hasColor = true;
-			m_mixerChannels[num]->m_color.setNamedColor( mixch.attribute( "color" ) );
+			m_mixerChannels[num]->setColor(QColor{mixch.attribute("color")});
 		}
 
 		m_mixerChannels[num]->m_fxChain.restoreState( mixch.firstChildElement(
@@ -803,7 +814,7 @@ void Mixer::loadSettings( const QDomElement & _this )
 
 		// mixer sends
 		QDomNodeList chData = mixch.childNodes();
-		for( unsigned int i=0; i<chData.length(); ++i )
+		for (auto i = 0; i < chData.length(); ++i)
 		{
 			QDomElement chDataItem = chData.at(i).toElement();
 			if( chDataItem.nodeName() == QString( "send" ) )
@@ -835,19 +846,22 @@ void Mixer::validateChannelName( int index, int oldIndex )
 bool Mixer::isChannelInUse(int index)
 {
 	// check if the index mixer channel receives audio from any other channel
-	if (!m_mixerChannels[index]->m_receives.isEmpty())
+	if (!m_mixerChannels[index]->m_receives.empty())
 	{
 		return true;
 	}
 
 	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+
+	auto& songTracks = Engine::getSong()->tracks();
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
+	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
 	for (const auto t : tracks)
 	{
-		if (t->type() == Track::InstrumentTrack)
+		if (t->type() == Track::Type::Instrument)
 		{
 			auto inst = dynamic_cast<InstrumentTrack*>(t);
 			if (inst->mixerChannelModel()->value() == index)
@@ -855,7 +869,7 @@ bool Mixer::isChannelInUse(int index)
 				return true;
 			}
 		}
-		else if (t->type() == Track::SampleTrack)
+		else if (t->type() == Track::Type::Sample)
 		{
 			auto strack = dynamic_cast<SampleTrack*>(t);
 			if (strack->mixerChannelModel()->value() == index)

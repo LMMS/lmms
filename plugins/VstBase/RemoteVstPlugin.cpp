@@ -87,11 +87,7 @@
 #undef Unsorted
 #endif
 
-#ifdef USE_MINGW_THREADS_REPLACEMENT
-#	include <mingw.mutex.h>
-#else
-#	include <mutex>
-#endif
+#include <mutex>
 
 #include <algorithm>
 #include <vector>
@@ -127,7 +123,7 @@ struct ERect
 
 using namespace std;
 
-static lmms::VstHostLanguages hlang = lmms::LanguageEnglish;
+static lmms::VstHostLanguage hlang = lmms::VstHostLanguage::English;
 
 static bool EMBED = false;
 static bool EMBED_X11 = false;
@@ -191,7 +187,7 @@ public:
 	void hideEditor();
 	void destroyEditor();
 
-	virtual void process( const sampleFrame * _in, sampleFrame * _out );
+	virtual void process( const SampleFrame* _in, SampleFrame* _out );
 
 
 	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
@@ -269,7 +265,7 @@ public:
 	void saveChunkToFile( const std::string & _file );
 
 	// restore settings chunk of plugin from file
-	void loadChunkFromFile( const std::string & _file, int _len );
+	void loadChunkFromFile(const std::string& _file, std::size_t _len);
 
 	// restore settings chunk of plugin from file
 	void loadPresetFile( const std::string & _file );
@@ -390,7 +386,7 @@ public:
 #endif
 
 private:
-	enum GuiThreadMessages
+	enum class GuiThreadMessage
 	{
 		None,
 		ProcessPluginMessage,
@@ -628,7 +624,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstSetLanguage:
-			hlang = static_cast<VstHostLanguages>( _m.getInt() );
+			hlang = static_cast<VstHostLanguage>( _m.getInt() );
 			break;
 
 		case IdVstGetParameterDump:
@@ -1027,7 +1023,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 
 
-void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
+void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )
@@ -1307,7 +1303,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 					"Error opening file for saving chunk.\n" );
 				return;
 			}
-			if ( fwrite( chunk, 1, len, fp ) != len )
+			if (fwrite(chunk, 1, len, fp) != static_cast<std::size_t>(len))
 			{
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
@@ -1545,7 +1541,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int toUInt;
 	float * pFloat;
 
-	if (m_plugin->uniqueID != pBank->fxID) {
+	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != pBank->fxID) {
 		sendMessage( message( IdVstCurrentProgramName ).
 					addString( "Error: Plugin UniqID not match" ) );
 		fclose( stream );
@@ -1581,7 +1577,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 		else
 		{
 			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk);
-			for (int i = 0; i < pBank->numPrograms; i++ )
+			for (auto i = 0u; i < pBank->numPrograms; i++)
 			{
 				toUInt = endian_swap( toUIntArray[ i ] );
 				pFloat = ( float* ) &toUInt;
@@ -1629,10 +1625,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	delete[] (char*)chunk;
 }
 
-
-
-
-void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
+void RemoteVstPlugin::loadChunkFromFile(const std::string& _file, std::size_t _len)
 {
 	auto chunk = new char[_len];
 
@@ -1763,7 +1756,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too)
 #ifndef NATIVE_LINUX_VST
-			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::GiveIdle), 0 );
 #else
 			__plugin->sendX11Idle();
 #endif
@@ -2066,7 +2059,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterGetLanguage:
 			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
-			return hlang;
+			return static_cast<std::intptr_t>(hlang);
 
 		case audioMasterGetDirectory:
 			SHOW_CALLBACK( "amc: audioMasterGetDirectory\n" );
@@ -2077,7 +2070,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
 #ifndef NATIVE_LINUX_VST
-			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::GiveIdle), 0 );
 #else
 			__plugin->sendX11Idle();
 #endif
@@ -2234,7 +2227,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 #ifndef NATIVE_LINUX_VST
 			PostMessage( __MessageHwnd,
 					WM_USER,
-					ProcessPluginMessage,
+					static_cast<WPARAM>(GuiThreadMessage::ProcessPluginMessage),
 					(LPARAM) new message( m ) );
 #else
 		_this->queueMessage( m );
@@ -2244,7 +2237,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 
 	// notify GUI thread about shutdown
 #ifndef NATIVE_LINUX_VST
-	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
+	PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::ClosePlugin), 0 );
 
 	return 0;
 #else
@@ -2349,9 +2342,9 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 	}
 	else if( uMsg == WM_USER )
 	{
-		switch( wParam )
+		switch( static_cast<GuiThreadMessage>(wParam) )
 		{
-			case ProcessPluginMessage:
+			case GuiThreadMessage::ProcessPluginMessage:
 			{
 				message * m = (message *) lParam;
 				__plugin->queueMessage( *m );
@@ -2363,11 +2356,11 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 				return 0;
 			}
 
-			case GiveIdle:
+			case GuiThreadMessage::GiveIdle:
 				__plugin->idle();
 				return 0;
 
-			case ClosePlugin:
+			case GuiThreadMessage::ClosePlugin:
 				PostQuitMessage(0);
 				return 0;
 

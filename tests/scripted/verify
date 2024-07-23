@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 import tempfile
 import os
+import sys
 
 
 def set_git_config():
@@ -17,7 +18,7 @@ def set_git_config():
 def create_file(filename: str, file_content: str):
 	"""Create a file in the current directory and adds it to git"""
 	Path(filename).parent.mkdir(parents=True, exist_ok=True)
-	with open(filename, "w") as textfile:
+	with open(filename, "w", encoding='utf-8') as textfile:
 		print(file_content, file=textfile)
 	subprocess.run(['git', 'add', filename], check=True)
 
@@ -36,8 +37,6 @@ class ScriptTest():
 		set_git_config()
 		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
 		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
-		create_file('debian/lmms-common.docs', '')
-		create_file('debian/copyright', '')
 		create_file('data/locale/de.ts',
 					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
 					'    <context>\n'
@@ -64,7 +63,10 @@ class ScriptTest():
 
 	def run(self, expected_returncode: int = 1):  # default: something goes wrong ("to the safe side")
 		"""Run the script, check the exit code and store the result"""
-		self.result = subprocess.run([str(self.scriptpath)], capture_output=True, text=True)
+		command = [str(self.scriptpath)]
+		if os.name == 'nt':
+			command.insert(0, sys.executable)
+		self.result = subprocess.run(command, capture_output=True, text=True)
 		print('--->8--- Script output BEGIN --->8---')
 		print(self.result.stdout)
 		print('--->8--- Script output END   --->8---')
@@ -106,22 +108,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
 		create_file('data/locale/fr.ts',
 					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
 					'    <context>\n'
-					'    <name>TestClass</name>\n'
-					'     <message>\n'
-					'        <location filename="../../src/core/non-existent.cpp" line="20"/>\n'
-					'        <source>About LMMS</source>\n'
-					'        <translation>À propos de LMMS</translation>\n'
-					'    </message>\n'
-					'</context>\n'
-					'</TS>\n')
-		test.run()
-		test.expect('Error: data/locale: Source file does not exist: ../../src/core/non-existent.cpp')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('data/locale/fr.ts',
-					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
-					'    <context>\n'
 					'    <name>NonExistentClass</name>\n'
 					'     <message>\n'
 					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
@@ -141,24 +127,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
 					'}')
 		test.run()
 		test.expect('Error: data/themes/classic/style.css: Class does not exist in source code: NonExistentClass')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/patches/clang.patch', '/plugins/non-existent-file')
-		test.run()
-		test.expect('Error: debian/patches/clang.patch: Source file does not exist: plugins/non-existent-file')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/lmms-common.docs', '/plugins/caps.html')
-		test.run()
-		test.expect('Error: debian/lmms-common.docs: Path does not exist: /plugins/caps.html')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/copyright', 'Files: NonExistent')
-		test.run()
-		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
 		test.expect('1 errors')
 
 	with ScriptTest(check_namespace) as test:

@@ -25,6 +25,8 @@
 #ifndef LMMS_AUDIO_ENGINE_PROFILER_H
 #define LMMS_AUDIO_ENGINE_PROFILER_H
 
+#include <array>
+#include <atomic>
 #include <QFile>
 
 #include "lmms_basics.h"
@@ -53,11 +55,55 @@ public:
 
 	void setOutputFile( const QString& outputFile );
 
+	enum class DetailType {
+		NoteSetup,
+		Instruments,
+		Effects,
+		Mixing,
+		Count
+	};
+
+	constexpr static auto DetailCount = static_cast<std::size_t>(DetailType::Count);
+
+	int detailLoad(const DetailType type) const
+	{
+		return m_detailLoad[static_cast<std::size_t>(type)].load(std::memory_order_relaxed);
+	}
+
+	class Probe
+	{
+	public:
+		Probe(AudioEngineProfiler& profiler, AudioEngineProfiler::DetailType type)
+			: m_profiler(profiler)
+			, m_type(type)
+		{
+			profiler.startDetail(type);
+		}
+		~Probe() { m_profiler.finishDetail(m_type); }
+		Probe& operator=(const Probe&) = delete;
+		Probe(const Probe&) = delete;
+		Probe(Probe&&) = delete;
+
+	private:
+		AudioEngineProfiler &m_profiler;
+		const AudioEngineProfiler::DetailType m_type;
+	};
 
 private:
+	void startDetail(const DetailType type) { m_detailTimer[static_cast<std::size_t>(type)].reset(); }
+	void finishDetail(const DetailType type)
+	{
+		m_detailTime[static_cast<std::size_t>(type)] = m_detailTimer[static_cast<std::size_t>(type)].elapsed();
+	}
+
 	MicroTimer m_periodTimer;
-	int m_cpuLoad;
+	std::atomic<float> m_cpuLoad;
 	QFile m_outputFile;
+
+	// Use arrays to avoid dynamic allocations in realtime code
+	std::array<MicroTimer, DetailCount> m_detailTimer;
+	std::array<int, DetailCount> m_detailTime{0};
+	std::array<std::atomic<float>, DetailCount> m_detailLoad{0};
 };
 
 } // namespace lmms

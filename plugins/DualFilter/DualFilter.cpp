@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -57,8 +57,8 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
-	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
-	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
+	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
+	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
 
 	// ensure filters get updated
 	m_filter1changed = true;
@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool DualFilterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -90,12 +90,12 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
     if( m_dfControls.m_filter1Model.isValueChanged() || m_filter1changed )
 	{
-		m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
+		m_filter1->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter1Model.value()) );
 		m_filter1changed = true;
 	}
     if( m_dfControls.m_filter2Model.isValueChanged() || m_filter2changed )
 	{
-		m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+		m_filter2->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter2Model.value()) );
 		m_filter2changed = true;
 	}
 
@@ -218,6 +218,11 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	return isRunning();
 }
 
+void DualFilterEffect::onEnabledChanged()
+{
+	m_filter1->clearHistory();
+	m_filter2->clearHistory();
+}
 
 
 

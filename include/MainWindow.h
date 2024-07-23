@@ -113,7 +113,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover
@@ -248,7 +248,6 @@ private slots:
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-	void onSongStopped();
 	void onSongModified();
 	void onProjectFileNameChanged();
 

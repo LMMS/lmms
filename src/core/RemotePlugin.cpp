@@ -325,7 +325,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf )
+bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -333,7 +333,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	{
 		if( _out_buf != nullptr )
 		{
-			BufferManager::clear( _out_buf, frames );
+			zeroSampleFrames(_out_buf, frames);
 		}
 		return false;
 	}
@@ -352,14 +352,14 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		}
 		if( _out_buf != nullptr )
 		{
-			BufferManager::clear( _out_buf, frames );
+			zeroSampleFrames(_out_buf, frames);
 		}
 		return false;
 	}
 
 	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
 
-	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
+	ch_cnt_t inputs = std::min<ch_cnt_t>(m_inputCount, DEFAULT_CHANNELS);
 
 	if( _in_buf != nullptr && inputs > 0 )
 	{
@@ -376,11 +376,12 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		}
 		else if( inputs == DEFAULT_CHANNELS )
 		{
-			memcpy( m_audioBuffer.get(), _in_buf, frames * BYTES_PER_FRAME );
+			auto target = m_audioBuffer.get();
+			copyFromSampleFrames(target, _in_buf, frames);
 		}
 		else
 		{
-			auto o = (sampleFrame*)m_audioBuffer.get();
+			auto o = (SampleFrame*)m_audioBuffer.get();
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
@@ -403,8 +404,8 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount,
-							DEFAULT_CHANNELS );
+	const ch_cnt_t outputs = std::min<ch_cnt_t>(m_outputCount,
+							DEFAULT_CHANNELS);
 	if( m_splitChannels )
 	{
 		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
@@ -418,17 +419,17 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	}
 	else if( outputs == DEFAULT_CHANNELS )
 	{
-		memcpy( _out_buf, m_audioBuffer.get() + m_inputCount * frames,
-						frames * BYTES_PER_FRAME );
+		auto source = m_audioBuffer.get() + m_inputCount * frames;
+		copyToSampleFrames(_out_buf, source, frames);
 	}
 	else
 	{
-		auto o = (sampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
+		auto o = (SampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
 		// clear buffer, if plugin didn't fill up both channels
-		BufferManager::clear( _out_buf, frames );
+		zeroSampleFrames(_out_buf, frames);
 
-		for( ch_cnt_t ch = 0; ch <
-				qMin<int>( DEFAULT_CHANNELS, outputs ); ++ch )
+		for (ch_cnt_t ch = 0; ch <
+				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -535,7 +536,7 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::audioEngine()->processingSampleRate() );
+			reply_message.addInt( Engine::audioEngine()->outputSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:

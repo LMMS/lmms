@@ -38,7 +38,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
-#include "MemoryManager.h"
 #include "gig.h"
 
 
@@ -158,7 +157,7 @@ public:
 
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
-	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+	bool convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
@@ -187,7 +186,7 @@ public:
 
 
 // What portion of a note are we in?
-enum GigState
+enum class GigState
 {
 	// We just pressed the key
 	KeyDown,
@@ -224,7 +223,7 @@ public:
 
 	GigNote( int midiNote, int velocity, float frequency, GIGPluginData * handle )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), isRelease( false ), state( KeyDown ),
+		  release( false ), isRelease( false ), state( GigState::KeyDown ),
 		  frequency( frequency ), handle( handle )
 	{
 	}
@@ -236,7 +235,6 @@ public:
 class GigInstrument : public Instrument
 {
 	Q_OBJECT
-	MM_OPERATORS
 
 	mapPropertyFromModel( int, getBank, setBank, m_bankNum );
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
@@ -245,10 +243,10 @@ public:
 	GigInstrument( InstrumentTrack * _instrument_track );
 	~GigInstrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -260,16 +258,6 @@ public:
 	AutomatableModel * childModel( const QString & _modelName ) override;
 
 	QString nodeName() const override;
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0;
-	}
-
-	Flags flags() const override
-	{
-		return IsSingleStreamed|IsNotBendable;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
@@ -324,7 +312,7 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples );
+	void loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples );
 	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 

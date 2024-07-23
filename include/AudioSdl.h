@@ -74,7 +74,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );
@@ -89,7 +88,7 @@ private:
 
 	SDL_AudioSpec m_audioHandle;
 
-	surroundSampleFrame * m_outBuf;
+	SampleFrame* m_outBuf;
 
 #ifdef LMMS_HAVE_SDL2
 	size_t m_currentBufferFramePos;

@@ -51,7 +51,7 @@ namespace gui
 
 class InstrumentTrackView;
 class InstrumentTrackWindow;
-class InstrumentMiscView;
+class InstrumentTuningView;
 class MidiCCRackView;
 
 } // namespace gui
@@ -60,14 +60,13 @@ class MidiCCRackView;
 class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	InstrumentTrack( TrackContainer* tc );
 	~InstrumentTrack() override;
 
 	// used by instrument
-	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
 							NotePlayHandle * _n );
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
@@ -87,7 +86,7 @@ public:
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
-	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
+	void playNote( NotePlayHandle * _n, SampleFrame* _working_buffer );
 
 	QString instrumentName() const;
 	const Instrument *instrument() const
@@ -244,7 +243,6 @@ signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
 	void midiNoteOff( const lmms::Note& );
-	void nameChanged();
 	void newNote();
 	void endNote();
 
@@ -316,7 +314,7 @@ private:
 	friend class gui::InstrumentTrackView;
 	friend class gui::InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class gui::InstrumentMiscView;
+	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
 
 } ;

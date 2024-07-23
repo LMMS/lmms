@@ -190,15 +190,13 @@ public :
 		float s = sinf( w0 );
 		float alpha = s / ( 2 * m_res );
 
-		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
-
 		//calc coefficents
-		b0 = ( 1 + c ) * 0.5;
-		b1 = ( -( 1 + c ) );
-		b2 = ( 1 + c ) * 0.5;
-		a0 = 1 + alpha;
-		a1 = ( -2 * c );
-		a2 = 1 - alpha;
+		float b0 = (1 + c) * 0.5;
+		float b1 = (-(1 + c));
+		float b2 = (1 + c) * 0.5;
+		float a0 = 1 + alpha;
+		float a1 = (-2 * c);
+		float a2 = 1 - alpha;
 
 		//normalise
 		b0 /= a0;
@@ -235,15 +233,13 @@ public :
 		float s = sinf( w0 );
 		float alpha = s / ( 2 * m_res );
 
-		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
-
 		//calc coefficents
-		b0 = ( 1 - c ) * 0.5;
-		b1 = 1 - c;
-		b2 = ( 1 - c ) * 0.5;
-		a0 = 1 + alpha;
-		a1 = -2 * c;
-		a2 = 1 - alpha;
+		float b0 = (1 - c) * 0.5;
+		float b1 = 1 - c;
+		float b2 = (1 - c) * 0.5;
+		float a0 = 1 + alpha;
+		float a1 = -2 * c;
+		float a2 = 1 - alpha;
 
 		//normalise
 		b0 /= a0;
@@ -279,15 +275,13 @@ public:
 		float A =  pow( 10, m_gain * 0.025);
 		float alpha = s * sinh( log( 2 ) / 2 * m_bw * w0 / sinf(w0) );
 
-		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
-
 		//calc coefficents
-		b0 =   1 + alpha*A;
-		b1 =  -2*c;
-		b2 =   1 - alpha*A;
-		a0 =   1 + alpha/A;
-		a1 =  -2*c;
-		a2 =   1 - alpha/A;
+		float b0 = 1 + alpha * A;
+		float b1 = -2 * c;
+		float b2 = 1 - alpha * A;
+		float a0 = 1 + alpha / A;
+		float a1 = -2 * c;
+		float a2 = 1 - alpha / A;
 
 		//normalise
 		b0 /= a0;
@@ -345,15 +339,13 @@ public :
 		//        float alpha = s / ( 2 * m_res );
 		float beta = sqrt( A ) / m_res;
 
-		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
-
 		//calc coefficents
-		b0 = A * ( ( A+1 ) - ( A-1 ) * c + beta * s );
-		b1 = 2  * A * ( ( A - 1 ) - ( A + 1 ) * c) ;
-		b2 = A * ( ( A + 1 ) - ( A - 1 ) * c - beta * s);
-		a0 = ( A + 1 ) + ( A - 1 ) * c + beta * s;
-		a1 = -2 * ( ( A - 1 ) + ( A + 1 ) * c );
-		a2 = ( A + 1 ) + ( A - 1) * c - beta * s;
+		float b0 = A * ((A + 1) - (A - 1) * c + beta * s);
+		float b1 = 2 * A * ((A - 1) - (A + 1) * c);
+		float b2 = A * ((A + 1) - (A - 1) * c - beta * s);
+		float a0 = (A + 1) + (A - 1) * c + beta * s;
+		float a1 = -2 * ((A - 1) + (A + 1) * c);
+		float a2 = (A + 1) + (A - 1) * c - beta * s;
 
 		//normalise
 		b0 /= a0;
@@ -383,15 +375,14 @@ public :
 		float A =  pow( 10, m_gain * 0.025 );
 		float beta = sqrt( A ) / m_res;
 
-		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
-
 		//calc coefficents
-		b0 = A *( ( A +1 ) + ( A - 1 ) * c + beta * s);
-		b1 = -2 * A * ( ( A - 1 ) + ( A + 1 ) * c );
-		b2 = A * ( ( A + 1 ) + ( A - 1 ) * c - beta * s);
-		a0 = ( A + 1 ) - ( A - 1 ) * c + beta * s;
-		a1 = 2 * ( ( A - 1 ) - ( A + 1 ) * c );
-		a2 = ( A + 1) - ( A - 1 ) * c - beta * s;
+		float b0 = A * ((A + 1) + (A - 1) * c + beta * s);
+		float b1 = -2 * A * ((A - 1) + (A + 1) * c);
+		float b2 = A * ((A + 1) + (A - 1) * c - beta * s);
+		float a0 = (A + 1) - (A - 1) * c + beta * s;
+		float a1 = 2 * ((A - 1) - (A + 1) * c);
+		float a2 = (A + 1) - (A - 1) * c - beta * s;
+
 		//normalise
 		b0 /= a0;
 		b1 /= a0;
@@ -441,7 +432,7 @@ public:
 
 
 
-	virtual void processBuffer( sampleFrame* buf, const fpp_t frames )
+	virtual void processBuffer( SampleFrame* buf, const fpp_t frames )
 	{
 		for ( fpp_t f = 0 ; f < frames ; ++f)
 		{

@@ -46,7 +46,7 @@ class LMMS_EXPORT MidiClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum MidiClipTypes
+	enum class Type
 	{
 		BeatClip,
 		MelodyClip
@@ -63,7 +63,8 @@ public:
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( Note * _note_to_del );
+	NoteVector::const_iterator removeNote(NoteVector::const_iterator it);
+	NoteVector::const_iterator removeNote(Note* note);
 
 	Note * noteAtStep( int _step );
 
@@ -79,10 +80,10 @@ public:
 	void setStep( int step, bool enabled );
 
 	// Split the list of notes on the given position
-	void splitNotes(NoteVector notes, TimePos pos);
+	void splitNotes(const NoteVector& notes, TimePos pos);
 
 	// clip-type stuff
-	inline MidiClipTypes type() const
+	inline Type type() const
 	{
 		return m_clipType;
 	}
@@ -129,14 +130,14 @@ protected slots:
 private:
 	TimePos beatClipLength() const;
 
-	void setType( MidiClipTypes _new_clip_type );
+	void setType( Type _new_clip_type );
 	void checkType();
 
 	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;
 
-	MidiClipTypes m_clipType;
+	Type m_clipType;
 
 	// data-stuff
 	NoteVector m_notes;

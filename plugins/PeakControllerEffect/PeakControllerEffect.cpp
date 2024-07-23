@@ -48,7 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 			"Plugin for controlling knobs with sound peaks" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -76,7 +76,7 @@ PeakControllerEffect::PeakControllerEffect(
 	{
 		Engine::getSong()->addController( m_autoController );
 	}
-	PeakController::s_effects.append( this );
+	PeakController::s_effects.push_back(this);
 }
 
 
@@ -84,16 +84,16 @@ PeakControllerEffect::PeakControllerEffect(
 
 PeakControllerEffect::~PeakControllerEffect()
 {
-	int idx = PeakController::s_effects.indexOf( this );
-	if( idx >= 0 )
+	auto it = std::find(PeakController::s_effects.begin(), PeakController::s_effects.end(), this);
+	if (it != PeakController::s_effects.end())
 	{
-		PeakController::s_effects.remove( idx );
-		Engine::getSong()->removeController( m_autoController );
+		PeakController::s_effects.erase(it);
+		Engine::getSong()->removeController(m_autoController);
 	}
 }
 
 
-bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
+bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	PeakControllerEffectControls & c = m_peakControls;
@@ -110,7 +110,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( c.m_absModel.value() )
 	{
-		for( int i = 0; i < _frames; ++i )
+		for (auto i = std::size_t{0}; i < _frames; ++i)
 		{
 			// absolute value is achieved because the squares are > 0
 			sum += _buf[i][0]*_buf[i][0] + _buf[i][1]*_buf[i][1];
@@ -118,7 +118,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 	else
 	{
-		for( int i = 0; i < _frames; ++i )
+		for (auto i = std::size_t{0}; i < _frames; ++i)
 		{
 			// the value is absolute because of squaring,
 			// so we need to correct it
@@ -131,7 +131,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	// this will mute the output after the values were measured
 	if( c.m_muteModel.value() )
 	{
-		for( int i = 0; i < _frames; ++i )
+		for (auto i = std::size_t{0}; i < _frames; ++i)
 		{
 			_buf[i][0] = _buf[i][1] = 0.0f;
 		}

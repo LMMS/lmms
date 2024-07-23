@@ -39,7 +39,7 @@ extern "C" {
 		QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0100,
-		Plugin::Effect,
+		Plugin::Type::Effect,
 		new PluginPixmapLoader("logo"),
 		nullptr,
 		nullptr,
@@ -58,7 +58,7 @@ Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatu
 
 
 // Take audio data and store them for processing and display in the GUI thread.
-bool Vectorscope::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
+bool Vectorscope::processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count)
 {
 	if (!isEnabled() || !isRunning ()) {return false;}
 
