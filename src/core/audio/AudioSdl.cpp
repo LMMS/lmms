@@ -316,15 +316,11 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 }
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-<<<<<<< HEAD
+
 	if ( (!m_stopped) & (m_captureOn) ) //!< Guard for Bugs ...
 	{
-		auto samples_buffer = (sampleFrame*)_buf;
-		fpp_t frames = _len / sizeof ( sampleFrame );
-=======
-	auto samples_buffer = (SampleFrame*)_buf;
-	fpp_t frames = _len / sizeof ( SampleFrame );
->>>>>>> upstream/master
+		auto samples_buffer = (SampleFrame*)_buf;
+		fpp_t frames = _len / sizeof ( SampleFrame );
 
 		audioEngine()->pushInputFrames (samples_buffer, frames);
 	}
@@ -343,16 +339,8 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
-<<<<<<< HEAD
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-=======
 
 	form->addRow(tr("Device"), m_device);
->>>>>>> upstream/master
 }
 
 
