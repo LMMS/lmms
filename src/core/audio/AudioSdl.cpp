@@ -39,8 +39,8 @@ namespace lmms
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
-	m_captureCbErrors(0),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
+	m_captureCbErrors(0)
 {
 	_success_ful = false;
 
