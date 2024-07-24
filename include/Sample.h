@@ -52,6 +52,11 @@ public:
 			assert(resampleState && src_strerror(error));
 		}
 
+		~PlaybackState()
+		{
+			src_delete(resampleState);
+		}
+
 		const Sample* sample = nullptr;
 		Loop* loop = nullptr;
 		SRC_STATE* resampleState = nullptr;

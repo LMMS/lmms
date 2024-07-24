@@ -160,8 +160,8 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 long Sample::render(void* callbackData, float** data)
 {
 	const auto state = static_cast<PlaybackState*>(callbackData);
-	const auto& loop = *state->loop;
-	const auto& sample = state->sample;
+	const auto loop = *state->loop;
+	const auto sample = state->sample;
 	auto& index = state->frameIndex;
 	auto& backwards = state->backwards;
 
