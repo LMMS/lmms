@@ -177,7 +177,7 @@ static void cs_exSyncMode(bool playing)
 static void cs_exSyncPosition(uint32_t frames)
 {
 	Song * l_song = Engine::getSong();
-	if ((l_song->exSyncReact()) && (l_song->playMode()  == Song::Mode_PlaySong))
+	if ((l_song->exSyncReact()) && (l_song->playMode()  == Song::PlayMode::Song))
 	{
 		TimePos timePos = 
 			TimePos::fromFrames(frames , Engine::framesPerTick());
@@ -190,7 +190,8 @@ static void cs_exSyncPosition(uint32_t frames)
 
 static sample_rate_t cs_exSyncSampleRate()
 {
-	return Engine::mixer()->processingSampleRate();
+	//return Engine::mixer()->processingSampleRate();
+	return 44100; // Stub :: DEBUG
 }
 
 
@@ -211,7 +212,7 @@ void Song::onPlaybackStateChanged()
 {
 	if (m_exSyncMasterOn && m_exSyncOn)
 	{
-		if (m_playMode < Mode_PlayBB) 
+		if (m_playMode < Song::PlayMode::Pattern) 
 		{
 			// Hint to future:
 			//#ifdef LMMS_HAVE_JACK
@@ -849,7 +850,7 @@ void Song::stop()
 	m_recording = true;
 
 #ifdef LMMS_HAVE_JACK
-	if (m_playMode < Mode_PlayBB) { exSyncSendPosition(); } // !!! Conflict ???
+	if (m_playMode < Song::PlayMode::Pattern) { exSyncSendPosition(); } // !!! Conflict ???
 #endif
 
 	m_playing = false;

@@ -186,9 +186,10 @@ struct ExSyncHandler
 // struct ExSyncCallbacks *getExSync();
 // END ExSync ExSync.h context
 
-} // namespace lmms
 //! provides jackd ExSync driver API using frame based synchronization
 struct ExSyncHandler * exSyncGetJackHandler();
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_JACK
 

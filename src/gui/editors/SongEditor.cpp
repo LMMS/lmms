@@ -33,6 +33,8 @@
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
+//ExSync:
+#include <QPushButton> 	
 
 #include "ActionGroup.h"
 #include "AudioDevice.h"
@@ -57,6 +59,20 @@
 #include "TimeLineWidget.h"
 #include "TrackView.h"
 
+
+namespace lmms
+{
+
+#ifdef LMMS_HAVE_JACK
+#include "AudioJack.h"
+// This is dirty hack, but I don't want to place this function
+// to public interface ... 
+extern void exSyncStoppedHack(); // from core/audio/AudioJack.cpp
+#endif
+
+}
+
+
 namespace lmms::gui
 {
 
@@ -71,16 +87,6 @@ constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f}
 constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
 
 }
-
-
-
-#ifdef LMMS_HAVE_JACK
-#include "AudioJack.h"
-// This is dirty hack, but I don't want to place this function
-// to public interface ... 
-extern void exSyncStoppedHack(); // from core/audio/AudioJack.cpp
-#endif
-
 
 
 

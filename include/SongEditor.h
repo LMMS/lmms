@@ -32,6 +32,7 @@
 
 class QLabel;
 class QScrollBar;
+class QPushButton; //ExcSync
 
 namespace lmms
 {
