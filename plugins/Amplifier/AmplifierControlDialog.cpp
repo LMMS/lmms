@@ -40,21 +40,21 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	setPalette(pal);
 	setFixedSize(100, 110);
 	
-	auto makeKnob = [this](int x, int y, const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
+	auto makeKnob = [this](int x, int y, const QString& label, const QString& hintText, const QString& unit, FloatModel* model, VolKnobType volKnobType)
 	{
         Knob* newKnob = new Knob(KnobType::Bright26, this);
         newKnob->move(x, y);
         newKnob->setModel(model);
         newKnob->setLabel(label);
         newKnob->setHintText(hintText, unit);
-        newKnob->setVolumeKnob(isVolume);
+        newKnob->setVolKnobType(volKnobType);
         return newKnob;
-    };
+	};
 
-	makeKnob(16, 10, tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, true);
-	makeKnob(57, 10, tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false);
-	makeKnob(16, 65, tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, true);
-	makeKnob(57, 65, tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, true);
+	makeKnob(16, 10, tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, VolKnobType::RelVol);
+	makeKnob(57, 10, tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, VolKnobType::Normal);
+	makeKnob(16, 65, tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, VolKnobType::RelVol);
+	makeKnob(57, 65, tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, VolKnobType::RelVol);
 }
 
 } // namespace lmms::gui
