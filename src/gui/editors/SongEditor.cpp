@@ -766,7 +766,7 @@ void SongEditor::updatePosition( const TimePos & t )
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
 		
-		if (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Stepped) 
+		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 		{
 			if( t > m_currentPosition + w * TimePos::ticksPerBar() /
 								pixelsPerBar() )
@@ -778,7 +778,7 @@ void SongEditor::updatePosition( const TimePos & t )
 				animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
 			}
 		}
-		else if (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Continuous)
+		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 		{
 			animateScroll( m_leftRightScroll, std::max(t.getBar() - w / pixelsPerBar() / 2, 0.0f), m_smoothScroll );
 		}
