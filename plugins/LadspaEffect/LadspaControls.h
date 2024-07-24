@@ -26,11 +26,15 @@
 #define LADSPA_CONTROLS_H
 
 #include "EffectControls.h"
-#include "LadspaControl.h"
 #include "LadspaControlDialog.h"
+#include "LadspaMatrixControlDialog.h"
+
+namespace lmms
+{
 
 
-typedef QVector<LadspaControl *> control_list_t;
+class LadspaControl;
+using control_list_t = QVector<LadspaControl*>;
 
 class LadspaEffect;
 
@@ -40,23 +44,23 @@ class LadspaControls : public EffectControls
 	Q_OBJECT
 public:
 	LadspaControls( LadspaEffect * _eff );
-	virtual ~LadspaControls();
+	~LadspaControls() override;
 
-	inline int controlCount()
+	inline int controlCount() override
 	{
 		return m_controlCount;
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "ladspacontrols";
 	}
 
-	virtual EffectControlDialog * createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new LadspaControlDialog( this );
+		return new gui::LadspaMatrixControlDialog( this );
 	}
 
 
@@ -75,13 +79,17 @@ private:
 	QVector<control_list_t> m_controls;
 
 
-	friend class LadspaControlDialog;
+	friend class gui::LadspaControlDialog;
+	friend class gui::LadspaMatrixControlDialog;
 	friend class LadspaEffect;
 
 
 signals:
-	void effectModelChanged( LadspaControls * );
+	void effectModelChanged( lmms::LadspaControls * );
 
 } ;
+
+
+} // namespace lmms
 
 #endif

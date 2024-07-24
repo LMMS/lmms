@@ -36,6 +36,9 @@
 #include "lmms_basics.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
@@ -45,10 +48,10 @@ extern "C" {
 		QT_TRANSLATE_NOOP("PluginBrowser", "A graphical spectrum analyzer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0112,
-		Plugin::Effect,
+		Plugin::Type::Effect,
 		new PluginPixmapLoader("logo"),
-		NULL,
-		NULL
+		nullptr,
+		nullptr,
 	};
 }
 
@@ -74,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
+bool Analyzer::processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
@@ -116,3 +119,5 @@ extern "C" {
 	}
 }
 
+
+} // namespace lmms

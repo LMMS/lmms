@@ -1,7 +1,7 @@
 /*
  * Lv2FxControlDialog.cpp - Lv2FxControlDialog implementation
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,12 +24,12 @@
 
 #include "Lv2FxControlDialog.h"
 
-#include <QDebug>
 #include <QPushButton>
-#include <lv2.h>
 
-#include "Lv2Effect.h"
 #include "Lv2FxControls.h"
+
+namespace lmms::gui
+{
 
 
 Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
@@ -38,7 +38,7 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 {
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-				this, [this](){ lv2Controls()->reloadPlugin(); });
+				this, [this](){ lv2Controls()->reload(); });
 	}
 	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled,
@@ -67,6 +67,18 @@ Lv2FxControls *Lv2FxControlDialog::lv2Controls()
 void Lv2FxControlDialog::modelChanged()
 {
 	Lv2ViewBase::modelChanged(lv2Controls());
+	connect(lv2Controls(), &Lv2FxControls::modelChanged,
+		this, [this](){ this->modelChanged();} );
 }
 
 
+
+
+void Lv2FxControlDialog::hideEvent(QHideEvent *event)
+{
+	closeHelpWindow();
+	QWidget::hideEvent(event);
+}
+
+
+} // namespace lmms::gui

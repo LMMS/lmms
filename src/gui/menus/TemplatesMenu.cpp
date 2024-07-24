@@ -8,14 +8,19 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+
+namespace lmms::gui
+{
+
+
 TemplatesMenu::TemplatesMenu(QWidget *parent) :
 	QMenu(tr("New from template"), parent)
 {
 	setIcon(embed::getIconPixmap("project_new"));
 
-	connect( this, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
-	connect( this, SIGNAL( triggered( QAction * ) ),
-		SLOT( createNewProjectFromTemplate( QAction * ) ) );
+	connect( this, SIGNAL(aboutToShow()), SLOT(fillTemplatesMenu()));
+	connect( this, SIGNAL(triggered(QAction*)),
+		SLOT(createNewProjectFromTemplate(QAction*)));
 }
 
 
@@ -23,7 +28,7 @@ TemplatesMenu::TemplatesMenu(QWidget *parent) :
 
 void TemplatesMenu::createNewProjectFromTemplate(QAction * _action)
 {
-	if( gui->mainWindow()->mayChangeProject(true) )
+	if( getGUI()->mainWindow()->mayChangeProject(true) )
 	{
 		const QString& templateFilePath = _action->data().toString();
 		Engine::getSong()->createNewProjectFromTemplate(templateFilePath);
@@ -67,3 +72,6 @@ void TemplatesMenu::addTemplatesFromDir( const QDir& dir ) {
 #endif
 	}
 }
+
+
+} // namespace lmms::gui

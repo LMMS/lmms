@@ -23,10 +23,13 @@
  *
  */
 
-#ifndef PRESET_PREVIEW_PLAY_HANDLE_H
-#define PRESET_PREVIEW_PLAY_HANDLE_H
+#ifndef LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
+#define LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
 
 #include "NotePlayHandle.h"
+
+namespace lmms
+{
 
 
 class DataFile;
@@ -37,14 +40,14 @@ class LMMS_EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
 	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
-	virtual ~PresetPreviewPlayHandle();
+	~PresetPreviewPlayHandle() override;
 
 	inline bool affinityMatters() const override
 	{
 		return true;
 	}
 
-	void play( sampleFrame* buffer ) override;
+	void play( SampleFrame* buffer ) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;
@@ -64,4 +67,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_PRESET_PREVIEW_PLAY_HANDLE_H

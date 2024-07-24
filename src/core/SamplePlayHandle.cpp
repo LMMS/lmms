@@ -23,25 +23,28 @@
  */
 
 #include "SamplePlayHandle.h"
+#include "AudioEngine.h"
 #include "AudioPort.h"
-#include "BBTrack.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
-#include "Mixer.h"
-#include "SampleTCO.h"
+#include "Note.h"
+#include "PatternTrack.h"
+#include "SampleClip.h"
+#include "SampleTrack.h"
+
+namespace lmms
+{
 
 
-
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort) :
+	PlayHandle( Type::SamplePlayHandle ),
+	m_sample(sample),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
 	m_ownAudioPort( ownAudioPort ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_track( nullptr ),
+	m_patternTrack( nullptr )
 {
 	if (ownAudioPort)
 	{
@@ -53,19 +56,18 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPo
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle( new SampleBuffer( sampleFile ) , true)
+	SamplePlayHandle(new Sample(sampleFile), true)
 {
-	sharedObject::unref( m_sampleBuffer );
 }
 
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	SamplePlayHandle( tco->sampleBuffer() , false)
+SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
+	SamplePlayHandle(&clip->sample(), false)
 {
-	m_track = tco->getTrack();
-	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
+	m_track = clip->getTrack();
+	setAudioPort( ( (SampleTrack *)clip->getTrack() )->audioPort() );
 }
 
 
@@ -73,47 +75,48 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 
 SamplePlayHandle::~SamplePlayHandle()
 {
-	sharedObject::unref( m_sampleBuffer );
 	if( m_ownAudioPort )
 	{
 		delete audioPort();
+		delete m_sample;
 	}
 }
 
 
 
 
-void SamplePlayHandle::play( sampleFrame * buffer )
+void SamplePlayHandle::play( SampleFrame* buffer )
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * fpp );
+		zeroSampleFrames(buffer, fpp);
 		return;
 	}
 
-	sampleFrame * workingBuffer = buffer;
+	SampleFrame* workingBuffer = buffer;
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period
 	if( framesDone() == 0 )
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * offset() );
+		zeroSampleFrames(buffer, offset());
 		workingBuffer += offset();
 		frames -= offset();
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
-/*		stereoVolumeVector v =
+/*		StereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq ) )
+		// SamplePlayHandle always plays the sample at its original pitch;
+		// it is used only for previews, SampleTracks and the metronome.
+		if (!m_sample->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
-			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
+			zeroSampleFrames(workingBuffer, frames);
 		}
 	}
 
@@ -133,7 +136,7 @@ bool SamplePlayHandle::isFinished() const
 
 bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_track == _track || m_bbTrack == _track;
+	return m_track == _track || m_patternTrack == _track;
 }
 
 
@@ -141,9 +144,9 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate() );
+	return (m_sample->endFrame() - m_sample->startFrame()) *
+			(static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->sampleRate());
 }
 
 
-
-
+} // namespace lmms

@@ -32,6 +32,10 @@
 #include "Lv2Manager.h"
 
 
+namespace lmms
+{
+
+
 bool Lv2Features::isFeatureSupported(const char* featName)
 {
 	return Engine::getLv2Manager()->isFeatureSupported(featName);
@@ -44,7 +48,7 @@ Lv2Features::Lv2Features()
 {
 	const Lv2Manager* man = Engine::getLv2Manager();
 	// create (yet empty) map feature URI -> feature
-	for(const char* uri : man->supportedFeatureURIs())
+	for(auto uri : man->supportedFeatureURIs())
 	{
 		m_featureByUri.emplace(uri, nullptr);
 	}
@@ -67,17 +71,25 @@ void Lv2Features::initCommon()
 void Lv2Features::createFeatureVectors()
 {
 	// create vector of features
-	for(std::pair<const char* const, void*>& pr : m_featureByUri)
+	for(const auto& [uri, feature] : m_featureByUri)
 	{
-		Q_ASSERT(pr.second != nullptr);
-		m_features.push_back(LV2_Feature { pr.first, pr.second });
+		/*
+			If pr.second is nullptr here, this means that the LV2_feature
+			has no "data". If this happens here, this means
+			* either that this feature is static
+			  (e.g. LV2_BUF_SIZE__boundedBlockLength)
+			* or that the programmer forgot to use operator[] before feature
+			  vector creation (This can be done in
+			  Lv2Proc::initPluginSpecificFeatures or in Lv2Features::initCommon)
+		*/
+		m_features.push_back(LV2_Feature{(const char*)uri.data(), (void*)feature});
 	}
 
 	// create pointer vector (for lilv_plugin_instantiate)
 	m_featurePointers.reserve(m_features.size() + 1);
-	for(std::size_t i = 0; i < m_features.size(); ++i)
+	for (const auto& feature : m_features)
 	{
-		m_featurePointers.push_back(&m_features[i]);
+		m_featurePointers.push_back(&feature);
 	}
 	m_featurePointers.push_back(nullptr);
 }
@@ -92,6 +104,21 @@ void *&Lv2Features::operator[](const char *featName)
 	return itr->second;
 }
 
+
+
+
+void Lv2Features::clear()
+{
+	m_features.clear();
+	for (auto& [uri, feature] : m_featureByUri)
+	{
+		(void) uri;
+		feature = nullptr;
+	}
+}
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

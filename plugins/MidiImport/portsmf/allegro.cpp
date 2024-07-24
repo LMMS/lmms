@@ -207,12 +207,12 @@ Alg_parameters *Alg_parameters::remove_key(Alg_parameters **list,
         if (STREQL((*list)->parm.attr_name(), name)) {
             Alg_parameters_ptr p = *list;
             *list = p->next;
-            p->next = NULL;
+            p->next = nullptr;
             return p; // caller should free this pointer
         }
         list = &((*list)->next);
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -225,7 +225,7 @@ Alg_parameter_ptr Alg_parameters::find(Alg_attribute attr)
             return &(temp->parm);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -287,7 +287,7 @@ void Alg_event::set_string_value(const char *a, const char *value)
     parm.set_attr(attr);
     parm.s = value;
     set_parameter(&parm);
-    parm.s = NULL; // do this to prevent string from being freed
+    parm.s = nullptr; // do this to prevent string from being freed
 }
 
 
@@ -416,7 +416,7 @@ bool Alg_event::has_attribute(const char *a)
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
     Alg_parameter_ptr parm = note->parameters->find(attr);
-    return parm != NULL;
+    return parm != nullptr;
 }
 
 
@@ -491,7 +491,7 @@ const char *Alg_event::get_atom_value(const char *a, const char *value)
     if (parm) return parm->a;
     // if default is a string, convert to an atom (unique
     // string in symbol table) and return it
-    return (value == NULL ? NULL :
+    return (value == nullptr ? nullptr :
               symbol_table.insert_string(value));
 }
 
@@ -1246,7 +1246,7 @@ void Alg_time_map::insert_beats(double start, double len)
 Alg_track::Alg_track(Alg_time_map *map, bool seconds)
 {
     type = 't';
-    time_map = NULL;
+    time_map = nullptr;
     units_are_seconds = seconds;
     set_time_map(map);
 }
@@ -1267,7 +1267,7 @@ Alg_event_ptr Alg_track::copy_event(Alg_event_ptr event)
 Alg_track::Alg_track(Alg_track &track)
 {
     type = 't';
-    time_map = NULL;
+    time_map = nullptr;
     for (int i = 0; i < track.length(); i++) {
       append(copy_event(track.events[i]));
     }
@@ -1280,7 +1280,7 @@ Alg_track::Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map,
                      bool units_are_seconds)
 {
     type = 't';
-    time_map = NULL;
+    time_map = nullptr;
     for (int i = 0; i < event_list.length(); i++) {
         append(copy_event(event_list[i]));
     }
@@ -1628,7 +1628,7 @@ void Alg_track::unserialize_track()
             // (although order shouldn't matter)
             Alg_parameters_ptr *list = &note->parameters;
             for (j = 0; j < param_num; j++) {
-                *list = new Alg_parameters(NULL);
+                *list = new Alg_parameters(nullptr);
                 unserialize_parameter(&((*list)->parm));
                 list = &((*list)->next);
             }
@@ -1677,7 +1677,7 @@ void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr)
 void Alg_track::set_time_map(Alg_time_map *map)
 {
     if (time_map) time_map->dereference();
-    if (map == NULL) {
+    if (map == nullptr) {
         time_map = new Alg_time_map(); // new default map
         time_map->reference();
     } else {
@@ -2628,7 +2628,7 @@ void Alg_tracks::reset()
         delete tracks[i];
     }
     if (tracks) delete [] tracks;
-    tracks = NULL;
+    tracks = nullptr;
     len = 0;
     maxlen = 0;
 }
@@ -2880,8 +2880,7 @@ Alg_event_ptr const &Alg_seq::operator[](int i)
         }
         tr++;
     }
-    assert(false); // out of bounds
-    return NULL;
+	throw std::out_of_range{"Alg_seq::operator[] - Index out of range."};
 }
 //#pragma warning(default: 4715)
 
@@ -2954,7 +2953,7 @@ Alg_seq_ptr Alg_seq::cut(double start, double len, bool all)
 {
     double dur = get_dur();
     // fix parameters to fall within existing sequence
-    if (start > dur) return NULL; // nothing to cut
+    if (start > dur) return nullptr; // nothing to cut
     if (start < 0) start = 0; // can't start before sequence starts
     if (start + len > dur) // can't cut after end:
         len = dur - start; 
@@ -3059,7 +3058,7 @@ Alg_track_ptr Alg_seq::copy_track(int track_num, double t, double len, bool all)
 Alg_seq *Alg_seq::copy(double start, double len, bool all)
 {
     // fix parameters to fall within existing sequence
-    if (start > get_dur()) return NULL; // nothing to copy
+    if (start > get_dur()) return nullptr; // nothing to copy
     if (start < 0) start = 0; // can't copy before sequence starts
     if (start + len > get_dur()) // can't copy after end:
         len = get_dur() - start; 
@@ -3445,7 +3444,7 @@ Alg_event_ptr Alg_iterator::next(bool *note_on, void **cookie_ptr,
     bool on;
     double when;
     if (!remove_next(events_ptr, index, on, cookie, offset, when)) {
-        return NULL;
+        return nullptr;
     }
     if (note_on) *note_on = on;
     Alg_event_ptr event = (*events_ptr)[index];

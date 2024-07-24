@@ -23,22 +23,32 @@
  *
  */
 
-#ifndef MIDI_PORT_H
-#define MIDI_PORT_H
+#ifndef LMMS_MIDI_PORT_H
+#define LMMS_MIDI_PORT_H
 
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QMap>
+#include <QString>
+#include <QList>
+#include <QMap>
 
 #include "Midi.h"
 #include "TimePos.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
 
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
+
+namespace gui
+{
+
 class MidiPortMenu;
+class ControllerConnectionDialog;
+class InstrumentMidiIOView;
+
+}
 
 
 // class for abstraction of MIDI-port
@@ -57,23 +67,22 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
-	typedef QMap<QString, bool> Map;
+	using Map = QMap<QString, bool>;
 
-	enum Modes
+	enum class Mode
 	{
 		Disabled,	// don't route any MIDI-events (default)
 		Input,		// from MIDI-client to MIDI-event-processor
 		Output,		// from MIDI-event-processor to MIDI-client
 		Duplex		// both directions
 	} ;
-	typedef Modes Mode;
 
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,
-			Model* parent = NULL,
-			Mode mode = Disabled );
-	virtual ~MidiPort();
+			Model* parent = nullptr,
+			Mode mode = Mode::Disabled );
+	~MidiPort() override;
 
 	void setName( const QString& name );
 
@@ -86,12 +95,12 @@ public:
 
 	bool isInputEnabled() const
 	{
-		return mode() == Input || mode() == Duplex;
+		return mode() == Mode::Input || mode() == Mode::Duplex;
 	}
 
 	bool isOutputEnabled() const
 	{
-		return mode() == Output || mode() == Duplex;
+		return mode() == Mode::Output || mode() == Mode::Duplex;
 	}
 
 	int realOutputChannel() const
@@ -129,8 +138,8 @@ public:
 
 	void invalidateCilent();
 
-	MidiPortMenu* m_readablePortsMenu;
-	MidiPortMenu* m_writablePortsMenu;
+	gui::MidiPortMenu* m_readablePortsMenu;
+	gui::MidiPortMenu* m_writablePortsMenu;
 
 
 public slots:
@@ -165,8 +174,8 @@ private:
 	Map m_writablePorts;
 
 
-	friend class ControllerConnectionDialog;
-	friend class InstrumentMidiIOView;
+	friend class gui::ControllerConnectionDialog;
+	friend class gui::InstrumentMidiIOView;
 
 
 signals:
@@ -176,8 +185,8 @@ signals:
 
 } ;
 
+using MidiPortList = QList<MidiPort*>;
 
-typedef QList<MidiPort *> MidiPortList;
+} // namespace lmms
 
-
-#endif
+#endif // LMMS_MIDI_PORT_H

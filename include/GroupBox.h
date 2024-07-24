@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef GROUP_BOX_H
-#define GROUP_BOX_H
+#ifndef LMMS_GUI_GROUP_BOX_H
+#define LMMS_GUI_GROUP_BOX_H
 
 #include <QWidget>
 
@@ -34,13 +33,15 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
 
 class GroupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
 public:
-	GroupBox( const QString & _caption, QWidget * _parent = NULL );
-	virtual ~GroupBox();
+	GroupBox( const QString & _caption, QWidget * _parent = nullptr );
+	~GroupBox() override;
 
 	void modelChanged() override;
 
@@ -48,6 +49,21 @@ public:
 	{
 		return m_led;
 	}
+
+	/**
+	 * @brief Returns whether the LED button is shown or not
+	 * 
+	 * @return true LED button is shown
+	 * @return false LED button is hidden
+	 */
+	bool ledButtonShown() const;
+
+	/**
+	 * @brief Sets if the LED check box is shown or not
+	 * 
+	 * @param value Set to true to show the LED check box or to false to hide it.
+	 */
+	void setLedButtonShown(bool value);
 
 	int titleBarHeight() const
 	{
@@ -70,6 +86,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_GROUP_BOX_H

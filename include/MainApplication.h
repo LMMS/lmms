@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MAINAPPLICATION_H
-#define MAINAPPLICATION_H
+#ifndef LMMS_GUI_MAIN_APPLICATION_H
+#define LMMS_GUI_MAIN_APPLICATION_H
 
 #include "lmmsconfig.h"
 
@@ -33,6 +33,11 @@
 #include <windows.h>
 #include <QAbstractNativeEventFilter>
 #endif
+
+
+namespace lmms::gui
+{
+
 
 #if defined(LMMS_BUILD_WIN32)
 class MainApplication : public QApplication, public QAbstractNativeEventFilter
@@ -56,4 +61,7 @@ private:
 	QString m_queuedFile;
 };
 
-#endif // MAINAPPLICATION_H
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_MAIN_APPLICATION_H

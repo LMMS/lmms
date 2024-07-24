@@ -1,6 +1,5 @@
 #include "PathUtil.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 
@@ -8,9 +7,9 @@
 #include "Engine.h"
 #include "Song.h"
 
-namespace PathUtil
+namespace lmms::PathUtil
 {
-	Base relativeBases[] = { Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
+	auto relativeBases = std::array{ Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
 		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
 		Base::LocalDir };
 
@@ -122,7 +121,7 @@ namespace PathUtil
 		//Check if it's a factory sample
 		QString factoryPath = baseLocation(Base::FactorySample) + input;
 		QFileInfo factoryInfo(factoryPath);
-		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }	
+		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
 
 		//Check if it's a VST
 		QString vstPath = baseLocation(Base::UserVST) + input;
@@ -188,4 +187,5 @@ namespace PathUtil
 		}
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
-}
+
+} // namespace lmms::PathUtil

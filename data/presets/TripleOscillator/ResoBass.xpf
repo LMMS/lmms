@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="ResoBass" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="30">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="30">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="26" userwavefile0="" finer0="6" userwavefile1="" finer1="0" userwavefile2="" finer2="1" coarse0="0" coarse1="0" coarse2="-12" finel0="-4" finel1="0" modalgo1="2" modalgo2="2" finel2="1" pan0="0" modalgo3="2" pan1="0" stphdetun0="227" pan2="0" stphdetun1="102" wavetype0="4" stphdetun2="255" wavetype1="5" wavetype2="0" vol0="51" vol1="97" phoffset0="0" phoffset1="152" vol2="100"/>
       </instrument>

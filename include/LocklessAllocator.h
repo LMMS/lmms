@@ -22,11 +22,16 @@
  *
  */
 
-#ifndef LOCKLESS_ALLOCATOR_H
-#define LOCKLESS_ALLOCATOR_H
+#ifndef LMMS_LOCKLESS_ALLOCATOR_H
+#define LMMS_LOCKLESS_ALLOCATOR_H
 
 #include <atomic>
-#include <stddef.h>
+#include <cstddef>
+
+
+namespace lmms
+{
+
 
 class LocklessAllocator
 {
@@ -45,8 +50,8 @@ private:
 	std::atomic_int * m_freeState;
 	size_t m_freeStateSets;
 
-	std::atomic_int m_available;
-	std::atomic_int m_startIndex;
+	std::atomic_size_t m_available;
+	std::atomic_size_t m_startIndex;
 
 } ;
 
@@ -62,9 +67,7 @@ public:
 	{
 	}
 
-	virtual ~LocklessAllocatorT()
-	{
-	}
+	~LocklessAllocatorT() override = default;
 
 	T * alloc()
 	{
@@ -79,4 +82,6 @@ public:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_LOCKLESS_ALLOCATOR_H

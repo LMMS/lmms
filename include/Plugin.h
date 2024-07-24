@@ -22,23 +22,30 @@
  *
  */
 
-#ifndef PLUGIN_H
-#define PLUGIN_H
+#ifndef LMMS_PLUGIN_H
+#define LMMS_PLUGIN_H
 
-#include <QtCore/QStringList>
-#include <QtCore/QMap>
-#include <QtXml/QDomDocument>
+#include <QStringList>
+#include <QMap>
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MemoryManager.h"
 
 
 class QWidget;
 
-class PixmapLoader;
-class PluginView;
+namespace lmms
+{
+
 class AutomatableModel;
+class PixmapLoader;
+
+namespace gui
+{
+
+class PluginView;
+
+}
 
 /**
 	Abstract representation of a plugin
@@ -63,10 +70,9 @@ class AutomatableModel;
 */
 class LMMS_EXPORT Plugin : public Model, public JournallingObject
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
-	enum PluginTypes
+	enum class Type
 	{
 		Instrument,	// instrument being used in channel-track
 		Effect,		// effect-plugin for effect-board
@@ -89,7 +95,7 @@ public:
 		const char * description;
 		const char * author;
 		int version;
-		PluginTypes type;
+		Type type;
 		const PixmapLoader * logo;
 		const char * supportedFileTypes; //!< csv list of extensions
 
@@ -128,9 +134,9 @@ public:
 			*/
 			struct Key
 			{
-				typedef QMap<QString, QString> AttributeMap;
+				using AttributeMap = QMap<QString, QString>;
 
-				inline Key( const Plugin::Descriptor * desc = NULL,
+				inline Key( const Plugin::Descriptor * desc = nullptr,
 						const QString & name = QString(),
 						const AttributeMap & am = AttributeMap()
 					)
@@ -171,17 +177,14 @@ public:
 				const PixmapLoader* logo() const;
 			} ;
 
-			typedef QList<Key> KeyList;
+			using KeyList = QList<Key>;
 
-
-			SubPluginFeatures( Plugin::PluginTypes type ) :
+			SubPluginFeatures( Plugin::Type type ) :
 				m_type( type )
 			{
 			}
 
-			virtual ~SubPluginFeatures()
-			{
-			}
+			virtual ~SubPluginFeatures() = default;
 
 			virtual void fillDescriptionWidget( QWidget *, const Key * ) const
 			{
@@ -222,21 +225,21 @@ public:
 			}
 
 		protected:
-			const Plugin::PluginTypes m_type;
+			const Plugin::Type m_type;
 		} ;
 
 		SubPluginFeatures * subPluginFeatures;
 
 	} ;
 	// typedef a list so we can easily work with list of plugin descriptors
-	typedef QList<Descriptor*> DescriptorList;
+	using DescriptorList = QList<Descriptor*>;
 
 	//! Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//!   See the key() function
 	Plugin(const Descriptor * descriptor, Model * parent,
 		const Descriptor::SubPluginFeatures::Key *key = nullptr);
-	virtual ~Plugin();
+	~Plugin() override = default;
 
 	//! Return display-name out of sub plugin or descriptor
 	QString displayName() const override;
@@ -245,7 +248,7 @@ public:
 	const PixmapLoader *logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type( void ) const
+	inline Type type() const
 	{
 		return m_descriptor->type;
 	}
@@ -287,11 +290,11 @@ public:
 	static Plugin * instantiate(const QString& pluginName, Model * parent, void *data);
 
 	//! Create a view for the model
-	PluginView * createView( QWidget * parent );
+	gui::PluginView * createView( QWidget * parent );
 
 protected:
 	//! Create a view for the model
-	virtual PluginView* instantiateView( QWidget * ) = 0;
+	virtual gui::PluginView* instantiateView( QWidget * ) = 0;
 	void collectErrorForUI( QString errMsg );
 
 
@@ -301,9 +304,10 @@ private:
 	Descriptor::SubPluginFeatures::Key m_key;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model * , void * );
-
+	using InstantiationHook = Plugin* (*)(Model*, void*);
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_PLUGIN_H

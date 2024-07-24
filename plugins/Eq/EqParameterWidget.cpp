@@ -25,13 +25,21 @@
 
 #include "EqParameterWidget.h"
 
+#include <cmath>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QMouseEvent>
+#include <QPainter>
+#include <QPen>
 #include <QWidget>
 
-#include "EqControls.h"
-#include "lmms_math.h"
+#include "AutomatableModel.h"
+#include "EqCurve.h"
+#include "EqParameterWidget.h"
+#include "lmms_constants.h"
+
+
+namespace lmms::gui
+{
 
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
@@ -48,31 +56,31 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
-	QGraphicsScene *scene = new QGraphicsScene();
+	auto scene = new QGraphicsScene(this);
 	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	QGraphicsView *view = new QGraphicsView( this );
+	auto view = new QGraphicsView(this);
 	view->setStyleSheet( "border-style: none; background: transparent;" );
 	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setScene( scene );
 
 	//adds the handles
-	m_handleList = new QList<EqHandle*>;
+	m_handleList.reserve(bandCount());
 	for ( int i = 0; i < bandCount(); i++ )
 	{
 		m_handle = new EqHandle ( i, m_displayWidth, m_displayHeigth );
-		m_handleList->append( m_handle );
+		m_handleList.append(m_handle);
 		m_handle->setZValue( 1 );
 		scene->addItem( m_handle );
 	}
 
 	//adds the curve widget
-	m_eqcurve = new EqCurve( m_handleList, m_displayWidth, m_displayHeigth );
+	m_eqcurve = new EqCurve(&m_handleList, m_displayWidth, m_displayHeigth);
 	scene->addItem( m_eqcurve );
 	for ( int i = 0; i < bandCount(); i++ )
 	{
 		// if the data of handle position has changed update the models
-		QObject::connect( m_handleList->at( i ) ,SIGNAL( positionChanged() ), this ,SLOT( updateModels() ) );
+		QObject::connect(m_handleList.at(i), SIGNAL(positionChanged()), this, SLOT(updateModels()));
 	}
 }
 
@@ -104,16 +112,13 @@ void EqParameterWidget::updateHandle()
 	m_eqcurve->setModelChanged( true );
 	for( int i = 0 ; i < bandCount(); i++ )
 	{
-		if ( !m_handleList->at( i )->mousePressed() ) //prevents a short circuit between handle and data model
+		if (!m_handleList.at(i)->mousePressed()) // prevents a short circuit between handle and data model
 		{
 			//sets the band on active if a fader or a knob is moved
 			bool hover = false; // prevents an action if handle is moved
 			for ( int j = 0; j < bandCount(); j++ )
 			{
-				if ( m_handleList->at(j)->isMouseHover() )
-				{
-					hover = true;
-				}
+				if (m_handleList.at(j)->isMouseHover()) { hover = true; }
 			}
 			if ( !hover )
 			{
@@ -123,17 +128,14 @@ void EqParameterWidget::updateHandle()
 			}
 			changeHandle( i );
 		}
-		else
-		{
-			m_handleList->at( i )->setHandleActive( m_bands[i].active->value() );
-		}
+		else { m_handleList.at(i)->setHandleActive(m_bands[i].active->value()); }
 	}
-	if ( m_bands[0].hp12->value() ) m_handleList->at( 0 )->sethp12();
-	if ( m_bands[0].hp24->value() ) m_handleList->at( 0 )->sethp24();
-	if ( m_bands[0].hp48->value() ) m_handleList->at( 0 )->sethp48();
-	if ( m_bands[7].lp12->value() ) m_handleList->at( 7 )->setlp12();
-	if ( m_bands[7].lp24->value() ) m_handleList->at( 7 )->setlp24();
-	if ( m_bands[7].lp48->value() ) m_handleList->at( 7 )->setlp48();
+	if (m_bands[0].hp12->value()) m_handleList.at(0)->sethp12();
+	if (m_bands[0].hp24->value()) m_handleList.at(0)->sethp24();
+	if (m_bands[0].hp48->value()) m_handleList.at(0)->sethp48();
+	if (m_bands[7].lp12->value()) m_handleList.at(7)->setlp12();
+	if (m_bands[7].lp24->value()) m_handleList.at(7)->setlp24();
+	if (m_bands[7].lp48->value()) m_handleList.at(7)->setlp48();
 }
 
 
@@ -143,7 +145,7 @@ void EqParameterWidget::changeHandle( int i )
 {
 	//fill x, y, and bw with data from model
 	float x = EqHandle::freqToXPixel( m_bands[i].freq->value(), m_displayWidth );
-	float y = m_handleList->at( i )->y();
+	float y = m_handleList.at(i)->y();
 	//for pass filters there is no gain model
 	if( m_bands[i].gain )
 	{
@@ -156,48 +158,45 @@ void EqParameterWidget::changeHandle( int i )
 	switch ( i )
 	{
 	case 0 :
-		m_handleList->at( i )->setType( highpass );
-		m_handleList->at( i )->setPos( x, m_displayHeigth / 2 );
+		m_handleList.at(i)->setType(EqHandleType::HighPass);
+		m_handleList.at(i)->setPos(x, m_displayHeigth / 2);
 		break;
 	case 1:
-		m_handleList->at( i )->setType( lowshelf );
-		m_handleList->at( i )->setPos( x, y );
+		m_handleList.at(i)->setType(EqHandleType::LowShelf);
+		m_handleList.at(i)->setPos(x, y);
 		break;
 	case 2:
-		m_handleList->at( i )->setType( para );
-		m_handleList->at( i )->setPos( x, y );
+		m_handleList.at(i)->setType(EqHandleType::Para);
+		m_handleList.at(i)->setPos(x, y);
 		break;
 	case 3:
-		m_handleList->at( i )->setType( para );
-		m_handleList->at( i )->setPos( x, y );
+		m_handleList.at(i)->setType(EqHandleType::Para);
+		m_handleList.at(i)->setPos(x, y);
 		break;
 	case 4:
-		m_handleList->at( i )->setType( para );
-		m_handleList->at( i )->setPos( x, y );
+		m_handleList.at(i)->setType(EqHandleType::Para);
+		m_handleList.at(i)->setPos(x, y);
 		break;
 	case 5:
-		m_handleList->at( i )->setType( para );
-		m_handleList->at( i )->setPos( x, y );
+		m_handleList.at(i)->setType(EqHandleType::Para);
+		m_handleList.at(i)->setPos(x, y);
 		break;
 	case 6:
-		m_handleList->at( i )->setType( highshelf );
-		m_handleList->at( i )->setPos( x, y );
+		m_handleList.at(i)->setType(EqHandleType::HighShelf);
+		m_handleList.at(i)->setPos(x, y);
 		break;
 	case 7:
-		m_handleList->at( i )->setType( lowpass );
-		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth / 2 ) );
+		m_handleList.at(i)->setType(EqHandleType::LowPass);
+		m_handleList.at(i)->setPos(QPointF(x, m_displayHeigth / 2));
 		break;
 	}
 
 	// set resonance/bandwidth for each handle
-	if ( m_handleList->at( i )->getResonance() != bw )
-	{
-		m_handleList->at( i )->setResonance( bw );
-	}
+	if (m_handleList.at(i)->getResonance() != bw) { m_handleList.at(i)->setResonance(bw); }
 
 	// and the active status
-	m_handleList->at( i )->setHandleActive( m_bands[i].active->value() );
-	m_handleList->at( i )->update();
+	m_handleList.at(i)->setHandleActive(m_bands[i].active->value());
+	m_handleList.at(i)->update();
 	m_eqcurve->update();
 }
 
@@ -208,19 +207,17 @@ void EqParameterWidget::updateModels()
 {
 	for ( int i=0 ; i < bandCount(); i++ )
 	{
-		m_bands[i].freq->setValue( EqHandle::xPixelToFreq( m_handleList->at( i )->x(), m_displayWidth ) );
+		m_bands[i].freq->setValue(EqHandle::xPixelToFreq(m_handleList.at(i)->x(), m_displayWidth));
 
 		if( m_bands[i].gain )
 		{
-			m_bands[i].gain->setValue( EqHandle::yPixelToGain( m_handleList->at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight ) );
+			m_bands[i].gain->setValue(
+				EqHandle::yPixelToGain(m_handleList.at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight));
 		}
 
-		m_bands[i].res->setValue( m_handleList->at( i )->getResonance() );
+		m_bands[i].res->setValue(m_handleList.at(i)->getResonance());
 		//identifies the handle which is moved and set the band active
-		if ( sender() == m_handleList->at( i ) )
-		{
-			m_bands[i].active->setValue( true );
-		}
+		if (sender() == m_handleList.at(i)) { m_bands[i].active->setValue(true); }
 	}
 	m_eqcurve->update();
 }
@@ -240,3 +237,6 @@ EqBand::EqBand() :
 	peakR( 0 )
 {
 }
+
+
+} // namespace lmms::gui

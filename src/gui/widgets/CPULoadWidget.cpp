@@ -24,12 +24,17 @@
  */
 
 
+#include <algorithm>
 #include <QPainter>
 
+#include "AudioEngine.h"
 #include "CPULoadWidget.h"
 #include "embed.h"
 #include "Engine.h"
-#include "Mixer.h"
+
+
+namespace lmms::gui
+{
 
 
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
@@ -47,17 +52,13 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	m_temp = QPixmap( width(), height() );
 	
 
-	connect( &m_updateTimer, SIGNAL( timeout() ),
-					this, SLOT( updateCpuLoad() ) );
+	connect( &m_updateTimer, SIGNAL(timeout()),
+					this, SLOT(updateCpuLoad()));
 	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
 }
 
 
 
-
-CPULoadWidget::~CPULoadWidget()
-{
-}
 
 
 
@@ -72,10 +73,9 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );
 
-		// as load-indicator consists of small 2-pixel wide leds with
-		// 1 pixel spacing, we have to make sure, only whole leds are
-		// shown which we achieve by the following formula
-		int w = ( m_leds.width() * m_currentLoad / 300 ) * 3;
+		// Normally the CPU load indicator moves smoothly, with 1 pixel resolution. However, some themes may want to
+		// draw discrete elements (like LEDs), so the stepSize property can be used to specify a larger step size.
+		int w = (m_leds.width() * std::min(m_currentLoad, 100) / (stepSize() * 100)) * stepSize();
 		if( w > 0 )
 		{
 			p.drawPixmap( 23, 3, m_leds, 0, 0, w,
@@ -91,10 +91,21 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 
 void CPULoadWidget::updateCpuLoad()
 {
-	// smooth load-values a bit
-	int new_load = ( m_currentLoad + Engine::mixer()->cpuLoad() ) / 2;
-	if( new_load != m_currentLoad )
+	// Additional display smoothing for the main load-value. Stronger averaging
+	// cannot be used directly in the profiler: cpuLoad() must react fast enough
+	// to be useful as overload indicator in AudioEngine::criticalXRuns().
+	const int new_load = (m_currentLoad + Engine::audioEngine()->cpuLoad()) / 2;
+
+	if (new_load != m_currentLoad)
 	{
+		auto engine = Engine::audioEngine();
+		setToolTip(
+			tr("DSP total: %1%").arg(new_load) + "\n"
+			+ tr(" - Notes and setup: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::NoteSetup)) + "\n"
+			+ tr(" - Instruments: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Instruments)) + "\n"
+			+ tr(" - Effects: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Effects)) + "\n"
+			+ tr(" - Mixing: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Mixing))
+		);
 		m_currentLoad = new_load;
 		m_changed = true;
 		update();
@@ -102,7 +113,4 @@ void CPULoadWidget::updateCpuLoad()
 }
 
 
-
-
-
-
+} // namespace lmms::gui

@@ -22,14 +22,18 @@
  *
  */
 
-#ifndef SIDE_BAR_H
-#define SIDE_BAR_H
+#ifndef LMMS_GUI_SIDE_BAR_H
+#define LMMS_GUI_SIDE_BAR_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QButtonGroup>
 #include <QToolBar>
 
 class QToolButton;
+
+namespace lmms::gui
+{
+
 class SideBarWidget;
 
 
@@ -38,7 +42,7 @@ class SideBar : public QToolBar
 	Q_OBJECT
 public:
 	SideBar( Qt::Orientation _orientation, QWidget * _parent );
-	virtual ~SideBar();
+	~SideBar() override = default;
 
 	void appendTab( SideBarWidget * _sbw );
 
@@ -49,9 +53,11 @@ private slots:
 
 private:
 	QButtonGroup m_btnGroup;
-	typedef QMap<QToolButton *, QWidget *> ButtonMap;
+	using ButtonMap = QMap<QToolButton*, QWidget*>;
 	ButtonMap m_widgets;
 
 } ;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SIDE_BAR_H

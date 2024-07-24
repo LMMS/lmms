@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef LADSPA_CONTROL_H
-#define LADSPA_CONTROL_H
+#ifndef LMMS_LADSPA_CONTROL_H
+#define LMMS_LADSPA_CONTROL_H
 
 #include <ladspa.h>
 
@@ -32,8 +32,18 @@
 #include "TempoSyncKnobModel.h"
 #include "ValueBuffer.h"
 
+namespace lmms
+{
 
-typedef struct PortDescription port_desc_t;
+struct port_desc_t;
+
+namespace gui
+{
+
+class LadspaControlView;
+class LadspaMatrixControlDialog;
+
+} // namespace gui
 
 
 class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
@@ -42,7 +52,7 @@ class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
 public:
 	LadspaControl( Model * _parent, port_desc_t * _port,
 							bool _link = false );
-	~LadspaControl();
+	~LadspaControl() override = default;
 
 	LADSPA_Data value();
 	ValueBuffer * valueBuffer();
@@ -115,8 +125,12 @@ private:
 	TempoSyncKnobModel m_tempoSyncKnobModel;
 
 
-	friend class LadspaControlView;
+	friend class gui::LadspaControlView;
+	friend class gui::LadspaMatrixControlDialog;
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_LADSPA_CONTROL_H

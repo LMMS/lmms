@@ -23,14 +23,14 @@
  *
  */
 
-
-#ifndef TIME_POS_H
-#define TIME_POS_H
-
-#include <QtGlobal>
+#ifndef LMMS_TIME_POS_H
+#define LMMS_TIME_POS_H
 
 #include "lmms_export.h"
 #include "lmms_basics.h"
+
+namespace lmms
+{
 
 // note: a bar was erroneously called "tact" in older versions of LMMS
 const int DefaultTicksPerBar = 192;
@@ -114,4 +114,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_TIME_POS_H

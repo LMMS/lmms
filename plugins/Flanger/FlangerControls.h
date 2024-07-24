@@ -26,8 +26,10 @@
 #define FLANGERCONTROLS_H
 
 #include "EffectControls.h"
-#include "Knob.h"
 #include "FlangerControlsDialog.h"
+
+namespace lmms
+{
 
 
 class FlangerEffect;
@@ -37,22 +39,20 @@ class FlangerControls : public EffectControls
 	Q_OBJECT
 public:
 	FlangerControls( FlangerEffect* effect );
-	virtual ~FlangerControls()
-	{
-	}
-	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
-	virtual void loadSettings ( const QDomElement &_this );
-	inline virtual QString nodeName() const
+	~FlangerControls() override = default;
+	void saveSettings ( QDomDocument& doc, QDomElement& parent ) override;
+	void loadSettings ( const QDomElement &_this ) override;
+	inline QString nodeName() const override
 	{
 		return "Flanger";
 	}
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 7;
 	}
-	virtual EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new FlangerControlsDialog( this );
+		return new gui::FlangerControlsDialog( this );
 	}
 
 private slots:
@@ -69,9 +69,12 @@ private:
 	FloatModel m_whiteNoiseAmountModel;
 	BoolModel m_invertFeedbackModel;
 
-	friend class FlangerControlsDialog;
+	friend class gui::FlangerControlsDialog;
 	friend class FlangerEffect;
 
 };
+
+
+} // namespace lmms
 
 #endif // FLANGERCONTROLS_H

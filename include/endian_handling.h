@@ -22,12 +22,16 @@
  *
  */
 
-#ifndef ENDIAN_HANDLING_H
-#define ENDIAN_HANDLING_H
+#ifndef LMMS_ENDIAN_HANDLING_H
+#define LMMS_ENDIAN_HANDLING_H
 
-#include <QtCore/QSysInfo>
+#include <QSysInfo>
 
 #include "lmms_basics.h"
+
+
+namespace lmms
+{
 
 
 inline bool isLittleEndian()
@@ -50,4 +54,7 @@ inline int32_t swap32IfBE( int32_t i )
 					( ( i & 0x000000ff ) << 24 ) );
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_ENDIAN_HANDLING_H

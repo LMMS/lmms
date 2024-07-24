@@ -53,7 +53,7 @@ hanning (sample_t * s, int n)
 	/* could speed up by using DSP::Sine but we rarely use this window */
 	for (int i = 0; i < n; ++i)
 	{
-		register double f = (double) i / n - 1;
+		double f = (double) i / n - 1;
 		F (s[i], .5 - .5 * cos (2 * M_PI * f));
 	}
 }
@@ -62,13 +62,13 @@ template <window_sample_func_t F>
 void
 blackman (sample_t * s, int n)
 {
-	register float w = n;
+	float w = n;
 
 	for (int i = 0; i < n; ++i)
 	{
-		register float f = (float) i;
+		float f = (float) i;
 
-		register double b = .42f - 
+		double b = .42f - 
 						.5f * cos (2.f * f * M_PI / w) + 
 						.08 * cos (4.f * f * M_PI / w);
 
@@ -80,15 +80,15 @@ template <window_sample_func_t F>
 void
 blackman_harris (sample_t * s, int n)
 {
-	register double w1 = 2.f * M_PI / (n - 1);
-	register double w2 = 2.f * w1;
-	register double w3 = 3.f * w1;
+	double w1 = 2.f * M_PI / (n - 1);
+	double w2 = 2.f * w1;
+	double w3 = 3.f * w1;
 
 	for (int i = 0; i < n; ++i)
 	{
-		register double f = (double) i;
+		double f = (double) i;
 
-		register double bh = .35875f - 
+		double bh = .35875f - 
 				.48829f * cos (w1 * f) + 
 				.14128f * cos (w2 * f) - 
 				.01168f * cos (w3 * f);

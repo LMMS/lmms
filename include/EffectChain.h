@@ -23,14 +23,25 @@
  *
  */
 
-#ifndef EFFECT_CHAIN_H
-#define EFFECT_CHAIN_H
+#ifndef LMMS_EFFECT_CHAIN_H
+#define LMMS_EFFECT_CHAIN_H
 
 #include "Model.h"
 #include "SerializingObject.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
+
 class Effect;
+class SampleFrame;
+
+namespace gui
+{
+
+class EffectRackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT EffectChain : public Model, public SerializingObject
@@ -38,7 +49,7 @@ class LMMS_EXPORT EffectChain : public Model, public SerializingObject
 	Q_OBJECT
 public:
 	EffectChain( Model * _parent );
-	virtual ~EffectChain();
+	~EffectChain() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -52,20 +63,20 @@ public:
 	void removeEffect( Effect * _effect );
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
-	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise );
+	bool processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bool hasInputNoise );
 	void startRunning();
 
 	void clear();
 
 
 private:
-	typedef QVector<Effect *> EffectList;
+	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;
 
 
-	friend class EffectRackView;
+	friend class gui::EffectRackView;
 
 
 signals:
@@ -73,5 +84,6 @@ signals:
 
 } ;
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_EFFECT_CHAIN_H

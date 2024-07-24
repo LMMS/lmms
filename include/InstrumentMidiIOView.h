@@ -23,19 +23,26 @@
  *
  */
 
-#ifndef INSTRUMENT_MIDI_IO_VIEW_H
-#define INSTRUMENT_MIDI_IO_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_MIDI_IO_VIEW_H
+#define LMMS_GUI_INSTRUMENT_MIDI_IO_VIEW_H
 
 #include <QWidget>
 
 #include "ModelView.h"
 
+class QToolButton;
+
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class GroupBox;
 class LcdSpinBox;
-class QToolButton;
 class LedCheckBox;
-class InstrumentTrack;
 
 
 class InstrumentMidiIOView : public QWidget, public ModelView
@@ -43,7 +50,7 @@ class InstrumentMidiIOView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentMidiIOView( QWidget* parent );
-	virtual ~InstrumentMidiIOView();
+	~InstrumentMidiIOView() override = default;
 
 
 private:
@@ -65,22 +72,9 @@ private:
 
 } ;
 
-class InstrumentMiscView : public QWidget
-{
-	Q_OBJECT
-public:
-	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
-	~InstrumentMiscView();
 
-	GroupBox * pitchGroupBox()
-	{
-		return m_pitchGroupBox;
-	}
+} // namespace gui
 
-private:
+} // namespace lmms
 
-	GroupBox * m_pitchGroupBox;
-
-};
-
-#endif
+#endif // LMMS_GUI_INSTRUMENT_MIDI_IO_VIEW_H

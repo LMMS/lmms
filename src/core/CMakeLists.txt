@@ -1,13 +1,15 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
+	core/AudioEngine.cpp
+	core/AudioEngineProfiler.cpp
+	core/AudioEngineWorkerThread.cpp
+	core/AudioResampler.cpp
 	core/AutomatableModel.cpp
-	core/AutomationPattern.cpp
+	core/AutomationClip.cpp
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
-	core/BBTCO.cpp
-	core/BBTrackContainer.cpp
 	core/BufferManager.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
@@ -21,7 +23,8 @@ set(LMMS_SRCS
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
-	core/FxMixer.cpp
+	core/FileSearch.cpp
+	core/Mixer.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
 	core/Instrument.cpp
@@ -29,19 +32,16 @@ set(LMMS_SRCS
 	core/InstrumentPlayHandle.cpp
 	core/InstrumentSoundShaping.cpp
 	core/JournallingObject.cpp
+	core/Keymap.cpp
 	core/Ladspa2LMMS.cpp
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
-	core/MemoryHelper.cpp
-	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
-	core/Mixer.cpp
-	core/MixerProfiler.cpp
-	core/MixerWorkerThread.cpp
+	core/Microtuner.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
@@ -49,6 +49,8 @@ set(LMMS_SRCS
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
 	core/PathUtil.cpp
+	core/PatternClip.cpp
+	core/PatternStore.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
 	core/Piano.cpp
@@ -63,18 +65,26 @@ set(LMMS_SRCS
 	core/RemotePlugin.cpp
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
+	core/Sample.cpp
 	core/SampleBuffer.cpp
+	core/SampleClip.cpp
+	core/SampleDecoder.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
-	core/SampleTCO.cpp
+	core/Scale.cpp
+	core/LmmsSemaphore.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/ThreadPool.cpp
+	core/Timeline.cpp
 	core/TimePos.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
-	core/TrackContentObject.cpp
+	core/UpgradeExtendedNoteRange.h
+	core/UpgradeExtendedNoteRange.cpp
+	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
@@ -107,6 +117,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2SubPluginFeatures.cpp
 	core/lv2/Lv2UridCache.cpp
 	core/lv2/Lv2UridMap.cpp
+	core/lv2/Lv2Worker.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp

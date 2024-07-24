@@ -23,16 +23,20 @@
 #ifndef VECTORVIEW_H
 #define VECTORVIEW_H
 
-#include <QMouseEvent>
-#include <QWheelEvent>
 #include <QWidget>
 
-#include "Knob.h"
-#include "LedCheckbox.h"
 #include "LocklessRingBuffer.h"
-#include "VecControls.h"
+
+namespace lmms
+{
+class VecControls;
+class SampleFrame;
+}
 
 //#define VEC_DEBUG
+
+namespace lmms::gui
+{
 
 
 // Widget that displays a vectorscope visualization of stereo signal.
@@ -40,8 +44,8 @@ class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
-	virtual ~VectorView() {}
+	explicit VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
+	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
 
@@ -56,8 +60,8 @@ private slots:
 private:
 	VecControls *m_controls;
 
-	LocklessRingBuffer<sampleFrame> *m_inputBuffer;
-	LocklessRingBufferReader<sampleFrame> m_bufferReader;
+	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
+	LocklessRingBufferReader<SampleFrame> m_bufferReader;
 
 	std::vector<uchar> m_displayBuffer;
 	const unsigned short m_displaySize;
@@ -77,4 +81,8 @@ private:
 	float m_executionAvg = 0;
 #endif
 };
+
+
+} // namespace lmms::gui
+
 #endif // VECTORVIEW_H

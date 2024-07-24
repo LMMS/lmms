@@ -22,15 +22,25 @@
  *
  */
 
-#ifndef LINKEDMODELGROUPVIEWS_H
-#define LINKEDMODELGROUPVIEWS_H
-
+#ifndef LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
+#define LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
 
 #include <cstddef>
 #include <memory>
-#include <vector>
 #include <QWidget>
 
+namespace lmms
+{
+
+
+class LinkedModelGroup;
+class LinkedModelGroups;
+
+
+namespace gui
+{
+
+class Control;
 
 /**
 	@file LinkedModelGroupViews.h
@@ -56,17 +66,17 @@ public:
 		@param colNum numbers of columns for the controls
 			(link LEDs not counted)
 	*/
-	LinkedModelGroupView(QWidget *parent, class LinkedModelGroup* model,
+	LinkedModelGroupView(QWidget* parent, LinkedModelGroup* model,
 		std::size_t colNum);
-	~LinkedModelGroupView();
+	~LinkedModelGroupView() override = default;
 
 	//! Reconnect models if model changed
-	void modelChanged(class LinkedModelGroup *linkedModelGroup);
+	void modelChanged(LinkedModelGroup* linkedModelGroup);
 
 protected:
 	//! Add a control to this widget
 	//! @warning This widget will own this control, do not free it
-	void addControl(class Control *ctrl, const std::string &id,
+	void addControl(Control* ctrl, const std::string &id,
 					const std::string& display, bool removable);
 
 	void removeControl(const QString &key);
@@ -95,7 +105,7 @@ protected:
 	~LinkedModelGroupsView() = default;
 
 	//! Reconnect models if model changed; to be called by child virtuals
-	void modelChanged(class LinkedModelGroups* ctrlBase);
+	void modelChanged(LinkedModelGroups* ctrlBase);
 
 private:
 	//! The base class must return the addressed group view,
@@ -104,4 +114,8 @@ private:
 };
 
 
-#endif // LINKEDMODELGROUPVIEWS_H
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H

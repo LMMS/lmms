@@ -22,11 +22,15 @@
  *
  */
 
-#ifndef PERFLOG_H
-#define PERFLOG_H
+#ifndef LMMS_PERFLOG_H
+#define LMMS_PERFLOG_H
 
 #include <ctime>
-#include <QtCore/QString>
+#include <QString>
+
+namespace lmms
+{
+
 
 /// \brief CPU time point
 ///
@@ -70,4 +74,7 @@ class PerfLogTimer
 	PerfTime begin_time;
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_PERFLOG_H

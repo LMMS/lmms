@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Harmonium" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="69" vol="59">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="69" vol="59">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" finer0="0" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="11" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="0" modalgo2="1" finel2="-24" pan0="0" modalgo3="0" pan1="-36" stphdetun0="195" pan2="27" stphdetun1="90" wavetype0="1" stphdetun2="306" wavetype1="1" wavetype2="0" vol0="35" vol1="51" phoffset0="260" phoffset1="89" vol2="32"/>
       </instrument>

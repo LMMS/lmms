@@ -25,7 +25,11 @@
 
 #include "TimePos.h"
 
+#include <cassert>
 #include "MeterModel.h"
+
+namespace lmms
+{
 
 TimeSig::TimeSig( int num, int denom ) :
 	m_num(num),
@@ -158,11 +162,11 @@ tick_t TimePos::getTickWithinBeat( const TimeSig &sig ) const
 
 f_cnt_t TimePos::frames( const float framesPerTick ) const
 {
-	if( m_ticks >= 0 )
-	{
-		return static_cast<f_cnt_t>( m_ticks * framesPerTick );
-	}
-	return 0;
+	// Before, step notes used to have negative length. This
+	// assert is a safeguard against negative length being
+	// introduced again (now using Note Types instead #5902)
+	assert(m_ticks >= 0);
+	return static_cast<f_cnt_t>(m_ticks * framesPerTick);
 }
 
 double TimePos::getTimeInMilliseconds( bpm_t beatsPerMinute ) const
@@ -191,7 +195,7 @@ tick_t TimePos::ticksPerBar( const TimeSig &sig )
 int TimePos::stepsPerBar()
 {
 	int steps = ticksPerBar() / DefaultBeatsPerBar;
-	return qMax( 1, steps );
+	return std::max(1, steps);
 }
 
 
@@ -216,3 +220,6 @@ double TimePos::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)
 	// 60 * 1000 / 48 = 1250
 	return ( ticks * 1250 ) / beatsPerMinute;
 }
+
+
+} // namespace lmms

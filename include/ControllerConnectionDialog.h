@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef CONTROLLER_CONNECTION_DIALOG_H
-#define CONTROLLER_CONNECTION_DIALOG_H
+#ifndef LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H
+#define LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
@@ -38,7 +37,15 @@
 class QLineEdit;
 class QListView;
 class QScrollArea;
+
+namespace lmms
+{
+
 class AutoDetectMidiController;
+
+namespace gui
+{
+
 class ComboBox;
 class GroupBox;
 class TabWidget;
@@ -47,14 +54,13 @@ class LedCheckBox;
 class MidiPortMenu;
 
 
-
 class ControllerConnectionDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	ControllerConnectionDialog( QWidget * _parent,
 			const AutomatableModel * _target_model );
-	virtual ~ControllerConnectionDialog();
+	~ControllerConnectionDialog() override;
 
 	Controller * chosenController()
 	{
@@ -99,4 +105,9 @@ private:
 	AutoDetectMidiController * m_midiController;
 } ;
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H

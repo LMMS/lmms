@@ -27,16 +27,26 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
-#include "SaControls.h"
 
 #include <string>
 #include <utility>
+#include <vector>
 #include <QPainterPath>
 #include <QWidget>
 
 class QMouseEvent;
 class QPainter;
+
+namespace lmms
+{
+
+
+class SaControls;
 class SaProcessor;
+
+namespace gui
+{
+
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
 class SaSpectrumView : public QWidget
@@ -44,7 +54,7 @@ class SaSpectrumView : public QWidget
 	Q_OBJECT
 public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaSpectrumView() {}
+	~SaSpectrumView() override = default;
 
 	QSize sizeHint() const override {return QSize(400, 200);}
 
@@ -120,6 +130,15 @@ private:
 	unsigned int m_displayRight;
 	unsigned int m_displayWidth;
 
+	// cached frequency bin → x position conversion for better performance
+	std::vector<float> m_cachedBinToX;
+	float m_cachedRangeMin;
+	float m_cachedRangeMax;
+	bool m_cachedLogX;
+	unsigned int m_cachedDisplayWidth;
+	unsigned int m_cachedBinCount;
+	unsigned int m_cachedSampleRate;
+
 	#ifdef SA_DEBUG
 		float m_execution_avg;
 		float m_refresh_avg;
@@ -127,5 +146,11 @@ private:
 		float m_draw_avg;
 	#endif
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // SASPECTRUMVIEW_H
 

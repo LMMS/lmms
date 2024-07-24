@@ -22,16 +22,18 @@
  *
  */
 
-#ifndef MIDISETUPWIDGET_H
-#define MIDISETUPWIDGET_H
+#ifndef LMMS_GUI_MIDI_SETUP_WIDGET_H
+#define LMMS_GUI_MIDI_SETUP_WIDGET_H
 
-#include <QLabel>
-
-#include "TabWidget.h"
+#include <QGroupBox>
 
 class QLineEdit;
 
-class MidiSetupWidget : public TabWidget
+namespace lmms::gui
+{
+
+
+class MidiSetupWidget : public QGroupBox
 {
 	Q_OBJECT
 	MidiSetupWidget( const QString & caption, const QString & configSection,
@@ -54,4 +56,7 @@ private:
 
 };
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_MIDI_SETUP_WIDGET_H

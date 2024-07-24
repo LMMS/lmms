@@ -22,83 +22,98 @@
  *
  */
 
-#include "QTestSuite.h"
+#include <QtTest/QtTest>
 
 #include "QCoreApplication"
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrack.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "DetuningHelper.h"
 #include "InstrumentTrack.h"
-#include "Pattern.h"
+#include "MidiClip.h"
+#include "PatternClip.h"
+#include "PatternTrack.h"
+#include "PatternStore.h"
 #include "TrackContainer.h"
 
 #include "Engine.h"
 #include "Song.h"
 
-class AutomationTrackTest : QTestSuite
+class AutomationTrackTest : public QObject
 {
 	Q_OBJECT
 private slots:
 	void initTestCase()
 	{
+		using namespace lmms;
+		Engine::init(true);
 	}
 
-	void testPatternLinear()
+	void cleanupTestCase()
 	{
-		AutomationPattern p(nullptr);
-		p.setProgressionType(AutomationPattern::LinearProgression);
-		p.putValue(0, 0.0, false);
-		p.putValue(100, 1.0, false);
-
-		QCOMPARE(p.valueAt(0), 0.0f);
-		QCOMPARE(p.valueAt(25), 0.25f);
-		QCOMPARE(p.valueAt(50), 0.5f);
-		QCOMPARE(p.valueAt(75), 0.75f);
-		QCOMPARE(p.valueAt(100), 1.0f);
-		QCOMPARE(p.valueAt(150), 1.0f);
+		using namespace lmms;
+		Engine::destroy();
 	}
 
-	void testPatternDiscrete()
+	void testClipLinear()
 	{
-		AutomationPattern p(nullptr);
-		p.setProgressionType(AutomationPattern::DiscreteProgression);
-		p.putValue(0, 0.0, false);
-		p.putValue(100, 1.0, false);
+		using namespace lmms;
 
-		QCOMPARE(p.valueAt(0), 0.0f);
-		QCOMPARE(p.valueAt(50), 0.0f);
-		QCOMPARE(p.valueAt(100), 1.0f);
-		QCOMPARE(p.valueAt(150), 1.0f);
+		AutomationClip c(nullptr);
+		c.setProgressionType(AutomationClip::ProgressionType::Linear);
+		c.putValue(0, 0.0, false);
+		c.putValue(100, 1.0, false);
+
+		QCOMPARE(c.valueAt(0), 0.0f);
+		QCOMPARE(c.valueAt(25), 0.25f);
+		QCOMPARE(c.valueAt(50), 0.5f);
+		QCOMPARE(c.valueAt(75), 0.75f);
+		QCOMPARE(c.valueAt(100), 1.0f);
+		QCOMPARE(c.valueAt(150), 1.0f);
 	}
 
-	void testPatterns()
+	void testClipDiscrete()
 	{
+		using namespace lmms;
+
+		AutomationClip c(nullptr);
+		c.setProgressionType(AutomationClip::ProgressionType::Discrete);
+		c.putValue(0, 0.0, false);
+		c.putValue(100, 1.0, false);
+
+		QCOMPARE(c.valueAt(0), 0.0f);
+		QCOMPARE(c.valueAt(50), 0.0f);
+		QCOMPARE(c.valueAt(100), 1.0f);
+		QCOMPARE(c.valueAt(150), 1.0f);
+	}
+
+	void testClips()
+	{
+		using namespace lmms;
+
 		FloatModel model;
 
 		auto song = Engine::getSong();
 		AutomationTrack track(song);
 
-		AutomationPattern p1(&track);
-		p1.setProgressionType(AutomationPattern::LinearProgression);
-		p1.putValue(0, 0.0, false);
-		p1.putValue(10, 1.0, false);
-		p1.movePosition(0);
-		p1.addObject(&model);
+		AutomationClip c1(&track);
+		c1.setProgressionType(AutomationClip::ProgressionType::Linear);
+		c1.putValue(0, 0.0, false);
+		c1.putValue(10, 1.0, false);
+		c1.movePosition(0);
+		c1.addObject(&model);
 
-		AutomationPattern p2(&track);
-		p2.setProgressionType(AutomationPattern::LinearProgression);
-		p2.putValue(0, 0.0, false);
-		p2.putValue(100, 1.0, false);
-		p2.movePosition(100);
-		p2.addObject(&model);
+		AutomationClip c2(&track);
+		c2.setProgressionType(AutomationClip::ProgressionType::Linear);
+		c2.putValue(0, 0.0, false);
+		c2.putValue(100, 1.0, false);
+		c2.movePosition(100);
+		c2.addObject(&model);
 
-		AutomationPattern p3(&track);
-		p3.addObject(&model);
+		AutomationClip c3(&track);
+		c3.addObject(&model);
 		//XXX: Why is this even necessary?
-		p3.clear();
+		c3.clear();
 
 		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(  5)[&model], 0.5f);
@@ -110,24 +125,26 @@ private slots:
 
 	void testLengthRespected()
 	{
+		using namespace lmms;
+
 		FloatModel model;
 
 		auto song = Engine::getSong();
 		AutomationTrack track(song);
 
-		AutomationPattern p(&track);
-		p.setProgressionType(AutomationPattern::LinearProgression);
-		p.addObject(&model);
+		AutomationClip c(&track);
+		c.setProgressionType(AutomationClip::ProgressionType::Linear);
+		c.addObject(&model);
 
-		p.putValue(0, 0.0, false);
-		p.putValue(100, 1.0, false);
+		c.putValue(0, 0.0, false);
+		c.putValue(100, 1.0, false);
 
-		p.changeLength(100);
+		c.changeLength(100);
 		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt( 50)[&model], 0.5f);
 		QCOMPARE(song->automatedValuesAt(100)[&model], 1.0f);
 
-		p.changeLength(50);
+		c.changeLength(50);
 		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt( 50)[&model], 0.5f);
 		QCOMPARE(song->automatedValuesAt(100)[&model], 0.5f);
@@ -135,59 +152,63 @@ private slots:
 
 	void testInlineAutomation()
 	{
+		using namespace lmms;
+
 		auto song = Engine::getSong();
 
-		InstrumentTrack* instrumentTrack =
-				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
+		InstrumentTrack instrumentTrack(song);
 
-		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
-		notePattern->changeLength(TimePos(4, 0));
-		Note* note = notePattern->addNote(Note(TimePos(4, 0)), false);
+		MidiClip midiClip(&instrumentTrack);
+		midiClip.changeLength(TimePos(4, 0));
+		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
 
 		DetuningHelper* dh = note->detuning();
-		auto pattern = dh->automationPattern();
-		pattern->setProgressionType( AutomationPattern::LinearProgression );
-		pattern->putValue(TimePos(0, 0), 0.0);
-		pattern->putValue(TimePos(4, 0), 1.0);
+		auto clip = dh->automationClip();
+		clip->setProgressionType( AutomationClip::ProgressionType::Linear );
+		clip->putValue(TimePos(0, 0), 0.0);
+		clip->putValue(TimePos(4, 0), 1.0);
 
-		QCOMPARE(pattern->valueAt(TimePos(0, 0)), 0.0f);
-		QCOMPARE(pattern->valueAt(TimePos(1, 0)), 0.25f);
-		QCOMPARE(pattern->valueAt(TimePos(2, 0)), 0.5f);
-		QCOMPARE(pattern->valueAt(TimePos(4, 0)), 1.0f);
+		QCOMPARE(clip->valueAt(TimePos(0, 0)), 0.0f);
+		QCOMPARE(clip->valueAt(TimePos(1, 0)), 0.25f);
+		QCOMPARE(clip->valueAt(TimePos(2, 0)), 0.5f);
+		QCOMPARE(clip->valueAt(TimePos(4, 0)), 1.0f);
 	}
 
-	void testBBTrack()
+	void testPatternTrack()
 	{
-		auto song = Engine::getSong();
-		auto bbContainer = Engine::getBBTrackContainer();
-		BBTrack bbTrack(song);
-		Track* automationTrack = Track::create(Track::AutomationTrack, bbContainer);
+		using namespace lmms;
 
-		QVERIFY(automationTrack->numOfTCOs());
-		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack->getTCO(0));
-		QVERIFY(p1);
+		auto song = Engine::getSong();
+		auto patternStore = Engine::patternStore();
+		PatternTrack patternTrack(song);
+		AutomationTrack automationTrack(patternStore);
+		automationTrack.createClipsForPattern(patternStore->numOfPatterns() - 1);
+
+		QVERIFY(automationTrack.numOfClips());
+		auto c1 = dynamic_cast<AutomationClip*>(automationTrack.getClip(0));
+		QVERIFY(c1);
 
 		FloatModel model;
 
-		p1->setProgressionType(AutomationPattern::LinearProgression);
-		p1->putValue(0, 0.0, false);
-		p1->putValue(10, 1.0, false);
-		p1->addObject(&model);
+		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
+		c1->putValue(0, 0.0, false);
+		c1->putValue(10, 1.0, false);
+		c1->addObject(&model);
 
-		QCOMPARE(bbContainer->automatedValuesAt( 0, bbTrack.index())[&model], 0.0f);
-		QCOMPARE(bbContainer->automatedValuesAt( 5, bbTrack.index())[&model], 0.5f);
-		QCOMPARE(bbContainer->automatedValuesAt(10, bbTrack.index())[&model], 1.0f);
-		QCOMPARE(bbContainer->automatedValuesAt(50, bbTrack.index())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.patternIndex())[&model], 0.5f);
+		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.patternIndex())[&model], 1.0f);
 
-		BBTrack bbTrack2(song);
+		PatternTrack patternTrack2(song);
 
-		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
-		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
+		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.patternIndex())[&model], 0.5f);
+		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.patternIndex()).size());
 
-		BBTCO tco(&bbTrack);
-		tco.changeLength(TimePos::ticksPerBar() * 2);
-		tco.movePosition(0);
+		PatternClip clip(&patternTrack);
+		clip.changeLength(TimePos::ticksPerBar() * 2);
+		clip.movePosition(0);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
@@ -196,27 +217,30 @@ private slots:
 
 	void testGlobalAutomation()
 	{
+		using namespace lmms;
+
 		// Global automation should not have priority, see https://github.com/LMMS/lmms/issues/4268
 		// Tests regression caused by 75077f6200a5aee3a5821aae48a3b8466ed8714a
 		auto song = Engine::getSong();
 
 		auto globalTrack = song->globalAutomationTrack();
-		AutomationPattern globalPattern(globalTrack);
+		AutomationClip globalClip(globalTrack);
 
 		AutomationTrack localTrack(song);
-		AutomationPattern localPattern(&localTrack);
+		AutomationClip localClip(&localTrack);
 
 		FloatModel model;
-		globalPattern.setProgressionType(AutomationPattern::DiscreteProgression);
-		localPattern.setProgressionType(AutomationPattern::DiscreteProgression);
-		globalPattern.addObject(&model);
-		localPattern.addObject(&model);
-		globalPattern.putValue(0, 100.0f, false);
-		localPattern.putValue(0, 50.0f, false);
+		globalClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
+		localClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
+		globalClip.addObject(&model);
+		localClip.addObject(&model);
+		globalClip.putValue(0, 100.0f, false);
+		localClip.putValue(0, 50.0f, false);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 50.0f);
 	}
 
-} AutomationTrackTest;
+};
 
+QTEST_GUILESS_MAIN(AutomationTrackTest)
 #include "AutomationTrackTest.moc"

@@ -26,53 +26,37 @@
 
 #include "ComboBox.h"
 
-#include <QApplication>
-#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOptionFrame>
+#include <QScreen>
 
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 
+#define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#if !QT_SUPPORTS_WIDGET_SCREEN
+#include <QApplication>
+#include <QDesktopWidget>
+#endif
 
-QPixmap * ComboBox::s_background = NULL;
-QPixmap * ComboBox::s_arrow = NULL;
-QPixmap * ComboBox::s_arrowSelected = NULL;
-
+namespace lmms::gui
+{
 const int CB_ARROW_BTN_WIDTH = 18;
 
 
 ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	IntModelView( new ComboBoxModel( NULL, QString(), true ), this ),
+	IntModelView( new ComboBoxModel( nullptr, QString(), true ), this ),
 	m_menu( this ),
 	m_pressed( false )
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	if( s_background == NULL )
-	{
-		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );
-	}
+	setFont(adjustedToPixelSize(font(), 10));
 
-	if( s_arrow == NULL )
-	{
-		s_arrow = new QPixmap( embed::getIconPixmap( "combobox_arrow" ) );
-	}
-
-	if( s_arrowSelected == NULL )
-	{
-		s_arrowSelected = new QPixmap( embed::getIconPixmap( "combobox_arrow_selected" ) );
-	}
-
-	setFont( pointSize<9>( font() ) );
-	m_menu.setFont( pointSize<8>( m_menu.font() ) );
-
-	connect( &m_menu, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( setItem( QAction * ) ) );
+	connect( &m_menu, SIGNAL(triggered(QAction*)),
+				this, SLOT(setItem(QAction*)));
 
 	setWindowTitle( _name );
 	doConnections();
@@ -80,10 +64,6 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 
 
-
-ComboBox::~ComboBox()
-{
-}
 
 
 
@@ -104,7 +84,7 @@ void ComboBox::selectPrevious()
 
 void ComboBox::contextMenuEvent( QContextMenuEvent * event )
 {
-	if( model() == NULL || event->x() <= width() - CB_ARROW_BTN_WIDTH )
+	if( model() == nullptr || event->x() <= width() - CB_ARROW_BTN_WIDTH )
 	{
 		QWidget::contextMenuEvent( event );
 		return;
@@ -120,7 +100,7 @@ void ComboBox::contextMenuEvent( QContextMenuEvent * event )
 
 void ComboBox::mousePressEvent( QMouseEvent* event )
 {
-	if( model() == NULL )
+	if( model() == nullptr )
 	{
 		return;
 	}
@@ -140,15 +120,23 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 				a->setData( i );
 			}
 
-			QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
-			if( gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height() )
+			QPoint gpos = mapToGlobal(QPoint(0, height()));
+
+			#if (QT_SUPPORTS_WIDGET_SCREEN)
+			bool const menuCanBeFullyShown = screen()->geometry().contains(QRect(gpos, m_menu.sizeHint()));
+			#else
+			bool const menuCanBeFullyShown = gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height();
+			#endif
+
+			if (menuCanBeFullyShown)
 			{
-				m_menu.exec( gpos );
+				m_menu.exec(gpos);
 			}
 			else
 			{
-				m_menu.exec( mapToGlobal( QPoint( width(), 0 ) ) );
+				m_menu.exec(mapToGlobal(QPoint(width(), 0)));
 			}
+
 			m_pressed = false;
 			update();
 		}
@@ -176,7 +164,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	p.fillRect( 2, 2, width()-2, height()-4, *s_background );
+	p.fillRect(2, 2, width() - 2, height() - 4, m_background);
 
 	QColor shadow = palette().shadow().color();
 	QColor highlight = palette().highlight().color();
@@ -198,9 +186,9 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
-	QPixmap * arrow = m_pressed ? s_arrowSelected : s_arrow;
+	auto arrow = m_pressed ? m_arrowSelected : m_arrow;
 
-	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 3, 4, *arrow );
+	p.drawPixmap(width() - CB_ARROW_BTN_WIDTH + 3, 4, arrow);
 
 	if( model() && model()->size() > 0 )
 	{
@@ -232,7 +220,8 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
+		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
+		model()->setInitValue(model()->value() + direction);
 		update();
 		event->accept();
 	}
@@ -250,6 +239,6 @@ void ComboBox::setItem( QAction* item )
 }
 
 
-
+} // namespace lmms::gui
 
 

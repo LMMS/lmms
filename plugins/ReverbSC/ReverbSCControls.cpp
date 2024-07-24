@@ -28,7 +28,10 @@
 #include "ReverbSCControls.h"
 #include "ReverbSC.h"
 #include "Engine.h"
-#include "Song.h"
+
+namespace lmms
+{
+
 
 ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	EffectControls( effect ),
@@ -38,7 +41,7 @@ ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	m_colorModel( 10000.0f, 100.0f, 15000.0f, 0.1f, this, tr( "Color" ) ),
 	m_outputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Output gain" ) )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
 }
 
 void ReverbSCControls::changeControl()
@@ -65,3 +68,6 @@ void ReverbSCControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }
+
+
+} // namespace lmms

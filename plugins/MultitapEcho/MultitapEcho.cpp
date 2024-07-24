@@ -25,22 +25,27 @@
 
 #include "MultitapEcho.h"
 #include "embed.h"
+#include "lmms_basics.h"
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Multitap Echo",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A multitap echo delay plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -51,10 +56,10 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	m_work = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
@@ -63,7 +68,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 
 MultitapEchoEffect::~MultitapEchoEffect()
 {
-	MM_FREE( m_work );
+	delete[] m_work;
 }
 
 
@@ -79,9 +84,9 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 }
 
 
-void MultitapEchoEffect::runFilter( sampleFrame * dst, sampleFrame * src, StereoOnePole & filter, const fpp_t frames )
+void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames )
 {
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		dst[f][0] = filter.update( src[f][0], 0 );
 		dst[f][1] = filter.update( src[f][1], 1 );
@@ -89,7 +94,7 @@ void MultitapEchoEffect::runFilter( sampleFrame * dst, sampleFrame * src, Stereo
 }
 
 
-bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t frames )
+bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -114,8 +119,8 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	}
 	
 	// add dry buffer - never swap inputs for dry
-	m_buffer.writeAddingMultiplied( buf, 0, frames, dryGain );
-	
+	m_buffer.writeAddingMultiplied(buf, f_cnt_t{0}, frames, dryGain);
+
 	// swapped inputs?
 	if( swapInputs )
 	{
@@ -147,7 +152,7 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	// pop the buffer and mix it into output
 	m_buffer.pop( m_work );
 
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
@@ -170,3 +175,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms

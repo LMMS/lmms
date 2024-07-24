@@ -28,8 +28,15 @@
 #include "MidiPort.h"
 #include "MidiClient.h"
 #include "MidiDummy.h"
+#include "MidiEventProcessor.h"
 #include "Note.h"
 #include "Song.h"
+#include "MidiController.h"
+
+
+namespace lmms
+{
+
 
 static MidiDummy s_dummyClient;
 
@@ -41,15 +48,15 @@ MidiPort::MidiPort( const QString& name,
 					Model* parent,
 					Mode mode ) :
 	Model( parent ),
-	m_readablePortsMenu( NULL ),
-	m_writablePortsMenu( NULL ),
+	m_readablePortsMenu( nullptr ),
+	m_writablePortsMenu( nullptr ),
 	m_midiClient( client ),
 	m_midiEventProcessor( eventProcessor ),
 	m_mode( mode ),
 	m_inputChannelModel( 0, 0, MidiChannelCount, this, tr( "Input channel" ) ),
 	m_outputChannelModel( 1, 0, MidiChannelCount, this, tr( "Output channel" ) ),
-	m_inputControllerModel( 0, 0, MidiControllerCount, this, tr( "Input controller" ) ),
-	m_outputControllerModel( 0, 0, MidiControllerCount, this, tr( "Output controller" ) ),
+	m_inputControllerModel(MidiController::NONE, MidiController::NONE, MidiControllerCount - 1, this, tr( "Input controller" )),
+	m_outputControllerModel(MidiController::NONE, MidiController::NONE, MidiControllerCount - 1, this, tr( "Output controller" )),
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed input velocity" ) ),
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed output velocity" ) ),
 	m_fixedOutputNoteModel( -1, -1, MidiMaxKey, this, tr( "Fixed output note" ) ),
@@ -60,15 +67,15 @@ MidiPort::MidiPort( const QString& name,
 {
 	m_midiClient->addPort( this );
 
-	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
-	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );
+	m_readableModel.setValue( m_mode == Mode::Input || m_mode == Mode::Duplex );
+	m_writableModel.setValue( m_mode == Mode::Output || m_mode == Mode::Duplex );
 
-	connect( &m_readableModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
-	connect( &m_writableModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
-	connect( &m_outputProgramModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateOutputProgram() ), Qt::DirectConnection );
+	connect( &m_readableModel, SIGNAL(dataChanged()),
+			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
+	connect( &m_writableModel, SIGNAL(dataChanged()),
+			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
+	connect( &m_outputProgramModel, SIGNAL(dataChanged()),
+			this, SLOT(updateOutputProgram()), Qt::DirectConnection );
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -79,8 +86,8 @@ MidiPort::MidiPort( const QString& name,
 		updateWritablePorts();
 
 		// we want to get informed about port-changes!
-		m_midiClient->connectRPChanged( this, SLOT( updateReadablePorts() ) );
-		m_midiClient->connectWPChanged( this, SLOT( updateWritablePorts() ) );
+		m_midiClient->connectRPChanged( this, SLOT(updateReadablePorts()));
+		m_midiClient->connectWPChanged( this, SLOT(updateWritablePorts()));
 	}
 
 	updateMidiPortMode();
@@ -163,6 +170,12 @@ void MidiPort::processOutEvent( const MidiEvent& event, const TimePos& time )
 			outEvent.setVelocity( fixedOutputVelocity() );
 		}
 
+		if( fixedOutputNote() >= 0 &&
+			( event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure ) )
+		{
+			outEvent.setKey( fixedOutputNote() );
+		}
+
 		m_midiClient->processOutEvent( outEvent, time, this );
 	}
 }
@@ -232,6 +245,7 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_outputControllerModel.loadSettings( thisElement, "outputcontroller" );
 	m_fixedInputVelocityModel.loadSettings( thisElement, "fixedinputvelocity" );
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
+	m_fixedOutputNoteModel.loadSettings( thisElement, "fixedoutputnote" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );
@@ -312,10 +326,10 @@ void MidiPort::subscribeWritablePort( const QString& port, bool subscribe )
 void MidiPort::updateMidiPortMode()
 {
 	// this small lookup-table makes everything easier
-	static const Modes modeTable[2][2] =
+	static const Mode modeTable[2][2] =
 	{
-		{ Disabled, Output },
-		{ Input, Duplex }
+		{ Mode::Disabled, Mode::Output },
+		{ Mode::Input, Mode::Duplex }
 	} ;
 	setMode( modeTable[m_readableModel.value()][m_writableModel.value()] );
 
@@ -372,9 +386,9 @@ void MidiPort::updateReadablePorts()
 	m_readablePorts.clear();
 	const QStringList& wp = m_midiClient->readablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it )
+	for (const auto& port : wp)
 	{
-		m_readablePorts[*it] = ( selectedPorts.indexOf( *it ) != -1 );
+		m_readablePorts[port] = (selectedPorts.indexOf(port) != -1);
 	}
 
 	emit readablePortsChanged();
@@ -398,9 +412,9 @@ void MidiPort::updateWritablePorts()
 	m_writablePorts.clear();
 	const QStringList & wp = m_midiClient->writablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it )
+	for (const auto& port : wp)
 	{
-		m_writablePorts[*it] = ( selectedPorts.indexOf( *it ) != -1 );
+		m_writablePorts[port] = (selectedPorts.indexOf(port) != -1);
 	}
 
 	emit writablePortsChanged();
@@ -421,3 +435,6 @@ void MidiPort::invalidateCilent()
 {
 	m_midiClient = &s_dummyClient;
 }
+
+
+} // namespace lmms

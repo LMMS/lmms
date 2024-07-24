@@ -3,7 +3,7 @@
  *                            Plugin::Descriptor::SubPluginFeatures for
  *                            hosting LV2 plugins
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,13 +28,15 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
 
 #include "Engine.h"
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
+
+namespace lmms
+{
 
 
 const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
@@ -57,7 +59,7 @@ QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
 
 
 
-Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type) :
+Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::Type type) :
 	SubPluginFeatures(type)
 {
 }
@@ -70,23 +72,23 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 {
 	const LilvPlugin *plug = getPlugin(*k);
 
-	QLabel *label = new QLabel(parent);
+	auto label = new QLabel(parent);
 	label->setText(QWidget::tr("Name: ") + pluginName(plug));
 
-	QLabel *label2 = new QLabel(parent);
+	auto label2 = new QLabel(parent);
 	label2->setText(QWidget::tr("URI: ") +
 		lilv_node_as_uri(lilv_plugin_get_uri(plug)));
 
-	QWidget *maker = new QWidget(parent);
-	QHBoxLayout *l = new QHBoxLayout(maker);
-	l->setMargin(0);
+	auto maker = new QWidget(parent);
+	auto l = new QHBoxLayout(maker);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 
-	QLabel *maker_label = new QLabel(maker);
+	auto maker_label = new QLabel(maker);
 	maker_label->setText(QWidget::tr("Maker: "));
 	maker_label->setAlignment(Qt::AlignTop);
 
-	QLabel *maker_content = new QLabel(maker);
+	auto maker_content = new QLabel(maker);
 	maker_content->setText(
 		qStringFromPluginNode(plug, lilv_plugin_get_author_name));
 	maker_content->setWordWrap(true);
@@ -94,17 +96,17 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	l->addWidget(maker_label);
 	l->addWidget(maker_content, 1);
 
-	QWidget *copyright = new QWidget(parent);
+	auto copyright = new QWidget(parent);
 	l = new QHBoxLayout(copyright);
-	l->setMargin(0);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	copyright->setMinimumWidth(parent->minimumWidth());
 
-	QLabel *copyright_label = new QLabel(copyright);
+	auto copyright_label = new QLabel(copyright);
 	copyright_label->setText(QWidget::tr("Copyright: "));
 	copyright_label->setAlignment(Qt::AlignTop);
 
-	QLabel *copyright_content = new QLabel(copyright);
+	auto copyright_content = new QLabel(copyright);
 	copyright_content->setText("<unknown>");
 	copyright_content->setWordWrap(true);
 	l->addWidget(copyright_label);
@@ -179,6 +181,9 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 		}
 	}
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 
