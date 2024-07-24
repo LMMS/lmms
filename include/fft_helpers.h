@@ -37,7 +37,7 @@ namespace lmms
 // NOTE: FFT_BUFFER_SIZE should be considered deprecated!
 // It is used by Eq plugin and some older code here, but this should be a user
 // switchable parameter, not a constant. Use a value from FFT_BLOCK_SIZES
-const unsigned int FFT_BUFFER_SIZE = 2048;
+constexpr auto FFT_BUFFER_SIZE = std::size_t{2048};
 
 // Allowed FFT block sizes. Ranging from barely useful to barely acceptable
 // because of performance and latency reasons.

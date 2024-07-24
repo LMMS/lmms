@@ -514,7 +514,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 		}
 		
 		sample_t O2R = 0.;
-		if (len_r != 0.)
+		if (pd_r != 0.)
 		{
 			len_r = BandLimitedWave::pdToLen(pd_r);
 			if (m_counter2r > 0)
@@ -685,7 +685,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 }
 
 
-inline void MonstroSynth::updateModulators( float * env1, float * env2, float * lfo1, float * lfo2, int frames )
+inline void MonstroSynth::updateModulators(float * env1, float * env2, float * lfo1, float * lfo2, f_cnt_t frames)
 {
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
@@ -790,7 +790,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 		// attack
 		for( f_cnt_t f = 0; f < frames; ++f )
 		{
-			if( tfp + f < m_lfoatt[i] ) lfo[i][f] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
+			if (tfp + f < static_cast<f_cnt_t>(m_lfoatt[i])) { lfo[i][f] *= static_cast<sample_t>(tfp) / m_lfoatt[i]; }
 		}
 
 

@@ -57,7 +57,7 @@ enum class PluginIssueType
 	FeatureNotSupported, //!< plugin requires functionality LMMS can't offer
 	// misc
 	BadPortType, //!< port type not supported
-	Blacklisted,
+	Blocked,
 	NoIssue
 };
 

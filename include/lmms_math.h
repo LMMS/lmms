@@ -61,10 +61,9 @@ static inline float fraction( const float _x )
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-static inline float absFraction( const float _x )
+static inline float absFraction(const float x)
 {
-	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
-						static_cast<int>( _x ) - 1 ) );
+	return x - std::floor(x);
 }
 
 /*!
