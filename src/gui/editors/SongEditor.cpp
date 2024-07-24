@@ -34,6 +34,8 @@
 #include <QSlider>
 #include <QTimeLine>
 
+#include <QDebug>
+
 #include "ActionGroup.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
@@ -756,22 +758,29 @@ void SongEditor::updatePosition( const TimePos & t )
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
-	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
-		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||
+	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song ) ||
 							m_scrollBack == true )
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		if( t > m_currentPosition + w * TimePos::ticksPerBar() /
-							pixelsPerBar() )
+		
+		if (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Stepped) 
 		{
-			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+			if( t > m_currentPosition + w * TimePos::ticksPerBar() /
+								pixelsPerBar() )
+			{
+				animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+			}
+			else if( t < m_currentPosition )
+			{
+				animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+			}
 		}
-		else if( t < m_currentPosition )
+		else if (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Continuous)
 		{
-			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+			animateScroll( m_leftRightScroll, std::max(t.getBar() - w / pixelsPerBar() / 2, 0.0f), m_smoothScroll );
 		}
 		m_scrollBack = false;
 	}

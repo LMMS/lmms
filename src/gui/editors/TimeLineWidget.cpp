@@ -87,20 +87,15 @@ void TimeLineWidget::setXOffset(const int x)
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
+	
 	auto autoScroll = new NStateButton(_tool_bar);
 	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
+	autoScroll->addState( embed::getIconPixmap( "autoscroll_stepped_on" ) );
+	autoScroll->addState( embed::getIconPixmap( "autoscroll_continuous_on" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
-	// Better Auto Scroll
-
-	auto continuousAutoScroll = new NStateButton(_tool_bar);
-	continuousAutoScroll->setGeneralToolTip( tr( "Continuous auto scrolling" ) );
-	continuousAutoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
-	continuousAutoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
-	connect( continuousAutoScroll, SIGNAL(changedState(int)), this,
-					SLOT(toggleContinuousAutoScroll(int)));
+	
 
 	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
@@ -134,7 +129,6 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	behaviourAtStop->changeState(static_cast<int>(m_timeline->stopBehaviour()));
 
 	_tool_bar->addWidget( autoScroll );
-	_tool_bar->addWidget( continuousAutoScroll );
 	_tool_bar->addWidget( loopPoints );
 	_tool_bar->addWidget( behaviourAtStop );
 }
@@ -148,11 +142,6 @@ void TimeLineWidget::updatePosition()
 void TimeLineWidget::toggleAutoScroll( int _n )
 {
 	m_autoScroll = static_cast<AutoScrollState>( _n );
-}
-
-void TimeLineWidget::toggleContinuousAutoScroll( int _n )
-{
-	m_continuousAutoScroll = static_cast<AutoScrollState>( _n );
 }
 
 void TimeLineWidget::paintEvent( QPaintEvent * )
