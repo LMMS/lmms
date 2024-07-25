@@ -34,8 +34,6 @@
 #include <QSlider>
 #include <QTimeLine>
 
-#include <QDebug>
-
 #include "ActionGroup.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"

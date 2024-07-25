@@ -29,8 +29,6 @@
 #include <QMenu>
 #include <QPainter>
 
-#include <QDebug>
-
 #include "AutomationClip.h"
 #include "Clipboard.h"
 #include "DataFile.h"
