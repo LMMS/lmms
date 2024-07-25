@@ -190,8 +190,7 @@ static void cs_exSyncPosition(uint32_t frames)
 
 static sample_rate_t cs_exSyncSampleRate()
 {
-	//return Engine::mixer()->processingSampleRate();
-	return 44100; // Stub :: DEBUG
+	return Engine::audioEngine()->outputSampleRate();
 }
 
 
