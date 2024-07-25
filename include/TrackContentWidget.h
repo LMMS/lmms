@@ -175,6 +175,7 @@ private:
 	int m_fineGridWidth;
 	int m_horizontalWidth;
 	int m_embossWidth;
+
 	int m_embossOffset;
 } ;
 
