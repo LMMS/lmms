@@ -293,8 +293,6 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	}
 	setUpdatesEnabled( true );
 
-	m_song_editor_currentPosition = pos;
-
 	// redraw background
 	updateBackground();
 //	update();
