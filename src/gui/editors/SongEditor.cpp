@@ -236,7 +236,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
 	m_leftRightScroll->setSingleStep( 1 );
-	m_leftRightScroll->setPageStep( 20 );
+	m_leftRightScroll->setPageStep( 20 * TimePos::ticksPerBar() );
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),
 					this, SLOT(scrolled(int)));
@@ -547,12 +547,12 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() /30);
+							we->angleDelta().x());
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() / 30);
+							we->angleDelta().y());
 	}
 	else
 	{
