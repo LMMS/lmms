@@ -237,7 +237,7 @@ void TrackOperationsWidget::cloneTrack()
 		i--;
 	}
 
-	if (m_soloBtn->model()->value() == true)
+	if (m_soloBtn->model()->value())
 	{
 		// if this track was solo, make the new track the new solo
 		newTrack->toggleSolo();
