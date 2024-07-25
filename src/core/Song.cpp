@@ -330,7 +330,7 @@ bool Song::exSyncAvailable()
 	return false;
 }
 
-#endif
+#endif // LMMS_HAVE_JACK
 
 
 

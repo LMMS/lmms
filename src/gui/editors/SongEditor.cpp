@@ -33,8 +33,12 @@
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
+
+#ifdef LMMS_HAVE_JACK 
 //ExSync:
+#include "AudioJack.h"
 #include <QPushButton> 	
+#endif
 
 #include "ActionGroup.h"
 #include "AudioDevice.h"
@@ -64,7 +68,6 @@ namespace lmms
 {
 
 #ifdef LMMS_HAVE_JACK
-#include "AudioJack.h"
 // This is dirty hack, but I don't want to place this function
 // to public interface ... 
 extern void exSyncStoppedHack(); // from core/audio/AudioJack.cpp
