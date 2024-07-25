@@ -176,6 +176,8 @@ private:
 	int m_horizontalWidth;
 	int m_embossWidth;
 
+	TimePos m_song_editor_currentPosition;
+
 	int m_embossOffset;
 } ;
 

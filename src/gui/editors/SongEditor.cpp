@@ -327,7 +327,7 @@ QString SongEditor::getSnapSizeString() const
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = TimePos( new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = TimePos( new_pos ) );
 }
 
 
@@ -715,7 +715,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 void SongEditor::updateScrollBar( int len )
 {
-	m_leftRightScroll->setMaximum( len );
+	m_leftRightScroll->setMaximum( len * TimePos::ticksPerBar() );
 }
 
 
@@ -771,16 +771,16 @@ void SongEditor::updatePosition( const TimePos & t )
 			if( t > m_currentPosition + w * TimePos::ticksPerBar() /
 								pixelsPerBar() )
 			{
-				animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+				animateScroll( m_leftRightScroll, t.getTicks(), m_smoothScroll );
 			}
 			else if( t < m_currentPosition )
 			{
-				animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+				animateScroll( m_leftRightScroll, t.getTicks(), m_smoothScroll );
 			}
 		}
 		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 		{
-			animateScroll( m_leftRightScroll, std::max(t.getBar() - w / pixelsPerBar() / 2, 0.0f), m_smoothScroll );
+			animateScroll( m_leftRightScroll, std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f), m_smoothScroll );
 		}
 		m_scrollBack = false;
 	}
