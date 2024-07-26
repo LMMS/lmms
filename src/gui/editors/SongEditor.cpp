@@ -545,12 +545,12 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	else if (abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value()
-							- we->angleDelta().x() / pixelsPerBar());
+							- we->angleDelta().x());
 	}
 	else if (we->modifiers() & Qt::ShiftModifier)
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value()
-							- we->angleDelta().y() / pixelsPerBar());
+							- we->angleDelta().y());
 	}
 	else
 	{
@@ -764,7 +764,7 @@ void SongEditor::updatePosition( const TimePos & t )
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
 		
-		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
+		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
 		{
 			if (t > m_currentPosition + w * TimePos::ticksPerBar()
 								/ pixelsPerBar())
