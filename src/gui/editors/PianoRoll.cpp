@@ -4465,11 +4465,11 @@ void PianoRoll::autoScroll( const TimePos & t )
 	const int w = width() - m_whiteKeyWidth;
 	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 	{
-		if(t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
+		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
 			m_leftRightScroll->setValue(t.getBar() * TimePos::ticksPerBar());
 		}
-		else if(t < m_currentPosition)
+		else if (t < m_currentPosition)
 		{
 			TimePos t2 = qMax(t - w * TimePos::ticksPerBar() *
 						TimePos::ticksPerBar() / m_ppb, (tick_t) 0);
@@ -4485,9 +4485,9 @@ void PianoRoll::autoScroll( const TimePos & t )
 
 
 
-void PianoRoll::updatePosition( const TimePos & t )
+void PianoRoll::updatePosition(const TimePos & t)
 {
-	if((Engine::getSong()->isPlaying()
+	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
 			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
 		) || m_scrollBack)

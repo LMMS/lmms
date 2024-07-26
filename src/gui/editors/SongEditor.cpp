@@ -542,12 +542,12 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value()
 							- we->angleDelta().x() / pixelsPerBar());
 	}
-	else if(we->modifiers() & Qt::ShiftModifier)
+	else if (we->modifiers() & Qt::ShiftModifier)
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value()
 							- we->angleDelta().y() / pixelsPerBar());
@@ -711,7 +711,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
-void SongEditor::updateScrollBar( int len )
+void SongEditor::updateScrollBar(int len)
 {
 	m_leftRightScroll->setMaximum(len * TimePos::ticksPerBar());
 }
@@ -766,12 +766,12 @@ void SongEditor::updatePosition( const TimePos & t )
 		
 		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 		{
-			if(t > m_currentPosition + w * TimePos::ticksPerBar()
+			if (t > m_currentPosition + w * TimePos::ticksPerBar()
 								/ pixelsPerBar())
 			{
 				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
 			}
-			else if(t < m_currentPosition)
+			else if (t < m_currentPosition)
 			{
 				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
 			}
