@@ -767,8 +767,10 @@ void SongEditor::updatePosition( const TimePos & t )
 		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
 		{
 			const auto nextPosition = m_currentPosition + w * TimePos::ticksPerBar() / pixelsPerBar();
-			if (t <= nextPosition && t >= m_currentPosition) { return; }
-			animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
+			if (t > nextPosition || t < m_currentPosition) 
+			{
+				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
+			}
 		}
 		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 		{
