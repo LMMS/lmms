@@ -368,16 +368,6 @@ public:
 
 	bool isSavingProject() const;
 
-#ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
-	void exSyncSendPosition();
-	const char * exSyncToggleMode();
-	const char * exSyncGetModeString();
-	bool exSyncToggle();
-	inline bool exSyncReact() { return m_exSyncOn; }
-	bool exSyncAvailable();
-#endif
-
 	std::shared_ptr<const Scale> getScale(unsigned int index) const;
 	std::shared_ptr<const Keymap> getKeymap(unsigned int index) const;
 	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
@@ -521,14 +511,6 @@ private:
 	TimePos m_exportLoopEnd;
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
-#ifdef LMMS_HAVE_JACK
-	
-	// ExSync context : after ExSync.h ifdef MUST be removed
-	bool m_exSyncSlaveOn; //(Receave)
-	bool m_exSyncMasterOn; //(Send)
-	bool m_exSyncOn; //(React and Send)
-	unsigned m_exSyncMode; //(for ModeButton state)
-#endif
 
 	std::shared_ptr<Scale> m_scales[MaxScaleCount];
 	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];

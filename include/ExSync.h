@@ -100,11 +100,34 @@ void exSyncStoppedHack();
 //For AudioJack:
 void syncJackd(jack_client_t* client);
 
+//From Song.h:
+void exSyncSendPosition();
+const char * exSyncToggleMode();
+const char * exSyncGetModeString();
+bool exSyncToggle();
+bool exSyncReact();
+bool exSyncAvailable();
+bool exSyncMasterAndSync();
+
 }
 
 #else
 
 // Some empty functions/macroses here
+
+namespace lmms 
+{
+
+inline void exSyncStoppedHack(){}
+
+//From Song.h:
+inline void exSyncSendPosition(){}
+//const char * exSyncToggleMode();
+//const char * exSyncGetModeString();
+//bool exSyncToggle();
+//inline bool exSyncReact() { return m_exSyncOn; }
+//bool exSyncAvailable();
+}
 
 #endif
 

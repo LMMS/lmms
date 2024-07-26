@@ -138,7 +138,7 @@ private:
 	LcdSpinBox * m_tempoSpinBox;
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
+	//ExSync
 	QPushButton * m_exSyncButton;
 	QPushButton * m_exSyncModeButton;
 #endif

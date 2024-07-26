@@ -30,15 +30,12 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
+//ExSync
+#include <QPushButton> 
+
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
-
-#ifdef LMMS_HAVE_JACK 
-//ExSync
-#include "ExSync.h"
-#include <QPushButton> 	
-#endif
 
 #include "ActionGroup.h"
 #include "AudioDevice.h"
@@ -50,6 +47,9 @@
 #include "CPULoadWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
+//ExSync
+#include "ExSync.h"
+
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -111,7 +111,7 @@ SongEditor::SongEditor( Song * song ) :
 	);
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
+	//ExSync
 	m_timeLine->exSyncSetShouldSend(); // Mark TimeLineWidget for ExSync 
 #endif
 
@@ -242,14 +242,14 @@ SongEditor::SongEditor( Song * song ) :
 	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
+	//ExSync
 	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
 	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
 	m_exSyncButton->setStyleSheet("background-color:black");
 	connect(m_exSyncButton, SIGNAL(clicked()), this, SLOT(toggleExSync()));
 	int exSyncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_exSyncButton, 0);
 	
-	m_exSyncModeButton = new QPushButton(m_song->exSyncGetModeString() , tb);
+	m_exSyncModeButton = new QPushButton(exSyncGetModeString() , tb);
 	m_exSyncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
 	connect(m_exSyncModeButton, SIGNAL(clicked()), this, SLOT(toggleExSyncMode()));
 	getGUI()->mainWindow()->addWidgetToToolBar( m_exSyncModeButton, 1, exSyncBoxCol);
@@ -739,26 +739,26 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 #ifdef LMMS_HAVE_JACK
-// ExSync context : after ExSync.h ifdef MUST be removed
+//ExSync
 void SongEditor::toggleExSync()
 {
-	bool on = m_song->exSyncToggle();
+	bool on = exSyncToggle();
 	if (on)
 	{
 		m_exSyncButton->setStyleSheet("background-color:green;");
-		m_exSyncModeButton->setText(m_song->exSyncGetModeString());
+		m_exSyncModeButton->setText( exSyncGetModeString() );
 	} else {
 		m_exSyncButton->setStyleSheet("background-color:black");
 	}
-	if (!m_song->exSyncAvailable()) { m_exSyncModeButton->setText(""); }
+	if (!exSyncAvailable()) { m_exSyncModeButton->setText(""); }
 }
 
 
 
-
+//ExSync
 void SongEditor::toggleExSyncMode()
 {
-	m_exSyncModeButton->setText(m_song->exSyncToggleMode());
+	m_exSyncModeButton->setText(exSyncToggleMode());
 }
 #endif
 
@@ -810,9 +810,7 @@ void SongEditor::updatePosition( const TimePos & t )
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
-#ifdef LMMS_HAVE_JACK
-	exSyncStoppedHack();  // from core/audio/AudioJack.cpp line ~91
-#endif
+	exSyncStoppedHack(); //ExSync
 
 	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
 		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||

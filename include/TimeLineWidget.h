@@ -157,11 +157,11 @@ public:
 	}
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
+	//ExSync
 	inline bool exSyncShouldSend() { return m_parentIsSongEditor; }
 	inline void exSyncSetShouldSend() { m_parentIsSongEditor = true; }
-	
 #endif
+
 signals:
 	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
@@ -194,9 +194,8 @@ private:
 	};
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
-	bool m_parentIsSongEditor;
-	
+	//ExSync
+	bool m_parentIsSongEditor;	
 #endif
 
 	auto getClickedTime(int xPosition) const -> TimePos;

@@ -40,6 +40,9 @@
 #include "NStateButton.h"
 #include "TextFloat.h"
 
+//ExSync
+#include "ExSync.h"
+
 namespace lmms::gui
 {
 
@@ -349,10 +352,10 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			m_pos.setJumped( true );
 			updatePosition();
 #ifdef LMMS_HAVE_JACK
-			// ExSync context : after ExSync.h ifdef MUST be removed
+			//ExSync
 			if ( exSyncShouldSend() )
 			{
-				Engine::getSong()->exSyncSendPosition();
+				exSyncSendPosition();
 			}
 #endif
 			break;
