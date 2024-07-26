@@ -4062,7 +4062,7 @@ void PianoRoll::stop()
 {
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled);
+	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
 }
 
 
