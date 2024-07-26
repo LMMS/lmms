@@ -35,8 +35,8 @@
 #include <QTimeLine>
 
 #ifdef LMMS_HAVE_JACK 
-//ExSync:
-#include "AudioJack.h"
+//ExSync
+#include "ExSync.h"
 #include <QPushButton> 	
 #endif
 
@@ -62,18 +62,6 @@
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "TrackView.h"
-
-
-namespace lmms
-{
-
-#ifdef LMMS_HAVE_JACK
-// This is dirty hack, but I don't want to place this function
-// to public interface ... 
-extern void exSyncStoppedHack(); // from core/audio/AudioJack.cpp
-#endif
-
-}
 
 
 namespace lmms::gui

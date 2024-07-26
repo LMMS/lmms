@@ -38,125 +38,11 @@
 #include "MainWindow.h"
 #include "MidiJack.h"
 
+//ExSync
+#include "ExSync.h"
+
 namespace lmms
 {
-
-// ExSync driver API frame based implementation
-// BEGIN
-static jack_client_t * cs_syncJackd = nullptr;
-
-
-static bool cs_exSyncAvailable()
-{
-	if (cs_syncJackd) { return true; }
-	return false;
-}
-
-
-static struct ExSyncCallbacks *cs_slaveCallBacks = nullptr;
-
-
-static int cs_syncCallBack(jack_transport_state_t state, jack_position_t *pos, void *arg)
-{
-	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
-	// Now slaveCallBacks is local copy - never be changed by other thread ...
-	if (slaveCallBacks)
-	{
-		switch(state)
-		{
-		case JackTransportStopped:
-			slaveCallBacks->mode(false);
-			slaveCallBacks->position(pos->frame);
-			break;
-		case JackTransportStarting:
-			slaveCallBacks->mode(true);
-			slaveCallBacks->position(pos->frame);
-			break;
-		case JackTransportRolling: //!< mostly not called with this state
-			slaveCallBacks->mode(true);
-			slaveCallBacks->position(pos->frame);
-			break;
-		default:
-			; // not use JackTransportLooping  and JackTransportNetStarting enum
-		}
-	}
-	return 1; 
-}
-
-
-static jack_transport_state_t cs_lastState = JackTransportStopped;
-// Called from SongEditor.cpp line ~827 (updatePosition implementation)
-void exSyncStoppedHack()
-{
-	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
-	// Now slaveCallBacks is local copy - never be changed by other thread ...
-	if (cs_syncJackd && slaveCallBacks)
-	{ 
-		jack_transport_state_t state = jack_transport_query(cs_syncJackd, nullptr);
-		if ( ( JackTransportStopped == state) && (state != cs_lastState) )
-		{
-			slaveCallBacks->mode(false);
-		}
-		cs_lastState = state ;
-	} else {
-		cs_lastState = JackTransportStopped;
-	}
-}
-
-
-static void cs_play( bool playing )
-{
-	if (cs_syncJackd)
-	{
-		if (playing) {
-			jack_transport_start(cs_syncJackd);
-		} else {
-			jack_transport_stop(cs_syncJackd);
-		}
-	}
-}
-
-
-static void cs_position(const SongExtendedPos *pos)
-{
-	if (cs_syncJackd)
-	{
-		jack_transport_locate(cs_syncJackd, pos->frame);
-	}
-}
-
-
-static void cs_slave(struct ExSyncCallbacks *cb)
-{
-	cs_slaveCallBacks = cb;
-	if (cs_syncJackd)
-	{
-		if (cb)
-		{
-			jack_set_sync_callback (cs_syncJackd, 
-					&cs_syncCallBack, nullptr);
-		} else {
-			jack_set_sync_callback (cs_syncJackd, nullptr, nullptr);
-		}
-	}
-}
-
-
-static struct ExSyncHandler cs_handler = {
-	&cs_exSyncAvailable,
-	&cs_play,
-	&cs_position,
-	&cs_slave
-};
-
-
-struct ExSyncHandler * exSyncGetJackHandler()
-{
-	return &cs_handler;
-}
-
-
-// END ExSync
 
 
 
@@ -303,7 +189,7 @@ void AudioJack::startProcessing()
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
-		cs_syncJackd = m_client; // ExSync
+		syncJackd(m_client); // cs_syncJackd = m_client; //ExSync
 		return;
 	}
 
@@ -337,7 +223,7 @@ void AudioJack::startProcessing()
 	}
 
 	m_stopped = false;
-	cs_syncJackd = m_client; // ExSync
+	syncJackd(m_client); // cs_syncJackd = m_client; //ExSync
 	jack_free(ports);
 }
 
@@ -347,7 +233,7 @@ void AudioJack::startProcessing()
 void AudioJack::stopProcessing()
 {
 	m_stopped = true;
-	cs_syncJackd = nullptr; // ExSync
+	syncJackd(nullptr); // cs_syncJackd = nullptr; //ExSync
 }
 
 void AudioJack::registerPort(AudioPort* port)

@@ -33,8 +33,8 @@
 #include <cmath>
 
 #ifdef LMMS_HAVE_JACK
-// ExSync after ExSync.h : ExSync.h MUST be included with other .h ...
-#include "AudioJack.h"
+//ExSync
+#include "ExSync.h"
 #endif
 
 #include "AutomationTrack.h"
