@@ -4062,7 +4062,7 @@ void PianoRoll::stop()
 {
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = ( m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled );
+	m_scrollBack = (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled);
 }
 
 
@@ -4465,20 +4465,20 @@ void PianoRoll::autoScroll( const TimePos & t )
 	const int w = width() - m_whiteKeyWidth;
 	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 	{
-		if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
+		if(t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
-			m_leftRightScroll->setValue( t.getBar() * TimePos::ticksPerBar() );
+			m_leftRightScroll->setValue(t.getBar() * TimePos::ticksPerBar());
 		}
-		else if( t < m_currentPosition )
+		else if(t < m_currentPosition)
 		{
-			TimePos t2 = qMax( t - w * TimePos::ticksPerBar() *
-						TimePos::ticksPerBar() / m_ppb, (tick_t) 0 );
-			m_leftRightScroll->setValue( t2.getBar() * TimePos::ticksPerBar() );
+			TimePos t2 = qMax(t - w * TimePos::ticksPerBar() *
+						TimePos::ticksPerBar() / m_ppb, (tick_t) 0);
+			m_leftRightScroll->setValue(t2.getBar() * TimePos::ticksPerBar());
 		}
 	}
 	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 	{
-		m_leftRightScroll->setValue( std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0 ) );
+		m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0));
 	}
 	m_scrollBack = false;
 }
@@ -4487,12 +4487,12 @@ void PianoRoll::autoScroll( const TimePos & t )
 
 void PianoRoll::updatePosition( const TimePos & t )
 {
-	if( ( Engine::getSong()->isPlaying()
+	if((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
 			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
-		) || m_scrollBack )
+		) || m_scrollBack)
 	{
-		autoScroll( t );
+		autoScroll(t);
 	}
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left

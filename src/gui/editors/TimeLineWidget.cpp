@@ -87,15 +87,13 @@ void TimeLineWidget::setXOffset(const int x)
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
-	
 	auto autoScroll = new NStateButton(_tool_bar);
-	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_stepped_on" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_continuous_on" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
+	autoScroll->setGeneralToolTip(tr("Auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap( "autoscroll_stepped_on"));
+	autoScroll->addState(embed::getIconPixmap( "autoscroll_continuous_on"));
+	autoScroll->addState(embed::getIconPixmap( "autoscroll_off"));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
-	
 
 	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );

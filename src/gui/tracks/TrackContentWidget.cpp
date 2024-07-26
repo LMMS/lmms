@@ -629,8 +629,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	// Don't draw background on Pattern Editor
 	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
 	{
-		p.drawTiledPixmap( rect(), m_background, QPoint(
-				tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0 ) );
+		p.drawTiledPixmap(rect(), m_background, QPoint(
+				tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0));
 	}
 }
 

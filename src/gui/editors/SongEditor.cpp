@@ -231,10 +231,10 @@ SongEditor::SongEditor( Song * song ) :
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
-	m_leftRightScroll->setMinimum( 0 );
-	m_leftRightScroll->setMaximum( 0 );
-	m_leftRightScroll->setSingleStep( 1 );
-	m_leftRightScroll->setPageStep( 20 * TimePos::ticksPerBar() );
+	m_leftRightScroll->setMinimum(0);
+	m_leftRightScroll->setMaximum(0);
+	m_leftRightScroll->setSingleStep(1);
+	m_leftRightScroll->setPageStep(20 * TimePos::ticksPerBar());
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),
 					this, SLOT(scrolled(int)));
@@ -325,7 +325,7 @@ QString SongEditor::getSnapSizeString() const
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = TimePos( new_pos ) );
+	emit positionChanged(m_currentPosition = TimePos(new_pos));
 }
 
 
@@ -544,13 +544,13 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x());
+		m_leftRightScroll->setValue(m_leftRightScroll->value()
+							- we->angleDelta().x() / pixelsPerBar());
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y());
+		m_leftRightScroll->setValue(m_leftRightScroll->value()
+							- we->angleDelta().y() / pixelsPerBar());
 	}
 	else
 	{
@@ -713,7 +713,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 void SongEditor::updateScrollBar( int len )
 {
-	m_leftRightScroll->setMaximum( len * TimePos::ticksPerBar() );
+	m_leftRightScroll->setMaximum(len * TimePos::ticksPerBar());
 }
 
 
@@ -756,8 +756,8 @@ void SongEditor::updatePosition( const TimePos & t )
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
-	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song ) ||
-							m_scrollBack == true )
+	if((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
+							|| m_scrollBack == true)
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
@@ -766,19 +766,19 @@ void SongEditor::updatePosition( const TimePos & t )
 		
 		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 		{
-			if( t > m_currentPosition + w * TimePos::ticksPerBar() /
-								pixelsPerBar() )
+			if(t > m_currentPosition + w * TimePos::ticksPerBar()
+								/ pixelsPerBar())
 			{
-				animateScroll( m_leftRightScroll, t.getTicks(), m_smoothScroll );
+				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
 			}
-			else if( t < m_currentPosition )
+			else if(t < m_currentPosition)
 			{
-				animateScroll( m_leftRightScroll, t.getTicks(), m_smoothScroll );
+				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
 			}
 		}
 		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 		{
-			animateScroll( m_leftRightScroll, std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f), m_smoothScroll );
+			animateScroll(m_leftRightScroll, std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f), m_smoothScroll);
 		}
 		m_scrollBack = false;
 	}
