@@ -757,7 +757,7 @@ void SongEditor::updatePosition( const TimePos & t )
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
 	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
-							|| m_scrollBack == true)
+							|| m_scrollBack)
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
