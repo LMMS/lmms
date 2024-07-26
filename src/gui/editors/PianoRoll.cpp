@@ -4471,8 +4471,8 @@ void PianoRoll::autoScroll( const TimePos & t )
 		}
 		else if (t < m_currentPosition)
 		{
-			TimePos t2 = qMax(t - w * TimePos::ticksPerBar() *
-						TimePos::ticksPerBar() / m_ppb, (tick_t) 0);
+			TimePos t2 = std::max(t - w * TimePos::ticksPerBar() *
+						TimePos::ticksPerBar() / m_ppb, static_cast<tick_t>(0));
 			m_leftRightScroll->setValue(t2.getBar() * TimePos::ticksPerBar());
 		}
 	}
