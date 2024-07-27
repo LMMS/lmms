@@ -1,8 +1,6 @@
 /*
  * ExSync.h - support for external synchronization
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -38,18 +36,18 @@
 
 namespace lmms
 {
-//! ExSync sending code provide all fields, but here used only @frame
+//! ExSync sending code provide all fields (for future), but here used only @frame
 struct SongExtendedPos
 {
-	bar_t bar; 	//!< the bar position, 0-based "Song.h"
-	int beat; 		//!< the beat position inside the bar, 0-based "Song.h"
-	int tick; 		//!< the remainder after bar and beat are removed , 0-based "Song.h"
-	int barStartTick; //!< tick_t currentTick()  "Song.h"
-	int beatsPerBar; //!<  getTimeSigModel().numeratorModel().value(); "MeterModel.h"
-	int beatType; 	//!<  getTimeSigModel().denominatorModel().value(); "MeterModel.h"
-	tick_t ticksPerBeat; //!< ticksPerBeat(...) "TimePos.h"
-	bpm_t tempo; //!< beats per minute getTempo(); "Song.h"
-	f_cnt_t frame; //!< currentFrame(); "Song.h"
+	bar_t bar;
+	int beat;
+	int tick;
+	int barStartTick;
+	int beatsPerBar;
+	int beatType;
+	tick_t ticksPerBeat;
+	bpm_t tempo;
+	f_cnt_t frame;
 };
 
 //! Functions, MUST be provided by ExSync driver
@@ -66,7 +64,6 @@ struct ExSyncHandler
 };
 
 
-//! provides jackd ExSync driver API using frame based synchronization
 struct ExSyncHandler * exSyncGetHandler();
 
 void exSyncStopped();
@@ -81,7 +78,7 @@ bool exSyncReact();
 bool exSyncAvailable();
 bool exSyncMasterAndSync();
 
-}
+} // namespace lmms 
 
 #define 	LMMS_HAVE_EXSYNC
 
@@ -92,13 +89,13 @@ bool exSyncMasterAndSync();
 namespace lmms 
 {
 
-inline void exSyncStopped(){}
-inline void exSyncSendPosition(){}
+inline void exSyncStopped() {}
+inline void exSyncSendPosition() {}
 
 }
 
-#endif
+#endif // LMMS_HAVE_JACK
 
 
 
-#endif
+#endif // LMMS_EXSYNC_H

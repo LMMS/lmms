@@ -31,6 +31,9 @@
 #include <QSize>
 #include <QWidget>
 
+//ExSync
+#include "ExSync.h"
+
 #include "Song.h"
 #include "embed.h"
 
@@ -156,7 +159,7 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 	//ExSync
 	inline bool exSyncShouldSend() { return m_parentIsSongEditor; }
 	inline void exSyncSetShouldSend() { m_parentIsSongEditor = true; }
