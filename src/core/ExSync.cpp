@@ -53,7 +53,7 @@ static jack_client_t * cs_syncJackd = nullptr;
 
 
 
-static bool available()
+static bool jackAvailable()
 {
 	if (cs_syncJackd) { return true; }
 	return false;
@@ -102,7 +102,7 @@ static jack_transport_state_t cs_lastState = JackTransportStopped;
 
 
 
-static void play(bool playing)
+static void jackPlay(bool playing)
 {
 	if (cs_syncJackd)
 	{
@@ -117,7 +117,7 @@ static void play(bool playing)
 
 
 
-static void position(const SongExtendedPos *pos)
+static void jackPosition(const SongExtendedPos *pos)
 {
 	if (cs_syncJackd)
 	{
@@ -128,7 +128,7 @@ static void position(const SongExtendedPos *pos)
 
 
 
-static void slave(struct ExSyncCallbacks *cb)
+static void jackSlave(struct ExSyncCallbacks *cb)
 {
 	cs_slaveCallBacks = cb;
 	if (cs_syncJackd)
@@ -146,10 +146,10 @@ static void slave(struct ExSyncCallbacks *cb)
 
 
 static struct ExSyncHandler cs_handler = {
-	&available,
-	&play,
-	&position,
-	&slave
+	&jackAvailable,
+	&jackPlay,
+	&jackPosition,
+	&jackSlave
 };
 
 
