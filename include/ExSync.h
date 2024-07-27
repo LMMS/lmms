@@ -38,16 +38,6 @@
 
 namespace lmms
 {
-
-/**
-After implementing more ExSync devices 
-MUST be placed in own header  "ExSync.h"
-*/
-// BEGIN ExSync ExSync.h context
-//! Is included here but should be included in "ExSync.h"
-// #include "lmms_basics.h"
-
-
 //! ExSync sending code provide all fields, but here used only @frame
 struct SongExtendedPos
 {
@@ -62,21 +52,6 @@ struct SongExtendedPos
 	f_cnt_t frame; //!< currentFrame(); "Song.h"
 };
 
-/**
- Functions, provided by Song.cpp, to control LMMS position/playing
- LMMS react only in if ExSync is on (button is green)
-*/
-struct ExSyncCallbacks
-{
-	//! @playing [true : to start; false : to pause] 
-	void (* mode)(bool playing); 
-	//! change position to @frames;
-	void (* position)(uint32_t frames);
-	//! to calculate frames from time (not used here - jack is working in frames)
-	sample_rate_t (* processingSampleRate)(); //!< provided from Mixer.cpp
-};
-
-
 //! Functions, MUST be provided by ExSync driver
 struct ExSyncHandler
 {
@@ -89,18 +64,15 @@ struct ExSyncHandler
 	//! driver MUST start/stop remote LMMS controling @cb !nullptr/nullptr
 	void (* setSlave)(struct ExSyncCallbacks *cb); 
 };
-// struct ExSyncCallbacks *getExSync();
-// END ExSync ExSync.h context
+
 
 //! provides jackd ExSync driver API using frame based synchronization
-struct ExSyncHandler * exSyncGetJackHandler();
+struct ExSyncHandler * exSyncGetHandler();
 
-void exSyncStoppedHack();
+void exSyncStopped();
 
-//For AudioJack:
 void syncJackd(jack_client_t* client);
 
-//From Song.h:
 void exSyncSendPosition();
 const char * exSyncToggleMode();
 const char * exSyncGetModeString();
@@ -111,6 +83,8 @@ bool exSyncMasterAndSync();
 
 }
 
+#define 	LMMS_HAVE_EXSYNC
+
 #else
 
 // Some empty functions/macroses here
@@ -118,15 +92,9 @@ bool exSyncMasterAndSync();
 namespace lmms 
 {
 
-inline void exSyncStoppedHack(){}
-
-//From Song.h:
+inline void exSyncStopped(){}
 inline void exSyncSendPosition(){}
-//const char * exSyncToggleMode();
-//const char * exSyncGetModeString();
-//bool exSyncToggle();
-//inline bool exSyncReact() { return m_exSyncOn; }
-//bool exSyncAvailable();
+
 }
 
 #endif

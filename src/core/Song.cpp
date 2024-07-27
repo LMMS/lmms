@@ -114,8 +114,8 @@ Song::Song() :
 	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
 						SLOT(updateFramesPerTick()));
 
-#ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
+#ifdef LMMS_HAVE_EXSYNC
+	//ExSync
 	connect( this, SIGNAL( playbackStateChanged() ), this, SLOT( onPlaybackStateChanged() ) );
 #endif
 
@@ -657,7 +657,7 @@ void Song::stop()
 	m_paused = false;
 	m_recording = true;
 
-	if (m_playMode < Song::PlayMode::Pattern) { exSyncSendPosition(); } //ExSync !!! some work around ???
+	if (m_playMode < Song::PlayMode::Pattern) { exSyncSendPosition(); } //ExSync
 
 	m_playing = false;
 
@@ -1424,7 +1424,7 @@ void Song::updateFramesPerTick()
 
 
 
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 //ExSync
 void Song::onPlaybackStateChanged()
 {
@@ -1432,7 +1432,7 @@ void Song::onPlaybackStateChanged()
 	{
 		if (m_playMode < Song::PlayMode::Pattern) 
 		{
-			ExSyncHandler * sync =  exSyncGetJackHandler();
+			ExSyncHandler * sync =  exSyncGetHandler();
 			sync->sendPlay(m_playing);
 		}
 	}

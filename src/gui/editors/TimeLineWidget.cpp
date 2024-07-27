@@ -351,12 +351,9 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			m_pos.setCurrentFrame( 0 );
 			m_pos.setJumped( true );
 			updatePosition();
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 			//ExSync
-			if ( exSyncShouldSend() )
-			{
-				exSyncSendPosition();
-			}
+			if ( exSyncShouldSend() ) { exSyncSendPosition(); }
 #endif
 			break;
 

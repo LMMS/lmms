@@ -110,7 +110,7 @@ SongEditor::SongEditor( Song * song ) :
 		m_currentPosition, Song::PlayMode::Song, this
 	);
 
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 	//ExSync
 	m_timeLine->exSyncSetShouldSend(); // Mark TimeLineWidget for ExSync 
 #endif
@@ -241,7 +241,7 @@ SongEditor::SongEditor( Song * song ) :
 
 	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
 
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 	//ExSync
 	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
 	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
@@ -738,7 +738,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 //ExSync
 void SongEditor::toggleExSync()
 {
@@ -810,7 +810,7 @@ void SongEditor::updatePosition( const TimePos & t )
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
-	exSyncStoppedHack(); //ExSync
+	exSyncStopped(); //ExSync
 
 	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
 		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||

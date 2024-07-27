@@ -30,8 +30,26 @@
 #include "Engine.h"
 #include "Song.h"
 
-// ExSync driver API frame based implementation
-// BEGIN
+namespace lmms 
+{
+
+/**
+ Functions to control LMMS position/playing
+ LMMS react only in if ExSync is on (button is green)
+*/
+struct ExSyncCallbacks
+{
+	//! @playing [true : to start; false : to pause] 
+	void (* mode)(bool playing); 
+	//! change position to @frames;
+	void (* position)(uint32_t frames);
+	//! to calculate frames from time (not used here - jack is working in frames)
+	sample_rate_t (* processingSampleRate)(); //!< provided from Mixer.cpp
+};
+
+
+
+
 static jack_client_t * cs_syncJackd = nullptr;
 
 
@@ -42,12 +60,12 @@ static bool cs_exSyncAvailable()
 }
 
 
-static struct lmms::ExSyncCallbacks *cs_slaveCallBacks = nullptr;
+static struct ExSyncCallbacks *cs_slaveCallBacks = nullptr;
 
 
 static int cs_syncCallBack(jack_transport_state_t state, jack_position_t *pos, void *arg)
 {
-	struct lmms::ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
+	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
 	// Now slaveCallBacks is local copy - never be changed by other thread ...
 	if (slaveCallBacks)
 	{
@@ -90,7 +108,7 @@ static void cs_play( bool playing )
 }
 
 
-static void cs_position(const lmms::SongExtendedPos *pos)
+static void cs_position(const SongExtendedPos *pos)
 {
 	if (cs_syncJackd)
 	{
@@ -99,7 +117,7 @@ static void cs_position(const lmms::SongExtendedPos *pos)
 }
 
 
-static void cs_slave(struct lmms::ExSyncCallbacks *cb)
+static void cs_slave(struct ExSyncCallbacks *cb)
 {
 	cs_slaveCallBacks = cb;
 	if (cs_syncJackd)
@@ -115,7 +133,7 @@ static void cs_slave(struct lmms::ExSyncCallbacks *cb)
 }
 
 
-static struct lmms::ExSyncHandler cs_handler = {
+static struct ExSyncHandler cs_handler = {
 	&cs_exSyncAvailable,
 	&cs_play,
 	&cs_position,
@@ -132,8 +150,8 @@ static unsigned m_exSyncMode = 0; //(for ModeButton state)
 
 static void cs_exSyncMode(bool playing)
 {
-	lmms::Song * l_song = lmms::Engine::getSong();
-	if ((lmms::exSyncReact()) && (l_song->isPlaying() != playing)) 
+	Song * l_song = Engine::getSong();
+	if ((exSyncReact()) && (l_song->isPlaying() != playing)) 
 	{
 		if ( l_song->isStopped() )
 		{
@@ -149,11 +167,11 @@ static void cs_exSyncMode(bool playing)
 
 static void cs_exSyncPosition(uint32_t frames)
 {
-	lmms::Song * l_song = lmms::Engine::getSong();
-	if ((lmms::exSyncReact()) && (l_song->playMode()  == lmms::Song::PlayMode::Song))
+	Song * l_song = Engine::getSong();
+	if ((exSyncReact()) && (l_song->playMode()  == Song::PlayMode::Song))
 	{
-		lmms::TimePos timePos = 
-			lmms::TimePos::fromFrames(frames , lmms::Engine::framesPerTick());
+		TimePos timePos = 
+			TimePos::fromFrames(frames , Engine::framesPerTick());
 		l_song->setToTime(timePos);
 	}
 }
@@ -161,15 +179,15 @@ static void cs_exSyncPosition(uint32_t frames)
 
 
 
-static lmms::sample_rate_t cs_exSyncSampleRate()
+static sample_rate_t cs_exSyncSampleRate()
 {
-	return lmms::Engine::audioEngine()->outputSampleRate();
+	return Engine::audioEngine()->outputSampleRate();
 }
 
 
 
 
-static struct lmms::ExSyncCallbacks cs_exSyncCallbacks = {
+static struct ExSyncCallbacks cs_exSyncCallbacks = {
 	&cs_exSyncMode,
 	&cs_exSyncPosition,
 	&cs_exSyncSampleRate
@@ -184,23 +202,16 @@ static const char * cs_exSyncModeStrings[EXSYNC_MAX_MODES] = {
 
 
 
-namespace lmms 
-{
-
-
-
-
-struct lmms::ExSyncHandler * exSyncGetJackHandler()
+struct ExSyncHandler * exSyncGetHandler()
 {
 	return &cs_handler;
 }
 
 
 
-// Called from SongEditor.cpp line ~827 (updatePosition implementation)
-void exSyncStoppedHack()
+
+void exSyncStopped()
 {
-	//Now static inner interface available!!! TODO:
 	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
 	// Now slaveCallBacks is local copy - never be changed by other thread ...
 	if (cs_syncJackd && slaveCallBacks)
@@ -216,6 +227,9 @@ void exSyncStoppedHack()
 	}
 }
 
+
+
+
 void syncJackd(jack_client_t* client)
 {
 	cs_syncJackd = client;
@@ -223,24 +237,25 @@ void syncJackd(jack_client_t* client)
 
 
 
-//From Song.cpp:
+
 void exSyncSendPosition() 
 {
 	struct SongExtendedPos pos;
+	auto _ = Engine::getSong();
+	
 	if (m_exSyncMasterOn && m_exSyncOn)
 	{
-		//pos.bar = Engine::getSong()->currentBar(); //TODO private
-		//pos.beat = Engine::getSong()->getBeat();
-		//pos.tick = Engine::getSong()->getBeatTicks();
-		//pos.barStartTick = Engine::getSong()->getTicks();
-		//pos.beatsPerBar = Engine::getSong()->getTimeSigModel().numeratorModel().value();
-		//pos.beatType = Engine::getSong()->getTimeSigModel().denominatorModel().value();
-		//pos.ticksPerBeat = Engine::getSong()->getPlayPos().ticksPerBeat( Engine::getSong()->getTimeSigModel() );
-		//pos.tempo = Engine::getSong()->getTempo();
-		pos.frame = Engine::getSong()->getFrames(); //currentFrame(); //TODO private
+		pos.bar = _->getBars();
+		pos.beat = _->getBeat();
+		pos.tick = _->getBeatTicks();
+		pos.barStartTick = _->getTicks();
+		pos.beatsPerBar = _->getTimeSigModel().numeratorModel().value();
+		pos.beatType = _->getTimeSigModel().denominatorModel().value();
+		pos.ticksPerBeat = _->getPlayPos().ticksPerBeat( _->getTimeSigModel() );
+		pos.tempo = _->getTempo();
+		pos.frame = _->getFrames();
 		
-		//Now static inner interface available!!! TODO:
-		ExSyncHandler * sync =  exSyncGetJackHandler();
+		ExSyncHandler * sync =  exSyncGetHandler();
 		sync->sendPosition(&pos);
 
 	}
@@ -250,8 +265,7 @@ void exSyncSendPosition()
 
 const char * exSyncToggleMode()
 {
-	//Now static inner interface available!!! TODO:
-	ExSyncHandler * sync =  exSyncGetJackHandler();
+	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( !sync->availableNow() ) 
 	{
 		// If driver is not available nothing to do ... 
@@ -290,8 +304,7 @@ const char * exSyncGetModeString()
 
 bool exSyncToggle()
 {
-	//Now static inner interface available!!! TODO:
-	ExSyncHandler * sync =  exSyncGetJackHandler();
+	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( sync->availableNow() )
 	{
 		if  (m_exSyncOn)
@@ -309,22 +322,23 @@ bool exSyncToggle()
 
 
 
+
 bool exSyncReact() { return m_exSyncOn; }
+
 
 
 
 bool exSyncAvailable()
 {
-	//Now static inner interface available!!! TODO:
-	ExSyncHandler * sync =  exSyncGetJackHandler();
+	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( sync->availableNow() ) { return true; }
 	return false;
 }
 
 
 
-bool exSyncMasterAndSync() { return m_exSyncMasterOn && m_exSyncOn; }
 
+bool exSyncMasterAndSync() { return m_exSyncMasterOn && m_exSyncOn; }
 
 
 
