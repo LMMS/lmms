@@ -305,8 +305,11 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	auto sid = static_cast<reSID::SID*>(_n->m_pluginData);
 	int delta_t = clockrate * frames / samplerate + 4;
-	// avoid variable length array for msvc compat
-	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
+#ifndef _MSC_VER
+	short buf[frames];
+#else
+	const auto buf = static_cast<short*>(_alloca(frames * sizeof(short)));
+#endif
 	auto sidreg = std::array<unsigned char, NUMSIDREGS>{};
 
 	for (auto& reg : sidreg)
@@ -407,12 +410,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	sidreg[24] = data8&0x00FF;
 
-	int num = sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames);
-	if(num!=frames)
+	const auto num = static_cast<f_cnt_t>(sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames));
+	if (num != frames) {
 		printf("!!!Not enough samples\n");
+	}
 
 	// loop backwards to avoid overwriting data in the short-to-float conversion
-	for( fpp_t frame = frames - 1; frame >= 0; frame-- )
+	for (auto frame = std::size_t{0}; frame < frames; ++frame)
 	{
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )

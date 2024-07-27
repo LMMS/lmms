@@ -66,7 +66,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this, tr( "Cutoff frequency" ) ),
 	m_filterResModel(0.5f, BasicFilters<>::minQ(), 10.f, 0.01f, this, tr("Q/Resonance"))
 {
-	for( int i = 0; i < NumTargets; ++i )
+	for (auto i = std::size_t{0}; i < NumTargets; ++i)
 	{
 		float value_for_zero_amount = 0.0;
 		if( static_cast<Target>(i) == Target::Volume )
@@ -279,7 +279,7 @@ f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 
 	if( _only_vol == false )
 	{
-		for( int i = static_cast<std::size_t>(Target::Volume)+1; i < NumTargets; ++i )
+		for (auto i = static_cast<std::size_t>(Target::Volume) + 1; i < NumTargets; ++i)
 		{
 			if( m_envLfoParameters[i]->isUsed() &&
 				m_envLfoParameters[i]->PAHD_Frames() > ret_val )
@@ -313,7 +313,7 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 		return m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->releaseFrames();
 	}
 
-	for( int i = static_cast<std::size_t>(Target::Volume)+1; i < NumTargets; ++i )
+	for (auto i = static_cast<std::size_t>(Target::Volume) + 1; i < NumTargets; ++i)
 	{
 		if( m_envLfoParameters[i]->isUsed() )
 		{
@@ -333,7 +333,7 @@ void InstrumentSoundShaping::saveSettings( QDomDocument & _doc, QDomElement & _t
 	m_filterResModel.saveSettings( _doc, _this, "fres" );
 	m_filterEnabledModel.saveSettings( _doc, _this, "fwet" );
 
-	for( int i = 0; i < NumTargets; ++i )
+	for (auto i = std::size_t{0}; i < NumTargets; ++i)
 	{
 		m_envLfoParameters[i]->saveState( _doc, _this ).setTagName(
 			m_envLfoParameters[i]->nodeName() +
@@ -356,7 +356,7 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 	{
 		if( node.isElement() )
 		{
-			for( int i = 0; i < NumTargets; ++i )
+			for (auto i = std::size_t{0}; i < NumTargets; ++i)
 			{
 				if( node.nodeName() ==
 					m_envLfoParameters[i]->nodeName() +

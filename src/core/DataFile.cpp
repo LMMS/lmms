@@ -1184,7 +1184,7 @@ static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
 		int syncmode = el.attribute( "syncmode" ).toInt();
 		QStringList names;
 		QDomNamedNodeMap atts = el.attributes();
-		for( uint i = 0; i < atts.length(); i++ )
+		for (auto i = 0; i < atts.length(); i++)
 		{
 			QString name = atts.item( i ).nodeName();
 			if( name.endsWith( "_numerator" ) )

@@ -646,22 +646,26 @@ option(USE_WERROR "Treat compiler warnings as errors" OFF)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	set(COMPILE_ERROR_FLAGS
 		"-Wall" # Enable most warnings by default
-		"-Werror=unused-function" # Unused functions are an error
-		# TODO: Fix the code and remove the following:
-		"-Wno-sign-compare" # Permit comparisons between signed and unsigned integers
-		"-Wno-strict-overflow" # Permit optimisations assuming no signed overflow
 	)
 	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
 		"-w" # Disable all warnings
 	)
 
-	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-	# TODO: Is this still necessary?
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		list(APPEND COMPILE_ERROR_FLAGS
+			# The following warning generates false positives that are difficult
+			# to work around, in particular when inlining calls to standard
+			# algorithms performed on single-element arrays. See, for example,
+			# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111273.
 			"-Wno-array-bounds" # Permit out-of-bounds array subscripts
-			"-Wno-attributes" # Permit unrecognised attributes
 		)
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "11")
+			list(APPEND COMPILE_ERROR_FLAGS
+				# This has the same problems described above for "array-bounds".
+				"-Wno-stringop-overread" # Permit string functions overreading the source
+			)
+		endif()
 	endif()
 
 	if(USE_WERROR)
