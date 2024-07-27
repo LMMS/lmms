@@ -842,7 +842,6 @@ void RemoteVstPlugin::initEditor()
 #endif
 
 #else
-	XEvent e;
 	Atom prop_atom, val_atom;
 	
 	if (m_display == nullptr)
@@ -2301,7 +2300,7 @@ void RemoteVstPlugin::guiEventLoop()
 		{
 			XNextEvent(m_display, &e);
 		
-			if (e.type == ClientMessage && e.xclient.data.l[0] == m_wmDeleteMessage)
+			if (e.type == ClientMessage && static_cast<Atom>(e.xclient.data.l[0]) == m_wmDeleteMessage)
 			{
 				hideEditor();
 			}
