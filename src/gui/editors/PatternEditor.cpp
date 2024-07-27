@@ -45,10 +45,11 @@ namespace lmms::gui
 
 
 PatternEditor::PatternEditor(PatternStore* ps) :
-	TrackContainerView(ps),
+	TrackContainerView(ps, true),
 	m_ps(ps)
 {
 	setModel(ps);
+	contentWidget()->widget()->setMinimumWidth(500);
 }
 
 
@@ -167,7 +168,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 
 void PatternEditor::updatePosition()
 {
-	//realignTracks();
+	realignTracks();
 	emit positionChanged( m_currentPosition );
 }
 
@@ -236,11 +237,11 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	// TODO: Use style sheet
 	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
-		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 384);
+		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 10);
 	}
 	else
 	{
-		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
+		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * ClipView::BORDER_WIDTH + 10);
 	}
 
 	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));

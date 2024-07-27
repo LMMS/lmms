@@ -74,7 +74,7 @@ void InstrumentLoaderThread::run()
 namespace gui
 {
 
-TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
+TrackContainerView::TrackContainerView(TrackContainer * _tc, bool canHorizontalScroll) :
 	QWidget(),
 	ModelView( nullptr, this ),
 	JournallingObject(),
@@ -82,7 +82,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_currentPosition( 0, 0 ),
 	m_tc( _tc ),
 	m_trackViews(),
-	m_scrollArea( new scrollArea( this ) ),
+	m_scrollArea(new scrollArea(this, canHorizontalScroll)),
 	m_ppb( DEFAULT_PIXELS_PER_BAR ),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
@@ -259,6 +259,14 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
+	/*
+	 * TODO remove?
+	qDebug("tracksRealigned: width() = %d", width());
+	m_scrollArea->widget()->setFixedWidth(width());
+	m_scrollArea->widget()->setFixedHeight(
+				m_scrollArea->widget()->minimumSizeHint().height());
+
+	*/
 	for (const auto& trackView : m_trackViews)
 	{
 		trackView->show();
@@ -456,12 +464,15 @@ RubberBand *TrackContainerView::rubberBand() const
 
 
 
-TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
+TrackContainerView::scrollArea::scrollArea(TrackContainerView * _parent, bool canHorizontalScroll) :
 	QScrollArea( _parent ),
 	m_trackContainerView( _parent )
 {
 	setFrameStyle( QFrame::NoFrame );
-	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	if (canHorizontalScroll == false)
+	{
+		setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	}
 }
 
 

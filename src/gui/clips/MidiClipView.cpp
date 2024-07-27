@@ -63,10 +63,19 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 			this, SLOT(update()));
 	update();
 
-	setStyle( QApplication::style() );
+	//setStyle( QApplication::style() );
+
+	setFixedWidth(300);
+
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 
+
+QSize MidiClipView::sizeHint() const
+{
+	return {200, 200};
+}
 
 
 MidiClip* MidiClipView::getMidiClip()
@@ -373,6 +382,8 @@ static int computeNoteRange(int minKey, int maxKey)
 
 void MidiClipView::paintEvent( QPaintEvent * )
 {
+	qDebug("minimum size w: %d", minimumSizeHint().width());
+	qDebug("minimum size ww: %d", minimumSize().width());
 	QPainter painter( this );
 
 	if( !needsUpdate() )
