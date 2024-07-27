@@ -364,9 +364,6 @@ static inline int numDigitsAsInt(float f)
 	return digits;
 }
 
-
-
-
 template <typename T>
 class LinearMap
 {
