@@ -37,6 +37,11 @@
 namespace lmms
 {
 
+static inline bool approximatelyEqual(float x, float y)
+{
+	return x == y ? true : std::abs(x - y) < F_EPSILON;
+}
+
 #ifdef __INTEL_COMPILER
 
 static inline float absFraction( const float _x )
@@ -361,10 +366,6 @@ static inline int numDigitsAsInt(float f)
 }
 
 
-static inline bool floatCompare(float x, float y)
-{
-	return x == y ? true : std::abs(x - y) < F_EPSILON;
-}
 
 
 template <typename T>
