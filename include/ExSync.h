@@ -36,6 +36,12 @@
 
 namespace lmms
 {
+
+// Jack Transport target implementation:
+void syncJackd(jack_client_t* client); //!< called from src/core/audio/AudioJack.cpp
+void exSyncStopped();
+
+// Common target independent part:
 //! ExSync sending code provide all fields (for future), but here used only @frame
 struct SongExtendedPos
 {
@@ -63,14 +69,10 @@ struct ExSyncHandler
 	void (* setSlave)(struct ExSyncCallbacks *cb); 
 };
 
-
 struct ExSyncHandler * exSyncGetHandler();
 
-void exSyncStopped();
-
-void syncJackd(jack_client_t* client);
-
 void exSyncSendPosition();
+
 const char * exSyncToggleMode();
 const char * exSyncGetModeString();
 bool exSyncToggle();

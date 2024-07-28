@@ -31,6 +31,9 @@
 namespace lmms 
 {
 
+
+/* -----------------------ExSync private --------------------------- */
+
 /**
 	 Functions to control LMMS position/playing
 	 LMMS react only in if ExSync is on (button is green)
@@ -48,25 +51,15 @@ struct ExSyncCallbacks
 
 
 
-static jack_client_t * cs_syncJackd = nullptr;
+/* Jack Transport target implementation private part (BEGIN): */
 
 
-
-
-static bool jackAvailable()
-{
-	if (cs_syncJackd) { return true; }
-	return false;
-}
-
-
-
-
+static jack_client_t * cs_syncJackd = nullptr; //!< Set by Jack audio 
 static struct ExSyncCallbacks *cs_slaveCallBacks = nullptr;
+static jack_transport_state_t cs_lastState = JackTransportStopped;
 
 
-
-
+/*! Function adapt events from Jack Transport to LMMS  */
 static int syncCallBack(jack_transport_state_t state, jack_position_t *pos, void *arg)
 {
 	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
@@ -95,11 +88,13 @@ static int syncCallBack(jack_transport_state_t state, jack_position_t *pos, void
 }
 
 
+/* Functions needed  to control Jack Transport (adapt events from LMMS) */
 
 
-static jack_transport_state_t cs_lastState = JackTransportStopped;
-
-
+static bool jackAvailable()
+{
+	if (cs_syncJackd) { return true; } else { return false; }
+}
 
 
 static void jackPlay(bool playing)
@@ -115,8 +110,6 @@ static void jackPlay(bool playing)
 }
 
 
-
-
 static void jackPosition(const SongExtendedPos *pos)
 {
 	if (cs_syncJackd)
@@ -126,8 +119,6 @@ static void jackPosition(const SongExtendedPos *pos)
 }
 
 
-
-
 static void jackSlave(struct ExSyncCallbacks *cb)
 {
 	cs_slaveCallBacks = cb;
@@ -135,16 +126,23 @@ static void jackSlave(struct ExSyncCallbacks *cb)
 	{
 		if (cb)
 		{
-			jack_set_sync_callback (cs_syncJackd, &syncCallBack, nullptr);
+			jack_set_sync_callback(cs_syncJackd, &syncCallBack, nullptr);
 		} else {
-			jack_set_sync_callback (cs_syncJackd, nullptr, nullptr);
+			jack_set_sync_callback(cs_syncJackd, nullptr, nullptr);
 		}
 	}
 }
+/* (END) [Jack Transport target implementation ] */
 
 
 
 
+/* NEW target implementation private code here */
+
+
+
+
+// In future will be array ExSyncHandler cs_handler[] 
 static struct ExSyncHandler cs_handler = {
 	&jackAvailable,
 	&jackPlay,
@@ -153,11 +151,19 @@ static struct ExSyncHandler cs_handler = {
 };
 
 
+
+
+/**
+	Model controled by user interface 
+	using View/Controller in SongEditor
+	(include/SongEditor.h, src/gui/editors/SongEditor.cpp)
+ */ 
+
+
 static bool cs_exSyncSlaveOn = false; //!< (Receave)
 static bool cs_exSyncMasterOn = true; //!< (Send)
 static bool cs_exSyncOn = false; //!< (React and Send)
 static unsigned cs_exSyncMode = 0; //!< (for ModeButton state)
-
 
 
 static void exSyncMode(bool playing)
@@ -171,8 +177,6 @@ static void exSyncMode(bool playing)
 }
 
 
-
-
 static void exSyncPosition(uint32_t frames)
 {
 	auto _ = Engine::getSong();
@@ -184,14 +188,10 @@ static void exSyncPosition(uint32_t frames)
 }
 
 
-
-
 static sample_rate_t exSyncSampleRate()
 {
 	return Engine::audioEngine()->outputSampleRate();
 }
-
-
 
 
 static struct ExSyncCallbacks cs_exSyncCallbacks = {
@@ -199,8 +199,6 @@ static struct ExSyncCallbacks cs_exSyncCallbacks = {
 	&exSyncPosition,
 	&exSyncSampleRate
 };
-
-
 
 
 #define 	EXSYNC_MAX_MODES 	(3)
@@ -211,12 +209,10 @@ static const char * cs_exSyncModeStrings[EXSYNC_MAX_MODES] = {
 
 
 
-struct ExSyncHandler * exSyncGetHandler()
-{
-	return &cs_handler;
-}
+/* -----------------------ExSync public ----------------------------- */
 
 
+/* Jack Transport target implementation (public part): */
 
 
 void exSyncStopped()
@@ -237,14 +233,25 @@ void exSyncStopped()
 }
 
 
-
-
 void syncJackd(jack_client_t* client)
 {
 	cs_syncJackd = client;
 }
 
 
+
+
+/* NEW target implementation public code here */
+
+
+
+/* Target independent part: */
+
+
+struct ExSyncHandler * exSyncGetHandler()
+{
+	return &cs_handler;
+}
 
 
 void exSyncSendPosition() 
@@ -269,7 +276,6 @@ void exSyncSendPosition()
 
 	}
 }
-
 
 
 const char * exSyncToggleMode()
@@ -301,14 +307,10 @@ const char * exSyncToggleMode()
 }
 
 
-
-
 const char * exSyncGetModeString()
 {
 	return cs_exSyncModeStrings[cs_exSyncMode];
 }
-
-
 
 
 bool exSyncToggle()
@@ -317,12 +319,7 @@ bool exSyncToggle()
 
 	if ( sync->availableNow() )
 	{
-		if  (cs_exSyncOn)
-		{
-			cs_exSyncOn = false;
-		} else {
-			cs_exSyncOn = true;
-		}
+		if (cs_exSyncOn) {	cs_exSyncOn = false; } else { cs_exSyncOn = true; }
 	} else {
 		cs_exSyncOn = false;
 	}
@@ -330,12 +327,7 @@ bool exSyncToggle()
 }
 
 
-
-
-
 bool exSyncReact() { return cs_exSyncOn; }
-
-
 
 
 bool exSyncAvailable()
@@ -346,14 +338,12 @@ bool exSyncAvailable()
 }
 
 
-
-
 bool exSyncMasterAndSync() { return cs_exSyncMasterOn && cs_exSyncOn; }
 
 
 
 
-}
+} // namespace lmms 
 
 #endif
 
