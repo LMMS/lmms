@@ -144,7 +144,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
 
 	// ZynAddSubFX's internal value that LMMS's FREQ knob controls
-	// isn't set properly when the patch is first loaded in,
+	// isn't set properly when the instrument is first loaded in,
 	// and doesn't update until the FREQ knob is moved
 	updateFilterFreq();
 }
