@@ -221,14 +221,15 @@ QString Lv2SubPluginFeatures::description(
 	const LilvPlugin* plug = mgr->getPlugin(k.attributes["uri"]);
 	if (plug)
 	{
-		QString result{lilv_node_as_uri(lilv_plugin_get_uri(plug))};
+		QString result;
 		AutoLilvNode rdfs_comment{mgr->uri(LILV_NS_RDFS "comment")};
 		AutoLilvNodes comments{lilv_plugin_get_value(plug, rdfs_comment.get())};
 		if (comments)
 		{
-			result += "\n\n";
 			result += lilv_node_as_string(lilv_nodes_get_first(comments.get()));
+			result += "\n\n";
 		}
+		result += lilv_node_as_uri(lilv_plugin_get_uri(plug));
 		return result.trimmed();
 	}
 	return QObject::tr("failed to load description");
