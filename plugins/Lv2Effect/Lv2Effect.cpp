@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.cpp - implementation of LV2 effect
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -73,15 +73,15 @@ bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 	if (!isEnabled() || !isRunning()) { return false; }
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
-	m_controls.copyBuffersFromLmms(buf, frames);
-	m_controls.copyModelsFromLmms();
+	m_controls.copyBuffersFromCore(buf, frames);
+	m_controls.copyModelsFromCore();
 
 //	m_pluginMutex.lock();
 	m_controls.run(frames);
 //	m_pluginMutex.unlock();
 
-	m_controls.copyModelsToLmms();
-	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
+	m_controls.copyModelsToCore();
+	m_controls.copyBuffersToCore(m_tmpOutputSmps.data(), frames);
 
 	double outSum = .0;
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1

@@ -36,7 +36,6 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
-	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
@@ -44,6 +43,7 @@ set(LMMS_SRCS
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
+	core/ModelGroup.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
@@ -106,7 +106,6 @@ set(LMMS_SRCS
 	core/audio/AudioSdl.cpp
 
 	core/lv2/Lv2Basics.cpp
-	core/lv2/Lv2ControlBase.cpp
 	core/lv2/Lv2Evbuf.cpp
 	core/lv2/Lv2Features.cpp
 	core/lv2/Lv2Ports.cpp
