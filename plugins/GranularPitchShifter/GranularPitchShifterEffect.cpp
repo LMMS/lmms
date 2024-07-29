@@ -60,7 +60,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-bool GranularPitchShifterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false; }
 
@@ -258,7 +258,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	
 	m_ringBufLength = m_sampleRate * ringBufLength;
 	m_ringBuf.resize(m_ringBufLength);
-	for (size_t i = 0; i < m_ringBufLength; ++i)
+	for (size_t i = 0; i < static_cast<std::size_t>(m_ringBufLength); ++i)
 	{
 		m_ringBuf[i][0] = 0;
 		m_ringBuf[i][1] = 0;

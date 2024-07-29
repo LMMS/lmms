@@ -25,11 +25,7 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#ifdef __MINGW32__
-#include <mingw.mutex.h>
-#else
 #include <mutex>
-#endif
 
 #include <QThread>
 #include <samplerate.h>
@@ -38,6 +34,7 @@
 #include <vector>
 
 #include "lmms_basics.h"
+#include "SampleFrame.h"
 #include "LocklessList.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
@@ -58,8 +55,7 @@ const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
 const int BYTES_PER_SAMPLE = sizeof( sample_t );
 const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const int BYTES_PER_FRAME = sizeof( sampleFrame );
-const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
+const int BYTES_PER_FRAME = sizeof( SampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
@@ -267,15 +263,6 @@ public:
 	}
 
 
-	struct StereoSample
-	{
-		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
-		sample_t left;
-		sample_t right;
-	};
-	StereoSample getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
-
-
 	bool criticalXRuns() const;
 
 	inline bool hasFifoWriter() const
@@ -283,9 +270,9 @@ public:
 		return m_fifoWriter != nullptr;
 	}
 
-	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
+	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
 
-	inline const sampleFrame * inputBuffer()
+	inline const SampleFrame* inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
 	}
@@ -295,7 +282,7 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const surroundSampleFrame * nextBuffer()
+	inline const SampleFrame* nextBuffer()
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
@@ -321,11 +308,11 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
+	void nextAudioBuffer(const lmms::SampleFrame* buffer);
 
 
 private:
-	using Fifo = FifoBuffer<surroundSampleFrame*>;
+	using Fifo = FifoBuffer<SampleFrame*>;
 
 	class fifoWriter : public QThread
 	{
@@ -342,7 +329,7 @@ private:
 
 		void run() override;
 
-		void write( surroundSampleFrame * buffer );
+		void write(SampleFrame* buffer);
 	} ;
 
 
@@ -361,7 +348,7 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const surroundSampleFrame * renderNextBuffer();
+	const SampleFrame* renderNextBuffer();
 
 	void swapBuffers();
 
@@ -375,14 +362,14 @@ private:
 
 	fpp_t m_framesPerPeriod;
 
-	sampleFrame * m_inputBuffer[2];
+	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	std::unique_ptr<surroundSampleFrame[]> m_outputBufferRead;
-	std::unique_ptr<surroundSampleFrame[]> m_outputBufferWrite;
+	std::unique_ptr<SampleFrame[]> m_outputBufferRead;
+	std::unique_ptr<SampleFrame[]> m_outputBufferWrite;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;
@@ -419,7 +406,7 @@ private:
 
 	bool m_clearSignal;
 
-	std::mutex m_changeMutex;
+	std::recursive_mutex m_changeMutex;
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;

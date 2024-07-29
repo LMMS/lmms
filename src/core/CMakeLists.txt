@@ -4,7 +4,6 @@ set(LMMS_SRCS
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
-	core/AudioResampler.cpp
 	core/AutomatableModel.cpp
 	core/AutomationClip.cpp
 	core/AutomationNode.cpp

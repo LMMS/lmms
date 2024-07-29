@@ -121,6 +121,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
+        -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
@@ -216,6 +217,7 @@ jobs:
     container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
+        -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
@@ -223,6 +225,12 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
+      - name: Enable POSIX MinGW
+        run: |
+          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -327,6 +335,7 @@ jobs:
             -B build `
             -G Ninja `
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+            -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `

@@ -413,7 +413,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
 
 		// Track must be in TrackContainer's tracks
-		if( finalTrackIndex < 0 || finalTrackIndex >= tracks.size() )
+		if (finalTrackIndex < 0 || static_cast<std::size_t>(finalTrackIndex) >= tracks.size())
 		{
 			return false;
 		}
