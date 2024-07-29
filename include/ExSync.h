@@ -96,7 +96,7 @@ namespace lmms
 inline void exSyncStopped() {}
 inline void exSyncSendPosition() {}
 
-}
+} // namespace lmms
 
 #endif // LMMS_HAVE_JACK
 

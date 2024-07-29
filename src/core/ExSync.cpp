@@ -372,5 +372,5 @@ bool exSyncMasterAndSync() { return cs_exSyncMasterOn && cs_exSyncOn; }
 
 } // namespace lmms 
 
-#endif
+#endif // LMMS_HAVE_JACK
 
