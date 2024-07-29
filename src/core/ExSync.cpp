@@ -34,9 +34,16 @@ namespace lmms
 
 /* -----------------------ExSync private --------------------------- */
 
+
+
+
 /**
-	 Functions to control LMMS position/playing
+	 Functions to control LMMS position/playing in Slave || Duplex
 	 LMMS react only in if ExSync is on (button is green)
+	 MUST be provided by ExSync driver
+	 
+	 External code MUST NOT use this functions: this is adapter
+	 from external device events to LMMS (so not included in ExSync.h)
 */
 struct ExSyncCallbacks
 {
@@ -48,6 +55,7 @@ struct ExSyncCallbacks
 	sample_rate_t (* processingSampleRate)();
 };
 
+static struct ExSyncCallbacks * getSlaveCallbacks();
 
 
 
@@ -55,14 +63,13 @@ struct ExSyncCallbacks
 
 
 static jack_client_t * cs_syncJackd = nullptr; //!< Set by Jack audio 
-static struct ExSyncCallbacks *cs_slaveCallBacks = nullptr;
-static jack_transport_state_t cs_lastState = JackTransportStopped;
+static jack_transport_state_t cs_lastJackState = JackTransportStopped;
 
 
 /*! Function adapt events from Jack Transport to LMMS  */
 static int syncCallBack(jack_transport_state_t state, jack_position_t *pos, void *arg)
 {
-	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
+	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
 	// Now slaveCallBacks is local copy - never be changed by other thread ...
 	if (slaveCallBacks)
 	{
@@ -119,12 +126,31 @@ static void jackPosition(const SongExtendedPos *pos)
 }
 
 
-static void jackSlave(struct ExSyncCallbacks *cb)
+static bool jackStopped()
 {
-	cs_slaveCallBacks = cb;
+	bool justStopped = false;
+
+	if (cs_syncJackd)
+	{ 
+		jack_transport_state_t state = jack_transport_query(cs_syncJackd, nullptr);
+		if ((JackTransportStopped == state) && (state != cs_lastJackState))
+		{
+			justStopped = true;
+		}
+		cs_lastJackState = state;
+	} else {
+		cs_lastJackState = JackTransportStopped;
+	}
+
+	return justStopped;
+}
+
+
+static void jackSlave(bool set)
+{
 	if (cs_syncJackd)
 	{
-		if (cb)
+		if (set)
 		{
 			jack_set_sync_callback(cs_syncJackd, &syncCallBack, nullptr);
 		} else {
@@ -132,6 +158,9 @@ static void jackSlave(struct ExSyncCallbacks *cb)
 		}
 	}
 }
+
+
+
 /* (END) [Jack Transport target implementation ] */
 
 
@@ -147,6 +176,7 @@ static struct ExSyncHandler cs_handler = {
 	&jackAvailable,
 	&jackPlay,
 	&jackPosition,
+	&jackStopped,
 	&jackSlave
 };
 
@@ -159,6 +189,9 @@ static struct ExSyncHandler cs_handler = {
 	(include/SongEditor.h, src/gui/editors/SongEditor.cpp)
  */ 
 
+static struct ExSyncCallbacks *cs_slaveCallBacks = nullptr;
+
+static struct ExSyncCallbacks * getSlaveCallbacks() {return cs_slaveCallBacks; }
 
 static bool cs_exSyncSlaveOn = false; //!< (Receave)
 static bool cs_exSyncMasterOn = true; //!< (Send)
@@ -194,6 +227,8 @@ static sample_rate_t exSyncSampleRate()
 }
 
 
+// In future will be array ExSyncHandler cs_exSyncCallbacks[]
+// now available only one target: Jack Transport
 static struct ExSyncCallbacks cs_exSyncCallbacks = {
 	&exSyncMode,
 	&exSyncPosition,
@@ -215,24 +250,6 @@ static const char * cs_exSyncModeStrings[EXSYNC_MAX_MODES] = {
 /* Jack Transport target implementation (public part): */
 
 
-void exSyncStopped()
-{
-	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
-	// Now slaveCallBacks is local copy - never be changed by other thread ...
-	if (cs_syncJackd && slaveCallBacks)
-	{ 
-		jack_transport_state_t state = jack_transport_query(cs_syncJackd, nullptr);
-		if ((JackTransportStopped == state) && (state != cs_lastState))
-		{
-			slaveCallBacks->mode(false);
-		}
-		cs_lastState = state;
-	} else {
-		cs_lastState = JackTransportStopped;
-	}
-}
-
-
 void syncJackd(jack_client_t* client)
 {
 	cs_syncJackd = client;
@@ -251,6 +268,15 @@ void syncJackd(jack_client_t* client)
 struct ExSyncHandler * exSyncGetHandler()
 {
 	return &cs_handler;
+}
+
+
+void exSyncStopped()
+{
+	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
+	struct ExSyncHandler *sync = exSyncGetHandler();
+	// Now slaveCallBacks  and sync are local copy - never be changed by other thread ...
+	if (sync && slaveCallBacks && sync->Stopped()) { slaveCallBacks->mode(false); }
 }
 
 
@@ -286,6 +312,7 @@ const char * exSyncToggleMode()
 		// If driver is not available nothing to do ... 
 		return cs_exSyncModeStrings[cs_exSyncMode];
 	}
+	//! Make state change (Master -> Slave -> Duplex -> Master -> ...)
 	cs_exSyncMode += 1; 
 	if (cs_exSyncMode >= EXSYNC_MAX_MODES) { cs_exSyncMode = 0; }
 	switch(cs_exSyncMode)
@@ -293,12 +320,14 @@ const char * exSyncToggleMode()
 	case 0: // Master
 		cs_exSyncSlaveOn = false;
 		cs_exSyncMasterOn = true;
-		sync->setSlave(nullptr); // ExSync more calls after ExSync.h
+		sync->setSlave(false); // ExSync more calls after ExSync.h
+		cs_slaveCallBacks = nullptr;
 		break;
 	case 1: // Slave
 		cs_exSyncSlaveOn = true;
 		cs_exSyncMasterOn = false;
-		sync->setSlave(&cs_exSyncCallbacks); // ExSync more calls after ExSync.h
+		sync->setSlave(true); // ExSync more calls after ExSync.h
+		cs_slaveCallBacks = &cs_exSyncCallbacks; // in future = getSlaveCallbacks();
 		break;
 	case 2: // Duplex
 		cs_exSyncMasterOn = true;
@@ -339,8 +368,6 @@ bool exSyncAvailable()
 
 
 bool exSyncMasterAndSync() { return cs_exSyncMasterOn && cs_exSyncOn; }
-
-
 
 
 } // namespace lmms 

@@ -39,7 +39,6 @@ namespace lmms
 
 // Jack Transport target implementation:
 void syncJackd(jack_client_t* client); //!< called from src/core/audio/AudioJack.cpp
-void exSyncStopped();
 
 // Common target independent part:
 //! ExSync sending code provide all fields (for future), but here used only @frame
@@ -65,12 +64,15 @@ struct ExSyncHandler
 	void (* sendPlay)(bool playing); 
 	//! driver MUST send new position message
 	void (* sendPosition)(const SongExtendedPos *pos);
-	//! driver MUST start/stop remote LMMS controling @cb !nullptr/nullptr
-	void (* setSlave)(struct ExSyncCallbacks *cb); 
+	//! driver check if target plaing just stopped (after last call) 
+	bool (* Stopped)();
+	//! driver MUST start/stop remote LMMS controling @set true/false
+	void (* setSlave)(bool set);// (struct ExSyncCallbacks *cb); 
 };
 
 struct ExSyncHandler * exSyncGetHandler();
 
+void exSyncStopped();
 void exSyncSendPosition();
 
 const char * exSyncToggleMode();
