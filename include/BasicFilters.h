@@ -36,6 +36,7 @@
 #endif
 
 #include <cmath>
+#include <array>
 
 #include "lmms_basics.h"
 #include "lmms_constants.h"
