@@ -134,7 +134,8 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	state->sample = this;
 	state->loop = &loopMode;
 
-	src_set_ratio(state->resampleState, resampleRatio);
+	state->error = src_set_ratio(state->resampleState, resampleRatio);
+	assert(state->error == 0 && src_sterror(state->error));
 
 	const auto outputFrames = src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]);
 	if (outputFrames > 0 && outputFrames < numFrames)
