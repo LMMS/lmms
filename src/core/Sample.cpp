@@ -141,7 +141,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	if (outputFrames > 0 && outputFrames < numFrames)
 	{
 		std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{});
-		MixHelpers::multiply(dst + outputFrames, m_amplification, numFrames - outputFrames);
+		MixHelpers::multiply(dst, m_amplification, outputFrames);
 		return true;
 	}
 	else if (outputFrames == numFrames)
