@@ -63,8 +63,6 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
-	QSize sizeHint() const override;
-
 public slots:
 	lmms::MidiClip* getMidiClip();
 	void update() override;
