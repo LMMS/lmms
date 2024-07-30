@@ -108,6 +108,7 @@ public:
 
 	bool empty();
 
+	int getSteps() const;
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
