@@ -70,6 +70,8 @@ class ClipView : public selectableObject, public ModelView
 
 public:
 	const static int BORDER_WIDTH = 2;
+	//! only used when fixedClips() is true
+	const static int MIN_FIXED_WIDTH = 250;
 
 	ClipView( Clip * clip, TrackView * tv );
 	~ClipView() override;
