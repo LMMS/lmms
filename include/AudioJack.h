@@ -116,7 +116,6 @@ private:
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
 
-
 #ifdef AUDIO_PORT_SUPPORT
 	struct StereoPort
 	{
@@ -130,7 +129,6 @@ private:
 signals:
 	void zombified();
 };
-
 
 } // namespace lmms
 

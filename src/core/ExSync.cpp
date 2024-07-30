@@ -235,9 +235,12 @@ static struct ExSyncCallbacks cs_exSyncCallbacks = {
 	&exSyncSampleRate
 };
 
+enum {
+	ESM_MASTER = 0, ESM_SLAVE, ESM_DUPLEX, ESM_LAST
+};
 
-#define 	EXSYNC_MAX_MODES 	(3)
-static const char * cs_exSyncModeStrings[EXSYNC_MAX_MODES] = {
+
+static const char * cs_exSyncModeStrings[ESM_LAST] = {
 	"Master", "Slave", "Duplex"
 };
 
@@ -299,8 +302,13 @@ void exSyncSendPosition()
 		
 		ExSyncHandler * sync =  exSyncGetHandler();
 		sync->sendPosition(&pos);
-
 	}
+}
+
+
+void exSyncSendPositioniIfMaster()
+{
+	if( ESM_MASTER == cs_exSyncMode) { exSyncSendPosition(); }
 }
 
 
@@ -314,22 +322,22 @@ const char * exSyncToggleMode()
 	}
 	//! Make state change (Master -> Slave -> Duplex -> Master -> ...)
 	cs_exSyncMode += 1; 
-	if (cs_exSyncMode >= EXSYNC_MAX_MODES) { cs_exSyncMode = 0; }
+	if (cs_exSyncMode >= ESM_LAST) { cs_exSyncMode = ESM_MASTER; }
 	switch(cs_exSyncMode)
 	{
-	case 0: // Master
+	case ESM_MASTER: // Master
 		cs_exSyncSlaveOn = false;
 		cs_exSyncMasterOn = true;
 		sync->setSlave(false); // ExSync more calls after ExSync.h
 		cs_slaveCallBacks = nullptr;
 		break;
-	case 1: // Slave
+	case ESM_SLAVE: // Slave
 		cs_exSyncSlaveOn = true;
 		cs_exSyncMasterOn = false;
 		sync->setSlave(true); // ExSync more calls after ExSync.h
 		cs_slaveCallBacks = &cs_exSyncCallbacks; // in future = getSlaveCallbacks();
 		break;
-	case 2: // Duplex
+	case ESM_DUPLEX: // Duplex
 		cs_exSyncMasterOn = true;
 	}
 	return cs_exSyncModeStrings[cs_exSyncMode];

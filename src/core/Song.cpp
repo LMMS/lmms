@@ -1434,6 +1434,7 @@ void Song::onPlaybackStateChanged()
 		{
 			ExSyncHandler * sync =  exSyncGetHandler();
 			sync->sendPlay(m_playing);
+			exSyncSendPositioniIfMaster();
 		}
 	}
 }

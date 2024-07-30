@@ -74,6 +74,7 @@ struct ExSyncHandler * exSyncGetHandler();
 
 void exSyncStopped();
 void exSyncSendPosition();
+void exSyncSendPositioniIfMaster();
 
 const char * exSyncToggleMode();
 const char * exSyncGetModeString();
