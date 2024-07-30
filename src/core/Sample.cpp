@@ -137,7 +137,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	state->error = src_set_ratio(state->resampleState, resampleRatio);
 	assert(state->error == 0 && src_sterror(state->error));
 
-	const auto outputFrames = src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]);
+	const auto outputFrames = static_cast<size_t>(src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]));
 	if (outputFrames > 0 && outputFrames < numFrames)
 	{
 		std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{});
