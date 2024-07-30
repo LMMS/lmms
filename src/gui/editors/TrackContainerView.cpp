@@ -41,6 +41,8 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackView.h"
+#include "ClipView.h"
+#include "MidiClip.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
@@ -263,6 +265,39 @@ void TrackContainerView::realignTracks()
 	 * TODO remove?
 	qDebug("tracksRealigned: width() = %d", width());
 	m_scrollArea->widget()->setFixedWidth(width());
+	if (fixedClips())
+	{
+		// if for example this TrackContainerView is a pattern editor
+		int maxSteps = 16;
+		// loop through the tracks to find the clip with
+		// the highest amount of steps
+		// this should be the same value for all clips, but we never know
+		for (const auto& trackView : m_trackViews)
+		{
+			if (trackView->getTrack()->type() == Track::Type::Instrument)
+			{
+				InstrumentTrack* curTrack = static_cast<InstrumentTrack*>(trackView->getTrack());
+				if (curTrack->getClips().size() > 0)
+				{
+					MidiClip* curClip = reinterpret_cast<MidiClip*>(curTrack->getClip(0));
+					int curSteps = curClip->getSteps();
+					qDebug("size = %d", curSteps);
+					if (maxSteps < curSteps)
+					{
+						maxSteps = curSteps;
+					}
+				}
+			}
+		}
+
+		// calculate minimum width
+		const int minWidth = TrackView::getTrackFixedWidth() + maxSteps * ClipView::MIN_FIXED_WIDTH / 16;
+		m_scrollArea->widget()->setFixedWidth(minWidth > width() ? minWidth : width());
+	}
+	else
+	{
+		m_scrollArea->widget()->setFixedWidth(width());
+	}
 	m_scrollArea->widget()->setFixedHeight(
 				m_scrollArea->widget()->minimumSizeHint().height());
 
