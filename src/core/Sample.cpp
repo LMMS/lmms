@@ -24,9 +24,11 @@
 
 #include "Sample.h"
 
+#include <algorithm>
 #include <cassert>
 
 #include "MixHelpers.h"
+#include "SampleFrame.h"
 
 namespace lmms {
 
@@ -133,7 +135,15 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, doub
 	state->loop = &loopMode;
 
 	src_set_ratio(state->resampleState, resampleRatio);
-	if (src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]) != 0)
+
+	const auto outputFrames = src_callback_read(state->resampleState, resampleRatio, numFrames, &dst[0][0]);
+	if (outputFrames > 0 && outputFrames < numFrames)
+	{
+		std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{});
+		MixHelpers::multiply(dst + outputFrames, m_amplification, numFrames - outputFrames);
+		return true;
+	}
+	else if (outputFrames == numFrames)
 	{
 		MixHelpers::multiply(dst, m_amplification, numFrames);
 		return true;
