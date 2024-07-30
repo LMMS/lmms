@@ -522,8 +522,8 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
 	{
 		int x = position(we).x() - m_trackHeadWidth;
-		// bar based on the mouse x-position where the scroll wheel was used
-		int bar = x / pixelsPerBar() * TimePos::ticksPerBar();
+		// tick based on the mouse x-position where the scroll wheel was used
+		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 
 		// move zoom slider (pixelsPerBar will change automatically)
 		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
@@ -531,9 +531,9 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		int direction = (we->angleDelta().y() + we->angleDelta().x()) > 0 ? 1 : -1;
 		m_zoomingModel->incValue(step * direction);
 
-		// scroll to zooming around cursor's bar
-		int newBar = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
-		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
+		// scroll to zooming around cursor's tick
+		int newTick = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + tick - newTick);
 
 		// update timeline
 		m_timeLine->setPixelsPerBar(pixelsPerBar());
