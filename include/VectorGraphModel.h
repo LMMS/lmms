@@ -410,18 +410,6 @@ private:
 		// if the line (each sample) should be effected (only works when y is effected)
 		bool m_effectLines = true;
 
-		/*
-		bool m_effectAdd = false;
-		bool m_effectSubtract = false;
-		bool m_effectMultiply = false;
-		bool m_effectDivide = false;
-		bool m_effectPower = false;
-		bool m_effectLog = false;
-		bool m_effectSine = false;
-		bool m_effectClampLower = false;
-		bool m_effectClampUpper = false;
-		*/
-
 		// stores m_automationModel->value(), used in getSamples() when updating
 		float m_bufferedAutomationValue = 0.0f;
 		// automation: connecting to floatmodels, -1 when it isn't conntected
@@ -464,7 +452,7 @@ private:
 	// adds the m_dataArray points that are
 	// effected by the changed effector array points.
 	// ONLY WORKS IN SORTED ARRAYS
-	void getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations);
+	void getUpdatingFromEffector(std::vector<unsigned int>* effectorUpdatedPoints);
 	// if pointLocation >= 0 -> adds the location to m_needsUpdating
 	// else it will update the whole m_dataArray and m_bakedSamples
 	// changes in the size of m_dataArray (addtition, deletion, ect.)
