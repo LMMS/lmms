@@ -81,18 +81,25 @@ public:
 	VectorGraphCotnrolDialog(QWidget* parent, VectorGraphView* targetVectorGraphView);
 	~VectorGraphCotnrolDialog();
 
+	// deletes m_curAutomationModelKnob connected to the VectorGraphDataArray::m_automationModelArray
 	void hideAutomation();
+	// connects or adds m_curAutomationModelKnob to the gui, sets the selected point
 	void switchPoint(unsigned int selectedArray, unsigned int selectedLocation);
 
 public slots:
 	void controlValueChanged();
+	// slots for buttons
 	void effectedPointClicked(bool isChecked);
 	void effectedLineClicked(bool isChecked);
 	void deleteAutomationClicked(bool isChecked);
 protected slots:
+	// needs to be used
+	// to not delete this control dialog widget when closing
 	void closeEvent(QCloseEvent * ce);
 private:
+	// loads in the selected point's values, settings and attributes
 	void updateControls();
+	// sets the selected point's values to the control knob's values
 	void updateVectorGraphAttribs();
 
 	VectorGraphView* m_vectorGraphView;
