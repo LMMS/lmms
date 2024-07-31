@@ -191,7 +191,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	settingLayout->setAlignment(lineTypeLabel, Qt::AlignHCenter);
 	ComboBox* lineTypeComboBox = new ComboBox(this);
 	lineTypeComboBox->setModel(&m_lineTypeModel);
-	lineTypeComboBox->setFixedSize(100, 20);
+	lineTypeComboBox->setFixedSize(100, ComboBox::DEFAULT_HEIGHT);
 	lineTypeComboBox->show();
 	settingLayout->addWidget(lineTypeComboBox);
 	settingLayout->setAlignment(lineTypeComboBox, Qt::AlignHCenter);
@@ -203,7 +203,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	settingLayout->setAlignment(automatedAttribLabel, Qt::AlignHCenter);
 	ComboBox* automatedAttribComboBox = new ComboBox(this);
 	automatedAttribComboBox->setModel(&m_automatedAttribModel);
-	automatedAttribComboBox->setFixedSize(100, 20);
+	automatedAttribComboBox->setFixedSize(100, ComboBox::DEFAULT_HEIGHT);
 	automatedAttribComboBox->show();
 	settingLayout->addWidget(automatedAttribComboBox);
 	settingLayout->setAlignment(automatedAttribComboBox, Qt::AlignHCenter);
@@ -215,7 +215,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	settingLayout->setAlignment(effectedAttribLabel, Qt::AlignHCenter);
 	ComboBox* effectedAttribComboBox = new ComboBox(this);
 	effectedAttribComboBox->setModel(&m_effectedAttribModel);
-	effectedAttribComboBox->setFixedSize(100, 20);
+	effectedAttribComboBox->setFixedSize(100, ComboBox::DEFAULT_HEIGHT);
 	effectedAttribComboBox->show();
 	settingLayout->addWidget(effectedAttribComboBox);
 	settingLayout->setAlignment(effectedAttribComboBox, Qt::AlignHCenter);
@@ -227,7 +227,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	settingLayout->setAlignment(effectedLabelA, Qt::AlignHCenter);
 	ComboBox* effectedComboBoxA = new ComboBox(this);
 	effectedComboBoxA->setModel(&m_effectModelA);
-	effectedComboBoxA->setFixedSize(100, 20);
+	effectedComboBoxA->setFixedSize(100, ComboBox::DEFAULT_HEIGHT);
 	effectedComboBoxA->show();
 	settingLayout->addWidget(effectedComboBoxA);
 	settingLayout->setAlignment(effectedComboBoxA, Qt::AlignHCenter);
@@ -239,7 +239,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	settingLayout->setAlignment(effectedLabelB, Qt::AlignHCenter);
 	ComboBox* effectedComboBoxB = new ComboBox(this);
 	effectedComboBoxB->setModel(&m_effectModelB);
-	effectedComboBoxB->setFixedSize(100, 20);
+	effectedComboBoxB->setFixedSize(100, ComboBox::DEFAULT_HEIGHT);
 	effectedComboBoxB->show();
 	settingLayout->addWidget(effectedComboBoxB);
 	settingLayout->setAlignment(effectedComboBoxB, Qt::AlignHCenter);
@@ -251,7 +251,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	settingLayout->setAlignment(effectedLabelC, Qt::AlignHCenter);
 	ComboBox* effectedComboBoxC = new ComboBox(this);
 	effectedComboBoxC->setModel(&m_effectModelC);
-	effectedComboBoxC->setFixedSize(100, 20);
+	effectedComboBoxC->setFixedSize(100, ComboBox::DEFAULT_HEIGHT);
 	effectedComboBoxC->show();
 	settingLayout->addWidget(effectedComboBoxC);
 	settingLayout->setAlignment(effectedComboBoxC, Qt::AlignHCenter);
