@@ -182,8 +182,8 @@ public:
 	QColor* getActiveColor();
 	QColor* getFillColor();
 	QColor* getAutomatedColor();
-	// returns -1 if it has no effector
 
+	// returns -1 if it has no effector
 	int getEffectorArrayLocation();
 	bool getIsAnEffector();
 	int getId();
