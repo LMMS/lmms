@@ -1777,32 +1777,32 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 	}
 }
 
-void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations)
+void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* effectorUpdatingPoints)
 {
 	/*
-	 * here m_needsUpdating points are decided
-	 * firstly we get changed points from the effector graph (updatingPointLocations)
+	 * here we decide m_needsUpdating points from an effector array's updated points (effectorUpdatingPoints is the location of these points)
+	 * firstly we get changed points from the effector graph (effectorUpdatingPoints)
 	 * we get a segment consisting of changed effector points that come after each other
-	 * this will be useful because we can update the current graph's points between this segment (segment start = i, segment end = updatingEnd)
-	 * secondly we get a (current graph's) point before the segment start and after the segment end
-	 * so we get locationBefore and locationAfter which will be added to m_needsUpdating
+	 * this will be useful because we can update this graph's points between this segment (segment start = i, segment end = updatingEnd)
+	 * secondly we find a (this graph's) point before the segment start and after the segment end
+	 * so we get locationBefore and locationAfter, everything between them will be added to m_needsUpdating
 	 * thirdly we finalyze locationBefore and locationAfter, clamp them and start adding the points between them to m_needsUpdating
-	 * if the (current graph's) point is not effected, we avoid adding it to m_needsUpdating
+	 * if the (this graph's) point is not effected, we avoid adding it to m_needsUpdating
 	*/
 	VectorGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
-	for (unsigned int i = 0; i < updatingPointLocations->size(); i++)
+	for (unsigned int i = 0; i < effectorUpdatingPoints->size(); i++)
 	{
-		// since updatingPointLocations is a sorted list, we can get the end
+		// since effectorUpdatingPoints is a sorted list, we can get the end
 		// location and update everithing between them
 		// starting effector location is i, end effector location is updatingEnd
 		unsigned int updatingEnd = i;
-		for (unsigned int j = i + 1; j < updatingPointLocations->size(); j++)
+		for (unsigned int j = i + 1; j < effectorUpdatingPoints->size(); j++)
 		{
 			// we can not skip gaps because
-			// every updatingPointLocations point effects their line only
+			// every effectorUpdatingPoints point effects their line only
 			// (the line that starts with the point)
-			if ((*updatingPointLocations)[updatingEnd] + 1 >=
-					(*updatingPointLocations)[j])
+			if ((*effectorUpdatingPoints)[updatingEnd] + 1 >=
+					(*effectorUpdatingPoints)[j])
 			{
 				updatingEnd = j;
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
@@ -1813,7 +1813,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 				qDebug("getUpdatingFromEffector: updatingEnd: %d brake: %d < %d [j = %d]", updatingEnd,
-					((*updatingPointLocations)[updatingEnd] + 1), (*updatingPointLocations)[j], j);
+					((*effectorUpdatingPoints)[updatingEnd] + 1), (*effectorUpdatingPoints)[j], j);
 #endif
 				break;
 			}
@@ -1834,7 +1834,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		bool found = false;
 		bool isBefore = false;
 		// this can return -1
-		int locationBefore = getNearestLocation(effector->getX((*updatingPointLocations)[i]), &found, &isBefore);
+		int locationBefore = getNearestLocation(effector->getX((*effectorUpdatingPoints)[i]), &found, &isBefore);
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 		qDebug("getUpdatingFromEffector: getNearestLocation before: %d, i: %d", locationBefore, i);
 #endif
@@ -1849,17 +1849,17 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			// remember points control the line after (connected to) them
 			// but in this case changes in the points position can effect the line before it
 			locationBefore--;
-			// now (here) locationBefore is Always before (*updatingPointLocations)[i]
+			// now (here) locationBefore is Always before (*effectorUpdatingPoints)[i]
 		}
 		// clamp
 		locationBefore = locationBefore < 0 ? 0 :
 			m_dataArray.size() - 1 < locationBefore ? m_dataArray.size() - 1 : locationBefore;
 
 		isBefore = false;
-		int locationAfter = getNearestLocation(effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), &found, &isBefore);
+		int locationAfter = getNearestLocation(effector->getX((*effectorUpdatingPoints)[updatingEnd] + updatingEndSlide), &found, &isBefore);
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 		qDebug("getUpdatingFromEffector: getNearestLocation after: %d, updatingEnd: %d (+ %d), effector x: %f, dataArray x: %f", locationAfter, updatingEnd, updatingEndSlide,
-			effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
+			effector->getX((*effectorUpdatingPoints)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
 #endif
 		if (isBefore == false)
 		{
@@ -1870,7 +1870,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			locationAfter--;
 		}
 		// updating everything before if i -> 0
-		if ((*updatingPointLocations)[i] == 0)
+		if ((*effectorUpdatingPoints)[i] == 0)
 		{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector updating everything before");
@@ -1879,7 +1879,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		}
 		// if updatingEnd is the last point in effecor, then
 		// update everithing after
-		if ((*updatingPointLocations)[updatingEnd] + updatingEndSlide + 1 >= effector->size())
+		if ((*effectorUpdatingPoints)[updatingEnd] + updatingEndSlide + 1 >= effector->size())
 		{
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 			qDebug("getUpdatingFromEffector updating everything after");
@@ -1897,6 +1897,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		// if the last point was updated (ture in case of j = 0)
 		bool lastUpdated = true;
 		// adding the values between locationBefore, locationAfter
+		// (including locationBefore and locationAfter) to m_needsUpdating
 		for (unsigned int j = locationBefore; j <= locationAfter; j++)
 		{
 			// update only if effected
