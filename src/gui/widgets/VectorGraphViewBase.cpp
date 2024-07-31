@@ -328,9 +328,12 @@ void VectorGraphCotnrolDialog::hideAutomation()
 
 void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned int selectedLocation)
 {
+	// set current point location
 	m_curSelectedArray = selectedArray;
 	m_curSelectedLocation = selectedLocation;
+	// enable all of the control dialog settings by turning this on
 	m_isValidSelection = true;
+	// get a FloatModel for the selected point
 	m_vectorGraphView->model()->getDataArray(selectedArray)->setAutomated(selectedLocation, true);
 	m_curAutomationModel = m_vectorGraphView->model()->getDataArray(selectedArray)->getAutomationModel(selectedLocation);
 
@@ -338,6 +341,8 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 	{
 		if (m_curAutomationModelKnob != nullptr)
 		{
+			// if m_curAutomationKnob exists
+			// update its model to the selected point's automationModel
 			if (m_curAutomationModel != m_curAutomationModelKnob->model())
 			{
 				m_curAutomationModelKnob->setModel(m_curAutomationModel);
@@ -345,6 +350,8 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 		}
 		else
 		{
+			// if m_curAutomationKnob doesn't exist
+			// create new
 			m_curAutomationModelKnob = new Knob(KnobType::Bright26, this);
 			m_curAutomationModelKnob->setModel(m_curAutomationModel);
 			m_curAutomationModelKnob->setLabel(tr("automation knob"));
@@ -357,7 +364,10 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 	}
 	else
 	{
+		// if can not be automated
 		hideAutomation();
+		// turn back on this
+		// so ohter functions can still work
 		m_isValidSelection = true;
 	}
 	updateControls();
@@ -386,6 +396,7 @@ void VectorGraphCotnrolDialog::deleteAutomationClicked(bool isChecked)
 	
 	bool swapIsValidSelection = m_isValidSelection;
 	hideAutomation();
+	// remove automationModel (FloatModel) from the selected point
 	m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->setAutomated(m_curSelectedLocation, false);
 	m_isValidSelection = swapIsValidSelection;
 }
@@ -404,11 +415,7 @@ void VectorGraphCotnrolDialog::updateControls()
 {
 	if (m_isValidSelection == false) { hideAutomation(); return; }
 
-	for (size_t i = 0; i < m_controlModelArray.size(); i++)
-	{
-		m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i));
-	}
-
+	// show every control
 	for (Knob* i : m_hideableKnobs)
 	{
 		if (i != nullptr)
@@ -453,6 +460,12 @@ void VectorGraphCotnrolDialog::updateControls()
 		if (m_hideableComboBoxes[5] != nullptr) { m_hideableComboBoxes[5]->hide(); }
 	}
 
+	// load selected point's values into knobs
+	for (size_t i = 0; i < m_controlModelArray.size(); i++)
+	{
+		m_controlModelArray[i]->setAutomatedValue(m_vectorGraphView->getInputAttribValue(i));
+	}
+
 	m_lineTypeModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(5));
 	m_automatedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(6));
 	m_effectedAttribModel.setAutomatedValue(m_vectorGraphView->getInputAttribValue(7));
@@ -465,6 +478,7 @@ void VectorGraphCotnrolDialog::updateVectorGraphAttribs()
 {
 	if (m_isValidSelection == false) { hideAutomation(); return; }
 
+	// set / load knob's values into the selected point's values
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
 		m_vectorGraphView->setInputAttribValue(static_cast<unsigned int>(i), m_controlModelArray[i]->value());
