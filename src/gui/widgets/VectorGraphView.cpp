@@ -1044,7 +1044,7 @@ void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, flo
 			break;
 		case 5:
 			// type
-			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 5.0f));
+			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 6.0f));
 			model()->getDataArray(m_selectedArray)->setType(m_selectedLocation, clampedValueB);
 			break;
 		case 6:
