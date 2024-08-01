@@ -646,7 +646,7 @@ int VectorGraphDataArray::add(float newX)
 			if (isBefore == true)
 			{
 				// we are adding one value, so dataArray.size() will be a valid location
-				if (targetLocation < m_dataArray.size())
+				if (targetLocation < static_cast<int>(m_dataArray.size()))
 				{
 					targetLocation++;
 				}
@@ -857,7 +857,7 @@ int VectorGraphDataArray::getNearestLocation(float searchXIn, bool* foundOut, bo
 		{
 			mid = mid - 1;
 		}
-		if (mid + 1 < m_dataArray.size() &&
+		if (mid + 1 < static_cast<int>(m_dataArray.size()) &&
 			std::abs(m_dataArray[mid].m_x - searchXIn) >
 			std::abs(m_dataArray[mid + 1].m_x - searchXIn))
 		{
@@ -1041,14 +1041,14 @@ unsigned int VectorGraphDataArray::setX(unsigned int pointLocation, float newX)
 			// if getNearestLocation returned a value
 			if (location >= 0)
 			{
-				if (location < pointLocation && isBefore == true)
+				if (location < static_cast<int>(pointLocation) && isBefore == true)
 				{
-					if (targetLocation + 1 < m_dataArray.size())
+					if (targetLocation + 1 < static_cast<int>(m_dataArray.size()))
 					{
 						targetLocation++;
 					}
 				}
-				else if (location > pointLocation && isBefore == false)
+				else if (location > static_cast<int>(pointLocation) && isBefore == false)
 				{
 					if (targetLocation > 0)
 					{
@@ -1337,12 +1337,12 @@ void VectorGraphDataArray::deleteUnusedAutomation()
 			usedAutomation.push_back(i.m_automationModel);
 		}
 	}
-	for	(unsigned int i = 0; i < m_automationModelArray.size(); i++)
+	for	(size_t i = 0; i < m_automationModelArray.size(); i++)
 	{
 		bool found = false;
-		for	(unsigned int j = 0; j < usedAutomation.size(); j++)
+		for	(size_t j = 0; j < usedAutomation.size(); j++)
 		{
-			if (i == usedAutomation[j])
+			if (static_cast<int>(i) == usedAutomation[j])
 			{
 				found = true;
 				break;
@@ -1377,7 +1377,7 @@ void VectorGraphDataArray::loadDataArray(QString data, unsigned int arraySize, b
 	char* dst = 0;
 	base64::decode(data, &dst, &size);
 
-	if (size == arraySize * sizeof(VectorGraphPoint))
+	if (size == static_cast<int>(arraySize * sizeof(VectorGraphPoint)))
 	{
 		m_dataArray.resize(arraySize);
 
@@ -1398,7 +1398,7 @@ void VectorGraphDataArray::loadDataArray(QString data, unsigned int arraySize, b
 
 void VectorGraphDataArray::deleteAutomationModel(int modelLocation, bool callDataChanged)
 {
-	if (modelLocation < 0 || modelLocation >= m_automationModelArray.size()) { return; }
+	if (modelLocation < 0 || modelLocation >= static_cast<int>(m_automationModelArray.size())) { return; }
 
 	FloatModel* curModel = m_automationModelArray[modelLocation];
 
@@ -1423,7 +1423,7 @@ void VectorGraphDataArray::deleteAutomationModel(int modelLocation, bool callDat
 				getUpdatingFromPoint(i - 1);
 			}
 		}
-		if (m_dataArray[i].m_automationModel == m_automationModelArray.size())
+		if (m_dataArray[i].m_automationModel == static_cast<int>(m_automationModelArray.size()))
 		{
 			m_dataArray[i].m_automationModel = modelLocation;
 		}
@@ -1651,27 +1651,27 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 		count = 0;
 	}
 	float tValB = 0.001f + ((sineFreq + 1.0f) / 2.0f) * 0.999f;
-	// calculating how many samples are needed to 1 complete wave
+	// calculating how many samples are needed for 1 complete wave
 	// we have "count" amount of samples and "tValB * 100.0f" amount of waves
 	int end = static_cast<int>(std::floor(count / (tValB * 100.0f)));
-	if (count <= 0)
+	if (count < 0)
 	{
 		end = 0;
 	}
-	else
+	else if (end > 0)
 	{
 		end = end > count ? count : end + 1;
 	}
 	// "allocate" "end" amount of floats
 	// for 1 whole sine wave
 	// in the universal buffer
-	if (m_universalSampleBuffer.size() < end)
+	if (static_cast<int>(m_universalSampleBuffer.size()) < end)
 	{
 		m_universalSampleBuffer.resize(end);
 	}
 
 	// calculate 1 wave of sine
-	for (unsigned int i = 0; i < end; i++)
+	for (int i = 0; i < end; i++)
 	{
 		// 628.318531f = 100.0f * 2.0f * pi
 		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
@@ -1682,7 +1682,7 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 	for (int i = 0; i < count; i += end)
 	{
 		int endB = i + end >= count ? count - i : end;
-		for (unsigned int j = 0; j < endB; j++)
+		for (int j = 0; j < endB; j++)
 		{
 			(*samplesOut)[startLoc + j + i] += m_universalSampleBuffer[j];
 		}
@@ -1712,7 +1712,7 @@ void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesO
 	{
 		count = 0;
 	}
-	for (unsigned int i = 0; i < count; i++)
+	for (size_t i = 0; i < static_cast<size_t>(count); i++)
 	{
 		(*samplesOut)[startLoc + i] += std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
 			std::abs((*xArray)[startLoc + i] - (peakX + 1.0f) * 0.5f) * 10.0f) * peakAmp;
@@ -1744,7 +1744,7 @@ void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samples
 	}
 
 	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
-	for (unsigned int i = 0; i < count; i++)
+	for (size_t i = 0; i < static_cast<size_t>(count); i++)
 	{
 		float y = (*yArray)[startLoc + i] + 1.0f;
 		float diff = std::round(y * stepCountB) - y * stepCountB;
@@ -1808,7 +1808,7 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 	// blending
 	// real size
 	float size = static_cast<float>(randomValuesSize / 2);
-	for (unsigned int i = 0; i < count; i++)
+	for (size_t i = 0; i < static_cast<size_t>(count); i++)
 	{
 		float randomValueX = (*xArray)[startLoc + i] * size;
 		float randomValueLocation = std::floor(randomValueX);
@@ -1893,7 +1893,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* ef
 		}
 		// clamp
 		locationBefore = locationBefore < 0 ? 0 :
-			m_dataArray.size() - 1 < locationBefore ? m_dataArray.size() - 1 : locationBefore;
+			static_cast<int>(m_dataArray.size()) - 1 < locationBefore ? m_dataArray.size() - 1 : locationBefore;
 
 		isBefore = false;
 		int locationAfter = getNearestLocation(effector->getX((*effectorUpdatingPoints)[updatingEnd] + updatingEndSlide), &found, &isBefore);
@@ -1928,7 +1928,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* ef
 		}
 		// clamp
 		locationAfter = locationAfter < 0 ? 0 :
-			m_dataArray.size() - 1 < locationAfter ? m_dataArray.size() - 1 : locationAfter;
+			static_cast<int>(m_dataArray.size()) - 1 < locationAfter ? m_dataArray.size() - 1 : locationAfter;
 
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 		qDebug("getUpdatingFromEffector: final start: %d, final end: %d, i: %d", locationBefore, locationAfter, i);
@@ -1938,7 +1938,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* ef
 		bool lastUpdated = true;
 		// adding the values between locationBefore, locationAfter
 		// (including locationBefore and locationAfter) to m_needsUpdating
-		for (unsigned int j = locationBefore; j <= locationAfter; j++)
+		for (int j = locationBefore; j <= locationAfter; j++)
 		{
 			// update only if effected
 			if (isEffectedPoint(j) == true && (getEffectPoints(j) == true || getEffectLines(j) == true))
@@ -2023,7 +2023,7 @@ void VectorGraphDataArray::getUpdatingOriginals()
 
 	// removing duplicates
 	int sizeDiff = 0;
-	for (int i = 1; i < m_needsUpdating.size(); i++)
+	for (int i = 1; i < static_cast<int>(m_needsUpdating.size()); i++)
 	{
 		if (m_needsUpdating[i - 1 + sizeDiff] == m_needsUpdating[i + sizeDiff])
 		{
@@ -2079,9 +2079,9 @@ void VectorGraphDataArray::getSamplesInner(unsigned int targetSizeIn, bool* isCh
 	{
 		for (unsigned int i = 0; i < m_dataArray.size(); i++)
 		{
-			effectedCount += isEffectedPoint(i) == true? 1 : 0;
+			effectedCount += isEffectedPoint(i) == true ? 1 : 0;
 		}
-		if (effectedCount > m_dataArray.size() / 2)
+		if (effectedCount > static_cast<int>(m_dataArray.size() / 2))
 		{
 			m_isDataChanged = m_isDataChanged || effectorIsChanged;
 		}
@@ -2249,7 +2249,7 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 	if (m_needsUpdating[pointLocation] + 1 >= m_dataArray.size())
 	{
 		// if this point is at the last location in m_dataArray
-		for (int j = end; j < m_updatingBakedSamples.size(); j++)
+		for (int j = end; j < static_cast<int>(m_updatingBakedSamples.size()); j++)
 		{
 			m_updatingBakedSamples[j] = curY;
 		}
