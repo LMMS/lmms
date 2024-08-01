@@ -716,16 +716,6 @@ void VectorGraphView::paintEditing(QPainter* p)
 		}
 
 		int controlTextCount = m_controlText.size();
-		if (dataArray->getIsEditableAttrib() == false)
-		{
-			// x, y
-			controlTextCount = 2;
-		}
-		else if (dataArray->getIsAutomatableEffectable() == false)
-		{
-			// x, y, curve, valA, valB, switch type
-			controlTextCount = 6;
-		}
 
 		int segmentLength = width() / (m_controlDisplayCount);
 		// draw inputs
