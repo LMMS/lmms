@@ -156,7 +156,7 @@ private:
 	void processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving);
 	// returns -1 if no control / input was clicked
 	// returns displayed absolute control / input location based on inputCount
-	int getPressedControlInput(int mouseX, int mouseY, unsigned int controlCount);
+	int getPressedControlInput(int mouseX, int mouseY, size_t controlCount);
 	// returns a float attrib value
 	float getInputAttribValue(unsigned int controlArrayLocation);
 	// sets the selected point's attrib (controlArrayLocation) to floatValue
@@ -208,8 +208,8 @@ private:
 
 	unsigned int m_graphHeight;
 	unsigned int m_controlHeight;
-	// displayed control count (+1 because of the ">>" button in editing mode)
-	unsigned int m_controlDisplayCount;
+	// displayed control count
+	size_t m_controlDisplayCount;
 	bool m_isEditingActive;
 	const std::array<QString, 2> m_controlText =
 	{

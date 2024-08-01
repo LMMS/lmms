@@ -715,7 +715,7 @@ void VectorGraphView::paintEditing(QPainter* p)
 			foreColor = *dataArray->getFillColor();
 		}
 
-		int controlTextCount = m_controlText.size();
+		size_t controlTextCount = m_controlText.size();
 
 		int segmentLength = width() / (m_controlDisplayCount);
 		// draw inputs
@@ -730,7 +730,7 @@ void VectorGraphView::paintEditing(QPainter* p)
 		// draw outline
 		p->setPen(QPen(*dataArray->getLineColor(), 1));
 		p->drawLine(0, m_graphHeight, width(), m_graphHeight);
-		for (unsigned int i = 1; i < m_controlDisplayCount; i++)
+		for (size_t i = 1; i < m_controlDisplayCount; i++)
 		{
 			if (i < controlTextCount || i >= m_controlDisplayCount)
 			{
@@ -941,14 +941,14 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 		}
 	}
 }
-int VectorGraphView::getPressedControlInput(int mouseX, int mouseY, unsigned int controlCount)
+int VectorGraphView::getPressedControlInput(int mouseX, int mouseY, size_t controlCount)
 {
 	int output = -1;
-	if (m_isEditingActive == true && mouseY > m_graphHeight)
+	if (m_isEditingActive == true && mouseY > static_cast<int>(m_graphHeight))
 	{
 		output = mouseX * controlCount / width();
 	}
-	if (output > controlCount)
+	if (output > static_cast<int>(controlCount))
 	{
 		output = controlCount;
 	}
@@ -1217,7 +1217,7 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 		{
 			curvedBefore = 1;
 		}
-		if (location - curvedBefore < dataArray->size()  - 1)
+		if (location - curvedBefore < static_cast<int>(dataArray->size()) - 1)
 		{
 			PointF curvedDataCoords = mapDataCurvePosF(
 				dataArray->getX(location - curvedBefore), dataArray->getY(location - curvedBefore),
@@ -1257,7 +1257,7 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 				}
 			}
 			// getting where the search needs to end
-			for (int i = location - curvedBefore + 1; i < dataArray->size(); i++)
+			for (int i = location - curvedBefore + 1; i < static_cast<int>(dataArray->size()); i++)
 			{
 				if (std::abs(dataArray->getX(i) - transformedMouse.first) > maxDistance)
 				{
@@ -1274,7 +1274,7 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 					dataY = dataArray->getY(i);
 					if (isCurved == true && dataArray->size() > 1)
 					{
-						if (dataArray->size() - 1 > i)
+						if (static_cast<int>(dataArray->size()) - 1 > i)
 						{
 							PointF curvedDataCoords = mapDataCurvePosF(
 								dataArray->getX(i), dataArray->getY(i), dataArray->getX(i + 1), dataArray->getY(i + 1),
