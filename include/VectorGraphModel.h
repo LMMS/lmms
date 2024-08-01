@@ -142,8 +142,8 @@ public:
 	VectorGraphDataArray();
 	VectorGraphDataArray(
 	bool isFixedSize, bool isFixedX, bool isFixedY, bool isNonNegative,
-	bool isFixedEndPoints, bool isSelectable, bool isEditableAttrib, bool isAutomatableEffectable,
-	bool isSaveable, VectorGraphModel* parent, int arrayId);
+	bool isFixedEndPoints, bool isSelectable, bool isEditableAttrib, bool isAutomatable,
+	bool isEffectable, bool isSaveable, VectorGraphModel* parent, int arrayId);
 	~VectorGraphDataArray();
 
 	void updateConnections(VectorGraphModel* parent);
@@ -155,7 +155,8 @@ public:
 	void setIsFixedEndPoints(bool bValue);
 	void setIsSelectable(bool bValue);
 	void setIsEditableAttrib(bool bValue);
-	void setIsAutomatableEffectable(bool bValue);
+	void setIsAutomatable(bool bValue);
+	void setIsEffectable(bool bValue);
 	void setIsSaveable(bool bValue);
 	void setIsNonNegative(bool bValue);
 	void setLineColor(QColor color);
@@ -175,7 +176,8 @@ public:
 	bool getIsFixedEndPoints();
 	bool getIsSelectable();
 	bool getIsEditableAttrib();
-	bool getIsAutomatableEffectable();
+	bool getIsAutomatable();
+	bool getIsEffectable();
 	bool getIsSaveable();
 	bool getIsNonNegative();
 	QColor* getLineColor();
@@ -313,23 +315,23 @@ public:
 	// checks m_isEditableAttrib
 	// sets line type
 	void setType(unsigned int pointLocation, unsigned int newType);
-	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// checks m_isAutomatable and m_isEditableAttrib
 	// sets what attribute gets automated (by point's FloatModel)
 	void setAutomatedAttrib(unsigned int pointLocation, unsigned int attribLocation);
-	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// checks m_isEffectable and m_isEditableAttrib
 	// sets what attribute gets effected (by effector array)
 	void setEffectedAttrib(unsigned int pointLocation, unsigned int attribLocation);
-	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// checks m_isEffectable and m_isEditableAttrib
 	// if bValue is true then the effector array will effect the point's attributes
 	void setEffectPoints(unsigned int pointLocation, bool bValue);
-	// checks m_isAutomatableEffectable and m_isEditableAttribs
+	// checks m_isEffectable and m_isEditableAttribs
 	// if bValue is true then the effector array will effect the line's individual samples (only when y is effected)
 	void setEffectLines(unsigned int pointLocation, bool bValue);
-	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// checks m_isEffectable and m_isEditableAttrib
 	// sets the point's effect type
 	// effectSlot: which effect slot (m_effectTypeA / B / C), effectType: what kind of effect (add, exct)
 	void setEffect(unsigned int pointLocation, unsigned int effectSlot, unsigned int effectType);
-	// checks m_isAutomatableEffectable
+	// checks m_isAutomatable
 	// if bValue is true then make a new FloatModel and connect it, else delete
 	// the currently used FloatModel
 	void setAutomated(unsigned int pointLocation, bool bValue);
@@ -492,9 +494,10 @@ private:
 	// every attribute outside of x and y
 	// automation can be changed
 	bool m_isEditableAttrib;
-	// can the points be automated or effected
-	// (can these settings be changed)
-	bool m_isAutomatableEffectable;
+	// can the points be automated
+	bool m_isAutomatable;
+	// can the points be effected
+	bool m_isEffectable;
 	// if VectorGraphDataArray is allowed to save this
 	bool m_isSaveable;
 	// can values be less than 0
