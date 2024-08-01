@@ -451,9 +451,12 @@ void VectorGraphCotnrolDialog::updateControls()
 		if (m_hideableComboBoxes[1] != nullptr) { m_hideableComboBoxes[1]->hide(); }
 		if (m_hideableComboBoxes[2] != nullptr) { m_hideableComboBoxes[2]->hide(); }
 	}
-	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsAutomatableEffectable() == false)
+	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsAutomatable() == false)
 	{
 		if (m_hideableComboBoxes[1] != nullptr) { m_hideableComboBoxes[1]->hide(); }
+	}
+	if (m_vectorGraphView->model()->getDataArray(m_curSelectedArray)->getIsEffectable() == false)
+	{
 		if (m_hideableComboBoxes[2] != nullptr) { m_hideableComboBoxes[2]->hide(); }
 		if (m_hideableComboBoxes[3] != nullptr) { m_hideableComboBoxes[3]->hide(); }
 		if (m_hideableComboBoxes[4] != nullptr) { m_hideableComboBoxes[4]->hide(); }
