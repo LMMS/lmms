@@ -127,8 +127,9 @@ private:
 		tr("x coordinate"), "x",  tr("y coordinate"), "y", tr("curve"), tr("curve"), tr("1. attribute value"), tr("1. attribute"),
 		tr("2. attribute value"), tr("2. attribute")
 	};
-	const std::array<QString, 6> m_controlLineTypeText = {
+	const std::array<QString, 7> m_controlLineTypeText = {
 		tr("none"),
+		tr("bézier"),
 		tr("sine"),
 		tr("phase changable sine"),
 		tr("peak"),
