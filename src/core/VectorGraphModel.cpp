@@ -60,7 +60,7 @@ unsigned int VectorGraphModel::addDataArray()
 {
 	VectorGraphDataArray tempArray(
 		false, false, false, false, false, false, false,
-		false, true, this, getDataArrayNewId());
+		false, false, true, this, getDataArrayNewId());
 	m_dataArrays.push_back(tempArray);
 	emit dataChanged();
 	return m_dataArrays.size() - 1;
@@ -312,7 +312,8 @@ VectorGraphDataArray::VectorGraphDataArray()
 	m_isFixedEndPoints = false;
 	m_isSelectable = false;
 	m_isEditableAttrib = false;
-	m_isAutomatableEffectable = false;
+	m_isAutomatable = false;
+	m_isEffectable = false;
 	m_isSaveable = false;
 	m_isNonNegative = false;
 	
@@ -337,8 +338,8 @@ VectorGraphDataArray::VectorGraphDataArray()
 
 VectorGraphDataArray::VectorGraphDataArray(
 	bool isFixedSize, bool isFixedX, bool isFixedY, bool isNonNegative,
-	bool isFixedEndPoints, bool isSelectable, bool isEditableAttrib, bool isAutomatableEffectable,
-	bool isSaveable, VectorGraphModel* parent, int arrayId)
+	bool isFixedEndPoints, bool isSelectable, bool isEditableAttrib, bool isAutomatable,
+	bool isEffectable, bool isSaveable, VectorGraphModel* parent, int arrayId)
 {
 	m_isFixedSize = isFixedSize;
 	m_isFixedY = isFixedX;
@@ -346,7 +347,8 @@ VectorGraphDataArray::VectorGraphDataArray(
 	m_isFixedEndPoints = isFixedEndPoints;
 	m_isSelectable = isSelectable;
 	m_isEditableAttrib = isEditableAttrib;
-	m_isAutomatableEffectable = isAutomatableEffectable;
+	m_isAutomatable = isAutomatable;
+	m_isEffectable = isEffectable;
 	m_isSaveable = isSaveable;
 	m_isNonNegative = isNonNegative;
 	
@@ -429,9 +431,15 @@ void VectorGraphDataArray::setIsEditableAttrib(bool bValue)
 	getUpdatingFromPoint(-1);
 	dataChanged();
 }
-void VectorGraphDataArray::setIsAutomatableEffectable(bool bValue)
+void VectorGraphDataArray::setIsAutomatable(bool bValue)
 {
-	m_isAutomatableEffectable = bValue;
+	m_isAutomatable = bValue;
+	getUpdatingFromPoint(-1);
+	dataChanged();
+}
+void VectorGraphDataArray::setIsEffectable(bool bValue)
+{
+	m_isEffectable = bValue;
 	if (bValue == false)
 	{
 		// setEffectorArray will call dataChanged()
@@ -569,9 +577,13 @@ bool VectorGraphDataArray::getIsEditableAttrib()
 {
 	return m_isEditableAttrib;
 }
-bool VectorGraphDataArray::getIsAutomatableEffectable()
+bool VectorGraphDataArray::getIsAutomatable()
 {
-	return m_isAutomatableEffectable;
+	return m_isAutomatable;
+}
+bool VectorGraphDataArray::getIsEffectable()
+{
+	return m_isEffectable;
 }
 bool VectorGraphDataArray::getIsSaveable()
 {
@@ -1119,7 +1131,7 @@ void VectorGraphDataArray::setType(unsigned int pointLocation, unsigned int newT
 }
 void VectorGraphDataArray::setAutomatedAttrib(unsigned int pointLocation, unsigned int attribLocation)
 {
-	if (m_isAutomatableEffectable == false || m_isEditableAttrib == false) { return; }
+	if (m_isAutomatable == false || m_isEditableAttrib == false) { return; }
 
 	// clamp only 4 attributes can be automated (y, c, valA, valB)
 	attribLocation = attribLocation > 3 ? 0 : attribLocation;
@@ -1135,7 +1147,7 @@ void VectorGraphDataArray::setAutomatedAttrib(unsigned int pointLocation, unsign
 }
 void VectorGraphDataArray::setEffectedAttrib(unsigned int pointLocation, unsigned int attribLocation)
 {
-	if (m_isAutomatableEffectable == false || m_isEditableAttrib == false) { return; }
+	if (m_isEffectable == false || m_isEditableAttrib == false) { return; }
 
 	// clamp only 4 attributes can be automated (y, c, valA, valB)
 	attribLocation = attribLocation > 3 ? 0 : attribLocation;
@@ -1172,7 +1184,7 @@ bool VectorGraphDataArray::getEffectLines(unsigned int pointLocation)
 }
 void VectorGraphDataArray::setEffectPoints(unsigned int pointLocation, bool bValue)
 {
-	if (m_isAutomatableEffectable == false || m_isEditableAttrib == false) { return; }
+	if (m_isEffectable == false || m_isEditableAttrib == false) { return; }
 
 	if (m_dataArray[pointLocation].m_effectPoints != bValue)
 	{
@@ -1197,7 +1209,7 @@ void VectorGraphDataArray::setEffectPoints(unsigned int pointLocation, bool bVal
 }
 void VectorGraphDataArray::setEffectLines(unsigned int pointLocation, bool bValue)
 {
-	if (m_isAutomatableEffectable == false || m_isEditableAttrib == false) { return; }
+	if (m_isEffectable == false || m_isEditableAttrib == false) { return; }
 
 	if (m_dataArray[pointLocation].m_effectLines != bValue)
 	{
@@ -1229,7 +1241,7 @@ unsigned int VectorGraphDataArray::getEffect(unsigned int pointLocation, unsigne
 }
 void VectorGraphDataArray::setEffect(unsigned int pointLocation, unsigned int effectSlot, unsigned int effectType)
 {
-	if (m_isAutomatableEffectable == false || m_isEditableAttrib == false) { return; }
+	if (m_isEffectable == false || m_isEditableAttrib == false) { return; }
 
 	switch (effectSlot)
 	{
@@ -1267,7 +1279,7 @@ void VectorGraphDataArray::setAutomated(unsigned int pointLocation, bool bValue)
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 	qDebug("setAutomated start");
 #endif
-	if (m_isAutomatableEffectable == false) { return; }
+	if (m_isAutomatable == false) { return; }
 
 	if (bValue == true)
 	{
