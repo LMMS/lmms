@@ -53,14 +53,15 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	// see other settings avalible for VectorGraphDataArray in VectorGraphModel.h
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
-	m_vectorGraphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsAutomatable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEffectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
 
 	unsigned int arrayLocationB = m_vectorGraphModel.addDataArray();
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatable(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
 
 	// connect VectorGraphDataArrays so the 2. VectorGraphDataArray will be able to effect the 1.:
