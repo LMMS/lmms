@@ -878,6 +878,13 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, std::vector<flo
 	qDebug("getSamples start: targetSizeIn: %d", targetSizeIn);
 #endif
 
+	// try limiting m_universalSampleBuffer's size
+	// to save memory
+	if (m_universalSampleBuffer.size() > 10000)
+	{
+		m_universalSampleBuffer.resize(10000);
+	}
+
 	if (sampleBufferOut != nullptr)
 	{
 		if (sampleBufferOut->size() != targetSizeIn)
