@@ -375,11 +375,12 @@ private:
 		float m_valB = 0.0f;
 		// line type:
 		// 0 - none
-		// 1 - sine
-		// 2 - sineB
-		// 3 - peak
-		// 4 - steps
-		// 5 - random
+		// 1 - bezier
+		// 2 - sine
+		// 3 - sineB
+		// 4 - peak
+		// 5 - steps
+		// 6 - random
 		unsigned int m_type = 0;
 		// the automated attrib location and
 		// the effected attrib location is
@@ -421,8 +422,7 @@ private:
 	// swapping values, "shouldShiftBetween" moves the values (between) once left or right to keep the order
 	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool shouldShiftBetween);
-	// returns the curve value at a given x coord, does clamp
-	float processCurve(float yBefore, float yAfter, float curve, float xIn);
+
 	// returns effected attribute value from base attribValue (input attribute value), does clamp
 	// this function applies the point Effects (like add effect) based on attribValue and effectValue
 	float processEffect(unsigned int pointLocation, float attribValue, unsigned int attribLocation, float effectValue);
@@ -432,19 +432,21 @@ private:
 
 	// line types, m_type is used for this
 	// fadeInStartVal: from what relative x value should the line type fade out
-	// linking: valA: sineAmp, valB: sineFreq
+	// samplesOut: output for the line type functions
+	// xArray: exact sorted x coordinates of samples between 0 and 1
+	// startLoc: from where to apply line type
+	// endLoc: where to stop applying line type
+	// other inputs: mostly between -1 and 1
+	void processBezier(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+		float yBefore, float yAfter, float targetYBefore, float targetYAfter, float curveStrength);
 	void processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float sineAmp, float sineFreq, float fadeInStartVal);
-	// linking: valA: sineAmp, valB: sineFreq, curve: sinePhase
 	void processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal);
-	// linking: valA: amp, valB: x coord, curve: width
 	void processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float peakAmp, float peakX, float peakWidth, float fadeInStartVal);
-	// linking: y: yArray, valA: stepCount, valB: stepCurve
 	void processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartVal);
-	// linking: valA: randomAmp, valB: randomCount, curve: randomSeed
 	void processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float randomAmp, float randomCount, float randomSeed, float fadeInStartVal);
 

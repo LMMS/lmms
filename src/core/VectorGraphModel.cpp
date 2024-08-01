@@ -1476,26 +1476,6 @@ void VectorGraphDataArray::swap(unsigned int pointLocationA, unsigned int pointL
 	getUpdatingFromPoint(pointLocationB);
 	dataChanged();
 }
-float VectorGraphDataArray::processCurve(float yBefore, float yAfter, float curve, float x)
-{
-	// calculating line curve
-	float absCurveIn = std::abs(curve);
-	float pow = curve < 0.0f ? 1.0f - x : x;
-	pow = std::pow(pow, 1.0f - absCurveIn) - pow;
-
-	float output = yBefore + (yAfter - yBefore) * x;
-	output = curve > 0.0f ? output + pow * (yAfter - yBefore) : output - pow * (yAfter - yBefore);
-	// clamp
-	if (yBefore > yAfter)
-	{
-		output = std::clamp(output, yAfter, yBefore);
-	}
-	else
-	{
-		output = std::clamp(output, yBefore, yAfter);
-	}
-	return output;
-}
 
 float VectorGraphDataArray::processEffect(unsigned int pointLocation, float attribValue,
 	unsigned int attribLocation, float effectValue)
@@ -1592,6 +1572,47 @@ float VectorGraphDataArray::processAutomation(unsigned int pointLocation, float 
 	
 	output = std::clamp(output, -1.0f, 1.0f);
 	return output;
+}
+
+void VectorGraphDataArray::processBezier(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	float yBefore, float yAfter, float targetYBefore, float targetYAfter, float curveStrength)
+{
+	// note: targetYBefore and targetYAfter can be bigger than 1
+	curveStrength = std::abs(curveStrength);
+	// draw bezier
+	if (curveStrength != 0.0f)
+	{
+		for (unsigned int i = startLoc; i < endLoc; i++)
+		{
+			// bezier B(t), "t" is a number between 0 and 1
+			float t = (*xArray)[i];
+			// inverse t
+			float iT = (1.0f - t);
+			(*samplesOut)[i] = (std::pow(iT, 3.0f) * yBefore) +
+				(3.0f * iT * iT * t * targetYBefore) +
+				(3.0f * iT * t * t * targetYAfter) +
+				(std::pow(t, 3.0f) * yAfter);
+			(*samplesOut)[i] = std::clamp((*samplesOut)[i] * curveStrength, -1.0f, 1.0f);
+		}
+	}
+	else
+	{
+		// if no bezier is drawn, reset the line's contents to 0
+		// (so a drawn line can be added later)
+		for (unsigned int i = startLoc; i < endLoc; i++)
+		{
+			(*samplesOut)[i] = 0.0f;
+		}
+	}
+
+	// draw line
+	if (curveStrength < 1.0f)
+	{
+		for (unsigned int i = startLoc; i < endLoc; i++)
+		{
+			(*samplesOut)[i] += (yBefore + (yAfter - yBefore) * (*xArray)[i]) * (1.0f - curveStrength);
+		}
+	}
 }
 
 void VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
@@ -2191,7 +2212,7 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 	{
 		effectYLocation = static_cast<unsigned int>
 			(std::ceil(m_dataArray[m_needsUpdating[pointLocation] + 1].m_x / stepSize));
-		// where updating line ends (+1)
+		// where to end updating line (+1)
 		end = effectYLocation;
 		nextY = processAutomation(m_needsUpdating[pointLocation] + 1, m_dataArray[m_needsUpdating[pointLocation] + 1].m_y, 0);
 
@@ -2234,59 +2255,72 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 	if (type == 0)
 	{
 		// calculate curve
-		for (int j = start; j < end; j++)
+		float curveStrength = std::abs(curC);
+		float curveTarget = curY + (nextY - curY) * (curC + 1.0f) / 2.0f;
+		if (curveStrength > 0.0f)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*sampleXLocations)[j]);
+			curveStrength = std::clamp(std::sqrt(curveStrength), -1.0f, 1.0f);
 		}
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curveTarget, curveTarget, curveStrength);
 		// no line type
 	}
 	else if (type == 1)
 	{
-		// curve
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*sampleXLocations)[j]);
-		}
+		// don't calculate curve
 		// line type
-		processLineTypeArraySine(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, fadeInStart);
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curY + curValA * 2.0f, nextY + curValB * 2.0f, (curC + 1.0f) / 2.0f);
 	}
 	else if (type == 2)
 	{
 		// curve
-		for (int j = start; j < end; j++)
+		float curveStrength = std::abs(curC);
+		float curveTarget = curY + (nextY - curY) * (curC + 1.0f) / 2.0f;
+		if (curveStrength > 0.0f)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*sampleXLocations)[j]);
+			curveStrength = std::clamp(std::sqrt(curveStrength), -1.0f, 1.0f);
 		}
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curveTarget, curveTarget, curveStrength);
 		// line type
-		processLineTypeArraySineB(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
+		processLineTypeArraySine(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, fadeInStart);
 	}
 	else if (type == 3)
 	{
 		// curve
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*sampleXLocations)[j]);
-		}
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curY, nextY, 0.0f);
 		// line type
-		processLineTypeArrayPeak(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
+		processLineTypeArraySineB(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	else if (type == 4)
 	{
 		// curve
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*sampleXLocations)[j]);
-		}
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curY, nextY, 0.0f);
 		// line type
-		processLineTypeArraySteps(&m_updatingBakedSamples, sampleXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
+		processLineTypeArrayPeak(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	else if (type == 5)
 	{
 		// curve
-		for (int j = start; j < end; j++)
+		float curveStrength = std::abs(curC);
+		float curveTarget = curY + (nextY - curY) * (curC + 1.0f) / 2.0f;
+		if (curveStrength > 0.0f)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*sampleXLocations)[j]);
+			curveStrength = std::clamp(std::sqrt(curveStrength), -1.0f, 1.0f);
 		}
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curveTarget, curveTarget, curveStrength);
+		// line type
+		processLineTypeArraySteps(&m_updatingBakedSamples, sampleXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
+	}
+	else if (type == 6)
+	{
+		// curve
+		processBezier(&m_updatingBakedSamples, sampleXLocations, start, end,
+			curY, nextY, curY, nextY, 0.0f);
 		// line type
 		processLineTypeArrayRandom(&m_updatingBakedSamples, sampleXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
