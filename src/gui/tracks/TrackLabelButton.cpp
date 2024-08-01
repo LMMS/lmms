@@ -90,6 +90,10 @@ void TrackLabelButton::rename()
 	else
 	{
 		QString txt = m_trackView->getTrack()->name();
+
+		//hide text behind rename line edit
+		setText("");
+
 		m_renameLineEdit->show();
 		m_renameLineEdit->setText( txt );
 		m_renameLineEdit->selectAll();
@@ -106,14 +110,14 @@ void TrackLabelButton::renameFinished()
 	{
 		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();
-		if( m_renameLineEdit->text() != "" )
-		{
-			if( m_renameLineEdit->text() != m_trackView->getTrack()->name() )
-			{
-				setText( elideName( m_renameLineEdit->text() ) );
-				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
-			}
-		}
+
+		auto textEmpty = m_renameLineEdit->text() == "";
+		auto nameHasChanged = m_renameLineEdit->text() != m_trackView->getTrack()->name();
+
+		if (!textEmpty && nameHasChanged)
+			m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+
+		nameChanged();
 	}
 }
 
