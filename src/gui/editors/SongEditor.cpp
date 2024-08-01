@@ -246,11 +246,13 @@ SongEditor::SongEditor( Song * song ) :
 	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
 	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
 	m_exSyncButton->setStyleSheet("background-color:black");
+	m_exSyncButton->setFocusPolicy(Qt::NoFocus);
 	connect(m_exSyncButton, SIGNAL(clicked()), this, SLOT(toggleExSync()));
 	int exSyncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_exSyncButton, 0);
 	
 	m_exSyncModeButton = new QPushButton(exSyncGetModeString() , tb);
 	m_exSyncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
+	m_exSyncModeButton->setFocusPolicy(Qt::NoFocus);
 	connect(m_exSyncModeButton, SIGNAL(clicked()), this, SLOT(toggleExSyncMode()));
 	getGUI()->mainWindow()->addWidgetToToolBar( m_exSyncModeButton, 1, exSyncBoxCol);
 #endif

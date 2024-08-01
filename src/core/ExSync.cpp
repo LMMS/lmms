@@ -273,13 +273,25 @@ struct ExSyncHandler * exSyncGetHandler()
 	return &cs_handler;
 }
 
-
+static f_cnt_t cs_lastFrame = 0;
 void exSyncStopped()
 {
 	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
 	struct ExSyncHandler *sync = exSyncGetHandler();
+	auto _ = Engine::getSong();
+	f_cnt_t l_frame = 0;
+
 	// Now slaveCallBacks  and sync are local copy - never be changed by other thread ...
 	if (sync && slaveCallBacks && sync->Stopped()) { slaveCallBacks->mode(false); }
+	if (sync &&  _->isStopped())
+	{
+		l_frame = _->getFrames();
+		if (cs_exSyncMasterOn && cs_exSyncOn && (l_frame != cs_lastFrame) )
+		{
+			cs_lastFrame = l_frame;
+			exSyncSendPosition();
+		}
+	}
 }
 
 
