@@ -51,6 +51,9 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 	m_renameLineEdit = new TrackRenameLineEdit( this );
+	auto font = QFont();
+	font.setPointSize(8);
+	m_renameLineEdit->setFont(font);
 	m_renameLineEdit->hide();
 	
 	if (isInCompactMode())
@@ -60,8 +63,8 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	else
 	{
 		setFixedSize( 160, 29 );
-		m_renameLineEdit->move( 30, ( height() / 2 ) - ( m_renameLineEdit->sizeHint().height() / 2 ) );
-		m_renameLineEdit->setFixedWidth( width() - 33 );
+		m_renameLineEdit->move( 26, ( height() / 2  - m_renameLineEdit->sizeHint().height() / 2 ) + 1 );
+		m_renameLineEdit->setFixedWidth( width() - 31 );
 		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	}
 	
@@ -69,8 +72,6 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	connect( m_trackView->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect( m_trackView->getTrack(), SIGNAL(nameChanged()), this, SLOT(nameChanged()));
 }
-
-
 
 
 
@@ -90,10 +91,6 @@ void TrackLabelButton::rename()
 	else
 	{
 		QString txt = m_trackView->getTrack()->name();
-
-		//hide text behind rename line edit
-		setText("");
-
 		m_renameLineEdit->show();
 		m_renameLineEdit->setText( txt );
 		m_renameLineEdit->selectAll();
@@ -110,14 +107,14 @@ void TrackLabelButton::renameFinished()
 	{
 		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();
-
-		auto textEmpty = m_renameLineEdit->text() == "";
-		auto nameHasChanged = m_renameLineEdit->text() != m_trackView->getTrack()->name();
-
-		if (!textEmpty && nameHasChanged)
-			m_trackView->getTrack()->setName( m_renameLineEdit->text() );
-
-		nameChanged();
+		if( m_renameLineEdit->text() != "" )
+		{
+			if( m_renameLineEdit->text() != m_trackView->getTrack()->name() )
+			{
+				setText( elideName( m_renameLineEdit->text() ) );
+				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+			}
+		}
 	}
 }
 
