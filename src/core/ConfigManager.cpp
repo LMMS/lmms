@@ -186,6 +186,12 @@ QString ConfigManager::defaultVersion() const
    return LMMS_VERSION;
 }
 
+bool ConfigManager::enableBlockedPlugins()
+{
+	const char* envVar = getenv("LMMS_ENABLE_BLOCKED_PLUGINS");
+	return (envVar && *envVar);
+}
+
 QStringList ConfigManager::availableVstEmbedMethods()
 {
    QStringList methods;
@@ -514,44 +520,43 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 #else
 			   bool badPath = false;
 #endif
+				if(badPath || !QDir(m_themeDir).exists() ||
+						!QFile(m_themeDir + "/style.css").exists())
+				{
+					m_themeDir = defaultThemeDir();
+				}
+				m_themeDir = ensureTrailingSlash(m_themeDir);
+			}
+			setWorkingDir(value("paths", "workingdir"));
 
-			   if(badPath || !QDir(m_themeDir).exists() ||
-				   !QFile(m_themeDir + "/style.css").exists())
-			   {
-				   m_themeDir = defaultThemeDir();
-			   }
-			   m_themeDir = ensureTrailingSlash(m_themeDir);
-		   }
-		   setWorkingDir(value("paths", "workingdir"));
+			setGIGDir(value("paths", "gigdir") == "" ? gigDir() : value("paths", "gigdir"));
+			setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
+			setVSTDir(value("paths", "vstdir"));
+			setLADSPADir(value("paths", "ladspadir"));
+		#ifdef LMMS_HAVE_STK
+			setSTKDir(value("paths", "stkdir"));
+		#endif
+		#ifdef LMMS_HAVE_FLUIDSYNTH
+			setSF2File(value("paths", "defaultsf2"));
+		#endif
+			setBackgroundPicFile(value("paths", "backgroundtheme"));
+		}
+		else if (gui::getGUI() != nullptr)
+		{
+			QMessageBox::warning(nullptr, gui::MainWindow::tr("Configuration file"),
+									gui::MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
+													arg(errorLine).
+													arg(errorCol).
+													arg(errorString));
+		}
+		cfg_file.close();
+	}
 
-		   setGIGDir(value("paths", "gigdir") == "" ? gigDir() : value("paths", "gigdir"));
-		   setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
-		   setVSTDir(value("paths", "vstdir"));
-		   setLADSPADir(value("paths", "ladspadir"));
-#ifdef LMMS_HAVE_STK
-		   setSTKDir(value("paths", "stkdir"));
-#endif
-#ifdef LMMS_HAVE_FLUIDSYNTH
-		   setSF2File(value("paths", "defaultsf2"));
-#endif
-		   setBackgroundPicFile(value("paths", "backgroundtheme"));
-	   }
-	   else if (gui::getGUI() != nullptr)
-	   {
-		   QMessageBox::warning(nullptr, gui::MainWindow::tr("Configuration file"),
-			   gui::MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
-			   arg(errorLine).
-			   arg(errorCol).
-			   arg(errorString));
-	   }
-	   cfg_file.close();
-   }
-
-   // Plugins are searched recursively, blacklist problematic locations
-   if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
-	   m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
-	   !QDir( m_vstDir ).exists() )
-   {
+	// Plugins are searched recursively, block problematic locations
+	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
+			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
+			!QDir( m_vstDir ).exists() )
+	{
 #ifdef LMMS_BUILD_WIN32
 	   QString programFiles = QString::fromLocal8Bit(getenv("ProgramFiles"));
 	   m_vstDir =  programFiles + "/VstPlugins/";

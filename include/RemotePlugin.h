@@ -189,12 +189,10 @@ private slots:
 	void processErrored(QProcess::ProcessError err );
 } ;
 
-
-LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
+inline std::string QSTR_TO_STDSTR(QString const& qstr)
 {
 	return qstr.toStdString();
 }
-
 
 } // namespace lmms
 

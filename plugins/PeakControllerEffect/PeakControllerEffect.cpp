@@ -110,7 +110,7 @@ bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
 
 	if( c.m_absModel.value() )
 	{
-		for( int i = 0; i < _frames; ++i )
+		for (auto i = std::size_t{0}; i < _frames; ++i)
 		{
 			// absolute value is achieved because the squares are > 0
 			sum += _buf[i][0]*_buf[i][0] + _buf[i][1]*_buf[i][1];
@@ -118,7 +118,7 @@ bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
 	}
 	else
 	{
-		for( int i = 0; i < _frames; ++i )
+		for (auto i = std::size_t{0}; i < _frames; ++i)
 		{
 			// the value is absolute because of squaring,
 			// so we need to correct it
@@ -131,7 +131,7 @@ bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
 	// this will mute the output after the values were measured
 	if( c.m_muteModel.value() )
 	{
-		for( int i = 0; i < _frames; ++i )
+		for (auto i = std::size_t{0}; i < _frames; ++i)
 		{
 			_buf[i][0] = _buf[i][1] = 0.0f;
 		}

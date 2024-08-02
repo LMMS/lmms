@@ -26,12 +26,13 @@
 #define LV2_INSTRUMENT_H
 
 #include <QString>
+#include <array>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Note.h"
 #include "Lv2ControlBase.h"
 #include "Lv2ViewBase.h"
+#include "Note.h"
 
 // whether to use MIDI vs playHandle
 // currently only MIDI works

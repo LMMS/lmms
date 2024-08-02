@@ -219,7 +219,7 @@ PianoRoll::PianoRoll() :
 
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
-	for( int i = 0; i < m_nemStr.size(); ++i )
+	for (auto i = std::size_t{0}; i < m_nemStr.size(); ++i)
 	{
 		auto act = new QAction(m_nemStr.at(i), this);
 		connect( act, &QAction::triggered, [this, i](){ changeNoteEditMode(i); } );

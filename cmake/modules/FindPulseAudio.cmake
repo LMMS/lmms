@@ -18,13 +18,15 @@ ENDIF (PULSEAUDIO_INCLUDE_DIR AND PULSEAUDIO_LIBRARIES)
 IF (NOT WIN32)
    # use pkg-config to get the directories and then use these values
    # in the FIND_PATH() and FIND_LIBRARY() calls
-   INCLUDE(FindPkgConfig)
-   pkg_check_modules(PA libpulse)
-	set(_PASIncDir ${PA_INCLUDE_DIRS})
-	set(_PASLinkDir ${PA_LIBRARY_DIRS})
-	set(_PASLinkFlags ${PA_LDFLAGS})
-	set(_PASCflags ${PA_CFLAGS})
-   SET(PULSEAUDIO_DEFINITIONS ${_PASCflags})
+   find_package(PkgConfig QUIET)
+   if(PKG_CONFIG_FOUND)
+      pkg_check_modules(PA libpulse)
+      set(_PASIncDir ${PA_INCLUDE_DIRS})
+      set(_PASLinkDir ${PA_LIBRARY_DIRS})
+      set(_PASLinkFlags ${PA_LDFLAGS})
+      set(_PASCflags ${PA_CFLAGS})
+      set(PULSEAUDIO_DEFINITIONS ${_PASCflags})
+   endif()
 ENDIF (NOT WIN32)
 
 FIND_PATH(PULSEAUDIO_INCLUDE_DIR pulse/pulseaudio.h

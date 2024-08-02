@@ -145,7 +145,7 @@ bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
-	for (int i = 0; i < DEFAULT_BUFFER_SIZE; i++)
+	for (auto i = std::size_t{0}; i < DEFAULT_BUFFER_SIZE; i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;
 		m_delayBuffer[i][1] = 0.0f;

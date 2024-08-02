@@ -96,7 +96,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 		sliceStart = 0;
 		sliceEnd = 1;
 	}
-	else if (noteIndex > 0 && noteIndex < m_slicePoints.size())
+	else if (noteIndex > 0 && static_cast<std::size_t>(noteIndex) < m_slicePoints.size())
 	{
 		noteIndex -= 1;
 		sliceStart = m_slicePoints[noteIndex];
@@ -134,9 +134,9 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
 		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
-		for (int i = 0; i < frames; i++)
+		for (auto i = std::size_t{0}; i < frames; i++)
 		{
-			float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
+			float fadeValue = static_cast<float>(noteFramesLeft - static_cast<int>(i)) / fadeOutFrames;
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 			fadeValue = cosinusInterpolate(0, 1, fadeValue);
 
@@ -170,7 +170,7 @@ void SlicerT::findSlices()
 
 	float maxMag = -1;
 	std::vector<float> singleChannel(m_originalSample.sampleSize(), 0);
-	for (int i = 0; i < m_originalSample.sampleSize(); i++)
+	for (auto i = std::size_t{0}; i < m_originalSample.sampleSize(); i++)
 	{
 		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
 		maxMag = std::max(maxMag, singleChannel[i]);
@@ -179,7 +179,7 @@ void SlicerT::findSlices()
 	// normalize and find 0 crossings
 	std::vector<int> zeroCrossings;
 	float lastValue = 1;
-	for (int i = 0; i < singleChannel.size(); i++)
+	for (auto i = std::size_t{0}; i < singleChannel.size(); i++)
 	{
 		singleChannel[i] /= maxMag;
 		if (sign(lastValue) != sign(singleChannel[i]))
@@ -199,7 +199,7 @@ void SlicerT::findSlices()
 	float spectralFlux = 0;
 	float prevFlux = 1E-10f; // small value, no divison by zero
 
-	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
+	for (int i = 0; i < static_cast<int>(singleChannel.size()) - windowSize; i += windowSize)
 	{
 		// fft
 		std::copy_n(singleChannel.data() + i, windowSize, fftIn.data());
@@ -300,7 +300,7 @@ std::vector<Note> SlicerT::getMidi()
 	float totalTicks = outFrames / framesPerTick;
 	float lastEnd = 0;
 
-	for (int i = 0; i < m_slicePoints.size() - 1; i++)
+	for (auto i = std::size_t{0}; i < m_slicePoints.size() - 1; i++)
 	{
 		float sliceStart = lastEnd;
 		float sliceEnd = totalTicks * m_slicePoints[i + 1];
@@ -342,7 +342,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	}
 
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
-	for (int i = 0; i < m_slicePoints.size(); i++)
+	for (auto i = std::size_t{0}; i < m_slicePoints.size(); i++)
 	{
 		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
 	}

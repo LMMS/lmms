@@ -323,7 +323,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 void GigInstrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	const int rate = Engine::audioEngine()->outputSampleRate();
+	const auto rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -437,7 +437,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
+				samples = frames / freq_factor + s_interpolationMargins[m_interpolation];
 			}
 
 			// Load this note's data
@@ -1216,7 +1216,7 @@ bool GigSample::convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
 		return false;
 	}
 
-	if( src_data.output_frames_gen > 0 && src_data.output_frames_gen < newSize )
+	if (src_data.output_frames_gen > 0 && static_cast<f_cnt_t>(src_data.output_frames_gen) < newSize)
 	{
 		qCritical() << "GigInstrument: not enough frames, wanted"
 			<< newSize << "generated" << src_data.output_frames_gen;

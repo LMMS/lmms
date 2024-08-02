@@ -81,6 +81,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
+        -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
@@ -176,6 +177,7 @@ jobs:
     container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
+        -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
@@ -293,6 +295,7 @@ jobs:
             -B build `
             -G Ninja `
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+            -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `

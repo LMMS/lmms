@@ -79,7 +79,7 @@ class MixerChannel : public ThreadableJob
 		auto color() const -> const std::optional<QColor>& { return m_color; }
 		void setColor(const std::optional<QColor>& color) { m_color = color; }
 
-		std::atomic_int m_dependenciesMet;
+		std::atomic_size_t m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		

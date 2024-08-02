@@ -579,9 +579,9 @@ void XpressiveView::expressionChanged() {
 
 		if (parse_ok) {
 			e->exprValid().setValue(0);
-			const int length = m_raw_graph->length();
+			const auto length = static_cast<std::size_t>(m_raw_graph->length());
 			auto const samples = new float[length];
-			for (i = 0; i < length; i++) {
+			for (auto i = std::size_t{0}; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
 				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0)

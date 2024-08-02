@@ -57,7 +57,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new SampleFrame[frames];
 
-	BufferManager::clear( m_buffer, frames );
+	zeroSampleFrames(m_buffer, frames);
 
 
 	setToolTip(tr("Oscilloscope"));
@@ -190,7 +190,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 				otherChannelsColor(); // Any other channel
 			p.setPen(QPen(color, width));
 
-			for( int frame = 0; frame < frames; ++frame )
+			for (auto frame = std::size_t{0}; frame < frames; ++frame)
 			{
 				sample_t const clippedSample = AudioEngine::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(

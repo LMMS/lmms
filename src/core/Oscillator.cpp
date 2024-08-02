@@ -81,7 +81,7 @@ void Oscillator::update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 {
 	if (m_freq >= Engine::audioEngine()->outputSampleRate() / 2)
 	{
-		BufferManager::clear(ab, frames);
+		zeroSampleFrames(ab, frames);
 		return;
 	}
 	// If this oscillator is used to PM or PF modulate another oscillator, take a note.

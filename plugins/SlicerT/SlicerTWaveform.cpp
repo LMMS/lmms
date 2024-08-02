@@ -195,11 +195,11 @@ void SlicerTWaveform::drawEditor()
 
 	brush.setPen(QPen(s_sliceColor, 2));
 
-	for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
+	for (auto i = std::size_t{0}; i < m_slicerTParent->m_slicePoints.size(); i++)
 	{
 		float xPos = (m_slicerTParent->m_slicePoints.at(i) - startFrame) / numFramesToDraw * m_editorWidth;
 
-		if (i == m_closestSlice)
+		if (i == static_cast<std::size_t>(m_closestSlice))
 		{
 			brush.setPen(QPen(s_sliceHighlightColor, 2));
 			brush.drawLine(xPos, 0, xPos, m_editorHeight);
@@ -268,7 +268,7 @@ void SlicerTWaveform::updateClosest(QMouseEvent* me)
 		m_closestSlice = -1;
 		float startFrame = m_seekerStart;
 		float endFrame = m_seekerEnd;
-		for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
+		for (auto i = std::size_t{0}; i < m_slicerTParent->m_slicePoints.size(); i++)
 		{
 			float sliceIndex = m_slicerTParent->m_slicePoints.at(i);
 			float xPos = (sliceIndex - startFrame) / (endFrame - startFrame);
