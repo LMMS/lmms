@@ -388,14 +388,14 @@ int Track::numOfClips()
  *  \todo if we create a Clip here, should we somehow attach it to the
  *     track?
  */
-Clip * Track::getClip( int clipNum )
+auto Track::getClip(std::size_t clipNum) -> Clip*
 {
 	if( clipNum < m_clips.size() )
 	{
 		return m_clips[clipNum];
 	}
-	printf( "called Track::getClip( %d ), "
-			"but Clip %d doesn't exist\n", clipNum, clipNum );
+	printf( "called Track::getClip( %zu ), "
+			"but Clip %zu doesn't exist\n", clipNum, clipNum );
 	return createClip( clipNum * TimePos::ticksPerBar() );
 
 }

@@ -23,6 +23,7 @@
  */
 
 #include "AudioSdl.h"
+#include "lmms_basics.h"
 
 #ifdef LMMS_HAVE_SDL
 
@@ -38,7 +39,7 @@ namespace lmms
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
-	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
+	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
 {
 	_success_ful = false;
 
@@ -69,7 +70,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 						// to convert the buffers
 #endif
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = std::max(1024, audioEngine()->framesPerPeriod() * 2);
+	m_audioHandle.samples = std::max(f_cnt_t{1024}, audioEngine()->framesPerPeriod() * 2);
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -225,13 +226,13 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 			m_currentBufferFramesCount = frames;
 
 		}
-		const uint min_frames_count = std::min(_len/sizeof(sampleFrame),
+		const uint min_frames_count = std::min(_len/sizeof(SampleFrame),
 										  m_currentBufferFramesCount
 										- m_currentBufferFramePos);
 
-		memcpy( _buf, m_outBuf + m_currentBufferFramePos, min_frames_count*sizeof(sampleFrame) );
-		_buf += min_frames_count*sizeof(sampleFrame);
-		_len -= min_frames_count*sizeof(sampleFrame);
+		memcpy( _buf, m_outBuf + m_currentBufferFramePos, min_frames_count*sizeof(SampleFrame) );
+		_buf += min_frames_count*sizeof(SampleFrame);
+		_len -= min_frames_count*sizeof(SampleFrame);
 		m_currentBufferFramePos += min_frames_count;
 
 		m_currentBufferFramePos %= m_currentBufferFramesCount;
@@ -274,8 +275,8 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 }
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-	auto samples_buffer = (sampleFrame*)_buf;
-	fpp_t frames = _len / sizeof ( sampleFrame );
+	auto samples_buffer = (SampleFrame*)_buf;
+	fpp_t frames = _len / sizeof ( SampleFrame );
 
 	audioEngine()->pushInputFrames (samples_buffer, frames);
 }

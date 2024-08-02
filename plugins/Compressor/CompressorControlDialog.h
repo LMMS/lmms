@@ -36,7 +36,7 @@ class QLabel;
 namespace lmms
 {
 
-constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
+constexpr float COMP_NOISE_FLOOR = 0.000001f;// -120 dbFs
 
 class CompressorControls;
 

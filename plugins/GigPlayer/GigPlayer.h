@@ -157,7 +157,7 @@ public:
 
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
-	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+	bool convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
@@ -240,13 +240,19 @@ class GigInstrument : public Instrument
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
 
 public:
+	// values for buffer margins, used for various libsamplerate interpolation modes
+	// the array positions correspond to the converter_type parameter values in libsamplerate
+	// if there appears problems with playback on some interpolation mode, then the value for that mode
+	// may need to be higher - conversely, to optimize, some may work with lower values
+	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
+
 	GigInstrument( InstrumentTrack * _instrument_track );
 	~GigInstrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -312,7 +318,7 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples );
+	void loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples );
 	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 
