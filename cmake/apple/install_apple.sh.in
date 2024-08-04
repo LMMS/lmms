@@ -69,6 +69,22 @@ for file in "$APP/Contents/lib/lmms/ladspa/"*.so; do
    _executables="${_executables} -executable=$_thisfile"
 done
 
+# Build a list of shared objects in lib/suil-0
+if [ -f "@SUIL_LINK_LIBRARIES@" ]; then
+	# Try to guess where modules are located (e.g. lib/suil-0) based on lib name
+	# SUIL_LINK_LIBRARIES: @SUIL_LINK_LIBRARIES@
+	# SUIL_LIBRARIES: @SUIL_LIBRARIES@
+	SUIL_MODULES="$(dirname "@SUIL_LINK_LIBRARIES@")/@SUIL_LIBRARIES@"
+	if [ -d "$SUIL_MODULES" ]; then
+		mkdir -p "$APP/Contents/Frameworks/suil-0"
+		for file in "$SUIL_MODULES/"*.dylib; do
+			# Copy to a predictable location
+			cp "$file" "$APP/Contents/Frameworks/suil-0/"
+			_executables="${_executables} -executable=$APP/Contents/Frameworks/suil-0/$(basename "$file")"
+		done
+	fi
+fi
+
 # Finalize .app
 # shellcheck disable=SC2086
 macdeployqt "$APP" $_executables

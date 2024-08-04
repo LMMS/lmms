@@ -1,7 +1,7 @@
 /*
  * Lv2Features.cpp - Lv2Features implementation
  *
- * Copyright (c) 2020-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2020-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -50,7 +50,7 @@ Lv2Features::Lv2Features()
 	// create (yet empty) map feature URI -> feature
 	for(auto uri : man->supportedFeatureURIs())
 	{
-		m_featureByUri.emplace(uri, nullptr);
+		m_featureByUri.emplace(uri, LV2_Feature { uri.data(), nullptr });
 	}
 }
 
@@ -61,8 +61,8 @@ void Lv2Features::initCommon()
 {
 	Lv2Manager* man = Engine::getLv2Manager();
 	// init m_featureByUri with the plugin-common features
-	operator[](LV2_URID__map) = man->uridMap().mapFeature();
-	operator[](LV2_URID__unmap) = man->uridMap().unmapFeature();
+	operator[](LV2_URID__map).data = man->uridMap().mapFeature();
+	operator[](LV2_URID__unmap).data = man->uridMap().unmapFeature();
 }
 
 
@@ -82,7 +82,7 @@ void Lv2Features::createFeatureVectors()
 			  vector creation (This can be done in
 			  Lv2Proc::initPluginSpecificFeatures or in Lv2Features::initCommon)
 		*/
-		m_features.push_back(LV2_Feature{(const char*)uri.data(), (void*)feature});
+		m_features.push_back(feature);
 	}
 
 	// create pointer vector (for lilv_plugin_instantiate)
@@ -97,7 +97,7 @@ void Lv2Features::createFeatureVectors()
 
 
 
-void *&Lv2Features::operator[](const char *featName)
+LV2_Feature& Lv2Features::operator[](const char *featName)
 {
 	auto itr = m_featureByUri.find(featName);
 	Q_ASSERT(itr != m_featureByUri.end());
@@ -113,7 +113,7 @@ void Lv2Features::clear()
 	for (auto& [uri, feature] : m_featureByUri)
 	{
 		(void) uri;
-		feature = nullptr;
+		feature.data = nullptr;
 	}
 }
 
