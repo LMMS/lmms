@@ -344,14 +344,7 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 	// Set the current device to the one in the configuration
 	const auto inputDevice = ConfigManager::inst()->value(SectionSDL, InputDeviceSDL);
-	if (inputDevice.isEmpty())
-	{
-		m_inputDeviceComboBox->setCurrentText(s_systemDefaultDevice);
-	}
-	else
-	{
-		m_inputDeviceComboBox->setCurrentText(inputDevice);
-	}
+	m_inputDeviceComboBox->setCurrentText(inputDevice.isEmpty() ? s_systemDefaultDevice : inputDevice);
 #endif
 
 	form->addRow(tr("Input device"), m_inputDeviceComboBox);
