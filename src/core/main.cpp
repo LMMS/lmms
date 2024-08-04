@@ -308,7 +308,7 @@ int main( int argc, char * * argv )
 		}
 	}
 
-	#ifdef LMMS_DEBUG_FPE
+#ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
 	feenableexcept( FE_INVALID   |
