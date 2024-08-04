@@ -1986,7 +1986,7 @@ void DataFile::findProblematicLadspaPlugins()
 
 	const QDomNodeList ladspacontrols = elementsByTagName("ladspacontrols");
 
-	auto problematicLadspaControlFound = false;
+	uint numberOfProblematicPlugins = 0;
 
 	for (int i = 0; i < ladspacontrols.size(); ++i)
 	{
@@ -1999,16 +1999,16 @@ void DataFile::findProblematicLadspaPlugins()
 			const auto name = attribute.nodeName();
 			if (name != "ports" && name.startsWith("port"))
 			{
-				problematicLadspaControlFound = true;
+				++numberOfProblematicPlugins;
 				break;
 			}
 		}
 	}
 
-	if (problematicLadspaControlFound)
+	if (numberOfProblematicPlugins > 0)
 	{
 		QMessageBox::warning(nullptr, QObject::tr("LADSPA plugins"),
-			QObject::tr("The project contains LADSPA plugins which might have not been restored correctly! Please check the project."));
+			QObject::tr("The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.").arg(numberOfProblematicPlugins));
 	}
 }
 
