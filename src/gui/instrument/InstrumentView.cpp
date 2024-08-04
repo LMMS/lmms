@@ -23,11 +23,13 @@
  */
 
 #include <QIcon>
+#include <QLayout>
 
 #include "InstrumentView.h"
 #include "embed.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
+#include "SubWindow.h"
 
 namespace lmms::gui
 {
@@ -61,6 +63,24 @@ void InstrumentView::setModel( Model * _model, bool )
 		ModelView::setModel( _model );
 		instrumentTrackWindow()->setWindowIcon( model()->logo()->pixmap() );
 		connect( model(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
+	}
+	InstrumentTrackWindow* itw = instrumentTrackWindow();
+	SubWindow* subWindow = qobject_cast<SubWindow*>(itw->parent());
+	if ( isResizable() )
+	{
+		subWindow->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+		if (subWindow->layout())
+		{
+			subWindow->layout()->setSizeConstraint(QLayout::SetNoConstraint);
+		}
+	}
+	else
+	{
+		subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+		if (subWindow->layout())
+		{
+			subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+		}
 	}
 }
 
