@@ -1,7 +1,7 @@
 /*
  * Lv2Basics.cpp - basic Lv2 functions
  *
- * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,7 +24,10 @@
 
 #include "Lv2Basics.h"
 
-#ifdef LMMS_HAVE_LV2
+#include <QGuiApplication>
+#include <QScreen>
+
+#ifdef  LMMS_HAVE_LV2
 
 namespace lmms
 {
@@ -46,6 +49,16 @@ std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
 {
 	return std::string(
 			lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
+}
+
+float lv2UiRefreshRate()
+{
+	return (float)QGuiApplication::primaryScreen()->refreshRate();
+}
+
+float lv2UiScaleFactor()
+{
+	return (float)QGuiApplication::primaryScreen()->devicePixelRatio();
 }
 
 } // namespace lmms

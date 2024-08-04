@@ -87,7 +87,6 @@ public:
 	const Lv2Proc *control(std::size_t idx) const { return m_procs[idx].get(); }
 
 	bool hasGui() const { return m_hasGUI; }
-	void setHasGui(bool val) { m_hasGUI = val; }
 
 protected:
 	/*

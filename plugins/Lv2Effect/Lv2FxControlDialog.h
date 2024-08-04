@@ -47,6 +47,9 @@ private:
 	Lv2FxControls *lv2Controls();
 	void modelChanged() final;
 	void hideEvent(QHideEvent *event) override;
+	bool isResizable() const final { return Lv2ViewBase::isResizable(); }
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 };
 
 
