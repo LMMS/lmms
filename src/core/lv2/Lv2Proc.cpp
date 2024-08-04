@@ -196,7 +196,8 @@ Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	m_plugin(plugin),
 	m_workLock(1),
 	m_midiInputBuf(m_maxMidiInputEvents),
-	m_midiInputReader(m_midiInputBuf)
+	m_midiInputReader(m_midiInputBuf),
+	m_pluginEvents(uiMidiBufsize() * uiNBufferCycles())
 {
 	createPorts();
 	initPlugin();
@@ -215,6 +216,29 @@ void Lv2Proc::reload() { Lv2ProcSuspender(this); }
 
 
 
+void Lv2Proc::onSettingsLoaded()
+{
+	// Savefile has been loaded into models, but not into corresponding ports yet
+	copyModelsFromCore();
+
+	// All control ports may have changed -> Tell UI
+	if (isUiActive())
+	{
+		for (uint32_t p = 0; p < portNum(); ++p)
+		{
+			const Lv2Ports::PortBase& port = *m_ports[p];
+			if (port.m_flow == Lv2Ports::Flow::Input &&
+				port.m_type == Lv2Ports::Type::Control)
+			{
+				sendToUi(p, Lv2Ports::dcast<Lv2Ports::Control>(&port));
+			}
+		}
+	}
+}
+
+
+
+
 void Lv2Proc::dumpPorts()
 {
 	std::size_t num = 0;
@@ -222,6 +246,94 @@ void Lv2Proc::dumpPorts()
 	{
 		(void)port;
 		dumpPort(num++);
+	}
+}
+
+
+
+
+void Lv2Proc::applyUiEvents(uint32_t nframes)
+{
+	if (!isUiActive()) { return; }
+	Lv2UiControlChange ev;
+	const size_t space = m_uiEventsReader->read_space();
+	Lv2Manager* mgr = Engine::getLv2Manager();
+	LV2_URID atom_eventTransfer = mgr->uridMap().map(LV2_ATOM__eventTransfer);
+	for (size_t i = 0; i < space; i += sizeof(ev) + ev.size)
+	{
+		// read ControlChange
+		if (space - i < sizeof(ev)) { break; }
+		m_uiEventsReader->read(sizeof(ev)).copy((char*)&ev, sizeof(ev));
+
+		// fill body
+		char body[uiEventsBufsize()];
+		{
+			auto sequence = m_uiEventsReader->read(ev.size);
+			if (sequence.size() == ev.size)
+			{
+				sequence.copy(body, ev.size);
+			}
+			else
+			{
+				qWarning() << "error: Error reading from UI ring buffer";
+				break;
+			}
+		}
+
+		assert(ev.index < portNum());
+		struct Lv2Ports::PortBase& port = *m_ports[ev.index];
+		if (ev.protocol == 0)
+		{
+			assert(ev.size == sizeof(float));
+			struct FloatToModelVisitor : public ModelVisitor
+			{
+				const std::vector<float>* m_scalePointMap; // in
+				float m_val; // in
+				void visit(FloatModel& m) override { m.setValue(m_val); qDebug() << "set val" << m_val; }
+				void visit(IntModel& m) override { m.setValue(m_val); }
+				void visit(BoolModel& m) override { m.setValue(m_val); }
+				void visit(ComboBoxModel& m) override
+				{
+					float bestDist = std::numeric_limits<float>::max();
+					std::size_t bestIdx = std::numeric_limits<std::size_t>::max();
+					for (std::size_t idx = 0; idx < m_scalePointMap->size(); ++idx)
+					{
+						float dist = std::fabs((*m_scalePointMap)[idx] - m_val);
+						if(dist < bestDist)
+						{
+							bestDist = dist;
+							bestIdx = idx;
+						}
+					}
+					assert(bestIdx != std::numeric_limits<std::size_t>::max());
+					m.setValue(static_cast<float>(bestIdx));
+				}
+			};
+			Lv2Ports::Control* ctrl = Lv2Ports::dcast<Lv2Ports::Control>(&port);
+			// update value in port
+			ctrl->m_val = *(float*)body;
+			// update value in model
+			FloatToModelVisitor ftmv;
+			ftmv.m_scalePointMap = &ctrl->m_scalePointMap;
+			ftmv.m_val = *(float*)body;
+			ctrl->m_connectedModel->accept(ftmv);
+			qDebug() << m_ports[ev.index]->uri();
+			qDebug() << m_ports[ev.index]->name();
+		}
+		else if (ev.protocol == atom_eventTransfer)
+		{
+			Lv2Ports::AtomSeq* ato = Lv2Ports::dcast<Lv2Ports::AtomSeq>(&port);
+			assert(ato);
+			LV2_Evbuf_Iterator e = lv2_evbuf_end(ato->m_buf.get());
+			const LV2_Atom* const atom = (const LV2_Atom*)body;
+			assert(atom);
+			lv2_evbuf_write(&e, nframes, atom->type, atom->size,
+				(const uint8_t*)LV2_ATOM_BODY_CONST(atom));
+		}
+		else
+		{
+			qDebug() << "error: Unknown control change protocol" << ev.protocol;
+		}
 	}
 }
 
@@ -291,7 +403,7 @@ void Lv2Proc::copyModelsFromCore()
 			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), buf.size());
 			if(bufsize)
 			{
-				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf.data());
+				lv2_evbuf_write(&iter, atomStamp, type, (uint32_t)bufsize, buf.data());
 			}
 		}
 	}
@@ -369,8 +481,60 @@ void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 
 
 
+bool Lv2Proc::sendToUi(uint32_t port_index,
+						uint32_t type, uint32_t size, const void* body)
+{
+	if (!isUiActive()) { return false; }
+
+	char evbuf[sizeof(Lv2UiControlChange) + sizeof(LV2_Atom)];
+	Lv2UiControlChange* ev = (Lv2UiControlChange*)evbuf;
+	ev->index = port_index;
+	ev->protocol = Engine::getLv2Manager()->uridMap().map(LV2_ATOM__eventTransfer);
+	ev->size = sizeof(LV2_Atom) + size;
+	
+	LV2_Atom* atom = (LV2_Atom*)(ev + 1);
+	atom->type = type;
+	atom->size = size;
+	
+	const bool enoughSpace = m_pluginEvents.capacity() >= sizeof(evbuf) + size;
+	if (enoughSpace)
+	{
+		m_pluginEvents.write(evbuf, sizeof(evbuf));
+		m_pluginEvents.write((const char*)body, size);
+	}
+	else { qWarning() << "Plugin => UI buffer overflow for port" << port_index << "!"; }
+	return enoughSpace;
+}
+
+
+
+
+bool Lv2Proc::sendToUi(uint32_t port_index, const Lv2Ports::Control* ctrl)
+{
+		qDebug () << "sendToUi(): Want to set float port" << port_index << "to" << ctrl->m_val;
+
+	if (!isUiActive()) { return false; }
+	assert(ctrl);
+	char buf[sizeof(Lv2UiControlChange) + sizeof(float)];
+	Lv2UiControlChange* ev = (Lv2UiControlChange*)buf;
+	ev->index = port_index;
+	ev->protocol = 0;  // = float value
+	ev->size = sizeof(float);
+	*(float*)(ev + 1) = ctrl->m_val;
+	const bool enoughSpace = m_pluginEvents.capacity() >= sizeof(buf);
+	qDebug () << "sendToUi(): Setting float port" << port_index << "to" << ctrl->m_val;
+	if (enoughSpace) { m_pluginEvents.write(buf, sizeof(buf)); }
+	else { qWarning() << "Plugin => UI buffer overflow for port" << port_index << "!"; }
+	return enoughSpace;
+}
+
+
+
+
 void Lv2Proc::run(fpp_t frames)
 {
+	applyUiEvents(frames);
+
 	if (m_worker)
 	{
 		// Process any worker replies
@@ -383,6 +547,75 @@ void Lv2Proc::run(fpp_t frames)
 	{
 		// Notify the plugin the run() cycle is finished
 		m_worker->notifyPluginThatRunFinished();
+	}
+	
+	// Check if it's time to send updates to the UI
+	m_eventDeltaT += frames;
+	bool sendUiUpdates = false;
+	uint32_t updateFrames = (uint32_t)(Engine::audioEngine()->outputSampleRate() / lv2UiRefreshRate());
+	if (isUiActive() && (m_eventDeltaT > updateFrames))
+	{
+		sendUiUpdates = true;
+		m_eventDeltaT = 0;
+	}
+
+	for (uint32_t p = 0; p < portNum(); ++p)
+	{
+		const Lv2Ports::PortBase& port = *m_ports[p];
+		if (port.m_flow == Lv2Ports::Flow::Output &&
+			port.m_type == Lv2Ports::Type::AtomSeq)
+		{
+			// plugin writes all kind of information to AtomSeq output,
+			// so we forward this to the UI
+			// example: User presses key -> MIDI gets to Atom in port -> Plugin plays sound
+			//          -> MIDI gets send to Atom out port -> UI visualizes sound
+			const Lv2Ports::AtomSeq* atomSeq = Lv2Ports::dcast<Lv2Ports::AtomSeq>(&port);
+			/*void* buf = nullptr;
+			if (port->sys_port)
+			{
+				buf = jack_port_get_buffer(port->sys_port, nframes);
+				jack_midi_clear_buffer(buf);
+			}*/
+			for (LV2_Evbuf_Iterator i = lv2_evbuf_begin(&*atomSeq->m_buf);
+					lv2_evbuf_is_valid(i);  // see note (*) on bottom of file
+					i = lv2_evbuf_next(i))
+			{
+				// Get event from LV2 buffer
+				uint32_t frames    = 0;
+				uint32_t type      = 0;
+				uint32_t size      = 0;
+				uint8_t* body      = NULL;
+				lv2_evbuf_get(i, &frames, &type, &size, &body);
+		
+				/*if (buf && type == jalv->urids.midi_MidiEvent)
+				{
+					// Write MIDI event to Jack output
+					jack_midi_event_write(buf, frames, body, size);
+				}*/
+				sendToUi(p, type, size, body);  // forward event to UI
+			}
+		}
+		else if (sendUiUpdates &&
+				port.m_flow == Lv2Ports::Flow::Output &&
+				port.m_type == Lv2Ports::Type::Control)
+		{
+			const Lv2Ports::Control* ctrl = Lv2Ports::dcast<Lv2Ports::Control>(&port);
+			assert(ctrl);
+			char buf[sizeof(Lv2UiControlChange) + sizeof(float)];
+			Lv2UiControlChange* ev = (Lv2UiControlChange*)buf;
+			ev->index = p;
+			ev->protocol = 0;
+			ev->size = sizeof(float);
+			*(float*)(ev + 1) = ctrl->m_val;
+			if (m_pluginEvents.capacity() >= sizeof(buf))
+			{
+				m_pluginEvents.write(buf, sizeof(buf));
+			}
+			else
+			{
+				qWarning() << "Plugin => UI buffer overflow!";
+			}
+		}
 	}
 }
 
@@ -424,11 +657,13 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 
 
 
+#if 0
 AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 {
 	const auto itr = m_connectedModels.find(uri.toUtf8().data());
 	return itr != m_connectedModels.end() ? itr->second : nullptr;
 }
+#endif
 
 
 
@@ -442,6 +677,8 @@ void Lv2Proc::initPlugin()
 	m_instance = lilv_plugin_instantiate(m_plugin,
 		Engine::audioEngine()->outputSampleRate(),
 		m_features.featurePointers());
+	
+	m_features.m_extData.data_access = lilv_instance_get_descriptor(m_instance)->extension_data;
 
 	if (m_instance)
 	{
@@ -462,9 +699,7 @@ void Lv2Proc::initPlugin()
 	{
 		qCritical() << "Failed to create an instance of"
 			<< qStringFromPluginNode(m_plugin, lilv_plugin_get_name)
-			<< "(URI:"
-			<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
-			<< ")";
+			<< "(URI:" << pluginUri() << ")";
 		throw std::runtime_error("Failed to create Lv2 processor");
 	}
 }
@@ -497,6 +732,47 @@ bool Lv2Proc::hasNoteInput() const
 
 
 
+std::size_t Lv2Proc::getIdOfPort(const char* symbol) const
+{
+	std::size_t idx = 0;
+	for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
+	{
+		if (!strcmp(port.get()->uri().toUtf8().data(), symbol))
+		{
+			return idx;
+		}
+		++idx;
+	}
+	return -1;
+}
+
+
+
+
+QString Lv2Proc::portname(std::size_t idx) const { return m_ports[idx].get()->name(); }
+
+
+
+
+uint32_t Lv2Proc::portNum() const
+{
+	return m_ports.size();
+}
+
+
+
+
+bool Lv2Proc::isUiActive() const
+{
+	// m_uiEventsReader is connected in Lv2ViewProc CTOR
+	// not connected => Lv2ViewProc CTOR has not been completed
+	// connected => Lv2ViewProc CTOR has not been completed "sufficiently"
+	return !!m_uiEventsReader;
+}
+
+
+
+
 void Lv2Proc::initMOptions()
 {
 	/*
@@ -512,13 +788,24 @@ void Lv2Proc::initMOptions()
 	float sampleRate = Engine::audioEngine()->outputSampleRate();
 	int32_t blockLength = Engine::audioEngine()->framesPerPeriod();
 	int32_t sequenceSize = defaultEvbufSize();
-
+	// Create dummy object to find out the color
+	// I wish there was a more clean way...
+	/*gui::SubWindow tmpSubWindow;
+	int32_t backgroundColor = tmpSubWindow.palette().color(QPalette::Window).rgba();
+	int32_t foregroundColor = tmpSubWindow.palette().color(QPalette::WindowText).rgba();*/
+	int32_t backgroundColor = 0xffffffff;
+	int32_t foregroundColor = 0x000000ff;
+	qDebug() << backgroundColor << " <-> " << foregroundColor;
 	using Id = Lv2UridCache::Id;
 	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
 	m_options.initOption<int32_t>(Id::bufsz_maxBlockLength, blockLength);
 	m_options.initOption<int32_t>(Id::bufsz_minBlockLength, blockLength);
 	m_options.initOption<int32_t>(Id::bufsz_nominalBlockLength, blockLength);
 	m_options.initOption<int32_t>(Id::bufsz_sequenceSize, sequenceSize);
+	m_options.initOption<float>(Id::ui_updateRate, lv2UiRefreshRate());
+	m_options.initOption<float>(Id::ui_scaleFactor, lv2UiScaleFactor());
+	m_options.initOption<int32_t>(Id::ui_backgroundColor, backgroundColor);
+	m_options.initOption<int32_t>(Id::ui_foregroundColor, foregroundColor);
 	m_options.createOptionVectors();
 }
 
@@ -529,7 +816,7 @@ void Lv2Proc::initPluginSpecificFeatures()
 {
 	// options
 	initMOptions();
-	m_features[LV2_OPTIONS__options] = const_cast<LV2_Options_Option*>(m_options.feature());
+	m_features[LV2_OPTIONS__options].data = const_cast<LV2_Options_Option*>(m_options.feature());
 
 	// worker (if plugin has worker extension)
 	Lv2Manager* mgr = Engine::getLv2Manager();
@@ -537,7 +824,7 @@ void Lv2Proc::initPluginSpecificFeatures()
 	{
 		bool threaded = !Engine::audioEngine()->renderOnly();
 		m_worker.emplace(&m_workLock, threaded);
-		m_features[LV2_WORKER__schedule] = m_worker->feature();
+		m_features[LV2_WORKER__schedule].data = m_worker->feature();
 		// note: the worker interface can not be instantiated yet - it requires m_instance. see initPlugin()
 	}
 }
@@ -576,9 +863,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				{
 					qWarning()	<< "Warning: Plugin"
 								<< qStringFromPluginNode(m_plugin, lilv_plugin_get_name)
-								<< "(URI:"
-								<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
-								<< ") has a default value for port"
+								<< "(URI:" << pluginUri() << ") has a default value for port"
 								<< dispName
 								<< "which is not in range [min, max].";
 				}
@@ -698,7 +983,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				lv2_evbuf_new(static_cast<uint32_t>(minimumSize),
 								mgr->uridMap().map(LV2_ATOM__Chunk),
 								mgr->uridMap().map(LV2_ATOM__Sequence)));
-
+			
 			port = atomPort;
 			break;
 		}
@@ -917,5 +1202,24 @@ AutoLilvNode Lv2Proc::uri(const char *uriStr)
 
 
 } // namespace lmms
+
+/*
+	*Note:	lv2_evbuf_is_valid is called only for output ports here
+			output ports are created with "evbuf->buf.atom.type == evbuf->atom_Chunk",
+			so lv2_evbuf_is_valid would always return false
+						
+			However, the atom.type can get overwritten by the plugin, e.g. like
+			in the following backtrace:
+
+			memcpy
+			lv2_atom_forge_raw
+			lv2_atom_forge_write
+			lv2_atom_forge_sequence_head
+			lsp::lv2::Extensions::forge_sequence_head
+			lsp::lv2::Wrapper::transmit_atoms
+			lsp::lv2::Wrapper::run
+			lsp::lv2::run
+			lilv_instance_run
+*/
 
 #endif // LMMS_HAVE_LV2

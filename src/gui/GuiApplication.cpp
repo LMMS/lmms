@@ -41,14 +41,20 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QDir>
 #include <QtGlobal>
 #include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <QtGlobal>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
+#endif
+
+#ifdef LMMS_HAVE_SUIL
+	#include <suil/suil.h>
 #endif
 
 namespace lmms
@@ -73,7 +79,7 @@ GuiApplication* GuiApplication::instance()
 
 
 
-GuiApplication::GuiApplication()
+GuiApplication::GuiApplication(int *argc, char ***argv)
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
@@ -103,6 +109,34 @@ GuiApplication::GuiApplication()
 #ifdef LMMS_BUILD_APPLE
 	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
+
+#ifdef LMMS_HAVE_SUIL
+	if(qgetenv("SUIL_MODULE_DIR").isEmpty())
+	{
+	// Load Suil modules from a bundled application
+#if defined(LMMS_BUILD_WIN32)
+		if(qApp->applicationDirPath().contains("/Program Files/")) {
+			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../suil-0/").toUtf8());
+		}
+#elif defined(LMMS_BUILD_APPLE)
+		if(qApp->applicationDirPath().endsWith("/Contents/MacOS")) {
+			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../Frameworks/suil-0/").toUtf8());
+		}
+#else
+		if(qApp->applicationDirPath().contains("/squashfs-root/") ||
+				qApp->applicationDirPath().contains("/.mount_lmms-") ||
+				qApp->applicationDirPath().startsWith("/opt/lmms/")) {
+			qputenv("SUIL_MODULE_DIR", qApp->applicationDirPath().append("/../lib/suil-0/").toUtf8());
+		}
+#endif
+	}
+	else { qDebug() << "Using SUIL_MODULE_DIR from commandline:" << qgetenv("SUIL_MODULE_DIR"); }
+	// Note: The suil_init documentation says "This function should be called
+	// as early as possible, before any other GUI" - This place here is after the LMMS
+	// arguments have been passed. We do so because qApp->applicationDirPath() (see above)
+	// can not be called before GuiApplication has been inited.
+	suil_init(argc, argv, SUIL_ARG_NONE);
+#endif // LMMS_HAVE_SUIL
 
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
