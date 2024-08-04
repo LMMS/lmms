@@ -264,6 +264,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", 3);
 	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", 4);
 	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
+// EffectRackView has sizeHint to be QSize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1)
+
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -330,7 +332,7 @@ void InstrumentTrackWindow::resizeEvent(QResizeEvent * event) {
 	adjustTabSize(m_instrumentView);
 	adjustTabSize(m_instrumentFunctionsView);
 	adjustTabSize(m_ssView);
-	adjustTabSize(m_effectView);
+	// EffectRackView has sizeHint to be QSize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1)
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_tuningView);
 }
