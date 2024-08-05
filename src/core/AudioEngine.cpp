@@ -328,11 +328,7 @@ void AudioEngine::renderStageNoteSetup()
 		if( it != m_playHandles.end() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
-			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
-			}
-			else delete *it;
+			delete *it;
 			m_playHandles.erase( it );
 		}
 
@@ -393,11 +389,7 @@ void AudioEngine::renderStageEffects()
 		if( ( *it )->isFinished() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
-			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
-			}
-			else delete *it;
+			delete *it;
 			it = m_playHandles.erase( it );
 		}
 		else
@@ -660,12 +652,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 		return true;
 	}
 
-	if( handle->type() == PlayHandle::Type::NotePlayHandle )
-	{
-		NotePlayHandleManager::release( (NotePlayHandle*)handle );
-	}
-	else delete handle;
-
+	delete handle;
 	return false;
 }
 
@@ -709,14 +696,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 		// Only deleting PlayHandles that were actually found in the list
 		// "fixes crash when previewing a preset under high load"
 		// (See tobydox's 2008 commit 4583e48)
-		if ( removedFromList )
-		{
-			if (ph->type() == PlayHandle::Type::NotePlayHandle)
-			{
-				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
-			}
-			else { delete ph; }
-		}
+		if (removedFromList) { delete ph; }
 	}
 	else
 	{
@@ -737,11 +717,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
-			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
-			}
-			else delete *it;
+			delete *it;
 			it = m_playHandles.erase( it );
 		}
 		else
