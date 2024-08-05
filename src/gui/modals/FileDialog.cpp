@@ -46,19 +46,26 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-#ifdef LMMS_BUILD_LINUX
-	QList<QUrl> urls;
-#else
+	auto addIfUnavailable = [](QList<QUrl>& urls, const QString& path)
+	{
+		auto newUrl = QUrl::fromLocalFile(path);
+	
+		if (!urls.contains(newUrl))
+		{
+			urls << newUrl;
+		}
+	};
+
+	m_oldURLs = sidebarUrls();
 	QList<QUrl> urls = sidebarUrls();
-#endif
 
 	QDir desktopDir;
 	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
 	if (desktopDir.exists())
 	{
-		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
+	    addIfUnavailable(urls, desktopDir.absolutePath());
 	}
-	
+
 	QDir downloadDir(QDir::homePath() + "/Downloads");
 	if (!downloadDir.exists())
 	{
@@ -66,24 +73,24 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	}
 	if (downloadDir.exists())
 	{
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
+		addIfUnavailable(urls, downloadDir.absolutePath());
 	}
 
 	QDir musicDir;
 	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
 	if (musicDir.exists())
 	{
-		urls << QUrl::fromLocalFile(musicDir.absolutePath());
+		addIfUnavailable(urls, musicDir.absolutePath());
 	}
 
-	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
-	
+	addIfUnavailable(urls, ConfigManager::inst()->workingDir());
+
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
 #ifdef LMMS_BUILD_APPLE
 	QDir volumesDir( QDir("/Volumes") );
 	if ( volumesDir.exists() )
-		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+		addIfUnavailable(urls, volumesDir.absolutePath());
 #endif
 
 #ifdef LMMS_BUILD_LINUX
@@ -96,13 +103,18 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 		storage.refresh();
 
 		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
-		{			
-			urls << QUrl::fromLocalFile(storage.rootPath());	
+		{
+			addIfUnavailable(urls, storage.rootPath());
 		}
 	}
 #endif
 
 	setSidebarUrls(urls);
+}
+
+FileDialog::~FileDialog()
+{
+	setSidebarUrls(m_oldURLs);
 }
 
 
