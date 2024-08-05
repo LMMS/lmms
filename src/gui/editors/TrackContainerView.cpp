@@ -281,7 +281,6 @@ void TrackContainerView::realignTracks()
 				{
 					MidiClip* curClip = reinterpret_cast<MidiClip*>(curTrack->getClip(0));
 					int curSteps = curClip->getSteps();
-					qDebug("size = %d", curSteps);
 					if (maxSteps < curSteps)
 					{
 						maxSteps = curSteps;
