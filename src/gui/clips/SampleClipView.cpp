@@ -34,7 +34,7 @@
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
-#include "SampleWaveform.h"
+#include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -45,6 +45,7 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
+	m_thumbnaillist(  SampleThumbnailListManager() ),
 	m_paintPixmap()
 {
 	// update UI and tooltip
@@ -61,6 +62,9 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 void SampleClipView::updateSample()
 {
 	update();
+	
+	m_thumbnaillist = SampleThumbnailListManager(m_clip->m_sample);
+	
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
@@ -268,13 +272,28 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	QRect r = QRect( offset, spacing,
-			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-
+	// Visualize
+	float offsetStart 	=  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	float sampleLength  =  m_clip->sampleLength() * ppb / ticksPerBar;
+	float clipLength 	= m_clip->length() * ppb / ticksPerBar;
+	
 	const auto& sample = m_clip->m_sample;
-	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	SampleWaveform::visualize(waveform, p, r);
+
+	auto param = SampleThumbnailVisualizeParameters();
+
+	param.amplification = sample.amplification();
+	param.reversed 		= sample.reversed();
+
+	param.x = static_cast<long>(offsetStart);
+	param.y = spacing;
+
+	param.width 	= std::max<long>(static_cast<long>(sampleLength), 1);
+	param.height 	= rect().bottom() - 2 * spacing;
+
+	param.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart);
+
+	m_thumbnaillist.visualize(param, p);
+	//
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

@@ -34,6 +34,7 @@
 
 #include "Instrument.h"
 #include "SampleBuffer.h"
+#include "SampleThumbnail.h"
 
 namespace lmms {
 
@@ -108,6 +109,8 @@ private:
 	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
+	
+	SampleThumbnailListManager m_thumbnaillist;
 
 	SlicerT* m_slicerTParent;
 
