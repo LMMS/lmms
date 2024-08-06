@@ -29,6 +29,8 @@
 #include "WaveShaperControls.h"
 #include "embed.h"
 #include "Graph.h"
+#include "VectorGraphView.h"
+#include "VectorGraphModel.h"
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "LedCheckBox.h"
@@ -39,7 +41,8 @@ namespace lmms::gui
 
 WaveShaperControlDialog::WaveShaperControlDialog(
 					WaveShaperControls * _controls ) :
-	EffectControlDialog( _controls )
+	EffectControlDialog(_controls),
+	m_vectorGraphWidget(nullptr)
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -48,16 +51,14 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	auto waveGraph = new Graph(this, Graph::Style::LinearNonCyclic, 204, 205);
-	waveGraph -> move( 10, 6 );
-	waveGraph -> setModel( &_controls -> m_wavegraphModel );
-	waveGraph -> setAutoFillBackground( true );
-	pal = QPalette();
-	pal.setBrush( backgroundRole(),
-			PLUGIN_NAME::getIconPixmap("wavegraph") );
-	waveGraph->setPalette( pal );
-	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
-	waveGraph -> setMaximumSize( 204, 205 );
+	m_vectorGraphWidget = new VectorGraphView(this, 204, 205, 8, 30, false);
+	m_vectorGraphWidget->setModel(&_controls->m_vectorGraphModel);
+	m_vectorGraphWidget->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
+	// this can cause problems with custom colors
+	m_vectorGraphWidget->applyDefaultColors();
+	// custom colors can be set this way (but this garph uses applyDefaultColros()):
+	// example: m_vectorGraphWidget->setLineColor(QColor(210, 50, 50, 255), arrayLocation);
+	m_vectorGraphWidget->move(10, 6);
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);
 	inputKnob -> setVolumeKnob( true );
@@ -76,32 +77,18 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
-	resetButton -> move( 162, 221 );
+	resetButton -> move(162, 225);
 	resetButton -> resize( 13, 46 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	resetButton->setToolTip(tr("Reset wavegraph"));
 
-	auto smoothButton = new PixmapButton(this, tr("Smooth wavegraph"));
-	smoothButton -> move( 162, 237 );
-	smoothButton -> resize( 13, 46 );
-	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
-	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
-	smoothButton->setToolTip(tr("Smooth wavegraph"));
-
-	auto addOneButton = new PixmapButton(this, tr("Increase wavegraph amplitude by 1 dB"));
-	addOneButton -> move( 131, 221 );
-	addOneButton -> resize( 13, 29 );
-	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
-	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
-	addOneButton->setToolTip(tr("Increase wavegraph amplitude by 1 dB"));
-
-	auto subOneButton = new PixmapButton(this, tr("Decrease wavegraph amplitude by 1 dB"));
-	subOneButton -> move( 131, 237 );
-	subOneButton -> resize( 13, 29 );
-	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
-	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
-	subOneButton->setToolTip(tr("Decrease wavegraph amplitude by 1 dB"));
+	auto simplifyButton = new PixmapButton(this, tr("Simplify graph displayed"));
+	simplifyButton->move(112, 225);
+	simplifyButton->resize(13, 46);
+	simplifyButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("simplify_active"));
+	simplifyButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("simplify_inactive"));
+	simplifyButton->setToolTip(tr("Simplify the graph display for performance"));
 
 	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::LedColor::Green);
 	clipInputToggle -> move( 131, 252 );
@@ -110,13 +97,17 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 
 	connect( resetButton, SIGNAL (clicked () ),
 			_controls, SLOT ( resetClicked() ) );
-	connect( smoothButton, SIGNAL (clicked () ),
-			_controls, SLOT ( smoothClicked() ) );
-	connect( addOneButton, SIGNAL( clicked() ),
-			_controls, SLOT( addOneClicked() ) );
-	connect( subOneButton, SIGNAL( clicked() ),
-			_controls, SLOT( subOneClicked() ) );
+	connect(simplifyButton, SIGNAL(clicked()),
+			this, SLOT(simplifyClicked()));
 }
 
+void WaveShaperControlDialog::simplifyClicked()
+{
+	if (m_vectorGraphWidget != nullptr)
+	{
+		m_vectorGraphWidget->setIsSimplified(!m_vectorGraphWidget->getIsSimplified());
+		m_vectorGraphWidget->model()->updateGraphModel(true);
+	}
+}
 
 } // namespace lmms::gui

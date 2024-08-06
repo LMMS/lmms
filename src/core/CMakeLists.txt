@@ -86,6 +86,7 @@ set(LMMS_SRCS
 	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
+	core/VectorGraphModel.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
 
