@@ -170,6 +170,16 @@ public:
 		return castValue<T>( m_value );
 	}
 
+	inline float getTrueValue(int frameOffset = 0) const
+	{
+		if (!m_controllerConnection && !hasLinkedModels())
+		{
+			return m_value;
+		}
+
+		return controllerValue(frameOffset);
+	}
+
 	float controllerValue( int frameOffset ) const;
 
 	//! @brief Function that returns sample-exact data as a ValueBuffer
