@@ -203,7 +203,7 @@ static void exSyncMode(bool playing)
 {
 	auto _ = Engine::getSong();
 
-	if ((exSyncReact()) && (_->isPlaying() != playing)) 
+	if ((! _->isExporting()) && (exSyncReact()) && (_->isPlaying() != playing)) 
 	{
 		if ( _->isStopped() ) { _->playSong(); } else {	_->togglePause(); }
 	}
@@ -214,7 +214,7 @@ static void exSyncPosition(uint32_t frames)
 {
 	auto _ = Engine::getSong();
 
-	if ((exSyncReact()) && (_->playMode()  == Song::PlayMode::Song))
+	if ((! _->isExporting()) && (exSyncReact()) && (_->playMode()  == Song::PlayMode::Song))
 	{
 		_->setToTime(TimePos::fromFrames(frames , Engine::framesPerTick()));
 	}
@@ -227,8 +227,8 @@ static sample_rate_t exSyncSampleRate()
 }
 
 
-// In future will be array ExSyncHandler cs_exSyncCallbacks[]
-// now available only one target: Jack Transport
+//! Function used by internal code to send messages to LMMS::Song from
+//! external device (in Slave , Duplex modes)
 static struct ExSyncCallbacks cs_exSyncCallbacks = {
 	&exSyncMode,
 	&exSyncPosition,
@@ -300,7 +300,7 @@ void exSyncSendPosition()
 	struct SongExtendedPos pos;
 	auto _ = Engine::getSong();
 	
-	if (cs_exSyncMasterOn && cs_exSyncOn)
+	if ((! _->isExporting()) && cs_exSyncMasterOn && cs_exSyncOn)
 	{
 		pos.bar = _->getBars();
 		pos.beat = _->getBeat();
@@ -313,7 +313,7 @@ void exSyncSendPosition()
 		pos.frame = _->getFrames();
 		
 		ExSyncHandler * sync =  exSyncGetHandler();
-		sync->sendPosition(&pos);
+		if (sync) { sync->sendPosition(&pos); }
 	}
 }
 
