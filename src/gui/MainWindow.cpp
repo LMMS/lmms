@@ -1523,8 +1523,8 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
-		epd.exec();
+		auto exportDialog = ExportProjectDialog{exportFileName, multiExport, nullptr, getGUI()->mainWindow()};
+		exportDialog.exec();
 	}
 }
 
