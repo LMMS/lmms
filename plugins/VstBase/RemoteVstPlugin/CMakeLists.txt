@@ -1,4 +1,9 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.13)
+
+if(POLICY "CMP0092")
+	cmake_policy(SET CMP0092 NEW) # MSVC warning flags are not in CMAKE_<LANG>_FLAGS by default.
+endif()
+
 project(RemoteVstPlugin 
 	LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
@@ -21,6 +26,9 @@ FOREACH( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 	STRING(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
 	SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 ENDFOREACH()
+
+# Add warning and error flags
+include(ErrorFlags)
 
 # Import of windows.h breaks min()/max()
 add_definitions(-DNOMINMAX)

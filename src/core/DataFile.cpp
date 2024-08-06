@@ -85,6 +85,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
+	&DataFile::findProblematicLadspaPlugins
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1072,7 +1073,6 @@ void DataFile::upgrade_0_4_0_rc2()
 	}
 }
 
-
 void DataFile::upgrade_1_0_99()
 {
 	jo_id_t last_assigned_id = 0;
@@ -1976,6 +1976,39 @@ void DataFile::upgrade_midiCCIndexing()
 				element.setAttribute(attrName, cc - 1);
 			}
 		}
+	}
+}
+
+void DataFile::findProblematicLadspaPlugins()
+{
+	// This is not an upgrade but a check for potentially problematic LADSPA
+	// controls. See #5738 for more details.
+
+	const QDomNodeList ladspacontrols = elementsByTagName("ladspacontrols");
+
+	uint numberOfProblematicPlugins = 0;
+
+	for (int i = 0; i < ladspacontrols.size(); ++i)
+	{
+		const QDomElement ladspacontrol = ladspacontrols.item(i).toElement();
+
+		const auto attributes = ladspacontrol.attributes();
+		for (int j = 0; j < attributes.length(); ++j)
+		{
+			const auto attribute = attributes.item(j);
+			const auto name = attribute.nodeName();
+			if (name != "ports" && name.startsWith("port"))
+			{
+				++numberOfProblematicPlugins;
+				break;
+			}
+		}
+	}
+
+	if (numberOfProblematicPlugins > 0)
+	{
+		QMessageBox::warning(nullptr, QObject::tr("LADSPA plugins"),
+			QObject::tr("The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.").arg(numberOfProblematicPlugins));
 	}
 }
 
