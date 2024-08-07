@@ -29,12 +29,16 @@
 #include "AutomatableModel.h"
 #include "PluginView.h"
 #include "Effect.h"
+#include "EffectLabelButton.h"
 
 class QGraphicsOpacityEffect;
 class QGroupBox;
 class QLabel;
 class QPushButton;
 class QMdiSubWindow;
+class QHBoxLayout;
+class QLabel;
+class QToolButton;
 
 namespace lmms::gui
 {
@@ -62,11 +66,13 @@ public:
 	}
 
 	static constexpr int DEFAULT_WIDTH = 215;
-	static constexpr int DEFAULT_HEIGHT = 60;
+	static constexpr int DEFAULT_HEIGHT = 35;
 	
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
+
+	void setViewWidth(int px);
 
 public slots:
 	void editControls();
@@ -88,17 +94,19 @@ protected:
 
 
 private:
-	QPixmap m_bg;
+	QHBoxLayout* m_mainLayout;
 	LedCheckBox * m_bypass;
+	EffectLabelButton* m_label;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	
+	int m_viewWidth;
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;
 
+	friend class EffectLabelButton;
 } ;
 
 
