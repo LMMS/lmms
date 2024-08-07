@@ -26,7 +26,6 @@
 #define LMMS_TYPES_H
 
 #include <cstddef>
-#include <limits>
 
 #include "lmmsconfig.h"
 
@@ -54,57 +53,6 @@ using bitrate_t = uint16_t;		// bitrate in kbps
 using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
 
 using jo_id_t = uint32_t; // (unique) ID of a journalling object
-
-// windows headers define "min" and "max" macros, breaking the methods bwloe
-#undef min
-#undef max
-
-template<typename T>
-struct typeInfo
-{
-	static inline T min()
-	{
-		return std::numeric_limits<T>::min();
-	}
-
-	static inline T max()
-	{
-		return std::numeric_limits<T>::max();
-	}
-
-	static inline T minEps()
-	{
-		return 1;
-	}
-
-	static inline bool isEqual( T x, T y )
-	{
-		return x == y;
-	}
-
-	static inline T absVal( T t )
-	{
-		return t >= 0 ? t : -t;
-	}
-} ;
-
-
-template<>
-inline float typeInfo<float>::minEps()
-{
-	return 1.0e-10f;
-}
-
-template<>
-inline bool typeInfo<float>::isEqual( float x, float y )
-{
-	if( x == y )
-	{
-		return true;
-	}
-	return absVal( x - y ) < minEps();
-}
-
 
 
 constexpr ch_cnt_t DEFAULT_CHANNELS = 2;

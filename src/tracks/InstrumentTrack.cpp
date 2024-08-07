@@ -342,7 +342,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
 								this, offset,
-								typeInfo<f_cnt_t>::max() / 2,
+								std::numeric_limits<f_cnt_t>::max() / 2,
 								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
 										event.key(), event.volume(midiPort()->baseVelocity())),
 								nullptr, event.channel(),
