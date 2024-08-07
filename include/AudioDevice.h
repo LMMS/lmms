@@ -71,6 +71,11 @@ public:
 		return m_supportsCapture;
 	}
 
+	inline bool isCaptureOn() const
+	{
+		return m_captureOn;
+	}
+
 	inline sample_rate_t sampleRate() const
 	{
 		return m_sampleRate;
@@ -89,6 +94,11 @@ public:
 	}
 
 	virtual void stopProcessing();
+
+	//! Starts capture callback if can, driver MUST override if enebales capture
+	virtual void startCapture();
+	//! Stops capture callback if can, driver MUST override if enebales capture
+	virtual void stopCapture();
 
 protected:
 	// subclasses can re-implement this for being used in conjunction with
@@ -124,6 +134,7 @@ protected:
 
 protected:
 	bool m_supportsCapture;
+	bool m_captureOn;
 
 
 private:

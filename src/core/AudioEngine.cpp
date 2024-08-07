@@ -280,7 +280,11 @@ bool AudioEngine::criticalXRuns() const
 
 void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 {
-	requestChangeInModel();
+	bool needCapture = Engine::getSong()->isRecording();
+	if (needCapture)
+	{
+		requestChangeInModel(); // future_hint : MUST NOT be here
+	}
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
 	auto size = m_inputBufferSize[m_inputBufferWrite];
@@ -302,7 +306,10 @@ void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( SampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 
-	doneChangeInModel();
+	if (needCapture)
+	{
+		doneChangeInModel(); // future_hint : MUST NOT be here
+	}
 }
 
 
