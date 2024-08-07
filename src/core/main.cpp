@@ -43,10 +43,6 @@
 #include <windows.h>
 #endif
 
-#ifdef LMMS_HAVE_SCHED_H
-#include "sched.h"
-#endif
-
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
 #endif
