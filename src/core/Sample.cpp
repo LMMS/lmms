@@ -24,6 +24,8 @@
 
 #include "Sample.h"
 
+#include "lmms_math.h"
+
 #include <cassert>
 
 namespace lmms {
@@ -143,7 +145,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto outputFrames = static_cast<f_cnt_t>(resampleResult.outputFramesGenerated);
 	if (outputFrames < numFrames) { std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{}); }
 
-	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
+	if (!approximatelyEqual(m_amplification, 1.0f))
 	{
 		for (auto i = std::size_t{0}; i < numFrames; ++i)
 		{
