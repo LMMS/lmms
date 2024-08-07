@@ -49,15 +49,15 @@
 namespace lmms::gui
 {
 
-EffectView::EffectView( Effect * _model, QWidget * _parent ) :
-	PluginView( _model, _parent ),
-	m_subWindow( nullptr ),
+EffectView::EffectView(Effect * _model, QWidget * _parent) :
+	PluginView(_model, _parent),
+	m_subWindow(nullptr),
 	m_controlView(nullptr),
 	m_dragging(false)
 {
 	setFocusPolicy(Qt::StrongFocus);
 	setViewWidth(EffectView::DEFAULT_WIDTH);
-	
+
 	m_mainLayout = new QHBoxLayout();
 	m_mainLayout->setContentsMargins(8, 2, 8, 2);
 
@@ -73,6 +73,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_label = new EffectLabelButton(this, this);
 	m_label->setText(model()->displayName());
 	m_label->setFont(labelFont);
+	m_label->setCheckable(true);
 	m_label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 	if(hasControls)
 	{
@@ -146,13 +147,13 @@ void EffectView::editControls()
 			m_subWindow->show();
 			m_subWindow->raise();
 			effect()->controls()->setViewVisible(true);
-			m_label->setDown(true);
+			m_label->setChecked(true);
 		}
 		else
 		{
 			m_subWindow->hide();
 			effect()->controls()->setViewVisible(false);
-			m_label->setDown(false);
+			m_label->setChecked(false);
 		}
 	}
 }
@@ -189,7 +190,8 @@ void EffectView::closeEffects()
 	{
 		m_subWindow->hide();
 	}
-	effect()->controls()->setViewVisible( false );
+	effect()->controls()->setViewVisible(false);
+	m_label->setChecked(false);
 }
 
 
