@@ -84,8 +84,6 @@ bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 	if( m_bbControls.m_gainModel.isValueChanged() ) { changeGain(); }
 	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
 
-	const float const_gain = m_bbControls.m_gainModel.value();
-	const ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
 
 	double outSum = 0.0;
 	const float d = dryLevel();
@@ -96,7 +94,7 @@ bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 		auto& currentFrame = buf[f];
 
 		// Process copy of current sample frame
-		m_bbFX.setGain(gainBuffer ? gainBuffer->value(f) : const_gain);
+		m_bbFX.setGain(m_bbControls.m_gainModel.valueAt(f));
 		auto s = currentFrame;
 		m_bbFX.nextSample(s);
 
