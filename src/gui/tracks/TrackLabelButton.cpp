@@ -51,6 +51,9 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 	m_renameLineEdit = new TrackRenameLineEdit( this );
+	auto font = QFont();
+	font.setPointSize(8);
+	m_renameLineEdit->setFont(font);
 	m_renameLineEdit->hide();
 	
 	if (isInCompactMode())
@@ -60,8 +63,8 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	else
 	{
 		setFixedSize( 160, 29 );
-		m_renameLineEdit->move( 30, ( height() / 2 ) - ( m_renameLineEdit->sizeHint().height() / 2 ) );
-		m_renameLineEdit->setFixedWidth( width() - 33 );
+		m_renameLineEdit->move(25, ( height() / 2  - m_renameLineEdit->sizeHint().height() / 2 ) + 1);
+		m_renameLineEdit->setFixedWidth(width() - 31);
 		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	}
 	
