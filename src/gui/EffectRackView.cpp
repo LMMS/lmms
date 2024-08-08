@@ -273,4 +273,13 @@ void EffectRackView::modelChanged()
 
 
 
+QSize EffectRackView::sizeHint() const
+{
+	// Use the formula from InstrumentTrackWindow.cpp
+	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
+}
+
+
+
+
 } // namespace lmms::gui
