@@ -55,9 +55,9 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	m_controlView(nullptr),
 	m_dragging(false)
 {
+	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
 	setFocusPolicy(Qt::StrongFocus);
-	setViewWidth(EffectView::DEFAULT_WIDTH);
-
+	
 	m_mainLayout = new QHBoxLayout();
 	m_mainLayout->setContentsMargins(8, 2, 8, 2);
 
@@ -92,7 +92,7 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	m_autoQuit->setHintText(tr("Stop after:"), "ms");
 	m_mainLayout->addWidget(m_autoQuit);
 
-	setModel(_model);
+	setModel( _model );
 
 	if(hasControls)
 	{
@@ -259,7 +259,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p(this);
 	QPainterPath path;
 
-	path.addRoundedRect(QRectF(2, 2, m_viewWidth - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
+	path.addRoundedRect(QRectF(2, 2, EffectView::DEFAULT_WIDTH - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
 
 	QPen pen(Qt::black, 1);
 	p.setPen(pen);
@@ -275,15 +275,6 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
-}
-
-
-
-
-void EffectView::setViewWidth(int px)
-{
-	m_viewWidth = px;
-	setFixedSize(m_viewWidth, EffectView::DEFAULT_HEIGHT);
 }
 
 } // namespace lmms::gui

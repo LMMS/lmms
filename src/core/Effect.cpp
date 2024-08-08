@@ -143,9 +143,9 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate(double _out_sum)
+void Effect::checkGate( double _out_sum )
 {
-	if(m_autoQuitDisabled)
+	if( m_autoQuitDisabled )
 	{
 		return;
 	}
@@ -155,7 +155,7 @@ void Effect::checkGate(double _out_sum)
 	if (_out_sum <= F_EPSILON)
 	{
 		incrementBufferCount();
-		if(bufferCount() > timeout())
+		if( bufferCount() > timeout() )
 		{
 			stopRunning();
 			resetBufferCount();
