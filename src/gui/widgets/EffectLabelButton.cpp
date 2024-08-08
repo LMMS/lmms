@@ -37,36 +37,32 @@
 namespace lmms::gui
 {
 
-EffectLabelButton::EffectLabelButton( EffectView * _tv, QWidget * _parent ) :
-	QPushButton( _parent ),
-	m_effectView( _tv ),
+EffectLabelButton::EffectLabelButton(EffectView* _tv, QWidget* _parent) :
+	QPushButton(_parent),
+	m_effectView(_tv),
 	m_iconName()
 {
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAcceptDrops(false);
 
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
 	setStyleSheet("text-align:left;padding:2px;");
-
-	//setFixedSize( 160, 29 );
-	//setIconSize( QSize( 24, 24 ) );
 }
 
 void EffectLabelButton::paintEvent(QPaintEvent* pe)
 {
-	//setDown(!m_effectView->m_subWindow->isVisible());
 	QPushButton::paintEvent(pe);
 }
 
-QString EffectLabelButton::elideName( const QString &name )
+QString EffectLabelButton::elideName(const QString &name)
 {
 	const int spacing = 16;
 	const int maxTextWidth = width() - spacing - iconSize().width();
 
 	setToolTip(name);
 
-	QFontMetrics metrics( font() );
-	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextWidth );
+	QFontMetrics metrics(font());
+	QString elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextWidth);
 	return elidedName;
 }
 

@@ -36,18 +36,18 @@ class EffectLabelButton : public QPushButton
 {
 	Q_OBJECT
 public:
-	EffectLabelButton( EffectView * _tv, QWidget * _parent );
+	EffectLabelButton(EffectView* _tv, QWidget* _parent);
 	~EffectLabelButton() override = default;
 
 protected:
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
-	EffectView * m_effectView;
+	EffectView* m_effectView;
 	QString m_iconName;
 	QRect m_buttonRect;
-	QString elideName( const QString &name );
-} ;
+	QString elideName(const QString &name);
+};
 
 
 } // namespace lmms::gui
