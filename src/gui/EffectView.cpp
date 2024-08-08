@@ -99,10 +99,10 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 		m_controlView = effect()->controls()->createView();
 		if(m_controlView)
 		{
-			m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controlView);
-			if (!m_controlView->isResizable())
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
+			if ( !m_controlView->isResizable() )
 			{
-				m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 				if (m_subWindow->layout())
 				{
 					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -111,9 +111,9 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 
 			Qt::WindowFlags flags = m_subWindow->windowFlags();
 			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags(flags);
+			m_subWindow->setWindowFlags( flags );
 
-			connect(m_controlView, SIGNAL(closed()),
+			connect( m_controlView, SIGNAL(closed()),
 					this, SLOT(closeEffects()));
 
 			m_subWindow->hide();
@@ -146,13 +146,13 @@ void EffectView::editControls()
 		{
 			m_subWindow->show();
 			m_subWindow->raise();
-			effect()->controls()->setViewVisible(true);
+			effect()->controls()->setViewVisible( true );
 			m_label->setChecked(true);
 		}
 		else
 		{
 			m_subWindow->hide();
-			effect()->controls()->setViewVisible(false);
+			effect()->controls()->setViewVisible( false );
 			m_label->setChecked(false);
 		}
 	}
