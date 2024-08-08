@@ -26,6 +26,8 @@
 #define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
+#include <QList>
+#include <QUrl>
 
 #include "lmms_export.h"
 
@@ -40,6 +42,8 @@ public:
 	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
 						const QString &directory = QString(),
 						const QString &filter = QString() );
+						
+	~FileDialog();
 
 	static QString getExistingDirectory(QWidget *parent,
 										const QString &caption,
@@ -51,6 +55,9 @@ public:
 									const QString &filter = QString(),
 									QString *selectedFilter = 0);
 	void clearSelection();
+	
+private:
+	QList<QUrl> m_oldURLs;
 };
 
 
