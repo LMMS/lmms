@@ -97,7 +97,7 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	if(hasControls)
 	{
 		m_controlView = effect()->controls()->createView();
-		if(m_controlView)
+		if( m_controlView )
 		{
 			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
 			if ( !m_controlView->isResizable() )
@@ -190,7 +190,7 @@ void EffectView::closeEffects()
 	{
 		m_subWindow->hide();
 	}
-	effect()->controls()->setViewVisible(false);
+	effect()->controls()->setViewVisible( false );
 	m_label->setChecked(false);
 }
 
