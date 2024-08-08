@@ -774,7 +774,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		}
 		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 		{
-			animateScroll(m_leftRightScroll, std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f), m_smoothScroll);
+			m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f));
 		}
 		m_scrollBack = false;
 	}
