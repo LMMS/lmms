@@ -38,6 +38,9 @@
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "EnvelopeAndLfoParameters.h"
+//ExSync
+#include "ExSync.h"
+
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -110,6 +113,11 @@ Song::Song() :
 
 	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
 						SLOT(updateFramesPerTick()));
+
+#ifdef LMMS_HAVE_EXSYNC
+	//ExSync
+	connect( this, SIGNAL( playbackStateChanged() ), this, SLOT( onPlaybackStateChanged() ) );
+#endif
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
@@ -248,6 +256,9 @@ void Song::processNextBuffer()
 			setToTime(begin);
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
+
+			exSyncSendPosition(); //ExSync
+
 			return true;
 		}
 		return false;
@@ -645,6 +656,9 @@ void Song::stop()
 	auto& timeline = getTimeline();
 	m_paused = false;
 	m_recording = true;
+
+	if (m_playMode < Song::PlayMode::Pattern) { exSyncSendPosition(); } //ExSync
+
 	m_playing = false;
 
 	switch (timeline.stopBehaviour())
@@ -1409,6 +1423,22 @@ void Song::updateFramesPerTick()
 }
 
 
+
+#ifdef LMMS_HAVE_EXSYNC
+//ExSync
+void Song::onPlaybackStateChanged()
+{
+	if (exSyncMasterAndSync())
+	{
+		if (m_playMode < Song::PlayMode::Pattern) 
+		{
+			ExSyncHandler * sync =  exSyncGetHandler();
+			sync->sendPlay(m_playing);
+			exSyncSendPositioniIfMaster();
+		}
+	}
+}
+#endif
 
 
 void Song::setModified()

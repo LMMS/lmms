@@ -40,6 +40,9 @@
 #include "NStateButton.h"
 #include "TextFloat.h"
 
+//ExSync
+#include "ExSync.h"
+
 namespace lmms::gui
 {
 
@@ -51,6 +54,10 @@ namespace
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
 		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
 	QWidget{parent},
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	m_parentIsSongEditor(false),
+#endif
 	m_xOffset{xoff},
 	m_ppb{ppb},
 	m_pos{pos},
@@ -345,6 +352,10 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			m_pos.setCurrentFrame( 0 );
 			m_pos.setJumped( true );
 			updatePosition();
+#ifdef LMMS_HAVE_EXSYNC
+			//ExSync
+			if ( exSyncShouldSend() ) { exSyncSendPosition(); }
+#endif
 			break;
 
 		case Action::MoveLoopBegin:

@@ -38,8 +38,12 @@
 #include "MainWindow.h"
 #include "MidiJack.h"
 
+//ExSync
+#include "ExSync.h"
+
 namespace lmms
 {
+
 
 
 AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
@@ -185,6 +189,7 @@ void AudioJack::startProcessing()
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
+		syncJackd(m_client); // cs_syncJackd = m_client; //ExSync
 		return;
 	}
 
@@ -218,6 +223,7 @@ void AudioJack::startProcessing()
 	}
 
 	m_stopped = false;
+	syncJackd(m_client); // cs_syncJackd = m_client; //ExSync
 	jack_free(ports);
 }
 
@@ -227,6 +233,7 @@ void AudioJack::startProcessing()
 void AudioJack::stopProcessing()
 {
 	m_stopped = true;
+	syncJackd(nullptr); // cs_syncJackd = nullptr; //ExSync
 }
 
 void AudioJack::registerPort(AudioPort* port)

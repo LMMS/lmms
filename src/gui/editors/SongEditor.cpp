@@ -30,6 +30,9 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
+//ExSync
+#include <QPushButton> 
+
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
@@ -44,6 +47,9 @@
 #include "CPULoadWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
+//ExSync
+#include "ExSync.h"
+
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -56,6 +62,7 @@
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "TrackView.h"
+
 
 namespace lmms::gui
 {
@@ -102,6 +109,12 @@ SongEditor::SongEditor( Song * song ) :
 		m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, Song::PlayMode::Song, this
 	);
+
+#ifdef LMMS_HAVE_EXSYNC
+	//ExSync
+	m_timeLine->exSyncSetShouldSend(); // Mark TimeLineWidget for ExSync 
+#endif
+
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
@@ -227,6 +240,22 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->addStretch();
 
 	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
+
+#ifdef LMMS_HAVE_EXSYNC
+	//ExSync
+	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
+	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
+	m_exSyncButton->setStyleSheet("background-color:black");
+	m_exSyncButton->setFocusPolicy(Qt::NoFocus);
+	connect(m_exSyncButton, SIGNAL(clicked()), this, SLOT(toggleExSync()));
+	int exSyncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_exSyncButton, 0);
+	
+	m_exSyncModeButton = new QPushButton(exSyncGetModeString() , tb);
+	m_exSyncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
+	m_exSyncModeButton->setFocusPolicy(Qt::NoFocus);
+	connect(m_exSyncModeButton, SIGNAL(clicked()), this, SLOT(toggleExSyncMode()));
+	getGUI()->mainWindow()->addWidgetToToolBar( m_exSyncModeButton, 1, exSyncBoxCol);
+#endif
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -711,6 +740,33 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
+#ifdef LMMS_HAVE_EXSYNC
+//ExSync
+void SongEditor::toggleExSync()
+{
+	bool on = exSyncToggle();
+	if (on)
+	{
+		m_exSyncButton->setStyleSheet("background-color:green;");
+		m_exSyncModeButton->setText( exSyncGetModeString() );
+	} else {
+		m_exSyncButton->setStyleSheet("background-color:black");
+	}
+	if (!exSyncAvailable()) { m_exSyncModeButton->setText(""); }
+}
+
+
+
+//ExSync
+void SongEditor::toggleExSyncMode()
+{
+	m_exSyncModeButton->setText(exSyncToggleMode());
+}
+#endif
+
+
+
+
 void SongEditor::updateScrollBar(int len)
 {
 	m_leftRightScroll->setMaximum(len * TimePos::ticksPerBar());
@@ -755,6 +811,8 @@ void SongEditor::updatePosition( const TimePos & t )
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
+
+	exSyncStopped(); //ExSync
 
 	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
 							|| m_scrollBack)

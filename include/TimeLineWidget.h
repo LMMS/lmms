@@ -31,6 +31,9 @@
 #include <QSize>
 #include <QWidget>
 
+//ExSync
+#include "ExSync.h"
+
 #include "Song.h"
 #include "embed.h"
 
@@ -157,6 +160,12 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+#ifdef LMMS_HAVE_EXSYNC
+	//ExSync
+	inline bool exSyncShouldSend() { return m_parentIsSongEditor; }
+	inline void exSyncSetShouldSend() { m_parentIsSongEditor = true; }
+#endif
+
 signals:
 	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
@@ -187,6 +196,11 @@ private:
 		MoveLoop,
 		SelectSongClip,
 	};
+
+#ifdef LMMS_HAVE_JACK
+	//ExSync
+	bool m_parentIsSongEditor;	
+#endif
 
 	auto getClickedTime(int xPosition) const -> TimePos;
 	auto getLoopAction(QMouseEvent* event) const -> Action;

@@ -32,6 +32,7 @@
 
 class QLabel;
 class QScrollBar;
+class QPushButton; //ExcSync
 
 namespace lmms
 {
@@ -107,6 +108,12 @@ private slots:
 	void updateMasterPitchFloat( int new_val );
 	void hideMasterPitchFloat();
 
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	void toggleExSync();
+	void toggleExSyncMode();
+#endif
+
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
@@ -129,6 +136,12 @@ private:
 	QScrollBar * m_leftRightScroll;
 
 	LcdSpinBox * m_tempoSpinBox;
+
+#ifdef LMMS_HAVE_JACK
+	//ExSync
+	QPushButton * m_exSyncButton;
+	QPushButton * m_exSyncModeButton;
+#endif
 
 	TimeLineWidget * m_timeLine;
 

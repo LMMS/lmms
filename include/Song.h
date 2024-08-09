@@ -410,7 +410,11 @@ private slots:
 
 	void updateFramesPerTick();
 
-
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	void onPlaybackStateChanged();
+	
+#endif
 
 private:
 	Song();
