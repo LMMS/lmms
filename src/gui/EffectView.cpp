@@ -74,7 +74,7 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	m_label->setFont(labelFont);
 	if(hasControls)
 	{
-		connect(m_label, SIGNAL(clicked()), this, SLOT(editControls()));
+		connect(m_label, &EffectLabelButton::clicked, this, &EffectView::editControls);
 	}
 	m_mainLayout->addWidget(m_label);
 
@@ -256,7 +256,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p(this);
 	QPainterPath path;
 
-	path.addRoundedRect(QRectF(2, 2, EffectView::DEFAULT_WIDTH - 4, EffectView::DEFAULT_HEIGHT - 4), 2, 2);
+	path.addRoundedRect(rect().marginsRemoved(QMargins(2, 2, 2, 2)), 2, 2);
 
 	QPen pen(Qt::black, 1);
 	p.setPen(pen);
