@@ -92,20 +92,6 @@ static inline float fastRandf( float range )
 	return fast_rand() * range * fast_rand_ratio;
 }
 
-//! @brief Takes advantage of fmal() function if present in hardware
-static inline long double fastFmal( long double a, long double b, long double c ) 
-{
-#ifdef FP_FAST_FMAL
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmal( a, b, c );
-	#endif
-#else
-	return a * b + c;
-#endif // FP_FAST_FMAL
-}
-
 //! @brief Takes advantage of fmaf() function if present in hardware
 static inline float fastFmaf( float a, float b, float c ) 
 {
@@ -118,16 +104,6 @@ static inline float fastFmaf( float a, float b, float c )
 #else
 	return a * b + c;
 #endif // FP_FAST_FMAF
-}
-
-//! @brief Takes advantage of fma() function if present in hardware
-static inline double fastFma( double a, double b, double c ) 
-{
-#ifdef FP_FAST_FMA
-	return fma( a, b, c );
-#else
-	return a * b + c;
-#endif
 }
 
 //! Round `value` to `where` depending on step size
