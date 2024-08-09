@@ -97,12 +97,6 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 	}
 }
 
-// sinc function
-static inline double sinc( double _x )
-{
-	return _x == 0.0 ? 1.0 : sin( F_PI * _x ) / ( F_PI * _x );
-}
-
 
 //! @brief Exponential function that deals with negative bases
 static inline float signedPowf( float v, float e )
