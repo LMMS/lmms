@@ -2,6 +2,7 @@
  * lmms_math.h - defines math functions
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Roshan M R (AKA Ross Maxx) <mrroshan127/at/gmail/dot/com>
  * 
  * This file is part of LMMS - https://lmms.io
  *
