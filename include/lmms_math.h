@@ -37,6 +37,11 @@
 
 namespace lmms
 {
+static inline bool approximatelyEqual(float x, float y)
+{
+	return x == y ? true : std::abs(x - y) < F_EPSILON;
+}
+
 /*!
  * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
  *
@@ -129,7 +134,7 @@ static inline double fastFma( double a, double b, double c )
 template<class T>
 static void roundAt(T& value, const T& where, const T& stepSize)
 {
-	if (std::abs(value - where) < typeInfo<float>::minEps() * std::abs(stepSize))
+	if (std::abs(value - where) < F_EPSILON * std::abs(stepSize))
 	{
 		value = where;
 	}
