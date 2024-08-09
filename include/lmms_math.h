@@ -36,6 +36,7 @@
 
 namespace lmms
 {
+
 static inline bool approximatelyEqual(float x, float y)
 {
 	return x == y ? true : std::abs(x - y) < F_EPSILON;
@@ -239,6 +240,7 @@ static inline int numDigitsAsInt(float f)
 		++digits;
 		asInt = -asInt;
 	}
+	// "asInt" is positive from now
 	int power = 1;
 	for (int i = 1; i < 10; ++i)
 	{
