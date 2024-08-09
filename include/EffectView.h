@@ -40,6 +40,7 @@ class QHBoxLayout;
 class QLabel;
 class QToolButton;
 
+
 namespace lmms::gui
 {
 
