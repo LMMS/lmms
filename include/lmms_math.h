@@ -100,14 +100,14 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 
 
 //! returns 1.0f if val >= 0.0f, -1.0 else
-static inline float sign( float val ) 
+static inline float sign(float val) 
 { 
 	return val >= 0.0f ? 1.0f : -1.0f; 
 }
 
 
 //! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-static inline float sqrt_neg( float val ) 
+static inline float sqrt_neg(float val) 
 {
 	return sqrtf(std::abs(val)) * sign(val);
 }
