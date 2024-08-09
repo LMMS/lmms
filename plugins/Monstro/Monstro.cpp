@@ -858,7 +858,7 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 {
 	if( m_parent->m_slope[slope] == 1.0f ) return s;
 	if( s == 0.0f ) return s;
-	return fastPow( s, m_parent->m_slope[slope] );
+	return std::pow(s, m_parent->m_slope[slope]);
 }
 
 

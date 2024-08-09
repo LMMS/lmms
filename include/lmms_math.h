@@ -2,6 +2,7 @@
  * lmms_math.h - defines math functions
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Roshan M R (AKA Ross Maxx) <mrroshan127/at/gmail/dot/com>
  * 
  * This file is part of LMMS - https://lmms.io
  *
@@ -42,19 +43,19 @@ static inline bool approximatelyEqual(float x, float y)
 	return x == y ? true : std::abs(x - y) < F_EPSILON;
 }
 
-#ifdef __INTEL_COMPILER
-
-static inline float absFraction( const float _x )
+/*!
+ * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
+ *
+ * fraction( 2.3) =>  0.3
+ * fraction(-2.3) => -0.3
+ *
+ * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
+ * negative phases.
+ */
+static inline float fraction(const float x)
 {
-	return( _x - floorf( _x ) );
+	return x - std::trunc(x);
 }
-
-static inline float fraction( const float _x )
-{
-	return( _x - floorf( _x ) - ( _x >= 0.0f ? 0.0 : 1.0 ) );
-}
-
-#else
 
 /*!
  * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
@@ -71,61 +72,6 @@ static inline float absFraction(const float x)
 	return x - std::floor(x);
 }
 
-/*!
- * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
- *
- * fraction( 2.3) =>  0.3
- * fraction(-2.3) => -0.3
- *
- * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
- * negative phases.
- */
-static inline float fraction( const float _x )
-{
-	return( _x - static_cast<int>( _x ) );
-}
-
-
-#if 0
-// SSE3-version
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"ftst\n\t"
-		"sahf\n\t"
-		"jae 1f\n\t"
-		"fld1\n\t"
-		"fsubrp %%st, %%st(1)\n\t"
-	"1:\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)", "cc" );
-	return( _x );
-}
-
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)" );
-	return( _x );
-}
-#endif
-
-#endif // __INTEL_COMPILER
-
-
 
 constexpr int FAST_RAND_MAX = 32767;
 static inline int fast_rand()
@@ -135,82 +81,41 @@ static inline int fast_rand()
 	return( (unsigned)( next / 65536 ) % 32768 );
 }
 
-static inline double fastRand( double range )
-{
-	static const double fast_rand_ratio = 1.0 / FAST_RAND_MAX;
-	return fast_rand() * range * fast_rand_ratio;
-}
-
 static inline float fastRandf( float range )
 {
 	static const float fast_rand_ratio = 1.0f / FAST_RAND_MAX;
 	return fast_rand() * range * fast_rand_ratio;
 }
 
-//! @brief Takes advantage of fmal() function if present in hardware
-static inline long double fastFmal( long double a, long double b, long double c ) 
-{
-#ifdef FP_FAST_FMAL
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmal( a, b, c );
-	#endif
-#else
-	return a * b + c;
-#endif // FP_FAST_FMAL
-}
 
-//! @brief Takes advantage of fmaf() function if present in hardware
-static inline float fastFmaf( float a, float b, float c ) 
+//! Round `value` to `where` depending on step size
+template<class T>
+static void roundAt(T& value, const T& where, const T& stepSize)
 {
-#ifdef FP_FAST_FMAF
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmaf( a, b, c );
-	#endif
-#else
-	return a * b + c;
-#endif // FP_FAST_FMAF
-}
-
-//! @brief Takes advantage of fma() function if present in hardware
-static inline double fastFma( double a, double b, double c ) 
-{
-#ifdef FP_FAST_FMA
-	return fma( a, b, c );
-#else
-	return a * b + c;
-#endif
-}
-
-// source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
-static inline double fastPow( double a, double b )
-{
-	union
+	if (std::abs(value - where) < F_EPSILON * std::abs(stepSize))
 	{
-		double d;
-		int32_t x[2];
-	} u = { a };
-	u.x[1] = static_cast<int32_t>( b * ( u.x[1] - 1072632447 ) + 1072632447 );
-	u.x[0] = 0;
-	return u.d;
+		value = where;
+	}
 }
 
-// sinc function
-static inline double sinc( double _x )
+
+//! returns 1.0f if val >= 0.0f, -1.0 else
+static inline float sign(float val) 
+{ 
+	return val >= 0.0f ? 1.0f : -1.0f; 
+}
+
+
+//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
+static inline float sqrt_neg(float val) 
 {
-	return _x == 0.0 ? 1.0 : sin( F_PI * _x ) / ( F_PI * _x );
+	return sqrtf(std::abs(val)) * sign(val);
 }
-
 
 //! @brief Exponential function that deals with negative bases
-static inline float signedPowf( float v, float e )
+static inline float signedPowf(float v, float e)
 {
-	return v < 0 
-		? powf( -v, e ) * -1.0f
-		: powf( v, e );
+	return std::pow(std::abs(v), e) * sign(v);
 }
 
 
@@ -289,48 +194,6 @@ static inline float dbfsToAmp(float dbfs)
 }
 
 
-
-//! returns 1.0f if val >= 0.0f, -1.0 else
-static inline float sign( float val ) 
-{ 
-	return val >= 0.0f ? 1.0f : -1.0f; 
-}
-
-
-//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-static inline float sqrt_neg( float val ) 
-{
-	return sqrtf( fabs( val ) ) * sign( val );
-}
-
-
-// fast approximation of square root
-static inline float fastSqrt( float n )
-{
-	union 
-	{
-		int32_t i;
-		float f;
-	} u;
-	u.f = n;
-	u.i = ( u.i + ( 127 << 23 ) ) >> 1;
-	return u.f;
-}
-
-//! returns value furthest from zero
-template<class T>
-static inline T absMax( T a, T b )
-{
-	return std::abs(a) > std::abs(b) ? a : b;
-}
-
-//! returns value nearest to zero
-template<class T>
-static inline T absMin( T a, T b )
-{
-	return std::abs(a) < std::abs(b) ? a : b;
-}
-
 //! Returns the linear interpolation of the two values
 template<class T, class F>
 constexpr T lerp(T a, T b, F t)
@@ -342,11 +205,7 @@ constexpr T lerp(T a, T b, F t)
 // @note Once we upgrade to C++20, we could probably use std::formatted_size
 static inline int numDigitsAsInt(float f)
 {
-	// use rounding:
-	// LcdSpinBox sometimes uses roundf(), sometimes cast rounding
-	// we use rounding to be on the "safe side"
-	const float rounded = roundf(f);
-	int asInt = static_cast<int>(rounded);
+	int asInt = static_cast<int>(std::round(f));
 	int digits = 1; // always at least 1
 	if(asInt < 0)
 	{
@@ -354,11 +213,11 @@ static inline int numDigitsAsInt(float f)
 		asInt = -asInt;
 	}
 	// "asInt" is positive from now
-	int32_t power = 1;
-	for(int32_t i = 1; i<10; ++i)
+	int power = 1;
+	for (int i = 1; i < 10; ++i)
 	{
 		power *= 10;
-		if(static_cast<int32_t>(asInt) >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
+		if (asInt >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
 		else { break; }
 	}
 	return digits;
