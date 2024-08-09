@@ -80,12 +80,6 @@ static inline int fast_rand()
 	return( (unsigned)( next / 65536 ) % 32768 );
 }
 
-static inline double fastRand( double range )
-{
-	static const double fast_rand_ratio = 1.0 / FAST_RAND_MAX;
-	return fast_rand() * range * fast_rand_ratio;
-}
-
 static inline float fastRandf( float range )
 {
 	static const float fast_rand_ratio = 1.0f / FAST_RAND_MAX;
