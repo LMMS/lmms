@@ -40,7 +40,6 @@ class QHBoxLayout;
 class QLabel;
 class QToolButton;
 
-
 namespace lmms::gui
 {
 
@@ -48,6 +47,7 @@ class EffectControlDialog;
 class Knob;
 class LedCheckBox;
 class TempoSyncKnob;
+
 
 class EffectView : public PluginView
 {
