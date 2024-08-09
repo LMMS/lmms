@@ -45,6 +45,7 @@
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
 
+
 namespace lmms::gui
 {
 
