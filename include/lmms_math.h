@@ -30,7 +30,6 @@
 #include <cmath>
 #include <cstdint>
 
-#include "lmms_basics.h"
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
 #include <cassert>
