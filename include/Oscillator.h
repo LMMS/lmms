@@ -170,12 +170,8 @@ public:
 	{
 		if (buffer == nullptr || buffer->size() == 0) { return 0; }
 		const auto frames = buffer->size();
-		const auto frame = sample * frames;
-		auto f1 = static_cast<f_cnt_t>(frame) % frames;
-		if (f1 < 0)
-		{
-			f1 += frames;
-		}
+		const auto frame = absFraction(sample) * frames;
+		const auto f1 = static_cast<f_cnt_t>(frame);
 
 		return linearInterpolate(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
 	}
@@ -190,12 +186,8 @@ public:
 	inline wtSampleControl getWtSampleControl(const float sample) const
 	{
 		wtSampleControl control;
-		control.frame = sample * OscillatorConstants::WAVETABLE_LENGTH;
-		control.f1 = static_cast<f_cnt_t>(control.frame) % OscillatorConstants::WAVETABLE_LENGTH;
-		if (control.f1 < 0)
-		{
-			control.f1 += OscillatorConstants::WAVETABLE_LENGTH;
-		}
+		control.frame = absFraction(sample) * OscillatorConstants::WAVETABLE_LENGTH;
+		control.f1 = static_cast<f_cnt_t>(control.frame);
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :
 					0;

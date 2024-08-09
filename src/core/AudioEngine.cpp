@@ -95,7 +95,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		BufferManager::clear( m_inputBuffer[i], m_inputBufferSize[i] );
+		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
 	}
 
 	// determine FIFO size and number of frames per period
@@ -283,7 +283,7 @@ void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
-	int size = m_inputBufferSize[ m_inputBufferWrite ];
+	auto size = m_inputBufferSize[m_inputBufferWrite];
 	SampleFrame* buf = m_inputBuffer[ m_inputBufferWrite ];
 
 	if( frames + _frames > size )

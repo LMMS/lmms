@@ -139,7 +139,7 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 		return( false );
 	}
 
-	int frames = _frames;
+	auto frames = _frames;
 	SampleFrame* o_buf = nullptr;
 	QVarLengthArray<SampleFrame> sBuf(_frames);
 

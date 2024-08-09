@@ -127,7 +127,7 @@ public:
 	void deleteClips();
 
 	int numOfClips();
-	Clip * getClip( int clipNum );
+	auto getClip(std::size_t clipNum) -> Clip*;
 	int getClipNum(const Clip* clip );
 
 	const clipVector & getClips() const
