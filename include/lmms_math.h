@@ -86,19 +86,6 @@ static inline float fastRandf( float range )
 	return fast_rand() * range * fast_rand_ratio;
 }
 
-//! @brief Takes advantage of fmaf() function if present in hardware
-static inline float fastFmaf( float a, float b, float c ) 
-{
-#ifdef FP_FAST_FMAF
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmaf( a, b, c );
-	#endif
-#else
-	return a * b + c;
-#endif // FP_FAST_FMAF
-}
 
 //! Round `value` to `where` depending on step size
 template<class T>
