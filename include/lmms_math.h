@@ -98,15 +98,6 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 }
 
 
-//! @brief Exponential function that deals with negative bases
-static inline float signedPowf( float v, float e )
-{
-	return v < 0 
-		? powf( -v, e ) * -1.0f
-		: powf( v, e );
-}
-
-
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
 static inline float logToLinearScale( float min, float max, float value )
@@ -194,6 +185,12 @@ static inline float sign( float val )
 static inline float sqrt_neg( float val ) 
 {
 	return sqrtf( fabs( val ) ) * sign( val );
+}
+
+//! @brief Exponential function that deals with negative bases
+static inline float signedPowf(float v, float e)
+{
+	return std::pow(std::abs(v), e) * sign(v);
 }
 
 
