@@ -33,9 +33,11 @@
 #include <QLabel>
 #include <QToolButton>
 
+#include "Effect.h"
 #include "EffectView.h"
 #include "DummyEffect.h"
 #include "CaptionMenu.h"
+#include "EffectLabelButton.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"

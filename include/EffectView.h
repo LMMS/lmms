@@ -26,19 +26,17 @@
 #ifndef LMMS_GUI_EFFECT_VIEW_H
 #define LMMS_GUI_EFFECT_VIEW_H
 
-#include "AutomatableModel.h"
 #include "PluginView.h"
-#include "Effect.h"
-#include "EffectLabelButton.h"
 
 class QGraphicsOpacityEffect;
-class QGroupBox;
-class QLabel;
-class QPushButton;
 class QMdiSubWindow;
 class QHBoxLayout;
-class QLabel;
 class QToolButton;
+
+namespace lmms
+{
+class Effect;
+}
 
 namespace lmms::gui
 {
@@ -47,6 +45,7 @@ class EffectControlDialog;
 class Knob;
 class LedCheckBox;
 class TempoSyncKnob;
+class EffectLabelButton;
 
 
 class EffectView : public PluginView
@@ -102,8 +101,6 @@ private:
 	
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;
-
-	//friend class EffectLabelButton;
 } ;
 
 
