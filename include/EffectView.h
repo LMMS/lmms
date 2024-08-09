@@ -48,7 +48,6 @@ class Knob;
 class LedCheckBox;
 class TempoSyncKnob;
 
-
 class EffectView : public PluginView
 {
 	Q_OBJECT
@@ -103,7 +102,7 @@ private:
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;
 
-	friend class EffectLabelButton;
+	//friend class EffectLabelButton;
 } ;
 
 
