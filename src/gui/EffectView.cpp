@@ -73,8 +73,6 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	m_label = new EffectLabelButton(this, this);
 	m_label->setText(model()->displayName());
 	m_label->setFont(labelFont);
-	m_label->setCheckable(true);
-	m_label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 	if(hasControls)
 	{
 		connect(m_label, SIGNAL(clicked()), this, SLOT(editControls()));

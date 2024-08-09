@@ -1,7 +1,7 @@
 /*
  * EffectLabelButton.h - class trackLabelButton
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Noah Brecht <noahb2713/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -39,14 +39,8 @@ public:
 	EffectLabelButton(EffectView* _tv, QWidget* _parent);
 	~EffectLabelButton() override = default;
 
-protected:
-	void paintEvent(QPaintEvent* pe) override;
-
 private:
 	EffectView* m_effectView;
-	QString m_iconName;
-	QRect m_buttonRect;
-	QString elideName(const QString &name);
 };
 
 

@@ -2,7 +2,7 @@
  * EffectLabelButton.cpp - implementation of class trackLabelButton, a label
  *                          which is renamable by double-clicking it
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Noah Brecht <noahb2713/at/gmail/dot/com>
  * 
  * This file is part of LMMS - https://lmms.io
  *
@@ -39,31 +39,15 @@ namespace lmms::gui
 
 EffectLabelButton::EffectLabelButton(EffectView* _tv, QWidget* _parent) :
 	QPushButton(_parent),
-	m_effectView(_tv),
-	m_iconName()
+	m_effectView(_tv)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAcceptDrops(false);
 
 	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
 	setStyleSheet("text-align:left;padding:2px;");
-}
-
-void EffectLabelButton::paintEvent(QPaintEvent* pe)
-{
-	QPushButton::paintEvent(pe);
-}
-
-QString EffectLabelButton::elideName(const QString &name)
-{
-	const int spacing = 16;
-	const int maxTextWidth = width() - spacing - iconSize().width();
-
-	setToolTip(name);
-
-	QFontMetrics metrics(font());
-	QString elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextWidth);
-	return elidedName;
+	setCheckable(true);
+	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 }
 
 } // namespace lmms::gui
