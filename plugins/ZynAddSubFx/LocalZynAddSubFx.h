@@ -25,6 +25,8 @@
 #ifndef LOCAL_ZYNADDSUBFX_H
 #define LOCAL_ZYNADDSUBFX_H
 
+#include <array>
+
 #include "Note.h"
 
 class Master;

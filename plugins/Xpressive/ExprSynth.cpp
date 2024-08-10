@@ -147,13 +147,8 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 
 	inline T operator()(const T& x) override
 	{
-		if (!std::isnan(x) && !std::isinf(x))
-		{
-			const int ix=(int)x;
-			if (ix>=1 && ix<=m_history_size)
-			{
-				return m_samples[(ix + m_pivot_last) % m_history_size];
-			}
+		if (!std::isnan(x) && x >= 1 && x <= m_history_size) {
+			return m_samples[(static_cast<std::size_t>(x) + m_pivot_last) % m_history_size];
 		}
 		return 0;
 	}

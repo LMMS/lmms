@@ -64,6 +64,10 @@ public:
 		~setupWidget() override = default;
 
 		void saveSettings() override;
+	
+	private:
+		void populatePlaybackDeviceComboBox();
+		void populateInputDeviceComboBox();
 
 	private:
 		QComboBox* m_playbackDeviceComboBox = nullptr;

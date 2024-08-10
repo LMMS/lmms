@@ -630,69 +630,6 @@ ENDIF(WANT_DEBUG_FPE)
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
-# Shim the SYSTEM property for older CMake versions
-if(CMAKE_VERSION VERSION_LESS "3.25")
-	define_property(TARGET
-		PROPERTY SYSTEM
-		INHERITED
-		BRIEF_DOCS "Shim of built-in SYSTEM property for CMake versions less than 3.25"
-		FULL_DOCS "Non-functional, but allows the property to be inherited properly."
-			"See the CMake documentation at https://cmake.org/cmake/help/latest/prop_tgt/SYSTEM.html."
-	)
-endif()
-
-# Add warning and error flags
-option(USE_WERROR "Treat compiler warnings as errors" OFF)
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	set(COMPILE_ERROR_FLAGS
-		"-Wall" # Enable most warnings by default
-		"-Werror=unused-function" # Unused functions are an error
-		# TODO: Fix the code and remove the following:
-		"-Wno-sign-compare" # Permit comparisons between signed and unsigned integers
-		"-Wno-strict-overflow" # Permit optimisations assuming no signed overflow
-	)
-	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
-		"-w" # Disable all warnings
-	)
-
-	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-	# TODO: Is this still necessary?
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		list(APPEND COMPILE_ERROR_FLAGS
-			"-Wno-array-bounds" # Permit out-of-bounds array subscripts
-			"-Wno-attributes" # Permit unrecognised attributes
-		)
-	endif()
-
-	if(USE_WERROR)
-		list(APPEND COMPILE_ERROR_FLAGS
-			"-Werror" # Treat warnings as errors
-		)
-	endif()
-elseif(MSVC)
-	set(COMPILE_ERROR_FLAGS
-		"/W2" # Enable some warnings by default
-		"/external:W0" # Don't emit warnings for third-party code
-		"/external:anglebrackets" # Consider headers included with angle brackets to be third-party
-		"/external:templates-" # Still emit warnings from first-party instantiations of third-party templates
-		# Silence "class X needs to have DLL-interface to be used by clients of
-		# class Y" warnings. These aren't trivial to address, and don't pose a
-		# problem for us since we build all modules with the same compiler and
-		# options, and dynamically link the CRT.
-		"/wd4251"
-	)
-	set(THIRD_PARTY_COMPILE_ERROR_FLAGS
-		"/W0" # Disable all warnings
-	)
-
-	if(USE_WERROR)
-		list(APPEND COMPILE_ERROR_FLAGS
-			"/WX" # Treat warnings as errors
-		)
-	endif()
-endif()
-add_compile_options("$<IF:$<BOOL:$<TARGET_PROPERTY:SYSTEM>>,${THIRD_PARTY_COMPILE_ERROR_FLAGS},${COMPILE_ERROR_FLAGS}>")
-
 IF(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Setting build type to 'Release' as none was specified.")
 	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -774,6 +711,8 @@ add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-p
 # not being found by PeakController
 add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
 
+# Add warning and error flags
+include(ErrorFlags)
 
 # use ccache
 include(CompileCache)

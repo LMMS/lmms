@@ -51,12 +51,12 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	const size_t maxFrames = numPixels * static_cast<size_t>(framesPerPixel);
 
-	int pixelIndex = 0;
+	auto pixelIndex = std::size_t{0};
 
-	for (int i = 0; i < maxFrames; i += static_cast<int>(resolution))
+	for (auto i = std::size_t{0}; i < maxFrames; i += static_cast<std::size_t>(resolution))
 	{
 		pixelIndex = i / framesPerPixel;
-		const int frameIndex = !parameters.reversed ? i : maxFrames - i;
+		const auto frameIndex = !parameters.reversed ? i : maxFrames - i;
 
 		const auto& frame = parameters.buffer[frameIndex];
 		const auto value = frame.average();
@@ -75,11 +75,11 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 		pixelIndex++;
 	}
 
-	for (int i = 0; i < numPixels; i++)
+	for (auto i = std::size_t{0}; i < numPixels; i++)
 	{
 		const int lineY1 = centerY - max[i] * halfHeight * parameters.amplification;
 		const int lineY2 = centerY - min[i] * halfHeight * parameters.amplification;
-		const int lineX = i + x;
+		const int lineX = static_cast<int>(i) + x;
 		painter.drawLine(lineX, lineY1, lineX, lineY2);
 
 		const float rms = std::sqrt(squared[i] / framesPerResolution);

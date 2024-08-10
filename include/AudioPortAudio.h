@@ -84,11 +84,7 @@ public:
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
 	}
 
-
-	int process_callback( const float *_inputBuffer,
-		float * _outputBuffer,
-		unsigned long _framesPerBuffer );
-
+	int process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer);
 
 	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
@@ -151,8 +147,8 @@ private:
 	bool m_wasPAInitError;
 
 	SampleFrame* m_outBuf;
-	int m_outBufPos;
-	int m_outBufSize;
+	std::size_t m_outBufPos;
+	fpp_t m_outBufSize;
 
 	bool m_stopped;
 
