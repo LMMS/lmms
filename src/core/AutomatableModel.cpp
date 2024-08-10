@@ -135,42 +135,6 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 			element.setAttribute( name, m_value );
 		}
 	}
-
-	// Skip saving MIDI connections if we're saving project and
-	// the discardMIDIConnections option is true.
-	auto controllerType = m_controllerConnection
-			? m_controllerConnection->getController()->type()
-			: Controller::ControllerType::Dummy;
-	bool skipMidiController = Engine::getSong()->isSavingProject()
-							  && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
-	if (m_controllerConnection && controllerType != Controller::ControllerType::Dummy
-		&& !(skipMidiController && controllerType == Controller::ControllerType::Midi))
-	{
-		QDomElement controllerElement;
-
-		// get "connection" element (and create it if needed)
-		QDomNode node = element.namedItem( "connection" );
-		if( node.isElement() )
-		{
-			controllerElement = node.toElement();
-		}
-		else
-		{
-			controllerElement = doc.createElement( "connection" );
-			element.appendChild( controllerElement );
-		}
-
-		bool mustQuote = mustQuoteName(name);
-		QString elementName = mustQuote ? "controllerconnection"
-						: name;
-
-		QDomElement element = doc.createElement( elementName );
-		if(mustQuote)
-			element.setAttribute( "nodename", name );
-		m_controllerConnection->saveSettings( doc, element );
-
-		controllerElement.appendChild( element );
-	}
 }
 
 
@@ -198,30 +162,6 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		}
 		// logscales were not existing at this point of time
 		// so they can be ignored
-	}
-
-	QDomNode connectionNode = element.namedItem( "connection" );
-	// reads controller connection
-	if( connectionNode.isElement() )
-	{
-		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
-		if( !thisConnection.isElement() )
-		{
-			thisConnection = connectionNode.toElement().namedItem( "controllerconnection" );
-			QDomElement tcElement = thisConnection.toElement();
-			// sanity check
-			if( tcElement.isNull() || tcElement.attribute( "nodename" ) != name )
-			{
-				// no, that wasn't it, act as if we never found one
-				thisConnection.clear();
-			}
-		}
-		if( thisConnection.isElement() )
-		{
-			setControllerConnection(new ControllerConnection(nullptr));
-			m_controllerConnection->loadSettings( thisConnection.toElement() );
-			//m_controllerConnection->setTargetName( displayName() );
-		}
 	}
 
 	// models can be stored as elements (port00) or attributes (port10):

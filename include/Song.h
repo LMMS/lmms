@@ -83,16 +83,11 @@ public:
 
 	struct SaveOptions {
 		/**
-		 * Should we discard MIDI ControllerConnections from project files?
-		 */
-		BoolModel discardMIDIConnections{false};
-		/**
 		 * Should we save the project as a project bundle? (with resources)
 		 */
 		BoolModel saveAsProjectBundle{false};
 
 		void setDefaultOptions() {
-			discardMIDIConnections.setValue(false);
 			saveAsProjectBundle.setValue(false);
 		}
 	};
