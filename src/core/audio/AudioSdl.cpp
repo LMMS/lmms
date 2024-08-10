@@ -38,9 +38,9 @@
 namespace lmms
 {
 
-constexpr char const* const SectionSDL = "audiosdl";
-constexpr char const* const PlaybackDeviceSDL = "device";
-constexpr char const* const InputDeviceSDL = "inputdevice";
+constexpr auto SectionSDL = "audiosdl";
+constexpr auto PlaybackDeviceSDL = "device";
+constexpr auto InputDeviceSDL = "inputdevice";
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
