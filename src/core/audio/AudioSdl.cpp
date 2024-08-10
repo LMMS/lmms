@@ -304,7 +304,7 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 
 #endif
 
-QString AudioSdl::setupWidget::s_systemDefaultDevice = QObject::tr("[System Default]");
+QString AudioSdl::setupWidget::s_systemDefaultDevice = AudioDeviceSetupWidget::tr("[System Default]");
 
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
@@ -333,7 +333,7 @@ void AudioSdl::setupWidget::saveSettings()
 	const auto currentPlaybackDevice = m_playbackDeviceComboBox->currentText();
 	if (currentPlaybackDevice == s_systemDefaultDevice)
 	{
-		// Represent the default input device with an empty string
+		// Represent the default playback device with an empty string
 		ConfigManager::inst()->setValue(SectionSDL, PlaybackDeviceSDL, "");
 	}
 	else if (!currentPlaybackDevice.isEmpty())
