@@ -125,21 +125,38 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
  */
 void TrackView::resizeEvent( QResizeEvent * re )
 {
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH_COMPACT, height() - 1 );
-		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT, height() - 1 );
-	}
-	else
-	{
-		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
-		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH, height() - 1 );
-	}
-	m_trackContentWidget.setFixedHeight( height() );
+	m_trackOperationsWidget.setFixedSize(getTrackFixedOperationsWidth(), height() - 1);
+	m_trackSettingsWidget.setFixedSize(getTrackFixedSettingsWidth(), height() - 1);
+	m_trackContentWidget.setFixedHeight(height());
 }
 
 
+const int TrackView::getTrackFixedWidth()
+{
+	return getTrackFixedSettingsWidth() + getTrackFixedOperationsWidth();
+}
+
+const int TrackView::getTrackFixedSettingsWidth()
+{
+	if(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
+	{
+		// if compact size
+		return DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
+	}
+	// if not compact
+	return DEFAULT_SETTINGS_WIDGET_WIDTH;
+}
+
+const int TrackView::getTrackFixedOperationsWidth()
+{
+	if(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
+	{
+		// if compact size
+		return TRACK_OP_WIDTH_COMPACT;
+	}
+	// if not compact
+	return TRACK_OP_WIDTH;
+}
 
 
 /*! \brief Update this track View and all its content objects.

@@ -48,12 +48,12 @@ class FadeButton;
 class TrackContainerView;
 
 
-const int DEFAULT_SETTINGS_WIDGET_WIDTH = 256;
-const int TRACK_OP_WIDTH = 78;
+static const int DEFAULT_SETTINGS_WIDGET_WIDTH = 256;
+static const int TRACK_OP_WIDTH = 78;
 // This shaves 150-ish pixels off track buttons,
 // ruled from config: ui.compacttrackbuttons
-const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 128;
-const int TRACK_OP_WIDTH_COMPACT = 62;
+static const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 128;
+static const int TRACK_OP_WIDTH_COMPACT = 62;
 
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
@@ -97,6 +97,12 @@ public:
 	{
 		return m_action == Action::Move;
 	}
+
+	// returns getTrackFixedSettingsWidth() + getTrackFixedOperationsWidth()
+	static const int getTrackFixedWidth();
+	// returns the right compact or not compact width
+	static const int getTrackFixedSettingsWidth();
+	static const int getTrackFixedOperationsWidth();
 
 	virtual void update();
 

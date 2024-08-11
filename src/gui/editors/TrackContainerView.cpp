@@ -41,6 +41,8 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackView.h"
+#include "ClipView.h"
+#include "MidiClip.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
@@ -74,7 +76,7 @@ void InstrumentLoaderThread::run()
 namespace gui
 {
 
-TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
+TrackContainerView::TrackContainerView(TrackContainer * _tc, bool canHorizontalScroll) :
 	QWidget(),
 	ModelView( nullptr, this ),
 	JournallingObject(),
@@ -82,7 +84,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_currentPosition( 0, 0 ),
 	m_tc( _tc ),
 	m_trackViews(),
-	m_scrollArea( new scrollArea( this ) ),
+	m_scrollArea(new scrollArea(this, canHorizontalScroll)),
 	m_ppb( DEFAULT_PIXELS_PER_BAR ),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
@@ -254,7 +256,38 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	m_scrollArea->widget()->setFixedWidth(width());
+	if (fixedClips())
+	{
+		// if for example this TrackContainerView is a pattern editor
+		int maxSteps = 16;
+		// loop through the tracks to find the clip with
+		// the highest amount of steps
+		// this should be the same value for all clips, but we never know
+		for (const auto& trackView : m_trackViews)
+		{
+			if (trackView->getTrack()->type() == Track::Type::Instrument)
+			{
+				InstrumentTrack* curTrack = static_cast<InstrumentTrack*>(trackView->getTrack());
+				if (curTrack->getClips().size() > 0)
+				{
+					MidiClip* curClip = reinterpret_cast<MidiClip*>(curTrack->getClip(0));
+					int curSteps = curClip->getSteps();
+					if (maxSteps < curSteps)
+					{
+						maxSteps = curSteps;
+					}
+				}
+			}
+		}
+
+		// calculate minimum width
+		const int minWidth = TrackView::getTrackFixedWidth() + maxSteps * ClipView::MIN_FIXED_WIDTH / 16;
+		m_scrollArea->widget()->setFixedWidth(minWidth > width() ? minWidth : width());
+	}
+	else
+	{
+		m_scrollArea->widget()->setFixedWidth(width());
+	}
 	m_scrollArea->widget()->setFixedHeight(
 				m_scrollArea->widget()->minimumSizeHint().height());
 
@@ -464,12 +497,15 @@ RubberBand *TrackContainerView::rubberBand() const
 
 
 
-TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
+TrackContainerView::scrollArea::scrollArea(TrackContainerView * _parent, bool canHorizontalScroll) :
 	QScrollArea( _parent ),
 	m_trackContainerView( _parent )
 {
 	setFrameStyle( QFrame::NoFrame );
-	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	if (canHorizontalScroll == false)
+	{
+		setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	}
 }
 
 

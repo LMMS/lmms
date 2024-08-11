@@ -89,9 +89,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_rubberBandStartTrackview(0),
 	m_rubberbandStartTimePos(0),
 	m_rubberbandPixelsPerBar(DEFAULT_PIXELS_PER_BAR),
-	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
+	m_trackHeadWidth(TrackView::getTrackFixedWidth()),
 	m_selectRegion(false)
 {
 	m_zoomingModel->setParent(this);
@@ -752,9 +750,8 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const TimePos & t )
 {
-	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
-	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
-	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
+	const auto widgetWidth = TrackView::getTrackFixedSettingsWidth();
+	const auto trackOpWidth = TrackView::getTrackFixedOperationsWidth();
 
 	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
 							|| m_scrollBack)

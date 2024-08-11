@@ -71,7 +71,7 @@ class TrackContainerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	TrackContainerView( TrackContainer* tc );
+	TrackContainerView(TrackContainer* tc, bool canHorizontalScroll = false);
 	~TrackContainerView() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
@@ -177,7 +177,7 @@ private:
 	class scrollArea : public QScrollArea
 	{
 	public:
-		scrollArea( TrackContainerView* parent );
+		scrollArea(TrackContainerView* parent, bool canHorizontalScroll);
 		~scrollArea() override = default;
 
 	protected:
