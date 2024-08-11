@@ -95,11 +95,10 @@ private:
 	fpp_t m_outBufSize;
 
 	bool m_stopped;
-
-} ;
-
-#endif // LMMS_HAVE_PORTAUDIO
+};
 
 } // namespace lmms
+
+#endif // LMMS_HAVE_PORTAUDIO
 
 #endif // LMMS_AUDIO_PORTAUDIO_H
