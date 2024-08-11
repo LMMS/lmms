@@ -2,7 +2,6 @@
  * lmms_math.h - defines math functions
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2024 Roshan M R (AKA Ross Maxx) <mrroshan127/at/gmail/dot/com>
  * 
  * This file is part of LMMS - https://lmms.io
  *
@@ -109,7 +108,7 @@ static inline float sign(float val)
 //! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
 static inline float sqrt_neg(float val) 
 {
-	return sqrtf(std::abs(val)) * sign(val);
+	return std::sqrt(std::abs(val)) * sign(val);
 }
 
 //! @brief Exponential function that deals with negative bases
@@ -205,6 +204,9 @@ constexpr T lerp(T a, T b, F t)
 // @note Once we upgrade to C++20, we could probably use std::formatted_size
 static inline int numDigitsAsInt(float f)
 {
+	// use rounding:
+	// LcdSpinBox sometimes uses std::round(), sometimes cast rounding
+	// we use rounding to be on the "safe side"
 	int asInt = static_cast<int>(std::round(f));
 	int digits = 1; // always at least 1
 	if(asInt < 0)

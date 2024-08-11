@@ -75,7 +75,7 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 
 	return (v1 + std::fma(0.5f, frcu, x) * (v2 - frcu * (1.0f / 6.0f) -
 		std::fma(t1, (1.0f / 6.0f), -v0) * (1.0f / 3.0f)) + frsq * x * (t1 *
-		(1.0f/6.0f) - 0.5f * v2) + frsq * std::fma(0.5f, v2, -v1 ));
+		(1.0f / 6.0f) - 0.5f * v2) + frsq * std::fma(0.5f, v2, -v1));
 }
 
 
