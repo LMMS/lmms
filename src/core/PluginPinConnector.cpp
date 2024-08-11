@@ -223,17 +223,16 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 
 void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	// Only plugins with a mono in/out need to be saved
-	//if (m_portCountIn != 1 && m_portCountOut != 1) { return; }
+	elem.setAttribute("v", 0); // version
 
-	elem.setAttribute("in_count", m_pluginInCount);   // probably not needed, but just in case
-	elem.setAttribute("out_count", m_pluginOutCount); // ditto
+	elem.setAttribute("ins", m_pluginInCount);
+	elem.setAttribute("outs", m_pluginOutCount);
 
-	auto pinsIn = doc.createElement("in");
+	auto pinsIn = doc.createElement("in_matrix");
 	elem.appendChild(pinsIn);
 	saveSettings(m_inModels, doc, pinsIn);
 
-	auto pinsOut = doc.createElement("out");
+	auto pinsOut = doc.createElement("out_matrix");
 	elem.appendChild(pinsOut);
 	saveSettings(m_outModels, doc, pinsOut);
 }
@@ -245,25 +244,26 @@ void PluginPinConnector::loadSettings(const QDomElement& elem)
 	assert(m_coreOutCount == 2);
 
 	// TODO: Assert port counts are what was expected?
-	const auto pluginInCount = elem.attribute("in_count", "0").toInt();
-	const auto pluginOutCount = elem.attribute("out_count", "0").toInt();
+	const auto pluginInCount = elem.attribute("ins", "0").toInt();
+	const auto pluginOutCount = elem.attribute("outs", "0").toInt();
 	setChannelCounts(pluginInCount, pluginOutCount);
 
-	loadSettings(elem.firstChildElement("in"), m_inModels);
-	loadSettings(elem.firstChildElement("out"), m_outModels);
+	loadSettings(elem.firstChildElement("in_matrix"), m_inModels);
+	loadSettings(elem.firstChildElement("out_matrix"), m_outModels);
 }
 
 void PluginPinConnector::saveSettings(const PinMap& pins, QDomDocument& doc, QDomElement& elem)
 {
+	// Only saves connections that are actually used, otherwise could bloat project file
 	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
 	{
 		auto& trackChannels = pins[trackChannel];
 		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
 		{
-			if (trackChannels[pluginChannel]->value())
+			if (trackChannels[pluginChannel]->value() || trackChannels[pluginChannel]->isAutomatedOrControlled())
 			{
 				trackChannels[pluginChannel]->saveSettings(doc, elem,
-					QString{"%1,%2"}.arg(trackChannel).arg(pluginChannel));
+					QString{"c%1,%2"}.arg(trackChannel + 1).arg(pluginChannel + 1));
 			}
 		}
 	}
@@ -271,12 +271,80 @@ void PluginPinConnector::saveSettings(const PinMap& pins, QDomDocument& doc, QDo
 
 void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 {
+	const auto trackChannelCount = static_cast<int>(pins.size());
+	const auto pluginChannelCount = trackChannelCount > 0 ? static_cast<int>(pins[0].size()) : 0;
+
+	std::vector<std::vector<bool>> connectionsToLoad;
+	connectionsToLoad.resize(trackChannelCount);
+	for (auto& pluginChannels : connectionsToLoad)
+	{
+		pluginChannels.resize(pluginChannelCount);
+	}
+
+	auto addConnection = [&connectionsToLoad](const QString& name) {
+#ifndef NDEBUG
+		constexpr auto minSize = std::string_view{"c#,#"}.size();
+		if (name.size() < minSize) { throw std::runtime_error{"string too small"}; }
+		if (name[0] != 'c') { throw std::runtime_error{"invalid string"}; }
+#endif
+
+		const auto pos = name.indexOf(QStringView{u","});
+#ifndef NDEBUG
+		if (pos <= 0) { throw std::runtime_error{"parse failure"}; }
+#endif
+
+		auto trackChannel = name.midRef(1, pos - 1).toInt();
+		auto pluginChannel = name.midRef(pos + 1).toInt();
+#ifndef NDEBUG
+		if (trackChannel == 0 || pluginChannel == 0) { throw std::runtime_error{"failed to parse integer"}; }
+#endif
+
+		connectionsToLoad.at(trackChannel - 1).at(pluginChannel - 1) = true;
+	};
+
+	// Get non-automated pin connector connections
+	const auto& attrs = elem.attributes();
+	for (int idx = 0; idx < attrs.size(); ++idx)
+	{
+		const auto node = attrs.item(idx);
+		addConnection(node.nodeName());
+	}
+
+	// Get automated pin connector connections
+	const auto children = elem.childNodes();
+	for (int idx = 0; idx < children.size(); ++idx)
+	{
+		const auto node = children.item(idx);
+		addConnection(node.nodeName());
+	}
+
+	// Lastly, load the connections
+	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
+	{
+		auto& trackChannels = pins[trackChannel];
+		auto& trackChannelsToLoad = connectionsToLoad[trackChannel];
+		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
+		{
+			if (trackChannelsToLoad[pluginChannel])
+			{
+				const auto name = QString{"c%1,%2"}.arg(trackChannel + 1).arg(pluginChannel + 1);
+				trackChannels[pluginChannel]->loadSettings(elem, name);
+			}
+			else
+			{
+				trackChannels[pluginChannel]->setValue(0);
+			}
+		}
+	}
+
+#if 0
+	// TODO: This method is very inefficient
 	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
 	{
 		auto& trackChannels = pins[trackChannel];
 		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
 		{
-			const auto name = QString{"%1,%2"}.arg(trackChannel).arg(pluginChannel);
+			const auto name = QString{"c%1,%2"}.arg(trackChannel).arg(pluginChannel);
 			if (elem.hasAttribute(name) || !elem.firstChildElement(name).isNull())
 			{
 				trackChannels[pluginChannel]->loadSettings(elem, name);
@@ -287,6 +355,7 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 			}
 		}
 	}
+#endif
 }
 
 void PluginPinConnector::setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount)
