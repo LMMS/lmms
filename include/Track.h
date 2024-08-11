@@ -115,9 +115,9 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	void setSimpleSerializing()
+	void setSimpleSerializing(bool simpleSerializing = true)
 	{
-		m_simpleSerializingMode = true;
+		m_simpleSerializingMode = simpleSerializing;
 	}
 
 	// -- for usage by Clip only ---------------

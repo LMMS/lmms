@@ -191,7 +191,7 @@ Track* Track::clone()
  */
 void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 {
-	if( !m_simpleSerializingMode )
+	if (!isSimpleSerializing())
 	{
 		element.setTagName( "track" );
 	}
@@ -217,9 +217,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.appendChild( tsDe );
 	saveTrackSpecificSettings( doc, tsDe );
 
-	if( m_simpleSerializingMode )
+	if (isSimpleSerializing())
 	{
-		m_simpleSerializingMode = false;
+		setSimpleSerializing(false);
 		return;
 	}
 
@@ -267,7 +267,7 @@ void Track::loadSettings( const QDomElement & element )
 		setColor(QColor{element.attribute("color")});
 	}
 
-	if( m_simpleSerializingMode )
+	if (isSimpleSerializing())
 	{
 		QDomNode node = element.firstChild();
 		while( !node.isNull() )
@@ -279,7 +279,9 @@ void Track::loadSettings( const QDomElement & element )
 			}
 			node = node.nextSibling();
 		}
-		m_simpleSerializingMode = false;
+
+		setSimpleSerializing(false);
+
 		return;
 	}
 
