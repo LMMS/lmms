@@ -90,7 +90,7 @@ private:
 
 	bool m_wasPAInitError;
 
-	SampleFrame* m_outBuf;
+	std::unique_ptr<SampleFrame[]> m_outBuf;
 	std::size_t m_outBufPos;
 	fpp_t m_outBufSize;
 

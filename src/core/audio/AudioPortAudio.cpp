@@ -45,7 +45,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		  engine)
 	, m_paStream(nullptr)
 	, m_wasPAInitError(false)
-	, m_outBuf(new SampleFrame[engine->framesPerPeriod()])
+	, m_outBuf(std::make_unique<SampleFrame[]>(engine->framesPerPeriod()))
 	, m_outBufPos(0)
 	, m_outBufSize(engine->framesPerPeriod())
 {
@@ -139,7 +139,6 @@ AudioPortAudio::~AudioPortAudio()
 	{
 		Pa_Terminate();
 	}
-	delete[] m_outBuf;
 }
 
 
@@ -186,7 +185,7 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 	{
 		if( m_outBufPos == 0 )
 		{
-			const fpp_t frames = getNextBuffer( m_outBuf );
+			const fpp_t frames = getNextBuffer(m_outBuf.get());
 			if( !frames )
 			{
 				m_stopped = true;
