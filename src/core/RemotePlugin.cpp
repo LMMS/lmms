@@ -144,7 +144,7 @@ RemotePlugin::RemotePlugin(Model* parent)
 #endif
 	, m_splitChannels{false}
 	, m_audioBufferSize{0}
-	, m_portConfig{parent}
+	, m_pinConnector{parent}
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
@@ -324,7 +324,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf )
+bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf ) // TODO: Make single in-out buffer (See Vestige.cpp and VstEffect.cpp - inplace processing is possible)
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -358,49 +358,17 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 
 	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
 
-	const ch_cnt_t inputsReal = m_portConfig.portCountIn();
-	const ch_cnt_t inputsClamped = std::min<ch_cnt_t>(inputsReal, DEFAULT_CHANNELS);
+	const ch_cnt_t inputsClamped = std::min<ch_cnt_t>(m_pinConnector.channelCountIn(), DEFAULT_CHANNELS);
 
 	if( _in_buf != nullptr && inputsClamped > 0 )
 	{
-		if( m_splitChannels )
+		if (m_splitChannels)
 		{
 			// NOTE: VST plugins always use split channels
-			switch (m_portConfig.portConfigIn())
-			{
-				case PluginPortConfig::Config::MonoMix:
-					for (fpp_t frame = 0; frame < frames; ++frame)
-					{
-						// mix stereo to mono for mono plugin input
-						m_audioBuffer[frame] = (_in_buf[frame][0] + _in_buf[frame][1]) / 2;
-					}
-					break;
-				case PluginPortConfig::Config::LeftOnly:
-					for (fpp_t frame = 0; frame < frames; ++frame)
-					{
-						m_audioBuffer[frame] = _in_buf[frame][0];
-						_out_buf[frame][1] = _in_buf[frame][1]; // right bypass
-					}
-					break;
-				case PluginPortConfig::Config::RightOnly:
-					for (fpp_t frame = 0; frame < frames; ++frame)
-					{
-						_out_buf[frame][0] = _in_buf[frame][0]; // left bypass
-						m_audioBuffer[frame] = _in_buf[frame][1];
-					}
-					break;
-				case PluginPortConfig::Config::Stereo:
-					assert(inputsReal == 2);
-					for (ch_cnt_t ch = 0; ch < inputsClamped; ++ch)
-					{
-						for (fpp_t frame = 0; frame < frames; ++frame)
-						{
-							m_audioBuffer[ch * frames + frame] = _in_buf[frame][ch];
-						}
-					}
-					break;
-				default: throw std::runtime_error{"Invalid input port config"};
-			}
+			const auto trackChannels = CoreAudioData{&_in_buf, 1};
+			const auto pluginInput = SplitAudioData<sample_t>{m_audioBuffer.get(), frames * m_pinConnector.channelCountIn()};
+
+			m_pinConnector.routeToPlugin(frames, trackChannels, pluginInput);
 		}
 		else if (inputsClamped == DEFAULT_CHANNELS)
 		{
@@ -422,7 +390,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if (m_failed || _out_buf == nullptr || m_portConfig.portCountOut() == 0)
+	if (m_failed || _out_buf == nullptr || m_pinConnector.channelCountOut() == 0)
 	{
 		unlock();
 		return false;
@@ -431,52 +399,27 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputsReal = m_portConfig.portCountOut();
-	const ch_cnt_t outputsClamped = std::min<ch_cnt_t>(outputsReal, DEFAULT_CHANNELS);
+	const ch_cnt_t outputsClamped = std::min<ch_cnt_t>(m_pinConnector.channelCountOut(), DEFAULT_CHANNELS);
 
-	if( m_splitChannels )
+	if (m_splitChannels)
 	{
 		// NOTE: VST plugins always use split channels
-		switch (m_portConfig.portConfigOut())
-		{
-			case PluginPortConfig::Config::MonoMix:
-				for (fpp_t frame = 0; frame < frames; ++frame)
-				{
-					_out_buf[frame][0] = _out_buf[frame][1] = m_audioBuffer[inputsReal * frames + frame];
-				}
-				break;
-			case PluginPortConfig::Config::LeftOnly:
-				for (fpp_t frame = 0; frame < frames; ++frame)
-				{
-					_out_buf[frame][0] = m_audioBuffer[inputsReal * frames + frame];
-				}
-				break;
-			case PluginPortConfig::Config::RightOnly:
-				for (fpp_t frame = 0; frame < frames; ++frame)
-				{
-					_out_buf[frame][1] = m_audioBuffer[inputsReal * frames + frame];
-				}
-				break;
-			case PluginPortConfig::Config::Stereo:
-				for (ch_cnt_t ch = 0; ch < outputsClamped; ++ch)
-				{
-					for (fpp_t frame = 0; frame < frames; ++frame)
-					{
-						_out_buf[frame][ch] = m_audioBuffer[(inputsReal + ch) * frames + frame];
-					}
-				}
-				break;
-			default: throw std::runtime_error{"Invalid output port config"};
-		}
+		const auto trackChannels = CoreAudioDataMut{&_out_buf, 1};
+		const auto pluginOutput = SplitAudioData<const sample_t> {
+			m_audioBuffer.get() + (frames * m_pinConnector.channelCountIn()),
+			frames * m_pinConnector.channelCountOut()
+		};
+
+		m_pinConnector.routeFromPlugin(frames, pluginOutput, trackChannels);
 	}
 	else if (outputsClamped == DEFAULT_CHANNELS)
 	{
-		memcpy( _out_buf, m_audioBuffer.get() + inputsReal * frames,
+		memcpy( _out_buf, m_audioBuffer.get() + m_pinConnector.channelCountIn() * frames,
 						frames * BYTES_PER_FRAME );
 	}
 	else
 	{
-		auto o = reinterpret_cast<sampleFrame*>(m_audioBuffer.get() + inputsReal * frames);
+		auto o = reinterpret_cast<sampleFrame*>(m_audioBuffer.get() + m_pinConnector.channelCountIn() * frames);
 		// clear buffer, if plugin didn't fill up both channels
 		BufferManager::clear( _out_buf, frames );
 
@@ -528,7 +471,7 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = (m_portConfig.portCountIn() + m_portConfig.portCountOut())
+	const size_t s = (m_pinConnector.channelCountIn() + m_pinConnector.channelCountOut())
 		* Engine::audioEngine()->framesPerPeriod();
 	try
 	{
@@ -597,17 +540,17 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdChangeInputCount:
-			m_portConfig.setPortCountIn(_m.getInt(0));
+			m_pinConnector.setChannelCountIn(_m.getInt(0));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeOutputCount:
-			m_portConfig.setPortCountOut(_m.getInt(0));
+			m_pinConnector.setChannelCountOut(_m.getInt(0));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeInputOutputCount:
-			m_portConfig.setPortCounts(_m.getInt(0), _m.getInt(1));
+			m_pinConnector.setChannelCounts(_m.getInt(0), _m.getInt(1));
 			resizeSharedProcessingMemory();
 			break;
 
