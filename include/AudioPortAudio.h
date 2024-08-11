@@ -52,12 +52,26 @@ public:
 	ComboBoxModel m_deviceModel;
 };
 
-namespace gui
-{
+namespace gui {
+
 class ComboBox;
 class LcdSpinBox;
-}
 
+class AudioPortAudioSetupWidget : public gui::AudioDeviceSetupWidget
+{
+public:
+	AudioPortAudioSetupWidget(QWidget* _parent);
+	~AudioPortAudioSetupWidget() override;
+
+	void saveSettings() override;
+	void show() override;
+
+private:
+	ComboBox* m_backend;
+	ComboBox* m_device;
+	AudioPortAudioSetupUtil m_setupUtil;
+};
+} // namespace gui
 
 class AudioPortAudio : public AudioDevice
 {
@@ -71,22 +85,6 @@ public:
 	}
 
 	int process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer);
-
-	class setupWidget : public gui::AudioDeviceSetupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		~setupWidget() override;
-
-		void saveSettings() override;
-		void show() override;
-
-	private:
-		gui::ComboBox * m_backend;
-		gui::ComboBox * m_device;
-		AudioPortAudioSetupUtil m_setupUtil;
-
-	} ;
 
 private:
 	void startProcessing() override;

@@ -323,11 +323,8 @@ void AudioPortAudioSetupUtil::updateChannels()
 	Pa_Terminate();
 }
 
-
-
-
-AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
+gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
+	: AudioDeviceSetupWidget(AudioPortAudio::name(), _parent)
 {
 	using gui::ComboBox;
 
@@ -352,7 +349,7 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 
 
-AudioPortAudio::setupWidget::~setupWidget()
+gui::AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
 {
 	disconnect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
 			&m_setupUtil, SLOT(updateDevices()));
@@ -364,7 +361,7 @@ AudioPortAudio::setupWidget::~setupWidget()
 
 
 
-void AudioPortAudio::setupWidget::saveSettings()
+void gui::AudioPortAudioSetupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audioportaudio", "backend",
 							m_setupUtil.m_backendModel.currentText() );
@@ -375,7 +372,7 @@ void AudioPortAudio::setupWidget::saveSettings()
 
 
 
-void AudioPortAudio::setupWidget::show()
+void gui::AudioPortAudioSetupWidget::show()
 {
 	if( m_setupUtil.m_backendModel.size() == 0 )
 	{
