@@ -25,26 +25,16 @@
 #ifndef LMMS_AUDIO_PORTAUDIO_H
 #define LMMS_AUDIO_PORTAUDIO_H
 
-#include <QObject>
-
 #include "lmmsconfig.h"
-#include "ComboBoxModel.h"
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#   include <portaudio.h>
+#include <QObject>
+#include "ComboBoxModel.h"
 
-#   include "AudioDevice.h"
-#   include "AudioDeviceSetupWidget.h"
-
-#   if defined paNeverDropInput || defined paNonInterleaved
-#	    define PORTAUDIO_V19
-#   else
-#	    define PORTAUDIO_V18
-#   endif
-
-#endif
-
+#include <portaudio.h>
+#include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 
 namespace lmms
 {
@@ -61,10 +51,6 @@ public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
 };
-
-
-#ifdef LMMS_HAVE_PORTAUDIO
-
 
 namespace gui
 {
@@ -106,39 +92,11 @@ private:
 	void startProcessing() override;
 	void stopProcessing() override;
 
-#ifdef PORTAUDIO_V19
 	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
 		unsigned long _framesPerBuffer,
 		const PaStreamCallbackTimeInfo * _timeInfo,
 		PaStreamCallbackFlags _statusFlags,
 		void *arg );
-
-#else
-
-#define paContinue 0
-#define paComplete 1
-#define Pa_GetDeviceCount Pa_CountDevices
-#define Pa_GetDefaultInputDevice Pa_GetDefaultInputDeviceID
-#define Pa_GetDefaultOutputDevice Pa_GetDefaultOutputDeviceID
-#define Pa_IsStreamActive Pa_StreamActive
-
-	static int _process_callback( void * _inputBuffer, void * _outputBuffer,
-		unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
-
-
-	using PaTime = double;
-	using PaDeviceIndex = PaDeviceID;
-
-	using PaStreamParameters = struct
-	{
-		PaDeviceIndex device;
-		int channelCount;
-		PaSampleFormat sampleFormat;
-		PaTime suggestedLatency;
-		void *hostApiSpecificStreamInfo;
-
-	} PaStreamParameters;
-#endif // PORTAUDIO_V19
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;
