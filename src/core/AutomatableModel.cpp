@@ -136,15 +136,12 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		}
 	}
 
-	// Skip saving MIDI connections if we're saving project and
-	// the discardMIDIConnections option is true.
+	// Skip saving MIDI connections if we're saving project
 	auto controllerType = m_controllerConnection
 			? m_controllerConnection->getController()->type()
 			: Controller::ControllerType::Dummy;
-	bool skipMidiController = Engine::getSong()->isSavingProject()
-							  && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
-	if (m_controllerConnection && controllerType != Controller::ControllerType::Dummy
-		&& !(skipMidiController && controllerType == Controller::ControllerType::Midi))
+	if (m_controllerConnection && (controllerType != Controller::ControllerType::Dummy
+		|| controllerType != Controller::ControllerType::Midi))
 	{
 		QDomElement controllerElement;
 
