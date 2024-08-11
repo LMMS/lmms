@@ -38,19 +38,16 @@
 namespace lmms
 {
 
-
-AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_paStream( nullptr ),
-	m_wasPAInitError( false ),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
-	m_outBufPos( 0 )
+AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
+	: AudioDevice(std::clamp<ch_cnt_t>(ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
+					  DEFAULT_CHANNELS, DEFAULT_CHANNELS),
+		  engine)
+	, m_paStream(nullptr)
+	, m_wasPAInitError(false)
+	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_outBufPos(0)
 {
-	_success_ful = false;
-
+	successful = false;
 	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
@@ -133,7 +130,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
 
-	_success_ful = true;
+	successful = true;
 }
 
 

@@ -68,7 +68,7 @@ private:
 class AudioPortAudio : public AudioDevice
 {
 public:
-	AudioPortAudio( bool & _success_ful, AudioEngine* audioEngine );
+	AudioPortAudio(bool& successful, AudioEngine* engine);
 	~AudioPortAudio() override;
 
 	inline static QString name()
