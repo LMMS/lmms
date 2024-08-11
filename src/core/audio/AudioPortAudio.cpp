@@ -112,7 +112,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
 
 	err = Pa_OpenStream(&m_paStream, supportsCapture() ? &m_inputParameters : nullptr, &m_outputParameters,
-		sampleRate(), samples, paNoFlag, _process_callback, this);
+		sampleRate(), samples, paNoFlag, processCallback, this);
 
 	if( err == paInvalidDevice && sampleRate() < 48000 )
 	{
@@ -120,15 +120,8 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		// some backends or drivers do not allow 32 bit floating point data
 		// with a samplerate of 44100 Hz
 		setSampleRate( 48000 );
-		err = Pa_OpenStream(
-				&m_paStream,
-				supportsCapture() ? &m_inputParameters : nullptr,
-				&m_outputParameters,
-				sampleRate(),
-				samples,
-				paNoFlag,
-				_process_callback, 
-				this );
+		err = Pa_OpenStream(&m_paStream, supportsCapture() ? &m_inputParameters : nullptr, &m_outputParameters,
+			sampleRate(), samples, paNoFlag, processCallback, this);
 	}
 
 	if( err != paNoError )
@@ -190,7 +183,7 @@ void AudioPortAudio::stopProcessing()
 }
 
 
-int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer)
+int AudioPortAudio::processCallback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer)
 {
 	if( supportsCapture() )
 	{
@@ -239,7 +232,7 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 
 
 
-int AudioPortAudio::_process_callback(
+int AudioPortAudio::processCallback(
 	const void *_inputBuffer,
 	void * _outputBuffer,
 	unsigned long _framesPerBuffer,
@@ -251,8 +244,7 @@ int AudioPortAudio::_process_callback(
 	Q_UNUSED(_statusFlags);
 
 	auto _this = static_cast<AudioPortAudio*>(_arg);
-	return _this->process_callback( (const float*)_inputBuffer,
-		(float*)_outputBuffer, _framesPerBuffer );
+	return _this->processCallback((const float*)_inputBuffer, (float*)_outputBuffer, _framesPerBuffer);
 }
 
 

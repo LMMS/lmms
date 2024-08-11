@@ -84,17 +84,13 @@ public:
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
 	}
 
-	int process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer);
-
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
 
-	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
-		unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo * _timeInfo,
-		PaStreamCallbackFlags _statusFlags,
-		void *arg );
+	int processCallback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer);
+	static int processCallback(const void* _inputBuffer, void* _outputBuffer, unsigned long _framesPerBuffer,
+		const PaStreamCallbackTimeInfo* _timeInfo, PaStreamCallbackFlags _statusFlags, void* arg);
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;
