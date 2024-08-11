@@ -330,6 +330,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 void SampleClipView::reverseSample()
 {
 	m_clip->m_sample.setReversed(!m_clip->m_sample.reversed());
+	const TimePos sample_length = TimePos::fromFrames(m_clip->m_sample.sampleSize(), Engine::framesPerTick());
+	m_clip->setStartTimeOffset(m_clip->length() - m_clip->startTimeOffset() - sample_length);
 	Engine::getSong()->setModified();
 	update();
 }
