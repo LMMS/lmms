@@ -81,23 +81,16 @@ void MixerChannelLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void MixerChannelLcdSpinBox::enterValue()
 {
-	bool ok;
-	int new_val;
+	const auto val = model()->value();
+	const auto min = model()->minValue();
+	const auto max = model()->maxValue();
+	const auto step = model()->step<int>();
+	const auto label = tr("Please enter a new value between %1 and %2:").arg(min).arg(max);
 
-	new_val = QInputDialog::getInt(
-			this, tr("Set value"),
-			tr("Please enter a new value between %1 and %2:").
-			arg(model()->minValue()).
-			arg(model()->maxValue()),
-			model()->value(),
-			model()->minValue(),
-			model()->maxValue(),
-			model()->step<int>(), &ok);
+	auto ok = false;
+	const auto newVal = QInputDialog::getInt(this, tr("Set value"), label, val, min, max, step, &ok);
 
-	if(ok)
-	{
-		model()->setValue(new_val);
-	}
+	if (ok) { model()->setValue(newVal); }
 }
 
 } // namespace lmms::gui
