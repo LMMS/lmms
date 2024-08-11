@@ -118,25 +118,20 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		return;
 	}
 
-	double inLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
-
-	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
-	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
 	const int samples = audioEngine()->framesPerPeriod();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
 	m_outputParameters.channelCount = channels();
 	m_outputParameters.sampleFormat = paFloat32; // 32 bit floating point output
-	m_outputParameters.suggestedLatency = outLatency;
+	m_outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevIdx)->defaultLowOutputLatency;
 	m_outputParameters.hostApiSpecificStreamInfo = nullptr;
-	
+
 	// Configure input parameters.
 	m_inputParameters.device = inDevIdx;
 	m_inputParameters.channelCount = DEFAULT_CHANNELS;
 	m_inputParameters.sampleFormat = paFloat32; // 32 bit floating point input
-	m_inputParameters.suggestedLatency = inLatency;
+	m_inputParameters.suggestedLatency = Pa_GetDeviceInfo(inDevIdx)->defaultLowInputLatency;
 	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
 	
 	// Open an audio I/O stream. 
