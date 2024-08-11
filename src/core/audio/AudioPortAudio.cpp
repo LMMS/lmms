@@ -29,6 +29,7 @@
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #include <QFormLayout>
+#include <iostream>
 
 #include "Engine.h"
 #include "ConfigManager.h"
@@ -44,91 +45,85 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		  engine)
 	, m_paStream(nullptr)
 	, m_wasPAInitError(false)
-	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_outBuf(new SampleFrame[engine->framesPerPeriod()])
 	, m_outBufPos(0)
+	, m_outBufSize(engine->framesPerPeriod())
 {
 	successful = false;
-	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
-	
 	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
+		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		m_wasPAInitError = true;
 		return;
 	}
 
-	if( Pa_GetDeviceCount() <= 0 )
-	{
-		return;
-	}
-	
 	const QString& backend = ConfigManager::inst()->value( "audioportaudio", "backend" );
 	const QString& device = ConfigManager::inst()->value( "audioportaudio", "device" );
-		
-	PaDeviceIndex inDevIdx = -1;
-	PaDeviceIndex outDevIdx = -1;
+
+	PaDeviceIndex inputDeviceIndex = Pa_GetDefaultInputDevice();
+	PaDeviceIndex outputDeviceIndex = Pa_GetDefaultOutputDevice();
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
-		const auto di = Pa_GetDeviceInfo(i);
-		if( di->name == device &&
-			Pa_GetHostApiInfo( di->hostApi )->name == backend )
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+		if (deviceInfo->name == device && Pa_GetHostApiInfo(deviceInfo->hostApi)->name == backend)
 		{
-			inDevIdx = i;
-			outDevIdx = i;
+			inputDeviceIndex = i;
+			outputDeviceIndex = i;
 		}
 	}
 
-	if( inDevIdx < 0 )
+	PaStreamParameters* inputParameters = nullptr;
+	PaStreamParameters* outputParameters = nullptr;
+
+	if (outputDeviceIndex >= 0)
 	{
-		inDevIdx = Pa_GetDefaultInputDevice();
+		m_outputParameters.device = outputDeviceIndex;
+		m_outputParameters.channelCount = channels();
+		m_outputParameters.sampleFormat = paFloat32;
+		m_outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputDeviceIndex)->defaultLowOutputLatency;
+		m_outputParameters.hostApiSpecificStreamInfo = nullptr;
+		outputParameters = &m_outputParameters;
 	}
-	
-	if( outDevIdx < 0 )
+	else { return; }
+
+	if (inputDeviceIndex >= 0)
 	{
-		outDevIdx = Pa_GetDefaultOutputDevice();
+		m_inputParameters.device = inputDeviceIndex;
+		m_inputParameters.channelCount = channels();
+		m_inputParameters.sampleFormat = paFloat32;
+		m_inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputDeviceIndex)->defaultLowInputLatency;
+		m_inputParameters.hostApiSpecificStreamInfo = nullptr;
+		inputParameters = &m_inputParameters;
+		m_supportsCapture = true;
 	}
+	else { m_supportsCapture = false; }
 
-	if( inDevIdx < 0 || outDevIdx < 0 )
-	{
-		return;
-	}
-
-	const int samples = audioEngine()->framesPerPeriod();
-	
-	m_outputParameters.device = outDevIdx;
-	m_outputParameters.channelCount = channels();
-	m_outputParameters.sampleFormat = paFloat32;
-	m_outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevIdx)->defaultLowOutputLatency;
-	m_outputParameters.hostApiSpecificStreamInfo = nullptr;
-
-	m_inputParameters.device = inDevIdx;
-	m_inputParameters.channelCount = DEFAULT_CHANNELS;
-	m_inputParameters.sampleFormat = paFloat32;
-	m_inputParameters.suggestedLatency = Pa_GetDeviceInfo(inDevIdx)->defaultLowInputLatency;
-	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
-
-	err = Pa_OpenStream(&m_paStream, supportsCapture() ? &m_inputParameters : nullptr, &m_outputParameters,
-		sampleRate(), samples, paNoFlag, processCallback, this);
-
-	if( err == paInvalidDevice && sampleRate() < 48000 )
-	{
-		printf("Pa_OpenStream() failed with 44,1 KHz, trying again with 48 KHz\n");
-		// some backends or drivers do not allow 32 bit floating point data
-		// with a samplerate of 44100 Hz
-		setSampleRate( 48000 );
-		err = Pa_OpenStream(&m_paStream, supportsCapture() ? &m_inputParameters : nullptr, &m_outputParameters,
-			sampleRate(), samples, paNoFlag, processCallback, this);
-	}
+	err = Pa_OpenStream(&m_paStream,
+		inputParameters,
+		outputParameters,
+		sampleRate(),
+		engine->framesPerPeriod(),
+		paNoFlag, 
+		processCallback,
+		this);
 
 	if( err != paNoError )
 	{
-		printf( "Couldn't open PortAudio: %s\n", Pa_GetErrorText( err ) );
+		std::cerr << "Couldn't open PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
 
-	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
-	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
+	const auto inputDeviceInfo = Pa_GetDeviceInfo(inputDeviceIndex);
+	const auto inputDeviceName = inputDeviceInfo->name;
+	const auto inputDeviceBackend = Pa_GetHostApiInfo(inputDeviceInfo->hostApi)->name;
+
+	const auto outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
+	const auto outputDeviceName = outputDeviceInfo->name;
+	const auto outputDeviceBackend = Pa_GetHostApiInfo(outputDeviceInfo->hostApi)->name;
+
+	std::cout << "Input device: " << inputDeviceName << ", backend: " << inputDeviceBackend << '\n';
+	std::cout << "Output device: " << outputDeviceName << ", backend: " << outputDeviceBackend << '\n';
 
 	successful = true;
 }
