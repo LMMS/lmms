@@ -180,21 +180,17 @@ void AudioPortAudio::stopProcessing()
 }
 
 
-int AudioPortAudio::processCallback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer)
+int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer)
 {
-	if( supportsCapture() )
-	{
-		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
-	}
+	if (supportsCapture()) { audioEngine()->pushInputFrames((SampleFrame*)inputBuffer, framesPerBuffer); }
 
 	if( m_stopped )
 	{
-		memset( _outputBuffer, 0, _framesPerBuffer *
-			channels() * sizeof(float) );
+		memset(outputBuffer, 0, framesPerBuffer * channels() * sizeof(float));
 		return paComplete;
 	}
 
-	while( _framesPerBuffer )
+	while (framesPerBuffer)
 	{
 		if( m_outBufPos == 0 )
 		{
@@ -202,24 +198,23 @@ int AudioPortAudio::processCallback(const float* _inputBuffer, float* _outputBuf
 			if( !frames )
 			{
 				m_stopped = true;
-				memset( _outputBuffer, 0, _framesPerBuffer *
-					channels() * sizeof(float) );
+				memset(outputBuffer, 0, framesPerBuffer * channels() * sizeof(float));
 				return paComplete;
 			}
 			m_outBufSize = frames;
 		}
-		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
+		const auto min_len = std::min(framesPerBuffer, m_outBufSize - m_outBufPos);
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				(_outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
+				(outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
 			}
 		}
 
-		_outputBuffer += min_len * channels();
-		_framesPerBuffer -= min_len;
+		outputBuffer += min_len * channels();
+		framesPerBuffer -= min_len;
 		m_outBufPos += min_len;
 		m_outBufPos %= m_outBufSize;
 	}
@@ -227,21 +222,15 @@ int AudioPortAudio::processCallback(const float* _inputBuffer, float* _outputBuf
 	return paContinue;
 }
 
-
-
-int AudioPortAudio::processCallback(
-	const void *_inputBuffer,
-	void * _outputBuffer,
-	unsigned long _framesPerBuffer,
-	const PaStreamCallbackTimeInfo * _timeInfo,
-	PaStreamCallbackFlags _statusFlags,
-	void * _arg )
+int AudioPortAudio::processCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
+	const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* arg)
 {
-	Q_UNUSED(_timeInfo);
-	Q_UNUSED(_statusFlags);
+	Q_UNUSED(timeInfo);
+	Q_UNUSED(statusFlags);
 
-	auto _this = static_cast<AudioPortAudio*>(_arg);
-	return _this->processCallback((const float*)_inputBuffer, (float*)_outputBuffer, _framesPerBuffer);
+	auto _this = static_cast<AudioPortAudio*>(arg);
+	return _this->processCallback(
+		static_cast<const float*>(inputBuffer), static_cast<float*>(outputBuffer), framesPerBuffer);
 }
 
 

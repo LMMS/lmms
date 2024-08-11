@@ -80,9 +80,9 @@ private:
 	void startProcessing() override;
 	void stopProcessing() override;
 
-	int processCallback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer);
-	static int processCallback(const void* _inputBuffer, void* _outputBuffer, unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo* _timeInfo, PaStreamCallbackFlags _statusFlags, void* arg);
+	int processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer);
+	static int processCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
+		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* arg);
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;
