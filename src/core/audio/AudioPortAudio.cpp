@@ -153,7 +153,7 @@ void AudioPortAudio::startProcessing()
 	if( err != paNoError )
 	{
 		m_stopped = true;
-		printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+		std::cerr << "Failed to start PortAudio stream: " << Pa_GetErrorText(err) << '\n';
 	}
 }
 
@@ -166,11 +166,8 @@ void AudioPortAudio::stopProcessing()
 	{
 		m_stopped = true;
 		PaError err = Pa_StopStream( m_paStream );
-	
-		if( err != paNoError )
-		{
-			printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-		}
+
+		if (err != paNoError) { std::cerr << "Failed to stop PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 	}
 }
 
@@ -235,7 +232,7 @@ void gui::AudioPortAudioSetupWidget::updateBackends()
 {
 	PaError err = Pa_Initialize();
 	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
+		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
 
@@ -255,7 +252,7 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 {
 	PaError err = Pa_Initialize();
 	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
+		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
 
@@ -290,7 +287,7 @@ void gui::AudioPortAudioSetupWidget::updateChannels()
 {
 	PaError err = Pa_Initialize();
 	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
+		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
 	Pa_Terminate();
