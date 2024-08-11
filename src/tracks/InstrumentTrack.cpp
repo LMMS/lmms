@@ -871,7 +871,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 		// Only save the MIDI port information if we are not saving a preset.
 		if (!isPresetMode())
 		{
-			m_midiPort.saveState( doc, thisElement );
+			m_midiPort.saveState(doc, thisElement);
 		}
 
 		autoAssignMidiDevice(hasAuto);
