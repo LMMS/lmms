@@ -120,30 +120,20 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 
 	const int samples = audioEngine()->framesPerPeriod();
 	
-	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
 	m_outputParameters.channelCount = channels();
-	m_outputParameters.sampleFormat = paFloat32; // 32 bit floating point output
+	m_outputParameters.sampleFormat = paFloat32;
 	m_outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevIdx)->defaultLowOutputLatency;
 	m_outputParameters.hostApiSpecificStreamInfo = nullptr;
 
-	// Configure input parameters.
 	m_inputParameters.device = inDevIdx;
 	m_inputParameters.channelCount = DEFAULT_CHANNELS;
-	m_inputParameters.sampleFormat = paFloat32; // 32 bit floating point input
+	m_inputParameters.sampleFormat = paFloat32;
 	m_inputParameters.suggestedLatency = Pa_GetDeviceInfo(inDevIdx)->defaultLowInputLatency;
 	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
-	
-	// Open an audio I/O stream. 
-	err = Pa_OpenStream(
-			&m_paStream,
-			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
-			&m_outputParameters,	// The outputparameter
-			sampleRate(),
-			samples,
-			paNoFlag,		// Don't use any flags
-			_process_callback, 	// our callback function
-			this );
+
+	err = Pa_OpenStream(&m_paStream, supportsCapture() ? &m_inputParameters : nullptr, &m_outputParameters,
+		sampleRate(), samples, paNoFlag, _process_callback, this);
 
 	if( err == paInvalidDevice && sampleRate() < 48000 )
 	{
@@ -153,12 +143,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		setSampleRate( 48000 );
 		err = Pa_OpenStream(
 				&m_paStream,
-				supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
-				&m_outputParameters,	// The outputparameter
+				supportsCapture() ? &m_inputParameters : nullptr,
+				&m_outputParameters,
 				sampleRate(),
 				samples,
-				paNoFlag,		// Don't use any flags
-				_process_callback, 	// our callback function
+				paNoFlag,
+				_process_callback, 
 				this );
 	}
 
@@ -170,9 +160,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
-
-	// TODO: debug AudioEngine::pushInputFrames()
-	//m_supportsCapture = true;
 
 	_success_ful = true;
 }
@@ -242,7 +229,6 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 	{
 		if( m_outBufPos == 0 )
 		{
-			// frames depend on the sample rate
 			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
@@ -321,7 +307,6 @@ void AudioPortAudioSetupUtil::updateDevices()
 		return;
 	}
 
-	// get active backend 
 	const QString& backend = m_backendModel.currentText();
 	int hostApi = 0;
 	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
@@ -334,7 +319,6 @@ void AudioPortAudioSetupUtil::updateDevices()
 		}
 	}
 
-	// get devices for selected backend
 	m_deviceModel.clear();
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
@@ -357,7 +341,6 @@ void AudioPortAudioSetupUtil::updateChannels()
 		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
 		return;
 	}
-	// get active backend 
 	Pa_Terminate();
 }
 
@@ -376,17 +359,6 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_device = new ComboBox( this, "DEVICE" );
 	form->addRow(tr("Device"), m_device);
-	
-/*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
-	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audioportaudio",
-							"channels" ).toInt() );
-
-	m_channels = new LcdSpinBox( 1, this );
-	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 308, 20 );*/
 
 	connect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
 			&m_setupUtil, SLOT(updateDevices()));
@@ -415,14 +387,10 @@ AudioPortAudio::setupWidget::~setupWidget()
 
 void AudioPortAudio::setupWidget::saveSettings()
 {
-
 	ConfigManager::inst()->setValue( "audioportaudio", "backend",
 							m_setupUtil.m_backendModel.currentText() );
 	ConfigManager::inst()->setValue( "audioportaudio", "device",
 							m_setupUtil.m_deviceModel.currentText() );
-/*	ConfigManager::inst()->setValue( "audioportaudio", "channels",
-				QString::number( m_channels->value<int>() ) );*/
-
 }
 
 
