@@ -424,7 +424,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		DataFile dataFile(DataFile::Type::InstrumentTrackSettings);
 		QDomElement& content(dataFile.content());
 
-		m_track->setSimpleSerializing();
+		m_track->setPresetMode();
 		m_track->saveSettings(dataFile, content);
 		//We don't want to save muted & solo settings when we're saving a preset
 		content.setAttribute("muted", 0);

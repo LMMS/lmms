@@ -115,9 +115,9 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	void setSimpleSerializing(bool simpleSerializing = true)
+	void setPresetMode(bool presetMode = true)
 	{
-		m_simpleSerializingMode = simpleSerializing;
+		m_presetMode = presetMode;
 	}
 
 	// -- for usage by Clip only ---------------
@@ -210,9 +210,9 @@ public slots:
 	void toggleSolo();
 
 protected:
-	bool isSimpleSerializing() const
+	bool isPresetMode() const
 	{
-		return m_simpleSerializingMode;
+		return m_presetMode;
 	}
 
 private:
@@ -228,7 +228,7 @@ private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
-	bool m_simpleSerializingMode;
+	bool m_presetMode;
 
 	clipVector m_clips;
 

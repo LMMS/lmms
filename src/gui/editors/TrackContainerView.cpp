@@ -416,7 +416,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	{
 		DataFile dataFile( value );
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		it->setSimpleSerializing();
+		it->setPresetMode();
 		it->loadSettings( dataFile.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();

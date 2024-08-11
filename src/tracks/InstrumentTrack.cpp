@@ -869,7 +869,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 		autoAssignMidiDevice(false);
 
 		// Only save the MIDI port information if we are not saving a preset.
-		if (!isSimpleSerializing())
+		if (!isPresetMode())
 		{
 			m_midiPort.saveState( doc, thisElement );
 		}
@@ -1011,7 +1011,7 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 	int mixerChannel = mixerChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
-	setSimpleSerializing();
+	setPresetMode();
 	
 	//Replacing an instrument shouldn't change the solo/mute state.
 	bool oldMute = isMuted();
