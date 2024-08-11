@@ -48,7 +48,7 @@ PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Mo
 {
 }
 
-void PluginPinConnector::setPortCounts(int inCount, int outCount)
+void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 {
 	if (inCount < 0)
 	{
@@ -71,49 +71,22 @@ void PluginPinConnector::setPortCounts(int inCount, int outCount)
 		return;
 	}
 
-	auto parent = dynamic_cast<Model*>(this->parent());
-	auto updateModels = [parent](std::vector<std::vector<BoolModel*>>& models, int& oldCount, int newCount) {
-		if (oldCount < newCount)
-		{
-			for (auto& pluginModels : models)
-			{
-				pluginModels.reserve(newCount);
-				for (int idx = oldCount; idx < newCount; ++idx)
-				{
-					pluginModels.push_back(new BoolModel{false, parent});
-				}
-			}
-		}
-		else if (oldCount > newCount)
-		{
-			for (auto& pluginModels : models)
-			{
-				for (int idx = newCount; idx < oldCount; ++idx)
-				{
-					delete pluginModels[idx];
-				}
-				pluginModels.erase(pluginModels.begin() + newCount, pluginModels.end());
-			}
-		}
-		oldCount = newCount;
-	};
-
-	updateModels(m_inModels, m_pluginInCount, inCount);
-	updateModels(m_outModels, m_pluginOutCount, outCount);
+	setChannelCount(inCount, m_inModels, m_pluginInCount);
+	setChannelCount(outCount, m_outModels, m_pluginOutCount);
 
 	updateOptions();
 
-	emit portsChanged();
+	emit channelCountsChanged();
 }
 
-void PluginPinConnector::setPortCountIn(int inCount)
+void PluginPinConnector::setChannelCountIn(int inCount)
 {
-	setPortCounts(inCount, m_pluginOutCount);
+	setChannelCounts(inCount, m_pluginOutCount);
 }
 
-void PluginPinConnector::setPortCountOut(int outCount)
+void PluginPinConnector::setChannelCountOut(int outCount)
 {
-	setPortCounts(m_pluginInCount, outCount);
+	setChannelCounts(m_pluginInCount, outCount);
 }
 
 void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAudioData<sample_t> out)
@@ -253,18 +226,96 @@ void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 	// Only plugins with a mono in/out need to be saved
 	//if (m_portCountIn != 1 && m_portCountOut != 1) { return; }
 
-	elem.setAttribute("in", m_pluginInCount);   // probably not needed, but just in case
-	elem.setAttribute("out", m_pluginOutCount); // ditto
-	m_config.saveSettings(doc, elem, "config");
+	elem.setAttribute("in_count", m_pluginInCount);   // probably not needed, but just in case
+	elem.setAttribute("out_count", m_pluginOutCount); // ditto
+
+	auto pinsIn = doc.createElement("in");
+	elem.appendChild(pinsIn);
+	saveSettings(m_inModels, doc, pinsIn);
+
+	auto pinsOut = doc.createElement("out");
+	elem.appendChild(pinsOut);
+	saveSettings(m_outModels, doc, pinsOut);
 }
 
 void PluginPinConnector::loadSettings(const QDomElement& elem)
 {
+	// Until full routing support is added, track channel count should always be 2
+	assert(m_coreInCount == 2);
+	assert(m_coreOutCount == 2);
+
 	// TODO: Assert port counts are what was expected?
-	//const auto portCountIn = elem.attribute("in", "0").toInt();
-	//const auto portCountOut = elem.attribute("out", "0").toInt();
-	m_config.loadSettings(elem, "config");
+	const auto pluginInCount = elem.attribute("in_count", "0").toInt();
+	const auto pluginOutCount = elem.attribute("out_count", "0").toInt();
+	setChannelCounts(pluginInCount, pluginOutCount);
+
+	loadSettings(elem.firstChildElement("in"), m_inModels);
+	loadSettings(elem.firstChildElement("out"), m_outModels);
 }
+
+void PluginPinConnector::saveSettings(const PinMap& pins, QDomDocument& doc, QDomElement& elem)
+{
+	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
+	{
+		auto& trackChannels = pins[trackChannel];
+		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
+		{
+			if (trackChannels[pluginChannel]->value())
+			{
+				trackChannels[pluginChannel]->saveSettings(doc, elem,
+					QString{"%1,%2"}.arg(trackChannel).arg(pluginChannel));
+			}
+		}
+	}
+}
+
+void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
+{
+	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
+	{
+		auto& trackChannels = pins[trackChannel];
+		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
+		{
+			const auto name = QString{"%1,%2"}.arg(trackChannel).arg(pluginChannel);
+			if (elem.hasAttribute(name) || !elem.firstChildElement(name).isNull())
+			{
+				trackChannels[pluginChannel]->loadSettings(elem, name);
+			}
+			else
+			{
+				trackChannels[pluginChannel]->setValue(0);
+			}
+		}
+	}
+}
+
+void PluginPinConnector::setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount)
+{
+	auto parent = dynamic_cast<Model*>(this->parent());
+	if (oldCount < newCount)
+	{
+		for (auto& pluginModels : models)
+		{
+			pluginModels.reserve(newCount);
+			for (int idx = oldCount; idx < newCount; ++idx)
+			{
+				pluginModels.push_back(new BoolModel{false, parent});
+			}
+		}
+	}
+	else if (oldCount > newCount)
+	{
+		for (auto& pluginModels : models)
+		{
+			for (int idx = newCount; idx < oldCount; ++idx)
+			{
+				delete pluginModels[idx];
+			}
+			pluginModels.erase(pluginModels.begin() + newCount, pluginModels.end());
+		}
+	}
+	oldCount = newCount;
+};
 
 auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorWidget*
 {

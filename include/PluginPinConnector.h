@@ -29,6 +29,7 @@
 #include <QObject>
 #include <vector>
 
+#include "AutomatableModel.h"
 #include "lmms_basics.h"
 #include "lmms_export.h"
 #include "SerializingObject.h"
@@ -37,8 +38,6 @@ class QWidget;
 
 namespace lmms
 {
-
-class BoolModel;
 
 namespace gui
 {
@@ -64,10 +63,10 @@ public:
 	/**
 	 * Getters
 	 */
-	auto coreCountIn() const -> int { return m_coreInCount; }
-	auto coreCountOut() const -> int { return m_coreOutCount; }
-	auto pluginCountIn() const -> int { return m_pluginInCount; }
-	auto pluginCountOut() const -> int { return m_pluginOutCount; }
+	//auto coreCountIn() const -> int { return m_coreInCount; }
+	//auto coreCountOut() const -> int { return m_coreOutCount; }
+	auto channelCountIn() const -> int { return m_pluginInCount; }
+	auto channelCountOut() const -> int { return m_pluginOutCount; }
 
 	auto pinMapIn() const -> const PinMap& { return m_inModels; }
 	auto pinMapOut() const -> const PinMap& { return m_outModels; }
@@ -86,9 +85,9 @@ public:
 	/**
 	 * Setters
 	 */
-	void setPortCounts(int inCount, int outCount);
-	void setPortCountIn(int inCount);
-	void setPortCountOut(int outCount);
+	void setChannelCounts(int inCount, int outCount);
+	void setChannelCountIn(int inCount);
+	void setChannelCountOut(int outCount);
 
 	/*
 	 * Routes audio from LMMS track channels to plugin inputs according to the plugin pin connector configuration.
@@ -120,15 +119,20 @@ public:
 	 */
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
-	auto nodeName() const -> QString override { return "port_config"; }
+	auto nodeName() const -> QString override { return "pins"; }
 
 	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorWidget*;
 
 signals:
-	void portsChanged();
+	void channelCountsChanged();
 
 private:
 	void updateOptions();
+
+	static void saveSettings(const PinMap& pins, QDomDocument& doc, QDomElement& elem);
+	static void loadSettings(const QDomElement& elem, PinMap& pins);
+
+	void setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount);
 
 	int m_coreInCount = DEFAULT_CHANNELS;
 	int m_coreOutCount = DEFAULT_CHANNELS;
