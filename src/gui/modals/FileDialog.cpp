@@ -46,24 +46,23 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-	auto addIfUnavailable = [](QList<QUrl>& urls, const QString& path)
+	QList<QUrl> urls = sidebarUrls();
+
+	auto addUnique = [&](const QString& path)
 	{
 		auto newUrl = QUrl::fromLocalFile(path);
-	
+
 		if (!urls.contains(newUrl))
 		{
 			urls << newUrl;
 		}
 	};
 
-	m_oldURLs = sidebarUrls();
-	QList<QUrl> urls = sidebarUrls();
-
 	QDir desktopDir;
 	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
 	if (desktopDir.exists())
 	{
-	    addIfUnavailable(urls, desktopDir.absolutePath());
+	    addUnique(desktopDir.absolutePath());
 	}
 
 	QDir downloadDir(QDir::homePath() + "/Downloads");
@@ -73,24 +72,24 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	}
 	if (downloadDir.exists())
 	{
-		addIfUnavailable(urls, downloadDir.absolutePath());
+		addUnique(downloadDir.absolutePath());
 	}
 
 	QDir musicDir;
 	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
 	if (musicDir.exists())
 	{
-		addIfUnavailable(urls, musicDir.absolutePath());
+		addUnique(musicDir.absolutePath());
 	}
 
-	addIfUnavailable(urls, ConfigManager::inst()->workingDir());
+	addUnique(ConfigManager::inst()->workingDir());
 
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
 #ifdef LMMS_BUILD_APPLE
 	QDir volumesDir( QDir("/Volumes") );
 	if ( volumesDir.exists() )
-		addIfUnavailable(urls, volumesDir.absolutePath());
+		addUnique(volumesDir.absolutePath());
 #endif
 
 #ifdef LMMS_BUILD_LINUX
@@ -104,19 +103,13 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
 		{
-			addIfUnavailable(urls, storage.rootPath());
+			addUnique(storage.rootPath());
 		}
 	}
 #endif
 
 	setSidebarUrls(urls);
 }
-
-FileDialog::~FileDialog()
-{
-	setSidebarUrls(m_oldURLs);
-}
-
 
 QString FileDialog::getExistingDirectory(QWidget *parent,
 										const QString &caption,
