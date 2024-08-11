@@ -59,10 +59,10 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
 	Effect( &bitcrush_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = new sampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
+	m_buffer = new SampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 
@@ -83,7 +83,7 @@ BitcrushEffect::~BitcrushEffect()
 
 void BitcrushEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
@@ -100,7 +100,7 @@ inline float BitcrushEffect::noise( float amt )
 	return fastRandf( amt * 2.0f ) - amt;
 }
 
-bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -153,7 +153,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -180,7 +180,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	}
 	else // rate crushing disabled: simply oversample with zero-order hold
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -196,7 +196,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	// the oversampled buffer is now written, so filter it to reduce aliasing
 
-	for( int f = 0; f < frames * OS_RATE; ++f )
+	for (auto f = std::size_t{0}; f < frames * OS_RATE; ++f)
 	{
 		if( qMax( qAbs( m_buffer[f][0] ), qAbs( m_buffer[f][1] ) ) >= 1.0e-10f )
 		{
@@ -225,7 +225,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		float lsum = 0.0f;
 		float rsum = 0.0f;

@@ -41,7 +41,7 @@ class BitcrushEffect : public Effect
 public:
 	BitcrushEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~BitcrushEffect() override;
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
 
 	EffectControls* controls() override
 	{
@@ -55,7 +55,7 @@ private:
 
 	BitcrushControls m_controls;
 	
-	sampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 	float m_sampleRate;
 	StereoLinkwitzRiley m_filter;
 	

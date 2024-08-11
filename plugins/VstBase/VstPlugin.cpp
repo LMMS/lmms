@@ -36,7 +36,7 @@
 
 #ifdef LMMS_BUILD_LINUX
 #	include <QX11Info>
-#	include "X11EmbedContainer.h"
+#	include <X11EmbedContainer.h>
 #endif
 
 #include <QWindow>
@@ -338,7 +338,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::audioEngine()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->outputSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }

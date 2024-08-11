@@ -55,7 +55,7 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 	m_reverbSCControls( this )
 {
 	sp_create(&sp);
-	sp->sr = Engine::audioEngine()->processingSampleRate();
+	sp->sr = Engine::audioEngine()->outputSampleRate();
 
 	sp_revsc_create(&revsc);
 	sp_revsc_init(sp, revsc);
@@ -63,8 +63,8 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
 
-	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
-	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[0], 1);
+	sp_dcblock_init(sp, dcblk[1], 1);
 }
 
 ReverbSCEffect::~ReverbSCEffect()
@@ -75,7 +75,7 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -132,7 +132,7 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 void ReverbSCEffect::changeSampleRate()
 {
 	// Change sr variable in Soundpipe. does not need to be destroyed
-	sp->sr = Engine::audioEngine()->processingSampleRate();
+	sp->sr = Engine::audioEngine()->outputSampleRate();
 
 	mutex.lock();
 	sp_revsc_destroy(&revsc);
@@ -145,8 +145,8 @@ void ReverbSCEffect::changeSampleRate()
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
 
-	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
-	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[0], 1);
+	sp_dcblock_init(sp, dcblk[1], 1);
 	mutex.unlock();
 }
 

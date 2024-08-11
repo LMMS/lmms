@@ -52,13 +52,13 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&dispersion_plugin_descriptor, parent, key),
 	m_dispersionControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_amountVal(0)
 {
 }
 
 
-bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool DispersionEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning())
 	{

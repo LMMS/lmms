@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &crossovereq_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_lp1( m_sampleRate ),
 	m_lp2( m_sampleRate ),
 	m_lp3( m_sampleRate ),
@@ -64,9 +64,9 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp2 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
-	m_tmp1 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
-	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_tmp2 = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_tmp1 = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_work = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
@@ -78,7 +78,7 @@ CrossoverEQEffect::~CrossoverEQEffect()
 
 void CrossoverEQEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_lp1.setSampleRate( m_sampleRate );
 	m_lp2.setSampleRate( m_sampleRate );
 	m_lp3.setSampleRate( m_sampleRate );
@@ -89,7 +89,7 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool CrossoverEQEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -139,10 +139,10 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	
 	m_needsUpdate = false;
 	
-	memset( m_work, 0, sizeof( sampleFrame ) * frames );
+	zeroSampleFrames(m_work, frames);
 	
 	// run temp bands
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		m_tmp1[f][0] = m_lp2.update( buf[f][0], 0 );
 		m_tmp1[f][1] = m_lp2.update( buf[f][1], 1 );
@@ -153,7 +153,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	// run band 1
 	if( mute1 )
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			m_work[f][0] += m_lp1.update( m_tmp1[f][0], 0 ) * m_gain1;
 			m_work[f][1] += m_lp1.update( m_tmp1[f][1], 1 ) * m_gain1;
@@ -163,7 +163,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	// run band 2
 	if( mute2 )
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			m_work[f][0] += m_hp2.update( m_tmp1[f][0], 0 ) * m_gain2;
 			m_work[f][1] += m_hp2.update( m_tmp1[f][1], 1 ) * m_gain2;
@@ -173,7 +173,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	// run band 3
 	if( mute3 )
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			m_work[f][0] += m_lp3.update( m_tmp2[f][0], 0 ) * m_gain3;
 			m_work[f][1] += m_lp3.update( m_tmp2[f][1], 1 ) * m_gain3;
@@ -183,7 +183,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	// run band 4
 	if( mute4 )
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			m_work[f][0] += m_hp4.update( m_tmp2[f][0], 0 ) * m_gain4;
 			m_work[f][1] += m_hp4.update( m_tmp2[f][1], 1 ) * m_gain4;
@@ -193,7 +193,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	const float d = dryLevel();
 	const float w = wetLevel();
 	double outSum = 0.0;
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];

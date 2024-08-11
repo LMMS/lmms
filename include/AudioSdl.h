@@ -39,7 +39,7 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-class QLineEdit;
+class QComboBox;
 
 namespace lmms
 {
@@ -64,10 +64,16 @@ public:
 		~setupWidget() override = default;
 
 		void saveSettings() override;
+	
+	private:
+		void populatePlaybackDeviceComboBox();
+		void populateInputDeviceComboBox();
 
 	private:
-		QLineEdit * m_device;
+		QComboBox* m_playbackDeviceComboBox = nullptr;
+		QComboBox* m_inputDeviceComboBox = nullptr;
 
+		static QString s_systemDefaultDevice;
 	} ;
 
 
@@ -85,7 +91,7 @@ private:
 
 	SDL_AudioSpec m_audioHandle;
 
-	surroundSampleFrame * m_outBuf;
+	SampleFrame* m_outBuf;
 
 #ifdef LMMS_HAVE_SDL2
 	size_t m_currentBufferFramePos;

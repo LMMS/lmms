@@ -50,33 +50,29 @@ extern "C"
 LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&lomm_plugin_descriptor, parent, key),
 	m_lommControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp1(m_sampleRate),
 	m_lp2(m_sampleRate),
 	m_hp1(m_sampleRate),
 	m_hp2(m_sampleRate),
 	m_ap(m_sampleRate),
 	m_needsUpdate(true),
-	m_coeffPrecalc(-0.05),
-	m_crestTimeConst(0.999),
+	m_coeffPrecalc(-0.05f),
+	m_crestTimeConst(0.999f),
 	m_lookWrite(0),
 	m_lookBufLength(2)
 {
 	autoQuitModel()->setValue(autoQuitModel()->maxValue());
 	
-	m_yL[0][0] = m_yL[0][1] = LOMM_MIN_FLOOR;
-	m_yL[1][0] = m_yL[1][1] = LOMM_MIN_FLOOR;
-	m_yL[2][0] = m_yL[2][1] = LOMM_MIN_FLOOR;
-	
 	m_ap.setFilterType(BasicFilters<2>::FilterType::AllPass);
 	
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
-	emit changeSampleRate();
+	changeSampleRate();
 }
 
 void LOMMEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 	m_lp1.setSampleRate(m_sampleRate);
 	m_lp2.setSampleRate(m_sampleRate);
 	m_hp1.setSampleRate(m_sampleRate);
@@ -97,10 +93,15 @@ void LOMMEffect::changeSampleRate()
 			m_scLookBuf[j][i].resize(m_lookBufLength, LOMM_MIN_FLOOR);
 		}
 	}
+
+	std::fill(m_yL.begin(), m_yL.end(), std::array<float, 2>{LOMM_MIN_FLOOR, LOMM_MIN_FLOOR});
+	m_rms = m_gainResult = m_displayIn = m_displayOut = m_prevOut = m_yL;
+	m_crestPeakVal[0] = m_crestPeakVal[1] = LOMM_MIN_FLOOR;
+	m_crestRmsVal = m_crestFactorVal = m_crestPeakVal;
 }
 
 
-bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool LOMMEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning())
 	{
@@ -111,7 +112,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		m_lp1.setLowpass(m_lommControls.m_split1Model.value());
 		m_hp1.setHighpass(m_lommControls.m_split1Model.value());
-		m_ap.calcFilterCoeffs(m_lommControls.m_split1Model.value(), 0.70710678118);
+		m_ap.calcFilterCoeffs(m_lommControls.m_split1Model.value(), 0.70710678118f);
 	}
 	if (m_needsUpdate || m_lommControls.m_split2Model.isValueChanged())
 	{

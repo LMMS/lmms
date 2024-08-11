@@ -56,7 +56,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	}
 
 	int cbIndex = 0;
-	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
+	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
 	{
 		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
 		{
@@ -154,11 +154,8 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	AudioEngine::qualitySettings qs =
-			AudioEngine::qualitySettings(
-					static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<AudioEngine::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
-
+	auto qs = AudioEngine::qualitySettings(
+		static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()));
 	const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
@@ -271,7 +268,7 @@ void ExportProjectDialog::startBtnClicked()
 	}
 
 	// Find proper file extension.
-	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
+	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
 	{
 		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
 		{

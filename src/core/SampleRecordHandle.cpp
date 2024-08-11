@@ -64,9 +64,9 @@ SampleRecordHandle::~SampleRecordHandle()
 
 
 
-void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
+void SampleRecordHandle::play( SampleFrame* /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = Engine::audioEngine()->inputBuffer();
+	const SampleFrame* recbuf = Engine::audioEngine()->inputBuffer();
 	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
@@ -110,7 +110,7 @@ std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	auto bigBuffer = std::vector<sampleFrame>(frames);
+	auto bigBuffer = std::vector<SampleFrame>(frames);
 
 	// now copy all buffers into big buffer
 	auto framesCopied = 0;
@@ -127,9 +127,9 @@ std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 
 
 
-void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _frames )
+void SampleRecordHandle::writeBuffer( const SampleFrame* _ab, const f_cnt_t _frames )
 {
-	auto buf = new sampleFrame[_frames];
+	auto buf = new SampleFrame[_frames];
 	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )

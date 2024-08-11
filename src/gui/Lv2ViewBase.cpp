@@ -31,7 +31,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <lilv/lilv.h>
-#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
+#include <lv2/port-props/port-props.h>
 
 #include "AudioEngine.h"
 #include "Controls.h"
@@ -74,7 +74,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+						sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 						auto pMin = port.min(sr);
 						auto pMax = port.max(sr);
 						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));

@@ -109,7 +109,7 @@ public:
 		m_userAntiAliasWaveTable = waveform;
 	}
 
-	void update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
+	void update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
 
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
@@ -163,23 +163,15 @@ public:
 
 	static inline sample_t noiseSample( const float )
 	{
-		// Precise implementation
-//		return 1.0f - rand() * 2.0f / RAND_MAX;
-
-		// Fast implementation
-		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
+		return 1.0f - rand() * 2.0f / RAND_MAX;
 	}
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
 		if (buffer == nullptr || buffer->size() == 0) { return 0; }
 		const auto frames = buffer->size();
-		const auto frame = sample * frames;
-		auto f1 = static_cast<f_cnt_t>(frame) % frames;
-		if (f1 < 0)
-		{
-			f1 += frames;
-		}
+		const auto frame = absFraction(sample) * frames;
+		const auto f1 = static_cast<f_cnt_t>(frame);
 
 		return linearInterpolate(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
 	}
@@ -194,17 +186,13 @@ public:
 	inline wtSampleControl getWtSampleControl(const float sample) const
 	{
 		wtSampleControl control;
-		control.frame = sample * OscillatorConstants::WAVETABLE_LENGTH;
-		control.f1 = static_cast<f_cnt_t>(control.frame) % OscillatorConstants::WAVETABLE_LENGTH;
-		if (control.f1 < 0)
-		{
-			control.f1 += OscillatorConstants::WAVETABLE_LENGTH;
-		}
+		control.frame = absFraction(sample) * OscillatorConstants::WAVETABLE_LENGTH;
+		control.f1 = static_cast<f_cnt_t>(control.frame);
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :
 					0;
 		control.band = waveTableBandFromFreq(
-			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->processingSampleRate());
+			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->outputSampleRate());
 		return control;
 	}
 
@@ -286,40 +274,40 @@ private:
 	/* End Multiband wavetable */
 
 
-	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+	void updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updatePM( sampleFrame * _ab, const fpp_t _frames,
+	void updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateAM( sampleFrame * _ab, const fpp_t _frames,
+	void updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateMix( sampleFrame * _ab, const fpp_t _frames,
+	void updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateSync( sampleFrame * _ab, const fpp_t _frames,
+	void updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateFM( sampleFrame * _ab, const fpp_t _frames,
+	void updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	float syncInit( sampleFrame * _ab, const fpp_t _frames,
+	float syncInit( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
 	template<WaveShape W>
-	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+	void updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updatePM( sampleFrame * _ab, const fpp_t _frames,
+	void updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateAM( sampleFrame * _ab, const fpp_t _frames,
+	void updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateMix( sampleFrame * _ab, const fpp_t _frames,
+	void updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateSync( sampleFrame * _ab, const fpp_t _frames,
+	void updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<WaveShape W>
-	void updateFM( sampleFrame * _ab, const fpp_t _frames,
+	void updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
 	template<WaveShape W>

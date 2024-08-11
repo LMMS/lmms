@@ -184,7 +184,7 @@ void EffectChain::moveUp( Effect * _effect )
 
 
 
-bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise )
+bool EffectChain::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bool hasInputNoise )
 {
 	if( m_enabledModel.value() == false )
 	{

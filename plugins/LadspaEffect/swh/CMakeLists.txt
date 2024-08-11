@@ -1,3 +1,5 @@
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
 # Create blank config.h
 FILE(WRITE ladspa/config.h "")
 
@@ -5,13 +7,16 @@ FILE(WRITE ladspa/config.h "")
 IF(LMMS_BUILD_WIN32)
 	SET(PIC_FLAGS "")
 ELSE()
-	SET(PIC_FLAGS "-fPIC -DPIC")
+	SET(PIC_FLAGS -fPIC -DPIC)
 ENDIF()
 
 # Additional compile flags
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
+if(NOT MSVC)
+	set(COMPILE_FLAGS ${COMPILE_FLAGS} -O3 -c
+		-fomit-frame-pointer -funroll-loops -ffast-math -fno-strict-aliasing
+		${PIC_FLAGS}
+	)
+endif()
 
 # Loop over every XML file
 FILE(GLOB XML_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/*.xml")
@@ -34,6 +39,10 @@ FOREACH(_item ${XML_SOURCES})
 	# Add a library target for this C file, which depends on success of makestup.pl
 	ADD_LIBRARY("${_plugin}" MODULE "${_out_file}")
 
+	if(MSVC)
+		target_link_options("${_plugin}" PRIVATE "/EXPORT:ladspa_descriptor")
+	endif()
+
 	# Vocoder does not use fftw
 	IF(NOT ("${_plugin}" STREQUAL "vocoder_1337"))
 		TARGET_LINK_LIBRARIES("${_plugin}" ${FFTW3F_LIBRARIES})
@@ -53,8 +62,7 @@ FOREACH(_item ${XML_SOURCES})
 	endif(LMMS_BUILD_WIN32)
 
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES PREFIX "")
-	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
-	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+	target_compile_options("${_plugin}" PRIVATE "${COMPILE_FLAGS}")
 	INSTALL(TARGETS "${_plugin}" LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 ENDFOREACH()
 
@@ -67,7 +75,7 @@ INCLUDE_DIRECTORIES(
 )
 
 ADD_LIBRARY(iir STATIC ladspa/util/iir.c)
-SET_TARGET_PROPERTIES(iir PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
+target_compile_options(iir PRIVATE "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(bandpass_a_iir_1893 iir)
 TARGET_LINK_LIBRARIES(bandpass_iir_1892 iir)
 TARGET_LINK_LIBRARIES(butterworth_1902 iir)
@@ -78,23 +86,23 @@ TARGET_LINK_LIBRARIES(notch_iir_1894 iir)
 FILE(GLOB GSM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/gsm/*.c")
 LIST(SORT GSM_SOURCES)
 ADD_LIBRARY(gsm STATIC ${GSM_SOURCES})
-SET_TARGET_PROPERTIES(gsm PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
+target_compile_options(gsm PRIVATE "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(gsm_1215 gsm)
 
 ADD_LIBRARY(gverb STATIC ladspa/gverb/gverb.c ladspa/gverb/gverbdsp.c)
-SET_TARGET_PROPERTIES(gverb PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
+target_compile_options(gverb PRIVATE "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(gverb_1216 gverb)
 
 ADD_LIBRARY(blo STATIC ladspa/util/blo.c)
-SET_TARGET_PROPERTIES(blo PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
+target_compile_options(blo PRIVATE "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(analogue_osc_1416 blo)
 TARGET_LINK_LIBRARIES(fm_osc_1415 blo)
 TARGET_LINK_LIBRARIES(hermes_filter_1200 blo)
 
 ADD_LIBRARY(rms STATIC ladspa/util/rms.c)
 ADD_LIBRARY(db STATIC ladspa/util/db.c)
-SET_TARGET_PROPERTIES(rms PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
-SET_TARGET_PROPERTIES(db PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
+target_compile_options(rms PRIVATE "${PIC_FLAGS}")
+target_compile_options(db PRIVATE "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(sc1_1425 rms db)
 TARGET_LINK_LIBRARIES(sc2_1426 rms db)
 TARGET_LINK_LIBRARIES(sc3_1427 rms db)
@@ -103,7 +111,7 @@ TARGET_LINK_LIBRARIES(sc4m_1916 rms db)
 TARGET_LINK_LIBRARIES(se4_1883 rms db)
 
 ADD_LIBRARY(pitchscale STATIC ladspa/util/pitchscale.c)
-SET_TARGET_PROPERTIES(pitchscale PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
-TARGET_LINK_LIBRARIES(pitchscale -lfftw3f)
+target_compile_options(pitchscale PRIVATE "${PIC_FLAGS}")
+TARGET_LINK_LIBRARIES(pitchscale ${FFTW3F_LIBRARIES})
 TARGET_LINK_LIBRARIES(pitch_scale_1193 pitchscale)
 TARGET_LINK_LIBRARIES(pitch_scale_1194 pitchscale)

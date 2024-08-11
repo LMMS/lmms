@@ -352,14 +352,24 @@ lmms--gui--TrackView > QWidget {
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-/* track background colors */
+/* track background config */
 lmms--gui--TrackContentWidget {
-	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
-	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
-	qproperty-gridColor: rgba( 0, 0, 0, 160 );
-	qproperty-embossColor: rgba( 140, 140, 140, 64 );
+	/* colors */
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(20, 20, 20), stop:1 rgb(15, 15, 15));
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(40, 40, 40), stop:1 rgb(30, 30, 30));
+	qproperty-coarseGridColor: rgba(0, 0, 0, 160);
+	qproperty-fineGridColor: rgba(0, 0, 0, 80);
+	qproperty-horizontalColor: rgba(0, 0, 0, 160);
+	qproperty-embossColor: rgba(140, 140, 140, 64);
+	
+	/* line widths */
+	qproperty-coarseGridWidth: 2;
+	qproperty-fineGridWidth: 1;
+	qproperty-horizontalWidth: 1;
+	qproperty-embossWidth: 0;
+
+	/* positive offset shifts emboss to the right */
+	qproperty-embossOffset: 0;
 }
 
 
@@ -649,6 +659,11 @@ lmms--gui--MixerChannelView {
 lmms--gui--MixerChannelView QGraphicsView {
 	background: transparent;
 	border-style: none;
+}
+
+lmms--gui--PeakIndicator {
+	background-color: #111811;
+	font-size: 7pt;
 }
 
 /* persistent peak markers for fx peak meters */

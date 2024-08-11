@@ -25,6 +25,8 @@
 #ifndef LOCAL_ZYNADDSUBFX_H
 #define LOCAL_ZYNADDSUBFX_H
 
+#include <array>
+
 #include "Note.h"
 
 class Master;
@@ -34,10 +36,12 @@ namespace lmms
 {
 
 class MidiEvent;
+class SampleFrame;
 
 
 class LocalZynAddSubFx
 {
+
 public:
 	LocalZynAddSubFx();
 	~LocalZynAddSubFx();
@@ -59,7 +63,7 @@ public:
 
 	void processMidiEvent( const MidiEvent& event );
 
-	void processAudio( sampleFrame * _out );
+	void processAudio( SampleFrame* _out );
 
 	inline Master * master()
 	{

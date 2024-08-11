@@ -196,7 +196,7 @@ QString Xpressive::nodeName() const {
 	return (xpressive_plugin_descriptor.name);
 }
 
-void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
+void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 	m_A1=m_parameterA1.value();
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
@@ -204,14 +204,14 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	if (!nph->m_pluginData) {
 
 		auto exprO1 = new ExprFront(m_outputExpression[0].constData(),
-			Engine::audioEngine()->processingSampleRate()); // give the "last" function a whole second
-		auto exprO2 = new ExprFront(m_outputExpression[1].constData(), Engine::audioEngine()->processingSampleRate());
+			Engine::audioEngine()->outputSampleRate()); // give the "last" function a whole second
+		auto exprO2 = new ExprFront(m_outputExpression[1].constData(), Engine::audioEngine()->outputSampleRate());
 
 		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
 			e->add_constant("key", nph->key());//the key that was pressed.
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
-			e->add_constant("srate", Engine::audioEngine()->processingSampleRate());// sample rate of the audio engine
+			e->add_constant("srate", Engine::audioEngine()->outputSampleRate());// sample rate of the audio engine
 			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
 			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
 			e->add_variable("A1", m_A1);//A1,A2,A3: general purpose input controls.
@@ -225,7 +225,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 		m_W2.setInterpolate(m_interpolateW2.value());
 		m_W3.setInterpolate(m_interpolateW3.value());
 		nph->m_pluginData = new ExprSynth(&m_W1, &m_W2, &m_W3, exprO1, exprO2, nph,
-				Engine::audioEngine()->processingSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
+				Engine::audioEngine()->outputSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
 	}
 
 	auto ps = static_cast<ExprSynth*>(nph->m_pluginData);
@@ -579,9 +579,9 @@ void XpressiveView::expressionChanged() {
 
 		if (parse_ok) {
 			e->exprValid().setValue(0);
-			const int length = m_raw_graph->length();
+			const auto length = static_cast<std::size_t>(m_raw_graph->length());
 			auto const samples = new float[length];
-			for (i = 0; i < length; i++) {
+			for (auto i = std::size_t{0}; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
 				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0)

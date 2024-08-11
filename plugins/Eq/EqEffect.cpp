@@ -64,9 +64,9 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
+bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
-	const int sampleRate = Engine::audioEngine()->processingSampleRate();
+	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	//wet/dry controls
 	const float dry = dryLevel();
@@ -157,7 +157,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	}
 
 	const float outGain =  m_outGain;
-	sampleFrame m_inPeak = { 0, 0 };
+	SampleFrame m_inPeak = { 0, 0 };
 
 	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 && m_eqControls.isViewVisible()  )
 	{
@@ -263,7 +263,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	}
 
-	sampleFrame outPeak = { 0, 0 };
+	SampleFrame outPeak = { 0, 0 };
 	gain( buf, frames, outGain, &outPeak );
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;

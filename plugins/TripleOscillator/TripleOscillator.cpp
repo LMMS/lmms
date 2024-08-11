@@ -177,7 +177,7 @@ void OscillatorObject::updateDetuningLeft()
 {
 	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-				/ Engine::audioEngine()->processingSampleRate();
+				/ Engine::audioEngine()->outputSampleRate();
 }
 
 
@@ -187,7 +187,7 @@ void OscillatorObject::updateDetuningRight()
 {
 	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineRightModel.value() ) / 1200.0f )
-				/ Engine::audioEngine()->processingSampleRate();
+				/ Engine::audioEngine()->outputSampleRate();
 }
 
 
@@ -307,7 +307,7 @@ QString TripleOscillator::nodeName() const
 
 
 void TripleOscillator::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if (!_n->m_pluginData)
 	{

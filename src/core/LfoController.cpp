@@ -39,9 +39,9 @@ namespace lmms
 
 LfoController::LfoController( Model * _parent ) :
 	Controller( ControllerType::Lfo, _parent, tr( "LFO Controller" ) ),
-	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
-	m_speedModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
-	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
+	m_baseModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Base value")),
+	m_speedModel(2.f, 0.01f, 20.f, 0.0001f, 20000.f, this, tr("Oscillator speed")),
+	m_amountModel(1.f, -1.f, 1.f, 0.005f, this, tr("Oscillator amount")),
 	m_phaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
 	m_waveModel( static_cast<int>(Oscillator::WaveShape::Sine), 0, Oscillator::NumWaveShapes,
 			this, tr( "Oscillator waveform" ) ),
@@ -155,7 +155,7 @@ void LfoController::updatePhase()
 
 void LfoController::updateDuration()
 {
-	float newDurationF = Engine::audioEngine()->processingSampleRate() * m_speedModel.value();
+	float newDurationF = Engine::audioEngine()->outputSampleRate() * m_speedModel.value();
 
 	switch(m_multiplierModel.value() )
 	{

@@ -37,6 +37,7 @@ namespace lmms
 
 class AudioEngine;
 class AudioPort;
+class SampleFrame;
 
 
 class AudioDevice
@@ -89,19 +90,17 @@ public:
 
 	virtual void stopProcessing();
 
-	void applyQualitySettings();
-
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer(const surroundSampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
+	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer( surroundSampleFrame * _ab );
+	fpp_t getNextBuffer(SampleFrame* _ab);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16( const surroundSampleFrame * _ab,
+	int convertToS16(const SampleFrame* _ab,
 						const fpp_t _frames,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
@@ -109,13 +108,6 @@ protected:
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,
 							const fpp_t _frames );
-
-	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	fpp_t resample( const surroundSampleFrame * _src,
-					const fpp_t _frames,
-					surroundSampleFrame * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
 
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
@@ -142,10 +134,7 @@ private:
 
 	QMutex m_devMutex;
 
-	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
-
-	surroundSampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 
 };
 
