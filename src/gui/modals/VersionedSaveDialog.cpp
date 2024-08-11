@@ -180,10 +180,15 @@ bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle
 SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 	auto *layout = new QVBoxLayout();
 
+	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
+	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));
+	m_discardMIDIConnectionsCheckbox->setModel(&saveOptions.discardMIDIConnections);
+
 	m_saveAsProjectBundleCheckbox = new LedCheckBox(nullptr);
 	m_saveAsProjectBundleCheckbox->setText(tr("Save As Project Bundle (with resources)"));
 	m_saveAsProjectBundleCheckbox->setModel(&saveOptions.saveAsProjectBundle);
 
+	layout->addWidget(m_discardMIDIConnectionsCheckbox);
 	layout->addWidget(m_saveAsProjectBundleCheckbox);
 
 	setLayout(layout);

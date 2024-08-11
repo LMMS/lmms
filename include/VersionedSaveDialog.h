@@ -42,6 +42,7 @@ public:
 	SaveOptionsWidget(Song::SaveOptions &saveOptions);
 
 private:
+	LedCheckBox *m_discardMIDIConnectionsCheckbox;
 	LedCheckBox *m_saveAsProjectBundleCheckbox;
 };
 
