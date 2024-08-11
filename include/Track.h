@@ -209,6 +209,12 @@ public slots:
 
 	void toggleSolo();
 
+protected:
+	bool isSimpleSerializing() const
+	{
+		return m_simpleSerializingMode;
+	}
+
 private:
 	TrackContainer* m_trackContainer;
 	Type m_type;
