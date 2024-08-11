@@ -39,19 +39,6 @@
 namespace lmms
 {
 
-class AudioPortAudioSetupUtil : public QObject
-{
-Q_OBJECT
-public slots:
-	void updateBackends();
-	void updateDevices();
-	void updateChannels();
-
-public:
-	ComboBoxModel m_backendModel;
-	ComboBoxModel m_deviceModel;
-};
-
 namespace gui {
 
 class ComboBox;
@@ -63,13 +50,18 @@ public:
 	AudioPortAudioSetupWidget(QWidget* _parent);
 	~AudioPortAudioSetupWidget() override;
 
+	void updateBackends();
+	void updateDevices();
+	void updateChannels();
+
 	void saveSettings() override;
 	void show() override;
 
 private:
 	ComboBox* m_backend;
 	ComboBox* m_device;
-	AudioPortAudioSetupUtil m_setupUtil;
+	ComboBoxModel m_backendModel;
+	ComboBoxModel m_deviceModel;
 };
 } // namespace gui
 

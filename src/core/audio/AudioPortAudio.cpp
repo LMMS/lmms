@@ -250,7 +250,7 @@ int AudioPortAudio::processCallback(
 
 
 
-void AudioPortAudioSetupUtil::updateBackends()
+void gui::AudioPortAudioSetupWidget::updateBackends()
 {
 	PaError err = Pa_Initialize();
 	if( err != paNoError ) {
@@ -270,7 +270,7 @@ void AudioPortAudioSetupUtil::updateBackends()
 
 
 
-void AudioPortAudioSetupUtil::updateDevices()
+void gui::AudioPortAudioSetupWidget::updateDevices()
 {
 	PaError err = Pa_Initialize();
 	if( err != paNoError ) {
@@ -305,7 +305,7 @@ void AudioPortAudioSetupUtil::updateDevices()
 
 
 
-void AudioPortAudioSetupUtil::updateChannels()
+void gui::AudioPortAudioSetupWidget::updateChannels()
 {
 	PaError err = Pa_Initialize();
 	if( err != paNoError ) {
@@ -328,14 +328,11 @@ gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 	m_device = new ComboBox( this, "DEVICE" );
 	form->addRow(tr("Device"), m_device);
 
-	connect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateDevices()));
-			
-	connect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateChannels()));
-			
-	m_backend->setModel( &m_setupUtil.m_backendModel );
-	m_device->setModel( &m_setupUtil.m_deviceModel );
+	connect(&m_backendModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateDevices);
+	connect(&m_deviceModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateChannels);
+
+	m_backend->setModel(&m_backendModel);
+	m_device->setModel(&m_deviceModel);
 }
 
 
@@ -343,11 +340,8 @@ gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 
 gui::AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
 {
-	disconnect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateDevices()));
-			
-	disconnect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateChannels()));
+	disconnect(&m_backendModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateDevices);
+	disconnect(&m_deviceModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateChannels);
 }
 
 
@@ -355,10 +349,8 @@ gui::AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
 
 void gui::AudioPortAudioSetupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue( "audioportaudio", "backend",
-							m_setupUtil.m_backendModel.currentText() );
-	ConfigManager::inst()->setValue( "audioportaudio", "device",
-							m_setupUtil.m_deviceModel.currentText() );
+	ConfigManager::inst()->setValue("audioportaudio", "backend", m_backendModel.currentText());
+	ConfigManager::inst()->setValue("audioportaudio", "device", m_deviceModel.currentText());
 }
 
 
@@ -366,23 +358,23 @@ void gui::AudioPortAudioSetupWidget::saveSettings()
 
 void gui::AudioPortAudioSetupWidget::show()
 {
-	if( m_setupUtil.m_backendModel.size() == 0 )
+	if (m_backendModel.size() == 0)
 	{
 		// populate the backend model the first time we are shown
-		m_setupUtil.updateBackends();
+		updateBackends();
 
 		const QString& backend = ConfigManager::inst()->value(
 			"audioportaudio", "backend" );
 		const QString& device = ConfigManager::inst()->value(
 			"audioportaudio", "device" );
-		
-		int i = std::max(0, m_setupUtil.m_backendModel.findText(backend));
-		m_setupUtil.m_backendModel.setValue( i );
-		
-		m_setupUtil.updateDevices();
-		
-		i = std::max(0, m_setupUtil.m_deviceModel.findText(device));
-		m_setupUtil.m_deviceModel.setValue( i );
+
+		int i = std::max(0, m_backendModel.findText(backend));
+		m_backendModel.setValue(i);
+
+		updateDevices();
+
+		i = std::max(0, m_deviceModel.findText(device));
+		m_deviceModel.setValue(i);
 	}
 
 	AudioDeviceSetupWidget::show();
