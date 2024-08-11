@@ -27,7 +27,7 @@
 
 #include "RemotePluginBase.h"
 
-#include "PluginPortConfig.h"
+#include "PluginPinConnector.h"
 #include "SharedMemory.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -142,9 +142,9 @@ public:
 		m_commMutex.unlock();
 	}
 
-	PluginPortConfig& portConfig()
+	PluginPinConnector& pinConnector()
 	{
-		return m_portConfig;
+		return m_pinConnector;
 	}
 
 public slots:
@@ -179,7 +179,7 @@ private:
 	SharedMemory<float[]> m_audioBuffer;
 	std::size_t m_audioBufferSize;
 
-	PluginPortConfig m_portConfig;
+	PluginPinConnector m_pinConnector;
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;

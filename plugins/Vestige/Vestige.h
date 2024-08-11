@@ -44,7 +44,7 @@ namespace lmms
 
 class ComboBox;
 class FloatModel;
-class PluginPortConfig;
+class PluginPinConnector;
 class VstPlugin;
 
 namespace gui
@@ -76,7 +76,7 @@ public:
 
 	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
-	PluginPortConfig* portConfig();
+	PluginPinConnector* pinConnector();
 
 protected slots:
 	void setParameter( lmms::Model * action );

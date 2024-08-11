@@ -483,10 +483,10 @@ gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 }
 
 
-PluginPortConfig* VestigeInstrument::portConfig()
+PluginPinConnector* VestigeInstrument::pinConnector()
 {
 	if (!m_plugin) { return nullptr; }
-	return &m_plugin->portConfig();
+	return &m_plugin->pinConnector();
 }
 
 

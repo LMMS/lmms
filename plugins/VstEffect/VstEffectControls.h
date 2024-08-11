@@ -39,7 +39,7 @@ class QScrollArea;
 namespace lmms
 {
 
-class PluginPortConfig;
+class PluginPinConnector;
 class VstEffect;
 
 namespace gui
@@ -69,7 +69,7 @@ public:
 
 	gui::EffectControlDialog* createView() override;
 
-	PluginPortConfig* portConfig();
+	PluginPinConnector* pinConnector();
 
 protected slots:
 	void updateMenu();

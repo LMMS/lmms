@@ -166,10 +166,10 @@ gui::EffectControlDialog* VstEffectControls::createView()
 
 
 
-PluginPortConfig* VstEffectControls::portConfig()
+PluginPinConnector* VstEffectControls::pinConnector()
 {
 	if (!m_effect->m_plugin) { return nullptr; }
-	return &m_effect->m_plugin->portConfig();
+	return &m_effect->m_plugin->pinConnector();
 }
 
 

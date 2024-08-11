@@ -1,6 +1,6 @@
 /*
- * PluginPortConfig.cpp - Specifies how to route audio channels
- *                        in and out of a plugin.
+ * PluginPinConnector.cpp - Specifies how to route audio channels
+ *                          in and out of a plugin.
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -23,63 +23,39 @@
  *
  */
 
-#include "PluginPortConfig.h"
+#include "PluginPinConnector.h"
 
 #include <QDomDocument>
 #include <QDomElement>
 #include <cassert>
 #include <stdexcept>
 
-#include "ComboBox.h"
+#include "AudioEngine.h"
 #include "Model.h"
 
 namespace lmms
 {
 
-PluginPortConfig::PluginPortConfig(Model* parent)
+PluginPinConnector::PluginPinConnector(Model* parent)
 	: QObject{parent}
-	, m_config{parent, tr("L/R channel configuration")}
 {
 }
 
-PluginPortConfig::PluginPortConfig(int inCount, int outCount, Model* parent)
+PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent)
 	: QObject{parent}
-	, m_portCountIn{inCount}
-	, m_portCountOut{outCount}
-	, m_config{parent, tr("L/R channel configuration")}
+	, m_pluginInCount{pluginInCount}
+	, m_pluginOutCount{pluginOutCount}
 {
 }
 
-auto PluginPortConfig::hasMonoPort() const -> bool
+void PluginPinConnector::setPortCounts(int inCount, int outCount)
 {
-	return m_portCountIn == 1 || m_portCountOut == 1;
-}
-
-auto PluginPortConfig::monoPluginType() const -> MonoPluginType
-{
-	if (m_portCountIn == 1)
-	{
-		if (m_portCountOut == 1)
-		{
-			return MonoPluginType::Both;
-		}
-		return MonoPluginType::Input;
-	}
-	else if (m_portCountOut == 1)
-	{
-		return MonoPluginType::Output;
-	}
-	return MonoPluginType::None;
-}
-
-void PluginPortConfig::setPortCounts(int inCount, int outCount)
-{
-	if (inCount < 0 || inCount > DEFAULT_CHANNELS)
+	if (inCount < 0)
 	{
 		throw std::invalid_argument{"Invalid input count"};
 	}
 
-	if (outCount < 0 || outCount > DEFAULT_CHANNELS)
+	if (outCount < 0)
 	{
 		throw std::invalid_argument{"Invalid output count"};
 	}
@@ -89,58 +65,200 @@ void PluginPortConfig::setPortCounts(int inCount, int outCount)
 		throw std::invalid_argument{"At least one port count must be non-zero"};
 	}
 
-	if (m_portCountIn == inCount && m_portCountOut == outCount)
+	if (m_pluginInCount == inCount && m_pluginOutCount == outCount)
 	{
 		// No action needed
 		return;
 	}
 
-	m_portCountIn = inCount;
-	m_portCountOut = outCount;
+	auto parent = dynamic_cast<Model*>(this->parent());
+	auto updateModels = [parent](std::vector<std::vector<BoolModel*>>& models, int& oldCount, int newCount) {
+		if (oldCount < newCount)
+		{
+			for (auto& pluginModels : models)
+			{
+				pluginModels.reserve(newCount);
+				for (int idx = oldCount; idx < newCount; ++idx)
+				{
+					pluginModels.push_back(new BoolModel{false, parent});
+				}
+			}
+		}
+		else if (oldCount > newCount)
+		{
+			for (auto& pluginModels : models)
+			{
+				for (int idx = newCount; idx < oldCount; ++idx)
+				{
+					delete pluginModels[idx];
+				}
+				pluginModels.erase(pluginModels.begin() + newCount, pluginModels.end());
+			}
+		}
+		oldCount = newCount;
+	};
+
+	updateModels(m_inModels, m_pluginInCount, inCount);
+	updateModels(m_outModels, m_pluginOutCount, outCount);
 
 	updateOptions();
 
 	emit portsChanged();
 }
 
-void PluginPortConfig::setPortCountIn(int inCount)
+void PluginPinConnector::setPortCountIn(int inCount)
 {
-	setPortCounts(inCount, m_portCountOut);
+	setPortCounts(inCount, m_pluginOutCount);
 }
 
-void PluginPortConfig::setPortCountOut(int outCount)
+void PluginPinConnector::setPortCountOut(int outCount)
 {
-	setPortCounts(m_portCountIn, outCount);
+	setPortCounts(m_pluginInCount, outCount);
 }
 
-auto PluginPortConfig::setPortConfig(Config config) -> bool
+void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAudioData<sample_t> out)
 {
-	assert(config != Config::None);
-	if (m_portCountIn != 1 && m_portCountOut != 1)
+	// Zero the output buffer
+	std::fill_n(out.ptr, out.size, 0.f);
+
+	std::uint8_t outChannel = 0;
+	for (f_cnt_t outSampleIdx = 0; outSampleIdx < out.size; outSampleIdx += frames, ++outChannel)
 	{
-		if (config != Config::Stereo) { return false; }
-		m_config.setValue(0);
-	}
-	else
-	{
-		if (config == Config::Stereo) { return false; }
-		m_config.setValue(static_cast<int>(config));
-	}
+		mix_ch_t numRouted = 0; // counter for # of in channels routed to the current out channel
+		sample_t* outPtr = &out[outSampleIdx];
 
-	return true;
+		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < in.size; ++inChannelPairIdx)
+		{
+			const sampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
+
+			const std::uint8_t inChannel = inChannelPairIdx * 2;
+			const std::uint8_t enabledPins =
+				(static_cast<std::uint8_t>(inputEnabled(inChannel, outChannel)) << 1u)
+				+ static_cast<std::uint8_t>(inputEnabled(inChannel + 1, outChannel));
+
+			switch (enabledPins)
+			{
+				case 0b00: break;
+				case 0b01: // R channel only
+				{
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						outPtr[frame] += inPtr[frame][1];
+					}
+					++numRouted;
+					break;
+				}
+				case 0b10: // L channel only
+				{
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						outPtr[frame] += inPtr[frame][0];
+					}
+					++numRouted;
+					break;
+				}
+				case 0b11: // Both channels
+				{
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						outPtr[frame] += inPtr[frame][0] + inPtr[frame][1];
+					}
+					numRouted += 2;
+					break;
+				}
+				default:
+					unreachable();
+					break;
+			}
+		}
+
+		// No input channels were routed to this output - output stays zeroed
+		if (numRouted == 0) { continue; }
+
+		// Normalize output
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			outPtr[frame] /= numRouted;
+		}
+	}
 }
 
-void PluginPortConfig::saveSettings(QDomDocument& doc, QDomElement& elem)
+void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sample_t> in, CoreAudioDataMut inOut)
+{
+	assert(frames < DEFAULT_BUFFER_SIZE);
+
+	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOut.size; ++outChannelPairIdx)
+	{
+		auto buffer = std::array<float, DEFAULT_BUFFER_SIZE>();
+		mix_ch_t numRouted; // counter for # of in channels routed to the current out channel
+
+		// Helper function - returns `numRouted` and `buffer` via out parameter
+		const auto mixInputs = [&](std::uint8_t outChannel, mix_ch_t& numRoutedOut, auto& bufferOut) {
+			bufferOut.fill(0);
+			numRoutedOut = 0;
+
+			std::uint8_t inChannel = 0;
+			for (f_cnt_t inSampleIdx = 0; inSampleIdx < in.size; inSampleIdx += frames, ++inChannel)
+			{
+				const sample_t* inPtr = &in[inSampleIdx];
+
+				if (outputEnabled(inChannel, outChannel))
+				{
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						bufferOut[frame] += inPtr[frame];
+					}
+					++numRoutedOut;
+				}
+			}
+		};
+
+		// Left SampleFrame channel first
+
+		auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
+
+		mixInputs(outChannel, numRouted, buffer);
+		if (numRouted > 0)
+		{
+			// Normalize output
+			sampleFrame* outPtr = inOut[outChannel];
+			for (f_cnt_t frame = 0; frame < frames; ++frame)
+			{
+				outPtr[frame][0] = buffer[frame] / numRouted;
+			}
+		}
+
+		// Right SampleFrame channel second
+
+		++outChannel;
+
+		mixInputs(outChannel, numRouted, buffer);
+		if (numRouted > 0)
+		{
+			// Normalize output
+			sampleFrame* outPtr = inOut[outChannel];
+			for (f_cnt_t frame = 0; frame < frames; ++frame)
+			{
+				outPtr[frame][1] = buffer[frame] / numRouted;
+			}
+		}
+
+		// NOTE: When numRouted == 0, nothing needs to be written to `inOut` for
+		// the audio bypass, since it already contains the LMMS core input audio.
+	}
+}
+
+void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	// Only plugins with a mono in/out need to be saved
 	//if (m_portCountIn != 1 && m_portCountOut != 1) { return; }
 
-	elem.setAttribute("in", m_portCountIn);   // probably not needed, but just in case
-	elem.setAttribute("out", m_portCountOut); // ditto
+	elem.setAttribute("in", m_pluginInCount);   // probably not needed, but just in case
+	elem.setAttribute("out", m_pluginOutCount); // ditto
 	m_config.saveSettings(doc, elem, "config");
 }
 
-void PluginPortConfig::loadSettings(const QDomElement& elem)
+void PluginPinConnector::loadSettings(const QDomElement& elem)
 {
 	// TODO: Assert port counts are what was expected?
 	//const auto portCountIn = elem.attribute("in", "0").toInt();
@@ -148,108 +266,14 @@ void PluginPortConfig::loadSettings(const QDomElement& elem)
 	m_config.loadSettings(elem, "config");
 }
 
-auto PluginPortConfig::instantiateView(QWidget* parent) -> gui::ComboBox*
+auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorWidget*
 {
-	auto view = new gui::ComboBox{parent};
-
-	QString inputType;
-	switch (m_portCountIn)
-	{
-		case 0: break;
-		case 1: inputType += tr("mono in"); break;
-		case 2: inputType += tr("stereo in"); break;
-		default: break;
-	}
-
-	QString outputType;
-	switch (m_portCountOut)
-	{
-		case 0: break;
-		case 1: outputType += tr("mono out"); break;
-		case 2: outputType += tr("stereo out"); break;
-		default: break;
-	}
-
-	QString pluginType;
-	if (inputType.isEmpty()) { pluginType = outputType; }
-	else if (outputType.isEmpty()) { pluginType = inputType; }
-	else { pluginType = tr("%1, %2").arg(inputType, outputType); }
-
-	view->setToolTip(tr("L/R channel config for %1 plugin").arg(pluginType));
-	view->setModel(model());
-
-	return view;
+	throw std::runtime_error{"Not implemented yet"};
 }
 
-void PluginPortConfig::updateOptions()
+void PluginPinConnector::updateOptions()
 {
-	m_config.clear();
-
-	const auto monoType = monoPluginType();
-	if (monoType == MonoPluginType::None)
-	{
-		m_config.addItem(tr("Stereo"));
-		return;
-	}
-
-	const auto hasInputPort = m_portCountIn != 0;
-	const auto hasOutputPort = m_portCountOut != 0;
-
-	// 1. Mono mix
-	QString itemText;
-	switch (monoType)
-	{
-		case MonoPluginType::Input:
-			itemText = tr("Downmix to mono"); break;
-		case MonoPluginType::Output:
-			itemText = tr("Upmix to stereo"); break;
-		case MonoPluginType::Both:
-			itemText = tr("Mono mix"); break;
-		default: break;
-	}
-	m_config.addItem(itemText);
-
-	// 2. Left only
-	itemText = QString{};
-	switch (monoType)
-	{
-		case MonoPluginType::Input:
-			itemText = hasOutputPort
-				? tr("L in (R bypass)")
-				: tr("Left in");
-			break;
-		case MonoPluginType::Output:
-			itemText = hasInputPort
-				? tr("L out (R bypass)")
-				: tr("Left only");
-			break;
-		case MonoPluginType::Both:
-			itemText = tr("L only (R bypass)");
-			break;
-		default: break;
-	}
-	m_config.addItem(itemText);
-
-	// 3. Right only
-	itemText = QString{};
-	switch (monoType)
-	{
-		case MonoPluginType::Input:
-			itemText = hasOutputPort
-				? tr("R in (L bypass)")
-				: tr("Right in");
-			break;
-		case MonoPluginType::Output:
-			itemText = hasInputPort
-				? tr("R out (L bypass)")
-				: tr("Right only");
-			break;
-		case MonoPluginType::Both:
-			itemText = tr("R only (L bypass)");
-			break;
-		default: break;
-	}
-	m_config.addItem(itemText);
+	throw std::runtime_error{"Not implemented yet"};
 }
 
 } // namespace lmms
