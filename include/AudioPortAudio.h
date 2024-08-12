@@ -43,8 +43,6 @@ namespace lmms
 
 namespace gui {
 
-class LcdSpinBox;
-
 class AudioPortAudioSetupWidget : public gui::AudioDeviceSetupWidget
 {
 public:
