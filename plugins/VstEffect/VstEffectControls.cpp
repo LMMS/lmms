@@ -364,12 +364,13 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
-	if (m_vi->portConfig()->hasMonoPort())
+	/*
+	if (m_vi->portConfig()->hasMonoPort()) // TODO
 	{
 		m_portConfig = m_vi->portConfig()->instantiateView(widget);
 		m_portConfig->setFixedSize(108, gui::ComboBox::DEFAULT_HEIGHT);
 		l->addWidget(m_portConfig, 0, 2, 1, 3, Qt::AlignLeft);
-	}
+	}*/
 
 	for( int i = 0; i < 10; i++ )
 	{

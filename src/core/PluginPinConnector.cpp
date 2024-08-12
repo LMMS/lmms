@@ -29,6 +29,7 @@
 #include <QDomElement>
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
 
 #include "AudioEngine.h"
 #include "Model.h"
@@ -39,13 +40,27 @@ namespace lmms
 PluginPinConnector::PluginPinConnector(Model* parent)
 	: QObject{parent}
 {
+	std::cout << "~~~Default ctor\n";
+
+#ifndef NDEBUG
+	std::cout << "~~~DEBUG ENBALED\n";
+#endif
+
+	//setChannelCounts(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
+	//setDefaultConnections();
 }
 
 PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent)
 	: QObject{parent}
-	, m_pluginInCount{pluginInCount}
-	, m_pluginOutCount{pluginOutCount}
 {
+	std::cout << "~~~2nd ctor\n";
+
+#ifndef NDEBUG
+	std::cout << "~~~DEBUG ENABLED\n";
+#endif
+
+	setChannelCounts(pluginInCount, pluginOutCount);
+	setDefaultConnections();
 }
 
 void PluginPinConnector::setChannelCounts(int inCount, int outCount)
@@ -71,10 +86,23 @@ void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 		return;
 	}
 
+	std::cout << "BEFORE\n";
+	std::cout << "~~~~~inCount:" << inCount << "; outCount:" << outCount << "\n";
+	std::cout << "~~~~~m_inCount:" << m_pluginInCount << "; m_outCount:" << m_pluginOutCount << "\n";
+	std::cout << "~~~~~inModels.size():" << m_inModels.size() << "; inModels[0].size():" << (m_inModels.size() > 0 ? (int)m_inModels[0].size() : 0) << "\n";
+	std::cout << "~~~~~outModels.size():" << m_outModels.size() << "; outModels[0].size():" << (m_outModels.size() > 0 ? (int)m_outModels[0].size() : 0) << "\n";
+
 	setChannelCount(inCount, m_inModels, m_pluginInCount);
 	setChannelCount(outCount, m_outModels, m_pluginOutCount);
 
+	std::cout << "AFTER\n";
+	std::cout << "~~~~~m_inCount:" << m_pluginInCount << "; m_outCount:" << m_pluginOutCount << "\n";
+	std::cout << "~~~~~inModels.size():" << m_inModels.size() << "; inModels[0].size():" << (m_inModels.size() > 0 ? (int)m_inModels[0].size() : 0) << "\n";
+	std::cout << "~~~~~outModels.size():" << m_outModels.size() << "; outModels[0].size():" << (m_outModels.size() > 0 ? (int)m_outModels[0].size() : 0) << "\n";
+
 	updateOptions();
+
+	setDefaultConnections(); // TEMPORARY
 
 	emit channelCountsChanged();
 }
@@ -87,6 +115,41 @@ void PluginPinConnector::setChannelCountIn(int inCount)
 void PluginPinConnector::setChannelCountOut(int outCount)
 {
 	setChannelCounts(m_pluginInCount, outCount);
+}
+
+void PluginPinConnector::setDefaultConnections()
+{
+	// Assumes pin maps are cleared
+	// TODO: Take into account channel groups?
+
+	assert(m_coreInCount >= 2);
+	assert(m_coreOutCount >= 2);
+
+	switch (m_pluginInCount)
+	{
+		case 0: break;
+		case 1:
+			m_inModels[0][0]->setValue(true);
+			m_inModels[1][0]->setValue(true);
+			break;
+		default: // >= 2
+			m_inModels[0][0]->setValue(true);
+			m_inModels[1][1]->setValue(true);
+			break;
+	}
+
+	switch (m_pluginOutCount)
+	{
+		case 0: break;
+		case 1:
+			m_outModels[0][0]->setValue(true);
+			m_outModels[1][0]->setValue(true);
+			break;
+		default: // >= 2
+			m_outModels[0][0]->setValue(true);
+			m_outModels[1][1]->setValue(true);
+			break;
+	}
 }
 
 void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAudioData<sample_t> out)
@@ -158,7 +221,7 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAu
 
 void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sample_t> in, CoreAudioDataMut inOut)
 {
-	assert(frames < DEFAULT_BUFFER_SIZE);
+	assert(frames <= DEFAULT_BUFFER_SIZE);
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOut.size; ++outChannelPairIdx)
 	{
@@ -175,7 +238,7 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 			{
 				const sample_t* inPtr = &in[inSampleIdx];
 
-				if (outputEnabled(inChannel, outChannel))
+				if (outputEnabled(outChannel, inChannel))
 				{
 					for (f_cnt_t frame = 0; frame < frames; ++frame)
 					{
@@ -360,7 +423,14 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 
 void PluginPinConnector::setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount)
 {
+	// TODO: Move this to a separate method?
+	if (models.size() != m_coreOutCount)
+	{
+		models.resize(m_coreOutCount);
+	}
+
 	auto parent = dynamic_cast<Model*>(this->parent());
+	assert(parent != nullptr);
 	if (oldCount < newCount)
 	{
 		for (auto& pluginModels : models)
@@ -393,7 +463,7 @@ auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConne
 
 void PluginPinConnector::updateOptions()
 {
-	throw std::runtime_error{"Not implemented yet"};
+	//throw std::runtime_error{"Not implemented yet"};
 }
 
 } // namespace lmms

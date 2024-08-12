@@ -89,6 +89,8 @@ public:
 	void setChannelCountIn(int inCount);
 	void setChannelCountOut(int outCount);
 
+	void setDefaultConnections();
+
 	/*
 	 * Routes audio from LMMS track channels to plugin inputs according to the plugin pin connector configuration.
 	 *
@@ -136,8 +138,8 @@ private:
 
 	int m_coreInCount = DEFAULT_CHANNELS;
 	int m_coreOutCount = DEFAULT_CHANNELS;
-	int m_pluginInCount = DEFAULT_CHANNELS;
-	int m_pluginOutCount = DEFAULT_CHANNELS;
+	int m_pluginInCount = 0;
+	int m_pluginOutCount = 0;
 
 	// TODO: When full routing is added, get LMMS channel counts from bus or router class
 
@@ -150,10 +152,10 @@ private:
 	//! Cached values to quickly determine whether a given track channel bypasses the plugin
 	//std::vector<bool> m_bypassed; // TODO!
 
-	//! Specifies channel groupings for plugin input channels - purely for display purposes
+	//! Specifies channel groupings for plugin input channels
 	//std::vector<ch_cnt_t> m_pluginInChannelCounts; // TODO!
 
-	//! Specifies channel groupings for plugin output channels - purely for display purposes
+	//! Specifies channel groupings for plugin output channels
 	//std::vector<ch_cnt_t> m_pluginOutChannelCounts; // TODO!
 };
 
