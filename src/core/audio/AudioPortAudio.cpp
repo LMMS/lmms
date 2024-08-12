@@ -146,12 +146,9 @@ AudioPortAudio::~AudioPortAudio()
 
 void AudioPortAudio::startProcessing()
 {
-	m_stopped = false;
 	PaError err = Pa_StartStream( m_paStream );
-	
 	if( err != paNoError )
 	{
-		m_stopped = true;
 		std::cerr << "Failed to start PortAudio stream: " << Pa_GetErrorText(err) << '\n';
 	}
 }
@@ -163,9 +160,7 @@ void AudioPortAudio::stopProcessing()
 {
 	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
 	{
-		m_stopped = true;
 		PaError err = Pa_StopStream( m_paStream );
-
 		if (err != paNoError) { std::cerr << "Failed to stop PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 	}
 }
@@ -175,12 +170,6 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 {
 	if (supportsCapture()) { audioEngine()->pushInputFrames((SampleFrame*)inputBuffer, framesPerBuffer); }
 
-	if( m_stopped )
-	{
-		memset(outputBuffer, 0, framesPerBuffer * channels() * sizeof(float));
-		return paComplete;
-	}
-
 	while (framesPerBuffer)
 	{
 		if( m_outBufPos == 0 )
@@ -188,9 +177,8 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 			const fpp_t frames = getNextBuffer(m_outBuf.get());
 			if( !frames )
 			{
-				m_stopped = true;
 				memset(outputBuffer, 0, framesPerBuffer * channels() * sizeof(float));
-				return paComplete;
+				return paContinue;
 			}
 			m_outBufSize = frames;
 		}
