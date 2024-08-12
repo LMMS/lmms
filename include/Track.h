@@ -210,10 +210,7 @@ public slots:
 	void toggleSolo();
 
 protected:
-	bool isPresetMode() const
-	{
-		return m_presetMode;
-	}
+	bool isPresetMode() const { return m_presetMode; }
 
 private:
 	TrackContainer* m_trackContainer;
@@ -228,7 +225,7 @@ private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
-	bool m_presetMode;
+	bool m_presetMode = false;
 
 	clipVector m_clips;
 

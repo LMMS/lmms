@@ -63,7 +63,6 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
-	m_presetMode(false),
 	m_clips()        /*!< The clips (segments) */
 {	
 	m_trackContainer->addTrack( this );
