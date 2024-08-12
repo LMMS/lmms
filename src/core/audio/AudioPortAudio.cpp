@@ -183,7 +183,7 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 		}
 
 		const auto minLen = std::min(framesPerBuffer, m_outBufSize - m_outBufPos);
-		for (auto sample = 0; sample < framesPerBuffer * channels(); ++sample)
+		for (auto sample = std::size_t{0}; sample < framesPerBuffer * channels(); ++sample)
 		{
 			outputBuffer[sample] = m_outBuf[sample / channels()][sample % channels()];
 		}
