@@ -182,9 +182,9 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 			}
 			m_outBufSize = frames;
 		}
-		const auto min_len = std::min(framesPerBuffer, m_outBufSize - m_outBufPos);
 
-		for( fpp_t frame = 0; frame < min_len; ++frame )
+		const auto minLen = std::min(framesPerBuffer, m_outBufSize - m_outBufPos);
+		for (fpp_t frame = 0; frame < minLen; ++frame)
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
@@ -192,9 +192,9 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 			}
 		}
 
-		outputBuffer += min_len * channels();
-		framesPerBuffer -= min_len;
-		m_outBufPos += min_len;
+		outputBuffer += minLen * channels();
+		framesPerBuffer -= minLen;
+		m_outBufPos += minLen;
 		m_outBufPos %= m_outBufSize;
 	}
 
