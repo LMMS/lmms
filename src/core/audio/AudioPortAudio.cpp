@@ -177,7 +177,7 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 			const fpp_t frames = getNextBuffer(m_outBuf.get());
 			if( !frames )
 			{
-				memset(outputBuffer, 0, framesPerBuffer * channels() * sizeof(float));
+				std::fill_n(outputBuffer, framesPerBuffer * channels(), 0.0f);
 				return paComplete;
 			}
 			m_outBufSize = frames;
