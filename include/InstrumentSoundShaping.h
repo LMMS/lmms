@@ -52,14 +52,14 @@ public:
 	void processAudioBuffer( SampleFrame* _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	const EnvelopeAndLfoParameters& getVolumeParameters() const;
-	EnvelopeAndLfoParameters& getVolumeParameters();
+	const EnvelopeAndLfoParameters& getVolumeParameters() const { return m_volumeParameters; }
+	EnvelopeAndLfoParameters& getVolumeParameters() { return m_volumeParameters; }
 
-	const EnvelopeAndLfoParameters& getCutoffParameters() const;
-	EnvelopeAndLfoParameters& getCutoffParameters();
+	const EnvelopeAndLfoParameters& getCutoffParameters() const { return m_cutoffParameters; }
+	EnvelopeAndLfoParameters& getCutoffParameters() { return m_cutoffParameters; }
 
-	const EnvelopeAndLfoParameters& getResonanceParameters() const;
-	EnvelopeAndLfoParameters& getResonanceParameters();
+	const EnvelopeAndLfoParameters& getResonanceParameters() const { return m_resonanceParameters; }
+	EnvelopeAndLfoParameters& getResonanceParameters() { return m_resonanceParameters; }
 
 	BoolModel& getFilterEnabledModel() { return m_filterEnabledModel; }
 	ComboBoxModel& getFilterModel() { return m_filterModel; }

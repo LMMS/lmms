@@ -369,36 +369,6 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 	}
 }
 
-const EnvelopeAndLfoParameters& InstrumentSoundShaping::getVolumeParameters() const
-{
-	return m_volumeParameters;
-}
-
-EnvelopeAndLfoParameters& InstrumentSoundShaping::getVolumeParameters()
-{
-	return m_volumeParameters;
-}
-
-const EnvelopeAndLfoParameters& InstrumentSoundShaping::getCutoffParameters() const
-{
-	return m_cutoffParameters;
-}
-
-EnvelopeAndLfoParameters& InstrumentSoundShaping::getCutoffParameters()
-{
-	return m_cutoffParameters;
-}
-
-const EnvelopeAndLfoParameters& InstrumentSoundShaping::getResonanceParameters() const
-{
-	return m_resonanceParameters;
-}
-
-EnvelopeAndLfoParameters& InstrumentSoundShaping::getResonanceParameters()
-{
-	return m_resonanceParameters;
-}
-
 QString InstrumentSoundShaping::getVolumeNodeName() const
 {
 	return getVolumeParameters().nodeName() + "vol";
