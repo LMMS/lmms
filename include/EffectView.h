@@ -65,7 +65,7 @@ public:
 	}
 
 	static constexpr int DEFAULT_WIDTH = 215;
-	static constexpr int DEFAULT_HEIGHT = 35;
+	static constexpr int DEFAULT_HEIGHT = 47;
 	
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;

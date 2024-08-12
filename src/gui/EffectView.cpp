@@ -61,7 +61,7 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	setFocusPolicy(Qt::StrongFocus);
 	
 	m_mainLayout = new QHBoxLayout();
-	m_mainLayout->setContentsMargins(8, 2, 8, 2);
+	m_mainLayout->setContentsMargins(8, 0, 8, 0);
 
 	bool hasControls = effect()->controls()->controlCount() > 0;
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
@@ -74,7 +74,6 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	QFont labelFont = adjustedToPixelSize(font(), 10);
 	m_label = new EffectLabelButton(this, this);
 	m_label->setText(model()->displayName());
-	m_label->setFont(labelFont);
 	if(hasControls)
 	{
 		connect(m_label, &EffectLabelButton::clicked, this, &EffectView::editControls);
@@ -84,12 +83,15 @@ EffectView::EffectView(Effect * _model, QWidget * _parent) :
 	m_wetDry = new Knob(KnobType::Small17, this);
 	m_wetDry->setEnabled(isEnabled);
 	m_wetDry->setHintText(tr("Wet Level:"), "");
+	m_wetDry->setLabel("W/D");
 	m_mainLayout->addWidget(m_wetDry);
 
 	m_autoQuit = new TempoSyncKnob(KnobType::Small17, this);
 	m_autoQuit->setEnabled(isEnabled && !effect()->m_autoQuitDisabled);
 	m_autoQuit->setVisible(isEnabled && !effect()->m_autoQuitDisabled);
 	m_autoQuit->setHintText(tr("Stop after:"), "ms");
+	m_autoQuit->setLabel("STOP");
+	m_autoQuit->setFont(labelFont);
 	m_mainLayout->addWidget(m_autoQuit);
 
 	setModel( _model );
