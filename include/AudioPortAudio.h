@@ -30,8 +30,9 @@
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #include <QObject>
-
+#include <memory>
 #include <portaudio.h>
+
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
