@@ -40,7 +40,7 @@ class CrossoverEQEffect : public Effect
 public:
 	CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~CrossoverEQEffect() override;
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
 
 	EffectControls* controls() override
 	{
@@ -69,9 +69,9 @@ private:
 	StereoLinkwitzRiley m_hp3;
 	StereoLinkwitzRiley m_hp4;
 	
-	sampleFrame * m_tmp1;
-	sampleFrame * m_tmp2;
-	sampleFrame * m_work;
+	SampleFrame* m_tmp1;
+	SampleFrame* m_tmp2;
+	SampleFrame* m_work;
 	
 	bool m_needsUpdate;
 	

@@ -26,6 +26,7 @@
 #include "interpolation.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "lmms_basics.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -99,7 +100,7 @@ void VibratingString::resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstF
 	{
 		const float srcFrameFloat = frame * static_cast<float>(srcFrames) / dstFrames;
 		const float fracPos = srcFrameFloat - static_cast<f_cnt_t>(srcFrameFloat);
-		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), 1, srcFrames - 3);
+		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), f_cnt_t{1}, srcFrames - 3);
 		m_impulse[frame] = cubicInterpolate(
 			src[srcFrame - 1],
 			src[srcFrame + 0],

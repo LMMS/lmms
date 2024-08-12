@@ -230,6 +230,7 @@ public:
 
 	QString defaultVersion() const;
 
+	static bool enableBlockedPlugins();
 
 	static QStringList availableVstEmbedMethods();
 	QString vstEmbedMethod() const;

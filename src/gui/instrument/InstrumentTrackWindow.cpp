@@ -265,7 +265,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
-	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
+	// EffectRackView has sizeHint to be QSize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1)
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_tuningView);
 

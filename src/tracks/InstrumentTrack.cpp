@@ -220,7 +220,7 @@ InstrumentTrack::~InstrumentTrack()
 
 
 
-void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
+void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( Engine::getSong()->playMode() != Song::PlayMode::MidiClip &&
@@ -342,7 +342,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
 								this, offset,
-								typeInfo<f_cnt_t>::max() / 2,
+								std::numeric_limits<f_cnt_t>::max() / 2,
 								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
 										event.key(), event.volume(midiPort()->baseVelocity())),
 								nullptr, event.channel(),
@@ -567,7 +567,7 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
+void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 {
 	// Note: under certain circumstances the working buffer is a nullptr.
 	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.

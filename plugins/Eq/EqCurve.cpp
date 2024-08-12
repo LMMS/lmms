@@ -31,6 +31,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 
 namespace lmms::gui
@@ -65,7 +66,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
-	if (typeInfo<float>::isEqual(freq, 0.0f)) { return 0.0f; }
+	if (approximatelyEqual(freq, 0.0f)) { return 0.0f; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;
@@ -185,9 +186,9 @@ QPainterPath EqHandle::getCurvePath()
 
 void EqHandle::loadPixmap()
 {
-	QString fileName = "handle" + QString::number(m_numb+1);
-	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
-	m_circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
+	auto fileName = "handle" + std::to_string(m_numb + 1);
+	if (!isActiveHandle()) { fileName += "inactive"; }
+	m_circlePixmap = PLUGIN_NAME::getIconPixmap(fileName);
 }
 
 bool EqHandle::mousePressed() const
@@ -581,17 +582,8 @@ void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 
 	if( wevent->orientation() == Qt::Vertical )
 	{
-		m_resonance = m_resonance + ( numSteps );
+		m_resonance = std::clamp(m_resonance + numSteps, 0.1f, highestBandwich);
 
-		if( m_resonance < 0.1 )
-		{
-			m_resonance = 0.1;
-		}
-
-		if( m_resonance > highestBandwich )
-		{
-			m_resonance = highestBandwich;
-		}
 		emit positionChanged();
 	}
 	wevent->accept();

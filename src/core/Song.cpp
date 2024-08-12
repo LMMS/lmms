@@ -562,6 +562,8 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 
 void Song::updateLength()
 {
+	if (m_loadingProject) { return; }
+
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
@@ -845,7 +847,7 @@ void Song::clearProject()
 		stop();
 	}
 
-	for( int i = 0; i < PlayModeCount; i++ )
+	for (auto i = std::size_t{0}; i < PlayModeCount; i++)
 	{
 		setPlayPos( 0, ( PlayMode )i );
 	}
@@ -963,7 +965,7 @@ void Song::createNewProject()
 	QCoreApplication::instance()->processEvents();
 
 	m_loadingProject = false;
-
+	updateLength();
 	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
@@ -1206,6 +1208,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
+	updateLength();
 	setModified(false);
 	m_loadOnLaunch = false;
 }
@@ -1346,7 +1349,7 @@ void Song::restoreScaleStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_scales[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1371,7 +1374,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_keymaps[i]->restoreState(node.toElement());
 		node = node.nextSibling();

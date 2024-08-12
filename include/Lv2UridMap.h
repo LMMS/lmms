@@ -29,7 +29,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2/lv2plug.in/ns/ext/urid/urid.h>
+#include <lv2/urid/urid.h>
 #include <mutex> // TODO: use semaphore, even though this is not realtime critical
 #include <string>
 #include <unordered_map>

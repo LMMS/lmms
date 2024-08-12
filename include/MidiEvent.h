@@ -190,6 +190,8 @@ public:
 		setParam( 0, pitchBend );
 	}
 
+	auto sysExData() const -> const char* { return m_sysExData; }
+
 	Source source() const
 	{
 		return m_source;
@@ -212,7 +214,7 @@ private:
 		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
-	[[maybe_unused]] const char* m_sysExData;
+	const char* m_sysExData;
 	const void* m_sourcePort;
 
 	// Stores the source of the MidiEvent: Internal or External (hardware controllers).

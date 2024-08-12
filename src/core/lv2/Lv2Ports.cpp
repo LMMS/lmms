@@ -27,13 +27,14 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
+#include <lv2/atom/atom.h>
+#include <lv2/port-props/port-props.h>
 
 #include "Engine.h"
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
 #include "Lv2Evbuf.h"
+#include "SampleFrame.h"
 
 
 namespace lmms::Lv2Ports
@@ -311,7 +312,7 @@ Audio::Audio(std::size_t bufferSize, bool isSidechain)
 
 
 
-void Audio::copyBuffersFromCore(const sampleFrame *lmmsBuf,
+void Audio::copyBuffersFromCore(const SampleFrame* lmmsBuf,
 	unsigned channel, fpp_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
@@ -323,7 +324,7 @@ void Audio::copyBuffersFromCore(const sampleFrame *lmmsBuf,
 
 
 
-void Audio::averageWithBuffersFromCore(const sampleFrame *lmmsBuf,
+void Audio::averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
 	unsigned channel, fpp_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
@@ -335,7 +336,7 @@ void Audio::averageWithBuffersFromCore(const sampleFrame *lmmsBuf,
 
 
 
-void Audio::copyBuffersToCore(sampleFrame *lmmsBuf,
+void Audio::copyBuffersToCore(SampleFrame* lmmsBuf,
 	unsigned channel, fpp_t frames) const
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
