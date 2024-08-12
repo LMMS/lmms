@@ -549,15 +549,9 @@ void AudioEngine::clearInternal()
 
 void AudioEngine::changeQuality(const struct qualitySettings & qs)
 {
-	// don't delete the audio-device
-	stopProcessing();
-
 	m_qualitySettings = qs;
-
 	emit sampleRateChanged();
 	emit qualitySettingsChanged();
-
-	startProcessing();
 }
 
 
