@@ -235,9 +235,6 @@ void Song::processNextBuffer()
 			return;
 	}
 
-	// If we have no tracks to play, there is nothing to do
-	if (trackList.empty()) { return; }
-
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
