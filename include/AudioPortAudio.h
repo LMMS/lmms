@@ -30,25 +30,24 @@
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #include <QObject>
-#include "ComboBoxModel.h"
 
 #include <portaudio.h>
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+
+class QComboBox;
 
 namespace lmms
 {
 
 namespace gui {
 
-class ComboBox;
 class LcdSpinBox;
 
 class AudioPortAudioSetupWidget : public gui::AudioDeviceSetupWidget
 {
 public:
 	AudioPortAudioSetupWidget(QWidget* _parent);
-	~AudioPortAudioSetupWidget() override;
 
 	void updateBackends();
 	void updateDevices();
@@ -58,10 +57,8 @@ public:
 	void show() override;
 
 private:
-	ComboBox* m_backend;
-	ComboBox* m_device;
-	ComboBoxModel m_backendModel;
-	ComboBoxModel m_deviceModel;
+	QComboBox* m_backendComboBox;
+	QComboBox* m_deviceComboBox;
 };
 } // namespace gui
 

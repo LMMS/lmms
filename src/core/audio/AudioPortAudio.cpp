@@ -28,13 +28,13 @@
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
+#include <QComboBox>
 #include <QFormLayout>
 #include <iostream>
 
-#include "Engine.h"
-#include "ConfigManager.h"
-#include "ComboBox.h"
 #include "AudioEngine.h"
+#include "ConfigManager.h"
+#include "Engine.h"
 
 namespace lmms
 {
@@ -222,7 +222,7 @@ void gui::AudioPortAudioSetupWidget::updateBackends()
 	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
 	{
 		const auto hi = Pa_GetHostApiInfo(i);
-		m_backendModel.addItem( hi->name );
+		m_backendComboBox->addItem(hi->name);
 	}
 
 	Pa_Terminate();
@@ -239,7 +239,7 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 		return;
 	}
 
-	const QString& backend = m_backendModel.currentText();
+	const QString& backend = m_backendComboBox->currentText();
 	int hostApi = 0;
 	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
 	{
@@ -251,14 +251,11 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 		}
 	}
 
-	m_deviceModel.clear();
+	m_deviceComboBox->clear();
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
 		const auto di = Pa_GetDeviceInfo(i);
-		if( di->hostApi == hostApi )
-		{
-			m_deviceModel.addItem( di->name );
-		}
+		if (di->hostApi == hostApi) { m_deviceComboBox->addItem(di->name); }
 	}
 	Pa_Terminate();
 }
@@ -279,39 +276,20 @@ void gui::AudioPortAudioSetupWidget::updateChannels()
 gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 	: AudioDeviceSetupWidget(AudioPortAudio::name(), _parent)
 {
-	using gui::ComboBox;
-
 	QFormLayout * form = new QFormLayout(this);
+	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
-	m_backend = new ComboBox( this, "BACKEND" );
-	form->addRow(tr("Backend"), m_backend);
+	m_backendComboBox = new QComboBox(this);
+	form->addRow(tr("Backend"), m_backendComboBox);
 
-	m_device = new ComboBox( this, "DEVICE" );
-	form->addRow(tr("Device"), m_device);
-
-	connect(&m_backendModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateDevices);
-	connect(&m_deviceModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateChannels);
-
-	m_backend->setModel(&m_backendModel);
-	m_device->setModel(&m_deviceModel);
+	m_deviceComboBox = new QComboBox(this);
+	form->addRow(tr("Device"), m_deviceComboBox);
 }
-
-
-
-
-gui::AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
-{
-	disconnect(&m_backendModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateDevices);
-	disconnect(&m_deviceModel, &ComboBoxModel::dataChanged, this, &AudioPortAudioSetupWidget::updateChannels);
-}
-
-
-
 
 void gui::AudioPortAudioSetupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue("audioportaudio", "backend", m_backendModel.currentText());
-	ConfigManager::inst()->setValue("audioportaudio", "device", m_deviceModel.currentText());
+	ConfigManager::inst()->setValue("audioportaudio", "backend", m_backendComboBox->currentText());
+	ConfigManager::inst()->setValue("audioportaudio", "device", m_deviceComboBox->currentText());
 }
 
 
@@ -319,7 +297,7 @@ void gui::AudioPortAudioSetupWidget::saveSettings()
 
 void gui::AudioPortAudioSetupWidget::show()
 {
-	if (m_backendModel.size() == 0)
+	if (m_backendComboBox->count() == 0)
 	{
 		// populate the backend model the first time we are shown
 		updateBackends();
@@ -329,13 +307,13 @@ void gui::AudioPortAudioSetupWidget::show()
 		const QString& device = ConfigManager::inst()->value(
 			"audioportaudio", "device" );
 
-		int i = std::max(0, m_backendModel.findText(backend));
-		m_backendModel.setValue(i);
+		const auto backendIndex = std::max(0, m_backendComboBox->findText(backend));
+		m_backendComboBox->setCurrentIndex(backendIndex);
 
 		updateDevices();
 
-		i = std::max(0, m_deviceModel.findText(device));
-		m_deviceModel.setValue(i);
+		const auto deviceIndex = std::max(0, m_deviceComboBox->findText(device));
+		m_deviceComboBox->setCurrentIndex(deviceIndex);
 	}
 
 	AudioDeviceSetupWidget::show();
