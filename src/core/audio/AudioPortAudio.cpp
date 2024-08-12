@@ -174,13 +174,12 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 	{
 		if( m_outBufPos == 0 )
 		{
-			const fpp_t frames = getNextBuffer(m_outBuf.get());
-			if( !frames )
+			m_outBufSize = getNextBuffer(m_outBuf.get());
+			if (m_outBufSize == 0)
 			{
 				std::fill_n(outputBuffer, framesPerBuffer * channels(), 0.0f);
 				return paComplete;
 			}
-			m_outBufSize = frames;
 		}
 
 		const auto minLen = std::min(framesPerBuffer, m_outBufSize - m_outBufPos);
