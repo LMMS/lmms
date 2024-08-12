@@ -165,7 +165,7 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAu
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < in.size; ++inChannelPairIdx)
 		{
-			const sampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
+			const SampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
 
 			const std::uint8_t inChannel = inChannelPairIdx * 2;
 			const std::uint8_t enabledPins =
@@ -257,7 +257,7 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 		if (numRouted > 0)
 		{
 			// Normalize output
-			sampleFrame* outPtr = inOut[outChannel];
+			SampleFrame* outPtr = inOut[outChannel];
 			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
 				outPtr[frame][0] = buffer[frame] / numRouted;
@@ -272,7 +272,7 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 		if (numRouted > 0)
 		{
 			// Normalize output
-			sampleFrame* outPtr = inOut[outChannel];
+			SampleFrame* outPtr = inOut[outChannel];
 			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
 				outPtr[frame][1] = buffer[frame] / numRouted;

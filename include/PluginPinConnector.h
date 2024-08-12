@@ -30,8 +30,8 @@
 #include <vector>
 
 #include "AutomatableModel.h"
-#include "lmms_basics.h"
 #include "lmms_export.h"
+#include "SampleFrame.h"
 #include "SerializingObject.h"
 
 class QWidget;

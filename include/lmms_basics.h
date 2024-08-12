@@ -63,7 +63,6 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
-
 #define LMMS_STRINGIFY(s) LMMS_STR(s)
 #define LMMS_STR(PN)	#PN
 
@@ -91,66 +90,6 @@ struct Span
 	constexpr auto end() const -> const T* { return ptr + size; }
 	constexpr auto end() -> T* { return ptr + size; }
 };
-
-
-//! Conventions for passing audio data
-enum class AudioDataLayout
-{
-	/*
-	 * Given:
-	 *   - N == Frame count
-	 *   - C == Number of channels
-	 *   - i == Sample index, where 0 <= i < N
-	 *   - `samples` has the type sample_t*
-	 *   - `samples` size == N * C
-	 */
-
-	/**
-	 * Layout where the samples for each channel are interleaved.
-	 * i.e. "LRLRLRLR"
-	 *
-	 * Or:
-	 * - Channel #0 samples: samples[C*i]
-	 * - Channel #1 samples: samples[C*i + 1]
-	 * - Channel #2 samples: samples[C*i + 2]
-	 * - Channel #3 samples: samples[C*i + 3]
-	 */
-	Interleaved,
-
-	/**
-	 * Layout where all samples for a particular channel are grouped together.
-	 * i.e. "LLLLRRRR"
-	 *
-	 * Or:
-	 * - Channel #0 samples: samples[i]
-	 * - Channel #1 samples: samples[1*N + i]
-	 * - Channel #2 samples: samples[2*N + i]
-	 * - Channel #3 samples: samples[3*N + i]
-	 */
-	Split
-};
-
-
-/**
- * A simple (samples, size) pair for storing audio data of a particular layout.
- *
- * Does not contain channel grouping information like `ChannelGroups`, but all data is contiguous in memory.
- *
- * NOTE: More information is still needed to correctly interpret this audio data:
- * - For Split layout, the frame count is needed
- * - For Interleaved layout, the channel count is needed
- */
-template<AudioDataLayout layout, typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-using AudioData = Span<T>;
-
-template<typename T>
-using SplitAudioData = AudioData<AudioDataLayout::Split, T>;
-
-template<typename T>
-using InterleavedAudioData = AudioData<AudioDataLayout::Interleaved, T>;
-
-using CoreAudioData = Span<const sampleFrame* const>;
-using CoreAudioDataMut = Span<sampleFrame* const>;
 
 
 // Stand-in for C++23's std::unreachable

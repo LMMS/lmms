@@ -26,6 +26,7 @@
 #ifndef LMMS_SAMPLEFRAME_H
 #define LMMS_SAMPLEFRAME_H
 
+#include "AudioData.h"
 #include "lmms_basics.h"
 
 #include <algorithm>
@@ -52,12 +53,12 @@ public:
 	{
 	}
 
-	sample_t* data()
+	InterleavedAudioDataPtr<sample_t> data()
 	{
 		return m_samples.data();
 	}
 
-	const sample_t* data() const
+	InterleavedAudioDataPtr<const sample_t> data() const
 	{
 		return m_samples.data();
 	}
@@ -208,7 +209,7 @@ inline SampleFrame getAbsPeakValues(SampleFrame* buffer, size_t frames)
 	return peaks;
 }
 
-inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t frames)
+inline void copyToSampleFrames(SampleFrame* target, InterleavedAudioDataPtr<const float> source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -217,7 +218,7 @@ inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t 
 	}
 }
 
-inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_t frames)
+inline void copyFromSampleFrames(InterleavedAudioDataPtr<float> target, const SampleFrame* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -225,6 +226,9 @@ inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_
 		target[2*i + 1] = source[i].right();
 	}
 }
+
+using CoreAudioData = Span<const SampleFrame* const>;
+using CoreAudioDataMut = Span<SampleFrame* const>;
 
 } // namespace lmms
 
