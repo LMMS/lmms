@@ -52,8 +52,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView(nullptr),
 	m_dragging(false)
 {
-	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
-	setFocusPolicy(Qt::StrongFocus);
+	/* resize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT); */
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // TODO: Actual effect resizing
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
