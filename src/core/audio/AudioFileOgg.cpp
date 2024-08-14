@@ -44,9 +44,8 @@ namespace lmms
 AudioFileOgg::AudioFileOgg(OutputSettings const & outputSettings,
 			bool & successful,
 			const QString & file,
-			const ch_cnt_t channels, const fpp_t defaultBufferSize,
-			AudioFileDevice::BufferFn getBufferFunction) :
-	AudioFileDevice(outputSettings, file, channels, defaultBufferSize, getBufferFunction)
+			const ch_cnt_t channels, const fpp_t defaultBufferSize) :
+	AudioFileDevice(outputSettings, file, channels, defaultBufferSize)
 {
 	m_ok = successful = outputFileOpened() && startEncoding();
 }
