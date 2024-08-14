@@ -26,7 +26,6 @@
 #ifndef LMMS_PLUGIN_PIN_CONNECTOR_H
 #define LMMS_PLUGIN_PIN_CONNECTOR_H
 
-#include <QObject>
 #include <vector>
 
 #include "AutomatableModel.h"
@@ -42,13 +41,13 @@ namespace lmms
 namespace gui
 {
 
-class PluginPinConnectorWidget;
+class PluginPinConnectorView;
 
 } // namespace gui
 
 //! Configure channel routing for a plugin's mono/stereo in/out ports
 class LMMS_EXPORT PluginPinConnector
-	: public QObject
+	: public Model
 	, public SerializingObject
 {
 	Q_OBJECT
@@ -123,7 +122,7 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 	auto nodeName() const -> QString override { return "pins"; }
 
-	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorWidget*;
+	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorView*;
 
 	static constexpr int MaxTrackChannels = 256;
 

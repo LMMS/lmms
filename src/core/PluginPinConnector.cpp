@@ -32,17 +32,18 @@
 
 #include "AudioEngine.h"
 #include "Model.h"
+#include "PluginPinConnectorView.h"
 
 namespace lmms
 {
 
 PluginPinConnector::PluginPinConnector(Model* parent)
-	: QObject{parent}
+	: Model{parent}
 {
 }
 
 PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent)
-	: QObject{parent}
+	: Model{parent}
 {
 	setChannelCounts(pluginInCount, pluginOutCount);
 }
@@ -440,9 +441,11 @@ void PluginPinConnector::setChannelCount(int newCount, PluginPinConnector::PinMa
 	oldCount = newCount;
 };
 
-auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorWidget*
+auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorView*
 {
-	throw std::runtime_error{"Not implemented yet"};
+	auto view = new gui::PluginPinConnectorView{parent};
+	view->setModel(this);
+	return view;
 }
 
 void PluginPinConnector::updateOptions()

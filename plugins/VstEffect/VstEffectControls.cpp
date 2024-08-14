@@ -32,6 +32,7 @@
 #include "embed.h"
 #include "ComboBox.h"
 #include "CustomTextKnob.h"
+#include "PluginPinConnectorView.h"
 #include "VstEffectControls.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
@@ -371,6 +372,12 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		m_portConfig->setFixedSize(108, gui::ComboBox::DEFAULT_HEIGHT);
 		l->addWidget(m_portConfig, 0, 2, 1, 3, Qt::AlignLeft);
 	}*/
+
+	if (auto pc = m_vi->pinConnector())
+	{
+		m_pinConnector = pc->instantiateView(widget);
+		l->addWidget(m_pinConnector, 0, 2, 1, 3, Qt::AlignLeft);
+	}
 
 	for( int i = 0; i < 10; i++ )
 	{

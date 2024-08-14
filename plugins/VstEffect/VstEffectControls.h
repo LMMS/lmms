@@ -44,9 +44,9 @@ class VstEffect;
 
 namespace gui
 {
-class ComboBox;
 class CustomTextKnob;
 class ManageVSTEffectView;
+class PluginPinConnectorView;
 class VstEffectControlDialog;
 }
 
@@ -140,7 +140,7 @@ private:
 
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
-	ComboBox* m_portConfig;
+	PluginPinConnectorView* m_pinConnector;
 	CustomTextKnob ** vstKnobs;
 
 } ;
