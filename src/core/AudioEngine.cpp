@@ -240,6 +240,45 @@ void AudioEngine::stopProcessing()
 }
 
 
+void AudioEngine::startExporting(bool needsFifo, const struct qualitySettings& qs)
+{
+	stopProcessing();
+
+	m_qualitySettings = qs;
+	if (needsFifo)
+	{
+		m_fifoWriter = new fifoWriter(this, m_fifo);
+		m_fifoWriter->start(QThread::HighPriority);
+		qDebug("start exporting add fifo");
+		if (hasFifoWriter() == true)
+		{
+			qDebug("start exporting fifo confirmed");
+		}
+	}
+	else
+	{
+		m_fifoWriter = nullptr;
+	}
+
+	emit qualitySettingsChanged();
+	emit sampleRateChanged();
+}
+
+void AudioEngine::stopExporting()
+{
+	if( m_fifoWriter != nullptr )
+	{
+		qDebug("stop exporting fifo confirmed");
+		if (Engine::audioEngine()->hasFifoWriter() == true)
+		{
+			qDebug("stop exporting nofifo confirmed");
+		}
+		m_fifoWriter->finish();
+		m_fifoWriter->wait();
+		delete m_fifoWriter;
+		m_fifoWriter = nullptr;
+	}
+}
 
 
 sample_rate_t AudioEngine::baseSampleRate() const
@@ -544,7 +583,51 @@ void AudioEngine::clearInternal()
 	}
 }
 
+// gets a buffer and frame count as input
+// fills the buffer with nextBuffer() data and sets the correct size TODO remove resize?
+// this class doesn't own bufferOut
+// bufferOut can be nullptr, can be returned as nullptr
+// framesOut can be set to 0, can not be nullptr
+void AudioEngine::nextOutputBuffer(SampleFrame* bufferOut, fpp_t* framesOut, fpp_t oldFrames)
+{
+	fpp_t curFrames = Engine::audioEngine()->framesPerPeriod();
+	if (oldFrames != curFrames)
+	{
+		// reallocate output buffer to correct size
+		delete[] bufferOut;
+		bufferOut = nullptr;
+		// set correct buffer size
+		*framesOut = curFrames;
+	}
 
+	if (bufferOut == nullptr)
+	{
+		// allocate buffer if nullptr
+		bufferOut = new SampleFrame[curFrames];
+		qDebug("nextOutputBuffer new buffer allocated");
+	}
+	
+	// get next buffer
+	const SampleFrame* newBuffer = Engine::audioEngine()->nextBuffer();
+
+	if (!Engine::audioEngine()->hasFifoWriter() == false)
+	{
+		qDebug("nextOutputBuffer no fifo");
+	}
+	if (!newBuffer)
+	{
+		// copy new buffer to bufferOut
+		memcpy(bufferOut, newBuffer, curFrames * sizeof(SampleFrame));
+		qDebug("nextOutputBuffer wrote buffer");
+
+		if (Engine::audioEngine()->hasFifoWriter()) { delete[] newBuffer; }
+	}
+	else
+	{
+		*framesOut = 0;
+		qDebug("nextOutputBuffer return 0");
+	}
+}
 
 
 void AudioEngine::changeQuality(const struct qualitySettings & qs)
