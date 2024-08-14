@@ -270,7 +270,7 @@ void AudioAlsa::run()
 				}
 				outbuf_size = frames * channels();
 
-				convertToS16(temp, frames, outbuf, m_convertEndian);
+				convertToS16(temp, frames, outbuf, channels(), m_convertEndian);
 			}
 			int min_len = std::min(len, outbuf_size - outbuf_pos);
 			memcpy( ptr, outbuf + outbuf_pos,
