@@ -182,9 +182,10 @@ void RenderManager::render(QString outputPath)
 
 void RenderManager::endRendering(void* data)
 {
-	if (m_isRendering == false) { return; }
+	RenderManager* thisManager = reinterpret_cast<RenderManager*>(data);
+	if (thisManager->m_isRendering == false) { return; }
 	
-	m_isRendering = false;
+	thisManager->m_isRendering = false;
 	// stop exporting song
 	// Notify the audio engine of the end of processing.
 	Engine::audioEngine()->stopProcessing();
