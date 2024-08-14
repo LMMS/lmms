@@ -95,8 +95,8 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 		bool successful = false;
 
 		m_fileDev = audioEncoderFactory(
-					outputFilename, outputSettings, DEFAULT_CHANNELS,
-					Engine::audioEngine(), successful );
+					outputSettings, successful, outputFilename, DEFAULT_CHANNELS,
+					Engine::audioEngine()->framesPerPeriod(), Engine::audioEngine()->nextOutputBuffer);
 		if( !successful )
 		{
 			delete m_fileDev;
@@ -145,7 +145,7 @@ void ProjectRenderer::startProcessing()
 	{
 		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
+		//Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false ); TODO remove?
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -179,7 +179,7 @@ void ProjectRenderer::run()
 	m_progress = 0;
 
 	// Now start processing
-	Engine::audioEngine()->startProcessing(false);
+	Engine::audioEngine()->startExporting(true, m_qualitySettings);
 
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
@@ -194,7 +194,7 @@ void ProjectRenderer::run()
 	}
 
 	// Notify the audio engine of the end of processing.
-	Engine::audioEngine()->stopProcessing();
+	Engine::audioEngine()->stopExporting();
 
 	Engine::getSong()->stopExport();
 
