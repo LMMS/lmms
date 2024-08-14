@@ -152,7 +152,7 @@ void AudioSndio::run()
 			break;
 		}
 
-		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
+		uint bytes = convertToS16(temp, frames, outbuf, channels(), m_convertEndian);
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;
