@@ -125,6 +125,8 @@ public:
 
 	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorWidget*;
 
+	static constexpr int MaxTrackChannels = 256;
+
 signals:
 	void channelCountsChanged();
 

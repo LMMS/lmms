@@ -29,7 +29,6 @@
 #include <QDomElement>
 #include <cassert>
 #include <stdexcept>
-#include <iostream>
 
 #include "AudioEngine.h"
 #include "Model.h"
@@ -40,31 +39,21 @@ namespace lmms
 PluginPinConnector::PluginPinConnector(Model* parent)
 	: QObject{parent}
 {
-	std::cout << "~~~Default ctor\n";
-
-#ifndef NDEBUG
-	std::cout << "~~~DEBUG ENBALED\n";
-#endif
-
-	//setChannelCounts(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	//setDefaultConnections();
 }
 
 PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent)
 	: QObject{parent}
 {
-	std::cout << "~~~2nd ctor\n";
-
-#ifndef NDEBUG
-	std::cout << "~~~DEBUG ENABLED\n";
-#endif
-
 	setChannelCounts(pluginInCount, pluginOutCount);
-	setDefaultConnections();
 }
 
 void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 {
+	if (m_coreInCount > MaxTrackChannels || m_coreOutCount > MaxTrackChannels)
+	{
+		throw std::runtime_error{"Only up to 256 track channels are allowed"};
+	}
+
 	if (inCount < 0)
 	{
 		throw std::invalid_argument{"Invalid input count"};
@@ -86,23 +75,17 @@ void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 		return;
 	}
 
-	std::cout << "BEFORE\n";
-	std::cout << "~~~~~inCount:" << inCount << "; outCount:" << outCount << "\n";
-	std::cout << "~~~~~m_inCount:" << m_pluginInCount << "; m_outCount:" << m_pluginOutCount << "\n";
-	std::cout << "~~~~~inModels.size():" << m_inModels.size() << "; inModels[0].size():" << (m_inModels.size() > 0 ? (int)m_inModels[0].size() : 0) << "\n";
-	std::cout << "~~~~~outModels.size():" << m_outModels.size() << "; outModels[0].size():" << (m_outModels.size() > 0 ? (int)m_outModels[0].size() : 0) << "\n";
+	const bool initialSetup = m_pluginInCount == 0 && m_pluginOutCount == 0;
 
 	setChannelCount(inCount, m_inModels, m_pluginInCount);
 	setChannelCount(outCount, m_outModels, m_pluginOutCount);
 
-	std::cout << "AFTER\n";
-	std::cout << "~~~~~m_inCount:" << m_pluginInCount << "; m_outCount:" << m_pluginOutCount << "\n";
-	std::cout << "~~~~~inModels.size():" << m_inModels.size() << "; inModels[0].size():" << (m_inModels.size() > 0 ? (int)m_inModels[0].size() : 0) << "\n";
-	std::cout << "~~~~~outModels.size():" << m_outModels.size() << "; outModels[0].size():" << (m_outModels.size() > 0 ? (int)m_outModels[0].size() : 0) << "\n";
+	if (initialSetup)
+	{
+		setDefaultConnections();
+	}
 
 	updateOptions();
-
-	setDefaultConnections(); // TEMPORARY
 
 	emit channelCountsChanged();
 }
@@ -225,6 +208,9 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOut.size; ++outChannelPairIdx)
 	{
+		SampleFrame* outPtr = inOut[outChannelPairIdx]; // L/R track channel pair
+		const auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
+
 		auto buffer = std::array<float, DEFAULT_BUFFER_SIZE>();
 		mix_ch_t numRouted; // counter for # of in channels routed to the current out channel
 
@@ -250,14 +236,10 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 		};
 
 		// Left SampleFrame channel first
-
-		auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
-
 		mixInputs(outChannel, numRouted, buffer);
 		if (numRouted > 0)
 		{
 			// Normalize output
-			SampleFrame* outPtr = inOut[outChannel];
 			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
 				outPtr[frame][0] = buffer[frame] / numRouted;
@@ -265,14 +247,10 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 		}
 
 		// Right SampleFrame channel second
-
-		++outChannel;
-
-		mixInputs(outChannel, numRouted, buffer);
+		mixInputs(outChannel + 1, numRouted, buffer);
 		if (numRouted > 0)
 		{
 			// Normalize output
-			SampleFrame* outPtr = inOut[outChannel];
 			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
 				outPtr[frame][1] = buffer[frame] / numRouted;
@@ -286,33 +264,39 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 
 void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("v", 0); // version
+	auto pins = doc.createElement(nodeName());
+	elem.appendChild(pins);
 
-	elem.setAttribute("ins", m_pluginInCount);
-	elem.setAttribute("outs", m_pluginOutCount);
+	pins.setAttribute("v", 0); // version
+
+	pins.setAttribute("num_in", m_pluginInCount);
+	pins.setAttribute("num_out", m_pluginOutCount);
 
 	auto pinsIn = doc.createElement("in_matrix");
-	elem.appendChild(pinsIn);
+	pins.appendChild(pinsIn);
 	saveSettings(m_inModels, doc, pinsIn);
 
 	auto pinsOut = doc.createElement("out_matrix");
-	elem.appendChild(pinsOut);
+	pins.appendChild(pinsOut);
 	saveSettings(m_outModels, doc, pinsOut);
 }
 
 void PluginPinConnector::loadSettings(const QDomElement& elem)
 {
+	const auto pins = elem.firstChildElement(nodeName());
+	if (pins.isNull()) { return; }
+
 	// Until full routing support is added, track channel count should always be 2
 	assert(m_coreInCount == 2);
 	assert(m_coreOutCount == 2);
 
 	// TODO: Assert port counts are what was expected?
-	const auto pluginInCount = elem.attribute("ins", "0").toInt();
-	const auto pluginOutCount = elem.attribute("outs", "0").toInt();
+	const auto pluginInCount = pins.attribute("num_in", "0").toInt();
+	const auto pluginOutCount = pins.attribute("num_out", "0").toInt();
 	setChannelCounts(pluginInCount, pluginOutCount);
 
-	loadSettings(elem.firstChildElement("in_matrix"), m_inModels);
-	loadSettings(elem.firstChildElement("out_matrix"), m_outModels);
+	loadSettings(pins.firstChildElement("in_matrix"), m_inModels);
+	loadSettings(pins.firstChildElement("out_matrix"), m_outModels);
 }
 
 void PluginPinConnector::saveSettings(const PinMap& pins, QDomDocument& doc, QDomElement& elem)
@@ -326,7 +310,7 @@ void PluginPinConnector::saveSettings(const PinMap& pins, QDomDocument& doc, QDo
 			if (trackChannels[pluginChannel]->value() || trackChannels[pluginChannel]->isAutomatedOrControlled())
 			{
 				trackChannels[pluginChannel]->saveSettings(doc, elem,
-					QString{"c%1,%2"}.arg(trackChannel + 1).arg(pluginChannel + 1));
+					QString{"c%1_%2"}.arg(trackChannel + 1).arg(pluginChannel + 1));
 			}
 		}
 	}
@@ -346,12 +330,12 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 
 	auto addConnection = [&connectionsToLoad](const QString& name) {
 #ifndef NDEBUG
-		constexpr auto minSize = std::string_view{"c#,#"}.size();
+		constexpr auto minSize = static_cast<int>(std::string_view{"c#_#"}.size());
 		if (name.size() < minSize) { throw std::runtime_error{"string too small"}; }
-		if (name[0] != 'c') { throw std::runtime_error{"invalid string"}; }
+		if (name[0] != 'c') { throw std::runtime_error{"invalid string: \"" + name.toStdString() + "\""}; }
 #endif
 
-		const auto pos = name.indexOf(QStringView{u","});
+		const auto pos = name.indexOf(QStringView{u"_"});
 #ifndef NDEBUG
 		if (pos <= 0) { throw std::runtime_error{"parse failure"}; }
 #endif
@@ -390,7 +374,7 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 		{
 			if (trackChannelsToLoad[pluginChannel])
 			{
-				const auto name = QString{"c%1,%2"}.arg(trackChannel + 1).arg(pluginChannel + 1);
+				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(pluginChannel + 1);
 				trackChannels[pluginChannel]->loadSettings(elem, name);
 			}
 			else
@@ -407,7 +391,7 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 		auto& trackChannels = pins[trackChannel];
 		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
 		{
-			const auto name = QString{"c%1,%2"}.arg(trackChannel).arg(pluginChannel);
+			const auto name = QString{"c%1_%2"}.arg(trackChannel).arg(pluginChannel);
 			if (elem.hasAttribute(name) || !elem.firstChildElement(name).isNull())
 			{
 				trackChannels[pluginChannel]->loadSettings(elem, name);
@@ -424,7 +408,7 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 void PluginPinConnector::setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount)
 {
 	// TODO: Move this to a separate method?
-	if (models.size() != m_coreOutCount)
+	if (static_cast<int>(models.size()) != m_coreOutCount)
 	{
 		models.resize(m_coreOutCount);
 	}
