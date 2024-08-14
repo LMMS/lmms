@@ -994,7 +994,17 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	unlock();
 }
 
+void InstrumentTrack::savePreset(QDomDocument & doc, QDomElement & element)
+{
+	setPresetMode();
+	saveSettings(doc, element);
+}
 
+void InstrumentTrack::loadPreset(const QDomElement & element)
+{
+	setPresetMode();
+	loadSettings(element);
+}
 
 
 void InstrumentTrack::setPreviewMode( const bool value )
@@ -1011,14 +1021,13 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 	int mixerChannel = mixerChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
-	setPresetMode();
 	
 	//Replacing an instrument shouldn't change the solo/mute state.
 	bool oldMute = isMuted();
 	bool oldSolo = isSolo();
 	bool oldMutedBeforeSolo = isMutedBeforeSolo();
 
-	loadSettings(dataFile.content().toElement());
+	loadPreset(dataFile.content().toElement());
 	
 	setMuted(oldMute);
 	setSolo(oldSolo);

@@ -137,6 +137,9 @@ public:
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
+	void savePreset(QDomDocument & doc, QDomElement & element);
+	void loadPreset(const QDomElement & element);
+
 	using Track::setJournalling;
 
 

@@ -115,11 +115,6 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	void setPresetMode(bool presetMode = true)
-	{
-		m_presetMode = presetMode;
-	}
-
 	// -- for usage by Clip only ---------------
 	Clip * addClip( Clip * clip );
 	void removeClip( Clip * clip );
@@ -211,6 +206,10 @@ public slots:
 
 protected:
 	bool isPresetMode() const { return m_presetMode; }
+	void setPresetMode(bool presetMode = true)
+	{
+		m_presetMode = presetMode;
+	}
 
 private:
 	TrackContainer* m_trackContainer;
