@@ -56,6 +56,10 @@ public:
 
 	void abortProcessing();
 
+
+	// fill buffer for lmms::TODO
+	static void nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* dataIn);
+
 signals:
 	void progressChanged( int );
 	void finished();
@@ -69,6 +73,7 @@ private:
 	void restoreMutedState();
 
 	void render( QString outputPath );
+	static void endRendering(void* data);
 
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;
@@ -77,6 +82,8 @@ private:
 	QString m_outputPath;
 
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;
+	volatile int m_progress;
+	bool m_isRendering;
 
 	std::vector<Track*> m_tracksToRender;
 	std::vector<Track*> m_unmuted;

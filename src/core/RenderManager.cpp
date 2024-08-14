@@ -44,13 +44,16 @@ RenderManager::RenderManager(
 	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
 	m_outputSettings(outputSettings),
 	m_format(fmt),
-	m_outputPath(outputPath)
+	m_outputPath(outputPath),
+	m_progress(0),
+	m_isRendering(false)
 {
 	Engine::audioEngine()->storeAudioDevice();
 }
 
 RenderManager::~RenderManager()
 {
+	endRendering(this);
 	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
 	Engine::audioEngine()->changeQuality( m_oldQualitySettings );
 }
@@ -145,19 +148,29 @@ void RenderManager::render(QString outputPath)
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,
-			outputPath);
+			outputPath,
+			Engine::audioEngine()->framesPerPeriod(),
+			&nextOutputBuffer,
+			&endRendering,
+			this);
 
 	if( m_activeRenderer->isReady() )
 	{
-		// pass progress signals through
-		connect( m_activeRenderer.get(), SIGNAL(progressChanged(int)),
-				this, SIGNAL(progressChanged(int)));
-
 		// when it is finished, render the next track.
 		// if we have not queued any tracks, renderNextTrack will just clean up
 		connect( m_activeRenderer.get(), SIGNAL(finished()),
 				this, SLOT(renderNextTrack()));
 
+		// setup song and audio engine for exporting
+		Engine::getSong()->startExport();
+		// Skip first empty buffer.
+		Engine::audioEngine()->nextBuffer();
+		m_progress = 0;
+		// Now start processing
+		Engine::audioEngine()->startExporting(m_qualitySettings);
+		m_isRendering = true;
+
+		// start thread
 		m_activeRenderer->startProcessing();
 	}
 	else
@@ -165,6 +178,17 @@ void RenderManager::render(QString outputPath)
 		qDebug( "Renderer failed to acquire a file device!" );
 		renderNextTrack();
 	}
+}
+
+void RenderManager::endRendering(void* data)
+{
+	if (m_isRendering == false) { return; }
+	
+	m_isRendering = false;
+	// stop exporting song
+	// Notify the audio engine of the end of processing.
+	Engine::audioEngine()->stopProcessing();
+	Engine::getSong()->stopExport();
 }
 
 // Unmute all tracks that were muted while rendering tracks
@@ -192,7 +216,24 @@ void RenderManager::updateConsoleProgress()
 {
 	if ( m_activeRenderer )
 	{
-		m_activeRenderer->updateConsoleProgress();
+		const int cols = 50;
+		static int rot = 0;
+		auto buf = std::array<char, 80>{};
+		auto prog = std::array<char, cols + 1>{};
+
+		for (int i = 0; i < cols; i++)
+		{
+			prog[i] = (i * 100 / cols <= m_progress ? '-' : ' ');
+		}
+		prog[cols] = 0;
+
+		const auto activity = (const char*)"|/-\\";
+		std::fill(buf.begin(), buf.end(), 0);
+		sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress, activity[rot]);
+		rot = (rot + 1) % 4;
+
+		fprintf(stderr, "%s", buf.data());
+		fflush(stderr);
 
 		int totalNum = m_unmuted.size();
 		if ( totalNum > 0 )
@@ -204,5 +245,61 @@ void RenderManager::updateConsoleProgress()
 	}
 }
 
+// gets a buffer and some data as input
+// the sender who constructed lmms::TODO decides what is dataIn
+
+// fills the buffer with AudioEngine::nextBuffer() data and sets the correct size
+
+// this class doesn't own bufferOut
+// bufferOut can not be nullptr
+// dataIn can be nullptr
+void RenderManager::nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* dataIn)
+{
+	RenderManager* thisManager = reinterpret_cast<RenderManager*>(dataIn);
+
+	fpp_t curFrames = Engine::audioEngine()->framesPerPeriod();
+	if (bufferOut->size() != curFrames)
+	{
+		bufferOut->resize(curFrames);
+	}
+	
+	// get next buffer
+	const SampleFrame* newBuffer = Engine::audioEngine()->nextBuffer();
+
+	// DEBUG TODO
+	if (Engine::getSong()->isExportDone() == false)
+	{
+		qDebug("exportingDone false");
+	}
+	if (newBuffer == nullptr)
+	{
+		qDebug("newBuffer is nullptr");
+	}
+
+
+	if (newBuffer != nullptr && Engine::getSong()->isExportDone() == false)
+	{
+		// copy new buffer to bufferOut
+		memcpy(bufferOut->data(), newBuffer, curFrames * sizeof(SampleFrame));
+		qDebug("nextOutputBuffer wrote buffer");
+
+		// update progress
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (thisManager->m_progress != nprog)
+		{
+			thisManager->m_progress = nprog;
+			emit thisManager->progressChanged(thisManager->m_progress);
+		}
+
+		// delete source buffer
+		if (Engine::audioEngine()->hasFifoWriter()) { delete[] newBuffer; }
+	}
+	else
+	{
+		// this will stop ProjectRenderer exporting
+		bufferOut->clear();
+		qDebug("nextOutputBuffer return 0");
+	}
+}
 
 } // namespace lmms
