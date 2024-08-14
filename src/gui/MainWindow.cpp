@@ -57,7 +57,7 @@
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
-#include "ProjectRenderer.h"
+#include "ActiveRenderer.h"
 #include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
@@ -1464,10 +1464,10 @@ void MainWindow::exportProject(bool multiExport)
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::ExportFileFormat::Count)
+		while(ActiveRenderer::fileEncodeDevices[idx].m_fileFormat != ActiveRenderer::ExportFileFormat::Count)
 		{
-			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
-				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
+			if(ActiveRenderer::fileEncodeDevices[idx].isAvailable()) {
+				types << tr(ActiveRenderer::fileEncodeDevices[idx].m_description);
 			}
 			++idx;
 		}
@@ -1483,7 +1483,7 @@ void MainWindow::exportProject(bool multiExport)
 			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 			baseFilename = tr( "untitled" );
 		}
-		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
+		efd.selectFile(baseFilename + ActiveRenderer::fileEncodeDevices[0].m_extension);
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
