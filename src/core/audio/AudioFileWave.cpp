@@ -24,18 +24,21 @@
  */
 
 #include "AudioFileWave.h"
-#include "endian_handling.h"
+
+#include "AudioDevice.h" // convertToS16
 #include "AudioEngine.h"
+#include "endian_handling.h"
 
 
 namespace lmms
 {
 
-AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
-				const ch_cnt_t channels, bool & successful,
-				const QString & file,
-				AudioEngine* audioEngine ) :
-	AudioFileDevice( outputSettings, channels, file, audioEngine ),
+AudioFileWave::AudioFileWave(OutputSettings const & outputSettings,
+			bool & successful,
+			const QString & file,
+			const ch_cnt_t channels, const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction) :
+	AudioFileDevice(outputSettings, file, channels, defaultBufferSize, getBufferFunction),
 	m_sf( nullptr )
 {
 	successful = outputFileOpened() && startEncoding();
@@ -54,9 +57,9 @@ AudioFileWave::~AudioFileWave()
 
 bool AudioFileWave::startEncoding()
 {
-	m_si.samplerate = sampleRate();
-	m_si.channels = channels();
-	m_si.frames = audioEngine()->framesPerPeriod();
+	m_si.samplerate = getSampleRate();
+	m_si.channels = getChannel();
+	m_si.frames = getDefaultFrameCount();
 	m_si.sections = 1;
 	m_si.seekable = 0;
 
@@ -99,12 +102,12 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 
 	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
 	{
-		auto buf = new float[_frames * channels()];
+		auto buf = new float[_frames * getChannel()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < getChannel(); ++chnl )
 			{
-				buf[frame * channels() + chnl] = _ab[frame][chnl];
+				buf[frame * getChannel() + chnl] = _ab[frame][chnl];
 			}
 		}
 		sf_writef_float( m_sf, buf, _frames );
@@ -112,8 +115,8 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 	}
 	else
 	{
-		auto buf = new int_sample_t[_frames * channels()];
-		convertToS16(_ab, _frames, buf, !isLittleEndian());
+		auto buf = new int_sample_t[_frames * getChannel()];
+		AudioDevice::convertToS16(_ab, _frames, buf, !isLittleEndian(), getChannel());
 
 		sf_writef_short( m_sf, buf, _frames );
 		delete[] buf;
