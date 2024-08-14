@@ -28,14 +28,20 @@
 #include <memory>
 
 #include "AudioFileFlac.h"
-#include "endian_handling.h"
+
+#include "AudioDevice.h" // convertToS16
 #include "AudioEngine.h"
+#include "endian_handling.h"
 
 namespace lmms
 {
 
-AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, AudioEngine* audioEngine):
-	AudioFileDevice(outputSettings,channels,file,audioEngine),
+AudioFileFlac::AudioFileFlac(OutputSettings const & outputSettings,
+			bool & successful,
+			const QString & file,
+			const ch_cnt_t channels, const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction) :
+	AudioFileDevice(outputSettings, file, channels, defaultBufferSize, getBufferFunction),
 	m_sf(nullptr)
 {
 	successful = outputFileOpened() && startEncoding();
@@ -48,11 +54,12 @@ AudioFileFlac::~AudioFileFlac()
 
 bool AudioFileFlac::startEncoding()
 {
-	m_sfinfo.samplerate=sampleRate();
-	m_sfinfo.channels=channels();
-	m_sfinfo.frames = audioEngine()->framesPerPeriod();
+	m_sfinfo.samplerate = getSampleRate();
+	m_sfinfo.channels = getChannel();
+	m_sfinfo.frames = getDefaultFrameCount();
 	m_sfinfo.sections=1;
 	m_sfinfo.seekable=0;
+	qDebug("sample rate: %d, channel: %d, frameCount: %d", getSampleRate(), getChannel(), getDefaultFrameCount());
 
 	m_sfinfo.format = SF_FORMAT_FLAC;
 
@@ -96,23 +103,23 @@ void AudioFileFlac::writeBuffer(const SampleFrame* _ab, fpp_t const frames)
 
 	if (depth == OutputSettings::BitDepth::Depth24Bit || depth == OutputSettings::BitDepth::Depth32Bit) // Float encoding
 	{
-		auto buf = std::vector<sample_t>(frames * channels());
+		auto buf = std::vector<sample_t>(frames * getChannel());
 		for(fpp_t frame = 0; frame < frames; ++frame)
 		{
-			for(ch_cnt_t channel=0; channel<channels(); ++channel)
+			for (ch_cnt_t channel = 0; channel < getChannel(); channel++)
 			{
 				// Clip the negative side to just above -1.0 in order to prevent it from changing sign
 				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
 				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
-				buf[frame*channels() + channel] = std::max(clipvalue, _ab[frame][channel]);
+				buf[frame * getChannel() + channel] = std::max(clipvalue, _ab[frame][channel]);
 			}
 		}
 		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
 	}
 	else // integer PCM encoding
 	{
-		auto buf = std::vector<int_sample_t>(frames * channels());
-		convertToS16(_ab, frames, buf.data(), !isLittleEndian());
+		auto buf = std::vector<int_sample_t>(frames * getChannel());
+		AudioDevice::convertToS16(_ab, frames, buf.data(), !isLittleEndian(), getChannel());
 		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 

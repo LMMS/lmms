@@ -36,27 +36,28 @@ namespace lmms
 class AudioFileFlac : public AudioFileDevice
 {
 public:
-	AudioFileFlac(OutputSettings const& outputSettings,
-			ch_cnt_t const channels,
-			bool& successful,
-			QString const& file,
-			AudioEngine* audioEngine
-	);
-
+	AudioFileFlac(OutputSettings const & outputSettings,
+			bool & successful,
+			const QString & file,
+			const ch_cnt_t channels, const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction);
 	~AudioFileFlac() override;
 
-	static AudioFileDevice* getInst(QString const& outputFilename,
-			OutputSettings const& outputSettings,
-			ch_cnt_t const channels,
-			AudioEngine* audioEngine,
-			bool& successful)
+	static AudioFileDevice * getInst(
+			OutputSettings const &outputSettings,
+			bool &successful,
+			const QString & outputFilename,
+			const ch_cnt_t channels,
+			const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction)
 	{
 		return new AudioFileFlac(
 			outputSettings,
-			channels,
 			successful,
 			outputFilename,
-			audioEngine
+			channels,
+			defaultBufferSize,
+			getBufferFunction
 		);
 	}
 
