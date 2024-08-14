@@ -81,12 +81,19 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
 					ExportFileFormat exportFileFormat,
-					const QString & outputFilename ) :
+					const QString & outputFilename,
+					const fpp_t defaultFrameCount,
+					BufferFn getBufferFunction,
+					EndFn endFunction,
+					void* getBufferData) :
 	QThread( Engine::audioEngine() ),
 	m_fileDev( nullptr ),
 	m_qualitySettings( qualitySettings ),
-	m_progress( 0 ),
-	m_abort( false )
+	m_abort(false),
+	m_getBufferFunction(getBufferFunction),
+	m_endFunction(endFunction),
+	m_getBufferData(getBufferData),
+	m_buffer(0)
 {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
 
@@ -96,7 +103,7 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 
 		m_fileDev = audioEncoderFactory(
 					outputSettings, successful, outputFilename, DEFAULT_CHANNELS,
-					Engine::audioEngine()->framesPerPeriod(), Engine::audioEngine()->nextOutputBuffer);
+					defaultFrameCount);
 		if( !successful )
 		{
 			delete m_fileDev;
@@ -136,6 +143,27 @@ QString ProjectRenderer::getFileExtensionFromFormat(
 }
 
 
+bool ProjectRenderer::processNextBuffer()
+{
+	m_getBufferFunction(&m_buffer, m_getBufferData);
+	if (m_buffer.size() <= 0) { return true; }
+	
+	qDebug("write buffer, count: %ld", m_buffer.size());
+
+	return false;
+}
+
+bool ProjectRenderer::processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount)
+{
+	if (frameCount <= 0) { m_buffer.clear(); return true; }
+	if (m_buffer.size() != frameCount)
+	{
+		m_buffer.resize(frameCount);
+	}
+
+	memcpy(m_buffer.data(), frameBuffer, m_buffer.size() * sizeof(SampleFrame));
+	return false;
+}
 
 
 void ProjectRenderer::startProcessing()
@@ -172,16 +200,50 @@ void ProjectRenderer::run()
 
 	PerfLogTimer perfLog("Project Render");
 
-	Engine::getSong()->startExport();
+	//Engine::getSong()->startExport();
 	// Skip first empty buffer.
-	Engine::audioEngine()->nextBuffer();
+	//Engine::audioEngine()->nextBuffer();
 
-	m_progress = 0;
+	//m_progress = 0;
 
 	// Now start processing
-	Engine::audioEngine()->startExporting(true, m_qualitySettings);
+	//Engine::audioEngine()->startExporting(true, m_qualitySettings);
 
-	// Continually track and emit progress percentage to listeners.
+	qDebug("start running");
+
+	while (!m_abort)
+	{
+		// if a function pointer was provided
+		// use that to fill m_buffer
+		qDebug("m_getBufferFunction if null");
+		if (m_getBufferFunction != nullptr)
+		{
+			qDebug("m_getBufferFunction not null");
+			processNextBuffer();
+		}
+		
+		// if m_buffer wasn't filled by
+		// processNextBuffer() or processThisBuffer() before
+		if (m_buffer.size() <= 0)
+		{
+			qDebug("m_getBufferFunction break because of size");
+			break;
+		}
+
+		m_fileDev->processThisBuffer(m_buffer.data(), m_buffer.size());
+		// Continually track and emit progress percentage to listeners.
+		progressChanged();
+		
+		// if no function pointer was provided
+		if (m_getBufferFunction == nullptr)
+		{
+			// clear buffer to end while loop
+			m_buffer.clear();
+			break;
+		}
+	}
+	
+	/*
 	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
 		m_fileDev->processNextBuffer();
@@ -192,11 +254,16 @@ void ProjectRenderer::run()
 			emit progressChanged( m_progress );
 		}
 	}
+	*/
 
 	// Notify the audio engine of the end of processing.
-	Engine::audioEngine()->stopExporting();
+	//Engine::audioEngine()->stopExporting();
 
-	Engine::getSong()->stopExport();
+	//Engine::getSong()->stopExport();
+	if (m_endFunction != nullptr)
+	{
+		m_endFunction(m_getBufferData);
+	}
 
 	perfLog.end();
 
@@ -217,30 +284,6 @@ void ProjectRenderer::abortProcessing()
 	wait();
 }
 
-
-
-void ProjectRenderer::updateConsoleProgress()
-{
-	const int cols = 50;
-	static int rot = 0;
-	auto buf = std::array<char, 80>{};
-	auto prog = std::array<char, cols + 1>{};
-
-	for( int i = 0; i < cols; ++i )
-	{
-		prog[i] = ( i*100/cols <= m_progress ? '-' : ' ' );
-	}
-	prog[cols] = 0;
-
-	const auto activity = (const char*)"|/-\\";
-	std::fill(buf.begin(), buf.end(), 0);
-	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
-							activity[rot] );
-	rot = ( rot+1 ) % 4;
-
-	fprintf( stderr, "%s", buf.data() );
-	fflush( stderr );
-}
 
 
 } // namespace lmms

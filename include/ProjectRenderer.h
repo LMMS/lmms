@@ -25,10 +25,14 @@
 #ifndef LMMS_PROJECT_RENDERER_H
 #define LMMS_PROJECT_RENDERER_H
 
+#include <functional>
+#include <vector>
+
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
 #include "AudioEngine.h"
 #include "OutputSettings.h"
+#include "SampleFrame.h"
 
 #include "lmms_export.h"
 
@@ -40,6 +44,8 @@ class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
+	using BufferFn = std::function<void(std::vector<SampleFrame>*, void*)>;
+	using EndFn = std::function<void(void*)>;
 	enum class ExportFileFormat : int
 	{
 		Wave,
@@ -64,7 +70,11 @@ public:
 	ProjectRenderer( const AudioEngine::qualitySettings & _qs,
 				const OutputSettings & _os,
 				ExportFileFormat _file_format,
-				const QString & _out_file );
+				const QString & _out_file,
+				const fpp_t defaultFrameCount,
+				BufferFn getBufferFunction,
+				EndFn endFunction,
+				void* getBufferData);
 	~ProjectRenderer() override = default;
 
 	bool isReady() const
@@ -78,16 +88,17 @@ public:
 	static QString getFileExtensionFromFormat( ExportFileFormat fmt );
 
 	static const std::array<FileEncodeDevice, 5> fileEncodeDevices;
+	
+	// returns false if finished
+	bool processNextBuffer();
+	bool processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
 
 public slots:
 	void startProcessing();
 	void abortProcessing();
 
-	void updateConsoleProgress();
-
-
 signals:
-	void progressChanged( int );
+	void progressChanged();
 
 
 private:
@@ -96,9 +107,16 @@ private:
 	AudioFileDevice * m_fileDev;
 	AudioEngine::qualitySettings m_qualitySettings;
 
-	volatile int m_progress;
 	volatile bool m_abort;
 
+	// called if not nullptr
+	// while run()
+	// if returned buffer.size() <= 0 then break; end
+	BufferFn m_getBufferFunction;
+	// called at the end of run(), can be nullptr
+	EndFn m_endFunction;
+	void* m_getBufferData;
+	std::vector<SampleFrame> m_buffer;
 } ;
 
 
