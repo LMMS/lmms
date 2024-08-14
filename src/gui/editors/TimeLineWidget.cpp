@@ -134,6 +134,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 void TimeLineWidget::updatePosition()
 {
 	emit positionChanged(m_pos);
+	emit m_timeline->positionChanged(m_pos);
 	update();
 }
 
