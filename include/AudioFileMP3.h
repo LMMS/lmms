@@ -40,21 +40,29 @@ namespace lmms
 class AudioFileMP3 : public AudioFileDevice
 {
 public:
-	AudioFileMP3( OutputSettings const & outputSettings,
-			const ch_cnt_t _channels,
+	AudioFileMP3(OutputSettings const & outputSettings,
 			bool & successful,
-			const QString & _file,
-			AudioEngine* audioEngine );
+			const QString & file,
+			const ch_cnt_t channels, const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction);
 	~AudioFileMP3() override;
 
-	static AudioFileDevice * getInst( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  AudioEngine* audioEngine,
-					  bool & successful )
+	static AudioFileDevice * getInst(
+			OutputSettings const &outputSettings,
+			bool &successful,
+			const QString & outputFilename,
+			const ch_cnt_t channels,
+			const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction)
 	{
-		return new AudioFileMP3( outputSettings, channels, successful,
-					 outputFilename, audioEngine );
+		return new AudioFileMP3(
+			outputSettings,
+			successful,
+			outputFilename,
+			channels,
+			defaultBufferSize,
+			getBufferFunction
+		);
 	}
 
 protected:
