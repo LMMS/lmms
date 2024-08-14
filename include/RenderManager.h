@@ -28,7 +28,7 @@
 
 #include <memory>
 
-#include "ProjectRenderer.h"
+#include "ActiveRenderer.h"
 #include "OutputSettings.h"
 
 
@@ -43,7 +43,7 @@ public:
 	RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormat fmt,
+		ActiveRenderer::ExportFileFormat fmt,
 		QString outputPath);
 
 	~RenderManager() override;
@@ -57,7 +57,7 @@ public:
 	void abortProcessing();
 
 
-	// fill buffer for lmms::TODO
+	// fill lmms::ActiveRenderer's buffer
 	static void nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* dataIn);
 
 signals:
@@ -78,10 +78,10 @@ private:
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
-	ProjectRenderer::ExportFileFormat m_format;
+	ActiveRenderer::ExportFileFormat m_format;
 	QString m_outputPath;
 
-	std::unique_ptr<ProjectRenderer> m_activeRenderer;
+	std::unique_ptr<ActiveRenderer> m_activeRenderer;
 	volatile int m_progress;
 	bool m_isRendering;
 
