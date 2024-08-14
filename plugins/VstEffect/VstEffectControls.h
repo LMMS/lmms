@@ -123,6 +123,7 @@ protected slots:
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
+	void togglePinConnector();
 	void closeWindow();
 
 private:
@@ -140,6 +141,7 @@ private:
 
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
+	QPushButton* m_pinConnectorButton;
 	PluginPinConnectorView* m_pinConnector;
 	CustomTextKnob ** vstKnobs;
 

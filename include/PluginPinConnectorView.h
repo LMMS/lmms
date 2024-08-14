@@ -27,8 +27,8 @@
 
 #include <QWidget>
 
-#include "ModelView.h"
 #include "embed.h"
+#include "ModelView.h"
 
 namespace lmms
 {
@@ -40,10 +40,14 @@ class PluginPinConnectorView
 	: public QWidget
 	, public ModelView
 {
+	Q_OBJECT
+
 public:
 	PluginPinConnectorView(QWidget* parent);
 
 	auto sizeHint() const -> QSize override;
+
+	auto getChannelCountText() const -> QString;
 
 protected:
 	void mousePressEvent(QMouseEvent* me) override;

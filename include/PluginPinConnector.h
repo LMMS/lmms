@@ -62,8 +62,7 @@ public:
 	/**
 	 * Getters
 	 */
-	//auto coreCountIn() const -> int { return m_coreInCount; }
-	//auto coreCountOut() const -> int { return m_coreOutCount; }
+	auto trackChannelsUsed() const -> unsigned int { return m_trackChannelsUsed; }
 	auto channelCountIn() const -> int { return m_pluginInCount; }
 	auto channelCountOut() const -> int { return m_pluginOutCount; }
 
@@ -124,10 +123,15 @@ public:
 
 	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorView*;
 
-	static constexpr int MaxTrackChannels = 256;
+	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
 signals:
-	void channelCountsChanged();
+	void channelCountsChanged(); //!< plugin channel counts
+
+public slots:
+
+	void updateTrackChannels(int count);
+	void updateConnectionLabels();
 
 private:
 	void updateOptions();
@@ -135,10 +139,14 @@ private:
 	static void saveSettings(const PinMap& pins, QDomDocument& doc, QDomElement& elem);
 	static void loadSettings(const QDomElement& elem, PinMap& pins);
 
-	void setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount);
+	void setChannelCount(int newCount, PinMap& pins, int& oldCount);
 
-	int m_coreInCount = DEFAULT_CHANNELS;
-	int m_coreOutCount = DEFAULT_CHANNELS;
+	//! TODO: Move this somewhere else; Will be >= 2 once there is support for adding new track channels
+	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
+
+	//! This value is <= to the total number of track channels (currently always 2)
+	unsigned int m_trackChannelsUsed = DEFAULT_CHANNELS;
+
 	int m_pluginInCount = 0;
 	int m_pluginOutCount = 0;
 
@@ -149,6 +157,12 @@ private:
 
 	//! Maps LMMS core output to plugin output
 	PinMap m_outModels;
+
+	/**
+	 * Plugins can optionally provide custom channel names
+	 */
+	std::vector<std::string> m_inNames;
+	std::vector<std::string> m_outNames;
 
 	//! Cached values to quickly determine whether a given track channel bypasses the plugin
 	//std::vector<bool> m_bypassed; // TODO!

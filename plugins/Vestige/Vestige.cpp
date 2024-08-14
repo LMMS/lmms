@@ -54,6 +54,7 @@
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
+#include "PluginPinConnectorView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -968,13 +969,18 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _i
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
-	/*
-	if (m_vi->portConfig()->hasMonoPort()) // TODO
-	{
-		m_portConfig = m_vi->portConfig()->instantiateView(this);
-		m_portConfig->setFixedSize(108, gui::ComboBox::DEFAULT_HEIGHT);
-		l->addWidget(m_portConfig, 0, 2, 1, 3, Qt::AlignLeft);
-	}*/
+
+	m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
+	m_pinConnectorButton = new QPushButton{m_pinConnector->getChannelCountText(), this};
+
+	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVestigeInstrumentView::togglePinConnector);
+
+	connect(m_vi->pinConnector(), &PluginPinConnector::channelCountsChanged, this, [&]() {
+		m_pinConnectorButton->setText(m_pinConnector->getChannelCountText());
+	});
+
+	l->addWidget(m_pinConnectorButton, 0, 2, 1, 2, Qt::AlignLeft);
+
 
 	for( int i = 0; i < 10; i++ )
 	{
@@ -1044,6 +1050,21 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _i
 	m_vi->m_scrollArea->setWidget( widget );
 
 	m_vi->m_subWindow->show();
+}
+
+
+
+
+void ManageVestigeInstrumentView::togglePinConnector()
+{
+	if (m_pinConnector->isVisible())
+	{
+		m_pinConnector->hide();
+	}
+	else
+	{
+		m_pinConnector->show();
+	}
 }
 
 

@@ -40,17 +40,19 @@ namespace lmms
 PluginPinConnector::PluginPinConnector(Model* parent)
 	: Model{parent}
 {
+	updateTrackChannels(s_totalTrackChannels);
 }
 
 PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent)
 	: Model{parent}
 {
+	updateTrackChannels(s_totalTrackChannels);
 	setChannelCounts(pluginInCount, pluginOutCount);
 }
 
 void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 {
-	if (m_coreInCount > MaxTrackChannels || m_coreOutCount > MaxTrackChannels)
+	if (m_trackChannelsUsed > MaxTrackChannels)
 	{
 		throw std::runtime_error{"Only up to 256 track channels are allowed"};
 	}
@@ -86,9 +88,7 @@ void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 		setDefaultConnections();
 	}
 
-	updateOptions();
-
-	emit channelCountsChanged();
+	emit propertiesChanged();
 }
 
 void PluginPinConnector::setChannelCountIn(int inCount)
@@ -106,8 +106,7 @@ void PluginPinConnector::setDefaultConnections()
 	// Assumes pin maps are cleared
 	// TODO: Take into account channel groups?
 
-	assert(m_coreInCount >= 2);
-	assert(m_coreOutCount >= 2);
+	assert(m_trackChannelsUsed >= 2);
 
 	switch (m_pluginInCount)
 	{
@@ -138,6 +137,10 @@ void PluginPinConnector::setDefaultConnections()
 
 void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAudioData<sample_t> out)
 {
+	// Ignore all unused track channels for better performance
+	const auto inSizeConstrained = m_trackChannelsUsed / 2;
+	assert(inSizeConstrained <= in.size);
+
 	// Zero the output buffer
 	std::fill_n(out.ptr, out.size, 0.f);
 
@@ -147,7 +150,7 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAu
 		mix_ch_t numRouted = 0; // counter for # of in channels routed to the current out channel
 		sample_t* outPtr = &out[outSampleIdx];
 
-		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < in.size; ++inChannelPairIdx)
+		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 		{
 			const SampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
 
@@ -207,7 +210,11 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sa
 {
 	assert(frames <= DEFAULT_BUFFER_SIZE);
 
-	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOut.size; ++outChannelPairIdx)
+	// Ignore all unused track channels for better performance
+	const auto inOutSizeConstrained = m_trackChannelsUsed / 2;
+	assert(inOutSizeConstrained <= inOut.size);
+
+	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
 		SampleFrame* outPtr = inOut[outChannelPairIdx]; // L/R track channel pair
 		const auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
@@ -270,6 +277,11 @@ void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 	pins.setAttribute("v", 0); // version
 
+	if (m_trackChannelsUsed != s_totalTrackChannels)
+	{
+		pins.setAttribute("tc_used", m_trackChannelsUsed);
+	}
+
 	pins.setAttribute("num_in", m_pluginInCount);
 	pins.setAttribute("num_out", m_pluginOutCount);
 
@@ -288,8 +300,8 @@ void PluginPinConnector::loadSettings(const QDomElement& elem)
 	if (pins.isNull()) { return; }
 
 	// Until full routing support is added, track channel count should always be 2
-	assert(m_coreInCount == 2);
-	assert(m_coreOutCount == 2);
+	m_trackChannelsUsed = pins.attribute("tc_used", QString::number(s_totalTrackChannels)).toUInt();
+	assert(m_trackChannelsUsed == 2);
 
 	// TODO: Assert port counts are what was expected?
 	const auto pluginInCount = pins.attribute("num_in", "0").toInt();
@@ -406,36 +418,31 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 #endif
 }
 
-void PluginPinConnector::setChannelCount(int newCount, PluginPinConnector::PinMap& models, int& oldCount)
+void PluginPinConnector::setChannelCount(int newCount, PinMap& pins, int& oldCount)
 {
-	// TODO: Move this to a separate method?
-	if (static_cast<int>(models.size()) != m_coreOutCount)
-	{
-		models.resize(m_coreOutCount);
-	}
-
 	auto parent = dynamic_cast<Model*>(this->parent());
 	assert(parent != nullptr);
 	if (oldCount < newCount)
 	{
-		for (auto& pluginModels : models)
+		for (auto& pluginChannels : pins)
 		{
-			pluginModels.reserve(newCount);
+			pluginChannels.reserve(newCount);
 			for (int idx = oldCount; idx < newCount; ++idx)
 			{
-				pluginModels.push_back(new BoolModel{false, parent});
+				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parent});
+				connect(model, &BoolModel::dataChanged, this, &PluginPinConnector::dataChanged);
 			}
 		}
 	}
 	else if (oldCount > newCount)
 	{
-		for (auto& pluginModels : models)
+		for (auto& pluginChannels : pins)
 		{
 			for (int idx = newCount; idx < oldCount; ++idx)
 			{
-				delete pluginModels[idx];
+				delete pluginChannels[idx];
 			}
-			pluginModels.erase(pluginModels.begin() + newCount, pluginModels.end());
+			pluginChannels.erase(pluginChannels.begin() + newCount, pluginChannels.end());
 		}
 	}
 	oldCount = newCount;
@@ -445,7 +452,66 @@ auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConne
 {
 	auto view = new gui::PluginPinConnectorView{parent};
 	view->setModel(this);
+	connect(this, &PluginPinConnector::dataChanged,
+		view, static_cast<void(gui::PluginPinConnectorView::*)()>(&gui::PluginPinConnectorView::update));
+	connect(this, &PluginPinConnector::propertiesChanged,
+		view, static_cast<void(gui::PluginPinConnectorView::*)()>(&gui::PluginPinConnectorView::update));
 	return view;
+}
+
+void PluginPinConnector::updateTrackChannels(int count)
+{
+	if (count < 2) { throw std::invalid_argument{"There must be at least 2 track channels"}; }
+	if (count % 2 != 0) { throw std::invalid_argument{"There must be an even number of track channels"}; }
+
+	if (static_cast<int>(m_inModels.size()) == count
+		&& static_cast<int>(m_outModels.size()) == count)
+	{
+		return;
+	}
+
+	auto updateModels = [&](int pluginChannels, auto& models) {
+		auto oldSize = static_cast<int>(models.size());
+		if (oldSize > count)
+		{
+			for (auto idx = count; idx < oldSize; ++idx)
+			{
+				for (BoolModel* model : models[idx])
+				{
+					delete model;
+				}
+			}
+			m_trackChannelsUsed = std::min<unsigned>(m_trackChannelsUsed, count);
+			models.resize(count);
+		}
+		else if (oldSize < count)
+		{
+			auto parent = dynamic_cast<Model*>(this->parent());
+			assert(parent != nullptr);
+
+			models.resize(count);
+			for (auto idx = oldSize; idx < count; ++idx)
+			{
+				auto& channels = models[idx];
+				channels.reserve(pluginChannels);
+				for (int pcIdx = 0; pcIdx < pluginChannels; ++pcIdx)
+				{
+					BoolModel* model = channels.emplace_back(new BoolModel{false, parent});
+					connect(model, &BoolModel::dataChanged, this, &PluginPinConnector::dataChanged);
+				}
+			}
+		}
+	};
+
+	updateModels(m_pluginInCount, m_inModels);
+	updateModels(m_pluginOutCount, m_outModels);
+
+	emit propertiesChanged();
+}
+
+void PluginPinConnector::updateConnectionLabels()
+{
+
 }
 
 void PluginPinConnector::updateOptions()

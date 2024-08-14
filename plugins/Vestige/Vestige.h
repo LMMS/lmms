@@ -42,17 +42,17 @@ class QGridLayout;
 namespace lmms
 {
 
-class ComboBox;
 class FloatModel;
 class PluginPinConnector;
 class VstPlugin;
 
 namespace gui
 {
-class PixmapButton;
 class CustomTextKnob;
-class VestigeInstrumentView;
 class ManageVestigeInstrumentView;
+class PixmapButton;
+class PluginPinConnectorView;
+class VestigeInstrumentView;
 } // namespace gui
 
 
@@ -120,6 +120,7 @@ protected slots:
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
+	void togglePinConnector();
 	void closeWindow();
 
 
@@ -136,7 +137,8 @@ private:
 	QGridLayout * l;
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
-	ComboBox* m_portConfig;
+	QPushButton* m_pinConnectorButton;
+	PluginPinConnectorView* m_pinConnector;
 	CustomTextKnob ** vstKnobs;
 
 } ;

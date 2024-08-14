@@ -365,19 +365,18 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
-	/*
-	if (m_vi->portConfig()->hasMonoPort()) // TODO
-	{
-		m_portConfig = m_vi->portConfig()->instantiateView(widget);
-		m_portConfig->setFixedSize(108, gui::ComboBox::DEFAULT_HEIGHT);
-		l->addWidget(m_portConfig, 0, 2, 1, 3, Qt::AlignLeft);
-	}*/
 
-	if (auto pc = m_vi->pinConnector())
-	{
-		m_pinConnector = pc->instantiateView(widget);
-		l->addWidget(m_pinConnector, 0, 2, 1, 3, Qt::AlignLeft);
-	}
+	m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
+	m_pinConnectorButton = new QPushButton{m_pinConnector->getChannelCountText(), widget};
+
+	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVSTEffectView::togglePinConnector);
+
+	connect(m_vi->pinConnector(), &PluginPinConnector::channelCountsChanged, this, [&]() {
+		m_pinConnectorButton->setText(m_pinConnector->getChannelCountText());
+	});
+
+	l->addWidget(m_pinConnectorButton, 0, 2, 1, 2, Qt::AlignLeft);
+
 
 	for( int i = 0; i < 10; i++ )
 	{
@@ -449,6 +448,21 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_vi->m_scrollArea->setWidget( widget );
 
 	m_vi->m_subWindow->show();
+}
+
+
+
+
+void ManageVSTEffectView::togglePinConnector()
+{
+	if (m_pinConnector->isVisible())
+	{
+		m_pinConnector->hide();
+	}
+	else
+	{
+		m_pinConnector->show();
+	}
 }
 
 

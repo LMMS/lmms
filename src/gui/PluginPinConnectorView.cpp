@@ -27,9 +27,12 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "PluginPinConnector.h"
-
+//#include "AutomatableModelView.h"
 #include "gui_templates.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "PluginPinConnector.h"
+#include "StringPairDrag.h"
 
 namespace lmms
 {
@@ -48,11 +51,38 @@ PluginPinConnectorView::PluginPinConnectorView(QWidget* parent)
 	: QWidget{parent}
 	, ModelView{nullptr, this}
 {
+	setWindowTitle(tr("Plugin Pin Connector"));
+	getGUI()->mainWindow()->addWindowedWidget(this);
+	setAttribute(Qt::WA_DeleteOnClose, false);
+	setWindowIcon(embed::getIconPixmap("tool"));
+
+	// No maximize button
+	Qt::WindowFlags flags = parentWidget()->windowFlags();
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	parentWidget()->setWindowFlags(flags);
 }
 
 auto PluginPinConnectorView::sizeHint() const -> QSize
 {
 	return QSize{512, 256};
+}
+
+auto PluginPinConnectorView::getChannelCountText() const -> QString
+{
+	const auto* pinConnector = castModel<PluginPinConnector>();
+	if (!pinConnector) { return QString{}; }
+
+	constexpr int totalTrackChannels = 2; // TODO: Move somewhere else
+
+	const auto inText = pinConnector->channelCountIn() > totalTrackChannels
+		? QString{"%1/%2"}.arg(totalTrackChannels).arg(pinConnector->channelCountIn())
+		: QString{"%1"}.arg(pinConnector->channelCountIn());
+
+	const auto outText = pinConnector->channelCountOut() > totalTrackChannels
+		? QString{"%1/%2"}.arg(totalTrackChannels).arg(pinConnector->channelCountOut())
+		: QString{"%1"}.arg(pinConnector->channelCountOut());
+
+	return QString{tr("%1 in %2 out")}.arg(inText).arg(outText);
 }
 
 void PluginPinConnectorView::mousePressEvent(QMouseEvent* me)
@@ -79,10 +109,19 @@ void PluginPinConnectorView::mousePressEvent(QMouseEvent* me)
 		if (relPos >= buttonH || relPos <= 0) { return false; }
 		
 		BoolModel* model = pins.at(yIdx).at(xIdx);
-		model->setValue(!model->value());
+
+		if (me->modifiers() & Qt::ControlModifier)
+		{
+			// Taken from AutomatableModelView::mousePressEvent
+			new gui::StringPairDrag{"automatable_model", QString::number(model->id()), QPixmap{}, widget()};
+		}
+		else
+		{
+			model->setValue(!model->value());
+			update();
+		}
 
 		me->accept();
-		update();
 
 		return true;
 	};
