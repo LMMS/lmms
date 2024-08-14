@@ -43,8 +43,7 @@ public:
 	AudioFileMP3(OutputSettings const & outputSettings,
 			bool & successful,
 			const QString & file,
-			const ch_cnt_t channels, const fpp_t defaultBufferSize,
-			AudioFileDevice::BufferFn getBufferFunction);
+			const ch_cnt_t channels, const fpp_t defaultBufferSize);
 	~AudioFileMP3() override;
 
 	static AudioFileDevice * getInst(
@@ -52,16 +51,14 @@ public:
 			bool &successful,
 			const QString & outputFilename,
 			const ch_cnt_t channels,
-			const fpp_t defaultBufferSize,
-			AudioFileDevice::BufferFn getBufferFunction)
+			const fpp_t defaultBufferSize)
 	{
 		return new AudioFileMP3(
 			outputSettings,
 			successful,
 			outputFilename,
 			channels,
-			defaultBufferSize,
-			getBufferFunction
+			defaultBufferSize
 		);
 	}
 
