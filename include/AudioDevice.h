@@ -90,6 +90,19 @@ public:
 
 	virtual void stopProcessing();
 
+
+	// convert a given audio-buffer to a buffer in signed 16-bit samples
+	// returns num of bytes in outbuf
+	static int convertToS16(const SampleFrame* _ab,
+						const fpp_t _frames,
+						int_sample_t * _output_buffer,
+						ch_cnt_t channels,
+						const bool _convert_endian = false );
+
+	// clear given signed-int-16-buffer
+	static void clearS16Buffer( int_sample_t * _outbuf,
+							const fpp_t _frames,
+							ch_cnt_t channels);
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
@@ -98,18 +111,7 @@ protected:
 	// called by according driver for fetching new sound-data
 	fpp_t getNextBuffer(SampleFrame* _ab);
 
-	// convert a given audio-buffer to a buffer in signed 16-bit samples
-	// returns num of bytes in outbuf
-	int convertToS16(const SampleFrame* _ab,
-						const fpp_t _frames,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian = false );
-
-	// clear given signed-int-16-buffer
-	void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames );
-
-	inline void setSampleRate( const sample_rate_t _new_sr )
+	inline void setSampleRate(const sample_rate_t _new_sr)
 	{
 		m_sampleRate = _new_sr;
 	}
