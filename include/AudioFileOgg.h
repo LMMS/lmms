@@ -40,20 +40,29 @@ namespace lmms
 class AudioFileOgg : public AudioFileDevice
 {
 public:
-	AudioFileOgg( OutputSettings const & outputSettings,
-			const ch_cnt_t _channels,
-			bool & _success_ful,
-			const QString & _file,
-			AudioEngine* audioEngine );
+	AudioFileOgg(OutputSettings const & outputSettings,
+			bool & successful,
+			const QString & file,
+			const ch_cnt_t channels, const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction);
 	~AudioFileOgg() override;
 
-	static AudioFileDevice * getInst( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  AudioEngine* audioEngine,
-					  bool & successful )
+	static AudioFileDevice * getInst(
+			OutputSettings const &outputSettings,
+			bool &successful,
+			const QString & outputFilename,
+			const ch_cnt_t channels,
+			const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction)
 	{
-		return new AudioFileOgg( outputSettings, channels, successful, outputFilename, audioEngine );
+		return new AudioFileOgg(
+			outputSettings,
+			successful,
+			outputFilename,
+			channels,
+			defaultBufferSize,
+			getBufferFunction
+		);
 	}
 
 

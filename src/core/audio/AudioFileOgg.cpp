@@ -41,12 +41,12 @@
 namespace lmms
 {
 
-AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
-				const ch_cnt_t channels,
-				bool & successful,
-				const QString & file,
-				AudioEngine* audioEngine ) :
-	AudioFileDevice( outputSettings, channels, file, audioEngine )
+AudioFileOgg::AudioFileOgg(OutputSettings const & outputSettings,
+			bool & successful,
+			const QString & file,
+			const ch_cnt_t channels, const fpp_t defaultBufferSize,
+			AudioFileDevice::BufferFn getBufferFunction) :
+	AudioFileDevice(outputSettings, file, channels, defaultBufferSize, getBufferFunction)
 {
 	m_ok = successful = outputFileOpened() && startEncoding();
 }
@@ -85,7 +85,7 @@ bool AudioFileOgg::startEncoding()
 	vc.comments = 1;
 	vc.vendor = nullptr;
 
-	m_channels = channels();
+	m_channels = getChannel();
 
 	bool useVariableBitRate = getOutputSettings().getBitRateSettings().isVariableBitRate();
 	bitrate_t minimalBitrate = nominalBitrate();
@@ -98,7 +98,7 @@ bool AudioFileOgg::startEncoding()
 	}
 
 
-	m_rate 		= sampleRate();		// default-samplerate
+	m_rate = getSampleRate();		// default-samplerate
 	if( m_rate > 48000 )
 	{
 		m_rate = 48000;
@@ -184,11 +184,11 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 	int eos = 0;
 
 	float * * buffer = vorbis_analysis_buffer( &m_vd, _frames *
-							BYTES_PER_SAMPLE *
-								channels() );
+		BYTES_PER_SAMPLE *
+		getChannel());
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
-		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+		for (ch_cnt_t chnl = 0; chnl < getChannel(); chnl++)
 		{
 			buffer[chnl][frame] = _ab[frame][chnl];
 		}
@@ -262,5 +262,4 @@ void AudioFileOgg::finishEncoding()
 } // namespace lmms
 
 #endif // LMMS_HAVE_OGGVORBIS
-
 
