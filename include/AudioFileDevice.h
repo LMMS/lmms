@@ -26,15 +26,14 @@
 #ifndef LMMS_AUDIO_FILE_DEVICE_H
 #define LMMS_AUDIO_FILE_DEVICE_H
 
-#include <functional>
-
 #include <QFile>
 
 #include "OutputSettings.h"
-#include "SampleFrame.h"
 
 namespace lmms
 {
+
+class SampleFrame;
 
 class AudioFileDevice
 {
@@ -44,7 +43,7 @@ public:
 
 	AudioFileDevice(OutputSettings const & outputSettings,
 			const QString & _file, const ch_cnt_t _channels,
-			const fpp_t defaultBufferSize, BufferFn getBufferFunction);
+			const fpp_t defaultBufferSize);
 	virtual ~AudioFileDevice();
 
 	QString outputFile() const
@@ -56,21 +55,17 @@ public:
 
 	sample_rate_t getSampleRate();
 	ch_cnt_t getChannel();
-	// how many samples to write currently
-	fpp_t getFrameCount();
 	// how many samples to store in a buffer
 	const fpp_t getDefaultFrameCount();
 
 	void setSampleRate(sample_rate_t newSampleRate);
 
-	// returns false if finished
-	bool processNextBuffer();
-	bool processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
+	// save audio
+	void processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
 
 
 protected:
 	// subclasses can re-implement this for being used in conjunction with
-	// processNextBuffer()
 	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	int writeData( const void* data, int len );
@@ -89,17 +84,12 @@ private:
 	QFile m_outputFile;
 	OutputSettings m_outputSettings;
 
-	BufferFn m_getBufferFunction;
-
-	SampleFrame* m_buffer;
-	// buffer size
-	fpp_t m_frameCount;
 	const fpp_t m_defaultFrameCount;
 	ch_cnt_t m_channelCount;
 } ;
 
 using AudioFileDeviceInstantiaton
-	= AudioFileDevice* (*)(const OutputSettings&m, bool&, const QString&, const ch_cnt_t, const fpp_t, AudioFileDevice::BufferFn);
+	= AudioFileDevice* (*)(const OutputSettings&m, bool&, const QString&, const ch_cnt_t, const fpp_t);
 
 } // namespace lmms
 
