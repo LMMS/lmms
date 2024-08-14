@@ -261,7 +261,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 			m_quit = true;
 			break;
 		}
-		int bytes = convertToS16(temp, frames, pcmbuf, m_convertEndian);
+		int bytes = convertToS16(temp, frames, pcmbuf, channels(), m_convertEndian);
 		if( bytes > 0 )
 		{
 			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
