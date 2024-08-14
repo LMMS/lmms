@@ -287,9 +287,6 @@ public:
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
-	// provide buffer information for lmms::AudioDevice
-	static void nextOutputBuffer(SampleFrame* bufferOut, fpp_t* framesOut, fpp_t oldFrames);
-
 	void changeQuality(const struct qualitySettings & qs);
 
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
@@ -342,8 +339,7 @@ private:
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
 
-	void startExporting(bool needsFifo, const struct qualitySettings& qs);
-	void stopExporting();
+	void startExporting(const struct qualitySettings& qs);
 
 
 	AudioDevice * tryAudioDevices();
@@ -416,7 +412,7 @@ private:
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
-	friend class ProjectRenderer;
+	friend class RenderManager;
 } ;
 
 } // namespace lmms
