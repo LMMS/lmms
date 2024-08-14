@@ -30,8 +30,12 @@
 #include "embed.h"
 #include "ModelView.h"
 
+class QPixmap;
+
 namespace lmms
 {
+
+class BoolModel;
 
 namespace gui
 {
@@ -54,6 +58,8 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
+	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
+
 	QRect m_pinsInRect;
 	QRect m_pinsOutRect;
 

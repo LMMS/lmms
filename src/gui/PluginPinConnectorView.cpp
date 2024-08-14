@@ -113,7 +113,8 @@ void PluginPinConnectorView::mousePressEvent(QMouseEvent* me)
 		if (me->modifiers() & Qt::ControlModifier)
 		{
 			// Taken from AutomatableModelView::mousePressEvent
-			new gui::StringPairDrag{"automatable_model", QString::number(model->id()), QPixmap{}, widget()};
+			new gui::StringPairDrag{"automatable_model", QString::number(model->id()),
+				getIcon(*model, yIdx, xIdx), widget()};
 		}
 		else
 		{
@@ -163,8 +164,6 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	auto drawGrid = [&](const PluginPinConnector::PinMap& pins, QPoint xy) -> QRect {
 		if (pins.empty() || pins[0].empty()) { return QRect{xy, xy}; }
 
-		const auto* offIcon = &m_buttonOffBlack;
-
 		auto drawXY = QPoint{};
 		drawXY.ry() = xy.y();
 
@@ -175,10 +174,8 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 			auto& pluginChannels = pins[tcIdx];
 			for (std::size_t pcIdx = 0; pcIdx < pluginChannels.size(); ++pcIdx)
 			{
-				const BoolModel* pin = pluginChannels[pcIdx];
-				p.drawPixmap(drawXY, pin->value() ? m_buttonOn : *offIcon);
-
-				// TODO: Alternate b/w black and gray icons
+				BoolModel* pin = pluginChannels[pcIdx];
+				p.drawPixmap(drawXY, getIcon(*pin, tcIdx, pcIdx));
 
 				drawXY.rx() += buttonW + MarginSize;
 			}
@@ -193,6 +190,14 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	m_pinsOutRect = drawGrid(pinsOut, m_pinsInRect.topRight() + QPoint{5, 0});
 }
 
+auto PluginPinConnectorView::getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&
+{
+	// TODO: Alternate b/w black and gray icons?
+	(void)trackChannel;
+	(void)pluginChannel;
+	const auto* offIcon = &m_buttonOffBlack;
+	return model.value() ? m_buttonOn : *offIcon;
+}
 
 } // namespace gui
 
