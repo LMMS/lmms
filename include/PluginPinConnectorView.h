@@ -63,7 +63,7 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
-	void calculateSizes();
+	void updateGeometry();
 	auto calculateMatrixSize(bool inMatrix) const -> QSize;
 	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
 

@@ -23,6 +23,16 @@
  *
  */
 
+/*
+TODO:
+- Methods to set custom plugin channel names
+	- Remember to emit dataChanged signal
+- Fix layout/alignment
+- Give BoolModels a name for automation
+- Testing!
+*/
+
+
 #include "PluginPinConnector.h"
 
 #include <QDomDocument>
@@ -48,6 +58,39 @@ PluginPinConnector::PluginPinConnector(int pluginInCount, int pluginOutCount, Mo
 {
 	updateTrackChannels(s_totalTrackChannels);
 	setChannelCounts(pluginInCount, pluginOutCount);
+}
+
+static auto defaultName(int channel) -> QString
+{
+	// A-Z
+	if (channel < 26)
+	{
+		return QChar::fromLatin1('A' + channel);
+	}
+
+	// AA-ZZ
+	channel -= 26;
+	if (channel < 26 * 26)
+	{
+		auto ret = QString{"AA"};
+		ret[0] = QChar::fromLatin1('A' + channel / 26);
+		ret[1] = QChar::fromLatin1('A' + channel % 26);
+		return ret;
+	}
+
+	throw std::invalid_argument{"Too many channels"};
+};
+
+auto PluginPinConnector::channelNameIn(int index) const -> QString
+{
+	if (index < static_cast<int>(m_inNames.size())) { return m_inNames[index]; }
+	return defaultName(index);
+}
+
+auto PluginPinConnector::channelNameOut(int index) const -> QString
+{
+	if (index < static_cast<int>(m_outNames.size())) { return m_outNames[index]; }
+	return defaultName(index);
 }
 
 void PluginPinConnector::setChannelCounts(int inCount, int outCount)

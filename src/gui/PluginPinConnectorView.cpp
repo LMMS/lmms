@@ -77,7 +77,7 @@ auto PluginPinConnectorView::sizeHint() const -> QSize
 
 void PluginPinConnectorView::update()
 {
-	calculateSizes();
+	updateGeometry();
 	QWidget::update();
 }
 
@@ -208,17 +208,54 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	int yPos = m_inRect.y();
 	for (unsigned idx = 0; idx < pinConnector->trackChannelsUsed(); ++idx)
 	{
-		p.drawText(xwIn.first, yPos, xwIn.second, buttonH, Qt::AlignRight,
-			QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
-		p.drawText(xwOut.first, yPos, xwOut.second, buttonH, Qt::AlignLeft,
-			QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
+		if (pinConnector->channelCountIn() != 0)
+		{
+			p.drawText(xwIn.first, yPos, xwIn.second, buttonH, Qt::AlignRight,
+				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
+		}
+
+		if (pinConnector->channelCountOut() != 0)
+		{
+			p.drawText(xwOut.first, yPos, xwOut.second, buttonH, Qt::AlignLeft,
+				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
+		}
 
 		yPos += buttonH + GridMargin;
 	}
 
+	p.save();
+
+	// Draw plugin channel text (in)
+	yPos = m_inRect.top() - 4;
+	int xPos = m_inRect.x() + GridMargin;
+	for (int idx = 0; idx < pinConnector->channelCountIn(); ++idx)
+	{
+		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
+		p.setTransform(transform);
+
+		const auto name = pinConnector->channelNameIn(idx);
+		p.drawText(0, 0, buttonW, yPos, Qt::AlignLeft, name);
+
+		xPos += buttonW + GridMargin;
+	}
+
+	// Draw plugin channel text (out)
+	xPos = m_outRect.x() + GridMargin;
+	for (int idx = 0; idx < pinConnector->channelCountOut(); ++idx)
+	{
+		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
+		p.setTransform(transform);
+
+		const auto name = pinConnector->channelNameOut(idx);
+		p.drawText(0, 0, buttonW, yPos, Qt::AlignLeft, name);
+
+		xPos += buttonW + GridMargin;
+	}
+
+	p.restore();
 }
 
-void PluginPinConnectorView::calculateSizes()
+void PluginPinConnectorView::updateGeometry()
 {
 	const auto inSize = calculateMatrixSize(true);
 	const auto outSize = calculateMatrixSize(false);
@@ -250,7 +287,7 @@ void PluginPinConnectorView::calculateSizes()
 auto PluginPinConnectorView::calculateMatrixSize(bool inMatrix) const -> QSize
 {
 	const auto* pc = castModel<PluginPinConnector>();
-	if (!pc) { return {}; }
+	if (!pc) { return QSize{}; }
 
 	const auto tcc = static_cast<int>(pc->trackChannelsUsed());
 	if (tcc == 0) { return QSize{}; }

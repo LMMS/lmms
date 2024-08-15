@@ -80,6 +80,9 @@ public:
 		return m_outModels[trackChannel][pluginChannel]->value();
 	}
 
+	auto channelNameIn(int index) const -> QString;
+	auto channelNameOut(int index) const -> QString;
+
 
 	/**
 	 * Setters
@@ -163,8 +166,8 @@ private:
 	/**
 	 * Plugins can optionally provide custom channel names
 	 */
-	std::vector<std::string> m_inNames;
-	std::vector<std::string> m_outNames;
+	std::vector<QString> m_inNames;
+	std::vector<QString> m_outNames;
 
 	//! Cached values to quickly determine whether a given track channel bypasses the plugin
 	//std::vector<bool> m_bypassed; // TODO!
