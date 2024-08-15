@@ -267,7 +267,10 @@ void RenderManager::nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* 
 	if (newBuffer != nullptr && Engine::getSong()->isExportDone() == false)
 	{
 		// copy new buffer to bufferOut
-		memcpy(bufferOut->data(), newBuffer, curFrames * sizeof(SampleFrame));
+		for (size_t i = 0; i < bufferOut->size(); i++)
+		{
+			(*bufferOut)[i] = newBuffer[i];
+		}
 
 		// update progress
 		const int nprog = Engine::getSong()->getExportProgress();
