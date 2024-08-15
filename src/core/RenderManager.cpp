@@ -247,9 +247,7 @@ void RenderManager::updateConsoleProgress()
 
 // gets a buffer and some data as input
 // the sender who constructed lmms::ActiveRenderer decides what is dataIn
-
-// fills the buffer with AudioEngine::nextBuffer() data and sets the correct size
-
+// fills the provided buffer with AudioEngine::nextBuffer() data and sets the correct size
 // this class doesn't own bufferOut
 // bufferOut can not be nullptr
 // dataIn can be nullptr

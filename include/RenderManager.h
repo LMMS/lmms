@@ -57,7 +57,8 @@ public:
 	void abortProcessing();
 
 
-	// fill lmms::ActiveRenderer's buffer
+	// fill m_activeRenderer's buffer
+	// provided as function pointer to m_activeRenderer
 	static void nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* dataIn);
 
 signals:
