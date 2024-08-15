@@ -28,8 +28,11 @@ TODO:
 - Methods to set custom plugin channel names
 	- Remember to emit dataChanged signal
 - Fix layout/alignment
+	- In updateGeometry, if minimum needed size is smaller than default window size,
+		set setMinimumSize to it (respecting margins), else set it to the default size
 - Give BoolModels a name for automation
-- Testing!
+- New icons?
+- Testing! (esp. loading/saving)
 */
 
 
@@ -391,7 +394,7 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, PinMap& pins)
 		if (name[0] != 'c') { throw std::runtime_error{"invalid string: \"" + name.toStdString() + "\""}; }
 #endif
 
-		const auto pos = name.indexOf(QStringView{u"_"});
+		const auto pos = name.indexOf('_');
 #ifndef NDEBUG
 		if (pos <= 0) { throw std::runtime_error{"parse failure"}; }
 #endif
