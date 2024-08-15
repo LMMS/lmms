@@ -452,11 +452,25 @@ auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConne
 {
 	auto view = new gui::PluginPinConnectorView{parent};
 	view->setModel(this);
-	connect(this, &PluginPinConnector::dataChanged,
-		view, static_cast<void(gui::PluginPinConnectorView::*)()>(&gui::PluginPinConnectorView::update));
-	connect(this, &PluginPinConnector::propertiesChanged,
-		view, static_cast<void(gui::PluginPinConnectorView::*)()>(&gui::PluginPinConnectorView::update));
+
+	connect(this, &PluginPinConnector::dataChanged, view, &gui::PluginPinConnectorView::update);
+	connect(this, &PluginPinConnector::propertiesChanged, view, &gui::PluginPinConnectorView::update);
+	view->update();
+
 	return view;
+}
+
+auto PluginPinConnector::getChannelCountText() const -> QString
+{
+	const auto inText = m_pluginInCount > static_cast<int>(s_totalTrackChannels)
+		? QString{"%1/%2"}.arg(s_totalTrackChannels).arg(m_pluginInCount)
+		: QString{"%1"}.arg(m_pluginInCount);
+
+	const auto outText = m_pluginOutCount > static_cast<int>(s_totalTrackChannels)
+		? QString{"%1/%2"}.arg(s_totalTrackChannels).arg(m_pluginOutCount)
+		: QString{"%1"}.arg(m_pluginOutCount);
+
+	return QString{tr("%1 in %2 out")}.arg(inText).arg(outText);
 }
 
 void PluginPinConnector::updateTrackChannels(int count)

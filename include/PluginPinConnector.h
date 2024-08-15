@@ -62,6 +62,7 @@ public:
 	/**
 	 * Getters
 	 */
+	auto trackChannelsCount() const -> std::size_t { return s_totalTrackChannels; }
 	auto trackChannelsUsed() const -> unsigned int { return m_trackChannelsUsed; }
 	auto channelCountIn() const -> int { return m_pluginInCount; }
 	auto channelCountOut() const -> int { return m_pluginOutCount; }
@@ -122,6 +123,7 @@ public:
 	auto nodeName() const -> QString override { return "pins"; }
 
 	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorView*;
+	auto getChannelCountText() const -> QString;
 
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
 

@@ -138,7 +138,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton* m_pinConnectorButton;
-	PluginPinConnectorView* m_pinConnector;
+	PluginPinConnectorView* m_pinConnector = nullptr;
 	CustomTextKnob ** vstKnobs;
 
 } ;

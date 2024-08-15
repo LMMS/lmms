@@ -970,13 +970,12 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _i
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
 
-	m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
-	m_pinConnectorButton = new QPushButton{m_pinConnector->getChannelCountText(), this};
+	m_pinConnectorButton = new QPushButton{m_vi->pinConnector()->getChannelCountText(), this};
 
 	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVestigeInstrumentView::togglePinConnector);
 
 	connect(m_vi->pinConnector(), &PluginPinConnector::channelCountsChanged, this, [&]() {
-		m_pinConnectorButton->setText(m_pinConnector->getChannelCountText());
+		m_pinConnectorButton->setText(m_vi->pinConnector()->getChannelCountText());
 	});
 
 	l->addWidget(m_pinConnectorButton, 0, 2, 1, 2, Qt::AlignLeft);
@@ -1057,13 +1056,24 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _i
 
 void ManageVestigeInstrumentView::togglePinConnector()
 {
-	if (m_pinConnector->isVisible())
+	if (!m_pinConnector)
 	{
-		m_pinConnector->hide();
+		m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
+		m_pinConnector->subWindow()->show();
 	}
 	else
 	{
-		m_pinConnector->show();
+		auto subWindow = m_pinConnector->subWindow();
+		if (subWindow->isVisible())
+		{
+			subWindow->hide();
+			m_pinConnector->hide();
+		}
+		else
+		{
+			subWindow->show();
+			m_pinConnector->show();
+		}
 	}
 }
 

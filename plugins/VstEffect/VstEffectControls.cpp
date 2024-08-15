@@ -366,13 +366,12 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
 
-	m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
-	m_pinConnectorButton = new QPushButton{m_pinConnector->getChannelCountText(), widget};
+	m_pinConnectorButton = new QPushButton{m_vi->pinConnector()->getChannelCountText(), widget};
 
 	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVSTEffectView::togglePinConnector);
 
-	connect(m_vi->pinConnector(), &PluginPinConnector::channelCountsChanged, this, [&]() {
-		m_pinConnectorButton->setText(m_pinConnector->getChannelCountText());
+	connect(m_vi->pinConnector(), &PluginPinConnector::propertiesChanged, this, [&]() {
+		m_pinConnectorButton->setText(m_vi->pinConnector()->getChannelCountText());
 	});
 
 	l->addWidget(m_pinConnectorButton, 0, 2, 1, 2, Qt::AlignLeft);
@@ -455,13 +454,24 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 void ManageVSTEffectView::togglePinConnector()
 {
-	if (m_pinConnector->isVisible())
+	if (!m_pinConnector)
 	{
-		m_pinConnector->hide();
+		m_pinConnector = m_vi2->pinConnector()->instantiateView(m_vi2->m_subWindow);
+		m_pinConnector->subWindow()->show();
 	}
 	else
 	{
-		m_pinConnector->show();
+		auto subWindow = m_pinConnector->subWindow();
+		if (subWindow->isVisible())
+		{
+			subWindow->hide();
+			m_pinConnector->hide();
+		}
+		else
+		{
+			subWindow->show();
+			m_pinConnector->show();
+		}
 	}
 }
 

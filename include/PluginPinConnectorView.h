@@ -40,6 +40,8 @@ class BoolModel;
 namespace gui
 {
 
+class SubWindow;
+
 class PluginPinConnectorView
 	: public QWidget
 	, public ModelView
@@ -51,17 +53,25 @@ public:
 
 	auto sizeHint() const -> QSize override;
 
-	auto getChannelCountText() const -> QString;
+	auto subWindow() -> SubWindow* { return m_subWindow; }
+
+public slots:
+	void update();
 
 protected:
 	void mousePressEvent(QMouseEvent* me) override;
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
+	void calculateSizes();
+	auto calculateMatrixSize(bool inMatrix) const -> QSize;
 	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
 
-	QRect m_pinsInRect;
-	QRect m_pinsOutRect;
+	SubWindow* m_subWindow = nullptr;
+
+	QRect m_inRect;
+	QRect m_outRect;
+	QSize m_minSize;
 
 	QPixmap m_buttonOffBlack = embed::getIconPixmap("step_btn_off");
 	QPixmap m_buttonOffGray = embed::getIconPixmap("step_btn_off_light");
