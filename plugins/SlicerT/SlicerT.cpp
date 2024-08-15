@@ -247,7 +247,7 @@ void SlicerT::findSlices()
 	if (noteSnap == 0) { sliceLock = 1; }
 	for (float& sliceValue : m_slicePoints)
 	{
-		sliceValue += sliceLock / 2.;
+		sliceValue += sliceLock / 2.f;
 		sliceValue -= static_cast<int>(sliceValue) % sliceLock;
 	}
 
