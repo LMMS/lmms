@@ -58,7 +58,6 @@ bool AudioFileFlac::startEncoding()
 	m_sfinfo.frames = getDefaultFrameCount();
 	m_sfinfo.sections=1;
 	m_sfinfo.seekable=0;
-	qDebug("sample rate: %d, channel: %d, frameCount: %d", getSampleRate(), getChannel(), getDefaultFrameCount());
 
 	m_sfinfo.format = SF_FORMAT_FLAC;
 

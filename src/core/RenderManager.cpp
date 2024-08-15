@@ -175,7 +175,6 @@ void RenderManager::render(QString outputPath)
 	}
 	else
 	{
-		qDebug( "Renderer failed to acquire a file device!" );
 		renderNextTrack();
 	}
 }
@@ -271,7 +270,6 @@ void RenderManager::nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* 
 	{
 		// copy new buffer to bufferOut
 		memcpy(bufferOut->data(), newBuffer, curFrames * sizeof(SampleFrame));
-		qDebug("nextOutputBuffer wrote buffer");
 
 		// update progress
 		const int nprog = Engine::getSong()->getExportProgress();
@@ -288,7 +286,6 @@ void RenderManager::nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* 
 	{
 		// this will stop ActiveRenderer exporting
 		bufferOut->clear();
-		qDebug("nextOutputBuffer return 0");
 	}
 }
 

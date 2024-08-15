@@ -98,7 +98,6 @@ void AudioFileDevice::setSampleRate(sample_rate_t newSampleRate)
 
 void AudioFileDevice::processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount)
 {
-	qDebug("AudioFileDevice::processThisBuffer, size: %d", frameCount);
     writeBuffer(frameBuffer, frameCount);
 }
 

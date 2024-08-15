@@ -147,8 +147,6 @@ bool ActiveRenderer::processNextBuffer()
 {
 	m_getBufferFunction(&m_buffer, m_getBufferData);
 	if (m_buffer.size() <= 0) { return true; }
-	
-	qDebug("write buffer, count: %ld", m_buffer.size());
 
 	return false;
 }
@@ -196,16 +194,12 @@ void ActiveRenderer::run()
 
 	PerfLogTimer perfLog("Project Render");
 
-	qDebug("start running");
-
 	while (!m_abort)
 	{
 		// if a function pointer was provided
 		// use that to fill m_buffer
-		qDebug("m_getBufferFunction if null");
 		if (m_getBufferFunction != nullptr)
 		{
-			qDebug("m_getBufferFunction not null");
 			processNextBuffer();
 		}
 		
@@ -213,7 +207,6 @@ void ActiveRenderer::run()
 		// processNextBuffer() or processThisBuffer() before
 		if (m_buffer.size() <= 0)
 		{
-			qDebug("m_getBufferFunction break because of size");
 			break;
 		}
 
