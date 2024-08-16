@@ -30,7 +30,7 @@
 #include <memory>
 #include "ui_export_project.h"
 
-#include "ActiveRenderer.h"
+#include "ProjectRenderer.h"
 #include "RenderManager.h"
 
 namespace lmms::gui
@@ -62,7 +62,7 @@ private:
 	QString m_fileExtension;
 	bool m_multiExport;
 
-	ActiveRenderer::ExportFileFormat m_ft;
+	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 
