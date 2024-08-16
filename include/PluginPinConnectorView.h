@@ -29,6 +29,7 @@
 #include <QScrollArea>
 
 #include "embed.h"
+#include "lmms_export.h"
 #include "ModelView.h"
 
 class QPixmap;
@@ -44,7 +45,7 @@ namespace gui
 
 class SubWindow;
 
-class PluginPinConnectorView
+class LMMS_EXPORT PluginPinConnectorView
 	: public QWidget
 	//: public QScrollArea
 	, public ModelView
