@@ -170,7 +170,7 @@ public:
 		return castValue<T>( m_value );
 	}
 
-	inline float getTrueValue(int frameOffset = 0) const
+	inline float getTypelessValue(int frameOffset = 0) const
 	{
 		if (!m_controllerConnection && !hasLinkedModels())
 		{
