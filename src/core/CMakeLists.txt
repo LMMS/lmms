@@ -60,7 +60,7 @@ set(LMMS_SRCS
 	core/PluginFactory.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
-	core/ActiveRenderer.cpp
+	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
 	core/RenderManager.cpp
