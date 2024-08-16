@@ -367,6 +367,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 
 	m_pinConnectorButton = new QPushButton{m_vi->pinConnector()->getChannelCountText(), widget};
+	m_pinConnectorButton->setToolTip(tr("Plugin Pin Connector"));
 
 	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVSTEffectView::togglePinConnector);
 
@@ -457,21 +458,10 @@ void ManageVSTEffectView::togglePinConnector()
 	if (!m_pinConnector)
 	{
 		m_pinConnector = m_vi2->pinConnector()->instantiateView(m_vi2->m_subWindow);
-		m_pinConnector->subWindow()->show();
 	}
 	else
 	{
-		auto subWindow = m_pinConnector->subWindow();
-		if (subWindow->isVisible())
-		{
-			subWindow->hide();
-			m_pinConnector->hide();
-		}
-		else
-		{
-			subWindow->show();
-			m_pinConnector->show();
-		}
+		m_pinConnector->toggleVisibility();
 	}
 }
 

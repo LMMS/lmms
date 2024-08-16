@@ -56,33 +56,38 @@ public:
 	//! [LMMS track channel][plugin channel]
 	using PinMap = std::vector<std::vector<BoolModel*>>;
 
+	class Matrix
+	{
+	public:
+		friend class PluginPinConnector;
+
+		auto pinMap() const -> const PinMap& { return m_pinMap; }
+		auto channelCount() const -> int { return m_channelCount; }
+		auto channelName(int channel) const -> QString;
+
+		auto enabled(std::uint8_t trackChannel, unsigned pluginChannel) const -> bool
+		{
+			return m_pinMap[trackChannel][pluginChannel]->value();
+		}
+
+	private:
+		PinMap m_pinMap;
+		int m_channelCount = 0;
+		std::vector<QString> m_channelNames; //!< optional
+
+		// TODO: Channel groupings, port configurations, ...
+	};
+
 	PluginPinConnector(Model* parent = nullptr);
 	PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent = nullptr);
 
 	/**
 	 * Getters
 	 */
+	auto in() const -> const Matrix& { return m_in; };
+	auto out() const -> const Matrix& { return m_out; };
 	auto trackChannelsCount() const -> std::size_t { return s_totalTrackChannels; }
 	auto trackChannelsUsed() const -> unsigned int { return m_trackChannelsUsed; }
-	auto channelCountIn() const -> int { return m_pluginInCount; }
-	auto channelCountOut() const -> int { return m_pluginOutCount; }
-
-	auto pinMapIn() const -> const PinMap& { return m_inModels; }
-	auto pinMapOut() const -> const PinMap& { return m_outModels; }
-
-	auto inputEnabled(std::uint8_t trackChannel, unsigned pluginChannel) const -> bool
-	{
-		return m_inModels[trackChannel][pluginChannel]->value();
-	}
-
-	auto outputEnabled(std::uint8_t trackChannel, unsigned pluginChannel) const -> bool
-	{
-		return m_outModels[trackChannel][pluginChannel]->value();
-	}
-
-	auto channelNameIn(int index) const -> QString;
-	auto channelNameOut(int index) const -> QString;
-
 
 	/**
 	 * Setters
@@ -130,9 +135,6 @@ public:
 
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
-signals:
-	void channelCountsChanged(); //!< plugin channel counts
-
 public slots:
 
 	void updateTrackChannels(int count);
@@ -141,10 +143,13 @@ public slots:
 private:
 	void updateOptions();
 
-	static void saveSettings(const PinMap& pins, QDomDocument& doc, QDomElement& elem);
-	static void loadSettings(const QDomElement& elem, PinMap& pins);
+	static void saveSettings(const Matrix& matrix, QDomDocument& doc, QDomElement& elem);
+	static void loadSettings(const QDomElement& elem, Matrix& matrix);
 
-	void setChannelCount(int newCount, PinMap& pins, int& oldCount);
+	void setChannelCount(int newCount, Matrix& matrix);
+
+	Matrix m_in;  //!< LMMS --> Plugin
+	Matrix m_out; //!< Plugin --> LMMS
 
 	//! TODO: Move this somewhere else; Will be >= 2 once there is support for adding new track channels
 	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
@@ -152,31 +157,7 @@ private:
 	//! This value is <= to the total number of track channels (currently always 2)
 	unsigned int m_trackChannelsUsed = DEFAULT_CHANNELS;
 
-	int m_pluginInCount = 0;
-	int m_pluginOutCount = 0;
-
 	// TODO: When full routing is added, get LMMS channel counts from bus or router class
-
-	//! Maps LMMS core input to plugin input
-	PinMap m_inModels;
-
-	//! Maps LMMS core output to plugin output
-	PinMap m_outModels;
-
-	/**
-	 * Plugins can optionally provide custom channel names
-	 */
-	std::vector<QString> m_inNames;
-	std::vector<QString> m_outNames;
-
-	//! Cached values to quickly determine whether a given track channel bypasses the plugin
-	//std::vector<bool> m_bypassed; // TODO!
-
-	//! Specifies channel groupings for plugin input channels
-	//std::vector<ch_cnt_t> m_pluginInChannelCounts; // TODO!
-
-	//! Specifies channel groupings for plugin output channels
-	//std::vector<ch_cnt_t> m_pluginOutChannelCounts; // TODO!
 };
 
 } // namespace lmms

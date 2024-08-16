@@ -971,10 +971,11 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _i
 
 
 	m_pinConnectorButton = new QPushButton{m_vi->pinConnector()->getChannelCountText(), this};
+	m_pinConnectorButton->setToolTip(tr("Plugin Pin Connector"));
 
 	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVestigeInstrumentView::togglePinConnector);
 
-	connect(m_vi->pinConnector(), &PluginPinConnector::channelCountsChanged, this, [&]() {
+	connect(m_vi->pinConnector(), &PluginPinConnector::propertiesChanged, this, [&]() {
 		m_pinConnectorButton->setText(m_vi->pinConnector()->getChannelCountText());
 	});
 
@@ -1059,21 +1060,10 @@ void ManageVestigeInstrumentView::togglePinConnector()
 	if (!m_pinConnector)
 	{
 		m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
-		m_pinConnector->subWindow()->show();
 	}
 	else
 	{
-		auto subWindow = m_pinConnector->subWindow();
-		if (subWindow->isVisible())
-		{
-			subWindow->hide();
-			m_pinConnector->hide();
-		}
-		else
-		{
-			subWindow->show();
-			m_pinConnector->show();
-		}
+		m_pinConnector->toggleVisibility();
 	}
 }
 

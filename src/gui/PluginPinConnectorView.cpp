@@ -24,8 +24,10 @@
 
 #include "PluginPinConnectorView.h"
 
+#include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QScrollArea>
 
 #include "gui_templates.h"
 #include "GuiApplication.h"
@@ -51,28 +53,83 @@ constexpr auto DefaultWindowSize = QSize{400, 256};
 } // namespace
 
 PluginPinConnectorView::PluginPinConnectorView(QWidget* parent)
-	: QWidget{parent}
+	: QWidget{parent} // new QScrollArea{parent}
+	//: QScrollArea{parent}
 	, ModelView{nullptr, this}
 {
+	/*
+	updateGeometry();
+
+	// The initial window size should not exceed DefaultWindowSize but can be smaller
+	const auto initialSize = QSize {
+		std::min(m_minSize.width(), DefaultWindowSize.width()),
+		std::min(m_minSize.height(), DefaultWindowSize.height())
+	};
+	*/
+
+#if 0
+	m_scrollArea = new QScrollArea{};
+	m_scrollArea->setBackgroundRole(QPalette::Dark);
+	m_scrollArea->setWidget(this);
+	//m_scrollArea->setMinimumSize(initialSize);
+#endif
+
 	setWindowTitle(tr("Plugin Pin Connector"));
 	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(this);
 	m_subWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 	setWindowIcon(embed::getIconPixmap("tool"));
 
 	// No maximize button
-	Qt::WindowFlags flags = parentWidget()->windowFlags();
+	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
-	parentWidget()->setWindowFlags(flags);
+	m_subWindow->setWindowFlags(flags);
+
+
+	//auto layout = new QHBoxLayout{this};
+	//layout->addWidget()
+
+
+	//m_subWindow->setMinimumSize(initialSize);
+	//setMinimumSize(initialSize);
 
 	setMinimumSize(DefaultWindowSize);
+
+
+	//m_subWindow->setMinimumSize(initialSize);
+
+	//m_subWindow->show();
 }
 
 auto PluginPinConnectorView::sizeHint() const -> QSize
 {
-	if (m_minSize.width() > DefaultWindowSize.width()) { return m_minSize; }
-	if (m_minSize.height() > DefaultWindowSize.height()) { return m_minSize; }
+	//if (m_minSize.width() > DefaultWindowSize.width()) { return m_minSize; }
+	//if (m_minSize.height() > DefaultWindowSize.height()) { return m_minSize; }
 
-	return DefaultWindowSize;
+	//return DefaultWindowSize;
+
+
+	return QSize {
+		std::min(m_minSize.width(), DefaultWindowSize.width()),
+		std::min(m_minSize.height(), DefaultWindowSize.height())
+	};
+
+}
+
+void PluginPinConnectorView::toggleVisibility()
+{
+	if (m_subWindow->isVisible())
+	{
+		m_subWindow->hide();
+		m_scrollArea->hide();
+		hide();
+	}
+	else
+	{
+		updateGeometry();
+		show();
+		m_scrollArea->show();
+		m_subWindow->show();
+	}
 }
 
 void PluginPinConnectorView::update()
@@ -110,7 +167,7 @@ void PluginPinConnectorView::mousePressEvent(QMouseEvent* me)
 		{
 			// Taken from AutomatableModelView::mousePressEvent
 			new gui::StringPairDrag{"automatable_model", QString::number(model->id()),
-				getIcon(*model, yIdx, xIdx), widget()};
+				getIcon(*model, yIdx, xIdx), this};
 		}
 		else
 		{
@@ -122,9 +179,9 @@ void PluginPinConnectorView::mousePressEvent(QMouseEvent* me)
 		return true;
 	};
 
-	if (!handleClick(pinConnector->pinMapIn(), m_inRect))
+	if (!handleClick(pinConnector->in().pinMap(), m_inRect))
 	{
-		if (!handleClick(pinConnector->pinMapOut(), m_outRect))
+		if (!handleClick(pinConnector->out().pinMap(), m_outRect))
 		{
 			me->ignore();
 		}
@@ -137,7 +194,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 	p.fillRect(rect(), p.background());
 
-/*
+#if 0
 #ifndef NDEBUG
 	p.setPen(palette().text().color());
 	const auto marginUpperLeft = QPoint {
@@ -151,13 +208,13 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	auto margins = QRect{marginUpperLeft, marginSize};
 	p.drawRect(margins);
 #endif
-*/
+#endif
 
 	const auto* pinConnector = castModel<PluginPinConnector>();
 	if (!pinConnector) { return; }
 
-	const auto& pinsIn = pinConnector->pinMapIn();
-	const auto& pinsOut = pinConnector->pinMapOut();
+	const auto& pinsIn = pinConnector->in().pinMap();
+	const auto& pinsOut = pinConnector->out().pinMap();
 
 	const auto buttonW = m_buttonOn.width();
 	const auto buttonH = m_buttonOn.height();
@@ -208,13 +265,13 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	int yPos = m_inRect.y();
 	for (unsigned idx = 0; idx < pinConnector->trackChannelsUsed(); ++idx)
 	{
-		if (pinConnector->channelCountIn() != 0)
+		if (pinConnector->in().channelCount() != 0)
 		{
 			p.drawText(xwIn.first, yPos, xwIn.second, buttonH, Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
 		}
 
-		if (pinConnector->channelCountOut() != 0)
+		if (pinConnector->out().channelCount() != 0)
 		{
 			p.drawText(xwOut.first, yPos, xwOut.second, buttonH, Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
@@ -228,12 +285,12 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	// Draw plugin channel text (in)
 	yPos = m_inRect.top() - 4;
 	int xPos = m_inRect.x() + GridMargin;
-	for (int idx = 0; idx < pinConnector->channelCountIn(); ++idx)
+	for (int idx = 0; idx < pinConnector->in().channelCount(); ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
 
-		const auto name = pinConnector->channelNameIn(idx);
+		const auto name = pinConnector->in().channelName(idx);
 		p.drawText(0, 0, buttonW, yPos, Qt::AlignLeft, name);
 
 		xPos += buttonW + GridMargin;
@@ -241,12 +298,12 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 
 	// Draw plugin channel text (out)
 	xPos = m_outRect.x() + GridMargin;
-	for (int idx = 0; idx < pinConnector->channelCountOut(); ++idx)
+	for (int idx = 0; idx < pinConnector->out().channelCount(); ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
 
-		const auto name = pinConnector->channelNameOut(idx);
+		const auto name = pinConnector->out().channelName(idx);
 		p.drawText(0, 0, buttonW, yPos, Qt::AlignLeft, name);
 
 		xPos += buttonW + GridMargin;
@@ -264,6 +321,11 @@ void PluginPinConnectorView::updateGeometry()
 
 	m_minSize = WindowMarginTotal + centerMargin + inSize + outSize;
 
+	
+
+	//setMinimumSize(m_minSize);
+	//m_subWindow->setMinimumSize(m_minSize);
+
 	//std::cout << "m_minSize: {" << m_minSize.width() << ", " << m_minSize.height() << "}\n";
 
 	const auto extra = QSize {
@@ -271,8 +333,8 @@ void PluginPinConnectorView::updateGeometry()
 		std::max(DefaultWindowSize.height() - m_minSize.height(), 0) / 2
 	};
 
-	m_minSize.rwidth() = std::max(DefaultWindowSize.width(), m_minSize.width());
-	m_minSize.rheight() = std::max(DefaultWindowSize.height(), m_minSize.height());
+	//m_minSize.rwidth() = std::max(DefaultWindowSize.width(), m_minSize.width());
+	//m_minSize.rheight() = std::max(DefaultWindowSize.height(), m_minSize.height());
 
 	const auto inMatrixPos = WindowMarginTop + WindowMarginSide + extra;
 	const auto outMatrixPos = inMatrixPos + centerMargin + QSize{inSize.width(), 0};
@@ -284,6 +346,11 @@ void PluginPinConnectorView::updateGeometry()
 	//std::cout << "m_outRect: {" << m_outRect.x() << ", " << m_outRect.y() << "}, {" << m_outRect.width() << ", " << m_outRect.height() << "}\n";
 }
 
+void updatePositions()
+{
+
+}
+
 auto PluginPinConnectorView::calculateMatrixSize(bool inMatrix) const -> QSize
 {
 	const auto* pc = castModel<PluginPinConnector>();
@@ -292,7 +359,7 @@ auto PluginPinConnectorView::calculateMatrixSize(bool inMatrix) const -> QSize
 	const auto tcc = static_cast<int>(pc->trackChannelsUsed());
 	if (tcc == 0) { return QSize{}; }
 
-	const int pcc = inMatrix ? pc->channelCountIn() : pc->channelCountOut();
+	const int pcc = inMatrix ? pc->in().channelCount() : pc->out().channelCount();
 	if (pcc == 0) { return QSize{}; }
 
 	const int pcSize = (pcc * m_buttonOn.width()) + (pcc - 1) * GridMargin;
