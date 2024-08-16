@@ -206,10 +206,9 @@ public slots:
 
 protected:
 	bool isPresetMode() const { return m_presetMode; }
-	void setPresetMode(bool presetMode = true)
-	{
-		m_presetMode = presetMode;
-	}
+
+protected:
+	bool m_presetMode = false;
 
 private:
 	TrackContainer* m_trackContainer;
@@ -223,8 +222,6 @@ protected:
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
-
-	bool m_presetMode = false;
 
 	clipVector m_clips;
 

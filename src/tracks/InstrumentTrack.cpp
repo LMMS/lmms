@@ -994,15 +994,45 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	unlock();
 }
 
+/**
+ * @brief RAII "guard" used to safely change and reset booleans even during exceptions
+ * 
+ * Needed to safely reset m_presetMode in savePreset and loadPreset. For this reason
+ * only defined locally because at least the pattern used by these methods should not
+ * spread outside.
+ */
+class BoolGuard
+{
+public:
+	BoolGuard(bool& member, bool temporaryValue) :
+	m_member(member),
+	m_oldValue(member)
+	{
+		m_member = temporaryValue;
+	}
+
+	~BoolGuard()
+	{
+		m_member = m_oldValue;
+	}
+
+	BoolGuard(const BoolGuard&) = delete;
+    BoolGuard& operator=(const BoolGuard&) = delete;
+
+private:
+	bool & m_member;
+	bool const m_oldValue;
+};
+
 void InstrumentTrack::savePreset(QDomDocument & doc, QDomElement & element)
 {
-	setPresetMode();
+	BoolGuard guard(m_presetMode, true);
 	saveSettings(doc, element);
 }
 
 void InstrumentTrack::loadPreset(const QDomElement & element)
 {
-	setPresetMode();
+	BoolGuard guard(m_presetMode, true);
 	loadSettings(element);
 }
 

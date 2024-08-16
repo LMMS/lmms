@@ -218,7 +218,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 
 	if (isPresetMode())
 	{
-		setPresetMode(false);
+		// No need to unset preset mode here as this will done by the guard in InstrumentTrack::savePreset
 		return;
 	}
 
@@ -279,7 +279,7 @@ void Track::loadSettings( const QDomElement & element )
 			node = node.nextSibling();
 		}
 
-		setPresetMode(false);
+		// No need to unset preset mode here as this will done by the guard in InstrumentTrack::loadPreset
 
 		return;
 	}
