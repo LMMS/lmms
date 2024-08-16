@@ -296,7 +296,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 
 	clip->setAutoResize(true);
 	// adding model value
-	clip->recordValue(timePos, m_amv->modelUntyped()->getTrueValue());
+	clip->recordValue(timePos, m_amv->modelUntyped()->getTypelessValue());
 	clip->setAutoResize(autoResize);
 }
 
@@ -317,7 +317,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 		bool autoResize = newClip->getAutoResize();
 
 		newClip->setAutoResize(true);
-		newClip->recordValue(timePos, m_amv->modelUntyped()->getTrueValue());
+		newClip->recordValue(timePos, m_amv->modelUntyped()->getTypelessValue());
 		newClip->setAutoResize(autoResize);
 	}
 	else
@@ -341,7 +341,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	if (nodeClip)
 	{
 		// modifying its value
-		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTrueValue());
+		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTypelessValue());
 	}
 }
 
