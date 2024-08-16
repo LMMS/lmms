@@ -68,7 +68,7 @@
 #include "MainWindow.h"
 #include "MixHelpers.h"
 #include "OutputSettings.h"
-#include "ActiveRenderer.h"
+#include "ProjectRenderer.h"
 #include "RenderManager.h"
 #include "Song.h"
 
@@ -379,7 +379,7 @@ int main( int argc, char * * argv )
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
-	ActiveRenderer::ExportFileFormat eff = ActiveRenderer::ExportFileFormat::Wave;
+	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -521,23 +521,23 @@ int main( int argc, char * * argv )
 
 			if( ext == "wav" )
 			{
-				eff = ActiveRenderer::ExportFileFormat::Wave;
+				eff = ProjectRenderer::ExportFileFormat::Wave;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = ActiveRenderer::ExportFileFormat::Ogg;
+				eff = ProjectRenderer::ExportFileFormat::Ogg;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
 			else if( ext == "mp3" )
 			{
-				eff = ActiveRenderer::ExportFileFormat::MP3;
+				eff = ProjectRenderer::ExportFileFormat::MP3;
 			}
 #endif
 			else if (ext == "flac")
 			{
-				eff = ActiveRenderer::ExportFileFormat::Flac;
+				eff = ProjectRenderer::ExportFileFormat::Flac;
 			}
 			else
 			{
@@ -776,7 +776,7 @@ int main( int argc, char * * argv )
 		if ( !renderTracks )
 		{
 			renderOut = baseName( renderOut ) +
-				ActiveRenderer::getFileExtensionFromFormat(eff);
+				ProjectRenderer::getFileExtensionFromFormat(eff);
 		}
 
 		// create renderer
@@ -968,7 +968,7 @@ int main( int argc, char * * argv )
 		Engine::destroy();
 	}
 
-	// RenderManager::updateConsoleProgress() doesn't return line after render
+	// ProjectRenderer::updateConsoleProgress() doesn't return line after render
 	if( coreOnly )
 	{
 		printf( "\n" );
