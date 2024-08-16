@@ -38,7 +38,7 @@ namespace lmms
 RenderManager::RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ActiveRenderer::ExportFileFormat fmt,
+		ProjectRenderer::ExportFileFormat fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
 	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
@@ -144,7 +144,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = std::make_unique<ActiveRenderer>(
+	m_activeRenderer = std::make_unique<ProjectRenderer>(
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,
@@ -205,7 +205,7 @@ void RenderManager::restoreMutedState()
 // Determine the output path for a track when rendering tracks individually
 QString RenderManager::pathForTrack(const Track *track, int num)
 {
-	QString extension = ActiveRenderer::getFileExtensionFromFormat( m_format );
+	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
 	name = name.remove(QRegularExpression(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
@@ -246,7 +246,7 @@ void RenderManager::updateConsoleProgress()
 }
 
 // gets a buffer and some data as input
-// the sender who constructed lmms::ActiveRenderer decides what is dataIn
+// the sender who constructed lmms::ProjectRenderer decides what is dataIn
 // fills the provided buffer with AudioEngine::nextBuffer() data and sets the correct size
 // this class doesn't own bufferOut
 // bufferOut can not be nullptr
@@ -285,7 +285,7 @@ void RenderManager::nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* 
 	}
 	else
 	{
-		// this will stop ActiveRenderer exporting
+		// this will stop ProjectRenderer exporting
 		bufferOut->clear();
 	}
 }

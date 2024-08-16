@@ -28,7 +28,7 @@
 
 #include <memory>
 
-#include "ActiveRenderer.h"
+#include "ProjectRenderer.h"
 #include "OutputSettings.h"
 
 
@@ -43,7 +43,7 @@ public:
 	RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ActiveRenderer::ExportFileFormat fmt,
+		ProjectRenderer::ExportFileFormat fmt,
 		QString outputPath);
 
 	~RenderManager() override;
@@ -79,10 +79,10 @@ private:
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
-	ActiveRenderer::ExportFileFormat m_format;
+	ProjectRenderer::ExportFileFormat m_format;
 	QString m_outputPath;
 
-	std::unique_ptr<ActiveRenderer> m_activeRenderer;
+	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 	volatile int m_progress;
 	bool m_isRendering;
 
