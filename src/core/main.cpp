@@ -43,10 +43,6 @@
 #include <windows.h>
 #endif
 
-#ifdef LMMS_HAVE_SCHED_H
-#include "sched.h"
-#endif
-
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
 #endif
@@ -740,29 +736,6 @@ int main( int argc, char * * argv )
 #endif
 	// override it with bundled/custom one, if exists
 	loadTranslation(QString("qt_") + pos, ConfigManager::inst()->localeDir());
-
-
-	// try to set realtime priority
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-#ifndef __OpenBSD__
-	struct sched_param sparam;
-	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
-				sched_get_priority_min( SCHED_FIFO ) ) / 2;
-	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
-	{
-		printf( "Notice: could not set realtime priority.\n" );
-	}
-#endif
-#endif // LMMS_HAVE_SCHED_H
-#endif
-
-#ifdef LMMS_BUILD_WIN32
-	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
-	{
-		printf( "Notice: could not set high priority.\n" );
-	}
-#endif
 
 #if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE
 	struct sigaction sa;

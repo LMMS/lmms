@@ -338,34 +338,11 @@ IF(WANT_SDL)
 	FIND_PACKAGE(SDL2)
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(LMMS_HAVE_SDL2 TRUE)
-		SET(STATUS_SDL "OK, using SDL2")
+		SET(STATUS_SDL "OK")
 		SET(SDL2_LIBRARY "SDL2::SDL2")
-		SET(SDL_INCLUDE_DIR "")
-		SET(SDL_LIBRARY "")
 	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) if you require SDL support")
 		SET(SDL2_LIBRARY "")
-	ENDIF()
-ENDIF()
-
-# fallback to SDL1
-IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
-	# Fallback to SDL1.2
-	SET(SDL_BUILDING_LIBRARY TRUE)
-	FIND_PACKAGE(SDL)
-	IF(SDL_FOUND)
-		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK, using SDL1.2")
-		# fix mingw since 53abd65
-		IF(NOT SDL_INCLUDE_DIR)
-			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-		ENDIF()
-
-	ELSE()
-		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
-			"if you require SDL support")
-		SET(SDL_INCLUDE_DIR "")
-		SET(SDL_LIBRARY "")
 	ENDIF()
 ENDIF()
 

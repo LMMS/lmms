@@ -354,8 +354,7 @@ float AutomatableModel::inverseScaledValue( float value ) const
 template<class T>
 void roundAt( T& value, const T& where, const T& step_size )
 {
-	if (std::abs(value - where)
-		< typeInfo<float>::minEps() * std::abs(step_size))
+	if (std::abs(value - where) < F_EPSILON * std::abs(step_size))
 	{
 		value = where;
 	}
@@ -583,7 +582,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 				"lacks implementation for a scale type");
 			break;
 		}
-		if( typeInfo<float>::isEqual( m_step, 1 ) && m_hasStrictStepSize )
+		if (approximatelyEqual(m_step, 1) && m_hasStrictStepSize)
 		{
 			return std::round(v);
 		}
