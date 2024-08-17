@@ -453,14 +453,21 @@ void PluginPinConnector::setChannelCount(int newCount, Matrix& matrix)
 {
 	auto parent = dynamic_cast<Model*>(this->parent());
 	assert(parent != nullptr);
+
 	if (matrix.channelCount < newCount)
 	{
-		for (auto& pluginChannels : matrix.pins)
+		const auto nameFormat = QString::fromUtf16(matrix.in
+			? u"Pin in [%1 \U0001F82E %2]"
+			: u"Pin out [%2 \U0001F82E %1]");
+
+		for (unsigned tcIdx = 0; tcIdx < matrix.pins.size(); ++tcIdx)
 		{
+			auto& pluginChannels = matrix.pins[tcIdx];
 			pluginChannels.reserve(newCount);
-			for (int idx = matrix.channelCount; idx < newCount; ++idx)
+			for (int pcIdx = matrix.channelCount; pcIdx < newCount; ++pcIdx)
 			{
-				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parent});
+				const auto name = nameFormat.arg(tcIdx + 1).arg(matrix.channelName(pcIdx));
+				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parent, name});
 				connect(model, &BoolModel::dataChanged, this, &PluginPinConnector::dataChanged);
 			}
 		}
@@ -508,13 +515,14 @@ void PluginPinConnector::updateTrackChannels(int count)
 		return;
 	}
 
-	auto updateModels = [&](int pluginChannels, auto& models) {
+	auto updateModels = [&](int pluginChannels, const QString& nameFormat, PluginPinConnector::Matrix& matrix) {
+		auto& models = matrix.pins;
 		auto oldSize = static_cast<int>(models.size());
 		if (oldSize > count)
 		{
-			for (auto idx = count; idx < oldSize; ++idx)
+			for (auto tcIdx = count; tcIdx < oldSize; ++tcIdx)
 			{
-				for (BoolModel* model : models[idx])
+				for (BoolModel* model : models[tcIdx])
 				{
 					delete model;
 				}
@@ -528,21 +536,22 @@ void PluginPinConnector::updateTrackChannels(int count)
 			assert(parent != nullptr);
 
 			models.resize(count);
-			for (auto idx = oldSize; idx < count; ++idx)
+			for (auto tcIdx = oldSize; tcIdx < count; ++tcIdx)
 			{
-				auto& channels = models[idx];
+				auto& channels = models[tcIdx];
 				channels.reserve(pluginChannels);
 				for (int pcIdx = 0; pcIdx < pluginChannels; ++pcIdx)
 				{
-					BoolModel* model = channels.emplace_back(new BoolModel{false, parent});
+					const auto name = nameFormat.arg(tcIdx + 1).arg(matrix.channelName(pcIdx));
+					BoolModel* model = channels.emplace_back(new BoolModel{false, parent, name});
 					connect(model, &BoolModel::dataChanged, this, &PluginPinConnector::dataChanged);
 				}
 			}
 		}
 	};
 
-	updateModels(in().channelCount, m_in.pins);
-	updateModels(out().channelCount, m_out.pins);
+	updateModels(in().channelCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"), m_in);
+	updateModels(out().channelCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"), m_out);
 
 	emit propertiesChanged();
 }
