@@ -133,9 +133,7 @@ public:
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
 public slots:
-
 	void updateTrackChannels(int count);
-	void updateConnectionLabels();
 
 private:
 	static void saveSettings(const Matrix& matrix, QDomDocument& doc, QDomElement& elem);

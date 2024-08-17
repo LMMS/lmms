@@ -23,16 +23,6 @@
  *
  */
 
-/*
-TODO:
-- Methods to set custom plugin channel names
-	- Remember to emit dataChanged signal
-- Give BoolModels a name for automation
-- New icons?
-- Testing! (esp. loading/saving)
-*/
-
-
 #include "PluginPinConnector.h"
 
 #include <QDomDocument>
@@ -305,8 +295,6 @@ void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 	auto pins = doc.createElement(nodeName());
 	elem.appendChild(pins);
 
-	pins.setAttribute("v", 0); // version
-
 	if (m_trackChannelsUsed != s_totalTrackChannels)
 	{
 		pins.setAttribute("tc_used", m_trackChannelsUsed);
@@ -554,11 +542,6 @@ void PluginPinConnector::updateTrackChannels(int count)
 	updateModels(out().channelCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"), m_out);
 
 	emit propertiesChanged();
-}
-
-void PluginPinConnector::updateConnectionLabels()
-{
-
 }
 
 } // namespace lmms

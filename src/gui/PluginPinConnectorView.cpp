@@ -44,11 +44,11 @@ namespace
 {
 
 constexpr auto CenterMargin = QSize{48, 0};
-constexpr auto WindowMarginTop = QSize{0, 144};
-constexpr auto WindowMarginBottom = QSize{0, 48};
-constexpr auto WindowMarginSide = QSize{64, 0};
+constexpr auto WindowMarginTop = QSize{0, 96};
+constexpr auto WindowMarginBottom = QSize{0, 32};
+constexpr auto WindowMarginSide = QSize{48, 0};
 constexpr auto WindowMarginTotal = WindowMarginTop + WindowMarginBottom + WindowMarginSide + WindowMarginSide;
-constexpr auto DefaultWindowSize = QSize{400, 256};
+constexpr auto DefaultMaxWindowSize = QSize{400, 256};
 
 } // namespace
 
@@ -100,7 +100,8 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidge
 	m_subWindow->setWindowFlags(flags);
 
 	auto hLayout = new QHBoxLayout{};
-	hLayout->addWidget(m_inView, 1, Qt::AlignmentFlag::AlignRight);
+	hLayout->addSpacing(WindowMarginSide.width());
+	hLayout->addWidget(m_inView, 0, Qt::AlignmentFlag::AlignRight);
 
 	auto getSpacerWidth = [&]() {
 		const bool singleMatrix = model->trackChannelsUsed() == 0
@@ -116,7 +117,8 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidge
 	});
 	hLayout->addSpacerItem(spacer);
 
-	hLayout->addWidget(m_outView, 1, Qt::AlignmentFlag::AlignLeft);
+	hLayout->addWidget(m_outView, 0, Qt::AlignmentFlag::AlignLeft);
+	hLayout->addSpacing(WindowMarginSide.width());
 
 
 	auto vLayout = new QVBoxLayout{this};
@@ -148,8 +150,8 @@ auto PluginPinConnectorView::minimumSizeHint() const -> QSize
 {
 	const auto minSize = sizeHint();
 	return QSize {
-		std::min(minSize.width(), DefaultWindowSize.width()),
-		std::min(minSize.height(), DefaultWindowSize.height())
+		std::min(minSize.width(), DefaultMaxWindowSize.width()),
+		std::min(minSize.height(), DefaultMaxWindowSize.height())
 	};
 }
 
@@ -196,31 +198,38 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	auto outMatrixRect = m_outView->rect();
 	outMatrixRect.moveTo(m_outView->pos());
 
-	// Draw track channel text
-	const auto xwIn = std::pair{0, inMatrixRect.left() - 4};
-	const auto xwOut = std::pair{outMatrixRect.right() + 4, width() - outMatrixRect.right() - 4};
-	int yPos = inMatrixRect.y();
-	for (unsigned idx = 0; idx < model->trackChannelsUsed(); ++idx)
+	// Draw track channel text (in)
+	if (model->in().channelCount != 0)
 	{
-		if (model->in().channelCount != 0)
+		const auto xwIn = std::pair{0, inMatrixRect.left() - 4};
+		int yPos = inMatrixRect.y();
+		for (unsigned idx = 0; idx < model->trackChannelsUsed(); ++idx)
 		{
 			p.drawText(xwIn.first, yPos, xwIn.second, textSize.height(), Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
-		}
 
-		if (model->out().channelCount != 0)
+			yPos += cellSize.height();
+		}
+	}
+
+	// Draw track channel text (out)
+	if (model->out().channelCount != 0)
+	{
+		const auto xwOut = std::pair{outMatrixRect.right() + 4, width() - outMatrixRect.right() - 4};
+		int yPos = outMatrixRect.y();
+		for (unsigned idx = 0; idx < model->trackChannelsUsed(); ++idx)
 		{
 			p.drawText(xwOut.first, yPos, xwOut.second, textSize.height(), Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
-		}
 
-		yPos += cellSize.height();
+			yPos += cellSize.height();
+		}
 	}
 
 	p.save();
 
 	// Draw plugin channel text (in)
-	yPos = inMatrixRect.top() - 4;
+	int yPos = inMatrixRect.top() - 4;
 	int xPos = inMatrixRect.x() + 2;
 	for (int idx = 0; idx < model->in().channelCount; ++idx)
 	{
@@ -234,6 +243,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	}
 
 	// Draw plugin channel text (out)
+	yPos = outMatrixRect.top() - 4;
 	xPos = outMatrixRect.x() + 2;
 	for (int idx = 0; idx < model->out().channelCount; ++idx)
 	{
