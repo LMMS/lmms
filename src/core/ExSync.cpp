@@ -401,5 +401,5 @@ bool ExSyncCtl::have()
 
 } // namespace lmms 
 
-#endif // LMMS_HAVE_JACK
+#endif // LMMS_HAVE_EXSYNC
 
