@@ -27,12 +27,7 @@
 TODO:
 - Methods to set custom plugin channel names
 	- Remember to emit dataChanged signal
-- Fix layout/alignment
-	- In updateGeometry, if minimum needed size is smaller than default window size,
-		set setMinimumSize to it (respecting margins), else set it to the default size
 - Give BoolModels a name for automation
-- Use labels with tooltips for channel names?
-	- Truncate the text if needed
 - New icons?
 - Testing! (esp. loading/saving)
 */

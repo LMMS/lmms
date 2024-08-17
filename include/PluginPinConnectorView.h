@@ -26,14 +26,13 @@
 #define LMMS_GUI_PLUGIN_PIN_CONNECTOR_VIEW_H
 
 #include <QWidget>
-#include <QScrollArea>
 
 #include "embed.h"
 #include "lmms_export.h"
 #include "ModelView.h"
 
 class QPixmap;
-class QScrollArea;
+//class QScrollArea;
 
 namespace lmms
 {
@@ -48,7 +47,6 @@ class SubWindow;
 
 class LMMS_EXPORT PluginPinConnectorView
 	: public QWidget
-	//: public QScrollArea
 	, public ModelView
 {
 	Q_OBJECT
@@ -57,11 +55,9 @@ public:
 	PluginPinConnectorView(PluginPinConnector* model, QWidget* parent);
 
 	auto sizeHint() const -> QSize override;
+	auto minimumSizeHint() const -> QSize override;
 
 	void toggleVisibility();
-
-public slots:
-	void update();
 
 protected:
 	void paintEvent(QPaintEvent* pe) override;
@@ -70,15 +66,9 @@ private:
 	class MatrixView;
 
 	void updateGeometry();
-	void updatePositions();
 
 	SubWindow* m_subWindow = nullptr;
-	QScrollArea* m_scrollArea = nullptr;
-	QWidget* m_widget = nullptr;
-
-	QRect m_inRect;
-	QRect m_outRect;
-	QSize m_minSize;
+	//QScrollArea* m_scrollArea = nullptr;
 
 	MatrixView* m_inView = nullptr;
 	MatrixView* m_outView = nullptr;
