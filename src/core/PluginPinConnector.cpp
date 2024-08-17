@@ -487,16 +487,7 @@ void PluginPinConnector::setChannelCount(int newCount, Matrix& matrix)
 
 auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorView*
 {
-	auto view = new gui::PluginPinConnectorView{parent};
-	view->setModel(this);
-
-	connect(this, &PluginPinConnector::dataChanged, view, &gui::PluginPinConnectorView::update);
-	connect(this, &PluginPinConnector::propertiesChanged, view, &gui::PluginPinConnectorView::update);
-	view->update();
-	//view->toggleVisibility();
-	view->show();
-
-	return view;
+	return new gui::PluginPinConnectorView{this, parent};
 }
 
 auto PluginPinConnector::getChannelCountText() const -> QString

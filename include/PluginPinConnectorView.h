@@ -39,6 +39,7 @@ namespace lmms
 {
 
 class BoolModel;
+class PluginPinConnector;
 
 namespace gui
 {
@@ -53,7 +54,7 @@ class LMMS_EXPORT PluginPinConnectorView
 	Q_OBJECT
 
 public:
-	PluginPinConnectorView(QWidget* parent);
+	PluginPinConnectorView(PluginPinConnector* model, QWidget* parent);
 
 	auto sizeHint() const -> QSize override;
 
@@ -63,14 +64,13 @@ public slots:
 	void update();
 
 protected:
-	void mousePressEvent(QMouseEvent* me) override;
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
+	class MatrixView;
+
 	void updateGeometry();
 	void updatePositions();
-	auto calculateMatrixSize(bool inMatrix) const -> QSize;
-	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
 
 	SubWindow* m_subWindow = nullptr;
 	QScrollArea* m_scrollArea = nullptr;
@@ -80,10 +80,8 @@ private:
 	QRect m_outRect;
 	QSize m_minSize;
 
-	QPixmap m_buttonOffBlack = embed::getIconPixmap("step_btn_off");
-	QPixmap m_buttonOffGray = embed::getIconPixmap("step_btn_off_light");
-	//QPixmap m_buttonOn0 = embed::getIconPixmap("step_btn_on_0");
-	QPixmap m_buttonOn = embed::getIconPixmap("step_btn_on_200");
+	MatrixView* m_inView = nullptr;
+	MatrixView* m_outView = nullptr;
 };
 
 } // namespace gui

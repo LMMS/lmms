@@ -42,21 +42,62 @@ namespace lmms::gui
 namespace
 {
 
-constexpr auto GridMargin = 2;
+constexpr auto GridMargin = 2; // TODO: Remove?
 constexpr auto CenterMargin = QSize{48, 0};
-constexpr auto WindowMarginTop = QSize{0, 160};
+constexpr auto WindowMarginTop = QSize{0, 144};
 constexpr auto WindowMarginBottom = QSize{0, 48};
-constexpr auto WindowMarginSide = QSize{144, 0};
+constexpr auto WindowMarginSide = QSize{64, 0};
 constexpr auto WindowMarginTotal = WindowMarginTop + WindowMarginBottom + WindowMarginSide + WindowMarginSide;
 constexpr auto DefaultWindowSize = QSize{400, 256};
 
 } // namespace
 
-PluginPinConnectorView::PluginPinConnectorView(QWidget* parent)
+
+class PluginPinConnectorView::MatrixView : public QWidget
+{
+public:
+	MatrixView(PluginPinConnectorView* parent, const PluginPinConnector::Matrix& matrix);
+	~MatrixView() override = default;
+	auto sizeHint() const -> QSize override;
+	void paintEvent(QPaintEvent*) override;
+	void mousePressEvent(QMouseEvent* me) override;
+	void updateSize();
+	auto cellSize() const -> QSize;
+
+private:
+	auto calculateSize() const -> QSize;
+	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
+
+	//PluginPinConnectorView* m_view;
+	PluginPinConnector* m_model;
+	const PluginPinConnector::Matrix* m_matrix;
+	//QString m_name;
+
+	QPixmap m_buttonOffBlack = embed::getIconPixmap("step_btn_off");
+	QPixmap m_buttonOffGray = embed::getIconPixmap("step_btn_off_light");
+	//QPixmap m_buttonOn0 = embed::getIconPixmap("step_btn_on_0");
+	QPixmap m_buttonOn = embed::getIconPixmap("step_btn_on_200");
+
+	static constexpr int s_gridMargin = 2;
+};
+
+
+PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidget* parent)
 	: QWidget{parent} // new QScrollArea{parent}
 	//: QScrollArea{parent}
-	, ModelView{nullptr, this}
+	, ModelView{model, this}
+	, m_inView{new MatrixView{this, model->in()}}
+	, m_outView{new MatrixView{this, model->out()}}
 {
+
+
+	//connect(model, &PluginPinConnector::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
+
+	// Update geometry then regular update
+	//connect(model, &PluginPinConnector::propertiesChanged, this, &PluginPinConnectorView::updateGeometry);
+
+	
+
 	/*
 	updateGeometry();
 
@@ -92,12 +133,24 @@ PluginPinConnectorView::PluginPinConnectorView(QWidget* parent)
 	//m_subWindow->setMinimumSize(initialSize);
 	//setMinimumSize(initialSize);
 
-	setMinimumSize(DefaultWindowSize);
+	//setMinimumSize(DefaultWindowSize);
+	//setSizePolicy(QSizePolicy::MinimumExpanding);
+	//setMinimumSize(m_minSize);
 
 
 	//m_subWindow->setMinimumSize(initialSize);
 
 	//m_subWindow->show();
+
+	updateGeometry();
+
+
+	// TEMPORARY!
+	m_inView->move(m_inRect.topLeft());
+	m_outView->move(m_outRect.topLeft());
+
+
+	show();
 }
 
 auto PluginPinConnectorView::sizeHint() const -> QSize
@@ -120,72 +173,32 @@ void PluginPinConnectorView::toggleVisibility()
 	if (m_subWindow->isVisible())
 	{
 		m_subWindow->hide();
-		m_scrollArea->hide();
+		//m_scrollArea->hide();
 		hide();
 	}
 	else
 	{
 		updateGeometry();
 		show();
-		m_scrollArea->show();
+		//m_scrollArea->show();
 		m_subWindow->show();
 	}
 }
 
 void PluginPinConnectorView::update()
 {
+/*
 	updateGeometry();
+
+
+	setMinimumSize({
+		std::min(m_minSize.width(), DefaultWindowSize.width()),
+		std::min(m_minSize.height(), DefaultWindowSize.height())
+	});
+
+	setMaximumSize(m_minSize);
+*/
 	QWidget::update();
-}
-
-void PluginPinConnectorView::mousePressEvent(QMouseEvent* me)
-{
-	if (me->button() != Qt::LeftButton) { return; }
-
-	const auto* pinConnector = castModel<PluginPinConnector>();
-	if (!pinConnector) { return; }
-
-	const int buttonW = m_buttonOn.width();
-	const int buttonH = m_buttonOn.height();
-
-	auto handleClick = [&](const PluginPinConnector::PinMap& pins, QRect rect) -> bool {
-		if (!rect.contains(me->pos(), true)) { return false; }
-
-		const auto relMousePos = me->pos() - rect.topLeft();
-		const int xIdx = relMousePos.x() / (buttonW + GridMargin);
-		const int yIdx = relMousePos.y() / (buttonH + GridMargin);
-
-		// Check if within margin
-		int relPos = relMousePos.x() - xIdx * buttonW;
-		if (relPos >= buttonW || relPos <= 0) { return false; }
-		relPos = relMousePos.y() - yIdx * buttonH;
-		if (relPos >= buttonH || relPos <= 0) { return false; }
-		
-		BoolModel* model = pins.at(yIdx).at(xIdx);
-
-		if (me->modifiers() & Qt::ControlModifier)
-		{
-			// Taken from AutomatableModelView::mousePressEvent
-			new gui::StringPairDrag{"automatable_model", QString::number(model->id()),
-				getIcon(*model, yIdx, xIdx), this};
-		}
-		else
-		{
-			model->setValue(!model->value());
-		}
-
-		me->accept();
-
-		return true;
-	};
-
-	if (!handleClick(pinConnector->in().pinMap(), m_inRect))
-	{
-		if (!handleClick(pinConnector->out().pinMap(), m_outRect))
-		{
-			me->ignore();
-		}
-	}
 }
 
 void PluginPinConnectorView::paintEvent(QPaintEvent*)
@@ -213,46 +226,11 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	const auto* pinConnector = castModel<PluginPinConnector>();
 	if (!pinConnector) { return; }
 
-	const auto& pinsIn = pinConnector->in().pinMap();
-	const auto& pinsOut = pinConnector->out().pinMap();
-
-	const auto buttonW = m_buttonOn.width();
-	const auto buttonH = m_buttonOn.height();
-
-	auto drawMatrix = [&](const PluginPinConnector::PinMap& pins, QRect rect) {
-		if (pins.empty() || pins[0].empty()) { return; }
-		if (pinConnector->trackChannelsUsed() == 0) { return; }
-
-		auto drawXY = QPoint{};
-		drawXY.ry() = rect.y();
-
-		for (std::size_t tcIdx = 0; tcIdx < pins.size(); ++tcIdx)
-		{
-			drawXY.rx() = rect.x();
-
-			auto& pluginChannels = pins[tcIdx];
-			for (std::size_t pcIdx = 0; pcIdx < pluginChannels.size(); ++pcIdx)
-			{
-				BoolModel* pin = pluginChannels[pcIdx];
-				p.drawPixmap(drawXY, getIcon(*pin, tcIdx, pcIdx));
-
-				drawXY.rx() += buttonW + GridMargin;
-			}
-
-			drawXY.ry() += buttonH + GridMargin;
-		}
-
-#ifndef NDEBUG
-		const auto expected = rect.bottomRight();
-		const auto actual = drawXY - QPoint{GridMargin + 1, GridMargin + 1};
-		//std::cout << "expected: {" << expected.x() << ", " << expected.y() << "}\n";
-		//std::cout << "actual: {" << actual.x() << ", " << actual.y() << "}\n";
-		assert(actual == expected);
-#endif
+	const auto cellSize = m_inView->cellSize();
+	const auto textSize = QSize {
+		static_cast<int>(cellSize.width() * 0.9),
+		static_cast<int>(cellSize.height() * 0.9)
 	};
-
-	drawMatrix(pinsIn, m_inRect);
-	drawMatrix(pinsOut, m_outRect);
 
 	QFont f = adjustedToPixelSize(font(), 16);
 	f.setBold(false);
@@ -267,17 +245,17 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	{
 		if (pinConnector->in().channelCount() != 0)
 		{
-			p.drawText(xwIn.first, yPos, xwIn.second, buttonH, Qt::AlignRight,
+			p.drawText(xwIn.first, yPos, xwIn.second, textSize.height(), Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
 		}
 
 		if (pinConnector->out().channelCount() != 0)
 		{
-			p.drawText(xwOut.first, yPos, xwOut.second, buttonH, Qt::AlignLeft,
+			p.drawText(xwOut.first, yPos, xwOut.second, textSize.height(), Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
 		}
 
-		yPos += buttonH + GridMargin;
+		yPos += cellSize.height();
 	}
 
 	p.save();
@@ -291,9 +269,9 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 		p.setTransform(transform);
 
 		const auto name = pinConnector->in().channelName(idx);
-		p.drawText(0, 0, buttonW, yPos, Qt::AlignLeft, name);
+		p.drawText(0, 0, textSize.width(), yPos, Qt::AlignLeft, name);
 
-		xPos += buttonW + GridMargin;
+		xPos += cellSize.width();
 	}
 
 	// Draw plugin channel text (out)
@@ -304,9 +282,9 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 		p.setTransform(transform);
 
 		const auto name = pinConnector->out().channelName(idx);
-		p.drawText(0, 0, buttonW, yPos, Qt::AlignLeft, name);
+		p.drawText(0, 0, textSize.width(), yPos, Qt::AlignLeft, name);
 
-		xPos += buttonW + GridMargin;
+		xPos += cellSize.width();
 	}
 
 	p.restore();
@@ -314,8 +292,8 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 
 void PluginPinConnectorView::updateGeometry()
 {
-	const auto inSize = calculateMatrixSize(true);
-	const auto outSize = calculateMatrixSize(false);
+	const auto inSize = m_inView->size();
+	const auto outSize = m_outView->size();
 
 	const auto centerMargin = (inSize.isEmpty() || outSize.isEmpty()) ? QSize{} : CenterMargin;
 
@@ -328,9 +306,19 @@ void PluginPinConnectorView::updateGeometry()
 
 	//std::cout << "m_minSize: {" << m_minSize.width() << ", " << m_minSize.height() << "}\n";
 
+
+	setMinimumSize({
+		std::min(m_minSize.width(), DefaultWindowSize.width()),
+		std::min(m_minSize.height(), DefaultWindowSize.height())
+	});
+
+	setMaximumSize(m_minSize);
+
+
+
 	const auto extra = QSize {
-		std::max(DefaultWindowSize.width() - m_minSize.width(), 0) / 2,
-		std::max(DefaultWindowSize.height() - m_minSize.height(), 0) / 2
+		std::max(width() - m_minSize.width(), 0) / 2,
+		std::max(height() - m_minSize.height(), 0) / 2
 	};
 
 	//m_minSize.rwidth() = std::max(DefaultWindowSize.width(), m_minSize.width());
@@ -344,6 +332,11 @@ void PluginPinConnectorView::updateGeometry()
 
 	//std::cout << "m_inRect: {" << m_inRect.x() << ", " << m_inRect.y() << "}, {" << m_inRect.width() << ", " << m_inRect.height() << "}\n";
 	//std::cout << "m_outRect: {" << m_outRect.x() << ", " << m_outRect.y() << "}, {" << m_outRect.width() << ", " << m_outRect.height() << "}\n";
+
+
+	
+
+	update();
 }
 
 void updatePositions()
@@ -351,24 +344,137 @@ void updatePositions()
 
 }
 
-auto PluginPinConnectorView::calculateMatrixSize(bool inMatrix) const -> QSize
-{
-	const auto* pc = castModel<PluginPinConnector>();
-	if (!pc) { return QSize{}; }
+//////////////////////////////////////////////
 
-	const auto tcc = static_cast<int>(pc->trackChannelsUsed());
+PluginPinConnectorView::MatrixView::MatrixView(PluginPinConnectorView* parent,
+	const PluginPinConnector::Matrix& matrix)
+	: QWidget{parent}
+	, m_model{parent->castModel<PluginPinConnector>()}
+	, m_matrix{&matrix}
+{
+	assert(m_model != nullptr);
+
+	connect(m_model, &PluginPinConnector::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
+	connect(m_model, &PluginPinConnector::propertiesChanged, this, &MatrixView::updateSize);
+
+	updateSize();
+}
+
+auto PluginPinConnectorView::MatrixView::sizeHint() const -> QSize
+{
+	return calculateSize();
+}
+
+void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
+{
+	auto p = QPainter{this};
+	p.setRenderHint(QPainter::Antialiasing);
+	p.fillRect(rect(), p.background());
+
+	const auto& pins = m_matrix->pinMap();
+	if (pins.empty() || pins[0].empty()) { return; }
+	if (m_model->trackChannelsUsed() == 0) { return; }
+
+	assert(m_model->trackChannelsUsed() <= pins.size());
+	const auto cellSize = this->cellSize();
+
+	auto drawXY = QPoint{0, 0};
+	for (std::size_t tcIdx = 0; tcIdx < pins.size(); ++tcIdx)
+	{
+		drawXY.rx() = 0;
+		auto& pluginChannels = pins[tcIdx];
+		for (std::size_t pcIdx = 0; pcIdx < pluginChannels.size(); ++pcIdx)
+		{
+			BoolModel* pin = pluginChannels[pcIdx];
+			p.drawPixmap(drawXY, getIcon(*pin, tcIdx, pcIdx));
+
+			drawXY.rx() += cellSize.width();
+		}
+
+		drawXY.ry() += cellSize.height();
+	}
+
+#ifndef NDEBUG
+	const auto expected = QPoint{width(), height()};
+	const auto actual = drawXY - QPoint{s_gridMargin, s_gridMargin};
+	//std::cout << "expected: {" << expected.x() << ", " << expected.y() << "}\n";
+	//std::cout << "actual: {" << actual.x() << ", " << actual.y() << "}\n";
+	assert(actual == expected);
+#endif
+}
+
+void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
+{
+	if (!rect().contains(me->pos(), true))
+	{
+		me->ignore();
+		return;
+	}
+
+	const int buttonW = m_buttonOn.width();
+	const int buttonH = m_buttonOn.height();
+
+	const auto relMousePos = me->pos();
+	const int xIdx = relMousePos.x() / (buttonW + s_gridMargin);
+	const int yIdx = relMousePos.y() / (buttonH + s_gridMargin);
+
+	// Check if within margin
+	int relPos = relMousePos.x() - xIdx * buttonW;
+	if (relPos >= buttonW || relPos <= 0)
+	{
+		me->ignore();
+		return;
+	}
+
+	relPos = relMousePos.y() - yIdx * buttonH;
+	if (relPos >= buttonH || relPos <= 0)
+	{
+		me->ignore();
+		return;
+	}
+
+	BoolModel* model = m_matrix->pinMap().at(yIdx).at(xIdx);
+
+	if (me->modifiers() & Qt::ControlModifier)
+	{
+		// Taken from AutomatableModelView::mousePressEvent
+		new gui::StringPairDrag{"automatable_model", QString::number(model->id()),
+			getIcon(*model, yIdx, xIdx), this};
+	}
+	else
+	{
+		model->setValue(!model->value());
+	}
+
+	me->accept();
+}
+
+void PluginPinConnectorView::MatrixView::updateSize()
+{
+	setFixedSize(calculateSize());
+}
+
+auto PluginPinConnectorView::MatrixView::cellSize() const -> QSize
+{
+	return {m_buttonOn.width() + s_gridMargin, m_buttonOn.height() + s_gridMargin};
+}
+
+auto PluginPinConnectorView::MatrixView::calculateSize() const -> QSize
+{
+	const auto tcc = static_cast<int>(m_model->trackChannelsUsed());
 	if (tcc == 0) { return QSize{}; }
 
-	const int pcc = inMatrix ? pc->in().channelCount() : pc->out().channelCount();
+	const int pcc = m_matrix->channelCount();
 	if (pcc == 0) { return QSize{}; }
 
-	const int pcSize = (pcc * m_buttonOn.width()) + (pcc - 1) * GridMargin;
-	const int tcSize = (tcc * m_buttonOn.height()) + (tcc - 1) * GridMargin;
+	const int pcSize = pcc * (m_buttonOn.width() + s_gridMargin) - s_gridMargin;
+	const int tcSize = tcc * (m_buttonOn.height() + s_gridMargin) - s_gridMargin;
 
 	return {pcSize, tcSize};
 }
 
-auto PluginPinConnectorView::getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&
+auto PluginPinConnectorView::MatrixView::getIcon(const BoolModel& model, int trackChannel, int pluginChannel)
+	-> const QPixmap&
 {
 	// TODO: Alternate b/w black and gray icons?
 	(void)trackChannel;
