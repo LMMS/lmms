@@ -415,26 +415,6 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, Matrix& matrix)
 			}
 		}
 	}
-
-#if 0
-	// TODO: This method is very inefficient
-	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
-	{
-		auto& trackChannels = pins[trackChannel];
-		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
-		{
-			const auto name = QString{"c%1_%2"}.arg(trackChannel).arg(pluginChannel);
-			if (elem.hasAttribute(name) || !elem.firstChildElement(name).isNull())
-			{
-				trackChannels[pluginChannel]->loadSettings(elem, name);
-			}
-			else
-			{
-				trackChannels[pluginChannel]->setValue(0);
-			}
-		}
-	}
-#endif
 }
 
 void PluginPinConnector::setChannelCount(int newCount, Matrix& matrix)

@@ -328,12 +328,6 @@ void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
 
 		drawXY.ry() += cellSize.height();
 	}
-
-#ifndef NDEBUG
-	const auto expected = QPoint{width(), height()};
-	const auto actual = drawXY - QPoint{s_gridMargin, s_gridMargin};
-	assert(actual == expected);
-#endif
 }
 
 void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
