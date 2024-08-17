@@ -67,40 +67,62 @@ struct ExSyncHandler
 	//! driver check if target plaing just stopped (after last call) 
 	bool (* Stopped)();
 	//! driver MUST start/stop remote LMMS controling @set true/false
-	void (* setSlave)(bool set);// (struct ExSyncCallbacks *cb); 
+	void (* setSlave)(bool set);
 };
 
 struct ExSyncHandler * exSyncGetHandler();
 
-void exSyncStopped();
-void exSyncSendPosition();
-void exSyncSendPositioniIfMaster();
 
-const char * exSyncToggleMode();
-const char * exSyncGetModeString();
-bool exSyncToggle();
-bool exSyncReact();
-bool exSyncAvailable();
-bool exSyncMasterAndSync();
+/* ExSync implementation (not ExSync API part): 
+ * semi private - do not use (except bug-fix or refactoring context) 
+ */
+
+/** 
+	Catch events,needed to sent.
+	Events:
+	* jump - when song position changed not in "natural" way
+	(most challenging event to catch, so even @pulse() is needed);
+	* start - when song starts playing ;
+	* stop - when song stops playing . 
+	Implementation details see in ExSync.cpp
+ */ 
+class ExSyncHook
+{
+public:
+	static void pulse(); //!< called periodically to catch jump when stopped
+	static void jump(); //!< placed where jump introduced by user or by LMMS
+	static void start();
+	static void stop();
+};
+
+/**
+	Used to control ExSync by GUI (all calls are in SongEditorWindow) 
+*/
+class ExSyncCtl
+{
+public:
+	//! ExSync modes named from LMMS point of view, toggled in round robin way 
+	enum ExSyncMode 
+	{
+		Master = 0, //!< LMMS send commands, but not react 
+		Slave, //!< LMMS react but not send
+		Duplex, //!< LMMS send and react, position followed to external application
+		Last //!< used for array element count 
+	};
+	static ExSyncMode toggleMode(); //!< @return mode after call
+	static ExSyncMode getMode(); //!< @return current mode
+	static bool toggleOnOff(); //!< @return true if ExSync became active
+	static bool have(); //!< @return true if available
+};
+
 
 } // namespace lmms 
 
+
 #define 	LMMS_HAVE_EXSYNC
 
-#else
-
-// Some empty functions/macroses here
-
-namespace lmms 
-{
-
-inline void exSyncStopped() {}
-inline void exSyncSendPosition() {}
-
-} // namespace lmms
 
 #endif // LMMS_HAVE_JACK
-
 
 
 #endif // LMMS_EXSYNC_H

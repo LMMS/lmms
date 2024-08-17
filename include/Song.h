@@ -33,6 +33,7 @@
 
 #include "AudioEngine.h"
 #include "Controller.h"
+#include "ExSync.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Timeline.h"
@@ -410,10 +411,9 @@ private slots:
 
 	void updateFramesPerTick();
 
-#ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
+#ifdef LMMS_HAVE_EXSYNC
 	void onPlaybackStateChanged();
-	
+	void onPlaybackPositionChanged();
 #endif
 
 private:

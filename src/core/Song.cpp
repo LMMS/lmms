@@ -38,9 +38,7 @@
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "EnvelopeAndLfoParameters.h"
-//ExSync
 #include "ExSync.h"
-
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -115,8 +113,8 @@ Song::Song() :
 						SLOT(updateFramesPerTick()));
 
 #ifdef LMMS_HAVE_EXSYNC
-	//ExSync
 	connect( this, SIGNAL( playbackStateChanged() ), this, SLOT( onPlaybackStateChanged() ) );
+	connect( this, SIGNAL( playbackPositionChanged() ), this, SLOT( onPlaybackPositionChanged() ) );
 #endif
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
@@ -256,9 +254,10 @@ void Song::processNextBuffer()
 			setToTime(begin);
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
-
-			exSyncSendPosition(); //ExSync
-
+#ifdef LMMS_HAVE_EXSYNC
+			//Invoked LMMS change plaing position in loop mode
+			ExSyncHook::jump();	//exSyncSendPosition();
+#endif
 			return true;
 		}
 		return false;
@@ -656,9 +655,13 @@ void Song::stop()
 	auto& timeline = getTimeline();
 	m_paused = false;
 	m_recording = true;
-
-	if (m_playMode < Song::PlayMode::Pattern) { exSyncSendPosition(); } //ExSync
-
+#ifdef LMMS_HAVE_EXSYNC
+	if (m_playMode < Song::PlayMode::Pattern) 
+	{ 
+		//Invoke on stop event, but only plaing song. 
+		ExSyncHook::jump();	// exSyncSendPosition(); 
+	}
+#endif
 	m_playing = false;
 
 	switch (timeline.stopBehaviour())
@@ -1425,18 +1428,19 @@ void Song::updateFramesPerTick()
 
 
 #ifdef LMMS_HAVE_EXSYNC
-//ExSync
 void Song::onPlaybackStateChanged()
 {
-	if (exSyncMasterAndSync())
+	if (m_playMode < Song::PlayMode::Pattern) 
 	{
-		if (m_playMode < Song::PlayMode::Pattern) 
-		{
-			ExSyncHandler * sync =  exSyncGetHandler();
-			sync->sendPlay(m_playing);
-			exSyncSendPositioniIfMaster();
-		}
+		if (m_playing) { ExSyncHook::start(); } else { ExSyncHook::stop(); }
 	}
+}
+
+static unsigned cs_change_count = 0;
+void Song::onPlaybackPositionChanged()
+{
+	fprintf(stderr, "P"); cs_change_count++;
+	if (cs_change_count >= 100) {fprintf(stderr, "\n");  cs_change_count = 0;}
 }
 #endif
 

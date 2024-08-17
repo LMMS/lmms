@@ -28,6 +28,7 @@
 
 #include "AutomatableModel.h"
 #include "Editor.h"
+#include "ExSync.h"
 #include "TrackContainerView.h"
 
 class QLabel;
@@ -108,10 +109,9 @@ private slots:
 	void updateMasterPitchFloat( int new_val );
 	void hideMasterPitchFloat();
 
-#ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
-	void toggleExSync();
-	void toggleExSyncMode();
+#ifdef LMMS_HAVE_EXSYNC
+	void toggleExSync(); //!< toggle On/Off
+	void toggleExSyncMode(); //!< toggle "Master"/"Slave"/"Duplex"
 #endif
 
 	void updateScrollBar(int len);
@@ -137,10 +137,10 @@ private:
 
 	LcdSpinBox * m_tempoSpinBox;
 
-#ifdef LMMS_HAVE_JACK
-	//ExSync
+#ifdef LMMS_HAVE_EXSYNC
 	QPushButton * m_exSyncButton;
 	QPushButton * m_exSyncModeButton;
+	static const char * exSyncGetModeString(enum ExSyncCtl::ExSyncMode mode);
 #endif
 
 	TimeLineWidget * m_timeLine;

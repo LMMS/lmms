@@ -36,12 +36,11 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
+#include "ExSync.h"
 #include "GuiApplication.h"
 #include "NStateButton.h"
 #include "TextFloat.h"
 
-//ExSync
-#include "ExSync.h"
 
 namespace lmms::gui
 {
@@ -353,8 +352,8 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			m_pos.setJumped( true );
 			updatePosition();
 #ifdef LMMS_HAVE_EXSYNC
-			//ExSync
-			if ( exSyncShouldSend() ) { exSyncSendPosition(); }
+			//Invoked when user change plaing position by mouse and only if Song Editor TimeLine
+			if (exSyncShouldSend()) { ExSyncHook::jump(); }
 #endif
 			break;
 

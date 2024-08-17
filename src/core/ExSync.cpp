@@ -22,7 +22,7 @@
 
 #include "ExSync.h"
 
-#ifdef LMMS_HAVE_JACK
+#ifdef LMMS_HAVE_EXSYNC
 
 
 #include "Engine.h"
@@ -62,8 +62,8 @@ static struct ExSyncCallbacks * getSlaveCallbacks();
 /* Jack Transport target implementation private part (BEGIN): */
 
 
-static jack_client_t * cs_syncJackd = nullptr; //!< Set by Jack audio 
-static jack_transport_state_t cs_lastJackState = JackTransportStopped;
+static jack_client_t * s_syncJackd = nullptr; //!< Set by Jack audio 
+static jack_transport_state_t s_lastJackState = JackTransportStopped;
 
 
 /*! Function adapt events from Jack Transport to LMMS  */
@@ -100,18 +100,18 @@ static int syncCallBack(jack_transport_state_t state, jack_position_t *pos, void
 
 static bool jackAvailable()
 {
-	if (cs_syncJackd) { return true; } else { return false; }
+	if (s_syncJackd) { return true; } else { return false; }
 }
 
 
 static void jackPlay(bool playing)
 {
-	if (cs_syncJackd)
+	if (s_syncJackd)
 	{
 		if (playing) {
-			jack_transport_start(cs_syncJackd);
+			jack_transport_start(s_syncJackd);
 		} else {
-			jack_transport_stop(cs_syncJackd);
+			jack_transport_stop(s_syncJackd);
 		}
 	}
 }
@@ -119,9 +119,9 @@ static void jackPlay(bool playing)
 
 static void jackPosition(const SongExtendedPos *pos)
 {
-	if (cs_syncJackd)
+	if (s_syncJackd)
 	{
-		jack_transport_locate(cs_syncJackd, pos->frame);
+		jack_transport_locate(s_syncJackd, pos->frame);
 	}
 }
 
@@ -130,16 +130,16 @@ static bool jackStopped()
 {
 	bool justStopped = false;
 
-	if (cs_syncJackd)
+	if (s_syncJackd)
 	{ 
-		jack_transport_state_t state = jack_transport_query(cs_syncJackd, nullptr);
-		if ((JackTransportStopped == state) && (state != cs_lastJackState))
+		jack_transport_state_t state = jack_transport_query(s_syncJackd, nullptr);
+		if ((JackTransportStopped == state) && (state != s_lastJackState))
 		{
 			justStopped = true;
 		}
-		cs_lastJackState = state;
+		s_lastJackState = state;
 	} else {
-		cs_lastJackState = JackTransportStopped;
+		s_lastJackState = JackTransportStopped;
 	}
 
 	return justStopped;
@@ -148,13 +148,13 @@ static bool jackStopped()
 
 static void jackSlave(bool set)
 {
-	if (cs_syncJackd)
+	if (s_syncJackd)
 	{
 		if (set)
 		{
-			jack_set_sync_callback(cs_syncJackd, &syncCallBack, nullptr);
+			jack_set_sync_callback(s_syncJackd, &syncCallBack, nullptr);
 		} else {
-			jack_set_sync_callback(cs_syncJackd, nullptr, nullptr);
+			jack_set_sync_callback(s_syncJackd, nullptr, nullptr);
 		}
 	}
 }
@@ -171,8 +171,7 @@ static void jackSlave(bool set)
 
 
 
-// In future will be array ExSyncHandler cs_handler[] 
-static struct ExSyncHandler cs_handler = {
+static struct ExSyncHandler s_handler = {
 	&jackAvailable,
 	&jackPlay,
 	&jackPosition,
@@ -181,42 +180,44 @@ static struct ExSyncHandler cs_handler = {
 };
 
 
-
-
 /**
 	Model controled by user interface 
 	using View/Controller in SongEditor
 	(include/SongEditor.h, src/gui/editors/SongEditor.cpp)
  */ 
 
-static struct ExSyncCallbacks *cs_slaveCallBacks = nullptr;
+static struct ExSyncCallbacks *s_slaveCallBacks = nullptr;
 
-static struct ExSyncCallbacks * getSlaveCallbacks() {return cs_slaveCallBacks; }
+static struct ExSyncCallbacks * getSlaveCallbacks() {return s_slaveCallBacks; }
 
-static bool cs_exSyncSlaveOn = false; //!< (Receave)
-static bool cs_exSyncMasterOn = true; //!< (Send)
-static bool cs_exSyncOn = false; //!< (React and Send)
-static unsigned cs_exSyncMode = 0; //!< (for ModeButton state)
+
+/* class ExSyncHook && class ExSyncCtl: private part */
+
+
+static bool s_exSyncSlaveOn = false; //!< (Receave)
+static bool s_exSyncMasterOn = true; //!< (Send)
+static bool s_exSyncOn = false; //!< (React and Send)
+static ExSyncCtl::ExSyncMode s_exSyncMode = ExSyncCtl::Master; //!< (for ModeButton state)
 
 
 static void exSyncMode(bool playing)
 {
-	auto _ = Engine::getSong();
+	auto lSong = Engine::getSong();
 
-	if ((! _->isExporting()) && (exSyncReact()) && (_->isPlaying() != playing)) 
+	if ((! lSong->isExporting()) && s_exSyncOn && (lSong->isPlaying() != playing)) 
 	{
-		if ( _->isStopped() ) { _->playSong(); } else {	_->togglePause(); }
+		if ( lSong->isStopped() ) { lSong->playSong(); } else {	lSong->togglePause(); }
 	}
 }
 
 
 static void exSyncPosition(uint32_t frames)
 {
-	auto _ = Engine::getSong();
+	auto lSong = Engine::getSong();
 
-	if ((! _->isExporting()) && (exSyncReact()) && (_->playMode()  == Song::PlayMode::Song))
+	if ((! lSong->isExporting()) && s_exSyncOn && (lSong->playMode()  == Song::PlayMode::Song))
 	{
-		_->setToTime(TimePos::fromFrames(frames , Engine::framesPerTick()));
+		lSong->setToTime(TimePos::fromFrames(frames , Engine::framesPerTick()));
 	}
 }
 
@@ -229,22 +230,11 @@ static sample_rate_t exSyncSampleRate()
 
 //! Function used by internal code to send messages to LMMS::Song from
 //! external device (in Slave , Duplex modes)
-static struct ExSyncCallbacks cs_exSyncCallbacks = {
+static struct ExSyncCallbacks s_exSyncCallbacks = {
 	&exSyncMode,
 	&exSyncPosition,
 	&exSyncSampleRate
 };
-
-enum {
-	ESM_MASTER = 0, ESM_SLAVE, ESM_DUPLEX, ESM_LAST
-};
-
-
-static const char * cs_exSyncModeStrings[ESM_LAST] = {
-	"Master", "Slave", "Duplex"
-};
-
-
 
 
 /* -----------------------ExSync public ----------------------------- */
@@ -255,14 +245,11 @@ static const char * cs_exSyncModeStrings[ESM_LAST] = {
 
 void syncJackd(jack_client_t* client)
 {
-	cs_syncJackd = client;
+	s_syncJackd = client;
 }
 
 
-
-
 /* NEW target implementation public code here */
-
 
 
 /* Target independent part: */
@@ -270,124 +257,146 @@ void syncJackd(jack_client_t* client)
 
 struct ExSyncHandler * exSyncGetHandler()
 {
-	return &cs_handler;
+	return &s_handler;
 }
 
-static f_cnt_t cs_lastFrame = 0;
-void exSyncStopped()
+
+/* class ExSyncHook: public part */
+
+
+static f_cnt_t s_lastFrame = 0; // Save last frame position to catch change
+void ExSyncHook::pulse()
 {
 	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
 	struct ExSyncHandler *sync = exSyncGetHandler();
-	auto _ = Engine::getSong();
-	f_cnt_t l_frame = 0;
-
-	// Now slaveCallBacks  and sync are local copy - never be changed by other thread ...
-	if (sync && slaveCallBacks && sync->Stopped()) { slaveCallBacks->mode(false); }
-	if (sync &&  _->isStopped())
+	auto lSong = Engine::getSong();
+	f_cnt_t lFrame = 0;
+	if (sync && slaveCallBacks && sync->Stopped()) 
+	{ 
+		slaveCallBacks->mode(false); 
+	}
+	if (sync &&  lSong->isStopped())
 	{
-		l_frame = _->getFrames();
-		if (cs_exSyncMasterOn && cs_exSyncOn && (l_frame != cs_lastFrame) )
+		lFrame = lSong->getFrames();
+		if (s_exSyncMasterOn && s_exSyncOn && (lFrame != s_lastFrame) )
 		{
-			cs_lastFrame = l_frame;
-			exSyncSendPosition();
+			s_lastFrame = lFrame;
+			jump();
 		}
 	}
 }
 
 
-void exSyncSendPosition() 
+void ExSyncHook::jump()
 {
 	struct SongExtendedPos pos;
-	auto _ = Engine::getSong();
-	
-	if ((! _->isExporting()) && cs_exSyncMasterOn && cs_exSyncOn)
+	auto lSong = Engine::getSong();
+	if ((! lSong->isExporting()) && s_exSyncMasterOn && s_exSyncOn)
 	{
-		pos.bar = _->getBars();
-		pos.beat = _->getBeat();
-		pos.tick = _->getBeatTicks();
-		pos.barStartTick = _->getTicks();
-		pos.beatsPerBar = _->getTimeSigModel().numeratorModel().value();
-		pos.beatType = _->getTimeSigModel().denominatorModel().value();
-		pos.ticksPerBeat = _->getPlayPos().ticksPerBeat( _->getTimeSigModel() );
-		pos.tempo = _->getTempo();
-		pos.frame = _->getFrames();
-		
+		pos.bar = lSong->getBars();
+		pos.beat = lSong->getBeat();
+		pos.tick = lSong->getBeatTicks();
+		pos.barStartTick = lSong->getTicks();
+		pos.beatsPerBar = lSong->getTimeSigModel().numeratorModel().value();
+		pos.beatType = lSong->getTimeSigModel().denominatorModel().value();
+		pos.ticksPerBeat = lSong->getPlayPos().ticksPerBeat( lSong->getTimeSigModel() );
+		pos.tempo = lSong->getTempo();
+		pos.frame = lSong->getFrames();
 		ExSyncHandler * sync =  exSyncGetHandler();
 		if (sync) { sync->sendPosition(&pos); }
 	}
 }
 
 
-void exSyncSendPositioniIfMaster()
+void ExSyncHook::start()
 {
-	if( ESM_MASTER == cs_exSyncMode) { exSyncSendPosition(); }
+	struct ExSyncHandler *sync = exSyncGetHandler();
+	if (sync && s_exSyncOn)
+	{
+		sync->sendPlay(true);
+		if( ExSyncCtl::Master == s_exSyncMode) { jump(); }
+	}
 }
 
 
-const char * exSyncToggleMode()
+void ExSyncHook::stop()
+{
+	struct ExSyncHandler *sync = exSyncGetHandler();
+	if (sync && s_exSyncOn)
+	{
+		sync->sendPlay(false);
+		if( ExSyncCtl::Master == s_exSyncMode) { jump(); }
+	}
+}
+
+
+/* class ExSyncCtl: public part */
+
+
+ExSyncCtl::ExSyncMode ExSyncCtl::toggleMode()
 {
 	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( !sync->availableNow() ) 
 	{
-		// If driver is not available nothing to do ... 
-		return cs_exSyncModeStrings[cs_exSyncMode];
+		return s_exSyncMode;
 	}
-	//! Make state change (Master -> Slave -> Duplex -> Master -> ...)
-	cs_exSyncMode += 1; 
-	if (cs_exSyncMode >= ESM_LAST) { cs_exSyncMode = ESM_MASTER; }
-	switch(cs_exSyncMode)
+	// Make state change (Master -> Slave -> Duplex -> Master -> ...)
+	switch(s_exSyncMode)
 	{
-	case ESM_MASTER: // Master
-		cs_exSyncSlaveOn = false;
-		cs_exSyncMasterOn = true;
-		sync->setSlave(false); // ExSync more calls after ExSync.h
-		cs_slaveCallBacks = nullptr;
+	case Duplex: // Duplex -> Master
+		s_exSyncMode = Master;
+		s_exSyncSlaveOn = false;
+		s_exSyncMasterOn = true;
+		sync->setSlave(false);
+		s_slaveCallBacks = nullptr;
 		break;
-	case ESM_SLAVE: // Slave
-		cs_exSyncSlaveOn = true;
-		cs_exSyncMasterOn = false;
-		sync->setSlave(true); // ExSync more calls after ExSync.h
-		cs_slaveCallBacks = &cs_exSyncCallbacks; // in future = getSlaveCallbacks();
+	case Master: // Master -> Slave
+		s_exSyncMode = Slave;
+		s_exSyncSlaveOn = true;
+		s_exSyncMasterOn = false;
+		sync->setSlave(true);
+		s_slaveCallBacks = &s_exSyncCallbacks;
 		break;
-	case ESM_DUPLEX: // Duplex
-		cs_exSyncMasterOn = true;
+	case Slave: // Slave -> Duplex
+		s_exSyncMode = Duplex;
+		s_exSyncSlaveOn = true; // already set, but ... to be simple
+		s_exSyncMasterOn = true;
+		sync->setSlave(true); // already set, but ... to be simple 
+		s_slaveCallBacks = &s_exSyncCallbacks; // already set, but ... to be simple 
+		break;
+	default: // never happens, but our compiler want this
+		s_exSyncMode = Master;
 	}
-	return cs_exSyncModeStrings[cs_exSyncMode];
+	return s_exSyncMode;
 }
 
 
-const char * exSyncGetModeString()
+ExSyncCtl::ExSyncMode ExSyncCtl::getMode()
 {
-	return cs_exSyncModeStrings[cs_exSyncMode];
+	return s_exSyncMode;
 }
 
 
-bool exSyncToggle()
+bool ExSyncCtl::toggleOnOff()
 {
 	ExSyncHandler * sync =  exSyncGetHandler();
 
 	if ( sync->availableNow() )
 	{
-		if (cs_exSyncOn) {	cs_exSyncOn = false; } else { cs_exSyncOn = true; }
+		if (s_exSyncOn) {	s_exSyncOn = false; } else { s_exSyncOn = true; }
 	} else {
-		cs_exSyncOn = false;
+		s_exSyncOn = false;
 	}
-	return cs_exSyncOn;
+	return s_exSyncOn;
 }
 
 
-bool exSyncReact() { return cs_exSyncOn; }
-
-
-bool exSyncAvailable()
+bool ExSyncCtl::have()
 {
 	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( sync->availableNow() ) { return true; }
 	return false;
 }
-
-
-bool exSyncMasterAndSync() { return cs_exSyncMasterOn && cs_exSyncOn; }
 
 
 } // namespace lmms 
