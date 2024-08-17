@@ -56,7 +56,7 @@ constexpr auto DefaultWindowSize = QSize{400, 256};
 class PluginPinConnectorView::MatrixView : public QWidget
 {
 public:
-	MatrixView(PluginPinConnectorView* view, const PluginPinConnector::Matrix& matrix);
+	MatrixView(PluginPinConnectorView* view, const PluginPinConnector::Matrix& matrix, bool isIn);
 	~MatrixView() override = default;
 	auto sizeHint() const -> QSize override;
 	auto minimumSizeHint() const -> QSize override;
@@ -84,8 +84,8 @@ private:
 PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidget* parent)
 	: QWidget{parent}
 	, ModelView{model, this}
-	, m_inView{new MatrixView{this, model->in()}}
-	, m_outView{new MatrixView{this, model->out()}}
+	, m_inView{new MatrixView{this, model->in(), true}}
+	, m_outView{new MatrixView{this, model->out(), false}}
 {
 	connect(model, &PluginPinConnector::propertiesChanged, this, &PluginPinConnectorView::updateGeometry);
 
@@ -104,8 +104,8 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidge
 
 	auto getSpacerWidth = [&]() {
 		const bool singleMatrix = model->trackChannelsUsed() == 0
-			|| model->in().channelCount() == 0
-			|| model->out().channelCount() == 0;
+			|| model->in().channelCount == 0
+			|| model->out().channelCount == 0;
 		
 		return singleMatrix	? 0 : CenterMargin.width();
 	};
@@ -139,7 +139,7 @@ auto PluginPinConnectorView::sizeHint() const -> QSize
 	const auto inSize = m_inView->size();
 	const auto outSize = m_outView->size();
 
-	const auto centerMargin = (inSize.isEmpty() || outSize.isEmpty()) ? QSize{} : CenterMargin;
+	const auto centerMargin = (inSize.isEmpty() || outSize.isEmpty()) ? QSize{0, 0} : CenterMargin;
 
 	return WindowMarginTotal + centerMargin + inSize + outSize;
 }
@@ -202,13 +202,13 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	int yPos = inMatrixRect.y();
 	for (unsigned idx = 0; idx < model->trackChannelsUsed(); ++idx)
 	{
-		if (model->in().channelCount() != 0)
+		if (model->in().channelCount != 0)
 		{
 			p.drawText(xwIn.first, yPos, xwIn.second, textSize.height(), Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
 		}
 
-		if (model->out().channelCount() != 0)
+		if (model->out().channelCount != 0)
 		{
 			p.drawText(xwOut.first, yPos, xwOut.second, textSize.height(), Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
@@ -222,7 +222,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	// Draw plugin channel text (in)
 	yPos = inMatrixRect.top() - 4;
 	int xPos = inMatrixRect.x() + 2;
-	for (int idx = 0; idx < model->in().channelCount(); ++idx)
+	for (int idx = 0; idx < model->in().channelCount; ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
@@ -235,7 +235,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 
 	// Draw plugin channel text (out)
 	xPos = outMatrixRect.x() + 2;
-	for (int idx = 0; idx < model->out().channelCount(); ++idx)
+	for (int idx = 0; idx < model->out().channelCount; ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
@@ -263,13 +263,19 @@ void PluginPinConnectorView::updateGeometry()
 //////////////////////////////////////////////
 
 PluginPinConnectorView::MatrixView::MatrixView(PluginPinConnectorView* view,
-	const PluginPinConnector::Matrix& matrix)
+	const PluginPinConnector::Matrix& matrix, bool isIn)
 	: QWidget{nullptr}
 	, m_model{view->castModel<PluginPinConnector>()}
 	, m_matrix{&matrix}
 {
 	assert(m_model != nullptr);
 	connect(m_model, &PluginPinConnector::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
+
+	const Model* parentModel = m_model->parentModel();
+	assert(parentModel != nullptr);
+
+	const char* formatText = isIn ? "LMMS to %1 input(s)" : "%1 output(s) to LMMS";
+	setToolTip(QString{formatText}.arg(parentModel->fullDisplayName()));
 
 	updateSize();
 }
@@ -290,7 +296,7 @@ void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 	p.fillRect(rect(), p.background());
 
-	const auto& pins = m_matrix->pinMap();
+	const auto& pins = m_matrix->pins;
 	if (pins.empty() || pins[0].empty()) { return; }
 	if (m_model->trackChannelsUsed() == 0) { return; }
 
@@ -350,7 +356,7 @@ void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
 		return;
 	}
 
-	BoolModel* model = m_matrix->pinMap().at(yIdx).at(xIdx);
+	BoolModel* model = m_matrix->pins.at(yIdx).at(xIdx);
 
 	if (me->modifiers() & Qt::ControlModifier)
 	{
@@ -391,10 +397,10 @@ auto PluginPinConnectorView::MatrixView::cellSize() const -> QSize
 auto PluginPinConnectorView::MatrixView::calculateSize() const -> QSize
 {
 	const auto tcc = static_cast<int>(m_model->trackChannelsUsed());
-	if (tcc == 0) { return QSize{}; }
+	if (tcc == 0) { return QSize{0, 0}; }
 
-	const int pcc = m_matrix->channelCount();
-	if (pcc == 0) { return QSize{}; }
+	const int pcc = m_matrix->channelCount;
+	if (pcc == 0) { return QSize{0, 0}; }
 
 	const int pcSize = pcc * (m_buttonOn.width() + s_gridMargin) - s_gridMargin;
 	const int tcSize = tcc * (m_buttonOn.height() + s_gridMargin) - s_gridMargin;

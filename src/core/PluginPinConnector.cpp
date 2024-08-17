@@ -64,9 +64,9 @@ auto PluginPinConnector::Matrix::channelName(int channel) const -> QString
 {
 	// Custom name (if supported)
 	assert(channel >= 0);
-	if (channel < static_cast<int>(m_channelNames.size()))
+	if (channel < static_cast<int>(channelNames.size()))
 	{
-		return m_channelNames[channel];
+		return channelNames[channel];
 	}
 
 	// A-Z
@@ -110,13 +110,13 @@ void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 		throw std::invalid_argument{"At least one port count must be non-zero"};
 	}
 
-	if (in().channelCount() == inCount && out().channelCount() == outCount)
+	if (in().channelCount == inCount && out().channelCount == outCount)
 	{
 		// No action needed
 		return;
 	}
 
-	const bool initialSetup = in().channelCount() == 0 && out().channelCount() == 0;
+	const bool initialSetup = in().channelCount == 0 && out().channelCount == 0;
 
 	setChannelCount(inCount, m_in);
 	setChannelCount(outCount, m_out);
@@ -131,12 +131,12 @@ void PluginPinConnector::setChannelCounts(int inCount, int outCount)
 
 void PluginPinConnector::setChannelCountIn(int inCount)
 {
-	setChannelCounts(inCount, out().channelCount());
+	setChannelCounts(inCount, out().channelCount);
 }
 
 void PluginPinConnector::setChannelCountOut(int outCount)
 {
-	setChannelCounts(in().channelCount(), outCount);
+	setChannelCounts(in().channelCount, outCount);
 }
 
 void PluginPinConnector::setDefaultConnections()
@@ -147,16 +147,16 @@ void PluginPinConnector::setDefaultConnections()
 	assert(m_trackChannelsUsed >= 2);
 
 	auto setConnections = [](Matrix& matrix) {
-		switch (matrix.channelCount())
+		switch (matrix.channelCount)
 		{
 			case 0: break;
 			case 1:
-				matrix.m_pinMap[0][0]->setValue(true);
-				matrix.m_pinMap[1][0]->setValue(true);
+				matrix.pins[0][0]->setValue(true);
+				matrix.pins[1][0]->setValue(true);
 				break;
 			default: // >= 2
-				matrix.m_pinMap[0][0]->setValue(true);
-				matrix.m_pinMap[1][1]->setValue(true);
+				matrix.pins[0][0]->setValue(true);
+				matrix.pins[1][1]->setValue(true);
 				break;
 		}
 	};
@@ -312,8 +312,8 @@ void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 		pins.setAttribute("tc_used", m_trackChannelsUsed);
 	}
 
-	pins.setAttribute("num_in", in().channelCount());
-	pins.setAttribute("num_out", out().channelCount());
+	pins.setAttribute("num_in", in().channelCount);
+	pins.setAttribute("num_out", out().channelCount);
 
 	auto pinsIn = doc.createElement("in_matrix");
 	pins.appendChild(pinsIn);
@@ -345,9 +345,9 @@ void PluginPinConnector::loadSettings(const QDomElement& elem)
 void PluginPinConnector::saveSettings(const Matrix& matrix, QDomDocument& doc, QDomElement& elem)
 {
 	// Only saves connections that are actually used, otherwise could bloat project file
-	for (std::size_t trackChannel = 0; trackChannel < matrix.pinMap().size(); ++trackChannel)
+	for (std::size_t trackChannel = 0; trackChannel < matrix.pins.size(); ++trackChannel)
 	{
-		auto& trackChannels = matrix.pinMap()[trackChannel];
+		auto& trackChannels = matrix.pins[trackChannel];
 		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
 		{
 			if (trackChannels[pluginChannel]->value() || trackChannels[pluginChannel]->isAutomatedOrControlled())
@@ -361,10 +361,9 @@ void PluginPinConnector::saveSettings(const Matrix& matrix, QDomDocument& doc, Q
 
 void PluginPinConnector::loadSettings(const QDomElement& elem, Matrix& matrix)
 {
-	auto& pins = matrix.m_pinMap;
-	const auto trackChannelCount = static_cast<int>(pins.size());
-	const auto pluginChannelCount = trackChannelCount > 0 ? static_cast<int>(pins[0].size()) : 0;
-	assert(pluginChannelCount == matrix.channelCount());
+	const auto trackChannelCount = static_cast<int>(matrix.pins.size());
+	const auto pluginChannelCount = trackChannelCount > 0 ? static_cast<int>(matrix.pins[0].size()) : 0;
+	assert(pluginChannelCount == matrix.channelCount);
 
 	std::vector<std::vector<bool>> connectionsToLoad;
 	connectionsToLoad.resize(trackChannelCount);
@@ -411,9 +410,9 @@ void PluginPinConnector::loadSettings(const QDomElement& elem, Matrix& matrix)
 	}
 
 	// Lastly, load the connections
-	for (std::size_t trackChannel = 0; trackChannel < pins.size(); ++trackChannel)
+	for (std::size_t trackChannel = 0; trackChannel < matrix.pins.size(); ++trackChannel)
 	{
-		auto& trackChannels = pins[trackChannel];
+		auto& trackChannels = matrix.pins[trackChannel];
 		auto& trackChannelsToLoad = connectionsToLoad[trackChannel];
 		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
 		{
@@ -454,30 +453,30 @@ void PluginPinConnector::setChannelCount(int newCount, Matrix& matrix)
 {
 	auto parent = dynamic_cast<Model*>(this->parent());
 	assert(parent != nullptr);
-	if (matrix.channelCount() < newCount)
+	if (matrix.channelCount < newCount)
 	{
-		for (auto& pluginChannels : matrix.m_pinMap)
+		for (auto& pluginChannels : matrix.pins)
 		{
 			pluginChannels.reserve(newCount);
-			for (int idx = matrix.channelCount(); idx < newCount; ++idx)
+			for (int idx = matrix.channelCount; idx < newCount; ++idx)
 			{
 				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parent});
 				connect(model, &BoolModel::dataChanged, this, &PluginPinConnector::dataChanged);
 			}
 		}
 	}
-	else if (matrix.channelCount() > newCount)
+	else if (matrix.channelCount > newCount)
 	{
-		for (auto& pluginChannels : matrix.m_pinMap)
+		for (auto& pluginChannels : matrix.pins)
 		{
-			for (int idx = newCount; idx < matrix.channelCount(); ++idx)
+			for (int idx = newCount; idx < matrix.channelCount; ++idx)
 			{
 				delete pluginChannels[idx];
 			}
 			pluginChannels.erase(pluginChannels.begin() + newCount, pluginChannels.end());
 		}
 	}
-	matrix.m_channelCount = newCount;
+	matrix.channelCount = newCount;
 };
 
 auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorView*
@@ -487,13 +486,13 @@ auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConne
 
 auto PluginPinConnector::getChannelCountText() const -> QString
 {
-	const auto inText = in().channelCount() > static_cast<int>(s_totalTrackChannels)
-		? QString{"%1/%2"}.arg(s_totalTrackChannels).arg(in().channelCount())
-		: QString{"%1"}.arg(in().channelCount());
+	const auto inText = in().channelCount > static_cast<int>(s_totalTrackChannels)
+		? QString{"%1/%2"}.arg(s_totalTrackChannels).arg(in().channelCount)
+		: QString{"%1"}.arg(in().channelCount);
 
-	const auto outText = out().channelCount() > static_cast<int>(s_totalTrackChannels)
-		? QString{"%1/%2"}.arg(s_totalTrackChannels).arg(out().channelCount())
-		: QString{"%1"}.arg(out().channelCount());
+	const auto outText = out().channelCount > static_cast<int>(s_totalTrackChannels)
+		? QString{"%1/%2"}.arg(s_totalTrackChannels).arg(out().channelCount)
+		: QString{"%1"}.arg(out().channelCount);
 
 	return QString{tr("%1 in %2 out")}.arg(inText).arg(outText);
 }
@@ -503,8 +502,8 @@ void PluginPinConnector::updateTrackChannels(int count)
 	if (count < 2) { throw std::invalid_argument{"There must be at least 2 track channels"}; }
 	if (count % 2 != 0) { throw std::invalid_argument{"There must be an even number of track channels"}; }
 
-	if (static_cast<int>(in().pinMap().size()) == count
-		&& static_cast<int>(out().pinMap().size()) == count)
+	if (static_cast<int>(in().pins.size()) == count
+		&& static_cast<int>(out().pins.size()) == count)
 	{
 		return;
 	}
@@ -542,8 +541,8 @@ void PluginPinConnector::updateTrackChannels(int count)
 		}
 	};
 
-	updateModels(in().channelCount(), m_in.m_pinMap);
-	updateModels(out().channelCount(), m_out.m_pinMap);
+	updateModels(in().channelCount, m_in.pins);
+	updateModels(out().channelCount, m_out.pins);
 
 	emit propertiesChanged();
 }
@@ -551,11 +550,6 @@ void PluginPinConnector::updateTrackChannels(int count)
 void PluginPinConnector::updateConnectionLabels()
 {
 
-}
-
-void PluginPinConnector::updateOptions()
-{
-	//throw std::runtime_error{"Not implemented yet"};
 }
 
 } // namespace lmms

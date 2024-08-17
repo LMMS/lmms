@@ -56,24 +56,21 @@ public:
 	//! [LMMS track channel][plugin channel]
 	using PinMap = std::vector<std::vector<BoolModel*>>;
 
-	class Matrix
+	struct Matrix
 	{
-	public:
-		friend class PluginPinConnector;
+		explicit Matrix(bool isIn) : in{isIn} {}
 
-		auto pinMap() const -> const PinMap& { return m_pinMap; }
-		auto channelCount() const -> int { return m_channelCount; }
 		auto channelName(int channel) const -> QString;
 
 		auto enabled(std::uint8_t trackChannel, unsigned pluginChannel) const -> bool
 		{
-			return m_pinMap[trackChannel][pluginChannel]->value();
+			return pins[trackChannel][pluginChannel]->value();
 		}
 
-	private:
-		PinMap m_pinMap;
-		int m_channelCount = 0;
-		std::vector<QString> m_channelNames; //!< optional
+		PinMap pins;
+		int channelCount = 0;
+		std::vector<QString> channelNames; //!< optional
+		bool in; //!< true: LMMS-to-plugin; false: plugin-to-LMMS
 
 		// TODO: Channel groupings, port configurations, ...
 	};
@@ -141,15 +138,13 @@ public slots:
 	void updateConnectionLabels();
 
 private:
-	void updateOptions();
-
 	static void saveSettings(const Matrix& matrix, QDomDocument& doc, QDomElement& elem);
 	static void loadSettings(const QDomElement& elem, Matrix& matrix);
 
 	void setChannelCount(int newCount, Matrix& matrix);
 
-	Matrix m_in;  //!< LMMS --> Plugin
-	Matrix m_out; //!< Plugin --> LMMS
+	Matrix m_in{true};   //!< LMMS --> Plugin
+	Matrix m_out{false}; //!< Plugin --> LMMS
 
 	//! TODO: Move this somewhere else; Will be >= 2 once there is support for adding new track channels
 	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
