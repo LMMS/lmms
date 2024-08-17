@@ -58,6 +58,7 @@ public:
 	auto minimumSizeHint() const -> QSize override;
 
 	void toggleVisibility();
+	void closeWindow();
 
 protected:
 	void paintEvent(QPaintEvent* pe) override;

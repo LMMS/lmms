@@ -172,6 +172,12 @@ void PluginPinConnectorView::toggleVisibility()
 	}
 }
 
+void PluginPinConnectorView::closeWindow()
+{
+	m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+	m_subWindow->close();
+}
+
 void PluginPinConnectorView::paintEvent(QPaintEvent*)
 {
 	auto p = QPainter{this};

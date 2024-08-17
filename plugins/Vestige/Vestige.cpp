@@ -1152,6 +1152,13 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 		m_vi->m_scrollArea = nullptr;
 	}
 
+	if (m_pinConnector != nullptr)
+	{
+		m_pinConnector->closeWindow();
+		delete m_pinConnector;
+		m_pinConnector = nullptr;
+	}
+
 	if ( m_vi->m_subWindow != nullptr ) {
 		m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 		m_vi->m_subWindow->close();
