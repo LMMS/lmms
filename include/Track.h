@@ -107,11 +107,12 @@ public:
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
 	virtual Clip * createClip( const TimePos & pos ) = 0;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & doc,
-						QDomElement & parent ) = 0;
+	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
 
+	void saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode);
+	void loadTrack(const QDomElement& element, bool presetMode);
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
@@ -203,12 +204,6 @@ public slots:
 	}
 
 	void toggleSolo();
-
-protected:
-	bool isPresetMode() const { return m_presetMode; }
-
-protected:
-	bool m_presetMode = false;
 
 private:
 	TrackContainer* m_trackContainer;

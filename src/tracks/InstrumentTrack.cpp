@@ -821,7 +821,7 @@ gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement & thisElement )
+void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& thisElement, bool presetMode)
 {
 	m_volumeModel.saveSettings( doc, thisElement, "vol" );
 	m_panningModel.saveSettings( doc, thisElement, "pan" );
@@ -869,7 +869,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 		autoAssignMidiDevice(false);
 
 		// Only save the MIDI port information if we are not saving a preset.
-		if (!isPresetMode())
+		if (!presetMode)
 		{
 			m_midiPort.saveState(doc, thisElement);
 		}
@@ -994,46 +994,14 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	unlock();
 }
 
-/**
- * @brief RAII "guard" used to safely change and reset booleans even during exceptions
- * 
- * Needed to safely reset m_presetMode in savePreset and loadPreset. For this reason
- * only defined locally because at least the pattern used by these methods should not
- * spread outside.
- */
-class BoolGuard
-{
-public:
-	BoolGuard(bool& member, bool temporaryValue) :
-	m_member(member),
-	m_oldValue(member)
-	{
-		m_member = temporaryValue;
-	}
-
-	~BoolGuard()
-	{
-		m_member = m_oldValue;
-	}
-
-	BoolGuard(const BoolGuard&) = delete;
-    BoolGuard& operator=(const BoolGuard&) = delete;
-
-private:
-	bool & m_member;
-	bool const m_oldValue;
-};
-
 void InstrumentTrack::savePreset(QDomDocument & doc, QDomElement & element)
 {
-	BoolGuard guard(m_presetMode, true);
-	saveSettings(doc, element);
+	saveTrack(doc, element, true);
 }
 
 void InstrumentTrack::loadPreset(const QDomElement & element)
 {
-	BoolGuard guard(m_presetMode, true);
-	loadSettings(element);
+	loadTrack(element, true);
 }
 
 
