@@ -110,9 +110,11 @@ public:
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
+	// Saving and loading of presets which do not necessarily contain all the track information
+	void savePreset(QDomDocument & doc, QDomElement & element);
+	void loadPreset(const QDomElement & element);
 
-	void saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode);
-	void loadTrack(const QDomElement& element, bool presetMode);
+	// Saving and loading of full tracks
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
@@ -204,6 +206,10 @@ public slots:
 	}
 
 	void toggleSolo();
+
+private:
+	void saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode);
+	void loadTrack(const QDomElement& element, bool presetMode);
 
 private:
 	TrackContainer* m_trackContainer;

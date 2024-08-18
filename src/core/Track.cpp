@@ -309,13 +309,25 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 	}
 }
 
+void Track::savePreset(QDomDocument & doc, QDomElement & element)
+{
+	saveTrack(doc, element, true);
+}
+
+void Track::loadPreset(const QDomElement & element)
+{
+	loadTrack(element, true);
+}
+
 void Track::saveSettings(QDomDocument& doc, QDomElement& element)
 {
+	// Assume that everything should be saved if we are called through SerializingObject::saveSettings
 	saveTrack(doc, element, false);
 }
 
 void Track::loadSettings(const QDomElement& element)
 {
+	// Assume that everything should be loaded if we are called through SerializingObject::loadSettings 
 	loadTrack(element, false);
 }
 

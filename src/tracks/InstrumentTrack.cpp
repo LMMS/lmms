@@ -994,15 +994,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	unlock();
 }
 
-void InstrumentTrack::savePreset(QDomDocument & doc, QDomElement & element)
-{
-	saveTrack(doc, element, true);
-}
 
-void InstrumentTrack::loadPreset(const QDomElement & element)
-{
-	loadTrack(element, true);
-}
 
 
 void InstrumentTrack::setPreviewMode( const bool value )
