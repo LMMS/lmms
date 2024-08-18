@@ -28,16 +28,18 @@
 
 #include "ModelView.h"
 #include "AutomatableModel.h"
-#include "AutomationTrack.h"
-#include "AutomationClip.h"
-#include "SongEditor.h"
-#include "Song.h"
+
 
 class QMenu;
 class QMouseEvent;
-class Song;
 
-namespace lmms::gui
+namespace lmms
+{
+
+class AutomationClip;
+class AutomationTrack;
+
+namespace gui
 {
 
 class LMMS_EXPORT AutomatableModelView : public ModelView
@@ -158,6 +160,8 @@ using FloatModelView = TypedModelView<FloatModel>;
 using IntModelView = TypedModelView<IntModel>;
 using BoolModelView = TypedModelView<BoolModel>;
 
-} // namespace lmms::gui
+} // namespace gui
+
+} // namespace lmms
 
 #endif // LMMS_GUI_AUTOMATABLE_MODEL_VIEW_H

@@ -29,16 +29,21 @@
 #include <QMouseEvent>
 
 #include "AutomatableModelView.h"
+
 #include "AutomationClip.h"
 #include "AutomationNode.h"
+#include "AutomationTrack.h"
+#include "Clipboard.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
-#include "Clipboard.h"
-#include "Engine.h"
+#include "Song.h"
+#include "SongEditor.h"
+
 
 #include "AutomationEditor.h"
 
@@ -295,7 +300,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 	timePos -= clip->startPosition();
 
 	// adding model value
-	clip->recordValue(timePos, m_amv->modelUntyped()->getTypelessValue());
+	clip->recordValue(timePos, m_amv->modelUntyped()->getAutomatedRawValue());
 }
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
@@ -312,7 +317,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 		newClip->setProgressionType(clip->progressionType());
 		timePos -= newClip->startPosition();
 
-		newClip->recordValue(timePos, m_amv->modelUntyped()->getTypelessValue());
+		newClip->recordValue(timePos, m_amv->modelUntyped()->getAutomatedRawValue());
 	}
 	else
 	{
@@ -334,7 +339,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	if (nodeClip)
 	{
 		// modifying its value
-		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getTypelessValue());
+		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getAutomatedRawValue());
 	}
 }
 
