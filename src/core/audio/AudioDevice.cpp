@@ -67,13 +67,12 @@ void AudioDevice::processNextBuffer()
 fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 {
 	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->nextBuffer();
+	const SampleFrame* b = audioEngine()->renderNextBuffer();
 
 	if (!b) { return 0; }
 
 	memcpy(_ab, b, frames * sizeof(SampleFrame));
 
-	if (audioEngine()->hasFifoWriter()) { delete[] b; }
 	return frames;
 }
 
@@ -82,13 +81,6 @@ fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 
 void AudioDevice::stopProcessing()
 {
-	if( audioEngine()->hasFifoWriter() )
-	{
-		while( m_inProcess )
-		{
-			processNextBuffer();
-		}
-	}
 }
 
 
