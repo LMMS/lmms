@@ -346,20 +346,21 @@ void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
 
 	const int buttonW = m_buttonOn.width();
 	const int buttonH = m_buttonOn.height();
+	const auto cellSize = this->cellSize();
 
 	const auto relMousePos = me->pos();
-	const int xIdx = relMousePos.x() / (buttonW + s_gridMargin);
-	const int yIdx = relMousePos.y() / (buttonH + s_gridMargin);
+	const int xIdx = relMousePos.x() / cellSize.width();
+	const int yIdx = relMousePos.y() / cellSize.height();
 
 	// Check if within margin
-	int relPos = relMousePos.x() - xIdx * buttonW;
+	int relPos = relMousePos.x() - xIdx * cellSize.width();
 	if (relPos >= buttonW || relPos <= 0)
 	{
 		me->ignore();
 		return;
 	}
 
-	relPos = relMousePos.y() - yIdx * buttonH;
+	relPos = relMousePos.y() - yIdx * cellSize.height();
 	if (relPos >= buttonH || relPos <= 0)
 	{
 		me->ignore();
