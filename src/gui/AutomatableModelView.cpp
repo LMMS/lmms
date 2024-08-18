@@ -295,12 +295,9 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
 	// account for the node's relative position inside clip
 	timePos -= clip->startPosition();
-	bool autoResize = clip->getAutoResize();
 
-	clip->setAutoResize(true);
 	// adding model value
 	clip->recordValue(timePos, m_amv->modelUntyped()->getTypelessValue());
-	clip->setAutoResize(autoResize);
 }
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
@@ -317,11 +314,8 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 		// copying the progressionType of the clip before
 		newClip->setProgressionType(clip->progressionType());
 		timePos -= newClip->startPosition();
-		bool autoResize = newClip->getAutoResize();
 
-		newClip->setAutoResize(true);
 		newClip->recordValue(timePos, m_amv->modelUntyped()->getTypelessValue());
-		newClip->setAutoResize(autoResize);
 	}
 	else
 	{
