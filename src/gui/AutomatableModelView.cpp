@@ -285,7 +285,7 @@ void AutomatableModelViewSlots::removeConnection()
 void AutomatableModelViewSlots::addSongAutomationNode()
 {
 	// selecting the track with the most clips connected to this model
-	AutomationTrack* track = getCurrentAutomationTrackFromClips(true);
+	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
 	// getting the clip before the current song time position
 	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
 
@@ -300,7 +300,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 {
-	AutomationTrack* track = getCurrentAutomationTrackFromClips(true);
+	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
 	AutomationClip* clip = getCurrentAutomationClip(track, false, false);
 
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
@@ -323,7 +323,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 {
 	// getting the track without adding a new one if no track was found
-	AutomationTrack* track = getCurrentAutomationTrackFromClips(false);
+	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
 	if (!track) { return; }
@@ -341,7 +341,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 {
 	// getting the track without adding a new one if no track was found
-	AutomationTrack* track = getCurrentAutomationTrackFromClips(false);
+	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
@@ -410,6 +410,7 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 	{
 		// adding new track
 		output = new AutomationTrack(getGUI()->songEditor()->m_editor->model(), false);
+		output->setName(m_amv->modelUntyped()->displayName() + " " + tr("track"));
 	}
 	return output;
 }
@@ -522,7 +523,7 @@ AutomationClip* AutomatableModelViewSlots::makeNewClip(AutomationTrack* track, T
 	return output;
 }
 
-AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrackFromClips(bool canAddNewTrack)
+AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrackForModel(bool canAddNewTrack)
 {
 	// getting all the clips that have this model
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
