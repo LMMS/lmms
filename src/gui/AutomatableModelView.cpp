@@ -284,10 +284,8 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::addSongAutomationNode()
 {
-	// getting all the clips that have this model
-	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
 	// selecting the track with the most clips connected to this model
-	AutomationTrack* track = getCurrentAutomationTrack(&clips, true);
+	AutomationTrack* track = getCurrentAutomationTrackFromClips(true);
 	// getting the clip before the current song time position
 	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
 
@@ -302,8 +300,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 {
-	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
-	AutomationTrack* track = getCurrentAutomationTrack(&clips, true);
+	AutomationTrack* track = getCurrentAutomationTrackFromClips(true);
 	AutomationClip* clip = getCurrentAutomationClip(track, false, false);
 
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
@@ -325,9 +322,8 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 
 void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 {
-	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
 	// getting the track without adding a new one if no track was found
-	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
+	AutomationTrack* track = getCurrentAutomationTrackFromClips(false);
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
 	if (!track) { return; }
@@ -344,9 +340,8 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 
 void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 {
-	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
 	// getting the track without adding a new one if no track was found
-	AutomationTrack* track = getCurrentAutomationTrack(&clips, false);
+	AutomationTrack* track = getCurrentAutomationTrackFromClips(false);
 
 	// this needs to be checked because getCurrentAutomationTrack might give
 	// a nullptr if it can not find and add a track
@@ -525,6 +520,14 @@ AutomationClip* AutomatableModelViewSlots::makeNewClip(AutomationTrack* track, T
 	// connect to model
 	output->addObject(m_amv->modelUntyped(), true);
 	return output;
+}
+
+AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrackFromClips(bool canAddNewTrack)
+{
+	// getting all the clips that have this model
+	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
+	// getting the track that has the most clips connected to this model
+	return getCurrentAutomationTrack(&clips, canAddNewTrack);
 }
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
