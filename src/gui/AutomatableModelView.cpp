@@ -22,6 +22,9 @@
  *
  */
 
+#include <list>
+#include <utility>
+
 #include <QMenu>
 #include <QMouseEvent>
 
@@ -375,27 +378,46 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 	{
 		// selecting the track with the most amount of clips
 		// connected to this model
-		AutomationTrack* maxTrack = dynamic_cast<AutomationTrack*>((*clips)[0]->getTrack());
-		int maxTrackCount = 1;
-		for (size_t i = 1; i < clips->size(); i++)
+
+		// track*, how many clips are on that track (that are connected to this model)
+		std::list<std::pair<AutomationTrack*, size_t>> trackList;
+		for (size_t i = 0; i < clips->size(); i++)
 		{
-			int currentCount = 0;
-			for (AutomationClip* j : (*clips))
+			bool found = false;
+			// search this track inside the existing tracks
+			for (std::pair<AutomationTrack*, size_t>& j : trackList)
 			{
-				if ((*clips)[i]->getTrack() == j->getTrack())
+				// if the track already is in trackList
+				if (j.first == (*clips)[i]->getTrack())
 				{
-					currentCount++;
+					found = true;
+					j.second++;
+					break;
 				}
 			}
-			if (maxTrackCount < currentCount)
+			if (!found)
 			{
-				maxTrackCount = currentCount;
-				maxTrack = dynamic_cast<AutomationTrack*>((*clips)[i]->getTrack());;
+				trackList.push_back(std::make_pair(dynamic_cast<AutomationTrack*>((*clips)[i]->getTrack()), 1));
 			}
 		}
-		output = maxTrack;
+
+		size_t matchedModelCount = 0;
+		AutomationTrack* matchedTrack = nullptr;
+		// find a track where all clips are all connected to this model
+		for (std::pair<AutomationTrack*, size_t>& j : trackList)
+		{
+			// if all clips on that track are connected to this model
+			bool isOnlyThatModel = static_cast<size_t>(j.first->numOfClips()) == j.second;
+			if (matchedModelCount < j.second && isOnlyThatModel)
+			{
+				matchedTrack = j.first;
+				matchedModelCount = j.second;
+			}
+		}
+
+		output = matchedTrack;
 	}
-	else if (canAddNewTrack)
+	if (canAddNewTrack && output == nullptr)
 	{
 		// adding new track
 		output = new AutomationTrack(getGUI()->songEditor()->m_editor->model(), false);
