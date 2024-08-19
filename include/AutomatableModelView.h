@@ -113,6 +113,12 @@ public slots:
 	void removeSongGlobalAutomation();
 
 private:
+	struct AutomationNodeAtTimePos
+	{
+		TimePos m_position;
+		AutomationClip* m_clip;
+	};
+
 	// gets the automationTrack with the most amount of clips connected to it
 	// if this track doesn't exists and "canAddNewTrack" is true, then add a new one else return nullptr
 	// "clips" = clips that are connected to this model
@@ -123,7 +129,7 @@ private:
 	// gets the automationNode closest to the song time position (playback pos)
 	// "clipOut" is the clip that has the node
 	// can return nullptr on "clipOut"
-	const TimePos getNearestAutomationNode(AutomationTrack* track, AutomationClip** clipOut);
+	const AutomationNodeAtTimePos getNearestAutomationNode(AutomationTrack* track);
 	// makes new clip and connects it to this model
 	AutomationClip* makeNewClip(AutomationTrack* track, TimePos position, bool canSnap);
 	AutomationTrack* getCurrentAutomationTrackForModel(bool canAddNewTrack);

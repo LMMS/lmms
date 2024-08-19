@@ -334,12 +334,11 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	if (!track) { return; }
 
 	// getting nearest node position
-	AutomationClip* nodeClip = nullptr;
-	TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
-	if (nodeClip)
+	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
+	if (nodeClip.m_clip)
 	{
 		// modifying its value
-		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getRawValueOrControllerValue());
+		nodeClip.m_clip->recordValue(nodeClip.m_position, m_amv->modelUntyped()->getRawValueOrControllerValue());
 	}
 }
 
@@ -352,15 +351,15 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 	// a nullptr if it can not find and add a track
 	if (!track) { return; }
 
-	AutomationClip* nodeClip = nullptr;
-	TimePos nodePos = getNearestAutomationNode(track, &nodeClip);
-	if (nodeClip)
+	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
+	if (nodeClip.m_clip)
 	{
-		nodeClip->removeNode(nodePos);
+		nodeClip.m_clip->removeNode(nodeClip.m_position);
 		// if there is no node left, the automationClip will be deleted
-		if (nodeClip->hasAutomation() == false)
+		if (nodeClip.m_clip->hasAutomation() == false)
 		{
-			delete nodeClip;
+			// this is safe because clips remove themself from tracks
+			delete nodeClip.m_clip;
 		}
 	}
 }
@@ -471,10 +470,10 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 	return output;
 }
 
-const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrack* track, AutomationClip** clipOut)
+const AutomatableModelViewSlots::AutomationNodeAtTimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrack* track)
 {
-	TimePos output;
-	AutomationClip* minClip = nullptr;
+	AutomationNodeAtTimePos output;
+	output.m_clip = nullptr;
 	int minDistance = -1;
 
 	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
@@ -492,8 +491,8 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 			if (curDistance < minDistance || minDistance < 0)
 			{
 				minDistance = curDistance;
-				output = TimePos(POS(it));
-				minClip = clipBefore;
+				output.m_position = TimePos(POS(it));
+				output.m_clip = clipBefore;
 			}
 		}
 	}
@@ -505,12 +504,10 @@ const TimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrac
 		if (curDistance < minDistance || minDistance < 0)
 		{
 			minDistance = curDistance;
-			output = TimePos(POS(clipAfter->getTimeMap().begin()));
-			minClip = clipAfter;
+			output.m_position = TimePos(POS(clipAfter->getTimeMap().begin()));
+			output.m_clip = clipAfter;
 		}
 	}
-
-	*clipOut = minClip;
 
 	return output;
 }
