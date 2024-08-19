@@ -295,7 +295,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
 
 	// getting global song time
-	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+	TimePos timePos = getCurrentPlayingPosition();
 	// account for the node's relative position inside clip
 	timePos -= clip->startPosition();
 
@@ -308,7 +308,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
 	AutomationClip* clip = getCurrentAutomationClip(track, false, false);
 
-	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+	TimePos timePos = getCurrentPlayingPosition();
 
 	if (clip && clip->endPosition().getTicks() < timePos.getTicks())
 	{
@@ -423,7 +423,7 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 {
 	AutomationClip* output = nullptr;
 	const std::vector<Clip*>& trackClips = track->getClips();
-	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+	TimePos timePos = getCurrentPlayingPosition();
 	
 	bool tryAdding = false;
 	if (trackClips.size() > 0)
@@ -476,7 +476,7 @@ const AutomatableModelViewSlots::AutomationNodeAtTimePos AutomatableModelViewSlo
 	output.m_clip = nullptr;
 	int minDistance = -1;
 
-	TimePos timePos = static_cast<TimePos>(Engine::getSong()->getPlayPos());
+	TimePos timePos = getCurrentPlayingPosition();
 	// getting the clips before and after the global time position
 	AutomationClip* clipBefore = getCurrentAutomationClip(track, false, false);
 	AutomationClip* clipAfter = getCurrentAutomationClip(track, false, true);
@@ -531,6 +531,11 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrackForModel(bo
 	std::vector<AutomationClip*> clips = AutomationClip::clipsForModel(m_amv->modelUntyped());
 	// getting the track that has the most clips connected to this model
 	return getCurrentAutomationTrack(&clips, canAddNewTrack);
+}
+
+TimePos AutomatableModelViewSlots::getCurrentPlayingPosition()
+{
+	return static_cast<TimePos>(Engine::getSong()->getPlayPos());
 }
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()

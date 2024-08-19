@@ -132,7 +132,9 @@ private:
 	const AutomationNodeAtTimePos getNearestAutomationNode(AutomationTrack* track);
 	// makes new clip and connects it to this model
 	AutomationClip* makeNewClip(AutomationTrack* track, TimePos position, bool canSnap);
+	// can return nullptr
 	AutomationTrack* getCurrentAutomationTrackForModel(bool canAddNewTrack);
+	TimePos getCurrentPlayingPosition();
 private slots:
 	/// Copy the model's value to the clipboard.
 	void copyToClipboard();
