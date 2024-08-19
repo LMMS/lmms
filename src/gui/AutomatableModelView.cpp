@@ -300,7 +300,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 	timePos -= clip->startPosition();
 
 	// adding model value
-	clip->recordValue(timePos, m_amv->modelUntyped()->getAutomatedRawValue());
+	clip->recordValue(timePos, m_amv->modelUntyped()->getRawValueOrControllerValue());
 }
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
@@ -317,7 +317,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 		newClip->setProgressionType(clip->progressionType());
 		timePos -= newClip->startPosition();
 
-		newClip->recordValue(timePos, m_amv->modelUntyped()->getAutomatedRawValue());
+		newClip->recordValue(timePos, m_amv->modelUntyped()->getRawValueOrControllerValue());
 	}
 	else
 	{
@@ -339,7 +339,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	if (nodeClip)
 	{
 		// modifying its value
-		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getAutomatedRawValue());
+		nodeClip->recordValue(nodePos, m_amv->modelUntyped()->getRawValueOrControllerValue());
 	}
 }
 
