@@ -382,9 +382,8 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 void AudioFileProcessorWaveView::slide(int px)
 {
 	const double fact = qAbs(double(px) / width());
-	double step = range() * fact * (px > 0 ? 1 : -1);
+	auto step = range() * fact * (px > 0 ? 1 : -1);
 
-	// get the real start and end frame
 	const auto sampleStart = static_cast<double>(m_sample->startFrame());
 	const auto sampleEnd = static_cast<double>(m_sample->endFrame());
 
