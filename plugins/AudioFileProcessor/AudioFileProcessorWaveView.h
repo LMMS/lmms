@@ -118,6 +118,8 @@ private:
 	enum class DraggingType
 	{
 		Wave,
+		SlideWave,
+		ZoomWave,
 		SampleStart,
 		SampleEnd,
 		SampleLoop
@@ -158,8 +160,8 @@ private:
 	void zoom(const bool out = false);
 	void slide(int px);
 	void slideSamplePointByPx(Point point, int px);
-	void slideSamplePointByFrames(Point point, f_cnt_t frames, bool slide_to = false);
-	void slideSampleByFrames(f_cnt_t frames);
+	void slideSamplePointByFrames(Point point, long frameOffset, bool slideTo = false);
+	void slideSampleByFrames(long frameOffset);
 
 	void slideSamplePointToFrames(Point point, f_cnt_t frames)
 	{
