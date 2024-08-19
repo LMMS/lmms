@@ -144,8 +144,11 @@ public:
 	void insertBar( const TimePos & pos );
 	void removeBar( const TimePos & pos );
 
-	bar_t length() const;
-
+	void updateLength();
+	inline bar_t length()
+	{
+		return m_length;
+	}
 
 	inline TrackContainer* trackContainer() const
 	{
@@ -229,6 +232,8 @@ private:
 	QMutex m_processingLock;
 	
 	std::optional<QColor> m_color;
+	
+	bar_t m_length;
 
 	friend class gui::TrackView;
 

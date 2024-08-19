@@ -64,7 +64,8 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_clips()        /*!< The clips (segments) */
+	m_clips(),        /*!< The clips (segments) */
+	m_length(0)
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -314,6 +315,8 @@ void Track::loadSettings( const QDomElement & element )
 	{
 		m_height = storedHeight;
 	}
+	
+	updateLength();
 }
 
 
@@ -345,11 +348,8 @@ void Track::removeClip( Clip * clip )
 	if( it != m_clips.end() )
 	{
 		m_clips.erase( it );
-		if( Engine::getSong() )
-		{
-			Engine::getSong()->updateLength();
-			Engine::getSong()->setModified();
-		}
+		updateLength();
+		if (Engine::getSong()) { Engine::getSong()->setModified(); };
 	}
 }
 
@@ -535,31 +535,30 @@ void Track::removeBar( const TimePos & pos )
 
 
 
-/*! \brief Return the length of the entire track in bars
+/*! \brief Calculate the length of the entire track in bars
  *
  *  We step through our list of Clips and determine their end position,
- *  keeping track of the latest time found in ticks.  Then we return
- *  that in bars by dividing by the number of ticks per bar.
+ *  keeping track of the latest time found in ticks.  Then we convert
+ *  that to bars by dividing by the number of ticks per bar.
  */
-bar_t Track::length() const
+void Track::updateLength()
 {
 	// find last end-position
 	tick_t last = 0;
 	for (const auto& clip : m_clips)
 	{
-		if (Engine::getSong()->isExporting() && clip->isMuted())
+		if (Engine::getSong() && Engine::getSong()->isExporting() && clip->isMuted())
 		{
 			continue;
 		}
 
 		const tick_t cur = clip->endPosition();
-		if( cur > last )
-		{
-			last = cur;
-		}
+		if (cur > last) { last = cur; }
 	}
 
-	return last / TimePos::ticksPerBar();
+	m_length = last / TimePos::ticksPerBar();
+	
+	if (Engine::getSong()) { Engine::getSong()->updateLength(); };
 }
 
 
