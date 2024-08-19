@@ -415,7 +415,7 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 	{
 		// adding new track
 		output = new AutomationTrack(getGUI()->songEditor()->m_editor->model(), false);
-		output->setName(m_amv->modelUntyped()->displayName() + " " + tr("track"));
+		output->setName(m_amv->modelUntyped()->displayName() + " " + tr("automation"));
 	}
 	return output;
 }
