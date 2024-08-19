@@ -170,7 +170,7 @@ public:
 		return castValue<T>( m_value );
 	}
 
-	inline float getAutomatedRawValue(int frameOffset = 0) const
+	inline float getRawValueOrControllerValue(int frameOffset = 0) const
 	{
 		if (!m_controllerConnection && !hasLinkedModels())
 		{
