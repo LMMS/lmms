@@ -68,8 +68,6 @@ public:
 	InstrumentTrackWindow( InstrumentTrackView * _tv );
 	~InstrumentTrackWindow() override;
 
-	// Is this needed?
-	/* void resizeEvent(QResizeEvent* event) override {  m_instrumentView->resize(size()); } */
 	void resizeEvent(QResizeEvent* event) override;
 
 

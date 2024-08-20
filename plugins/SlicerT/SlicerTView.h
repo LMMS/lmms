@@ -75,8 +75,6 @@ protected:
 	void dropEvent(QDropEvent* de) override;
 
 	void paintEvent(QPaintEvent* pe) override;
-	/* QSize sizeHint() const override { return QSize(150, 150); } */
-	/* QSize minimumSizeHint() const override { return QSize(300, 300); } */
 	void resizeEvent(QResizeEvent* event) override;
 
 private:

@@ -25,13 +25,8 @@
 #include "SlicerTView.h"
 
 #include <QDropEvent>
-#include <QFileInfo>
-#include <cmath>
-#include <qlayout.h>
 #include <qpixmap.h>
 #include <qpushbutton.h>
-#include <qsizepolicy.h>
-#include <qwidget.h>
 
 #include "Clipboard.h"
 #include "DataFile.h"

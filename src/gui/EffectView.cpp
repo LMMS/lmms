@@ -52,7 +52,6 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView(nullptr),
 	m_dragging(false)
 {
-	/* resize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT); */
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // TODO: Actual effect resizing
 
 	// Disable effects that are of type "DummyEffect"
