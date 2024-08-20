@@ -38,8 +38,8 @@
 #include "MainWindow.h"
 #include "MidiJack.h"
 
-//ExSync
-#include "ExSync.h"
+
+
 
 namespace lmms
 {
@@ -183,13 +183,13 @@ bool AudioJack::initJackClient()
 
 
 
-
+extern void syncJackd(jack_client_t* client); // from core/ExternalSync.cpp
 void AudioJack::startProcessing()
 {
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
-		syncJackd(m_client); // cs_syncJackd = m_client; //ExSync
+		syncJackd(m_client); // from core/ExternalSync.cpp, shoud be placed only here
 		return;
 	}
 

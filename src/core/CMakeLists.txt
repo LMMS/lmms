@@ -22,7 +22,7 @@ set(LMMS_SRCS
 	core/EffectChain.cpp
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
-	core/ExSync.cpp
+	core/ExternalSync.cpp
 	core/fft_helpers.cpp
 	core/FileSearch.cpp
 	core/Mixer.cpp

@@ -30,9 +30,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
-//ExSync
 #include <QPushButton> 
-
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
@@ -47,9 +45,7 @@
 #include "CPULoadWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-//ExSync
-#include "ExSync.h"
-
+#include "ExternalSync.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -111,8 +107,8 @@ SongEditor::SongEditor( Song * song ) :
 		m_currentPosition, Song::PlayMode::Song, this
 	);
 
-#ifdef LMMS_HAVE_EXSYNC
-	m_timeLine->exSyncSetShouldSend(); // Mark TimeLineWidget for ExSync 
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	m_timeLine->syncSetShouldSend(); // Mark TimeLineWidget for ExternalSync 
 #endif
 
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
@@ -241,20 +237,20 @@ SongEditor::SongEditor( Song * song ) :
 
 	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
 
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 	// ExSync toggle On/Off button:
-	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
-	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
-	m_exSyncButton->setStyleSheet("background-color:black");
-	m_exSyncButton->setFocusPolicy(Qt::NoFocus);
-	connect(m_exSyncButton, SIGNAL(clicked()), this, SLOT(toggleExSync()));
-	int exSyncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_exSyncButton, 0);
+	m_syncButton = new QPushButton(tr("ExSync") , tb);
+	m_syncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
+	m_syncButton->setStyleSheet("background-color:black");
+	m_syncButton->setFocusPolicy(Qt::NoFocus);
+	connect(m_syncButton, SIGNAL(clicked()), this, SLOT(toggleSync()));
+	int syncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_syncButton, 0);
 	// ExSync toggle mode button:
-	m_exSyncModeButton = new QPushButton(exSyncGetModeString(ExSyncCtl::getMode()) , tb);
-	m_exSyncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
-	m_exSyncModeButton->setFocusPolicy(Qt::NoFocus);
-	connect(m_exSyncModeButton, SIGNAL(clicked()), this, SLOT(toggleExSyncMode()));
-	getGUI()->mainWindow()->addWidgetToToolBar( m_exSyncModeButton, 1, exSyncBoxCol);
+	m_syncModeButton = new QPushButton(syncGetModeString(SyncCtl::getMode()) , tb);
+	m_syncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
+	m_syncModeButton->setFocusPolicy(Qt::NoFocus);
+	connect(m_syncModeButton, SIGNAL(clicked()), this, SLOT(toggleSyncMode()));
+	getGUI()->mainWindow()->addWidgetToToolBar(m_syncModeButton, 1, syncBoxCol);
 #endif
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
@@ -740,17 +736,17 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 
 
-const char * SongEditor::exSyncGetModeString(enum ExSyncCtl::ExSyncMode mode)
+const char * SongEditor::syncGetModeString(enum SyncCtl::SyncMode mode)
 {
-	static const char * exSyncModeStrings[ExSyncCtl::Last]
+	static const char * syncModeStrings[SyncCtl::Last]
 										= {"Master", "Slave", "Duplex"};
 	const char *result = "";
-	if (mode < ExSyncCtl::Last) 
+	if (mode < SyncCtl::Last) 
 	{ 
-		result = exSyncModeStrings[mode]; 
+		result = syncModeStrings[mode]; 
 	}
 	return result;
 }
@@ -758,29 +754,29 @@ const char * SongEditor::exSyncGetModeString(enum ExSyncCtl::ExSyncMode mode)
 
 
 
-void SongEditor::toggleExSync()
+void SongEditor::toggleSync()
 {
-	bool on = ExSyncCtl::toggleOnOff();
+	bool on = SyncCtl::toggleOnOff();
 	if (on)
 	{
-		m_exSyncButton->setStyleSheet("background-color:green;");
-		m_exSyncModeButton->setText( exSyncGetModeString(ExSyncCtl::getMode()) );
+		m_syncButton->setStyleSheet("background-color:green;");
+		m_syncModeButton->setText( syncGetModeString(SyncCtl::getMode()) );
 	} else {
-		m_exSyncButton->setStyleSheet("background-color:black");
+		m_syncButton->setStyleSheet("background-color:black");
 	}
-	if (!ExSyncCtl::have()) { m_exSyncModeButton->setText(""); }
+	if (!SyncCtl::have()) { m_syncModeButton->setText(""); }
 }
 
 
 
 
-void SongEditor::toggleExSyncMode()
+void SongEditor::toggleSyncMode()
 {
-	enum ExSyncCtl::ExSyncMode mode = ExSyncCtl::toggleMode();
-	m_exSyncModeButton->setText(exSyncGetModeString(mode));
+	enum SyncCtl::SyncMode mode = SyncCtl::toggleMode();
+	m_syncModeButton->setText(syncGetModeString(mode));
 }
 
-#endif // LMMS_HAVE_EXSYNC
+#endif // LMMS_HAVE_EXTERNALSYNC
 
 
 
@@ -829,9 +825,9 @@ void SongEditor::updatePosition( const TimePos & t )
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 	//Need be called periodically at least 10 times in second, especially, when song is stopped
-	ExSyncHook::pulse();
+	SyncHook::pulse();
 #endif
 	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
 							|| m_scrollBack)

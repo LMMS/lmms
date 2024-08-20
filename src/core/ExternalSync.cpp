@@ -20,9 +20,19 @@
  *
  */
 
-#include "ExSync.h"
+#include "ExternalSync.h"
 
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_JACK
+
+#ifndef LMMS_HAVE_WEAKJACK
+#include <jack/jack.h>
+#else
+#include <weak_libjack.h>
+#endif
+
+#endif // LMMS_HAVE_JACK
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
 
 
 #include "Engine.h"
@@ -194,17 +204,17 @@ static struct ExSyncCallbacks * getSlaveCallbacks() {return s_slaveCallBacks; }
 /* class ExSyncHook && class ExSyncCtl: private part */
 
 
-static bool s_exSyncSlaveOn = false; //!< (Receave)
-static bool s_exSyncMasterOn = true; //!< (Send)
-static bool s_exSyncOn = false; //!< (React and Send)
-static ExSyncCtl::ExSyncMode s_exSyncMode = ExSyncCtl::Master; //!< (for ModeButton state)
+static bool s_SyncSlaveOn = false; //!< (Receave)
+static bool s_SyncMasterOn = true; //!< (Send)
+static bool s_SyncOn = false; //!< (React and Send)
+static SyncCtl::SyncMode s_SyncMode = SyncCtl::Master; //!< (for ModeButton state)
 
 
 static void exSyncMode(bool playing)
 {
 	auto lSong = Engine::getSong();
 
-	if ((! lSong->isExporting()) && s_exSyncOn && (lSong->isPlaying() != playing)) 
+	if ((! lSong->isExporting()) && s_SyncOn && (lSong->isPlaying() != playing)) 
 	{
 		if ( lSong->isStopped() ) { lSong->playSong(); } else {	lSong->togglePause(); }
 	}
@@ -215,7 +225,7 @@ static void exSyncPosition(uint32_t frames)
 {
 	auto lSong = Engine::getSong();
 
-	if ((! lSong->isExporting()) && s_exSyncOn && (lSong->playMode()  == Song::PlayMode::Song))
+	if ((! lSong->isExporting()) && s_SyncOn && (lSong->playMode()  == Song::PlayMode::Song))
 	{
 		lSong->setToTime(TimePos::fromFrames(frames , Engine::framesPerTick()));
 	}
@@ -230,7 +240,7 @@ static sample_rate_t exSyncSampleRate()
 
 //! Function used by internal code to send messages to LMMS::Song from
 //! external device (in Slave , Duplex modes)
-static struct ExSyncCallbacks s_exSyncCallbacks = {
+static struct ExSyncCallbacks s_SyncCallbacks = {
 	&exSyncMode,
 	&exSyncPosition,
 	&exSyncSampleRate
@@ -265,7 +275,7 @@ struct ExSyncHandler * exSyncGetHandler()
 
 
 static f_cnt_t s_lastFrame = 0; // Save last frame position to catch change
-void ExSyncHook::pulse()
+void SyncHook::pulse()
 {
 	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
 	struct ExSyncHandler *sync = exSyncGetHandler();
@@ -278,7 +288,7 @@ void ExSyncHook::pulse()
 	if (sync &&  lSong->isStopped())
 	{
 		lFrame = lSong->getFrames();
-		if (s_exSyncMasterOn && s_exSyncOn && (lFrame != s_lastFrame) )
+		if (s_SyncMasterOn && s_SyncOn && (lFrame != s_lastFrame) )
 		{
 			s_lastFrame = lFrame;
 			jump();
@@ -287,11 +297,11 @@ void ExSyncHook::pulse()
 }
 
 
-void ExSyncHook::jump()
+void SyncHook::jump()
 {
 	struct SongExtendedPos pos;
 	auto lSong = Engine::getSong();
-	if ((! lSong->isExporting()) && s_exSyncMasterOn && s_exSyncOn)
+	if ((! lSong->isExporting()) && s_SyncMasterOn && s_SyncOn)
 	{
 		pos.bar = lSong->getBars();
 		pos.beat = lSong->getBeat();
@@ -308,24 +318,24 @@ void ExSyncHook::jump()
 }
 
 
-void ExSyncHook::start()
+void SyncHook::start()
 {
 	struct ExSyncHandler *sync = exSyncGetHandler();
-	if (sync && s_exSyncOn)
+	if (sync && s_SyncOn)
 	{
 		sync->sendPlay(true);
-		if( ExSyncCtl::Master == s_exSyncMode) { jump(); }
+		if( SyncCtl::Master == s_SyncMode) { jump(); }
 	}
 }
 
 
-void ExSyncHook::stop()
+void SyncHook::stop()
 {
 	struct ExSyncHandler *sync = exSyncGetHandler();
-	if (sync && s_exSyncOn)
+	if (sync && s_SyncOn)
 	{
 		sync->sendPlay(false);
-		if( ExSyncCtl::Master == s_exSyncMode) { jump(); }
+		if( SyncCtl::Master == s_SyncMode) { jump(); }
 	}
 }
 
@@ -333,65 +343,87 @@ void ExSyncHook::stop()
 /* class ExSyncCtl: public part */
 
 
-ExSyncCtl::ExSyncMode ExSyncCtl::toggleMode()
+SyncCtl::SyncMode SyncCtl::toggleMode()
 {
 	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( !sync->availableNow() ) 
 	{
-		return s_exSyncMode;
+		return s_SyncMode;
 	}
 	// Make state change (Master -> Slave -> Duplex -> Master -> ...)
-	switch(s_exSyncMode)
+	switch(s_SyncMode)
 	{
 	case Duplex: // Duplex -> Master
-		s_exSyncMode = Master;
-		s_exSyncSlaveOn = false;
-		s_exSyncMasterOn = true;
+		s_SyncMode = Master;
+		break;
+	case Master: // Master -> Slave
+		s_SyncMode = Slave;
+		break;
+	case Slave: // Slave -> Duplex
+		s_SyncMode = Duplex;
+		break;
+	default: // never happens, but our compiler want this
+		s_SyncMode = Master;
+	}
+	setMode(s_SyncMode);
+	return s_SyncMode;
+}
+
+
+void SyncCtl::setMode(SyncCtl::SyncMode mode)
+{
+	ExSyncHandler * sync =  exSyncGetHandler();
+	if ( !sync->availableNow() ) 
+	{
+		return;
+	}
+	switch(mode)
+	{
+	case Master:
+		s_SyncSlaveOn = false;
+		s_SyncMasterOn = true;
 		sync->setSlave(false);
 		s_slaveCallBacks = nullptr;
 		break;
-	case Master: // Master -> Slave
-		s_exSyncMode = Slave;
-		s_exSyncSlaveOn = true;
-		s_exSyncMasterOn = false;
+	case Slave:
+		s_SyncSlaveOn = true;
+		s_SyncMasterOn = false;
 		sync->setSlave(true);
-		s_slaveCallBacks = &s_exSyncCallbacks;
+		s_slaveCallBacks = &s_SyncCallbacks;
 		break;
-	case Slave: // Slave -> Duplex
-		s_exSyncMode = Duplex;
-		s_exSyncSlaveOn = true; // already set, but ... to be simple
-		s_exSyncMasterOn = true;
-		sync->setSlave(true); // already set, but ... to be simple 
-		s_slaveCallBacks = &s_exSyncCallbacks; // already set, but ... to be simple 
+	case Duplex:
+		s_SyncSlaveOn = true;
+		s_SyncMasterOn = true;
+		sync->setSlave(true);
+		s_slaveCallBacks = &s_SyncCallbacks;
 		break;
-	default: // never happens, but our compiler want this
-		s_exSyncMode = Master;
+	default:
+		s_SyncOn = false; // turn Off 
 	}
-	return s_exSyncMode;
 }
 
 
-ExSyncCtl::ExSyncMode ExSyncCtl::getMode()
+SyncCtl::SyncMode SyncCtl::getMode()
 {
-	return s_exSyncMode;
+	return s_SyncMode;
 }
 
 
-bool ExSyncCtl::toggleOnOff()
+bool SyncCtl::toggleOnOff()
 {
 	ExSyncHandler * sync =  exSyncGetHandler();
 
 	if ( sync->availableNow() )
 	{
-		if (s_exSyncOn) {	s_exSyncOn = false; } else { s_exSyncOn = true; }
+		if (s_SyncOn) {	s_SyncOn = false; } else { s_SyncOn = true; }
 	} else {
-		s_exSyncOn = false;
+		s_SyncOn = false;
 	}
-	return s_exSyncOn;
+	return s_SyncOn;
 }
 
 
-bool ExSyncCtl::have()
+bool SyncCtl::have()
 {
 	ExSyncHandler * sync =  exSyncGetHandler();
 	if ( sync->availableNow() ) { return true; }
@@ -401,5 +433,5 @@ bool ExSyncCtl::have()
 
 } // namespace lmms 
 
-#endif // LMMS_HAVE_EXSYNC
+#endif // LMMS_HAVE_EXTERNALSYNC
 

@@ -20,25 +20,17 @@
  *
  */
 
-#ifndef LMMS_EXSYNC_H
-#define LMMS_EXSYNC_H
+#ifndef LMMS_EXTERNALSYNC_H
+#define LMMS_EXTERNALSYNC_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
-#ifndef LMMS_HAVE_WEAKJACK
-#include <jack/jack.h>
-#else
-#include <weak_libjack.h>
-#endif
 
 #include "lmms_basics.h"
 
 namespace lmms
 {
-
-// Jack Transport target implementation:
-void syncJackd(jack_client_t* client); //!< called from src/core/audio/AudioJack.cpp
 
 // Common target independent part:
 //! ExSync sending code provide all fields (for future), but here used only @frame
@@ -86,7 +78,7 @@ struct ExSyncHandler * exSyncGetHandler();
 	* stop - when song stops playing . 
 	Implementation details see in ExSync.cpp
  */ 
-class ExSyncHook
+class SyncHook
 {
 public:
 	static void pulse(); //!< called periodically to catch jump when stopped
@@ -98,20 +90,21 @@ public:
 /**
 	Used to control ExSync by GUI (all calls are in SongEditorWindow) 
 */
-class ExSyncCtl
+class SyncCtl
 {
 public:
 	//! ExSync modes named from LMMS point of view, toggled in round robin way 
-	enum ExSyncMode 
+	enum SyncMode 
 	{
 		Master = 0, //!< LMMS send commands, but not react 
 		Slave, //!< LMMS react but not send
 		Duplex, //!< LMMS send and react, position followed to external application
 		Last //!< used for array element count 
 	};
-	static ExSyncMode toggleMode(); //!< @return mode after call
-	static ExSyncMode getMode(); //!< @return current mode
-	static bool toggleOnOff(); //!< @return true if ExSync became active
+	static SyncMode toggleMode(); //!< @return mode after call
+	static void setMode(SyncMode mode); //!< directly set mode, or set Off, if "Last" is used
+	static SyncMode getMode(); //!< @return current mode
+	static bool toggleOnOff(); //!< @return true if ExternalSync became active
 	static bool have(); //!< @return true if available
 };
 
@@ -119,10 +112,10 @@ public:
 } // namespace lmms 
 
 
-#define 	LMMS_HAVE_EXSYNC
+#define 	LMMS_HAVE_EXTERNALSYNC
 
 
 #endif // LMMS_HAVE_JACK
 
 
-#endif // LMMS_EXSYNC_H
+#endif // LMMS_EXTERNALSYNC_H

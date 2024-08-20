@@ -36,7 +36,7 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
-#include "ExSync.h"
+#include "ExternalSync.h"
 #include "GuiApplication.h"
 #include "NStateButton.h"
 #include "TextFloat.h"
@@ -53,9 +53,8 @@ namespace
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
 		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
 	QWidget{parent},
-#ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef MUST be removed
-	m_parentIsSongEditor(false),
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	m_parentIsSongEditor(false), // default mark of all TimeLineWidget objects (ExternalSync)
 #endif
 	m_xOffset{xoff},
 	m_ppb{ppb},
@@ -351,9 +350,9 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			m_pos.setCurrentFrame( 0 );
 			m_pos.setJumped( true );
 			updatePosition();
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 			//Invoked when user change plaing position by mouse and only if Song Editor TimeLine
-			if (exSyncShouldSend()) { ExSyncHook::jump(); }
+			if (syncShouldSend()) { SyncHook::jump(); }
 #endif
 			break;
 

@@ -38,7 +38,7 @@
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "ExSync.h"
+#include "ExternalSync.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -112,7 +112,7 @@ Song::Song() :
 	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
 						SLOT(updateFramesPerTick()));
 
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 	connect( this, SIGNAL( playbackStateChanged() ), this, SLOT( onPlaybackStateChanged() ) );
 	connect( this, SIGNAL( playbackPositionChanged() ), this, SLOT( onPlaybackPositionChanged() ) );
 #endif
@@ -254,9 +254,9 @@ void Song::processNextBuffer()
 			setToTime(begin);
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 			//Invoked LMMS change plaing position in loop mode
-			ExSyncHook::jump();	//exSyncSendPosition();
+			SyncHook::jump();
 #endif
 			return true;
 		}
@@ -655,11 +655,11 @@ void Song::stop()
 	auto& timeline = getTimeline();
 	m_paused = false;
 	m_recording = true;
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 	if (m_playMode < Song::PlayMode::Pattern) 
 	{ 
 		//Invoke on stop event, but only plaing song. 
-		ExSyncHook::jump();	// exSyncSendPosition(); 
+		SyncHook::jump();	// exSyncSendPosition(); 
 	}
 #endif
 	m_playing = false;
@@ -1427,12 +1427,12 @@ void Song::updateFramesPerTick()
 
 
 
-#ifdef LMMS_HAVE_EXSYNC
+#ifdef LMMS_HAVE_EXTERNALSYNC
 void Song::onPlaybackStateChanged()
 {
 	if (m_playMode < Song::PlayMode::Pattern) 
 	{
-		if (m_playing) { ExSyncHook::start(); } else { ExSyncHook::stop(); }
+		if (m_playing) { SyncHook::start(); } else { SyncHook::stop(); }
 	}
 }
 

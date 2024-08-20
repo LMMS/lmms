@@ -31,9 +31,7 @@
 #include <QSize>
 #include <QWidget>
 
-//ExSync
-#include "ExSync.h"
-
+#include "ExternalSync.h"
 #include "Song.h"
 #include "embed.h"
 
@@ -160,10 +158,9 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-#ifdef LMMS_HAVE_EXSYNC
-	//ExSync
-	inline bool exSyncShouldSend() { return m_parentIsSongEditor; }
-	inline void exSyncSetShouldSend() { m_parentIsSongEditor = true; }
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	inline bool syncShouldSend() { return m_parentIsSongEditor; }
+	inline void syncSetShouldSend() { m_parentIsSongEditor = true; }
 #endif
 
 signals:
@@ -197,9 +194,8 @@ private:
 		SelectSongClip,
 	};
 
-#ifdef LMMS_HAVE_JACK
-	//ExSync
-	bool m_parentIsSongEditor;	
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	bool m_parentIsSongEditor; // used only by ExternalSync
 #endif
 
 	auto getClickedTime(int xPosition) const -> TimePos;
