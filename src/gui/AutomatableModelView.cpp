@@ -111,7 +111,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 		amvSlots,
 		&AutomatableModelViewSlots::removeSongNearestAutomationNode);
 	automationMenu->addAction(QPixmap(),
-		AutomatableModel::tr("Open closest automation clip"),
+		AutomatableModel::tr("Open automation clip"),
 		amvSlots,
 		&AutomatableModelViewSlots::openSongNearestAutomationClip);
 
