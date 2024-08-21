@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "AudioFileDevice.h"
-#include "AudioEngine.h" // AudioEngine::qualitySettings
 #include "SampleFrame.h"
 
 namespace lmms
@@ -71,14 +70,12 @@ public:
 	~LmmsExporter();
 
 	void setupAufioFile(
-			const AudioEngine::qualitySettings& qualitiSettings,
 			const OutputSettings& outputSettings,
 			ExportAudioFileFormat fileFormat,
 			const fpp_t defaultFrameCount,
 			SampleFrame* exportBuffer,
 			const fpp_t exportBufferFrameCount);
 	void setupAufioFile(
-			const AudioEngine::qualitySettings& qualitiSettings,
 			const OutputSettings& outputSettings,
 			ExportAudioFileFormat fileFormat,
 			const fpp_t defaultFrameCount,
@@ -97,13 +94,13 @@ public:
 
 private:
 	static void processExportingAudioFile(LmmsExporter* thisExporter);
-	bool canExportAutioFile(); const
+	bool canExportAutioFile() const;
 	
 	// audio exporting
 	bool processNextBuffer();
 	bool processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
 	void setupAudioFileInternal(
-		OutputSettings& outputSettings,
+		const OutputSettings& outputSettings,
 		ExportAudioFileFormat fileFormat,
 		const fpp_t defaultFrameCount);
 
@@ -111,9 +108,6 @@ private:
 
 	ExportFileType m_exportFileType;
 	QString m_outputFile;
-
-	AudioFileDevice* m_fileDev;
-	AudioEngine::qualitySettings m_qualitySettings; // TODO remove?
 
 	volatile bool m_abort;
 
@@ -125,6 +119,7 @@ private:
 	EndFn m_endFunction;
 	void* m_getBufferData;
 	
+	AudioFileDevice* m_fileDev;
 	std::vector<SampleFrame> m_buffer;
 	std::unique_ptr<std::thread> m_thread;
 };

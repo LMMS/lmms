@@ -72,11 +72,11 @@ LmmsExporter::LmmsExporter(const ExportFileType fileType,
 			const QString& outputLocationAndName) :
 	m_exportFileType(fileType),
 	m_outputFile(outputLocationAndName),
-	m_fileDev(nullptr),
 	m_abort(false),
 	m_getBufferFunction(nullptr),
 	m_endFunction(nullptr),
 	m_getBufferData(nullptr),
+	m_fileDev(nullptr),
 	m_buffer(0)
 {
 	m_thread = nullptr;
@@ -94,22 +94,18 @@ LmmsExporter::~LmmsExporter()
 }
 
 void LmmsExporter::setupAufioFile(
-		const AudioEngine::qualitySettings& qualitiSettings,
 		const OutputSettings& outputSettings,
 		ExportAudioFileFormat fileFormat,
 		const fpp_t defaultFrameCount,
-		SampleFrame* exportBuffer
-		const fpp_t exportBufferFrameCount);
+		SampleFrame* exportBuffer,
+		const fpp_t exportBufferFrameCount)
 {
-	m_qualitySettings = qualitiSettings;
-	
 	setupAudioFileInternal(outputSettings, fileFormat, defaultFrameCount);
 	
-	processThisBuffer(exportFrameBuffer, exportFrameCount);
+	processThisBuffer(exportBuffer, exportBufferFrameCount);
 }
 
 void LmmsExporter::setupAufioFile(
-		const AudioEngine::qualitySettings& qualitiSettings,
 		const OutputSettings& outputSettings,
 		ExportAudioFileFormat fileFormat,
 		const fpp_t defaultFrameCount,
@@ -117,8 +113,6 @@ void LmmsExporter::setupAufioFile(
 		EndFn endFunction,
 		void* getBufferData)
 {
-	m_qualitySettings = qualitiSettings;
-
 	m_getBufferFunction = getBufferFunction;
 	m_endFunction = endFunction;
 	m_getBufferData = getBufferData;
@@ -128,15 +122,15 @@ void LmmsExporter::setupAufioFile(
 
 
 
-static ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromFileName(const QString& fileName)
+LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromFileName(const QString& fileName)
 {
 
 }
-static ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromExtension(const QString& extenisonString)
+LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromExtension(const QString& extenisonString)
 {
 
 }
-static QString LmmsExporter::getAudioFileExtensionFromFormat(ExportAudioFileFormat fmt)
+QString LmmsExporter::getAudioFileExtensionFromFormat(ExportAudioFileFormat fmt)
 {
 
 }
@@ -176,7 +170,7 @@ void LmmsExporter::processExportingAudioFile(LmmsExporter* thisExporter)
 		// use that to fill m_buffer
 		if (thisExporter->m_getBufferFunction != nullptr)
 		{
-			processNextBuffer();
+			thisExporter->processNextBuffer();
 		}
 		
 		// if thisExporter->m_buffer wasn't filled by
@@ -187,8 +181,6 @@ void LmmsExporter::processExportingAudioFile(LmmsExporter* thisExporter)
 		}
 
 		thisExporter->m_fileDev->processThisBuffer(thisExporter->m_buffer.data(), thisExporter->m_buffer.size());
-		// Continually track and emit progress percentage to listeners.
-		progressChanged();
 		
 		// if no function pointer was provided
 		if (thisExporter->m_getBufferFunction == nullptr)
@@ -239,8 +231,8 @@ bool LmmsExporter::processThisBuffer(SampleFrame* frameBuffer, const fpp_t frame
 	return false;
 }
 
-void setupAudioFileInternal(
-	OutputSettings& outputSettings
+void LmmsExporter::setupAudioFileInternal(
+	const OutputSettings& outputSettings,
 	ExportAudioFileFormat fileFormat,
 	const fpp_t defaultFrameCount)
 {
