@@ -294,9 +294,9 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::addSongAutomationNode()
 {
+	track->addJournalCheckPoint();
 	// selecting the track with the most clips connected to this model
 	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
-	track->addJournalCheckPoint();
 
 	// getting the clip before the current song time position
 	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
@@ -312,6 +312,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 {
+	track->addJournalCheckPoint();
 	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 	AutomationClip* clip = getCurrentAutomationClip(track, false, false);
 
@@ -319,7 +320,6 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 
 	if (track && clip && clip->endPosition().getTicks() < timePos.getTicks())
 	{
-		track->addJournalCheckPoint();
 		AutomationClip* newClip = makeNewClip(track, timePos, true);
 		// copying the progressionType of the clip before
 		newClip->setProgressionType(clip->progressionType());
@@ -335,6 +335,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 
 void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 {
+	track->addJournalCheckPoint();
 	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 
 	if (!track) { return; }
@@ -343,7 +344,6 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
 	if (nodeClip.clip)
 	{
-		track->addJournalCheckPoint();
 		// modifying its value
 		nodeClip.clip->putValue(nodeClip.position, m_amv->modelUntyped()->getRawValueOrControllerValue(), true);
 	}
@@ -351,6 +351,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 
 void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 {
+	track->addJournalCheckPoint();
 	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 
 	if (!track) { return; }
@@ -358,8 +359,6 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
 	if (nodeClip.clip)
 	{
-		track->addJournalCheckPoint();
-		
 		nodeClip.clip->removeNode(nodeClip.position);
 		// if there is no node left add a default node
 		// because clips wihtout nodes will not be seen as connected to this model
@@ -372,6 +371,7 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 
 void AutomatableModelViewSlots::openSongNearestAutomationClip()
 {
+	track->addJournalCheckPoint();
 	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
 	
 	// getting the clip before the current song time position
