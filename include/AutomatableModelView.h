@@ -115,8 +115,8 @@ public slots:
 private:
 	struct AutomationNodeAtTimePos
 	{
-		TimePos m_position;
-		AutomationClip* m_clip;
+		TimePos position;
+		AutomationClip* clip;
 	};
 
 	// gets the automationTrack with the most amount of clips connected to it

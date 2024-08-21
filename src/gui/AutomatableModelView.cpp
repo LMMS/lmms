@@ -336,10 +336,10 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 
 	// getting nearest node position
 	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
-	if (nodeClip.m_clip)
+	if (nodeClip.clip)
 	{
 		// modifying its value
-		nodeClip.m_clip->recordValue(nodeClip.m_position, m_amv->modelUntyped()->getRawValueOrControllerValue());
+		nodeClip.clip->recordValue(nodeClip.position, m_amv->modelUntyped()->getRawValueOrControllerValue());
 	}
 }
 
@@ -353,14 +353,14 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 	if (!track) { return; }
 
 	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
-	if (nodeClip.m_clip)
+	if (nodeClip.clip)
 	{
-		nodeClip.m_clip->removeNode(nodeClip.m_position);
+		nodeClip.clip->removeNode(nodeClip.position);
 		// if there is no node left, the automationClip will be deleted
-		if (nodeClip.m_clip->hasAutomation() == false)
+		if (nodeClip.clip->hasAutomation() == false)
 		{
 			// this is safe because clips remove themself from tracks
-			delete nodeClip.m_clip;
+			delete nodeClip.clip;
 		}
 	}
 }
@@ -475,7 +475,7 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 const AutomatableModelViewSlots::AutomationNodeAtTimePos AutomatableModelViewSlots::getNearestAutomationNode(AutomationTrack* track)
 {
 	AutomationNodeAtTimePos output;
-	output.m_clip = nullptr;
+	output.clip = nullptr;
 	int minDistance = -1;
 
 	TimePos timePos = getCurrentPlayingPosition();
@@ -493,8 +493,8 @@ const AutomatableModelViewSlots::AutomationNodeAtTimePos AutomatableModelViewSlo
 			if (curDistance < minDistance || minDistance < 0)
 			{
 				minDistance = curDistance;
-				output.m_position = TimePos(POS(it));
-				output.m_clip = clipBefore;
+				output.position = TimePos(POS(it));
+				output.clip = clipBefore;
 			}
 		}
 	}
@@ -506,8 +506,8 @@ const AutomatableModelViewSlots::AutomationNodeAtTimePos AutomatableModelViewSlo
 		if (curDistance < minDistance || minDistance < 0)
 		{
 			minDistance = curDistance;
-			output.m_position = TimePos(POS(clipAfter->getTimeMap().begin()));
-			output.m_clip = clipAfter;
+			output.position = TimePos(POS(clipAfter->getTimeMap().begin()));
+			output.clip = clipAfter;
 		}
 	}
 
