@@ -189,7 +189,7 @@ void AudioJack::startProcessing()
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
-		syncJackd(m_client); // from core/ExternalSync.cpp, shoud be placed only here
+		syncJackd(m_client); // from core/ExternalSync.cpp
 		return;
 	}
 
@@ -223,7 +223,7 @@ void AudioJack::startProcessing()
 	}
 
 	m_stopped = false;
-	syncJackd(m_client); // cs_syncJackd = m_client; //ExSync
+	syncJackd(m_client); // from core/ExternalSync.cpp
 	jack_free(ports);
 }
 
@@ -233,7 +233,7 @@ void AudioJack::startProcessing()
 void AudioJack::stopProcessing()
 {
 	m_stopped = true;
-	syncJackd(nullptr); // cs_syncJackd = nullptr; //ExSync
+	syncJackd(nullptr); // from core/ExternalSync.cpp
 }
 
 void AudioJack::registerPort(AudioPort* port)

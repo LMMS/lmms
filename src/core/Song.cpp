@@ -114,7 +114,6 @@ Song::Song() :
 
 #ifdef LMMS_HAVE_EXTERNALSYNC
 	connect( this, SIGNAL( playbackStateChanged() ), this, SLOT( onPlaybackStateChanged() ) );
-	connect( this, SIGNAL( playbackPositionChanged() ), this, SLOT( onPlaybackPositionChanged() ) );
 #endif
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
@@ -1434,13 +1433,6 @@ void Song::onPlaybackStateChanged()
 	{
 		if (m_playing) { SyncHook::start(); } else { SyncHook::stop(); }
 	}
-}
-
-static unsigned cs_change_count = 0;
-void Song::onPlaybackPositionChanged()
-{
-	fprintf(stderr, "P"); cs_change_count++;
-	if (cs_change_count >= 100) {fprintf(stderr, "\n");  cs_change_count = 0;}
 }
 #endif
 

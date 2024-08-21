@@ -413,7 +413,6 @@ private slots:
 
 #ifdef LMMS_HAVE_EXTERNALSYNC
 	void onPlaybackStateChanged();
-	void onPlaybackPositionChanged();
 #endif
 
 private:
