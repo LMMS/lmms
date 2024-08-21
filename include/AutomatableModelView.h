@@ -117,7 +117,7 @@ private:
 	struct AutomationNodeAtTimePos
 	{
 		TimePos position;
-		AutomationClip* clip;
+		AutomationClip* clip = nullptr;
 	};
 
 	// gets the automationTrack with the most amount of clips connected to it
