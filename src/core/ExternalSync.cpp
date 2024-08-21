@@ -1,5 +1,5 @@
 /*
- * ExSync.cpp - support for external synchronization
+ * ExternalSync.cpp - support for external synchronization
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -65,7 +65,7 @@ struct ExSyncCallbacks
 	sample_rate_t (* processingSampleRate)();
 };
 
-static struct ExSyncCallbacks * getSlaveCallbacks();
+static struct ExSyncCallbacks * getFollowerCallBacks();
 
 
 
@@ -79,7 +79,7 @@ static jack_transport_state_t s_lastJackState = JackTransportStopped;
 /*! Function adapt events from Jack Transport to LMMS  */
 static int syncCallBack(jack_transport_state_t state, jack_position_t *pos, void *arg)
 {
-	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
+	struct ExSyncCallbacks *slaveCallBacks  = getFollowerCallBacks();
 	// Now slaveCallBacks is local copy - never be changed by other thread ...
 	if (slaveCallBacks)
 	{
@@ -196,18 +196,18 @@ static struct ExSyncHandler s_handler = {
 	(include/SongEditor.h, src/gui/editors/SongEditor.cpp)
  */ 
 
-static struct ExSyncCallbacks *s_slaveCallBacks = nullptr;
+static struct ExSyncCallbacks *s_followerCallBacks= nullptr;
 
-static struct ExSyncCallbacks * getSlaveCallbacks() {return s_slaveCallBacks; }
+static struct ExSyncCallbacks * getFollowerCallBacks() {return s_followerCallBacks; }
 
 
 /* class ExSyncHook && class ExSyncCtl: private part */
 
 
-static bool s_SyncSlaveOn = false; //!< (Receave)
-static bool s_SyncMasterOn = true; //!< (Send)
+static bool s_SyncFollow = false; //!< (Receave)
+static bool s_SyncLead = true; //!< (Send)
 static bool s_SyncOn = false; //!< (React and Send)
-static SyncCtl::SyncMode s_SyncMode = SyncCtl::Master; //!< (for ModeButton state)
+static SyncCtl::SyncMode s_SyncMode = SyncCtl::Leader; //!< (for ModeButton state)
 
 
 static void exSyncMode(bool playing)
@@ -277,7 +277,7 @@ struct ExSyncHandler * exSyncGetHandler()
 static f_cnt_t s_lastFrame = 0; // Save last frame position to catch change
 void SyncHook::pulse()
 {
-	struct ExSyncCallbacks *slaveCallBacks  = getSlaveCallbacks();
+	struct ExSyncCallbacks *slaveCallBacks  = getFollowerCallBacks();
 	struct ExSyncHandler *sync = exSyncGetHandler();
 	auto lSong = Engine::getSong();
 	f_cnt_t lFrame = 0;
@@ -288,7 +288,7 @@ void SyncHook::pulse()
 	if (sync &&  lSong->isStopped())
 	{
 		lFrame = lSong->getFrames();
-		if (s_SyncMasterOn && s_SyncOn && (lFrame != s_lastFrame) )
+		if (s_SyncLead && s_SyncOn && (lFrame != s_lastFrame) )
 		{
 			s_lastFrame = lFrame;
 			jump();
@@ -301,7 +301,7 @@ void SyncHook::jump()
 {
 	struct SongExtendedPos pos;
 	auto lSong = Engine::getSong();
-	if ((! lSong->isExporting()) && s_SyncMasterOn && s_SyncOn)
+	if ((! lSong->isExporting()) && s_SyncLead && s_SyncOn)
 	{
 		pos.bar = lSong->getBars();
 		pos.beat = lSong->getBeat();
@@ -324,7 +324,7 @@ void SyncHook::start()
 	if (sync && s_SyncOn)
 	{
 		sync->sendPlay(true);
-		if( SyncCtl::Master == s_SyncMode) { jump(); }
+		if( SyncCtl::Leader == s_SyncMode) { jump(); }
 	}
 }
 
@@ -335,12 +335,12 @@ void SyncHook::stop()
 	if (sync && s_SyncOn)
 	{
 		sync->sendPlay(false);
-		if( SyncCtl::Master == s_SyncMode) { jump(); }
+		if( SyncCtl::Leader == s_SyncMode) { jump(); }
 	}
 }
 
 
-/* class ExSyncCtl: public part */
+/* class SyncCtl: public part */
 
 
 SyncCtl::SyncMode SyncCtl::toggleMode()
@@ -353,17 +353,17 @@ SyncCtl::SyncMode SyncCtl::toggleMode()
 	// Make state change (Master -> Slave -> Duplex -> Master -> ...)
 	switch(s_SyncMode)
 	{
-	case Duplex: // Duplex -> Master
-		s_SyncMode = Master;
+	case Duplex: // Duplex -> Leader
+		s_SyncMode = Leader;
 		break;
-	case Master: // Master -> Slave
-		s_SyncMode = Slave;
+	case Leader: // Leader -> Follower
+		s_SyncMode = Follower;
 		break;
-	case Slave: // Slave -> Duplex
+	case Follower: // Follower -> Duplex
 		s_SyncMode = Duplex;
 		break;
 	default: // never happens, but our compiler want this
-		s_SyncMode = Master;
+		s_SyncMode = Leader;
 	}
 	setMode(s_SyncMode);
 	return s_SyncMode;
@@ -379,23 +379,23 @@ void SyncCtl::setMode(SyncCtl::SyncMode mode)
 	}
 	switch(mode)
 	{
-	case Master:
-		s_SyncSlaveOn = false;
-		s_SyncMasterOn = true;
+	case Leader:
+		s_SyncFollow = false;
+		s_SyncLead = true;
 		sync->setSlave(false);
-		s_slaveCallBacks = nullptr;
+		s_followerCallBacks= nullptr;
 		break;
-	case Slave:
-		s_SyncSlaveOn = true;
-		s_SyncMasterOn = false;
+	case Follower:
+		s_SyncFollow = true;
+		s_SyncLead = false;
 		sync->setSlave(true);
-		s_slaveCallBacks = &s_SyncCallbacks;
+		s_followerCallBacks= &s_SyncCallbacks;
 		break;
 	case Duplex:
-		s_SyncSlaveOn = true;
-		s_SyncMasterOn = true;
+		s_SyncFollow = true;
+		s_SyncLead = true;
 		sync->setSlave(true);
-		s_slaveCallBacks = &s_SyncCallbacks;
+		s_followerCallBacks= &s_SyncCallbacks;
 		break;
 	default:
 		s_SyncOn = false; // turn Off 

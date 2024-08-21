@@ -247,7 +247,7 @@ SongEditor::SongEditor( Song * song ) :
 	int syncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_syncButton, 0);
 	// ExSync toggle mode button:
 	m_syncModeButton = new QPushButton(syncGetModeString(SyncCtl::getMode()) , tb);
-	m_syncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
+	m_syncModeButton->setToolTip(tr("toggle [Leader] , [Follower] , [Duplex]"));
 	m_syncModeButton->setFocusPolicy(Qt::NoFocus);
 	connect(m_syncModeButton, SIGNAL(clicked()), this, SLOT(toggleSyncMode()));
 	getGUI()->mainWindow()->addWidgetToToolBar(m_syncModeButton, 1, syncBoxCol);
@@ -742,7 +742,7 @@ void SongEditor::hideMasterPitchFloat( void )
 const char * SongEditor::syncGetModeString(enum SyncCtl::SyncMode mode)
 {
 	static const char * syncModeStrings[SyncCtl::Last]
-										= {"Master", "Slave", "Duplex"};
+										= {"Leader", "Follower", "Duplex"};
 	const char *result = "";
 	if (mode < SyncCtl::Last) 
 	{ 

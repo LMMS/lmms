@@ -1,5 +1,5 @@
 /*
- * ExSync.h - support for external synchronization
+ * ExternalSync.h - support for external synchronization
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -96,8 +96,8 @@ public:
 	//! ExSync modes named from LMMS point of view, toggled in round robin way 
 	enum SyncMode 
 	{
-		Master = 0, //!< LMMS send commands, but not react 
-		Slave, //!< LMMS react but not send
+		Leader = 0, //!< LMMS send commands, but not react 
+		Follower, //!< LMMS react but not send
 		Duplex, //!< LMMS send and react, position followed to external application
 		Last //!< used for array element count 
 	};
