@@ -94,20 +94,20 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 	menu->addSeparator();
 
 	menu->addAction(QPixmap(),
-		AutomatableModel::tr("add automation node"),
+		AutomatableModel::tr("Add automation node"),
 		amvSlots,
 		&AutomatableModelViewSlots::addSongAutomationNode);
-	QMenu* automationMenu = menu->addMenu(QPixmap(), AutomatableModel::tr("more automation"));
+	QMenu* automationMenu = menu->addMenu(QPixmap(), AutomatableModel::tr("Automations"));
 	automationMenu->addAction(QPixmap(),
-		AutomatableModel::tr("add automation node to new clip"),
+		AutomatableModel::tr("Add automation node to new clip"),
 		amvSlots,
 		&AutomatableModelViewSlots::addSongAutomationNodeAndClip);
 	automationMenu->addAction(QPixmap(),
-		AutomatableModel::tr("update closest automation node"),
+		AutomatableModel::tr("Update closest automation node"),
 		amvSlots,
 		&AutomatableModelViewSlots::updateSongNearestAutomationNode);
 	automationMenu->addAction(QPixmap(),
-		AutomatableModel::tr("remove closest automation node"),
+		AutomatableModel::tr("Remove closest automation node"),
 		amvSlots,
 		&AutomatableModelViewSlots::removeSongNearestAutomationNode);
 
