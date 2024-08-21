@@ -110,6 +110,10 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 		AutomatableModel::tr("Remove closest automation node"),
 		amvSlots,
 		&AutomatableModelViewSlots::removeSongNearestAutomationNode);
+	automationMenu->addAction(QPixmap(),
+		AutomatableModel::tr("Open closest automation clip"),
+		amvSlots,
+		&AutomatableModelViewSlots::openSongNearestAutomationClip);
 
 	menu->addSeparator();
 
@@ -331,10 +335,8 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 
 void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 {
-	// getting the track without adding a new one if no track was found
 	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
-	// this needs to be checked because getCurrentAutomationTrack might give
-	// a nullptr if it can not find and add a track
+
 	if (!track) { return; }
 
 	// getting nearest node position
@@ -349,11 +351,8 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 
 void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 {
-	// getting the track without adding a new one if no track was found
 	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 
-	// this needs to be checked because getCurrentAutomationTrack might give
-	// a nullptr if it can not find and add a track
 	if (!track) { return; }
 
 	AutomationNodeAtTimePos nodeClip = getNearestAutomationNode(track);
@@ -368,6 +367,16 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 			delete nodeClip.clip;
 		}
 	}
+}
+
+void AutomatableModelViewSlots::openSongNearestAutomationClip()
+{
+	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
+	
+	// getting the clip before the current song time position
+	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
+	
+	getGUI()->automationEditor()->open(clip);
 }
 
 AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vector<AutomationClip*>* clips, bool canAddNewTrack)

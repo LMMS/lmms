@@ -108,6 +108,7 @@ public slots:
 	void addSongAutomationNodeAndClip();
 	void updateSongNearestAutomationNode();
 	void removeSongNearestAutomationNode();
+	void openSongNearestAutomationClip();
 	void editSongGlobalAutomation();
 	void unlinkAllModels();
 	void removeSongGlobalAutomation();
