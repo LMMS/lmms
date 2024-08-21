@@ -306,7 +306,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 {
-	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
+	AutomationTrack* track = getCurrentAutomationTrackForModel(false);
 	AutomationClip* clip = getCurrentAutomationClip(track, false, false);
 
 	TimePos timePos = getCurrentPlayingPosition();
@@ -422,6 +422,7 @@ AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vecto
 
 AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTrack* track, bool canAddNewClip, bool searchAfter)
 {
+	if (!track) { return nullptr; }
 	AutomationClip* output = nullptr;
 	const std::vector<Clip*>& trackClips = track->getClips();
 	TimePos timePos = getCurrentPlayingPosition();
@@ -429,7 +430,7 @@ AutomationClip* AutomatableModelViewSlots::getCurrentAutomationClip(AutomationTr
 	bool tryAdding = false;
 	if (trackClips.size() > 0)
 	{
-		// getting the closest clip that start before or after the global time position
+		// getting the closest clip that starts before or after the global time position
 		tick_t closestTime = -1;
 		Clip* closestClip = nullptr;
 		for (Clip* currentClip : trackClips)
