@@ -307,7 +307,7 @@ void AutomatableModelViewSlots::addSongAutomationNode()
 	timePos -= clip->startPosition();
 	
 	// adding model value
-	clip->putValue(timePos, m_amv->modelUntyped()->getRawValueOrControllerValue(), true);
+	clip->putValue(timePos, m_amv->modelUntyped()->value<float>(), true);
 }
 
 void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
@@ -325,7 +325,7 @@ void AutomatableModelViewSlots::addSongAutomationNodeAndClip()
 		newClip->setProgressionType(clip->progressionType());
 		timePos -= newClip->startPosition();
 
-		newClip->putValue(timePos, m_amv->modelUntyped()->getRawValueOrControllerValue(), true);
+		newClip->putValue(timePos, m_amv->modelUntyped()->value<float>(), true);
 	}
 	else
 	{
@@ -345,7 +345,7 @@ void AutomatableModelViewSlots::updateSongNearestAutomationNode()
 	{
 		track->addJournalCheckPoint();
 		// modifying its value
-		nodeClip.clip->putValue(nodeClip.position, m_amv->modelUntyped()->getRawValueOrControllerValue(), true);
+		nodeClip.clip->putValue(nodeClip.position, m_amv->modelUntyped()->value<float>(), true);
 	}
 }
 
@@ -365,7 +365,7 @@ void AutomatableModelViewSlots::removeSongNearestAutomationNode()
 		// because clips wihtout nodes will not be seen as connected to this model
 		if (nodeClip.clip->hasAutomation() == false)
 		{
-			nodeClip.clip->putValue(TimePos(0), m_amv->modelUntyped()->getRawValueOrControllerValue(), true);
+			nodeClip.clip->putValue(TimePos(0), m_amv->modelUntyped()->value<float>(), true);
 		}
 	}
 }
