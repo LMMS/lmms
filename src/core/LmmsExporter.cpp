@@ -124,15 +124,35 @@ void LmmsExporter::setupAufioFile(
 
 LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromFileName(const QString& fileName)
 {
-
+	// TODO test
+	QString extension = "";
+	for (size_t i = fileName.size(); i >= 0; i--)
+	{
+		extension = extension + fileName[i];
+		if (fileName[i] == ".")
+		{
+			break;
+		}
+	}
+	return getAudioFileFormatFromExtension(extension);
 }
+
 LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromExtension(const QString& extenisonString)
 {
-
+	int idx = 0;
+	while (s_fileEncodeDevices[idx].m_fileFormat != ExportFileFormat::Count)
+	{
+		if (QString(s_fileEncodeDevices[idx].m_extension) == _ext)
+		{
+			return s_fileEncodeDevices[idx].m_fileFormat;
+		}
+		idx++;
+	}
 }
+
 QString LmmsExporter::getAudioFileExtensionFromFormat(ExportAudioFileFormat fmt)
 {
-
+	return s_fileEncodeDevices[static_cast<std::size_t>(fmt)].m_extension;
 }
 
 
@@ -142,9 +162,14 @@ void LmmsExporter::startExporting()
 	if (m_thread.get() != nullptr) { return; }
 	m_abort = false;
 
-	if (canExportAutioFile())
+	switch (m_exportFileType)
 	{
-		m_thread = std::make_unique<std::thread>(processExportingAudioFile, this);
+		case ExportFileType::Autio:
+			if (canExportAutioFile())
+			{
+				m_thread = std::make_unique<std::thread>(processExportingAudioFile, this);
+			}
+			break;
 	}
 }
 
