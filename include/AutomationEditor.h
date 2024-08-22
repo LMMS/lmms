@@ -233,6 +233,7 @@ private:
 
 	MidiClip* m_ghostNotes = nullptr;
 	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	TimePos m_detuningOffset;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
