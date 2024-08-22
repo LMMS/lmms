@@ -412,7 +412,7 @@ private:
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
-	friend class RenderManager;
+	friend class ProjectRenderer;
 } ;
 
 } // namespace lmms
