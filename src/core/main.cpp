@@ -379,7 +379,7 @@ int main( int argc, char * * argv )
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
-	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
+	LmmsExporter::ExportAudioFileFormat eff = LmmsExporter::ExportAudioFileFormat::Wave;
 
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -521,23 +521,23 @@ int main( int argc, char * * argv )
 
 			if( ext == "wav" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::Wave;
+				eff = LmmsExporter::ExportAudioFileFormat::Wave;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::Ogg;
+				eff = LmmsExporter::ExportAudioFileFormat::Ogg;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
 			else if( ext == "mp3" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::MP3;
+				eff = LmmsExporter::ExportAudioFileFormat::MP3;
 			}
 #endif
 			else if (ext == "flac")
 			{
-				eff = ProjectRenderer::ExportFileFormat::Flac;
+				eff = LmmsExporter::ExportAudioFileFormat::Flac;
 			}
 			else
 			{
@@ -776,7 +776,7 @@ int main( int argc, char * * argv )
 		if ( !renderTracks )
 		{
 			renderOut = baseName( renderOut ) +
-				ProjectRenderer::getFileExtensionFromFormat(eff);
+				LmmsExporter::getAudioFileExtensionFromFormat(eff);
 		}
 
 		// create renderer
