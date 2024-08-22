@@ -374,10 +374,49 @@ void AutomatableModelViewSlots::openSongNearestAutomationClip()
 {
 	AutomationTrack* track = getCurrentAutomationTrackForModel(true);
 	
-	// getting the clip before the current song time position
-	AutomationClip* clip = getCurrentAutomationClip(track, true, false);
+	// getting the clips before and after the global time position
+	AutomationClip* clipBefore = getCurrentAutomationClip(track, false, false);
+	AutomationClip* clipAfter = getCurrentAutomationClip(track, false, true);
+
+	TimePos timePos = getCurrentPlayingPosition();
+
+	AutomationClip* closestClip = clipBefore;
+	int minDistance = -1;
+	if (clipBefore)
+	{
+		// assume that clipBefore is the closest clip
+		minDistance = static_cast<int>(timePos.getTicks()) - static_cast<int>(clipBefore->startPosition().getTicks());
+		int endDistance = std::abs(static_cast<int>(timePos.getTicks()) - static_cast<int>(clipBefore->endPosition().getTicks()));
+		if (minDistance > endDistance)
+		{
+			minDistance = endDistance;
+		}
+	}
 	
-	getGUI()->automationEditor()->open(clip);
+	if (clipAfter)
+	{
+		if (minDistance <= -1 || !closestClip)
+		{
+			closestClip = clipAfter;
+		}
+		else
+		{
+			int curDistance = static_cast<int>(clipAfter->startPosition().getTicks()) - static_cast<int>(timePos.getTicks());
+			bool closeToClipAfterStart = timePos.getTicks() + TimePos::ticksPerBar() / 2 > clipAfter->startPosition().getTicks();
+			if (minDistance > curDistance || closeToClipAfterStart)
+			{
+				closestClip = clipAfter;
+			}
+		}
+	}
+	
+	if (!closestClip)
+	{
+		// make new clip
+		closestClip = getCurrentAutomationClip(track, true, false);
+	}
+	
+	getGUI()->automationEditor()->open(closestClip);
 }
 
 AutomationTrack* AutomatableModelViewSlots::getCurrentAutomationTrack(std::vector<AutomationClip*>* clips, bool canAddNewTrack)
