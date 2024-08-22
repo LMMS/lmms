@@ -93,19 +93,19 @@ LmmsExporter::~LmmsExporter()
 	}
 }
 
-void LmmsExporter::setupAufioFile(
+void LmmsExporter::setupAudioRendering(
 		const OutputSettings& outputSettings,
 		ExportAudioFileFormat fileFormat,
 		const fpp_t defaultFrameCount,
 		SampleFrame* exportBuffer,
 		const fpp_t exportBufferFrameCount)
 {
-	setupAudioFileInternal(outputSettings, fileFormat, defaultFrameCount);
+	setupAudioRenderingInternal(outputSettings, fileFormat, defaultFrameCount);
 	
 	processThisBuffer(exportBuffer, exportBufferFrameCount);
 }
 
-void LmmsExporter::setupAufioFile(
+void LmmsExporter::setupAudioRendering(
 		const OutputSettings& outputSettings,
 		ExportAudioFileFormat fileFormat,
 		const fpp_t defaultFrameCount,
@@ -117,7 +117,12 @@ void LmmsExporter::setupAufioFile(
 	m_endFunction = endFunction;
 	m_getBufferData = getBufferData;
 
-	setupAudioFileInternal(outputSettings, fileFormat, defaultFrameCount);
+	setupAudioRenderingInternal(outputSettings, fileFormat, defaultFrameCount);
+}
+
+bool LmmsExporter::canExportAutioFile() const
+{
+	return m_fileDev != nullptr && (m_buffer.size() > 0 || m_getBufferFunction != nullptr);
 }
 
 
@@ -128,8 +133,8 @@ LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromFileName
 	QString extension = "";
 	for (size_t i = fileName.size(); i >= 0; i--)
 	{
-		extension = extension + fileName[i];
-		if (fileName[i] == ".")
+		extension = extension + fileName.at(i);
+		if (fileName.at(i) == ".")
 		{
 			break;
 		}
@@ -140,14 +145,15 @@ LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromFileName
 LmmsExporter::ExportAudioFileFormat LmmsExporter::getAudioFileFormatFromExtension(const QString& extenisonString)
 {
 	int idx = 0;
-	while (s_fileEncodeDevices[idx].m_fileFormat != ExportFileFormat::Count)
+	while (s_fileEncodeDevices[idx].m_fileFormat != ExportAudioFileFormat::Count)
 	{
-		if (QString(s_fileEncodeDevices[idx].m_extension) == _ext)
+		if (QString(s_fileEncodeDevices[idx].m_extension) == extenisonString)
 		{
 			return s_fileEncodeDevices[idx].m_fileFormat;
 		}
 		idx++;
 	}
+	return ExportAudioFileFormat::Count;
 }
 
 QString LmmsExporter::getAudioFileExtensionFromFormat(ExportAudioFileFormat fmt)
@@ -164,10 +170,14 @@ void LmmsExporter::startExporting()
 
 	switch (m_exportFileType)
 	{
-		case ExportFileType::Autio:
+		case ExportFileType::Audio:
 			if (canExportAutioFile())
 			{
 				m_thread = std::make_unique<std::thread>(processExportingAudioFile, this);
+			}
+			else if (m_endFunction != nullptr)
+			{
+				m_endFunction(m_getBufferData);
 			}
 			break;
 	}
@@ -229,11 +239,6 @@ void LmmsExporter::processExportingAudioFile(LmmsExporter* thisExporter)
 	}
 }
 
-bool LmmsExporter::canExportAutioFile() const
-{
-	return m_fileDev != nullptr && (m_buffer.size() > 0 || m_getBufferFunction != nullptr);
-}
-
 
 
 bool LmmsExporter::processNextBuffer()
@@ -256,7 +261,7 @@ bool LmmsExporter::processThisBuffer(SampleFrame* frameBuffer, const fpp_t frame
 	return false;
 }
 
-void LmmsExporter::setupAudioFileInternal(
+void LmmsExporter::setupAudioRenderingInternal(
 	const OutputSettings& outputSettings,
 	ExportAudioFileFormat fileFormat,
 	const fpp_t defaultFrameCount)

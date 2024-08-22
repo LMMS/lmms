@@ -22,6 +22,10 @@
  *
  */
 
+#ifndef LMMS_LMMS_EXPORTER_H
+#define LMMS_LMMS_EXPORTER_H
+
+#include <functional>
 #include <thread>
 #include <vector>
 
@@ -31,10 +35,9 @@
 namespace lmms
 {
 
-//class AudioFileDevice;
-
 class LmmsExporter
 {
+
 public:
 	using BufferFn = std::function<void(std::vector<SampleFrame>*, void*)>;
 	using EndFn = std::function<void(void*)>;
@@ -69,19 +72,20 @@ public:
 				const QString& outputLocationAndName);
 	~LmmsExporter();
 
-	void setupAufioFile(
+	void setupAudioRendering(
 			const OutputSettings& outputSettings,
 			ExportAudioFileFormat fileFormat,
 			const fpp_t defaultFrameCount,
 			SampleFrame* exportBuffer,
 			const fpp_t exportBufferFrameCount);
-	void setupAufioFile(
+	void setupAudioRendering(
 			const OutputSettings& outputSettings,
 			ExportAudioFileFormat fileFormat,
 			const fpp_t defaultFrameCount,
 			BufferFn getBufferFunction,
 			EndFn endFunction,
 			void* getBufferData);
+	bool canExportAutioFile() const;
 
 	static ExportAudioFileFormat getAudioFileFormatFromFileName(const QString& fileName);
 	static ExportAudioFileFormat getAudioFileFormatFromExtension(const QString& extenisonString);
@@ -94,12 +98,11 @@ public:
 
 private:
 	static void processExportingAudioFile(LmmsExporter* thisExporter);
-	bool canExportAutioFile() const;
 	
 	// audio exporting
 	bool processNextBuffer();
 	bool processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
-	void setupAudioFileInternal(
+	void setupAudioRenderingInternal(
 		const OutputSettings& outputSettings,
 		ExportAudioFileFormat fileFormat,
 		const fpp_t defaultFrameCount);
@@ -126,3 +129,4 @@ private:
 
 }
 
+#endif // LMMS_LMMS_EXPORTER_H
