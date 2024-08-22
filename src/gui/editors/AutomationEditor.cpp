@@ -1699,6 +1699,7 @@ void AutomationEditor::play()
 	{
 		if( Engine::getSong()->isStopped() == true )
 		{
+			Engine::getSong()->setToTime(m_clip->startPosition().getTicks(), Song::PlayMode::Song);
 			Engine::getSong()->playSong();
 		}
 		else
