@@ -189,6 +189,16 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+
+		// Set the vertical zoom to 200% when detuning notes
+		if (!m_clip->getTrack())
+		{
+			m_zoomingYModel.setValue(4);
+		}
+		else
+		{
+			m_zoomingYModel.setValue(0);
+		}
 	}
 
 	emit currentClipChanged();
