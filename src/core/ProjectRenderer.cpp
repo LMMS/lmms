@@ -42,16 +42,16 @@ namespace lmms
 const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
 {
 
-	FileEncodeDevice{ProjectRenderer::ExportFileFormat::Wave,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "WAV (*.wav)"),
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Wave,
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
-	FileEncodeDevice{ProjectRenderer::ExportFileFormat::Flac,
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Flac,
 		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlac::getInst
 	},
-	FileEncodeDevice{ProjectRenderer::ExportFileFormat::Ogg,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "OGG (*.ogg)"),
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Ogg,
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
@@ -59,8 +59,8 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 					nullptr
 #endif
 									},
-	FileEncodeDevice{ProjectRenderer::ExportFileFormat::MP3,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "MP3 (*.mp3)"),
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::MP3,
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
 					".mp3",
 #ifdef LMMS_HAVE_MP3LAME
 					&AudioFileMP3::getInst
@@ -71,7 +71,7 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
-	FileEncodeDevice{ProjectRenderer::ExportFileFormat::Count, nullptr, nullptr, nullptr}
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Count, nullptr, nullptr, nullptr }
 
 } ;
 
@@ -81,19 +81,12 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
 					ExportFileFormat exportFileFormat,
-					const QString & outputFilename,
-					const fpp_t defaultFrameCount,
-					BufferFn getBufferFunction,
-					EndFn endFunction,
-					void* getBufferData) :
+					const QString & outputFilename ) :
 	QThread( Engine::audioEngine() ),
 	m_fileDev( nullptr ),
 	m_qualitySettings( qualitySettings ),
-	m_abort(false),
-	m_getBufferFunction(getBufferFunction),
-	m_endFunction(endFunction),
-	m_getBufferData(getBufferData),
-	m_buffer(0)
+	m_progress( 0 ),
+	m_abort( false )
 {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
 
@@ -102,8 +95,8 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 		bool successful = false;
 
 		m_fileDev = audioEncoderFactory(
-					outputSettings, successful, outputFilename, DEFAULT_CHANNELS,
-					defaultFrameCount);
+					outputFilename, outputSettings, DEFAULT_CHANNELS,
+					Engine::audioEngine(), successful );
 		if( !successful )
 		{
 			delete m_fileDev;
@@ -143,25 +136,6 @@ QString ProjectRenderer::getFileExtensionFromFormat(
 }
 
 
-bool ProjectRenderer::processNextBuffer()
-{
-	m_getBufferFunction(&m_buffer, m_getBufferData);
-	if (m_buffer.size() <= 0) { return true; }
-
-	return false;
-}
-
-bool ProjectRenderer::processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount)
-{
-	if (frameCount <= 0) { m_buffer.clear(); return true; }
-	if (m_buffer.size() != frameCount)
-	{
-		m_buffer.resize(frameCount);
-	}
-
-	memcpy(m_buffer.data(), frameBuffer, m_buffer.size() * sizeof(SampleFrame));
-	return false;
-}
 
 
 void ProjectRenderer::startProcessing()
@@ -169,6 +143,10 @@ void ProjectRenderer::startProcessing()
 
 	if( isReady() )
 	{
+		// Have to do audio engine stuff with GUI-thread affinity in order to
+		// make slots connected to sampleRateChanged()-signals being called immediately.
+		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
+
 		start(
 #ifndef LMMS_BUILD_WIN32
 			QThread::HighPriority
@@ -194,39 +172,31 @@ void ProjectRenderer::run()
 
 	PerfLogTimer perfLog("Project Render");
 
-	while (!m_abort)
-	{
-		// if a function pointer was provided
-		// use that to fill m_buffer
-		if (m_getBufferFunction != nullptr)
-		{
-			processNextBuffer();
-		}
-		
-		// if m_buffer wasn't filled by
-		// processNextBuffer() or processThisBuffer() before
-		if (m_buffer.size() <= 0)
-		{
-			break;
-		}
+	Engine::getSong()->startExport();
+	// Skip first empty buffer.
+	Engine::audioEngine()->nextBuffer();
 
-		m_fileDev->processThisBuffer(m_buffer.data(), m_buffer.size());
-		// Continually track and emit progress percentage to listeners.
-		progressChanged();
-		
-		// if no function pointer was provided
-		if (m_getBufferFunction == nullptr)
+	m_progress = 0;
+
+	// Now start processing
+	Engine::audioEngine()->startProcessing(false);
+
+	// Continually track and emit progress percentage to listeners.
+	while (!Engine::getSong()->isExportDone() && !m_abort)
+	{
+		m_fileDev->processNextBuffer();
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (m_progress != nprog)
 		{
-			// clear buffer to end while loop
-			m_buffer.clear();
-			break;
+			m_progress = nprog;
+			emit progressChanged( m_progress );
 		}
 	}
 
-	if (m_endFunction != nullptr)
-	{
-		m_endFunction(m_getBufferData);
-	}
+	// Notify the audio engine of the end of processing.
+	Engine::audioEngine()->stopProcessing();
+
+	Engine::getSong()->stopExport();
 
 	perfLog.end();
 
@@ -247,6 +217,30 @@ void ProjectRenderer::abortProcessing()
 	wait();
 }
 
+
+
+void ProjectRenderer::updateConsoleProgress()
+{
+	const int cols = 50;
+	static int rot = 0;
+	auto buf = std::array<char, 80>{};
+	auto prog = std::array<char, cols + 1>{};
+
+	for( int i = 0; i < cols; ++i )
+	{
+		prog[i] = ( i*100/cols <= m_progress ? '-' : ' ' );
+	}
+	prog[cols] = 0;
+
+	const auto activity = (const char*)"|/-\\";
+	std::fill(buf.begin(), buf.end(), 0);
+	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
+							activity[rot] );
+	rot = ( rot+1 ) % 4;
+
+	fprintf( stderr, "%s", buf.data() );
+	fflush( stderr );
+}
 
 
 } // namespace lmms
