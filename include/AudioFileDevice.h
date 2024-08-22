@@ -49,6 +49,8 @@ public:
 
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
 
+	void processNextBuffer();
+	virtual void writeBuffer(const SampleFrame* buffer, const f_cnt_t frames) = 0;
 
 protected:
 	int writeData( const void* data, int len );
@@ -66,6 +68,7 @@ protected:
 private:
 	QFile m_outputFile;
 	OutputSettings m_outputSettings;
+	std::unique_ptr<SampleFrame[]> m_buffer;
 } ;
 
 using AudioFileDeviceInstantiaton
