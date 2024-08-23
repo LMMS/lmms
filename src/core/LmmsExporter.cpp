@@ -272,7 +272,7 @@ void LmmsExporter::setupAudioRenderingInternal(
 	{
 		bool successful = false;
 
-		m_fileDev = audioEncoderFactory(outputSettings, successful, m_outputFile, 2, defaultFrameCount);
+		m_fileDev = audioEncoderFactory(outputSettings, successful, m_outputFile, defaultFrameCount);
 		if(!successful)
 		{
 			delete m_fileDev;
