@@ -36,9 +36,9 @@
 namespace lmms
 {
 
-AudioFileFlac::AudioFileFlac(OutputSettings const & outputSettings,
-			bool & successful,
-			const QString & file,
+AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings,
+			bool& successful,
+			const QString& file,
 			const fpp_t defaultBufferSize) :
 	AudioFileDevice(outputSettings, file, defaultBufferSize),
 	m_sf(nullptr)
