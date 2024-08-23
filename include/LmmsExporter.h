@@ -34,10 +34,8 @@
 
 namespace lmms
 {
-
 class LmmsExporter
 {
-
 public:
 	using BufferFn = std::function<void(std::vector<SampleFrame>*, void*)>;
 	using EndFn = std::function<void(void*)>;
@@ -127,6 +125,6 @@ private:
 	std::unique_ptr<std::thread> m_thread;
 };
 
-}
+} // namespace lmms
 
 #endif // LMMS_LMMS_EXPORTER_H
