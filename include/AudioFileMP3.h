@@ -41,23 +41,21 @@ class AudioFileMP3 : public AudioFileDevice
 {
 public:
 	AudioFileMP3(OutputSettings const & outputSettings,
-			bool & successful,
-			const QString & file,
-			const ch_cnt_t channels, const fpp_t defaultBufferSize);
+			bool& successful,
+			const QString& file,
+			const fpp_t defaultBufferSize);
 	~AudioFileMP3() override;
 
 	static AudioFileDevice * getInst(
 			OutputSettings const &outputSettings,
 			bool &successful,
 			const QString & outputFilename,
-			const ch_cnt_t channels,
 			const fpp_t defaultBufferSize)
 	{
 		return new AudioFileMP3(
 			outputSettings,
 			successful,
 			outputFilename,
-			channels,
 			defaultBufferSize
 		);
 	}
