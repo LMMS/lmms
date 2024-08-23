@@ -138,7 +138,7 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 	{
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels; ++chnl )
+			for (ch_cnt_t chnl = 0; chnl < channels; ++chnl)
 			{
 				auto temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
 
@@ -152,7 +152,7 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 	{
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels; ++chnl )
+			for (ch_cnt_t chnl = 0; chnl < channels; ++chnl)
 			{
 				(_output_buffer + frame * channels)[chnl]
 					= static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);

@@ -99,7 +99,7 @@ public:
 						const bool _convert_endian = false );
 
 	// clear given signed-int-16-buffer
-	static void clearS16Buffer( int_sample_t * _outbuf,
+	static void clearS16Buffer(int_sample_t * _outbuf,
 							const fpp_t _frames);
 protected:
 	// subclasses can re-implement this for being used in conjunction with
