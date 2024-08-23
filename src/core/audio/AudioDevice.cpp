@@ -130,9 +130,10 @@ void AudioDevice::renamePort( AudioPort * )
 int AudioDevice::convertToS16(const SampleFrame* _ab,
 								const fpp_t _frames,
 								int_sample_t * _output_buffer,
-								ch_cnt_t channels,
+
 								const bool _convert_endian)
 {
+	const unsigned int channels = 2;
 	if( _convert_endian )
 	{
 		for( fpp_t frame = 0; frame < _frames; ++frame )
@@ -165,11 +166,12 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 
 
 
-void AudioDevice::clearS16Buffer(int_sample_t * _outbuf, const fpp_t _frames, ch_cnt_t channels)
+void AudioDevice::clearS16Buffer(int_sample_t * _outbuf, const fpp_t _frames)
 {
 
 	assert( _outbuf != nullptr );
 
+	const unsigned int channels = 2;
 	memset(_outbuf, 0,  _frames * channels * BYTES_PER_INT_SAMPLE);
 }
 

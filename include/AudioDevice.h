@@ -96,13 +96,11 @@ public:
 	static int convertToS16(const SampleFrame* _ab,
 						const fpp_t _frames,
 						int_sample_t * _output_buffer,
-						ch_cnt_t channels,
 						const bool _convert_endian = false );
 
 	// clear given signed-int-16-buffer
 	static void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames,
-							ch_cnt_t channels);
+							const fpp_t _frames);
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
