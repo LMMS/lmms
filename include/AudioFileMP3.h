@@ -40,13 +40,13 @@ namespace lmms
 class AudioFileMP3 : public AudioFileDevice
 {
 public:
-	AudioFileMP3(OutputSettings const & outputSettings,
+	AudioFileMP3(OutputSettings const& outputSettings,
 			bool& successful,
 			const QString& file,
 			const fpp_t defaultBufferSize);
 	~AudioFileMP3() override;
 
-	static AudioFileDevice * getInst(
+	static AudioFileDevice* getInst(
 			OutputSettings const &outputSettings,
 			bool &successful,
 			const QString & outputFilename,
