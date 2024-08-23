@@ -33,12 +33,11 @@ namespace lmms
 {
 
 AudioFileDevice::AudioFileDevice(OutputSettings const & outputSettings,
-	const QString & _file, const ch_cnt_t _channels,
+	const QString & _file,
 	const fpp_t defaultBufferSize) :
 	m_outputFile( _file ),
 	m_outputSettings(outputSettings),
-	m_defaultFrameCount(defaultBufferSize),
-	m_channelCount(_channels)
+	m_defaultFrameCount(defaultBufferSize)
 {
 	using gui::ExportProjectDialog;
 
@@ -79,11 +78,6 @@ AudioFileDevice::~AudioFileDevice()
 sample_rate_t AudioFileDevice::getSampleRate()
 {
 	return m_outputSettings.getSampleRate();
-}
-
-ch_cnt_t AudioFileDevice::getChannel()
-{
-	return m_channelCount;
 }
 
 const fpp_t AudioFileDevice::getDefaultFrameCount()

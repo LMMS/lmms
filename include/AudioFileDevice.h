@@ -42,7 +42,7 @@ public:
 	using BufferFn = std::function<void(SampleFrame*, fpp_t*, fpp_t)>;
 
 	AudioFileDevice(OutputSettings const & outputSettings,
-			const QString & _file, const ch_cnt_t _channels,
+			const QString & _file,
 			const fpp_t defaultBufferSize);
 	virtual ~AudioFileDevice();
 
@@ -54,7 +54,6 @@ public:
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
 
 	sample_rate_t getSampleRate();
-	ch_cnt_t getChannel();
 	// how many samples to store in a buffer
 	const fpp_t getDefaultFrameCount();
 
@@ -85,11 +84,10 @@ private:
 	OutputSettings m_outputSettings;
 
 	const fpp_t m_defaultFrameCount;
-	ch_cnt_t m_channelCount;
 } ;
 
 using AudioFileDeviceInstantiaton
-	= AudioFileDevice* (*)(const OutputSettings&m, bool&, const QString&, const ch_cnt_t, const fpp_t);
+	= AudioFileDevice* (*)(const OutputSettings&, bool&, const QString&, const fpp_t);
 
 } // namespace lmms
 
