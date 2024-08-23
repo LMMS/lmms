@@ -38,23 +38,21 @@ class AudioFileWave : public AudioFileDevice
 {
 public:
 	AudioFileWave(OutputSettings const & outputSettings,
-			bool & successful,
-			const QString & file,
-			const ch_cnt_t channels, const fpp_t defaultBufferSize);
+			bool& successful,
+			const QString& file,
+			const fpp_t defaultBufferSize);
 	~AudioFileWave() override;
 
 	static AudioFileDevice * getInst(
 			OutputSettings const &outputSettings,
 			bool &successful,
 			const QString & outputFilename,
-			const ch_cnt_t channels,
 			const fpp_t defaultBufferSize)
 	{
 		return new AudioFileWave(
 			outputSettings,
 			successful,
 			outputFilename,
-			channels,
 			defaultBufferSize
 		);
 	}

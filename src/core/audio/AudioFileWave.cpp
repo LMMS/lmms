@@ -36,8 +36,8 @@ namespace lmms
 AudioFileWave::AudioFileWave(OutputSettings const & outputSettings,
 			bool & successful,
 			const QString & file,
-			const ch_cnt_t channels, const fpp_t defaultBufferSize) :
-	AudioFileDevice(outputSettings, file, channels, defaultBufferSize),
+			const fpp_t defaultBufferSize) :
+	AudioFileDevice(outputSettings, file, defaultBufferSize),
 	m_sf( nullptr )
 {
 	successful = outputFileOpened() && startEncoding();
@@ -57,7 +57,7 @@ AudioFileWave::~AudioFileWave()
 bool AudioFileWave::startEncoding()
 {
 	m_si.samplerate = getSampleRate();
-	m_si.channels = getChannel();
+	m_si.channels = 2;
 	m_si.frames = getDefaultFrameCount();
 	m_si.sections = 1;
 	m_si.seekable = 0;
@@ -97,16 +97,17 @@ bool AudioFileWave::startEncoding()
 
 void AudioFileWave::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
+	const unsigned int channels = 2;
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 
 	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
 	{
-		auto buf = new float[_frames * getChannel()];
+		auto buf = new float[_frames * channels];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < getChannel(); ++chnl )
+			for (ch_cnt_t chnl = 0; chnl < channels; ++chnl)
 			{
-				buf[frame * getChannel() + chnl] = _ab[frame][chnl];
+				buf[frame * channels + chnl] = _ab[frame][chnl];
 			}
 		}
 		sf_writef_float( m_sf, buf, _frames );
@@ -114,8 +115,8 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 	}
 	else
 	{
-		auto buf = new int_sample_t[_frames * getChannel()];
-		AudioDevice::convertToS16(_ab, _frames, buf, !isLittleEndian(), getChannel());
+		auto buf = new int_sample_t[_frames * channels];
+		AudioDevice::convertToS16(_ab, _frames, buf, !isLittleEndian());
 
 		sf_writef_short( m_sf, buf, _frames );
 		delete[] buf;
