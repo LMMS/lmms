@@ -32,8 +32,8 @@
 namespace lmms
 {
 
-AudioFileDevice::AudioFileDevice(OutputSettings const & outputSettings,
-	const QString & _file,
+AudioFileDevice::AudioFileDevice(OutputSettings const& outputSettings,
+	const QString& _file,
 	const fpp_t defaultBufferSize) :
 	m_outputFile( _file ),
 	m_outputSettings(outputSettings),
