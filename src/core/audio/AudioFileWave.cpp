@@ -33,9 +33,9 @@
 namespace lmms
 {
 
-AudioFileWave::AudioFileWave(OutputSettings const & outputSettings,
-			bool & successful,
-			const QString & file,
+AudioFileWave::AudioFileWave(OutputSettings const& outputSettings,
+			bool& successful,
+			const QString& file,
 			const fpp_t defaultBufferSize) :
 	AudioFileDevice(outputSettings, file, defaultBufferSize),
 	m_sf( nullptr )
