@@ -41,9 +41,9 @@
 namespace lmms
 {
 
-AudioFileOgg::AudioFileOgg(OutputSettings const & outputSettings,
-			bool & successful,
-			const QString & file,
+AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings,
+			bool& successful,
+			const QString& file,
 			const fpp_t defaultBufferSize) :
 	AudioFileDevice(outputSettings, file, defaultBufferSize)
 {
@@ -183,7 +183,7 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 	const unsigned int channels = 2;
 	int eos = 0;
 
-	float * * buffer = vorbis_analysis_buffer( &m_vd, _frames * BYTES_PER_SAMPLE * channels);
+	float** buffer = vorbis_analysis_buffer( &m_vd, _frames * BYTES_PER_SAMPLE * channels);
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		for (ch_cnt_t chnl = 0; chnl < channels; chnl++)

@@ -40,13 +40,13 @@ namespace lmms
 class AudioFileOgg : public AudioFileDevice
 {
 public:
-	AudioFileOgg(OutputSettings const & outputSettings,
+	AudioFileOgg(OutputSettings const& outputSettings,
 			bool& successful,
 			const QString& file,
 			const fpp_t defaultBufferSize);
 	~AudioFileOgg() override;
 
-	static AudioFileDevice * getInst(
+	static AudioFileDevice* getInst(
 			OutputSettings const &outputSettings,
 			bool &successful,
 			const QString & outputFilename,
