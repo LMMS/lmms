@@ -39,8 +39,8 @@ namespace lmms
 AudioFileFlac::AudioFileFlac(OutputSettings const & outputSettings,
 			bool & successful,
 			const QString & file,
-			const ch_cnt_t channels, const fpp_t defaultBufferSize) :
-	AudioFileDevice(outputSettings, file, channels, defaultBufferSize),
+			const fpp_t defaultBufferSize) :
+	AudioFileDevice(outputSettings, file, defaultBufferSize),
 	m_sf(nullptr)
 {
 	successful = outputFileOpened() && startEncoding();
@@ -54,7 +54,7 @@ AudioFileFlac::~AudioFileFlac()
 bool AudioFileFlac::startEncoding()
 {
 	m_sfinfo.samplerate = getSampleRate();
-	m_sfinfo.channels = getChannel();
+	m_sfinfo.channels = 2;
 	m_sfinfo.frames = getDefaultFrameCount();
 	m_sfinfo.sections=1;
 	m_sfinfo.seekable=0;
@@ -96,28 +96,29 @@ bool AudioFileFlac::startEncoding()
 
 void AudioFileFlac::writeBuffer(const SampleFrame* _ab, fpp_t const frames)
 {
+	const unsigned int channels = 2;
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
 	if (depth == OutputSettings::BitDepth::Depth24Bit || depth == OutputSettings::BitDepth::Depth32Bit) // Float encoding
 	{
-		auto buf = std::vector<sample_t>(frames * getChannel());
+		auto buf = std::vector<sample_t>(frames * channels);
 		for(fpp_t frame = 0; frame < frames; ++frame)
 		{
-			for (ch_cnt_t channel = 0; channel < getChannel(); channel++)
+			for (ch_cnt_t channel = 0; channel < channels; channel++)
 			{
 				// Clip the negative side to just above -1.0 in order to prevent it from changing sign
 				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
 				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
-				buf[frame * getChannel() + channel] = std::max(clipvalue, _ab[frame][channel]);
+				buf[frame * channels + channel] = std::max(clipvalue, _ab[frame][channel]);
 			}
 		}
 		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
 	}
 	else // integer PCM encoding
 	{
-		auto buf = std::vector<int_sample_t>(frames * getChannel());
-		AudioDevice::convertToS16(_ab, frames, buf.data(), !isLittleEndian(), getChannel());
+		auto buf = std::vector<int_sample_t>(frames * channels);
+		AudioDevice::convertToS16(_ab, frames, buf.data(), !isLittleEndian());
 		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 
