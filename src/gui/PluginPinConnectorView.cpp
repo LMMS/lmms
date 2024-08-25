@@ -61,11 +61,13 @@ public:
 	auto sizeHint() const -> QSize override;
 	auto minimumSizeHint() const -> QSize override;
 	void paintEvent(QPaintEvent*) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
 	void mousePressEvent(QMouseEvent* me) override;
 	void updateSize();
 	auto cellSize() const -> QSize;
 
 private:
+	auto getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool;
 	auto calculateSize() const -> QSize;
 	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
 
@@ -293,6 +295,8 @@ PluginPinConnectorView::MatrixView::MatrixView(PluginPinConnectorView* view,
 	const char* formatText = isIn ? "LMMS to %1 input(s)" : "%1 output(s) to LMMS";
 	setToolTip(QString{formatText}.arg(parentModel->fullDisplayName()));
 
+	setMouseTracking(true);
+
 	updateSize();
 }
 
@@ -336,32 +340,32 @@ void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
 	}
 }
 
+void PluginPinConnectorView::MatrixView::mouseMoveEvent(QMouseEvent* me)
+{
+	me->ignore();
+
+	if (me->button() != Qt::MouseButton::NoButton)
+	{
+		unsetCursor();
+		return;
+	}
+
+	int xIdx;
+	int yIdx;
+	if (!getCell(me->pos(), xIdx, yIdx))
+	{
+		unsetCursor();
+		return;
+	}
+
+	setCursor(Qt::PointingHandCursor);
+}
+
 void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
 {
-	if (!rect().contains(me->pos(), true))
-	{
-		me->ignore();
-		return;
-	}
-
-	const int buttonW = m_buttonOn.width();
-	const int buttonH = m_buttonOn.height();
-	const auto cellSize = this->cellSize();
-
-	const auto relMousePos = me->pos();
-	const int xIdx = relMousePos.x() / cellSize.width();
-	const int yIdx = relMousePos.y() / cellSize.height();
-
-	// Check if within margin
-	int relPos = relMousePos.x() - xIdx * cellSize.width();
-	if (relPos >= buttonW || relPos <= 0)
-	{
-		me->ignore();
-		return;
-	}
-
-	relPos = relMousePos.y() - yIdx * cellSize.height();
-	if (relPos >= buttonH || relPos <= 0)
+	int xIdx = 0;
+	int yIdx = 0;
+	if (!getCell(me->pos(), xIdx, yIdx))
 	{
 		me->ignore();
 		return;
@@ -403,6 +407,27 @@ void PluginPinConnectorView::MatrixView::updateSize()
 auto PluginPinConnectorView::MatrixView::cellSize() const -> QSize
 {
 	return {m_buttonOn.width() + s_gridMargin, m_buttonOn.height() + s_gridMargin};
+}
+
+auto PluginPinConnectorView::MatrixView::getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool
+{
+	if (!rect().contains(mousePos, true)) { return false; }
+
+	const int buttonW = m_buttonOn.width();
+	const int buttonH = m_buttonOn.height();
+	const auto cellSize = this->cellSize();
+
+	xIdx = mousePos.x() / cellSize.width();
+	yIdx = mousePos.y() / cellSize.height();
+
+	// Check if within margin
+	int relPos = mousePos.x() - xIdx * cellSize.width();
+	if (relPos >= buttonW || relPos <= 0) { return false; }
+
+	relPos = mousePos.y() - yIdx * cellSize.height();
+	if (relPos >= buttonH || relPos <= 0) { return false; }
+
+	return true;
 }
 
 auto PluginPinConnectorView::MatrixView::calculateSize() const -> QSize
