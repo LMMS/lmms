@@ -544,17 +544,17 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdChangeInputCount:
-			m_pinConnector.setChannelCountIn(_m.getInt(0));
+			m_pinConnector.setPluginChannelCountIn(_m.getInt(0));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeOutputCount:
-			m_pinConnector.setChannelCountOut(_m.getInt(0));
+			m_pinConnector.setPluginChannelCountOut(_m.getInt(0));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeInputOutputCount:
-			m_pinConnector.setChannelCounts(_m.getInt(0), _m.getInt(1));
+			m_pinConnector.setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
 			resizeSharedProcessingMemory();
 			break;
 

@@ -48,11 +48,12 @@ enum class AudioDataLayout
 	 * Layout where the samples for each channel are interleaved.
 	 * i.e. "LRLRLRLR"
 	 *
-	 * Or:
+	 * Samples for individual channels can be accessed like this:
 	 * - Channel #0 samples: samples[C*i]
 	 * - Channel #1 samples: samples[C*i + 1]
 	 * - Channel #2 samples: samples[C*i + 2]
 	 * - Channel #3 samples: samples[C*i + 3]
+	 * - ...
 	 */
 	Interleaved,
 
@@ -60,11 +61,12 @@ enum class AudioDataLayout
 	 * Layout where all samples for a particular channel are grouped together.
 	 * i.e. "LLLLRRRR"
 	 *
-	 * Or:
+	 * Samples for individual channels can be accessed like this:
 	 * - Channel #0 samples: samples[i]
 	 * - Channel #1 samples: samples[1*N + i]
 	 * - Channel #2 samples: samples[2*N + i]
 	 * - Channel #3 samples: samples[3*N + i]
+	 * - ...
 	 */
 	Split
 };
@@ -88,8 +90,7 @@ using InterleavedAudioDataPtr = AudioDataPtr<AudioDataLayout::Interleaved, T>;
 
 /**
  * A simple (samples, size) pair for storing audio data of a particular layout.
- *
- * Does not contain channel grouping information like `ChannelGroups`, but all data is contiguous in memory.
+ * All data is contiguous in memory.
  *
  * NOTE: More information is still needed to correctly interpret this audio data:
  * - For Split layout, the frame count is needed

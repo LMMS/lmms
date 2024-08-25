@@ -45,7 +45,7 @@ class PluginPinConnectorView;
 
 } // namespace gui
 
-//! Configure channel routing for a plugin's mono/stereo in/out ports
+//! Configuration for audio channel routing in/out of plugin
 class LMMS_EXPORT PluginPinConnector
 	: public Model
 	, public SerializingObject
@@ -53,12 +53,17 @@ class LMMS_EXPORT PluginPinConnector
 	Q_OBJECT
 
 public:
-	//! [LMMS track channel][plugin channel]
+	//! [track channel][plugin channel]
 	using PinMap = std::vector<std::vector<BoolModel*>>;
 
+	//! A plugin's input or output connections and other info
 	struct Matrix
 	{
-		explicit Matrix(bool isIn) : in{isIn} {}
+		PinMap pins;
+		int channelCount = 0;
+		std::vector<QString> channelNames; //!< optional
+
+		// TODO: Channel groupings, port configurations, ...
 
 		auto channelName(int channel) const -> QString;
 
@@ -66,32 +71,25 @@ public:
 		{
 			return pins[trackChannel][pluginChannel]->value();
 		}
-
-		PinMap pins;
-		int channelCount = 0;
-		std::vector<QString> channelNames; //!< optional
-		bool in; //!< true: LMMS-to-plugin; false: plugin-to-LMMS
-
-		// TODO: Channel groupings, port configurations, ...
 	};
 
 	PluginPinConnector(Model* parent = nullptr);
-	PluginPinConnector(int pluginInCount, int pluginOutCount, Model* parent = nullptr);
+	PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, Model* parent = nullptr);
 
 	/**
 	 * Getters
 	 */
 	auto in() const -> const Matrix& { return m_in; };
 	auto out() const -> const Matrix& { return m_out; };
-	auto trackChannelsCount() const -> std::size_t { return s_totalTrackChannels; }
+	auto trackChannelCount() const -> std::size_t { return s_totalTrackChannels; }
 	auto trackChannelsUsed() const -> unsigned int { return m_trackChannelsUsed; }
 
 	/**
 	 * Setters
 	 */
-	void setChannelCounts(int inCount, int outCount);
-	void setChannelCountIn(int inCount);
-	void setChannelCountOut(int outCount);
+	void setPluginChannelCounts(int inCount, int outCount);
+	void setPluginChannelCountIn(int inCount);
+	void setPluginChannelCountOut(int outCount);
 
 	void setDefaultConnections();
 
@@ -133,16 +131,16 @@ public:
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
 public slots:
-	void updateTrackChannels(int count);
+	void setTrackChannelCount(int count);
 
 private:
 	static void saveSettings(const Matrix& matrix, QDomDocument& doc, QDomElement& elem);
 	static void loadSettings(const QDomElement& elem, Matrix& matrix);
 
-	void setChannelCount(int newCount, Matrix& matrix);
+	void setPluginChannelCount(int newCount, bool isInput, Matrix& matrix);
 
-	Matrix m_in{true};   //!< LMMS --> Plugin
-	Matrix m_out{false}; //!< Plugin --> LMMS
+	Matrix m_in;  //!< LMMS --> Plugin
+	Matrix m_out; //!< Plugin --> LMMS
 
 	//! TODO: Move this somewhere else; Will be >= 2 once there is support for adding new track channels
 	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
