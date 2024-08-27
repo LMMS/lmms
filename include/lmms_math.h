@@ -37,7 +37,7 @@
 namespace lmms
 {
 
-static inline bool approximatelyEqual(float x, float y)
+inline bool approximatelyEqual(float x, float y)
 {
 	return x == y ? true : std::abs(x - y) < F_EPSILON;
 }
@@ -51,7 +51,7 @@ static inline bool approximatelyEqual(float x, float y)
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-static inline float fraction(const float x)
+inline float fraction(const float x)
 {
 	return x - std::trunc(x);
 }
@@ -66,21 +66,21 @@ static inline float fraction(const float x)
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-static inline float absFraction(const float x)
+inline float absFraction(const float x)
 {
 	return x - std::floor(x);
 }
 
 
 constexpr float FAST_RAND_RATIO = 1.0f / 32767;
-static inline int fast_rand()
+inline int fast_rand()
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
 	return( (unsigned)( next / 65536 ) % 32768 );
 }
 
-static inline float fastRandf( float range )
+inline float fastRandf(float range)
 {
 	return fast_rand() * range * FAST_RAND_RATIO;
 }
@@ -98,20 +98,20 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 
 
 //! returns 1.0f if val >= 0.0f, -1.0 else
-static inline float sign(float val) 
+inline float sign(float val) 
 { 
 	return val >= 0.0f ? 1.0f : -1.0f; 
 }
 
 
 //! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-static inline float sqrt_neg(float val) 
+inline float sqrt_neg(float val) 
 {
 	return std::sqrt(std::abs(val)) * sign(val);
 }
 
 //! @brief Exponential function that deals with negative bases
-static inline float signedPowf(float v, float e)
+inline float signedPowf(float v, float e)
 {
 	return std::pow(std::abs(v), e) * sign(v);
 }
@@ -119,7 +119,7 @@ static inline float signedPowf(float v, float e)
 
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
-static inline float logToLinearScale( float min, float max, float value )
+inline float logToLinearScale(float min, float max, float value)
 {
 	if( min < 0 )
 	{
@@ -134,7 +134,7 @@ static inline float logToLinearScale( float min, float max, float value )
 
 
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
-static inline float linearToLogScale( float min, float max, float value )
+inline float linearToLogScale(float min, float max, float value)
 {
 	static const float EXP = 1.0f / F_E;
 	const float valueLimited = std::clamp(value, min, max);
@@ -155,7 +155,7 @@ static inline float linearToLogScale( float min, float max, float value )
 //! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. 
 //! @return Amplitude in dBFS. -inf for 0 amplitude.
-static inline float safeAmpToDbfs( float amp )
+inline float safeAmpToDbfs(float amp)
 {
 	return amp == 0.0f
 		? -INFINITY
@@ -166,7 +166,7 @@ static inline float safeAmpToDbfs( float amp )
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
 //! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
 //! @return Linear amplitude
-static inline float safeDbfsToAmp( float dbfs )
+inline float safeDbfsToAmp(float dbfs)
 {
 	return std::isinf( dbfs )
 		? 0.0f
@@ -177,7 +177,7 @@ static inline float safeDbfsToAmp( float dbfs )
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
-static inline float ampToDbfs(float amp)
+inline float ampToDbfs(float amp)
 {
 	return log10f(amp) * 20.0f;
 }
@@ -186,7 +186,7 @@ static inline float ampToDbfs(float amp)
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbfsToAmp(float dbfs)
+inline float dbfsToAmp(float dbfs)
 {
 	return std::pow(10.f, dbfs * 0.05f);
 }
@@ -201,7 +201,7 @@ constexpr T lerp(T a, T b, F t)
 
 // @brief Calculate number of digits which LcdSpinBox would show for a given number
 // @note Once we upgrade to C++20, we could probably use std::formatted_size
-static inline int numDigitsAsInt(float f)
+inline int numDigitsAsInt(float f)
 {
 	// use rounding:
 	// LcdSpinBox sometimes uses std::round(), sometimes cast rounding
