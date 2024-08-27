@@ -339,7 +339,7 @@ TimePos AutomationClip::putValues(
 
 
 
-void AutomationClip::removeNode(const TimePos & time, bool lengthUpdate)
+void AutomationClip::removeNode(const TimePos & time)
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -352,11 +352,6 @@ void AutomationClip::removeNode(const TimePos & time, bool lengthUpdate)
 		--it;
 	}
 	generateTangents(it, 3);
-
-	if (lengthUpdate)
-	{
-		updateLength();
-	}
 
 	emit dataChanged();
 }
@@ -374,6 +369,7 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	if (tick0 == tick1)
 	{
 		removeNode(TimePos(tick0));
+		updateLength();
 		return;
 	}
 
@@ -393,6 +389,12 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	for (auto node: nodesToRemove)
 	{
 		removeNode(node);
+	}
+
+	if (!nodesToRemove.empty())
+	{
+		// Only update the length if we have actually removed nodes
+		updateLength();
 	}
 }
 
@@ -463,6 +465,7 @@ void AutomationClip::recordValue(TimePos time, float value)
 	else if( valueAt( time ) != value )
 	{
 		removeNode(time);
+		updateLength();
 	}
 }
 
@@ -523,7 +526,7 @@ TimePos AutomationClip::setDragValue(
 			}
 		}
 
-		this->removeNode(newTime, false);
+		this->removeNode(newTime);
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
 	}
