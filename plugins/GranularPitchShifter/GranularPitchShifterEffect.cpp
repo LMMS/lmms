@@ -157,7 +157,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			double randThing = (fast_rand() * FAST_RAND_RATIO * 2. - 1.);
+			double randThing = fast_rand() * FAST_RAND_RATIO * 2. - 1.;
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
