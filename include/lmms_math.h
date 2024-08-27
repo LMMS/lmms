@@ -72,7 +72,7 @@ static inline float absFraction(const float x)
 }
 
 
-constexpr int FAST_RAND_MAX = 32767;
+constexpr float FAST_RAND_RATIO = 1.0f / 32767;
 static inline int fast_rand()
 {
 	static unsigned long next = 1;
@@ -82,8 +82,7 @@ static inline int fast_rand()
 
 static inline float fastRandf( float range )
 {
-	static const float fast_rand_ratio = 1.0f / FAST_RAND_MAX;
-	return fast_rand() * range * fast_rand_ratio;
+	return fast_rand() * range * FAST_RAND_RATIO;
 }
 
 
