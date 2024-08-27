@@ -339,7 +339,7 @@ TimePos AutomationClip::putValues(
 
 
 
-void AutomationClip::removeNode(const TimePos & time)
+void AutomationClip::removeNode(const TimePos & time, bool lengthUpdate)
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -353,7 +353,10 @@ void AutomationClip::removeNode(const TimePos & time)
 	}
 	generateTangents(it, 3);
 
-	updateLength();
+	if (lengthUpdate)
+	{
+		updateLength();
+	}
 
 	emit dataChanged();
 }
@@ -520,7 +523,7 @@ TimePos AutomationClip::setDragValue(
 			}
 		}
 
-		this->removeNode(newTime);
+		this->removeNode(newTime, false);
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
 	}

@@ -107,7 +107,7 @@ public:
 		const bool ignoreSurroundingPoints = true
 	);
 
-	void removeNode(const TimePos & time);
+	void removeNode(const TimePos & time, bool lengthUpdate = true);
 	void removeNodes(const int tick0, const int tick1);
 
 	void resetNodes(const int tick0, const int tick1);
