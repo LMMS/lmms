@@ -63,7 +63,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
-	m_volumeKnob->setVolumeKnob( true );
+	m_volumeKnob->setVolKnobType(VolKnobType::RelVol);
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
 
