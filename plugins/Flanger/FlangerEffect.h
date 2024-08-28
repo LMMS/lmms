@@ -33,7 +33,6 @@ namespace lmms
 {
 
 class MonoDelay;
-class Noise;
 class QuadratureLfo;
 
 
@@ -55,8 +54,6 @@ private:
 	MonoDelay* m_lDelay;
 	MonoDelay* m_rDelay;
 	QuadratureLfo* m_lfo;
-	Noise* m_noise;
-
 };
 
 
