@@ -157,17 +157,17 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			double randThing = (fast_rand()/static_cast<double>(FAST_RAND_MAX) * 2. - 1.);
+			double randThing = fast_rand() * static_cast<double>(FAST_RAND_RATIO) * 2. - 1.;
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
 			std::array<float, 2> sprayResult = {0, 0};
 			if (spray > 0)
 			{
-				sprayResult[0] = (fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate;
+				sprayResult[0] = fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate;
 				sprayResult[1] = linearInterpolate(
 					sprayResult[0],
-					(fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate,
+					fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate,
 					spraySpread);
 			}
 			
