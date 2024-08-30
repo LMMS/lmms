@@ -401,7 +401,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::StringPairDataType::AutomatableModelLink);
 	if( !_dee->isAccepted() )
 	{
 		ClipView::dragEnterEvent( _dee );
@@ -413,9 +413,9 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
+	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(_de);
 	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "automatable_model" )
+	if (type == Clipboard::StringPairDataType::AutomatableModelLink)
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )
