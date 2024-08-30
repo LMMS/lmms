@@ -3876,12 +3876,12 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15 / m_zoomLevels[m_zoomingModel.value()]);
+							we->angleDelta().x() * 2 / 6 / m_zoomLevels[m_zoomingModel.value()]);
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15 / m_zoomLevels[m_zoomingModel.value()]);
+							we->angleDelta().y() * 2 / 6 / m_zoomLevels[m_zoomingModel.value()]);
 	}
 	else
 	{
