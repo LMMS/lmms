@@ -545,12 +545,12 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value()
-							- we->angleDelta().x());
+							- we->angleDelta().x() * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
 	}
 	else if (we->modifiers() & Qt::ShiftModifier)
 	{
 		m_leftRightScroll->setValue(m_leftRightScroll->value()
-							- we->angleDelta().y());
+							- we->angleDelta().y() * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
 	}
 	else
 	{
