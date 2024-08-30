@@ -26,11 +26,14 @@
 #ifndef LMMS_GUI_STRING_PAIR_DRAG_H
 #define LMMS_GUI_STRING_PAIR_DRAG_H
 
+#include <vector>
+
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
 
+#include "Clipboard.h"
 #include "lmms_export.h"
 
 class QPixmap;
@@ -42,13 +45,15 @@ namespace lmms::gui
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
-	StringPairDrag( const QString & _key, const QString & _value,
-					const QPixmap & _icon, QWidget * _w );
+	StringPairDrag(Clipboard::StringPairDataType key, const QString& _value,
+					const QPixmap& _icon, QWidget* _w);
 	~StringPairDrag() override;
 
-	static bool processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys );
-	static QString decodeKey( QDropEvent * _de );
+	static bool processDragEnterEvent(QDragEnterEvent* _dee,
+						Clipboard::StringPairDataType allowedKey);
+	static bool processDragEnterEvent(QDragEnterEvent* _dee,
+						const std::vector<Clipboard::StringPairDataType>* allowedKeys);
+	static Clipboard::StringPairDataType decodeKey(QDropEvent * _de);
 	static QString decodeValue( QDropEvent * _de );
 } ;
 
