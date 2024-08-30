@@ -24,11 +24,15 @@
 
 #include "InteractiveModelView.h"
 
+#include <algorithm>
+
+#include <QKeyEvent>
+
 namespace lmms::gui
 {
 
-InteractiveModelView::InteractiveModelView(Model* model, QWidget* widget) :
-	ModelView(model, widget),
+InteractiveModelView::InteractiveModelView(QWidget* widget) :
+	QWidget(widget),
 	m_isHighlighted(false),
 	m_lastShortcutCounter(0)
 {
@@ -42,43 +46,41 @@ InteractiveModelView::InteractiveModelView(Model* model, QWidget* widget) :
 
 InteractiveModelView::~InteractiveModelView()
 {
+	auto it = std::find(s_interactiveWidgets.begin(), s_interactiveWidgets.end(), this);
+	if (it != s_interactiveWidgets.end())
+	{
+		s_interactiveWidgets.erase(it);
+	}
+}
+
+void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataType)
+{
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		if (it == this)
+		if ((*it)->canAcceptClipBoardData(dataType))
 		{
-			s_interactiveWidgets.erase(it);
-			break;
+			(*it)->setIsHighlighted(true);
 		}
 	}
 }
 
-static void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataType)
+void InteractiveModelView::stopHighlighting()
 {
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		if (it->canAcceptClipBoardData(dataType))
-		{
-			it->setIsHighlighted(true);
-		}
-	}
-}
-
-static void InteractiveModelView::stopHighlighting()
-{
-	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
-	{
-		it->setIsHighlighted(false);
+		(*it)->setIsHighlighted(false);
 	}
 }
 
 void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 {
-	const std::vector<ModelShortcut> shortcuts(getShortcuts());
+	std::vector<ModelShortcut> shortcuts(getShortcuts());
 	for (size_t i = 0; i < shortcuts.size(); i++)
 	{
-		if (doesShortcutMatch(shortcuts[i], event, m_lastShortcutCounter))
+		if (doesShortcutMatch(&(shortcuts[i]), event, m_lastShortcutCounter))
 		{
-			if (m_lastShortcut == shortcuts[i])
+			ModelShortcut temp = shortcuts[i];
+			if (m_lastShortcut == temp)
 			{
 				m_lastShortcutCounter++;
 			}
@@ -94,7 +96,7 @@ void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 	}
 }
 
-void InteractiveModelView::enterEvent(QEnterEvent* event)
+void InteractiveModelView::enterEvent(QEvent* event)
 {
 	m_lastShortcutCounter = 0;
 
@@ -106,7 +108,7 @@ void InteractiveModelView::enterEvent(QEnterEvent* event)
 	qDebug("enter event");
 }
 
-void InteractiveModelView::leaveEvent(QLeaveEvent* event)
+void InteractiveModelView::leaveEvent(QEvent* event)
 {
 	qDebug("leave event");
 }
@@ -121,7 +123,7 @@ bool InteractiveModelView::getIsHighlighted() const
 	return m_isHighlighted;
 }
 
-bool InteractiveModelView::setIsHighlighted(bool isHighlighted)
+void InteractiveModelView::setIsHighlighted(bool isHighlighted)
 {
 	if (m_isHighlighted != isHighlighted)
 	{
@@ -130,9 +132,9 @@ bool InteractiveModelView::setIsHighlighted(bool isHighlighted)
 	}
 }
 
-bool InteractiveModelView::doesShortcutMatch(ModelShortcut& shortcut, QKeyEvent* event, unsigned int times)
+bool InteractiveModelView::doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event, unsigned int times) const
 {
-	return shortcut.m_key == event->key() && (event->modifiers() & shortcut.m_modifier) && shortcut.m_times == times;
+	return shortcut->m_key == event->key() && (event->modifiers() & shortcut->m_modifier) && shortcut->m_times == times;
 }
 
 } // namespace lmms::gui
