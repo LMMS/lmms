@@ -285,7 +285,7 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 	Engine::setDndPluginKey(&m_pluginKey);
 	if ( _me->button() == Qt::LeftButton )
 	{
-		new StringPairDrag("instrument",
+		new StringPairDrag(Clipboard::StringPairDataType::Instrument,
 			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
 	}
