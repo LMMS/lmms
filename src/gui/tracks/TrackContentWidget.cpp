@@ -328,8 +328,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-						QString::number( static_cast<int>(getTrack()->type()) ) );
+		StringPairDrag::processDragEnterEvent(dee, ClipView::getClipStringPairType(getTrack()));
 	}
 }
 
@@ -355,15 +354,12 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QDropEvent* d
 // Overloaded method to make it possible to call this method without a Drag&Drop event
 bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md , bool allowSameBar )
 {
-	// For decodeKey() and decodeValue()
-	using namespace Clipboard;
-
 	Track * t = getTrack();
-	QString type = decodeKey( md );
-	QString value = decodeValue( md );
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(md);
+	QString value = Clipboard::decodeValue(md);
 
 	// We can only paste into tracks of the same type
-	if (type != ("clip_" + QString::number(static_cast<int>(t->type()))))
+	if (type != ClipView::getClipStringPairType(getTrack()))
 	{
 		return false;
 	}
@@ -452,17 +448,13 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, QDropEvent * de )
 // Overloaded method so we can call it without a Drag&Drop event
 bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, bool skipSafetyCheck )
 {
-	// For decodeKey() and decodeValue()
-	using namespace Clipboard;
-
 	// When canPasteSelection was already called before, skipSafetyCheck will skip this
 	if( !skipSafetyCheck && canPasteSelection( clipPos, md ) == false )
 	{
 		return false;
 	}
 
-	QString type = decodeKey( md );
-	QString value = decodeValue( md );
+	QString value = Clipboard::decodeValue(md);
 
 	getTrack()->addJournalCheckPoint();
 
@@ -676,9 +668,6 @@ TimePos TrackContentWidget::endPosition( const TimePos & posStart )
 
 void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 {
-	// For hasFormat(), MimeType enum class and getMimeData()
-	using namespace Clipboard;
-
 	if( cme->modifiers() )
 	{
 		return;
@@ -686,7 +675,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	// If we don't have Clip data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
-	if( ! hasFormat( MimeType::StringPair )  )
+	if (!Clipboard::hasFormat(Clipboard::MimeType::StringPair))
 	{
 		return;
 	}
@@ -695,7 +684,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, ContextMenuAction::Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
-	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );
+	pasteA->setEnabled(canPasteSelection(getPosition(cme->x()), Clipboard::getMimeData()) ? true : false);
 
 	contextMenu.exec( QCursor::pos() );
 }
