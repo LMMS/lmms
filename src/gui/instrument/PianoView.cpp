@@ -449,7 +449,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 
 			if (me->modifiers() & Qt::ControlModifier)
 			{
-				new StringPairDrag("automatable_model",	QString::number(m_movedNoteModel->id()), QPixmap(), this);
+				new StringPairDrag(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(m_movedNoteModel->id()), QPixmap(), this);
 				me->accept();
 			}
 			else
