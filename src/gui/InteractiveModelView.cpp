@@ -31,6 +31,8 @@
 namespace lmms::gui
 {
 
+std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
+
 InteractiveModelView::InteractiveModelView(QWidget* widget) :
 	QWidget(widget),
 	m_isHighlighted(false),
