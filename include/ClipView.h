@@ -32,6 +32,7 @@
 #include "ModelView.h"
 #include "Rubberband.h"
 #include "Clip.h"
+#include "Clipboard.h"
 
 
 class QMenu;
@@ -125,6 +126,9 @@ public:
 
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	
+	//! used for getting the correct clip `StringPairDataType` for a given track
+	static Clipboard::StringPairDataType getClipStringPairType(Track* track);
 
 	QColor getColorForDisplay( QColor );
 
