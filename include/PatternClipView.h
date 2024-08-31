@@ -65,6 +65,8 @@ private:
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
+	
+	bool splitClip(const TimePos pos) override;
 } ;
 
 

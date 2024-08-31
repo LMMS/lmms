@@ -486,5 +486,49 @@ void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 	m_clip->generateTangents();
 }
 
+//! Split this Clip.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool AutomationClipView::splitClip( const TimePos pos )
+{
+	setMarkerEnabled( false );
+
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	//Don't split if we slid off the Clip or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialClipPos && splitPos < m_initialClipEnd )
+	{
+		m_clip->getTrack()->addJournalCheckPoint();
+		m_clip->getTrack()->saveJournallingState(false);
+
+		auto rightClip = new AutomationClip(*m_clip);
+
+		for( AutomationClip::timeMap::const_iterator it =
+							m_clip->getTimeMap().begin();
+						it != m_clip->getTimeMap().end(); ++it )
+		{
+			rightClip->removeNode(POS(it));
+			if (POS(it) >= pos)
+			{
+				rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
+			}
+		}
+
+		rightClip->putValue(0, m_clip->valueAt(pos));
+
+		m_clip->changeLength(splitPos - m_initialClipPos);
+
+		rightClip->movePosition(splitPos);
+		rightClip->changeLength(m_initialClipEnd - splitPos);
+
+		// For some reason, the new clip sometimes randomly puts itself in record mode. This is a temportary fix which forces it to match the original clip.
+		rightClip->setRecording(m_clip->isRecording());
+		
+		m_clip->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
+}
 
 } // namespace lmms::gui

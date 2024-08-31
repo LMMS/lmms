@@ -195,5 +195,34 @@ void PatternClipView::update()
 	ClipView::update();
 }
 
+//! Split this Clip.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool PatternClipView::splitClip(const TimePos pos)
+{
+	setMarkerEnabled( false );
+
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	//Don't split if we slid off the Clip or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if (splitPos > m_initialClipPos && splitPos < m_initialClipEnd)
+	{
+		m_patternClip->getTrack()->addJournalCheckPoint();
+		m_patternClip->getTrack()->saveJournallingState(false);
+
+		auto rightClip = new PatternClip(m_patternClip->getTrack());
+
+		m_patternClip->changeLength(splitPos - m_initialClipPos);
+
+		rightClip->movePosition(splitPos);
+		rightClip->changeLength(m_initialClipEnd - splitPos);
+		rightClip->setStartTimeOffset(m_patternClip->startTimeOffset() - m_patternClip->length());
+
+		m_patternClip->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else {return false;}
+}
 
 } // namespace lmms::gui
