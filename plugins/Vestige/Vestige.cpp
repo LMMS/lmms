@@ -860,9 +860,9 @@ void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void VestigeInstrumentView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
+	auto type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "vstplugin" )
+	if (type == Clipboard::StringPairDataType::VstPluginFile)
 	{
 		m_vi->loadFile( value );
 		_de->accept();
@@ -1216,9 +1216,9 @@ void ManageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void ManageVestigeInstrumentView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
+	auto type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "vstplugin" )
+	if (type == Clipboard::StringPairDataType::VstPluginFile)
 	{
 		m_vi->loadFile( value );
 		_de->accept();
