@@ -414,7 +414,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	if (!outfile.commit())
 	{
 		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("An unknown error has occured and the file could not be saved."));
+			SongEditor::tr("An unknown error has occurred and the file could not be saved."));
 		return false;
 	}
 
