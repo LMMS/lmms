@@ -497,44 +497,42 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	//Don't split if we slid off the Clip or if we're on the clip's start/end
 	//Cutting at exactly the start/end position would create a zero length
 	//clip (bad), and a clip the same length as the original one (pointless).
-	if (splitPos > m_initialClipPos && splitPos < m_initialClipEnd)
+	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) {return false;}
+
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto rightClip = new AutomationClip(*m_clip);
+	auto leftClip = new AutomationClip(*m_clip);
+	rightClip->clear();
+	leftClip->clear();
+
+	for(auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
 	{
-		m_clip->getTrack()->addJournalCheckPoint();
-		m_clip->getTrack()->saveJournallingState(false);
-
-		auto rightClip = new AutomationClip(*m_clip);
-		auto leftClip = new AutomationClip(*m_clip);
-		rightClip->clear();
-		leftClip->clear();
-
-		for(auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
+		if (POS(it) >= pos)
 		{
-			if (POS(it) >= pos)
-			{
-				rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
-			}
-			else
-			{
-				leftClip->putValues(POS(it), INVAL(it), OUTVAL(it), false);
-			}
+			rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
 		}
-		rightClip->putValue(0, m_clip->valueAt(pos));
-		leftClip->putValue(pos, m_clip->valueAt(pos));
-
-		leftClip->changeLength(splitPos - m_initialClipPos);
-
-		rightClip->movePosition(splitPos);
-		rightClip->changeLength(m_initialClipEnd - splitPos);
-
-		// For some reason, the new clips sometime randomly put themselves in record mode. This is a temportary fix which forces them to match the original clip.
-		rightClip->setRecording(m_clip->isRecording());
-		leftClip->setRecording(m_clip->isRecording());
-		
-		m_clip->getTrack()->restoreJournallingState();
-		remove();
-		return true;
+		else
+		{
+			leftClip->putValues(POS(it), INVAL(it), OUTVAL(it), false);
+		}
 	}
-	else { return false; }
+	rightClip->putValue(0, m_clip->valueAt(pos));
+	leftClip->putValue(pos, m_clip->valueAt(pos));
+
+	leftClip->changeLength(splitPos - m_initialClipPos);
+
+	rightClip->movePosition(splitPos);
+	rightClip->changeLength(m_initialClipEnd - splitPos);
+
+	// For some reason, the new clips sometime randomly put themselves in record mode. This is a temportary fix which forces them to match the original clip.
+	rightClip->setRecording(m_clip->isRecording());
+	leftClip->setRecording(m_clip->isRecording());
+	
+	m_clip->getTrack()->restoreJournallingState();
+	remove();
+	return true;
 }
 
 } // namespace lmms::gui
