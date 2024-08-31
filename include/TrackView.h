@@ -27,6 +27,7 @@
 
 #include <QWidget>
 
+#include "Clipboard.h"
 #include "JournallingObject.h"
 #include "ModelView.h"
 #include "TrackContentWidget.h"
@@ -104,7 +105,7 @@ public:
 	// Currently instrument track and sample track supports it
 	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
 
-
+	static Clipboard::StringPairDataType getTrackStringPairType(Track* track);
 public slots:
 	virtual bool close();
 
