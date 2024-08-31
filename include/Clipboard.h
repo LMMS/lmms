@@ -49,6 +49,7 @@ namespace lmms::Clipboard
 		FloatValue,
 		AutomatableModelLink,
 		Instrument,
+		
 		PresetFile,
 		PluginPresetFile,
 		SampleFile,
@@ -56,7 +57,20 @@ namespace lmms::Clipboard
 		PatchFile,
 		VstPluginFile,
 		ImportedProject,
-		ProjectFile
+		ProjectFile,
+		
+		SampleData,
+		
+		InstrumentTrack,
+		PatternTrack,
+		SampleTrack,
+		AutomationTrack,
+		HiddenAutomationTrack,
+		
+		MidiClip,
+		PatternClip,
+		SampleClip,
+		AutomationClip
 	};
 
 	// Convenience Methods
@@ -89,11 +103,12 @@ namespace lmms::Clipboard
 		}
 	}
 
-	const std::array<QString, 12> StringPairDataTypeNames = {
+	const std::array<QString, 22> StringPairDataTypeNames = {
 		QString("None_error"),
 		QString("FloatValue"),
 		QString("AutomatableModelLink"),
 		QString("Instrument"),
+		
 		QString("PresetFile"),
 		QString("PluginPresetFile"),
 		QString("SampleFile"),
@@ -101,7 +116,20 @@ namespace lmms::Clipboard
 		QString("PatchFile"),
 		QString("VstPluginFile"),
 		QString("ImportedProject"),
-		QString("ProjectFile")
+		QString("ProjectFile"),
+		
+		QString("SampleData"),
+		
+		QString("InstrumentTrack"),
+		QString("PatternTrack"),
+		QString("SampleTrack"),
+		QString("AutomationTrack"),
+		QString("HiddenAutomationTrack"),
+		
+		QString("MidiClip"),
+		QString("PatternClip"),
+		QString("SampleClip"),
+		QString("AutomationClip")
 	};
 
 } // namespace lmms::Clipboard
