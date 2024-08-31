@@ -102,8 +102,11 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
+		Clipboard::StringPairDataType::SampleFile,
+		Clipboard::StringPairDataType::SampleData
+	};
+	if (StringPairDrag::processDragEnterEvent(_dee, &acceptedKeys) == false)
 	{
 		ClipView::dragEnterEvent( _dee );
 	}
@@ -116,12 +119,13 @@ void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleClipView::dropEvent( QDropEvent * _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(_de);
+	if (type == Clipboard::StringPairDataType::SampleFile)
 	{
 		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
 	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
+	else if (type == Clipboard::StringPairDataType::SampleData)
 	{
 		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
