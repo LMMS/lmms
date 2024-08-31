@@ -694,6 +694,7 @@ bool MidiClipView::splitClip(const TimePos pos)
 		m_clip->getTrack()->saveJournallingState(false);
 
 		auto rightClip = new MidiClip(m_clip->instrumentTrack());
+		auto leftClip = new MidiClip(m_clip->instrumentTrack());
 		
 		for (Note const * note : m_clip->m_notes)
 		{
@@ -705,12 +706,21 @@ bool MidiClipView::splitClip(const TimePos pos)
 			}
 		}
 
-		m_clip->changeLength(splitPos - m_initialClipPos);
+		for (Note const * note : m_clip->m_notes)
+		{
+			if (note->pos() < rounded_pos)
+			{
+				leftClip->addNote(*note);
+			}
+		}
+
+		leftClip->changeLength(splitPos - m_initialClipPos);
 
 		rightClip->movePosition(splitPos);
 		rightClip->changeLength(m_initialClipEnd - splitPos);
 
 		m_clip->getTrack()->restoreJournallingState();
+		remove();
 		return true;
 	}
 	else {return false;}
