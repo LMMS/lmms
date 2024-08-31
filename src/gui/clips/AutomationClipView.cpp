@@ -503,29 +503,37 @@ bool AutomationClipView::splitClip( const TimePos pos )
 		m_clip->getTrack()->saveJournallingState(false);
 
 		auto rightClip = new AutomationClip(*m_clip);
+		auto leftClip = new AutomationClip(*m_clip);
+		rightClip->clear();
+		leftClip->clear();
 
 		for( AutomationClip::timeMap::const_iterator it =
 							m_clip->getTimeMap().begin();
 						it != m_clip->getTimeMap().end(); ++it )
 		{
-			rightClip->removeNode(POS(it));
 			if (POS(it) >= pos)
 			{
 				rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
 			}
+			else
+			{
+				leftClip->putValues(POS(it), INVAL(it), OUTVAL(it), false);
+			}
 		}
-
 		rightClip->putValue(0, m_clip->valueAt(pos));
+		leftClip->putValue(pos, m_clip->valueAt(pos));
 
-		m_clip->changeLength(splitPos - m_initialClipPos);
+		leftClip->changeLength(splitPos - m_initialClipPos);
 
 		rightClip->movePosition(splitPos);
 		rightClip->changeLength(m_initialClipEnd - splitPos);
 
-		// For some reason, the new clip sometimes randomly puts itself in record mode. This is a temportary fix which forces it to match the original clip.
+		// For some reason, the new clips sometime randomly put themselves in record mode. This is a temportary fix which forces them to match the original clip.
 		rightClip->setRecording(m_clip->isRecording());
+		leftClip->setRecording(m_clip->isRecording());
 		
 		m_clip->getTrack()->restoreJournallingState();
+		remove();
 		return true;
 	}
 	else { return false; }
