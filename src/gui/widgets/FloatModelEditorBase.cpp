@@ -130,21 +130,24 @@ void FloatModelEditorBase::toggleScale()
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, "float_value,"
-							"automatable_model");
+	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
+		Clipboard::StringPairDataType::FloatValue,
+		Clipboard::StringPairDataType::AutomatableModelLink
+	};
+	StringPairDrag::processDragEnterEvent(dee, &acceptedKeys);
 }
 
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	QString type = StringPairDrag::decodeKey(de);
+	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(de);
 	QString val = StringPairDrag::decodeValue(de);
-	if (type == "float_value")
+	if (type == Clipboard::StringPairDataType::FloatValue)
 	{
 		model()->setValue(LocaleHelper::toFloat(val));
 		de->accept();
 	}
-	else if (type == "automatable_model")
+	else if (type == Clipboard::StringPairDataType::AutomatableModelLink)
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
@@ -186,7 +189,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 	else if (me->button() == Qt::LeftButton &&
 			(me->modifiers() & Qt::ShiftModifier))
 	{
-		new StringPairDrag("float_value",
+		new StringPairDrag(Clipboard::StringPairDataType::FloatValue,
 					QString::number(model()->value()),
 							QPixmap(), this);
 	}
