@@ -48,9 +48,10 @@ namespace lmms::gui
 {
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
+QString FloatModelEditorBase::m_shortcutMessage = "";
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
-	QWidget(parent),
+	InteractiveModelView(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
 	m_volumeKnob(false),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
@@ -66,6 +67,11 @@ void FloatModelEditorBase::initUi(const QString & name)
 	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
+	}
+
+	if (m_shortcutMessage == "")
+	{
+		m_shortcutMessage = buildShortcutMessage();
 	}
 
 	setWindowTitle(name);
@@ -140,21 +146,20 @@ void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(de);
-	QString val = StringPairDrag::decodeValue(de);
-	if (type == Clipboard::StringPairDataType::FloatValue)
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false)
 	{
-		model()->setValue(LocaleHelper::toFloat(val));
+		de->ignore();
+		return;
+	}
+
+	bool canAccept = processPaste(StringPairDrag::decodeKey(de), StringPairDrag::decodeValue(de));
+	if (canAccept == true)
+	{
 		de->accept();
 	}
-	else if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	else
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if (mod != nullptr)
-		{
-			AutomatableModel::linkModels(model(), mod);
-			mod->setValue(model()->value());
-		}
+		de->ignore();
 	}
 }
 
@@ -238,12 +243,14 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 
 void FloatModelEditorBase::enterEvent(QEvent *event)
 {
+	InteractiveModelView::enterEvent(event);
 	showTextFloat(700, 2000);
 }
 
 
 void FloatModelEditorBase::leaveEvent(QEvent *event)
 {
+	InteractiveModelView::leaveEvent(event);
 	s_textFloat->hide();
 }
 
@@ -283,6 +290,66 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
 }
 
+bool FloatModelEditorBase::canAcceptClipBoardData(Clipboard::StringPairDataType dataType)
+{
+	return dataType == Clipboard::StringPairDataType::FloatValue
+		|| dataType == Clipboard::StringPairDataType::AutomatableModelLink;
+}
+
+void FloatModelEditorBase::shortcutPressedEvent(size_t shortcutLocation, QKeyEvent* event)
+{
+	switch (shortcutLocation)
+	{
+		case 0:
+			Clipboard::copyStringPair(Clipboard::StringPairDataType::FloatValue, Clipboard::clipboardEncodeFloatValue(model()->value() * getConversionFactor()));
+			break;
+		case 1:
+			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(model()->id()));
+			break;
+		case 2:
+			if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { break; }
+			processPaste(Clipboard::decodeKey(Clipboard::getMimeData()), Clipboard::decodeValue(Clipboard::getMimeData()));
+			break;
+		default:
+			break;
+	}
+}
+
+QString& FloatModelEditorBase::getShortcutMessage()
+{
+	return m_shortcutMessage;
+}
+
+std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::getShortcuts()
+{
+	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
+	};
+	return shortcuts;
+}
+
+bool FloatModelEditorBase::processPaste(Clipboard::StringPairDataType type, QString value)
+{
+	bool shouldAccept = false;
+	if (type == Clipboard::StringPairDataType::FloatValue)
+	{
+		model()->setValue(LocaleHelper::toFloat(value));
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
+		if (mod != nullptr)
+		{
+			AutomatableModel::linkModels(model(), mod);
+			mod->setValue(model()->value());
+			shouldAccept = true;
+		}
+	}
+	return shouldAccept;
+}
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
