@@ -73,7 +73,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod(ConfigManager::inst()
-							->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
+							->value("audioengine", "framesperaudiobuffer", QString::number(AudioEngine::DefaultBufferSize))
 							.toInt()),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),

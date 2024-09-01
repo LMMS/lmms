@@ -48,11 +48,6 @@ class MidiClient;
 class AudioPort;
 class AudioEngineWorkerThread;
 
-
-constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
-constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
-constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
-
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
 constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
@@ -63,6 +58,10 @@ class LMMS_EXPORT AudioEngine : public QObject
 {
 	Q_OBJECT
 public:
+	constexpr static auto MinimumBufferSize = 32;
+	constexpr static auto DefaultBufferSize = 256;
+	constexpr static auto MaximumBufferSize = 1024;
+
 	/**
 	 * @brief RAII helper for requestChangesInModel.
 	 * Used by AudioEngine::requestChangesGuard.
