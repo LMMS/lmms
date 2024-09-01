@@ -35,10 +35,12 @@
 #include "lmms_export.h"
 #include "ModelView.h"
 
+class QMimeData;
+class QPainter;
+
 namespace lmms::gui
 {
 
-//class QPainter;
 class SimpleTextFloat;
 
 class LMMS_EXPORT InteractiveModelView : public QWidget
@@ -110,9 +112,9 @@ protected:
 	//! should implement dragging and dropping widgets or pasting from clipboard
 	//! should return if `QDropEvent` event can be accepted
 	//! force implement this method
-	virtual bool processPaste(Clipboard::StringPairDataType type, QString value) = 0;
+	virtual bool processPaste(const QMimeData* mimeData) = 0;
 
-	//void drawAutoHighlight(QPainter* painter);
+	void drawAutoHighlight(QPainter* painter);
 	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;
