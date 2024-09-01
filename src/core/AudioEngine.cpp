@@ -459,54 +459,47 @@ void AudioEngine::swapBuffers()
 	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
 }
 
-
-
-
 void AudioEngine::handleMetronome()
 {
-	static tick_t lastMetroTicks = -1;
-
-	Song * song = Engine::getSong();
-	Song::PlayMode currentPlayMode = song->playMode();
-
-	bool metronomeSupported =
-		currentPlayMode == Song::PlayMode::MidiClip
-		|| currentPlayMode == Song::PlayMode::Song
+	const auto song = Engine::getSong();
+	const auto currentPlayMode = song->playMode();
+	const auto supported = currentPlayMode == Song::PlayMode::MidiClip || currentPlayMode == Song::PlayMode::Song
 		|| currentPlayMode == Song::PlayMode::Pattern;
 
-	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
-	{
-		return;
-	}
+	if (!supported || !m_metronomeActive || song->isExporting() || song->countTracks() == 0) { return; }
 
-	// stop crash with metronome if empty project
-	if (song->countTracks() == 0)
-	{
-		return;
-	}
+	const auto ticksPerBar = TimePos::ticksPerBar();
+	const auto beatsPerBar = song->getTimeSigModel().getNumerator();
+	const auto framesPerTick = static_cast<std::size_t>(Engine::framesPerTick());
 
-	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
-	tick_t ticksPerBar = TimePos::ticksPerBar();
-	int numerator = song->getTimeSigModel().getNumerator();
+	auto currentTick = song->getPlayPos(song->playMode()).getTicks();
+	auto currentFrameOffset = song->getPlayPos(song->playMode()).currentFrame();
+	auto currentFrame = static_cast<std::size_t>(currentTick * framesPerTick + currentFrameOffset);
 
-	if (ticks == lastMetroTicks)
+	for (auto frame = std::size_t{0}; frame < m_framesPerPeriod; ++frame, ++currentFrame)
 	{
-		return;
-	}
+		if (currentFrame % framesPerTick == 0 && currentFrame != framesPerTick)
+		{
+			auto handle = static_cast<SamplePlayHandle*>(nullptr);
+			if (currentTick % ticksPerBar == 0)
+			{
+				handle = new SamplePlayHandle("misc/metronome02.ogg");
+			}
+			else if (currentTick % (ticksPerBar / beatsPerBar) == 0)
+			{
+				handle = new SamplePlayHandle("misc/metronome01.ogg");
+			}
 
-	if (ticks % (ticksPerBar / 1) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
-	}
-	else if (ticks % (ticksPerBar / numerator) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
-	}
+			if (handle)
+			{
+				handle->setOffset(frame);
+				addPlayHandle(handle);
+			}
 
-	lastMetroTicks = ticks;
+			++currentTick;
+		}
+	}
 }
-
-
 
 void AudioEngine::clear()
 {
