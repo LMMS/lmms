@@ -72,7 +72,9 @@ static thread_local bool s_renderingThread = false;
 
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
-	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_framesPerPeriod(ConfigManager::inst()
+							->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
+							.toInt()),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),
@@ -91,8 +93,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	for( int i = 0; i < 2; ++i )
 	{
 		m_inputBufferFrames[i] = 0;
-		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
-		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
+		m_inputBufferSize[i] = m_framesPerPeriod * 100;
+		m_inputBuffer[i] = new SampleFrame[m_framesPerPeriod * 100];
 		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
 	}
 
@@ -101,7 +103,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	m_outputBufferRead = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 	m_outputBufferWrite = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
-
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
