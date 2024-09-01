@@ -30,9 +30,11 @@
 
 
 #include "StringPairDrag.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
+
 #include "Clipboard.h"
+#include "GuiApplication.h"
+#include "InteractiveModelView.h"
+#include "MainWindow.h"
 
 
 namespace lmms::gui
@@ -40,7 +42,7 @@ namespace lmms::gui
 
 
 StringPairDrag::StringPairDrag(Clipboard::StringPairDataType key, const QString& _value,
-				const QPixmap& _icon, QWidget* _w) :
+				const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets) :
 	QDrag( _w )
 {
 	// For mimeType() and MimeType enum class
@@ -61,6 +63,10 @@ StringPairDrag::StringPairDrag(Clipboard::StringPairDataType key, const QString&
 	auto m = new QMimeData();
 	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
+	if (shouldHighlightWidgets)
+	{
+		InteractiveModelView::startHighlighting(key);
+	}
 	exec( Qt::LinkAction, Qt::LinkAction );
 }
 
