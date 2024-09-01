@@ -98,7 +98,8 @@ void InteractiveModelView::showMessage(QString& message)
 		s_simpleTextFloat = new SimpleTextFloat();
 	}
 	s_simpleTextFloat->setText(message);
-	s_simpleTextFloat->moveToGlobal(QPoint(2, getGUI()->mainWindow()->height()));
+	s_simpleTextFloat->moveToGlobal(QPoint(getGUI()->mainWindow()->pos().x() + 2,
+		getGUI()->mainWindow()->pos().y() + getGUI()->mainWindow()->height()));
 	s_simpleTextFloat->showWithDelay(0, 60000);
 }
 
