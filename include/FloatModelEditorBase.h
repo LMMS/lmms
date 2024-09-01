@@ -90,7 +90,7 @@ protected:
 	bool canAcceptClipBoardData(Clipboard::StringPairDataType dataType);
 	QString& getShortcutMessage();
 	std::vector<ModelShortcut> getShortcuts();
-	bool processPaste(Clipboard::StringPairDataType type, QString value);
+	bool processPaste(const QMimeData* mimeData);
 
 	virtual float getValue(const QPoint & p);
 

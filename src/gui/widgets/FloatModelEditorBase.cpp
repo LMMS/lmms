@@ -146,13 +146,7 @@ void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false)
-	{
-		de->ignore();
-		return;
-	}
-
-	bool canAccept = processPaste(StringPairDrag::decodeKey(de), StringPairDrag::decodeValue(de));
+	bool canAccept = processPaste(de->mimeData());
 	if (canAccept == true)
 	{
 		de->accept();
@@ -307,8 +301,7 @@ void FloatModelEditorBase::shortcutPressedEvent(size_t shortcutLocation, QKeyEve
 			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(model()->id()));
 			break;
 		case 2:
-			if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { break; }
-			processPaste(Clipboard::decodeKey(Clipboard::getMimeData()), Clipboard::decodeValue(Clipboard::getMimeData()));
+			processPaste(Clipboard::getMimeData());
 			break;
 		default:
 			break;
@@ -330,9 +323,14 @@ std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::getShortc
 	return shortcuts;
 }
 
-bool FloatModelEditorBase::processPaste(Clipboard::StringPairDataType type, QString value)
+bool FloatModelEditorBase::processPaste(const QMimeData* mimeData)
 {
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
 	bool shouldAccept = false;
+
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	QString value = Clipboard::decodeValue(mimeData);
+	
 	if (type == Clipboard::StringPairDataType::FloatValue)
 	{
 		model()->setValue(LocaleHelper::toFloat(value));
