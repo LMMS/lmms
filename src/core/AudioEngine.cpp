@@ -345,8 +345,6 @@ void AudioEngine::renderStageNoteSetup()
 	Mixer * mixer = Engine::mixer();
 	mixer->prepareMasterMix();
 
-	Metronome::process(m_framesPerPeriod);
-
 	// create play-handles for new notes, samples etc.
 	Engine::getSong()->processNextBuffer();
 

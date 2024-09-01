@@ -31,12 +31,12 @@ namespace lmms {
 class Metronome
 {
 public:
-	static bool active();
-	static void setActive(bool active);
-	static void process(size_t bufferSize);
+	bool active() const;
+	void setActive(bool active);
+	void process(size_t bufferSize);
 
 private:
-	inline static bool s_active = false;
+	bool m_active = false;
 };
 } // namespace lmms
 

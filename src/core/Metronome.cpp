@@ -30,14 +30,14 @@
 
 namespace lmms {
 
-bool Metronome::active()
+bool Metronome::active() const
 {
-	return s_active;
+	return m_active;
 }
 
 void Metronome::setActive(bool active)
 {
-	s_active = active;
+	m_active = active;
 }
 
 void Metronome::process(size_t bufferSize)
@@ -47,7 +47,7 @@ void Metronome::process(size_t bufferSize)
 	const auto supported = currentPlayMode == Song::PlayMode::MidiClip || currentPlayMode == Song::PlayMode::Song
 		|| currentPlayMode == Song::PlayMode::Pattern;
 
-	if (!supported || !s_active || song->isExporting() || song->countTracks() == 0) { return; }
+	if (!supported || !m_active || song->isExporting() || song->countTracks() == 0) { return; }
 
 	const auto ticksPerBar = TimePos::ticksPerBar();
 	const auto beatsPerBar = song->getTimeSigModel().getNumerator();

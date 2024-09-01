@@ -33,6 +33,7 @@
 
 #include "AudioEngine.h"
 #include "Controller.h"
+#include "Metronome.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Timeline.h"
@@ -375,6 +376,8 @@ public:
 
 	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
 
+	Metronome& metronome();
+
 public slots:
 	void playSong();
 	void record();
@@ -512,6 +515,8 @@ private:
 	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
 
 	AutomatedValueMap m_oldAutomatedValues;
+
+	Metronome m_metronome;
 
 	friend class Engine;
 	friend class gui::SongEditor;

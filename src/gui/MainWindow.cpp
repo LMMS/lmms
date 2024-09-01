@@ -431,7 +431,7 @@ void MainWindow::finalize()
 				this, SLOT(onToggleMetronome()),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Metronome::active());
+	m_metronomeToggle->setChecked(Engine::getSong()->metronome().active());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -1174,7 +1174,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Metronome::setActive(m_metronomeToggle->isChecked());
+	Engine::getSong()->metronome().setActive(m_metronomeToggle->isChecked());
 }
 
 
