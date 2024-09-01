@@ -26,17 +26,21 @@
 #define LMMS_GUI_INTERACTIVE_MODEL_VIEW_H
 
 #include <list>
+#include <memory>
 #include <vector>
 
 #include <QApplication>
 #include <QWidget>
+#include <QColor>
 
 #include "Clipboard.h"
 #include "lmms_export.h"
 #include "ModelView.h"
 
+class QColor;
 class QMimeData;
 class QPainter;
+class QTimer;
 
 namespace lmms::gui
 {
@@ -46,6 +50,7 @@ class SimpleTextFloat;
 class LMMS_EXPORT InteractiveModelView : public QWidget
 {
 Q_OBJECT
+	Q_PROPERTY(QColor highlightColor READ getHighlightColor WRITE setHighlightColor)
 public:
 	InteractiveModelView(QWidget* widget);
 	~InteractiveModelView() override;
@@ -55,6 +60,8 @@ public:
 	static void showMessage(QString& message);
 	static void hideMessage();
 
+	static QColor getHighlightColor();
+	static void setHighlightColor(QColor& color);
 protected:
 	class ModelShortcut
 	{
@@ -118,11 +125,17 @@ protected:
 	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;
+private slots:
+	inline static void timerStopHighlighting()
+	{
+		stopHighlighting();
+	}
 private:
 	void setIsHighlighted(bool isHighlighted);
 	//! draws
 	bool doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event) const;
 	bool doesShortcutMatch(const ModelShortcut* shortcutA, const ModelShortcut* shortcutB) const;
+	
 
 	bool m_isHighlighted;
 	
@@ -131,6 +144,8 @@ private:
 
 	QWidget* m_focusedBeforeWidget;
 
+	static std::unique_ptr<QColor> s_highlightColor;
+	static QTimer* s_highlightTimer;
 	static SimpleTextFloat* s_simpleTextFloat;
 	static std::list<InteractiveModelView*> s_interactiveWidgets;
 };

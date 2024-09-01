@@ -28,6 +28,8 @@
 
 #include <QKeyEvent>
 #include <QKeySequence> // displaying qt key names
+#include <QPainter> // drawAutoHighlight()
+#include <QPainterPath> // drawAutoHighlight()
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -35,6 +37,9 @@
 
 namespace lmms::gui
 {
+
+std::unique_ptr<QColor> InteractiveModelView::s_highlightColor = std::make_unique<QColor>();
+QTimer* InteractiveModelView::s_highlightTimer = nullptr;
 
 SimpleTextFloat* InteractiveModelView::s_simpleTextFloat = nullptr;
 std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
@@ -61,6 +66,12 @@ InteractiveModelView::~InteractiveModelView()
 
 void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataType)
 {
+	if (s_highlightTimer == nullptr)
+	{
+		s_highlightTimer = new QTimer(getGUI()->mainWindow());
+		s_highlightTimer->setSingleShot(true);
+		QObject::connect(s_highlightTimer, &QTimer::timeout, timerStopHighlighting);
+	}
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
 		if ((*it)->canAcceptClipBoardData(dataType))
@@ -68,6 +79,7 @@ void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataT
 			(*it)->setIsHighlighted(true);
 		}
 	}
+	s_highlightTimer->start(20000);
 }
 
 void InteractiveModelView::stopHighlighting()
@@ -97,6 +109,16 @@ void InteractiveModelView::hideMessage()
 		s_simpleTextFloat = new SimpleTextFloat();
 	}
 	s_simpleTextFloat->hide();
+}
+
+QColor InteractiveModelView::getHighlightColor()
+{
+	return *s_highlightColor;
+}
+
+void InteractiveModelView::setHighlightColor(QColor& color)
+{
+	s_highlightColor = std::make_unique<QColor>(color);
 }
 
 void InteractiveModelView::keyPressEvent(QKeyEvent* event)
@@ -187,7 +209,20 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 {
-	//TODO
+	if (getIsHighlighted())
+	{
+		QPainterPath path;
+		path.addRoundedRect(QRectF(1, 1, width() - 2, height() - 2), 0, 0);
+		QColor fillColor = *s_highlightColor;
+		fillColor.setAlpha(70);
+		painter->fillPath(path, fillColor);
+
+		painter->setPen(QPen(*s_highlightColor, 2));
+		painter->drawLine(1, 1, 5, 1);
+		painter->drawLine(1, 1, 1, 5);
+		painter->drawLine(width() - 2, height() - 2, width() - 6, height() - 2);
+		painter->drawLine(width() - 2, height() - 2, width() - 2, height() - 6);
+	}
 }
 
 QString InteractiveModelView::buildShortcutMessage()
