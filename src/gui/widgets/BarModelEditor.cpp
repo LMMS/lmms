@@ -112,6 +112,9 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	// Now draw the text
 	painter.setPen(getTextColor());
 	painter.drawText(textRect, elidedText);
+	
+	// draw `InteractiveModelView` highlight
+	drawAutoHighlight(&painter);
 }
 
 } // namespace lmms::gui
