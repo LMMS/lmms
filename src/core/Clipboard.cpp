@@ -69,7 +69,7 @@ namespace lmms::Clipboard
 
 	void copyStringPair(StringPairDataType key, const QString & value )
 	{
-		QString finalString = key + ":" + value;
+		QString finalString = StringPairDataTypeNames[static_cast<size_t>(key)] + ":" + value;
 
 		auto content = new QMimeData;
 		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
