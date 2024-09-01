@@ -290,7 +290,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), SIGNAL(positionChanged(const lmms::TimePos&)), this, SLOT(updatePositionAccompany(const lmms::TimePos&)));
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
