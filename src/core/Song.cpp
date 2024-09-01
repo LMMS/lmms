@@ -267,8 +267,6 @@ void Song::processNextBuffer()
 	const auto framesPerTick = Engine::framesPerTick();
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
-	m_metronome.process(framesPerPeriod);
-
 	f_cnt_t frameOffsetInPeriod = 0;
 
 	while (frameOffsetInPeriod < framesPerPeriod)
@@ -334,6 +332,8 @@ void Song::processNextBuffer()
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
+			processMetronome(frameOffsetInPeriod);
+
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
@@ -1543,6 +1543,17 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	std::atomic_store(&m_keymaps[index], newMap);
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
+}
+
+void Song::processMetronome(size_t bufferOffset)
+{
+	const auto currentPlayMode = playMode();
+	const auto supported = currentPlayMode == Song::PlayMode::MidiClip
+		|| currentPlayMode == Song::PlayMode::Song
+		|| currentPlayMode == Song::PlayMode::Pattern;
+
+	if (!supported || isExporting()) { return; } 
+	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
 }
 
 Metronome& Song::metronome()

@@ -26,7 +26,6 @@
 
 #include "Engine.h"
 #include "SamplePlayHandle.h"
-#include "Song.h"
 
 namespace lmms {
 
@@ -40,34 +39,14 @@ void Metronome::setActive(bool active)
 	m_active = active;
 }
 
-void Metronome::process(size_t bufferSize)
+void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset)
 {
-	const auto song = Engine::getSong();
-	const auto currentPlayMode = song->playMode();
-	const auto supported = currentPlayMode == Song::PlayMode::MidiClip || currentPlayMode == Song::PlayMode::Song
-		|| currentPlayMode == Song::PlayMode::Pattern;
+	const auto ticksPerBeat = ticksPerBar / beatsPerBar;
+	if (currentTick % ticksPerBeat != 0 || !m_active) { return; }
 
-	if (!supported || !m_active || song->isExporting() || song->countTracks() == 0) { return; }
-
-	const auto ticksPerBar = TimePos::ticksPerBar();
-	const auto beatsPerBar = song->getTimeSigModel().getNumerator();
-
-	const auto framesPerTick = static_cast<std::size_t>(Engine::framesPerTick());
-	const auto framesPerBar = framesPerTick * ticksPerBar;
-	const auto framesPerBeat = framesPerBar / beatsPerBar;
-
-	const auto currentTick = song->getPlayPos(song->playMode()).getTicks();
-	const auto currentFrameOffset = song->getPlayPos(song->playMode()).currentFrame();
-	auto currentFrame = static_cast<std::size_t>(currentTick * framesPerTick + currentFrameOffset);
-
-	for (auto frame = std::size_t{0}; frame < bufferSize; ++frame, ++currentFrame)
-	{
-		if (currentFrame % framesPerBeat != 0) { continue; }
-
-		const auto handle = currentFrame % framesPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
-															 : new SamplePlayHandle("misc/metronome01.ogg");
-		handle->setOffset(frame);
-		Engine::audioEngine()->addPlayHandle(handle);
-	}
+	const auto handle = currentTick % ticksPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
+													   : new SamplePlayHandle("misc/metronome01.ogg");
+	handle->setOffset(bufferOffset);
+	Engine::audioEngine()->addPlayHandle(handle);
 }
 } // namespace lmms

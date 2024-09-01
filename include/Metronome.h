@@ -33,7 +33,7 @@ class Metronome
 public:
 	bool active() const;
 	void setActive(bool active);
-	void process(size_t bufferSize);
+	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset);
 
 private:
 	bool m_active = false;

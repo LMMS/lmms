@@ -451,6 +451,7 @@ private:
 	void restoreKeymapStates(const QDomElement &element);
 
 	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
+	void processMetronome(size_t bufferOffset);
 
 	void setModified(bool value);
 
