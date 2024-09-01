@@ -51,34 +51,23 @@ void Metronome::process(size_t bufferSize)
 
 	const auto ticksPerBar = TimePos::ticksPerBar();
 	const auto beatsPerBar = song->getTimeSigModel().getNumerator();
-	const auto framesPerTick = static_cast<std::size_t>(Engine::framesPerTick());
 
-	auto currentTick = song->getPlayPos(song->playMode()).getTicks();
-	auto currentFrameOffset = song->getPlayPos(song->playMode()).currentFrame();
+	const auto framesPerTick = static_cast<std::size_t>(Engine::framesPerTick());
+	const auto framesPerBar = framesPerTick * ticksPerBar;
+	const auto framesPerBeat = framesPerBar / beatsPerBar;
+
+	const auto currentTick = song->getPlayPos(song->playMode()).getTicks();
+	const auto currentFrameOffset = song->getPlayPos(song->playMode()).currentFrame();
 	auto currentFrame = static_cast<std::size_t>(currentTick * framesPerTick + currentFrameOffset);
 
 	for (auto frame = std::size_t{0}; frame < bufferSize; ++frame, ++currentFrame)
 	{
-		if (currentFrame % framesPerTick == 0 && currentFrame != framesPerTick)
-		{
-			auto handle = static_cast<SamplePlayHandle*>(nullptr);
-			if (currentTick % ticksPerBar == 0)
-            {
-                handle = new SamplePlayHandle("misc/metronome02.ogg");
-            }
-			else if (currentTick % (ticksPerBar / beatsPerBar) == 0)
-			{
-				handle = new SamplePlayHandle("misc/metronome01.ogg");
-			}
+		if (currentFrame % framesPerBeat != 0) { continue; }
 
-			if (handle)
-			{
-				handle->setOffset(frame);
-				Engine::audioEngine()->addPlayHandle(handle);
-			}
-
-			++currentTick;
-		}
+		const auto handle = currentFrame % framesPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
+															 : new SamplePlayHandle("misc/metronome01.ogg");
+		handle->setOffset(frame);
+		Engine::audioEngine()->addPlayHandle(handle);
 	}
 }
 } // namespace lmms
