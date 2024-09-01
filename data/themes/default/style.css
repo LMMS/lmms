@@ -46,6 +46,10 @@ lmms--gui--FileBrowser QCheckBox
 	color: white;
 }
 
+lmms--gui--InteractiveModelView {
+	qproperty-highlightColor: rgb(42, 219, 49);
+}
+
 lmms--gui--Knob {
 	qproperty-lineInactiveColor: rgb(120, 120, 120);
 	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);

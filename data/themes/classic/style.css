@@ -11,6 +11,10 @@ QMdiArea {
 	background-image: url("resources:background_artwork.png");
 }
 
+lmms--gui--InteractiveModelView {
+	qproperty-highlightColor: rgb(38, 237, 231);
+}
+
 lmms--gui--Knob {
 	qproperty-lineInactiveColor: rgb(120, 120, 120);
 	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
