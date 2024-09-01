@@ -282,6 +282,7 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	p.setPen(foreground);
 	p.setBrush(foreground);
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
+	drawAutoHighlight(&p);
 }
 
 bool FloatModelEditorBase::canAcceptClipBoardData(Clipboard::StringPairDataType dataType)
@@ -296,9 +297,11 @@ void FloatModelEditorBase::shortcutPressedEvent(size_t shortcutLocation, QKeyEve
 	{
 		case 0:
 			Clipboard::copyStringPair(Clipboard::StringPairDataType::FloatValue, Clipboard::clipboardEncodeFloatValue(model()->value() * getConversionFactor()));
+			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::FloatValue);
 			break;
 		case 1:
 			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(model()->id()));
+			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::FloatValue);
 			break;
 		case 2:
 			processPaste(Clipboard::getMimeData());
@@ -345,6 +348,10 @@ bool FloatModelEditorBase::processPaste(const QMimeData* mimeData)
 			mod->setValue(model()->value());
 			shouldAccept = true;
 		}
+	}
+	if (shouldAccept)
+	{
+		InteractiveModelView::stopHighlighting();
 	}
 	return shouldAccept;
 }
