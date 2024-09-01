@@ -31,6 +31,7 @@
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
+#include "Metronome.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -87,7 +88,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
-	m_metronomeActive(false),
 	m_clearSignal(false)
 {
 	for( int i = 0; i < 2; ++i )
@@ -345,7 +345,7 @@ void AudioEngine::renderStageNoteSetup()
 	Mixer * mixer = Engine::mixer();
 	mixer->prepareMasterMix();
 
-	handleMetronome();
+	Metronome::process(m_framesPerPeriod);
 
 	// create play-handles for new notes, samples etc.
 	Engine::getSong()->processNextBuffer();
@@ -457,48 +457,6 @@ void AudioEngine::swapBuffers()
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
 	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
-}
-
-void AudioEngine::handleMetronome()
-{
-	const auto song = Engine::getSong();
-	const auto currentPlayMode = song->playMode();
-	const auto supported = currentPlayMode == Song::PlayMode::MidiClip || currentPlayMode == Song::PlayMode::Song
-		|| currentPlayMode == Song::PlayMode::Pattern;
-
-	if (!supported || !m_metronomeActive || song->isExporting() || song->countTracks() == 0) { return; }
-
-	const auto ticksPerBar = TimePos::ticksPerBar();
-	const auto beatsPerBar = song->getTimeSigModel().getNumerator();
-	const auto framesPerTick = static_cast<std::size_t>(Engine::framesPerTick());
-
-	auto currentTick = song->getPlayPos(song->playMode()).getTicks();
-	auto currentFrameOffset = song->getPlayPos(song->playMode()).currentFrame();
-	auto currentFrame = static_cast<std::size_t>(currentTick * framesPerTick + currentFrameOffset);
-
-	for (auto frame = std::size_t{0}; frame < m_framesPerPeriod; ++frame, ++currentFrame)
-	{
-		if (currentFrame % framesPerTick == 0 && currentFrame != framesPerTick)
-		{
-			auto handle = static_cast<SamplePlayHandle*>(nullptr);
-			if (currentTick % ticksPerBar == 0)
-			{
-				handle = new SamplePlayHandle("misc/metronome02.ogg");
-			}
-			else if (currentTick % (ticksPerBar / beatsPerBar) == 0)
-			{
-				handle = new SamplePlayHandle("misc/metronome01.ogg");
-			}
-
-			if (handle)
-			{
-				handle->setOffset(frame);
-				addPlayHandle(handle);
-			}
-
-			++currentTick;
-		}
-	}
 }
 
 void AudioEngine::clear()

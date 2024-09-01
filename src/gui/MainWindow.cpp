@@ -43,6 +43,7 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "Metronome.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -430,7 +431,7 @@ void MainWindow::finalize()
 				this, SLOT(onToggleMetronome()),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::audioEngine()->isMetronomeActive());
+	m_metronomeToggle->setChecked(Metronome::active());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -1173,7 +1174,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Engine::audioEngine()->setMetronomeActive( m_metronomeToggle->isChecked() );
+	Metronome::setActive(m_metronomeToggle->isChecked());
 }
 
 
