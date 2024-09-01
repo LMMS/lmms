@@ -30,6 +30,7 @@
 #include <QPoint>
 
 #include "AutomatableModelView.h"
+#include "InteractiveModelView.h"
 
 
 namespace lmms::gui
@@ -37,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView
 {
 	Q_OBJECT
 
@@ -84,6 +85,13 @@ protected:
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 
+	// InteractiveModelView methods
+	void shortcutPressedEvent(size_t shortcutLocation, QKeyEvent* event);
+	bool canAcceptClipBoardData(Clipboard::StringPairDataType dataType);
+	QString& getShortcutMessage();
+	std::vector<ModelShortcut> getShortcuts();
+	bool processPaste(Clipboard::StringPairDataType type, QString value);
+
 	virtual float getValue(const QPoint & p);
 
 private slots:
@@ -105,6 +113,7 @@ private:
 	}
 
 	static SimpleTextFloat * s_textFloat;
+	static QString m_shortcutMessage;
 
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
