@@ -46,7 +46,7 @@ class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
 	StringPairDrag(Clipboard::StringPairDataType key, const QString& _value,
-					const QPixmap& _icon, QWidget* _w);
+					const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets = true);
 	~StringPairDrag() override;
 
 	static bool processDragEnterEvent(QDragEnterEvent* _dee,
