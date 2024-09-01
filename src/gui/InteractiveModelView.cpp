@@ -185,12 +185,10 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 	}
 }
 
-/*
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 {
-	
+	//TODO
 }
-*/
 
 QString InteractiveModelView::buildShortcutMessage()
 {
