@@ -67,7 +67,7 @@ namespace lmms::Clipboard
 
 
 
-	void copyStringPair(StringPairDataType key, const QString & value )
+	void copyStringPair(StringPairDataType key, const QString& value)
 	{
 		QString finalString = StringPairDataTypeNames[static_cast<size_t>(key)] + ":" + value;
 
