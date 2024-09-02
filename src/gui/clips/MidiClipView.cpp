@@ -706,7 +706,7 @@ bool MidiClipView::splitClip(const TimePos pos)
 		}
 	}
 
-	for (Note const * note : m_clip->m_notes)
+	for (Note const* note : m_clip->m_notes)
 	{
 		if (note->pos() < rounded_pos)
 		{
