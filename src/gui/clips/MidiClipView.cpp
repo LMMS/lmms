@@ -714,6 +714,7 @@ bool MidiClipView::splitClip(const TimePos pos)
 		}
 	}
 
+	leftClip->movePosition(m_initialClipPos);
 	leftClip->changeLength(splitPos - m_initialClipPos);
 
 	rightClip->movePosition(splitPos);

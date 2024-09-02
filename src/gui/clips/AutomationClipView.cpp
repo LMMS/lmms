@@ -522,6 +522,7 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	rightClip->putValue(0, m_clip->valueAt(pos));
 	leftClip->putValue(pos, m_clip->valueAt(pos));
 
+	leftClip->movePosition(m_initialClipPos);
 	leftClip->changeLength(splitPos - m_initialClipPos);
 
 	rightClip->movePosition(splitPos);
