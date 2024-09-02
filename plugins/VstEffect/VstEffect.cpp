@@ -65,14 +65,14 @@ VstEffect::VstEffect( Model * _parent,
 	m_key( *_key ),
 	m_vstControls( this )
 {
+	setDontRun(true);
+
 	if( !m_key.attributes["file"].isEmpty() )
 	{
 		openPlugin( m_key.attributes["file"] );
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
 		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
-
-	setDontRun(true);
 }
 
 
