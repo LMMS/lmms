@@ -75,13 +75,8 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+double ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -120,13 +115,10 @@ bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
 		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
 
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return outSum;
 }
 
 void ReverbSCEffect::changeSampleRate()

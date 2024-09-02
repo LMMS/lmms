@@ -45,8 +45,7 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~VstEffect() override = default;
 
-	bool processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames ) override;
+	double processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{

@@ -58,13 +58,8 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-bool DispersionEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+double DispersionEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
-
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -125,8 +120,7 @@ bool DispersionEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	checkGate(outSum / frames);
-	return isRunning();
+	return outSum;
 }
 
 

@@ -68,9 +68,8 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+double Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
 	m_controls.copyBuffersFromLmms(buf, frames);
@@ -95,9 +94,8 @@ bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		auto r = static_cast<double>(buf[f][1]);
 		outSum += l*l + r*r;
 	}
-	checkGate(outSum / frames);
 
-	return isRunning();
+	return outSum;
 }
 
 

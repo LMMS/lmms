@@ -122,6 +122,25 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
+bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+{
+	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	{
+		sleepImpl();
+		return false;
+	}
+
+	const auto outSum = processImpl(buf, frames);
+	if (outSum >= 0)
+	{
+		checkGate(outSum / frames);
+	}
+
+	return isRunning();
+}
+
+
+
 
 Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,

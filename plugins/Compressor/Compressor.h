@@ -43,7 +43,9 @@ class CompressorEffect : public Effect
 public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~CompressorEffect() override = default;
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
+
+	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	void sleepImpl() override;
 
 	EffectControls* controls() override
 	{

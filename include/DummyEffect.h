@@ -98,6 +98,7 @@ public:
 		m_originalPluginData( originalPluginData )
 	{
 		setName();
+		setDontRun(true);
 	}
 
 	~DummyEffect() override = default;
@@ -107,9 +108,9 @@ public:
 		return &m_controls;
 	}
 
-	bool processAudioBuffer( SampleFrame*, const fpp_t ) override
+	double processImpl(SampleFrame*, const fpp_t) override
 	{
-		return false;
+		return -1.0;
 	}
 
 	const QDomElement& originalPluginData() const

@@ -71,51 +71,37 @@ VstEffect::VstEffect( Model * _parent,
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
 		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
+
+	setDontRun(true);
 }
 
 
 
 
-bool VstEffect::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames )
+double VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
+	assert(m_plugin != nullptr);
+	assert(frames <= DEFAULT_BUFFER_SIZE);
+	static thread_local auto tempBuf = std::array<SampleFrame, DEFAULT_BUFFER_SIZE>();
+
+	std::memcpy(tempBuf.data(), buf, sizeof(SampleFrame) * frames);
+	if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
 	{
-		return false;
+		m_plugin->process(tempBuf.data(), tempBuf.data());
+		m_pluginMutex.unlock();
 	}
 
-	if( m_plugin )
+	double outSum = 0.0;
+	const float w = wetLevel();
+	const float d = dryLevel();
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		const float d = dryLevel();
-#ifdef __GNUC__
-		SampleFrame buf[_frames];
-#else
-		SampleFrame* buf = new SampleFrame[_frames];
-#endif
-		memcpy( buf, _buf, sizeof( SampleFrame ) * _frames );
-		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
-		{
-			m_plugin->process( buf, buf );
-			m_pluginMutex.unlock();
-		}
-
-		double out_sum = 0.0;
-		const float w = wetLevel();
-		for( fpp_t f = 0; f < _frames; ++f )
-		{
-			_buf[f][0] = w*buf[f][0] + d*_buf[f][0];
-			_buf[f][1] = w*buf[f][1] + d*_buf[f][1];
-		}
-		for( fpp_t f = 0; f < _frames; ++f )
-		{
-			out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
-		}
-#ifndef __GNUC__
-		delete[] buf;
-#endif
-
-		checkGate( out_sum / _frames );
+		buf[f][0] = w * tempBuf[f][0] + d * buf[f][0];
+		buf[f][1] = w * tempBuf[f][1] + d * buf[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
-	return isRunning();
+
+	return outSum;
 }
 
 
@@ -137,11 +123,13 @@ void VstEffect::openPlugin( const QString & _plugin )
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();
+		setDontRun(true);
 		delete tf;
 		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
 		return;
 	}
 
+	setDontRun(false);
 	delete tf;
 
 	m_key.attributes["file"] = _plugin;

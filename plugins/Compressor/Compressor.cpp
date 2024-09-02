@@ -233,31 +233,11 @@ void CompressorEffect::calcMix()
 
 
 
-bool CompressorEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+double CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		// Clear lookahead buffers and other values when needed
-		if (!m_cleanedBuffers)
-		{
-			m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
-			m_gainResult[0] = m_gainResult[1] = 1;
-			m_displayPeak[0] = m_displayPeak[1] = COMP_NOISE_FLOOR;
-			m_displayGain[0] = m_displayGain[1] = COMP_NOISE_FLOOR;
-			std::fill(std::begin(m_scLookBuf[0]), std::end(m_scLookBuf[0]), COMP_NOISE_FLOOR);
-			std::fill(std::begin(m_scLookBuf[1]), std::end(m_scLookBuf[1]), COMP_NOISE_FLOOR);
-			std::fill(std::begin(m_inLookBuf[0]), std::end(m_inLookBuf[0]), 0);
-			std::fill(std::begin(m_inLookBuf[1]), std::end(m_inLookBuf[1]), 0);
-			m_cleanedBuffers = true;
-		}
-		return false;
-	}
-	else
-	{
-		m_cleanedBuffers = false;
-	}
+	m_cleanedBuffers = false;
 
-	float outSum = 0.0;
+	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -526,15 +506,30 @@ bool CompressorEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		rOutPeak = s[1] > rOutPeak ? s[1] : rOutPeak;
 	}
 
-	checkGate(outSum / frames);
 	m_compressorControls.m_outPeakL = lOutPeak;
 	m_compressorControls.m_outPeakR = rOutPeak;
 	m_compressorControls.m_inPeakL = lInPeak;
 	m_compressorControls.m_inPeakR = rInPeak;
 
-	return isRunning();
+	return outSum;
 }
 
+void CompressorEffect::sleepImpl()
+{
+	// Clear lookahead buffers and other values when needed
+	if (!m_cleanedBuffers)
+	{
+		m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
+		m_gainResult[0] = m_gainResult[1] = 1;
+		m_displayPeak[0] = m_displayPeak[1] = COMP_NOISE_FLOOR;
+		m_displayGain[0] = m_displayGain[1] = COMP_NOISE_FLOOR;
+		std::fill(std::begin(m_scLookBuf[0]), std::end(m_scLookBuf[0]), COMP_NOISE_FLOOR);
+		std::fill(std::begin(m_scLookBuf[1]), std::end(m_scLookBuf[1]), COMP_NOISE_FLOOR);
+		std::fill(std::begin(m_inLookBuf[0]), std::end(m_inLookBuf[0]), 0);
+		std::fill(std::begin(m_inLookBuf[1]), std::end(m_inLookBuf[1]), 0);
+		m_cleanedBuffers = true;
+	}
+}
 
 // Regular modulo doesn't handle negative numbers correctly.  This does.
 inline int CompressorEffect::realmod(int k, int n)

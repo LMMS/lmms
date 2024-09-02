@@ -69,12 +69,8 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+double BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
 	// check out changed controls
 	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
 	{
@@ -106,9 +102,7 @@ bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return outSum;
 }
 
 

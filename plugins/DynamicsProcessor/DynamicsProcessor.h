@@ -42,8 +42,9 @@ public:
 	DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~DynProcEffect() override;
-	bool processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames ) override;
+
+	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	void sleepImpl() override;
 
 	EffectControls * controls() override
 	{

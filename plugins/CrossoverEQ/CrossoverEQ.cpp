@@ -89,13 +89,8 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-bool CrossoverEQEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+double CrossoverEQEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-	
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
 	{
@@ -199,10 +194,8 @@ bool CrossoverEQEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
-	
-	checkGate( outSum / frames );
-	
-	return isRunning();
+
+	return outSum;
 }
 
 void CrossoverEQEffect::clearFilterHistories()
