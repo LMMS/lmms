@@ -496,9 +496,9 @@ bool AutomationClipView::splitClip(const TimePos pos)
 
 	const TimePos splitPos = m_initialClipPos + pos;
 
-	//Don't split if we slid off the Clip or if we're on the clip's start/end
-	//Cutting at exactly the start/end position would create a zero length
-	//clip (bad), and a clip the same length as the original one (pointless).
+	// Don't split if we slid off the Clip or if we're on the clip's start/end
+	// Cutting at exactly the start/end position would create a zero length
+	// clip (bad), and a clip the same length as the original one (pointless).
 	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
 
 	m_clip->getTrack()->addJournalCheckPoint();
