@@ -91,7 +91,6 @@ double GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t fra
 	const float shapeK = cosWindowApproxK(shape);
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
-	double outSum = 0.0;
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -236,7 +235,6 @@ double GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t fra
 			
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f].sumOfSquaredAmplitudes();
 	}
 	
 	if (m_sampleRateNeedsUpdate)
@@ -245,7 +243,7 @@ double GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t fra
 		changeSampleRate();
 	}
 
-	return outSum;
+	return -1.0;
 }
 
 void GranularPitchShifterEffect::changeSampleRate()
