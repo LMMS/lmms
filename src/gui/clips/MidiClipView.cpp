@@ -696,7 +696,7 @@ bool MidiClipView::splitClip(const TimePos pos)
 	auto rightClip = new MidiClip(m_clip->instrumentTrack());
 	auto leftClip = new MidiClip(m_clip->instrumentTrack());
 	
-	for (Note const * note : m_clip->m_notes)
+	for (Note const* note : m_clip->m_notes)
 	{
 		if (note->pos() >= rounded_pos)
 		{
