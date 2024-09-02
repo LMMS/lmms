@@ -675,10 +675,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 }
 
 
-//! Split this Clip.
-/**
-	\param pos the position of the split, relative to the start of the clip 
-*/
+
+
 bool MidiClipView::splitClip(const TimePos pos)
 {
 	// Currently, due to midi clips being required to be multiples of 1 bar in length, restrict the split pos to the nearest bar:

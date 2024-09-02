@@ -345,10 +345,9 @@ void SampleClipView::setAutomationGhost()
 	aEditor->setFocus();
 }
 
-//! Split this Clip.
-/**
-	\param pos the position of the split, relative to the start of the clip
-*/
+
+
+
 bool SampleClipView::splitClip(const TimePos pos)
 {
 	setMarkerEnabled(false);

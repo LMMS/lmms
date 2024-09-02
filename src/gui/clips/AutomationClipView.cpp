@@ -486,10 +486,9 @@ void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 	m_clip->generateTangents();
 }
 
-//! Split this Clip.
-/**
-	param pos the position of the split, relative to the start of the clip
-*/
+
+
+
 bool AutomationClipView::splitClip(const TimePos pos)
 {
 	setMarkerEnabled(false);
