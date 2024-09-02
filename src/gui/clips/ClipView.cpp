@@ -665,7 +665,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
-				if( m_clip->getAutoResize() && !knifeMode)
+				if (m_clip->getAutoResize() && !knifeMode)
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
