@@ -507,7 +507,7 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	rightClip->clear();
 	leftClip->clear();
 
-	for(auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
+	for (auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
 	{
 		if (POS(it) >= pos)
 		{
