@@ -700,9 +700,9 @@ bool MidiClipView::splitClip(const TimePos pos)
 	{
 		if (note->pos() >= roundedPos)
 		{
-			Note *moved_note = new Note(*note);
-			moved_note->setPos(note->pos() - roundedPos);
-			rightClip->addNote(*moved_note);
+			auto movedNote = Note{*note};
+			movedNote.setPos(note->pos() - roundedPos);
+			rightClip->addNote(movedNote);
 		}
 	}
 
