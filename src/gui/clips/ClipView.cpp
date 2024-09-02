@@ -680,7 +680,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if(knifeMode)
+				else if (knifeMode)
 				{
 					m_action = Action::Split;
 					setCursor( m_cursorKnife );
