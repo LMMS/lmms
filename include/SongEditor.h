@@ -28,10 +28,12 @@
 
 #include "AutomatableModel.h"
 #include "Editor.h"
+#include "ExternalSync.h"
 #include "TrackContainerView.h"
 
 class QLabel;
 class QScrollBar;
+class QPushButton; //ExternalSync
 
 namespace lmms
 {
@@ -107,6 +109,11 @@ private slots:
 	void updateMasterPitchFloat( int new_val );
 	void hideMasterPitchFloat();
 
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	void toggleSync(); //!< toggle On/Off
+	void toggleSyncMode(); //!< toggle "Master"/"Slave"/"Duplex"
+#endif
+
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
@@ -129,6 +136,12 @@ private:
 	QScrollBar * m_leftRightScroll;
 
 	LcdSpinBox * m_tempoSpinBox;
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	QPushButton * m_syncButton;
+	QPushButton * m_syncModeButton;
+	static const char * syncGetModeString(enum SyncCtl::SyncMode mode);
+#endif
 
 	TimeLineWidget * m_timeLine;
 
