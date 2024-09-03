@@ -218,13 +218,11 @@ protected:
 
 private:
 	/**
-		Effects should call this at the end of audio processing
-
 		If the setting "Keep effects running even without input" is disabled,
 		after "decay" ms of a signal below "gate", the effect is turned off
 		and won't be processed again until it receives new audio input
 	*/
-	void checkGate( double _out_sum );
+	void checkGate(double outSum);
 
 
 	EffectChain * m_parent;

@@ -68,7 +68,7 @@ double StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	double out_sum = 0.0;
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{	
 		const float d = dryLevel();
 		const float w = wetLevel();
