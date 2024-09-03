@@ -27,6 +27,7 @@
 #define LMMS_AUDIO_FILE_DEVICE_H
 
 #include <QFile>
+#include <memory>
 
 #include "AudioDevice.h"
 #include "OutputSettings.h"
