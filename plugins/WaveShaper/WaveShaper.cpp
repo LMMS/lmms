@@ -146,8 +146,6 @@ bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
 		inputPtr += inputInc;
 	}
 
-	checkGate( out_sum / _frames );
-
 	return( isRunning() );
 }
 

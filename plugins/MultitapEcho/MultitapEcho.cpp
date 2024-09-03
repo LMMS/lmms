@@ -158,8 +158,6 @@ bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frame
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	
-	checkGate( outSum / frames );
 
 	return isRunning();	
 }

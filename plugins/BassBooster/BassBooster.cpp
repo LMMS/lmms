@@ -106,8 +106,6 @@ bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
-	checkGate( outSum / frames );
-
 	return isRunning();
 }
 

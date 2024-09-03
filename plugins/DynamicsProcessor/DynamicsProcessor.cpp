@@ -215,8 +215,6 @@ bool DynProcEffect::processAudioBuffer( SampleFrame* _buf,
 		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 	}
 
-	checkGate( out_sum / _frames );
-
 	return( isRunning() );
 }
 

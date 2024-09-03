@@ -125,12 +125,6 @@ public:
 		return 1.0f - m_wetDryModel.value();
 	}
 
-	inline float gate() const
-	{
-		const float level = m_gateModel.value();
-		return level*level * m_processors;
-	}
-
 	inline f_cnt_t bufferCount() const
 	{
 		return m_bufferCount;
@@ -174,15 +168,6 @@ public:
 
 
 protected:
-	/**
-		Effects should call this at the end of audio processing
-
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate( double _out_sum );
-
 	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
@@ -227,7 +212,6 @@ private:
 
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;
-	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
 	
 	bool m_autoQuitDisabled;

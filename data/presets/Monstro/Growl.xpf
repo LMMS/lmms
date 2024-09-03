@@ -44,11 +44,11 @@
             <attribute name="plugin" value="Clip"/>
           </key>
         </effect>
-        <effect name="dualfilter" autoquit_denominator="4" on="1" autoquit_numerator="4" wet="1" autoquit_syncmode="0" gate="0.02" autoquit="1">
+        <effect name="dualfilter" autoquit_denominator="4" on="1" autoquit_numerator="4" wet="1" autoquit_syncmode="0" autoquit="1">
           <DualFilterControls mix="-0.14" filter1="1" filter2="1" res1="0.5" res2="0.5" cut1="197" enabled1="1" gain1="100" cut2="229" enabled2="1" gain2="100"/>
           <key/>
         </effect>
-        <effect name="ladspaeffect" autoquit_denominator="4" on="1" autoquit_numerator="4" wet="1" autoquit_syncmode="0" gate="1" autoquit="1">
+        <effect name="ladspaeffect" autoquit_denominator="4" on="1" autoquit_numerator="4" wet="1" autoquit_syncmode="0" autoquit="1">
           <ladspacontrols ports="6" link="1">
             <port00 data="-4.875" link="1"/>
             <port01 data="1" link="1"/>

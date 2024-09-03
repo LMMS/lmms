@@ -268,8 +268,6 @@ bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
 
-	checkGate( outSum / frames );
-
 	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );

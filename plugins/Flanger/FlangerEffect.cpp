@@ -134,7 +134,6 @@ bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	checkGate( outSum / frames );
 	return isRunning();
 }
 

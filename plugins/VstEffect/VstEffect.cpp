@@ -113,7 +113,6 @@ bool VstEffect::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames )
 		delete[] buf;
 #endif
 
-		checkGate( out_sum / _frames );
 	}
 	return isRunning();
 }

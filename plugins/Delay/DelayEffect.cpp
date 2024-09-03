@@ -143,7 +143,6 @@ bool DelayEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		lfoTimePtr += lfoTimeInc;
 		feedbackPtr += feedbackInc;
 	}
-	checkGate( outSum / frames );
 	m_delayControls.m_outPeakL = peak.left();
 	m_delayControls.m_outPeakR = peak.right();
 

@@ -260,8 +260,6 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 		sampleBack( _buf, o_buf, m_maxSampleRate );
 	}
 
-	checkGate( out_sum / frames );
-
 
 	bool is_running = isRunning();
 	m_pluginMutex.unlock();

@@ -99,8 +99,6 @@ bool StereoMatrixEffect::processAudioBuffer( SampleFrame* _buf,
 
 	}
 
-	checkGate( out_sum / _frames );
-
 	return( isRunning() );
 }
 

@@ -213,8 +213,6 @@ bool DualFilterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames 
 		mixPtr += mixInc;
 	}
 
-	checkGate( outSum / frames );
-
 	return isRunning();
 }
 

@@ -239,8 +239,6 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 
-	checkGate( outSum / frames );
-
 	return isRunning();
 }
 

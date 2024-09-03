@@ -95,7 +95,6 @@ bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		auto r = static_cast<double>(buf[f][1]);
 		outSum += l*l + r*r;
 	}
-	checkGate(outSum / frames);
 
 	return isRunning();
 }

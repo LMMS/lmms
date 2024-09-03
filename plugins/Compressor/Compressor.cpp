@@ -526,7 +526,6 @@ bool CompressorEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		rOutPeak = s[1] > rOutPeak ? s[1] : rOutPeak;
 	}
 
-	checkGate(outSum / frames);
 	m_compressorControls.m_outPeakL = lOutPeak;
 	m_compressorControls.m_outPeakR = rOutPeak;
 	m_compressorControls.m_inPeakL = lInPeak;

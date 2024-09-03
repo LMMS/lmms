@@ -131,7 +131,6 @@ bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	checkGate( out_sum / _frames );
 	if( !isRunning() )
 	{
 		clearMyBuffer();
