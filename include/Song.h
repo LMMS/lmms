@@ -376,7 +376,7 @@ public:
 
 	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
 
-	Metronome& metronome();
+	Metronome& metronome() { return m_metronome; }
 
 public slots:
 	void playSong();

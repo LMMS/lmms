@@ -1548,17 +1548,12 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 void Song::processMetronome(size_t bufferOffset)
 {
 	const auto currentPlayMode = playMode();
-	const auto supported = currentPlayMode == Song::PlayMode::MidiClip
-		|| currentPlayMode == Song::PlayMode::Song
-		|| currentPlayMode == Song::PlayMode::Pattern;
+	const auto supported = currentPlayMode == PlayMode::MidiClip
+		|| currentPlayMode == PlayMode::Song
+		|| currentPlayMode == PlayMode::Pattern;
 
 	if (!supported || isExporting()) { return; } 
 	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
-}
-
-Metronome& Song::metronome()
-{
-	return m_metronome;
 }
 
 } // namespace lmms

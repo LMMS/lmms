@@ -28,17 +28,6 @@
 #include "SamplePlayHandle.h"
 
 namespace lmms {
-
-bool Metronome::active() const
-{
-	return m_active;
-}
-
-void Metronome::setActive(bool active)
-{
-	m_active = active;
-}
-
 void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset)
 {
 	const auto ticksPerBeat = ticksPerBar / beatsPerBar;

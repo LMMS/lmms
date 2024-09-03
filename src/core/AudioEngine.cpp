@@ -31,7 +31,6 @@
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
-#include "Metronome.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
