@@ -159,7 +159,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) );
 }
-
 }
 
 
