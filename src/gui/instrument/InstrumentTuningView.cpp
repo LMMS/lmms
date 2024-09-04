@@ -110,6 +110,18 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	m_rangeImportCheckbox->setCheckable(true);
 	microtunerLayout->addWidget(m_rangeImportCheckbox);
 
+	// Groove toggle
+	m_grooveGroupBox = new GroupBox(tr("GROOVE"));
+	m_grooveGroupBox->setModel(&it->m_useGrooveModel);
+	layout->addWidget(m_grooveGroupBox);
+
+	QHBoxLayout *grooveLayout = new QHBoxLayout(m_grooveGroupBox);
+	grooveLayout->setContentsMargins(8, 18, 8, 8);
+
+	QLabel *grooveLabel = new QLabel(tr("Enables the use of Groove"));
+	grooveLabel->setFont(adjustedToPixelSize(tlabel->font(), 8));
+	grooveLayout->addWidget(grooveLabel);
+
 	// Fill remaining space
 	layout->addStretch();
 }

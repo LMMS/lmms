@@ -62,10 +62,13 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
+	m_groove( nullptr ),
+	m_noGroove( nullptr ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
 	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
+	m_useGrooveModel( true, this, tr( "Groove" ) ),
 	m_instrument( nullptr ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
@@ -110,6 +113,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
+	connect(&m_useGrooveModel, SIGNAL(dataChanged()), this, SLOT(updateGroove()), Qt::DirectConnection );
 }
 
 
@@ -215,6 +219,10 @@ InstrumentTrack::~InstrumentTrack()
 
 	// now we're save deleting the instrument
 	if( m_instrument ) delete m_instrument;
+
+	if (m_noGroove != nullptr) {
+		delete m_noGroove;
+	}
 }
 
 
@@ -736,6 +744,10 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		return false;
 	}
 
+	// pluggable algorithm for playing notes that are
+	// posated within the current sample-frame
+	Groove * globalGroove = Engine::getSong()->globalGroove();
+
 	bool played_a_note = false;	// will be return variable
 
 	for (const auto& clip : clips)
@@ -758,10 +770,19 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// ...and set our index to zero
 		auto nit = notes.begin();
 
+		Groove * groove = this->groove();
+		if (!groove) {
+				groove = globalGroove;
+		}
+
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
 
 
+
+		// FIXME: Uncomment once groove is straight.
+		// Perhaps have groove supply max shift so we can skip some notes if not all
+/*
 		if( cur_start > 0 )
 		{
 			// skip notes which are posated before start-bar
@@ -770,29 +791,32 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				++nit;
 			}
 		}
-
-		while (nit != notes.end() && (*nit)->pos() == cur_start)
+*/
+		while (nit != notes.end())
 		{
 			const auto currentNote = *nit;
-
-			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
-			// plays for the whole length of the sample
-			const auto noteFrames = currentNote->type() == Note::Type::Step
-				? 0
-				: currentNote->length().frames(frames_per_tick);
-
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
-			notePlayHandle->setPatternTrack(pattern_track);
-			// are we playing global song?
-			if( _clip_num < 0 )
+			const auto grooveOffset = groove->isInTick(&cur_start, _frames, _offset, currentNote, c);
+			if (grooveOffset >= 0)
 			{
-				// then set song-global offset of clip in order to
-				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
-			}
+				// If the note is a Step Note, frames will be 0 so the NotePlayHandle
+				// plays for the whole length of the sample
+				const auto noteFrames = currentNote->type() == Note::Type::Step
+					? 0
+					: currentNote->length().frames(frames_per_tick);
 
-			Engine::audioEngine()->addPlayHandle( notePlayHandle );
-			played_a_note = true;
+				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, grooveOffset, noteFrames, *currentNote);
+				notePlayHandle->setPatternTrack(pattern_track);
+				// are we playing global song?
+				if ( _clip_num < 0 )
+				{
+					// then set song-global offset of pattern in order to
+					// properly perform the note detuning
+					notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
+				}
+
+				Engine::audioEngine()->addPlayHandle( notePlayHandle );
+				played_a_note = true;
+			}
 			++nit;
 		}
 	}
@@ -800,7 +824,36 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	return played_a_note;
 }
 
+Groove * InstrumentTrack::groove()
+{
+	if (m_grooveOn)
+	{
+		// nullptr: Use global groove
+		return m_groove;
+	}
+	else
+	{
+		// Disable global groove
+		return m_noGroove;
+	}
+}
 
+
+void InstrumentTrack::updateGroove()
+{
+	if (m_useGrooveModel.value())
+	{
+		m_grooveOn = true;
+	}
+	else
+	{
+		if (!m_noGroove)
+		{
+			m_noGroove = new Groove();
+		}
+		m_grooveOn = false;
+	}
+}
 
 
 Clip* InstrumentTrack::createClip(const TimePos & pos)
@@ -834,6 +887,7 @@ void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& 
 	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
 	m_microtuner.saveSettings(doc, thisElement);
+	m_useGrooveModel.saveSettings( doc, thisElement, "usegroove");
 
 	// Save MIDI CC stuff
 	m_midiCCEnable->saveSettings(doc, thisElement, "enablecc");
@@ -907,6 +961,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_lastKeyModel.loadSettings(thisElement, "lastkey");
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
 	m_microtuner.loadSettings(thisElement);
+	m_useGrooveModel.loadSettings(thisElement, "usegroove");
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();

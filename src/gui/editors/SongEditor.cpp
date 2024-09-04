@@ -44,6 +44,7 @@
 #include "CPULoadWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
+#include "GrooveView.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -151,6 +152,11 @@ SongEditor::SongEditor( Song * song ) :
 	getGUI()->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+
+	getGUI()->mainWindow()->addWidgetToToolBar( new GrooveView( tb ) );
+
+	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+
 
 	auto master_vol_lbl = new QLabel(tb);
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );

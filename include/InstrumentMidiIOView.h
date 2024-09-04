@@ -69,8 +69,7 @@ private:
 	QToolButton * m_wpBtn;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
-
-} ;
+};
 
 
 } // namespace gui

@@ -29,6 +29,7 @@
 #include <limits>
 
 #include "AudioPort.h"
+#include "Groove.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
@@ -85,6 +86,8 @@ public:
 
 	f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
+	void disableGroove();
+	void enableGroove();
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
@@ -148,6 +151,8 @@ public:
 	{
 		return &m_audioPort;
 	}
+
+	Groove * groove();
 
 	MidiPort * midiPort()
 	{
@@ -295,10 +300,16 @@ private:
 
 	AudioPort m_audioPort;
 
+	// Track specific groove or NULL
+	Groove * m_groove;
+	Groove * m_noGroove;
+	bool m_grooveOn; //if true temporarily return nooop Groove for the groove
+
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_mixerChannelModel;
 	BoolModel m_useMasterPitchModel;
+	BoolModel m_useGrooveModel;
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
@@ -318,7 +329,9 @@ private:
 	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
 
-} ;
+private slots:
+	void updateGroove();
+};
 
 
 
