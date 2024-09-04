@@ -81,8 +81,7 @@ VstEffect::VstEffect( Model * _parent,
 double VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	assert(m_plugin != nullptr);
-	assert(frames <= DEFAULT_BUFFER_SIZE);
-	static thread_local auto tempBuf = std::array<SampleFrame, DEFAULT_BUFFER_SIZE>();
+	static thread_local auto tempBuf = std::array<SampleFrame, MAXIMUM_BUFFER_SIZE>();
 
 	std::memcpy(tempBuf.data(), buf, sizeof(SampleFrame) * frames);
 	if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
