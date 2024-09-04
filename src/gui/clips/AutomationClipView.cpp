@@ -509,18 +509,15 @@ bool AutomationClipView::splitClip(const TimePos pos)
 
 	auto rightClip = new AutomationClip(*m_clip);
 	auto leftClip = new AutomationClip(*m_clip);
+
 	rightClip->clear();
-	leftClip->clear();
+	leftClip->removeNodes(splitPos, m_initialClipEnd);
 
 	for (auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
 	{
 		if (POS(it) >= pos)
 		{
 			rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
-		}
-		else
-		{
-			leftClip->putValues(POS(it), INVAL(it), OUTVAL(it), false);
 		}
 	}
 	rightClip->putValue(0, m_clip->valueAt(pos));
