@@ -37,6 +37,8 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "Track.h"
+#include "TrackContainerView.h"
+#include "TrackView.h"
 
 #include "Engine.h"
 
@@ -209,6 +211,8 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 
 void AutomationClipView::mouseDoubleClickEvent( QMouseEvent * me )
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	if(me->button() != Qt::LeftButton)
 	{
 		me->ignore();

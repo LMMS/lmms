@@ -37,6 +37,8 @@
 #include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainerView.h"
+#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -180,6 +182,8 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }

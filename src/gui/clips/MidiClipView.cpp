@@ -41,6 +41,7 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "TrackContainerView.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -299,6 +300,8 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 
 void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	if( _me->button() != Qt::LeftButton )
 	{
 		_me->ignore();
