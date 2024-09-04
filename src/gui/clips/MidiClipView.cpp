@@ -684,7 +684,7 @@ bool MidiClipView::splitClip(const TimePos pos)
 {
 	// Currently, due to midi clips being required to be multiples of 1 bar in length, restrict the split pos to the nearest bar:
 	const TimePos roundedPos = (pos + TimePos::ticksPerBar() / 2) - (pos + TimePos::ticksPerBar() / 2) % TimePos::ticksPerBar();
-	setMarkerEnabled( false );
+	setMarkerEnabled(false);
 
 	const TimePos splitPos = m_initialClipPos + roundedPos;
 
