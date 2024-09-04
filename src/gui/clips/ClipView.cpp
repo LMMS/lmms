@@ -502,7 +502,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 		setCursor(Qt::SizeHorCursor);
 	}
 	// If we are in the middle on knife mode, use the knife cursor
-	else if (sClip && m_trackView->trackContainerView()->knifeMode() && !isSelected())
+	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
 		setCursor(m_cursorKnife);
 	}
