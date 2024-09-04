@@ -285,13 +285,17 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	drawAutoHighlight(&p);
 }
 
-bool FloatModelEditorBase::canAcceptClipBoardData(Clipboard::StringPairDataType dataType)
+std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::getShortcuts()
 {
-	return dataType == Clipboard::StringPairDataType::FloatValue
-		|| dataType == Clipboard::StringPairDataType::AutomatableModelLink;
+	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
+	};
+	return shortcuts;
 }
 
-void FloatModelEditorBase::shortcutPressedEvent(size_t shortcutLocation, QKeyEvent* event)
+void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
 {
 	switch (shortcutLocation)
 	{
@@ -316,14 +320,10 @@ QString& FloatModelEditorBase::getShortcutMessage()
 	return m_shortcutMessage;
 }
 
-std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::getShortcuts()
+bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
 {
-	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
-		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
-		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
-		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
-	};
-	return shortcuts;
+	return dataType == Clipboard::StringPairDataType::FloatValue
+		|| dataType == Clipboard::StringPairDataType::AutomatableModelLink;
 }
 
 bool FloatModelEditorBase::processPaste(const QMimeData* mimeData)
