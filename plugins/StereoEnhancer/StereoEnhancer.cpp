@@ -84,10 +84,7 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 double StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect
-	double out_sum = 0.0;
-
+	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -117,7 +114,7 @@ double StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		out_sum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
 		// Update currFrame
 		m_currFrame += 1;
@@ -129,7 +126,7 @@ double StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		clearMyBuffer();
 	}
 
-	return out_sum;
+	return outSum;
 }
 
 

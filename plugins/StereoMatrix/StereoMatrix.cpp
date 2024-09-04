@@ -66,7 +66,7 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 double StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	double out_sum = 0.0;
+	double outSum = 0.0;
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{	
@@ -86,11 +86,11 @@ double StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 		buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
 					m_smControls.m_rrModel.value( f ) * r ) * w;
-		out_sum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
 	}
 
-	return out_sum;
+	return outSum;
 }
 
 

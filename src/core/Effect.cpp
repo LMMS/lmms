@@ -165,7 +165,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate( double _out_sum )
+void Effect::checkGate(double outSum)
 {
 	if( m_autoQuitDisabled )
 	{
@@ -174,7 +174,7 @@ void Effect::checkGate( double _out_sum )
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if (_out_sum - gate() <= F_EPSILON)
+	if (outSum - gate() <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )

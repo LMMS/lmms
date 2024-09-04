@@ -212,7 +212,7 @@ double LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	}
 
 	// Copy the LADSPA output buffers to the LMMS buffer.
-	double out_sum = 0.0;
+	double outSum = 0.0;
 	channel = 0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -250,12 +250,12 @@ double LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 	for (fpp_t frame = 0; frame < frames; ++frame)
 	{
-		out_sum += buf[frame].sumOfSquaredAmplitudes();
+		outSum += buf[frame].sumOfSquaredAmplitudes();
 	}
 
 	m_pluginMutex.unlock();
 
-	return out_sum;
+	return outSum;
 }
 
 
