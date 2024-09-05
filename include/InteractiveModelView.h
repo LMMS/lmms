@@ -110,29 +110,33 @@ protected:
 	//! return the avalible shortcuts for the widget
 	virtual std::vector<ModelShortcut> getShortcuts() = 0;
 	//! called when a `getShortcuts()` shortcut shortcut is pressed
-	virtual void shortcutPressedEvent(size_t shortcutLocation, QKeyEvent* event) = 0;
+	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
 	//! called when a shortcut message needs to be displayed
 	//! should return the message built with `buildShortcutMessage()`
-	virtual QString& getShortcutMessage() = 0;
+	virtual QString getShortcutMessage() = 0;
 	//! return true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
-	virtual bool canAcceptClipBoardData(Clipboard::StringPairDataType dataType) = 0;
+	virtual bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) = 0;
 	//! should implement dragging and dropping widgets or pasting from clipboard
 	//! should return if `QDropEvent` event can be accepted
 	//! force implement this method
 	virtual bool processPaste(const QMimeData* mimeData) = 0;
+	//! return isHighlighted
+	//! override this if the widget requires custom updating code
+	virtual void overrideSetIsHighlighted(bool isHighlighted);
 
+	//! draws the highlight automatically for the widget if highilighted
 	void drawAutoHighlight(QPainter* painter);
+	//! builds a string from getShortcuts()
 	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;
+	void setIsHighlighted(bool isHighlighted);
 private slots:
 	inline static void timerStopHighlighting()
 	{
 		stopHighlighting();
 	}
 private:
-	void setIsHighlighted(bool isHighlighted);
-	//! draws
 	bool doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event) const;
 	bool doesShortcutMatch(const ModelShortcut* shortcutA, const ModelShortcut* shortcutB) const;
 	
