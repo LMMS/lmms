@@ -88,7 +88,7 @@ protected:
 	// InteractiveModelView methods
 	std::vector<ModelShortcut> getShortcuts() override;
 	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
-	QString& getShortcutMessage() override;
+	QString getShortcutMessage() override;
 	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
 	bool processPaste(const QMimeData* mimeData) override;
 
