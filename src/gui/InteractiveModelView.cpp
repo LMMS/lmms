@@ -74,10 +74,7 @@ void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataT
 	}
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		if ((*it)->canAcceptClipBoardData(dataType))
-		{
-			(*it)->setIsHighlighted(true);
-		}
+		(*it)->overrideSetIsHighlighted((*it)->canAcceptClipboardData(dataType));
 	}
 	s_highlightTimer->start(20000);
 }
@@ -86,7 +83,7 @@ void InteractiveModelView::stopHighlighting()
 {
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		(*it)->setIsHighlighted(false);
+		(*it)->overrideSetIsHighlighted(false);
 	}
 }
 
@@ -179,7 +176,18 @@ void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 	{
 		QString message = shortcuts[foundIndex].m_shortcutDescription;
 		showMessage(message);
-		shortcutPressedEvent(foundIndex, event);
+		processShortcutPressed(foundIndex, event);
+	}
+	else
+	{
+		// reset focus
+		if (m_focusedBeforeWidget && event->key() != Qt::Key_Control
+			&& event->key() != Qt::Key_Shift
+			&& event->key() != Qt::Key_Alt
+			&& event->key() != Qt::Key_AltGr)
+		{
+			m_focusedBeforeWidget->setFocus();
+		}
 	}
 }
 
@@ -188,7 +196,8 @@ void InteractiveModelView::enterEvent(QEvent* event)
 	m_lastShortcutCounter = 0;
 	m_lastShortcut.reset();
 
-	showMessage(getShortcutMessage());
+	QString message = getShortcutMessage();
+	showMessage(message);
 
 	if (isVisible())
 	{
@@ -201,22 +210,20 @@ void InteractiveModelView::enterEvent(QEvent* event)
 void InteractiveModelView::leaveEvent(QEvent* event)
 {
 	hideMessage();
-	// reset focus
-	if (m_focusedBeforeWidget)
-	{
-		m_focusedBeforeWidget->setFocus();
-	}
+}
+
+void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted)
+{
+	setIsHighlighted(isHighlighted);
 }
 
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 {
 	if (getIsHighlighted())
 	{
-		QPainterPath path;
-		path.addRoundedRect(QRectF(1, 1, width() - 2, height() - 2), 0, 0);
 		QColor fillColor = *s_highlightColor;
 		fillColor.setAlpha(70);
-		painter->fillPath(path, fillColor);
+		painter->fillRect(QRect(1, 1, width() - 2, height() - 2), fillColor);
 
 		painter->setPen(QPen(*s_highlightColor, 2));
 		painter->drawLine(1, 1, 5, 1);
