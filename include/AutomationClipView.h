@@ -67,11 +67,18 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
-
+	
+	std::vector<ModelShortcut> getShortcuts() override;
+	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
+	QString getShortcutMessage() override;
+	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
+	bool processPaste(const QMimeData* mimeData) override;
 
 private:
 	AutomationClip * m_clip;
 	QPixmap m_paintPixmap;
+	
+	static QString m_shortcutMessage;
 	
 	QStaticText m_staticTextName;
 	void scaleTimemapToFit( float oldMin, float oldMax );
