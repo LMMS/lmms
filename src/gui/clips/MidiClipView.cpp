@@ -673,6 +673,11 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
+	
+	if ( m_marker )
+	{
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
@@ -682,11 +687,9 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 bool MidiClipView::splitClip(const TimePos pos)
 {
-	// Currently, due to midi clips being required to be multiples of 1 bar in length, restrict the split pos to the nearest bar:
-	const TimePos roundedPos = (pos + TimePos::ticksPerBar() / 2) - (pos + TimePos::ticksPerBar() / 2) % TimePos::ticksPerBar();
 	setMarkerEnabled(false);
 
-	const TimePos splitPos = m_initialClipPos + roundedPos;
+	const TimePos splitPos = m_initialClipPos + pos;
 
 	// Don't split if we slid off the Clip or if we're on the clip's start/end
 	// Cutting at exactly the start/end position would create a zero length
@@ -701,17 +704,17 @@ bool MidiClipView::splitClip(const TimePos pos)
 	
 	for (Note const* note : m_clip->m_notes)
 	{
-		if (note->pos() >= roundedPos)
+		if (note->pos() >= pos)
 		{
 			auto movedNote = Note{*note};
-			movedNote.setPos(note->pos() - roundedPos);
+			movedNote.setPos(note->pos() - pos);
 			rightClip->addNote(movedNote);
 		}
 	}
 
 	for (Note const* note : m_clip->m_notes)
 	{
-		if (note->pos() < roundedPos)
+		if (note->pos() < pos)
 		{
 			leftClip->addNote(*note);
 		}

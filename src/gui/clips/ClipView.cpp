@@ -633,7 +633,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
+		if ( me->modifiers() & Qt::ControlModifier && !(knifeMode) )
 		{
 			if( isSelected() )
 			{
@@ -743,12 +743,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		if (m_action == Action::Split)
 		{
 			m_action = Action::None;
-			auto sClip = dynamic_cast<SampleClip*>(m_clip);
-			if (sClip)
-			{
-				setMarkerEnabled( false );
-				update();
-			}
+			setMarkerEnabled( false );
+			update();
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
@@ -984,11 +980,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		auto sClip = dynamic_cast<SampleClip*>(m_clip);
-		if (sClip) {
-			setCursor( m_cursorKnife );
-			setMarkerPos( knifeMarkerPos( me ) );
-		}
+		setCursor(m_cursorKnife);
+		setMarkerPos(knifeMarkerPos(me));
 		update();
 	}
 	// None of the actions above, we will just handle the cursor

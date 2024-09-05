@@ -159,6 +159,11 @@ void PatternClipView::paintEvent(QPaintEvent*)
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
+	if ( m_marker )
+	{
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
+	
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
