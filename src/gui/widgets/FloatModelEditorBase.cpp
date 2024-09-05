@@ -302,7 +302,7 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 			break;
 		case 1:
 			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(model()->id()));
-			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::FloatValue);
+			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::AutomatableModelLink);
 			break;
 		case 2:
 			processPaste(Clipboard::getMimeData());
@@ -312,7 +312,7 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 	}
 }
 
-QString& FloatModelEditorBase::getShortcutMessage()
+QString FloatModelEditorBase::getShortcutMessage()
 {
 	return m_shortcutMessage;
 }
