@@ -539,7 +539,7 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	leftClip->setRecording(m_clip->isRecording());
 	
 	m_clip->getTrack()->restoreJournallingState();
-	remove();
+	close();
 	return true;
 }
 

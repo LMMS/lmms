@@ -727,7 +727,7 @@ bool MidiClipView::splitClip(const TimePos pos)
 	rightClip->updateLength();
 
 	m_clip->getTrack()->restoreJournallingState();
-	remove();
+	close();
 	return true;
 }
 
