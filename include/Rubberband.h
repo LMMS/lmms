@@ -29,16 +29,18 @@
 #include <QRubberBand>
 #include <QVector>
 
+#include "InteractiveModelView.h"
+
 namespace lmms::gui
 {
 
 
-class selectableObject : public QWidget
+class selectableObject : public InteractiveModelView
 {
 	Q_OBJECT
 public:
-	selectableObject( QWidget * _parent ) :
-		QWidget( _parent ),
+	selectableObject(QWidget* parent) :
+		InteractiveModelView(parent),
 		m_selected( false )
 	{
 	}
@@ -64,10 +66,23 @@ public slots:
 		QWidget::update();
 	}
 
+protected:
+	
+	// InteractiveModelView methods
+	/*
+	inline std::vector<ModelShortcut> getShortcuts() override { return std::vector<ModelShortcut>(); };
+	inline void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override {};
+	inline QString& getShortcutMessage() override
+	{
+		return m_tempString;
+	};
+	inline bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override { return false; };
+	inline bool processPaste(const QMimeData* mimeData) override { return false; };
+	*/
 
 private:
 	bool m_selected;
-
+	//QString m_tempString = "";
 } ;
 
 
