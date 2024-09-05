@@ -648,20 +648,6 @@ void PianoView::focusOutEvent( QFocusEvent * )
 		return;
 	}
 
-	// focus just switched to another control inside the instrument track
-	// window we live in?
-	if( parentWidget()->parentWidget()->focusWidget() != this &&
-		parentWidget()->parentWidget()->focusWidget() != nullptr &&
-		!(parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QLineEdit" ) ||
-		parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QPlainTextEdit" ) ))
-	{
-		// then reclaim keyboard focus!
-		setFocus();
-		return;
-	}
-
 	// if we loose focus, we HAVE to note off all running notes because
 	// we don't receive key-release-events anymore and so the notes would
 	// hang otherwise
