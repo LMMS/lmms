@@ -85,11 +85,11 @@ StringPairDrag::~StringPairDrag()
 
 
 bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
-						Clipboard::StringPairDataType allowedKey)
+	Clipboard::StringPairDataType allowedKey)
 {
 	if (!_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
-		return( false );
+		return(false);
 	}
 	Clipboard::StringPairDataType curKey = Clipboard::decodeKey(_dee->mimeData());
 	if (allowedKey == curKey)
@@ -98,15 +98,15 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
 		return(true);
 	}
 	_dee->ignore();
-	return( false );
+	return(false);
 }
 
 bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
-						const std::vector<Clipboard::StringPairDataType>* allowedKeys)
+	const std::vector<Clipboard::StringPairDataType>* allowedKeys)
 {
 	if (!_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
-		return( false );
+		return(false);
 	}
 	Clipboard::StringPairDataType curKey = Clipboard::decodeKey(_dee->mimeData());
 	for (auto& i : (*allowedKeys))
@@ -118,10 +118,8 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
 		}
 	}
 	_dee->ignore();
-	return( false );
+	return(false);
 }
-
-
 
 
 Clipboard::StringPairDataType StringPairDrag::decodeKey(QDropEvent * _de)
