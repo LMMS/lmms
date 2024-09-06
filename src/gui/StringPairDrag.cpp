@@ -59,7 +59,7 @@ StringPairDrag::StringPairDrag(Clipboard::StringPairDataType key, const QString&
 	{
 		setPixmap( _icon );
 	}
-	QString txt = Clipboard::StringPairDataTypeNames[static_cast<size_t>(key)] + ":" + _value;
+	QString txt = Clipboard::getStringPairKeyName(key) + ":" + _value;
 	auto m = new QMimeData();
 	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
