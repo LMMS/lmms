@@ -297,11 +297,11 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 	switch (shortcutLocation)
 	{
 		case 0:
-			Clipboard::copyStringPair(Clipboard::StringPairDataType::FloatValue, Clipboard::clipboardEncodeFloatValue(model()->value() * getConversionFactor()));
+			Clipboard::copyStringPair(Clipboard::StringPairDataType::FloatValue, Clipboard::encodeFloatValue(model()->value() * getConversionFactor()));
 			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::FloatValue);
 			break;
 		case 1:
-			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(model()->id()));
+			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*model()));
 			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::AutomatableModelLink);
 			break;
 		case 2:
