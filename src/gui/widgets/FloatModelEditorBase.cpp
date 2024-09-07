@@ -323,14 +323,9 @@ bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::StringPairDataType 
 		|| dataType == Clipboard::StringPairDataType::AutomatableModelLink;
 }
 
-bool FloatModelEditorBase::processPaste(const QMimeData* mimeData)
+bool FloatModelEditorBase::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
 {
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
 	bool shouldAccept = false;
-
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
-	QString value = Clipboard::decodeValue(mimeData);
-	
 	if (type == Clipboard::StringPairDataType::FloatValue)
 	{
 		model()->setValue(LocaleHelper::toFloat(value));
@@ -345,10 +340,6 @@ bool FloatModelEditorBase::processPaste(const QMimeData* mimeData)
 			mod->setValue(model()->value());
 			shouldAccept = true;
 		}
-	}
-	if (shouldAccept)
-	{
-		InteractiveModelView::stopHighlighting();
 	}
 	return shouldAccept;
 }
