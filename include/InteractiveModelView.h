@@ -55,6 +55,7 @@ public:
 	InteractiveModelView(QWidget* widget);
 	~InteractiveModelView() override;
 
+	//! highlight every InteractiveModelView that accepts dataType
 	static void startHighlighting(Clipboard::StringPairDataType dataType);
 	static void stopHighlighting();
 	static void showMessage(QString& message);
@@ -109,24 +110,25 @@ protected:
 	
 	//! return the avalible shortcuts for the widget
 	virtual std::vector<ModelShortcut> getShortcuts() = 0;
-	//! called when a `getShortcuts()` shortcut shortcut is pressed
+	//! called when a shortcut from `getShortcuts()` is pressed
 	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
 	//! called when a shortcut message needs to be displayed
-	//! should return the message built with `buildShortcutMessage()`
+	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
 	virtual QString getShortcutMessage() = 0;
 	//! return true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
 	virtual bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) = 0;
 	//! should implement dragging and dropping widgets or pasting from clipboard
 	//! should return if `QDropEvent` event can be accepted
 	//! force implement this method
-	virtual bool processPaste(const QMimeData* mimeData) = 0;
-	//! return isHighlighted
+	virtual bool processPasteImplementation(Clipboard::StringPairDataType type, QString& value) = 0;
+	//! calls `processPasteImplementation()` to process paste
+	bool processPaste(const QMimeData* mimeData);
 	//! override this if the widget requires custom updating code
 	virtual void overrideSetIsHighlighted(bool isHighlighted);
 
 	//! draws the highlight automatically for the widget if highilighted
 	void drawAutoHighlight(QPainter* painter);
-	//! builds a string from getShortcuts()
+	//! builds a string from `getShortcuts()`
 	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;

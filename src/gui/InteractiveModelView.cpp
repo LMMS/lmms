@@ -212,6 +212,20 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 	hideMessage();
 }
 
+bool InteractiveModelView::processPaste(const QMimeData* mimeData)
+{
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
+
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	QString value = Clipboard::decodeValue(mimeData);
+	bool shouldAccept = processPasteImplementation(type, value);
+	if (shouldAccept)
+	{
+		InteractiveModelView::stopHighlighting();
+	}
+	return shouldAccept;
+}
+
 void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted)
 {
 	setIsHighlighted(isHighlighted);
