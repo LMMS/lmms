@@ -244,12 +244,8 @@ bool AutomationClipView::canAcceptClipboardData(Clipboard::StringPairDataType da
 	return dataType == Clipboard::StringPairDataType::AutomatableModelLink || ClipView::canAcceptClipboardData(dataType);
 }
 
-bool AutomationClipView::processPaste(const QMimeData* mimeData)
+bool AutomationClipView::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
 {
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
-	QString value = Clipboard::decodeValue(mimeData);
-
 	bool shouldAccept = false;
 	if (type == Clipboard::StringPairDataType::AutomatableModelLink)
 	{
@@ -275,13 +271,9 @@ bool AutomationClipView::processPaste(const QMimeData* mimeData)
 		}
 	}
 	
-	if (shouldAccept)
+	if (shouldAccept == false)
 	{
-		InteractiveModelView::stopHighlighting();
-	}
-	else
-	{
-		shouldAccept = ClipView::processPaste(mimeData);
+		shouldAccept = ClipView::processPasteImplementation(type, value);
 	}
 	return shouldAccept;
 }
