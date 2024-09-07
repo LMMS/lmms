@@ -743,7 +743,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		if (m_action == Action::Split)
 		{
 			m_action = Action::None;
-			setMarkerEnabled( false );
+			setMarkerEnabled(false);
 			update();
 		}
 	}
