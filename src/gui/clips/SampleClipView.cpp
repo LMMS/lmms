@@ -354,32 +354,25 @@ bool SampleClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataTy
 		|| ClipView::canAcceptClipboardData(dataType);
 }
 
-bool SampleClipView::processPaste(const QMimeData* mimeData)
+bool SampleClipView::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
 {
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
 	bool shouldAccept = false;
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
-
 	if (type == Clipboard::StringPairDataType::SampleFile)
 	{
-		m_clip->setSampleFile( Clipboard::decodeValue(mimeData));
+		m_clip->setSampleFile(value);
 		shouldAccept = true;
 	}
 	else if (type == Clipboard::StringPairDataType::SampleData)
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(Clipboard::decodeValue(mimeData)));
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
 		m_clip->updateLength();
 		update();
 		shouldAccept = true;
 	}
 
-	if (shouldAccept)
+	if (shouldAccept == false)
 	{
-		InteractiveModelView::stopHighlighting();
-	}
-	else
-	{
-		shouldAccept = ClipView::processPaste(mimeData);
+		shouldAccept = ClipView::processPasteImplementation(type, value);
 	}
 	return shouldAccept;
 }

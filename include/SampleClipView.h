@@ -63,7 +63,7 @@ protected:
 	void paintEvent( QPaintEvent * ) override;
 
 	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
-	bool processPaste(const QMimeData* mimeData) override;
+	bool processPasteImplementation(Clipboard::StringPairDataType type, QString& value) override;
 
 private:
 	SampleClip * m_clip;
