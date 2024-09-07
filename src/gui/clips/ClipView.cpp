@@ -1192,11 +1192,8 @@ bool ClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
 	return dataType == getClipStringPairType(m_clip->getTrack());;
 }
 
-bool ClipView::processPaste(const QMimeData* mimeData)
+bool ClipView::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
 {
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
-	QString value = Clipboard::decodeValue(mimeData);
 	// Track must be the same type to paste into
 	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::StringPairDataType::None) { return false; }
 
@@ -1205,10 +1202,9 @@ bool ClipView::processPaste(const QMimeData* mimeData)
 	TrackContentWidget* tcw = getTrackView()->getTrackContentWidget();
 	TimePos clipPos{m_clip->startPosition()};
 
-	if (tcw->pasteSelection(clipPos, mimeData, false) == true)
+	if (tcw->pasteSelection(clipPos, type, value, false) == true)
 	{
 		shouldAccept = true;
-		InteractiveModelView::stopHighlighting();
 		remove();
 	}
 	return shouldAccept;
