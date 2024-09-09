@@ -65,14 +65,15 @@ VstEffect::VstEffect( Model * _parent,
 	m_key( *_key ),
 	m_vstControls( this )
 {
-	setDontRun(true);
-
+	bool loaded = false;
 	if( !m_key.attributes["file"].isEmpty() )
 	{
-		openPlugin( m_key.attributes["file"] );
+		loaded = openPlugin(m_key.attributes["file"]);
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
 		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
+
+	setDontRun(!loaded);
 }
 
 
@@ -106,7 +107,7 @@ double VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 
 
-void VstEffect::openPlugin( const QString & _plugin )
+bool VstEffect::openPlugin(const QString& plugin)
 {
 	gui::TextFloat* tf = nullptr;
 	if( gui::getGUI() != nullptr )
@@ -118,20 +119,19 @@ void VstEffect::openPlugin( const QString & _plugin )
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin( _plugin ));
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin));
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();
-		setDontRun(true);
 		delete tf;
-		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
-		return;
+		collectErrorForUI(VstPlugin::tr("The VST plugin %1 could not be loaded.").arg(plugin));
+		return false;
 	}
 
-	setDontRun(false);
 	delete tf;
 
-	m_key.attributes["file"] = _plugin;
+	m_key.attributes["file"] = plugin;
+	return true;
 }
 
 
