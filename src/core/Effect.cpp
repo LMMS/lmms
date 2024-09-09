@@ -126,7 +126,7 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
 	{
-		sleepImpl();
+		processBypassedImpl();
 		return false;
 	}
 

@@ -514,7 +514,7 @@ double CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	return outSum;
 }
 
-void CompressorEffect::sleepImpl()
+void CompressorEffect::processBypassedImpl()
 {
 	// Clear lookahead buffers and other values when needed
 	if (!m_cleanedBuffers)

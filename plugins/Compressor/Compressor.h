@@ -45,7 +45,7 @@ public:
 	~CompressorEffect() override = default;
 
 	double processImpl(SampleFrame* buf, const fpp_t frames) override;
-	void sleepImpl() override;
+	void processBypassedImpl() override;
 
 	EffectControls* controls() override
 	{

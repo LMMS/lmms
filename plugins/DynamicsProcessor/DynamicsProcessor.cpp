@@ -211,7 +211,7 @@ double DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	return outSum;
 }
 
-void DynProcEffect::sleepImpl()
+void DynProcEffect::processBypassedImpl()
 {
 	// Apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;

@@ -185,7 +185,7 @@ protected:
 	 * Optional method that runs when plugin is sleeping (not enabled,
 	 * not running, not in the Okay state, or in the Don't Run state)
 	 */
-	virtual void sleepImpl() {}
+	virtual void processBypassedImpl() {}
 
 
 	gui::PluginView* instantiateView( QWidget * ) override;
