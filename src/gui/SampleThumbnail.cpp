@@ -152,7 +152,7 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	}
 }
 
-void SampleThumbnailListManager::draw(QPainter& painter, const SampleThumbnailBit& bit, int lineX, int centerY,
+void SampleThumbnailListManager::draw(QPainter& painter, const SampleThumbnailBit& bit, float lineX, int centerY,
 	float scalingFactor, const QColor& color, const QColor& rmsColor)
 {
 	const auto lengthY1 = bit.max * scalingFactor;
@@ -167,10 +167,10 @@ void SampleThumbnailListManager::draw(QPainter& painter, const SampleThumbnailBi
 	const auto rmsLineY1 = centerY - maxRMS * scalingFactor;
 	const auto rmsLineY2 = centerY - minRMS * scalingFactor;
 
-	painter.drawLine(lineX, lineY1, lineX, lineY2);
+	painter.drawLine(QPointF{lineX, lineY1}, QPointF{lineX, lineY2});
 	painter.setPen(rmsColor);
 
-	painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
+	painter.drawLine(QPointF{lineX, rmsLineY1}, QPointF{lineX, rmsLineY2});
 	painter.setPen(color);
 }
 

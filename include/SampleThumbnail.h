@@ -97,7 +97,7 @@ public:
 	void visualizeOriginal(const SampleThumbnailVisualizeParameters&, QPainter&) const;
 
 private:
-	static void draw(QPainter& painter, const SampleThumbnailBit& bit, int lineX, int centerY, float scalingFactor,
+	static void draw(QPainter& painter, const SampleThumbnailBit& bit, float lineX, int centerY, float scalingFactor,
 		const QColor& color, const QColor& rmsColor);
 
 	static SampleThumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
