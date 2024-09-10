@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_THUMBNAIL_H
 
 #include <QPainter>
+#include <memory>
 
 #include "lmms_export.h"
 
