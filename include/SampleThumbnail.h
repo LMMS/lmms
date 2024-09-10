@@ -37,15 +37,15 @@ struct SampleThumbnailVisualizeParameters
 	const Sample* originalSample; //!< Points to an original sample to render.
 
 	float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
-	bool reversed = false; //!< Determines if the waveform is drawn in reverse or not.
+	bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
 
 	float sampleStart = 0.0f; //!< Where the sample begins for drawing.
-	float sampleEnd = 1.0f; //!< Where the sample ends for drawing.
+	float sampleEnd = 1.0f;	  //!< Where the sample ends for drawing.
 
 	long x = 0; //!< Starting X position for the waveform.
 	long y = 0; //!< Starting Y position for the waveform.
 
-	long width = 0; //!< The width of the rectangle to draw into.
+	long width = 0;	 //!< The width of the rectangle to draw into.
 	long height = 0; //!< The height of the rectangle to draw into.
 
 	/**
@@ -100,8 +100,7 @@ private:
 	static void draw(QPainter& painter, const SampleThumbnailBit& bit, int lineX, int centerY, float scalingFactor,
 		const QColor& color, const QColor& rmsColor);
 
-	static SampleThumbnail generate(
-		const size_t thumbnailsize, const SampleFrame* sampleBuffer, const SampleFrame* sampleBufferEnd);
+	static SampleThumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
 
 	SharedSampleThumbnailList m_list = nullptr;
 	inline static std::map<const QString, SharedSampleThumbnailList> s_sampleThumbnailListMap;
