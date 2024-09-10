@@ -211,7 +211,7 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	const auto widthSelect = static_cast<long>(static_cast<float>(width) / sampleViewLength);
+	const auto widthSelect = static_cast<std::size_t>(static_cast<float>(width) / sampleViewLength);
 
 	const auto thumbnailIt = std::find_if(m_thumbnailCache->begin(), m_thumbnailCache->end(),
 		[&](const auto& thumbnail) { return thumbnail.size() >= widthSelect; });
