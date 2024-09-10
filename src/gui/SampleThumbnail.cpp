@@ -172,7 +172,7 @@ void SampleThumbnail::draw(QPainter& painter, const SampleThumbnail::Bit& bit, f
 
 void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& parameters, QPainter& painter) const
 {
-	const auto sampleLength = parameters.sampleEnd - parameters.sampleStart;
+	const auto sampleViewLength = parameters.sampleEnd - parameters.sampleStart;
 
 	// We specify that the existence of the original sample
 	// means we may need the sample to be drawn
@@ -185,8 +185,10 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 	if (parameters.originalSample)
 	{
 		const auto sampleSize = static_cast<float>(parameters.originalSample->sampleSize());
-		const auto sampleViewSize = static_cast<long>(sampleSize * sampleLength);
+		const auto sampleViewSize = static_cast<long>(sampleSize * sampleViewLength);
 
+		// Author tested when to switch to drawing with the
+		// orignal sample and this magic number felt right.
 		if (sampleViewSize / parameters.width < 882)
 		{
 			visualizeOriginal(parameters, painter);
@@ -209,13 +211,13 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	const auto widthSelect = static_cast<long>(static_cast<float>(width) / sampleLength);
+	const auto widthSelect = static_cast<long>(static_cast<float>(width) / sampleViewLength);
 
 	const auto thumbnailIt = std::find_if(m_thumbnailCache->begin(), m_thumbnailCache->end(),
-		[&](const auto& thumbnail) { return thumbnail.size() < widthSelect; });
+		[&](const auto& thumbnail) { return thumbnail.size() >= widthSelect; });
 
 	const auto thumbnail
-		= thumbnailIt == m_thumbnailCache->end() ? *m_thumbnailCache->begin() : *thumbnailIt;
+		= thumbnailIt == m_thumbnailCache->end() ? m_thumbnailCache->front() : *thumbnailIt;
 
 	const auto thumbnailSize = thumbnail.size();
 	const auto thumbnailLastSample = std::max(static_cast<std::size_t>(parameters.sampleEnd * thumbnailSize), std::size_t{1}) - 1;
