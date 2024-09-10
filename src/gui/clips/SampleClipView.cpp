@@ -45,7 +45,6 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	m_thumbnaillist(  SampleThumbnailListManager() ),
 	m_paintPixmap()
 {
 	// update UI and tooltip
@@ -63,8 +62,8 @@ void SampleClipView::updateSample()
 {
 	update();
 	
-	m_thumbnaillist = SampleThumbnailListManager(m_clip->m_sample);
-	
+	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
+
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
@@ -279,21 +278,16 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	
 	const auto& sample = m_clip->m_sample;
 
-	auto param = SampleThumbnailVisualizeParameters();
-
+	auto param = SampleThumbnail::VisualizeParameters{};
 	param.amplification = sample.amplification();
-	param.reversed 		= sample.reversed();
-
+	param.reversed = sample.reversed();
 	param.x = static_cast<long>(offsetStart);
 	param.y = spacing;
-
-	param.width 	= std::max<long>(static_cast<long>(sampleLength), 1);
-	param.height 	= rect().bottom() - 2 * spacing;
-
+	param.width = std::max<long>(static_cast<long>(sampleLength), 1);
+	param.height = rect().bottom() - 2 * spacing;
 	param.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart);
 
-	m_thumbnaillist.visualize(param, p);
-	//
+	m_sampleThumbnail.visualize(param, p);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

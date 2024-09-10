@@ -143,7 +143,7 @@ private:
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
-	SampleThumbnailListManager m_thumbnaillist;
+	SampleThumbnail m_sampleThumbnail;
 
 	friend class AudioFileProcessorView;
 

@@ -90,20 +90,17 @@ void SlicerTWaveform::drawSeekerWaveform()
 	brush.setPen(s_waveformColor);
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	
-	m_thumbnaillist = SampleThumbnailListManager(sample);
-	auto param = SampleThumbnailVisualizeParameters();
 
+	m_sampleThumbnail = SampleThumbnail{sample};
+
+	auto param = SampleThumbnail::VisualizeParameters{};
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
-
 	param.x = 0;
 	param.y = 0;
-
 	param.width = m_seekerWaveform.width();
 	param.height = m_seekerWaveform.height();
-
-	m_thumbnaillist.visualize(param, brush);
+	m_sampleThumbnail.visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -159,25 +156,21 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	// Visualize
 	const auto& sample = m_slicerTParent->m_originalSample;
-	
-	m_thumbnaillist = SampleThumbnailListManager(sample);
-	auto param = SampleThumbnailVisualizeParameters();
 
+	m_sampleThumbnail = SampleThumbnail{sample};
+
+	auto param = SampleThumbnail::VisualizeParameters{};
 	param.originalSample = &sample;
-
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
-
-	param.sampleStart	= static_cast<float>(startFrame) / sample.sampleSize();
-	param.sampleEnd 	= static_cast<float>(  endFrame) / sample.sampleSize();
-
+	param.sampleStart = static_cast<float>(startFrame) / sample.sampleSize();
+	param.sampleEnd = static_cast<float>(endFrame) / sample.sampleSize();
 	param.x = 0;
 	param.y = zoomOffset;
-
 	param.width = m_editorWidth;
 	param.height = static_cast<long>(m_zoomLevel * m_editorHeight);
 
-	m_thumbnaillist.visualize(param, brush);
+	m_sampleThumbnail.visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);

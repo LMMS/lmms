@@ -107,8 +107,7 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0),
-	m_ghostNoteColor(0, 0, 0),
-	m_thumbnaillist(SampleThumbnailListManager())
+	m_ghostNoteColor(0, 0, 0)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -1026,7 +1025,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
-	m_thumbnaillist = SampleThumbnailListManager(newGhostSample->sample());
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1219,21 +1218,16 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			
-			const auto& sample = m_ghostSample->sample();
-			
-			auto param = SampleThumbnailVisualizeParameters();
 
-			param.amplification = sample.amplification();
-			param.reversed 		= sample.reversed();
-			
+			auto param = SampleThumbnail::VisualizeParameters{};
+			param.amplification = m_ghostSample->sample().amplification();
+			param.reversed = m_ghostSample->sample().reversed();
 			param.x = startPos;
 			param.y = yOffset;
-			
-			param.width 	= sampleWidth;
-			param.height 	= sampleHeight;
+			param.width = sampleWidth;
+			param.height = sampleHeight;
 
-			m_thumbnaillist.visualize(param, p);
+			m_sampleThumbnail.visualize(param, p);
 		}
 
 		// draw ghost notes

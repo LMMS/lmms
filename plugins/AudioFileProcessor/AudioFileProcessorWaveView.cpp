@@ -25,6 +25,7 @@
 #include "AudioFileProcessorWaveView.h"
 
 #include "ConfigManager.h"
+#include "Sample.h"
 #include "gui_templates.h"
 #include "SampleThumbnail.h"
 
@@ -82,7 +83,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_reversed(false),
 	m_framesPlayed(0),
 	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt()),
-	m_thumbnaillist(SampleThumbnailListManager(*buf))
+	m_sampleThumbnail(*buf)
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
@@ -334,25 +335,20 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	m_thumbnaillist = SampleThumbnailListManager(*m_sample);
-	
-	auto param = SampleThumbnailVisualizeParameters();
-	
+	m_sampleThumbnail = SampleThumbnail{*m_sample};
+
+	auto param = SampleThumbnail::VisualizeParameters{};
 	param.originalSample = m_sample,
-
 	param.amplification = m_sample->amplification();
-	param.reversed 		= m_sample->reversed();
-
-	param.sampleStart 	= static_cast<float>(m_from) / m_sample->sampleSize();
-	param.sampleEnd 	= static_cast<float>(m_to  ) / m_sample->sampleSize();
-
+	param.reversed = m_sample->reversed();
+	param.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize();
+	param.sampleEnd = static_cast<float>(m_to) / m_sample->sampleSize();
 	param.x = 0;
 	param.y = 0;
-
-	param.width  = m_graph.width();
+	param.width = m_graph.width();
 	param.height = m_graph.height();
 
-	m_thumbnaillist.visualize(param, p);
+	m_sampleThumbnail.visualize(param, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

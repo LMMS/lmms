@@ -290,7 +290,7 @@ private:
 	QColor m_detuningNoteColor;
 	QColor m_ghostSampleColor;
 	
-	SampleThumbnailListManager m_thumbnaillist;
+	SampleThumbnail m_sampleThumbnail;
 
 	friend class AutomationEditorWindow;
 

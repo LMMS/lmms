@@ -27,51 +27,12 @@
 
 #include <QPainter>
 
-#include "Sample.h"
 #include "lmms_export.h"
 
 namespace lmms {
 
-struct SampleThumbnailVisualizeParameters
-{
-	const Sample* originalSample; //!< Points to an original sample to render.
-
-	float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
-	bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
-
-	float sampleStart = 0.0f; //!< Where the sample begins for drawing.
-	float sampleEnd = 1.0f;	  //!< Where the sample ends for drawing.
-
-	long x = 0; //!< Starting X position for the waveform.
-	long y = 0; //!< Starting Y position for the waveform.
-
-	long width = 0;	 //!< The width of the rectangle to draw into.
-	long height = 0; //!< The height of the rectangle to draw into.
-
-	/**
-		Song editor clips shorter than the sample length (measuring
-		from the start of the sample) can specify this field so
-		rendering cuts off early, reducing computation cost.
-	*/
-	long clipWidthSinceSampleStart = std::numeric_limits<long>::max();
-};
-
-struct SampleThumbnailBit
-{
-	SampleThumbnailBit() = default;
-	SampleThumbnailBit(const SampleFrame&);
-
-	void merge(const SampleThumbnailBit&);
-	void merge(const SampleFrame&);
-
-	float max = -100.0f;
-	float min = 100.0f;
-	float rms = 0.0f;
-};
-
-using SampleThumbnail = std::vector<SampleThumbnailBit>;
-using SampleThumbnailList = std::vector<SampleThumbnail>;
-using SharedSampleThumbnailList = std::shared_ptr<SampleThumbnailList>;
+class Sample;
+class SampleFrame;
 
 /**
    Insert this into your class when you want to implement
@@ -80,30 +41,70 @@ using SharedSampleThumbnailList = std::shared_ptr<SampleThumbnailList>;
    when you generate thumbnails somewhere else, and have to be regenerated
    before being rendered, which is slower than rendering the sample directly.
 */
-class LMMS_EXPORT SampleThumbnailListManager
+class LMMS_EXPORT SampleThumbnail
 {
 public:
 	static constexpr auto MinThumbnailSize = 1;
 	static constexpr auto MaxThumbnailSize = 32768;
 	static constexpr auto ThumbnailSizeDivisor = 32;
 
-	SampleThumbnailListManager() = default;
-	SampleThumbnailListManager(const Sample&);
+	struct Bit
+	{
+		Bit() = default;
+		Bit(const SampleFrame&);
+
+		void merge(const Bit&);
+		void merge(const SampleFrame&);
+
+		float max = -100.0f;
+		float min = 100.0f;
+		float rms = 0.0f;
+	};
+
+	struct VisualizeParameters
+	{
+		const Sample* originalSample; //!< Points to an original sample to render.
+
+		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
+		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
+
+		float sampleStart = 0.0f; //!< Where the sample begins for drawing.
+		float sampleEnd = 1.0f;	  //!< Where the sample ends for drawing.
+
+		long x = 0; //!< Starting X position for the waveform.
+		long y = 0; //!< Starting Y position for the waveform.
+
+		long width = 0;	 //!< The width of the rectangle to draw into.
+		long height = 0; //!< The height of the rectangle to draw into.
+
+		/**
+			Song editor clips shorter than the sample length (measuring
+			from the start of the sample) can specify this field so
+			rendering cuts off early, reducing computation cost.
+		*/
+		long clipWidthSinceSampleStart = std::numeric_limits<long>::max();
+	};
+
+	using Thumbnail = std::vector<Bit>;
+	using ThumbnailCache = std::vector<Thumbnail>;
+
+	SampleThumbnail() = default;
+	SampleThumbnail(const Sample& sample);
+
+	void visualize(const VisualizeParameters& parameters, QPainter& painter) const;
+	void visualizeOriginal(const VisualizeParameters& parameters, QPainter& painter) const;
 
 	bool selectFromGlobalThumbnailMap(const Sample&);
-	void cleanUpGlobalThumbnailMap();
-
-	void visualize(const SampleThumbnailVisualizeParameters&, QPainter&) const;
-	void visualizeOriginal(const SampleThumbnailVisualizeParameters&, QPainter&) const;
+	static void cleanUpGlobalThumbnailMap();
 
 private:
-	static void draw(QPainter& painter, const SampleThumbnailBit& bit, float lineX, int centerY, float scalingFactor,
+	static void draw(QPainter& painter, const Bit& bit, float lineX, int centerY, float scalingFactor,
 		const QColor& color, const QColor& rmsColor);
 
-	static SampleThumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
+	static Thumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
 
-	SharedSampleThumbnailList m_list = nullptr;
-	inline static std::map<const QString, SharedSampleThumbnailList> s_sampleThumbnailListMap;
+	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
+	inline static std::map<const QString, std::shared_ptr<ThumbnailCache>> s_sampleThumbnailCacheMap;
 };
 
 } // namespace lmms

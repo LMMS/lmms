@@ -25,56 +25,56 @@
 #include "SampleThumbnail.h"
 
 #include <algorithm>
+#include "Sample.h"
 
 namespace lmms {
 
-SampleThumbnailBit::SampleThumbnailBit(const SampleFrame& frame)
+SampleThumbnail::Bit::Bit(const SampleFrame& frame)
 	: max(std::max(frame.left(), frame.right()))
 	, min(std::min(frame.left(), frame.right()))
 	, rms(0.0)
 {
 }
 
-void SampleThumbnailBit::merge(const SampleThumbnailBit& other)
+void SampleThumbnail::Bit::merge(const Bit& other)
 {
 	min = std::min(min, other.min);
 	max = std::max(max, other.max);
 	rms = std::sqrt((rms * rms + other.rms * other.rms) / 2.0);
 }
 
-void SampleThumbnailBit::merge(const SampleFrame& frame)
+void SampleThumbnail::Bit::merge(const SampleFrame& frame)
 {
-	merge(SampleThumbnailBit{frame});
+	merge(Bit{frame});
 }
 
-bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(const Sample& inputSample)
+bool SampleThumbnail::selectFromGlobalThumbnailMap(const Sample& inputSample)
 {
 	const auto samplePtr = inputSample.buffer();
 	const auto name = inputSample.sampleFile();
-	const auto end = s_sampleThumbnailListMap.end();
+	const auto end = s_sampleThumbnailCacheMap.end();
 
-	if (const auto list = s_sampleThumbnailListMap.find(name); list != end)
+	if (const auto list = s_sampleThumbnailCacheMap.find(name); list != end)
 	{
-		m_list = list->second;
+		m_thumbnailCache = list->second;
 		return true;
 	}
 
-	m_list = std::make_shared<SampleThumbnailList>();
-	s_sampleThumbnailListMap.insert(std::make_pair(name, m_list));
+	m_thumbnailCache = std::make_shared<ThumbnailCache>();
+	s_sampleThumbnailCacheMap.insert(std::make_pair(name, m_thumbnailCache));
 	return false;
 }
 
-void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
+void SampleThumbnail::cleanUpGlobalThumbnailMap()
 {
-	auto map = s_sampleThumbnailListMap.begin();
-	while (map != s_sampleThumbnailListMap.end())
+	auto map = s_sampleThumbnailCacheMap.begin();
+	while (map != s_sampleThumbnailCacheMap.end())
 	{
-		// All instances of SampleThumbnailListManager are destroyed,
-		// a.k.a sample goes out of use
+		// All sample thumbnails are destroyed, a.k.a sample goes out of use
 		if (map->second.use_count() == 1)
 		{
-			s_sampleThumbnailListMap.erase(map);
-			map = s_sampleThumbnailListMap.begin();
+			s_sampleThumbnailCacheMap.erase(map);
+			map = s_sampleThumbnailCacheMap.begin();
 			continue;
 		}
 
@@ -82,10 +82,10 @@ void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 	}
 }
 
-SampleThumbnail SampleThumbnailListManager::generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size)
+SampleThumbnail::Thumbnail SampleThumbnail::generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size)
 {
 	const auto sampleChunk = (size + thumbnailSize) / thumbnailSize;
-	auto thumbnail = SampleThumbnail(thumbnailSize);
+	auto thumbnail = SampleThumbnail::Thumbnail(thumbnailSize);
 
 	for (auto tIndex = std::size_t{0}; tIndex < thumbnailSize; tIndex++)
 	{
@@ -110,7 +110,7 @@ SampleThumbnail SampleThumbnailListManager::generate(const size_t thumbnailSize,
 	return thumbnail;
 }
 
-SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample)
+SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 {
 	if (selectFromGlobalThumbnailMap(inputSample)) { return; }
 
@@ -122,23 +122,19 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	// For very small samples, use the sample size.
 	const auto firstThumbnailSize = std::min(std::max(sampleBufferSize, std::size_t{1}), std::size_t{MaxThumbnailSize});
 
-	auto& thumbnaillist = *m_list;
-
-	SampleThumbnail firstThumbnail = generate(firstThumbnailSize, buffer, sampleBufferSize);
-
-	thumbnaillist.push_back(firstThumbnail);
+	const auto firstThumbnail = generate(firstThumbnailSize, buffer, sampleBufferSize);
+	m_thumbnailCache->push_back(firstThumbnail);
 
 	// Generate the remaining thumbnails using the first one, each one's
 	// size is the size of the previous one divided by the thumbnail size divisor.
 	for (auto thumbnailSize = std::size_t{firstThumbnailSize / ThumbnailSizeDivisor}; thumbnailSize >= MinThumbnailSize;
 		 thumbnailSize /= ThumbnailSizeDivisor)
 	{
-		const auto& biggerThumbnail = thumbnaillist.back();
+		const auto& biggerThumbnail = m_thumbnailCache->back();
 		const auto biggerThumbnailSize = biggerThumbnail.size();
 		auto bitIndex = std::size_t{0};
 
-		SampleThumbnail thumbnail = std::vector(thumbnailSize, lmms::SampleThumbnailBit());
-
+		auto thumbnail = Thumbnail(thumbnailSize);
 		for (const auto& biggerBit : biggerThumbnail)
 		{
 			auto& bit = thumbnail[bitIndex * thumbnailSize / biggerThumbnailSize];
@@ -148,11 +144,11 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 			++bitIndex;
 		}
 
-		thumbnaillist.push_back(thumbnail);
+		m_thumbnailCache->push_back(thumbnail);
 	}
 }
 
-void SampleThumbnailListManager::draw(QPainter& painter, const SampleThumbnailBit& bit, float lineX, int centerY,
+void SampleThumbnail::draw(QPainter& painter, const SampleThumbnail::Bit& bit, float lineX, int centerY,
 	float scalingFactor, const QColor& color, const QColor& rmsColor)
 {
 	const auto lengthY1 = bit.max * scalingFactor;
@@ -174,8 +170,7 @@ void SampleThumbnailListManager::draw(QPainter& painter, const SampleThumbnailBi
 	painter.setPen(color);
 }
 
-void SampleThumbnailListManager::visualize(
-	const SampleThumbnailVisualizeParameters& parameters, QPainter& painter) const
+void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& parameters, QPainter& painter) const
 {
 	const auto sampleLength = parameters.sampleEnd - parameters.sampleStart;
 
@@ -214,15 +209,13 @@ void SampleThumbnailListManager::visualize(
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	auto list = m_list->end() - 1;
-	const auto begin = m_list->begin();
 	const auto widthSelect = static_cast<long>(static_cast<float>(width) / sampleLength);
-	while (list != begin && list->size() < widthSelect)
-	{
-		list--;
-	}
 
-	const auto& thumbnail = *list;
+	const auto thumbnailIt = std::find_if(m_thumbnailCache->begin(), m_thumbnailCache->end(),
+		[&](const auto& thumbnail) { return thumbnail.size() < widthSelect; });
+
+	const auto thumbnail
+		= thumbnailIt == m_thumbnailCache->end() ? *m_thumbnailCache->begin() : *thumbnailIt;
 
 	const auto thumbnailSize = thumbnail.size();
 	const auto thumbnailLastSample = std::max(static_cast<std::size_t>(parameters.sampleEnd * thumbnailSize), std::size_t{1}) - 1;
@@ -238,7 +231,7 @@ void SampleThumbnailListManager::visualize(
 	do
 	{
 		tIndex = tStart + pixelIndex * thumbnailViewSize / width;
-		auto thumbnailBit = SampleThumbnailBit();
+		auto thumbnailBit = Bit{};
 		const auto tChunkBound = tIndex + tChunk;
 
 		while (tIndex < tChunkBound)
@@ -253,8 +246,7 @@ void SampleThumbnailListManager::visualize(
 	} while (pixelIndex <= pixelBound && tIndex < tLast);
 }
 
-void SampleThumbnailListManager::visualizeOriginal(
-	const SampleThumbnailVisualizeParameters& parameters, QPainter& painter) const
+void SampleThumbnail::visualizeOriginal(const VisualizeParameters& parameters, QPainter& painter) const
 {
 	const auto x = parameters.x;
 	const auto height = parameters.height;
