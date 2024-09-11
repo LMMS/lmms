@@ -95,7 +95,7 @@ AutomatableModelView* CheckControl::modelView() { return m_checkBox; }
 
 CheckControl::CheckControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
-	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::Green)),
+	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::LedColor::Green)),
 	m_label(new QLabel(m_widget))
 {
 	auto vbox = new QVBoxLayout(m_widget);

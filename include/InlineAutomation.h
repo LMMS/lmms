@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INLINE_AUTOMATION_H
-#define INLINE_AUTOMATION_H
+#ifndef LMMS_INLINE_AUTOMATION_H
+#define LMMS_INLINE_AUTOMATION_H
 
 #include "AutomationNode.h"
 #include "AutomationClip.h"
@@ -99,4 +99,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INLINE_AUTOMATION_H

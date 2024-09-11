@@ -65,7 +65,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
 	m_trackSettingsWidget( this ),      /*!< Our trackSettingsWidget */
 	m_trackContentWidget( this ),       /*!< Our trackContentWidget */
-	m_action( NoAction )                /*!< The action we're currently performing */
+	m_action( Action::None )                /*!< The action we're currently performing */
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -75,7 +75,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	m_trackSettingsWidget.setAutoFillBackground( true );
 
 	auto layout = new QHBoxLayout(this);
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 	layout->addWidget( &m_trackOperationsWidget );
 	layout->addWidget( &m_trackSettingsWidget );
@@ -207,7 +207,7 @@ void TrackView::modelChanged()
 void TrackView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	StringPairDrag::processDragEnterEvent( dee, "track_" +
-					QString::number( m_track->type() ) );
+					QString::number( static_cast<int>(m_track->type()) ) );
 }
 
 
@@ -225,7 +225,7 @@ void TrackView::dropEvent( QDropEvent * de )
 {
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
-	if( type == ( "track_" + QString::number( m_track->type() ) ) )
+	if( type == ( "track_" + QString::number( static_cast<int>(m_track->type()) ) ) )
 	{
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
@@ -278,7 +278,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ShiftModifier )
 		{
-			m_action = ResizeTrack;
+			m_action = Action::Resize;
 			QCursor::setPos( mapToGlobal( QPoint( me->x(),
 								height() ) ) );
 			QCursor c( Qt::SizeVerCursor);
@@ -292,7 +292,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 				return;
 			}
 
-			m_action = MoveTrack;
+			m_action = Action::Move;
 
 			QCursor c( Qt::SizeVerCursor );
 			QApplication::setOverrideCursor( c );
@@ -338,7 +338,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	{
 		QWidget::mouseMoveEvent( me );
 	}
-	else if( m_action == MoveTrack )
+	else if( m_action == Action::Move )
 	{
 		// look which track-widget the mouse-cursor is over
 		const int yPos =
@@ -362,11 +362,9 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( m_action == ResizeTrack )
+	else if( m_action == Action::Resize )
 	{
-		setFixedHeight( qMax<int>( me->y(), MINIMAL_TRACK_HEIGHT ) );
-		m_trackContainerView->realignTracks();
-		m_track->setHeight( height() );
+		resizeToHeight(me->y());
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
@@ -383,7 +381,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
  */
 void TrackView::mouseReleaseEvent( QMouseEvent * me )
 {
-	m_action = NoAction;
+	m_action = Action::None;
 	while( QApplication::overrideCursor() != nullptr )
 	{
 		QApplication::restoreOverrideCursor();
@@ -391,6 +389,23 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 	m_trackOperationsWidget.update();
 
 	QWidget::mouseReleaseEvent( me );
+}
+
+void TrackView::wheelEvent(QWheelEvent* we)
+{
+	// Note: we add the values because one of them will be 0. If the alt modifier
+	// is pressed x is non-zero and otherwise y.
+	const int deltaY = we->angleDelta().x() + we->angleDelta().y();
+	int const direction = deltaY < 0 ? -1 : 1;
+
+	auto const modKeys = we->modifiers();
+	int stepSize = modKeys == (Qt::ControlModifier | Qt::AltModifier) ? 1 : modKeys == (Qt::ShiftModifier | Qt::AltModifier) ? 5 : 0;
+
+	if (stepSize != 0)
+	{
+		resizeToHeight(height() + stepSize * direction);
+		we->accept();
+	}
 }
 
 
@@ -442,6 +457,14 @@ void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 {
 	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
 	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
+}
+
+
+void TrackView::resizeToHeight(int h)
+{
+	setFixedHeight(qMax<int>(h, MINIMAL_TRACK_HEIGHT));
+	m_trackContainerView->realignTracks();
+	m_track->setHeight(height());
 }
 
 

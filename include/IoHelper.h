@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef IO_HELPER_H
-#define IO_HELPER_H
+#ifndef LMMS_IO_HELPER_H
+#define LMMS_IO_HELPER_H
 
 #include "lmmsconfig.h"
 
@@ -75,13 +75,12 @@ inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
 
 inline int fileToDescriptor(FILE* f, bool closeFile = true)
 {
-	int fh;
 	if (f == nullptr) {return -1;}
 
 #ifdef LMMS_BUILD_WIN32
-	fh = _dup(_fileno(f));
+	int fh = _dup(_fileno(f));
 #else
-	fh = dup(fileno(f));
+	int fh = dup(fileno(f));
 #endif
 
 	if (closeFile) {fclose(f);}
@@ -91,4 +90,4 @@ inline int fileToDescriptor(FILE* f, bool closeFile = true)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_IO_HELPER_H

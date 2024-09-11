@@ -23,11 +23,10 @@
  *
  */
 
-#ifndef DETUNING_HELPER_H
-#define DETUNING_HELPER_H
+#ifndef LMMS_DETUNING_HELPER_H
+#define LMMS_DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -35,7 +34,6 @@ namespace lmms
 class DetuningHelper : public InlineAutomation
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 	DetuningHelper() :
 		InlineAutomation()
@@ -64,4 +62,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DETUNING_HELPER_H

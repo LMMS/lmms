@@ -22,15 +22,13 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
- 
-#ifndef DELAY_H
-#define DELAY_H
+
+#ifndef LMMS_DELAY_H
+#define LMMS_DELAY_H
 
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -75,20 +73,20 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>(maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedback()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -146,20 +144,20 @@ class CombFeedfwd
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedfwd()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -217,20 +215,20 @@ class CombFeedbackDualtap
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedbackDualtap()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -298,20 +296,20 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~AllpassDelay()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -365,4 +363,4 @@ using StereoAllpassDelay = AllpassDelay<2>;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DELAY_H

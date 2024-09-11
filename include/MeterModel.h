@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef METER_MODEL_H
-#define METER_MODEL_H
+#ifndef LMMS_METER_MODEL_H
+#define LMMS_METER_MODEL_H
 
 #include "AutomatableModel.h"
 
@@ -68,4 +68,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_METER_MODEL_H

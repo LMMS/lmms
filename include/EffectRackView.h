@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_RACK_VIEW_H
-#define EFFECT_RACK_VIEW_H
+#ifndef LMMS_GUI_EFFECT_RACK_VIEW_H
+#define LMMS_GUI_EFFECT_RACK_VIEW_H
 
 #include <QWidget>
 
@@ -53,10 +53,9 @@ public:
 
 public slots:
 	void clearViews();
-	void moveUp( lmms::gui::EffectView* view );
-	void moveDown( lmms::gui::EffectView* view );
-	void deletePlugin( lmms::gui::EffectView* view );
-
+	void moveUp(EffectView* view);
+	void moveDown(EffectView* view);
+	void deletePlugin(EffectView* view);
 
 private slots:
 	virtual void update();
@@ -65,6 +64,8 @@ private slots:
 
 private:
 	void modelChanged() override;
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 
 	inline EffectChain* fxChain()
 	{
@@ -88,4 +89,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EFFECT_RACK_VIEW_H

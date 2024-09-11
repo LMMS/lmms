@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_SOUNDIO_H
-#define AUDIO_SOUNDIO_H
+#ifndef LMMS_AUDIO_SOUNDIO_H
+#define LMMS_AUDIO_SOUNDIO_H
 
 #include <QObject>
 
@@ -110,7 +110,7 @@ private:
 	SoundIo *m_soundio;
 	SoundIoOutStream *m_outstream;
 
-	surroundSampleFrame * m_outBuf;
+	SampleFrame* m_outBuf;
 	int m_outBufSize;
 	fpp_t m_outBufFramesTotal;
 	fpp_t m_outBufFrameIndex;
@@ -145,4 +145,4 @@ private:
 
 #endif // LMMS_HAVE_SOUNDIO
 
-#endif
+#endif // LMMS_AUDIO_SOUNDIO_H

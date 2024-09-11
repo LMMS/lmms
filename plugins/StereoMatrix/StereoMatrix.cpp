@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -64,7 +64,7 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-bool StereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
+bool StereoMatrixEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	

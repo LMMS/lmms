@@ -70,8 +70,8 @@
 **
 ****************************************************************************/
 
-#ifndef CONTROLLAYOUT_H
-#define CONTROLLAYOUT_H
+#ifndef LMMS_GUI_CONTROL_LAYOUT_H
+#define LMMS_GUI_CONTROL_LAYOUT_H
 
 #include <QLayout>
 #include <QMultiMap>
@@ -141,4 +141,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // CONTROLLAYOUT_H
+#endif // LMMS_GUI_CONTROL_LAYOUT_H

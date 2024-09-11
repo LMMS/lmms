@@ -22,68 +22,62 @@
  *
  */
 
+#include "embed.h"
+
 #include <QDebug>
+#include <QDir>
 #include <QImageReader>
 #include <QPixmapCache>
 #include <QResource>
-#include "embed.h"
 
-namespace lmms::embed
+namespace lmms::embed {
+
+namespace {
+
+auto loadPixmap(const QString& name, int width, int height, const char* const* xpm) -> QPixmap
 {
+	if (xpm) { return QPixmap{xpm}; }
 
-QPixmap getIconPixmap(const QString& pixmapName,
-	int width, int height, const char** xpm )
+	const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
+	auto reader = QImageReader{resourceName};
+	if (width > 0 && height > 0) { reader.setScaledSize(QSize{width, height}); }
+
+	const auto pixmap = QPixmap::fromImageReader(&reader);
+	if (pixmap.isNull()) {
+		qWarning().nospace() << "Error loading icon pixmap " << name << ": " << reader.errorString();
+		return QPixmap{1, 1};
+	}
+	return pixmap;
+}
+
+} // namespace
+
+auto getIconPixmap(std::string_view name, int width, int height, const char* const* xpm) -> QPixmap
 {
-	QString cacheName;
-	if (width > 0 && height > 0)
-	{
-		cacheName = QString("%1_%2_%3").arg(pixmapName, width, height);
-	}
-	else
-	{
-		cacheName = pixmapName;
-	}
+	if (name.empty()) { return QPixmap{}; }
 
-	// Return cached pixmap
-	QPixmap pixmap;
-	if( QPixmapCache::find(cacheName, &pixmap) )
-	{
-		return pixmap;
-	}
+	const auto pixmapName = QString::fromUtf8(name.data(), name.size());
+	const auto cacheName = (width > 0 && height > 0)
+		? QStringLiteral("%1_%2_%3").arg(pixmapName, width, height)
+		: pixmapName;
 
-	if(xpm)
-	{
-		pixmap = QPixmap(xpm);
-	}
-	else
-	{
-		QImageReader reader(QString("artwork:%1").arg(pixmapName));
+	// Return cached pixmap if it exists
+	if (auto pixmap = QPixmap{}; QPixmapCache::find(cacheName, &pixmap)) { return pixmap; }
 
-		if (width > 0 && height > 0)
-		{
-			reader.setScaledSize(QSize(width, height));
-		}
-
-		pixmap = QPixmap::fromImageReader(&reader);
-
-		if (pixmap.isNull())
-		{
-			qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " <<
-									reader.errorString().toLocal8Bit().data();
-			return QPixmap(1,1);
-		}
-	}
-
-	// Save to cache and return
+	// Load the pixmap and cache it before returning
+	const auto pixmap = loadPixmap(pixmapName, width, height, xpm);
 	QPixmapCache::insert(cacheName, pixmap);
 	return pixmap;
 }
 
-
-QString getText( const char * name )
+auto getText(std::string_view name) -> QString
 {
-	return QString::fromUtf8( (const char*) QResource(QString(":/%1").arg(name)).data());
+	const auto resource = QResource{":/" + QString::fromUtf8(name.data(), name.size())};
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+	return QString::fromUtf8(resource.uncompressedData());
+#else
+	return QString::fromUtf8(reinterpret_cast<const char*>(resource.data()), resource.size());
+#endif
 }
-
 
 } // namespace lmms::embed

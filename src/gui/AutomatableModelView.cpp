@@ -176,7 +176,7 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
 	}
-	else if( event->button() == Qt::MidButton )
+	else if( event->button() == Qt::MiddleButton )
 	{
 		modelUntyped()->reset();
 	}

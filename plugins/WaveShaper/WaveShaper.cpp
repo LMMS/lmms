@@ -46,7 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 				"plugin for waveshaping" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -66,7 +66,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
+bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )

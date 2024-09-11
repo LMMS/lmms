@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_H
-#define MIDI_H
+#ifndef LMMS_MIDI_H
+#define LMMS_MIDI_H
 
 #include "lmms_basics.h"
 
@@ -143,4 +143,4 @@ const int MidiMaxPitchBend = 16383;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_H

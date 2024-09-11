@@ -21,10 +21,12 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SENDBUTTONINDICATOR_H
-#define SENDBUTTONINDICATOR_H
+
+#ifndef LMMS_GUI_SEND_BUTTON_INDICATOR_H
+#define LMMS_GUI_SEND_BUTTON_INDICATOR_H
 
 #include <QLabel>
+#include "embed.h"
 
 
 namespace lmms
@@ -35,27 +37,25 @@ class FloatModel;
 namespace gui
 {
 
-class MixerLine;
+class MixerChannelView;
 class MixerView;
 
-
-class SendButtonIndicator : public QLabel 
+class SendButtonIndicator : public QLabel
 {
 public:
-	SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
-						 MixerView * _mv);
+	SendButtonIndicator(QWidget* parent, MixerChannelView* owner, MixerView* mv);
 
-	void mousePressEvent( QMouseEvent * e ) override;
+	void mousePressEvent(QMouseEvent* e) override;
 	void updateLightStatus();
 
 private:
 
-	MixerLine * m_parent;
-	MixerView * m_mv;
-	static QPixmap * s_qpmOn;
-	static QPixmap * s_qpmOff;
+	MixerChannelView* m_parent;
+	MixerView* m_mv;
+	QPixmap m_qpmOff = embed::getIconPixmap("mixer_send_off", 29, 20);
+	QPixmap m_qpmOn = embed::getIconPixmap("mixer_send_on", 29, 20);
 
-	FloatModel * getSendModel();
+	FloatModel* getSendModel();
 };
 
 
@@ -63,4 +63,4 @@ private:
 
 } // namespace lmms
 
-#endif // SENDBUTTONINDICATOR_H
+#endif // LMMS_GUI_SEND_BUTTON_INDICATOR_H

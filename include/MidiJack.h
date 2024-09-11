@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDIJACK_H
-#define MIDIJACK_H
+#ifndef LMMS_MIDI_JACK_H
+#define LMMS_MIDI_JACK_H
 
 #include "lmmsconfig.h"
 
@@ -32,7 +32,7 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #else
-#include "weak_libjack.h"
+#include <weak_libjack.h>
 #endif
 
 #include <QThread>
@@ -102,4 +102,4 @@ private:
 
 #endif // LMMS_HAVE_JACK
 
-#endif // MIDIJACK_H
+#endif // LMMS_MIDI_JACK_H

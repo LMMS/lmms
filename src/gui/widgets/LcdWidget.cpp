@@ -66,17 +66,6 @@ LcdWidget::LcdWidget(int numDigits, const QString& style, QWidget* parent, const
 	initUi( name, style );
 }
 
-
-
-
-LcdWidget::~LcdWidget()
-{
-	delete m_lcdPixmap;
-}
-
-
-
-
 void LcdWidget::setValue(int value)
 {
 	QString s = m_textForValue[value];
@@ -89,9 +78,31 @@ void LcdWidget::setValue(int value)
 		}
 	}
 
-	m_display = s;
+	if (m_display != s)
+	{
+		m_display = s;
 
-	update();
+		update();
+	}
+}
+
+void LcdWidget::setValue(float value)
+{
+	if (-1 < value && value < 0)
+	{
+		QString s = QString::number(static_cast<int>(value));
+		s.prepend('-');
+		
+		if (m_display != s)
+		{
+			m_display = s;
+			update();
+		}
+	}
+	else
+	{
+		setValue(static_cast<int>(value));
+	}
 }
 
 
@@ -146,11 +157,8 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	{
 		p.translate(margin, margin);
 		// Left Margin
-		p.drawPixmap(
-			cellRect,
-			*m_lcdPixmap,
-			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize)
-		);
+		p.drawPixmap(cellRect, m_lcdPixmap,
+			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
 
 		p.translate(m_marginWidth, 0);
 	}
@@ -158,8 +166,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Padding
 	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
 	{
-		p.drawPixmap( cellRect, *m_lcdPixmap, 
-			QRect( QPoint( 10 * m_cellWidth, isEnabled()?0:m_cellHeight) , cellSize ) );
+		p.drawPixmap(cellRect, m_lcdPixmap, QRect(QPoint(10 * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
 		p.translate( m_cellWidth, 0 );
 	}
 
@@ -173,18 +180,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 			else
 				val = 10;
 		}
-		p.drawPixmap( cellRect, *m_lcdPixmap,
-				QRect( QPoint( val*m_cellWidth, 
-					isEnabled()?0:m_cellHeight ),
-				cellSize ) );
+		p.drawPixmap(cellRect, m_lcdPixmap, QRect(QPoint(val * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Right Margin
-	p.drawPixmap(QRect(0, 0, m_seamlessRight ? 0 : m_marginWidth - 1, m_cellHeight),
-		*m_lcdPixmap,
+	p.drawPixmap(QRect(0, 0, m_seamlessRight ? 0 : m_marginWidth - 1, m_cellHeight), m_lcdPixmap,
 		QRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth / 2, m_cellHeight));
-
 
 	p.restore();
 
@@ -207,7 +209,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Label
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6.5 ) );
+		p.setFont(adjustedToPixelSize(p.font(), 10));
 		p.setPen( textShadowColor() );
 		p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1,
@@ -259,7 +261,7 @@ void LcdWidget::updateSize()
 		setFixedSize(
 			qMax<int>(
 				m_cellWidth * m_numDigits + marginX1 + marginX2,
-				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)
+				horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), 10)), m_label)
 			),
 			m_cellHeight + (2 * marginY) + 9
 		);
@@ -278,12 +280,12 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 	setWindowTitle( name );
 
 	// We should make a factory for these or something.
-	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
-	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) ); // TODO!!
-	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
+	//m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData());
+	//m_lcdPixmap = embed::getIconPixmap("lcd_19green"); // TODO!!
 
-	m_cellWidth = m_lcdPixmap->size().width() / LcdWidget::charsPerPixmap;
-	m_cellHeight = m_lcdPixmap->size().height() / 2;
+	m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData());
+	m_cellWidth = m_lcdPixmap.size().width() / LcdWidget::charsPerPixmap;
+	m_cellHeight = m_lcdPixmap.size().height() / 2;
 
 	m_marginWidth =  m_cellWidth / 2;
 

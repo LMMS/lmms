@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EDITOR_COMMON_H
-#define EDITOR_COMMON_H
+#ifndef LMMS_GUI_EDITOR_H
+#define LMMS_GUI_EDITOR_H
 
 #include <QMainWindow>
 #include <QToolBar>
@@ -113,4 +113,4 @@ protected:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EDITOR_H

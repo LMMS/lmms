@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef GUIAPPLICATION_H
-#define GUIAPPLICATION_H
+#ifndef LMMS_GUI_GUI_APPLICATION_H
+#define LMMS_GUI_GUI_APPLICATION_H
 
 #include <QObject>
 
@@ -93,4 +93,4 @@ LMMS_EXPORT GuiApplication* getGUI();
 
 } // namespace lmms::gui
 
-#endif // GUIAPPLICATION_H
+#endif // LMMS_GUI_GUI_APPLICATION_H

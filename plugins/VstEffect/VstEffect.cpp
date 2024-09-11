@@ -49,10 +49,10 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new VstSubPluginFeatures( Plugin::Effect )
+	new VstSubPluginFeatures( Plugin::Type::Effect )
 } ;
 
 }
@@ -76,7 +76,7 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
+bool VstEffect::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -87,11 +87,11 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 	{
 		const float d = dryLevel();
 #ifdef __GNUC__
-		sampleFrame buf[_frames];
+		SampleFrame buf[_frames];
 #else
-		sampleFrame * buf = new sampleFrame[_frames];
+		SampleFrame* buf = new SampleFrame[_frames];
 #endif
-		memcpy( buf, _buf, sizeof( sampleFrame ) * _frames );
+		memcpy( buf, _buf, sizeof( SampleFrame ) * _frames );
 		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
 		{
 			m_plugin->process( buf, buf );

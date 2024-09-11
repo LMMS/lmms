@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef AUTOMATION_CLIP_H
-#define AUTOMATION_CLIP_H
+#ifndef LMMS_AUTOMATION_CLIP_H
+#define LMMS_AUTOMATION_CLIP_H
 
 #include <QMap>
 #include <QPointer>
@@ -46,6 +46,7 @@ class TimePos;
 namespace gui
 {
 class AutomationClipView;
+class AutomationEditor;
 } // namespace gui
 
 
@@ -54,15 +55,15 @@ class LMMS_EXPORT AutomationClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum ProgressionTypes
+	enum class ProgressionType
 	{
-		DiscreteProgression,
-		LinearProgression,
-		CubicHermiteProgression
+		Discrete,
+		Linear,
+		CubicHermite
 	} ;
 
 	using timeMap = QMap<int, AutomationNode>;
-	using objectVector = QVector<QPointer<AutomatableModel>>;
+	using objectVector = std::vector<QPointer<AutomatableModel>>;
 
 	using TimemapIterator = timeMap::const_iterator;
 
@@ -76,11 +77,11 @@ public:
 	const objectVector& objects() const;
 
 	// progression-type stuff
-	inline ProgressionTypes progressionType() const
+	inline ProgressionType progressionType() const
 	{
 		return m_progressionType;
 	}
-	void setProgressionType( ProgressionTypes _new_progression_type );
+	void setProgressionType( ProgressionType _new_progression_type );
 
 	inline float getTension() const
 	{
@@ -110,6 +111,13 @@ public:
 	void removeNodes(const int tick0, const int tick1);
 
 	void resetNodes(const int tick0, const int tick1);
+
+	/**
+	 * @brief Resets the tangents from the nodes between the given ticks
+	 * @param Int first tick of the range
+	 * @param Int second tick of the range
+	 */
+	void resetTangents(const int tick0, const int tick1);
 
 	void recordValue(TimePos time, float value);
 
@@ -151,10 +159,21 @@ public:
 		return m_timeMap.isEmpty() == false;
 	}
 
+	static bool supportsTangentEditing(ProgressionType pType)
+	{
+		// Update function if we have new progression types that support tangent editing
+		return pType == ProgressionType::CubicHermite;
+	}
+
+	inline bool canEditTangents() const
+	{
+		return supportsTangentEditing(m_progressionType);
+	}
+
 	float valueAt( const TimePos & _time ) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
-	const QString name() const;
+	QString name() const;
 
 	// settings-management
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -167,7 +186,7 @@ public:
 
 
 	static bool isAutomated( const AutomatableModel * _m );
-	static QVector<AutomationClip *> clipsForModel( const AutomatableModel * _m );
+	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 
@@ -190,6 +209,15 @@ private:
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
+	/**
+	 * @brief
+	 * This function combines the song tracks, pattern store tracks,
+	 * and the global automation track all in one vector.
+	 *
+	 * @return std::vector<Track*>
+	 */
+	static std::vector<Track*> combineAllTracks();
+
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -199,17 +227,20 @@ private:
 #endif
 
 	AutomationTrack * m_autoTrack;
-	QVector<jo_id_t> m_idsToResolve;
+	std::vector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	float m_tension;
 	bool m_hasAutomation;
-	ProgressionTypes m_progressionType;
+	ProgressionType m_progressionType;
 
 	bool m_dragging;
 	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
 	float m_dragOutValue; // The outValue of the dragged node's
+	bool m_dragLockedTan; // If the dragged node has it's tangents locked
+	float m_dragInTan; // The dragged node's inTangent
+	float m_dragOutTan; // The dragged node's outTangent
 
 	bool m_isRecording;
 	float m_lastRecordedValue;
@@ -221,6 +252,7 @@ private:
 
 	friend class gui::AutomationClipView;
 	friend class AutomationNode;
+	friend class gui::AutomationEditor;
 
 } ;
 
@@ -252,6 +284,11 @@ inline float OUTTAN(AutomationClip::TimemapIterator it)
 	return it->getOutTangent();
 }
 
+inline float LOCKEDTAN(AutomationClip::TimemapIterator it)
+{
+	return it->lockedTangents();
+}
+
 inline int POS(AutomationClip::TimemapIterator it)
 {
 	return it.key();
@@ -260,4 +297,4 @@ inline int POS(AutomationClip::TimemapIterator it)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUTOMATION_CLIP_H

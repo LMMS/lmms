@@ -31,6 +31,8 @@
 #include "EffectView.h"
 
 #include "ConfigManager.h"
+#include "SampleFrame.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -52,13 +54,19 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
 	m_autoQuitDisabled( false )
 {
+	m_wetDryModel.setCenterValue(0);
+
 	m_srcState[0] = m_srcState[1] = nullptr;
 	reinitSRC();
-	
+
 	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
 	{
 		m_autoQuitDisabled = true;
 	}
+
+	// Call the virtual method onEnabledChanged so that effects can react to changes,
+	// e.g. by resetting state.
+	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
 
@@ -147,7 +155,7 @@ void Effect::checkGate( double _out_sum )
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum - gate() <= typeInfo<float>::minEps() )
+	if (_out_sum - gate() <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
@@ -193,9 +201,9 @@ void Effect::reinitSRC()
 
 
 
-void Effect::resample( int _i, const sampleFrame * _src_buf,
+void Effect::resample( int _i, const SampleFrame* _src_buf,
 							sample_rate_t _src_sr,
-				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+				SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 								f_cnt_t _frames )
 {
 	if( m_srcState[_i] == nullptr )
@@ -208,8 +216,8 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	m_srcData[_i].data_out = _dst_buf[0].data ();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
-	int error;
-	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
+
+	if (int error = src_process(m_srcState[_i], &m_srcData[_i]))
 	{
 		qFatal( "Effect::resample(): error while resampling: %s\n",
 							src_strerror( error ) );

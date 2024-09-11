@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef THREADABLE_JOB_H
-#define THREADABLE_JOB_H
+#ifndef LMMS_THREADABLE_JOB_H
+#define LMMS_THREADABLE_JOB_H
 
 #include "lmms_basics.h"
 
@@ -90,4 +90,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_THREADABLE_JOB_H

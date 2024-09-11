@@ -108,10 +108,8 @@ void ProjectNotes::setText( const QString & _text )
 void ProjectNotes::setupActions()
 {
 	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );
-	QAction * a;
 
-	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
-									this );
+	auto a = new QAction(embed::getIconPixmap("edit_undo"), tr("&Undo"), this);
 	a->setShortcut( tr( "%1+Z" ).arg(UI_CTRL_KEY) );
 	connect( a, SIGNAL(triggered()), m_edit, SLOT(undo()));
 	tb->addAction( a );

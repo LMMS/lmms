@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LFO_CONTROLLER_H
-#define LFO_CONTROLLER_H
+#ifndef LMMS_LFO_CONTROLLER_H
+#define LMMS_LFO_CONTROLLER_H
 
 #include <QWidget>
 
@@ -51,7 +51,7 @@ class LfoControllerDialog;
 }
 
 
-class LfoController : public Controller 
+class LfoController : public Controller
 {
 	Q_OBJECT
 public:
@@ -86,7 +86,8 @@ protected:
 	sample_t (*m_sampleFunction)( const float );
 
 private:
-	SampleBuffer * m_userDefSampleBuffer;
+	float m_heldSample;
+	std::shared_ptr<const SampleBuffer> m_userDefSampleBuffer = SampleBuffer::emptyBuffer();
 
 protected slots:
 	void updatePhase();
@@ -136,4 +137,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LFO_CONTROLLER_H
