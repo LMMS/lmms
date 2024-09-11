@@ -1651,6 +1651,7 @@ void DataFile::upgrade_noHiddenAutomationTracks()
 	{
 		// global automationclips
 		QDomNodeList aps = gaTrack.elementsByTagName("automationclip");
+		QList<QDomNode> tracksToInsert;
 		for (int i = 0; i < aps.length(); ++i)
 		{
 			QDomElement ap = aps.item(i).toElement();
@@ -1669,9 +1670,15 @@ void DataFile::upgrade_noHiddenAutomationTracks()
 				QDomElement at = createElement("automationtrack");
 				aptrack.appendChild(at);
 				aptrack.appendChild(aps.item(i).cloneNode());
-				tc.appendChild(aptrack);
+				tracksToInsert.prepend(aptrack); // To preserve orders
 			}
 		}
+
+		// Insert the tracks at the beginning of tc, preserving their order
+		for (const auto& track : tracksToInsert) {
+			tc.insertBefore(track, tc.firstChild());
+		}
+
 		// Remove the track object just in case
 		gaTrack.parentNode().removeChild(gaTrack);
 	}
