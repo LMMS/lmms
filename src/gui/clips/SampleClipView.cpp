@@ -268,8 +268,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	// Visualize
 	float offsetStart 	=  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	float sampleLength  =  m_clip->sampleLength() * ppb / ticksPerBar;
-	float clipLength 	= m_clip->length() * ppb / ticksPerBar;
-	
+
 	const auto& sample = m_clip->m_sample;
 
 	auto param = SampleThumbnail::VisualizeParameters{};
