@@ -96,6 +96,43 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 	}
 }
 
+//! Takes advantage of fma() function if present in hardware
+template<typename T>
+T fastFma(T x, T y, T z);
+
+//! Takes advantage of fmaf() function if present in hardware
+template<>
+inline float fastFma(float x, float y, float z)
+{
+#ifdef FP_FAST_FMAF
+	return std::fma(x, y, z);
+#else
+	return x * y + z;
+#endif
+}
+
+//! Takes advantage of fma() function if present in hardware
+template<>
+inline double fastFma(double x, double y, double z)
+{
+#ifdef FP_FAST_FMA
+	return std::fma(x, y, z);
+#else
+	return x * y + z;
+#endif
+}
+
+//! Takes advantage of fmal() function if present in hardware
+template<>
+inline long double fastFma(long double x, long double y, long double z)
+{
+#ifdef FP_FAST_FMAL
+	return std::fma(x, y, z);
+#else
+	return x * y + z;
+#endif
+}
+
 
 //! returns 1.0f if val >= 0.0f, -1.0 else
 inline float sign(float val) 
