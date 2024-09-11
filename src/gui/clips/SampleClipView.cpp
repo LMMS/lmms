@@ -278,7 +278,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	param.viewX = region.x();
 	param.y = spacing;
 	param.width = std::max<long>(static_cast<long>(sampleLength), 1);
-	param.height = region.bottom() - 2 * spacing;
+	param.height = rect().bottom() - 2 * spacing;
 	param.clipWidthSinceSampleStart = static_cast<long>(region.width() + region.x() - offsetStart);
 
 	m_sampleThumbnail.visualize(param, p);
@@ -291,12 +291,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 135 ) );
-	p.drawRect( 1, 1, region.right() - BORDER_WIDTH,
-		region.bottom() - BORDER_WIDTH );
+	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 200 ) );
-	p.drawRect( 0, 0, region.right(), region.bottom() );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
