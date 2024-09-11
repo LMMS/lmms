@@ -64,7 +64,7 @@ public:
 
 	struct VisualizeParameters
 	{
-		const Sample* originalSample; //!< Points to an original sample to render.
+		const Sample* originalSample = nullptr; //!< Points to an original sample to render.
 
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
@@ -74,6 +74,13 @@ public:
 
 		long x = 0; //!< Starting X position for the waveform.
 		long y = 0; //!< Starting Y position for the waveform.
+        
+        /**
+            If the left side of the sample clip is out of view, 
+            this field will specify the x position of left most 
+            pixels of the sample clip that's still in view.
+        */
+        long viewX = 0;
 
 		long width = 0;	 //!< The width of the rectangle to draw into.
 		long height = 0; //!< The height of the rectangle to draw into.

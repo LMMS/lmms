@@ -226,8 +226,8 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 	const auto tLast = std::min(thumbnailLastSample, thumbnailSize - 1);
 	const auto pixelBound = std::min(width, parameters.clipWidthSinceSampleStart);
 
-	auto tIndex = std::size_t{0};
-	auto pixelIndex = absXOr0;
+	auto tIndex = 0;
+	auto pixelIndex = std::max(absXOr0, parameters.viewX);
 	const auto tChunk = (thumbnailSize + width) / width;
 
 	do
