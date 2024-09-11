@@ -273,7 +273,7 @@ void SampleThumbnail::visualizeOriginal(const VisualizeParameters& parameters, Q
 	const auto sampleEndFrame = std::min(static_cast<std::size_t>(parameters.sampleEnd * originalSampleSize), originalSampleSize);
 
 	const auto thumbnail
-		= generate(width, originalSampleBuffer + sampleStartFrame, sampleEndFrame);
+		= generate(width, originalSampleBuffer + sampleStartFrame, sampleEndFrame - sampleStartFrame);
 
 	for (auto pixelIndex = absXOr0; pixelIndex < width; pixelIndex++)
 	{
