@@ -85,7 +85,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
-	&DataFile::findProblematicLadspaPlugins, &DataFile::upgrade_noHiddenAutomationTracks
+	&DataFile::findProblematicLadspaPlugins,
+	&DataFile::upgrade_noHiddenAutomationTracks
 };
 
 // Vector of all versions that have upgrade routines.
