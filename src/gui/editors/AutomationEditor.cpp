@@ -1226,6 +1226,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			param.y = yOffset;
 			param.width = sampleWidth;
 			param.height = sampleHeight;
+			param.clipWidthSinceSampleStart = width() - startPos;
 
 			m_sampleThumbnail.visualize(param, p);
 		}
