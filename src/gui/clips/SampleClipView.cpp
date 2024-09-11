@@ -208,20 +208,14 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
-	if( !needsUpdate() )
-	{
-		painter.drawPixmap( 0, 0, m_paintPixmap );
-		return;
-	}
-
-	setNeedsUpdate( false );
-
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
 		m_paintPixmap = QPixmap(size());
 	}
 
 	QPainter p( &m_paintPixmap );
+
+	const auto region = pe->region().boundingRect();
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
@@ -235,15 +229,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+	p.fillRect( region, QColor( 0, 0, 0 ) );
 
 	if( gradient() )
 	{
-		p.fillRect( rect(), lingrad );
+		p.fillRect( region, lingrad );
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		p.fillRect( region, c );
 	}
 
 	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
@@ -281,11 +275,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	auto param = SampleThumbnail::VisualizeParameters{};
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
-	param.x = static_cast<long>(offsetStart);
+	param.x = offsetStart;
+	param.viewX = region.x();
 	param.y = spacing;
 	param.width = std::max<long>(static_cast<long>(sampleLength), 1);
 	param.height = rect().bottom() - 2 * spacing;
-	param.clipWidthSinceSampleStart = static_cast<long>(clipLength - offsetStart);
+	param.clipWidthSinceSampleStart = static_cast<long>(region.width() + region.x() - offsetStart);
 
 	m_sampleThumbnail.visualize(param, p);
 
