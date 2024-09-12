@@ -153,7 +153,7 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -180,7 +180,7 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	}
 	else // rate crushing disabled: simply oversample with zero-order hold
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -196,7 +196,7 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 
 	// the oversampled buffer is now written, so filter it to reduce aliasing
 
-	for( int f = 0; f < frames * OS_RATE; ++f )
+	for (auto f = std::size_t{0}; f < frames * OS_RATE; ++f)
 	{
 		if( qMax( qAbs( m_buffer[f][0] ), qAbs( m_buffer[f][1] ) ) >= 1.0e-10f )
 		{
@@ -225,7 +225,7 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		float lsum = 0.0f;
 		float rsum = 0.0f;

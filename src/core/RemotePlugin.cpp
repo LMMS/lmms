@@ -333,7 +333,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 	{
 		if( _out_buf != nullptr )
 		{
-			BufferManager::clear( _out_buf, frames );
+			zeroSampleFrames(_out_buf, frames);
 		}
 		return false;
 	}
@@ -352,7 +352,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 		}
 		if( _out_buf != nullptr )
 		{
-			BufferManager::clear( _out_buf, frames );
+			zeroSampleFrames(_out_buf, frames);
 		}
 		return false;
 	}
@@ -426,7 +426,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 	{
 		auto o = (SampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
 		// clear buffer, if plugin didn't fill up both channels
-		BufferManager::clear( _out_buf, frames );
+		zeroSampleFrames(_out_buf, frames);
 
 		for (ch_cnt_t ch = 0; ch <
 				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
