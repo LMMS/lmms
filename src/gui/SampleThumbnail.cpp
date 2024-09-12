@@ -48,6 +48,42 @@ void SampleThumbnail::Bit::merge(const SampleFrame& frame)
 	merge(Bit{frame});
 }
 
+/* DEPRECATED; functionality is kept for testing conveniences */
+bool SampleThumbnail::selectFromGlobalThumbnailMap(const Sample& inputSample)
+{
+	const auto samplePtr = inputSample.buffer();
+	const auto name = inputSample.sampleFile();
+	const auto end = s_sampleThumbnailCacheMap.end();
+
+	if (const auto list = s_sampleThumbnailCacheMap.find(name); list != end)
+	{
+		m_thumbnailCache = list->second;
+		return true;
+	}
+
+	m_thumbnailCache = std::make_shared<ThumbnailCache>();
+	s_sampleThumbnailCacheMap.insert(std::make_pair(name, m_thumbnailCache));
+	return false;
+}
+
+/* DEPRECATED; functionality is kept for testing conveniences */
+void SampleThumbnail::cleanUpGlobalThumbnailMap()
+{
+	auto map = s_sampleThumbnailCacheMap.begin();
+	while (map != s_sampleThumbnailCacheMap.end())
+	{
+		// All sample thumbnails are destroyed, a.k.a sample goes out of use
+		if (map->second.use_count() == 1)
+		{
+			s_sampleThumbnailCacheMap.erase(map);
+			map = s_sampleThumbnailCacheMap.begin();
+			continue;
+		}
+
+		map++;
+	}
+}
+
 SampleThumbnail::Thumbnail SampleThumbnail::generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size)
 {
 	const auto sampleChunk = (size + thumbnailSize) / thumbnailSize;
@@ -78,7 +114,9 @@ SampleThumbnail::Thumbnail SampleThumbnail::generate(const size_t thumbnailSize,
 
 SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 {
-	m_thumbnailCache = std::make_shared<ThumbnailCache>();
+	if (selectFromGlobalThumbnailMap(inputSample)) { return; }
+
+	cleanUpGlobalThumbnailMap();
 
 	const auto sampleBufferSize = inputSample.sampleSize();
 	const auto& buffer = inputSample.data();

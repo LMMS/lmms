@@ -111,6 +111,9 @@ private:
 	static Thumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
 
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
+
+	/* DEPRECATED; functionality is kept for testing conveniences */
+	inline static std::map<const QString, std::shared_ptr<ThumbnailCache>> s_sampleThumbnailCacheMap;
 };
 
 } // namespace lmms
