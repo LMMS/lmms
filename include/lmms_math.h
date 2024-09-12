@@ -96,11 +96,11 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 	}
 }
 
-//! Takes advantage of fma() function if present in hardware
+//! Uses `x * y + z` or `std::fma` - whichever is faster
 template<typename T>
-T fastFma(T x, T y, T z);
+inline T fastFma(T x, T y, T z);
 
-//! Takes advantage of fmaf() function if present in hardware
+//! Uses `x * y + z` or `std::fma` - whichever is faster
 template<>
 inline float fastFma(float x, float y, float z)
 {
@@ -108,10 +108,10 @@ inline float fastFma(float x, float y, float z)
 	return std::fma(x, y, z);
 #else
 	return x * y + z;
-#endif
+#endif // FP_FAST_FMAF
 }
 
-//! Takes advantage of fma() function if present in hardware
+//! Uses `x * y + z` or `std::fma` - whichever is faster
 template<>
 inline double fastFma(double x, double y, double z)
 {
@@ -119,10 +119,10 @@ inline double fastFma(double x, double y, double z)
 	return std::fma(x, y, z);
 #else
 	return x * y + z;
-#endif
+#endif // FP_FAST_FMA
 }
 
-//! Takes advantage of fmal() function if present in hardware
+//! Uses `x * y + z` or `std::fma` - whichever is faster
 template<>
 inline long double fastFma(long double x, long double y, long double z)
 {
@@ -130,7 +130,21 @@ inline long double fastFma(long double x, long double y, long double z)
 	return std::fma(x, y, z);
 #else
 	return x * y + z;
-#endif
+#endif // FP_FAST_FMAL
+}
+
+
+//! Source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+inline double fastPow(double a, double b)
+{
+	union
+	{
+		double d;
+		std::int32_t x[2];
+	} u = { a };
+	u.x[1] = static_cast<std::int32_t>(b * (u.x[1] - 1072632447) + 1072632447);
+	u.x[0] = 0;
+	return u.d;
 }
 
 
