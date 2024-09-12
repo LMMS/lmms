@@ -1220,6 +1220,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			p.setPen(m_ghostSampleColor);
 
 			auto param = SampleThumbnail::VisualizeParameters{};
+			param.allowHighResolution = true;
 			param.amplification = m_ghostSample->sample().amplification();
 			param.reversed = m_ghostSample->sample().reversed();
 			param.x = startPos;

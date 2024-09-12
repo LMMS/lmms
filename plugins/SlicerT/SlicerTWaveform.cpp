@@ -160,7 +160,7 @@ void SlicerTWaveform::drawEditorWaveform()
 	m_sampleThumbnail = SampleThumbnail{sample};
 
 	auto param = SampleThumbnail::VisualizeParameters{};
-	param.originalSample = &sample;
+	param.allowHighResolution = true;
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
 	param.sampleStart = static_cast<float>(startFrame) / sample.sampleSize();

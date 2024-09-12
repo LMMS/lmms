@@ -45,7 +45,8 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	m_paintPixmap()
+	m_paintPixmap(),
+	m_paintPixmapDrawnRegion()
 {
 	// update UI and tooltip
 	updateSample();
@@ -208,20 +209,32 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
+	const auto region = pe->rect();
+
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
 		m_paintPixmap = QPixmap(size());
+		m_paintPixmapDrawnRegion = QRect();
 	}
 
-	QPainter p( &m_paintPixmap );
+	if (m_paintPixmapDrawnRegion.contains(region) && !needsUpdate())
+	{
+		painter.drawPixmap(0, 0, m_paintPixmap);
+		return;
+	}
 
-	const auto region = pe->region().boundingRect();
+	m_paintPixmapDrawnRegion |= region;
+
+	setNeedsUpdate(false);
+
+	QPainter p( &m_paintPixmap );
+	p.setClipRegion(pe->region());
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
+	QColor c = painter.background().color();
 
 	QLinearGradient lingrad(0, 0, 0, height());
-	QColor c = painter.background().color();
 	if (muted) { c = c.darker(150); }
 	if (selected) { c = c.darker(150); }
 
@@ -239,6 +252,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	{
 		p.fillRect( region, c );
 	}
+
 
 	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
 
@@ -284,6 +298,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	m_sampleThumbnail.visualize(param, p);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

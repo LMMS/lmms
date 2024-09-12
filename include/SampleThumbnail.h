@@ -47,7 +47,6 @@ class LMMS_EXPORT SampleThumbnail
 public:
 	static constexpr auto MinThumbnailSize = 1;
 	static constexpr auto MaxThumbnailSize = 32768;
-	static constexpr auto ThumbnailSizeDivisor = 32;
 
 	struct Bit
 	{
@@ -64,7 +63,7 @@ public:
 
 	struct VisualizeParameters
 	{
-		const Sample* originalSample = nullptr; //!< Points to an original sample to render.
+		bool allowHighResolution = false;
 
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
@@ -74,13 +73,13 @@ public:
 
 		long x = 0; //!< Starting X position for the waveform.
 		long y = 0; //!< Starting Y position for the waveform.
-        
-        /**
-            If the left side of the sample clip is out of view, 
-            this field will specify the x position of left most 
-            pixels of the sample clip that's still in view.
-        */
-        long viewX = 0;
+
+		/**
+			If the left side of the sample clip is out of view, 
+			this field will specify the x position of left most 
+			pixels of the sample clip that's still in view.
+		*/
+		long viewX = 0;
 
 		long width = 0;	 //!< The width of the rectangle to draw into.
 		long height = 0; //!< The height of the rectangle to draw into.
@@ -112,7 +111,6 @@ private:
 	static Thumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
 
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
-	inline static std::map<const QString, std::shared_ptr<ThumbnailCache>> s_sampleThumbnailCacheMap;
 };
 
 } // namespace lmms
