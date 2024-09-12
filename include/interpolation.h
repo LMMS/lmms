@@ -69,9 +69,9 @@ inline float hermiteInterpolate( float x0, float x1, float x2, float x3,
 
 inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 {
-	float frsq = x*x;
-	float frcu = frsq*v0;
-	float t1 = fastFma(v1, 3, v3);
+	float frsq = x * x;
+	float frcu = frsq * v0;
+	float t1 = fastFma(v1, 3.f, v3);
 
 	return (v1 + fastFma(0.5f, frcu, x) * (v2 - frcu * (1.0f / 6.0f) -
 		fastFma(t1, (1.0f / 6.0f), -v0) * (1.0f / 3.0f)) + frsq * x * (t1 *
