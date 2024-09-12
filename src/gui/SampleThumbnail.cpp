@@ -121,7 +121,7 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 	const auto sampleBufferSize = inputSample.sampleSize();
 	const auto& buffer = inputSample.data();
 
-	const auto thumbnailSizeDivisor = std::max<size_t>(2, 2*std::log2(sampleBufferSize));
+	const auto thumbnailSizeDivisor = std::max<size_t>(32, 3*std::log2(sampleBufferSize));
 	// I don't think we *really* need to keep a full resolution thumbnail of the sample.
 	const auto firstThumbnailSize = std::max<size_t>(sampleBufferSize / 4, 1);
 
