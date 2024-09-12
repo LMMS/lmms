@@ -209,7 +209,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
-	const auto region = pe->rect();
+	/*
+		Extend the update region by this amount so the code doesn't
+		have to constantly update during continuous scrolling.
+	*/
+	const auto extendAmount = 100;
+	const auto region = pe->rect().adjusted(-extendAmount, 0, extendAmount, 0);
 
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
