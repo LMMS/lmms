@@ -233,7 +233,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	setNeedsUpdate(false);
 
 	QPainter p( &m_paintPixmap );
-	p.setClipRegion(pe->region());
+	p.setClipRegion(region);
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
