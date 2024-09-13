@@ -89,8 +89,6 @@ Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frame
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-		auto l = static_cast<double>(buf[f][0]);
-		auto r = static_cast<double>(buf[f][1]);
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;
