@@ -178,7 +178,7 @@ protected:
 		//! Unconditionally continue processing
 		Continue,
 
-		//! Calculate the RMS out sum to determine whether to call `checkGate` and stop processing
+		//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
 		ContinueIfNotQuiet,
 
 		//! Do not continue processing

@@ -106,7 +106,7 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 			frameIndex += DEFAULT_BUFFER_SIZE;
 		}
 
-		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
+		//sample_t s[2] = { buf[f][0], buf[f][1] };	//Vanilla
 		auto s = std::array{buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
 
 		m_seFX.nextSample( s[0], s[1] );
