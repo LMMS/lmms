@@ -144,6 +144,7 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 			}
 
 			checkGate(outSum / frames);
+			break;
 		}
 		case ProcessStatus::Sleep:
 			return false;
