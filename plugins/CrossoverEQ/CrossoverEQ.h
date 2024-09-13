@@ -41,7 +41,7 @@ public:
 	CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~CrossoverEQEffect() override;
 
-	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
 
 	EffectControls* controls() override
 	{

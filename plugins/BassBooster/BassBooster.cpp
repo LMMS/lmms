@@ -69,7 +69,7 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-double BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	// check out changed controls
 	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
@@ -83,7 +83,7 @@ double BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	const float const_gain = m_bbControls.m_gainModel.value();
 	const ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
 
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -102,7 +102,7 @@ double BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
-	return outSum;
+	return true;
 }
 
 

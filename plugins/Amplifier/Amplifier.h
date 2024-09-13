@@ -38,7 +38,7 @@ public:
 	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~AmplifierEffect() override = default;
 
-	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
 
 	EffectControls* controls() override
 	{

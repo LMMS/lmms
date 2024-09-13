@@ -91,7 +91,7 @@ inline void DynProcEffect::calcRelease()
 }
 
 
-double DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
@@ -100,7 +100,7 @@ double DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 	auto sm_peak = std::array{0.0f, 0.0f};
 
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -208,7 +208,7 @@ double DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return outSum;
+	return true;
 }
 
 void DynProcEffect::processBypassedImpl()

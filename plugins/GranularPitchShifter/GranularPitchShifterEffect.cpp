@@ -60,7 +60,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-double GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -91,7 +91,7 @@ double GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t fra
 	const float shapeK = cosWindowApproxK(shape);
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
-	double outSum = 0.0;
+	outSum = 0.0;
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -245,7 +245,7 @@ double GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t fra
 		changeSampleRate();
 	}
 
-	return outSum;
+	return true;
 }
 
 void GranularPitchShifterEffect::changeSampleRate()

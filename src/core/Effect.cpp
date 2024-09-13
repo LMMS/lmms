@@ -130,7 +130,12 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		return false;
 	}
 
-	const auto outSum = processImpl(buf, frames);
+	double outSum = -1.0;
+	if (!processImpl(buf, frames, outSum))
+	{
+		return false;
+	}
+
 	if (outSum >= 0)
 	{
 		checkGate(outSum / frames);

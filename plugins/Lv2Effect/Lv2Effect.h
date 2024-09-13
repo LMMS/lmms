@@ -42,7 +42,7 @@ public:
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 
-	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
 
 	EffectControls* controls() override { return &m_controls; }
 

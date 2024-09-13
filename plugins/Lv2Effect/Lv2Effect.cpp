@@ -68,7 +68,7 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-double Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
@@ -82,7 +82,7 @@ double Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
 	m_controls.copyModelsToLmms();
 	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
 
-	double outSum = .0;
+	outSum = 0.0;
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1 : dryLevel();
 	const float w = corrupt ? 0 : wetLevel();
@@ -95,7 +95,7 @@ double Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += l*l + r*r;
 	}
 
-	return outSum;
+	return true;
 }
 
 

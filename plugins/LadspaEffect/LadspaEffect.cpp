@@ -129,9 +129,14 @@ void LadspaEffect::changeSampleRate()
 
 
 
-double LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	m_pluginMutex.lock();
+	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	{
+		m_pluginMutex.unlock();
+		return false;
+	}
 
 	auto outFrames = frames;
 	SampleFrame* outBuf = nullptr;
@@ -212,7 +217,7 @@ double LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	}
 
 	// Copy the LADSPA output buffers to the LMMS buffer.
-	double outSum = 0.0;
+	outSum = 0.0;
 	channel = 0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -255,7 +260,7 @@ double LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 	m_pluginMutex.unlock();
 
-	return outSum;
+	return true;
 }
 
 

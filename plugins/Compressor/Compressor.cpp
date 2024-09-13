@@ -233,11 +233,11 @@ void CompressorEffect::calcMix()
 
 
 
-double CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	m_cleanedBuffers = false;
 
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -511,7 +511,7 @@ double CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	m_compressorControls.m_inPeakL = lInPeak;
 	m_compressorControls.m_inPeakR = rInPeak;
 
-	return outSum;
+	return true;
 }
 
 void CompressorEffect::processBypassedImpl()

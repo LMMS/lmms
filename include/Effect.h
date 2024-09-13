@@ -176,10 +176,11 @@ protected:
 	/**
 	 * The main audio processing method that runs when plugin is not asleep
 	 *
-	 * Returns the RMS output sum for use by `checkGate`,
-	 * or -1.0 if `checkGate` should not be called
+	 * Set the `outSum` out parameter with the RMS output sum for use by `checkGate`,
+	 * or ignore it if `checkGate` should not be called.
+	 * Return false to send the plugin to sleep, otherwise return true.
 	 */
-	virtual double processImpl(SampleFrame* buf, const fpp_t frames) = 0;
+	virtual bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) = 0;
 
 	/**
 	 * Optional method that runs when plugin is sleeping (not enabled,

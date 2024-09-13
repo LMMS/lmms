@@ -49,7 +49,7 @@ public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~GranularPitchShifterEffect() override = default;
 
-	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
 
 	EffectControls* controls() override
 	{

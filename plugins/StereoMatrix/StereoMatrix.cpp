@@ -64,9 +64,9 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-double StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
-	double outSum = 0.0;
+	outSum = 0.0;
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{	
@@ -90,7 +90,7 @@ double StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 	}
 
-	return outSum;
+	return true;
 }
 
 

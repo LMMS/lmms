@@ -100,7 +100,7 @@ inline float BitcrushEffect::noise( float amt )
 	return fastRandf( amt * 2.0f ) - amt;
 }
 
-double BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
@@ -217,7 +217,7 @@ double BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 	// now downsample and write it back to main buffer
 
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	for (auto f = std::size_t{0}; f < frames; ++f)
@@ -234,7 +234,7 @@ double BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return outSum;
+	return true;
 }
 
 

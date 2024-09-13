@@ -108,9 +108,9 @@ public:
 		return &m_controls;
 	}
 
-	double processImpl(SampleFrame*, const fpp_t) override
+	bool processImpl(SampleFrame*, const fpp_t, double&) override
 	{
-		return -1.0;
+		return true;
 	}
 
 	const QDomElement& originalPluginData() const

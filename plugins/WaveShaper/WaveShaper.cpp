@@ -66,12 +66,12 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-double WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 // variables for effect
 	int i = 0;
 
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
@@ -140,7 +140,7 @@ double WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		inputPtr += inputInc;
 	}
 
-	return outSum;
+	return true;
 }
 
 

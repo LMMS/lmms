@@ -82,9 +82,9 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-double StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -126,7 +126,7 @@ double StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		clearMyBuffer();
 	}
 
-	return outSum;
+	return true;
 }
 
 

@@ -75,9 +75,9 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-double ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -118,7 +118,7 @@ double ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return outSum;
+	return true;
 }
 
 void ReverbSCEffect::changeSampleRate()

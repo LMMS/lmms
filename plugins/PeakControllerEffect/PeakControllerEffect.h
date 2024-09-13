@@ -42,7 +42,7 @@ public:
 						const Descriptor::SubPluginFeatures::Key * _key );
 	~PeakControllerEffect() override;
 
-	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
 
 	EffectControls * controls() override
 	{

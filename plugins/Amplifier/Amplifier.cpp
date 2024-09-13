@@ -57,9 +57,9 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-double AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -88,7 +88,7 @@ double AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
-	return outSum;
+	return true;
 }
 
 

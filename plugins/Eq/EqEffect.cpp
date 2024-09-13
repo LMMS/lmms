@@ -64,7 +64,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-double EqEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool EqEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -142,7 +142,7 @@ double EqEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 	}
 
 	m_eqControls.m_inProgress = true;
-	double outSum = 0.0;
+	outSum = 0.0;
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -273,7 +273,7 @@ double EqEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 	m_eqControls.m_inProgress = false;
 
-	return outSum;
+	return true;
 }
 
 

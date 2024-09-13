@@ -79,7 +79,7 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-double VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+bool VstEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	assert(m_plugin != nullptr);
 	static thread_local auto tempBuf = std::array<SampleFrame, MAXIMUM_BUFFER_SIZE>();
@@ -91,7 +91,7 @@ double VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		m_pluginMutex.unlock();
 	}
 
-	double outSum = 0.0;
+	outSum = 0.0;
 	const float w = wetLevel();
 	const float d = dryLevel();
 	for (fpp_t f = 0; f < frames; ++f)
@@ -101,7 +101,7 @@ double VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return outSum;
+	return true;
 }
 
 

@@ -43,7 +43,7 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~DynProcEffect() override;
 
-	double processImpl(SampleFrame* buf, const fpp_t frames) override;
+	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
 	void processBypassedImpl() override;
 
 	EffectControls * controls() override

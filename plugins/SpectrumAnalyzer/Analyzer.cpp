@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-double Analyzer::processImpl(SampleFrame* buf, const fpp_t frames)
+bool Analyzer::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
@@ -105,7 +105,7 @@ double Analyzer::processImpl(SampleFrame* buf, const fpp_t frames)
 		if (audio_time / 1000000.0 > m_max_execution) {m_max_execution = audio_time / 1000000.0;}
 	#endif
 
-	return -1.0;
+	return true;
 }
 
 
