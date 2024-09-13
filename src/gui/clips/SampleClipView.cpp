@@ -46,7 +46,9 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
 	m_paintPixmap(),
-	m_paintPixmapDrawnRegion()
+	m_paintPixmapDrawnRegion(),
+	m_muted(false),
+	m_selected(false)
 {
 	// update UI and tooltip
 	updateSample();
@@ -64,6 +66,7 @@ void SampleClipView::updateSample()
 	update();
 	
 	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
+	m_paintPixmapDrawnRegion = QRect();
 
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
@@ -208,35 +211,48 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
-
 	/*
-		Extend the update region by this amount so the code doesn't
-		have to constantly update during continuous scrolling.
+		This is too ambiguous. There's no way to tell whether the clip
+		needs updating because of mute/select change, undrawn region
+		entering view, sample change, zooming, etc...
+
+		Overriding this until the functionality is improved.
+		Update is determined by zooming, update region, mute/select
+		change, sample changes.
 	*/
-	const auto extendAmount = 100;
-	const auto region = pe->rect().adjusted(-extendAmount, 0, extendAmount, 0);
+	setNeedsUpdate(false);
+
+	const auto originalRegion = pe->rect();
 
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
 		m_paintPixmap = QPixmap(size());
 		m_paintPixmapDrawnRegion = QRect();
+		setNeedsUpdate(true);
 	}
 
-	if (m_paintPixmapDrawnRegion.contains(region) && !needsUpdate())
+	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+	bool selected = isSelected();
+
+	if (m_muted == muted && m_selected == selected && m_paintPixmapDrawnRegion.contains(originalRegion) && !needsUpdate())
 	{
-		painter.drawPixmap(0, 0, m_paintPixmap);
+		painter.drawPixmap(originalRegion, m_paintPixmap, originalRegion);
 		return;
 	}
 
-	m_paintPixmapDrawnRegion |= region;
+	/*
+		Extend the update region by this amount so the code doesn't
+		have to constantly update during continuous scrolling.
+	*/
+	const auto region = originalRegion.adjusted(0, 0, 500, 0);
 
-	setNeedsUpdate(false);
+	m_muted = muted;
+	m_selected = selected;
+	m_paintPixmapDrawnRegion |= region;
 
 	QPainter p( &m_paintPixmap );
 	p.setClipRegion(region);
 
-	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
-	bool selected = isSelected();
 	QColor c = painter.background().color();
 
 	QLinearGradient lingrad(0, 0, 0, height());
@@ -293,12 +309,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	auto param = SampleThumbnail::VisualizeParameters{};
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
-	param.x = offsetStart;
-	param.viewX = region.x();
-	param.y = spacing;
-	param.width = std::max<long>(static_cast<long>(sampleLength), 1);
-	param.height = rect().bottom() - 2 * spacing;
-	param.clipWidthSinceSampleStart = static_cast<long>(region.width() + region.x() - offsetStart);
+	param.sampRect =
+		QRect(
+			offsetStart,
+			spacing,
+			sampleLength,
+			rect().bottom()
+		);
+	param.clipRect = rect();
+	param.viewRect = region;
 
 	m_sampleThumbnail.visualize(param, p);
 

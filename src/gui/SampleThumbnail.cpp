@@ -23,8 +23,6 @@
  */
 
 #include "SampleThumbnail.h"
-
-#include <algorithm>
 #include "Sample.h"
 
 namespace lmms {
@@ -84,7 +82,7 @@ void SampleThumbnail::cleanUpGlobalThumbnailMap()
 	}
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size)
+SampleThumbnail::Thumbnail SampleThumbnail::generate(const std::size_t thumbnailSize, const SampleFrame* buffer, const std::size_t size)
 {
 	const auto sampleChunk = (size + thumbnailSize) / thumbnailSize;
 	auto thumbnail = SampleThumbnail::Thumbnail(thumbnailSize);
@@ -175,18 +173,23 @@ void SampleThumbnail::draw(QPainter& painter, const SampleThumbnail::Bit& bit, f
 
 void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& parameters, QPainter& painter) const
 {
+	const auto& clipRect = parameters.clipRect;
+	const auto& sampRect = parameters.sampRect.isNull() ? clipRect : parameters.sampRect;
+	const auto& viewRect = parameters.viewRect.isNull() ? clipRect : parameters.viewRect;
+
 	const auto sampleViewLength = parameters.sampleEnd - parameters.sampleStart;
 
-	const auto x = parameters.x;
-	const auto height = parameters.height;
+	const auto x = sampRect.x();
+	const auto height = clipRect.height();
 	const auto halfHeight = height / 2;
-	const auto width = parameters.width;
-	const auto centerY = parameters.y + halfHeight;
+	const auto width = sampRect.width();
+	const auto centerY = clipRect.y() + halfHeight;
 
-	// If the clip extends to the left past the start of the
-	// sample, start drawing at the start of the sample and
-	// skip the blank space.
-	const auto absXOr0 = (x < 0) ? -x : 0;
+	if (width < 1)
+	{
+		return;
+	}
+
 	const auto scalingFactor = halfHeight * parameters.amplification;
 
 	const auto color = painter.pen().color();
@@ -194,29 +197,31 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 
 	const auto widthSelect = static_cast<std::size_t>(static_cast<float>(width) / sampleViewLength);
 
-	auto thumbnailIt = m_thumbnailCache->end()-1;
-	const auto thumbnailItStop = m_thumbnailCache->begin() + (parameters.allowHighResolution ? 0 : 1);
-	while (thumbnailIt != thumbnailItStop && thumbnailIt->size() < widthSelect)
-	{
-		thumbnailIt--;
-	}
+	auto thumbnailIt = m_thumbnailCache->end();
+	const auto thumbnailItStop =
+		m_thumbnailCache->begin() + (parameters.allowHighResolution || m_thumbnailCache->size() == 1 ? 0 : 1);
 
-	const auto thumbnail = *thumbnailIt;
+	do {
+		thumbnailIt--;
+	} while (thumbnailIt != thumbnailItStop && thumbnailIt->size() < widthSelect);
+
+	const auto& thumbnail = *thumbnailIt;
 
 	const auto thumbnailSize = thumbnail.size();
 	const auto thumbnailLastSample = std::max(static_cast<std::size_t>(parameters.sampleEnd * thumbnailSize), std::size_t{1}) - 1;
 	const auto tStart = static_cast<long>(parameters.sampleStart * thumbnailSize);
 	const auto thumbnailViewSize = thumbnailLastSample + 1 - tStart;
-	const auto tLast = std::min(thumbnailLastSample, thumbnailSize - 1);
-	const auto pixelBound = std::min(width, parameters.clipWidthSinceSampleStart);
+	const auto tLast = std::min<std::size_t>(thumbnailLastSample, thumbnailSize - 1);
 
 	auto tIndex = std::size_t{0};
-	auto pixelIndex = std::max(absXOr0, parameters.viewX);
+	const auto pixelIndexStart = std::max(x, std::max(clipRect.x(), viewRect.x()));
+	const auto pixelIndexEnd = std::min(width, std::min(clipRect.width(), viewRect.width())) + pixelIndexStart;
+
 	const auto tChunk = (thumbnailViewSize + width) / width;
 
-	while (pixelIndex <= pixelBound)
+	for (auto pixelIndex = pixelIndexStart; pixelIndex <= pixelIndexEnd; pixelIndex++)
 	{
-		tIndex = tStart + pixelIndex * thumbnailViewSize / width;
+		tIndex = tStart + (pixelIndex - x) * thumbnailViewSize / width;
 
 		if (tIndex > tLast) break;
 
@@ -230,9 +235,7 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 			tIndex += 1;
 		}
 
-		draw(painter, thumbnailBit, pixelIndex + x, centerY, scalingFactor, color, rmsColor);
-
-		pixelIndex++;
+		draw(painter, thumbnailBit, pixelIndex, centerY, scalingFactor, color, rmsColor);
 	}
 }
 

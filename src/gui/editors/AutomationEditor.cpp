@@ -1223,11 +1223,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			param.allowHighResolution = true;
 			param.amplification = m_ghostSample->sample().amplification();
 			param.reversed = m_ghostSample->sample().reversed();
-			param.x = startPos;
-			param.y = yOffset;
-			param.width = sampleWidth;
-			param.height = sampleHeight;
-			param.clipWidthSinceSampleStart = width() - startPos;
+			param.sampRect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
+			param.clipRect = QRect(0, 0, width(), height());
 
 			m_sampleThumbnail.visualize(param, p);
 		}

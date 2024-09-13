@@ -349,10 +349,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	param.reversed = m_sample->reversed();
 	param.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize();
 	param.sampleEnd = static_cast<float>(m_to) / m_sample->sampleSize();
-	param.x = 0;
-	param.y = 0;
-	param.width = m_graph.width();
-	param.height = m_graph.height();
+	param.clipRect = m_graph.rect();
 
 	m_sampleThumbnail.visualize(param, p);
 }

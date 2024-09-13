@@ -68,6 +68,8 @@ private:
 	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;
 	QRect m_paintPixmapDrawnRegion;
+	bool m_muted;
+	bool m_selected;
 	bool splitClip( const TimePos pos ) override;
 } ;
 
