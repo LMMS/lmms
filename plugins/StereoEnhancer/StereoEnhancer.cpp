@@ -82,9 +82,8 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-bool StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -114,7 +113,6 @@ bool StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames, dou
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
 		// Update currFrame
 		m_currFrame += 1;
@@ -126,7 +124,7 @@ bool StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames, dou
 		clearMyBuffer();
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

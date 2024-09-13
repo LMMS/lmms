@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-bool PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 
@@ -135,7 +135,7 @@ bool PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames, dou
 	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;
 	m_lastSample = qBound( 0.0f, c.m_baseModel.value() + amount * curRMS, 1.0f );
 
-	return true;
+	return ProcessStatus::Continue;
 }
 
 

@@ -64,10 +64,8 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-bool StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	outSum = 0.0;
-
 	for (fpp_t f = 0; f < frames; ++f)
 	{	
 		const float d = dryLevel();
@@ -86,11 +84,9 @@ bool StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames, doubl
 
 		buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
 					m_smControls.m_rrModel.value( f ) * r ) * w;
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
-
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

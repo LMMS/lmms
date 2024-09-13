@@ -101,7 +101,7 @@ void LOMMEffect::changeSampleRate()
 }
 
 
-bool LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	if (m_needsUpdate || m_lommControls.m_split1Model.isValueChanged())
 	{
@@ -116,7 +116,6 @@ bool LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSu
 	}
 	m_needsUpdate = false;
 
-	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -418,10 +417,9 @@ bool LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSu
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f].sumOfSquaredAmplitudes();
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 extern "C"

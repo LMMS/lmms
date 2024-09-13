@@ -75,9 +75,8 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -114,11 +113,9 @@ bool ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& o
 		sp_dcblock_compute(sp, dcblk[1], &tmpR, &dcblkR);
 		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
 		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
-
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void ReverbSCEffect::changeSampleRate()

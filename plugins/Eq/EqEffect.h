@@ -41,7 +41,7 @@ public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
 
-	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{

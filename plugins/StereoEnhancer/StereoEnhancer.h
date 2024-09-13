@@ -41,7 +41,7 @@ public:
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoEnhancerEffect() override;
 
-	bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) override;
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{

@@ -57,9 +57,8 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-bool AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -84,11 +83,9 @@ bool AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& 
 
 		// Dry/wet mix
 		currentFrame = currentFrame * d + s * w;
-
-		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

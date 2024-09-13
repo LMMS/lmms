@@ -89,7 +89,7 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-bool CrossoverEQEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
@@ -187,15 +187,14 @@ bool CrossoverEQEffect::processImpl(SampleFrame* buf, const fpp_t frames, double
 	
 	const float d = dryLevel();
 	const float w = wetLevel();
-	outSum = 0.0;
+
 	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void CrossoverEQEffect::clearFilterHistories()

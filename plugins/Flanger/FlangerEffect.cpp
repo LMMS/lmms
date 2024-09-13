@@ -85,9 +85,8 @@ FlangerEffect::~FlangerEffect()
 
 
 
-bool FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::audioEngine()->outputSampleRate();
@@ -123,10 +122,9 @@ bool FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& ou
 
 		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
 		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

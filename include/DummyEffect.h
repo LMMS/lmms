@@ -108,9 +108,9 @@ public:
 		return &m_controls;
 	}
 
-	bool processImpl(SampleFrame*, const fpp_t, double&) override
+	ProcessStatus processImpl(SampleFrame*, const fpp_t) override
 	{
-		return true;
+		return ProcessStatus::Sleep;
 	}
 
 	const QDomElement& originalPluginData() const

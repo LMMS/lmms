@@ -58,7 +58,7 @@ Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatu
 
 
 // Take audio data and store them for processing and display in the GUI thread.
-bool Vectorscope::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus Vectorscope::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
@@ -68,7 +68,7 @@ bool Vectorscope::processImpl(SampleFrame* buf, const fpp_t frames, double& outS
 		m_inputBuffer.write(buf, frames);
 	}
 
-	return true;
+	return ProcessStatus::Continue;
 }
 
 

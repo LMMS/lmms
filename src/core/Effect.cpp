@@ -130,15 +130,25 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		return false;
 	}
 
-	double outSum = -1.0;
-	if (!processImpl(buf, frames, outSum))
+	const auto status = processImpl(buf, frames);
+	switch (status)
 	{
-		return false;
-	}
+		case ProcessStatus::Continue:
+			break;
+		case ProcessStatus::ContinueIfNotQuiet:
+		{
+			double outSum = 0.0;
+			for (std::size_t idx = 0; idx < frames; ++idx)
+			{
+				outSum += buf[idx].sumOfSquaredAmplitudes();
+			}
 
-	if (outSum >= 0)
-	{
-		checkGate(outSum / frames);
+			checkGate(outSum / frames);
+		}
+		case ProcessStatus::Sleep:
+			return false;
+		default:
+			break;
 	}
 
 	return isRunning();

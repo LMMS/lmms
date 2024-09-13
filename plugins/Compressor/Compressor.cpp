@@ -233,11 +233,10 @@ void CompressorEffect::calcMix()
 
 
 
-bool CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames, double& outSum)
+Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	m_cleanedBuffers = false;
 
-	outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -496,8 +495,6 @@ bool CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames, double&
 		buf[f][0] = (1 - m_mixVal) * temp1 + m_mixVal * buf[f][0];
 		buf[f][1] = (1 - m_mixVal) * temp2 + m_mixVal * buf[f][1];
 
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
-		
 		if (--m_lookWrite < 0) { m_lookWrite = m_lookBufLength - 1; }
 
 		lInPeak = drySignal[0] > lInPeak ? drySignal[0] : lInPeak;
@@ -511,7 +508,7 @@ bool CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames, double&
 	m_compressorControls.m_inPeakL = lInPeak;
 	m_compressorControls.m_inPeakR = rInPeak;
 
-	return true;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void CompressorEffect::processBypassedImpl()

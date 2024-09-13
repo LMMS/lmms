@@ -173,14 +173,22 @@ public:
 
 
 protected:
+	enum class ProcessStatus
+	{
+		//! Unconditionally continue processing
+		Continue,
+
+		//! Calculate the RMS out sum to determine whether to call `checkGate` and stop processing
+		ContinueIfNotQuiet,
+
+		//! Do not continue processing
+		Sleep
+	};
+
 	/**
 	 * The main audio processing method that runs when plugin is not asleep
-	 *
-	 * Set the `outSum` out parameter with the RMS output sum for use by `checkGate`,
-	 * or ignore it if `checkGate` should not be called.
-	 * Return false to send the plugin to sleep, otherwise return true.
 	 */
-	virtual bool processImpl(SampleFrame* buf, const fpp_t frames, double& outSum) = 0;
+	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
 
 	/**
 	 * Optional method that runs when plugin is sleeping (not enabled,
