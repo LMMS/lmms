@@ -141,7 +141,7 @@ public:
 	}
 
 
-	void process(float* _in, float* _out) override
+	void process(const float* _in, float* _out) override
 	{
 		LocalZynAddSubFx::processAudio(reinterpret_cast<SampleFrame*>(_out));
 	}
