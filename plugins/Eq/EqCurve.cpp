@@ -150,7 +150,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		}
 
 		QFont painterFont = painter->font();
-		constexpr int newFont = static_cast<int>(painterFont.pointSizeF());
+		int newFont = static_cast<int>(painterFont.pointSizeF());
 		adjustedToPixelSize(painterFont, newFont); // shrink the font
 		painter->setFont( painterFont );
 		painter->setPen( Qt::black );
