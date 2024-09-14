@@ -358,7 +358,7 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 
 	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
 
-	const ch_cnt_t inputsClamped = std::min<ch_cnt_t>(m_pinConnector.in().channelCount, DEFAULT_CHANNELS);
+	const ch_cnt_t inputsClamped = std::min<ch_cnt_t>(m_pinConnector.in().channelCount(), DEFAULT_CHANNELS);
 
 	if( _in_buf != nullptr && inputsClamped > 0 )
 	{
@@ -368,7 +368,7 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 			const auto trackChannels = CoreAudioData{&_in_buf, 1};
 			const auto pluginInput = SplitAudioData<sample_t> {
 				m_audioBuffer.get(),
-				static_cast<std::size_t>(frames * m_pinConnector.in().channelCount)
+				static_cast<std::size_t>(frames * m_pinConnector.in().channelCount())
 			};
 
 			m_pinConnector.routeToPlugin(frames, trackChannels, pluginInput);
@@ -394,7 +394,7 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if (m_failed || _out_buf == nullptr || m_pinConnector.out().channelCount == 0)
+	if (m_failed || _out_buf == nullptr || m_pinConnector.out().channelCount() == 0)
 	{
 		unlock();
 		return false;
@@ -403,22 +403,22 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputsClamped = std::min<ch_cnt_t>(m_pinConnector.out().channelCount, DEFAULT_CHANNELS);
+	const ch_cnt_t outputsClamped = std::min<ch_cnt_t>(m_pinConnector.out().channelCount(), DEFAULT_CHANNELS);
 
 	if (m_splitChannels)
 	{
 		// NOTE: VST plugins always use split channels
 		const auto trackChannels = CoreAudioDataMut{&_out_buf, 1};
 		const auto pluginOutput = SplitAudioData<const sample_t> {
-			m_audioBuffer.get() + (frames * m_pinConnector.in().channelCount),
-			static_cast<std::size_t>(frames * m_pinConnector.out().channelCount)
+			m_audioBuffer.get() + (frames * m_pinConnector.in().channelCount()),
+			static_cast<std::size_t>(frames * m_pinConnector.out().channelCount())
 		};
 
 		m_pinConnector.routeFromPlugin(frames, pluginOutput, trackChannels);
 	}
 	else if (outputsClamped == DEFAULT_CHANNELS)
 	{
-		auto source = m_audioBuffer.get() + m_pinConnector.in().channelCount * frames;
+		auto source = m_audioBuffer.get() + m_pinConnector.in().channelCount() * frames;
 		copyToSampleFrames(_out_buf, source, frames);
 	}
 	else
@@ -426,7 +426,7 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 		// clear buffer, if plugin didn't fill up both channels
 		zeroSampleFrames(_out_buf, frames);
 
-		auto o = reinterpret_cast<SampleFrame*>(m_audioBuffer.get() + m_pinConnector.in().channelCount * frames);
+		auto o = reinterpret_cast<SampleFrame*>(m_audioBuffer.get() + m_pinConnector.in().channelCount() * frames);
 		for (ch_cnt_t ch = 0; ch < outputsClamped; ++ch)
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
@@ -475,7 +475,7 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = (m_pinConnector.in().channelCount + m_pinConnector.out().channelCount)
+	const size_t s = (m_pinConnector.in().channelCount() + m_pinConnector.out().channelCount())
 		* Engine::audioEngine()->framesPerPeriod();
 	try
 	{

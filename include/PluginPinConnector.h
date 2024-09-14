@@ -57,20 +57,34 @@ public:
 	using PinMap = std::vector<std::vector<BoolModel*>>;
 
 	//! A plugin's input or output connections and other info
-	struct Matrix
+	class Matrix
 	{
-		PinMap pins;
-		int channelCount = 0;
-		std::vector<QString> channelNames; //!< optional
+	public:
+		auto pins() const -> const PinMap& { return m_pins; }
 
-		// TODO: Channel groupings, port configurations, ...
+		auto channelCount() const -> int { return m_channelCount; }
 
 		auto channelName(int channel) const -> QString;
 
 		auto enabled(std::uint8_t trackChannel, unsigned pluginChannel) const -> bool
 		{
-			return pins[trackChannel][pluginChannel]->value();
+			return m_pins[trackChannel][pluginChannel]->value();
 		}
+
+		friend class PluginPinConnector;
+
+	private:
+		void setTrackChannelCount(PluginPinConnector* parent, int count, const QString& nameFormat);
+		void setPluginChannelCount(PluginPinConnector* parent, int count, const QString& nameFormat);
+
+		void setDefaultConnections();
+
+		void saveSettings(QDomDocument& doc, QDomElement& elem) const;
+		void loadSettings(const QDomElement& elem);
+
+		PinMap m_pins;
+		int m_channelCount = 0;
+		std::vector<QString> m_channelNames; //!< optional
 	};
 
 	PluginPinConnector(Model* parent = nullptr);
@@ -134,11 +148,6 @@ public slots:
 	void setTrackChannelCount(int count);
 
 private:
-	static void saveSettings(const Matrix& matrix, QDomDocument& doc, QDomElement& elem);
-	static void loadSettings(const QDomElement& elem, Matrix& matrix);
-
-	void setPluginChannelCount(int newCount, bool isInput, Matrix& matrix);
-
 	Matrix m_in;  //!< LMMS --> Plugin
 	Matrix m_out; //!< Plugin --> LMMS
 
