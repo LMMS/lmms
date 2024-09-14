@@ -57,7 +57,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	mainLayout->setVerticalSpacing( 1 );
 
 	auto chordLabel = new QLabel(tr("Chord:"));
-	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), 10));
+	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), 14));
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
@@ -145,7 +145,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
-	constexpr int labelFontSize = 10;
+	constexpr int labelFontSize = 14;
 	auto arpChordLabel = new QLabel(tr("Chord:"));
 	arpChordLabel->setFont(adjustedToPixelSize(arpChordLabel->font(), labelFontSize));
 

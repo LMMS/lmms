@@ -217,6 +217,7 @@ void AudioFileProcessorView::dropEvent(QDropEvent* de)
 void AudioFileProcessorView::paintEvent(QPaintEvent*)
 {
 	QPainter p(this);
+	QFont font = p.font();
 
 	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
 	p.drawPixmap(0, 0, s_artwork);
@@ -227,9 +228,9 @@ void AudioFileProcessorView::paintEvent(QPaintEvent*)
 
 	int idx = a->sample().sampleFile().length();
 
-	p.setFont(adjustedToPixelSize(font(), 8));
+	p.setFont(adjustedToPixelSize(font, 12));
 
-	QFontMetrics fm(p.font());
+	QFontMetrics fm(font);
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle

@@ -30,6 +30,7 @@
 #include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
+#include "gui_templates.h"
 #include "lmms_constants.h"
 #include "lmms_math.h"
 
@@ -149,7 +150,8 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		}
 
 		QFont painterFont = painter->font();
-		painterFont.setPointSizeF( painterFont.pointSizeF() * 0.7 );
+		constexpr int newFont = static_cast<int>(painterFont.pointSizeF());
+		adjustedToPixelSize(painterFont, newFont); // shrink the font
 		painter->setFont( painterFont );
 		painter->setPen( Qt::black );
 		painter->drawRect( textRect );
