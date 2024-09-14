@@ -185,7 +185,7 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames,
 			const std::uint8_t inChannel = inChannelPairIdx * 2;
 			const std::uint8_t enabledPins =
 				(static_cast<std::uint8_t>(m_in.enabled(inChannel, outChannel)) << 1u)
-				+ static_cast<std::uint8_t>(m_in.enabled(inChannel + 1, outChannel));
+				| static_cast<std::uint8_t>(m_in.enabled(inChannel + 1, outChannel));
 
 			switch (enabledPins)
 			{
