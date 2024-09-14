@@ -36,6 +36,14 @@
 namespace lmms
 {
 
+namespace
+{
+
+// Scratch pad for intermediate calculations within this class
+thread_local auto WorkingBuffer = std::array<float, DEFAULT_BUFFER_SIZE>();
+
+} // namespace
+
 PluginPinConnector::PluginPinConnector(Model* parent)
 	: Model{parent}
 {
@@ -215,8 +223,9 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames,
 			}
 		}
 
-		// No input channels were routed to this output - output stays zeroed
-		if (numRouted == 0) { continue; }
+		// Either no input channels were routed to this output and output stays zeroed,
+		// or only one channel was routed and normalization is not needed
+		if (numRouted <= 1) { continue; }
 
 		// Normalize output
 		for (f_cnt_t frame = 0; frame < frames; ++frame)
@@ -240,54 +249,59 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
 		SampleFrame* outPtr = inOut[outChannelPairIdx]; // L/R track channel pair
 		const auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
 
-		auto buffer = std::array<float, DEFAULT_BUFFER_SIZE>();
-		mix_ch_t numRouted; // counter for # of in channels routed to the current out channel
+		const auto mixInputs = [&](std::uint8_t outChannel, std::uint8_t outChannelOffset) {
+			WorkingBuffer.fill(0);
 
-		// Helper function - returns `numRouted` and `buffer` via out parameter
-		const auto mixInputs = [&](std::uint8_t outChannel, mix_ch_t& numRoutedOut, auto& bufferOut) {
-			bufferOut.fill(0);
-			numRoutedOut = 0;
+			// Counter for # of in channels routed to the current out channel
+			mix_ch_t numRouted = 0;
 
 			std::uint8_t inChannel = 0;
 			for (f_cnt_t inSampleIdx = 0; inSampleIdx < in.size; inSampleIdx += frames, ++inChannel)
 			{
 				const sample_t* inPtr = &in[inSampleIdx];
 
-				if (m_out.enabled(outChannel, inChannel))
+				if (m_out.enabled(outChannel + outChannelOffset, inChannel))
 				{
 					for (f_cnt_t frame = 0; frame < frames; ++frame)
 					{
-						bufferOut[frame] += inPtr[frame];
+						WorkingBuffer[frame] += inPtr[frame];
 					}
-					++numRoutedOut;
+					++numRouted;
+				}
+			}
+
+			switch (numRouted)
+			{
+				case 0:
+					// Nothing needs to be written to `inOut` for audio bypass,
+					// since it already contains the LMMS core input audio.
+					break;
+				case 1:
+				{
+					// Normalization not needed, but copying is
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						outPtr[frame][outChannelOffset] = WorkingBuffer[frame];
+					}
+					break;
+				}
+				default: // >= 2
+				{
+					// Normalize output
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						outPtr[frame][outChannelOffset] = WorkingBuffer[frame] / numRouted;
+					}
+					break;
 				}
 			}
 		};
 
 		// Left SampleFrame channel first
-		mixInputs(outChannel, numRouted, buffer);
-		if (numRouted > 0)
-		{
-			// Normalize output
-			for (f_cnt_t frame = 0; frame < frames; ++frame)
-			{
-				outPtr[frame][0] = buffer[frame] / numRouted;
-			}
-		}
+		mixInputs(outChannel, 0);
 
 		// Right SampleFrame channel second
-		mixInputs(outChannel + 1, numRouted, buffer);
-		if (numRouted > 0)
-		{
-			// Normalize output
-			for (f_cnt_t frame = 0; frame < frames; ++frame)
-			{
-				outPtr[frame][1] = buffer[frame] / numRouted;
-			}
-		}
-
-		// NOTE: When numRouted == 0, nothing needs to be written to `inOut` for
-		// the audio bypass, since it already contains the LMMS core input audio.
+		mixInputs(outChannel, 1);
 	}
 }
 
