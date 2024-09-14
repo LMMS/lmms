@@ -154,7 +154,8 @@ void PluginPinConnector::setDefaultConnections()
 	setConnections(m_out);
 }
 
-void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAudioData<sample_t> out)
+void PluginPinConnector::routeToPlugin(f_cnt_t frames,
+	CoreAudioData in, SplitAudioData<sample_t> out) const
 {
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_trackChannelsUsed / 2;
@@ -225,7 +226,8 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames, CoreAudioData in, SplitAu
 	}
 }
 
-void PluginPinConnector::routeFromPlugin(f_cnt_t frames, SplitAudioData<const sample_t> in, CoreAudioDataMut inOut)
+void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
+	SplitAudioData<const sample_t> in, CoreAudioDataMut inOut) const
 {
 	assert(frames <= DEFAULT_BUFFER_SIZE);
 
