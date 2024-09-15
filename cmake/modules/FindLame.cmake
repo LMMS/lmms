@@ -1,16 +1,31 @@
-# - Try to find LAME
-# Once done this will define
+# Copyright (c) 2023 Dominic Clark
 #
-# LAME_FOUND - system has liblame
-# LAME_INCLUDE_DIRS - the liblame include directory
-# LAME_LIBRARIES - The liblame libraries
+# Redistribution and use is allowed according to the terms of the New BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-find_path(LAME_INCLUDE_DIRS lame/lame.h)
-find_library(LAME_LIBRARIES mp3lame)
+include(ImportedTargetHelpers)
+
+find_package_config_mode_with_fallback(mp3lame mp3lame::mp3lame
+	LIBRARY_NAMES "mp3lame"
+	INCLUDE_NAMES "lame/lame.h"
+	PREFIX Lame
+)
+
+determine_version_from_source(Lame_VERSION mp3lame::mp3lame [[
+	#include <iostream>
+	#include <lame/lame.h>
+
+	auto main() -> int
+	{
+		auto version = lame_version_t{};
+		get_lame_version_numerical(&version);
+		std::cout << version.major << "." << version.minor;
+	}
+]])
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Lame DEFAULT_MSG LAME_INCLUDE_DIRS LAME_LIBRARIES)
 
-list(APPEND LAME_DEFINITIONS -DHAVE_LIBMP3LAME=1)
-
-mark_as_advanced(LAME_INCLUDE_DIRS LAME_LIBRARIES LAME_DEFINITIONS)
+find_package_handle_standard_args(Lame
+	REQUIRED_VARS Lame_LIBRARY Lame_INCLUDE_DIRS
+	VERSION_VAR Lame_VERSION
+)

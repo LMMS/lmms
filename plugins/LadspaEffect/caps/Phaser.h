@@ -50,7 +50,7 @@ class PhaserAP
 
 		sample_t process (sample_t x)
 		{
-			register sample_t y = -a * x + m;
+			sample_t y = -a * x + m;
 			m = a * y + x;
 
 			return y;

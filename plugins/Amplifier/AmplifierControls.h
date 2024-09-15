@@ -23,46 +23,40 @@
  *
  */
 
-#ifndef AMPLIFIER_CONTROLS_H
-#define AMPLIFIER_CONTROLS_H
+#ifndef LMMS_AMPLIFIER_CONTROLS_H
+#define LMMS_AMPLIFIER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "AmplifierControlDialog.h"
-#include "Knob.h"
 
+namespace lmms
+{
 
 class AmplifierEffect;
 
+namespace gui
+{
+class AmplifierControlDialog;
+}
 
 class AmplifierControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	AmplifierControls( AmplifierEffect* effect );
-	virtual ~AmplifierControls()
-	{
-	}
+	AmplifierControls(AmplifierEffect* effect);
+	~AmplifierControls() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings(const QDomElement& parent) override;
+	inline QString nodeName() const override
 	{
 		return "AmplifierControls";
 	}
-
-	virtual int controlCount()
+	gui::EffectControlDialog* createView() override
 	{
-		return 4;
+		return new gui::AmplifierControlDialog(this);
 	}
-
-	virtual EffectControlDialog* createView()
-	{
-		return new AmplifierControlDialog( this );
-	}
-
-
-private slots:
-	void changeControl();
+	int controlCount() override { return 4; }
 
 private:
 	AmplifierEffect* m_effect;
@@ -71,9 +65,10 @@ private:
 	FloatModel m_leftModel;
 	FloatModel m_rightModel;
 
-	friend class AmplifierControlDialog;
+	friend class gui::AmplifierControlDialog;
 	friend class AmplifierEffect;
+};
 
-} ;
+} // namespace lmms
 
-#endif
+#endif // LMMS_AMPLIFIER_CONTROLS_H

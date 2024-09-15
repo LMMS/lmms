@@ -25,16 +25,22 @@
 #include <QDomElement>
 
 #include "InstrumentFunctions.h"
+#include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
-#include "stdshims.h"
 
+#include <vector>
+#include <algorithm>
 
-InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
+namespace lmms
 {
+
+std::array<InstrumentFunctionNoteStacking::ChordTable::Init, InstrumentFunctionNoteStacking::NUM_CHORD_TABLES>
+	InstrumentFunctionNoteStacking::ChordTable::s_initTable =
+	std::array<InstrumentFunctionNoteStacking::ChordTable::Init, NUM_CHORD_TABLES>
+{{
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Majb5" ), { 0, 4, 6, -1 } },
@@ -137,7 +143,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, -1 } }
-} ;
+}};
 
 
 
@@ -174,14 +180,11 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) cons
 
 
 
-InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
-	QVector<Chord>()
+InstrumentFunctionNoteStacking::ChordTable::ChordTable()
 {
-	for( int i = 0;
-		i < static_cast<int>( sizeof s_initTable / sizeof *s_initTable );
-		i++ )
+	for (const auto& chord : s_initTable)
 	{
-		push_back( Chord( s_initTable[i].m_name, s_initTable[i].m_semiTones ) );
+		m_chords.emplace_back(chord.m_name, chord.m_semiTones);
 	}
 }
 
@@ -190,10 +193,12 @@ InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 
 const InstrumentFunctionNoteStacking::Chord & InstrumentFunctionNoteStacking::ChordTable::getByName( const QString & name, bool is_scale ) const
 {
-	for( int i = 0; i < size(); i++ )
+	for (const auto& chord : m_chords)
 	{
-		if( at( i ).getName() == name && is_scale == at( i ).isScale() )
-			return at( i );
+		if (chord.getName() == name && is_scale == chord.isScale())
+		{
+			return chord;
+		}
 	}
 
 	static Chord empty;
@@ -210,18 +215,15 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
 	const ChordTable & chord_table = ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+
+	for (const auto& chord : chord_table.chords())
 	{
-		m_chordsModel.addItem( chord_table[i].getName() );
+		m_chordsModel.addItem(chord.getName());
 	}
 }
 
 
 
-
-InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
-{
-}
 
 
 
@@ -235,7 +237,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if( ( _n->origin() == NotePlayHandle::OriginArpeggio || ( _n->hasParent() == false && _n->instrumentTrack()->isArpeggioEnabled() == false ) ) &&
+	if( ( _n->origin() == NotePlayHandle::Origin::Arpeggio || ( _n->hasParent() == false && _n->instrumentTrack()->isArpeggioEnabled() == false ) ) &&
 			_n->totalFramesPlayed() == 0 &&
 			m_chordsEnabledModel.value() == true && ! _n->isReleased() )
 	{
@@ -247,10 +249,10 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
 
 			// process all notes in the chord
-			for( int i = 0; i < chord_table[selected_chord].size(); ++i )
+			for( int i = 0; i < chord_table.chords()[selected_chord].size(); ++i )
 			{
 				// add interval to sub-note-key
-				const int sub_note_key = sub_note_key_base + (int) chord_table[selected_chord][i];
+				const int sub_note_key = sub_note_key_base + (int) chord_table.chords()[selected_chord][i];
 				// maybe we're out of range -> let's get outta
 				// here!
 				if( sub_note_key > NumKeys )
@@ -262,9 +264,9 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				Engine::mixer()->addPlayHandle(
+				Engine::audioEngine()->addPlayHandle(
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
-									_n, -1, NotePlayHandle::OriginNoteStacking )
+									_n, -1, NotePlayHandle::Origin::NoteStacking )
 						);
 			}
 		}
@@ -302,6 +304,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
+	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
@@ -311,29 +314,24 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+	for (auto& chord : chord_table.chords())
 	{
-		m_arpModel.addItem( chord_table[i].getName() );
+		m_arpModel.addItem(chord.getName());
 	}
 
-	m_arpDirectionModel.addItem( tr( "Up" ), make_unique<PixmapLoader>( "arp_up" ) );
-	m_arpDirectionModel.addItem( tr( "Down" ), make_unique<PixmapLoader>( "arp_down" ) );
-	m_arpDirectionModel.addItem( tr( "Up and down" ), make_unique<PixmapLoader>( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Down and up" ), make_unique<PixmapLoader>( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Random" ), make_unique<PixmapLoader>( "arp_random" ) );
-	m_arpDirectionModel.setInitValue( ArpDirUp );
+	m_arpDirectionModel.addItem( tr( "Up" ), std::make_unique<PixmapLoader>( "arp_up" ) );
+	m_arpDirectionModel.addItem( tr( "Down" ), std::make_unique<PixmapLoader>( "arp_down" ) );
+	m_arpDirectionModel.addItem( tr( "Up and down" ), std::make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Down and up" ), std::make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ), std::make_unique<PixmapLoader>( "arp_random" ) );
+	m_arpDirectionModel.setInitValue( static_cast<float>(ArpDirection::Up) );
 
-	m_arpModeModel.addItem( tr( "Free" ), make_unique<PixmapLoader>( "arp_free" ) );
-	m_arpModeModel.addItem( tr( "Sort" ), make_unique<PixmapLoader>( "arp_sort" ) );
-	m_arpModeModel.addItem( tr( "Sync" ), make_unique<PixmapLoader>( "arp_sync" ) );
+	m_arpModeModel.addItem( tr( "Free" ), std::make_unique<PixmapLoader>( "arp_free" ) );
+	m_arpModeModel.addItem( tr( "Sort" ), std::make_unique<PixmapLoader>( "arp_sort" ) );
+	m_arpModeModel.addItem( tr( "Sync" ), std::make_unique<PixmapLoader>( "arp_sync" ) );
 }
 
 
-
-
-InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
-{
-}
 
 
 
@@ -341,8 +339,8 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
-	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
-		_n->origin() == NotePlayHandle::OriginNoteStacking ||
+	if( _n->origin() == NotePlayHandle::Origin::Arpeggio ||
+		_n->origin() == NotePlayHandle::Origin::NoteStacking ||
 		!m_arpEnabledModel.value() ||
 		_n->isReleased() )
 	{
@@ -353,10 +351,11 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	_n->setMasterNote();
 
 	const int selected_arp = m_arpModel.value();
+	const auto arpMode = static_cast<ArpMode>(m_arpModeModel.value());
 
-	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
+	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack(_n->instrumentTrack());
 
-	if( m_arpModeModel.value() != FreeMode && cnphv.size() == 0 )
+	if(arpMode != ArpMode::Free && cnphv.size() == 0 )
 	{
 		// maybe we're playing only a preset-preview-note?
 		cnphv = PresetPreviewPlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
@@ -368,29 +367,46 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 	}
 
+	// avoid playing same key for all
+	// currently playing notes if sort mode is enabled
+	if (arpMode == ArpMode::Sort && _n != cnphv.first()) { return; }
+
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	const int cur_chord_size = chord_table[selected_arp].size();
-	const int range = (int)( cur_chord_size * m_arpRangeModel.value() );
-	const int total_range = range * cnphv.size();
+	const int cur_chord_size = chord_table.chords()[selected_arp].size();
+	const int total_chord_size = cur_chord_size * cnphv.size();
+	// how many notes are in a single chord (multiplied by range)
+	const int singleNoteRange = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
+	// how many notes are in the final chord
+	const int range = arpMode == ArpMode::Sort ? singleNoteRange * cnphv.size() : singleNoteRange;
+
+	if (arpMode == ArpMode::Sort)
+	{
+		std::sort(cnphv.begin(), cnphv.end(), [](const NotePlayHandle* a, const NotePlayHandle* b)
+		{
+			return a->key() < b->key();
+		});
+	}
 
 	// number of frames that every note should be played
-	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate() );
-	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames / 100.0f );
+	const auto arp_frames = (f_cnt_t)(m_arpTimeModel.value() / 1000.0f * Engine::audioEngine()->outputSampleRate());
+	const auto gated_frames = (f_cnt_t)(m_arpGateModel.value() * arp_frames / 100.0f);
 
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
-	int cur_frame = ( ( m_arpModeModel.value() != FreeMode ) ?
+	int cur_frame = (arpMode != ArpMode::Free ?
 						cnphv.first()->totalFramesPlayed() :
-						_n->totalFramesPlayed() ) + arp_frames - 1;
+						_n->totalFramesPlayed()) + arp_frames - 1;
 	// used for loop
-	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
+	f_cnt_t frames_processed = arpMode != ArpMode::Free ? cnphv.first()->noteOffset() : _n->noteOffset();
 
-	while( frames_processed < Engine::mixer()->framesPerPeriod() )
+	while( frames_processed < Engine::audioEngine()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
-		// does current arp-note fill whole audio-buffer?
-		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() )
+		// does current arp-note fill whole audio-buffer or is the remaining time just
+		// a short bit that we can discard?
+		if( remaining_frames_for_cur_arp > Engine::audioEngine()->framesPerPeriod() ||
+			_n->frames() - _n->totalFramesPlayed() < arp_frames / 5 )
 		{
 			// then we don't have to do something!
 			break;
@@ -398,21 +414,10 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		frames_processed += remaining_frames_for_cur_arp;
 
-		// in sorted mode: is it our turn or do we have to be quiet for
-		// now?
-		if( m_arpModeModel.value() == SortMode &&
-				( ( cur_frame / arp_frames ) % total_range ) / range != (f_cnt_t) _n->index() )
-		{
-			// update counters
-			frames_processed += arp_frames;
-			cur_frame += arp_frames;
-			continue;
-		}
-
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
+			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpSkipModel.value())
 			{
 				// update counters
 				frames_processed += arp_frames;
@@ -421,78 +426,84 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			}
 		}
 
-		int dir = m_arpDirectionModel.value();
+		auto dir = static_cast<ArpDirection>(m_arpDirectionModel.value());
 
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
 
 		if( m_arpMissModel.value() )
 		{
-			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpMissModel.value() )
+			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpMissModel.value())
 			{
-				dir = ArpDirRandom;
+				dir = ArpDirection::Random;
 			}
 		}
 
 		int cur_arp_idx = 0;
 		// process according to arpeggio-direction...
-		if( dir == ArpDirUp )
+		if (dir == ArpDirection::Up || dir == ArpDirection::Down)
 		{
-			cur_arp_idx = ( cur_frame / arp_frames ) % range;
+			cur_arp_idx = (cur_frame / arp_frames) % range;
 		}
-		else if( dir == ArpDirDown )
-		{
-			cur_arp_idx = range - ( cur_frame / arp_frames ) %
-								range - 1;
-		}
-		else if( dir == ArpDirUpAndDown && range > 1 )
+		else if ((dir == ArpDirection::UpAndDown || dir == ArpDirection::DownAndUp) && range > 1)
 		{
 			// imagine, we had to play the arp once up and then
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			cur_arp_idx = (cur_frame / arp_frames) % (range * 2 - (2 * static_cast<int>(m_arpRepeatsModel.value())));
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= range )
+			if (cur_arp_idx >= range)
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx % (range - 1) - static_cast<int>(m_arpRepeatsModel.value());
 			}
 		}
-		else if( dir == ArpDirDownAndUp && range > 1 )
-		{
-			// copied from ArpDirUpAndDown above
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
-			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= range )
-			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
-			}
-			// inverts direction
-			cur_arp_idx = range - cur_arp_idx - 1;
-		}
-		else if( dir == ArpDirRandom )
+		else if( dir == ArpDirection::Random )
 		{
 			// just pick a random chord-index
-			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
+			cur_arp_idx = static_cast<int>(range * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
 		}
 
+		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
+		cur_arp_idx = static_cast<int>(cur_arp_idx / m_arpRepeatsModel.value());
+
 		// Cycle notes
-		if( m_arpCycleModel.value() && dir != ArpDirRandom )
+		if( m_arpCycleModel.value() && dir != ArpDirection::Random )
 		{
 			cur_arp_idx *= m_arpCycleModel.value() + 1;
-			cur_arp_idx %= range;
+			cur_arp_idx %= static_cast<int>(range / m_arpRepeatsModel.value());
+		}
+
+		// If ArpDirection::Down or ArpDirection::DownAndUp, invert the final range.
+		if (dir == ArpDirection::Down || dir == ArpDirection::DownAndUp)
+		{
+			cur_arp_idx = static_cast<int>(range / m_arpRepeatsModel.value()) - cur_arp_idx - 1;
 		}
 
 		// now calculate final key for our arp-note
-		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size ) *
-							KeysPerOctave + chord_table[selected_arp][cur_arp_idx % cur_chord_size];
+		int sub_note_key = 0;
+		if (arpMode != ArpMode::Sort)
+		{
+			sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size) *
+							KeysPerOctave + chord_table.chords()[selected_arp][cur_arp_idx % cur_chord_size];
+		}
+		else
+		{
+			const auto octaveDiv = std::div(cur_arp_idx, total_chord_size);
+			const int octave = octaveDiv.quot;
+			const auto arpDiv = std::div(octaveDiv.rem, cnphv.size());
+			const int arpIndex = arpDiv.rem;
+			const int chordIndex = arpDiv.quot;
+			sub_note_key = cnphv[arpIndex]->key()
+				+ chord_table.chords()[selected_arp][chordIndex]
+				+ octave * KeysPerOctave;
+		}
 
 		// range-checking
 		if( sub_note_key >= NumKeys ||
 			sub_note_key < 0 ||
-			Engine::mixer()->criticalXRuns() )
+			Engine::audioEngine()->criticalXRuns() )
 		{
 			continue;
 		}
@@ -501,13 +512,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		Engine::mixer()->addPlayHandle(
+		Engine::audioEngine()->addPlayHandle(
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
-							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, _n->getVolume(),
+							Note( TimePos( 0 ), TimePos( 0 ), sub_note_key, _n->getVolume(),
 									_n->getPanning(), _n->detuning() ),
-							_n, -1, NotePlayHandle::OriginArpeggio )
+							_n, -1, NotePlayHandle::Origin::Arpeggio )
 				);
 
 		// update counters
@@ -524,6 +535,7 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpEnabledModel.saveSettings( _doc, _this, "arp-enabled" );
 	m_arpModel.saveSettings( _doc, _this, "arp" );
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
+	m_arpRepeatsModel.saveSettings( _doc, _this, "arprepeats" );
 	m_arpCycleModel.saveSettings( _doc, _this, "arpcycle" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
 	m_arpMissModel.saveSettings( _doc, _this, "arpmiss" );
@@ -541,6 +553,7 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpEnabledModel.loadSettings( _this, "arp-enabled" );
 	m_arpModel.loadSettings( _this, "arp" );
 	m_arpRangeModel.loadSettings( _this, "arprange" );
+	m_arpRepeatsModel.loadSettings( _this, "arprepeats" );
 	m_arpCycleModel.loadSettings( _this, "arpcycle" );
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
 	m_arpMissModel.loadSettings( _this, "arpmiss" );
@@ -549,3 +562,6 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
+
+
+} // namespace lmms

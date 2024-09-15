@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="AnalogBell" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="69" vol="59">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="69" vol="59">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" finer0="0" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="13" coarse0="0" coarse1="0" coarse2="-12" finel0="0" finel1="0" modalgo1="2" modalgo2="3" finel2="-14" pan0="0" modalgo3="0" pan1="0" stphdetun0="247" pan2="0" stphdetun1="109" wavetype0="3" stphdetun2="50" wavetype1="2" wavetype2="0" vol0="49" vol1="54" phoffset0="0" phoffset1="271" vol2="14"/>
       </instrument>

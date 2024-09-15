@@ -1,5 +1,5 @@
 /*
- * AudioDevice.h - base-class for audio-devices, used by LMMS-mixer
+ * AudioDevice.h - base-class for audio-devices, used by LMMS audio engine
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,24 +22,28 @@
  *
  */
 
-#ifndef AUDIO_DEVICE_H
-#define AUDIO_DEVICE_H
+#ifndef LMMS_AUDIO_DEVICE_H
+#define LMMS_AUDIO_DEVICE_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 #include <samplerate.h>
 
 #include "lmms_basics.h"
 
-
-class AudioPort;
-class Mixer;
 class QThread;
+
+namespace lmms
+{
+
+class AudioEngine;
+class AudioPort;
+class SampleFrame;
 
 
 class AudioDevice
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, Mixer* mixer );
+	AudioDevice( const ch_cnt_t _channels, AudioEngine* audioEngine );
 	virtual ~AudioDevice();
 
 	inline void lock()
@@ -86,27 +90,18 @@ public:
 
 	virtual void stopProcessing();
 
-	virtual void applyQualitySettings();
-
-
-
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/,
-						const float /*_master_gain*/ )
-	{
-	}
+	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer( surroundSampleFrame * _ab );
+	fpp_t getNextBuffer(SampleFrame* _ab);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16( const surroundSampleFrame * _ab,
+	int convertToS16(const SampleFrame* _ab,
 						const fpp_t _frames,
-						const float _master_gain,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
 
@@ -114,24 +109,15 @@ protected:
 	void clearS16Buffer( int_sample_t * _outbuf,
 							const fpp_t _frames );
 
-	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	void resample( const surroundSampleFrame * _src,
-					const fpp_t _frames,
-					surroundSampleFrame * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
-
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
 		m_sampleRate = _new_sr;
 	}
 
-	Mixer* mixer()
+	AudioEngine* audioEngine()
 	{
-		return m_mixer;
+		return m_audioEngine;
 	}
-
-	bool hqAudio() const;
 
 	static void stopProcessingThread( QThread * thread );
 
@@ -143,17 +129,15 @@ protected:
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	Mixer* m_mixer;
+	AudioEngine* m_audioEngine;
 	bool m_inProcess;
 
 	QMutex m_devMutex;
 
-	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
+	SampleFrame* m_buffer;
 
-	surroundSampleFrame * m_buffer;
+};
 
-} ;
+} // namespace lmms
 
-
-#endif
+#endif // LMMS_AUDIO_DEVICE_H

@@ -23,15 +23,20 @@
  *
  */
 
-#ifndef CONTROLLER_DIALOG_H
-#define CONTROLLER_DIALOG_H
+#ifndef LMMS_GUI_CONTROLLER_DIALOG_H
+#define LMMS_GUI_CONTROLLER_DIALOG_H
 
 #include <QWidget>
 
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class Controller;
 
+namespace gui
+{
 
 class ControllerDialog : public QWidget, public ModelView
 {
@@ -39,7 +44,7 @@ class ControllerDialog : public QWidget, public ModelView
 public:
 	ControllerDialog( Controller * _controller, QWidget * _parent );
 
-	virtual ~ControllerDialog();
+	~ControllerDialog() override = default;
 
 
 signals:
@@ -47,8 +52,13 @@ signals:
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 
 } ;
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_CONTROLLER_DIALOG_H

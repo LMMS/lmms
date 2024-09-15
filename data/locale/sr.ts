@@ -346,7 +346,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationEditor</name>
     <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
+        <source>Please open an automation clip with the context menu of a control!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -361,7 +361,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationEditorWindow</name>
     <message>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -369,7 +369,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -469,7 +469,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Automation Editor - no pattern</source>
+        <source>Automation Editor - no clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -497,19 +497,19 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
@@ -551,7 +551,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -563,7 +563,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBEditor</name>
+    <name>PatternEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
         <translation type="unfinished"/>
@@ -614,7 +614,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>PatternClipView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
         <translation type="unfinished"/>
@@ -637,7 +637,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTrack</name>
+    <name>PatternTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
         <translation type="unfinished"/>
@@ -2178,18 +2178,18 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FxLine</name>
+    <name>MixerChannelView</name>
     <message>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>The FX channel receives input from one or more instrument tracks.
- It in turn can be routed to multiple other FX channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
+        <source>The mixer channel receives input from one or more instrument tracks.
+ It in turn can be routed to multiple other mixer channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
 
-In order to route the channel to another channel, select the FX channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
+In order to route the channel to another channel, select the mixer channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
 
-You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
+You can remove and move mixer channels in the context menu, which is accessed by right-clicking the mixer channel.
 </source>
         <translation type="unfinished"/>
     </message>
@@ -2215,24 +2215,24 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -2240,7 +2240,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -2248,12 +2248,12 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation type="unfinished"/>
@@ -2956,7 +2956,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <source>MASTER PITCH</source>
         <translation type="unfinished"/>
@@ -3163,7 +3163,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3226,7 +3226,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -3277,7 +3277,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3289,7 +3289,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3550,7 +3550,7 @@ Double click to pick a file.</source>
     </message>
 </context>
 <context>
-    <name>LmmsCore</name>
+    <name>Engine</name>
     <message>
         <source>Generating wavetables</source>
         <translation type="unfinished"/>
@@ -3692,11 +3692,11 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different mixer-channels.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3901,7 +3901,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -5184,7 +5184,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
         <source>Open in piano-roll</source>
         <translation type="unfinished"/>
@@ -5337,7 +5337,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 <context>
     <name>PianoRoll</name>
     <message>
-        <source>Please open a pattern by double-clicking on it!</source>
+        <source>Please open a clip by double-clicking on it!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -5412,7 +5412,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 <context>
     <name>PianoRollWindow</name>
     <message>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -5424,7 +5424,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -5540,7 +5540,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Piano-Roll - no pattern</source>
+        <source>Piano-Roll - no clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -5837,7 +5837,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
         <source>double-click to select sample</source>
         <translation type="unfinished"/>
@@ -6389,7 +6389,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SpectrumAnalyzerControlDialog</name>
+    <name>SaControlsDialog</name>
     <message>
         <source>Linear spectrum</source>
         <translation type="unfinished"/>
@@ -6400,7 +6400,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SpectrumAnalyzerControls</name>
+    <name>SaControls</name>
     <message>
         <source>Linear spectrum</source>
         <translation type="unfinished"/>
@@ -6630,14 +6630,14 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
         <source>Mute</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
         <source>Current position</source>
         <translation type="unfinished"/>
@@ -6718,7 +6718,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6730,7 +6730,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -6980,7 +6980,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VisualizationWidget</name>
+    <name>Oscilloscope</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
         <translation type="unfinished"/>
@@ -7505,7 +7505,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>audioFileProcessor</name>
+    <name>AudioFileProcessor</name>
     <message>
         <source>Amplify</source>
         <translation type="unfinished"/>
@@ -7556,14 +7556,14 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>bitInvader</name>
+    <name>BitInvader</name>
     <message>
         <source>Samplelength</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>bitInvaderView</name>
+    <name>BitInvaderView</name>
     <message>
         <source>Sample Length</source>
         <translation type="unfinished"/>
@@ -7638,7 +7638,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>dynProcControlDialog</name>
+    <name>DynProcControlDialog</name>
     <message>
         <source>INPUT</source>
         <translation type="unfinished"/>
@@ -7729,7 +7729,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>dynProcControls</name>
+    <name>DynProcControls</name>
     <message>
         <source>Input gain</source>
         <translation type="unfinished"/>
@@ -7752,13 +7752,13 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>fxLineLcdSpinBox</name>
+    <name>MixerChannelLcdSpinBox</name>
     <message>
         <source>Assign to:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -7770,7 +7770,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>kickerInstrument</name>
+    <name>KickerInstrument</name>
     <message>
         <source>Start frequency</source>
         <translation type="unfinished"/>
@@ -7821,7 +7821,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>kickerInstrumentView</name>
+    <name>KickerInstrumentView</name>
     <message>
         <source>Start frequency:</source>
         <translation type="unfinished"/>
@@ -7864,7 +7864,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>ladspaBrowserView</name>
+    <name>LadspaBrowserView</name>
     <message>
         <source>Available Effects</source>
         <translation type="unfinished"/>
@@ -7907,7 +7907,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ladspaDescription</name>
+    <name>LadspaDescription</name>
     <message>
         <source>Plugins</source>
         <translation type="unfinished"/>
@@ -7918,7 +7918,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ladspaPortDialog</name>
+    <name>LadspaPortDialog</name>
     <message>
         <source>Ports</source>
         <translation type="unfinished"/>
@@ -7985,7 +7985,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>lb302Synth</name>
+    <name>Lb302Synth</name>
     <message>
         <source>VCF Cutoff Frequency</source>
         <translation type="unfinished"/>
@@ -8032,7 +8032,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>lb302SynthView</name>
+    <name>Lb302SynthView</name>
     <message>
         <source>Cutoff Freq:</source>
         <translation type="unfinished"/>
@@ -8155,7 +8155,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>malletsInstrument</name>
+    <name>MalletsInstrument</name>
     <message>
         <source>Hardness</source>
         <translation type="unfinished"/>
@@ -8274,7 +8274,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>malletsInstrumentView</name>
+    <name>MalletsInstrumentView</name>
     <message>
         <source>Instrument</source>
         <translation type="unfinished"/>
@@ -8393,7 +8393,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>manageVSTEffectView</name>
+    <name>ManageVSTEffectView</name>
     <message>
         <source> - VST parameter control</source>
         <translation type="unfinished"/>
@@ -8424,7 +8424,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>manageVestigeInstrumentView</name>
+    <name>ManageVestigeInstrumentView</name>
     <message>
         <source> - VST plugin control</source>
         <translation type="unfinished"/>
@@ -8455,7 +8455,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>opl2instrument</name>
+    <name>OpulenzInstrument</name>
     <message>
         <source>Patch</source>
         <translation type="unfinished"/>
@@ -8574,7 +8574,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>opl2instrumentView</name>
+    <name>OpulenzInstrumentView</name>
     <message>
         <source>Attack</source>
         <translation type="unfinished"/>
@@ -8593,7 +8593,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>organicInstrument</name>
+    <name>OrganicInstrument</name>
     <message>
         <source>Distortion</source>
         <translation type="unfinished"/>
@@ -8604,7 +8604,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>organicInstrumentView</name>
+    <name>OrganicInstrumentView</name>
     <message>
         <source>Distortion:</source>
         <translation type="unfinished"/>
@@ -8921,7 +8921,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>patchesDialog</name>
+    <name>PatchesDialog</name>
     <message>
         <source>Qsynth: Channel Preset</source>
         <translation type="unfinished"/>
@@ -8956,13 +8956,13 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>pluginBrowser</name>
+    <name>PluginBrowser</name>
     <message>
         <source>no description</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Incomplete monophonic imitation tb303</source>
+        <source>Incomplete monophonic imitation TB-303</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -9136,7 +9136,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sf2Instrument</name>
+    <name>Sf2Instrument</name>
     <message>
         <source>Bank</source>
         <translation type="unfinished"/>
@@ -9195,7 +9195,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sf2InstrumentView</name>
+    <name>Sf2InstrumentView</name>
     <message>
         <source>Open other SoundFont file</source>
         <translation type="unfinished"/>
@@ -9270,14 +9270,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sfxrInstrument</name>
+    <name>SfxrInstrument</name>
     <message>
         <source>Wave Form</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>sidInstrument</name>
+    <name>SidInstrument</name>
     <message>
         <source>Cutoff</source>
         <translation type="unfinished"/>
@@ -9304,7 +9304,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sidInstrumentView</name>
+    <name>SidInstrumentView</name>
     <message>
         <source>Volume:</source>
         <translation type="unfinished"/>
@@ -9439,7 +9439,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>stereoEnhancerControlDialog</name>
+    <name>StereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
         <translation type="unfinished"/>
@@ -9450,14 +9450,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>stereoEnhancerControls</name>
+    <name>StereoEnhancerControls</name>
     <message>
         <source>Width</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>stereoMatrixControlDialog</name>
+    <name>StereoMatrixControlDialog</name>
     <message>
         <source>Left to Left Vol:</source>
         <translation type="unfinished"/>
@@ -9476,7 +9476,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>stereoMatrixControls</name>
+    <name>StereoMatrixControls</name>
     <message>
         <source>Left to Left</source>
         <translation type="unfinished"/>
@@ -9495,7 +9495,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>vestigeInstrument</name>
+    <name>VestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
         <translation type="unfinished"/>
@@ -9506,7 +9506,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>vibed</name>
+    <name>Vibed</name>
     <message>
         <source>String %1 volume</source>
         <translation type="unfinished"/>
@@ -9549,7 +9549,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>vibedView</name>
+    <name>VibedView</name>
     <message>
         <source>Volume:</source>
         <translation type="unfinished"/>
@@ -9740,7 +9740,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>voiceObject</name>
+    <name>VoiceObject</name>
     <message>
         <source>Voice %1 pulse width</source>
         <translation type="unfinished"/>
@@ -9787,7 +9787,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>waveShaperControlDialog</name>
+    <name>WaveShaperControlDialog</name>
     <message>
         <source>INPUT</source>
         <translation type="unfinished"/>
@@ -9846,7 +9846,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>waveShaperControls</name>
+    <name>WaveShaperControls</name>
     <message>
         <source>Input gain</source>
         <translation type="unfinished"/>

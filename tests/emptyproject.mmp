@@ -5,7 +5,7 @@
   <song>
     <trackcontainer width="600" x="5" y="5" maximized="0" height="300" visible="1" type="song" minimized="0" >
       <track muted="0" type="0" name="Standard-Preset" >
-        <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="100" >
+        <instrumenttrack pan="0" mixch="0" pitch="0" basenote="57" vol="100" >
           <instrument name="tripleoscillator" >
             <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33" />
           </instrument>
@@ -30,7 +30,7 @@
         <bbtrack>
           <trackcontainer width="504" x="610" y="5" maximized="0" height="300" visible="1" type="bbtrackcontainer" minimized="0" >
             <track muted="0" type="0" name="Standard-Preset" >
-              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="100" >
+              <instrumenttrack pan="0" mixch="0" pitch="0" basenote="57" vol="100" >
                 <instrument name="tripleoscillator" >
                   <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33" />
                 </instrument>
@@ -68,203 +68,203 @@
         <object id="948063" />
       </automationpattern>
     </track>
-    <fxmixer width="865" x="5" y="310" maximized="0" height="278" visible="1" minimized="0" >
-      <fxchannel num="0" muted="0" volume="1" name="Master" >
+    <mixer width="865" x="5" y="310" maximized="0" height="278" visible="1" minimized="0" >
+      <mixerchannel num="0" muted="0" volume="1" name="Master" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="1" muted="0" volume="1" name="FX 1" >
+      </mixerchannel>
+      <mixerchannel num="1" muted="0" volume="1" name="Channel 1" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="2" muted="0" volume="1" name="FX 2" >
+      </mixerchannel>
+      <mixerchannel num="2" muted="0" volume="1" name="Channel 2" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="3" muted="0" volume="1" name="FX 3" >
+      </mixerchannel>
+      <mixerchannel num="3" muted="0" volume="1" name="Channel 3" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="4" muted="0" volume="1" name="FX 4" >
+      </mixerchannel>
+      <mixerchannel num="4" muted="0" volume="1" name="Channel 4" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="5" muted="0" volume="1" name="FX 5" >
+      </mixerchannel>
+      <mixerchannel num="5" muted="0" volume="1" name="Channel 5" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="6" muted="0" volume="1" name="FX 6" >
+      </mixerchannel>
+      <mixerchannel num="6" muted="0" volume="1" name="Channel 6" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="7" muted="0" volume="1" name="FX 7" >
+      </mixerchannel>
+      <mixerchannel num="7" muted="0" volume="1" name="Channel 7" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="8" muted="0" volume="1" name="FX 8" >
+      </mixerchannel>
+      <mixerchannel num="8" muted="0" volume="1" name="Channel 8" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="9" muted="0" volume="1" name="FX 9" >
+      </mixerchannel>
+      <mixerchannel num="9" muted="0" volume="1" name="Channel 9" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="10" muted="0" volume="1" name="FX 10" >
+      </mixerchannel>
+      <mixerchannel num="10" muted="0" volume="1" name="Channel 10" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="11" muted="0" volume="1" name="FX 11" >
+      </mixerchannel>
+      <mixerchannel num="11" muted="0" volume="1" name="Channel 11" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="12" muted="0" volume="1" name="FX 12" >
+      </mixerchannel>
+      <mixerchannel num="12" muted="0" volume="1" name="Channel 12" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="13" muted="0" volume="1" name="FX 13" >
+      </mixerchannel>
+      <mixerchannel num="13" muted="0" volume="1" name="Channel 13" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="14" muted="0" volume="1" name="FX 14" >
+      </mixerchannel>
+      <mixerchannel num="14" muted="0" volume="1" name="Channel 14" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="15" muted="0" volume="1" name="FX 15" >
+      </mixerchannel>
+      <mixerchannel num="15" muted="0" volume="1" name="Channel 15" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="16" muted="0" volume="1" name="FX 16" >
+      </mixerchannel>
+      <mixerchannel num="16" muted="0" volume="1" name="Channel 16" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="17" muted="0" volume="1" name="FX 17" >
+      </mixerchannel>
+      <mixerchannel num="17" muted="0" volume="1" name="Channel 17" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="18" muted="0" volume="1" name="FX 18" >
+      </mixerchannel>
+      <mixerchannel num="18" muted="0" volume="1" name="Channel 18" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="19" muted="0" volume="1" name="FX 19" >
+      </mixerchannel>
+      <mixerchannel num="19" muted="0" volume="1" name="Channel 19" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="20" muted="0" volume="1" name="FX 20" >
+      </mixerchannel>
+      <mixerchannel num="20" muted="0" volume="1" name="Channel 20" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="21" muted="0" volume="1" name="FX 21" >
+      </mixerchannel>
+      <mixerchannel num="21" muted="0" volume="1" name="Channel 21" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="22" muted="0" volume="1" name="FX 22" >
+      </mixerchannel>
+      <mixerchannel num="22" muted="0" volume="1" name="Channel 22" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="23" muted="0" volume="1" name="FX 23" >
+      </mixerchannel>
+      <mixerchannel num="23" muted="0" volume="1" name="Channel 23" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="24" muted="0" volume="1" name="FX 24" >
+      </mixerchannel>
+      <mixerchannel num="24" muted="0" volume="1" name="Channel 24" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="25" muted="0" volume="1" name="FX 25" >
+      </mixerchannel>
+      <mixerchannel num="25" muted="0" volume="1" name="Channel 25" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="26" muted="0" volume="1" name="FX 26" >
+      </mixerchannel>
+      <mixerchannel num="26" muted="0" volume="1" name="Channel 26" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="27" muted="0" volume="1" name="FX 27" >
+      </mixerchannel>
+      <mixerchannel num="27" muted="0" volume="1" name="Channel 27" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="28" muted="0" volume="1" name="FX 28" >
+      </mixerchannel>
+      <mixerchannel num="28" muted="0" volume="1" name="Channel 28" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="29" muted="0" volume="1" name="FX 29" >
+      </mixerchannel>
+      <mixerchannel num="29" muted="0" volume="1" name="Channel 29" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="30" muted="0" volume="1" name="FX 30" >
+      </mixerchannel>
+      <mixerchannel num="30" muted="0" volume="1" name="Channel 30" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="31" muted="0" volume="1" name="FX 31" >
+      </mixerchannel>
+      <mixerchannel num="31" muted="0" volume="1" name="Channel 31" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="32" muted="0" volume="1" name="FX 32" >
+      </mixerchannel>
+      <mixerchannel num="32" muted="0" volume="1" name="Channel 32" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="33" muted="0" volume="1" name="FX 33" >
+      </mixerchannel>
+      <mixerchannel num="33" muted="0" volume="1" name="Channel 33" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="34" muted="0" volume="1" name="FX 34" >
+      </mixerchannel>
+      <mixerchannel num="34" muted="0" volume="1" name="Channel 34" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="35" muted="0" volume="1" name="FX 35" >
+      </mixerchannel>
+      <mixerchannel num="35" muted="0" volume="1" name="Channel 35" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="36" muted="0" volume="1" name="FX 36" >
+      </mixerchannel>
+      <mixerchannel num="36" muted="0" volume="1" name="Channel 36" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="37" muted="0" volume="1" name="FX 37" >
+      </mixerchannel>
+      <mixerchannel num="37" muted="0" volume="1" name="Channel 37" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="38" muted="0" volume="1" name="FX 38" >
+      </mixerchannel>
+      <mixerchannel num="38" muted="0" volume="1" name="Channel 38" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="39" muted="0" volume="1" name="FX 39" >
+      </mixerchannel>
+      <mixerchannel num="39" muted="0" volume="1" name="Channel 39" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="40" muted="0" volume="1" name="FX 40" >
+      </mixerchannel>
+      <mixerchannel num="40" muted="0" volume="1" name="Channel 40" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="41" muted="0" volume="1" name="FX 41" >
+      </mixerchannel>
+      <mixerchannel num="41" muted="0" volume="1" name="Channel 41" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="42" muted="0" volume="1" name="FX 42" >
+      </mixerchannel>
+      <mixerchannel num="42" muted="0" volume="1" name="Channel 42" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="43" muted="0" volume="1" name="FX 43" >
+      </mixerchannel>
+      <mixerchannel num="43" muted="0" volume="1" name="Channel 43" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="44" muted="0" volume="1" name="FX 44" >
+      </mixerchannel>
+      <mixerchannel num="44" muted="0" volume="1" name="Channel 44" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="45" muted="0" volume="1" name="FX 45" >
+      </mixerchannel>
+      <mixerchannel num="45" muted="0" volume="1" name="Channel 45" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="46" muted="0" volume="1" name="FX 46" >
+      </mixerchannel>
+      <mixerchannel num="46" muted="0" volume="1" name="Channel 46" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="47" muted="0" volume="1" name="FX 47" >
+      </mixerchannel>
+      <mixerchannel num="47" muted="0" volume="1" name="Channel 47" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="48" muted="0" volume="1" name="FX 48" >
+      </mixerchannel>
+      <mixerchannel num="48" muted="0" volume="1" name="Channel 48" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="49" muted="0" volume="1" name="FX 49" >
+      </mixerchannel>
+      <mixerchannel num="49" muted="0" volume="1" name="Channel 49" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="50" muted="0" volume="1" name="FX 50" >
+      </mixerchannel>
+      <mixerchannel num="50" muted="0" volume="1" name="Channel 50" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="51" muted="0" volume="1" name="FX 51" >
+      </mixerchannel>
+      <mixerchannel num="51" muted="0" volume="1" name="Channel 51" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="52" muted="0" volume="1" name="FX 52" >
+      </mixerchannel>
+      <mixerchannel num="52" muted="0" volume="1" name="Channel 52" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="53" muted="0" volume="1" name="FX 53" >
+      </mixerchannel>
+      <mixerchannel num="53" muted="0" volume="1" name="Channel 53" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="54" muted="0" volume="1" name="FX 54" >
+      </mixerchannel>
+      <mixerchannel num="54" muted="0" volume="1" name="Channel 54" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="55" muted="0" volume="1" name="FX 55" >
+      </mixerchannel>
+      <mixerchannel num="55" muted="0" volume="1" name="Channel 55" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="56" muted="0" volume="1" name="FX 56" >
+      </mixerchannel>
+      <mixerchannel num="56" muted="0" volume="1" name="Channel 56" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="57" muted="0" volume="1" name="FX 57" >
+      </mixerchannel>
+      <mixerchannel num="57" muted="0" volume="1" name="Channel 57" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="58" muted="0" volume="1" name="FX 58" >
+      </mixerchannel>
+      <mixerchannel num="58" muted="0" volume="1" name="Channel 58" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="59" muted="0" volume="1" name="FX 59" >
+      </mixerchannel>
+      <mixerchannel num="59" muted="0" volume="1" name="Channel 59" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="60" muted="0" volume="1" name="FX 60" >
+      </mixerchannel>
+      <mixerchannel num="60" muted="0" volume="1" name="Channel 60" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="61" muted="0" volume="1" name="FX 61" >
+      </mixerchannel>
+      <mixerchannel num="61" muted="0" volume="1" name="Channel 61" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="62" muted="0" volume="1" name="FX 62" >
+      </mixerchannel>
+      <mixerchannel num="62" muted="0" volume="1" name="Channel 62" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="63" muted="0" volume="1" name="FX 63" >
+      </mixerchannel>
+      <mixerchannel num="63" muted="0" volume="1" name="Channel 63" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-      <fxchannel num="64" muted="0" volume="1" name="FX 64" >
+      </mixerchannel>
+      <mixerchannel num="64" muted="0" volume="1" name="Channel 64" >
         <fxchain numofeffects="0" enabled="0" />
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <controllerrackview width="258" x="880" y="310" maximized="0" height="278" visible="1" minimized="0" />
     <pianoroll width="840" x="-11" y="0" maximized="0" height="480" visible="0" minimized="0" />
     <automationeditor width="740" x="0" y="0" maximized="0" height="480" visible="0" minimized="0" />

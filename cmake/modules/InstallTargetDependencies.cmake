@@ -12,12 +12,13 @@ SET(DEFAULT_SEARCH_SUFFIXES "bin" "lib" "../bin")
 #	DESTINATION:		directory path to install the binaries to.
 #	LIB_DIRS:			list of paths for looking up dependencies.
 #	LIB_DIRS_SUFFIXES:	list of possible suffixes for LIB_DIRS entries.
+#	SEARCH_PATHS:			list of library search paths on runtime
 #	NO_DEFAULT_PATHS:	supply this value to avoid adding DEFAULT_SEARCH_DIRECTORIES
 #						to LIB_DIRS and DEFAULT_SEARCH_SUFFIXES to LIB_DIRS_SUFFIXES.
 FUNCTION(INSTALL_TARGET_DEPENDENCIES)
 	set(options NO_DEFAULT_PATHS)
 	set(oneValueArgs NAME)
-	set(multiValueArgs TARGETS DESTINATION LIB_DIRS_SUFFIXES LIB_DIRS)
+	set(multiValueArgs TARGETS DESTINATION LIB_DIRS_SUFFIXES LIB_DIRS SEARCH_PATHS)
 	cmake_parse_arguments(DEPS "${options}" "${oneValueArgs}"
 			"${multiValueArgs}" ${ARGN} )
 

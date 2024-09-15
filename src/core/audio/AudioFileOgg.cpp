@@ -30,19 +30,23 @@
 
 #ifdef LMMS_HAVE_OGGVORBIS
 
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
+#include <QRandomGenerator>
+#endif
 #include <string>
 #include <vorbis/vorbisenc.h>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 
+namespace lmms
+{
 
 AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
 				bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer )
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine )
 {
 	m_ok = successful = outputFileOpened() && startEncoding();
 }
@@ -79,7 +83,7 @@ bool AudioFileOgg::startEncoding()
 	vc.user_comments = &user_comments;
 	vc.comment_lengths = &comment_length;
 	vc.comments = 1;
-	vc.vendor = NULL;
+	vc.vendor = nullptr;
 
 	m_channels = channels();
 
@@ -120,11 +124,11 @@ bool AudioFileOgg::startEncoding()
 	if( useVariableBitRate )
 	{
 		// Turn off management entirely (if it was turned on).
-		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, NULL );
+		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, nullptr );
 	}
 	else
 	{
-		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
+		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, nullptr );
 	}
 
 	vorbis_encode_setup_init( &m_vi );
@@ -136,8 +140,13 @@ bool AudioFileOgg::startEncoding()
 
 	// We give our ogg file a random serial number and avoid
 	// 0 and UINT32_MAX which can get you into trouble.
-	qsrand( time( 0 ) );
+#if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
+	// QRandomGenerator::global() is already initialized, and we can't seed() it.
+	m_serialNo = 0xD0000000 + QRandomGenerator::global()->generate() % 0x0FFFFFFF;
+#else
+	qsrand(time(0));
 	m_serialNo = 0xD0000000 + qrand() % 0x0FFFFFFF;
+#endif
 	ogg_stream_init( &m_os, m_serialNo );
 
 	// Now, build the three header packets and send through to the stream
@@ -147,7 +156,6 @@ bool AudioFileOgg::startEncoding()
 	ogg_packet header_main;
 	ogg_packet header_comments;
 	ogg_packet header_codebooks;
-	int result;
 
 	// Build the packets
 	vorbis_analysis_headerout( &m_vd, m_comments, &header_main,
@@ -158,14 +166,9 @@ bool AudioFileOgg::startEncoding()
 	ogg_stream_packetin( &m_os, &header_comments );
 	ogg_stream_packetin( &m_os, &header_codebooks );
 
-	while( ( result = ogg_stream_flush( &m_os, &m_og ) ) )
+	while (ogg_stream_flush(&m_os, &m_og))
 	{
-		if( !result )
-		{
-			break;
-		}
-		int ret = writePage();
-		if( ret != m_og.header_len + m_og.body_len )
+		if (int ret = writePage(); ret != m_og.header_len + m_og.body_len)
 		{
 			// clean up
 			finishEncoding();
@@ -176,12 +179,7 @@ bool AudioFileOgg::startEncoding()
 	return true;
 }
 
-
-
-
-void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain )
+void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
 	int eos = 0;
 
@@ -192,7 +190,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	{
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
-			buffer[chnl][frame] = _ab[frame][chnl] * _master_gain;
+			buffer[chnl][frame] = _ab[frame][chnl];
 		}
 	}
 
@@ -203,7 +201,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	while( vorbis_analysis_blockout( &m_vd, &m_vb ) == 1 )
 	{
 		// Do the main analysis, creating a packet
-		vorbis_analysis( &m_vb, NULL );
+		vorbis_analysis( &m_vb, nullptr );
 		vorbis_bitrate_addblock( &m_vb );
 
 		while( vorbis_bitrate_flushpacket( &m_vd, &m_op ) )
@@ -249,7 +247,7 @@ void AudioFileOgg::finishEncoding()
 	if( m_ok )
 	{
 		// just for flushing buffers...
-		writeBuffer( NULL, 0, 0.0f );
+		writeBuffer(nullptr, 0);
 
 		// clean up
 		ogg_stream_clear( &m_os );
@@ -261,6 +259,8 @@ void AudioFileOgg::finishEncoding()
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_OGGVORBIS
 
 

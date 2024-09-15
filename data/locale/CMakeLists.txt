@@ -29,9 +29,14 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	ADD_CUSTOM_TARGET(${_ts_target}
 		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS}  ${LMMS_UIS} ${CMAKE_SOURCE_DIR}/plugins  -ts "\"${_ts_file}\""
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-	ADD_CUSTOM_TARGET(${_qm_target}
+	add_custom_command(
+		OUTPUT "${_qm_file}"
 		COMMAND "${QT_LRELEASE_EXECUTABLE}" "${_ts_file}" -qm "${_qm_file}"
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+		MAIN_DEPENDENCY "${_ts_file}"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+		VERBATIM
+	)
+	add_custom_target("${_qm_target}" DEPENDS "${_qm_file}")
 	LIST(APPEND ts_targets "${_ts_target}")
 	LIST(APPEND qm_targets "${_qm_target}")
 	LIST(APPEND QM_FILES "${_qm_file}")
@@ -47,9 +52,9 @@ FOREACH(_item ${qm_targets})
 	ADD_DEPENDENCIES(finalize-locales "${_item}")
 ENDFOREACH(_item ${qm_targets})
 
-IF(LMMS_BUILD_WIN32)
-	FILE(GLOB QT_QM_FILES "${QT_TRANSLATIONS_DIR}/qt*[^h].qm")
+IF(BUNDLE_QT_TRANSLATIONS)
+	FILE(GLOB QT_QM_FILES "${QT_TRANSLATIONS_DIR}/qt*.qm")
 	LIST(SORT QT_QM_FILES)
-ENDIF(LMMS_BUILD_WIN32)
+ENDIF()
 
 INSTALL(FILES ${QM_FILES} ${QT_QM_FILES} DESTINATION "${LMMS_DATA_DIR}/locale")

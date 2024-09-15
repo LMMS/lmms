@@ -23,25 +23,27 @@
  *
  */
 
-#ifndef _TIME_DISPLAY_WIDGET
-#define _TIME_DISPLAY_WIDGET
+#ifndef LMMS_GUI_TIME_DISPLAY_WIDGET_H
+#define LMMS_GUI_TIME_DISPLAY_WIDGET_H
 
 #include <QWidget>
 #include <QHBoxLayout>
 
 #include "LcdWidget.h"
 
+namespace lmms::gui
+{
 
 class TimeDisplayWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	TimeDisplayWidget();
-	virtual ~TimeDisplayWidget() = default;
+	~TimeDisplayWidget() override = default;
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent* mouseEvent );
+	void mousePressEvent( QMouseEvent* mouseEvent ) override;
 
 
 private slots:
@@ -49,13 +51,11 @@ private slots:
 
 
 private:
-	enum DisplayModes
+	enum class DisplayMode
 	{
 		MinutesSeconds,
-		BarsTicks,
-		DisplayModeCount
+		BarsTicks
 	};
-	typedef DisplayModes DisplayMode;
 
 	void setDisplayMode( DisplayMode displayMode );
 
@@ -67,4 +67,6 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_TIME_DISPLAY_WIDGET_H

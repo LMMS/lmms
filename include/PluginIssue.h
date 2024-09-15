@@ -22,27 +22,43 @@
  *
  */
 
-#ifndef PLUGINISSUE_H
-#define PLUGINISSUE_H
+#ifndef LMMS_PLUGIN_ISSUE_H
+#define LMMS_PLUGIN_ISSUE_H
 
 #include <QDebug>
 #include <string>
 
+namespace lmms
+{
+
 //! Types of issues that can cause LMMS to not load a plugin
 //! LMMS Plugins should use this to indicate errors
-enum PluginIssueType
+enum class PluginIssueType
 {
-	unknownPortFlow,
-	unknownPortType,
-	tooManyInputChannels,
-	tooManyOutputChannels,
-	noOutputChannel,
-	portHasNoDef,
-	portHasNoMin,
-	portHasNoMax,
-	featureNotSupported, //!< plugin requires functionality LMMS can't offer
-	badPortType, //!< port type not supported
-	noIssue
+	// port flow & type
+	UnknownPortFlow,
+	UnknownPortType,
+	// channel count
+	TooManyInputChannels,
+	TooManyOutputChannels,
+	TooManyMidiInputChannels,
+	TooManyMidiOutputChannels,
+	NoOutputChannel,
+	// port metadata
+	PortHasNoDef,
+	PortHasNoMin,
+	PortHasNoMax,
+	MinGreaterMax,
+	DefaultValueNotInRange,
+	LogScaleMinMissing,
+	LogScaleMaxMissing,
+	LogScaleMinMaxDifferentSigns,
+	// features
+	FeatureNotSupported, //!< plugin requires functionality LMMS can't offer
+	// misc
+	BadPortType, //!< port type not supported
+	Blocked,
+	NoIssue
 };
 
 //! Issue type bundled with informational string
@@ -58,9 +74,14 @@ public:
 		: m_issueType(it), m_info(msg)
 	{
 	}
+	PluginIssueType type() const { return m_issueType; }
+	bool operator==(const PluginIssue& other) const;
+	bool operator<(const PluginIssue& other) const;
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 
 QDebug operator<<(QDebug stream, const PluginIssue& iss);
 
-#endif // PLUGINISSUE_H
+} // namespace lmms
+
+#endif // LMMS_PLUGIN_ISSUE_H

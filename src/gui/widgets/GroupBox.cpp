@@ -34,10 +34,13 @@
 #include "gui_templates.h"
 
 
+namespace lmms::gui
+{
+
 
 GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	BoolModelView( NULL, this ),
+	BoolModelView( nullptr, this ),
 	m_caption( _caption ),
 	m_titleBarHeight( 11 )
 {
@@ -47,7 +50,7 @@ GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
-	setModel( new BoolModel( false, NULL, _caption, true ) );
+	setModel( new BoolModel( false, nullptr, _caption, true ) );
 	setAutoFillBackground( true );
 	unsetCursor();
 }
@@ -69,13 +72,23 @@ void GroupBox::modelChanged()
 }
 
 
+bool GroupBox::ledButtonShown() const
+{
+	return m_led->isVisible();
+}
+
+
+void GroupBox::setLedButtonShown(bool value)
+{
+	m_led->setVisible(value);
+}
 
 
 void GroupBox::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton )
+	if (ledButtonShown() && _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton)
 	{
-		model()->setValue( !model()->value() );
+		model()->setValue(!model()->value());
 	}
 }
 
@@ -90,7 +103,7 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 	p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
 
 	// outer rect
-	p.setPen( p.background().color().dark( 150 ) );
+	p.setPen( p.background().color().darker( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
 	// draw line below titlebar
@@ -98,6 +111,11 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 
 	// draw text
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 22, m_titleBarHeight, m_caption );
+	p.setFont(adjustedToPixelSize(font(), 10));
+
+	int const captionX = ledButtonShown() ? 22 : 6;
+	p.drawText(captionX, m_titleBarHeight, m_caption);
 }
+
+
+} // namespace lmms::gui

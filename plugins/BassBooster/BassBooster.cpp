@@ -27,20 +27,24 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BassBooster",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Boost your bass the fast and simple way" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -61,14 +65,11 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-BassBoosterEffect::~BassBoosterEffect()
-{
-}
 
 
 
 
-bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool BassBoosterEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -90,23 +91,19 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		float gain = const_gain;
-		if (gainBuffer) {
-			//process period using sample exact data
-			gain = gainBuffer->value( f );
-		}
-		//float gain = gainBuffer ? gainBuffer[f] : gain;
-		m_bbFX.leftFX().setGain( gain );
-		m_bbFX.rightFX().setGain( gain);
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+		auto& currentFrame = buf[f];
 
-		sample_t s[2] = { buf[f][0], buf[f][1] };
-		m_bbFX.nextSample( s[0], s[1] );
+		// Process copy of current sample frame
+		m_bbFX.setGain(gainBuffer ? gainBuffer->value(f) : const_gain);
+		auto s = currentFrame;
+		m_bbFX.nextSample(s);
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		// Dry/wet mix
+		currentFrame = currentFrame * d + s * w;
+
+		outSum += currentFrame.sumOfSquaredAmplitudes();
 	}
 
 	checkGate( outSum / frames );
@@ -117,7 +114,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 
 inline void BassBoosterEffect::changeFrequency()
 {
-	const sample_t fac = Engine::mixer()->processingSampleRate() / 44100.0f;
+	const sample_t fac = Engine::audioEngine()->outputSampleRate() / 44100.0f;
 
 	m_bbFX.leftFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
 	m_bbFX.rightFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
@@ -155,3 +152,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }
 
+
+} // namespace lmms

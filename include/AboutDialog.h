@@ -22,14 +22,15 @@
  *
  */
 
-
-#ifndef ABOUT_DIALOG_H
-#define ABOUT_DIALOG_H
+#ifndef LMMS_GUI_ABOUT_DIALOG_H
+#define LMMS_GUI_ABOUT_DIALOG_H
 
 #include <QDialog>
 
 #include "ui_about_dialog.h"
 
+namespace lmms::gui
+{
 
 class AboutDialog : public QDialog, public Ui::AboutDialog
 {
@@ -38,6 +39,6 @@ public:
 
 } ;
 
+} // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_ABOUT_DIALOG_H

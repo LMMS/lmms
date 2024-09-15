@@ -1,0 +1,199 @@
+#!/usr/bin/python3
+
+# This script checks the code for namespace related issues
+# Note: This script is not perfect. It can not parse all LMMS files,
+#       and does not contain a complete C++ parser. If you encounter
+#       difficulties with this tests, it could be a fault of your
+#       changes, but it could also be a fault of this script.
+
+import re
+import subprocess
+import sys
+from pathlib import Path
+from typing import NamedTuple
+
+
+# types
+
+class BlockType:
+    pass
+
+
+IF_MACRO = BlockType()
+HEADER_GUARD = BlockType()
+CODE_BLOCK = BlockType()
+EXTERN = BlockType()
+
+
+class Expectation(NamedTuple):
+    type: BlockType
+    statement: str  # expected end statement
+    name: str  # expected name in comment
+
+
+# global variables
+
+errors = 0
+
+
+# functions
+
+def caption(my_str):
+    print(f'\n# {my_str}\n')
+
+
+def error(where, match, my_str):
+    global errors
+    errors += 1
+    if match:
+        line = match.string[:match.start()].count('\n') + 1  # first line is 1
+        where = f'{where}:{line}'
+    print(f'Error: {where}: {my_str}')
+
+
+if not Path('.gitmodules').is_file():
+    print('You need to call this script from the LMMS top directory')
+    exit(1)
+
+result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
+                        capture_output=True, text=True, check=True)
+
+known_no_namespace_lmms = {
+    # main.cpp
+    'src/core/main.cpp',
+    # nothing to set under a namespace
+    'include/debug.h',
+    'include/versioninfo.h',
+    'plugins/CarlaBase/CarlaConfig/config.h',
+    'plugins/CarlaBase/DummyCarla.cpp',
+    # unclear why it has no namespace
+    'plugins/ZynAddSubFx/RemoteZynAddSubFx.cpp',
+}
+
+exclude_files = re.compile(
+    # not ours:
+    'include/(aeffectx|fenv|ladspa).h|'
+    'plugins/LadspaEffect/(calf|caps|cmt|swh|tap)/|'
+    'plugins/MidiExport/MidiFile.hpp|'
+    'plugins/ReverbSC/[a-z]|'
+    'plugins/Sf2Player/fluidsynthshims.h|'
+    '/portsmf/|'
+    # only forward to headers that are not ours:
+    'plugins/ZynAddSubFx/ThreadShims.h'
+)
+
+files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
+
+# Debug argument
+if len(sys.argv) > 1:
+    files = [Path(arg) for arg in sys.argv[1:]]
+
+statement_pattern = re.compile(
+    # Capture comments first to prevent them from matching any other regex
+    #  Include next line if line ends with backslash
+    r'/[*](.|\n)*?[*]/|//(.*\\\n)*.*|'
+
+    # Macro with <30 lines and no other #if inside needs no end comment
+    #  Match here to prevent from matching next regex
+    #  With a (?!negative lookahead) we can allow all # except the ones followed by "if"
+    r'^ *# *(?P<short_macro>ifn?def)(?=(([^#\n]|#(?!if|endif))*\n){,30} *# *endif)|'
+    # Macro followed by name or comment
+    #  With (?P<name>...) you can do a backreference to \name later
+    r'^ *# *(?P<named_macro>ifn?def|endif)(( *// *| +)(?P<macro_name>\w+))?|'
+    # Other macros where we don't want the argument
+    r'^ *# *(?P<macro>include|if|el(se|if))|'
+
+    # Namespace that contains no other braces needs no end comment
+    #  With a (?=lookahead) we can let the "namespace" part be eaten by the parser
+    #  but save the braces and their content for later so they can be matched again
+    r'^ *namespace *[\w:]*\s*(?={[^{}]*})|'
+    # Start of named namespace, extern "C" or just a opening brace
+    r'(^ *(namespace +(?P<namespace>[\w:]+)|(?P<extern>extern *"C"))\s*)?(?P<opening_brace>{)|'
+    # End of namespace including comment, or just a closing brace
+    r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?'
+
+    # In all the regexes above match both tab and space when a space is used
+    r''.replace(' ', r'[\t ]'),
+    # Make ^ match on every line, not just beginning of file
+    re.MULTILINE)
+
+# Comments and whitespace followed by header guard
+header_guard_pattern = re.compile(r'^(/[*](.|\n)*?[*]/|//.*|\s)*#\s*(ifndef|pragma\s+once)')
+
+# Namespace lmms
+namespace_pattern = re.compile(r'^\s*namespace\s+lmms', re.MULTILINE)
+
+#
+# the real code
+#
+
+caption('namespace checks')
+
+for cur_file in files:
+    if cur_file.is_file():
+        cur_text = cur_file.read_text(errors='replace')
+
+        if cur_file.as_posix() not in known_no_namespace_lmms:
+            namespace_pattern.search(cur_text) or error(cur_file, None, f'File has no namespace lmms')
+
+        header_guard = str(cur_file).endswith('.h')
+        expectations = []  # type: list[Expectation]
+
+        if header_guard:
+            if not header_guard_pattern.match(cur_text):
+                error(cur_file, None, 'First statement should be header guard')
+                header_guard = False
+
+        for m in statement_pattern.finditer(cur_text):
+            # Find the matched regex group
+            statement = m.group('opening_brace') or m.group('closing_brace')
+            if not statement:
+                statement = '#' + (m.group('macro') or m.group('named_macro') or m.group('short_macro') or '')
+            if not statement:
+                continue
+
+            # Start statements
+            if statement == '{':
+                etype = EXTERN if m.group('extern') else CODE_BLOCK
+                expectations.append(Expectation(etype, '}', m.group('namespace')))
+            elif statement.startswith('#if'):
+                etype = HEADER_GUARD if header_guard else IF_MACRO
+                expectations.append(Expectation(etype, '#endif', m.group('macro_name')))
+                header_guard = False
+
+            # End statements
+            elif statement == '#endif' or statement.startswith('#el') or statement == '}':
+                if not expectations:
+                    error(cur_file, m, f'Unexpected {statement}')
+                    break
+                if statement.startswith('#el') and expectations[-1].statement == '#endif':
+                    # After an #else or #elif the comment is no longer mandatory, since it's hard to define
+                    expectations[-1] = Expectation(IF_MACRO, '#endif', '')
+                    # Don't pop the expectations, we are still waiting for the #endif
+                    continue
+                exp = expectations.pop()
+                name = m.group('macro_name') or m.group('namespace_end') or ''
+                if statement != exp.statement:
+                    error(cur_file, m, f'Expected {exp.statement} before {statement}')
+                    break
+                # Require no end comment for header guard
+                elif exp.type is HEADER_GUARD and not name:
+                    continue
+                elif exp.name and name != exp.name:
+                    comment = 'namespace ' if exp.type is CODE_BLOCK else ''
+                    error(cur_file, m, f'Missing comment // {comment}{exp.name}')
+
+            # Extra checks
+            elif statement == '#include':
+                if any(True for e in expectations if e.type is CODE_BLOCK):
+                    error(cur_file, m, '#include inside a code block')
+
+        else:
+            # Leftover expected statements
+            for exp in reversed(expectations):
+                error(cur_file, None, f'Expected {exp.statement} before end of file')
+
+caption('summary')
+
+print(f'{str(errors)} errors.')
+exit(1 if errors > 0 else 0)

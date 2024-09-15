@@ -3,7 +3,7 @@
 <multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="E-Organ 2">
-    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="69" vol="36">
+    <instrumenttrack pan="0" mixch="0" pitch="0" basenote="69" vol="36">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="74" userwavefile0="" userwavefile1="" finer0="28" userwavefile2="" finer1="6" finer2="0" coarse0="0" coarse1="24" coarse2="12" finel0="-28" finel1="-6" modalgo1="2" finel2="0" modalgo2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="184" pan2="0" stphdetun1="183" wavetype0="4" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="100" vol1="62" phoffset0="180" phoffset1="49" vol2="112"/>
       </instrument>

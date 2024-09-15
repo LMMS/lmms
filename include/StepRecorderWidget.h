@@ -19,15 +19,17 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef STEP_RECOREDER_WIDGET_H
-#define STEP_RECOREDER_WIDGET_H
 
-#include "lmms_basics.h"
-#include "Note.h"
+#ifndef LMMS_GUI_STEP_RECOREDER_WIDGET_H
+#define LMMS_GUI_STEP_RECOREDER_WIDGET_H
 
 #include <QWidget>
 #include <QColor>
-#include <QPainter>
+
+#include "TimePos.h"
+
+namespace lmms::gui
+{
 
 class StepRecorderWidget : public QWidget
 {
@@ -36,40 +38,42 @@ class StepRecorderWidget : public QWidget
 public:
 	StepRecorderWidget(
 		QWidget * parent,
-		const int ppt,
+		const int ppb,
 		const int marginTop,
 		const int marginBottom,
 		const int marginLeft,
 		const int marginRight);
 
 	//API used by PianoRoll
-	void setPixelsPerTact(int ppt);
-	void setCurrentPosition(MidiTime currentPosition);
+	void setPixelsPerBar(int ppb);
+	void setCurrentPosition(TimePos currentPosition);
+	void setMargins(const QMargins &qm);
 	void setBottomMargin(const int marginBottom);
+	QMargins margins();
 
 	//API used by StepRecorder
-	void setStepsLength(MidiTime stepsLength);
-	void setStartPosition(MidiTime pos);
-	void setEndPosition(MidiTime pos);
+	void setStepsLength(TimePos stepsLength);
+	void setStartPosition(TimePos pos);
+	void setEndPosition(TimePos pos);
 
 	void showHint();
 
 private:
-	virtual void paintEvent(QPaintEvent * pe);
+	void paintEvent(QPaintEvent * pe) override;
 
 	int xCoordOfTick(int tick);
 
 	void drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom);
-	void drawVerLine(QPainter* painter, const MidiTime& pos, const QColor& color, int top, int bottom);
+	void drawVerLine(QPainter* painter, const TimePos& pos, const QColor& color, int top, int bottom);
 
 	void updateBoundaries();
 
-	MidiTime m_stepsLength;
-	MidiTime m_curStepStartPos;
-	MidiTime m_curStepEndPos;
+	TimePos m_stepsLength;
+	TimePos m_curStepStartPos;
+	TimePos m_curStepEndPos;
 
-	int m_ppt; // pixels per tact
-	MidiTime m_currentPosition; // current position showed by on PianoRoll
+	int m_ppb; // pixels per bar
+	TimePos m_currentPosition; // current position showed by on PianoRoll
 
 	QColor m_colorLineStart;
 	QColor m_colorLineEnd;
@@ -86,7 +90,9 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const MidiTime & t);
+	void positionChanged(const lmms::TimePos & t);
 } ;
 
-#endif //STEP_RECOREDER_WIDGET_H
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_STEP_RECOREDER_WIDGET_H

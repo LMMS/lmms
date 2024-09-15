@@ -30,10 +30,16 @@
 
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
+#include "Note.h"
+
+class QDomNode;
+
+namespace lmms
+{
 
 
 const int BUFFER_SIZE = 50*1024;
-typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+using MTrack = MidiFile::MIDITrack<BUFFER_SIZE>;
 
 struct MidiNote
 {
@@ -41,6 +47,7 @@ struct MidiNote
 	uint8_t pitch;
 	int duration;
 	uint8_t volume;
+	Note::Type type;
 
 	inline bool operator<(const MidiNote &b) const
 	{
@@ -48,39 +55,49 @@ struct MidiNote
 	}
 } ;
 
-typedef std::vector<MidiNote> MidiNoteVector;
-typedef std::vector<MidiNote>::iterator MidiNoteIterator;
-
-
+using MidiNoteVector = std::vector<MidiNote>;
+using MidiNoteIterator = std::vector<MidiNote>::iterator;
 
 class MidiExport: public ExportFilter
 {
 // 	Q_OBJECT
 public:
 	MidiExport();
-	~MidiExport();
+	~MidiExport() override = default;
 
-	virtual PluginView *instantiateView(QWidget *)
+	// Default Beat Length in ticks for step notes
+	// TODO: The beat length actually varies per note, however the method that
+	// calculates it (InstrumentTrack::beatLen) requires a NotePlayHandle to do
+	// so. While we don't figure out a way to hold the beat length of each note
+	// on its member variables, we will use a default value as a beat length that
+	// will be used as an upper limit of the midi note length. This doesn't worsen
+	// the current logic used for MidiExport because right now the beat length is
+	// not even considered during the generation of the MIDI.
+	static constexpr int DefaultBeatLength = 1500;
+
+	gui::PluginView* instantiateView(QWidget *) override
 	{
 		return nullptr;
 	}
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracks_BB,
-				int tempo, int masterPitch, const QString &filename);
+	bool tryExport(const TrackContainer::TrackList &tracks,
+				const TrackContainer::TrackList &patternTracks,
+				int tempo, int masterPitch, const QString &filename) override;
 	
 private:
-	void writePattern(MidiNoteVector &pat, QDomNode n,
+	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time);
-	void writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
+	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
+	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
-	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
+	void processPatternNotes(MidiNoteVector &nv, int cutPos);
 
 	void error();
 
 
 } ;
 
+
+} // namespace lmms
 
 #endif

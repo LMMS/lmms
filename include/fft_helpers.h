@@ -23,31 +23,33 @@
  *
  */
 
-
-#ifndef FFT_HELPERS_H
-#define FFT_HELPERS_H
+#ifndef LMMS_FFT_HELPERS_H
+#define LMMS_FFT_HELPERS_H
 
 #include "lmms_export.h"
 
 #include <vector>
 #include <fftw3.h>
 
+namespace lmms
+{
+
 // NOTE: FFT_BUFFER_SIZE should be considered deprecated!
 // It is used by Eq plugin and some older code here, but this should be a user
 // switchable parameter, not a constant. Use a value from FFT_BLOCK_SIZES
-const unsigned int FFT_BUFFER_SIZE = 2048;
+constexpr auto FFT_BUFFER_SIZE = std::size_t{2048};
 
 // Allowed FFT block sizes. Ranging from barely useful to barely acceptable
 // because of performance and latency reasons.
 const std::vector<unsigned int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};
 
 // List of FFT window functions supported by precomputeWindow()
-enum FFT_WINDOWS
+enum class FFTWindow
 {
-	RECTANGULAR = 0,
-	BLACKMAN_HARRIS,
-	HAMMING,
-	HANNING
+	Rectangular = 0,
+	BlackmanHarris,
+	Hamming,
+	Hanning
 };
 
 
@@ -81,7 +83,7 @@ int LMMS_EXPORT notEmpty(const std::vector<float> &spectrum);
  *
  *	@return -1 on error
  */
-int LMMS_EXPORT precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool normalized = true);
+int LMMS_EXPORT precomputeWindow(float *window, unsigned int length, FFTWindow type, bool normalized = true);
 
 
 /**	Compute absolute values of complex_buffer, save to absspec_buffer.
@@ -104,15 +106,6 @@ int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressed
 			int _num_old, int _num_new, int _bottom, int _top);
 
 
-int LMMS_EXPORT calc13octaveband31(float * _absspec_buffer, float * _subbands,
-				int _num_spec, float _max_frequency);
+} // namespace lmms
 
-
-/**	Compute power of finite time sequence.
- *	Take care num_values is length of timesignal[].
- *
- *	@return power on success, else -1
- */
-float LMMS_EXPORT signalpower(const float *timesignal, int num_values);
-
-#endif
+#endif // LMMS_FFT_HELPERS_H

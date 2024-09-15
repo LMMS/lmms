@@ -1,7 +1,7 @@
 /*
- * PluginIssue.h - PluginIssue class
+ * PluginIssue.cpp - PluginIssue class implementation
  *
- * Copyright (c) 2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,37 +26,73 @@
 
 #include "PluginIssue.h"
 
+namespace lmms
+{
+
+
 const char *PluginIssue::msgFor(const PluginIssueType &it)
 {
 	switch (it)
 	{
-		case unknownPortFlow:
+		case PluginIssueType::UnknownPortFlow:
 			return "unknown port flow for mandatory port";
-		case unknownPortType:
+		case PluginIssueType::UnknownPortType:
 			return "unknown port type for mandatory port";
-		case tooManyInputChannels:
+		case PluginIssueType::TooManyInputChannels:
 			return "too many audio input channels";
-		case tooManyOutputChannels:
+		case PluginIssueType::TooManyOutputChannels:
 			return "too many audio output channels";
-		case noOutputChannel:
+		case PluginIssueType::TooManyMidiInputChannels:
+			return "too many MIDI input channels";
+		case PluginIssueType::TooManyMidiOutputChannels:
+			return "too many MIDI output channels";
+		case PluginIssueType::NoOutputChannel:
 			return "no audio output channel";
-		case portHasNoDef:
+		case PluginIssueType::PortHasNoDef:
 			return "port is missing default value";
-		case portHasNoMin:
+		case PluginIssueType::PortHasNoMin:
 			return "port is missing min value";
-		case portHasNoMax:
+		case PluginIssueType::PortHasNoMax:
 			return "port is missing max value";
-		case featureNotSupported:
+		case PluginIssueType::MinGreaterMax:
+			return "port minimum is greater than maximum";
+		case PluginIssueType::DefaultValueNotInRange:
+			return "default value is not in range [min, max]";
+		case PluginIssueType::LogScaleMinMissing:
+			return "logscale requires minimum value";
+		case PluginIssueType::LogScaleMaxMissing:
+			return "logscale requires maximum value";
+		case PluginIssueType::LogScaleMinMaxDifferentSigns:
+			return "logscale with min < 0 < max";
+		case PluginIssueType::FeatureNotSupported:
 			return "required feature not supported";
-		case badPortType:
+		case PluginIssueType::BadPortType:
 			return "unsupported port type";
-		case noIssue:
+		case PluginIssueType::Blocked:
+			return "blocked plugin";
+		case PluginIssueType::NoIssue:
 			return nullptr;
 	}
 	return nullptr;
 }
 
 
+
+
+bool PluginIssue::operator==(const PluginIssue &other) const
+{
+	return (m_issueType == other.m_issueType) && (m_info == other.m_info);
+}
+
+
+
+
+bool PluginIssue::operator<(const PluginIssue &other) const
+{
+	return (m_issueType != other.m_issueType)
+			? m_issueType < other.m_issueType
+			: m_info < other.m_info;
+}
 
 
 QDebug operator<<(QDebug stream, const PluginIssue &iss)
@@ -68,5 +104,8 @@ QDebug operator<<(QDebug stream, const PluginIssue &iss)
 	}
 	return stream;
 }
+
+} // namespace lmms
+
 
 

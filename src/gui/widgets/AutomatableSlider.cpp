@@ -28,31 +28,28 @@
 #include <QMouseEvent>
 
 #include "CaptionMenu.h"
-#include "MainWindow.h"
 
 
+namespace lmms::gui
+{
 
 
 AutomatableSlider::AutomatableSlider( QWidget * _parent,
 						const QString & _name ) :
 	QSlider( _parent ),
-	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
+	IntModelView( new IntModel( 0, 0, 0, nullptr, _name, true ), this ),
 	m_showStatus( false )
 {
 	setWindowTitle( _name );
 
-	connect( this, SIGNAL( valueChanged( int ) ),
-					this, SLOT( changeValue( int ) ) );
-	connect( this, SIGNAL( sliderMoved( int ) ),
-					this, SLOT( moveSlider( int ) ) );
+	connect( this, SIGNAL(valueChanged(int)),
+					this, SLOT(changeValue(int)));
+	connect( this, SIGNAL(sliderMoved(int)),
+					this, SLOT(moveSlider(int)));
 }
 
 
 
-
-AutomatableSlider::~AutomatableSlider()
-{
-}
 
 
 
@@ -108,8 +105,8 @@ void AutomatableSlider::modelChanged()
 {
 	QSlider::setRange( model()->minValue(), model()->maxValue() );
 	updateSlider();
-	connect( model(), SIGNAL( dataChanged() ),
-				this, SLOT( updateSlider() ) );
+	connect( model(), SIGNAL(dataChanged()),
+				this, SLOT(updateSlider()));
 }
 
 
@@ -141,5 +138,5 @@ void AutomatableSlider::updateSlider()
 
 
 
-
+} // namespace lmms::gui
 

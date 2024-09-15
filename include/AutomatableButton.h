@@ -22,14 +22,15 @@
  *
  */
 
-
-#ifndef AUTOMATABLE_BUTTON_H
-#define AUTOMATABLE_BUTTON_H
+#ifndef LMMS_GUI_AUTOMATABLE_BUTTON_H
+#define LMMS_GUI_AUTOMATABLE_BUTTON_H
 
 #include <QPushButton>
 
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
 
 class automatableButtonGroup;
 
@@ -40,7 +41,7 @@ class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 public:
 	AutomatableButton( QWidget * _parent, const QString & _name
 			= QString() );
-	virtual ~AutomatableButton();
+	~AutomatableButton() override;
 
 	inline void setCheckable( bool _on )
 	{
@@ -48,7 +49,7 @@ public:
 		model()->setJournalling( _on );
 	}
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 public slots:
@@ -62,9 +63,9 @@ public slots:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 
 private:
@@ -85,14 +86,14 @@ class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
 public:
 	automatableButtonGroup( QWidget * _parent, const QString & _name
 			= QString() );
-	virtual ~automatableButtonGroup();
+	~automatableButtonGroup() override;
 
 	void addButton( AutomatableButton * _btn );
 	void removeButton( AutomatableButton * _btn );
 
 	void activateButton( AutomatableButton * _btn );
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private slots:
@@ -105,5 +106,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUTOMATABLE_BUTTON_H

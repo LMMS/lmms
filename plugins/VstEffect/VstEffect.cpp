@@ -22,33 +22,37 @@
  *
  */
 
-#include <QMessageBox>
 
 #include "VstEffect.h"
 
 #include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
+#include "VstPlugin.h"
 #include "VstSubPluginFeatures.h"
 
 #include "embed.h"
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"VST",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	new VstSubPluginFeatures( Plugin::Effect )
+	nullptr,
+	new VstSubPluginFeatures( Plugin::Type::Effect )
 } ;
 
 }
@@ -72,14 +76,7 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-VstEffect::~VstEffect()
-{
-}
-
-
-
-
-bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
+bool VstEffect::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -90,11 +87,11 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 	{
 		const float d = dryLevel();
 #ifdef __GNUC__
-		sampleFrame buf[_frames];
+		SampleFrame buf[_frames];
 #else
-		sampleFrame * buf = new sampleFrame[_frames];
+		SampleFrame* buf = new SampleFrame[_frames];
 #endif
-		memcpy( buf, _buf, sizeof( sampleFrame ) * _frames );
+		memcpy( buf, _buf, sizeof( SampleFrame ) * _frames );
 		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
 		{
 			m_plugin->process( buf, buf );
@@ -126,10 +123,10 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = NULL;
-	if( gui )
+	gui::TextFloat* tf = nullptr;
+	if( gui::getGUI() != nullptr )
 	{
-		tf = TextFloat::displayMessage(
+		tf = gui::TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),
 			VstPlugin::tr( "Please wait while loading VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -166,3 +163,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

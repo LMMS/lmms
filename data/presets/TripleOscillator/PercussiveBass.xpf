@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Percussive Bass" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="69" vol="76.5">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="69" vol="76.5">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="-24" coarse1="24" coarse2="-12" finel0="0" finel1="0" modalgo1="2" modalgo2="4" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="3" stphdetun2="0" wavetype1="2" wavetype2="1" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="4"/>
       </instrument>

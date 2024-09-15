@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "assert.h"
 #include "stdlib.h"
 #include "string.h"
 #include "ctype.h"
@@ -27,6 +27,8 @@ public:
     Alg_seq_ptr seq;
     double tsnum;
     double tsden;
+    double offset;
+    bool offset_found;
 
     Alg_reader(istream *a_file, Alg_seq_ptr new_seq);
     void readline();
@@ -37,6 +39,7 @@ public:
     long parse_int(string &field);
     int find_real_in(string &field, int n);
     double parse_real(string &field);
+    void parse_error(string &field, long offset, char *message);
     void parse_error(string &field, long offset, const char *message);
     double parse_dur(string &field, double base);
     double parse_after_dur(double dur, string &field, int n, double base);
@@ -73,15 +76,20 @@ Alg_reader::Alg_reader(istream *a_file, Alg_seq_ptr new_seq)
     tsnum = 4; // default time signature
     tsden = 4;
     seq = new_seq;
+    offset = 0.0;
+    offset_found = false;
 }
 
 
-Alg_error alg_read(istream &file, Alg_seq_ptr new_seq)
+Alg_error alg_read(istream &file, Alg_seq_ptr new_seq, double *offset_ptr)
     // read a sequence from allegro file
 {
     assert(new_seq);
     Alg_reader alg_reader(&file, new_seq);
     bool err = alg_reader.parse();
+    if (!err && offset_ptr) {
+        *offset_ptr = alg_reader.offset;
+    }
     return (err ? alg_error_syntax : alg_no_error);
 }
 
@@ -151,7 +159,7 @@ bool Alg_reader::parse()
     while (line_parser_flag) {
         bool time_flag = false;
         bool next_flag = false;
-        double next;
+        double next = 0;
         bool voice_flag = false;
         bool loud_flag = false;
         bool dur_flag = false;
@@ -159,7 +167,7 @@ bool Alg_reader::parse()
         double new_pitch = 0.0;
         bool new_key_flag = false;   // "K" syntax
         int new_key = 0;
-        Alg_parameters_ptr attributes = NULL;
+        Alg_parameters_ptr attributes = nullptr;
         if (line_parser.peek() == '#') {
             // look for #track
             line_parser.get_nonspace_quoted(field);
@@ -169,27 +177,38 @@ bool Alg_reader::parse()
                 // parse_int ignores the first character of the argument
                 track_num = parse_int(field);
                 seq->add_track(track_num);
-            }
-            // maybe we have a sequence or track name
-            line_parser.get_remainder(field);
-            // if there is a non-space character after #track n then
-            // use it as sequence or track name. Note that because we
-            // skip over spaces, a sequence or track name cannot begin
-            // with leading blanks. Another decision is that the name
-            // must be at time zero
-            if (field.length() > 0) {
-                // insert the field as sequence name or track name
-                Alg_update_ptr update = new Alg_update;
-                update->chan = -1;
-                update->time = 0;
-                update->set_identifier(-1);
-                // sequence name is whatever is on track 0
-                // other tracks have track names
-                const char *attr =
-                        (track_num == 0 ? "seqnames" : "tracknames");
-                update->parameter.set_attr(symbol_table.insert_string(attr));
-                update->parameter.s = heapify(field.c_str());
-                seq->add_event(update, track_num);
+
+                // maybe we have a sequence or track name
+                line_parser.get_remainder(field);
+                // if there is a non-space character after #track n then
+                // use it as sequence or track name. Note that because we
+                // skip over spaces, a sequence or track name cannot begin
+                // with leading blanks. Another decision is that the name
+                // must be at time zero
+                if (field.length() > 0) {
+                    // insert the field as sequence name or track name
+                    Alg_update_ptr update = new Alg_update;
+                    update->chan = -1;
+                    update->time = 0;
+                    update->set_identifier(-1);
+                    // sequence name is whatever is on track 0
+                    // other tracks have track names
+                    const char *attr =
+                            (track_num == 0 ? "seqnames" : "tracknames");
+                    update->parameter.set_attr(
+                            symbol_table.insert_string(attr));
+                    update->parameter.s = heapify(field.c_str());
+                    seq->add_event(update, track_num);
+                }
+            } else if (streql(field.c_str(), "#offset")) {
+                if (offset_found) {
+                    parse_error(field, 0, "#offset specified twice");
+                }
+                offset_found = true;
+                line_parser.get_nonspace_quoted(field); // number
+                field.insert(0, " "); // need char at beginning because
+                // parse_real ignores first character in the argument
+                offset = parse_real(field);
             }
         } else {
             // we must have a track to insert into
@@ -262,7 +281,7 @@ bool Alg_reader::parse()
                         parse_error(field, 0, "Dur specified twice");
                     } else {
                         // prepend 'U' to field, copy EOS too
-                        field.insert(0, 1, 'U');
+                        field.insert((unsigned int) 0, 1, 'U');
                         dur = parse_dur(field, time);
                         dur_flag = true;
                     }
@@ -271,7 +290,7 @@ bool Alg_reader::parse()
                         parse_error(field, 0, "Pitch specified twice");
                     } else {
                         // prepend 'P' to field
-                        field.insert(0, 1, 'P');
+                        field.insert((unsigned int) 0, 1, 'P');
                         new_pitch = parse_pitch(field);
                         new_pitch_flag = true;
                     }
@@ -280,7 +299,7 @@ bool Alg_reader::parse()
                     if (parse_attribute(field, &parm)) { // enter attribute-value pair
                         attributes = new Alg_parameters(attributes);
                         attributes->parm = parm;
-                        parm.s = NULL; // protect string from deletion by destructor
+                        parm.s = nullptr; // protect string from deletion by destructor
                     }
                 } else {
                     parse_error(field, 0, "Unknown field");
@@ -346,8 +365,8 @@ bool Alg_reader::parse()
                     note_ptr->time = time;
                     note_ptr->dur = dur;
                     note_ptr->set_identifier(key);
-                    note_ptr->pitch = pitch;
-                    note_ptr->loud = loud;
+                    note_ptr->pitch = (float) pitch;
+                    note_ptr->loud = (float) loud;
                     note_ptr->parameters = attributes;
                     seq->add_event(note_ptr, track_num); // sort later
                     if (seq->get_real_dur() < (time + dur)) seq->set_real_dur(time + dur);
@@ -378,7 +397,7 @@ bool Alg_reader::parse()
                             seq->add_event(new_upd, track_num);
                             Alg_parameters_ptr p = attributes;
                             attributes = attributes->next;
-                            p->parm.s = NULL; // so we don't delete the string
+                            p->parm.s = nullptr; // so we don't delete the string
                             delete p;
                         }
                     }
@@ -456,6 +475,7 @@ int Alg_reader::find_real_in(string &field, int n)
     // scans from offset n to the end of a real constant
     bool decimal = false;
     int len = field.length();
+    if (n < len && field[n] == '-') n += 1; // parse one minus sign
     for (int i = n; i < len; i++) {
         char c = field[i];
         if (!isdigit(c)) {
@@ -466,7 +486,7 @@ int Alg_reader::find_real_in(string &field, int n)
             }
         }
     }
-    return field.length();
+    return len;
 }
 
 
@@ -483,7 +503,7 @@ double Alg_reader::parse_real(string &field)
 }
 
 
-void Alg_reader::parse_error(string &field, long offset, const char *message)
+void Alg_reader::parse_error(string &field, long offset, char *message)
 {
     int position = line_parser.pos - field.length() + offset;
     error_flag = true;
@@ -493,6 +513,11 @@ void Alg_reader::parse_error(string &field, long offset, const char *message)
     }
     putc('^', stdout);
     printf("    %s\n", message);
+}
+
+void Alg_reader::parse_error(string &field, long offset, const char *message)
+{
+    parse_error(field, offset, const_cast<char*>(message));
 }
 
 
@@ -563,7 +588,7 @@ struct loud_lookup_struct {
     int val;
 } loud_lookup[] = { {"FFF", 127}, {"FF", 120}, {"F", 110}, {"MF", 100}, 
                     {"MP", 90}, {"P", 80}, {"PP", 70}, {"PPP", 60}, 
-                    {NULL, 0} };
+                    {nullptr, 0} };
 
 
 double Alg_reader::parse_loud(string &field)
@@ -697,7 +722,9 @@ bool Alg_reader::parse_val(Alg_parameter_ptr param, string &s, int i)
     } else if (isdigit(s[i]) || s[i] == '-' || s[i] == '.') {
         int pos = i;
         bool period = false;
+        /* int sign = 1; LMMS unused variable */
         if (s[pos] == '-') {
+            /* sign = -1; LMMS unused variable */
             pos++;
         }
         while (pos < len) {

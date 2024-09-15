@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Acid Lead" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="45" vol="66">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="45" vol="66">
       <instrument name="lb302">
         <lb302 db24="0" vcf_res="1.25" vcf_dec="0.26" dead="0" vcf_cut="0.2" vcf_mod="0.27" dist="1" slide_dec="0.19" slide="0" shape="5"/>
       </instrument>

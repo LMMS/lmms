@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef NOTE_PLAY_HANDLE_H
-#define NOTE_PLAY_HANDLE_H
+#ifndef LMMS_NOTE_PLAY_HANDLE_H
+#define LMMS_NOTE_PLAY_HANDLE_H
 
 #include <memory>
 
@@ -32,50 +32,52 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "MemoryManager.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
-typedef QList<NotePlayHandle *> NotePlayHandleList;
-typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
-
+using NotePlayHandleList = QList<NotePlayHandle*>;
+using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
-	MM_OPERATORS
 public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
 
+	// length of the declicking fade in
+	fpp_t m_fadeInLength;
+
 	// specifies origin of NotePlayHandle
-	enum Origins
+	enum class Origin
 	{
-		OriginPattern,		/*! playback of a note from a pattern */
-		OriginMidiInput,	/*! playback of a MIDI note input event */
-		OriginNoteStacking,	/*! created by note stacking instrument function */
-		OriginArpeggio,		/*! created by arpeggio instrument function */
-		OriginCount
+		MidiClip,		/*! playback of a note from a MIDI clip */
+		MidiInput,	/*! playback of a MIDI note input event */
+		NoteStacking,	/*! created by note stacking instrument function */
+		Arpeggio,		/*! created by arpeggio instrument function */
 	};
-	typedef Origins Origin;
 
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle();
+					Origin origin = Origin::MidiClip );
+	~NotePlayHandle() override;
 
 	void * operator new ( size_t size, void * p )
 	{
 		return p;
 	}
 
-	virtual void setVolume( volume_t volume );
-	virtual void setPanning( panning_t panning );
+	void setVolume( volume_t volume ) override;
+	void setPanning( panning_t panning ) override;
 
 	int midiKey() const;
 	int midiChannel() const
@@ -104,11 +106,14 @@ public:
 		return m_unpitchedFrequency;
 	}
 
+	//! Get the current per-note detuning for this note
+	float currentDetuning() const { return m_baseDetuning->value(); }
+
 	/*! Renders one chunk using the attached instrument into the buffer */
-	virtual void play( sampleFrame* buffer );
+	void play( SampleFrame* buffer ) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return m_released && framesLeft() <= 0;
 	}
@@ -120,9 +125,9 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const Track* _track ) const;
+	bool isFromTrack( const Track* _track ) const override;
 
-	/*! Releases the note (and plays release frames */
+	/*! Releases the note (and plays release frames) */
 	void noteOff( const f_cnt_t offset = 0 );
 
 	/*! Returns number of frames to be played until the note is going to be released */
@@ -228,32 +233,32 @@ public:
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
 
-	/*! Returns whether NotePlayHandle belongs to BB track and BB track is muted */
-	bool isBbTrackMuted()
+	/*! Returns whether NotePlayHandle belongs to pattern track and pattern track is muted */
+	bool isPatternTrackMuted()
 	{
-		return m_bbTrack && m_bbTrack->isMuted();
+		return m_patternTrack && m_patternTrack->isMuted();
 	}
 
-	/*! Sets attached BB track */
-	void setBBTrack( Track* t )
+	/*! Sets attached pattern track */
+	void setPatternTrack(Track* t)
 	{
-		m_bbTrack = t;
+		m_patternTrack = t;
 	}
 
 	/*! Process note detuning automation */
-	void processMidiTime( const MidiTime& time );
+	void processTimePos(const TimePos& time, float pitchValue, bool isRecording);
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
-	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
-	void setSongGlobalParentOffset( const MidiTime& offset )
+	/*! Set song-global offset (relative to containing MIDI clip) in order to properly perform the note detuning */
+	void setSongGlobalParentOffset( const TimePos& offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
 	/*! Returns song-global offset */
-	const MidiTime& songGlobalParentOffset() const
+	const TimePos& songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -266,7 +271,6 @@ public:
 private:
 	class BaseDetuning
 	{
-		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -308,7 +312,7 @@ private:
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	Track* m_bbTrack;						// related BB track
+	Track* m_patternTrack;						// related pattern track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
@@ -320,7 +324,7 @@ private:
 	float m_unpitchedFrequency;
 
 	BaseDetuning* m_baseDetuning;
-	MidiTime m_songGlobalParentOffset;
+	TimePos m_songGlobalParentOffset;
 
 	int m_midiChannel;
 	Origin m_origin;
@@ -334,18 +338,18 @@ const int NPH_CACHE_INCREMENT = 16;
 
 class NotePlayHandleManager
 {
-	MM_OPERATORS
 public:
 	static void init();
 	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+					NotePlayHandle::Origin origin = NotePlayHandle::Origin::MidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
+	static void free();
 
 private:
 	static NotePlayHandle ** s_available;
@@ -355,4 +359,6 @@ private:
 };
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_NOTE_PLAY_HANDLE_H

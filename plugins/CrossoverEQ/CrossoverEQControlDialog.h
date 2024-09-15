@@ -27,24 +27,29 @@
 #ifndef CROSSOVEREQ_CONTROL_DIALOG_H
 #define CROSSOVEREQ_CONTROL_DIALOG_H
 
-#include <QPixmap>
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class CrossoverEQControls;
+
+
+namespace gui
+{
 
 class CrossoverEQControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	CrossoverEQControlDialog( CrossoverEQControls * controls );
-	virtual ~CrossoverEQControlDialog()
-	{
-	}
-	
-private:
-	QPixmap m_fader_bg;
-	QPixmap m_fader_empty;
-	QPixmap m_fader_knob;
+	~CrossoverEQControlDialog() override = default;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

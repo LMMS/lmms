@@ -1,5 +1,5 @@
 /*
- * PluginBrowser.h - include file for pluginBrowser
+ * PluginBrowser.h - include file for PluginBrowser
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,10 +22,9 @@
  *
  */
 
-#ifndef PLUGIN_BROWSER_H
-#define PLUGIN_BROWSER_H
+#ifndef LMMS_GUI_PLUGIN_BROWSER_H
+#define LMMS_GUI_PLUGIN_BROWSER_H
 
-#include <QtCore/QTimer>
 #include <QPixmap>
 
 #include "SideBarWidget.h"
@@ -33,15 +32,16 @@
 
 class QLineEdit;
 class QTreeWidget;
-class QTreeWidgetItem;
 
+namespace lmms::gui
+{
 
 class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
 	PluginBrowser( QWidget * _parent );
-	virtual ~PluginBrowser() = default;
+	~PluginBrowser() override = default;
 
 private slots:
 	void onFilterChanged( const QString & filter );
@@ -53,27 +53,24 @@ private:
 
 	QWidget * m_view;
 	QTreeWidget * m_descTree;
-	QTreeWidgetItem * m_lmmsRoot;
-	QTreeWidgetItem * m_lv2Root;
 };
-
-
 
 
 class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
 	QString name() const;
-
+	void openInNewInstrumentTrack(QString value);
 
 protected:
 	void enterEvent( QEvent * _e ) override;
 	void leaveEvent( QEvent * _e ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
+	void contextMenuEvent(QContextMenuEvent* e) override;
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
@@ -85,4 +82,6 @@ private:
 };
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_PLUGIN_BROWSER_H

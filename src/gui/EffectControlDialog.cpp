@@ -23,27 +23,22 @@
  *
  */
 
-#include <QMessageBox>
 #include <QCloseEvent>
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
 
+namespace lmms::gui
+{
+
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
-	QWidget( NULL ),
+	QWidget( nullptr ),
 	ModelView( _controls, this ),
 	m_effectControls( _controls )
 {
 	setWindowTitle( m_effectControls->effect()->displayName() );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-}
-
-
-
-
-EffectControlDialog::~EffectControlDialog()
-{
 }
 
 
@@ -56,6 +51,4 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-
-
-
+} // namespace lmms::gui

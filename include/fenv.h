@@ -45,4 +45,4 @@ inline int fedisableexcept(unsigned int excepts)
     return fesetenv(&fenv) ? -1 : old_excepts;
 }
 
-#endif
+#endif // defined(__APPLE__) && defined(__MACH__)

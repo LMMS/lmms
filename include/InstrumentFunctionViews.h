@@ -22,34 +22,39 @@
  *
  */
 
-#ifndef INSTRUMENT_FUNCTION_VIEWS_H
-#define INSTRUMENT_FUNCTION_VIEWS_H
+#ifndef LMMS_INSTRUMENT_FUNCTION_VIEWS_H
+#define LMMS_INSTRUMENT_FUNCTION_VIEWS_H
 
 #include "ModelView.h"
 
 #include <QWidget>
 
 class QLabel;
+
+namespace lmms
+{
+
+class InstrumentFunctionArpeggio;
+class InstrumentFunctionNoteStacking;
+
+namespace gui
+{
+
 class ComboBox;
 class GroupBox;
 class Knob;
 class TempoSyncKnob;
 
-class InstrumentFunctionArpeggio;
-class InstrumentFunctionNoteStacking;
-
-
-
 class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = NULL );
-	virtual ~InstrumentFunctionNoteStackingView();
+	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = nullptr );
+	~InstrumentFunctionNoteStackingView() override;
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	InstrumentFunctionNoteStacking * m_cc;
 
@@ -67,17 +72,18 @@ class InstrumentFunctionArpeggioView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = NULL );
-	virtual ~InstrumentFunctionArpeggioView();
+	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = nullptr );
+	~InstrumentFunctionArpeggioView() override;
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	InstrumentFunctionArpeggio * m_a;
 	GroupBox * m_arpGroupBox;
 	ComboBox * m_arpComboBox;
 	Knob * m_arpRangeKnob;
+	Knob * m_arpRepeatsKnob;
 	Knob * m_arpCycleKnob;
 	Knob * m_arpSkipKnob;
 	Knob * m_arpMissKnob;
@@ -89,5 +95,8 @@ private:
 
 } ;
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_INSTRUMENT_FUNCTION_VIEWS_H

@@ -8,7 +8,7 @@
         <bbtrack>
           <trackcontainer visible="1" width="580" height="249" type="bbtrackcontainer" x="426" y="182" maximized="0" minimized="0">
             <track type="0" muted="0" name="Jupiter" solo="0">
-              <instrumenttrack pitch="0" vol="29" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="29" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="tripleoscillator">
                   <tripleoscillator finel0="0" vol1="100" finel1="-16" coarse0="0" finer0="0" vol2="63" pan0="0" finer1="13" coarse1="0" finel2="0" pan1="0" coarse2="12" finer2="0" pan2="0" wavetype0="2" wavetype1="2" wavetype2="3" phoffset0="0" phoffset1="266" phoffset2="80" modalgo1="2" modalgo2="0" modalgo3="2" stphdetun0="121" stphdetun1="259" stphdetun2="92" userwavefile0="" userwavefile1="" userwavefile2="samples/shapes/smooth_inv_saw.ogg" vol0="100"/>
                 </instrument>
@@ -67,11 +67,11 @@
       <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
       <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
     </track>
-    <fxmixer visible="1" width="647" height="332" x="9" y="441" maximized="0" minimized="0">
-      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+    <mixer visible="1" width="647" height="332" x="9" y="441" maximized="0" minimized="0">
+      <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <ControllerRackView visible="1" width="258" height="173" x="664" y="444" maximized="0" minimized="0"/>
     <pianoroll visible="0" width="640" height="480" x="1" y="1" maximized="1" minimized="0"/>
     <automationeditor visible="0" width="640" height="400" x="356" y="129" maximized="0" minimized="0"/>

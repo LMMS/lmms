@@ -23,23 +23,28 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_VIEW_H
-#define ENVELOPE_AND_LFO_VIEW_H
+#ifndef LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H
+#define LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H
 
 #include <QWidget>
 
 #include "ModelView.h"
 
-class QPaintEvent;
-class QPixmap;
+namespace lmms
+{
 
 class EnvelopeAndLfoParameters;
+
+namespace gui
+{
 
 class automatableButtonGroup;
 class Knob;
 class LedCheckBox;
 class PixmapButton;
 class TempoSyncKnob;
+class EnvelopeGraph;
+class LfoGraph;
 
 
 
@@ -48,16 +53,14 @@ class EnvelopeAndLfoView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	EnvelopeAndLfoView( QWidget * _parent );
-	virtual ~EnvelopeAndLfoView();
+	~EnvelopeAndLfoView() override;
 
 
 protected:
-	virtual void modelChanged();
+	void modelChanged() override;
 
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 protected slots:
@@ -65,13 +68,10 @@ protected slots:
 
 
 private:
-	static QPixmap * s_envGraph;
-	static QPixmap * s_lfoGraph;
-
 	EnvelopeAndLfoParameters * m_params;
 
-
 	// envelope stuff
+	EnvelopeGraph* m_envelopeGraph;
 	Knob * m_predelayKnob;
 	Knob * m_attackKnob;
 	Knob * m_holdKnob;
@@ -81,6 +81,7 @@ private:
 	Knob * m_amountKnob;
 
 	// LFO stuff
+	LfoGraph* m_lfoGraph;
 	Knob * m_lfoPredelayKnob;
 	Knob * m_lfoAttackKnob;
 	TempoSyncKnob * m_lfoSpeedKnob;
@@ -90,8 +91,10 @@ private:
 
 	LedCheckBox * m_x100Cb;
 	LedCheckBox * m_controlEnvAmountCb;
-	
-	float m_randomGraph;
 } ;
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H

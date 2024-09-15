@@ -28,13 +28,13 @@
 #include <QBuffer>
 #include <QDataStream>
 
-namespace base64
+namespace lmms::base64
 {
 
 
 QVariant decode( const QString & _b64, QVariant::Type _force_type )
 {
-	char * dst = NULL;
+	char * dst = nullptr;
 	int dsize = 0;
 	base64::decode( _b64, &dst, &dsize );
 	QByteArray ba( dst, dsize );
@@ -54,5 +54,4 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 }
 
 
-} ;
-
+} // namespace lmms::base64

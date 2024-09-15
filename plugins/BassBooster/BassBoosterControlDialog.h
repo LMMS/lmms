@@ -27,19 +27,26 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
 
 class BassBoosterControls;
 
+namespace gui
+{
 
 class BassBoosterControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	BassBoosterControlDialog( BassBoosterControls* controls );
-	virtual ~BassBoosterControlDialog()
-	{
-	}
+	~BassBoosterControlDialog() override = default;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

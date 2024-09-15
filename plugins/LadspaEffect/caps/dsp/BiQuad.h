@@ -77,9 +77,9 @@ class BiQuad
 
 		inline sample_t process (sample_t s)
 			{
-				register int z = h;
+				int z = h;
 
-				register sample_t r = s * a[0];
+				sample_t r = s * a[0];
 				
 				r += a[1] * x[z];
 				r += b[1] * y[z];
@@ -101,9 +101,9 @@ class BiQuad
 		 * case */
 		inline sample_t process_0_1()
 			{
-				register int z = h;
+				int z = h;
 
-				register sample_t r = 0;
+				sample_t r = 0;
 				
 				r += a[1] * x[z];
 				r += b[1] * y[z];
@@ -122,9 +122,9 @@ class BiQuad
 
 		inline sample_t process_0_2()
 			{
-				register int z = h;
+				int z = h;
 
-				register sample_t r = 0;
+				sample_t r = 0;
 				
 				r += b[1] * y[z];
 
@@ -142,9 +142,9 @@ class BiQuad
 
 		inline sample_t process_0_3()
 			{
-				register int z = h;
+				int z = h;
 
-				register sample_t r = 0;
+				sample_t r = 0;
 				
 				r += b[1] * y[z];
 
