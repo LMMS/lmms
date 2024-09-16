@@ -60,7 +60,7 @@ struct ExSyncCallbacks
 	//! @playing [true : to start; false : to pause] 
 	void (* mode)(bool playing); 
 	//! change position to @frames;
-	void (* position)(uint32_t frames);
+	void (* position)(f_cnt_t frames);
 	//! to calculate frames from time (not used here - jack is working in frames)
 	sample_rate_t (* processingSampleRate)();
 };
@@ -221,7 +221,7 @@ static void exSyncMode(bool playing)
 }
 
 
-static void exSyncPosition(uint32_t frames)
+static void exSyncPosition(f_cnt_t frames)
 {
 	auto lSong = Engine::getSong();
 
@@ -269,6 +269,56 @@ struct ExSyncHandler * exSyncGetHandler()
 {
 	return &s_handler;
 }
+
+
+
+
+
+/* ExternalSync LMMS handler for target be able to control LMMS
+ *  
+ */ 
+
+static void startLMMS()
+{
+	exSyncMode(true);
+}
+
+static void stopLMMS()
+{
+	exSyncMode(false);
+}
+
+
+static unsigned short getLMMSPosition(struct SongExtendedPos *position)
+{
+	auto lSong = Engine::getSong();
+	//
+	position->bar = lSong->getBars();
+	position->beat = lSong->getBeat();
+	position->tick = lSong->getBeatTicks();
+	position->barStartTick = lSong->getTicks();
+	position->beatsPerBar = lSong->getTimeSigModel().numeratorModel().value();
+	position->beatType = lSong->getTimeSigModel().denominatorModel().value();
+	position->ticksPerBeat = lSong->getPlayPos().ticksPerBeat( lSong->getTimeSigModel() );
+	position->tempo = lSong->getTempo();
+	position->frame = lSong->getFrames();
+	//
+	return (unsigned short) SyncHandler::All;
+}
+
+
+static struct SyncHandler s_LMMSSyncHandler = {
+	&startLMMS,
+	&stopLMMS,
+	&exSyncPosition,
+	&getLMMSPosition
+};
+
+struct SyncHandler *getLMMSSyncHandler()
+{
+	return &s_LMMSSyncHandler;
+}
+
 
 
 /* class ExSyncHook: public part */
@@ -350,7 +400,7 @@ SyncCtl::SyncMode SyncCtl::toggleMode()
 	{
 		return s_SyncMode;
 	}
-	// Make state change (Master -> Slave -> Duplex -> Master -> ...)
+	// Make state change (Leader -> Follower -> Duplex -> Leader -> ...)
 	switch(s_SyncMode)
 	{
 	case Duplex: // Duplex -> Leader

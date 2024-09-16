@@ -33,7 +33,7 @@ namespace lmms
 {
 
 // Common target independent part:
-//! ExSync sending code provide all fields (for future), but here used only @frame
+//! LMMS and Jack ExternalSync provide all fields, but here used only @frame
 struct SongExtendedPos
 {
 	bar_t bar;
@@ -65,7 +65,46 @@ struct ExSyncHandler
 struct ExSyncHandler * exSyncGetHandler();
 
 
-/* ExSync implementation (not ExSync API part): 
+/* ExternalSync API main part: 
+ * - this structure is provided by LMMS to implement Follower mode;
+ * - must be provided by target (plugin, external device, ...)
+ *   so LMMS can control it it Leader mode; 
+ */
+
+
+struct SyncHandler
+{
+	enum GetPositionFlags
+	{
+		On = 1,
+		Frame = 1 << 1,
+		Tick = 1 << 2,
+		Beat = 1 << 3,
+		Bar = 1 << 4,
+		Tempo = 1 << 5,
+		BarStartTick = 1 << 6,
+		TicksPerBeat = 1 << 7,
+		BeatsPerBar = 1 << 8, 
+		BeatType = 1 << 9,
+		All = 0xFFFF,
+		No = 0
+	};
+	void (* start)();
+	void (* stop)();
+	void (* jump)(f_cnt_t frame);
+	unsigned short (* getPosition)(struct SongExtendedPos *position);
+};
+
+
+/* ExternalSync LMMS handler for target be able to control LMMS
+ *  
+ */ 
+
+
+struct SyncHandler *getLMMSSyncHandler();
+
+
+/* ExternalSync implementation (not ExternalSync API part): 
  * semi private - do not use (except bug-fix or refactoring context) 
  */
 
