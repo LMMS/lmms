@@ -1,7 +1,7 @@
 /*
- * noise.cpp - defination of Noise class.
+ * Metronome.h
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,25 +22,22 @@
  *
  */
 
-#include "Noise.h"
-#include "lmms_math.h"
+#ifndef LMMS_METRONOME_H
+#define LMMS_METRONOME_H
 
-namespace lmms
+#include <cstddef>
+
+namespace lmms {
+class Metronome
 {
+public:
+	bool active() const { return m_active; }
+	void setActive(bool active) { m_active = active; }
+	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset);
 
-
-Noise::Noise()
-{
-	inv_randmax = FAST_RAND_RATIO; /* for range of 0 - 1.0 */
-}
-
-
-
-
-float Noise::tick()
-{
-	return fastRandf(2.0f) - 1.0f;
-}
-
-
+private:
+	bool m_active = false;
+};
 } // namespace lmms
+
+#endif // LMMS_METRONOME_H
