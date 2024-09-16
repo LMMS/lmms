@@ -97,13 +97,13 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 							Model * _parent ) :
 	Model( _parent ),
 	m_used( false ),
-	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
-	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
-	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env hold" ) ),
-	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env decay" ) ),
-	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Env sustain" ) ),
-	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Env release" ) ),
-	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Env mod amount" ) ),
+	m_predelayModel(0.f, 0.f, 2.f, 0.001f, this, tr("Env pre-delay")),
+	m_attackModel(0.f, 0.f, 2.f, 0.001f, this, tr("Env attack")),
+	m_holdModel(0.5f, 0.f, 2.f, 0.001f, this, tr("Env hold")),
+	m_decayModel(0.5f, 0.f, 2.f, 0.001f, this, tr("Env decay")),
+	m_sustainModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Env sustain")),
+	m_releaseModel(0.1f, 0.f, 2.f, 0.001f, this, tr("Env release")),
+	m_amountModel(0.f, -1.f, 1.f, 0.005f, this, tr("Env mod amount")),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
@@ -111,12 +111,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_rEnv( nullptr ),
 	m_pahdBufSize( 0 ),
 	m_rBufSize( 0 ),
-	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO pre-delay" ) ),
-	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO attack" ) ),
-	m_lfoSpeedModel( 0.1, 0.001, 1.0, 0.0001,
-				SECS_PER_LFO_OSCILLATION * 1000.0, this,
-							tr( "LFO frequency" ) ),
-	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
+	m_lfoPredelayModel(0.f, 0.f, 1.f, 0.001f, this, tr("LFO pre-delay")),
+	m_lfoAttackModel(0.f, 0.f, 1.f, 0.001f, this, tr("LFO attack")),
+	m_lfoSpeedModel(0.1f, 0.001f, 1.f, 0.0001f,
+				SECS_PER_LFO_OSCILLATION * 1000.f, this,
+							tr("LFO frequency")),
+	m_lfoAmountModel(0.f, -1.f, 1.f, 0.005f, this, tr("LFO mod amount")),
 	m_lfoWaveModel( static_cast<int>(LfoShape::SineWave), 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
 	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
@@ -298,11 +298,6 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 						const fpp_t _frames )
 {
 	QMutexLocker m(&m_paramMutex);
-
-	if( _frame < 0 || _release_begin < 0 )
-	{
-		return;
-	}
 
 	fillLfoLevel( _buf, _frame, _frames );
 

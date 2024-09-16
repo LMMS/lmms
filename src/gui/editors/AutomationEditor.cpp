@@ -120,7 +120,7 @@ AutomationEditor::AutomationEditor() :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
-	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
+	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
@@ -2107,7 +2107,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
 	{
-		m_editor->m_zoomingXModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_editor->m_zoomingXModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_editor->m_zoomingXModel.setValue( m_editor->m_zoomingXModel.findText( "100%" ) );
 

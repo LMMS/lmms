@@ -28,11 +28,7 @@
 #include <chrono>
 #include <lmmsconfig.h>
 
-#ifdef __MINGW32__
-#include <mingw.thread.h>
-#else
 #include <thread>
-#endif
 
 namespace lmms {
 FileSearch::FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions,

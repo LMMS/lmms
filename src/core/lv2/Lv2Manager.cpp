@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.cpp - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -36,6 +36,7 @@
 #include <QElapsedTimer>
 
 #include "AudioEngine.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
 #include "Lv2ControlBase.h"
@@ -47,7 +48,7 @@ namespace lmms
 {
 
 
-const std::set<std::string_view> Lv2Manager::pluginBlacklist =
+const std::set<std::string_view> Lv2Manager::unstablePlugins =
 {
 	// github.com/calf-studio-gear/calf, #278
 	"http://calf.sourceforge.net/plugins/Analyzer",
@@ -67,7 +68,13 @@ const std::set<std::string_view> Lv2Manager::pluginBlacklist =
 	"http://drobilla.net/plugins/blop/square",
 	"http://drobilla.net/plugins/blop/triangle",
 
-	// Visualization, meters, and scopes etc., won't work until we have gui support
+	// unstable
+	"urn:juced:DrumSynth"
+};
+
+const std::set<std::string_view> Lv2Manager::pluginsOnlyUsefulWithUi =
+{
+	// Visualization, meters, and scopes etc., won't work if UI is disabled
 	"http://distrho.sf.net/plugins/ProM",
 	"http://distrho.sf.net/plugins/glBars",
 	"http://gareus.org/oss/lv2/meters#spectr30mono",
@@ -132,13 +139,10 @@ const std::set<std::string_view> Lv2Manager::pluginBlacklist =
 	"urn:juce:TalFilter2",
 	"urn:juce:Vex",
 	"http://zynaddsubfx.sourceforge.net",
-	"http://geontime.com/geonkick/single",
-
-	// unstable
-	"urn:juced:DrumSynth"
+	"http://geontime.com/geonkick/single"
 };
 
-const std::set<std::string_view> Lv2Manager::pluginBlacklistBuffersizeLessThan32 =
+const std::set<std::string_view> Lv2Manager::unstablePluginsBuffersizeLessEqual32 =
 {
 	"http://moddevices.com/plugins/mod-devel/2Voices",
 	"http://moddevices.com/plugins/mod-devel/Capo",
@@ -237,7 +241,7 @@ void Lv2Manager::initPlugins()
 	QElapsedTimer timer;
 	timer.start();
 
-	unsigned blacklisted = 0;
+	unsigned blocked = 0;
 	LILV_FOREACH(plugins, itr, plugins)
 	{
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
@@ -266,9 +270,9 @@ void Lv2Manager::initPlugins()
 		{
 			if(std::any_of(issues.begin(), issues.end(),
 				[](const PluginIssue& iss) {
-				return iss.type() == PluginIssueType::Blacklisted; }))
+				return iss.type() == PluginIssueType::Blocked; }))
 			{
-				++blacklisted;
+				++blocked;
 			}
 		}
 		++pluginCount;
@@ -295,19 +299,19 @@ void Lv2Manager::initPlugins()
 	}
 
 	// TODO: might be better in the LMMS core
-	if(Engine::ignorePluginBlacklist())
+	if(ConfigManager::enableBlockedPlugins())
 	{
 		qWarning() <<
-			"WARNING! Plugin blacklist disabled! If you want to use the blacklist,\n"
-			"  please set environment variable \"LMMS_IGNORE_BLACKLIST\" to empty or\n"
+			"WARNING! Blocked plugins enabled! If you want to disable them,\n"
+			"  please set environment variable \"LMMS_ENABLE_BLOCKED_PLUGINS\" to empty or\n"
 			"  do not set it.";
 	}
-	else if(blacklisted > 0)
+	else if(blocked > 0)
 	{
 		qDebug() <<
-			"Lv2 Plugins blacklisted:" << blacklisted << "of" << pluginCount << "\n"
-			"  If you want to ignore the blacklist (dangerous!), please set\n"
-			"  environment variable \"LMMS_IGNORE_BLACKLIST\" to nonempty.";
+			"Blocked Lv2 Plugins:" << blocked << "of" << pluginCount << "\n"
+			"  If you want to enable them (dangerous!), please set\n"
+			"  environment variable \"LMMS_ENABLE_BLOCKED_PLUGINS\" to nonempty.";
 	}
 }
 
@@ -326,6 +330,14 @@ AutoLilvNodes Lv2Manager::findNodes(const LilvNode *subject,
 	const LilvNode *predicate, const LilvNode *object)
 {
 	return AutoLilvNodes(lilv_world_find_nodes (m_world, subject, predicate, object));
+}
+
+
+
+
+bool Lv2Manager::wantUi()
+{
+	return false;
 }
 
 

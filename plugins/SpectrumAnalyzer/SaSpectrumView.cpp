@@ -302,7 +302,7 @@ void SaSpectrumView::refreshPaths()
 // part new, part old. At reasonable frame rate, such difference is invisible..
 void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer)
 {
-	for (int n = 0; n < m_processor->binCount(); n++)
+	for (auto n = std::size_t{0}; n < m_processor->binCount(); n++)
 	{
 		// Update the exponential average if enabled, or simply copy the value.
 		if (!m_controls->m_pauseModel.value())
@@ -742,7 +742,7 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 
 	// Generate n dB increments, start checking at -90 dB. Limits are tweaked
 	// just a little bit to make sure float comparisons do not miss edges.
-	for (float i = 0.000000001; 10 * log10(i) <= (high + 0.001); i *= increment)
+	for (float i = 0.000000001f; 10 * log10(i) <= (high + 0.001); i *= increment)
 	{
 		if (10 * log10(i) >= (low - 0.001))
 		{

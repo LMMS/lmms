@@ -91,7 +91,7 @@ inline void DynProcEffect::calcRelease()
 }
 
 
-bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
+bool DynProcEffect::processAudioBuffer( SampleFrame* _buf,
 							const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )

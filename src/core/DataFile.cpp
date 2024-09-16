@@ -84,7 +84,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
-	&DataFile::upgrade_fixCMTDelays
+	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
+	&DataFile::findProblematicLadspaPlugins
 };
 
 // Vector of all versions that have upgrade routines.
@@ -413,7 +414,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	if (!outfile.commit())
 	{
 		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("An unknown error has occured and the file could not be saved."));
+			SongEditor::tr("An unknown error has occurred and the file could not be saved."));
 		return false;
 	}
 
@@ -637,6 +638,32 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 			}
 		}
 		node = node.nextSibling();
+	}
+}
+
+void DataFile::mapSrcAttributeInElementsWithResources(const QMap<QString, QString>& map)
+{
+	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	{
+		auto elements = elementsByTagName(elem);
+
+		for (const auto& srcAttr : srcAttrs)
+		{
+			for (int i = 0; i < elements.length(); ++i)
+			{
+				auto item = elements.item(i).toElement();
+
+				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
+
+				const QString srcVal = item.attribute(srcAttr);
+
+				const auto it = map.constFind(srcVal);
+				if (it != map.constEnd())
+				{
+					item.setAttribute(srcAttr, *it);
+				}
+			}
+		}
 	}
 }
 
@@ -1046,7 +1073,6 @@ void DataFile::upgrade_0_4_0_rc2()
 	}
 }
 
-
 void DataFile::upgrade_1_0_99()
 {
 	jo_id_t last_assigned_id = 0;
@@ -1158,7 +1184,7 @@ static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
 		int syncmode = el.attribute( "syncmode" ).toInt();
 		QStringList names;
 		QDomNamedNodeMap atts = el.attributes();
-		for( uint i = 0; i < atts.length(); i++ )
+		for (auto i = 0; i < atts.length(); i++)
 		{
 			QString name = atts.item( i ).nodeName();
 			if( name.endsWith( "_numerator" ) )
@@ -1871,68 +1897,64 @@ void DataFile::upgrade_sampleAndHold()
 }
 
 
+static QMap<QString, QString> buildReplacementMap()
+{
+	static constexpr auto loopBPMs = std::array{
+		std::pair{"bassloops/briff01", "140"},
+		std::pair{"bassloops/briff01", "140"},
+		std::pair{"bassloops/rave_bass01", "180"},
+		std::pair{"bassloops/rave_bass02", "180"},
+		std::pair{"bassloops/tb303_01", "123"},
+		std::pair{"bassloops/techno_bass01", "140"},
+		std::pair{"bassloops/techno_bass02", "140"},
+		std::pair{"bassloops/techno_synth01", "140"},
+		std::pair{"bassloops/techno_synth02", "140"},
+		std::pair{"bassloops/techno_synth03", "130"},
+		std::pair{"bassloops/techno_synth04", "140"},
+		std::pair{"beats/909beat01", "122"},
+		std::pair{"beats/break01", "168"},
+		std::pair{"beats/break02", "141"},
+		std::pair{"beats/break03", "168"},
+		std::pair{"beats/electro_beat01", "120"},
+		std::pair{"beats/electro_beat02", "119"},
+		std::pair{"beats/house_loop01", "142"},
+		std::pair{"beats/jungle01", "168"},
+		std::pair{"beats/rave_hihat01", "180"},
+		std::pair{"beats/rave_hihat02", "180"},
+		std::pair{"beats/rave_kick01", "180"},
+		std::pair{"beats/rave_kick02", "180"},
+		std::pair{"beats/rave_snare01", "180"},
+		std::pair{"latin/latin_brass01", "140"},
+		std::pair{"latin/latin_guitar01", "126"},
+		std::pair{"latin/latin_guitar02", "140"},
+		std::pair{"latin/latin_guitar03", "120"},
+	};
+
+	QMap<QString, QString> namesToNamesWithBPMsMap;
+
+	auto insertEntry = [&namesToNamesWithBPMsMap](const QString& originalName, const QString& bpm, const QString& prefix = "", const QString& extension = "ogg")
+	{
+		const QString original = prefix + originalName + "." + extension;
+		const QString replacement = prefix + originalName + " - " + bpm + " BPM." + extension;
+
+		namesToNamesWithBPMsMap.insert(original, replacement);
+	};
+
+	for (const auto & loopBPM : loopBPMs)
+	{
+		insertEntry(loopBPM.first, loopBPM.second);
+		insertEntry(loopBPM.first, loopBPM.second, "factorysample:");
+	}
+
+	return namesToNamesWithBPMsMap;
+}
+
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	auto createEntry = [](const QString& originalName, const QString& bpm, const QString& extension = "ogg")
-	{
-		const QString replacement = originalName + " - " + bpm + " BPM." + extension;
-		return std::pair{originalName + "." + extension, replacement};
-	};
+	static const QMap<QString, QString> namesToNamesWithBPMsMap = buildReplacementMap();
 
-	static const QMap<QString, QString> namesToNamesWithBPMsMap {
-		{ createEntry("bassloops/briff01", "140") },
-		{ createEntry("bassloops/rave_bass01", "180") },
-		{ createEntry("bassloops/rave_bass02", "180") },
-		{ createEntry("bassloops/tb303_01", "123") },
-		{ createEntry("bassloops/techno_bass01", "140") },
-		{ createEntry("bassloops/techno_bass02", "140") },
-		{ createEntry("bassloops/techno_synth01", "140") },
-		{ createEntry("bassloops/techno_synth02", "140") },
-		{ createEntry("bassloops/techno_synth03", "130") },
-		{ createEntry("bassloops/techno_synth04", "140") },
-		{ createEntry("beats/909beat01", "122") },
-		{ createEntry("beats/break01", "168") },
-		{ createEntry("beats/break02", "141") },
-		{ createEntry("beats/break03", "168") },
-		{ createEntry("beats/electro_beat01", "120") },
-		{ createEntry("beats/electro_beat02", "119") },
-		{ createEntry("beats/house_loop01", "142") },
-		{ createEntry("beats/jungle01", "168") },
-		{ createEntry("beats/rave_hihat01", "180") },
-		{ createEntry("beats/rave_hihat02", "180") },
-		{ createEntry("beats/rave_kick01", "180") },
-		{ createEntry("beats/rave_kick02", "180") },
-		{ createEntry("beats/rave_snare01", "180") },
-		{ createEntry("latin/latin_brass01", "140") },
-		{ createEntry("latin/latin_guitar01", "126") },
-		{ createEntry("latin/latin_guitar02", "140") },
-		{ createEntry("latin/latin_guitar03", "120") }
-	};
-
-	// Replace loop sample names
-	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
-	{
-		auto elements = elementsByTagName(elem);
-
-		for (const auto& srcAttr : srcAttrs)
-		{
-			for (int i = 0; i < elements.length(); ++i)
-			{
-				auto item = elements.item(i).toElement();
-
-				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
-
-				const QString srcVal = item.attribute(srcAttr);
-
-				const auto it = namesToNamesWithBPMsMap.constFind(srcVal);
-				if (it != namesToNamesWithBPMsMap.constEnd())
-				{
-					item.setAttribute(srcAttr, *it);
-				}
-			}
-		}
-	}
+	mapSrcAttributeInElementsWithResources(namesToNamesWithBPMsMap);
 }
 
 //! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
@@ -1955,6 +1977,57 @@ void DataFile::upgrade_midiCCIndexing()
 			}
 		}
 	}
+}
+
+void DataFile::findProblematicLadspaPlugins()
+{
+	// This is not an upgrade but a check for potentially problematic LADSPA
+	// controls. See #5738 for more details.
+
+	const QDomNodeList ladspacontrols = elementsByTagName("ladspacontrols");
+
+	uint numberOfProblematicPlugins = 0;
+
+	for (int i = 0; i < ladspacontrols.size(); ++i)
+	{
+		const QDomElement ladspacontrol = ladspacontrols.item(i).toElement();
+
+		const auto attributes = ladspacontrol.attributes();
+		for (int j = 0; j < attributes.length(); ++j)
+		{
+			const auto attribute = attributes.item(j);
+			const auto name = attribute.nodeName();
+			if (name != "ports" && name.startsWith("port"))
+			{
+				++numberOfProblematicPlugins;
+				break;
+			}
+		}
+	}
+
+	if (numberOfProblematicPlugins > 0)
+	{
+		QMessageBox::warning(nullptr, QObject::tr("LADSPA plugins"),
+			QObject::tr("The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.").arg(numberOfProblematicPlugins));
+	}
+}
+
+void DataFile::upgrade_fixBassLoopsTypo()
+{
+	static const QMap<QString, QString> replacementMap = {
+		{ "bassloopes/briff01.ogg", "bassloops/briff01 - 140 BPM.ogg" },
+		{ "bassloopes/rave_bass01.ogg", "bassloops/rave_bass01 - 180 BPM.ogg" },
+		{ "bassloopes/rave_bass02.ogg", "bassloops/rave_bass02 - 180 BPM.ogg" },
+		{ "bassloopes/tb303_01.ogg","bassloops/tb303_01 - 123 BPM.ogg" },
+		{ "bassloopes/techno_bass01.ogg", "bassloops/techno_bass01 - 140 BPM.ogg" },
+		{ "bassloopes/techno_bass02.ogg", "bassloops/techno_bass02 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth01.ogg", "bassloops/techno_synth01 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth02.ogg", "bassloops/techno_synth02 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth03.ogg", "bassloops/techno_synth03 - 130 BPM.ogg" },
+		{ "bassloopes/techno_synth04.ogg", "bassloops/techno_synth04 - 140 BPM.ogg" }
+	};
+
+	mapSrcAttributeInElementsWithResources(replacementMap);
 }
 
 void DataFile::upgrade()
