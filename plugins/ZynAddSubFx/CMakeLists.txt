@@ -134,7 +134,7 @@ target_link_libraries(ZynAddSubFxCore INTERFACE
 
 # Workaround for a build fail on MSVC with Qt 6
 IF(MSVC)
-	TARGET_COMPILE_OPTIONS(ZynAddSubFxCoreObjs PUBLIC "/Zc:__cplusplus" "/permissive-")
+	TARGET_COMPILE_OPTIONS(ZynAddSubFxCore PUBLIC "/Zc:__cplusplus" "/permissive-")
 ENDIF()
 
 LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
