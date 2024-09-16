@@ -48,7 +48,7 @@
 #include "Clipboard.h"
 
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "plugin_export.h"
 
 namespace lmms

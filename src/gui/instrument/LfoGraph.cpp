@@ -32,7 +32,7 @@
 #include "Oscillator.h"
 #include "ColorHelper.h"
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 namespace lmms
 {

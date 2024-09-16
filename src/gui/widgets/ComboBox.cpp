@@ -32,7 +32,7 @@
 #include <QScreen>
 
 #include "CaptionMenu.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 #define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 #if !QT_SUPPORTS_WIDGET_SCREEN

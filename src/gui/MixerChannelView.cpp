@@ -32,7 +32,7 @@
 #include "Song.h"
 #include "ConfigManager.h"
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "lmms_math.h"
 
 #include <QGraphicsProxyWidget>

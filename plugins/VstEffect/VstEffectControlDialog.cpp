@@ -33,7 +33,7 @@
 #include "PixmapButton.h"
 #include "embed.h"
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include <QToolBar>
 #include <QLabel>
 

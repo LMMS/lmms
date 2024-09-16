@@ -50,7 +50,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"

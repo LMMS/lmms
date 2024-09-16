@@ -31,7 +31,7 @@
 
 #include "ComboBox.h"
 #include "DataFile.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "PixmapButton.h"
 #include "SampleLoader.h"
 #include "Song.h"

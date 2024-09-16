@@ -64,7 +64,7 @@
 #include "TimeLineWidget.h"
 #include "debug.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 
 namespace lmms::gui

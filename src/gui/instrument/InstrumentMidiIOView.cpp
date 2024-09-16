@@ -33,7 +33,7 @@
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 

@@ -38,7 +38,7 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "lmms_math.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Manager.h"

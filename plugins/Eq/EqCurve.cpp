@@ -30,7 +30,7 @@
 #include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "lmms_constants.h"
 #include "lmms_math.h"
 

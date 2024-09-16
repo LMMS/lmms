@@ -28,7 +28,7 @@
 #include "LcdFloatSpinBox.h"
 #include "Knob.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "PixmapButton.h"
 
 

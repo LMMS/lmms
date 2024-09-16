@@ -32,7 +32,7 @@
 #include "Knob.h"
 #include "MidiEventToByteSeq.h"
 #include "MainWindow.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Song.h"
 
 #include <QApplication>

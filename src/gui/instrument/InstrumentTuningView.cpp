@@ -33,7 +33,7 @@
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"

@@ -33,7 +33,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "FileDialog.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"

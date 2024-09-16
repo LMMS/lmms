@@ -30,7 +30,7 @@
 #include "InstrumentFunctionViews.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 

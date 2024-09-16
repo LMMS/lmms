@@ -41,7 +41,7 @@
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "MainWindow.h"
 
 namespace lmms::gui

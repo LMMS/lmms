@@ -35,7 +35,7 @@
 #include <QWidget>
 
 #include "Engine.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
 #include "TapTempo.h"

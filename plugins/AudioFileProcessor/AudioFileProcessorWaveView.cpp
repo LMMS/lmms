@@ -25,7 +25,7 @@
 #include "AudioFileProcessorWaveView.h"
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "SampleWaveform.h"
 
 #include <QPainter>
