@@ -16,6 +16,9 @@ echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 qtpath="$(dirname "@QT_QMAKE_EXECUTABLE@")"
 export PATH="$PATH:$qtpath"
 
+# Qt6: Fix @rpath bug https://github.com/orgs/Homebrew/discussions/2823
+ln -sf "$qtpath/../lib" "@CMAKE_BINARY_DIR@/lib"
+
 # Remove any old .app bundles
 rm -Rf "$APP"
 

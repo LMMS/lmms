@@ -55,6 +55,7 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "SimpleTextFloat.h"
 
 namespace lmms::gui
@@ -124,6 +125,8 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
+	const auto pos = position(mouseEvent);
+
 	if (mouseEvent->button() == Qt::LeftButton &&
 			!(mouseEvent->modifiers() & Qt::ControlModifier))
 	{
@@ -134,7 +137,7 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			thisModel->saveJournallingState(false);
 		}
 
-		if (mouseEvent->y() >= knobPosY() - (m_knob).height() && mouseEvent->y() < knobPosY())
+		if (pos.y() >= knobPosY() - (m_knob).height() && pos.y() < knobPosY())
 		{
 			updateTextFloat();
 			s_textFloat->show();
