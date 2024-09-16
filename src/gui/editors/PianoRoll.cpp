@@ -3018,7 +3018,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// set font-size to 80% of key line height
 	QFont f = p.font();
 	int keyFontSize = m_keyLineHeight * 0.8;
-	p.setFont(adjustedToPixelSize(f, keyFontSize)); // font size doesn't change without this for some reason
+	p.setFont(adjustedToPixelSize(f, keyFontSize));
 	QFontMetrics fontMetrics(p.font());
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
