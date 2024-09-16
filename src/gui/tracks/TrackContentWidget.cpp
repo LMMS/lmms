@@ -293,6 +293,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	setUpdatesEnabled( true );
 
 	// redraw background
+	updateBackground();
 //	update();
 }
 
@@ -416,7 +417,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
 
 		// Track must be in TrackContainer's tracks
-		if( finalTrackIndex < 0 || finalTrackIndex >= tracks.size() )
+		if (finalTrackIndex < 0 || static_cast<std::size_t>(finalTrackIndex) >= tracks.size())
 		{
 			return false;
 		}
@@ -635,8 +636,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	// Don't draw background on Pattern Editor
 	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
 	{
-		p.drawTiledPixmap( rect(), m_background, QPoint(
-				tcv->currentPosition().getBar() * ppb, 0 ) );
+		p.drawTiledPixmap(rect(), m_background, QPoint(
+				tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0));
 	}
 }
 

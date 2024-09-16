@@ -30,6 +30,13 @@
 
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+class SampleFrame;
+
+}
+
 namespace lmms::gui
 {
 
@@ -67,7 +74,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer( const lmms::surroundSampleFrame * buffer );
+	void updateAudioBuffer(const lmms::SampleFrame* buffer);
 
 private:
 	bool clips(float level) const;
@@ -76,7 +83,7 @@ private:
 	QPixmap m_background;
 	QPointF * m_points;
 
-	sampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 	bool m_active;
 
 	QColor m_leftChannelColor;

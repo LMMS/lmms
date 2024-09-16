@@ -93,7 +93,7 @@ bool AudioFileWave::startEncoding()
 	return true;
 }
 
-void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames)
+void AudioFileWave::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 

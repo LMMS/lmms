@@ -26,6 +26,8 @@
 
 #include "BufferManager.h"
 
+#include "SampleFrame.h"
+
 #include <cstring>
 
 
@@ -40,26 +42,14 @@ void BufferManager::init( fpp_t fpp )
 }
 
 
-sampleFrame * BufferManager::acquire()
+SampleFrame* BufferManager::acquire()
 {
-	return new sampleFrame[s_framesPerPeriod];
+	return new SampleFrame[s_framesPerPeriod];
 }
 
-void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
-{
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
-}
-
-#ifndef LMMS_DISABLE_SURROUND
-void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
-							const f_cnt_t offset )
-{
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
-}
-#endif
 
 
-void BufferManager::release( sampleFrame * buf )
+void BufferManager::release( SampleFrame* buf )
 {
 	delete[] buf;
 }

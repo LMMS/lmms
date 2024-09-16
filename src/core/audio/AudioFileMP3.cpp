@@ -25,6 +25,8 @@
 
 #include "AudioFileMP3.h"
 
+#include "SampleFrame.h"
+
 #ifdef LMMS_HAVE_MP3LAME
 
 
@@ -53,7 +55,7 @@ AudioFileMP3::~AudioFileMP3()
 	tearDownEncoder();
 }
 
-void AudioFileMP3::writeBuffer(const surroundSampleFrame* _buf, const fpp_t _frames)
+void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const fpp_t _frames)
 {
 	if (_frames < 1)
 	{

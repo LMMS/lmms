@@ -73,7 +73,8 @@ public:
 
 	enum class AutoScrollState
 	{
-		Enabled,
+		Stepped,
+		Continuous,
 		Disabled
 	};
 
@@ -212,7 +213,7 @@ private:
 	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
-	AutoScrollState m_autoScroll = AutoScrollState::Enabled;
+	AutoScrollState m_autoScroll = AutoScrollState::Stepped;
 
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;

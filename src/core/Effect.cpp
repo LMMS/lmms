@@ -31,6 +31,8 @@
 #include "EffectView.h"
 
 #include "ConfigManager.h"
+#include "SampleFrame.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -153,7 +155,7 @@ void Effect::checkGate( double _out_sum )
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum - gate() <= typeInfo<float>::minEps() )
+	if (_out_sum - gate() <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
@@ -199,9 +201,9 @@ void Effect::reinitSRC()
 
 
 
-void Effect::resample( int _i, const sampleFrame * _src_buf,
+void Effect::resample( int _i, const SampleFrame* _src_buf,
 							sample_rate_t _src_sr,
-				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+				SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 								f_cnt_t _frames )
 {
 	if( m_srcState[_i] == nullptr )

@@ -66,10 +66,6 @@ include_directories(SYSTEM
 	${FFTW3F_INCLUDE_DIRS}
 )
 
-IF(NOT LMMS_HAVE_SDL2 AND NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
-	include_directories(SYSTEM "${SDL_INCLUDE_DIR}")
-ENDIF()
-
 IF(NOT ("${PULSEAUDIO_INCLUDE_DIR}" STREQUAL ""))
 	include_directories(SYSTEM "${PULSEAUDIO_INCLUDE_DIR}")
 ENDIF()
@@ -163,10 +159,6 @@ endif()
 
 if(LMMS_HAVE_OGGVORBIS)
 	list(APPEND EXTRA_LIBRARIES Vorbis::vorbisenc Vorbis::vorbisfile)
-endif()
-
-if(LMMS_USE_MINGW_STD_THREADS)
-	list(APPEND EXTRA_LIBRARIES mingw_stdthreads)
 endif()
 
 SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
