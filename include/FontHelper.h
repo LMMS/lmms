@@ -25,6 +25,7 @@
 #ifndef LMMS_FONT_HELPER_H
 #define LMMS_FONT_HELPER_H
 
+#include <QApplication>
 #include <QFont>
 
 constexpr int DEFAULT_FONT_SIZE = 14;
