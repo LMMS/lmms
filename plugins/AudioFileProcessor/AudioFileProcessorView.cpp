@@ -228,7 +228,7 @@ void AudioFileProcessorView::paintEvent(QPaintEvent*)
 
 	int idx = a->sample().sampleFile().length();
 
-	p.setFont(adjustedToPixelSize(font, 12));
+	p.setFont(adjustedToPixelSize(font, SMALL_FONT_SIZE));
 
 	QFontMetrics fm(font);
 

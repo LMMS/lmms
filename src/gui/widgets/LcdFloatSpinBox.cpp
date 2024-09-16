@@ -245,7 +245,7 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 	// Label
 	if (!m_label.isEmpty())
 	{
-		p.setFont(adjustedToPixelSize(p.font(), 14));
+		p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
 		p.setPen(m_wholeDisplay.textShadowColor());
 		p.drawText(width() / 2 - p.fontMetrics().boundingRect(m_label).width() / 2 + 1, height(), m_label);
 		p.setPen(m_wholeDisplay.textColor());

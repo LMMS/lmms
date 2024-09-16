@@ -75,7 +75,7 @@ namespace lmms::gui
 
         m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
-        m_renameLineEdit->setFont(adjustedToPixelSize(font(), 16));
+        m_renameLineEdit->setFont(adjustedToPixelSize(font(), LARGE_FONT_SIZE));
         m_renameLineEdit->setReadOnly(true);
         m_renameLineEdit->installEventFilter(this);
 
