@@ -28,9 +28,9 @@
 #include <QApplication>
 #include <QFont>
 
-constexpr int DEFAULT_FONT_SIZE = 14;
-constexpr int SMALL_FONT_SIZE = 12;
-constexpr int LARGE_FONT_SIZE = 16;
+constexpr int DEFAULT_FONT_SIZE = 12;
+constexpr int SMALL_FONT_SIZE = 10;
+constexpr int LARGE_FONT_SIZE = 14;
 
 namespace lmms::gui
 {
