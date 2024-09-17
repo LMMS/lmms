@@ -130,6 +130,7 @@ namespace lmms::gui
 
         auto mainLayout = new QVBoxLayout{this};
         mainLayout->setContentsMargins(2, 2, 2, 2);
+        mainLayout->setSpacing(0);
         mainLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
