@@ -1029,7 +1029,8 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			QString noteKeyString = getNoteString(n->key());
 
 			QFont noteFont(p.font());
-			QFontMetrics fontMetrics(adjustedToPixelSize(noteFont, noteTextHeight));
+			noteFont = adjustedToPixelSize(noteFont, noteTextHeight);
+			QFontMetrics fontMetrics(noteFont);
 			QSize textSize = fontMetrics.size(Qt::TextSingleLine, noteKeyString);
 
 			int const distanceToBorder = 2;
