@@ -86,7 +86,7 @@ namespace lmms::gui
         retainSizeWhenHidden(m_sendArrow);
 
         m_channelNumberLcd = new LcdWidget{2, this};
-        m_channelNumberLcd->setValue(channelIndex); 
+        m_channelNumberLcd->setValue(channelIndex);
         retainSizeWhenHidden(m_channelNumberLcd);
 
         const auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
