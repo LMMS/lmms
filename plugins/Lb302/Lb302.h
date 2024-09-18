@@ -246,7 +246,7 @@ private:
 
 	void recalcFilter();
 
-	int process(SampleFrame* outbuf, const int size);
+	int process(SampleFrame* outbuf, const std::size_t size);
 
 	friend class gui::Lb302SynthView;
 
