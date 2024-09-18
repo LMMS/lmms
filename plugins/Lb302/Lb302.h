@@ -214,7 +214,7 @@ private:
 	Lb302FilterKnobState fs;
 	QAtomicPointer<Lb302Filter> vcf;
 
-	int release_frame;
+	size_t release_frame;
 
 	// More States
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC

@@ -751,7 +751,7 @@ void Lb302Synth::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 	}
 	m_notesMutex.unlock();
 
-	release_frame = std::max(release_frame, static_cast<int>(_n->framesLeft()) + static_cast<int>(_n->offset()));
+	release_frame = std::max(release_frame, _n->framesLeft() + _n->offset());
 }
 
 
