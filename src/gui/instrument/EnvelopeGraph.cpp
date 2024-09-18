@@ -211,8 +211,8 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
 
 	// Determine the line width so that it scales with the widget
-	// Use the minimum value of the current width and height to compute it.
-	const qreal lineWidth = std::min(width(), height()) / 20.;
+	// Use the diagonal of the box to compute it
+	const qreal lineWidth = sqrt(width()*width() + height()*height()) / 80.;
 	const QPen linePen{lineColor, lineWidth};
 	p.setPen(linePen);
 
