@@ -137,4 +137,4 @@ namespace lmms::gui
     };
 } // namespace lmms::gui
 
-#endif
+#endif // MIXER_CHANNEL_VIEW_H
