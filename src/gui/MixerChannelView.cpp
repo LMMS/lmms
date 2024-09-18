@@ -113,12 +113,6 @@ namespace lmms::gui
         m_soloButton->setCheckable(true);
         m_soloButton->setToolTip(tr("Solo this channel"));        
 
-        QVBoxLayout* soloMuteLayout = new QVBoxLayout();
-        soloMuteLayout->setContentsMargins(0, 0, 0, 0);
-        soloMuteLayout->setSpacing(0);
-        soloMuteLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
-        soloMuteLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
-
         m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), this};
 
         m_peakIndicator = new PeakIndicator(this);
@@ -136,7 +130,8 @@ namespace lmms::gui
         mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
-        mainLayout->addLayout(soloMuteLayout, 0);
+        mainLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_peakIndicator);
         mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
