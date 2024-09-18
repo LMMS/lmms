@@ -32,7 +32,6 @@
 #include "Song.h"
 #include "ConfigManager.h"
 #include "FontHelper.h"
-#include "lmms_math.h"
 
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
