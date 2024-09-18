@@ -37,6 +37,7 @@
 #include <QLineEdit>
 #include <QPixmap>
 #include <QWidget>
+#include <QStackedWidget>
 
 namespace lmms
 {
@@ -59,11 +60,6 @@ namespace lmms::gui
         Q_PROPERTY(QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive)
         Q_PROPERTY(QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive)
     public:
-        enum class SendReceiveState
-        {
-            None, SendToThis, ReceiveFromThis
-        };
-
         MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex);
         void paintEvent(QPaintEvent* event) override;
         void contextMenuEvent(QContextMenuEvent*) override;
@@ -73,9 +69,6 @@ namespace lmms::gui
 
         int channelIndex() const;
         void setChannelIndex(int index);
-
-        SendReceiveState sendReceiveState() const;
-        void setSendReceiveState(const SendReceiveState& state);
 
         QBrush backgroundActive() const;
         void setBackgroundActive(const QBrush& c);
@@ -115,19 +108,22 @@ namespace lmms::gui
 
     private:
         SendButtonIndicator* m_sendButton;
+        QLabel* m_receiveArrow;
+        QStackedWidget* m_receiveArrowOrSendButton;
+        int m_receiveArrowStackedIndex = -1;
+        int m_sendButtonStackedIndex = -1;
+
         Knob* m_sendKnob;
         LcdWidget* m_channelNumberLcd;
         QLineEdit* m_renameLineEdit;
         QGraphicsView* m_renameLineEditView;
         QLabel* m_sendArrow;
-        QLabel* m_receiveArrow;
         PixmapButton* m_muteButton;
         PixmapButton* m_soloButton;
         PeakIndicator* m_peakIndicator = nullptr;
         Fader* m_fader;
         EffectRackView* m_effectRackView;
         MixerView* m_mixerView;
-        SendReceiveState m_sendReceiveState = SendReceiveState::None;
         int m_channelIndex = 0;
         bool m_inRename = false;
 
