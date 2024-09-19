@@ -56,9 +56,9 @@ public slots:
 	void moveUp(EffectView* view);
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
+	void update();
 
 private slots:
-	virtual void update();
 	void addEffect();
 
 
