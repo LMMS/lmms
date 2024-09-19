@@ -289,7 +289,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		// any better way than this?
 	} else {
-		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
+		subWin->setMaximumSize(m_instrumentView->maximumWidth() + 12, m_instrumentView->maximumHeight() + 208);
 		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
 	}
 	flags &= ~Qt::WindowMaximizeButtonHint;
