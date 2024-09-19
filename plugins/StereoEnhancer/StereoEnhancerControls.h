@@ -50,7 +50,7 @@ public:
 
 	int controlCount() override
 	{
-		return( 1 );
+		return 2;
 	}
 	
 	gui::EffectControlDialog* createView() override
@@ -66,9 +66,10 @@ private slots:
 private:
 	StereoEnhancerEffect * m_effect;
 	FloatModel m_widthModel;
+	FloatModel m_outputGain;
 	
 	friend class gui::StereoEnhancerControlDialog;
-
+	friend class StereoEnhancerEffect;
 } ;
 
 
