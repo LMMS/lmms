@@ -234,6 +234,7 @@ void MixerView::refreshDisplay()
 	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		updateMixerChannel(i);
+		m_mixerChannelViews[i]->m_effectRackView->update();
 	}
 
 	updateMaxChannelSelector();
