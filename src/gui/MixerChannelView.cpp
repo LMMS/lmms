@@ -113,7 +113,7 @@ namespace lmms::gui
         m_soloButton->setCheckable(true);
         m_soloButton->setToolTip(tr("Solo this channel"));        
 
-        QVBoxLayout* soloMuteLayout = new QVBoxLayout();
+        auto soloMuteLayout = new QVBoxLayout();
         soloMuteLayout->setContentsMargins(0, 0, 0, 0);
         soloMuteLayout->setSpacing(0);
         soloMuteLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
@@ -128,15 +128,16 @@ namespace lmms::gui
         m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
 
         auto mainLayout = new QVBoxLayout{this};
-        mainLayout->setContentsMargins(0, 0, 0, 0);
-        mainLayout->setSpacing(0);
+        mainLayout->setContentsMargins(4, 4, 4, 4);
+        mainLayout->setSpacing(2);
+
         mainLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
-        mainLayout->addLayout(soloMuteLayout, 0);
+        mainLayout->addLayout(soloMuteLayout);
         mainLayout->addWidget(m_peakIndicator);
         mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
