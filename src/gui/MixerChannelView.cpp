@@ -128,8 +128,8 @@ namespace lmms::gui
         m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
 
         auto mainLayout = new QVBoxLayout{this};
-        mainLayout->setContentsMargins(3, 3, 3, 3);
-        mainLayout->setSpacing(3);
+        mainLayout->setSpacing(2);
+        mainLayout->setContentsMargins(4, mainLayout->spacing(), 4, mainLayout->spacing());
         mainLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
