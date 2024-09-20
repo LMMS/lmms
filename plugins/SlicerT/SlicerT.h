@@ -84,6 +84,8 @@ public:
 	void findSlices();
 	void findBPM();
 
+	QString getSampleName() { return m_originalSample.sampleFile(); }
+
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
 

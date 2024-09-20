@@ -1,7 +1,7 @@
 /*
- * PluginView.h - declaration of class PluginView
+ * Metronome.cpp
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,32 +22,20 @@
  *
  */
 
-#ifndef LMMS_GUI_PLUGIN_VIEW_H
-#define LMMS_GUI_PLUGIN_VIEW_H
+#include "Metronome.h"
 
-#include <QWidget>
+#include "Engine.h"
+#include "SamplePlayHandle.h"
 
-#include "ModelView.h"
-#include "Plugin.h"
-
-namespace lmms::gui {
-
-class LMMS_EXPORT PluginView : public QWidget, public ModelView
+namespace lmms {
+void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset)
 {
-public:
-	PluginView(Plugin* _plugin, QWidget* _parent)
-		: QWidget(_parent)
-		, ModelView(_plugin, this)
-	{
-	}
+	const auto ticksPerBeat = ticksPerBar / beatsPerBar;
+	if (currentTick % ticksPerBeat != 0 || !m_active) { return; }
 
-	void setResizable(bool resizable) { m_isResizable = resizable; }
-	bool isResizable() { return m_isResizable; }
-
-private:
-	bool m_isResizable = false;
-};
-
-} // namespace lmms::gui
-
-#endif // LMMS_GUI_PLUGIN_VIEW_H
+	const auto handle = currentTick % ticksPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
+													   : new SamplePlayHandle("misc/metronome01.ogg");
+	handle->setOffset(bufferOffset);
+	Engine::audioEngine()->addPlayHandle(handle);
+}
+} // namespace lmms

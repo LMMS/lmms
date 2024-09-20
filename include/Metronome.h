@@ -1,7 +1,7 @@
 /*
- * PluginView.h - declaration of class PluginView
+ * Metronome.h
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,32 +22,22 @@
  *
  */
 
-#ifndef LMMS_GUI_PLUGIN_VIEW_H
-#define LMMS_GUI_PLUGIN_VIEW_H
+#ifndef LMMS_METRONOME_H
+#define LMMS_METRONOME_H
 
-#include <QWidget>
+#include <cstddef>
 
-#include "ModelView.h"
-#include "Plugin.h"
-
-namespace lmms::gui {
-
-class LMMS_EXPORT PluginView : public QWidget, public ModelView
+namespace lmms {
+class Metronome
 {
 public:
-	PluginView(Plugin* _plugin, QWidget* _parent)
-		: QWidget(_parent)
-		, ModelView(_plugin, this)
-	{
-	}
-
-	void setResizable(bool resizable) { m_isResizable = resizable; }
-	bool isResizable() { return m_isResizable; }
+	bool active() const { return m_active; }
+	void setActive(bool active) { m_active = active; }
+	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset);
 
 private:
-	bool m_isResizable = false;
+	bool m_active = false;
 };
+} // namespace lmms
 
-} // namespace lmms::gui
-
-#endif // LMMS_GUI_PLUGIN_VIEW_H
+#endif // LMMS_METRONOME_H

@@ -332,6 +332,8 @@ void Song::processNextBuffer()
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
+			processMetronome(frameOffsetInPeriod);
+
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
@@ -424,6 +426,17 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 			it.key()->setUseControllerValue(true);
 		}
 	}
+}
+
+void Song::processMetronome(size_t bufferOffset)
+{
+	const auto currentPlayMode = playMode();
+	const auto supported = currentPlayMode == PlayMode::MidiClip
+		|| currentPlayMode == PlayMode::Song
+		|| currentPlayMode == PlayMode::Pattern;
+
+	if (!supported || m_exporting) { return; } 
+	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
 }
 
 void Song::setModified(bool value)
@@ -1542,6 +1555,4 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
-
-
 } // namespace lmms

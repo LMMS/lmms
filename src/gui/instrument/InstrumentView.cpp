@@ -35,6 +35,7 @@ namespace lmms::gui
 InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 	PluginView( _Instrument, _parent )
 {
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setModel( _Instrument );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 }
@@ -44,6 +45,7 @@ InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 
 InstrumentView::~InstrumentView()
 {
+	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	if( instrumentTrackWindow() )
 	{
 		instrumentTrackWindow()->m_instrumentView = nullptr;
