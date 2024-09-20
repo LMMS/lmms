@@ -129,7 +129,7 @@ Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const 
 		}
 	}
 
-	float curRMS = sqrt_neg( sum / frames );
+	float curRMS = sqrt_neg(sum / frames);
 	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
 	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;

@@ -87,7 +87,7 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
 
 		// copy samples into the delay buffer
