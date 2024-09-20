@@ -216,14 +216,16 @@ void EffectRackView::update()
 		}
 		else
 		{
+			(*it)->resize(width() - 35, EffectView::DEFAULT_HEIGHT);
 			( *it )->move( EffectViewMargin, m_lastY );
+			(*it)->update();
 			m_lastY += ( *it )->height();
 			++nView;
 			++it;
 		}
 	}
 
-	w->setFixedSize( EffectView::DEFAULT_WIDTH + 2*EffectViewMargin, m_lastY);
+	w->resize(width() - 35 + 2 * EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }
@@ -268,6 +270,15 @@ void EffectRackView::modelChanged()
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	connect( fxChain(), SIGNAL(aboutToClear()), this, SLOT(clearViews()));
 	update();
+}
+
+
+
+
+QSize EffectRackView::sizeHint() const
+{
+	// Use the formula from InstrumentTrackWindow.cpp
+	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
 

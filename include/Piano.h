@@ -25,8 +25,10 @@
 #ifndef LMMS_PIANO_H
 #define LMMS_PIANO_H
 
-#include "Note.h"
+#include <array>
+
 #include "Model.h"
+#include "Note.h"
 
 namespace lmms
 {

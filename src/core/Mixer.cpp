@@ -77,7 +77,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_queued( false ),
 	m_dependenciesMet(0)
 {
-	BufferManager::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
@@ -102,7 +102,7 @@ inline void MixerChannel::processed()
 
 void MixerChannel::incrementDeps()
 {
-	int i = m_dependenciesMet++ + 1;
+	const auto i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
@@ -272,7 +272,7 @@ int Mixer::createChannel()
 
 void Mixer::activateSolo()
 {
-	for (int i = 1; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		m_mixerChannels[i]->m_muteBeforeSolo = m_mixerChannels[i]->m_muteModel.value();
 		m_mixerChannels[i]->m_muteModel.setValue( true );
@@ -281,7 +281,7 @@ void Mixer::activateSolo()
 
 void Mixer::deactivateSolo()
 {
-	for (int i = 1; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		m_mixerChannels[i]->m_muteModel.setValue( m_mixerChannels[i]->m_muteBeforeSolo );
 	}
@@ -297,7 +297,7 @@ void Mixer::toggledSolo()
 		m_mixerChannels[m_lastSoloed]->m_soloModel.setValue( false );
 	}
 	//determine the soloed channel
-	for (int i = 0; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
 		if (m_mixerChannels[i]->m_soloModel.value() == true)
 			soloedChan = i;
@@ -392,7 +392,7 @@ void Mixer::deleteChannel( int index )
 	m_mixerChannels.erase(m_mixerChannels.begin() + index);
 	delete ch;
 
-	for( int i = index; i < m_mixerChannels.size(); ++i )
+	for (auto i = static_cast<std::size_t>(index); i < m_mixerChannels.size(); ++i)
 	{
 		validateChannelName( i, i + 1 );
 
@@ -418,7 +418,7 @@ void Mixer::deleteChannel( int index )
 void Mixer::moveChannelLeft( int index )
 {
 	// can't move master or first channel
-	if( index <= 1 || index >= m_mixerChannels.size() )
+	if (index <= 1 || static_cast<std::size_t>(index) >= m_mixerChannels.size())
 	{
 		return;
 	}
@@ -649,8 +649,7 @@ void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 
 void Mixer::prepareMasterMix()
 {
-	BufferManager::clear( m_mixerChannels[0]->m_buffer,
-					Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_mixerChannels[0]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
@@ -722,8 +721,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_mixerChannels[i]->m_buffer,
-				Engine::audioEngine()->framesPerPeriod() );
+		zeroSampleFrames(m_mixerChannels[i]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;
 		// also reset hasInput
@@ -783,7 +781,7 @@ void Mixer::clearChannel(mix_ch_t index)
 void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// save channels
-	for( int i = 0; i < m_mixerChannels.size(); ++i )
+	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
 		MixerChannel * ch = m_mixerChannels[i];
 
@@ -794,7 +792,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
-		mixch.setAttribute( "num", i );
+		mixch.setAttribute("num", static_cast<qulonglong>(i));
 		mixch.setAttribute( "name", ch->m_name );
 		if (const auto& color = ch->color()) { mixch.setAttribute("color", color->name()); }
 
@@ -813,7 +811,8 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 // make sure we have at least num channels
 void Mixer::allocateChannelsTo(int num)
 {
-	while( num > m_mixerChannels.size() - 1 )
+	if (num <= 0) { return; }
+	while (static_cast<std::size_t>(num) > m_mixerChannels.size() - 1)
 	{
 		createChannel();
 
@@ -852,7 +851,7 @@ void Mixer::loadSettings( const QDomElement & _this )
 
 		// mixer sends
 		QDomNodeList chData = mixch.childNodes();
-		for( unsigned int i=0; i<chData.length(); ++i )
+		for (auto i = 0; i < chData.length(); ++i)
 		{
 			QDomElement chDataItem = chData.at(i).toElement();
 			if( chDataItem.nodeName() == QString( "send" ) )

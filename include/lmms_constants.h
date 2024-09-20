@@ -56,6 +56,8 @@ constexpr float F_E = (float) LD_E;
 constexpr float F_E_R = (float) LD_E_R;
 constexpr float F_SQRT_2 = (float) LD_SQRT_2;
 
+constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+
 // Microtuner
 constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
 constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per project

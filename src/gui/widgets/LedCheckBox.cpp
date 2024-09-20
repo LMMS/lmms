@@ -22,11 +22,12 @@
  *
  */
 
+#include "LedCheckBox.h"
 
 #include <QFontMetrics>
 #include <QPainter>
+#include <array>
 
-#include "LedCheckBox.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"

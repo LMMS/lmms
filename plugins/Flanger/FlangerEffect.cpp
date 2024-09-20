@@ -25,10 +25,10 @@
 #include "FlangerEffect.h"
 #include "Engine.h"
 #include "MonoDelay.h"
-#include "Noise.h"
 #include "QuadratureLfo.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -61,7 +61,6 @@ FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPlugin
 	m_lfo = new QuadratureLfo( Engine::audioEngine()->outputSampleRate() );
 	m_lDelay = new MonoDelay( 1, Engine::audioEngine()->outputSampleRate() );
 	m_rDelay = new MonoDelay( 1, Engine::audioEngine()->outputSampleRate() );
-	m_noise = new Noise;
 }
 
 
@@ -80,10 +79,6 @@ FlangerEffect::~FlangerEffect()
 	if( m_lfo )
 	{
 		delete m_lfo;
-	}
-	if(m_noise)
-	{
-		delete m_noise;
 	}
 }
 
@@ -113,8 +108,8 @@ bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += m_noise->tick() * noise;
-		buf[f][1] += m_noise->tick() * noise;
+		buf[f][0] += (fastRandf(2.0f) - 1.0f) * noise;
+		buf[f][1] += (fastRandf(2.0f) - 1.0f) * noise;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);

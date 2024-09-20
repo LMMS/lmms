@@ -289,9 +289,6 @@ public:
 
 	void changeQuality(const struct qualitySettings & qs);
 
-	inline bool isMetronomeActive() const { return m_metronomeActive; }
-	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
-
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
@@ -352,8 +349,6 @@ private:
 
 	void swapBuffers();
 
-	void handleMetronome();
-
 	void clearInternal();
 
 	bool m_renderOnly;
@@ -401,8 +396,6 @@ private:
 	fifoWriter * m_fifoWriter;
 
 	AudioEngineProfiler m_profiler;
-
-	bool m_metronomeActive;
 
 	bool m_clearSignal;
 

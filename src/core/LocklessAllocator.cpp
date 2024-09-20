@@ -71,8 +71,7 @@ LocklessAllocator::LocklessAllocator( size_t nmemb, size_t size )
 
 LocklessAllocator::~LocklessAllocator()
 {
-	int available = m_available;
-	if( available != m_capacity )
+	if (m_available != m_capacity)
 	{
 		fprintf( stderr, "LocklessAllocator: "
 				"Destroying with elements still allocated\n" );
@@ -110,7 +109,7 @@ void * LocklessAllocator::alloc()
 	// Some of these CAS loops could probably use relaxed atomics, as discussed
 	// in http://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange.
 	// Let's use sequentially-consistent ops to be safe for now.
-	int available = m_available.load();
+	auto available = m_available.load();
 	do
 	{
 		if( !available )

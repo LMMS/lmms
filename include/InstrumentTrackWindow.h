@@ -29,6 +29,7 @@
 
 #include "ModelView.h"
 #include "SerializingObject.h"
+#include "PluginView.h"
 
 class QLabel;
 class QLineEdit;
@@ -66,6 +67,9 @@ class InstrumentTrackWindow : public QWidget, public ModelView,
 public:
 	InstrumentTrackWindow( InstrumentTrackView * _tv );
 	~InstrumentTrackWindow() override;
+
+	void resizeEvent(QResizeEvent* event) override;
+
 
 	// parent for all internal tab-widgets
 	TabWidget * tabWidgetParent()
@@ -152,6 +156,7 @@ private:
 	InstrumentSoundShapingView * m_ssView;
 	InstrumentFunctionNoteStackingView* m_noteStackingView;
 	InstrumentFunctionArpeggioView* m_arpeggioView;
+	QWidget* m_instrumentFunctionsView; // container of note stacking and arpeggio
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
 	InstrumentTuningView *m_tuningView;

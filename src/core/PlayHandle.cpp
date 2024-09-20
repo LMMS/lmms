@@ -55,7 +55,7 @@ void PlayHandle::doProcessing()
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
-		BufferManager::clear(m_playHandleBuffer, Engine::audioEngine()->framesPerPeriod());
+		zeroSampleFrames(m_playHandleBuffer, Engine::audioEngine()->framesPerPeriod());
 		play( buffer() );
 	}
 	else

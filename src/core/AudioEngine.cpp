@@ -87,7 +87,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
-	m_metronomeActive(false),
 	m_clearSignal(false)
 {
 	for( int i = 0; i < 2; ++i )
@@ -95,7 +94,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		BufferManager::clear( m_inputBuffer[i], m_inputBufferSize[i] );
+		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
 	}
 
 	// determine FIFO size and number of frames per period
@@ -283,7 +282,7 @@ void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
-	int size = m_inputBufferSize[ m_inputBufferWrite ];
+	auto size = m_inputBufferSize[m_inputBufferWrite];
 	SampleFrame* buf = m_inputBuffer[ m_inputBufferWrite ];
 
 	if( frames + _frames > size )
@@ -344,8 +343,6 @@ void AudioEngine::renderStageNoteSetup()
 	// prepare master mix (clear internal buffers etc.)
 	Mixer * mixer = Engine::mixer();
 	mixer->prepareMasterMix();
-
-	handleMetronome();
 
 	// create play-handles for new notes, samples etc.
 	Engine::getSong()->processNextBuffer();
@@ -458,55 +455,6 @@ void AudioEngine::swapBuffers()
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
 	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
 }
-
-
-
-
-void AudioEngine::handleMetronome()
-{
-	static tick_t lastMetroTicks = -1;
-
-	Song * song = Engine::getSong();
-	Song::PlayMode currentPlayMode = song->playMode();
-
-	bool metronomeSupported =
-		currentPlayMode == Song::PlayMode::MidiClip
-		|| currentPlayMode == Song::PlayMode::Song
-		|| currentPlayMode == Song::PlayMode::Pattern;
-
-	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
-	{
-		return;
-	}
-
-	// stop crash with metronome if empty project
-	if (song->countTracks() == 0)
-	{
-		return;
-	}
-
-	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
-	tick_t ticksPerBar = TimePos::ticksPerBar();
-	int numerator = song->getTimeSigModel().getNumerator();
-
-	if (ticks == lastMetroTicks)
-	{
-		return;
-	}
-
-	if (ticks % (ticksPerBar / 1) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
-	}
-	else if (ticks % (ticksPerBar / numerator) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
-	}
-
-	lastMetroTicks = ticks;
-}
-
-
 
 void AudioEngine::clear()
 {

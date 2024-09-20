@@ -24,7 +24,7 @@ check_library_exists(sndio sio_open "${SNDIO_LIBRARY_DIR}" HAVE_SIO_OPEN)
 find_path(SNDIO_INCLUDE_DIR sndio.h)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SNDIO DEFAULT_MSG SNDIO_LIBRARY SNDIO_INCLUDE_DIR HAVE_SIO_OPEN)
+find_package_handle_standard_args(Sndio DEFAULT_MSG SNDIO_LIBRARY SNDIO_INCLUDE_DIR HAVE_SIO_OPEN)
 
 if(SNDIO_FOUND)
     set(SNDIO_INCLUDE_DIRS "${SNDIO_INCLUDE_DIR}")

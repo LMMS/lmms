@@ -1,7 +1,7 @@
 /*
  * Lv2Proc.cpp - Lv2 processor class
  *
- * Copyright (c) 2019-2022 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -38,6 +38,7 @@
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Lv2Features.h"
 #include "Lv2Manager.h"
@@ -74,21 +75,21 @@ Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
 	//qDebug() << "Checking plugin" << pluginUri << "...";
 
-	// TODO: manage a global blacklist outside of the code
+	// TODO: manage a global list of blocked plugins outside of the code
 	//       for now, this will help
 	//       this is only a fix for the meantime
-	if (!Engine::ignorePluginBlacklist())
+	if (!ConfigManager::enableBlockedPlugins())
 	{
-		const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
-		const auto& pluginBlacklist32 = Lv2Manager::getPluginBlacklistBuffersizeLessThan32();
-		if(pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+		if( // plugin unstable?
+			Lv2Manager::pluginIsUnstable(pluginUri) ||
+			// plugins only useful with UI?
+			(!Lv2Manager::wantUi() &&
+			Lv2Manager::pluginIsOnlyUsefulWithUi(pluginUri)) ||
+			// plugin unstable with 32 or less fpp?
+			(Engine::audioEngine()->framesPerPeriod() <= 32 &&
+			Lv2Manager::pluginIsUnstableWithBuffersizeLessEqual32(pluginUri)) )
 		{
-			issues.emplace_back(PluginIssueType::Blacklisted);
-		}
-		else if(Engine::audioEngine()->framesPerPeriod() <= 32 &&
-			pluginBlacklist32.find(pluginUri) != pluginBlacklist32.end())
-		{
-			issues.emplace_back(PluginIssueType::Blacklisted);  // currently no special blacklist category
+			issues.emplace_back(PluginIssueType::Blocked);
 		}
 	}
 

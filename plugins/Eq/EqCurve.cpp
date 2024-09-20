@@ -31,6 +31,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 
 namespace lmms::gui
@@ -65,7 +66,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
-	if (typeInfo<float>::isEqual(freq, 0.0f)) { return 0.0f; }
+	if (approximatelyEqual(freq, 0.0f)) { return 0.0f; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;

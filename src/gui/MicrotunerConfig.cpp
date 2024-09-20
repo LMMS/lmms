@@ -224,14 +224,14 @@ MicrotunerConfig::MicrotunerConfig() :
  */
 void MicrotunerConfig::updateScaleList(int index)
 {
-	if (index >= 0 && index < MaxScaleCount)
+	if (index >= 0 && static_cast<std::size_t>(index) < MaxScaleCount)
 	{
 		m_scaleComboModel.replaceItem(index,
 			QString::number(index) + ": " + Engine::getSong()->getScale(index)->getDescription());
 	}
 	else
 	{
-		for (int i = 0; i < MaxScaleCount; i++)
+		for (auto i = std::size_t{0}; i < MaxScaleCount; i++)
 		{
 			m_scaleComboModel.replaceItem(i,
 				QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
@@ -246,14 +246,14 @@ void MicrotunerConfig::updateScaleList(int index)
  */
 void MicrotunerConfig::updateKeymapList(int index)
 {
-	if (index >= 0 && index < MaxKeymapCount)
+	if (index >= 0 && static_cast<std::size_t>(index) < MaxKeymapCount)
 	{
 		m_keymapComboModel.replaceItem(index,
 			QString::number(index) + ": " + Engine::getSong()->getKeymap(index)->getDescription());
 	}
 	else
 	{
-		for (int i = 0; i < MaxKeymapCount; i++)
+		for (auto i = std::size_t{0}; i < MaxKeymapCount; i++)
 		{
 			m_keymapComboModel.replaceItem(i,
 				QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());

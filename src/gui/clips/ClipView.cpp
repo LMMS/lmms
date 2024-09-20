@@ -534,8 +534,9 @@ DataFile ClipView::createClipDataFiles(
 	{
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
-		int trackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack));
-		assert(trackIndex != tc->tracks().size());
+		const auto trackIt = std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack);
+		assert(trackIt != tc->tracks().end());
+		int trackIndex = std::distance(tc->tracks().begin(), trackIt);
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", static_cast<int>(clipTrack->type()) );

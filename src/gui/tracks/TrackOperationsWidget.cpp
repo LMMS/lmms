@@ -236,6 +236,12 @@ void TrackOperationsWidget::cloneTrack()
 		tcView->moveTrackView( newTrackView, i - 1 );
 		i--;
 	}
+
+	if (m_soloBtn->model()->value())
+	{
+		// if this track was solo, make the new track the new solo
+		newTrack->toggleSolo();
+	}
 }
 
 

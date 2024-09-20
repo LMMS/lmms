@@ -54,7 +54,7 @@ EqAnalyser::EqAnalyser() :
 	const float a2 = 0.14128f;
 	const float a3 = 0.01168f;
 
-	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
+	for (auto i = std::size_t{0}; i < FFT_BUFFER_SIZE; i++)
 	{
 		m_fftWindow[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
 								+ a2 * cos(4 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
