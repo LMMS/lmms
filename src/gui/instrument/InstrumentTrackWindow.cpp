@@ -285,24 +285,30 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
-	if (!m_instrumentView->isResizable()) {
-		flags |= Qt::MSWindowsFixedSizeDialogHint;
-		// any better way than this?
-	} else {
-		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
-		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+
+	if (m_instrumentView->isResizable())
+	{
+		// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
+		const auto extraSpace = QSize(12, 208);
+		subWin->setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
+		subWin->setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
+
+		flags |= Qt::WindowMaximizeButtonHint;
 	}
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
+	else
+	{
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		flags &= ~Qt::WindowMaximizeButtonHint;
 
+		// Hide the Size and Maximize options from the system menu since the dialog size is fixed.
+		QMenu * systemMenu = subWin->systemMenu();
+		systemMenu->actions().at(2)->setVisible(false); // Size
+		systemMenu->actions().at(4)->setVisible(false); // Maximize
+	}
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at( 2 )->setVisible( false ); // Size
-	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
+	subWin->setWindowFlags(flags);
 
-	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
+	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
 }
 
