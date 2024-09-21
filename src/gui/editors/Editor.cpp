@@ -24,6 +24,8 @@
 
 #include "Editor.h"
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "Song.h"
 
 #include "embed.h"
@@ -148,7 +150,8 @@ void Editor::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
-	_ce->accept();
+	getGUI()->mainWindow()->refocus();
+	_ce->ignore();
  }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
