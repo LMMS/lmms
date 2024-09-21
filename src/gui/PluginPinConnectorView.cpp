@@ -106,7 +106,7 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidge
 	hLayout->addWidget(m_inView, 0, Qt::AlignmentFlag::AlignRight);
 
 	auto getSpacerWidth = [&]() {
-		const bool singleMatrix = model->trackChannelsUsed() == 0
+		const bool singleMatrix = model->trackChannelCount() == 0
 			|| model->in().channelCount() == 0
 			|| model->out().channelCount() == 0;
 
@@ -211,7 +211,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	{
 		const auto xwIn = std::pair{0, inMatrixRect.left() - 4};
 		int yPos = inMatrixRect.y();
-		for (unsigned idx = 0; idx < model->trackChannelsUsed(); ++idx)
+		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
 		{
 			p.drawText(xwIn.first, yPos, xwIn.second, textSize.height(), Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
@@ -225,7 +225,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	{
 		const auto xwOut = std::pair{outMatrixRect.right() + 4, width() - outMatrixRect.right() - 4};
 		int yPos = outMatrixRect.y();
-		for (unsigned idx = 0; idx < model->trackChannelsUsed(); ++idx)
+		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
 		{
 			p.drawText(xwOut.first, yPos, xwOut.second, textSize.height(), Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
@@ -318,9 +318,9 @@ void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
 
 	const auto& pins = m_matrix->pins();
 	if (pins.empty() || pins[0].empty()) { return; }
-	if (m_model->trackChannelsUsed() == 0) { return; }
 
-	assert(m_model->trackChannelsUsed() <= pins.size());
+	assert(m_model->trackChannelCount() >= 2);
+	assert(m_model->trackChannelCount() <= pins.size());
 	const auto cellSize = this->cellSize();
 
 	auto drawXY = QPoint{0, 0};
@@ -432,7 +432,7 @@ auto PluginPinConnectorView::MatrixView::getCell(const QPoint& mousePos, int& xI
 
 auto PluginPinConnectorView::MatrixView::calculateSize() const -> QSize
 {
-	const auto tcc = static_cast<int>(m_model->trackChannelsUsed());
+	const auto tcc = static_cast<int>(m_model->trackChannelCount());
 	if (tcc == 0) { return QSize{0, 0}; }
 
 	const int pcc = m_matrix->channelCount();

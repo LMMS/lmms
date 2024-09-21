@@ -96,7 +96,6 @@ public:
 	auto in() const -> const Matrix& { return m_in; };
 	auto out() const -> const Matrix& { return m_out; };
 	auto trackChannelCount() const -> std::size_t { return s_totalTrackChannels; }
-	auto trackChannelsUsed() const -> unsigned int { return m_trackChannelsUsed; }
 
 	/**
 	 * Setters
@@ -131,7 +130,6 @@ public:
 	 */
 	void routeFromPlugin(f_cnt_t frames, SplitAudioData<const sample_t> in, CoreAudioDataMut inOut) const;
 
-
 	/**
 	 * SerializingObject implementation
 	 */
@@ -155,7 +153,7 @@ private:
 	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
 
 	//! This value is <= to the total number of track channels (currently always 2)
-	unsigned int m_trackChannelsUsed = DEFAULT_CHANNELS;
+	unsigned int m_trackChannelsUpperBound = DEFAULT_CHANNELS;
 
 	// TODO: When full routing is added, get LMMS channel counts from bus or router class
 };

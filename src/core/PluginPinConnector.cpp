@@ -59,7 +59,7 @@ PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChann
 
 void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 {
-	if (m_trackChannelsUsed > MaxTrackChannels)
+	if (m_trackChannelsUpperBound > MaxTrackChannels)
 	{
 		throw std::runtime_error{"Only up to 256 track channels are allowed"};
 	}
@@ -121,7 +121,7 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames,
 	CoreAudioData in, SplitAudioData<sample_t> out) const
 {
 	// Ignore all unused track channels for better performance
-	const auto inSizeConstrained = m_trackChannelsUsed / 2;
+	const auto inSizeConstrained = m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.size);
 
 	// Zero the output buffer
@@ -196,7 +196,7 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
 	assert(frames <= DEFAULT_BUFFER_SIZE);
 
 	// Ignore all unused track channels for better performance
-	const auto inOutSizeConstrained = m_trackChannelsUsed / 2;
+	const auto inOutSizeConstrained = m_trackChannelsUpperBound / 2;
 	assert(inOutSizeConstrained <= inOut.size);
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
@@ -205,7 +205,7 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
 		const auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
 
 		const auto mixInputs = [&](std::uint8_t outChannel, std::uint8_t outChannelOffset) {
-			WorkingBuffer.fill(0);
+			WorkingBuffer.fill(0); // used as buffer out
 
 			// Counter for # of in channels routed to the current out channel
 			mix_ch_t numRouted = 0;
@@ -265,9 +265,9 @@ void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 	auto pins = doc.createElement(nodeName());
 	elem.appendChild(pins);
 
-	if (m_trackChannelsUsed != s_totalTrackChannels)
+	if (m_trackChannelsUpperBound != s_totalTrackChannels)
 	{
-		pins.setAttribute("tc_used", m_trackChannelsUsed);
+		pins.setAttribute("tc_used", m_trackChannelsUpperBound);
 	}
 
 	pins.setAttribute("num_in", in().channelCount());
@@ -288,8 +288,8 @@ void PluginPinConnector::loadSettings(const QDomElement& elem)
 	if (pins.isNull()) { return; }
 
 	// Until full routing support is added, track channel count should always be 2
-	m_trackChannelsUsed = pins.attribute("tc_used", QString::number(s_totalTrackChannels)).toUInt();
-	assert(m_trackChannelsUsed == 2);
+	m_trackChannelsUpperBound = pins.attribute("tc_used", QString::number(s_totalTrackChannels)).toUInt(); // TODO: Calculate m_trackChannelsUpperBound instead
+	assert(m_trackChannelsUpperBound == 2);
 
 	// TODO: Assert port counts are what was expected?
 	const auto pluginInCount = pins.attribute("num_in", "0").toInt();
@@ -311,7 +311,7 @@ void PluginPinConnector::setTrackChannelCount(int count)
 		return;
 	}
 
-	m_trackChannelsUsed = std::min<unsigned>(m_trackChannelsUsed, count);
+	m_trackChannelsUpperBound = std::min<unsigned>(m_trackChannelsUpperBound, count);
 
 	m_in.setTrackChannelCount(this, count, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setTrackChannelCount(this, count, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
