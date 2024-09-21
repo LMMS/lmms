@@ -34,7 +34,7 @@
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\

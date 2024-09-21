@@ -27,7 +27,7 @@
 #define DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 class DetuningHelper : public InlineAutomation
 {

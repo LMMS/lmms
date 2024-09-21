@@ -7,10 +7,7 @@ target_include_directories(rpmalloc PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/rpmalloc/rpmalloc
 )
 
-set_target_properties(rpmalloc PROPERTIES
-	C_STANDARD 11
-	POSITION_INDEPENDENT_CODE ON
-)
+set_property(TARGET rpmalloc PROPERTY C_STANDARD 11)
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	target_compile_options(rpmalloc

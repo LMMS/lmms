@@ -27,7 +27,7 @@
 #include <QVector>
 
 #include "vibrating_string.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 
 class stringContainer

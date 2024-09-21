@@ -31,7 +31,7 @@
 
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 
 template<class FX = DspEffectLibrary::StereoBypass>

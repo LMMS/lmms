@@ -30,7 +30,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
-#include "Memory.h"
+#include "MemoryManager.h"
 #include "PlayHandle.h"
 
 class EffectChain;

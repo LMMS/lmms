@@ -31,6 +31,7 @@
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 
+
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
 {
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },

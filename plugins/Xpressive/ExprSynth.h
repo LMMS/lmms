@@ -31,7 +31,7 @@
 #include "AutomatableModel.h"
 #include "Graph.h"
 #include "Instrument.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 
 class ExprFrontData;

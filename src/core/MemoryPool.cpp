@@ -17,7 +17,7 @@
 #include "libcds.h"
 #include <cds/container/vyukov_mpmc_cycle_queue.h>
 
-#include "Memory.h"
+#include "MemoryManager.h"
 
 class _MemoryPool_Private : MmAllocator<char>
 {

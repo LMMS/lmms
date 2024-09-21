@@ -36,7 +36,7 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "Memory.h"
+#include "MemoryHelper.h"
 #include "MixHelpers.h"
 #include "BufferPool.h"
 
@@ -136,9 +136,9 @@ Mixer::Mixer( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferPool
 	BufferPool::init( m_framesPerPeriod );
 
-	AlignedAllocator<surroundSampleFrame> alloc;
-	m_outputBufferRead = alloc.allocate(m_framesPerPeriod);
-	m_outputBufferWrite = alloc.allocate(m_framesPerPeriod);
+	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
+	m_outputBufferRead = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferWrite = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
 
 	MixHelpers::clear(m_outputBufferRead, m_framesPerPeriod);
 	MixHelpers::clear(m_outputBufferWrite, m_framesPerPeriod);
@@ -182,9 +182,8 @@ Mixer::~Mixer()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	AlignedAllocator<surroundSampleFrame> alloc;
-	alloc.deallocate(m_outputBufferRead, m_framesPerPeriod);
-	alloc.deallocate(m_outputBufferWrite, m_framesPerPeriod);
+	MemoryHelper::alignedFree(m_outputBufferRead);
+	MemoryHelper::alignedFree(m_outputBufferWrite);
 
 	for( int i = 0; i < 2; ++i )
 	{

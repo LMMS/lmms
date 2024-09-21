@@ -31,7 +31,6 @@
 #include <QtCore/QMap>
 #include <QStaticText>
 
-#include "lmms_export.h"
 #include "TrackContentObjectView.h"
 #include "Track.h"
 #include "TrackView.h"
@@ -40,7 +39,7 @@ class TrackLabelButton;
 class TrackContainer;
 
 
-class LMMS_EXPORT BBTCO : public TrackContentObject
+class BBTCO : public TrackContentObject
 {
 public:
 	BBTCO( Track * _track );

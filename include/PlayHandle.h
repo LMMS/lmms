@@ -30,7 +30,7 @@
 
 #include "lmms_export.h"
 
-#include "Memory.h"
+#include "MemoryManager.h"
 
 #include "ThreadableJob.h"
 #include "lmms_basics.h"

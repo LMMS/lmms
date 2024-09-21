@@ -31,13 +31,12 @@
 #include <QtCore/QStringList>
 
 #include <limits>
-#include "lmms_export.h"
 
 /*! \brief Version number parsing and comparison
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
  */
-class LMMS_EXPORT ProjectVersion
+class ProjectVersion
 {
 public:
 	enum CompareType : int { None = 0, Major=1, Minor=2, Release=3, Stage=4, Build=5, All = std::numeric_limits<int>::max() };

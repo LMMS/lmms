@@ -32,6 +32,7 @@
 #include "Mixer.h"
 #include "Song.h"
 
+
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {

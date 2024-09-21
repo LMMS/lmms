@@ -160,8 +160,6 @@ INCLUDE_DIRECTORIES(
 	${Qt5Xml_INCLUDE_DIRS}
 )
 
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
-
 SET(QT_LIBRARIES
 	Qt5::Core
 	Qt5::Gui
@@ -187,6 +185,9 @@ IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
 	ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
 ENDIF()
+
+FIND_PACKAGE(Qt5Test)
+SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
@@ -441,7 +442,7 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 IF(WANT_JACK)
 	IF(WANT_WEAKJACK)
 		SET(LMMS_HAVE_WEAKJACK TRUE)
-		SET(WEAKJACK_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
+		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
 		SET(JACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/jack2/common)
 		SET(STATUS_JACK "OK (weak linking enabled)")
 		# use dlsym instead

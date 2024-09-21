@@ -38,7 +38,7 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 #include "gig.h"
 
 class GigInstrumentView;

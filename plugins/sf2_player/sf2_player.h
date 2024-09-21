@@ -37,7 +37,7 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "fluidsynthshims.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 class sf2InstrumentView;
 class sf2Font;

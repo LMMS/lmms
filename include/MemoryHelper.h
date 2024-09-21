@@ -1,7 +1,6 @@
 /*
- * MixerProfiler.h - class for profiling performance of Mixer
- *
- * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,40 +21,22 @@
  *
  */
 
-#ifndef MIXER_PROFILER_H
-#define MIXER_PROFILER_H
 
-#include <QFile>
+#ifndef MEMORY_HELPER_H
+#define MEMORY_HELPER_H
 
-#include "lmms_basics.h"
-#include "MicroTimer.h"
-
-class MixerProfiler
-{
+/**
+ * Helper class to alocate aligned memory and free it.
+ */
+class MemoryHelper {
 public:
-	MixerProfiler();
-	~MixerProfiler();
 
-	void startPeriod()
-	{
-		m_periodTimer.reset();
-	}
+	static void* alignedMalloc( size_t );
 
-	void finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod );
-
-	int cpuLoad() const
-	{
-		return m_cpuLoad;
-	}
-
-	void setOutputFile( const QString& outputFile );
-
+	static void alignedFree( void* );
 
 private:
-	MicroTimer m_periodTimer;
-	int m_cpuLoad;
-	QFile m_outputFile;
-
 };
 
 #endif
+

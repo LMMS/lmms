@@ -33,7 +33,7 @@
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "LedCheckbox.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 
 class oscillator;
 class bitInvaderView;

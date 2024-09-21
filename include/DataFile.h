@@ -30,7 +30,7 @@
 #include <QDomDocument>
 
 #include "lmms_export.h"
-#include "Memory.h"
+#include "MemoryManager.h"
 #include "ProjectVersion.h"
 
 class QTextStream;

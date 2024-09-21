@@ -32,7 +32,7 @@
 #include "OutputSettings.h"
 
 
-class LMMS_EXPORT RenderManager : public QObject
+class RenderManager : public QObject
 {
 	Q_OBJECT
 public:
