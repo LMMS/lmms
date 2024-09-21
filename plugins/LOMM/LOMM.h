@@ -45,7 +45,8 @@ class LOMMEffect : public Effect
 public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
