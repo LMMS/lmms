@@ -87,7 +87,10 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	m_autoTrack( _clip_to_copy.m_autoTrack ),
 	m_objects( _clip_to_copy.m_objects ),
 	m_tension( _clip_to_copy.m_tension ),
-	m_progressionType( _clip_to_copy.m_progressionType )
+	m_progressionType(_clip_to_copy.m_progressionType),
+	m_dragging(false),
+	m_isRecording(_clip_to_copy.m_isRecording),
+	m_lastRecordedValue(0)
 {
 	// Locks the mutex of the copied AutomationClip to make sure it
 	// doesn't change while it's being copied

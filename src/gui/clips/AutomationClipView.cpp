@@ -533,10 +533,6 @@ bool AutomationClipView::splitClip(const TimePos pos)
 
 	rightClip->movePosition(splitPos);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
-
-	// For some reason, the new clips sometime randomly put themselves in record mode. This is a temportary fix which forces them to match the original clip.
-	rightClip->setRecording(m_clip->isRecording());
-	leftClip->setRecording(m_clip->isRecording());
 	
 	m_clip->getTrack()->restoreJournallingState();
 	close();
