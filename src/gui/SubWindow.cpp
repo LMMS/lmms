@@ -105,9 +105,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
 
-	bool isActive = mdiArea()
-			? mdiArea()->activeSubWindow() == this
-			: false;
+	const bool isActive = windowState() & Qt::WindowActive;
 
 	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
 
