@@ -270,9 +270,13 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 				return (portId == (std::size_t)-1 ? LV2UI_INVALID_PORT_INDEX : portId);
 			},
 			nullptr, nullptr);
-		
 		Q_ASSERT(m_uiHost);
-
+		suil_host_set_touch_func(m_uiHost,
+			[](void* controller, uint32_t port_index, bool grabbed)
+			{
+				static_cast<Lv2ViewProc*>(controller)->touch(port_index, grabbed);
+			});
+		
 		const LV2_Feature parentFeature = {LV2_UI__parent, parent};
 		const LV2_Feature instanceFeature = {
 			LV2_INSTANCE_ACCESS_URI,
@@ -525,6 +529,14 @@ LV2UI_Request_Value_Status Lv2ViewProc::requestValue(
 	return LV2UI_REQUEST_VALUE_ERR_UNSUPPORTED;
 }
 #endif
+
+
+
+
+void Lv2ViewProc::touch(uint32_t portIndex, bool grabbed)
+{
+	qDebug() << "touch:" << portIndex << grabbed;
+}
 
 
 
