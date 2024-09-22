@@ -153,7 +153,7 @@ namespace lmms::gui
         mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
-        connect(Engine::mixer(), &Mixer::channelInvalidOutputStateChanged, this, &MixerChannelView::updateInvalidOutputState);
+        connect(Engine::mixer(), &Mixer::channelInvalidOutputStateChanged, this, &MixerChannelView::updateInvalidOutputState, Qt::QueuedConnection);
     }
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
