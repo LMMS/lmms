@@ -58,28 +58,13 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_borderColor = Qt::black;
 
 	// close, maximize and restore (after maximizing) buttons
-	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString(), this );
-	m_closeBtn->resize( m_buttonSize );
-	m_closeBtn->setFocusPolicy( Qt::NoFocus );
-	m_closeBtn->setCursor( Qt::ArrowCursor );
-	m_closeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_closeBtn->setToolTip( tr( "Close" ) );
+	m_closeBtn = addTitleButton("close", tr("Close"));
 	connect( m_closeBtn, SIGNAL(clicked(bool)), this, SLOT(close()));
 
-	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
-	m_maximizeBtn->resize( m_buttonSize );
-	m_maximizeBtn->setFocusPolicy( Qt::NoFocus );
-	m_maximizeBtn->setCursor( Qt::ArrowCursor );
-	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
+	m_maximizeBtn = addTitleButton("maximize", tr("Maximize"));
 	connect( m_maximizeBtn, SIGNAL(clicked(bool)), this, SLOT(showMaximized()));
 
-	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
-	m_restoreBtn->resize( m_buttonSize );
-	m_restoreBtn->setFocusPolicy( Qt::NoFocus );
-	m_restoreBtn->setCursor( Qt::ArrowCursor );
-	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_restoreBtn->setToolTip( tr( "Restore" ) );
+	m_restoreBtn = addTitleButton("restore", tr("Restore"));
 	connect( m_restoreBtn, SIGNAL(clicked(bool)), this, SLOT(showNormal()));
 
 	// QLabel for the window title and the shadow effect
@@ -424,6 +409,18 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}
+}
+
+QPushButton* SubWindow::addTitleButton(const std::string & iconName, const QString & toolTip)
+{
+	auto button = new QPushButton(embed::getIconPixmap(iconName), QString(), this);
+	button->resize(m_buttonSize);
+	button->setFocusPolicy(Qt::NoFocus);
+	button->setCursor(Qt::ArrowCursor);
+	button->setAttribute(Qt::WA_NoMousePropagation);
+	button->setToolTip(toolTip);
+
+	return button;
 }
 
 

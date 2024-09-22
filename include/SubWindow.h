@@ -78,6 +78,8 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
 
+	QPushButton* addTitleButton(const std::string & iconName, const QString & toolTip);
+
 signals:
 	void focusLost();
 
