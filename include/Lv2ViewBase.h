@@ -113,6 +113,7 @@ private:
 		LV2_URID type,
 		const LV2_Feature* const* features);
 #endif
+	void touch(uint32_t portIndex, bool grabbed);
 };
 
 
