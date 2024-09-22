@@ -96,7 +96,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 void SubWindow::paintEvent( QPaintEvent * )
 {
 	// Don't paint any of the other stuff if the sub window is maximized
-	// so that only it child content is painted.
+	// so that only its child content is painted.
 	if (isMaximized())
 	{
 		return;
