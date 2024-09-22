@@ -42,9 +42,8 @@ class Mixer;
 class MixerRoute;
 using MixerRouteVector = std::vector<MixerRoute*>;
 
-class MixerChannel : public QObject, public ThreadableJob
+class MixerChannel : public ThreadableJob
 {
-	Q_OBJECT
 	public:
 		MixerChannel(int idx, Mixer* mixer);
 		virtual ~MixerChannel();
