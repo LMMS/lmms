@@ -111,6 +111,13 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
  */
 void SubWindow::paintEvent( QPaintEvent * )
 {
+	// Don't paint any of the other stuff if the sub window is maximized
+	// so that only it child content is painted.
+	if (isMaximized())
+	{
+		return;
+	}
+
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
 
@@ -295,9 +302,25 @@ void SubWindow::moveEvent( QMoveEvent * event )
  */
 void SubWindow::adjustTitleBar()
 {
+	// Don't show the title or any button if the sub window is maximized. Otherwise they
+	// might show up behind the actual maximized content of the child widget.
+	if (isMaximized())
+	{
+		m_closeBtn->hide();
+		m_maximizeBtn->hide();
+		m_restoreBtn->hide();
+		m_windowTitle->hide();
+
+		return;
+	}
+
+	// Title adjustments
+	m_windowTitle->show();
+
 	// button adjustments
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
+	m_closeBtn->show();
 
 	const int rightSpace = 3;
 	const int buttonGap = 1;
