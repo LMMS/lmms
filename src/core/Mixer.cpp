@@ -23,18 +23,21 @@
  */
 
 #include <QDomElement>
+#include <algorithm>
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
 #include "BufferManager.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
+#include "SampleFrame.h"
 #include "Song.h"
 
 #include "InstrumentTrack.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+#include "lmms_basics.h"
 
 namespace lmms
 {
@@ -57,22 +60,22 @@ void MixerRoute::updateName()
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
 }
 
-
-MixerChannel::MixerChannel( int idx, Model * _parent ) :
-	m_fxChain( nullptr ),
-	m_hasInput( false ),
-	m_stillRunning( false ),
-	m_peakLeft( 0.0f ),
-	m_peakRight( 0.0f ),
-	m_buffer( new SampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
-	m_muteModel( false, _parent ),
-	m_soloModel( false, _parent ),
-	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
-	m_name(),
-	m_lock(),
-	m_channelIndex( idx ),
-	m_queued( false ),
-	m_dependenciesMet(0)
+MixerChannel::MixerChannel(int idx, Mixer* mixer)
+	: m_fxChain(nullptr)
+	, m_hasInput(false)
+	, m_stillRunning(false)
+	, m_peakLeft(0.0f)
+	, m_peakRight(0.0f)
+	, m_buffer(new SampleFrame[Engine::audioEngine()->framesPerPeriod()])
+	, m_muteModel(false, mixer)
+	, m_soloModel(false, mixer)
+	, m_volumeModel(1.f, 0.f, 2.f, 0.001f, mixer)
+	, m_name()
+	, m_lock()
+	, m_channelIndex(idx)
+	, m_queued(false)
+	, m_dependenciesMet(0)
+	, m_mixer(mixer)
 {
 	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
@@ -113,6 +116,40 @@ void MixerChannel::unmuteForSolo()
 	m_muteModel.setValue(false);
 }
 
+void MixerChannel::setMuteInvalidOutput(bool mute)
+{
+	s_muteInvalidOutput = mute;
+}
+
+void MixerChannel::sanitizeOutput()
+{
+	if (!s_muteInvalidOutput) { return; }
+
+	const auto fpp = Engine::audioEngine()->framesPerPeriod();
+	const auto begin = &m_buffer[0][0];
+	const auto end = &m_buffer[0][0] + fpp * DEFAULT_CHANNELS;
+	const auto handler = [](auto x) { return std::isinf(x) || std::isnan(x); };
+	const auto it = std::find_if(begin, end, handler);
+
+	if (it != end)
+	{
+		std::fill_n(m_buffer, fpp, SampleFrame{});
+		m_peakLeft = 0.0f;
+		m_peakRight = 0.0f;
+
+		if (!m_hasInvalidOutput)
+		{
+			m_hasInvalidOutput = true;
+			m_mixer->broadcastChannelInvalidOutputState(m_channelIndex, true);
+		}
+	}
+	else if (m_hasInvalidOutput)
+	{
+		m_hasInvalidOutput = false;
+		m_mixer->broadcastChannelInvalidOutputState(m_channelIndex, false);
+	}
+}
+
 
 
 void MixerChannel::doProcessing()
@@ -140,21 +177,21 @@ void MixerChannel::doProcessing()
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * sendModel->value();
-					MixHelpers::addSanitizedMultiplied( m_buffer, ch_buf, v, fpp );
+					MixHelpers::addMultiplied(m_buffer, ch_buf, v, fpp);
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					MixHelpers::addSanitizedMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp );
+					MixHelpers::addMultipliedByBuffers(m_buffer, ch_buf, volBuf, sendBuf, fpp);
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp );
+					MixHelpers::addMultipliedByBuffer(m_buffer, ch_buf, v, volBuf, fpp);
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
+					MixHelpers::addMultipliedByBuffer(m_buffer, ch_buf, v, sendBuf, fpp);
 				}
 				m_hasInput = true;
 			}
@@ -180,7 +217,7 @@ void MixerChannel::doProcessing()
 		m_peakLeft = m_peakRight = 0.0f;
 	}
 
-	// increment dependency counter of all receivers
+	sanitizeOutput();
 	processed();
 }
 
@@ -678,7 +715,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 	const float v = volBuf
 		? 1.0f
 		: m_mixerChannels[0]->m_volumeModel.value();
-	MixHelpers::addSanitizedMultiplied( _buf, m_mixerChannels[0]->m_buffer, v, fpp );
+	MixHelpers::addMultiplied(_buf, m_mixerChannels[0]->m_buffer, v, fpp);
 
 	// clear all channel buffers and
 	// reset channel process state

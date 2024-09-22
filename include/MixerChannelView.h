@@ -99,6 +99,7 @@ namespace lmms::gui
         void removeUnusedChannels();
         void moveChannelLeft();
         void moveChannelRight();
+        void updateInvalidOutputState(int index, bool invalid);
 
     private:
         bool confirmRemoval(int index);

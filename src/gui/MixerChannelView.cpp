@@ -152,6 +152,7 @@ namespace lmms::gui
         mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
+        connect(Engine::mixer(), &Mixer::channelInvalidOutputStateChanged, this, &MixerChannelView::updateInvalidOutputState, Qt::QueuedConnection);
     }
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -263,13 +264,14 @@ namespace lmms::gui
 
     void MixerChannelView::setChannelIndex(int index)
     {
-        MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
-        m_fader->setModel(&mixerChannel->m_volumeModel);
-        m_muteButton->setModel(&mixerChannel->m_muteModel);
-        m_soloButton->setModel(&mixerChannel->m_soloModel);
-        m_effectRackView->setModel(&mixerChannel->m_fxChain);
+        auto channel = Engine::mixer()->mixerChannel(index);
+        m_fader->setModel(&channel->m_volumeModel);
+        m_muteButton->setModel(&channel->m_muteModel);
+        m_soloButton->setModel(&channel->m_soloModel);
+        m_effectRackView->setModel(&channel->m_fxChain);
         m_channelNumberLcd->setValue(index);
         m_channelIndex = index;
+        updateInvalidOutputState(m_channelIndex, channel->hasInvalidOutput());
     }
 
     QBrush MixerChannelView::backgroundActive() const
@@ -467,6 +469,22 @@ namespace lmms::gui
     MixerChannel* MixerChannelView::mixerChannel() const
     {
         return Engine::mixer()->mixerChannel(m_channelIndex);
+    }
+
+    void MixerChannelView::updateInvalidOutputState(int index, bool invalid)
+    {
+        if (m_channelIndex != index) { return; }
+
+        if (invalid)
+        {
+            m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_red"));
+            m_muteButton->setToolTip(tr("Mixer channel is muted because of invalid output"));
+        }
+        else
+        {
+            m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
+            m_muteButton->setToolTip(tr("Mute this channel"));
+        }
     }
 
 } // namespace lmms::gui
