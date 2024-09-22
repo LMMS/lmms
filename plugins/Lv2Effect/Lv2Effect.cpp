@@ -100,16 +100,21 @@ bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-		auto l = static_cast<double>(buf[f][0]);
-		auto r = static_cast<double>(buf[f][1]);
-		outSum += l*l + r*r;
+		if(wantUi)
+		{
+			auto l = static_cast<double>(buf[f][0]);
+			auto r = static_cast<double>(buf[f][1]);
+			outSum += l*l + r*r;
+		}
 	}
-	checkGate(outSum / frames);
-
-	// keep DSP<->UI communication active, but return a useful value
-	bool producedOutput = isRunning();
-	if(wantUi) { startRunning(); }
-	return producedOutput;
+	if(wantUi)
+	{
+		// keep DSP communication active
+	} else {
+		// stopRunning if wanted
+		checkGate(outSum / frames);
+	}
+	return isRunning();
 }
 
 
