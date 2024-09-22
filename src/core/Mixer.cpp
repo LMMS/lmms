@@ -60,22 +60,22 @@ void MixerRoute::updateName()
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
 }
 
-
-MixerChannel::MixerChannel( int idx, Model * _parent ) :
-	m_fxChain( nullptr ),
-	m_hasInput( false ),
-	m_stillRunning( false ),
-	m_peakLeft( 0.0f ),
-	m_peakRight( 0.0f ),
-	m_buffer( new SampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
-	m_muteModel( false, _parent ),
-	m_soloModel( false, _parent ),
-	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
-	m_name(),
-	m_lock(),
-	m_channelIndex( idx ),
-	m_queued( false ),
-	m_dependenciesMet(0)
+MixerChannel::MixerChannel(int idx, Mixer* mixer)
+	: m_fxChain(nullptr)
+	, m_hasInput(false)
+	, m_stillRunning(false)
+	, m_peakLeft(0.0f)
+	, m_peakRight(0.0f)
+	, m_buffer(new SampleFrame[Engine::audioEngine()->framesPerPeriod()])
+	, m_muteModel(false, mixer)
+	, m_soloModel(false, mixer)
+	, m_volumeModel(1.f, 0.f, 2.f, 0.001f, mixer)
+	, m_name()
+	, m_lock()
+	, m_channelIndex(idx)
+	, m_queued(false)
+	, m_dependenciesMet(0)
+	, m_mixer(mixer)
 {
 	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
@@ -140,13 +140,13 @@ void MixerChannel::sanitizeOutput()
 		if (!m_hasInvalidOutput)
 		{
 			m_hasInvalidOutput = true;
-			emit hasInvalidOutput(true);
+			m_mixer->broadcastChannelInvalidOutputState(m_channelIndex, true);
 		}
 	}
 	else if (m_hasInvalidOutput)
 	{
 		m_hasInvalidOutput = false;
-		emit hasInvalidOutput(false);
+		m_mixer->broadcastChannelInvalidOutputState(m_channelIndex, false);
 	}
 }
 
