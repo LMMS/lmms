@@ -79,9 +79,8 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_windowTitle->setGraphicsEffect( m_shadow );
 
 	// disable the minimize button
-	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
-		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
-		Qt::CustomizeWindowHint );
+	setWindowFlags(this->windowFlags() & ~Qt::WindowMinimizeButtonHint);
+
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
 
