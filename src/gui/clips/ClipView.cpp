@@ -633,7 +633,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(knifeMode) )
+		if (me->modifiers() & Qt::ControlModifier && !knifeMode)
 		{
 			if( isSelected() )
 			{
