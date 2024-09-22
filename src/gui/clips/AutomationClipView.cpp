@@ -395,7 +395,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
-	if ( m_marker )
+	if (m_marker)
 	{
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
