@@ -534,8 +534,9 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	rightClip->movePosition(splitPos);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
 	
+	remove();
+
 	m_clip->getTrack()->restoreJournallingState();
-	close();
 	return true;
 }
 
