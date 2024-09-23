@@ -141,9 +141,9 @@ public:
 	}
 
 
-	void process( const SampleFrame* _in, SampleFrame* _out ) override
+	void process(const float* _in, float* _out) override
 	{
-		LocalZynAddSubFx::processAudio( _out );
+		LocalZynAddSubFx::processAudio(reinterpret_cast<SampleFrame*>(_out));
 	}
 
 	void guiLoop();

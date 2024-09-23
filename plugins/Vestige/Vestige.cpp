@@ -41,6 +41,7 @@
 
 
 #include "AudioEngine.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CustomTextKnob.h"
 #include "Engine.h"
@@ -53,6 +54,7 @@
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
+#include "PluginPinConnectorView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -363,7 +365,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
+	m_plugin = new VstInstrumentPlugin{m_pluginDLL, this};
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -482,10 +484,17 @@ gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 }
 
 
+PluginPinConnector* VestigeInstrument::pinConnector()
+{
+	if (!m_plugin) { return nullptr; }
+	return &m_plugin->pinConnector();
+}
+
+
 namespace gui
 {
 
-VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
+VestigeInstrumentView::VestigeInstrumentView( VestigeInstrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
@@ -602,7 +611,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							SLOT( noteOffAll() ) );
 
 	setAcceptDrops( true );
-	_instrument2 = _instrument;
+	m_instrument2 = _instrument;
 	_parent2 = _parent;
 }
 
@@ -610,7 +619,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 void VestigeInstrumentView::managePlugin( void )
 {
 	if ( m_vi->m_plugin != nullptr && m_vi->m_subWindow == nullptr ) {
-		m_vi->p_subWindow = new ManageVestigeInstrumentView( _instrument2, _parent2, m_vi);
+		m_vi->p_subWindow = new ManageVestigeInstrumentView( m_instrument2, _parent2, m_vi);
 	} else if (m_vi->m_subWindow != nullptr) {
 		if (m_vi->m_subWindow->widget()->isVisible() == false ) {
 			m_vi->m_scrollArea->show();
@@ -912,8 +921,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 
 
-ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrument,
-							QWidget * _parent, VestigeInstrument * m_vi2 ) :
+ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _instrument,
+							QWidget * _parent, VestigeInstrument * _vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
 #if QT_VERSION < 0x50C00
@@ -927,7 +936,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 #endif
 
-	m_vi = m_vi2;
+	m_vi = _vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
@@ -961,11 +970,16 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
 
-	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
-	connect( m_closeButton, SIGNAL( clicked() ), this,
-							SLOT( closeWindow() ) );
+	m_pinConnectorButton = new QPushButton{m_vi->pinConnector()->getChannelCountText(), this};
+	m_pinConnectorButton->setToolTip(tr("Plugin Pin Connector"));
 
-	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
+	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVestigeInstrumentView::togglePinConnector);
+
+	connect(m_vi->pinConnector(), &PluginPinConnector::propertiesChanged, this, [&]() {
+		m_pinConnectorButton->setText(m_vi->pinConnector()->getChannelCountText());
+	});
+
+	l->addWidget(m_pinConnectorButton, 0, 2, 1, 2, Qt::AlignLeft);
 
 
 	for( int i = 0; i < 10; i++ )
@@ -1036,6 +1050,21 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_scrollArea->setWidget( widget );
 
 	m_vi->m_subWindow->show();
+}
+
+
+
+
+void ManageVestigeInstrumentView::togglePinConnector()
+{
+	if (!m_pinConnector)
+	{
+		m_pinConnector = m_vi->pinConnector()->instantiateView(m_vi->m_subWindow);
+	}
+	else
+	{
+		m_pinConnector->toggleVisibility();
+	}
 }
 
 
@@ -1121,6 +1150,13 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 	if (m_vi->m_scrollArea != nullptr) {
 		delete m_vi->m_scrollArea;
 		m_vi->m_scrollArea = nullptr;
+	}
+
+	if (m_pinConnector != nullptr)
+	{
+		m_pinConnector->closeWindow();
+		delete m_pinConnector;
+		m_pinConnector = nullptr;
 	}
 
 	if ( m_vi->m_subWindow != nullptr ) {

@@ -120,8 +120,8 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 
 		SRC_STATE* resampleState = playbackState->resamplingState();
 		SRC_DATA resampleData;
-		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
-		resampleData.data_out = (workingBuffer + offset)->data();
+		resampleData.data_in = audio_cast<const float*>((m_originalSample.data() + noteFrame)->data());
+		resampleData.data_out = audio_cast<float*>((workingBuffer + offset)->data());
 		resampleData.input_frames = noteLeft * m_originalSample.sampleSize();
 		resampleData.output_frames = frames;
 		resampleData.src_ratio = speedRatio;
