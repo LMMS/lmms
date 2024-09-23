@@ -111,7 +111,7 @@ jobs:
         with:
           workflow: build.yml
           name: msvc-${{ matrix.arch }}
-	  - name: Setup tmate session
+      - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
       - name: Display help
         run: >
