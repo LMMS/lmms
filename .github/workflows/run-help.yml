@@ -82,9 +82,13 @@ jobs:
         with:
           workflow: build.yml
           name: mingw${{ matrix.arch }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Display help
         run: >
-            $result = & lmms-*.exe "--help" |
+            $exe = Get-ChildItem -Path . -Filter "lmms-*.exe" | Select-Object -First 1;
+            if ($null -eq $exe) { exit 1 };
+            $result = & $exe.FullName "--help" |
             Select-String "Usage: lmms";
             if($result.Matches.Count -eq 0) { exit 1 }
   help-msvc:
@@ -107,6 +111,8 @@ jobs:
         with:
           workflow: build.yml
           name: msvc-${{ matrix.arch }}
+	  - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Display help
         run: >
             $exe = Get-ChildItem -Path . -Filter "lmms-*.exe" | Select-Object -First 1;
