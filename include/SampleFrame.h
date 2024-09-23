@@ -53,42 +53,42 @@ public:
 	{
 	}
 
-	InterleavedAudioDataPtr<sample_t> data()
+	InterleavedSampleType<sample_t>* data()
 	{
 		return m_samples.data();
 	}
 
-	InterleavedAudioDataPtr<const sample_t> data() const
+	const InterleavedSampleType<sample_t>* data() const
 	{
 		return m_samples.data();
 	}
 
-	sample_t& left()
+	sample_t& leftRef()
 	{
 		return m_samples[0];
 	}
 
-	const sample_t& left() const
+	sample_t left() const
 	{
 		return m_samples[0];
 	}
 
-	void setLeft(const sample_t& value)
+	void setLeft(sample_t value)
 	{
 		m_samples[0] = value;
 	}
 
-	sample_t& right()
+	sample_t& rightRef()
 	{
 		return m_samples[1];
 	}
 
-	const sample_t& right() const
+	sample_t right() const
 	{
 		return m_samples[1];
 	}
 
-	void setRight(const sample_t& value)
+	void setRight(sample_t value)
 	{
 		m_samples[1] = value;
 	}
@@ -98,7 +98,7 @@ public:
 		return m_samples[index];
 	}
 
-	const sample_t& operator[](size_t index) const
+	sample_t operator[](size_t index) const
 	{
 		return m_samples[index];
 	}
@@ -110,8 +110,8 @@ public:
 
 	SampleFrame& operator+=(const SampleFrame& other)
 	{
-		auto & l = left();
-		auto & r = right();
+		auto& l = leftRef();
+		auto& r = rightRef();
 
 		l += other.left();
 		r += other.right();
@@ -139,8 +139,8 @@ public:
 
 	void operator*=(const SampleFrame& other)
 	{
-		left() *= other.left();
-		right() *= other.right();
+		leftRef() *= other.left();
+		rightRef() *= other.right();
 	}
 
 	sample_t sumOfSquaredAmplitudes() const
@@ -168,10 +168,10 @@ public:
 
 	void clamp(sample_t low, sample_t high)
 	{
-		auto & l = left();
+		auto& l = leftRef();
 		l = std::clamp(l, low, high);
 
-		auto & r = right();
+		auto& r = rightRef();
 		r = std::clamp(r, low, high);
 	}
 
@@ -186,7 +186,7 @@ public:
 	}
 
 private:
-	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
+	std::array<InterleavedSampleType<sample_t>, DEFAULT_CHANNELS> m_samples;
 };
 
 inline void zeroSampleFrames(SampleFrame* buffer, size_t frames)
@@ -209,7 +209,7 @@ inline SampleFrame getAbsPeakValues(SampleFrame* buffer, size_t frames)
 	return peaks;
 }
 
-inline void copyToSampleFrames(SampleFrame* target, InterleavedAudioDataPtr<const float> source, size_t frames)
+inline void copyToSampleFrames(SampleFrame* target, const InterleavedSampleType<float>* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -218,7 +218,7 @@ inline void copyToSampleFrames(SampleFrame* target, InterleavedAudioDataPtr<cons
 	}
 }
 
-inline void copyFromSampleFrames(InterleavedAudioDataPtr<float> target, const SampleFrame* source, size_t frames)
+inline void copyFromSampleFrames(InterleavedSampleType<float>* target, const SampleFrame* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -227,8 +227,36 @@ inline void copyFromSampleFrames(InterleavedAudioDataPtr<float> target, const Sa
 	}
 }
 
-using CoreAudioData = Span<const SampleFrame* const>;
-using CoreAudioDataMut = Span<SampleFrame* const>;
+using CoreAudioBuffer = Span<const SampleFrame* const>;
+using CoreAudioBufferMut = Span<SampleFrame* const>;
+
+//! Cast a raw audio samples pointer `sample_t*` to `SampleFrame*`
+template<>
+inline auto audio_cast(sample_t* samples) -> SampleFrame*
+{
+	return reinterpret_cast<SampleFrame*>(samples);
+}
+
+//! Cast a raw audio samples pointer `const float*` to `const SampleFrame*`
+template<>
+inline auto audio_cast(const sample_t* samples) -> const SampleFrame*
+{
+	return reinterpret_cast<const SampleFrame*>(samples);
+}
+
+//! Cast a raw audio samples pointer `InterleavedSampleType*` to `SampleFrame*`
+template<>
+inline auto audio_cast(InterleavedSampleType<sample_t>* samples) -> SampleFrame*
+{
+	return reinterpret_cast<SampleFrame*>(samples);
+}
+
+//! Cast a raw audio samples pointer `const InterleavedSampleType*` to `const SampleFrame*`
+template<>
+inline auto audio_cast(const InterleavedSampleType<sample_t>* samples) -> const SampleFrame*
+{
+	return reinterpret_cast<const SampleFrame*>(samples);
+}
 
 } // namespace lmms
 

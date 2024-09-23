@@ -365,9 +365,9 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 		if (m_splitChannels)
 		{
 			// NOTE: VST plugins always use split channels
-			const auto trackChannels = CoreAudioData{&_in_buf, 1};
-			const auto pluginInput = SplitAudioData<sample_t> {
-				m_audioBuffer.get(),
+			const auto trackChannels = CoreAudioBuffer{&_in_buf, 1};
+			const auto pluginInput = SplitAudioBuffer<sample_t> {
+				audio_cast<SplitSampleType<sample_t>*>(m_audioBuffer.get()),
 				static_cast<std::size_t>(frames * m_pinConnector.in().channelCount())
 			};
 
@@ -375,12 +375,12 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 		}
 		else if (inputsClamped == DEFAULT_CHANNELS)
 		{
-			auto target = m_audioBuffer.get();
+			auto target = audio_cast<InterleavedSampleType<sample_t>*>(m_audioBuffer.get());
 			copyFromSampleFrames(target, _in_buf, frames);
 		}
 		else
 		{
-			auto o = reinterpret_cast<SampleFrame*>(m_audioBuffer.get());
+			auto o = audio_cast<SampleFrame*>(m_audioBuffer.get());
 			for( ch_cnt_t ch = 0; ch < inputsClamped; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
@@ -408,9 +408,10 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 	if (m_splitChannels)
 	{
 		// NOTE: VST plugins always use split channels
-		const auto trackChannels = CoreAudioDataMut{&_out_buf, 1};
-		const auto pluginOutput = SplitAudioData<const sample_t> {
-			m_audioBuffer.get() + (frames * m_pinConnector.in().channelCount()),
+		const auto trackChannels = CoreAudioBufferMut{&_out_buf, 1};
+		const auto pluginOutput = SplitAudioBuffer<const sample_t> {
+			audio_cast<const SplitSampleType<sample_t>*>(
+				m_audioBuffer.get() + (frames * m_pinConnector.in().channelCount())),
 			static_cast<std::size_t>(frames * m_pinConnector.out().channelCount())
 		};
 
@@ -418,7 +419,8 @@ bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf 
 	}
 	else if (outputsClamped == DEFAULT_CHANNELS)
 	{
-		auto source = m_audioBuffer.get() + m_pinConnector.in().channelCount() * frames;
+		auto source = audio_cast<InterleavedSampleType<float>*>(
+			m_audioBuffer.get() + m_pinConnector.in().channelCount() * frames);
 		copyToSampleFrames(_out_buf, source, frames);
 	}
 	else

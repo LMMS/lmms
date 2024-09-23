@@ -118,20 +118,20 @@ void PluginPinConnector::setDefaultConnections()
 }
 
 void PluginPinConnector::routeToPlugin(f_cnt_t frames,
-	CoreAudioData in, SplitAudioData<sample_t> out) const
+	CoreAudioBuffer in, SplitAudioBuffer<sample_t> out) const
 {
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_trackChannelsUpperBound / 2;
-	assert(inSizeConstrained <= in.size);
+	assert(inSizeConstrained <= in.size());
 
 	// Zero the output buffer
-	std::fill_n(out.ptr, out.size, 0.f);
+	std::fill(out.begin(), out.end(), 0.f);
 
 	std::uint8_t outChannel = 0;
-	for (f_cnt_t outSampleIdx = 0; outSampleIdx < out.size; outSampleIdx += frames, ++outChannel)
+	for (f_cnt_t outSampleIdx = 0; outSampleIdx < out.size(); outSampleIdx += frames, ++outChannel)
 	{
 		mix_ch_t numRouted = 0; // counter for # of in channels routed to the current out channel
-		sample_t* outPtr = &out[outSampleIdx];
+		SplitSampleType<sample_t>* outPtr = &out[outSampleIdx];
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 		{
@@ -191,13 +191,13 @@ void PluginPinConnector::routeToPlugin(f_cnt_t frames,
 }
 
 void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
-	SplitAudioData<const sample_t> in, CoreAudioDataMut inOut) const
+	SplitAudioBuffer<const sample_t> in, CoreAudioBufferMut inOut) const
 {
 	assert(frames <= DEFAULT_BUFFER_SIZE);
 
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_trackChannelsUpperBound / 2;
-	assert(inOutSizeConstrained <= inOut.size);
+	assert(inOutSizeConstrained <= inOut.size());
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
@@ -205,15 +205,15 @@ void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
 		const auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
 
 		const auto mixInputs = [&](std::uint8_t outChannel, std::uint8_t outChannelOffset) {
-			WorkingBuffer.fill(0); // used as buffer out
+			WorkingBuffer.fill(0.f); // used as buffer out
 
 			// Counter for # of in channels routed to the current out channel
 			mix_ch_t numRouted = 0;
 
 			std::uint8_t inChannel = 0;
-			for (f_cnt_t inSampleIdx = 0; inSampleIdx < in.size; inSampleIdx += frames, ++inChannel)
+			for (f_cnt_t inSampleIdx = 0; inSampleIdx < in.size(); inSampleIdx += frames, ++inChannel)
 			{
-				const sample_t* inPtr = &in[inSampleIdx];
+				const SplitSampleType<sample_t>* inPtr = &in[inSampleIdx];
 
 				if (m_out.enabled(outChannel + outChannelOffset, inChannel))
 				{

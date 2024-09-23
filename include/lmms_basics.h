@@ -74,26 +74,46 @@ constexpr const char* UI_CTRL_KEY =
 "Ctrl";
 #endif
 
-
-//! Stand-in for C++20's std::span
+/**
+ * Simple minimally functional stand-in for C++20's std::span
+ *
+ * TODO C++20: Use std::span instead
+ */
 template<typename T>
-struct Span
+class Span
 {
-	T* ptr;
-	std::size_t size;
+public:
+	Span() = default;
+	Span(T* data, std::size_t size)
+		: m_data{data}
+		, m_size{size}
+	{
+	}
 
-	constexpr auto operator[](std::size_t idx) const -> const T& { return ptr[idx]; }
-	constexpr auto operator[](std::size_t idx) -> T& { return ptr[idx]; }
+	constexpr auto data() const -> T* { return m_data; }
+	constexpr auto size() const -> std::size_t { return m_size; }
+	constexpr auto size_bytes() const -> std::size_t { return m_size * sizeof(T); }
 
-	constexpr auto begin() const -> const T* { return ptr; }
-	constexpr auto begin() -> T* { return ptr; }
-	constexpr auto end() const -> const T* { return ptr + size; }
-	constexpr auto end() -> T* { return ptr + size; }
+	constexpr auto operator[](std::size_t idx) const -> const T& { return m_data[idx]; }
+	constexpr auto operator[](std::size_t idx) -> T& { return m_data[idx]; }
+
+	constexpr auto begin() const -> const T* { return m_data; }
+	constexpr auto begin() -> T* { return m_data; }
+	constexpr auto end() const -> const T* { return m_data + m_size; }
+	constexpr auto end() -> T* { return m_data + m_size; }
+
+private:
+	T* m_data = nullptr;
+	std::size_t m_size = 0;
 };
 
 
-// Stand-in for C++23's std::unreachable
-// Taken from https://en.cppreference.com/w/cpp/utility/unreachable
+/**
+ * Stand-in for C++23's std::unreachable
+ * Taken from https://en.cppreference.com/w/cpp/utility/unreachable
+ *
+ * TODO C++23: Use std::unreachable instead
+ */
 [[noreturn]] inline void unreachable()
 {
 #if defined(_MSC_VER) && !defined(__clang__) // MSVC
