@@ -38,7 +38,7 @@ jobs:
           - arch: 'x86_64'
             runner: 'macos-latest'
           - arch: 'arm64'
-            runner: 'macos-latest-arm64'
+            runner: 'macos-14-arm64'
     name: help-macos-${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runner }}
     steps:
@@ -115,8 +115,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
       - name: Display help
         run: >
-            $exe = Get-ChildItem -Path . -Filter "lmms-*.exe" | Select-Object -First 1;
+            $exe = Get-ChildItem -Path . -Filter "lmms-*.exe" |  Select-Object -Property Name;
             if ($null -eq $exe) { exit 1 };
-            $result = & $exe.FullName "--help" |
-            Select-String "Usage: lmms";
+            $result = & ".\$($exe.Name)" "--help" | Select-String "Usage: lmms";
             if($result.Matches.Count -eq 0) { exit 1 }
