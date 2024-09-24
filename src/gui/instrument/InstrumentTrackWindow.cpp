@@ -264,7 +264,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", 3);
 	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", 4);
 	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
-// EffectRackView has sizeHint to be QSize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1)
 
 
 	// setup piano-widget
@@ -305,13 +304,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 			subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
 		}
 		Qt::WindowFlags flags = subWin->windowFlags();
-	if (!m_instrumentView->isResizable()) {
-		flags |= Qt::MSWindowsFixedSizeDialogHint;
-		// any better way than this?
-	} else {
-		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
-		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
-	}
+		if (!m_instrumentView->isResizable()) {
+			flags |= Qt::MSWindowsFixedSizeDialogHint;
+			// any better way than this?
+		} else {
+			subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
+			subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+		}
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		subWin->setWindowFlags( flags );
 	}
