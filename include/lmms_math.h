@@ -96,44 +96,6 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 	}
 }
 
-//! Uses `x * y + z` or `std::fma` - whichever is faster
-template<typename T>
-inline T fastFma(T x, T y, T z);
-
-//! Uses `x * y + z` or `std::fma` - whichever is faster
-template<>
-inline float fastFma(float x, float y, float z)
-{
-#ifdef FP_FAST_FMAF
-	return std::fma(x, y, z);
-#else
-	return x * y + z;
-#endif // FP_FAST_FMAF
-}
-
-//! Uses `x * y + z` or `std::fma` - whichever is faster
-template<>
-inline double fastFma(double x, double y, double z)
-{
-#ifdef FP_FAST_FMA
-	return std::fma(x, y, z);
-#else
-	return x * y + z;
-#endif // FP_FAST_FMA
-}
-
-//! Uses `x * y + z` or `std::fma` - whichever is faster
-template<>
-inline long double fastFma(long double x, long double y, long double z)
-{
-#ifdef FP_FAST_FMAL
-	return std::fma(x, y, z);
-#else
-	return x * y + z;
-#endif // FP_FAST_FMAL
-}
-
-
 //! Source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
 inline double fastPow(double a, double b)
 {
