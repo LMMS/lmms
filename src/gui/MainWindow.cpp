@@ -991,7 +991,7 @@ void MainWindow::refocus()
 	}
 
 	// ... otherwise set the focus on the main window.
-	this->setFocus();	
+	this->setFocus();
 }
 
 
