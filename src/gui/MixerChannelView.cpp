@@ -58,11 +58,32 @@ namespace lmms::gui
             widget->setSizePolicy(sizePolicy);
         };
 
+        auto receiveArrowContainer = new QWidget{};
+        auto receiveArrowLayout = new QVBoxLayout{receiveArrowContainer};
+        m_receiveArrow = new QLabel{};
+        m_receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
+        receiveArrowLayout->setContentsMargins(0, 0, 0, 0);
+        receiveArrowLayout->setSpacing(0);
+        receiveArrowLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
+
+        auto sendButtonContainer = new QWidget{};
+        auto sendButtonLayout = new QVBoxLayout{sendButtonContainer};
         m_sendButton = new SendButtonIndicator{this, this, mixerView};
-        retainSizeWhenHidden(m_sendButton);
+        sendButtonLayout->setContentsMargins(0, 0, 0, 0);
+        sendButtonLayout->setSpacing(0);
+        sendButtonLayout->addWidget(m_sendButton, 0, Qt::AlignHCenter);
+
+        m_receiveArrowOrSendButton = new QStackedWidget{this};
+        m_receiveArrowStackedIndex = m_receiveArrowOrSendButton->addWidget(receiveArrowContainer);
+        m_sendButtonStackedIndex = m_receiveArrowOrSendButton->addWidget(sendButtonContainer);
+        retainSizeWhenHidden(m_receiveArrowOrSendButton);
 
         m_sendKnob = new Knob{KnobType::Bright26, this, tr("Channel send amount")};
         retainSizeWhenHidden(m_sendKnob);
+
+        m_sendArrow = new QLabel{};
+        m_sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
+        retainSizeWhenHidden(m_sendArrow);
 
         m_channelNumberLcd = new LcdWidget{2, this};
         m_channelNumberLcd->setValue(channelIndex);
@@ -89,16 +110,6 @@ namespace lmms::gui
         renameLineEditProxy->setRotation(-90);
         m_renameLineEditView->setFixedSize(m_renameLineEdit->height() + 5, m_renameLineEdit->width() + 5);
 
-        m_sendArrow = new QLabel{};
-        m_sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
-        retainSizeWhenHidden(m_sendArrow);
-        m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::SendToThis);
-
-        m_receiveArrow = new QLabel{};
-        m_receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
-        retainSizeWhenHidden(m_receiveArrow);
-        m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::ReceiveFromThis);
-
         m_muteButton = new PixmapButton(this, tr("Mute"));
         m_muteButton->setModel(&mixerChannel->m_muteModel);
         m_muteButton->setActiveGraphic(embed::getIconPixmap("led_off"));
@@ -113,7 +124,7 @@ namespace lmms::gui
         m_soloButton->setCheckable(true);
         m_soloButton->setToolTip(tr("Solo this channel"));        
 
-        QVBoxLayout* soloMuteLayout = new QVBoxLayout();
+        auto soloMuteLayout = new QVBoxLayout();
         soloMuteLayout->setContentsMargins(0, 0, 0, 0);
         soloMuteLayout->setSpacing(0);
         soloMuteLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
@@ -128,15 +139,15 @@ namespace lmms::gui
         m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
 
         auto mainLayout = new QVBoxLayout{this};
-        mainLayout->setContentsMargins(0, 0, 0, 0);
-        mainLayout->setSpacing(0);
-        mainLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(m_sendButton, 0, Qt::AlignHCenter);
+        mainLayout->setContentsMargins(4, 4, 4, 4);
+        mainLayout->setSpacing(2);
+
+        mainLayout->addWidget(m_receiveArrowOrSendButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
-        mainLayout->addLayout(soloMuteLayout, 0);
+        mainLayout->addLayout(soloMuteLayout);
         mainLayout->addWidget(m_peakIndicator);
         mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
@@ -178,13 +189,11 @@ namespace lmms::gui
 
     void MixerChannelView::paintEvent(QPaintEvent* event)
     {
-        auto * mixer = Engine::mixer();
         const auto channel = mixerChannel();
         const bool muted = channel->m_muteModel.value();
         const auto name = channel->m_name;
         const auto elidedName = elideName(name);
-        const auto * mixerChannelView = m_mixerView->currentMixerChannel();
-        const auto isActive = mixerChannelView == this;
+        const auto isActive = m_mixerView->currentMixerChannel() == this;
 
         if (!m_inRename && m_renameLineEdit->text() != elidedName)
         {
@@ -211,26 +220,6 @@ namespace lmms::gui
         // outer border
         painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
         painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
-
-        const auto & currentMixerChannelIndex = mixerChannelView->m_channelIndex;
-        const auto sendToThis = mixer->channelSendModel(currentMixerChannelIndex, m_channelIndex) != nullptr;
-        const auto receiveFromThis = mixer->channelSendModel(m_channelIndex, currentMixerChannelIndex) != nullptr;
-        const auto sendReceiveStateNone = !sendToThis && !receiveFromThis;
-
-        // Only one or none of them can be on
-        assert(sendToThis ^ receiveFromThis || sendReceiveStateNone);
-
-        m_sendArrow->setVisible(sendToThis);
-        m_receiveArrow->setVisible(receiveFromThis);
-
-        if (sendReceiveStateNone)
-        {
-            setSendReceiveState(SendReceiveState::None);
-        }
-        else
-        {
-            setSendReceiveState(sendToThis ? SendReceiveState::SendToThis : SendReceiveState::ReceiveFromThis);
-        }
 
         QWidget::paintEvent(event);
     }
@@ -281,18 +270,6 @@ namespace lmms::gui
         m_effectRackView->setModel(&mixerChannel->m_fxChain);
         m_channelNumberLcd->setValue(index);
         m_channelIndex = index;
-    }
-
-    MixerChannelView::SendReceiveState MixerChannelView::sendReceiveState() const
-    {
-        return m_sendReceiveState;
-    }
-
-    void MixerChannelView::setSendReceiveState(const SendReceiveState& state)
-    {
-        m_sendReceiveState = state;
-        m_sendArrow->setVisible(state == SendReceiveState::SendToThis);
-        m_receiveArrow->setVisible(state == SendReceiveState::ReceiveFromThis);
     }
 
     QBrush MixerChannelView::backgroundActive() const
