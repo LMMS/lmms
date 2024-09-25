@@ -27,12 +27,13 @@
 
 #include <QtGlobal>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <cassert>
 
 namespace lmms
 {
@@ -99,14 +100,15 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 //! Source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
 inline double fastPow(double a, double b)
 {
-	union
-	{
-		double d;
-		std::int32_t x[2];
-	} u = { a };
-	u.x[1] = static_cast<std::int32_t>(b * (u.x[1] - 1072632447) + 1072632447);
-	u.x[0] = 0;
-	return u.d;
+	double d;
+	std::int32_t x[2];
+
+	std::memcpy(x, &a, sizeof(x));
+	x[1] = static_cast<std::int32_t>(b * (x[1] - 1072632447) + 1072632447);
+	x[0] = 0;
+
+	std::memcpy(&d, x, sizeof(d));
+	return d;
 }
 
 
