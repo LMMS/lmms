@@ -140,7 +140,7 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-void Editor::closeEvent( QCloseEvent * _ce )
+void Editor::closeEvent(QCloseEvent * event)
 {
 	if( parentWidget() )
 	{
@@ -151,7 +151,7 @@ void Editor::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	getGUI()->mainWindow()->refocus();
-	_ce->ignore();
+	event->ignore();
  }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
