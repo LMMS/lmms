@@ -978,7 +978,7 @@ void MainWindow::refocus()
 	const auto gui = getGUI();
 
 	// Attempt to set the focus on the first of these editors that is not hidden...
-	const std::vector<QWidget*> editorParents = { gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
+	const auto editorParents = std::array{ gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
 		gui->pianoRoll()->parentWidget(), gui->automationEditor()->parentWidget() };
 
 	for (auto editorParent : editorParents)
