@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
 #include <QApplication>
@@ -45,10 +45,7 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	m_paintPixmap(),
-	m_paintPixmapDrawnRegion(),
-	m_muted(false),
-	m_selected(false)
+	m_paintPixmap()
 {
 	// update UI and tooltip
 	updateSample();
@@ -64,9 +61,8 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 void SampleClipView::updateSample()
 {
 	update();
-	
+
 	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
-	m_paintPixmapDrawnRegion = QRect();
 
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
@@ -190,7 +186,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
-	
+
 	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
 		m_clip->changeLengthToSampleLength();
@@ -211,44 +207,24 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
-	/*
-		This is too ambiguous. There's no way to tell whether the clip
-		needs updating because of mute/select change, undrawn region
-		entering view, sample change, zooming, etc...
 
-		Overriding this until the functionality is improved.
-		Update is determined by zooming, update region, mute/select
-		change, sample changes.
-	*/
-	setNeedsUpdate(false);
-
-	const auto originalRegion = pe->rect();
+	const auto region = pe->rect();
 
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
 		m_paintPixmap = QPixmap(size());
-		m_paintPixmapDrawnRegion = QRect();
-		setNeedsUpdate(true);
 	}
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
 
-	if (m_muted == muted && m_selected == selected && m_paintPixmapDrawnRegion.contains(originalRegion) && !needsUpdate())
+	if (!needsUpdate())
 	{
-		painter.drawPixmap(originalRegion, m_paintPixmap, originalRegion);
+		painter.drawPixmap(region, m_paintPixmap, region);
 		return;
 	}
 
-	/*
-		Extend the update region by this amount so the code doesn't
-		have to constantly update during continuous scrolling.
-	*/
-	const auto region = originalRegion.adjusted(0, 0, 500, 0);
-
-	m_muted = muted;
-	m_selected = selected;
-	m_paintPixmapDrawnRegion |= region;
+	setNeedsUpdate(false);
 
 	QPainter p( &m_paintPixmap );
 	p.setClipRegion(region);
