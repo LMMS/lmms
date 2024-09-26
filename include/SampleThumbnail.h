@@ -46,9 +46,6 @@ class SampleFrame;
 class LMMS_EXPORT SampleThumbnail
 {
 public:
-	static constexpr auto MinThumbnailSize = 1;
-	static constexpr auto MaxThumbnailSize = 32768;
-
 	struct Bit
 	{
 		Bit() = default;

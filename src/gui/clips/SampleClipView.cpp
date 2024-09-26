@@ -208,7 +208,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
-	const auto region = pe->rect();
+	const auto re = pe->rect();
+	const auto region = QRect(re.x(), rect().y(), re.width(), rect().height());
 
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{

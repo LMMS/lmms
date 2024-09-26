@@ -119,7 +119,7 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 	const auto sampleBufferSize = inputSample.sampleSize();
 	const auto& buffer = inputSample.data();
 
-	const auto thumbnailSizeDivisor = std::max<size_t>(32, 3*std::log2(sampleBufferSize));
+	const auto thumbnailSizeDivisor = std::max<size_t>(16, 2*std::log2(sampleBufferSize));
 	// I don't think we *really* need to keep a full resolution thumbnail of the sample.
 	const auto firstThumbnailSize = std::max<size_t>(sampleBufferSize / 4, 1);
 
@@ -128,7 +128,7 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 
 	// Generate the remaining thumbnails using the first one, each one's
 	// size is the size of the previous one divided by the thumbnail size divisor.
-	for (auto thumbnailSize = std::size_t{firstThumbnailSize / thumbnailSizeDivisor}; thumbnailSize >= MinThumbnailSize;
+	for (auto thumbnailSize = std::size_t{firstThumbnailSize / thumbnailSizeDivisor}; thumbnailSize >= 1;
 		 thumbnailSize /= thumbnailSizeDivisor)
 	{
 		const auto& biggerThumbnail = m_thumbnailCache->back();
