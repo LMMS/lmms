@@ -453,7 +453,7 @@ void AudioEngine::clearNewPlayHandles()
 	requestChangeInModel();
 	for (LocklessListElement* e = m_newPlayHandles.popList(); e;)
 	{
-		LocklessListElement * next = e->next;
+		LocklessListElement* next = e->next;
 		m_newPlayHandles.free(e);
 		e = next;
 	}
