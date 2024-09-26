@@ -252,8 +252,7 @@ sample_rate_t AudioEngine::baseSampleRate() const
 
 sample_rate_t AudioEngine::outputSampleRate() const
 {
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
-							baseSampleRate();
+	return m_audioDev ? m_audioDev->sampleRate() : baseSampleRate();
 }
 
 
@@ -261,8 +260,7 @@ sample_rate_t AudioEngine::outputSampleRate() const
 
 sample_rate_t AudioEngine::inputSampleRate() const
 {
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
-							baseSampleRate();
+	return m_audioDev ? m_audioDev->sampleRate() : baseSampleRate();
 }
 
 bool AudioEngine::criticalXRuns() const
