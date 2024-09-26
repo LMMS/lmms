@@ -617,8 +617,7 @@ void AudioEngine::removePlayHandle(PlayHandle* ph)
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		for (LocklessListElement* e = m_newPlayHandles.first(), *ePrev = nullptr;
-			e; ePrev = e, e = e->next)
+		for (auto e = m_newPlayHandles.first(), *ePrev = nullptr; e; ePrev = e, e = e->next)
 		{
 			if (e->value == ph)
 			{
@@ -667,8 +666,7 @@ void AudioEngine::removePlayHandle(PlayHandle* ph)
 void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
 	requestChangeInModel();
-	PlayHandleList::Iterator it = m_playHandles.begin();
-	while (it != m_playHandles.end())
+	for (auto it = m_playHandles.begin(); it != m_playHandles.end();)
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
