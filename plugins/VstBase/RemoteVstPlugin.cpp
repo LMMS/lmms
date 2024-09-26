@@ -265,7 +265,7 @@ public:
 	void saveChunkToFile( const std::string & _file );
 
 	// restore settings chunk of plugin from file
-	void loadChunkFromFile( const std::string & _file, int _len );
+	void loadChunkFromFile(const std::string& _file, std::size_t _len);
 
 	// restore settings chunk of plugin from file
 	void loadPresetFile( const std::string & _file );
@@ -842,7 +842,6 @@ void RemoteVstPlugin::initEditor()
 #endif
 
 #else
-	XEvent e;
 	Atom prop_atom, val_atom;
 	
 	if (m_display == nullptr)
@@ -1303,7 +1302,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 					"Error opening file for saving chunk.\n" );
 				return;
 			}
-			if ( fwrite( chunk, 1, len, fp ) != len )
+			if (fwrite(chunk, 1, len, fp) != static_cast<std::size_t>(len))
 			{
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
@@ -1541,7 +1540,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int toUInt;
 	float * pFloat;
 
-	if (m_plugin->uniqueID != pBank->fxID) {
+	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != pBank->fxID) {
 		sendMessage( message( IdVstCurrentProgramName ).
 					addString( "Error: Plugin UniqID not match" ) );
 		fclose( stream );
@@ -1577,7 +1576,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 		else
 		{
 			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk);
-			for (int i = 0; i < pBank->numPrograms; i++ )
+			for (auto i = 0u; i < pBank->numPrograms; i++)
 			{
 				toUInt = endian_swap( toUIntArray[ i ] );
 				pFloat = ( float* ) &toUInt;
@@ -1625,10 +1624,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	delete[] (char*)chunk;
 }
 
-
-
-
-void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
+void RemoteVstPlugin::loadChunkFromFile(const std::string& _file, std::size_t _len)
 {
 	auto chunk = new char[_len];
 
@@ -2304,7 +2300,7 @@ void RemoteVstPlugin::guiEventLoop()
 		{
 			XNextEvent(m_display, &e);
 		
-			if (e.type == ClientMessage && e.xclient.data.l[0] == m_wmDeleteMessage)
+			if (e.type == ClientMessage && static_cast<Atom>(e.xclient.data.l[0]) == m_wmDeleteMessage)
 			{
 				hideEditor();
 			}

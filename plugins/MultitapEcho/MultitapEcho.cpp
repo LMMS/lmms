@@ -25,6 +25,7 @@
 
 #include "MultitapEcho.h"
 #include "embed.h"
+#include "lmms_basics.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -85,7 +86,7 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 
 void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames )
 {
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		dst[f][0] = filter.update( src[f][0], 0 );
 		dst[f][1] = filter.update( src[f][1], 1 );
@@ -93,14 +94,8 @@ void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOn
 }
 
 
-bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-	
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -118,8 +113,8 @@ bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frame
 	}
 	
 	// add dry buffer - never swap inputs for dry
-	m_buffer.writeAddingMultiplied( buf, 0, frames, dryGain );
-	
+	m_buffer.writeAddingMultiplied(buf, f_cnt_t{0}, frames, dryGain);
+
 	// swapped inputs?
 	if( swapInputs )
 	{
@@ -151,16 +146,13 @@ bool MultitapEchoEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frame
 	// pop the buffer and mix it into output
 	m_buffer.pop( m_work );
 
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	
-	checkGate( outSum / frames );
 
-	return isRunning();	
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

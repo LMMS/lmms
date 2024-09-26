@@ -302,7 +302,7 @@ void SaSpectrumView::refreshPaths()
 // part new, part old. At reasonable frame rate, such difference is invisible..
 void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer)
 {
-	for (int n = 0; n < m_processor->binCount(); n++)
+	for (auto n = std::size_t{0}; n < m_processor->binCount(); n++)
 	{
 		// Update the exponential average if enabled, or simply copy the value.
 		if (!m_controls->m_pauseModel.value())

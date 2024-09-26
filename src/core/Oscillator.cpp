@@ -81,7 +81,7 @@ void Oscillator::update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 {
 	if (m_freq >= Engine::audioEngine()->outputSampleRate() / 2)
 	{
-		BufferManager::clear(ab, frames);
+		zeroSampleFrames(ab, frames);
 		return;
 	}
 	// If this oscillator is used to PM or PF modulate another oscillator, take a note.
@@ -535,7 +535,7 @@ void Oscillator::updateFM( SampleFrame* _ab, const fpp_t _frames,
 // should be called every time phase-offset is changed...
 inline void Oscillator::recalcPhase()
 {
-	if( !typeInfo<float>::isEqual( m_phaseOffset, m_ext_phaseOffset ) )
+	if (!approximatelyEqual(m_phaseOffset, m_ext_phaseOffset))
 	{
 		m_phase -= m_phaseOffset;
 		m_phaseOffset = m_ext_phaseOffset;

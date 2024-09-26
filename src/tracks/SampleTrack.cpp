@@ -188,8 +188,7 @@ Clip * SampleTrack::createClip(const TimePos & pos)
 
 
 
-void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
 {
 	m_audioPort.effects()->saveState( _doc, _this );
 #if 0

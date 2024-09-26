@@ -27,6 +27,7 @@
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
+#include <array>
 #include <fluidsynth/types.h>
 #include <QMutex>
 #include <samplerate.h>

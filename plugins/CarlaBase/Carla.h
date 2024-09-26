@@ -29,6 +29,8 @@
 #define CARLA_MIN_PARAM_VERSION 0x020090
 #define CARLA_VERSION_HEX_3 0x30000
 
+#include <vector>
+
 // qt
 #include <QCloseEvent>
 #include <QDomElement>
@@ -223,7 +225,7 @@ private:
     QMutex fMutex;
 
     uint8_t m_paramGroupCount;
-    QList<CarlaParamFloatModel*> m_paramModels;
+    std::vector<CarlaParamFloatModel*> m_paramModels;
     QDomElement m_settingsElem;
 
     QCompleter* m_paramsCompleter;
@@ -351,7 +353,7 @@ private:
 
 	CarlaInstrument* const m_carlaInstrument;
 	CarlaInstrumentView* const m_carlaInstrumentView;
-	QList<Knob*> m_knobs;
+	std::vector<Knob*> m_knobs;
 
 	// Keep track of the biggest knob width per group
 	QList<uint16_t> m_maxKnobWidthPerGroup;

@@ -60,10 +60,8 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
-
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -157,17 +155,17 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			double randThing = (fast_rand()/static_cast<double>(FAST_RAND_MAX) * 2. - 1.);
+			double randThing = fast_rand() * static_cast<double>(FAST_RAND_RATIO) * 2. - 1.;
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
 			std::array<float, 2> sprayResult = {0, 0};
 			if (spray > 0)
 			{
-				sprayResult[0] = (fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate;
+				sprayResult[0] = fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate;
 				sprayResult[1] = linearInterpolate(
 					sprayResult[0],
-					(fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate,
+					fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate,
 					spraySpread);
 			}
 			
@@ -245,7 +243,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		changeSampleRate();
 	}
 
-	return isRunning();
+	return Effect::ProcessStatus::ContinueIfNotQuiet;
 }
 
 void GranularPitchShifterEffect::changeSampleRate()
@@ -258,7 +256,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	
 	m_ringBufLength = m_sampleRate * ringBufLength;
 	m_ringBuf.resize(m_ringBufLength);
-	for (size_t i = 0; i < m_ringBufLength; ++i)
+	for (size_t i = 0; i < static_cast<std::size_t>(m_ringBufLength); ++i)
 	{
 		m_ringBuf[i][0] = 0;
 		m_ringBuf[i][1] = 0;

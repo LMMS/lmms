@@ -56,7 +56,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	}
 
 	int cbIndex = 0;
-	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
+	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
 	{
 		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
 		{
@@ -268,7 +268,7 @@ void ExportProjectDialog::startBtnClicked()
 	}
 
 	// Find proper file extension.
-	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
+	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
 	{
 		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
 		{
