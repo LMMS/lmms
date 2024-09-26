@@ -368,6 +368,11 @@ void AudioEngine::renderStageEffects()
 	// removed all play handles which are done
 	for (auto it = m_playHandles.begin(); it != m_playHandles.end();)
 	{
+		if ((*it)->affinityMatters() && (*it)->affinity() != QThread::currentThread())
+		{
+			++it;
+			continue;
+		}
 		if ((*it)->isFinished())
 		{
 			(*it)->audioPort()->removePlayHandle(*it);
