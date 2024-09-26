@@ -64,6 +64,15 @@ struct ExSyncHandler
 
 struct ExSyncHandler * exSyncGetHandler();
 
+/* ExternalSync Extention handler: */
+
+class SyncExtentionHanlder
+{
+public:
+	static void add(struct SyncHandler *syncH);
+	static bool remove(struct SyncHandler *syncH);
+};
+
 
 /* ExternalSync API main part: 
  * - this structure is provided by LMMS to implement Follower mode;

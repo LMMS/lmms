@@ -35,6 +35,8 @@
 #ifdef LMMS_HAVE_EXTERNALSYNC
 
 
+#include <vector>
+
 #include "Engine.h"
 #include "Song.h"
 
@@ -270,9 +272,49 @@ struct ExSyncHandler * exSyncGetHandler()
 	return &s_handler;
 }
 
+/* ExterbalSync Extension holder part:
+ */ 
+
+static std::vector<struct SyncHandler *> s_extentions;
 
 
+static void startSyncExtentions()
+{
+	for (auto syncHandler : s_extentions)
+	{
+		if (nullptr != syncHandler) { syncHandler->start(); }
+	}
+}
 
+static void stopSyncExtentions()
+{
+	for (auto syncHandler : s_extentions)
+	{
+		if (nullptr != syncHandler) { syncHandler->stop(); }
+	}
+}
+
+static void jumpSyncExtentions(f_cnt_t frame)
+{
+	for (auto syncHandler : s_extentions)
+	{
+		if (nullptr != syncHandler) { syncHandler->jump(frame); }
+	}
+}
+
+void SyncExtentionHanlder::add(struct SyncHandler *syncH)
+{
+	if (nullptr != syncH) { s_extentions.push_back(syncH); }
+}
+
+bool SyncExtentionHanlder::remove(struct SyncHandler *syncH)
+{
+	for (auto syncHandler : s_extentions)
+	{
+		if (syncH == syncHandler) { syncHandler = nullptr; return true; }
+	}
+	return false;
+}
 
 /* ExternalSync LMMS handler for target be able to control LMMS
  *  
@@ -364,6 +406,7 @@ void SyncHook::jump()
 		pos.frame = lSong->getFrames();
 		ExSyncHandler * sync =  exSyncGetHandler();
 		if (sync) { sync->sendPosition(&pos); }
+		jumpSyncExtentions(pos.frame);
 	}
 }
 
@@ -373,6 +416,7 @@ void SyncHook::start()
 	struct ExSyncHandler *sync = exSyncGetHandler();
 	if (sync && s_SyncOn)
 	{
+		startSyncExtentions();
 		sync->sendPlay(true);
 		if( SyncCtl::Leader == s_SyncMode) { jump(); }
 	}
@@ -384,6 +428,7 @@ void SyncHook::stop()
 	struct ExSyncHandler *sync = exSyncGetHandler();
 	if (sync && s_SyncOn)
 	{
+		stopSyncExtentions();
 		sync->sendPlay(false);
 		if( SyncCtl::Leader == s_SyncMode) { jump(); }
 	}
