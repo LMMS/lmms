@@ -110,9 +110,8 @@ AudioEngine::AudioEngine(bool renderOnly) :
 		// save it to the configuration
 		if (m_framesPerPeriod < MINIMUM_BUFFER_SIZE)
 		{
-			ConfigManager::inst()->setValue("audioengine",
-						"framesperaudiobuffer",
-						QString::number(DEFAULT_BUFFER_SIZE));
+			ConfigManager::inst()->setValue("audioengine", 
+					"framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE));
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
@@ -168,8 +167,8 @@ AudioEngine::~AudioEngine()
 	{
 		delete[] m_fifo->read();
 	}
-	delete m_fifo;
 
+	delete m_fifo;
 	delete m_midiClient;
 	delete m_audioDev;
 
@@ -245,11 +244,7 @@ void AudioEngine::stopProcessing()
 sample_rate_t AudioEngine::baseSampleRate() const
 {
 	sample_rate_t sr = ConfigManager::inst()->value("audioengine", "samplerate").toInt();
-	if (sr < 44100)
-	{
-		sr = 44100;
-	}
-	return sr;
+	return (sr < 41000) ? 41000 : sr;
 }
 
 
@@ -278,8 +273,7 @@ bool AudioEngine::criticalXRuns() const
 
 
 
-
-void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
+void AudioEngine::pushInputFrames(SampleFrame* _ab, const f_cnt_t _frames)
 {
 	requestChangeInModel();
 
@@ -321,8 +315,7 @@ void AudioEngine::renderStageNoteSetup()
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
-	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
-	while (it_rem != m_playHandlesToRemove.end())
+	for (auto it_rem = m_playHandlesToRemove.begin(); it_rem != m_playHandlesToRemove.end();)
 	{
 		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), *it_rem);
 
@@ -380,7 +373,7 @@ void AudioEngine::renderStageEffects()
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
-	for (PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end();)
+	for (auto it = m_playHandles.begin(); it != m_playHandles.end();)
 	{
 		if ((*it)->affinityMatters() && (*it)->affinity() != QThread::currentThread())
 		{
@@ -452,8 +445,6 @@ void AudioEngine::swapBuffers()
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
 	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
 }
-
-
 
 
 void AudioEngine::clear()
@@ -534,7 +525,7 @@ void AudioEngine::doSetAudioDevice(AudioDevice* device)
 
 
 void AudioEngine::setAudioDevice(AudioDevice* device, const struct qualitySettings& qs,
-				bool _needs_fifo, bool startNow)
+				bool needs_fifo, bool startNow)
 {
 	stopProcessing();
 
@@ -545,7 +536,7 @@ void AudioEngine::setAudioDevice(AudioDevice* device, const struct qualitySettin
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	if (startNow) { startProcessing(_needs_fifo); }
+	if (startNow) { startProcessing(needs_fifo); }
 }
 
 
@@ -980,7 +971,7 @@ AudioDevice* AudioEngine::tryAudioDevices()
 
 
 
-MidiClient * AudioEngine::tryMidiClients()
+MidiClient* AudioEngine::tryMidiClients()
 {
 	QString client_name = ConfigManager::inst()->value("audioengine", "mididev");
 	if (!isMidiDevNameValid(client_name))
@@ -1041,7 +1032,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_SNDIO
 	if (client_name == MidiSndio::name() || client_name == "")
 	{
-		MidiSndio * msndio = new MidiSndio;
+		auto msndio = new MidiSndio;
 		if (msndio->isRunning())
 		{
 			m_midiClientName = MidiSndio::name();
@@ -1054,7 +1045,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_BUILD_WIN32
 	if (client_name == MidiWinMM::name() || client_name == "")
 	{
-		MidiWinMM * mwmm = new MidiWinMM;
+		auto mwmm = new MidiWinMM;
 //		if (moss->isRunning())
 		{
 			m_midiClientName = MidiWinMM::name();
@@ -1068,7 +1059,7 @@ MidiClient * AudioEngine::tryMidiClients()
     printf("trying midi apple...\n");
     if (client_name == MidiApple::name() || client_name == "")
     {
-        MidiApple * mapple = new MidiApple;
+        auto mapple = new MidiApple;
         m_midiClientName = MidiApple::name();
         printf("Returning midi apple\n");
         return mapple;
@@ -1124,17 +1115,6 @@ void AudioEngine::fifoWriter::finish()
 void AudioEngine::fifoWriter::run()
 {
 	disable_denormals();
-
-#if 0
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO(&mask);
-	CPU_SET(0, &mask);
-	sched_setaffinity(0, sizeof(mask), &mask);
-#endif
-#endif
-#endif
 
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while (m_writing)
