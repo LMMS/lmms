@@ -339,7 +339,7 @@ void AudioEngine::renderStageNoteSetup()
 	for (LocklessListElement* e = m_newPlayHandles.popList(); e;)
 	{
 		m_playHandles += e->value;
-		LocklessListElement * next = e->next;
+		LocklessListElement* next = e->next;
 		m_newPlayHandles.free(e);
 		e = next;
 	}
