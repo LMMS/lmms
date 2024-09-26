@@ -216,16 +216,14 @@ void EffectRackView::update()
 		}
 		else
 		{
-			(*it)->resize(width() - 35, EffectView::DEFAULT_HEIGHT);
 			( *it )->move( EffectViewMargin, m_lastY );
-			(*it)->update();
 			m_lastY += ( *it )->height();
 			++nView;
 			++it;
 		}
 	}
 
-	w->resize(width() - 35 + 2 * EffectViewMargin, m_lastY);
+	w->setFixedSize(EffectView::DEFAULT_WIDTH + 2 * EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }
