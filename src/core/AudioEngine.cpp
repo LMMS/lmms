@@ -258,11 +258,6 @@ sample_rate_t AudioEngine::outputSampleRate() const
 
 
 
-sample_rate_t AudioEngine::inputSampleRate() const
-{
-	return m_audioDev ? m_audioDev->sampleRate() : baseSampleRate();
-}
-
 bool AudioEngine::criticalXRuns() const
 {
 	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
