@@ -601,55 +601,56 @@ bool AudioEngine::addPlayHandle(PlayHandle* handle)
 
 void AudioEngine::removePlayHandle(PlayHandle* ph)
 {
-	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than the audio engine thread
-	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
-	{
-		ph->audioPort()->removePlayHandle(ph);
-		bool removedFromList = false;
-		// Check m_newPlayHandles first because doing it the other way around
-		// creates a race condition
-		LocklessListElement* e = m_newPlayHandles.first(), *ePrev = nullptr;
-		while (e)
-		{
-			if (e->value == ph)
-			{
-				if (ePrev)
-				{
-					ePrev->next = e->next;
-				}
-				else
-				{
-					m_newPlayHandles.setFirst(e->next);
-				}
-				m_newPlayHandles.free(e);
-				removedFromList = true;
-				break;
-			}
-		}
-		// Now check m_playHandles
-		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), ph);
-		if (it != m_playHandles.end())
-		{
-			m_playHandles.erase(it);
-			removedFromList = true;
-		}
-		// Only deleting PlayHandles that were actually found in the list
-		// "fixes crash when previewing a preset under high load"
-		// (See tobydox's 2008 commit 4583e48)
-		if (removedFromList)
-		{
-			if (ph->type() == PlayHandle::Type::NotePlayHandle)
-			{
-				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
-			}
-			else { delete ph; }
-		}
-	}
-	else
+	if (!ph->affinityMatters() || ph->affinity() != QThread::currentThread())
 	{
 		m_playHandlesToRemove.push_back(ph);
+		return;
+	}
+
+	requestChangeInModel();
+	ph->audioPort()->removePlayHandle(ph);
+	bool removedFromList = false;
+	// Check m_newPlayHandles first because doing it the other way around
+	// creates a race condition
+	LocklessListElement* e = m_newPlayHandles.first(), *ePrev = nullptr;
+	while (e)
+	{
+		if (e->value == ph)
+		{
+			if (ePrev)
+			{
+				ePrev->next = e->next;
+			}
+			else
+			{
+				m_newPlayHandles.setFirst(e->next);
+			}
+			m_newPlayHandles.free(e);
+			removedFromList = true;
+			break;
+		}
+	}
+
+	// Now check m_playHandles
+	PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), ph);
+	if (it != m_playHandles.end())
+	{
+		m_playHandles.erase(it);
+		removedFromList = true;
+	}
+
+	// Only deleting PlayHandles that were actually found in the list
+	// "fixes crash when previewing a preset under high load"
+	// (See tobydox's 2008 commit 4583e48)
+	if (removedFromList)
+	{
+		if (ph->type() == PlayHandle::Type::NotePlayHandle)
+		{
+			NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
+		}
+		else { delete ph; }
 	}
 	doneChangeInModel();
 }
