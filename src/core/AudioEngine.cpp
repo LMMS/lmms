@@ -601,15 +601,16 @@ bool AudioEngine::addPlayHandle(PlayHandle* handle)
 
 void AudioEngine::removePlayHandle(PlayHandle* ph)
 {
+	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than the audio engine thread
 	if (!ph->affinityMatters() || ph->affinity() != QThread::currentThread())
 	{
 		m_playHandlesToRemove.push_back(ph);
+		doneChangesInModel();
 		return;
 	}
 
-	requestChangeInModel();
 	ph->audioPort()->removePlayHandle(ph);
 	bool removedFromList = false;
 	// Check m_newPlayHandles first because doing it the other way around
