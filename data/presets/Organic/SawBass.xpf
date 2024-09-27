@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project creator="LMMS" creatorversion="1.3.0-alpha.1.687+g35f350eef" type="instrumenttracksettings" version="30">
+  <head/>
+  <instrumenttracksettings mutedBeforeSolo="0" name="SawBass" solo="0" type="0" muted="0">
+    <instrumenttrack pitchrange="2" keymap="0" vol="100" range_import="1" pitch="0" pan="0" enablecc="0" lastkey="127" usemasterpitch="1" scale="0" basenote="69" firstkey="0" mixch="0" enabled="0">
+      <midicontrollers cc21="0" cc119="0" cc60="0" cc64="0" cc73="0" cc89="0" cc56="0" cc5="0" cc109="0" cc49="0" cc104="0" cc101="0" cc113="0" cc46="0" cc97="0" cc108="0" cc53="0" cc63="0" cc111="0" cc77="0" cc82="0" cc11="0" cc105="0" cc120="0" cc58="0" cc85="0" cc33="0" cc26="0" cc40="0" cc79="0" cc94="0" cc8="0" cc87="0" cc112="0" cc50="0" cc74="0" cc88="0" cc16="0" cc123="0" cc35="0" cc122="0" cc55="0" cc69="0" cc71="0" cc14="0" cc37="0" cc90="0" cc9="0" cc4="0" cc41="0" cc30="0" cc127="0" cc83="0" cc92="0" cc116="0" cc91="0" cc102="0" cc52="0" cc115="0" cc36="0" cc86="0" cc27="0" cc84="0" cc126="0" cc3="0" cc1="0" cc45="0" cc93="0" cc110="0" cc61="0" cc18="0" cc78="0" cc19="0" cc47="0" cc12="0" cc106="0" cc39="0" cc34="0" cc103="0" cc24="0" cc43="0" cc114="0" cc42="0" cc62="0" cc59="0" cc125="0" cc13="0" cc20="0" cc31="0" cc107="0" cc6="0" cc117="0" cc70="0" cc100="0" cc29="0" cc75="0" cc65="0" cc28="0" cc2="0" cc72="0" cc81="0" cc10="0" cc51="0" cc22="0" cc57="0" cc67="0" cc95="0" cc0="0" cc32="0" cc44="0" cc66="0" cc7="0" cc54="0" cc98="0" cc118="0" cc76="0" cc124="0" cc17="0" cc99="0" cc121="0" cc48="0" cc38="0" cc68="0" cc80="0" cc96="0" cc23="0" cc25="0" cc15="0"/>
+      <instrument name="organic">
+        <organic vol6="100" vol0="98" num_osc="8" newharmonic2="0" wavetype7="1" wavetype3="1" newharmonic1="0" newharmonic3="0" vol2="100" pan6="0" newdetune5="-15" newdetune7="20" newharmonic7="0" newharmonic5="0" pan3="0" newharmonic4="0" pan7="0" wavetype0="1" wavetype6="1" newdetune0="0" newharmonic6="0" newdetune4="-10" vol7="100" pan5="0" vol="106" wavetype5="1" newdetune6="15" newdetune3="10" newdetune1="-5" vol3="100" pan0="0" pan4="0" newharmonic0="0" newdetune2="5" vol4="100" wavetype4="1" vol1="100" pan1="0" foldback="0" wavetype2="1" pan2="0" vol5="100" wavetype1="1">
+          <key/>
+        </organic>
+      </instrument>
+      <eldata ftype="7" fcut="729" fwet="1" fres="0.52999997">
+        <elvol pdel="0" hold="0" rel="0.086000003" lspd_syncmode="0" sustain="0" userwavefile="" x100="1" lamt="0" latt="0" lshp="0" lspd="0.66899997" att="0" lspd_denominator="4" lspd_numerator="4" dec="0.296" amt="1" lpdel="0" ctlenvamt="0"/>
+        <elcut pdel="0" hold="0" rel="0.147" lspd_syncmode="0" sustain="0" userwavefile="" x100="0" lamt="0" latt="0" lshp="0" lspd="0.1" att="0" lspd_denominator="4" lspd_numerator="4" dec="0.147" amt="1" lpdel="0" ctlenvamt="0"/>
+        <elres pdel="0" hold="0" rel="0.1" lspd_syncmode="0" sustain="0.27000007" userwavefile="" x100="0" lamt="0" latt="0" lshp="0" lspd="0.1" att="0" lspd_denominator="4" lspd_numerator="4" dec="0.37200001" amt="0" lpdel="0" ctlenvamt="0"/>
+      </eldata>
+      <chordcreator chordrange="1" chord-enabled="0" chord="0"/>
+      <arpeggiator arprepeats="1" arptime="200" arpmode="0" arptime_denominator="4" arpdir="0" arpmiss="0" arpskip="0" arp="0" arprange="1" arpcycle="0" arpgate="100" arp-enabled="0" arptime_numerator="4" arptime_syncmode="0"/>
+      <fxchain numofeffects="2" enabled="1">
+        <effect autoquit="1" autoquit_denominator="4" gate="0" name="ladspaeffect" wet="1" autoquit_syncmode="0" autoquit_numerator="4" on="1">
+          <ladspacontrols ports="9">
+            <port07>
+              <data scale_type="log" value="1.6847999" id="4663"/>
+            </port07>
+            <port08>
+              <data scale_type="log" value="6324.5552" id="27656"/>
+            </port08>
+            <port09 data="2"/>
+            <port010 data="0.5"/>
+            <port011 data="1.0599999"/>
+            <port012 data="1"/>
+            <port013 data="0"/>
+            <port014>
+              <data scale_type="log" value="8544.5342" id="29014"/>
+            </port014>
+            <port015>
+              <data scale_type="log" value="13866.24" id="30129"/>
+            </port015>
+          </ladspacontrols>
+          <key>
+            <attribute value="calf" name="file"/>
+            <attribute value="Reverb" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit="1" autoquit_denominator="4" gate="0" name="ladspaeffect" wet="1" autoquit_syncmode="0" autoquit_numerator="4" on="1">
+          <ladspacontrols ports="10">
+            <port04 data="140"/>
+            <port05 data="11"/>
+            <port06 data="8"/>
+            <port07 data="8"/>
+            <port08 data="0.36399999"/>
+            <port09 data="1.008"/>
+            <port010 data="3"/>
+            <port011 data="1"/>
+            <port012 data="1"/>
+            <port013 data="1"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="calf" name="file"/>
+            <attribute value="VintageDelay" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>
