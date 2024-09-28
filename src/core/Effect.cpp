@@ -187,7 +187,7 @@ void Effect::checkGate(double outSum)
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if (out_sum <= F_EPSILON)
+	if (outSum <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
