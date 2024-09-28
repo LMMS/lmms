@@ -81,7 +81,8 @@ public:
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
-	void setLabel( const QString & txt );
+	void setLabel(const QString & txt, bool legacyMode = true);
+	void setLabelLegacy(const QString & txt);
 	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
