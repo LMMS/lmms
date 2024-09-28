@@ -453,13 +453,11 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
 	
-	m_spreadKnob = new Knob( KnobType::Vintage32, this );
-	m_spreadKnob->setLabelLegacy( tr( "Spread" ) );
+	m_spreadKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Spread"), this);
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
-	m_randomKnob = new Knob(KnobType::Vintage32, this);
-	m_randomKnob->setLabelLegacy(tr("Random"));
+	m_randomKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Random"), this);
 	m_randomKnob->move(190, 190);
 	m_randomKnob->setHintText(tr("Random:"), "");
 
@@ -494,28 +492,23 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 		
-	m_hardnessKnob = new Knob( KnobType::Vintage32, widget );
-	m_hardnessKnob->setLabelLegacy( tr( "Hardness" ) );
+	m_hardnessKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Hardness"), widget);
 	m_hardnessKnob->move( 30, 90 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ), "" );
 
-	m_positionKnob = new Knob( KnobType::Vintage32, widget );
-	m_positionKnob->setLabelLegacy( tr( "Position" ) );
+	m_positionKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Position"), widget);
 	m_positionKnob->move( 110, 90 );
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
-	m_vibratoGainKnob = new Knob( KnobType::Vintage32, widget );
-	m_vibratoGainKnob->setLabelLegacy( tr( "Vibrato gain" ) );
+	m_vibratoGainKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Vibrato gain"), widget);
 	m_vibratoGainKnob->move( 30, 140 );
 	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
-	m_vibratoFreqKnob = new Knob( KnobType::Vintage32, widget );
-	m_vibratoFreqKnob->setLabelLegacy( tr( "Vibrato frequency" ) );
+	m_vibratoFreqKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Vibrato frequency"), widget);
 	m_vibratoFreqKnob->move( 110, 140 );
 	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
 
-	m_stickKnob = new Knob( KnobType::Vintage32, widget );
-	m_stickKnob->setLabelLegacy( tr( "Stick mix" ) );
+	m_stickKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Stick mix"), widget);
 	m_stickKnob->move( 190, 90 );
 	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 
@@ -530,28 +523,23 @@ QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 	
-	m_modulatorKnob = new Knob( KnobType::Vintage32, widget );
-	m_modulatorKnob->setLabelLegacy( tr( "Modulator" ) );
+	m_modulatorKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Modulator"), widget);
 	m_modulatorKnob->move( 30, 90 );
 	m_modulatorKnob->setHintText( tr( "Modulator:" ), "" );
 
-	m_crossfadeKnob = new Knob( KnobType::Vintage32, widget );
-	m_crossfadeKnob->setLabelLegacy( tr( "Crossfade" ) );
+	m_crossfadeKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Crossfade"), widget);
 	m_crossfadeKnob->move( 110, 90 );
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
 	
-	m_lfoSpeedKnob = new Knob( KnobType::Vintage32, widget );
-	m_lfoSpeedKnob->setLabelLegacy( tr( "LFO speed" ) );
+	m_lfoSpeedKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("LFO speed"), widget);
 	m_lfoSpeedKnob->move( 30, 140 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
 	
-	m_lfoDepthKnob = new Knob( KnobType::Vintage32, widget );
-	m_lfoDepthKnob->setLabelLegacy( tr( "LFO depth" ) );
+	m_lfoDepthKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("LFO depth"), widget);
 	m_lfoDepthKnob->move( 110, 140 );
 	m_lfoDepthKnob->setHintText( tr( "LFO depth:" ), "" );
 	
-	m_adsrKnob = new Knob( KnobType::Vintage32, widget );
-	m_adsrKnob->setLabelLegacy( tr( "ADSR" ) );
+	m_adsrKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("ADSR"), widget);
 	m_adsrKnob->move( 190, 90 );
 	m_adsrKnob->setHintText( tr( "ADSR:" ), "" );
 
@@ -570,23 +558,19 @@ QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 /*	m_strikeLED = new LedCheckBox( tr( "Bowed" ), widget );
 	m_strikeLED->move( 138, 25 );*/
 
-	m_pressureKnob = new Knob( KnobType::Vintage32, widget );
-	m_pressureKnob->setLabelLegacy( tr( "Pressure" ) );
+	m_pressureKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Pressure"), widget);
 	m_pressureKnob->move( 30, 90 );
 	m_pressureKnob->setHintText( tr( "Pressure:" ), "" );
 
-/*	m_motionKnob = new Knob( KnobType::Vintage32, widget );
-	m_motionKnob->setLabelLegacy( tr( "Motion" ) );
+/*	m_motionKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Motion"), widget);
 	m_motionKnob->move( 110, 90 );
 	m_motionKnob->setHintText( tr( "Motion:" ), "" );*/
 
-	m_velocityKnob = new Knob( KnobType::Vintage32, widget );
-	m_velocityKnob->setLabelLegacy( tr( "Speed" ) );
+	m_velocityKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Speed"), widget);
 	m_velocityKnob->move( 30, 140 );
 	m_velocityKnob->setHintText( tr( "Speed:" ), "" );
 	
-/*	m_vibratoKnob = new Knob( KnobType::Vintage32, widget, tr( "Vibrato" ) );
-	m_vibratoKnob->setLabelLegacy( tr( "Vibrato" ) );
+/*	m_vibratoKnob = Knob::buildLegacyKnob(KnobType::Vintage32, tr("Vibrato"), widget);
 	m_vibratoKnob->move( 110, 140 );
 	m_vibratoKnob->setHintText( tr( "Vibrato:" ), "" );*/
 	

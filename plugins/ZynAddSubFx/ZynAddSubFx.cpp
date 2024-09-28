@@ -512,33 +512,26 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->setVerticalSpacing( 16 );
 	l->setHorizontalSpacing( 10 );
 
-	m_portamento = new Knob( KnobType::Bright26, this );
+	m_portamento = Knob::buildLegacyKnob(KnobType::Bright26, tr("PORT"), this);
 	m_portamento->setHintText( tr( "Portamento:" ), "" );
-	m_portamento->setLabelLegacy( tr( "PORT" ) );
 
-	m_filterFreq = new Knob( KnobType::Bright26, this );
+	m_filterFreq = Knob::buildLegacyKnob(KnobType::Bright26, tr("FREQ"), this);
 	m_filterFreq->setHintText( tr( "Filter frequency:" ), "" );
-	m_filterFreq->setLabelLegacy( tr( "FREQ" ) );
 
-	m_filterQ = new Knob( KnobType::Bright26, this );
+	m_filterQ = Knob::buildLegacyKnob(KnobType::Bright26, tr("RES"), this);
 	m_filterQ->setHintText( tr( "Filter resonance:" ), "" );
-	m_filterQ->setLabelLegacy( tr( "RES" ) );
 
-	m_bandwidth = new Knob( KnobType::Bright26, this );
+	m_bandwidth = Knob::buildLegacyKnob(KnobType::Bright26, tr("BW"), this);
 	m_bandwidth->setHintText( tr( "Bandwidth:" ), "" );
-	m_bandwidth->setLabelLegacy( tr( "BW" ) );
 
-	m_fmGain = new Knob( KnobType::Bright26, this );
+	m_fmGain = Knob::buildLegacyKnob(KnobType::Bright26, tr("FM GAIN"), this);
 	m_fmGain->setHintText( tr( "FM gain:" ), "" );
-	m_fmGain->setLabelLegacy( tr( "FM GAIN" ) );
 
-	m_resCenterFreq = new Knob( KnobType::Bright26, this );
+	m_resCenterFreq = Knob::buildLegacyKnob(KnobType::Bright26, tr("RES CF"), this);
 	m_resCenterFreq->setHintText( tr( "Resonance center frequency:" ), "" );
-	m_resCenterFreq->setLabelLegacy( tr( "RES CF" ) );
 
-	m_resBandwidth = new Knob( KnobType::Bright26, this );
+	m_resBandwidth = Knob::buildLegacyKnob(KnobType::Bright26, tr("RES BW"), this);
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ), "" );
-	m_resBandwidth->setLabelLegacy( tr( "RES BW" ) );
 
 	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI control changes" ), this );
 

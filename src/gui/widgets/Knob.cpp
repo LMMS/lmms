@@ -57,7 +57,15 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 {
 }
 
+Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget * parent)
+{
+	auto result = new Knob(knob_num, parent);
 
+	result->setLegacyMode(true);
+	result->setLabelLegacy(label);
+
+	return result;
+}
 
 
 void Knob::initUi( const QString & _name )
@@ -174,14 +182,11 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 
 void Knob::setLegacyMode(bool legacyMode)
 {
-	if (m_legacyMode != legacyMode)
-	{
-		m_legacyMode = legacyMode;
+	m_legacyMode = legacyMode;
 
-		updateFixedSize();
+	updateFixedSize();
 
-		update();
-	}
+	update();
 }
 
 void Knob::updateFixedSize()

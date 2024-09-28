@@ -36,6 +36,16 @@ CustomTextKnob::CustomTextKnob( QWidget * _parent, const QString & _name, const 
 	Knob( _parent, _name ),
 	m_value_text( _value_text ) {}
 
+CustomTextKnob* CustomTextKnob::buildLegacyKnob(KnobType knob_num, QWidget* parent, const QString& description, const QString& label)
+{
+	auto result = new CustomTextKnob(knob_num, parent, description);
+
+	result->setLegacyMode(true);
+	result->setLabelLegacy(label);
+
+	return result;
+}
+
 QString CustomTextKnob::displayValue() const
 {
 	return m_description.trimmed() + m_value_text;

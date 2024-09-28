@@ -78,8 +78,10 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 
 	// Persistence knob
 	auto persistenceKnob = new Knob(KnobType::Small17, this);
+	// Make the font the same size as the other controls
+	persistenceKnob->setFont(highQualityButton->font());
 	persistenceKnob->setModel(&controls->m_persistenceModel);
-	persistenceKnob->setLabelLegacy(tr("Persist."));
+	persistenceKnob->setLabel(tr("Persist."));
 	persistenceKnob->setToolTip(tr("Trace persistence: higher amount means the trace will stay bright for longer time."));
 	persistenceKnob->setHintText(tr("Trace persistence"), "");
 	config_layout->addWidget(persistenceKnob);

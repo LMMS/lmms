@@ -63,6 +63,15 @@ TempoSyncKnob::~TempoSyncKnob()
 }
 
 
+TempoSyncKnob* TempoSyncKnob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* parent)
+{
+	auto result = new TempoSyncKnob(knob_num, parent);
+
+	result->setLegacyMode(true);
+	result->setLabelLegacy(label);
+
+	return result;
+}
 
 
 void TempoSyncKnob::modelChanged()

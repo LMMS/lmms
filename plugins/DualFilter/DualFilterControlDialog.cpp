@@ -35,10 +35,9 @@ namespace lmms::gui
 
 
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
-	Knob * name = new Knob( KnobType::Bright26, this); 			\
+	Knob * name = Knob::buildLegacyKnob(KnobType::Bright26, label, this); 			\
 	(name) -> move( x, y );									\
 	(name) ->setModel( &controls-> model );					\
-	(name) ->setLabelLegacy( label );							\
 	(name) ->setHintText( hint, unit );
 
 
