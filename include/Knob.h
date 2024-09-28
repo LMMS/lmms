@@ -85,6 +85,9 @@ public:
 	void setLabelLegacy(const QString & txt);
 	void setHtmlLabel( const QString &htmltxt );
 
+	bool legacyMode() const { return m_legacyMode; }
+	void setLegacyMode(bool legacyMode);
+
 	void setTotalAngle( float angle );
 
 	// Begin styled knob accessors
@@ -129,6 +132,8 @@ private:
 	{
 		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
 	}
+
+	void updateFixedSize();
 
 	QString m_label;
 	bool m_legacyMode = false;

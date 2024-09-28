@@ -135,37 +135,19 @@ void Knob::onKnobNumUpdated()
 void Knob::setLabel(const QString & txt)
 {
 	m_label = txt;
-	m_legacyMode = false;
 	m_isHtmlLabel = false;
 
-	QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
-
-	auto fm = QFontMetrics(font());
-
-	const int width = std::max(pixmapSize.width(), horizontalAdvance(fm, m_label));
-	const int height = pixmapSize.height() + fm.height();
-
-	setFixedSize(width, height);
-
-	update();
+	setLegacyMode(false);
 }
 
 void Knob::setLabelLegacy(const QString & txt)
 {
 	m_label = txt;
-	m_legacyMode = true;
 	m_isHtmlLabel = false;
 
 	setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
-	if( m_knobPixmap )
-	{
-		setFixedSize(qMax<int>( m_knobPixmap->width(),
-					horizontalAdvance(QFontMetrics(font()), m_label)),
-						m_knobPixmap->height() + 10);
-	}
-
-	update();
+	setLegacyMode(true);
 }
 
 
@@ -190,8 +172,41 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 	update();
 }
 
+void Knob::setLegacyMode(bool legacyMode)
+{
+	if (m_legacyMode != legacyMode)
+	{
+		m_legacyMode = legacyMode;
 
+		updateFixedSize();
 
+		update();
+	}
+}
+
+void Knob::updateFixedSize()
+{
+	if (legacyMode())
+	{
+		if( m_knobPixmap )
+		{
+			setFixedSize(qMax<int>( m_knobPixmap->width(),
+						horizontalAdvance(QFontMetrics(font()), m_label)),
+							m_knobPixmap->height() + 10);
+		}
+	}
+	else
+	{
+		QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
+
+		auto fm = QFontMetrics(font());
+
+		const int width = std::max(pixmapSize.width(), horizontalAdvance(fm, m_label));
+		const int height = pixmapSize.height() + fm.height();
+
+		setFixedSize(width, height);
+	}
+}
 
 void Knob::setTotalAngle( float angle )
 {
