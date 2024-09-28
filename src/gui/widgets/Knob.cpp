@@ -493,10 +493,13 @@ void Knob::paintEvent( QPaintEvent * _me )
 	{
 		if (!m_isHtmlLabel)
 		{
+			auto fm = p.fontMetrics();
+			const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
+			const auto descent = legacyMode() ? 2 : fm.descent();
+			const auto y = height() - descent; 
+
 			p.setPen(textColor());
-			p.drawText(width() / 2 -
-				horizontalAdvance(p.fontMetrics(), m_label) / 2,
-				height() - 2, m_label);
+			p.drawText(x, y, m_label);
 		}
 		else
 		{
