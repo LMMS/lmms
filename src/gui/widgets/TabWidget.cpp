@@ -33,7 +33,7 @@
 
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -58,7 +58,7 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 	m_tabheight = caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
 
-	setFont(adjustedToPixelSize(font(), 10));
+	setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
 	setAutoFillBackground(true);
 	QColor bg_color = QApplication::palette().color(QPalette::Active, QPalette::Window).darker(132);
@@ -214,7 +214,7 @@ void TabWidget::resizeEvent(QResizeEvent*)
 void TabWidget::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	p.setFont(adjustedToPixelSize(font(), 10));
+	p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
 	// Draw background
 	QBrush bg_color = p.background();

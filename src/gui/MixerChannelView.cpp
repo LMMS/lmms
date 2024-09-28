@@ -31,8 +31,7 @@
 #include "PeakIndicator.h"
 #include "Song.h"
 #include "ConfigManager.h"
-
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
@@ -95,7 +94,7 @@ namespace lmms::gui
 
         m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
-        m_renameLineEdit->setFont(adjustedToPixelSize(font(), 12));
+        m_renameLineEdit->setFont(adjustedToPixelSize(font(), LARGE_FONT_SIZE));
         m_renameLineEdit->setReadOnly(true);
         m_renameLineEdit->installEventFilter(this);
 

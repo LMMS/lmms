@@ -59,6 +59,7 @@
 #include "DetuningHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
@@ -1028,7 +1029,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			QString noteKeyString = getNoteString(n->key());
 
 			QFont noteFont(p.font());
-			noteFont.setPixelSize(noteTextHeight);
+			noteFont = adjustedToPixelSize(noteFont, noteTextHeight);
 			QFontMetrics fontMetrics(noteFont);
 			QSize textSize = fontMetrics.size(Qt::TextSingleLine, noteKeyString);
 
@@ -3017,8 +3018,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// set font-size to 80% of key line height
 	QFont f = p.font();
-	f.setPixelSize(m_keyLineHeight * 0.8);
-	p.setFont(f); // font size doesn't change without this for some reason
+	int keyFontSize = m_keyLineHeight * 0.8;
+	p.setFont(adjustedToPixelSize(f, keyFontSize));
 	QFontMetrics fontMetrics(p.font());
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
@@ -3345,8 +3346,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// display note editing info
 	f.setBold(false);
-	f.setPixelSize(10);
-	p.setFont(f);
+	p.setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 	p.setPen(m_noteModeColor);
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()),
