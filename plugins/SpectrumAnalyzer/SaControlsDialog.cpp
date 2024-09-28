@@ -238,7 +238,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Peak envelope resolution
 	auto envelopeResolutionKnob = new Knob(KnobType::Small17, this);
 	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
-	envelopeResolutionKnob->setLabel(tr("Envelope res."));
+	envelopeResolutionKnob->setLabelLegacy(tr("Envelope res."));
 	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
 	envelopeResolutionKnob->setHintText(tr("Maximum number of envelope points drawn per pixel:"), "");
 	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
@@ -246,7 +246,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Spectrum graph resolution
 	auto spectrumResolutionKnob = new Knob(KnobType::Small17, this);
 	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
-	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
+	spectrumResolutionKnob->setLabelLegacy(tr("Spectrum res."));
 	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
 	spectrumResolutionKnob->setHintText(tr("Maximum number of spectrum points drawn per pixel:"), "");
 	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
@@ -254,7 +254,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Peak falloff speed
 	auto peakDecayFactorKnob = new Knob(KnobType::Small17, this);
 	peakDecayFactorKnob->setModel(&controls->m_peakDecayFactorModel);
-	peakDecayFactorKnob->setLabel(tr("Falloff factor"));
+	peakDecayFactorKnob->setLabelLegacy(tr("Falloff factor"));
 	peakDecayFactorKnob->setToolTip(tr("Decrease to make peaks fall faster."));
 	peakDecayFactorKnob->setHintText(tr("Multiply buffered value by"), "");
 	advanced_layout->addWidget(peakDecayFactorKnob, 0, 1, 1, 1, Qt::AlignCenter);
@@ -262,7 +262,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Averaging weight
 	auto averagingWeightKnob = new Knob(KnobType::Small17, this);
 	averagingWeightKnob->setModel(&controls->m_averagingWeightModel);
-	averagingWeightKnob->setLabel(tr("Averaging weight"));
+	averagingWeightKnob->setLabelLegacy(tr("Averaging weight"));
 	averagingWeightKnob->setToolTip(tr("Decrease to make averaging slower and smoother."));
 	averagingWeightKnob->setHintText(tr("New sample contributes"), "");
 	advanced_layout->addWidget(averagingWeightKnob, 1, 1, 1, 1, Qt::AlignCenter);
@@ -270,7 +270,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Waterfall history size
 	auto waterfallHeightKnob = new Knob(KnobType::Small17, this);
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
-	waterfallHeightKnob->setLabel(tr("Waterfall height"));
+	waterfallHeightKnob->setLabelLegacy(tr("Waterfall height"));
 	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
 	waterfallHeightKnob->setHintText(tr("Number of lines to keep:"), "");
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
@@ -280,7 +280,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Waterfall gamma correction
 	auto waterfallGammaKnob = new Knob(KnobType::Small17, this);
 	waterfallGammaKnob->setModel(&controls->m_waterfallGammaModel);
-	waterfallGammaKnob->setLabel(tr("Waterfall gamma"));
+	waterfallGammaKnob->setLabelLegacy(tr("Waterfall gamma"));
 	waterfallGammaKnob->setToolTip(tr("Decrease to see very weak signals, increase to get better contrast."));
 	waterfallGammaKnob->setHintText(tr("Gamma value:"), "");
 	advanced_layout->addWidget(waterfallGammaKnob, 1, 2, 1, 1, Qt::AlignCenter);
@@ -288,7 +288,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// FFT window overlap
 	auto windowOverlapKnob = new Knob(KnobType::Small17, this);
 	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
-	windowOverlapKnob->setLabel(tr("Window overlap"));
+	windowOverlapKnob->setLabelLegacy(tr("Window overlap"));
 	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
 	windowOverlapKnob->setHintText(tr("Number of times each sample is processed:"), "");
 	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
@@ -296,7 +296,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// FFT zero padding
 	auto zeroPaddingKnob = new Knob(KnobType::Small17, this);
 	zeroPaddingKnob->setModel(&controls->m_zeroPaddingModel);
-	zeroPaddingKnob->setLabel(tr("Zero padding"));
+	zeroPaddingKnob->setLabelLegacy(tr("Zero padding"));
 	zeroPaddingKnob->setToolTip(tr("Increase to get smoother-looking spectrum. Warning: high CPU usage."));
 	zeroPaddingKnob->setHintText(tr("Processing buffer is"), tr(" steps larger than input block"));
 	advanced_layout->addWidget(zeroPaddingKnob, 1, 3, 1, 1, Qt::AlignCenter);

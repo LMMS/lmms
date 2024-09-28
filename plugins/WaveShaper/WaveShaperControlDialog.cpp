@@ -64,7 +64,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setLabel( tr( "INPUT" ) );
+	inputKnob->setLabelLegacy( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
 	auto outputKnob = new Knob(KnobType::Bright26, this);
@@ -72,7 +72,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 225 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setLabel( tr( "OUTPUT" ) );
+	outputKnob->setLabelLegacy( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));

@@ -992,7 +992,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
 		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		vstKnobs[ i ]->setLabelLegacy( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{

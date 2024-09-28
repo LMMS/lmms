@@ -38,7 +38,7 @@ namespace lmms::gui
 {
 
 
-void KnobControl::setText(const QString &text) { m_knob->setLabel(text); }
+void KnobControl::setText(const QString &text) { m_knob->setLabelLegacy(text); }
 
 QWidget *KnobControl::topWidget() { return m_knob; }
 

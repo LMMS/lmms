@@ -67,14 +67,14 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
 
-	m_volumeKnob->setLabel( tr( "VOL" ) );
+	m_volumeKnob->setLabelLegacy( tr( "VOL" ) );
 	m_volumeKnob->show();
 
 	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->setLabel( tr( "PAN" ) );
+	m_panningKnob->setLabelLegacy( tr( "PAN" ) );
 	m_panningKnob->show();
 
 	m_activityIndicator = new FadeButton(

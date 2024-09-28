@@ -391,7 +391,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, widget, s_dumpValues.at( 1 ) );
 		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		vstKnobs[ i ]->setLabelLegacy( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{

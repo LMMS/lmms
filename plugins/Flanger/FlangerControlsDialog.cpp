@@ -46,42 +46,42 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	delayKnob->move( 10,10 );
 	delayKnob->setVolumeKnob( false );
 	delayKnob->setModel( &controls->m_delayTimeModel );
-	delayKnob->setLabel( tr( "DELAY" ) );
+	delayKnob->setLabelLegacy( tr( "DELAY" ) );
 	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
 
 	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, this);
 	lfoFreqKnob->move( 48,10 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
-	lfoFreqKnob->setLabel( tr( "RATE" ) );
+	lfoFreqKnob->setLabelLegacy( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr( "Period:" ) , " Sec" );
 
 	auto lfoAmtKnob = new Knob(KnobType::Bright26, this);
 	lfoAmtKnob->move( 85,10 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
-	lfoAmtKnob->setLabel( tr( "AMNT" ) );
+	lfoAmtKnob->setLabelLegacy( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr( "Amount:" ) , "" );
 
 	auto lfoPhaseKnob = new Knob(KnobType::Bright26, this);
 	lfoPhaseKnob->move( 123,10 );
 	lfoPhaseKnob->setVolumeKnob( false );
 	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
-	lfoPhaseKnob->setLabel( tr( "PHASE" ) );
+	lfoPhaseKnob->setLabelLegacy( tr( "PHASE" ) );
 	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
 	auto feedbackKnob = new Knob(KnobType::Bright26, this);
 	feedbackKnob->move( 160,10 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel );
-	feedbackKnob->setLabel( tr( "FDBK" ) );
+	feedbackKnob->setLabelLegacy( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
 	auto whiteNoiseKnob = new Knob(KnobType::Bright26, this);
 	whiteNoiseKnob->move( 196,10 );
 	whiteNoiseKnob->setVolumeKnob( true) ;
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
-	whiteNoiseKnob->setLabel( tr( "NOISE" ) );
+	whiteNoiseKnob->setLabelLegacy( tr( "NOISE" ) );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 
 	auto invertCb = new LedCheckBox(tr("Invert"), this);

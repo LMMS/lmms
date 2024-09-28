@@ -63,7 +63,7 @@ DynProcControlDialog::DynProcControlDialog(
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 223 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setLabel( tr( "INPUT" ) );
+	inputKnob->setLabelLegacy( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
 	auto outputKnob = new Knob(KnobType::Bright26, this);
@@ -71,19 +71,19 @@ DynProcControlDialog::DynProcControlDialog(
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 223 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setLabel( tr( "OUTPUT" ) );
+	outputKnob->setLabelLegacy( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ) , "" );
 
 	auto attackKnob = new Knob(KnobType::Bright26, this);
 	attackKnob -> move( 24, 268 );
 	attackKnob->setModel( &_controls->m_attackModel );
-	attackKnob->setLabel( tr( "ATTACK" ) );
+	attackKnob->setLabelLegacy( tr( "ATTACK" ) );
 	attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
 
 	auto releaseKnob = new Knob(KnobType::Bright26, this);
 	releaseKnob -> move( 74, 268 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
-	releaseKnob->setLabel( tr( "RELEASE" ) );
+	releaseKnob->setLabelLegacy( tr( "RELEASE" ) );
 	releaseKnob->setHintText( tr( "Peak release time:" ) , "ms" );
 
 //wavegraph control buttons

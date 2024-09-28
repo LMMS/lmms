@@ -59,7 +59,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	auto chordLabel = new QLabel(tr("Chord:"));
 	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), DEFAULT_FONT_SIZE));
 
-	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
+	m_chordRangeKnob->setLabelLegacy( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
 
 	mainLayout->addWidget( chordLabel, 0, 0 );
@@ -118,31 +118,31 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->setHorizontalSpacing( 20 );
 	mainLayout->setVerticalSpacing( 1 );
 
-	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
+	m_arpRangeKnob->setLabelLegacy( tr( "RANGE" ) );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
 
 
-	m_arpRepeatsKnob->setLabel( tr( "REP" ) );
+	m_arpRepeatsKnob->setLabelLegacy( tr( "REP" ) );
 	m_arpRepeatsKnob->setHintText( tr( "Note repeats:" ) + " ", " " + tr( "time(s)" ) );
 
 
-	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
+	m_arpCycleKnob->setLabelLegacy( tr( "CYCLE" ) );
 	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
 
 
-	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
+	m_arpSkipKnob->setLabelLegacy( tr( "SKIP" ) );
 	m_arpSkipKnob->setHintText( tr( "Skip rate:" ), tr( "%" ) );
 
 
-	m_arpMissKnob->setLabel( tr( "MISS" ) );
+	m_arpMissKnob->setLabelLegacy( tr( "MISS" ) );
 	m_arpMissKnob->setHintText( tr( "Miss rate:" ), tr( "%" ) );
 
 
-	m_arpTimeKnob->setLabel( tr( "TIME" ) );
+	m_arpTimeKnob->setLabelLegacy( tr( "TIME" ) );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
 
 
-	m_arpGateKnob->setLabel( tr( "GATE" ) );
+	m_arpGateKnob->setLabelLegacy( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
 	auto arpChordLabel = new QLabel(tr("Chord:"));

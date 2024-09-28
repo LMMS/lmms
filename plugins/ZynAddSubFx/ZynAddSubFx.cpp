@@ -514,31 +514,31 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 	m_portamento = new Knob( KnobType::Bright26, this );
 	m_portamento->setHintText( tr( "Portamento:" ), "" );
-	m_portamento->setLabel( tr( "PORT" ) );
+	m_portamento->setLabelLegacy( tr( "PORT" ) );
 
 	m_filterFreq = new Knob( KnobType::Bright26, this );
 	m_filterFreq->setHintText( tr( "Filter frequency:" ), "" );
-	m_filterFreq->setLabel( tr( "FREQ" ) );
+	m_filterFreq->setLabelLegacy( tr( "FREQ" ) );
 
 	m_filterQ = new Knob( KnobType::Bright26, this );
 	m_filterQ->setHintText( tr( "Filter resonance:" ), "" );
-	m_filterQ->setLabel( tr( "RES" ) );
+	m_filterQ->setLabelLegacy( tr( "RES" ) );
 
 	m_bandwidth = new Knob( KnobType::Bright26, this );
 	m_bandwidth->setHintText( tr( "Bandwidth:" ), "" );
-	m_bandwidth->setLabel( tr( "BW" ) );
+	m_bandwidth->setLabelLegacy( tr( "BW" ) );
 
 	m_fmGain = new Knob( KnobType::Bright26, this );
 	m_fmGain->setHintText( tr( "FM gain:" ), "" );
-	m_fmGain->setLabel( tr( "FM GAIN" ) );
+	m_fmGain->setLabelLegacy( tr( "FM GAIN" ) );
 
 	m_resCenterFreq = new Knob( KnobType::Bright26, this );
 	m_resCenterFreq->setHintText( tr( "Resonance center frequency:" ), "" );
-	m_resCenterFreq->setLabel( tr( "RES CF" ) );
+	m_resCenterFreq->setLabelLegacy( tr( "RES CF" ) );
 
 	m_resBandwidth = new Knob( KnobType::Bright26, this );
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ), "" );
-	m_resBandwidth->setLabel( tr( "RES BW" ) );
+	m_resBandwidth->setLabelLegacy( tr( "RES BW" ) );
 
 	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI control changes" ), this );
 

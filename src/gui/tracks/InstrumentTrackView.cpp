@@ -82,14 +82,14 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->setLabel( tr( "VOL" ) );
+	m_volumeKnob->setLabelLegacy( tr( "VOL" ) );
 	m_volumeKnob->show();
 
 	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText(tr("Panning:"), "%");
-	m_panningKnob->setLabel( tr( "PAN" ) );
+	m_panningKnob->setLabelLegacy( tr( "PAN" ) );
 	m_panningKnob->show();
 
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );

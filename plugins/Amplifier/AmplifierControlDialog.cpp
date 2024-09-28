@@ -45,7 +45,7 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
         Knob* newKnob = new Knob(KnobType::Bright26, this);
         newKnob->move(x, y);
         newKnob->setModel(model);
-        newKnob->setLabel(label);
+        newKnob->setLabelLegacy(label);
         newKnob->setHintText(hintText, unit);
         newKnob->setVolumeKnob(isVolume);
         return newKnob;

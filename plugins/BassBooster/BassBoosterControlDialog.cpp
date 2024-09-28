@@ -52,17 +52,17 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 
 	auto freqKnob = new Knob(KnobType::Bright26, this);
 	freqKnob->setModel( &controls->m_freqModel );
-	freqKnob->setLabel( tr( "FREQ" ) );
+	freqKnob->setLabelLegacy( tr( "FREQ" ) );
 	freqKnob->setHintText( tr( "Frequency:" ) , "Hz" );
 
 	auto gainKnob = new Knob(KnobType::Bright26, this);
 	gainKnob->setModel( &controls->m_gainModel );
-	gainKnob->setLabel( tr( "GAIN" ) );
+	gainKnob->setLabelLegacy( tr( "GAIN" ) );
 	gainKnob->setHintText( tr( "Gain:" ) , "" );
 
 	auto ratioKnob = new Knob(KnobType::Bright26, this);
 	ratioKnob->setModel( &controls->m_ratioModel );
-	ratioKnob->setLabel( tr( "RATIO" ) );
+	ratioKnob->setLabelLegacy( tr( "RATIO" ) );
 	ratioKnob->setHintText( tr( "Ratio:" ) , "" );
 
 	l->addWidget( freqKnob );

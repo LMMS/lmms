@@ -1010,7 +1010,7 @@ void CarlaParamsView::refreshKnobs()
 		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
 		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
 		m_knobs[i]->setHintText(name, "");
-		m_knobs[i]->setLabel(name);
+		m_knobs[i]->setLabelLegacy(name);
 		m_knobs[i]->setObjectName(name); // this is being used for filtering the knobs.
 
 		// Set the newly created model to the knob.

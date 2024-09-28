@@ -38,7 +38,7 @@ namespace lmms::gui
 	Knob * name = new Knob( KnobType::Bright26, this); 			\
 	(name) -> move( x, y );									\
 	(name) ->setModel( &controls-> model );					\
-	(name) ->setLabel( label );							\
+	(name) ->setLabelLegacy( label );							\
 	(name) ->setHintText( hint, unit );
 
 

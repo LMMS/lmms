@@ -56,13 +56,13 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	auto inGain = new Knob(KnobType::Bright26, this);
 	inGain->move( 16, 32 );
 	inGain->setModel( & controls->m_inGain );
-	inGain->setLabel( tr( "GAIN" ) );
+	inGain->setLabelLegacy( tr( "GAIN" ) );
 	inGain->setHintText( tr( "Input gain:" ) , " dBFS" );
 
 	auto inNoise = new Knob(KnobType::Bright26, this);
 	inNoise->move( 14, 76 );
 	inNoise->setModel( & controls->m_inNoise );
-	inNoise->setLabel( tr( "NOISE" ) );
+	inNoise->setLabelLegacy( tr( "NOISE" ) );
 	inNoise->setHintText( tr( "Input noise:" ) , "%" );
 	
 	
@@ -70,13 +70,13 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	auto outGain = new Knob(KnobType::Bright26, this);
 	outGain->move( 138, 32 );
 	outGain->setModel( & controls->m_outGain );
-	outGain->setLabel( tr( "GAIN" ) );
+	outGain->setLabelLegacy( tr( "GAIN" ) );
 	outGain->setHintText( tr( "Output gain:" ) , " dBFS" );
 
 	auto outClip = new Knob(KnobType::Bright26, this);
 	outClip->move( 138, 76 );
 	outClip->setModel( & controls->m_outClip );
-	outClip->setLabel( tr( "CLIP" ) );
+	outClip->setLabelLegacy( tr( "CLIP" ) );
     outClip->setHintText( tr( "Output clip:" ) , " dBFS");
 
 	
@@ -97,13 +97,13 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	auto rate = new Knob(KnobType::Bright26, this);
 	rate->move( 59, 32 );
 	rate->setModel( & controls->m_rate );
-	rate->setLabel( tr( "FREQ" ) );
+	rate->setLabelLegacy( tr( "FREQ" ) );
 	rate->setHintText( tr( "Sample rate:" ) , " Hz" );
 
 	auto stereoDiff = new Knob(KnobType::Bright26, this);
 	stereoDiff->move( 72, 76 );
 	stereoDiff->setModel( & controls->m_stereoDiff );
-	stereoDiff->setLabel( tr( "STEREO" ) );
+	stereoDiff->setLabelLegacy( tr( "STEREO" ) );
 	stereoDiff->setHintText( tr( "Stereo difference:" ) , "%" );
 	
 	
@@ -111,7 +111,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	auto levels = new Knob(KnobType::Bright26, this);
 	levels->move( 92, 32 );
 	levels->setModel( & controls->m_levels );
-	levels->setLabel( tr( "QUANT" ) );
+	levels->setLabelLegacy( tr( "QUANT" ) );
 	levels->setHintText( tr( "Levels:" ) , "" );
 }
 

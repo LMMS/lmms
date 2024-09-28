@@ -45,25 +45,25 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	auto inputGainKnob = new Knob(KnobType::Bright26, this);
 	inputGainKnob -> move( 16, 10 );
 	inputGainKnob->setModel( &controls->m_inputGainModel );
-	inputGainKnob->setLabel( tr( "Input" ) );
+	inputGainKnob->setLabelLegacy( tr( "Input" ) );
 	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
 
 	auto sizeKnob = new Knob(KnobType::Bright26, this);
 	sizeKnob -> move( 57, 10 );
 	sizeKnob->setModel( &controls->m_sizeModel );
-	sizeKnob->setLabel( tr( "Size" ) );
+	sizeKnob->setLabelLegacy( tr( "Size" ) );
 	sizeKnob->setHintText( tr( "Size:" ) , "" );
 
 	auto colorKnob = new Knob(KnobType::Bright26, this);
 	colorKnob -> move( 98, 10 );
 	colorKnob->setModel( &controls->m_colorModel );
-	colorKnob->setLabel( tr( "Color" ) );
+	colorKnob->setLabelLegacy( tr( "Color" ) );
 	colorKnob->setHintText( tr( "Color:" ) , "" );
 
 	auto outputGainKnob = new Knob(KnobType::Bright26, this);
 	outputGainKnob -> move( 139, 10 );
 	outputGainKnob->setModel( &controls->m_outputGainModel );
-	outputGainKnob->setLabel( tr( "Output" ) );
+	outputGainKnob->setLabelLegacy( tr( "Output" ) );
 	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
 }
 
