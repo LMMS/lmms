@@ -57,9 +57,9 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 {
 }
 
-Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget * parent)
+Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget * parent, const QString & name)
 {
-	auto result = new Knob(knob_num, parent);
+	auto result = new Knob(knob_num, parent, name);
 
 	result->setLegacyMode(true);
 	result->setLabelLegacy(label);

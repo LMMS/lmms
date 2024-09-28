@@ -67,13 +67,11 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	m_filterComboBox = new ComboBox(m_filterGroupBox);
 	filterLayout->addWidget(m_filterComboBox);
 
-	m_filterCutKnob = new Knob(KnobType::Bright26, m_filterGroupBox);
-	m_filterCutKnob->setLabelLegacy(tr("FREQ"));
+	m_filterCutKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("FREQ"), m_filterGroupBox);
 	m_filterCutKnob->setHintText(tr("Cutoff frequency:"), " " + tr("Hz"));
 	filterLayout->addWidget(m_filterCutKnob);
 
-	m_filterResKnob = new Knob(KnobType::Bright26, m_filterGroupBox);
-	m_filterResKnob->setLabelLegacy(tr("Q/RESO"));
+	m_filterResKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("Q/RESO"), m_filterGroupBox);
 	m_filterResKnob->setHintText(tr("Q/Resonance:"), "");
 	filterLayout->addWidget(m_filterResKnob);
 

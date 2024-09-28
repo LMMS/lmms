@@ -81,7 +81,7 @@ public:
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
-	static Knob* buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* parent);
+	static Knob* buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* parent, const QString & _name = QString());
 
 	void setLabel(const QString & txt);
 	void setLabelLegacy(const QString & txt);

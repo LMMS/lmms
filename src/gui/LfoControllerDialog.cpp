@@ -62,23 +62,19 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 240, 58 );
 	
-	m_baseKnob = new Knob( KnobType::Bright26, this );
-	m_baseKnob->setLabelLegacy( tr( "BASE" ) );
+	m_baseKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("BASE"), this);
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base:" ), "" );
 
-	m_speedKnob = new TempoSyncKnob( KnobType::Bright26, this );
-	m_speedKnob->setLabelLegacy( tr( "FREQ" ) );
+	m_speedKnob = TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("FREQ"), this);
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO frequency:" ), "" );
 
-	m_amountKnob = new Knob( KnobType::Bright26, this );
-	m_amountKnob->setLabelLegacy( tr( "AMNT" ) );
+	m_amountKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("AMNT"), this);
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 
-	m_phaseKnob = new Knob( KnobType::Bright26, this );
-	m_phaseKnob->setLabelLegacy( tr( "PHS" ) );
+	m_phaseKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("PHS"), this);
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( " degrees" ) );
 
