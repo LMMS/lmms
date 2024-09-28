@@ -64,7 +64,7 @@
 #include "TimeLineWidget.h"
 #include "debug.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 
 namespace lmms::gui
@@ -1040,7 +1040,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	p.setFont(adjustedToPixelSize(p.font(), 10));
+	p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 
