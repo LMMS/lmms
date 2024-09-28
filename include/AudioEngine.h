@@ -50,14 +50,15 @@ class AudioPort;
 class AudioEngineWorkerThread;
 
 
-const fpp_t MINIMUM_BUFFER_SIZE = 32;
-const fpp_t DEFAULT_BUFFER_SIZE = 256;
+constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
+constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
+constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
 
-const int BYTES_PER_SAMPLE = sizeof( sample_t );
-const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const int BYTES_PER_FRAME = sizeof( SampleFrame );
+constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
+constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
+constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
-const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
+constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
 class LMMS_EXPORT AudioEngine : public QObject
 {
@@ -289,9 +290,6 @@ public:
 
 	void changeQuality(const struct qualitySettings & qs);
 
-	inline bool isMetronomeActive() const { return m_metronomeActive; }
-	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
-
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
@@ -352,8 +350,6 @@ private:
 
 	void swapBuffers();
 
-	void handleMetronome();
-
 	void clearInternal();
 
 	bool m_renderOnly;
@@ -401,8 +397,6 @@ private:
 	fifoWriter * m_fifoWriter;
 
 	AudioEngineProfiler m_profiler;
-
-	bool m_metronomeActive;
 
 	bool m_clearSignal;
 

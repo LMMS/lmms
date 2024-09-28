@@ -29,17 +29,12 @@
 
 #ifdef LMMS_HAVE_SDL
 
-#ifdef LMMS_HAVE_SDL2
 #include <SDL2/SDL_audio.h>
-#else
-#include <SDL/SDL.h>
-#include <SDL/SDL_audio.h>
-#endif
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-class QLineEdit;
+class QComboBox;
 
 namespace lmms
 {
@@ -64,10 +59,16 @@ public:
 		~setupWidget() override = default;
 
 		void saveSettings() override;
+	
+	private:
+		void populatePlaybackDeviceComboBox();
+		void populateInputDeviceComboBox();
 
 	private:
-		QLineEdit * m_device;
+		QComboBox* m_playbackDeviceComboBox = nullptr;
+		QComboBox* m_inputDeviceComboBox = nullptr;
 
+		static QString s_systemDefaultDevice;
 	} ;
 
 
@@ -78,35 +79,22 @@ private:
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );
 
-#ifdef LMMS_HAVE_SDL2
 	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlInputAudioCallback( Uint8 * _buf, int _len );
-#endif
 
 	SDL_AudioSpec m_audioHandle;
 
 	SampleFrame* m_outBuf;
 
-#ifdef LMMS_HAVE_SDL2
 	size_t m_currentBufferFramePos;
 	size_t m_currentBufferFramesCount;
-#else
-	Uint8 * m_convertedBuf;
-	int m_convertedBufPos;
-	int m_convertedBufSize;
-	bool m_outConvertEndian;
-#endif
-
 
 	bool m_stopped;
 
-#ifdef LMMS_HAVE_SDL2
 	SDL_AudioDeviceID m_outputDevice;
 
 	SDL_AudioSpec m_inputAudioHandle;
 	SDL_AudioDeviceID m_inputDevice;
-#endif
-
 } ;
 
 

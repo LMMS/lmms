@@ -40,7 +40,8 @@ class DualFilterEffect : public Effect
 public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~DualFilterEffect() override;
-	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

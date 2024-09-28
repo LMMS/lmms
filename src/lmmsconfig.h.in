@@ -31,7 +31,6 @@
 #cmakedefine LMMS_HAVE_SOUNDIO
 #cmakedefine LMMS_HAVE_PULSEAUDIO
 #cmakedefine LMMS_HAVE_SDL
-#cmakedefine LMMS_HAVE_SDL2
 #cmakedefine LMMS_HAVE_STK
 #cmakedefine LMMS_HAVE_VST
 #cmakedefine LMMS_HAVE_SF_COMPLEVEL
