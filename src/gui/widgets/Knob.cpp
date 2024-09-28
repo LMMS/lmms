@@ -132,16 +132,10 @@ void Knob::onKnobNumUpdated()
 
 
 
-void Knob::setLabel(const QString & txt, bool legacyMode)
+void Knob::setLabel(const QString & txt)
 {
-	// TODO Remove this block so that everyone has to explicitly call setLabelLegacy
-	if (legacyMode)
-	{
-		setLabelLegacy(txt);
-		return;
-	}
-
 	m_label = txt;
+	m_legacyMode = false;
 	m_isHtmlLabel = false;
 
 	QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
@@ -159,6 +153,7 @@ void Knob::setLabel(const QString & txt, bool legacyMode)
 void Knob::setLabelLegacy(const QString & txt)
 {
 	m_label = txt;
+	m_legacyMode = true;
 	m_isHtmlLabel = false;
 
 	setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
@@ -508,7 +503,15 @@ void Knob::changeEvent(QEvent * ev)
 		onKnobNumUpdated();
 		if (!m_label.isEmpty())
 		{
-			setLabel(m_label);
+			if (m_legacyMode)
+			{
+				setLabelLegacy(m_label);
+			}
+			else
+			{
+				setLabel(m_label);
+			}
+			
 		}
 		m_cache = QImage();
 		update();

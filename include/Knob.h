@@ -81,7 +81,7 @@ public:
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
-	void setLabel(const QString & txt, bool legacyMode = true);
+	void setLabel(const QString & txt);
 	void setLabelLegacy(const QString & txt);
 	void setHtmlLabel( const QString &htmltxt );
 
@@ -131,6 +131,7 @@ private:
 	}
 
 	QString m_label;
+	bool m_legacyMode = false;
 	bool m_isHtmlLabel;
 	QTextDocument* m_tdRenderer;
 
