@@ -484,11 +484,8 @@ void Knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
-void Knob::paintEvent( QPaintEvent * _me )
+void Knob::drawLabel(QPainter& p)
 {
-	QPainter p( this );
-
-	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
 		if (!m_isHtmlLabel)
@@ -509,6 +506,14 @@ void Knob::paintEvent( QPaintEvent * _me )
 			m_tdRenderer->drawContents(&p);
 		}
 	}
+}
+
+void Knob::paintEvent( QPaintEvent * _me )
+{
+	QPainter p(this);
+
+	drawKnob(&p);
+	drawLabel(p);
 }
 
 void Knob::changeEvent(QEvent * ev)

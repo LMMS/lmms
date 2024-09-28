@@ -127,6 +127,7 @@ private:
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
+	void drawLabel(QPainter& p);
 	bool updateAngle();
 
 	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
