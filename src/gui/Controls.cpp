@@ -40,14 +40,7 @@ namespace lmms::gui
 
 void KnobControl::setText(const QString &text)
 {
-	if (m_knob->legacyMode())
-	{
-		m_knob->setLabelLegacy(text);
-	}
-	else
-	{
-		m_knob->setLabel(text);
-	}
+	m_knob->setLabel(text);
 }
 
 QWidget *KnobControl::topWidget() { return m_knob; }

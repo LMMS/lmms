@@ -30,6 +30,7 @@
 #include "Engine.h"
 #include "CaptionMenu.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
@@ -68,7 +69,8 @@ TempoSyncKnob* TempoSyncKnob::buildLegacyKnob(KnobType knob_num, const QString& 
 	auto result = new TempoSyncKnob(knob_num, parent);
 
 	result->setLegacyMode(true);
-	result->setLabelLegacy(label);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
 
 	return result;
 }

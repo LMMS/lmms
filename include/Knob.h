@@ -84,7 +84,6 @@ public:
 	static Knob* buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* parent, const QString & _name = QString());
 
 	void setLabel(const QString & txt);
-	void setLabelLegacy(const QString & txt);
 	void setHtmlLabel( const QString &htmltxt );
 
 	bool legacyMode() const { return m_legacyMode; }

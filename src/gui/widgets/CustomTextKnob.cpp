@@ -23,6 +23,7 @@
  */
 
 #include "CustomTextKnob.h"
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -41,7 +42,8 @@ CustomTextKnob* CustomTextKnob::buildLegacyKnob(KnobType knob_num, QWidget* pare
 	auto result = new CustomTextKnob(knob_num, parent, description);
 
 	result->setLegacyMode(true);
-	result->setLabelLegacy(label);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
 
 	return result;
 }

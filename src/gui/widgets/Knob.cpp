@@ -60,9 +60,9 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget * parent, const QString & name)
 {
 	auto result = new Knob(knob_num, parent, name);
-
 	result->setLegacyMode(true);
-	result->setLabelLegacy(label);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
 
 	return result;
 }
@@ -145,17 +145,9 @@ void Knob::setLabel(const QString & txt)
 	m_label = txt;
 	m_isHtmlLabel = false;
 
-	setLegacyMode(false);
-}
+	updateFixedSize();
 
-void Knob::setLabelLegacy(const QString & txt)
-{
-	m_label = txt;
-	m_isHtmlLabel = false;
-
-	setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
-
-	setLegacyMode(true);
+	update();
 }
 
 
@@ -523,17 +515,17 @@ void Knob::changeEvent(QEvent * ev)
 		onKnobNumUpdated();
 		if (!m_label.isEmpty())
 		{
-			if (m_legacyMode)
-			{
-				setLabelLegacy(m_label);
-			}
-			else
-			{
-				setLabel(m_label);
-			}
-			
+			setLabel(m_label);
 		}
 		m_cache = QImage();
+		update();
+	}
+	else if (ev->type() == QEvent::FontChange)
+	{
+		// The size of the label might have changed so update
+		// the size of this widget.
+		updateFixedSize();
+
 		update();
 	}
 }
