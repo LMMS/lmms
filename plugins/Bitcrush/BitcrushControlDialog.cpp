@@ -29,6 +29,7 @@
 #include "embed.h"
 #include "BitcrushControlDialog.h"
 #include "BitcrushControls.h"
+#include "FontHelper.h"
 #include "LedCheckBox.h"
 #include "Knob.h"
 
@@ -46,31 +47,35 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	setFixedSize( 181, 128 );
 	
 	// labels
+	const auto labelFont = adjustedToPixelSize(font(), DEFAULT_FONT_SIZE);
+
 	auto inLabel = new QLabel(tr("IN"), this);
+	inLabel->setFont(labelFont);
 	inLabel->move( 24, 15 );
 
 	auto outLabel = new QLabel(tr("OUT"), this);
+	outLabel->setFont(labelFont);
 	outLabel->move( 139, 15 );
 	
 	// input knobs
-	auto inGain = Knob::buildLegacyKnob(KnobType::Bright26, tr("GAIN"), this);
+	auto inGain = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("GAIN"), this);
 	inGain->move( 16, 32 );
 	inGain->setModel( & controls->m_inGain );
 	inGain->setHintText( tr( "Input gain:" ) , " dBFS" );
 
-	auto inNoise = Knob::buildLegacyKnob(KnobType::Bright26, tr("NOISE"), this);
+	auto inNoise = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("NOISE"), this);
 	inNoise->move( 14, 76 );
 	inNoise->setModel( & controls->m_inNoise );
 	inNoise->setHintText( tr( "Input noise:" ) , "%" );
 	
 	
 	// output knobs
-	auto outGain = Knob::buildLegacyKnob(KnobType::Bright26, tr("GAIN"), this);
+	auto outGain = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("GAIN"), this);
 	outGain->move( 138, 32 );
 	outGain->setModel( & controls->m_outGain );
 	outGain->setHintText( tr( "Output gain:" ) , " dBFS" );
 
-	auto outClip = Knob::buildLegacyKnob(KnobType::Bright26, tr("CLIP"), this);
+	auto outClip = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("CLIP"), this);
 	outClip->move( 138, 76 );
 	outClip->setModel( & controls->m_outClip );
     outClip->setHintText( tr( "Output clip:" ) , " dBFS");
@@ -90,19 +95,19 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	
 	// rate crushing knobs
-	auto rate = Knob::buildLegacyKnob(KnobType::Bright26, tr("FREQ"), this);
+	auto rate = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("FREQ"), this);
 	rate->move( 59, 32 );
 	rate->setModel( & controls->m_rate );
 	rate->setHintText( tr( "Sample rate:" ) , " Hz" );
 
-	auto stereoDiff = Knob::buildLegacyKnob(KnobType::Bright26, tr("STEREO"), this);
+	auto stereoDiff = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("STEREO"), this);
 	stereoDiff->move( 72, 76 );
 	stereoDiff->setModel( & controls->m_stereoDiff );
 	stereoDiff->setHintText( tr( "Stereo difference:" ) , "%" );
 	
 	
 	// depth crushing knob
-	auto levels = Knob::buildLegacyKnob(KnobType::Bright26, tr("QUANT"), this);
+	auto levels = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("QUANT"), this);
 	levels->move( 92, 32 );
 	levels->setModel( & controls->m_levels );
 	levels->setHintText( tr( "Levels:" ) , "" );

@@ -59,14 +59,14 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
-	auto inputKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("INPUT"), this);
+	auto inputKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("INPUT"), this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	auto outputKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("OUTPUT"), this);
+	auto outputKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("OUTPUT"), this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 225 );

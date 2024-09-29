@@ -67,6 +67,15 @@ Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget * p
 	return result;
 }
 
+Knob* Knob::buildKnobWithSmallPixelFont(KnobType knob_num, const QString& label, QWidget * parent, const QString & name)
+{
+	auto result = new Knob(knob_num, parent, name);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
+
+	return result;
+}
+
 
 void Knob::initUi( const QString & _name )
 {
