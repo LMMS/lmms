@@ -516,17 +516,27 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	auto leftClip = new AutomationClip(*m_clip);
 
 	rightClip->clear();
-	leftClip->removeNodes(splitPos, m_initialClipEnd);
+	// Remove the nodes past the split point from the left clip. +1 to prevent deleting a node
+	// right on the split point
+	leftClip->removeNodes(splitPos + 1, m_initialClipEnd);
 
 	for (auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
 	{
 		if (POS(it) >= pos)
 		{
 			rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
+			rightClip->getTimeMap().find(POS(it) - pos).value().setLockedTangents(LOCKEDTAN(it));
+			rightClip->getTimeMap().find(POS(it) - pos).value().setInTangent(INTAN(it));
+			rightClip->getTimeMap().find(POS(it) - pos).value().setOutTangent(OUTTAN(it));
 		}
 	}
-	rightClip->putValue(0, m_clip->valueAt(pos));
-	leftClip->putValue(pos, m_clip->valueAt(pos));
+
+	// Only place a node at the split position if there isn't one there to begin with
+	if (m_clip->getTimeMap().find(pos) == m_clip->getTimeMap().end())
+	{
+		rightClip->putValue(0, m_clip->valueAt(pos));
+		leftClip->putValue(pos, m_clip->valueAt(pos));
+	}
 
 	leftClip->movePosition(m_initialClipPos);
 	leftClip->changeLength(splitPos - m_initialClipPos);
