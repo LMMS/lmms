@@ -237,7 +237,6 @@ public:
 
 	sample_rate_t baseSampleRate() const;
 	sample_rate_t outputSampleRate() const;
-	sample_rate_t inputSampleRate() const;
 
 	inline float masterGain() const
 	{
