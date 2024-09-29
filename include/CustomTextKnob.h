@@ -42,7 +42,7 @@ public:
 
 	CustomTextKnob( const Knob& other ) = delete;
 
-	static CustomTextKnob* buildLegacyKnob(KnobType knob_num, QWidget* parent, const QString& description, const QString& label);
+	static CustomTextKnob* buildKnobWithSmallPixelFont(KnobType knob_num, QWidget* parent, const QString& description, const QString& label);
 
 	inline void setValueText(const QString & _value_text)
 	{
