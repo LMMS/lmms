@@ -554,10 +554,11 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
 	// Shorter names for some commonly used properties of the event
 	const auto key = ke->key();
-	const bool vertical   = (key == Qt::Key_Up    || key == Qt::Key_Down);
-	const bool horizontal = (key == Qt::Key_Left  || key == Qt::Key_Right);
-	const bool insert     = (key == Qt::Key_Enter || key == Qt::Key_Return);
-	const bool preview    = (key == Qt::Key_Space);
+	const bool vertical      = (key == Qt::Key_Up    || key == Qt::Key_Down);
+	const bool horizontal    = (key == Qt::Key_Left  || key == Qt::Key_Right);
+	const bool insert        = (key == Qt::Key_Enter || key == Qt::Key_Return);
+	const bool insertSlicert = (key == Qt::Key_Slash);
+	const bool preview       = (key == Qt::Key_Space);
 
 	// First of all, forward all keypresses
 	QTreeWidget::keyPressEvent(ke);
@@ -588,6 +589,14 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 		if (sampleTrack && songEditor){ openInNewSampleTrack(file); }
 		// Otherwise we send the item as a new instrument track
 		else if (!sampleTrack){ openInNewInstrumentTrack(file, songEditor); }
+	}
+
+	// When / is pressed, add SlicerT...
+	if (insertSlicert)
+	{
+		// ...to the song editor by default, or to the pattern editor if ctrl is held
+		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
+		openInNewInstrumentTrack(file, songEditor, "slicert");
 	}
 
 	// When space is pressed, start a preview of the selected item
@@ -661,23 +670,67 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	}
 }
 
+bool instrumentActionsInitialised = false;
+const std::array<std::array<QString, 3>, INSTRUMENTACTIONS_LENGTH> instrumentActions;
 
-
+#define INSTRUMENTACTIONS_INSTRUMENT_INDEX 2
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
+	if (!instrumentActionsInitialised)
+	{
+		// instrumentActions has not been initialised yet.
+		// Let's fix that
+		instrumentActions =
+		{
+			{
+				// doing this here because we can't call tr()
+				// in global scope
+				{
+					{
+						tr("Send to new AudioFileProcessor instance"),
+						"audiofileprocessor",
+						"Enter"
+					}
+				},
+				{
+					{
+						tr("Send to new SlicerT instance"),
+						"slicert",
+						"/"
+					}
+				},
+				{
+					{
+						tr("Send to instrument track"),
+						"",
+						"Enter"
+					}
+				}
+			}
+		};
+		instrumentActionsInitialised = true;
+	}
+	
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	QString instrumentAction = fileIsSample ?
-		tr("Send to new AudioFileProcessor instance") :
-		tr("Send to new instrument track");
-	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+	for (int i = fileIsSample ? 0 : INSTRUMENTACTIONS_INSTRUMENT_INDEX;
+			i < (fileIsSample ? INSTRUMENTACTIONS_INSTRUMENT_INDEX
+				: INSTRUMENTACTIONS_LENGTH); i++)
+	{
+		const std::array<QString, 3>& instrumentAction = instrumentActions[i];
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
-	connect(toInstrument, &QAction::triggered,
-		[=]{ openInNewInstrumentTrack(file, songEditor); });
-	result.append(toInstrument);
+		auto toInstrument = new QAction(
+				instrumentAction[0] + tr(" (%2)")
+				.arg((songEditor ? "" : UI_CTRL_KEY + QString(" + "))
+					+ instrumentAction[2]),
+				nullptr
+				);
+		connect(toInstrument, &QAction::triggered,
+			[=]{ openInNewInstrumentTrack(file, songEditor, instrumentAction[1]); });
+		result.append(toInstrument);
+	}
 
 	if (songEditor && fileIsSample)
 	{
@@ -877,7 +930,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 
 
-void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
+void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it, const QString& pluginPreference)
 {
 	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
@@ -896,8 +949,19 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			if( i == nullptr ||
 				!i->descriptor()->supportsFileType( e ) )
 			{
-				PluginFactory::PluginInfoAndKey piakn =
-					getPluginFactory()->pluginSupportingExtension(e);
+				PluginFactory::PluginInfoAndKey piakn;
+				if (pluginPreference == NULL || pluginPreference.isEmpty())
+				{
+					piakn = getPluginFactory()->pluginSupportingExtension(e);
+				}
+			       	else
+				{
+					piakn.info = getPluginFactory()->pluginInfo(pluginPreference
+							.toStdString().c_str());
+					Plugin::Descriptor::SubPluginFeatures::Key k;
+					k.name = pluginPreference;
+					piakn.key = k;
+				}
 				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
@@ -920,6 +984,14 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 
 	}
 	Engine::audioEngine()->doneChangeInModel();
+}
+
+
+
+
+void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
+{
+	handleFile(f, it, "");
 }
 
 
@@ -949,13 +1021,31 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 
 
 
-void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileItem* item)
+void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileItem* item, const QString& pluginCode)
 {
 	if(item->isTrack())
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
-		handleFile(item, it);
+		handleFile(item, it, pluginCode);
 	}
+}
+
+
+
+
+void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileItem* item) {
+	openInNewInstrumentTrack(tc, item, "");
+}
+
+
+
+
+void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEditor, const QString& pluginCode)
+{
+	// Get the correct TrackContainer. Ternary doesn't compile here
+	TrackContainer* tc = Engine::getSong();
+	if (!songEditor) { tc = Engine::patternStore(); }
+	openInNewInstrumentTrack(tc, item, pluginCode);
 }
 
 
@@ -963,10 +1053,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileIte
 
 void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEditor)
 {
-	// Get the correct TrackContainer. Ternary doesn't compile here
-	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::patternStore(); }
-	openInNewInstrumentTrack(tc, item);
+	openInNewInstrumentTrack(item, songEditor, "");
 }
 
 
