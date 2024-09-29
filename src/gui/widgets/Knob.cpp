@@ -203,6 +203,14 @@ void Knob::updateFixedSize()
 	}
 	else
 	{
+		// Styled knobs do not use pixmaps and have no labels. Their size is set from the outside and
+		// they are painted within these limits. Hence we should not compute a new size from a pixmap
+		// and/or label the case of styled knobs.
+		if (knobNum() == KnobType::Styled)
+		{
+			return;
+		}
+
 		QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
 
 		auto fm = QFontMetrics(font());
