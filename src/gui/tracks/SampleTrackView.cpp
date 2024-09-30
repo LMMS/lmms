@@ -31,6 +31,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
+#include "FontHelper.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -61,8 +62,8 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	auto f = font();
-	f.setPixelSize(9);
+	const auto f = adjustedToPixelSize(font(), 9);
+
 	m_volumeKnob = new Knob(KnobType::Small17, getTrackSettingsWidget(), tr("Track volume"));
 	m_volumeKnob->setFont(f);
 	m_volumeKnob->setLabel(tr("VOL"));

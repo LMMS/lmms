@@ -35,6 +35,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "MidiCCRackView.h"
 #include "Mixer.h"
@@ -77,8 +78,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	auto f = font();
-	f.setPixelSize(9);
+	const auto f = adjustedToPixelSize(font(), 9);
+
 	m_volumeKnob = new Knob(KnobType::Small17, getTrackSettingsWidget(), tr("Volume"));
 	m_volumeKnob->setFont(f);
 	m_volumeKnob->setLabel(tr("VOL"));
