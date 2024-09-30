@@ -1,7 +1,7 @@
 /*
- * MixerChannelView.h - the mixer channel view
+ * MixerChannelView.h
  *
- * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
