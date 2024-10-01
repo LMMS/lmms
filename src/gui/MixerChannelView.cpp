@@ -186,7 +186,7 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	delete contextMenu;
 }
 
-void MixerChannelView::paintEvent(QPaintEvent* event)
+void MixerChannelView::paintEvent(QPaintEvent*)
 {
 	const auto channel = mixerChannel();
 	const auto isActive = m_mixerView->currentMixerChannel() == this;
@@ -219,7 +219,7 @@ void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
 	renameChannel();
 }
 
-bool MixerChannelView::eventFilter(QObject* dist, QEvent* event)
+bool MixerChannelView::eventFilter(QObject*, QEvent* event)
 {
 	// If we are in a rename, capture the enter/return events and handle them
 	if (event->type() == QEvent::KeyPress)
