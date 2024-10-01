@@ -208,11 +208,11 @@ void MixerChannelView::paintEvent(QPaintEvent* event)
 
 	// inner border
 	painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());
-	painter.drawRect(1, 1, width - MIXER_CHANNEL_INNER_BORDER_SIZE, height - MIXER_CHANNEL_INNER_BORDER_SIZE);
+	painter.drawRect(1, 1, width - InnerBorderSize, height - InnerBorderSize);
 
 	// outer border
 	painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
-	painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
+	painter.drawRect(0, 0, width - OuterBorderSize, height - OuterBorderSize);
 
 	QWidget::paintEvent(event);
 }

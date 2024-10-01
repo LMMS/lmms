@@ -46,8 +46,6 @@ class MixerChannel;
 
 namespace lmms::gui {
 
-constexpr int MIXER_CHANNEL_INNER_BORDER_SIZE = 3;
-constexpr int MIXER_CHANNEL_OUTER_BORDER_SIZE = 1;
 
 class MixerChannelView : public QWidget
 {
@@ -58,6 +56,9 @@ class MixerChannelView : public QWidget
 	Q_PROPERTY(QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive)
 	Q_PROPERTY(QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive)
 public:
+	static constexpr auto InnerBorderSize = 3;
+	static constexpr auto OuterBorderSize = 1;
+
 	MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex);
 	void paintEvent(QPaintEvent* event) override;
 	void contextMenuEvent(QContextMenuEvent*) override;
