@@ -246,11 +246,6 @@ bool MixerChannelView::eventFilter(QObject* dist, QEvent* event)
 	return false;
 }
 
-int MixerChannelView::channelIndex() const
-{
-	return m_channelIndex;
-}
-
 void MixerChannelView::setChannelIndex(int index)
 {
 	MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
@@ -260,11 +255,6 @@ void MixerChannelView::setChannelIndex(int index)
 	m_effectRackView->setModel(&mixerChannel->m_fxChain);
 	m_channelNumberLcd->setValue(index);
 	m_channelIndex = index;
-}
-
-void MixerChannelView::reset()
-{
-	m_peakIndicator->resetPeakToMinusInf();
 }
 
 void MixerChannelView::renameChannel()

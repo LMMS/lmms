@@ -38,13 +38,13 @@
 #include "LcdWidget.h"
 #include "PixmapButton.h"
 #include "SendButtonIndicator.h"
+#include "PeakIndicator.h"
 
 namespace lmms {
 class MixerChannel;
 }
 
 namespace lmms::gui {
-class PeakIndicator;
 
 constexpr int MIXER_CHANNEL_INNER_BORDER_SIZE = 3;
 constexpr int MIXER_CHANNEL_OUTER_BORDER_SIZE = 1;
@@ -65,8 +65,8 @@ public:
 	void mouseDoubleClickEvent(QMouseEvent*) override;
 	bool eventFilter(QObject* dist, QEvent* event) override;
 
-	void reset();
-	int channelIndex() const;
+	void reset() { 	m_peakIndicator->resetPeakToMinusInf(); }
+	int channelIndex() const { return m_channelIndex; }
 	void setChannelIndex(int index);
 
 	QBrush backgroundActive() const { return m_backgroundActive; }
