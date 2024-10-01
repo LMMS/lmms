@@ -189,18 +189,12 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 void MixerChannelView::paintEvent(QPaintEvent* event)
 {
 	const auto channel = mixerChannel();
-	const bool muted = channel->m_muteModel.value();
-	const auto name = channel->m_name;
-	const auto elidedName = elideName(name);
 	const auto isActive = m_mixerView->currentMixerChannel() == this;
-
-	if (!m_inRename && m_renameLineEdit->text() != elidedName) { m_renameLineEdit->setText(elidedName); }
-
 	const auto width = rect().width();
 	const auto height = rect().height();
 	auto painter = QPainter{this};
 
-	if (channel->color().has_value() && !muted)
+	if (channel->color().has_value() && !channel->m_muteModel.value())
 	{
 		painter.fillRect(rect(), channel->color()->darker(isActive ? 120 : 150));
 	}
@@ -213,8 +207,6 @@ void MixerChannelView::paintEvent(QPaintEvent* event)
 	// outer border
 	painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
 	painter.drawRect(0, 0, width - OuterBorderSize, height - OuterBorderSize);
-
-	QWidget::paintEvent(event);
 }
 
 void MixerChannelView::mousePressEvent(QMouseEvent*)
