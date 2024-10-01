@@ -262,56 +262,6 @@ void MixerChannelView::setChannelIndex(int index)
 	m_channelIndex = index;
 }
 
-QBrush MixerChannelView::backgroundActive() const
-{
-	return m_backgroundActive;
-}
-
-void MixerChannelView::setBackgroundActive(const QBrush& c)
-{
-	m_backgroundActive = c;
-}
-
-QColor MixerChannelView::strokeOuterActive() const
-{
-	return m_strokeOuterActive;
-}
-
-void MixerChannelView::setStrokeOuterActive(const QColor& c)
-{
-	m_strokeOuterActive = c;
-}
-
-QColor MixerChannelView::strokeOuterInactive() const
-{
-	return m_strokeOuterInactive;
-}
-
-void MixerChannelView::setStrokeOuterInactive(const QColor& c)
-{
-	m_strokeOuterInactive = c;
-}
-
-QColor MixerChannelView::strokeInnerActive() const
-{
-	return m_strokeInnerActive;
-}
-
-void MixerChannelView::setStrokeInnerActive(const QColor& c)
-{
-	m_strokeInnerActive = c;
-}
-
-QColor MixerChannelView::strokeInnerInactive() const
-{
-	return m_strokeInnerInactive;
-}
-
-void MixerChannelView::setStrokeInnerInactive(const QColor& c)
-{
-	m_strokeInnerInactive = c;
-}
-
 void MixerChannelView::reset()
 {
 	m_peakIndicator->resetPeakToMinusInf();

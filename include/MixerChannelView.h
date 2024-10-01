@@ -65,25 +65,24 @@ public:
 	void mouseDoubleClickEvent(QMouseEvent*) override;
 	bool eventFilter(QObject* dist, QEvent* event) override;
 
+	void reset();
 	int channelIndex() const;
 	void setChannelIndex(int index);
 
-	QBrush backgroundActive() const;
-	void setBackgroundActive(const QBrush& c);
+	QBrush backgroundActive() const { return m_backgroundActive; }
+	void setBackgroundActive(const QBrush& c) { m_backgroundActive = c; }
 
-	QColor strokeOuterActive() const;
-	void setStrokeOuterActive(const QColor& c);
+	QColor strokeOuterActive() const { return m_strokeOuterActive; }
+	void setStrokeOuterActive(const QColor& c) { m_strokeOuterActive = c; }
 
-	QColor strokeOuterInactive() const;
-	void setStrokeOuterInactive(const QColor& c);
+	QColor strokeOuterInactive() const { return m_strokeOuterInactive; }
+	void setStrokeOuterInactive(const QColor& c) { m_strokeOuterInactive = c; }
 
-	QColor strokeInnerActive() const;
-	void setStrokeInnerActive(const QColor& c);
+	QColor strokeInnerActive() const { return m_strokeInnerActive; }
+	void setStrokeInnerActive(const QColor& c) { m_strokeInnerActive = c; }
 
-	QColor strokeInnerInactive() const;
-	void setStrokeInnerInactive(const QColor& c);
-
-	void reset();
+	QColor strokeInnerInactive() const { return m_strokeInnerInactive; }
+	void setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
 
 public slots:
 	void renameChannel();
