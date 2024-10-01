@@ -403,6 +403,7 @@ private slots:
 	void removeBar();
 	void addSampleTrack();
 	void addAutomationTrack();
+	void addVideoTrack();
 
 	void setTempo();
 	void setTimeSignature();

@@ -48,6 +48,7 @@ SET(LMMS_SRCS
 	gui/clips/MidiClipView.cpp
 	gui/clips/PatternClipView.cpp
 	gui/clips/SampleClipView.cpp
+	gui/clips/VideoClipView.cpp
 
 	gui/editors/AutomationEditor.cpp
 	gui/editors/Editor.cpp
@@ -95,6 +96,7 @@ SET(LMMS_SRCS
 	gui/tracks/TrackOperationsWidget.cpp
 	gui/tracks/TrackRenameLineEdit.cpp
 	gui/tracks/TrackView.cpp
+	gui/tracks/VideoTrackView.cpp
 
 	gui/widgets/AutomatableButton.cpp
 	gui/widgets/AutomatableSlider.cpp

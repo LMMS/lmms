@@ -170,7 +170,7 @@ check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml Multimedia REQUIRED)
 FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
 include_directories(SYSTEM
@@ -178,6 +178,7 @@ include_directories(SYSTEM
 	${Qt5Gui_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
 	${Qt5Xml_INCLUDE_DIRS}
+	${Qt5Multimedia_INCLUDE_DIRS}
 )
 
 SET(QT_LIBRARIES
@@ -185,6 +186,7 @@ SET(QT_LIBRARIES
 	Qt5::Gui
 	Qt5::Widgets
 	Qt5::Xml
+	Qt5::Multimedia
 )
 
 IF(LMMS_BUILD_LINUX AND WANT_VST)

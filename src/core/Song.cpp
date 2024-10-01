@@ -829,6 +829,12 @@ void Song::addAutomationTrack()
 
 
 
+void Song::addVideoTrack()
+{
+	( void )Track::create( Track::Type::Video, this );
+}
+
+
 
 bpm_t Song::getTempo()
 {
