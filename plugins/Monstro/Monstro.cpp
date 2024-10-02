@@ -30,7 +30,6 @@
 #include "ComboBox.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "gui_templates.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 
@@ -111,7 +110,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 }
 
 
-void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
+void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 {
 	float modtmp; // temp variable for freq modulation
 // macros for modulating with env/lfos
@@ -515,7 +514,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 		
 		sample_t O2R = 0.;
-		if (len_r != 0.)
+		if (pd_r != 0.)
 		{
 			len_r = BandLimitedWave::pdToLen(pd_r);
 			if (m_counter2r > 0)
@@ -686,7 +685,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 }
 
 
-inline void MonstroSynth::updateModulators( float * env1, float * env2, float * lfo1, float * lfo2, int frames )
+inline void MonstroSynth::updateModulators(float * env1, float * env2, float * lfo1, float * lfo2, f_cnt_t frames)
 {
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
@@ -791,7 +790,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 		// attack
 		for( f_cnt_t f = 0; f < frames; ++f )
 		{
-			if( tfp + f < m_lfoatt[i] ) lfo[i][f] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
+			if (tfp + f < static_cast<f_cnt_t>(m_lfoatt[i])) { lfo[i][f] *= static_cast<sample_t>(tfp) / m_lfoatt[i]; }
 		}
 
 
@@ -859,38 +858,38 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 {
 	if( m_parent->m_slope[slope] == 1.0f ) return s;
 	if( s == 0.0f ) return s;
-	return fastPow( s, m_parent->m_slope[slope] );
+	return fastPow(s, m_parent->m_slope[slope]);
 }
 
 
 MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		Instrument( _instrument_track, &monstro_plugin_descriptor ),
 
-		m_osc1Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 1 volume" ) ),
-		m_osc1Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 1 panning" ) ),
+		m_osc1Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 1 volume")),
+		m_osc1Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 1 panning")),
 		m_osc1Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 1 coarse detune" ) ),
 		m_osc1Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 fine detune left" ) ),
 		m_osc1Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 fine detune right" ) ),
-		m_osc1Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 1 stereo phase offset" ) ),
-		m_osc1Pw( 50.0, PW_MIN, PW_MAX, 0.01, this, tr( "Osc 1 pulse width" ) ),
+		m_osc1Spo(0.f, -180.f, 180.f, 0.1f, this, tr("Osc 1 stereo phase offset")),
+		m_osc1Pw(50.f, PW_MIN, PW_MAX, 0.01f, this, tr("Osc 1 pulse width")),
 		m_osc1SSR( false, this, tr( "Osc 1 sync send on rise" ) ),
 		m_osc1SSF( false, this, tr( "Osc 1 sync send on fall" ) ),
 
-		m_osc2Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 2 volume" ) ),
-		m_osc2Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 2 panning" ) ),
+		m_osc2Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 2 volume")),
+		m_osc2Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 2 panning")),
 		m_osc2Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 2 coarse detune" ) ),
 		m_osc2Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 fine detune left" ) ),
 		m_osc2Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 fine detune right" ) ),
-		m_osc2Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 2 stereo phase offset" ) ),
+		m_osc2Spo(0.f, -180.f, 180.f, 0.1f, this, tr("Osc 2 stereo phase offset")),
 		m_osc2Wave( this, tr( "Osc 2 waveform" ) ),
 		m_osc2SyncH( false, this, tr( "Osc 2 sync hard" ) ),
 		m_osc2SyncR( false, this, tr( "Osc 2 sync reverse" ) ),
 
-		m_osc3Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 3 volume" ) ),
-		m_osc3Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 panning" ) ),
+		m_osc3Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 3 volume")),
+		m_osc3Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 3 panning")),
 		m_osc3Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 3 coarse detune" ) ),
-		m_osc3Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 3 Stereo phase offset" ) ),
-		m_osc3Sub( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 sub-oscillator mix" ) ),
+		m_osc3Spo(0.f, -180.f, 180.f, 0.1f, this, tr("Osc 3 Stereo phase offset")),
+		m_osc3Sub(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 3 sub-oscillator mix")),
 		m_osc3Wave1( this, tr( "Osc 3 waveform 1" ) ),
 		m_osc3Wave2( this, tr( "Osc 3 waveform 2" ) ),
 		m_osc3SyncH( false, this, tr( "Osc 3 sync hard" ) ),
@@ -898,13 +897,13 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 		m_lfo1Wave( this, tr( "LFO 1 waveform" ) ),
 		m_lfo1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 1 attack" ) ),
-		m_lfo1Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 1 rate" ) ),
-		m_lfo1Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 1 phase" ) ),
+		m_lfo1Rate(1.0f, 0.1f, 10000.f, 0.1f, 10000.0f, this, tr("LFO 1 rate")),
+		m_lfo1Phs(0.f, -180.f, 180.f, 0.1f, this, tr("LFO 1 phase")),
 
 		m_lfo2Wave( this, tr( "LFO 2 waveform" ) ),
 		m_lfo2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 2 attack" ) ),
-		m_lfo2Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 2 rate" ) ),
-		m_lfo2Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 2 phase" ) ),
+		m_lfo2Rate(1.0f, 0.1f, 10000.f, 0.1f, 10000.0f, this, tr("LFO 2 rate")),
+		m_lfo2Phs(0.0, -180.f, 180.f, 0.1f, this, tr("LFO 2 phase")),
 
 		m_env1Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 pre-delay" ) ),
 		m_env1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 attack" ) ),
@@ -1063,7 +1062,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 
 void MonstroInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -1327,12 +1326,11 @@ QString MonstroInstrument::nodeName() const
 	return monstro_plugin_descriptor.name;
 }
 
-
-f_cnt_t MonstroInstrument::desiredReleaseFrames() const
+float MonstroInstrument::desiredReleaseTimeMs() const
 {
-	return qMax( 64, qMax( m_env1_relF, m_env2_relF ) );
+	const auto maxEnvelope = std::max(m_env1_rel, m_env2_rel);
+	return std::max(1.5f, maxEnvelope);
 }
-
 
 gui::PluginView* MonstroInstrument::instantiateView( QWidget * _parent )
 {
@@ -1449,7 +1447,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::audioEngine()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->outputSampleRate();
 
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
@@ -1694,7 +1692,6 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc2WaveBox = new ComboBox( view );
 	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc2WaveBox->setFont( pointSize<8>( m_osc2WaveBox->font() ) );
 
 	maketinyled( m_osc2SyncHButton, 212, O2ROW - 3, tr( "Hard sync oscillator 2" ) )
 	maketinyled( m_osc2SyncRButton, 191, O2ROW - 3, tr( "Reverse sync oscillator 2" ) )
@@ -1709,18 +1706,15 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc3Wave1Box->setFont( pointSize<8>( m_osc3Wave1Box->font() ) );
 
 	m_osc3Wave2Box = new ComboBox( view );
 	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc3Wave2Box->setFont( pointSize<8>( m_osc3Wave2Box->font() ) );
 
 	maketinyled( m_osc3SyncHButton, 212, O3ROW - 3, tr( "Hard sync oscillator 3" ) )
 	maketinyled( m_osc3SyncRButton, 191, O3ROW - 3, tr( "Reverse sync oscillator 3" ) )
 
 	m_lfo1WaveBox = new ComboBox( view );
 	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_lfo1WaveBox->setFont( pointSize<8>( m_lfo1WaveBox->font() ) );
 
 	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
 	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, tr( "Rate" ), " ms", "lfoKnob" )
@@ -1728,7 +1722,6 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_lfo2WaveBox = new ComboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
 	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
 	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")

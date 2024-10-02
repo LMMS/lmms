@@ -220,30 +220,18 @@ QString FreeBoyInstrument::nodeName() const
 
 
 
-/*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
+float FreeBoyInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
-	int maxrel = 0;
-	for( int i = 0 ; i < 3 ; ++i )
-	{
-		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = m_voice[i]->m_releaseModel.value();
-	}
-
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
-}*/
-
-f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
-{
-	return f_cnt_t( 1000 );
+	// Previous implementation was 1000 samples. At 44.1 kHz this is somewhat shy of 23. ms.
+	return 23.f;
 }
 
 
 
-void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
+void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
@@ -392,9 +380,8 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		papu->writeRegister(0xff23, 128);
 	}
 
-	constexpr int bufSize = 2048;
-	int framesLeft = frames;
-	int dataLen = 0;
+	constexpr auto bufSize = f_cnt_t{2048};
+	auto framesLeft = frames;
 	auto buf = std::array<blip_sample_t, bufSize * 2>{};
 	while (framesLeft > 0)
 	{
@@ -404,12 +391,11 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 			papu->endFrame(FRAME_LENGTH);
 			avail = papu->samplesAvail();
 		}
-		dataLen = framesLeft > avail ? avail : framesLeft;
-		dataLen = dataLen > bufSize ? bufSize : dataLen;
+		const auto dataLen = std::min({static_cast<f_cnt_t>(avail), framesLeft, bufSize});
 
-		long count = papu->readSamples(buf.data(), dataLen * 2) / 2;
+		const auto count = static_cast<f_cnt_t>(papu->readSamples(buf.data(), dataLen * 2) / 2);
 
-		for (fpp_t frame = 0; frame < count; ++frame)
+		for (auto frame = std::size_t{0}; frame < count; ++frame)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{

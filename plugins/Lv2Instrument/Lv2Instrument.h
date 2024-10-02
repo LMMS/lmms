@@ -26,12 +26,13 @@
 #define LV2_INSTRUMENT_H
 
 #include <QString>
+#include <array>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Note.h"
 #include "Lv2ControlBase.h"
 #include "Lv2ViewBase.h"
+#include "Note.h"
 
 // whether to use MIDI vs playHandle
 // currently only MIDI works
@@ -77,21 +78,13 @@ public:
 	bool handleMidiEvent(const MidiEvent &event,
 		const TimePos &time = TimePos(), f_cnt_t offset = 0) override;
 #else
-	void playNote(NotePlayHandle *nph, sampleFrame *) override;
+	void playNote(NotePlayHandle *nph, SampleFrame*) override;
 #endif
-	void play(sampleFrame *buf) override;
+	void play(SampleFrame* buf) override;
 
 	/*
 		misc
 	*/
-	Flags flags() const override
-	{
-#ifdef LV2_INSTRUMENT_USE_MIDI
-		return Flag::IsSingleStreamed | Flag::IsMidiBased;
-#else
-		return Flag::IsSingleStreamed;
-#endif
-	}
 	gui::PluginView* instantiateView(QWidget *parent) override;
 
 private slots:

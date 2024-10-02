@@ -31,7 +31,7 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 
 #include "ComboBox.h"
@@ -224,14 +224,14 @@ MicrotunerConfig::MicrotunerConfig() :
  */
 void MicrotunerConfig::updateScaleList(int index)
 {
-	if (index >= 0 && index < MaxScaleCount)
+	if (index >= 0 && static_cast<std::size_t>(index) < MaxScaleCount)
 	{
 		m_scaleComboModel.replaceItem(index,
 			QString::number(index) + ": " + Engine::getSong()->getScale(index)->getDescription());
 	}
 	else
 	{
-		for (int i = 0; i < MaxScaleCount; i++)
+		for (auto i = std::size_t{0}; i < MaxScaleCount; i++)
 		{
 			m_scaleComboModel.replaceItem(i,
 				QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
@@ -246,14 +246,14 @@ void MicrotunerConfig::updateScaleList(int index)
  */
 void MicrotunerConfig::updateKeymapList(int index)
 {
-	if (index >= 0 && index < MaxKeymapCount)
+	if (index >= 0 && static_cast<std::size_t>(index) < MaxKeymapCount)
 	{
 		m_keymapComboModel.replaceItem(index,
 			QString::number(index) + ": " + Engine::getSong()->getKeymap(index)->getDescription());
 	}
 	else
 	{
-		for (int i = 0; i < MaxKeymapCount; i++)
+		for (auto i = std::size_t{0}; i < MaxKeymapCount; i++)
 		{
 			m_keymapComboModel.replaceItem(i,
 				QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
@@ -342,7 +342,7 @@ bool MicrotunerConfig::validateScaleForm()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}		// comment
-		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
 			bool ok = true;
@@ -357,7 +357,7 @@ bool MicrotunerConfig::validateScaleForm()
 			if (!ok) {fail(tr("Numerator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (line.contains('/'))
 			{
-				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
+				den = line.split('/').at(1).section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
 			}
 			if (!ok) {fail(tr("Denominator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (num * den < 0) {fail(tr("Interval defined as a ratio cannot be negative")); return false;}
@@ -390,7 +390,7 @@ bool MicrotunerConfig::validateKeymapForm()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}			// comment
-		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection == "x") {continue;}	// not mapped
 		// otherwise must contain a number
 		bool ok = true;
@@ -424,7 +424,7 @@ bool MicrotunerConfig::applyScale()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}		// comment
-		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
 			newIntervals.emplace_back(firstSection.toFloat());
@@ -435,7 +435,7 @@ bool MicrotunerConfig::applyScale()
 			num = firstSection.toInt();
 			if (line.contains('/'))
 			{
-				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
+				den = line.split('/').at(1).section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
 			}
 			newIntervals.emplace_back(num, den);
 		}
@@ -470,7 +470,7 @@ bool MicrotunerConfig::applyKeymap()
 	{
 		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}			// comment
-		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+		QString firstSection = line.section(QRegularExpression("\\s+"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection == "x")
 		{
 			newMap.push_back(-1);				// not mapped

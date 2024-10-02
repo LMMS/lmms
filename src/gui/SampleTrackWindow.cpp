@@ -33,7 +33,6 @@
 
 #include "EffectRackView.h"
 #include "embed.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
@@ -41,7 +40,6 @@
 #include "SampleTrackView.h"
 #include "Song.h"
 #include "SubWindow.h"
-#include "TabWidget.h"
 #include "TrackLabelButton.h"
 
 namespace lmms::gui
@@ -70,12 +68,8 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing(0);
 
-	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
-
+	auto generalSettingsWidget = new QWidget(this);
 	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
-
-	generalSettingsLayout->setContentsMargins(8, 18, 8, 8);
-	generalSettingsLayout->setSpacing(6);
 
 	auto nameWidget = new QWidget(generalSettingsWidget);
 	auto nameLayout = new QHBoxLayout(nameWidget);
@@ -98,7 +92,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
 
-	QString labelStyleSheet = "font-size: 6pt;";
+	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 

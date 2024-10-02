@@ -213,17 +213,15 @@ float SaWaterfallView::yPixelToTime(float position, int height)
 std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 {
 	std::vector<std::pair<float, std::string>> result;
-	float i;
 
 	// get time value of the last line
 	float limit = yPixelToTime(m_displayBottom, m_displayHeight);
 
 	// set increment to about 30 pixels (but min. 0.1 s)
-	float increment = std::round(10 * limit / (m_displayHeight / 30)) / 10;
-	if (increment < 0.1) {increment = 0.1;}
+	const float increment = std::max(std::round(10 * limit / (m_displayHeight / 30)) / 10, 0.1f);
 
 	// NOTE: labels positions are rounded to match the (rounded) label value
-	for (i = 0; i <= limit; i += increment)
+	for (float i = 0; i <= limit; i += increment)
 	{
 		if (i > 99)
 		{

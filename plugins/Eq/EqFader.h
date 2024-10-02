@@ -42,20 +42,6 @@ class EqFader : public Fader
 public:
 	Q_OBJECT
 public:
-	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * backg, QPixmap * leds, QPixmap * knobpi,  float* lPeak, float* rPeak ) :
-		Fader( model, name, parent, backg, leds, knobpi )
-	{
-		setMinimumSize( 23, 80 );
-		setMaximumSize( 23, 80 );
-		resize( 23, 80 );
-		m_lPeak = lPeak;
-		m_rPeak = rPeak;
-		connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
-		m_model = model;
-		setPeak_L( 0 );
-		setPeak_R( 0 );
-	}
-
 	EqFader( FloatModel * model, const QString & name, QWidget * parent,  float* lPeak, float* rPeak ) :
 		Fader( model, name, parent )
 	{
@@ -81,7 +67,7 @@ private slots:
 	{
 		const float opl = getPeak_L();
 		const float opr = getPeak_R();
-		const float fallOff = 1.07;
+		const float fallOff = 1.07f;
 		if( *m_lPeak > opl )
 		{
 			setPeak_L( *m_lPeak );

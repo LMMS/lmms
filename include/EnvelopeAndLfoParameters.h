@@ -71,7 +71,18 @@ public:
 		using LfoList = QList<EnvelopeAndLfoParameters*>;
 		LfoList m_lfos;
 
-	} ;
+	};
+
+	enum class LfoShape
+	{
+		SineWave,
+		TriangleWave,
+		SawWave,
+		SquareWave,
+		UserDefinedWave,
+		RandomWave,
+		Count
+	};
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
@@ -114,6 +125,28 @@ public:
 		return m_rFrames;
 	}
 
+	// Envelope
+	const FloatModel& getPredelayModel() const { return m_predelayModel; }
+	const FloatModel& getAttackModel() const { return m_attackModel; }
+	const FloatModel& getHoldModel() const { return m_holdModel; }
+	const FloatModel& getDecayModel() const { return m_decayModel; }
+	const FloatModel& getSustainModel() const { return m_sustainModel; }
+	const FloatModel& getReleaseModel() const { return m_releaseModel; }
+	const FloatModel& getAmountModel() const { return m_amountModel; }
+	FloatModel& getAmountModel() { return m_amountModel; }
+
+
+	// LFO
+	inline f_cnt_t getLfoPredelayFrames() const { return m_lfoPredelayFrames; }
+	inline f_cnt_t getLfoAttackFrames() const { return m_lfoAttackFrames; }
+	inline f_cnt_t getLfoOscillationFrames() const { return m_lfoOscillationFrames; }
+
+	const FloatModel& getLfoAmountModel() const { return m_lfoAmountModel; }
+	FloatModel& getLfoAmountModel() { return m_lfoAmountModel; }
+	const TempoSyncKnobModel& getLfoSpeedModel() const { return m_lfoSpeedModel; }
+	const BoolModel& getX100Model() const { return m_x100Model; }
+	const IntModel& getLfoWaveModel() const { return m_lfoWaveModel; }
+	std::shared_ptr<const SampleBuffer> getLfoUserWave() const { return m_userWave; }
 
 public slots:
 	void updateSampleVars();
@@ -170,16 +203,6 @@ private:
 	bool m_bad_lfoShapeData;
 	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
 
-	enum class LfoShape
-	{
-		SineWave,
-		TriangleWave,
-		SawWave,
-		SquareWave,
-		UserDefinedWave,
-		RandomWave,
-		Count
-	} ;
 	constexpr static auto NumLfoShapes = static_cast<std::size_t>(LfoShape::Count);
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );

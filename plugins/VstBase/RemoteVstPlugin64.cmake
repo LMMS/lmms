@@ -1,12 +1,6 @@
 IF(LMMS_BUILD_WIN64)
 	ADD_SUBDIRECTORY(RemoteVstPlugin)
 ELSEIF(LMMS_BUILD_LINUX)
-	INCLUDE(CheckWineGcc)
-	CheckWineGcc(64 "${WINEGCC}" WINEGCC_WORKING)
-	IF(NOT WINEGCC_WORKING)
-		MESSAGE(WARNING "winegcc fails to compile 64-bit binaries, please make sure you have 64-bit GCC libraries")
-		RETURN()
-	ENDIF()
 	ExternalProject_Add(RemoteVstPlugin64
 		"${EXTERNALPROJECT_ARGS}"
 		CMAKE_ARGS

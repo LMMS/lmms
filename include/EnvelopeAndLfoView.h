@@ -29,10 +29,6 @@
 #include <QWidget>
 
 #include "ModelView.h"
-#include "embed.h"
-
-class QPaintEvent;
-class QPixmap;
 
 namespace lmms
 {
@@ -47,6 +43,8 @@ class Knob;
 class LedCheckBox;
 class PixmapButton;
 class TempoSyncKnob;
+class EnvelopeGraph;
+class LfoGraph;
 
 
 
@@ -63,8 +61,6 @@ protected:
 
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _pe ) override;
 
 
 protected slots:
@@ -72,13 +68,10 @@ protected slots:
 
 
 private:
-	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
-	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
-
 	EnvelopeAndLfoParameters * m_params;
 
-
 	// envelope stuff
+	EnvelopeGraph* m_envelopeGraph;
 	Knob * m_predelayKnob;
 	Knob * m_attackKnob;
 	Knob * m_holdKnob;
@@ -88,6 +81,7 @@ private:
 	Knob * m_amountKnob;
 
 	// LFO stuff
+	LfoGraph* m_lfoGraph;
 	Knob * m_lfoPredelayKnob;
 	Knob * m_lfoAttackKnob;
 	TempoSyncKnob * m_lfoSpeedKnob;
@@ -97,8 +91,6 @@ private:
 
 	LedCheckBox * m_x100Cb;
 	LedCheckBox * m_controlEnvAmountCb;
-	
-	float m_randomGraph;
 } ;
 
 } // namespace gui

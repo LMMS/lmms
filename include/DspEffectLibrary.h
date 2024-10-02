@@ -28,7 +28,7 @@
 #include "lmms_math.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
-
+#include "SampleFrame.h"
 
 namespace lmms::DspEffectLibrary
 {
@@ -78,6 +78,17 @@ namespace lmms::DspEffectLibrary
 			m_leftFX( leftFX ),
 			m_rightFX( rightFX )
 		{
+		}
+
+		void setGain(float gain)
+		{
+			leftFX().setGain(gain);
+			rightFX().setGain(gain);
+		}
+
+		void nextSample(SampleFrame & in)
+		{
+			nextSample(in.left(), in.right());
 		}
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )

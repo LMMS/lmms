@@ -30,7 +30,9 @@
 #include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 
 namespace lmms::gui
@@ -65,7 +67,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
-	if (typeInfo<float>::isEqual(freq, 0.0f)) { return 0.0f; }
+	if (approximatelyEqual(freq, 0.0f)) { return 0.0f; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;
@@ -147,9 +149,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 			res = tr( "BW: " ) +  QString::number( getResonance() );
 		}
 
-		QFont painterFont = painter->font();
-		painterFont.setPointSizeF( painterFont.pointSizeF() * 0.7 );
-		painter->setFont( painterFont );
+		painter->setFont(adjustedToPixelSize(painter->font(), SMALL_FONT_SIZE));
 		painter->setPen( Qt::black );
 		painter->drawRect( textRect );
 		painter->fillRect( textRect, QBrush( QColor( 6, 106, 43, 180 ) ) );
@@ -185,9 +185,9 @@ QPainterPath EqHandle::getCurvePath()
 
 void EqHandle::loadPixmap()
 {
-	QString fileName = "handle" + QString::number(m_numb+1);
-	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
-	m_circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
+	auto fileName = "handle" + std::to_string(m_numb + 1);
+	if (!isActiveHandle()) { fileName += "inactive"; }
+	m_circlePixmap = PLUGIN_NAME::getIconPixmap(fileName);
 }
 
 bool EqHandle::mousePressed() const
@@ -201,22 +201,21 @@ bool EqHandle::mousePressed() const
 float EqHandle::getPeakCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->processingSampleRate();
+	const int SR = Engine::audioEngine()->outputSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double Q = getResonance();
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	//calc coefficents
-	b0 =   1 + alpha * A;
-	b1 =  -2 * c;
-	b2 =   1 - alpha * A;
-	a0 =   1 + alpha / A;
-	a1 =  -2 * c;
-	a2 =   1 - alpha / A;
+	double b0 = 1 + alpha * A;
+	double b1 = -2 * c;
+	double b2 = 1 - alpha * A;
+	double a0 = 1 + alpha / A;
+	double a1 = -2 * c;
+	double a2 = 1 - alpha / A;
 
 	//normalise
 	b0 /= a0;
@@ -239,21 +238,21 @@ float EqHandle::getPeakCurve( float x )
 float EqHandle::getHighShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->processingSampleRate();
+	const int SR = Engine::audioEngine()->outputSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) * 0.025 );
 	double beta = sqrt( A ) / m_resonance;
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	//calc coefficents
-	b0 = A * ( ( A + 1 ) + ( A - 1 ) * c + beta * s);
-	b1 = -2 * A * ( ( A - 1 ) + ( A + 1 ) * c );
-	b2 = A * ( ( A + 1 ) + ( A - 1 ) * c - beta * s);
-	a0 = ( A + 1 ) - ( A - 1 ) * c + beta * s;
-	a1 = 2 * ( ( A - 1 ) - ( A + 1 ) * c );
-	a2 = ( A + 1 ) - ( A - 1 ) * c - beta * s;
+	double b0 = A * ((A + 1) + (A - 1) * c + beta * s);
+	double b1 = -2 * A * ((A - 1) + (A + 1) * c);
+	double b2 = A * ((A + 1) + (A - 1) * c - beta * s);
+	double a0 = (A + 1) - (A - 1) * c + beta * s;
+	double a1 = 2 * ((A - 1) - (A + 1) * c);
+	double a2 = (A + 1) - (A - 1) * c - beta * s;
+
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -275,21 +274,20 @@ float EqHandle::getHighShelfCurve( float x )
 float EqHandle::getLowShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->processingSampleRate();
+	const int SR = Engine::audioEngine()->outputSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double beta = sqrt( A ) / m_resonance;
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	//calc coefficents
-	b0 = A * ( ( A + 1 ) - ( A - 1 ) * c + beta * s );
-	b1 = 2  * A * ( ( A - 1 ) - ( A + 1 ) * c ) ;
-	b2 = A * ( ( A + 1 ) - ( A - 1 ) * c - beta * s);
-	a0 = ( A + 1 ) + ( A - 1 ) * c + beta * s;
-	a1 = -2 * ( ( A - 1 ) + ( A + 1 ) * c );
-	a2 = ( A + 1 ) + ( A - 1) * c - beta * s;
+	double b0 = A * ((A + 1) - (A - 1) * c + beta * s);
+	double b1 = 2 * A * ((A - 1) - (A + 1) * c);
+	double b2 = A * ((A + 1) - (A - 1) * c - beta * s);
+	double a0 = (A + 1) + (A - 1) * c + beta * s;
+	double a1 = -2 * ((A - 1) + (A + 1) * c);
+	double a2 = (A + 1) + (A - 1) * c - beta * s;
 
 	//normalise
 	b0 /= a0;
@@ -312,20 +310,20 @@ float EqHandle::getLowShelfCurve( float x )
 float EqHandle::getLowCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->processingSampleRate();
+	const int SR = Engine::audioEngine()->outputSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-	b0 = ( 1 + c ) * 0.5;
-	b1 = ( -( 1 + c ) );
-	b2 = ( 1 + c ) * 0.5;
-	a0 = 1 + alpha;
-	a1 = ( -2 * c );
-	a2 = 1 - alpha;
+	double b0 = (1 + c) * 0.5;
+	double b1 = (-(1 + c));
+	double b2 = (1 + c) * 0.5;
+	double a0 = 1 + alpha;
+	double a1 = (-2 * c);
+	double a2 = 1 - alpha;
+
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -355,20 +353,20 @@ float EqHandle::getLowCutCurve( float x )
 float EqHandle::getHighCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->processingSampleRate();
+	const int SR = Engine::audioEngine()->outputSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-	b0 = ( 1 - c ) * 0.5;
-	b1 = 1 - c;
-	b2 = ( 1 - c ) * 0.5;
-	a0 = 1 + alpha;
-	a1 = -2 * c;
-	a2 = 1 - alpha;
+	double b0 = (1 - c) * 0.5;
+	double b1 = 1 - c;
+	double b2 = (1 - c) * 0.5;
+	double a0 = 1 + alpha;
+	double a1 = -2 * c;
+	double a2 = 1 - alpha;
+
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -529,7 +527,7 @@ void EqHandle::setlp48()
 
 double EqHandle::calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 )
 {
-	const int SR = Engine::audioEngine()->processingSampleRate();
+	const int SR = Engine::audioEngine()->outputSampleRate();
 
 	const double w = 2 * LD_PI * freq / SR ;
 	const double PHI = pow( sin( w / 2 ), 2 ) * 4;
@@ -569,16 +567,7 @@ void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 
 void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 {
-	float highestBandwich;
-	if( m_type != EqHandleType::Para )
-	{
-		highestBandwich = 10;
-	}
-	else
-	{
-		highestBandwich = 4;
-	}
-
+	float highestBandwich = m_type != EqHandleType::Para ? 10 : 4;
 	int numDegrees = wevent->delta() / 120;
 	float numSteps = 0;
 	if( wevent->modifiers() == Qt::ControlModifier )
@@ -592,17 +581,8 @@ void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 
 	if( wevent->orientation() == Qt::Vertical )
 	{
-		m_resonance = m_resonance + ( numSteps );
+		m_resonance = std::clamp(m_resonance + numSteps, 0.1f, highestBandwich);
 
-		if( m_resonance < 0.1 )
-		{
-			m_resonance = 0.1;
-		}
-
-		if( m_resonance > highestBandwich )
-		{
-			m_resonance = highestBandwich;
-		}
 		emit positionChanged();
 	}
 	wevent->accept();

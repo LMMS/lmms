@@ -189,7 +189,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 		return model;
 	}
 
-	static FloatModel fm(0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001);
+	static FloatModel fm(0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001f);
 	return &fm;
 }
 
@@ -1222,11 +1222,9 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			// TODO: This behavior means that a very small difference between the inValue and outValue can
 			// result in a big change in the curve. In the future, allowing the user to manually adjust
 			// the tangents would be better.
-			float inTangent;
-			float outTangent;
 			if (OFFSET(it) == 0)
 			{
-				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
+				float inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
 				it.value().setInTangent(inTangent);
 				// inTangent == outTangent in this case
 				it.value().setOutTangent(inTangent);
@@ -1234,9 +1232,9 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			else
 			{
 				// Calculate the left side of the curve
-				inTangent = (INVAL(it) - OUTVAL(it - 1)) / (POS(it) - POS(it - 1));
+				float inTangent = (INVAL(it) - OUTVAL(it - 1)) / (POS(it) - POS(it - 1));
 				// Calculate the right side of the curve
-				outTangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
+				float outTangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
 				it.value().setInTangent(inTangent);
 				it.value().setOutTangent(outTangent);
 			}

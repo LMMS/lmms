@@ -85,23 +85,23 @@ SamplePlayHandle::~SamplePlayHandle()
 
 
 
-void SamplePlayHandle::play( sampleFrame * buffer )
+void SamplePlayHandle::play( SampleFrame* buffer )
 {
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * fpp );
+		zeroSampleFrames(buffer, fpp);
 		return;
 	}
 
-	sampleFrame * workingBuffer = buffer;
+	SampleFrame* workingBuffer = buffer;
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period
 	if( framesDone() == 0 )
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * offset() );
+		zeroSampleFrames(buffer, offset());
 		workingBuffer += offset();
 		frames -= offset();
 	}
@@ -116,7 +116,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 		// it is used only for previews, SampleTracks and the metronome.
 		if (!m_sample->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
-			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
+			zeroSampleFrames(workingBuffer, frames);
 		}
 	}
 
@@ -145,7 +145,7 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
 	return (m_sample->endFrame() - m_sample->startFrame()) *
-			(static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_sample->sampleRate());
+			(static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->sampleRate());
 }
 
 

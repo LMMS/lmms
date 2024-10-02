@@ -643,11 +643,10 @@ void graphModel::convolve(const float *convolution,
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 	const int graphLength = length();
-	float sum;
 	// make a cyclic convolution
 	for ( int i = 0; i <  graphLength; i++ )
 	{
-		sum = 0;
+		float sum = 0.0f;
 		for ( int j = 0; j < convolutionLength; j++ )
 		{
 			sum += convolution[j] * temp[( i + j ) % graphLength];

@@ -77,8 +77,8 @@ public:
 	};
 
 	Sample() = default;
-	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	Sample(const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other);
 	explicit Sample(const QString& audioFile);
@@ -87,7 +87,7 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) -> Sample&;
 
-	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
+	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
@@ -97,7 +97,7 @@ public:
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
-	auto data() const -> const sampleFrame* { return m_buffer->data(); }
+	auto data() const -> const SampleFrame* { return m_buffer->data(); }
 	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
 	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }
@@ -117,7 +117,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	void playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
+	void playRaw(SampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:

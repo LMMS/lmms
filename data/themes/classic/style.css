@@ -203,7 +203,9 @@ lmms--gui--GroupBox {
 lmms--gui--Oscilloscope {
 	background: none;
 	border: none;
-	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-leftChannelColor: rgb(71, 253, 133);
+	qproperty-rightChannelColor: rgb(238, 253, 71);
+	qproperty-otherChannelsColor: rgb(71, 235, 253);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -350,14 +352,24 @@ lmms--gui--TrackView > QWidget {
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-/* track background colors */
+/* track background config */
 lmms--gui--TrackContentWidget {
-	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
-	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
-	qproperty-gridColor: rgba( 0, 0, 0, 160 );
-	qproperty-embossColor: rgba( 140, 140, 140, 64 );
+	/* colors */
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(20, 20, 20), stop:1 rgb(15, 15, 15));
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(40, 40, 40), stop:1 rgb(30, 30, 30));
+	qproperty-coarseGridColor: rgba(0, 0, 0, 160);
+	qproperty-fineGridColor: rgba(0, 0, 0, 80);
+	qproperty-horizontalColor: rgba(0, 0, 0, 160);
+	qproperty-embossColor: rgba(140, 140, 140, 64);
+	
+	/* line widths */
+	qproperty-coarseGridWidth: 2;
+	qproperty-fineGridWidth: 1;
+	qproperty-horizontalWidth: 1;
+	qproperty-embossWidth: 0;
+
+	/* positive offset shifts emboss to the right */
+	qproperty-embossOffset: 0;
 }
 
 
@@ -649,11 +661,16 @@ lmms--gui--MixerChannelView QGraphicsView {
 	border-style: none;
 }
 
+lmms--gui--PeakIndicator {
+	background-color: #111811;
+	font-size: 7pt;
+}
+
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
-	qproperty-peakGreen: rgb( 74, 253, 133);
-	qproperty-peakYellow: rgb(224, 222, 18);
-	qproperty-peakRed: rgb( 255, 100, 100);
+	qproperty-peakOk: rgb( 74, 253, 133);
+	qproperty-peakWarn: rgb(224, 222, 18);
+	qproperty-peakClip: rgb( 255, 100, 100);
 }
 
 lmms--gui--TimeLineWidget {
@@ -996,6 +1013,7 @@ lmms--gui--CompressorControlDialog {
 	qproperty-textColor: rgba(209, 216, 228, 50);
 	qproperty-graphColor: rgba(209, 216, 228, 50);
 	qproperty-resetColor: rgba(200, 100, 15, 200);
+	qproperty-backgroundColor: rgba(7, 8, 9, 255);
 }
 
 lmms--gui--CompressorControlDialog lmms--gui--Knob {

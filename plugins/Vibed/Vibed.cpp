@@ -33,7 +33,6 @@
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "VibratingString.h"
-#include "MemoryManager.h"
 #include "base64.h"
 #include "CaptionMenu.h"
 #include "volume.h"
@@ -67,18 +66,17 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 
 class Vibed::StringContainer
 {
-	MM_OPERATORS
 public:
 	StringContainer(float pitch, sample_rate_t sampleRate, int bufferLength) :
 		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength) {}
 
 	~StringContainer() = default;
 
-	void addString(int harm, float pick, float pickup, const float* impulse, float randomize,
+	void addString(std::size_t harm, float pick, float pickup, const float* impulse, float randomize,
 		float stringLoss, float detune, int oversample, bool state, int id)
 	{
 		constexpr auto octave = std::array{0.25f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
-		assert(harm >= 0 && harm < octave.size());
+		assert(harm < octave.size());
 
 		m_strings[id] = VibratingString{m_pitch * octave[harm], pick, pickup, impulse, m_bufferLength,
 			m_sampleRate, oversample, randomize, stringLoss, detune, state};
@@ -99,7 +97,7 @@ private:
 };
 
 Vibed::Vibed(InstrumentTrack* instrumentTrack) :
-	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor)
+	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor, nullptr, Flag::IsNotBendable)
 {
 	for (int harm = 0; harm < s_stringCount; ++harm)
 	{
@@ -203,12 +201,12 @@ QString Vibed::nodeName() const
 	return vibedstrings_plugin_descriptor.name;
 }
 
-void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
+void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 {
 	if (!n->m_pluginData)
 	{
 		const auto newContainer = new StringContainer{n->frequency(),
-			Engine::audioEngine()->processingSampleRate(), s_sampleLength};
+			Engine::audioEngine()->outputSampleRate(), s_sampleLength};
 
 		n->m_pluginData = newContainer;
 

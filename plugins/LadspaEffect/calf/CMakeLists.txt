@@ -1,6 +1,8 @@
 # Note:
 # 	The last version of Calf that was LADSPA-capable is version 0.0.18.2
 
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
 # Parse version info from autoconf
 FILE(READ veal/configure.ac VERSION_FILE)
 STRING(REPLACE "[" ";" VERSION_FILE ${VERSION_FILE} )
@@ -38,7 +40,14 @@ SET(INLINE_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
 ENDIF()
-target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
+
+if(NOT MSVC)
+	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
+endif()
+
+if(MSVC)
+	target_link_options(veal PRIVATE "/EXPORT:ladspa_descriptor")
+endif()
 
 if(LMMS_BUILD_WIN32)
 	add_custom_command(

@@ -59,7 +59,7 @@
 #include "DetuningHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
@@ -161,6 +161,7 @@ PianoRoll::PianoRoll() :
 	m_midiClip( nullptr ),
 	m_currentPosition(),
 	m_recording( false ),
+	m_doAutoQuantization(ConfigManager::inst()->value("midi", "autoquantize").toInt() != 0),
 	m_currentNote( nullptr ),
 	m_action( Action::None ),
 	m_noteEditMode( NoteEditMode::Volume ),
@@ -219,7 +220,7 @@ PianoRoll::PianoRoll() :
 
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
-	for( int i = 0; i < m_nemStr.size(); ++i )
+	for (auto i = std::size_t{0}; i < m_nemStr.size(); ++i)
 	{
 		auto act = new QAction(m_nemStr.at(i), this);
 		connect( act, &QAction::triggered, [this, i](){ changeNoteEditMode(i); } );
@@ -241,6 +242,15 @@ PianoRoll::PianoRoll() :
 	connect( markChordAction, &QAction::triggered, [this](){ markSemiTone(SemiToneMarkerAction::MarkCurrentChord); });
 	connect( unmarkAllAction, &QAction::triggered, [this](){ markSemiTone(SemiToneMarkerAction::UnmarkAll); });
 	connect( copyAllNotesAction, &QAction::triggered, [this](){ markSemiTone(SemiToneMarkerAction::CopyAllNotesOnKey); });
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged,
+		[this](QString const& cls, QString const& attribute, QString const& value)
+		{
+			if (!(cls == "midi" && attribute == "autoquantize"))
+			{
+				return;
+			}
+			this->m_doAutoQuantization = (value.toInt() != 0);
+		});
 
 	markScaleAction->setEnabled( false );
 	markChordAction->setEnabled( false );
@@ -305,7 +315,7 @@ PianoRoll::PianoRoll() :
 	// setup zooming-stuff
 	for( float const & zoomLevel : m_zoomLevels )
 	{
-		m_zoomingModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_zoomingModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
 	connect( &m_zoomingModel, SIGNAL(dataChanged()),
@@ -314,7 +324,7 @@ PianoRoll::PianoRoll() :
 	// zoom y
 	for (float const & zoomLevel : m_zoomYLevels)
 	{
-		m_zoomingYModel.addItem(QString( "%1\%" ).arg(zoomLevel * 100));
+		m_zoomingYModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_zoomingYModel.setValue(m_zoomingYModel.findText("100%"));
 	connect(&m_zoomingYModel, SIGNAL(dataChanged()),
@@ -333,7 +343,7 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
-	const auto pixmaps = std::array<QString, 11>{"whole", "half", "quarter", "eighth",
+	const auto pixmaps = std::array<std::string, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
 						"tripletsixteenth", "tripletthirtysecond"};
@@ -1019,7 +1029,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			QString noteKeyString = getNoteString(n->key());
 
 			QFont noteFont(p.font());
-			noteFont.setPixelSize(noteTextHeight);
+			noteFont = adjustedToPixelSize(noteFont, noteTextHeight);
 			QFontMetrics fontMetrics(noteFont);
 			QSize textSize = fontMetrics.size(Qt::TextSingleLine, noteKeyString);
 
@@ -2646,7 +2656,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					)
 				{
 					// delete this note
-					m_midiClip->removeNote( note );
+					it = m_midiClip->removeNote(it);
 					Engine::getSong()->setModified();
 				}
 				else
@@ -3008,8 +3018,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// set font-size to 80% of key line height
 	QFont f = p.font();
-	f.setPixelSize(m_keyLineHeight * 0.8);
-	p.setFont(f); // font size doesn't change without this for some reason
+	int keyFontSize = m_keyLineHeight * 0.8;
+	p.setFont(adjustedToPixelSize(f, keyFontSize));
 	QFontMetrics fontMetrics(p.font());
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
@@ -3030,10 +3040,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	if (hasValidMidiClip())
 	{
-		int pianoAreaHeight, partialKeyVisible, topKey, topNote;
-		pianoAreaHeight = keyAreaBottom() - keyAreaTop();
+		int pianoAreaHeight = keyAreaBottom() - keyAreaTop();
 		m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
-		partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
+		int partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
 		// check if we're below the minimum key area size
 		if (m_pianoKeysVisible * m_keyLineHeight < KEY_AREA_MIN_HEIGHT)
 		{
@@ -3058,8 +3067,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 			partialKeyVisible = 0;
 		}
-		topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
-		topNote = topKey % KeysPerOctave;
+		int topKey = std::clamp(m_startKey + m_pianoKeysVisible - 1, 0, NumKeys - 1);
+		int topNote = topKey % KeysPerOctave;
 		// if not resizing the note edit area, we can change m_notesEditHeight
 		if (m_action != Action::ResizeNoteEditArea && partialKeyVisible != 0)
 		{
@@ -3336,9 +3345,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()), bgColor);
 
 	// display note editing info
-	//QFont f = p.font();
-	f.setBold( false );
-	p.setFont( pointSize<10>( f ) );
+	f.setBold(false);
+	p.setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 	p.setPen(m_noteModeColor);
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()),
@@ -3599,9 +3607,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 	else
 	{
-		QFont f = p.font();
-		f.setBold( true );
-		p.setFont( pointSize<14>( f ) );
+		QFont f = font();
+		f.setBold(true);
+		p.setFont(f);
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,
@@ -3766,7 +3774,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->angleDelta().y() > 0 ? 1 : -1;
+			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{
 				for ( Note * n : nv )
@@ -4053,7 +4062,7 @@ void PianoRoll::stop()
 {
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = ( m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled );
+	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
 }
 
 
@@ -4110,8 +4119,13 @@ void PianoRoll::finishRecordNote(const Note & n )
 					Note n1(n.length(), it->pos(),
 							it->key(), it->getVolume(),
 							it->getPanning(), n.detuning());
-					n1.quantizeLength( quantization() );
-					m_midiClip->addNote( n1 );
+
+					if (m_doAutoQuantization)
+					{
+						n1.quantizeLength(quantization());
+						n1.quantizePos(quantization());
+					}
+					m_midiClip->addNote(n1, false);
 					update();
 					m_recordingNotes.erase( it );
 					break;
@@ -4449,30 +4463,36 @@ bool PianoRoll::deleteSelectedNotes()
 void PianoRoll::autoScroll( const TimePos & t )
 {
 	const int w = width() - m_whiteKeyWidth;
-	if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 	{
-		m_leftRightScroll->setValue( t.getBar() * TimePos::ticksPerBar() );
+		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
+		{
+			m_leftRightScroll->setValue(t.getBar() * TimePos::ticksPerBar());
+		}
+		else if (t < m_currentPosition)
+		{
+			TimePos t2 = std::max(t - w * TimePos::ticksPerBar() *
+						TimePos::ticksPerBar() / m_ppb, static_cast<tick_t>(0));
+			m_leftRightScroll->setValue(t2.getBar() * TimePos::ticksPerBar());
+		}
 	}
-	else if( t < m_currentPosition )
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 	{
-		TimePos t2 = qMax( t - w * TimePos::ticksPerBar() *
-					TimePos::ticksPerBar() / m_ppb, (tick_t) 0 );
-		m_leftRightScroll->setValue( t2.getBar() * TimePos::ticksPerBar() );
+		m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0));
 	}
 	m_scrollBack = false;
 }
 
 
 
-
-void PianoRoll::updatePosition( const TimePos & t )
+void PianoRoll::updatePosition(const TimePos & t)
 {
-	if( ( Engine::getSong()->isPlaying()
+	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
-			&& m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled
-		) || m_scrollBack )
+			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
+		) || m_scrollBack)
 	{
-		autoScroll( t );
+		autoScroll(t);
 	}
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
@@ -4881,7 +4901,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
+	m_quantizeComboBox->setFixedSize(85, ComboBox::DEFAULT_HEIGHT);
 	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
@@ -4905,7 +4925,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
-	m_scaleComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
+	m_scaleComboBox->setFixedSize(155, ComboBox::DEFAULT_HEIGHT);
 	m_scaleComboBox->setToolTip( tr( "Scale") );
 
 	// setup chord-stuff
@@ -4914,7 +4934,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
-	m_chordComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
+	m_chordComboBox->setFixedSize(125, ComboBox::DEFAULT_HEIGHT);
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// setup snap-stuff
@@ -4923,7 +4943,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_snapComboBox = new ComboBox(m_toolBar);
 	m_snapComboBox->setModel(&m_editor->m_snapModel);
-	m_snapComboBox->setFixedSize(105, ComboBox::DEFAULT_HEIGHT);
+	m_snapComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
 	// -- Clear ghost MIDI clip button

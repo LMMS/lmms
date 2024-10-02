@@ -30,7 +30,6 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MemoryManager.h"
 
 
 class QWidget;
@@ -71,7 +70,6 @@ class PluginView;
 */
 class LMMS_EXPORT Plugin : public Model, public JournallingObject
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	enum class Type

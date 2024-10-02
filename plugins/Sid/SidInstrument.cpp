@@ -29,7 +29,7 @@
 #include <cmath>
 #include <cstdio>
 
-#include "sid.h"
+#include <sid.h>
 
 #include "SidInstrument.h"
 #include "AudioEngine.h"
@@ -221,44 +221,35 @@ QString SidInstrument::nodeName() const
 }
 
 
-
-
-f_cnt_t SidInstrument::desiredReleaseFrames() const
+float SidInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for (const auto& voice : m_voice)
 	{
-		if( maxrel < voice->m_releaseModel.value() )
-			maxrel = (int)voice->m_releaseModel.value();
+		maxrel = std::max(maxrel, static_cast<int>(voice->m_releaseModel.value()));
 	}
 
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
+	return computeReleaseTimeMsByFrameCount(relTime[maxrel]);
 }
-
-
 
 
 static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
-  int tdelta2;
-  int result;
   int total = 0;
-  int c;
 //  customly added
   int residdelay = 0;
 
   int badline = rand() % NUMSIDREGS;
 
-  for (c = 0; c < NUMSIDREGS; c++)
+  for (int c = 0; c < NUMSIDREGS; c++)
   {
     unsigned char o = sidorder[c];
 
   	// Extra delay for loading the waveform (and mt_chngate,x)
   	if ((o == 4) || (o == 11) || (o == 18))
   	{
-  	  tdelta2 = SIDWAVEDELAY;
-      result = sid->clock(tdelta2, ptr, samples);
+  	  int tdelta2 = SIDWAVEDELAY;
+      int result = sid->clock(tdelta2, ptr, samples);
       total += result;
       ptr += result;
       samples -= result;
@@ -268,8 +259,8 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
     // Possible random badline delay once per writing
     if ((badline == c) && (residdelay))
   	{
-      tdelta2 = residdelay;
-      result = sid->clock(tdelta2, ptr, samples);
+      int tdelta2 = residdelay;
+      int result = sid->clock(tdelta2, ptr, samples);
       total += result;
       ptr += result;
       samples -= result;
@@ -278,14 +269,14 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 
     sid->write(o, sidreg[o]);
 
-    tdelta2 = SIDWRITEDELAY;
-    result = sid->clock(tdelta2, ptr, samples);
+    int tdelta2 = SIDWRITEDELAY;
+    int result = sid->clock(tdelta2, ptr, samples);
     total += result;
     ptr += result;
     samples -= result;
     tdelta -= SIDWRITEDELAY;
   }
-  result = sid->clock(tdelta, ptr, samples);
+  int result = sid->clock(tdelta, ptr, samples);
   total += result;
 
   return total;
@@ -295,10 +286,10 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 
 
 void SidInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 
 	if (!_n->m_pluginData)
 	{
@@ -314,8 +305,11 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	auto sid = static_cast<reSID::SID*>(_n->m_pluginData);
 	int delta_t = clockrate * frames / samplerate + 4;
-	// avoid variable length array for msvc compat
-	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
+#ifndef _MSC_VER
+	short buf[frames];
+#else
+	const auto buf = static_cast<short*>(_alloca(frames * sizeof(short)));
+#endif
 	auto sidreg = std::array<unsigned char, NUMSIDREGS>{};
 
 	for (auto& reg : sidreg)
@@ -416,12 +410,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	sidreg[24] = data8&0x00FF;
 
-	int num = sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames);
-	if(num!=frames)
+	const auto num = static_cast<f_cnt_t>(sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames));
+	if (num != frames) {
 		printf("!!!Not enough samples\n");
+	}
 
 	// loop backwards to avoid overwriting data in the short-to-float conversion
-	for( fpp_t frame = frames - 1; frame >= 0; frame-- )
+	for (auto frame = std::size_t{0}; frame < frames; ++frame)
 	{
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )

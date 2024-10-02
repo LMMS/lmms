@@ -77,10 +77,9 @@ public slots:
 
 
 signals:
-	void moveUp( lmms::gui::EffectView * _plugin );
-	void moveDown( lmms::gui::EffectView * _plugin );
-	void deletePlugin( lmms::gui::EffectView * _plugin );
-
+	void movedUp(EffectView* view);
+	void movedDown(EffectView* view);
+	void deletedPlugin(EffectView* view);
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;

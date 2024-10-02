@@ -28,10 +28,11 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
-#include "embed.h"
-
-#include "FileBrowserSearcher.h"
 #include <QProgressBar>
+#include <memory>
+
+#include "FileSearch.h"
+#include "embed.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
@@ -76,9 +77,9 @@ public:
 
 	~FileBrowser() override = default;
 
-	static QStringList directoryBlacklist()
+	static QStringList excludedPaths()
 	{
-		static auto s_blacklist = QStringList{
+		static auto s_excludedPaths = QStringList{
 #ifdef LMMS_BUILD_LINUX
 			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
 			"/sys"
@@ -87,9 +88,9 @@ public:
 			"C:\\Windows"
 #endif
 		};
-		return s_blacklist;
+		return s_excludedPaths;
 	}
-	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
+	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
 private slots:
@@ -105,16 +106,19 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
-	void buildSearchTree();
+	void foundSearchMatch(FileSearch* search, const QString& match);
+	void searchCompleted(FileSearch* search);
 	void onSearch(const QString& filter);
-	void toggleSearch(bool on);
+	void displaySearch(bool on);
+
+	void addContentCheckBox();
 
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
 
-	std::shared_ptr<FileBrowserSearcher::SearchFuture> m_currentSearch;
+	std::shared_ptr<FileSearch> m_currentSearch;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
@@ -122,9 +126,13 @@ private:
 
 	bool m_dirsAsItems;
 
-	void addContentCheckBox();
 	QCheckBox* m_showUserContent = nullptr;
 	QCheckBox* m_showFactoryContent = nullptr;
+	QCheckBox* m_showHiddenContent = nullptr;
+
+	QBoxLayout *filterWidgetLayout = nullptr;
+	QBoxLayout *hiddenWidgetLayout = nullptr;
+	QBoxLayout *outerLayout = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
 	QList<QString> m_savedExpandedDirs;

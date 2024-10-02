@@ -81,7 +81,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
+	Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
 	m_instance( nullptr ),
 	m_instrument( nullptr ),
 	m_filename( "" ),
@@ -289,7 +289,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
+void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	const float LOG440 = 2.643452676f;
 
@@ -320,10 +320,10 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::play( sampleFrame * _working_buffer )
+void GigInstrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	const int rate = Engine::audioEngine()->processingSampleRate();
+	const auto rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -441,7 +441,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Load this note's data
-			sampleFrame sampleData[samples];
+			SampleFrame sampleData[samples];
 			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
@@ -458,7 +458,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Output the data resampling if needed
 			if( resample == true )
 			{
-				sampleFrame convertBuf[frames];
+				SampleFrame convertBuf[frames];
 
 				// Only output if resampling is successful (note that "used" is output)
 				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
@@ -499,7 +499,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 
 
-void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples )
+void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples )
 {
 	if( sampleData == nullptr || samples < 1 )
 	{
@@ -746,7 +746,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->outputSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
@@ -1182,7 +1182,7 @@ void GigSample::updateSampleRate()
 
 
 
-bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+bool GigSample::convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == nullptr )
@@ -1216,7 +1216,7 @@ bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
 		return false;
 	}
 
-	if( src_data.output_frames_gen > 0 && src_data.output_frames_gen < newSize )
+	if (src_data.output_frames_gen > 0 && static_cast<f_cnt_t>(src_data.output_frames_gen) < newSize)
 	{
 		qCritical() << "GigInstrument: not enough frames, wanted"
 			<< newSize << "generated" << src_data.output_frames_gen;

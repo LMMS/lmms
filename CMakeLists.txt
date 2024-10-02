@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
 
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
@@ -15,8 +15,7 @@ function(enable_policy_if_exists id)
 	endif()
 endfunction()
 
-# Needed for the SWH Ladspa plugins. See below.
-enable_policy_if_exists(CMP0074) # find_package() uses <PackageName>_ROOT variables.
+enable_policy_if_exists(CMP0092) # MSVC warning flags are not in CMAKE_<LANG>_FLAGS by default.
 # Needed for ccache support with MSVC
 enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
 
@@ -43,10 +42,11 @@ INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
 INCLUDE(GenerateExportHeader)
+include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2023)
+SET(PROJECT_YEAR 2024)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -94,8 +94,8 @@ OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
-OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
-OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
+OPTION(WANT_VST_32	"Include 32-bit Windows VST support" ON)
+OPTION(WANT_VST_64	"Include 64-bit Windows VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
@@ -131,6 +131,9 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_WINMM ON)
 	SET(BUNDLE_QT_TRANSLATIONS ON)
 	SET(LMMS_HAVE_WINMM TRUE)
+	if(NOT LMMS_BUILD_WIN64)
+		set(WANT_VST_64 OFF)
+	endif()
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_OSS "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
@@ -142,16 +145,6 @@ ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
 
-
-# TODO: Fix linking issues with msys debug builds
-IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-	SET(WANT_GIG OFF)
-	SET(WANT_STK OFF)
-	SET(WANT_SWH OFF)
-	SET(STATUS_GIG "not built as requested")
-	SET(STATUS_STK "not built as requested")
-ENDIF()
-
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
@@ -161,6 +154,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
+CHECK_INCLUDE_FILES(sys/prctl.h LMMS_HAVE_SYS_PRCTL_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -176,10 +170,10 @@ check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.6.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
 FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
-INCLUDE_DIRECTORIES(
+include_directories(SYSTEM
 	${Qt5Core_INCLUDE_DIRS}
 	${Qt5Gui_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
@@ -344,34 +338,11 @@ IF(WANT_SDL)
 	FIND_PACKAGE(SDL2)
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(LMMS_HAVE_SDL2 TRUE)
-		SET(STATUS_SDL "OK, using SDL2")
+		SET(STATUS_SDL "OK")
 		SET(SDL2_LIBRARY "SDL2::SDL2")
-		SET(SDL_INCLUDE_DIR "")
-		SET(SDL_LIBRARY "")
 	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) if you require SDL support")
 		SET(SDL2_LIBRARY "")
-	ENDIF()
-ENDIF()
-
-# fallback to SDL1
-IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
-	# Fallback to SDL1.2
-	SET(SDL_BUILDING_LIBRARY TRUE)
-	FIND_PACKAGE(SDL)
-	IF(SDL_FOUND)
-		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK, using SDL1.2")
-		# fix mingw since 53abd65
-		IF(NOT SDL_INCLUDE_DIR)
-			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-		ENDIF()
-
-	ELSE()
-		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
-			"if you require SDL support")
-		SET(SDL_INCLUDE_DIR "")
-		SET(SDL_LIBRARY "")
 	ENDIF()
 ENDIF()
 
@@ -417,7 +388,7 @@ IF(WANT_SOUNDIO)
   IF(SOUNDIO_FOUND)
 	SET(LMMS_HAVE_SOUNDIO TRUE)
 	SET(STATUS_SOUNDIO "OK")
-	INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
+	include_directories(SYSTEM "${SOUNDIO_INCLUDE_DIR}")
   ELSE(SOUNDIO_FOUND)
 	SET(SOUNDIO_INCLUDE_DIR "")
 	SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
@@ -498,11 +469,9 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 IF(WANT_JACK)
 	IF(WANT_WEAKJACK)
 		SET(LMMS_HAVE_WEAKJACK TRUE)
-		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-		SET(JACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/jack2/common)
 		SET(STATUS_JACK "OK (weak linking enabled)")
-		# use dlsym instead
-		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+		set(JACK_INCLUDE_DIRS "")
+		set(JACK_LIBRARIES weakjack)
 		SET(LMMS_HAVE_JACK TRUE)
 		SET(LMMS_HAVE_JACK_PRENAME TRUE)
 		SET(JACK_FOUND TRUE)
@@ -587,26 +556,42 @@ IF(WANT_SNDIO)
 ENDIF(WANT_SNDIO)
 
 # check for WINE
-IF(WANT_VST)
-	FIND_PACKAGE(Wine)
-	IF(WINE_FOUND)
-		SET(LMMS_SUPPORT_VST TRUE)
-		IF(WINE_LIBRARY_FIX)
-			SET(STATUS_VST "OK, with workaround linking ${WINE_LIBRARY_FIX}")
-		ELSE()
-			SET(STATUS_VST "OK")
-		ENDIF()
-	ELSEIF(WANT_VST_NOWINE)
-		SET(LMMS_SUPPORT_VST TRUE)
-		SET(STATUS_VST "OK")
-	ELSE(WINE_FOUND)
-		SET(STATUS_VST "not found, please install (lib)wine-dev (or similar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
-	ENDIF(WINE_FOUND)
-ENDIF(WANT_VST)
-IF(LMMS_BUILD_WIN32)
-	SET(LMMS_SUPPORT_VST TRUE)
-	SET(STATUS_VST "OK")
-ENDIF(LMMS_BUILD_WIN32)
+if(WANT_VST)
+	if((WANT_VST_32 OR WANT_VST_64) AND NOT LMMS_BUILD_WIN32)
+		find_package(Wine)
+		include(CheckWineGcc)
+	endif()
+	macro(check_vst bits)
+		if(NOT WANT_VST_${bits})
+			set(STATUS_VST_${bits} "Not built, as requested")
+		elseif(LMMS_BUILD_WIN32)
+			set(STATUS_VST_${bits} "OK")
+			set(LMMS_HAVE_VST_${bits} TRUE)
+		elseif(NOT WINE_FOUND)
+			set(STATUS_VST_${bits} "not found, please install (lib)wine-dev (or similar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
+		else()
+			CheckWineGcc("${bits}" "${WINEGCC}" WINEGCC_WORKING)
+			if(WINEGCC_WORKING)
+				set(LMMS_HAVE_VST_${bits} TRUE)
+				if(WINE_LIBRARY_FIX)
+					set(STATUS_VST_${bits} "OK, with workaround linking ${WINE_LIBRARY_FIX}")
+				else()
+					set(STATUS_VST_${bits} "OK")
+				endif()
+			else()
+				set(STATUS_VST_${bits} "winegcc fails to compile ${bits}-bit binaries, please make sure you have ${bits}-bit GCC libraries")
+			endif()
+		endif()
+	endmacro()
+	check_vst(32)
+	check_vst(64)
+	if(LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64 OR LMMS_BUILD_LINUX)
+		set(LMMS_HAVE_VST TRUE)
+		set(STATUS_VST "OK")
+	else()
+		set(STATUS_VST "No hosts selected and available")
+	endif()
+endif()
 
 IF(WANT_DEBUG_FPE)
 	IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -622,28 +607,6 @@ ENDIF(WANT_DEBUG_FPE)
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
-# set compiler flags
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
-	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
-	IF(${USE_WERROR})
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
-	ENDIF()
-
-	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds -Wno-attributes")
-	ENDIF()
-ELSEIF(MSVC)
-	# Remove any existing /W flags
-	STRING(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	SET(WERROR_FLAGS "/W2")
-	IF(${USE_WERROR})
-		SET(WERROR_FLAGS "${WERROR_FLAGS} /WX")
-	ENDIF()
-ENDIF()
-
-
 IF(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Setting build type to 'Release' as none was specified.")
 	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -652,8 +615,6 @@ IF(NOT CMAKE_BUILD_TYPE)
 		"MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
-SET(CMAKE_C_FLAGS "${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
@@ -695,12 +656,9 @@ ENDIF()
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	IF(WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
-	ELSE(WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
-	ENDIF(WIN32)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND NOT WIN32)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DPIC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 elseif(MSVC)
 	# Use UTF-8 as the source and execution character set
 	add_compile_options("/utf-8")
@@ -730,6 +688,8 @@ add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-p
 # not being found by PeakController
 add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
 
+# Add warning and error flags
+include(ErrorFlags)
 
 # use ccache
 include(CompileCache)
@@ -852,8 +812,9 @@ MESSAGE(
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Sid instrument              : ${STATUS_SID}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
-"* VST-instrument hoster       : ${STATUS_VST}\n"
-"* VST-effect hoster           : ${STATUS_VST}\n"
+"* VST plugin host             : ${STATUS_VST}\n"
+"  * 32-bit Windows host       : ${STATUS_VST_32}\n"
+"  * 64-bit Windows host       : ${STATUS_VST_64}\n"
 "* CALF LADSPA plugins         : ${STATUS_CALF}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"

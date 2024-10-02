@@ -64,7 +64,7 @@
 #include "TimeLineWidget.h"
 #include "debug.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 
 namespace lmms::gui
@@ -120,7 +120,7 @@ AutomationEditor::AutomationEditor() :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
-	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
+	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
@@ -320,8 +320,6 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
-	int xstep;
-	int ystep;
 
 	if( deltax < AutomationClip::quantization() )
 	{
@@ -332,34 +330,14 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( x0 < x1 )
-	{
-		xstep = AutomationClip::quantization();
-	}
-	else
-	{
-		xstep = -( AutomationClip::quantization() );
-	}
+	int xstep = (x0 < x1 ? 1 : -1) * AutomationClip::quantization();
+	int ystep = y0 < y1 ? 1 : -1;
+	float lineAdjust = ystep * yscale;
 
-	float lineAdjust;
-	if( y0 < y1 )
-	{
-		ystep = 1;
-		lineAdjust = yscale;
-	}
-	else
-	{
-		ystep = -1;
-		lineAdjust = -( yscale );
-	}
-
-	int i = 0;
-	while( i < deltax )
+	for (int i = 0; i < deltax; ++i)
 	{
 		y = y0 + ( ystep * yscale * i ) + lineAdjust;
-
 		x += xstep;
-		i += 1;
 		m_clip->removeNode(TimePos(x));
 		m_clip->putValue( TimePos( x ), y );
 	}
@@ -979,7 +957,6 @@ inline void AutomationEditor::drawCross( QPainter & p )
 inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
-	int y;
 	// Below (m_ppb * AutomationClip::quantization() / 576) is used because:
 	// 1 bar equals to 192/quantization() notes. Hence, to calculate the number of pixels
 	// per note we would have (m_ppb * 1 bar / (192/quantization()) notes per bar), or
@@ -988,7 +965,7 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 	const int outerRadius = qBound(3, (m_ppb * AutomationClip::quantization()) / 576, 5);
 
 	// Draw a circle for the outValue
-	y = yCoordOfLevel(OUTVAL(it));
+	int y = yCoordOfLevel(OUTVAL(it));
 	p.setPen(QPen(m_nodeOutValueColor.lighter(200)));
 	p.setBrush(QBrush(m_nodeOutValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
@@ -1006,7 +983,6 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
-	int y, tx, ty;
 
 	// The tangent value correlates the variation in the node value related to the increase
 	// in ticks. So to have a proportionate drawing of the tangent line, we need to find the
@@ -1020,9 +996,9 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 	p.setPen(QPen(m_nodeTangentLineColor));
 	p.setBrush(QBrush(m_nodeTangentLineColor));
 
-	y = yCoordOfLevel(INVAL(it));
-	tx = x - 20;
-	ty = y + 20 * INTAN(it) * proportion;
+	int y = yCoordOfLevel(INVAL(it));
+	int tx = x - 20;
+	int ty = y + 20 * INTAN(it) * proportion;
 	p.drawLine(x, y, tx, ty);
 	p.setBrush(QBrush(m_nodeTangentLineColor.darker(200)));
 	p.drawEllipse(tx - 3, ty - 3, 6, 6);
@@ -1064,8 +1040,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	// set font-size to 8
-	p.setFont( pointSize<8>( p.font() ) );
+	p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 
@@ -1101,7 +1076,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			int y;
 			int level = (int) m_bottomLevel;
 			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
@@ -1116,7 +1090,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			{
 				const QString & label = m_clip->firstObject()
 							->displayValue( level );
-				y = yCoordOfLevel( level );
+				int y = yCoordOfLevel(level);
 				p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::Shadow ) );
 				p.drawText( 1, y - font_height + 1,
@@ -1139,7 +1113,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( m_clip )
 	{
-		int tick, x, q;
+		int q;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
@@ -1163,10 +1137,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = m_currentPosition - m_currentPosition % q,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += q, x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick(tick); x <= width();
+			 tick += q, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_lineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1187,10 +1159,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			float y;
 			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
-				y =  yCoordOfLevel( (float)level );
+				float y = yCoordOfLevel(static_cast<float>(level));
 
 				p.setPen(level % 10 == 0 ? m_beatLineColor : m_lineColor);
 
@@ -1226,10 +1197,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
-		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % ticksPerBeat, x = xCoordOfTick(tick); x <= width();
+			 tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1316,10 +1285,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += TimePos::ticksPerBar(), x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
+			 x <= width(); tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1365,15 +1332,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the outValue of the current node). When we have nodes with linear or cubic progression
 				// the value of the end of the shape between the two nodes will be the inValue of
 				// the next node.
-				float nextValue;
-				if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
-				{
-					nextValue = OUTVAL(it);
-				}
-				else
-				{
-					nextValue = INVAL(it + 1);
-				}
+				float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
+					? OUTVAL(it)
+					: INVAL(it + 1);
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
@@ -1421,9 +1382,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 	else
 	{
-		QFont f = p.font();
+		QFont f = font();
 		f.setBold( true );
-		p.setFont( pointSize<14>( f ) );
+		p.setFont(f);
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
@@ -1523,25 +1484,11 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 			|| ( value > m_topLevel && m_topLevel >= 0 )
 			|| ( value < m_bottomLevel && m_bottomLevel <= 0 ) )
 	{
-		int y_start = yCoordOfLevel( value );
-		int rect_height;
-
-		if( m_y_auto )
-		{
-			int y_end = (int)( grid_bottom
-						+ ( grid_bottom - TOP_MARGIN )
-						* m_minLevel
-						/ ( m_maxLevel - m_minLevel ) );
-
-			rect_height = y_end - y_start;
-		}
-		else
-		{
-			rect_height = (int)( value * m_y_delta );
-		}
+		const int y_start = yCoordOfLevel(value);
+		const int y_end = grid_bottom + (grid_bottom - TOP_MARGIN) * m_minLevel / (m_maxLevel - m_minLevel);
+		const int rect_height = m_y_auto ? y_end - y_start : value * m_y_delta;
 
 		QBrush currentColor = m_graphColor;
-
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
 #ifdef LMMS_DEBUG
@@ -1700,14 +1647,14 @@ float AutomationEditor::getLevel(int y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
+	float level = std::roundf( ( m_bottomLevel + ( m_y_auto ?
 			( m_maxLevel - m_minLevel ) * ( level_line_y - y )
 					/ (float)( level_line_y - ( TOP_MARGIN + 2 ) ) :
 			( level_line_y - y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
-	level = qBound( m_bottomLevel, level, m_topLevel );
+	level = qBound(std::roundf(m_bottomLevel), level, std::roundf(m_topLevel));
 
-	return( level );
+	return level;
 }
 
 
@@ -2160,7 +2107,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
 	{
-		m_editor->m_zoomingXModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_editor->m_zoomingXModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_editor->m_zoomingXModel.setValue( m_editor->m_zoomingXModel.findText( "100%" ) );
 

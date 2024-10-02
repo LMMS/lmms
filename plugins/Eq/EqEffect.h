@@ -40,12 +40,14 @@ class EqEffect : public Effect
 public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
-	bool processAudioBuffer( sampleFrame * buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
 	EffectControls * controls() override
 	{
 		return &m_eqControls;
 	}
-	inline void gain( sampleFrame * buf, const fpp_t frames, float scale, sampleFrame * peak )
+	inline void gain( SampleFrame* buf, const fpp_t frames, float scale, SampleFrame* peak )
 	{
 		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
 		for( fpp_t f = 0; f < frames; ++f )
@@ -87,7 +89,7 @@ private:
 	float m_inGain;
 	float m_outGain;
 
-	float peakBand( float minF, float maxF, EqAnalyser *, int );
+	float linearPeakBand(float minF, float maxF, EqAnalyser*, int);
 
 	inline float bandToFreq ( int index , int sampleRate )
 	{

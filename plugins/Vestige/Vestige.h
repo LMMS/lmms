@@ -61,7 +61,7 @@ public:
 	VestigeInstrument( InstrumentTrack * _instrument_track );
 	virtual ~VestigeInstrument();
 
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play( SampleFrame* _working_buffer );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -69,11 +69,6 @@ public:
 	virtual QString nodeName() const;
 
 	virtual void loadFile( const QString & _file );
-
-	virtual Flags flags() const
-	{
-		return Flag::IsSingleStreamed | Flag::IsMidiBased;
-	}
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 

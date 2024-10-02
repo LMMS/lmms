@@ -28,9 +28,9 @@
 
 #include <map>
 #include <QDomDocument>
+#include <vector>
 
 #include "lmms_export.h"
-#include "MemoryManager.h"
 
 class QTextStream;
 
@@ -42,7 +42,6 @@ class ProjectVersion;
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
-	MM_OPERATORS
 
 	using UpgradeMethod = void(DataFile::*)();
 
@@ -102,6 +101,8 @@ private:
 
 	void cleanMetaNodes( QDomElement de );
 
+	void mapSrcAttributeInElementsWithResources(const QMap<QString, QString>& map);
+
 	// helper upgrade routines
 	void upgrade_0_2_1_20070501();
 	void upgrade_0_2_1_20070508();
@@ -130,6 +131,9 @@ private:
 	void upgrade_midiCCIndexing();
 	void upgrade_loopsRename();
 	void upgrade_noteTypes();
+	void upgrade_fixCMTDelays();
+	void upgrade_fixBassLoopsTypo();
+	void findProblematicLadspaPlugins();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
@@ -149,7 +153,6 @@ private:
 	QDomElement m_head;
 	Type m_type;
 	unsigned int m_fileVersion;
-
 } ;
 
 

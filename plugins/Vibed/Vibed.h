@@ -57,15 +57,13 @@ public:
 	Vibed(InstrumentTrack* instrumentTrack);
 	~Vibed() override = default;
 
-	void playNote(NotePlayHandle* n, sampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* n, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* n) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
-
-	Flags flags() const override { return Flag::IsNotBendable; }
 
 	gui::PluginView* instantiateView(QWidget* parent) override;
 

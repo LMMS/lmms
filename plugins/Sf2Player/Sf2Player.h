@@ -27,6 +27,7 @@
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
+#include <array>
 #include <fluidsynth/types.h>
 #include <QMutex>
 #include <samplerate.h>
@@ -34,7 +35,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
-#include "MemoryManager.h"
 
 class QLabel;
 
@@ -65,10 +65,10 @@ public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
 	~Sf2Instrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -80,16 +80,6 @@ public:
 	AutomatableModel * childModel( const QString & _modelName ) override;
 
 	QString nodeName() const override;
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0;
-	}
-
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 	
@@ -161,7 +151,7 @@ private:
 	void freeFont();
 	void noteOn( Sf2PluginData * n );
 	void noteOff( Sf2PluginData * n );
-	void renderFrames( f_cnt_t frames, sampleFrame * buf );
+	void renderFrames( f_cnt_t frames, SampleFrame* buf );
 
 	friend class gui::Sf2InstrumentView;
 

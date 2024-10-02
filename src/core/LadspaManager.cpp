@@ -122,14 +122,8 @@ LadspaManager::~LadspaManager()
 LadspaManagerDescription * LadspaManager::getDescription(
 						const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		return( m_ladspaManagerMap[_plugin] );
-	}
-	else
-	{
-		return( nullptr );
-	}
+	auto const it = m_ladspaManagerMap.find(_plugin);
+	return it != m_ladspaManagerMap.end() ? *it : nullptr;
 }
 
 
@@ -139,11 +133,7 @@ void LadspaManager::addPlugins(
 		LADSPA_Descriptor_Function _descriptor_func,
 						const QString & _file )
 {
-	const LADSPA_Descriptor * descriptor;
-
-	for( long pluginIndex = 0;
-		( descriptor = _descriptor_func( pluginIndex ) ) != nullptr;
-								++pluginIndex )
+	for (long pluginIndex = 0; const auto descriptor = _descriptor_func(pluginIndex); ++pluginIndex)
 	{
 		ladspa_key_t key( _file, QString( descriptor->Label ) );
 		if( m_ladspaManagerMap.contains( key ) )
@@ -523,24 +513,16 @@ bool LadspaManager::isInteger( const ladspa_key_t & _plugin,
 
 bool LadspaManager::isEnum( const ladspa_key_t & _plugin, uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin )
-		   && _port < getPortCount( _plugin ) )
+	auto const * desc = getDescriptor(_plugin);
+	if (desc && _port < desc->PortCount)
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
 		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
+			desc->PortRangeHints[_port].HintDescriptor;
 		// This is an LMMS extension to ladspa
-		return( LADSPA_IS_HINT_INTEGER( hintDescriptor ) &&
-			LADSPA_IS_HINT_TOGGLED( hintDescriptor ) );
+		return LADSPA_IS_HINT_INTEGER(hintDescriptor) && LADSPA_IS_HINT_TOGGLED(hintDescriptor);
 	}
-	else
-	{
-		return( false );
-	}
+
+	return false;
 }
 
 
@@ -566,22 +548,20 @@ const void * LadspaManager::getImplementationData(
 
 
 
-const LADSPA_Descriptor * LadspaManager::getDescriptor(
-						const ladspa_key_t & _plugin )
+const LADSPA_Descriptor * LadspaManager::getDescriptor(const ladspa_key_t & _plugin)
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	auto const it = m_ladspaManagerMap.find(_plugin);
+	if (it != m_ladspaManagerMap.end())
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( descriptor );
+		auto const plugin = *it;
+
+		LADSPA_Descriptor_Function descriptorFunction = plugin->descriptorFunction;
+		const LADSPA_Descriptor* descriptor = descriptorFunction(plugin->index);
+
+		return descriptor;
 	}
-	else
-	{
-		return( nullptr );
-	}
+
+	return nullptr;
 }
 
 

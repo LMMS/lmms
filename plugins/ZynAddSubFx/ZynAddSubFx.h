@@ -28,12 +28,12 @@
 #include <QMap>
 #include <QMutex>
 
+#include <globals.h>
+
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
-#include "zynaddsubfx/src/globals.h"
-
 
 class QPushButton;
 
@@ -74,7 +74,7 @@ public:
 	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
 	~ZynAddSubFxInstrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
@@ -85,11 +85,6 @@ public:
 
 
 	QString nodeName() const override;
-
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed | Flag::IsMidiBased;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

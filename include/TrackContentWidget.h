@@ -49,17 +49,23 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	Q_OBJECT
 
 	// qproperties for track background gradients
-	Q_PROPERTY( QBrush darkerColor READ darkerColor WRITE setDarkerColor )
-	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
-	Q_PROPERTY( QBrush gridColor READ gridColor WRITE setGridColor )
-	Q_PROPERTY( QBrush embossColor READ embossColor WRITE setEmbossColor )
+	Q_PROPERTY(QBrush darkerColor READ darkerColor WRITE setDarkerColor)
+	Q_PROPERTY(QBrush lighterColor READ lighterColor WRITE setLighterColor)
+	Q_PROPERTY(QBrush coarseGridColor READ coarseGridColor WRITE setCoarseGridColor)
+	Q_PROPERTY(QBrush fineGridColor READ fineGridColor WRITE setFineGridColor)
+	Q_PROPERTY(QBrush horizontalColor READ horizontalColor WRITE setHorizontalColor)
+	Q_PROPERTY(QBrush embossColor READ embossColor WRITE setEmbossColor)
+
+	Q_PROPERTY(int coarseGridWidth READ coarseGridWidth WRITE setCoarseGridWidth)
+	Q_PROPERTY(int fineGridWidth READ fineGridWidth WRITE setFineGridWidth)
+	Q_PROPERTY(int horizontalWidth READ horizontalWidth WRITE setHorizontalWidth)
+	Q_PROPERTY(int embossWidth READ embossWidth WRITE setEmbossWidth)
+
+	Q_PROPERTY(int embossOffset READ embossOffset WRITE setEmbossOffset)
 
 public:
 	TrackContentWidget( TrackView * parent );
 	~TrackContentWidget() override = default;
-
-	/*! \brief Updates the background tile pixmap. */
-	void updateBackground();
 
 	void addClipView( ClipView * clipv );
 	void removeClipView( ClipView * clipv );
@@ -82,17 +88,37 @@ public:
 
 	QBrush darkerColor() const;
 	QBrush lighterColor() const;
-	QBrush gridColor() const;
+	QBrush coarseGridColor() const;
+	QBrush fineGridColor() const;
+	QBrush horizontalColor() const;
 	QBrush embossColor() const;
 
-	void setDarkerColor( const QBrush & c );
-	void setLighterColor( const QBrush & c );
-	void setGridColor( const QBrush & c );
-	void setEmbossColor( const QBrush & c);
+	int coarseGridWidth() const;
+	int fineGridWidth() const;
+	int horizontalWidth() const;
+	int embossWidth() const;
+
+	int embossOffset() const;
+
+	void setDarkerColor(const QBrush & c);
+	void setLighterColor(const QBrush & c);
+	void setCoarseGridColor(const QBrush & c);
+	void setFineGridColor(const QBrush & c);
+	void setHorizontalColor(const QBrush & c);
+	void setEmbossColor(const QBrush & c);
+
+	void setCoarseGridWidth(int c);
+	void setFineGridWidth(int c);
+	void setHorizontalWidth(int c);
+	void setEmbossWidth(int c);
+
+	void setEmbossOffset(int c);
 
 public slots:
 	void update();
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
+	/*! \brief Updates the background tile pixmap. */
+	void updateBackground();
 
 protected:
 	enum class ContextMenuAction
@@ -140,8 +166,17 @@ private:
 	// qproperty fields
 	QBrush m_darkerColor;
 	QBrush m_lighterColor;
-	QBrush m_gridColor;
+	QBrush m_coarseGridColor;
+	QBrush m_fineGridColor;
+	QBrush m_horizontalColor;
 	QBrush m_embossColor;
+
+	int m_coarseGridWidth;
+	int m_fineGridWidth;
+	int m_horizontalWidth;
+	int m_embossWidth;
+
+	int m_embossOffset;
 } ;
 
 

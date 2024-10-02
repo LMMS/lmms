@@ -234,7 +234,9 @@ lmms--gui--GroupBox {
 lmms--gui--Oscilloscope {
 	background: none;
 	border: none;
-	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-leftChannelColor: rgb(71, 253, 133);
+	qproperty-rightChannelColor: rgb(238, 253, 71);
+	qproperty-otherChannelsColor: rgb(71, 235, 253);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -276,33 +278,33 @@ QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-	background: #3f4750;
+	background: #5d6b77;
 	border: none;
 	border-radius: 4px;
 	min-width: 24px;
 }
 
 QScrollBar::handle:horizontal:hover {
-	background: #525e69;
+	background: #b8c4d1;
 }
 
 QScrollBar::handle:horizontal:pressed {
-	background: rgba(11,213,86,100);
+	background: #ffffff;
 }
 
 QScrollBar::handle:vertical {
-	background: #3f4750;
+	background: #5d6b77;
 	border: none;
 	border-radius: 4px;
 	min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
-	background: #525e69;
+	background: #b8c4d1;
 }
 
 QScrollBar::handle:vertical:pressed {
-	background: rgba(11,213,86,100);
+	background: #ffffff;
 }
 
 QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
@@ -386,12 +388,24 @@ lmms--gui--TrackView > QWidget {
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-/* track background colors */
+/* track background config */
 lmms--gui--TrackContentWidget {
+	/* colors */
 	qproperty-darkerColor: #0C0E0F;
 	qproperty-lighterColor: #14151A;
-	qproperty-gridColor: #262B30;
-	qproperty-embossColor: rgba( 0, 0, 0, 0 );
+	qproperty-coarseGridColor: #3C444C;
+	qproperty-fineGridColor: #262B30;
+	qproperty-horizontalColor: #3C444C;
+	qproperty-embossColor: rgba(0, 0, 0, 0);
+	
+	/* line widths */
+	qproperty-coarseGridWidth: 2;
+	qproperty-fineGridWidth: 1;
+	qproperty-horizontalWidth: 1;
+	qproperty-embossWidth: 0;
+	
+	/* positive offset shifts emboss to the right */
+	qproperty-embossOffset: 0;
 }
 
 
@@ -535,6 +549,12 @@ QToolButton:hover {
 	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #7c8799, stop:1 #343840)
+}
+
+QToolButton:hover:checked {
+	border: 2px solid #343840;
+	border-radius: 2px;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #292d33, stop:1 #22262c)
 }
 
 QToolButton:pressed {
@@ -690,11 +710,16 @@ lmms--gui--MixerChannelView QGraphicsView {
 	border-style: none;
 }
 
+lmms--gui--PeakIndicator {
+	background-color: #111811;
+	font-size: 7pt;
+}
+
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
-	qproperty-peakGreen: #0ad45c;
-	qproperty-peakYellow: #d6ec52;
-	qproperty-peakRed: #c12038;
+	qproperty-peakOk: #0ad45c;
+	qproperty-peakWarn: #d6ec52;
+	qproperty-peakClip: #c12038;
 }
 
 lmms--gui--TimeLineWidget {
@@ -1038,6 +1063,7 @@ lmms--gui--CompressorControlDialog {
 	qproperty-textColor: rgba(209, 216, 228, 50);
 	qproperty-graphColor: rgba(209, 216, 228, 50);
 	qproperty-resetColor: rgba(200, 100, 15, 200);
+	qproperty-backgroundColor: rgba(7, 8, 9, 255);
 }
 
 lmms--gui--CompressorControlDialog lmms--gui--Knob {

@@ -107,7 +107,7 @@ public:
 	 */
 	static inline float freqToLen( float f )
 	{
-		return freqToLen( f, Engine::audioEngine()->processingSampleRate() );
+		return freqToLen( f, Engine::audioEngine()->outputSampleRate() );
 	}
 
 	/*! \brief This method converts frequency to wavelength, but you can use any custom sample rate with it.

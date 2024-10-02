@@ -48,7 +48,6 @@ class PixmapButton;
 class VoiceObject : public Model
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 	enum class WaveForm {
 		Square = 0,
@@ -103,7 +102,7 @@ public:
 	~SidInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -112,7 +111,7 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override;
+	float desiredReleaseTimeMs() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

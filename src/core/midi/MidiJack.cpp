@@ -179,7 +179,6 @@ QString MidiJack::probeDevice()
 // we read data from jack
 void MidiJack::JackMidiRead(jack_nframes_t nframes)
 {
-	unsigned int i,b;
 	void* port_buf = jack_port_get_buffer(m_input_port, nframes);
 	jack_midi_event_t in_event;
 	jack_nframes_t event_index = 0;
@@ -188,13 +187,13 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 	int rval = jack_midi_event_get(&in_event, port_buf, 0);
 	if (rval == 0 /* 0 = success */)
 	{
-		for(i=0; i<nframes; i++)
+		for (unsigned int i = 0; i < nframes; i++)
 		{
 			while((in_event.time == i) && (event_index < event_count))
 			{
 				// lmms is setup to parse bytes coming from a device
 				// parse it byte by byte as it expects
-				for(b=0;b<in_event.size;b++)
+				for (unsigned int b = 0; b < in_event.size; b++)
 					parseData( *(in_event.buffer + b) );
 
 				event_index++;

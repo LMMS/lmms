@@ -32,7 +32,6 @@
 #include <QLabel>
 
 
-#include "gui_templates.h"
 #include "LadspaDescription.h"
 #include "LadspaPortDialog.h"
 #include "TabBar.h"
@@ -172,7 +171,6 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	auto title = new QLabel(type + _txt, tab);
 	QFont f = title->font();
 	f.setBold( true );
-	title->setFont( pointSize<12>( f ) );
 
 	layout->addSpacing( 5 );
 	layout->addWidget( title );

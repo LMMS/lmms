@@ -31,6 +31,8 @@
 #include "EffectView.h"
 
 #include "ConfigManager.h"
+#include "SampleFrame.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -61,6 +63,10 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	{
 		m_autoQuitDisabled = true;
 	}
+
+	// Call the virtual method onEnabledChanged so that effects can react to changes,
+	// e.g. by resetting state.
+	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
 
@@ -116,6 +122,41 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
+bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+{
+	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	{
+		processBypassedImpl();
+		return false;
+	}
+
+	const auto status = processImpl(buf, frames);
+	switch (status)
+	{
+		case ProcessStatus::Continue:
+			break;
+		case ProcessStatus::ContinueIfNotQuiet:
+		{
+			double outSum = 0.0;
+			for (std::size_t idx = 0; idx < frames; ++idx)
+			{
+				outSum += buf[idx].sumOfSquaredAmplitudes();
+			}
+
+			checkGate(outSum / frames);
+			break;
+		}
+		case ProcessStatus::Sleep:
+			return false;
+		default:
+			break;
+	}
+
+	return isRunning();
+}
+
+
+
 
 Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
@@ -140,7 +181,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate( double _out_sum )
+void Effect::checkGate(double outSum)
 {
 	if( m_autoQuitDisabled )
 	{
@@ -149,7 +190,7 @@ void Effect::checkGate( double _out_sum )
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum - gate() <= typeInfo<float>::minEps() )
+	if (outSum - gate() <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
@@ -195,9 +236,9 @@ void Effect::reinitSRC()
 
 
 
-void Effect::resample( int _i, const sampleFrame * _src_buf,
+void Effect::resample( int _i, const SampleFrame* _src_buf,
 							sample_rate_t _src_sr,
-				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+				SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 								f_cnt_t _frames )
 {
 	if( m_srcState[_i] == nullptr )
@@ -210,8 +251,8 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	m_srcData[_i].data_out = _dst_buf[0].data ();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
-	int error;
-	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
+
+	if (int error = src_process(m_srcState[_i], &m_srcData[_i]))
 	{
 		qFatal( "Effect::resample(): error while resampling: %s\n",
 							src_strerror( error ) );

@@ -208,16 +208,30 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-void MidiClip::removeNote( Note * _note_to_del )
+NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
+{
+	instrumentTrack()->lock();
+	delete *it;
+	auto new_it = m_notes.erase(it);
+	instrumentTrack()->unlock();
+
+	checkType();
+	updateLength();
+
+	emit dataChanged();
+	return new_it;
+}
+
+NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
+	auto it = std::find(m_notes.begin(), m_notes.end(), note);
+	if (it != m_notes.end())
 	{
-		auto shouldRemove = note == _note_to_del;
-		if (shouldRemove) { delete note; }
-		return shouldRemove;
-	}), m_notes.end());
+		delete *it;
+		it = m_notes.erase(it);
+	}
 
 	instrumentTrack()->unlock();
 
@@ -225,6 +239,7 @@ void MidiClip::removeNote( Note * _note_to_del )
 	updateLength();
 
 	emit dataChanged();
+	return it;
 }
 
 
@@ -458,9 +473,9 @@ MidiClip *  MidiClip::nextMidiClip() const
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
 	auto& clips = m_instrumentTrack->getClips();
-	int clipNum = m_instrumentTrack->getClipNum(this);
-	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
-	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
+	int clipNum = m_instrumentTrack->getClipNum(this) + offset;
+	if (clipNum < 0 || static_cast<size_t>(clipNum) >= clips.size()) { return nullptr; }
+	return dynamic_cast<MidiClip*>(clips[clipNum]);
 }
 
 

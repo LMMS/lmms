@@ -36,7 +36,7 @@ class QLabel;
 namespace lmms
 {
 
-constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
+constexpr float COMP_NOISE_FLOOR = 0.000001f;// -120 dbFs
 
 class CompressorControls;
 
@@ -86,6 +86,7 @@ public:
 	Q_PROPERTY(QColor textColor MEMBER m_textColor)
 	Q_PROPERTY(QColor graphColor MEMBER m_graphColor)
 	Q_PROPERTY(QColor resetColor MEMBER m_resetColor)
+	Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor)
 
 protected:
 	void resizeEvent(QResizeEvent *event) override;
@@ -150,6 +151,7 @@ private:
 	QColor m_textColor = QColor(209, 216, 228, 50);
 	QColor m_graphColor = QColor(209, 216, 228, 50);
 	QColor m_resetColor = QColor(200, 100, 15, 200);
+	QColor m_backgroundColor = QColor(7, 8, 9, 255);
 
 	float m_peakAvg;
 	float m_gainAvg;

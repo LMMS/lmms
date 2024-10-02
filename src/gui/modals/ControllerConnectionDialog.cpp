@@ -295,13 +295,12 @@ ControllerConnectionDialog::~ControllerConnectionDialog()
 void ControllerConnectionDialog::selectController()
 {
 	// Midi
-	if( m_midiGroupBox->model()->value() > 0 )
+	if (m_midiGroupBox->model()->value())
 	{
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
-			MidiController * mc;
-			mc = m_midiController->copyToMidiController( Engine::getSong() );
-	
+			auto mc = m_midiController->copyToMidiController(Engine::getSong());
+
 			/*
 			if( m_targetModel->getTrack() && 
 					!m_targetModel->getTrack()->displayName().isEmpty() )
@@ -322,8 +321,7 @@ void ControllerConnectionDialog::selectController()
 	// User
 	else 
 	{
-		if( m_userGroupBox->model()->value() > 0 && 
-				Engine::getSong()->controllers().size() )
+		if (m_userGroupBox->model()->value() && Engine::getSong()->controllers().size())
 		{
 			m_controller = Engine::getSong()->controllers().at( 
 					m_userController->model()->value() );

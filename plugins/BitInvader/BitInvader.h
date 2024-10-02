@@ -31,7 +31,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -48,7 +47,6 @@ class PixmapButton;
 
 class BSynth
 {
-	MM_OPERATORS
 public:
 	BSynth( float * sample, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 
@@ -77,7 +75,7 @@ public:
 	~BitInvader() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -87,9 +85,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 64 );
+		return 1.5f;
 	}
 
 	gui::PluginView * instantiateView( QWidget * _parent ) override;

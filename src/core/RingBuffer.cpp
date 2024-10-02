@@ -34,22 +34,22 @@ namespace lmms
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
 	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
-	m_samplerate( Engine::audioEngine()->processingSampleRate() ),
+	m_samplerate( Engine::audioEngine()->outputSampleRate() ),
 	m_size( size + m_fpp )
 {
-	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	m_buffer = new SampleFrame[ m_size ];
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 }
 
 
 RingBuffer::RingBuffer( float size ) : 
 	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
-	m_samplerate( Engine::audioEngine()->processingSampleRate() )
+	m_samplerate( Engine::audioEngine()->outputSampleRate() )
 {
 	m_size = msToFrames( size ) + m_fpp;
-	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	m_buffer = new SampleFrame[ m_size ];
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 	setSamplerateAware( true );
 	//qDebug( "m_size %d, m_position %d", m_size, m_position );
@@ -64,7 +64,7 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::reset()
 {
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 }
 
@@ -72,10 +72,10 @@ void RingBuffer::reset()
 void RingBuffer::changeSize( f_cnt_t size )
 {
 	size += m_fpp;
-	sampleFrame * tmp = m_buffer;
+	SampleFrame* tmp = m_buffer;
 	m_size = size;
-	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	m_buffer = new SampleFrame[ m_size ];
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 	delete[] tmp;
 }
@@ -118,111 +118,109 @@ void RingBuffer::movePosition( float amount )
 }
 
 
-void RingBuffer::pop( sampleFrame * dst )
+void RingBuffer::pop( SampleFrame* dst )
 {
 	if( m_position + m_fpp <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
-		memcpy( dst, & m_buffer [ m_position ], m_fpp * sizeof( sampleFrame ) );
-		memset( & m_buffer[m_position], 0, m_fpp * sizeof( sampleFrame ) );
+		memcpy( dst, & m_buffer [ m_position ], m_fpp * sizeof( SampleFrame ) );
+		zeroSampleFrames(&m_buffer[m_position], m_fpp);
 	}
 	else
 	{
 		f_cnt_t first = m_size - m_position;
 		f_cnt_t second = m_fpp - first;
 		
-		memcpy( dst, & m_buffer [ m_position ], first * sizeof( sampleFrame ) );
-		memset( & m_buffer [m_position], 0, first * sizeof( sampleFrame ) );
+		memcpy( dst, & m_buffer [ m_position ], first * sizeof( SampleFrame ) );
+		zeroSampleFrames(&m_buffer[m_position], first);
 		
-		memcpy( & dst [first], m_buffer, second * sizeof( sampleFrame ) );
-		memset( m_buffer, 0, second * sizeof( sampleFrame ) );
+		memcpy( & dst [first], m_buffer, second * sizeof( SampleFrame ) );
+		zeroSampleFrames(m_buffer, second);
 	}
 	
 	m_position = ( m_position + m_fpp ) % m_size;
 }
 
 
-void RingBuffer::read( sampleFrame * dst, f_cnt_t offset )
+void RingBuffer::read( SampleFrame* dst, f_cnt_t offset )
 {
 	f_cnt_t pos = ( m_position + offset ) % m_size;
-	if( pos < 0 ) { pos += m_size; }
 	
 	if( pos + m_fpp <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
-		memcpy( dst, & m_buffer [pos], m_fpp * sizeof( sampleFrame ) );
+		memcpy( dst, & m_buffer [pos], m_fpp * sizeof( SampleFrame ) );
 	}
 	else
 	{
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = m_fpp - first;
 		
-		memcpy( dst, & m_buffer [pos], first * sizeof( sampleFrame ) );
+		memcpy( dst, & m_buffer [pos], first * sizeof( SampleFrame ) );
 		
-		memcpy( & dst [first], m_buffer, second * sizeof( sampleFrame ) );
+		memcpy( & dst [first], m_buffer, second * sizeof( SampleFrame ) );
 	}
 }
 
 
-void RingBuffer::read( sampleFrame * dst, float offset )
+void RingBuffer::read( SampleFrame* dst, float offset )
 {
 	read( dst, msToFrames( offset ) );
 }
 
 
-void RingBuffer::read( sampleFrame * dst, f_cnt_t offset, f_cnt_t length )
+void RingBuffer::read( SampleFrame* dst, f_cnt_t offset, f_cnt_t length )
 {
 	f_cnt_t pos = ( m_position + offset ) % m_size;
-	if( pos < 0 ) { pos += m_size; }
 	
 	if( pos + length <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
-		memcpy( dst, & m_buffer [pos], length * sizeof( sampleFrame ) );
+		memcpy( dst, & m_buffer [pos], length * sizeof( SampleFrame ) );
 	}
 	else
 	{
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 		
-		memcpy( dst, & m_buffer [pos], first * sizeof( sampleFrame ) );
+		memcpy( dst, & m_buffer [pos], first * sizeof( SampleFrame ) );
 		
-		memcpy( & dst [first], m_buffer, second * sizeof( sampleFrame ) );
+		memcpy( & dst [first], m_buffer, second * sizeof( SampleFrame ) );
 	}
 }
 
 
-void RingBuffer::read( sampleFrame * dst, float offset, f_cnt_t length )
+void RingBuffer::read( SampleFrame* dst, float offset, f_cnt_t length )
 {
 	read( dst, msToFrames( offset ), length );
 }
 
 
-void RingBuffer::write( sampleFrame * src, f_cnt_t offset, f_cnt_t length )
+void RingBuffer::write( SampleFrame* src, f_cnt_t offset, f_cnt_t length )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
 	
 	if( pos + length <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
-		memcpy( & m_buffer [pos], src, length * sizeof( sampleFrame ) );
+		memcpy( & m_buffer [pos], src, length * sizeof( SampleFrame ) );
 	}
 	else
 	{
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 
-		memcpy( & m_buffer [pos], src, first * sizeof( sampleFrame ) );
+		memcpy( & m_buffer [pos], src, first * sizeof( SampleFrame ) );
 		
-		memcpy( m_buffer, & src [first], second * sizeof( sampleFrame ) );
+		memcpy( m_buffer, & src [first], second * sizeof( SampleFrame ) );
 	}
 }
 
 
-void RingBuffer::write( sampleFrame * src, float offset, f_cnt_t length )
+void RingBuffer::write( SampleFrame* src, float offset, f_cnt_t length )
 {
 	write( src, msToFrames( offset ), length );
 }
 
 
-void RingBuffer::writeAdding( sampleFrame * src, f_cnt_t offset, f_cnt_t length )
+void RingBuffer::writeAdding( SampleFrame* src, f_cnt_t offset, f_cnt_t length )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
@@ -243,13 +241,13 @@ void RingBuffer::writeAdding( sampleFrame * src, f_cnt_t offset, f_cnt_t length 
 }
 
 
-void RingBuffer::writeAdding( sampleFrame * src, float offset, f_cnt_t length )
+void RingBuffer::writeAdding( SampleFrame* src, float offset, f_cnt_t length )
 {
 	writeAdding( src, msToFrames( offset ), length );
 }
 
 
-void RingBuffer::writeAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt_t length, float level )
+void RingBuffer::writeAddingMultiplied( SampleFrame* src, f_cnt_t offset, f_cnt_t length, float level )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	//qDebug( "pos %d m_pos %d ofs %d siz %d", pos, m_position, offset, m_size );
@@ -271,14 +269,14 @@ void RingBuffer::writeAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt
 }
 
 
-void RingBuffer::writeAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level )
+void RingBuffer::writeAddingMultiplied( SampleFrame* src, float offset, f_cnt_t length, float level )
 {
 	f_cnt_t ofs = msToFrames( offset );
 	writeAddingMultiplied( src, ofs, length, level );
 }
 
 
-void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt_t length, float level )
+void RingBuffer::writeSwappedAddingMultiplied( SampleFrame* src, f_cnt_t offset, f_cnt_t length, float level )
 {
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
@@ -299,7 +297,7 @@ void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, f_cnt_t offset
 }
 
 
-void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level )
+void RingBuffer::writeSwappedAddingMultiplied( SampleFrame* src, float offset, f_cnt_t length, float level )
 {
 	writeSwappedAddingMultiplied( src, msToFrames( offset ), length, level );
 }
@@ -307,12 +305,12 @@ void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, float offset, 
 
 void RingBuffer::updateSamplerate()
 {
-	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::audioEngine()->processingSampleRate() ) / m_samplerate;
+	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::audioEngine()->outputSampleRate() ) / m_samplerate;
 	m_size = static_cast<f_cnt_t>( ceilf( newsize ) ) + m_fpp;
-	m_samplerate = Engine::audioEngine()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->outputSampleRate();
 	delete[] m_buffer;
-	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	m_buffer = new SampleFrame[ m_size ];
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 }
 

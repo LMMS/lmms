@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 }
 
 const float DYN_NOISE_FLOOR = 0.00001f; // -100dBFS noise floor
-const double DNF_LOG = 5.0;
+const double DNF_LOG = -1.0;
 
 DynProcEffect::DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
@@ -64,8 +64,8 @@ DynProcEffect::DynProcEffect( Model * _parent,
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
-	m_rms[1] = new RmsHelper( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
+	m_rms[0] = new RmsHelper( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
+	m_rms[1] = new RmsHelper( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
 	calcAttack();
 	calcRelease();
 }
@@ -82,33 +82,24 @@ DynProcEffect::~DynProcEffect()
 
 inline void DynProcEffect::calcAttack()
 {
-	m_attCoeff = std::pow(10.f, ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
+	m_attCoeff = std::exp((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::audioEngine()->outputSampleRate());
 }
 
 inline void DynProcEffect::calcRelease()
 {
-	m_relCoeff = std::pow(10.f, ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
+	m_relCoeff = std::exp((DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::audioEngine()->outputSampleRate());
 }
 
 
-bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-//apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
-		m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-		return( false );
-	}
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
 // variables for effect
 	int i = 0;
 
 	auto sm_peak = std::array{0.0f, 0.0f};
-	float gain;
 
-	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -123,8 +114,8 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_needsUpdate )
 	{
-		m_rms[0]->setSize( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
-		m_rms[1]->setSize( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
+		m_rms[0]->setSize( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
+		m_rms[1]->setSize( 64 * Engine::audioEngine()->outputSampleRate() / 44100 );
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;
@@ -141,9 +132,9 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 	}
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		auto s = std::array{_buf[f][0], _buf[f][1]};
+		auto s = std::array{buf[f][0], buf[f][1]};
 
 // apply input gain
 		s[0] *= inputGain;
@@ -155,15 +146,15 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 			const double t = m_rms[i]->update( s[i] );
 			if( t > m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, t );
+				m_currentPeak[i] = m_currentPeak[i] * m_attCoeff + (1 - m_attCoeff) * t;
 			}
 			else
 			if( t < m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, t );
+				m_currentPeak[i] = m_currentPeak[i] * m_relCoeff + (1 - m_relCoeff) * t;
 			}
 
-			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
+			m_currentPeak[i] = std::max(DYN_NOISE_FLOOR, m_currentPeak[i]);
 		}
 
 // account for stereo mode
@@ -196,20 +187,10 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 			if( sm_peak[i] > DYN_NOISE_FLOOR )
 			{
-				if ( lookup < 1 )
-				{
-					gain = frac * samples[0];
-				}
-				else
-				if ( lookup < 200 )
-				{
-					gain = linearInterpolate( samples[ lookup - 1 ],
-							samples[ lookup ], frac );
-				}
-				else
-				{
-					gain = samples[199];
-				};
+				float gain;
+				if (lookup < 1) { gain = frac * samples[0]; }
+				else if (lookup < 200) { gain = linearInterpolate(samples[lookup - 1], samples[lookup], frac); }
+				else { gain = samples[199]; }
 
 				s[i] *= gain;
 				s[i] /= sm_peak[i];
@@ -221,17 +202,18 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		s[1] *= outputGain;
 
 // mix wet/dry signals
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
-		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 	}
 
-	checkGate( out_sum / _frames );
-
-	return( isRunning() );
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
-
+void DynProcEffect::processBypassedImpl()
+{
+	// Apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
+	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
+}
 
 
 

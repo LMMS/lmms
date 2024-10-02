@@ -25,6 +25,8 @@
 #ifndef LMMS_GUI_TRACK_LABEL_BUTTON_H
 #define LMMS_GUI_TRACK_LABEL_BUTTON_H
 
+#include <string>
+
 #include <QToolButton>
 
 namespace lmms::gui
@@ -55,6 +57,7 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void paintEvent(QPaintEvent* pe) override;
 	void resizeEvent( QResizeEvent * _re ) override;
 
 private:
@@ -62,7 +65,7 @@ private:
 
 private:
 	TrackView * m_trackView;
-	QString m_iconName;
+	std::string m_iconName;
 	TrackRenameLineEdit * m_renameLineEdit;
 	QRect m_buttonRect;
 	QString elideName( const QString &name );

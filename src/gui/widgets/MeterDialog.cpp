@@ -30,7 +30,6 @@
 
 #include "MeterDialog.h"
 #include "MeterModel.h"
-#include "gui_templates.h"
 #include "LcdSpinBox.h"
 
 namespace lmms::gui
@@ -60,7 +59,6 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	{
 		auto num_label = new QLabel(tr("Meter Numerator"), num);
 		QFont f = num_label->font();
-		num_label->setFont( pointSize<7>( f ) );
 		num_layout->addSpacing( 5 );
 		num_layout->addWidget( num_label );
 	}
@@ -84,7 +82,6 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	{
 		auto den_label = new QLabel(tr("Meter Denominator"), den);
 		QFont f = den_label->font();
-		den_label->setFont( pointSize<7>( f ) );
 		den_layout->addSpacing( 5 );
 		den_layout->addWidget( den_label );
 	}

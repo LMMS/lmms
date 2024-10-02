@@ -56,7 +56,7 @@ class MixerChannel : public ThreadableJob
 
 		float m_peakLeft;
 		float m_peakRight;
-		sampleFrame * m_buffer;
+		SampleFrame* m_buffer;
 		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
 		BoolModel m_soloModel;
@@ -79,7 +79,7 @@ class MixerChannel : public ThreadableJob
 		auto color() const -> const std::optional<QColor>& { return m_color; }
 		void setColor(const std::optional<QColor>& color) { m_color = color; }
 
-		std::atomic_int m_dependenciesMet;
+		std::atomic_size_t m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		
@@ -137,10 +137,10 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel( const sampleFrame * _buf, mix_ch_t _ch );
+	void mixToChannel( const SampleFrame* _buf, mix_ch_t _ch );
 
 	void prepareMasterMix();
-	void masterMix( sampleFrame * _buf );
+	void masterMix( SampleFrame* _buf );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

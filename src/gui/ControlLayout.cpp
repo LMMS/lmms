@@ -101,8 +101,7 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 
 ControlLayout::~ControlLayout()
 {
-	QLayoutItem *item;
-	while ((item = takeAt(0))) { delete item; }
+	while (auto item = takeAt(0)) { delete item; }
 }
 
 void ControlLayout::onTextChanged(const QString&)

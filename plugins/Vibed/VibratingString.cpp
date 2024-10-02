@@ -26,6 +26,7 @@
 #include "interpolation.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "lmms_basics.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -75,12 +76,10 @@ std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int l
 	if (len > 0)
 	{
 		dl->data = std::make_unique<sample_t[]>(len);
-		float r;
-		float offset = 0.0f;
 		for (int i = 0; i < dl->length; ++i)
 		{
-			r = static_cast<float>(std::rand()) / RAND_MAX;
-			offset = (m_randomize / 2.0f - m_randomize) * r;
+			float r = static_cast<float>(std::rand()) / RAND_MAX;
+			float offset = (m_randomize / 2.0f - m_randomize) * r;
 			dl->data[i] = offset;
 		}
 	}
@@ -101,7 +100,7 @@ void VibratingString::resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstF
 	{
 		const float srcFrameFloat = frame * static_cast<float>(srcFrames) / dstFrames;
 		const float fracPos = srcFrameFloat - static_cast<f_cnt_t>(srcFrameFloat);
-		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), 1, srcFrames - 3);
+		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), f_cnt_t{1}, srcFrames - 3);
 		m_impulse[frame] = cubicInterpolate(
 			src[srcFrame - 1],
 			src[srcFrame + 0],

@@ -61,4 +61,9 @@ auto AudioResampler::resample(const float* in, long inputFrames, float* out, lon
 	return {src_process(m_state, &data), data.input_frames_used, data.output_frames_gen};
 }
 
+void AudioResampler::setRatio(double ratio)
+{
+	src_set_ratio(m_state, ratio);
+}
+
 } // namespace lmms
