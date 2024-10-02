@@ -58,7 +58,7 @@ jobs:
         run: |
           mkdir -p ~/tmpvolume
           hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
-          cp -R "~/tmpvolume/LMMS.app" /tmp/
+          cp -R ~/tmpvolume/LMMS.app /tmp/
       - name: Display help
         run: |
           /tmp/LMMS.app/Contents/MacOS/lmms --help | grep "Usage: lmms"
