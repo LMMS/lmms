@@ -56,9 +56,9 @@ jobs:
           name: macos-${{ matrix.config.arch }}
       - name: Mount the DMG
         run: |
-          mkdir -p /Volumes/lmms
-          hdiutil attach lmms-*.dmg -mountpoint /Volumes/lmms
-          cp -R "/Volumes/lmms/LMMS.app" /tmp/
+          mkdir -p ~/tmpvolume
+          hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
+          cp -R "~/tmpvolume/LMMS.app" /tmp/
       - name: Display help
         run: |
           /tmp/LMMS.app/Contents/MacOS/lmms --help | grep "Usage: lmms"
