@@ -58,8 +58,7 @@ jobs:
         run: |
           mkdir -p ~/tmpvolume
           hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+          cp -R "~/tmpvolume/LMMS.app" /tmp/
       - name: Display help
         run: |
           /tmp/LMMS.app/Contents/MacOS/lmms --help | grep "Usage: lmms"
