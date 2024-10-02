@@ -1,0 +1,121 @@
+---
+name: run-help
+'on': [push, pull_request]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  help-linux:
+    name: help-linux
+    runs-on: ubuntu-latest
+    #container: ghcr.io/lmms/linux.gcc:20.04
+    steps:
+      - name: wait for build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          check-name: 'linux'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+      - name: Download workflow artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          name: linux
+      - name: Extract artifact
+        run: |
+          chmod +x lmms-*.AppImage
+          ./lmms-*.AppImage --appimage-extract
+      - name: Display help
+        run: |
+          cd squashfs-root/
+          ./AppRun --help | grep "Usage: lmms"
+  help-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - arch: 'x86_64'
+            runner: 'macos-latest'
+          # ARM is currently disabled because there seems to be no runner available
+          # - arch: 'arm64'
+          #   runner: 'macos-14-arm64'
+    name: help-macos-${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.runner }}
+    steps:
+      - name: wait for build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          check-name: macos-${{ matrix.config.arch }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+      - name: Download workflow artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          name: macos-${{ matrix.config.arch }}
+      - name: Mount the DMG
+        run: |
+          hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
+          cp -R ~/tmpvolume/LMMS.app /tmp/
+      - name: Display help
+        run: |
+          /tmp/LMMS.app/Contents/MacOS/lmms --help | grep "Usage: lmms"
+  help-mingw:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ['32', '64']
+    name: help-mingw${{ matrix.arch }}
+    runs-on: windows-latest
+    steps:
+      - name: wait for build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          check-name: mingw${{ matrix.arch }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+      - name: Download workflow artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          name: mingw${{ matrix.arch }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+      - name: Display help
+        run: >
+            $exe = Get-ChildItem -Path . -Filter "lmms-*.exe" | Select-Object -First 1;
+            if ($null -eq $exe) { exit 1 };
+            $result = & $exe.FullName "--help" |
+            Select-String "Usage: lmms";
+            if($result.Matches.Count -eq 0) { exit 1 }
+  help-msvc:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ['x86', 'x64']
+    name: help-msvc-${{ matrix.arch }}
+    runs-on: windows-latest
+    steps:
+      - name: wait for build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          check-name: msvc-${{ matrix.arch }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+      - name: Download workflow artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          name: msvc-${{ matrix.arch }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+      - name: Display help
+        run: >
+            $exe = Get-ChildItem -Path . -Filter "lmms-*.exe" |  Select-Object -Property Name;
+            if ($null -eq $exe) { exit 1 };
+            $result = & ".\$($exe.Name)" "--help" | Select-String "Usage: lmms";
+            if($result.Matches.Count -eq 0) { exit 1 }
