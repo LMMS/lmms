@@ -11,17 +11,6 @@ target_include_directories(jack_headers INTERFACE jack2/common)
 ADD_SUBDIRECTORY(hiir)
 ADD_SUBDIRECTORY(weakjack)
 
-IF(WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
-	SET(MINGW TRUE)
-ENDIF()
-
-IF(MINGW)
-	# Work around linking errors with MinGW
-	SET(CDS_LIBRARY_TYPE SHARED)
-ELSE()
-	SET(CDS_LIBRARY_TYPE STATIC)
-ENDIF()
-
 ADD_LIBRARY(cds ${CDS_LIBRARY_TYPE}
 	libcds/src/init.cpp
 	libcds/src/hp.cpp
@@ -42,17 +31,9 @@ TARGET_INCLUDE_DIRECTORIES(cds
 	PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/libcds"
 )
 
-IF(CDS_LIBRARY_TYPE STREQUAL "STATIC")
-	TARGET_COMPILE_DEFINITIONS(cds
-		PUBLIC CDS_BUILD_STATIC_LIB
-	)
-ELSE()
-	TARGET_COMPILE_DEFINITIONS(cds
-		PRIVATE CDS_BUILD_LIB
-	)
-	# Install DLL
-	install(TARGETS cds RUNTIME DESTINATION .)
-ENDIF()
+TARGET_COMPILE_DEFINITIONS(cds
+	PUBLIC CDS_BUILD_STATIC_LIB
+)
 
 # The lockless ring buffer library is linked as part of the core
 add_library(ringbuffer OBJECT
