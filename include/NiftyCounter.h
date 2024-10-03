@@ -12,6 +12,9 @@
 
 #pragma once
 
+namespace lmms
+{
+
 /// Nifty counter, also known as "Schwarz Counter". Used for ensuring global
 /// static object initialization and destruction order.
 
@@ -58,3 +61,5 @@ private:
 	thread_local static int s_count;
 };
 template <void C(), void D()> thread_local int NiftyCounterTL<C, D>::s_count = 0;
+
+} // namespace lmms

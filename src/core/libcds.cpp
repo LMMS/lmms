@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace _cdslib
+namespace lmms::_cdslib
 {
 
 void init()
@@ -31,4 +31,4 @@ void thread_deinit()
 	}
 }
 
-}
+} // namespace lmms::_cdslib
