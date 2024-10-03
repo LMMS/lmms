@@ -24,6 +24,7 @@
 
 #include "AudioFileProcessorWaveView.h"
 
+#include "Sample.h"
 #include "ConfigManager.h"
 #include "SampleThumbnail.h"
 #include "FontHelper.h"
