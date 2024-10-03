@@ -51,10 +51,20 @@ public:
 		return "videoclip";
 	}
 
+    QString& videoFile()
+    {
+        return m_videoFile;
+    }
+
+	void changeLength( const TimePos & _length ) override;
+	void setVideoFile(const QString& vf);
+
     void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
     void loadSettings( const QDomElement & _this ) override;
 
 private:
+    QString m_videoFile;
+
 	friend class gui::VideoClipView;
 };
 

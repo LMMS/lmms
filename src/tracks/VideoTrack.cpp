@@ -33,7 +33,7 @@ namespace lmms
 VideoTrack::VideoTrack(TrackContainer* tc):
     Track(Track::Type::Video, tc)
 {
-
+    setName(tr("Video track"));
 }
 
 bool VideoTrack::play(const TimePos & start, const fpp_t frames, const f_cnt_t frameBase, int clipNum)

@@ -22,16 +22,26 @@
  *
  */
 
-//#include "VideoTrack.h"
+#include "embed.h"
+#include "GuiApplication.h"
+#include "TrackLabelButton.h"
+#include "VideoTrack.h"
 #include "VideoTrackView.h"
 
 
 namespace lmms::gui
 {
 
-VideoTrackView::VideoTrackView(Track * _track, TrackContainerView* tcv):
+VideoTrackView::VideoTrackView(VideoTrack * _track, TrackContainerView* tcv):
     TrackView(_track, tcv)
 {
+	setFixedHeight(32);
+
+	m_trackLabel = new TrackLabelButton(this, getTrackSettingsWidget());
+	m_trackLabel->setIcon( embed::getIconPixmap("video_track"));
+	m_trackLabel->move(3, 1);
+	m_trackLabel->show();
+	setModel(_track);
 }
 
 void VideoTrackView::saveSettings( QDomDocument & _doc, QDomElement & _parent )

@@ -30,25 +30,40 @@
 namespace lmms
 {
 
-//class VideoTrack;
+class VideoTrack;
 
 namespace gui
 {
+
+class TrackLabelButton;
 
 class VideoTrackView : public TrackView
 {
     Q_OBJECT
 public:
-    VideoTrackView(Track * _track, TrackContainerView* tcv);
+    VideoTrackView(VideoTrack * _track, TrackContainerView* tcv);
 
     void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
     void loadSettings( const QDomElement & _this ) override;
+
+	VideoTrack * model()
+	{
+		return castModel<VideoTrack>();
+	}
+
+	const VideoTrack * model() const
+	{
+		return castModel<VideoTrack>();
+	}
 
 protected:
 	QString nodeName() const override
 	{
 		return "VideoTrackView";
 	}
+
+private:
+    TrackLabelButton * m_trackLabel;
 
 };
 

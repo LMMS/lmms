@@ -30,6 +30,8 @@
 namespace lmms
 {
 
+class VideoClip;
+
 namespace gui
 {
 
@@ -37,10 +39,16 @@ class VideoClipView : public ClipView
 {
     Q_OBJECT
 public:
-    VideoClipView(Clip * clip, TrackView * tv);
+    VideoClipView(VideoClip * clip, TrackView * tv);
     //~VideoClip() override;
 
+protected:
+	void paintEvent(QPaintEvent * pe) override;
+
 private:
+    VideoClip * m_clip;
+	QPixmap m_paintPixmap;
+    
     bool splitClip( const TimePos pos ) override;
 };
 

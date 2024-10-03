@@ -31,11 +31,26 @@ namespace lmms
 VideoClip::VideoClip(Track * track):
     Clip(track)
 {
+	saveJournallingState( false );
+	setVideoFile( "" );
+	restoreJournallingState();
 }
 
 gui::ClipView * VideoClip::createView(gui::TrackView * tv)
 {
     return new gui::VideoClipView(this, tv);
+}
+
+void VideoClip::changeLength(const TimePos & _length)
+{
+	Clip::changeLength(std::max(static_cast<int>(_length), 1));
+}
+
+void VideoClip::setVideoFile(const QString& vf)
+{
+    m_videoFile = vf;
+	changeLength(TimePos::ticksPerBar());
+	setStartTimeOffset(0);
 }
 
 void VideoClip::saveSettings( QDomDocument & _doc, QDomElement & _parent )
