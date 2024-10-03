@@ -31,6 +31,7 @@
 #include "Track.h" // I don't think this is right
 #include "VideoClipView.h"
 #include "VideoClip.h"
+#include "VideoClipWindow.h"
 
 namespace lmms::gui
 {
@@ -41,9 +42,19 @@ VideoClipView::VideoClipView(VideoClip * clip, TrackView * tv):
     m_paintPixmap()
 {
     //updateVideo();
+	m_window = new VideoClipWindow(m_clip);
+	m_window->toggleVisibility(false);
 
 	setStyle(QApplication::style());
 }
+
+
+
+void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
+{
+	m_window->toggleVisibility(m_window->parentWidget()->isHidden());
+}
+
 
 void VideoClipView::paintEvent(QPaintEvent* pe)
 {

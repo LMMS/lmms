@@ -1,5 +1,5 @@
 /*
- * VideoClipView.h
+ * VideoClipWindow.h
  *
  * Copyright (c) 2024 regulus79
  *
@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef LMMS_VIDEO_CLIP_VIEW_H
-#define LMMS_VIDEO_CLIP_VIEW_H
+#ifndef LMMS_GUI_VIDEO_CLIP_WINDOW_H
+#define LMMS_GUI_VIDEO_CLIP_WINDOW_H
 
-#include "ClipView.h"
+#include <QWidget>
 
 namespace lmms
 {
@@ -35,30 +35,22 @@ class VideoClip;
 namespace gui
 {
 
-class VideoClipWindow;
-
-class VideoClipView : public ClipView
+class VideoClipWindow : public QWidget
 {
     Q_OBJECT
 public:
-    VideoClipView(VideoClip * clip, TrackView * tv);
-    //~VideoClip() override;
+    VideoClipWindow(VideoClip * vclip);
 
-protected:
-	void paintEvent(QPaintEvent * pe) override;
-    void mouseDoubleClickEvent(QMouseEvent * me) override;
+public slots:
+	void toggleVisibility(bool on);
 
 private:
     VideoClip * m_clip;
-	QPixmap m_paintPixmap;
 
-    VideoClipWindow * m_window;
-    
-    bool splitClip( const TimePos pos ) override;
 };
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif // LMMS_VIDEO_CLIP_VIEW_H
+#endif // LMMS_GUI_VIDEO_CLIP_WINDOW_H
