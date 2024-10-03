@@ -25,13 +25,13 @@
 #include "BufferPool.h"
 #include "PlayHandle.h"
 #include "Engine.h"
-#include "Mixer.h"
-#include "MixHelpers.h"
+#include "AudioEngine.h"
 
-#include <QtCore/QThread>
-#include <QDebug>
+#include <QThread>
 
-#include <iterator>
+
+namespace lmms
+{
 
 PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
@@ -55,12 +55,12 @@ void PlayHandle::doProcessing()
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
-		MixHelpers::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
+		zeroSampleFrames(m_playHandleBuffer, Engine::audioEngine()->framesPerPeriod());
 		play( buffer() );
 	}
 	else
 	{
-		play( NULL );
+		play( nullptr );
 	}
 }
 
@@ -70,7 +70,9 @@ void PlayHandle::releaseBuffer()
 	m_bufferReleased = true;
 }
 
-sampleFrame* PlayHandle::buffer()
+SampleFrame* PlayHandle::buffer()
 {
-	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
+	return m_bufferReleased ? nullptr : m_playHandleBuffer;
 };
+
+} // namespace lmms

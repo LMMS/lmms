@@ -1,0 +1,151 @@
+#!/usr/bin/python3
+
+# This script checks for strings like paths or class names that are *not* in the source code, but e.g. in
+# translation files, stylesheets or git files.
+# Invalid strings *in the source code* are usually recognized when you compile them, but other strings may
+# be overseen, which is why this script checks strings *outside of the source code*.
+
+
+import re
+import subprocess
+import xml.etree.ElementTree as ElementTree
+from pathlib import Path
+import tinycss2
+
+
+# global variables
+
+errors = 0
+
+
+# functions
+
+def caption(my_str):
+    print(f'\n# {my_str}\n')
+
+def error(where, my_str):
+    global errors
+    errors += 1
+    print(f'Error: {where}: {my_str}')
+
+# if a string makes a classname, we need to check if that class is in the source
+# however, some of these strings name classes that are not from LMMS, so these can be ignored for such checks:
+def is_our_class(classname: str) -> int:
+    return classname[0] != 'Q'  # Qt classes
+
+
+# prepare some variables
+
+if not Path('.gitmodules').is_file():
+    print('You need to call this script from the LMMS top directory')
+    exit(1)
+
+result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', '*.ui', ':!tests/*'],
+                        capture_output=True, text=True, check=True)
+files = [Path(f) for f in result.stdout.splitlines()]
+carlabase = 'carlabase' if Path('plugins/carlabase').is_dir() else 'CarlaBase'
+carlapath = f'plugins/{carlabase}/carla/'
+result = subprocess.run(['git',
+                         '--git-dir',   f'{carlapath}/.git',
+                         '--work-tree', f'{carlapath}',
+                         'ls-files', 'resources/ui', 'source/frontend'], capture_output=True, text=True, check=True)
+files.extend([Path(f'{carlapath}/{f}') for f in result.stdout.splitlines()])
+
+classes = set()
+class_pat = re.compile(r'^\s*class(?:\s+LMMS_EXPORT)?\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.MULTILINE)
+class_pat_ui = re.compile(r'<class>([a-zA-Z_][a-zA-Z0-9_]*)</class>')
+for cur_file in files:
+    if cur_file.is_file():
+        text = cur_file.read_text(errors='replace')
+        classes.update(re.findall(class_pat_ui if cur_file.suffix == '.ui' else class_pat, text))
+
+
+# the real checks
+
+caption('.gitmodules')
+
+for p in re.findall(r'\[submodule "([^"]+)"\]\s*$', Path('.gitmodules').read_text(errors='replace'), re.MULTILINE):
+    if not Path(p).is_dir():
+        error('.gitmodules', f'Directory does not exist: {p}')
+
+
+caption('locale')
+
+classes_found = set()
+for cur_file in Path('data/locale').glob('*.ts'):
+    tree = ElementTree.parse(str(cur_file))
+    root = tree.getroot()
+    for location in root.findall('./context/name'):
+        classes_found.add(location.text)
+for c in sorted(classes_found):
+    if is_our_class(c) and '::' not in c and c not in classes:
+        error('data/locale', f'Class does not exist in source code: {c}')
+
+
+caption('themes')
+
+
+GUI_NAMESPACE_PREFIX = "lmms--gui"
+
+
+def unscope_classname(stylesheet, cname):
+    # Strip the namespace part from the given class name,
+    # while expecting it to have one in the first place.
+    SCOPE_TOKEN = "--"
+    i = cname.rfind(SCOPE_TOKEN) + len(SCOPE_TOKEN)
+
+    assert i>=0
+
+    return cname[i:]
+
+
+for theme in sorted([d for d in Path('data/themes').iterdir() if d.is_dir()]):
+    classes_in_sheet = set()
+    stylesheet = theme / 'style.css'
+    rules = tinycss2.parse_stylesheet(Path(stylesheet).read_text(errors='replace'))
+    for rule in rules:
+        if rule.type == 'qualified-rule':
+            class_found = False
+            for c in rule.prelude:
+                if c.type == 'ident' and not class_found:
+                    if is_our_class(c.value):
+                        if str(c.value).startswith(GUI_NAMESPACE_PREFIX):
+                            classes_in_sheet.add(unscope_classname(stylesheet, c.value))
+                        else:
+                            error(stylesheet.as_posix(), f"Namespace prefix missing from class {c.value}")
+                    class_found = True
+                # After whitespace or comma comes a new class
+                elif c.type == 'whitespace' or (c.type == 'literal' and c.value == ','):
+                    class_found = False
+    missing_classes = classes_in_sheet - classes
+    for class_in_sheet in sorted(missing_classes):
+        error(stylesheet.as_posix(), f'Class does not exist in source code: {class_in_sheet}')
+
+
+caption('patches (checks only plugins/)')
+
+pat = re.compile(r'/(plugins/\S*)', re.MULTILINE)
+calf = re.compile(r'calf/.*/modules\.')  # these are a bit complicated to fix...
+for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
+    if Path(cur_file).is_file():
+        paths_in_patches = set()
+        for line in pat.findall(cur_file.read_text(errors='replace')):
+            if not calf.search(line):
+                paths_in_patches.add(Path(line))
+        for mpath in sorted(paths_in_patches):
+            # in case of LADSPA SWH effects, check that the XML exists, not the C file
+            # (because the C files are not generated until a build is done)
+            if mpath.parent == Path('plugins/LadspaEffect/swh/ladspa/'):
+                mpath = mpath.with_suffix('.xml')
+            if not mpath.is_file():
+                error(cur_file.as_posix(), f'Source file does not exist: {mpath.as_posix()}')
+
+
+
+
+# summary
+
+caption('summary')
+
+print(f'{str(errors)} errors.')
+exit(1 if errors > 0 else 0)

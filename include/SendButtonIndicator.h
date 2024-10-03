@@ -1,33 +1,66 @@
-#ifndef SENDBUTTONINDICATOR_H
-#define SENDBUTTONINDICATOR_H
+/*
+ * SendButtonIndicator.h
+ *
+ * Copyright (c) 2014-2022 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
-#include <QDebug>
+#ifndef LMMS_GUI_SEND_BUTTON_INDICATOR_H
+#define LMMS_GUI_SEND_BUTTON_INDICATOR_H
+
 #include <QLabel>
-#include <QPixmap>
+#include "embed.h"
 
-#include "FxLine.h"
-#include "FxMixerView.h"
 
-class FxLine;
-class FxMixerView;
+namespace lmms
+{
 
-class SendButtonIndicator : public QLabel 
+class FloatModel;
+
+namespace gui
+{
+
+class MixerChannelView;
+class MixerView;
+
+class SendButtonIndicator : public QLabel
 {
 public:
-	SendButtonIndicator( QWidget * _parent, FxLine * _owner,
-						 FxMixerView * _mv);
+	SendButtonIndicator(QWidget* parent, MixerChannelView* owner, MixerView* mv);
 
-	void mousePressEvent( QMouseEvent * e ) override;
+	void mousePressEvent(QMouseEvent* e) override;
 	void updateLightStatus();
 
 private:
 
-	FxLine * m_parent;
-	FxMixerView * m_mv;
-	static QPixmap * s_qpmOn;
-	static QPixmap * s_qpmOff;
+	MixerChannelView* m_parent;
+	MixerView* m_mv;
+	QPixmap m_qpmOff = embed::getIconPixmap("mixer_send_off", 29, 20);
+	QPixmap m_qpmOn = embed::getIconPixmap("mixer_send_on", 29, 20);
 
-	FloatModel * getSendModel();
+	FloatModel* getSendModel();
 };
 
-#endif // SENDBUTTONINDICATOR_H
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_SEND_BUTTON_INDICATOR_H

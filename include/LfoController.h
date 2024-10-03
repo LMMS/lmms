@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LFO_CONTROLLER_H
-#define LFO_CONTROLLER_H
+#ifndef LMMS_LFO_CONTROLLER_H
+#define LMMS_LFO_CONTROLLER_H
 
 #include <QWidget>
 
@@ -34,20 +34,30 @@
 #include "TempoSyncKnobModel.h"
 #include "Oscillator.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
 class automatableButtonGroup;
-class Knob;
 class LedCheckBox;
-class TempoSyncKnob;
 class PixmapButton;
+class Knob;
+class TempoSyncKnob;
+
+class LfoControllerDialog;
+
+}
 
 
-class LfoController : public Controller 
+class LfoController : public Controller
 {
 	Q_OBJECT
 public:
 	LfoController( Model * _parent );
 
-	virtual ~LfoController();
+	~LfoController() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -55,7 +65,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
 
 
 protected:
@@ -76,25 +86,27 @@ protected:
 	sample_t (*m_sampleFunction)( const float );
 
 private:
-	SampleBuffer * m_userDefSampleBuffer;
+	float m_heldSample;
+	std::shared_ptr<const SampleBuffer> m_userDefSampleBuffer = SampleBuffer::emptyBuffer();
 
 protected slots:
 	void updatePhase();
 	void updateSampleFunction();
 	void updateDuration();
 
-	friend class LfoControllerDialog;
+	friend class gui::LfoControllerDialog;
 
 } ;
 
-
+namespace gui
+{
 
 class LfoControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
 	LfoControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~LfoControllerDialog();
+	~LfoControllerDialog() override;
 
 
 protected:
@@ -120,4 +132,9 @@ private slots:
 
 } ;
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_LFO_CONTROLLER_H

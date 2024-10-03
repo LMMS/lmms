@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef LMMS_CONTROLLER_H
+#define LMMS_CONTROLLER_H
 
 #include "lmms_export.h"
 #include "Engine.h"
@@ -33,34 +32,41 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
-class ControllerDialog;
+namespace lmms
+{
+
 class Controller;
 class ControllerConnection;
 
-typedef QVector<Controller *> ControllerVector;
+namespace gui
+{
 
+class ControllerDialog;
+
+} // namespace gui
+
+using ControllerVector = std::vector<Controller*>;
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	enum ControllerTypes
+	enum class ControllerType
 	{
-		DummyController,
-		LfoController,
-		MidiController,
-		PeakController,
+		Dummy,
+		Lfo,
+		Midi,
+		Peak,
 		/*
-		XYController,
-		EquationController
+		XY,
+		Equation
 		*/
-		NumControllerTypes
 	} ;
 
-	Controller( ControllerTypes _type, Model * _parent,
+	Controller( ControllerType _type, Model * _parent,
 						const QString & _display_name );
 
-	virtual ~Controller();
+	~Controller() override;
 
 	virtual float currentValue( int _offset );
 	// The per-controller get-value-in-buffers function
@@ -76,7 +82,7 @@ public:
 		m_sampleExact = _exact;
 	}
 
-	inline ControllerTypes type() const
+	inline ControllerType type() const
 	{
 		return( m_type );
 	}
@@ -87,8 +93,8 @@ public:
 	{
 		switch( m_type )
 		{
-			case LfoController: return( true );
-			case PeakController: return( true );
+			case ControllerType::Lfo: return( true );
+			case ControllerType::Peak: return( true );
 			default:
 				break;
 		}
@@ -105,13 +111,13 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	QString nodeName() const override;
 
-	static Controller * create( ControllerTypes _tt, Model * _parent );
+	static Controller * create( ControllerType _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
 							Model * _parent );
 
 	inline static float fittedValue( float _val )
 	{
-		return qBound<float>( 0.0f, _val, 1.0f );
+		return std::clamp(_val, 0.0f, 1.0f);
 	}
 
 	static long runningPeriods()
@@ -132,7 +138,7 @@ public:
 	bool hasModel( const Model * m ) const;
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	virtual gui::ControllerDialog * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -158,7 +164,7 @@ protected:
 	int m_connectionCount;
 
 	QString m_name;
-	ControllerTypes m_type;
+	ControllerType m_type;
 
 	static ControllerVector s_controllers;
 
@@ -166,12 +172,14 @@ protected:
 
 
 signals:
-	// The value changed while the mixer isn't running (i.e: MIDI CC)
+	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerDialog;
+	friend class gui::ControllerDialog;
 
 } ;
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_CONTROLLER_H

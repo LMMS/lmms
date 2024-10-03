@@ -22,12 +22,15 @@
  *
  */
 
-#ifndef LOCKLESS_LIST_H
-#define LOCKLESS_LIST_H
+#ifndef LMMS_LOCKLESS_LIST_H
+#define LMMS_LOCKLESS_LIST_H
 
 #include "MemoryPool.h"
 
 #include <atomic>
+
+namespace lmms
+{
 
 template<typename T>
 class LocklessList
@@ -91,4 +94,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_LOCKLESS_LIST_H

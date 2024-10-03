@@ -1,14 +1,13 @@
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
-INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}")
-
-SET(CMAKE_CXX_STANDARD 11)
-
 SET(CMAKE_AUTOMOC ON)
 
 ADD_EXECUTABLE(benchmarks
 	EXCLUDE_FROM_ALL
 	benchmark.cpp
 )
-TARGET_LINK_LIBRARIES(benchmarks lmmslib)
+
+# TODO replace usages of include_directories in src/CMakeLists.txt with target_include_directories
+# and remove this line (also in tests/CMakeLists.txt)
+target_include_directories(benchmarks PRIVATE $<TARGET_PROPERTY:lmmsobjs,INCLUDE_DIRECTORIES>)
+
+target_static_libraries(benchmarks PRIVATE lmmsobjs)
+target_compile_features(benchmarks PRIVATE cxx_std_17)

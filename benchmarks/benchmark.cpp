@@ -14,6 +14,8 @@
 
 #include "NotePlayHandle.h"
 
+using namespace lmms;
+
 template<typename T>
 using LocklessQueue = cds::container::VyukovMPMCCycleQueue<T>;
 
@@ -116,7 +118,6 @@ int main(int argc, char* argv[])
 		constexpr size_t S = 256;
 		using T = std::array<char, S>;
 		benchmark_allocator("std::allocator", std::allocator<T>{}, n, 1);
-		benchmark_allocator("MmAllocator", MmAllocator<T>{}, n, 1);
 		benchmark_allocator("MemoryPool", MemoryPool<T>{n}, n, 1);
 	}
 	{
@@ -124,7 +125,6 @@ int main(int argc, char* argv[])
 		constexpr size_t S = 256;
 		using T = std::array<char, S>;
 		benchmark_allocator_threaded("std::allocator", std::allocator<T>{}, n, 4);
-		benchmark_allocator_threaded("MmAllocator", MmAllocator<T>{}, n, 4);
 		benchmark_allocator_threaded("MemoryPool", MemoryPool<T>{n}, n, 4);
 	}
 }

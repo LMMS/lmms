@@ -36,6 +36,11 @@
 
 #include <CoreMIDI/CoreMIDI.h>
 
+
+namespace lmms
+{
+
+
 const unsigned int SYSEX_LENGTH=1024;
 
 MidiApple::MidiApple() :
@@ -254,7 +259,7 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 		nBytes = packet->length;
 		// Check if this is the end of a continued SysEx message
 		if (continueSysEx) {
-			unsigned int lengthToCopy = qMin(nBytes, SYSEX_LENGTH - sysExLength);
+			unsigned int lengthToCopy = std::min(nBytes, SYSEX_LENGTH - sysExLength);
 			// Copy the message into our SysEx message buffer,
 			// making sure not to overrun the buffer
 			memcpy(sysExMessage + sysExLength, packet->data, lengthToCopy);
@@ -293,7 +298,7 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 				{
 					// MIDI SysEx then we copy the rest of the message into the SysEx message buffer
 					unsigned int lengthLeftInMessage = nBytes - iByte;
-					unsigned int lengthToCopy = qMin(lengthLeftInMessage, SYSEX_LENGTH);
+					unsigned int lengthToCopy = std::min(lengthLeftInMessage, SYSEX_LENGTH);
 					
 					memcpy(sysExMessage + sysExLength, packet->data, lengthToCopy);
 					sysExLength += lengthToCopy;
@@ -318,28 +323,28 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 				}
 				
 				unsigned char messageChannel = status & 0xF;
-				const MidiEventTypes cmdtype = static_cast<MidiEventTypes>( status & 0xF0 );
+				const MidiEventTypes cmdtype = static_cast<MidiEventTypes>(status & 0xF0);
 				const int par1 = packet->data[iByte + 1];
 				const int par2 = packet->data[iByte + 2];
 
 				switch (cmdtype)
 				{
-					case MidiNoteOff: //0x80:
-					case MidiNoteOn: //0x90:
-					case MidiKeyPressure: //0xA0:
-						notifyMidiPortList(m_inputSubs[refName],MidiEvent( cmdtype, messageChannel, par1 - KeysPerOctave, par2 & 0xff, &endPointRef ));
+					case MidiNoteOff:			//0x80:
+					case MidiNoteOn:			//0x90:
+					case MidiKeyPressure:		//0xA0:
+					case MidiControlChange:		//0xB0:
+					case MidiProgramChange:		//0xC0:
+					case MidiChannelPressure:	//0xD0:
+						notifyMidiPortList(
+							m_inputSubs[refName],
+							MidiEvent(cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef));
 						break;
-						
-					case MidiControlChange: //0xB0:
-					case MidiProgramChange: //0xC0:
-					case MidiChannelPressure: //0xD0:
-						notifyMidiPortList(m_inputSubs[refName],MidiEvent( cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef ));
+					case MidiPitchBend:			//0xE0:
+						notifyMidiPortList(
+							m_inputSubs[refName],
+							MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
 						break;
-						
-					case MidiPitchBend: //0xE0:
-						notifyMidiPortList(m_inputSubs[refName],MidiEvent( cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef ));
-						break;
-					case MidiActiveSensing: //0xF0
+					case MidiActiveSensing:		//0xF0
 					case 0xF0:
 						break;
 					default:
@@ -398,7 +403,7 @@ void MidiApple::midiInClose( MIDIEndpointRef reference )
 
 
 
-char *getName( MIDIObjectRef &object )
+char *getName( const MIDIObjectRef &object )
 {
 	// Returns the name of a given MIDIObjectRef as char *
 	CFStringRef name = nullptr;
@@ -625,6 +630,6 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 }
 
 
-#endif
+} // namespace lmms
 
-
+#endif // LMMS_BUILD_APPLE

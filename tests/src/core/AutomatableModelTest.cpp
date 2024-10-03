@@ -22,15 +22,16 @@
  *
  */
 
-#include "QTestSuite.h"
 
+#include <QtTest/QtTest>
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+#include "Engine.h"
 
-class AutomatableModelTest : QTestSuite
+class AutomatableModelTest : public QObject
 {
 	Q_OBJECT
-
+public:
 	bool m1Changed, m2Changed;
 	void resetChanged() { m1Changed = m2Changed = false; }
 
@@ -41,8 +42,23 @@ private slots: // helper slots
 private slots: // tests
 	//! Test that upcast and exact casts work,
 	//! but no downcast or any other casts
+
+	void initTestCase()
+	{
+		using namespace lmms;
+		Engine::init(true);
+	}
+
+	void cleanupTestCase()
+	{
+		using namespace lmms;
+		Engine::destroy();
+	}
+
 	void CastTests()
 	{
+		using namespace lmms;
+
 		ComboBoxModel comboModel;
 		AutomatableModel* amPtr = &comboModel;
 		QVERIFY(nullptr == amPtr->dynamicCast<FloatModel>()); // not a parent class
@@ -60,6 +76,8 @@ private slots: // tests
 
 	void LinkTests()
 	{
+		using namespace lmms;
+
 		BoolModel m1(false), m2(false);
 
 		QObject::connect(&m1, SIGNAL(dataChanged()),
@@ -96,6 +114,7 @@ private slots: // tests
 		QVERIFY(m2.value());
 		QVERIFY(!m3.value());
 	}
-} AutomatableModelTests;
+};
 
+QTEST_GUILESS_MAIN(AutomatableModelTest)
 #include "AutomatableModelTest.moc"

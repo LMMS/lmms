@@ -27,6 +27,10 @@
 #include "CrossoverEQControls.h"
 #include "CrossoverEQ.h"
 
+namespace lmms
+{
+
+
 CrossoverEQControls::CrossoverEQControls( CrossoverEQEffect * eff ) :
 	EffectControls( eff ),
 	m_effect( eff ),
@@ -42,7 +46,7 @@ CrossoverEQControls::CrossoverEQControls( CrossoverEQEffect * eff ) :
 	m_mute3( true, this, "Mute Band 3" ),
 	m_mute4( true, this, "Mute Band 4" )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	connect( &m_xover12, SIGNAL( dataChanged() ), this, SLOT( xover12Changed() ) );
 	connect( &m_xover23, SIGNAL( dataChanged() ), this, SLOT( xover23Changed() ) );
 	connect( &m_xover34, SIGNAL( dataChanged() ), this, SLOT( xover34Changed() ) );
@@ -115,3 +119,6 @@ void CrossoverEQControls::sampleRateChanged()
 {
 	m_effect->sampleRateChanged();
 }
+
+
+} // namespace lmms

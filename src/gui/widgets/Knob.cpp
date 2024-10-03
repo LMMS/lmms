@@ -22,12 +22,8 @@
  *
  */
 
-#include <memory>
-#include <QApplication>
-#include <QBitmap>
-#include <QFontMetrics>
-#include <QInputDialog>
-#include <QMouseEvent>
+#include "Knob.h"
+
 #include <QPainter>
 
 #ifndef __USE_XOPEN
@@ -35,34 +31,19 @@
 #endif
 
 #include "lmms_math.h"
-#include "Knob.h"
-#include "CaptionMenu.h"
-#include "ConfigManager.h"
-#include "ControllerConnection.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
-#include "GuiApplication.h"
-#include "LocaleHelper.h"
-#include "MainWindow.h"
-#include "ProjectJournal.h"
-#include "Song.h"
-#include "stdshims.h"
-#include "StringPairDrag.h"
-#include "TextFloat.h"
-
-TextFloat * Knob::s_textFloat = NULL;
+#include "FontHelper.h"
 
 
+namespace lmms::gui
+{
 
-
-Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
-	QWidget( _parent ),
-	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
+Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
+	FloatModelEditorBase(DirectionOfManipulation::Vertical, _parent, _name),
 	m_label( "" ),
-	m_volumeKnob( false ),
-	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false ),
+	m_isHtmlLabel(false),
+	m_tdRenderer(nullptr),
 	m_angle( -10 ),
 	m_lineWidth( 0 ),
 	m_textColor( 255, 255, 255 ),
@@ -72,7 +53,7 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 }
 
 Knob::Knob( QWidget * _parent, const QString & _name ) :
-	Knob( knobBright_26, _parent, _name )
+	Knob( KnobType::Bright26, _parent, _name )
 {
 }
 
@@ -81,18 +62,10 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 
 void Knob::initUi( const QString & _name )
 {
-	if( s_textFloat == NULL )
-	{
-		s_textFloat = new TextFloat;
-	}
-
-	setWindowTitle( _name );
-
 	onKnobNumUpdated();
 	setTotalAngle( 270.0f );
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
-	setFocusPolicy( Qt::ClickFocus );
 
 	// This is a workaround to enable style sheets for knobs which are not styled knobs.
 	//
@@ -103,15 +76,15 @@ void Knob::initUi( const QString & _name )
 	// overrides that color.
 	switch (knobNum())
 	{
-	case knobSmall_17:
-	case knobBright_26:
-	case knobDark_28:
+	case KnobType::Small17:
+	case KnobType::Bright26:
+	case KnobType::Dark28:
 		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
 		m_arcActiveColor = QColor(QApplication::palette().color(
 									QPalette::Active, QPalette::WindowText));
 		m_arcActiveColor.setAlpha(70);
 		break;
-	case knobVintage_32:
+	case KnobType::Vintage32:
 		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
 		m_arcActiveColor = QColor(QApplication::palette().color(
 									QPalette::Active, QPalette::Shadow));
@@ -120,38 +93,34 @@ void Knob::initUi( const QString & _name )
 	default:
 		break;
 	}
-
-	doConnections();
 }
-
-
 
 
 void Knob::onKnobNumUpdated()
 {
-	if( m_knobNum != knobStyled )
+	if( m_knobNum != KnobType::Styled )
 	{
 		QString knobFilename;
 		switch (m_knobNum)
 		{
-		case knobDark_28:
+		case KnobType::Dark28:
 			knobFilename = "knob01";
 			break;
-		case knobBright_26:
+		case KnobType::Bright26:
 			knobFilename = "knob02";
 			break;
-		case knobSmall_17:
+		case KnobType::Small17:
 			knobFilename = "knob03";
 			break;
-		case knobVintage_32:
+		case KnobType::Vintage32:
 			knobFilename = "knob05";
 			break;
-		case knobStyled: // only here to stop the compiler from complaining
+		case KnobType::Styled: // only here to stop the compiler from complaining
 			break;
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap = make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
+		m_knobPixmap = std::make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
 		if (!this->isEnabled())
 		{
 			convertPixmapToGrayScale(*m_knobPixmap.get());
@@ -166,12 +135,36 @@ void Knob::onKnobNumUpdated()
 void Knob::setLabel( const QString & txt )
 {
 	m_label = txt;
+	m_isHtmlLabel = false;
 	if( m_knobPixmap )
 	{
 		setFixedSize(qMax<int>( m_knobPixmap->width(),
-					horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
+					horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label)),
 						m_knobPixmap->height() + 10);
 	}
+
+	update();
+}
+
+
+void Knob::setHtmlLabel(const QString &htmltxt)
+{
+	m_label = htmltxt;
+	m_isHtmlLabel = true;
+	// Put the rendered HTML content into cache
+	if (!m_tdRenderer)
+	{
+		m_tdRenderer = new QTextDocument(this);
+	}
+
+	m_tdRenderer->setHtml(QString("<span style=\"color:%1;\">%2</span>").arg(textColor().name(), m_label));
+
+	if (m_knobPixmap)
+	{
+		setFixedSize(m_knobPixmap->width(),
+				m_knobPixmap->height() + 15);
+	}
+
 	update();
 }
 
@@ -224,7 +217,7 @@ void Knob::setOuterRadius( float r )
 
 
 
-knobTypes Knob::knobNum() const
+KnobType Knob::knobNum() const
 {
 	return m_knobNum;
 }
@@ -232,7 +225,7 @@ knobTypes Knob::knobNum() const
 
 
 
-void Knob::setknobNum( knobTypes k )
+void Knob::setknobNum( KnobType k )
 {
 	if( m_knobNum != k )
 	{
@@ -340,7 +333,7 @@ bool Knob::updateAngle()
 	{
 		angle = angleFromValue( model()->inverseScaledValue( model()->value() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 	}
-	if( qAbs( angle - m_angle ) > 3 )
+	if( qAbs( angle - m_angle ) > 0 )
 	{
 		m_angle = angle;
 		return true;
@@ -370,7 +363,7 @@ void Knob::drawKnob( QPainter * _p )
 
 	QPoint mid;
 
-	if( m_knobNum == knobStyled )
+	if( m_knobNum == KnobType::Styled )
 	{
 		p.setRenderHint( QPainter::Antialiasing );
 
@@ -421,17 +414,17 @@ void Knob::drawKnob( QPainter * _p )
 	p.setPen(QPen(currentLineColor, 2));
 	switch( m_knobNum )
 	{
-		case knobSmall_17:
+		case KnobType::Small17:
 		{
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
-		case knobBright_26:
+		case KnobType::Bright26:
 		{
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
-		case knobDark_28:
+		case KnobType::Dark28:
 		{
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
@@ -441,12 +434,12 @@ void Knob::drawKnob( QPainter * _p )
 			p.drawLine( ln );
 			break;
 		}
-		case knobVintage_32:
+		case KnobType::Vintage32:
 		{
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
-		case knobStyled:
+		case KnobType::Styled:
 			break;
 	}
 
@@ -457,183 +450,6 @@ void Knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
-float Knob::getValue( const QPoint & _p )
-{
-	float value;
-
-	// knob value increase is linear to mouse movement
-	value = .4f * _p.y();
-
-	// if shift pressed we want slower movement
-	if( gui->mainWindow()->isShiftPressed() )
-	{
-		value /= 4.0f;
-		value = qBound( -4.0f, value, 4.0f );
-	}
-	return value * pageSize();
-}
-
-
-
-
-void Knob::contextMenuEvent( QContextMenuEvent * )
-{
-	// for the case, the user clicked right while pressing left mouse-
-	// button, the context-menu appears while mouse-cursor is still hidden
-	// and it isn't shown again until user does something which causes
-	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent( NULL );
-
-	CaptionMenu contextMenu( model()->displayName(), this );
-	addDefaultActions( &contextMenu );
-	contextMenu.addAction( QPixmap(),
-		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
-		this, SLOT( toggleScale() ) );
-	contextMenu.addSeparator();
-	contextMenu.exec( QCursor::pos() );
-}
-
-
-void Knob::toggleScale()
-{
-	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
-	update();
-}
-
-
-
-void Knob::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	StringPairDrag::processDragEnterEvent( _dee, "float_value,"
-							"automatable_model" );
-}
-
-
-
-
-void Knob::dropEvent( QDropEvent * _de )
-{
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "float_value" )
-	{
-		model()->setValue( LocaleHelper::toFloat(val) );
-		_de->accept();
-	}
-	else if( type == "automatable_model" )
-	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
-		if( mod != NULL )
-		{
-			AutomatableModel::linkModels( model(), mod );
-			mod->setValue( model()->value() );
-		}
-	}
-}
-
-
-
-
-void Knob::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() == Qt::LeftButton &&
-			! ( _me->modifiers() & Qt::ControlModifier ) &&
-			! ( _me->modifiers() & Qt::ShiftModifier ) )
-	{
-		AutomatableModel *thisModel = model();
-		if( thisModel )
-		{
-			thisModel->addJournalCheckPoint();
-			thisModel->saveJournallingState( false );
-		}
-
-		const QPoint & p = _me->pos();
-		m_lastMousePos = p;
-		m_leftOver = 0.0f;
-
-		emit sliderPressed();
-
-		s_textFloat->setText( displayValue() );
-		s_textFloat->moveGlobal( this,
-				QPoint( width() + 2, 0 ) );
-		s_textFloat->show();
-		m_buttonPressed = true;
-	}
-	else if( _me->button() == Qt::LeftButton &&
-			(_me->modifiers() & Qt::ShiftModifier) )
-	{
-		new StringPairDrag( "float_value",
-					QString::number( model()->value() ),
-							QPixmap(), this );
-	}
-	else
-	{
-		FloatModelView::mousePressEvent( _me );
-	}
-}
-
-
-
-
-void Knob::mouseMoveEvent( QMouseEvent * _me )
-{
-	if( m_buttonPressed && _me->pos() != m_lastMousePos )
-	{
-		// knob position is changed depending on last mouse position
-		setPosition( _me->pos() - m_lastMousePos );
-		emit sliderMoved( model()->value() );
-		// original position for next time is current position
-		m_lastMousePos = _me->pos();
-	}
-	s_textFloat->setText( displayValue() );
-}
-
-
-
-
-void Knob::mouseReleaseEvent( QMouseEvent* event )
-{
-	if( event && event->button() == Qt::LeftButton )
-	{
-		AutomatableModel *thisModel = model();
-		if( thisModel )
-		{
-			thisModel->restoreJournallingState();
-		}
-	}
-
-	m_buttonPressed = false;
-
-	emit sliderReleased();
-
-	QApplication::restoreOverrideCursor();
-
-	s_textFloat->hide();
-}
-
-
-
-
-void Knob::focusOutEvent( QFocusEvent * _fe )
-{
-	// make sure we don't loose mouse release event
-	mouseReleaseEvent( NULL );
-	QWidget::focusOutEvent( _fe );
-}
-
-
-
-
-void Knob::mouseDoubleClickEvent( QMouseEvent * )
-{
-	enterValue();
-}
-
-
-
-
 void Knob::paintEvent( QPaintEvent * _me )
 {
 	QPainter p( this );
@@ -641,170 +457,23 @@ void Knob::paintEvent( QPaintEvent * _me )
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6.5 ) );
-/*		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( width() / 2 -
-			p.fontMetrics().width( m_label ) / 2 + 1,
-				height() - 1, m_label );*/
-		p.setPen( textColor() );
-		p.drawText(width() / 2 -
+		if (!m_isHtmlLabel)
+		{
+			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
+			p.setPen(textColor());
+			p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2,
 				height() - 2, m_label);
-	}
-}
-
-
-
-
-void Knob::wheelEvent(QWheelEvent * we)
-{
-	we->accept();
-	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
-	model()->incValue( inc );
-
-
-	s_textFloat->setText( displayValue() );
-	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
-	s_textFloat->setVisibilityTimeOut( 1000 );
-
-	emit sliderMoved( model()->value() );
-}
-
-
-
-
-void Knob::setPosition( const QPoint & _p )
-{
-	const float value = getValue( _p ) + m_leftOver;
-	const float step = model()->step<float>();
-	const float oldValue = model()->value();
-
-
-
-	if( model()->isScaleLogarithmic() ) // logarithmic code
-	{
-		const float pos = model()->minValue() < 0
-			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
-			: ( oldValue - model()->minValue() ) / model()->range();
-		const float ratio = 0.1f + qAbs( pos ) * 15.f;
-		float newValue = value * ratio;
-		if( qAbs( newValue ) >= step )
-		{
-			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
-			model()->setValue( roundedValue );
-			m_leftOver = 0.0f;
 		}
 		else
 		{
-			m_leftOver = value;
-		}
-	}
-
-	else // linear code
-	{
-		if( qAbs( value ) >= step )
-		{
-			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
-			model()->setValue( roundedValue );
-			m_leftOver = 0.0f;
-		}
-		else
-		{
-			m_leftOver = value;
+			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
+			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
+			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
+			m_tdRenderer->drawContents(&p);
 		}
 	}
 }
-
-
-
-
-void Knob::enterValue()
-{
-	bool ok;
-	float new_val;
-
-	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
-	{
-		new_val = QInputDialog::getDouble(
-			this, tr( "Set value" ),
-			tr( "Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:" ),
-				ampToDbfs( model()->getRoundedValue() / 100.0 ),
-							-96.0, 6.0, model()->getDigitCount(), &ok );
-		if( new_val <= -96.0 )
-		{
-			new_val = 0.0f;
-		}
-		else
-		{
-			new_val = dbfsToAmp( new_val ) * 100.0;
-		}
-	}
-	else
-	{
-		new_val = QInputDialog::getDouble(
-				this, tr( "Set value" ),
-				tr( "Please enter a new value between "
-						"%1 and %2:" ).
-						arg( model()->minValue() ).
-						arg( model()->maxValue() ),
-					model()->getRoundedValue(),
-					model()->minValue(),
-					model()->maxValue(), model()->getDigitCount(), &ok );
-	}
-
-	if( ok )
-	{
-		model()->setValue( new_val );
-	}
-}
-
-
-
-
-void Knob::friendlyUpdate()
-{
-	if (model() && (model()->controllerConnection() == NULL ||
-		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0))
-	{
-		update();
-	}
-}
-
-
-
-
-QString Knob::displayValue() const
-{
-	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
-	{
-		return m_description.trimmed() + QString( " %1 dBFS" ).
-				arg( ampToDbfs( model()->getRoundedValue() / volumeRatio() ),
-								3, 'f', 2 );
-	}
-	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->getRoundedValue() ) + m_unit;
-}
-
-
-
-
-void Knob::doConnections()
-{
-	if( model() != NULL )
-	{
-		QObject::connect( model(), SIGNAL( dataChanged() ),
-					this, SLOT( friendlyUpdate() ) );
-
-		QObject::connect( model(), SIGNAL( propertiesChanged() ),
-						this, SLOT( update() ) );
-	}
-}
-
 
 void Knob::changeEvent(QEvent * ev)
 {
@@ -836,3 +505,6 @@ void convertPixmapToGrayScale(QPixmap& pixMap)
 	}
 	pixMap.convertFromImage(temp);
 }
+
+
+} // namespace lmms::gui

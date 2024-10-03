@@ -25,19 +25,22 @@
 
 #include "AudioFileMP3.h"
 
+#include "SampleFrame.h"
+
 #ifdef LMMS_HAVE_MP3LAME
 
-#include "Mixer.h"
 
 #include <cassert>
 
+namespace lmms
+{
 
 AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
 				bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer )
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine )
 {
 	successful = true;
 	// For now only accept stereo sources
@@ -52,21 +55,18 @@ AudioFileMP3::~AudioFileMP3()
 	tearDownEncoder();
 }
 
-void AudioFileMP3::writeBuffer( const surroundSampleFrame * _buf,
-					const fpp_t _frames,
-					const float _master_gain )
+void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const fpp_t _frames)
 {
 	if (_frames < 1)
 	{
 		return;
 	}
 
-	// TODO Why isn't the gain applied by the driver but inside the device?
 	std::vector<float> interleavedDataBuffer(_frames * 2);
 	for (fpp_t i = 0; i < _frames; ++i)
 	{
-		interleavedDataBuffer[2*i] = _buf[i][0] * _master_gain;
-		interleavedDataBuffer[2*i + 1] = _buf[i][1] * _master_gain;
+		interleavedDataBuffer[2*i] = _buf[i][0];
+		interleavedDataBuffer[2*i + 1] = _buf[i][1];
 	}
 
 	size_t minimumBufferSize = 1.25 * _frames + 7200;
@@ -93,11 +93,11 @@ MPEG_mode mapToMPEG_mode(OutputSettings::StereoMode stereoMode)
 {
 	switch (stereoMode)
 	{
-	case OutputSettings::StereoMode_Stereo:
+	case OutputSettings::StereoMode::Stereo:
 		return STEREO;
-	case OutputSettings::StereoMode_JointStereo:
+	case OutputSettings::StereoMode::JointStereo:
 		return JOINT_STEREO;
-	case OutputSettings::StereoMode_Mono:
+	case OutputSettings::StereoMode::Mono:
 		return MONO;
 	default:
 		return NOT_SET;
@@ -131,4 +131,6 @@ void AudioFileMP3::tearDownEncoder()
 	lame_close(m_lame);
 }
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_MP3LAME

@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="25" name="bell" tab="0">
+    <instrumenttrack mixch="0" vol="25" name="bell" tab="0">
       <bitinvader sampleLength="8" version="0.1" normalize="0" sampleShape="AAAAAPMENT8AAIA/8wQ1Py69u7P1BDW/AACAv+8ENb8=" interpolation="1"/>
       <eldata fres="0.43" ftype="0" fcut="1280" fwet="0">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.351" latt="0" sus="0.499" lspd="0.1" att="0.03" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0"/>

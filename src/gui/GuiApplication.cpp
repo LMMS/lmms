@@ -30,12 +30,12 @@
 #include "LmmsPalette.h"
 
 #include "AutomationEditor.h"
-#include "BBEditor.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
-#include "FxMixerView.h"
-#include "InstrumentTrack.h"
+#include "MixerView.h"
 #include "MainWindow.h"
+#include "MicrotunerConfig.h"
+#include "PatternEditor.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
@@ -43,12 +43,26 @@
 #include <QApplication>
 #include <QDir>
 #include <QtGlobal>
+#include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #endif
+
+namespace lmms
+{
+
+
+namespace gui
+{
+
+GuiApplication* getGUI()
+{
+	return GuiApplication::instance();
+}
+
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 
@@ -58,11 +72,12 @@ GuiApplication* GuiApplication::instance()
 }
 
 
+
 GuiApplication::GuiApplication()
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
-		QMessageBox::question( NULL,
+		QMessageBox::question( nullptr,
 				tr( "Working directory" ),
 				tr( "The LMMS working directory %1 does not "
 				"exist. Create it now? You can change the directory "
@@ -76,11 +91,11 @@ GuiApplication::GuiApplication()
 	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultThemeDir());
 	QDir::addSearchPath("artwork", ":/artwork");
 
-	LmmsStyle* lmmsstyle = new LmmsStyle();
+	auto lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
-	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
-	QPalette* lpal = new QPalette(lmmspal->palette());
+	auto lmmspal = new LmmsPalette(nullptr, lmmsstyle);
+	auto lpal = new QPalette(lmmspal->palette());
 
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;
@@ -133,8 +148,8 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_fxMixerView = new FxMixerView;
-	connect(m_fxMixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	m_mixerView = new MixerView(Engine::mixer());
+	connect(m_mixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
@@ -144,9 +159,13 @@ GuiApplication::GuiApplication()
 	m_projectNotes = new ProjectNotes;
 	connect(m_projectNotes, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing beat/bassline editor"));
-	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
-	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	displayInitProgress(tr("Preparing microtuner"));
+	m_microtunerConfig = new MicrotunerConfig;
+	connect(m_microtunerConfig, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
+	displayInitProgress(tr("Preparing pattern editor"));
+	m_patternEditor = new PatternEditorWindow(Engine::patternStore());
+	connect(m_patternEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing piano roll"));
 	m_pianoRoll = new PianoRollWindow();
@@ -180,15 +199,15 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
+	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->mixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{
 		m_mainWindow = nullptr;
 	}
-	else if (obj == m_fxMixerView)
+	else if (obj == m_mixerView)
 	{
-		m_fxMixerView = nullptr;
+		m_mixerView = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{
@@ -198,9 +217,9 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_automationEditor = nullptr;
 	}
-	else if (obj == m_bbEditor)
+	else if (obj == m_patternEditor)
 	{
-		m_bbEditor = nullptr;
+		m_patternEditor = nullptr;
 	}
 	else if (obj == m_pianoRoll)
 	{
@@ -209,6 +228,10 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_projectNotes)
 	{
 		m_projectNotes = nullptr;
+	}
+	else if (obj == m_microtunerConfig)
+	{
+		m_microtunerConfig = nullptr;
 	}
 	else if (obj == m_controllerRackView)
 	{
@@ -228,11 +251,16 @@ QFont GuiApplication::getWin32SystemFont()
 	if ( pointSize < 0 )
 	{
 		// height is in pixels, convert to points
-		HDC hDC = GetDC( NULL );
+		HDC hDC = GetDC( nullptr );
 		pointSize = MulDiv( abs( pointSize ), 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
-		ReleaseDC( NULL, hDC );
+		ReleaseDC( nullptr, hDC );
 	}
 
 	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );
 }
 #endif
+
+
+} // namespace gui
+
+} // namespace lmms

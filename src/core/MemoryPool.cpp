@@ -17,11 +17,11 @@
 #include "libcds.h"
 #include <cds/container/vyukov_mpmc_cycle_queue.h>
 
-#include "MemoryManager.h"
-
-class _MemoryPool_Private : MmAllocator<char>
+namespace lmms
 {
-	using Alloc = MmAllocator<char>;
+
+class _MemoryPool_Private
+{
 public:
 	_MemoryPool_Private(size_t size, size_t nmemb)
 		: m_elementSize(size)
@@ -41,7 +41,7 @@ public:
 		char* ptr = nullptr;
 		while (m_freelist.pop(ptr)) {
 			if (! is_from_pool(ptr)) {
-				Alloc::deallocate(ptr, m_elementSize);
+				delete[] ptr;
 			}
 		}
 		delete[] m_buffer;
@@ -54,7 +54,7 @@ public:
 			return ptr;
 		} else {
 			qWarning() << "MemoryPool exhausted";
-			return Alloc::allocate(m_elementSize);
+			return new char[m_elementSize];
 		}
 	}
 
@@ -78,11 +78,11 @@ public:
 private:
 	void* do_allocate()
 	{
-		return Alloc::allocate(m_elementSize);
+		return new char[m_elementSize];
 	}
 	void do_deallocate(void* ptr)
 	{
-		Alloc::deallocate(reinterpret_cast<char*>(ptr), m_elementSize);
+		delete[] reinterpret_cast<char*>(ptr);
 	}
 
 	bool is_from_pool(void* ptr)
@@ -121,3 +121,5 @@ void _MemoryPool_Base::deallocate(void * ptr)
 	return _imp->deallocate(ptr);
 }
 
+
+} // namespace lmms

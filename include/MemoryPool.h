@@ -16,6 +16,9 @@
 #include <memory>
 #include "lmms_export.h"
 
+namespace lmms
+{
+
 class LMMS_EXPORT _MemoryPool_Private;
 
 class LMMS_EXPORT _MemoryPool_Base
@@ -81,3 +84,5 @@ public:
 		deallocate(ptr);
 	}
 } ;
+
+} // namespace lmms

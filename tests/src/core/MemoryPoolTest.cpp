@@ -22,14 +22,15 @@
  *
  */
 
-#include "QTestSuite.h"
-
+#include <QtTest/QtTest>
 #include "MemoryPool.h"
 
 #include <array>
 #include <stack>
 
-class MemoryPoolTest : QTestSuite
+using namespace lmms;
+
+class MemoryPoolTest : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -54,6 +55,8 @@ private slots:
 			ptrs.pop();
 		}
 	}
-} MemoryPoolTests;
+};
+
+QTEST_GUILESS_MAIN(MemoryPoolTest)
 
 #include "MemoryPoolTest.moc"

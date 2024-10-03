@@ -3,7 +3,7 @@
 <multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="RaveBass">
-    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="29">
+    <instrumenttrack pan="0" mixch="0" pitch="0" basenote="57" vol="29">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="82" finer1="16" finer2="-3" coarse0="-12" coarse1="0" coarse2="12" finel0="0" finel1="10" modalgo1="2" finel2="-2" modalgo2="2" pan0="9" modalgo3="0" pan1="-20" stphdetun0="232" pan2="10" stphdetun1="95" wavetype0="2" stphdetun2="109" wavetype1="2" wavetype2="2" vol0="50" vol1="50" phoffset0="74" phoffset1="280" vol2="50"/>
       </instrument>

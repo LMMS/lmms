@@ -24,41 +24,43 @@
 #ifndef EQEFFECT_H
 #define EQEFFECT_H
 
-#include "BasicFilters.h"
 #include "Effect.h"
 #include "EqControls.h"
 #include "EqFilter.h"
-#include "lmms_math.h"
 
+#include <algorithm>
+
+
+namespace lmms
+{
 
 
 class EqEffect : public Effect
 {
 public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
-	virtual ~EqEffect();
-	virtual bool processAudioBuffer( sampleFrame * buf, const fpp_t frames );
-	virtual EffectControls * controls()
+	~EqEffect() override = default;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls * controls() override
 	{
 		return &m_eqControls;
 	}
-	inline void  gain( sampleFrame * buf, const fpp_t frames, float scale, sampleFrame * peak )
+	inline void gain( SampleFrame* buf, const fpp_t frames, float scale, SampleFrame* peak )
 	{
 		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
 		for( fpp_t f = 0; f < frames; ++f )
 		{
-			buf[f][0] *= scale;
-			buf[f][1] *= scale;
+			auto & sf = buf[f];
 
-			if( fabs( buf[f][0] ) > peak[0][0] )
-			{
-				peak[0][0] = fabs( buf[f][0] );
-			}
-			if( fabs( buf[f][1] ) > peak[0][1] )
-			{
-				peak[0][1] = fabs( buf[f][0] );
-			}
+			// Apply gain to sample frame
+			sf[0] *= scale;
+			sf[1] *= scale;
 
+			// Update peaks
+			peak[0][0] = std::max(peak[0][0], (float)fabs(sf[0]));
+			peak[0][1] = std::max(peak[0][1], (float)fabs(sf[1]));
 		}
 	}
 
@@ -87,7 +89,7 @@ private:
 	float m_inGain;
 	float m_outGain;
 
-	float peakBand( float minF, float maxF, EqAnalyser *, int );
+	float linearPeakBand(float minF, float maxF, EqAnalyser*, int);
 
 	inline float bandToFreq ( int index , int sampleRate )
 	{
@@ -96,5 +98,8 @@ private:
 
 	void setBandPeaks( EqAnalyser * fft , int );
 };
+
+
+} // namespace lmms
 
 #endif // EQEFFECT_H

@@ -185,7 +185,7 @@ class TwelveAX7_3
 					return r12AX7::v2v [r12AX7::Samples - 1];
 
 				/* linear interpolation from sampled function */
-				register int i = lrintf (a);
+				int i = lrintf (a);
 				a -= i;
 				
 				return (r12AX7::v2v [i] * (1.f - a) + r12AX7::v2v [i + 1] * a);

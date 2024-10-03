@@ -27,26 +27,30 @@
 #ifndef _VST_SUBPLUGIN_FEATURES_H
 #define _VST_SUBPLUGIN_FEATURES_H
 
+
 #include "Effect.h"
+#include "Plugin.h"
+
+namespace lmms
+{
 
 
 class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	VstSubPluginFeatures( Plugin::PluginTypes _type );
+	VstSubPluginFeatures( Plugin::Type _type );
 
-	virtual void fillDescriptionWidget( QWidget * _parent,
-											const Key * _key ) const;
+	void fillDescriptionWidget( QWidget * _parent,
+											const Key * _key ) const override;
 
-	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
-											KeyList & _kl ) const;
+	void listSubPluginKeys( const Plugin::Descriptor * _desc,
+											KeyList & _kl ) const override;
 private:
 	void addPluginsFromDir(QStringList* filenames,  QString path) const;
 } ;
 
 
-
-
+} // namespace lmms
 
 #endif
 

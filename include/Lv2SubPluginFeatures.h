@@ -3,7 +3,7 @@
  *                          Plugin::Descriptor::SubPluginFeatures for
  *                          hosting LV2 plugins
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef LV2_SUBPLUGIN_FEATURES_H
-#define LV2_SUBPLUGIN_FEATURES_H
+#ifndef LMMS_LV2_SUBPLUGIN_FEATURES_H
+#define LMMS_LV2_SUBPLUGIN_FEATURES_H
 
 #include "lmmsconfig.h"
 
@@ -36,6 +36,10 @@
 #include "lmms_export.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 private:
@@ -43,7 +47,7 @@ private:
 	static QString pluginName(const LilvPlugin *plug);
 
 public:
-	Lv2SubPluginFeatures(Plugin::PluginTypes type);
+	Lv2SubPluginFeatures(Plugin::Type type);
 
 	void fillDescriptionWidget(
 		QWidget *parent, const Key *k) const override;
@@ -57,6 +61,9 @@ public:
 		const Plugin::Descriptor *desc, KeyList &kl) const override;
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2_SUBPLUGIN_FEATURES_H

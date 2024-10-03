@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_RACK_VIEW_H
-#define EFFECT_RACK_VIEW_H
+#ifndef LMMS_GUI_EFFECT_RACK_VIEW_H
+#define LMMS_GUI_EFFECT_RACK_VIEW_H
 
 #include <QWidget>
 
@@ -35,6 +35,9 @@
 class QScrollArea;
 class QVBoxLayout;
 
+namespace lmms::gui
+{
+
 class EffectView;
 class GroupBox;
 
@@ -43,17 +46,16 @@ class EffectRackView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectRackView( EffectChain* model, QWidget* parent = NULL );
-	virtual ~EffectRackView();
+	EffectRackView( EffectChain* model, QWidget* parent = nullptr );
+	~EffectRackView() override;
 
 	static constexpr int DEFAULT_WIDTH = 245;
 
 public slots:
 	void clearViews();
-	void moveUp( EffectView* view );
-	void moveDown( EffectView* view );
-	void deletePlugin( EffectView* view );
-
+	void moveUp(EffectView* view);
+	void moveDown(EffectView* view);
+	void deletePlugin(EffectView* view);
 
 private slots:
 	virtual void update();
@@ -62,6 +64,8 @@ private slots:
 
 private:
 	void modelChanged() override;
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 
 	inline EffectChain* fxChain()
 	{
@@ -83,4 +87,6 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_EFFECT_RACK_VIEW_H

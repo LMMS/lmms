@@ -23,25 +23,24 @@
  *
  */
 
-#ifndef DETUNING_HELPER_H
-#define DETUNING_HELPER_H
+#ifndef LMMS_DETUNING_HELPER_H
+#define LMMS_DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
-#include "MemoryManager.h"
+
+namespace lmms
+{
 
 class DetuningHelper : public InlineAutomation
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 	DetuningHelper() :
 		InlineAutomation()
 	{
 	}
 
-	virtual ~DetuningHelper()
-	{
-	}
+	~DetuningHelper() override = default;
 
 	float defaultValue() const override
 	{
@@ -61,4 +60,6 @@ public:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_DETUNING_HELPER_H

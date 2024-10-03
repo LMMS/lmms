@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="59" name="Xylophon" tab="2">
+    <instrumenttrack mixch="0" vol="59" name="Xylophon" tab="2">
       <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" userwavefile1="samples/empty.wav" finer0="0" userwavefile2="samples/empty.wav" finer1="12" finer2="-13" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="22" modalgo1="1" finel2="-25" modalgo2="1" pan0="0" pan1="0" stphdetun0="66" pan2="0" stphdetun1="275" stphdetun2="0" wavetype0="0" wavetype1="0" wavetype2="0" vol0="100" vol1="100" phoffset0="0" vol2="100" phoffset1="0"/>
       <eldata fres="0.5" ftype="1" fcut="820" fwet="0">
         <elvol lpdel="0" ctlenvamt="0" amt="1" rel="0.38" latt="0" sus="0.999" lspd="0.01" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0"/>

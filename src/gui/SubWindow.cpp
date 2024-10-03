@@ -28,20 +28,25 @@
 
 #include "SubWindow.h"
 
+#include <QGraphicsDropShadowEffect>
+#include <QLabel>
 #include <QMdiArea>
 #include <QMoveEvent>
 #include <QPainter>
-#include <QScrollBar>
+#include <QPushButton>
+#include <QStyleOption>
 
 #include "embed.h"
 
+namespace lmms::gui
+{
 
 
-SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
-	QMdiSubWindow( parent, windowFlags ),
-	m_buttonSize( 17, 17 ),
-	m_titleBarHeight( 24 ),
-	m_hasFocus( false )
+SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
+	QMdiSubWindow(parent, windowFlags),
+	m_buttonSize(17, 17),
+	m_titleBarHeight(titleBarHeight()),
+	m_hasFocus(false)
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -59,7 +64,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeBtn->setCursor( Qt::ArrowCursor );
 	m_closeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_closeBtn->setToolTip( tr( "Close" ) );
-	connect( m_closeBtn, SIGNAL( clicked( bool ) ), this, SLOT( close() ) );
+	connect( m_closeBtn, SIGNAL(clicked(bool)), this, SLOT(close()));
 
 	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
 	m_maximizeBtn->resize( m_buttonSize );
@@ -67,7 +72,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_maximizeBtn->setCursor( Qt::ArrowCursor );
 	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
-	connect( m_maximizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMaximized() ) );
+	connect( m_maximizeBtn, SIGNAL(clicked(bool)), this, SLOT(showMaximized()));
 
 	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
 	m_restoreBtn->resize( m_buttonSize );
@@ -75,7 +80,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_restoreBtn->setCursor( Qt::ArrowCursor );
 	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_restoreBtn->setToolTip( tr( "Restore" ) );
-	connect( m_restoreBtn, SIGNAL( clicked( bool ) ), this, SLOT( showNormal() ) );
+	connect( m_restoreBtn, SIGNAL(clicked(bool)), this, SLOT(showNormal()));
 
 	// QLabel for the window title and the shadow effect
 	m_shadow = new QGraphicsDropShadowEffect();
@@ -92,7 +97,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
 		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint );
-	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
+	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
 
 
@@ -236,6 +241,27 @@ void SubWindow::setBorderColor( const QColor &c )
 
 
 
+
+int SubWindow::titleBarHeight() const
+{
+	QStyleOptionTitleBar so;
+	so.titleBarState = Qt::WindowActive; // kThemeStateActiv
+	so.titleBarFlags = Qt::Window;
+	return style()->pixelMetric(QStyle::PM_TitleBarHeight, &so, this);
+}
+
+
+
+
+int SubWindow::frameWidth() const
+{
+	QStyleOptionFrame so;
+	return style()->pixelMetric(QStyle::PM_MdiSubWindowFrameWidth, &so, this);
+}
+
+
+
+
 /**
  * @brief SubWindow::moveEvent
  * 
@@ -376,3 +402,6 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 		m_trackedNormalGeom.setSize( event->size() );
 	}
 }
+
+
+} // namespace lmms::gui

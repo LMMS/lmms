@@ -31,13 +31,18 @@
 #include "EffectView.h"
 
 #include "ConfigManager.h"
+#include "SampleFrame.h"
+#include "lmms_constants.h"
+
+namespace lmms
+{
 
 
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Plugin( _desc, _parent, _key ),
-	m_parent( NULL ),
+	m_parent( nullptr ),
 	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -49,13 +54,19 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
 	m_autoQuitDisabled( false )
 {
-	m_srcState[0] = m_srcState[1] = NULL;
+	m_wetDryModel.setCenterValue(0);
+
+	m_srcState[0] = m_srcState[1] = nullptr;
 	reinitSRC();
-	
+
 	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
 	{
 		m_autoQuitDisabled = true;
 	}
+
+	// Call the virtual method onEnabledChanged so that effects can react to changes,
+	// e.g. by resetting state.
+	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
 
@@ -63,11 +74,11 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 
 Effect::~Effect()
 {
-	for( int i = 0; i < 2; ++i )
+	for (const auto& state : m_srcState)
 	{
-		if( m_srcState[i] != NULL )
+		if (state != nullptr)
 		{
-			src_delete( m_srcState[i] );
+			src_delete(state);
 		}
 	}
 }
@@ -111,6 +122,41 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
+bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+{
+	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	{
+		processBypassedImpl();
+		return false;
+	}
+
+	const auto status = processImpl(buf, frames);
+	switch (status)
+	{
+		case ProcessStatus::Continue:
+			break;
+		case ProcessStatus::ContinueIfNotQuiet:
+		{
+			double outSum = 0.0;
+			for (std::size_t idx = 0; idx < frames; ++idx)
+			{
+				outSum += buf[idx].sumOfSquaredAmplitudes();
+			}
+
+			checkGate(outSum / frames);
+			break;
+		}
+		case ProcessStatus::Sleep:
+			return false;
+		default:
+			break;
+	}
+
+	return isRunning();
+}
+
+
+
 
 Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
@@ -118,10 +164,10 @@ Effect * Effect::instantiate( const QString& pluginName,
 {
 	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
-	if( dynamic_cast<Effect *>( p ) != NULL )
+	if( dynamic_cast<Effect *>( p ) != nullptr )
 	{
 		// everything ok, so return pointer
-		Effect * effect = dynamic_cast<Effect *>( p );
+		auto effect = dynamic_cast<Effect*>(p);
 		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
 		return effect;
 	}
@@ -129,13 +175,13 @@ Effect * Effect::instantiate( const QString& pluginName,
 	// not quite... so delete plugin and leave it up to the caller to instantiate a DummyEffect
 	delete p;
 
-	return NULL;
+	return nullptr;
 }
 
 
 
 
-void Effect::checkGate( double _out_sum )
+void Effect::checkGate(double outSum)
 {
 	if( m_autoQuitDisabled )
 	{
@@ -144,7 +190,7 @@ void Effect::checkGate( double _out_sum )
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum - gate() <= typeInfo<float>::minEps() )
+	if (outSum - gate() <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
@@ -162,9 +208,9 @@ void Effect::checkGate( double _out_sum )
 
 
 
-PluginView * Effect::instantiateView( QWidget * _parent )
+gui::PluginView * Effect::instantiateView( QWidget * _parent )
 {
-	return new EffectView( this, _parent );
+	return new gui::EffectView( this, _parent );
 }
 
 	
@@ -172,17 +218,15 @@ PluginView * Effect::instantiateView( QWidget * _parent )
 
 void Effect::reinitSRC()
 {
-	for( int i = 0; i < 2; ++i )
+	for (auto& state : m_srcState)
 	{
-		if( m_srcState[i] != NULL )
+		if (state != nullptr)
 		{
-			src_delete( m_srcState[i] );
+			src_delete(state);
 		}
 		int error;
-		if( ( m_srcState[i] = src_new(
-			Engine::mixer()->currentQualitySettings().
-							libsrcInterpolation(),
-					DEFAULT_CHANNELS, &error ) ) == NULL )
+		const int currentInterpolation = Engine::audioEngine()->currentQualitySettings().libsrcInterpolation();
+		if((state = src_new(currentInterpolation, DEFAULT_CHANNELS, &error)) == nullptr)
 		{
 			qFatal( "Error: src_new() failed in effect.cpp!\n" );
 		}
@@ -192,26 +236,27 @@ void Effect::reinitSRC()
 
 
 
-void Effect::resample( int _i, const sampleFrame * _src_buf,
+void Effect::resample( int _i, const SampleFrame* _src_buf,
 							sample_rate_t _src_sr,
-				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+				SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 								f_cnt_t _frames )
 {
-	if( m_srcState[_i] == NULL )
+	if( m_srcState[_i] == nullptr )
 	{
 		return;
 	}
 	m_srcData[_i].input_frames = _frames;
-	m_srcData[_i].output_frames = Engine::mixer()->framesPerPeriod();
+	m_srcData[_i].output_frames = Engine::audioEngine()->framesPerPeriod();
 	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());
 	m_srcData[_i].data_out = _dst_buf[0].data ();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
-	int error;
-	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
+
+	if (int error = src_process(m_srcState[_i], &m_srcData[_i]))
 	{
 		qFatal( "Effect::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
 	}
 }
 
+} // namespace lmms

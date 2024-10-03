@@ -30,10 +30,15 @@
 
 #include "ColorChooser.h"
 #include "GuiApplication.h"
+#include "FontHelper.h"
 #include "MainWindow.h"
+#include "VecControls.h"
+
+namespace lmms::gui
+{
 
 
-VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
+VectorView::VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
 	QWidget(parent),
 	m_controls(controls),
 	m_inputBuffer(inputBuffer),
@@ -49,7 +54,7 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 	setMinimumSize(200, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
 
@@ -85,7 +90,6 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	QFont normalFont, boldFont;
-	boldFont.setPixelSize(26);
 	boldFont.setBold(true);
 	const int labelWidth = 26;
 	const int labelHeight = 26;
@@ -134,8 +138,6 @@ void VectorView::paintEvent(QPaintEvent *event)
 	std::size_t frameCount = inBuffer.size();
 
 	// Draw new points on top
-	float left, right;
-	int x, y;
 
 	const bool logScale = m_controls->m_logarithmicModel.value();
 	const unsigned short activeSize = hq ? m_displaySize : m_displaySize / 2;
@@ -160,6 +162,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 		// The longer the line is, the dimmer, simulating real electron trace on luminescent screen.
 		for (std::size_t frame = 0; frame < frameCount; frame++)
 		{
+			float left = 0.0f;
+			float right = 0.0f;
 			float inLeft = inBuffer[frame][0] * m_zoom;
 			float inRight = inBuffer[frame][1] * m_zoom;
 			// Scale left and right channel from (-1.0, 1.0) to display range
@@ -181,8 +185,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 			}
 
 			// Rotate display coordinates 45 degrees, flip Y axis and make sure the result stays within bounds
-			x = saturate(right - left + activeSize / 2.f);
-			y = saturate(activeSize - (right + left + activeSize / 2.f));
+			int x = saturate(right - left + activeSize / 2.f);
+			int y = saturate(activeSize - (right + left + activeSize / 2.f));
 
 			// Estimate number of points needed to fill space between the old and new pixel. Cap at 100.
 			unsigned char points = std::min((int)sqrt((m_oldX - x) * (m_oldX - x) + (m_oldY - y) * (m_oldY - y)), 100);
@@ -218,6 +222,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 		// one full-color pixel per sample.
 		for (std::size_t frame = 0; frame < frameCount; frame++)
 		{
+			float left = 0.0f;
+			float right = 0.0f;
 			float inLeft = inBuffer[frame][0] * m_zoom;
 			float inRight = inBuffer[frame][1] * m_zoom;
 			if (logScale) {
@@ -231,8 +237,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 				left  = inLeft * (activeSize - 1) / 4;
 				right = inRight * (activeSize - 1) / 4;
 			}
-			x = saturate(right - left + activeSize / 2.f);
-			y = saturate(activeSize - (right + left + activeSize / 2.f));
+			int x = saturate(right - left + activeSize / 2.f);
+			int y = saturate(activeSize - (right + left + activeSize / 2.f));
 			((QRgb*)m_displayBuffer.data())[x + y * activeSize] = m_controls->m_colorFG.rgb();
 		}
 	}
@@ -258,7 +264,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.drawLine(QPointF(centerX, centerY), QPointF(displayRight - gridCorner, displayTop + gridCorner));
 
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.setFont(boldFont);
+	painter.setFont(adjustedToPixelSize(boldFont, 26));
 	painter.drawText(displayLeft + margin, displayTop,
 					 labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
 					 QString("L"));
@@ -303,7 +309,7 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	ColorChooser *colorDialog = new ColorChooser(m_controls->m_colorFG, this);
+	auto colorDialog = new ColorChooser(m_controls->m_colorFG, this);
 	if (colorDialog->exec())
 	{
 		m_controls->m_colorFG = colorDialog->currentColor();
@@ -326,3 +332,6 @@ void VectorView::wheelEvent(QWheelEvent *event)
 	).count();
 
 }
+
+
+} // namespace lmms::gui

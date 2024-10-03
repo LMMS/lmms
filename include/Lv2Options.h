@@ -22,16 +22,16 @@
  *
  */
 
-#ifndef LV2OPTIONS_H
-#define LV2OPTIONS_H
+#ifndef LMMS_LV2_OPTIONS_H
+#define LMMS_LV2_OPTIONS_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
 
 #include <cstdint>
-#include <lv2/lv2plug.in/ns/ext/options/options.h>
-#include <lv2/lv2plug.in/ns/ext/urid/urid.h>
+#include <lv2/options/options.h>
+#include <lv2/urid/urid.h>
 #include <map>
 #include <memory>
 #include <set>
@@ -40,6 +40,9 @@
 #include "Engine.h"
 #include "Lv2Manager.h"
 #include "Lv2UridCache.h"
+
+namespace lmms
+{
 
 /**
 	Option container
@@ -81,6 +84,8 @@ public:
 		return m_options.data();
 	}
 
+	void clear();
+
 private:
 	//! Initialize an option internally
 	void initOption(LV2_URID key,
@@ -99,6 +104,9 @@ private:
 	std::map<LV2_URID, std::shared_ptr<void>> m_optionValues;
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2OPTIONS_H
+#endif // LMMS_LV2_OPTIONS_H

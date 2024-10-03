@@ -2,8 +2,9 @@
 
 #include "interpolation.h"
 
-ValueBuffer::ValueBuffer()
-{}
+namespace lmms
+{
+
 
 ValueBuffer::ValueBuffer(int length)
 	: std::vector<float>(length)
@@ -41,3 +42,6 @@ void ValueBuffer::interpolate(float start, float end_)
 		return linearInterpolate( start, end_, i++ / length());
 	});
 }
+
+
+} // namespace lmms

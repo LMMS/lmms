@@ -26,23 +26,30 @@
 
 #include "BufferPool.h"
 
+#include "SampleFrame.h"
+
 #include <cstring>
 #include "MemoryPool.h"
+
+namespace lmms
+{
 
 static std::unique_ptr<_MemoryPool_Base> pool;
 const int BM_INITIAL_BUFFERS = 256;
 
 void BufferPool::init( fpp_t framesPerPeriod )
 {
-	pool.reset(new _MemoryPool_Base(framesPerPeriod * sizeof(sampleFrame), BM_INITIAL_BUFFERS));
+	pool.reset(new _MemoryPool_Base(framesPerPeriod * sizeof(SampleFrame), BM_INITIAL_BUFFERS));
 }
 
-sampleFrame * BufferPool::acquire()
+SampleFrame * BufferPool::acquire()
 {
-	return reinterpret_cast<sampleFrame*>(pool->allocate());
+	return reinterpret_cast<SampleFrame*>(pool->allocate());
 }
 
-void BufferPool::release( sampleFrame * buf )
+void BufferPool::release( SampleFrame * buf )
 {
 	pool->deallocate(buf);
 }
+
+} // namespace lmms

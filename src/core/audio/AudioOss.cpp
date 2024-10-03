@@ -27,14 +27,13 @@
 #ifdef LMMS_HAVE_OSS
 
 #include <QFileInfo>
-#include <QLabel>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -57,22 +56,23 @@
 
 #include "ConfigManager.h"
 
+namespace lmms
+{
 
-#ifndef _PATH_DEV_DSP
+static const QString PATH_DEV_DSP =
 #if defined(__NetBSD__) || defined(__OpenBSD__)
-#define _PATH_DEV_DSP  "/dev/audio"
+"/dev/audio";
 #else
-#define _PATH_DEV_DSP  "/dev/dsp"
+"/dev/dsp";
 #endif
-#endif
 
 
 
-AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( qBound<ch_cnt_t>(
+AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audiooss", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		DEFAULT_CHANNELS), _audioEngine),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -99,10 +99,9 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	fcntl( m_audioFD, F_SETFD, fcntl( m_audioFD, F_GETFD ) | FD_CLOEXEC );
 
 	int frag_spec;
-	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		mixer()->framesPerPeriod() * channels() *
-							BYTES_PER_INT_SAMPLE;
-		++frag_spec )
+	for (frag_spec = 0;
+		1u << frag_spec < audioEngine()->framesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
+		++frag_spec)
 	{
 	}
 
@@ -172,7 +171,7 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	}
 	if( value != sampleRate() )
 	{
-		value = mixer()->baseSampleRate();
+		value = audioEngine()->baseSampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 		{
 			perror( "SNDCTL_DSP_SPEED" );
@@ -204,13 +203,13 @@ QString AudioOss::probeDevice()
 	{
 		char * adev = getenv( "AUDIODEV" );	// Is there a standard
 							// variable name?
-		if( adev != NULL )
+		if( adev != nullptr )
 		{
 			dev = adev;
 		}
 		else
 		{
-			dev = _PATH_DEV_DSP;		// default device
+			dev = PATH_DEV_DSP;		// default device
 		}
 	}
 
@@ -218,12 +217,12 @@ QString AudioOss::probeDevice()
 	if( QFileInfo( dev ).isWritable() == false )
 	{
 		int instance = -1;
-		while( 1 )
+		while( true )
 		{
-			dev = _PATH_DEV_DSP + QString::number( ++instance );
+			dev = PATH_DEV_DSP + QString::number( ++instance );
 			if( !QFileInfo( dev ).exists() )
 			{
-				dev = _PATH_DEV_DSP;
+				dev = PATH_DEV_DSP;
 				break;
 			}
 			if( QFileInfo( dev ).isWritable() )
@@ -254,48 +253,10 @@ void AudioOss::stopProcessing()
 	stopProcessingThread( this );
 }
 
-
-
-
-void AudioOss::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
-
-		unsigned int value = sampleRate();
-		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
-		{
-			perror( "SNDCTL_DSP_SPEED" );
-			printf( "Couldn't set audio frequency\n" );
-			return;
-		}
-		if( value != sampleRate() )
-		{
-			value = mixer()->baseSampleRate();
-			if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
-			{
-				perror( "SNDCTL_DSP_SPEED" );
-				printf( "Couldn't set audio frequency\n" );
-				return;
-			}
-			setSampleRate( value );
-		}
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioOss::run()
 {
-	surroundSampleFrame * temp =
-		new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-			new int_sample_t[mixer()->framesPerPeriod() *
-								channels()];
+	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
+	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )
 	{
@@ -305,9 +266,7 @@ void AudioOss::run()
 			break;
 		}
 
-		int bytes = convertToS16( temp, frames,
-				mixer()->masterGain(), outbuf,
-							m_convertEndian );
+		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;
@@ -324,24 +283,22 @@ void AudioOss::run()
 AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioOss::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	m_device = new QLineEdit( probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	form->addRow(tr("Device"), m_device);
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	auto m = new gui::LcdSpinBoxModel(/* this */);
+	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiooss",
 							"channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 
@@ -364,5 +321,7 @@ void AudioOss::setupWidget::saveSettings()
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_OSS
 

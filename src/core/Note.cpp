@@ -25,26 +25,29 @@
 
 #include <QDomElement>
 
-#include <math.h>
+#include <cmath>
 
 #include "Note.h"
 #include "DetuningHelper.h"
+
+namespace lmms
+{
 
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
 						DetuningHelper * detuning ) :
 	m_selected( false ),
-	m_oldKey( qBound( 0, key, NumKeys ) ),
+	m_oldKey(std::clamp(key, 0, NumKeys)),
 	m_oldPos( pos ),
 	m_oldLength( length ),
 	m_isPlaying( false ),
-	m_key( qBound( 0, key, NumKeys ) ),
-	m_volume( qBound( MinVolume, volume, MaxVolume ) ),
-	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
+	m_key(std::clamp(key, 0, NumKeys)),
+	m_volume(std::clamp(volume, MinVolume, MaxVolume)),
+	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( NULL )
+	m_detuning( nullptr )
 {
 	if( detuning )
 	{
@@ -71,7 +74,8 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning( NULL )
+	m_detuning(nullptr),
+	m_type(note.m_type)
 {
 	if( note.m_detuning )
 	{
@@ -111,7 +115,7 @@ void Note::setPos( const TimePos & pos )
 
 void Note::setKey( const int key )
 {
-	const int k = qBound( 0, key, NumKeys - 1 );
+	const int k = std::clamp(key, 0, NumKeys - 1);
 	m_key = k;
 }
 
@@ -120,7 +124,7 @@ void Note::setKey( const int key )
 
 void Note::setVolume( volume_t volume )
 {
-	const volume_t v = qBound( MinVolume, volume, MaxVolume );
+	const volume_t v = std::clamp(volume, MinVolume, MaxVolume);
 	m_volume = v;
 }
 
@@ -129,7 +133,7 @@ void Note::setVolume( volume_t volume )
 
 void Note::setPanning( panning_t panning )
 {
-	const panning_t p = qBound( PanningLeft, panning, PanningRight );
+	const panning_t p = std::clamp(panning, PanningLeft, PanningRight);
 	m_panning = p;
 }
 
@@ -176,6 +180,7 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	parent.setAttribute( "pan", m_panning );
 	parent.setAttribute( "len", m_length );
 	parent.setAttribute( "pos", m_pos );
+	parent.setAttribute("type", static_cast<int>(m_type));
 
 	if( m_detuning && m_length )
 	{
@@ -189,11 +194,14 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 void Note::loadSettings( const QDomElement & _this )
 {
 	const int oldKey = _this.attribute( "tone" ).toInt() + _this.attribute( "oct" ).toInt() * KeysPerOctave;
-	m_key = qMax( oldKey, _this.attribute( "key" ).toInt() );
+	m_key = std::max(oldKey, _this.attribute("key").toInt());
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
+	// Default m_type value is 0, which corresponds to RegularNote
+	static_assert(0 == static_cast<int>(Type::Regular));
+	m_type = static_cast<Type>(_this.attribute("type", "0").toInt());
 
 	if( _this.hasChildNodes() )
 	{
@@ -208,12 +216,12 @@ void Note::loadSettings( const QDomElement & _this )
 
 void Note::createDetuning()
 {
-	if( m_detuning == NULL )
+	if( m_detuning == nullptr )
 	{
 		m_detuning = new DetuningHelper;
-		(void) m_detuning->automationPattern();
+		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
-		m_detuning->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
+		m_detuning->automationClip()->setProgressionType( AutomationClip::ProgressionType::Linear );
 	}
 }
 
@@ -232,3 +240,35 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
 		&& length().getTicks() != 0;
 }
+
+
+
+
+/*! \brief Get the start/end/bottom/top positions of notes in a vector
+ *
+ *  Returns no value if there are no notes
+ */
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
+{
+	if (notes.empty()) { return std::nullopt; }
+
+	TimePos start = notes.front()->pos();
+	TimePos end = start;
+	int lower = notes.front()->key();
+	int upper = lower;
+
+	for (const Note* note: notes)
+	{
+		// TODO should we assume that NoteVector is always sorted correctly,
+		// so first() always has the lowest time position?
+		start = std::min(start, note->pos());
+		end = std::max(end, note->endPos());
+		lower = std::min(lower, note->key());
+		upper = std::max(upper, note->key());
+	}
+
+	return NoteBounds{start, end, lower, upper};
+}
+
+
+} // namespace lmms

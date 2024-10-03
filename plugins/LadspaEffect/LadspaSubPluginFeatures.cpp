@@ -30,13 +30,16 @@
 
 #include "LadspaSubPluginFeatures.h"
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
-#include "Mixer.h"
+
+namespace lmms
+{
 
 
-LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
+LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::Type _type ) :
 	SubPluginFeatures( _type )
 {
 }
@@ -60,65 +63,65 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
 	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 
-	QLabel * label = new QLabel( _parent );
+	auto label = new QLabel(_parent);
 	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
 
-	QLabel* fileInfo = new QLabel( _parent );
+	auto fileInfo = new QLabel(_parent);
 	fileInfo->setText( QWidget::tr( "File: %1" ).arg( lkey.first ) );
 
-	QWidget * maker = new QWidget( _parent );
-	QHBoxLayout * l = new QHBoxLayout( maker );
-	l->setMargin( 0 );
+	auto maker = new QWidget(_parent);
+	auto l = new QHBoxLayout(maker);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing( 0 );
 
-	QLabel * maker_label = new QLabel( maker );
+	auto maker_label = new QLabel(maker);
 	maker_label->setText( QWidget::tr( "Maker: " ) );
 	maker_label->setAlignment( Qt::AlignTop );
-	QLabel * maker_content = new QLabel( maker );
+	auto maker_content = new QLabel(maker);
 	maker_content->setText( lm->getMaker( lkey ) );
 	maker_content->setWordWrap( true );
 	l->addWidget( maker_label );
 	l->addWidget( maker_content, 1 );
 
-	QWidget * copyright = new QWidget( _parent );
+	auto copyright = new QWidget(_parent);
 	l = new QHBoxLayout( copyright );
-	l->setMargin( 0 );
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing( 0 );
 
 	copyright->setMinimumWidth( _parent->minimumWidth() );
-	QLabel * copyright_label = new QLabel( copyright );
+	auto copyright_label = new QLabel(copyright);
 	copyright_label->setText( QWidget::tr( "Copyright: " ) );
 	copyright_label->setAlignment( Qt::AlignTop );
 
-	QLabel * copyright_content = new QLabel( copyright );
+	auto copyright_content = new QLabel(copyright);
 	copyright_content->setText( lm->getCopyright( lkey ) );
 	copyright_content->setWordWrap( true );
 	l->addWidget( copyright_label );
 	l->addWidget( copyright_content, 1 );
 
-	QLabel * requiresRealTime = new QLabel( _parent );
+	auto requiresRealTime = new QLabel(_parent);
 	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
 					( lm->hasRealTimeDependency( lkey ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 
-	QLabel * realTimeCapable = new QLabel( _parent );
+	auto realTimeCapable = new QLabel(_parent);
 	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
 					( lm->isRealTimeCapable( lkey ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 
-	QLabel * inplaceBroken = new QLabel( _parent );
+	auto inplaceBroken = new QLabel(_parent);
 	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
 					( lm->isInplaceBroken( lkey ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
-	
-	QLabel * channelsIn = new QLabel( _parent );
+
+	auto channelsIn = new QLabel(_parent);
 	channelsIn->setText( QWidget::tr( "Channels In: " ) +
 		QString::number( lm->getDescription( lkey )->inputChannels ) );
 
-	QLabel * channelsOut = new QLabel( _parent );
+	auto channelsOut = new QLabel(_parent);
 	channelsOut->setText( QWidget::tr( "Channels Out: " ) +
 		QString::number( lm->getDescription( lkey )->outputChannels ) );	
 }
@@ -134,17 +137,17 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 	l_sortable_plugin_t plugins;
 	switch( m_type )
 	{
-		case Plugin::Instrument:
+		case Plugin::Type::Instrument:
 			plugins = lm->getInstruments();
 			break;
-		case Plugin::Effect:
+		case Plugin::Type::Effect:
 			plugins = lm->getValidEffects();
 			//plugins += lm->getInvalidEffects();
 			break;
-		case Plugin::Tool:
+		case Plugin::Type::Tool:
 			plugins = lm->getAnalysisTools();
 			break;
-		case Plugin::Other:
+		case Plugin::Type::Other:
 			plugins = lm->getOthers();
 			break;
 		default:
@@ -154,8 +157,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 	for( l_sortable_plugin_t::const_iterator it = plugins.begin();
 						it != plugins.end(); ++it )
 	{
-		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  Engine::mixer()->audioDev()->channels() )
+		if( lm->getDescription( ( *it ).second )->inputChannels <= Engine::audioEngine()->audioDev()->channels() )
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}
@@ -169,8 +171,7 @@ ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 							const Key * _key )
 {
 	QString file = _key->attributes["file"];
-	return( ladspa_key_t( file.remove( QRegExp( "\\.so$" ) ).
-				remove( QRegExp( "\\.dll$" ) ) +
+	return(ladspa_key_t(file.remove(QRegularExpression("\\.so$")).remove(QRegularExpression("\\.dll$")) +
 #ifdef LMMS_BUILD_WIN32
 						".dll"
 #else
@@ -179,3 +180,5 @@ ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 					, _key->attributes["plugin"] ) );
 }
 
+
+} // namespace lmms

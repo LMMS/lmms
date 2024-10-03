@@ -29,18 +29,21 @@
 
 #include "Effect.h"
 #include "CrossoverEQControls.h"
-#include "ValueBuffer.h"
-#include "lmms_math.h"
 #include "BasicFilters.h"
+
+namespace lmms
+{
+
 
 class CrossoverEQEffect : public Effect
 {
 public:
 	CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~CrossoverEQEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~CrossoverEQEffect() override;
 
-	virtual EffectControls* controls()
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
@@ -67,13 +70,16 @@ private:
 	StereoLinkwitzRiley m_hp3;
 	StereoLinkwitzRiley m_hp4;
 	
-	sampleFrame * m_tmp1;
-	sampleFrame * m_tmp2;
-	sampleFrame * m_work;
+	SampleFrame* m_tmp1;
+	SampleFrame* m_tmp2;
+	SampleFrame* m_work;
 	
 	bool m_needsUpdate;
 	
 	friend class CrossoverEQControls;
 };
+
+
+} // namespace lmms
 
 #endif

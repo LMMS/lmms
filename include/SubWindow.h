@@ -23,21 +23,25 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SUBWINDOW_H
-#define SUBWINDOW_H
 
-#include <QEvent>
-#include <QGraphicsDropShadowEffect>
+#ifndef LMMS_GUI_SUBWINDOW_H
+#define LMMS_GUI_SUBWINDOW_H
+
 #include <QMdiSubWindow>
-#include <QLabel>
-#include <QPushButton>
 #include <QString>
 
 #include "lmms_export.h"
 
+class QGraphicsDropShadowEffect;
+class QLabel;
 class QMoveEvent;
+class QPushButton;
 class QResizeEvent;
 class QWidget;
+
+namespace lmms::gui
+{
+
 
 /**
  * @brief The SubWindow class
@@ -55,7 +59,7 @@ class LMMS_EXPORT SubWindow : public QMdiSubWindow
 	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
 
 public:
-	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = QFlag(0) );
+	SubWindow( QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0) );
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
 	QRect getTrueNormalGeometry() const;
 	QBrush activeColor() const;
@@ -64,6 +68,8 @@ public:
 	void setActiveColor( const QBrush & b );
 	void setTextShadowColor( const QColor &c );
 	void setBorderColor( const QColor &c );
+	int titleBarHeight() const;
+	int frameWidth() const;
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
@@ -97,4 +103,8 @@ private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
 };
 
-#endif
+
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SUBWINDOW_H

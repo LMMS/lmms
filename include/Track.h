@@ -22,23 +22,34 @@
  *
  */
 
-#ifndef TRACK_H
-#define TRACK_H
+#ifndef LMMS_TRACK_H
+#define LMMS_TRACK_H
 
+#include <vector>
 
-#include <QtCore/QVector>
 #include <QColor>
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_basics.h"
+#include <optional>
 
+
+namespace lmms
+{
 
 class TimePos;
 class TrackContainer;
-class TrackContainerView;
-class TrackContentObject;
+class Clip;
+
+
+namespace gui
+{
+
 class TrackView;
+class TrackContainerView;
+
+}
 
 
 /*! The minimum track height in pixels
@@ -56,78 +67,76 @@ char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<TrackContentObject *> tcoVector;
+	using clipVector = std::vector<Clip*>;
 
-	enum TrackTypes
+	enum class Type
 	{
-		InstrumentTrack,
-		BBTrack,
-		SampleTrack,
-		EventTrack,
-		VideoTrack,
-		AutomationTrack,
-		HiddenAutomationTrack,
-		NumTrackTypes
+		Instrument,
+		Pattern,
+		Sample,
+		Event,
+		Video,
+		Automation,
+		HiddenAutomation,
+		Count
 	} ;
 
-	Track( TrackTypes type, TrackContainer * tc );
-	virtual ~Track();
+	Track( Type type, TrackContainer * tc );
+	~Track() override;
 
-	static Track * create( TrackTypes tt, TrackContainer * tc );
+	static Track * create( Type tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
 	Track * clone();
 
 
 	// pure virtual functions
-	TrackTypes type() const
+	Type type() const
 	{
 		return m_type;
 	}
 
 	virtual bool play( const TimePos & start, const fpp_t frames,
-						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
+						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
-	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & doc,
-						QDomElement & parent ) = 0;
+	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
+	virtual Clip * createClip( const TimePos & pos ) = 0;
+
+	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
+	// Saving and loading of presets which do not necessarily contain all the track information
+	void savePreset(QDomDocument & doc, QDomElement & element);
+	void loadPreset(const QDomElement & element);
 
+	// Saving and loading of full tracks
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	void setSimpleSerializing()
-	{
-		m_simpleSerializingMode = true;
-	}
-
-	// -- for usage by TrackContentObject only ---------------
-	TrackContentObject * addTCO( TrackContentObject * tco );
-	void removeTCO( TrackContentObject * tco );
+	// -- for usage by Clip only ---------------
+	Clip * addClip( Clip * clip );
+	void removeClip( Clip * clip );
 	// -------------------------------------------------------
-	void deleteTCOs();
+	void deleteClips();
 
-	int numOfTCOs();
-	TrackContentObject * getTCO( int tcoNum );
-	int getTCONum(const TrackContentObject* tco );
+	int numOfClips();
+	auto getClip(std::size_t clipNum) -> Clip*;
+	int getClipNum(const Clip* clip );
 
-	const tcoVector & getTCOs() const
+	const clipVector & getClips() const
 	{
-		return m_trackContentObjects;
+		return m_clips;
 	}
-	void getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+	void getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end );
-	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
+	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
-	void createTCOsForBB( int bb );
+	void createClipsForPattern(int pattern);
 
 
 	void insertBar( const TimePos & pos );
@@ -177,61 +186,61 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	
-	QColor color()
+
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
+
+	bool isMutedBeforeSolo() const
 	{
-		return m_color;
-	}
-	bool useColor()
-	{
-		return m_hasColor;
+		return m_mutedBeforeSolo;
 	}
 	
 	BoolModel* getMutedModel();
 
 public slots:
-	virtual void setName( const QString & newName )
+	virtual void setName(const QString& newName);
+
+	void setMutedBeforeSolo(const bool muted)
 	{
-		m_name = newName;
-		emit nameChanged();
+		m_mutedBeforeSolo = muted;
 	}
 
 	void toggleSolo();
 
-	void trackColorChanged( QColor & c );
-	void trackColorReset();
+private:
+	void saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode);
+	void loadTrack(const QDomElement& element, bool presetMode);
 
 private:
 	TrackContainer* m_trackContainer;
-	TrackTypes m_type;
+	Type m_type;
 	QString m_name;
 	int m_height;
 
 protected:
 	BoolModel m_mutedModel;
+
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
-	bool m_simpleSerializingMode;
-
-	tcoVector m_trackContentObjects;
+	clipVector m_clips;
 
 	QMutex m_processingLock;
 	
-	QColor m_color;
-	bool m_hasColor;
+	std::optional<QColor> m_color;
 
-	friend class TrackView;
+	friend class gui::TrackView;
 
 
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void trackContentObjectAdded( TrackContentObject * );
-
+	void clipAdded( lmms::Clip * );
+	void colorChanged();
 } ;
 
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_H
