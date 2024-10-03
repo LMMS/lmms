@@ -467,9 +467,11 @@ void AudioFileProcessorWaveView::reverse()
 			- m_sample->endFrame()
 			- m_sample->startFrame()
 	);
+	
+	const int m_from_ = m_from;
 
 	setFrom(m_sample->sampleSize() - m_to);
-	setTo(m_sample->sampleSize() - m_from);
+	setTo(m_sample->sampleSize() - m_from_);
 	m_reversed = ! m_reversed;
 }
 
