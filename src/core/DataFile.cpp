@@ -1644,43 +1644,43 @@ void DataFile::upgrade_noHiddenAutomationTracks()
 	// convert global automation tracks to non-hidden
 	QDomElement song = firstChildElement("lmms-project")
 		.firstChildElement("song");
-	QDomElement tc = song.firstChildElement("trackcontainer");
-	QDomElement gaTrack = song.firstChildElement("track");
-	if (!gaTrack.isNull()
-		&& gaTrack.attribute("type").toInt() == static_cast<int>(Track::Type::HiddenAutomation))
+	QDomElement trackContainer = song.firstChildElement("trackcontainer");
+	QDomElement globalAutomationTrack = song.firstChildElement("track");
+	if (!globalAutomationTrack.isNull()
+		&& globalAutomationTrack.attribute("type").toInt() == static_cast<int>(Track::Type::HiddenAutomation))
 	{
-		// global automationclips
-		QDomNodeList aps = gaTrack.elementsByTagName("automationclip");
+		// global automation clips
+		QDomNodeList automationClips = globalAutomationTrack.elementsByTagName("automationclip");
 		QList<QDomNode> tracksToInsert;
-		for (int i = 0; i < aps.length(); ++i)
+		for (int i = 0; i < automationClips.length(); ++i)
 		{
-			QDomElement ap = aps.item(i).toElement();
-			// If ap has time nodes, move it to trackcontainer
+			QDomElement automationClip = automationClips.item(i).toElement();
+			// If automationClip has time nodes, move it to trackcontainer
 			// There are times when an <object> node is present without an
 			// object with the same ID in the file, so we ignore that node
-			if (ap.elementsByTagName("time").length() > 1)
+			if (automationClip.elementsByTagName("time").length() > 1)
 			{
-				QDomElement aptrack = createElement("track");
-				aptrack.setAttribute("muted", QString::number(false));
-				aptrack.setAttribute("solo", QString::number(false));
-				aptrack.setAttribute("type",
+				QDomElement automationTrackForClip = createElement("track");
+				automationTrackForClip.setAttribute("muted", QString::number(false));
+				automationTrackForClip.setAttribute("solo", QString::number(false));
+				automationTrackForClip.setAttribute("type",
 					QString::number(static_cast<int>(Track::Type::Automation)));
-				aptrack.setAttribute("name",
-					ap.attribute("name", "Automation Track"));
+				automationTrackForClip.setAttribute("name",
+					automationClip.attribute("name", "Automation Track"));
 				QDomElement at = createElement("automationtrack");
-				aptrack.appendChild(at);
-				aptrack.appendChild(aps.item(i).cloneNode());
-				tracksToInsert.prepend(aptrack); // To preserve orders
+				automationTrackForClip.appendChild(at);
+				automationTrackForClip.appendChild(automationClips.item(i).cloneNode());
+				tracksToInsert.prepend(automationTrackForClip); // To preserve orders
 			}
 		}
 
-		// Insert the tracks at the beginning of tc, preserving their order
+		// Insert the tracks at the beginning of trackContainer, preserving their order
 		for (const auto& track : tracksToInsert) {
-			tc.insertBefore(track, tc.firstChild());
+			trackContainer.insertBefore(track, trackContainer.firstChild());
 		}
 
 		// Remove the track object just in case
-		gaTrack.parentNode().removeChild(gaTrack);
+		globalAutomationTrack.parentNode().removeChild(globalAutomationTrack);
 	}
 }
 
