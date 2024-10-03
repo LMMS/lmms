@@ -34,7 +34,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
@@ -52,7 +52,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView(nullptr),
 	m_dragging(false)
 {
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // TODO: Actual effect resizing
+	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
+	setFocusPolicy(Qt::StrongFocus);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
@@ -90,7 +91,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont(adjustedToPixelSize(f, 10));
+		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
@@ -257,7 +258,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_bg );
 
-	QFont f = adjustedToPixelSize(font(), 10);
+	QFont f = adjustedToPixelSize(font(), DEFAULT_FONT_SIZE);
 	f.setBold( true );
 	p.setFont( f );
 

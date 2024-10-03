@@ -45,7 +45,6 @@ InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 
 InstrumentView::~InstrumentView()
 {
-	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	if( instrumentTrackWindow() )
 	{
 		instrumentTrackWindow()->m_instrumentView = nullptr;

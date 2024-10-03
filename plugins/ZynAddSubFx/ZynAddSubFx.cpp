@@ -48,6 +48,7 @@
 #include "Clipboard.h"
 
 #include "embed.h"
+#include "FontHelper.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -546,8 +547,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	QFont f = m_toggleUIButton->font();
-	f.setPointSizeF(12);
-	m_toggleUIButton->setFont(f);
+	m_toggleUIButton->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
