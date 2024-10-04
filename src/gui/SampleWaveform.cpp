@@ -44,7 +44,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const float resolution = std::max(1.0f, framesPerPixel / maxFramesPerPixel);
 	const float framesPerResolution = framesPerPixel / resolution;
 
-	size_t numPixels = std::min<size_t>(parameters.size, width);
+	size_t numPixels = std::min(parameters.size, static_cast<size_t>(width));
 	auto min = std::vector<float>(numPixels, 1);
 	auto max = std::vector<float>(numPixels, -1);
 	auto squared = std::vector<float>(numPixels, 0);
