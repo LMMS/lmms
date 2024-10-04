@@ -78,8 +78,8 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
 
-	// disable the minimize button
-	setWindowFlags(this->windowFlags() & ~Qt::WindowMinimizeButtonHint);
+	// Disable the minimize button and make sure that the custom window hint is set
+	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
 
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
