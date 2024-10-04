@@ -25,6 +25,9 @@
 #ifndef LMMS_GUI_VIDEO_CLIP_WINDOW_H
 #define LMMS_GUI_VIDEO_CLIP_WINDOW_H
 
+#include <QCloseEvent>
+#include <QMediaPlayer>
+#include <QVideoWidget>
 #include <QWidget>
 
 namespace lmms
@@ -42,10 +45,19 @@ public:
     VideoClipWindow(VideoClip * vclip);
 
 public slots:
+    void playbackStateChanged();
+    void playbackPositionChanged();
+	void videoChanged();
+	void durationChanged();
 	void toggleVisibility(bool on);
+
+protected:
+	void closeEvent(QCloseEvent * ce) override;
 
 private:
     VideoClip * m_clip;
+    QMediaPlayer * m_mediaPlayer;
+    QVideoWidget * m_videoWidget;
 
 };
 

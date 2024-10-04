@@ -33,6 +33,7 @@ VideoClip::VideoClip(Track * track):
 {
 	saveJournallingState( false );
 	setVideoFile( "" );
+	changeLength(TimePos::ticksPerBar());
 	restoreJournallingState();
 }
 
@@ -49,8 +50,9 @@ void VideoClip::changeLength(const TimePos & _length)
 void VideoClip::setVideoFile(const QString& vf)
 {
     m_videoFile = vf;
-	changeLength(TimePos::ticksPerBar());
 	setStartTimeOffset(0);
+	
+	emit videoChanged();
 }
 
 void VideoClip::saveSettings( QDomDocument & _doc, QDomElement & _parent )

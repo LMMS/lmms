@@ -66,6 +66,10 @@ private:
     QString m_videoFile;
 
 	friend class gui::VideoClipView;
+
+signals:
+    void videoChanged();
+
 };
 
 } // namespace lmms

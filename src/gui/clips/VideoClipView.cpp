@@ -24,8 +24,11 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
+#include <QDebug>
 
+#include "ConfigManager.h"
 #include "embed.h"
+#include "FileDialog.h"
 #include "PathUtil.h"
 #include "Song.h"
 #include "Track.h" // I don't think this is right
@@ -52,7 +55,23 @@ VideoClipView::VideoClipView(VideoClip * clip, TrackView * tv):
 
 void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 {
-	m_window->toggleVisibility(m_window->parentWidget()->isHidden());
+	if (m_clip->videoFile().isEmpty())
+	{
+		qDebug() << "Video file empty!";
+
+		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open audio file"));
+		openFileDialog.setDirectory(ConfigManager::inst()->userSamplesDir());
+		if (openFileDialog.exec() == QDialog::Accepted && !openFileDialog.selectedFiles().isEmpty())
+		{
+			m_clip->setVideoFile(PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]));
+			qDebug() << PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]);
+		}
+	}
+	else
+	{
+		qDebug() << "Video file NOT empty!";
+		m_window->toggleVisibility(m_window->parentWidget()->isHidden());
+	}
 }
 
 
