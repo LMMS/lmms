@@ -54,6 +54,7 @@
 #include "TrackContainer.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VideoClip.h"
 
 namespace lmms::gui
 {
@@ -494,10 +495,11 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	auto sClip = dynamic_cast<SampleClip*>(m_clip);
 	auto pClip = dynamic_cast<PatternClip*>(m_clip);
+	auto vClip = dynamic_cast<VideoClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip))))
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || vClip))))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -631,6 +633,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
+		auto vClip = dynamic_cast<VideoClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
 		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
@@ -675,7 +678,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip) )
+				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || vClip) )
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -914,7 +917,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		{
 			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			auto pClip = dynamic_cast<PatternClip*>(m_clip);
-			if( sClip || pClip )
+			auto vClip = dynamic_cast<VideoClip*>(m_clip);
+			if( sClip || pClip || vClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
@@ -966,6 +970,10 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 								* TimePos::ticksPerBar();
 						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
 						pClip->setStartTimeOffset(position);
+					}
+					else if (vClip)
+					{
+						vClip->setStartTimeOffset(vClip->startTimeOffset() + positionOffset);
 					}
 				}
 			}

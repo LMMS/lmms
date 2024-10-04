@@ -81,38 +81,48 @@ void VideoClipWindow::durationChanged()
 
 void VideoClipWindow::playbackStateChanged()
 {
-	int offsetTime = Engine::getSong()->getPlayPos().getTimeInMilliseconds(Engine::getSong()->getTempo())
-							- m_clip->startPosition().getTimeInMilliseconds(Engine::getSong()->getTempo());
+	int currentTime = Engine::getSong()->getPlayPos().getTimeInMilliseconds(Engine::getSong()->getTempo());
+	int clipStartTime = m_clip->startPosition().getTimeInMilliseconds(Engine::getSong()->getTempo());
+	int clipStartOffset = m_clip->startTimeOffset().getTimeInMilliseconds(Engine::getSong()->getTempo());
+	int clipLengthMilliseconds = m_clip->length().getTimeInMilliseconds(Engine::getSong()->getTempo());
+
+	int videoStartTime = clipStartTime + (clipStartOffset > 0? clipStartOffset : 0);
+
 	if (Engine::getSong()->playMode() == Song::PlayMode::Song)
 	{
-		if (Engine::getSong()->isPlaying() && offsetTime >= 0 && m_mediaPlayer->state() != QMediaPlayer::PlayingState)
+		if (Engine::getSong()->isPlaying() && currentTime >= videoStartTime && currentTime < clipStartTime + clipLengthMilliseconds
+			&& m_mediaPlayer->state() != QMediaPlayer::PlayingState)
 		{
 			m_mediaPlayer->play();
 			qDebug() << "Play!";
-			m_mediaPlayer->setPosition(std::max(offsetTime, 0));
+			qDebug() << "start offset" << clipStartOffset;
+			qDebug() << "current time" << currentTime;
+			qDebug() << "clip start time" << clipStartTime;
+			qDebug() << "video start time" << videoStartTime;
+			m_mediaPlayer->setPosition(std::max(currentTime - clipStartTime - clipStartOffset, 0));
 		}
-		else if ((!Engine::getSong()->isPlaying() || Engine::getSong()->isPlaying() && offsetTime < 0)
-					&& m_mediaPlayer->state() == QMediaPlayer::PlayingState)
+		else if (!Engine::getSong()->isPlaying() || (Engine::getSong()->isPlaying() && (currentTime < videoStartTime || currentTime >= clipStartTime + clipLengthMilliseconds)
+					&& m_mediaPlayer->state() == QMediaPlayer::PlayingState))
 		{
 			m_mediaPlayer->pause();
 			qDebug() << "Pause!";
-			m_mediaPlayer->setPosition(std::max(offsetTime, 0));
+			m_mediaPlayer->setPosition(std::max(currentTime - clipStartTime - clipStartOffset, 0));
 		}
 	}
 	else if (m_mediaPlayer->state() == QMediaPlayer::PlayingState)
 	{
 		m_mediaPlayer->pause();
 		qDebug() << "Pause! Not song playmode!";
-		m_mediaPlayer->setPosition(std::max(offsetTime, 0));
+		m_mediaPlayer->setPosition(std::max(currentTime - clipStartTime - clipStartOffset, 0));
 	}
 }
 
 void VideoClipWindow::playbackPositionChanged()
 {
 	qDebug() << "Playback position changed!" << Engine::getSong()->getPlayPos();
-	int offsetTime = Engine::getSong()->getPlayPos().getTimeInMilliseconds(Engine::getSong()->getTempo())
-							- m_clip->startPosition().getTimeInMilliseconds(Engine::getSong()->getTempo());
-	m_mediaPlayer->setPosition(std::max(offsetTime, 0));
+	int currentTime = Engine::getSong()->getPlayPos().getTimeInMilliseconds(Engine::getSong()->getTempo());
+	int clipStartTime = m_clip->startPosition().getTimeInMilliseconds(Engine::getSong()->getTempo());
+	m_mediaPlayer->setPosition(std::max(currentTime - clipStartTime, 0));
 }
 
 

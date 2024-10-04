@@ -35,6 +35,8 @@ VideoClip::VideoClip(Track * track):
 	setVideoFile( "" );
 	changeLength(TimePos::ticksPerBar());
 	restoreJournallingState();
+	
+	setAutoResize(false);
 }
 
 gui::ClipView * VideoClip::createView(gui::TrackView * tv)
