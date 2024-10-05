@@ -53,6 +53,11 @@ VideoClip::VideoClip(VideoClip & orig):
 	setVideoFile(orig.videoFile());
 }
 
+VideoClip::~VideoClip()
+{
+	delete m_window;
+}
+
 gui::ClipView * VideoClip::createView(gui::TrackView * tv)
 {
 	return new gui::VideoClipView(this, tv);

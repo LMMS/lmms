@@ -46,6 +46,7 @@ class VideoClip : public Clip
 public:
     VideoClip(Track * track);
     VideoClip(VideoClip & orig);
+    ~VideoClip() override;
 
     gui::ClipView * createView( gui::TrackView * tv ) override;
 
