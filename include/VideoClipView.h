@@ -37,20 +37,19 @@ namespace gui
 
 class VideoClipView : public ClipView
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    VideoClipView(VideoClip * clip, TrackView * tv);
-    //~VideoClip() override;
+	VideoClipView(VideoClip * clip, TrackView * tv);
 
 protected:
 	void paintEvent(QPaintEvent * pe) override;
-    void mouseDoubleClickEvent(QMouseEvent * me) override;
+	void mouseDoubleClickEvent(QMouseEvent * me) override;
 
 private:
-    VideoClip * m_clip;
+	VideoClip * m_clip;
 	QPixmap m_paintPixmap;
-    
-    bool splitClip( const TimePos pos ) override;
+
+	bool splitClip( const TimePos pos ) override;
 };
 
 } // namespace gui

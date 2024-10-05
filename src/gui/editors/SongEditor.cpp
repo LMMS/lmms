@@ -949,10 +949,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 	connect(m_addVideoTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addVideoTrack()));
 
-	trackActionsToolBar->addAction( m_addPatternTrackAction );
-	trackActionsToolBar->addAction( m_addSampleTrackAction );
-	trackActionsToolBar->addAction( m_addAutomationTrackAction );
-	trackActionsToolBar->addAction( m_addVideoTrackAction );
+	trackActionsToolBar->addAction(m_addPatternTrackAction);
+	trackActionsToolBar->addAction(m_addSampleTrackAction);
+	trackActionsToolBar->addAction(m_addAutomationTrackAction);
+	trackActionsToolBar->addAction(m_addVideoTrackAction);
 
 
 	// Edit actions

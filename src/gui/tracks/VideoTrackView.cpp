@@ -33,12 +33,12 @@ namespace lmms::gui
 {
 
 VideoTrackView::VideoTrackView(VideoTrack * _track, TrackContainerView* tcv):
-    TrackView(_track, tcv)
+	TrackView(_track, tcv)
 {
 	setFixedHeight(32);
 
 	m_trackLabel = new TrackLabelButton(this, getTrackSettingsWidget());
-	m_trackLabel->setIcon( embed::getIconPixmap("video_track"));
+	m_trackLabel->setIcon(embed::getIconPixmap("video_track"));
 	m_trackLabel->move(3, 1);
 	m_trackLabel->show();
 	setModel(_track);

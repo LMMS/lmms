@@ -31,36 +31,34 @@ namespace lmms
 {
 
 VideoTrack::VideoTrack(TrackContainer* tc):
-    Track(Track::Type::Video, tc)
+	Track(Track::Type::Video, tc)
 {
-    setName(tr("Video track"));
+	setName(tr("Video track"));
 }
 
 bool VideoTrack::play(const TimePos & start, const fpp_t frames, const f_cnt_t frameBase, int clipNum)
 {
-    return true;
+	return true;
 }
 
 gui::TrackView * VideoTrack::createView(gui::TrackContainerView * view)
 {
-    return new gui::VideoTrackView(this, view);
+	return new gui::VideoTrackView(this, view);
 }
 
 Clip * VideoTrack::createClip(const TimePos & pos)
 {
-    auto vClip = new VideoClip(this);
+	auto vClip = new VideoClip(this);
 	vClip->movePosition(pos);
 	return vClip;
 }
 
 void VideoTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode)
 {
-
 }
 
 void VideoTrack::loadTrackSpecificSettings(const QDomElement & element)
 {
-
 }
 
 } // namespace lmms

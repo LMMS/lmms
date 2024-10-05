@@ -39,19 +39,18 @@ namespace gui
 
 class VideoTrack : public Track
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    VideoTrack(TrackContainer* tc);
-    //~VideoTrack() override;
+	VideoTrack(TrackContainer* tc);
 
-    bool play( const TimePos & start, const fpp_t frames,
+	bool play( const TimePos & start, const fpp_t frames,
 						const f_cnt_t frameBase, int clipNum = -1 ) override;
-    
-    gui::TrackView * createView( gui::TrackContainerView * view ) override;
 
-    Clip * createClip( const TimePos & pos ) override;
+	gui::TrackView * createView( gui::TrackContainerView * view ) override;
 
-    void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
+	Clip * createClip( const TimePos & pos ) override;
+
+	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & element ) override;
 
 	QString nodeName() const override

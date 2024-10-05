@@ -831,7 +831,7 @@ void Song::addAutomationTrack()
 
 void Song::addVideoTrack()
 {
-	( void )Track::create( Track::Type::Video, this );
+	(void)Track::create(Track::Type::Video, this);
 }
 
 

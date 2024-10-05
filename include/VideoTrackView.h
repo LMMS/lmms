@@ -39,12 +39,12 @@ class TrackLabelButton;
 
 class VideoTrackView : public TrackView
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    VideoTrackView(VideoTrack * _track, TrackContainerView* tcv);
+	VideoTrackView(VideoTrack * _track, TrackContainerView* tcv);
 
-    void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-    void loadSettings( const QDomElement & _this ) override;
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	VideoTrack * model()
 	{
@@ -63,7 +63,7 @@ protected:
 	}
 
 private:
-    TrackLabelButton * m_trackLabel;
+	TrackLabelButton * m_trackLabel;
 
 };
 

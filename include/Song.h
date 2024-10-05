@@ -159,7 +159,7 @@ public:
 	{
 		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = pos.getTimeInMilliseconds(getTempo());
 		getPlayPos(playMode).setTicks(pos.getTicks());
-		if( isPlaying() )
+		if(isPlaying())
 		{
 			emit playbackPositionChanged();
 		}
@@ -174,7 +174,7 @@ public:
 	{
 		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		getPlayPos(playMode).setTicks(ticks);
-		if( isPlaying() )
+		if(isPlaying())
 		{
 			emit playbackPositionChanged();
 		}

@@ -24,14 +24,13 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
-#include <QDebug>
 
 #include "ConfigManager.h"
 #include "embed.h"
 #include "FileDialog.h"
 #include "PathUtil.h"
 #include "Song.h"
-#include "Track.h" // I don't think this is right
+#include "Track.h"
 #include "VideoClip.h"
 #include "VideoClipView.h"
 #include "VideoClipWindow.h"
@@ -40,13 +39,10 @@ namespace lmms::gui
 {
 
 VideoClipView::VideoClipView(VideoClip * clip, TrackView * tv):
-    ClipView(clip, tv),
-    m_clip(clip),
-    m_paintPixmap()
+	ClipView(clip, tv),
+	m_clip(clip),
+	m_paintPixmap()
 {
-    //updateVideo();
-	qDebug() << "VideoClipView Constructor!";
-
 	setStyle(QApplication::style());
 }
 
@@ -58,7 +54,7 @@ void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 	{
 		qDebug() << "Video file empty!";
 
-		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open audio file"));
+		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open video file"));
 		openFileDialog.setDirectory(ConfigManager::inst()->userSamplesDir());
 		if (openFileDialog.exec() == QDialog::Accepted && !openFileDialog.selectedFiles().isEmpty())
 		{
@@ -68,7 +64,6 @@ void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 	}
 	else
 	{
-		qDebug() << "Video file NOT empty!";
 		// TODO maybe use a getter instead of accessing private member?
 		m_clip->m_window->toggleVisibility(m_clip->m_window->parentWidget()->isHidden());
 	}
@@ -91,7 +86,7 @@ void VideoClipView::paintEvent(QPaintEvent* pe)
 	{
 		m_paintPixmap = QPixmap(size());
 	}
-    
+
 	QPainter p(&m_paintPixmap);
 
     bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();

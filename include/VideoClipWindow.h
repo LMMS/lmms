@@ -40,13 +40,13 @@ namespace gui
 
 class VideoClipWindow : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    VideoClipWindow(VideoClip * vclip);
+	VideoClipWindow(VideoClip * vclip);
 
 public slots:
-    void playbackStateChanged();
-    void playbackPositionChanged();
+	void playbackStateChanged();
+	void playbackPositionChanged();
 	void videoChanged();
 	void durationChanged();
 	void toggleVisibility(bool on);
@@ -55,9 +55,9 @@ protected:
 	void closeEvent(QCloseEvent * ce) override;
 
 private:
-    VideoClip * m_clip;
-    QMediaPlayer * m_mediaPlayer;
-    QVideoWidget * m_videoWidget;
+	VideoClip * m_clip;
+	QMediaPlayer * m_mediaPlayer;
+	QVideoWidget * m_videoWidget;
 
 };
 
