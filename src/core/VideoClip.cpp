@@ -22,6 +22,8 @@
  *
  */
 
+#include <QDomElement>
+
 #include "VideoClip.h"
 #include "VideoClipView.h"
 #include "VideoClipWindow.h"
@@ -71,10 +73,22 @@ void VideoClip::setVideoFile(const QString& vf)
 
 void VideoClip::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
+	_parent.setAttribute("pos", startPosition());
+	_parent.setAttribute("len", length());
+	_parent.setAttribute("src", videoFile());
+	_parent.setAttribute("off", startTimeOffset());
+	// TODO color?
 }
 
 void VideoClip::loadSettings( const QDomElement & _this )
 {
+	if (_this.attribute("pos") >= 0)
+	{
+		movePosition(_this.attribute("pos").toInt());
+	}
+	setVideoFile(_this.attribute("src"));
+	changeLength(_this.attribute("len").toInt());
+	setStartTimeOffset(_this.attribute("off").toInt());
 }
 
 } // namespace lmms
