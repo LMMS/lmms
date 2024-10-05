@@ -32,9 +32,8 @@ namespace lmms
 VideoClip::VideoClip(Track * track):
 	Clip(track)
 {
-	qDebug() << "Normal Constructor!";
 	saveJournallingState( false );
-	setVideoFile( "" );
+	setVideoFile("");
 	changeLength(TimePos::ticksPerBar());
 	restoreJournallingState();
 

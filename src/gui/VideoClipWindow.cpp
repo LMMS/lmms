@@ -39,7 +39,6 @@ VideoClipWindow::VideoClipWindow(VideoClip * vclip):
 	QWidget(),
 	m_clip(vclip)
 {
-	qDebug() << "VideoClipWindow Constructor!";
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	subWin->resize(640,480);
 	subWin->hide();
@@ -54,7 +53,10 @@ VideoClipWindow::VideoClipWindow(VideoClip * vclip):
 
 	connect(Engine::getSong(), &Song::playbackStateChanged, this, &VideoClipWindow::playbackStateChanged);
 	connect(Engine::getSong(), &Song::playbackPositionChanged, this, &VideoClipWindow::playbackPositionChanged);
+
 	connect(m_clip, &VideoClip::videoChanged, this, &VideoClipWindow::videoChanged);
+
+	connect(Engine::getSong(), &Song::tempoChanged, this, &VideoClipWindow::durationChanged);
 	connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &VideoClipWindow::durationChanged);
 
 	// TODO: Checking for updates 60 times per second is not optimal; it would be better to connect this to

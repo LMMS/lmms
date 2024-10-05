@@ -126,17 +126,17 @@ void VideoClipView::paintEvent(QPaintEvent* pe)
 		p.setPen(p.pen().brush().color().darker(150));
 	}
 
-	const int spacing = BORDER_WIDTH + 1;
-	const float ppb = fixedClips() ?
+	//const int spacing = BORDER_WIDTH + 1;
+	/*const float ppb = fixedClips() ?
 			( parentWidget()->width() - 2 * BORDER_WIDTH )
 					/ (float) m_clip->length().getBar() :
-								pixelsPerBar();
+								pixelsPerBar();*/
 
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	//float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	//QRect r = QRect( offset, spacing,
 	//		qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 
