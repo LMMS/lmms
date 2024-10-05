@@ -55,15 +55,12 @@ void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 {
 	if (m_clip->videoFile().isEmpty())
 	{
-		qDebug() << "Video file empty!";
-		
 		// Copied from SampleLoader.cpp
 		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open video file"));
 		openFileDialog.setDirectory(ConfigManager::inst()->userSamplesDir());
 		if (openFileDialog.exec() == QDialog::Accepted && !openFileDialog.selectedFiles().isEmpty())
 		{
 			m_clip->setVideoFile(PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]));
-			qDebug() << PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]);
 		}
 	}
 	else
