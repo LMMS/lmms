@@ -2,6 +2,9 @@
  * VideoClipView.cpp
  *
  * Copyright (c) 2024 regulus79
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * (Portions copied from SampleClipView.cpp and SampleLoader.cpp)
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -53,7 +56,8 @@ void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 	if (m_clip->videoFile().isEmpty())
 	{
 		qDebug() << "Video file empty!";
-
+		
+		// Copied from SampleLoader.cpp
 		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open video file"));
 		openFileDialog.setDirectory(ConfigManager::inst()->userSamplesDir());
 		if (openFileDialog.exec() == QDialog::Accepted && !openFileDialog.selectedFiles().isEmpty())
@@ -69,7 +73,7 @@ void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 	}
 }
 
-
+// Copied from SampleClipView.cpp
 void VideoClipView::paintEvent(QPaintEvent* pe)
 {
     QPainter painter(this);
@@ -174,6 +178,7 @@ void VideoClipView::paintEvent(QPaintEvent* pe)
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
+// Copied from SampleClipView.cpp
 bool VideoClipView::splitClip(const TimePos pos)
 {
 	setMarkerEnabled(false);

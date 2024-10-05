@@ -2,6 +2,8 @@
  * VideoTrackView.cpp
  *
  * Copyright (c) 2024 regulus79
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * (Portions copied from PatternTrackView.cpp)
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -35,8 +37,8 @@ namespace lmms::gui
 VideoTrackView::VideoTrackView(VideoTrack * _track, TrackContainerView* tcv):
 	TrackView(_track, tcv)
 {
+	// Copied from PatternTrackView.cpp
 	setFixedHeight(32);
-
 	m_trackLabel = new TrackLabelButton(this, getTrackSettingsWidget());
 	m_trackLabel->setIcon(embed::getIconPixmap("video_track"));
 	m_trackLabel->move(3, 1);

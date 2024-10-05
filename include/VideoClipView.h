@@ -2,6 +2,8 @@
  * VideoClipView.h
  *
  * Copyright (c) 2024 regulus79
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * (Portions copied from SampleTrackView.h)
  *
  * This file is part of LMMS - https://lmms.io
  *

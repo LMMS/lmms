@@ -2,6 +2,8 @@
  * VideoClipWindow.cpp
  *
  * Copyright (c) 2024 regulus79
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * (Portions copied from SampleTrackWindow.cpp and TimeLineWidget.cpp)
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -62,6 +64,8 @@ VideoClipWindow::VideoClipWindow(VideoClip * vclip):
 	// TODO: Checking for updates 60 times per second is not optimal; it would be better to connect this to
 	// a positionChanged signal from the timeline, but unfortunately the Song's getTimeline function returns
 	// a Timeline object, while the object which gives the signal is TimeLineWidget (which we cannot access).
+	
+	// Copied from TimeLineWidget.cpp
 	auto updateTimer = new QTimer(this);
 	connect(updateTimer, &QTimer::timeout, this, &VideoClipWindow::playbackStateChanged);
 	updateTimer->start( 1000 / 60 );  // 60 fps
@@ -124,7 +128,7 @@ void VideoClipWindow::playbackPositionChanged()
 	}
 }
 
-
+// Copied from SampleTrackWindow.cpp
 void VideoClipWindow::toggleVisibility(bool on)
 {
 	if(on)
@@ -139,6 +143,7 @@ void VideoClipWindow::toggleVisibility(bool on)
 	}
 }
 
+// Copied from SampleTrackWindow.cpp
 void VideoClipWindow::closeEvent(QCloseEvent* ce)
 {
 	ce->ignore();

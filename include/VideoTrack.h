@@ -1,7 +1,9 @@
 /*
  * VideoTrack.h - class VideoTrack, a track for VideoClips to be shown to sync music to
  *
- * Copyright (c) 2024 regulu79
+ * Copyright (c) 2024 regulus79
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * (Portions copied from VideoTrack.h)
  *
  * This file is part of LMMS - https://lmms.io
  *
