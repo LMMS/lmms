@@ -49,7 +49,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	auto max = std::vector<float>(numPixels, -1);
 	auto squared = std::vector<float>(numPixels, 0);
 
-	const size_t maxFrames = static_cast<size_t>(static_cast<float>(numPixels) * framesPerPixel);
+	const size_t maxFrames = static_cast<size_t>(numPixels * framesPerPixel);
 
 	auto pixelIndex = std::size_t{0};
 
