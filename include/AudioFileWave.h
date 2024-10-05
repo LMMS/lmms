@@ -37,21 +37,24 @@ namespace lmms
 class AudioFileWave : public AudioFileDevice
 {
 public:
-	AudioFileWave( OutputSettings const & outputSettings,
-			const ch_cnt_t channels,
-			bool & successful,
-			const QString & file,
-			AudioEngine* audioEngine );
+	AudioFileWave(OutputSettings const& outputSettings,
+			bool& successful,
+			const QString& file,
+			const fpp_t defaultBufferSize);
 	~AudioFileWave() override;
 
-	static AudioFileDevice * getInst( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  AudioEngine* audioEngine,
-					  bool & successful )
+	static AudioFileDevice* getInst(
+			OutputSettings const &outputSettings,
+			bool &successful,
+			const QString & outputFilename,
+			const fpp_t defaultBufferSize)
 	{
-		return new AudioFileWave( outputSettings, channels, successful,
-					  outputFilename, audioEngine );
+		return new AudioFileWave(
+			outputSettings,
+			successful,
+			outputFilename,
+			defaultBufferSize
+		);
 	}
 
 

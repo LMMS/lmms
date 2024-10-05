@@ -37,26 +37,22 @@ class AudioFileFlac : public AudioFileDevice
 {
 public:
 	AudioFileFlac(OutputSettings const& outputSettings,
-			ch_cnt_t const channels,
 			bool& successful,
-			QString const& file,
-			AudioEngine* audioEngine
-	);
-
+			const QString& file,
+			const fpp_t defaultBufferSize);
 	~AudioFileFlac() override;
 
-	static AudioFileDevice* getInst(QString const& outputFilename,
-			OutputSettings const& outputSettings,
-			ch_cnt_t const channels,
-			AudioEngine* audioEngine,
-			bool& successful)
+	static AudioFileDevice* getInst(
+			OutputSettings const &outputSettings,
+			bool &successful,
+			const QString & outputFilename,
+			const fpp_t defaultBufferSize)
 	{
 		return new AudioFileFlac(
 			outputSettings,
-			channels,
 			successful,
 			outputFilename,
-			audioEngine
+			defaultBufferSize
 		);
 	}
 

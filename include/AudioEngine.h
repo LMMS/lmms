@@ -337,6 +337,8 @@ private:
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
 
+	void startExporting(const struct qualitySettings& qs);
+
 
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();

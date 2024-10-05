@@ -25,10 +25,11 @@
 #ifndef LMMS_PROJECT_RENDERER_H
 #define LMMS_PROJECT_RENDERER_H
 
-#include "AudioFileDevice.h"
 #include "lmmsconfig.h"
+#include "LmmsExporter.h"
 #include "AudioEngine.h"
 #include "OutputSettings.h"
+#include "PerfLog.h"
 
 #include "lmms_export.h"
 
@@ -36,48 +37,20 @@ namespace lmms
 {
 
 
-class LMMS_EXPORT ProjectRenderer : public QThread
+class LMMS_EXPORT ProjectRenderer : public QObject
 {
 	Q_OBJECT
 public:
-	enum class ExportFileFormat : int
-	{
-		Wave,
-		Flac,
-		Ogg,
-		MP3,
-		Count
-	} ;
-	constexpr static auto NumFileFormats = static_cast<std::size_t>(ExportFileFormat::Count);
-
-	struct FileEncodeDevice
-	{
-		bool isAvailable() const { return m_getDevInst != nullptr; }
-
-		ExportFileFormat m_fileFormat;
-		const char * m_description;
-		const char * m_extension;
-		AudioFileDeviceInstantiaton m_getDevInst;
-	} ;
-
-
 	ProjectRenderer( const AudioEngine::qualitySettings & _qs,
 				const OutputSettings & _os,
-				ExportFileFormat _file_format,
+				LmmsExporter::ExportAudioFileFormat exportFileFormat,
 				const QString & _out_file );
 	~ProjectRenderer() override = default;
 
-	bool isReady() const
+	inline bool isReady()
 	{
-		return m_fileDev != nullptr;
+		return m_exporter.canExportAutioFile();
 	}
-
-	static ExportFileFormat getFileFormatFromExtension(
-							const QString & _ext );
-
-	static QString getFileExtensionFromFormat( ExportFileFormat fmt );
-
-	static const std::array<FileEncodeDevice, 5> fileEncodeDevices;
 
 public slots:
 	void startProcessing();
@@ -88,17 +61,22 @@ public slots:
 
 signals:
 	void progressChanged( int );
-
+	void finished();
 
 private:
-	void run() override;
+	// fill m_activeRenderer's buffer
+	// provided as function pointer to m_activeRenderer
+	static void nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* dataIn);
+	static void endRendering(void* dataIn);
 
-	AudioFileDevice * m_fileDev;
-	AudioEngine::qualitySettings m_qualitySettings;
+	const AudioEngine::qualitySettings m_qualitySettings;
+
+	LmmsExporter m_exporter;
 
 	volatile int m_progress;
-	volatile bool m_abort;
+	std::unique_ptr<PerfLogTimer> m_timer;
 
+	friend class LmmsExporter;
 } ;
 
 

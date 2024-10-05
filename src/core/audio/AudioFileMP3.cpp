@@ -35,16 +35,13 @@
 namespace lmms
 {
 
-AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
-				const ch_cnt_t channels,
-				bool & successful,
-				const QString & file,
-				AudioEngine* audioEngine ) :
-	AudioFileDevice( outputSettings, channels, file, audioEngine )
+AudioFileMP3::AudioFileMP3(OutputSettings const& outputSettings,
+			bool& successful,
+			const QString& file,
+			const fpp_t defaultBufferSize) :
+	AudioFileDevice(outputSettings, file, defaultBufferSize)
 {
 	successful = true;
-	// For now only accept stereo sources
-	successful &= channels == 2;
 	successful &= initEncoder();
 	successful &= outputFileOpened();
 }

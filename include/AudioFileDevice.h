@@ -28,19 +28,23 @@
 
 #include <QFile>
 
-#include "AudioDevice.h"
 #include "OutputSettings.h"
 
 namespace lmms
 {
 
-class AudioFileDevice : public AudioDevice
+class SampleFrame;
+
+class AudioFileDevice
 {
 public:
+	// getBufferFunction
+	using BufferFn = std::function<void(SampleFrame*, fpp_t*, fpp_t)>;
+
 	AudioFileDevice(OutputSettings const & outputSettings,
-			const ch_cnt_t _channels, const QString & _file,
-			AudioEngine* audioEngine );
-	~AudioFileDevice() override;
+			const QString & _file,
+			const fpp_t defaultBufferSize);
+	virtual ~AudioFileDevice();
 
 	QString outputFile() const
 	{
@@ -49,8 +53,20 @@ public:
 
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
 
+	sample_rate_t getSampleRate();
+	// how many samples to store in a buffer
+	const fpp_t getDefaultFrameCount();
+
+	void setSampleRate(sample_rate_t newSampleRate);
+
+	// save audio
+	void processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
+
 
 protected:
+	// subclasses can re-implement this for being used in conjunction with
+	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
+
 	int writeData( const void* data, int len );
 
 	inline bool outputFileOpened() const
@@ -66,10 +82,12 @@ protected:
 private:
 	QFile m_outputFile;
 	OutputSettings m_outputSettings;
+
+	const fpp_t m_defaultFrameCount;
 } ;
 
 using AudioFileDeviceInstantiaton
-	= AudioFileDevice* (*)(const QString&, const OutputSettings&, const ch_cnt_t, AudioEngine*, bool&);
+	= AudioFileDevice* (*)(const OutputSettings&, bool&, const QString&, const fpp_t);
 
 } // namespace lmms
 

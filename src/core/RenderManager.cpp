@@ -38,7 +38,7 @@ namespace lmms
 RenderManager::RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormat fmt,
+		LmmsExporter::ExportAudioFileFormat fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
 	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
@@ -181,7 +181,7 @@ void RenderManager::restoreMutedState()
 // Determine the output path for a track when rendering tracks individually
 QString RenderManager::pathForTrack(const Track *track, int num)
 {
-	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
+	QString extension = LmmsExporter::getAudioFileExtensionFromFormat(m_format);
 	QString name = track->name();
 	name = name.remove(QRegularExpression(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );

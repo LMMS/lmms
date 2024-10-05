@@ -62,7 +62,7 @@ private:
 	QString m_fileExtension;
 	bool m_multiExport;
 
-	ProjectRenderer::ExportFileFormat m_ft;
+	LmmsExporter::ExportAudioFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 

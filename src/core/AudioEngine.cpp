@@ -239,6 +239,15 @@ void AudioEngine::stopProcessing()
 }
 
 
+void AudioEngine::startExporting(const struct qualitySettings& qs)
+{
+	stopProcessing();
+
+	m_qualitySettings = qs;
+
+	emit qualitySettingsChanged();
+	emit sampleRateChanged();
+}
 
 
 sample_rate_t AudioEngine::baseSampleRate() const
@@ -493,8 +502,6 @@ void AudioEngine::clearInternal()
 }
 
 
-
-
 void AudioEngine::changeQuality(const struct qualitySettings & qs)
 {
 	// don't delete the audio-device
@@ -514,9 +521,6 @@ void AudioEngine::changeQuality(const struct qualitySettings & qs)
 void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 {
 	// TODO: Use shared_ptr here in the future.
-	// Currently, this is safe, because this is only called by
-	// ProjectRenderer, and after ProjectRenderer calls this function,
-	// it does not access the old device anymore.
 	if( m_audioDev != m_oldAudioDev ) {delete m_audioDev;}
 
 	if( _dev )

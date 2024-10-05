@@ -22,202 +22,57 @@
  *
  */
 
-
-#include <QFile>
-
 #include "ProjectRenderer.h"
 #include "Song.h"
-#include "PerfLog.h"
-
-#include "AudioFileWave.h"
-#include "AudioFileOgg.h"
-#include "AudioFileMP3.h"
-#include "AudioFileFlac.h"
-
 
 namespace lmms
 {
 
-
-const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
-{
-
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Wave,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
-					".wav", &AudioFileWave::getInst },
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Flac,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
-		".flac",
-		&AudioFileFlac::getInst
-	},
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Ogg,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
-					".ogg",
-#ifdef LMMS_HAVE_OGGVORBIS
-					&AudioFileOgg::getInst
-#else
-					nullptr
-#endif
-									},
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::MP3,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
-					".mp3",
-#ifdef LMMS_HAVE_MP3LAME
-					&AudioFileMP3::getInst
-#else
-					nullptr
-#endif
-									},
-	// Insert your own file-encoder infos here.
-	// Maybe one day the user can add own encoders inside the program.
-
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Count, nullptr, nullptr, nullptr }
-
-} ;
-
-
-
-
 ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
-					ExportFileFormat exportFileFormat,
+					LmmsExporter::ExportAudioFileFormat exportFileFormat,
 					const QString & outputFilename ) :
-	QThread( Engine::audioEngine() ),
-	m_fileDev( nullptr ),
-	m_qualitySettings( qualitySettings ),
-	m_progress( 0 ),
-	m_abort( false )
+	m_qualitySettings(qualitySettings),
+	m_exporter(LmmsExporter::ExportFileType::Audio, outputFilename),
+	m_progress(0)
 {
-	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
-
-	if (audioEncoderFactory)
-	{
-		bool successful = false;
-
-		m_fileDev = audioEncoderFactory(
-					outputFilename, outputSettings, DEFAULT_CHANNELS,
-					Engine::audioEngine(), successful );
-		if( !successful )
-		{
-			delete m_fileDev;
-			m_fileDev = nullptr;
-		}
-	}
+	m_timer = nullptr;
+	m_exporter.setupAudioRendering(outputSettings, exportFileFormat, Engine::audioEngine()->framesPerPeriod(),
+		&nextOutputBuffer, &endRendering, this);
 }
-
-
-
-
-// Little help function for getting file format from a file extension
-// (only for registered file-encoders).
-ProjectRenderer::ExportFileFormat ProjectRenderer::getFileFormatFromExtension(
-							const QString & _ext )
-{
-	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileFormat != ExportFileFormat::Count )
-	{
-		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
-		{
-			return( fileEncodeDevices[idx].m_fileFormat );
-		}
-		++idx;
-	}
-
-	return( ExportFileFormat::Wave ); // Default.
-}
-
-
-
-
-QString ProjectRenderer::getFileExtensionFromFormat(
-		ExportFileFormat fmt )
-{
-	return fileEncodeDevices[static_cast<std::size_t>(fmt)].m_extension;
-}
-
-
 
 
 void ProjectRenderer::startProcessing()
 {
-
-	if( isReady() )
-	{
-		// Have to do audio engine stuff with GUI-thread affinity in order to
-		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
-
-		start(
-#ifndef LMMS_BUILD_WIN32
-			QThread::HighPriority
-#endif
-						);
-
-	}
-}
-
-
-void ProjectRenderer::run()
-{
-#if 0
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-
-	PerfLogTimer perfLog("Project Render");
+	m_timer = std::make_unique<PerfLogTimer>("Project Render");
 
 	Engine::getSong()->startExport();
 	// Skip first empty buffer.
 	Engine::audioEngine()->nextBuffer();
+	Engine::audioEngine()->startExporting(m_qualitySettings);
 
 	m_progress = 0;
 
-	// Now start processing
-	Engine::audioEngine()->startProcessing(false);
-
-	// Continually track and emit progress percentage to listeners.
-	while (!Engine::getSong()->isExportDone() && !m_abort)
-	{
-		m_fileDev->processNextBuffer();
-		const int nprog = Engine::getSong()->getExportProgress();
-		if (m_progress != nprog)
-		{
-			m_progress = nprog;
-			emit progressChanged( m_progress );
-		}
-	}
-
-	// Notify the audio engine of the end of processing.
-	Engine::audioEngine()->stopProcessing();
-
-	Engine::getSong()->stopExport();
-
-	perfLog.end();
-
-	// If the user aborted export-process, the file has to be deleted.
-	const QString f = m_fileDev->outputFile();
-	if( m_abort )
-	{
-		QFile( f ).remove();
-	}
+	m_exporter.startExporting();
 }
-
-
-
 
 void ProjectRenderer::abortProcessing()
 {
-	m_abort = true;
-	wait();
+	m_exporter.stopExporting();
 }
 
+void ProjectRenderer::endRendering(void* dataIn)
+{
+	ProjectRenderer* thisRenderer = reinterpret_cast<ProjectRenderer*>(dataIn);
 
+	Engine::audioEngine()->stopProcessing();
+	Engine::getSong()->stopExport();
+
+	thisRenderer->m_timer->end();
+	thisRenderer->m_timer = nullptr;
+	
+	emit thisRenderer->finished();
+}
 
 void ProjectRenderer::updateConsoleProgress()
 {
@@ -240,6 +95,51 @@ void ProjectRenderer::updateConsoleProgress()
 
 	fprintf( stderr, "%s", buf.data() );
 	fflush( stderr );
+}
+
+// gets a buffer and some data as input
+// the sender who constructed lmms::LmmsExporter decides what is dataIn (in this case it is ProjectRenderer)
+// fills the provided buffer with AudioEngine::nextBuffer() data and sets the correct size
+// this class doesn't own bufferOut
+// bufferOut can not be nullptr
+// dataIn can be nullptr
+void ProjectRenderer::nextOutputBuffer(std::vector<SampleFrame>* bufferOut, void* dataIn)
+{
+	ProjectRenderer* thisRenderer = reinterpret_cast<ProjectRenderer*>(dataIn);
+
+	fpp_t curFrames = Engine::audioEngine()->framesPerPeriod();
+	if (bufferOut->size() != curFrames)
+	{
+		bufferOut->resize(curFrames);
+	}
+	
+	// get next buffer
+	const SampleFrame* newBuffer = Engine::audioEngine()->nextBuffer();
+
+	if (newBuffer != nullptr && Engine::getSong()->isExportDone() == false)
+	{
+		// copy new buffer to bufferOut
+		for (size_t i = 0; i < bufferOut->size(); i++)
+		{
+			(*bufferOut)[i] = newBuffer[i];
+		}
+
+		// update progress
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (thisRenderer->m_progress != nprog)
+		{
+			thisRenderer->m_progress = nprog;
+			emit thisRenderer->progressChanged(thisRenderer->m_progress);
+		}
+
+		// delete source buffer
+		if (Engine::audioEngine()->hasFifoWriter()) { delete[] newBuffer; }
+	}
+	else
+	{
+		// this will stop LmmsExporter exporting
+		bufferOut->clear();
+	}
 }
 
 

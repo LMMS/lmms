@@ -130,17 +130,19 @@ void AudioDevice::renamePort( AudioPort * )
 int AudioDevice::convertToS16(const SampleFrame* _ab,
 								const fpp_t _frames,
 								int_sample_t * _output_buffer,
-								const bool _convert_endian )
+
+								const bool _convert_endian)
 {
+	const unsigned int channels = 2;
 	if( _convert_endian )
 	{
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			for (ch_cnt_t chnl = 0; chnl < channels; ++chnl)
 			{
 				auto temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
 
-				( _output_buffer + frame * channels() )[chnl] =
+				( _output_buffer + frame * channels )[chnl] =
 						( temp & 0x00ff ) << 8 |
 						( temp & 0xff00 ) >> 8;
 			}
@@ -150,26 +152,27 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 	{
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			for (ch_cnt_t chnl = 0; chnl < channels; ++chnl)
 			{
-				(_output_buffer + frame * channels())[chnl]
+				(_output_buffer + frame * channels)[chnl]
 					= static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 	}
 
-	return _frames * channels() * BYTES_PER_INT_SAMPLE;
+	return _frames * channels * BYTES_PER_INT_SAMPLE;
 }
 
 
 
 
-void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
+void AudioDevice::clearS16Buffer(int_sample_t * _outbuf, const fpp_t _frames)
 {
 
 	assert( _outbuf != nullptr );
 
-	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
+	const unsigned int channels = 2;
+	memset(_outbuf, 0,  _frames * channels * BYTES_PER_INT_SAMPLE);
 }
 
 } // namespace lmms
