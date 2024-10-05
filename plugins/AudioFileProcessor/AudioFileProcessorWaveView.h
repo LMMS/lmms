@@ -171,6 +171,7 @@ private:
 	void updateGraph();
 	void reverse();
 	void updateCursor(QMouseEvent* me = nullptr);
+	bool pointerCloseToStartEndOrLoop(QMouseEvent* me);
 
 	void configureKnobRelationsAndWaveViews();
 

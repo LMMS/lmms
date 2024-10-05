@@ -480,21 +480,26 @@ void AudioFileProcessorWaveView::reverse()
 
 void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
 {
-	QPoint pos;
-	if (me) { pos = position(me); }
-
 	bool const waveIsDragged = m_isDragging && (m_draggingType == DraggingType::Wave);
-	bool const pointerCloseToStartEndOrLoop = (me != nullptr) &&
-			(isCloseTo(pos.x(), m_startFrameX) ||
-			  isCloseTo(pos.x(), m_endFrameX) ||
-			  isCloseTo(pos.x(), m_loopFrameX));
 
-	if (!m_isDragging && pointerCloseToStartEndOrLoop)
+	if (!m_isDragging && pointerCloseToStartEndOrLoop(me))
 		setCursor(Qt::SizeHorCursor);
 	else if (waveIsDragged)
 		setCursor(Qt::ClosedHandCursor);
 	else
 		setCursor(Qt::OpenHandCursor);
+}
+
+bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(QMouseEvent * me)
+{
+	if (me == nullptr)
+	{
+		return false;
+	}
+
+	const QPoint pos = position(me);
+
+	return isCloseTo(pos.x(), m_startFrameX) || isCloseTo(pos.x(), m_endFrameX) || isCloseTo(pos.x(), m_loopFrameX);
 }
 
 void AudioFileProcessorWaveView::configureKnobRelationsAndWaveViews()
