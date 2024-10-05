@@ -21,9 +21,11 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+#include <QDebug>
 
 #include "VideoClip.h"
 #include "VideoClipView.h"
+#include "VideoClipWindow.h"
 
 namespace lmms
 {
@@ -31,12 +33,23 @@ namespace lmms
 VideoClip::VideoClip(Track * track):
     Clip(track)
 {
+	qDebug() << "Normal Constructor!";
 	saveJournallingState( false );
 	setVideoFile( "" );
 	changeLength(TimePos::ticksPerBar());
 	restoreJournallingState();
-	
+
+	m_window = new gui::VideoClipWindow(this);
+	m_window->toggleVisibility(false);
+
 	setAutoResize(false);
+}
+
+VideoClip::VideoClip(VideoClip & orig):
+    VideoClip(orig.getTrack())
+{
+	qDebug() << "Copy Constructor!";
+	setVideoFile(orig.videoFile());
 }
 
 gui::ClipView * VideoClip::createView(gui::TrackView * tv)
@@ -53,8 +66,12 @@ void VideoClip::setVideoFile(const QString& vf)
 {
     m_videoFile = vf;
 	setStartTimeOffset(0);
-	
-	emit videoChanged();
+	qDebug() << "setVideoFile!";
+	if (!vf.isEmpty())
+	{
+		qDebug() << "Emitting videoChanged!";
+		emit videoChanged();
+	}
 }
 
 void VideoClip::saveSettings( QDomDocument & _doc, QDomElement & _parent )

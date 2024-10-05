@@ -23,6 +23,7 @@
  */
 #include <QVBoxLayout>
 #include <QDebug>
+#include <QSizePolicy>
 
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -39,7 +40,10 @@ VideoClipWindow::VideoClipWindow(VideoClip * vclip):
 	QWidget(),
     m_clip(vclip)
 {
+	qDebug() << "VideoClipWindow Constructor!";
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+	subWin->resize(640,480);
+	subWin->hide();
 
     QVBoxLayout * layout = new QVBoxLayout(this);
 
@@ -61,14 +65,13 @@ VideoClipWindow::VideoClipWindow(VideoClip * vclip):
 	connect(updateTimer, &QTimer::timeout, this, &VideoClipWindow::playbackStateChanged);
 	updateTimer->start( 1000 / 60 );  // 60 fps
 
-	resize(640,480);
 
 }
 
 void VideoClipWindow::videoChanged()
 {
     m_mediaPlayer->setMedia(QUrl::fromLocalFile(m_clip->videoFile()));
-
+	qDebug() << "Video Changed!" << m_clip->videoFile();
 }
 
 void VideoClipWindow::durationChanged()

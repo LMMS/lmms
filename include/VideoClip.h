@@ -34,6 +34,7 @@ namespace gui
 {
 
 class VideoClipView;
+class VideoClipWindow;
 
 }
 
@@ -42,6 +43,7 @@ class VideoClip : public Clip
     Q_OBJECT
 public:
     VideoClip(Track * track);
+    VideoClip(VideoClip & orig);
     //~VideoClip() override;
 
     gui::ClipView * createView( gui::TrackView * tv ) override;
@@ -64,6 +66,8 @@ public:
 
 private:
     QString m_videoFile;
+
+    gui::VideoClipWindow * m_window;
 
 	friend class gui::VideoClipView;
 

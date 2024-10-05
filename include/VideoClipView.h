@@ -35,8 +35,6 @@ class VideoClip;
 namespace gui
 {
 
-class VideoClipWindow;
-
 class VideoClipView : public ClipView
 {
     Q_OBJECT
@@ -51,8 +49,6 @@ protected:
 private:
     VideoClip * m_clip;
 	QPixmap m_paintPixmap;
-
-    VideoClipWindow * m_window;
     
     bool splitClip( const TimePos pos ) override;
 };

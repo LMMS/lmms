@@ -683,7 +683,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( sClip && knifeMode )
+				else if( (sClip || vClip) && knifeMode )
 				{
 					m_action = Action::Split;
 					setCursor( m_cursorKnife );
@@ -746,12 +746,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		if (m_action == Action::Split)
 		{
 			m_action = Action::None;
-			auto sClip = dynamic_cast<SampleClip*>(m_clip);
-			if (sClip)
-			{
-				setMarkerEnabled( false );
-				update();
-			}
+			setMarkerEnabled( false );
+			update();
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
@@ -992,11 +988,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		auto sClip = dynamic_cast<SampleClip*>(m_clip);
-		if (sClip) {
-			setCursor( m_cursorKnife );
-			setMarkerPos( knifeMarkerPos( me ) );
-		}
+		setCursor( m_cursorKnife );
+		setMarkerPos( knifeMarkerPos( me ) );
 		update();
 	}
 	// None of the actions above, we will just handle the cursor

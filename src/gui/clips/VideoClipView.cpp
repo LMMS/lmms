@@ -32,8 +32,8 @@
 #include "PathUtil.h"
 #include "Song.h"
 #include "Track.h" // I don't think this is right
-#include "VideoClipView.h"
 #include "VideoClip.h"
+#include "VideoClipView.h"
 #include "VideoClipWindow.h"
 
 namespace lmms::gui
@@ -45,8 +45,7 @@ VideoClipView::VideoClipView(VideoClip * clip, TrackView * tv):
     m_paintPixmap()
 {
     //updateVideo();
-	m_window = new VideoClipWindow(m_clip);
-	m_window->toggleVisibility(false);
+	qDebug() << "VideoClipView Constructor!";
 
 	setStyle(QApplication::style());
 }
@@ -70,7 +69,8 @@ void VideoClipView::mouseDoubleClickEvent(QMouseEvent * me)
 	else
 	{
 		qDebug() << "Video file NOT empty!";
-		m_window->toggleVisibility(m_window->parentWidget()->isHidden());
+		// TODO maybe use a getter instead of accessing private member?
+		m_clip->m_window->toggleVisibility(m_clip->m_window->parentWidget()->isHidden());
 	}
 }
 
@@ -181,7 +181,28 @@ void VideoClipView::paintEvent(QPaintEvent* pe)
 
 bool VideoClipView::splitClip(const TimePos pos)
 {
-    return false;
+	setMarkerEnabled(false);
+
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	// Don't split if we slid off the Clip or if we're on the clip's start/end
+	// Cutting at exactly the start/end position would create a zero length
+	// clip (bad), and a clip the same length as the original one (pointless).
+	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
+
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto rightClip = new VideoClip(*m_clip);
+
+	m_clip->changeLength(splitPos - m_initialClipPos);
+
+	rightClip->movePosition(splitPos);
+	rightClip->changeLength(m_initialClipEnd - splitPos);
+	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
+
+	m_clip->getTrack()->restoreJournallingState();
+	return true;
 }
 
 } // namespace lmms::gui
