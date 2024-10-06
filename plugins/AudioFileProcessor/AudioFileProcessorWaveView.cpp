@@ -490,7 +490,7 @@ void AudioFileProcessorWaveView::updateCursor(const QMouseEvent * me)
 		setCursor(Qt::OpenHandCursor);
 }
 
-bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(const QMouseEvent * me)
+bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(const QMouseEvent * me) const
 {
 	if (me == nullptr)
 	{
