@@ -516,7 +516,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 
 
-void SongEditor::incrementLeftRightScoll(int value)
+void SongEditor::adjustLeftRightScoll(int value)
 {
 	m_leftRightScroll->setValue(m_leftRightScroll->value()
 						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
@@ -550,11 +550,11 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		incrementLeftRightScoll(we->angleDelta().x());
+		adjustLeftRightScoll(we->angleDelta().x());
 	}
 	else if (we->modifiers() & Qt::ShiftModifier)
 	{
-		incrementLeftRightScoll(we->angleDelta().y());
+		adjustLeftRightScoll(we->angleDelta().y());
 	}
 	else
 	{

@@ -1560,7 +1560,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 	update();
 }
 
-void AutomationEditor::incrementLeftRightScoll(int value)
+void AutomationEditor::adjustLeftRightScoll(int value)
 {
 	m_leftRightScroll->setValue(m_leftRightScroll->value() -
 							value * 0.3f / m_zoomXLevels[m_zoomingXModel.value()]);
@@ -1629,11 +1629,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		incrementLeftRightScoll(we->angleDelta().x());
+		adjustLeftRightScoll(we->angleDelta().x());
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		incrementLeftRightScoll(we->angleDelta().y());
+		adjustLeftRightScoll(we->angleDelta().y());
 	}
 	else
 	{
