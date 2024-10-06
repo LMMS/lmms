@@ -127,7 +127,7 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 		{
 			// A group, we must get process it instead
 			auto groupView = (AutomatableModelView*)m_group;
-			new StringPairDrag( "automatable_model",
+			new StringPairDrag(Clipboard::StringPairDataType::AutomatableModelLink,
 					QString::number( groupView->modelUntyped()->id() ),
 					QPixmap(), widget() );
 			// TODO: ^^ Maybe use a predefined icon instead of the button they happened to select

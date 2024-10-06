@@ -139,8 +139,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 	{
 		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
-		new StringPairDrag( QString( "track_%1" ).arg(
-					static_cast<int>(m_trackView->getTrack()->type()) ),
+		new StringPairDrag(TrackView::getTrackStringPairType(m_trackView->getTrack()),
 			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
 									this );
 	}

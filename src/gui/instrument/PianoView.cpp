@@ -449,7 +449,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 
 			if (me->modifiers() & Qt::ControlModifier)
 			{
-				new StringPairDrag("automatable_model",	QString::number(m_movedNoteModel->id()), QPixmap(), this);
+				new StringPairDrag(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(m_movedNoteModel->id()), QPixmap(), this);
 				me->accept();
 			}
 			else
@@ -645,20 +645,6 @@ void PianoView::focusOutEvent( QFocusEvent * )
 {
 	if( m_piano == nullptr )
 	{
-		return;
-	}
-
-	// focus just switched to another control inside the instrument track
-	// window we live in?
-	if( parentWidget()->parentWidget()->focusWidget() != this &&
-		parentWidget()->parentWidget()->focusWidget() != nullptr &&
-		!(parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QLineEdit" ) ||
-		parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QPlainTextEdit" ) ))
-	{
-		// then reclaim keyboard focus!
-		setFocus();
 		return;
 	}
 

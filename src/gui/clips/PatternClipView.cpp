@@ -155,6 +155,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
+	drawAutoHighlight(&p);
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );

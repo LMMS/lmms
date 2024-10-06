@@ -32,6 +32,7 @@
 #include "ModelView.h"
 #include "Rubberband.h"
 #include "Clip.h"
+#include "Clipboard.h"
 
 
 class QMenu;
@@ -125,6 +126,9 @@ public:
 
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	
+	//! used for getting the correct clip `StringPairDataType` for a given track
+	static Clipboard::StringPairDataType getClipStringPairType(Track* track);
 
 	QColor getColorForDisplay( QColor );
 
@@ -174,6 +178,14 @@ protected:
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
+	
+	// InteractiveModelView methods
+	std::vector<ModelShortcut> getShortcuts() override;
+	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
+	QString getShortcutMessage() override;
+	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
+	bool processPaste(const QMimeData* mimeData) override;
+	void overrideSetIsHighlighted(bool isHighlighted) override;
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos( TimePos, bool shiftMode );
@@ -191,7 +203,7 @@ protected slots:
 	void updateLength();
 	void updatePosition();
 
-
+	static QString getDefaultSortcutMessage();
 private:
 	enum class Action
 	{
@@ -206,6 +218,7 @@ private:
 	} ;
 
 	static TextFloat * s_textFloat;
+	static QString m_shortcutMessage;
 
 	Clip * m_clip;
 	Action m_action;

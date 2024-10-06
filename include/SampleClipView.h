@@ -60,6 +60,8 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
 
+	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
+	bool processPaste(const QMimeData* mimeData) override;
 
 private:
 	SampleClip * m_clip;
