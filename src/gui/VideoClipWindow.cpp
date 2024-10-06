@@ -3,7 +3,6 @@
  *
  * Copyright (c) 2024 regulus79
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * (Portions copied from SampleTrackWindow.cpp and TimeLineWidget.cpp)
  *
  * This file is part of LMMS - https://lmms.io
  *

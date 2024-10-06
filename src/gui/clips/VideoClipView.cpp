@@ -4,7 +4,6 @@
  * Copyright (c) 2024 regulus79
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
- * (Portions copied from SampleClipView.cpp and SampleLoader.cpp)
  *
  * This file is part of LMMS - https://lmms.io
  *
