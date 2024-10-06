@@ -58,7 +58,7 @@ inline int horizontalAdvance(const QFontMetrics& metrics, const QString& text)
  * @param wheelEvent
  * @return the position of wheelEvent
  */
-inline QPoint position(QWheelEvent *wheelEvent)
+inline QPoint position(const QWheelEvent *wheelEvent)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
 	return wheelEvent->position().toPoint();
@@ -95,7 +95,7 @@ constexpr int combine(Args... args)
  * @param me
  * @return the position of the mouse event
  */
-inline QPoint position(QMouseEvent* me)
+inline QPoint position(const QMouseEvent* me)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 	return me->position().toPoint();
@@ -110,7 +110,7 @@ inline QPoint position(QMouseEvent* me)
  * @param me
  * @return the position of the drop event
  */
-inline QPoint position(QDropEvent* de)
+inline QPoint position(const QDropEvent* de)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 	return de->position().toPoint();
