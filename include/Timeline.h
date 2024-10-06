@@ -63,6 +63,7 @@ public:
 signals:
 	void loopEnabledChanged(bool enabled);
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
+	void positionChanged(const lmms::TimePos& position);
 
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
