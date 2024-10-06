@@ -3746,7 +3746,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 void PianoRoll::incrementLeftRightScoll(int value)
 {
 	m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							value * 0.3f / m_zoomXLevels[m_zoomingXModel.value()]);
+							value * 0.3f / m_zoomLevels[m_zoomingModel.value()]);
 }
 
 
