@@ -128,6 +128,8 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
+	void incrementLeftRightScoll(int value);
+
 	LcdSpinBox * m_tempoSpinBox;
 
 	TimeLineWidget * m_timeLine;
