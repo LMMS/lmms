@@ -478,7 +478,7 @@ void AudioFileProcessorWaveView::reverse()
 	m_reversed = ! m_reversed;
 }
 
-void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
+void AudioFileProcessorWaveView::updateCursor(const QMouseEvent * me)
 {
 	bool const waveIsDragged = m_isDragging && (m_draggingType == DraggingType::Wave);
 
@@ -490,7 +490,7 @@ void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
 		setCursor(Qt::OpenHandCursor);
 }
 
-bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(QMouseEvent * me)
+bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(const QMouseEvent * me)
 {
 	if (me == nullptr)
 	{
