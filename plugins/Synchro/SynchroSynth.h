@@ -105,8 +105,6 @@ class SynchroView : public InstrumentViewFixedSize {
 //===========//
 
 class SynchroSynth {
-	MM_OPERATORS // see `MemoryManager.h`
-	
 	public:
 	SynchroSynth(NotePlayHandle* notePlayHandle);
 	double nextSample( // TODO: put these in the same order as they appear in member declarations
@@ -134,8 +132,8 @@ class SynchroInstrument : public Instrument {
 
 	public:
 	SynchroInstrument(InstrumentTrack* instrument_track);
-	void playNote(NotePlayHandle* nph, sampleFrame* working_buffer) override;
-	f_cnt_t desiredReleaseFrames() const override { return static_cast<f_cnt_t>(128); };
+	void playNote(NotePlayHandle* nph, SampleFrame* working_buffer) override;
+	virtual float desiredReleaseTimeMs() const override	{ return 128 / 48000.f; }
 	//Flags flags() const override { return IsSingleStreamed; };
 	void saveSettings(QDomDocument& doc, QDomElement& thisElement) override;
 	void loadSettings(const QDomElement& thiselement) override;

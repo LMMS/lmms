@@ -53,7 +53,7 @@ extern "C" {
 		// every single plugin has a value of 0x0100 except:
 		// ReverbSC (0x0123), Analyzer (0x0112), TripleOscillator (0x0110), VstEffect (0x0200)
 		0x0100,
-		Plugin::Instrument,
+		Plugin::Type::Instrument,
 		new PluginPixmapLoader("logo"),
 		nullptr, // const char* supportedFileTypes
 		nullptr, // SubPluginFeatures* subPluginFeatures
@@ -137,67 +137,67 @@ InstrumentViewFixedSize(instrument, parent) {
 	// what future-proof solution should I be using here instead of `setHintText()`?
 
 	// general controls
-	m_resultingWaveform = new Graph(this, Graph::LinearStyle, 48, 42);
+	m_resultingWaveform = new Graph(this, Graph::Style::Linear, 48, 42);
 	m_resultingWaveform->move(5, 73);
 	m_resultingWaveform->setAutoFillBackground(false);
 	m_resultingWaveform->setGraphColor(QColor(255, 255, 255));
 	m_resultingWaveform->setEnabled(false); // read-only, no drawing allowed!!
 
-	m_modAmount = new Knob(knobDark_28, this);
+	m_modAmount = new Knob(KnobType::Dark28, this);
 	m_modAmount->move(89, 80);
 	m_modAmount->setHintText(tr("modulation"), "×"); //TODO: make the UI show 0-100 %
 
-	m_harmonics = new Knob(knobDark_28, this);
+	m_harmonics = new Knob(KnobType::Dark28, this);
 	m_harmonics->move(185, 80);
 	m_harmonics->setHintText(tr("modulator harmonics"), "×"); //TODO: make the UI show 0-100 %
 
-	m_modRange = new Knob(knobDark_28, this);
+	m_modRange = new Knob(KnobType::Dark28, this);
 	m_modRange->move(281, 80);
 	m_modRange->setHintText(tr("modulation range"), "×"); //TODO: make the UI show 0-100 %
 
 	// carrier controls
-	m_carrierWaveform = new Graph(this, Graph::LinearStyle, 48, 42);
+	m_carrierWaveform = new Graph(this, Graph::Style::Linear, 48, 42);
 	m_carrierWaveform->move(5, 138);
 	m_carrierWaveform->setAutoFillBackground(false);
 	m_carrierWaveform->setGraphColor(QColor(255, 255, 255));
 	m_carrierWaveform->setEnabled(false); // read-only, no drawing allowed!!
 
-	m_carrierOctave = new Knob(knobDark_28, this);
+	m_carrierOctave = new Knob(KnobType::Dark28, this);
 	m_carrierOctave->move(64, 144);
 	m_carrierOctave->setHintText(tr("voice detune"), "octaves");
 
-	m_carrierDrive = new Knob(knobDark_28, this);
+	m_carrierDrive = new Knob(KnobType::Dark28, this);
 	m_carrierDrive->move(113, 144);
 	m_carrierDrive->setHintText(tr("voice drive"), "×");
 
-	m_carrierSync = new Knob(knobDark_28, this);
+	m_carrierSync = new Knob(KnobType::Dark28, this);
 	m_carrierSync->move(161, 144);
 	m_carrierSync->setHintText(tr("voice sync"), "×");
 
-	m_carrierPulse = new Knob(knobDark_28, this);
+	m_carrierPulse = new Knob(KnobType::Dark28, this);
 	m_carrierPulse->move(208, 144);
 	m_carrierPulse->setHintText(tr("voice pulse"), "");
 
 	// modulator controls
-	m_modulatorWaveform = new Graph(this, Graph::LinearStyle, 48, 42);
+	m_modulatorWaveform = new Graph(this, Graph::Style::Linear, 48, 42);
 	m_modulatorWaveform->move(5, 203);
 	m_modulatorWaveform->setAutoFillBackground(false);
 	m_modulatorWaveform->setGraphColor(QColor(255, 255, 255));
 	m_modulatorWaveform->setEnabled(false); // read-only, no drawing allowed!!
 
-	m_modulatorOctave = new Knob(knobDark_28, this);
+	m_modulatorOctave = new Knob(KnobType::Dark28, this);
 	m_modulatorOctave->move(64, 210);
 	m_modulatorOctave->setHintText(tr("modulator detune"), "octaves");
 
-	m_modulatorDrive = new Knob(knobDark_28, this);
+	m_modulatorDrive = new Knob(KnobType::Dark28, this);
 	m_modulatorDrive->move(113, 210);
 	m_modulatorDrive->setHintText(tr("modulator drive"), "×");
 
-	m_modulatorSync = new Knob(knobDark_28, this);
+	m_modulatorSync = new Knob(KnobType::Dark28, this);
 	m_modulatorSync->move(161, 210);
 	m_modulatorSync->setHintText(tr("modulator sync"), "×");
 
-	m_modulatorPulse = new Knob(knobDark_28, this);
+	m_modulatorPulse = new Knob(KnobType::Dark28, this);
 	m_modulatorPulse->move(208, 210);
 	m_modulatorPulse->setHintText(tr("modulator pulse"), "");
 } //SynchroView::SynchroView()
@@ -252,7 +252,7 @@ double SynchroSynth::nextSample(
 		) {
 	const double radians_per_subsample =
 		m_nph->frequency() * D_2PI /
-		(Engine::audioEngine()->processingSampleRate() * SYNCHRO_OVERSAMPLING_FACTOR);
+		(Engine::audioEngine()->outputSampleRate() * SYNCHRO_OVERSAMPLING_FACTOR);
 
 	m_modulatorPhase = reduce_phase(m_modulatorPhase + radians_per_subsample * exp2(modulatorOctave));
 	double phase_modulation = synchro_waveform(
@@ -327,7 +327,7 @@ m_modulatorPulse(0, 0, 4, 0.01f, this, tr("modulator pulse"))
 
 QString SynchroInstrument::nodeName() const { return synchro_plugin_descriptor.name; }
 
-void SynchroInstrument::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
+void SynchroInstrument::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 	// this seems to be part of what makes this synth polyphonic
 	// probably need to study Lb302 to see how to make it monophonic
 	if (nph->m_pluginData == nullptr) { nph->m_pluginData = new SynchroSynth(nph); }
@@ -392,11 +392,9 @@ void SynchroInstrument::playNote(NotePlayHandle* nph, sampleFrame* working_buffe
 
 	// working_buffer starts at framesOffset, but m_downsamplingBuffer starts at 0
 	for (f_cnt_t frame = framesOffset; frame < frames + framesOffset; ++frame) {
-		// is this worth doing or should i just assume working_buffer is stereo (`DEFAULT_CHANNELS`)?
-		// output from this synth is mono anyways
-		for (auto& chnl : working_buffer[frame]) {
-			chnl = static_cast<sample_t>(m_downsamplingBuffer[which_buffer][frame - framesOffset]);
-		}
+		// Map the mono output of the synth to the stereo result sample
+		const auto synthOutput = static_cast<sample_t>(m_downsamplingBuffer[which_buffer][frame - framesOffset]);
+		working_buffer[frame] = SampleFrame(synthOutput);
 	}
 
 	applyRelease(working_buffer, nph);
@@ -418,7 +416,7 @@ void SynchroInstrument::sampleRateChanged() {
 } //SynchroInstrument::sampleRateChanged()
 
 void SynchroInstrument::carrierChanged() {
-	for (int i = 0; i < SYNCHRO_WAVEFORM_GUI_SAMPLES; ++i) {
+	for (unsigned int i = 0; i < SYNCHRO_WAVEFORM_GUI_SAMPLES; ++i) {
 		double phase = i * D_2PI / SYNCHRO_WAVEFORM_GUI_SAMPLES;
 		m_carrierWaveform.setSampleAt(
 			i,
@@ -435,7 +433,7 @@ void SynchroInstrument::carrierChanged() {
 } //SynchroInstrument::carrierChanged()
 
 void SynchroInstrument::modulatorChanged() {
-	for (int i = 0; i < SYNCHRO_WAVEFORM_GUI_SAMPLES; ++i) {
+	for (unsigned int i = 0; i < SYNCHRO_WAVEFORM_GUI_SAMPLES; ++i) {
 		double phase = i * D_2PI / SYNCHRO_WAVEFORM_GUI_SAMPLES;
 		m_modulatorWaveform.setSampleAt(
 			i,
@@ -456,7 +454,7 @@ void SynchroInstrument::generalChanged() {
 	const int octaveDiff = m_carrierOctave.value() - m_modulatorOctave.value();
 	const float pitchDifference = powf(2, octaveDiff);
 
-	for (int i = 0; i < SYNCHRO_WAVEFORM_GUI_SAMPLES; ++i) {
+	for (unsigned int i = 0; i < SYNCHRO_WAVEFORM_GUI_SAMPLES; ++i) {
 		double phase = reduce_phase(i * D_2PI / SYNCHRO_WAVEFORM_GUI_SAMPLES);
 
 		float phaseMod = synchro_waveform(
