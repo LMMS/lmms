@@ -32,21 +32,20 @@
 #include "AutomatableModel.h"
 #include "TempoSyncKnob.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
 
 namespace lmms
 {
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, this ); 				\
+	name = new Knob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 19, 19 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( knobStyled, this ); 				\
+	name = new TempoSyncKnob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -88,7 +87,6 @@ class WatsynView;
 
 class WatsynObject
 {
-	MM_OPERATORS
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
@@ -98,11 +96,11 @@ public:
 
 	void renderOutput( fpp_t _frames );
 
-	inline sampleFrame * abuf() const
+	inline SampleFrame* abuf() const
 	{
 		return m_abuf;
 	}
-	inline sampleFrame * bbuf() const
+	inline SampleFrame* bbuf() const
 	{
 		return m_bbuf;
 	}
@@ -122,8 +120,8 @@ private:
 
 	WatsynInstrument * m_parent;
 
-	sampleFrame * m_abuf;
-	sampleFrame * m_bbuf;
+	SampleFrame* m_abuf;
+	SampleFrame* m_bbuf;
 
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
@@ -142,7 +140,7 @@ public:
 	~WatsynInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -152,9 +150,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 64 );
+		return 1.5f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

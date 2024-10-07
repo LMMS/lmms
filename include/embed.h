@@ -22,8 +22,11 @@
  *
  */
 
-#ifndef EMBED_H
-#define EMBED_H
+#ifndef LMMS_EMBED_H
+#define LMMS_EMBED_H
+
+#include <string>
+#include <string_view>
 
 #include <QPixmap>
 #include <QString>
@@ -31,112 +34,73 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+namespace lmms {
 
-namespace lmms
-{
-
-namespace embed
-{
+namespace embed {
 
 /**
  * Return an image for the icon pixmap cache.
  *
- * @param _name Identifier for the pixmap. If it is not in the icon pixmap
+ * @param name Identifier for the pixmap. If it is not in the icon pixmap
  *   cache, it will be loaded from the artwork QDir search paths (exceptions are
  *   compiled-in XPMs, you need to provide @p xpm for loading them).
  * @param xpm Must be XPM data if the source should be raw XPM data instead of
  *   a file
  */
-QPixmap LMMS_EXPORT getIconPixmap( const QString&  _name,
-	int _w = -1, int _h = -1 , const char** xpm = nullptr );
-QString LMMS_EXPORT getText( const char * _name );
+auto LMMS_EXPORT getIconPixmap(std::string_view name,
+	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap;
+auto LMMS_EXPORT getText(std::string_view name) -> QString;
 
-}
+} // namespace embed
 
+class PixmapLoader
+{
+public:
+	PixmapLoader() = default;
+
+	explicit PixmapLoader(std::string name, const char* const* xpm = nullptr) :
+		m_name{std::move(name)},
+		m_xpm{xpm}
+	{ }
+
+	virtual ~PixmapLoader() = default;
+
+	auto pixmap(int width = -1, int height = -1) const -> QPixmap
+	{
+		return embed::getIconPixmap(m_name, width, height, m_xpm);
+	}
+
+	auto pixmapName() const -> const std::string& { return m_name; }
+
+private:
+	std::string m_name;
+	const char* const* m_xpm = nullptr;
+};
 
 #ifdef PLUGIN_NAME
-namespace PLUGIN_NAME
-{
 
-inline QPixmap getIconPixmap( const QString&  _name,
-	int _w = -1, int _h = -1, const char** xpm = nullptr )
+class PluginPixmapLoader : public PixmapLoader
 {
-	return embed::getIconPixmap(QString("%1/%2").arg(LMMS_STRINGIFY(PLUGIN_NAME), _name), _w, _h, xpm);
+public:
+	PluginPixmapLoader() = default;
+
+	explicit PluginPixmapLoader(std::string name, const char* const* xpm = nullptr) :
+		PixmapLoader{LMMS_STRINGIFY(PLUGIN_NAME) "/" + name, xpm}
+	{ }
+};
+
+namespace PLUGIN_NAME {
+
+inline auto getIconPixmap(std::string_view name,
+	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap
+{
+	return PluginPixmapLoader{std::string{name}, xpm}.pixmap(width, height);
 }
-//QString getText( const char * _name );
 
 } // namespace PLUGIN_NAME
 
 #endif // PLUGIN_NAME
 
-
-class PixmapLoader
-{
-public:
-	PixmapLoader( const PixmapLoader * _ref ) :
-		m_name( _ref != nullptr ? _ref->m_name : QString() ),
-		m_xpm( _ref->m_xpm )
-	{
-	}
-
-	PixmapLoader( const QString & _name = QString(),
-		const char** xpm = nullptr ) :
-		m_name( _name ),
-		m_xpm(xpm)
-	{
-	}
-
-	virtual QPixmap pixmap() const
-	{
-		if( !m_name.isEmpty() )
-		{
-			return( embed::getIconPixmap(
-				m_name.toLatin1().constData(), -1, -1, m_xpm ));
-		}
-		return( QPixmap() );
-	}
-
-	virtual ~PixmapLoader() = default;
-
-	virtual QString pixmapName() const
-	{
-		return m_name;
-	}
-
-protected:
-	QString m_name;
-	const char** m_xpm = nullptr;
-} ;
-
-
-#ifdef PLUGIN_NAME
-class PluginPixmapLoader : public PixmapLoader
-{
-public:
-	PluginPixmapLoader( const QString & _name = QString() ) :
-		PixmapLoader( _name )
-	{
-	}
-
-	QPixmap pixmap() const override
-	{
-		if( !m_name.isEmpty() )
-		{
-			return( PLUGIN_NAME::getIconPixmap(
-					m_name.toLatin1().constData() ) );
-		}
-		return( QPixmap() );
-	}
-
-	QString pixmapName() const override
-	{
-		return QString( LMMS_STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
-	}
-
-} ;
-#endif // PLUGIN_NAME
-
-
 } // namespace lmms
 
-#endif
+#endif // LMMS_EMBED_H

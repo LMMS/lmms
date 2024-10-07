@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FIFO_BUFFER_H
-#define FIFO_BUFFER_H
+#ifndef LMMS_FIFO_BUFFER_H
+#define LMMS_FIFO_BUFFER_H
 
 #include <QSemaphore>
 
@@ -94,4 +94,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_FIFO_BUFFER_H

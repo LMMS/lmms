@@ -64,8 +64,8 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		// If gradient is enabled, we're in focus and we're playing, enable gradient
 		if (m_hasTailGradient &&
 			Engine::getSong()->isPlaying() &&
-			(Engine::getSong()->playMode() == Song::Mode_PlaySong ||
-			 Engine::getSong()->playMode() == Song::Mode_PlayMidiClip))
+			(Engine::getSong()->playMode() == Song::PlayMode::Song ||
+			 Engine::getSong()->playMode() == Song::PlayMode::MidiClip))
 		{
 			c.setAlpha(60);
 			gradient.setColorAt(w, c);
@@ -93,7 +93,7 @@ void PositionLine::zoomChange(float zoom)
 {
 	int playHeadPos = x() + width() - 1;
 
-	resize(8.0 * zoom, height());
+	resize(std::max(8.0 * zoom, 1.0), height());
 	move(playHeadPos - width() + 1, y());
 
 	update();

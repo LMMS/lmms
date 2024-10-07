@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef DUMMY_INSTRUMENT_H
-#define DUMMY_INSTRUMENT_H
+#ifndef LMMS_DUMMY_INSTRUMENT_H
+#define LMMS_DUMMY_INSTRUMENT_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -49,10 +49,9 @@ public:
 
 	~DummyInstrument() override = default;
 
-	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
+	void playNote( NotePlayHandle*, SampleFrame* buffer ) override
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) *
-			Engine::audioEngine()->framesPerPeriod() );
+		zeroSampleFrames(buffer, Engine::audioEngine()->framesPerPeriod());
 	}
 
 	void saveSettings( QDomDocument &, QDomElement & ) override
@@ -77,4 +76,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DUMMY_INSTRUMENT_H

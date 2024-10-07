@@ -1,37 +1,31 @@
-# - Try to find LAME
-# Once done this will define
+# Copyright (c) 2023 Dominic Clark
 #
-# Lame_FOUND - system has liblame
-# Lame_INCLUDE_DIRS - the liblame include directory
-# Lame_LIBRARIES - The liblame libraries
-# mp3lame::mp3lame - an imported target providing lame
+# Redistribution and use is allowed according to the terms of the New BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-find_package(mp3lame CONFIG QUIET)
+include(ImportedTargetHelpers)
 
-if(TARGET mp3lame::mp3lame)
-	# Extract details for find_package_handle_standard_args
-	get_target_property(Lame_LIBRARIES mp3lame::mp3lame LOCATION)
-	get_target_property(Lame_INCLUDE_DIRS mp3lame::mp3lame INTERFACE_INCLUDE_DIRECTORIES)
-else()
-	find_path(Lame_INCLUDE_DIRS lame/lame.h)
-	find_library(Lame_LIBRARIES mp3lame)
+find_package_config_mode_with_fallback(mp3lame mp3lame::mp3lame
+	LIBRARY_NAMES "mp3lame"
+	INCLUDE_NAMES "lame/lame.h"
+	PREFIX Lame
+)
 
-	list(APPEND Lame_DEFINITIONS HAVE_LIBMP3LAME=1)
+determine_version_from_source(Lame_VERSION mp3lame::mp3lame [[
+	#include <iostream>
+	#include <lame/lame.h>
 
-	mark_as_advanced(Lame_INCLUDE_DIRS Lame_LIBRARIES Lame_DEFINITIONS)
-
-	if(Lame_LIBRARIES AND Lame_INCLUDE_DIRS)
-		add_library(mp3lame::mp3lame UNKNOWN IMPORTED)
-
-		set_target_properties(mp3lame::mp3lame PROPERTIES
-			INTERFACE_INCLUDE_DIRECTORIES "${Lame_INCLUDE_DIRS}"
-			INTERFACE_COMPILE_DEFINITIONS "${Lame_DEFINITIONS}"
-			IMPORTED_LOCATION "${Lame_LIBRARIES}"
-		)
-	endif()
-endif()
+	auto main() -> int
+	{
+		auto version = lame_version_t{};
+		get_lame_version_numerical(&version);
+		std::cout << version.major << "." << version.minor;
+	}
+]])
 
 include(FindPackageHandleStandardArgs)
+
 find_package_handle_standard_args(Lame
-	REQUIRED_VARS Lame_LIBRARIES Lame_INCLUDE_DIRS
+	REQUIRED_VARS Lame_LIBRARY Lame_INCLUDE_DIRS
+	VERSION_VAR Lame_VERSION
 )

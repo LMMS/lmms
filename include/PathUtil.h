@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PATHUTIL_H
-#define PATHUTIL_H
+#ifndef LMMS_PATHUTIL_H
+#define LMMS_PATHUTIL_H
 
 #include "lmms_export.h"
 
@@ -70,4 +70,4 @@ namespace lmms::PathUtil
 
 } // namespace lmms::PathUtil
 
-#endif
+#endif // LMMS_PATHUTIL_H

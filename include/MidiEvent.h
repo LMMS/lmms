@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_EVENT_H
-#define MIDI_EVENT_H
+#ifndef LMMS_MIDI_EVENT_H
+#define LMMS_MIDI_EVENT_H
 
 #include <cstdlib>
 #include "Midi.h"
@@ -190,6 +190,8 @@ public:
 		setParam( 0, pitchBend );
 	}
 
+	auto sysExData() const -> const char* { return m_sysExData; }
+
 	Source source() const
 	{
 		return m_source;
@@ -221,4 +223,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_EVENT_H

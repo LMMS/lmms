@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SWEEP_OSCILLATOR_H
-#define SWEEP_OSCILLATOR_H
+#ifndef LMMS_SWEEP_OSCILLATOR_H
+#define LMMS_SWEEP_OSCILLATOR_H
 
 #include "Oscillator.h"
 #include "DspEffectLibrary.h"
@@ -43,7 +43,7 @@ public:
 
 	virtual ~SweepOscillator() = default;
 
-	void update( sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
+	void update( SampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
 	{
 		const float df = freq2 - freq1;
 		for( fpp_t frame = 0; frame < frames; ++frame )
@@ -69,4 +69,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SWEEP_OSCILLATOR_H

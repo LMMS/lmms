@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef AUTOMATABLE_BUTTON_H
-#define AUTOMATABLE_BUTTON_H
+#ifndef LMMS_GUI_AUTOMATABLE_BUTTON_H
+#define LMMS_GUI_AUTOMATABLE_BUTTON_H
 
 #include <QPushButton>
 
@@ -109,4 +108,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUTOMATABLE_BUTTON_H

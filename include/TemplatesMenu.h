@@ -21,8 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef TEMPLATESMENU_H
-#define TEMPLATESMENU_H
+
+#ifndef LMMS_GUI_TEMPLATES_MENU_H
+#define LMMS_GUI_TEMPLATES_MENU_H
 
 #include <QDir>
 #include <QMenu>
@@ -49,4 +50,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif // TEMPLATESMENU_H
+#endif // LMMS_GUI_TEMPLATES_MENU_H

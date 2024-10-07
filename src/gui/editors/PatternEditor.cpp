@@ -69,11 +69,11 @@ void PatternEditor::cloneSteps()
 
 void PatternEditor::removeSteps()
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	const TrackContainer::TrackList& tl = model()->tracks();
 
 	for (const auto& track : tl)
 	{
-		if (track->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
 			auto p = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
 			p->removeSteps();
@@ -86,7 +86,7 @@ void PatternEditor::removeSteps()
 
 void PatternEditor::addSampleTrack()
 {
-	(void) Track::create( Track::SampleTrack, model() );
+	(void) Track::create( Track::Type::Sample, model() );
 }
 
 
@@ -94,7 +94,7 @@ void PatternEditor::addSampleTrack()
 
 void PatternEditor::addAutomationTrack()
 {
-	(void) Track::create( Track::AutomationTrack, model() );
+	(void) Track::create( Track::Type::Automation, model() );
 }
 
 
@@ -135,10 +135,10 @@ void PatternEditor::dropEvent(QDropEvent* de)
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;
-		if (t->getClips().size() == m_ps->numOfPatterns())
+		if (t->getClips().size() == static_cast<std::size_t>(m_ps->numOfPatterns()))
 		{
 			hasValidPatternClips = true;
-			for (int i = 0; i < t->getClips().size(); ++i)
+			for (auto i = std::size_t{0}; i < t->getClips().size(); ++i)
 			{
 				if (t->getClips()[i]->startPosition() != TimePos(i, 0))
 				{
@@ -176,11 +176,11 @@ void PatternEditor::updatePosition()
 
 void PatternEditor::makeSteps( bool clone )
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	const TrackContainer::TrackList& tl = model()->tracks();
 
 	for (const auto& track : tl)
 	{
-		if (track->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
 			auto p = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
 			if( clone )
@@ -306,7 +306,7 @@ QSize PatternEditorWindow::sizeHint() const
 
 void PatternEditorWindow::play()
 {
-	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
+	if (Engine::getSong()->playMode() != Song::PlayMode::Pattern)
 	{
 		Engine::getSong()->playPattern();
 	}

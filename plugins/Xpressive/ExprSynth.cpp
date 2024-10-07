@@ -34,9 +34,10 @@
 #include "interpolation.h"
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
+#include "SampleFrame.h"
 
 
-#include "exprtk.hpp"
+#include <exprtk.hpp>
 
 #define WARN_EXPRTK qWarning("ExprTk exception")
 
@@ -146,13 +147,8 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 
 	inline T operator()(const T& x) override
 	{
-		if (!std::isnan(x) && !std::isinf(x))
-		{
-			const int ix=(int)x;
-			if (ix>=1 && ix<=m_history_size)
-			{
-				return m_samples[(ix + m_pivot_last) % m_history_size];
-			}
+		if (!std::isnan(x) && x >= 1 && x <= m_history_size) {
+			return m_samples[(static_cast<std::size_t>(x) + m_pivot_last) % m_history_size];
 		}
 		return 0;
 	}
@@ -322,14 +318,8 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 
 	inline float operator()(const float& index,const float& seed) override
 	{
-		int irseed;
-		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
-		{
-			irseed=0;
-		}
-		else
-			irseed=(int)seed;
-		return randv(index,irseed);
+		const int irseed = seed < 0 || std::isnan(seed) || std::isinf(seed) ? 0 : static_cast<int>(seed);
+		return randv(index, irseed);
 	}
 
 	static const int data_size=sizeof(random_data)/sizeof(int);
@@ -741,7 +731,7 @@ ExprSynth::~ExprSynth()
 	}
 }
 
-void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
+void ExprSynth::renderOutput(fpp_t frames, SampleFrame* buf)
 {
 	try
 	{

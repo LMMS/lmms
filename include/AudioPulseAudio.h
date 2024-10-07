@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_PULSEAUDIO_H
-#define AUDIO_PULSEAUDIO_H
+#ifndef LMMS_AUDIO_PULSEAUDIO_H
+#define LMMS_AUDIO_PULSEAUDIO_H
 
 #include "lmmsconfig.h"
 
@@ -88,7 +88,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 	void run() override;
 
 	volatile bool m_quit;
@@ -104,4 +103,4 @@ private:
 
 #endif // LMMS_HAVE_PULSEAUDIO
 
-#endif
+#endif // LMMS_AUDIO_PULSEAUDIO_H

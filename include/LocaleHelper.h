@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef LOCALEHELPER_H
-#define LOCALEHELPER_H
+#ifndef LMMS_LOCALEHELPER_H
+#define LMMS_LOCALEHELPER_H
 
 #include <QLocale>
 
@@ -39,10 +39,9 @@ namespace lmms::LocaleHelper
 inline double toDouble(QString str, bool* ok = nullptr)
 {
 	bool isOkay;
-	double value;
 	QLocale c(QLocale::C);
 	c.setNumberOptions(QLocale::RejectGroupSeparator);
-	value = c.toDouble(str, &isOkay);
+	double value = c.toDouble(str, &isOkay);
 	if (!isOkay)
 	{
 		QLocale german(QLocale::German);
@@ -67,4 +66,4 @@ inline float toFloat(QString str, bool* ok = nullptr)
 
 } // namespace lmms::LocaleHelper
 
-#endif // LOCALEHELPER_H
+#endif // LMMS_LOCALEHELPER_H

@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef SAMPLE_TRACK_H
-#define SAMPLE_TRACK_H
-
+#ifndef LMMS_SAMPLE_TRACK_H
+#define LMMS_SAMPLE_TRACK_H
 
 #include "AudioPort.h"
 #include "Track.h"
@@ -55,8 +54,7 @@ public:
 	Clip* createClip(const TimePos & pos) override;
 
 
-	void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
+	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	inline IntModel * mixerChannelModel()
@@ -110,4 +108,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_TRACK_H

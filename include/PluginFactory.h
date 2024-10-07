@@ -22,17 +22,17 @@
  *
  */
 
-#ifndef PLUGINFACTORY_H
-#define PLUGINFACTORY_H
+#ifndef LMMS_PLUGIN_FACTORY_H
+#define LMMS_PLUGIN_FACTORY_H
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <QFileInfo>
 #include <QHash>
 #include <QList>
 #include <QString>
-#include <QVector>
 
 #include "lmms_export.h"
 #include "Plugin.h"
@@ -55,7 +55,7 @@ public:
 		bool isNull() const {return ! library;}
 	};
 	using PluginInfoList = QList<PluginInfo>;
-	using DescriptorMap = QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*>;
+	using DescriptorMap = QMultiMap<Plugin::Type, Plugin::Descriptor*>;
 
 	PluginFactory();
 	~PluginFactory() = default;
@@ -68,7 +68,7 @@ public:
 
 	/// Returns a list of all found plugins' descriptors.
 	Plugin::DescriptorList descriptors() const;
-	Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
+	Plugin::DescriptorList descriptors(Plugin::Type type) const;
 
 	struct PluginInfoAndKey
 	{
@@ -99,7 +99,7 @@ private:
 	PluginInfoList m_pluginInfos;
 
 	QMap<QString, PluginInfoAndKey> m_pluginByExt;
-	QVector<std::string> m_garbage; //!< cleaned up at destruction
+	std::vector<std::string> m_garbage; //!< cleaned up at destruction
 
 	QHash<QString, QString> m_errors;
 
@@ -112,4 +112,4 @@ LMMS_EXPORT PluginFactory* getPluginFactory();
 
 } // namespace lmms
 
-#endif // PLUGINFACTORY_H
+#endif // LMMS_PLUGIN_FACTORY_H

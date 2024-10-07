@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef LMMS_GUI_MAIN_WINDOW_H
+#define LMMS_GUI_MAIN_WINDOW_H
 
 #include <QBasicTimer>
 #include <QTimer>
@@ -72,6 +72,8 @@ public:
 	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
 
+	void refocus();
+
 	///
 	/// \brief	Asks whether changes made to the project are to be saved.
 	///
@@ -113,7 +115,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover
@@ -195,7 +197,6 @@ private:
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
-	void refocus();
 
 	void exportProject(bool multiExport = false);
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
@@ -248,7 +249,6 @@ private slots:
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-	void onSongStopped();
 	void onSongModified();
 	void onProjectFileNameChanged();
 
@@ -263,4 +263,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_MAIN_WINDOW_H

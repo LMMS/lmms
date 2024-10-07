@@ -22,29 +22,32 @@
  *
  */
 
-#ifndef PLUGIN_VIEW_H
-#define PLUGIN_VIEW_H
+#ifndef LMMS_GUI_PLUGIN_VIEW_H
+#define LMMS_GUI_PLUGIN_VIEW_H
 
 #include <QWidget>
 
-#include "Plugin.h"
 #include "ModelView.h"
+#include "Plugin.h"
 
-namespace lmms::gui
-{
+namespace lmms::gui {
 
-class LMMS_EXPORT PluginView  : public QWidget, public ModelView
+class LMMS_EXPORT PluginView : public QWidget, public ModelView
 {
 public:
-	PluginView( Plugin * _plugin, QWidget * _parent ) :
-		QWidget( _parent ),
-		ModelView( _plugin, this )
+	PluginView(Plugin* _plugin, QWidget* _parent)
+		: QWidget(_parent)
+		, ModelView(_plugin, this)
 	{
 	}
 
-} ;
+	void setResizable(bool resizable) { m_isResizable = resizable; }
+	bool isResizable() { return m_isResizable; }
 
+private:
+	bool m_isResizable = false;
+};
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PLUGIN_VIEW_H
