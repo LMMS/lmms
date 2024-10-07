@@ -44,7 +44,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
 	m_amount(amount, 0, 1, 0.001f, nullptr,
-			tr("Amount to send from channel %1 to channel %2").arg(m_from->m_channelIndex).arg(m_to->m_channelIndex))
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->getIndex()).arg(m_to->getIndex()))
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
@@ -54,7 +54,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 void MixerRoute::updateName()
 {
 	m_amount.setDisplayName(
-			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->getIndex()).arg(m_to->getIndex()));
 }
 
 
@@ -70,9 +70,9 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
 	m_name(),
 	m_lock(),
-	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet(0)
+	m_dependenciesMet(0),
+	m_channelIndex(idx)
 {
 	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
@@ -112,7 +112,7 @@ void MixerChannel::unmuteForSolo()
 	m_muteModel.setValue(false);
 
 	// if channel is not master, unmute also every channel it sends to/receives from
-	if (m_channelIndex != 0)
+	if (!isMaster())
 	{
 		for (const MixerRoute* sendsRoute : m_sends)
 		{
@@ -130,7 +130,7 @@ void MixerChannel::unmuteSenderForSolo()
 	m_muteModel.setValue(false);
 
 	// if channel is not master, unmute every channel it sends to
-	if (m_channelIndex != 0)
+	if (!isMaster())
 	{
 		for (const MixerRoute* sendsRoute : m_sends)
 		{
@@ -145,7 +145,7 @@ void MixerChannel::unmuteReceiverForSolo()
 	m_muteModel.setValue(false);
 
 	// if channel is not master, unmute every channel it receives from, and of those, unmute the channels they send to
-	if (m_channelIndex != 0)
+	if (!isMaster())
 	{
 		for (const MixerRoute* receiverRoute : m_receives)
 		{
@@ -405,7 +405,7 @@ void Mixer::deleteChannel( int index )
 		validateChannelName( i, i + 1 );
 
 		// set correct channel index
-		m_mixerChannels[i]->m_channelIndex = i;
+		m_mixerChannels[i]->setIndex(i);
 
 		// now check all routes and update names of the send models
 		for( MixerRoute * r : m_mixerChannels[i]->m_sends )
@@ -478,8 +478,8 @@ void Mixer::moveChannelLeft( int index )
 	qSwap(m_mixerChannels[index], m_mixerChannels[index - 1]);
 
 	// Update m_channelIndex of both channels
-	m_mixerChannels[index]->m_channelIndex = index;
-	m_mixerChannels[index - 1]->m_channelIndex = index -1;
+	m_mixerChannels[index]->setIndex(index);
+	m_mixerChannels[index - 1]->setIndex(index - 1);
 }
 
 
