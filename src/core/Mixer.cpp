@@ -155,7 +155,6 @@ void MixerChannel::unmuteReceiverForSolo()
 		{
 			sendsRoute->receiver()->unmuteSenderForSolo();
 		}
-
 	}
 }
 
