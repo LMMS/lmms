@@ -601,17 +601,11 @@ lmms--gui--TrackLabelButton:hover {
 	background: #3B424A;
 	border: 1px solid #515B66;
 	border-radius: none;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:pressed {
 	background: #262B30;
 	border-radius: none;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:checked {
@@ -619,17 +613,12 @@ lmms--gui--TrackLabelButton:checked {
 	background: #1C1F24;
 	background-image: url("resources:track_shadow_p.png");
 	border-radius: none;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
 	background-image: url("resources:track_shadow_p.png");
-	font-size: 11px;
-	padding: 2px 1px;
 	font-weight: solid;
 }
 
