@@ -42,14 +42,13 @@
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "GroupBox.h"
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Instrument.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
-#include "InstrumentMiscView.h"
+#include "InstrumentTuningView.h"
 #include "InstrumentSoundShapingView.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
@@ -93,12 +92,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing( 0 );
 
-	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
-
+	auto generalSettingsWidget = new QWidget(this);
 	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
-
-	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
-	generalSettingsLayout->setSpacing( 6 );
 
 	auto nameAndChangeTrackWidget = new QWidget(generalSettingsWidget);
 	auto nameAndChangeTrackLayout = new QHBoxLayout(nameAndChangeTrackWidget);
@@ -107,11 +102,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString& ) ),
 				this, SLOT( textChanged( const QString& ) ) );
 
-	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	nameAndChangeTrackLayout->addWidget(m_nameLineEdit, 1);
 
 
@@ -124,7 +118,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
-
+	nameAndChangeTrackWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	generalSettingsLayout->addWidget( nameAndChangeTrackWidget );
 
 	auto basicControlsLayout = new QGridLayout;
@@ -143,12 +137,12 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 #endif
 
-	QString labelStyleSheet = "font-size: 6pt;";
+	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob( knobBright_26, nullptr, tr( "Volume" ) );
+	m_volumeKnob = new Knob( KnobType::Bright26, nullptr, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 
@@ -162,7 +156,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// set up panning knob
-	m_panningKnob = new Knob( knobBright_26, nullptr, tr( "Panning" ) );
+	m_panningKnob = new Knob( KnobType::Bright26, nullptr, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ), "" );
 
 	basicControlsLayout->addWidget( m_panningKnob, 0, 1 );
@@ -178,7 +172,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// set up pitch knob
-	m_pitchKnob = new Knob( knobBright_26, nullptr, tr( "Pitch" ) );
+	m_pitchKnob = new Knob( KnobType::Bright26, nullptr, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ), " " + tr( "cents" ) );
 
 	basicControlsLayout->addWidget( m_pitchKnob, 0, 3 );
@@ -206,7 +200,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_mixerChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "Mixer channel" ), m_itv );
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_itv);
 
 	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );
@@ -244,8 +238,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
 
 	// FUNC tab
-	auto instrumentFunctions = new QWidget(m_tabWidget);
-	auto instrumentFunctionsLayout = new QVBoxLayout(instrumentFunctions);
+	m_instrumentFunctionsView = new QWidget(m_tabWidget);
+	auto instrumentFunctionsLayout = new QVBoxLayout(m_instrumentFunctionsView);
 	instrumentFunctionsLayout->setContentsMargins(5, 5, 5, 5);
 	m_noteStackingView = new InstrumentFunctionNoteStackingView( &m_track->m_noteStacking );
 	m_arpeggioView = new InstrumentFunctionArpeggioView( &m_track->m_arpeggio );
@@ -255,30 +249,30 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	instrumentFunctionsLayout->addStretch();
 
 	// MIDI tab
-	m_midiView = new InstrumentMidiIOView( m_tabWidget );
+	m_midiView = new InstrumentMidiIOView(m_tabWidget);
 
 	// FX tab
-	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
+	m_effectView = new EffectRackView(m_track->m_audioPort.effects(), m_tabWidget);
 
-	// MISC tab
-	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
+	// Tuning tab
+	m_tuningView = new InstrumentTuningView(m_track, m_tabWidget);
 
 
-	m_tabWidget->addTab( m_ssView, tr( "Envelope, filter & LFO" ), "env_lfo_tab", 1 );
-	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "func_tab", 2 );
-	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
-	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
-	adjustTabSize(m_ssView);
-	adjustTabSize(instrumentFunctions);
-	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
-	adjustTabSize(m_midiView);
-	adjustTabSize(m_miscView);
+	m_tabWidget->addTab(m_ssView, tr("Envelope, filter & LFO"), "env_lfo_tab", 1);
+	m_tabWidget->addTab(m_instrumentFunctionsView, tr("Chord stacking & arpeggio"), "func_tab", 2);
+	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", 3);
+	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", 4);
+	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
 	m_pianoView->setMinimumHeight( PIANO_HEIGHT );
 	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
+
+	// setup sizes and policies
+	generalSettingsWidget->setMaximumHeight(90);
+	generalSettingsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	vlayout->addWidget( generalSettingsWidget );
 	// Use QWidgetItem explicitly to make the size hint change on instrument changes
@@ -287,13 +281,20 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
+	updateInstrumentView();
+
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	if (!m_instrumentView->isResizable()) {
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		// any better way than this?
+	} else {
+		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
+		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+	}
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
 
-	updateInstrumentView();
 
 	// Hide the Size and Maximize options from the system menu
 	// since the dialog size is fixed.
@@ -302,10 +303,18 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
 
 	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
-	subWin->setMinimumSize( subWin->size() );
 	subWin->hide();
 }
 
+void InstrumentTrackWindow::resizeEvent(QResizeEvent * event) {
+	/* m_instrumentView->resize(QSize(size().width()-1, maxHeight)); */
+	adjustTabSize(m_instrumentView);
+	adjustTabSize(m_instrumentFunctionsView);
+	adjustTabSize(m_ssView);
+	adjustTabSize(m_effectView);
+	adjustTabSize(m_midiView);
+	adjustTabSize(m_tuningView);
+}
 
 
 
@@ -356,7 +365,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_mixerChannelNumber->setModel( &m_track->m_mixerChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
-	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::IsNotBendable ) == false )
+	if (m_track->instrument() && m_track->instrument()->isBendable())
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
@@ -374,14 +383,16 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchRangeLabel->hide();
 	}
 
-	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
+	if (m_track->instrument() && m_track->instrument()->isMidiBased())
 	{
-		m_miscView->microtunerGroupBox()->hide();
+		m_tuningView->microtunerNotSupportedLabel()->show();
+		m_tuningView->microtunerGroupBox()->hide();
 		m_track->m_microtuner.enabledModel()->setValue(false);
 	}
 	else
 	{
-		m_miscView->microtunerGroupBox()->show();
+		m_tuningView->microtunerNotSupportedLabel()->hide();
+		m_tuningView->microtunerGroupBox()->show();
 	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );
@@ -389,11 +400,11 @@ void InstrumentTrackWindow::modelChanged()
 	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
-	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
-	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
-	m_miscView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
-	m_miscView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
-	m_miscView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
+	m_tuningView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
+	m_tuningView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
+	m_tuningView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
+	m_tuningView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
+	m_tuningView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
 }
 
@@ -418,18 +429,17 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory(presetRoot + m_track->instrumentName());
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
+	sfd.selectFile(fname.remove(QRegularExpression(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
-		DataFile dataFile(DataFile::InstrumentTrackSettings);
+		DataFile dataFile(DataFile::Type::InstrumentTrackSettings);
 		QDomElement& content(dataFile.content());
 
-		m_track->setSimpleSerializing();
-		m_track->saveSettings(dataFile, content);
+		m_track->savePreset(dataFile, content);
 		//We don't want to save muted & solo settings when we're saving a preset
 		content.setAttribute("muted", 0);
 		content.setAttribute("solo", 0);
@@ -466,7 +476,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
-		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) );
+		m_ssView->setFunctionsHidden(m_track->m_instrument->isSingleStreamed());
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
@@ -673,6 +683,13 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 	}
 	Q_ASSERT(bringToFront);
 	bringToFront->getInstrumentTrackWindow()->setFocus();
+	Qt::WindowFlags flags = windowFlags();
+	if (!m_instrumentView->isResizable()) {
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+	} else {
+		flags &= ~Qt::MSWindowsFixedSizeDialogHint;
+	}
+	setWindowFlags( flags );
 }
 
 void InstrumentTrackWindow::viewNextInstrument()
@@ -689,7 +706,8 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	// "-1" :
 	// in "TabWidget::addTab", under "Position tab's window", the widget is
 	// moved up by 1 pixel
-	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
+	w->resize(width() - 4, height() - 180);
+	w->update();
 }
 
 

@@ -46,7 +46,7 @@ bool PeakController::m_buggedFile;
 
 PeakController::PeakController( Model * _parent,
 		PeakControllerEffect * _peak_effect ) :
-	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
+	Controller( ControllerType::Peak, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect ),
 	m_currentSample( 0.0f )
 {
@@ -80,7 +80,7 @@ void PeakController::updateValueBuffer()
 {
 	if( m_coeffNeedsUpdate )
 	{
-		const float ratio = 44100.0f / Engine::audioEngine()->processingSampleRate();
+		const float ratio = 44100.0f / Engine::audioEngine()->outputSampleRate();
 		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
 		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
 		m_coeffNeedsUpdate = false;
@@ -161,12 +161,11 @@ void PeakController::loadSettings( const QDomElement & _this )
 		effectId = m_loadCount++;
 	}
 
-	PeakControllerEffectVector::Iterator i;
-	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	for (const auto& effect : s_effects)
 	{
-		if( (*i)->m_effectId == effectId )
+		if (effect->m_effectId == effectId)
 		{
-			m_peakEffect = *i;
+			m_peakEffect = effect;
 			return;
 		}
 	}
@@ -190,16 +189,14 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 {
 	int effectId = _this.attribute( "effectId" ).toInt();
 
-	PeakControllerEffectVector::Iterator i;
-
 	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
 	//foundCount should always be 1 because m_effectId is initialized with rand()
 	int foundCount = 0;
 	if( m_buggedFile == false )
 	{
-		for( i = s_effects.begin(); i != s_effects.end(); ++i )
+		for (const auto& effect : s_effects)
 		{
-			if( (*i)->m_effectId == effectId )
+			if (effect->m_effectId == effectId)
 			{
 				foundCount++;
 			}
@@ -208,9 +205,9 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 		{
 			m_buggedFile = true;
 			int newEffectId = 0;
-			for( i = s_effects.begin(); i != s_effects.end(); ++i )
+			for (const auto& effect : s_effects)
 			{
-				(*i)->m_effectId = newEffectId++;
+				effect->m_effectId = newEffectId++;
 			}
 			QMessageBox msgBox;
 			msgBox.setIcon( QMessageBox::Information );
@@ -231,11 +228,11 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	}
 	m_getCount++; //NB: m_getCount should be increased even m_buggedFile is false
 
-	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	for (const auto& effect : s_effects)
 	{
-		if( (*i)->m_effectId == effectId )
+		if (effect->m_effectId == effectId)
 		{
-			return (*i)->controller();
+			return effect->controller();
 		}
 	}
 

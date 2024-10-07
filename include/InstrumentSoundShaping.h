@@ -34,6 +34,7 @@ namespace lmms
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
+class SampleFrame;
 
 namespace gui
 {
@@ -48,16 +49,17 @@ public:
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
 	~InstrumentSoundShaping() override = default;
 
-	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	enum Targets
+	enum class Target
 	{
 		Volume,
 		Cut,
 		Resonance,
-		NumTargets
+		Count
 	} ;
+	constexpr static auto NumTargets = static_cast<std::size_t>(Target::Count);
 
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;
@@ -82,7 +84,7 @@ private:
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
 
-	static const char *const targetNames[InstrumentSoundShaping::NumTargets][3];
+	static const char *const targetNames[NumTargets][3];
 
 
 	friend class gui::InstrumentSoundShapingView;

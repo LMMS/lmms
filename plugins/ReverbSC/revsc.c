@@ -16,7 +16,7 @@
 #include "base.h"
 #include "revsc.h"
 
-#define DEFAULT_SRATE   44100.0
+#define DEFAULT_SRATE   44100.f
 #define MIN_SRATE       5000.0
 #define MAX_SRATE       1000000.0
 #define MAX_PITCHMOD    20.0
@@ -34,20 +34,20 @@
 /* reverbParams[n][3] = random seed (0 - 32767)                     */
 
 static const SPFLOAT reverbParams[8][4] = {
-    { (2473.0 / DEFAULT_SRATE), 0.0010, 3.100,  1966.0 },
-    { (2767.0 / DEFAULT_SRATE), 0.0011, 3.500, 29491.0 },
-    { (3217.0 / DEFAULT_SRATE), 0.0017, 1.110, 22937.0 },
-    { (3557.0 / DEFAULT_SRATE), 0.0006, 3.973,  9830.0 },
-    { (3907.0 / DEFAULT_SRATE), 0.0010, 2.341, 20643.0 },
-    { (4127.0 / DEFAULT_SRATE), 0.0011, 1.897, 22937.0 },
-    { (2143.0 / DEFAULT_SRATE), 0.0017, 0.891, 29491.0 },
-    { (1933.0 / DEFAULT_SRATE), 0.0006, 3.221, 14417.0 }
+    { (2473.f / DEFAULT_SRATE), 0.0010f, 3.100f,  1966.f },
+    { (2767.f / DEFAULT_SRATE), 0.0011f, 3.500f, 29491.f },
+    { (3217.f / DEFAULT_SRATE), 0.0017f, 1.110f, 22937.f },
+    { (3557.f / DEFAULT_SRATE), 0.0006f, 3.973f,  9830.f },
+    { (3907.f / DEFAULT_SRATE), 0.0010f, 2.341f, 20643.f },
+    { (4127.f / DEFAULT_SRATE), 0.0011f, 1.897f, 22937.f },
+    { (2143.f / DEFAULT_SRATE), 0.0017f, 0.891f, 29491.f },
+    { (1933.f / DEFAULT_SRATE), 0.0006f, 3.221f, 14417.f }
 };
 
 static int delay_line_max_samples(SPFLOAT sr, SPFLOAT iPitchMod, int n);
 static int init_delay_line(sp_revsc *p, sp_revsc_dl *lp, int n);
 static int delay_line_bytes_alloc(SPFLOAT sr, SPFLOAT iPitchMod, int n);
-static const SPFLOAT outputGain  = 0.35;
+static const SPFLOAT outputGain  = 0.35f;
 static const SPFLOAT jpScale     = 0.25;
 int sp_revsc_create(sp_revsc **p){
     *p = malloc(sizeof(sp_revsc));
@@ -56,9 +56,9 @@ int sp_revsc_create(sp_revsc **p){
 
 int sp_revsc_init(sp_data *sp, sp_revsc *p)
 {
-    p->iSampleRate = sp->sr;
-    p->sampleRate = sp->sr;
-    p->feedback = 0.97;
+    p->iSampleRate = (float) sp->sr;
+    p->sampleRate = (float) sp->sr;
+    p->feedback = 0.97f;
     p->lpfreq = 10000;
     p->iPitchMod = 1;
     p->iSkipInit = 0;
@@ -67,14 +67,14 @@ int sp_revsc_init(sp_data *sp, sp_revsc *p)
     p->initDone = 1;
     int i, nBytes = 0;
     for(i = 0; i < 8; i++){
-        nBytes += delay_line_bytes_alloc(sp->sr, 1, i);
+        nBytes += delay_line_bytes_alloc((float) sp->sr, 1, i);
     }
     sp_auxdata_alloc(&p->aux, nBytes);
     nBytes = 0;
     for (i = 0; i < 8; i++) {
         p->delayLines[i].buf = (SPFLOAT*) (((char*) p->aux.ptr) + nBytes);
         init_delay_line(p, &p->delayLines[i], i);
-        nBytes += delay_line_bytes_alloc(sp->sr, 1, i);
+        nBytes += delay_line_bytes_alloc((float) sp->sr, 1, i);
     }
 
     return SP_OK;
@@ -217,7 +217,7 @@ int sp_revsc_compute(sp_data *sp, sp_revsc *p, SPFLOAT *in1, SPFLOAT *in2, SPFLO
 
         /* calculate interpolation coefficients */
 
-        a2 = frac * frac; a2 -= 1.0; a2 *= (1.0 / 6.0);
+        a2 = frac * frac; a2 -= 1.0; a2 *= (1.f / 6.f);
         a1 = frac; a1 += 1.0; a1 *= 0.5; am1 = a1 - 1.0;
         a0 = 3.0 * a2; a1 -= a0; am1 -= a2; a0 -= frac;
 

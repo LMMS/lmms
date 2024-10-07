@@ -28,7 +28,7 @@
 #include "lmms_math.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
-
+#include "SampleFrame.h"
 
 namespace lmms::DspEffectLibrary
 {
@@ -78,6 +78,17 @@ namespace lmms::DspEffectLibrary
 			m_leftFX( leftFX ),
 			m_rightFX( rightFX )
 		{
+		}
+
+		void setGain(float gain)
+		{
+			leftFX().setGain(gain);
+			rightFX().setGain(gain);
+		}
+
+		void nextSample(SampleFrame & in)
+		{
+			nextSample(in.left(), in.right());
 		}
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
@@ -187,7 +198,7 @@ namespace lmms::DspEffectLibrary
 	template<typename sample_t>
 	inline sample_t saturate( sample_t x )
 	{
-		return qMin<sample_t>( qMax<sample_t>( -1.0f, x ), 1.0f );
+		return std::min<sample_t>(std::max<sample_t>(-1.0f, x), 1.0f);
 	}
 
 
@@ -198,7 +209,7 @@ namespace lmms::DspEffectLibrary
 				const sample_t _gain,
 				const sample_t _ratio,
 				const FastBassBoost & _orig = FastBassBoost() ) :
-			m_frequency( qMax<sample_t>( _frequency, 10.0 ) ),
+			m_frequency(std::max<sample_t>(_frequency, 10.0)),
 			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),

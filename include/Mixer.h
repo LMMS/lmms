@@ -31,7 +31,7 @@
 #include "ThreadableJob.h"
 
 #include <atomic>
-
+#include <optional>
 #include <QColor>
 
 namespace lmms
@@ -39,7 +39,7 @@ namespace lmms
 
 
 class MixerRoute;
-using MixerRouteVector = QVector<MixerRoute*>;
+using MixerRouteVector = std::vector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
 {
@@ -56,7 +56,7 @@ class MixerChannel : public ThreadableJob
 
 		float m_peakLeft;
 		float m_peakRight;
-		sampleFrame * m_buffer;
+		SampleFrame* m_buffer;
 		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
 		BoolModel m_soloModel;
@@ -78,25 +78,18 @@ class MixerChannel : public ThreadableJob
 		void unmuteSenderForSolo();
 		void unmuteReceiverForSolo();
 
-		void setColor (QColor newColor)
-		{
-			m_color = newColor;
-			m_hasColor = true;
-		}
+		auto color() const -> const std::optional<QColor>& { return m_color; }
+		void setColor(const std::optional<QColor>& color) { m_color = color; }
 
-		// TODO C++17 and above: use std::optional instead
-		QColor m_color;
-		bool m_hasColor;
-
-	
-		std::atomic_int m_dependenciesMet;
+		std::atomic_size_t m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		
 	private:
 		void doProcessing() override;
-};
 
+		std::optional<QColor> m_color;
+};
 
 class MixerRoute : public QObject
 {
@@ -146,10 +139,10 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel( const sampleFrame * _buf, mix_ch_t _ch );
+	void mixToChannel( const SampleFrame* _buf, mix_ch_t _ch );
 
 	void prepareMasterMix();
-	void masterMix( sampleFrame * _buf );
+	void masterMix( SampleFrame* _buf );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -220,7 +213,7 @@ public:
 
 private:
 	// the mixer channels in the mixer. index 0 is always master.
-	QVector<MixerChannel *> m_mixerChannels;
+	std::vector<MixerChannel*> m_mixerChannels;
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);

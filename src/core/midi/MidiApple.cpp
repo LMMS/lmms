@@ -259,7 +259,7 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 		nBytes = packet->length;
 		// Check if this is the end of a continued SysEx message
 		if (continueSysEx) {
-			unsigned int lengthToCopy = qMin(nBytes, SYSEX_LENGTH - sysExLength);
+			unsigned int lengthToCopy = std::min(nBytes, SYSEX_LENGTH - sysExLength);
 			// Copy the message into our SysEx message buffer,
 			// making sure not to overrun the buffer
 			memcpy(sysExMessage + sysExLength, packet->data, lengthToCopy);
@@ -298,7 +298,7 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 				{
 					// MIDI SysEx then we copy the rest of the message into the SysEx message buffer
 					unsigned int lengthLeftInMessage = nBytes - iByte;
-					unsigned int lengthToCopy = qMin(lengthLeftInMessage, SYSEX_LENGTH);
+					unsigned int lengthToCopy = std::min(lengthLeftInMessage, SYSEX_LENGTH);
 					
 					memcpy(sysExMessage + sysExLength, packet->data, lengthToCopy);
 					sysExLength += lengthToCopy;
@@ -403,7 +403,7 @@ void MidiApple::midiInClose( MIDIEndpointRef reference )
 
 
 
-char *getName( MIDIObjectRef &object )
+char *getName( const MIDIObjectRef &object )
 {
 	// Returns the name of a given MIDIObjectRef as char *
 	CFStringRef name = nullptr;

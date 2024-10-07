@@ -22,15 +22,15 @@
  *
  */
 
-#include "QTestSuite.h"
+#include <QDir>
+#include <QObject>
+#include <QtTest/QtTest>
 
 #include "ConfigManager.h"
-#include "SampleBuffer.h"
 #include "PathUtil.h"
+#include "SampleBuffer.h"
 
-#include <QDir>
-
-class RelativePathsTest : QTestSuite
+class RelativePathsTest : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -66,6 +66,7 @@ private slots:
 		QCOMPARE(PathUtil::toAbsolute(""), empty);
 		QCOMPARE(PathUtil::toShortestRelative(""), empty);
 	}
-} RelativePathTests;
+};
 
+QTEST_GUILESS_MAIN(RelativePathsTest)
 #include "RelativePathsTest.moc"

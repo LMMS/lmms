@@ -49,6 +49,12 @@ public:
 	}
 
 	void setLabel(const QString &label) { m_label = label; }
+	
+	void setSeamless(bool left, bool right)
+	{
+		m_wholeDisplay.setSeamless(left, true);
+		m_fractionDisplay.setSeamless(true, right);
+	}
 
 public slots:
 	virtual void update();

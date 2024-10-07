@@ -102,7 +102,7 @@ int notEmpty(const std::vector<float> &spectrum)
  *
  * return -1 on error
  */
-int precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool normalized)
+int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool normalized)
 {
 	if (window == nullptr) {return -1;}
 
@@ -117,23 +117,23 @@ int precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool 
 	switch (type)
 	{
 		default:
-		case RECTANGULAR:
+		case FFTWindow::Rectangular:
 			for (unsigned int i = 0; i < length; i++) {window[i] = 1.0;}
 			gain = 1;
 			return 0;
-		case BLACKMAN_HARRIS:	
-			a0 = 0.35875;
-			a1 = 0.48829;
-			a2 = 0.14128;
-			a3 = 0.01168;
+		case FFTWindow::BlackmanHarris:	
+			a0 = 0.35875f;
+			a1 = 0.48829f;
+			a2 = 0.14128f;
+			a3 = 0.01168f;
 			break;
-		case HAMMING:
-			a0 = 0.54;
+		case FFTWindow::Hamming:
+			a0 = 0.54f;
 			a1 = 1.0 - a0;
 			a2 = 0;
 			a3 = 0;
 			break;
-		case HANNING:
+		case FFTWindow::Hanning:
 			a0 = 0.5;
 			a1 = 1.0 - a0;
 			a2 = 0;
@@ -204,11 +204,11 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 
 		float j_min = (i * ratio) + bottom;
 
-		if (j_min < 0) {j_min = bottom;}
+		if (j_min < 0) { j_min = static_cast<float>(bottom); }
 
 		float j_max = j_min + ratio;
 
-		for (float j = (int)j_min; j <= j_max; j++)
+		for (float j = std::floor(j_min); j <= j_max; j++)
 		{
 			compressedband[i] += absspec_buffer[(int)j];
 		}

@@ -1,3 +1,3 @@
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(audiofileprocessor AudioFileProcessor.cpp AudioFileProcessor.h MOCFILES AudioFileProcessor.h EMBEDDED_RESOURCES *.png)
+BUILD_PLUGIN(audiofileprocessor AudioFileProcessor.cpp AudioFileProcessor.h AudioFileProcessorView.cpp AudioFileProcessorView.h AudioFileProcessorWaveView.cpp AudioFileProcessorWaveView.h MOCFILES AudioFileProcessor.h AudioFileProcessorView.h AudioFileProcessorWaveView.h EMBEDDED_RESOURCES *.png)

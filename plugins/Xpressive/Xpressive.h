@@ -68,7 +68,7 @@ public:
 	Xpressive(InstrumentTrack* instrument_track );
 
 	void playNote(NotePlayHandle* nph,
-						sampleFrame* working_buffer ) override;
+						SampleFrame* working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 
@@ -190,6 +190,7 @@ private:
 	PixmapButton *m_w3Btn;
 	PixmapButton *m_o1Btn;
 	PixmapButton *m_o2Btn;
+	PixmapButton *m_helpBtn;
 	PixmapButton *m_sinWaveBtn;
 	PixmapButton *m_triangleWaveBtn;
 	PixmapButton *m_sqrWaveBtn;

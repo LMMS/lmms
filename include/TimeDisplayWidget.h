@@ -51,13 +51,11 @@ private slots:
 
 
 private:
-	enum DisplayModes
+	enum class DisplayMode
 	{
 		MinutesSeconds,
-		BarsTicks,
-		DisplayModeCount
+		BarsTicks
 	};
-	using DisplayMode = DisplayModes;
 
 	void setDisplayMode( DisplayMode displayMode );
 

@@ -1,25 +1,25 @@
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialog.cpp LadspaSubPluginFeatures.cpp LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaSubPluginFeatures.h MOCFILES LadspaEffect.h LadspaControls.h LadspaControlDialog.h EMBEDDED_RESOURCES logo.png)
+BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialog.cpp LadspaMatrixControlDialog.cpp LadspaSubPluginFeatures.cpp LadspaWidgetFactory.cpp LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaMatrixControlDialog.h LadspaSubPluginFeatures.h LadspaWidgetFactory.h MOCFILES LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaMatrixControlDialog.h EMBEDDED_RESOURCES logo.png)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ladspa")
 
-IF(WANT_CAPS)
+IF(LMMS_HAVE_CAPS)
 ADD_SUBDIRECTORY(caps)
-ENDIF(WANT_CAPS)
+ENDIF()
 
-IF(WANT_TAP)
+IF(LMMS_HAVE_TAP)
 ADD_SUBDIRECTORY(tap)
-ENDIF(WANT_TAP)
+ENDIF()
 
-IF(WANT_SWH)
+IF(LMMS_HAVE_SWH)
 ADD_SUBDIRECTORY(swh)
-ENDIF(WANT_SWH)
+ENDIF()
 
-IF(WANT_CMT)
+IF(LMMS_HAVE_CMT)
 ADD_SUBDIRECTORY(cmt)
-ENDIF(WANT_CMT)
+ENDIF()
 
-IF(WANT_CALF)
+IF(LMMS_HAVE_CALF)
 ADD_SUBDIRECTORY(calf)
-ENDIF(WANT_CALF)
+ENDIF()

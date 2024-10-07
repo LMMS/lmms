@@ -30,9 +30,9 @@
 #include <QMap>
 #include <QPair>
 #include <QStringList>
-#include <QVector>
 #include <QObject>
 
+#include <vector>
 #include "lmms_export.h"
 
 
@@ -230,6 +230,7 @@ public:
 
 	QString defaultVersion() const;
 
+	static bool enableBlockedPlugins();
 
 	static QStringList availableVstEmbedMethods();
 	QString vstEmbedMethod() const;
@@ -239,11 +240,8 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	const QString & value(const QString & cls,
-					const QString & attribute) const;
-	const QString & value(const QString & cls,
-					const QString & attribute,
-					const QString & defaultVal) const;
+	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
+
 	void setValue(const QString & cls, const QString & attribute,
 						const QString & value);
 	void deleteValue(const QString & cls, const QString & attribute);
@@ -302,7 +300,7 @@ private:
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	using stringPairVector = QVector<QPair<QString, QString>>;
+	using stringPairVector = std::vector<QPair<QString, QString>>;
 	using settingsMap = QMap<QString, stringPairVector>;
 	settingsMap m_settings;
 

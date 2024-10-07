@@ -30,6 +30,7 @@
 
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
+#include "Note.h"
 
 class QDomNode;
 
@@ -46,6 +47,7 @@ struct MidiNote
 	uint8_t pitch;
 	int duration;
 	uint8_t volume;
+	Note::Type type;
 
 	inline bool operator<(const MidiNote &b) const
 	{
@@ -62,6 +64,16 @@ class MidiExport: public ExportFilter
 public:
 	MidiExport();
 	~MidiExport() override = default;
+
+	// Default Beat Length in ticks for step notes
+	// TODO: The beat length actually varies per note, however the method that
+	// calculates it (InstrumentTrack::beatLen) requires a NotePlayHandle to do
+	// so. While we don't figure out a way to hold the beat length of each note
+	// on its member variables, we will use a default value as a beat length that
+	// will be used as an upper limit of the midi note length. This doesn't worsen
+	// the current logic used for MidiExport because right now the beat length is
+	// not even considered during the generation of the MIDI.
+	static constexpr int DefaultBeatLength = 1500;
 
 	gui::PluginView* instantiateView(QWidget *) override
 	{

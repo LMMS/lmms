@@ -71,7 +71,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 				"Filter for importing MIDI-files into LMMS" ),
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
-	Plugin::ImportFilter,
+	Plugin::Type::ImportFilter,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -165,7 +165,7 @@ public:
 			// in the main thread. This should probably be
 			// removed if that ever changes.
 			qApp->processEvents();
-			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
+			at = dynamic_cast<AutomationTrack *>( Track::create( Track::Type::Automation, tc ) );
 		}
 		if( tn != "") {
 			at->setName( tn );
@@ -227,7 +227,7 @@ public:
 		if( !it ) {
 			// Keep LMMS responsive
 			qApp->processEvents();
-			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
+			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::Type::Instrument, tc ) );
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument( "sf2player" );
@@ -328,9 +328,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// NOTE: unordered_map::operator[] creates a new element if none exists
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	auto nt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
+	auto nt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
 	nt->setName(tr("MIDI Time Signature Numerator"));
-	auto dt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
+	auto dt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
 	dt->setName(tr("MIDI Time Signature Denominator"));
 	auto timeSigNumeratorPat = new AutomationClip(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
@@ -358,7 +358,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
+	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
 	tt->setName(tr("Tempo"));
 	auto tap = new AutomationClip(tt);
 	tap->setDisplayName(tr("Tempo"));
