@@ -164,12 +164,12 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan( result ) ? 0 : result;
 }
 
-static inline float fastPow10f(float x)
+inline float fastPow10f(float x)
 {
 	return expf(2.302585092994046f * x);
 }
 
-static inline float fastLog10f(float x)
+inline float fastLog10f(float x)
 {
 	return logf(x) * 0.4342944819032518f;
 }
@@ -177,7 +177,7 @@ static inline float fastLog10f(float x)
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
-static inline float ampToDbfs(float amp)
+inline float ampToDbfs(float amp)
 {
 	return fastLog10f(amp) * 20.0f;
 }
@@ -186,7 +186,7 @@ static inline float ampToDbfs(float amp)
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbfsToAmp(float dbfs)
+inline float dbfsToAmp(float dbfs)
 {
 	return fastPow10f(dbfs * 0.05f);
 }
@@ -197,9 +197,7 @@ static inline float dbfsToAmp(float dbfs)
 //! @return Amplitude in dBFS. -inf for 0 amplitude.
 inline float safeAmpToDbfs(float amp)
 {
-	return amp == 0.0f
-		? -INFINITY
-		: ampToDbfs(amp);
+	return amp == 0.0f ? -INFINITY : ampToDbfs(amp);
 }
 
 
@@ -208,9 +206,7 @@ inline float safeAmpToDbfs(float amp)
 //! @return Linear amplitude
 inline float safeDbfsToAmp(float dbfs)
 {
-	return std::isinf( dbfs )
-		? 0.0f
-		: dbfsToAmp(dbfs);
+	return std::isinf(dbfs) ? 0.0f : dbfsToAmp(dbfs);
 }
 
 
