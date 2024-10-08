@@ -1,7 +1,7 @@
 /*
- * SampleLoader.h - Load audio and waveform files
+ * SampleDatabase.cpp
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,27 +22,24 @@
  *
  */
 
-#ifndef LMMS_GUI_SAMPLE_LOADER_H
-#define LMMS_GUI_SAMPLE_LOADER_H
+#include "SampleDatabase.h"
 
-#include <QString>
-#include <memory>
+#include <filesystem>
 
+#include "FileSystemHelpers.h"
 #include "SampleBuffer.h"
-#include "lmms_export.h"
 
-namespace lmms::gui {
-class LMMS_EXPORT SampleLoader
+namespace lmms {
+auto SampleDatabase::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 {
-public:
-	static QString openAudioFile(const QString& previousFile = "");
-	static QString openWaveformFile(const QString& previousFile = "");
-	static std::shared_ptr<const SampleBuffer> loadBufferFromFile(const QString& filePath);
-	static std::shared_ptr<const SampleBuffer> loadBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
-private:
-	static void displayError(const QString& message);
-};
-} // namespace lmms::gui
+	const auto fsPath = FileSystemHelpers::pathFromQString(path);
+	const auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
+	return get(entry, s_audioFileMap, path);
+}
 
-#endif // LMMS_GUI_SAMPLE_LOADER_H
+auto SampleDatabase::fetch(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>
+{
+	const auto entry = Base64Entry{base64.toStdString(), sampleRate};
+	return get(entry, s_base64Map, base64, sampleRate);
+}
+} // namespace lmms
