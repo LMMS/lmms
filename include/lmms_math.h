@@ -171,7 +171,7 @@ static inline float fastPow10f(float x)
 
 static inline float fastLog10f(float x)
 {
-    return logf(x) * 0.4342944819032518f;
+	return logf(x) * 0.4342944819032518f;
 }
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
