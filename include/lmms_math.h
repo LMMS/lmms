@@ -166,12 +166,12 @@ inline float linearToLogScale(float min, float max, float value)
 
 inline float fastPow10f(float x)
 {
-	return expf(2.302585092994046f * x);
+	return std::exp(2.302585092994046f * x);
 }
 
 inline float fastLog10f(float x)
 {
-	return logf(x) * 0.4342944819032518f;
+	return std::log(x) * 0.4342944819032518f;
 }
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
