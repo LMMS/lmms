@@ -275,6 +275,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
 	const float ppTick  = ppb / TimePos::ticksPerBar();
+	float offset =  m_clip->startTimeOffset() * ppTick;
 
 	p.translate( 0.0f, max * height() / y_scale - BORDER_WIDTH );
 	p.scale( 1.0f, -h );
@@ -295,7 +296,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	{
 		if( it+1 == m_clip->getTimeMap().end() )
 		{
-			const float x1 = POS(it) * ppTick;
+			const float x1 = POS(it) * ppTick + offset;
 			const auto x2 = (float)(width() - BORDER_WIDTH);
 			if( x1 > ( width() - BORDER_WIDTH ) ) break;
 			// We are drawing the space after the last node, so we use the outValue
@@ -323,20 +324,19 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			: INVAL(it + 1);
 
 		QPainterPath path;
-		QPointF origin = QPointF(POS(it) * ppTick, 0.0f);
-		path.moveTo( origin );
-		path.moveTo(QPointF(POS(it) * ppTick,values[0]));
+		QPointF origin = QPointF(POS(it) * ppTick + offset, 0.0f);
+		path.moveTo(origin);
+		path.moveTo(QPointF(POS(it) * ppTick + offset, values[0]));
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
-			float x = i * ppTick;
-			if( x > ( width() - BORDER_WIDTH ) ) break;
+			float x = i * ppTick + offset;
+			if(x > (width() - BORDER_WIDTH)) break;
 			float value = values[i - POS(it)];
-			path.lineTo( QPointF( x, value ) );
-
+			path.lineTo(QPointF(x, value));
 		}
-		path.lineTo((POS(it + 1)) * ppTick, nextValue);
-		path.lineTo((POS(it + 1)) * ppTick, 0.0f);
-		path.lineTo( origin );
+		path.lineTo((POS(it + 1)) * ppTick + offset, nextValue);
+		path.lineTo((POS(it + 1)) * ppTick + offset, 0.0f);
+		path.lineTo(origin);
 
 		if( gradient() )
 		{
@@ -361,10 +361,10 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		const int bx = BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
 
 		//top line
-		p.drawLine(bx, BORDER_WIDTH, bx, BORDER_WIDTH + lineSize);
+		p.drawLine(bx + offset, BORDER_WIDTH, bx + offset, BORDER_WIDTH + lineSize);
 
 		//bottom line
-		p.drawLine(bx, rect().bottom() - (lineSize + BORDER_WIDTH), bx, rect().bottom() - BORDER_WIDTH);
+		p.drawLine(bx + offset, rect().bottom() - (lineSize + BORDER_WIDTH), bx + offset, rect().bottom() - BORDER_WIDTH);
 	}
 
 	// recording icon for when recording automation
@@ -513,39 +513,12 @@ bool AutomationClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->saveJournallingState(false);
 
 	auto rightClip = new AutomationClip(*m_clip);
-	auto leftClip = new AutomationClip(*m_clip);
 
-	rightClip->clear();
-	// Remove the nodes past the split point from the left clip. +1 to prevent deleting a node
-	// right on the split point
-	leftClip->removeNodes(splitPos + 1, m_initialClipEnd);
-
-	for (auto it = m_clip->getTimeMap().begin(); it != m_clip->getTimeMap().end(); ++it)
-	{
-		if (POS(it) >= pos)
-		{
-			rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
-			AutomationNode& node = rightClip->getTimeMap().find(POS(it) - pos).value();
-			node.setLockedTangents(LOCKEDTAN(it));
-			node.setInTangent(INTAN(it));
-			node.setOutTangent(OUTTAN(it));
-		}
-	}
-
-	// Only place a node at the split position if there isn't one there to begin with
-	if (m_clip->getTimeMap().find(pos) == m_clip->getTimeMap().end())
-	{
-		rightClip->putValue(0, m_clip->valueAt(pos));
-		leftClip->putValue(pos, m_clip->valueAt(pos));
-	}
-
-	leftClip->movePosition(m_initialClipPos);
-	leftClip->changeLength(splitPos - m_initialClipPos);
+	m_clip->changeLength(splitPos - m_initialClipPos);
 
 	rightClip->movePosition(splitPos);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
-	
-	remove();
+	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
 
 	m_clip->getTrack()->restoreJournallingState();
 	return true;

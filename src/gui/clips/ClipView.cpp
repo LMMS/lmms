@@ -494,10 +494,11 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	auto sClip = dynamic_cast<SampleClip*>(m_clip);
 	auto pClip = dynamic_cast<PatternClip*>(m_clip);
+	auto aClip = dynamic_cast<AutomationClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip))))
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip))))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -631,6 +632,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
+		auto aClip = dynamic_cast<AutomationClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
 		if (me->modifiers() & Qt::ControlModifier && !knifeMode)
@@ -675,7 +677,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip) )
+				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip) )
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -910,7 +912,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		{
 			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			auto pClip = dynamic_cast<PatternClip*>(m_clip);
-			if( sClip || pClip )
+			auto aClip = dynamic_cast<AutomationClip*>(m_clip);
+			if( sClip || pClip || aClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
@@ -962,6 +965,10 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 								* TimePos::ticksPerBar();
 						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
 						pClip->setStartTimeOffset(position);
+					}
+					else if (aClip)
+					{
+						aClip->setStartTimeOffset(aClip->startTimeOffset() + positionOffset);
 					}
 				}
 			}
