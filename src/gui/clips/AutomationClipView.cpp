@@ -275,7 +275,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
 	const float ppTick  = ppb / TimePos::ticksPerBar();
-	float offset =  m_clip->startTimeOffset() * ppTick;
+	const int offset =  m_clip->startTimeOffset() * ppTick;
 
 	p.translate( 0.0f, max * height() / y_scale - BORDER_WIDTH );
 	p.scale( 1.0f, -h );
