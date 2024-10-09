@@ -525,9 +525,10 @@ bool AutomationClipView::splitClip(const TimePos pos)
 		if (POS(it) >= pos)
 		{
 			rightClip->putValues(POS(it) - pos, INVAL(it), OUTVAL(it), false);
-			rightClip->getTimeMap().find(POS(it) - pos).value().setLockedTangents(LOCKEDTAN(it));
-			rightClip->getTimeMap().find(POS(it) - pos).value().setInTangent(INTAN(it));
-			rightClip->getTimeMap().find(POS(it) - pos).value().setOutTangent(OUTTAN(it));
+			AutomationNode& node = rightClip->getTimeMap().find(POS(it) - pos).value();
+			node.setLockedTangents(LOCKEDTAN(it));
+			node.setInTangent(INTAN(it));
+			node.setOutTangent(OUTTAN(it));
 		}
 	}
 
