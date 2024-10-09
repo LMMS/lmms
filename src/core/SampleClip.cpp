@@ -30,6 +30,7 @@
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
+#include "SampleFolder.h"
 #include "SampleLoader.h"
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
