@@ -742,6 +742,13 @@ void InstrumentTrackWindow::updateSubWindowState()
 		{
 			flags |= Qt::MSWindowsFixedSizeDialogHint;
 			flags &= ~Qt::WindowMaximizeButtonHint;
+
+			// The sub window might be reused from an instrument that was maximized. Show the sub window
+			// as normal, i.e. not maximized, if the instrument view is not resizable.
+			if (subWindow->isMaximized())
+			{
+				subWindow->showNormal();
+			}
 		}
 
 		subWindow->setWindowFlags(flags);
