@@ -411,7 +411,7 @@ lmms--gui--TrackContentWidget {
 
 /* gear button in tracks */
 
-lmms--gui--TrackOperationsWidget > QPushButton {
+lmms--gui--TrackOperationsWidget QPushButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -420,7 +420,7 @@ lmms--gui--TrackOperationsWidget > QPushButton {
 	border: none;
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
 	image: url("resources:trackop.png");
 	subcontrol-origin: padding;
 	subcontrol-position: center;
@@ -428,8 +428,8 @@ lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
 	top: 1px;
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:pressed,
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:checked {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:pressed,
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:checked {
 	image: url("resources:trackop.png");
 	position: relative;
 	top: 2px;
