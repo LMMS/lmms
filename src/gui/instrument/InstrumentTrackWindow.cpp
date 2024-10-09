@@ -293,6 +293,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 		subWin->setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
 		subWin->setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
 
+		flags &= ~Qt::MSWindowsFixedSizeDialogHint;
 		flags |= Qt::WindowMaximizeButtonHint;
 	}
 	else
