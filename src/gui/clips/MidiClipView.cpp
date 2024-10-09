@@ -41,6 +41,7 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "TrackContainerView.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -299,6 +300,8 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 
 void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	if( _me->button() != Qt::LeftButton )
 	{
 		_me->ignore();
@@ -670,9 +673,65 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
+	
+	if (m_marker)
+	{
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
+
+
+bool MidiClipView::splitClip(const TimePos pos)
+{
+	setMarkerEnabled(false);
+
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	// Don't split if we slid off the Clip or if we're on the clip's start/end
+	// Cutting at exactly the start/end position would create a zero length
+	// clip (bad), and a clip the same length as the original one (pointless).
+	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
+
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto leftClip = new MidiClip(m_clip->instrumentTrack());
+	auto rightClip = new MidiClip(m_clip->instrumentTrack());
+	
+	for (Note const* note : m_clip->m_notes)
+	{
+		if (note->pos() >= pos)
+		{
+			auto movedNote = Note{*note};
+			movedNote.setPos(note->pos() - pos);
+			rightClip->addNote(movedNote, false);
+		}
+	}
+
+	for (Note const* note : m_clip->m_notes)
+	{
+		if (note->pos() < pos)
+		{
+			leftClip->addNote(*note, false);
+		}
+	}
+
+	leftClip->movePosition(m_initialClipPos);
+	leftClip->updateLength();
+
+	rightClip->movePosition(splitPos);
+	rightClip->updateLength();
+
+	remove();
+	
+	m_clip->getTrack()->restoreJournallingState();
+	return true;
+}
+
 
 
 } // namespace lmms::gui

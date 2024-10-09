@@ -494,15 +494,16 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	auto sClip = dynamic_cast<SampleClip*>(m_clip);
 	auto pClip = dynamic_cast<PatternClip*>(m_clip);
+	auto aClip = dynamic_cast<AutomationClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip))))
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip))))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
 	// If we are in the middle on knife mode, use the knife cursor
-	else if (sClip && m_trackView->trackContainerView()->knifeMode() && !isSelected())
+	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
 		setCursor(m_cursorKnife);
 	}
@@ -631,9 +632,10 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
+		auto aClip = dynamic_cast<AutomationClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
+		if (me->modifiers() & Qt::ControlModifier && !knifeMode)
 		{
 			if( isSelected() )
 			{
@@ -665,7 +667,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
-				if( m_clip->getAutoResize() )
+				if (m_clip->getAutoResize() && !knifeMode)
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
@@ -675,12 +677,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip) )
+				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip) )
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( sClip && knifeMode )
+				else if (knifeMode)
 				{
 					m_action = Action::Split;
 					setCursor( m_cursorKnife );
@@ -743,12 +745,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		if (m_action == Action::Split)
 		{
 			m_action = Action::None;
-			auto sClip = dynamic_cast<SampleClip*>(m_clip);
-			if (sClip)
-			{
-				setMarkerEnabled( false );
-				update();
-			}
+			setMarkerEnabled(false);
+			update();
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
@@ -914,7 +912,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		{
 			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			auto pClip = dynamic_cast<PatternClip*>(m_clip);
-			if( sClip || pClip )
+			auto aClip = dynamic_cast<AutomationClip*>(m_clip);
+			if( sClip || pClip || aClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
@@ -967,6 +966,10 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
 						pClip->setStartTimeOffset(position);
 					}
+					else if (aClip)
+					{
+						aClip->setStartTimeOffset(aClip->startTimeOffset() + positionOffset);
+					}
 				}
 			}
 		}
@@ -984,11 +987,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		auto sClip = dynamic_cast<SampleClip*>(m_clip);
-		if (sClip) {
-			setCursor( m_cursorKnife );
-			setMarkerPos( knifeMarkerPos( me ) );
-		}
+		setCursor(m_cursorKnife);
+		setMarkerPos(knifeMarkerPos(me));
 		update();
 	}
 	// None of the actions above, we will just handle the cursor

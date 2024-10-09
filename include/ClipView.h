@@ -244,8 +244,13 @@ private:
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
-	//! Return true iff the clip could be split. Currently only implemented for samples
-	virtual bool splitClip( const TimePos pos ){ return false; };
+	
+	/**
+	* Split this Clip into two clips
+	* @param pos the position of the split, relative to the start of the clip
+	* @return true iff the clip could be split
+	*/
+	virtual bool splitClip(const TimePos pos) = 0;
 	void updateCursor(QMouseEvent * me);
 } ;
 
