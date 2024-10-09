@@ -726,7 +726,9 @@ void InstrumentTrackWindow::updateSubWindowState()
 	{
 		Qt::WindowFlags flags = subWindow->windowFlags();
 
-		if (m_instrumentView->isResizable())
+		const auto instrumentViewResizable = m_instrumentView->isResizable();
+
+		if (instrumentViewResizable)
 		{
 			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
 			const auto extraSpace = QSize(12, 208);
@@ -740,14 +742,14 @@ void InstrumentTrackWindow::updateSubWindowState()
 		{
 			flags |= Qt::MSWindowsFixedSizeDialogHint;
 			flags &= ~Qt::WindowMaximizeButtonHint;
-
-			// Hide the Size and Maximize options from the system menu since the dialog size is fixed.
-			QMenu * systemMenu = subWindow->systemMenu();
-			systemMenu->actions().at(2)->setVisible(false); // Size
-			systemMenu->actions().at(4)->setVisible(false); // Maximize
 		}
 
 		subWindow->setWindowFlags(flags);
+
+		// Show or gide the Size and Maximize options from the system menu depending on whether the view is resizable or not
+		QMenu * systemMenu = subWindow->systemMenu();
+		systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
+		systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
 		
 		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
 		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
