@@ -296,6 +296,9 @@ void SubWindow::adjustTitleBar()
 		return;
 	}
 
+	// The sub window is not maximized, i.e. the title must be shown
+	// as well as some buttons.
+
 	// Title adjustments
 	m_windowTitle->show();
 
@@ -327,12 +330,12 @@ void SubWindow::adjustTitleBar()
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
 		m_restoreBtn->move( middleButtonPos );
-		m_maximizeBtn->setHidden( isMaximized() );
+		m_maximizeBtn->setVisible(true);
 	}
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
-	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
+	m_restoreBtn->setVisible(isMinimized());
 	if( isMinimized() )
 	{
 		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
