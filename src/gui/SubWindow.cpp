@@ -411,7 +411,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	}
 }
 
-QPushButton* SubWindow::addTitleButton(const std::string & iconName, const QString & toolTip)
+QPushButton* SubWindow::addTitleButton(const std::string& iconName, const QString& toolTip)
 {
 	auto button = new QPushButton(embed::getIconPixmap(iconName), QString(), this);
 	button->resize(m_buttonSize);
