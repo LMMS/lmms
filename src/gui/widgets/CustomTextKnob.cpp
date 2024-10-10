@@ -37,9 +37,9 @@ CustomTextKnob::CustomTextKnob( QWidget * _parent, const QString & _name, const 
 	Knob( _parent, _name ),
 	m_value_text( _value_text ) {}
 
-CustomTextKnob* CustomTextKnob::buildKnobWithSmallPixelFont(KnobType knob_num, QWidget* parent, const QString& description, const QString& label)
+CustomTextKnob* CustomTextKnob::buildKnobWithSmallPixelFont(KnobType knobNum, QWidget* parent, const QString& description, const QString& label)
 {
-	auto result = new CustomTextKnob(knob_num, parent, description);
+	auto result = new CustomTextKnob(knobNum, parent, description);
 
 	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
 	result->setLabel(label);

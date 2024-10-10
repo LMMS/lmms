@@ -81,10 +81,10 @@ public:
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
-	static Knob* buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* parent, const QString& name = QString());
-	static Knob* buildKnobWithSmallPixelFont(KnobType knob_num, const QString& label, QWidget* parent, const QString& name = QString());
+	static Knob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
+	static Knob* buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
 
-	void setLabel(const QString & txt);
+	void setLabel(const QString& txt);
 	void setHtmlLabel( const QString &htmltxt );
 
 	bool legacyMode() const { return m_legacyMode; }
@@ -119,7 +119,7 @@ public:
 
 
 protected:
-	void paintEvent( QPaintEvent * _me ) override;
+	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
 

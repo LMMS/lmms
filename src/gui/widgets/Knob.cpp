@@ -57,9 +57,9 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 {
 }
 
-Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* parent, const QString& name)
+Knob* Knob::buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name)
 {
-	auto result = new Knob(knob_num, parent, name);
+	auto result = new Knob(knobNum, parent, name);
 	result->setLegacyMode(true);
 	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
 	result->setLabel(label);
@@ -67,9 +67,9 @@ Knob* Knob::buildLegacyKnob(KnobType knob_num, const QString& label, QWidget* pa
 	return result;
 }
 
-Knob* Knob::buildKnobWithSmallPixelFont(KnobType knob_num, const QString& label, QWidget* parent, const QString& name)
+Knob* Knob::buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent, const QString& name)
 {
-	auto result = new Knob(knob_num, parent, name);
+	auto result = new Knob(knobNum, parent, name);
 	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
 	result->setLabel(label);
 
@@ -149,7 +149,7 @@ void Knob::onKnobNumUpdated()
 
 
 
-void Knob::setLabel(const QString & txt)
+void Knob::setLabel(const QString& txt)
 {
 	m_label = txt;
 	m_isHtmlLabel = false;
@@ -194,11 +194,14 @@ void Knob::updateFixedSize()
 {
 	if (legacyMode())
 	{
-		if( m_knobPixmap )
+		if (m_knobPixmap)
 		{
-			setFixedSize(qMax<int>( m_knobPixmap->width(),
-						horizontalAdvance(QFontMetrics(font()), m_label)),
-							m_knobPixmap->height() + 10);
+			// In legacy mode only the width of the label is taken into account while the height is not
+			const int labelWidth = horizontalAdvance(QFontMetrics(font()), m_label);
+			const int width = qMax<int>( m_knobPixmap->width(), labelWidth);
+
+			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
+			setFixedSize(width, m_knobPixmap->height() + 10);
 		}
 	}
 	else
@@ -525,7 +528,7 @@ void Knob::drawLabel(QPainter& p)
 	}
 }
 
-void Knob::paintEvent( QPaintEvent * _me )
+void Knob::paintEvent(QPaintEvent*)
 {
 	QPainter p(this);
 
