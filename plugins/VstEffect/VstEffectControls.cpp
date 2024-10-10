@@ -389,9 +389,11 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		sprintf(paramStr.data(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, widget, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		const auto & description = s_dumpValues.at(1);
+
+		auto knob = CustomTextKnob::buildKnobWithSmallPixelFont(KnobType::Bright26, widget, description, description.left(15));
+		knob->setDescription(description + ":" );
+		vstKnobs[i] = knob;
 
 		if( !hasKnobModel )
 		{
