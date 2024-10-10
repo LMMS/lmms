@@ -97,10 +97,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 {
 	// Don't paint any of the other stuff if the sub window is maximized
 	// so that only its child content is painted.
-	if (isMaximized())
-	{
-		return;
-	}
+	if (isMaximized()) { return; }
 
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
