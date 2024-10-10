@@ -33,7 +33,6 @@
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "SampleLoader.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "DataFile.h"
@@ -85,11 +84,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	envelopeLayout->addLayout(graphAndAmountLayout);
 
 	m_envelopeGraph = new EnvelopeGraph(this);
-	m_envelopeGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	graphAndAmountLayout->addWidget(m_envelopeGraph);
 
 	m_amountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
-	m_amountKnob->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	graphAndAmountLayout->addWidget(m_amountKnob, 0, Qt::AlignCenter);
 
 	QHBoxLayout* envKnobsLayout = new QHBoxLayout();

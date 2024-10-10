@@ -975,26 +975,21 @@ void MainWindow::toggleFullscreen()
  */
 void MainWindow::refocus()
 {
-	QList<QWidget*> editors;
-	editors
-		<< getGUI()->songEditor()->parentWidget()
-		<< getGUI()->patternEditor()->parentWidget()
-		<< getGUI()->pianoRoll()->parentWidget()
-		<< getGUI()->automationEditor()->parentWidget();
+	const auto gui = getGUI();
 
-	bool found = false;
-	QList<QWidget*>::Iterator editor;
-	for( editor = editors.begin(); editor != editors.end(); ++editor )
+	// Attempt to set the focus on the first of these editors that is not hidden...
+	for (auto editorParent : { gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
+		gui->pianoRoll()->parentWidget(), gui->automationEditor()->parentWidget() })
 	{
-		if( ! (*editor)->isHidden() ) {
-			(*editor)->setFocus();
-			found = true;
-			break;
+		if (!editorParent->isHidden())
+		{
+			editorParent->setFocus();
+			return;
 		}
 	}
 
-	if( ! found )
-		this->setFocus();
+	// ... otherwise set the focus on the main window.
+	this->setFocus();
 }
 
 

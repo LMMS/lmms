@@ -78,8 +78,8 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
 
-	// disable the minimize button
-	setWindowFlags(this->windowFlags() & ~Qt::WindowMinimizeButtonHint);
+	// Disable the minimize button and make sure that the custom window hint is set
+	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
 
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
@@ -97,10 +97,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 {
 	// Don't paint any of the other stuff if the sub window is maximized
 	// so that only its child content is painted.
-	if (isMaximized())
-	{
-		return;
-	}
+	if (isMaximized()) { return; }
 
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
@@ -300,6 +297,9 @@ void SubWindow::adjustTitleBar()
 		return;
 	}
 
+	// The sub window is not maximized, i.e. the title must be shown
+	// as well as some buttons.
+
 	// Title adjustments
 	m_windowTitle->show();
 
@@ -331,12 +331,12 @@ void SubWindow::adjustTitleBar()
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
 		m_restoreBtn->move( middleButtonPos );
-		m_maximizeBtn->setHidden( isMaximized() );
+		m_maximizeBtn->setVisible(true);
 	}
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
-	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
+	m_restoreBtn->setVisible(isMinimized());
 	if( isMinimized() )
 	{
 		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
@@ -412,7 +412,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	}
 }
 
-QPushButton* SubWindow::addTitleButton(const std::string & iconName, const QString & toolTip)
+QPushButton* SubWindow::addTitleButton(const std::string& iconName, const QString& toolTip)
 {
 	auto button = new QPushButton(embed::getIconPixmap(iconName), QString(), this);
 	button->resize(m_buttonSize);

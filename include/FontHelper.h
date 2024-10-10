@@ -1,5 +1,5 @@
 /*
- * gui_templates.h - GUI-specific templates
+ * FontHelper.h - Header function to help with fonts
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,11 +22,15 @@
  *
  */
 
-#ifndef LMMS_GUI_TEMPLATES_H
-#define LMMS_GUI_TEMPLATES_H
+#ifndef LMMS_FONT_HELPER_H
+#define LMMS_FONT_HELPER_H
 
 #include <QApplication>
 #include <QFont>
+
+constexpr int DEFAULT_FONT_SIZE = 12;
+constexpr int SMALL_FONT_SIZE = 10;
+constexpr int LARGE_FONT_SIZE = 14;
 
 namespace lmms::gui
 {
@@ -40,4 +44,4 @@ inline QFont adjustedToPixelSize(QFont font, int size)
 
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_TEMPLATES_H
+#endif // LMMS_FONT_HELPER_H

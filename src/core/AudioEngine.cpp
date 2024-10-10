@@ -1131,17 +1131,6 @@ void AudioEngine::fifoWriter::run()
 {
 	disable_denormals();
 
-#if 0
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
