@@ -25,8 +25,6 @@
 #ifndef LMMS_SAMPLEFOLDER_H
 #define LMMS_SAMPLEFOLDER_H
 
-#include "lmms_basics.h"
-
 #include <filesystem>
 #include <list>
 #include <string>
@@ -62,7 +60,7 @@ public:
 	//! returns true if sampleFileName is managed by SampleFolder
 	static bool getSampleFileSourceName(const std::string& sampleFileName, bool isOnlyNameStem = false);
 
-	const static std::string s_sampleFileSourceName;// = "LOAD_WITH_SAMPLEFOLDER";
+	const static std::string s_sampleFileSourceName;
 private:
 	//! used for adding a new sample
 	//! sampleInformation: string that's attached at the end of the file name for readability
