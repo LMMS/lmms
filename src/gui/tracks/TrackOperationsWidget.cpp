@@ -101,7 +101,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	// The resizing only seems to affect the track view hierarchy and is triggered by Qt's internal mechanisms.
 	// For example the buttons in the mixer view do not seem to be affected.
 	// If you want to debug this simply override "PixmapButton::resizeEvent" and trigger a break point in there.
-	auto buildPixmapButtonWrappedInWidget = [](QWidget* parent, const QString& toolTip, std::string_view activeGraphic, std::string_view inactiveGraphic, PixmapButton*&pixmapButton)
+	auto buildPixmapButtonWrappedInWidget = [](QWidget* parent, const QString& toolTip,
+		std::string_view activeGraphic, std::string_view inactiveGraphic, PixmapButton*& pixmapButton)
 	{
 		const auto activePixmap = embed::getIconPixmap(activeGraphic);
 		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);

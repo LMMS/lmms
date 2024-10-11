@@ -105,8 +105,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
 	
 	auto trackGrip = m_trackOperationsWidget.getTrackGrip();
-	connect(trackGrip, SIGNAL(grabbed()), this, SLOT(onTrackGripGrabbed()));
-	connect(trackGrip, SIGNAL(released()), this, SLOT(onTrackGripReleased()));
+	connect(trackGrip, &TrackGrip::grabbed, this, &TrackView::onTrackGripGrabbed);
+	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
 
 	// create views for already existing clips
 	for (const auto& clip : m_track->m_clips)

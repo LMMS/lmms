@@ -55,7 +55,7 @@ protected:
 	void paintEvent(QPaintEvent*) override;
 
 private:
-	Track* m_track;
+	Track* m_track = nullptr;
 	bool m_isGrabbed = false;
 	static QPixmap* s_grabbedPixmap;
 	static QPixmap* s_releasedPixmap;
