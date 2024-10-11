@@ -136,7 +136,7 @@ private:
 	void adjustTabSize(QWidget *w);
 
 	QMdiSubWindow* findSubWindowInParents();
-	void updateSubWindowState();
+	void updateSubWindow();
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;

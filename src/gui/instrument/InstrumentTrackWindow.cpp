@@ -286,7 +286,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// The previous call should have given us a sub window parent. Therefore
 	// we can reuse this method.
-	updateSubWindowState();
+	updateSubWindow();
 
 	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
@@ -393,7 +393,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_tuningView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
 
-	updateSubWindowState();
+	updateSubWindow();
 }
 
 
@@ -719,7 +719,7 @@ QMdiSubWindow* InstrumentTrackWindow::findSubWindowInParents()
 	return nullptr;
 }
 
-void InstrumentTrackWindow::updateSubWindowState()
+void InstrumentTrackWindow::updateSubWindow()
 {
 	auto subWindow = findSubWindowInParents();
 	if (subWindow && m_instrumentView)
