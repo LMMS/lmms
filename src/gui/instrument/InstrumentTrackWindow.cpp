@@ -753,7 +753,7 @@ void InstrumentTrackWindow::updateSubWindowState()
 
 		subWindow->setWindowFlags(flags);
 
-		// Show or gide the Size and Maximize options from the system menu depending on whether the view is resizable or not
+		// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
 		QMenu * systemMenu = subWindow->systemMenu();
 		systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
 		systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
