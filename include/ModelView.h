@@ -34,7 +34,7 @@ namespace lmms::gui
 class LMMS_EXPORT ModelView
 {
 public:
-	ModelView( Model* model, QWidget* widget );
+	ModelView(Model* model, QWidget* parent);
 	virtual ~ModelView();
 
 	virtual void setModel( Model* model, bool isOldModelValid = true );

@@ -28,7 +28,7 @@
 
 #include <QWidget>
 
-#include "ModelView.h"
+#include "PluginView.h"
 
 namespace lmms
 {
@@ -39,26 +39,21 @@ class EffectControls;
 namespace gui
 {
 
-class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
+class LMMS_EXPORT EffectControlDialog : public PluginView
 {
 	Q_OBJECT
 public:
-	EffectControlDialog( EffectControls * _controls );
+	EffectControlDialog(EffectControls *controls);
 	~EffectControlDialog() override = default;
-
-	virtual bool isResizable() const {return false;}
-
 
 signals:
 	void closed();
 
-
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent *closeEv) override;
 
 	EffectControls * m_effectControls;
-
-} ;
+};
 
 } // namespace gui
 

@@ -30,9 +30,9 @@ namespace lmms::gui
 {
 
 
-ModelView::ModelView( Model* model, QWidget* widget ) :
-	m_widget( widget ),
-	m_model( model )
+ModelView::ModelView(Model* model, QWidget* parent) :
+	m_widget(parent),
+	m_model(model)
 {
 }
 

@@ -210,7 +210,8 @@ void Effect::checkGate(double outSum)
 
 gui::PluginView * Effect::instantiateView( QWidget * _parent )
 {
-	return new gui::EffectView( this, _parent );
+	assert(false);  // This function implements a virtual, but for Effects, this is unused
+	return nullptr;
 }
 
 	

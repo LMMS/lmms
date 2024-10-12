@@ -26,8 +26,9 @@
 #ifndef LMMS_GUI_EFFECT_VIEW_H
 #define LMMS_GUI_EFFECT_VIEW_H
 
-#include "AutomatableModel.h"
-#include "PluginView.h"
+#include <QPixmap>
+#include <QWidget>
+#include "ModelView.h"
 #include "Effect.h"
 
 class QGraphicsOpacityEffect;
@@ -35,6 +36,7 @@ class QGroupBox;
 class QLabel;
 class QPushButton;
 class QMdiSubWindow;
+class QMouseEvent;
 
 namespace lmms::gui
 {
@@ -45,11 +47,11 @@ class LedCheckBox;
 class TempoSyncKnob;
 
 
-class EffectView : public PluginView
+class EffectView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectView( Effect * _model, QWidget * _parent );
+	EffectView(Effect *model, QWidget *parent);
 	~EffectView() override;
 
 	inline Effect * effect()
