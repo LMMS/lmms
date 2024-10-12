@@ -1,5 +1,5 @@
 /*
- * AudioFileDevice.h - base-class for audio-device-classes which write
+ * AudioFileDeviceSample.h - base-class for audio-device-classes which write
  *                     their output into a file
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -62,6 +62,16 @@ public:
 	// save audio
 	void processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
 
+	// convert a given audio-buffer to a buffer in signed 16-bit samples
+	// returns num of bytes in outbuf
+	static int convertToS16(const SampleFrame* _ab,
+						const fpp_t _frames,
+						int_sample_t * _output_buffer,
+						const bool _convert_endian = false );
+
+	// clear given signed-int-16-buffer
+	static void clearS16Buffer(int_sample_t * _outbuf,
+							const fpp_t _frames);
 
 protected:
 	// subclasses can re-implement this for being used in conjunction with
