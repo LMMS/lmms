@@ -1,5 +1,5 @@
 /*
- * LmmsExporter.cpp - exporting files (currently only audio files), TODO rename class when things change
+ * AudioFileDeviceSample.cpp - exporting files (currently only audio files), TODO rename class when things change
  *
  * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot.com>
  *
@@ -26,24 +26,24 @@
 
 #include "LmmsExporterSample.h"
 
-#include "AudioFileWave.h"
 #include "AudioFileFlacSample.h"
-#include "AudioFileOgg.h"
-#include "AudioFileMP3.h"
 
 namespace lmms
 {
 
 const std::array<LmmsExporterSample::FileEncodeDevice, 5> LmmsExporterSample::s_fileEncodeDevices
 {
+	/*
 	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Wave,
 		QT_TRANSLATE_NOOP("LmmsExporterSample", "WAV (*.wav)"),
 					".wav", &AudioFileWave::getInst },
+	*/
 	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Flac,
 		QT_TRANSLATE_NOOP("LmmsExporterSample", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlacSample::getInst
 	},
+	/*
 	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Ogg,
 		QT_TRANSLATE_NOOP("LmmsExporterSample", "OGG (*.ogg)"),
 					".ogg",
@@ -62,6 +62,7 @@ const std::array<LmmsExporterSample::FileEncodeDevice, 5> LmmsExporterSample::s_
 					nullptr
 #endif
 	},
+	*/
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
@@ -266,7 +267,7 @@ void LmmsExporterSample::setupAudioRenderingInternal(
 	ExportAudioFileFormat fileFormat,
 	const fpp_t defaultFrameCount)
 {
-	AudioFileDeviceInstantiaton audioEncoderFactory = s_fileEncodeDevices[static_cast<std::size_t>(fileFormat)].m_getDevInst;
+	AudioFileDeviceSampleInstantiaton audioEncoderFactory = s_fileEncodeDevices[static_cast<std::size_t>(fileFormat)].m_getDevInst;
 
 	if (audioEncoderFactory)
 	{

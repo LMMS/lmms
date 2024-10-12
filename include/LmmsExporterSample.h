@@ -1,5 +1,5 @@
 /*
- * LmmsExporter.h - exporting files (currently only audio files), TODO rename class when things change
+ * LmmsExporterSample.h - exporting files (currently only audio files), TODO rename class when things change
  *
  * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot.com>
  *
@@ -29,7 +29,7 @@
 #include <thread>
 #include <vector>
 
-#include "AudioFileDevice.h"
+#include "AudioFileDeviceSample.h"
 #include "SampleFrame.h"
 
 namespace lmms
@@ -42,10 +42,10 @@ public:
 
 	enum class ExportAudioFileFormat : int
 	{
-		Wave,
+		//Wave,
 		Flac,
-		Ogg,
-		MP3,
+		//Ogg,
+		//MP3,
 		Count
 	};
 	// in the future more types can be added
@@ -63,7 +63,7 @@ public:
 		ExportAudioFileFormat m_fileFormat;
 		const char* m_description;
 		const char* m_extension;
-		AudioFileDeviceInstantiaton m_getDevInst;
+		AudioFileDeviceSampleInstantiaton m_getDevInst;
 	};
 
 	LmmsExporterSample(const ExportFileType fileType,
@@ -120,7 +120,7 @@ private:
 	EndFn m_endFunction;
 	void* m_getBufferData;
 	
-	AudioFileDevice* m_fileDev;
+	AudioFileDeviceSample* m_fileDev;
 	std::vector<SampleFrame> m_buffer;
 	std::unique_ptr<std::thread> m_thread;
 };
