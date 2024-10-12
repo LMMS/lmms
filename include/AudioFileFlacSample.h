@@ -1,5 +1,5 @@
 /*
- * AudioFileFlac.h - Audio device which encodes a wave stream into a FLAC file.
+ * AudioFileFlacSample.h - Audio device which encodes a wave stream into a FLAC file.
  *
  * Copyright (c) 2017 to present Levin Oehlmann <irrenhaus3/at/gmail[dot]com> et al.
  *

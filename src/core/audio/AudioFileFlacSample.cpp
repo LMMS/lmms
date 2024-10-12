@@ -1,5 +1,5 @@
 /*
- * AudioFileFlac.cpp - Audio device which encodes a wave stream into a FLAC file (Implementation).
+ * AudioFileFlacSample.cpp - Audio device which encodes a wave stream into a FLAC file (Implementation).
  *
  * Copyright (c) 2017 to present Levin Oehlmann <irrenhaus3/at/gmail[dot]com> et al.
  *
@@ -29,8 +29,6 @@
 
 #include "AudioFileFlacSample.h"
 
-#include "AudioDevice.h" // convertToS16
-#include "AudioEngine.h"
 #include "endian_handling.h"
 
 namespace lmms
@@ -96,7 +94,7 @@ bool AudioFileFlacSample::startEncoding()
 
 void AudioFileFlacSample::writeBuffer(const SampleFrame* _ab, fpp_t const frames)
 {
-	const unsigned int channels = 2;
+	constexpr unsigned int channels = 2;
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
@@ -118,7 +116,7 @@ void AudioFileFlacSample::writeBuffer(const SampleFrame* _ab, fpp_t const frames
 	else // integer PCM encoding
 	{
 		auto buf = std::vector<int_sample_t>(frames * channels);
-		AudioDevice::convertToS16(_ab, frames, buf.data(), !isLittleEndian());
+		AudioFileDeviceSample::convertToS16(_ab, frames, buf.data(), !isLittleEndian());
 		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 
