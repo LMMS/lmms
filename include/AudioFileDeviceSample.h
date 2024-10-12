@@ -62,14 +62,16 @@ public:
 	// save audio
 	void processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
 
-	// convert a given audio-buffer to a buffer in signed 16-bit samples
-	// returns num of bytes in outbuf
+	//! convert a given audio-buffer to a buffer in signed 16-bit samples
+	//! returns num of bytes in outbuf
+	//! this functions is from AudioDevice
 	static int convertToS16(const SampleFrame* _ab,
 						const fpp_t _frames,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
 
-	// clear given signed-int-16-buffer
+	//! clear given signed-int-16-buffer
+	//! this functions is from AudioDevice
 	static void clearS16Buffer(int_sample_t * _outbuf,
 							const fpp_t _frames);
 
