@@ -67,9 +67,9 @@ namespace lmms::Clipboard
 
 
 
-	void copyStringPair( const QString & key, const QString & value )
+	void copyStringPair(StringPairDataType key, const QString& value)
 	{
-		QString finalString = key + ":" + value;
+		QString finalString = StringPairDataTypeNames[static_cast<size_t>(key)] + ":" + value;
 
 		auto content = new QMimeData;
 		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
@@ -79,9 +79,17 @@ namespace lmms::Clipboard
 
 
 
-	QString decodeKey( const QMimeData * mimeData )
+	StringPairDataType decodeKey(const QMimeData* mimeData)
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
+		QString keyString = QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 0, 0);
+		for (size_t i = 0; i < StringPairDataTypeNames.size(); i++)
+		{
+			if (StringPairDataTypeNames[i] == keyString)
+			{
+				return static_cast<StringPairDataType>(i);
+			}
+		}
+		return StringPairDataType::None;
 	}
 
 
@@ -90,6 +98,16 @@ namespace lmms::Clipboard
 	QString decodeValue( const QMimeData * mimeData )
 	{
 		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+	}
+	
+	QString clipboardEncodeFloatValue(float value)
+	{
+		return QString::number(value);
+	}
+	
+	QString clipboardEncodeAutomatableModelLink(size_t id)
+	{
+		return QString::number(id);
 	}
 
 

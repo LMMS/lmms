@@ -671,6 +671,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
+	drawAutoHighlight(&p);
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 

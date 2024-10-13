@@ -25,6 +25,8 @@
 #ifndef LMMS_CLIPBOARD_H
 #define LMMS_CLIPBOARD_H
 
+#include <array>
+
 #include <QDomElement>
 #include <QMap>
 
@@ -40,6 +42,36 @@ namespace lmms::Clipboard
 		StringPair,
 		Default
 	};
+	
+	enum StringPairDataType
+	{
+		None, //!< only use for error handling
+		FloatValue,
+		AutomatableModelLink,
+		Instrument,
+		
+		PresetFile,
+		PluginPresetFile,
+		SampleFile,
+		SoundFontFile,
+		PatchFile,
+		VstPluginFile,
+		ImportedProject,
+		ProjectFile,
+		
+		SampleData,
+		
+		InstrumentTrack,
+		PatternTrack,
+		SampleTrack,
+		AutomationTrack,
+		HiddenAutomationTrack,
+		
+		MidiClip,
+		PatternClip,
+		SampleClip,
+		AutomationClip
+	};
 
 	// Convenience Methods
 	const QMimeData * getMimeData();
@@ -50,9 +82,12 @@ namespace lmms::Clipboard
 	QString getString( MimeType mT );
 
 	// Helper methods for String Pair data
-	void copyStringPair( const QString & key, const QString & value );
-	QString decodeKey( const QMimeData * mimeData );
+	void copyStringPair(StringPairDataType key, const QString& value);
+	StringPairDataType decodeKey(const QMimeData* mimeData);
 	QString decodeValue( const QMimeData * mimeData );
+
+	QString clipboardEncodeFloatValue(float value);
+	QString clipboardEncodeAutomatableModelLink(size_t id);
 
 	inline const char * mimeType( MimeType type )
 	{
@@ -67,6 +102,35 @@ namespace lmms::Clipboard
 				break;
 		}
 	}
+
+	const std::array<QString, 22> StringPairDataTypeNames = {
+		QString("None_error"),
+		QString("FloatValue"),
+		QString("AutomatableModelLink"),
+		QString("Instrument"),
+		
+		QString("PresetFile"),
+		QString("PluginPresetFile"),
+		QString("SampleFile"),
+		QString("SoundFontFile"),
+		QString("PatchFile"),
+		QString("VstPluginFile"),
+		QString("ImportedProject"),
+		QString("ProjectFile"),
+		
+		QString("SampleData"),
+		
+		QString("InstrumentTrack"),
+		QString("PatternTrack"),
+		QString("SampleTrack"),
+		QString("AutomationTrack"),
+		QString("HiddenAutomationTrack"),
+		
+		QString("MidiClip"),
+		QString("PatternClip"),
+		QString("SampleClip"),
+		QString("AutomationClip")
+	};
 
 } // namespace lmms::Clipboard
 
