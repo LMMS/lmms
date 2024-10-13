@@ -95,8 +95,8 @@ Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frame
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
 	}
 
-	return wantUi
-		? ProcessStatus::Continue;
+	return Lv2Manager::wantUi()
+		? ProcessStatus::Continue
 		: ProcessStatus::ContinueIfNotQuiet;
 }
 
