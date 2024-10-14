@@ -21,7 +21,7 @@ LMMS is an open-source cross-platform digital audio workstation designed for mus
 Features
 ---------
 
-* Song-Editor for aranging melodies, samples, patterns, and automation
+* Song-Editor for arranging melodies, samples, patterns, and automation
 * Pattern-Editor for creating beats and patterns
 * An easy-to-use Piano-Roll for editing patterns and melodies
 * A Mixer with unlimited mixer channels and arbitrary number of effects
