@@ -9,11 +9,7 @@
 What is LMMS?
 --------------
 
-LMMS is a free cross-platform alternative to commercial programs like
-FL Studio®, which allow you to produce music with your computer. This includes
-the creation of melodies and beats, the synthesis and mixing of sounds, and
-arranging of samples. You can have fun with your MIDI-keyboard and much more;
-all in a user-friendly and modern interface.
+LMMS is an open-source cross-platform digital audio workstation designed for music production. It includes an advanced Piano Roll, Beat Sequencer, Song Editor, and Mixer for composing, aranging, and mixing music. It comes with 15+ synthesizer plugins by default, along with VST(i) and SoundFont2 support.
 
 [Homepage](https://lmms.io)<br>
 [Downloads/Releases](https://github.com/LMMS/lmms/releases)<br>
@@ -25,7 +21,7 @@ all in a user-friendly and modern interface.
 Features
 ---------
 
-* Song-Editor for composing songs
+* Song-Editor for aranging melodies, samples, patterns, and automation
 * Pattern-Editor for creating beats and patterns
 * An easy-to-use Piano-Roll for editing patterns and melodies
 * A Mixer with unlimited mixer channels and arbitrary number of effects
