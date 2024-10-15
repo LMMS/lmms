@@ -170,6 +170,8 @@ public:
 		return m_audioDev;
 	}
 
+	bool captureDeviceAvailable() const;
+
 
 	// audio-port-stuff
 	inline void addAudioPort(AudioPort * port)
@@ -340,6 +342,11 @@ private:
 
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
+
+	const AudioDevice* audioDev() const
+	{
+		return m_audioDev;
+	}
 
 	void renderStageNoteSetup();
 	void renderStageInstruments();
