@@ -282,4 +282,5 @@ QSize EffectRackView::sizeHint() const
 
 
 
+
 } // namespace lmms::gui
