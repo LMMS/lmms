@@ -57,7 +57,24 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 {
 }
 
+Knob* Knob::buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name)
+{
+	auto result = new Knob(knobNum, parent, name);
+	result->setLegacyMode(true);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
 
+	return result;
+}
+
+Knob* Knob::buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent, const QString& name)
+{
+	auto result = new Knob(knobNum, parent, name);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
+
+	return result;
+}
 
 
 void Knob::initUi( const QString & _name )
@@ -132,16 +149,12 @@ void Knob::onKnobNumUpdated()
 
 
 
-void Knob::setLabel( const QString & txt )
+void Knob::setLabel(const QString& txt)
 {
 	m_label = txt;
 	m_isHtmlLabel = false;
-	if( m_knobPixmap )
-	{
-		setFixedSize(qMax<int>( m_knobPixmap->width(),
-					horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label)),
-						m_knobPixmap->height() + 10);
-	}
+
+	updateFixedSize();
 
 	update();
 }
@@ -168,8 +181,49 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 	update();
 }
 
+void Knob::setLegacyMode(bool legacyMode)
+{
+	m_legacyMode = legacyMode;
 
+	updateFixedSize();
 
+	update();
+}
+
+void Knob::updateFixedSize()
+{
+	if (legacyMode())
+	{
+		if (m_knobPixmap)
+		{
+			// In legacy mode only the width of the label is taken into account while the height is not
+			const int labelWidth = horizontalAdvance(QFontMetrics(font()), m_label);
+			const int width = qMax<int>( m_knobPixmap->width(), labelWidth);
+
+			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
+			setFixedSize(width, m_knobPixmap->height() + 10);
+		}
+	}
+	else
+	{
+		// Styled knobs do not use pixmaps and have no labels. Their size is set from the outside and
+		// they are painted within these limits. Hence we should not compute a new size from a pixmap
+		// and/or label the case of styled knobs.
+		if (knobNum() == KnobType::Styled)
+		{
+			return;
+		}
+
+		QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
+
+		auto fm = QFontMetrics(font());
+
+		const int width = std::max(pixmapSize.width(), horizontalAdvance(fm, m_label));
+		const int height = pixmapSize.height() + fm.height();
+
+		setFixedSize(width, height);
+	}
+}
 
 void Knob::setTotalAngle( float angle )
 {
@@ -450,29 +504,36 @@ void Knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
-void Knob::paintEvent( QPaintEvent * _me )
+void Knob::drawLabel(QPainter& p)
 {
-	QPainter p( this );
-
-	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
 		if (!m_isHtmlLabel)
 		{
-			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
+			auto fm = p.fontMetrics();
+			const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
+			const auto descent = legacyMode() ? 2 : fm.descent();
+			const auto y = height() - descent; 
+
 			p.setPen(textColor());
-			p.drawText(width() / 2 -
-				horizontalAdvance(p.fontMetrics(), m_label) / 2,
-				height() - 2, m_label);
+			p.drawText(x, y, m_label);
 		}
 		else
 		{
 			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
-			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
+			m_tdRenderer->setDefaultFont(font());
 			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
 			m_tdRenderer->drawContents(&p);
 		}
 	}
+}
+
+void Knob::paintEvent(QPaintEvent*)
+{
+	QPainter p(this);
+
+	drawKnob(&p);
+	drawLabel(p);
 }
 
 void Knob::changeEvent(QEvent * ev)
@@ -485,6 +546,14 @@ void Knob::changeEvent(QEvent * ev)
 			setLabel(m_label);
 		}
 		m_cache = QImage();
+		update();
+	}
+	else if (ev->type() == QEvent::FontChange)
+	{
+		// The size of the label might have changed so update
+		// the size of this widget.
+		updateFixedSize();
+
 		update();
 	}
 }
