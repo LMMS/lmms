@@ -186,21 +186,15 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	delete contextMenu;
 }
 
-void MixerChannelView::paintEvent(QPaintEvent* event)
+void MixerChannelView::paintEvent(QPaintEvent*)
 {
 	const auto channel = mixerChannel();
-	const bool muted = channel->m_muteModel.value();
-	const auto name = channel->m_name;
-	const auto elidedName = elideName(name);
 	const auto isActive = m_mixerView->currentMixerChannel() == this;
-
-	if (!m_inRename && m_renameLineEdit->text() != elidedName) { m_renameLineEdit->setText(elidedName); }
-
 	const auto width = rect().width();
 	const auto height = rect().height();
 	auto painter = QPainter{this};
 
-	if (channel->color().has_value() && !muted)
+	if (channel->color().has_value() && !channel->m_muteModel.value())
 	{
 		painter.fillRect(rect(), channel->color()->darker(isActive ? 120 : 150));
 	}
@@ -208,13 +202,11 @@ void MixerChannelView::paintEvent(QPaintEvent* event)
 
 	// inner border
 	painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());
-	painter.drawRect(1, 1, width - MIXER_CHANNEL_INNER_BORDER_SIZE, height - MIXER_CHANNEL_INNER_BORDER_SIZE);
+	painter.drawRect(1, 1, width - InnerBorderSize, height - InnerBorderSize);
 
 	// outer border
 	painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
-	painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
-
-	QWidget::paintEvent(event);
+	painter.drawRect(0, 0, width - OuterBorderSize, height - OuterBorderSize);
 }
 
 void MixerChannelView::mousePressEvent(QMouseEvent*)
@@ -227,7 +219,7 @@ void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
 	renameChannel();
 }
 
-bool MixerChannelView::eventFilter(QObject* dist, QEvent* event)
+bool MixerChannelView::eventFilter(QObject*, QEvent* event)
 {
 	// If we are in a rename, capture the enter/return events and handle them
 	if (event->type() == QEvent::KeyPress)
@@ -246,11 +238,6 @@ bool MixerChannelView::eventFilter(QObject* dist, QEvent* event)
 	return false;
 }
 
-int MixerChannelView::channelIndex() const
-{
-	return m_channelIndex;
-}
-
 void MixerChannelView::setChannelIndex(int index)
 {
 	MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
@@ -260,61 +247,6 @@ void MixerChannelView::setChannelIndex(int index)
 	m_effectRackView->setModel(&mixerChannel->m_fxChain);
 	m_channelNumberLcd->setValue(index);
 	m_channelIndex = index;
-}
-
-QBrush MixerChannelView::backgroundActive() const
-{
-	return m_backgroundActive;
-}
-
-void MixerChannelView::setBackgroundActive(const QBrush& c)
-{
-	m_backgroundActive = c;
-}
-
-QColor MixerChannelView::strokeOuterActive() const
-{
-	return m_strokeOuterActive;
-}
-
-void MixerChannelView::setStrokeOuterActive(const QColor& c)
-{
-	m_strokeOuterActive = c;
-}
-
-QColor MixerChannelView::strokeOuterInactive() const
-{
-	return m_strokeOuterInactive;
-}
-
-void MixerChannelView::setStrokeOuterInactive(const QColor& c)
-{
-	m_strokeOuterInactive = c;
-}
-
-QColor MixerChannelView::strokeInnerActive() const
-{
-	return m_strokeInnerActive;
-}
-
-void MixerChannelView::setStrokeInnerActive(const QColor& c)
-{
-	m_strokeInnerActive = c;
-}
-
-QColor MixerChannelView::strokeInnerInactive() const
-{
-	return m_strokeInnerInactive;
-}
-
-void MixerChannelView::setStrokeInnerInactive(const QColor& c)
-{
-	m_strokeInnerInactive = c;
-}
-
-void MixerChannelView::reset()
-{
-	m_peakIndicator->resetPeakToMinusInf();
 }
 
 void MixerChannelView::renameChannel()
