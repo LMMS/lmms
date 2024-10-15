@@ -160,6 +160,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
 	if (me->button() == Qt::LeftButton &&
 			! (me->modifiers() & Qt::ControlModifier) &&
+			! (me->modifiers() & Qt::AltModifier) &&
 			! (me->modifiers() & Qt::ShiftModifier))
 	{
 		AutomatableModel *thisModel = model();
