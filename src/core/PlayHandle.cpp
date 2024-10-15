@@ -22,10 +22,10 @@
  *
  */
  
+#include "BufferPool.h"
 #include "PlayHandle.h"
-#include "AudioEngine.h"
-#include "BufferManager.h"
 #include "Engine.h"
+#include "AudioEngine.h"
 
 #include <QThread>
 
@@ -37,7 +37,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
 		m_offset(offset),
 		m_affinity(QThread::currentThread()),
-		m_playHandleBuffer(BufferManager::acquire()),
+		m_playHandleBuffer(BufferPool::acquire()),
 		m_bufferReleased(true),
 		m_usesBuffer(true)
 {
@@ -46,7 +46,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 
 PlayHandle::~PlayHandle()
 {
-	BufferManager::release(m_playHandleBuffer);
+	BufferPool::release(m_playHandleBuffer);
 }
 
 

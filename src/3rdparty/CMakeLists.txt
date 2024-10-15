@@ -11,6 +11,30 @@ target_include_directories(jack_headers INTERFACE jack2/common)
 ADD_SUBDIRECTORY(hiir)
 ADD_SUBDIRECTORY(weakjack)
 
+ADD_LIBRARY(cds ${CDS_LIBRARY_TYPE}
+	libcds/src/init.cpp
+	libcds/src/hp.cpp
+	libcds/src/dhp.cpp
+	libcds/src/urcu_gp.cpp
+	libcds/src/urcu_sh.cpp
+	libcds/src/thread_data.cpp
+	libcds/src/topology_hpux.cpp
+	libcds/src/topology_linux.cpp
+	libcds/src/topology_osx.cpp
+	libcds/src/dllmain.cpp
+)
+SET_TARGET_PROPERTIES(cds PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON
+)
+TARGET_INCLUDE_DIRECTORIES(cds
+	PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/libcds"
+)
+
+TARGET_COMPILE_DEFINITIONS(cds
+	PUBLIC CDS_BUILD_STATIC_LIB
+)
+
 # The lockless ring buffer library is linked as part of the core
 add_library(ringbuffer OBJECT
 	ringbuffer/src/lib/ringbuffer.cpp
