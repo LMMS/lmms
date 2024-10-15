@@ -361,6 +361,7 @@ private:
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
+	sample_rate_t m_sampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 

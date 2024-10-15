@@ -74,6 +74,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_sampleRate(0),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),
@@ -99,6 +100,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	// determine FIFO size and number of frames per period
 	int fifoSize = 1;
+
+	// get sample rate from config manager
+	m_sampleRate = ConfigManager::inst()->value("audioengine", "samplerate").toInt();
 
 	// if not only rendering (that is, using the GUI), load the buffer
 	// size from user configuration
@@ -243,12 +247,11 @@ void AudioEngine::stopProcessing()
 
 sample_rate_t AudioEngine::baseSampleRate() const
 {
-	sample_rate_t sr = ConfigManager::inst()->value( "audioengine", "samplerate" ).toInt();
-	if( sr < 44100 )
+	if (m_sampleRate < 44100)
 	{
-		sr = 44100;
+		m_sampleRate = 44100;
 	}
-	return sr;
+	return m_sampleRate;
 }
 
 
