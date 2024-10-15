@@ -103,7 +103,14 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	// get sample rate from config manager
 	m_sampleRate = ConfigManager::inst()->value("audioengine", "samplerate").toInt();
+	
+	// if sample rate < 41000, it should be raised to 41000 as minimum value
+	if (m_sampleRate < 44100)
+	{
+		m_sampleRate = 44100;
+	}
 
+	
 	// if not only rendering (that is, using the GUI), load the buffer
 	// size from user configuration
 	if( renderOnly == false )
@@ -247,10 +254,6 @@ void AudioEngine::stopProcessing()
 
 sample_rate_t AudioEngine::baseSampleRate() const
 {
-	if (m_sampleRate < 44100)
-	{
-		m_sampleRate = 44100;
-	}
 	return m_sampleRate;
 }
 
