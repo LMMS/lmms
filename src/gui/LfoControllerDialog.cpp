@@ -216,7 +216,7 @@ void LfoControllerDialog::askUserDefWave()
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
-	buffer = SampleLoader::createBufferFromFile(fileName);
+	buffer = SampleLoader::loadBufferFromFile(fileName);
 
 	m_userWaveBtn->setToolTip(buffer->audioFile());
 }

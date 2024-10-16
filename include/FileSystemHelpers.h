@@ -1,7 +1,7 @@
 /*
- * SampleLoader.h - Load audio and waveform files
+ * FileSystemHelpers.h
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,27 +22,34 @@
  *
  */
 
-#ifndef LMMS_GUI_SAMPLE_LOADER_H
-#define LMMS_GUI_SAMPLE_LOADER_H
+#ifndef LMMS_FILE_SYSTEM_HELPERS_H
+#define LMMS_FILE_SYSTEM_HELPERS_H
 
 #include <QString>
-#include <memory>
+#include <filesystem>
 
-#include "SampleBuffer.h"
-#include "lmms_export.h"
-
-namespace lmms::gui {
-class LMMS_EXPORT SampleLoader
+namespace lmms {
+class FileSystemHelpers
 {
 public:
-	static QString openAudioFile(const QString& previousFile = "");
-	static QString openWaveformFile(const QString& previousFile = "");
-	static std::shared_ptr<const SampleBuffer> loadBufferFromFile(const QString& filePath);
-	static std::shared_ptr<const SampleBuffer> loadBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
-private:
-	static void displayError(const QString& message);
-};
-} // namespace lmms::gui
+	static std::filesystem::path pathFromQString(const QString& path)
+	{
+#ifdef _WIN32
+		return std::filesystem::path{path.toStdWString()};
+#else
+		return std::filesystem::path{path.toStdString()};
+#endif
+	}
 
-#endif // LMMS_GUI_SAMPLE_LOADER_H
+	static QString qStringFromPath(const std::filesystem::path& path)
+	{
+#ifdef _WIN32
+		return QString::fromStdWString(path.generic_wstring());
+#else
+		return QString::fromStdString(path.native());
+#endif
+	}
+};
+} // namespace lmms
+
+#endif // LMMS_FILE_SYSTEM_HELPERS_H

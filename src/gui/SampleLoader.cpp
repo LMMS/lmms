@@ -32,8 +32,8 @@
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "PathUtil.h"
+#include "SampleDatabase.h"
 #include "SampleDecoder.h"
-#include "Song.h"
 
 namespace lmms::gui {
 QString SampleLoader::openAudioFile(const QString& previousFile)
@@ -88,13 +88,13 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
+std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromFile(const QString& filePath)
 {
 	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
 	try
 	{
-		return std::make_shared<SampleBuffer>(filePath);
+		return SampleDatabase::fetch(filePath);
 	}
 	catch (const std::runtime_error& error)
 	{
@@ -103,13 +103,13 @@ std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QSt
 	}
 }
 
-std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromBase64(const QString& base64, int sampleRate)
 {
 	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
 	try
 	{
-		return std::make_shared<SampleBuffer>(base64, sampleRate);
+		return SampleDatabase::fetch(base64, sampleRate);
 	}
 	catch (const std::runtime_error& error)
 	{
