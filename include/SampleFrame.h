@@ -227,36 +227,9 @@ inline void copyFromSampleFrames(InterleavedSampleType<float>* target, const Sam
 	}
 }
 
-using CoreAudioBuffer = Span<const SampleFrame* const>;
-using CoreAudioBufferMut = Span<SampleFrame* const>;
+using CoreAudioBufferView = Span<const SampleFrame* const>;
+using CoreAudioBufferViewMut = Span<SampleFrame* const>;
 
-//! Cast a raw audio samples pointer `sample_t*` to `SampleFrame*`
-template<>
-inline auto audio_cast(sample_t* samples) -> SampleFrame*
-{
-	return reinterpret_cast<SampleFrame*>(samples);
-}
-
-//! Cast a raw audio samples pointer `const float*` to `const SampleFrame*`
-template<>
-inline auto audio_cast(const sample_t* samples) -> const SampleFrame*
-{
-	return reinterpret_cast<const SampleFrame*>(samples);
-}
-
-//! Cast a raw audio samples pointer `InterleavedSampleType*` to `SampleFrame*`
-template<>
-inline auto audio_cast(InterleavedSampleType<sample_t>* samples) -> SampleFrame*
-{
-	return reinterpret_cast<SampleFrame*>(samples);
-}
-
-//! Cast a raw audio samples pointer `const InterleavedSampleType*` to `const SampleFrame*`
-template<>
-inline auto audio_cast(const InterleavedSampleType<sample_t>* samples) -> const SampleFrame*
-{
-	return reinterpret_cast<const SampleFrame*>(samples);
-}
 
 } // namespace lmms
 

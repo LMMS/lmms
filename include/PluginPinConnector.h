@@ -93,8 +93,8 @@ public:
 	/**
 	 * Getters
 	 */
-	auto in() const -> const Matrix& { return m_in; };
-	auto out() const -> const Matrix& { return m_out; };
+	auto in() const -> const Matrix& { return m_in; }
+	auto out() const -> const Matrix& { return m_out; }
 	auto trackChannelCount() const -> std::size_t { return s_totalTrackChannels; }
 
 	/**
@@ -116,7 +116,7 @@ public:
 	 * `in`     : track channels from LMMS core (currently just the main track channel pair)
 	 * `out`    : plugin input channels in Split form
 	 */
-	void routeToPlugin(f_cnt_t frames, CoreAudioBuffer in, SplitAudioBuffer<sample_t> out) const;
+	void routeToPlugin(f_cnt_t frames, CoreAudioBufferView in, SplitAudioBufferView<sample_t> out) const;
 
 	/*
 	 * Routes audio from plugin outputs to LMMS track channels according to the plugin pin connector configuration.
@@ -128,7 +128,7 @@ public:
 	 * `in`      : plugin output channels in Split form
 	 * `inOut`   : track channels from/to LMMS core (inplace processing)
 	 */
-	void routeFromPlugin(f_cnt_t frames, SplitAudioBuffer<const sample_t> in, CoreAudioBufferMut inOut) const;
+	void routeFromPlugin(f_cnt_t frames, SplitAudioBufferView<const sample_t> in, CoreAudioBufferViewMut inOut) const;
 
 	/**
 	 * SerializingObject implementation

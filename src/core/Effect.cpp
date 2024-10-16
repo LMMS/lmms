@@ -247,8 +247,8 @@ void Effect::resample( int _i, const SampleFrame* _src_buf,
 	}
 	m_srcData[_i].input_frames = _frames;
 	m_srcData[_i].output_frames = Engine::audioEngine()->framesPerPeriod();
-	m_srcData[_i].data_in = audio_cast<const float*>(_src_buf[0].data());
-	m_srcData[_i].data_out = audio_cast<float*>(_dst_buf[0].data());
+	m_srcData[_i].data_in = _src_buf[0].data();
+	m_srcData[_i].data_out = _dst_buf[0].data();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
 
