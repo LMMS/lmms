@@ -344,4 +344,4 @@ void gui::SynchroView::modelChanged()
 	m_modulatorPulse->setModel(&model->m_modulator.pulse);
 }
 
-}
+} // namespace lmms

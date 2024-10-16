@@ -16,9 +16,9 @@ namespace
 {
 
 constexpr auto  SYNCHRO_GRAPH_RESOLUTION = 168;
-constexpr QColor SYNCHRO_RED = QColor(246, 91, 117);
-constexpr QColor SYNCHRO_CYAN = QColor(13, 204, 218);
-constexpr QColor SYNCHRO_YELLOW = QColor(255, 187, 0);
+const QColor SYNCHRO_RED = QColor(246, 91, 117);
+const QColor SYNCHRO_CYAN = QColor(13, 204, 218);
+const QColor SYNCHRO_YELLOW = QColor(255, 187, 0);
 
 }
 
@@ -108,6 +108,6 @@ private:
 	Knob  *m_modulatorPulse;
 };
 
-}
+} // namespace lmms
 
 #endif
