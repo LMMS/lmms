@@ -237,7 +237,7 @@ public:
 
 	static inline float freqFromWaveTableBand(int band)
 	{
-		return 440.0f * std::pow(2.0f, (band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
+		return 440.0f * std::exp2f((band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
 	}
 
 private:

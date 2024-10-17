@@ -128,7 +128,7 @@ inline float sqrt_neg(float val)
 //! @brief Exponential function that deals with negative bases
 inline float signedPowf(float v, float e)
 {
-	return std::pow(std::abs(v), e) * sign(v);
+	return fastPow(std::abs(v), e) * sign(v);
 }
 
 

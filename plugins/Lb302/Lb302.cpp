@@ -275,7 +275,7 @@ static float computeDecayFactor(float decayTimeInSeconds, float targetedAttenuat
 
 	// This computes the factor that's needed to make a signal with a value of 1 decay to the
 	// targeted attenuation over the time in number of samples.
-	return std::pow(targetedAttenuation, 1. / samplesNeededForDecay);
+	return fastPow(targetedAttenuation, 1. / samplesNeededForDecay);
 }
 
 Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
