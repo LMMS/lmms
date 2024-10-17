@@ -664,6 +664,13 @@ elseif(MSVC)
 	add_compile_options("/utf-8")
 ENDIF()
 
+# gcc builds support gprof for profiling, should not be used for release builds because
+# -fomit-frame-pointer clashes with -pg
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+endif()
+
 # add enabled sanitizers
 function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	if(${want_flag})
