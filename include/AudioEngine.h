@@ -235,7 +235,10 @@ public:
 	}
 
 
-	sample_rate_t baseSampleRate() const;
+	inline sample_rate_t baseSampleRate() const{
+		return m_baseSampleRate;
+	}
+
 	sample_rate_t outputSampleRate() const;
 	sample_rate_t inputSampleRate() const;
 
@@ -361,7 +364,7 @@ private:
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
-	sample_rate_t m_sampleRate;
+	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
