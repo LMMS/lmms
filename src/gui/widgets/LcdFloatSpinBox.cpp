@@ -42,6 +42,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "FontHelper.h"
+#include "lmms_math.h"
 #include "MainWindow.h"
 
 namespace lmms::gui
