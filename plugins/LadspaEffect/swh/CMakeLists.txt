@@ -17,7 +17,7 @@ if(NOT MSVC)
 		${PIC_FLAGS}
 	)
 	# an optimisation flag, but makes it harder to debug
-	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	if(NOT WANT_DEBUG_GPROF)
 		set(COMPILE_FLAGS ${COMPILE_FLAGS} -fomit-frame-pointer)
 	endif()
 endif()
