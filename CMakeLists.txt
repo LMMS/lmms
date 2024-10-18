@@ -667,7 +667,7 @@ ENDIF()
 
 # gcc builds support gprof for profiling
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	set("${STATUS_GPROF}" "NOT SUPPORTED ON THIS PLATFORM")
+	set("${STATUS_GPROF}" ", NOT SUPPORTED ON THIS PLATFORM")
 	set(WANT_DEBUG_GPROF OFF)
 endif()
 
@@ -675,6 +675,8 @@ if(WANT_DEBUG_GPROF)
 	add_compile_options(-pg)
 	add_link_options(-pg)
 	set("${STATUS_GPROF}" "OK")
+else()
+	set("${STATUS_GPROF}" "DISABLED ${STATUS_GPROF}")
 endif()
 
 # add enabled sanitizers
@@ -844,7 +846,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Profiling using GNU profiler		 : ${STATUS_GPROF}\n"
+"* Profiling using GNU profiler      : ${STATUS_GPROF}\n"
 )
 
 MESSAGE(
