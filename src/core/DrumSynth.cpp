@@ -558,7 +558,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	{
 		DAtten = DGain * static_cast<short>(LoudestEnv());
 		clippoint = DAtten > 32700 ? 32700 : static_cast<short>(DAtten);
-		DAtten = std::exp2f(2.0 * GetPrivateProfileInt(sec, "Bits", 0, dsfile));
+		DAtten = std::exp2(2.0 * GetPrivateProfileInt(sec, "Bits", 0, dsfile));
 		DGain = DAtten * DGain * fastPow10f(0.05 * GetPrivateProfileInt(sec, "Clipping", 0, dsfile));
 	}
 
