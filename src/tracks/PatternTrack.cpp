@@ -194,8 +194,19 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		{
 			Clip::copyStateTo(track->getClip(src), track->getClip(dst));
 		}
-		setName( tr( "Clone of %1" ).arg(
-					_this.parentNode().toElement().attribute( "name" ) ) );
+		// Check if track name has number at end; if so, increment the number
+		QStringList splitName = _this.parentNode().toElement().attribute( "name" ).split(" ");
+		bool isNumberAtEnd;
+		int number = splitName.takeLast().toInt(&isNumberAtEnd);
+		if (isNumberAtEnd)
+		{
+			setName(splitName.join(" ") + " " + QString::number(number + 1));
+		}
+		else
+		{
+			// Else just add "2" at the end of the name
+			setName(tr("%1 2").arg(_this.parentNode().toElement().attribute("name")));
+		}
 	}
 	else
 	{
