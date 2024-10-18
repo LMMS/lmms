@@ -102,6 +102,7 @@ option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
+option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 
 
@@ -664,6 +665,20 @@ elseif(MSVC)
 	add_compile_options("/utf-8")
 ENDIF()
 
+# gcc builds support gprof for profiling
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set(STATUS_GPROF ", NOT SUPPORTED ON THIS PLATFORM")
+	set(WANT_DEBUG_GPROF OFF)
+endif()
+
+if(WANT_DEBUG_GPROF)
+	add_compile_options(-pg)
+	add_link_options(-pg)
+	set(STATUS_GPROF "OK")
+else()
+	set(STATUS_GPROF "DISABLED ${STATUS_GPROF}")
+endif()
+
 # add enabled sanitizers
 function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	if(${want_flag})
@@ -831,6 +846,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Profiling using GNU profiler      : ${STATUS_GPROF}\n"
 )
 
 MESSAGE(
