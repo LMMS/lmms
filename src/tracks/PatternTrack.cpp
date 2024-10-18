@@ -205,8 +205,7 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		else
 		{
 			// Else just add "2" at the end of the name
-			setName(tr( "%1 2" ).arg(
-						_this.parentNode().toElement().attribute( "name" )));
+			setName(tr("%1 2").arg(_this.parentNode().toElement().attribute("name")));
 		}
 	}
 	else
