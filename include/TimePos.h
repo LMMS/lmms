@@ -51,8 +51,8 @@ class LMMS_EXPORT TimeSig
 public:
 	TimeSig( int num, int denom );
 	TimeSig( const MeterModel &model );
-	int numerator() const;
-	int denominator() const;
+	int numerator() const { return m_num; }
+	int denominator() const { return m_denom; }
 private:
 	int m_num;
 	int m_denom;

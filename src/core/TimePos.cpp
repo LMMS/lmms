@@ -43,20 +43,6 @@ TimeSig::TimeSig( const MeterModel &model ) :
 {
 }
 
-
-int TimeSig::numerator() const
-{
-	return m_num;
-}
-
-int TimeSig::denominator() const
-{
-	return m_denom;
-}
-
-
-
-
 TimePos::TimePos( const bar_t bar, const tick_t ticks ) :
 	m_ticks( bar * s_ticksPerBar + ticks )
 {
