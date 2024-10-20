@@ -7,11 +7,6 @@ if(MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /fp:fast")
 else()
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fno-strict-aliasing -funroll-loops -ffast-math")
-	
-	# an optimisation flag, but makes it harder to debug
-	if(NOT WANT_DEBUG_GPROF)
-		set(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer")
-	endif()
 endif()
 FOREACH(_item ${PLUGIN_SOURCES})
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)

@@ -16,10 +16,6 @@ if(NOT MSVC)
 		-funroll-loops -ffast-math -fno-strict-aliasing
 		${PIC_FLAGS}
 	)
-	# an optimisation flag, but makes it harder to debug
-	if(NOT WANT_DEBUG_GPROF)
-		set(COMPILE_FLAGS ${COMPILE_FLAGS} -fomit-frame-pointer)
-	endif()
 endif()
 
 # Loop over every XML file
