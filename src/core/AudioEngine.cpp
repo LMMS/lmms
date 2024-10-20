@@ -254,7 +254,7 @@ void AudioEngine::stopProcessing()
 
 sample_rate_t AudioEngine::outputSampleRate() const
 {
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSamplerate;
+	return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
 }
 
 
