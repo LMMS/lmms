@@ -73,7 +73,7 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 						this, SLOT(changeName()));
 	_cm->addAction(
 		embed::getIconPixmap("pattern_track"),
-		tr("Copy Clip to new Pattern Track"),
+		tr("Copy to New Pattern Track"),
 		this,
 		&PatternClipView::copySelectionToNewPatternTrack
 	);
