@@ -28,12 +28,16 @@
 #include <QMenu>
 #include <QPainter>
 
+#include "AutomationClip.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
+#include "PatternTrack.h"
 #include "RenameDialog.h"
+#include "SampleClip.h"
 
 namespace lmms::gui
 {
@@ -104,6 +108,13 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
+	int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
+	int offset = static_cast<int>(m_patternClip->startTimeOffset() * (pixelsPerBar() / TimePos::ticksPerBar()))
+			% pixelsPerPattern;
+	if (offset < 2) {
+		offset += pixelsPerPattern;
+	}
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -112,15 +123,62 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	{
 		p.fillRect( rect(), c );
 	}
+	// draw notes
+	int patternIndex = static_cast<PatternTrack*>(m_patternClip->getTrack())->patternIndex();
+	// Count the number of non-empty instrument tracks. Only used midi tracks will be drawn.
+	int numberIntsrumentTracksUsed = 0;
+	for (const auto& track : Engine::patternStore()->tracks())
+	{
+		Clip* clip = track->getClip(patternIndex);
+		MidiClip* mClip = dynamic_cast<MidiClip*>(clip);
+		if (mClip)
+		{
+			if (mClip->notes().size() > 0) { numberIntsrumentTracksUsed++; }
+		}
+	}
+
+	int trackIndex = 0;
+	for (const auto& track : Engine::patternStore()->tracks())
+	{
+		Clip* clip = track->getClip(patternIndex);
+		MidiClip* mClip = dynamic_cast<MidiClip*>(clip);
+		SampleClip* sClip = dynamic_cast<SampleClip*>(clip);
+		AutomationClip* aClip = dynamic_cast<AutomationClip*>(clip);
+		if (mClip)
+		{
+			if (mClip->notes().size() == 0) { continue; } // Continue without updating the track index; empty tracks are not drawn.
+			// Compare how long the clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
+			int maxPossibleRepeitions = getClip()->length() / mClip->length() + 1 + 1;
+			for (Note const * note : mClip->notes())
+			{
+				QRect noteRect = QRect(
+					note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset,
+					trackIndex * height() / numberIntsrumentTracksUsed,
+					pixelsPerBar() / 16,
+					height() / numberIntsrumentTracksUsed
+				);
+				// Loop through all the possible bars this pattern could affect. Starting at -1 for the possibility of start offset
+				for (int i = -1; i < maxPossibleRepeitions - 1; i++)
+				{
+					noteRect.moveLeft(note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + i * pixelsPerPattern);
+					p.fillRect(noteRect, QColor(255, 255, 255, std::min(255, note->getVolume() * 255 / 100)));
+				}
+			}
+		}
+		else if (sClip)
+		{
+			// TODO, we probably won't be rendering a whole waveform for this; perhaps just a single block given the sample start offset
+		}
+		else if (aClip)
+		{
+			// TODO, probably do nothing?
+		}
+		// Only increment the track index if we actually drew anything; empty tracks do not contribute.
+		trackIndex++;
+	}
 	
 	// bar lines
 	const int lineSize = 3;
-	int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
-	int offset = static_cast<int>(m_patternClip->startTimeOffset() * (pixelsPerBar() / TimePos::ticksPerBar()))
-			% pixelsPerPattern;
-	if (offset < 2) {
-		offset += pixelsPerPattern;
-	}
 
 	p.setPen( c.darker( 200 ) );
 
