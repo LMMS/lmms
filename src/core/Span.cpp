@@ -85,7 +85,6 @@ namespace pointer_and_size_construction_tests
 	}
 
 	// dynamic extent
-	constexpr int arr[] = {1, 2, 3};
 	constexpr auto span2 = Span{&arr[0], 3};
 
 	static_assert(std::is_same_v<decltype(span2), const Span<const int, dynamic_extent>>);

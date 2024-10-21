@@ -46,6 +46,15 @@ namespace lmms
 
 inline constexpr auto dynamic_extent = static_cast<std::size_t>(-1);
 
+
+//! C++20 std::type_identity implementation
+template<class T>
+struct type_identity { using type = T; };
+
+template< class T >
+using type_identity_t = typename type_identity<T>::type;
+
+
 //! Span with static extent
 template<class T, std::size_t Extent = dynamic_extent>
 class Span
@@ -63,12 +72,12 @@ public:
 	using iterator               = pointer;
 	using const_iterator         = const_pointer;
 	using reverse_iterator       = std::reverse_iterator<iterator>;
-	using const_reverse_iterator = std::const_iterator<reverse_iterator>;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	static constexpr std::size_t extent = Extent;
 
 	// constructors, copy, and assignment
-	template<std::enable_if_t<Extent == 0, bool> = true>
+	template<auto ext = Extent, std::enable_if_t<ext == 0, bool> = true>
 	constexpr Span() noexcept {}
 
 	constexpr explicit Span(T* data, std::size_t count)
@@ -77,7 +86,7 @@ public:
 		assert(count == Extent);
 	}
 
-	constexpr Span(std::type_identity_t<T> (&arr)[Extent]) noexcept : m_data{arr} {}
+	constexpr Span(type_identity_t<T> (&arr)[Extent]) noexcept : m_data{arr} {}
 
 	template<class U, std::enable_if_t<std::is_convertible_v<U*, T*>, bool> = true>
 	constexpr Span(std::array<U, Extent>& arr) noexcept
@@ -92,7 +101,7 @@ public:
 	}
 
 	// C++26 P2447R6
-	template<class U = T, std::enable_if_t<std::is_const_v<T>, bool> = true>
+	template<class U = T, std::enable_if_t<std::is_const_v<U>, bool> = true>
 	constexpr explicit Span(std::initializer_list<value_type> il)
 		: m_data{il.begin()}
 	{
@@ -101,13 +110,13 @@ public:
 
 	template<class U, std::enable_if_t<std::is_convertible_v<U*, T*>, bool> = true>
 	constexpr Span(const Span<U, Extent>& source) noexcept
-		: m_data{source.m_data}
+		: m_data{source.data()}
 	{
 	}
 
 	template<class U, std::enable_if_t<std::is_convertible_v<U*, T*>, bool> = true>
 	constexpr explicit Span(const Span<U, dynamic_extent>& source) noexcept
-		: m_data{source.m_data}
+		: m_data{source.data()}
 	{
 		assert(source.size() == Extent);
 	}
@@ -121,14 +130,14 @@ public:
 	constexpr auto first() const -> Span<T, Count>
 	{
 		static_assert(Count <= Extent);
-		return {m_data, Count};
+		return Span<T, Count>(m_data, Count);
 	}
 
 	template<std::size_t Count>
 	constexpr auto last() const -> Span<T, Count>
 	{
 		static_assert(Count <= Extent);
-		return {m_data + Extent - Count, Count};
+		return Span<T, Count>(m_data + Extent - Count, Count);
 	}
 
 	template<std::size_t Offset, std::size_t Count = dynamic_extent>
@@ -137,22 +146,22 @@ public:
 		static_assert(Offset <= Extent);
 		if constexpr (Count != dynamic_extent) {
 			static_assert(Count <= Extent - Offset);
-			return {m_data + Offset, Count};
+			return Span<T, Count>(m_data + Offset, Count);
 		} else {
-			return {m_data + Offset, Extent - Offset};
+			return Span<T, Count>(m_data + Offset, Extent - Offset);
 		}
 	}
 
 	constexpr auto first(std::size_t count) const -> Span<T, dynamic_extent>
 	{
 		assert(count <= Extent);
-		return {m_data, count};
+		return Span<T, dynamic_extent>(m_data, count);
 	}
 
 	constexpr auto last(std::size_t count) const -> Span<T, dynamic_extent>
 	{
 		assert(count <= Extent);
-		return {m_data + Extent - count, count};
+		return Span<T, dynamic_extent>(m_data + Extent - count, count);
 	}
 
 	constexpr auto subspan(std::size_t offset, std::size_t count = dynamic_extent) const
@@ -161,9 +170,9 @@ public:
 		assert(offset <= Extent);
 		if (count != dynamic_extent) {
 			assert(count <= Extent - offset);
-			return {m_data + offset, count};
+			return Span<T, dynamic_extent>(m_data + offset, count);
 		} else {
-			return {m_data + offset, Extent - offset};
+			return Span<T, dynamic_extent>(m_data + offset, Extent - offset);
 		}
 	}
 
@@ -190,8 +199,8 @@ public:
 	constexpr auto end() const noexcept -> T* { return m_data + Extent; }
 	constexpr auto cbegin() const noexcept -> const T* { return begin(); }
 	constexpr auto cend() const noexcept -> const T* { return end(); }
-	constexpr auto rbegin() const noexcept -> reverse_iterator { return {end()}; }
-	constexpr auto rend() const noexcept -> reverse_iterator { return {begin()}; }
+	constexpr auto rbegin() const noexcept -> reverse_iterator { return reverse_iterator{end()}; }
+	constexpr auto rend() const noexcept -> reverse_iterator { return reverse_iterator{begin()}; }
 	constexpr auto crbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
 	constexpr auto crend() const noexcept -> const_reverse_iterator { return rend(); }
 
@@ -217,7 +226,7 @@ public:
 	using iterator               = pointer;
 	using const_iterator         = const_pointer;
 	using reverse_iterator       = std::reverse_iterator<iterator>;
-	using const_reverse_iterator = std::const_iterator<reverse_iterator>;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	static constexpr std::size_t extent = dynamic_extent;
 
@@ -231,7 +240,7 @@ public:
 	}
 
 	template<std::size_t N>
-	constexpr Span(std::type_identity_t<T> (&arr)[N]) noexcept
+	constexpr Span(type_identity_t<T> (&arr)[N]) noexcept
 		: m_data{arr}
 		, m_size{N}
 	{
@@ -252,7 +261,7 @@ public:
 	}
 
 	// C++26 P2447R6
-	template<std::enable_if_t<std::is_const_v<T>, bool> = true>
+	template<class U = T, std::enable_if_t<std::is_const_v<U>, bool> = true>
 	constexpr Span(std::initializer_list<value_type> il) noexcept
 		: m_data{il.begin()}
 		, m_size{il.size()}
@@ -261,7 +270,7 @@ public:
 
 	template<class U, std::size_t N, std::enable_if_t<N != dynamic_extent, bool> = true>
 	constexpr Span(const Span<U, N>& source) noexcept
-		: m_data{source.m_data}
+		: m_data{source.data()}
 		, m_size{N}
 	{
 	}
@@ -275,14 +284,14 @@ public:
 	constexpr auto first() const -> Span<T, Count>
 	{
 		assert(Count <= m_size);
-		return {m_data, Count};
+		return Span<T, Count>(m_data, Count);
 	}
 
 	template<std::size_t Count>
 	constexpr auto last() const -> Span<T, Count>
 	{
 		assert(Count <= m_size);
-		return {m_data + m_size - Count, Count};
+		return Span<T, Count>(m_data + m_size - Count, Count);
 	}
 
 	template<std::size_t Offset, std::size_t Count = dynamic_extent>
@@ -291,22 +300,22 @@ public:
 		assert(Offset <= m_size);
 		if constexpr (Count != dynamic_extent) {
 			assert(Count <= m_size - Offset);
-			return {m_data + Offset, Count};
+			return Span<T, Count>(m_data + Offset, Count);
 		} else {
-			return {m_data + Offset, m_size - Offset};
+			return Span<T, Count>(m_data + Offset, m_size - Offset);
 		}
 	}
 
 	constexpr auto first(std::size_t count) const -> Span<T, dynamic_extent>
 	{
 		assert(count <= m_size);
-		return {m_data, count};
+		return Span<T, dynamic_extent>(m_data, count);
 	}
 
 	constexpr auto last(std::size_t count) const -> Span<T, dynamic_extent>
 	{
 		assert(count <= m_size);
-		return {m_data + m_size - count, count};
+		return Span<T, dynamic_extent>(m_data + m_size - count, count);
 	}
 
 	constexpr auto subspan(std::size_t offset, std::size_t count = dynamic_extent) const
@@ -315,9 +324,9 @@ public:
 		assert(offset <= m_size);
 		if (count != dynamic_extent) {
 			assert(count <= m_size - offset);
-			return {m_data + offset, count};
+			return Span<T, dynamic_extent>(m_data + offset, count);
 		} else {
-			return {m_data + offset, m_size - offset};
+			return Span<T, dynamic_extent>(m_data + offset, m_size - offset);
 		}
 	}
 
@@ -344,8 +353,8 @@ public:
 	constexpr auto end() const noexcept -> T* { return m_data + m_size; }
 	constexpr auto cbegin() const noexcept -> const T* { return begin(); }
 	constexpr auto cend() const noexcept -> const T* { return end(); }
-	constexpr auto rbegin() const noexcept -> reverse_iterator { return {end()}; }
-	constexpr auto rend() const noexcept -> reverse_iterator { return {begin()}; }
+	constexpr auto rbegin() const noexcept -> reverse_iterator { return reverse_iterator{end()}; }
+	constexpr auto rend() const noexcept -> reverse_iterator { return reverse_iterator{begin()}; }
 	constexpr auto crbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
 	constexpr auto crend() const noexcept -> const_reverse_iterator { return rend(); }
 
@@ -376,14 +385,16 @@ template<class T, std::size_t N>
 inline auto as_bytes(Span<T, N> s) noexcept
 	-> Span<const std::byte, (N == dynamic_extent ? dynamic_extent : N * sizeof(T))>
 {
-	return {reinterpret_cast<const std::byte*>(s.data()), s.size_bytes()};
+	using Type = Span<const std::byte, (N == dynamic_extent ? dynamic_extent : N * sizeof(T))>;
+	return Type(reinterpret_cast<const std::byte*>(s.data()), s.size_bytes());
 }
 
 template<class T, std::size_t N, std::enable_if_t<!std::is_const_v<T>, bool> = true>
 inline auto as_writable_bytes(Span<T, N> s) noexcept
 	-> Span<std::byte, (N == dynamic_extent ? dynamic_extent : N * sizeof(T))>
 {
-	return {reinterpret_cast<std::byte*>(s.data()), s.size_bytes()};
+	using Type = Span<std::byte, (N == dynamic_extent ? dynamic_extent : N * sizeof(T))>;
+	return Type(reinterpret_cast<std::byte*>(s.data()), s.size_bytes());
 }
 
 
