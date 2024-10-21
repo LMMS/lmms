@@ -227,6 +227,7 @@ namespace span_converting_construction_tests
 	{
 		auto source2 = Span<int, 3>{nonconst_arr};
 		auto dest2 = Span<const int, dynamic_extent>{source2};
+		(void)dest2;
 		return true;
 	}
 	static_assert(func2());
@@ -236,6 +237,7 @@ namespace span_converting_construction_tests
 	{
 		auto source3 = Span<int, 3>{nonconst_arr};
 		auto dest3 = Span<int, dynamic_extent>{source3};
+		(void)dest3;
 		return true;
 	}
 	static_assert(func3());
@@ -249,6 +251,7 @@ namespace span_converting_construction_tests
 	{
 		auto source5 = Span<int, dynamic_extent>{nonconst_arr};
 		auto dest5 = Span<const int, 3>{source5};
+		(void)dest5;
 		return true;
 	}
 	static_assert(func5());
@@ -258,6 +261,7 @@ namespace span_converting_construction_tests
 	{
 		auto source6 = Span<int, dynamic_extent>{nonconst_arr};
 		auto dest6 = Span<int, 3>{source6};
+		(void)dest6;
 		return true;
 	}
 	static_assert(func6());
@@ -344,19 +348,23 @@ namespace subview_tests
 		auto first1 = span2.first<3>();
 		assert(first1.size() == 3);
 		assert(first1[0] == 1); assert(first1[1] == 3); assert(first1[2] == 5);
+		(void)first1;
 
 		auto last1 = span2.last<3>();
 		assert(last1.size() == 3);
 		assert(last1[0] == 5); assert(last1[1] == 7); assert(last1[2] == 9);
+		(void)last1;
 
 		auto sub1 = span2.subspan<1, 3>();
 		assert(sub1.size() == 3);
 		assert(sub1[0] == 3); assert(sub1[1] == 5); assert(sub1[2] == 7);
+		(void)sub1;
 
 		auto sub2 = span2.subspan<1>();
 		assert(sub2.size() == 4);
 		assert(sub2[0] == 3); assert(sub2[1] == 5);
 		assert(sub2[2] == 7); assert(sub2[3] == 9);
+		(void)sub2;
 
 		return true;
 	}
@@ -370,19 +378,23 @@ namespace subview_tests
 		auto first1 = span2.first(3);
 		assert(first1.size() == 3);
 		assert(first1[0] == 1); assert(first1[1] == 3); assert(first1[2] == 5);
+		(void)first1;
 
 		auto last1 = span2.last(3);
 		assert(last1.size() == 3);
 		assert(last1[0] == 5); assert(last1[1] == 7); assert(last1[2] == 9);
+		(void)last1;
 
 		auto sub1 = span2.subspan(1, 3);
 		assert(sub1.size() == 3);
 		assert(sub1[0] == 3); assert(sub1[1] == 5); assert(sub1[2] == 7);
+		(void)sub1;
 
 		auto sub2 = span2.subspan<1>();
 		assert(sub2.size() == 4);
 		assert(sub2[0] == 3); assert(sub2[1] == 5);
 		assert(sub2[2] == 7); assert(sub2[3] == 9);
+		(void)sub2;
 
 		return true;
 	}
