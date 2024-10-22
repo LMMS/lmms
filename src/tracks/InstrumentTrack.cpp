@@ -104,7 +104,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 			this, [this, i]{ processCCEvent(i); }, Qt::DirectConnection);
 	}
 
-	setName( tr( "Default preset" ) );
+	setName(findUniqueName(tr("Default preset")));
 
 	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
@@ -1056,7 +1056,7 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 	m_instrument = Instrument::instantiate(_plugin_name, this,
 					key, keyFromDnd);
 	unlock();
-	setName(m_instrument->displayName());
+	setName(findUniqueName(m_instrument->displayName()));
 
 	emit instrumentChanged();
 
