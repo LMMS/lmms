@@ -24,14 +24,14 @@
 
 #include "SampleFolder.h"
 
-#include <filesystem>
+#include "LmmsExporterSample.h"
 
 namespace lmms
 {
 
 std::string SampleFolder::s_sampleFileSourceName = "LOAD_WITH_SAMPLEFOLDER";
 
-SampleFolder::SampleFolder(std::string folderPath)
+SampleFolder::SampleFolder(std::filesystem::path folderPath)
 {
 	setTargetFolderPath(folderPath);
 }
@@ -40,7 +40,7 @@ SampleFolder::~SampleFolder()
 {
 }
 
-void SampleFolder::setTargetFolderPath(std::string folderPath)
+void SampleFolder::setTargetFolderPath(std::filesystem::path folderPath)
 {
 	m_targetFolderPath = folderPath;
 	updateAllFilesList();
@@ -49,7 +49,7 @@ void SampleFolder::setTargetFolderPath(std::string folderPath)
 void SampleFolder::updateAllFilesList()
 {
 	m_allFilesList.clear();
-	for (const auto& entry : std::filesystem::directory_iterator(path))
+	for (const auto& entry : std::filesystem::directory_iterator(m_targetFolderPath))
 	{
 		// adding filenames with extensions to m_allFilesList
 		m_allFilesList.push_back(entry.path().filename());
@@ -144,7 +144,7 @@ void SampleFolder::setSampleFileSourceName(std::string* sampleFileName, bool isM
 			}
 			nameStem = nameStem + sampleFilePath.extension();
 		}
-		
+
 		// replace filename with the new stem + extension
 		sampleFilePath.replace_filename(nameStem);
 		*sampleFileName = sampleFilePath.string();
@@ -161,14 +161,21 @@ bool SampleFolder::getSampleFileSourceName(const std::string& sampleFileName, bo
 	return nameStem.ends_with(s_sampleFileSourceName);
 }
 
-const static SampleFolder::std::string s_sampleFileSourceName = "LOAD_WITH_SAMPLEFOLDER";
-
 bool SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const std::string& sampleFileName)
 {
 	// getting rid of s_sampleFileSourceName tag
 	setSampleFileSourceName(&sampleFileName, false);
 	
 	// TODO save
+
+	LmmsExporterSample exporter(LmmsExporterSample::ExportFileType::Audio, (m_targetFolderPath / std::filesystem::path(sampleFileName)));
+	exporter.setupAudioRendering(
+		const OutputSettings& outputSettings,
+		LmmsExporterSample::ExportAudioFileFormat::Flac,
+		256,
+		sampleBuffer->data(),
+		sampleBuffer->size();
+	);
 }
 
 size_t SampleFolder::getFileNumber(const std::filesystem::path& sampleFilePath)
@@ -178,7 +185,6 @@ size_t SampleFolder::getFileNumber(const std::filesystem::path& sampleFilePath)
 	std::string nameNumber = "";
 	for (size_t i = nameStem.size() - 1; i >= 0; i--)
 	{
-		// if [i] isn't a digit
 		if (std::isdigit(nameStem[i]) == false) { break; }
 		// could be made more efficient with copy() and resize()
 		nameNumber = nameNumber + nameStem[i];

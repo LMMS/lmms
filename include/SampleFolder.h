@@ -38,10 +38,10 @@ class SampleFolder
 {
 public:
 	//! folderPath: from where should SampleFolder load in the samples
-	SampleFolder(std::string folderPath);
+	SampleFolder(std::filesystem::path folderPath);
 	~SampleFolder();
 
-	void setTargetFolderPath(std::string folderPath);
+	void setTargetFolderPath(std::filesystem::path folderPath);
 
 	void updateAllFilesList();
 
@@ -68,7 +68,7 @@ private:
 	bool saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const std::string& sampleFileName);
 	size_t getFileNumber(const std::filesystem::path& sampleFilePath);
 
-	std::string m_targetFolderPath;
+	std::filesystem::path m_targetFolderPath;
 
 	//! list of used file names inside m_targetFolderPath
 	std::list<std::string> m_loadedFilesList;
