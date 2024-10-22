@@ -44,6 +44,8 @@
 namespace lmms::gui
 {
 
+QString AutomationClipView::m_shortcutMessage = "";
+
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
 	ClipView( _clip, _parent ),
@@ -56,6 +58,11 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 			this, SLOT(update()));
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
+
+	if (m_shortcutMessage == "")
+	{
+		m_shortcutMessage = buildShortcutMessage();
+	}
 
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
@@ -202,6 +209,78 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 				this, SLOT(disconnectObject(QAction*)));
 		_cm->addMenu( m );
 	}
+}
+
+std::vector<InteractiveModelView::ModelShortcut> AutomationClipView::getShortcuts()
+{
+	std::vector<InteractiveModelView::ModelShortcut> clipShortcuts = ClipView::getShortcuts();
+	clipShortcuts.emplace_back(Qt::Key_F, Qt::ControlModifier, 0, QString(tr("Open in Automation editor")), false);
+	return clipShortcuts;
+}
+
+void AutomationClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
+{
+	switch (shortcutLocation)
+	{
+		case 3:
+			openInAutomationEditor();
+			break;
+		default:
+			ClipView::processShortcutPressed(shortcutLocation, event);
+			break;
+	}
+}
+
+QString AutomationClipView::getShortcutMessage()
+{
+	return m_shortcutMessage;
+}
+
+bool AutomationClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+{
+	return dataType == Clipboard::StringPairDataType::AutomatableModelLink || ClipView::canAcceptClipboardData(dataType);
+}
+
+bool AutomationClipView::processPaste(const QMimeData* mimeData)
+{
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	QString value = Clipboard::decodeValue(mimeData);
+
+	bool shouldAccept = false;
+	if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
+		if (mod != nullptr)
+		{
+			bool added = m_clip->addObject(mod);
+			shouldAccept = added;
+			if (!added)
+			{
+				TextFloat::displayMessage(mod->displayName(),
+					tr("Model is already connected to this clip."),
+					embed::getIconPixmap("automation"), 2000);
+			}
+		}
+
+		update();
+
+		if (getGUI()->automationEditor()
+			&& getGUI()->automationEditor()->currentClip() == m_clip)
+		{
+			getGUI()->automationEditor()->setCurrentClip(m_clip);
+		}
+	}
+	
+	if (shouldAccept)
+	{
+		InteractiveModelView::stopHighlighting();
+	}
+	else
+	{
+		shouldAccept = ClipView::processPaste(mimeData);
+	}
+	return shouldAccept;
 }
 
 
@@ -391,8 +470,9 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
+	drawAutoHighlight(&p);
 	p.end();
-
+	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
@@ -401,7 +481,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::StringPairDataType::AutomatableModelLink);
 	if( !_dee->isAccepted() )
 	{
 		ClipView::dragEnterEvent( _dee );
@@ -413,34 +493,11 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "automatable_model" )
-	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if( mod != nullptr )
-		{
-			bool added = m_clip->addObject( mod );
-			if ( !added )
-			{
-				TextFloat::displayMessage( mod->displayName(),
-							   tr( "Model is already connected "
-							   "to this clip." ),
-							   embed::getIconPixmap( "automation" ),
-							   2000 );
-			}
-		}
-		update();
+	bool shouldAccept = processPaste(_de->mimeData());
 
-		if( getGUI()->automationEditor() &&
-			getGUI()->automationEditor()->currentClip() == m_clip )
-		{
-			getGUI()->automationEditor()->setCurrentClip( m_clip );
-		}
-	}
-	else
+	if (shouldAccept)
 	{
-		ClipView::dropEvent( _de );
+		_de->accept();
 	}
 }
 

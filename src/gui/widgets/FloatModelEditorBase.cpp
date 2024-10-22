@@ -48,9 +48,10 @@ namespace lmms::gui
 {
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
+QString FloatModelEditorBase::m_shortcutMessage = "";
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
-	QWidget(parent),
+	InteractiveModelView(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
 	m_volumeKnob(false),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
@@ -66,6 +67,11 @@ void FloatModelEditorBase::initUi(const QString & name)
 	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
+	}
+
+	if (m_shortcutMessage == "")
+	{
+		m_shortcutMessage = buildShortcutMessage();
 	}
 
 	setWindowTitle(name);
@@ -130,28 +136,24 @@ void FloatModelEditorBase::toggleScale()
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, "float_value,"
-							"automatable_model");
+	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
+		Clipboard::StringPairDataType::FloatValue,
+		Clipboard::StringPairDataType::AutomatableModelLink
+	};
+	StringPairDrag::processDragEnterEvent(dee, &acceptedKeys);
 }
 
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	QString type = StringPairDrag::decodeKey(de);
-	QString val = StringPairDrag::decodeValue(de);
-	if (type == "float_value")
+	bool canAccept = processPaste(de->mimeData());
+	if (canAccept == true)
 	{
-		model()->setValue(LocaleHelper::toFloat(val));
 		de->accept();
 	}
-	else if (type == "automatable_model")
+	else
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if (mod != nullptr)
-		{
-			AutomatableModel::linkModels(model(), mod);
-			mod->setValue(model()->value());
-		}
+		de->ignore();
 	}
 }
 
@@ -186,7 +188,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 	else if (me->button() == Qt::LeftButton &&
 			(me->modifiers() & Qt::ShiftModifier))
 	{
-		new StringPairDrag("float_value",
+		new StringPairDrag(Clipboard::StringPairDataType::FloatValue,
 					QString::number(model()->value()),
 							QPixmap(), this);
 	}
@@ -235,12 +237,14 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 
 void FloatModelEditorBase::enterEvent(QEvent *event)
 {
+	InteractiveModelView::enterEvent(event);
 	showTextFloat(700, 2000);
 }
 
 
 void FloatModelEditorBase::leaveEvent(QEvent *event)
 {
+	InteractiveModelView::leaveEvent(event);
 	s_textFloat->hide();
 }
 
@@ -278,8 +282,79 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	p.setPen(foreground);
 	p.setBrush(foreground);
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
+	drawAutoHighlight(&p);
 }
 
+std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::getShortcuts()
+{
+	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
+	};
+	return shortcuts;
+}
+
+void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
+{
+	switch (shortcutLocation)
+	{
+		case 0:
+			Clipboard::copyStringPair(Clipboard::StringPairDataType::FloatValue, Clipboard::clipboardEncodeFloatValue(model()->value() * getConversionFactor()));
+			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::FloatValue);
+			break;
+		case 1:
+			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::clipboardEncodeAutomatableModelLink(model()->id()));
+			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::AutomatableModelLink);
+			break;
+		case 2:
+			processPaste(Clipboard::getMimeData());
+			break;
+		default:
+			break;
+	}
+}
+
+QString FloatModelEditorBase::getShortcutMessage()
+{
+	return m_shortcutMessage;
+}
+
+bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+{
+	return dataType == Clipboard::StringPairDataType::FloatValue
+		|| dataType == Clipboard::StringPairDataType::AutomatableModelLink;
+}
+
+bool FloatModelEditorBase::processPaste(const QMimeData* mimeData)
+{
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
+	bool shouldAccept = false;
+
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	QString value = Clipboard::decodeValue(mimeData);
+	
+	if (type == Clipboard::StringPairDataType::FloatValue)
+	{
+		model()->setValue(LocaleHelper::toFloat(value));
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
+		if (mod != nullptr)
+		{
+			AutomatableModel::linkModels(model(), mod);
+			mod->setValue(model()->value());
+			shouldAccept = true;
+		}
+	}
+	if (shouldAccept)
+	{
+		InteractiveModelView::stopHighlighting();
+	}
+	return shouldAccept;
+}
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {

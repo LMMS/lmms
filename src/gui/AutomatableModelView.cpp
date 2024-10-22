@@ -173,7 +173,8 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
 	{
-		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
+		new gui::StringPairDrag(Clipboard::StringPairDataType::AutomatableModelLink,
+			Clipboard::clipboardEncodeAutomatableModelLink(modelUntyped()->id()), QPixmap(), widget());
 		event->accept();
 	}
 	else if( event->button() == Qt::MiddleButton )

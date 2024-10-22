@@ -72,6 +72,12 @@ const int RESIZE_GRIP_WIDTH = 4;
  */
 TextFloat * ClipView::s_textFloat = nullptr;
 
+/*! QString holding the generated shortcut description.
+ *
+ * Update with `InteractiveModelView::buildShortcutMessage()`
+ */
+QString ClipView::m_shortcutMessage = "";
+
 
 /*! \brief Create a new ClipView
  *
@@ -111,6 +117,10 @@ ClipView::ClipView( Clip * clip,
 	{
 		s_textFloat = new TextFloat;
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
+	}
+	if (m_shortcutMessage == "")
+	{
+		m_shortcutMessage = buildShortcutMessage();
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -351,6 +361,12 @@ void ClipView::updatePosition()
 	m_trackView->trackContainerView()->update();
 }
 
+QString ClipView::getDefaultSortcutMessage()
+{
+	return m_shortcutMessage;
+}
+
+
 void ClipView::selectColor()
 {
 	// Get a color from the user
@@ -424,8 +440,7 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-					QString::number( static_cast<int>(m_clip->getTrack()->type()) ) );
+		StringPairDrag::processDragEnterEvent(dee, getClipStringPairType(m_clip->getTrack()));
 	}
 }
 
@@ -443,44 +458,22 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
  */
 void ClipView::dropEvent( QDropEvent * de )
 {
-	QString type = StringPairDrag::decodeKey( de );
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return; }
+	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue( de );
 
 	// Track must be the same type to paste into
-	if( type != ( "clip_" + QString::number( static_cast<int>(m_clip->getTrack()->type()) ) ) )
+	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::StringPairDataType::None)
 	{
 		return;
 	}
 
-	// Defer to rubberband paste if we're in that mode
-	if( m_trackView->trackContainerView()->allowRubberband() == true )
+	bool shouldAccept = processPaste(de->mimeData());
+
+	if (shouldAccept)
 	{
-		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		TimePos clipPos{m_clip->startPosition()};
-
-		if( tcw->pasteSelection( clipPos, de ) == true )
-		{
-			de->accept();
-		}
-		return;
+		de->accept();
 	}
-
-	// Don't allow pasting a clip into itself.
-	QObject* qwSource = de->source();
-	if( qwSource != nullptr &&
-	    dynamic_cast<ClipView *>( qwSource ) == this )
-	{
-		return;
-	}
-
-	// Copy state into existing clip
-	DataFile dataFile( value.toUtf8() );
-	TimePos pos = m_clip->startPosition();
-	QDomElement clips = dataFile.content().firstChildElement("clips");
-	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
-	m_clip->movePosition( pos );
-	AutomationClip::resolveAllIDs();
-	de->accept();
 }
 
 
@@ -818,9 +811,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-			new StringPairDrag( QString( "clip_%1" ).arg(
-								static_cast<int>(m_clip->getTrack()->type()) ),
-								dataFile.toString(), thumbnail, this );
+			new StringPairDrag(getClipStringPairType(m_clip->getTrack()),
+					dataFile.toString(), thumbnail, this);
 		}
 	}
 
@@ -1156,6 +1148,77 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 	}
 }
 
+std::vector<InteractiveModelView::ModelShortcut> ClipView::getShortcuts()
+{
+	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
+		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy clip")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste clip")), false),
+		InteractiveModelView::ModelShortcut(Qt::Key_X, Qt::ControlModifier, 0, QString(tr("Cut out clip")), false)
+	};
+	return shortcuts;
+}
+
+void ClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
+{
+	switch (shortcutLocation)
+	{
+		case 0:
+			contextMenuAction(ContextMenuAction::Copy);
+			//static void startHighlighting(Clipboard::StringPairDataType dataType);
+			break;
+		case 1:
+			contextMenuAction(ContextMenuAction::Paste);
+			break;
+		case 2:
+			if (fixedClips() == false)
+			{
+				contextMenuAction(ContextMenuAction::Cut);
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+QString ClipView::getShortcutMessage()
+{
+	return m_shortcutMessage;
+}
+
+bool ClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+{
+	return dataType == getClipStringPairType(m_clip->getTrack());;
+}
+
+bool ClipView::processPaste(const QMimeData* mimeData)
+{
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	QString value = Clipboard::decodeValue(mimeData);
+	// Track must be the same type to paste into
+	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::StringPairDataType::None) { return false; }
+
+	bool shouldAccept = false;
+
+	TrackContentWidget* tcw = getTrackView()->getTrackContentWidget();
+	TimePos clipPos{m_clip->startPosition()};
+
+	if (tcw->pasteSelection(clipPos, mimeData, false) == true)
+	{
+		shouldAccept = true;
+		InteractiveModelView::stopHighlighting();
+		remove();
+	}
+	return shouldAccept;
+}
+
+void ClipView::overrideSetIsHighlighted(bool isHighlighted)
+{
+	if (getIsHighlighted() != isHighlighted) { setNeedsUpdate(true); }
+	setIsHighlighted(isHighlighted);
+}
+
+
 QVector<ClipView *> ClipView::getClickedClips()
 {
 	// Get a list of selected selectableObjects
@@ -1190,15 +1253,12 @@ void ClipView::remove( QVector<ClipView *> clipvs )
 
 void ClipView::copy( QVector<ClipView *> clipvs )
 {
-	// For copyStringPair()
-	using namespace Clipboard;
-
 	// Write the Clips to a DataFile for copying
 	DataFile dataFile = createClipDataFiles( clipvs );
 
 	// Copy the Clip type as a key and the Clip data file to the clipboard
-	copyStringPair( QString( "clip_%1" ).arg( static_cast<int>(m_clip->getTrack()->type()) ),
-		dataFile.toString() );
+	Clipboard::copyStringPair(getClipStringPairType(m_clip->getTrack()), dataFile.toString());
+	InteractiveModelView::startHighlighting(getClipStringPairType(m_clip->getTrack()));
 }
 
 void ClipView::cut( QVector<ClipView *> clipvs )
@@ -1212,19 +1272,21 @@ void ClipView::cut( QVector<ClipView *> clipvs )
 
 void ClipView::paste()
 {
-	// For getMimeData()
-	using namespace Clipboard;
+	processPaste(Clipboard::getMimeData());
 
+	/*
 	// If possible, paste the selection on the TimePos of the selected Track and remove it
 	TimePos clipPos{m_clip->startPosition()};
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
-	if( tcw->pasteSelection( clipPos, getMimeData() ) )
+
+	if( tcw->pasteSelection( clipPos, Clipboard::getMimeData() ) )
 	{
 		// If we succeed on the paste we delete the Clip we pasted on
 		remove();
 	}
+	*/
 }
 
 void ClipView::toggleMute( QVector<ClipView *> clipvs )
@@ -1511,6 +1573,31 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 auto ClipView::hasCustomColor() const -> bool
 {
 	return m_clip->color().has_value() || m_clip->getTrack()->color().has_value();
+}
+
+Clipboard::StringPairDataType ClipView::getClipStringPairType(Track* track)
+{
+	switch (track->type())
+	{
+		case Track::Type::Instrument:
+			return Clipboard::StringPairDataType::MidiClip;
+			break;
+		case Track::Type::Pattern:
+			return Clipboard::StringPairDataType::PatternClip;
+			break;
+		case Track::Type::Sample:
+			return Clipboard::StringPairDataType::SampleClip;
+			break;
+		case Track::Type::Automation:
+			return Clipboard::StringPairDataType::AutomationClip;
+			break;
+		case Track::Type::HiddenAutomation:
+			return Clipboard::StringPairDataType::AutomationClip;
+			break;
+		default:
+			break;
+	}
+	return Clipboard::StringPairDataType::None;
 }
 
 } // namespace lmms::gui

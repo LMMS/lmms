@@ -102,8 +102,11 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
+		Clipboard::StringPairDataType::SampleFile,
+		Clipboard::StringPairDataType::SampleData
+	};
+	if (StringPairDrag::processDragEnterEvent(_dee, &acceptedKeys) == false)
 	{
 		ClipView::dragEnterEvent( _dee );
 	}
@@ -116,21 +119,11 @@ void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleClipView::dropEvent( QDropEvent * _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	bool shouldAccept = processPaste(_de->mimeData());
+
+	if (shouldAccept)
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
-	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
-	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
-		m_clip->updateLength();
-		update();
-		_de->accept();
-	}
-	else
-	{
-		ClipView::dropEvent( _de );
 	}
 }
 
@@ -319,12 +312,48 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
 
+	drawAutoHighlight(&p);
 	p.end();
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
+bool SampleClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+{
+	return dataType == Clipboard::StringPairDataType::SampleFile
+		|| dataType == Clipboard::StringPairDataType::SampleData
+		|| ClipView::canAcceptClipboardData(dataType);
+}
 
+bool SampleClipView::processPaste(const QMimeData* mimeData)
+{
+	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
+	bool shouldAccept = false;
+	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+
+	if (type == Clipboard::StringPairDataType::SampleFile)
+	{
+		m_clip->setSampleFile( Clipboard::decodeValue(mimeData));
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::StringPairDataType::SampleData)
+	{
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(Clipboard::decodeValue(mimeData)));
+		m_clip->updateLength();
+		update();
+		shouldAccept = true;
+	}
+
+	if (shouldAccept)
+	{
+		InteractiveModelView::stopHighlighting();
+	}
+	else
+	{
+		shouldAccept = ClipView::processPaste(mimeData);
+	}
+	return shouldAccept;
+}
 
 
 void SampleClipView::reverseSample()
