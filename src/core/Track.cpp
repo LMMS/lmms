@@ -167,6 +167,8 @@ Track* Track::clone()
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
+	// giving different name to cloned track
+	t->setName(findUniqueName(name()));
 
 	AutomationClip::resolveAllIDs();
 	return t;
@@ -650,6 +652,56 @@ void Track::setColor(const std::optional<QColor>& color)
 BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
+}
+
+QString Track::findUniqueName(const QString& sourceName) const
+{
+	QString output = sourceName;
+	// removing number from `sourceName`
+	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName).size();
+	if (sourceNumberLength > 0)
+	{
+		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
+		sourceNumberLength++;
+		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
+	}
+	
+	const TrackContainer::TrackList& trackList = m_trackContainer->tracks();
+	
+	size_t maxNameCounter = 0;
+	bool found = false;
+	
+	for (const Track* it : trackList)
+	{
+		if (it->name().startsWith(sourceName))
+		{
+			size_t nameCount = Track::getNameNumberEnding(it->name()).toInt();
+			maxNameCounter = maxNameCounter < nameCount ? nameCount : maxNameCounter;
+			found = true;
+		}
+	}
+	
+	if (found)
+	{
+		output = output + " " + QString::number(maxNameCounter + 1);
+	}
+
+	return output;
+}
+
+QString Track::getNameNumberEnding(const QString& name)
+{
+	QString numberString = "";
+
+	// this should be safe with unsigned types
+	for (int i = name.size(); i-- > 0;)
+	{
+		if (name[i].isDigit() == true)
+		{
+			numberString = name[i] + numberString;
+		}
+	}
+	return numberString;
 }
 
 void Track::setName(const QString& newName)
