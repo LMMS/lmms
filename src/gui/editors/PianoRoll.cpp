@@ -3098,7 +3098,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6) { q = 6; }
 		}
-		auto xCoordOfTick = [=](int tick) {
+		auto xCoordOfTick = [this](int tick) {
 			return m_whiteKeyWidth + (
 				(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
 			);
