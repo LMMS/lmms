@@ -658,12 +658,12 @@ QString Track::findUniqueName(const QString& sourceName) const
 {
 	QString output = sourceName;
 	// removing number from `sourceName`
-	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName).size();
+	bool isSeparatedWithWhiteSpace = false;
+	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName, &isSeparatedWithWhiteSpace).size();
 	if (sourceNumberLength > 0)
 	{
-		qDebug("source name length");
 		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
-		sourceNumberLength++;
+		sourceNumberLength = isSeparatedWithWhiteSpace ? sourceNumberLength + 1 : sourceNumberLength;
 		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
 	}
 	
@@ -674,7 +674,7 @@ QString Track::findUniqueName(const QString& sourceName) const
 	
 	for (const Track* it : trackList)
 	{
-		if (it->name().startsWith(sourceName))
+		if (it->name().startsWith(output))
 		{
 			size_t nameCount = Track::getNameNumberEnding(it->name()).toInt();
 			maxNameCounter = maxNameCounter < nameCount ? nameCount : maxNameCounter;
@@ -684,14 +684,13 @@ QString Track::findUniqueName(const QString& sourceName) const
 	
 	if (found)
 	{
-		qDebug("found");
 		output = output + " " + QString::number(maxNameCounter + 1);
 	}
 
 	return output;
 }
 
-QString Track::getNameNumberEnding(const QString& name)
+QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace)
 {
 	QString numberString = "";
 
@@ -703,6 +702,10 @@ QString Track::getNameNumberEnding(const QString& name)
 		it--;
 		if (it->isDigit() == false)
 		{
+			if (isSeparatedWithWhiteSpace != nullptr)
+			{
+				*isSeparatedWithWhiteSpace = *it == ' ';
+			}
 			// the last character was not a number
 			// increase `it` to account for this (and make it point to a digit)
 			it++;

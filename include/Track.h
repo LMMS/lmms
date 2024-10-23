@@ -214,7 +214,7 @@ private:
 	void loadTrack(const QDomElement& element, bool presetMode);
 
 	//! returns the number characters at the end of a string
-	static QString getNameNumberEnding(const QString& name);
+	static QString getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace = nullptr);
 
 private:
 	TrackContainer* m_trackContainer;
