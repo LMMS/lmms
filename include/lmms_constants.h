@@ -42,7 +42,7 @@ template<typename T> constexpr T SQRT_2 = T(1.4142135623730950488016887242096980
 // probably be good to either keep these aliases but mark them as
 // deprecated, or to replace uses of them with the template versions
 // instead. Leaving them be for now.
-constexpr long double LD_2PI = TAU<long double>;
+constexpr long double LD_PI = PI<long double>;
 constexpr double D_PI = PI<double>;
 constexpr double D_2PI = TAU<double>;
 constexpr float F_PI = PI<float>;
