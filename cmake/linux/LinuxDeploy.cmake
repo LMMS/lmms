@@ -121,15 +121,7 @@ if(EXISTS "${VST64_BEFORE}")
 endif()
 
 # Patch desktop file
-file(READ "${DESKTOP_FILE}" DESKTOP_FILE_CONTENTS)
-#string(REPLACE "Exec=${lmms}" "Exec=${lmms}.real" DESKTOP_FILE_CONTENTS "${DESKTOP_FILE_CONTENTS}")
-file(WRITE "${DESKTOP_FILE}" "${DESKTOP_FILE_CONTENTS}")
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
-
-# TODO: Keep this symlink until LinuxDeployQt.cmake is removed
-# - First, edit launch_lmms.sh to point directly to /usr/bin/lmms (instead of lmms.real)
-# - Second, delete the below symlink; linuxdeploy supports wrappers natively; linuxdeployqt didn't;
-create_symlink("${APP}/usr/bin/${lmms}" "${APP}/usr/bin/${lmms}.real")
 
 # Build list of executables to inform linuxdeploy about
 # e.g. -executable=foo.dylib -executable=bar.dylib
