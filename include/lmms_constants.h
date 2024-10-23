@@ -25,36 +25,48 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
+#include <numbers>
+#include <concepts>
+
 namespace lmms
 {
 
+template<std::floating_point T> inline constexpr T Tau = T(std::numbers::pi_v<T> * 2.0);
+template<std::floating_point T> inline constexpr T HalfPi = T(std::numbers::pi_v<T> / 2.0);
+template<std::floating_point T> inline constexpr T PiSquared = T(std::numbers::pi_v<T> * std::numbers::pi_v<T>);
 
-constexpr long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
-constexpr long double LD_2PI = LD_PI * 2.0;
-constexpr long double LD_PI_2 = LD_PI * 0.5;
-constexpr long double LD_PI_R = 1.0 / LD_PI;
-constexpr long double LD_PI_SQR = LD_PI * LD_PI;
-constexpr long double LD_E = 2.71828182845904523536028747135266249775724709369995;
-constexpr long double LD_E_R = 1.0 / LD_E;
-constexpr long double LD_SQRT_2 = 1.41421356237309504880168872420969807856967187537695;
+inline constexpr long double LD_2PI = Tau<long double>;
+inline constexpr double D_2PI = Tau<double>;
+inline constexpr float F_2PI = Tau<float>;
+inline constexpr float F_PI_2 = HalfPi<float>;
+inline constexpr float F_PI_SQR = PiSquared<float>;
 
-constexpr double D_PI = (double) LD_PI;
-constexpr double D_2PI = (double) LD_2PI;
-constexpr double D_PI_2 = (double) LD_PI_2;
-constexpr double D_PI_R = (double) LD_PI_R;
-constexpr double D_PI_SQR = (double) LD_PI_SQR;
-constexpr double D_E = (double) LD_E;
-constexpr double D_E_R = (double) LD_E_R;
-constexpr double D_SQRT_2 = (double) LD_SQRT_2;
+[[deprecated("use std::numbers::pi_v<long double> instead")]]
+inline constexpr long double LD_PI = std::numbers::pi_v<long double>;
 
-constexpr float F_PI = (float) LD_PI;
-constexpr float F_2PI = (float) LD_2PI;
-constexpr float F_PI_2 = (float) LD_PI_2;
-constexpr float F_PI_R = (float) LD_PI_R;
-constexpr float F_PI_SQR = (float) LD_PI_SQR;
-constexpr float F_E = (float) LD_E;
-constexpr float F_E_R = (float) LD_E_R;
-constexpr float F_SQRT_2 = (float) LD_SQRT_2;
+[[deprecated("use std::numbers::pi_v<double> instead")]]
+inline constexpr double D_PI = std::numbers::pi_v<double>;
+
+[[deprecated("use std::numbers::pi_v<float> instead")]]
+inline constexpr float F_PI = std::numbers::pi_v<float>;
+
+[[deprecated("use std::numbers::e_v<long double> instead")]]
+inline constexpr long double LD_E = std::numbers::e_v<long double>;
+
+[[deprecated("use std::numbers::e_v<double> instead")]]
+inline constexpr double D_E = std::numbers::e_v<double>;
+
+[[deprecated("use std::numbers::e_v<float> instead")]]
+inline constexpr float F_E = std::numbers::e_v<float>;
+
+[[deprecated("use std::numbers::sqrt2_v<long double> instead")]]
+inline constexpr long double LD_SQRT_2 = std::numbers::sqrt2_v<long double>;
+
+[[deprecated("use std::numbers::sqrt2_v<double> instead")]]
+inline constexpr double D_SQRT_2 = std::numbers::sqrt2_v<double>;
+
+[[deprecated("use std::numbers::sqrt2_v<float> instead")]]
+inline constexpr float F_SQRT_2 = std::numbers::sqrt2_v<float>;
 
 constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
