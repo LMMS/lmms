@@ -28,28 +28,26 @@
 namespace lmms
 {
 
-template<typename T> constexpr T PI = T(3.14159265358979323846264338327950288419716939937510);
-template<typename T> constexpr T PI_2 = T(PI<T> / 2.0);
-template<typename T> constexpr T PI_R = T(1.0 / PI<T>);
-template<typename T> constexpr T PI_SQR = T(PI<T> * PI<T>);
-template<typename T> constexpr T TAU = T(PI<T> * 2.0);
-template<typename T> constexpr T TAU_R = T(1.0 / TAU<T>);
+template<typename T> constexpr T Pi = T(3.14159265358979323846264338327950288419716939937510);
+template<typename T> constexpr T Pi2 = T(Pi<T> / 2.0);
+template<typename T> constexpr T PiR = T(1.0 / Pi<T>);
+template<typename T> constexpr T PiSqr = T(Pi<T> * Pi<T>);
+template<typename T> constexpr T Tau = T(Pi<T> * 2.0);
+template<typename T> constexpr T TauR = T(1.0 / Tau<T>);
 template<typename T> constexpr T E = T(2.71828182845904523536028747135266249775724709369995);
-template<typename T> constexpr T E_R = T(1.0 / E<T>);
-template<typename T> constexpr T SQRT_2 = T(1.41421356237309504880168872420969807856967187537695);
+template<typename T> constexpr T ER = T(1.0 / E<T>);
+template<typename T> constexpr T Sqrt2 = T(1.41421356237309504880168872420969807856967187537695);
 
-// TODO these aliases are still in use across the codebase. It would
-// probably be good to either keep these aliases but mark them as
-// deprecated, or to replace uses of them with the template versions
-// instead. Leaving them be for now.
-constexpr long double LD_PI = PI<long double>;
-constexpr double D_PI = PI<double>;
-constexpr double D_2PI = TAU<double>;
-constexpr float F_PI = PI<float>;
-constexpr float F_2PI = TAU<float>;
-constexpr float F_PI_2 = PI_2<float>;
-constexpr float F_PI_SQR = PI_SQR<float>;
+constexpr long double LD_2PI = Tau<long double>;
+constexpr long double LD_PI = Pi<long double>;
+constexpr double D_PI = Pi<double>;
+constexpr double D_2PI = Tau<double>;
+constexpr float F_PI = Pi<float>;
+constexpr float F_2PI = Tau<float>;
+constexpr float F_PI_2 = Pi2<float>;
+constexpr float F_PI_SQR = PiSqr<float>;
 constexpr float F_E = E<float>;
+constexpr float F_SQRT_2 = Sqrt2<float>;
 
 constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
