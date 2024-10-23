@@ -694,7 +694,7 @@ QString Track::getNameNumberEnding(const QString& name)
 	QString numberString = "";
 
 	// this should be safe with unsigned types
-	for (int i = name.size(); i-- > 0;)
+	for (unsigned int i = name.size(); i-- > 0;)
 	{
 		if (name[i].isDigit() == true)
 		{
