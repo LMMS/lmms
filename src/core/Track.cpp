@@ -661,6 +661,7 @@ QString Track::findUniqueName(const QString& sourceName) const
 	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName).size();
 	if (sourceNumberLength > 0)
 	{
+		qDebug("source name length");
 		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
 		sourceNumberLength++;
 		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
@@ -683,6 +684,7 @@ QString Track::findUniqueName(const QString& sourceName) const
 	
 	if (found)
 	{
+		qDebug("found");
 		output = output + " " + QString::number(maxNameCounter + 1);
 	}
 
@@ -693,14 +695,28 @@ QString Track::getNameNumberEnding(const QString& name)
 {
 	QString numberString = "";
 
-	// this should be safe with unsigned types
-	for (unsigned int i = name.size(); i-- > 0;)
+	//! `it` will point to where the numbers start in `name`
+	auto it = name.end();
+	size_t digitCount = 0;
+	while (it != name.begin())
 	{
-		if (name[i].isDigit() == true)
+		it--;
+		if (it->isDigit() == false)
 		{
-			numberString = name[i] + numberString;
+			// the last character was not a number
+			// increase `it` to account for this (and make it point to a digit)
+			it++;
+			break;
 		}
+		digitCount++;
 	}
+
+	if (digitCount > 0)
+	{
+		numberString.resize(digitCount);
+		std::copy(it, name.end(), numberString.begin());
+	}
+		
 	return numberString;
 }
 
