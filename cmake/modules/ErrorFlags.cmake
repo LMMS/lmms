@@ -44,6 +44,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 			"-Werror" # Treat warnings as errors
 		)
 	endif()
+
+	set(SILENCE_DEPRECATION_DEFS "")
+	set(THIRD_PARTY_SILENCE_DEPRECATION_DEFS "")
 elseif(MSVC)
 	set(COMPILE_ERROR_FLAGS
 		"/W2" # Enable some warnings by default
@@ -65,8 +68,12 @@ elseif(MSVC)
 			"/WX" # Treat warnings as errors
 		)
 	endif()
+
+	set(SILENCE_DEPRECATION_DEFS "_SILENCE_CXX20_OLD_SHARED_PTR_ATOMIC_SUPPORT_DEPRECATION_WARNING")
+	set(THIRD_PARTY_SILENCE_DEPRECATION_DEFS "")
 endif()
 
 # Add the flags to the whole directory tree. We use the third-party flags for
 # targets whose SYSTEM property is true, and the normal flags otherwise.
 add_compile_options("$<IF:$<BOOL:$<TARGET_PROPERTY:SYSTEM>>,${THIRD_PARTY_COMPILE_ERROR_FLAGS},${COMPILE_ERROR_FLAGS}>")
+add_compile_definitions("$<IF:$<BOOL:$<TARGET_PROPERTY:SYSTEM>>,${THIRD_PARTY_SILENCE_DEPRECATION_DEFS},${SILENCE_DEPRECATION_DEFS}>")
