@@ -289,7 +289,9 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 						m_clip->getTimeMap().begin();
 					it != m_clip->getTimeMap().end(); ++it )
 	{
-		if( it+1 == m_clip->getTimeMap().end() )
+		const auto nit = std::next(it);
+
+		if( nit == m_clip->getTimeMap().end() )
 		{
 			const float x1 = POS(it) * ppTick;
 			const auto x2 = (float)(width() - BORDER_WIDTH);
@@ -316,13 +318,13 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		// the next node.
 		float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
 			? OUTVAL(it)
-			: INVAL(it + 1);
+			: INVAL(nit);
 
 		QPainterPath path;
 		QPointF origin = QPointF(POS(it) * ppTick, 0.0f);
 		path.moveTo( origin );
 		path.moveTo(QPointF(POS(it) * ppTick,values[0]));
-		for (int i = POS(it) + 1; i < POS(it + 1); i++)
+		for (int i = POS(it) + 1; i < POS(nit); i++)
 		{
 			float x = i * ppTick;
 			if( x > ( width() - BORDER_WIDTH ) ) break;
@@ -330,8 +332,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			path.lineTo( QPointF( x, value ) );
 
 		}
-		path.lineTo((POS(it + 1)) * ppTick, nextValue);
-		path.lineTo((POS(it + 1)) * ppTick, 0.0f);
+		path.lineTo((POS(nit)) * ppTick, nextValue);
+		path.lineTo((POS(nit)) * ppTick, 0.0f);
 		path.lineTo( origin );
 
 		if( gradient() )

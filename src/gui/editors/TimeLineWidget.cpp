@@ -35,6 +35,7 @@
 #include <QToolBar>
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "NStateButton.h"
@@ -242,8 +243,10 @@ auto TimeLineWidget::getClickedTime(const int xPosition) const -> TimePos
 
 auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::Action
 {
+	const auto pos = position(event);
+
 	const auto mode = ConfigManager::inst()->value("app", "loopmarkermode");
-	const auto xPos = event->x();
+	const auto xPos = pos.x();
 	const auto button = event->button();
 
 	if (mode == "handles")
@@ -286,7 +289,9 @@ auto TimeLineWidget::actionCursor(Action action) const -> QCursor
 
 void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 {
-	if (event->x() < m_xOffset) { return; }
+	const auto pos = position(event);
+
+	if (pos.x() < m_xOffset) { return; }
 
 	const auto shift = event->modifiers() & Qt::ShiftModifier;
 	const auto ctrl = event->modifiers() & Qt::ControlModifier;
@@ -298,14 +303,14 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 
 		if (m_action == Action::MoveLoop)
 		{
-			m_dragStartPos = getClickedTime(event->x());
+			m_dragStartPos = getClickedTime(pos.x());
 			m_oldLoopPos = {m_timeline->loopBegin(), m_timeline->loopEnd()};
 		}
 	}
 	else if (event->button() == Qt::LeftButton && ctrl) // selection
 	{
 		m_action = Action::SelectSongClip;
-		m_initalXSelect = event->x();
+		m_initalXSelect = pos.x();
 	}
 	else if (event->button() == Qt::LeftButton && !ctrl) // move playhead
 	{
@@ -329,7 +334,9 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 
-	auto timeAtCursor = getClickedTime(event->x());
+	const auto pos = position(event);
+
+	auto timeAtCursor = getClickedTime(pos.x());
 	const auto control = event->modifiers() & Qt::ControlModifier;
 
 	switch( m_action )
@@ -390,7 +397,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			break;
 		}
 		case Action::SelectSongClip:
-			emit regionSelectedFromPixels( m_initalXSelect , event->x() );
+			emit regionSelectedFromPixels( m_initalXSelect , pos.x() );
 			break;
 
 		default:

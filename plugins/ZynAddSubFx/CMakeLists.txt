@@ -126,11 +126,16 @@ target_static_libraries(ZynAddSubFxCore PUBLIC
 target_link_libraries(ZynAddSubFxCore INTERFACE
 	${FFTW3F_LIBRARIES}
 	${QT_LIBRARIES}
-	Qt5::Widgets
-	Qt5::Xml
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Xml
 	Threads::Threads
 	ZLIB::ZLIB
 )
+
+# Workaround for a build fail on MSVC with Qt 6
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(ZynAddSubFxCore PUBLIC "/Zc:__cplusplus" "/permissive-")
+ENDIF()
 
 LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
 IF(LMMS_BUILD_LINUX)
@@ -172,6 +177,11 @@ SET_PROPERTY(GLOBAL APPEND PROPERTY PLUGINS_BUILT "RemoteZynAddSubFx")
 
 TARGET_COMPILE_DEFINITIONS(RemoteZynAddSubFx PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
+# Workaround for a build fail on MSVC with Qt 6
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(RemoteZynAddSubFx PUBLIC "/Zc:__cplusplus" "/permissive-")
+ENDIF()
+
 IF(LMMS_BUILD_WIN32)
 	target_link_options(RemoteZynAddSubFx PRIVATE "-mwindows")
 ENDIF()
@@ -192,7 +202,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 # Support qt_version_tag in Qt 5.6
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt${QT_VERSION_MAJOR}::Core)
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)

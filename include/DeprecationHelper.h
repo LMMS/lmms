@@ -55,12 +55,42 @@ inline int horizontalAdvance(const QFontMetrics& metrics, const QString& text)
  * @param wheelEvent
  * @return the position of wheelEvent
  */
-inline QPoint position(QWheelEvent *wheelEvent)
+inline QPoint position(const QWheelEvent *wheelEvent)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
 	return wheelEvent->position().toPoint();
 #else
 	return wheelEvent->pos();
+#endif
+}
+
+/**
+ * @brief position is a backwards-compatible adapter for
+ * QMouseEvent::position and pos functions.
+ * @param me
+ * @return the position of the mouse event
+ */
+inline QPoint position(const QMouseEvent* me)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return me->position().toPoint();
+#else
+	return me->pos();
+#endif
+}
+
+/**
+ * @brief position is a backwards-compatible adapter for
+ * QDropEvent::position and pos functions.
+ * @param me
+ * @return the position of the drop event
+ */
+inline QPoint position(const QDropEvent* de)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return de->position().toPoint();
+#else
+	return de->pos();
 #endif
 }
 

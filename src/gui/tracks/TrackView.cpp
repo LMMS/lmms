@@ -36,6 +36,7 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "PixmapButton.h"
@@ -103,7 +104,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
 			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
-	
+
 	auto trackGrip = m_trackOperationsWidget.getTrackGrip();
 	connect(trackGrip, &TrackGrip::grabbed, this, &TrackView::onTrackGripGrabbed);
 	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
@@ -260,6 +261,7 @@ void TrackView::dropEvent( QDropEvent * de )
  */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
+	const auto pos = position(me);
 
 	// If previously dragged too small, restore on shift-leftclick
 	if( height() < DEFAULT_TRACK_HEIGHT &&
@@ -275,7 +277,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if( m_trackContainerView->allowRubberband() == true  && me->x() > widgetTotal )
+	if( m_trackContainerView->allowRubberband() == true  && pos.x() > widgetTotal )
 	{
 		QWidget::mousePressEvent( me );
 	}
@@ -284,7 +286,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 		if( me->modifiers() & Qt::ShiftModifier )
 		{
 			m_action = Action::Resize;
-			QCursor::setPos( mapToGlobal( QPoint( me->x(),
+			QCursor::setPos( mapToGlobal( QPoint( pos.x(),
 								height() ) ) );
 			QCursor c( Qt::SizeVerCursor);
 			QApplication::setOverrideCursor( c );
@@ -319,11 +321,13 @@ void TrackView::mousePressEvent( QMouseEvent * me )
  */
 void TrackView::mouseMoveEvent( QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	int widgetTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if( m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal )
+	if( m_trackContainerView->allowRubberband() == true && pos.x() > widgetTotal )
 	{
 		QWidget::mouseMoveEvent( me );
 	}
@@ -341,7 +345,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		if( trackAtY != nullptr && trackAtY != this )
 		{
 			// then move us up/down there!
-			if( me->y() < 0 )
+			if( pos.y() < 0 )
 			{
 				m_trackContainerView->moveTrackViewUp( this );
 			}
@@ -353,7 +357,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Resize )
 	{
-		resizeToHeight(me->y());
+		resizeToHeight(pos.y());
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )

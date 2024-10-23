@@ -103,6 +103,7 @@ option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
+option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -170,30 +171,40 @@ check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
-FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
+IF(WANT_QT6)
+	SET(QT_VERSION_MAJOR 6)
+	SET(LMMS_QT_MIN_VERSION 6.0.0)
+	SET(STATUS_QT6 "ENABLED")
+ELSE()
+	SET(QT_VERSION_MAJOR 5)
+	SET(LMMS_QT_MIN_VERSION 5.9.0)
+	SET(STATUS_QT6 "NOT ENABLED")
+ENDIF()
+
+FIND_PACKAGE(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
 
 include_directories(SYSTEM
-	${Qt5Core_INCLUDE_DIRS}
-	${Qt5Gui_INCLUDE_DIRS}
-	${Qt5Widgets_INCLUDE_DIRS}
-	${Qt5Xml_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Core_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Gui_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Xml_INCLUDE_DIRS}
 )
 
 SET(QT_LIBRARIES
-	Qt5::Core
-	Qt5::Gui
-	Qt5::Widgets
-	Qt5::Xml
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Gui
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Xml
 )
 
-IF(LMMS_BUILD_LINUX AND WANT_VST)
+IF(LMMS_BUILD_LINUX AND WANT_VST AND NOT WANT_QT6)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
 
-# Resolve Qt5::qmake to full path for use in packaging scripts
-GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
+# Resolve qmake to full path for use in packaging scripts
+GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
 
 # Find the location of Qt translation files
 execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
@@ -206,8 +217,8 @@ IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	ADD_DEFINITIONS("-DQT_TRANSLATIONS_DIR=\"${QT_TRANSLATIONS_DIR}\"")
 ENDIF()
 
-FIND_PACKAGE(Qt5Test)
-SET(QT_QTTEST_LIBRARY Qt5::Test)
+FIND_PACKAGE(Qt${QT_VERSION_MAJOR}Test)
+SET(QT_QTTEST_LIBRARY Qt${QT_VERSION_MAJOR}::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
@@ -831,6 +842,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Experimental Qt6 support          : ${STATUS_QT6}\n"
 )
 
 MESSAGE(
