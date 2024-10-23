@@ -21,7 +21,7 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 	# Check if fuse is needed
 	if("${RESULT_VARIABLE}" MATCHES "\\.AppImage$" OR "${_name}" MATCHES "\\.AppImage$")
 		message(STATUS "AppImage detected, we'll extract the AppImage before using")
-		set(_${RESULT_VARIABLE}_IS_APPIMAGE true)
+		set(_${RESULT_VARIABLE}_IS_APPIMAGE TRUE)
     endif()
 
 	# Determine a suitable working directory
