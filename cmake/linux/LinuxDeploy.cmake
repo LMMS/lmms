@@ -10,13 +10,13 @@ set(APPIMAGE_BEFORE_RENAME "${CPACK_BINARY_DIR}/${LMMS}-${ARCH}.AppImage")
 
 set(DESKTOP_FILE "${APP}/usr/share/applications/${lmms}.desktop")
 
+# Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
-set(VERBOSITY 1)
-# Set to "STDOUT" to show all verbose commands
-set(COMMAND_ECHO NONE)
-set(OUTPUT_QUIET OUTPUT_QUIET)
-
-if(CPACK_DEBUG)
+if(NOT CPACK_DEBUG)
+	set(VERBOSITY 1)
+	set(COMMAND_ECHO NONE)
+	set(OUTPUT_QUIET OUTPUT_QUIET)
+else()
 	set(VERBOSITY 2)
 	set(COMMAND_ECHO STDOUT)
 	unset(OUTPUT_QUIET)
@@ -36,13 +36,13 @@ file(REMOVE ${cleanup})
 download_binary(LINUXDEPLOY_BIN
 	"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
 	linuxdeploy-${ARCH}.AppImage
-	false)
+	FALSE)
 
 # Download linuxdeploy-plugin-qt
 download_binary(LINUXDEPLOY_PLUGIN_BIN
 	"https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${ARCH}.AppImage"
 	linuxdeploy-plugin-qt-${ARCH}.AppImage
-	false)
+	FALSE)
 
 message(STATUS "Creating AppDir ${APP}...")
 
