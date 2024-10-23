@@ -39,7 +39,6 @@ jobs:
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX=./install \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -209,7 +208,6 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX=./install \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-${{ matrix.arch }}.cmake" \
                 $CMAKE_OPTS
       - name: Build
