@@ -28,11 +28,11 @@
 #include <stdexcept>
 #include <string>
 
-namespace lmms {
+namespace lmms
+{
 
 AudioResampler::AudioResampler(int interpolationMode, int channels)
-	: m_interpolationMode(interpolationMode)
-	, m_channels(channels)
+	: m_interpolationMode(interpolationMode), m_channels(channels)
 	, m_state(src_new(interpolationMode, channels, &m_error))
 {
 	if (!m_state)
