@@ -18,7 +18,13 @@ include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
 
 # Already done by toplevel
-find_library(ASOUND_LIBRARY asound)
+# Using NO_DEFAULT_PATH to ignore vcpkg's alsa package
+find_library(ASOUND_LIBRARY
+    NAMES asound
+    HINTS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu
+    PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu
+    NO_DEFAULT_PATH)
+
 set(ASOUND_LIBRARY_DIR "")
 if(ASOUND_LIBRARY)
    get_filename_component(ASOUND_LIBRARY_DIR ${ASOUND_LIBRARY} PATH)
