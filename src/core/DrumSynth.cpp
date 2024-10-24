@@ -30,6 +30,8 @@
 #include <cstring>
 #include <sstream>
 
+#include "lmms_math.h"
+
 #ifdef _MSC_VER
 // not #if LMMS_BUILD_WIN32 because we have strncasecmp in mingw
 #define strcasecmp _stricmp
@@ -403,13 +405,13 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	timestretch *= Fs / 44100.f;
 
 	DGain = 1.0f; // leave this here!
-	DGain = static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileFloat(sec, "Level", 0, dsfile)));
+	DGain = fastPow10f(0.05 * GetPrivateProfileFloat(sec, "Level", 0, dsfile));
 
 	MasterTune = GetPrivateProfileFloat(sec, "Tuning", 0.0, dsfile);
-	MasterTune = static_cast<float>(std::pow(1.0594631f, MasterTune + mem_tune));
+	MasterTune = std::pow(1.0594631f, MasterTune + mem_tune);
 	MainFilter = 2 * GetPrivateProfileInt(sec, "Filter", 0, dsfile);
 	MFres = 0.0101f * GetPrivateProfileFloat(sec, "Resonance", 0.0, dsfile);
-	MFres = static_cast<float>(std::pow(MFres, 0.5f));
+	MFres = std::sqrt(MFres);
 
 	HighPass = GetPrivateProfileInt(sec, "HighPass", 0, dsfile);
 	GetEnv(7, sec, "FilterEnv", dsfile);
@@ -455,7 +457,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	TDroopRate = GetPrivateProfileFloat(sec, "Droop", 0.f, dsfile);
 	if (TDroopRate > 0.f)
 	{
-		TDroopRate = static_cast<float>(std::pow(10.0f, (TDroopRate - 20.0f) / 30.0f));
+		TDroopRate = fastPow10f((TDroopRate - 20.0f) / 30.0f);
 		TDroopRate = TDroopRate * -4.f / envData[1][MAX];
 		TDroop = 1;
 		F2 = F1 + ((F2 - F1) / (1.f - static_cast<float>(exp(TDroopRate * envData[1][MAX]))));
@@ -482,7 +484,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	OW1 = GetPrivateProfileInt(sec, "Wave1", 0, dsfile);
 	OW2 = GetPrivateProfileInt(sec, "Wave2", 0, dsfile);
 	OBal2 = static_cast<float>(GetPrivateProfileInt(sec, "Param", 50, dsfile));
-	ODrive = static_cast<float>(std::pow(OBal2, 3.0f)) / std::pow(50.0f, 3.0f);
+	ODrive = (OBal2 * OBal2 * OBal2) / 125000.0f;
 	OBal2 *= 0.01f;
 	OBal1 = 1.f - OBal2;
 	Ophi1 = Tphi;
@@ -556,9 +558,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	{
 		DAtten = DGain * static_cast<short>(LoudestEnv());
 		clippoint = DAtten > 32700 ? 32700 : static_cast<short>(DAtten);
-		DAtten = static_cast<float>(std::pow(2.0, 2.0 * GetPrivateProfileInt(sec, "Bits", 0, dsfile)));
-		DGain = DAtten * DGain
-			* static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileInt(sec, "Clipping", 0, dsfile)));
+		DAtten = std::exp2(2.0 * GetPrivateProfileInt(sec, "Bits", 0, dsfile));
+		DGain = DAtten * DGain * fastPow10f(0.05 * GetPrivateProfileInt(sec, "Clipping", 0, dsfile));
 	}
 
 	// prepare envelopes
@@ -856,7 +857,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				MFtmp = envData[7][ENV];
 				if (MFtmp > 0.2f)
 				{
-					MFfb = 1.001f - static_cast<float>(std::pow(10.0f, MFtmp - 1));
+					MFfb = 1.001f - fastPow10f(MFtmp - 1);
 				}
 				else
 				{
@@ -883,7 +884,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				MFtmp = envData[7][ENV];
 				if (MFtmp > 0.2f)
 				{
-					MFfb = 1.001f - static_cast<float>(std::pow(10.0f, MFtmp - 1));
+					MFfb = 1.001f - fastPow10f(MFtmp - 1);
 				}
 				else
 				{
