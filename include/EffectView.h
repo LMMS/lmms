@@ -26,15 +26,17 @@
 #ifndef LMMS_GUI_EFFECT_VIEW_H
 #define LMMS_GUI_EFFECT_VIEW_H
 
-#include "AutomatableModel.h"
 #include "PluginView.h"
-#include "Effect.h"
 
 class QGraphicsOpacityEffect;
-class QGroupBox;
-class QLabel;
-class QPushButton;
 class QMdiSubWindow;
+class QHBoxLayout;
+class QToolButton;
+
+namespace lmms
+{
+class Effect;
+}
 
 namespace lmms::gui
 {
@@ -43,6 +45,7 @@ class EffectControlDialog;
 class Knob;
 class LedCheckBox;
 class TempoSyncKnob;
+class EffectLabelButton;
 
 
 class EffectView : public PluginView
@@ -62,7 +65,7 @@ public:
 	}
 
 	static constexpr int DEFAULT_WIDTH = 215;
-	static constexpr int DEFAULT_HEIGHT = 60;
+	static constexpr int DEFAULT_HEIGHT = 47;
 	
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
@@ -88,17 +91,16 @@ protected:
 
 
 private:
-	QPixmap m_bg;
+	QHBoxLayout* m_mainLayout;
 	LedCheckBox * m_bypass;
+	EffectLabelButton* m_label;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;
-
 } ;
 
 
