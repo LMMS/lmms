@@ -42,6 +42,8 @@ public:
 	InstrumentView( Instrument * _instrument, QWidget * _parent );
 	~InstrumentView() override;
 
+	virtual bool isResizable() const { return false; }
+
 	Instrument * model()
 	{
 		return( castModel<Instrument>() );
