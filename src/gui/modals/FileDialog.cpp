@@ -46,19 +46,25 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-#ifdef LMMS_BUILD_LINUX
-	QList<QUrl> urls;
-#else
 	QList<QUrl> urls = sidebarUrls();
-#endif
+
+	auto addUnique = [&](const QString& path)
+	{
+		auto newUrl = QUrl::fromLocalFile(path);
+
+		if (!urls.contains(newUrl))
+		{
+			urls << newUrl;
+		}
+	};
 
 	QDir desktopDir;
 	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
 	if (desktopDir.exists())
 	{
-		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
+	    addUnique(desktopDir.absolutePath());
 	}
-	
+
 	QDir downloadDir(QDir::homePath() + "/Downloads");
 	if (!downloadDir.exists())
 	{
@@ -66,24 +72,24 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	}
 	if (downloadDir.exists())
 	{
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
+		addUnique(downloadDir.absolutePath());
 	}
 
 	QDir musicDir;
 	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
 	if (musicDir.exists())
 	{
-		urls << QUrl::fromLocalFile(musicDir.absolutePath());
+		addUnique(musicDir.absolutePath());
 	}
 
-	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
-	
+	addUnique(ConfigManager::inst()->workingDir());
+
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
 #ifdef LMMS_BUILD_APPLE
 	QDir volumesDir( QDir("/Volumes") );
 	if ( volumesDir.exists() )
-		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+		addUnique(volumesDir.absolutePath());
 #endif
 
 #ifdef LMMS_BUILD_LINUX
@@ -96,15 +102,14 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 		storage.refresh();
 
 		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
-		{			
-			urls << QUrl::fromLocalFile(storage.rootPath());	
+		{
+			addUnique(storage.rootPath());
 		}
 	}
 #endif
 
 	setSidebarUrls(urls);
 }
-
 
 QString FileDialog::getExistingDirectory(QWidget *parent,
 										const QString &caption,
