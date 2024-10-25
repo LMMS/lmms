@@ -125,8 +125,7 @@ private:
 namespace gui
 {
 
-ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
-		const AutomatableModel * _target_model ) :
+ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, const AutomatableModel * _target_model ) :
 	QDialog( _parent ),
 	m_readablePorts( nullptr ),
 	m_midiAutoDetect( false ),
@@ -138,51 +137,51 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	setWindowTitle( tr( "Connection Settings" ) );
 	setModal( true );
 
-	// Midi stuff
+
+
+	// MIDI CONTROLLER Section
 	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
 	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
 	connect( m_midiGroupBox->model(), SIGNAL(dataChanged()),
 			this, SLOT(midiToggled()));
 	
-	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
-			tr( "Input channel" ) );
+	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox, tr( "Input channel" ) );
 	m_midiChannelSpinBox->addTextForValue( 0, "--" );
 	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_midiChannelSpinBox->move( 8, 24 );
 
-	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
-			tr( "Input controller" ) );
+	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox, tr( "Input controller" ) );
 	m_midiControllerSpinBox->addTextForValue(MidiController::NONE, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
 	m_midiControllerSpinBox->move( 68, 24 );
 	
-
-	m_midiAutoDetectCheckBox =
-			new LedCheckBox( tr("Auto Detect"),
-				m_midiGroupBox, tr("Auto Detect") );
+	m_midiAutoDetectCheckBox = new LedCheckBox( tr("Auto Detect"), m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
 	m_midiAutoDetectCheckBox->move( 8, 60 );
 	connect( &m_midiAutoDetect, SIGNAL(dataChanged()),
 			this, SLOT(autoDetectToggled()));
+
+
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		m_readablePorts = new MidiPortMenu( MidiPort::Mode::Input );
+
 		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
 				this, SLOT(enableAutoDetect(QAction*)));
+
 		auto rp_btn = new ToolButton(m_midiGroupBox);
-		rp_btn->setText( tr( "MIDI-devices to receive "
-						"MIDI-events from" ) );
-		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
-		rp_btn->setGeometry( 160, 24, 32, 32 );
-		rp_btn->setMenu( m_readablePorts );
-		rp_btn->setPopupMode( QToolButton::InstantPopup );
+			rp_btn->setText( tr( "MIDI-devices to receive MIDI-events from" ) );
+			rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
+			rp_btn->setGeometry( 160, 24, 32, 32 );
+			rp_btn->setMenu( m_readablePorts );
+			rp_btn->setPopupMode( QToolButton::InstantPopup );
 	}
 
 
-	// User stuff
+	// USER CONTROLLER Section
 	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
 	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
 	connect( m_userGroupBox->model(), SIGNAL(dataChanged()),
@@ -200,7 +199,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			this, SLOT(userSelected()));
 
 
-	// Mapping functions
+	// MAPPING FUNCTION Section
 	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
 	m_mappingBox->setGeometry( 8, 170, 240, 64 );
 	m_mappingFunction = new QLineEdit( m_mappingBox );
@@ -241,7 +240,6 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	if( m_targetModel )
 	{
 		cc = m_targetModel->controllerConnection();
-
 		if( cc && cc->getController()->type() != Controller::ControllerType::Dummy && Engine::getSong() )
 		{
 			if ( cc->getController()->type() == Controller::ControllerType::Midi )
@@ -318,6 +316,7 @@ void ControllerConnectionDialog::selectController()
 			m_controller = mc;
 		}
 	}
+
 	// User
 	else 
 	{
@@ -339,8 +338,8 @@ void ControllerConnectionDialog::selectController()
 }
 
 
-
-
+// Comments from someone trying to get their head around Qt!
+// MIDI CONTROLLER Section logic (Doubles as a Radio-button kinda logic together with USER CONTROLLER Section, apaprently)
 void ControllerConnectionDialog::midiToggled()
 {
 	int enabled = m_midiGroupBox->model()->value();
@@ -373,7 +372,11 @@ void ControllerConnectionDialog::midiToggled()
 			connect( m_midiController, SIGNAL(valueChanged()), this, SLOT(midiValueChanged()));
 		}
 	}
-	m_midiAutoDetect.setValue( enabled );
+
+	// TODO: This should be reworked into some sort of "shadow" state rather than turning it off...
+	// since it makes for switching between the USER mode and CONTROLLER mode a bit awkward
+	// If you toggle the autodetect then move from MIDI to USER then back to MIDI it resets, which is not ideal.
+	m_midiAutoDetect.setValue( enabled && (!m_targetModel->controllerConnection()) );
 
 	m_midiChannelSpinBox->setEnabled( enabled );
 	m_midiControllerSpinBox->setEnabled( enabled );
@@ -382,7 +385,7 @@ void ControllerConnectionDialog::midiToggled()
 
 
 
-
+// USER CONTROLLER Section logic (Doubles as a Radio-button kinda logic together with MIDI CONTROLLER Section, apparently)
 void ControllerConnectionDialog::userToggled()
 {
 	int enabled = m_userGroupBox->model()->value();
@@ -403,7 +406,8 @@ void ControllerConnectionDialog::userSelected()
 
 
 
-
+// TODO: Suggestion, maybe this _should be an issue?_, toggling Autodetect ON should NOT clear the controller,
+// instead, a proper 'clear connection' button should be implemented; This prevents accidents, and makes UI clearer!
 void ControllerConnectionDialog::autoDetectToggled()
 {
 	if (m_midiAutoDetect.value() && m_midiController)
@@ -420,6 +424,7 @@ void ControllerConnectionDialog::midiValueChanged()
 	if( m_midiAutoDetect.value() )
 	{
 		m_midiController->useDetected();
+		m_midiAutoDetect.setValue( false );
 		if( m_readablePorts )
 		{
 			m_readablePorts->updateMenu();
