@@ -165,7 +165,7 @@ file(GLOB UNWANTED_LIBS
 	"${APP}/usr/lib/libjack*")
 
 list(SORT UNWANTED_LIBS)
-foreach(_LIB UNWANTED_LIBS)
+foreach(_LIB IN LISTS UNWANTED_LIBS)
 	file(REMOVE "${_LIB}")
 endforeach()
 
