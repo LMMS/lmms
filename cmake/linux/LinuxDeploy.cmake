@@ -86,10 +86,10 @@ set(VST32 "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
 if(EXISTS "${VST32_BEFORE}")
 	create_symlink("${VST32_BEFORE}" "${VST32}")
 	execute_process(COMMAND ldd "${VST32}"
-			OUTPUT_VARIABLE LDD_OUTPUT
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-			COMMAND_ECHO ${COMMAND_ECHO}
-			COMMAND_ERROR_IS_FATAL ANY)
+		OUTPUT_VARIABLE LDD_OUTPUT
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
 	string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
@@ -106,10 +106,10 @@ set(VST64 "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
 if(EXISTS "${VST64_BEFORE}")
 	create_symlink("${VST64_BEFORE}" "${VST64}")
 	execute_process(COMMAND ldd "${VST64}"
-			OUTPUT_VARIABLE LDD_OUTPUT
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-			COMMAND_ECHO ${COMMAND_ECHO}
-			COMMAND_ERROR_IS_FATAL ANY)
+		OUTPUT_VARIABLE LDD_OUTPUT
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
 	string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 	foreach(line ${LDD_LIST})
 		if(line MATCHES "libwine.so" AND line MATCHES "not found")
@@ -124,7 +124,7 @@ endif()
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
 # Build list of executables to inform linuxdeploy about
-# e.g. -executable=foo.dylib -executable=bar.dylib
+# e.g. --executable=foo.dylib --executable=bar.dylib
 file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
 #file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
 # TODO: Both Linux and Mac have LADPSA plugins in this listing, but why?
@@ -141,7 +141,9 @@ list(SORT LIBS)
 
 # Construct linuxdeploy parameters
 foreach(_LIB IN LISTS LIBS)
-	list(APPEND EXECUTABLES "-executable=${_LIB}")
+	if(EXISTS "${_LIB}")
+		list(APPEND EXECUTABLES "--executable=${_LIB}")
+	endif()
 endforeach()
 
 # Call linuxdeploy
@@ -152,30 +154,36 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--desktop-file "${APP}/usr/share/applications/${lmms}.desktop"
 	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
+	${EXECUTABLES}
 	--verbosity ${VERBOSITY}
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
 
 # Remove libraries that are normally sytem-provided
-file(GLOB UNWANTED_LIBS
+file(GLOB EXCLUDE_LIBS
 	"${APP}/usr/lib/libwine*"
 	"${APP}/usr/lib/libcarla*"
 	"${APP}/usr/lib/optional/libcarla*"
 	"${APP}/usr/lib/libjack*")
 
-list(SORT UNWANTED_LIBS)
-foreach(_LIB IN LISTS UNWANTED_LIBS)
-	file(REMOVE "${_LIB}")
+list(SORT EXCLUDE_LIBS)
+foreach(_LIB IN LISTS EXCLUDE_LIBS)
+	if(EXISTS "${_LIB}")
+		get_filename_component(_LIBNAME "${_LIB}" NAME)
+		file(REMOVE "${_LIB}")
+		# Exclude requires glob pattern
+		list(APPEND EXCLUDES "--exclude-library=${_LIBNAME}")
+	endif()
 endforeach()
 
 # Bundle jack to avoid crash for systems without it
 # See https://github.com/LMMS/lmms/pull/4186
 execute_process(COMMAND ldd "${APP}/usr/bin/${lmms}"
-			OUTPUT_VARIABLE LDD_OUTPUT
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-			COMMAND_ECHO ${COMMAND_ECHO}
-			COMMAND_ERROR_IS_FATAL ANY)
+	OUTPUT_VARIABLE LDD_OUTPUT
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	COMMAND_ECHO ${COMMAND_ECHO}
+	COMMAND_ERROR_IS_FATAL ANY)
 string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
 foreach(line ${LDD_LIST})
 	if(line MATCHES "libjack\\.so")
@@ -218,8 +226,8 @@ if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
 	file(REMOVE "${RUN_FILE}")
 	execute_process(COMMAND makeself
 		--keep-umask
-	    --nox11
-	    ${MAKESELF_QUIET}
+		--nox11
+		${MAKESELF_QUIET}
 		"${APP}"
 		"${RUN_FILE}"
 		"${LMMS} Installer"
@@ -230,32 +238,33 @@ if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
 
 	# ensure the installer can be executed as a script file
 	execute_process(COMMAND "${RUN_FILE}" --help
-    		${OUTPUT_QUIET}
-    		${ERROR_QUIET}
-    		COMMAND_ECHO ${COMMAND_ECHO}
-    		COMMAND_ERROR_IS_FATAL ANY)
+		${OUTPUT_QUIET}
+		${ERROR_QUIET}
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
 
-    message(STATUS "Installer created: ${RUN_FILE}")
+	message(STATUS "Installer created: ${RUN_FILE}")
 else()
 	# Create AppImage (default)
-    # appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
-    set(ENV{ARCH} "${ARCH}")
-    message(STATUS "Finishing the AppImage...")
-    execute_process(COMMAND "${LINUXDEPLOY_BIN}"
-    	--appdir "${APP}"
-    	--output appimage
-    	--verbosity ${VERBOSITY}
-    	${OUTPUT_QUIET}
-    	COMMAND_ECHO ${COMMAND_ECHO}
-    	COMMAND_ERROR_IS_FATAL ANY)
+	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
+	set(ENV{ARCH} "${ARCH}")
+	message(STATUS "Finishing the AppImage...")
+	execute_process(COMMAND "${LINUXDEPLOY_BIN}"
+		--appdir "${APP}"
+		--output appimage
+		${EXCLUDES}
+		--verbosity ${VERBOSITY}
+		${OUTPUT_QUIET}
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
 
-    message(STATUS "AppImage created successfully... renaming...")
+	message(STATUS "AppImage created successfully... renaming...")
 
-    if(EXISTS "${APPIMAGE_BEFORE_RENAME}")
-    	file(RENAME "${APPIMAGE_BEFORE_RENAME}" "${APPIMAGE_FILE}")
-    	message(STATUS "AppImage created: ${APPIMAGE_FILE}")
-    else()
-    	message(FATAL_ERROR "An error occured generating the AppImage")
-    endif()
+	if(EXISTS "${APPIMAGE_BEFORE_RENAME}")
+		file(RENAME "${APPIMAGE_BEFORE_RENAME}" "${APPIMAGE_FILE}")
+		message(STATUS "AppImage created: ${APPIMAGE_FILE}")
+	else()
+		message(FATAL_ERROR "An error occured generating the AppImage")
+	endif()
 endif()
 
