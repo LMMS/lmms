@@ -99,7 +99,7 @@ macro(download_binary RESULT_VARIABLE _url _name _prepend_to_path)
 	endif()
 
 	# We need to create a subdirectory for this binary and symlink it's AppRun to where it's expected
-	if(_${RESULT_VARIABLE}_IS_APPIMAGE)
+	if(_${RESULT_VARIABLE}_IS_APPIMAGE AND NOT IS_SYMLINK "${_${RESULT_VARIABLE}}")
 		if(NOT COMMAND create_symlink)
 			include(CreateSymlink)
 		endif()
