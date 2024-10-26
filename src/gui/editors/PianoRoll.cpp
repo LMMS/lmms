@@ -711,59 +711,185 @@ void PianoRoll::glueNotes()
 	}
 }
 
-void PianoRoll::fitNoteLengths(bool fill)
+
+
+bool fillGapsBetweenNotesInList(
+	const NoteVector& notes,
+	bool hasSelection,
+	bool extendLastNoteToEndOfBar,
+	bool dryRun)
+{
+	bool success = false;
+
+	TimePos lastEndPos;
+
+	for (auto currentNote = notes.begin();
+		 currentNote != notes.end();
+		++currentNote)
+	{
+		if (hasSelection && !(*currentNote)->selected()) { continue; }
+
+		// Find the note next after the current that doesn't overlap it more than 50%
+		// (we must start on currentNote to get a correct lastEndPos in case there is only a single note)
+		auto nextNote = currentNote;
+		for (; nextNote != notes.end(); ++nextNote)
+		{
+			// Keep track of where the clip ends
+			lastEndPos = std::max(lastEndPos, (*nextNote)->endPos());
+
+			int lengthOfShortestNote = std::min((*currentNote)->length(), (*nextNote)->length());
+			int overlap = (*currentNote)->endPos() - (*nextNote)->pos();
+			if (overlap < (lengthOfShortestNote / 2)) { break; }
+		}
+
+		// If there are no more notes, extend the current note to the end of the bar
+		// (don't do this if we only compare within the selection, because that will stretch
+		// the selection to the end of the clip)
+		if (nextNote == notes.end())
+		{
+			TimePos endOfLastBar = lastEndPos.nextFullBar() * TimePos::ticksPerBar();
+			if ((*currentNote)->endPos() < endOfLastBar && extendLastNoteToEndOfBar)
+			{
+				success = true;
+				if (dryRun) { return success; }
+				(*currentNote)->setLength(endOfLastBar - (*currentNote)->pos());
+			}
+		}
+
+		// If the current note doesn't overlap with the next note, extend it
+		else if ((*currentNote)->endPos() < (*nextNote)->pos())
+		{
+			success = true;
+			if (dryRun) { return success; }
+			(*currentNote)->setLength((*nextNote)->pos() - (*currentNote)->pos());
+		}
+	}
+
+	return success;
+}
+
+
+
+void PianoRoll::fillGapsBetweenNotes()
 {
 	if (!hasValidMidiClip()) { return; }
 	m_midiClip->addJournalCheckPoint();
+
+	// Make sure notes are sorted by start position
 	m_midiClip->rearrangeAllNotes();
 
-	// Reference notes
-	const NoteVector& refNotes = m_midiClip->notes();
+	auto selectedNotes = getSelectedNotes();
 
-	// Notes to edit
-	NoteVector notes = getSelectedNotes();
-	if (notes.empty())
-	{
-		notes = refNotes;
-	}
-	else if (!fill)
-	{
-		std::sort(notes.begin(), notes.end(), Note::lessThan);
-	}
-	if (fill)
-	{
-		std::sort(notes.begin(), notes.end(), [](Note* n1, Note* n2) { return n1->endPos() < n2->endPos(); });
-	}
+	// Run the fill function twice:
+	// The first run resizes the selected notes until they reach ANY other note
+	// The second resizes the selected notes until they reach the next SELECTED note
+	// If the first run changed some notes, the second run is only a dry-run
 
-	int length;
-	auto ref = refNotes.begin();
-	for (Note* note : notes)
+	bool firstRunSuccess = fillGapsBetweenNotesInList(
+		m_midiClip->notes(),
+		/*hasSelection*/ !selectedNotes.empty(),
+		/*extendLastNoteToEndOfBar*/ true,
+		/*dryRun*/ false);
+
+	bool secondRunSuccess = fillGapsBetweenNotesInList(
+		selectedNotes,
+		/*hasSelection*/ !selectedNotes.empty(),
+		/*extendLastNoteToEndOfBar*/ false,
+		/*dryRun*/ firstRunSuccess);
+
+	if (firstRunSuccess || secondRunSuccess)
 	{
-		// Fast forward to next reference note
-		while (ref != refNotes.end() && (fill ? (*ref)->pos() < note->endPos() : (*ref)->pos() <= note->pos()))
-		{
-			ref++;
-		}
-		if (ref == refNotes.end())
-		{
-			if (!fill) { break; }
-			// Last notes stretch to end of last bar
-			length = notes.back()->endPos().nextFullBar() * TimePos::ticksPerBar() - note->pos();
-		}
-		else
-		{
-			length = (*ref)->pos() - note->pos();
-		}
-		if (fill ? note->length() < length : note->length() > length)
-		{
-			note->setLength(length);
-		}
+		emit m_midiClip->dataChanged();
+		Engine::getSong()->setModified();
 	}
 
-	update();
-	getGUI()->songEditor()->update();
-	Engine::getSong()->setModified();
+	if (firstRunSuccess && secondRunSuccess)
+	{
+		TextFloat::displayMessage(tr("Fill"),
+			tr("Repeat to fill the selection completely."),
+			embed::getIconPixmap("fill", 24, 24),
+			5000);
+	}
 }
+
+
+
+bool cutOverlappingNotesInList(
+	const NoteVector& notesToEdit,
+	const NoteVector& notesToCompareTo,
+	bool dryRun)
+{
+	bool success = false;
+
+	auto nextNote = notesToCompareTo.begin();
+
+	for (auto currentNote: notesToEdit)
+	{
+		// Find the next note that starts after the current note
+		while (nextNote != notesToCompareTo.end() && (*nextNote)->pos() <= currentNote->pos())
+		{
+			++nextNote;
+		}
+
+		// If the current note overlaps with the next note, cut it
+		if (nextNote != notesToCompareTo.end() && (*nextNote)->pos() < currentNote->endPos())
+		{
+			success = true;
+			if (dryRun) { return success; }
+			currentNote->setLength((*nextNote)->pos() - currentNote->pos());
+		}
+	}
+
+	return success;
+}
+
+
+
+void PianoRoll::cutOverlappingNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+	m_midiClip->addJournalCheckPoint();
+
+	// Make sure notes are sorted by start position
+	m_midiClip->rearrangeAllNotes();
+
+	NoteVector selectedNotes = getSelectedNotes();
+	if (selectedNotes.empty())
+	{
+		selectedNotes = m_midiClip->notes();
+	}
+
+	// Run the cut function twice:
+	// The first run cuts overlaps within the SELECTION only
+	// The second run cuts the selected notes where they overlap with ANY other note
+	// If the first changed some notes, the second run is only a dry-run
+
+	bool firstRunSuccess = cutOverlappingNotesInList(
+		/*notesToEdit*/ selectedNotes,
+		/*notesToCompareTo*/ selectedNotes,
+		/*dryRun*/ false);
+
+	bool secondRunSuccess = cutOverlappingNotesInList(
+		/*notesToEdit*/ selectedNotes,
+		/*notesToCompareTo*/ m_midiClip->notes(),
+		/*dryRun*/ firstRunSuccess);
+
+	if (firstRunSuccess || secondRunSuccess)
+	{
+		m_midiClip->updateLength();
+		emit m_midiClip->dataChanged();
+		Engine::getSong()->setModified();
+	}
+
+	if (firstRunSuccess && secondRunSuccess)
+	{
+		TextFloat::displayMessage(tr("Cut overlaps"),
+			tr("Repeat to cut remaining overlaps."),
+			embed::getIconPixmap("cut_overlaps", 24, 24),
+			5000);
+	}
+}
+
 
 
 void PianoRoll::constrainNoteLengths(bool constrainMax)
@@ -4856,11 +4982,11 @@ PianoRollWindow::PianoRollWindow() :
 	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
 
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
-	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
+	connect(fillAction, &QAction::triggered, [this](){ m_editor->fillGapsBetweenNotes(); });
 	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
 
 	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
-	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
+	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->cutOverlappingNotes(); });
 	cutOverlapsAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
 	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
