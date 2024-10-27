@@ -553,7 +553,7 @@ void XpressiveView::expressionChanged() {
 		ExprFront expr(text.constData(),sample_rate);
 		float t=0;
 		const float f=10,key=5,v=0.5;
-        unsigned int frame_counter = 0;
+		unsigned int frame_counter = 0;
 		expr.add_variable("t", t);
 
 		if (m_output_expr)
@@ -572,21 +572,24 @@ void XpressiveView::expressionChanged() {
 			expr.add_cyclic_vector("W2",e->graphW2().samples(),e->graphW2().length());
 			expr.add_cyclic_vector("W3",e->graphW3().samples(),e->graphW3().length());
 		}
-        expr.setIntegrate(&frame_counter,sample_rate);
+		expr.setIntegrate(&frame_counter,sample_rate);
 		expr.add_constant("srate",sample_rate);
 
 		const bool parse_ok=expr.compile();
 
 		if (parse_ok) {
 			e->exprValid().setValue(0);
-            const unsigned int length = static_cast<unsigned int>(m_raw_graph->length());
+			const unsigned int length = static_cast<unsigned int>(m_raw_graph->length());
 			auto const samples = new float[length];
-            // frame_counter's reference is used in the integrate function.
-            for ( frame_counter = 0; frame_counter < length; ++frame_counter) {
-                t = frame_counter / (float) length;
-                samples[frame_counter] = expr.evaluate();
-                if (std::isinf(samples[frame_counter]) != 0 || std::isnan(samples[frame_counter]) != 0)
-                    samples[frame_counter] = 0;
+			// frame_counter's reference is used in the integrate function.
+			for (frame_counter = 0; frame_counter < length; ++frame_counter)
+			{
+				t = frame_counter / (float) length;
+				samples[frame_counter] = expr.evaluate();
+				if (std::isinf(samples[frame_counter]) != 0 || std::isnan(samples[frame_counter]) != 0)
+				{
+					samples[frame_counter] = 0;
+				}
 			}
 			m_raw_graph->setSamples(samples);
 			delete[] samples;
