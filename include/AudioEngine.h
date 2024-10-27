@@ -237,8 +237,16 @@ public:
 
 	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
 
-	sample_rate_t outputSampleRate() const;
-	sample_rate_t inputSampleRate() const;
+
+	sample_rate_t outputSampleRate() const{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+	
+
+	sample_rate_t inputSampleRate() const{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+
 
 	inline float masterGain() const
 	{

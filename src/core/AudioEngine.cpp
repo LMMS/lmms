@@ -242,19 +242,6 @@ void AudioEngine::stopProcessing()
 
 
 
-sample_rate_t AudioEngine::outputSampleRate() const
-{
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
-}
-
-
-
-
-sample_rate_t AudioEngine::inputSampleRate() const
-{
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
-}
-
 bool AudioEngine::criticalXRuns() const
 {
 	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
