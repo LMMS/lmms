@@ -235,9 +235,7 @@ public:
 	}
 
 
-	inline sample_rate_t baseSampleRate() const{
-		return m_baseSampleRate;
-	}
+	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
 
 	sample_rate_t outputSampleRate() const;
 	sample_rate_t inputSampleRate() const;
