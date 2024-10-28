@@ -99,8 +99,8 @@ private:
 	LcdSpinBox* m_midiChannelSpinBox;
 	LcdSpinBox* m_midiControllerSpinBox;
 	LedCheckBox* m_midiAutoDetectCheckBox;
-	BoolModel m_midiAutoDetect;
 	MidiPortMenu* m_readablePorts;
+	BoolModel m_midiAutoDetect;
 
 	// User controller groupbox
 	GroupBox* m_userGroupBox;
