@@ -73,7 +73,7 @@ if(MSVC)
 endif()
 
 if(IS_MINGW)
-	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
+	SET(CMAKE_REQUIRED_FLAGS "-std=c++20")
 endif()
 
 if(LMMS_BUILD_WIN32)
