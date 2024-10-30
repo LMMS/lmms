@@ -33,6 +33,7 @@
 #include <memory>
 #include <vector>
 
+#include "AudioDevice.h"
 #include "lmms_basics.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
