@@ -402,7 +402,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 	// Fill buffer with portions of the note samples
 	std::for_each(m_notes.begin(), m_notes.end(), [&](GigNote& note) {
-		if (!(note.state == GigState::PlayingKeyDown || note.state == GigState::PlayingKeyUp)) { return; }
+		if (note.state != GigState::PlayingKeyDown && note.state != GigState::PlayingKeyUp) { return; }
 
 		std::for_each(note.samples.begin(), note.samples.end(), [&](GigSample& sample) {
 			if (sample.sample == nullptr || sample.region == nullptr) { return; }
