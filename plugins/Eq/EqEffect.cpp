@@ -64,7 +64,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -131,13 +131,6 @@ bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	m_lp481.setParameters( sampleRate, lpFreq, lpRes, 1 );
 
 
-
-
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 	if( m_eqControls.m_outGainModel.isValueChanged() )
 	{
 		m_outGain = dbfsToAmp(m_eqControls.m_outGainModel.value());
@@ -151,9 +144,9 @@ bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
 	const float outGain =  m_outGain;
@@ -268,8 +261,6 @@ bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
 
-	checkGate( outSum / frames );
-
 	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );
@@ -281,7 +272,8 @@ bool EqEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	}
 
 	m_eqControls.m_inProgress = false;
-	return isRunning();
+
+	return Effect::ProcessStatus::ContinueIfNotQuiet;
 }
 
 

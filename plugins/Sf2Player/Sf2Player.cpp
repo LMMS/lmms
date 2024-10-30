@@ -499,43 +499,57 @@ void Sf2Instrument::updateGain()
 	fluid_synth_set_gain( m_synth, m_gain.value() );
 }
 
-
-
+#define FLUIDSYNTH_VERSION_HEX ((FLUIDSYNTH_VERSION_MAJOR << 16) \
+	| (FLUIDSYNTH_VERSION_MINOR << 8) \
+	| FLUIDSYNTH_VERSION_MICRO)
+#define USE_NEW_EFFECT_API (FLUIDSYNTH_VERSION_HEX >= 0x020200)
 
 void Sf2Instrument::updateReverbOn()
 {
-	fluid_synth_set_reverb_on( m_synth, m_reverbOn.value() ? 1 : 0 );
+#if USE_NEW_EFFECT_API
+	fluid_synth_reverb_on(m_synth, -1, m_reverbOn.value() ? 1 : 0);
+#else
+	fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0);
+#endif
 }
-
-
-
 
 void Sf2Instrument::updateReverb()
 {
-	fluid_synth_set_reverb( m_synth, m_reverbRoomSize.value(),
+#if USE_NEW_EFFECT_API
+	fluid_synth_set_reverb_group_roomsize(m_synth, -1, m_reverbRoomSize.value());
+	fluid_synth_set_reverb_group_damp(m_synth, -1, m_reverbDamping.value());
+	fluid_synth_set_reverb_group_width(m_synth, -1, m_reverbWidth.value());
+	fluid_synth_set_reverb_group_level(m_synth, -1, m_reverbLevel.value());
+#else
+	fluid_synth_set_reverb(m_synth, m_reverbRoomSize.value(),
 			m_reverbDamping.value(), m_reverbWidth.value(),
-			m_reverbLevel.value() );
+			m_reverbLevel.value());
+#endif
 }
 
-
-
-
-void  Sf2Instrument::updateChorusOn()
+void Sf2Instrument::updateChorusOn()
 {
-	fluid_synth_set_chorus_on( m_synth, m_chorusOn.value() ? 1 : 0 );
+#if USE_NEW_EFFECT_API
+	fluid_synth_chorus_on(m_synth, -1, m_chorusOn.value() ? 1 : 0);
+#else
+	fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0);
+#endif
 }
 
-
-
-
-void  Sf2Instrument::updateChorus()
+void Sf2Instrument::updateChorus()
 {
-	fluid_synth_set_chorus( m_synth, static_cast<int>( m_chorusNum.value() ),
+#if USE_NEW_EFFECT_API
+	fluid_synth_set_chorus_group_nr(m_synth, -1, static_cast<int>(m_chorusNum.value()));
+	fluid_synth_set_chorus_group_level(m_synth, -1, m_chorusLevel.value());
+	fluid_synth_set_chorus_group_speed(m_synth, -1, m_chorusSpeed.value());
+	fluid_synth_set_chorus_group_depth(m_synth, -1, m_chorusDepth.value());
+	fluid_synth_set_chorus_group_type(m_synth, -1, FLUID_CHORUS_MOD_SINE);
+#else
+	fluid_synth_set_chorus(m_synth, static_cast<int>(m_chorusNum.value()),
 			m_chorusLevel.value(), m_chorusSpeed.value(),
-			m_chorusDepth.value(), 0 );
+			m_chorusDepth.value(), FLUID_CHORUS_MOD_SINE);
+#endif
 }
-
-
 
 void Sf2Instrument::updateTuning()
 {
@@ -898,7 +912,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 		{
 			qCritical( "Sf2Instrument: error while resampling: %s", src_strerror( error ) );
 		}
-		if( src_data.output_frames_gen > frames )
+		if (static_cast<f_cnt_t>(src_data.output_frames_gen) < frames)
 		{
 			qCritical("Sf2Instrument: not enough frames: %ld / %zu", src_data.output_frames_gen, frames);
 		}

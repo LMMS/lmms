@@ -329,7 +329,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 	thread_local static std::vector<SampleFrame> convertBuf(32768);
 
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	const int rate = Engine::audioEngine()->outputSampleRate();
+	const auto rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -1188,7 +1188,7 @@ bool GigSample::convertSampleRate(std::vector<SampleFrame>& oldBuf, std::vector<
 		return false;
 	}
 
-	if( src_data.output_frames_gen > 0 && src_data.output_frames_gen < newSize )
+	if (src_data.output_frames_gen > 0 && static_cast<f_cnt_t>(src_data.output_frames_gen) < newSize)
 	{
 		qCritical() << "GigInstrument: not enough frames, wanted"
 			<< newSize << "generated" << src_data.output_frames_gen;

@@ -44,19 +44,19 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const float resolution = std::max(1.0f, framesPerPixel / maxFramesPerPixel);
 	const float framesPerResolution = framesPerPixel / resolution;
 
-	const size_t numPixels = std::min<size_t>(parameters.size, width);
+	size_t numPixels = std::min(parameters.size, static_cast<size_t>(width));
 	auto min = std::vector<float>(numPixels, 1);
 	auto max = std::vector<float>(numPixels, -1);
 	auto squared = std::vector<float>(numPixels, 0);
 
-	const size_t maxFrames = numPixels * static_cast<size_t>(framesPerPixel);
+	const size_t maxFrames = static_cast<size_t>(numPixels * framesPerPixel);
 
-	int pixelIndex = 0;
+	auto pixelIndex = std::size_t{0};
 
-	for (int i = 0; i < maxFrames; i += static_cast<int>(resolution))
+	for (auto i = std::size_t{0}; i < maxFrames; i += static_cast<std::size_t>(resolution))
 	{
 		pixelIndex = i / framesPerPixel;
-		const int frameIndex = !parameters.reversed ? i : maxFrames - i;
+		const auto frameIndex = !parameters.reversed ? i : maxFrames - i;
 
 		const auto& frame = parameters.buffer[frameIndex];
 		const auto value = frame.average();
@@ -67,19 +67,16 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 		squared[pixelIndex] += value * value;
 	}
 	
-	while (pixelIndex < numPixels)
+	if (pixelIndex < numPixels)
 	{
-		max[pixelIndex] = 0.0;
-		min[pixelIndex] = 0.0;
-		
-		pixelIndex++;
+		numPixels = pixelIndex;
 	}
 
-	for (int i = 0; i < numPixels; i++)
+	for (auto i = std::size_t{0}; i < numPixels; i++)
 	{
 		const int lineY1 = centerY - max[i] * halfHeight * parameters.amplification;
 		const int lineY2 = centerY - min[i] * halfHeight * parameters.amplification;
-		const int lineX = i + x;
+		const int lineX = static_cast<int>(i) + x;
 		painter.drawLine(lineX, lineY1, lineX, lineY2);
 
 		const float rms = std::sqrt(squared[i] / framesPerResolution);

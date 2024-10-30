@@ -48,6 +48,7 @@
 #include "Clipboard.h"
 
 #include "embed.h"
+#include "FontHelper.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -142,6 +143,11 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
+
+	// ZynAddSubFX's internal value that LMMS's FREQ knob controls
+	// isn't set properly when the instrument is first loaded in,
+	// and doesn't update until the FREQ knob is moved
+	updateFilterFreq();
 }
 
 
@@ -541,8 +547,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	QFont f = m_toggleUIButton->font();
-	f.setPointSizeF(12);
-	m_toggleUIButton->setFont(f);
+	m_toggleUIButton->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );

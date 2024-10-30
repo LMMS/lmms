@@ -171,7 +171,8 @@ private:
 private slots:
 	void createClipView( lmms::Clip * clip );
 	void muteChanged();
-
+	void onTrackGripGrabbed();
+	void onTrackGripReleased();
 } ;
 
 

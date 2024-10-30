@@ -64,6 +64,8 @@ private slots:
 
 private:
 	void modelChanged() override;
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 
 	inline EffectChain* fxChain()
 	{

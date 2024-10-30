@@ -25,6 +25,8 @@ if(LMMS_HAVE_GIG)
 		add_compile_options("-Wno-deprecated")
 	endif()
 
+	link_directories(${GIG_LIBRARY_DIRS})
+	link_libraries(${GIG_LIBRARIES})
 	build_plugin(gigplayer
 		GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui
 		MOCFILES GigPlayer.h PatchesDialog.h

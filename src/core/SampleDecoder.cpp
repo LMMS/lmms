@@ -174,7 +174,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 	}
 
 	auto result = std::vector<SampleFrame>(totalSamplesRead / numChannels);
-	for (int i = 0; i < result.size(); ++i)
+	for (auto i = std::size_t{0}; i < result.size(); ++i)
 	{
 		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }
 		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }

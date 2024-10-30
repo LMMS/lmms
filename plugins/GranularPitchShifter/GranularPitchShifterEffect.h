@@ -48,7 +48,8 @@ class GranularPitchShifterEffect : public Effect
 public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~GranularPitchShifterEffect() override = default;
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -58,7 +59,7 @@ public:
 	// double index and fraction are required for good quality
 	float getHermiteSample(double index, int ch)
 	{
-		const int index_floor = static_cast<int>(index);
+		const auto index_floor = static_cast<std::size_t>(index);
 		const double fraction = index - index_floor;
 		
 		float v0, v1, v2, v3;
