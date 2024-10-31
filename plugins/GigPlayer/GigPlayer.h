@@ -318,8 +318,6 @@ private:
 
 	// Load sample data from the Gig file, looping the sample where needed
 	void loadSample(GigSample& sample, std::vector<SampleFrame>& sampleData, gig::file_offset_t samples);
-	gig::file_offset_t getLoopedIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const;
-	gig::file_offset_t getPingPongIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const;
 
 	// Add the desired samples to the note, either normal samples or release
 	// samples
