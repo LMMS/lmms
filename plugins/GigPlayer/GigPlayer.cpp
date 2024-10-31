@@ -511,7 +511,9 @@ void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& samp
 		// Calculate the new position based on the type of loop
 		if (loopType == gig::loop_type_bidirectional)
 		{
-			sample.pos = getPingPongIndex(sample.pos, loopStart, loopStart + loopLength);
+			const auto loopPos = (sample.pos - loopStart + loopLength) % (loopLength * 2);
+			sample.pos = (sample.pos < loopStart + loopLength) ? sample.pos 
+						: ((loopPos < loopLength) ? endf - loopPos : startf + (loopPos - loopLength));
 		}
 		else
 		{
@@ -601,19 +603,6 @@ void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& samp
 				: factor * r;
 		}
 	}
-}
-
-
-
-
-gig::file_offset_t GigInstrument::getPingPongIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const
-{
-	if (index < endf) { return index; }
-	const auto loopLen = endf - startf;
-	const auto loopPos = (index - endf) % (loopLen * 2);
-	return (loopPos < loopLen)
-		? endf - loopPos
-		: startf + (loopPos - loopLen);
 }
 
 
