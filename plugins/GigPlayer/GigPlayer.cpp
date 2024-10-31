@@ -513,7 +513,7 @@ void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& samp
 		{
 			const auto loopPos = (sample.pos - loopStart + loopLength) % (loopLength * 2);
 			sample.pos = (sample.pos < loopStart + loopLength) ? sample.pos 
-						: ((loopPos < loopLength) ? endf - loopPos : startf + (loopPos - loopLength));
+						: (loopStart + ((loopPos < loopLength) ? loopLength - loopPos : loopPos - loopLength));
 		}
 		else
 		{
