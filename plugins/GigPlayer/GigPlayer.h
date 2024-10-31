@@ -38,7 +38,8 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
-#include "libgig/gig.h"
+
+#include <libgig/gig.h>
 #include <vector>
 #include <list>
 
