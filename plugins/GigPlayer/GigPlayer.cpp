@@ -441,18 +441,10 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 			const auto amplitude = copy.value();
-#if ((_MSC_VER >= 1914) || (__GNUC__ >= 9 && __GNUC_MINOR__ >= 3) || (__clang__ && __clang_major__ >= 5))
 			std::for_each_n(sampleData.begin(), samples, [&](auto& frame) {
 				frame[0] *= amplitude;
 				frame[1] *= amplitude;
 			});
-#else
-			// TODO: Ubuntu 20.04 CI change should be enough to remove this if/else
-			for (f_cnt_t i = 0; i < samples; ++i) {
-				sampleData[i][0] *= amplitude;
-				sampleData[i][1] *= amplitude;
-			}
-#endif
 
 			// Output the data resampling if needed
 			// Only output if resampling is successful (note that "used" is output)
