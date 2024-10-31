@@ -515,7 +515,8 @@ void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& samp
 		}
 		else
 		{
-			sample.pos = getLoopedIndex(sample.pos, loopStart, loopStart + loopLength);
+			sample.pos = (sample.pos < loopStart + loopLength) ? sample.pos 
+						: loopStart + (sample.pos - loopStart) % loopLength;
 			// TODO: also implement loop_type_backward support
 		}
 
@@ -600,16 +601,6 @@ void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& samp
 				: factor * r;
 		}
 	}
-}
-
-
-
-
-// These two loop index functions taken from SampleBuffer.cpp
-gig::file_offset_t GigInstrument::getLoopedIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const
-{
-	if (index < endf) { return index; }
-	return startf + (index - startf) % (endf - startf);
 }
 
 
