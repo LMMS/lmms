@@ -27,12 +27,13 @@
 
 #include <QtGlobal>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <cassert>
 
 namespace lmms
 {
@@ -96,6 +97,20 @@ static void roundAt(T& value, const T& where, const T& stepSize)
 	}
 }
 
+//! Source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+inline double fastPow(double a, double b)
+{
+	double d;
+	std::int32_t x[2];
+
+	std::memcpy(x, &a, sizeof(x));
+	x[1] = static_cast<std::int32_t>(b * (x[1] - 1072632447) + 1072632447);
+	x[0] = 0;
+
+	std::memcpy(&d, x, sizeof(d));
+	return d;
+}
+
 
 //! returns 1.0f if val >= 0.0f, -1.0 else
 inline float sign(float val) 
@@ -149,37 +164,22 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan( result ) ? 0 : result;
 }
 
-
-
-
-//! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
-//! @param amp Linear amplitude, where 1.0 = 0dBFS. 
-//! @return Amplitude in dBFS. -inf for 0 amplitude.
-inline float safeAmpToDbfs(float amp)
+inline float fastPow10f(float x)
 {
-	return amp == 0.0f
-		? -INFINITY
-		: log10f( amp ) * 20.0f;
+	return std::exp(2.302585092994046f * x);
 }
 
-
-//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
-//! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
-//! @return Linear amplitude
-inline float safeDbfsToAmp(float dbfs)
+inline float fastLog10f(float x)
 {
-	return std::isinf( dbfs )
-		? 0.0f
-		: std::pow(10.f, dbfs * 0.05f );
+	return std::log(x) * 0.4342944819032518f;
 }
-
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
 inline float ampToDbfs(float amp)
 {
-	return log10f(amp) * 20.0f;
+	return fastLog10f(amp) * 20.0f;
 }
 
 
@@ -188,8 +188,27 @@ inline float ampToDbfs(float amp)
 //! @return Linear amplitude
 inline float dbfsToAmp(float dbfs)
 {
-	return std::pow(10.f, dbfs * 0.05f);
+	return fastPow10f(dbfs * 0.05f);
 }
+
+
+//! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
+//! @param amp Linear amplitude, where 1.0 = 0dBFS. 
+//! @return Amplitude in dBFS. -inf for 0 amplitude.
+inline float safeAmpToDbfs(float amp)
+{
+	return amp == 0.0f ? -INFINITY : ampToDbfs(amp);
+}
+
+
+//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
+//! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
+//! @return Linear amplitude
+inline float safeDbfsToAmp(float dbfs)
+{
+	return std::isinf(dbfs) ? 0.0f : dbfsToAmp(dbfs);
+}
+
 
 
 //! Returns the linear interpolation of the two values
