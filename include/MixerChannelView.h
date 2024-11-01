@@ -38,13 +38,13 @@
 #include "LcdWidget.h"
 #include "PixmapButton.h"
 #include "SendButtonIndicator.h"
-#include "PeakIndicator.h"
 
 namespace lmms {
 class MixerChannel;
 }
 
 namespace lmms::gui {
+class PeakIndicator;
 
 
 class MixerChannelView : public QWidget
