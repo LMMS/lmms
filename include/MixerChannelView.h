@@ -66,7 +66,7 @@ public:
 	void mouseDoubleClickEvent(QMouseEvent*) override;
 	bool eventFilter(QObject* dist, QEvent* event) override;
 
-	void reset() { 	m_peakIndicator->resetPeakToMinusInf(); }
+	void reset();
 	int channelIndex() const { return m_channelIndex; }
 	void setChannelIndex(int index);
 

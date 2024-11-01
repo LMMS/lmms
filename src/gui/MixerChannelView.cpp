@@ -391,4 +391,9 @@ MixerChannel* MixerChannelView::mixerChannel() const
 	return Engine::mixer()->mixerChannel(m_channelIndex);
 }
 
+void MixerChannelView::reset()
+{
+	m_peakIndicator->resetPeakToMinusInf();
+}
+
 } // namespace lmms::gui
