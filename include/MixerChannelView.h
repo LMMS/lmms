@@ -56,9 +56,6 @@ class MixerChannelView : public QWidget
 	Q_PROPERTY(QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive)
 	Q_PROPERTY(QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive)
 public:
-	static constexpr auto InnerBorderSize = 3;
-	static constexpr auto OuterBorderSize = 1;
-
 	MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex);
 	void paintEvent(QPaintEvent* event) override;
 	void contextMenuEvent(QContextMenuEvent*) override;

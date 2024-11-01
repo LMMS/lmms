@@ -188,6 +188,9 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 
 void MixerChannelView::paintEvent(QPaintEvent*)
 {
+	static constexpr auto innerBorderSize = 3;
+	static constexpr auto outerBorderSize = 1;
+
 	const auto channel = mixerChannel();
 	const auto isActive = m_mixerView->currentMixerChannel() == this;
 	const auto width = rect().width();
@@ -202,11 +205,11 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 
 	// inner border
 	painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());
-	painter.drawRect(1, 1, width - InnerBorderSize, height - InnerBorderSize);
+	painter.drawRect(1, 1, width - innerBorderSize, height - innerBorderSize);
 
 	// outer border
 	painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
-	painter.drawRect(0, 0, width - OuterBorderSize, height - OuterBorderSize);
+	painter.drawRect(0, 0, width - outerBorderSize, height - outerBorderSize);
 }
 
 void MixerChannelView::mousePressEvent(QMouseEvent*)
