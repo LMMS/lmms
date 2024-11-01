@@ -249,6 +249,7 @@ void MixerChannelView::setChannelIndex(int index)
 	m_soloButton->setModel(&mixerChannel->m_soloModel);
 	m_effectRackView->setModel(&mixerChannel->m_fxChain);
 	m_channelNumberLcd->setValue(index);
+	m_renameLineEdit->setText(mixerChannel->m_name);
 	m_channelIndex = index;
 }
 
