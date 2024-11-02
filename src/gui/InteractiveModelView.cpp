@@ -75,7 +75,7 @@ void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataT
 	{
 		(*it)->overrideSetIsHighlighted((*it)->canAcceptClipboardData(dataType));
 	}
-	s_highlightTimer->start(20000);
+	s_highlightTimer->start(10000);
 }
 
 void InteractiveModelView::stopHighlighting()
