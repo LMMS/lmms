@@ -1296,7 +1296,6 @@ void MainWindow::focusOutEvent( QFocusEvent * _fe )
 
 void MainWindow::keyPressEvent( QKeyEvent * _ke )
 {
-qDebug("KeyPressed event");
 	switch( _ke->key() )
 	{
 		case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
