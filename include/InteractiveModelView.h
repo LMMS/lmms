@@ -63,6 +63,9 @@ public:
 
 	static QColor getHighlightColor();
 	static void setHighlightColor(QColor& color);
+	
+	// returns true if successful
+	bool HandleKeyPress(QKeyEvent* event);
 protected:
 	class ModelShortcut
 	{
