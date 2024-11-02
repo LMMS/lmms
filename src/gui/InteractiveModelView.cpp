@@ -114,12 +114,7 @@ QColor InteractiveModelView::getHighlightColor()
 	return *s_highlightColor;
 }
 
-void InteractiveModelView::setHighlightColor(QColor& color)
-{
-	s_highlightColor = std::make_unique<QColor>(color);
-}
-
-void InteractiveModelView::keyPressEvent(QKeyEvent* event)
+bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 {
 	std::vector<ModelShortcut> shortcuts(getShortcuts());
 
@@ -177,6 +172,8 @@ void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 		QString message = shortcuts[foundIndex].m_shortcutDescription;
 		showMessage(message);
 		processShortcutPressed(foundIndex, event);
+
+		event->accept();
 	}
 	else
 	{
@@ -186,9 +183,22 @@ void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 			&& event->key() != Qt::Key_Alt
 			&& event->key() != Qt::Key_AltGr)
 		{
-			m_focusedBeforeWidget->setFocus();
+			//m_focusedBeforeWidget->setFocus();
+			getGUI()->mainWindow()->setFocusedInteractiveModel(nullptr);
 		}
 	}
+	return found;
+}
+
+void InteractiveModelView::setHighlightColor(QColor& color)
+{
+	s_highlightColor = std::make_unique<QColor>(color);
+}
+
+void InteractiveModelView::keyPressEvent(QKeyEvent* event)
+{
+	// this will run `HandleKeyPress()` for the widget that is focused inside MainWindow
+	getGUI()->mainWindow()->focusedInteractiveModelHandleKeyPress(event);
 }
 
 void InteractiveModelView::enterEvent(QEvent* event)
@@ -203,7 +213,9 @@ void InteractiveModelView::enterEvent(QEvent* event)
 	{
 		m_focusedBeforeWidget = QApplication::focusWidget();
 		// focus on this widget so keyPressEvent works
-		setFocus();
+		//setFocus();
+		qDebug("focus set");
+		getGUI()->mainWindow()->setFocusedInteractiveModel(this);
 	}
 }
 
