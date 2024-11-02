@@ -50,6 +50,7 @@
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
+#include "InteractiveModelView.h"
 #include "MicrotunerConfig.h"
 #include "PatternEditor.h"
 #include "PianoRoll.h"
@@ -285,7 +286,7 @@ void MainWindow::finalize()
 	project_menu->addMenu(new RecentProjectsMenu(this));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "&Save" ),
+					tr( "Save" ),
 					this, SLOT(saveProject()),
 					QKeySequence::Save );
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
@@ -1263,6 +1264,19 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 }
 
 
+void MainWindow::setFocusedInteractiveModel(InteractiveModelView* model)
+{
+	m_focusedInteractiveModel = model;
+}
+
+bool MainWindow::focusedInteractiveModelHandleKeyPress(QKeyEvent* event)
+{
+	if (m_focusedInteractiveModel != nullptr)
+	{
+		return m_focusedInteractiveModel->HandleKeyPress(event);
+	}
+	return false;
+}
 
 
 void MainWindow::focusOutEvent( QFocusEvent * _fe )
@@ -1279,6 +1293,7 @@ void MainWindow::focusOutEvent( QFocusEvent * _fe )
 
 void MainWindow::keyPressEvent( QKeyEvent * _ke )
 {
+qDebug("KeyPressed event");
 	switch( _ke->key() )
 	{
 		case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
@@ -1311,6 +1326,9 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		}
 		default:
 		{
+			bool accepted = focusedInteractiveModelHandleKeyPress(_ke);
+			if (accepted) { break; }
+			
 			InstrumentTrackWindow * w =
 						InstrumentTrackView::topLevelInstrumentTrackWindow();
 			if( w )
