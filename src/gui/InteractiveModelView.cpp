@@ -210,8 +210,6 @@ void InteractiveModelView::enterEvent(QEvent* event)
 	if (isVisible())
 	{
 		// focus on this widget so keyPressEvent works
-		//setFocus();
-		qDebug("focus set");
 		getGUI()->mainWindow()->setFocusedInteractiveModel(this);
 	}
 }
