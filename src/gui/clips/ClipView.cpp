@@ -79,6 +79,15 @@ TextFloat * ClipView::s_textFloat = nullptr;
  */
 QString ClipView::m_shortcutMessage = "";
 
+/*! Vector storing the widget's shortcuts.
+ */
+std::vector<InteractiveModelView::ModelShortcut> ClipView::s_shortcutArray =
+{
+	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy clip")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste clip")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_X, Qt::ControlModifier, 0, QString(tr("Cut out clip")), false)
+};
+
 
 /*! \brief Create a new ClipView
  *
@@ -1150,14 +1159,9 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 	}
 }
 
-std::vector<InteractiveModelView::ModelShortcut> ClipView::getShortcuts()
+const std::vector<InteractiveModelView::ModelShortcut>& ClipView::getShortcuts()
 {
-	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
-		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy clip")), false),
-		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste clip")), false),
-		InteractiveModelView::ModelShortcut(Qt::Key_X, Qt::ControlModifier, 0, QString(tr("Cut out clip")), false)
-	};
-	return shortcuts;
+	return s_shortcutArray;
 }
 
 void ClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
