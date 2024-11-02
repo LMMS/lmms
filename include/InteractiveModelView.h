@@ -111,7 +111,7 @@ protected:
 	void leaveEvent(QEvent* event) override;
 	
 	//! return the avalible shortcuts for the widget
-	virtual std::vector<ModelShortcut> getShortcuts() = 0;
+	virtual const std::vector<ModelShortcut>& getShortcuts() = 0;
 	//! called when a shortcut from `getShortcuts()` is pressed
 	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
 	//! called when a shortcut message needs to be displayed
