@@ -67,44 +67,43 @@ public:
 	// returns true if successful
 	bool HandleKeyPress(QKeyEvent* event);
 protected:
-	class ModelShortcut
+	struct ModelShortcut
 	{
-	public:
-		inline ModelShortcut() {}
-		inline ModelShortcut(Qt::Key key, Qt::KeyboardModifier modifier, unsigned int times, QString description, bool shouldLoop) :
-			m_key(key),
-			m_modifier(modifier),
-			m_times(times),
-			m_shortcutDescription(description),
-			m_shouldLoop(shouldLoop)
+		ModelShortcut() {}
+		ModelShortcut(Qt::Key key, Qt::KeyboardModifier modifier, unsigned int times, QString description, bool shouldLoop) :
+			key(key),
+			modifier(modifier),
+			times(times),
+			shortcutDescription(description),
+			shouldLoop(shouldLoop)
 		{
 		}
 
-		inline bool operator==(ModelShortcut& rhs)
+		bool operator==(ModelShortcut& rhs)
 		{
-			return m_key == rhs.m_key
-				&& m_modifier == rhs.m_modifier
-				&& m_times == rhs.m_times
-				&& m_shouldLoop == rhs.m_shouldLoop;
+			return key == rhs.key
+				&& modifier == rhs.modifier
+				&& times == rhs.times
+				&& shouldLoop == rhs.shouldLoop;
 		}
 
-		inline void reset()
+		void reset()
 		{
-			m_key = Qt::Key_F35;
-			m_modifier = Qt::NoModifier;
-			m_times = 0;
-			m_shortcutDescription = "";
-			m_shouldLoop = false;
+			key = Qt::Key_F35;
+			modifier = Qt::NoModifier;
+			times = 0;
+			shortcutDescription = "";
+			shouldLoop = false;
 		}
 
-		Qt::Key m_key = Qt::Key_F35;
-		Qt::KeyboardModifier m_modifier = Qt::NoModifier;
+		Qt::Key key = Qt::Key_F35;
+		Qt::KeyboardModifier modifier = Qt::NoModifier;
 		//! how many times do the keys need to be pressed to activate this shortcut
-		unsigned int m_times = 0;
+		unsigned int times = 0;
 		//! what the shortcut does
-		QString m_shortcutDescription = "";
+		QString shortcutDescription = "";
 		//! should it loop back if m_times is reached
-		bool m_shouldLoop = false;
+		bool shouldLoop = false;
 	};
 
 	void keyPressEvent(QKeyEvent* event) override;
