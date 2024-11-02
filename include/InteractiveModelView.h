@@ -151,8 +151,6 @@ private:
 	ModelShortcut m_lastShortcut;
 	unsigned int m_lastShortcutCounter;
 
-	QWidget* m_focusedBeforeWidget;
-
 	static std::unique_ptr<QColor> s_highlightColor;
 	static QTimer* s_highlightTimer;
 	static SimpleTextFloat* s_simpleTextFloat;

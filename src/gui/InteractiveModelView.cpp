@@ -47,8 +47,7 @@ std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
 InteractiveModelView::InteractiveModelView(QWidget* widget) :
 	QWidget(widget),
 	m_isHighlighted(false),
-	m_lastShortcutCounter(0),
-	m_focusedBeforeWidget(nullptr)
+	m_lastShortcutCounter(0)
 {
 	s_interactiveWidgets.push_back(this);
 
@@ -178,12 +177,11 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	else
 	{
 		// reset focus
-		if (m_focusedBeforeWidget && event->key() != Qt::Key_Control
+		if (event->key() != Qt::Key_Control
 			&& event->key() != Qt::Key_Shift
 			&& event->key() != Qt::Key_Alt
 			&& event->key() != Qt::Key_AltGr)
 		{
-			//m_focusedBeforeWidget->setFocus();
 			getGUI()->mainWindow()->setFocusedInteractiveModel(nullptr);
 		}
 	}
@@ -211,7 +209,6 @@ void InteractiveModelView::enterEvent(QEvent* event)
 
 	if (isVisible())
 	{
-		m_focusedBeforeWidget = QApplication::focusWidget();
 		// focus on this widget so keyPressEvent works
 		//setFocus();
 		qDebug("focus set");
