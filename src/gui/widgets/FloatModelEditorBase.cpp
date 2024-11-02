@@ -46,6 +46,12 @@ namespace lmms::gui
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 QString FloatModelEditorBase::m_shortcutMessage = "";
+std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::s_shortcutArray =
+{
+	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
+};
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	InteractiveModelView(parent),
@@ -282,14 +288,9 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	drawAutoHighlight(&p);
 }
 
-std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::getShortcuts()
+const std::vector<InteractiveModelView::ModelShortcut>& FloatModelEditorBase::getShortcuts()
 {
-	std::vector<InteractiveModelView::ModelShortcut> shortcuts = {
-		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
-		InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
-		InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
-	};
-	return shortcuts;
+	return s_shortcutArray;
 }
 
 void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
