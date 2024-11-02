@@ -51,7 +51,9 @@
 #include "embed.h"
 #include "Engine.h"
 #include "FontHelper.h"
+#include "GuiApplication.h" // mainWindow()
 #include "InstrumentTrack.h"
+#include "MainWindow.h" // focusedInteractiveModelHandleKeyPress()
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -109,7 +111,7 @@ PianoView::PianoView(QWidget *parent) :
 	connect( m_pianoScroll, SIGNAL(valueChanged(int)),
 			this, SLOT(pianoScrolled(int)));
 
-	// create a layout for ourselves
+	// create a layout for ourselvesr
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing( 0 );
 	layout->setContentsMargins(0, 0, 0, 0);
@@ -587,6 +589,10 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
+	// focusing is wird, workaround PianoView's agressive focus and see if InteractiveModelView can accept it
+	bool accepted = getGUI()->mainWindow()->focusedInteractiveModelHandleKeyPress(_ke);
+	if (accepted) { return; }
+	
 	const int key_num = getKeyFromKeyEvent( _ke );
 
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
@@ -646,6 +652,21 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	{
 		return;
 	}
+	
+	// focus just switched to another control inside the instrument track
+	// window we live in?
+	if( parentWidget()->parentWidget()->focusWidget() != this &&
+		parentWidget()->parentWidget()->focusWidget() != nullptr &&
+		!(parentWidget()->parentWidget()->
+				focusWidget()->inherits( "QLineEdit" ) ||
+		parentWidget()->parentWidget()->
+				focusWidget()->inherits( "QPlainTextEdit" ) ))
+	{
+		// then reclaim keyboard focus!
+		setFocus();
+		return;
+	}
+
 
 	// if we loose focus, we HAVE to note off all running notes because
 	// we don't receive key-release-events anymore and so the notes would
