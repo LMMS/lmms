@@ -64,9 +64,9 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 	if (m_shortcutMessage == "")
 	{
-		m_shortcutMessage = buildShortcutMessage();
-		std::vector<InteractiveModelView::ModelShortcut> s_shortcutArray = ClipView::getShortcuts();
+		s_shortcutArray = ClipView::getShortcuts();
 		s_shortcutArray.emplace_back(Qt::Key_F, Qt::ControlModifier, 0, QString(tr("Open in Automation editor")), false);
+		m_shortcutMessage = buildShortcutMessage();
 	}
 
 	setToolTip(m_clip->name());
