@@ -259,11 +259,9 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
 	void (QDragEnterEvent::*reaction)() = &QDragEnterEvent::ignore;
 
-	if (_dee->mimeData()->hasFormat( Clipboard::mimeType(Clipboard::MimeType::StringPair)))
+	if (_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
-		const QString txt =
-			_dee->mimeData()->data(Clipboard::mimeType(Clipboard::MimeType::StringPair));
-		const Clipboard::StringPairDataType type = Clipboard::decodeKey(_dee.mimeData());
+		const Clipboard::StringPairDataType type = Clipboard::decodeKey(_dee->mimeData());
 		if (type == Clipboard::StringPairDataType::PluginPresetFile)
 		{
 			reaction = &QDragEnterEvent::acceptProposedAction;
