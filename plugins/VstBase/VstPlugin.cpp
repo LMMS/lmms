@@ -504,7 +504,7 @@ QWidget *VstPlugin::editor()
 
 void VstPlugin::openPreset()
 {
-	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
+	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"), gui::FileDialog::Operation::OpPlugin);
 	ofd.setFileMode(gui::FileDialog::ExistingFiles);
 	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
