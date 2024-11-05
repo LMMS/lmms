@@ -73,7 +73,7 @@ jobs:
         include:
           - arch: x86_64
             os: macos-13
-            xcode: "13.1"
+            xcode: "15.2"
           - arch: arm64
             os: macos-14
             xcode: "14.3.1"
