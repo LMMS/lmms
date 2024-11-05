@@ -159,7 +159,7 @@ void MidiApple::removePort( MidiPort* port )
 
 QString MidiApple::sourcePortName( const MidiEvent& event ) const
 {
-	qDebug("sourcePortName return '%s'?\n", event.sourcePort());
+	qDebug("sourcePortName");
 	/*
 	if( event.sourcePort() )
 	{
