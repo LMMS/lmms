@@ -76,7 +76,7 @@ jobs:
             xcode: "15.2"
           - arch: arm64
             os: macos-14
-            xcode: "14.3.1"
+            xcode: "15.4"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
