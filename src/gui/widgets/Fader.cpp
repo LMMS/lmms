@@ -283,8 +283,8 @@ void Fader::paintEvent(QPaintEvent* ev)
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 {
 	const auto mapper = linear
-		? [](float value) -> float { return value; }
-		: [](float value) -> float { return ampToDbfs(qMax(0.0001f, value)); };
+		? +[](float value) -> float { return value; }
+		: +[](float value) -> float { return ampToDbfs(qMax(0.0001f, value)); };
 
 	const float mappedMinPeak = mapper(m_fMinPeak);
 	const float mappedMaxPeak = mapper(m_fMaxPeak);
