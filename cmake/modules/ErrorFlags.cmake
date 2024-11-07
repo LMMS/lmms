@@ -66,6 +66,8 @@ elseif(MSVC)
 		)
 	endif()
 
+	# Silence deprecation warnings for the std::atomic_...<std::shared_ptr> family of functions.
+	# TODO: Remove once C++20's std::atomic<std::shared_ptr> is fully supported.
 	add_compile_definitions("_SILENCE_CXX20_OLD_SHARED_PTR_ATOMIC_SUPPORT_DEPRECATION_WARNING")
 endif()
 
