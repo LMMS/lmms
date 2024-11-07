@@ -398,7 +398,7 @@ public:
 		message & addInt( int _i )
 		{
 			char buf[32];
-			sprintf( buf, "%d", _i );
+			std::snprintf(buf, 32, "%d", _i);
 			data.emplace_back( buf );
 			return *this;
 		}
@@ -406,7 +406,7 @@ public:
 		message & addFloat( float _f )
 		{
 			char buf[32];
-			sprintf( buf, "%f", _f );
+			std::snprintf(buf, 32, "%f", _f);
 			data.emplace_back( buf );
 			return *this;
 		}
