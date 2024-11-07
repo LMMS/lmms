@@ -176,13 +176,13 @@ void EffectRackView::update()
 			connect(view, &EffectView::deletedPlugin, this, &EffectRackView::deletePlugin, Qt::QueuedConnection);
 
 			QAction* moveUpAction = new QAction(view);
-			moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
+			moveUpAction->setShortcut(QKeySequence{Qt::Key_Up, Qt::AltModifier});
 			moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 			connect(moveUpAction, &QAction::triggered, view, &EffectView::moveUp);
 			view->addAction(moveUpAction);
 
 			QAction* moveDownAction = new QAction(view);
-			moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
+			moveDownAction->setShortcut(QKeySequence{Qt::Key_Down, Qt::AltModifier});
 			moveDownAction->setShortcutContext(Qt::WidgetShortcut);
 			connect(moveDownAction, &QAction::triggered, view, &EffectView::moveDown);
 			view->addAction(moveDownAction);
