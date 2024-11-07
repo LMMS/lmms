@@ -152,9 +152,9 @@ public:
 	Lb302Synth( InstrumentTrack * _instrument_track );
 	~Lb302Synth() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -214,7 +214,7 @@ private:
 	Lb302FilterKnobState fs;
 	QAtomicPointer<Lb302Filter> vcf;
 
-	int release_frame;
+	size_t release_frame;
 
 	// More States
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
@@ -246,7 +246,7 @@ private:
 
 	void recalcFilter();
 
-	int process(sampleFrame *outbuf, const int size);
+	int process(SampleFrame* outbuf, const std::size_t size);
 
 	friend class gui::Lb302SynthView;
 

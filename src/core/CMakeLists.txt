@@ -24,6 +24,7 @@ set(LMMS_SRCS
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
+	core/FileSearch.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
 	core/Instrument.cpp
@@ -38,8 +39,8 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
-	core/MemoryHelper.cpp
 	core/MeterModel.cpp
+	core/Metronome.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
 	core/Mixer.cpp
@@ -82,6 +83,7 @@ set(LMMS_SRCS
 	core/Song.cpp
 	core/StepRecorder.cpp
 	core/TempoSyncKnobModel.cpp
+	core/ThreadPool.cpp
 	core/Timeline.cpp
 	core/TimePos.cpp
 	core/ToolPlugin.cpp

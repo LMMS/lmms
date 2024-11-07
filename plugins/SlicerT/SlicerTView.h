@@ -26,9 +26,9 @@
 #define LMMS_GUI_SLICERT_VIEW_H
 
 #include <QPushButton>
+#include <qpixmap.h>
 
 #include "ComboBox.h"
-#include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
@@ -42,7 +42,7 @@ class SlicerT;
 
 namespace gui {
 
-class SlicerTView : public InstrumentViewFixedSize
+class SlicerTView : public InstrumentView
 {
 	Q_OBJECT
 
@@ -55,23 +55,39 @@ public:
 
 	static constexpr int s_textBoxHeight = 20;
 	static constexpr int s_textBoxWidth = 50;
-	static constexpr int s_topTextY = 170;
-	static constexpr int s_bottomTextY = 220;
 
+	static constexpr int s_topBarHeight = 50;
+	static constexpr int s_bottomBoxHeight = 97;
+	static constexpr int s_bottomBoxOffset = 65;
+	static constexpr int s_sampleBoxHeight = 14;
+	static constexpr int s_folderButtonWidth = 15;
+	static constexpr int s_leftBoxWidth = 400;
+
+
+	static constexpr int s_x1 = 35;
+	static constexpr int s_x2 = 85;
+	static constexpr int s_x3 = 160;
+	static constexpr int s_x4 = 190;
+	static constexpr int s_x5 = 275;
+	static constexpr int s_x6 = 325;
 protected:
-	virtual void dragEnterEvent(QDragEnterEvent* dee);
-	virtual void dropEvent(QDropEvent* de);
+	void dragEnterEvent(QDragEnterEvent* dee) override;
+	void dropEvent(QDropEvent* de) override;
 
-	virtual void paintEvent(QPaintEvent* pe);
+	void paintEvent(QPaintEvent* pe) override;
+	void resizeEvent(QResizeEvent* event) override;
 
 private:
+	bool isResizable() const override { return true; }
+
 	SlicerT* m_slicerTParent;
 
 	Knob* m_noteThresholdKnob;
 	Knob* m_fadeOutKnob;
 	LcdSpinBox* m_bpmBox;
 	ComboBox* m_snapSetting;
-	LedCheckBox* m_syncToggle;
+	PixmapButton* m_syncToggle;
+	PixmapButton* m_folderButton;
 
 	QPushButton* m_resetButton;
 	QPushButton* m_midiExportButton;
@@ -79,6 +95,13 @@ private:
 	SlicerTWaveform* m_wf;
 
 	Knob* createStyledKnob();
+
+	QPixmap m_fullLogo;
+	QPixmap m_background;
+
+
+	int m_y1;
+	int m_y2;
 };
 } // namespace gui
 } // namespace lmms

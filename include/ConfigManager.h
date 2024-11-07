@@ -232,6 +232,8 @@ public:
 
 	QString defaultVersion() const;
 
+	static bool enableBlockedPlugins();
+
 	WindowEmbed::Method vstEmbedMethod() const;
 
 	// Returns true if the working dir (e.g. ~/lmms) exists on disk.

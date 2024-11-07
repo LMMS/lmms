@@ -196,7 +196,7 @@ QString Xpressive::nodeName() const {
 	return (xpressive_plugin_descriptor.name);
 }
 
-void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
+void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 	m_A1=m_parameterA1.value();
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
@@ -579,9 +579,9 @@ void XpressiveView::expressionChanged() {
 
 		if (parse_ok) {
 			e->exprValid().setValue(0);
-			const int length = m_raw_graph->length();
+			const auto length = static_cast<std::size_t>(m_raw_graph->length());
 			auto const samples = new float[length];
-			for (i = 0; i < length; i++) {
+			for (auto i = std::size_t{0}; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
 				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0)

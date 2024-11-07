@@ -221,7 +221,7 @@ QString OrganicInstrument::nodeName() const
 
 
 void OrganicInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -302,7 +302,7 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	// fxKnob is [0;1]
 	float t =  m_fx1Model.value();
 
-	for (int i=0 ; i < frames + offset ; i++)
+	for (auto i = std::size_t{0}; i < frames + offset; i++)
 	{
 		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
 						m_volModel.value() / 100.0f;

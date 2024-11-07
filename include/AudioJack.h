@@ -31,7 +31,7 @@
 #ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #else
-#include "weak_libjack.h"
+#include <weak_libjack.h>
 #endif
 
 #include <atomic>
@@ -111,7 +111,7 @@ private:
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
-	surroundSampleFrame* m_outBuf;
+	SampleFrame* m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;

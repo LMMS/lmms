@@ -43,6 +43,7 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "Metronome.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -135,7 +136,7 @@ MainWindow::MainWindow() :
 		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
-	QString title = tr( "Root directory" );
+	QString title = tr("Root Directory");
 	bool dirs_as_items = false;
 
 #ifdef LMMS_BUILD_APPLE
@@ -430,7 +431,7 @@ void MainWindow::finalize()
 				this, SLOT(onToggleMetronome()),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::audioEngine()->isMetronomeActive());
+	m_metronomeToggle->setChecked(Engine::getSong()->metronome().active());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -974,26 +975,21 @@ void MainWindow::toggleFullscreen()
  */
 void MainWindow::refocus()
 {
-	QList<QWidget*> editors;
-	editors
-		<< getGUI()->songEditor()->parentWidget()
-		<< getGUI()->patternEditor()->parentWidget()
-		<< getGUI()->pianoRoll()->parentWidget()
-		<< getGUI()->automationEditor()->parentWidget();
+	const auto gui = getGUI();
 
-	bool found = false;
-	QList<QWidget*>::Iterator editor;
-	for( editor = editors.begin(); editor != editors.end(); ++editor )
+	// Attempt to set the focus on the first of these editors that is not hidden...
+	for (auto editorParent : { gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
+		gui->pianoRoll()->parentWidget(), gui->automationEditor()->parentWidget() })
 	{
-		if( ! (*editor)->isHidden() ) {
-			(*editor)->setFocus();
-			found = true;
-			break;
+		if (!editorParent->isHidden())
+		{
+			editorParent->setFocus();
+			return;
 		}
 	}
 
-	if( ! found )
-		this->setFocus();
+	// ... otherwise set the focus on the main window.
+	this->setFocus();
 }
 
 
@@ -1173,7 +1169,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Engine::audioEngine()->setMetronomeActive( m_metronomeToggle->isChecked() );
+	Engine::getSong()->metronome().setActive(m_metronomeToggle->isChecked());
 }
 
 

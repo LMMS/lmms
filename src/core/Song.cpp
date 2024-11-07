@@ -244,9 +244,6 @@ void Song::processNextBuffer()
 			return;
 	}
 
-	// If we have no tracks to play, there is nothing to do
-	if (trackList.empty()) { return; }
-
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
@@ -359,6 +356,8 @@ void Song::processNextBuffer()
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
+			processMetronome(frameOffsetInPeriod);
+
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
@@ -451,6 +450,17 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 			it.key()->setUseControllerValue(true);
 		}
 	}
+}
+
+void Song::processMetronome(size_t bufferOffset)
+{
+	const auto currentPlayMode = playMode();
+	const auto supported = currentPlayMode == PlayMode::MidiClip
+		|| currentPlayMode == PlayMode::Song
+		|| currentPlayMode == PlayMode::Pattern;
+
+	if (!supported || m_exporting) { return; } 
+	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
 }
 
 void Song::setModified(bool value)
@@ -594,6 +604,8 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 
 void Song::updateLength()
 {
+	if (m_loadingProject) { return; }
+
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
@@ -891,7 +903,7 @@ void Song::clearProject()
 		stop();
 	}
 
-	for( int i = 0; i < PlayModeCount; i++ )
+	for (auto i = std::size_t{0}; i < PlayModeCount; i++)
 	{
 		setPlayPos( 0, ( PlayMode )i );
 	}
@@ -1009,7 +1021,7 @@ void Song::createNewProject()
 	QCoreApplication::instance()->processEvents();
 
 	m_loadingProject = false;
-
+	updateLength();
 	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
@@ -1252,6 +1264,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
+	updateLength();
 	setModified(false);
 	m_loadOnLaunch = false;
 }
@@ -1392,7 +1405,7 @@ void Song::restoreScaleStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_scales[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1417,7 +1430,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_keymaps[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1588,6 +1601,4 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
-
-
 } // namespace lmms
