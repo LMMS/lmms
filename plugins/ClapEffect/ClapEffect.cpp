@@ -105,8 +105,6 @@ auto ClapEffect::processImpl(SampleFrame* buf, const fpp_t frames) -> ProcessSta
 	{
 		buf[f][0] = dry * buf[f][0] + wet * leftSamples[f][0];
 		buf[f][1] = dry * buf[f][1] + wet * rightSamples[f][1];
-		auto left = static_cast<double>(buf[f][0]);
-		auto right = static_cast<double>(buf[f][1]);
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

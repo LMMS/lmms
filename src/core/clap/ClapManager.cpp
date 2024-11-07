@@ -214,8 +214,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	const auto startTime = std::chrono::steady_clock::now();
 
 	// Search `searchPaths` for files (or macOS bundles) with ".clap" extension
-	int totalClapFiles = 0;
-	int totalPlugins = 0;
+	std::size_t totalClapFiles = 0;
+	std::size_t totalPlugins = 0;
 	for (const auto& path : searchPaths)
 	{
 		for (const auto& entry : std::filesystem::recursive_directory_iterator{path})

@@ -31,12 +31,7 @@
 #include <QDomElement>
 #include <algorithm>
 #include <cassert>
-
-#ifdef __MINGW32__
-#include <mingw.thread.h>
-#else
 #include <thread>
-#endif
 
 #include "AudioEngine.h"
 #include "ClapManager.h"

@@ -47,7 +47,7 @@ namespace lmms
 class ClapAudioBuffer
 {
 public:
-	ClapAudioBuffer(std::uint32_t channels, std::uint32_t frames)
+	ClapAudioBuffer(std::uint32_t channels, fpp_t frames)
 		: m_channels{channels}
 		, m_frames{frames}
 	{
@@ -99,7 +99,7 @@ private:
 	}
 
 	std::uint32_t m_channels;
-	std::uint32_t m_frames;
+	fpp_t m_frames;
 	float** m_data = nullptr;
 };
 

@@ -32,6 +32,7 @@
 #include <string_view>
 #include <clap/plugin.h>
 
+#include "lmms_export.h"
 #include "NoCopyNoMove.h"
 
 namespace lmms
@@ -43,7 +44,7 @@ class ClapLog;
 namespace detail
 {
 
-class ClapExtensionHelper : public NoCopyNoMove
+class LMMS_EXPORT ClapExtensionHelper : public NoCopyNoMove
 {
 public:
 	ClapExtensionHelper(ClapInstance* instance)
@@ -109,7 +110,7 @@ private:
  * Template for extensions with both a host and plugin side
  */
 template<class HostExt, class PluginExt = void>
-class ClapExtension : public detail::ClapExtensionHelper
+class LMMS_EXPORT ClapExtension : public detail::ClapExtensionHelper
 {
 public:
 	using detail::ClapExtensionHelper::ClapExtensionHelper;
@@ -219,7 +220,7 @@ private:
  * Template for host-only extensions
 */
 template<class HostExt>
-class ClapExtension<HostExt, void> : public detail::ClapExtensionHelper
+class LMMS_EXPORT ClapExtension<HostExt, void> : public detail::ClapExtensionHelper
 {
 public:
 	using detail::ClapExtensionHelper::ClapExtensionHelper;
