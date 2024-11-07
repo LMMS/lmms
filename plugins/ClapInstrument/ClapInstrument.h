@@ -73,7 +73,7 @@ public:
 	 */
 	auto hasNoteInput() const -> bool override;
 	auto handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) -> bool override;
-	void play(sampleFrame* buffer) override;
+	void play(SampleFrame* buffer) override;
 
 	auto instantiateView(QWidget* parent) -> gui::PluginView* override;
 

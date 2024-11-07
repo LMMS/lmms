@@ -116,6 +116,7 @@ auto PresetDatabase::findOrLoadPresets(std::string_view file) -> std::vector<con
 	loadPresets(location, file, presets);
 
 	std::vector<const Preset*> results;
+	results.reserve(presets.size());
 	for (const auto& preset : presets)
 	{
 		results.push_back(&preset);

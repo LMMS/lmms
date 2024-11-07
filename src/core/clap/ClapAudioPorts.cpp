@@ -37,7 +37,7 @@ namespace lmms
 namespace
 {
 	template<bool stereo>
-	inline void copyBuffersHostToPlugin(const sampleFrame* hostBuf, float** pluginBuf,
+	inline void copyBuffersHostToPlugin(const SampleFrame* hostBuf, float** pluginBuf,
 		unsigned channel, fpp_t frames)
 	{
 		for (fpp_t f = 0; f < frames; ++f)
@@ -47,7 +47,7 @@ namespace
 		}
 	}
 
-	inline void copyBuffersStereoHostToMonoPlugin(const sampleFrame* hostBuf, float** pluginBuf,
+	inline void copyBuffersStereoHostToMonoPlugin(const SampleFrame* hostBuf, float** pluginBuf,
 		unsigned channel, fpp_t frames)
 	{
 		for (fpp_t f = 0; f < frames; ++f)
@@ -57,7 +57,7 @@ namespace
 	}
 
 	template<bool stereo>
-	inline void copyBuffersPluginToHost(float** pluginBuf, sampleFrame* hostBuf,
+	inline void copyBuffersPluginToHost(float** pluginBuf, SampleFrame* hostBuf,
 		std::uint64_t constantMask, unsigned channel, fpp_t frames)
 	{
 		const bool isLeftConstant = (constantMask & (1 << 0)) != 0;
@@ -79,7 +79,7 @@ namespace
 		}
 	}
 
-	inline void copyBuffersMonoPluginToStereoHost(float** pluginBuf, sampleFrame* hostBuf,
+	inline void copyBuffersMonoPluginToStereoHost(float** pluginBuf, SampleFrame* hostBuf,
 		std::uint64_t constantMask, unsigned channel, fpp_t frames)
 	{
 		const bool isConstant = (constantMask & (1 << 0)) != 0;
@@ -364,7 +364,7 @@ auto ClapAudioPorts::checkSupported(const clap_plugin_audio_ports& ext) -> bool
 	return ext.count && ext.get;
 }
 
-void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buffer, fpp_t frames)
+void ClapAudioPorts::copyBuffersFromCore(const SampleFrame* buffer, fpp_t frames)
 {
 	switch (portConfig<true>())
 	{
@@ -389,7 +389,7 @@ void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buffer, fpp_t frames
 	}
 }
 
-void ClapAudioPorts::copyBuffersToCore(sampleFrame* buffer, fpp_t frames) const
+void ClapAudioPorts::copyBuffersToCore(SampleFrame* buffer, fpp_t frames) const
 {
 	switch (portConfig<false>())
 	{

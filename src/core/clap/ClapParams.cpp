@@ -93,7 +93,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 	std::unordered_set<clap_id> paramIds(count * 2);
 	bool needToUpdateParamsCache = false;
 
-	for (std::int32_t idx = 0; idx < count; ++idx)
+	for (std::uint32_t idx = 0; idx < count; ++idx)
 	{
 		clap_param_info info{};
 		info.id = CLAP_INVALID_ID;

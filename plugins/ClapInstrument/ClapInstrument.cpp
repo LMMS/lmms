@@ -166,7 +166,7 @@ auto ClapInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& time
 	return true;
 }
 
-void ClapInstrument::play(sampleFrame* buffer)
+void ClapInstrument::play(SampleFrame* buffer)
 {
 	if (!m_instance) { return; }
 

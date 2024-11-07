@@ -41,8 +41,8 @@
 #include "CustomTextKnob.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "lmms_math.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
@@ -153,7 +153,7 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), SMALL_FONT_SIZE));
 		btnBox->addWidget(m_toggleUIButton);
 	}
 

@@ -69,14 +69,13 @@ ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 	, m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod())
 {
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this,
-		[&] { m_tempOutputSamples.reserve(Engine::audioEngine()->framesPerPeriod()); });
+		[&] { m_tempOutputSamples.resize(Engine::audioEngine()->framesPerPeriod()); });
 }
 
-bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+auto ClapEffect::processImpl(SampleFrame* buf, const fpp_t frames) -> ProcessStatus
 {
 	ClapInstance* instance = m_controls.m_instance.get();
-
-	if (!isEnabled() || !isRunning() || !instance) { return false; }
+	assert(instance != nullptr);
 	assert(frames <= static_cast<fpp_t>(m_tempOutputSamples.size()));
 
 	instance->audioPorts().copyBuffersFromCore(buf, frames);
@@ -87,8 +86,8 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	instance->copyModelsToCore();
 	instance->audioPorts().copyBuffersToCore(m_tempOutputSamples.data(), frames);
 
-	sampleFrame* leftSamples = m_tempOutputSamples.data();
-	sampleFrame* rightSamples = m_tempOutputSamples.data();
+	SampleFrame* leftSamples = m_tempOutputSamples.data();
+	SampleFrame* rightSamples = m_tempOutputSamples.data();
 	switch (instance->audioPorts().portConfig<false>())
 	{
 		case PluginPortConfig::Config::LeftOnly:
@@ -98,7 +97,6 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		default: break;
 	}
 
-	double outSum = 0.0;
 	bool corrupt = wetLevel() < 0.f; // #3261 - if wet < 0, bash wet := 0, dry := 1
 	const float dry = corrupt ? 1.f : dryLevel();
 	const float wet = corrupt ? 0.f : wetLevel();
@@ -109,11 +107,9 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		buf[f][1] = dry * buf[f][1] + wet * rightSamples[f][1];
 		auto left = static_cast<double>(buf[f][0]);
 		auto right = static_cast<double>(buf[f][1]);
-		outSum += left * left + right * right;
 	}
-	checkGate(outSum / frames);
 
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 } // namespace lmms

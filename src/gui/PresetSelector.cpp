@@ -162,9 +162,9 @@ void PresetSelector::updateMenu()
 	for (int idx = 0; idx < static_cast<int>(presets.size()); ++idx)
 	{
 		auto presetAction = new QAction{this};
-		connect(presetAction, &QAction::triggered, this, [=] { selectPreset(idx); });
+		connect(presetAction, &QAction::triggered, this, [this, idx] { selectPreset(idx); });
 
-		const auto isActive = m_presets->presetIndex().value_or(-1) == idx;
+		const auto isActive = static_cast<int>(m_presets->presetIndex().value_or(-1)) == idx;
 		if (isActive)
 		{
 			auto font = presetAction->font();

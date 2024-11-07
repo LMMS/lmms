@@ -38,6 +38,7 @@
 #include "lmms_export.h"
 #include "PluginIssue.h"
 #include "PluginPortConfig.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -114,8 +115,8 @@ public:
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_AUDIO_PORTS; }
 
-	void copyBuffersFromCore(const sampleFrame* buffer, fpp_t frames);
-	void copyBuffersToCore(sampleFrame* buffer, fpp_t frames) const;
+	void copyBuffersFromCore(const SampleFrame* buffer, fpp_t frames);
+	void copyBuffersToCore(SampleFrame* buffer, fpp_t frames) const;
 
 private:
 	auto hostExtImpl() const -> const clap_host_audio_ports* override { return nullptr; } // not impl for host yet

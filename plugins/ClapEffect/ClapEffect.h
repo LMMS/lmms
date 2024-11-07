@@ -43,7 +43,7 @@ public:
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool { return m_controls.isValid(); }
 
-	auto processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool override;
+	auto processImpl(SampleFrame* buf, const fpp_t frames) -> ProcessStatus override;
 	auto controls() -> EffectControls* override { return &m_controls; }
 
 	auto clapControls() -> ClapFxControls* { return &m_controls; }
@@ -52,7 +52,7 @@ public:
 private:
 	ClapFxControls m_controls;
 
-	std::vector<sampleFrame> m_tempOutputSamples;
+	std::vector<SampleFrame> m_tempOutputSamples;
 };
 
 } // namespace lmms
