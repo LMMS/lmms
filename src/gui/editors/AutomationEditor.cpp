@@ -2037,17 +2037,17 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	auto editModeGroup = new ActionGroup(this);
 	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	m_drawAction->setShortcut(QKeySequence{Qt::SHIFT, Qt::Key_D});
+	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 	m_drawAction->setChecked(true);
 
 	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	m_eraseAction->setShortcut(QKeySequence{Qt::SHIFT, Qt::Key_E});
+	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
 	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
-	m_drawOutAction->setShortcut(QKeySequence{Qt::SHIFT, Qt::Key_C});
+	m_drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
 	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
-	m_editTanAction->setShortcut(QKeySequence{Qt::SHIFT, Qt::Key_T});
+	m_editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
 	m_editTanAction->setEnabled(false);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
