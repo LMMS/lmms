@@ -23,73 +23,93 @@
  */
 
 #include "SampleWaveform.h"
+#include "interpolation.h"
 
 namespace lmms::gui {
 
-void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const QRect& rect)
+SampleWaveform::SampleWaveform(const SampleFrame* buffer, size_t size)
+	: m_buffer(buffer)
+	, m_size(size)
 {
-	const int x = rect.x();
-	const int height = rect.height();
-	const int width = rect.width();
-	const int centerY = rect.center().y();
+}
 
-	const int halfHeight = height / 2;
+void SampleWaveform::generate()
+{
+	if (!m_buffer || m_size == 0) { return; }
 
-	const auto color = painter.pen().color();
-	const auto rmsColor = color.lighter(123);
+	m_min.clear();
+	m_max.clear();
 
-	const float framesPerPixel = std::max(1.0f, static_cast<float>(parameters.size) / width);
-
-	constexpr float maxFramesPerPixel = 512.0f;
-	const float resolution = std::max(1.0f, framesPerPixel / maxFramesPerPixel);
-	const float framesPerResolution = framesPerPixel / resolution;
-
-	size_t numPixels = std::min(parameters.size, static_cast<size_t>(width));
-	auto min = std::vector<float>(numPixels, 1);
-	auto max = std::vector<float>(numPixels, -1);
-	auto squared = std::vector<float>(numPixels, 0);
-
-	const size_t maxFrames = static_cast<size_t>(numPixels * framesPerPixel);
-
-	auto pixelIndex = std::size_t{0};
-
-	for (auto i = std::size_t{0}; i < maxFrames; i += static_cast<std::size_t>(resolution))
+	const auto maxLevel = static_cast<int>(std::log2(m_size));
+	for (auto level = 1; level <= maxLevel; ++level)
 	{
-		pixelIndex = i / framesPerPixel;
-		const auto frameIndex = !parameters.reversed ? i : maxFrames - i;
+		const auto downsampledSize = m_size / static_cast<int>(std::exp2(level));
+		m_min[level].resize(downsampledSize);
+		m_max[level].resize(downsampledSize);
 
-		const auto& frame = parameters.buffer[frameIndex];
-		const auto value = frame.average();
-
-		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
-		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
-
-		squared[pixelIndex] += value * value;
+		if (level == 1)
+		{
+			for (auto i = std::size_t{0}; i < downsampledSize; ++i)
+			{
+				static auto peakComp = [](const SampleFrame& a, const SampleFrame& b) { return a.average() < b.average(); };
+				m_min[level][i] = std::min_element(&m_buffer[i * 2], &m_buffer[i * 2 + 2], peakComp)->average();
+				m_max[level][i] = std::max_element(&m_buffer[i * 2], &m_buffer[i * 2 + 2], peakComp)->average();
+			}
+		}
+		else
+		{
+			for (auto i = std::size_t{0}; i < downsampledSize; ++i)
+			{
+				m_min[level][i] = *std::min_element(&m_min[level - 1][i * 2], &m_min[level - 1][i * 2 + 2]);
+				m_max[level][i] = *std::max_element(&m_max[level - 1][i * 2], &m_max[level - 1][i * 2 + 2]);
+			}
+		}
 	}
-	
-	if (pixelIndex < numPixels)
-	{
-		numPixels = pixelIndex;
+}
+
+void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float amplification, bool reversed, std::optional<size_t> from, std::optional<size_t> to)
+{
+	if (!m_buffer || m_size == 0) { return; }
+
+	const auto sampleBegin = from.has_value() ? from.value() : 0;
+	const auto sampleEnd = to.has_value() ? to.value() : m_size;
+	const auto sampleRange = sampleEnd - sampleBegin;
+	const auto samplesPerPixel = std::max(1, static_cast<int>(sampleRange) / rect.width());
+
+	const auto downsampledLevelLow = static_cast<int>(std::log2(samplesPerPixel));
+	const auto downsampledLevelHigh = static_cast<int>(std::ceil(std::log2(samplesPerPixel)));
+
+	const auto downsampledFactorLow = static_cast<int>(std::exp2(downsampledLevelLow));
+	const auto downsampledFactorHigh = static_cast<int>(std::exp2(downsampledLevelHigh));
+
+	const auto ratio = downsampledFactorHigh == downsampledFactorLow
+		? 1.0f
+		: static_cast<float>(samplesPerPixel - downsampledFactorLow) / (downsampledFactorHigh - downsampledFactorLow);
+
+	const auto centerY = rect.center().y();
+	const auto centerHeight = rect.height() / 2.0f;
+
+	for (auto i = 0; i < rect.width(); ++i)
+	{	
+		const auto index = static_cast<float>(i * samplesPerPixel);
+		const auto lowIndex = static_cast<int>(std::floor(index / downsampledFactorLow));
+		const auto highIndex = static_cast<int>(std::ceil(index / downsampledFactorHigh));
+
+		const auto minPeak = linearInterpolate(m_min[downsampledLevelLow][lowIndex], m_min[downsampledLevelHigh][highIndex], ratio);
+		const auto maxPeak = linearInterpolate(m_max[downsampledLevelLow][lowIndex], m_max[downsampledLevelHigh][highIndex], ratio);
+
+		const auto lineMin = centerY - minPeak * centerHeight * amplification;
+		const auto lineMax = centerY - maxPeak * centerHeight * amplification;
+		const auto lineX = rect.x() + static_cast<int>(i);
+		painter.drawLine(lineX, lineMax, lineX, lineMin);
 	}
+}
 
-	for (auto i = std::size_t{0}; i < numPixels; i++)
-	{
-		const int lineY1 = centerY - max[i] * halfHeight * parameters.amplification;
-		const int lineY2 = centerY - min[i] * halfHeight * parameters.amplification;
-		const int lineX = static_cast<int>(i) + x;
-		painter.drawLine(lineX, lineY1, lineX, lineY2);
-
-		const float rms = std::sqrt(squared[i] / framesPerResolution);
-		const float maxRMS = std::clamp(rms, min[i], max[i]);
-		const float minRMS = std::clamp(-rms, min[i], max[i]);
-
-		const int rmsLineY1 = centerY - maxRMS * halfHeight * parameters.amplification;
-		const int rmsLineY2 = centerY - minRMS * halfHeight * parameters.amplification;
-
-		painter.setPen(rmsColor);
-		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
-		painter.setPen(color);
-	}
+void SampleWaveform::reset(const SampleFrame* buffer, size_t size)
+{
+	m_buffer = buffer;
+	m_size = size;
+	generate();
 }
 
 } // namespace lmms::gui

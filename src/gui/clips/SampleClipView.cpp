@@ -61,6 +61,8 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 void SampleClipView::updateSample()
 {
 	update();
+	m_waveform.reset(m_clip->m_sample.data(), m_clip->m_sample.sampleSize());
+
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
@@ -272,9 +274,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 
-	const auto& sample = m_clip->m_sample;
-	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	SampleWaveform::visualize(waveform, p, r);
+	m_waveform.visualize(p, r);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

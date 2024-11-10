@@ -85,6 +85,7 @@ SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instr
 
 	connect(instrument, &SlicerT::isPlaying, this, &SlicerTWaveform::isPlaying);
 	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::updateUI);
+	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::updateWaveform);
 
 	m_emptySampleIcon = m_emptySampleIcon.createMaskFromColor(QColor(255, 255, 255), Qt::MaskMode::MaskOutColor);
 
@@ -115,10 +116,8 @@ void SlicerTWaveform::drawSeekerWaveform()
 	brush.setPen(s_waveformColor);
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform
-		= SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
 	const auto rect = QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height());
-	SampleWaveform::visualize(waveform, brush, rect);
+	m_waveform.visualize(brush, rect, sample.amplification(), sample.reversed());
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -173,11 +172,9 @@ void SlicerTWaveform::drawEditorWaveform()
 	brush.setPen(s_waveformColor);
 	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
-	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform = SampleWaveform::Parameters{
-		sample.data() + startFrame, endFrame - startFrame, sample.amplification(), sample.reversed()};
 	const auto rect = QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight);
-	SampleWaveform::visualize(waveform, brush, rect);
+	const auto& sample = m_slicerTParent->m_originalSample;
+	m_waveform.visualize(brush, rect, sample.amplification(), sample.reversed(), startFrame, endFrame);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -273,6 +270,12 @@ void SlicerTWaveform::updateUI()
 	drawSeeker();
 	drawEditor();
 	update();
+}
+
+void SlicerTWaveform::updateWaveform()
+{
+	const auto& sample = m_slicerTParent->m_originalSample;
+	m_waveform.reset(sample.data(), sample.sampleSize());
 }
 
 // updates the closest object and changes the cursor respectivly

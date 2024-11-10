@@ -26,23 +26,30 @@
 #define LMMS_GUI_SAMPLE_WAVEFORM_H
 
 #include <QPainter>
+#include <optional>
 
-#include "Sample.h"
+#include "SampleFrame.h"
 #include "lmms_export.h"
 
 namespace lmms::gui {
 class LMMS_EXPORT SampleWaveform
 {
 public:
-	struct Parameters
-	{
-		const SampleFrame* buffer;
-		size_t size;
-		float amplification;
-		bool reversed;
-	};
+	SampleWaveform() = default;
+	SampleWaveform(const SampleFrame* buffer, size_t size);
 
-	static void visualize(Parameters parameters, QPainter& painter, const QRect& rect);
+	void generate();
+	void visualize(QPainter& painter, const QRect& rect,
+		float amplification = 1.0f, bool reversed = false,
+		std::optional<size_t> from = std::nullopt,
+		std::optional<size_t> to = std::nullopt);
+	void reset(const SampleFrame* buffer, size_t size);
+
+private:
+	const SampleFrame* m_buffer = nullptr;
+	size_t m_size = 0;
+	std::unordered_map<int, std::vector<float>> m_min;
+	std::unordered_map<int, std::vector<float>> m_max;
 };
 } // namespace lmms::gui
 

@@ -26,6 +26,7 @@
 #define LMMS_GUI_SAMPLE_CLIP_VIEW_H
 
 #include "ClipView.h"
+#include "SampleWaveform.h"
 
 namespace lmms
 {
@@ -63,6 +64,7 @@ protected:
 
 private:
 	SampleClip * m_clip;
+	SampleWaveform m_waveform;
 	QPixmap m_paintPixmap;
 	bool splitClip( const TimePos pos ) override;
 } ;

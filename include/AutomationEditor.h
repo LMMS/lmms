@@ -36,6 +36,7 @@
 #include "JournallingObject.h"
 #include "MidiClip.h"
 #include "SampleClip.h"
+#include "SampleWaveform.h"
 #include "TimePos.h"
 #include "lmms_basics.h"
 
@@ -233,6 +234,7 @@ private:
 
 	MidiClip* m_ghostNotes = nullptr;
 	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	SampleWaveform m_waveform;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();

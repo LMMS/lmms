@@ -26,6 +26,7 @@
 
 #include "ConfigManager.h"
 #include "FontHelper.h"
+#include "Sample.h"
 #include "SampleWaveform.h"
 
 #include <QPainter>
@@ -48,6 +49,8 @@ void AudioFileProcessorWaveView::updateSampleRange()
 		setFrom(m_sample->startFrame() - marging);
 		setTo(m_sample->endFrame() + marging);
 	}
+
+	m_waveform.reset(m_sample->data(), m_sample->sampleSize());
 }
 
 void AudioFileProcessorWaveView::setTo(int to)
@@ -339,12 +342,8 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 	
-	const auto dataOffset = m_reversed ? m_sample->sampleSize() - m_to : m_from;
-
 	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
-	const auto waveform = SampleWaveform::Parameters{
-		m_sample->data() + dataOffset, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
-	SampleWaveform::visualize(waveform, p, rect);
+	m_waveform.visualize(p, rect, m_sample->amplification(), m_sample->reversed(), m_from, m_to);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

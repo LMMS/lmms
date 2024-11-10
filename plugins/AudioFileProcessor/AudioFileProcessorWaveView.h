@@ -27,6 +27,7 @@
 
 
 #include "Knob.h"
+#include "SampleWaveform.h"
 
 
 namespace lmms
@@ -126,6 +127,7 @@ private:
 	} ;
 
 	Sample const* m_sample;
+	SampleWaveform m_waveform;
 	QPixmap m_graph;
 	int m_from;
 	int m_to;

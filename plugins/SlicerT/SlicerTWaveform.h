@@ -31,6 +31,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include "SampleWaveform.h"
 
 namespace lmms {
 
@@ -44,6 +45,7 @@ class SlicerTWaveform : public QWidget
 
 public slots:
 	void updateUI();
+	void updateWaveform();
 	void isPlaying(float current, float start, float end);
 
 public:
@@ -112,6 +114,9 @@ private:
 	SlicerT* m_slicerTParent;
 
 	QElapsedTimer m_updateTimer;
+
+	SampleWaveform m_waveform;
+
 	void drawSeekerWaveform();
 	void drawSeeker();
 	void drawEditorWaveform();
