@@ -67,7 +67,8 @@ void SampleWaveform::generate()
 	}
 }
 
-void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float amplification, bool reversed, std::optional<size_t> from, std::optional<size_t> to)
+void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float amplification, bool reversed,
+	std::optional<size_t> from, std::optional<size_t> to, std::optional<int> clipWidth)
 {
 	if (!m_buffer || m_size == 0) { return; }
 
@@ -88,8 +89,9 @@ void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float ampli
 
 	const auto centerY = rect.center().y();
 	const auto centerHeight = rect.height() / 2.0f;
+	const auto maxWidth = clipWidth.has_value() ? clipWidth.value() : rect.width();
 
-	for (auto i = 0; i < rect.width(); ++i)
+	for (auto i = 0; i < maxWidth; ++i)
 	{	
 		const auto index = static_cast<float>(i * samplesPerPixel);
 		const auto lowIndex = static_cast<int>(std::floor(index / downsampledFactorLow));
@@ -100,7 +102,7 @@ void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float ampli
 
 		const auto lineMin = centerY - minPeak * centerHeight * amplification;
 		const auto lineMax = centerY - maxPeak * centerHeight * amplification;
-		const auto lineX = rect.x() + static_cast<int>(i);
+		const auto lineX = reversed ? maxWidth - i : i;
 		painter.drawLine(lineX, lineMax, lineX, lineMin);
 	}
 }

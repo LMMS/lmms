@@ -42,7 +42,8 @@ public:
 	void visualize(QPainter& painter, const QRect& rect,
 		float amplification = 1.0f, bool reversed = false,
 		std::optional<size_t> from = std::nullopt,
-		std::optional<size_t> to = std::nullopt);
+		std::optional<size_t> to = std::nullopt,
+		std::optional<int> clipWidth = std::nullopt);
 	void reset(const SampleFrame* buffer, size_t size);
 
 private:
