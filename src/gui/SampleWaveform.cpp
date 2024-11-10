@@ -68,14 +68,13 @@ void SampleWaveform::generate()
 }
 
 void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float amplification, bool reversed,
-	std::optional<size_t> from, std::optional<size_t> to, std::optional<int> clipWidth)
+	std::optional<size_t> from, std::optional<size_t> to)
 {
 	if (!m_buffer || m_size == 0) { return; }
 
 	const auto sampleBegin = from.has_value() ? from.value() : 0;
 	const auto sampleEnd = to.has_value() ? to.value() : m_size;
-	const auto sampleRange = sampleEnd - sampleBegin;
-	const auto samplesPerPixel = std::max(1, static_cast<int>(sampleRange) / rect.width());
+	const auto samplesPerPixel = std::max(1, static_cast<int>(sampleEnd - sampleBegin) / rect.width());
 
 	const auto downsampledLevelLow = static_cast<int>(std::log2(samplesPerPixel));
 	const auto downsampledLevelHigh = static_cast<int>(std::ceil(std::log2(samplesPerPixel)));
@@ -89,9 +88,8 @@ void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float ampli
 
 	const auto centerY = rect.center().y();
 	const auto centerHeight = rect.height() / 2.0f;
-	const auto maxWidth = clipWidth.has_value() ? clipWidth.value() : rect.width();
 
-	for (auto i = 0; i < maxWidth; ++i)
+	for (auto i = 0; i < rect.width(); ++i)
 	{	
 		const auto index = static_cast<float>(i * samplesPerPixel);
 		const auto lowIndex = static_cast<int>(std::floor(index / downsampledFactorLow));
@@ -102,7 +100,7 @@ void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float ampli
 
 		const auto lineMin = centerY - minPeak * centerHeight * amplification;
 		const auto lineMax = centerY - maxPeak * centerHeight * amplification;
-		const auto lineX = reversed ? maxWidth - i : i;
+		const auto lineX = rect.x() + (reversed ? rect.width() - i : i);
 		painter.drawLine(lineX, lineMax, lineX, lineMin);
 	}
 }

@@ -275,7 +275,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 
 	const auto& sample = m_clip->sample();
-	m_waveform.visualize(p, r, sample.amplification(), sample.reversed(), std::nullopt, std::nullopt, width());
+	m_waveform.visualize(p, r, sample.amplification(), sample.reversed());
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
