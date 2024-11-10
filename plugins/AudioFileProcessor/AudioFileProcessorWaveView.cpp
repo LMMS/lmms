@@ -49,7 +49,10 @@ void AudioFileProcessorWaveView::updateSampleRange()
 		setFrom(m_sample->startFrame() - marging);
 		setTo(m_sample->endFrame() + marging);
 	}
+}
 
+void AudioFileProcessorWaveView::updateWaveform()
+{
 	m_waveform.reset(m_sample->data(), m_sample->sampleSize());
 }
 
@@ -92,6 +95,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	configureKnobRelationsAndWaveViews();
 
 	updateSampleRange();
+	updateWaveform();
 
 	m_graph.fill(Qt::transparent);
 	update();

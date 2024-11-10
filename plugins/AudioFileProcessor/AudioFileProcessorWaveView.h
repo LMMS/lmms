@@ -155,6 +155,7 @@ public:
 
 
 	void updateSampleRange();
+	void updateWaveform();
 private:
 	void setTo(int to);
 	void setFrom(int from);

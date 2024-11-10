@@ -210,6 +210,7 @@ void AudioFileProcessorView::dropEvent(QDropEvent* de)
 	}
 
 	m_waveView->updateSampleRange();
+	m_waveView->updateWaveform();
 	Engine::getSong()->setModified();
 	de->accept();
 }
@@ -263,6 +264,7 @@ void AudioFileProcessorView::openAudioFile()
 	castModel<AudioFileProcessor>()->setAudioFile(af);
 	Engine::getSong()->setModified();
 	m_waveView->updateSampleRange();
+	m_waveView->updateWaveform();
 }
 
 void AudioFileProcessorView::modelChanged()
