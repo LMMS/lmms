@@ -135,6 +135,7 @@ QString FileDialog::getOperationPath(const FileDialog::Operation op, const QStri
 			return OperationPaths[i];
 		}
 	}
+
 	return OperationPaths[OpGeneric];
 }
 
@@ -145,6 +146,7 @@ void FileDialog::setOperationPath(const FileDialog::Operation op, const QString&
 		if (i == op)
 		{
 			OperationPaths[i] = path;
+			return;
 		}
 	}
 }
