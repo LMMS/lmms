@@ -72,8 +72,8 @@ void SampleWaveform::visualize(QPainter& painter, const QRect& rect, float ampli
 {
 	if (!m_buffer || m_size == 0) { return; }
 
-	const auto sampleBegin = from.has_value() ? from.value() : 0;
-	const auto sampleEnd = to.has_value() ? to.value() : m_size;
+	const auto sampleBegin = from.value_or(0);
+	const auto sampleEnd = to.value_or(m_size);
 	const auto samplesPerPixel = std::max(1, static_cast<int>(sampleEnd - sampleBegin) / rect.width());
 
 	const auto downsampledLevelLow = static_cast<int>(std::log2(samplesPerPixel));
