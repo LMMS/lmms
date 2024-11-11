@@ -191,9 +191,6 @@ Clip * SampleTrack::createClip(const TimePos & pos)
 void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
 {
 	m_audioPort.effects()->saveState( _doc, _this );
-#if 0
-	_this.setAttribute( "icon", tlb->pixmapFile() );
-#endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
 	m_mixerChannelModel.saveSettings( _doc, _this, "mixch" );
