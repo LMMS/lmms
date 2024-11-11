@@ -340,8 +340,6 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill(Qt::transparent);
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
-	
-	const auto dataOffset = m_reversed ? m_sample->sampleSize() - m_to : m_from;
 
 	m_sampleThumbnail = SampleThumbnail{*m_sample};
 
@@ -354,7 +352,6 @@ void AudioFileProcessorWaveView::updateGraph()
 	param.clipRect = m_graph.rect();
 
 	m_sampleThumbnail.visualize(param, p);
-
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)
@@ -479,7 +476,7 @@ void AudioFileProcessorWaveView::reverse()
 			- m_sample->endFrame()
 			- m_sample->startFrame()
 	);
-	
+
 	const int fromTmp = m_from;
 
 	setFrom(m_sample->sampleSize() - m_to);
