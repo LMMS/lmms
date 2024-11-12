@@ -66,7 +66,8 @@ class SlicerT : public Instrument
 	Q_OBJECT
 
 public slots:
-	void updateFile(QString file);
+	void updateFile(QString file, bool rename);
+	void updateFile(QString file); // assumes rename = false
 	void updateSlices();
 
 signals:
@@ -80,6 +81,8 @@ public:
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
+
+	void loadFile( const QString & _file ) override;
 
 	void findSlices();
 	void findBPM();

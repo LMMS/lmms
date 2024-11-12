@@ -318,14 +318,30 @@ std::vector<Note> SlicerT::getMidi()
 	return outputNotes;
 }
 
-void SlicerT::updateFile(QString file)
+void SlicerT::updateFile(QString file, bool rename)
 {
+	// (copied and adapted from AudioFileProcessor)
+	// is current channel-name equal to previous-filename??
+	if( rename &&
+		( instrumentTrack()->name() ==
+			QFileInfo(m_originalSample.sampleFile()).fileName() ||
+				m_originalSample.sampleFile().isEmpty()))
+	{
+		// then set it to new one
+		instrumentTrack()->setName( PathUtil::cleanName( file ) );
+	}
+	// else we don't touch the track-name, because the user named it self
+
 	if (auto buffer = gui::SampleLoader::createBufferFromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
 
 	findBPM();
 	findSlices();
 
 	emit dataChanged();
+}
+
+void SlicerT::updateFile(QString file) {
+	updateFile(file, false);
 }
 
 void SlicerT::updateSlices()
@@ -391,6 +407,11 @@ void SlicerT::loadSettings(const QDomElement& element)
 	m_enableSync.loadSettings(element, "syncEnable");
 
 	emit dataChanged();
+}
+
+void SlicerT::loadFile( const QString & _file )
+{
+	updateFile(_file, true);
 }
 
 QString SlicerT::nodeName() const
