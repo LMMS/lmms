@@ -1,7 +1,7 @@
 ---
 # Language
 Language:        Cpp
-Standard:        Cpp11  # Cpp14 and Cpp17 are not supported by clang 11
+Standard:        c++20
 
 # Indentation
 TabWidth:        4
