@@ -667,7 +667,7 @@ ENDIF()
 
 # gcc builds support gprof for profiling
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	set(STATUS_GPROF ", NOT SUPPORTED ON THIS PLATFORM")
+	set(STATUS_GPROF ", NOT SUPPORTED BY THIS COMPILER")
 	set(WANT_DEBUG_GPROF OFF)
 endif()
 
@@ -846,7 +846,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Profiling using GNU profiler      : ${STATUS_GPROF}\n"
+"* Profile using GNU profiler        : ${STATUS_GPROF}\n"
 )
 
 MESSAGE(
