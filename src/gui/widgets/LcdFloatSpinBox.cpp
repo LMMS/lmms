@@ -110,7 +110,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 
 void LcdFloatSpinBox::update()
 {
-	const int digitValue = fastPow10f(m_fractionDisplay.numDigits());
+	const int digitValue = std::pow(10.0f, m_fractionDisplay.numDigits());
 	float value = model()->value();
 	int fraction = std::abs(std::round((value - static_cast<int>(value)) * digitValue));
 	if (fraction == digitValue)
