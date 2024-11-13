@@ -39,6 +39,6 @@ public:
 	static std::shared_ptr<const SampleBuffer> loadBufferFromBase64(
 		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 };
-} // namespace lmms::gui
+} // namespace lmms
 
 #endif // LMMS_SAMPLE_LOADER_H
