@@ -32,6 +32,10 @@
 namespace lmms {
 auto SampleDatabase::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 {
+	// To ensure that only the main thread is requesting samples from the database
+	// Can be removed if proven that other threads are requesting samples besides the main thread
+	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+
 	const auto fsPath = PathUtil::pathFromQString(path);
 	const auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
 	return get(entry, s_audioFileMap, path);
@@ -39,6 +43,10 @@ auto SampleDatabase::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 
 auto SampleDatabase::fetch(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>
 {
+	// To ensure that only the main thread is requesting samples from the database
+	// Can be removed if proven that other threads are requesting samples besides the main thread
+	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+
 	const auto entry = Base64Entry{base64.toStdString(), sampleRate};
 	return get(entry, s_base64Map, base64, sampleRate);
 }
