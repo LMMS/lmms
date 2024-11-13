@@ -1,5 +1,5 @@
 /*
- * SampleDatabase.h
+ * SampleCache.h
  *
  * Copyright (c) 2024 saker
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_DATABASE_H
-#define LMMS_SAMPLE_DATABASE_H
+#ifndef LMMS_SAMPLE_CACHE_H
+#define LMMS_SAMPLE_CACHE_H
 
 #include <QString>
 #include <filesystem>
@@ -33,28 +33,28 @@
 #include "SampleBuffer.h"
 
 namespace lmms {
-class SampleDatabase
+class SampleCache
 {
 public:
 	/**
-		Fetches a sample from the database through a path to an audio file,
+		Fetches a sample from the cache through a path to an audio file,
 		and returns the stored buffer.
 
-		If `path` exists in the database, its last write time is checked with what is currently in the database. If
-		there is a mismatch, the sample is reloaded from disk, its entry in the database is updated, and the sample is
+		If `path` exists in the cache, its last write time is checked with what is currently in the cache. If
+		there is a mismatch, the sample is reloaded from disk, its entry in the cache is updated, and the sample is
 		returned.
 
-		If `path` does not exist in the database, the sample is loaded from disk and
+		If `path` does not exist in the cache, the sample is loaded from disk and
 		then returned.
 	 */
 	static auto fetch(const QString& path) -> std::shared_ptr<SampleBuffer>;
 
 	/**
-		Fetches a sample from the database through a Base64 string and a sample rate
+		Fetches a sample from the cache through a Base64 string and a sample rate
 		and returns the stored buffer.
 
-		If an entry for a `base64` string with a certain `sampleRate` exists in the database, the stored sample is
-		returned. Otherwise, if it does not exist in the database, the sample is loaded and then returned.
+		If an entry for a `base64` string with a certain `sampleRate` exists in the cache, the stored sample is
+		returned. Otherwise, if it does not exist in the cache, the sample is loaded and then returned.
 	 */
 	static auto fetch(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>;
 
@@ -122,4 +122,4 @@ private:
 };
 } // namespace lmms
 
-#endif // LMMS_SAMPLE_DATABASE_H
+#endif // LMMS_SAMPLE_CACHE_H

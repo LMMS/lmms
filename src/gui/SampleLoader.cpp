@@ -29,7 +29,7 @@
 #include <memory>
 
 #include "GuiApplication.h"
-#include "SampleDatabase.h"
+#include "SampleCache.h"
 
 namespace lmms {
 
@@ -46,7 +46,7 @@ std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromFile(const QStri
 
 	try
 	{
-		return SampleDatabase::fetch(filePath);
+		return SampleCache::fetch(filePath);
 	}
 	catch (const std::runtime_error& error)
 	{
@@ -62,7 +62,7 @@ std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromBase64(const QSt
 
 	try
 	{
-		return SampleDatabase::fetch(base64, sampleRate);
+		return SampleCache::fetch(base64, sampleRate);
 	}
 	catch (const std::runtime_error& error)
 	{
