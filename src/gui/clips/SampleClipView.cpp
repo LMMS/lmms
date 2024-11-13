@@ -23,7 +23,6 @@
  */
  
 #include "SampleClipView.h"
-
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
@@ -33,6 +32,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
+#include "SampleFilePicker.h"
 #include "SampleLoader.h"
 #include "SampleWaveform.h"
 #include "Song.h"
@@ -180,7 +180,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = SampleFilePicker::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	

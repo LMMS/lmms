@@ -28,65 +28,17 @@
 #include <QMessageBox>
 #include <memory>
 
-#include "ConfigManager.h"
-#include "FileDialog.h"
 #include "GuiApplication.h"
-#include "PathUtil.h"
 #include "SampleDatabase.h"
-#include "SampleDecoder.h"
 
-namespace lmms::gui {
-QString SampleLoader::openAudioFile(const QString& previousFile)
+namespace lmms {
+
+namespace {
+void displayError(const QString& message)
 {
-	auto openFileDialog = FileDialog(nullptr, QObject::tr("Open audio file"));
-	auto dir = !previousFile.isEmpty() ? PathUtil::toAbsolute(previousFile) : ConfigManager::inst()->userSamplesDir();
-
-	// change dir to position of previously opened file
-	openFileDialog.setDirectory(dir);
-	openFileDialog.setFileMode(FileDialog::ExistingFiles);
-
-	// set filters
-	auto fileTypes = QStringList{};
-	auto allFileTypes = QStringList{};
-	auto nameFilters = QStringList{};
-	const auto& supportedAudioTypes = SampleDecoder::supportedAudioTypes();
-
-	for (const auto& audioType : supportedAudioTypes)
-	{
-		const auto name = QString::fromStdString(audioType.name);
-		const auto extension = QString::fromStdString(audioType.extension);
-		const auto displayExtension = QString{"*.%1"}.arg(extension);
-		fileTypes.append(QString{"%1 (%2)"}.arg(FileDialog::tr("%1 files").arg(name), displayExtension));
-		allFileTypes.append(displayExtension);
-	}
-
-	nameFilters.append(QString{"%1 (%2)"}.arg(FileDialog::tr("All audio files"), allFileTypes.join(" ")));
-	nameFilters.append(fileTypes);
-	nameFilters.append(QString("%1 (*)").arg(FileDialog::tr("Other files")));
-
-	openFileDialog.setNameFilters(nameFilters);
-
-	if (!previousFile.isEmpty())
-	{
-		// select previously opened file
-		openFileDialog.selectFile(QFileInfo{previousFile}.fileName());
-	}
-
-	if (openFileDialog.exec() == QDialog::Accepted)
-	{
-		if (openFileDialog.selectedFiles().isEmpty()) { return ""; }
-
-		return PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]);
-	}
-
-	return "";
+	QMessageBox::critical(nullptr, QObject::tr("Error loading sample"), message);
 }
-
-QString SampleLoader::openWaveformFile(const QString& previousFile)
-{
-	return openAudioFile(
-		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
-}
+} // namespace
 
 std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromFile(const QString& filePath)
 {
@@ -98,7 +50,8 @@ std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromFile(const QStri
 	}
 	catch (const std::runtime_error& error)
 	{
-		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
+		// TODO: Remove calls to `gui::getGUI` from core and use something to signal back to the GUI instead
+		if (gui::getGUI()) { displayError(QString::fromStdString(error.what())); }
 		return SampleBuffer::emptyBuffer();
 	}
 }
@@ -113,14 +66,9 @@ std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromBase64(const QSt
 	}
 	catch (const std::runtime_error& error)
 	{
-		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
+		// TODO: Remove calls to `gui::getGUI` from core and use something to signal back to the GUI instead
+		if (gui::getGUI()) { displayError(QString::fromStdString(error.what())); }
 		return SampleBuffer::emptyBuffer();
 	}
 }
-
-void SampleLoader::displayError(const QString& message)
-{
-	QMessageBox::critical(nullptr, QObject::tr("Error loading sample"), message);
-}
-
-} // namespace lmms::gui
+} // namespace lmms
