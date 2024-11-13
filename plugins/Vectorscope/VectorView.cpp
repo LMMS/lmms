@@ -30,6 +30,7 @@
 
 #include "ColorChooser.h"
 #include "GuiApplication.h"
+#include "FontHelper.h"
 #include "MainWindow.h"
 #include "VecControls.h"
 
@@ -89,7 +90,6 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	QFont normalFont, boldFont;
-	boldFont.setPixelSize(26);
 	boldFont.setBold(true);
 	const int labelWidth = 26;
 	const int labelHeight = 26;
@@ -264,7 +264,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.drawLine(QPointF(centerX, centerY), QPointF(displayRight - gridCorner, displayTop + gridCorner));
 
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.setFont(boldFont);
+	painter.setFont(adjustedToPixelSize(boldFont, 26));
 	painter.drawText(displayLeft + margin, displayTop,
 					 labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
 					 QString("L"));

@@ -40,7 +40,8 @@ class CrossoverEQEffect : public Effect
 public:
 	CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~CrossoverEQEffect() override;
-	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

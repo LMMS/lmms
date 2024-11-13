@@ -30,7 +30,7 @@
 #include "InstrumentFunctionViews.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 
@@ -57,7 +57,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	mainLayout->setVerticalSpacing( 1 );
 
 	auto chordLabel = new QLabel(tr("Chord:"));
-	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), 10));
+	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), DEFAULT_FONT_SIZE));
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
@@ -145,15 +145,14 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
-	constexpr int labelFontSize = 10;
 	auto arpChordLabel = new QLabel(tr("Chord:"));
-	arpChordLabel->setFont(adjustedToPixelSize(arpChordLabel->font(), labelFontSize));
+	arpChordLabel->setFont(adjustedToPixelSize(arpChordLabel->font(), DEFAULT_FONT_SIZE));
 
 	auto arpDirectionLabel = new QLabel(tr("Direction:"));
-	arpDirectionLabel->setFont(adjustedToPixelSize(arpDirectionLabel->font(), labelFontSize));
+	arpDirectionLabel->setFont(adjustedToPixelSize(arpDirectionLabel->font(), DEFAULT_FONT_SIZE));
 
 	auto arpModeLabel = new QLabel(tr("Mode:"));
-	arpModeLabel->setFont(adjustedToPixelSize(arpModeLabel->font(), labelFontSize));
+	arpModeLabel->setFont(adjustedToPixelSize(arpModeLabel->font(), DEFAULT_FONT_SIZE));
 
 	mainLayout->addWidget( arpChordLabel, 0, 0 );
 	mainLayout->addWidget( m_arpComboBox, 1, 0 );

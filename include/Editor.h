@@ -56,7 +56,7 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent * event) override;
 protected slots:
 	virtual void play() {}
 	virtual void record() {}

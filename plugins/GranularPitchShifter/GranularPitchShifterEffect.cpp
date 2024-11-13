@@ -60,10 +60,8 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
-
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -245,7 +243,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		changeSampleRate();
 	}
 
-	return isRunning();
+	return Effect::ProcessStatus::ContinueIfNotQuiet;
 }
 
 void GranularPitchShifterEffect::changeSampleRate()

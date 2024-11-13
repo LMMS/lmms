@@ -72,6 +72,8 @@ public:
 	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
 
+	void refocus();
+
 	///
 	/// \brief	Asks whether changes made to the project are to be saved.
 	///
@@ -195,7 +197,6 @@ private:
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
-	void refocus();
 
 	void exportProject(bool multiExport = false);
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);

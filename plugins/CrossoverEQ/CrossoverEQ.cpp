@@ -89,13 +89,8 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-bool CrossoverEQEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-	
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
 	{
@@ -192,17 +187,14 @@ bool CrossoverEQEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames
 	
 	const float d = dryLevel();
 	const float w = wetLevel();
-	double outSum = 0.0;
+
 	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
-	
-	checkGate( outSum / frames );
-	
-	return isRunning();
+
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void CrossoverEQEffect::clearFilterHistories()

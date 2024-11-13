@@ -93,37 +93,29 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	PeakControllerEffectControls & c = m_peakControls;
-
-	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
-	if( !isEnabled() || !isRunning() )
-	{
-		return false;
-	}
 
 	// RMS:
 	double sum = 0;
 
 	if( c.m_absModel.value() )
 	{
-		for (auto i = std::size_t{0}; i < _frames; ++i)
+		for (auto i = std::size_t{0}; i < frames; ++i)
 		{
 			// absolute value is achieved because the squares are > 0
-			sum += _buf[i][0]*_buf[i][0] + _buf[i][1]*_buf[i][1];
+			sum += buf[i][0] * buf[i][0] + buf[i][1] * buf[i][1];
 		}
 	}
 	else
 	{
-		for (auto i = std::size_t{0}; i < _frames; ++i)
+		for (auto i = std::size_t{0}; i < frames; ++i)
 		{
 			// the value is absolute because of squaring,
 			// so we need to correct it
-			sum += _buf[i][0] * _buf[i][0] * sign( _buf[i][0] )
-				+ _buf[i][1] * _buf[i][1] * sign( _buf[i][1] );
+			sum += buf[i][0] * buf[i][0] * sign(buf[i][0])
+				+ buf[i][1] * buf[i][1] * sign(buf[i][1]);
 		}
 	}
 
@@ -131,19 +123,29 @@ bool PeakControllerEffect::processAudioBuffer( SampleFrame* _buf,
 	// this will mute the output after the values were measured
 	if( c.m_muteModel.value() )
 	{
-		for (auto i = std::size_t{0}; i < _frames; ++i)
+		for (auto i = std::size_t{0}; i < frames; ++i)
 		{
-			_buf[i][0] = _buf[i][1] = 0.0f;
+			buf[i][0] = buf[i][1] = 0.0f;
 		}
 	}
 
-	float curRMS = sqrt_neg( sum / _frames );
+	float curRMS = sqrt_neg(sum / frames);
 	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
-	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;
-	m_lastSample = qBound( 0.0f, c.m_baseModel.value() + amount * curRMS, 1.0f );
+	const float attack = 1.0f - c.m_attackModel.value();
+	const float decay = 1.0f - c.m_decayModel.value();
 
-	return isRunning();
+	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;
+	float target = c.m_baseModel.value() + amount * curRMS;
+	// Use decay when the volume is decreasing, attack otherwise.
+	// Since direction can change as often as every sampleBuffer, it's difficult
+	// to witness attack/decay working in isolation unless using large buffer sizes.
+	const float t = target < m_lastSample ? decay : attack;
+	// Set m_lastSample to the interpolation between itself and target.
+	// When t is 1.0, m_lastSample snaps to target. When t is 0.0, m_lastSample shouldn't change.
+	m_lastSample = std::clamp(m_lastSample + t * (target - m_lastSample), 0.0f, 1.0f);
+
+	return ProcessStatus::Continue;
 }
 
 

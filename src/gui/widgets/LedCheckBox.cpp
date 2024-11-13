@@ -30,7 +30,7 @@
 
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -93,7 +93,7 @@ void LedCheckBox::initUi( LedColor _color )
 	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(_color)].toUtf8().constData());
 	m_ledOffPixmap = embed::getIconPixmap("led_off");
 
-	if (m_legacyMode){ setFont(adjustedToPixelSize(font(), 10)); }
+	if (m_legacyMode){ setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)); }
 
 	setText( m_text );
 }
@@ -114,7 +114,7 @@ void LedCheckBox::onTextUpdated()
 void LedCheckBox::paintLegacy(QPaintEvent * pe)
 {
 	QPainter p( this );
-	p.setFont(adjustedToPixelSize(font(), 10));
+	p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
 	p.drawPixmap(0, 0, model()->value() ? m_ledOnPixmap : m_ledOffPixmap);
 
