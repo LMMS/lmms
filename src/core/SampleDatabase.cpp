@@ -26,13 +26,13 @@
 
 #include <filesystem>
 
-#include "FileSystemHelpers.h"
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 
 namespace lmms {
 auto SampleDatabase::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 {
-	const auto fsPath = FileSystemHelpers::pathFromQString(path);
+	const auto fsPath = PathUtil::pathFromQString(path);
 	const auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
 	return get(entry, s_audioFileMap, path);
 }
