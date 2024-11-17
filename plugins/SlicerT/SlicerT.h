@@ -33,6 +33,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
+#include "Sample.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
 #include "lmms_basics.h"
@@ -74,7 +75,7 @@ signals:
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 
-	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
@@ -82,6 +83,8 @@ public:
 
 	void findSlices();
 	void findBPM();
+
+	QString getSampleName() { return m_originalSample.sampleFile(); }
 
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
@@ -95,7 +98,7 @@ private:
 	ComboBoxModel m_sliceSnap;
 	BoolModel m_enableSync;
 
-	SampleBuffer m_originalSample;
+	Sample m_originalSample;
 
 	std::vector<float> m_slicePoints;
 

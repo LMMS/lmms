@@ -52,20 +52,14 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&dispersion_plugin_descriptor, parent, key),
 	m_dispersionControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_amountVal(0)
 {
 }
 
 
-bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
-
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -122,11 +116,9 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	checkGate(outSum / frames);
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

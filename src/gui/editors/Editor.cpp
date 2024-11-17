@@ -27,6 +27,9 @@
 #include <QAction>
 #include <QShortcut>
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
+
 #include "Song.h"
 #include "embed.h"
 

@@ -74,8 +74,8 @@ WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 				m_fpp( _frames ),
 				m_parent( _w )
 {
-	m_abuf = new sampleFrame[_frames];
-	m_bbuf = new sampleFrame[_frames];
+	m_abuf = new SampleFrame[_frames];
+	m_bbuf = new SampleFrame[_frames];
 
 	m_lphase[A1_OSC] = 0.0f;
 	m_lphase[A2_OSC] = 0.0f;
@@ -107,9 +107,9 @@ WatsynObject::~WatsynObject()
 void WatsynObject::renderOutput( fpp_t _frames )
 {
 	if( m_abuf == nullptr )
-		m_abuf = new sampleFrame[m_fpp];
+		m_abuf = new SampleFrame[m_fpp];
 	if( m_bbuf == nullptr )
-		m_bbuf = new sampleFrame[m_fpp];
+		m_bbuf = new SampleFrame[m_fpp];
 
 	for( fpp_t frame = 0; frame < _frames; frame++ )
 	{
@@ -327,24 +327,24 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 
 
 void WatsynInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if (!_n->m_pluginData)
 	{
 		auto w = new WatsynObject(&A1_wave[0], &A2_wave[0], &B1_wave[0], &B2_wave[0], m_amod.value(), m_bmod.value(),
-			Engine::audioEngine()->processingSampleRate(), _n, Engine::audioEngine()->framesPerPeriod(), this);
+			Engine::audioEngine()->outputSampleRate(), _n, Engine::audioEngine()->framesPerPeriod(), this);
 
 		_n->m_pluginData = w;
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	sampleFrame * buffer = _working_buffer + offset;
+	SampleFrame* buffer = _working_buffer + offset;
 
 	auto w = static_cast<WatsynObject*>(_n->m_pluginData);
 
-	sampleFrame * abuf = w->abuf();
-	sampleFrame * bbuf = w->bbuf();
+	SampleFrame* abuf = w->abuf();
+	SampleFrame* bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
 

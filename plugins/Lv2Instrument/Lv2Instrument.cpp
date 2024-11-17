@@ -73,22 +73,25 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 
 Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 	Descriptor::SubPluginFeatures::Key *key) :
-	Instrument(instrumentTrackArg, &lv2instrument_plugin_descriptor, key),
+	Instrument(instrumentTrackArg, &lv2instrument_plugin_descriptor, key,
+#ifdef LV2_INSTRUMENT_USE_MIDI
+		Flag::IsSingleStreamed | Flag::IsMidiBased
+#else
+		Flag::IsSingleStreamed
+#endif
+	),
 	Lv2ControlBase(this, key->attributes["uri"])
 {
-	if (Lv2ControlBase::isValid())
-	{
-		clearRunningNotes();
+	clearRunningNotes();
 
-		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
-			this, SLOT(updatePitchRange()), Qt::DirectConnection);
-		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){onSampleRateChanged();});
+	connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
+		this, SLOT(updatePitchRange()), Qt::DirectConnection);
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
+		this, &Lv2Instrument::onSampleRateChanged);
 
-		// now we need a play-handle which cares for calling play()
-		auto iph = new InstrumentPlayHandle(this, instrumentTrackArg);
-		Engine::audioEngine()->addPlayHandle(iph);
-	}
+	// now we need a play-handle which cares for calling play()
+	auto iph = new InstrumentPlayHandle(this, instrumentTrackArg);
+	Engine::audioEngine()->addPlayHandle(iph);
 }
 
 
@@ -134,11 +137,6 @@ void Lv2Instrument::onSampleRateChanged()
 
 
 
-bool Lv2Instrument::isValid() const { return Lv2ControlBase::isValid(); }
-
-
-
-
 void Lv2Instrument::saveSettings(QDomDocument &doc, QDomElement &that)
 {
 	Lv2ControlBase::saveSettings(doc, that);
@@ -179,7 +177,7 @@ bool Lv2Instrument::handleMidiEvent(
 
 // not yet working
 #ifndef LV2_INSTRUMENT_USE_MIDI
-void Lv2Instrument::playNote(NotePlayHandle *nph, sampleFrame *)
+void Lv2Instrument::playNote(NotePlayHandle *nph, SampleFrame*)
 {
 }
 #endif
@@ -187,7 +185,7 @@ void Lv2Instrument::playNote(NotePlayHandle *nph, sampleFrame *)
 
 
 
-void Lv2Instrument::play(sampleFrame *buf)
+void Lv2Instrument::play(SampleFrame* buf)
 {
 	copyModelsFromLmms();
 
@@ -321,9 +319,12 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto ins = new Lv2Instrument(static_cast<InstrumentTrack*>(_parent), static_cast<KeyType*>(_data));
-	if (!ins->isValid()) { delete ins; ins = nullptr; }
-	return ins;
+	try {
+		return new Lv2Instrument(static_cast<InstrumentTrack*>(_parent), static_cast<KeyType*>(_data));
+	} catch (const std::runtime_error& e) {
+		qCritical() << e.what();
+		return nullptr;
+	}
 }
 
 }

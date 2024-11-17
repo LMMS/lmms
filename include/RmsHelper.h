@@ -36,7 +36,7 @@ namespace lmms
 class RmsHelper
 {
 public:
-	RmsHelper( int size ) :
+	RmsHelper(std::size_t size) :
 		m_buffer( nullptr )
 	{
 		setSize( size );
@@ -46,7 +46,7 @@ public:
 		if( m_buffer ) delete[] m_buffer;
 	}
 
-	inline void setSize( int size )
+	void setSize(std::size_t size)
 	{
 		if( m_buffer )
 		{
@@ -90,8 +90,8 @@ public:
 private:
 	float * m_buffer;
 	float m_sum;
-	unsigned int m_pos;
-	unsigned int m_size;
+	std::size_t m_pos;
+	std::size_t m_size;
 	float m_sizef;
 };
 

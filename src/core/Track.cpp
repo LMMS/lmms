@@ -63,9 +63,7 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
-	m_simpleSerializingMode( false ),
-	m_clips(),        /*!< The clips (segments) */
-	m_color(std::nullopt)
+	m_clips()        /*!< The clips (segments) */
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -175,10 +173,6 @@ Track* Track::clone()
 }
 
 
-
-
-
-
 /*! \brief Save this track's settings to file
  *
  *  We save the track type and its muted state and solo state, then append the track-
@@ -187,12 +181,13 @@ Track* Track::clone()
  *
  *  \param doc The QDomDocument to use to save
  *  \param element The The QDomElement to save into
+ *  \param presetMode Describes whether to save the track as a preset or not.
  *  \todo Does this accurately describe the parameters?  I think not!?
  *  \todo Save the track height
  */
-void Track::saveSettings( QDomDocument & doc, QDomElement & element )
+void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 {
-	if( !m_simpleSerializingMode )
+	if (!presetMode)
 	{
 		element.setTagName( "track" );
 	}
@@ -216,11 +211,10 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, PatternTrack, SampleTrack etc.) save its settings
 	element.appendChild( tsDe );
-	saveTrackSpecificSettings( doc, tsDe );
+	saveTrackSpecificSettings(doc, tsDe, presetMode);
 
-	if( m_simpleSerializingMode )
+	if (presetMode)
 	{
-		m_simpleSerializingMode = false;
 		return;
 	}
 
@@ -230,9 +224,6 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		clip->saveState(doc, element);
 	}
 }
-
-
-
 
 /*! \brief Load the settings from a file
  *
@@ -244,9 +235,10 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
  *  one at a time.
  *
  *  \param element the QDomElement to load track settings from
+ *  \param presetMode Indicates if a preset or a full track is loaded
  *  \todo Load the track height.
  */
-void Track::loadSettings( const QDomElement & element )
+void Track::loadTrack(const QDomElement& element, bool presetMode)
 {
 	if( static_cast<Type>(element.attribute( "type" ).toInt()) != type() )
 	{
@@ -263,17 +255,12 @@ void Track::loadSettings( const QDomElement & element )
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
-	if( element.hasAttribute( "color" ) )
+	if (element.hasAttribute("color"))
 	{
-		QColor newColor = QColor(element.attribute("color"));
-		setColor(newColor);
-	}
-	else
-	{
-		resetColor();
+		setColor(QColor{element.attribute("color")});
 	}
 
-	if( m_simpleSerializingMode )
+	if (presetMode)
 	{
 		QDomNode node = element.firstChild();
 		while( !node.isNull() )
@@ -285,14 +272,13 @@ void Track::loadSettings( const QDomElement & element )
 			}
 			node = node.nextSibling();
 		}
-		m_simpleSerializingMode = false;
+
 		return;
 	}
 
-	while( !m_clips.empty() )
 	{
-		delete m_clips.front();
-//		m_clips.erase( m_clips.begin() );
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		deleteClips();
 	}
 
 	QDomNode node = element.firstChild();
@@ -321,6 +307,28 @@ void Track::loadSettings( const QDomElement & element )
 	{
 		m_height = storedHeight;
 	}
+}
+
+void Track::savePreset(QDomDocument & doc, QDomElement & element)
+{
+	saveTrack(doc, element, true);
+}
+
+void Track::loadPreset(const QDomElement & element)
+{
+	loadTrack(element, true);
+}
+
+void Track::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	// Assume that everything should be saved if we are called through SerializingObject::saveSettings
+	saveTrack(doc, element, false);
+}
+
+void Track::loadSettings(const QDomElement& element)
+{
+	// Assume that everything should be loaded if we are called through SerializingObject::loadSettings 
+	loadTrack(element, false);
 }
 
 
@@ -395,14 +403,14 @@ int Track::numOfClips()
  *  \todo if we create a Clip here, should we somehow attach it to the
  *     track?
  */
-Clip * Track::getClip( int clipNum )
+auto Track::getClip(std::size_t clipNum) -> Clip*
 {
 	if( clipNum < m_clips.size() )
 	{
 		return m_clips[clipNum];
 	}
-	printf( "called Track::getClip( %d ), "
-			"but Clip %d doesn't exist\n", clipNum, clipNum );
+	printf( "called Track::getClip( %zu ), "
+			"but Clip %zu doesn't exist\n", clipNum, clipNum );
 	return createClip( clipNum * TimePos::ticksPerBar() );
 
 }
@@ -633,22 +641,30 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::setColor(const QColor& c)
+void Track::setColor(const std::optional<QColor>& color)
 {
-	m_color = c;
+	m_color = color;
 	emit colorChanged();
 }
-
-void Track::resetColor()
-{
-	m_color = std::nullopt;
-	emit colorChanged();
-}
-
 
 BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
+}
+
+void Track::setName(const QString& newName)
+{
+	if (m_name != newName)
+	{
+		m_name = newName;
+
+		if (auto song = Engine::getSong())
+		{
+			song->setModified();
+		}
+		
+		emit nameChanged();
+	}
 }
 
 } // namespace lmms

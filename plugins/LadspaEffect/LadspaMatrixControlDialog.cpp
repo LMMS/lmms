@@ -41,9 +41,6 @@
 #include "LadspaControlView.h"
 #include "LedCheckBox.h"
 
-#include "GuiApplication.h"
-#include "MainWindow.h"
-
 
 namespace lmms::gui
 {
@@ -205,20 +202,6 @@ void LadspaMatrixControlDialog::updateEffectView(LadspaControls * ladspaControls
 	// Make sure that the horizontal scroll bar does not show
 	// From: https://forum.qt.io/topic/13374/solved-qscrollarea-vertical-scroll-only/4
 	m_scrollArea->setMinimumWidth(matrixWidget->minimumSizeHint().width() + m_scrollArea->verticalScrollBar()->width());
-
-
-	// Make sure that the widget is shown without a scrollbar whenever possible
-	// If the widget fits on the workspace we use the height of the widget as the minimum size of the scroll area.
-	// This will ensure that the scrollbar is not shown initially (and never will be).
-	// If the widget is larger than the workspace then we want it to mostly cover the workspace.
-	//
-	// This is somewhat ugly but I have no idea how to control the initial size of the scroll area otherwise
-	auto const workspaceSize = getGUI()->mainWindow()->workspace()->viewport()->size();
-	// Make sure that we always account a minumum height for the workspace, i.e. that we never compute
-	// something close to 0 if the LMMS window is very small
-	int workspaceHeight = qMax(200, static_cast<int>(workspaceSize.height() * 0.9));
-	int minOfWidgetAndWorkspace = qMin(matrixWidget->minimumSizeHint().height(), workspaceHeight);
-	m_scrollArea->setMinimumHeight(minOfWidgetAndWorkspace);
 
 	if (getChannelCount() > 1 && m_stereoLink != nullptr)
 	{

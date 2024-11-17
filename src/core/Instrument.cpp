@@ -28,6 +28,7 @@
 
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
+#include "lmms_basics.h"
 #include "lmms_constants.h"
 
 
@@ -37,13 +38,15 @@ namespace lmms
 
 Instrument::Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key *key) :
+			const Descriptor::SubPluginFeatures::Key *key,
+			Flags flags) :
 	Plugin(_descriptor, nullptr/* _instrument_track*/, key),
-	m_instrumentTrack( _instrument_track )
+	m_instrumentTrack( _instrument_track ),
+	m_flags(flags)
 {
 }
 
-void Instrument::play( sampleFrame * )
+void Instrument::play( SampleFrame* )
 {
 }
 
@@ -87,7 +90,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 // helper function for Instrument::applyFadeIn
-static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
+static int countZeroCrossings(SampleFrame* buf, fpp_t start, fpp_t frames)
 {
 	// zero point crossing counts of all channels
 	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
@@ -126,7 +129,7 @@ fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
 }
 
 
-void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
+void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 {
 	const static float MAX_FADE_IN_LENGTH = 85.0;
 	f_cnt_t total = n->totalFramesPlayed();
@@ -177,13 +180,13 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	}
 }
 
-void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
+void Instrument::applyRelease( SampleFrame* buf, const NotePlayHandle * _n )
 {
 	const auto fpp = Engine::audioEngine()->framesPerPeriod();
 	const auto releaseFrames = desiredReleaseFrames();
 
 	const auto endFrame = _n->framesLeft();
-	const auto startFrame = std::max(0, endFrame - releaseFrames);
+	const auto startFrame = endFrame - std::min(endFrame, releaseFrames);
 
 	for (auto f = startFrame; f < endFrame && f < fpp; f++)
 	{
@@ -195,7 +198,16 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	}
 }
 
+float Instrument::computeReleaseTimeMsByFrameCount(f_cnt_t frames) const
+{
+	return frames / getSampleRate() * 1000.;
+}
 
+
+sample_rate_t Instrument::getSampleRate() const
+{
+	return Engine::audioEngine()->outputSampleRate();
+}
 
 
 QString Instrument::fullDisplayName() const

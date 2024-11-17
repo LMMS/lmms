@@ -189,7 +189,7 @@ int sp_set(sp_param *p, SPFLOAT val) {
 
 int sp_out(sp_data *sp, uint32_t chan, SPFLOAT val)
 {
-    if(chan > sp->nchan - 1) {
+    if (chan >= (uint32_t) sp->nchan) {
         fprintf(stderr, "sp_out: Invalid channel\n");
         return SP_NOT_OK;
     }

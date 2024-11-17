@@ -41,10 +41,9 @@ public:
 		initialization
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_controls.isValid(); }
 
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
 	EffectControls* controls() override { return &m_controls; }
 
 	Lv2FxControls* lv2Controls() { return &m_controls; }
@@ -52,7 +51,7 @@ public:
 
 private:
 	Lv2FxControls m_controls;
-	std::vector<sampleFrame> m_tmpOutputSmps;
+	std::vector<SampleFrame> m_tmpOutputSmps;
 };
 
 

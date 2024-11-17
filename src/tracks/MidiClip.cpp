@@ -39,13 +39,6 @@
 namespace lmms
 {
 
-QPixmap * gui::MidiClipView::s_stepBtnOn0 = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOn200 = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOff = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
-
-
-
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
@@ -215,16 +208,30 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-void MidiClip::removeNote( Note * _note_to_del )
+NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
+{
+	instrumentTrack()->lock();
+	delete *it;
+	auto new_it = m_notes.erase(it);
+	instrumentTrack()->unlock();
+
+	checkType();
+	updateLength();
+
+	emit dataChanged();
+	return new_it;
+}
+
+NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
+	auto it = std::find(m_notes.begin(), m_notes.end(), note);
+	if (it != m_notes.end())
 	{
-		auto shouldRemove = note == _note_to_del;
-		if (shouldRemove) { delete note; }
-		return shouldRemove;
-	}), m_notes.end());
+		delete *it;
+		it = m_notes.erase(it);
+	}
 
 	instrumentTrack()->unlock();
 
@@ -232,6 +239,7 @@ void MidiClip::removeNote( Note * _note_to_del )
 	updateLength();
 
 	emit dataChanged();
+	return it;
 }
 
 
@@ -367,9 +375,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
 	
-	if( usesCustomClipColor() )
+	if (const auto& c = color())
 	{
-		_this.setAttribute( "color", color().name() );
+		_this.setAttribute("color", c->name());
 	}
 	// as the target of copied/dragged MIDI clip is always an existing
 	// MIDI clip, we must not store actual position, instead we store -1
@@ -401,17 +409,12 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	m_clipType = static_cast<Type>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
-	
-	if( _this.hasAttribute( "color" ) )
+
+	if (_this.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( _this.attribute( "color" ) );
+		setColor(QColor{_this.attribute("color")});
 	}
-	else
-	{
-		useCustomClipColor(false);
-	}
-	
+
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
@@ -470,9 +473,9 @@ MidiClip *  MidiClip::nextMidiClip() const
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
 	auto& clips = m_instrumentTrack->getClips();
-	int clipNum = m_instrumentTrack->getClipNum(this);
-	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
-	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
+	int clipNum = m_instrumentTrack->getClipNum(this) + offset;
+	if (clipNum < 0 || static_cast<size_t>(clipNum) >= clips.size()) { return nullptr; }
+	return dynamic_cast<MidiClip*>(clips[clipNum]);
 }
 
 

@@ -41,6 +41,7 @@
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "Track.h"
+#include "TrackGrip.h"
 #include "TrackContainerView.h"
 #include "ClipView.h"
 
@@ -102,6 +103,10 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
 			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
+	
+	auto trackGrip = m_trackOperationsWidget.getTrackGrip();
+	connect(trackGrip, &TrackGrip::grabbed, this, &TrackView::onTrackGripGrabbed);
+	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
 
 	// create views for already existing clips
 	for (const auto& clip : m_track->m_clips)
@@ -284,22 +289,6 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 			QCursor c( Qt::SizeVerCursor);
 			QApplication::setOverrideCursor( c );
 		}
-		else
-		{
-			if( me->x()>10 ) // 10 = The width of the grip + 2 pixels to the left and right.
-			{
-				QWidget::mousePressEvent( me );
-				return;
-			}
-
-			m_action = Action::Move;
-
-			QCursor c( Qt::SizeVerCursor );
-			QApplication::setOverrideCursor( c );
-			// update because in move-mode, all elements in
-			// track-op-widgets are hidden as a visual feedback
-			m_trackOperationsWidget.update();
-		}
 
 		me->accept();
 	}
@@ -364,9 +353,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Resize )
 	{
-		setFixedHeight( qMax<int>( me->y(), MINIMAL_TRACK_HEIGHT ) );
-		m_trackContainerView->realignTracks();
-		m_track->setHeight( height() );
+		resizeToHeight(me->y());
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
@@ -391,6 +378,23 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 	m_trackOperationsWidget.update();
 
 	QWidget::mouseReleaseEvent( me );
+}
+
+void TrackView::wheelEvent(QWheelEvent* we)
+{
+	// Note: we add the values because one of them will be 0. If the alt modifier
+	// is pressed x is non-zero and otherwise y.
+	const int deltaY = we->angleDelta().x() + we->angleDelta().y();
+	int const direction = deltaY < 0 ? -1 : 1;
+
+	auto const modKeys = we->modifiers();
+	int stepSize = modKeys == (Qt::ControlModifier | Qt::AltModifier) ? 1 : modKeys == (Qt::ShiftModifier | Qt::AltModifier) ? 5 : 0;
+
+	if (stepSize != 0)
+	{
+		resizeToHeight(height() + stepSize * direction);
+		we->accept();
+	}
 }
 
 
@@ -436,12 +440,30 @@ void TrackView::muteChanged()
 }
 
 
+void TrackView::onTrackGripGrabbed()
+{
+	m_action = Action::Move;
+}
+
+void TrackView::onTrackGripReleased()
+{
+	m_action = Action::None;
+}
+
 
 
 void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 {
 	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
 	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
+}
+
+
+void TrackView::resizeToHeight(int h)
+{
+	setFixedHeight(qMax<int>(h, MINIMAL_TRACK_HEIGHT));
+	m_trackContainerView->realignTracks();
+	m_track->setHeight(height());
 }
 
 

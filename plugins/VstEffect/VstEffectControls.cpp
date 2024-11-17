@@ -50,7 +50,6 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
 	m_subWindow( nullptr ),
-	knobFModel( nullptr ),
 	ctrHandle( nullptr ),
 	lastPosInMenu (0),
 	m_vstGuiVisible ( true )
@@ -84,11 +83,11 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
 		auto paramStr = std::array<char, 35>{};
-		knobFModel = new FloatModel *[ paramCount ];
+		knobFModel.resize(paramCount);
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf(paramStr.data(), "param%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
@@ -131,14 +130,14 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( m_effect->m_plugin != nullptr )
 	{
 		m_effect->m_plugin->saveSettings( _doc, _this );
-		if (knobFModel != nullptr) {
+		if (!knobFModel.empty()) {
 			const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 			paramCount = dump.size();
 			auto paramStr = std::array<char, 35>{};
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf(paramStr.data(), "param%d", i);
+					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 			}
@@ -376,8 +375,9 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
-	if (m_vi->knobFModel == nullptr) {
-		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
+	if (m_vi->knobFModel.empty())
+	{
+		m_vi->knobFModel.resize(m_vi->paramCount);
 		hasKnobModel = false;
 	}
 
@@ -386,7 +386,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf(paramStr.data(), "param%d", i);
+		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
 		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, widget, s_dumpValues.at( 1 ) );
@@ -395,7 +395,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 		if( !hasKnobModel )
 		{
-			sprintf(paramStr.data(), "%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "%d", i);
 			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
 					0.0f, 1.0f, 0.01f, _eff, paramStr.data());
 		}
@@ -452,7 +452,6 @@ void ManageVSTEffectView::syncPlugin()
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
-	float f_value;
 
 	for( int i = 0; i < m_vi2->paramCount; i++ )
 	{
@@ -461,9 +460,9 @@ void ManageVSTEffectView::syncPlugin()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf(paramStr.data(), "param%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
-			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
+			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}
@@ -543,7 +542,7 @@ void ManageVSTEffectView::syncParameterText()
 
 ManageVSTEffectView::~ManageVSTEffectView()
 {
-	if( m_vi2->knobFModel != nullptr )
+	if (!m_vi2->knobFModel.empty())
 	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
@@ -558,11 +557,7 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		vstKnobs = nullptr;
 	}
 
-	if( m_vi2->knobFModel != nullptr )
-	{
-		delete [] m_vi2->knobFModel;
-		m_vi2->knobFModel = nullptr;
-	}
+	m_vi2->knobFModel.clear();
 
 	if( m_vi2->m_scrollArea != nullptr )
 	{

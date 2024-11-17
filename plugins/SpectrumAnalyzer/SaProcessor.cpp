@@ -41,6 +41,9 @@
 #include "LocklessRingBuffer.h"
 #include "SaControls.h"
 
+#include <cassert>
+#include <limits>
+
 namespace lmms
 {
 
@@ -50,7 +53,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_terminate(false),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
 	m_fftBlockSize(FFT_BLOCK_SIZES[0]),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_framesFilledUp(0),
 	m_spectrumActive(false),
 	m_waterfallActive(false),
@@ -95,9 +98,9 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
+void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 {
-	LocklessRingBufferReader<sampleFrame> reader(ring_buffer);
+	LocklessRingBufferReader<SampleFrame> reader(ring_buffer);
 
 	// Processing thread loop
 	while (!m_terminate)
@@ -163,7 +166,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				#endif
 
 				// update sample rate
-				m_sampleRate = Engine::audioEngine()->processingSampleRate();
+				m_sampleRate = Engine::audioEngine()->outputSampleRate();
 
 				// apply FFT window
 				for (unsigned int i = 0; i < m_inBlockSize; i++)
@@ -206,7 +209,6 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					memset(pixel, 0, waterfallWidth() * sizeof (QRgb));
 
 					// add newest result on top
-					int target;		// pixel being constructed
 					float accL = 0;	// accumulators for merging multiple bins
 					float accR = 0;
 					for (unsigned int i = 0; i < binCount(); i++)
@@ -230,7 +232,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
+								for (auto target = static_cast<std::size_t>(std::max(band_start, 0.f));
+									 target < band_end && target < waterfallWidth(); target++)
 								{
 									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
@@ -242,7 +245,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							else
 							{
 								// sub-pixel drawing; add contribution of current band
-								target = (int)band_start;
+								int target = static_cast<int>(band_start);
 								if ((int)band_start == (int)band_end)
 								{
 									// band ends within current target pixel, accumulate
@@ -256,7 +259,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 									accL += ((int)band_end - band_start) * m_normSpectrumL[i];
 									accR += ((int)band_end - band_start) * m_normSpectrumR[i];
 
-									if (target >= 0 && target < waterfallWidth()) {pixel[target] = makePixel(accL, accR);}
+									if (target >= 0 && static_cast<std::size_t>(target) < waterfallWidth()) {
+										pixel[target] = makePixel(accL, accR);
+									}
 
 									// save remaining portion of the band for the following band / pixel
 									accL = (band_end - (int)band_end) * m_normSpectrumL[i];
@@ -267,7 +272,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
+							for (auto target = static_cast<std::size_t>(std::max(band_start, 0.f));
+								 target < band_end && target < waterfallWidth(); target++)
 							{
 								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 							}
@@ -358,30 +364,20 @@ void SaProcessor::setWaterfallActive(bool active)
 // Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers()
 {
-	unsigned int new_size_index = m_controls->m_blockSizeModel.value();
-	unsigned int new_in_size, new_fft_size;
-	unsigned int new_bins;
+	m_zeroPadFactor = m_controls->m_zeroPaddingModel.value();
 
 	// get new block sizes and bin count based on selected index
-	if (new_size_index < FFT_BLOCK_SIZES.size())
-	{
-		new_in_size = FFT_BLOCK_SIZES[new_size_index];
-	}
-	else
-	{
-		new_in_size = FFT_BLOCK_SIZES.back();
-	}
-	m_zeroPadFactor = m_controls->m_zeroPaddingModel.value();
-	if (new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size())
-	{
-		new_fft_size = FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor];
-	}
-	else
-	{
-		new_fft_size = FFT_BLOCK_SIZES.back();
-	}
+	const unsigned int new_size_index = m_controls->m_blockSizeModel.value();
 
-	new_bins = new_fft_size / 2 +1;
+	const unsigned int new_in_size = new_size_index < FFT_BLOCK_SIZES.size()
+		? FFT_BLOCK_SIZES[new_size_index]
+		: FFT_BLOCK_SIZES.back();
+
+	const unsigned int new_fft_size = (new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size())
+		? FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor]
+		: FFT_BLOCK_SIZES.back();
+
+	const unsigned int new_bins = new_fft_size / 2 + 1;
 
 	// Use m_reallocating to tell analyze() to avoid asking for the lock. This
 	// is needed because under heavy load the FFT thread requests data lock so
@@ -650,7 +646,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	if (m_controls->m_logYModel.value())
 	{
 		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
-		float amplitude_dB = 10 * log10(amplitude);
+		assert (amplitude >= 0);
+		float amplitude_dB = 10 * std::log10(std::max(amplitude, std::numeric_limits<float>::min()));
 		if (amplitude_dB < getAmpRangeMin())
 		{
 			return height;
