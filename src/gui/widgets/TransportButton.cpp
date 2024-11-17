@@ -19,10 +19,6 @@ TransportButton::TransportButton(QWidget * _parent, const QString & _name) :
 
 void TransportButton::mousePressEvent(QMouseEvent * _me)
 {
-	if (_me->button() == Qt::LeftButton)
-	{
-		toggle();
-	}
 	QPushButton::mousePressEvent(_me);
 }
 
@@ -76,4 +72,4 @@ void TransportButton::contextMenuEvent(QContextMenuEvent * _me)
 	contextMenu.exec(QCursor::pos());
 }
 
-}
+} // namespace lmms::gui

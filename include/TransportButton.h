@@ -20,6 +20,6 @@ protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 } ;
 
-}
+} // namespace lmms::gui
 
 #endif // TRANSPORTBUTTON_H
