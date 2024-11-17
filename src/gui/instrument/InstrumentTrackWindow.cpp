@@ -510,6 +510,7 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 	else
 	{
 		parentWidget()->hide();
+		hide();
 	}
 }
 
