@@ -64,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 
 
 KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &kicker_plugin_descriptor ),
+	Instrument(_instrument_track, &kicker_plugin_descriptor, nullptr, Flag::IsNotBendable),
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 440.0f, 5.0f, 5000.0f, 1.0f, 5000.0f, this, tr( "Length" ) ),
@@ -156,11 +156,11 @@ using DistFX = DspEffectLibrary::Distortion;
 using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
 void KickerInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	const float decfr = m_decayModel.value() * Engine::audioEngine()->processingSampleRate() / 1000.0f;
+	const float decfr = m_decayModel.value() * Engine::audioEngine()->outputSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if (!_n->m_pluginData)
@@ -184,17 +184,26 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	auto so = static_cast<SweepOsc*>(_n->m_pluginData);
-	so->update( _working_buffer + offset, frames, Engine::audioEngine()->processingSampleRate() );
+	so->update( _working_buffer + offset, frames, Engine::audioEngine()->outputSampleRate() );
 
 	if( _n->isReleased() )
 	{
-		const float done = _n->releaseFramesDone();
+		// We need this to check if the release has ended
 		const float desired = desiredReleaseFrames();
-		for( fpp_t f = 0; f < frames; ++f )
+
+		// This can be considered the current release frame in the "global" context of the release.
+		// We need it with the desired number of release frames to compute the linear decay.
+		fpp_t currentReleaseFrame = _n->releaseFramesDone();
+
+		// Start applying the release at the correct frame
+		const float framesBeforeRelease = _n->framesBeforeRelease();
+		for (fpp_t f = framesBeforeRelease; f < frames; ++f, ++currentReleaseFrame)
 		{
-			const float fac = ( done+f < desired ) ? ( 1.0f - ( ( done+f ) / desired ) ) : 0;
-			_working_buffer[f+offset][0] *= fac;
-			_working_buffer[f+offset][1] *= fac;
+			const bool releaseStillActive = currentReleaseFrame < desired;
+			const float attenuation = releaseStillActive ? (1.0f - (currentReleaseFrame / desired)) : 0.f;
+
+			_working_buffer[f + offset][0] *= attenuation;
+			_working_buffer[f + offset][1] *= attenuation;
 		}
 	}
 }

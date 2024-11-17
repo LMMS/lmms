@@ -25,16 +25,19 @@
 #ifndef LMMS_SONG_H
 #define LMMS_SONG_H
 
+#include <array>
 #include <memory>
 
 #include <QHash>
 #include <QString>
 
-#include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "Controller.h"
+#include "Metronome.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
+#include "Timeline.h"
+#include "TrackContainer.h"
 #include "VstSyncController.h"
 
 namespace lmms
@@ -105,7 +108,6 @@ public:
 	public:
 		PlayPos( const int abs = 0 ) :
 			TimePos( abs ),
-			m_timeLine( nullptr ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -125,13 +127,11 @@ public:
 		{
 			return m_jumped;
 		}
-		gui::TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
 		bool m_jumped;
-
-	} ;
+	};
 
 	void processNextBuffer();
 
@@ -274,6 +274,11 @@ public:
 		return getPlayPos(m_playMode);
 	}
 
+	auto getTimeline(PlayMode mode) -> Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
+	auto getTimeline(PlayMode mode) const -> const Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
+	auto getTimeline() -> Timeline& { return getTimeline(m_playMode); }
+	auto getTimeline() const -> const Timeline& { return getTimeline(m_playMode); }
+
 	void updateLength();
 	bar_t length() const
 	{
@@ -371,6 +376,8 @@ public:
 
 	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
 
+	Metronome& metronome() { return m_metronome; }
+
 public slots:
 	void playSong();
 	void record();
@@ -402,7 +409,7 @@ private slots:
 
 	void masterVolumeChanged();
 
-	void savePos();
+	void savePlayStartPosition();
 
 	void updateFramesPerTick();
 
@@ -444,6 +451,7 @@ private:
 	void restoreKeymapStates(const QDomElement &element);
 
 	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
+	void processMetronome(size_t bufferOffset);
 
 	void setModified(bool value);
 
@@ -481,6 +489,8 @@ private:
 
 	QHash<QString, int> m_errors;
 
+	std::array<Timeline, PlayModeCount> m_timelines;
+
 	PlayMode m_playMode;
 	PlayPos m_playPos[PlayModeCount];
 	bar_t m_length;
@@ -506,6 +516,8 @@ private:
 	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
 
 	AutomatedValueMap m_oldAutomatedValues;
+
+	Metronome m_metronome;
 
 	friend class Engine;
 	friend class gui::SongEditor;

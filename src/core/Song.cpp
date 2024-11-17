@@ -184,14 +184,9 @@ void Song::setTimeSignature()
 
 
 
-void Song::savePos()
+void Song::savePlayStartPosition()
 {
-	gui::TimeLineWidget* tl = getPlayPos().m_timeLine;
-
-	if( tl != nullptr )
-	{
-		tl->savePos( getPlayPos() );
-	}
+	getTimeline().setPlayStartPosition(getPlayPos());
 }
 
 
@@ -240,9 +235,6 @@ void Song::processNextBuffer()
 			return;
 	}
 
-	// If we have no tracks to play, there is nothing to do
-	if (trackList.empty()) { return; }
-
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
@@ -258,16 +250,17 @@ void Song::processNextBuffer()
 		return false;
 	};
 
-	const auto timeline = getPlayPos().m_timeLine;
-	const auto loopEnabled = !m_exporting && timeline && timeline->loopPointsEnabled();
+	const auto& timeline = getTimeline();
+	const auto loopEnabled = !m_exporting && timeline.loopEnabled();
 
 	// Ensure playback begins within the loop if it is enabled
-	if (loopEnabled) { enforceLoop(timeline->loopBegin(), timeline->loopEnd()); }
+	if (loopEnabled) { enforceLoop(timeline.loopBegin(), timeline.loopEnd()); }
 
-	// Inform VST plugins if the user moved the play head
+	// Inform VST plugins and sample tracks if the user moved the play head
 	if (getPlayPos().jumped())
 	{
 		m_vstSyncController.setPlaybackJumped(true);
+		emit updateSampleTracks();
 		getPlayPos().setJumped(false);
 	}
 
@@ -301,13 +294,13 @@ void Song::processNextBuffer()
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
-			if (loopEnabled || (m_loopRenderRemaining > 1 && getPlayPos() >= timeline->loopBegin()))
+			if (loopEnabled || (m_loopRenderRemaining > 1 && getPlayPos() >= timeline.loopBegin()))
 			{
 				m_vstSyncController.startCycle(
-					timeline->loopBegin().getTicks(), timeline->loopEnd().getTicks());
+					timeline.loopBegin().getTicks(), timeline.loopEnd().getTicks());
 
 				// Loop if necessary, and decrement the remaining loops if we did
-				if (enforceLoop(timeline->loopBegin(), timeline->loopEnd())
+				if (enforceLoop(timeline.loopBegin(), timeline.loopEnd())
 					&& m_loopRenderRemaining > 1)
 				{
 					m_loopRenderRemaining--;
@@ -339,6 +332,8 @@ void Song::processNextBuffer()
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
+			processMetronome(frameOffsetInPeriod);
+
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
@@ -433,6 +428,17 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	}
 }
 
+void Song::processMetronome(size_t bufferOffset)
+{
+	const auto currentPlayMode = playMode();
+	const auto supported = currentPlayMode == PlayMode::MidiClip
+		|| currentPlayMode == PlayMode::Song
+		|| currentPlayMode == PlayMode::Pattern;
+
+	if (!supported || m_exporting) { return; } 
+	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
+}
+
 void Song::setModified(bool value)
 {
 	if( !m_loadingProject && m_modified != value)
@@ -492,7 +498,7 @@ void Song::playSong()
 
 	m_vstSyncController.setPlaybackState( true );
 
-	savePos();
+	savePlayStartPosition();
 
 	emit playbackStateChanged();
 }
@@ -531,7 +537,7 @@ void Song::playPattern()
 
 	m_vstSyncController.setPlaybackState( true );
 
-	savePos();
+	savePlayStartPosition();
 
 	emit playbackStateChanged();
 }
@@ -556,7 +562,7 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 		m_paused = false;
 	}
 
-	savePos();
+	savePlayStartPosition();
 
 	emit playbackStateChanged();
 }
@@ -566,6 +572,8 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 
 void Song::updateLength()
 {
+	if (m_loadingProject) { return; }
+
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
@@ -644,39 +652,31 @@ void Song::stop()
 	// To avoid race conditions with the processing threads
 	Engine::audioEngine()->requestChangeInModel();
 
-	TimeLineWidget * tl = getPlayPos().m_timeLine;
+	auto& timeline = getTimeline();
 	m_paused = false;
 	m_recording = true;
-
-	if( tl )
-	{
-		switch( tl->behaviourAtStop() )
-		{
-			case TimeLineWidget::BehaviourAtStopState::BackToZero:
-				getPlayPos().setTicks(0);
-				m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::BackToStart:
-				if( tl->savedPos() >= 0 )
-				{
-					getPlayPos().setTicks(tl->savedPos().getTicks());
-					setToTime(tl->savedPos());
-
-					tl->savePos( -1 );
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::KeepStopPosition:
-				break;
-		}
-	}
-	else
-	{
-		getPlayPos().setTicks( 0 );
-		m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
-	}
 	m_playing = false;
+
+	switch (timeline.stopBehaviour())
+	{
+		case Timeline::StopBehaviour::BackToZero:
+			getPlayPos().setTicks(0);
+			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
+			break;
+
+		case Timeline::StopBehaviour::BackToStart:
+			if (timeline.playStartPosition() >= 0)
+			{
+				getPlayPos().setTicks(timeline.playStartPosition().getTicks());
+				setToTime(timeline.playStartPosition());
+
+				timeline.setPlayStartPosition(-1);
+			}
+			break;
+
+		case Timeline::StopBehaviour::KeepPosition:
+			break;
+	}
 
 	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)] = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
 	getPlayPos(PlayMode::None).setTicks(getPlayPos().getTicks());
@@ -719,37 +719,35 @@ void Song::startExport()
 	m_exporting = true;
 	updateLength();
 
+	const auto& timeline = getTimeline(PlayMode::Song);
+
 	if (m_renderBetweenMarkers)
 	{
-		m_exportSongBegin = m_exportLoopBegin = getPlayPos(PlayMode::Song).m_timeLine->loopBegin();
-		m_exportSongEnd = m_exportLoopEnd = getPlayPos(PlayMode::Song).m_timeLine->loopEnd();
+		m_exportSongBegin = m_exportLoopBegin = timeline.loopBegin();
+		m_exportSongEnd = m_exportLoopEnd = timeline.loopEnd();
 
-		getPlayPos(PlayMode::Song).setTicks( getPlayPos(PlayMode::Song).m_timeLine->loopBegin().getTicks() );
+		getPlayPos(PlayMode::Song).setTicks(timeline.loopBegin().getTicks());
 	}
 	else
 	{
 		m_exportSongEnd = TimePos(m_length, 0);
         
 		// Handle potentially ridiculous loop points gracefully.
-		if (m_loopRenderCount > 1 && getPlayPos(PlayMode::Song).m_timeLine->loopEnd() > m_exportSongEnd) 
+		if (m_loopRenderCount > 1 && timeline.loopEnd() > m_exportSongEnd) 
 		{
-			m_exportSongEnd = getPlayPos(PlayMode::Song).m_timeLine->loopEnd();
+			m_exportSongEnd = timeline.loopEnd();
 		}
 
 		if (!m_exportLoop) 
 			m_exportSongEnd += TimePos(1,0);
         
 		m_exportSongBegin = TimePos(0,0);
-		// FIXME: remove this check once we load timeline in headless mode
-		if (getPlayPos(PlayMode::Song).m_timeLine)
-		{
-			m_exportLoopBegin = getPlayPos(PlayMode::Song).m_timeLine->loopBegin() < m_exportSongEnd &&
-				getPlayPos(PlayMode::Song).m_timeLine->loopEnd() <= m_exportSongEnd ?
-				getPlayPos(PlayMode::Song).m_timeLine->loopBegin() : TimePos(0,0);
-			m_exportLoopEnd = getPlayPos(PlayMode::Song).m_timeLine->loopBegin() < m_exportSongEnd &&
-				getPlayPos(PlayMode::Song).m_timeLine->loopEnd() <= m_exportSongEnd ?
-				getPlayPos(PlayMode::Song).m_timeLine->loopEnd() : TimePos(0,0);
-		}
+		m_exportLoopBegin = timeline.loopBegin() < m_exportSongEnd && timeline.loopEnd() <= m_exportSongEnd
+			? timeline.loopBegin()
+			: TimePos{0};
+		m_exportLoopEnd = timeline.loopBegin() < m_exportSongEnd && timeline.loopEnd() <= m_exportSongEnd
+			? timeline.loopEnd()
+			: TimePos{0};
 
 		getPlayPos(PlayMode::Song).setTicks( 0 );
 	}
@@ -859,7 +857,7 @@ void Song::clearProject()
 		stop();
 	}
 
-	for( int i = 0; i < PlayModeCount; i++ )
+	for (auto i = std::size_t{0}; i < PlayModeCount; i++)
 	{
 		setPlayPos( 0, ( PlayMode )i );
 	}
@@ -959,13 +957,12 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	Track * t;
-	t = Track::create( Track::Type::Instrument, this );
-	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
-					"tripleoscillator" );
-	t = Track::create(Track::Type::Instrument, Engine::patternStore());
-	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
-						"kicker" );
+	auto tripleOscTrack = Track::create(Track::Type::Instrument, this);
+	dynamic_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
+
+	auto kickerTrack = Track::create(Track::Type::Instrument, Engine::patternStore());
+	dynamic_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
+
 	Track::create( Track::Type::Sample, this );
 	Track::create( Track::Type::Pattern, this );
 	Track::create( Track::Type::Automation, this );
@@ -978,7 +975,7 @@ void Song::createNewProject()
 	QCoreApplication::instance()->processEvents();
 
 	m_loadingProject = false;
-
+	updateLength();
 	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
@@ -1080,11 +1077,7 @@ void Song::loadProject( const QString & fileName )
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
-	if( getPlayPos(PlayMode::Song).m_timeLine )
-	{
-		// reset loop-point-state
-		getPlayPos(PlayMode::Song).m_timeLine->toggleLoopPoints( 0 );
-	}
+	getTimeline(PlayMode::Song).setLoopEnabled(false);
 
 	if( !dataFile.content().firstChildElement( "track" ).isNull() )
 	{
@@ -1167,9 +1160,9 @@ void Song::loadProject( const QString & fileName )
 				{
 					 getGUI()->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == getPlayPos(PlayMode::Song).m_timeLine->nodeName() )
+				else if (node.nodeName() == getTimeline(PlayMode::Song).nodeName())
 				{
-					getPlayPos(PlayMode::Song).m_timeLine->restoreState( node.toElement() );
+					getTimeline(PlayMode::Song).restoreState(node.toElement());
 				}
 			}
 		}
@@ -1225,6 +1218,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
+	updateLength();
 	setModified(false);
 	m_loadOnLaunch = false;
 }
@@ -1253,7 +1247,7 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 		getGUI()->pianoRoll()->saveState( dataFile, dataFile.content() );
 		getGUI()->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
 		getGUI()->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
-		getPlayPos(PlayMode::Song).m_timeLine->saveState( dataFile, dataFile.content() );
+		getTimeline(PlayMode::Song).saveState(dataFile, dataFile.content());
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );
@@ -1365,7 +1359,7 @@ void Song::restoreScaleStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_scales[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1390,7 +1384,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_keymaps[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1561,6 +1555,4 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
-
-
 } // namespace lmms

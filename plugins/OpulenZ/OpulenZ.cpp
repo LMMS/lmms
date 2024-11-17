@@ -46,9 +46,9 @@
 #include <cassert>
 #include <cmath>
 
-#include "opl.h"
-#include "temuopl.h"
-#include "mididata.h"
+#include <opl.h>
+#include <temuopl.h>
+#include <mididata.h>
 
 #include "embed.h"
 #include "debug.h"
@@ -95,7 +95,7 @@ QMutex OpulenzInstrument::emulatorMutex;
 const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
+	Instrument(_instrument_track, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
 	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 attack" )  ),
 	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 decay" )   ),
@@ -140,7 +140,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -231,7 +231,7 @@ OpulenzInstrument::~OpulenzInstrument() {
 void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
@@ -244,14 +244,12 @@ void OpulenzInstrument::reloadEmulator() {
 
 // This shall only be called from code protected by the holy Mutex!
 void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
-	int vel_adjusted;
+	int vel_adjusted = !fm_mdl.value()
+		? 63 - (op1_lvl_mdl.value() * vel / 127.0)
+		: 63 - op1_lvl_mdl.value();
+
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
-	if( fm_mdl.value() == false ) {
-		vel_adjusted = 63 - ( op1_lvl_mdl.value() * vel/127.0) ;
-	} else {
-		vel_adjusted = 63 - op1_lvl_mdl.value();
-	}
 	theEmulator->write(0x40+adlib_opadd[voice],
 			   ( (int)op1_scale_mdl.value() & 0x03 << 6) +
 			   ( vel_adjusted & 0x3f ) );
@@ -297,66 +295,60 @@ int OpulenzInstrument::pushVoice(int v) {
 bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
-	int key, vel, voice, tmp_pb;
 
-	switch(event.type()) {
-        case MidiNoteOn:
-		key = event.key();
-		vel = event.velocity();
-
-		voice = popVoice();
-		if( voice != OPL2_NO_VOICE ) {
+	int key = event.key();
+	int vel = event.velocity();
+	switch (event.type())
+	{
+	case MidiNoteOn:
+		if (int voice = popVoice(); voice != OPL2_NO_VOICE)
+		{
 			// Turn voice on, NB! the frequencies are straight by voice number,
 			// not by the adlib_opadd table!
-			theEmulator->write(0xA0+voice, fnums[key] & 0xff);
-			theEmulator->write(0xB0+voice, 32 + ((fnums[key] & 0x1f00) >> 8) );
+			theEmulator->write(0xA0 + voice, fnums[key] & 0xff);
+			theEmulator->write(0xB0 + voice, 32 + ((fnums[key] & 0x1f00) >> 8));
 			setVoiceVelocity(voice, vel);
 			voiceNote[voice] = key;
 			velocities[key] = vel;
 		}
-                break;
-        case MidiNoteOff:
-                key = event.key();
-                for(voice=0; voice<OPL2_VOICES; ++voice) {
-                        if( voiceNote[voice] == key ) {
-                                theEmulator->write(0xA0+voice, fnums[key] & 0xff);
-                                theEmulator->write(0xB0+voice, (fnums[key] & 0x1f00) >> 8 );
-                                voiceNote[voice] |= OPL2_VOICE_FREE;
+		break;
+	case MidiNoteOff:
+		for (int voice = 0; voice < OPL2_VOICES; ++voice)
+		{
+			if (voiceNote[voice] == key)
+			{
+				theEmulator->write(0xA0 + voice, fnums[key] & 0xff);
+				theEmulator->write(0xB0 + voice, (fnums[key] & 0x1f00) >> 8);
+				voiceNote[voice] |= OPL2_VOICE_FREE;
 				pushVoice(voice);
-                        }
-                }
-		velocities[key] = 0;
-                break;
-        case MidiKeyPressure:
-                key = event.key();
-                vel = event.velocity();
-		if( velocities[key] != 0) {
-			velocities[key] = vel;
-		}
-		for(voice=0; voice<OPL2_VOICES; ++voice) {
-			if(voiceNote[voice] == key) {
-				setVoiceVelocity(voice, vel);
 			}
 		}
-                break;
-        case MidiPitchBend:
+		velocities[key] = 0;
+		break;
+	case MidiKeyPressure:
+		if (velocities[key] != 0) { velocities[key] = vel; }
+		for (int voice = 0; voice < OPL2_VOICES; ++voice)
+		{
+			if (voiceNote[voice] == key) { setVoiceVelocity(voice, vel); }
+		}
+		break;
+	case MidiPitchBend:
 		// Update fnumber table
-
 		// Neutral = 8192, full downbend = 0, full upbend = 16383
-		tmp_pb = ( event.pitchBend()-8192 ) * pitchBendRange / 8192;
-
-		if( tmp_pb != pitchbend ) {
+		if (int tmp_pb = (event.pitchBend() - 8192) * pitchBendRange / 8192; tmp_pb != pitchbend)
+		{
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
 		}
 		// Update pitch of all voices (also released ones)
-		for( int v=0; v<OPL2_VOICES; ++v ) {
-			int vn = (voiceNote[v] & ~OPL2_VOICE_FREE); // remove the flag bit
+		for (int v = 0; v < OPL2_VOICES; ++v)
+		{
+			int vn = (voiceNote[v] & ~OPL2_VOICE_FREE);			 // remove the flag bit
 			int playing = (voiceNote[v] & OPL2_VOICE_FREE) == 0; // just the flag bit
-			theEmulator->write(0xA0+v, fnums[vn] & 0xff);
-			theEmulator->write(0xB0+v, (playing ? 32 : 0) + ((fnums[vn] & 0x1f00) >> 8) );
-                }
-                break;
+			theEmulator->write(0xA0 + v, fnums[vn] & 0xff);
+			theEmulator->write(0xB0 + v, (playing ? 32 : 0) + ((fnums[vn] & 0x1f00) >> 8));
+		}
+		break;
 	case MidiControlChange:
 		switch (event.controllerNumber()) {
 		case MidiControllerRegisteredParameterNumberLSB:
@@ -382,7 +374,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
                 printf("Midi event type %d\n",event.type());
 #endif
 		break;
-        }
+		}
 	emulatorMutex.unlock();
 	return true;
 }
@@ -398,7 +390,7 @@ gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void OpulenzInstrument::play( sampleFrame * _working_buffer )
+void OpulenzInstrument::play( SampleFrame* _working_buffer )
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
@@ -504,9 +496,8 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 }
 
 void OpulenzInstrument::tuneEqual(int center, float Hz) {
-	float tmp;
 	for(int n=0; n<128; ++n) {
-		tmp = Hz*pow( 2.0, ( n - center ) * ( 1.0 / 12.0 ) + pitchbend * ( 1.0 / 1200.0 ) );
+		float tmp = Hz * pow(2.0, (n - center) * (1.0 / 12.0) + pitchbend * (1.0 / 1200.0));
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -779,15 +770,15 @@ void OpulenzInstrumentView::updateKnobHints()
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
 	const auto attack_times = std::array<float, 16>{
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4,
-		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
-		950.0, 1900.0, 3800.0
+		0.f, 0.2f, 0.4f, 0.9f, 1.8f, 3.7f, 7.4f,
+		15.f, 30.f, 60.f, 120.f, 240.f, 480.f,
+		950.f, 1900.f, 3800.f
 	};
 
 	const auto dr_times = std::array<float, 16>{
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0,
-		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0,
-		5200.0, 10000.0, 20000.0
+		0.f, 1.2f, 2.5f, 5.f, 10.f, 20.f, 40.f,
+		80.f, 160.f, 320.f, 640.f, 1300.f, 2600.f,
+		5200.f, 10000.f, 20000.f
 	};
 
 	const auto fmultipliers = std::array<int, 16>{

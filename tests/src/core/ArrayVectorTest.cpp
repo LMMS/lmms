@@ -24,10 +24,10 @@
 
 #include "ArrayVector.h"
 
+#include <QObject>
+#include <QtTest/QtTest>
 #include <array>
 #include <iterator>
-
-#include "QTestSuite.h"
 
 using lmms::ArrayVector;
 
@@ -59,10 +59,9 @@ struct DestructorCheck
 	bool* destructed;
 };
 
-class ArrayVectorTest : QTestSuite
+class ArrayVectorTest : public QObject
 {
 	Q_OBJECT
-
 private slots:
 	void defaultConstructorTest()
 	{
@@ -227,9 +226,19 @@ private slots:
 	{
 		{
 			// Self-assignment should not change the contents
+			//// Please note the following:
+			//// https://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#2468
+			//// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81159
 			auto v = ArrayVector<int, 5>{1, 2, 3};
 			const auto oldValue = v;
+#if __GNUC__ >= 13
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wself-move"
+#endif
 			v = std::move(v);
+#if __GNUC__ >= 13
+#	pragma GCC diagnostic pop
+#endif
 			QCOMPARE(v, oldValue);
 		}
 		{
@@ -826,6 +835,7 @@ private slots:
 		QVERIFY(!(e != v));
 		QVERIFY(g != v);
 	}
-} ArrayVectorTests;
+};
 
+QTEST_GUILESS_MAIN(ArrayVectorTest)
 #include "ArrayVectorTest.moc"

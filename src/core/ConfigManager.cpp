@@ -188,13 +188,17 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
+bool ConfigManager::enableBlockedPlugins()
+{
+	const char* envVar = getenv("LMMS_ENABLE_BLOCKED_PLUGINS");
+	return (envVar && *envVar);
+}
+
 QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;
 	methods.append("none");
-#if QT_VERSION >= 0x050100
 	methods.append("qt");
-#endif
 #ifdef LMMS_BUILD_WIN32
 	methods.append("win32");
 #endif
@@ -514,7 +518,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		cfg_file.close();
 	}
 
-	// Plugins are searched recursively, blacklist problematic locations
+	// Plugins are searched recursively, block problematic locations
 	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
 			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
 			!QDir( m_vstDir ).exists() )

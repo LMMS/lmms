@@ -157,7 +157,7 @@ void SfxrSynth::resetSample( bool restart )
 
 
 
-void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
+void SfxrSynth::update( SampleFrame* buffer, const int32_t frameNum )
 {
 	for(int i=0;i<frameNum;i++)
 	{
@@ -442,9 +442,9 @@ QString SfxrInstrument::nodeName() const
 
 
 
-void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 {
-	float currentSampleRate = Engine::audioEngine()->processingSampleRate();
+	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 
 	fpp_t frameNum = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -454,7 +454,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	}
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
-		memset(_working_buffer + offset, 0, sizeof(sampleFrame) * frameNum);
+		zeroSampleFrames(_working_buffer + offset, frameNum);
 		_n->noteOff();
 		return;
 	}
@@ -467,7 +467,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 // debug code
 //	qDebug( "pFN %d", pitchedFrameNum );
 
-	auto pitchedBuffer = new sampleFrame[pitchedFrameNum];
+	auto pitchedBuffer = new SampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
 	for( fpp_t i=0; i<frameNum; i++ )
 	{

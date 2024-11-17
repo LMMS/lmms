@@ -43,6 +43,7 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "Metronome.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -115,27 +116,27 @@ MainWindow::MainWindow() :
 					"*.mmp *.mmpz *.xml *.mid *.mpt",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
+							splitter, false,
 				confMgr->userProjectsDir(),
 				confMgr->factoryProjectsDir()));
 	sideBar->appendTab(
 		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
 			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
-			true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
+			confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz *.lv2",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false, true,
+							splitter , false,
 				confMgr->userPresetsDir(),
 				confMgr->factoryPresetsDir()));
 	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
-		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false, false));
+		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
-	QString title = tr( "Root directory" );
+	QString title = tr("Root Directory");
 	bool dirs_as_items = false;
 
 #ifdef LMMS_BUILD_APPLE
@@ -225,8 +226,6 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 				this, SLOT(updatePlayPauseIcons()));
-
-	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
 
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
@@ -326,10 +325,7 @@ void MainWindow::finalize()
 					SLOT(onExportProjectMidi()),
 					Qt::CTRL + Qt::Key_M );
 
-// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
-#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT(closeAllWindows()),
 					Qt::CTRL + Qt::Key_Q );
@@ -402,10 +398,7 @@ void MainWindow::finalize()
 							this, SLOT(help()));
 	}
 
-// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
-#endif
 	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT(aboutLMMS()));
 
@@ -438,7 +431,7 @@ void MainWindow::finalize()
 				this, SLOT(onToggleMetronome()),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::audioEngine()->isMetronomeActive());
+	m_metronomeToggle->setChecked(Engine::getSong()->metronome().active());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -982,26 +975,21 @@ void MainWindow::toggleFullscreen()
  */
 void MainWindow::refocus()
 {
-	QList<QWidget*> editors;
-	editors
-		<< getGUI()->songEditor()->parentWidget()
-		<< getGUI()->patternEditor()->parentWidget()
-		<< getGUI()->pianoRoll()->parentWidget()
-		<< getGUI()->automationEditor()->parentWidget();
+	const auto gui = getGUI();
 
-	bool found = false;
-	QList<QWidget*>::Iterator editor;
-	for( editor = editors.begin(); editor != editors.end(); ++editor )
+	// Attempt to set the focus on the first of these editors that is not hidden...
+	for (auto editorParent : { gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
+		gui->pianoRoll()->parentWidget(), gui->automationEditor()->parentWidget() })
 	{
-		if( ! (*editor)->isHidden() ) {
-			(*editor)->setFocus();
-			found = true;
-			break;
+		if (!editorParent->isHidden())
+		{
+			editorParent->setFocus();
+			return;
 		}
 	}
 
-	if( ! found )
-		this->setFocus();
+	// ... otherwise set the focus on the main window.
+	this->setFocus();
 }
 
 
@@ -1110,8 +1098,7 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	QAction *qa;
-	qa = new QAction(tr( "Volume as dBFS" ), this);
+	auto qa = new QAction(tr("Volume as dBFS"), this);
 	qa->setData("displaydbfs");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
@@ -1182,7 +1169,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Engine::audioEngine()->setMetronomeActive( m_metronomeToggle->isChecked() );
+	Engine::getSong()->metronome().setActive(m_metronomeToggle->isChecked());
 }
 
 
@@ -1603,42 +1590,6 @@ void MainWindow::onImportProject()
 		}
 
 		song->setLoadOnLaunch(false);
-	}
-}
-
-void MainWindow::onSongStopped()
-{
-	Song * song = Engine::getSong();
-	Song::PlayPos const & playPos = song->getPlayPos();
-
-	TimeLineWidget * tl = playPos.m_timeLine;
-
-	if( tl )
-	{
-		SongEditorWindow* songEditor = getGUI()->songEditor();
-		switch( tl->behaviourAtStop() )
-		{
-			case TimeLineWidget::BehaviourAtStopState::BackToZero:
-				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
-				{
-					songEditor->m_editor->updatePosition(0);
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::BackToStart:
-				if( tl->savedPos() >= 0 )
-				{
-					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
-					{
-						songEditor->m_editor->updatePosition( TimePos(tl->savedPos().getTicks() ) );
-					}
-					tl->savePos( -1 );
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::KeepStopPosition:
-				break;
-		}
 	}
 }
 

@@ -97,8 +97,8 @@ bool AutomatableModel::isAutomated() const
 
 bool AutomatableModel::mustQuoteName(const QString& name)
 {
-	QRegExp reg("^[A-Za-z0-9._-]+$");
-	return !reg.exactMatch(name);
+	QRegularExpression reg("^[A-Za-z0-9._-]+$");
+	return !reg.match(name).hasMatch();
 }
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
@@ -350,19 +350,6 @@ float AutomatableModel::inverseScaledValue( float value ) const
 
 
 
-//! @todo: this should be moved into a maths header
-template<class T>
-void roundAt( T& value, const T& where, const T& step_size )
-{
-	if (std::abs(value - where)
-		< typeInfo<float>::minEps() * std::abs(step_size))
-	{
-		value = where;
-	}
-}
-
-
-
 
 template<class T>
 void AutomatableModel::roundAt( T& value, const T& where ) const
@@ -583,7 +570,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 				"lacks implementation for a scale type");
 			break;
 		}
-		if( typeInfo<float>::isEqual( m_step, 1 ) && m_hasStrictStepSize )
+		if (approximatelyEqual(m_step, 1) && m_hasStrictStepSize)
 		{
 			return std::round(v);
 		}
@@ -613,10 +600,9 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	float val = m_value; // make sure our m_value doesn't change midway
 
-	ValueBuffer * vb;
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
-		vb = m_controllerConnection->valueBuffer();
+		auto vb = m_controllerConnection->valueBuffer();
 		if( vb )
 		{
 			float * values = vb->values();
@@ -656,7 +642,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
 				lm->controllerConnection()->getController()->isSampleExact())
 		{
-			vb = lm->valueBuffer();
+			auto vb = lm->valueBuffer();
 			float * values = vb->values();
 			float * nvalues = m_valueBuffer.values();
 			for (int i = 0; i < vb->length(); i++)

@@ -1,14 +1,13 @@
 {
 	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+	"name": "lmms",
 	"dependencies": [
 		{
 			"name": "fftw3",
 			"default-features": false,
 			"features": [
 				"sse",
-				"sse2",
-				"avx",
-				"avx2"
+				"sse2"
 			]
 		},
 		{
@@ -64,10 +63,7 @@
 		},
 		{
 			"name": "sdl2",
-			"default-features": false,
-			"features": [
-				"base"
-			]
+			"default-features": false
 		},
 		{
 			"name": "zlib",

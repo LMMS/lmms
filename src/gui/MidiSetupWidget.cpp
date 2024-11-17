@@ -28,7 +28,6 @@
 #include <QLineEdit>
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 namespace lmms::gui

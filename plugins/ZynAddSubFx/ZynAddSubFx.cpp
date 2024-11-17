@@ -40,7 +40,6 @@
 #include "DataFile.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "gui_templates.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
@@ -49,6 +48,7 @@
 #include "Clipboard.h"
 
 #include "embed.h"
+#include "FontHelper.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -104,12 +104,12 @@ bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
 
 ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
+	Instrument(_instrumentTrack, &zynaddsubfx_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_hasGUI( false ),
 	m_plugin( nullptr ),
 	m_remotePlugin( nullptr ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
-	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
+	m_filterFreqModel( 127, 0, 127, 1, this, tr( "Filter frequency" ) ),
 	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM gain" ) ),
@@ -143,6 +143,11 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
+
+	// ZynAddSubFX's internal value that LMMS's FREQ knob controls
+	// isn't set properly when the instrument is first loaded in,
+	// and doesn't update until the FREQ knob is moved
+	updateFilterFreq();
 }
 
 
@@ -311,7 +316,7 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 	}
 
-	instrumentTrack()->setName( QFileInfo( _file ).baseName().replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
+	instrumentTrack()->setName(QFileInfo(_file).baseName().replace(QRegularExpression("^[0-9]{4}-"), QString()));
 
 	m_modifiedControllers.clear();
 
@@ -329,7 +334,7 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 
 
-void ZynAddSubFxInstrument::play( sampleFrame * _buf )
+void ZynAddSubFxInstrument::play( SampleFrame* _buf )
 {
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 	if( m_remotePlugin )
@@ -452,7 +457,7 @@ void ZynAddSubFxInstrument::initPlugin()
 						QDir( ConfigManager::inst()->factoryPresetsDir() +
 								"/ZynAddSubFX" ).absolutePath() ) ) );
 
-		m_remotePlugin->updateSampleRate( Engine::audioEngine()->processingSampleRate() );
+		m_remotePlugin->updateSampleRate( Engine::audioEngine()->outputSampleRate() );
 
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
@@ -464,7 +469,7 @@ void ZynAddSubFxInstrument::initPlugin()
 	else
 	{
 		m_plugin = new LocalZynAddSubFx;
-		m_plugin->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+		m_plugin->setSampleRate( Engine::audioEngine()->outputSampleRate() );
 		m_plugin->setBufferSize( Engine::audioEngine()->framesPerPeriod() );
 	}
 
@@ -541,7 +546,9 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
+	QFont f = m_toggleUIButton->font();
+	m_toggleUIButton->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
+
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
 
