@@ -272,6 +272,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// setup sizes and policies
 	generalSettingsWidget->setMaximumHeight(90);
 	generalSettingsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	vlayout->setSizeConstraint(QLayout::SetFixedSize);
 	m_tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	vlayout->addWidget( generalSettingsWidget );
