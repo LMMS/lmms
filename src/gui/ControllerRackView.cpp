@@ -78,10 +78,15 @@ ControllerRackView::ControllerRackView()
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
 
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+
+	// TODO: Automate setting one of these, stop hardcoding title bar height
+	// Set dimensions for detached mode
 	setFixedWidth(350);
 	setMinimumHeight(200);
-
-	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+	// Set dimensions for embedded mode
+	subWin->setFixedWidth(350);
+	subWin->setMinimumHeight(230);
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
