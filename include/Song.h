@@ -133,6 +133,10 @@ public:
 		bool m_jumped;
 	};
 
+	Song();
+	Song(const Song&);
+	~Song() override;
+
 	void processNextBuffer();
 
 	inline int getLoadingTrackCount() const
@@ -416,9 +420,6 @@ private slots:
 
 
 private:
-	Song();
-	Song( const Song & );
-	~Song() override;
 
 
 	inline bar_t currentBar() const
