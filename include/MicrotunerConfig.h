@@ -25,10 +25,9 @@
 #ifndef LMMS_GUI_MICROTUNER_CONFIG_H
 #define LMMS_GUI_MICROTUNER_CONFIG_H
 
-#include <QWidget>
-
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+#include "DetachableWidget.h"
 #include "SerializingObject.h"
 
 class QLineEdit;
@@ -38,7 +37,7 @@ namespace lmms::gui
 {
 
 
-class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
+class LMMS_EXPORT MicrotunerConfig : public DetachableWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -58,9 +57,6 @@ public slots:
 	void updateKeymapList(int index);
 	void updateScaleForm();
 	void updateKeymapForm();
-
-protected:
-	void closeEvent(QCloseEvent *ce) override;
 
 private slots:
 	bool loadScaleFromFile();
