@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QPainter>
+#include <QToolTip>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -47,8 +48,6 @@
 namespace lmms::gui
 {
 
-SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
-
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
@@ -63,11 +62,6 @@ FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfMa
 
 void FloatModelEditorBase::initUi(const QString & name)
 {
-	if (s_textFloat == nullptr)
-	{
-		s_textFloat = new SimpleTextFloat;
-	}
-
 	setWindowTitle(name);
 
 	setFocusPolicy(Qt::ClickFocus);
@@ -78,9 +72,8 @@ void FloatModelEditorBase::initUi(const QString & name)
 
 void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
 {
-	s_textFloat->setText(displayValue());
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
+	// FIXME: figure out a way to delay displaying the hint
+	QToolTip::showText(mapToGlobal(QPoint(0, 0)), displayValue(), this, {}, msecDisplayTime);
 }
 
 
@@ -175,12 +168,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 
 		emit sliderPressed();
 
-		showTextFloat(0, 0);
-
-		s_textFloat->setText(displayValue());
-		s_textFloat->moveGlobal(this,
-				QPoint(width() + 2, 0));
-		s_textFloat->show();
+		showTextFloat(0, -1);
 		m_buttonPressed = true;
 	}
 	else if (me->button() == Qt::LeftButton &&
@@ -207,8 +195,7 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 		// original position for next time is current position
 		m_lastMousePos = me->pos();
 	}
-	s_textFloat->setText(displayValue());
-	s_textFloat->show();
+	showTextFloat(0, -1);
 }
 
 
@@ -229,7 +216,7 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 
 	QApplication::restoreOverrideCursor();
 
-	s_textFloat->hide();
+	QToolTip::hideText();
 }
 
 
@@ -241,7 +228,7 @@ void FloatModelEditorBase::enterEvent(QEvent *event)
 
 void FloatModelEditorBase::leaveEvent(QEvent *event)
 {
-	s_textFloat->hide();
+	QToolTip::hideText();
 }
 
 
@@ -336,9 +323,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	s_textFloat->setText(displayValue());
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->setVisibilityTimeOut(1000);
+	showTextFloat(0, 1000);
 
 	emit sliderMoved(model()->value());
 }

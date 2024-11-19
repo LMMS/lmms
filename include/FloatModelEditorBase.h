@@ -104,8 +104,6 @@ private:
 		return (model()->maxValue() - model()->minValue()) / 100.0f;
 	}
 
-	static SimpleTextFloat * s_textFloat;
-
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
 
