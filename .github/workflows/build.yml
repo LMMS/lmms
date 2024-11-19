@@ -239,7 +239,7 @@ jobs:
       matrix:
         arch: ['x86', 'x64']
     name: msvc-${{ matrix.arch }}
-    runs-on: windows-2022
+    runs-on: windows-2019
     env:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
