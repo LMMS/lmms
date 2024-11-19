@@ -249,6 +249,15 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Set up or Update vcpkg
+        run: |
+          if (!(Test-Path C:/vcpkg)) {
+            git clone https://github.com/microsoft/vcpkg.git C:/vcpkg
+          }
+          cd C:/vcpkg
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
