@@ -30,7 +30,6 @@
 
 #include "lmms_export.h"
 
-class QLabel;
 class QTimer;
 
 namespace lmms::gui
@@ -55,9 +54,10 @@ public:
 	}
 
 	void hide();
+	void show();
 
 private:
-	QLabel * m_textLabel;
+	QString m_text;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
 };
