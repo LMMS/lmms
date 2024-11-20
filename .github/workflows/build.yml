@@ -251,7 +251,7 @@ jobs:
           submodules: recursive
       - name: Update vcpkg (TEMPORARY)
         run: |
-          cd ${VCPKG_INSTALLATION_ROOT}
+          cd $env:VCPKG_INSTALLATION_ROOT
           git pull
           .\bootstrap-vcpkg.bat
         shell: pwsh
