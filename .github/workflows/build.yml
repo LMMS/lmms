@@ -292,7 +292,7 @@ jobs:
           archives: qtbase qtsvg qttools
           cache: true
       - name: Set up build environment
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@cec98b9d092141f74527d0afa6feb2af698cfe89
         with:
           arch: ${{ matrix.arch }}
       - name: Configure
