@@ -39,7 +39,7 @@ jobs:
       - name: Install system packages
         run: sudo apt-get install -y ${{ env.APT_DEPENDENCIES }}
       - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@c6c7281365daef91a238e1c2ddce4eaa94a2991d
         with:
           version: '5.15.2'
           arch: 'gcc_64'
