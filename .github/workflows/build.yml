@@ -249,12 +249,9 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Set up or Update vcpkg
+      - name: Update vcpkg (TEMPORARY)
         run: |
-          if (!(Test-Path C:/vcpkg)) {
-            git clone https://github.com/microsoft/vcpkg.git C:/vcpkg
-          }
-          cd C:/vcpkg
+          cd ${VCPKG_INSTALLATION_ROOT}
           git pull
           .\bootstrap-vcpkg.bat
         shell: pwsh
