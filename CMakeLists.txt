@@ -665,8 +665,8 @@ elseif(MSVC)
 	add_compile_options("/utf-8")
 ENDIF()
 
-# gcc/clang builds support gprof for profiling
-if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|CLANG")
+# gcc builds support gprof for profiling
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(STATUS_GPROF ", NOT SUPPORTED BY THIS COMPILER")
 	set(WANT_DEBUG_GPROF OFF)
 endif()
