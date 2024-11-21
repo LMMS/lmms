@@ -98,23 +98,16 @@ private:
 	static auto get(const T& entry, std::unordered_map<T, std::weak_ptr<SampleBuffer>, Hash>& map, Args... args)
 	{
 		const auto it = map.find(entry);
+		const auto item = it == map.end() ? nullptr : it->second.lock();
 
-		if (it == map.end())
+		if (!item)
 		{
 			const auto buffer = std::make_shared<SampleBuffer>(std::forward<Args>(args)...);
-			map.insert(std::make_pair(entry, buffer));
+			map.emplace(entry, buffer);
 			return buffer;
 		}
 
-		const auto entryLock = it->second.lock();
-		if (!entryLock)
-		{
-			const auto buffer = std::make_shared<SampleBuffer>(std::forward<Args>(args)...);
-			map[entry] = buffer;
-			return buffer;
-		}
-
-		return entryLock;
+		return item;
 	}
 
 	inline static std::unordered_map<AudioFileEntry, std::weak_ptr<SampleBuffer>, Hash> s_audioFileMap;
