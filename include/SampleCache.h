@@ -95,7 +95,7 @@ private:
 	};
 
 	template <typename T, typename ...Args>
-	static auto get(const T& entry, std::unordered_map<T, std::weak_ptr<SampleBuffer>, Hash>& map, Args... args)
+	static auto get(const T& entry, std::unordered_map<T, std::weak_ptr<SampleBuffer>, Hash>& map, Args&&... args)
 	{
 		const auto it = map.find(entry);
 		const auto item = it == map.end() ? nullptr : it->second.lock();
@@ -103,7 +103,7 @@ private:
 		if (!item)
 		{
 			const auto buffer = std::make_shared<SampleBuffer>(std::forward<Args>(args)...);
-			map.emplace(entry, buffer);
+			map.insert_or_assign(std::move(entry), std::move(buffer));
 			return buffer;
 		}
 
