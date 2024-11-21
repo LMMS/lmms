@@ -352,14 +352,14 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer
 		// a unique frequency, we can start by guessing s = r = 0 here and then skip r = 0 in the loop.
 		char clock_freq = 0;
 		char div_ratio = 0;
-		float closest_freq = 524288.0 / (0.5 * std::pow(2.0, clock_freq + 1.0));
+		float closest_freq = 524288.0 / (0.5 * std::exp2(clock_freq + 1.0));
 		// This nested for loop iterates over all possible combinations of clock frequency and dividing
 		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
 		for (char s = 0; s < 16; ++s)
 		{
 			for (char r = 1; r < 8; ++r)
 			{
-				float f = 524288.0 / (r * std::pow(2.0, s + 1.0));
+				float f = 524288.0 / (r * std::exp2(s + 1.0));
 				if (std::fabs(freq - closest_freq) > std::fabs(freq - f))
 				{
 					closest_freq = f;

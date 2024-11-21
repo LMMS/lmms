@@ -249,6 +249,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Update vcpkg (TEMPORARY)
+        run: |
+          cd $env:VCPKG_INSTALLATION_ROOT
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
