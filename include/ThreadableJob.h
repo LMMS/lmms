@@ -25,9 +25,8 @@
 #ifndef LMMS_THREADABLE_JOB_H
 #define LMMS_THREADABLE_JOB_H
 
-#include "lmms_basics.h"
-
 #include <atomic>
+#include <memory_resource>
 
 namespace lmms
 {
@@ -81,11 +80,14 @@ public:
 
 	virtual bool requiresProcessing() const = 0;
 
+	static void* operator new(std::size_t bytes) { return s_pool.allocate(bytes); }
+	static void operator delete(void* ptr, std::size_t bytes) { s_pool.deallocate(ptr, bytes); }
 
 protected:
 	virtual void doProcessing() = 0;
 
 	std::atomic<ProcessingState> m_state;
+	inline static thread_local std::pmr::unsynchronized_pool_resource s_pool;
 } ;
 
 } // namespace lmms
