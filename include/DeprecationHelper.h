@@ -80,7 +80,7 @@ inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
 
 /**
  * @brief Combines Qt key and modifier arguments together,
- * replacing A | B or A + B which was deprecated in C++20
+ * replacing `A | B` which was deprecated in C++20
  * due to the enums being different types. (P1120R0)
  * @param args Any number of Qt::Key, Qt::Modifier, or Qt::KeyboardModifier
  * @return The combination of the given keys/modifiers as an int
@@ -88,7 +88,7 @@ inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
 template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ...), bool> = true>
 constexpr int combine(Args... args)
 {
-	return (0 + ... + static_cast<int>(args));
+	return (0 | ... | static_cast<int>(args));
 }
 
 } // namespace lmms
