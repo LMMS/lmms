@@ -37,8 +37,8 @@ auto SampleCache::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
 
 	const auto fsPath = PathUtil::pathFromQString(path);
-	const auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
-	return get(entry, s_audioFileMap, path);
+	auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
+	return get(std::move(entry), s_audioFileMap, path);
 }
 
 auto SampleCache::fetch(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>
