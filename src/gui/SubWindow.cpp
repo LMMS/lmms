@@ -29,6 +29,7 @@
 #include "SubWindow.h"
 
 #include <QGraphicsDropShadowEffect>
+#include <QGuiApplication>
 #include <QLabel>
 #include <QMdiArea>
 #include <QMetaMethod>
@@ -303,7 +304,10 @@ void SubWindow::attach()
 	// visible first, so that resizing works.
 	QObject obj;
 	connect(&obj, &QObject::destroyed, this, [this, frame]() {
-		move(mdiArea()->mapFromGlobal(frame.topLeft()));
+		if (QGuiApplication::platformName() != "wayland")
+		{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
+			move(mdiArea()->mapFromGlobal(frame.topLeft()));
+		}
 		resize(frame.size());
 	}, Qt::QueuedConnection);
 }
