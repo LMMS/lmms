@@ -47,7 +47,7 @@ auto SampleCache::fetch(const QString& base64, int sampleRate) -> std::shared_pt
 	// Can be removed if proven that other threads are requesting samples besides the main thread
 	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
 
-	const auto entry = Base64Entry{base64.toStdString(), sampleRate};
-	return get(entry, s_base64Map, base64, sampleRate);
+	auto entry = Base64Entry{base64.toStdString(), sampleRate};
+	return get(std::move(entry), s_base64Map, base64, sampleRate);
 }
 } // namespace lmms
