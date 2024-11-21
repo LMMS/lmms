@@ -95,19 +95,18 @@ private:
 	};
 
 	template <typename T, typename ...Args>
-	static auto get(const T& entry, std::unordered_map<T, std::weak_ptr<SampleBuffer>, Hash>& map, Args&&... args)
+	static auto get(T entry, std::unordered_map<T, std::weak_ptr<SampleBuffer>, Hash>& map, Args&&... args)
 	{
-		const auto it = map.find(entry);
-		const auto item = it == map.end() ? nullptr : it->second.lock();
+		auto& value = map[std::move(entry)];
+		auto buffer = value.lock();
 
-		if (!item)
+		if (!buffer)
 		{
-			const auto buffer = std::make_shared<SampleBuffer>(std::forward<Args>(args)...);
-			map.insert_or_assign(std::move(entry), buffer);
-			return buffer;
+			buffer = std::make_shared<SampleBuffer>(std::forward<Args>(args)...);
+			value = buffer;
 		}
 
-		return item;
+		return buffer;
 	}
 
 	inline static std::unordered_map<AudioFileEntry, std::weak_ptr<SampleBuffer>, Hash> s_audioFileMap;
