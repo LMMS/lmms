@@ -462,7 +462,7 @@ inline float GET_INC(float freq) {
 	return freq/Engine::audioEngine()->outputSampleRate();  // TODO: Use actual sampling rate.
 }
 
-int Lb302Synth::process(sampleFrame *outbuf, const int size)
+int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 
@@ -498,13 +498,10 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 	// hard coded value of 0.99897516.
 	auto decay = computeDecayFactor(0.245260770975f, 1.f / 65536.f);
 
-	for( int i=0; i<size; i++ ) 
+	for (auto i = std::size_t{0}; i < size; i++)
 	{
 		// start decay if we're past release
-		if( i >= release_frame )
-		{
-			vca_mode = VcaMode::Decay;
-		}
+		if (i >= release_frame) { vca_mode = VcaMode::Decay; }
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
@@ -732,7 +729,7 @@ void Lb302Synth::initSlide()
 }
 
 
-void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void Lb302Synth::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -750,8 +747,8 @@ void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 		m_notes.prepend( _n );
 	}
 	m_notesMutex.unlock();
-	
-	release_frame = qMax( release_frame, _n->framesLeft() + _n->offset() );
+
+	release_frame = std::max(release_frame, _n->framesLeft() + _n->offset());
 }
 
 
@@ -791,7 +788,7 @@ void Lb302Synth::processNote( NotePlayHandle * _n )
 
 
 
-void Lb302Synth::play( sampleFrame * _working_buffer )
+void Lb302Synth::play( SampleFrame* _working_buffer )
 {
 	m_notesMutex.lock();
 	while( ! m_notes.isEmpty() )

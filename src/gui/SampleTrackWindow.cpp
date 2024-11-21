@@ -92,7 +92,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
 
-	QString labelStyleSheet = "font-size: 6pt;";
+	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 

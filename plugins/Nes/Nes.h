@@ -95,7 +95,7 @@ public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject() = default;
 	
-	void renderOutput( sampleFrame * buf, fpp_t frames );
+	void renderOutput( SampleFrame* buf, fpp_t frames );
 	void updateVibrato( float * freq );
 	void updatePitch();
 	
@@ -134,13 +134,6 @@ public:
 	inline int wavelength( float freq )
 	{
 		return static_cast<int>( m_samplerate / freq );
-	}
-	
-	inline float signedPow( float f, float e )
-	{
-		return f < 0 
-			? powf( qAbs( f ), e ) * -1.0f
-			: powf( f, e );
 	}
 	
 	inline int nearestNoiseFreq( float f )
@@ -212,7 +205,7 @@ public:
 	~NesInstrument() override = default;
 	
 	void playNote( NotePlayHandle * n,
-						sampleFrame * workingBuffer ) override;
+						SampleFrame* workingBuffer ) override;
 	void deleteNotePluginData( NotePlayHandle * n ) override;
 
 

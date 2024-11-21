@@ -25,12 +25,8 @@ endif()
 
 # build ZynAddSubFX with full optimizations
 if(NOT MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fpermissive")
 endif()
-
-IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "6.0.0")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation -Wno-format-truncation")
-ENDIF()
 
 IF(MINGW_PREFIX)
 	SET(FLTK_FLUID_EXECUTABLE "${MINGW_PREFIX}/bin/fluid")
@@ -110,12 +106,6 @@ add_library(zynaddsubfx_synth OBJECT
 set_target_properties(zynaddsubfx_nio PROPERTIES SYSTEM TRUE)
 set_target_properties(zynaddsubfx_gui PROPERTIES SYSTEM TRUE)
 set_target_properties(zynaddsubfx_synth PROPERTIES SYSTEM TRUE)
-
-if(MINGW)
-	target_link_libraries(zynaddsubfx_nio PUBLIC mingw_stdthreads)
-	target_link_libraries(zynaddsubfx_gui PUBLIC mingw_stdthreads)
-	target_link_libraries(zynaddsubfx_synth PUBLIC mingw_stdthreads)
-endif()
 
 # Relative include paths don't work automatically for the GUI, because the
 # generated C++ files aren't in the source directory. Thus, add the expected

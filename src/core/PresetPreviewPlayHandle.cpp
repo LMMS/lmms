@@ -176,7 +176,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	Engine::audioEngine()->requestChangeInModel();
 	m_previewNote = new NotePlayHandle(
-		s_previewTC->previewInstrumentTrack(), 0, typeInfo<f_cnt_t>::max() / 2, Note{0, 0, DefaultKey, 100});
+		s_previewTC->previewInstrumentTrack(), 0, std::numeric_limits<f_cnt_t>::max() / 2, Note{0, 0, DefaultKey, 100});
 
 	setAudioPort( s_previewTC->previewInstrumentTrack()->audioPort() );
 
@@ -206,7 +206,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 
 
 
-void PresetPreviewPlayHandle::play( sampleFrame * _working_buffer )
+void PresetPreviewPlayHandle::play( SampleFrame* _working_buffer )
 {
 	// Do nothing; the preview instrument is played by m_previewNote, which
 	// has been added to the audio engine

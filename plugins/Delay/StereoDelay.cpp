@@ -23,7 +23,9 @@
  */
 
 #include "StereoDelay.h"
+
 #include "lmms_basics.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -55,7 +57,7 @@ StereoDelay::~StereoDelay()
 
 
 
-void StereoDelay::tick( sampleFrame& frame )
+void StereoDelay::tick( SampleFrame& frame )
 {
 	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
 	int readIndex = m_writeIndex - static_cast<int>(m_length);
@@ -81,7 +83,7 @@ void StereoDelay::setSampleRate( int sampleRate )
 	}
 
 	int bufferSize = ( int )( sampleRate * m_maxTime );
-	m_buffer = new sampleFrame[bufferSize];
+	m_buffer = new SampleFrame[bufferSize];
 	for( int i = 0 ; i < bufferSize ; i++)
 	{
 		m_buffer[i][0] = 0.0;

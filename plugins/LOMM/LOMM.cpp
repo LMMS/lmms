@@ -64,14 +64,10 @@ LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 {
 	autoQuitModel()->setValue(autoQuitModel()->maxValue());
 	
-	m_yL[0][0] = m_yL[0][1] = LOMM_MIN_FLOOR;
-	m_yL[1][0] = m_yL[1][1] = LOMM_MIN_FLOOR;
-	m_yL[2][0] = m_yL[2][1] = LOMM_MIN_FLOOR;
-	
 	m_ap.setFilterType(BasicFilters<2>::FilterType::AllPass);
 	
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
-	emit changeSampleRate();
+	changeSampleRate();
 }
 
 void LOMMEffect::changeSampleRate()
@@ -97,16 +93,16 @@ void LOMMEffect::changeSampleRate()
 			m_scLookBuf[j][i].resize(m_lookBufLength, LOMM_MIN_FLOOR);
 		}
 	}
+
+	std::fill(m_yL.begin(), m_yL.end(), std::array<float, 2>{LOMM_MIN_FLOOR, LOMM_MIN_FLOOR});
+	m_rms = m_gainResult = m_displayIn = m_displayOut = m_prevOut = m_yL;
+	m_crestPeakVal[0] = m_crestPeakVal[1] = LOMM_MIN_FLOOR;
+	m_crestRmsVal = m_crestFactorVal = m_crestPeakVal;
 }
 
 
-bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
-	
 	if (m_needsUpdate || m_lommControls.m_split1Model.isValueChanged())
 	{
 		m_lp1.setLowpass(m_lommControls.m_split1Model.value());
@@ -120,7 +116,6 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	}
 	m_needsUpdate = false;
 
-	float outSum = 0.f;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -422,11 +417,9 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] + buf[f][1];
 	}
 
-	checkGate(outSum / frames);
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 extern "C"

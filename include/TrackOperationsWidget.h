@@ -33,6 +33,7 @@ namespace lmms::gui
 {
 
 class PixmapButton;
+class TrackGrip;
 class TrackView;
 
 class TrackOperationsWidget : public QWidget
@@ -42,6 +43,7 @@ public:
 	TrackOperationsWidget( TrackView * parent );
 	~TrackOperationsWidget() override = default;
 
+	TrackGrip* getTrackGrip() const { return m_trackGrip; }
 
 protected:
 	void mousePressEvent( QMouseEvent * me ) override;
@@ -65,6 +67,7 @@ private slots:
 private:
 	TrackView * m_trackView;
 
+	TrackGrip* m_trackGrip;
 	QPushButton * m_trackOps;
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
