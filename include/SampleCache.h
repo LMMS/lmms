@@ -103,7 +103,7 @@ private:
 		if (!item)
 		{
 			const auto buffer = std::make_shared<SampleBuffer>(std::forward<Args>(args)...);
-			map.insert_or_assign(std::move(entry), std::move(buffer));
+			map.insert_or_assign(std::move(entry), buffer);
 			return buffer;
 		}
 
