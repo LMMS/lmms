@@ -134,12 +134,14 @@ void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 {
+	const auto pos = position(event);
+
 	// switch between integer and fractional step based on cursor position
 	m_intStep = event->x() < m_wholeDisplay.width();
 
 	if (event->button() == Qt::LeftButton &&
 		!(event->modifiers() & Qt::ControlModifier) &&
-		event->y() < m_wholeDisplay.cellHeight() + 2)
+		pos.y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();

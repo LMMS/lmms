@@ -25,6 +25,7 @@
 #include "AudioFileProcessorWaveView.h"
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "FontHelper.h"
 #include "SampleWaveform.h"
 
@@ -113,10 +114,12 @@ void AudioFileProcessorWaveView::leaveEvent(QEvent * e)
 
 void AudioFileProcessorWaveView::mousePressEvent(QMouseEvent * me)
 {
+	const auto pos = position(me);
+
 	m_isDragging = true;
 	m_draggingLastPoint = me->pos();
 
-	const int x = me->x();
+	const int x = pos.x();
 
 	const int start_dist =		qAbs(m_startFrameX - x);
 	const int end_dist = 		qAbs(m_endFrameX - x);
@@ -154,7 +157,9 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 		return;
 	}
 
-	const int step = me->x() - m_draggingLastPoint.x();
+	const auto pos = position(me);
+
+	const int step = pos.x() - m_draggingLastPoint.x();
 	switch(m_draggingType)
 	{
 		case DraggingType::SampleStart:
@@ -170,12 +175,12 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 			slide(step);
 			break;
 		case DraggingType::ZoomWave:
-			zoom(me->y() < m_draggingLastPoint.y());
+			zoom(pos.y() < m_draggingLastPoint.y());
 			break;
 		case DraggingType::Wave:
 		default:
-			if (qAbs(me->y() - m_draggingLastPoint.y())
-				< 2 * qAbs(me->x() - m_draggingLastPoint.x()))
+			if (qAbs(pos.y() - m_draggingLastPoint.y())
+				< 2 * qAbs(pos.x() - m_draggingLastPoint.x()))
 			{
 				m_draggingType = DraggingType::SlideWave;
 			}
@@ -185,7 +190,7 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 			}
 	}
 
-	m_draggingLastPoint = me->pos();
+	m_draggingLastPoint = pos;
 	update();
 }
 
@@ -477,20 +482,28 @@ void AudioFileProcessorWaveView::reverse()
 	m_reversed = ! m_reversed;
 }
 
-void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
+void AudioFileProcessorWaveView::updateCursor(const QMouseEvent * me)
 {
 	bool const waveIsDragged = m_isDragging && (m_draggingType == DraggingType::Wave);
-	bool const pointerCloseToStartEndOrLoop = (me != nullptr) &&
-			(isCloseTo(me->x(), m_startFrameX) ||
-			  isCloseTo(me->x(), m_endFrameX) ||
-			  isCloseTo(me->x(), m_loopFrameX));
 
-	if (!m_isDragging && pointerCloseToStartEndOrLoop)
+	if (!m_isDragging && pointerCloseToStartEndOrLoop(me))
 		setCursor(Qt::SizeHorCursor);
 	else if (waveIsDragged)
 		setCursor(Qt::ClosedHandCursor);
 	else
 		setCursor(Qt::OpenHandCursor);
+}
+
+bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(const QMouseEvent * me) const
+{
+	if (me == nullptr)
+	{
+		return false;
+	}
+
+	const QPoint pos = position(me);
+
+	return isCloseTo(pos.x(), m_startFrameX) || isCloseTo(pos.x(), m_endFrameX) || isCloseTo(pos.x(), m_loopFrameX);
 }
 
 void AudioFileProcessorWaveView::configureKnobRelationsAndWaveViews()

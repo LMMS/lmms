@@ -232,8 +232,12 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 	s_textFloat->hide();
 }
 
-
-void FloatModelEditorBase::enterEvent(QEvent *event)
+// Todo : cleanup once Qt 5 support is dropped
+#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
+void FloatModelEditorBase::enterEvent(QEnterEvent* event)
+#else
+void FloatModelEditorBase::enterEvent(QEvent* event)
+#endif
 {
 	showTextFloat(700, 2000);
 }
