@@ -50,7 +50,10 @@ std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::s_shortcu
 {
 	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
 	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false)
+	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_E, Qt::ShiftModifier, 0, QString(tr("increase value")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, QString(tr("decrease value")), false),
+	InteractiveModelView::ModelShortcut(Qt::Key_U, Qt::ControlModifier, 0, QString(tr("unlink widget")), false)
 };
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
@@ -307,6 +310,15 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 			break;
 		case 2:
 			processPaste(Clipboard::getMimeData());
+			break;
+		case 3:
+			model()->setValue(model()->value() + model()->range() / 20.0f);
+			break;
+		case 4:
+			model()->setValue(model()->value() - model()->range() / 20.0f);
+			break;
+		case 5:
+			model()->unlinkAllModels();
 			break;
 		default:
 			break;
