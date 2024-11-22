@@ -154,7 +154,7 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 		{
 			if (doesShortcutMatch(&shortcuts[i], event))
 			{
-				// selecting the shortcut with the largest `ModelShortcut::times`
+				// selecting the shortcut with the lowest `ModelShortcut::times`
 				if (found == false || minMaxTimes > shortcuts[i].times)
 				{
 					foundIndex = i;
@@ -295,7 +295,9 @@ void InteractiveModelView::setIsHighlighted(bool isHighlighted)
 
 bool InteractiveModelView::doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event) const
 {
-	return shortcut->key == event->key() && (event->modifiers() & shortcut->modifier);
+	// if shortcut key == event key and the shortcut modifier can be found inside event modifiers or there is no modifier
+	return shortcut->key == event->key() && ((event->modifiers() & shortcut->modifier)
+		|| (event->nativeModifiers() <= 0 && shortcut->modifier == Qt::NoModifier));
 }
 
 bool InteractiveModelView::doesShortcutMatch(const ModelShortcut* shortcutA, const ModelShortcut* shortcutB) const
