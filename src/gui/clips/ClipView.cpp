@@ -677,7 +677,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip) )
+				else if (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip))
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
