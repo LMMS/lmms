@@ -1634,7 +1634,6 @@ void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 	if (m_lastY != event->y())
 	{
 		verticalScrollBar()->setValue(verticalScrollBar()->value() + m_lastY - event->y());
-		//verticalScrollBar()->setValue(newScroll);
 		m_lastY = event->y();
 	}
 }
