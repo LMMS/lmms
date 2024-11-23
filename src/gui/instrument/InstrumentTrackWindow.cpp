@@ -277,7 +277,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( generalSettingsWidget );
 	// Use QWidgetItem explicitly to make the size hint change on instrument changes
 	// QLayout::addWidget() uses QWidgetItemV2 with size hint caching
-	vlayout->insertItem(1, new QWidgetItem(m_tabWidget));
+
+	vlayout->addWidget( m_tabWidget, 1 );
+	m_tabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
@@ -288,9 +290,19 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	if (!m_instrumentView->isResizable()) {
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		// any better way than this?
+		subWin->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+		if (subWin->layout())
+		{
+			subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+		}
 	} else {
 		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
 		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+		subWin->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+		if (subWin->layout())
+		{
+			subWin->layout()->setSizeConstraint(QLayout::SetNoConstraint);
+		}
 	}
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
@@ -311,7 +323,7 @@ void InstrumentTrackWindow::resizeEvent(QResizeEvent * event) {
 	adjustTabSize(m_instrumentView);
 	adjustTabSize(m_instrumentFunctionsView);
 	adjustTabSize(m_ssView);
-	adjustTabSize(m_effectView);
+	// EffectRackView has sizeHint to be QSize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1)
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_tuningView);
 }
@@ -482,6 +494,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_track->dataChanged(); // Get the text on the trackButton to change
 
 		adjustTabSize(m_instrumentView);
+		m_instrumentView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
 		// adjust window size
 		layout()->invalidate();
