@@ -31,3 +31,10 @@ jobs:
             $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in") \
             doc/bash-completion/lmms \
             buildtools/update_locales
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+      - name: Run yamllint
+        run: for i in $(git ls-files '*.yml'); do yamllint $i; done

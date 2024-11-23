@@ -4,6 +4,7 @@ set(LMMS_SRCS
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
+	core/AudioResampler.cpp
 	core/AutomatableModel.cpp
 	core/AutomationClip.cpp
 	core/AutomationNode.cpp
@@ -39,6 +40,7 @@ set(LMMS_SRCS
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
+	core/Metronome.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
 	core/MixHelpers.cpp

@@ -30,7 +30,9 @@
 #include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 
 namespace lmms::gui
@@ -65,7 +67,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
-	if (typeInfo<float>::isEqual(freq, 0.0f)) { return 0.0f; }
+	if (approximatelyEqual(freq, 0.0f)) { return 0.0f; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;
@@ -147,9 +149,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 			res = tr( "BW: " ) +  QString::number( getResonance() );
 		}
 
-		QFont painterFont = painter->font();
-		painterFont.setPointSizeF( painterFont.pointSizeF() * 0.7 );
-		painter->setFont( painterFont );
+		painter->setFont(adjustedToPixelSize(painter->font(), SMALL_FONT_SIZE));
 		painter->setPen( Qt::black );
 		painter->drawRect( textRect );
 		painter->fillRect( textRect, QBrush( QColor( 6, 106, 43, 180 ) ) );

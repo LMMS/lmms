@@ -59,6 +59,7 @@
 #include "DetuningHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
@@ -1028,7 +1029,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			QString noteKeyString = getNoteString(n->key());
 
 			QFont noteFont(p.font());
-			noteFont.setPixelSize(noteTextHeight);
+			noteFont = adjustedToPixelSize(noteFont, noteTextHeight);
 			QFontMetrics fontMetrics(noteFont);
 			QSize textSize = fontMetrics.size(Qt::TextSingleLine, noteKeyString);
 
@@ -3017,8 +3018,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// set font-size to 80% of key line height
 	QFont f = p.font();
-	f.setPixelSize(m_keyLineHeight * 0.8);
-	p.setFont(f); // font size doesn't change without this for some reason
+	int keyFontSize = m_keyLineHeight * 0.8;
+	p.setFont(adjustedToPixelSize(f, keyFontSize));
 	QFontMetrics fontMetrics(p.font());
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
@@ -3097,7 +3098,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6) { q = 6; }
 		}
-		auto xCoordOfTick = [=](int tick) {
+		auto xCoordOfTick = [this](int tick) {
 			return m_whiteKeyWidth + (
 				(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
 			);
@@ -3345,8 +3346,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// display note editing info
 	f.setBold(false);
-	f.setPixelSize(10);
-	p.setFont(f);
+	p.setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 	p.setPen(m_noteModeColor);
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()),
@@ -3743,6 +3743,12 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 }
 
 
+void PianoRoll::adjustLeftRightScoll(int value)
+{
+	m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							value * 0.3f / m_zoomLevels[m_zoomingModel.value()]);
+}
+
 
 
 void PianoRoll::wheelEvent(QWheelEvent * we )
@@ -3875,13 +3881,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15);
+		adjustLeftRightScoll(we->angleDelta().x());
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15);
+		adjustLeftRightScoll(we->angleDelta().y());
 	}
 	else
 	{
@@ -4062,7 +4066,7 @@ void PianoRoll::stop()
 {
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = ( m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled );
+	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
 }
 
 
@@ -4463,30 +4467,36 @@ bool PianoRoll::deleteSelectedNotes()
 void PianoRoll::autoScroll( const TimePos & t )
 {
 	const int w = width() - m_whiteKeyWidth;
-	if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 	{
-		m_leftRightScroll->setValue( t.getBar() * TimePos::ticksPerBar() );
+		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
+		{
+			m_leftRightScroll->setValue(t.getBar() * TimePos::ticksPerBar());
+		}
+		else if (t < m_currentPosition)
+		{
+			TimePos t2 = std::max(t - w * TimePos::ticksPerBar() *
+						TimePos::ticksPerBar() / m_ppb, static_cast<tick_t>(0));
+			m_leftRightScroll->setValue(t2.getBar() * TimePos::ticksPerBar());
+		}
 	}
-	else if( t < m_currentPosition )
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 	{
-		TimePos t2 = qMax( t - w * TimePos::ticksPerBar() *
-					TimePos::ticksPerBar() / m_ppb, (tick_t) 0 );
-		m_leftRightScroll->setValue( t2.getBar() * TimePos::ticksPerBar() );
+		m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0));
 	}
 	m_scrollBack = false;
 }
 
 
 
-
-void PianoRoll::updatePosition( const TimePos & t )
+void PianoRoll::updatePosition(const TimePos & t)
 {
-	if( ( Engine::getSong()->isPlaying()
+	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
-			&& m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled
-		) || m_scrollBack )
+			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
+		) || m_scrollBack)
 	{
-		autoScroll( t );
+		autoScroll(t);
 	}
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
@@ -4754,10 +4764,10 @@ PianoRollWindow::PianoRollWindow() :
 
 	drawAction->setChecked( true );
 
-	drawAction->setShortcut( Qt::SHIFT | Qt::Key_D );
-	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
-	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
-	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
+	drawAction->setShortcut(combine(Qt::SHIFT, Qt::Key_D));
+	eraseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_E));
+	selectAction->setShortcut(combine(Qt::SHIFT, Qt::Key_S));
+	pitchBendAction->setShortcut(combine(Qt::SHIFT, Qt::Key_T));
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
@@ -4816,9 +4826,9 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto pasteAction = new QAction(embed::getIconPixmap("edit_paste"), tr("Paste (%1+V)").arg(UI_CTRL_KEY), this);
 
-	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
-	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
-	pasteAction->setShortcut( Qt::CTRL | Qt::Key_V );
+	cutAction->setShortcut(combine(Qt::CTRL, Qt::Key_X));
+	copyAction->setShortcut(combine(Qt::CTRL, Qt::Key_C));
+	pasteAction->setShortcut(combine(Qt::CTRL, Qt::Key_V));
 
 	connect( cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
 	connect( copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
@@ -4839,19 +4849,19 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto glueAction = new QAction(embed::getIconPixmap("glue"), tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
-	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
+	glueAction->setShortcut(combine(Qt::SHIFT, Qt::Key_G));
 
 	auto knifeAction = new QAction(embed::getIconPixmap("edit_knife"), tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
-	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
+	knifeAction->setShortcut(combine(Qt::SHIFT, Qt::Key_K));
 
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
-	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
+	fillAction->setShortcut(combine(Qt::SHIFT, Qt::Key_F));
 
 	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
-	cutOverlapsAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	cutOverlapsAction->setShortcut(combine(Qt::SHIFT, Qt::Key_C));
 
 	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });

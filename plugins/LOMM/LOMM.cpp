@@ -101,13 +101,8 @@ void LOMMEffect::changeSampleRate()
 }
 
 
-bool LOMMEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
-	
 	if (m_needsUpdate || m_lommControls.m_split1Model.isValueChanged())
 	{
 		m_lp1.setLowpass(m_lommControls.m_split1Model.value());
@@ -121,7 +116,6 @@ bool LOMMEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 	}
 	m_needsUpdate = false;
 
-	float outSum = 0.f;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -423,11 +417,9 @@ bool LOMMEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] + buf[f][1];
 	}
 
-	checkGate(outSum / frames);
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 extern "C"

@@ -33,6 +33,7 @@
 #include <memory>
 #include <vector>
 
+#include "AudioDevice.h"
 #include "lmms_basics.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
@@ -50,14 +51,15 @@ class AudioPort;
 class AudioEngineWorkerThread;
 
 
-const fpp_t MINIMUM_BUFFER_SIZE = 32;
-const fpp_t DEFAULT_BUFFER_SIZE = 256;
+constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
+constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
+constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
 
-const int BYTES_PER_SAMPLE = sizeof( sample_t );
-const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const int BYTES_PER_FRAME = sizeof( SampleFrame );
+constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
+constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
+constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
-const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
+constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
 class LMMS_EXPORT AudioEngine : public QObject
 {
@@ -234,9 +236,20 @@ public:
 	}
 
 
-	sample_rate_t baseSampleRate() const;
-	sample_rate_t outputSampleRate() const;
-	sample_rate_t inputSampleRate() const;
+	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
+
+
+	sample_rate_t outputSampleRate() const
+	{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+	
+
+	sample_rate_t inputSampleRate() const	
+	{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+
 
 	inline float masterGain() const
 	{
@@ -288,9 +301,6 @@ public:
 	}
 
 	void changeQuality(const struct qualitySettings & qs);
-
-	inline bool isMetronomeActive() const { return m_metronomeActive; }
-	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
@@ -352,8 +362,6 @@ private:
 
 	void swapBuffers();
 
-	void handleMetronome();
-
 	void clearInternal();
 
 	bool m_renderOnly;
@@ -365,6 +373,7 @@ private:
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
+	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
@@ -401,8 +410,6 @@ private:
 	fifoWriter * m_fifoWriter;
 
 	AudioEngineProfiler m_profiler;
-
-	bool m_metronomeActive;
 
 	bool m_clearSignal;
 

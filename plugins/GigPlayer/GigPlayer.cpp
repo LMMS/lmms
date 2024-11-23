@@ -437,7 +437,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + s_interpolationMargins[m_interpolation];
+				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
 			// Load this note's data

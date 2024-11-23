@@ -23,13 +23,15 @@
  *
  */
 
+#include "EffectRackView.h"
+
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "EffectRackView.h"
+#include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "GroupBox.h"
@@ -176,13 +178,13 @@ void EffectRackView::update()
 			connect(view, &EffectView::deletedPlugin, this, &EffectRackView::deletePlugin, Qt::QueuedConnection);
 
 			QAction* moveUpAction = new QAction(view);
-			moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
+			moveUpAction->setShortcut(combine(Qt::Key_Up, Qt::AltModifier));
 			moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 			connect(moveUpAction, &QAction::triggered, view, &EffectView::moveUp);
 			view->addAction(moveUpAction);
 
 			QAction* moveDownAction = new QAction(view);
-			moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
+			moveDownAction->setShortcut(combine(Qt::Key_Down, Qt::AltModifier));
 			moveDownAction->setShortcutContext(Qt::WidgetShortcut);
 			connect(moveDownAction, &QAction::triggered, view, &EffectView::moveDown);
 			view->addAction(moveDownAction);
@@ -223,7 +225,7 @@ void EffectRackView::update()
 		}
 	}
 
-	w->setFixedSize( EffectView::DEFAULT_WIDTH + 2*EffectViewMargin, m_lastY);
+	w->setFixedSize(EffectView::DEFAULT_WIDTH + 2 * EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }
@@ -268,6 +270,15 @@ void EffectRackView::modelChanged()
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	connect( fxChain(), SIGNAL(aboutToClear()), this, SLOT(clearViews()));
 	update();
+}
+
+
+
+
+QSize EffectRackView::sizeHint() const
+{
+	// Use the formula from InstrumentTrackWindow.cpp
+	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
 
