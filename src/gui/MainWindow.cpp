@@ -531,7 +531,10 @@ void MainWindow::finalize()
 }
 
 
-
+QMdiArea* MainWindow::workspace()
+{
+	return static_cast<QMdiArea*>(m_workspace);
+}
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
@@ -1611,21 +1614,21 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
-CustomQMdiArea::CustomQMdiArea(QWidget* parent) :
+MainWindow::CustomQMdiArea::CustomQMdiArea(QWidget* parent) :
 	QMdiArea(parent),
 	m_isBeingMoved(false),
 	m_lastX(0),
 	m_lastY(0)
 {}
 
-void CustomQMdiArea::mousePressEvent(QMouseEvent* event)
+void MainWindow::CustomQMdiArea::mousePressEvent(QMouseEvent* event)
 {
 	m_lastX = event->x();
 	m_lastY = event->y();
 	m_isBeingMoved = true;
 }
 
-void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
+void MainWindow::CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_isBeingMoved == false) { return; }
 
@@ -1643,7 +1646,7 @@ void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void CustomQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+void MainWindow::CustomQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_isBeingMoved = false;
 }

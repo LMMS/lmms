@@ -57,10 +57,7 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	QMdiArea* workspace()
-	{
-		return reinterpret_cast<QMdiArea*>(m_workspace);
-	}
+	QMdiArea* workspace();
 
 	QWidget* toolBar()
 	{
@@ -205,6 +202,21 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
+	class CustomQMdiArea : public QMdiArea
+	{
+	public:
+		CustomQMdiArea(QWidget* parent = nullptr);
+		~CustomQMdiArea() {}
+	protected:
+		void mousePressEvent(QMouseEvent* event) override;
+		void mouseMoveEvent(QMouseEvent* event) override;
+		void mouseReleaseEvent(QMouseEvent* event) override;
+	private:
+		bool m_isBeingMoved;
+		int m_lastX;
+		int m_lastY;
+	};
+
 	CustomQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
@@ -259,21 +271,6 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
-
-class CustomQMdiArea : public QMdiArea
-{
-public:
-	CustomQMdiArea(QWidget* parent = nullptr);
-	~CustomQMdiArea() {}
-protected:
-	void mousePressEvent(QMouseEvent* event) override;
-	void mouseMoveEvent(QMouseEvent* event) override;
-	void mouseReleaseEvent(QMouseEvent* event) override;
-private:
-	bool m_isBeingMoved;
-	int m_lastX;
-	int m_lastY;
-};
 
 } // namespace gui
 
