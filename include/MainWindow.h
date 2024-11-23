@@ -56,7 +56,10 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	QMdiArea* workspace();
+	inline QMdiArea* workspace()
+	{
+		return static_cast<QMdiArea*>(m_workspace);
+	}
 
 	QWidget* toolBar()
 	{
