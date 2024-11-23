@@ -248,7 +248,7 @@ private:
 	/**
 	* Split this Clip into two clips
 	* @param pos the position of the split, relative to the start of the clip
-	* @return true iff the clip could be split
+	* @return true if the clip could be split
 	*/
 	virtual bool splitClip(const TimePos pos) = 0;
 	void updateCursor(QMouseEvent * me);
