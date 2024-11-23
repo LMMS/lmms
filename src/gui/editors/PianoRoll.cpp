@@ -3098,7 +3098,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6) { q = 6; }
 		}
-		auto xCoordOfTick = [=](int tick) {
+		auto xCoordOfTick = [this](int tick) {
 			return m_whiteKeyWidth + (
 				(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
 			);
@@ -4764,10 +4764,10 @@ PianoRollWindow::PianoRollWindow() :
 
 	drawAction->setChecked( true );
 
-	drawAction->setShortcut( Qt::SHIFT | Qt::Key_D );
-	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
-	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
-	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
+	drawAction->setShortcut(combine(Qt::SHIFT, Qt::Key_D));
+	eraseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_E));
+	selectAction->setShortcut(combine(Qt::SHIFT, Qt::Key_S));
+	pitchBendAction->setShortcut(combine(Qt::SHIFT, Qt::Key_T));
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
@@ -4826,9 +4826,9 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto pasteAction = new QAction(embed::getIconPixmap("edit_paste"), tr("Paste (%1+V)").arg(UI_CTRL_KEY), this);
 
-	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
-	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
-	pasteAction->setShortcut( Qt::CTRL | Qt::Key_V );
+	cutAction->setShortcut(combine(Qt::CTRL, Qt::Key_X));
+	copyAction->setShortcut(combine(Qt::CTRL, Qt::Key_C));
+	pasteAction->setShortcut(combine(Qt::CTRL, Qt::Key_V));
 
 	connect( cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
 	connect( copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
@@ -4849,19 +4849,19 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto glueAction = new QAction(embed::getIconPixmap("glue"), tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
-	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
+	glueAction->setShortcut(combine(Qt::SHIFT, Qt::Key_G));
 
 	auto knifeAction = new QAction(embed::getIconPixmap("edit_knife"), tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
-	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
+	knifeAction->setShortcut(combine(Qt::SHIFT, Qt::Key_K));
 
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
-	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
+	fillAction->setShortcut(combine(Qt::SHIFT, Qt::Key_F));
 
 	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
-	cutOverlapsAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	cutOverlapsAction->setShortcut(combine(Qt::SHIFT, Qt::Key_C));
 
 	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
