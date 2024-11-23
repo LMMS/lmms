@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.h - TODO
+ * InteractiveModelView.h - Implements shortcut system, StringPair system and highlighting for widgets
  *
  * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -63,8 +63,9 @@ public:
 
 	static QColor getHighlightColor();
 	static void setHighlightColor(QColor& color);
-	
-	// returns true if successful
+
+	//! returns true if successful
+	//! checks if QKeyEvent maches with a known shortcut and calls `processShortcutPressed()`
 	bool HandleKeyPress(QKeyEvent* event);
 protected:
 	struct ModelShortcut
@@ -110,14 +111,14 @@ protected:
 	void enterEvent(QEvent* event) override;
 	void leaveEvent(QEvent* event) override;
 	
-	//! return the avalible shortcuts for the widget
+	//! returns the avalible shortcuts for the widget
 	virtual const std::vector<ModelShortcut>& getShortcuts() = 0;
 	//! called when a shortcut from `getShortcuts()` is pressed
 	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
 	//! called when a shortcut message needs to be displayed
 	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
 	virtual QString getShortcutMessage() = 0;
-	//! return true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
+	//! returns true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
 	virtual bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) = 0;
 	//! should implement dragging and dropping widgets or pasting from clipboard
 	//! should return if `QDropEvent` event can be accepted
@@ -128,7 +129,7 @@ protected:
 	//! override this if the widget requires custom updating code
 	virtual void overrideSetIsHighlighted(bool isHighlighted);
 
-	//! draws the highlight automatically for the widget if highilighted
+	//! draws the highlight automatically for the widget if highlighted
 	void drawAutoHighlight(QPainter* painter);
 	//! builds a string from `getShortcuts()`
 	QString buildShortcutMessage();

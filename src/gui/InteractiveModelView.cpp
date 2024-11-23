@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.h - TODO
+ * InteractiveModelView.cpp - Implements shortcut system, StringPair system and highlighting for widgets
  *
  * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot/com>
  *
