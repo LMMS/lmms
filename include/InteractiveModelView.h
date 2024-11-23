@@ -64,6 +64,12 @@ public:
 	static QColor getHighlightColor();
 	static void setHighlightColor(QColor& color);
 
+	//! highlights this widgets specifically
+	//! duration: highlight time in milliseconds
+	//! shouldStopHighlightingOrhers: calls `stopHighlighting()`,
+	//! should be false if multiple widgets are highlighted and `this` is not the first one
+	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);
+
 	//! returns true if successful
 	//! checks if QKeyEvent maches with a known shortcut and calls `processShortcutPressed()`
 	bool HandleKeyPress(QKeyEvent* event);
@@ -127,7 +133,7 @@ protected:
 	//! calls `processPasteImplementation()` to process paste
 	bool processPaste(const QMimeData* mimeData);
 	//! override this if the widget requires custom updating code
-	virtual void overrideSetIsHighlighted(bool isHighlighted);
+	virtual void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
 
 	//! draws the highlight automatically for the widget if highlighted
 	void drawAutoHighlight(QPainter* painter);
@@ -135,7 +141,9 @@ protected:
 	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;
-	void setIsHighlighted(bool isHighlighted);
+	//! shouldOverrideUpdate: should update if visible, ignore optimizations
+	//! shouldOverrideUpdate could be needed if the color was changed
+	void setIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
 private slots:
 	inline static void timerStopHighlighting()
 	{
@@ -144,7 +152,6 @@ private slots:
 private:
 	bool doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event) const;
 	bool doesShortcutMatch(const ModelShortcut* shortcutA, const ModelShortcut* shortcutB) const;
-	
 
 	bool m_isHighlighted;
 	
@@ -152,6 +159,7 @@ private:
 	unsigned int m_lastShortcutCounter;
 
 	static std::unique_ptr<QColor> s_highlightColor;
+	static std::unique_ptr<QColor> s_usedHighlightColor;
 	static QTimer* s_highlightTimer;
 	static SimpleTextFloat* s_simpleTextFloat;
 	static std::list<InteractiveModelView*> s_interactiveWidgets;
