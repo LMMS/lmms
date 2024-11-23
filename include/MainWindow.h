@@ -46,7 +46,6 @@ class ConfigManager;
 namespace gui
 {
 
-class CustomQMdiArea;
 class PluginView;
 class SubWindow;
 class ToolButton;
@@ -202,11 +201,11 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	class CustomQMdiArea : public QMdiArea
+	class MovableQMdiArea : public QMdiArea
 	{
 	public:
-		CustomQMdiArea(QWidget* parent = nullptr);
-		~CustomQMdiArea() {}
+		MovableQMdiArea(QWidget* parent = nullptr);
+		~MovableQMdiArea() {}
 	protected:
 		void mousePressEvent(QMouseEvent* event) override;
 		void mouseMoveEvent(QMouseEvent* event) override;
@@ -217,7 +216,7 @@ private:
 		int m_lastY;
 	};
 
-	CustomQMdiArea * m_workspace;
+	MovableQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;

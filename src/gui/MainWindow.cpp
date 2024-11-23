@@ -159,7 +159,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new CustomQMdiArea(splitter);
+	m_workspace = new MovableQMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -1614,21 +1614,21 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
-MainWindow::CustomQMdiArea::CustomQMdiArea(QWidget* parent) :
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
 	QMdiArea(parent),
 	m_isBeingMoved(false),
 	m_lastX(0),
 	m_lastY(0)
 {}
 
-void MainWindow::CustomQMdiArea::mousePressEvent(QMouseEvent* event)
+void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
 	m_lastX = event->x();
 	m_lastY = event->y();
 	m_isBeingMoved = true;
 }
 
-void MainWindow::CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
+void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_isBeingMoved == false) { return; }
 
@@ -1646,7 +1646,7 @@ void MainWindow::CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void MainWindow::CustomQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_isBeingMoved = false;
 }
