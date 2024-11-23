@@ -159,7 +159,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new QMdiArea(splitter);
+	m_workspace = new CustomQMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -1611,5 +1611,36 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
+CustomQMdiArea::CustomQMdiArea(QWidget* parent) :
+	QMdiArea(parent),
+	m_isBeingMoved(false)
+{
+	
+}
+void CustomQMdiArea::mousePressEvent(QMouseEvent* event)
+{
+	m_lastX = event->x();
+	m_lastY = event->y();
+	m_isBeingMoved = true;
+}
+void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
+{
+	if (m_isBeingMoved == false) { return; }
+	if (m_lastX != event->x())
+	{
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_lastX - event->x());
+		m_lastX = event->x();
+	}
+	if (m_lastY != event->y())
+	{
+		verticalScrollBar()->setValue(verticalScrollBar()->value() + m_lastY - event->y());
+		//verticalScrollBar()->setValue(newScroll);
+		m_lastY = event->y();
+	}
+}
+void CustomQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+{
+	m_isBeingMoved = false;
+}
 
 } // namespace lmms::gui

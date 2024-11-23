@@ -29,6 +29,7 @@
 #include <QTimer>
 #include <QList>
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "ConfigManager.h"
 
@@ -45,6 +46,7 @@ class ConfigManager;
 namespace gui
 {
 
+class CustomQMdiArea;
 class PluginView;
 class SubWindow;
 class ToolButton;
@@ -57,7 +59,7 @@ class MainWindow : public QMainWindow
 public:
 	QMdiArea* workspace()
 	{
-		return m_workspace;
+		return reinterpret_cast<QMdiArea*>(m_workspace);
 	}
 
 	QWidget* toolBar()
@@ -203,7 +205,7 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	QMdiArea * m_workspace;
+	CustomQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
@@ -258,6 +260,20 @@ signals:
 
 } ;
 
+class CustomQMdiArea : public QMdiArea
+{
+public:
+	CustomQMdiArea(QWidget* parent = nullptr);
+	~CustomQMdiArea() {}
+protected:
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
+private:
+	bool m_isBeingMoved;
+	int m_lastX;
+	int m_lastY;
+};
 
 } // namespace gui
 
