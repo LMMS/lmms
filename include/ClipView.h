@@ -185,7 +185,7 @@ protected:
 	QString getShortcutMessage() override;
 	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
 	bool processPasteImplementation(Clipboard::StringPairDataType type, QString& value) override;
-	void overrideSetIsHighlighted(bool isHighlighted) override;
+	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos( TimePos, bool shiftMode );

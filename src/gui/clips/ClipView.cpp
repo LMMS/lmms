@@ -1214,10 +1214,10 @@ bool ClipView::processPasteImplementation(Clipboard::StringPairDataType type, QS
 	return shouldAccept;
 }
 
-void ClipView::overrideSetIsHighlighted(bool isHighlighted)
+void ClipView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
 {
-	if (getIsHighlighted() != isHighlighted) { setNeedsUpdate(true); }
-	setIsHighlighted(isHighlighted);
+	if (shouldOverrideUpdate || getIsHighlighted() != isHighlighted) { setNeedsUpdate(true); }
+	setIsHighlighted(isHighlighted, shouldOverrideUpdate);
 }
 
 
