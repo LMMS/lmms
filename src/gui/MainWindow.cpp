@@ -1613,7 +1613,9 @@ void MainWindow::onProjectFileNameChanged()
 
 CustomQMdiArea::CustomQMdiArea(QWidget* parent) :
 	QMdiArea(parent),
-	m_isBeingMoved(false)
+	m_isBeingMoved(false),
+	m_lastX(0),
+	m_lastY(0)
 {}
 
 void CustomQMdiArea::mousePressEvent(QMouseEvent* event)
@@ -1626,11 +1628,14 @@ void CustomQMdiArea::mousePressEvent(QMouseEvent* event)
 void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_isBeingMoved == false) { return; }
+
+
 	if (m_lastX != event->x())
 	{
 		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_lastX - event->x());
 		m_lastX = event->x();
 	}
+
 	if (m_lastY != event->y())
 	{
 		verticalScrollBar()->setValue(verticalScrollBar()->value() + m_lastY - event->y());
