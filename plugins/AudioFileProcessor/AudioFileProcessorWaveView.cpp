@@ -25,7 +25,7 @@
 #include "AudioFileProcessorWaveView.h"
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "SampleWaveform.h"
 
 #include <QPainter>
@@ -279,7 +279,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.fillRect(s_padding, s_padding, m_graph.width(), 14, g);
 
 	p.setPen(QColor(255, 255, 255));
-	p.setFont(adjustedToPixelSize(font(), 8));
+	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
 	QString length_text;
 	const int length = m_sample->sampleDuration().count();
@@ -338,10 +338,12 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill(Qt::transparent);
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
+	
+	const auto dataOffset = m_reversed ? m_sample->sampleSize() - m_to : m_from;
 
 	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
 	const auto waveform = SampleWaveform::Parameters{
-		m_sample->data() + m_from, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
+		m_sample->data() + dataOffset, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
 	SampleWaveform::visualize(waveform, p, rect);
 }
 
@@ -467,9 +469,11 @@ void AudioFileProcessorWaveView::reverse()
 			- m_sample->endFrame()
 			- m_sample->startFrame()
 	);
+	
+	const int fromTmp = m_from;
 
 	setFrom(m_sample->sampleSize() - m_to);
-	setTo(m_sample->sampleSize() - m_from);
+	setTo(m_sample->sampleSize() - fromTmp);
 	m_reversed = ! m_reversed;
 }
 

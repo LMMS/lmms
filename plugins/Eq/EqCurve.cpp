@@ -30,6 +30,7 @@
 #include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "lmms_constants.h"
 #include "lmms_math.h"
 
@@ -148,9 +149,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 			res = tr( "BW: " ) +  QString::number( getResonance() );
 		}
 
-		QFont painterFont = painter->font();
-		painterFont.setPointSizeF( painterFont.pointSizeF() * 0.7 );
-		painter->setFont( painterFont );
+		painter->setFont(adjustedToPixelSize(painter->font(), SMALL_FONT_SIZE));
 		painter->setPen( Qt::black );
 		painter->drawRect( textRect );
 		painter->fillRect( textRect, QBrush( QColor( 6, 106, 43, 180 ) ) );

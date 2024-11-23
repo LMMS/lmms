@@ -1,7 +1,7 @@
 /*
- * PluginView.h - declaration of class PluginView
+ * FontHelper.h - Header function to help with fonts
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,28 +22,26 @@
  *
  */
 
-#ifndef LMMS_GUI_PLUGIN_VIEW_H
-#define LMMS_GUI_PLUGIN_VIEW_H
+#ifndef LMMS_FONT_HELPER_H
+#define LMMS_FONT_HELPER_H
 
-#include <QWidget>
+#include <QApplication>
+#include <QFont>
 
-#include "ModelView.h"
-#include "Plugin.h"
+constexpr int DEFAULT_FONT_SIZE = 12;
+constexpr int SMALL_FONT_SIZE = 10;
+constexpr int LARGE_FONT_SIZE = 14;
 
-namespace lmms::gui {
-
-class LMMS_EXPORT PluginView : public QWidget, public ModelView
+namespace lmms::gui
 {
-public:
-	PluginView(Plugin* _plugin, QWidget* _parent)
-		: QWidget(_parent)
-		, ModelView(_plugin, this)
-	{
-	}
 
-	virtual bool isResizable() const { return false; }
-};
+// Convenience method to set the font size in pixels
+inline QFont adjustedToPixelSize(QFont font, int size)
+{
+	font.setPixelSize(size);
+	return font;
+}
 
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_PLUGIN_VIEW_H
+#endif // LMMS_FONT_HELPER_H

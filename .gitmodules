@@ -16,6 +16,7 @@
 [submodule "plugins/Xpressive/exprtk"]
 	path = plugins/Xpressive/exprtk
 	url = https://github.com/ArashPartow/exprtk
+	branch = release
 [submodule "plugins/LadspaEffect/swh/ladspa"]
 	path = plugins/LadspaEffect/swh/ladspa
 	url = https://github.com/swh/ladspa
