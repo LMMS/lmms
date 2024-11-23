@@ -23,6 +23,8 @@
  *
  */
 
+#include "ControllerRackView.h"
+
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
@@ -31,21 +33,20 @@
 #include <QVBoxLayout>
 
 #include "Song.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "ControllerRackView.h"
 #include "ControllerView.h"
 #include "LfoController.h"
 #include "SubWindow.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView() :
-	QWidget(),
-	m_nextIndex(0)
+ControllerRackView::ControllerRackView()
+	: DetachableWidget{}
+	, m_nextIndex{0}
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -79,6 +80,14 @@ ControllerRackView::ControllerRackView() :
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 
+	// TODO: Automate setting one of these, stop hardcoding title bar height
+	// Set dimensions for detached mode
+	setFixedWidth(350);
+	setMinimumHeight(200);
+	// Set dimensions for embedded mode
+	subWin->setFixedWidth(350);
+	subWin->setMinimumHeight(230);
+
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -86,9 +95,6 @@ ControllerRackView::ControllerRackView() :
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 680, 310 );
-	subWin->resize( 350, 200 );
-	subWin->setFixedWidth( 350 );
-	subWin->setMinimumHeight( 200 );
 }
 
 
@@ -226,22 +232,5 @@ void ControllerRackView::addController()
 	// new controller
 	setFocus();
 }
-
-
-
-
-void ControllerRackView::closeEvent( QCloseEvent * _ce )
- {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
-
 
 } // namespace lmms::gui

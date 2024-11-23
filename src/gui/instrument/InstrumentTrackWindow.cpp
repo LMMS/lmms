@@ -288,9 +288,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	if (!m_instrumentView->isResizable()) {
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		// any better way than this?
+		setFixedSize(sizeHint());
+		// this should replace that; it does not. Ask Qt why.
+		// Does the same thing, for detached detached windows, for other OSs.
+		
 	} else {
-		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
-		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+		subWin->setMaximumSize(m_instrumentView->maximumWidth() + 12, m_instrumentView->maximumHeight() + 208);
+		subWin->setMinimumSize(m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
 	}
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
@@ -518,6 +522,7 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 	else
 	{
 		parentWidget()->hide();
+		hide();
 	}
 }
 
@@ -526,15 +531,20 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 
 void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
-	event->ignore();
-
-	if( getGUI()->mainWindow()->workspace() )
+	// TODO: When is this event used?
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		event->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		event->ignore();
 	}
 	else
 	{
 		hide();
+		event->ignore();
 	}
 
 	m_itv->m_tlb->setFocus();

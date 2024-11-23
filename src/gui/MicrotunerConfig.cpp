@@ -55,7 +55,7 @@ namespace lmms::gui
 
 
 MicrotunerConfig::MicrotunerConfig() :
-	QWidget(),
+	DetachableWidget(),
 	m_scaleComboModel(nullptr, tr("Selected scale slot")),
 	m_keymapComboModel(nullptr, tr("Selected keymap slot")),
 	m_firstKeyModel(0, 0, NumKeys - 1, nullptr, tr("First key")),
@@ -677,14 +677,6 @@ void MicrotunerConfig::saveSettings(QDomDocument &document, QDomElement &element
 void MicrotunerConfig::loadSettings(const QDomElement &element)
 {
 	MainWindow::restoreWidgetState(this, element);
-}
-
-
-void MicrotunerConfig::closeEvent(QCloseEvent *ce)
-{
-	if (parentWidget()) {parentWidget()->hide();}
-	else {hide();}
-	ce->ignore();
 }
 
 
