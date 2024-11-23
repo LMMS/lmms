@@ -39,6 +39,7 @@ namespace lmms::gui
 {
 
 std::unique_ptr<QColor> InteractiveModelView::s_highlightColor = std::make_unique<QColor>();
+std::unique_ptr<QColor> InteractiveModelView::s_usedHighlightColor = std::make_unique<QColor>();
 QTimer* InteractiveModelView::s_highlightTimer = nullptr;
 
 SimpleTextFloat* InteractiveModelView::s_simpleTextFloat = nullptr;
@@ -71,9 +72,12 @@ void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataT
 		s_highlightTimer->setSingleShot(true);
 		QObject::connect(s_highlightTimer, &QTimer::timeout, timerStopHighlighting);
 	}
+
+	bool shouldOverrideUpdate = *s_usedHighlightColor != *s_highlightColor;
+	if (shouldOverrideUpdate) { s_usedHighlightColor = std::make_unique<QColor>(*s_highlightColor); }
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		(*it)->overrideSetIsHighlighted((*it)->canAcceptClipboardData(dataType));
+		(*it)->overrideSetIsHighlighted((*it)->canAcceptClipboardData(dataType), shouldOverrideUpdate);
 	}
 	s_highlightTimer->start(10000);
 }
@@ -82,7 +86,7 @@ void InteractiveModelView::stopHighlighting()
 {
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		(*it)->overrideSetIsHighlighted(false);
+		(*it)->overrideSetIsHighlighted(false, false);
 	}
 }
 
@@ -111,6 +115,32 @@ void InteractiveModelView::hideMessage()
 QColor InteractiveModelView::getHighlightColor()
 {
 	return *s_highlightColor;
+}
+
+void InteractiveModelView::setHighlightColor(QColor& color)
+{
+	s_highlightColor = std::make_unique<QColor>(color);
+}
+
+void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers)
+{
+	if (s_highlightTimer == nullptr)
+	{
+		s_highlightTimer = new QTimer(getGUI()->mainWindow());
+		s_highlightTimer->setSingleShot(true);
+		QObject::connect(s_highlightTimer, &QTimer::timeout, timerStopHighlighting);
+	}
+
+	if (shouldStopHighlightingOrhers)
+	{
+		// since only 1 `s_highlightTimer` exists, every other widget needs to stop using it
+		stopHighlighting();
+	}
+	
+	bool shouldOverrideUpdate = *s_usedHighlightColor != color;
+	if (shouldOverrideUpdate) { s_usedHighlightColor = std::make_unique<QColor>(color); }
+	overrideSetIsHighlighted(true, shouldOverrideUpdate);
+	s_highlightTimer->start(duration);
 }
 
 bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
@@ -188,11 +218,6 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	return found;
 }
 
-void InteractiveModelView::setHighlightColor(QColor& color)
-{
-	s_highlightColor = std::make_unique<QColor>(color);
-}
-
 void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 {
 	// this will run `HandleKeyPress()` for the widget that is focused inside MainWindow
@@ -233,20 +258,20 @@ bool InteractiveModelView::processPaste(const QMimeData* mimeData)
 	return shouldAccept;
 }
 
-void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted)
+void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
 {
-	setIsHighlighted(isHighlighted);
+	setIsHighlighted(isHighlighted, shouldOverrideUpdate);
 }
 
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 {
 	if (getIsHighlighted())
 	{
-		QColor fillColor = *s_highlightColor;
+		QColor fillColor = *s_usedHighlightColor;
 		fillColor.setAlpha(70);
 		painter->fillRect(QRect(1, 1, width() - 2, height() - 2), fillColor);
 
-		painter->setPen(QPen(*s_highlightColor, 2));
+		painter->setPen(QPen(*s_usedHighlightColor, 2));
 		painter->drawLine(1, 1, 5, 1);
 		painter->drawLine(1, 1, 1, 5);
 		painter->drawLine(width() - 2, height() - 2, width() - 6, height() - 2);
@@ -281,9 +306,9 @@ bool InteractiveModelView::getIsHighlighted() const
 	return m_isHighlighted;
 }
 
-void InteractiveModelView::setIsHighlighted(bool isHighlighted)
+void InteractiveModelView::setIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
 {
-	if (m_isHighlighted != isHighlighted)
+	if (shouldOverrideUpdate || m_isHighlighted != isHighlighted)
 	{
 		m_isHighlighted = isHighlighted;
 		if (isVisible())
