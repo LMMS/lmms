@@ -1614,15 +1614,15 @@ void MainWindow::onProjectFileNameChanged()
 CustomQMdiArea::CustomQMdiArea(QWidget* parent) :
 	QMdiArea(parent),
 	m_isBeingMoved(false)
-{
-	
-}
+{}
+
 void CustomQMdiArea::mousePressEvent(QMouseEvent* event)
 {
 	m_lastX = event->x();
 	m_lastY = event->y();
 	m_isBeingMoved = true;
 }
+
 void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_isBeingMoved == false) { return; }
@@ -1638,6 +1638,7 @@ void CustomQMdiArea::mouseMoveEvent(QMouseEvent* event)
 		m_lastY = event->y();
 	}
 }
+
 void CustomQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_isBeingMoved = false;
