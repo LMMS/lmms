@@ -30,7 +30,6 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MemoryManager.h"
 
 
 class QWidget;
@@ -71,10 +70,9 @@ class PluginView;
 */
 class LMMS_EXPORT Plugin : public Model, public JournallingObject
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
-	enum PluginTypes
+	enum class Type
 	{
 		Instrument,	// instrument being used in channel-track
 		Effect,		// effect-plugin for effect-board
@@ -97,7 +95,7 @@ public:
 		const char * description;
 		const char * author;
 		int version;
-		PluginTypes type;
+		Type type;
 		const PixmapLoader * logo;
 		const char * supportedFileTypes; //!< csv list of extensions
 
@@ -181,7 +179,7 @@ public:
 
 			using KeyList = QList<Key>;
 
-			SubPluginFeatures( Plugin::PluginTypes type ) :
+			SubPluginFeatures( Plugin::Type type ) :
 				m_type( type )
 			{
 			}
@@ -227,7 +225,7 @@ public:
 			}
 
 		protected:
-			const Plugin::PluginTypes m_type;
+			const Plugin::Type m_type;
 		} ;
 
 		SubPluginFeatures * subPluginFeatures;
@@ -250,7 +248,7 @@ public:
 	const PixmapLoader *logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type() const
+	inline Type type() const
 	{
 		return m_descriptor->type;
 	}

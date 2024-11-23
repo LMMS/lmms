@@ -106,6 +106,7 @@ GuiApplication::GuiApplication()
 
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
+	splashScreen.setFixedSize(splashScreen.pixmap().size());
 	splashScreen.show();
 
 	QHBoxLayout layout;
@@ -148,7 +149,7 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_mixerView = new MixerView;
+	m_mixerView = new MixerView(Engine::mixer());
 	connect(m_mixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));

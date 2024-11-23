@@ -159,7 +159,7 @@ void MidiApple::removePort( MidiPort* port )
 
 QString MidiApple::sourcePortName( const MidiEvent& event ) const
 {
-	qDebug("sourcePortName return '%s'?\n", event.sourcePort());
+	qDebug("sourcePortName");
 	/*
 	if( event.sourcePort() )
 	{
@@ -259,7 +259,7 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 		nBytes = packet->length;
 		// Check if this is the end of a continued SysEx message
 		if (continueSysEx) {
-			unsigned int lengthToCopy = qMin(nBytes, SYSEX_LENGTH - sysExLength);
+			unsigned int lengthToCopy = std::min(nBytes, SYSEX_LENGTH - sysExLength);
 			// Copy the message into our SysEx message buffer,
 			// making sure not to overrun the buffer
 			memcpy(sysExMessage + sysExLength, packet->data, lengthToCopy);
@@ -298,7 +298,7 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 				{
 					// MIDI SysEx then we copy the rest of the message into the SysEx message buffer
 					unsigned int lengthLeftInMessage = nBytes - iByte;
-					unsigned int lengthToCopy = qMin(lengthLeftInMessage, SYSEX_LENGTH);
+					unsigned int lengthToCopy = std::min(lengthLeftInMessage, SYSEX_LENGTH);
 					
 					memcpy(sysExMessage + sysExLength, packet->data, lengthToCopy);
 					sysExLength += lengthToCopy;
@@ -403,7 +403,7 @@ void MidiApple::midiInClose( MIDIEndpointRef reference )
 
 
 
-char *getName( MIDIObjectRef &object )
+char *getName( const MIDIObjectRef &object )
 {
 	// Returns the name of a given MIDIObjectRef as char *
 	CFStringRef name = nullptr;
@@ -501,7 +501,7 @@ void MidiApple::openDevices()
 void MidiApple::openMidiReference( MIDIEndpointRef reference, QString refName, bool isIn )
 {
 	char * registeredName = (char*) malloc(refName.length()+1);
-	sprintf(registeredName, "%s",refName.toLatin1().constData());
+	std::snprintf(registeredName, refName.length() + 1, "%s",refName.toLatin1().constData());
 	qDebug("openMidiReference refName '%s'",refName.toLatin1().constData());
 	
 	MIDIClientRef mClient = getMidiClientRef();
@@ -623,7 +623,7 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 	size_t deviceNameLen = deviceName == nullptr ? 0 : strlen(deviceName);
 	size_t endPointNameLen = endPointName == nullptr ? 0 : strlen(endPointName);
 	char * fullName = (char *)malloc(deviceNameLen + endPointNameLen + 2);
-	sprintf(fullName, "%s:%s", deviceName,endPointName);
+	std::snprintf(fullName, deviceNameLen + endPointNameLen + 2, "%s:%s", deviceName,endPointName);
 	if (deviceName != nullptr) { free(deviceName); }
 	if (endPointName != nullptr) { free(endPointName); }
 	return fullName;

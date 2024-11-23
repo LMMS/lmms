@@ -25,6 +25,8 @@
 #ifndef LMMS_CLIP_H
 #define LMMS_CLIP_H
 
+#include <optional>
+
 #include <QColor>
 
 #include "AutomatableModel.h"
@@ -48,7 +50,6 @@ class TrackView;
 class LMMS_EXPORT Clip : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
@@ -109,24 +110,8 @@ public:
 		return m_autoResize;
 	}
 
-	QColor color() const
-	{
-		return m_color;
-	}
-
-	void setColor( const QColor & c )
-	{
-		m_color = c;
-	}
-
-	bool hasColor();
-
-	void useCustomClipColor( bool b );
-
-	bool usesCustomClipColor()
-	{
-		return m_useCustomClipColor;
-	}
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
 
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
@@ -164,13 +149,6 @@ signals:
 
 
 private:
-	enum Actions
-	{
-		NoAction,
-		Move,
-		Resize
-	} ;
-
 	Track * m_track;
 	QString m_name;
 
@@ -184,8 +162,7 @@ private:
 
 	bool m_selectViewOnCreate;
 
-	QColor m_color;
-	bool m_useCustomClipColor;
+	std::optional<QColor> m_color;
 
 	friend class ClipView;
 

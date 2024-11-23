@@ -190,6 +190,8 @@ public:
 		setParam( 0, pitchBend );
 	}
 
+	auto sysExData() const -> const char* { return m_sysExData; }
+
 	Source source() const
 	{
 		return m_source;

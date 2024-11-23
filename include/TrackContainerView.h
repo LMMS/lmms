@@ -166,20 +166,12 @@ public slots:
 
 
 protected:
-	static const int DEFAULT_PIXELS_PER_BAR = 16;
-
-	void resizeEvent( QResizeEvent * ) override;
+	static const int DEFAULT_PIXELS_PER_BAR = 128;
 
 	TimePos m_currentPosition;
 
 
 private:
-	enum Actions
-	{
-		AddTrack,
-		RemoveTrack
-	} ;
-
 	class scrollArea : public QScrollArea
 	{
 	public:

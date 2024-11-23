@@ -43,6 +43,7 @@ namespace lmms
 
 class Lv2Proc;
 class PluginIssue;
+class SampleFrame;
 
 /**
 	Common base class for Lv2 plugins
@@ -74,7 +75,7 @@ class PluginIssue;
 class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
+	static Plugin::Type check(const LilvPlugin* m_plugin,
 		std::vector<PluginIssue> &issues);
 
 	void shutdown();
@@ -102,9 +103,6 @@ protected:
 
 	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
 
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_valid; }
-
 	/*
 		overrides
 	*/
@@ -121,9 +119,9 @@ protected:
 	void copyModelsToLmms() const;
 
 	//! Copy buffer passed by LMMS into our ports
-	void copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames);
+	void copyBuffersFromLmms(const SampleFrame* buf, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
-	void copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const;
+	void copyBuffersToLmms(SampleFrame* buf, fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 
@@ -149,7 +147,6 @@ private:
 	//! fulfill LMMS' requirement of having stereo input and output
 	std::vector<std::unique_ptr<Lv2Proc>> m_procs;
 
-	bool m_valid = true;
 	bool m_hasGUI = false;
 	unsigned m_channelsPerProc;
 

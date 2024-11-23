@@ -46,7 +46,7 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
@@ -77,7 +77,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 #ifdef LMMS_BUILD_LINUX
 	"dll,so",
@@ -152,7 +152,7 @@ private:
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &vestige_plugin_descriptor ),
+	Instrument(_instrument_track, &vestige_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_plugin( nullptr ),
 	m_pluginMutex(),
 	m_subWindow( nullptr ),
@@ -185,8 +185,8 @@ VestigeInstrument::~VestigeInstrument()
 	}
 
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	closePlugin();
 }
 
@@ -226,7 +226,7 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf(paramStr.data(), "param%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
@@ -290,7 +290,7 @@ void VestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf(paramStr.data(), "param%d", i);
+					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 
@@ -395,11 +395,9 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 
 
-void VestigeInstrument::play( sampleFrame * _buf )
+void VestigeInstrument::play( SampleFrame* _buf )
 {
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
-
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_plugin == nullptr )
 	{
@@ -408,8 +406,6 @@ void VestigeInstrument::play( sampleFrame * _buf )
 	}
 
 	m_plugin->process( nullptr, _buf );
-
-	instrumentTrack()->processAudioBuffer( _buf, frames, nullptr );
 
 	m_pluginMutex.unlock();
 }
@@ -489,21 +485,11 @@ gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 namespace gui
 {
 
-QPixmap * VestigeInstrumentView::s_artwork = nullptr;
-QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
-
-
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
 {
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
 	m_openPluginButton = new PixmapButton( this, "" );
 	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
@@ -597,11 +583,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_selPresetButton->setMenu(menu);
 
-
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
+	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), LARGE_FONT_SIZE));
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
@@ -610,7 +595,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
+	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), LARGE_FONT_SIZE));
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
@@ -885,7 +870,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, *s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	p.drawPixmap(0, 0, s_artwork);
 
 	QString plugin_name = ( m_vi->m_plugin != nullptr ) ?
 				m_vi->m_plugin->name()/* + QString::number(
@@ -894,7 +880,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 				tr( "No VST plugin loaded" );
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont( pointSize<10>( f ) );
+	p.setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
@@ -906,7 +892,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 0, 0, 0 ) );
 		f.setBold( false );
-		p.setFont( pointSize<8>( f ) );
+		p.setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.setPen( QColor( 255, 255, 255 ) );
@@ -1001,16 +987,16 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf(paramStr.data(), "param%d", i);
+		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, this, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
 		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{
-			sprintf(paramStr.data(), "%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "%d", i);
 			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
 				0.0f, 1.0f, 0.01f, castModel<VestigeInstrument>(), paramStr.data());
 		}
@@ -1066,7 +1052,6 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	float f_value;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
@@ -1074,9 +1059,9 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 		// those auto-setted values are not jurnaled, tracked for undo / redo
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf(paramStr.data(), "param%d", i);
-    		s_dumpValues = dump[paramStr.data()].split(":");
-			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
+			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}

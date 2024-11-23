@@ -30,6 +30,13 @@
 
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+class SampleFrame;
+
+}
+
 namespace lmms::gui
 {
 
@@ -38,7 +45,9 @@ class Oscilloscope : public QWidget
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
+	Q_PROPERTY( QColor leftChannelColor READ leftChannelColor WRITE setLeftChannelColor )
+	Q_PROPERTY( QColor rightChannelColor READ rightChannelColor WRITE setRightChannelColor )
+	Q_PROPERTY( QColor otherChannelsColor READ otherChannelsColor WRITE setOtherChannelsColor )
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
 
 	Oscilloscope( QWidget * _parent );
@@ -46,8 +55,14 @@ public:
 
 	void setActive( bool _active );
 
-	QColor const & normalColor() const;
-	void setNormalColor(QColor const & normalColor);
+	QColor const & leftChannelColor() const;
+	void setLeftChannelColor(QColor const & leftChannelColor);
+
+	QColor const & rightChannelColor() const;
+	void setRightChannelColor(QColor const & rightChannelColor);
+
+	QColor const & otherChannelsColor() const;
+	void setOtherChannelsColor(QColor const & otherChannelsColor);
 
 	QColor const & clippingColor() const;
 	void setClippingColor(QColor const & clippingColor);
@@ -59,19 +74,21 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer( const lmms::surroundSampleFrame * buffer );
+	void updateAudioBuffer(const lmms::SampleFrame* buffer);
 
 private:
-	QColor const & determineLineColor(float level) const;
+	bool clips(float level) const;
 
 private:
 	QPixmap m_background;
 	QPointF * m_points;
 
-	sampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 	bool m_active;
 
-	QColor m_normalColor;
+	QColor m_leftChannelColor;
+	QColor m_rightChannelColor;
+	QColor m_otherChannelsColor;
 	QColor m_clippingColor;
 } ;
 

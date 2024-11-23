@@ -36,7 +36,7 @@ namespace lmms
 
 class PeakControllerEffect;
 
-using PeakControllerEffectVector = QVector<PeakControllerEffect*>;
+using PeakControllerEffectVector = std::vector<PeakControllerEffect*>;
 
 class LMMS_EXPORT PeakController : public Controller
 {
@@ -78,8 +78,7 @@ private:
 	static int m_loadCount;
 	static bool m_buggedFile;
 	
-	float m_attackCoeff;
-	float m_decayCoeff;
+	float m_coeff;
 	bool m_coeffNeedsUpdate;
 } ;
 

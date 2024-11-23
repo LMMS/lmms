@@ -88,7 +88,6 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 	void run() override;
 
 	volatile bool m_quit;

@@ -29,7 +29,6 @@
 #include <QString>
 #include <QMutex>
 
-#include "MemoryManager.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -41,14 +40,13 @@ class BoolModel;
 
 class AudioPort : public ThreadableJob
 {
-	MM_OPERATORS
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true,
 		FloatModel * volumeModel = nullptr, FloatModel * panningModel = nullptr,
 		BoolModel * mutedModel = nullptr );
 	virtual ~AudioPort();
 
-	inline sampleFrame * buffer()
+	inline SampleFrame* buffer()
 	{
 		return m_portBuffer;
 	}
@@ -114,7 +112,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	sampleFrame * m_portBuffer;
+	SampleFrame* m_portBuffer;
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;

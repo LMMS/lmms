@@ -1,19 +1,32 @@
-IF(LMMS_BUILD_LINUX AND WANT_VST)
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
+if(LMMS_BUILD_LINUX AND LMMS_HAVE_VST)
 	set(BUILD_SHARED_LIBS OFF)
 	add_subdirectory(qt5-x11embed)
 ENDIF()
 
+add_library(jack_headers INTERFACE)
+target_include_directories(jack_headers INTERFACE jack2/common)
+
 ADD_SUBDIRECTORY(hiir)
-ADD_SUBDIRECTORY(rpmalloc)
 ADD_SUBDIRECTORY(weakjack)
 
-# The lockless ring buffer library is compiled as part of the core
-SET(RINGBUFFER_DIR "${CMAKE_SOURCE_DIR}/src/3rdparty/ringbuffer/")
-SET(RINGBUFFER_DIR ${RINGBUFFER_DIR} PARENT_SCOPE)
+# The lockless ring buffer library is linked as part of the core
+add_library(ringbuffer OBJECT
+	ringbuffer/src/lib/ringbuffer.cpp
+)
+target_compile_features(ringbuffer PUBLIC cxx_std_20)
+target_include_directories(ringbuffer PUBLIC
+	ringbuffer/include
+	"${CMAKE_CURRENT_BINARY_DIR}"
+)
 # Create a dummy ringbuffer_export.h, since ringbuffer is not compiled as a library
-FILE(WRITE ${CMAKE_BINARY_DIR}/src/ringbuffer_export.h
-	"#include \"${CMAKE_BINARY_DIR}/src/lmms_export.h\"\n
-	#define RINGBUFFER_EXPORT LMMS_EXPORT")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ringbuffer_export.h.in" [[
+	#include "${CMAKE_BINARY_DIR}/src/lmms_export.h"
+	#define RINGBUFFER_EXPORT LMMS_EXPORT
+]])
+configure_file("${CMAKE_CURRENT_BINARY_DIR}/ringbuffer_export.h.in" ringbuffer_export.h)
+target_compile_definitions(ringbuffer PRIVATE lmmsobjs_EXPORTS)
 # Enable MLOCK support for ringbuffer if available
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES(sys/mman.h HAVE_SYS_MMAN)
@@ -23,5 +36,5 @@ ELSE()
     SET(USE_MLOCK OFF)
 ENDIF()
 # Generate ringbuffer configuration headers
-CONFIGURE_FILE(${RINGBUFFER_DIR}/src/ringbuffer-config.h.in  ${CMAKE_BINARY_DIR}/src/ringbuffer-config.h)
-CONFIGURE_FILE(${RINGBUFFER_DIR}/src/ringbuffer-version.h.in ${CMAKE_BINARY_DIR}/src/ringbuffer-version.h)
+configure_file(ringbuffer/src/ringbuffer-config.h.in  ringbuffer-config.h)
+configure_file(ringbuffer/src/ringbuffer-version.h.in ringbuffer-version.h)
