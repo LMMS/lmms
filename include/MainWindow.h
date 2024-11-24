@@ -56,7 +56,7 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	inline QMdiArea* workspace()
+	QMdiArea* workspace()
 	{
 		return static_cast<QMdiArea*>(m_workspace);
 	}

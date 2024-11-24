@@ -1614,13 +1614,16 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
 	m_isBeingMoved(false),
 	m_lastX(0),
 	m_lastY(0)
-{}
+{
+	setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+}
 
 void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
 	m_lastX = event->x();
 	m_lastY = event->y();
 	m_isBeingMoved = true;
+	setCursor(Qt::ClosedHandCursor);
 }
 
 void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
@@ -1643,6 +1646,7 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
+	setCursor(Qt::ArrowCursor);
 	m_isBeingMoved = false;
 }
 
