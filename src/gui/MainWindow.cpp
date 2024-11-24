@@ -1614,9 +1614,7 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
 	m_isBeingMoved(false),
 	m_lastX(0),
 	m_lastY(0)
-{
-	setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
-}
+{}
 
 void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
