@@ -53,7 +53,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 		const auto lineY1 = centerY - maxPeak * halfHeight * parameters.amplification;
 		const auto lineY2 = centerY - minPeak * halfHeight * parameters.amplification;
-		const auto lineX = rect.x() + i;
+		const auto lineX = rect.x() + (parameters.reversed ? numPixelsToDraw - i : i);
 
 		const auto squaredSum = std::accumulate(start, end, 0.0f, squaredSumFn);
 		const auto rms = std::sqrt(squaredSum / samplesPerPixel);
