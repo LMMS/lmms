@@ -36,17 +36,16 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	const auto samplesPerPixel = std::max(1, static_cast<int>(parameters.size) / rect.width());
+	const auto samplesPerPixel = std::max(1.0f, static_cast<float>(parameters.size) / rect.width());
+	const auto numDrawPixels = std::min(static_cast<int>(parameters.size), rect.width());
 
 	const auto compFn = [](const SampleFrame& a, const SampleFrame& b) { return a.average() < b.average(); };
 	const auto squaredSumFn = [](const float acc, const SampleFrame& x) { return acc + x.average() * x.average(); };
 
-	for (auto i = 0; i < rect.width(); i++)
+	for (auto i = 0; i < numDrawPixels; i++)
 	{
-		const auto start = parameters.buffer + i * samplesPerPixel;
-		const auto end = start + samplesPerPixel;
-
-		if (start >= parameters.buffer + parameters.size || end > parameters.buffer + parameters.size) { return; }
+		const auto start = parameters.buffer + static_cast<int>(std::floor(i * samplesPerPixel));
+		const auto end = parameters.buffer + static_cast<int>(std::ceil((i + 1) * samplesPerPixel));
 
 		const auto [min, max] = std::minmax_element(start, end, compFn);
 		const auto minPeak = min->average();
