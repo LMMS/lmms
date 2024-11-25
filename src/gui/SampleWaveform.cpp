@@ -53,16 +53,16 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 		const auto lineY1 = centerY - maxPeak * halfHeight * parameters.amplification;
 		const auto lineY2 = centerY - minPeak * halfHeight * parameters.amplification;
-		const auto lineX = static_cast<float>(rect.x() + i);
+		const auto lineX = rect.x() + i;
 
 		const auto squaredSum = std::accumulate(start, end, 0.0f, squaredSumFn);
 		const auto rms = std::sqrt(squaredSum / samplesPerPixel);
 		const auto rmsLineY1 = centerY - rms * halfHeight * parameters.amplification;
 		const auto rmsLineY2 = centerY + rms * halfHeight * parameters.amplification;
 
-		painter.drawLine(QLineF{lineX, lineY1, lineX, lineY2});
+		painter.drawLine(lineX, lineY1, lineX, lineY2);
 		painter.setPen(rmsColor);
-		painter.drawLine(QLineF{lineX, rmsLineY1, lineX, rmsLineY2});
+		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
 		painter.setPen(color);
 	}
 }
