@@ -368,10 +368,6 @@ int main( int argc, char * * argv )
 		return EXIT_FAILURE;
 	}
 #endif
-#ifdef LMMS_BUILD_LINUX
-	// don't let OS steal the menu bar. FIXME: only effective on Qt4
-	QCoreApplication::setAttribute( Qt::AA_DontUseNativeMenuBar );
-#endif
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
