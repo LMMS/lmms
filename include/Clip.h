@@ -110,6 +110,22 @@ public:
 		return m_autoResize;
 	}
 
+	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
+	 *
+	 *  If a clip has been resized previously, it will not automatically 
+	 *  resize when editing it.
+	 *
+	 */
+	inline void setHasBeenResized( const bool r )
+	{
+		m_hasBeenResized = r;
+	}
+
+	inline const bool getHasBeenResized() const
+	{
+		return m_hasBeenResized;
+	}
+
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
 
@@ -159,6 +175,7 @@ private:
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 	bool m_autoResize;
+	bool m_hasBeenResized;
 
 	bool m_selectViewOnCreate;
 

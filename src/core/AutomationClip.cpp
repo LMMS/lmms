@@ -227,8 +227,14 @@ TimePos AutomationClip::timeMapLength() const
 
 void AutomationClip::updateLength()
 {
-	// Do not resize down in case user manually extended up
-	changeLength(std::max(length(), timeMapLength()));
+	// Technically it only matters if the clip has been resized from the right, but this
+	// checks if it has been resized from either direction.
+	if (!getHasBeenResized())
+	{
+		// Using 1 bar as the min length for an un-resized clip. 
+		// This does not prevent the user from resizing the clip to be less than a bar later on.
+		changeLength(std::max(TimePos::ticksPerBar(), timeMapLength() + startTimeOffset()));
+	}
 }
 
 
@@ -835,6 +841,8 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
+	_this.setAttribute("off", startTimeOffset());
+	_this.setAttribute("been_resized", QString::number(getHasBeenResized()));
 
 	if (const auto& c = color())
 	{
@@ -885,6 +893,8 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
 	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
+	setHasBeenResized(_this.attribute( "been_resized" ).toInt());
+	setStartTimeOffset(_this.attribute( "off" ).toInt());
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )

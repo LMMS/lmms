@@ -373,6 +373,8 @@ bool SampleClipView::splitClip(const TimePos pos)
 	rightClip->movePosition(splitPos);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
 	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
+	m_clip->setHasBeenResized(true);
+	rightClip->setHasBeenResized(true);
 
 	m_clip->getTrack()->restoreJournallingState();
 	return true;

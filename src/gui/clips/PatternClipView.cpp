@@ -228,6 +228,8 @@ bool PatternClipView::splitClip(const TimePos pos)
 	rightClip->movePosition(splitPos);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
 	rightClip->setStartTimeOffset(m_patternClip->startTimeOffset() - m_patternClip->length());
+	m_patternClip->setHasBeenResized(true);
+	rightClip->setHasBeenResized(true);
 
 	m_patternClip->getTrack()->restoreJournallingState();
 	return true;

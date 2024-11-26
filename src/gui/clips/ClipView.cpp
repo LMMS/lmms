@@ -889,6 +889,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				setInitialPos( m_initialMousePos );
 				// Don't resize to less than 1 tick
 				m_clip->changeLength( qMax<int>( 1, l ) );
+				m_clip->setHasBeenResized(true);
 			}
 			else if ( me->modifiers() & Qt::ShiftModifier )
 			{	// If shift is held, quantize clip's end position
@@ -897,6 +898,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				TimePos min = m_initialClipPos.quantize( snapSize );
 				if ( min <= m_initialClipPos ) min += snapLength;
 				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
+				m_clip->setHasBeenResized(true);
 			}
 			else
 			{	// Otherwise, resize in fixed increments
@@ -906,6 +908,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				auto min = TimePos(initialLength % snapLength);
 				if (min < 1) min += snapLength;
 				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
+				m_clip->setHasBeenResized(true);
 			}
 		}
 		else
@@ -970,6 +973,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 					{
 						aClip->setStartTimeOffset(aClip->startTimeOffset() + positionOffset);
 					}
+					m_clip->setHasBeenResized(true);
 				}
 			}
 		}
