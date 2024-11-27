@@ -25,48 +25,54 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-#include <numbers>
-#include <concepts>
+// #include <numbers>
+// #include <concepts>
+
+namespace lmms::numbers
+{
+
+//TODO C++20: Use std::floating_point instead of typename
+//TODO C++20: Use std::numbers::pi_v<T> instead of literal value
+template<typename T>
+inline constexpr T pi_v = T(3.14159265358979323846264338327950288419716939937510);
+inline constexpr double pi = pi_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T tau_v = T(pi_v<T> * 2.0);
+inline constexpr double tau = tau_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T pi_half_v = T(pi_v<T> / 2.0);
+inline constexpr double pi_half = pi_half_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T pi_sqr_v = T(pi_v<T> * pi_v<T>);
+inline constexpr double pi_sqr = pi_sqr_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+//TODO C++20: Use std::numbers::e_v<T> instead of literal value
+template<typename T>
+inline constexpr T e_v = T(2.71828182845904523536028747135266249775724709369995);
+inline constexpr double e = e_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T inv_e_v = T(1.0 / e_v<T>);
+inline constexpr double inv_e = e_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+//TODO C++20: Use std::numbers::sqrt2_v<T> instead of literal value
+template<typename T>
+inline constexpr T sqrt2_v = T(1.41421356237309504880168872420969807856967187537695);
+inline constexpr double sqrt2 = sqrt2_v<double>;
+
+}
 
 namespace lmms
 {
-
-template<std::floating_point T> inline constexpr T Tau = T(std::numbers::pi_v<T> * 2.0);
-template<std::floating_point T> inline constexpr T HalfPi = T(std::numbers::pi_v<T> / 2.0);
-template<std::floating_point T> inline constexpr T PiSquared = T(std::numbers::pi_v<T> * std::numbers::pi_v<T>);
-
-inline constexpr long double LD_2PI = Tau<long double>;
-inline constexpr double D_2PI = Tau<double>;
-inline constexpr float F_2PI = Tau<float>;
-inline constexpr float F_PI_2 = HalfPi<float>;
-inline constexpr float F_PI_SQR = PiSquared<float>;
-
-[[deprecated("use std::numbers::pi_v<long double> instead")]]
-inline constexpr long double LD_PI = std::numbers::pi_v<long double>;
-
-[[deprecated("use std::numbers::pi_v<double> instead")]]
-inline constexpr double D_PI = std::numbers::pi_v<double>;
-
-[[deprecated("use std::numbers::pi_v<float> instead")]]
-inline constexpr float F_PI = std::numbers::pi_v<float>;
-
-[[deprecated("use std::numbers::e_v<long double> instead")]]
-inline constexpr long double LD_E = std::numbers::e_v<long double>;
-
-[[deprecated("use std::numbers::e_v<double> instead")]]
-inline constexpr double D_E = std::numbers::e_v<double>;
-
-[[deprecated("use std::numbers::e_v<float> instead")]]
-inline constexpr float F_E = std::numbers::e_v<float>;
-
-[[deprecated("use std::numbers::sqrt2_v<long double> instead")]]
-inline constexpr long double LD_SQRT_2 = std::numbers::sqrt2_v<long double>;
-
-[[deprecated("use std::numbers::sqrt2_v<double> instead")]]
-inline constexpr double D_SQRT_2 = std::numbers::sqrt2_v<double>;
-
-[[deprecated("use std::numbers::sqrt2_v<float> instead")]]
-inline constexpr float F_SQRT_2 = std::numbers::sqrt2_v<float>;
 
 constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
