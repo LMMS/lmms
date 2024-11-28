@@ -795,10 +795,15 @@ void PianoRoll::reverseNotes()
 
 	const NoteVector selectedNotes = getSelectedNotes();
 	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
-	const auto firstNote = notes.front();
-	const auto lastNote = notes.back();
-	const TimePos firstPos = firstNote->pos();
-	const TimePos lastPos = lastNote->endPos();
+
+	TimePos firstPos = notes.front()->pos();
+	TimePos lastPos = notes.back()->endPos();
+	// Find the actual min/max positions
+	for (auto note : notes)
+	{
+		if (note->pos() < firstPos) { firstPos = note->pos(); }
+		if (note->endPos() > lastPos) { lastPos = note->endPos(); }
+	}
 
 	for (auto note : notes)
 	{
@@ -807,6 +812,9 @@ void PianoRoll::reverseNotes()
 		TimePos newStart = newEnd - note->length();
 		note->setPos(newStart);
 	}
+	
+	m_midiClip->rearrangeAllNotes();
+	m_midiClip->dataChanged();
 
 	update();
 	getGUI()->songEditor()->update();
