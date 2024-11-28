@@ -808,8 +808,7 @@ void PianoRoll::reverseNotes()
 	for (auto note : notes)
 	{
 		TimePos oldStart = note->pos();
-		TimePos newEnd = lastPos - (oldStart - firstPos);
-		TimePos newStart = newEnd - note->length();
+		TimePos newStart = lastPos - (oldStart - firstPos) - note->length();
 		note->setPos(newStart);
 	}
 	
