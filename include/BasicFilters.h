@@ -773,7 +773,7 @@ public:
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
-			m_r = _q * powf(numbers::e_v<float>, (1 - m_p) * 1.386249f);
+			m_r = _q * std::exp((1 - m_p) * 1.386249f);
 
 			if( m_doubleFilter )
 			{
@@ -790,7 +790,7 @@ public:
 			
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1.0f;
-			m_r = _q * 0.1f * powf(numbers::e_v<float>, (1 - m_p) * 1.386249f);
+			m_r = _q * 0.1f * std::exp((1 - m_p) * 1.386249f);
 			
 			return;
 		}
