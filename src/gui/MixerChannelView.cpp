@@ -343,7 +343,7 @@ bool MixerChannelView::confirmRemoval(int index)
 		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
 	});
 
-	QMessageBox mb(this);
+	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
 	mb.setWindowTitle(messageTitleRemoveTrack);
 	mb.setIcon(QMessageBox::Warning);
