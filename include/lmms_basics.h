@@ -22,16 +22,14 @@
  *
  */
 
-#ifndef LMMS_TYPES_H
-#define LMMS_TYPES_H
+#ifndef LMMS_BASICS_H
+#define LMMS_BASICS_H
 
+#include <array>
 #include <cstddef>
-
-#include "lmmsconfig.h"
-
 #include <cstdint>
 
-
+#include "lmmsconfig.h"
 
 namespace lmms
 {
@@ -65,7 +63,6 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
-
 #define LMMS_STRINGIFY(s) LMMS_STR(s)
 #define LMMS_STR(PN)	#PN
 
@@ -77,7 +74,56 @@ constexpr const char* UI_CTRL_KEY =
 "Ctrl";
 #endif
 
+/**
+ * Simple minimally functional stand-in for C++20's std::span
+ *
+ * TODO C++20: Use std::span instead
+ */
+template<typename T>
+class Span
+{
+public:
+	Span() = default;
+	Span(T* data, std::size_t size)
+		: m_data{data}
+		, m_size{size}
+	{
+	}
+
+	constexpr auto data() const -> T* { return m_data; }
+	constexpr auto size() const -> std::size_t { return m_size; }
+	constexpr auto size_bytes() const -> std::size_t { return m_size * sizeof(T); }
+
+	constexpr auto operator[](std::size_t idx) const -> const T& { return m_data[idx]; }
+	constexpr auto operator[](std::size_t idx) -> T& { return m_data[idx]; }
+
+	constexpr auto begin() const -> const T* { return m_data; }
+	constexpr auto begin() -> T* { return m_data; }
+	constexpr auto end() const -> const T* { return m_data + m_size; }
+	constexpr auto end() -> T* { return m_data + m_size; }
+
+private:
+	T* m_data = nullptr;
+	std::size_t m_size = 0;
+};
+
+
+/**
+ * Stand-in for C++23's std::unreachable
+ * Taken from https://en.cppreference.com/w/cpp/utility/unreachable
+ *
+ * TODO C++23: Use std::unreachable instead
+ */
+[[noreturn]] inline void unreachable()
+{
+#if defined(_MSC_VER) && !defined(__clang__) // MSVC
+	__assume(false);
+#else // GCC, Clang
+	__builtin_unreachable();
+#endif
+}
+
 
 } // namespace lmms
 
-#endif // LMMS_TYPES_H
+#endif // LMMS_BASICS_H

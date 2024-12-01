@@ -117,7 +117,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin));
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin{plugin, this});
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();

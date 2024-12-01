@@ -77,10 +77,10 @@ namespace lmms
 
 // simple helper thread monitoring our RemotePlugin - if process terminates
 // unexpectedly invalidate plugin so LMMS doesn't lock up
-ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
-	QThread(),
-	m_plugin( _p ),
-	m_quit( false )
+ProcessWatcher::ProcessWatcher(RemotePlugin* plugin)
+	: QThread{}
+	, m_plugin{plugin}
+	, m_quit{false}
 {
 }
 
@@ -130,22 +130,21 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin() :
-	QObject(),
+RemotePlugin::RemotePlugin(Model* parent)
+	: QObject{}
 #ifdef SYNC_WITH_SHM_FIFO
-	RemotePluginBase( new shmFifo(), new shmFifo() ),
+	, RemotePluginBase{new shmFifo(), new shmFifo()}
 #else
-	RemotePluginBase(),
+	, RemotePluginBase{}
 #endif
-	m_failed( true ),
-	m_watcher( this ),
+	, m_failed{true}
+	, m_watcher{this}
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_commMutex(QMutex::Recursive),
+	, m_commMutex{QMutex::Recursive}
 #endif
-	m_splitChannels( false ),
-	m_audioBufferSize( 0 ),
-	m_inputCount( DEFAULT_CHANNELS ),
-	m_outputCount( DEFAULT_CHANNELS )
+	, m_splitChannels{false}
+	, m_audioBufferSize{0}
+	, m_pinConnector{parent}
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
@@ -325,7 +324,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
+bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf ) // TODO: Make single in-out buffer (See Vestige.cpp and VstEffect.cpp - inplace processing is possible)
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -359,30 +358,29 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 
 	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
 
-	ch_cnt_t inputs = std::min<ch_cnt_t>(m_inputCount, DEFAULT_CHANNELS);
+	const ch_cnt_t inputsClamped = std::min<ch_cnt_t>(m_pinConnector.in().channelCount(), DEFAULT_CHANNELS);
 
-	if( _in_buf != nullptr && inputs > 0 )
+	if( _in_buf != nullptr && inputsClamped > 0 )
 	{
-		if( m_splitChannels )
+		if (m_splitChannels)
 		{
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
-			{
-				for( fpp_t frame = 0; frame < frames; ++frame )
-				{
-					m_audioBuffer[ch * frames + frame] =
-							_in_buf[frame][ch];
-				}
-			}
+			// NOTE: VST plugins always use split channels
+			const auto trackChannels = CoreAudioBufferView{&_in_buf, 1};
+			const auto pluginInput = SplitAudioBufferView<sample_t> {
+				m_audioBuffer.get(),
+				static_cast<std::size_t>(frames * m_pinConnector.in().channelCount())
+			};
+
+			m_pinConnector.routeToPlugin(frames, trackChannels, pluginInput);
 		}
-		else if( inputs == DEFAULT_CHANNELS )
+		else if (inputsClamped == DEFAULT_CHANNELS)
 		{
-			auto target = m_audioBuffer.get();
-			copyFromSampleFrames(target, _in_buf, frames);
+			copyFromSampleFrames(m_audioBuffer.get(), _in_buf, frames);
 		}
 		else
 		{
-			auto o = (SampleFrame*)m_audioBuffer.get();
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
+			auto o = reinterpret_cast<SampleFrame*>(m_audioBuffer.get());
+			for( ch_cnt_t ch = 0; ch < inputsClamped; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
 				{
@@ -395,7 +393,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if( m_failed || _out_buf == nullptr || m_outputCount == 0 )
+	if (m_failed || _out_buf == nullptr || m_pinConnector.out().channelCount() == 0)
 	{
 		unlock();
 		return false;
@@ -404,32 +402,31 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputs = std::min<ch_cnt_t>(m_outputCount,
-							DEFAULT_CHANNELS);
-	if( m_splitChannels )
+	const ch_cnt_t outputsClamped = std::min<ch_cnt_t>(m_pinConnector.out().channelCount(), DEFAULT_CHANNELS);
+
+	if (m_splitChannels)
 	{
-		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
-		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
-								frames + frame];
-			}
-		}
+		// NOTE: VST plugins always use split channels
+		const auto trackChannels = CoreAudioBufferViewMut{&_out_buf, 1};
+		const auto pluginOutput = SplitAudioBufferView<const sample_t> {
+			m_audioBuffer.get() + (frames * m_pinConnector.in().channelCount()),
+			static_cast<std::size_t>(frames * m_pinConnector.out().channelCount())
+		};
+
+		m_pinConnector.routeFromPlugin(frames, pluginOutput, trackChannels);
 	}
-	else if( outputs == DEFAULT_CHANNELS )
+	else if (outputsClamped == DEFAULT_CHANNELS)
 	{
-		auto source = m_audioBuffer.get() + m_inputCount * frames;
+		auto source = m_audioBuffer.get() + m_pinConnector.in().channelCount() * frames;
 		copyToSampleFrames(_out_buf, source, frames);
 	}
 	else
 	{
-		auto o = (SampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
 		// clear buffer, if plugin didn't fill up both channels
 		zeroSampleFrames(_out_buf, frames);
 
-		for (ch_cnt_t ch = 0; ch <
-				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
+		auto o = reinterpret_cast<SampleFrame*>(m_audioBuffer.get() + m_pinConnector.in().channelCount() * frames);
+		for (ch_cnt_t ch = 0; ch < outputsClamped; ++ch)
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -477,7 +474,8 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
+	const size_t s = (m_pinConnector.in().channelCount() + m_pinConnector.out().channelCount())
+		* Engine::audioEngine()->framesPerPeriod();
 	try
 	{
 		m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
@@ -545,18 +543,17 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdChangeInputCount:
-			m_inputCount = _m.getInt( 0 );
+			m_pinConnector.setPluginChannelCountIn(_m.getInt(0));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeOutputCount:
-			m_outputCount = _m.getInt( 0 );
+			m_pinConnector.setPluginChannelCountOut(_m.getInt(0));
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeInputOutputCount:
-			m_inputCount = _m.getInt( 0 );
-			m_outputCount = _m.getInt( 1 );
+			m_pinConnector.setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
 			resizeSharedProcessingMemory();
 			break;
 

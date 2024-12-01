@@ -26,6 +26,8 @@
 #define LMMS_REMOTE_PLUGIN_H
 
 #include "RemotePluginBase.h"
+
+#include "PluginPinConnector.h"
 #include "SharedMemory.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -43,7 +45,7 @@ class ProcessWatcher : public QThread
 {
 	Q_OBJECT
 public:
-	ProcessWatcher( RemotePlugin * );
+	explicit ProcessWatcher(RemotePlugin* plugin);
 	~ProcessWatcher() override = default;
 
 	void stop()
@@ -70,7 +72,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:
-	RemotePlugin();
+	explicit RemotePlugin(Model* parent = nullptr);
 	~RemotePlugin() override;
 
 	inline bool isRunning()
@@ -141,6 +143,11 @@ public:
 		m_commMutex.unlock();
 	}
 
+	PluginPinConnector& pinConnector()
+	{
+		return m_pinConnector;
+	}
+
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
@@ -173,8 +180,7 @@ private:
 	SharedMemory<float[]> m_audioBuffer;
 	std::size_t m_audioBufferSize;
 
-	int m_inputCount;
-	int m_outputCount;
+	PluginPinConnector m_pinConnector;
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;
