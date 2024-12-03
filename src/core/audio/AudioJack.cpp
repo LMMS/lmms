@@ -57,6 +57,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
 	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_inBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
@@ -66,6 +67,8 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	if (successful) {
 		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
 	}
+
+	m_supportsCapture = true;
 }
 
 
@@ -90,6 +93,7 @@ AudioJack::~AudioJack()
 	delete[] m_tempOutBufs;
 
 	delete[] m_outBuf;
+	delete[] m_inBuf;
 }
 
 
@@ -154,6 +158,10 @@ bool AudioJack::initJackClient()
 				clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
 
+	m_inputFrameBuffer = new jack_default_audio_sample_t[channels() * jack_get_buffer_size(m_client)];
+
+	jack_set_buffer_size_callback(m_client, setBufferSizeCallback, this);
+
 	// set process-callback
 	jack_set_process_callback(m_client, staticProcessCallback, this);
 
@@ -167,6 +175,10 @@ bool AudioJack::initJackClient()
 		QString name = QString("master out ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
 		m_outputPorts.push_back(
 			jack_port_register(m_client, name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
+
+		QString input_name = QString("master in ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
+		m_inputPorts.push_back(jack_port_register(m_client, input_name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0));
+
 		if (m_outputPorts.back() == nullptr)
 		{
 			printf("no more JACK-ports available!\n");
@@ -286,11 +298,17 @@ void AudioJack::renamePort(AudioPort* port)
 }
 
 
+int AudioJack::setBufferSizeCallback(jack_nframes_t nframes, void* udata)
+{
+	auto thisClass = static_cast<AudioJack*>(udata);
+	delete[] thisClass->m_inputFrameBuffer;
+	thisClass->m_inputFrameBuffer = new jack_default_audio_sample_t[thisClass->channels() * nframes];
+	return 0;
+}
 
 
 int AudioJack::processCallback(jack_nframes_t nframes)
 {
-
 	// do midi processing first so that midi input can
 	// add to the following sound processing
 	if (m_midiClient && nframes > 0)
@@ -356,6 +374,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		}
 	}
 
+	for (int c = 0; c < channels(); ++c)
+	{
+		jack_default_audio_sample_t* jack_input_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(m_inputPorts[c], nframes);
+
+		for (jack_nframes_t frame = 0; frame < nframes; frame++)
+		{
+			m_inputFrameBuffer[frame * channels() + c] = jack_input_buffer[frame];
+		}
+	}
+	audioEngine()->pushInputFrames ((SampleFrame*) m_inputFrameBuffer, nframes);
 	return 0;
 }
 
