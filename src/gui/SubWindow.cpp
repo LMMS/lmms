@@ -38,6 +38,7 @@
 #include <QPushButton>
 #include <QWindow>
 #include <QStyleOption>
+#include <QLayout>
 
 #include "embed.h"
 
@@ -92,6 +93,8 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
+
+	layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
 	// Disable the minimize button and make sure that the custom window hint is set
 	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
@@ -517,5 +520,6 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 		return QMdiSubWindow::eventFilter(obj, event);
 	}
 }
+
 
 } // namespace lmms::gui

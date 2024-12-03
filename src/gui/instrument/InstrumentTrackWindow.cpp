@@ -283,7 +283,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	updateInstrumentView();
 
-	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	if (!m_instrumentView->isResizable()) {
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
@@ -293,8 +293,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 		// Does the same thing, for detached detached windows, for other OSs.
 		
 	} else {
-		subWin->setMaximumSize(m_instrumentView->maximumWidth() + 12, m_instrumentView->maximumHeight() + 208);
-		subWin->setMinimumSize(m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+		setMaximumSize(m_instrumentView->maximumWidth() + 12, m_instrumentView->maximumHeight() + 208);
+		setMinimumSize(m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
 	}
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );

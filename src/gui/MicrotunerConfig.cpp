@@ -202,13 +202,10 @@ MicrotunerConfig::MicrotunerConfig() :
 	this->setLayout(microtunerLayout);
 
 	// Add to the main window and setup fixed size etc.
-	QMdiSubWindow *subWin = getGUI()->mainWindow()->addWindowedWidget(this);
-
+	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	subWin->setAttribute(Qt::WA_DeleteOnClose, false);
-	subWin->setMinimumWidth(300);
-	subWin->setMinimumHeight(300);
-	subWin->setMaximumWidth(500);
-	subWin->setMaximumHeight(700);
+	setMinimumSize(300, 300);
+	setMaximumSize(500, 700);
 	subWin->hide();
 
 	// No maximize button
