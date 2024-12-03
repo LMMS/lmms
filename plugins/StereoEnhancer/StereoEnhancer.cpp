@@ -58,7 +58,7 @@ StereoEnhancerEffect::StereoEnhancerEffect(
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
 	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
-	m_delayBuffer( new SampleFrame[DEFAULT_BUFFER_SIZE] ),
+	m_delayBuffer(Engine::audioEngine()->framesPerPeriod()),
 	m_currFrame( 0 ),
 	m_bbControls( this )
 {
@@ -71,11 +71,6 @@ StereoEnhancerEffect::StereoEnhancerEffect(
 
 StereoEnhancerEffect::~StereoEnhancerEffect()
 {
-	if( m_delayBuffer )
-	{
-		delete [] m_delayBuffer;
-	}
-
 	m_currFrame = 0;
 }
 
@@ -103,7 +98,7 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 		if( frameIndex < 0 )
 		{
 			// e.g. difference = -10, frameIndex = DBS - 10
-			frameIndex += DEFAULT_BUFFER_SIZE;
+			frameIndex += m_delayBuffer.size();
 		}
 
 		//sample_t s[2] = { buf[f][0], buf[f][1] };	//Vanilla
@@ -116,7 +111,7 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 
 		// Update currFrame
 		m_currFrame += 1;
-		m_currFrame %= DEFAULT_BUFFER_SIZE;
+		m_currFrame %= m_delayBuffer.size();
 	}
 
 	if( !isRunning() )
@@ -132,7 +127,7 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
-	for (auto i = std::size_t{0}; i < DEFAULT_BUFFER_SIZE; i++)
+	for (auto i = std::size_t{0}; i < m_delayBuffer.size(); i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;
 		m_delayBuffer[i][1] = 0.0f;

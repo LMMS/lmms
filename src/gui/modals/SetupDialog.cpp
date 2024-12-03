@@ -564,7 +564,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	QHBoxLayout * bufferSizeSubLayout = new QHBoxLayout();
 
 	m_bufferSizeSlider = new QSlider(Qt::Horizontal, bufferSizeBox);
-	m_bufferSizeSlider->setRange(1, MAXIMUM_BUFFER_SIZE / BUFFERSIZE_RESOLUTION);
+	m_bufferSizeSlider->setRange(1, AudioEngine::MaximumBufferSize / AudioEngine::MinimumBufferSize);
 	m_bufferSizeSlider->setTickInterval(8);
 	m_bufferSizeSlider->setPageStep(8);
 	m_bufferSizeSlider->setValue(m_bufferSize / BUFFERSIZE_RESOLUTION);
@@ -1201,7 +1201,7 @@ void SetupDialog::updateBufferSizeWarning(int value)
 
 void SetupDialog::setBufferSize(int value)
 {
-	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
+	const int step = AudioEngine::DefaultBufferSize / BUFFERSIZE_RESOLUTION;
 	if(value > step && value % step)
 	{
 		int mod_value = value % step;
@@ -1230,7 +1230,7 @@ void SetupDialog::setBufferSize(int value)
 
 void SetupDialog::resetBufferSize()
 {
-	setBufferSize(DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION);
+	setBufferSize(AudioEngine::DefaultBufferSize / BUFFERSIZE_RESOLUTION);
 }
 
 
