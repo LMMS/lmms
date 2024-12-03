@@ -78,7 +78,7 @@ ControllerRackView::ControllerRackView()
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
 
-	SubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 
 	setFixedWidth(350);
 	setMinimumHeight(200);
