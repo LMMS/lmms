@@ -440,7 +440,7 @@ private:
 
 	bool m_mouseDownRight; //true if right click is being held down
 
-	TimeLineWidget * m_timeLine;
+	TimeLineWidget * m_timeLineWidget;
 	bool m_scrollBack;
 
 	void copyToClipboard(const NoteVector & notes ) const;
