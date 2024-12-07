@@ -65,7 +65,6 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_clips()        /*!< The clips (segments) */
 {	
-	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
 
@@ -90,73 +89,6 @@ Track::~Track()
 	unlock();
 }
 
-
-
-
-/*! \brief Create a track based on the given track type and container.
- *
- *  \param tt The type of track to create
- *  \param tc The track container to attach to
- */
-Track * Track::create( Type tt, TrackContainer * tc )
-{
-	Engine::audioEngine()->requestChangeInModel();
-
-	Track * t = nullptr;
-
-	switch( tt )
-	{
-		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
-		case Type::Pattern: t = new class PatternTrack( tc ); break;
-		case Type::Sample: t = new class SampleTrack( tc ); break;
-//		case Type::Event:
-//		case Type::Video:
-		case Type::Automation: t = new class AutomationTrack( tc ); break;
-		case Type::HiddenAutomation:
-						t = new class AutomationTrack( tc, true ); break;
-		default: break;
-	}
-
-	if (tc == Engine::patternStore() && t)
-	{
-		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
-	}
-
-	tc->updateAfterTrackAdd();
-
-	Engine::audioEngine()->doneChangeInModel();
-
-	return t;
-}
-
-
-
-
-/*! \brief Create a track inside TrackContainer from track type in a QDomElement and restore state from XML
- *
- *  \param element The QDomElement containing the type of track to create
- *  \param tc The track container to attach to
- */
-Track * Track::create( const QDomElement & element, TrackContainer * tc )
-{
-	Engine::audioEngine()->requestChangeInModel();
-
-	Track * t = create(
-		static_cast<Type>( element.attribute( "type" ).toInt() ),
-									tc );
-	if( t != nullptr )
-	{
-		t->restoreState( element );
-	}
-
-	Engine::audioEngine()->doneChangeInModel();
-
-	return t;
-}
-
-
-
-
 /*! \brief Clone a track from this track
  *
  */
@@ -166,10 +98,10 @@ Track* Track::clone()
 	QDomDocument doc;
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
-	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
+	const auto track = m_trackContainer->addTrack(parent.firstChild().toElement());
 
 	AutomationClip::resolveAllIDs();
-	return t;
+	return track;
 }
 
 

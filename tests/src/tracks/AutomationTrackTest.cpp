@@ -94,23 +94,23 @@ private slots:
 		FloatModel model;
 
 		auto song = Engine::getSong();
-		AutomationTrack track(song);
+		auto track = static_cast<AutomationTrack*>(song->addTrack(Track::Type::Automation));
 
-		AutomationClip c1(&track);
+		AutomationClip c1(track);
 		c1.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1.putValue(0, 0.0, false);
 		c1.putValue(10, 1.0, false);
 		c1.movePosition(0);
 		c1.addObject(&model);
 
-		AutomationClip c2(&track);
+		AutomationClip c2(track);
 		c2.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c2.putValue(0, 0.0, false);
 		c2.putValue(100, 1.0, false);
 		c2.movePosition(100);
 		c2.addObject(&model);
 
-		AutomationClip c3(&track);
+		AutomationClip c3(track);
 		c3.addObject(&model);
 		//XXX: Why is this even necessary?
 		c3.clear();
@@ -130,9 +130,9 @@ private slots:
 		FloatModel model;
 
 		auto song = Engine::getSong();
-		AutomationTrack track(song);
+		auto track = static_cast<AutomationTrack*>(song->addTrack(Track::Type::Automation));
 
-		AutomationClip c(&track);
+		AutomationClip c(track);
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c.addObject(&model);
 
@@ -155,10 +155,9 @@ private slots:
 		using namespace lmms;
 
 		auto song = Engine::getSong();
+		auto instrumentTrack = static_cast<InstrumentTrack*>(song->addTrack(Track::Type::Instrument));
 
-		InstrumentTrack instrumentTrack(song);
-
-		MidiClip midiClip(&instrumentTrack);
+		MidiClip midiClip(instrumentTrack);
 		midiClip.changeLength(TimePos(4, 0));
 		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
@@ -181,12 +180,12 @@ private slots:
 
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
-		PatternTrack patternTrack(song);
-		AutomationTrack automationTrack(patternStore);
-		automationTrack.createClipsForPattern(patternStore->numOfPatterns() - 1);
+		auto patternTrack = static_cast<PatternTrack*>(song->addTrack(Track::Type::Pattern));
+		auto automationTrack = static_cast<AutomationTrack*>(patternStore->addTrack(Track::Type::Automation));
+		automationTrack->createClipsForPattern(patternStore->numOfPatterns() - 1);
 
-		QVERIFY(automationTrack.numOfClips());
-		auto c1 = dynamic_cast<AutomationClip*>(automationTrack.getClip(0));
+		QVERIFY(automationTrack->numOfClips());
+		auto c1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
 		QVERIFY(c1);
 
 		FloatModel model;
@@ -196,17 +195,17 @@ private slots:
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
 
-		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
-		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.patternIndex())[&model], 0.5f);
-		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.patternIndex())[&model], 1.0f);
-		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack->patternIndex())[&model], 0.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack->patternIndex())[&model], 0.5f);
+		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack->patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack->patternIndex())[&model], 1.0f);
 
-		PatternTrack patternTrack2(song);
+		auto patternTrack2 = static_cast<PatternTrack*>(song->addTrack(Track::Type::Pattern));
 
-		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.patternIndex())[&model], 0.5f);
-		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.patternIndex()).size());
+		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack->patternIndex())[&model], 0.5f);
+		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2->patternIndex()).size());
 
-		PatternClip clip(&patternTrack);
+		PatternClip clip(patternTrack);
 		clip.changeLength(TimePos::ticksPerBar() * 2);
 		clip.movePosition(0);
 
@@ -226,8 +225,8 @@ private slots:
 		auto globalTrack = song->globalAutomationTrack();
 		AutomationClip globalClip(globalTrack);
 
-		AutomationTrack localTrack(song);
-		AutomationClip localClip(&localTrack);
+		auto localTrack = static_cast<AutomationTrack*>(song->addTrack(Track::Type::Automation));
+		AutomationClip localClip(localTrack);
 
 		FloatModel model;
 		globalClip.setProgressionType(AutomationClip::ProgressionType::Discrete);

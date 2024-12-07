@@ -67,9 +67,7 @@ tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 Song::Song() :
 	TrackContainer(),
-	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
-				Track::create( Track::Type::HiddenAutomation,
-								this ) ) ),
+	m_globalAutomationTrack(static_cast<AutomationTrack*>(addTrack(Track::Type::HiddenAutomation))),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
@@ -807,8 +805,8 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	Track * t = Track::create(Track::Type::Pattern, this);
-	Engine::patternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
+	const auto patternTrack = addTrack(Track::Type::Pattern);
+	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
 
 
@@ -816,7 +814,7 @@ void Song::addPatternTrack()
 
 void Song::addSampleTrack()
 {
-	( void )Track::create( Track::Type::Sample, this );
+	(void)addTrack(Track::Type::Sample);
 }
 
 
@@ -824,7 +822,7 @@ void Song::addSampleTrack()
 
 void Song::addAutomationTrack()
 {
-	( void )Track::create( Track::Type::Automation, this );
+	(void)addTrack(Track::Type::Automation);
 }
 
 
@@ -957,15 +955,15 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	auto tripleOscTrack = Track::create(Track::Type::Instrument, this);
-	dynamic_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
+	auto tripleOscTrack = addTrack(Track::Type::Instrument);
+	static_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
 
-	auto kickerTrack = Track::create(Track::Type::Instrument, Engine::patternStore());
-	dynamic_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
+	auto kickerTrack = Engine::patternStore()->addTrack(Track::Type::Instrument);
+	static_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
 
-	Track::create( Track::Type::Sample, this );
-	Track::create( Track::Type::Pattern, this );
-	Track::create( Track::Type::Automation, this );
+	addTrack(Track::Type::Sample);
+	addTrack(Track::Type::Pattern);
+	addTrack(Track::Type::Automation);
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();

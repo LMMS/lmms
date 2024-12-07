@@ -65,8 +65,8 @@ public:
 
 	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
-
-	void addTrack( Track * _track );
+	Track* addTrack(Track::Type type);
+	Track* addTrack(const QDomElement& element);
 	void removeTrack( Track * _track );
 
 	virtual void updateAfterTrackAdd();

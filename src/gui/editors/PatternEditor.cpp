@@ -86,7 +86,7 @@ void PatternEditor::removeSteps()
 
 void PatternEditor::addSampleTrack()
 {
-	(void) Track::create( Track::Type::Sample, model() );
+	(void)model()->addTrack(Track::Type::Sample);
 }
 
 
@@ -94,7 +94,7 @@ void PatternEditor::addSampleTrack()
 
 void PatternEditor::addAutomationTrack()
 {
-	(void) Track::create( Track::Type::Automation, model() );
+	(void)model()->addTrack(Track::Type::Automation);
 }
 
 
@@ -131,7 +131,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 	if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
+		Track* t = model()->addTrack(dataFile.content().firstChild().toElement());
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;

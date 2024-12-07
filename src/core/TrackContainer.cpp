@@ -28,8 +28,12 @@
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
+#include <iostream>
 
 #include "AutomationClip.h"
+#include "AutomationTrack.h"
+#include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "embed.h"
 #include "TrackContainer.h"
 #include "PatternClip.h"
@@ -138,7 +142,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
 			}
-			Track::create( node.toElement(), this );
+			addTrack(node.toElement());
 		}
 		node = node.nextSibling();
 	}
@@ -171,24 +175,56 @@ int TrackContainer::countTracks( Track::Type _tt ) const
 	return( cnt );
 }
 
-
-
-
-void TrackContainer::addTrack( Track * _track )
+Track* TrackContainer::addTrack(Track::Type type)
 {
-	if( _track->type() != Track::Type::HiddenAutomation )
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+
+	auto track = static_cast<Track*>(nullptr);
+	switch (type)
 	{
-		_track->lock();
-		m_tracksMutex.lockForWrite();
-		m_tracks.push_back( _track );
-		m_tracksMutex.unlock();
-		_track->unlock();
-		emit trackAdded( _track );
+	case Track::Type::Instrument:
+		track = new InstrumentTrack(this);
+		break;
+	case Track::Type::Pattern:
+		track = new PatternTrack(this);
+		break;
+	case Track::Type::Sample:
+		track = new SampleTrack(this);
+		break;
+	case Track::Type::Automation:
+		track = new AutomationTrack(this);
+		break;
+	case Track::Type::HiddenAutomation:
+		track = new AutomationTrack(this, true);
+		break;
+	default:
+		std::cerr << "TrackContainer::addTrack - unimplemented type\n";
+		return nullptr;
 	}
+
+	if (track->type() != Track::Type::HiddenAutomation)
+	{
+		track->lock();
+		m_tracksMutex.lockForWrite();
+		
+		m_tracks.push_back(track);
+		if (this == Engine::patternStore()) { static_cast<PatternStore*>(this)->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1); }
+		updateAfterTrackAdd();
+
+		m_tracksMutex.unlock();
+		track->unlock();
+		emit trackAdded(track);
+	}
+
+	return track;
 }
 
-
-
+Track* TrackContainer::addTrack(const QDomElement& element)
+{
+	const auto track = addTrack(static_cast<Track::Type>(element.attribute("type").toInt()));
+	track->restoreState(element);
+	return track;
+}
 
 void TrackContainer::removeTrack( Track * _track )
 {
