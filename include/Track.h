@@ -72,6 +72,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 public:
 	using clipVector = std::vector<Clip*>;
 
+	// Note: implement StringPairDrag for new track types in `ClipView` and `TrackView`
 	enum class Type
 	{
 		Instrument,
