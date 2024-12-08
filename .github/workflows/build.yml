@@ -7,8 +7,8 @@ concurrency:
 jobs:
   linux:
     name: linux
-    runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.gcc:20.04
+    runs-on: ubuntu-20.04
+    container: ubuntu:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -17,14 +17,48 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        run: |
+          apt update && apt install sudo
+          sudo apt-get install --yes git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Prepare to install system packages
+        run: |
+          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-ubuntu-20.04-gcc.txt)" >> "$GITHUB_ENV"
+          .github/workflows/setup-wine.sh
+          .github/workflows/setup-cmake.sh
+          # Fix for software-properties-common
+          sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+      - name: Install system packages
+        run: sudo apt-get install -y ${{ env.APT_DEPENDENCIES }}
+      - name: Install Qt
+        uses: jurplel/install-qt-action@c6c7281365daef91a238e1c2ddce4eaa94a2991d
+        with:
+          version: '5.15.2'
+          arch: 'gcc_64'
+          archives: qtbase qtsvg qttools qtx11extras icu
+          cache: true
+          setup-python: false
+      - name: Download and bootstrap vcpkg
+        run: |
+          git clone --branch 2024.05.24 https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_INSTALLATION_ROOT=${GITHUB_WORKSPACE}/vcpkg" >> "$GITHUB_ENV"
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-linux-
+          path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -36,11 +70,17 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX=./install \
+                --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+                -DVCPKG_TARGET_TRIPLET="x64-linux" \
+                -DVCPKG_HOST_TRIPLET="x64-linux" \
+                -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
+                -DCMAKE_INSTALL_PREFIX=./build/install \
                 $CMAKE_OPTS
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Run tests
