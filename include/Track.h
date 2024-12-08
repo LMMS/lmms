@@ -124,6 +124,7 @@ public:
 		static_assert(std::is_base_of_v<Clip, T>, "T must be a kind of Clip");
 		auto clip = new T(std::forward<Args>(args)...);
 		m_clips.push_back(clip);
+		clip->onAddedToTrack(this);
 		emit clipAdded(clip);
 		return clip;
 	}

@@ -59,6 +59,7 @@ public:
 	void init();
 
 	void updateLength();
+	void onAddedToTrack(Track* track) override;
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );

@@ -45,11 +45,6 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	if (_instrument_track->trackContainer()	== Engine::patternStore())
-	{
-		resizeToFirstTrack();
-	}
-	init();
 	setAutoResize( true );
 }
 
@@ -65,20 +60,6 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	for (const auto& note : other.m_notes)
 	{
 		m_notes.push_back(new Note(*note));
-	}
-
-	init();
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
 	}
 }
 
@@ -596,5 +577,10 @@ void MidiClip::changeTimeSignature()
 	updateLength();
 }
 
+void MidiClip::onAddedToTrack(Track* track)
+{
+	if (track->trackContainer() == Engine::patternStore()) { resizeToFirstTrack(); }
+	init();
+}
 
 } // namespace lmms

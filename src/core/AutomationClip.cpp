@@ -59,21 +59,6 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( TimePos( 1, 0 ) );
-	if( getTrack() )
-	{
-		switch( getTrack()->trackContainer()->type() )
-		{
-			case TrackContainer::Type::Pattern:
-				setAutoResize( true );
-				break;
-
-			case TrackContainer::Type::Song:
-				// move down
-			default:
-				setAutoResize( false );
-				break;
-		}
-	}
 }
 
 
@@ -143,7 +128,10 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 	return true;
 }
 
-
+void AutomationClip::onAddedToTrack(Track* track)
+{
+	setAutoResize(dynamic_cast<PatternStore*>(track->trackContainer()) != nullptr);
+}
 
 
 void AutomationClip::setProgressionType(

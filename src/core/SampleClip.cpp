@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 
+#include "PatternStore.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
@@ -61,25 +62,8 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
 	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
-	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
-			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
-
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
-	updateTrackClips();
 }
 
 SampleClip::SampleClip(Track* track)
@@ -92,7 +76,14 @@ SampleClip::SampleClip(const SampleClip& orig) :
 {
 }
 
+void SampleClip::onAddedToTrack(Track* track)
+{
+	connect(getTrack()->getMutedModel(), SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()),
+		Qt::DirectConnection);
 
+	setAutoResize(dynamic_cast<PatternStore*>(track->trackContainer()) != nullptr);
+	updateTrackClips();
+}
 
 
 SampleClip::~SampleClip()

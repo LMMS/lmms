@@ -72,7 +72,7 @@ public:
 	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
-
+	void onAddedToTrack(Track* track) override;
 	const AutomatableModel * firstObject() const;
 	const objectVector& objects() const;
 
