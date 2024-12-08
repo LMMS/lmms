@@ -38,8 +38,8 @@
 namespace lmms
 {
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
+SampleClip::SampleClip(Sample sample, bool isPlaying)
+	: Clip()
 	, m_sample(std::move(sample))
 	, m_isPlaying(false)
 {
@@ -66,13 +66,13 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 }
 
-SampleClip::SampleClip(Track* track)
-	: SampleClip(track, Sample(), false)
+SampleClip::SampleClip()
+	: SampleClip(Sample(), false)
 {
 }
 
 SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.getTrack(), orig.m_sample, orig.m_isPlaying)
+	SampleClip(orig.m_sample, orig.m_isPlaying)
 {
 }
 

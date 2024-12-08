@@ -27,14 +27,11 @@
 #define LMMS_MIDI_CLIP_H
 
 #include "Clip.h"
+#include "InstrumentTrack.h"
 #include "Note.h"
-
 
 namespace lmms
 {
-
-
-class InstrumentTrack;
 
 namespace gui
 {
@@ -52,7 +49,7 @@ public:
 		MelodyClip
 	} ;
 
-	MidiClip( InstrumentTrack* instrumentTrack );
+	MidiClip();
 	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
@@ -104,7 +101,7 @@ public:
 
 	inline InstrumentTrack * instrumentTrack() const
 	{
-		return m_instrumentTrack;
+		return static_cast<InstrumentTrack*>(getTrack());
 	}
 
 	bool empty();
@@ -135,8 +132,6 @@ private:
 	void checkType();
 
 	void resizeToFirstTrack();
-
-	InstrumentTrack * m_instrumentTrack;
 
 	Type m_clipType;
 

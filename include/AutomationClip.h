@@ -67,7 +67,7 @@ public:
 
 	using TimemapIterator = timeMap::const_iterator;
 
-	AutomationClip( AutomationTrack * _auto_track );
+	AutomationClip();
 	AutomationClip( const AutomationClip & _clip_to_copy );
 	~AutomationClip() override = default;
 
@@ -226,7 +226,6 @@ private:
 	mutable QMutex m_clipMutex;
 #endif
 
-	AutomationTrack * m_autoTrack;
 	std::vector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values

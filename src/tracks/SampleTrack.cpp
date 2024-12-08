@@ -180,7 +180,7 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 
 Clip * SampleTrack::createClip()
 {
-	return addClip<SampleClip>(this);
+	return addClip<SampleClip>();
 }
 
 

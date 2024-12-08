@@ -59,7 +59,7 @@ private slots:
 	{
 		using namespace lmms;
 
-		AutomationClip c(nullptr);
+		AutomationClip c;
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c.putValue(0, 0.0, false);
 		c.putValue(100, 1.0, false);
@@ -76,7 +76,7 @@ private slots:
 	{
 		using namespace lmms;
 
-		AutomationClip c(nullptr);
+		AutomationClip c;
 		c.setProgressionType(AutomationClip::ProgressionType::Discrete);
 		c.putValue(0, 0.0, false);
 		c.putValue(100, 1.0, false);

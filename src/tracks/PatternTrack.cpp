@@ -146,7 +146,7 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 Clip* PatternTrack::createClip()
 {
-	return addClip<PatternClip>(this);
+	return addClip<PatternClip>();
 }
 
 

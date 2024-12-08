@@ -58,7 +58,7 @@ gui::TrackView* AutomationTrack::createView( gui::TrackContainerView* tcv )
 
 Clip* AutomationTrack::createClip()
 {
-	return addClip<AutomationClip>(this);
+	return addClip<AutomationClip>();
 }
 
 

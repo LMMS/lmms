@@ -35,8 +35,8 @@ namespace lmms
 {
 
 
-PatternClip::PatternClip(Track* track) :
-	Clip(track)
+PatternClip::PatternClip() :
+	Clip()
 {
 	setAutoResize( false );
 }

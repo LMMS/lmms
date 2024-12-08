@@ -37,7 +37,7 @@ namespace lmms
 class PatternClip : public Clip
 {
 public:
-	PatternClip(Track* track);
+	PatternClip();
 	~PatternClip() override = default;
 
 	void onAddedToTrack(Track* track) override;

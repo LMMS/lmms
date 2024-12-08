@@ -805,7 +805,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 Clip* InstrumentTrack::createClip()
 {
-	return addClip<MidiClip>(this);
+	return addClip<MidiClip>();
 }
 
 
