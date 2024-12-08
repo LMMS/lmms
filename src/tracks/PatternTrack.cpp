@@ -47,10 +47,6 @@ PatternTrack::PatternTrack() :
 	s_infoMap[this] = patternNum;
 
 	setName(tr("Pattern %1").arg(patternNum));
-	Engine::patternStore()->createClipsForPattern(patternNum);
-	Engine::patternStore()->setCurrentPattern(patternNum);
-	Engine::patternStore()->updateComboBox();
-
 	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
 }
