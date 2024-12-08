@@ -1,7 +1,7 @@
 /*
  * LmmsExporterSample.h - exporting files (currently only audio files), TODO rename class when things change
  *
- * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot.com>
+ * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,104 +25,48 @@
 #ifndef LMMS_LMMS_EXPORTER_H
 #define LMMS_LMMS_EXPORTER_H
 
-#include <functional>
+#include <memory>
+#include <sndfile.h>
 #include <thread>
+#include <utility>
 #include <vector>
+#include <mutex>
 
-#include "AudioFileDeviceSample.h"
-#include "SampleFrame.h"
+#include <QString>
 
 namespace lmms
 {
+
+class SampleBuffer;
+
 class LmmsExporterSample
 {
 public:
-	using BufferFn = std::function<void(std::vector<SampleFrame>*, void*)>;
-	using EndFn = std::function<void(void*)>;
-
-	enum class ExportAudioFileFormat : int
-	{
-		//Wave,
-		Flac,
-		//Ogg,
-		//MP3,
-		Count
-	};
-	// in the future more types can be added
-	enum class ExportFileType
-	{
-		Audio
-	};
-
-	constexpr static auto NumFileFormats = static_cast<std::size_t>(ExportAudioFileFormat::Count);
-
-	struct FileEncodeDevice
-	{
-		bool isAvailable() const { return m_getDevInst != nullptr; }
-
-		ExportAudioFileFormat m_fileFormat;
-		const char* m_description;
-		const char* m_extension;
-		AudioFileDeviceSampleInstantiaton m_getDevInst;
-	};
-
-	LmmsExporterSample(const ExportFileType fileType,
-				const QString& outputLocationAndName);
+	LmmsExporterSample();
 	~LmmsExporterSample();
 
-	void setupAudioRendering(
-			const OutputSettings& outputSettings,
-			ExportAudioFileFormat fileFormat,
-			const fpp_t defaultFrameCount,
-			SampleFrame* exportBuffer,
-			const fpp_t exportBufferFrameCount);
-	void setupAudioRendering(
-			const OutputSettings& outputSettings,
-			ExportAudioFileFormat fileFormat,
-			const fpp_t defaultFrameCount,
-			BufferFn getBufferFunction,
-			EndFn endFunction,
-			void* getBufferData);
-	bool canExportAutioFile() const;
-
-	static ExportAudioFileFormat getAudioFileFormatFromFileName(const QString& fileName);
-	static ExportAudioFileFormat getAudioFileFormatFromExtension(const QString& extenisonString);
-	static QString getAudioFileExtensionFromFormat(ExportAudioFileFormat fmt);
-
-	static const std::array<FileEncodeDevice, 5> s_fileEncodeDevices;
-
-	void startExporting();
+	void startExporting(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer);
 	void stopExporting();
+	
+	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
 
 private:
-	static void processExportingAudioFile(LmmsExporterSample* thisExporter);
-	
-	// audio exporting
-	bool processNextBuffer();
-	bool processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount);
-	void setupAudioRenderingInternal(
-		const OutputSettings& outputSettings,
-		ExportAudioFileFormat fileFormat,
-		const fpp_t defaultFrameCount);
+	static void threadedExportFunction(LmmsExporterSample* thisExporter, bool* abortExport);
 
+	void stopThread();
+	void openFile(const QString& outputLocationAndName);
+	void exportBuffer(std::shared_ptr<SampleBuffer> buffer);
+	void closeFile();
 
+	QFile m_outputFile;
+	std::vector<std::pair<QString, std::shared_ptr<SampleBuffer>>> m_buffers;
 
-	ExportFileType m_exportFileType;
-	QString m_outputFile;
-
-	volatile bool m_abort;
-
-	// called if not nullptr
-	// while run()
-	// if returned buffer.size() <= 0 then break; end
-	BufferFn m_getBufferFunction;
-	// called at the end of run(), can be nullptr
-	EndFn m_endFunction;
-	void* m_getBufferData;
-	
-	AudioFileDeviceSample* m_fileDev;
-	std::vector<SampleFrame> m_buffer;
+	volatile bool m_abortExport;
+	bool m_isThreadRunning;
+	std::mutex m_readMutex;
 	std::unique_ptr<std::thread> m_thread;
+	
+	SNDFILE* m_fileDescriptor;
 };
 
 } // namespace lmms

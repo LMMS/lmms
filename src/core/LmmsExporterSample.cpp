@@ -22,264 +22,115 @@
  *
  */
 
+#include <sndfile.h>
+
 #include <QFile>
 
 #include "LmmsExporterSample.h"
 
-#include "AudioFileFlacSample.h"
+#include "SampleBuffer.h"
 
 namespace lmms
 {
 
-const std::array<LmmsExporterSample::FileEncodeDevice, 5> LmmsExporterSample::s_fileEncodeDevices
+LmmsExporterSample::LmmsExporterSample() :
+	m_fileDescriptor(NULL)
 {
-	/*
-	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Wave,
-		QT_TRANSLATE_NOOP("LmmsExporterSample", "WAV (*.wav)"),
-					".wav", &AudioFileWave::getInst },
-	*/
-	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Flac,
-		QT_TRANSLATE_NOOP("LmmsExporterSample", "FLAC (*.flac)"),
-		".flac",
-		&AudioFileFlacSample::getInst
-	},
-	/*
-	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Ogg,
-		QT_TRANSLATE_NOOP("LmmsExporterSample", "OGG (*.ogg)"),
-					".ogg",
-#ifdef LMMS_HAVE_OGGVORBIS
-					&AudioFileOgg::getInst
-#else
-					nullptr
-#endif
-	},
-	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::MP3,
-		QT_TRANSLATE_NOOP("LmmsExporterSample", "MP3 (*.mp3)"),
-					".mp3",
-#ifdef LMMS_HAVE_MP3LAME
-					&AudioFileMP3::getInst
-#else
-					nullptr
-#endif
-	},
-	*/
-	// Insert your own file-encoder infos here.
-	// Maybe one day the user can add own encoders inside the program.
 
-	FileEncodeDevice{LmmsExporterSample::ExportAudioFileFormat::Count, nullptr, nullptr, nullptr}
-};
-
-LmmsExporterSample::LmmsExporterSample(const ExportFileType fileType,
-			const QString& outputLocationAndName) :
-	m_exportFileType(fileType),
-	m_outputFile(outputLocationAndName),
-	m_abort(false),
-	m_getBufferFunction(nullptr),
-	m_endFunction(nullptr),
-	m_getBufferData(nullptr),
-	m_fileDev(nullptr),
-	m_buffer(0)
-{
-	m_thread = nullptr;
 }
 
 LmmsExporterSample::~LmmsExporterSample()
 {
-	// close thread
-	stopExporting();
+	stopExorting();
+}
 
-	if (m_fileDev != nullptr)
+
+void LmmsExporterSample::startExporting(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer)
+{
+	m_readMutex.lock();
+	m_buffers.push_back(std::make_pair(outputLocationAndName, buffer));
+	m_readMutex.unlock();
+
+	if (m_isThreadRunning == false)
 	{
-		delete m_fileDev;
-	}
-}
-
-void LmmsExporterSample::setupAudioRendering(
-		const OutputSettings& outputSettings,
-		ExportAudioFileFormat fileFormat,
-		const fpp_t defaultFrameCount,
-		SampleFrame* exportBuffer,
-		const fpp_t exportBufferFrameCount)
-{
-	setupAudioRenderingInternal(outputSettings, fileFormat, defaultFrameCount);
-	
-	processThisBuffer(exportBuffer, exportBufferFrameCount);
-}
-
-void LmmsExporterSample::setupAudioRendering(
-		const OutputSettings& outputSettings,
-		ExportAudioFileFormat fileFormat,
-		const fpp_t defaultFrameCount,
-		BufferFn getBufferFunction,
-		EndFn endFunction,
-		void* getBufferData)
-{
-	m_getBufferFunction = getBufferFunction;
-	m_endFunction = endFunction;
-	m_getBufferData = getBufferData;
-
-	setupAudioRenderingInternal(outputSettings, fileFormat, defaultFrameCount);
-}
-
-bool LmmsExporterSample::canExportAutioFile() const
-{
-	return m_fileDev != nullptr && (m_buffer.size() > 0 || m_getBufferFunction != nullptr);
-}
-
-
-
-LmmsExporterSample::ExportAudioFileFormat LmmsExporterSample::getAudioFileFormatFromFileName(const QString& fileName)
-{
-	// TODO test
-	QString extension = "";
-	for (size_t i = fileName.size(); i >= 0; i--)
-	{
-		extension = extension + fileName.at(i);
-		if (fileName.at(i) == ".")
-		{
-			break;
-		}
-	}
-	return getAudioFileFormatFromExtension(extension);
-}
-
-LmmsExporterSample::ExportAudioFileFormat LmmsExporterSample::getAudioFileFormatFromExtension(const QString& extenisonString)
-{
-	int idx = 0;
-	while (s_fileEncodeDevices[idx].m_fileFormat != ExportAudioFileFormat::Count)
-	{
-		if (QString(s_fileEncodeDevices[idx].m_extension) == extenisonString)
-		{
-			return s_fileEncodeDevices[idx].m_fileFormat;
-		}
-		idx++;
-	}
-	return ExportAudioFileFormat::Count;
-}
-
-QString LmmsExporterSample::getAudioFileExtensionFromFormat(ExportAudioFileFormat fmt)
-{
-	return s_fileEncodeDevices[static_cast<std::size_t>(fmt)].m_extension;
-}
-
-
-
-void LmmsExporterSample::startExporting()
-{
-	if (m_thread.get() != nullptr) { return; }
-	m_abort = false;
-
-	switch (m_exportFileType)
-	{
-		case ExportFileType::Audio:
-			if (canExportAutioFile())
-			{
-				m_thread = std::make_unique<std::thread>(processExportingAudioFile, this);
-			}
-			else if (m_endFunction != nullptr)
-			{
-				m_endFunction(m_getBufferData);
-			}
-			break;
+		stopExorting();
+		m_isThreadRunning = true;
+		m_thread = std::make_unique<std::thread>(&LmmsExporterSample::threadedExportFunction, this, &m_abortExport);
 	}
 }
 
 void LmmsExporterSample::stopExporting()
 {
-	// close thread
 	if (m_thread.get() != nullptr)
 	{
-		m_abort = true;
-		m_thread->join();
-		// deleting unique_ptr
+		if (m_isThreadRunning == true)
+		{
+			m_abortExport = true;
+			m_thread->join();
+		}
 		m_thread = nullptr;
+		m_isThreadRunning = false;
+		m_abortExport = false;
 	}
 }
 
 
-
-void LmmsExporterSample::processExportingAudioFile(LmmsExporterSample* thisExporter)
+void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter, bool* abortExport)
 {
-	while (!thisExporter->m_abort)
-	{
-		// if a function pointer was provided
-		// use that to fill m_buffer
-		if (thisExporter->m_getBufferFunction != nullptr)
-		{
-			thisExporter->processNextBuffer();
-		}
-		
-		// if thisExporter->m_buffer wasn't filled by
-		// processNextBuffer() or processThisBuffer() before
-		if (thisExporter->m_buffer.size() <= 0)
-		{
-			break;
-		}
+	thisExporter->m_isThreadRunning = true;
 
-		thisExporter->m_fileDev->processThisBuffer(thisExporter->m_buffer.data(), thisExporter->m_buffer.size());
-		
-		// if no function pointer was provided
-		if (thisExporter->m_getBufferFunction == nullptr)
+	while (abortExport == false)
+	{
+		std::pari<QString, std::shared_ptr<SampleBuffer>> curBuffer = nullptr;
+		thisExporter->m_readMutex.lock();
+		bool shouldExit = thisExporter->m_buffers.size() <= 0;
+		if (shouldExit == false)
 		{
-			// clear buffer to end while loop
-			thisExporter->m_buffer.clear();
-			break;
+			curBuffer = thisExporter->m_buffers[0];
 		}
+		thisExporter->m_readMutex.unlock();
+		if (shouldExit) { break; }
+
+		thisExporter->openFile(curBuffer.first, curBuffer.second);
+		thisExporter->exportBuffer(curBuffer.second);
+		thisExporter->closeFile();
 	}
 
-	if (thisExporter->m_endFunction != nullptr)
-	{
-		thisExporter->m_endFunction(thisExporter->m_getBufferData);
-	}
-
-	// If the user aborted export-process, the file has to be deleted.
-	if(thisExporter->m_abort)
-	{
-		const QString file = thisExporter->m_fileDev->outputFile();
-		QFile(file).remove();
-	}
+	thisExporter->m_isThreadRunning = false;
 }
 
-
-
-bool LmmsExporterSample::processNextBuffer()
+void LmmsExporterSample::openFile(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer)
 {
-	m_getBufferFunction(&m_buffer, m_getBufferData);
-	if (m_buffer.size() <= 0) { return true; }
+	SF_INFO exportInfo;
 
-	return false;
+	memset(&exportInfo, 0, sizeof(exportInfo));
+	exportInfo.frames = buffer->size();
+	exportInfo.samplerate = buffer->sampleRate();
+	exportInfo.channels = 2;
+	exportInfo.format = SF_FORMAT_FLAC;
+
+#ifdef LMMS_BUILD_WIN32 || LMMS_BUILD_WIN64
+	std::wstring characters = outputLocationAndName.toWString();
+	// wstring::c_str should guarantee null termination character at end
+	// this should be in big endian byte order
+	m_fileDescriptor = sf_open(characters.c_str(), SFM_WRITE, &exportInfo);
+#else
+	QByteArray characters = outputLocationAndName.toUtf8();
+	m_fileDescriptor = sf_open(&characters, SFM_WRITE, &exportInfo);
+#endif
 }
 
-bool LmmsExporterSample::processThisBuffer(SampleFrame* frameBuffer, const fpp_t frameCount)
+void LmmsExporterSample::exportBuffer(std::shared_ptr<SampleBuffer> buffer)
 {
-	if (frameCount <= 0) { m_buffer.clear(); return true; }
-	if (m_buffer.size() != frameCount)
-	{
-		m_buffer.resize(frameCount);
-	}
-
-	memcpy(m_buffer.data(), frameBuffer, m_buffer.size() * sizeof(SampleFrame));
-	return false;
+	if (m_fileDescriptor == NULL) { return; }
+	sf_writef_float(m_fileDescrtiptor, static_cast<float*>(buffer->data()), buffer->size());
 }
 
-void LmmsExporterSample::setupAudioRenderingInternal(
-	const OutputSettings& outputSettings,
-	ExportAudioFileFormat fileFormat,
-	const fpp_t defaultFrameCount)
+void LmmsExporterSample::closeFile()
 {
-	AudioFileDeviceSampleInstantiaton audioEncoderFactory = s_fileEncodeDevices[static_cast<std::size_t>(fileFormat)].m_getDevInst;
-
-	if (audioEncoderFactory)
-	{
-		bool successful = false;
-
-		m_fileDev = audioEncoderFactory(outputSettings, successful, m_outputFile, defaultFrameCount);
-		if(!successful)
-		{
-			delete m_fileDev;
-			m_fileDev = nullptr;
-		}
-	}
+	if (m_fileDescriptor == NULL) { return; }
+	int success = sf_close(m_fileDescriptor);
+	m_fileDescriptor = NULL;
 }
 
 } // namespace lmms
