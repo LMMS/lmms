@@ -87,11 +87,7 @@ public:
 	Track(Type type);
 	~Track() override;
 
-	static Track * create( Type tt, TrackContainer * tc );
-	static Track * create( const QDomElement & element,
-							TrackContainer * tc );
 	Track * clone();
-
 
 	// pure virtual functions
 	Type type() const
