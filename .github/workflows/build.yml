@@ -72,11 +72,11 @@ jobs:
         arch: [ x86_64, arm64 ]
         include:
           - arch: x86_64
-            os: macos-12
-            xcode: "13.1"
+            os: macos-13
+            xcode: "15.2"
           - arch: arm64
             os: macos-14
-            xcode: "14.3.1"
+            xcode: "15.4"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -249,6 +249,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Update vcpkg (TEMPORARY)
+        run: |
+          cd $env:VCPKG_INSTALLATION_ROOT
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
