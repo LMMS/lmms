@@ -36,7 +36,7 @@ class AutomationTrack : public Track
 {
 	Q_OBJECT
 public:
-	AutomationTrack( TrackContainer* tc, bool _hidden = false );
+	AutomationTrack(bool hidden = false);
 	~AutomationTrack() override = default;
 
 	bool play( const TimePos & _start, const fpp_t _frames,

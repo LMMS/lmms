@@ -68,7 +68,7 @@ tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 Song::Song() :
 	TrackContainer(),
-	m_globalAutomationTrack(new AutomationTrack(this, true)),
+	m_globalAutomationTrack(new AutomationTrack(true)),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
@@ -98,6 +98,8 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
+	m_globalAutomationTrack->setTrackContainer(this);
+
 	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
@@ -806,7 +808,7 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	const auto patternTrack = addTrack<PatternTrack>(this);
+	const auto patternTrack = addTrack<PatternTrack>();
 	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
 
@@ -815,7 +817,7 @@ void Song::addPatternTrack()
 
 void Song::addSampleTrack()
 {
-	addTrack<SampleTrack>(this);
+	addTrack<SampleTrack>();
 }
 
 
@@ -823,7 +825,7 @@ void Song::addSampleTrack()
 
 void Song::addAutomationTrack()
 {
-	addTrack<AutomationTrack>(this);
+	addTrack<AutomationTrack>();
 }
 
 
@@ -956,15 +958,15 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	auto tripleOscTrack = addTrack<InstrumentTrack>(this);
+	auto tripleOscTrack = addTrack<InstrumentTrack>();
 	static_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
 
-	auto kickerTrack = Engine::patternStore()->addTrack<InstrumentTrack>(Engine::patternStore());
+	auto kickerTrack = Engine::patternStore()->addTrack<InstrumentTrack>();
 	static_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
 
-	addTrack<SampleTrack>(this);
-	addTrack<PatternTrack>(this);
-	addTrack<AutomationTrack>(this);
+	addTrack<SampleTrack>();
+	addTrack<PatternTrack>();
+	addTrack<AutomationTrack>();
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();

@@ -165,7 +165,7 @@ public:
 			// in the main thread. This should probably be
 			// removed if that ever changes.
 			qApp->processEvents();
-			at = tc->addTrack<AutomationTrack>(tc);
+			at = tc->addTrack<AutomationTrack>();
 		}
 		if( tn != "") {
 			at->setName( tn );
@@ -227,7 +227,7 @@ public:
 		if( !it ) {
 			// Keep LMMS responsive
 			qApp->processEvents();
-			it = tc->addTrack<InstrumentTrack>(tc);
+			it = tc->addTrack<InstrumentTrack>();
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument( "sf2player" );
@@ -331,10 +331,10 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// NOTE: unordered_map::operator[] creates a new element if none exists
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	auto nt = Engine::getSong()->addTrack<AutomationTrack>(Engine::getSong());
+	auto nt = Engine::getSong()->addTrack<AutomationTrack>();
 
 	nt->setName(tr("MIDI Time Signature Numerator"));
-	auto dt = Engine::getSong()->addTrack<AutomationTrack>(Engine::getSong());
+	auto dt = Engine::getSong()->addTrack<AutomationTrack>();
 
 	dt->setName(tr("MIDI Time Signature Denominator"));
 	auto timeSigNumeratorPat = static_cast<AutomationClip*>(nt->createClip());
@@ -363,7 +363,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	auto tt = Engine::getSong()->addTrack<AutomationTrack>(Engine::getSong());
+	auto tt = Engine::getSong()->addTrack<AutomationTrack>();
 	tt->setName(tr("Tempo"));
 	auto tap = static_cast<AutomationClip*>(tt->createClip());
 	tap->setDisplayName(tr("Tempo"));

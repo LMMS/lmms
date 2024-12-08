@@ -56,9 +56,9 @@ namespace lmms
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-Track::Track( Type type, TrackContainer * tc ) :
-	Model( tc ),                   /*!< The track Model */
-	m_trackContainer( tc ),        /*!< The track container object */
+Track::Track(Type type) :
+	Model(nullptr),                   /*!< The track Model */
+	m_trackContainer(),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */

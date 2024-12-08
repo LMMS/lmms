@@ -83,6 +83,7 @@ public:
 		m_tracksMutex.lockForWrite();
 
 		m_tracks.push_back(track);
+		track->setTrackContainer(this);
 		updateAfterTrackAdd(track);
 
 		m_tracksMutex.unlock();
