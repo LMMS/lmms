@@ -413,7 +413,7 @@ void InstrumentTrackWindow::modelChanged()
 
 void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
-	FileDialog sfd(this, tr("Save preset"), "", tr("XML preset file (*.xpf)"));
+	FileDialog sfd(this, tr("Save preset"), "", tr("XML preset file (*.xpf)"), FileDialog::Operation::OpPreset);
 
 	QString presetRoot = ConfigManager::inst()->userPresetsDir();
 	if(!QDir(presetRoot).exists())
