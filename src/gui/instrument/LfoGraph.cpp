@@ -32,7 +32,7 @@
 #include "Oscillator.h"
 #include "ColorHelper.h"
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 namespace lmms
 {
@@ -44,7 +44,9 @@ namespace gui
 
 LfoGraph::LfoGraph(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this)
+	ModelView(nullptr, this),
+	m_noAmountColor(96, 91, 96),
+	m_fullAmountColor(0, 255, 128)
 {
 	setMinimumSize(m_lfoGraph.size());
 }
@@ -143,9 +145,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 
 	// Compute the color of the lines based on the amount of the LFO
 	const float absAmount = std::abs(amount);
-	const QColor noAmountColor{96, 91, 96};
-	const QColor fullAmountColor{0, 255, 128};
-	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
+	const QColor lineColor{ColorHelper::interpolateInRgb(m_noAmountColor, m_fullAmountColor, absAmount)};
 
 	p.setPen(QPen(lineColor, 1.5));
 
@@ -166,8 +166,7 @@ void LfoGraph::drawInfoText(const EnvelopeAndLfoParameters& params)
 
 	// First configure the font so that we get correct results for the font metrics used below
 	QFont f = p.font();
-	f.setPixelSize(height() * 0.2);
-	p.setFont(f);
+	p.setFont(adjustedToPixelSize(f, height() * 0.2));
 
 	// This is the position where the text and its rectangle will be rendered
 	const QPoint textPosition(4, height() - 6);

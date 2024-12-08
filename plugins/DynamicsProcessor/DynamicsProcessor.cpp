@@ -91,15 +91,8 @@ inline void DynProcEffect::calcRelease()
 }
 
 
-bool DynProcEffect::processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-//apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
-		m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-		return( false );
-	}
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
 // variables for effect
@@ -107,7 +100,6 @@ bool DynProcEffect::processAudioBuffer( SampleFrame* _buf,
 
 	auto sm_peak = std::array{0.0f, 0.0f};
 
-	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -140,9 +132,9 @@ bool DynProcEffect::processAudioBuffer( SampleFrame* _buf,
 		}
 	}
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		auto s = std::array{_buf[f][0], _buf[f][1]};
+		auto s = std::array{buf[f][0], buf[f][1]};
 
 // apply input gain
 		s[0] *= inputGain;
@@ -210,17 +202,18 @@ bool DynProcEffect::processAudioBuffer( SampleFrame* _buf,
 		s[1] *= outputGain;
 
 // mix wet/dry signals
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
-		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 	}
 
-	checkGate( out_sum / _frames );
-
-	return( isRunning() );
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
-
+void DynProcEffect::processBypassedImpl()
+{
+	// Apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
+	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
+}
 
 
 

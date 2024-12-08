@@ -1,7 +1,7 @@
 /*
- * gui_templates.h - GUI-specific templates
+ * TrackGrip.h - Grip that can be used to move tracks
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,22 +22,47 @@
  *
  */
 
-#ifndef LMMS_GUI_TEMPLATES_H
-#define LMMS_GUI_TEMPLATES_H
+#ifndef LMMS_GUI_TRACK_GRIP_H
+#define LMMS_GUI_TRACK_GRIP_H
 
-#include <QApplication>
-#include <QFont>
+#include <QWidget>
 
-namespace lmms::gui
+
+class QPixmap;
+
+namespace lmms
 {
 
-// Convenience method to set the font size in pixels
-inline QFont adjustedToPixelSize(QFont font, int size)
+class Track;
+
+namespace gui
 {
-	font.setPixelSize(size);
-	return font;
-}
 
-} // namespace lmms::gui
+class TrackGrip : public QWidget
+{
+	Q_OBJECT
+public:
+	TrackGrip(Track* track, QWidget* parent = 0);
+	~TrackGrip() override = default;
 
-#endif // LMMS_GUI_TEMPLATES_H
+signals:
+	void grabbed();
+	void released();
+
+protected:
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void paintEvent(QPaintEvent*) override;
+
+private:
+	Track* m_track = nullptr;
+	bool m_isGrabbed = false;
+	static QPixmap* s_grabbedPixmap;
+	static QPixmap* s_releasedPixmap;
+};
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_TRACK_GRIP_H

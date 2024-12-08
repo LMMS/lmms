@@ -83,9 +83,10 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 
 	IntegrateFunction(const unsigned int* frame, unsigned int sample_rate,unsigned int max_counters) :
 	exprtk::ifunction<T>(1),
+	m_firstValue(0),
 	m_frame(frame),
-	m_sample_rate(sample_rate),
-	m_max_counters(max_counters),
+	m_sampleRate(sample_rate),
+	m_maxCounters(max_counters),
 	m_nCounters(0),
 	m_nCountersCalls(0),
 	m_cc(0)
@@ -96,15 +97,26 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 
 	inline T operator()(const T& x) override
 	{
-		if (*m_frame == 0)
+		if (m_frame)
 		{
-			++m_nCountersCalls;
-			if (m_nCountersCalls > m_max_counters)
+			if (m_nCountersCalls == 0)
 			{
-				return 0;
+				m_firstValue = *m_frame;
 			}
-			m_cc = m_nCounters;
-			++m_nCounters;
+			if (m_firstValue == *m_frame)
+			{
+				++m_nCountersCalls;
+				if (m_nCountersCalls > m_maxCounters)
+				{
+					return 0;
+				}
+				m_cc = m_nCounters;
+				++m_nCounters;
+			}
+			else // we moved to the next frame
+			{
+				m_frame = 0; // this will indicate that we are no longer in init phase.
+			}
 		}
 
 		T res = 0;
@@ -114,13 +126,16 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 			m_counters[m_cc] += x;
 		}
 		m_cc = (m_cc + 1) % m_nCountersCalls;
-		return res / m_sample_rate;
+		return res / m_sampleRate;
 	}
-
-	const unsigned int* const m_frame;
-	const unsigned int m_sample_rate;
-	const unsigned int m_max_counters;
+	unsigned int m_firstValue;
+	const unsigned int* m_frame;
+	const unsigned int m_sampleRate;
+	// number of counters allocated
+	const unsigned int m_maxCounters;
+	// number of integrate instances that has counters allocated
 	unsigned int m_nCounters;
+	// real number of integrate instances
 	unsigned int m_nCountersCalls;
 	unsigned int m_cc;
 	double *m_counters;

@@ -124,16 +124,13 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 QSize PixmapButton::sizeHint() const
 {
-	if (isActive())
-	{
-		return m_activePixmap.size();
-	}
-	else 
-	{
-		return m_inactivePixmap.size();
-	}
+	return minimumSizeHint();
 }
 
+QSize PixmapButton::minimumSizeHint() const
+{
+	return m_activePixmap.size().expandedTo(m_inactivePixmap.size());
+}
 
 bool PixmapButton::isActive() const
 {

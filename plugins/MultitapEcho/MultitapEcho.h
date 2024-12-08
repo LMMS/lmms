@@ -40,7 +40,8 @@ class MultitapEchoEffect : public Effect
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~MultitapEchoEffect() override;
-	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

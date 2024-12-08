@@ -50,7 +50,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -72,7 +72,7 @@ const int PW_WHITE_KEY_WIDTH = 10;  /*!< The width of a white key */
 const int PW_BLACK_KEY_WIDTH = 8;   /*!< The width of a black key */
 const int PW_WHITE_KEY_HEIGHT = 57; /*!< The height of a white key */
 const int PW_BLACK_KEY_HEIGHT = 38; /*!< The height of a black key */
-const int LABEL_TEXT_SIZE = 7;      /*!< The height of the key label text */
+const int LABEL_TEXT_SIZE = 8;      /*!< The height of the key label text */
 
 
 
