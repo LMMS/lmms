@@ -48,7 +48,7 @@ public:
 		m_dataMutex()
 	{
 		setJournalling( false );
-		m_previewInstrumentTrack = static_cast<InstrumentTrack*>(addTrack(Track::Type::Instrument));
+		m_previewInstrumentTrack = addTrack<InstrumentTrack>(this);
 		m_previewInstrumentTrack->setJournalling( false );
 		m_previewInstrumentTrack->setPreviewMode( true );
 	}

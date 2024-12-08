@@ -395,7 +395,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "instrument" )
 	{
-		auto it = static_cast<InstrumentTrack*>(m_tc->addTrack(Track::Type::Instrument));
+		auto it = m_tc->addTrack<InstrumentTrack>(m_tc);
 		auto ilt = new InstrumentLoaderThread(this, it, value);
 		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
@@ -405,7 +405,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
-		auto it = static_cast<InstrumentTrack*>(m_tc->addTrack(Track::Type::Instrument));
+		auto it = m_tc->addTrack<InstrumentTrack>(m_tc);
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
@@ -416,7 +416,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
-		auto it = static_cast<InstrumentTrack*>(m_tc->addTrack(Track::Type::Instrument));
+		auto it = m_tc->addTrack<InstrumentTrack>(m_tc);
 		it->loadPreset(dataFile.content().toElement());
 
 		//it->toggledInstrumentTrackButton( true );

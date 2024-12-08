@@ -306,7 +306,7 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
 	TrackContainer* tc = Engine::getSong();
-	auto it = static_cast<InstrumentTrack*>(tc->addTrack(Track::Type::Instrument));
+	auto it = tc->addTrack<InstrumentTrack>(tc);
 	auto ilt = new InstrumentLoaderThread(this, it, value);
 	ilt->start();
 }

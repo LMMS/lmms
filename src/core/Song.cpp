@@ -52,6 +52,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "SampleTrack.h"
 #include "Scale.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
@@ -67,7 +68,7 @@ tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 Song::Song() :
 	TrackContainer(),
-	m_globalAutomationTrack(static_cast<AutomationTrack*>(addTrack(Track::Type::HiddenAutomation))),
+	m_globalAutomationTrack(new AutomationTrack(this, true)),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
@@ -805,7 +806,7 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	const auto patternTrack = addTrack(Track::Type::Pattern);
+	const auto patternTrack = addTrack<PatternTrack>(this);
 	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
 
@@ -814,7 +815,7 @@ void Song::addPatternTrack()
 
 void Song::addSampleTrack()
 {
-	(void)addTrack(Track::Type::Sample);
+	addTrack<SampleTrack>(this);
 }
 
 
@@ -822,7 +823,7 @@ void Song::addSampleTrack()
 
 void Song::addAutomationTrack()
 {
-	(void)addTrack(Track::Type::Automation);
+	addTrack<AutomationTrack>(this);
 }
 
 
@@ -955,15 +956,15 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	auto tripleOscTrack = addTrack(Track::Type::Instrument);
+	auto tripleOscTrack = addTrack<InstrumentTrack>(this);
 	static_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
 
-	auto kickerTrack = Engine::patternStore()->addTrack(Track::Type::Instrument);
+	auto kickerTrack = Engine::patternStore()->addTrack<InstrumentTrack>(Engine::patternStore());
 	static_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
 
-	addTrack(Track::Type::Sample);
-	addTrack(Track::Type::Pattern);
-	addTrack(Track::Type::Automation);
+	addTrack<SampleTrack>(this);
+	addTrack<PatternTrack>(this);
+	addTrack<AutomationTrack>(this);
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();
@@ -974,7 +975,6 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 	updateLength();
-	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 

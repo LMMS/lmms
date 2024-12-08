@@ -28,14 +28,19 @@
 
 #include <QReadWriteLock>
 
-#include "Track.h"
+#include "AudioEngine.h"
+#include "AutomationTrack.h"
+#include "Engine.h"
+#include "InstrumentTrack.h"
 #include "JournallingObject.h"
+#include "PatternTrack.h"
+#include "SampleTrack.h"
+#include "Track.h"
 
 namespace lmms
 {
 
 class AutomationClip;
-class InstrumentTrack;
 
 namespace gui
 {
@@ -65,11 +70,32 @@ public:
 
 	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
-	Track* addTrack(Track::Type type);
+	template<typename T, typename... Args>
+	T* addTrack(Args&&... args)
+	{
+		// TODO: Use concepts (C++20)
+		static_assert(std::is_base_of_v<Track, T>, "T must be a kind of Track");
+
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
+		auto track = new T(std::forward<Args>(args)...);
+
+		track->lock();
+		m_tracksMutex.lockForWrite();
+
+		m_tracks.push_back(track);
+		updateAfterTrackAdd(track);
+
+		m_tracksMutex.unlock();
+		track->unlock();
+
+		emit trackAdded(track);
+		return track;
+	}
+
 	Track* addTrack(const QDomElement& element);
 	void removeTrack( Track * _track );
 
-	virtual void updateAfterTrackAdd();
+	virtual void updateAfterTrackAdd(Track* track);
 
 	void clearAllTracks();
 

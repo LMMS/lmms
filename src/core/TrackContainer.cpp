@@ -175,53 +175,32 @@ int TrackContainer::countTracks( Track::Type _tt ) const
 	return( cnt );
 }
 
-Track* TrackContainer::addTrack(Track::Type type)
+Track* TrackContainer::addTrack(const QDomElement& element)
 {
-	const auto guard = Engine::audioEngine()->requestChangesGuard();
-
+	const auto trackType = static_cast<Track::Type>(element.attribute("type").toInt());
 	auto track = static_cast<Track*>(nullptr);
-	switch (type)
+
+	switch (trackType)
 	{
 	case Track::Type::Instrument:
-		track = new InstrumentTrack(this);
+		track = addTrack<InstrumentTrack>(this);
 		break;
 	case Track::Type::Pattern:
-		track = new PatternTrack(this);
+		track = addTrack<PatternTrack>(this);
 		break;
 	case Track::Type::Sample:
-		track = new SampleTrack(this);
-		break;
-	case Track::Type::Automation:
-		track = new AutomationTrack(this);
+		track = addTrack<SampleTrack>(this);
 		break;
 	case Track::Type::HiddenAutomation:
-		track = new AutomationTrack(this, true);
+		[[fallthrough]];
+	case Track::Type::Automation:
+		track = addTrack<AutomationTrack>(this);
 		break;
 	default:
 		std::cerr << "TrackContainer::addTrack - unimplemented type\n";
 		return nullptr;
 	}
 
-	if (track->type() != Track::Type::HiddenAutomation)
-	{
-		track->lock();
-		m_tracksMutex.lockForWrite();
-		
-		m_tracks.push_back(track);
-		if (this == Engine::patternStore()) { static_cast<PatternStore*>(this)->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1); }
-		updateAfterTrackAdd();
-
-		m_tracksMutex.unlock();
-		track->unlock();
-		emit trackAdded(track);
-	}
-
-	return track;
-}
-
-Track* TrackContainer::addTrack(const QDomElement& element)
-{
-	const auto track = addTrack(static_cast<Track::Type>(element.attribute("type").toInt()));
 	track->restoreState(element);
 	return track;
 }
@@ -252,7 +231,7 @@ void TrackContainer::removeTrack( Track * _track )
 
 
 
-void TrackContainer::updateAfterTrackAdd()
+void TrackContainer::updateAfterTrackAdd(Track* track)
 {
 }
 

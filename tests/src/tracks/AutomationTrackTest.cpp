@@ -94,7 +94,7 @@ private slots:
 		FloatModel model;
 
 		auto song = Engine::getSong();
-		auto track = static_cast<AutomationTrack*>(song->addTrack(Track::Type::Automation));
+		auto track = song->addTrack<AutomationTrack>(song);
 
 		AutomationClip c1(track);
 		c1.setProgressionType(AutomationClip::ProgressionType::Linear);
@@ -130,7 +130,7 @@ private slots:
 		FloatModel model;
 
 		auto song = Engine::getSong();
-		auto track = static_cast<AutomationTrack*>(song->addTrack(Track::Type::Automation));
+		auto track = song->addTrack<AutomationTrack>(song);
 
 		AutomationClip c(track);
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
@@ -155,7 +155,7 @@ private slots:
 		using namespace lmms;
 
 		auto song = Engine::getSong();
-		auto instrumentTrack = static_cast<InstrumentTrack*>(song->addTrack(Track::Type::Instrument));
+		auto instrumentTrack = song->addTrack<InstrumentTrack>(song);
 
 		MidiClip midiClip(instrumentTrack);
 		midiClip.changeLength(TimePos(4, 0));
@@ -180,8 +180,8 @@ private slots:
 
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
-		auto patternTrack = static_cast<PatternTrack*>(song->addTrack(Track::Type::Pattern));
-		auto automationTrack = static_cast<AutomationTrack*>(patternStore->addTrack(Track::Type::Automation));
+		auto patternTrack = song->addTrack<PatternTrack>(song);
+		auto automationTrack = patternStore->addTrack<AutomationTrack>(patternStore);
 		automationTrack->createClipsForPattern(patternStore->numOfPatterns() - 1);
 
 		QVERIFY(automationTrack->numOfClips());
@@ -200,7 +200,7 @@ private slots:
 		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack->patternIndex())[&model], 1.0f);
 		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack->patternIndex())[&model], 1.0f);
 
-		auto patternTrack2 = static_cast<PatternTrack*>(song->addTrack(Track::Type::Pattern));
+		auto patternTrack2 = song->addTrack<PatternTrack>(song);
 
 		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack->patternIndex())[&model], 0.5f);
 		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2->patternIndex()).size());
@@ -225,7 +225,7 @@ private slots:
 		auto globalTrack = song->globalAutomationTrack();
 		AutomationClip globalClip(globalTrack);
 
-		auto localTrack = static_cast<AutomationTrack*>(song->addTrack(Track::Type::Automation));
+		auto localTrack = song->addTrack<AutomationTrack>(song);
 		AutomationClip localClip(localTrack);
 
 		FloatModel model;
