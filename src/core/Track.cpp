@@ -58,7 +58,7 @@ namespace lmms
  */
 Track::Track(Type type) :
 	Model(nullptr),                   /*!< The track Model */
-	m_trackContainer(),        /*!< The track container object */
+	m_trackContainer(nullptr),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
