@@ -267,6 +267,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
+	_this.setAttribute("been_resized", QString::number(getHasBeenResized()));
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -315,6 +316,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
+	setHasBeenResized(_this.attribute( "been_resized" ).toInt());
 
 	if (_this.hasAttribute("color"))
 	{

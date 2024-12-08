@@ -103,6 +103,8 @@ private:
 	QStaticText m_staticTextName;
 
 	bool m_legacySEPattern;
+	
+	bool splitClip(const TimePos pos) override;
 } ;
 
 
