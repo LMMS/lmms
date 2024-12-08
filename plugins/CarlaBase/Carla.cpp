@@ -1006,28 +1006,29 @@ void CarlaParamsView::refreshKnobs()
 
 	for (uint32_t i = 0; i < m_carlaInstrument->m_paramModels.size(); ++i)
 	{
-		bool enabled = m_carlaInstrument->m_paramModels[i]->enabled();
-		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
-		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
+		const auto currentParamModel = m_carlaInstrument->m_paramModels[i];
+
+		bool enabled = currentParamModel->enabled();
+		const QString name = currentParamModel->displayName();
+		m_knobs.push_back(Knob::buildLegacyKnob(KnobType::Dark28, name, m_inputScrollAreaWidgetContent));
 		m_knobs[i]->setHintText(name, "");
-		m_knobs[i]->setLabel(name);
 		m_knobs[i]->setObjectName(name); // this is being used for filtering the knobs.
 
 		// Set the newly created model to the knob.
-		m_knobs[i]->setModel(m_carlaInstrument->m_paramModels[i]);
+		m_knobs[i]->setModel(currentParamModel);
 		m_knobs[i]->setEnabled(enabled);
 
 		if (enabled)
 		{
 			// Collect group names
-			if (!groupNameList.contains(m_carlaInstrument->m_paramModels[i]->groupName()))
+			if (!groupNameList.contains(currentParamModel->groupName()))
 			{
-				groupNameList.append(m_carlaInstrument->m_paramModels[i]->groupName());
+				groupNameList.append(currentParamModel->groupName());
 			}
 
 			// Store biggest knob width per group (so we can calc how many
 			// knobs we can horizontaly fit)
-			uint8_t groupId = m_carlaInstrument->m_paramModels[i]->groupId();
+			uint8_t groupId = currentParamModel->groupId();
 			if (m_maxKnobWidthPerGroup[groupId] < m_knobs[i]->width())
 			{
 				m_maxKnobWidthPerGroup[groupId] = m_knobs[i]->width();
