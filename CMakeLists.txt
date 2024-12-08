@@ -666,6 +666,8 @@ elseif(MSVC)
 ENDIF()
 
 # gcc builds support gprof for profiling
+# clang too seems to support gprof, but i couldn't get it working.
+# if needed, change the if condition to "GNU|CLANG"
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(STATUS_GPROF ", NOT SUPPORTED BY THIS COMPILER")
 	set(WANT_DEBUG_GPROF OFF)
