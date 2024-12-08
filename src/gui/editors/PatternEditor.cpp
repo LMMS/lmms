@@ -132,7 +132,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 	if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		Track* t = model()->addTrack(dataFile.content().firstChild().toElement());
+		Track* t = model()->createTrack(dataFile.content().firstChild().toElement());
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;

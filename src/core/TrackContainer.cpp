@@ -142,7 +142,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
 			}
-			addTrack(node.toElement());
+			createTrack(node.toElement());
 		}
 		node = node.nextSibling();
 	}
@@ -175,7 +175,7 @@ int TrackContainer::countTracks( Track::Type _tt ) const
 	return( cnt );
 }
 
-Track* TrackContainer::addTrack(const QDomElement& element)
+Track* TrackContainer::createTrack(const QDomElement& element)
 {
 	const auto trackType = static_cast<Track::Type>(element.attribute("type").toInt());
 	auto track = static_cast<Track*>(nullptr);

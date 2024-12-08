@@ -93,7 +93,7 @@ public:
 		return track;
 	}
 
-	Track* addTrack(const QDomElement& element);
+	Track* createTrack(const QDomElement& element);
 	void removeTrack( Track * _track );
 
 	virtual void updateAfterTrackAdd(Track* track);
