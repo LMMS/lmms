@@ -56,11 +56,9 @@ gui::TrackView* AutomationTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-Clip* AutomationTrack::createClip(const TimePos & pos)
+Clip* AutomationTrack::createClip()
 {
-	auto p = new AutomationClip(this);
-	p->movePosition(pos);
-	return p;
+	return addClip<AutomationClip>(this);
 }
 
 

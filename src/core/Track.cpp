@@ -226,9 +226,9 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 			&& node.nodeName() != "solo"
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
-				Clip * clip = createClip(
-								TimePos( 0 ) );
-				clip->restoreState( node.toElement() );
+				auto clip = createClip();
+				clip->movePosition(TimePos{0});
+				clip->restoreState(node.toElement());
 			}
 		}
 		node = node.nextSibling();
@@ -262,25 +262,6 @@ void Track::loadSettings(const QDomElement& element)
 	// Assume that everything should be loaded if we are called through SerializingObject::loadSettings 
 	loadTrack(element, false);
 }
-
-
-
-
-/*! \brief Add another Clip into this track
- *
- *  \param clip The Clip to attach to this track.
- */
-Clip * Track::addClip( Clip * clip )
-{
-	m_clips.push_back( clip );
-
-	emit clipAdded( clip );
-
-	return clip; // just for convenience
-}
-
-
-
 
 /*! \brief Remove a given Clip from this track
  *
@@ -343,8 +324,10 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 	}
 	printf( "called Track::getClip( %zu ), "
 			"but Clip %zu doesn't exist\n", clipNum, clipNum );
-	return createClip( clipNum * TimePos::ticksPerBar() );
 
+	auto clip = createClip();
+	clip->movePosition(clipNum * TimePos::ticksPerBar());
+	return clip;
 }
 
 
@@ -431,8 +414,10 @@ void Track::createClipsForPattern(int pattern)
 	while( numOfClips() < pattern + 1 )
 	{
 		TimePos position = TimePos( numOfClips(), 0 );
-		Clip * clip = createClip( position );
-		clip->changeLength( TimePos( 1, 0 ) );
+
+		auto clip = createClip();
+		clip->movePosition(position);
+		clip->changeLength(TimePos(1, 0));
 	}
 }
 

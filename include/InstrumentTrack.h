@@ -129,7 +129,7 @@ public:
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
 
 	// create new track-content-object = clip
-	Clip* createClip(const TimePos & pos) override;
+	Clip* createClip() override;
 
 
 	// called by track

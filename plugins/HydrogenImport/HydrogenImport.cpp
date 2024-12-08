@@ -311,7 +311,8 @@ bool HydrogenImport::readSong()
 
 			int i = pattern_id[patId]+song_num_tracks;
 			Track* t = s->tracks().at(i);
-			t->createClip(pos);
+			auto clip = t->createClip();
+			clip->movePosition(pos);
 
 			if ( pattern_length[patId] > best_length ) 
 			{

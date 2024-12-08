@@ -178,11 +178,9 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-Clip * SampleTrack::createClip(const TimePos & pos)
+Clip * SampleTrack::createClip()
 {
-	auto sClip = new SampleClip(this);
-	sClip->movePosition(pos);
-	return sClip;
+	return addClip<SampleClip>(this);
 }
 
 

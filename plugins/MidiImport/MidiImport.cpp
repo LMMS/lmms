@@ -187,9 +187,9 @@ public:
 		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
 			TimePos pPos = TimePos( time.getBar(), 0 );
-			ap = dynamic_cast<AutomationClip*>(
-				at->createClip(pPos));
-			ap->addObject( objModel );
+			ap = static_cast<AutomationClip*>(at->createClip());
+			ap->movePosition(pPos);
+			ap->addObject(objModel);
 		}
 
 		lastPos = time;
@@ -254,7 +254,8 @@ public:
 			it->pitchRangeModel()->setInitValue( 2 );
 
 			// Create a default pattern
-			p = dynamic_cast<MidiClip*>(it->createClip(0));
+			p = static_cast<MidiClip*>(it->createClip());
+			p->movePosition(0);
 		}
 		return this;
 	}
@@ -264,7 +265,8 @@ public:
 	{
 		if (!p)
 		{
-			p = dynamic_cast<MidiClip*>(it->createClip(0));
+			p = static_cast<MidiClip*>(it->createClip());
+			p->movePosition(0);
 		}
 		p->addNote(n, false);
 		hasNotes = true;
@@ -281,7 +283,8 @@ public:
 			if (!newMidiClip || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
 				TimePos pPos = TimePos(n->pos().getBar(), 0);
-				newMidiClip = dynamic_cast<MidiClip*>(it->createClip(pPos));
+				newMidiClip = static_cast<MidiClip*>(it->createClip());
+				newMidiClip->movePosition(pPos);
 			}
 			lastEnd = n->pos() + n->length();
 

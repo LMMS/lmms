@@ -105,7 +105,7 @@ public:
 
 
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
-	virtual Clip * createClip( const TimePos & pos ) = 0;
+	virtual Clip* createClip() = 0;
 
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
@@ -118,10 +118,17 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	// -- for usage by Clip only ---------------
-	Clip * addClip( Clip * clip );
-	void removeClip( Clip * clip );
-	// -------------------------------------------------------
+	template<typename T, typename... Args>
+	T* addClip(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<Clip, T>, "T must be a kind of Clip");
+		auto clip = new T(std::forward<Args>(args)...);
+		m_clips.push_back(clip);
+		emit clipAdded(clip);
+		return clip;
+	}
+
+	void removeClip(Clip* clip);
 	void deleteClips();
 
 	int numOfClips();
