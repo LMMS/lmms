@@ -64,7 +64,7 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	masterPitchLayout->addWidget(tlabel);
 
 	// Microtuner settings
-	m_microtunerNotSupportedLabel = new QLabel(tr("Microtuner is not available for MIDI-based instruments."));
+	m_microtunerNotSupportedLabel = new QLabel(tr("Microtuner is not available\nfor MIDI-based instruments."));
 	m_microtunerNotSupportedLabel->setWordWrap(true);
 	m_microtunerNotSupportedLabel->hide();
 	layout->addWidget(m_microtunerNotSupportedLabel);
