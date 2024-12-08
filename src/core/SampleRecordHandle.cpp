@@ -36,13 +36,14 @@ namespace lmms
 {
 
 
-SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
-	PlayHandle( Type::SamplePlayHandle ),
+SampleRecordHandle::SampleRecordHandle(SampleClip* clip, TimePos startRecordTimeOffset) :
+	PlayHandle(Type::SamplePlayHandle),
 	m_framesRecorded( 0 ),
 	m_minLength( clip->length() ),
 	m_track( clip->getTrack() ),
 	m_patternTrack( nullptr ),
-	m_clip( clip )
+	m_clip(clip),
+	m_startRecordTimeOffset{startRecordTimeOffset}
 {
 }
 
@@ -52,6 +53,8 @@ SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
 SampleRecordHandle::~SampleRecordHandle()
 {
 	if (!m_buffers.empty()) { m_clip->setSampleBuffer(createSampleBuffer()); }
+
+	m_clip->setStartTimeOffset(m_startRecordTimeOffset);
 
 	while( !m_buffers.empty() )
 	{
