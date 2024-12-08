@@ -33,22 +33,7 @@ namespace lmms
 {
 
 /* SampleFolder/
-	ProjectFile (SampleFolder's name is equal)
-	Used/
-		Samples -> CAN MOVE
-	Unused/
-		Samples -> CAN MOVE
-
-	Samples -> DO NOT MOVE
-
-	interface:
-		load sample:
-			-> search in SampleFolder/, Used/, Unused/
-			-> if found, return shared_ptr
-			-> if not found, return nullptr
-	
-	
-	scan all avaliable files,
+TODO
 */
 
 class SampleFolder
