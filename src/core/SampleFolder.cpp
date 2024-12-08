@@ -24,14 +24,20 @@
 
 #include "SampleFolder.h"
 
+#include <array>
+#include <filesystem>
+
+#include <QFileInfo>
+
 #include "LmmsExporterSample.h"
+#include "SampleLoader.h"
 
 namespace lmms
 {
 
-std::string SampleFolder::s_sampleFileSourceName = "LOAD_WITH_SAMPLEFOLDER";
+QString SampleFolder::s_sampleFileSourceName = "LOAD_WITH_SAMPLEFOLDER";
 
-SampleFolder::SampleFolder(std::filesystem::path folderPath)
+SampleFolder::SampleFolder(const QString& folderPath)
 {
 	setTargetFolderPath(folderPath);
 }
@@ -40,7 +46,7 @@ SampleFolder::~SampleFolder()
 {
 }
 
-void SampleFolder::setTargetFolderPath(std::filesystem::path folderPath)
+void SampleFolder::setTargetFolderPath(const QString& folderPath)
 {
 	m_targetFolderPath = folderPath;
 	updateAllFilesList();
@@ -48,152 +54,184 @@ void SampleFolder::setTargetFolderPath(std::filesystem::path folderPath)
 
 void SampleFolder::updateAllFilesList()
 {
-	m_allFilesList.clear();
-	for (const auto& entry : std::filesystem::directory_iterator(m_targetFolderPath))
+	m_sampleFolderFiles.clear();
+	const std::array<QString, 3> filePaths = {QString(), s_usedFolderName, s_unusedFolderName};
+	for (size_t i = 0; i < filePaths.size(), i++)
 	{
-		// adding filenames with extensions to m_allFilesList
-		m_allFilesList.push_back(entry.path().filename());
-	}
-}
-
-
-void SampleFolder::saveUnchangedSample(std::shared_ptr<const SampleBuffer> sampleBuffer, std::string* sampleFileName)
-{
-	// shouldExport = true when sampleFileName includes s_sampleFileSourceName
-	bool shouldExport = getSampleFileSourceName(*sampleFileName, false);
-	if (shouldExport == false) { return; }
-
-	for (const auto& it : m_loadedFilesList)
-	{
-		if (it == *sampleFileName)
+		// TODO check if folder exists
+		std::filesystem::path curPath(m_targetFolderPath.toStdU16String() + filePaths[i]);
+		for (const auto& entry : std::filesystem::directory_iterator(curPath))
 		{
-			shouldExport = false;
-			break;
-		}
-	}
-	
-	if (shouldExport)
-	{
-		// remove everything except the file name and extension
-		*sampleFileName = std::filesystem::path(*sampleFileName).filename();		
-		
-		bool found = false;
-		for (const auto& it : m_allFilesList)
-		{
-			if (it == *sampleFileName)
+			if (std::filesystem::is_regular_file(curPath) == false
+				&& entry.path().extension() == ".flac")
 			{
-				found = true;
-				break;
+				// adding filenames with extensions to m_sampleFolderFiles
+				m_sampleFolderFiles.push_back(entry.path().filename());
+				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].name = entry.path().fileName();
+				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].relativeFolder = filePaths[i];
+				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].isManaged = i > 0;
 			}
 		}
-		if (found)
+	}
+}
+
+// retruns loaded sample or nullptr if not found
+// TODO: decide if sample is in the sample folder
+std::shared_ptr<SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName)
+{
+	std::shared_ptr<SampleBuffer> output = nullptr;
+	QString filteredSampleFileName(QFileInfo(sampleFileName).fileName());
+	ssize_t index = isFileInsideSampleFolder(filteredSampleFileName);
+	if (index >= 0)
+	{
+		if (m_sampleFolderFiles[index].isLoaded == false)
 		{
-			// renaming
-			size_t largestFileNumeber = 1;
-			for (const auto& it : m_allFilesList)
-			{
-				if (it == *sampleFileName)
-				{
-					size_t curNumber = getFileNumber(std::filesystem::path(*it));
-					if (largestFileNumeber < curNumber)
-					{
-						largestFileNumeber = curNumber;
-					}
-				}
-			}
-			sampleFileName = sampleFileName + std::to_string(largestFileNumeber + 1);
+			m_sampleFolderFiles[index].buffer = SampleLoader::createBufferFromFile(m_targetFolderPath + m_sampleFolderFiles[index].relativeFolder + filteredSampleFileName);
+			m_sampleFolderFiles[index].isLoaded = true;
 		}
-		saveSample(sampleBuffer, *sampleFileName);
+		output = m_sampleFolderFiles[index].buffer;
 	}
-}
-
-void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const std::string& sampleFileName)
-{
-	// TODO
-}
-
-std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const std::string& sampleFileName)
-{
-	if (getSampleFileSourceName(sampleFileName))
+	else
 	{
-		m_loadedFilesList.push_back(sampleFileName);
-		std::string newName = sampleFileName;
-		setSampleFileSourceName(&newName, false);
-		return gui::SampleLoader::createBufferFromFile(newName);
-	}
-	return gui::SampleLoader::createBufferFromFile(sampleFileName);
-}
-
-void SampleFolder::setSampleFileSourceName(std::string* sampleFileName, bool isManagedBySampleFolder)
-{
-	std::filesystem::path sampleFilePath(sampleFileName);
-	std::string nameStem = std::filesystem::path(sampleFileName).stem();
-	bool isManagedBySampleFolderByName = getSampleFileSourceName(sampleFilePath.stem(), true);
-	if (isManagedBySampleFolder != isManagedBySampleFolderByName)
-	{
-		if (isManagedBySampleFolder)
-		{
-			nameStem = nameStem + s_sampleFileSourceName + sampleFilePath.extension();
-		}
-		else
-		{
-			ssize_t newSize = nameStem.size() - s_sampleFileSourceName.size();
-			if (newSize >= 0)
-			{
-				nameStem.resize(static_cast<size_t>(newSize));
-			}
-			nameStem = nameStem + sampleFilePath.extension();
-		}
-
-		// replace filename with the new stem + extension
-		sampleFilePath.replace_filename(nameStem);
-		*sampleFileName = sampleFilePath.string();
-	}
-}
-
-bool SampleFolder::getSampleFileSourceName(const std::string& sampleFileName, bool isOnlyNameStem = false)
-{
-	if (isOnlyNameStem == false)
-	{
-		return sampleFileName.ends_with(s_sampleFileSourceName);
-	}
-	std::string nameStem = std::filesystem::path(sampleFileName).stem();
-	return nameStem.ends_with(s_sampleFileSourceName);
-}
-
-bool SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const std::string& sampleFileName)
-{
-	// getting rid of s_sampleFileSourceName tag
-	setSampleFileSourceName(&sampleFileName, false);
-	
-	// TODO save
-
-	LmmsExporterSample exporter(LmmsExporterSample::ExportFileType::Audio, (m_targetFolderPath / std::filesystem::path(sampleFileName)));
-	exporter.setupAudioRendering(
-		const OutputSettings& outputSettings,
-		LmmsExporterSample::ExportAudioFileFormat::Flac,
-		256,
-		sampleBuffer->data(),
-		sampleBuffer->size();
-	);
-}
-
-size_t SampleFolder::getFileNumber(const std::filesystem::path& sampleFilePath)
-{
-	size_t outout = 0;
-	std::string nameStem = sampleFilePath.stem();
-	std::string nameNumber = "";
-	for (size_t i = nameStem.size() - 1; i >= 0; i--)
-	{
-		if (std::isdigit(nameStem[i]) == false) { break; }
-		// could be made more efficient with copy() and resize()
-		nameNumber = nameNumber + nameStem[i];
-	}
-	if (nameNumber.size() > 0)
-	{
-		output = static_cast<size_t>(std::stol(nameNumber));
+		output = SampleLoader::createBufferFromFile(sampleFileName);
 	}
 	return output;
 }
+
+void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler = true, bool shouldGenerateUniqueName = false, QString* sampleFileFinalName)
+{
+	ssize_t index = isFileInsideSampleFolder(filteredSampleFileName);
+	if (shouldGenerateUniqueName && index >= 0)
+	{
+		m_sampleFolderFiles[index].isSaved = true;
+	}
+	else
+	{
+		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFolder, shouldGenerateUniqueName, sampleFileFinalName);
+	}
+}
+
+// exports a sample, only used for replacing old versions of same sample
+void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName)
+{
+	ssize_t index = isFileInsideSampleFolder(filteredSampleFileName);
+	if (index >= 0)
+	{
+		exportSample(sampleBuffer, sampleFileName, m_sampleFolderFiles[index].isManaged, false, nullptr);
+	}
+}
+
+void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler = true, bool shouldGenerateUniqueName = false, QString* sampleFileFinalName)
+{
+	
+}
+	
+bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)
+{
+	QString curFolderAsString(QFileInfo(m_targetFolderPath).absolutePath());
+	QString curFileAsString(QFileInfo(m_targetFolderPath).absolutePath());
+	/* std way:
+	std::filesystem::path curFolderPath(std::filesystem::absolute(m_targetFolderPath.toStdU16String());
+	std::filesystem::path curFilePath(std::filesystem::absolute(filePath.toStdU16String());
+	std::u16string curFolderAsString = static_cast<std::u16string>(curFolderPath);
+	std::u16string curFileAsString = static_cast<std::u16string>(curFilePath);
+	*/
+	bool found = curFolderAsString.size() <= curFileAsString.size();
+	if (found)
+	{
+		for (size_t i = 0; i < curFolderAsString.size(); i++)
+		{
+			if (curFolderAsString[i] != curFileAsString[i])
+			{
+				found = false;
+				break;
+			}
+		}
+	}
+	return found;
+}
+
+ssize_t SampleFolder::findFileInsideSampleFolder(const QString& sampleFileName)
+{
+	bool found = false;
+	for (SampleFolder::SampleFile& it : m_sampleFoldeFiles)
+	{
+		if (it.name == sampleFileName)
+		{
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
+QString SampleFolder::findUniqueName(const QString& sourceName) const
+{
+	QString output = sourceName;
+	// removing number from `sourceName`
+	bool isSeparatedWithWhiteSpace = false;
+	size_t sourceNumberLength = SampleFolder::getNameNumberEnding(sourceName, &isSeparatedWithWhiteSpace).size();
+	if (sourceNumberLength > 0)
+	{
+		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
+		sourceNumberLength = isSeparatedWithWhiteSpace ? sourceNumberLength + 1 : sourceNumberLength;
+		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
+	}
+
+	size_t maxNameCounter = 0;
+	bool found = false;
+
+	for (const SampleFolder::SampleFile& it : m_sampleFolderFiles)
+	{
+		if (it.name.startsWith(output))
+		{
+			size_t nameCount = SampleFolder::getNameNumberEnding(it->name).toInt();
+			maxNameCounter = maxNameCounter < nameCount ? nameCount : maxNameCounter;
+			found = true;
+		}
+	}
+
+	if (found)
+	{
+		output = output + " " + QString::number(maxNameCounter + 1);
+	}
+
+	return output;
+}
+
+QString SampleFolder::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace)
+{
+	QString numberString = "";
+
+	//! `it` will point to where the numbers start in `name`
+	auto it = name.end();
+	size_t digitCount = 0;
+	while (it != name.begin())
+	{
+		it--;
+		if (it->isDigit() == false)
+		{
+			if (isSeparatedWithWhiteSpace != nullptr)
+			{
+				*isSeparatedWithWhiteSpace = *it == ' ';
+			}
+			// the last character was not a number
+			// increase `it` to account for this (and make it point to a digit)
+			it++;
+			break;
+		}
+		digitCount++;
+	}
+
+	if (digitCount > 0)
+	{
+		numberString.resize(digitCount);
+		std::copy(it, name.end(), numberString.begin());
+	}
+
+	return numberString;
+}
+
+
 
 } // namespace lmms

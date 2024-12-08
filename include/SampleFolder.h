@@ -25,55 +25,99 @@
 #ifndef LMMS_SAMPLEFOLDER_H
 #define LMMS_SAMPLEFOLDER_H
 
-#include <filesystem>
-#include <list>
-#include <string>
+#include <vector>
 
-//#include <QStrintg> // TODO
+#include <QStrintg>
 
 namespace lmms
 {
+
+/* SampleFolder/
+	ProjectFile (SampleFolder's name is equal)
+	Used/
+		Samples -> CAN MOVE
+	Unused/
+		Samples -> CAN MOVE
+
+	Samples -> DO NOT MOVE
+
+	interface:
+		load sample:
+			-> search in SampleFolder/, Used/, Unused/
+			-> if found, return shared_ptr
+			-> if not found, return nullptr
+	
+	
+	scan all avaliable files,
+*/
 
 class SampleFolder
 {
 public:
 	//! folderPath: from where should SampleFolder load in the samples
-	SampleFolder(std::filesystem::path folderPath);
+	SampleFolder(const QString& folderPath);
 	~SampleFolder();
 
-	void setTargetFolderPath(std::filesystem::path folderPath);
+	void setTargetFolderPath(QString folderPath);
 
 	void updateAllFilesList();
 
-	//! use this to save sample files
-	//! this will only save a file if getSampleFileSourceName() == true and sampleFileName is not inside m_loadedFilesList
-	//! sampleFileName returns the final name
-	void saveUnchangedSample(std::shared_ptr<const SampleBuffer> sampleBuffer, std::string* sampleFileName);
-	//! this will update the data related with a sampleFileName
-	void updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const std::string& sampleFileName);
-	//! this accepts samples from all location
-	//! it will decide to load
-	std::shared_ptr<SampleBuffer> loadSample(const std::string& sampleFileName);
+	// retruns loaded sample or nullptr if not found
+	// TODO: decide if sample is in the sample folder
+	std::shared_ptr<SampleBuffer> loadSample(const QString& sampleFileName);
 
-	//! appends / removes a temporary tag to a given file name if it is managed by / loaded with SampleFolder
-	static void setSampleFileSourceName(std::string* sampleFileName, bool isManagedBySampleFolder);
-	//! returns true if sampleFileName is managed by SampleFolder
-	static bool getSampleFileSourceName(const std::string& sampleFileName, bool isOnlyNameStem = false);
+	//! saves sample inside TODO
+	void saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler = true, bool shouldGenerateUniqueName = false, QString* sampleFileFinalName);
+	
+	// exports a sample, only used for replacing old versions of same sample
+	void updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName);
 
-	const static std::string s_sampleFileSourceName;
+	struct SampleFile
+	{
+		SampleFile() :
+			name(""),
+			relativeFolder(""),
+			isManaged(false),
+			isLoaded(false),
+			isSaved(false),
+			buffer()
+		{}
+		//! the Sample's name
+		QString name;
+		QString relativeFolder;
+		//! if it is inside s_usedFolderName or s_unusedFolderName
+		bool isManaged;
+		//! if it was loaded by the project (since the last save)
+		//! used for tracking whether or not a sample file should be moved to the
+		//! `s_usedFolderName` or `s_unusedFolderName` folder
+		bool isLoaded;
+		bool isSaved;
+		//! the sample's audio buffer (nullptr if wasLoaded == false)
+		std::shared_ptr<SampleBuffer> buffer;
+	}
+
+	//! moves the files inside s_usedFolderName and s_unusedFolderName to their correct places
+	//! resets `SampleFile::isLoaded`, `SampleFile::isSaved` and unloads `SampleFile::buffer` if the sample isn't used
+	void sortManagedFiles();
+
 private:
-	//! used for adding a new sample
-	//! sampleInformation: string that's attached at the end of the file name for readability
-	//! returns true if successful
-	bool saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const std::string& sampleFileName);
-	size_t getFileNumber(const std::filesystem::path& sampleFilePath);
 
-	std::filesystem::path m_targetFolderPath;
+	void exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler = true, bool shouldGenerateUniqueName = false, QString* sampleFileFinalName);
+	
+	// returns -1 if not found, returns index if found
+	ssize_t findPathInsideSampleFolder(const QString& filePath);
+	bool isFileInsideSampleFolder(const QString& sampleFileName);
 
-	//! list of used file names inside m_targetFolderPath
-	std::list<std::string> m_loadedFilesList;
+	QString findUniqueName(const QString& sourceName) const;
+	static QString getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace);
+
+	static const QString s_usedFolderName = "/Used";
+	static const QString s_unusedFolderName = "/Unused";
+
+	QString m_targetFolderPath;
+
 	//! list of all file names inside m_targetFolderPath
-	std::list<std::string> m_allFilesList;
+	std::vector<SampleFile> m_sampleFolderFiles;
 };
 
 } // namespace lmms
