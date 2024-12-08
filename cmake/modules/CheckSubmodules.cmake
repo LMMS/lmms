@@ -44,8 +44,8 @@ SET(ENV{LC_ALL} "C")
 SET(ENV{LANG} "en_US")
 
 # Submodule list pairs, unparsed (WARNING: Assumes alpha-numeric paths)
-STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST_RAW ${SUBMODULE_DATA})
-STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_RAW ${SUBMODULE_DATA})
+STRING(REGEX MATCHALL "path = [-0-9A-Za-z/_]+" SUBMODULE_LIST_RAW ${SUBMODULE_DATA})
+STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/_]+" SUBMODULE_URL_RAW ${SUBMODULE_DATA})
 
 # Submodule list pairs, parsed
 SET(SUBMODULE_LIST "")
