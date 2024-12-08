@@ -62,6 +62,10 @@ Clip* AutomationTrack::createClip()
 
 
 
+bool AutomationTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<AutomationClip*>(clip) != nullptr;
+}
 
 void AutomationTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {

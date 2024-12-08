@@ -185,6 +185,10 @@ Clip * SampleTrack::createClip()
 
 
 
+bool SampleTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<SampleClip*>(clip) != nullptr;
+}
 
 void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
 {

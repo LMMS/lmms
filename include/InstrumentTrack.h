@@ -131,6 +131,7 @@ public:
 	// create new track-content-object = clip
 	Clip* createClip() override;
 
+	bool canAddClip(Clip* clip) override;
 
 	// called by track
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;

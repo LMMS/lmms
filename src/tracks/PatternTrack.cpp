@@ -150,6 +150,10 @@ Clip* PatternTrack::createClip()
 }
 
 
+bool PatternTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<PatternClip*>(clip) != nullptr;
+}
 
 
 void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)

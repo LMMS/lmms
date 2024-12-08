@@ -809,6 +809,10 @@ Clip* InstrumentTrack::createClip()
 }
 
 
+bool InstrumentTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<MidiClip*>(clip) != nullptr;
+}
 
 
 gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )

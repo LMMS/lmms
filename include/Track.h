@@ -102,6 +102,7 @@ public:
 
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
 	virtual Clip* createClip() = 0;
+	virtual bool canAddClip(Clip* clip) = 0;
 
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
@@ -118,7 +119,10 @@ public:
 	T* addClip(Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Clip, T>, "T must be a kind of Clip");
+
 		auto clip = new T(std::forward<Args>(args)...);
+		assert(canAddClip(clip) && "This clip cannot be added to this track (incompatible types?)");
+
 		m_clips.push_back(clip);
 		clip->setTrack(this);
 		clip->onAddedToTrack(this);
