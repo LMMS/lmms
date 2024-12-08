@@ -56,16 +56,15 @@ namespace lmms
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-Track::Track( Type type, TrackContainer * tc ) :
-	Model( tc ),                   /*!< The track Model */
-	m_trackContainer( tc ),        /*!< The track container object */
+Track::Track(Type type) :
+	Model(nullptr),                   /*!< The track Model */
+	m_trackContainer(nullptr),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_clips()        /*!< The clips (segments) */
 {	
-	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
 
@@ -90,73 +89,6 @@ Track::~Track()
 	unlock();
 }
 
-
-
-
-/*! \brief Create a track based on the given track type and container.
- *
- *  \param tt The type of track to create
- *  \param tc The track container to attach to
- */
-Track * Track::create( Type tt, TrackContainer * tc )
-{
-	Engine::audioEngine()->requestChangeInModel();
-
-	Track * t = nullptr;
-
-	switch( tt )
-	{
-		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
-		case Type::Pattern: t = new class PatternTrack( tc ); break;
-		case Type::Sample: t = new class SampleTrack( tc ); break;
-//		case Type::Event:
-//		case Type::Video:
-		case Type::Automation: t = new class AutomationTrack( tc ); break;
-		case Type::HiddenAutomation:
-						t = new class AutomationTrack( tc, true ); break;
-		default: break;
-	}
-
-	if (tc == Engine::patternStore() && t)
-	{
-		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
-	}
-
-	tc->updateAfterTrackAdd();
-
-	Engine::audioEngine()->doneChangeInModel();
-
-	return t;
-}
-
-
-
-
-/*! \brief Create a track inside TrackContainer from track type in a QDomElement and restore state from XML
- *
- *  \param element The QDomElement containing the type of track to create
- *  \param tc The track container to attach to
- */
-Track * Track::create( const QDomElement & element, TrackContainer * tc )
-{
-	Engine::audioEngine()->requestChangeInModel();
-
-	Track * t = create(
-		static_cast<Type>( element.attribute( "type" ).toInt() ),
-									tc );
-	if( t != nullptr )
-	{
-		t->restoreState( element );
-	}
-
-	Engine::audioEngine()->doneChangeInModel();
-
-	return t;
-}
-
-
-
-
 /*! \brief Clone a track from this track
  *
  */
@@ -166,10 +98,10 @@ Track* Track::clone()
 	QDomDocument doc;
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
-	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
+	const auto track = m_trackContainer->createTrack(parent.firstChild().toElement());
 
 	AutomationClip::resolveAllIDs();
-	return t;
+	return track;
 }
 
 
@@ -294,9 +226,9 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 			&& node.nodeName() != "solo"
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
-				Clip * clip = createClip(
-								TimePos( 0 ) );
-				clip->restoreState( node.toElement() );
+				auto clip = createClip();
+				clip->movePosition(TimePos{0});
+				clip->restoreState(node.toElement());
 			}
 		}
 		node = node.nextSibling();
@@ -330,25 +262,6 @@ void Track::loadSettings(const QDomElement& element)
 	// Assume that everything should be loaded if we are called through SerializingObject::loadSettings 
 	loadTrack(element, false);
 }
-
-
-
-
-/*! \brief Add another Clip into this track
- *
- *  \param clip The Clip to attach to this track.
- */
-Clip * Track::addClip( Clip * clip )
-{
-	m_clips.push_back( clip );
-
-	emit clipAdded( clip );
-
-	return clip; // just for convenience
-}
-
-
-
 
 /*! \brief Remove a given Clip from this track
  *
@@ -411,8 +324,10 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 	}
 	printf( "called Track::getClip( %zu ), "
 			"but Clip %zu doesn't exist\n", clipNum, clipNum );
-	return createClip( clipNum * TimePos::ticksPerBar() );
 
+	auto clip = createClip();
+	clip->movePosition(clipNum * TimePos::ticksPerBar());
+	return clip;
 }
 
 
@@ -499,8 +414,10 @@ void Track::createClipsForPattern(int pattern)
 	while( numOfClips() < pattern + 1 )
 	{
 		TimePos position = TimePos( numOfClips(), 0 );
-		Clip * clip = createClip( position );
-		clip->changeLength( TimePos( 1, 0 ) );
+
+		auto clip = createClip();
+		clip->movePosition(position);
+		clip->changeLength(TimePos(1, 0));
 	}
 }
 
