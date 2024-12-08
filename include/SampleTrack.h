@@ -41,7 +41,7 @@ class SampleTrackWindow;
 } // namespace gui
 
 
-class SampleTrack : public Track
+class LMMS_EXPORT SampleTrack : public Track
 {
 	Q_OBJECT
 public:
