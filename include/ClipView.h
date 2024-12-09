@@ -122,9 +122,12 @@ public:
 	static void remove( QVector<ClipView *> clipvs );
 	static void toggleMute( QVector<ClipView *> clipvs );
 	static void mergeClips(QVector<ClipView*> clipvs);
+	void fuseRhythm(QVector<ClipView*> clipvs);
 
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	// Returns true if selection can be rhythm fused and false if not
+	bool canFuseRhythm(QVector<ClipView*> clipvs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -148,7 +151,8 @@ protected:
 		Copy,
 		Paste,
 		Mute,
-		Merge
+		Merge,
+		FuseRhythm
 	};
 
 	TrackView * m_trackView;
