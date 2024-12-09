@@ -33,6 +33,9 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
+      - name: Install FFmpeg
+        run: |
+          apt-get --yes install libavcodec-dev libavformat-dev libavutil-dev libavdevice-dev libswresample-dev
       - name: Configure
         run: |
           ccache --zero-stats
@@ -207,6 +210,29 @@ jobs:
             ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
             ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/.ccache
+      - name: Cross Compile FFmpeg
+        run: |
+          apt-get --yes install yasm
+          git clone -c http.sslVerify=false https://git.ffmpeg.org/ffmpeg.git ffmpeg
+
+          if [ ${{ matrix.arch }} == 32 ]; then
+            FFMPEG_CROSS_PREFIX=i686-w64-mingw32
+          elif [ ${{ matrix.arch }} == 64 ]; then
+            FFMPEG_CROSS_PREFIX=x86_64-w64-mingw32
+          fi
+
+          cd ffmpeg
+          ./configure \
+            --arch=x86 \
+            --target-os=mingw32 \
+            --enable-cross-compile \
+            --prefix=/usr/$FFMPEG_CROSS_PREFIX \
+            --cross-prefix=$FFMPEG_CROSS_PREFIX- \
+            --x86asmexe=yasm \
+            --disable-programs \
+            --disable-doc
+          make && make install
+        shell: bash
       - name: Configure
         run: |
           ccache --zero-stats
