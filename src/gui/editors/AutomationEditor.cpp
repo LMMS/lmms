@@ -134,13 +134,12 @@ AutomationEditor::AutomationEditor() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
-		Engine::getSong()->getPlayPos(Song::PlayMode::AutomationClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
 		m_currentPosition, Song::PlayMode::AutomationClip, this
 	);
-	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &AutomationEditor::positionChanged, m_timeLine->timeline(), &Timeline::updatePosition);
+	connect(m_timeLine->timeline(), SIGNAL(positionChanged(const lmms::TimePos&)),
+			this, SLOT(updatePosition(const lmms::TimePos&)));
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -273,23 +272,23 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Left:
-			if( ( m_timeLine->pos() -= 16 ) < 0 )
+			if( ( m_timeLine->timeline()->pos() -= 16 ) < 0 )
 			{
-				m_timeLine->pos().setTicks( 0 );
+				m_timeLine->timeline()->pos().setTicks( 0 );
 			}
-			m_timeLine->updatePosition();
+			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Right:
-			m_timeLine->pos() += 16;
-			m_timeLine->updatePosition();
+			m_timeLine->timeline()->pos() += 16;
+			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLine->timeline()->pos().setTicks( 0 );
+			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
 

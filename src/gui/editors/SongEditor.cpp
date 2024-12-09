@@ -98,13 +98,11 @@ SongEditor::SongEditor( Song * song ) :
 	m_snappingModel->setParent(this);
 
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, Song::PlayMode::Song, this
 	);
-	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &TrackContainerView::positionChanged, m_timeLine->timeline(), &Timeline::updatePosition);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &SongEditor::updatePosition);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),

@@ -113,6 +113,8 @@ Song::Song() :
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
+						SLOT(updateFramesPerTick()));
 /*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
 			this, SLOT(masterPitchChanged()));*/
 
@@ -121,6 +123,7 @@ Song::Song() :
 
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
 	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
+	for (auto& timeline : m_timelines) { connect(this, &Song::bufferProcessed, &timeline, &Timeline::updatePosition, Qt::QueuedConnection); }
 }
 
 
@@ -348,6 +351,8 @@ void Song::processNextBuffer()
 		m_elapsedBars = getPlayPos(PlayMode::Song).getBar();
 		m_elapsedTicks = (getPlayPos(PlayMode::Song).getTicks() % ticksPerBar()) / 48;
 	}
+
+	emit bufferProcessed();
 }
 
 

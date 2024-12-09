@@ -34,6 +34,7 @@
 #include "AudioEngine.h"
 #include "Controller.h"
 #include "Metronome.h"
+#include "PlayPos.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Timeline.h"
@@ -102,36 +103,6 @@ public:
 	void collectError( const QString error );
 	bool hasErrors();
 	QString errorSummary();
-
-	class PlayPos : public TimePos
-	{
-	public:
-		PlayPos( const int abs = 0 ) :
-			TimePos( abs ),
-			m_currentFrame( 0.0f )
-		{
-		}
-		inline void setCurrentFrame( const float f )
-		{
-			m_currentFrame = f;
-		}
-		inline float currentFrame() const
-		{
-			return m_currentFrame;
-		}
-		inline void setJumped( const bool jumped )
-		{
-			m_jumped = jumped;
-		}
-		inline bool jumped() const
-		{
-			return m_jumped;
-		}
-
-	private:
-		float m_currentFrame;
-		bool m_jumped;
-	};
 
 	void processNextBuffer();
 
@@ -259,11 +230,11 @@ public:
 
 	inline PlayPos & getPlayPos( PlayMode pm )
 	{
-		return m_playPos[static_cast<std::size_t>(pm)];
+		return getTimeline(pm).pos();
 	}
 	inline const PlayPos & getPlayPos( PlayMode pm ) const
 	{
-		return m_playPos[static_cast<std::size_t>(pm)];
+		return getTimeline(pm).pos();
 	}
 	inline PlayPos & getPlayPos()
 	{
@@ -492,7 +463,6 @@ private:
 	std::array<Timeline, PlayModeCount> m_timelines;
 
 	PlayMode m_playMode;
-	PlayPos m_playPos[PlayModeCount];
 	bar_t m_length;
 
 	const MidiClip* m_midiClipToPlay;
@@ -527,6 +497,7 @@ signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
+	void bufferProcessed();
 	void lengthChanged( int bars );
 	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );

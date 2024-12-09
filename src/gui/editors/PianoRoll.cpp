@@ -278,13 +278,12 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &PianoRoll::positionChanged, m_timeLine->timeline(), &Timeline::updatePosition);
+	connect(m_timeLine->timeline(), SIGNAL(positionChanged( const lmms::TimePos&)),
+			this, SLOT(updatePosition(const lmms::TimePos&)));
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this);
@@ -294,7 +293,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -1438,8 +1437,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLine->timeline()->pos().setTicks( 0 );
+			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
 
@@ -4426,7 +4425,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
+			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->timeline()->pos(), quantization() ) );
 
 			// select it
 			cur_note.setSelected( true );
@@ -4504,7 +4503,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->timeline()->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{

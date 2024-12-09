@@ -27,7 +27,7 @@
 #include <QObject>
 
 #include "JournallingObject.h"
-#include "TimePos.h"
+#include "PlayPos.h"
 
 namespace lmms {
 
@@ -42,6 +42,16 @@ public:
 		BackToStart,
 		KeepPosition
 	};
+
+	inline PlayPos & pos()
+	{
+		return m_pos;
+	}
+
+	inline const PlayPos & pos() const
+	{
+		return m_pos;
+	}
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
@@ -65,6 +75,9 @@ signals:
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
 	void positionChanged(const lmms::TimePos& position);
 
+public slots:
+	void updatePosition();
+
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
@@ -73,6 +86,7 @@ private:
 	TimePos m_loopBegin = TimePos{0};
 	TimePos m_loopEnd = TimePos{DefaultTicksPerBar};
 	bool m_loopEnabled = false;
+	PlayPos m_pos = PlayPos{0};
 
 	StopBehaviour m_stopBehaviour = StopBehaviour::BackToStart;
 	TimePos m_playStartPosition = TimePos{-1};
