@@ -54,7 +54,7 @@ public:
 private:
 	DspEffectLibrary::StereoEnhancer m_seFX;
 	
-	SampleFrame* m_delayBuffer;
+	std::vector<SampleFrame> m_delayBuffer;
 	int m_currFrame;
 	
 	StereoEnhancerControls m_bbControls;

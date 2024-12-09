@@ -83,18 +83,10 @@ public:
 
 	void processNextBuffer();
 
-	virtual void startProcessing()
-	{
-		m_inProcess = true;
-	}
-
+	virtual void startProcessing();
 	virtual void stopProcessing();
 
 protected:
-	// subclasses can re-implement this for being used in conjunction with
-	// processNextBuffer()
-	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
-
 	// called by according driver for fetching new sound-data
 	fpp_t getNextBuffer(SampleFrame* _ab);
 
@@ -130,12 +122,7 @@ private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	AudioEngine* m_audioEngine;
-	bool m_inProcess;
-
 	QMutex m_devMutex;
-
-	SampleFrame* m_buffer;
-
 };
 
 } // namespace lmms

@@ -38,7 +38,8 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 					AudioEngine*  _audioEngine ) :
 	AudioDevice( _channels, _audioEngine ),
 	m_outputFile( _file ),
-	m_outputSettings(outputSettings)
+	m_outputSettings(outputSettings),
+	m_buffer(std::make_unique<SampleFrame[]>(_audioEngine->framesPerPeriod()))
 {
 	using gui::ExportProjectDialog;
 
@@ -89,6 +90,14 @@ int AudioFileDevice::writeData( const void* data, int len )
 	}
 
 	return -1;
+}
+
+void AudioFileDevice::processNextBuffer()
+{
+	if (const auto frames = getNextBuffer(m_buffer.get()); frames > 0)
+	{
+		writeBuffer(m_buffer.get(), frames);
+	}
 }
 
 } // namespace lmms
