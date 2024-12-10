@@ -28,9 +28,11 @@
 #include <QMenu>
 #include <QPainter>
 
+#include "AudioEngine.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -77,9 +79,12 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 {
 	cm->addSeparator();
 
-	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
-				tr( "Set/clear record" ),
-						m_clip, SLOT(toggleRecord()));*/
+
+	QAction* recordToggleAction = cm->addAction(embed::getIconPixmap("record"),
+                          tr("Set/clear record"),
+                          m_clip, &SampleClip::toggleRecord);
+	
+	recordToggleAction->setEnabled(recordingCapabilitiesAvailable());
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -306,18 +311,34 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 	// recording sample tracks is not possible at the moment
 
-	/* if( m_clip->isRecord() )
+	if (m_clip->isRecord())
 	{
-		p.setFont( pointSize<7>( p.font() ) );
+		p.setFont(adjustedToPixelSize(p.font(), 10));
 
-		p.setPen( textShadowColor() );
-		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( textColor() );
-		p.drawText( 9, p.fontMetrics().height(), "Rec" );
+		const auto fontHeight = p.fontMetrics().height();
 
-		p.setBrush( QBrush( textColor() ) );
-		p.drawEllipse( 4, 5, 4, 4 );
-	}*/
+		const auto baseLine = height() - 3;
+
+		constexpr int recordSymbolRadius = 3;
+		constexpr int recordSymbolCenterX = recordSymbolRadius + 4;
+		const int recordSymbolCenterY = baseLine - fontHeight / 2 + 1;
+
+		constexpr int textStartX = recordSymbolCenterX + recordSymbolRadius + 4;
+
+		auto textPos = QPoint(textStartX, baseLine);
+
+		const auto rec = tr("Rec");
+
+		p.setPen(textShadowColor());
+		p.drawText(textPos + QPoint(1, 1), rec);
+
+		p.setPen(textColor());
+		p.drawText(textPos, rec);
+
+		p.setBrush(QBrush(textColor()));
+
+		p.drawEllipse(QPoint(recordSymbolCenterX, recordSymbolCenterY), recordSymbolRadius, recordSymbolRadius);
+	}
 
 	p.end();
 
@@ -376,5 +397,9 @@ bool SampleClipView::splitClip( const TimePos pos )
 	else { return false; }
 }
 
+bool SampleClipView::recordingCapabilitiesAvailable() const
+{
+	return Engine::audioEngine()->captureDeviceAvailable();
+}
 
 } // namespace lmms::gui
