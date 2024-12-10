@@ -1431,19 +1431,21 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 	std::sort(melodyNotes.begin(), melodyNotes.end(), [](Note a, Note b){ return a.pos() < b.pos(); });
 	std::sort(rhythmNotes.begin(), rhythmNotes.end(), [](Note a, Note b){ return a.pos() < b.pos(); });
 
-	TimePos lastTime = TimePos(0);
-	int noteCount = 0;
-	for (Note note : melodyNotes)
+	size_t noteCount = 0;
+	for (auto it = melodyNotes.begin(); it != melodyNotes.end(); ++it)
 	{
-		Note* newNote = newMidiClip->addNote(note, false);
-		Note rhythmNote = rhythmNotes.at(noteCount);
-		newNote->setPos(rhythmNote.pos());
-		newNote->setLength(rhythmNote.length());
-		newNote->setVolume(rhythmNote.getVolume());
-		newNote->setPanning(rhythmNote.getPanning());
-
-		// Only increment if the notes are at different times (not a chord)
-		if (note.pos() > lastTime) { noteCount++; lastTime = note.pos(); }
+		Note* newNote = newMidiClip->addNote(*it, false);
+		
+		if (noteCount < rhythmNotes.size())
+		{
+			Note rhythmNote = rhythmNotes.at(noteCount);
+			newNote->setPos(rhythmNote.pos());
+			newNote->setLength(rhythmNote.length());
+			newNote->setVolume(rhythmNote.getVolume());
+			newNote->setPanning(rhythmNote.getPanning());
+		}
+		// Only increment if the next note is at a different time (to prevent chords from getting split up)
+		if ((*it).pos() != (*std::next(it, 1)).pos()) { noteCount++; }
 	}
 	// Update length since we might have moved notes beyond the end of the MidiClip length
 	newMidiClip->updateLength();
