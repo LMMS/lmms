@@ -1414,7 +1414,6 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 				movedNote.setPos(movedNote.pos() + clipOffset);
 				melodyNotes.push_back(movedNote);
 			}
-			clipv->getClip()->saveJournallingState(false);
 			clipv->remove();
 		}
 		else if (mclip->getTrack() == rhythmTrack)
