@@ -1361,19 +1361,21 @@ bool ClipView::canFuseRhythm(QVector<ClipView*> clipvs)
 
 void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 {
-	auto melodyClip = dynamic_cast<MidiClip*>(getClip());
-	auto rhythmClip = clipvs.at(0) == this?
-		dynamic_cast<MidiClip*>(clipvs.at(1)->getClip()) :
-		dynamic_cast<MidiClip*>(clipvs.at(0)->getClip());
-	
-	auto melodyTrack = melodyClip->getTrack();
-	auto rhythmTrack = rhythmClip->getTrack();
+	Track* melodyTrack = this->getClip()->getTrack();
+	Track* rhythmTrack;
+	for (ClipView* clipv : clipvs)
+	{
+		if (clipv->getClip()->getTrack() != melodyTrack) { rhythmTrack = clipv->getClip()->getTrack(); break; }
+	}
 
 	if (!melodyTrack || !rhythmTrack)
 	{
 		qWarning("Warning: Couldn't retrieve melody or rhythm InstrumentTrack in fuseRhythm()");
 		return;
 	}
+	// For Undo/Redo
+	melodyTrack->addJournalCheckPoint();
+	melodyTrack->saveJournallingState(false);
 
 
 	// Find the earliest position of all the selected ClipVs
@@ -1384,16 +1386,23 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 				b->getClip()->startPosition();
 		}
 	);
-
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
-	
-	// Collect all the notes in each group of clips
+	// Create a clip where all notes will be added
+	auto newMidiClip = dynamic_cast<MidiClip*>(melodyTrack->createClip(earliestPos));
+	if (!newMidiClip)
+	{
+		qWarning("Warning: Failed to convert Clip to MidiClip on fuseRhythm");
+		return;
+	}
+	newMidiClip->saveJournallingState(false);
+
 	std::vector<Note> melodyNotes;
 	std::vector<Note> rhythmNotes;
+	// Add all notes in every clip into their respective vectors
 	for (auto& clipv : clipvs)
 	{
 		MidiClip* mclip = dynamic_cast<MidiClip*>(clipv->getClip());
-		if (!mclip) { qWarning("Warning: Couldn't convert Clip to MidiClip in fuseRhythm"); continue; }
+		if (!mclip) { qWarning("Warning: Failed to convert Clip to MidiClip in fuseRhythm"); continue; }
 
 		if (mclip->getTrack() == melodyTrack)
 		{
@@ -1405,6 +1414,7 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 				movedNote.setPos(movedNote.pos() + clipOffset);
 				melodyNotes.push_back(movedNote);
 			}
+			clipv->getClip()->saveJournallingState(false);
 			clipv->remove();
 		}
 		else if (mclip->getTrack() == rhythmTrack)
@@ -1422,22 +1432,8 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 	std::sort(melodyNotes.begin(), melodyNotes.end(), [](Note a, Note b){ return a.pos() < b.pos(); });
 	std::sort(rhythmNotes.begin(), rhythmNotes.end(), [](Note a, Note b){ return a.pos() < b.pos(); });
 
-	// For Undo/Redo
-	melodyTrack->addJournalCheckPoint();
-	melodyTrack->saveJournallingState(false);
-
-	// Create a clip where all notes will be added
-	auto newMidiClip = dynamic_cast<MidiClip*>(melodyTrack->createClip(melodyClip->startPosition()));
-	if (!newMidiClip)
-	{
-		qWarning("Warning: Failed to convert Clip to MidiClip on fuseRhythm");
-		return;
-	}
-	newMidiClip->saveJournallingState(false);
-
 	TimePos lastTime = TimePos(0);
 	int noteCount = 0;
-	// Iterate to the min number of notes in either clip (TODO: maybe rhythm implicitly loop via modulo if the melody is too long?)
 	for (Note note : melodyNotes)
 	{
 		Note* newNote = newMidiClip->addNote(note, false);
