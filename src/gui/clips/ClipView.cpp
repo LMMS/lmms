@@ -1362,13 +1362,13 @@ bool ClipView::canFuseRhythm(QVector<ClipView*> clipvs)
 void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 {
 	Track* melodyTrack = this->getClip()->getTrack();
-	Track* rhythmTrack;
+	Track* rhythmTrack = melodyTrack; // Temporary initialization
 	for (ClipView* clipv : clipvs)
 	{
 		if (clipv->getClip()->getTrack() != melodyTrack) { rhythmTrack = clipv->getClip()->getTrack(); break; }
 	}
 
-	if (!melodyTrack || !rhythmTrack)
+	if (!melodyTrack || melodyTrack == rhythmTrack)
 	{
 		qWarning("Warning: Couldn't retrieve melody or rhythm InstrumentTrack in fuseRhythm()");
 		return;
