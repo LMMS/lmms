@@ -1346,8 +1346,7 @@ bool ClipView::canFuseRhythm(QVector<ClipView*> clipvs)
 {
 	// Can only fuse rhythm from one clip to another.
 	// TODO change this someday to allow multiple clips on the same tracks.
-	if (clipvs.size() != 2) { return false; }
-	if (this != clipvs.at(0) && this != clipvs.at(1)) { return false; }
+	if (clipvs.size() < 2) { return false; }
 
 	// We check if the owner of the first Clip is an Instrument Track
 	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(clipvs.at(0)->getTrackView());
@@ -1365,26 +1364,70 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 	auto melodyClip = dynamic_cast<MidiClip*>(getClip());
 	auto rhythmClip = clipvs.at(0) == this?
 		dynamic_cast<MidiClip*>(clipvs.at(1)->getClip()) :
-		dynamic_cast<MidiClip*>(clipvs.at(1)->getClip());
+		dynamic_cast<MidiClip*>(clipvs.at(0)->getClip());
+	
+	auto melodyTrack = melodyClip->getTrack();
+	auto rhythmTrack = rhythmClip->getTrack();
 
-	// Get the track with the melody Clip in it
-	auto track = dynamic_cast<InstrumentTrack*>(melodyClip->getTrack());
-
-	if (!track)
+	if (!melodyTrack || !rhythmTrack)
 	{
-		qWarning("Warning: Couldn't retrieve melody InstrumentTrack in fuseRhythm()");
+		qWarning("Warning: Couldn't retrieve melody or rhythm InstrumentTrack in fuseRhythm()");
 		return;
 	}
 
-	int numberNotesOfMelody = melodyClip->notes().size();
-	int numberNotesOfRhythm = rhythmClip->notes().size();
+
+	// Find the earliest position of all the selected ClipVs
+	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
+		[](ClipView* a, ClipView* b)
+		{
+			return a->getClip()->startPosition() <
+				b->getClip()->startPosition();
+		}
+	);
+
+	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
+	
+	// Collect all the notes in each group of clips
+	std::vector<Note> melodyNotes;
+	std::vector<Note> rhythmNotes;
+	for (auto& clipv : clipvs)
+	{
+		MidiClip* mclip = dynamic_cast<MidiClip*>(clipv->getClip());
+		if (!mclip) { qWarning("Warning: Couldn't convert Clip to MidiClip in fuseRhythm"); continue; }
+
+		if (mclip->getTrack() == melodyTrack)
+		{
+			TimePos clipOffset = mclip->startPosition() - earliestPos;
+			for (Note const* note : mclip->notes())
+			{
+				auto movedNote = Note{*note};
+				// Move note to be relative to start of first clip
+				movedNote.setPos(movedNote.pos() + clipOffset);
+				melodyNotes.push_back(movedNote);
+			}
+			clipv->remove();
+		}
+		else if (mclip->getTrack() == rhythmTrack)
+		{
+			TimePos clipOffset = mclip->startPosition() - earliestPos;
+			for (Note const* note : mclip->notes())
+			{
+				auto movedNote = Note{*note};
+				// Move note to be relative to start of first clip
+				movedNote.setPos(movedNote.pos() + clipOffset);
+				rhythmNotes.push_back(movedNote);
+			}
+		}
+	}
+	std::sort(melodyNotes.begin(), melodyNotes.end(), [](Note a, Note b){ return a.pos() < b.pos(); });
+	std::sort(rhythmNotes.begin(), rhythmNotes.end(), [](Note a, Note b){ return a.pos() < b.pos(); });
 
 	// For Undo/Redo
-	track->addJournalCheckPoint();
-	track->saveJournallingState(false);
+	melodyTrack->addJournalCheckPoint();
+	melodyTrack->saveJournallingState(false);
 
 	// Create a clip where all notes will be added
-	auto newMidiClip = dynamic_cast<MidiClip*>(track->createClip(melodyClip->startPosition()));
+	auto newMidiClip = dynamic_cast<MidiClip*>(melodyTrack->createClip(melodyClip->startPosition()));
 	if (!newMidiClip)
 	{
 		qWarning("Warning: Failed to convert Clip to MidiClip on fuseRhythm");
@@ -1395,34 +1438,25 @@ void ClipView::fuseRhythm(QVector<ClipView*> clipvs)
 	TimePos lastTime = TimePos(0);
 	int noteCount = 0;
 	// Iterate to the min number of notes in either clip (TODO: maybe rhythm implicitly loop via modulo if the melody is too long?)
-	for (int i = 0; i < std::min(numberNotesOfMelody, numberNotesOfRhythm); i++)
+	for (Note note : melodyNotes)
 	{
-		Note* newNote = newMidiClip->addNote(*melodyClip->notes().at(noteCount), false);
-
-		TimePos rhythmNotePos = rhythmClip->notes().at(noteCount)->pos();
-		newNote->setPos(rhythmNotePos);
-
-		TimePos rhythmNoteLength = rhythmClip->notes().at(noteCount)->length();
-		newNote->setLength(rhythmNoteLength);
-
-		auto rhythmNoteVolume = rhythmClip->notes().at(noteCount)->getVolume();
-		newNote->setVolume(rhythmNoteVolume);
-
-		auto rhythmNotePanning = rhythmClip->notes().at(noteCount)->getPanning();
-		newNote->setPanning(rhythmNotePanning);
+		Note* newNote = newMidiClip->addNote(note, false);
+		Note rhythmNote = rhythmNotes.at(noteCount);
+		newNote->setPos(rhythmNote.pos());
+		newNote->setLength(rhythmNote.length());
+		newNote->setVolume(rhythmNote.getVolume());
+		newNote->setPanning(rhythmNote.getPanning());
 
 		// Only increment if the notes are at different times (not a chord)
-		if (newNote->pos() > lastTime) { noteCount++; }
+		if (note.pos() > lastTime) { noteCount++; lastTime = note.pos(); }
 	}
-	// Remove old Clip
-	this->remove();
 	// Update length since we might have moved notes beyond the end of the MidiClip length
 	newMidiClip->updateLength();
 	// Rearrange notes because we might have moved them
 	newMidiClip->rearrangeAllNotes();
 	// Restore journalling states now that the operation is finished
 	newMidiClip->restoreJournallingState();
-	track->restoreJournallingState();
+	melodyTrack->restoreJournallingState();
 	// Update song
 	Engine::getSong()->setModified();
 	getGUI()->songEditor()->update();
