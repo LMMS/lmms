@@ -170,9 +170,7 @@ jobs:
   mingw:
     strategy:
       fail-fast: false
-      matrix:
-        arch: ['32', '64']
-    name: mingw${{ matrix.arch }}
+    name: mingw64
     runs-on: ubuntu-latest
     container: ghcr.io/lmms/linux.mingw:20.04
     env:
@@ -201,11 +199,11 @@ jobs:
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+          key: "ccache-${{ github.job }}-64-${{ github.ref }}\
             -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
-            ccache-${{ github.job }}-${{ matrix.arch }}-
+            ccache-${{ github.job }}-64-${{ github.ref }}-
+            ccache-${{ github.job }}-64-
           path: ~/.ccache
       - name: Configure
         run: |
@@ -213,7 +211,7 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_INSTALL_PREFIX=./install \
-                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-${{ matrix.arch }}.cmake" \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -222,7 +220,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mingw${{ matrix.arch }}
+          name: mingw64
           path: build/lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
