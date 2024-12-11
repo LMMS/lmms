@@ -282,8 +282,7 @@ PianoRoll::PianoRoll() :
 		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
 	connect(this, &PianoRoll::positionChanged, m_timeLine->timeline(), &Timeline::updatePosition);
-	connect(m_timeLine->timeline(), SIGNAL(positionChanged( const lmms::TimePos&)),
-			this, SLOT(updatePosition(const lmms::TimePos&)));
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this);
@@ -4540,7 +4539,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 		}
 		if( (int) pos > 0 )
 		{
-			s->getTimeline( Song::PlayMode::MidiClip ).setTicks( pos );
+			s->getTimeline(Song::PlayMode::MidiClip).setTicks(pos);
 			autoScroll( pos );
 		}
 	}

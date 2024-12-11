@@ -228,11 +228,11 @@ public:
 		return m_playMode;
 	}
 
-	inline const PlayPos getPlayPos( PlayMode pm ) const
+	inline const PlayPos & getPlayPos( PlayMode pm ) const
 	{
 		return getTimeline(pm).getPlayPos();
 	}
-	inline const PlayPos getPlayPos() const
+	inline const PlayPos & getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
 	}

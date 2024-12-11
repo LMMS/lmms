@@ -47,7 +47,7 @@ public:
 	{
 		return m_pos;
 	}
-	inline void setPlayPos(PlayPos pos) const
+	inline void setPlayPos(PlayPos pos)
 	{
 		m_pos = pos;
 		emit positionChanged(m_pos);
