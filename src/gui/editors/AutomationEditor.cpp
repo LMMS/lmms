@@ -272,22 +272,26 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Left:
-			if( ( m_timeLine->timeline()->pos() -= 16 ) < 0 )
+			if(m_timeLine->timeline()->getTicks() - 16 > 0)
 			{
-				m_timeLine->timeline()->pos().setTicks( 0 );
+				m_timeLine->timeline()->setTicks(m_timeLine->timeline()->getTicks() - 16);
+			}
+			else
+			{
+				m_timeLine->timeline()->setTicks(0);
 			}
 			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Right:
-			m_timeLine->timeline()->pos() += 16;
+			m_timeLine->timeline()->setTicks(m_timeLine->timeline()->getTicks() + 16);
 			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->timeline()->pos().setTicks( 0 );
+			m_timeLine->timeline()->setTicks(0);
 			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;

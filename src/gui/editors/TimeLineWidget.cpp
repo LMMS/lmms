@@ -214,12 +214,12 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	}
 
 	// Only draw the position marker if the position line is in view
-	if (markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - m_posMarkerPixmap.width() / 2)
+	if (markerX(m_timeline->getPlayPos()) >= m_xOffset && markerX(m_timeline->getPlayPos()) < width() - m_posMarkerPixmap.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_timeline->pos()) - (m_posMarkerPixmap.width() / 2),
+		p.drawPixmap(markerX(m_timeline->getPlayPos()) - (m_posMarkerPixmap.width() / 2),
 			height() - m_posMarkerPixmap.height(), m_posMarkerPixmap);
 	}
 }
@@ -326,15 +326,15 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	switch( m_action )
 	{
 		case Action::MovePositionMarker:
-			m_timeline->pos().setTicks(timeAtCursor.getTicks());
+			m_timeline->setTicks(timeAtCursor.getTicks());
 			Engine::getSong()->setToTime(timeAtCursor, m_mode);
 			if (!( Engine::getSong()->isPlaying()))
 			{
 				//Song::PlayMode::None is used when nothing is being played.
 				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
 			}
-			m_timeline->pos().setCurrentFrame( 0 );
-			m_timeline->pos().setJumped( true );
+			m_timeline->setCurrentFrame(0);
+			m_timeline->setJumped(true);
 			update();
 			break;
 

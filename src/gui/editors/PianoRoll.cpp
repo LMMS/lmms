@@ -293,7 +293,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -1437,7 +1437,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->timeline()->pos().setTicks( 0 );
+			m_timeLine->timeline()->setTicks(0);
 			m_timeLine->timeline()->updatePosition();
 			ke->accept();
 			break;
@@ -4425,7 +4425,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->timeline()->pos(), quantization() ) );
+			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->timeline()->getPlayPos(), quantization() ) );
 
 			// select it
 			cur_note.setSelected( true );
@@ -4503,7 +4503,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->timeline()->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->timeline()->getPlayPos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
@@ -4540,7 +4540,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 		}
 		if( (int) pos > 0 )
 		{
-			s->getPlayPos( Song::PlayMode::MidiClip ).setTicks( pos );
+			s->getTimeline( Song::PlayMode::MidiClip ).setTicks( pos );
 			autoScroll( pos );
 		}
 	}

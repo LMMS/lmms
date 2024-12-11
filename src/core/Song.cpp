@@ -187,6 +187,7 @@ void Song::setTimeSignature()
 
 void Song::savePlayStartPosition()
 {
+	// TODO simplify
 	getTimeline().setPlayStartPosition(getPlayPos());
 }
 
@@ -262,7 +263,7 @@ void Song::processNextBuffer()
 	{
 		m_vstSyncController.setPlaybackJumped(true);
 		emit updateSampleTracks();
-		getPlayPos().setJumped(false);
+		getTimeline().setJumped(false);
 	}
 
 	const auto framesPerTick = Engine::framesPerTick();
@@ -279,9 +280,9 @@ void Song::processNextBuffer()
 		{
 			// Transfer any whole ticks from the frame count to the tick count
 			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
-			getPlayPos().setTicks(getPlayPos().getTicks() + elapsedTicks);
+			getTimeline().setTicks(getPlayPos().getTicks() + elapsedTicks);
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
-			getPlayPos().setCurrentFrame(frameOffsetInTick);
+			getTimeline().setCurrentFrame(frameOffsetInTick);
 
 			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
@@ -344,7 +345,7 @@ void Song::processNextBuffer()
 		// Update frame counters
 		frameOffsetInPeriod += framesToPlay;
 		frameOffsetInTick += framesToPlay;
-		getPlayPos().setCurrentFrame(frameOffsetInTick);
+		getTimeline().setCurrentFrame(frameOffsetInTick);
 		m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] += TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
 		m_elapsedBars = getPlayPos(PlayMode::Song).getBar();
 		m_elapsedTicks = (getPlayPos(PlayMode::Song).getTicks() % ticksPerBar()) / 48;
@@ -605,9 +606,9 @@ void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 	tick_t ticksFromPlayMode = getPlayPos(playMode).getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
 	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
-	getPlayPos(playMode).setTicks( ticks );
-	getPlayPos(playMode).setCurrentFrame( 0.0f );
-	getPlayPos(playMode).setJumped( true );
+	getTimeline(playMode).setTicks( ticks );
+	getTimeline(playMode).setCurrentFrame( 0.0f );
+	getTimeline(playMode).setJumped( true );
 
 // send a signal if playposition changes during playback
 	if( isPlaying() )
@@ -663,14 +664,14 @@ void Song::stop()
 	switch (timeline.stopBehaviour())
 	{
 		case Timeline::StopBehaviour::BackToZero:
-			getPlayPos().setTicks(0);
+			getTimeline().setTicks(0);
 			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
 			break;
 
 		case Timeline::StopBehaviour::BackToStart:
 			if (timeline.playStartPosition() >= 0)
 			{
-				getPlayPos().setTicks(timeline.playStartPosition().getTicks());
+				getTimeline().setTicks(timeline.playStartPosition().getTicks());
 				setToTime(timeline.playStartPosition());
 
 				timeline.setPlayStartPosition(-1);
@@ -682,9 +683,9 @@ void Song::stop()
 	}
 
 	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)] = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
-	getPlayPos(PlayMode::None).setTicks(getPlayPos().getTicks());
+	getTimeline(PlayMode::None).setTicks(getPlayPos().getTicks());
 
-	getPlayPos().setCurrentFrame( 0 );
+	getTimeline().setCurrentFrame( 0 );
 
 	m_vstSyncController.setPlaybackState( m_exporting );
 	m_vstSyncController.setAbsolutePosition(
@@ -729,7 +730,7 @@ void Song::startExport()
 		m_exportSongBegin = m_exportLoopBegin = timeline.loopBegin();
 		m_exportSongEnd = m_exportLoopEnd = timeline.loopEnd();
 
-		getPlayPos(PlayMode::Song).setTicks(timeline.loopBegin().getTicks());
+		getTimeline(PlayMode::Song).setTicks(timeline.loopBegin().getTicks());
 	}
 	else
 	{
@@ -752,7 +753,7 @@ void Song::startExport()
 			? timeline.loopEnd()
 			: TimePos{0};
 
-		getPlayPos(PlayMode::Song).setTicks( 0 );
+		getTimeline(PlayMode::Song).setTicks( 0 );
 	}
 
 	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) 

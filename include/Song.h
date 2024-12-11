@@ -129,7 +129,7 @@ public:
 	inline void setToTime(TimePos const & pos, PlayMode playMode)
 	{
 		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = pos.getTimeInMilliseconds(getTempo());
-		getPlayPos(playMode).setTicks(pos.getTicks());
+		getTimeline(playMode).setTicks(pos.getTicks());
 	}
 
 	inline void setToTimeByTicks(tick_t ticks)
@@ -140,7 +140,7 @@ public:
 	inline void setToTimeByTicks(tick_t ticks, PlayMode playMode)
 	{
 		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds(ticks, getTempo());
-		getPlayPos(playMode).setTicks(ticks);
+		getTimeline(playMode).setTicks(ticks);
 	}
 
 	inline int getBars() const
@@ -228,19 +228,11 @@ public:
 		return m_playMode;
 	}
 
-	inline PlayPos & getPlayPos( PlayMode pm )
+	inline const PlayPos getPlayPos( PlayMode pm ) const
 	{
-		return getTimeline(pm).pos();
+		return getTimeline(pm).getPlayPos();
 	}
-	inline const PlayPos & getPlayPos( PlayMode pm ) const
-	{
-		return getTimeline(pm).pos();
-	}
-	inline PlayPos & getPlayPos()
-	{
-		return getPlayPos(m_playMode);
-	}
-	inline const PlayPos & getPlayPos() const
+	inline const PlayPos getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
 	}
