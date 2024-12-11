@@ -26,16 +26,19 @@
 
 #include <array>
 #include <filesystem>
+#include <string>
 
 #include <QFileInfo>
 
 #include "LmmsExporterSample.h"
+#include "SampleBuffer.h"
 #include "SampleLoader.h"
 
 namespace lmms
 {
 
-QString SampleFolder::s_sampleFileSourceName = "LOAD_WITH_SAMPLEFOLDER";
+const QString SampleFolder::s_usedFolderName = "/Used";
+const QString SampleFolder::s_unusedFolderName = "/Unused";
 
 SampleFolder::SampleFolder(const QString& folderPath)
 {
@@ -56,18 +59,20 @@ void SampleFolder::updateAllFilesList()
 {
 	m_sampleFolderFiles.clear();
 	const std::array<QString, 3> filePaths = {QString(), s_usedFolderName, s_unusedFolderName};
-	for (size_t i = 0; i < filePaths.size(), i++)
+	for (size_t i = 0; i < filePaths.size(); i++)
 	{
 		// TODO check if folder exists
-		std::filesystem::path curPath(m_targetFolderPath.toStdU16String() + filePaths[i]);
+		std::filesystem::path curPath((m_targetFolderPath + filePaths[i]).toStdU16String());
 		for (const auto& entry : std::filesystem::directory_iterator(curPath))
 		{
 			if (std::filesystem::is_regular_file(curPath) == false
 				&& entry.path().extension() == ".flac")
 			{
 				// adding filenames with extensions to m_sampleFolderFiles
-				m_sampleFolderFiles.push_back(entry.path().filename());
-				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].name = entry.path().fileName();
+				m_sampleFolderFiles.push_back(SampleFile());
+				std::string temp = entry.path().filename();
+				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].name =
+					QString::fromUtf8(static_cast<std::string>(entry.path().filename()).c_str());
 				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].relativeFolder = filePaths[i];
 				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].isManaged = i > 0;
 			}
@@ -77,51 +82,51 @@ void SampleFolder::updateAllFilesList()
 
 // retruns loaded sample or nullptr if not found
 // TODO: decide if sample is in the sample folder
-std::shared_ptr<SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName)
+std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName)
 {
-	std::shared_ptr<SampleBuffer> output = nullptr;
+	std::shared_ptr<const SampleBuffer> output = nullptr;
 	QString filteredSampleFileName(QFileInfo(sampleFileName).fileName());
-	ssize_t index = isFileInsideSampleFolder(filteredSampleFileName);
+	ssize_t index = findFileInsideSampleFolder(filteredSampleFileName);
 	if (index >= 0)
 	{
 		if (m_sampleFolderFiles[index].isLoaded == false)
 		{
-			m_sampleFolderFiles[index].buffer = SampleLoader::createBufferFromFile(m_targetFolderPath + m_sampleFolderFiles[index].relativeFolder + filteredSampleFileName);
+			m_sampleFolderFiles[index].buffer = gui::SampleLoader::createBufferFromFile(m_targetFolderPath + m_sampleFolderFiles[index].relativeFolder + filteredSampleFileName);
 			m_sampleFolderFiles[index].isLoaded = true;
 		}
 		output = m_sampleFolderFiles[index].buffer;
 	}
 	else
 	{
-		output = SampleLoader::createBufferFromFile(sampleFileName);
+		output = gui::SampleLoader::createBufferFromFile(sampleFileName);
 	}
 	return output;
 }
 
-void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler = true, bool shouldGenerateUniqueName = false, QString* sampleFileFinalName)
+void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
-	ssize_t index = isFileInsideSampleFolder(filteredSampleFileName);
+	ssize_t index = findFileInsideSampleFolder(sampleFileName);
 	if (shouldGenerateUniqueName && index >= 0)
 	{
 		m_sampleFolderFiles[index].isSaved = true;
 	}
 	else
 	{
-		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFolder, shouldGenerateUniqueName, sampleFileFinalName);
+		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFodler, shouldGenerateUniqueName, sampleFileFinalName);
 	}
 }
 
 // exports a sample, only used for replacing old versions of same sample
 void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName)
 {
-	ssize_t index = isFileInsideSampleFolder(filteredSampleFileName);
+	ssize_t index = findFileInsideSampleFolder(sampleFileName);
 	if (index >= 0)
 	{
 		exportSample(sampleBuffer, sampleFileName, m_sampleFolderFiles[index].isManaged, false, nullptr);
 	}
 }
 
-void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler = true, bool shouldGenerateUniqueName = false, QString* sampleFileFinalName)
+void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
 	
 }
@@ -139,9 +144,9 @@ bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)
 	bool found = curFolderAsString.size() <= curFileAsString.size();
 	if (found)
 	{
-		for (size_t i = 0; i < curFolderAsString.size(); i++)
+		for (int i = 0; i < curFolderAsString.size(); i++)
 		{
-			if (curFolderAsString[i] != curFileAsString[i])
+			if (curFolderAsString.at(i) != curFileAsString.at(i))
 			{
 				found = false;
 				break;
@@ -153,16 +158,16 @@ bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)
 
 ssize_t SampleFolder::findFileInsideSampleFolder(const QString& sampleFileName)
 {
-	bool found = false;
-	for (SampleFolder::SampleFile& it : m_sampleFoldeFiles)
+	ssize_t index = -1;
+	for (size_t i = 0; i < m_sampleFolderFiles.size(); i++)
 	{
-		if (it.name == sampleFileName)
+		if (m_sampleFolderFiles[i].name == sampleFileName)
 		{
-			found = true;
+			index = i;
 			break;
 		}
 	}
-	return found;
+	return index;
 }
 
 QString SampleFolder::findUniqueName(const QString& sourceName) const
@@ -185,7 +190,7 @@ QString SampleFolder::findUniqueName(const QString& sourceName) const
 	{
 		if (it.name.startsWith(output))
 		{
-			size_t nameCount = SampleFolder::getNameNumberEnding(it->name).toInt();
+			size_t nameCount = SampleFolder::getNameNumberEnding(it.name, nullptr).toInt();
 			maxNameCounter = maxNameCounter < nameCount ? nameCount : maxNameCounter;
 			found = true;
 		}
