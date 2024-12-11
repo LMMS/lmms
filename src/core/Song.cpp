@@ -113,8 +113,6 @@ Song::Song() :
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
-	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
-						SLOT(updateFramesPerTick()));
 /*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
 			this, SLOT(masterPitchChanged()));*/
 

@@ -162,7 +162,6 @@ signals:
 	void selectionFinished();
 
 public slots:
-	void updatePositionYAY();
 	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;

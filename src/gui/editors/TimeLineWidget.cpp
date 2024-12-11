@@ -62,13 +62,9 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 
 	setMouseTracking(true);
 
-	//auto updateTimer = new QTimer(this);
-	//connect(updateTimer, &QTimer::timeout, this, &TimeLineWidget::updatePositionYAY);
-	//connect(updateTimer, &QTimer::timeout, m_timeline, &Timeline::updatePosition);
-	//updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(update()));
-	connect(m_timeline, &Timeline::positionChanged, this, &TimeLineWidget::updatePositionYAY);
+	connect(m_timeline, &Timeline::positionChanged, this, qOverload<>(&QWidget::update));
 }
 
 
@@ -130,12 +126,6 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	_tool_bar->addWidget( autoScroll );
 	_tool_bar->addWidget( loopPoints );
 	_tool_bar->addWidget( behaviourAtStop );
-}
-
-// TODO
-void TimeLineWidget::updatePositionYAY()
-{
-	update();
 }
 
 void TimeLineWidget::toggleAutoScroll( int _n )
