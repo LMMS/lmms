@@ -51,10 +51,10 @@ public:
 	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
 
 private:
-	static void threadedExportFunction(LmmsExporterSample* thisExporter, bool* abortExport);
+	static void threadedExportFunction(LmmsExporterSample* thisExporter, volatile bool* abortExport);
 
 	void stopThread();
-	void openFile(const QString& outputLocationAndName);
+	void openFile(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer);
 	void exportBuffer(std::shared_ptr<SampleBuffer> buffer);
 	void closeFile();
 
@@ -64,7 +64,7 @@ private:
 	volatile bool m_abortExport;
 	bool m_isThreadRunning;
 	std::mutex m_readMutex;
-	std::unique_ptr<std::thread> m_thread;
+	std::thread* m_thread;
 	
 	SNDFILE* m_fileDescriptor;
 };

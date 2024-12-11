@@ -41,7 +41,7 @@ LmmsExporterSample::LmmsExporterSample() :
 
 LmmsExporterSample::~LmmsExporterSample()
 {
-	stopExorting();
+	stopExporting();
 }
 
 
@@ -53,21 +53,22 @@ void LmmsExporterSample::startExporting(const QString& outputLocationAndName, st
 
 	if (m_isThreadRunning == false)
 	{
-		stopExorting();
+		stopExporting();
 		m_isThreadRunning = true;
-		m_thread = std::make_unique<std::thread>(&LmmsExporterSample::threadedExportFunction, this, &m_abortExport);
+		m_thread = new std::thread(&LmmsExporterSample::threadedExportFunction, this, &m_abortExport);
 	}
 }
 
 void LmmsExporterSample::stopExporting()
 {
-	if (m_thread.get() != nullptr)
+	if (m_thread != nullptr)
 	{
 		if (m_isThreadRunning == true)
 		{
 			m_abortExport = true;
 			m_thread->join();
 		}
+		delete m_thread;
 		m_thread = nullptr;
 		m_isThreadRunning = false;
 		m_abortExport = false;
@@ -75,13 +76,13 @@ void LmmsExporterSample::stopExporting()
 }
 
 
-void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter, bool* abortExport)
+void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter, volatile bool* abortExport)
 {
 	thisExporter->m_isThreadRunning = true;
 
-	while (abortExport == false)
+	while (*abortExport == false)
 	{
-		std::pari<QString, std::shared_ptr<SampleBuffer>> curBuffer = nullptr;
+		std::pair<QString, std::shared_ptr<SampleBuffer>> curBuffer = std::make_pair(QString(""), nullptr);
 		thisExporter->m_readMutex.lock();
 		bool shouldExit = thisExporter->m_buffers.size() <= 0;
 		if (shouldExit == false)
@@ -109,27 +110,31 @@ void LmmsExporterSample::openFile(const QString& outputLocationAndName, std::sha
 	exportInfo.channels = 2;
 	exportInfo.format = SF_FORMAT_FLAC;
 
-#ifdef LMMS_BUILD_WIN32 || LMMS_BUILD_WIN64
+#ifdef LMMS_BUILD_WIN32 OR LMMS_BUILD_WIN64
 	std::wstring characters = outputLocationAndName.toWString();
 	// wstring::c_str should guarantee null termination character at end
 	// this should be in big endian byte order
 	m_fileDescriptor = sf_open(characters.c_str(), SFM_WRITE, &exportInfo);
 #else
 	QByteArray characters = outputLocationAndName.toUtf8();
-	m_fileDescriptor = sf_open(&characters, SFM_WRITE, &exportInfo);
+	m_fileDescriptor = sf_open(characters.data(), SFM_WRITE, &exportInfo);
 #endif
 }
 
 void LmmsExporterSample::exportBuffer(std::shared_ptr<SampleBuffer> buffer)
 {
 	if (m_fileDescriptor == NULL) { return; }
-	sf_writef_float(m_fileDescrtiptor, static_cast<float*>(buffer->data()), buffer->size());
+	sf_writef_float(m_fileDescriptor, static_cast<const float*>(&buffer->data()->left()), buffer->size());
 }
 
 void LmmsExporterSample::closeFile()
 {
 	if (m_fileDescriptor == NULL) { return; }
 	int success = sf_close(m_fileDescriptor);
+	if (success != 0)
+	{
+		printf("LmmsExporterSample export error");
+	}
 	m_fileDescriptor = NULL;
 }
 
