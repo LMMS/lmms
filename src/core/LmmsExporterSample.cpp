@@ -110,7 +110,7 @@ void LmmsExporterSample::openFile(const QString& outputLocationAndName, std::sha
 	exportInfo.channels = 2;
 	exportInfo.format = SF_FORMAT_FLAC;
 
-#ifdef LMMS_BUILD_WIN32 OR LMMS_BUILD_WIN64
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
 	std::wstring characters = outputLocationAndName.toWString();
 	// wstring::c_str should guarantee null termination character at end
 	// this should be in big endian byte order
