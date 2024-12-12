@@ -43,39 +43,35 @@ public:
 		KeepPosition
 	};
 
-	inline const PlayPos& getPlayPos() const
-	{
-		return m_pos;
-	}
-	inline void setPlayPos(PlayPos pos)
+	auto getPlayPos() const -> const PlayPos& { return m_pos; }
+
+	void setPlayPos(PlayPos pos)
 	{
 		m_pos = pos;
 		emit positionChanged(m_pos);
 	}
 
-	inline void setTicks(tick_t ticks) {
+	auto getTicks() const -> tick_t { return m_pos.getTicks(); }
+
+	void setTicks(tick_t ticks)
+	{
 		m_pos.setTicks(ticks);
 		emit positionChanged(m_pos);
 	}
-	inline tick_t getTicks() const {
-		return m_pos.getTicks();
+
+	auto currentFrame() const -> float { return m_pos.currentFrame(); }
+
+	void setCurrentFrame(const float f)
+	{
+		m_pos.setCurrentFrame(f);
 	}
-    inline void setCurrentFrame( const float f )
-    {
-        m_pos.setCurrentFrame(f);
-    }
-    inline float currentFrame() const
-    {
-        return m_pos.currentFrame();
-    }
-    inline void setJumped( const bool jumped )
-    {
-        m_pos.setJumped(jumped);
-    }
-    inline bool jumped() const
-    {
-        return m_pos.jumped();
-    }
+
+	auto jumped() const -> bool { return m_pos.jumped(); }
+
+	void setJumped(const bool jumped)
+	{
+		m_pos.setJumped(jumped);
+	}
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
