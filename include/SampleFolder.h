@@ -42,10 +42,12 @@ class SampleFolder
 {
 public:
 	//! folderPath: from where should SampleFolder load in the samples
-	SampleFolder(const QString& folderPath);
+	SampleFolder();
 	~SampleFolder();
 
 	void setTargetFolderPath(const QString& folderPath);
+	//! sets folder path to ConfigManager's default SampleFolder path
+	void resetTargetFolderPath();
 
 	void updateAllFilesList();
 

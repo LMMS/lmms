@@ -30,6 +30,7 @@
 
 #include <QFileInfo>
 
+#include "ConfigManager.h"
 #include "LmmsExporterSample.h"
 #include "SampleBuffer.h"
 #include "SampleLoader.h"
@@ -40,9 +41,9 @@ namespace lmms
 const QString SampleFolder::s_usedFolderName = "/Used";
 const QString SampleFolder::s_unusedFolderName = "/Unused";
 
-SampleFolder::SampleFolder(const QString& folderPath)
+SampleFolder::SampleFolder() :
+	m_targetFolderPath("")
 {
-	setTargetFolderPath(folderPath);
 }
 
 SampleFolder::~SampleFolder()
@@ -55,8 +56,16 @@ void SampleFolder::setTargetFolderPath(const QString& folderPath)
 	updateAllFilesList();
 }
 
+void SampleFolder::resetTargetFolderPath()
+{
+	setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir());
+	updateAllFilesList();
+}
+
+
 void SampleFolder::updateAllFilesList()
 {
+	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
 	m_sampleFolderFiles.clear();
 	const std::array<QString, 3> filePaths = {QString(), s_usedFolderName, s_unusedFolderName};
 	for (size_t i = 0; i < filePaths.size(); i++)
@@ -80,10 +89,9 @@ void SampleFolder::updateAllFilesList()
 	}
 }
 
-// retruns loaded sample or nullptr if not found
-// TODO: decide if sample is in the sample folder
 std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName)
 {
+	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
 	std::shared_ptr<const SampleBuffer> output = nullptr;
 	QString filteredSampleFileName(QFileInfo(sampleFileName).fileName());
 	ssize_t index = findFileInsideSampleFolder(filteredSampleFileName);
@@ -116,7 +124,6 @@ void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, 
 	}
 }
 
-// exports a sample, only used for replacing old versions of same sample
 void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName)
 {
 	ssize_t index = findFileInsideSampleFolder(sampleFileName);
@@ -133,6 +140,7 @@ void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer
 	
 bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)
 {
+	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
 	QString curFolderAsString(QFileInfo(m_targetFolderPath).absolutePath());
 	QString curFileAsString(QFileInfo(m_targetFolderPath).absolutePath());
 	/* std way:
