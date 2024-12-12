@@ -825,6 +825,17 @@ bool MainWindow::saveProjectAs()
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		QString fname = sfd.selectedFiles()[0] ;
+
+		// making sample folder
+		if (Engine::getSong()->getSaveOptions().makeSampleFolderForProject.value() == true)
+		{
+			QString originalFileName(fname);
+			QString folderName(QFileInfo(fname).baseName());
+			QFileInfo(fname).absoluteDir().mkdir(folderName);
+			// making the file path include the new folder
+			fname = QFileInfo(originalFileName).absoluteDir().path() + "/" + folderName + "/" + QFileInfo(originalFileName).fileName();
+		}
+
 		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
 		{
 			// Remove the default suffix
