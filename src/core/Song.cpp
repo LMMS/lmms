@@ -23,6 +23,7 @@
  */
 
 #include "Song.h"
+#include <QDir>
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
@@ -52,6 +53,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "SampleFolder.h"
 #include "Scale.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
@@ -1274,6 +1276,7 @@ bool Song::guiSaveProject()
 // Save the current song with the given filename
 bool Song::guiSaveProjectAs(const QString & filename)
 {
+	qDebug("guiSaveProjectAs: file name: %s", filename.toStdString().c_str());
 	DataFile dataFile(DataFile::Type::SongProject);
 	QString fileNameWithExtension = dataFile.nameWithExtension(filename);
 
@@ -1431,6 +1434,14 @@ void Song::setProjectFileName(QString const & projectFileName)
 	if (m_fileName != projectFileName)
 	{
 		m_fileName = projectFileName;
+		if (isSavedInSampleFolder())
+		{
+			Engine::getSampleFolder()->setTargetFolderPath(projectFileName);
+		}
+		else
+		{
+			Engine::getSampleFolder()->setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir());
+		}
 		emit projectFileNameChanged();
 	}
 }
@@ -1555,4 +1566,14 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
+
+bool Song::isSavedInSampleFolder() const
+{
+	QString projectPath = projectFileName();
+	QDir projectDir = QFileInfo(projectPath).absoluteDir();
+	projectDir.cdUp();
+	bool output = projectDir.exists(QFileInfo(projectPath).baseName());
+	return output;
+}
+
 } // namespace lmms
