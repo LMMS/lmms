@@ -285,14 +285,14 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Right:
-			m_timeLine->timeline()->setTicks(m_timeLine->timeline()->getTicks() + 16);
-			m_timeLine->timeline()->updatePosition();
+			m_timeLine->model()->setTicks(m_timeLine->model()->getTicks() + 16);
+			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->timeline()->setTicks(0);
-			m_timeLine->timeline()->updatePosition();
+			m_timeLine->model()->setTicks(0);
+			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 
