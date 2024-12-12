@@ -281,8 +281,8 @@ PianoRoll::PianoRoll() :
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine->timeline(), &Timeline::updatePosition);
-	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
+	connect(this, &PianoRoll::positionChanged, m_timeLine->model(), &Timeline::updatePosition);
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this);
@@ -1436,8 +1436,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->timeline()->setTicks(0);
-			m_timeLine->timeline()->updatePosition();
+			m_timeLine->model()->setTicks(0);
+			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 
@@ -4424,7 +4424,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->timeline()->getPlayPos(), quantization() ) );
+			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->model()->getPlayPos(), quantization() ) );
 
 			// select it
 			cur_note.setSelected( true );
@@ -4502,7 +4502,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->timeline()->getPlayPos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->model()->getPlayPos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
