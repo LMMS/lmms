@@ -186,7 +186,6 @@ void Song::setTimeSignature()
 
 void Song::savePlayStartPosition()
 {
-	// TODO simplify
 	getTimeline().setPlayStartPosition(getPlayPos());
 }
 
