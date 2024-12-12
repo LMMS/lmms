@@ -33,6 +33,7 @@
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
+#include "SampleFolder.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
@@ -44,6 +45,7 @@ float Engine::s_framesPerTick;
 AudioEngine* Engine::s_audioEngine = nullptr;
 Mixer * Engine::s_mixer = nullptr;
 PatternStore * Engine::s_patternStore = nullptr;
+SampleFolder * Engine::s_sampleFolder = nullptr;
 Song * Engine::s_song = nullptr;
 ProjectJournal * Engine::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
@@ -68,6 +70,7 @@ void Engine::init( bool renderOnly )
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
 	s_audioEngine = new AudioEngine( renderOnly );
+	s_sampleFolder = new SampleFolder();
 	s_song = new Song;
 	s_mixer = new Mixer;
 	s_patternStore = new PatternStore;
