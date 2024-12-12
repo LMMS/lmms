@@ -281,7 +281,6 @@ PianoRoll::PianoRoll() :
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine->model(), &Timeline::updatePosition);
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
 
 	// white position line follows timeline marker
@@ -1437,7 +1436,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 
 		case Qt::Key_Home:
 			m_timeLine->model()->setTicks(0);
-			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 

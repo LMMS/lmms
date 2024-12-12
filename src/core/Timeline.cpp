@@ -62,11 +62,6 @@ void Timeline::setStopBehaviour(StopBehaviour behaviour)
 	}
 }
 
-void Timeline::updatePosition()
-{
-	emit positionChanged(m_pos);
-}
-
 void Timeline::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	element.setAttribute("lp0pos", static_cast<int>(loopBegin()));

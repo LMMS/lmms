@@ -137,7 +137,6 @@ AutomationEditor::AutomationEditor() :
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
 		m_currentPosition, Song::PlayMode::AutomationClip, this
 	);
-	connect(this, &AutomationEditor::positionChanged, m_timeLine->model(), &Timeline::updatePosition);
 	connect(m_timeLine->model(), SIGNAL(positionChanged(const lmms::TimePos&)),
 			this, SLOT(updatePosition(const lmms::TimePos&)));
 
@@ -280,19 +279,16 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			{
 				m_timeLine->model()->setTicks(0);
 			}
-			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Right:
 			m_timeLine->model()->setTicks(m_timeLine->model()->getTicks() + 16);
-			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 
 		case Qt::Key_Home:
 			m_timeLine->model()->setTicks(0);
-			m_timeLine->model()->updatePosition();
 			ke->accept();
 			break;
 

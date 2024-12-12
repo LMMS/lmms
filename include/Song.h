@@ -489,7 +489,6 @@ signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
-	void bufferProcessed();
 	void lengthChanged( int bars );
 	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );

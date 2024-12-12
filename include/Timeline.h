@@ -95,9 +95,6 @@ signals:
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
 	void positionChanged(const lmms::TimePos& position);
 
-public slots:
-	void updatePosition();
-
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
