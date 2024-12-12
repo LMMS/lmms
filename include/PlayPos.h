@@ -33,27 +33,16 @@ namespace lmms
 class PlayPos : public TimePos
 {
 public:
-    PlayPos( const int abs = 0 ) :
-        TimePos( abs ),
-        m_currentFrame( 0.0f )
-    {
-    }
-    inline void setCurrentFrame( const float f )
-    {
-        m_currentFrame = f;
-    }
-    inline float currentFrame() const
-    {
-        return m_currentFrame;
-    }
-    inline void setJumped( const bool jumped )
-    {
-        m_jumped = jumped;
-    }
-    inline bool jumped() const
-    {
-        return m_jumped;
-    }
+	PlayPos(const int absolutePosition = 0)
+		: TimePos{absolutePosition}
+		, m_currentFrame{0.f}
+	{
+	}
+
+	auto currentFrame() const -> float { m_currentFrame; }
+	void setCurrentFrame( const float f ) { m_currentFrame = f; }
+	auto jumped() const -> bool { return m_jumped; }
+	void setJumped(const bool jumped) { m_jumped = jumped; }
 
 private:
     float m_currentFrame;
