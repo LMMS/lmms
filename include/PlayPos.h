@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	auto currentFrame() const -> float { m_currentFrame; }
+	auto currentFrame() const -> float { return m_currentFrame; }
 	void setCurrentFrame( const float f ) { m_currentFrame = f; }
 	auto jumped() const -> bool { return m_jumped; }
 	void setJumped(const bool jumped) { m_jumped = jumped; }
