@@ -137,8 +137,7 @@ AutomationEditor::AutomationEditor() :
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
 		m_currentPosition, Song::PlayMode::AutomationClip, this
 	);
-	connect(m_timeLine->model(), SIGNAL(positionChanged(const lmms::TimePos&)),
-			this, SLOT(updatePosition(const lmms::TimePos&)));
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::DirectConnection);
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );

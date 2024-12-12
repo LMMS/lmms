@@ -101,7 +101,7 @@ SongEditor::SongEditor( Song * song ) :
 		m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, Song::PlayMode::Song, this
 	);
-	connect(m_timeLine->model(), &Timeline::positionChanged, this, &SongEditor::updatePosition);
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::DirectConnection);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
