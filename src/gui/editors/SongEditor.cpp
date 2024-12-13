@@ -66,8 +66,8 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
-constexpr int SNAP_STEPS_SMALL = 5;
-constexpr int SNAP_STEPS_LARGE = 4;
+constexpr int SNAP_SIZES_SMALL = 5;
+constexpr int SNAP_SIZES_LARGE = 4;
 
 }
 
@@ -248,7 +248,7 @@ SongEditor::SongEditor( Song * song ) :
 
 	connect(m_song, &Song::timeSignatureChanged, this, &SongEditor::updateSnapSizes);
 	updateSnapSizes();
-	m_snappingModel->setInitValue(SNAP_STEPS_LARGE + 1);
+	m_snappingModel->setInitValue(SNAP_SIZES_LARGE + 1);
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -260,7 +260,7 @@ void SongEditor::updateSnapSizes()
 	m_snappingModel->clear();
 	m_snapSizes.clear();
 	int numerator = m_song->getTimeSigModel().getNumerator();
-	for (int i = SNAP_STEPS_LARGE; i >= -SNAP_STEPS_SMALL; i--)
+	for (int i = SNAP_SIZES_LARGE; i >= -SNAP_SIZES_SMALL; i--)
 	{
 		// Using exp2(i + 1) instead of exp2(i) for the first half so that it leaves
 		// a gap for a (snap size = numerator) and a (snap size = 1) in the middle
