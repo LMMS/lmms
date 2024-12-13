@@ -1,5 +1,5 @@
 /*
- * LmmsExporterSample.h - exporting files (currently only audio files), TODO rename class when things change
+ * LmmsExporterSample.h - exports .flac files outside of AudioEngine
  *
  * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot.com>
  *
@@ -45,7 +45,8 @@ public:
 	LmmsExporterSample();
 	~LmmsExporterSample();
 
-	void startExporting(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer);
+	//! outputLocationAndName: should include path and name, could include ".flac"
+	void startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
 	void stopExporting();
 	
 	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
@@ -54,12 +55,12 @@ private:
 	static void threadedExportFunction(LmmsExporterSample* thisExporter, volatile bool* abortExport);
 
 	void stopThread();
-	void openFile(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer);
-	void exportBuffer(std::shared_ptr<SampleBuffer> buffer);
+	void openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
+	void exportBuffer(std::shared_ptr<const SampleBuffer> buffer);
 	void closeFile();
 
 	QFile m_outputFile;
-	std::vector<std::pair<QString, std::shared_ptr<SampleBuffer>>> m_buffers;
+	std::vector<std::pair<QString, std::shared_ptr<const SampleBuffer>>> m_buffers;
 
 	volatile bool m_abortExport;
 	bool m_isThreadRunning;

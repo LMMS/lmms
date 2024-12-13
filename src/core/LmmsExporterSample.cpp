@@ -1,5 +1,5 @@
 /*
- * AudioFileDeviceSample.cpp - exporting files (currently only audio files), TODO rename class when things change
+ * LmmsExporterSample.cpp - exports .flac files outside of AudioEngine
  *
  * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot.com>
  *
@@ -45,10 +45,11 @@ LmmsExporterSample::~LmmsExporterSample()
 }
 
 
-void LmmsExporterSample::startExporting(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer)
+void LmmsExporterSample::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
 {
+	QString filteredName(QFileInfo(outputLocationAndName).absolutePath() + QFileInfo(outputLocationAndName).baseName()+ ".flac");
 	m_readMutex.lock();
-	m_buffers.push_back(std::make_pair(outputLocationAndName, buffer));
+	m_buffers.push_back(std::make_pair(filteredName, buffer));
 	m_readMutex.unlock();
 
 	if (m_isThreadRunning == false)
@@ -82,7 +83,7 @@ void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter
 
 	while (*abortExport == false)
 	{
-		std::pair<QString, std::shared_ptr<SampleBuffer>> curBuffer = std::make_pair(QString(""), nullptr);
+		std::pair<QString, std::shared_ptr<const SampleBuffer>> curBuffer = std::make_pair(QString(""), nullptr);
 		thisExporter->m_readMutex.lock();
 		bool shouldExit = thisExporter->m_buffers.size() <= 0;
 		if (shouldExit == false)
@@ -100,8 +101,18 @@ void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter
 	thisExporter->m_isThreadRunning = false;
 }
 
-void LmmsExporterSample::openFile(const QString& outputLocationAndName, std::shared_ptr<SampleBuffer> buffer)
+void LmmsExporterSample::openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
 {
+	qDebug("LmmsExporterSample::openFile");
+	QFile targetFile(outputLocationAndName);
+	if (targetFile.exists() == false)
+	{
+		// creating new file
+		targetFile.open(QIODevice::ReadOnly);
+		targetFile.close();
+		qDebug("new file created");
+	}
+
 	SF_INFO exportInfo;
 
 	memset(&exportInfo, 0, sizeof(exportInfo));
@@ -110,26 +121,31 @@ void LmmsExporterSample::openFile(const QString& outputLocationAndName, std::sha
 	exportInfo.channels = 2;
 	exportInfo.format = SF_FORMAT_FLAC;
 
+	qDebug("LmmsExporterSample::openFile 2");
 #if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
+	qDebug("LmmsExporterSample::openFile 3");
 	std::wstring characters = outputLocationAndName.toWString();
 	// wstring::c_str should guarantee null termination character at end
 	// this should be in big endian byte order
 	m_fileDescriptor = sf_open(characters.c_str(), SFM_WRITE, &exportInfo);
 #else
+	qDebug("LmmsExporterSample::openFile 4");
 	QByteArray characters = outputLocationAndName.toUtf8();
 	m_fileDescriptor = sf_open(characters.data(), SFM_WRITE, &exportInfo);
 #endif
 }
 
-void LmmsExporterSample::exportBuffer(std::shared_ptr<SampleBuffer> buffer)
+void LmmsExporterSample::exportBuffer(std::shared_ptr<const SampleBuffer> buffer)
 {
 	if (m_fileDescriptor == NULL) { return; }
+	qDebug("LmmsExporterSample::exportBuffer");
 	sf_writef_float(m_fileDescriptor, static_cast<const float*>(&buffer->data()->left()), buffer->size());
 }
 
 void LmmsExporterSample::closeFile()
 {
 	if (m_fileDescriptor == NULL) { return; }
+	qDebug("LmmsExporterSample::closeFile");
 	int success = sf_close(m_fileDescriptor);
 	if (success != 0)
 	{
