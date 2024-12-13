@@ -1276,7 +1276,6 @@ bool Song::guiSaveProject()
 // Save the current song with the given filename
 bool Song::guiSaveProjectAs(const QString & filename)
 {
-	qDebug("guiSaveProjectAs: file name: %s", filename.toStdString().c_str());
 	DataFile dataFile(DataFile::Type::SongProject);
 	QString fileNameWithExtension = dataFile.nameWithExtension(filename);
 
@@ -1434,7 +1433,7 @@ void Song::setProjectFileName(QString const & projectFileName)
 	if (m_fileName != projectFileName)
 	{
 		m_fileName = projectFileName;
-		if (isSavedInSampleFolder())
+		if (isSavedInSampleFolder() && projectFileName.size() > 0)
 		{
 			Engine::getSampleFolder()->setTargetFolderPath(projectFileName);
 		}
@@ -1442,6 +1441,7 @@ void Song::setProjectFileName(QString const & projectFileName)
 		{
 			Engine::getSampleFolder()->setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir());
 		}
+		Engine::getSampleFolder()->updateAllFilesList();
 		emit projectFileNameChanged();
 	}
 }
