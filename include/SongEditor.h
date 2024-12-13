@@ -89,7 +89,7 @@ public slots:
 	void updatePosition( const lmms::TimePos & t );
 	void updatePositionLine();
 	void selectAllClips( bool select );
-	void updateSnappingModel();
+	void updateSnapSizes();
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;

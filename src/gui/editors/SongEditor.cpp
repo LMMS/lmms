@@ -246,15 +246,15 @@ SongEditor::SongEditor( Song * song ) :
 	//zoom connects
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
-	connect(m_song, &Song::timeSignatureChanged, this, &SongEditor::updateSnappingModel);
-	updateSnappingModel();
+	connect(m_song, &Song::timeSignatureChanged, this, &SongEditor::updateSnapSizes);
+	updateSnapSizes();
 	m_snappingModel->setInitValue(SNAP_STEPS_LARGE + 1);
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
-void SongEditor::updateSnappingModel()
+void SongEditor::updateSnapSizes()
 {
 	int oldIndex = m_snappingModel->value();
 	m_snappingModel->clear();
