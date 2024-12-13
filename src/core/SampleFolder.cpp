@@ -1,5 +1,5 @@
 /*
- * SampleFrame.h - Representation of a stereo sample
+ * SampleFolder.cpp - Manages sample loading and saving from a sample folder
  *
  * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
  *
@@ -42,7 +42,9 @@ const QString SampleFolder::s_usedFolderName = "/Used";
 const QString SampleFolder::s_unusedFolderName = "/Unused";
 
 SampleFolder::SampleFolder() :
-	m_targetFolderPath("")
+	m_targetFolderPath(""),
+	m_sampleFolderFiles(),
+	m_exporter()
 {
 }
 
@@ -70,6 +72,7 @@ void SampleFolder::updateAllFilesList()
 	const std::array<QString, 3> filePaths = {QString(), s_usedFolderName, s_unusedFolderName};
 	for (size_t i = 0; i < filePaths.size(); i++)
 	{
+		if (QDir(m_targetFolderPath + filePaths[i]).exists() == false)
 		// TODO check if folder exists
 		std::filesystem::path curPath((m_targetFolderPath + filePaths[i]).toStdU16String());
 		for (const auto& entry : std::filesystem::directory_iterator(curPath))
@@ -87,6 +90,11 @@ void SampleFolder::updateAllFilesList()
 			}
 		}
 	}
+}
+
+static void makeSampleFolderDirs(const QString& path)
+{
+
 }
 
 std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName)
@@ -111,7 +119,7 @@ std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& samp
 	return output;
 }
 
-void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
+void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
 	ssize_t index = findFileInsideSampleFolder(sampleFileName);
 	if (shouldGenerateUniqueName && index >= 0)
@@ -120,7 +128,7 @@ void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, 
 	}
 	else
 	{
-		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFodler, shouldGenerateUniqueName, sampleFileFinalName);
+		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFolder, shouldGenerateUniqueName, sampleFileFinalName);
 	}
 }
 
@@ -133,9 +141,24 @@ void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer
 	}
 }
 
-void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
+void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
-	
+	QString finalName(sampleFileName);
+
+	if (shouldGenerateUniqueName)
+	{
+		finalName = findUniqueName(QFileInfo(sampleFileName).baseName()) + ".flac";
+	}
+
+	if (sampleFileFinalName != nullptr)
+	{
+		*sampleFileFinalName = finalName;
+	}
+
+	// adding path to name
+	finalName = m_targetFolderPath + (isManagedBySampleFolder == true ? s_usedFolderName : QString("")) + finalName;
+
+	m_exporter->startExporting(finalName, sampleBuffer);
 }
 	
 bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)

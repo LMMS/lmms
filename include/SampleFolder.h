@@ -1,5 +1,5 @@
 /*
- * SampleFrame.h - Representation of a stereo sample
+ * SampleFolder.h - Manages sample loading and saving from a sample folder
  *
  * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
  *
@@ -33,9 +33,7 @@
 namespace lmms
 {
 
-/* SampleFolder/
-TODO
-*/
+class LmmsExporterSample;
 class SampleBuffer;
 
 class SampleFolder
@@ -49,16 +47,23 @@ public:
 	//! sets folder path to ConfigManager's default SampleFolder path
 	void resetTargetFolderPath();
 
+	//! scans all files in `m_targetFolderPath` and makes an array out of them
 	void updateAllFilesList();
 
-	// retruns loaded sample or nullptr if not found
-	// TODO: decide if sample is in the sample folder
+	//! makes new dirs (`s_usedFolderName` and `s_unusedFolderName`) inside a given path
+	static void makeSampleFolderDirs(const QString& path);
+
+	//! retruns loaded sample or nullptr if not found
+	//! sampleFileName: could be a name contained in the sample folder, or a path to a sample anywhere
 	std::shared_ptr<const SampleBuffer> loadSample(const QString& sampleFileName);
 
-	//! saves sample inside TODO
-	void saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler, bool shouldGenerateUniqueName, QString* sampleFileFinalName);
+	//! sampleFileName: the exact file name (not path) that is stored inside the sample folder, or that needs to be saved as a new file
+	//! isManagedBySampleFolder: if true, then the sample will be inside `s_usedFolderName` or `s_unusedFolderName`
+	//! shouldGenerateUniqueName: forces saving the sample into a new file, appends a unique number behind `sampleFileName` and exports it as a new file
+	//! sampleFileFinalName: returns the final file name, could be nullptr
+	void saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName);
 	
-	// exports a sample, only used for replacing old versions of same sample
+	// exports a sample, only used for replacing old versions of a sample file
 	void updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName);
 
 	struct SampleFile
@@ -71,8 +76,9 @@ public:
 			isSaved(false),
 			buffer()
 		{}
-		//! the Sample's name
+		//! the Sample's name, doesn't contain path, includes extension
 		QString name;
+		//! where
 		QString relativeFolder;
 		//! if it is inside s_usedFolderName or s_unusedFolderName
 		bool isManaged;
@@ -91,10 +97,11 @@ public:
 
 private:
 
-	void exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFodler, bool shouldGenerateUniqueName, QString* sampleFileFinalName);
+	void exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName);
 	
 	bool isPathInsideSampleFolder(const QString& filePath);
-	// returns -1 if not found, returns index if found
+	//! returns -1 if not found, returns index if found
+	//! sampleFileName: the exact file name (not path) that is stored inside the sample folder
 	ssize_t findFileInsideSampleFolder(const QString& sampleFileName);
 
 	QString findUniqueName(const QString& sourceName) const;
@@ -103,10 +110,12 @@ private:
 	static const QString s_usedFolderName;
 	static const QString s_unusedFolderName;
 
+	//! absolute path to the target sample folder
 	QString m_targetFolderPath;
 
 	//! list of all file info inside m_targetFolderPath
 	std::vector<SampleFile> m_sampleFolderFiles;
+	std::unique_ptr<LmmsExporterSample> m_exporter;
 };
 
 } // namespace lmms
