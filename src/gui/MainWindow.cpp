@@ -61,6 +61,7 @@
 #include "ProjectRenderer.h"
 #include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
+#include "SampleFolder.h" // SampleFolder::makeSampleFolderDirs();
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
@@ -834,6 +835,7 @@ bool MainWindow::saveProjectAs()
 			QFileInfo(fname).absoluteDir().mkdir(folderName);
 			// making the file path include the new folder
 			fname = QFileInfo(originalFileName).absoluteDir().path() + "/" + folderName + "/" + QFileInfo(originalFileName).fileName();
+			SampleFolder::makeSampleFolderDirs(fname);
 		}
 
 		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
