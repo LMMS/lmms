@@ -89,6 +89,7 @@ public slots:
 	void updatePosition( const lmms::TimePos & t );
 	void updatePositionLine();
 	void selectAllClips( bool select );
+	void updateSnappingModel();
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;
@@ -146,6 +147,7 @@ private:
 	IntModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
+	std::vector<float> m_snapSizes;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
