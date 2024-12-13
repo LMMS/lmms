@@ -31,7 +31,6 @@
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
 #include "SampleFolder.h"
-#include "SampleLoader.h"
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
@@ -151,7 +150,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
+		m_sample = Sample(Engine::getSampleFolder()->loadSample(sf));
 		length = sampleLength();
 	}
 
@@ -268,10 +267,14 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
-	if( sampleFile() == "" )
+
+	if (sampleFile() != "")
 	{
-		QString s;
-		_this.setAttribute("data", m_sample.toBase64());
+		Engine::getSampleFolder()->saveSample(sampleFile());
+	}
+	else
+	{
+		// TODO maybe save inside SampleFolder
 	}
 
 	_this.setAttribute( "sample_rate", m_sample.sampleRate());
@@ -305,14 +308,6 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
 
-	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
-	{
-		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
-			Engine::audioEngine()->outputSampleRate();
-
-		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample(std::move(buffer));
-	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
