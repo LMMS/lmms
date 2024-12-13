@@ -62,6 +62,8 @@ public:
 	//! shouldGenerateUniqueName: forces saving the sample into a new file, appends a unique number behind `sampleFileName` and exports it as a new file
 	//! sampleFileFinalName: returns the final file name, could be nullptr
 	void saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName);
+	//! sampleFileName: the exact file name (not path) that is stored inside the sample folder
+	void saveSample(const QString& sampleFileName);
 	
 	// exports a sample, only used for replacing old versions of a sample file
 	void updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName);

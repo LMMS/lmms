@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <string>
 
+#include <QDir>
 #include <QFileInfo>
 
 #include "ConfigManager.h"
@@ -72,29 +73,37 @@ void SampleFolder::updateAllFilesList()
 	const std::array<QString, 3> filePaths = {QString(), s_usedFolderName, s_unusedFolderName};
 	for (size_t i = 0; i < filePaths.size(); i++)
 	{
-		if (QDir(m_targetFolderPath + filePaths[i]).exists() == false)
-		// TODO check if folder exists
-		std::filesystem::path curPath((m_targetFolderPath + filePaths[i]).toStdU16String());
-		for (const auto& entry : std::filesystem::directory_iterator(curPath))
+		QDir currentDir(m_targetFolderPath + filePaths[i]);
+		if (currentDir.exists() == true)
 		{
-			if (std::filesystem::is_regular_file(curPath) == false
-				&& entry.path().extension() == ".flac")
+			QStringList fileList(currentDir.entryList(QDir::Files, QDir::NoSort));
+			for (const auto& file : fileList)
 			{
-				// adding filenames with extensions to m_sampleFolderFiles
-				m_sampleFolderFiles.push_back(SampleFile());
-				std::string temp = entry.path().filename();
-				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].name =
-					QString::fromUtf8(static_cast<std::string>(entry.path().filename()).c_str());
-				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].relativeFolder = filePaths[i];
-				m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].isManaged = i > 0;
+				qDebug("updateAllFilesList file name: %s", file.toStdString().c_str());
+				if (QFileInfo(file).suffix() == "flac")
+				{
+					// adding filenames with extensions to m_sampleFolderFiles
+					m_sampleFolderFiles.push_back(SampleFile());
+					m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].name = file;
+					m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].relativeFolder = filePaths[i];
+					m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].isManaged = i > 0;
+				}
 			}
 		}
 	}
 }
 
-static void makeSampleFolderDirs(const QString& path)
+void SampleFolder::makeSampleFolderDirs(const QString& path)
 {
-
+	QDir targetDirectory(path);
+	if (targetDirectory.exists(s_usedFolderName) == false)
+	{
+		targetDirectory.mkdir(s_usedFolderName);
+	}
+	if (targetDirectory.exists(s_unusedFolderName) == false)
+	{
+		targetDirectory.mkdir(s_unusedFolderName);
+	}
 }
 
 std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName)
@@ -128,7 +137,25 @@ void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, 
 	}
 	else
 	{
-		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFolder, shouldGenerateUniqueName, sampleFileFinalName);
+		QString exportFinalName("");
+		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFolder, shouldGenerateUniqueName, &exportFinalName);
+		if (sampleFileFinalName != nullptr)
+		{
+			*sampleFileFinalName = exportFinalName;
+		}
+		m_sampleFolderFiles.push_back(SampleFile());
+		m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].name = exportFinalName;
+		m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].relativeFolder = isManagedBySampleFolder ? s_usedFolderName : "";
+		m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].isManaged = isManagedBySampleFolder;
+	}
+}
+
+void SampleFolder::saveSample(const QString& sampleFileName)
+{
+	ssize_t index = findFileInsideSampleFolder(sampleFileName);
+	if (index >= 0)
+	{
+		m_sampleFolderFiles[index].isSaved = true;
 	}
 }
 
@@ -143,6 +170,7 @@ void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer
 
 void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
+	if (sampleFileName.size() <= 0) { return; }
 	QString finalName(sampleFileName);
 
 	if (shouldGenerateUniqueName)
