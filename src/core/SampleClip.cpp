@@ -151,6 +151,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	{
 		//Otherwise set it to the sample's length
 		m_sample = Sample(Engine::getSampleFolder()->loadSample(sf));
+		qDebug("SampleClip::setSampleFile sample loaded name: %s", m_sample.sampleFile().toStdString().c_str());
 		length = sampleLength();
 	}
 
@@ -301,11 +302,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if (const auto srcFile = _this.attribute("src"); !srcFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
-		{
-			setSampleFile(srcFile);
-		}
-		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
+		setSampleFile(srcFile);
 	}
 
 	changeLength( _this.attribute( "len" ).toInt() );
