@@ -25,6 +25,7 @@
 #include "SampleClipView.h"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QMenu>
 #include <QPainter>
 
@@ -33,6 +34,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
+#include "SampleFolder.h"
 #include "SampleLoader.h"
 #include "SampleWaveform.h"
 #include "Song.h"
@@ -65,7 +67,7 @@ void SampleClipView::updateSample()
 	// sample-clip contains
 	setToolTip(
 		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+			? m_clip->m_sample.sampleFile()
 			: tr("Double-click to open sample")
 	);
 }
@@ -86,6 +88,13 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		tr("Reverse sample"),
 		this,
 		SLOT(reverseSample())
+	);
+
+	cm->addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("save to sample folder"),
+		this,
+		SLOT(exportSampleToSampleFolder())
 	);
 
 	cm->addAction(
@@ -190,7 +199,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		auto sampleBuffer = Engine::getSampleFolder()->loadSample(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
@@ -335,6 +344,13 @@ void SampleClipView::reverseSample()
 	update();
 }
 
+void SampleClipView::exportSampleToSampleFolder()
+{
+	QString newName = QFileInfo(m_clip->sampleFile()).baseName();
+	Engine::getSampleFolder()->saveSample(m_clip->sample().buffer(), newName, true, true, &newName);
+	qDebug("SampleClipView:: sample final name: %s", newName.toStdString().c_str());
+	m_clip->setSampleFile(newName);
+}
 
 
 void SampleClipView::setAutomationGhost()
