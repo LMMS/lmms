@@ -92,15 +92,28 @@ auto VstEffect::processImpl() -> ProcessStatus
 		m_pluginMutex.unlock();
 	}
 
-	// TODO: Move to AudioPluginInterface:
-	/*
+	// Lastly, perform wet/dry mixing on the output channels.
+	// This assumes that the first 1-2 output channels are the main output channels,
+	// and the dry signal for those output channels are the first 1-2 input channels.
+	// Wet/dry mixing only applies to those channels and any additional
+	// channels remain as-is.
+
+	const auto in = m_plugin->inputBuffer();
+	auto out = m_plugin->outputBuffer();
+
 	const float w = wetLevel();
 	const float d = dryLevel();
-	for (fpp_t f = 0; f < out.size(); ++f)
+
+	const auto mixableOutputs = std::min<pi_ch_t>(out.channels(), 2);
+	for (pi_ch_t channel = 0; channel < mixableOutputs; ++channel)
 	{
-		inOut[f][0] = w * tempBuf[f][0] + d * inOut[f][0];
-		inOut[f][1] = w * tempBuf[f][1] + d * inOut[f][1];
-	}*/
+		auto wetBuffer = out.buffer(channel);
+		auto dryBuffer = in.buffer(std::min(channel, in.channels()));
+		for (fpp_t f = 0; f < out.frames(); ++f)
+		{
+			wetBuffer[f] = w * wetBuffer[f] + d * dryBuffer[f];
+		}
+	}
 
 	return ProcessStatus::ContinueIfNotQuiet;
 }
