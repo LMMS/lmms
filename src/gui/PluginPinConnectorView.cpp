@@ -30,7 +30,7 @@
 #include <QScrollArea>
 #include <QSpacerItem>
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "PluginPinConnector.h"

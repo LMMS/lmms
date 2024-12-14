@@ -67,8 +67,7 @@ class Xpressive : public Instrument
 public:
 	Xpressive(InstrumentTrack* instrument_track );
 
-	void playNote(NotePlayHandle* nph,
-						SampleFrame* working_buffer ) override;
+	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 

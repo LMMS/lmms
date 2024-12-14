@@ -27,22 +27,12 @@
 
 #include <QDomDocument>
 #include <QDomElement>
-#include <cassert>
 #include <stdexcept>
 
-#include "AudioEngine.h"
 #include "PluginPinConnectorView.h"
 
 namespace lmms
 {
-
-namespace
-{
-
-// Scratch pad for intermediate calculations within this class
-thread_local auto WorkingBuffer = std::array<float, MAXIMUM_BUFFER_SIZE>();
-
-} // namespace
 
 PluginPinConnector::PluginPinConnector(Model* parent)
 	: Model{parent}
@@ -54,7 +44,11 @@ PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChann
 	: Model{parent}
 {
 	setTrackChannelCount(s_totalTrackChannels);
-	setPluginChannelCounts(pluginChannelCountIn, pluginChannelCountOut);
+
+	if (pluginChannelCountIn != DynamicChannelCount || pluginChannelCountOut != DynamicChannelCount)
+	{
+		setPluginChannelCounts(pluginChannelCountIn, pluginChannelCountOut);
+	}
 }
 
 void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
@@ -85,15 +79,8 @@ void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 		return;
 	}
 
-	const bool initialSetup = in().channelCount() == 0 && out().channelCount() == 0;
-
 	m_in.setPluginChannelCount(this, inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setPluginChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
-
-	if (initialSetup)
-	{
-		setDefaultConnections();
-	}
 
 	emit propertiesChanged();
 }
@@ -106,158 +93,6 @@ void PluginPinConnector::setPluginChannelCountIn(int inCount)
 void PluginPinConnector::setPluginChannelCountOut(int outCount)
 {
 	setPluginChannelCounts(in().channelCount(), outCount);
-}
-
-void PluginPinConnector::setDefaultConnections()
-{
-	// Assumes pin maps are cleared
-	// TODO: Take into account channel groups?
-
-	m_in.setDefaultConnections();
-	m_out.setDefaultConnections();
-}
-
-void PluginPinConnector::routeToPlugin(f_cnt_t frames,
-	CoreAudioBufferView in, SplitAudioBufferView<sample_t> out) const
-{
-	// Ignore all unused track channels for better performance
-	const auto inSizeConstrained = m_trackChannelsUpperBound / 2;
-	assert(inSizeConstrained <= in.size());
-
-	// Zero the output buffer
-	std::fill(out.begin(), out.end(), 0.f);
-
-	std::uint8_t outChannel = 0;
-	for (f_cnt_t outSampleIdx = 0; outSampleIdx < out.size(); outSampleIdx += frames, ++outChannel)
-	{
-		mix_ch_t numRouted = 0; // counter for # of in channels routed to the current out channel
-		SplitSampleType<sample_t>* outPtr = &out[outSampleIdx];
-
-		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
-		{
-			const SampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
-
-			const std::uint8_t inChannel = inChannelPairIdx * 2;
-			const std::uint8_t enabledPins =
-				(static_cast<std::uint8_t>(m_in.enabled(inChannel, outChannel)) << 1u)
-				| static_cast<std::uint8_t>(m_in.enabled(inChannel + 1, outChannel));
-
-			switch (enabledPins)
-			{
-				case 0b00: break;
-				case 0b01: // R channel only
-				{
-					for (f_cnt_t frame = 0; frame < frames; ++frame)
-					{
-						outPtr[frame] += inPtr[frame][1];
-					}
-					++numRouted;
-					break;
-				}
-				case 0b10: // L channel only
-				{
-					for (f_cnt_t frame = 0; frame < frames; ++frame)
-					{
-						outPtr[frame] += inPtr[frame][0];
-					}
-					++numRouted;
-					break;
-				}
-				case 0b11: // Both channels
-				{
-					for (f_cnt_t frame = 0; frame < frames; ++frame)
-					{
-						outPtr[frame] += inPtr[frame][0] + inPtr[frame][1];
-					}
-					numRouted += 2;
-					break;
-				}
-				default:
-					unreachable();
-					break;
-			}
-		}
-
-		// Either no input channels were routed to this output and output stays zeroed,
-		// or only one channel was routed and normalization is not needed
-		if (numRouted <= 1) { continue; }
-
-		// Normalize output
-		for (f_cnt_t frame = 0; frame < frames; ++frame)
-		{
-			outPtr[frame] /= numRouted;
-		}
-	}
-}
-
-void PluginPinConnector::routeFromPlugin(f_cnt_t frames,
-	SplitAudioBufferView<const sample_t> in, CoreAudioBufferViewMut inOut) const
-{
-	assert(frames <= MAXIMUM_BUFFER_SIZE);
-
-	// Ignore all unused track channels for better performance
-	const auto inOutSizeConstrained = m_trackChannelsUpperBound / 2;
-	assert(inOutSizeConstrained <= inOut.size());
-
-	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
-	{
-		SampleFrame* outPtr = inOut[outChannelPairIdx]; // L/R track channel pair
-		const auto outChannel = static_cast<std::uint8_t>(outChannelPairIdx * 2);
-
-		// TODO C++20: Use explicit non-type template parameter instead of `outChannelOffset` auto parameter
-		const auto mixInputs = [&](std::uint8_t outChannel, auto outChannelOffset) {
-			constexpr auto outChannelOffsetConst = outChannelOffset();
-			WorkingBuffer.fill(0.f); // used as buffer out
-
-			// Counter for # of in channels routed to the current out channel
-			mix_ch_t numRouted = 0;
-
-			std::uint8_t inChannel = 0;
-			for (f_cnt_t inSampleIdx = 0; inSampleIdx < in.size(); inSampleIdx += frames, ++inChannel)
-			{
-				if (!m_out.enabled(outChannel + outChannelOffsetConst, inChannel)) { continue; }
-
-				const SplitSampleType<sample_t>* inPtr = &in[inSampleIdx];
-				for (f_cnt_t frame = 0; frame < frames; ++frame)
-				{
-					WorkingBuffer[frame] += inPtr[frame];
-				}
-				++numRouted;
-			}
-
-			switch (numRouted)
-			{
-				case 0:
-					// Nothing needs to be written to `inOut` for audio bypass,
-					// since it already contains the LMMS core input audio.
-					break;
-				case 1:
-				{
-					// Normalization not needed, but copying is
-					for (f_cnt_t frame = 0; frame < frames; ++frame)
-					{
-						outPtr[frame][outChannelOffsetConst] = WorkingBuffer[frame];
-					}
-					break;
-				}
-				default: // >= 2
-				{
-					// Normalize output
-					for (f_cnt_t frame = 0; frame < frames; ++frame)
-					{
-						outPtr[frame][outChannelOffsetConst] = WorkingBuffer[frame] / numRouted;
-					}
-					break;
-				}
-			}
-		};
-
-		// Left SampleFrame channel first
-		mixInputs(outChannel, std::integral_constant<int, 0>{});
-
-		// Right SampleFrame channel second
-		mixInputs(outChannel, std::integral_constant<int, 1>{});
-	}
 }
 
 void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
@@ -312,11 +147,30 @@ void PluginPinConnector::setTrackChannelCount(int count)
 	}
 
 	m_trackChannelsUpperBound = std::min<unsigned>(m_trackChannelsUpperBound, count);
+	m_routedChannels.resize(static_cast<std::size_t>(count));
 
 	m_in.setTrackChannelCount(this, count, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setTrackChannelCount(this, count, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
 
+	updateAllRoutedChannels();
+
 	emit propertiesChanged();
+}
+
+void PluginPinConnector::updateRoutedChannels(unsigned int trackChannel)
+{
+	const auto& pins = m_out.m_pins.at(trackChannel);
+	m_routedChannels[trackChannel] = std::any_of(pins.begin(), pins.end(), [](BoolModel* m) {
+		return m->value();
+	});
+}
+
+void PluginPinConnector::updateAllRoutedChannels()
+{
+	for (unsigned int tc = 0; tc < s_totalTrackChannels; ++tc)
+	{
+		updateRoutedChannels(tc);
+	}
 }
 
 auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorView*
@@ -377,8 +231,10 @@ void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent
 	}
 	else if (oldSize < count)
 	{
-		auto parentModel = dynamic_cast<Model*>(parent->parent());
+		auto parentModel = parent->parentModel();
 		assert(parentModel != nullptr);
+
+		const bool isOutMatrix = this == &parent->out();
 
 		m_pins.resize(count);
 		for (auto tcIdx = oldSize; tcIdx < count; ++tcIdx)
@@ -389,7 +245,11 @@ void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent
 			{
 				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
 				BoolModel* model = channels.emplace_back(new BoolModel{false, parentModel, name});
-				connect(model, &BoolModel::dataChanged, parent, &PluginPinConnector::dataChanged);
+				if (isOutMatrix)
+				{
+					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
+				}
+				parentModel->connect(model, &BoolModel::dataChanged, parent, &PluginPinConnector::dataChanged);
 			}
 		}
 	}
@@ -398,11 +258,15 @@ void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent
 void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* parent, int count,
 	const QString& nameFormat)
 {
-	auto parentModel = dynamic_cast<Model*>(parent->parent());
+	auto parentModel = parent->parentModel();
 	assert(parentModel != nullptr);
+
+	const bool initialSetup = m_channelCount == 0;
 
 	if (channelCount() < count)
 	{
+		const bool isOutMatrix = this == &parent->out();
+
 		for (unsigned tcIdx = 0; tcIdx < m_pins.size(); ++tcIdx)
 		{
 			auto& pluginChannels = m_pins[tcIdx];
@@ -411,7 +275,11 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 			{
 				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
 				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parentModel, name});
-				connect(model, &BoolModel::dataChanged, parent, &PluginPinConnector::dataChanged);
+				if (isOutMatrix)
+				{
+					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
+				}
+				parentModel->connect(model, &BoolModel::dataChanged, parent, &PluginPinConnector::dataChanged);
 			}
 		}
 	}
@@ -428,6 +296,11 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 	}
 
 	m_channelCount = count;
+
+	if (initialSetup)
+	{
+		setDefaultConnections();
+	}
 }
 
 void PluginPinConnector::Matrix::setDefaultConnections()

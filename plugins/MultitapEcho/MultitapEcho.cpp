@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 
 
 MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &multitapecho_plugin_descriptor, parent, key ),
+	AudioPluginInterface(&multitapecho_plugin_descriptor, parent, key),
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
@@ -94,7 +94,7 @@ void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOn
 }
 
 
-Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus MultitapEchoEffect::processImpl(CoreAudioDataMut inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -113,7 +113,7 @@ Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fp
 	}
 	
 	// add dry buffer - never swap inputs for dry
-	m_buffer.writeAddingMultiplied(buf, f_cnt_t{0}, frames, dryGain);
+	m_buffer.writeAddingMultiplied(inOut.data(), f_cnt_t{0}, inOut.size(), dryGain);
 
 	// swapped inputs?
 	if( swapInputs )
@@ -123,9 +123,9 @@ Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fp
 		{
 			for( int s = 0; s < m_stages; ++s )
 			{
-				runFilter( m_work, buf, m_filter[i][s], frames );
+				runFilter(m_work, inOut.data(), m_filter[i][s], inOut.size());
 			}
-			m_buffer.writeSwappedAddingMultiplied( m_work, offset, frames, m_amp[i] );
+			m_buffer.writeSwappedAddingMultiplied(m_work, offset, inOut.size(), m_amp[i]);
 			offset += stepLength;
 		}
 	}
@@ -136,9 +136,9 @@ Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fp
 		{
 			for( int s = 0; s < m_stages; ++s )
 			{
-				runFilter( m_work, buf, m_filter[i][s], frames );
+				runFilter(m_work, inOut.data(), m_filter[i][s], inOut.size());
 			}
-			m_buffer.writeAddingMultiplied( m_work, offset, frames, m_amp[i] );
+			m_buffer.writeAddingMultiplied(m_work, offset, inOut.size(), m_amp[i]);
 			offset += stepLength;
 		}
 	}
@@ -146,10 +146,10 @@ Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fp
 	// pop the buffer and mix it into output
 	m_buffer.pop( m_work );
 
-	for (auto f = std::size_t{0}; f < frames; ++f)
+	for (auto f = std::size_t{0}; f < inOut.size(); ++f)
 	{
-		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
-		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
+		inOut[f][0] = d * inOut[f][0] + w * m_work[f][0];
+		inOut[f][1] = d * inOut[f][1] + w * m_work[f][1];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

@@ -85,23 +85,22 @@ SamplePlayHandle::~SamplePlayHandle()
 
 
 
-void SamplePlayHandle::play( SampleFrame* buffer )
+void SamplePlayHandle::play(CoreAudioDataMut buffer)
 {
-	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
-		zeroSampleFrames(buffer, fpp);
+		zeroSampleFrames(buffer.data(), buffer.size());
 		return;
 	}
 
-	SampleFrame* workingBuffer = buffer;
-	f_cnt_t frames = fpp;
+	SampleFrame* workingBuffer = buffer.data();
+	f_cnt_t frames = buffer.size();
 
 	// apply offset for the first period
 	if( framesDone() == 0 )
 	{
-		zeroSampleFrames(buffer, offset());
+		zeroSampleFrames(buffer.data(), offset());
 		workingBuffer += offset();
 		frames -= offset();
 	}

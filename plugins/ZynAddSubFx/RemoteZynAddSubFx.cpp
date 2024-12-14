@@ -141,9 +141,11 @@ public:
 	}
 
 
-	void process(const float* _in, float* _out) override
+	void process(const float* in, float* out) override
 	{
-		LocalZynAddSubFx::processAudio(reinterpret_cast<SampleFrame*>(_out));
+		(void)in;
+		auto output = SplitAudioData<float, 2>{&out, 2, bufferSize()};
+		LocalZynAddSubFx::process(output);
 	}
 
 	void guiLoop();

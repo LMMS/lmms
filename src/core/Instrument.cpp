@@ -26,7 +26,9 @@
 
 #include <cmath>
 
+#include "AudioEngine.h"
 #include "DummyInstrument.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "lmms_basics.h"
 #include "lmms_constants.h"
@@ -36,33 +38,14 @@ namespace lmms
 {
 
 
-Instrument::Instrument(InstrumentTrack * _instrument_track,
-			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key *key,
+Instrument::Instrument(const Descriptor* _descriptor,
+			InstrumentTrack* _instrument_track,
+			const Descriptor::SubPluginFeatures::Key* key,
 			Flags flags) :
 	Plugin(_descriptor, nullptr/* _instrument_track*/, key),
 	m_instrumentTrack( _instrument_track ),
 	m_flags(flags)
 {
-}
-
-void Instrument::play( SampleFrame* )
-{
-}
-
-
-
-
-void Instrument::deleteNotePluginData( NotePlayHandle * )
-{
-}
-
-
-
-
-f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
-{
-	return( 0 );
 }
 
 

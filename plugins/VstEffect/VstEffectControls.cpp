@@ -169,8 +169,8 @@ gui::EffectControlDialog* VstEffectControls::createView()
 
 PluginPinConnector* VstEffectControls::pinConnector()
 {
-	if (!m_effect->m_plugin) { return nullptr; }
-	return &m_effect->m_plugin->pinConnector();
+	assert(m_effect->m_plugin != nullptr);
+	return m_effect->pinConnector();
 }
 
 

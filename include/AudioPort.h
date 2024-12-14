@@ -30,6 +30,7 @@
 #include <QMutex>
 
 #include "PlayHandle.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -46,7 +47,7 @@ public:
 		BoolModel * mutedModel = nullptr );
 	virtual ~AudioPort();
 
-	inline SampleFrame* buffer()
+	CoreAudioDataMut buffer()
 	{
 		return m_portBuffer;
 	}
@@ -112,7 +113,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	SampleFrame* m_portBuffer;
+	CoreAudioDataMut m_portBuffer; //!< owning view
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;

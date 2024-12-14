@@ -60,7 +60,7 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	virtual void process(const float* _in, float* _out) = 0;
+	virtual void process(const float* in, float* out) = 0;
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{

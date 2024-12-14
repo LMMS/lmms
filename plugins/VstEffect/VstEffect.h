@@ -28,24 +28,24 @@
 #include <QMutex>
 #include <QSharedPointer>
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "VstEffectControls.h"
 
 namespace lmms
 {
 
-
 class VstPlugin;
 
-
-class VstEffect : public Effect
+class VstEffect
+	: public AudioPluginInterface<Effect, float,
+		PluginConfig{ .layout = AudioDataLayout::Split, .customBuffer = true }>
 {
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~VstEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	auto processImpl() -> ProcessStatus override;
 
 	EffectControls * controls() override
 	{
@@ -54,6 +54,9 @@ public:
 
 
 private:
+	auto bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float,
+		DynamicChannelCount, DynamicChannelCount>* override;
+
 	//! Returns true if plugin was loaded (m_plugin != nullptr)
 	bool openPlugin(const QString& plugin);
 	void closePlugin();

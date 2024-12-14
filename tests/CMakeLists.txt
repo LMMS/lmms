@@ -7,6 +7,7 @@ set(LMMS_TESTS
 	src/core/ArrayVectorTest.cpp
 	src/core/AutomatableModelTest.cpp
 	src/core/MathTest.cpp
+	src/core/PluginPinConnectorTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/tracks/AutomationTrackTest.cpp

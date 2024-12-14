@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 
 
 DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &delay_plugin_descriptor, parent, key ),
+	AudioPluginInterface(&delay_plugin_descriptor, parent, key),
 	m_delayControls( this )
 {
 	m_delay = 0;
@@ -81,7 +81,7 @@ DelayEffect::~DelayEffect()
 
 
 
-Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus DelayEffect::processImpl(CoreAudioDataMut inOut)
 {
 	const float sr = Engine::audioEngine()->outputSampleRate();
 	const float d = dryLevel();
@@ -110,9 +110,8 @@ Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const fpp_t fra
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (SampleFrame& currentFrame : inOut)
 	{
-		auto& currentFrame = buf[f];
 		const auto dryS = currentFrame;
 
 		// Prepare delay for current sample

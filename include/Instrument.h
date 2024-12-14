@@ -27,15 +27,14 @@
 #define LMMS_INSTRUMENT_H
 
 #include <QString>
+#include <cmath>
 
 #include "Flags.h"
+#include "SampleFrame.h"
 #include "lmms_export.h"
 #include "lmms_basics.h"
 #include "Plugin.h"
 #include "TimePos.h"
-
-#include <cmath>
-
 
 namespace lmms
 {
@@ -44,8 +43,8 @@ namespace lmms
 class InstrumentTrack;
 class MidiEvent;
 class NotePlayHandle;
+class PluginPinConnector;
 class Track;
-class SampleFrame;
 
 
 class LMMS_EXPORT Instrument : public Plugin
@@ -61,40 +60,51 @@ public:
 
 	using Flags = lmms::Flags<Flag>;
 
-	Instrument(InstrumentTrack * _instrument_track,
-			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key * key = nullptr,
+	Instrument(const Descriptor* _descriptor,
+			InstrumentTrack* _instrument_track,
+			const Descriptor::SubPluginFeatures::Key* key = nullptr,
 			Flags flags = Flag::NoFlags);
 	~Instrument() override = default;
+
+	// if the plugin doesn't play each note, it can create an instrument-
+	// play-handle and re-implement this method, so that it mixes its
+	// output buffer only once per audio engine period
+	void play(CoreAudioDataMut out)
+	{
+		playImpl(out);
+	}
+
+	void playNote(NotePlayHandle* notesToPlay, CoreAudioDataMut out)
+	{
+		playNoteImpl(notesToPlay, out);
+	}
 
 	// --------------------------------------------------------------------
 	// functions that can/should be re-implemented:
 	// --------------------------------------------------------------------
 
-	virtual bool hasNoteInput() const { return true; }
-
-	// if the plugin doesn't play each note, it can create an instrument-
-	// play-handle and re-implement this method, so that it mixes its
-	// output buffer only once per audio engine period
-	virtual void play( SampleFrame* _working_buffer );
-
-	// to be implemented by actual plugin
-	virtual void playNote( NotePlayHandle * /* _note_to_play */,
-					SampleFrame* /* _working_buf */ )
+	//! Receives all incoming MIDI events; Return true if event was handled.
+	virtual bool handleMidiEvent(const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0)
 	{
+		return true;
 	}
 
-	// needed for deleting plugin-specific-data of a note - plugin has to
-	// cast void-ptr so that the plugin-data is deleted properly
-	// (call of dtor if it's a class etc.)
-	virtual void deleteNotePluginData( NotePlayHandle * _note_to_play );
+	/**
+	 * Needed for deleting plugin-specific-data of a note - plugin has to
+	 * cast void-ptr so that the plugin-data is deleted properly
+	 * (call of dtor if it's a class etc.)
+	 */
+	virtual void deleteNotePluginData(NotePlayHandle* noteToPlay) {}
 
-	// Get number of sample-frames that should be used when playing beat
-	// (note with unspecified length)
-	// Per default this function returns 0. In this case, channel is using
-	// the length of the longest envelope (if one active).
-	virtual f_cnt_t beatLen( NotePlayHandle * _n ) const;
+	/**
+	 * Get number of sample-frames that should be used when playing beat
+	 * (note with unspecified length)
+	 * Per default this function returns 0. In this case, channel is using
+	 * the length of the longest envelope (if one active).
+	 */
+	virtual auto beatLen(NotePlayHandle* nph) const -> f_cnt_t { return 0; }
 
+	virtual bool hasNoteInput() const { return true; }
 
 	// This method can be overridden by instruments that need a certain
 	// release time even if no envelope is active. It returns the time
@@ -121,9 +131,10 @@ public:
 		return m_flags.testFlag(Instrument::Flag::IsSingleStreamed);
 	}
 
+	//! Returns whether the instrument is MIDI-based or NotePlayHandle-based
 	bool isMidiBased() const
 	{
-		return m_flags.testFlag(Instrument::Flag::IsMidiBased);
+		return !m_flags.testFlag(Instrument::Flag::IsMidiBased);
 	}
 
 	bool isBendable() const
@@ -131,11 +142,10 @@ public:
 		return !m_flags.testFlag(Instrument::Flag::IsNotBendable);
 	}
 
-	// sub-classes can re-implement this for receiving all incoming
-	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0 )
+	//! Returns nullptr if the instrument does not have a pin connector
+	virtual auto pinConnector() const -> const PluginPinConnector*
 	{
-		return true;
+		return nullptr;
 	}
 
 	QString fullDisplayName() const override;
@@ -160,6 +170,12 @@ public:
 
 
 protected:
+	//! To be implemented by AudioPluginInterface or plugin implementation
+	virtual void playImpl(CoreAudioDataMut out) {}
+
+	//! To be implemented by AudioPluginInterface or plugin implementation
+	virtual void playNoteImpl(NotePlayHandle* notesToPlay, CoreAudioDataMut out) {}
+
 	// fade in to prevent clicks
 	void applyFadeIn(SampleFrame* buf, NotePlayHandle * n);
 

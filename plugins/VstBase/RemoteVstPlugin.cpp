@@ -177,9 +177,9 @@ public:
 #else
 	RemoteVstPlugin( const char * socketPath );
 #endif
-	virtual ~RemoteVstPlugin();
+	~RemoteVstPlugin() override;
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage(const message& _m) override;
 
 	void init( const std::string & _plugin_file );
 	void initEditor();
@@ -190,10 +190,10 @@ public:
 	void process(const float* _in, float* _out) override;
 
 
-	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
+	void processMidiEvent(const MidiEvent& event, const f_cnt_t offset) override;
 
 	// set given sample-rate for plugin
-	virtual void updateSampleRate()
+	void updateSampleRate() override
 	{
 		SuspendPlugin suspend( this );
 		pluginDispatch( effSetSampleRate, 0, 0,
@@ -201,7 +201,7 @@ public:
 	}
 
 	// set given buffer-size for plugin
-	virtual void updateBufferSize()
+	void updateBufferSize() override
 	{
 		SuspendPlugin suspend( this );
 		pluginDispatch( effSetBlockSize, 0, bufferSize() );
@@ -283,7 +283,7 @@ public:
 	void savePreset( const std::string & _file );
 
 	// number of inputs
-	virtual int inputCount() const
+	int inputCount() const override
 	{
 		if( m_plugin )
 		{
@@ -293,7 +293,7 @@ public:
 	}
 
 	// number of outputs
-	virtual int outputCount() const
+	int outputCount() const override
 	{
 		if( m_plugin )
 		{

@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <type_traits>
 
 
 namespace lmms
@@ -227,8 +228,56 @@ inline void copyFromSampleFrames(InterleavedSampleType<float>* target, const Sam
 	}
 }
 
-using CoreAudioBufferView = Span<const SampleFrame* const>;
-using CoreAudioBufferViewMut = Span<SampleFrame* const>;
+
+//! A non-owning 2-channel buffer
+using CoreAudioData = Span<const SampleFrame>;
+
+//! Mutable CoreAudioData
+using CoreAudioDataMut = Span<SampleFrame>;
+
+
+/**
+ * A non-owning span of CoreAudioData.
+ *
+ * Access like this:
+ *   bus[channel pair index][frame index]
+ *
+ * where
+ *   0 <= channel pair index < channelPairs
+ *   0 <= frame index < frames
+ *
+ * TODO C++23: Use std::mdspan
+ */
+template<typename T>
+struct AudioBus
+{
+	static_assert(std::is_same_v<std::remove_const_t<T>, SampleFrame>);
+
+	AudioBus() = default;
+	AudioBus(const AudioBus&) = default;
+
+	AudioBus(T* const* bus, ch_cnt_t channelPairs, f_cnt_t frames)
+		: bus{bus}
+		, channelPairs{channelPairs}
+		, frames{frames}
+	{
+	}
+
+	template<typename U = T, std::enable_if_t<std::is_const_v<U>, bool> = true>
+	AudioBus(const AudioBus<std::remove_const_t<U>>& other)
+		: bus{other.bus}
+		, channelPairs{other.channelPairs}
+		, frames{other.frames}
+	{
+	}
+
+	T* const* bus = nullptr; //!< [channel pair index][frame index]
+	ch_cnt_t channelPairs = 0;
+	f_cnt_t frames = 0;
+};
+
+using CoreAudioBus = AudioBus<const SampleFrame>;
+using CoreAudioBusMut = AudioBus<SampleFrame>;
 
 
 } // namespace lmms

@@ -28,11 +28,11 @@
 #include <QList>
 #include <QMutex>
 
-#include "lmms_export.h"
-
 #include "Flags.h"
+#include "SampleFrame.h"
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
 
 class QThread;
 
@@ -41,7 +41,6 @@ namespace lmms
 
 class Track;
 class AudioPort;
-class SampleFrame;
 
 class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
@@ -106,7 +105,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play( SampleFrame* buffer ) = 0;
+	virtual void play(CoreAudioDataMut buffer) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -146,14 +145,14 @@ public:
 	
 	void releaseBuffer();
 	
-	SampleFrame* buffer();
+	CoreAudioDataMut buffer();
 
 private:
 	Type m_type;
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	SampleFrame* m_playHandleBuffer;
+	CoreAudioDataMut m_playHandleBuffer; //!< owning view
 	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioPort * m_audioPort;

@@ -26,6 +26,7 @@
 #include "AudioEngine.h"
 #include "BufferManager.h"
 #include "Engine.h"
+#include "SampleFrame.h"
 
 #include <QThread>
 
@@ -46,7 +47,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 
 PlayHandle::~PlayHandle()
 {
-	BufferManager::release(m_playHandleBuffer);
+	BufferManager::release(m_playHandleBuffer.data());
 }
 
 
@@ -55,12 +56,13 @@ void PlayHandle::doProcessing()
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
-		zeroSampleFrames(m_playHandleBuffer, Engine::audioEngine()->framesPerPeriod());
-		play( buffer() );
+
+		zeroSampleFrames(m_playHandleBuffer.data(), m_playHandleBuffer.size());
+		play(m_playHandleBuffer);
 	}
 	else
 	{
-		play( nullptr );
+		play(CoreAudioDataMut{});
 	}
 }
 
@@ -70,9 +72,9 @@ void PlayHandle::releaseBuffer()
 	m_bufferReleased = true;
 }
 
-SampleFrame* PlayHandle::buffer()
+CoreAudioDataMut PlayHandle::buffer()
 {
-	return m_bufferReleased ? nullptr : m_playHandleBuffer;
+	return m_bufferReleased ? CoreAudioDataMut{} : m_playHandleBuffer;
 };
 
 } // namespace lmms

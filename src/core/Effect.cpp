@@ -122,42 +122,6 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
-{
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
-	{
-		processBypassedImpl();
-		return false;
-	}
-
-	const auto status = processImpl(buf, frames);
-	switch (status)
-	{
-		case ProcessStatus::Continue:
-			break;
-		case ProcessStatus::ContinueIfNotQuiet:
-		{
-			double outSum = 0.0;
-			for (std::size_t idx = 0; idx < frames; ++idx)
-			{
-				outSum += buf[idx].sumOfSquaredAmplitudes();
-			}
-
-			checkGate(outSum / frames);
-			break;
-		}
-		case ProcessStatus::Sleep:
-			return false;
-		default:
-			break;
-	}
-
-	return isRunning();
-}
-
-
-
-
 Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )

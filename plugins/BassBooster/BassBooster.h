@@ -26,20 +26,20 @@
 #ifndef BASS_BOOSTER_H
 #define BASS_BOOSTER_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "DspEffectLibrary.h"
 #include "BassBoosterControls.h"
 
 namespace lmms
 {
 
-class BassBoosterEffect : public Effect
+class BassBoosterEffect : public DefaultEffectPluginInterface
 {
 public:
 	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~BassBoosterEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls* controls() override
 	{

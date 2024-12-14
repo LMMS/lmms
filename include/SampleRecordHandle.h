@@ -48,7 +48,7 @@ public:
 	SampleRecordHandle( SampleClip* clip );
 	~SampleRecordHandle() override;
 
-	void play( SampleFrame* _working_buffer ) override;
+	void play(CoreAudioDataMut buffer) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;

@@ -154,7 +154,7 @@ private:
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &vestige_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
+	AudioPluginInterface(&vestige_plugin_descriptor, _instrument_track, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_plugin( nullptr ),
 	m_pluginMutex(),
 	m_subWindow( nullptr ),
@@ -365,7 +365,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin{m_pluginDLL, this};
+	m_plugin = new VstInstrumentPlugin{m_pluginDLL, pinConnector(), this};
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -397,17 +397,17 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 
 
-void VestigeInstrument::play( SampleFrame* _buf )
+void VestigeInstrument::processImpl()
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
 
-	if( m_plugin == nullptr )
+	if (m_plugin == nullptr)
 	{
 		m_pluginMutex.unlock();
 		return;
 	}
 
-	m_plugin->process( nullptr, _buf );
+	m_plugin->process();
 
 	m_pluginMutex.unlock();
 }
@@ -478,17 +478,21 @@ void VestigeInstrument::closePlugin( void )
 
 
 
+
+auto VestigeInstrument::bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float,
+	DynamicChannelCount, DynamicChannelCount>*
+{
+	return m_plugin;
+}
+
+
+
+
 gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 {
 	return new gui::VestigeInstrumentView( this, _parent );
 }
 
-
-PluginPinConnector* VestigeInstrument::pinConnector()
-{
-	if (!m_plugin) { return nullptr; }
-	return &m_plugin->pinConnector();
-}
 
 
 namespace gui

@@ -27,7 +27,7 @@
 #ifndef BITCRUSH_H
 #define BITCRUSH_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "BitcrushControls.h"
 #include "BasicFilters.h"
 
@@ -36,13 +36,13 @@ namespace lmms
 {
 
 
-class BitcrushEffect : public Effect
+class BitcrushEffect : public DefaultEffectPluginInterface
 {
 public:
 	BitcrushEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~BitcrushEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls* controls() override
 	{

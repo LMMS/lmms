@@ -25,14 +25,14 @@
 #ifndef LV2_EFFECT_H
 #define LV2_EFFECT_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "Lv2FxControls.h"
 
 namespace lmms
 {
 
-
-class Lv2Effect : public Effect
+// TODO: Add support for a variable number of audio input/output ports
+class Lv2Effect : public DefaultEffectPluginInterface
 {
 	Q_OBJECT
 
@@ -42,7 +42,7 @@ public:
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls* controls() override { return &m_controls; }
 

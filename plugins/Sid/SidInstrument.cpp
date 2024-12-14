@@ -117,7 +117,7 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 
 
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &sid_plugin_descriptor ),
+	Instrument(&sid_plugin_descriptor, _instrument_track),
 	// filter
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
@@ -285,8 +285,7 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 
 
 
-void SidInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void SidInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
 {
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
 	const int samplerate = Engine::audioEngine()->outputSampleRate();
@@ -421,7 +420,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			_working_buffer[frame+offset][ch] = s;
+			out[frame+offset][ch] = s;
 		}
 	}
 }
