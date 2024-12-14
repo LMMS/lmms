@@ -43,14 +43,17 @@ public:
 	SampleFolder();
 	~SampleFolder();
 
-	void setTargetFolderPath(const QString& folderPath);
+	//! folderPath: the path to the sample folder
+	//! filterFileName: should get rid of file names inside the path
+	void setTargetFolderPath(const QString& folderPath, bool shouldFilterFileName);
 	//! sets folder path to ConfigManager's default SampleFolder path
 	void resetTargetFolderPath();
 
 	//! scans all files in `m_targetFolderPath` and makes an array out of them
 	void updateAllFilesList();
 
-	//! makes new dirs (`s_usedFolderName` and `s_unusedFolderName`) inside a given path
+	//! makes new dirs (`ConfigManager::COMMON_SAMPLE_FOLDER_USED`
+	//! and `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED`) inside a given path
 	static void makeSampleFolderDirs(const QString& path);
 
 	//! retruns loaded sample or nullptr if not found
@@ -58,7 +61,8 @@ public:
 	std::shared_ptr<const SampleBuffer> loadSample(const QString& sampleFileName);
 
 	//! sampleFileName: the exact file name (not path) that is stored inside the sample folder, or that needs to be saved as a new file
-	//! isManagedBySampleFolder: if true, then the sample will be inside `s_usedFolderName` or `s_unusedFolderName`
+	//! isManagedBySampleFolder: if true, then the sample will be inside `ConfigManager::COMMON_SAMPLE_FOLDER_USED`
+	//! or `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED`
 	//! shouldGenerateUniqueName: forces saving the sample into a new file, appends a unique number behind `sampleFileName` and exports it as a new file
 	//! sampleFileFinalName: returns the final file name, could be nullptr
 	void saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName);
@@ -82,18 +86,20 @@ public:
 		QString name;
 		//! where
 		QString relativeFolder;
-		//! if it is inside s_usedFolderName or s_unusedFolderName
+		//! if it is inside `ConfigManager::COMMON_SAMPLE_FOLDER_USED`
+		//! or `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED`
 		bool isManaged;
 		//! if it was loaded by the project (since the last save)
 		//! used for tracking whether or not a sample file should be moved to the
-		//! `s_usedFolderName` or `s_unusedFolderName` folder
+		//! `ConfigManager::COMMON_SAMPLE_FOLDER_USED` or `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED`
 		bool isLoaded;
 		bool isSaved;
 		//! the sample's audio buffer (nullptr if wasLoaded == false)
 		std::shared_ptr<const SampleBuffer> buffer;
 	};
 
-	//! moves the files inside s_usedFolderName and s_unusedFolderName to their correct places
+	//! moves the files inside `ConfigManager::COMMON_SAMPLE_FOLDER_USED`
+	//! and `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED` to their correct places
 	//! resets `SampleFile::isLoaded`, `SampleFile::isSaved` and unloads `SampleFile::buffer` if the sample isn't used
 	void sortManagedFiles();
 
@@ -106,11 +112,11 @@ private:
 	//! sampleFileName: the exact file name (not path) that is stored inside the sample folder
 	ssize_t findFileInsideSampleFolder(const QString& sampleFileName);
 
+	//! sourceName: file name (not path) with extension
+	//! isSeparatedWithWhiteSpace: returns if the source name's last character before the numbers was '_'
+	//! extensionCountOut: returns the number of characters that are part of the extension
 	QString findUniqueName(const QString& sourceName) const;
-	static QString getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace);
-
-	static const QString s_usedFolderName;
-	static const QString s_unusedFolderName;
+	static QString getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace, size_t* extensionCountOut);
 
 	//! absolute path to the target sample folder
 	QString m_targetFolderPath;
