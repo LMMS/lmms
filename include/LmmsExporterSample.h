@@ -55,11 +55,10 @@ private:
 	static void threadedExportFunction(LmmsExporterSample* thisExporter, volatile bool* abortExport);
 
 	void stopThread();
-	void openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
+	bool openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
 	void exportBuffer(std::shared_ptr<const SampleBuffer> buffer);
 	void closeFile();
 
-	QFile m_outputFile;
 	std::vector<std::pair<QString, std::shared_ptr<const SampleBuffer>>> m_buffers;
 
 	volatile bool m_abortExport;
