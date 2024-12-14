@@ -1435,13 +1435,12 @@ void Song::setProjectFileName(QString const & projectFileName)
 		m_fileName = projectFileName;
 		if (isSavedInSampleFolder() && projectFileName.size() > 0)
 		{
-			Engine::getSampleFolder()->setTargetFolderPath(projectFileName);
+			Engine::getSampleFolder()->setTargetFolderPath(projectFileName, true);
 		}
 		else
 		{
-			Engine::getSampleFolder()->setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir());
+			Engine::getSampleFolder()->setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir(), false);
 		}
-		Engine::getSampleFolder()->updateAllFilesList();
 		emit projectFileNameChanged();
 	}
 }
