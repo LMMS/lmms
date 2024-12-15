@@ -200,7 +200,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	else
 	{
 		auto sampleBuffer = Engine::getSampleFolder()->loadSample(selectedAudioFile);
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
+		if (sampleBuffer.get() != nullptr && sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
 		}
