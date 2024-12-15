@@ -1430,16 +1430,24 @@ void Song::setModified()
 
 void Song::setProjectFileName(QString const & projectFileName)
 {
+		qDebug("resetTargetFolderPath 9");
 	if (m_fileName != projectFileName)
 	{
+		qDebug("resetTargetFolderPath 8");
 		m_fileName = projectFileName;
+
+		qDebug("resetTargetFolderPath 10");
 		if (isSavedInSampleFolder() && projectFileName.size() > 0)
 		{
+
+			qDebug("resetTargetFolderPath 11");
 			Engine::getSampleFolder()->setTargetFolderPath(projectFileName, true);
 		}
 		else
 		{
-			Engine::getSampleFolder()->setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir(), false);
+
+			qDebug("resetTargetFolderPath 12");
+			Engine::getSampleFolder()->resetTargetFolderPath();
 		}
 		emit projectFileNameChanged();
 	}
@@ -1568,10 +1576,13 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 
 bool Song::isSavedInSampleFolder() const
 {
+	bool output = false;
 	QString projectPath = projectFileName();
-	QDir projectDir = QFileInfo(projectPath).absoluteDir();
+	if (projectPath.size() <= 0) { return output; }
+
+	QDir projectDir (QFileInfo(projectPath).absoluteDir());
 	projectDir.cdUp();
-	bool output = projectDir.exists(QFileInfo(projectPath).baseName());
+	output = projectDir.exists(QFileInfo(projectPath).baseName());
 	return output;
 }
 
