@@ -37,10 +37,11 @@
 namespace lmms
 {
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
-	, m_sample(std::move(sample))
-	, m_isPlaying(false)
+SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
+	Clip(_track),
+	m_sample(std::move(sample)),
+	m_sampleFile(""),
+	m_isPlaying(false)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -122,19 +123,20 @@ void SampleClip::changeLengthToSampleLength()
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.sampleFile();
+	return m_sampleFile;
 }
 
 bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 {
-	return m_sample.sampleFile() == filename;
+	return m_sampleFile == filename;
 }
 
-void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
+void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb, const QString& name)
 {
 	{
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
 		m_sample = Sample(std::move(sb));
+		m_sampleFile = name;
 	}
 	updateLength();
 
@@ -149,10 +151,24 @@ void SampleClip::setSampleFile(const QString& sf)
 
 	if (!sf.isEmpty())
 	{
-		//Otherwise set it to the sample's length
-		m_sample = Sample(Engine::getSampleFolder()->loadSample(sf));
-		qDebug("SampleClip::setSampleFile sample loaded name: %s", m_sample.sampleFile().toStdString().c_str());
-		length = sampleLength();
+		std::shared_ptr<const SampleBuffer> buffer = Engine::getSampleFolder()->loadSample(sf);
+		qDebug("SampleClip::setSampleFile 1");
+		if (buffer == SampleBuffer::emptyBuffer())
+		{
+			qDebug("SampleClip::setSampleFile 2");
+			Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), sf));
+		}
+		else
+		{
+			qDebug("SampleClip::setSampleFile 3");
+			//Otherwise set it to the sample's length
+			m_sample = Sample(buffer);
+			m_sampleFile = sf;
+
+			qDebug("SampleClip::setSampleFile sample loaded name: %s", m_sample.sampleFile().toStdString().c_str());
+			length = sampleLength();
+		}
+		qDebug("SampleClip::setSampleFile 4");
 	}
 
 	if (length == 0)
