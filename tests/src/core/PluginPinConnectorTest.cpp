@@ -281,8 +281,8 @@ private slots:
 		//
 		// In    Out
 		//  ___   ___
-		// |X| | |X| |
-		// | |X| | |X|
+		// | | | |X| |
+		// | | | | |X|
 		//  ---   ---
 
 		auto pc2x2Inst = PluginPinConnector{2, 2, true, &model};
