@@ -151,7 +151,7 @@ void SampleClip::setSampleFile(const QString& sf)
 
 	if (!sf.isEmpty())
 	{
-		std::shared_ptr<const SampleBuffer> buffer = Engine::getSampleFolder()->loadSample(sf);
+		std::shared_ptr<const SampleBuffer> buffer = Engine::getSampleFolder()->loadSample(sf, &m_sampleFile);
 		qDebug("SampleClip::setSampleFile 1");
 		if (buffer == SampleBuffer::emptyBuffer())
 		{
@@ -163,7 +163,6 @@ void SampleClip::setSampleFile(const QString& sf)
 			qDebug("SampleClip::setSampleFile 3");
 			//Otherwise set it to the sample's length
 			m_sample = Sample(buffer);
-			m_sampleFile = sf;
 
 			qDebug("SampleClip::setSampleFile sample loaded name: %s", m_sample.sampleFile().toStdString().c_str());
 			length = sampleLength();
