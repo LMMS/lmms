@@ -30,9 +30,7 @@
 #include <QScrollArea>
 
 #include "embed.h"
-#include "ComboBox.h"
 #include "CustomTextKnob.h"
-#include "PluginPinConnectorView.h"
 #include "VstEffectControls.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
@@ -165,13 +163,6 @@ gui::EffectControlDialog* VstEffectControls::createView()
 	return dialog;
 }
 
-
-
-PluginPinConnector* VstEffectControls::pinConnector()
-{
-	assert(m_effect->m_plugin != nullptr);
-	return m_effect->pinConnector();
-}
 
 
 
@@ -366,16 +357,11 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
 
-	m_pinConnectorButton = new QPushButton{m_vi->pinConnector()->getChannelCountText(), widget};
-	m_pinConnectorButton->setToolTip(tr("Plugin Pin Connector"));
+	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
+	connect( m_closeButton, SIGNAL( clicked() ), this,
+							SLOT( closeWindow() ) );
 
-	connect(m_pinConnectorButton, &QPushButton::clicked, this, &ManageVSTEffectView::togglePinConnector);
-
-	connect(m_vi->pinConnector(), &PluginPinConnector::propertiesChanged, this, [&]() {
-		m_pinConnectorButton->setText(m_vi->pinConnector()->getChannelCountText());
-	});
-
-	l->addWidget(m_pinConnectorButton, 0, 2, 1, 2, Qt::AlignLeft);
+	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 
 
 	for( int i = 0; i < 10; i++ )
@@ -448,21 +434,6 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_vi->m_scrollArea->setWidget( widget );
 
 	m_vi->m_subWindow->show();
-}
-
-
-
-
-void ManageVSTEffectView::togglePinConnector()
-{
-	if (!m_pinConnector)
-	{
-		m_pinConnector = m_vi2->pinConnector()->instantiateView(m_vi2->m_subWindow);
-	}
-	else
-	{
-		m_pinConnector->toggleVisibility();
-	}
 }
 
 
@@ -592,13 +563,6 @@ ManageVSTEffectView::~ManageVSTEffectView()
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = nullptr;
-	}
-
-	if (m_pinConnector != nullptr)
-	{
-		m_pinConnector->closeWindow();
-		delete m_pinConnector;
-		m_pinConnector = nullptr;
 	}
 
 	if( m_vi2->m_subWindow != nullptr )

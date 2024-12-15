@@ -39,14 +39,13 @@ class QScrollArea;
 namespace lmms
 {
 
-class PluginPinConnector;
+
 class VstEffect;
 
 namespace gui
 {
 class CustomTextKnob;
 class ManageVSTEffectView;
-class PluginPinConnectorView;
 class VstEffectControlDialog;
 }
 
@@ -69,7 +68,6 @@ public:
 
 	gui::EffectControlDialog* createView() override;
 
-	PluginPinConnector* pinConnector();
 
 protected slots:
 	void updateMenu();
@@ -123,7 +121,6 @@ protected slots:
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
-	void togglePinConnector();
 	void closeWindow();
 
 private:
@@ -141,8 +138,7 @@ private:
 
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
-	QPushButton* m_pinConnectorButton;
-	PluginPinConnectorView* m_pinConnector = nullptr;
+	QPushButton * m_closeButton;
 	CustomTextKnob ** vstKnobs;
 
 } ;
