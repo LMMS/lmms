@@ -1430,23 +1430,16 @@ void Song::setModified()
 
 void Song::setProjectFileName(QString const & projectFileName)
 {
-		qDebug("resetTargetFolderPath 9");
 	if (m_fileName != projectFileName)
 	{
-		qDebug("resetTargetFolderPath 8");
 		m_fileName = projectFileName;
 
-		qDebug("resetTargetFolderPath 10");
 		if (isSavedInSampleFolder() && projectFileName.size() > 0)
 		{
-
-			qDebug("resetTargetFolderPath 11");
 			Engine::getSampleFolder()->setTargetFolderPath(projectFileName, true);
 		}
 		else
 		{
-
-			qDebug("resetTargetFolderPath 12");
 			Engine::getSampleFolder()->resetTargetFolderPath();
 		}
 		emit projectFileNameChanged();
