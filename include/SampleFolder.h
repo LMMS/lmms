@@ -56,7 +56,7 @@ public:
 	//! and `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED`) inside a given path
 	static void makeSampleFolderDirs(const QString& path);
 
-	//! retruns loaded sample or nullptr if not found
+	//! retruns loaded sample or SampleBuffer::emptyBuffer if not found
 	//! sampleFileName: could be a name contained in the sample folder, or a path to a sample anywhere
 	std::shared_ptr<const SampleBuffer> loadSample(const QString& sampleFileName);
 
