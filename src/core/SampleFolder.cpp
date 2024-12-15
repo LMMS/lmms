@@ -53,53 +53,42 @@ SampleFolder::~SampleFolder()
 
 void SampleFolder::setTargetFolderPath(const QString& folderPath, bool shouldFilterFileName)
 {
-		qDebug("resetTargetFolderPath 3");
 	if (shouldFilterFileName)
 	{
-		qDebug("resetTargetFolderPath 4");
 		m_targetFolderPath = QFileInfo(folderPath).absoluteDir().path();
 	}
 	else
 	{
-		qDebug("resetTargetFolderPath 5");
 		m_targetFolderPath = folderPath;
 	}
 
-		qDebug("resetTargetFolderPath 6");
 	if (m_targetFolderPath.at(m_targetFolderPath.size() - 1) != "/")
 	{
-		qDebug("resetTargetFolderPath 7");
 		m_targetFolderPath = m_targetFolderPath + "/";
 	}
 
-	qDebug("setTargetFolderPath file name: %s", m_targetFolderPath.toStdString().c_str());
 	updateAllFilesList();
 }
 
 void SampleFolder::resetTargetFolderPath()
 {
-	qDebug("resetTargetFolderPath 1");
 	setTargetFolderPath(ConfigManager::inst()->commonSampleFolderDir(), false);
 }
 
 
 void SampleFolder::updateAllFilesList()
 {
-	qDebug("updateAllFilesList");
 	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
 	m_sampleFolderFiles.clear();
 	const std::array<QString, 3> filePaths = {QString(""), COMMON_SAMPLE_FOLDER_USED, COMMON_SAMPLE_FOLDER_UNUSED};
 	for (size_t i = 0; i < filePaths.size(); i++)
 	{
 		QDir currentDir(m_targetFolderPath + filePaths[i]);
-		qDebug("updateAllFilesList loop folder path: %s", (m_targetFolderPath + filePaths[i]).toStdString().c_str());
 		if (currentDir.exists() == true)
 		{
 			QStringList fileList(currentDir.entryList(QDir::Files, QDir::NoSort));
 			for (const auto& file : fileList)
 			{
-				qDebug("updateAllFilesList file name: %s", file.toStdString().c_str());
-				qDebug("updateAllFilesList folder name: %s", filePaths[i].toStdString().c_str());
 				if (QFileInfo(file).suffix() == "flac")
 				{
 					// adding filenames with extensions to m_sampleFolderFiles
@@ -128,11 +117,9 @@ void SampleFolder::makeSampleFolderDirs(const QString& path)
 
 std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& sampleFileName, QString* sampleFileFinalName)
 {
-	qDebug("loadSample file name: %s", sampleFileName.toStdString().c_str());
 	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
 	std::shared_ptr<const SampleBuffer> output = SampleBuffer::emptyBuffer();
 	QString filteredSampleFileName(QFileInfo(sampleFileName).fileName());
-	qDebug("loadSample filderedfile name: %s", filteredSampleFileName.toStdString().c_str());
 	if (sampleFileName == filteredSampleFileName || isPathInsideSampleFolder(sampleFileName))
 	{
 		ssize_t index = findFileInsideSampleFolder(filteredSampleFileName);
@@ -149,16 +136,6 @@ std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& samp
 			{
 				*sampleFileFinalName = m_sampleFolderFiles[index].name;
 			}
-
-			qDebug("sample loading set buffer");
-			if (output == SampleBuffer::emptyBuffer())
-			{
-				qDebug("sample loading error 3");
-			}
-		}
-		else
-		{
-			qDebug("sample loading error 1");
 		}
 	}
 	else
@@ -171,17 +148,12 @@ std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& samp
 				*sampleFileFinalName = sampleFileName;
 			}
 		}
-		else
-		{
-			qDebug("sample loading error 2");
-		}
 	}
 	return output;
 }
 
 void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
-	qDebug("saveSample file name: %s", sampleFileName.toStdString().c_str());
 	ssize_t index = findFileInsideSampleFolder(sampleFileName);
 	if (shouldGenerateUniqueName && index >= 0)
 	{
@@ -213,7 +185,6 @@ void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, 
 
 void SampleFolder::saveSample(const QString& sampleFileName)
 {
-	qDebug("saveSample 2 file name: %s", sampleFileName.toStdString().c_str());
 	ssize_t index = findFileInsideSampleFolder(sampleFileName);
 	if (index >= 0)
 	{
@@ -236,7 +207,6 @@ void SampleFolder::sortManagedFiles()
 	for (size_t i = 0; i < m_sampleFolderFiles.size(); i++)
 	{
 
-		qDebug("sortManagedFiles checking: %s", m_sampleFolderFiles[i].name.toStdString().c_str());
 		if (m_sampleFolderFiles[i].isLoaded && m_sampleFolderFiles[i].isManaged)
 		{
 			if (m_sampleFolderFiles[i].isSaved == true && m_sampleFolderFiles[i].relativeFolder == COMMON_SAMPLE_FOLDER_UNUSED)
@@ -244,14 +214,12 @@ void SampleFolder::sortManagedFiles()
 				curDir.rename(m_targetFolderPath + m_sampleFolderFiles[i].relativeFolder + m_sampleFolderFiles[i].name,
 					m_targetFolderPath + COMMON_SAMPLE_FOLDER_USED + m_sampleFolderFiles[i].name);
 				m_sampleFolderFiles[i].relativeFolder = COMMON_SAMPLE_FOLDER_USED;
-				qDebug("sortManagedFiles move to used: %s", m_sampleFolderFiles[i].name.toStdString().c_str());
 			}
 			else if (m_sampleFolderFiles[i].isSaved == false && m_sampleFolderFiles[i].relativeFolder == COMMON_SAMPLE_FOLDER_USED)
 			{
 				curDir.rename(m_targetFolderPath + m_sampleFolderFiles[i].relativeFolder + m_sampleFolderFiles[i].name,
 					m_targetFolderPath + COMMON_SAMPLE_FOLDER_UNUSED + m_sampleFolderFiles[i].name);
 				m_sampleFolderFiles[i].relativeFolder = COMMON_SAMPLE_FOLDER_UNUSED;
-				qDebug("sortManagedFiles move to unused: %s", m_sampleFolderFiles[i].name.toStdString().c_str());
 			}
 		}
 	}
@@ -268,7 +236,6 @@ void SampleFolder::resetSavedStatus()
 
 void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
 {
-	qDebug("exportSample file name: %s", sampleFileName.toStdString().c_str());
 	if (sampleFileName.size() <= 0) { return; }
 	QString finalName(sampleFileName);
 
@@ -282,10 +249,8 @@ void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer
 		*sampleFileFinalName = finalName;
 	}
 
-	qDebug("exportSample finalName: %s", finalName.toStdString().c_str());
 	// adding path to name
 	finalName = m_targetFolderPath + (isManagedBySampleFolder == true ? COMMON_SAMPLE_FOLDER_USED : QString("")) + finalName;
-	qDebug("exportSample final path: %s", finalName.toStdString().c_str());
 
 	m_exporter->startExporting(finalName, sampleBuffer);
 }
@@ -311,14 +276,11 @@ bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)
 
 ssize_t SampleFolder::findFileInsideSampleFolder(const QString& sampleFileName)
 {
-	qDebug("findFileInsideSampleFolder sampleFileName: %s", sampleFileName.toStdString().c_str());
 	ssize_t index = -1;
 	for (size_t i = 0; i < m_sampleFolderFiles.size(); i++)
 	{
-		qDebug("findFileInsideSampleFolder compare to: %s", m_sampleFolderFiles[i].name.toStdString().c_str());
 		if (m_sampleFolderFiles[i].name == sampleFileName)
 		{
-			qDebug("findFileInsideSampleFolder compare to: %s FOUND", m_sampleFolderFiles[i].name.toStdString().c_str());
 			index = i;
 			break;
 		}
@@ -328,7 +290,6 @@ ssize_t SampleFolder::findFileInsideSampleFolder(const QString& sampleFileName)
 
 QString SampleFolder::findUniqueName(const QString& sourceName) const
 {
-	qDebug("findUniqueName input: %s", sourceName.toStdString().c_str());
 	QString output = sourceName;
 	QString outputExtension = sourceName;
 	// removing number from `sourceName`
