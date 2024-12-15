@@ -200,10 +200,11 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = Engine::getSampleFolder()->loadSample(selectedAudioFile);
+		QString audioFileFinalName = selectedAudioFile;
+		auto sampleBuffer = Engine::getSampleFolder()->loadSample(selectedAudioFile, &audioFileFinalName);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
-			m_clip->setSampleBuffer(sampleBuffer, selectedAudioFile);
+			m_clip->setSampleBuffer(sampleBuffer, audioFileFinalName);
 		}
 	}
 }
