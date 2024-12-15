@@ -32,11 +32,9 @@
 #include <QFileInfo>
 
 #include "ConfigManager.h"
-#include "Engine.h" // getSong()
 #include "LmmsExporterSample.h"
 #include "SampleBuffer.h"
 #include "SampleLoader.h"
-#include "Song.h" // collectError()
 
 namespace lmms
 {
@@ -112,8 +110,7 @@ void SampleFolder::updateAllFilesList()
 
 void SampleFolder::makeSampleFolderDirs(const QString& path)
 {
-	qDebug("makeSampleFolderDirs");
-	QDir targetDirectory(path);
+	QDir targetDirectory(QFileInfo(path).absoluteDir());
 	if (targetDirectory.exists(COMMON_SAMPLE_FOLDER_USED) == false)
 	{
 		targetDirectory.mkdir(COMMON_SAMPLE_FOLDER_USED);
@@ -128,7 +125,7 @@ std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& samp
 {
 	qDebug("loadSample file name: %s", sampleFileName.toStdString().c_str());
 	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
-	std::shared_ptr<const SampleBuffer> output = nullptr;
+	std::shared_ptr<const SampleBuffer> output = SampleBuffer::emptyBuffer();
 	QString filteredSampleFileName(QFileInfo(sampleFileName).fileName());
 	qDebug("loadSample filderedfile name: %s", filteredSampleFileName.toStdString().c_str());
 	if (sampleFileName == filteredSampleFileName || isPathInsideSampleFolder(sampleFileName))
@@ -142,11 +139,16 @@ std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& samp
 				m_sampleFolderFiles[index].isLoaded = true;
 			}
 			output = m_sampleFolderFiles[index].buffer;
+
+			qDebug("sample loading set buffer");
+			if (output == SampleBuffer::emptyBuffer())
+			{
+				qDebug("sample loading error 3");
+			}
 		}
 		else
 		{
-			qDebug("missing sample");
-			Engine::getSong()->collectError(QString("%1: %2").arg(("Sample not found inside sample folder"), sampleFileName));
+			qDebug("sample loading error 1");
 		}
 	}
 	else
@@ -155,7 +157,10 @@ std::shared_ptr<const SampleBuffer> SampleFolder::loadSample(const QString& samp
 		{
 			output = gui::SampleLoader::createBufferFromFile(sampleFileName);
 		}
-		else { Engine::getSong()->collectError(QString("%1: %2").arg(("Sample not found"), sampleFileName)); }
+		else
+		{
+			qDebug("sample loading error 2");
+		}
 	}
 	return output;
 }
@@ -168,7 +173,7 @@ void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, 
 	{
 		m_sampleFolderFiles[index].isSaved = true;
 	}
-	else
+	else if (sampleBuffer != SampleBuffer::emptyBuffer())
 	{
 		QString exportFinalName("");
 		exportSample(sampleBuffer, sampleFileName, isManagedBySampleFolder, shouldGenerateUniqueName, &exportFinalName);
@@ -187,10 +192,7 @@ void SampleFolder::saveSample(std::shared_ptr<const SampleBuffer> sampleBuffer, 
 		}
 		else
 		{
-			std::shared_ptr<SampleBuffer> newBuffer = std::make_shared<SampleBuffer>(SampleBuffer(sampleBuffer->data(), sampleBuffer->size(), sampleBuffer->sampleRate()));
-			QString exportPath = m_targetFolderPath + m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].relativeFolder + exportFinalName;
-			newBuffer->setAudioFile(exportPath);
-			m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].buffer = newBuffer;
+			m_sampleFolderFiles[m_sampleFolderFiles.size() - 1].buffer = std::make_shared<SampleBuffer>(SampleBuffer(sampleBuffer->data(), sampleBuffer->size(), sampleBuffer->sampleRate()));;
 		}
 	}
 }
@@ -216,6 +218,7 @@ void SampleFolder::updateSample(std::shared_ptr<const SampleBuffer> sampleBuffer
 
 void SampleFolder::sortManagedFiles()
 {
+
 }
 
 void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer, const QString& sampleFileName, bool isManagedBySampleFolder, bool shouldGenerateUniqueName, QString* sampleFileFinalName)
@@ -245,20 +248,13 @@ void SampleFolder::exportSample(std::shared_ptr<const SampleBuffer> sampleBuffer
 bool SampleFolder::isPathInsideSampleFolder(const QString& filePath)
 {
 	if (m_targetFolderPath.size() == 0) { resetTargetFolderPath(); }
-	QString curFolderAsString(QFileInfo(m_targetFolderPath).absolutePath());
-	QString curFileAsString(QFileInfo(m_targetFolderPath).absolutePath());
-	/* std way:
-	std::filesystem::path curFolderPath(std::filesystem::absolute(m_targetFolderPath.toStdU16String());
-	std::filesystem::path curFilePath(std::filesystem::absolute(filePath.toStdU16String());
-	std::u16string curFolderAsString = static_cast<std::u16string>(curFolderPath);
-	std::u16string curFileAsString = static_cast<std::u16string>(curFilePath);
-	*/
-	bool found = curFolderAsString.size() <= curFileAsString.size();
+	QString curFileAsString(QFileInfo(filePath).absolutePath());
+	bool found = m_targetFolderPath.size() <= curFileAsString.size();
 	if (found)
 	{
-		for (int i = 0; i < curFolderAsString.size(); i++)
+		for (int i = 0; i < m_targetFolderPath.size(); i++)
 		{
-			if (curFolderAsString.at(i) != curFileAsString.at(i))
+			if (m_targetFolderPath.at(i) != curFileAsString.at(i))
 			{
 				found = false;
 				break;
