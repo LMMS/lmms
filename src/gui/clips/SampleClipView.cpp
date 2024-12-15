@@ -349,9 +349,7 @@ void SampleClipView::reverseSample()
 void SampleClipView::exportSampleToSampleFolder()
 {
 	QString newName = QFileInfo(m_clip->sampleFile()).baseName();
-	qDebug("SampleClipView:: sample base name: %s", newName.toStdString().c_str());
 	Engine::getSampleFolder()->saveSample(m_clip->sample().buffer(), newName, true, true, &newName);
-	qDebug("SampleClipView:: sample final name: %s", newName.toStdString().c_str());
 	m_clip->setSampleFile(newName);
 }
 
