@@ -1560,9 +1560,13 @@ void MainWindow::handleSaveResult(QString const & filename, bool songSavedSucces
 
 bool MainWindow::guiSaveProject()
 {
+	Engine::getSampleFolder()->resetSavedStatus();
+
 	Song * song = Engine::getSong();
 	bool const songSaveResult = song->guiSaveProject();
 	handleSaveResult(song->projectFileName(), songSaveResult);
+
+	Engine::getSampleFolder()->sortManagedFiles();
 
 	return songSaveResult;
 }
