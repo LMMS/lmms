@@ -59,7 +59,6 @@
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
-#include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -284,25 +283,12 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	updateInstrumentView();
 
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
-	Qt::WindowFlags flags = subWin->windowFlags();
-	if (!m_instrumentView->isResizable()) {
-		flags |= Qt::MSWindowsFixedSizeDialogHint;
-		// any better way than this?
-	} else {
-		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
-		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
-	}
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
 
+	// The previous call should have given us a sub window parent. Therefore
+	// we can reuse this method.
+	updateSubWindow();
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at( 2 )->setVisible( false ); // Size
-	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
-
-	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
+	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
 }
 
@@ -406,6 +392,8 @@ void InstrumentTrackWindow::modelChanged()
 	m_tuningView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
 	m_tuningView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
+
+	updateSubWindow();
 }
 
 
@@ -710,5 +698,75 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	w->update();
 }
 
+QMdiSubWindow* InstrumentTrackWindow::findSubWindowInParents()
+{
+	// TODO Move to helper? Does not seem to be provided by Qt.
+	auto p = parentWidget();
+
+	while (p != nullptr)
+	{
+		auto mdiSubWindow = dynamic_cast<QMdiSubWindow*>(p);
+		if (mdiSubWindow)
+		{
+			return mdiSubWindow;
+		}
+		else
+		{
+			p = p->parentWidget();
+		}
+	}
+
+	return nullptr;
+}
+
+void InstrumentTrackWindow::updateSubWindow()
+{
+	auto subWindow = findSubWindowInParents();
+	if (subWindow && m_instrumentView)
+	{
+		Qt::WindowFlags flags = subWindow->windowFlags();
+
+		const auto instrumentViewResizable = m_instrumentView->isResizable();
+
+		if (instrumentViewResizable)
+		{
+			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
+			const auto extraSpace = QSize(12, 208);
+			subWindow->setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
+			subWindow->setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
+
+			flags &= ~Qt::MSWindowsFixedSizeDialogHint;
+			flags |= Qt::WindowMaximizeButtonHint;
+		}
+		else
+		{
+			flags |= Qt::MSWindowsFixedSizeDialogHint;
+			flags &= ~Qt::WindowMaximizeButtonHint;
+
+			// The sub window might be reused from an instrument that was maximized. Show the sub window
+			// as normal, i.e. not maximized, if the instrument view is not resizable.
+			if (subWindow->isMaximized())
+			{
+				subWindow->showNormal();
+			}
+		}
+
+		subWindow->setWindowFlags(flags);
+
+		// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
+		QMenu * systemMenu = subWindow->systemMenu();
+		systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
+		systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
+		
+		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
+		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
+		// missing some implementation details that QMdiSubWindow has.
+		auto subWin = dynamic_cast<SubWindow*>(subWindow);
+		if (subWin)
+		{
+			subWin->updateTitleBar();
+		}
+	}
+}
 
 } // namespace lmms::gui
