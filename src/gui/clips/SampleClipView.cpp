@@ -66,8 +66,8 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? m_clip->m_sample.sampleFile()
+		m_clip->m_sample.buffer()->empty() == false
+			? m_clip->m_sampleFile
 			: tr("Double-click to open sample")
 	);
 }
@@ -132,7 +132,8 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		std::shared_ptr<const SampleBuffer> buffer = SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de));
+		m_clip->setSampleBuffer(buffer, buffer->audioFile());
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -200,9 +201,9 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	else
 	{
 		auto sampleBuffer = Engine::getSampleFolder()->loadSample(selectedAudioFile);
-		if (sampleBuffer.get() != nullptr && sampleBuffer != SampleBuffer::emptyBuffer())
+		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
-			m_clip->setSampleBuffer(sampleBuffer);
+			m_clip->setSampleBuffer(sampleBuffer, selectedAudioFile);
 		}
 	}
 }
@@ -285,7 +286,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
 	SampleWaveform::visualize(waveform, p, r);
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	QString name = PathUtil::cleanName(m_clip->m_sampleFile);
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -347,6 +348,7 @@ void SampleClipView::reverseSample()
 void SampleClipView::exportSampleToSampleFolder()
 {
 	QString newName = QFileInfo(m_clip->sampleFile()).baseName();
+	qDebug("SampleClipView:: sample base name: %s", newName.toStdString().c_str());
 	Engine::getSampleFolder()->saveSample(m_clip->sample().buffer(), newName, true, true, &newName);
 	qDebug("SampleClipView:: sample final name: %s", newName.toStdString().c_str());
 	m_clip->setSampleFile(newName);
