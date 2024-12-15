@@ -193,7 +193,7 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 	auto nodeName() const -> QString override { return "pins"; }
 
-	auto instantiateView(QWidget* parent = nullptr) -> gui::PluginPinConnectorView*;
+	auto instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*;
 	auto getChannelCountText() const -> QString;
 
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else

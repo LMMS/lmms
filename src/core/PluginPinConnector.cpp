@@ -173,9 +173,9 @@ void PluginPinConnector::updateAllRoutedChannels()
 	}
 }
 
-auto PluginPinConnector::instantiateView(QWidget* parent) -> gui::PluginPinConnectorView*
+auto PluginPinConnector::instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*
 {
-	return new gui::PluginPinConnectorView{this, parent};
+	return new gui::PluginPinConnectorView{const_cast<PluginPinConnector*>(this), parent};
 }
 
 auto PluginPinConnector::getChannelCountText() const -> QString

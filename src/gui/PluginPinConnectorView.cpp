@@ -89,9 +89,13 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidge
 	, m_inView{new MatrixView{this, model->in(), true}}
 	, m_outView{new MatrixView{this, model->out(), false}}
 {
+	assert(model != nullptr);
 	connect(model, &PluginPinConnector::propertiesChanged, this, &PluginPinConnectorView::updateGeometry);
 
-	setWindowTitle(tr("Plugin Pin Connector"));
+	const Model* parentModel = model->parentModel();
+	assert(parentModel != nullptr);
+
+	setWindowTitle(parentModel->fullDisplayName());
 	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(this);
 	m_subWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 	setWindowIcon(embed::getIconPixmap("tool"));

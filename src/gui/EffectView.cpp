@@ -38,6 +38,8 @@
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
+#include "PluginPinConnector.h"
+#include "PluginPinConnectorView.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
 
@@ -89,10 +91,11 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		auto ctls_btn = new QPushButton(tr("Controls"), this);
+		auto ctls_btn = new QPushButton(embed::getIconPixmap("trackop", 20, 20), "", this);
+		ctls_btn->setToolTip(tr("Controls"));
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
-		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		ctls_btn->setGeometry(144, 12, 28, 28);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
@@ -120,7 +123,17 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-	
+
+	if (auto pc = effect()->pinConnector())
+	{
+		auto pcButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
+		pcButton->setToolTip(tr("Pin connector\n%1").arg(pc->getChannelCountText()));
+		QFont f = pcButton->font();
+		pcButton->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
+		pcButton->setGeometry(144 + 32, 12, 28, 28);
+		connect(pcButton, &QPushButton::clicked, this, &EffectView::editPinConnector);
+	}
+
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
@@ -134,6 +147,12 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
+	if (m_pinConnectorView != nullptr)
+	{
+		m_pinConnectorView->closeWindow();
+		delete m_pinConnectorView;
+		m_pinConnectorView = nullptr;
+	}
 	delete m_subWindow;
 }
 
@@ -155,6 +174,24 @@ void EffectView::editControls()
 			m_subWindow->hide();
 			effect()->controls()->setViewVisible( false );
 		}
+	}
+}
+
+
+
+
+void EffectView::editPinConnector()
+{
+	auto pc = effect()->pinConnector();
+	if (!pc) { return; }
+
+	if (!m_pinConnectorView)
+	{
+		m_pinConnectorView = pc->instantiateView(this);
+	}
+	else
+	{
+		m_pinConnectorView->toggleVisibility();
 	}
 }
 
