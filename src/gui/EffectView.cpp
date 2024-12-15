@@ -93,8 +93,6 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(embed::getIconPixmap("trackop", 20, 20), "", this);
 		ctls_btn->setToolTip(tr("Controls"));
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 		ctls_btn->setGeometry(144, 12, 28, 28);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
@@ -126,12 +124,17 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if (auto pc = effect()->pinConnector())
 	{
-		auto pcButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
-		pcButton->setToolTip(tr("Pin connector\n%1").arg(pc->getChannelCountText()));
-		QFont f = pcButton->font();
-		pcButton->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
-		pcButton->setGeometry(144 + 32, 12, 28, 28);
-		connect(pcButton, &QPushButton::clicked, this, &EffectView::editPinConnector);
+		constexpr auto formatString = "Pin connector\n%1";
+
+		m_pinConnectorButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
+		m_pinConnectorButton->setToolTip(tr(formatString).arg(pc->getChannelCountText()));
+
+		connect(pc, &PluginPinConnector::propertiesChanged, [=, this]() {
+			m_pinConnectorButton->setToolTip(tr(formatString).arg(effect()->pinConnector()->getChannelCountText()));
+		});
+
+		m_pinConnectorButton->setGeometry(144 + 32, 12, 28, 28);
+		connect(m_pinConnectorButton, &QPushButton::clicked, this, &EffectView::editPinConnector);
 	}
 
 	m_opacityEffect = new QGraphicsOpacityEffect(this);

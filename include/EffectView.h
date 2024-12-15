@@ -97,6 +97,7 @@ private:
 	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
+	QPushButton* m_pinConnectorButton = nullptr;
 	PluginPinConnectorView* m_pinConnectorView = nullptr;
 
 	bool m_dragging;
