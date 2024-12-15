@@ -224,8 +224,8 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const lmms::TimePos & t );
-	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePosition();
+	void updatePositionAccompany();
 	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();

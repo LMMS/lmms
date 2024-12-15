@@ -137,7 +137,7 @@ AutomationEditor::AutomationEditor() :
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
 		m_currentPosition, Song::PlayMode::AutomationClip, this
 	);
-	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::DirectConnection);
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::QueuedConnection);
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -1803,8 +1803,9 @@ void AutomationEditor::setTension()
 
 
 
-void AutomationEditor::updatePosition(const TimePos & t )
+void AutomationEditor::updatePosition()
 {
+	const TimePos& t = m_timeLine->model()->getPlayPos();
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
 					Song::PlayMode::AutomationClip ) ||

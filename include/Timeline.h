@@ -48,7 +48,7 @@ public:
 	void setPlayPos(PlayPos pos)
 	{
 		m_pos = pos;
-		emit positionChanged(m_pos);
+		emit positionChanged();
 	}
 
 	auto getTicks() const -> tick_t { return m_pos.getTicks(); }
@@ -56,7 +56,7 @@ public:
 	void setTicks(tick_t ticks)
 	{
 		m_pos.setTicks(ticks);
-		emit positionChanged(m_pos);
+		emit positionChanged();
 	}
 
 	auto currentFrame() const -> float { return m_pos.currentFrame(); }
@@ -93,7 +93,7 @@ public:
 signals:
 	void loopEnabledChanged(bool enabled);
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
-	void positionChanged(const lmms::TimePos& position);
+	void positionChanged();
 
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
