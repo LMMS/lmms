@@ -92,17 +92,7 @@ public:
 
 	QString commonSampleFolderDir() const
 	{
-		return dataDir() + COMMON_SAMPLE_FOLDER;
-	}
-	
-	QString commonSampleFolderDirUsedRaw() const
-	{
-		return COMMON_SAMPLE_FOLDER_USED;
-	}
-	
-	QString commonSampleFolderDirUnusedRaw() const
-	{
-		return COMMON_SAMPLE_FOLDER_UNUSED;
+		return workingDir() + COMMON_SAMPLE_FOLDER;
 	}
 
 	QString factoryProjectsDir() const
