@@ -152,22 +152,17 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		std::shared_ptr<const SampleBuffer> buffer = Engine::getSampleFolder()->loadSample(sf, &m_sampleFile);
-		qDebug("SampleClip::setSampleFile 1");
 		if (buffer == SampleBuffer::emptyBuffer())
 		{
-			qDebug("SampleClip::setSampleFile 2");
 			Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), sf));
 		}
 		else
 		{
-			qDebug("SampleClip::setSampleFile 3");
 			//Otherwise set it to the sample's length
 			m_sample = Sample(buffer);
 
-			qDebug("SampleClip::setSampleFile sample loaded name: %s", m_sample.sampleFile().toStdString().c_str());
 			length = sampleLength();
 		}
-		qDebug("SampleClip::setSampleFile 4");
 	}
 
 	if (length == 0)
