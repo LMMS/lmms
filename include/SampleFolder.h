@@ -58,7 +58,8 @@ public:
 
 	//! retruns loaded sample or SampleBuffer::emptyBuffer if not found
 	//! sampleFileName: could be a name contained in the sample folder, or a path to a sample anywhere
-	std::shared_ptr<const SampleBuffer> loadSample(const QString& sampleFileName);
+	//! sampleFileFinalName: if the sample was found, retruns a name that should be used to refer to that sample, else it will not be modified
+	std::shared_ptr<const SampleBuffer> loadSample(const QString& sampleFileName, QString* sampleFileFinalName);
 
 	//! sampleFileName: the exact file name (not path) that is stored inside the sample folder, or that needs to be saved as a new file
 	//! isManagedBySampleFolder: if true, then the sample will be inside `ConfigManager::COMMON_SAMPLE_FOLDER_USED`
@@ -102,6 +103,7 @@ public:
 	//! and `ConfigManager::COMMON_SAMPLE_FOLDER_UNUSED` to their correct places
 	//! resets `SampleFile::isLoaded`, `SampleFile::isSaved` and unloads `SampleFile::buffer` if the sample isn't used
 	void sortManagedFiles();
+	void resetSavedStatus();
 
 private:
 
