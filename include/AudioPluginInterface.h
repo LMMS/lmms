@@ -180,7 +180,7 @@ class AudioProcessorImpl<Instrument, SampleT, config>
 public:
 	AudioProcessorImpl(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr, const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr, Instrument::Flags flags = Instrument::Flag::NoFlags)
 		: Instrument{desc, parent, key, flags}
-		, m_pinConnector{config.inputs, config.outputs, this}
+		, m_pinConnector{config.inputs, config.outputs, true, this}
 	{
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
 			auto iface = this->bufferInterface();
@@ -271,7 +271,7 @@ class AudioProcessorImpl<Effect, SampleT, config>
 public:
 	AudioProcessorImpl(const Plugin::Descriptor* desc, Model* parent = nullptr, const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
 		: Effect{desc, parent, key}
-		, m_pinConnector{config.inputs, config.outputs, this}
+		, m_pinConnector{config.inputs, config.outputs, false, this}
 	{
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
 			auto iface = this->bufferInterface();

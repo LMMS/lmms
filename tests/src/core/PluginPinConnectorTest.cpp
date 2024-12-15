@@ -192,7 +192,7 @@ private slots:
 		auto model = Model{nullptr};
 
 		// Channel counts should stay zero until known
-		auto pcNxN = PluginPinConnector{DynamicChannelCount, DynamicChannelCount, &model};
+		auto pcNxN = PluginPinConnector{DynamicChannelCount, DynamicChannelCount, false, &model};
 		QCOMPARE(pcNxN.in().channelCount(), 0);
 		QCOMPARE(pcNxN.out().channelCount(), 0);
 
@@ -205,12 +205,12 @@ private slots:
 		QCOMPARE(pcNxN.out().channelCount(), 8);
 
 		// stereo/stereo effect
-		auto pc2x2 = PluginPinConnector{2, 2, &model};
+		auto pc2x2 = PluginPinConnector{2, 2, false, &model};
 		QCOMPARE(pc2x2.in().channelCount(), 2);
 		QCOMPARE(pc2x2.out().channelCount(), 2);
 
 		// stereo instrument
-		auto pc0x2 = PluginPinConnector{0, 2, &model};
+		auto pc0x2 = PluginPinConnector{0, 2, true, &model};
 		QCOMPARE(pc0x2.in().channelCount(), 0);
 		QCOMPARE(pc0x2.out().channelCount(), 2);
 	}
@@ -230,7 +230,7 @@ private slots:
 		// | |X| | |X|
 		//  ---   ---
 
-		auto pc2x2 = PluginPinConnector{2, 2, &model};
+		auto pc2x2 = PluginPinConnector{2, 2, false, &model};
 		QCOMPARE(pc2x2.in().enabled(0, 0), true);
 		QCOMPARE(pc2x2.in().enabled(0, 1), false);
 		QCOMPARE(pc2x2.in().enabled(1, 0), false);
@@ -249,7 +249,7 @@ private slots:
 		// |X|   |X|
 		//  -     -
 
-		auto pc1x1 = PluginPinConnector{1, 1, &model};
+		auto pc1x1 = PluginPinConnector{1, 1, false, &model};
 		QCOMPARE(pc1x1.in().enabled(0, 0), true);
 		QCOMPARE(pc1x1.in().enabled(1, 0), true);
 
@@ -264,7 +264,7 @@ private slots:
 		// |X|   | |X| | |
 		//  -     -------
 
-		auto pc1x4 = PluginPinConnector{1, 4, &model};
+		auto pc1x4 = PluginPinConnector{1, 4, false, &model};
 		QCOMPARE(pc1x4.in().enabled(0, 0), true);
 		QCOMPARE(pc1x4.in().enabled(1, 0), true);
 
@@ -276,6 +276,25 @@ private slots:
 		QCOMPARE(pc1x4.out().enabled(1, 1), true);
 		QCOMPARE(pc1x4.out().enabled(1, 2), false);
 		QCOMPARE(pc1x4.out().enabled(1, 3), false);
+
+		// 2 inputs, 2 outputs (stereo instrument with stereo sidechain input)
+		//
+		// In    Out
+		//  ___   ___
+		// |X| | |X| |
+		// | |X| | |X|
+		//  ---   ---
+
+		auto pc2x2Inst = PluginPinConnector{2, 2, true, &model};
+		QCOMPARE(pc2x2Inst.in().enabled(0, 0), false);
+		QCOMPARE(pc2x2Inst.in().enabled(0, 1), false);
+		QCOMPARE(pc2x2Inst.in().enabled(1, 0), false);
+		QCOMPARE(pc2x2Inst.in().enabled(1, 1), false);
+
+		QCOMPARE(pc2x2Inst.out().enabled(0, 0), true);
+		QCOMPARE(pc2x2Inst.out().enabled(0, 1), false);
+		QCOMPARE(pc2x2Inst.out().enabled(1, 0), false);
+		QCOMPARE(pc2x2Inst.out().enabled(1, 1), true);
 	}
 
 	//! Verifies that the routed channels optimization works
@@ -285,7 +304,7 @@ private slots:
 
 		// Setup
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, &model};
+		auto pc = PluginPinConnector{2, 2, false, &model};
 
 		// Out
 		//  ___
@@ -339,7 +358,7 @@ private slots:
 
 		// Setup
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{1, 1, &model};
+		auto pc = PluginPinConnector{1, 1, false, &model};
 		auto coreBus = getCoreBus();
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
@@ -405,7 +424,7 @@ private slots:
 
 		// Setup
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, &model};
+		auto pc = PluginPinConnector{2, 2, false, &model};
 		auto coreBus = getCoreBus();
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
@@ -476,7 +495,7 @@ private slots:
 
 		// Setup
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, &model};
+		auto pc = PluginPinConnector{2, 2, false, &model};
 		auto coreBus = getCoreBus();
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
@@ -550,7 +569,7 @@ private slots:
 
 		// Setup
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, &model};
+		auto pc = PluginPinConnector{2, 2, false, &model};
 		auto coreBus = getCoreBus();
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 

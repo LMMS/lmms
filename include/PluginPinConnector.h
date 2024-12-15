@@ -34,10 +34,10 @@
 
 #include "AudioData.h"
 #include "AutomatableModel.h"
-#include "lmms_basics.h"
-#include "lmms_export.h"
 #include "SampleFrame.h"
 #include "SerializingObject.h"
+#include "lmms_basics.h"
+#include "lmms_export.h"
 
 class QWidget;
 
@@ -99,8 +99,8 @@ public:
 		std::vector<QString> m_channelNames; //!< optional
 	};
 
-	PluginPinConnector(Model* parent);
-	PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, Model* parent);
+	PluginPinConnector(bool isInstrument, Model* parent);
+	PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent);
 
 	/**
 	 * Getters
@@ -109,8 +109,10 @@ public:
 	auto out() const -> const Matrix& { return m_out; }
 	auto trackChannelCount() const -> std::size_t { return s_totalTrackChannels; }
 
-	//! The pin connector is initialized once the number of in/out channels are known
+	//! The pin connector is initialized once the number of in/out channels are known TODO: Remove?
 	auto initialized() const -> bool { return m_in.m_channelCount != 0 || m_out.m_channelCount != 0; }
+
+	auto isInstrument() const -> bool { return m_isInstrument; }
 
 	/**
 	 * Setters
@@ -227,6 +229,12 @@ private:
 	 * This means m_routedChannels[i] == true iif m_out.enabled(i, x) == true for any plugin channel x.
 	 */
 	std::vector<bool> m_routedChannels; // TODO: Need to calculate when pins are set/unset
+
+	/**
+	 * This needs to be known because the default connections (and view?) for instruments with sidechain
+	 * inputs is different from effects, even though they may both have the same channel counts.
+	 */
+	bool m_isInstrument = false;
 };
 
 

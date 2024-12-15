@@ -34,14 +34,16 @@
 namespace lmms
 {
 
-PluginPinConnector::PluginPinConnector(Model* parent)
+PluginPinConnector::PluginPinConnector(bool isInstrument, Model* parent)
 	: Model{parent}
+	, m_isInstrument{isInstrument}
 {
 	setTrackChannelCount(s_totalTrackChannels);
 }
 
-PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, Model* parent)
+PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent)
 	: Model{parent}
+	, m_isInstrument{isInstrument}
 {
 	setTrackChannelCount(s_totalTrackChannels);
 
@@ -262,11 +264,10 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 	assert(parentModel != nullptr);
 
 	const bool initialSetup = m_channelCount == 0;
+	const bool isOutMatrix = this == &parent->out();
 
 	if (channelCount() < count)
 	{
-		const bool isOutMatrix = this == &parent->out();
-
 		for (unsigned tcIdx = 0; tcIdx < m_pins.size(); ++tcIdx)
 		{
 			auto& pluginChannels = m_pins[tcIdx];
@@ -297,8 +298,9 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 
 	m_channelCount = count;
 
-	if (initialSetup)
+	if (initialSetup && (!parent->isInstrument() || isOutMatrix))
 	{
+		// Set default connections, unless this is the input matrix for an instrument
 		setDefaultConnections();
 	}
 }
