@@ -749,7 +749,7 @@ void Song::startExport()
 			? timeline.loopEnd()
 			: TimePos{0};
 
-		getTimeline(PlayMode::Song).setTicks( 0 );
+		getTimeline(PlayMode::Song).setTicks(0);
 	}
 
 	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) 
