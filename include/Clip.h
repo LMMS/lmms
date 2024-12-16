@@ -56,7 +56,7 @@ public:
 	Clip();
 	~Clip() override;
 
-	virtual void onAddedToTrack(Track* track) {}
+	virtual void onAddedToTrack(Track* track) = 0;
 
 	inline Track * getTrack() const
 	{
