@@ -602,9 +602,9 @@ void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 	tick_t ticksFromPlayMode = getPlayPos(playMode).getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
 	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
-	getTimeline(playMode).setTicks( ticks );
-	getTimeline(playMode).setCurrentFrame( 0.0f );
-	getTimeline(playMode).setJumped( true );
+	getTimeline(playMode).setTicks(ticks);
+	getTimeline(playMode).setCurrentFrame(0.0f);
+	getTimeline(playMode).setJumped(true);
 
 // send a signal if playposition changes during playback
 	if( isPlaying() )
