@@ -681,7 +681,7 @@ void Song::stop()
 	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)] = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
 	getTimeline(PlayMode::None).setTicks(getPlayPos().getTicks());
 
-	getTimeline().setCurrentFrame( 0 );
+	getTimeline().setCurrentFrame(0);
 
 	m_vstSyncController.setPlaybackState( m_exporting );
 	m_vstSyncController.setAbsolutePosition(
