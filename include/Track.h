@@ -29,7 +29,9 @@
 
 #include <QColor>
 
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
+#include "Engine.h"
 #include "JournallingObject.h"
 #include "lmms_basics.h"
 #include <optional>
@@ -119,6 +121,7 @@ public:
 	T* addClip(Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Clip, T>, "T must be a kind of Clip");
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
 
 		auto clip = new T(std::forward<Args>(args)...);
 		assert(canAddClip(clip) && "This clip cannot be added to this track (incompatible types?)");
