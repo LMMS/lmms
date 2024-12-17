@@ -4423,7 +4423,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->model()->getPlayPos(), quantization() ) );
+			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLine->model()->getPlayPos(), quantization()));
 
 			// select it
 			cur_note.setSelected( true );
