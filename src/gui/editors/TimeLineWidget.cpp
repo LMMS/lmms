@@ -48,12 +48,12 @@ namespace
 	constexpr int MIN_BAR_LABEL_DISTANCE = 35;
 }
 
-TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Timeline& timeline,
+TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Timeline* timeline,
 		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
 	m_ppb{ppb},
-	m_timeline{&timeline},
+	m_timeline{timeline},
 	m_begin{begin},
 	m_mode{mode}
 {

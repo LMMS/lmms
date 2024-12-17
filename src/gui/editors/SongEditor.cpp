@@ -98,7 +98,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_snappingModel->setParent(this);
 
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		m_song->getTimeline(Song::PlayMode::Song),
+		&m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, Song::PlayMode::Song, this
 	);
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::QueuedConnection);
