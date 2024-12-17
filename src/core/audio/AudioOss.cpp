@@ -100,7 +100,7 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 	int frag_spec;
 	for (frag_spec = 0;
-		1u << frag_spec < audioEngine()->framesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
+		1u << frag_spec < audioEngine()->userFramesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
 		++frag_spec)
 	{
 	}
@@ -255,26 +255,15 @@ void AudioOss::stopProcessing()
 
 void AudioOss::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	static auto buf = std::vector<SampleFrame>(audioEngine()->userFramesPerPeriod());
+	static auto outbuf = std::vector<int_sample_t>(buf.size() * channels());
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
-
-		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
-		if( write( m_audioFD, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+		const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
+		if (write(m_audioFD, outbuf.data(), bytes) != bytes) { break; }
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 
