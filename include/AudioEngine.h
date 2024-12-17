@@ -210,6 +210,7 @@ public:
 		return m_framesPerPeriod;
 	}
 
+	fpp_t userFramesPerPeriod() const { return m_userFramesPerPeriod; }
 
 	AudioEngineProfiler& profiler()
 	{
@@ -287,6 +288,7 @@ public:
 	}
 
 	const SampleFrame* renderNextBuffer();
+	void renderNextBufferChunked(SampleFrame* dst, std::size_t size);
 
 	void changeQuality(const struct qualitySettings & qs);
 
@@ -334,6 +336,7 @@ private:
 	std::vector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
+	fpp_t m_userFramesPerPeriod;
 
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];

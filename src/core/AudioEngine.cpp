@@ -74,6 +74,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_userFramesPerPeriod(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toInt()),
 	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), 44100)),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
@@ -96,33 +97,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
 		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
-	}
-
-	// if not only rendering (that is, using the GUI), load the buffer
-	// size from user configuration
-	if( renderOnly == false )
-	{
-		m_framesPerPeriod = 
-			( fpp_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
-
-		// if the value read from user configuration is not set or
-		// lower than the minimum allowed, use the default value and
-		// save it to the configuration
-		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
-		{
-			ConfigManager::inst()->setValue( "audioengine",
-						"framesperaudiobuffer",
-						QString::number( DEFAULT_BUFFER_SIZE ) );
-
-			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		}
-		// lmms works with chunks of size DEFAULT_BUFFER_SIZE (256) and only the final mix will use the actual
-		// buffer size. Plugins don't see a larger buffer size than 256. If m_framesPerPeriod is larger than
-		// DEFAULT_BUFFER_SIZE, it's set to DEFAULT_BUFFER_SIZE and the rest is handled by an increased fifoSize.
-		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
-		{
-			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		}
 	}
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
@@ -382,7 +356,22 @@ const SampleFrame* AudioEngine::renderNextBuffer()
 	return m_outputBufferRead.get();
 }
 
+void AudioEngine::renderNextBufferChunked(SampleFrame* dst, std::size_t size)
+{
+	auto buffer = static_cast<const SampleFrame*>(nullptr);
+	auto framesCopied = 0;
 
+	while (framesCopied != size)
+	{
+		if (!buffer) { buffer = renderNextBuffer(); }
+
+		const auto numFramesToCopy = std::min(m_framesPerPeriod, size - framesCopied);
+		std::copy_n(buffer + (framesCopied % m_framesPerPeriod), numFramesToCopy, dst + framesCopied);
+
+		framesCopied += numFramesToCopy;
+		if (framesCopied % m_framesPerPeriod == 0) { buffer = nullptr; }
+	}
+}
 
 
 void AudioEngine::swapBuffers()
