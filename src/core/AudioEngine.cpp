@@ -359,7 +359,7 @@ const SampleFrame* AudioEngine::renderNextBuffer()
 void AudioEngine::renderNextBufferChunked(SampleFrame* dst, std::size_t size)
 {
 	auto buffer = static_cast<const SampleFrame*>(nullptr);
-	auto framesCopied = 0;
+	auto framesCopied = std::size_t{0};
 
 	while (framesCopied != size)
 	{

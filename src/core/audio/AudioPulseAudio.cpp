@@ -240,11 +240,11 @@ void AudioPulseAudio::run()
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	static auto buf = std::vector<SampleFrame>(audioEngine()->userFramesPerPeriod());
-	static auto pcmbuf = std::vector<int_sample_t>(buf.size() * channels() * sizeof(int_sample_t));
+	static auto outbuf = std::vector<int_sample_t>(buf.size() * channels() * sizeof(int_sample_t));
 
 	audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
-	const auto bytes = convertToS16(buf.data(), buf.size(), pcmbuf.data(), m_convertEndian);
-	if (bytes > 0) { pa_stream_write(m_s, pcmbuf.data(), bytes, nullptr, 0, PA_SEEK_RELATIVE); }
+	const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
+	if (bytes > 0) { pa_stream_write(m_s, outbuf.data(), bytes, nullptr, 0, PA_SEEK_RELATIVE); }
 }
 
 
