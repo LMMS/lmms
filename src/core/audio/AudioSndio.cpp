@@ -74,7 +74,7 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = audioEngine()->framesPerPeriod();
+	m_par.round = audioEngine()->userFramesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
 	if ( (isLittleEndian() && (m_par.le == 0)) ||
@@ -141,26 +141,15 @@ void AudioSndio::stopProcessing()
 
 void AudioSndio::run()
 {
-	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	static auto buf = std::vector<SampleFrame>(audioEngine()->userFramesPerPeriod());
+	static auto outbuf = std::vector<int_sample_t>(buf.size() * channels());
 
-	while( true )
+	while (true)
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
-
-		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
-		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+		convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
+		sio_write(m_hdl, outbuf.data(), outbuf.size());
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 
