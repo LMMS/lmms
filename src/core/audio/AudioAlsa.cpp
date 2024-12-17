@@ -242,74 +242,17 @@ void AudioAlsa::stopProcessing()
 
 void AudioAlsa::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
-	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
+	static auto buf = std::vector<SampleFrame>(m_periodSize);
+	static auto outbuf = std::vector<int_sample_t>(buf.size() * channels());
 
-	int outbuf_size = audioEngine()->framesPerPeriod() * channels();
-	int outbuf_pos = 0;
-	int pcmbuf_size = m_periodSize * channels();
-
-	bool quit = false;
-	while( quit == false )
+	while (true)
 	{
-		int_sample_t * ptr = pcmbuf;
-		int len = pcmbuf_size;
-		while( len )
-		{
-			if( outbuf_pos == 0 )
-			{
-				// frames depend on the sample rate
-				const fpp_t frames = getNextBuffer( temp );
-				if( !frames )
-				{
-					quit = true;
-					memset( ptr, 0, len
-						* sizeof( int_sample_t ) );
-					break;
-				}
-				outbuf_size = frames * channels();
+		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+		convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
 
-				convertToS16(temp, frames, outbuf, m_convertEndian);
-			}
-			int min_len = std::min(len, outbuf_size - outbuf_pos);
-			memcpy( ptr, outbuf + outbuf_pos,
-					min_len * sizeof( int_sample_t ) );
-			ptr += min_len;
-			len -= min_len;
-			outbuf_pos += min_len;
-			outbuf_pos %= outbuf_size;
-		}
-
-		f_cnt_t frames = m_periodSize;
-		ptr = pcmbuf;
-
-		while( frames )
-		{
-			int err = snd_pcm_writei( m_handle, ptr, frames );
-
-			if( err == -EAGAIN )
-			{
-				continue;
-			}
-
-			if( err < 0 )
-			{
-				if( handleError( err ) < 0 )
-				{
-					printf( "Write error: %s\n",
-							snd_strerror( err ) );
-				}
-				break;	// skip this buffer
-			}
-			ptr += err * channels();
-			frames -= err;
-		}
+		const auto err = snd_pcm_writei(m_handle, outbuf.data(), buf.size());
+		if (handleError(err) < 0) { printf("Write error: %s\n", snd_strerror(err)); }
 	}
-
-	delete[] temp;
-	delete[] outbuf;
-	delete[] pcmbuf;
 }
 
 
@@ -369,7 +312,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 		}
 	}
 
-	m_periodSize = audioEngine()->framesPerPeriod();
+	m_periodSize = audioEngine()->userFramesPerPeriod();
 	m_bufferSize = m_periodSize * 8;
 	int dir;
 	if (int err = snd_pcm_hw_params_set_period_size_near(m_handle, m_hwParams, &m_periodSize, &dir); err < 0)
