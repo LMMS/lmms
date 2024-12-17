@@ -160,7 +160,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
+			double latency = static_cast<double>(Engine::audioEngine()->userFramesPerPeriod()) / _this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
@@ -229,7 +229,7 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = audioEngine()->framesPerPeriod();
+		const fpp_t fpp = audioEngine()->userFramesPerPeriod();
 		auto temp = new SampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
@@ -248,30 +248,12 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = audioEngine()->framesPerPeriod();
-	auto temp = new SampleFrame[fpp];
-	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
+	static auto buf = std::vector<SampleFrame>(audioEngine()->userFramesPerPeriod());
+	static auto pcmbuf = std::vector<int_sample_t>(buf.size() * channels() * sizeof(int_sample_t));
 
-	size_t fd = 0;
-	while( fd < length/4 && m_quit == false )
-	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			m_quit = true;
-			break;
-		}
-		int bytes = convertToS16(temp, frames, pcmbuf, m_convertEndian);
-		if( bytes > 0 )
-		{
-			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
-							PA_SEEK_RELATIVE );
-		}
-		fd += frames;
-	}
-
-	pa_xfree( pcmbuf );
-	delete[] temp;
+	audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+	const auto bytes = convertToS16(buf.data(), buf.size(), pcmbuf.data(), m_convertEndian);
+	if (bytes > 0) { pa_stream_write(m_s, pcmbuf.data(), bytes, nullptr, 0, PA_SEEK_RELATIVE); }
 }
 
 
