@@ -100,6 +100,23 @@ void AutomationClipView::changeName()
 
 
 
+void AutomationClipView::connectLastChangedModel()
+{
+	if (AutomatableModel::s_lastChangedModel != nullptr)
+	{
+		bool added = m_clip->addObject(AutomatableModel::s_lastChangedModel);
+		if (!added)
+		{
+			TextFloat::displayMessage(AutomatableModel::s_lastChangedModel->displayName(),
+							tr("Model is already connected to this clip."),
+							embed::getIconPixmap("automation"),
+							2000);
+		}
+		update();
+	}
+}
+
+
 
 void AutomationClipView::disconnectObject( QAction * _a )
 {
@@ -185,6 +202,11 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
+	if (AutomatableModel::s_lastChangedModel != nullptr && !AutomatableModel::s_lastChangedModel->displayName().isEmpty())
+	{
+		_cm->addAction(tr("Connect last changed model (%1)").arg(AutomatableModel::s_lastChangedModel->fullDisplayName()),
+						this, SLOT(connectLastChangedModel()));
+	}
 	if (!m_clip->m_objects.empty())
 	{
 		_cm->addSeparator();

@@ -37,6 +37,7 @@ namespace lmms
 {
 
 long AutomatableModel::s_periodCounter = 0;
+AutomatableModel* AutomatableModel::s_lastChangedModel = nullptr;
 
 
 
@@ -294,6 +295,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 
 void AutomatableModel::setValue( const float value )
 {
+	s_lastChangedModel = this;
 	m_oldValue = m_value;
 	++m_setValueDepth;
 	const float old_val = m_value;

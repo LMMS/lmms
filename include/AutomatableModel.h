@@ -94,6 +94,8 @@ public:
 	virtual void accept(ModelVisitor& v) = 0;
 	virtual void accept(ConstModelVisitor& v) const = 0;
 
+	static AutomatableModel* s_lastChangedModel;
+
 public:
 	/**
 	   @brief Return this class casted to Target
