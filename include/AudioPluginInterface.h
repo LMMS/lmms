@@ -178,18 +178,14 @@ class AudioProcessorImpl<Instrument, SampleT, config>
 		AudioPluginBufferDefaultImpl<config.layout, SampleT, config.inputs, config.outputs, config.inplace>>
 {
 public:
-	AudioProcessorImpl(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr, const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr, Instrument::Flags flags = Instrument::Flag::NoFlags)
+	AudioProcessorImpl(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
+		Instrument::Flags flags = Instrument::Flag::NoFlags)
 		: Instrument{desc, parent, key, flags}
 		, m_pinConnector{config.inputs, config.outputs, true, this}
 	{
-		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
-			auto iface = this->bufferInterface();
-			if (!iface) { return; }
-			iface->updateBuffers(
-				m_pinConnector.in().channelCount(),
-				m_pinConnector.out().channelCount()
-			);
-		});
+		connect(&m_pinConnector, &PluginPinConnector::pluginBuffersChanged,
+			this, &AudioProcessorImpl::updatePluginBuffers);
 	}
 
 	auto pinConnector() const -> const PluginPinConnector* final { return &m_pinConnector; }
@@ -198,7 +194,7 @@ protected:
 	void playImpl(CoreAudioDataMut inOut) final
 	{
 		SampleFrame* temp = inOut.data();
-		const auto bus = CoreAudioBusMut{&temp, 1, Engine::audioEngine()->framesPerPeriod()};
+		const auto bus = CoreAudioBusMut{&temp, 1, inOut.size()};
 		auto bufferInterface = this->bufferInterface();
 		if (!bufferInterface)
 		{
@@ -253,6 +249,16 @@ protected:
 	auto pinConnector() -> PluginPinConnector* { return &m_pinConnector; }
 
 private:
+	void updatePluginBuffers()
+	{
+		auto iface = this->bufferInterface();
+		if (!iface) { return; }
+		iface->updateBuffers(
+			m_pinConnector.in().channelCount(),
+			m_pinConnector.out().channelCount()
+		);
+	}
+
 	PluginPinConnector m_pinConnector;
 };
 
@@ -269,18 +275,13 @@ class AudioProcessorImpl<Effect, SampleT, config>
 		AudioPluginBufferDefaultImpl<config.layout, SampleT, config.inputs, config.outputs, config.inplace>>
 {
 public:
-	AudioProcessorImpl(const Plugin::Descriptor* desc, Model* parent = nullptr, const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
+	AudioProcessorImpl(const Plugin::Descriptor* desc, Model* parent = nullptr,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
 		: Effect{desc, parent, key}
 		, m_pinConnector{config.inputs, config.outputs, false, this}
 	{
-		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
-			auto iface = this->bufferInterface();
-			if (!iface) { return; }
-			iface->updateBuffers(
-				m_pinConnector.in().channelCount(),
-				m_pinConnector.out().channelCount()
-			);
-		});
+		connect(&m_pinConnector, &PluginPinConnector::pluginBuffersChanged,
+			this, &AudioProcessorImpl::updatePluginBuffers);
 	}
 
 	auto pinConnector() const -> const PluginPinConnector* final { return &m_pinConnector; }
@@ -364,6 +365,16 @@ protected:
 	auto pinConnector() -> PluginPinConnector* { return &m_pinConnector; }
 
 private:
+	void updatePluginBuffers()
+	{
+		auto iface = this->bufferInterface();
+		if (!iface) { return; }
+		iface->updateBuffers(
+			m_pinConnector.in().channelCount(),
+			m_pinConnector.out().channelCount()
+		);
+	}
+
 	PluginPinConnector m_pinConnector;
 };
 

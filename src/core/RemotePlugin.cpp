@@ -310,7 +310,6 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 #endif
 
 	sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey()));
-	updateBuffer(m_pinConnector->in().channelCount(), m_pinConnector->out().channelCount());
 
 	if( waitForInitDoneMsg )
 	{

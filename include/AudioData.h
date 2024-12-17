@@ -166,7 +166,11 @@ public:
 	 *     contiguous buffer for all channels whose size is channels() * frames().
 	 *     Whether this is true depends on the implementation of the source buffer.
 	 */
-	auto sourceBuffer() const -> SplitSampleType<SampleT>* { return m_data[0]; }
+	auto sourceBuffer() const -> SplitSampleType<SampleT>*
+	{
+		assert(m_data != nullptr);
+		return m_data[0];
+	}
 
 	auto data() const -> SplitSampleType<SampleT>* const* { return m_data; }
 

@@ -27,8 +27,11 @@
 
 #include <QDomDocument>
 #include <QDomElement>
+#include <QDebug>
 #include <stdexcept>
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "PluginPinConnectorView.h"
 
 namespace lmms
@@ -38,6 +41,7 @@ PluginPinConnector::PluginPinConnector(bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &PluginPinConnector::pluginBuffersChanged);
 	setTrackChannelCount(s_totalTrackChannels);
 }
 
@@ -45,7 +49,13 @@ PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChann
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &PluginPinConnector::pluginBuffersChanged);
 	setTrackChannelCount(s_totalTrackChannels);
+
+	if (pluginChannelCountIn == 0 && pluginChannelCountOut == 0)
+	{
+		throw std::invalid_argument{"At least one port count must be non-zero"};
+	}
 
 	if (pluginChannelCountIn != DynamicChannelCount || pluginChannelCountOut != DynamicChannelCount)
 	{
@@ -62,17 +72,20 @@ void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 
 	if (inCount < 0)
 	{
-		throw std::invalid_argument{"Invalid input count"};
+		qWarning() << "Invalid input count";
+		return;
 	}
 
 	if (outCount < 0)
 	{
-		throw std::invalid_argument{"Invalid output count"};
+		qWarning() << "Invalid output count";
+		return;
 	}
 
 	if (inCount == 0 && outCount == 0)
 	{
-		throw std::invalid_argument{"At least one port count must be non-zero"};
+		qWarning() << "At least one port count must be non-zero";
+		return;
 	}
 
 	if (in().channelCount() == inCount && out().channelCount() == outCount)
@@ -85,6 +98,7 @@ void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 	m_out.setPluginChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
 
 	emit propertiesChanged();
+	emit pluginBuffersChanged();
 }
 
 void PluginPinConnector::setPluginChannelCountIn(int inCount)

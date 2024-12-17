@@ -204,6 +204,13 @@ public:
 	friend class ::PluginPinConnectorTest;
 #endif
 
+signals:
+	//! Called when the plugin channel counts change or the track channel counts change
+	//void propertiesChanged(); [from Model base class]
+
+	//! Called when the plugin channel counts change or if the sample rate changes
+	void pluginBuffersChanged();
+
 public slots:
 	void setTrackChannelCount(int count);
 	void updateRoutedChannels(unsigned int trackChannel);
@@ -252,6 +259,7 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs);
+	assert(out.sourceBuffer() != nullptr);
 
 	// Zero the output buffer - TODO: std::memcpy?
 	std::fill_n(out.sourceBuffer(), out.channels() * out.frames(), SampleT{});
@@ -331,6 +339,7 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs);
+	assert(in.sourceBuffer() != nullptr);
 
 	/*
 	 * Routes plugin audio to track channel pair and normalizes the result. For track channels
@@ -513,6 +522,7 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs);
+	assert(out.data() != nullptr);
 
 	// Zero the output buffer - TODO: std::memcpy?
 	std::fill(out.begin(), out.end(), SampleFrame{});
@@ -652,6 +662,7 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs);
+	assert(in.data() != nullptr);
 
 	/*
 	 * This is essentially a function template with specializations for each
