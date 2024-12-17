@@ -227,15 +227,6 @@ void AudioPulseAudio::run()
 		pa_stream_disconnect( m_s );
 		pa_stream_unref( m_s );
 	}
-	else
-	{
-		const fpp_t fpp = audioEngine()->userFramesPerPeriod();
-		auto temp = new SampleFrame[fpp];
-		while( getNextBuffer( temp ) )
-		{
-		}
-		delete[] temp;
-	}
 
 	pa_context_disconnect( context );
 	pa_context_unref( context );

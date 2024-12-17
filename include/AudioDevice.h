@@ -91,9 +91,6 @@ protected:
 	// processNextBuffer()
 	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
-	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(SampleFrame* _ab);
-
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	int convertToS16(const SampleFrame* _ab,
@@ -126,11 +123,7 @@ private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	AudioEngine* m_audioEngine;
-
 	QMutex m_devMutex;
-
-	SampleFrame* m_buffer;
-
 };
 
 } // namespace lmms
