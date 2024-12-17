@@ -137,7 +137,7 @@ AutomationEditor::AutomationEditor() :
 		&Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
 		m_currentPosition, Song::PlayMode::AutomationClip, this
 	);
-	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
+	connect(this, &AutomationEditor::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::QueuedConnection);
 
 	// init scrollbars
