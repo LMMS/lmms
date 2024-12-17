@@ -1774,7 +1774,7 @@ Reaktivieren Sie sie, um den Prozess neuzustarten, wobei der letzte gespeicherte
     </message>
     <message>
         <source>Add Path</source>
-        <translation>Pad hinzufügen</translation>
+        <translation>Pfad hinzufügen</translation>
     </message>
 </context>
 <context>
