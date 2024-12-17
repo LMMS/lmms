@@ -83,11 +83,7 @@ public:
 
 	void processNextBuffer();
 
-	virtual void startProcessing()
-	{
-		m_inProcess = true;
-	}
-
+	virtual void startProcessing();
 	virtual void stopProcessing();
 
 protected:
@@ -130,7 +126,6 @@ private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	AudioEngine* m_audioEngine;
-	bool m_inProcess;
 
 	QMutex m_devMutex;
 
