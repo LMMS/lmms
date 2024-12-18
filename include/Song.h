@@ -355,6 +355,11 @@ public:
 		return m_timeSigModel;
 	}
 
+	const MeterModel& getTimeSigModel() const
+	{
+		return m_timeSigModel;
+	}
+
 	IntModel& tempoModel()
 	{
 		return m_tempoModel;
