@@ -735,7 +735,7 @@ POSSIBILITY OF SUCH DAMAGES.
     </message>
     <message>
         <source>&lt;br&gt;Version %1&lt;br&gt;Carla is a fully-featured audio plugin host%2.&lt;br&gt;&lt;br&gt;Copyright (C) 2011-2019 falkTX&lt;br&gt;</source>
-        <translation>&lt;br&gt;Version %1&lt;br&gt;Carla ist ein funktionsbeladener Audio-Plugin-Host%2.&lt;br&gt;&lt;br&gt;Copyright (C) 2011-2019 falkTX&lt;br&gt;</translation>
+        <translation>&lt;br&gt;Version %1&lt;br&gt;Carla ist ein voll funktionsfähiger Audio-Plugin-Host%2.&lt;br&gt;&lt;br&gt;Copyright (C) 2011-2019 falkTX&lt;br&gt;</translation>
     </message>
     <message>
         <source>(Engine not running)</source>
@@ -759,7 +759,7 @@ POSSIBILITY OF SUCH DAMAGES.
     </message>
     <message>
         <source>About 85% complete (missing vst bank/presets and some minor stuff)</source>
-        <translation>Circa 85% vollständig (es fehlen vst-Bank/-Presets und einige kleinere Dinge)</translation>
+        <translation>Circa 85 % vollständig (es fehlen vst-Bank/-Presets und einige kleinere Dinge)</translation>
     </message>
 </context>
 <context>
@@ -998,19 +998,19 @@ POSSIBILITY OF SUCH DAMAGES.
     </message>
     <message>
         <source>0% Wet (Bypass)</source>
-        <translation>0% Wet (umgehen)</translation>
+        <translation>0 % Wet (umgehen)</translation>
     </message>
     <message>
         <source>100% Wet</source>
-        <translation>100% Wet</translation>
+        <translation>100 % Wet</translation>
     </message>
     <message>
         <source>0% Volume (Mute)</source>
-        <translation>0% Lautstärke (stumm)</translation>
+        <translation>0 % Lautstärke (stumm)</translation>
     </message>
     <message>
         <source>100% Volume</source>
-        <translation>100% Lautstärke</translation>
+        <translation>100 % Lautstärke</translation>
     </message>
     <message>
         <source>Center Balance</source>
@@ -1090,7 +1090,7 @@ POSSIBILITY OF SUCH DAMAGES.
     </message>
     <message>
         <source>Zoom 100%</source>
-        <translation>Zoom 100%</translation>
+        <translation>Zoom 100 %</translation>
     </message>
     <message>
         <source>Ctrl+1</source>
@@ -1448,7 +1448,7 @@ Möchten Sie das jetzt tun?</translation>
     </message>
     <message>
         <source>Anti-Aliasing</source>
-        <translation>Anti-Aliasing</translation>
+        <translation>Antialiasing</translation>
     </message>
     <message>
         <source>Full canvas repaints (slower, but prevents drawing issues)</source>
@@ -1736,7 +1736,7 @@ Möchten Sie das jetzt tun?</translation>
     </message>
     <message>
         <source>High Quality Anti-Aliasing (OpenGL only)</source>
-        <translation>Hochqualitatives Anti-Aliasing (nur OpenGL)</translation>
+        <translation>Hochqualitatives Antialiasing (nur OpenGL)</translation>
     </message>
     <message>
         <source>Render Ardour-style &quot;Inline Displays&quot;</source>
@@ -2330,11 +2330,11 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>16 Bit Integer</source>
-        <translation type="vanished">16-Bit-Ganzzahlen</translation>
+        <translation type="vanished">16 Bit Ganzzahl</translation>
     </message>
     <message>
         <source>32 Bit Float</source>
-        <translation type="vanished">32-Bit-Gleitkommazahlen</translation>
+        <translation type="vanished">32 Bit Fließkommazahl</translation>
     </message>
     <message>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
@@ -2418,7 +2418,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Rendering: %1%</source>
-        <translation type="vanished">Rendere: %1%</translation>
+        <translation type="vanished">Rendern: %1 %</translation>
     </message>
     <message>
         <source>Could not open file %1 for writing.
@@ -2428,7 +2428,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte sowohl auf die Datei als auch d
     </message>
     <message>
         <source>Export as loop (remove extra bar)</source>
-        <translation>Als Schleife exportieren (Zusatz-Bar entfernen)</translation>
+        <translation>Als Schleife exportieren (Zusatztakt entfernen)</translation>
     </message>
     <message>
         <source>Render Looped Section:</source>
@@ -3263,7 +3263,7 @@ Sie können FX-Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     <message>
         <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translatorcomment>Text muss kurz sein, damit er passt</translatorcomment>
-        <translation type="vanished">Hier die Lautstärken-Normalisationsbasis für MIDI-basierende Instrumente bei Notenlautstärke von 100% angeben</translation>
+        <translation type="vanished">Hier die Lautstärken-Normalisationsbasis für MIDI-basierende Instrumente bei Notenlautstärke von 100 % angeben</translation>
     </message>
     <message>
         <source>BASE VELOCITY</source>
@@ -3979,7 +3979,7 @@ Doppelklicken Sie, um eine Datei auszuwählen.</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>B&amp;eenden</translation>
+        <translation>&amp;Verlassen</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -4162,7 +4162,7 @@ Doppelklicken Sie, um eine Datei auszuwählen.</translation>
     </message>
     <message>
         <source>Amount Multiplicator</source>
-        <translation type="vanished">Stärkenmultiplikator</translation>
+        <translation type="vanished">Intensitätsfaktor</translation>
     </message>
     <message>
         <source>Treshold</source>
@@ -4342,7 +4342,7 @@ Dieser Chip wurde in Commodore-64-Computern genutzt.</translation>
     </message>
     <message>
         <source>A multitap echo delay plugin</source>
-        <translation>Ein Multitap-Echo-Verzögerungs-Plugin</translation>
+        <translation>Ein Multitap-Echo-Plugin</translation>
     </message>
     <message>
         <source>A native flanger plugin</source>
@@ -4406,7 +4406,7 @@ Dieser Chip wurde in Commodore-64-Computern genutzt.</translation>
     </message>
     <message>
         <source>A graphical spectrum analyzer.</source>
-        <translation>Ein grafischer Spektrumsanalysator.</translation>
+        <translation>Ein grafischer Spektrumanalysator.</translation>
     </message>
     <message>
         <source>Tap to the beat</source>
@@ -4414,7 +4414,7 @@ Dieser Chip wurde in Commodore-64-Computern genutzt.</translation>
     </message>
     <message>
         <source>A stereo field visualizer.</source>
-        <translation type="unfinished">Ein Stereofeldvisualsator.</translation>
+        <translation type="unfinished">Ein Stereofeldvisualisierer.</translation>
     </message>
     <message>
         <source>Mathematical expression parser</source>
@@ -4445,11 +4445,11 @@ Dieser Chip wurde in Commodore-64-Computern genutzt.</translation>
     </message>
     <message>
         <source>Output dry/wet (100%)</source>
-        <translation>Dry/Wet-Ausgabe (100%)</translation>
+        <translation>Dry/Wet-Ausgabe (100 %)</translation>
     </message>
     <message>
         <source>Output volume (100%)</source>
-        <translation>Ausgabelautstärke (100%)</translation>
+        <translation>Ausgabelautstärke (100 %)</translation>
     </message>
     <message>
         <source>Balance Left (0%)</source>
@@ -5608,7 +5608,7 @@ Denken Sie daran, dass Sie außerdem Ihr Projekt manuell speichern. Sie können 
     </message>
     <message>
         <source>Value: %1%</source>
-        <translation type="vanished">Wert: %1%</translation>
+        <translation type="vanished">Wert: %1 %</translation>
     </message>
     <message>
         <source>Value: %1 semitones</source>
@@ -5845,7 +5845,7 @@ Denken Sie daran, dass Sie außerdem Ihr Projekt manuell speichern. Sie können 
     </message>
     <message>
         <source>BAR</source>
-        <translation type="vanished">BAR</translation>
+        <translation type="vanished">TAKT</translation>
     </message>
     <message>
         <source>BEAT</source>
@@ -5868,11 +5868,11 @@ Denken Sie daran, dass Sie außerdem Ihr Projekt manuell speichern. Sie können 
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="vanished">Nach dem Stopp zurück zum Anfang gehen</translation>
+        <translation type="vanished">Nach dem Stopp zurück zum Anfang springen</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="vanished">Nach dem Stopp zurück zur Position, wo die Wiedergabe gestartet wurde, gehen</translation>
+        <translation type="vanished">Nach dem Stopp zurück zur Position, wo die Wiedergabe gestartet wurde, springen</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
@@ -6838,7 +6838,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation type="vanished">2x Tiefpass</translation>
+        <translation type="vanished">2× Tiefpass</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
@@ -6870,7 +6870,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>2x Moog</source>
-        <translation>2x Moog</translation>
+        <translation>2× Moog</translation>
     </message>
     <message>
         <source>SV LowPass</source>
@@ -8685,15 +8685,15 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Osc 1 Coarse detune</source>
-        <translation type="vanished">Osz 1 Grob-Verstimmung</translation>
+        <translation type="vanished">Osz 1 Grobverstimmung</translation>
     </message>
     <message>
         <source>Osc 1 Fine detune left</source>
-        <translation type="vanished">Osz 1 Fein-Verstimmung links</translation>
+        <translation type="vanished">Osz 1 Feinverstimmung links</translation>
     </message>
     <message>
         <source>Osc 1 Fine detune right</source>
-        <translation type="vanished">Osz 1 Fein-Verstimmung rechts</translation>
+        <translation type="vanished">Osz 1 Feinverstimmung rechts</translation>
     </message>
     <message>
         <source>Osc 1 Stereo phase offset</source>
@@ -8721,15 +8721,15 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Osc 2 Coarse detune</source>
-        <translation type="vanished">Osz 2 Grob-Verstimmung</translation>
+        <translation type="vanished">Osz 2 Grobverstimmung</translation>
     </message>
     <message>
         <source>Osc 2 Fine detune left</source>
-        <translation type="vanished">Osz 2 Fein-Verstimmung links</translation>
+        <translation type="vanished">Osz 2 Feinverstimmung links</translation>
     </message>
     <message>
         <source>Osc 2 Fine detune right</source>
-        <translation type="vanished">Osz 2 Fein-Verstimmung rechts</translation>
+        <translation type="vanished">Osz 2 Feinverstimmung rechts</translation>
     </message>
     <message>
         <source>Osc 2 Stereo phase offset</source>
@@ -8757,7 +8757,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Osc 3 Coarse detune</source>
-        <translation type="vanished">Osz 3 Grob-Verstimmung</translation>
+        <translation type="vanished">Osz 3 Grobverstimmung</translation>
     </message>
     <message>
         <source>Osc 3 Stereo phase offset</source>
@@ -9229,7 +9229,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Osc 3 coarse detune</source>
-        <translation>Osz-3-Grob-Verstimmung</translation>
+        <translation>Osz-3-Grobverstimmung</translation>
     </message>
     <message>
         <source>Osc 3 sub-oscillator mix</source>
@@ -9524,7 +9524,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <name>lmms::NesInstrument</name>
     <message>
         <source>Channel 1 Coarse detune</source>
-        <translation type="vanished">Kanal 1 Grob-Verstimmung</translation>
+        <translation type="vanished">Kanal 1 Grobverstimmung</translation>
     </message>
     <message>
         <source>Channel 1 Volume</source>
@@ -9548,7 +9548,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Channel 2 Coarse detune</source>
-        <translation type="vanished">Kanal 2 Grob-Verstimmung</translation>
+        <translation type="vanished">Kanal 2 Grobverstimmung</translation>
     </message>
     <message>
         <source>Channel 2 Volume</source>
@@ -9572,7 +9572,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Channel 3 Coarse detune</source>
-        <translation type="vanished">Kanal 3 Grob-Verstimmung</translation>
+        <translation type="vanished">Kanal 3 Grobverstimmung</translation>
     </message>
     <message>
         <source>Channel 3 Volume</source>
@@ -9608,7 +9608,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Channel 1 coarse detune</source>
-        <translation>Kanal-1-Grob-Verstimmung</translation>
+        <translation>Kanal-1-Grobverstimmung</translation>
     </message>
     <message>
         <source>Channel 1 volume</source>
@@ -9977,15 +9977,15 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
-        <translation>Oszillator %1 Grob-Verstimmung</translation>
+        <translation>Oszillator %1 Grobverstimmung</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left</source>
-        <translation>Oszillator %1 Fein-Verstimmung links</translation>
+        <translation>Oszillator %1 Feinverstimmung links</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning right</source>
-        <translation>Oszillator %1 Fein-Verstimmung rechts</translation>
+        <translation>Oszillator %1 Feinverstimmung rechts</translation>
     </message>
     <message>
         <source>Osc %1 phase-offset</source>
@@ -10128,7 +10128,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Amount multiplicator</source>
-        <translation>Stärkenfaktor</translation>
+        <translation>Intensitätsfaktor</translation>
     </message>
 </context>
 <context>
@@ -10822,7 +10822,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Voice %1 coarse detuning</source>
-        <translation>Stimme %1 Grob-Verstimmung</translation>
+        <translation>Stimme %1 Grobverstimmung</translation>
     </message>
     <message>
         <source>Voice %1 wave shape</source>
@@ -11223,7 +11223,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation type="vanished">Mit diesem Regler können Sie die Verstärkungsrate festlegen. Wenn Sie einen Wert von 100% setzen, wird das Sample nicht geändert. Ansonsten wird es hoch oder runter verstärkt (Ihre Audio-Datei wird dabei nicht verändert!)</translation>
+        <translation type="vanished">Mit diesem Regler können Sie die Verstärkungsrate festlegen. Wenn Sie einen Wert von 100 % setzen, wird das Sample nicht geändert. Ansonsten wird es hoch oder runter verstärkt (Ihre Audio-Datei wird dabei nicht verändert!)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -11432,7 +11432,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation type="vanished">Ein höherer Spannungswert erzeugt vielleicht eine glattere Kurve aber schießt teilweise über. Ein niederer Spannungswert wird die Kurve über jeden Kontrollpunkt legen.</translation>
+        <translation type="vanished">Ein höherer Spannungswert erzeugt vielleicht eine glattere Kurve aber neigt zum Überschwingen. Ein niederer Spannungswert wird die Kurve über jeden Kontrollpunkt legen.</translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
@@ -11807,23 +11807,23 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <name>lmms::gui::CPULoadWidget</name>
     <message>
         <source>DSP total: %1%</source>
-        <translation>DSP gesamt: %1%</translation>
+        <translation>DSP gesamt: %1 %</translation>
     </message>
     <message>
         <source> - Notes and setup: %1%</source>
-        <translation> - Noten und Einrichtung: %1%</translation>
+        <translation> - Noten und Einrichtung: %1 %</translation>
     </message>
     <message>
         <source> - Instruments: %1%</source>
-        <translation> - Instrumente: %1%</translation>
+        <translation> - Instrumente: %1 %</translation>
     </message>
     <message>
         <source> - Effects: %1%</source>
-        <translation> - Effekte: %1%</translation>
+        <translation> - Effekte: %1 %</translation>
     </message>
     <message>
         <source> - Mixing: %1%</source>
-        <translation> - Mischen: %1%</translation>
+        <translation> - Mischen: %1 %</translation>
     </message>
 </context>
 <context>
@@ -13173,7 +13173,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte sowohl auf die Datei als auch d
     </message>
     <message>
         <source>Rendering: %1%</source>
-        <translation>Rendern: %1%</translation>
+        <translation>Rendern: %1 %</translation>
     </message>
 </context>
 <context>
@@ -13864,7 +13864,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte sowohl auf die Datei als auch d
     </message>
     <message>
         <source>MIDI notes at this velocity correspond to 100% note velocity.</source>
-        <translation>MIDI-Noten bei dieser Lautstärke entsprechen 100% Notenlautstärke.</translation>
+        <translation>MIDI-Noten bei dieser Lautstärke entsprechen 100 % Notenlautstärke.</translation>
     </message>
 </context>
 <context>
@@ -14755,7 +14755,7 @@ Doppelklicken auf eines der Plugins zeigt Informationen über die Ports an.</tra
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
-        <translation>303-artiger 3-Pol-Filter mit 24dB/Oktave</translation>
+        <translation>303-artiger 3-Pol-Filter mit 24 dB/Oktave</translation>
     </message>
     <message>
         <source>Slide Decay:</source>
@@ -15033,7 +15033,7 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>&amp;Beenden</translation>
+        <translation>&amp;Verlassen</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
@@ -16359,7 +16359,7 @@ PM bedeutet Phasenmodulation: Die Phase von Oszillator 3 wird durch Oszillator 2
     </message>
     <message>
         <source>Coarse detune</source>
-        <translation>Grob-Verstimmung</translation>
+        <translation>Grobverstimmung</translation>
     </message>
     <message>
         <source> semitones</source>
@@ -16537,7 +16537,7 @@ PM bedeutet Phasenmodulation: Die Phase von Oszillator 3 wird durch Oszillator 2
     </message>
     <message>
         <source>Coarse detune</source>
-        <translation>Grob-Verstimmung</translation>
+        <translation>Grobverstimmung</translation>
     </message>
     <message>
         <source>Envelope length</source>
@@ -16569,19 +16569,19 @@ PM bedeutet Phasenmodulation: Die Phase von Oszillator 3 wird durch Oszillator 2
     </message>
     <message>
         <source>12.5% Duty cycle</source>
-        <translation>12.5% Tastgrad</translation>
+        <translation>12,5 % Tastgrad</translation>
     </message>
     <message>
         <source>25% Duty cycle</source>
-        <translation>25% Tastgrad</translation>
+        <translation>25 % Tastgrad</translation>
     </message>
     <message>
         <source>50% Duty cycle</source>
-        <translation>50% Tastgrad</translation>
+        <translation>50 % Tastgrad</translation>
     </message>
     <message>
         <source>75% Duty cycle</source>
-        <translation>75% Tastgrad</translation>
+        <translation>75 % Tastgrad</translation>
     </message>
     <message>
         <source>Enable channel 2</source>
@@ -16971,15 +16971,15 @@ PM bedeutet Phasenmodulation: Die Phase von Oszillator 3 wird durch Oszillator 2
     </message>
     <message>
         <source>Velocity: %1%</source>
-        <translation>Lautstärke: %1%</translation>
+        <translation>Lautstärke: %1 %</translation>
     </message>
     <message>
         <source>Panning: %1% left</source>
-        <translation>Balance: %1% links</translation>
+        <translation>Balance: %1 % links</translation>
     </message>
     <message>
         <source>Panning: %1% right</source>
-        <translation>Balance: %1% rechts</translation>
+        <translation>Balance: %1 % rechts</translation>
     </message>
     <message>
         <source>Panning: center</source>
@@ -18451,15 +18451,15 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>1/%1 Bar</source>
-        <translation>1/%1 Bar</translation>
+        <translation>1/%1 Takt</translation>
     </message>
     <message>
         <source>%1 Bars</source>
-        <translation>%1 Bars</translation>
+        <translation>%1 Takte</translation>
     </message>
     <message>
         <source>Value: %1%</source>
-        <translation>Wert: %1%</translation>
+        <translation>Wert: %1 %</translation>
     </message>
     <message>
         <source>Value: %1 keys</source>
@@ -18526,15 +18526,15 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Bar insert controls</source>
-        <translation>Bar-Einfügesteuerung</translation>
+        <translation>Takteinfügesteuerung</translation>
     </message>
     <message>
         <source>Insert bar</source>
-        <translation>Bar einfügen</translation>
+        <translation>Takt einfügen</translation>
     </message>
     <message>
         <source>Remove bar</source>
-        <translation>Bar entfernen</translation>
+        <translation>Takt entfernen</translation>
     </message>
     <message>
         <source>Zoom controls</source>
@@ -18865,7 +18865,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>BAR</source>
-        <translation>BAR</translation>
+        <translation>TAKT</translation>
     </message>
     <message>
         <source>BEAT</source>
@@ -18900,11 +18900,11 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>After stopping go back to beginning</source>
-        <translation>Nach dem Stopp zurück zum Anfang gehen</translation>
+        <translation>Nach dem Stopp zurück zum Anfang springen</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation>Nach dem Stopp zurück zur Position, wo die Wiedergabe gestartet wurde, gehen</translation>
+        <translation>Nach dem Stopp zurück zur Position, wo die Wiedergabe gestartet wurde, springen</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
@@ -19085,11 +19085,11 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>With this knob you can set the panning of the oscillator %1. A value of -100 means 100% left and a value of 100 moves oscillator-output right.</source>
-        <translation type="vanished">Mit diesem Regler können Sie die Balance von Oszillator %1 setzen. Ein Wert von -100 heißt 100% links und ein Wert von 100 verschiebt den Oszillator-Ausgang nach rechts.</translation>
+        <translation type="vanished">Mit diesem Regler können Sie die Balance von Oszillator %1 setzen. Ein Wert von -100 heißt 100 % links und ein Wert von 100 verschiebt den Oszillator-Ausgang nach rechts.</translation>
     </message>
     <message>
         <source>Osc %1 coarse detuning:</source>
-        <translation>Oszillator %1 Grob-Verstimmung:</translation>
+        <translation>Oszillator %1 Grobverstimmung:</translation>
     </message>
     <message>
         <source>semitones</source>
@@ -19101,7 +19101,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
-        <translation>Oszillator %1 Fein-Verstimmung links:</translation>
+        <translation>Oszillator %1 Feinverstimmung links:</translation>
     </message>
     <message>
         <source>cents</source>
@@ -19109,15 +19109,15 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the left channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation type="vanished">Mit diesem Regler können Sie die Fein-Verstimmung von Oszillator %1 für den linken Kanal einstellen. Die Fein-Verstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um »fette« Sounds zu erzeugen.</translation>
+        <translation type="vanished">Mit diesem Regler können Sie die Feinverstimmung von Oszillator %1 für den linken Kanal einstellen. Die Feinverstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um »fette« Sounds zu erzeugen.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning right:</source>
-        <translation>Oszillator %1 Fein-Verstimmung rechts:</translation>
+        <translation>Oszillator %1 Feinverstimmung rechts:</translation>
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the right channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation type="vanished">Mit diesem Regler können Sie die Fein-Verstimmung von Oszillator %1 für den rechten Kanal einstellen. Die Fein-Verstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um »fette« Sounds zu erzeugen.</translation>
+        <translation type="vanished">Mit diesem Regler können Sie die Feinverstimmung von Oszillator %1 für den rechten Kanal einstellen. Die Feinverstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um »fette« Sounds zu erzeugen.</translation>
     </message>
     <message>
         <source>Osc %1 phase-offset:</source>
@@ -19540,7 +19540,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Effect by: </source>
-        <translation>Effekt von:</translation>
+        <translation>Effekt von: </translation>
     </message>
     <message>
         <source>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</source>
@@ -20209,7 +20209,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>The Coarse detuning allows to detune Voice %1 one octave up or down.</source>
-        <translation type="vanished">Die Grob-Verstimmung ermöglicht es die Stimme %1 um eine Oktave nach oben oder unten zu verstimmen.</translation>
+        <translation type="vanished">Die Grobverstimmung ermöglicht es, die Stimme %1 um eine Oktave nach oben oder unten zu verstimmen.</translation>
     </message>
     <message>
         <source>Pulse Wave</source>
