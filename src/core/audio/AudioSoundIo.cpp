@@ -256,7 +256,6 @@ void AudioSoundIo::underflowCallback()
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
 	const auto layout = &m_outstream->layout;
-
 	auto areas = static_cast<SoundIoChannelArea*>(nullptr);
 	auto framesLeft = frameCountMax;
 
@@ -269,8 +268,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 			return;
 		}
 
-		if (!frameCount)
-			break;
+		if (!frameCount) { break; }
 
 		if (m_stopped)
 		{
