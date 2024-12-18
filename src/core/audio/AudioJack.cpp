@@ -313,7 +313,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		for (int c = 0; c < channels(); ++c)
 		{
 			auto o = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(m_outputPorts[c], nframes));
-			std::fill_n(o, 0, nframes);
+			memset(o, 0, nframes);
 		}
 
 		return 0;

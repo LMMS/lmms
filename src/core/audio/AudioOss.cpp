@@ -241,6 +241,7 @@ void AudioOss::startProcessing()
 {
 	if( !isRunning() )
 	{
+		m_stopped = false;
 		start( QThread::HighPriority );
 	}
 }
@@ -250,6 +251,7 @@ void AudioOss::startProcessing()
 
 void AudioOss::stopProcessing()
 {
+	m_stopped = true;
 	stopProcessingThread( this );
 }
 
@@ -260,6 +262,8 @@ void AudioOss::run()
 
 	while (true)
 	{
+		if (m_stopped) { break; }
+
 		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
 		const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
 		if (write(m_audioFD, outbuf.data(), bytes) != bytes) { break; }

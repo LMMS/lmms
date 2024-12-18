@@ -228,6 +228,7 @@ void AudioAlsa::startProcessing()
 {
 	if( !isRunning() )
 	{
+		m_stopped = false;
 		start( QThread::HighPriority );
 	}
 }
@@ -237,6 +238,7 @@ void AudioAlsa::startProcessing()
 
 void AudioAlsa::stopProcessing()
 {
+	m_stopped = true;
 	stopProcessingThread( this );
 }
 
@@ -247,6 +249,8 @@ void AudioAlsa::run()
 
 	while (true)
 	{
+		if (m_stopped) { break; }
+
 		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
 		convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
 

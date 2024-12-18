@@ -129,6 +129,7 @@ void AudioSndio::startProcessing()
 {
 	if( !isRunning() )
 	{
+		m_stopped = false;
 		start( QThread::HighPriority );
 	}
 }
@@ -136,6 +137,7 @@ void AudioSndio::startProcessing()
 
 void AudioSndio::stopProcessing()
 {
+	m_stopped = true;
 	stopProcessingThread( this );
 }
 
@@ -146,9 +148,11 @@ void AudioSndio::run()
 
 	while (true)
 	{
+		if (m_stopped) { break; }
+
 		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
-		convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
-		sio_write(m_hdl, outbuf.data(), outbuf.size());
+		const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
+		if (sio_write(m_hdl, outbuf.data(), outbuf.size()) != bytes) { break; }
 	}
 }
 

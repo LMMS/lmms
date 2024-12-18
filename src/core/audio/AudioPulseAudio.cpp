@@ -51,7 +51,6 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngin
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_s( nullptr ),
-	m_quit( false ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -95,6 +94,7 @@ void AudioPulseAudio::startProcessing()
 {
 	if( !isRunning() )
 	{
+		m_stopped = false;
 		start( QThread::HighPriority );
 	}
 }
@@ -104,7 +104,7 @@ void AudioPulseAudio::startProcessing()
 
 void AudioPulseAudio::stopProcessing()
 {
-	m_quit = true;
+	m_stopped = true;
 	stopProcessingThread( this );
 }
 
@@ -218,11 +218,8 @@ void AudioPulseAudio::run()
 	if( m_connected )
 	{
 		int ret = 0;
-		m_quit = false;
-		while( m_quit == false
-			&& pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
-		{
-		}
+		m_stopped = false;
+		while (!m_stopped && pa_mainloop_iterate(mainLoop, 1, &ret) >= 0) {}
 
 		pa_stream_disconnect( m_s );
 		pa_stream_unref( m_s );
@@ -241,6 +238,8 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	static auto buf = std::vector<SampleFrame>(audioEngine()->userFramesPerPeriod());
 	static auto outbuf = std::vector<int_sample_t>(buf.size() * channels() * sizeof(int_sample_t));
+
+	if (m_stopped) { return; }
 
 	audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
 	const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
