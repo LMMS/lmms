@@ -258,11 +258,11 @@ void AudioOss::run()
 	static auto buf = std::vector<SampleFrame>(audioEngine()->userFramesPerPeriod());
 	static auto outbuf = std::vector<int_sample_t>(buf.size() * channels());
 
-	while( true )
+	while (true)
 	{
 		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
 		const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
-		if (write(m_audioFD, outbuf.data(), bytes) != bytes) { break; }
+		write(m_audioFD, outbuf.data(), bytes);
 	}
 }
 
