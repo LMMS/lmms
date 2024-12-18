@@ -202,7 +202,7 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
-	if (AutomatableModel::s_lastChangedModel != nullptr && !AutomatableModel::s_lastChangedModel->displayName().isEmpty())
+	if (AutomatableModel::s_lastChangedModel != nullptr)
 	{
 		_cm->addAction(tr("Connect last changed model (%1)").arg(AutomatableModel::s_lastChangedModel->fullDisplayName()),
 						this, &AutomationClipView::connectLastChangedModel);
