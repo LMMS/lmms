@@ -262,7 +262,7 @@ void AudioOss::run()
 	{
 		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
 		const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
-		write(m_audioFD, outbuf.data(), bytes);
+		if (write(m_audioFD, outbuf.data(), bytes) != bytes) { break; }
 	}
 }
 
