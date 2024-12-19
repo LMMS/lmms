@@ -40,17 +40,13 @@ namespace lmms
 PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
-PatternTrack::PatternTrack(TrackContainer* tc) :
-	Track(Track::Type::Pattern, tc)
+PatternTrack::PatternTrack() :
+	Track(Track::Type::Pattern)
 {
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
 
 	setName(tr("Pattern %1").arg(patternNum));
-	Engine::patternStore()->createClipsForPattern(patternNum);
-	Engine::patternStore()->setCurrentPattern(patternNum);
-	Engine::patternStore()->updateComboBox();
-
 	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
 }
@@ -144,14 +140,16 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 
 
-Clip* PatternTrack::createClip(const TimePos & pos)
+Clip* PatternTrack::createClip()
 {
-	auto pc = new PatternClip(this);
-	pc->movePosition(pos);
-	return pc;
+	return addClip<PatternClip>();
 }
 
 
+bool PatternTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<PatternClip*>(clip) != nullptr;
+}
 
 
 void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)

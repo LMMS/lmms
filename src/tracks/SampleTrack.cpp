@@ -44,8 +44,8 @@ namespace lmms
 {
 
 
-SampleTrack::SampleTrack(TrackContainer* tc) :
-	Track(Track::Type::Sample, tc),
+SampleTrack::SampleTrack() :
+	Track(Track::Type::Sample),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
 	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
@@ -178,15 +178,17 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-Clip * SampleTrack::createClip(const TimePos & pos)
+Clip * SampleTrack::createClip()
 {
-	auto sClip = new SampleClip(this);
-	sClip->movePosition(pos);
-	return sClip;
+	return addClip<SampleClip>();
 }
 
 
 
+bool SampleTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<SampleClip*>(clip) != nullptr;
+}
 
 void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
 {

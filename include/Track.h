@@ -84,14 +84,10 @@ public:
 		Count
 	} ;
 
-	Track( Type type, TrackContainer * tc );
+	Track(Type type);
 	~Track() override;
 
-	static Track * create( Type tt, TrackContainer * tc );
-	static Track * create( const QDomElement & element,
-							TrackContainer * tc );
 	Track * clone();
-
 
 	// pure virtual functions
 	Type type() const
@@ -105,7 +101,8 @@ public:
 
 
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
-	virtual Clip * createClip( const TimePos & pos ) = 0;
+	virtual Clip* createClip() = 0;
+	virtual bool canAddClip(Clip* clip) = 0;
 
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
@@ -118,10 +115,22 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	// -- for usage by Clip only ---------------
-	Clip * addClip( Clip * clip );
-	void removeClip( Clip * clip );
-	// -------------------------------------------------------
+	template<typename T, typename... Args>
+	T* addClip(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<Clip, T>, "T must be a kind of Clip");
+
+		auto clip = new T(std::forward<Args>(args)...);
+		assert(canAddClip(clip) && "This clip cannot be added to this track (incompatible types?)");
+
+		m_clips.push_back(clip);
+		clip->setTrack(this);
+		clip->onAddedToTrack(this);
+		emit clipAdded(clip);
+		return clip;
+	}
+
+	void removeClip(Clip* clip);
 	void deleteClips();
 
 	int numOfClips();
@@ -149,6 +158,8 @@ public:
 	{
 		return m_trackContainer;
 	}
+
+	void setTrackContainer(TrackContainer* trackContainer) { m_trackContainer = trackContainer; }
 
 	// name-stuff
 	virtual const QString & name() const
