@@ -26,19 +26,19 @@
 #ifndef LMMS_AMPLIFIER_H
 #define LMMS_AMPLIFIER_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "AmplifierControls.h"
 
 namespace lmms
 {
 
-class AmplifierEffect : public Effect
+class AmplifierEffect : public DefaultEffectPluginInterface
 {
 public:
 	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~AmplifierEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls* controls() override
 	{

@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 }
 
 ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &reverbsc_plugin_descriptor, parent, key ),
+	AudioPluginInterface(&reverbsc_plugin_descriptor, parent, key),
 	m_reverbSCControls( this )
 {
 	sp_create(&sp);
@@ -75,7 +75,7 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus ReverbSCEffect::processImpl(CoreAudioDataMut inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -88,9 +88,9 @@ Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t 
 	ValueBuffer * colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
 	ValueBuffer * outGainBuf = m_reverbSCControls.m_outputGainModel.valueBuffer();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < inOut.size(); ++f)
 	{
-		auto s = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{inOut[f][0], inOut[f][1]};
 
 		const auto inGain
 			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
@@ -111,8 +111,8 @@ Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t 
 		sp_revsc_compute(sp, revsc, &s[0], &s[1], &tmpL, &tmpR);
 		sp_dcblock_compute(sp, dcblk[0], &tmpL, &dcblkL);
 		sp_dcblock_compute(sp, dcblk[1], &tmpR, &dcblkR);
-		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
-		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
+		inOut[f][0] = d * inOut[f][0] + w * dcblkL * outGain;
+		inOut[f][1] = d * inOut[f][1] + w * dcblkR * outGain;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

@@ -26,6 +26,7 @@
 #ifndef LMMS_BUFFER_MANAGER_H
 #define LMMS_BUFFER_MANAGER_H
 
+#include "SampleFrame.h"
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
@@ -38,7 +39,7 @@ class LMMS_EXPORT BufferManager
 {
 public:
 	static void init( fpp_t fpp );
-	static SampleFrame* acquire();
+	static CoreAudioDataMut acquire(); //!< owning view
 	static void release( SampleFrame* buf );
 
 private:
