@@ -152,7 +152,7 @@ void AudioSndio::run()
 
 		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
 		const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
-		if (sio_write(m_hdl, outbuf.data(), outbuf.size()) != bytes) { break; }
+		if (sio_write(m_hdl, outbuf.data(), outbuf.size()) != static_cast<std::size_t>(bytes)) { break; }
 	}
 }
 
