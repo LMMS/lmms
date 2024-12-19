@@ -89,13 +89,6 @@ public:
 	{
 	}
 
-	// From AutomatableModel.h, it's private there.
-	inline static bool mustQuoteName(const QString &name)
-	{
-		QRegularExpression reg("^[A-Za-z0-9._-]+$");
-		return !reg.match(name).hasMatch();
-	}
-
 	inline void loadSettings(const QDomElement& element, const QString& name = QString("value")) override
 	{
 		AutomatableModel::loadSettings(element, name);
@@ -172,6 +165,7 @@ private:
 
 // -------------------------------------------------------------------
 
+// TODO: Add support for pin connector and variable number of audio input/output ports
 class CARLABASE_EXPORT CarlaInstrument : public Instrument
 {
     Q_OBJECT
@@ -195,7 +189,7 @@ public:
     QString nodeName() const override;
     void saveSettings(QDomDocument& doc, QDomElement& parent) override;
     void loadSettings(const QDomElement& elem) override;
-    void play(SampleFrame* workingBuffer) override;
+    void playImpl(CoreAudioDataMut out) override;
     bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
     gui::PluginView* instantiateView(QWidget* parent) override;
 

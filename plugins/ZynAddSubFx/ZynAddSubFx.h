@@ -28,10 +28,12 @@
 #include <QMap>
 #include <QMutex>
 
+#include <optional>
+
 #include <globals.h>
 
+#include "AudioPluginInterface.h"
 #include "AutomatableModel.h"
-#include "Instrument.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
 
@@ -51,30 +53,39 @@ class LedCheckBox;
 class ZynAddSubFxView;
 }
 
-class ZynAddSubFxRemotePlugin : public RemotePlugin
+class ZynAddSubFxRemotePlugin
+	: public RemotePlugin
+	, public AudioPluginBufferInterface<AudioDataLayout::Split, float, 0, 2>
 {
 	Q_OBJECT
 public:
-	ZynAddSubFxRemotePlugin();
+	ZynAddSubFxRemotePlugin(PluginPinConnector* pinConnector);
 
 	bool processMessage( const message & _m ) override;
 
+	auto inputBuffer() -> SplitAudioData<float, 0> override;
+	auto outputBuffer() -> SplitAudioData<float, 2> override;
+	void updateBuffers(int channelsIn, int channelsOut) override;
 
 signals:
 	void clickedCloseButton();
 
-} ;
+private:
+	std::array<float*, 2> m_accessBuffer;
+};
 
 
-
-class ZynAddSubFxInstrument : public Instrument
+// TODO: Is it always 0 inputs, 2 outputs?
+class ZynAddSubFxInstrument
+	: public AudioPluginInterface<Instrument, float,
+		PluginConfig{ .layout = AudioDataLayout::Split, .inputs = 0, .outputs = 2, .customBuffer = true }>
 {
 	Q_OBJECT
 public:
 	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
 	~ZynAddSubFxInstrument() override;
 
-	void play( SampleFrame* _working_buffer ) override;
+	void processImpl() override;
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
@@ -88,6 +99,7 @@ public:
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
+	auto bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float, 0, 2>* override;
 
 private slots:
 	void reloadPlugin();
@@ -109,8 +121,11 @@ private:
 
 	bool m_hasGUI;
 	QMutex m_pluginMutex;
-	LocalZynAddSubFx * m_plugin;
+	LocalZynAddSubFx * m_localPlugin;
 	ZynAddSubFxRemotePlugin * m_remotePlugin;
+
+	// LocalZynAddSubFx needs to be supplied with a buffer
+	std::optional<AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 0, 2, false>> m_localPluginBuffer;
 
 	FloatModel m_portamentoModel;
 	FloatModel m_filterFreqModel;

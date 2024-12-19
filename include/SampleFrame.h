@@ -26,11 +26,13 @@
 #ifndef LMMS_SAMPLEFRAME_H
 #define LMMS_SAMPLEFRAME_H
 
+#include "AudioData.h"
 #include "lmms_basics.h"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <type_traits>
 
 
 namespace lmms
@@ -52,42 +54,42 @@ public:
 	{
 	}
 
-	sample_t* data()
+	InterleavedSampleType<sample_t>* data()
 	{
 		return m_samples.data();
 	}
 
-	const sample_t* data() const
+	const InterleavedSampleType<sample_t>* data() const
 	{
 		return m_samples.data();
 	}
 
-	sample_t& left()
+	sample_t& leftRef()
 	{
 		return m_samples[0];
 	}
 
-	const sample_t& left() const
+	sample_t left() const
 	{
 		return m_samples[0];
 	}
 
-	void setLeft(const sample_t& value)
+	void setLeft(sample_t value)
 	{
 		m_samples[0] = value;
 	}
 
-	sample_t& right()
+	sample_t& rightRef()
 	{
 		return m_samples[1];
 	}
 
-	const sample_t& right() const
+	sample_t right() const
 	{
 		return m_samples[1];
 	}
 
-	void setRight(const sample_t& value)
+	void setRight(sample_t value)
 	{
 		m_samples[1] = value;
 	}
@@ -97,7 +99,7 @@ public:
 		return m_samples[index];
 	}
 
-	const sample_t& operator[](size_t index) const
+	sample_t operator[](size_t index) const
 	{
 		return m_samples[index];
 	}
@@ -109,8 +111,8 @@ public:
 
 	SampleFrame& operator+=(const SampleFrame& other)
 	{
-		auto & l = left();
-		auto & r = right();
+		auto& l = leftRef();
+		auto& r = rightRef();
 
 		l += other.left();
 		r += other.right();
@@ -138,8 +140,8 @@ public:
 
 	void operator*=(const SampleFrame& other)
 	{
-		left() *= other.left();
-		right() *= other.right();
+		leftRef() *= other.left();
+		rightRef() *= other.right();
 	}
 
 	sample_t sumOfSquaredAmplitudes() const
@@ -167,10 +169,10 @@ public:
 
 	void clamp(sample_t low, sample_t high)
 	{
-		auto & l = left();
+		auto& l = leftRef();
 		l = std::clamp(l, low, high);
 
-		auto & r = right();
+		auto& r = rightRef();
 		r = std::clamp(r, low, high);
 	}
 
@@ -185,7 +187,7 @@ public:
 	}
 
 private:
-	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
+	std::array<InterleavedSampleType<sample_t>, DEFAULT_CHANNELS> m_samples;
 };
 
 inline void zeroSampleFrames(SampleFrame* buffer, size_t frames)
@@ -208,7 +210,7 @@ inline SampleFrame getAbsPeakValues(SampleFrame* buffer, size_t frames)
 	return peaks;
 }
 
-inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t frames)
+inline void copyToSampleFrames(SampleFrame* target, const InterleavedSampleType<float>* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -217,7 +219,7 @@ inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t 
 	}
 }
 
-inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_t frames)
+inline void copyFromSampleFrames(InterleavedSampleType<float>* target, const SampleFrame* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -225,6 +227,58 @@ inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_
 		target[2*i + 1] = source[i].right();
 	}
 }
+
+
+//! A non-owning 2-channel buffer
+using CoreAudioData = Span<const SampleFrame>;
+
+//! Mutable CoreAudioData
+using CoreAudioDataMut = Span<SampleFrame>;
+
+
+/**
+ * A non-owning span of CoreAudioData.
+ *
+ * Access like this:
+ *   bus[channel pair index][frame index]
+ *
+ * where
+ *   0 <= channel pair index < channelPairs
+ *   0 <= frame index < frames
+ *
+ * TODO C++23: Use std::mdspan
+ */
+template<typename T>
+struct AudioBus
+{
+	static_assert(std::is_same_v<std::remove_const_t<T>, SampleFrame>);
+
+	AudioBus() = default;
+	AudioBus(const AudioBus&) = default;
+
+	AudioBus(T* const* bus, ch_cnt_t channelPairs, f_cnt_t frames)
+		: bus{bus}
+		, channelPairs{channelPairs}
+		, frames{frames}
+	{
+	}
+
+	template<typename U = T, std::enable_if_t<std::is_const_v<U>, bool> = true>
+	AudioBus(const AudioBus<std::remove_const_t<U>>& other)
+		: bus{other.bus}
+		, channelPairs{other.channelPairs}
+		, frames{other.frames}
+	{
+	}
+
+	T* const* bus = nullptr; //!< [channel pair index][frame index]
+	ch_cnt_t channelPairs = 0;
+	f_cnt_t frames = 0;
+};
+
+using CoreAudioBus = AudioBus<const SampleFrame>;
+using CoreAudioBusMut = AudioBus<SampleFrame>;
+
 
 } // namespace lmms
 

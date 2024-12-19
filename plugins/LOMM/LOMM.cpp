@@ -48,7 +48,7 @@ extern "C"
 
 
 LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&lomm_plugin_descriptor, parent, key),
+	AudioPluginInterface(&lomm_plugin_descriptor, parent, key),
 	m_lommControls(this),
 	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp1(m_sampleRate),
@@ -101,7 +101,7 @@ void LOMMEffect::changeSampleRate()
 }
 
 
-Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus LOMMEffect::processImpl(CoreAudioDataMut inOut)
 {
 	if (m_needsUpdate || m_lommControls.m_split1Model.isValueChanged())
 	{
@@ -188,9 +188,9 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 	const bool feedback = m_lommControls.m_feedbackModel.value() && !lookaheadEnable;
 	const bool lowSideUpwardSuppress = m_lommControls.m_lowSideUpwardSuppressModel.value() && midside;
 	
-	for (fpp_t f = 0; f < frames; ++f)
+	for (SampleFrame& frame : inOut)
 	{
-		std::array<sample_t, 2> s = {buf[f][0], buf[f][1]};
+		std::array<sample_t, 2> s = {frame[0], frame[1]};
 		
 		// Convert left/right to mid/side.  Side channel is intentionally made
 		// to be 6 dB louder to bring it into volume ranges comparable to the mid channel.
@@ -415,8 +415,8 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 		
 		if (--m_lookWrite < 0) { m_lookWrite = m_lookBufLength - 1; }
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		frame[0] = d * frame[0] + w * s[0];
+		frame[1] = d * frame[1] + w * s[1];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

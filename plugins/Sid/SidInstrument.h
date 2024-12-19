@@ -27,8 +27,8 @@
 #ifndef _SID_H
 #define _SID_H
 
+#include "AudioPluginInterface.h"
 #include "AutomatableModel.h"
-#include "Instrument.h"
 #include "InstrumentView.h"
 
 namespace lmms
@@ -101,8 +101,7 @@ public:
 	SidInstrument( InstrumentTrack * _instrument_track );
 	~SidInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

@@ -203,9 +203,8 @@ class NesInstrument : public Instrument
 public:
 	NesInstrument( InstrumentTrack * instrumentTrack );
 	~NesInstrument() override = default;
-	
-	void playNote( NotePlayHandle * n,
-						SampleFrame* workingBuffer ) override;
+
+	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) override;
 	void deleteNotePluginData( NotePlayHandle * n ) override;
 
 
