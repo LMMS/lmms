@@ -94,7 +94,7 @@ public:
 	virtual void accept(ModelVisitor& v) = 0;
 	virtual void accept(ConstModelVisitor& v) const = 0;
 
-inline static AutomatableModel* s_lastChangedModel = nullptr;
+	inline static AutomatableModel* s_lastChangedModel = nullptr;
 
 public:
 	/**
