@@ -85,7 +85,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
-		tr("export sample buffer"),
+		tr("Export sample buffer"),
 		this,
 		SLOT(exportSampleBuffer())
 	);
