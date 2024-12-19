@@ -40,9 +40,7 @@ LmmsExporterSample::LmmsExporterSample() :
 	m_readMutex(),
 	m_thread(nullptr),
 	m_fileDescriptor(NULL)
-{
-
-}
+{}
 
 LmmsExporterSample::~LmmsExporterSample()
 {
