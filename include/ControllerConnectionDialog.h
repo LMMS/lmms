@@ -58,23 +58,35 @@ class ControllerConnectionDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ControllerConnectionDialog( QWidget * _parent,
-			const AutomatableModel * _target_model );
+	ControllerConnectionDialog(QWidget* _parent,
+			const AutomatableModel* _target_model);
 	~ControllerConnectionDialog() override;
 
-	Controller * chosenController()
+	Controller* chosenController()
 	{
 		return m_controller;
 	}
 
 public slots:
-//	void setSelection( const effectKey & _selection );
-	void selectController();
+//	void setSelection(const effectKey & _selection);
+
+	// TODO: Add and improve doxy for these events:
+	// And, better yet, improve function naming all together
+
+	//! "MIDI CONTROLLER" LedCheckBox clicked/toggled event
 	void midiToggled();
-	void userToggled();
-	void userSelected();
+
+	//! "Autodetect" LedCheckBox clicked/toggled event
 	void autoDetectToggled();
-	void enableAutoDetect( QAction * _a );
+
+	//! "USER CONTROLLER" LedCheckBox clicked/toggled event
+	void userToggled();
+
+	//! "OK" button clicked event
+	void selectController();
+
+	void userSelected();
+	void enableAutoDetect(QAction* _a);
 
 
 protected slots:
@@ -82,27 +94,27 @@ protected slots:
 
 
 private:
-	// Midi
-	GroupBox * m_midiGroupBox;
-	LcdSpinBox * m_midiChannelSpinBox;
-	LcdSpinBox * m_midiControllerSpinBox;
-	LedCheckBox * m_midiAutoDetectCheckBox;
-	MidiPortMenu * m_readablePorts;
+	// Midi controller groupbox
+	GroupBox* m_midiGroupBox;
+	LcdSpinBox* m_midiChannelSpinBox;
+	LcdSpinBox* m_midiControllerSpinBox;
+	LedCheckBox* m_midiAutoDetectCheckBox;
+	MidiPortMenu* m_readablePorts;
 	BoolModel m_midiAutoDetect;
 
-	// User
-	GroupBox * m_userGroupBox;
-	ComboBox * m_userController;
+	// User controller groupbox
+	GroupBox* m_userGroupBox;
+	ComboBox* m_userController;
 
-	// Mapping
-	TabWidget * m_mappingBox;
-	QLineEdit * m_mappingFunction;
+	// Mapping function
+	TabWidget* m_mappingBox;
+	QLineEdit* m_mappingFunction;
 
-	Controller * m_controller;
-	const AutomatableModel * m_targetModel;
+	Controller* m_controller;
+	const AutomatableModel* m_targetModel;
 
 	// Temporary midiController
-	AutoDetectMidiController * m_midiController;
+	AutoDetectMidiController* m_midiController;
 } ;
 
 
