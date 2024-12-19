@@ -207,8 +207,11 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 						this, SLOT(flipX()));
 	if (AutomatableModel::lastChangedModel() != nullptr)
 	{
-		_cm->addAction(tr("Connect last changed model (%1)").arg(AutomatableModel::lastChangedModel()->fullDisplayName()),
-						this, &AutomationClipView::connectLastChangedModel);
+		_cm->addAction(tr("Connect last changed model (%1)").arg(
+			!AutomatableModel::lastChangedModel()->displayName().isEmpty()
+				? AutomatableModel::lastChangedModel()->fullDisplayName()
+				: "Unknown Model Name"),
+			this, &AutomationClipView::connectLastChangedModel);
 	}
 	if (!m_clip->m_objects.empty())
 	{
