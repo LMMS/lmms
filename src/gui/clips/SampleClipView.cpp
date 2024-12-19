@@ -31,6 +31,8 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "FileDialog.h"
+#include "LmmsExporterSample.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -86,6 +88,13 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_clip, SLOT(toggleRecord()));*/
+
+	cm->addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("export sample buffer"),
+		this,
+		SLOT(exportSampleBuffer())
+	);
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -373,6 +382,58 @@ void SampleClipView::setAutomationGhost()
 	aEditor->parentWidget()->show();
 	aEditor->show();
 	aEditor->setFocus();
+}
+
+//! Split this Clip.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool SampleClipView::splitClip( const TimePos pos )
+{
+	setMarkerEnabled( false );
+
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	//Don't split if we slid off the Clip or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialClipPos && splitPos < m_initialClipEnd )
+	{
+		m_clip->getTrack()->addJournalCheckPoint();
+		m_clip->getTrack()->saveJournallingState( false );
+
+		auto rightClip = new SampleClip(*m_clip);
+
+		m_clip->changeLength( splitPos - m_initialClipPos );
+
+		rightClip->movePosition( splitPos );
+		rightClip->changeLength( m_initialClipEnd - splitPos );
+		rightClip->setStartTimeOffset( m_clip->startTimeOffset() - m_clip->length() );
+
+		m_clip->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
+}
+
+void SampleClipView::exportSampleBuffer()
+{
+	auto openFileDialog = FileDialog(nullptr, tr("Export audio file"), QString(), tr("Audio files (*.wav *.flac *.ogg *.mp3);;WAV (*.wav);;FLAC (*.flac);;OGG (*.ogg);;MP3 (*.mp3)"));
+
+
+	if (openFileDialog.exec() == QDialog::Accepted)
+	{
+		QStringList curSelectedFiles(openFileDialog.selectedFiles());
+		if (curSelectedFiles.isEmpty() == false)
+		{
+			QString outputFileName = curSelectedFiles.first();
+			if (outputFileName.isEmpty()) { return; }
+			if (outputFileName.endsWith(".flac") == false)
+			{
+				outputFileName = PathUtil::stripPrefix(outputFileName) + ".flac";
+			}
+
+			m_clip->s_sampleExporter->startExporting(outputFileName, m_clip->m_sample.buffer());
+		}
+	}
 }
 
 } // namespace lmms::gui
