@@ -37,7 +37,6 @@ namespace lmms
 {
 
 long AutomatableModel::s_periodCounter = 0;
-AutomatableModel* AutomatableModel::s_lastChangedModel = nullptr;
 
 
 
