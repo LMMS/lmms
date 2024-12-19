@@ -42,6 +42,9 @@ namespace lmms
 
 class Engine;
 
+const QString COMMON_SAMPLE_FOLDER = "lmms_recorded_samples/";
+const QString COMMON_SAMPLE_FOLDER_USED = "Used/";
+const QString COMMON_SAMPLE_FOLDER_UNUSED = "Unused/";
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
@@ -87,6 +90,11 @@ public:
 		return m_dataDir;
 	}
 
+	QString commonSampleFolderDir() const
+	{
+		return workingDir() + COMMON_SAMPLE_FOLDER;
+	}
+
 	QString factoryProjectsDir() const
 	{
 		return dataDir() + PROJECTS_PATH;
@@ -106,7 +114,6 @@ public:
 	{
 		return dataDir() + SAMPLES_PATH;
 	}
-
 
 	QString userProjectsDir() const
 	{
