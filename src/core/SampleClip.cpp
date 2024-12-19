@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 
+#include "LmmsExporterSample.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
@@ -36,6 +37,9 @@
 
 namespace lmms
 {
+
+std::unique_ptr<LmmsExporterSample> SampleClip::s_sampleExporter = std::make_unique<LmmsExporterSample>();
+
 
 SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	: Clip(_track)
@@ -79,6 +83,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 			setResizable(true);
 			break;
 	}
+
 	updateTrackClips();
 }
 
