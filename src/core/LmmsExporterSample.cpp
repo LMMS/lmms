@@ -132,15 +132,9 @@ bool LmmsExporterSample::openFile(const QString& outputLocationAndName, std::sha
 	exportInfo.channels = channelCount;
 	exportInfo.format = (SF_FORMAT_FLAC | SF_FORMAT_PCM_24);
 
-#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
-	std::wstring characters = outputLocationAndName.toWString();
-	// wstring::c_str should guarantee null termination character at end
-	// this should be in big endian byte order
-	m_fileDescriptor = sf_open(characters.c_str(), SFM_WRITE, &exportInfo);
-#else
 	QByteArray characters = outputLocationAndName.toUtf8();
 	m_fileDescriptor = sf_open(characters.data(), SFM_WRITE, &exportInfo);
-#endif
+
 	success = m_fileDescriptor != NULL;
 
 	if (success == false)
