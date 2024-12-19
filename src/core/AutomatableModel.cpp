@@ -82,6 +82,8 @@ AutomatableModel::~AutomatableModel()
 
 	m_valueBuffer.clear();
 
+	if (s_lastChangedModel == this) { s_lastChangedModel = nullptr; }
+
 	emit destroyed( id() );
 }
 
