@@ -27,7 +27,7 @@
 #include <QObject>
 
 #include "JournallingObject.h"
-#include "TimePos.h"
+#include "PlayPos.h"
 
 namespace lmms {
 
@@ -42,6 +42,36 @@ public:
 		BackToStart,
 		KeepPosition
 	};
+
+	auto getPlayPos() const -> const PlayPos& { return m_pos; }
+
+	void setPlayPos(PlayPos pos)
+	{
+		m_pos = pos;
+		emit positionChanged();
+	}
+
+	auto getTicks() const -> tick_t { return m_pos.getTicks(); }
+
+	void setTicks(tick_t ticks)
+	{
+		m_pos.setTicks(ticks);
+		emit positionChanged();
+	}
+
+	auto currentFrame() const -> float { return m_pos.currentFrame(); }
+
+	void setCurrentFrame(const float f)
+	{
+		m_pos.setCurrentFrame(f);
+	}
+
+	auto jumped() const -> bool { return m_pos.jumped(); }
+
+	void setJumped(const bool jumped)
+	{
+		m_pos.setJumped(jumped);
+	}
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
@@ -63,6 +93,7 @@ public:
 signals:
 	void loopEnabledChanged(bool enabled);
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
+	void positionChanged();
 
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
@@ -72,6 +103,7 @@ private:
 	TimePos m_loopBegin = TimePos{0};
 	TimePos m_loopEnd = TimePos{DefaultTicksPerBar};
 	bool m_loopEnabled = false;
+	PlayPos m_pos = PlayPos{0};
 
 	StopBehaviour m_stopBehaviour = StopBehaviour::BackToStart;
 	TimePos m_playStartPosition = TimePos{-1};

@@ -98,13 +98,11 @@ SongEditor::SongEditor( Song * song ) :
 	m_snappingModel->setParent(this);
 
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		m_song->getPlayPos(Song::PlayMode::Song),
-		m_song->getTimeline(Song::PlayMode::Song),
+		&m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, Song::PlayMode::Song, this
 	);
-	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::QueuedConnection);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
@@ -754,8 +752,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const TimePos & t )
+void SongEditor::updatePosition()
 {
+	const TimePos& t = m_timeLine->model()->getPlayPos();
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
