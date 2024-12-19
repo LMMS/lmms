@@ -90,11 +90,12 @@ private:
 	void stopProcessing() override;
 	void run() override;
 
-	volatile bool m_quit;
-
 	bool m_convertEndian;
 
 	bool m_connected;
+
+	std::atomic<bool> m_stopped;
+
 	QSemaphore m_connectedSemaphore;
 
 } ;

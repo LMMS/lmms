@@ -84,6 +84,7 @@ private:
 	int m_audioFD;
 
 	bool m_convertEndian;
+	std::atomic<bool> m_stopped;
 
 } ;
 
