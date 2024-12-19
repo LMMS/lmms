@@ -94,8 +94,6 @@ public:
 	virtual void accept(ModelVisitor& v) = 0;
 	virtual void accept(ConstModelVisitor& v) const = 0;
 
-	inline static AutomatableModel* s_lastChangedModel = nullptr;
-
 public:
 	/**
 	   @brief Return this class casted to Target
@@ -319,6 +317,11 @@ public:
 		return m_useControllerValue;
 	}
 
+	static AutomatableModel* lastChangedModel()
+	{
+		return s_lastChangedModel;
+	}
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
@@ -342,6 +345,8 @@ protected:
 
 
 private:
+	inline static AutomatableModel* s_lastChangedModel = nullptr;
+
 	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
