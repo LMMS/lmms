@@ -39,6 +39,7 @@ set(LMMS_SRCS
 	core/LadspaManager.cpp
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
+	core/LmmsExporterSample.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
 	core/Metronome.cpp
