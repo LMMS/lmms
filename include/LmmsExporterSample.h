@@ -39,7 +39,7 @@ namespace lmms
 
 class SampleBuffer;
 
-class LmmsExporterSample
+class LMMS_EXPORT LmmsExporterSample
 {
 public:
 	LmmsExporterSample();
