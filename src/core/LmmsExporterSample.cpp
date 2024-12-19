@@ -143,9 +143,9 @@ bool LmmsExporterSample::openFile(const QString& outputLocationAndName, std::sha
 #endif
 	success = m_fileDescriptor != NULL;
 
-	if (success != 0)
+	if (success == false)
 	{
-		printf("LmmsExporterSample sf_open error");
+		printf("LmmsExporterSample sf_open error\n");
 	}
 
 	return success;
@@ -169,7 +169,7 @@ void LmmsExporterSample::exportBuffer(std::shared_ptr<const SampleBuffer> buffer
 	size_t count = sf_writef_float(m_fileDescriptor, outputBuffer.data(), static_cast<sf_count_t>(buffer->size()));
 	if (count != buffer->size())
 	{
-		printf("LmmsExporterSample sf_writef_float error");
+		printf("LmmsExporterSample sf_writef_float error\n");
 	}
 }
 
@@ -179,7 +179,7 @@ void LmmsExporterSample::closeFile()
 	int success = sf_close(m_fileDescriptor);
 	if (success != 0)
 	{
-		printf("LmmsExporterSample sf_close error");
+		printf("LmmsExporterSample sf_close error\n");
 	}
 	m_fileDescriptor = NULL;
 }

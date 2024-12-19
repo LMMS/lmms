@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_LMMS_EXPORTER_H
-#define LMMS_LMMS_EXPORTER_H
+#ifndef LMMS_LMMS_EXPORTER_SAMPLE_H
+#define LMMS_LMMS_EXPORTER_SAMPLE_H
 
 #include <memory>
 #include <sndfile.h>
@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_LMMS_EXPORTER_H
+#endif // LMMS_LMMS_EXPORTER_SAMPLE_H
