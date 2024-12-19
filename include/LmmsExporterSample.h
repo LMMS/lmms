@@ -28,7 +28,6 @@
 #include <memory>
 #include <sndfile.h>
 #include <thread>
-#include <utility>
 #include <vector>
 #include <mutex>
 
@@ -39,7 +38,7 @@ namespace lmms
 
 class SampleBuffer;
 
-class LMMS_EXPORT LmmsExporterSample
+class LmmsExporterSample
 {
 public:
 	LmmsExporterSample();
