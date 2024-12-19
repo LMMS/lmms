@@ -32,6 +32,7 @@
 namespace lmms
 {
 
+class LmmsExporterSample;
 class SampleBuffer;
 
 namespace gui
@@ -93,6 +94,8 @@ private:
 	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+	
+	static std::unique_ptr<LmmsExporterSample> s_sampleExporter;
 
 	friend class gui::SampleClipView;
 
