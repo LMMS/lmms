@@ -31,6 +31,8 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "FileDialog.h"
+#include "LmmsExporterSample.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -80,6 +82,13 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_clip, SLOT(toggleRecord()));*/
+
+	cm->addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("Export sample buffer"),
+		this,
+		SLOT(exportSampleBuffer())
+	);
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -374,6 +383,28 @@ bool SampleClipView::splitClip( const TimePos pos )
 		return true;
 	}
 	else { return false; }
+}
+
+void SampleClipView::exportSampleBuffer()
+{
+	auto openFileDialog = FileDialog(nullptr, tr("Export audio file"), QString(), tr("Audio files (*.wav *.flac *.ogg *.mp3);;WAV (*.wav);;FLAC (*.flac);;OGG (*.ogg);;MP3 (*.mp3)"));
+
+
+	if (openFileDialog.exec() == QDialog::Accepted)
+	{
+		QStringList curSelectedFiles(openFileDialog.selectedFiles());
+		if (curSelectedFiles.isEmpty() == false)
+		{
+			QString outputFileName = curSelectedFiles.first();
+			if (outputFileName.isEmpty()) { return; }
+			if (outputFileName.endsWith(".flac") == false)
+			{
+				outputFileName = PathUtil::stripPrefix(outputFileName) + ".flac";
+			}
+
+			m_clip->s_sampleExporter->startExporting(outputFileName, m_clip->m_sample.buffer());
+		}
+	}
 }
 
 
