@@ -1,0 +1,9 @@
+{
+ "title": "@APPDMG_VOLUME_NAME@",
+ "background": "@CPACK_SOURCE_DIR@/cmake/apple/background.png",
+ "icon-size": 128,
+ "contents": [
+   { "x": 139, "y": 200, "type": "file", "path": "@CPACK_TEMPORARY_INSTALL_DIRECTORY@/@CPACK_PROJECT_NAME_UCASE@.app" },
+   { "x": 568, "y": 200, "type": "link", "path": "/Applications" }
+ ]
+}
