@@ -39,7 +39,7 @@ class LMMS_EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
-	~AutomatableModelView() override = default;
+	~AutomatableModelView() override;
 
 	// some basic functions for convenience
 	AutomatableModel* modelUntyped()
@@ -76,6 +76,11 @@ public:
 	void setConversionFactor( float factor );
 	float getConversionFactor();
 
+	static AutomatableModel* lastChangedModel()
+	{
+		return s_lastChangedModel;
+	}
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent* event );
@@ -83,6 +88,9 @@ protected:
 	QString m_description;
 	QString m_unit;
 	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
+
+private:
+	inline static AutomatableModel* s_lastChangedModel = nullptr;
 } ;
 
 

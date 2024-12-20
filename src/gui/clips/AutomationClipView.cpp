@@ -30,6 +30,7 @@
 #include <QMenu>
 
 #include "AutomationEditor.h"
+#include "AutomatableModelView.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "ProjectJournal.h"
@@ -98,6 +99,26 @@ void AutomationClipView::changeName()
 	update();
 }
 
+
+
+void AutomationClipView::connectLastChangedModel()
+{
+	if (AutomatableModelView::lastChangedModel() != nullptr)
+	{
+		bool added = m_clip->addObject(AutomatableModelView::lastChangedModel());
+		if (added)
+		{
+			update();
+		}
+		else
+		{
+			TextFloat::displayMessage(AutomatableModelView::lastChangedModel()->displayName(),
+							tr("Model is already connected to this clip."),
+							embed::getIconPixmap("automation"),
+							2000);
+		}
+	}
+}
 
 
 
@@ -185,6 +206,14 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
+	if (AutomatableModelView::lastChangedModel() != nullptr)
+	{
+		_cm->addAction(tr("Connect last changed model (%1)").arg(
+			!AutomatableModelView::lastChangedModel()->displayName().isEmpty()
+				? AutomatableModelView::lastChangedModel()->fullDisplayName()
+				: "Unknown Model Name"),
+			this, &AutomationClipView::connectLastChangedModel);
+	}
 	if (!m_clip->m_objects.empty())
 	{
 		_cm->addSeparator();

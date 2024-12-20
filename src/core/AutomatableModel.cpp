@@ -32,6 +32,7 @@
 #include "LocaleHelper.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include <QDebug>
 
 namespace lmms
 {
