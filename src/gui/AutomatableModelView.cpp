@@ -49,15 +49,15 @@ AutomatableModelView::AutomatableModelView( Model* model, QWidget* _this ) :
 {
 	widget()->setAcceptDrops( true );
 	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
-	if (this->model() != nullptr)
+	if (modelUntyped() != nullptr)
 	{
-		QObject::connect(modelUntyped(), &AutomatableModel::dataChanged, [this](){ s_lastChangedModel = this->model(); });
+		QObject::connect(modelUntyped(), &AutomatableModel::dataChanged, [this](){ s_lastChangedModel = modelUntyped(); });
 	}
 }
 
 AutomatableModelView::~AutomatableModelView()
 {
-	if (model() != nullptr && s_lastChangedModel == model()) { s_lastChangedModel = nullptr; }
+	if (s_lastChangedModel != nullptr && s_lastChangedModel == modelUntyped()) { s_lastChangedModel = nullptr; }
 }
 
 void AutomatableModelView::addDefaultActions( QMenu* menu )
@@ -147,7 +147,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 void AutomatableModelView::setModel( Model* model, bool isOldModelValid )
 {
-	if (model != nullptr && model != this->model())
+	if (model != nullptr && model != modelUntyped())
 	{
 		QObject::connect(model, &AutomatableModel::dataChanged, [this](){ s_lastChangedModel = modelUntyped(); });
 	}
