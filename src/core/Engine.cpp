@@ -29,6 +29,7 @@
 #include "Mixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
+#include "ClapManager.h"
 #include "PatternStore.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
@@ -48,6 +49,9 @@ Song * Engine::s_song = nullptr;
 ProjectJournal * Engine::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
 Lv2Manager * Engine::s_lv2Manager = nullptr;
+#endif
+#ifdef LMMS_HAVE_CLAP
+ClapManager* Engine::s_clapManager = nullptr;
 #endif
 Ladspa2LMMS * Engine::s_ladspaManager = nullptr;
 void* Engine::s_dndPluginKey = nullptr;
@@ -76,6 +80,11 @@ void Engine::init( bool renderOnly )
 	s_lv2Manager = new Lv2Manager;
 	s_lv2Manager->initPlugins();
 #endif
+#ifdef LMMS_HAVE_CLAP
+	s_clapManager = new ClapManager;
+	s_clapManager->initPlugins();
+#endif
+
 	s_ladspaManager = new Ladspa2LMMS;
 
 	s_projectJournal->setJournalling( true );
@@ -108,6 +117,9 @@ void Engine::destroy()
 
 #ifdef LMMS_HAVE_LV2
 	deleteHelper( &s_lv2Manager );
+#endif
+#ifdef LMMS_HAVE_CLAP
+	deleteHelper( &s_clapManager );
 #endif
 	deleteHelper( &s_ladspaManager );
 
