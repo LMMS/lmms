@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
 #include <QApplication>
@@ -180,10 +180,10 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = SampleLoader::openAudioFile(m_clip ? m_clip->sample().sampleFile() : QString());
 
 	if (selectedAudioFile.isEmpty()) { return; }
-	
+
 	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
 		m_clip->changeLengthToSampleLength();

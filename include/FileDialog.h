@@ -26,7 +26,6 @@
 #define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
-
 #include "lmms_export.h"
 
 namespace lmms::gui
@@ -37,20 +36,48 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
+
+	enum Operation {
+		OpBegin = 0, // This variant is purely for looping conveviences.
+		OpGeneric = OpBegin,
+		OpProject,
+		OpMidi,
+		OpPreset,
+		OpPlugin,
+		OpSample,
+		OpSong,
+		OpEnd, // This variant is purely for looping conveviences
+	};
+
 	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
 						const QString &directory = QString(),
-						const QString &filter = QString() );
+						const QString &filter = QString(),
+						const Operation operation = OpGeneric);
+
+	~FileDialog();
 
 	static QString getExistingDirectory(QWidget *parent,
 										const QString &caption,
 										const QString &directory,
-										QFileDialog::Options options = QFileDialog::ShowDirsOnly);
+										QFileDialog::Options options = QFileDialog::ShowDirsOnly,
+										const Operation operation = OpGeneric);
     static QString getOpenFileName(QWidget *parent = 0,
 									const QString &caption = QString(),
 									const QString &directory = QString(),
 									const QString &filter = QString(),
-									QString *selectedFilter = 0);
+									QString *selectedFilter = 0,
+									const Operation operation = OpGeneric);
 	void clearSelection();
+
+private:
+	Operation operation;
+
+	static std::vector<QString> OperationPaths;
+	static bool OperationPathsReady;
+	static void prepareOperationPaths();
+	// If existing path is not empty, getOperationPath returns it instead.
+	static QString getOperationPath(const enum Operation op, const QString& existing);
+	static void setOperationPath(const enum Operation op, const QString& path);
 };
 
 

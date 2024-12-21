@@ -31,6 +31,7 @@
 
 #include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"
+#include "FileDialog.h"
 #include "LedCheckBox.h"
 
 
@@ -43,7 +44,7 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 										  const QString &caption,
 										  const QString &directory,
 										  const QString &filter ) :
-	FileDialog(parent, caption, directory, filter)
+	FileDialog(parent, caption, directory, filter, FileDialog::Operation::OpProject)
 {
 	setAcceptMode( QFileDialog::AcceptSave );
 	setFileMode( QFileDialog::AnyFile );
