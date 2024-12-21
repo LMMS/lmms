@@ -27,21 +27,21 @@
 #ifndef _WAVESHAPER_H
 #define _WAVESHAPER_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "WaveShaperControls.h"
 
 namespace lmms
 {
 
 
-class WaveShaperEffect : public Effect
+class WaveShaperEffect : public DefaultEffectPluginInterface
 {
 public:
 	WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~WaveShaperEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls * controls() override
 	{

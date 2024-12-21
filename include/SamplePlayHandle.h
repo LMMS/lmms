@@ -55,7 +55,7 @@ public:
 	}
 
 
-	void play( SampleFrame* buffer ) override;
+	void play(CoreAudioDataMut buffer) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;

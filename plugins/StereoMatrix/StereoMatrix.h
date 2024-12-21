@@ -26,21 +26,21 @@
 #ifndef _STEREO_MATRIX_H
 #define _STEREO_MATRIX_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "StereoMatrixControls.h"
 
 namespace lmms
 {
 
 
-class StereoMatrixEffect : public Effect
+class StereoMatrixEffect : public DefaultEffectPluginInterface
 {
 public:
 	StereoMatrixEffect( Model * parent, 
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoMatrixEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls* controls() override
 	{

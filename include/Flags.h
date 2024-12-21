@@ -52,6 +52,11 @@ public:
 	constexpr auto testAny(Flags flags) const -> bool { return (*this & flags) != Flags{}; }
 	constexpr auto testFlag(EnumType flag) const -> bool { return static_cast<bool>(*this & flag); }
 
+	constexpr void setFlag(EnumType flag, bool value = true)
+	{
+		m_value = value ? (m_value | flag) : (m_value & ~flag);
+	}
+
 	constexpr auto operator~() const -> Flags { return Flags{~m_value}; }
 	friend constexpr auto operator&(Flags l, Flags r) -> Flags { return Flags{l.m_value & r.m_value}; }
 	friend constexpr auto operator|(Flags l, Flags r) -> Flags { return Flags{l.m_value | r.m_value}; }

@@ -50,7 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 
 
 GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&granularpitchshifter_plugin_descriptor, parent, key),
+	AudioPluginInterface(&granularpitchshifter_plugin_descriptor, parent, key),
 	m_granularpitchshifterControls(this),
 	m_prefilter({PrefilterLowpass(), PrefilterLowpass()})
 {
@@ -60,7 +60,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus GranularPitchShifterEffect::processImpl(CoreAudioDataMut inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -92,7 +92,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < inOut.size(); ++f)
 	{
 		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
 		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
@@ -149,7 +149,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		}
 		
 		std::array<float, 2> s = {0, 0};
-		std::array<float, 2> filtered = {buf[f][0], buf[f][1]};
+		std::array<float, 2> filtered = {inOut[f][0], inOut[f][1]};
 		
 		// spawn a new grain if it's time
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
@@ -233,8 +233,8 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		m_ringBuf[m_writePoint][0] = filtered[0] + s[0] * feedback;
 		m_ringBuf[m_writePoint][1] = filtered[1] + s[1] * feedback;
 			
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		inOut[f][0] = d * inOut[f][0] + w * s[0];
+		inOut[f][1] = d * inOut[f][1] + w * s[1];
 	}
 	
 	if (m_sampleRateNeedsUpdate)
@@ -243,7 +243,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		changeSampleRate();
 	}
 
-	return Effect::ProcessStatus::ContinueIfNotQuiet;
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void GranularPitchShifterEffect::changeSampleRate()

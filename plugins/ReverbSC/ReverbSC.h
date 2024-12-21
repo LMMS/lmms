@@ -26,7 +26,7 @@
 #ifndef REVERBSC_H
 #define REVERBSC_H
 
-#include "Effect.h"
+#include "AudioPluginInterface.h"
 #include "ReverbSCControls.h"
 
 extern "C" {
@@ -40,13 +40,13 @@ namespace lmms
 {
 
 
-class ReverbSCEffect : public Effect
+class ReverbSCEffect : public DefaultEffectPluginInterface
 {
 public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~ReverbSCEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
 
 	EffectControls* controls() override
 	{
