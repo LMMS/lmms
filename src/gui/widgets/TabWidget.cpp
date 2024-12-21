@@ -90,6 +90,12 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	{
 		w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 	}
+	else
+	{
+		w->setSizePolicy(sizePolicy());
+	}
+	if(w->minimumHeight() > minimumHeight() || w->minimumSizeHint().height() > minimumHeight()) { setMinimumHeight(w->minimumHeight()); }
+	if(w->minimumWidth() > minimumWidth() || w->minimumSizeHint().width() > minimumWidth()) { setMinimumWidth(w->minimumWidth()); }
 	w->move(2, m_tabbarHeight - 1);
 	w->hide();
 
@@ -197,9 +203,26 @@ void TabWidget::mousePressEvent(QMouseEvent* me)
 
 
 
-void TabWidget::resizeEvent(QResizeEvent*)
+void TabWidget::resizeEvent(QResizeEvent* ev)
 {
-	if (!m_resizable)
+	if (m_resizable)
+	{
+		for (const auto& widget : m_widgets)
+		{
+			if(widget.w->minimumSize().height() > ev->size().height() - 4 ||
+				widget.w->minimumSize().width() > ev->size().width() - m_tabbarHeight)
+			{
+				ev->ignore();
+				return;
+			}
+		}
+		for (const auto& widget : m_widgets)
+		{
+			widget.w->resize(width() - 4, height() - m_tabbarHeight);
+		}
+		QWidget::resizeEvent(ev);
+	}
+	else
 	{
 		for (const auto& widget : m_widgets)
 		{
