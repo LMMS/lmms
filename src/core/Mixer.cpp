@@ -26,7 +26,7 @@
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
-#include "BufferManager.h"
+#include "BufferPool.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "Song.h"
