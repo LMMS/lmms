@@ -24,6 +24,7 @@
 
 #include "TextFloat.h"
 
+#include <QCoreApplication>
 #include <QTimer>
 #include <QPainter>
 #include <QStyleOption>
@@ -123,6 +124,8 @@ TextFloat * TextFloat::displayMessage(const QString & title,
 		tf->setAttribute(Qt::WA_DeleteOnClose, true);
 		QTimer::singleShot(timeout, tf, SLOT(close()));
 	}
+
+	QCoreApplication::processEvents();
 
 	return tf;
 }
