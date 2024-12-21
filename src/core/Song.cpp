@@ -52,6 +52,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "SampleTrack.h"
 #include "Scale.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
@@ -67,9 +68,7 @@ tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 Song::Song() :
 	TrackContainer(),
-	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
-				Track::create( Track::Type::HiddenAutomation,
-								this ) ) ),
+	m_globalAutomationTrack(new AutomationTrack(true)),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
@@ -99,6 +98,8 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
+	m_globalAutomationTrack->setTrackContainer(this);
+
 	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
@@ -807,8 +808,8 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	Track * t = Track::create(Track::Type::Pattern, this);
-	Engine::patternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
+	const auto patternTrack = addTrack<PatternTrack>();
+	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
 
 
@@ -816,7 +817,7 @@ void Song::addPatternTrack()
 
 void Song::addSampleTrack()
 {
-	( void )Track::create( Track::Type::Sample, this );
+	addTrack<SampleTrack>();
 }
 
 
@@ -824,7 +825,7 @@ void Song::addSampleTrack()
 
 void Song::addAutomationTrack()
 {
-	( void )Track::create( Track::Type::Automation, this );
+	addTrack<AutomationTrack>();
 }
 
 
@@ -957,15 +958,15 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	auto tripleOscTrack = Track::create(Track::Type::Instrument, this);
-	dynamic_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
+	auto tripleOscTrack = addTrack<InstrumentTrack>();
+	static_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
 
-	auto kickerTrack = Track::create(Track::Type::Instrument, Engine::patternStore());
-	dynamic_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
+	auto kickerTrack = Engine::patternStore()->addTrack<InstrumentTrack>();
+	static_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
 
-	Track::create( Track::Type::Sample, this );
-	Track::create( Track::Type::Pattern, this );
-	Track::create( Track::Type::Automation, this );
+	addTrack<SampleTrack>();
+	addTrack<PatternTrack>();
+	addTrack<AutomationTrack>();
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();
@@ -976,7 +977,6 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 	updateLength();
-	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 

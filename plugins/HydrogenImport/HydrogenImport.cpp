@@ -218,9 +218,7 @@ bool HydrogenImport::readSong()
 
 					if ( nLayer == 0 ) 
 					{
-						drum_track[sId] = static_cast<InstrumentTrack*>(
-							Track::create(Track::Type::Instrument, Engine::patternStore())
-						);
+						drum_track[sId] = Engine::patternStore()->addTrack<InstrumentTrack>();
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
 						ins = drum_track[sId]->loadInstrument( "audiofileprocessor" );
@@ -313,7 +311,8 @@ bool HydrogenImport::readSong()
 
 			int i = pattern_id[patId]+song_num_tracks;
 			Track* t = s->tracks().at(i);
-			t->createClip(pos);
+			auto clip = t->createClip();
+			clip->movePosition(pos);
 
 			if ( pattern_length[patId] > best_length ) 
 			{

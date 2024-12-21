@@ -941,7 +941,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	}
 	else if( f->handling() != FileItem::FileHandling::NotSupported )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, Engine::patternStore()));
+		auto it = Engine::patternStore()->addTrack<InstrumentTrack>();
 		handleFile( f, it );
 	}
 }
@@ -953,7 +953,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileIte
 {
 	if(item->isTrack())
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+		auto it = tc->addTrack<InstrumentTrack>();
 		handleFile(item, it);
 	}
 }
@@ -978,11 +978,12 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 	if (item->type() != FileItem::FileType::Sample) { return false; }
 
 	// Create a new sample track for this sample
-	auto sampleTrack = static_cast<SampleTrack*>(Track::create(Track::Type::Sample, Engine::getSong()));
+	auto sampleTrack = Engine::getSong()->addTrack<SampleTrack>();
 
 	// Add the sample clip to the track
 	Engine::audioEngine()->requestChangeInModel();
-	SampleClip* clip = static_cast<SampleClip*>(sampleTrack->createClip(0));
+	auto clip = static_cast<SampleClip*>(sampleTrack->createClip());
+	clip->movePosition(0);
 	clip->setSampleFile(item->fullName());
 	Engine::audioEngine()->doneChangeInModel();
 	return true;

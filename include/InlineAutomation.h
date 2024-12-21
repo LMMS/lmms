@@ -81,7 +81,7 @@ public:
 	{
 		if( m_autoClip == nullptr )
 		{
-			m_autoClip = new AutomationClip( nullptr );
+			m_autoClip = new AutomationClip();
 			m_autoClip->addObject( this );
 		}
 		return m_autoClip;

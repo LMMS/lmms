@@ -28,8 +28,12 @@
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
+#include <iostream>
 
 #include "AutomationClip.h"
+#include "AutomationTrack.h"
+#include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "embed.h"
 #include "TrackContainer.h"
 #include "PatternClip.h"
@@ -138,7 +142,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
 			}
-			Track::create( node.toElement(), this );
+			createTrack(node.toElement());
 		}
 		node = node.nextSibling();
 	}
@@ -171,24 +175,35 @@ int TrackContainer::countTracks( Track::Type _tt ) const
 	return( cnt );
 }
 
-
-
-
-void TrackContainer::addTrack( Track * _track )
+Track* TrackContainer::createTrack(const QDomElement& element)
 {
-	if( _track->type() != Track::Type::HiddenAutomation )
+	const auto trackType = static_cast<Track::Type>(element.attribute("type").toInt());
+	auto track = static_cast<Track*>(nullptr);
+
+	switch (trackType)
 	{
-		_track->lock();
-		m_tracksMutex.lockForWrite();
-		m_tracks.push_back( _track );
-		m_tracksMutex.unlock();
-		_track->unlock();
-		emit trackAdded( _track );
+	case Track::Type::Instrument:
+		track = addTrack<InstrumentTrack>();
+		break;
+	case Track::Type::Pattern:
+		track = addTrack<PatternTrack>();
+		break;
+	case Track::Type::Sample:
+		track = addTrack<SampleTrack>();
+		break;
+	case Track::Type::HiddenAutomation:
+		[[fallthrough]];
+	case Track::Type::Automation:
+		track = addTrack<AutomationTrack>();
+		break;
+	default:
+		std::cerr << "TrackContainer::addTrack - unimplemented type\n";
+		return nullptr;
 	}
+
+	track->restoreState(element);
+	return track;
 }
-
-
-
 
 void TrackContainer::removeTrack( Track * _track )
 {
@@ -216,7 +231,7 @@ void TrackContainer::removeTrack( Track * _track )
 
 
 
-void TrackContainer::updateAfterTrackAdd()
+void TrackContainer::updateAfterTrackAdd(Track* track)
 {
 }
 
