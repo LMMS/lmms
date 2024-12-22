@@ -14921,18 +14921,4 @@ Latenz: %2 ms</translation>
         <translation>MIDI-Steuerungsänderungen weiterleiten</translation>
     </message>
 </context>
-<context>
-    <name>testcontext</name>
-    <message>
-        <source>test string</source>
-        <translation>Test-String</translation>
-    </message>
-    <message numerus="yes">
-        <source>test plural %n</source>
-        <translation>
-            <numerusform>Test-Plural %n</numerusform>
-            <numerusform>Test-Plurale %n</numerusform>
-        </translation>
-    </message>
-</context>
 </TS>
