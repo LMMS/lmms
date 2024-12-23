@@ -261,8 +261,6 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	/*
-	 * TODO remove?
 	qDebug("tracksRealigned: width() = %d", width());
 	m_scrollArea->widget()->setFixedWidth(width());
 	if (fixedClips())
@@ -300,7 +298,6 @@ void TrackContainerView::realignTracks()
 	m_scrollArea->widget()->setFixedHeight(
 				m_scrollArea->widget()->minimumSizeHint().height());
 
-	*/
 	for (const auto& trackView : m_trackViews)
 	{
 		trackView->show();
