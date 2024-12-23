@@ -320,6 +320,7 @@ void ClipView::remove()
  */
 void ClipView::updateLength()
 {
+	qDebug("ClipView::updateLength");
 	if( fixedClips() )
 	{
 		setFixedWidth(MIN_FIXED_WIDTH < parentWidget()->width() ? parentWidget()->width() : MIN_FIXED_WIDTH);
