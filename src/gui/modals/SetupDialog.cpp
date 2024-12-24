@@ -91,8 +91,6 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 SetupDialog::SetupDialog(ConfigTab tab_to_open) :
-	m_displaydBFS(ConfigManager::inst()->value(
-			"app", "displaydbfs").toInt()),
 	m_tooltips(!ConfigManager::inst()->value(
 			"tooltips", "disabled").toInt()),
 	m_displayWaveform(ConfigManager::inst()->value(
@@ -231,8 +229,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	QGroupBox * guiGroupBox = new QGroupBox(tr("Graphical user interface (GUI)"), generalControls);
 	QVBoxLayout * guiGroupLayout = new QVBoxLayout(guiGroupBox);
 
-	addCheckBox(tr("Display volume as dBFS "), guiGroupBox, guiGroupLayout,
-		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
 	addCheckBox(tr("Enable tooltips"), guiGroupBox, guiGroupLayout,
 		m_tooltips, SLOT(toggleTooltips(bool)), true);
 	addCheckBox(tr("Enable master oscilloscope by default"), guiGroupBox, guiGroupLayout,
@@ -913,8 +909,6 @@ void SetupDialog::accept()
 	from taking mouse input, rendering the application unusable. */
 	QDialog::accept();
 
-	ConfigManager::inst()->setValue("app", "displaydbfs",
-					QString::number(m_displaydBFS));
 	ConfigManager::inst()->setValue("tooltips", "disabled",
 					QString::number(!m_tooltips));
 	ConfigManager::inst()->setValue("ui", "displaywaveform",
@@ -1002,12 +996,6 @@ void SetupDialog::accept()
 
 
 // General settings slots.
-
-void SetupDialog::toggleDisplaydBFS(bool enabled)
-{
-	m_displaydBFS = enabled;
-}
-
 
 void SetupDialog::toggleTooltips(bool enabled)
 {
