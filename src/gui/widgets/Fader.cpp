@@ -212,12 +212,57 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 
 void Fader::wheelEvent (QWheelEvent* ev)
 {
-	ev->accept();
 	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	model()->incValue(direction);
+	if (modelIsLinear())
+	{
+		auto value = model()->value();
+
+		if (value <= 0.)
+		{
+			// We are at -inf dB. Do nothing if we user wishes to decrease.
+			if (direction > 0)
+			{
+				// Otherwise set the model to the minimum value supported by the fader.
+				model()->setValue(dbfsToAmp(m_faderMinDb));
+			}
+		}
+		else
+		{
+			// We can safely compute the dB value as the value is greater than 0
+			auto valueInDB = ampToDbfs(value);
+
+			auto incrementValue = 1.;
+
+			auto const modKeys = ev->modifiers();
+			if (modKeys == Qt::ShiftModifier)
+			{
+				// The shift is intended to go through the values in very coarse steps as in:
+				// "Shift into overdrive"
+				incrementValue = 3.;
+			}
+			else if (modKeys == Qt::ControlModifier)
+			{
+				// The control key gives more control, i.e. it enables more fine-grained adjustments
+				incrementValue = 0.1;
+			}
+
+			auto increment = incrementValue * direction;
+
+			auto adjustedValue = valueInDB + increment;
+
+			model()->setValue(adjustedValue < m_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
+		}
+	}
+	else
+	{
+		model()->incValue(direction);
+	}
+
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut(1000);
+
+	ev->accept();
 }
 
 
