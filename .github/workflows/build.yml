@@ -168,8 +168,6 @@ jobs:
           key: "homebrew-${{ matrix.arch }}\
             -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
-    strategy:
-      fail-fast: false
     name: mingw64
     runs-on: ubuntu-latest
     container: ghcr.io/lmms/linux.mingw:20.04
@@ -232,8 +230,6 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
-    strategy:
-      fail-fast: false
     name: msvc-x64
     runs-on: windows-2019
     env:
