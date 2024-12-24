@@ -214,9 +214,26 @@ void Fader::wheelEvent (QWheelEvent* ev)
 {
 	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
+	float incrementValue = 1.;
+
+	auto const modKeys = ev->modifiers();
+	if (modKeys == Qt::ShiftModifier)
+	{
+		// The shift is intended to go through the values in very coarse steps as in:
+		// "Shift into overdrive"
+		incrementValue = 3.;
+	}
+	else if (modKeys == Qt::ControlModifier)
+	{
+		// The control key gives more control, i.e. it enables more fine-grained adjustments
+		incrementValue = 0.1;
+	}
+
+	const float increment = incrementValue * direction;
+
 	if (modelIsLinear())
 	{
-		auto value = model()->value();
+		const auto value = model()->value();
 
 		if (value <= 0.)
 		{
@@ -230,33 +247,18 @@ void Fader::wheelEvent (QWheelEvent* ev)
 		else
 		{
 			// We can safely compute the dB value as the value is greater than 0
-			auto valueInDB = ampToDbfs(value);
+			const auto valueInDB = ampToDbfs(value);
 
-			auto incrementValue = 1.;
-
-			auto const modKeys = ev->modifiers();
-			if (modKeys == Qt::ShiftModifier)
-			{
-				// The shift is intended to go through the values in very coarse steps as in:
-				// "Shift into overdrive"
-				incrementValue = 3.;
-			}
-			else if (modKeys == Qt::ControlModifier)
-			{
-				// The control key gives more control, i.e. it enables more fine-grained adjustments
-				incrementValue = 0.1;
-			}
-
-			auto increment = incrementValue * direction;
-
-			auto adjustedValue = valueInDB + increment;
+			const auto adjustedValue = valueInDB + increment;
 
 			model()->setValue(adjustedValue < m_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
 		}
 	}
 	else
 	{
-		model()->incValue(direction);
+		const auto adjustedValue = std::clamp(model()->value() + increment, model()->minValue(), model()->maxValue());
+
+		model()->setValue(adjustedValue);
 	}
 
 	updateTextFloat();
