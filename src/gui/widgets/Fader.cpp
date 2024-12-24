@@ -83,6 +83,17 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool model
 	setHintText("Volume:", "%");
 
 	m_conversionFactor = 100.0;
+
+	if (model)
+	{
+		// We currently assume that the model is not changed later on and only connect here once
+
+		// This is for example used to update the tool tip which shows the current value of the fader
+		connect(model, &FloatModel::dataChanged, this, &Fader::modelValueChanged);
+
+		// Trigger manually so that the tool tip is initialized correctly
+		modelValueChanged();
+	}
 }
 
 
@@ -346,17 +357,7 @@ void Fader::updateTextFloat()
 {
 	if (ConfigManager::inst()->value("app", "displaydbfs").toInt() && m_conversionFactor == 100.0)
 	{
-		QString label(tr("Volume: %1 dBFS"));
-
-		auto const modelValue = model()->value();
-		if (modelValue <= 0.)
-		{
-			s_textFloat->setText(label.arg("-∞"));
-		}
-		else
-		{
-			s_textFloat->setText(label.arg(ampToDbfs(modelValue), 3, 'f', 2));
-		}
+		s_textFloat->setText(getModelValueAsDbString());
 	}
 	else
 	{
@@ -366,6 +367,33 @@ void Fader::updateTextFloat()
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, calculateKnobPosYFromModel() - s_textFloat->height() / 2));
 }
 
+void Fader::modelValueChanged()
+{
+	setToolTip(getModelValueAsDbString());
+}
+
+QString Fader::getModelValueAsDbString() const
+{
+	const auto value = model()->value();
+
+	QString label(tr("Volume: %1 dB"));
+
+	if (modelIsLinear())
+	{
+		if (value <= 0.)
+		{
+			return label.arg(tr("-inf"));
+		}
+		else
+		{
+			return label.arg(ampToDbfs(value), 3, 'f', 2);
+		}
+	}
+	else
+	{
+		return label.arg(value, 3, 'f', 2);
+	}
+}
 
 void Fader::paintEvent(QPaintEvent* ev)
 {

@@ -125,6 +125,8 @@ private:
 	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
 
 	void updateTextFloat();
+	void modelValueChanged();
+	QString getModelValueAsDbString() const;
 
 	bool modelIsLinear() const { return m_modelIsLinear; }
 
