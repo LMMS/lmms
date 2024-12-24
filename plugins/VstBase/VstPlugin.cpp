@@ -835,18 +835,20 @@ void VstPlugin::updateBuffers(int channelsIn, int channelsOut)
 void VstPlugin::bufferUpdated()
 {
 	// Update the views into the RemotePlugin buffer
-	int idx = 0;
+	float* ptr = RemotePlugin::inputBuffer().data();
 	m_audioBufferIn.resize(channelsIn());
-	for (float* ptr = RemotePlugin::inputBuffer().data(); idx < channelsIn(); ++idx, ptr += frames())
+	for (pi_ch_t idx = 0; idx < channelsIn(); ++idx)
 	{
 		m_audioBufferIn[idx] = ptr;
+		ptr += frames();
 	}
 
-	idx = 0;
+	ptr = RemotePlugin::outputBuffer().data();
 	m_audioBufferOut.resize(channelsOut());
-	for (float* ptr = RemotePlugin::outputBuffer().data(); idx < channelsOut(); ++idx, ptr += frames())
+	for (pi_ch_t idx = 0; idx < channelsOut(); ++idx)
 	{
 		m_audioBufferOut[idx] = ptr;
+		ptr += frames();
 	}
 }
 

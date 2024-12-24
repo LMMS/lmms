@@ -124,13 +124,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if (auto pc = effect()->pinConnector())
 	{
-		constexpr auto formatString = "Pin connector\n%1";
+		const auto formatString = tr("Pin connector\n%1");
 
 		m_pinConnectorButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
-		m_pinConnectorButton->setToolTip(tr(formatString).arg(pc->getChannelCountText()));
+		m_pinConnectorButton->setToolTip(formatString.arg(pc->getChannelCountText()));
 
 		connect(pc, &PluginPinConnector::propertiesChanged, [=, this]() {
-			m_pinConnectorButton->setToolTip(tr(formatString).arg(effect()->pinConnector()->getChannelCountText()));
+			m_pinConnectorButton->setToolTip(formatString.arg(effect()->pinConnector()->getChannelCountText()));
 		});
 
 		m_pinConnectorButton->setGeometry(144 + 32, 12, 28, 28);

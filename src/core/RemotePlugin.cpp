@@ -336,7 +336,7 @@ bool RemotePlugin::process()
 
 	if (!m_audioBuffer)
 	{
-		// m_audioBuffer being zero means we didn't initialize everything so
+		// m_audioBuffer being null means we didn't initialize everything so
 		// far so process one message each time (and hope we get
 		// information like SHM-key etc.) until we process messages
 		// in a later stage of this procedure
@@ -352,8 +352,6 @@ bool RemotePlugin::process()
 		}
 		return false;
 	}
-
-	std::memset(m_audioBuffer.get(), 0, m_audioBufferSize);
 
 	lock();
 	sendMessage(IdStartProcessing);
@@ -382,6 +380,14 @@ void RemotePlugin::updateBuffer(int channelsIn, int channelsOut)
 	}
 
 	const auto frames = Engine::audioEngine()->framesPerPeriod();
+
+	if (channelsIn == static_cast<int>(m_channelsIn)
+		&& channelsOut == static_cast<int>(m_channelsOut)
+		&& frames == m_frames)
+	{
+		return;
+	}
+
 	const auto size = (channelsIn + channelsOut) * frames;
 
 	try
@@ -402,7 +408,7 @@ void RemotePlugin::updateBuffer(int channelsIn, int channelsOut)
 	m_channelsOut = static_cast<pi_ch_t>(channelsOut);
 
 	m_inputBuffer = Span<float>{m_audioBuffer.get(), m_channelsIn * m_frames};
-	m_outputBuffer = Span<float>{m_audioBuffer.get() + m_channelsIn * m_frames, m_channelsOut * m_frames};
+	m_outputBuffer = Span<float>{m_audioBuffer.get() + m_inputBuffer.size(), m_channelsOut * m_frames};
 
 	bufferUpdated();
 
