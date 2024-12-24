@@ -74,8 +74,8 @@ public:
 	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
 	Q_PROPERTY(QColor unityMarker MEMBER m_unityMarker)
 
-	Fader(FloatModel* model, const QString& name, QWidget* parent);
-	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
+	Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear = true);
+	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob, bool modelIsLinear = true);
 	~Fader() override = default;
 
 	void setPeak_L(float fPeak);
@@ -126,6 +126,8 @@ private:
 
 	void updateTextFloat();
 
+	bool modelIsLinear() const { return m_modelIsLinear; }
+
 	// Private members
 private:
 	float m_fPeakValue_L {0.};
@@ -141,6 +143,7 @@ private:
 	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
 
 	bool m_levelsDisplayedInDBFS {true};
+	bool m_modelIsLinear {false};
 
 	// The dbFS amount after which we drop down to -inf dbFS
 	float const m_faderMinDb {-120.};

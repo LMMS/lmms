@@ -62,9 +62,10 @@ namespace lmms::gui
 
 SimpleTextFloat* Fader::s_textFloat = nullptr;
 
-Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
 	QWidget(parent),
-	FloatModelView(model, this)
+	FloatModelView(model, this),
+	m_modelIsLinear(modelIsLinear)
 {
 	if (s_textFloat == nullptr)
 	{
@@ -85,8 +86,8 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 }
 
 
-Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob) :
-	Fader(model, name, parent)
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob, bool modelIsLinear) :
+	Fader(model, name, parent, modelIsLinear)
 {
 	m_knob = knob;
 }
@@ -191,37 +192,55 @@ void Fader::wheelEvent (QWheelEvent* ev)
 
 int Fader::calculateKnobPosYFromModel() const
 {
-	// This method calculates the pixel position where the lower end of
-	// the fader knob should be for the amplification value in the model.
-	//
-	// The following assumes that the model describes an amplification,
-	// i.e. that values are in [0, max] and that 1 is unity, i.e. 0 dbFS.
+	auto* m = model();
 
-	auto const minV = model()->minValue();
-	auto const maxV = model()->maxValue();
-	auto const value = model()->value();
+	auto const minV = m->minValue();
+	auto const maxV = m->maxValue();
+	auto const value = m->value();
 
-	auto const distanceToMin = value - minV;
-
-	// Prevent dbFS calculations with zero or negative values
-	if (distanceToMin <= 0)
+	if (modelIsLinear())
 	{
-		return height();
+		// This method calculates the pixel position where the lower end of
+		// the fader knob should be for the amplification value in the model.
+		//
+		// The following assumes that the model describes an amplification,
+		// i.e. that values are in [0, max] and that 1 is unity, i.e. 0 dbFS.
+
+		auto const distanceToMin = value - minV;
+
+		// Prevent dbFS calculations with zero or negative values
+		if (distanceToMin <= 0)
+		{
+			return height();
+		}
+		else
+		{
+			auto const maxDb = ampToDbfs(maxV);
+
+			// Make sure that we do not get values less that the minimum fader dbFS
+			// for the calculations that will follow.
+			auto const actualDb = std::max(m_faderMinDb, ampToDbfs(value));
+
+			auto const ratio = (actualDb - m_faderMinDb) / (maxDb - m_faderMinDb);
+
+			// This returns results between:
+			// * m_knob.height()  for a ratio of 1
+			// * height()         for a ratio of 0
+			return height() - (height() - m_knob.height()) * std::pow(ratio, 3.);
+		}
 	}
 	else
 	{
-		auto const maxDb = ampToDbfs(maxV);
+		// The model is in dB so we just show that in a linear fashion
+		
+		auto const clampedValue = std::clamp(value, minV, maxV);
 
-		// Make sure that we do not get values less that the minimum fader dbFS
-		// for the calculations that will follow.
-		auto const actualDb = std::max(m_faderMinDb, ampToDbfs(value));
-
-		auto const ratio = (actualDb - m_faderMinDb) / (maxDb - m_faderMinDb);
+		auto const ratio = (clampedValue - minV) / (maxV - minV);
 
 		// This returns results between:
 		// * m_knob.height()  for a ratio of 1
 		// * height()         for a ratio of 0
-		return height() - (height() - m_knob.height()) * std::pow(ratio, 3.);
+		return height() - (height() - m_knob.height()) * ratio;
 	}
 }
 
@@ -234,37 +253,49 @@ void Fader::setVolumeByLocalPixelValue(int y)
 	// Assume that the middle of the fader should go there.
 	int const lowerFaderKnob = y + (m_knob.height() / 2);
 
-	if (lowerFaderKnob >= height())
+	// In some cases we need the clamped lower position of the fader knob so we can ensure
+	// that we only set allowed values in the model range.
+	int const clampedLowerFaderKnob = std::clamp(lowerFaderKnob, m_knob.height(), height());
+
+	if (modelIsLinear())
 	{
-		// We have to check this before clamping because otherwise we wouldn't be able to set -inf dB!
-		model()->setValue(0);
+		if (lowerFaderKnob >= height())
+		{
+			// Check the non-clamped value because otherwise we wouldn't be able to set -inf dB!
+			model()->setValue(0);
+		}
+		else
+		{
+			// We are in the case where we set a value that's different from -inf dB so we use the clamped value
+			// of the lower knob position so that we only set allowed values in the model range.
+
+			// First map the lower knob position to [0, 1] so that we can apply some curve mapping, e.g.
+			// square, cube, etc.
+			LinearMap<float> knobMap(float(m_knob.height()), 1., float(height()), 0.);
+
+			// Apply the inverse of what is done in calculateKnobPosYFromModel
+			auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./3.);
+
+			float const maxDb = ampToDbfs(m->maxValue());
+
+			LinearMap<float> dbMap(1., maxDb, 0., m_faderMinDb);
+
+			float const dbValue = dbMap.map(knobPos);
+
+			// Pull everything that's quieter than the minimum fader dbFS value down to 0 amplification.
+			// This should not happen due to the steps above but let's be sure.
+			// Otherwise compute the amplification value from the mapped dbFS value but make sure that we
+			// do not exceed the maximum dbValue of the model
+			float ampValue = dbValue < m_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
+
+			model()->setValue(ampValue);
+		}
 	}
 	else
 	{
-		// We are in the case where we set a value different from -inf dB so we first clamp the
-		// lower position of the fader knob so that we only set allowed values in the model range.
-		int const clampedLowerFaderKnob = std::clamp(lowerFaderKnob, m_knob.height(), height());
+		LinearMap<float> valueMap(float(m_knob.height()), model()->maxValue(), float(height()), model()->minValue());
 
-		// First map the lower knob position to [0, 1] so that we can apply some curved mapping, e.g.
-		// square, cube, etc.
-		LinearMap<float> knobMap(float(m_knob.height()), 1., float(height()), 0.);
-
-		// Apply the inverse of what is done in calculateKnobPosYFromModel
-		auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./3.);
-
-		float const maxDb = ampToDbfs(m->maxValue());
-
-		LinearMap<float> dbMap(1., maxDb, 0., m_faderMinDb);
-
-		float const dbValue = dbMap.map(knobPos);
-
-		// Pull everything that's quieter than the minimum fader dbFS value down to 0 amplification.
-		// This should not happen due to the steps above but let's be sure.
-		// Otherwise compute the amplification value from the mapped dbFS value but make sure that we
-		// do not exceed the maximum dbValue of the model
-		float ampValue = dbValue < m_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
-
-		model()->setValue(ampValue);
+		model()->setValue(valueMap.map(clampedLowerFaderKnob));
 	}
 }
 
