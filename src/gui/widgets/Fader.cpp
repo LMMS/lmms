@@ -160,16 +160,36 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
 	bool ok;
-	// TODO: dbFS handling
-	auto minv = model()->minValue() * m_conversionFactor;
-	auto maxv = model()->maxValue() * m_conversionFactor;
-	float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
-						 tr("Please enter a new value between %1 and %2:").arg(minv).arg(maxv),
-						 model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok);
 
-	if (ok)
+	if (modelIsLinear())
 	{
-		model()->setValue(enteredValue / m_conversionFactor);
+		auto minDB = m_faderMinDb;
+		auto maxDB = ampToDbfs(model()->maxValue());
+		const auto currentValue = model()->value() <= 0. ? m_faderMinDb : ampToDbfs(model()->value());
+
+		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
+							tr("Please enter a new value between %1 and %2:").arg(minDB).arg(maxDB),
+							currentValue, minDB, maxDB, model()->getDigitCount(), &ok);
+
+		if (ok)
+		{
+			model()->setValue(dbfsToAmp(enteredValue));
+		}
+		return;
+	}
+	else
+	{
+		// The model already is in dB
+		auto minv = model()->minValue() * m_conversionFactor;
+		auto maxv = model()->maxValue() * m_conversionFactor;
+		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
+							tr("Please enter a new value between %1 and %2:").arg(minv).arg(maxv),
+							model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok);
+
+		if (ok)
+		{
+			model()->setValue(enteredValue / m_conversionFactor);
+		}
 	}
 }
 
