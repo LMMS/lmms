@@ -36,7 +36,6 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
-
 	enum Operation {
 		OpBegin = 0, // This variant is purely for looping conveviences.
 		OpGeneric = OpBegin,
@@ -54,7 +53,7 @@ public:
 						const QString &filter = QString(),
 						const Operation operation = OpGeneric);
 
-	~FileDialog();
+	~FileDialog() override;
 
 	static QString getExistingDirectory(QWidget *parent,
 										const QString &caption,
