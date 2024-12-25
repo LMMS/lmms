@@ -173,7 +173,10 @@ void ProjectRenderer::run()
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
-		m_fileDev->processNextBuffer();
+		const auto buffer = Engine::audioEngine()->renderNextBuffer();
+		const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
+		m_fileDev->writeBuffer(buffer, framesPerPeriod);
+
 		const int nprog = Engine::getSong()->getExportProgress();
 		if (m_progress != nprog)
 		{

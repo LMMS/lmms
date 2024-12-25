@@ -50,15 +50,6 @@ AudioDevice::~AudioDevice()
 }
 
 
-
-
-void AudioDevice::processNextBuffer()
-{
-	// TODO: This function can probably be in AudioFileDevice instead
-	const auto buffer = m_audioEngine->renderNextBuffer();
-	writeBuffer(buffer, m_audioEngine->framesPerPeriod());
-}
-
 void AudioDevice::startProcessing()
 {
 }

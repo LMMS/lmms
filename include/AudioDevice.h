@@ -81,16 +81,10 @@ public:
 		return m_channels;
 	}
 
-	void processNextBuffer();
-
 	virtual void startProcessing();
 	virtual void stopProcessing();
 
 protected:
-	// subclasses can re-implement this for being used in conjunction with
-	// processNextBuffer()
-	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
-
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	int convertToS16(const SampleFrame* _ab,
