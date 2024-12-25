@@ -226,7 +226,7 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf(paramStr.data(), "param%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
@@ -290,7 +290,7 @@ void VestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf(paramStr.data(), "param%d", i);
+					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 
@@ -987,7 +987,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf(paramStr.data(), "param%d", i);
+		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
 		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
@@ -996,7 +996,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 		if( !hasKnobModel )
 		{
-			sprintf(paramStr.data(), "%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "%d", i);
 			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
 				0.0f, 1.0f, 0.01f, castModel<VestigeInstrument>(), paramStr.data());
 		}
@@ -1059,8 +1059,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 		// those auto-setted values are not jurnaled, tracked for undo / redo
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf(paramStr.data(), "param%d", i);
-    		s_dumpValues = dump[paramStr.data()].split(":");
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );

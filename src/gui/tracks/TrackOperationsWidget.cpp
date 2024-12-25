@@ -232,7 +232,7 @@ bool TrackOperationsWidget::confirmRemoval()
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
 	});
 
-	QMessageBox mb(this);
+	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
 	mb.setWindowTitle(messageTitleRemoveTrack);
 	mb.setIcon(QMessageBox::Warning);
