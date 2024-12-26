@@ -36,7 +36,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	const auto samplesPerPixel = std::max(1.0f, static_cast<float>(parameters.size) / rect.width());
+	const auto samplesPerPixel = std::max(1.0, static_cast<double>(parameters.size) / rect.width());
 	const auto numPixelsToDraw = std::min(static_cast<int>(parameters.size), rect.width());
 
 	const auto compFn = [](const SampleFrame& a, const SampleFrame& b) { return a.average() < b.average(); };
