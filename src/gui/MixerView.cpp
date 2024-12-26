@@ -150,6 +150,7 @@ MixerView::MixerView(Mixer* mixer) :
 	newChannelBtn->setObjectName("newChannelBtn");
 	newChannelBtn->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
 	newChannelBtn->setFixedWidth(mixerChannelSize.width());
+	newChannelBtn->setFocusPolicy(Qt::NoFocus);
 	connect(newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget(newChannelBtn, 0);
 
