@@ -56,8 +56,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	// Helper lambdas for consistent repeated buiding of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
-		auto knob = new Knob(KnobType::Bright26, this);
-		knob->setLabel(label);
+		auto knob = Knob::buildLegacyKnob(KnobType::Bright26, label, this);
 		knob->setHintText(hintText, "");
 		
 		return knob;
@@ -167,8 +166,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_lfoAttackKnob = buildKnob(tr("ATT"), tr("Attack:"));
 	lfoKnobsLayout->addWidget(m_lfoAttackKnob);
 
-	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, this);
-	m_lfoSpeedKnob->setLabel(tr("SPD"));
+	m_lfoSpeedKnob = TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("SPD"), this);
 	m_lfoSpeedKnob->setHintText(tr("Frequency:"), "");
 	lfoKnobsLayout->addWidget(m_lfoSpeedKnob);
 
