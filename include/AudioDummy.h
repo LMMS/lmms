@@ -93,6 +93,7 @@ private:
 		MicroTimer timer;
 		while( true )
 		{
+			audioEngine()->renderNextBuffer();
 			timer.reset();
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
