@@ -53,13 +53,17 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	Clip( Track * track );
+	Clip();
 	~Clip() override;
+
+	virtual void onAddedToTrack(Track* track) {}
 
 	inline Track * getTrack() const
 	{
 		return m_track;
 	}
+
+	void setTrack(Track* track) { m_track = track; }
 
 	inline const QString & name() const
 	{

@@ -47,13 +47,14 @@ class SampleClip : public Clip
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleClip(Track* track, Sample sample, bool isPlaying);
-	SampleClip(Track* track);
+	SampleClip(Sample sample, bool isPlaying);
+	SampleClip();
 	SampleClip( const SampleClip& orig );
 	~SampleClip() override;
 
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
+	void onAddedToTrack(Track* track) override;
 	void changeLength( const TimePos & _length ) override;
 	void changeLengthToSampleLength();
 	const QString& sampleFile() const;
