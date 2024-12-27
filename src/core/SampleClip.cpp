@@ -30,17 +30,18 @@
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
-#include "SampleLoader.h"
+#include "SampleFolder.h"
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
 namespace lmms
 {
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
-	, m_sample(std::move(sample))
-	, m_isPlaying(false)
+SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
+	Clip(_track),
+	m_sample(std::move(sample)),
+	m_sampleFile(""),
+	m_isPlaying(false)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -122,19 +123,20 @@ void SampleClip::changeLengthToSampleLength()
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.sampleFile();
+	return m_sampleFile;
 }
 
 bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 {
-	return m_sample.sampleFile() == filename;
+	return m_sampleFile == filename;
 }
 
-void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
+void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb, const QString& name)
 {
 	{
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
 		m_sample = Sample(std::move(sb));
+		m_sampleFile = name;
 	}
 	updateLength();
 
@@ -149,9 +151,18 @@ void SampleClip::setSampleFile(const QString& sf)
 
 	if (!sf.isEmpty())
 	{
-		//Otherwise set it to the sample's length
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
-		length = sampleLength();
+		std::shared_ptr<const SampleBuffer> buffer = Engine::getSampleFolder()->loadSample(sf, &m_sampleFile);
+		if (buffer == SampleBuffer::emptyBuffer())
+		{
+			Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), sf));
+		}
+		else
+		{
+			//Otherwise set it to the sample's length
+			m_sample = Sample(buffer);
+
+			length = sampleLength();
+		}
 	}
 
 	if (length == 0)
@@ -267,10 +278,14 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
-	if( sampleFile() == "" )
+
+	if (sampleFile() != "")
 	{
-		QString s;
-		_this.setAttribute("data", m_sample.toBase64());
+		Engine::getSampleFolder()->saveSample(sampleFile());
+	}
+	else
+	{
+		// TODO maybe save inside SampleFolder
 	}
 
 	_this.setAttribute( "sample_rate", m_sample.sampleRate());
@@ -297,21 +312,9 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if (const auto srcFile = _this.attribute("src"); !srcFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
-		{
-			setSampleFile(srcFile);
-		}
-		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
+		setSampleFile(srcFile);
 	}
 
-	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
-	{
-		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
-			Engine::audioEngine()->outputSampleRate();
-
-		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample(std::move(buffer));
-	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
