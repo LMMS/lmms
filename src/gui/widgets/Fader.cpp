@@ -248,12 +248,12 @@ void Fader::wheelEvent (QWheelEvent* ev)
 	{
 		// The shift is intended to go through the values in very coarse steps as in:
 		// "Shift into overdrive"
-		incrementValue = 3.;
+		incrementValue = 3.f;
 	}
 	else if (modKeys == Qt::ControlModifier)
 	{
 		// The control key gives more control, i.e. it enables more fine-grained adjustments
-		incrementValue = 0.1;
+		incrementValue = 0.1f;
 	}
 
 	const float increment = incrementValue * direction;
