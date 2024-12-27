@@ -144,6 +144,11 @@ private:
 
 	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
 
+	// Stores the offset to the knob center when the user drags the fader knob.
+	// This is needed to make it feel like the users drag the knob without it
+	// jumping immediately to the click position.
+	int m_knobCenterOffset {0};
+
 	bool m_levelsDisplayedInDBFS {true};
 	bool m_modelIsLinear {false};
 

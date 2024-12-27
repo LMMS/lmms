@@ -142,7 +142,31 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 		}
 
 		const int localY = mouseEvent->y();
-		setVolumeByLocalPixelValue(localY);
+		const auto knobLowerPosY = calculateKnobPosYFromModel();
+		const auto knobUpperPosY = knobLowerPosY - m_knob.height();
+
+		const auto clickedOnKnob = localY >= knobUpperPosY && localY <= knobLowerPosY;
+
+		if (clickedOnKnob)
+		{
+			// If the users clicked on the knob we want to compensate for the offset to the center line
+			// of the knob when dealing with mouse move events.
+			// This will make it feel like the users have grabbed the knob where they clicked.
+			const auto knobCenterPos = knobLowerPosY - (m_knob.height() / 2);
+			m_knobCenterOffset = localY - knobCenterPos;
+
+			// In this case we also will not call setVolumeByLocalPixelValue, i.e. we do not make any immediate
+			// changes. This should only happen if the users actually move the mouse while grabbing the knob.
+			// This makes the knobs less "jumpy".
+		}
+		else
+		{
+			// If the users did not click on the knob then we assume that the fader knob's center should move to
+			// the position of the click. We do not compensate for any offset.
+			m_knobCenterOffset = 0;
+
+			setVolumeByLocalPixelValue(localY);
+		}
 
 		updateTextFloat();
 		s_textFloat->show();
@@ -205,6 +229,9 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 			thisModel->restoreJournallingState();
 		}
 	}
+
+	// Always reset the offset to 0 regardless of which mouse button is pressed
+	m_knobCenterOffset = 0;
 
 	s_textFloat->hide();
 }
@@ -326,6 +353,9 @@ int Fader::calculateKnobPosYFromModel() const
 void Fader::setVolumeByLocalPixelValue(int y)
 {
 	auto* m = model();
+
+	// Compensate the offset where users have actually clicked
+	y -= m_knobCenterOffset;
 
 	// The y parameter gives us where the mouse click went.
 	// Assume that the middle of the fader should go there.
