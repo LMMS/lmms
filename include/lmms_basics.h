@@ -76,6 +76,12 @@ constexpr const char* UI_CTRL_KEY =
 #else
 "Ctrl";
 #endif
+constexpr const char* UI_ALT_KEY =
+#ifdef LMMS_BUILD_APPLE
+"Option";
+#else
+"Alt";
+#endif
 
 
 } // namespace lmms
