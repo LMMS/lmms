@@ -104,7 +104,7 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 		for (auto smallIndex = size_t{0}; smallIndex < thumbnail.size(); smallIndex += 1)
 		{
 			auto bigIndex = smallIndex * thumbnailSizeDivisor;
-			auto bigItStart = biggerThumbnail.cbegin() + bigIndex;
+			auto bigItStart = biggerThumbnail.begin() + bigIndex;
 			auto bigItEnd = std::min(bigItStart + thumbnailSizeDivisor, biggerThumbnail.end());
 
 			thumbnail[smallIndex] = std::accumulate(bigItStart, bigItEnd, Bit{});
@@ -191,9 +191,9 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 		if (parameters.reversed)
 		{
 			thumbnailBit
-				= std::accumulate(thumbnail.cbegin() + tLast - tChunkBound, thumbnail.cbegin() + tLast - tIndex, Bit{});
+				= std::accumulate(thumbnail.begin() + tLast - tChunkBound, thumbnail.begin() + tLast - tIndex, Bit{});
 		}
-		else { thumbnailBit = std::accumulate(thumbnail.cbegin() + tIndex, thumbnail.cbegin() + tChunkBound, Bit{}); }
+		else { thumbnailBit = std::accumulate(thumbnail.begin() + tIndex, thumbnail.begin() + tChunkBound, Bit{}); }
 
 		draw(painter, thumbnailBit, pixelIndex, centerY, scalingFactor, color, innerColor);
 	}
