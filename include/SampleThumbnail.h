@@ -51,18 +51,15 @@ public:
 		Bit() = default;
 		Bit(const SampleFrame&);
 
-		void merge(const Bit&);
-		void merge(const SampleFrame&);
+		static Bit merge(const Bit&, const Bit&);
+		static Bit merge(const Bit&, const SampleFrame&);
 
-		float max = -100.0f;
-		float min = 100.0f;
-		float rms = 0.0f;
+		float max = -std::numeric_limits<float>::max();
+		float min =  std::numeric_limits<float>::max();
 	};
 
 	struct VisualizeParameters
 	{
-		bool allowHighResolution = false;
-
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
 
@@ -75,7 +72,7 @@ public:
 
 		QRect sampRect = QRect(); 	//!< Dimensions of the fully rendered sample on the Song editor; Can move around. = clipRect when null.
 		QRect clipRect;				//!< Region that the sample will be rendered into; Fixed in place.
-		QRect viewRect = QRect(); 	//!< Region of clipRect that is visible. = clipRect when null.
+		QRect drawRect = QRect(); 	//!< Region of clipRect that will be drawn into (the update region). = clipRect when null.
 	};
 
 	using Thumbnail = std::vector<Bit>;
@@ -94,7 +91,7 @@ private:
 	static void draw(QPainter& painter, const Bit& bit, float lineX, int centerY, float scalingFactor,
 		const QColor& color, const QColor& rmsColor);
 
-	static Thumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
+	static Thumbnail generate(const size_t thumbnailSize, const Sample& buffer, const size_t size);
 
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
 

@@ -294,7 +294,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			rect().bottom()
 		);
 	param.clipRect = rect();
-	param.viewRect = region;
+	param.drawRect = region;
 
 	m_sampleThumbnail.visualize(param, p);
 

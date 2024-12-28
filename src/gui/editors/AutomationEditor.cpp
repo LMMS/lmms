@@ -1220,7 +1220,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			p.setPen(m_ghostSampleColor);
 
 			auto param = SampleThumbnail::VisualizeParameters{};
-			param.allowHighResolution = true;
 			param.amplification = m_ghostSample->sample().amplification();
 			param.reversed = m_ghostSample->sample().reversed();
 			param.sampRect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
@@ -1267,7 +1266,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				int note_width = lenTicks * m_ppb / TimePos::ticksPerBar();
 				int keyRange = maxKey - minKey;
 
-				if (keyRange < MIN_NOTE_RANGE) 
+				if (keyRange < MIN_NOTE_RANGE)
 				{
 					int padding = (MIN_NOTE_RANGE - keyRange) / 2.0f;
 					maxKey += padding;
