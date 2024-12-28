@@ -80,18 +80,20 @@ public:
 private:
 	void startProcessing() override
 	{
+		m_stopped = false;
 		start();
 	}
 
 	void stopProcessing() override
 	{
+		m_stopped = true;
 		stopProcessingThread( this );
 	}
 
 	void run() override
 	{
 		MicroTimer timer;
-		while( true )
+		while (!m_stopped)
 		{
 			audioEngine()->renderNextBuffer();
 			timer.reset();
@@ -103,6 +105,7 @@ private:
 		}
 	}
 
+	std::atomic<bool> m_stopped;
 } ;
 
 } // namespace lmms
