@@ -23,52 +23,8 @@
  */
 
 #include "SampleThumbnail.h"
-#include "Sample.h"
 
 namespace lmms {
-
-SampleThumbnail::Bit::Bit(const SampleFrame& frame)
-	: max(std::max(frame.left(), frame.right()))
-	, min(std::min(frame.left(), frame.right()))
-{}
-
-SampleThumbnail::Bit SampleThumbnail::Bit::merge(const Bit& a, const Bit& b)
-{
-	Bit out{};
-	out.min = std::min(a.min, b.min);
-	out.max = std::max(a.max, b.max);
-	return out;
-}
-
-SampleThumbnail::Bit SampleThumbnail::Bit::merge(const Bit& current, const SampleFrame& frame)
-{
-	return merge(current, Bit{frame});
-}
-
-static SampleThumbnail::Bit mergeBits(
-	SampleThumbnail::Thumbnail::const_iterator start,
-	SampleThumbnail::Thumbnail::const_iterator end,
-	SampleThumbnail::Bit init_value = SampleThumbnail::Bit{}
-) {
-	return std::accumulate(
-		start,
-		end,
-		init_value,
-		[&](const SampleThumbnail::Bit& a, const SampleThumbnail::Bit& b) { return SampleThumbnail::Bit::merge(a, b); }
-	);
-}
-
-static SampleThumbnail::Bit mergeFrames(
-	SampleBuffer::const_iterator start,
-	SampleBuffer::const_iterator end
-) {
-	return std::accumulate(
-		start,
-		end,
-		SampleThumbnail::Bit{},
-		[&](const SampleThumbnail::Bit& a, const SampleFrame& b) { return SampleThumbnail::Bit::merge(a, b); }
-	);
-}
 
 /* DEPRECATED; functionality is kept for testing conveniences */
 bool SampleThumbnail::selectFromGlobalThumbnailMap(const Sample& inputSample)
@@ -106,18 +62,18 @@ void SampleThumbnail::cleanUpGlobalThumbnailMap()
 	}
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::generate(const std::size_t thumbnailSize, const Sample& sample, const std::size_t size)
+SampleThumbnail::Thumbnail SampleThumbnail::generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size)
 {
 	const auto sampleChunk = (size + thumbnailSize) / thumbnailSize;
-	auto thumbnail = SampleThumbnail::Thumbnail(thumbnailSize);
+	auto thumbnail = Thumbnail(thumbnailSize);
 
-	for (auto tIndex = std::size_t{0}; tIndex < thumbnailSize; tIndex++)
+	for (auto tIndex = size_t{0}; tIndex < thumbnailSize; tIndex++)
 	{
 		const auto
 		sampleIndex = tIndex * size / thumbnailSize,
 		sampleChunkBound = std::min(sampleIndex + sampleChunk, size);
 
-		thumbnail[tIndex] = mergeFrames(sample.buffer()->cbegin() + sampleIndex, sample.buffer()->cbegin() + sampleChunkBound);
+		thumbnail[tIndex] = std::accumulate(buffer + sampleIndex, buffer + sampleChunkBound, Bit{});
 	}
 
 	return thumbnail;
@@ -130,16 +86,16 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 	cleanUpGlobalThumbnailMap();
 
 	const auto sampleBufferSize 	= inputSample.sampleSize();
-	const auto thumbnailSizeDivisor = 10;
+	const auto thumbnailSizeDivisor = size_t{10};
 	const auto firstThumbnailSize 	= std::max<size_t>(sampleBufferSize / thumbnailSizeDivisor, 1);
 
-	const auto firstThumbnail 		= generate(firstThumbnailSize, inputSample, sampleBufferSize);
+	const auto firstThumbnail 		= generate(firstThumbnailSize, inputSample.data(), sampleBufferSize);
 
 	m_thumbnailCache->push_back(firstThumbnail);
 
 	// Generate the remaining thumbnails using the first one, each one's
 	// size is the size of the previous one divided by the thumbnail size divisor.
-	auto thumbnailSize = std::size_t{firstThumbnailSize / thumbnailSizeDivisor};
+	auto thumbnailSize = size_t{firstThumbnailSize / thumbnailSizeDivisor};
 	while(thumbnailSize >= 1)
 	{
 		const auto& biggerThumbnail = m_thumbnailCache->back();
@@ -155,7 +111,7 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 			auto bigItStart = biggerThumbnail.cbegin() + bigIndex;
 			auto bigItEnd 	= std::min(bigItStart + thumbnailSizeDivisor, biggerThumbnail.end());
 
-			thumbnail[smallIndex] = mergeBits(bigItStart, bigItEnd);
+			thumbnail[smallIndex] = std::accumulate(bigItStart, bigItEnd, Bit{});
 		}
 
 		m_thumbnailCache->push_back(thumbnail);
@@ -163,7 +119,7 @@ SampleThumbnail::SampleThumbnail(const Sample& inputSample)
 	}
 }
 
-void SampleThumbnail::draw(QPainter& painter, const SampleThumbnail::Bit& bit, float lineX, int centerY,
+void SampleThumbnail::draw(QPainter& painter, const Bit& bit, float lineX, int centerY,
 	float scalingFactor, const QColor& color, const QColor& innerColor)
 {
 	const auto lengthY1 = bit.max * scalingFactor;
@@ -182,7 +138,7 @@ void SampleThumbnail::draw(QPainter& painter, const SampleThumbnail::Bit& bit, f
 	painter.setPen(color);
 }
 
-void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& parameters, QPainter& painter) const
+void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter& painter) const
 {
 	const auto& clipRect = parameters.clipRect;
 	const auto& sampRect = parameters.sampRect.isNull() ? clipRect : parameters.sampRect;
@@ -234,10 +190,24 @@ void SampleThumbnail::visualize(const SampleThumbnail::VisualizeParameters& para
 
 		const auto tChunkBound = tIndex + tChunk;
 
-		const auto thumbailIteratorStart 	= thumbnail.cbegin() + (parameters.reversed ? tLast - tChunkBound : tIndex);
-		const auto thumbailIteratorEnd 		= thumbnail.cbegin() + (parameters.reversed ? tLast - tIndex : tChunkBound);
+		auto thumbnailBit = Bit{};
 
-		auto thumbnailBit = mergeBits(thumbailIteratorStart, thumbailIteratorEnd);
+		if (parameters.reversed)
+		{
+			thumbnailBit = std::accumulate(
+					thumbnail.cbegin() + tLast - tChunkBound,
+					thumbnail.cbegin() + tLast - tIndex,
+					Bit{}
+				);
+		}
+		else
+		{
+			thumbnailBit = std::accumulate(
+					thumbnail.cbegin() + tIndex,
+					thumbnail.cbegin() + tChunkBound,
+					Bit{}
+				);
+		}
 
 		draw(painter, thumbnailBit, pixelIndex, centerY, scalingFactor, color, innerColor);
 	}

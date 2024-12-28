@@ -28,13 +28,10 @@
 #include <QPainter>
 #include <QRect>
 #include <memory>
-
+#include "Sample.h"
 #include "lmms_export.h"
 
 namespace lmms {
-
-class Sample;
-class SampleFrame;
 
 /**
    Insert this into your class when you want to implement
@@ -49,13 +46,26 @@ public:
 	struct Bit
 	{
 		Bit() = default;
-		Bit(const SampleFrame&);
 
-		static Bit merge(const Bit&, const Bit&);
-		static Bit merge(const Bit&, const SampleFrame&);
+		Bit(float min, float max): min(min), max(max) {}
 
-		float max = -std::numeric_limits<float>::max();
+		Bit(const SampleFrame& frame)
+			: min(std::min(frame.left(), frame.right()))
+			, max(std::max(frame.left(), frame.right()))
+		{}
+
+		Bit operator+(const Bit& other) const
+		{
+			return Bit(std::min(min, other.min), std::max(max, other.max));
+		}
+
+		Bit operator+(const SampleFrame& frame) const
+		{
+			return *this + Bit{frame};
+		}
+
 		float min =  std::numeric_limits<float>::max();
+		float max = -std::numeric_limits<float>::max();
 	};
 
 	struct VisualizeParameters
@@ -91,7 +101,7 @@ private:
 	static void draw(QPainter& painter, const Bit& bit, float lineX, int centerY, float scalingFactor,
 		const QColor& color, const QColor& rmsColor);
 
-	static Thumbnail generate(const size_t thumbnailSize, const Sample& buffer, const size_t size);
+	static Thumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
 
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
 
