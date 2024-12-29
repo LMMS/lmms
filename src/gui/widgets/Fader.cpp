@@ -60,6 +60,8 @@
 namespace lmms::gui
 {
 
+constexpr auto c_dBScalingExponent = 3.f;
+
 SimpleTextFloat* Fader::s_textFloat = nullptr;
 
 Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
@@ -331,7 +333,7 @@ int Fader::calculateKnobPosYFromModel() const
 			// This returns results between:
 			// * m_knob.height()  for a ratio of 1
 			// * height()         for a ratio of 0
-			return height() - (height() - m_knob.height()) * std::pow(ratio, 3.);
+			return height() - (height() - m_knob.height()) * std::pow(ratio, c_dBScalingExponent);
 		}
 	}
 	else
@@ -382,7 +384,7 @@ void Fader::setVolumeByLocalPixelValue(int y)
 			LinearMap<float> knobMap(float(m_knob.height()), 1., float(height()), 0.);
 
 			// Apply the inverse of what is done in calculateKnobPosYFromModel
-			auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./3.);
+			auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./c_dBScalingExponent);
 
 			float const maxDb = ampToDbfs(m->maxValue());
 
