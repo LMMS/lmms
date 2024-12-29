@@ -39,24 +39,20 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const auto samplesPerPixel = std::max(1.0, static_cast<double>(parameters.size) / rect.width());
 	const auto numPixelsToDraw = std::min(static_cast<int>(parameters.size), rect.width());
 
-	const auto compFn = [](const SampleFrame& a, const SampleFrame& b) { return a.average() < b.average(); };
-	const auto squaredSumFn = [](const float acc, const SampleFrame& x) { return acc + x.average() * x.average(); };
+	const auto squaredSumFn = [](auto acc, auto x) { return acc + x * x; };
 
 	for (auto i = 0; i < numPixelsToDraw; i++)
 	{
 		const auto start = parameters.buffer + static_cast<int>(std::floor(i * samplesPerPixel));
 		const auto end = parameters.buffer + static_cast<int>(std::ceil((i + 1) * samplesPerPixel));
+		const auto [minPeak, maxPeak] = std::minmax_element(&start->left(), &end->right() + 1);
 
-		const auto [min, max] = std::minmax_element(start, end, compFn);
-		const auto minPeak = min->average();
-		const auto maxPeak = max->average();
-
-		const auto lineY1 = centerY - maxPeak * halfHeight * parameters.amplification;
-		const auto lineY2 = centerY - minPeak * halfHeight * parameters.amplification;
+		const auto lineY1 = centerY - *maxPeak * halfHeight * parameters.amplification;
+		const auto lineY2 = centerY - *minPeak * halfHeight * parameters.amplification;
 		const auto lineX = rect.x() + (parameters.reversed ? numPixelsToDraw - i : i);
 
-		const auto squaredSum = std::accumulate(start, end, 0.0f, squaredSumFn);
-		const auto rms = std::sqrt(squaredSum / samplesPerPixel);
+		const auto squaredSum = std::accumulate(&start->left(), &end->right() + 1, 0.0f, squaredSumFn);
+		const auto rms = std::sqrt(squaredSum / (samplesPerPixel * DEFAULT_CHANNELS));
 		const auto rmsLineY1 = centerY - rms * halfHeight * parameters.amplification;
 		const auto rmsLineY2 = centerY + rms * halfHeight * parameters.amplification;
 
