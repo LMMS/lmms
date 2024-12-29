@@ -159,7 +159,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new QMdiArea(splitter);
+	m_workspace = new MovableQMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -529,8 +529,6 @@ void MainWindow::finalize()
 		connect( subWindow, SIGNAL(windowStateChanged(Qt::WindowStates,Qt::WindowStates)), this, SLOT(resetWindowTitle()));
 	}
 }
-
-
 
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
@@ -1611,5 +1609,43 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
+	QMdiArea(parent),
+	m_isBeingMoved(false),
+	m_lastX(0),
+	m_lastY(0)
+{}
+
+void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+{
+	m_lastX = event->x();
+	m_lastY = event->y();
+	m_isBeingMoved = true;
+	setCursor(Qt::ClosedHandCursor);
+}
+
+void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+{
+	if (m_isBeingMoved == false) { return; }
+
+
+	if (m_lastX != event->x())
+	{
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_lastX - event->x());
+		m_lastX = event->x();
+	}
+
+	if (m_lastY != event->y())
+	{
+		verticalScrollBar()->setValue(verticalScrollBar()->value() + m_lastY - event->y());
+		m_lastY = event->y();
+	}
+}
+
+void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+{
+	setCursor(Qt::ArrowCursor);
+	m_isBeingMoved = false;
+}
 
 } // namespace lmms::gui
