@@ -277,13 +277,13 @@ PianoRoll::PianoRoll() :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
+	m_timeLineWidget = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
 		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+	connect(this, &PianoRoll::positionChanged, m_timeLineWidget, &TimeLineWidget::updatePosition);
+	connect( m_timeLineWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// white position line follows timeline marker
@@ -294,9 +294,9 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
+	connect(m_timeLineWidget, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
-/*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
+/*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLineWidget,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this,
 			SLOT( updatePositionAccompany( const lmms::TimePos& ) ) );*/
@@ -424,7 +424,7 @@ PianoRoll::PianoRoll() :
 						this, SLOT(update()));
 
 	//connection for selecion from timeline
-	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
+	connect(m_timeLineWidget, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 
 	// Set up snap model
@@ -1438,8 +1438,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLineWidget->pos().setTicks( 0 );
+			m_timeLineWidget->updatePosition();
 			ke->accept();
 			break;
 
@@ -3741,7 +3741,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 {
 	updatePositionLineHeight();
 	updateScrollbars();
-	m_timeLine->setFixedWidth(width());
+	m_timeLineWidget->setFixedWidth(width());
 	update();
 }
 
@@ -4003,7 +4003,9 @@ void PianoRoll::record()
 	m_midiClip->addJournalCheckPoint();
 	m_recording = true;
 
-	Engine::getSong()->playMidiClip( m_midiClip, false );
+	// Only loop the first bar during recording if the clip is empty, and if the user has not set their own loop points
+	bool loop = m_midiClip->notes().size() == 0 && !Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).loopEnabled();
+	Engine::getSong()->playMidiClip(m_midiClip, loop);
 }
 
 
@@ -4069,7 +4071,7 @@ void PianoRoll::stop()
 {
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
+	m_scrollBack = m_timeLineWidget->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
 }
 
 
@@ -4096,6 +4098,7 @@ void PianoRoll::startRecordNote(const Note & n )
 			{
 				m_recordingNotes << n1;
 			}
+			Engine::getSong()->setMidiClipLooping(false);
 		}
 		else if (m_stepRecorder.isRecording())
 		{
@@ -4426,7 +4429,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
+			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLineWidget->pos(), quantization()));
 
 			// select it
 			cur_note.setSelected( true );
@@ -4470,7 +4473,7 @@ bool PianoRoll::deleteSelectedNotes()
 void PianoRoll::autoScroll( const TimePos & t )
 {
 	const int w = width() - m_whiteKeyWidth;
-	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
+	if (m_timeLineWidget->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
 	{
 		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
@@ -4483,7 +4486,7 @@ void PianoRoll::autoScroll( const TimePos & t )
 			m_leftRightScroll->setValue(t2.getBar() * TimePos::ticksPerBar());
 		}
 	}
-	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
+	else if (m_timeLineWidget->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 	{
 		m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0));
 	}
@@ -4496,7 +4499,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 {
 	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
-			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
+			&& m_timeLineWidget->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
 		) || m_scrollBack)
 	{
 		autoScroll(t);
@@ -4504,7 +4507,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLineWidget->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
@@ -4563,7 +4566,7 @@ void PianoRoll::zoomingChanged()
 
 	assert( m_ppb > 0 );
 
-	m_timeLine->setPixelsPerBar( m_ppb );
+	m_timeLineWidget->setPixelsPerBar( m_ppb );
 	m_stepRecorderWidget.setPixelsPerBar( m_ppb );
 	m_positionLine->zoomChange(m_zoomLevels[m_zoomingModel.value()]);
 
@@ -4843,7 +4846,7 @@ PianoRollWindow::PianoRollWindow() :
 
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
-	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
+	m_editor->m_timeLineWidget->addToolButtons( timeLineToolBar );
 
 	// -- Note modifier tools
 	auto noteToolsButton = new QToolButton(m_toolBar);
@@ -5214,7 +5217,7 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	QMargins qm = m_editor->m_stepRecorderWidget.margins();
 	qm.setLeft(m_editor->m_whiteKeyWidth);
 	m_editor->m_stepRecorderWidget.setMargins(qm);
-	m_editor->m_timeLine->setXOffset(m_editor->m_whiteKeyWidth);
+	m_editor->m_timeLineWidget->setXOffset(m_editor->m_whiteKeyWidth);
 }
 
 
