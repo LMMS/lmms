@@ -113,6 +113,7 @@ TrackContainerView::TrackContainerView(TrackContainer * _tc, bool canHorizontalS
 	m_rubberBand->hide();
 	m_rubberBand->setEnabled( false );
 
+	setMinimumContentSize();
 	setAcceptDrops( true );
 
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
@@ -156,6 +157,7 @@ void TrackContainerView::loadSettings( const QDomElement & _this )
 
 TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
+	qDebug("TrackContainerView::addTrackView, current width: %d", contentWidget()->widget()->minimumWidth());
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
 	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -258,11 +260,8 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 
 
-
-void TrackContainerView::realignTracks()
+void TrackContainerView::setMinimumContentSize()
 {
-	qDebug("tracksRealigned: width() = %d", width());
-	m_scrollArea->widget()->setFixedWidth(width());
 	if (fixedClips())
 	{
 		// if for example this TrackContainerView is a pattern editor
@@ -289,14 +288,14 @@ void TrackContainerView::realignTracks()
 
 		// calculate minimum width
 		const int minWidth = TrackView::getTrackFixedWidth() + maxSteps * ClipView::MIN_FIXED_WIDTH / 16;
-		m_scrollArea->widget()->setFixedWidth(minWidth > width() ? minWidth : width());
+		m_scrollArea->widget()->setMinimumWidth(minWidth);
+		qDebug("tracksRealigned: setWidth() = %d", m_scrollArea->widget()->minimumWidth());
 	}
-	else
-	{
-		m_scrollArea->widget()->setFixedWidth(width());
-	}
-	m_scrollArea->widget()->setFixedHeight(
-				m_scrollArea->widget()->minimumSizeHint().height());
+}
+
+void TrackContainerView::realignTracks()
+{
+	setMinimumContentSize();
 
 	for (const auto& trackView : m_trackViews)
 	{
@@ -312,6 +311,7 @@ void TrackContainerView::realignTracks()
 
 TrackView * TrackContainerView::createTrackView( Track * _t )
 {
+	qDebug("TrackContainerView::createTrackView, current width: %d", contentWidget()->widget()->minimumWidth());
 	//m_tc->addJournalCheckPoint();
 
 	// Avoid duplicating track views
