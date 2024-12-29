@@ -115,10 +115,14 @@ private:
 	void mouseMoveEvent(QMouseEvent* ev) override;
 	void mouseReleaseEvent(QMouseEvent* me) override;
 	void wheelEvent(QWheelEvent* ev) override;
+	void keyPressEvent(QKeyEvent *event) override;
 	void paintEvent(QPaintEvent* ev) override;
 
 	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
 	void paintFaderTicks(QPainter& painter);
+
+	float determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const;
+	void adjustModelByDBDelta(float value);
 
 	int calculateKnobPosYFromModel() const;
 	void setVolumeByLocalPixelValue(int y);

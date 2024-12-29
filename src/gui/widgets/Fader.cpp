@@ -86,6 +86,8 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool model
 
 	m_conversionFactor = 100.0;
 
+	setFocusPolicy(Qt::StrongFocus);
+
 	if (model)
 	{
 		// We currently assume that the model is not changed later on and only connect here once
@@ -243,31 +245,74 @@ void Fader::wheelEvent (QWheelEvent* ev)
 {
 	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	float incrementValue = 1.;
+	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
 
-	auto const modKeys = ev->modifiers();
-	if (modKeys == Qt::ShiftModifier)
+	adjustModelByDBDelta(increment);
+
+	updateTextFloat();
+	s_textFloat->setVisibilityTimeOut(1000);
+
+	ev->accept();
+}
+
+void Fader::keyPressEvent(QKeyEvent *event)
+{
+	bool handled = false;
+
+	const auto key = event->key();
+	const auto modifiers = event->modifiers();
+
+	if (key == Qt::Key_Up || key == Qt::Key_Plus)
+	{
+		const float incrementValue = determineAdjustmentDelta(modifiers);
+		adjustModelByDBDelta(incrementValue);
+		handled = true;
+	}
+	else if (key == Qt::Key_Down || key == Qt::Key_Minus)
+	{
+		const float incrementValue = determineAdjustmentDelta(modifiers);
+		adjustModelByDBDelta(-incrementValue);
+		handled = true;
+	}
+
+	if (handled)
+	{
+		updateTextFloat();
+		s_textFloat->setVisibilityTimeOut(1000);
+	}
+	else
+	{
+		QWidget::keyPressEvent(event);
+	}
+}
+
+float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const
+{
+	if (modifiers == Qt::ShiftModifier)
 	{
 		// The shift is intended to go through the values in very coarse steps as in:
 		// "Shift into overdrive"
-		incrementValue = 3.f;
+		return 3.f;
 	}
-	else if (modKeys == Qt::ControlModifier)
+	else if (modifiers == Qt::ControlModifier)
 	{
 		// The control key gives more control, i.e. it enables more fine-grained adjustments
-		incrementValue = 0.1f;
+		return 0.1f;
 	}
 
-	const float increment = incrementValue * direction;
+	return 1.f;
+}
 
+void Fader::adjustModelByDBDelta(float value)
+{
 	if (modelIsLinear())
 	{
-		const auto value = model()->value();
+		const auto modelValue = model()->value();
 
-		if (value <= 0.)
+		if (modelValue <= 0.)
 		{
 			// We are at -inf dB. Do nothing if we user wishes to decrease.
-			if (direction > 0)
+			if (value > 0)
 			{
 				// Otherwise set the model to the minimum value supported by the fader.
 				model()->setValue(dbfsToAmp(m_faderMinDb));
@@ -276,26 +321,20 @@ void Fader::wheelEvent (QWheelEvent* ev)
 		else
 		{
 			// We can safely compute the dB value as the value is greater than 0
-			const auto valueInDB = ampToDbfs(value);
+			const auto valueInDB = ampToDbfs(modelValue);
 
-			const auto adjustedValue = valueInDB + increment;
+			const auto adjustedValue = valueInDB + value;
 
 			model()->setValue(adjustedValue < m_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
 		}
 	}
 	else
 	{
-		const auto adjustedValue = std::clamp(model()->value() + increment, model()->minValue(), model()->maxValue());
+		const auto adjustedValue = std::clamp(model()->value() + value, model()->minValue(), model()->maxValue());
 
 		model()->setValue(adjustedValue);
 	}
-
-	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut(1000);
-
-	ev->accept();
 }
-
 
 int Fader::calculateKnobPosYFromModel() const
 {
