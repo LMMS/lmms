@@ -322,18 +322,16 @@ int Fader::calculateKnobPosYFromModel() const
 		}
 		else
 		{
-			auto const maxDb = ampToDbfs(maxV);
-
 			// Make sure that we do not get values less that the minimum fader dbFS
 			// for the calculations that will follow.
 			auto const actualDb = std::max(m_faderMinDb, ampToDbfs(value));
 
-			auto const ratio = (actualDb - m_faderMinDb) / (maxDb - m_faderMinDb);
+			const auto scaledRatio = computeScaledRatio(actualDb);
 
 			// This returns results between:
 			// * m_knob.height()  for a ratio of 1
 			// * height()         for a ratio of 0
-			return height() - (height() - m_knob.height()) * std::pow(ratio, c_dBScalingExponent);
+			return height() - (height() - m_knob.height()) * scaledRatio;
 		}
 	}
 	else
@@ -407,6 +405,15 @@ void Fader::setVolumeByLocalPixelValue(int y)
 
 		model()->setValue(valueMap.map(clampedLowerFaderKnob));
 	}
+}
+
+float Fader::computeScaledRatio(float dBValue) const
+{
+	const auto maxDb = ampToDbfs(model()->maxValue());
+
+	const auto ratio = (dBValue - m_faderMinDb) / (maxDb - m_faderMinDb);
+
+	return std::pow(ratio, c_dBScalingExponent);
 }
 
 
@@ -500,6 +507,11 @@ void Fader::paintEvent(QPaintEvent* ev)
 
 	// Draw the levels with peaks
 	paintLevels(ev, painter, !m_levelsDisplayedInDBFS);
+
+	if (modelIsLinear())
+	{
+		paintFaderTicks(painter);
+	}
 
 	// Draw the knob
 	painter.drawPixmap((width() - m_knob.width()) / 2, calculateKnobPosYFromModel() - m_knob.height(), m_knob);
@@ -653,6 +665,24 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	{
 		const auto peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
 		painter.fillRect(peakRectR, linearGrad);
+	}
+
+	painter.restore();
+}
+
+void Fader::paintFaderTicks(QPainter& painter)
+{
+	painter.save();
+
+	painter.setPen(QColor(255, 255, 255, 128));
+
+	for (float i = 6.f; i >= -120.f; i-= 6.f)
+	{
+		const auto scaledRatio = computeScaledRatio(i);
+		const auto maxHeight = height() - (height() - m_knob.height()) * scaledRatio - (m_knob.height() / 2);
+
+		painter.drawLine(QPointF(0, maxHeight), QPointF(1, maxHeight));
+		painter.drawLine(QPointF(width() - 1, maxHeight), QPointF(width(), maxHeight));
 	}
 
 	painter.restore();

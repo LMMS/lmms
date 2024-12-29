@@ -118,9 +118,20 @@ private:
 	void paintEvent(QPaintEvent* ev) override;
 
 	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
+	void paintFaderTicks(QPainter& painter);
 
 	int calculateKnobPosYFromModel() const;
 	void setVolumeByLocalPixelValue(int y);
+
+	// Computes the scaled ratio between the maximum dB value supported by the model and the minimum
+	// dB value that's supported by the fader from the given actual dB value.
+	// If the provided input value lies inside the aforementioned interval then the result will be
+	// a value between 0 (value == minimum value) and 1 (value == maximum model value).
+	// If you look at the graphical representation of the fader then 0 represents a point at the bottom
+	// of the fader and 1 a point at the top of the fader.
+	// The ratio is scaled by an internal exponent which is an implementation detail that cannot be
+	// changed for now.
+	float computeScaledRatio(float dBValue) const;
 
 	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
 
