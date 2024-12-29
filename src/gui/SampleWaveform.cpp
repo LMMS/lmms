@@ -41,7 +41,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	const auto squaredSumFn = [](auto acc, auto x) { return acc + x * x; };
 
-	for (auto i = 0; i < numPixelsToDraw; i++)
+	for (auto i = 0; i < numPixelsToDraw; ++i)
 	{
 		const auto start = parameters.buffer + static_cast<int>(std::floor(i * samplesPerPixel));
 		const auto end = parameters.buffer + static_cast<int>(std::ceil((i + 1) * samplesPerPixel));
