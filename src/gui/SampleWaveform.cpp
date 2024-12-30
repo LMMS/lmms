@@ -35,6 +35,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
+	painter.setClipRect(viewport);
 
 	for (auto xPos = viewport.x(); xPos < viewport.x() + viewport.width(); ++xPos)
 	{

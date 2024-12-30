@@ -1222,8 +1222,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			const auto waveform = SampleWaveform::Parameters{
 				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
 			const auto fullSampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			const auto viewportSampleRect = QRect{pe->rect().left(), fullSampleRect.top(), pe->rect().width(), fullSampleRect.height()};
-			SampleWaveform::visualize(waveform, p, fullSampleRect, viewportSampleRect);
+			SampleWaveform::visualize(waveform, p, fullSampleRect, pe->rect());
 		}
 
 		// draw ghost notes
