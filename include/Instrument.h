@@ -134,7 +134,7 @@ public:
 	//! Returns whether the instrument is MIDI-based or NotePlayHandle-based
 	bool isMidiBased() const
 	{
-		return !m_flags.testFlag(Instrument::Flag::IsMidiBased);
+		return m_flags.testFlag(Instrument::Flag::IsMidiBased);
 	}
 
 	bool isBendable() const
