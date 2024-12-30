@@ -114,7 +114,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 		createClipView(clip);
 	}
 
-	qDebug("TrackView next: addTrackView:, current width: %d", m_trackContainerView->contentWidget()->widget()->minimumWidth());
 	m_trackContainerView->addTrackView( this );
 }
 
@@ -131,7 +130,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
  */
 void TrackView::resizeEvent( QResizeEvent * re )
 {
-	qDebug("TrackView::resizeEvent: TO %d, TS %d, current width: %d" , m_trackOperationsWidget.width(), m_trackSettingsWidget.width(), m_trackContainerView->contentWidget()->widget()->minimumWidth());
 	m_trackOperationsWidget.setFixedSize(getTrackFixedOperationsWidth(), height() - 1);
 	m_trackSettingsWidget.setFixedSize(getTrackFixedSettingsWidth(), height() - 1);
 	m_trackContentWidget.setFixedHeight(height());
@@ -140,7 +138,6 @@ void TrackView::resizeEvent( QResizeEvent * re )
 
 const int TrackView::getTrackFixedWidth()
 {
-	qDebug("TrackView::getTrackFixedWidth");
 	return getTrackFixedSettingsWidth() + getTrackFixedOperationsWidth();
 }
 
