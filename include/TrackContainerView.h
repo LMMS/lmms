@@ -28,7 +28,6 @@
 #include <QVector>
 #include <QScrollArea>
 #include <QWidget>
-#include <QResizeEvent> // TODO remove
 #include <QThread>
 
 #include "JournallingObject.h"
