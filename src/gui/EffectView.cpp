@@ -45,10 +45,11 @@
 namespace lmms::gui
 {
 
-EffectView::EffectView( Effect * _model, QWidget * _parent ) :
-	PluginView( _model, _parent ),
-	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
-	m_subWindow( nullptr ),
+EffectView::EffectView(Effect * modelParam, QWidget *parent) :
+	QWidget(parent),
+	ModelView(modelParam, this),
+	m_bg(embed::getIconPixmap("effect_plugin")),
+	m_subWindow(nullptr),
 	m_controlView(nullptr),
 	m_dragging(false)
 {
@@ -85,7 +86,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_gate->setHintText( tr( "Gate:" ), "" );
 
 
-	setModel( _model );
+	setModel(modelParam);
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
@@ -126,7 +127,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	setGraphicsEffect(m_opacityEffect);
 
 	//move above vst effect view creation
-	//setModel( _model );
+	//setModel(modelParam);
 }
 
 
