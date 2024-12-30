@@ -51,8 +51,8 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 		const auto endSample = parameters.buffer + endSampleIndex;
 
 		const auto [minPeak, maxPeak] = std::minmax_element(&startSample->left(), &endSample->right());
-		const auto yMin = rect.center().y() - *minPeak * parameters.amplification * verticalScale;
-		const auto yMax = rect.center().y() - *maxPeak * parameters.amplification * verticalScale;
+		const auto yMin = rect.center().y() - (*minPeak) * parameters.amplification * verticalScale;
+		const auto yMax = rect.center().y() - (*maxPeak) * parameters.amplification * verticalScale;
 
 		painter.drawLine(xPos, yMin, xPos, yMax);
 	}
