@@ -78,6 +78,8 @@ protected:
 	void resizeEvent(QResizeEvent* event) override;
 
 private:
+	bool isResizable() const override { return true; }
+
 	SlicerT* m_slicerTParent;
 
 	Knob* m_noteThresholdKnob;

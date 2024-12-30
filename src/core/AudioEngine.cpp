@@ -74,6 +74,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), 44100)),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),
@@ -240,34 +241,6 @@ void AudioEngine::stopProcessing()
 
 
 
-
-sample_rate_t AudioEngine::baseSampleRate() const
-{
-	sample_rate_t sr = ConfigManager::inst()->value( "audioengine", "samplerate" ).toInt();
-	if( sr < 44100 )
-	{
-		sr = 44100;
-	}
-	return sr;
-}
-
-
-
-
-sample_rate_t AudioEngine::outputSampleRate() const
-{
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
-							baseSampleRate();
-}
-
-
-
-
-sample_rate_t AudioEngine::inputSampleRate() const
-{
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
-							baseSampleRate();
-}
 
 bool AudioEngine::criticalXRuns() const
 {
