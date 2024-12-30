@@ -537,11 +537,6 @@ void MidiClip::removeSteps()
 }
 
 
-int MidiClip::getSteps() const
-{
-	return m_steps;
-}
-
 
 gui::ClipView * MidiClip::createView( gui::TrackView * _tv )
 {
