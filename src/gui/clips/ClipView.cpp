@@ -323,7 +323,6 @@ void ClipView::updateLength()
 	if( fixedClips() )
 	{
 		setFixedWidth(MIN_FIXED_WIDTH < parentWidget()->width() ? parentWidget()->width() : MIN_FIXED_WIDTH);
-		qDebug("ClipView::updateLength: %d, current width: %d", (MIN_FIXED_WIDTH < parentWidget()->width() ? parentWidget()->width() : MIN_FIXED_WIDTH), m_trackView->trackContainerView()->contentWidget()->widget()->minimumWidth());
 	}
 	else
 	{
