@@ -263,7 +263,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		? (parentWidget()->width() - 2 * BORDER_WIDTH) / (float)m_clip->length().getBar()
 		: ClipView::pixelsPerBar();
 
-
 	const auto ticksPerBar = Engine::getSong()->ticksPerBar();
 	const auto sampleOffset = static_cast<int>(static_cast<double>(m_clip->startTimeOffset()) / ticksPerBar * pixelsPerBar);
 
