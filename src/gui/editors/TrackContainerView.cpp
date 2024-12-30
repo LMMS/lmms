@@ -113,7 +113,6 @@ TrackContainerView::TrackContainerView(TrackContainer * _tc, bool canHorizontalS
 	m_rubberBand->hide();
 	m_rubberBand->setEnabled( false );
 
-	setMinimumContentSize();
 	setAcceptDrops( true );
 
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
@@ -157,7 +156,6 @@ void TrackContainerView::loadSettings( const QDomElement & _this )
 
 TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
-	qDebug("TrackContainerView::addTrackView, current width: %d", contentWidget()->widget()->minimumWidth());
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
 	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -260,43 +258,9 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 
 
-void TrackContainerView::setMinimumContentSize()
-{
-	if (fixedClips())
-	{
-		// if for example this TrackContainerView is a pattern editor
-		int maxSteps = 16;
-		// loop through the tracks to find the clip with
-		// the highest amount of steps
-		// this should be the same value for all clips, but we never know
-		for (const auto& trackView : m_trackViews)
-		{
-			if (trackView->getTrack()->type() == Track::Type::Instrument)
-			{
-				InstrumentTrack* curTrack = static_cast<InstrumentTrack*>(trackView->getTrack());
-				if (curTrack->getClips().size() > 0)
-				{
-					MidiClip* curClip = reinterpret_cast<MidiClip*>(curTrack->getClip(0));
-					int curSteps = curClip->getSteps();
-					if (maxSteps < curSteps)
-					{
-						maxSteps = curSteps;
-					}
-				}
-			}
-		}
-
-		// calculate minimum width
-		const int minWidth = TrackView::getTrackFixedWidth() + maxSteps * ClipView::MIN_FIXED_WIDTH / 16;
-		m_scrollArea->widget()->setMinimumWidth(minWidth);
-		qDebug("tracksRealigned: setWidth() = %d", m_scrollArea->widget()->minimumWidth());
-	}
-}
 
 void TrackContainerView::realignTracks()
 {
-	setMinimumContentSize();
-
 	for (const auto& trackView : m_trackViews)
 	{
 		trackView->show();
@@ -311,7 +275,6 @@ void TrackContainerView::realignTracks()
 
 TrackView * TrackContainerView::createTrackView( Track * _t )
 {
-	qDebug("TrackContainerView::createTrackView, current width: %d", contentWidget()->widget()->minimumWidth());
 	//m_tc->addJournalCheckPoint();
 
 	// Avoid duplicating track views

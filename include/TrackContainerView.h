@@ -152,8 +152,6 @@ public:
 
 	RubberBand *rubberBand() const;
 
-	void setMinimumContentSize();
-
 public slots:
 	void realignTracks();
 	lmms::gui::TrackView * createTrackView( lmms::Track * _t );
@@ -183,11 +181,6 @@ private:
 
 	protected:
 		void wheelEvent( QWheelEvent * _we ) override;
-		void resizeEvent( QResizeEvent * re ) override
-		{
-			qDebug("resizing scrollArea: %d, %d", re->size().width(), re->size().height());
-			QScrollArea::resizeEvent(re);
-		}
 
 	private:
 		TrackContainerView* m_trackContainerView;
