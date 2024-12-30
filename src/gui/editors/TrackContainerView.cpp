@@ -41,8 +41,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackView.h"
-#include "ClipView.h"
-#include "MidiClip.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
