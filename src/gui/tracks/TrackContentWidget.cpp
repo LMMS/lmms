@@ -211,6 +211,7 @@ void TrackContentWidget::removeClipView( ClipView * clipv )
  */
 void TrackContentWidget::update()
 {
+	setMinimumWidthBasedOnClips();
 	for (const auto& clipView : m_clipViews)
 	{
 		clipView->setFixedHeight(height() - 1);
@@ -636,6 +637,18 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 
 
 
+void TrackContentWidget::setMinimumWidthBasedOnClips()
+{
+	// if this is in the pattern editor
+	if (m_trackView->trackContainerView()->fixedClips())
+	{
+		if (m_clipViews.size() > 0)
+		{
+			auto minWidth = static_cast<size_t>(m_clipViews[0]->getClip()->length().getBar());
+			setMinimumWidth(minWidth * ClipView::MIN_FIXED_WIDTH);
+		}
+	}
+}
 
 /*! \brief Updates the background tile pixmap on size changes.
  *
@@ -643,6 +656,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
  */
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
+	setMinimumWidthBasedOnClips();
+
 	// Update backgroud
 	updateBackground();
 	// Force redraw
