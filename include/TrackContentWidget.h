@@ -114,8 +114,6 @@ public:
 
 	void setEmbossOffset(int c);
 
-	void setMinimumWidthBasedOnClips();
-
 public slots:
 	void update();
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
@@ -157,6 +155,7 @@ protected:
 private:
 	Track * getTrack();
 	TimePos getPosition( int mouseX );
+	void setMinimumWidthBasedOnClips();
 
 	TrackView * m_trackView;
 
