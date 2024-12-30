@@ -31,16 +31,18 @@
 
 #include "AutomationClip.h"
 #include "Clipboard.h"
+#include "ClipView.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "MidiClip.h"
+#include "MidiClipView.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
-#include "ClipView.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -644,8 +646,10 @@ void TrackContentWidget::setMinimumWidthBasedOnClips()
 	{
 		if (m_clipViews.size() > 0)
 		{
-			auto minWidth = static_cast<size_t>(m_clipViews[0]->getClip()->length().getBar());
-			setMinimumWidth(minWidth * ClipView::MIN_FIXED_WIDTH);
+			auto minWidth = static_cast<size_t>(m_clipViews[0]->getClip()->length().getTicks());
+			setMinimumWidth(minWidth);
+			//auto minWidth = static_cast<size_t>(m_clipViews[0]->getClip()->length().nextFullBar());
+			//setMinimumWidth(minWidth * m_trackView->trackContainerView()->pixelsPerBar());
 		}
 	}
 }
