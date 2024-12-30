@@ -26,8 +26,9 @@
 #define LMMS_GUI_SAMPLE_WAVEFORM_H
 
 #include <QPainter>
+#include <cmath>
 
-#include "Sample.h"
+#include "SampleFrame.h"
 #include "lmms_export.h"
 
 namespace lmms::gui {
@@ -36,13 +37,17 @@ class LMMS_EXPORT SampleWaveform
 public:
 	struct Parameters
 	{
-		const SampleFrame* buffer;
-		size_t size;
-		float amplification;
-		bool reversed;
+		const SampleFrame* buffer; //!< The buffer to all the samples contained within the rectangle
+		size_t size;			   //!< The number of samples contained within the rectangle
+		float amplification;	   //!< Amplfication to apply to the waveform
+		bool reversed;			   //!< If the waveform should be drawn in reverse
 	};
 
-	static void visualize(Parameters parameters, QPainter& painter, const QRect& rect);
+	//! Visualize a sample waveform.
+	//! `rect` is the rectangle that contains the all the samples. It specifies where the full waveform would be drawn
+	//! and for how long. `viewport` is a viewport into `rect` and specifies where the drawing will happen and for how
+	//! long. The position of `rect` should be specified relative to the `viewport`.
+	static void visualize(Parameters parameters, QPainter& painter, const QRect& rect, const QRect& viewport);
 };
 } // namespace lmms::gui
 

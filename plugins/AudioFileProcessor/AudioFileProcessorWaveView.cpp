@@ -344,7 +344,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
 	const auto waveform = SampleWaveform::Parameters{
 		m_sample->data() + dataOffset, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
-	SampleWaveform::visualize(waveform, p, rect);
+	SampleWaveform::visualize(waveform, p, rect, rect);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

@@ -259,22 +259,25 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 
 	const int spacing = BORDER_WIDTH + 1;
-	const float ppb = fixedClips() ?
-			( parentWidget()->width() - 2 * BORDER_WIDTH )
-					/ (float) m_clip->length().getBar() :
-								pixelsPerBar();
+	const float pixelsPerBar = fixedClips()
+		? (parentWidget()->width() - 2 * BORDER_WIDTH) / (float)m_clip->length().getBar()
+		: ClipView::pixelsPerBar();
 
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	QRect r = QRect( offset, spacing,
-			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
+	const auto ticksPerBar = Engine::getSong()->ticksPerBar();
+	const auto sampleOffset = static_cast<int>(static_cast<double>(m_clip->startTimeOffset()) / ticksPerBar * pixelsPerBar);
 
-	const auto& sample = m_clip->m_sample;
-	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	SampleWaveform::visualize(waveform, p, r);
+	const auto fullSampleWidth = static_cast<int>(m_clip->sampleLength() * pixelsPerBar / ticksPerBar);
+	const auto fullSampleHeight = rect().bottom() - 2 * spacing;
+	const auto fullSampleRect = QRect{sampleOffset, spacing, fullSampleWidth, fullSampleHeight};
+	const auto viewportSampleRect = QRect{pe->rect().left(), fullSampleRect.top(), pe->rect().width(), fullSampleRect.height()};
+
+	auto parameters = SampleWaveform::Parameters{};
+	parameters.buffer = m_clip->m_sample.data();
+	parameters.size = m_clip->m_sample.sampleSize();
+	parameters.amplification = m_clip->m_sample.amplification();
+	parameters.reversed = m_clip->m_sample.reversed();
+	SampleWaveform::visualize(parameters, p, fullSampleRect, viewportSampleRect);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

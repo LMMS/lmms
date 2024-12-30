@@ -26,41 +26,37 @@
 
 namespace lmms::gui {
 
-void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const QRect& rect)
+void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const QRect& rect, const QRect& viewport)
 {
-	if (!parameters.buffer || parameters.size == 0) { return; }
+	if (parameters.buffer == nullptr || parameters.size == 0) { return; }
 
-	const auto centerY = rect.center().y();
-	const auto halfHeight = rect.height() / 2;
+	const auto samplePerPixel = static_cast<double>(parameters.size) / rect.width();
+	const auto verticalScale = rect.height() / 2.0;
 
-	const auto color = painter.pen().color();
-	const auto rmsColor = color.lighter(123);
+	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	const auto samplesPerPixel = std::max(1.0, static_cast<double>(parameters.size) / rect.width());
-	const auto numPixelsToDraw = std::min(static_cast<int>(parameters.size), rect.width());
-
-	const auto squaredSumFn = [](auto acc, auto x) { return acc + x * x; };
-
-	for (auto i = 0; i < numPixelsToDraw; ++i)
+	for (auto xPos = viewport.x(); xPos < viewport.x() + viewport.width(); ++xPos)
 	{
-		const auto start = parameters.buffer + static_cast<int>(std::floor(i * samplesPerPixel));
-		const auto end = parameters.buffer + static_cast<int>(std::ceil((i + 1) * samplesPerPixel));
-		const auto [minPeak, maxPeak] = std::minmax_element(&start->left(), &end->right() + 1);
+		const auto xPosOffsetInRect = xPos - rect.x();
+		const auto pixelPosInRect = parameters.reversed ? (rect.x() + rect.width()) - xPosOffsetInRect : xPosOffsetInRect;
 
-		const auto lineY1 = centerY - *maxPeak * halfHeight * parameters.amplification;
-		const auto lineY2 = centerY - *minPeak * halfHeight * parameters.amplification;
-		const auto lineX = rect.x() + (parameters.reversed ? numPixelsToDraw - i : i);
+		const auto startSampleIndex = static_cast<std::size_t>(std::floor(pixelPosInRect * samplePerPixel));
+		const auto endSampleIndex = static_cast<std::size_t>(std::ceil((pixelPosInRect + 1) * samplePerPixel));
 
-		const auto squaredSum = std::accumulate(&start->left(), &end->right() + 1, 0.0f, squaredSumFn);
-		const auto rms = std::sqrt(squaredSum / (samplesPerPixel * DEFAULT_CHANNELS));
-		const auto rmsLineY1 = centerY - rms * halfHeight * parameters.amplification;
-		const auto rmsLineY2 = centerY + rms * halfHeight * parameters.amplification;
+		if (startSampleIndex < 0 || startSampleIndex >= parameters.size) { continue; }
+		if (endSampleIndex < 0 || endSampleIndex > parameters.size) { continue; }
 
-		painter.drawLine(lineX, lineY1, lineX, lineY2);
-		painter.setPen(rmsColor);
-		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
-		painter.setPen(color);
+		const auto startSample = parameters.buffer + startSampleIndex;
+		const auto endSample = parameters.buffer + endSampleIndex;
+
+		const auto [minPeak, maxPeak] = std::minmax_element(&startSample->left(), &endSample->right());
+		const auto yMin = rect.center().y() - *minPeak * parameters.amplification * verticalScale;
+		const auto yMax = rect.center().y() - *maxPeak * parameters.amplification * verticalScale;
+
+		painter.drawLine(xPos, yMin, xPos, yMax);
 	}
-}
 
+	painter.restore();
+}
 } // namespace lmms::gui

@@ -27,7 +27,7 @@
 
 
 #include "Knob.h"
-
+#include "Sample.h"
 
 namespace lmms
 {
