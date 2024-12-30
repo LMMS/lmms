@@ -237,7 +237,6 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 	// TODO: Use style sheet
 	setMinimumWidth(TrackView::getTrackFixedWidth() + 2 * ClipView::BORDER_WIDTH);
-	qDebug("PatternEditorWindow::setMinimumWidth: %d", minimumWidth());
 
 	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
 	m_stopAction->setToolTip(tr("Stop playback of current pattern (Space)"));
