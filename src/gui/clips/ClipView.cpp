@@ -322,7 +322,7 @@ void ClipView::updateLength()
 {
 	if( fixedClips() )
 	{
-		setFixedWidth(MIN_FIXED_WIDTH < parentWidget()->width() ? parentWidget()->width() : MIN_FIXED_WIDTH);
+		setFixedWidth(parentWidget()->width());
 	}
 	else
 	{
