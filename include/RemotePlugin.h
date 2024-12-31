@@ -164,7 +164,7 @@ protected:
 	auto inputBuffer() const -> Span<float> { return m_inputBuffer; }
 	auto outputBuffer() const -> Span<float> { return m_outputBuffer; }
 
-	PluginPinConnector* m_pinConnector = nullptr;
+	PluginPinConnector* const m_pinConnector = nullptr;
 
 private:
 	QProcess m_process;

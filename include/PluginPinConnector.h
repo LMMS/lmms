@@ -30,6 +30,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <type_traits>
 #include <vector>
 
 #include "AudioData.h"
@@ -54,6 +55,50 @@ namespace gui
 class PluginPinConnectorView;
 
 } // namespace gui
+
+
+/**
+ * A non-owning span of CoreAudioData.
+ *
+ * Access like this:
+ *   bus[channel pair index][frame index]
+ *
+ * where
+ *   0 <= channel pair index < channelPairs
+ *   0 <= frame index < frames
+ *
+ * TODO C++23: Use std::mdspan
+ */
+template<typename T>
+struct AudioBus
+{
+	static_assert(std::is_same_v<std::remove_const_t<T>, SampleFrame>);
+
+	AudioBus() = default;
+	AudioBus(const AudioBus&) = default;
+
+	AudioBus(T* const* bus, ch_cnt_t channelPairs, f_cnt_t frames)
+		: bus{bus}
+		, channelPairs{channelPairs}
+		, frames{frames}
+	{
+	}
+
+	template<typename U = T, std::enable_if_t<std::is_const_v<U>, bool> = true>
+	AudioBus(const AudioBus<std::remove_const_t<U>>& other)
+		: bus{other.bus}
+		, channelPairs{other.channelPairs}
+		, frames{other.frames}
+	{
+	}
+
+	T* const* bus = nullptr; //!< [channel pair index][frame index]
+	ch_cnt_t channelPairs = 0;
+	f_cnt_t frames = 0;
+};
+
+using CoreAudioBus = AudioBus<const SampleFrame>;
+using CoreAudioBusMut = AudioBus<SampleFrame>;
 
 
 //! Configuration for audio channel routing in/out of plugin
@@ -241,7 +286,7 @@ private:
 	 * This needs to be known because the default connections (and view?) for instruments with sidechain
 	 * inputs is different from effects, even though they may both have the same channel counts.
 	 */
-	bool m_isInstrument = false;
+	const bool m_isInstrument = false;
 };
 
 
@@ -489,7 +534,7 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 		switch (routedChannels)
 		{
 			case 0b00:
-				// Both track channels are bypassed, so nothing needs to be written to output
+				// Both track channels are bypassed, so nothing is allowed to be written to output
 				break;
 			case 0b01:
 				routeNx2(outPtr, outChannel, std::integral_constant<std::uint8_t, 0b01>{});

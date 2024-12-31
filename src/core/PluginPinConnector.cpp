@@ -191,6 +191,8 @@ void PluginPinConnector::updateAllRoutedChannels()
 
 auto PluginPinConnector::instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*
 {
+	// This method does not modify the pin connector, but it needs the view to store
+	// a mutable pointer to the pin connector, hence the const_cast.
 	return new gui::PluginPinConnectorView{const_cast<PluginPinConnector*>(this), parent};
 }
 

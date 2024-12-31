@@ -79,7 +79,7 @@ constexpr const char* UI_CTRL_KEY =
 /**
  * Simple minimally functional stand-in for C++20's std::span
  *
- * TODO C++20: Use std::span instead
+ * TODO C++20: Use std::span instead once we have GCC 10 or newer
  */
 template<typename T, std::size_t extents = static_cast<std::size_t>(-1)>
 class Span
