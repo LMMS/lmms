@@ -70,7 +70,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 
 LadspaEffect::LadspaEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&ladspaeffect_plugin_descriptor, _parent, _key),
+	AudioPlugin(&ladspaeffect_plugin_descriptor, _parent, _key),
 	m_controls( nullptr ),
 	m_maxSampleRate( 0 ),
 	m_key( LadspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )

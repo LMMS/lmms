@@ -26,7 +26,7 @@
 #ifndef MULTITAP_ECHO_H
 #define MULTITAP_ECHO_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "MultitapEchoControls.h"
 #include "RingBuffer.h"
 #include "BasicFilters.h"
@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-class MultitapEchoEffect : public DefaultEffectPluginInterface
+class MultitapEchoEffect : public DefaultEffect
 {
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );

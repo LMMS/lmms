@@ -26,7 +26,7 @@
 #ifndef _STEREO_ENHANCER_H
 #define _STEREO_ENHANCER_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "DspEffectLibrary.h"
 #include "StereoEnhancerControls.h"
 
@@ -34,7 +34,7 @@ namespace lmms
 {
 
 
-class StereoEnhancerEffect : public DefaultEffectPluginInterface
+class StereoEnhancerEffect : public DefaultEffect
 {
 public:
 	StereoEnhancerEffect( Model * parent,

@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 
 
 MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	AudioPluginInterface(&multitapecho_plugin_descriptor, parent, key),
+	AudioPlugin(&multitapecho_plugin_descriptor, parent, key),
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),

@@ -25,14 +25,14 @@
 #ifndef LV2_EFFECT_H
 #define LV2_EFFECT_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "Lv2FxControls.h"
 
 namespace lmms
 {
 
 // TODO: Add support for a variable number of audio input/output ports
-class Lv2Effect : public DefaultEffectPluginInterface
+class Lv2Effect : public DefaultEffect
 {
 	Q_OBJECT
 

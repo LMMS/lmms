@@ -65,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 PeakControllerEffect::PeakControllerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&peakcontrollereffect_plugin_descriptor, _parent, _key),
+	AudioPlugin(&peakcontrollereffect_plugin_descriptor, _parent, _key),
 	m_effectId( rand() ),
 	m_peakControls( this ),
 	m_lastSample( 0 ),

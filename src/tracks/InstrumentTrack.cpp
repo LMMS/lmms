@@ -23,7 +23,7 @@
  */
 #include "InstrumentTrack.h"
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"

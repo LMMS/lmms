@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 
 
 FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key ) :
-	AudioPluginInterface(&flanger_plugin_descriptor, parent, key),
+	AudioPlugin(&flanger_plugin_descriptor, parent, key),
 	m_flangerControls( this )
 {
 	m_lfo = new QuadratureLfo( Engine::audioEngine()->outputSampleRate() );

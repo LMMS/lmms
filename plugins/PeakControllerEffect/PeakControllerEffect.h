@@ -26,7 +26,7 @@
 #ifndef PEAK_CONTROLLER_EFFECT_H
 #define PEAK_CONTROLLER_EFFECT_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "PeakControllerEffectControls.h"
 
 namespace lmms
@@ -35,7 +35,7 @@ namespace lmms
 
 class PeakController;
 
-class PeakControllerEffect : public DefaultEffectPluginInterface
+class PeakControllerEffect : public DefaultEffect
 {
 public:
 	PeakControllerEffect( Model * parent, 

@@ -26,14 +26,14 @@
 #ifndef _STEREO_MATRIX_H
 #define _STEREO_MATRIX_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "StereoMatrixControls.h"
 
 namespace lmms
 {
 
 
-class StereoMatrixEffect : public DefaultEffectPluginInterface
+class StereoMatrixEffect : public DefaultEffect
 {
 public:
 	StereoMatrixEffect( Model * parent, 

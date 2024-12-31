@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 }
 
 ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	AudioPluginInterface(&reverbsc_plugin_descriptor, parent, key),
+	AudioPlugin(&reverbsc_plugin_descriptor, parent, key),
 	m_reverbSCControls( this )
 {
 	sp_create(&sp);

@@ -1,5 +1,6 @@
 /*
- * AudioPluginInterface.h - Interface for all audio plugins
+ * AudioPlugin.h - Interface for audio plugins which provides
+ *                 pin connector support and compile-time customizations
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,8 +23,8 @@
  *
  */
 
-#ifndef LMMS_AUDIO_PLUGIN_INTERFACE_H
-#define LMMS_AUDIO_PLUGIN_INTERFACE_H
+#ifndef LMMS_AUDIO_PLUGIN_H
+#define LMMS_AUDIO_PLUGIN_H
 
 #include "AudioData.h"
 #include "AudioPluginBuffer.h"
@@ -48,7 +49,7 @@ enum class ProcessStatus
 	Sleep
 };
 
-//! Compile time customizations for `AudioPluginInterface` to meet the needs of a plugin implementation
+//! Compile time customizations for `AudioPlugin` to meet the needs of a plugin implementation
 struct PluginConfig
 {
 	//! The audio data layout used by the plugin
@@ -73,7 +74,7 @@ namespace detail
 {
 
 //! Provides the correct `processImpl` interface for instruments or effects to implement
-template<class ChildT, typename BufferT, typename ConstBufferT, bool inplace, bool customBuffer>
+template<class ParentT, typename BufferT, typename ConstBufferT, bool inplace, bool customBuffer>
 class AudioProcessingMethod;
 
 //! Instrument specialization
@@ -158,16 +159,16 @@ protected:
 	virtual auto processImpl() -> ProcessStatus = 0;
 };
 
-//! Connects the core audio buses to the instrument or effect using the pin connector
-template<class ChildT, typename SampleT, PluginConfig config>
-class AudioProcessorImpl
+//! Connects the core audio channels to the instrument or effect using the pin connector
+template<class ParentT, typename SampleT, PluginConfig config>
+class AudioPlugin
 {
-	static_assert(always_false_v<ChildT>, "ChildT must be either Instrument or Effect");
+	static_assert(always_false_v<ParentT>, "ParentT must be either Instrument or Effect");
 };
 
 //! Instrument specialization
 template<typename SampleT, PluginConfig config>
-class AudioProcessorImpl<Instrument, SampleT, config>
+class AudioPlugin<Instrument, SampleT, config>
 	: public Instrument
 	, public AudioProcessingMethod<Instrument,
 		typename AudioDataTypeSelector<config.layout, SampleT, config.inputs>::type,
@@ -178,14 +179,14 @@ class AudioProcessorImpl<Instrument, SampleT, config>
 		AudioPluginBufferDefaultImpl<config.layout, SampleT, config.inputs, config.outputs, config.inplace>>
 {
 public:
-	AudioProcessorImpl(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr,
+	AudioPlugin(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr,
 		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 		Instrument::Flags flags = Instrument::Flag::NoFlags)
 		: Instrument{desc, parent, key, flags}
 		, m_pinConnector{config.inputs, config.outputs, true, this}
 	{
 		connect(&m_pinConnector, &PluginPinConnector::pluginBuffersChanged,
-			this, &AudioProcessorImpl::updatePluginBuffers);
+			this, &AudioPlugin::updatePluginBuffers);
 	}
 
 	auto pinConnector() const -> const PluginPinConnector* final { return &m_pinConnector; }
@@ -236,10 +237,10 @@ protected:
 	void playNoteImpl(NotePlayHandle* notesToPlay, CoreAudioDataMut inOut) final
 	{
 		/**
-		 * NOTE: Only MIDI-based instruments are currently supported by AudioPluginInterface.
+		 * NOTE: Only MIDI-based instruments are currently supported by AudioPlugin.
 		 * NotePlayHandle-based instruments use buffers from their play handles, and more work
 		 * would be needed to integrate that system with the AudioPluginBufferInterface system
-		 * used by AudioPluginInterface. AudioPluginBufferInterface is also not thread-safe.
+		 * used by AudioPlugin. AudioPluginBufferInterface is also not thread-safe.
 		 *
 		 * The `Instrument::playNote()` method is still called for MIDI-based instruments when
 		 * notes are played, so this method is a no-op.
@@ -264,7 +265,7 @@ private:
 
 //! Effect specialization
 template<typename SampleT, PluginConfig config>
-class AudioProcessorImpl<Effect, SampleT, config>
+class AudioPlugin<Effect, SampleT, config>
 	: public Effect
 	, public AudioProcessingMethod<Effect,
 		typename AudioDataTypeSelector<config.layout, SampleT, config.inputs>::type,
@@ -275,13 +276,13 @@ class AudioProcessorImpl<Effect, SampleT, config>
 		AudioPluginBufferDefaultImpl<config.layout, SampleT, config.inputs, config.outputs, config.inplace>>
 {
 public:
-	AudioProcessorImpl(const Plugin::Descriptor* desc, Model* parent = nullptr,
+	AudioPlugin(const Plugin::Descriptor* desc, Model* parent = nullptr,
 		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
 		: Effect{desc, parent, key}
 		, m_pinConnector{config.inputs, config.outputs, false, this}
 	{
 		connect(&m_pinConnector, &PluginPinConnector::pluginBuffersChanged,
-			this, &AudioProcessorImpl::updatePluginBuffers);
+			this, &AudioPlugin::updatePluginBuffers);
 	}
 
 	auto pinConnector() const -> const PluginPinConnector* final { return &m_pinConnector; }
@@ -383,7 +384,7 @@ private:
 
 
 /**
- * AudioPluginInterface is the bridge connecting an Instrument/Effect base class used by the Core
+ * AudioPlugin is the bridge connecting an Instrument/Effect base class used by the Core
  * with its derived class used by a plugin implementation.
  *
  * Pin connector routing and other common tasks are handled here to allow plugin implementations
@@ -397,33 +398,33 @@ private:
  *
  * A `processImpl` interface method is provided which must be implemented by the plugin implementation.
  *
- * @param ChildT Either `Instrument` or `Effect`
+ * @param ParentT Either `Instrument` or `Effect`
  * @param SampleT The plugin's sample type - i.e. float, double, int32_t, `SampleFrame`, etc.
- * @param config Compile time configuration to customize `AudioPluginInterface`
+ * @param config Compile time configuration to customize `AudioPlugin`
  */
-template<class ChildT, typename SampleT, PluginConfig config>
-class AudioPluginInterface
-	: public detail::AudioProcessorImpl<ChildT, SampleT, config>
+template<class ParentT, typename SampleT, PluginConfig config>
+class AudioPlugin
+	: public detail::AudioPlugin<ParentT, SampleT, config>
 {
 	static_assert(!std::is_const_v<SampleT>);
 	static_assert(!std::is_same_v<SampleT, SampleFrame>
 		|| ((config.inputs == 0 || config.inputs == 2) && (config.outputs == 0 || config.outputs == 2)),
 		"Don't use SampleFrame if more than 2 processor channels are needed");
 
-	using Base = detail::AudioProcessorImpl<ChildT, SampleT, config>;
+	using Base = detail::AudioPlugin<ParentT, SampleT, config>;
 
 public:
-	using Base::AudioProcessorImpl;
+	using Base::AudioPlugin;
 };
 
 // NOTE: NotePlayHandle-based instruments are not supported yet
-using DefaultMidiInstrumentPluginInterface = AudioPluginInterface<Instrument, SampleFrame,
+using DefaultMidiInstrument = AudioPlugin<Instrument, SampleFrame,
 	PluginConfig{ .layout = AudioDataLayout::Interleaved, .inputs = 0, .outputs = 2, .inplace = true }>;
 
-using DefaultEffectPluginInterface = AudioPluginInterface<Effect, SampleFrame,
+using DefaultEffect = AudioPlugin<Effect, SampleFrame,
 	PluginConfig{ .layout = AudioDataLayout::Interleaved, .inputs = 2, .outputs = 2, .inplace = true }>;
 
 
 } // namespace lmms
 
-#endif // LMMS_AUDIO_PLUGIN_INTERFACE_H
+#endif // LMMS_AUDIO_PLUGIN_H

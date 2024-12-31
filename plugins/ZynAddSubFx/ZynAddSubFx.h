@@ -32,7 +32,7 @@
 
 #include <globals.h>
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "AutomatableModel.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
@@ -77,7 +77,7 @@ private:
 
 // TODO: Is it always 0 inputs, 2 outputs?
 class ZynAddSubFxInstrument
-	: public AudioPluginInterface<Instrument, float,
+	: public AudioPlugin<Instrument, float,
 		PluginConfig{ .layout = AudioDataLayout::Split, .inputs = 0, .outputs = 2, .customBuffer = true }>
 {
 	Q_OBJECT

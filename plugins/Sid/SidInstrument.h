@@ -27,7 +27,7 @@
 #ifndef _SID_H
 #define _SID_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "AutomatableModel.h"
 #include "InstrumentView.h"
 

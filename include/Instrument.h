@@ -170,10 +170,10 @@ public:
 
 
 protected:
-	//! To be implemented by AudioPluginInterface or plugin implementation
+	//! To be implemented by AudioPlugin or plugin implementation
 	virtual void playImpl(CoreAudioDataMut out) {}
 
-	//! To be implemented by AudioPluginInterface or plugin implementation
+	//! To be implemented by AudioPlugin or plugin implementation
 	virtual void playNoteImpl(NotePlayHandle* notesToPlay, CoreAudioDataMut out) {}
 
 	// fade in to prevent clicks

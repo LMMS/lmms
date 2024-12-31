@@ -193,7 +193,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     if (fHandle != nullptr && fDescriptor->activate != nullptr)
         fDescriptor->activate(fHandle);
 
-    // we need a play-handle which cares for calling play(), TODO: Move responsibility for this to AudioPluginInterface
+    // we need a play-handle which cares for calling play(), TODO: Move responsibility for this to AudioPlugin
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
 

@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 StereoEnhancerEffect::StereoEnhancerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&stereoenhancer_plugin_descriptor, _parent, _key),
+	AudioPlugin(&stereoenhancer_plugin_descriptor, _parent, _key),
 	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new SampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),

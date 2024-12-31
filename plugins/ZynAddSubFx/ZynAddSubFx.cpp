@@ -121,7 +121,7 @@ void ZynAddSubFxRemotePlugin::updateBuffers(int channelsIn, int channelsOut)
 
 ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
-	AudioPluginInterface(&zynaddsubfx_plugin_descriptor, _instrumentTrack, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
+	AudioPlugin(&zynaddsubfx_plugin_descriptor, _instrumentTrack, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_hasGUI( false ),
 	m_localPlugin(nullptr),
 	m_remotePlugin( nullptr ),

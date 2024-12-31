@@ -53,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 
 
 CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	AudioPluginInterface(&compressor_plugin_descriptor, parent, key),
+	AudioPlugin(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
 	m_sampleRate = Engine::audioEngine()->outputSampleRate();

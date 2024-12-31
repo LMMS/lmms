@@ -26,7 +26,7 @@
 #ifndef REVERBSC_H
 #define REVERBSC_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "ReverbSCControls.h"
 
 extern "C" {
@@ -40,7 +40,7 @@ namespace lmms
 {
 
 
-class ReverbSCEffect : public DefaultEffectPluginInterface
+class ReverbSCEffect : public DefaultEffect
 {
 public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );

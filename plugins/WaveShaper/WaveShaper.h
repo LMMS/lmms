@@ -27,14 +27,14 @@
 #ifndef _WAVESHAPER_H
 #define _WAVESHAPER_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "WaveShaperControls.h"
 
 namespace lmms
 {
 
 
-class WaveShaperEffect : public DefaultEffectPluginInterface
+class WaveShaperEffect : public DefaultEffect
 {
 public:
 	WaveShaperEffect( Model * _parent,

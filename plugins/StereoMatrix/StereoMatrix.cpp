@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 StereoMatrixEffect::StereoMatrixEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&stereomatrix_plugin_descriptor, _parent, _key),
+	AudioPlugin(&stereomatrix_plugin_descriptor, _parent, _key),
 	m_smControls( this )
 {
 }

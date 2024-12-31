@@ -26,7 +26,7 @@
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "CompressorControls.h"
 
 namespace lmms
@@ -35,7 +35,7 @@ namespace lmms
 
 constexpr float COMP_LOG = -2.2f;
 
-class CompressorEffect : public DefaultEffectPluginInterface
+class CompressorEffect : public DefaultEffect
 {
 	Q_OBJECT
 public:

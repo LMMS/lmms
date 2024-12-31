@@ -25,7 +25,7 @@
 #ifndef LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 #define LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "GranularPitchShifterControls.h"
 
 #include "BasicFilters.h"
@@ -43,7 +43,7 @@ constexpr float SatuSafeVol = 16.f;
 constexpr float SatuStrength = 0.001f;
 
 
-class GranularPitchShifterEffect : public DefaultEffectPluginInterface
+class GranularPitchShifterEffect : public DefaultEffect
 {
 public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);

@@ -154,7 +154,7 @@ private:
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
-	AudioPluginInterface(&vestige_plugin_descriptor, _instrument_track, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
+	AudioPlugin(&vestige_plugin_descriptor, _instrument_track, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_plugin( nullptr ),
 	m_pluginMutex(),
 	m_subWindow( nullptr ),

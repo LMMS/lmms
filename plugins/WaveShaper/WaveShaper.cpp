@@ -58,7 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 
 WaveShaperEffect::WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&waveshaper_plugin_descriptor, _parent, _key),
+	AudioPlugin(&waveshaper_plugin_descriptor, _parent, _key),
 	m_wsControls( this )
 {
 }

@@ -26,13 +26,13 @@
 #ifndef LMMS_AMPLIFIER_H
 #define LMMS_AMPLIFIER_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "AmplifierControls.h"
 
 namespace lmms
 {
 
-class AmplifierEffect : public DefaultEffectPluginInterface
+class AmplifierEffect : public DefaultEffect
 {
 public:
 	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);

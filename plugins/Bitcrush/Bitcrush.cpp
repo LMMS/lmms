@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 }
 
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
-	AudioPluginInterface(&bitcrush_plugin_descriptor, parent, key),
+	AudioPlugin(&bitcrush_plugin_descriptor, parent, key),
 	m_controls( this ),
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )

@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <QSharedPointer>
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "VstEffectControls.h"
 
 namespace lmms
@@ -37,7 +37,7 @@ namespace lmms
 class VstPlugin;
 
 class VstEffect
-	: public AudioPluginInterface<Effect, float,
+	: public AudioPlugin<Effect, float,
 		PluginConfig{ .layout = AudioDataLayout::Split, .customBuffer = true }>
 {
 public:

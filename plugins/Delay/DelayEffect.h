@@ -25,7 +25,7 @@
 #ifndef DELAYEFFECT_H
 #define DELAYEFFECT_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "DelayControls.h"
 
 namespace lmms
@@ -34,7 +34,7 @@ namespace lmms
 class Lfo;
 class StereoDelay;
 
-class DelayEffect : public DefaultEffectPluginInterface
+class DelayEffect : public DefaultEffect
 {
 public:
 	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );

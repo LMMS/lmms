@@ -27,7 +27,7 @@
 #ifndef DYNPROC_H
 #define DYNPROC_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "DynamicsProcessorControls.h"
 
 namespace lmms
@@ -36,7 +36,7 @@ namespace lmms
 class RmsHelper;
 
 
-class DynProcEffect : public DefaultEffectPluginInterface
+class DynProcEffect : public DefaultEffect
 {
 public:
 	DynProcEffect( Model * _parent,

@@ -28,7 +28,7 @@
 
 #include <QMutex>
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "ladspa.h"
 #include "LadspaControls.h"
 #include "LadspaManager.h"
@@ -39,7 +39,7 @@ namespace lmms
 struct port_desc_t;
 using multi_proc_t = QVector<port_desc_t*>;
 
-class LadspaEffect : public DefaultEffectPluginInterface
+class LadspaEffect : public DefaultEffect
 {
 	Q_OBJECT
 public:

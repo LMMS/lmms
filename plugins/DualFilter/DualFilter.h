@@ -27,7 +27,7 @@
 #ifndef DUALFILTER_H
 #define DUALFILTER_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "DualFilterControls.h"
 #include "BasicFilters.h"
 
@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-class DualFilterEffect : public DefaultEffectPluginInterface
+class DualFilterEffect : public DefaultEffect
 {
 public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );

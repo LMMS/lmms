@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 
 VstEffect::VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&vsteffect_plugin_descriptor, _parent, _key),
+	AudioPlugin(&vsteffect_plugin_descriptor, _parent, _key),
 	m_pluginMutex(),
 	m_key( *_key ),
 	m_vstControls( this )

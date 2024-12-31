@@ -53,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 
 
 CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	AudioPluginInterface(&crossovereq_plugin_descriptor, parent, key),
+	AudioPlugin(&crossovereq_plugin_descriptor, parent, key),
 	m_controls( this ),
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_lp1( m_sampleRate ),

@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 
 
 EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
-	AudioPluginInterface(&eq_plugin_descriptor, parent, key),
+	AudioPlugin(&eq_plugin_descriptor, parent, key),
 	m_eqControls( this ),
 	m_inGain( 1.0 ),
 	m_outGain( 1.0 )

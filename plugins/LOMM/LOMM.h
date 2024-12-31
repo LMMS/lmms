@@ -26,7 +26,7 @@
 #ifndef LMMS_LOMM_H
 #define LMMS_LOMM_H
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "LOMMControls.h"
 
 #include "BasicFilters.h"
@@ -39,7 +39,7 @@ constexpr inline float LOMM_MIN_FLOOR = 0.00012589f;// -72 dBFS
 constexpr inline float LOMM_MAX_LOOKAHEAD = 20.f;
 constexpr inline float LOMM_AUTO_TIME_ADJUST = 5.f;
 
-class LOMMEffect : public DefaultEffectPluginInterface
+class LOMMEffect : public DefaultEffect
 {
 	Q_OBJECT
 public:

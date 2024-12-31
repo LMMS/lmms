@@ -60,7 +60,7 @@ const double DNF_LOG = -1.0;
 
 DynProcEffect::DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	AudioPluginInterface(&dynamicsprocessor_plugin_descriptor, _parent, _key),
+	AudioPlugin(&dynamicsprocessor_plugin_descriptor, _parent, _key),
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;

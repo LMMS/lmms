@@ -30,7 +30,7 @@
 #include <QMdiSubWindow>
 #include <QMutex>
 
-#include "AudioPluginInterface.h"
+#include "AudioPlugin.h"
 #include "InstrumentView.h"
 
 
@@ -56,7 +56,7 @@ class VestigeInstrumentView;
 
 
 class VestigeInstrument
-	: public AudioPluginInterface<Instrument, float,
+	: public AudioPlugin<Instrument, float,
 		PluginConfig{ .layout = AudioDataLayout::Split, .customBuffer = true }>
 {
 	Q_OBJECT
