@@ -21,7 +21,7 @@ Basic build steps:
    cd build
    cmake ../
    make
-   sudo make install
+   sudo make install || doas make install
    # or alternately: su -c 'make install'
 
 With the above commands an out-of-tree build is performed. You can also run
