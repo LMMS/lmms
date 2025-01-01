@@ -43,30 +43,6 @@ namespace lmms {
 class LMMS_EXPORT SampleThumbnail
 {
 public:
-	struct Bit
-	{
-		Bit() = default;
-
-		Bit(float min, float max): min(min), max(max) {}
-
-		Bit(const SampleFrame& frame)
-			: min(std::min(frame.left(), frame.right()))
-			, max(std::max(frame.left(), frame.right()))
-		{}
-
-		Bit operator+(const Bit& other) const
-		{
-			return Bit(std::min(min, other.min), std::max(max, other.max));
-		}
-
-		Bit operator+(const SampleFrame& frame) const
-		{
-			return *this + Bit{frame};
-		}
-
-		float min =  std::numeric_limits<float>::max();
-		float max = -std::numeric_limits<float>::max();
-	};
 
 	struct VisualizeParameters
 	{
@@ -85,24 +61,67 @@ public:
 		QRect drawRect = QRect(); 	//!< Region of clipRect that will be drawn into (the update region). = clipRect when null.
 	};
 
-	using Thumbnail = std::vector<Bit>;
-	using ThumbnailCache = std::vector<Thumbnail>;
 
 	SampleThumbnail() = default;
 	SampleThumbnail(const Sample& sample);
 
 	void visualize(const VisualizeParameters& parameters, QPainter& painter) const;
-	void visualizeOriginal(const VisualizeParameters& parameters, QPainter& painter) const;
 
 	bool selectFromGlobalThumbnailMap(const Sample&);
 	static void cleanUpGlobalThumbnailMap();
 
 private:
-	static void draw(QPainter& painter, const Bit& bit, float lineX, int centerY, float scalingFactor,
-		const QColor& color, const QColor& rmsColor);
+	class Thumbnail
+	{
+	public:
+		static constexpr auto AggregationPerZoomStep = 2;
 
-	static Thumbnail generate(const size_t thumbnailSize, const SampleFrame* buffer, const size_t size);
+		struct Peak
+		{
+			Peak() = default;
 
+			Peak(float min, float max)
+				: min(min)
+				, max(max)
+			{
+			}
+
+			Peak(const SampleFrame& frame)
+				: min(std::min(frame.left(), frame.right()))
+				, max(std::max(frame.left(), frame.right()))
+			{
+			}
+
+			Peak operator+(const Peak& other) const { return Peak(std::min(min, other.min), std::max(max, other.max)); }
+			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
+
+			float min = std::numeric_limits<float>::max();
+			float max = -std::numeric_limits<float>::max();
+		};
+
+		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
+		Thumbnail(const SampleFrame* buffer, size_t size, int width);
+
+		Thumbnail zoomOut(float factor);
+
+		void draw(QPainter& painter, const Peak& peak, float lineX, int centerY, float scalingFactor,
+			const QColor& color, const QColor& innerColor) const;
+
+		Peak& operator[](size_t index) { return m_peaks[index]; }
+		const Peak& operator[](size_t index) const { return m_peaks[index]; }
+
+		Peak* peaks() { return m_peaks.data(); }
+		const Peak* peaks() const { return m_peaks.data(); }
+		
+		int width() const { return m_peaks.size(); }
+		double samplesPerPeak() const { return m_samplesPerPeak; }
+
+	private:
+		std::vector<Peak> m_peaks;
+		double m_samplesPerPeak;
+	};
+
+	using ThumbnailCache = std::vector<Thumbnail>;
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
 
 	/* DEPRECATED; functionality is kept for testing conveniences */

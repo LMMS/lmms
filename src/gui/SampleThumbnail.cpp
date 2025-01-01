@@ -24,7 +24,60 @@
 
 #include "SampleThumbnail.h"
 
+#include <QGuiApplication>
+#include <QScreen>
+
 namespace lmms {
+
+SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPerPeak)
+	: m_peaks(std::move(peaks))
+	, m_samplesPerPeak(samplesPerPeak)
+{
+}
+
+SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, int width)
+	: m_peaks(width)
+	, m_samplesPerPeak(static_cast<double>(size) / width)
+{
+	for (auto peakIndex = 0; peakIndex < width; ++peakIndex)
+	{
+		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
+		const auto endSample = buffer + std::min(static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak)), size);
+		const auto [min, max] = std::minmax_element(&beginSample->left(), &endSample->left());
+		m_peaks[peakIndex] = Peak{*min, *max};
+	}
+}
+
+SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor)
+{
+	assert(width() >= factor);
+
+	auto peaks = std::vector<Peak>(width() / factor);
+	for (auto peakIndex = 0; peakIndex < peaks.size(); ++peakIndex)
+	{
+		const auto beginAggregationAt = m_peaks.begin() + static_cast<int>(std::floor(peakIndex * factor));
+		const auto endAggregationAt = m_peaks.begin() + std::min(static_cast<int>(std::ceil((peakIndex + 1) * factor)), width());
+		const auto aggregatedPeak = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
+		peaks[peakIndex] = aggregatedPeak;
+	}
+
+	return Thumbnail{std::move(peaks), (m_samplesPerPeak * m_peaks.size()) / peaks.size()};
+}
+
+SampleThumbnail::SampleThumbnail(const Sample& sample)
+{
+	if (selectFromGlobalThumbnailMap(sample)) { return; }
+	cleanUpGlobalThumbnailMap();
+
+	m_thumbnailCache->emplace_back(sample.buffer()->data(), sample.sampleSize(), sample.sampleSize());
+
+	do
+	{
+		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
+		m_thumbnailCache->emplace_back(zoomedOutThumbnail);
+	}
+	while (m_thumbnailCache->back().width() > QGuiApplication::primaryScreen()->geometry().width());
+}
 
 /* DEPRECATED; functionality is kept for testing conveniences */
 bool SampleThumbnail::selectFromGlobalThumbnailMap(const Sample& inputSample)
@@ -62,70 +115,17 @@ void SampleThumbnail::cleanUpGlobalThumbnailMap()
 	}
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::generate(
-	const size_t thumbnailSize, const SampleFrame* buffer, const size_t size)
+void SampleThumbnail::Thumbnail::draw(QPainter& painter, const Thumbnail::Peak& peak, float lineX, int centerY, float scalingFactor,
+	const QColor& color, const QColor& innerColor) const
 {
-	const auto sampleChunk = (size + thumbnailSize) / thumbnailSize;
-	auto thumbnail = Thumbnail(thumbnailSize);
-
-	for (auto tIndex = size_t{0}; tIndex < thumbnailSize; tIndex++)
-	{
-		const auto sampleIndex = tIndex * size / thumbnailSize;
-		const auto sampleChunkBound = std::min(sampleIndex + sampleChunk, size);
-		thumbnail[tIndex] = std::accumulate(buffer + sampleIndex, buffer + sampleChunkBound, Bit{});
-	}
-
-	return thumbnail;
-}
-
-SampleThumbnail::SampleThumbnail(const Sample& inputSample)
-{
-	if (selectFromGlobalThumbnailMap(inputSample)) { return; }
-
-	cleanUpGlobalThumbnailMap();
-
-	const auto sampleBufferSize = inputSample.sampleSize();
-	const auto thumbnailSizeDivisor = size_t{10};
-	const auto firstThumbnailSize = std::max<size_t>(sampleBufferSize / thumbnailSizeDivisor, 1);
-
-	const auto firstThumbnail = generate(firstThumbnailSize, inputSample.data(), sampleBufferSize);
-
-	m_thumbnailCache->push_back(firstThumbnail);
-
-	// Generate the remaining thumbnails using the first one, each one's
-	// size is the size of the previous one divided by the thumbnail size divisor.
-	auto thumbnailSize = size_t{firstThumbnailSize / thumbnailSizeDivisor};
-	while (thumbnailSize >= 1)
-	{
-		const auto& biggerThumbnail = m_thumbnailCache->back();
-
-		auto thumbnail = Thumbnail(thumbnailSize);
-
-		for (auto smallIndex = size_t{0}; smallIndex < thumbnail.size(); smallIndex += 1)
-		{
-			auto bigIndex = smallIndex * thumbnailSizeDivisor;
-			auto bigItStart = biggerThumbnail.begin() + bigIndex;
-			auto bigItEnd = std::min(bigItStart + thumbnailSizeDivisor, biggerThumbnail.end());
-
-			thumbnail[smallIndex] = std::accumulate(bigItStart, bigItEnd, Bit{});
-		}
-
-		m_thumbnailCache->push_back(thumbnail);
-		thumbnailSize /= thumbnailSizeDivisor;
-	}
-}
-
-void SampleThumbnail::draw(QPainter& painter, const Bit& bit, float lineX, int centerY, float scalingFactor,
-	const QColor& color, const QColor& innerColor)
-{
-	const auto lengthY1 = bit.max * scalingFactor;
-	const auto lengthY2 = bit.min * scalingFactor;
+	const auto lengthY1 = peak.max * scalingFactor;
+	const auto lengthY2 = peak.min * scalingFactor;
 
 	const auto lineY1 = centerY - lengthY1;
 	const auto lineY2 = centerY - lengthY2;
 
-	const auto innerLineY1 = centerY - bit.max * 0.6 * scalingFactor;
-	const auto innerLineY2 = centerY - bit.min * 0.6 * scalingFactor;
+	const auto innerLineY1 = centerY - peak.max * 0.6 * scalingFactor;
+	const auto innerLineY2 = centerY - peak.min * 0.6 * scalingFactor;
 
 	painter.drawLine(QPointF{lineX, lineY1}, QPointF{lineX, lineY2});
 	painter.setPen(innerColor);
@@ -162,15 +162,14 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	do
 	{
 		thumbnailIt--;
-	} while (thumbnailIt != m_thumbnailCache->begin() && thumbnailIt->size() < widthSelect);
+	} while (thumbnailIt != m_thumbnailCache->begin() && thumbnailIt->width() < widthSelect);
 
 	const auto& thumbnail = *thumbnailIt;
 
-	const auto thumbnailLastSample
-		= std::max<size_t>(static_cast<size_t>(parameters.sampleEnd * thumbnail.size()), 1) - 1;
-	const auto tViewStart = static_cast<long>(parameters.sampleStart * thumbnail.size());
-	const auto tViewLast = std::min<size_t>(thumbnailLastSample, thumbnail.size() - 1);
-	const auto tLast = thumbnail.size() - 1;
+	const auto thumbnailLastSample = std::max(static_cast<size_t>(parameters.sampleEnd * thumbnail.width()), std::size_t{1}) - 1;
+	const auto tViewStart = static_cast<long>(parameters.sampleStart * thumbnail.width());
+	const auto tViewLast = std::min<size_t>(thumbnailLastSample, thumbnail.width() - 1);
+	const auto tLast = thumbnail.width() - 1;
 	const auto thumbnailViewSize = thumbnailLastSample + 1 - tViewStart;
 
 	const auto pixelIndexStart = std::max(std::max(clipRect.x(), drawRect.x()), x);
@@ -181,21 +180,18 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	for (auto pixelIndex = pixelIndexStart; pixelIndex <= pixelIndexEnd; pixelIndex++)
 	{
 		auto tIndex = tViewStart + (pixelIndex - x) * thumbnailViewSize / width;
-
 		if (tIndex > tViewLast) { break; }
 
 		const auto tChunkBound = tIndex + tChunk;
 
-		auto thumbnailBit = Bit{};
-
+		auto peak = Thumbnail::Peak{};
 		if (parameters.reversed)
 		{
-			thumbnailBit
-				= std::accumulate(thumbnail.begin() + tLast - tChunkBound, thumbnail.begin() + tLast - tIndex, Bit{});
+			peak = std::accumulate(thumbnail.peaks() + tLast - tChunkBound, thumbnail.peaks() + tLast - tIndex, Thumbnail::Peak{});
 		}
-		else { thumbnailBit = std::accumulate(thumbnail.begin() + tIndex, thumbnail.begin() + tChunkBound, Bit{}); }
+		else { peak = std::accumulate(thumbnail.peaks() + tIndex, thumbnail.peaks() + tChunkBound, Thumbnail::Peak{}); }
 
-		draw(painter, thumbnailBit, pixelIndex, centerY, scalingFactor, color, innerColor);
+		thumbnail.draw(painter, peak, pixelIndex, centerY, scalingFactor, color, innerColor);
 	}
 }
 
