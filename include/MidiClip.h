@@ -108,7 +108,6 @@ public:
 
 	bool empty();
 
-
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 

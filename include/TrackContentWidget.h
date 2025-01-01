@@ -155,6 +155,7 @@ protected:
 private:
 	Track * getTrack();
 	TimePos getPosition( int mouseX );
+	void setMinimumWidthBasedOnClips();
 
 	TrackView * m_trackView;
 
