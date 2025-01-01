@@ -265,7 +265,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 				// create sub-note-play-handle, only note is
 				// different
 				Engine::audioEngine()->addPlayHandle(
-						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
+						NotePlayHandlePool.construct( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::Origin::NoteStacking )
 						);
 			}
@@ -513,7 +513,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
 		Engine::audioEngine()->addPlayHandle(
-				NotePlayHandleManager::acquire( _n->instrumentTrack(),
+				NotePlayHandlePool.construct( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
 							Note( TimePos( 0 ), TimePos( 0 ), sub_note_key, _n->getVolume(),
