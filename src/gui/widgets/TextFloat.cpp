@@ -24,6 +24,7 @@
 
 #include "TextFloat.h"
 
+#include <QCoreApplication>
 #include <QTimer>
 #include <QPainter>
 #include <QStyleOption>
@@ -44,7 +45,7 @@ TextFloat::TextFloat() :
 }
 
 TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap & pixmap) :
-	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
+	QWidget(getGUI()->mainWindow(), Qt::Tool | Qt::FramelessWindowHint)
 {
 	QHBoxLayout * mainLayout = new QHBoxLayout();
 	setLayout(mainLayout);
@@ -123,6 +124,8 @@ TextFloat * TextFloat::displayMessage(const QString & title,
 		tf->setAttribute(Qt::WA_DeleteOnClose, true);
 		QTimer::singleShot(timeout, tf, SLOT(close()));
 	}
+
+	QCoreApplication::processEvents();
 
 	return tf;
 }
