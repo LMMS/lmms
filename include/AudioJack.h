@@ -100,6 +100,7 @@ private:
 
 	int processCallback(jack_nframes_t nframes);
 
+	static int setBufferSizeCallback(jack_nframes_t nframes, void* udata);
 	static int staticProcessCallback(jack_nframes_t nframes, void* udata);
 	static void shutdownCallback(void* _udata);
 
@@ -110,8 +111,11 @@ private:
 
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
+	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
+	jack_default_audio_sample_t* m_inputFrameBuffer;
 	SampleFrame* m_outBuf;
+	SampleFrame* m_inBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
