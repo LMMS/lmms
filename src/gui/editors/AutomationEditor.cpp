@@ -1222,9 +1222,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			auto param = SampleThumbnail::VisualizeParameters{};
 			param.amplification = m_ghostSample->sample().amplification();
 			param.reversed = m_ghostSample->sample().reversed();
-			param.sampRect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			param.clipRect = QRect(0, 0, width(), height());
-
+			param.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
+			param.sampleStart = m_ghostSample->sample().startFrame();
+			param.sampleEnd = m_ghostSample->sample().endFrame();
 			m_sampleThumbnail.visualize(param, p);
 		}
 

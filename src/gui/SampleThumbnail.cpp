@@ -24,6 +24,7 @@
 
 #include "SampleThumbnail.h"
 
+#include <QDebug>
 #include <QGuiApplication>
 #include <QScreen>
 
@@ -42,26 +43,35 @@ SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, in
 	for (auto peakIndex = 0; peakIndex < width; ++peakIndex)
 	{
 		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
-		const auto endSample = buffer + std::min(static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak)), size);
+		const auto endSample
+			= buffer + std::min(static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak)), size);
 		const auto [min, max] = std::minmax_element(&beginSample->left(), &endSample->left());
 		m_peaks[peakIndex] = Peak{*min, *max};
 	}
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor)
+SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) const
 {
-	assert(width() >= factor);
+	assert(factor >= 1 && "Invalid zoom out factor");
 
 	auto peaks = std::vector<Peak>(width() / factor);
 	for (auto peakIndex = 0; peakIndex < peaks.size(); ++peakIndex)
 	{
 		const auto beginAggregationAt = m_peaks.begin() + static_cast<int>(std::floor(peakIndex * factor));
-		const auto endAggregationAt = m_peaks.begin() + std::min(static_cast<int>(std::ceil((peakIndex + 1) * factor)), width());
+		const auto endAggregationAt
+			= m_peaks.begin() + std::min(static_cast<int>(std::ceil((peakIndex + 1) * factor)), width());
 		const auto aggregatedPeak = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
 		peaks[peakIndex] = aggregatedPeak;
 	}
 
-	return Thumbnail{std::move(peaks), (m_samplesPerPeak * m_peaks.size()) / peaks.size()};
+	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
+}
+
+SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::extract(size_t from, size_t to) const
+{
+	auto peaks = std::vector<Peak>(to - from);
+	std::copy(m_peaks.begin() + from, m_peaks.begin() + to, peaks.begin());
+	return Thumbnail{std::move(peaks), m_samplesPerPeak};
 }
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
@@ -71,12 +81,11 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 
 	m_thumbnailCache->emplace_back(sample.buffer()->data(), sample.sampleSize(), sample.sampleSize());
 
-	do
+	while (m_thumbnailCache->back().width() > QGuiApplication::primaryScreen()->geometry().width())
 	{
 		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
 		m_thumbnailCache->emplace_back(zoomedOutThumbnail);
 	}
-	while (m_thumbnailCache->back().width() > QGuiApplication::primaryScreen()->geometry().width());
 }
 
 /* DEPRECATED; functionality is kept for testing conveniences */
@@ -115,83 +124,53 @@ void SampleThumbnail::cleanUpGlobalThumbnailMap()
 	}
 }
 
-void SampleThumbnail::Thumbnail::draw(QPainter& painter, const Thumbnail::Peak& peak, float lineX, int centerY, float scalingFactor,
-	const QColor& color, const QColor& innerColor) const
-{
-	const auto lengthY1 = peak.max * scalingFactor;
-	const auto lengthY2 = peak.min * scalingFactor;
-
-	const auto lineY1 = centerY - lengthY1;
-	const auto lineY2 = centerY - lengthY2;
-
-	const auto innerLineY1 = centerY - peak.max * 0.6 * scalingFactor;
-	const auto innerLineY2 = centerY - peak.min * 0.6 * scalingFactor;
-
-	painter.drawLine(QPointF{lineX, lineY1}, QPointF{lineX, lineY2});
-	painter.setPen(innerColor);
-
-	painter.drawLine(QPointF{lineX, innerLineY1}, QPointF{lineX, innerLineY2});
-	painter.setPen(color);
-}
-
 void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter& painter) const
 {
-	const auto& clipRect = parameters.clipRect;
-	const auto& sampRect = parameters.sampRect.isNull() ? clipRect : parameters.sampRect;
-	const auto& drawRect = parameters.drawRect.isNull() ? clipRect : parameters.drawRect;
+	assert(parameters.sampleStart <= parameters.sampleEnd && "Invalid sample range");
 
-	const auto sampleViewLength = parameters.sampleEnd - parameters.sampleStart;
-
-	const auto x = sampRect.x();
-	const auto height = clipRect.height();
-	const auto halfHeight = height / 2;
-	const auto width = sampRect.width();
-	const auto centerY = clipRect.y() + halfHeight;
-
-	if (width < 1) { return; }
-
-	const auto scalingFactor = halfHeight * parameters.amplification;
-
-	const auto color = painter.pen().color();
-	const auto innerColor = color.lighter(123);
-
-	const auto widthSelect = static_cast<std::size_t>(static_cast<float>(width) / sampleViewLength);
-
-	auto thumbnailIt = m_thumbnailCache->end();
-
-	do
+	if (m_thumbnailCache->empty())
 	{
-		thumbnailIt--;
-	} while (thumbnailIt != m_thumbnailCache->begin() && thumbnailIt->width() < widthSelect);
+		qDebug() << "SampleThumbnail::visualize: Cannot draw waveform with an empty thumbnail cache";
+		return;
+	}
 
-	const auto& thumbnail = *thumbnailIt;
+	const auto& sampleRect = parameters.sampleRect;
+	const auto& viewportRect = parameters.viewportRect.isNull() ? sampleRect : parameters.viewportRect;
 
-	const auto thumbnailLastSample = std::max(static_cast<size_t>(parameters.sampleEnd * thumbnail.width()), std::size_t{1}) - 1;
-	const auto tViewStart = static_cast<long>(parameters.sampleStart * thumbnail.width());
-	const auto tViewLast = std::min<size_t>(thumbnailLastSample, thumbnail.width() - 1);
-	const auto tLast = thumbnail.width() - 1;
-	const auto thumbnailViewSize = thumbnailLastSample + 1 - tViewStart;
+	const auto numSamples = parameters.sampleEnd - parameters.sampleStart;
+	const auto idealSamplesPerPeak = std::max(static_cast<double>(numSamples) / sampleRect.width(), 1.0);
 
-	const auto pixelIndexStart = std::max(std::max(clipRect.x(), drawRect.x()), x);
-	const auto pixelIndexEnd = std::min(std::min(clipRect.width(), drawRect.width()), width) + pixelIndexStart;
+	const auto smallestLargerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
+		[&](const auto& thumbnail) { return thumbnail.samplesPerPeak() <= idealSamplesPerPeak; });
 
-	const auto tChunk = (thumbnailViewSize + width) / width;
-
-	for (auto pixelIndex = pixelIndexStart; pixelIndex <= pixelIndexEnd; pixelIndex++)
+	if (smallestLargerThumbnail == m_thumbnailCache->rend())
 	{
-		auto tIndex = tViewStart + (pixelIndex - x) * thumbnailViewSize / width;
-		if (tIndex > tViewLast) { break; }
+		qDebug() << "SampleThumbnail::visualize: Smallest thumbnail of larger or equal width not found within "
+					"thumbnail cache for a "
+					"samples per peak of"
+				 << idealSamplesPerPeak;
+		return;
+	}
 
-		const auto tChunkBound = tIndex + tChunk;
+	const auto smallestLargerThumbnailBegin
+		= static_cast<double>(viewportRect.x()) / sampleRect.width() * smallestLargerThumbnail->width();
+	const auto smallestLargerThumbnailEnd = static_cast<double>(viewportRect.x() + viewportRect.width())
+		/ sampleRect.width() * smallestLargerThumbnail->width();
 
-		auto peak = Thumbnail::Peak{};
-		if (parameters.reversed)
-		{
-			peak = std::accumulate(thumbnail.peaks() + tLast - tChunkBound, thumbnail.peaks() + tLast - tIndex, Thumbnail::Peak{});
-		}
-		else { peak = std::accumulate(thumbnail.peaks() + tIndex, thumbnail.peaks() + tChunkBound, Thumbnail::Peak{}); }
+	const auto extractedThumbnail = smallestLargerThumbnail->extract(
+		std::floor(smallestLargerThumbnailBegin), std::ceil(smallestLargerThumbnailEnd));
+	const auto zoomedOutThumbnail
+		= extractedThumbnail.zoomOut(idealSamplesPerPeak / smallestLargerThumbnail->samplesPerPeak());
 
-		thumbnail.draw(painter, peak, pixelIndex, centerY, scalingFactor, color, innerColor);
+	painter.setClipRect(viewportRect.intersected(sampleRect));
+
+	const auto scalingFactor = sampleRect.center().y() / 2 * parameters.amplification;
+	for (auto xPos = viewportRect.x(); xPos < viewportRect.x() + viewportRect.width(); ++xPos)
+	{
+		const auto peak = zoomedOutThumbnail[xPos - viewportRect.x()];
+		const auto yMin = sampleRect.center().y() - peak.min * scalingFactor;
+		const auto yMax = sampleRect.center().y() - peak.max * scalingFactor;
+		painter.drawLine(xPos, yMin, xPos, yMax);
 	}
 }
 

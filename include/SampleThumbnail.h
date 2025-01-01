@@ -43,24 +43,17 @@ namespace lmms {
 class LMMS_EXPORT SampleThumbnail
 {
 public:
-
 	struct VisualizeParameters
 	{
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
 
-		/*
-			You can set these members when there's no easy way to calculate sampRect.
-			These will stretch the viewed region to the dimensions of the clipRect.
-		*/
-		float sampleStart = 0.0f; //!< Where the sample begins for drawing.
-		float sampleEnd = 1.0f;	  //!< Where the sample ends for drawing.
+		size_t sampleStart = 0; //!< Where the sample begins for drawing (inclusive).
+		size_t sampleEnd = 0;	//!< Where the sample ends for drawing (exclusive).
 
-		QRect sampRect = QRect(); 	//!< Dimensions of the fully rendered sample on the Song editor; Can move around. = clipRect when null.
-		QRect clipRect;				//!< Region that the sample will be rendered into; Fixed in place.
-		QRect drawRect = QRect(); 	//!< Region of clipRect that will be drawn into (the update region). = clipRect when null.
+		QRect sampleRect;	//!< Region that the sample will be rendered into.
+		QRect viewportRect; //!< Viewport for `sampleRect`. Equals `sampleRect` when null.
 	};
-
 
 	SampleThumbnail() = default;
 	SampleThumbnail(const Sample& sample);
@@ -102,10 +95,8 @@ private:
 		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
 		Thumbnail(const SampleFrame* buffer, size_t size, int width);
 
-		Thumbnail zoomOut(float factor);
-
-		void draw(QPainter& painter, const Peak& peak, float lineX, int centerY, float scalingFactor,
-			const QColor& color, const QColor& innerColor) const;
+		Thumbnail zoomOut(float factor) const;
+		Thumbnail extract(size_t from, size_t to) const;
 
 		Peak& operator[](size_t index) { return m_peaks[index]; }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }

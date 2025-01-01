@@ -121,7 +121,9 @@ void SlicerTWaveform::drawSeekerWaveform()
 	auto param = SampleThumbnail::VisualizeParameters{};
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
-	param.clipRect = m_seekerWaveform.rect();
+	param.sampleRect = m_seekerWaveform.rect();
+	param.sampleStart = sample.startFrame();
+	param.sampleEnd = sample.endFrame();
 	m_sampleThumbnail.visualize(param, brush);
 
 
@@ -188,14 +190,7 @@ void SlicerTWaveform::drawEditorWaveform()
 	param.reversed = sample.reversed();
 	param.sampleStart = static_cast<float>(startFrame) / sample.sampleSize();
 	param.sampleEnd = static_cast<float>(endFrame) / sample.sampleSize();
-	param.sampRect =
-		QRect(
-			0,
-			zoomOffset,
-			m_editorWidth,
-			static_cast<long>(m_zoomLevel * m_editorHeight)
-		);
-	param.clipRect = m_editorWaveform.rect();
+	param.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight));
 	m_sampleThumbnail.visualize(param, brush);
 
 	// increase brightness in inner color
