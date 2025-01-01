@@ -220,7 +220,7 @@ void CompressorEffect::calcTiltCoeffs()
 	m_lgain = exp(g1 / amp) - 1;
 	m_hgain = exp(g2 / amp) - 1;
 
-	const float omega = 2 * F_PI * m_compressorControls.m_tiltFreqModel.value();
+	const float omega = numbers::tau_v<float> * m_compressorControls.m_tiltFreqModel.value();
 	const float n = 1 / (m_sampleRate * 3 + omega);
 	m_a0 = 2 * omega * n;
 	m_b1 = (m_sampleRate * 3 - omega) * n;
