@@ -38,7 +38,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
 		BoolModel * mutedModel ) :
 	m_bufferUsage( false ),
-	m_portBuffer( BufferManager::acquire() ),
+	m_portBuffer(BufferManager::acquire()),
 	m_extOutputEnabled( false ),
 	m_nextMixerChannel( 0 ),
 	m_name( "unnamed port" ),
@@ -58,7 +58,7 @@ AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
 	Engine::audioEngine()->removeAudioPort( this );
-	BufferManager::release( m_portBuffer );
+	BufferManager::release(m_portBuffer.data());
 }
 
 
@@ -96,7 +96,7 @@ bool AudioPort::processEffects()
 {
 	if( m_effects )
 	{
-		bool more = m_effects->processAudioBuffer( m_portBuffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage );
+		bool more = m_effects->processAudioBuffer(m_portBuffer.data(), m_portBuffer.size(), m_bufferUsage );
 		return more;
 	}
 	return false;
@@ -111,21 +111,23 @@ void AudioPort::doProcessing()
 	}
 
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+	assert(m_portBuffer.size() == fpp);
 
 	// clear the buffer
-	zeroSampleFrames(m_portBuffer, fpp);
+	zeroSampleFrames(m_portBuffer.data(), m_portBuffer.size());
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for( PlayHandle * ph : m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
 	{
-		if( ph->buffer() )
+		if (auto phBuffer = ph->buffer(); phBuffer.data() != nullptr)
 		{
-			if( ph->usesBuffer()
-				&& ( ph->type() == PlayHandle::Type::NotePlayHandle
-					|| !MixHelpers::isSilent( ph->buffer(), fpp ) ) )
+			assert(phBuffer.size() == m_portBuffer.size());
+			if (ph->usesBuffer()
+				&& (ph->type() == PlayHandle::Type::NotePlayHandle
+					|| !MixHelpers::isSilent(phBuffer.data(), phBuffer.size())))
 			{
 				m_bufferUsage = true;
-				MixHelpers::add( m_portBuffer, ph->buffer(), fpp );
+				MixHelpers::add(m_portBuffer.data(), phBuffer.data(), fpp);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -224,7 +226,7 @@ void AudioPort::doProcessing()
 	const bool me = processEffects();
 	if( me || m_bufferUsage )
 	{
-		Engine::mixer()->mixToChannel( m_portBuffer, m_nextMixerChannel ); 	// send output to mixer
+		Engine::mixer()->mixToChannel(m_portBuffer.data(), m_nextMixerChannel); 	// send output to mixer
 																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}

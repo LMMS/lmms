@@ -53,6 +53,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
+#include "PluginPinConnector.h"
 #include "Song.h"
 #include "FileDialog.h"
 
@@ -121,17 +122,16 @@ enum class ExecutableType
 	Unknown, Win32, Win64, Linux64,
 };
 
-VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( PathUtil::toAbsolute(_plugin) ),
-	m_pluginWindowID( 0 ),
-	m_embedMethod( (gui::getGUI() != nullptr)
-			? ConfigManager::inst()->vstEmbedMethod()
-			: "headless" ),
-	m_version( 0 ),
-	m_currentProgram()
+VstPlugin::VstPlugin(const QString& plugin, PluginPinConnector* pinConnector, Model* parent)
+	: RemotePlugin{pinConnector, parent}
+	, m_plugin{PathUtil::toAbsolute(plugin)}
+	, m_pluginWindowID{0}
+	, m_embedMethod{(gui::getGUI() != nullptr)
+		? ConfigManager::inst()->vstEmbedMethod()
+		: "headless"}
+	, m_version{0}
+	, m_currentProgram{-1}
 {
-	setSplittedChannels( true );
-
 	auto pluginType = ExecutableType::Unknown;
 #ifdef LMMS_BUILD_LINUX
 	QFileInfo fi(m_plugin);
@@ -264,6 +264,8 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 		}
 		setParameterDump( dump );
 	}
+
+	m_pinConnector->loadSettings(_this);
 }
 
 
@@ -307,6 +309,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "program", currentProgram() );
+	m_pinConnector->saveSettings(_doc, _this);
 }
 
 void VstPlugin::toggleUI()
@@ -812,6 +815,41 @@ bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
+}
+
+auto VstPlugin::inputBuffer() -> SplitAudioData<float>
+{
+	return {m_audioBufferIn.data(), channelsIn(), frames()};
+}
+
+auto VstPlugin::outputBuffer() -> SplitAudioData<float>
+{
+	return {m_audioBufferOut.data(), channelsOut(), frames()};
+}
+
+void VstPlugin::updateBuffers(int channelsIn, int channelsOut)
+{
+	RemotePlugin::updateBuffer(channelsIn, channelsOut);
+}
+
+void VstPlugin::bufferUpdated()
+{
+	// Update the views into the RemotePlugin buffer
+	float* ptr = RemotePlugin::inputBuffer().data();
+	m_audioBufferIn.resize(channelsIn());
+	for (pi_ch_t idx = 0; idx < channelsIn(); ++idx)
+	{
+		m_audioBufferIn[idx] = ptr;
+		ptr += frames();
+	}
+
+	ptr = RemotePlugin::outputBuffer().data();
+	m_audioBufferOut.resize(channelsOut());
+	for (pi_ch_t idx = 0; idx < channelsOut(); ++idx)
+	{
+		m_audioBufferOut[idx] = ptr;
+		ptr += frames();
+	}
 }
 
 
