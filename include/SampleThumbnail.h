@@ -97,6 +97,7 @@ private:
 
 		Thumbnail zoomOut(float factor) const;
 		Thumbnail extract(size_t from, size_t to) const;
+		void reverse() { std::reverse(m_peaks.begin(), m_peaks.end()); }
 
 		Peak& operator[](size_t index) { return m_peaks[index]; }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }

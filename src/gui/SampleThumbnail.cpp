@@ -159,15 +159,16 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 
 	const auto extractedThumbnail = smallestLargerThumbnail->extract(
 		std::floor(smallestLargerThumbnailBegin), std::ceil(smallestLargerThumbnailEnd));
-	const auto zoomedOutThumbnail
-		= extractedThumbnail.zoomOut(idealSamplesPerPeak / smallestLargerThumbnail->samplesPerPeak());
+
+	auto outputThumbnail = extractedThumbnail.zoomOut(idealSamplesPerPeak / smallestLargerThumbnail->samplesPerPeak());
+	if (parameters.reversed) { outputThumbnail.reverse(); }
 
 	painter.setClipRect(viewportRect.intersected(sampleRect));
 
 	const auto scalingFactor = sampleRect.center().y() / 2 * parameters.amplification;
 	for (auto xPos = viewportRect.x(); xPos < viewportRect.x() + viewportRect.width(); ++xPos)
 	{
-		const auto peak = zoomedOutThumbnail[xPos - viewportRect.x()];
+		const auto peak = outputThumbnail[xPos - viewportRect.x()];
 		const auto yMin = sampleRect.center().y() - peak.min * scalingFactor;
 		const auto yMax = sampleRect.center().y() - peak.max * scalingFactor;
 		painter.drawLine(xPos, yMin, xPos, yMax);
