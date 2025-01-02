@@ -35,6 +35,10 @@
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
 
+#ifdef __SSE2__
+#include <emmintrin.h>
+#endif
+
 namespace lmms
 {
 
@@ -267,8 +271,6 @@ private:
 };
 
 #ifdef __SSE2__
-#include <emmintrin.h>
-
 // exp approximation for SSE2: https://stackoverflow.com/a/47025627/5759631
 // Maximum relative error of 1.72863156e-3 on [-87.33654, 88.72283]
 static inline __m128 fast_exp_sse(__m128 x)
