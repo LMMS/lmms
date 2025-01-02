@@ -84,9 +84,9 @@ public:
 
 	inline void process_sample(float* outSamples, float inSample)
 	{
-		size_t total = 1 << m_stages;
+		int total = 1 << m_stages;
 		outSamples[0] = inSample;
-		size_t gap1 = total / 2;
+		int gap1 = total / 2;
 
 		if (m_stages >= 1)
 		{
@@ -95,18 +95,18 @@ public:
 
 		if (m_stages >= 2)
 		{
-			size_t gap2 = gap1 / 2;
+			int gap2 = gap1 / 2;
 			m_upsampleSecond.process_sample(outSamples[0], outSamples[gap2], outSamples[0]);
 			m_upsampleSecond.process_sample(outSamples[gap1], outSamples[gap1 + gap2], outSamples[gap1]);
 		}
 
-		for (size_t i = 2; i < m_stages; ++i)
+		for (int i = 2; i < m_stages; ++i)
 		{
-			size_t count = 1 << i;
-			size_t gap = total / count;
-			for (size_t j = 0; j < count; ++j)
+			int count = 1 << i;
+			int gap = total / count;
+			for (int j = 0; j < count; ++j)
 			{
-				size_t temp = j * gap;
+				int temp = j * gap;
 				m_upsampleRest[i - 2].process_sample(outSamples[temp], outSamples[temp + gap / 2], outSamples[temp]);
 			}
 		}
@@ -179,7 +179,7 @@ public:
 	{
 		for (int i = m_stages - 1; i >= 2; --i)
 		{
-			for (size_t j = 0; j < 1 << i; ++j)
+			for (int j = 0; j < 1 << i; ++j)
 			{
 				inSamples[j] = m_downsampleRest[i - 2].process_sample(&inSamples[j * 2]);
 			}
@@ -187,7 +187,7 @@ public:
 
 		if (m_stages >= 2)
 		{
-			for (size_t j = 0; j < 2; ++j)
+			for (int j = 0; j < 2; ++j)
 			{
 				inSamples[j] = m_downsampleSecond.process_sample(&inSamples[j * 2]);
 			}
