@@ -100,6 +100,7 @@ private:
 	snd_pcm_sw_params_t * m_swParams;
 
 	bool m_convertEndian;
+	std::atomic<bool> m_stopped;
 
 } ;
 

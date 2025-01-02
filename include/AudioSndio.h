@@ -81,6 +81,7 @@ private:
 	struct sio_par m_par;
 
 	bool m_convertEndian;
+	std::atomic<bool> m_stopped;
 } ;
 
 

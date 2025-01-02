@@ -80,30 +80,23 @@ public:
 private:
 	void startProcessing() override
 	{
+		m_stopped = false;
 		start();
 	}
 
 	void stopProcessing() override
 	{
+		m_stopped = true;
 		stopProcessingThread( this );
 	}
 
 	void run() override
 	{
 		MicroTimer timer;
-		while( true )
+		while (!m_stopped)
 		{
+			audioEngine()->renderNextBuffer();
 			timer.reset();
-			const SampleFrame* b = audioEngine()->nextBuffer();
-			if( !b )
-			{
-				break;
-			}
-			if( audioEngine()->hasFifoWriter() )
-			{
-				delete[] b;
-			}
-
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
@@ -112,6 +105,7 @@ private:
 		}
 	}
 
+	std::atomic<bool> m_stopped;
 } ;
 
 } // namespace lmms
