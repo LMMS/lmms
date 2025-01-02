@@ -486,22 +486,22 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 	std::array<float, 4> in = {0};
 	std::array<float, 4> out = {0};
-	const float drive[4] = {drive1, drive1, drive2, drive2};
-	const float slewUp[4] = {slewUp1, slewUp1, slewUp2, slewUp2};
-	const float slewDown[4] = {slewDown1, slewDown1, slewDown2, slewDown2};
-	const int distType[4] = {distType1, distType1, distType2, distType2};
-	const float bias[4] = {bias1, bias1, bias2, bias2};
-	const float warp[4] = {warp1, warp1, warp2, warp2};
-	const float crush[4] = {crush1, crush1, crush2, crush2};
-	const float outVol[4] = {outVol1, outVol1, outVol2, outVol2};
-	const float attack[4] = {attack1, attack1, attack2, attack2};
-	const float attackInv[4] = {attackInv1, attackInv1, attackInv2, attackInv2};
-	const float release[4] = {release1, release1, release2, release2};
-	const float releaseInv[4] = {releaseInv1, releaseInv1, releaseInv2, releaseInv2};
-	const float dynamics[4] = {dynamics1, dynamics1, dynamics2, dynamics2};
-	const float dynamicSlew[4] = {dynamicSlew1, dynamicSlew1, dynamicSlew2, dynamicSlew2};
-	const float mix[4] = {mix1, mix1, mix2, mix2};
-	const bool slewLink[4] = {slewLink1, slewLink1, slewLink2, slewLink2};
+	const std::array<float, 4> drive = {drive1, drive1, drive2, drive2};
+	const std::array<float, 4> slewUp = {slewUp1, slewUp1, slewUp2, slewUp2};
+	const std::array<float, 4> slewDown = {slewDown1, slewDown1, slewDown2, slewDown2};
+	const std::array<int, 4> distType = {distType1, distType1, distType2, distType2};
+	const std::array<float, 4> bias = {bias1, bias1, bias2, bias2};
+	const std::array<float, 4> warp = {warp1, warp1, warp2, warp2};
+	const std::array<float, 4> crush = {crush1, crush1, crush2, crush2};
+	const std::array<float, 4> outVol = {outVol1, outVol1, outVol2, outVol2};
+	const std::array<float, 4> attack = {attack1, attack1, attack2, attack2};
+	const std::array<float, 4> attackInv = {attackInv1, attackInv1, attackInv2, attackInv2};
+	const std::array<float, 4> release = {release1, release1, release2, release2};
+	const std::array<float, 4> releaseInv = {releaseInv1, releaseInv1, releaseInv2, releaseInv2};
+	const std::array<float, 4> dynamics = {dynamics1, dynamics1, dynamics2, dynamics2};
+	const std::array<float, 4> dynamicSlew = {dynamicSlew1, dynamicSlew1, dynamicSlew2, dynamicSlew2};
+	const std::array<float, 4> mix = {mix1, mix1, mix2, mix2};
+	const std::array<bool, 4> slewLink = {slewLink1, slewLink1, slewLink2, slewLink2};
 	
 	if (m_slewdistortionControls.m_splitModel.isValueChanged())
 	{
@@ -608,8 +608,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					}
 					case 9: // bitcrush
 					{
-						const float scale = 16 / drive;
-						distOut = std::round(distIn / drive * scale) / scale;
+						const float scale = 16 / drive[i];
+						distOut = std::round(distIn / drive[i] * scale) / scale;
 						break;
 					}
 					default:
