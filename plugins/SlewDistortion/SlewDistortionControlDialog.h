@@ -27,6 +27,7 @@
 
 #include "EffectControlDialog.h"
 #include <QTextEdit>
+#include <array>
 
 namespace lmms
 {
