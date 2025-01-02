@@ -273,22 +273,24 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 					/ (float) m_clip->length().getBar() :
 								pixelsPerBar();
 
+
+	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+	float den = Engine::getSong()->getTimeSigModel().getDenominator();
+	float ticksPerBar = DefaultTicksPerBar * nom / den;
+	float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
+
 	const auto& sample = m_clip->m_sample;
-	const auto sampleFramesPerTick = Engine::framesPerTick(sample.sampleRate());
-	const auto sampleStart = -m_clip->startTimeOffset() * sampleFramesPerTick;
-
-	const auto clipEnd = sampleStart + m_clip->length() * sampleFramesPerTick;
-	const auto sampleEnd = std::min(static_cast<size_t>(clipEnd), sample.sampleSize());
-
-	auto param = SampleThumbnail::VisualizeParameters{};
-	param.amplification = sample.amplification();
-	param.reversed = sample.reversed();
-	param.sampleStart = sampleStart;
-	param.sampleEnd = sampleEnd;
-	param.sampleRect = rect();
-	param.viewportRect = pe->rect();
-
-	m_sampleThumbnail.visualize(param, p);
+	if (sample.sampleSize() != 0)
+	{
+		auto param = SampleThumbnail::VisualizeParameters{};
+		param.amplification = sample.amplification();
+		param.reversed = sample.reversed();
+		param.sampleRect = QRect(offsetStart, spacing, sampleLength, rect().height());
+		param.clipRect = rect();
+		param.viewportRect = pe->rect();
+		m_sampleThumbnail.visualize(param, p);
+	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 

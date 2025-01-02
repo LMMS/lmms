@@ -48,11 +48,12 @@ public:
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
 
-		size_t sampleStart = 0; //!< Where the sample begins for drawing (inclusive).
-		size_t sampleEnd = 0;	//!< Where the sample ends for drawing (exclusive).
+		float sampleStart = 0.0f; //!< Where the sample begins for drawing.
+		float sampleEnd = 1.0f;	  //!< Where the sample ends for drawing.
 
-		QRect sampleRect;	//!< Region that the sample will be rendered into.
-		QRect viewportRect; //!< Viewport for `sampleRect`. Equals `sampleRect` when null.
+		QRect sampleRect;	//!< A rectangle that covers the enitre range of samples.
+		QRect clipRect;		//!< An optional clipped rectangle for `sampleRect`. Equals `sampleRect` when null. 
+		QRect viewportRect; //!< Viewport for `clipRect`. Equals `clipRect` when null.
 	};
 
 	SampleThumbnail() = default;

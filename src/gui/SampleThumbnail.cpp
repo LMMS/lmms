@@ -126,53 +126,41 @@ void SampleThumbnail::cleanUpGlobalThumbnailMap()
 
 void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter& painter) const
 {
-	assert(parameters.sampleStart <= parameters.sampleEnd && "Invalid sample range");
-
-	if (m_thumbnailCache->empty())
-	{
-		qDebug() << "SampleThumbnail::visualize: Cannot draw waveform with an empty thumbnail cache";
-		return;
-	}
-
 	const auto& sampleRect = parameters.sampleRect;
-	const auto& viewportRect = parameters.viewportRect.isNull() ? sampleRect : parameters.viewportRect;
+	const auto clipRect = parameters.clipRect.isNull() ? sampleRect : parameters.clipRect;
+	const auto viewportRect = parameters.viewportRect.isNull() ? clipRect : parameters.viewportRect;
 
-	const auto numSamples = parameters.sampleEnd - parameters.sampleStart;
-	const auto idealSamplesPerPeak = std::max(static_cast<double>(numSamples) / sampleRect.width(), 1.0);
+	const auto thumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
+		[&](const auto& thumbnail) { return thumbnail.width() >= sampleRect.width(); });
 
-	const auto smallestLargerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
-		[&](const auto& thumbnail) { return thumbnail.samplesPerPeak() <= idealSamplesPerPeak; });
+	assert(thumbnail != m_thumbnailCache->rend());
 
-	if (smallestLargerThumbnail == m_thumbnailCache->rend())
-	{
-		qDebug() << "SampleThumbnail::visualize: Smallest thumbnail of larger or equal width not found within "
-					"thumbnail cache for a "
-					"samples per peak of"
-				 << idealSamplesPerPeak;
-		return;
-	}
+	const auto drawBeginIndex = std::max({clipRect.x(), sampleRect.x(), viewportRect.x()});
+	const auto drawEndIndex = std::min({clipRect.x() + clipRect.width(), sampleRect.x() + sampleRect.width(), viewportRect.x() + viewportRect.width()});
 
-	const auto smallestLargerThumbnailBegin
-		= static_cast<double>(viewportRect.x()) / sampleRect.width() * smallestLargerThumbnail->width();
-	const auto smallestLargerThumbnailEnd = static_cast<double>(viewportRect.x() + viewportRect.width())
-		/ sampleRect.width() * smallestLargerThumbnail->width();
+	const auto peakBeginIndex = -sampleRect.x() + drawBeginIndex;
+	const auto peakEndIndex = -sampleRect.x() + drawEndIndex;
 
-	const auto extractedThumbnail = smallestLargerThumbnail->extract(
-		std::floor(smallestLargerThumbnailBegin), std::ceil(smallestLargerThumbnailEnd));
+	const auto thumbnailScaleFactor = static_cast<double>(thumbnail->width()) / sampleRect.width();
+	const auto thumbnailBeginIndex = static_cast<int>(peakBeginIndex * thumbnailScaleFactor);
+	const auto thumbnailEndIndex = static_cast<int>(peakEndIndex * thumbnailScaleFactor);
 
-	auto outputThumbnail = extractedThumbnail.zoomOut(idealSamplesPerPeak / smallestLargerThumbnail->samplesPerPeak());
+	const auto extractedThumbnail = thumbnail->extract(thumbnailBeginIndex, thumbnailEndIndex);
+	auto outputThumbnail = extractedThumbnail.zoomOut(thumbnailScaleFactor);
 	if (parameters.reversed) { outputThumbnail.reverse(); }
 
-	painter.setClipRect(viewportRect.intersected(sampleRect));
+	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	const auto scalingFactor = sampleRect.center().y() / 2 * parameters.amplification;
-	for (auto xPos = viewportRect.x(); xPos < viewportRect.x() + viewportRect.width(); ++xPos)
+	for (auto x = drawBeginIndex; x < drawEndIndex; ++x)
 	{
-		const auto peak = outputThumbnail[xPos - viewportRect.x()];
-		const auto yMin = sampleRect.center().y() - peak.min * scalingFactor;
-		const auto yMax = sampleRect.center().y() - peak.max * scalingFactor;
-		painter.drawLine(xPos, yMin, xPos, yMax);
+		const auto peak = outputThumbnail[x - drawBeginIndex];
+		const auto yMin = sampleRect.center().y() - peak.min * sampleRect.center().y() / 2 * parameters.amplification;
+		const auto yMax = sampleRect.center().y() - peak.max * sampleRect.center().y() / 2 * parameters.amplification;
+		painter.drawLine(x, yMin, x, yMax);
 	}
+
+	painter.restore();
 }
 
 } // namespace lmms
