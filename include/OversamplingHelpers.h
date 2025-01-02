@@ -63,7 +63,7 @@ public:
 
 		// Remaining stages
 		constexpr int restCoefCount = std::max(MaxCoefs / 4, 2);
-		for (size_t i = 0; i < m_stages - 2; ++i)
+		for (int i = 0; i < m_stages - 2; ++i)
 		{
 			double coefsRest[restCoefCount];
 			hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsRest, restCoefCount, bw);
@@ -112,11 +112,11 @@ public:
 		}
 	}
 
-	inline size_t getStages() const { return m_stages; }
+	inline int getStages() const { return m_stages; }
 	inline float getSampleRate() const { return m_sampleRate; }
 	inline float getPassband() const { return m_passband; }
 
-	inline void setStages(size_t stages) { m_stages = stages; reset(); }
+	inline void setStages(int stages) { m_stages = stages; reset(); }
 	inline void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; reset(); }
 	inline void setPassband(float passband) { m_passband = passband; reset(); }
 
@@ -125,7 +125,7 @@ private:
 	hiir::Upsampler2xFpu<std::max(MaxCoefs / 2, 2)> m_upsampleSecond;
 	std::array<hiir::Upsampler2xFpu<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_upsampleRest;
 
-	size_t m_stages = 0;
+	int m_stages = 0;
 	float m_sampleRate = 44100;
 	float m_passband = HIIR_DEFAULT_PASSBAND;
 };
@@ -156,7 +156,7 @@ public:
 
 		// Remaining stages
 		constexpr int restCoefCount = std::max(MaxCoefs / 4, 2);
-		for (size_t i = 0; i < m_stages - 2; ++i)
+		for (int i = 0; i < m_stages - 2; ++i)
 		{
 			double coefsRest[restCoefCount];
 			hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsRest, restCoefCount, bw);
@@ -177,9 +177,9 @@ public:
 
 	inline float process_sample(float* inSamples)
 	{
-		for (size_t i = m_stages - 1; i >= 2; --i)
+		for (int i = m_stages - 1; i >= 2; --i)
 		{
-			for (size_t j = 0; j < static_cast<size_t>(1) << i; ++j)
+			for (size_t j = 0; j < 1 << i; ++j)
 			{
 				inSamples[j] = m_downsampleRest[i - 2].process_sample(&inSamples[j * 2]);
 			}
@@ -201,11 +201,11 @@ public:
 		return inSamples[0];
 	}
 
-	inline size_t getStages() const { return m_stages; }
+	inline int getStages() const { return m_stages; }
 	inline float getSampleRate() const { return m_sampleRate; }
 	inline float getPassband() const { return m_passband; }
 
-	inline void setStages(size_t stages) { m_stages = stages; reset(); }
+	inline void setStages(int stages) { m_stages = stages; reset(); }
 	inline void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; reset(); }
 	inline void setPassband(float passband) { m_passband = passband; reset(); }
 
@@ -214,7 +214,7 @@ private:
 	hiir::Downsampler2xFpu<std::max(MaxCoefs / 2, 2)> m_downsampleSecond;
 	std::array<hiir::Downsampler2xFpu<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_downsampleRest;
 
-	size_t m_stages = 0;
+	int m_stages = 0;
 	float m_sampleRate = 44100;
 	float m_passband = HIIR_DEFAULT_PASSBAND;
 };
