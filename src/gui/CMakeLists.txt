@@ -35,7 +35,7 @@ SET(LMMS_SRCS
 	gui/RowTableView.cpp
 	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
-	gui/SampleWaveform.cpp
+	gui/SampleThumbnail.cpp
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
 	gui/SideBarWidget.cpp

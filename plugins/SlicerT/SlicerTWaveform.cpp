@@ -27,7 +27,7 @@
 #include <QBitmap>
 #include <qpainterpath.h>
 
-#include "SampleWaveform.h"
+#include "SampleThumbnail.h"
 #include "SlicerT.h"
 #include "SlicerTView.h"
 #include "embed.h"
@@ -115,10 +115,17 @@ void SlicerTWaveform::drawSeekerWaveform()
 	brush.setPen(s_waveformColor);
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform
-		= SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	const auto rect = QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height());
-	SampleWaveform::visualize(waveform, brush, rect);
+
+	m_sampleThumbnail = SampleThumbnail{sample};
+
+	auto param = SampleThumbnail::VisualizeParameters{};
+	param.amplification = sample.amplification();
+	param.reversed = sample.reversed();
+	param.sampleRect = m_seekerWaveform.rect();
+	param.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize();
+	param.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize();
+	m_sampleThumbnail.visualize(param, brush);
+
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -171,13 +178,19 @@ void SlicerTWaveform::drawEditorWaveform()
 	size_t endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.sampleSize();
 
 	brush.setPen(s_waveformColor);
-	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
+	long zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform = SampleWaveform::Parameters{
-		sample.data() + startFrame, endFrame - startFrame, sample.amplification(), sample.reversed()};
-	const auto rect = QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight);
-	SampleWaveform::visualize(waveform, brush, rect);
+
+	m_sampleThumbnail = SampleThumbnail{sample};
+
+	auto param = SampleThumbnail::VisualizeParameters{};
+	param.amplification = sample.amplification();
+	param.reversed = sample.reversed();
+	param.sampleStart = static_cast<float>(startFrame) / sample.sampleSize();
+	param.sampleEnd = static_cast<float>(endFrame) / sample.sampleSize();
+	param.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight));
+	m_sampleThumbnail.visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
