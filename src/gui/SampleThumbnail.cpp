@@ -43,8 +43,7 @@ SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, in
 	for (auto peakIndex = 0; peakIndex < width; ++peakIndex)
 	{
 		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
-		const auto endSample
-			= buffer + std::min(static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak)), size);
+		const auto endSample = buffer + static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
 		const auto [min, max] = std::minmax_element(&beginSample->left(), &endSample->left());
 		m_peaks[peakIndex] = Peak{*min, *max};
 	}
@@ -57,9 +56,8 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 	auto peaks = std::vector<Peak>(width() / factor);
 	for (auto peakIndex = 0; peakIndex < peaks.size(); ++peakIndex)
 	{
-		const auto beginAggregationAt = m_peaks.begin() + static_cast<int>(std::floor(peakIndex * factor));
-		const auto endAggregationAt
-			= m_peaks.begin() + std::min(static_cast<int>(std::ceil((peakIndex + 1) * factor)), width());
+		const auto beginAggregationAt = m_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
+		const auto endAggregationAt = m_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
 		const auto aggregatedPeak = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
 		peaks[peakIndex] = aggregatedPeak;
 	}
@@ -156,8 +154,8 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	const auto drawEnd = std::min({sampleRect.x() + sampleRect.width(), drawRect.x() + drawRect.width(),
 		viewportRect.x() + viewportRect.width()});
 
-	const auto peakBegin = drawBegin - sampleRect.x();
-	const auto peakEnd = drawEnd - sampleRect.x();
+	const auto peakBegin = std::clamp(drawBegin - sampleRect.x(), 0, thumbnail.width());
+	const auto peakEnd = std::clamp(drawEnd - sampleRect.x(), 0, thumbnail.width());
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
