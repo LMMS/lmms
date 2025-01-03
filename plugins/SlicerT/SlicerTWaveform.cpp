@@ -122,8 +122,8 @@ void SlicerTWaveform::drawSeekerWaveform()
 	param.amplification = sample.amplification();
 	param.reversed = sample.reversed();
 	param.sampleRect = m_seekerWaveform.rect();
-	param.sampleStart = sample.startFrame();
-	param.sampleEnd = sample.endFrame();
+	param.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize();
+	param.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize();
 	m_sampleThumbnail.visualize(param, brush);
 
 

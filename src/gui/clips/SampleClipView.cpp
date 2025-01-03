@@ -281,14 +281,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
 
 	const auto& sample = m_clip->m_sample;
-	if (sample.sampleSize() != 0)
+	if (sample.sampleSize() > 0)
 	{
 		auto param = SampleThumbnail::VisualizeParameters{};
 		param.amplification = sample.amplification();
 		param.reversed = sample.reversed();
-		param.sampleRect = QRect(offsetStart, spacing, sampleLength, rect().height());
-		param.clipRect = rect();
+		param.sampleRect = QRect(offsetStart, 0, sampleLength, 0);
+		param.drawRect = QRect(0, spacing, width(), height() - spacing);
 		param.viewportRect = pe->rect();
+
 		m_sampleThumbnail.visualize(param, p);
 	}
 

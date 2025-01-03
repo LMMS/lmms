@@ -45,15 +45,20 @@ class LMMS_EXPORT SampleThumbnail
 public:
 	struct VisualizeParameters
 	{
+		QRect sampleRect; //!< A rectangle that covers the entire range of samples.
+
+		QRect drawRect; //!< Specifies the location in `sampleRect` where the waveform will be drawn. Equals
+						//!< `sampleRect` when null.
+
+		QRect viewportRect; //!< Clips `drawRect`. Equals `drawRect` when null.
+
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
-		bool reversed = false;		//!< Determines if the waveform is drawn in reverse or not.
 
 		float sampleStart = 0.0f; //!< Where the sample begins for drawing.
-		float sampleEnd = 1.0f;	  //!< Where the sample ends for drawing.
 
-		QRect sampleRect;	//!< A rectangle that covers the enitre range of samples.
-		QRect clipRect;		//!< An optional clipped rectangle for `sampleRect`. Equals `sampleRect` when null. 
-		QRect viewportRect; //!< Viewport for `clipRect`. Equals `clipRect` when null.
+		float sampleEnd = 1.0f; //!< Where the sample ends for drawing.
+
+		bool reversed = false; //!< Determines if the waveform is drawn in reverse or not.
 	};
 
 	SampleThumbnail() = default;
@@ -93,11 +98,12 @@ private:
 			float max = -std::numeric_limits<float>::max();
 		};
 
+		Thumbnail() = default;
 		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
 		Thumbnail(const SampleFrame* buffer, size_t size, int width);
 
 		Thumbnail zoomOut(float factor) const;
-		Thumbnail extract(size_t from, size_t to) const;
+		void clip(size_t from, size_t to);
 		void reverse() { std::reverse(m_peaks.begin(), m_peaks.end()); }
 
 		Peak& operator[](size_t index) { return m_peaks[index]; }
@@ -111,7 +117,7 @@ private:
 
 	private:
 		std::vector<Peak> m_peaks;
-		double m_samplesPerPeak;
+		double m_samplesPerPeak = 0.0;
 	};
 
 	using ThumbnailCache = std::vector<Thumbnail>;

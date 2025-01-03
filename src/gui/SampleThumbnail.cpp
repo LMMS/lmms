@@ -67,11 +67,11 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::extract(size_t from, size_t to) const
+void SampleThumbnail::Thumbnail::clip(size_t from, size_t to)
 {
 	auto peaks = std::vector<Peak>(to - from);
 	std::copy(m_peaks.begin() + from, m_peaks.begin() + to, peaks.begin());
-	return Thumbnail{std::move(peaks), m_samplesPerPeak};
+	m_peaks = std::move(peaks);
 }
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
@@ -127,36 +127,47 @@ void SampleThumbnail::cleanUpGlobalThumbnailMap()
 void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter& painter) const
 {
 	const auto& sampleRect = parameters.sampleRect;
-	const auto clipRect = parameters.clipRect.isNull() ? sampleRect : parameters.clipRect;
-	const auto viewportRect = parameters.viewportRect.isNull() ? clipRect : parameters.viewportRect;
+	const auto& drawRect = parameters.drawRect.isNull() ? sampleRect : parameters.drawRect;
+	const auto& viewportRect = parameters.viewportRect.isNull() ? drawRect : parameters.viewportRect;
 
-	const auto thumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
-		[&](const auto& thumbnail) { return thumbnail.width() >= sampleRect.width(); });
+	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
+	assert(sampleRange <= 1);
 
-	assert(thumbnail != m_thumbnailCache->rend());
+	const auto targetWidth = static_cast<float>(sampleRect.width()) / sampleRange;
 
-	const auto drawBeginIndex = std::max({clipRect.x(), sampleRect.x(), viewportRect.x()});
-	const auto drawEndIndex = std::min({clipRect.x() + clipRect.width(), sampleRect.x() + sampleRect.width(), viewportRect.x() + viewportRect.width()});
+	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
+		[&](const auto& thumbnail) { return thumbnail.width() >= targetWidth; });
 
-	const auto peakBeginIndex = -sampleRect.x() + drawBeginIndex;
-	const auto peakEndIndex = -sampleRect.x() + drawEndIndex;
+	if (finerThumbnail == m_thumbnailCache->rend())
+	{
+		qDebug() << "Could not find closest finer thumbnail for a target width of" << targetWidth;
+		return;
+	}
 
-	const auto thumbnailScaleFactor = static_cast<double>(thumbnail->width()) / sampleRect.width();
-	const auto thumbnailBeginIndex = static_cast<int>(peakBeginIndex * thumbnailScaleFactor);
-	const auto thumbnailEndIndex = static_cast<int>(peakEndIndex * thumbnailScaleFactor);
+	const auto thumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetWidth;
+	auto thumbnail = finerThumbnail->zoomOut(thumbnailScaleFactor);
+	if (parameters.reversed) { thumbnail.reverse(); }
 
-	const auto extractedThumbnail = thumbnail->extract(thumbnailBeginIndex, thumbnailEndIndex);
-	auto outputThumbnail = extractedThumbnail.zoomOut(thumbnailScaleFactor);
-	if (parameters.reversed) { outputThumbnail.reverse(); }
+	const auto finerThumbnailBegin = parameters.sampleStart * thumbnail.width();
+	const auto finerThumbnailEnd = parameters.sampleEnd * thumbnail.width();
+	thumbnail.clip(finerThumbnailBegin, finerThumbnailEnd);
+
+	const auto drawBegin = std::max({sampleRect.x(), drawRect.x(), viewportRect.x()});
+	const auto drawEnd = std::min({sampleRect.x() + sampleRect.width(), drawRect.x() + drawRect.width(),
+		viewportRect.x() + viewportRect.width()});
+
+	const auto peakBegin = drawBegin - sampleRect.x();
+	const auto peakEnd = drawEnd - sampleRect.x();
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	for (auto x = drawBeginIndex; x < drawEndIndex; ++x)
+	const auto yScale = drawRect.height() / 2 * parameters.amplification;
+	for (auto x = drawBegin, peakIndex = peakBegin; x < drawEnd && peakIndex < peakEnd; ++x, ++peakIndex)
 	{
-		const auto peak = outputThumbnail[x - drawBeginIndex];
-		const auto yMin = sampleRect.center().y() - peak.min * sampleRect.center().y() / 2 * parameters.amplification;
-		const auto yMax = sampleRect.center().y() - peak.max * sampleRect.center().y() / 2 * parameters.amplification;
+		const auto& peak = thumbnail[peakIndex];
+		const auto yMin = drawRect.center().y() - peak.min * yScale;
+		const auto yMax = drawRect.center().y() - peak.max * yScale;
 		painter.drawLine(x, yMin, x, yMax);
 	}
 
