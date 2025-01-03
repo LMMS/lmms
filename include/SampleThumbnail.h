@@ -105,7 +105,7 @@ private:
 
 		Thumbnail() = default;
 		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
-		Thumbnail(const SampleFrame* buffer, size_t size, int width);
+		Thumbnail(const SampleFrame* buffer, size_t size, size_t width);
 
 		Thumbnail zoomOut(float factor) const;
 		void clip(size_t from, size_t to);

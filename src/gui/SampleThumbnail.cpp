@@ -36,7 +36,7 @@ SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPer
 {
 }
 
-SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, int width)
+SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, size_t width)
 	: m_peaks(width)
 	, m_samplesPerPeak(static_cast<double>(size) / width)
 {
