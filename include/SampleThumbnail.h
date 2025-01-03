@@ -108,7 +108,7 @@ private:
 		Thumbnail(const SampleFrame* buffer, size_t size, size_t width);
 
 		Thumbnail zoomOut(float factor) const;
-		void clip(size_t from, size_t to);
+		Thumbnail zoomOut(float factor, size_t from, size_t to) const;
 		void reverse() { std::reverse(m_peaks.begin(), m_peaks.end()); }
 
 		Peak& operator[](size_t index) { return m_peaks[index]; }

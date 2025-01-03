@@ -49,26 +49,24 @@ SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, si
 	}
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) const
+SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor, size_t from, size_t to) const
 {
 	assert(factor >= 1 && "Invalid zoom out factor");
 
-	auto peaks = std::vector<Peak>(width() / factor);
+	auto peaks = std::vector<Peak>((to - from) / factor);
 	for (auto peakIndex = std::size_t{0}; peakIndex < peaks.size(); ++peakIndex)
 	{
-		const auto beginAggregationAt = m_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
-		const auto endAggregationAt = m_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
-		peaks[peakIndex] = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});;
+		const auto beginAggregationAt = m_peaks.begin() + from + static_cast<size_t>(std::floor(peakIndex * factor));
+		const auto endAggregationAt = m_peaks.begin() + from + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
+		peaks[peakIndex] = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
 	}
 
 	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
 }
 
-void SampleThumbnail::Thumbnail::clip(size_t from, size_t to)
+SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) const
 {
-	auto peaks = std::vector<Peak>(to - from);
-	std::copy(m_peaks.begin() + from, m_peaks.begin() + to, peaks.begin());
-	m_peaks = std::move(peaks);
+	return zoomOut(factor, 0, m_peaks.size());
 }
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
@@ -130,24 +128,21 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
 	assert(sampleRange <= 1);
 
-	const auto targetWidth = static_cast<float>(sampleRect.width()) / sampleRange;
-
+	const auto targetSampleWidth = static_cast<double>(sampleRect.width()) / sampleRange;
 	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
-		[&](const auto& thumbnail) { return thumbnail.width() >= targetWidth; });
+		[&](const auto& thumbnail) { return thumbnail.width() >= targetSampleWidth; });
 
 	if (finerThumbnail == m_thumbnailCache->rend())
 	{
-		qDebug() << "Could not find closest finer thumbnail for a target width of" << targetWidth;
+		qDebug() << "Could not find closest finer thumbnail for a target width of" << targetSampleWidth;
 		return;
 	}
 
-	const auto thumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetWidth;
-	auto thumbnail = finerThumbnail->zoomOut(thumbnailScaleFactor);
+	const auto finerThumbnailBegin = parameters.sampleStart * finerThumbnail->width();
+	const auto finerThumbnailEnd = parameters.sampleEnd * finerThumbnail->width();
+	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetSampleWidth;
+	auto thumbnail = finerThumbnail->zoomOut(finerThumbnailScaleFactor, finerThumbnailBegin, finerThumbnailEnd);
 	if (parameters.reversed) { thumbnail.reverse(); }
-
-	const auto finerThumbnailBegin = parameters.sampleStart * thumbnail.width();
-	const auto finerThumbnailEnd = parameters.sampleEnd * thumbnail.width();
-	thumbnail.clip(finerThumbnailBegin, finerThumbnailEnd);
 
 	const auto drawBegin = std::max({sampleRect.x(), drawRect.x(), viewportRect.x()});
 	const auto drawEnd = std::min({sampleRect.x() + sampleRect.width(), drawRect.x() + drawRect.width(),
