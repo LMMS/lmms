@@ -58,8 +58,7 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 	{
 		const auto beginAggregationAt = m_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
 		const auto endAggregationAt = m_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
-		const auto aggregatedPeak = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
-		peaks[peakIndex] = aggregatedPeak;
+		peaks[peakIndex] = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});;
 	}
 
 	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
