@@ -1269,7 +1269,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				int note_width = lenTicks * m_ppb / TimePos::ticksPerBar();
 				int keyRange = maxKey - minKey;
 
-				if (keyRange < MIN_NOTE_RANGE)
+				if (keyRange < MIN_NOTE_RANGE) 
 				{
 					int padding = (MIN_NOTE_RANGE - keyRange) / 2.0f;
 					maxKey += padding;

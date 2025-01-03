@@ -175,12 +175,11 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	QPainter brush(&m_editorWaveform);
 	size_t startFrame = m_seekerStart * m_slicerTParent->m_originalSample.sampleSize();
-	size_t   endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.sampleSize();
+	size_t endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.sampleSize();
 
 	brush.setPen(s_waveformColor);
 	long zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
-	// Visualize
 	const auto& sample = m_slicerTParent->m_originalSample;
 
 	m_sampleThumbnail = SampleThumbnail{sample};

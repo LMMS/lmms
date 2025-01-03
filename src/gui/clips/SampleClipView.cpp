@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
+ 
 #include "SampleClipView.h"
 
 #include <QApplication>
@@ -186,7 +186,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
-
+	
 	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
 		m_clip->changeLengthToSampleLength();
@@ -208,31 +208,26 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
-	const auto re = pe->rect();
-	const auto region = QRect(re.x(), rect().y(), re.width(), rect().height());
+	if( !needsUpdate() )
+	{
+		painter.drawPixmap( 0, 0, m_paintPixmap );
+		return;
+	}
+
+	setNeedsUpdate( false );
 
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
 		m_paintPixmap = QPixmap(size());
 	}
 
+	QPainter p( &m_paintPixmap );
+
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
 
-	if (!needsUpdate())
-	{
-		painter.drawPixmap(region, m_paintPixmap, region);
-		return;
-	}
-
-	setNeedsUpdate(false);
-
-	QPainter p( &m_paintPixmap );
-	p.setClipRegion(region);
-
-	QColor c = painter.background().color();
-
 	QLinearGradient lingrad(0, 0, 0, height());
+	QColor c = painter.background().color();
 	if (muted) { c = c.darker(150); }
 	if (selected) { c = c.darker(150); }
 
@@ -240,17 +235,16 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	p.fillRect( region, QColor( 0, 0, 0 ) );
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
 	{
-		p.fillRect( region, lingrad );
+		p.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		p.fillRect( region, c );
+		p.fillRect( rect(), c );
 	}
-
 
 	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
 
@@ -273,7 +267,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 					/ (float) m_clip->length().getBar() :
 								pixelsPerBar();
 
-
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
@@ -294,7 +287,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
-
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -320,7 +312,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if ( m_marker )
 	{
-		p.drawLine(m_markerPos, region.bottom(), m_markerPos, region.top());
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	// recording sample tracks is not possible at the moment
 
