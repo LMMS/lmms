@@ -40,7 +40,7 @@ SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, in
 	: m_peaks(width)
 	, m_samplesPerPeak(static_cast<double>(size) / width)
 {
-	for (auto peakIndex = 0; peakIndex < width; ++peakIndex)
+	for (auto peakIndex = std::size_t{0}; peakIndex < width; ++peakIndex)
 	{
 		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
 		const auto endSample = buffer + static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
@@ -54,7 +54,7 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 	assert(factor >= 1 && "Invalid zoom out factor");
 
 	auto peaks = std::vector<Peak>(width() / factor);
-	for (auto peakIndex = 0; peakIndex < peaks.size(); ++peakIndex)
+	for (auto peakIndex = std::size_t{0}; peakIndex < peaks.size(); ++peakIndex)
 	{
 		const auto beginAggregationAt = m_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
 		const auto endAggregationAt = m_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
