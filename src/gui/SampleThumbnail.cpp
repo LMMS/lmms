@@ -128,19 +128,19 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
 	assert(sampleRange <= 1);
 
-	const auto targetSampleWidth = static_cast<double>(sampleRect.width()) / sampleRange;
+	const auto targetThumbnailWidth = static_cast<double>(sampleRect.width()) / sampleRange;
 	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
-		[&](const auto& thumbnail) { return thumbnail.width() >= targetSampleWidth; });
+		[&](const auto& thumbnail) { return thumbnail.width() >= targetThumbnailWidth; });
 
 	if (finerThumbnail == m_thumbnailCache->rend())
 	{
-		qDebug() << "Could not find closest finer thumbnail for a target width of" << targetSampleWidth;
+		qDebug() << "Could not find closest finer thumbnail for a target width of" << targetThumbnailWidth;
 		return;
 	}
 
 	const auto finerThumbnailBegin = parameters.sampleStart * finerThumbnail->width();
 	const auto finerThumbnailEnd = parameters.sampleEnd * finerThumbnail->width();
-	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetSampleWidth;
+	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
 	auto thumbnail = finerThumbnail->zoomOut(finerThumbnailScaleFactor, finerThumbnailBegin, finerThumbnailEnd);
 	if (parameters.reversed) { thumbnail.reverse(); }
 
