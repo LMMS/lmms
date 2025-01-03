@@ -28,18 +28,23 @@
 #include <QPainter>
 #include <QRect>
 #include <memory>
+
 #include "Sample.h"
 #include "lmms_export.h"
 
 namespace lmms {
 
 /**
-   Insert this into your class when you want to implement
-   thumbnails. This is optional, but without this class, there will be no
-   indication that this thumbnail list is being used and it will be destroyed
-   when you generate thumbnails somewhere else, and have to be regenerated
-   before being rendered, which is slower than rendering the sample directly.
-*/
+   Allows for visualizing sample data.
+
+   On construction, thumbnails will be generated
+   at logarathmic intervals of downsampling. Those cached thumbnails will then be further downsampled on the fly and
+   transformed in various ways to create the desired waveform.
+
+   Given that we are dealing with far less data to generate
+   the visualization however (i.e., we are not reading from original sample data when drawing), this provides a
+   significant performance boost that wouldn't be possible otherwise.
+ */
 class LMMS_EXPORT SampleThumbnail
 {
 public:
@@ -111,7 +116,7 @@ private:
 
 		Peak* peaks() { return m_peaks.data(); }
 		const Peak* peaks() const { return m_peaks.data(); }
-		
+
 		int width() const { return m_peaks.size(); }
 		double samplesPerPeak() const { return m_samplesPerPeak; }
 
