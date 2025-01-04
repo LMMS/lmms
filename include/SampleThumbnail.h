@@ -79,7 +79,7 @@ private:
 	class Thumbnail
 	{
 	public:
-		static constexpr auto AggregationPerZoomStep = 10;
+		static constexpr auto AggregationPerZoomStep = 2;
 
 		struct Peak
 		{

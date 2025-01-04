@@ -25,8 +25,6 @@
 #include "SampleThumbnail.h"
 
 #include <QDebug>
-#include <QGuiApplication>
-#include <QScreen>
 #include <QFileInfo>
 
 namespace lmms {
@@ -87,7 +85,7 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	if (sample.sampleSize() == 0) { return; }
 
 	m_thumbnailCache->emplace_back(sample.buffer()->data(), sample.sampleSize(), sample.sampleSize());
-	while (m_thumbnailCache->back().width() > QGuiApplication::primaryScreen()->geometry().width())
+	while (m_thumbnailCache->back().width() >= Thumbnail::AggregationPerZoomStep)
 	{
 		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
 		m_thumbnailCache->emplace_back(zoomedOutThumbnail);
