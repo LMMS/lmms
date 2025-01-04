@@ -1,7 +1,7 @@
 /*
  * LmmsMassExporter.cpp - exports .flac files outside of AudioEngine
  *
- * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot.com>
+ * Copyright (c) 2024 - 2025 szeli1
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -41,7 +41,6 @@ FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLo
 	SF_INFO exportInfo;
 
 	memset(&exportInfo, 0, sizeof(exportInfo));
-	exportInfo.frames = 1;
 	exportInfo.samplerate = sampleRate;
 	exportInfo.channels = channelCount;
 	if (bitDepth == 16)
@@ -120,11 +119,11 @@ LmmsMassExporter::~LmmsMassExporter()
 }
 
 
-void LmmsMassExporter::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
+void LmmsMassExporter::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction, void* callbackObject)
 {
 	QString filteredName(QFileInfo(outputLocationAndName).absolutePath() + "/" + QFileInfo(outputLocationAndName).baseName()+ ".flac");
 	m_readMutex.lock();
-	m_buffers.push_back(std::make_pair(filteredName, buffer));
+	m_buffers.push_back(std::make_tuple(filteredName, buffer, callbackFunction, callbackObject));
 	m_readMutex.unlock();
 
 	if (m_isThreadRunning == false)
@@ -158,23 +157,31 @@ void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, vo
 
 	while (*abortExport == false)
 	{
-		std::pair<QString, std::shared_ptr<const SampleBuffer>> curBuffer = std::make_pair(QString(""), nullptr);
+		std::tuple<QString, std::shared_ptr<const SampleBuffer>, callbackFn, void*> curBuffer = std::make_tuple(QString(""), nullptr, nullptr, nullptr);
 		thisExporter->m_readMutex.lock();
 		bool shouldExit = thisExporter->m_buffers.size() <= 0;
 		if (shouldExit == false)
 		{
 			curBuffer = thisExporter->m_buffers[thisExporter->m_buffers.size() - 1];
+			thisExporter->m_buffers.pop_back();
 		}
 		thisExporter->m_readMutex.unlock();
 		if (shouldExit) { break; }
 
-		FlacExporter exporter(curBuffer.second->sampleRate(), 24, curBuffer.first);
-		if (exporter.getIsSuccesful())
+		// important new scope
 		{
-			exporter.writeThisBuffer(curBuffer.second->data(), curBuffer.second->size());
+			FlacExporter exporter(std::get<1>(curBuffer)->sampleRate(), 24, std::get<0>(curBuffer));
+			if (exporter.getIsSuccesful())
+			{
+				exporter.writeThisBuffer(std::get<1>(curBuffer)->data(), std::get<1>(curBuffer)->size());
+			}
 		}
 
-		thisExporter->m_buffers.pop_back();
+		if (std::get<2>(curBuffer))
+		{
+			// calling callback funcion
+			std::get<2>(curBuffer)(std::get<3>(curBuffer));
+		}
 	}
 
 	thisExporter->m_isThreadRunning = false;
