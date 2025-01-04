@@ -424,14 +424,14 @@ void SampleClipView::exportSampleBuffer()
 		QStringList curSelectedFiles(openFileDialog.selectedFiles());
 		if (curSelectedFiles.isEmpty() == false)
 		{
-			QString outputFileName = curSelectedFiles.first();
-			if (outputFileName.isEmpty()) { return; }
-			if (outputFileName.endsWith(".flac") == false)
+			QString outputFilename = curSelectedFiles.first();
+			if (outputFilename.isEmpty()) { return; }
+			if (outputFilename.endsWith(".flac") == false)
 			{
-				outputFileName = PathUtil::stripPrefix(outputFileName) + ".flac";
+				outputFilename = PathUtil::stripPrefix(outputFilename) + ".flac";
 			}
 
-			m_clip->s_sampleExporter->startExporting(outputFileName, m_clip->m_sample.buffer());
+			m_clip->exportSampleBuffer(outputFilename);
 		}
 	}
 }
