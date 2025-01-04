@@ -138,24 +138,27 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 		return;
 	}
 
-	const auto finerThumbnailBegin = parameters.sampleStart * finerThumbnail->width();
-	const auto finerThumbnailEnd = parameters.sampleEnd * finerThumbnail->width();
+	const auto finerThumbnailBegin = (parameters.reversed ? 1.0 - parameters.sampleEnd : parameters.sampleStart) * finerThumbnail->width();
+	const auto finerThumbnailEnd =  (parameters.reversed ? 1.0 - parameters.sampleStart : parameters.sampleEnd) * finerThumbnail->width();
 	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
-	auto thumbnail = finerThumbnail->zoomOut(finerThumbnailScaleFactor, finerThumbnailBegin, finerThumbnailEnd);
-	if (parameters.reversed) { thumbnail.reverse(); }
+	const auto thumbnail = finerThumbnail->zoomOut(finerThumbnailScaleFactor, finerThumbnailBegin, finerThumbnailEnd);
 
 	const auto drawBegin = std::max({sampleRect.x(), drawRect.x(), viewportRect.x()});
 	const auto drawEnd = std::min({sampleRect.x() + sampleRect.width(), drawRect.x() + drawRect.width(),
 		viewportRect.x() + viewportRect.width()});
 
-	const auto peakBegin = std::clamp(drawBegin - sampleRect.x(), 0, thumbnail.width());
-	const auto peakEnd = std::clamp(drawEnd - sampleRect.x(), 0, thumbnail.width());
+	const auto peakBeginForward = std::clamp(drawBegin - sampleRect.x(), 0, thumbnail.width());
+	const auto peakEndForward = std::clamp(drawEnd - sampleRect.x(), 0, thumbnail.width());
+
+	const auto peakIndexOffset = parameters.reversed ? -1 : 1;
+	const auto peakBegin = parameters.reversed ? thumbnail.width() - peakBeginForward - 1 : peakBeginForward;
+	const auto peakEnd = parameters.reversed ? thumbnail.width() - peakEndForward - 1 : peakEndForward;
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	const auto yScale = drawRect.height() / 2 * parameters.amplification;
-	for (auto x = drawBegin, peakIndex = peakBegin; x < drawEnd && peakIndex < peakEnd; ++x, ++peakIndex)
+	for (auto x = drawBegin, peakIndex = peakBegin; x < drawEnd && peakIndex != peakEnd; ++x, peakIndex += peakIndexOffset)
 	{
 		const auto& peak = thumbnail[peakIndex];
 		const auto yMin = drawRect.center().y() - peak.min * yScale;
