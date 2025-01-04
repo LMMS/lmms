@@ -41,10 +41,11 @@ namespace lmms
 std::unique_ptr<LmmsMassExporter> SampleClip::s_sampleExporter = std::make_unique<LmmsMassExporter>();
 
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
-	, m_sample(std::move(sample))
-	, m_isPlaying(false)
+SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
+	Clip(_track),
+	m_sample(std::move(sample)),
+	m_isPlaying(false),
+	m_exportedSampleName("")
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -381,6 +382,20 @@ void SampleClip::loadSettings( const QDomElement & _this )
 gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 {
 	return new gui::SampleClipView( this, _tv );
+}
+
+void SampleClip::exportSampleBuffer(const QString& fileName)
+{
+	m_exportedSampleName = fileName;
+	s_sampleExporter->startExporting(fileName, m_sample.buffer(), &SampleClip::exportSampleBufferCallback, this);
+}
+
+void SampleClip::exportSampleBufferCallback(void* thisObject)
+{
+	if (thisObject == nullptr) { return; }
+	SampleClip* castedThis = static_cast<SampleClip*>(thisObject);
+	castedThis->setSampleFile(castedThis->m_exportedSampleName);
+	castedThis->m_exportedSampleName.clear();
 }
 
 
