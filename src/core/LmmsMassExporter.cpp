@@ -34,12 +34,85 @@
 namespace lmms
 {
 
+FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLocationAndName) :
+	m_isSuccesful(false),
+	m_fileDescriptor(NULL)
+{
+	constexpr int channelCount = 2;
+	SF_INFO exportInfo;
+
+	memset(&exportInfo, 0, sizeof(exportInfo));
+	exportInfo.frames = 1;
+	exportInfo.samplerate = sampleRate;
+	exportInfo.channels = channelCount;
+	if (bitDepth == 16)
+	{
+		exportInfo.format = (SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+	}
+	else if (bitDepth == 24)
+	{
+		exportInfo.format = (SF_FORMAT_FLAC | SF_FORMAT_PCM_24);
+	}
+	else
+	{
+		// there is no 32 bit support
+		exportInfo.format = (SF_FORMAT_FLAC | SF_FORMAT_PCM_24);
+	}
+
+	QByteArray characters = outputLocationAndName.toUtf8();
+	m_fileDescriptor = sf_open(characters.data(), SFM_WRITE, &exportInfo);
+
+	m_isSuccesful = m_fileDescriptor != NULL;
+
+	if (m_isSuccesful == false)
+	{
+		printf("LmmsMassExporter sf_open error\n");
+	}
+}
+
+FlacExporter::~FlacExporter()
+{
+	if (m_fileDescriptor == NULL) { return; }
+	m_isSuccesful = sf_close(m_fileDescriptor) == 0;
+	if (m_isSuccesful == false)
+	{
+		printf("FlacExporter sf_close error\n");
+	}
+}
+
+void FlacExporter::writeThisBuffer(const SampleFrame* samples, size_t sampleCount)
+{
+	if (m_fileDescriptor == NULL) { m_isSuccesful = false; return; }
+	constexpr size_t channelCount = 2;
+	// multiply by 2 since there is 2 channels
+	std::vector<float> outputBuffer(sampleCount * channelCount);
+	size_t i = 0;
+	for (size_t j = 0; j < sampleCount; j++)
+	{
+		outputBuffer[i] = static_cast<float>((samples + j)->left());
+		outputBuffer[i + 1] = static_cast<float>((samples + j)->right());
+		outputBuffer[i] = outputBuffer[i] > 1.0f ? 1.0f : outputBuffer[i] < -1.0f ? -1.0f : outputBuffer[i];
+		outputBuffer[i + 1] = outputBuffer[i + 1] > 1.0f ? 1.0f : outputBuffer[i + 1] < -1.0f ? -1.0f : outputBuffer[i + 1];
+		i = i + channelCount;
+	}
+	size_t count = sf_writef_float(m_fileDescriptor, outputBuffer.data(), static_cast<sf_count_t>(sampleCount));
+	if (count != sampleCount)
+	{
+		m_isSuccesful = false;
+		printf("LmmsMassExporter sf_writef_float error\n");
+	}
+}
+
+bool FlacExporter::getIsSuccesful() const
+{
+	return m_isSuccesful;
+}
+
 LmmsMassExporter::LmmsMassExporter() :
 	m_abortExport(false),
 	m_isThreadRunning(false),
 	m_readMutex(),
-	m_thread(nullptr),
-	m_fileDescriptor(NULL)
+	m_thread(nullptr)
 {}
 
 LmmsMassExporter::~LmmsMassExporter()
@@ -80,7 +153,7 @@ void LmmsMassExporter::stopExporting()
 }
 
 
-void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, volatile bool* abortExport)
+void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, volatile std::atomic<bool>* abortExport)
 {
 	thisExporter->m_isThreadRunning = true;
 
@@ -96,84 +169,16 @@ void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, vo
 		thisExporter->m_readMutex.unlock();
 		if (shouldExit) { break; }
 
-		bool success = thisExporter->openFile(curBuffer.first, curBuffer.second);
-		if (success)
+		FlacExporter exporter(curBuffer.second->sampleRate(), 24, curBuffer.first);
+		if (exporter.getIsSuccesful())
 		{
-			thisExporter->exportBuffer(curBuffer.second);
-			thisExporter->closeFile();
+			exporter.writeThisBuffer(curBuffer.second->data(), curBuffer.second->size());
 		}
 
 		thisExporter->m_buffers.pop_back();
 	}
 
 	thisExporter->m_isThreadRunning = false;
-}
-
-bool LmmsMassExporter::openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
-{
-	bool success = true;
-	QFile targetFile(outputLocationAndName);
-	if (targetFile.exists() == false)
-	{
-		// creating new file
-		success = targetFile.open(QIODevice::WriteOnly);
-		if (success == false) { return false; }
-		targetFile.close();
-	}
-
-	constexpr int channelCount = 2;
-	SF_INFO exportInfo;
-
-	memset(&exportInfo, 0, sizeof(exportInfo));
-	exportInfo.frames = static_cast<sf_count_t>(buffer->size() * channelCount);
-	exportInfo.samplerate = buffer->sampleRate();
-	exportInfo.channels = channelCount;
-	exportInfo.format = (SF_FORMAT_FLAC | SF_FORMAT_PCM_24);
-
-	QByteArray characters = outputLocationAndName.toUtf8();
-	m_fileDescriptor = sf_open(characters.data(), SFM_WRITE, &exportInfo);
-
-	success = m_fileDescriptor != NULL;
-
-	if (success == false)
-	{
-		printf("LmmsMassExporter sf_open error\n");
-	}
-
-	return success;
-}
-
-void LmmsMassExporter::exportBuffer(std::shared_ptr<const SampleBuffer> buffer)
-{
-	if (m_fileDescriptor == NULL) { return; }
-	constexpr size_t channelCount = 2;
-	// multiply by 2 since there is 2 channels
-	std::vector<float> outputBuffer(buffer->size() * channelCount);
-	size_t i = 0;
-	for (auto it = buffer->begin(); it != buffer->end(); ++it)
-	{
-		outputBuffer[i] = static_cast<float>(it->left());
-		outputBuffer[i + 1] = static_cast<float>(it->right());
-		outputBuffer[i] = outputBuffer[i] > 1.0f ? 1.0f : outputBuffer[i] < -1.0f ? -1.0f : outputBuffer[i];
-		outputBuffer[i + 1] = outputBuffer[i + 1] > 1.0f ? 1.0f : outputBuffer[i + 1] < -1.0f ? -1.0f : outputBuffer[i + 1];
-		i = i + channelCount;
-	}
-	size_t count = sf_writef_float(m_fileDescriptor, outputBuffer.data(), static_cast<sf_count_t>(buffer->size()));
-	if (count != buffer->size())
-	{
-		printf("LmmsMassExporter sf_writef_float error\n");
-	}
-}
-
-void LmmsMassExporter::closeFile()
-{
-	if (m_fileDescriptor == NULL) { return; }
-	int success = sf_close(m_fileDescriptor);
-	if (success != 0)
-	{
-		printf("LmmsMassExporter sf_close error\n");
-	}
-	m_fileDescriptor = NULL;
 }
 
 } // namespace lmms

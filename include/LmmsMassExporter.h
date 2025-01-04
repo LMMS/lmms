@@ -25,11 +25,13 @@
 #ifndef LMMS_LMMS_MASS_EXPORTER_H
 #define LMMS_LMMS_MASS_EXPORTER_H
 
+#include <atomic>
 #include <memory>
-#include <sndfile.h>
 #include <thread>
 #include <vector>
 #include <mutex>
+
+#include <sndfile.h>
 
 #include <QString>
 
@@ -37,8 +39,21 @@ namespace lmms
 {
 
 class SampleBuffer;
+class SampleFrame;
 
+class FlacExporter
+{
+public:
+	FlacExporter(int sampleRate, int bitDepth, const QString& outputLocationAndName);
+	~FlacExporter();
 
+	void writeThisBuffer(const SampleFrame* samples, size_t sampleCount);
+	bool getIsSuccesful() const;
+	
+private:
+	bool m_isSuccesful;
+	SNDFILE* m_fileDescriptor;
+};
 
 class LmmsMassExporter
 {
@@ -53,7 +68,7 @@ public:
 	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
 
 private:
-	static void threadedExportFunction(LmmsMassExporter* thisExporter, volatile bool* abortExport);
+	static void threadedExportFunction(LmmsMassExporter* thisExporter, volatile std::atomic<bool>* abortExport);
 
 	void stopThread();
 	bool openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
@@ -62,12 +77,12 @@ private:
 
 	std::vector<std::pair<QString, std::shared_ptr<const SampleBuffer>>> m_buffers;
 
-	volatile bool m_abortExport;
+	volatile std::atomic<bool> m_abortExport;
 	bool m_isThreadRunning;
 	std::mutex m_readMutex;
 	std::thread* m_thread;
 	
-	SNDFILE* m_fileDescriptor;
+	
 };
 
 } // namespace lmms
