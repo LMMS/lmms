@@ -1,5 +1,5 @@
 /*
- * LmmsExporterSample.h - exports .flac files outside of AudioEngine
+ * LmmsMassExporter.h - exports .flac files outside of AudioEngine
  *
  * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_LMMS_EXPORTER_SAMPLE_H
-#define LMMS_LMMS_EXPORTER_SAMPLE_H
+#ifndef LMMS_LMMS_MASS_EXPORTER_H
+#define LMMS_LMMS_MASS_EXPORTER_H
 
 #include <memory>
 #include <sndfile.h>
@@ -38,11 +38,13 @@ namespace lmms
 
 class SampleBuffer;
 
-class LmmsExporterSample
+
+
+class LmmsMassExporter
 {
 public:
-	LmmsExporterSample();
-	~LmmsExporterSample();
+	LmmsMassExporter();
+	~LmmsMassExporter();
 
 	//! outputLocationAndName: should include path and name, could include ".flac"
 	void startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
@@ -51,7 +53,7 @@ public:
 	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
 
 private:
-	static void threadedExportFunction(LmmsExporterSample* thisExporter, volatile bool* abortExport);
+	static void threadedExportFunction(LmmsMassExporter* thisExporter, volatile bool* abortExport);
 
 	void stopThread();
 	bool openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
@@ -70,4 +72,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_LMMS_EXPORTER_SAMPLE_H
+#endif // LMMS_LMMS_MASS_EXPORTER_H

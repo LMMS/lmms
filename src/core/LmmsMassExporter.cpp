@@ -1,5 +1,5 @@
 /*
- * LmmsExporterSample.cpp - exports .flac files outside of AudioEngine
+ * LmmsMassExporter.cpp - exports .flac files outside of AudioEngine
  *
  * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot.com>
  *
@@ -27,14 +27,14 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include "LmmsExporterSample.h"
+#include "LmmsMassExporter.h"
 
 #include "SampleBuffer.h"
 
 namespace lmms
 {
 
-LmmsExporterSample::LmmsExporterSample() :
+LmmsMassExporter::LmmsMassExporter() :
 	m_abortExport(false),
 	m_isThreadRunning(false),
 	m_readMutex(),
@@ -42,13 +42,13 @@ LmmsExporterSample::LmmsExporterSample() :
 	m_fileDescriptor(NULL)
 {}
 
-LmmsExporterSample::~LmmsExporterSample()
+LmmsMassExporter::~LmmsMassExporter()
 {
 	stopExporting();
 }
 
 
-void LmmsExporterSample::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
+void LmmsMassExporter::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
 {
 	QString filteredName(QFileInfo(outputLocationAndName).absolutePath() + "/" + QFileInfo(outputLocationAndName).baseName()+ ".flac");
 	m_readMutex.lock();
@@ -59,11 +59,11 @@ void LmmsExporterSample::startExporting(const QString& outputLocationAndName, st
 	{
 		stopExporting();
 		m_isThreadRunning = true;
-		m_thread = new std::thread(&LmmsExporterSample::threadedExportFunction, this, &m_abortExport);
+		m_thread = new std::thread(&LmmsMassExporter::threadedExportFunction, this, &m_abortExport);
 	}
 }
 
-void LmmsExporterSample::stopExporting()
+void LmmsMassExporter::stopExporting()
 {
 	if (m_thread != nullptr)
 	{
@@ -80,7 +80,7 @@ void LmmsExporterSample::stopExporting()
 }
 
 
-void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter, volatile bool* abortExport)
+void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, volatile bool* abortExport)
 {
 	thisExporter->m_isThreadRunning = true;
 
@@ -109,7 +109,7 @@ void LmmsExporterSample::threadedExportFunction(LmmsExporterSample* thisExporter
 	thisExporter->m_isThreadRunning = false;
 }
 
-bool LmmsExporterSample::openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
+bool LmmsMassExporter::openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer)
 {
 	bool success = true;
 	QFile targetFile(outputLocationAndName);
@@ -137,13 +137,13 @@ bool LmmsExporterSample::openFile(const QString& outputLocationAndName, std::sha
 
 	if (success == false)
 	{
-		printf("LmmsExporterSample sf_open error\n");
+		printf("LmmsMassExporter sf_open error\n");
 	}
 
 	return success;
 }
 
-void LmmsExporterSample::exportBuffer(std::shared_ptr<const SampleBuffer> buffer)
+void LmmsMassExporter::exportBuffer(std::shared_ptr<const SampleBuffer> buffer)
 {
 	if (m_fileDescriptor == NULL) { return; }
 	constexpr size_t channelCount = 2;
@@ -161,17 +161,17 @@ void LmmsExporterSample::exportBuffer(std::shared_ptr<const SampleBuffer> buffer
 	size_t count = sf_writef_float(m_fileDescriptor, outputBuffer.data(), static_cast<sf_count_t>(buffer->size()));
 	if (count != buffer->size())
 	{
-		printf("LmmsExporterSample sf_writef_float error\n");
+		printf("LmmsMassExporter sf_writef_float error\n");
 	}
 }
 
-void LmmsExporterSample::closeFile()
+void LmmsMassExporter::closeFile()
 {
 	if (m_fileDescriptor == NULL) { return; }
 	int success = sf_close(m_fileDescriptor);
 	if (success != 0)
 	{
-		printf("LmmsExporterSample sf_close error\n");
+		printf("LmmsMassExporter sf_close error\n");
 	}
 	m_fileDescriptor = NULL;
 }
