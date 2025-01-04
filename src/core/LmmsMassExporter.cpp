@@ -24,7 +24,6 @@
 
 #include <sndfile.h>
 
-#include <QFile>
 #include <QFileInfo>
 
 #include "LmmsMassExporter.h"
