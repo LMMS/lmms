@@ -147,20 +147,19 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	const auto drawEnd = std::min({sampleRect.x() + sampleRect.width(), drawRect.x() + drawRect.width(),
 		viewportRect.x() + viewportRect.width()});
 
-	const auto peakBeginForward = std::clamp(drawBegin - sampleRect.x(), 0, thumbnail.width());
-	const auto peakEndForward = std::clamp(drawEnd - sampleRect.x(), 0, thumbnail.width());
-
-	const auto peakIndexOffset = parameters.reversed ? -1 : 1;
-	const auto peakBegin = parameters.reversed ? thumbnail.width() - peakBeginForward - 1 : peakBeginForward;
-	const auto peakEnd = parameters.reversed ? thumbnail.width() - peakEndForward - 1 : peakEndForward;
+	const auto thumbnailBeginForward = std::clamp(drawBegin - sampleRect.x(), 0, thumbnail.width());
+	const auto thumbnailEndForward = std::clamp(drawEnd - sampleRect.x(), 0, thumbnail.width());
+	const auto thumbnailBegin = parameters.reversed ? thumbnail.width() - thumbnailBeginForward - 1 : thumbnailBeginForward;
+	const auto thumbnailEnd = parameters.reversed ? thumbnail.width() - thumbnailEndForward - 1 : thumbnailEndForward;
+	const auto thumbnailIndexOffset = parameters.reversed ? -1 : 1;
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	const auto yScale = drawRect.height() / 2 * parameters.amplification;
-	for (auto x = drawBegin, peakIndex = peakBegin; x < drawEnd && peakIndex != peakEnd; ++x, peakIndex += peakIndexOffset)
+	for (auto x = drawBegin, i = thumbnailBegin; x < drawEnd && i != thumbnailEnd; ++x, i += thumbnailIndexOffset)
 	{
-		const auto& peak = thumbnail[peakIndex];
+		const auto& peak = thumbnail[i];
 		const auto yMin = drawRect.center().y() - peak.min * yScale;
 		const auto yMax = drawRect.center().y() - peak.max * yScale;
 		painter.drawLine(x, yMin, x, yMax);
