@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QFileInfo>
 
 namespace lmms {
 
@@ -71,51 +72,37 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
 {
-	if (selectFromGlobalThumbnailMap(sample)) { return; }
-	cleanUpGlobalThumbnailMap();
+	auto entry = SampleThumbnailEntry{sample.sampleFile(), QFileInfo{sample.sampleFile()}.lastModified()};
+	if (!entry.filePath.isEmpty())
+	{
+		const auto it = s_sampleThumbnailCacheMap.find(entry);
+		if (it != s_sampleThumbnailCacheMap.end())
+		{
+			m_thumbnailCache = it->second;
+			return;
+		}
+	}
+
+	if (!sample.buffer()) { throw std::runtime_error{"Cannot create a sample thumbnail with no buffer"}; }
+	if (sample.sampleSize() == 0) { return; }
 
 	m_thumbnailCache->emplace_back(sample.buffer()->data(), sample.sampleSize(), sample.sampleSize());
-
 	while (m_thumbnailCache->back().width() > QGuiApplication::primaryScreen()->geometry().width())
 	{
 		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
 		m_thumbnailCache->emplace_back(zoomedOutThumbnail);
 	}
-}
 
-/* DEPRECATED; functionality is kept for testing conveniences */
-bool SampleThumbnail::selectFromGlobalThumbnailMap(const Sample& inputSample)
-{
-	const auto samplePtr = inputSample.buffer();
-	const auto name = inputSample.sampleFile();
-	const auto end = s_sampleThumbnailCacheMap.end();
-
-	if (const auto list = s_sampleThumbnailCacheMap.find(name); list != end)
+	if (!entry.filePath.isEmpty())
 	{
-		m_thumbnailCache = list->second;
-		return true;
-	}
-
-	m_thumbnailCache = std::make_shared<ThumbnailCache>();
-	s_sampleThumbnailCacheMap.insert(std::make_pair(name, m_thumbnailCache));
-	return false;
-}
-
-/* DEPRECATED; functionality is kept for testing conveniences */
-void SampleThumbnail::cleanUpGlobalThumbnailMap()
-{
-	auto map = s_sampleThumbnailCacheMap.begin();
-	while (map != s_sampleThumbnailCacheMap.end())
-	{
-		// All sample thumbnails are destroyed, a.k.a sample goes out of use
-		if (map->second.use_count() == 1)
+		if (s_sampleThumbnailCacheMap.size() == MaxSampleThumbnailCacheSize)
 		{
-			s_sampleThumbnailCacheMap.erase(map);
-			map = s_sampleThumbnailCacheMap.begin();
-			continue;
+			const auto leastUsed = std::min_element(s_sampleThumbnailCacheMap.begin(), s_sampleThumbnailCacheMap.end(),
+				[](const auto& a, const auto& b) { return a.second.use_count() < b.second.use_count(); });
+			s_sampleThumbnailCacheMap.erase(leastUsed->first);
 		}
 
-		map++;
+		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
 	}
 }
 

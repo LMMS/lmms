@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QRect>
 #include <memory>
+#include <QDateTime>
 
 #include "Sample.h"
 #include "lmms_export.h"
@@ -48,6 +49,10 @@ namespace lmms {
 class LMMS_EXPORT SampleThumbnail
 {
 public:
+	//! Maximum number of cached sample thumbnails.
+	//! This cache only allows for caching sample thumbnails that have an associated file path.
+	static constexpr auto MaxSampleThumbnailCacheSize = 32;
+
 	struct VisualizeParameters
 	{
 		QRect sampleRect; //!< A rectangle that covers the entire range of samples.
@@ -68,11 +73,7 @@ public:
 
 	SampleThumbnail() = default;
 	SampleThumbnail(const Sample& sample);
-
 	void visualize(const VisualizeParameters& parameters, QPainter& painter) const;
-
-	bool selectFromGlobalThumbnailMap(const Sample&);
-	static void cleanUpGlobalThumbnailMap();
 
 private:
 	class Thumbnail
@@ -124,11 +125,29 @@ private:
 		double m_samplesPerPeak = 0.0;
 	};
 
-	using ThumbnailCache = std::vector<Thumbnail>;
-	std::shared_ptr<ThumbnailCache> m_thumbnailCache = nullptr;
+	struct SampleThumbnailEntry
+	{
+		QString filePath;
+		QDateTime lastModified;
 
-	/* DEPRECATED; functionality is kept for testing conveniences */
-	inline static std::map<const QString, std::shared_ptr<ThumbnailCache>> s_sampleThumbnailCacheMap;
+		friend bool operator==(const SampleThumbnailEntry& first, const SampleThumbnailEntry& second)
+		{
+			return first.filePath == second.filePath && first.lastModified == second.lastModified;
+		}
+	};
+
+	struct Hash
+	{
+		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept
+		{
+			return qHash(entry.filePath);
+		}
+	};
+
+	using ThumbnailCache = std::vector<Thumbnail>;
+	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
+
+	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
 };
 
 } // namespace lmms
