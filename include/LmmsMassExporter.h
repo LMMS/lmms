@@ -1,7 +1,7 @@
 /*
  * LmmsMassExporter.h - exports .flac files outside of AudioEngine
  *
- * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot.com>
+ * Copyright (c) 2024 - 2025 szeli1
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +28,7 @@
 #include <atomic>
 #include <memory>
 #include <thread>
+#include <tuple>
 #include <vector>
 #include <mutex>
 
@@ -40,6 +41,8 @@ namespace lmms
 
 class SampleBuffer;
 class SampleFrame;
+
+typedef void (*callbackFn)(void*);
 
 class FlacExporter
 {
@@ -62,7 +65,7 @@ public:
 	~LmmsMassExporter();
 
 	//! outputLocationAndName: should include path and name, could include ".flac"
-	void startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
+	void startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction = nullptr, void* callbackObject = nullptr);
 	void stopExporting();
 	
 	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
@@ -75,7 +78,7 @@ private:
 	void exportBuffer(std::shared_ptr<const SampleBuffer> buffer);
 	void closeFile();
 
-	std::vector<std::pair<QString, std::shared_ptr<const SampleBuffer>>> m_buffers;
+	std::vector<std::tuple<QString, std::shared_ptr<const SampleBuffer>, callbackFn, void*>> m_buffers;
 
 	volatile std::atomic<bool> m_abortExport;
 	bool m_isThreadRunning;
