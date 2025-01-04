@@ -416,24 +416,12 @@ bool SampleClipView::splitClip( const TimePos pos )
 
 void SampleClipView::exportSampleBuffer()
 {
-	auto openFileDialog = FileDialog(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+	const auto outputFilename = FileDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
 
-
-	if (openFileDialog.exec() == QDialog::Accepted)
+	if (!outputFilename.isEmpty())
 	{
-		QStringList curSelectedFiles(openFileDialog.selectedFiles());
-		if (curSelectedFiles.isEmpty() == false)
-		{
-			QString outputFilename = curSelectedFiles.first();
-			if (outputFilename.isEmpty()) { return; }
-			if (outputFilename.endsWith(".flac") == false)
-			{
-				outputFilename = PathUtil::stripPrefix(outputFilename) + ".flac";
-			}
-
-			m_clip->exportSampleBuffer(outputFilename);
-		}
-	}
+		m_clip->exportSampleBuffer(outputFilename);
+	}	
 }
 
 } // namespace lmms::gui
