@@ -91,9 +91,15 @@ public slots:
 
 
 private:
+	void exportSampleBuffer(const QString& fileName);
+	static void exportSampleBufferCallback(void* thisObject);
+
 	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+
+	//! used when a sample is exported and before it is reinported
+	QString m_exportedSampleName;	
 	
 	static std::unique_ptr<LmmsMassExporter> s_sampleExporter;
 
