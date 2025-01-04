@@ -32,7 +32,7 @@
 #include "AutomationEditor.h"
 #include "embed.h"
 #include "FileDialog.h"
-#include "LmmsExporterSample.h"
+#include "LmmsMassExporter.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -416,7 +416,7 @@ bool SampleClipView::splitClip( const TimePos pos )
 
 void SampleClipView::exportSampleBuffer()
 {
-	auto openFileDialog = FileDialog(nullptr, tr("Export audio file"), QString(), tr("Audio files (*.wav *.flac *.ogg *.mp3);;WAV (*.wav);;FLAC (*.flac);;OGG (*.ogg);;MP3 (*.mp3)"));
+	auto openFileDialog = FileDialog(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
 
 
 	if (openFileDialog.exec() == QDialog::Accepted)
