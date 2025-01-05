@@ -69,8 +69,6 @@ private:
 	bool m_isThreadRunning;
 	std::mutex m_readMutex;
 	std::thread* m_thread;
-	
-	
 };
 
 } // namespace lmms
