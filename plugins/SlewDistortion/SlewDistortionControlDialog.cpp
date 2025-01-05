@@ -204,8 +204,8 @@ void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
 
 	for (int i = 0; i < 4; ++i)
 	{
-		m_lastInPeaks[i] = (inPeak[i] != -1.0f) ? inPeak[i] : m_lastInPeaks[i];
-		m_lastOutPeaks[i] = (outPeak[i] != -1.0f) ? outPeak[i] : m_lastOutPeaks[i];
+		m_lastInPeaks[i] = std::max((inPeak[i] != -1.0f) ? inPeak[i] : m_lastInPeaks[i], SLEW_DISTORTION_MIN_FLOOR);
+		m_lastOutPeaks[i] = std::max((outPeak[i] != -1.0f) ? outPeak[i] : m_lastOutPeaks[i], SLEW_DISTORTION_MIN_FLOOR);
 		inPeak[i] = outPeak[i] = -1.0f;
 	}
 
