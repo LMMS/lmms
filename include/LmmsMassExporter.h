@@ -40,23 +40,8 @@ namespace lmms
 {
 
 class SampleBuffer;
-class SampleFrame;
 
 typedef void (*callbackFn)(void*);
-
-class FlacExporter
-{
-public:
-	FlacExporter(int sampleRate, int bitDepth, const QString& outputLocationAndName);
-	~FlacExporter();
-
-	void writeThisBuffer(const SampleFrame* samples, size_t sampleCount);
-	bool getIsSuccesful() const;
-	
-private:
-	bool m_isSuccesful;
-	SNDFILE* m_fileDescriptor;
-};
 
 class LmmsMassExporter
 {
