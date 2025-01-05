@@ -242,11 +242,11 @@ void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
 	{
 		for (int i = 1; i < 8; ++i)
 		{
-			int x = rect.left() + i * rect.width() / 8;
-			p.drawLine(x, rect.top(), x, rect.bottom());
+			int x = rect.left() + i * rect.width() / 8 + 1;
+			p.drawLine(x, rect.top() + 1, x, rect.bottom());
 
-			int y = rect.top() + i * rect.height() / 8;
-			p.drawLine(rect.left(), y, rect.right(), y);
+			int y = rect.top() + i * rect.height() / 8 + 1;
+			p.drawLine(rect.left() + 1, y, rect.right(), y);
 		}
 	};
 
@@ -259,8 +259,8 @@ void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
 
 	auto drawAxes = [&p](const QRect& rect)
 	{
-		p.drawLine(rect.center().x(), rect.top(), rect.center().x(), rect.bottom());
-		p.drawLine(rect.left(), rect.center().y(), rect.right(), rect.center().y());
+		p.drawLine(rect.center().x() + 2, rect.top() + 1, rect.center().x() + 2, rect.bottom());
+		p.drawLine(rect.left() + 1, rect.center().y() + 2, rect.right(), rect.center().y() + 2);
 	};
 
 	drawAxes(curveRect1);
