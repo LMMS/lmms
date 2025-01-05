@@ -90,7 +90,6 @@ PianoView::PianoView(QWidget *parent) :
 	m_lastKey(-1),                   /*!< The last key displayed? */
 	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
-	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
 
 	// Black keys are drawn halfway between successive white keys, so they do not
