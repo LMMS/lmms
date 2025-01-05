@@ -138,15 +138,18 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
+	auto drawBuffer = std::vector<QLineF>(drawEnd - drawBegin);
 	const auto yScale = drawRect.height() / 2 * parameters.amplification;
+
 	for (auto x = drawBegin, i = thumbnailBegin; x < drawEnd && i != thumbnailEnd; ++x, i += thumbnailIndexOffset)
 	{
 		const auto& peak = thumbnail[i];
 		const auto yMin = drawRect.center().y() - peak.min * yScale;
 		const auto yMax = drawRect.center().y() - peak.max * yScale;
-		painter.drawLine(x, yMin, x, yMax);
+		drawBuffer[x - drawBegin] = QLineF(x, yMin, x, yMax);
 	}
 
+	painter.drawLines(drawBuffer.data(), drawBuffer.size());
 	painter.restore();
 }
 
