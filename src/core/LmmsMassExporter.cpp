@@ -1,5 +1,5 @@
 /*
- * LmmsMassExporter.cpp - exports .flac files outside of AudioEngine
+ * LmmsMassExporter.cpp - exports files in .flac format on an other thread
  *
  * Copyright (c) 2024 - 2025 szeli1
  *
