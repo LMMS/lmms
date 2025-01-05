@@ -79,6 +79,15 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 			m_thumbnailCache = it->second;
 			return;
 		}
+
+		if (s_sampleThumbnailCacheMap.size() == MaxSampleThumbnailCacheSize)
+		{
+			const auto leastUsed = std::min_element(s_sampleThumbnailCacheMap.begin(), s_sampleThumbnailCacheMap.end(),
+				[](const auto& a, const auto& b) { return a.second.use_count() < b.second.use_count(); });
+			s_sampleThumbnailCacheMap.erase(leastUsed->first);
+		}
+
+		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
 	}
 
 	if (!sample.buffer()) { throw std::runtime_error{"Cannot create a sample thumbnail with no buffer"}; }
@@ -89,18 +98,6 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	{
 		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
 		m_thumbnailCache->emplace_back(zoomedOutThumbnail);
-	}
-
-	if (!entry.filePath.isEmpty())
-	{
-		if (s_sampleThumbnailCacheMap.size() == MaxSampleThumbnailCacheSize)
-		{
-			const auto leastUsed = std::min_element(s_sampleThumbnailCacheMap.begin(), s_sampleThumbnailCacheMap.end(),
-				[](const auto& a, const auto& b) { return a.second.use_count() < b.second.use_count(); });
-			s_sampleThumbnailCacheMap.erase(leastUsed->first);
-		}
-
-		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
 	}
 }
 
