@@ -111,7 +111,6 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	const __m128 drive = _mm_set_ps(drive2, drive2, drive1, drive1);
 	const __m128 slewUp = _mm_set_ps(slewUp2, slewUp2, slewUp1, slewUp1);
 	const __m128 slewDown = _mm_set_ps(slewDown2, slewDown2, slewDown1, slewDown1);
-	const __m128 bias = _mm_set_ps(bias2, bias2, bias1, bias1);
 	const __m128 warp = _mm_set_ps(warp2, warp2, warp1, warp1);
 	const __m128 crush = _mm_set_ps(crush2, crush2, crush1, crush1);
 	const __m128 outVol = _mm_set_ps(outVol2, outVol2, outVol1, outVol1);
@@ -137,6 +136,11 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
+		// interpolate bias to remove crackling when moving the parameter
+		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;
+		m_trueBias2 = m_biasInterpCoef * m_trueBias2 + (1.f - m_biasInterpCoef) * bias2;
+		const __m128 bias = _mm_set_ps(m_trueBias2, m_trueBias2, m_trueBias1, m_trueBias1);
+		
 		if (oversampleVal > 1)
 		{
 			m_upsampler[0].process_sample(m_overOuts[0].data(), buf[f][0]);
@@ -192,7 +196,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 			// determine whether we should use the slew up or slew down parameter
 			__m128 finalMask = _mm_or_ps(_mm_cmpge_ps(rate, zero), slewLinkMask);
-			__m128 finalSlew = _mm_or_ps(_mm_and_ps(finalMask, _mm_mul_ps(slewUp, slewMult)), _mm_andnot_ps(finalMask, _mm_mul_ps(slewDown, slewMult)));
+			__m128 finalSlew = _mm_or_ps(_mm_and_ps(finalMask, _mm_mul_ps(slewUp, slewMult)),
+				_mm_andnot_ps(finalMask, _mm_mul_ps(slewDown, slewMult)));
 			
 			__m128 clampedRate = _mm_max_ps(_mm_sub_ps(zero, finalSlew), _mm_min_ps(rate, finalSlew));
 			slewOut = _mm_add_ps(slewOut, clampedRate);
@@ -205,9 +210,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 signBiasedIn = _mm_and_ps(biasedIn, _mm_castsi128_ps(_mm_set1_epi32(0x80000000)));
 			__m128 warpOverCrush = _mm_div_ps(warp, crush);
 			__m128 copysignWarpOverCrush = _mm_or_ps(warpOverCrush, signBiasedIn);
-			__m128 numerator = _mm_sub_ps(biasedIn, copysignWarpOverCrush);
-			__m128 denominator = _mm_sub_ps(one, warp);
-			__m128 distIn = _mm_div_ps(numerator, denominator);
+			__m128 distIn = _mm_div_ps(_mm_sub_ps(biasedIn, copysignWarpOverCrush), _mm_sub_ps(one, warp));
 
 			alignas(16) std::array<float, 4> distInArr;
 			_mm_store_ps(&distInArr[0], distIn);
@@ -224,7 +227,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 				__m128 distInFull = _mm_load_ps(&distInArr[0]);
 				__m128 distOutFull;
 
-				// Switch-case applies the distortion to the full set of 4 values.
+				// switch-case applies the distortion to the full set of 4 values
 				switch (currentDistType)
 				{
 					case 0:// Hard Clip => clamp(x, -1, 1)
@@ -237,7 +240,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					case 1: // Tanh => 2 / (1 + exp(-2x)) - 1
 					{
 						// clamp to [-87.0f, 87.0f] since fast_exp_sse breaks outside of those bounds
-						__m128 clampedInput = _mm_max_ps(_mm_min_ps(_mm_mul_ps(_mm_set1_ps(-2.0f), distInFull), _mm_set1_ps(87.0f)), _mm_set1_ps(-87.0f));
+						__m128 clampedInput = _mm_max_ps(_mm_min_ps(_mm_mul_ps(_mm_set1_ps(-2.0f),
+							distInFull), _mm_set1_ps(87.0f)), _mm_set1_ps(-87.0f));
 						__m128 expResult = fast_exp_sse(clampedInput);
 						distOutFull = _mm_sub_ps(_mm_div_ps(_mm_set1_ps(2.0f), _mm_add_ps(one, expResult)), one);
 						break;
@@ -490,7 +494,6 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	const std::array<float, 4> slewUp = {slewUp1, slewUp1, slewUp2, slewUp2};
 	const std::array<float, 4> slewDown = {slewDown1, slewDown1, slewDown2, slewDown2};
 	const std::array<int, 4> distType = {distType1, distType1, distType2, distType2};
-	const std::array<float, 4> bias = {bias1, bias1, bias2, bias2};
 	const std::array<float, 4> warp = {warp1, warp1, warp2, warp2};
 	const std::array<float, 4> crush = {crush1, crush1, crush2, crush2};
 	const std::array<float, 4> outVol = {outVol1, outVol1, outVol2, outVol2};
@@ -510,6 +513,11 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	
 	for (fpp_t f = 0; f < frames; ++f)
 	{
+		// interpolate bias to remove crackling when moving the parameter
+		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;
+		m_trueBias2 = m_biasInterpCoef * m_trueBias2 + (1.f - m_biasInterpCoef) * bias2;
+		const std::array<float, 4> bias = {m_trueBias1, m_trueBias1, m_trueBias2, m_trueBias2};
+		
 		if (oversampleVal > 1)
 		{
 			m_upsampler[0].process_sample(m_overOuts[0].data(), buf[f][0]);
@@ -691,6 +699,8 @@ void SlewDistortion::changeSampleRate()
 	std::fill(std::begin(m_outEnv), std::end(m_outEnv), 0.0f);
 	std::fill(std::begin(m_outPeakDisplay), std::end(m_outPeakDisplay), 0.0f);
 	for (auto& subArray : m_overOuts) {std::fill(subArray.begin(), subArray.end(), 0.0f);}
+	
+	m_biasInterpCoef = std::exp(-1 / (0.01f * m_sampleRate));
 }
 
 

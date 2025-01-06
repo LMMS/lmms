@@ -70,6 +70,9 @@ private:
 	int m_oldOversampleVal = -1;
 	float m_coeffPrecalc = 0;
 	float m_dcCoeff = 0;
+	float m_biasInterpCoef = 0;
+	float m_trueBias1 = 0;
+	float m_trueBias2 = 0;
 	
 	std::array<Upsampler<SLEWDIST_MAX_OVERSAMPLE_STAGES>, 2> m_upsampler;
 	std::array<Downsampler<SLEWDIST_MAX_OVERSAMPLE_STAGES>, 2> m_downsampler;
