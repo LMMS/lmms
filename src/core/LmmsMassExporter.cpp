@@ -47,9 +47,8 @@ LmmsMassExporter::~LmmsMassExporter()
 
 void LmmsMassExporter::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction, void* callbackObject)
 {
-	QString filteredName(QFileInfo(outputLocationAndName).absolutePath() + "/" + QFileInfo(outputLocationAndName).baseName()+ ".flac");
 	m_readMutex.lock();
-	m_buffers.push_back(std::make_tuple(filteredName, buffer, callbackFunction, callbackObject));
+	m_buffers.push_back(std::make_tuple(outputLocationAndName, buffer, callbackFunction, callbackObject));
 	m_readMutex.unlock();
 
 	if (m_isThreadRunning == false)
