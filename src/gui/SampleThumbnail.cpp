@@ -35,15 +35,15 @@ SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPer
 {
 }
 
-SampleThumbnail::Thumbnail::Thumbnail(const SampleFrame* buffer, size_t size, size_t width)
+SampleThumbnail::Thumbnail::Thumbnail(const float* buffer, size_t size, size_t width)
 	: m_peaks(width)
-	, m_samplesPerPeak(static_cast<double>(size) / width)
+	, m_samplesPerPeak(std::max(static_cast<double>(size) / width, 1.0))
 {
 	for (auto peakIndex = std::size_t{0}; peakIndex < width; ++peakIndex)
 	{
 		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
 		const auto endSample = buffer + static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
-		const auto [min, max] = std::minmax_element(&beginSample->left(), &endSample->left());
+		const auto [min, max] = std::minmax_element(beginSample, endSample);
 		m_peaks[peakIndex] = Peak{*min, *max};
 	}
 }
@@ -93,7 +93,9 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	if (!sample.buffer()) { throw std::runtime_error{"Cannot create a sample thumbnail with no buffer"}; }
 	if (sample.sampleSize() == 0) { return; }
 
-	m_thumbnailCache->emplace_back(sample.buffer()->data(), sample.sampleSize(), sample.sampleSize());
+	const auto fullResolutionWidth = sample.sampleSize() * DEFAULT_CHANNELS;
+	m_thumbnailCache->emplace_back(&sample.buffer()->data()->left(), fullResolutionWidth, fullResolutionWidth);
+
 	while (m_thumbnailCache->back().width() >= Thumbnail::AggregationPerZoomStep)
 	{
 		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
