@@ -145,7 +145,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	PixmapButton* slewLink2Button = makeToggleButton(132, 191, tr("Slew Link 2"), "link_on", "link_off", &controls->m_slewLink2Model);
 	connect(slewLink2Button, &PixmapButton::clicked, this, [this, controls]{
 		controls->m_slewDown2Model.setValue(controls->m_slewUp2Model.value());
-		m_slewDown1Knob->setModel(controls->m_slewLink1Model.value() ? &controls->m_slewUp1Model : &controls->m_slewDown1Model);
+		m_slewDown2Knob->setModel(controls->m_slewLink2Model.value() ? &controls->m_slewUp2Model : &controls->m_slewDown2Model);
 	}, Qt::DirectConnection);
 	
 	makeToggleButton(9, 248, tr("DC Offset Removal"), "dc_on", "dc_off", &controls->m_dcRemoveModel);

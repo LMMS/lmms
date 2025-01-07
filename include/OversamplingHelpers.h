@@ -82,7 +82,7 @@ public:
 		reset();
 	}
 
-	inline void process_sample(float* outSamples, float inSample)
+	void process_sample(float* outSamples, float inSample)
 	{
 		int total = 1 << m_stages;
 		outSamples[0] = inSample;
@@ -112,13 +112,13 @@ public:
 		}
 	}
 
-	inline int getStages() const { return m_stages; }
-	inline float getSampleRate() const { return m_sampleRate; }
-	inline float getPassband() const { return m_passband; }
+	int getStages() const { return m_stages; }
+	float getSampleRate() const { return m_sampleRate; }
+	float getPassband() const { return m_passband; }
 
-	inline void setStages(int stages) { m_stages = stages; reset(); }
-	inline void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; reset(); }
-	inline void setPassband(float passband) { m_passband = passband; reset(); }
+	void setStages(int stages) { m_stages = stages; reset(); }
+	void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; reset(); }
+	void setPassband(float passband) { m_passband = passband; reset(); }
 
 private:
 	hiir::Upsampler2xFpu<MaxCoefs> m_upsampleFirst;
@@ -175,7 +175,7 @@ public:
 		reset();
 	}
 
-	inline float process_sample(float* inSamples)
+	float process_sample(float* inSamples)
 	{
 		for (int i = m_stages - 1; i >= 2; --i)
 		{
@@ -201,13 +201,13 @@ public:
 		return inSamples[0];
 	}
 
-	inline int getStages() const { return m_stages; }
-	inline float getSampleRate() const { return m_sampleRate; }
-	inline float getPassband() const { return m_passband; }
+	int getStages() const { return m_stages; }
+	float getSampleRate() const { return m_sampleRate; }
+	float getPassband() const { return m_passband; }
 
-	inline void setStages(int stages) { m_stages = stages; reset(); }
-	inline void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; reset(); }
-	inline void setPassband(float passband) { m_passband = passband; reset(); }
+	void setStages(int stages) { m_stages = stages; reset(); }
+	void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; reset(); }
+	void setPassband(float passband) { m_passband = passband; reset(); }
 
 private:
 	hiir::Downsampler2xFpu<MaxCoefs> m_downsampleFirst;
