@@ -109,8 +109,11 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	const auto& drawRect = parameters.drawRect.isNull() ? sampleRect : parameters.drawRect;
 	const auto& viewportRect = parameters.viewportRect.isNull() ? drawRect : parameters.viewportRect;
 
+	const auto renderRect = sampleRect.intersected(drawRect).intersected(viewportRect);
+	if (renderRect.isNull()) { return; }
+
 	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
-	assert(sampleRange <= 1);
+	if (sampleRange <= 0 || sampleRange > 1) { return; }
 
 	const auto targetThumbnailWidth = static_cast<double>(sampleRect.width()) / sampleRange;
 	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
@@ -127,12 +130,8 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
 	const auto thumbnail = finerThumbnail->zoomOut(finerThumbnailScaleFactor, finerThumbnailBegin, finerThumbnailEnd);
 
-	const auto drawBegin = std::max({sampleRect.x(), drawRect.x(), viewportRect.x()});
-	const auto drawEnd = std::min({sampleRect.x() + sampleRect.width(), drawRect.x() + drawRect.width(),
-		viewportRect.x() + viewportRect.width()});
-
-	const auto thumbnailBeginForward = std::clamp(drawBegin - sampleRect.x(), 0, thumbnail.width());
-	const auto thumbnailEndForward = std::clamp(drawEnd - sampleRect.x(), 0, thumbnail.width());
+	const auto thumbnailBeginForward = renderRect.x() - sampleRect.x();
+	const auto thumbnailEndForward = renderRect.x() + renderRect.width() - sampleRect.x();
 	const auto thumbnailBegin = parameters.reversed ? thumbnail.width() - thumbnailBeginForward - 1 : thumbnailBeginForward;
 	const auto thumbnailEnd = parameters.reversed ? thumbnail.width() - thumbnailEndForward - 1 : thumbnailEndForward;
 	const auto thumbnailIndexOffset = parameters.reversed ? -1 : 1;
@@ -140,15 +139,16 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	auto drawBuffer = std::vector<QLineF>(drawEnd - drawBegin);
+	auto drawBuffer = std::vector<QLineF>(renderRect.width());
 	const auto yScale = drawRect.height() / 2 * parameters.amplification;
 
-	for (auto x = drawBegin, i = thumbnailBegin; x < drawEnd && i != thumbnailEnd; ++x, i += thumbnailIndexOffset)
+	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
+		 ++x, i += thumbnailIndexOffset)
 	{
 		const auto& peak = thumbnail[i];
 		const auto yMin = drawRect.center().y() - peak.min * yScale;
 		const auto yMax = drawRect.center().y() - peak.max * yScale;
-		drawBuffer[x - drawBegin] = QLineF(x, yMin, x, yMax);
+		drawBuffer[x - renderRect.x()] = QLineF(x, yMin, x, yMax);
 	}
 
 	painter.drawLines(drawBuffer.data(), drawBuffer.size());
