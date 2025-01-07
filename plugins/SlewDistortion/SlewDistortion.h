@@ -78,6 +78,7 @@ private:
 	std::array<Downsampler<SLEWDIST_MAX_OVERSAMPLE_STAGES>, 2> m_downsampler;
 	
 	StereoLinkwitzRiley m_lp;
+	StereoLinkwitzRiley m_hp;
 	
 	SlewDistortionControls m_slewdistortionControls;
 	

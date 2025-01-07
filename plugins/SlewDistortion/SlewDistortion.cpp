@@ -51,6 +51,7 @@ SlewDistortion::SlewDistortion(Model* parent, const Descriptor::SubPluginFeature
 	Effect(&slewdistortion_plugin_descriptor, parent, key),
 	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp(m_sampleRate),
+	m_hp(m_sampleRate),
 	m_slewdistortionControls(this)
 {
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
@@ -132,6 +133,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	if (m_slewdistortionControls.m_splitModel.isValueChanged())
 	{
 		m_lp.setLowpass(split);
+		m_hp.setHighpass(split);
 	}
 
 	for (fpp_t f = 0; f < frames; ++f)
@@ -157,10 +159,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			alignas(16) std::array<float, 4> inArr = {0};
 			if (multiband)
 			{
+				inArr[0] = m_hp.update(m_overOuts[0][overSamp], 0);
+				inArr[1] = m_hp.update(m_overOuts[1][overSamp], 1);
 				inArr[2] = m_lp.update(m_overOuts[0][overSamp], 0);
 				inArr[3] = m_lp.update(m_overOuts[1][overSamp], 1);
-				inArr[0] = m_overOuts[0][overSamp] - inArr[2];
-				inArr[1] = m_overOuts[1][overSamp] - inArr[3];
 			}
 			else
 			{
@@ -509,6 +511,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	if (m_slewdistortionControls.m_splitModel.isValueChanged())
 	{
 		m_lp.setLowpass(split);
+		m_hp.setHighpass(split);
 	}
 	
 	for (fpp_t f = 0; f < frames; ++f)
@@ -533,10 +536,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		{
 			if (multiband)
 			{
-				in[2] = m_lp.update(m_overOuts[0][overSamp], 0);
-				in[3] = m_lp.update(m_overOuts[1][overSamp], 1);
-				in[0] = m_overOuts[0][overSamp] - in[2];
-				in[1] = m_overOuts[1][overSamp] - in[3];
+				inArr[0] = m_hp.update(m_overOuts[0][overSamp], 0);
+				inArr[1] = m_hp.update(m_overOuts[1][overSamp], 1);
+				inArr[2] = m_lp.update(m_overOuts[0][overSamp], 0);
+				inArr[3] = m_lp.update(m_overOuts[1][overSamp], 1);
 			}
 			else
 			{
@@ -687,6 +690,10 @@ void SlewDistortion::changeSampleRate()
 	m_lp.setSampleRate(sampleRateOver);
 	m_lp.setLowpass(m_slewdistortionControls.m_splitModel.value());
 	m_lp.clearHistory();
+	
+	m_hp.setSampleRate(sampleRateOver);
+	m_hp.setHighpass(m_slewdistortionControls.m_splitModel.value());
+	m_hp.clearHistory();
 	
 	m_coeffPrecalc = -1.f / (sampleRateOver * 0.001f);
 	
