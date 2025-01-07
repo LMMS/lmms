@@ -1,7 +1,8 @@
 /*
  * SampleThumbnail.cpp
  *
- * Copyright (c) Copyright (c) 2024 Khoi Dau <casboi86@gmail.com>
+ * Copyright (c) 2024 Khoi Dau <casboi86@gmail.com>
+ * Copyright (c) 2024 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -48,24 +49,19 @@ SampleThumbnail::Thumbnail::Thumbnail(const float* buffer, size_t size, size_t w
 	}
 }
 
-SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor, size_t from, size_t to) const
+SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) const
 {
 	assert(factor >= 1 && "Invalid zoom out factor");
 
-	auto peaks = std::vector<Peak>((to - from) / factor);
+	auto peaks = std::vector<Peak>(m_peaks.size() / factor);
 	for (auto peakIndex = std::size_t{0}; peakIndex < peaks.size(); ++peakIndex)
 	{
-		const auto beginAggregationAt = m_peaks.begin() + from + static_cast<size_t>(std::floor(peakIndex * factor));
-		const auto endAggregationAt = m_peaks.begin() + from + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
+		const auto beginAggregationAt = m_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
+		const auto endAggregationAt = m_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
 		peaks[peakIndex] = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
 	}
 
 	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
-}
-
-SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) const
-{
-	return zoomOut(factor, 0, m_peaks.size());
 }
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
@@ -96,10 +92,10 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	const auto fullResolutionWidth = sample.sampleSize() * DEFAULT_CHANNELS;
 	m_thumbnailCache->emplace_back(&sample.buffer()->data()->left(), fullResolutionWidth, fullResolutionWidth);
 
-	while (m_thumbnailCache->back().width() >= Thumbnail::AggregationPerZoomStep)
+	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
 	{
-		const auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(Thumbnail::AggregationPerZoomStep);
-		m_thumbnailCache->emplace_back(zoomedOutThumbnail);
+		auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(AggregationPerZoomStep);
+		m_thumbnailCache->emplace_back(std::move(zoomedOutThumbnail));
 	}
 }
 

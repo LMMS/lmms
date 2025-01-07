@@ -2,6 +2,7 @@
  * SampleThumbnail.h
  *
  * Copyright (c) 2024 Khoi Dau <casboi86@gmail.com>
+ * Copyright (c) 2024 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,10 +26,10 @@
 #ifndef LMMS_SAMPLE_THUMBNAIL_H
 #define LMMS_SAMPLE_THUMBNAIL_H
 
+#include <QDateTime>
 #include <QPainter>
 #include <QRect>
 #include <memory>
-#include <QDateTime>
 
 #include "Sample.h"
 #include "lmms_export.h"
@@ -52,6 +53,9 @@ public:
 	//! Maximum number of cached sample thumbnails.
 	//! This cache only allows for caching sample thumbnails that have an associated file path.
 	static constexpr auto MaxSampleThumbnailCacheSize = 32;
+
+	//! The number of samples to aggregate per zoom step when building the thumbnail cache.
+	static constexpr auto AggregationPerZoomStep = 10;
 
 	struct VisualizeParameters
 	{
@@ -79,8 +83,6 @@ private:
 	class Thumbnail
 	{
 	public:
-		static constexpr auto AggregationPerZoomStep = 10;
-
 		struct Peak
 		{
 			Peak() = default;
@@ -101,7 +103,7 @@ private:
 			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
 
 			float min = std::numeric_limits<float>::max();
-			float max = -std::numeric_limits<float>::max();
+			float max = std::numeric_limits<float>::min();
 		};
 
 		Thumbnail() = default;
@@ -109,7 +111,6 @@ private:
 		Thumbnail(const float* buffer, size_t size, size_t width);
 
 		Thumbnail zoomOut(float factor) const;
-		Thumbnail zoomOut(float factor, size_t from, size_t to) const;
 
 		Peak& operator[](size_t index) { return m_peaks[index]; }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }
@@ -138,10 +139,7 @@ private:
 
 	struct Hash
 	{
-		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept
-		{
-			return qHash(entry.filePath);
-		}
+		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept { return qHash(entry.filePath); }
 	};
 
 	using ThumbnailCache = std::vector<Thumbnail>;
