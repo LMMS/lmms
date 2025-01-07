@@ -536,10 +536,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		{
 			if (multiband)
 			{
-				inArr[0] = m_hp.update(m_overOuts[0][overSamp], 0);
-				inArr[1] = m_hp.update(m_overOuts[1][overSamp], 1);
-				inArr[2] = m_lp.update(m_overOuts[0][overSamp], 0);
-				inArr[3] = m_lp.update(m_overOuts[1][overSamp], 1);
+				in[0] = m_hp.update(m_overOuts[0][overSamp], 0);
+				in[1] = m_hp.update(m_overOuts[1][overSamp], 1);
+				in[2] = m_lp.update(m_overOuts[0][overSamp], 0);
+				in[3] = m_lp.update(m_overOuts[1][overSamp], 1);
 			}
 			else
 			{
