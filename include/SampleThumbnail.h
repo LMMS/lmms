@@ -73,7 +73,7 @@ public:
 
 	SampleThumbnail() = default;
 	SampleThumbnail(const Sample& sample);
-	void visualize(const VisualizeParameters& parameters, QPainter& painter) const;
+	void visualize(VisualizeParameters parameters, QPainter& painter) const;
 
 private:
 	class Thumbnail

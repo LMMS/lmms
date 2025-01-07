@@ -103,7 +103,7 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	}
 }
 
-void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter& painter) const
+void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painter) const
 {
 	const auto& sampleRect = parameters.sampleRect;
 	const auto& drawRect = parameters.drawRect.isNull() ? sampleRect : parameters.drawRect;
@@ -125,33 +125,31 @@ void SampleThumbnail::visualize(const VisualizeParameters& parameters, QPainter&
 		return;
 	}
 
-	const auto finerThumbnailBegin = (parameters.reversed ? 1.0 - parameters.sampleEnd : parameters.sampleStart) * finerThumbnail->width();
-	const auto finerThumbnailEnd =  (parameters.reversed ? 1.0 - parameters.sampleStart : parameters.sampleEnd) * finerThumbnail->width();
-	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
-	const auto thumbnail = finerThumbnail->zoomOut(finerThumbnailScaleFactor, finerThumbnailBegin, finerThumbnailEnd);
-
-	const auto thumbnailBeginForward = renderRect.x() - sampleRect.x();
-	const auto thumbnailEndForward = renderRect.x() + renderRect.width() - sampleRect.x();
-	const auto thumbnailBegin = parameters.reversed ? thumbnail.width() - thumbnailBeginForward - 1 : thumbnailBeginForward;
-	const auto thumbnailEnd = parameters.reversed ? thumbnail.width() - thumbnailEndForward - 1 : thumbnailEndForward;
-	const auto thumbnailIndexOffset = parameters.reversed ? -1 : 1;
-
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	auto drawBuffer = std::vector<QLineF>(renderRect.width());
+	const auto thumbnailBeginForward = renderRect.x() - sampleRect.x();
+	const auto thumbnailEndForward = renderRect.x() + renderRect.width() - sampleRect.x();
+	const auto thumbnailBegin = parameters.reversed ? static_cast<int>(targetThumbnailWidth) - thumbnailBeginForward - 1 : thumbnailBeginForward;
+	const auto thumbnailEnd = parameters.reversed ? static_cast<int>(targetThumbnailWidth) - thumbnailEndForward - 1 : thumbnailEndForward;
+	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
+
+	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
 	const auto yScale = drawRect.height() / 2 * parameters.amplification;
 
 	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
-		 ++x, i += thumbnailIndexOffset)
+		 ++x, i += advanceThumbnailBy)
 	{
-		const auto& peak = thumbnail[i];
+		const auto beginAggregationAt = &(*finerThumbnail)[static_cast<int>(std::floor(i * finerThumbnailScaleFactor))];
+		const auto endAggregationAt = &(*finerThumbnail)[static_cast<int>(std::ceil((i + 1) * finerThumbnailScaleFactor))];
+		const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
+
 		const auto yMin = drawRect.center().y() - peak.min * yScale;
 		const auto yMax = drawRect.center().y() - peak.max * yScale;
-		drawBuffer[x - renderRect.x()] = QLineF(x, yMin, x, yMax);
+
+		painter.drawLine(x, yMin, x, yMax);
 	}
 
-	painter.drawLines(drawBuffer.data(), drawBuffer.size());
 	painter.restore();
 }
 
