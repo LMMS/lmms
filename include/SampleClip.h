@@ -32,7 +32,7 @@
 namespace lmms
 {
 
-class LmmsMassExporter;
+class ThreadedExportManager;
 class SampleBuffer;
 
 namespace gui
@@ -107,7 +107,7 @@ private:
 	//! used when a sample is exported and before it is reinported
 	QString m_exportedSampleName;	
 	
-	static std::unique_ptr<LmmsMassExporter> s_sampleExporter;
+	static std::unique_ptr<ThreadedExportManager> s_sampleExporter;
 
 	friend class gui::SampleClipView;
 
