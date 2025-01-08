@@ -116,6 +116,8 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
+	m_sampleThumbnail = SampleThumbnail{sample};
+
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_seekerWaveform.rect(),
 		.amplification = sample.amplification(),
@@ -124,7 +126,6 @@ void SlicerTWaveform::drawSeekerWaveform()
 		.reversed = sample.reversed()
 	};
 
-	m_sampleThumbnail = SampleThumbnail{sample};
 	m_sampleThumbnail.visualize(param, brush);
 
 

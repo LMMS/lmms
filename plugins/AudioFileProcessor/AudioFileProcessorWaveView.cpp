@@ -340,6 +340,8 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
+	m_sampleThumbnail = SampleThumbnail{*m_sample};
+
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_graph.rect(),
 		.amplification = m_sample->amplification(),
@@ -348,7 +350,6 @@ void AudioFileProcessorWaveView::updateGraph()
 		.reversed = m_sample->reversed(),
 	};
 
-	m_sampleThumbnail = SampleThumbnail{*m_sample};
 	m_sampleThumbnail.visualize(param, p);
 }
 
