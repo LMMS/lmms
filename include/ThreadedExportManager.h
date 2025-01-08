@@ -1,5 +1,5 @@
 /*
- * LmmsMassExporter.h - exports files in .flac format on an other thread
+ * ThreadedExportManager.h - exports files in .flac format on an other thread
  *
  * Copyright (c) 2024 - 2025 szeli1
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_LMMS_MASS_EXPORTER_H
-#define LMMS_LMMS_MASS_EXPORTER_H
+#ifndef LMMS_THREADED_EXPORT_MANAGER_H
+#define LMMS_THREADED_EXPORT_MANAGER_H
 
 #include <atomic>
 #include <memory>
@@ -43,11 +43,11 @@ class SampleBuffer;
 
 typedef void (*callbackFn)(void*);
 
-class LmmsMassExporter
+class ThreadedExportManager
 {
 public:
-	LmmsMassExporter();
-	~LmmsMassExporter();
+	ThreadedExportManager();
+	~ThreadedExportManager();
 
 	//! outputLocationAndName: should include path and name, could include ".flac"
 	void startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction = nullptr, void* callbackObject = nullptr);
@@ -56,7 +56,7 @@ public:
 	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
 
 private:
-	static void threadedExportFunction(LmmsMassExporter* thisExporter, volatile std::atomic<bool>* abortExport);
+	static void threadedExportFunction(ThreadedExportManager* thisExporter, volatile std::atomic<bool>* abortExport);
 
 	void stopThread();
 	bool openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
@@ -73,4 +73,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_LMMS_MASS_EXPORTER_H
+#endif // LMMS_THREADED_EXPORT_MANAGER_H
