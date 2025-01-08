@@ -99,6 +99,13 @@ auto VstEffect::processImpl() -> ProcessStatus
 	// channels remain as-is.
 
 	const auto in = m_plugin->inputBuffer();
+	if (in.channels() == 0)
+	{
+		// Do not process wet/dry for an instrument loaded as an effect
+		// TODO: Prevent instruments from loading as effects?
+		return ProcessStatus::ContinueIfNotQuiet;
+	}
+
 	auto out = m_plugin->outputBuffer();
 
 	const float w = wetLevel();
