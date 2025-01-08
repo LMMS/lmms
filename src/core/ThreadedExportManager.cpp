@@ -1,5 +1,5 @@
 /*
- * LmmsMassExporter.cpp - exports files in .flac format on an other thread
+ * ThreadedExportManager.cpp - exports files in .flac format on an other thread
  *
  * Copyright (c) 2024 - 2025 szeli1
  *
@@ -22,9 +22,7 @@
  *
  */
 
-#include <QFileInfo>
-
-#include "LmmsMassExporter.h"
+#include "ThreadedExportManager.h"
 
 #include "FlacExporter.h"
 #include "SampleBuffer.h"
@@ -32,20 +30,20 @@
 namespace lmms
 {
 
-LmmsMassExporter::LmmsMassExporter() :
+ThreadedExportManager::ThreadedExportManager() :
 	m_abortExport(false),
 	m_isThreadRunning(false),
 	m_readMutex(),
 	m_thread(nullptr)
 {}
 
-LmmsMassExporter::~LmmsMassExporter()
+ThreadedExportManager::~ThreadedExportManager()
 {
 	stopExporting();
 }
 
 
-void LmmsMassExporter::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction, void* callbackObject)
+void ThreadedExportManager::startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction, void* callbackObject)
 {
 	m_readMutex.lock();
 	m_buffers.push_back(std::make_tuple(outputLocationAndName, buffer, callbackFunction, callbackObject));
@@ -55,11 +53,11 @@ void LmmsMassExporter::startExporting(const QString& outputLocationAndName, std:
 	{
 		stopExporting();
 		m_isThreadRunning = true;
-		m_thread = new std::thread(&LmmsMassExporter::threadedExportFunction, this, &m_abortExport);
+		m_thread = new std::thread(&ThreadedExportManager::threadedExportFunction, this, &m_abortExport);
 	}
 }
 
-void LmmsMassExporter::stopExporting()
+void ThreadedExportManager::stopExporting()
 {
 	if (m_thread != nullptr)
 	{
@@ -76,7 +74,7 @@ void LmmsMassExporter::stopExporting()
 }
 
 
-void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, volatile std::atomic<bool>* abortExport)
+void ThreadedExportManager::threadedExportFunction(ThreadedExportManager* thisExporter, volatile std::atomic<bool>* abortExport)
 {
 	thisExporter->m_isThreadRunning = true;
 
@@ -95,10 +93,10 @@ void LmmsMassExporter::threadedExportFunction(LmmsMassExporter* thisExporter, vo
 
 		// important new scope
 		{
-			FlacExporter exporter(std::get<1>(curBuffer)->sampleRate(), 24, std::get<0>(curBuffer));
-			if (exporter.getIsSuccesful())
+			FlacExporter flacExporter(std::get<1>(curBuffer)->sampleRate(), 24, std::get<0>(curBuffer));
+			if (flacExporter.getIsSuccesful())
 			{
-				exporter.writeThisBuffer(std::get<1>(curBuffer)->data(), std::get<1>(curBuffer)->size());
+				flacExporter.writeThisBuffer(std::get<1>(curBuffer)->data(), std::get<1>(curBuffer)->size());
 			}
 		}
 
