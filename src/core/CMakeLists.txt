@@ -38,7 +38,6 @@ set(LMMS_SRCS
 	core/LadspaManager.cpp
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
-	core/LmmsMassExporter.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
 	core/Metronome.cpp
@@ -78,6 +77,7 @@ set(LMMS_SRCS
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/ThreadedExportManager.cpp
 	core/ThreadPool.cpp
 	core/Timeline.cpp
 	core/TimePos.cpp
