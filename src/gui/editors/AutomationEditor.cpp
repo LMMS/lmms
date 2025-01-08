@@ -1221,12 +1221,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			const auto& sample = m_ghostSample->sample();
 
-			auto param = SampleThumbnail::VisualizeParameters{};
-			param.amplification = sample.amplification();
-			param.reversed = sample.reversed();
-			param.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			param.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize();
-			param.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize();
+			const auto param = SampleThumbnail::VisualizeParameters{
+				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.amplification = sample.amplification(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.reversed = sample.reversed()
+			};
 
 			m_sampleThumbnail.visualize(param, p);
 		}
