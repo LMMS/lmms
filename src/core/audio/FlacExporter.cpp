@@ -71,6 +71,7 @@ FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLo
 FlacExporter::~FlacExporter()
 {
 	if (m_fileDescriptor == NULL) { return; }
+	sf_write_sync(m_fileDescriptor);
 	m_isSuccesful = sf_close(m_fileDescriptor) == 0;
 	if (m_isSuccesful == false)
 	{
