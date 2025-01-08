@@ -27,7 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 
-#include "LmmsMassExporter.h"
+#include "ThreadedExportManager.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
@@ -38,7 +38,7 @@
 namespace lmms
 {
 
-std::unique_ptr<LmmsMassExporter> SampleClip::s_sampleExporter = std::make_unique<LmmsMassExporter>();
+std::unique_ptr<ThreadedExportManager> SampleClip::s_sampleExporter = std::make_unique<ThreadedExportManager>();
 
 
 SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
