@@ -32,7 +32,6 @@
 #include "AutomationEditor.h"
 #include "embed.h"
 #include "FileDialog.h"
-#include "LmmsMassExporter.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
