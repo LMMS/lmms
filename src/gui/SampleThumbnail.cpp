@@ -126,8 +126,8 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 
 	const auto thumbnailBeginForward = renderRect.x() - sampleRect.x();
 	const auto thumbnailEndForward = renderRect.x() + renderRect.width() - sampleRect.x();
-	const auto thumbnailBegin = parameters.reversed ? static_cast<int>(targetThumbnailWidth) - thumbnailBeginForward - 1 : thumbnailBeginForward;
-	const auto thumbnailEnd = parameters.reversed ? static_cast<int>(targetThumbnailWidth) - thumbnailEndForward - 1 : thumbnailEndForward;
+	const auto thumbnailBegin = parameters.reversed ? sampleRect.width() - thumbnailBeginForward - 1 : thumbnailBeginForward;
+	const auto thumbnailEnd = parameters.reversed ? sampleRect.width() - thumbnailEndForward : thumbnailEndForward;
 	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
 
 	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
