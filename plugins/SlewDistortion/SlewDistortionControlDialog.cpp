@@ -82,12 +82,12 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	};
 
 	ComboBox* distType1Box = new ComboBox(this);
-	distType1Box->setGeometry(85, 14, 115, 22);
+	distType1Box->setGeometry(85, 26, 115, 22);
 	//distType1Box->setFont(pointSize<8>(distType1Box->font()));
 	distType1Box->setModel(&controls->m_distType1Model);
 	
 	ComboBox* distType2Box = new ComboBox(this);
-	distType2Box->setGeometry(85, 135, 115, 22);
+	distType2Box->setGeometry(85, 147, 115, 22);
 	//distType2Box->setFont(pointSize<8>(distType2Box->font()));
 	distType2Box->setModel(&controls->m_distType2Model);
 	

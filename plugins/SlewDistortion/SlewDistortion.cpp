@@ -59,7 +59,7 @@ SlewDistortion::SlewDistortion(Model* parent, const Descriptor::SubPluginFeature
 }
 
 
-#ifdef __SSE2__
+#ifdef JNOAINHPIAHJP__SSE2__
 Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	const float d = dryLevel();
