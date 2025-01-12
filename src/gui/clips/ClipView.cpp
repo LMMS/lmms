@@ -634,12 +634,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-#ifdef LMMS_BUILD_APPLE
-		if ( me->modifiers() & Qt::AltModifier &&
-#else
-		if ( me->modifiers() & Qt::ControlModifier &&
-#endif
-			!(sClip && knifeMode) )
+		if (me->modifiers() & getOSSpecificModifierKey() && !(sClip && knifeMode))
 		{
 			if( isSelected() )
 			{
@@ -830,11 +825,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
-#ifdef LMMS_BUILD_APPLE
-	if( me->modifiers() & Qt::AltModifier )
-#else
-	if( me->modifiers() & Qt::ControlModifier )
-#endif
+	if (me->modifiers() & getOSSpecificModifierKey())
 	{
 		delete m_hint;
 		m_hint = nullptr;

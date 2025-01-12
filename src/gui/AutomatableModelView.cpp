@@ -32,6 +32,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "OperatingSystemHelpers.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
 
@@ -171,12 +172,7 @@ void AutomatableModelView::unsetModel()
 
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
-	if( event->button() == Qt::LeftButton &&
-#ifdef LMMS_BUILD_APPLE
-		event->modifiers() & Qt::AltModifier )
-#else
-		event->modifiers() & Qt::ControlModifier )
-#endif
+	if (event->button() == Qt::LeftButton && event->modifiers() & getOSSpecificModifierKey())
 	{
 		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
