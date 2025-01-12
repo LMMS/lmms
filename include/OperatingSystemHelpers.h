@@ -53,7 +53,7 @@ constexpr const char* UI_ALT_KEY =
 "Alt";
 #endif
 
-constexpr const char* getOSSppecificModifierKey()
+constexpr const char* getOSSppecificModifierKeyString()
 {
 #ifdef LMMS_BUILD_APPLE
     return UI_ALT_KEY;
