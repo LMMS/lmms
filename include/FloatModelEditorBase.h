@@ -110,7 +110,7 @@ private:
 	FloatModel m_volumeRatio;
 
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
-	float m_leftOver;
+	float m_lastModelValue; //!< model value in last mouseMoveEvent
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
