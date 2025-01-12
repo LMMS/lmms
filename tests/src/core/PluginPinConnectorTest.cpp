@@ -246,12 +246,12 @@ private slots:
 		// In    Out
 		//  _     _
 		// |X|   |X|
-		// |X|   |X|
+		// | |   |X|
 		//  -     -
 
 		auto pc1x1 = PluginPinConnector{1, 1, false, &model};
 		QCOMPARE(pc1x1.in().enabled(0, 0), true);
-		QCOMPARE(pc1x1.in().enabled(1, 0), true);
+		QCOMPARE(pc1x1.in().enabled(1, 0), false);
 
 		QCOMPARE(pc1x1.out().enabled(0, 0), true);
 		QCOMPARE(pc1x1.out().enabled(1, 0), true);
@@ -261,12 +261,12 @@ private slots:
 		// In    Out
 		//  _     _______
 		// |X|   |X| | | |
-		// |X|   | |X| | |
+		// | |   | |X| | |
 		//  -     -------
 
 		auto pc1x4 = PluginPinConnector{1, 4, false, &model};
 		QCOMPARE(pc1x4.in().enabled(0, 0), true);
-		QCOMPARE(pc1x4.in().enabled(1, 0), true);
+		QCOMPARE(pc1x4.in().enabled(1, 0), false);
 
 		QCOMPARE(pc1x4.out().enabled(0, 0), true);
 		QCOMPARE(pc1x4.out().enabled(0, 1), false);
@@ -362,12 +362,17 @@ private slots:
 		auto coreBus = getCoreBus();
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
-		// Downmix stereo to mono plugin input, upmix mono plugin output to stereo
+		// Use left channel as plugin input, upmix mono plugin output to stereo
 		// In    Out
 		//  _     _
 		// |X|   |X|
-		// |X|   |X|
+		// | |   |X|
 		//  -     -
+
+		// NOTE: If both channels were connected to the mono input, the signals would
+		//       be summed together and the amplitude would be doubled which is
+		//       undesirable, so the pin connector uses only the left channel as the
+		//       plugin input, following what REAPER does by default.
 
 		// Data on frames 0, 1, and 33
 		trackChannels[0].setLeft(123.f);
@@ -386,10 +391,10 @@ private slots:
 		auto router = pc.getRouter<AudioDataLayout::Split, float, 1, 1>();
 		router.routeToPlugin(coreBus, ins);
 
-		// Check that plugin inputs have data on frames 0, 1, and 33 (should be mixed down to mono)
-		QCOMPARE(ins.buffer(0)[0], (123.f + 321.f) / 2);
-		QCOMPARE(ins.buffer(0)[1], (456.f + 654.f) / 2);
-		QCOMPARE(ins.buffer(0)[33], (789.f + 987.f) / 2);
+		// Check that plugin inputs have data on frames 0, 1, and 33 (should be left channel's data)
+		QCOMPARE(ins.buffer(0)[0], 123.f);
+		QCOMPARE(ins.buffer(0)[1], 456.f);
+		QCOMPARE(ins.buffer(0)[33], 789.f);
 
 		// Do work of processImpl - in this case it doubles the amplitude
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
@@ -398,20 +403,20 @@ private slots:
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
 		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
-		coreBusExpected.bus[0][0] = SampleFrame{123.f + 321.f, 123.f + 321.f};
-		coreBusExpected.bus[0][1] = SampleFrame{456.f + 654.f, 456.f + 654.f};
-		coreBusExpected.bus[0][33] = SampleFrame{789.f + 987.f, 789.f + 987.f};
+		coreBusExpected.bus[0][0] = SampleFrame{123.f * 2, 123.f * 2};
+		coreBusExpected.bus[0][1] = SampleFrame{456.f * 2, 456.f * 2};
+		coreBusExpected.bus[0][33] = SampleFrame{789.f * 2, 789.f * 2};
 
 		// Route from plugin back to Core
 		router.routeFromPlugin(outs, coreBus);
 
-		// Check that result is mono mix with doubled amplitude
-		QCOMPARE(coreBus.bus[0][0].left(), 123.f + 321.f);
-		QCOMPARE(coreBus.bus[0][0].right(), 123.f + 321.f);
-		QCOMPARE(coreBus.bus[0][1].left(), 456.f + 654.f);
-		QCOMPARE(coreBus.bus[0][1].right(), 456.f + 654.f);
-		QCOMPARE(coreBus.bus[0][33].left(), 789.f + 987.f);
-		QCOMPARE(coreBus.bus[0][33].right(), 789.f + 987.f);
+		// Check that result is the original left track channel with doubled amplitude
+		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus.bus[0][0].right(), 123.f * 2);
+		QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus.bus[0][1].right(), 456.f * 2);
+		QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus.bus[0][33].right(), 789.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -505,6 +510,13 @@ private slots:
 		// |X| | |X| |
 		// | |X| | | |
 		//  ---   ---
+		pc.in().pins(0)[0]->setValue(true);
+		pc.in().pins(0)[1]->setValue(false);
+		pc.in().pins(1)[0]->setValue(false);
+		pc.in().pins(1)[1]->setValue(true);
+		pc.out().pins(0)[0]->setValue(true);
+		pc.out().pins(0)[1]->setValue(false);
+		pc.out().pins(1)[0]->setValue(false);
 		pc.out().pins(1)[1]->setValue(false);
 
 		// Data on frames 0, 1, and 33
@@ -622,6 +634,81 @@ private slots:
 		QCOMPARE(coreBus.bus[0][1].right(), 654.f * 2);
 		QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
 		QCOMPARE(coreBus.bus[0][33].right(), 987.f * 2);
+
+		// Test the rest of the buffer
+		compareBuffers(coreBus, coreBusExpected);
+	}
+
+	//! Verifies correct signal summing when routing a 1x2 non-interleaved (split) plugin
+	void Routing_Split1x2_Sum()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto model = Model{nullptr};
+		auto pc = PluginPinConnector{1, 2, false, &model};
+		auto coreBus = getCoreBus();
+		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+
+		// Sum both track channels together for plugin input, and sum the
+		//     two plugin output channels together for the left track channel output
+		// In    Out
+		//  _     ___
+		// |X|   |X|X|
+		// |X|   | | |
+		//  -     ---
+		pc.in().pins(0)[0]->setValue(true);
+		pc.in().pins(1)[0]->setValue(true);
+		pc.out().pins(0)[0]->setValue(true);
+		pc.out().pins(0)[1]->setValue(true);
+		pc.out().pins(1)[0]->setValue(false);
+		pc.out().pins(1)[1]->setValue(false);
+
+		// Data on frames 0, 1, and 33
+		trackChannels[0].setLeft(123.f);
+		trackChannels[0].setRight(321.f);
+		trackChannels[1].setLeft(456.f);
+		trackChannels[1].setRight(654.f);
+		trackChannels[33].setLeft(789.f);
+		trackChannels[33].setRight(987.f);
+
+		// Plugin input and output buffers
+		auto bufferSplit1x2 = AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 1, 2, false>{};
+		auto ins = bufferSplit1x2.inputBuffer();
+		auto outs = bufferSplit1x2.outputBuffer();
+
+		// Route to plugin
+		auto router = pc.getRouter<AudioDataLayout::Split, float, 1, 2>();
+		router.routeToPlugin(coreBus, ins);
+
+		// Check that plugin inputs have data on frames 0, 1, and 33 (should be both track channels summed together)
+		QCOMPARE(ins.buffer(0)[0], 123.f + 321.f);
+		QCOMPARE(ins.buffer(0)[1], 456.f + 654.f);
+		QCOMPARE(ins.buffer(0)[33], 789.f + 987.f);
+
+		// Do work of processImpl - in this case it does nothing (passthrough)
+		const auto process = [](auto s) { return s; };
+		std::transform(ins.buffer(0), ins.buffer(0) + ins.frames(), outs.buffer(0), process);
+		std::transform(ins.buffer(0), ins.buffer(0) + ins.frames(), outs.buffer(1), process);
+
+		// Construct buffer with the expected core bus result
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferPtrExpected = coreBufferExpected.data();
+		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
+		coreBusExpected.bus[0][0] = SampleFrame{(123.f + 321.f) * 2, 321.f};
+		coreBusExpected.bus[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
+		coreBusExpected.bus[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};
+
+		// Route from plugin back to Core
+		router.routeFromPlugin(outs, coreBus);
+
+		// Check that result is the two original track channels added together then doubled
+		QCOMPARE(coreBus.bus[0][0].left(), (123.f + 321.f) * 2);
+		QCOMPARE(coreBus.bus[0][0].right(), 321.f);
+		QCOMPARE(coreBus.bus[0][1].left(), (456.f + 654.f) * 2);
+		QCOMPARE(coreBus.bus[0][1].right(), 654.f);
+		QCOMPARE(coreBus.bus[0][33].left(), (789.f + 987.f) * 2);
+		QCOMPARE(coreBus.bus[0][33].right(), 987.f);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);

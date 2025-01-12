@@ -116,6 +116,11 @@ public:
 	class Matrix
 	{
 	public:
+		explicit Matrix(bool isOutput)
+			: m_isOutput{isOutput}
+		{
+		}
+
 		auto pins() const -> const PinMap& { return m_pins; }
 		auto pins(ch_cnt_t trackChannel) const -> const std::vector<BoolModel*>& { return m_pins[trackChannel]; }
 
@@ -127,6 +132,8 @@ public:
 		{
 			return m_pins[trackChannel][pluginChannel]->value();
 		}
+
+		auto isOutput() const -> bool { return m_isOutput; }
 
 		friend class PluginPinConnector;
 
@@ -141,6 +148,7 @@ public:
 
 		PinMap m_pins;
 		int m_channelCount = 0;
+		const bool m_isOutput = false;
 		std::vector<QString> m_channelNames; //!< optional
 	};
 
@@ -263,8 +271,8 @@ public slots:
 private:
 	void updateAllRoutedChannels();
 
-	Matrix m_in;  //!< LMMS --> Plugin
-	Matrix m_out; //!< Plugin --> LMMS
+	Matrix m_in{false}; //!< LMMS --> Plugin
+	Matrix m_out{true}; //!< Plugin --> LMMS
 
 	//! TODO: Move this somewhere else; Will be >= 2 once there is support for adding new track channels
 	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
@@ -312,7 +320,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 
 	for (std::uint32_t outChannel = 0; outChannel < out.channels(); ++outChannel)
 	{
-		mix_ch_t numRouted = 0; // counter for # of in channels routed to the current out channel
 		SampleType<layout, SampleT>* outPtr = out.buffer(outChannel);
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
@@ -333,7 +340,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 					{
 						outPtr[frame] += convertSample<SampleT>(inPtr[frame].right());
 					}
-					++numRouted;
 					break;
 				}
 				case 0b10: // L channel only
@@ -342,7 +348,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 					{
 						outPtr[frame] += convertSample<SampleT>(inPtr[frame].left());
 					}
-					++numRouted;
 					break;
 				}
 				case 0b11: // Both channels
@@ -351,23 +356,12 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 					{
 						outPtr[frame] += convertSample<SampleT>(inPtr[frame].left() + inPtr[frame].right());
 					}
-					numRouted += 2;
 					break;
 				}
 				default:
 					unreachable();
 					break;
 			}
-		}
-
-		// Either no input channels were routed to this output and output stays zeroed,
-		// or only one channel was routed and normalization is not needed
-		if (numRouted <= 1) { continue; }
-
-		// Normalize output
-		for (f_cnt_t frame = 0; frame < in.frames; ++frame)
-		{
-			outPtr[frame] /= numRouted;
 		}
 	}
 }
@@ -424,10 +418,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 			}
 		}
 
-		// Counters for # of in channels routed to the current pair of out channels
-		ch_cnt_t numRoutedL = 0;
-		ch_cnt_t numRoutedR = 0;
-
 		for (pi_ch_t inChannel = 0; inChannel < in.channels(); ++inChannel)
 		{
 			const SampleType<layout, const SampleT>* inPtr = in.buffer(inChannel);
@@ -437,10 +427,8 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 				// This input channel could be routed to either left, right, both, or neither output channels
 				if (m_pc->m_out.enabled(outChannel, inChannel))
 				{
-					++numRoutedL;
 					if (m_pc->m_out.enabled(outChannel + 1, inChannel))
 					{
-						++numRoutedR;
 						for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 						{
 							outPtr[frame].leftRef() += inPtr[frame];
@@ -457,7 +445,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 				}
 				else if (m_pc->m_out.enabled(outChannel + 1, inChannel))
 				{
-					++numRoutedR;
 					for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 					{
 						outPtr[frame].rightRef() += inPtr[frame];
@@ -469,7 +456,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 				// This input channel may or may not be routed to the left output channel
 				if (!m_pc->m_out.enabled(outChannel, inChannel)) { continue; }
 
-				++numRoutedL;
 				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 				{
 					outPtr[frame].leftRef() += inPtr[frame];
@@ -480,43 +466,10 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 				// This input channel may or may not be routed to the right output channel
 				if (!m_pc->m_out.enabled(outChannel + 1, inChannel)) { continue; }
 
-				++numRoutedR;
 				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 				{
 					outPtr[frame].rightRef() += inPtr[frame];
 				}
-			}
-		}
-
-		// If num routed is 0 or 1, either no plugin channels were routed to the output
-		// and the output stays zeroed, or only one channel was routed and normalization is not needed
-
-		if (numRoutedL > 1)
-		{
-			if (numRoutedR > 1)
-			{
-				// Normalize output - both channels
-				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
-				{
-					outPtr[frame].leftRef() /= numRoutedL;
-					outPtr[frame].rightRef() /= numRoutedR;
-				}
-			}
-			else
-			{
-				// Normalize output - left channel
-				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
-				{
-					outPtr[frame].leftRef() /= numRoutedL;
-				}
-			}
-		}
-		else if (numRoutedR > 1)
-		{
-			// Normalize output - right channel
-			for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
-			{
-				outPtr[frame].rightRef() /= numRoutedR;
 			}
 		}
 	};
@@ -572,30 +525,17 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 	// Zero the output buffer - TODO: std::memcpy?
 	std::fill(out.begin(), out.end(), SampleFrame{});
 
-	// Counters for # of in channels routed to the current pair of out channels
-	mix_ch_t numRoutedL = 0;
-	mix_ch_t numRoutedR = 0;
-
-	const auto samples = in.frames * 2;
-	sample_t* outPtr = out.data()->data();
-
 	/*
 	 * This is essentially a function template with specializations for each
 	 * of the 16 total routing combinations of an input `SampleFrame*` to an
 	 * output `SampleFrame*`. The purpose is to eliminate all branching within
 	 * the inner for-loop in hopes of better performance.
 	 */
-	auto route2x2 = [&, samples, outPtr](const sample_t* inPtr, auto enabledPins) {
+	auto route2x2 = [samples = in.frames * 2, outPtr = out.data()->data()](const sample_t* inPtr, auto enabledPins) {
 		constexpr auto epL =  static_cast<std::uint8_t>(enabledPins() >> 2); // for L out channel
 		constexpr auto epR = static_cast<std::uint8_t>(enabledPins() & 0b0011); // for R out channel
 
 		if constexpr (enabledPins() == 0) { return; }
-
-		if constexpr (epL == 0b11) { numRoutedL += 2; }
-		else if constexpr (epL != 0) { ++numRoutedL; }
-
-		if constexpr (epR == 0b11) { numRoutedR += 2; }
-		else if constexpr (epR != 0) { ++numRoutedR; }
 
 		for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 		{
@@ -656,42 +596,6 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 				break;
 		}
 	}
-
-	// If the number of channels routed to a specific output is <= 1, no normalization is needed,
-	// otherwise each output sample needs to be divided by the number that were routed.
-
-	if (numRoutedL > 1)
-	{
-		if (numRoutedR > 1)
-		{
-			// Normalize both output channels
-			for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
-			{
-				outPtr[sampleIdx] /= numRoutedL;
-				outPtr[sampleIdx + 1] /= numRoutedR;
-			}
-		}
-		else
-		{
-			// Normalize left output channel
-			for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
-			{
-				outPtr[sampleIdx] /= numRoutedL;
-			}
-		}
-	}
-	else
-	{
-		// Either no input channels were routed to either output channel and output stays zeroed,
-		// or only one channel was routed and normalization is not needed
-		if (numRoutedR <= 1) { return; }
-
-		// Normalize right output channel
-		for (f_cnt_t sampleIdx = 1; sampleIdx < samples; sampleIdx += 2)
-		{
-			outPtr[sampleIdx] /= numRoutedR;
-		}
-	}
 }
 
 template<AudioDataLayout layout, int channelCountIn, int channelCountOut>
@@ -729,7 +633,7 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 			// Route to left output channel
 			if constexpr (epL == 0b11)
 			{
-				outPtr[sampleIdx] = (inPtr[sampleIdx] + inPtr[sampleIdx + 1]) / 2;
+				outPtr[sampleIdx] = inPtr[sampleIdx] + inPtr[sampleIdx + 1];
 			}
 			else if constexpr (epL == 0b01)
 			{
@@ -743,7 +647,7 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 			// Route to right output channel
 			if constexpr (epR == 0b11)
 			{
-				outPtr[sampleIdx + 1] = (inPtr[sampleIdx] + inPtr[sampleIdx + 1]) / 2;
+				outPtr[sampleIdx + 1] = inPtr[sampleIdx] + inPtr[sampleIdx + 1];
 			}
 			else if constexpr (epR == 0b01)
 			{

@@ -75,7 +75,6 @@ private:
 };
 
 
-// TODO: Is it always 0 inputs, 2 outputs?
 class ZynAddSubFxInstrument
 	: public AudioPlugin<Instrument, float,
 		PluginConfig{ .layout = AudioDataLayout::Split, .inputs = 0, .outputs = 2, .customBuffer = true }>

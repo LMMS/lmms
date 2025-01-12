@@ -252,8 +252,6 @@ void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent
 		auto parentModel = parent->parentModel();
 		assert(parentModel != nullptr);
 
-		const bool isOutMatrix = this == &parent->out();
-
 		m_pins.resize(count);
 		for (auto tcIdx = oldSize; tcIdx < count; ++tcIdx)
 		{
@@ -263,7 +261,7 @@ void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent
 			{
 				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
 				BoolModel* model = channels.emplace_back(new BoolModel{false, parentModel, name});
-				if (isOutMatrix)
+				if (isOutput())
 				{
 					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
 				}
@@ -280,7 +278,6 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 	assert(parentModel != nullptr);
 
 	const bool initialSetup = m_channelCount == 0;
-	const bool isOutMatrix = this == &parent->out();
 
 	if (channelCount() < count)
 	{
@@ -292,7 +289,7 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 			{
 				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
 				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parentModel, name});
-				if (isOutMatrix)
+				if (isOutput())
 				{
 					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
 				}
@@ -314,7 +311,7 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 
 	m_channelCount = count;
 
-	if (initialSetup && (!parent->isInstrument() || isOutMatrix))
+	if (initialSetup && (!parent->isInstrument() || isOutput()))
 	{
 		// Set default connections, unless this is the input matrix for an instrument
 		setDefaultConnections();
@@ -328,9 +325,16 @@ void PluginPinConnector::Matrix::setDefaultConnections()
 	switch (channelCount())
 	{
 		case 0: break;
-		case 1:
+		case 1: // mono
 			m_pins[0][0]->setValue(true);
-			m_pins[1][0]->setValue(true);
+			if (isOutput())
+			{
+				// Only the first track channel is routed to mono-input
+				// plugins, otherwise the pin connector's input-summing behavior
+				// would cause mono plugins to be louder than stereo ones.
+				// This behavior matches what REAPER's plug-in pin connector does.
+				m_pins[1][0]->setValue(true);
+			}
 			break;
 		default: // >= 2
 			m_pins[0][0]->setValue(true);
