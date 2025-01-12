@@ -102,6 +102,8 @@ public:
 	void adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction);
 	void adjustByDecibelDelta(float value);
 
+	void adjustByDialog();
+
 	void setDisplayConversion(bool b)
 	{
 		m_conversionFactor = b ? 100.0 : 1.0;
