@@ -953,7 +953,7 @@ QString AutomationClip::name() const
 	{
 		return m_objects.front()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(getOSSppecificModifierKey());
+	return tr( "Drag a control while pressing <%1>" ).arg(getOSSppecificModifierKeyString());
 }
 
 
