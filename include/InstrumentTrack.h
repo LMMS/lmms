@@ -26,6 +26,8 @@
 #ifndef LMMS_INSTRUMENT_TRACK_H
 #define LMMS_INSTRUMENT_TRACK_H
 
+#include <limits>
+
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
@@ -66,7 +68,7 @@ public:
 	~InstrumentTrack() override;
 
 	// used by instrument
-	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
 							NotePlayHandle * _n );
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
@@ -86,7 +88,7 @@ public:
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
-	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
+	void playNote( NotePlayHandle * _n, SampleFrame* _working_buffer );
 
 	QString instrumentName() const;
 	const Instrument *instrument() const
@@ -131,8 +133,7 @@ public:
 
 
 	// called by track
-	void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
+	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	using Track::setJournalling;

@@ -36,7 +36,7 @@ class LMMS_EXPORT SampleWaveform
 public:
 	struct Parameters
 	{
-		const sampleFrame* buffer;
+		const SampleFrame* buffer;
 		size_t size;
 		float amplification;
 		bool reversed;

@@ -58,7 +58,7 @@ public:
 
 
 private:
-	void writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames) override;
+	void writeBuffer(const SampleFrame* _ab, const fpp_t _frames) override;
 
 	bool startEncoding();
 	void finishEncoding();

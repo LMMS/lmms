@@ -137,7 +137,7 @@ void Lv2ControlBase::copyModelsToLmms() const
 
 
 
-void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
+void Lv2ControlBase::copyBuffersFromLmms(const SampleFrame* buf, fpp_t frames) {
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
 	for (const auto& c : m_procs) 
 	{
@@ -149,7 +149,7 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 
 
-void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
+void Lv2ControlBase::copyBuffersToLmms(SampleFrame* buf, fpp_t frames) const {
 	unsigned firstChan = 0; // tell the procs which channels they shall write to
 	for (const auto& c : m_procs) {
 		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, frames);

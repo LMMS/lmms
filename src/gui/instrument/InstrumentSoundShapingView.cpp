@@ -31,7 +31,7 @@
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "TabWidget.h"
 
@@ -48,7 +48,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 
 	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
 
-	for (int i = 0; i < InstrumentSoundShaping::NumTargets; ++i)
+	for (auto i = std::size_t{0}; i < InstrumentSoundShaping::NumTargets; ++i)
 	{
 		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
 		m_targetsTabWidget->addTab(m_envLfoViews[i],
@@ -83,7 +83,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	m_singleStreamInfoLabel = new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
 	m_singleStreamInfoLabel->setWordWrap(true);
 	// TODO Could also be rendered in system font size...
-	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), 10));
+	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), DEFAULT_FONT_SIZE));
 	m_singleStreamInfoLabel->setFixedWidth(242);
 
 	mainLayout->addWidget(m_singleStreamInfoLabel, 0, Qt::AlignTop);
@@ -115,7 +115,7 @@ void InstrumentSoundShapingView::modelChanged()
 	m_filterComboBox->setModel( &m_ss->m_filterModel );
 	m_filterCutKnob->setModel( &m_ss->m_filterCutModel );
 	m_filterResKnob->setModel( &m_ss->m_filterResModel );
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
+	for (auto i = std::size_t{0}; i < InstrumentSoundShaping::NumTargets; ++i)
 	{
 		m_envLfoViews[i]->setModel( m_ss->m_envLfoParameters[i] );
 	}

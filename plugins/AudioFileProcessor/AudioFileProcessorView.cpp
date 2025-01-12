@@ -31,7 +31,7 @@
 
 #include "ComboBox.h"
 #include "DataFile.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "PixmapButton.h"
 #include "SampleLoader.h"
 #include "Song.h"
@@ -227,7 +227,7 @@ void AudioFileProcessorView::paintEvent(QPaintEvent*)
 
 	int idx = a->sample().sampleFile().length();
 
-	p.setFont(adjustedToPixelSize(font(), 8));
+	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
 	QFontMetrics fm(p.font());
 

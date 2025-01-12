@@ -135,10 +135,10 @@ void PatternEditor::dropEvent(QDropEvent* de)
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;
-		if (t->getClips().size() == m_ps->numOfPatterns())
+		if (t->getClips().size() == static_cast<std::size_t>(m_ps->numOfPatterns()))
 		{
 			hasValidPatternClips = true;
-			for (int i = 0; i < t->getClips().size(); ++i)
+			for (auto i = std::size_t{0}; i < t->getClips().size(); ++i)
 			{
 				if (t->getClips()[i]->startPosition() != TimePos(i, 0))
 				{

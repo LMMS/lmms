@@ -64,10 +64,10 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine),
+		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
+	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
@@ -229,14 +229,11 @@ void AudioPortAudio::stopProcessing()
 }
 
 
-int AudioPortAudio::process_callback(
-	const float *_inputBuffer,
-	float * _outputBuffer,
-	unsigned long _framesPerBuffer )
+int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer)
 {
 	if( supportsCapture() )
 	{
-		audioEngine()->pushInputFrames( (sampleFrame*)_inputBuffer, _framesPerBuffer );
+		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
 	if( m_stopped )
@@ -261,8 +258,7 @@ int AudioPortAudio::process_callback(
 			}
 			m_outBufSize = frames;
 		}
-		const int min_len = std::min(static_cast<int>(_framesPerBuffer),
-			m_outBufSize - m_outBufPos);
+		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{
@@ -387,7 +383,7 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	form->addRow(tr("Device"), m_device);
 	
 /*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audioportaudio",
 							"channels" ).toInt() );

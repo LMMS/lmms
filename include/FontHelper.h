@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * FontHelper.h - Header function to help with fonts
+ *
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,29 +22,26 @@
  *
  */
 
-#ifndef LMMS_MEMORY_HELPER_H
-#define LMMS_MEMORY_HELPER_H
+#ifndef LMMS_FONT_HELPER_H
+#define LMMS_FONT_HELPER_H
 
-#include <cstddef>
+#include <QApplication>
+#include <QFont>
 
-namespace lmms
+constexpr int DEFAULT_FONT_SIZE = 12;
+constexpr int SMALL_FONT_SIZE = 10;
+constexpr int LARGE_FONT_SIZE = 14;
+
+namespace lmms::gui
 {
 
+// Convenience method to set the font size in pixels
+inline QFont adjustedToPixelSize(QFont font, int size)
+{
+	font.setPixelSize(size);
+	return font;
+}
 
-/**
- * Helper class to alocate aligned memory and free it.
- */
-class MemoryHelper {
-public:
+} // namespace lmms::gui
 
-	static void* alignedMalloc( size_t );
-
-	static void alignedFree( void* );
-
-private:
-};
-
-
-} // namespace lmms
-
-#endif // LMMS_MEMORY_HELPER_H
+#endif // LMMS_FONT_HELPER_H

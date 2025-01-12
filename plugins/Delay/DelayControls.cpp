@@ -34,11 +34,11 @@ namespace lmms
 DelayControls::DelayControls( DelayEffect* effect ):
 	EffectControls( effect ),
 	m_effect ( effect ),
-	m_delayTimeModel( 0.5, 0.01, 5.0, 0.0001, 5000.0, this, tr( "Delay samples" )) ,
-	m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
-	m_lfoTimeModel(2.0, 0.01, 5.0, 0.0001, 20000.0, this, tr( "LFO frequency" ) ),
-	m_lfoAmountModel(0.0, 0.0, 0.5, 0.0001, 2000.0, this, tr ( "LFO amount" ) ),
-	m_outGainModel( 0.0, -60.0, 20.0, 0.01, this, tr( "Output gain" ) )
+	m_delayTimeModel(0.5f, 0.01f, 5.f, 0.0001f, 5000.f, this, tr("Delay samples")) ,
+	m_feedbackModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Feedback")),
+	m_lfoTimeModel(2.f, 0.01f, 5.f, 0.0001f, 20000.f, this, tr("LFO frequency")),
+	m_lfoAmountModel(0.f, 0.f, 0.5f, 0.0001f, 2000.f, this, tr("LFO amount")),
+	m_outGainModel(0.f, -60.f, 20.f, 0.01f, this, tr("Output gain"))
 {
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
 	m_outPeakL = 0.0;

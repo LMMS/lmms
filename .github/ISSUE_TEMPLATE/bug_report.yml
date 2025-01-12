@@ -78,7 +78,8 @@ body:
       label: Screenshots / Minimum Reproducible Project
       description: |
         - Upload any screenshots showing the bug in action.
-        - If possible, also include a .mmp/.mmpz project containing the simplest possible setup needed to reproduce the bug.
+        - If possible, also include a .mmp/.mmpz project containing the simplest possible
+          setup needed to reproduce the bug.
 
         ***Note:** To upload a project file to GitHub, it will need to be placed in a .zip archive.*
   - type: checkboxes

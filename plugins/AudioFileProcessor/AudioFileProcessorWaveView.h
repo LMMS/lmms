@@ -118,6 +118,8 @@ private:
 	enum class DraggingType
 	{
 		Wave,
+		SlideWave,
+		ZoomWave,
 		SampleStart,
 		SampleEnd,
 		SampleLoop
@@ -125,17 +127,17 @@ private:
 
 	Sample const* m_sample;
 	QPixmap m_graph;
-	f_cnt_t m_from;
-	f_cnt_t m_to;
-	f_cnt_t m_last_from;
-	f_cnt_t m_last_to;
+	int m_from;
+	int m_to;
+	int m_last_from;
+	int m_last_to;
 	float m_last_amp;
 	knob* m_startKnob;
 	knob* m_endKnob;
 	knob* m_loopKnob;
-	f_cnt_t m_startFrameX;
-	f_cnt_t m_endFrameX;
-	f_cnt_t m_loopFrameX;
+	int m_startFrameX;
+	int m_endFrameX;
+	int m_loopFrameX;
 	bool m_isDragging;
 	QPoint m_draggingLastPoint;
 	DraggingType m_draggingType;
@@ -152,14 +154,14 @@ public:
 
 	void updateSampleRange();
 private:
-	void setTo(f_cnt_t to);
-	void setFrom(f_cnt_t from);
-	f_cnt_t range() const;
+	void setTo(int to);
+	void setFrom(int from);
+	int range() const;
 	void zoom(const bool out = false);
 	void slide(int px);
 	void slideSamplePointByPx(Point point, int px);
-	void slideSamplePointByFrames(Point point, f_cnt_t frames, bool slide_to = false);
-	void slideSampleByFrames(f_cnt_t frames);
+	void slideSamplePointByFrames(Point point, long frameOffset, bool slideTo = false);
+	void slideSampleByFrames(long frameOffset);
 
 	void slideSamplePointToFrames(Point point, f_cnt_t frames)
 	{

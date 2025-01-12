@@ -24,8 +24,8 @@
 #ifndef LMMS_GB_APU_WRAPPER_H
 #define LMMS_GB_APU_WRAPPER_H
 
-#include "Gb_Apu.h"
-#include "Multi_Buffer.h"
+#include <Gb_Apu.h>
+#include <Multi_Buffer.h>
 
 namespace lmms
 {

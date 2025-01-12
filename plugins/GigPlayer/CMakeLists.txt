@@ -1,15 +1,10 @@
 if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
-	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
+	include_directories(SYSTEM ${GIG_INCLUDE_DIRS})
 	SET(CMAKE_AUTOUIC ON)
 
 	# Required for not crashing loading files with libgig
 	add_compile_options("-fexceptions")
-
-	# disable deprecated check for mingw-x-libgig
-	if(LMMS_BUILD_WIN32)
-		add_compile_options("-Wno-deprecated")
-	endif(LMMS_BUILD_WIN32)
 
 	link_directories(${GIG_LIBRARY_DIRS})
 	link_libraries(${GIG_LIBRARIES})

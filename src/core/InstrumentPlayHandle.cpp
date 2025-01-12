@@ -40,7 +40,7 @@ InstrumentPlayHandle::InstrumentPlayHandle(Instrument * instrument, InstrumentTr
 	setAudioPort(instrumentTrack->audioPort());
 }
 
-void InstrumentPlayHandle::play(sampleFrame * working_buffer)
+void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 {
 	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
 

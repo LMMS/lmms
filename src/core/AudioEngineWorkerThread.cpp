@@ -79,7 +79,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 	while (processedJob && m_itemsDone < m_writeIndex)
 	{
 		processedJob = false;
-		for( int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i )
+		for (auto i = std::size_t{0}; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i)
 		{
 			ThreadableJob * job = m_items[i].exchange(nullptr);
 			if( job )

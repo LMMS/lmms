@@ -3,9 +3,8 @@ host = https://www.transifex.com
 minimum_perc = 51
 #Need to finish at least 51% before merging back
 
-[lmms.lmms]
+[o:lmms:p:lmms:r:lmms]
 file_filter = data/locale/<lang>.ts
 source_file = data/locale/en.ts
 source_lang = en
-type = QT
-
+type        = QT

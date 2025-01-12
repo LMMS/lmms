@@ -1,0 +1,3 @@
+rules:
+  line-length:
+    max: 120  # be conforming to LMMS coding rules

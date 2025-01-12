@@ -209,7 +209,7 @@ Lb302Filter3Pole::Lb302Filter3Pole(Lb302FilterKnobState *p_fs) :
 void Lb302Filter3Pole::recalc()
 {
 	// DO NOT CALL BASE CLASS
-	vcf_e0 = 0.000001;
+	vcf_e0 = 0.000001f;
 	vcf_e1 = 1.0;
 }
 
@@ -291,7 +291,7 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	accentToggle( false, this, tr( "Accent" ) ),
 	deadToggle( false, this, tr( "Dead" ) ),
 	db24Toggle( false, this, tr( "24dB/oct Filter" ) ),
-	vca_attack(1.0 - 0.96406088),
+	vca_attack(1.f - 0.96406088f),
 	vca_a0(0.5),
 	vca_a(0.),
 	vca_mode(VcaMode::NeverPlayed)
@@ -462,7 +462,7 @@ inline float GET_INC(float freq) {
 	return freq/Engine::audioEngine()->outputSampleRate();  // TODO: Use actual sampling rate.
 }
 
-int Lb302Synth::process(sampleFrame *outbuf, const int size)
+int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 
@@ -498,13 +498,10 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 	// hard coded value of 0.99897516.
 	auto decay = computeDecayFactor(0.245260770975f, 1.f / 65536.f);
 
-	for( int i=0; i<size; i++ ) 
+	for (auto i = std::size_t{0}; i < size; i++)
 	{
 		// start decay if we're past release
-		if( i >= release_frame )
-		{
-			vca_mode = VcaMode::Decay;
-		}
+		if (i >= release_frame) { vca_mode = VcaMode::Decay; }
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
@@ -732,7 +729,7 @@ void Lb302Synth::initSlide()
 }
 
 
-void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void Lb302Synth::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -750,8 +747,8 @@ void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 		m_notes.prepend( _n );
 	}
 	m_notesMutex.unlock();
-	
-	release_frame = qMax( release_frame, _n->framesLeft() + _n->offset() );
+
+	release_frame = std::max(release_frame, _n->framesLeft() + _n->offset());
 }
 
 
@@ -791,7 +788,7 @@ void Lb302Synth::processNote( NotePlayHandle * _n )
 
 
 
-void Lb302Synth::play( sampleFrame * _working_buffer )
+void Lb302Synth::play( SampleFrame* _working_buffer )
 {
 	m_notesMutex.lock();
 	while( ! m_notes.isEmpty() )

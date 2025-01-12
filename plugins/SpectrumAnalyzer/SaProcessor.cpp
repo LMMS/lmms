@@ -98,9 +98,9 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
+void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 {
-	LocklessRingBufferReader<sampleFrame> reader(ring_buffer);
+	LocklessRingBufferReader<SampleFrame> reader(ring_buffer);
 
 	// Processing thread loop
 	while (!m_terminate)
@@ -232,7 +232,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (int target = std::max(static_cast<int>(band_start), 0);
+								for (auto target = static_cast<std::size_t>(std::max(band_start, 0.f));
 									 target < band_end && target < waterfallWidth(); target++)
 								{
 									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
@@ -259,7 +259,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 									accL += ((int)band_end - band_start) * m_normSpectrumL[i];
 									accR += ((int)band_end - band_start) * m_normSpectrumR[i];
 
-									if (target >= 0 && target < waterfallWidth()) {pixel[target] = makePixel(accL, accR);}
+									if (target >= 0 && static_cast<std::size_t>(target) < waterfallWidth()) {
+										pixel[target] = makePixel(accL, accR);
+									}
 
 									// save remaining portion of the band for the following band / pixel
 									accL = (band_end - (int)band_end) * m_normSpectrumL[i];
@@ -270,7 +272,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (int target = std::max(static_cast<int>(band_start), 0);
+							for (auto target = static_cast<std::size_t>(std::max(band_start, 0.f));
 								 target < band_end && target < waterfallWidth(); target++)
 							{
 								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
