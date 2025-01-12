@@ -953,12 +953,7 @@ QString AutomationClip::name() const
 	{
 		return m_objects.front()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" )
-#ifdef LMMS_BUILD_APPLE
-		.arg(UI_ALT_KEY);
-#else
-		.arg(UI_CTRL_KEY);
-#endif
+	return tr( "Drag a control while pressing <%1>" ).arg(getOSSppecificModifierKey());
 }
 
 
