@@ -96,7 +96,6 @@ float FloatModelEditorBase::getValue(const QPoint & p)
 	if (getGUI()->mainWindow()->isShiftPressed())
 	{
 		value /= 4.0f;
-		value = qBound(-4.0f, value, 4.0f);
 	}
 
 	return value * pageSize();
