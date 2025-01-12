@@ -172,7 +172,6 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 		const QPoint & p = me->pos();
 		m_lastMousePos = p;
 		m_lastModelValue = model()->value();
-		m_leftOver = 0.0f;
 
 		emit sliderPressed();
 
