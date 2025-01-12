@@ -44,6 +44,7 @@
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
+#include "OperatingSystemHelpers.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "SampleClip.h"

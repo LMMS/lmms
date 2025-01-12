@@ -53,6 +53,7 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
+#include "OperatingSystemHelpers.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"

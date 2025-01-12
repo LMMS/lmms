@@ -40,6 +40,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "OperatingSystemHelpers.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
