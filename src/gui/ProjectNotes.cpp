@@ -41,6 +41,7 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "OperatingSystemHelpers.h"
 #include "Song.h"
 
 

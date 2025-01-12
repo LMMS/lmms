@@ -59,6 +59,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
+#include "OperatingSystemHelpers.h"
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
