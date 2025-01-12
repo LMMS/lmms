@@ -96,6 +96,7 @@ float FloatModelEditorBase::getValue(const QPoint & p)
 	if (getGUI()->mainWindow()->isShiftPressed())
 	{
 		value /= 4.0f;
+		value = qBound(-4.0f, value, 4.0f);
 	}
 
 	return value * pageSize();
@@ -170,7 +171,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 
 		const QPoint & p = me->pos();
 		m_lastMousePos = p;
-		m_lastModelValue = model()->value();
+		m_leftOver = 0.0f;
 
 		emit sliderPressed();
 
@@ -203,6 +204,8 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 		// knob position is changed depending on last mouse position
 		setPosition(me->pos() - m_lastMousePos);
 		emit sliderMoved(model()->value());
+		// original position for next time is current position
+		m_lastMousePos = me->pos();
 	}
 	s_textFloat->setText(displayValue());
 	s_textFloat->show();
@@ -343,14 +346,20 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 void FloatModelEditorBase::setPosition(const QPoint & p)
 {
-	const float valueOffset = getValue(p);
-	const float scaledValueOffset = m_lastModelValue - model()->scaledValue(model()->inverseScaledValue(m_lastModelValue) - valueOffset);
+	const float valueOffset = getValue(p) + m_leftOver;
+	const float currentValue = model()->value();
+	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
+	const float roundedValue = qRound((currentValue - scaledValueOffset) / step) * step;
 
-	if (qAbs(valueOffset) >= step)
+	if (roundedValue != currentValue)
 	{
-		float roundedValue = qRound((m_lastModelValue - scaledValueOffset) / step) * step;
 		model()->setValue(roundedValue);
+		m_leftOver = 0.0f;
+	}
+	else
+	{
+		m_leftOver = valueOffset;
 	}
 }
 
