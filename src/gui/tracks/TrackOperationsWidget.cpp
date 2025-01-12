@@ -181,13 +181,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
  */
 void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
-	if( me->button() == Qt::LeftButton &&
-#ifdef LMMS_BUILD_APPLE
-		me->modifiers() & Qt::AltModifier &&
-#else
-		me->modifiers() & Qt::ControlModifier &&
-#endif
-			m_trackView->getTrack()->type() != Track::Type::Pattern)
+	if (me->button() == Qt::LeftButton && me->modifiers() & getOSSpecificModifierKey() &&
+		m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
 		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );

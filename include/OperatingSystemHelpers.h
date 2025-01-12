@@ -27,6 +27,8 @@
 
 #include "lmmsconfig.h"
 
+#include "qnamespace.h"
+
 
 namespace lmms
 {
@@ -60,6 +62,15 @@ constexpr const char* getOSSppecificModifierKeyString()
 #else
     return UI_CTRL_KEY;
 #endif
+}
+
+constexpr Qt::KeyboardModifier getOSSpecificModifierKey()
+{
+#ifdef LMMS_BUILD_APPLE
+	return Qt::AltModifier;
+#else
+	return Qt::ControlModifier;
+#endif    
 }
 
 } // namespace lmms
