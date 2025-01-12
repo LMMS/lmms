@@ -31,6 +31,13 @@
 namespace lmms
 {
 
+constexpr char LADSPA_PATH_SEPERATOR =
+#ifdef LMMS_BUILD_WIN32
+';';
+#else
+':';
+#endif
+
 // Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
 constexpr const char* UI_CTRL_KEY =
 #ifdef LMMS_BUILD_APPLE
