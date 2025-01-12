@@ -86,8 +86,6 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool model
 
 	m_conversionFactor = 100.0;
 
-	setFocusPolicy(Qt::StrongFocus);
-
 	if (model)
 	{
 		// We currently assume that the model is not changed later on and only connect here once
@@ -107,6 +105,19 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPix
 	m_knob = knob;
 }
 
+void Fader::adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction)
+{
+	const auto adjustmentDb = determineAdjustmentDelta(modifiers) * (direction == AdjustmentDirection::Down ? -1. : 1.);
+	adjustByDecibelDelta(adjustmentDb);
+}
+
+void Fader::adjustByDecibelDelta(float value)
+{
+	adjustModelByDBDelta(value);
+
+	updateTextFloat();
+	s_textFloat->setVisibilityTimeOut(1000);
+}
 
 void Fader::contextMenuEvent(QContextMenuEvent* ev)
 {
@@ -247,43 +258,9 @@ void Fader::wheelEvent (QWheelEvent* ev)
 
 	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
 
-	adjustModelByDBDelta(increment);
-
-	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut(1000);
+	adjustByDecibelDelta(increment);
 
 	ev->accept();
-}
-
-void Fader::keyPressEvent(QKeyEvent *event)
-{
-	bool handled = false;
-
-	const auto key = event->key();
-	const auto modifiers = event->modifiers();
-
-	if (key == Qt::Key_Up || key == Qt::Key_Plus)
-	{
-		const float incrementValue = determineAdjustmentDelta(modifiers);
-		adjustModelByDBDelta(incrementValue);
-		handled = true;
-	}
-	else if (key == Qt::Key_Down || key == Qt::Key_Minus)
-	{
-		const float incrementValue = determineAdjustmentDelta(modifiers);
-		adjustModelByDBDelta(-incrementValue);
-		handled = true;
-	}
-
-	if (handled)
-	{
-		updateTextFloat();
-		s_textFloat->setVisibilityTimeOut(1000);
-	}
-	else
-	{
-		QWidget::keyPressEvent(event);
-	}
 }
 
 float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const

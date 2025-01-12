@@ -93,6 +93,15 @@ public:
 	inline bool getRenderUnityLine() const { return m_renderUnityLine; }
 	inline void setRenderUnityLine(bool value = true) { m_renderUnityLine = value; }
 
+	enum class AdjustmentDirection
+	{
+		Up,
+		Down
+	};
+
+	void adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction);
+	void adjustByDecibelDelta(float value);
+
 	void setDisplayConversion(bool b)
 	{
 		m_conversionFactor = b ? 100.0 : 1.0;
@@ -115,7 +124,6 @@ private:
 	void mouseMoveEvent(QMouseEvent* ev) override;
 	void mouseReleaseEvent(QMouseEvent* me) override;
 	void wheelEvent(QWheelEvent* ev) override;
-	void keyPressEvent(QKeyEvent *event) override;
 	void paintEvent(QPaintEvent* ev) override;
 
 	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
