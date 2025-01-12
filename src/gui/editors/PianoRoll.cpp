@@ -2208,7 +2208,7 @@ void PianoRoll::computeSelectedNotes(bool shift)
 	{
 		for( Note *note : m_midiClip->notes() )
 		{
-			// make a new selection unless they're holding shift
+			// make a new selection unless they're holding shift (or control)
 			if( ! shift )
 			{
 				note->setSelected( false );
@@ -2235,7 +2235,7 @@ void PianoRoll::computeSelectedNotes(bool shift)
 				pos_ticks + len_ticks > sel_pos_start &&
 				pos_ticks < sel_pos_end )
 			{
-				// remove from selection when holding shift
+				// remove from selection when holding shift (or control)
 				bool selected = shift && note->selected();
 				note->setSelected( ! selected);
 			}
@@ -2270,7 +2270,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			// select the notes within the selection rectangle and
 			// then destroy the selection rectangle
 			computeSelectedNotes(
-					me->modifiers() & Qt::ShiftModifier );
+					me->modifiers() & (Qt::ShiftModifier | Qt::ControlModifier));
 		}
 		else if( m_action == Action::MoveNote )
 		{
