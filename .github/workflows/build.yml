@@ -48,8 +48,11 @@ jobs:
           setup-python: false
       - name: Download and bootstrap vcpkg
         run: |
-          git clone --branch 2024.05.24 https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.sh
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          latestTag=$(git describe --tags --abbrev=0)
+          git checkout $latestTag
+          ./bootstrap-vcpkg.sh
           echo "VCPKG_INSTALLATION_ROOT=${GITHUB_WORKSPACE}/vcpkg" >> "$GITHUB_ENV"
       - name: Cache vcpkg dependencies
         id: cache-deps
