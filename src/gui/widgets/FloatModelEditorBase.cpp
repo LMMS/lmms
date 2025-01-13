@@ -350,7 +350,7 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 	const float currentValue = model()->value();
 	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
-	const float roundedValue = qRound((currentValue - scaledValueOffset) / step) * step;
+	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
 
 	if (roundedValue != currentValue)
 	{
