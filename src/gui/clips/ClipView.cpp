@@ -495,10 +495,11 @@ void ClipView::updateCursor(QMouseEvent * me)
 	auto sClip = dynamic_cast<SampleClip*>(m_clip);
 	auto pClip = dynamic_cast<PatternClip*>(m_clip);
 	auto aClip = dynamic_cast<AutomationClip*>(m_clip);
+	auto mClip = dynamic_cast<MidiClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip))))
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip || mClip))))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -633,6 +634,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		auto aClip = dynamic_cast<AutomationClip*>(m_clip);
+		auto mClip = dynamic_cast<MidiClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
 		if (me->modifiers() & Qt::ControlModifier && !knifeMode)
@@ -677,7 +679,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip))
+				else if (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip || mClip))
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -916,7 +918,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			auto pClip = dynamic_cast<PatternClip*>(m_clip);
 			auto aClip = dynamic_cast<AutomationClip*>(m_clip);
-			if( sClip || pClip || aClip )
+			auto mClip = dynamic_cast<MidiClip*>(m_clip);
+			if( sClip || pClip || aClip || mClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
@@ -953,11 +956,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				{
 					m_clip->movePosition(t);
 					m_clip->changeLength(m_clip->length() + positionOffset);
-					if (sClip)
-					{
-						sClip->setStartTimeOffset(sClip->startTimeOffset() + positionOffset);
-					}
-					else if (pClip)
+					if (pClip)
 					{
 						// Modulus the start time offset as we need it only for offsets
 						// inside the pattern length. This is done to prevent a value overflow.
@@ -969,9 +968,9 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
 						pClip->setStartTimeOffset(position);
 					}
-					else if (aClip)
+					else if (sClip || aClip || mClip)
 					{
-						aClip->setStartTimeOffset(aClip->startTimeOffset() + positionOffset);
+						m_clip->setStartTimeOffset(m_clip->startTimeOffset() + positionOffset);
 					}
 					m_clip->setHasBeenResized(true);
 				}

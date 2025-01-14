@@ -445,11 +445,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Compute pixels per bar
 	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH
 						: width() - BORDER_WIDTH;
-	const float pixelsPerBar = baseWidth / (float) m_clip->length().getBar();
+	const float pixelsPerBar = 1.0f * baseWidth / m_clip->length() * TimePos::ticksPerBar();
+
+	const int offset = m_clip->startTimeOffset();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
-	const float barLength = 1. / m_clip->length().getBar();
-	const float tickLength = barLength / TimePos::ticksPerBar();
+	const float tickLength = 1.0f / m_clip->length();
 
 	const int x_base = BORDER_WIDTH;
 
@@ -611,7 +612,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			int mappedNoteKey = currentNote->key() - minKey;
 			int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
 
-			float const noteStartX = currentNote->pos() * tickLength;
+			float const noteStartX = (currentNote->pos() + offset) * tickLength;
 			float const noteLength = currentNote->length() * tickLength;
 
 			float const noteStartY = invertedMappedNoteKey * noteHeight;
@@ -636,14 +637,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	for( bar_t t = 1; t < m_clip->length().getBar(); ++t )
+	for(float t = (offset % TimePos::ticksPerBar()) * pixelsPerBar / TimePos::ticksPerBar(); t < m_clip->length(); t += pixelsPerBar)
 	{
-		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				BORDER_WIDTH, x_base + static_cast<int>(
-						pixelsPerBar * t ) - 1, BORDER_WIDTH + lineSize );
-		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
+		p.drawLine( x_base + t - 1,
+				BORDER_WIDTH,
+				x_base + t - 1,
+				BORDER_WIDTH + lineSize );
+		p.drawLine( x_base + t - 1,
 				rect().bottom() - ( lineSize + BORDER_WIDTH ),
-				x_base + static_cast<int>( pixelsPerBar * t ) - 1,
+				x_base + t - 1,
 				rect().bottom() - BORDER_WIDTH );
 	}
 
@@ -699,35 +701,16 @@ bool MidiClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto leftClip = new MidiClip(m_clip->instrumentTrack());
-	auto rightClip = new MidiClip(m_clip->instrumentTrack());
-	
-	for (Note const* note : m_clip->m_notes)
-	{
-		if (note->pos() >= pos)
-		{
-			auto movedNote = Note{*note};
-			movedNote.setPos(note->pos() - pos);
-			rightClip->addNote(movedNote, false);
-		}
-	}
+	auto rightClip = new MidiClip(*m_clip);
 
-	for (Note const* note : m_clip->m_notes)
-	{
-		if (note->pos() < pos)
-		{
-			leftClip->addNote(*note, false);
-		}
-	}
-
-	leftClip->movePosition(m_initialClipPos);
-	leftClip->updateLength();
+	m_clip->changeLength(splitPos - m_initialClipPos);
 
 	rightClip->movePosition(splitPos);
-	rightClip->updateLength();
+	rightClip->changeLength(m_initialClipEnd - splitPos);
+	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
+	m_clip->setHasBeenResized(true);
+	rightClip->setHasBeenResized(true);
 
-	remove();
-	
 	m_clip->getTrack()->restoreJournallingState();
 	return true;
 }

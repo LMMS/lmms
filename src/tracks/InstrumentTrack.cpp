@@ -42,6 +42,8 @@
 #include "Pitch.h"
 #include "Song.h"
 
+#include <QDebug>
+
 namespace lmms
 {
 
@@ -750,7 +752,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		TimePos cur_start = _start;
 		if( _clip_num < 0 )
 		{
-			cur_start -= c->startPosition();
+			cur_start -= c->startPosition() + c->startTimeOffset();
 		}
 
 		// get all notes from the given clip...
@@ -771,7 +773,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			}
 		}
 
-		while (nit != notes.end() && (*nit)->pos() == cur_start)
+		while (nit != notes.end() && (*nit)->pos() == cur_start && (*nit)->pos() < c->length() - c->startTimeOffset())
 		{
 			const auto currentNote = *nit;
 
@@ -788,7 +790,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );

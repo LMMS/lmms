@@ -48,9 +48,13 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
+		setAutoResize(true);
+	}
+	else
+	{
+		setAutoResize(false);
 	}
 	init();
-	setAutoResize( true );
 }
 
 
@@ -145,18 +149,23 @@ void MidiClip::updateLength()
 		return;
 	}
 
-	tick_t max_length = TimePos::ticksPerBar();
-
-	for (const auto& note : m_notes)
+	// If the clip has already been manually resized, don't automatically resize it.
+	// Unless we are a pattern clip, where you can't resize stuff manually
+	if (!getHasBeenResized() || getAutoResize())
 	{
-		if (note->length() > 0)
+		tick_t max_length = TimePos::ticksPerBar();
+
+		for (const auto& note : m_notes)
 		{
-			max_length = std::max<tick_t>(max_length, note->endPos());
+			if (note->length() > 0)
+			{
+				max_length = std::max<tick_t>(max_length, note->endPos());
+			}
 		}
+		changeLength( TimePos( max_length ).nextFullBar() *
+							TimePos::ticksPerBar() );
+		updatePatternTrack();
 	}
-	changeLength( TimePos( max_length ).nextFullBar() *
-						TimePos::ticksPerBar() );
-	updatePatternTrack();
 }
 
 
@@ -374,6 +383,8 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
+	_this.setAttribute("been_resized", QString::number(getHasBeenResized()));
+	_this.setAttribute("off", startTimeOffset());
 	
 	if (const auto& c = color())
 	{
@@ -393,6 +404,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "steps", m_steps );
+	_this.setAttribute( "len", length() );
 
 	// now save settings of all notes
 	for (auto& note : m_notes)
@@ -446,7 +458,20 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	}
 
 	checkType();
-	updateLength();
+
+	int len = _this.attribute( "len" ).toInt();
+	if( len <= 0 )
+	{
+		// TODO: Handle with an upgrade method
+		updateLength();
+	}
+	else
+	{
+		changeLength( len );
+	}
+	
+	setHasBeenResized(_this.attribute( "been_resized" ).toInt());
+	setStartTimeOffset(_this.attribute( "off" ).toInt());
 
 	emit dataChanged();
 }
