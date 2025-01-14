@@ -777,11 +777,13 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		{
 			const auto currentNote = *nit;
 
+			// Calculate the overlap of the note over the clip end.
+			const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
 			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
 			// plays for the whole length of the sample
 			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
-				: currentNote->length().frames(frames_per_tick);
+				: (currentNote->length() - noteOverlap) * frames_per_tick;
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
