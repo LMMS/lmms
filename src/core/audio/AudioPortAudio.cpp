@@ -23,7 +23,6 @@
  *
  */
 
-
 #include "AudioPortAudio.h"
 
 #ifdef LMMS_HAVE_PORTAUDIO
@@ -36,8 +35,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 
-namespace lmms
-{
+namespace lmms {
 
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	: AudioDevice(std::clamp<ch_cnt_t>(ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
@@ -52,18 +50,19 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	successful = false;
 
 	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
+	if (err != paNoError)
+	{
 		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		m_wasPAInitError = true;
 		return;
 	}
 
-	const QString& backend = ConfigManager::inst()->value( "audioportaudio", "backend" );
-	const QString& device = ConfigManager::inst()->value( "audioportaudio", "device" );
+	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
+	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
 	PaDeviceIndex inputDeviceIndex = Pa_GetDefaultInputDevice();
 	PaDeviceIndex outputDeviceIndex = Pa_GetDefaultOutputDevice();
-	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
+	for (int i = 0; i < Pa_GetDeviceCount(); ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 		if (deviceInfo->name == device && Pa_GetHostApiInfo(deviceInfo->hostApi)->name == backend)
@@ -100,16 +99,10 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	}
 	else { m_supportsCapture = false; }
 
-	err = Pa_OpenStream(&m_paStream,
-		inputParameters,
-		outputParameters,
-		sampleRate(),
-		engine->framesPerPeriod(),
-		paNoFlag, 
-		processCallback,
-		this);
+	err = Pa_OpenStream(&m_paStream, inputParameters, outputParameters, sampleRate(), engine->framesPerPeriod(),
+		paNoFlag, processCallback, this);
 
-	if( err != paNoError )
+	if (err != paNoError)
 	{
 		std::cerr << "Couldn't open PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
@@ -129,43 +122,27 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	successful = true;
 }
 
-
-
-
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
 
-	if( !m_wasPAInitError )
-	{
-		Pa_Terminate();
-	}
+	if (!m_wasPAInitError) { Pa_Terminate(); }
 }
-
-
-
 
 void AudioPortAudio::startProcessing()
 {
-	PaError err = Pa_StartStream( m_paStream );
-	if( err != paNoError )
-	{
-		std::cerr << "Failed to start PortAudio stream: " << Pa_GetErrorText(err) << '\n';
-	}
+	PaError err = Pa_StartStream(m_paStream);
+	if (err != paNoError) { std::cerr << "Failed to start PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 }
-
-
-
 
 void AudioPortAudio::stopProcessing()
 {
-	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
+	if (m_paStream && Pa_IsStreamActive(m_paStream))
 	{
-		PaError err = Pa_StopStream( m_paStream );
+		PaError err = Pa_StopStream(m_paStream);
 		if (err != paNoError) { std::cerr << "Failed to stop PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 	}
 }
-
 
 int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer)
 {
@@ -173,7 +150,7 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 
 	while (framesPerBuffer)
 	{
-		if( m_outBufPos == 0 )
+		if (m_outBufPos == 0)
 		{
 			m_outBufSize = getNextBuffer(m_outBuf.get());
 			if (m_outBufSize == 0)
@@ -209,18 +186,16 @@ int AudioPortAudio::processCallback(const void* inputBuffer, void* outputBuffer,
 		static_cast<const float*>(inputBuffer), static_cast<float*>(outputBuffer), framesPerBuffer);
 }
 
-
-
-
 void gui::AudioPortAudioSetupWidget::updateBackends()
 {
 	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
+	if (err != paNoError)
+	{
 		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
 
-	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
+	for (int i = 0; i < Pa_GetHostApiCount(); ++i)
 	{
 		const auto hi = Pa_GetHostApiInfo(i);
 		m_backendComboBox->addItem(hi->name);
@@ -229,23 +204,21 @@ void gui::AudioPortAudioSetupWidget::updateBackends()
 	Pa_Terminate();
 }
 
-
-
-
 void gui::AudioPortAudioSetupWidget::updateDevices()
 {
 	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
+	if (err != paNoError)
+	{
 		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
 
 	const QString& backend = m_backendComboBox->currentText();
 	int hostApi = 0;
-	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
+	for (int i = 0; i < Pa_GetHostApiCount(); ++i)
 	{
 		const auto hi = Pa_GetHostApiInfo(i);
-		if( backend == hi->name )
+		if (backend == hi->name)
 		{
 			hostApi = i;
 			break;
@@ -253,7 +226,7 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 	}
 
 	m_deviceComboBox->clear();
-	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
+	for (int i = 0; i < Pa_GetDeviceCount(); ++i)
 	{
 		const auto di = Pa_GetDeviceInfo(i);
 		if (di->hostApi == hostApi) { m_deviceComboBox->addItem(di->name); }
@@ -261,13 +234,11 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 	Pa_Terminate();
 }
 
-
-
-
 void gui::AudioPortAudioSetupWidget::updateChannels()
 {
 	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
+	if (err != paNoError)
+	{
 		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
 		return;
 	}
@@ -277,7 +248,7 @@ void gui::AudioPortAudioSetupWidget::updateChannels()
 gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 	: AudioDeviceSetupWidget(AudioPortAudio::name(), _parent)
 {
-	QFormLayout * form = new QFormLayout(this);
+	QFormLayout* form = new QFormLayout(this);
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
 	m_backendComboBox = new QComboBox(this);
@@ -293,9 +264,6 @@ void gui::AudioPortAudioSetupWidget::saveSettings()
 	ConfigManager::inst()->setValue("audioportaudio", "device", m_deviceComboBox->currentText());
 }
 
-
-
-
 void gui::AudioPortAudioSetupWidget::show()
 {
 	if (m_backendComboBox->count() == 0)
@@ -303,10 +271,8 @@ void gui::AudioPortAudioSetupWidget::show()
 		// populate the backend model the first time we are shown
 		updateBackends();
 
-		const QString& backend = ConfigManager::inst()->value(
-			"audioportaudio", "backend" );
-		const QString& device = ConfigManager::inst()->value(
-			"audioportaudio", "device" );
+		const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
+		const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
 		const auto backendIndex = std::max(0, m_backendComboBox->findText(backend));
 		m_backendComboBox->setCurrentIndex(backendIndex);
@@ -322,8 +288,4 @@ void gui::AudioPortAudioSetupWidget::show()
 
 } // namespace lmms
 
-
 #endif // LMMS_HAVE_PORTAUDIO
-
-
-
