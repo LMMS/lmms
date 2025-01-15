@@ -81,7 +81,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		m_outputParameters.device = outputDeviceIndex;
 		m_outputParameters.channelCount = channels();
 		m_outputParameters.sampleFormat = paFloat32;
-		m_outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputDeviceIndex)->defaultLowOutputLatency;
+		m_outputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
 		m_outputParameters.hostApiSpecificStreamInfo = nullptr;
 		outputParameters = &m_outputParameters;
 	}
@@ -92,7 +92,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		m_inputParameters.device = inputDeviceIndex;
 		m_inputParameters.channelCount = channels();
 		m_inputParameters.sampleFormat = paFloat32;
-		m_inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputDeviceIndex)->defaultLowInputLatency;
+		m_inputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
 		m_inputParameters.hostApiSpecificStreamInfo = nullptr;
 		inputParameters = &m_inputParameters;
 		m_supportsCapture = true;
