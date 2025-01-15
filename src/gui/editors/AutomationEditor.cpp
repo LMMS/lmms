@@ -107,7 +107,8 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0),
-	m_ghostNoteColor(0, 0, 0)
+	m_ghostNoteColor(0, 0, 0),
+	m_outOfBoundsShade(0, 0, 0, 128)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -1379,6 +1380,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				drawAutomationTangents(p, it);
 			}
 		}
+
+		// draw clip bounds overlay
+		p.fillRect(
+			xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
+			TOP_MARGIN,
+			width() - 10,
+			grid_bottom,
+			m_outOfBoundsShade
+		);
+		p.fillRect(
+			0,
+			TOP_MARGIN,
+			xCoordOfTick(-m_clip->startTimeOffset()),
+			grid_bottom,
+			m_outOfBoundsShade
+		);
 	}
 	else
 	{

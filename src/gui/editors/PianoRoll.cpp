@@ -210,6 +210,7 @@ PianoRoll::PianoRoll() :
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
 	m_backgroundShade( 0, 0, 0 ),
+	m_outOfBoundsShade(0, 0, 0, 128),
 	m_whiteKeyWidth(WHITE_KEY_WIDTH),
 	m_blackKeyWidth(BLACK_KEY_WIDTH)
 {
@@ -3023,6 +3024,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
 
+	auto xCoordOfTick = [=](int tick) {
+		return m_whiteKeyWidth + (
+			(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
+		);
+	};
+
 	// Order of drawing
 	// - vertical quantization lines
 	// - piano roll + horizontal key lines
@@ -3097,11 +3104,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6) { q = 6; }
 		}
-		auto xCoordOfTick = [=](int tick) {
-			return m_whiteKeyWidth + (
-				(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
-			);
-		};
 		p.setPen(m_lineColor);
 		for (tick = m_currentPosition - m_currentPosition % q,
 			x = xCoordOfTick(tick);
@@ -3532,13 +3534,25 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
+		// draw clip bounds
+		p.fillRect(
+			xCoordOfTick(m_midiClip->length() - m_midiClip->startTimeOffset()),
+			PR_TOP_MARGIN,
+			width() - 10,
+			noteEditBottom(),
+			m_outOfBoundsShade
+		);
+		p.fillRect(
+			0,
+			PR_TOP_MARGIN,
+			xCoordOfTick(-m_midiClip->startTimeOffset()),
+			noteEditBottom(),
+			m_outOfBoundsShade
+		);
+
 		// -- Knife tool (draw cut line)
 		if (m_action == Action::Knife)
 		{
-			auto xCoordOfTick = [this](int tick) {
-				return m_whiteKeyWidth + (
-					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
-			};
 			Note* n = noteUnderMouse();
 			if (n)
 			{
