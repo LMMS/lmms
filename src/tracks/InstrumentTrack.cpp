@@ -42,8 +42,6 @@
 #include "Pitch.h"
 #include "Song.h"
 
-#include <QDebug>
-
 namespace lmms
 {
 
@@ -763,19 +761,25 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
 
-
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-bar
-			while( nit != notes.end() && ( *nit )->pos() < cur_start )
+			// skip notes which end before start-bar
+			while( nit != notes.end() && ( *nit )->endPos() < cur_start )
 			{
 				++nit;
 			}
 		}
 
-		while (nit != notes.end() && (*nit)->pos() == cur_start && (*nit)->pos() < c->length() - c->startTimeOffset())
+		while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset())
 		{
 			const auto currentNote = *nit;
+			// Skip any notes note at the current time pos or not overlapping with the start.
+			if (!(currentNote->pos() == cur_start
+				|| (cur_start == -c->startTimeOffset() && (*nit)->pos() < cur_start && (*nit)->endPos() > cur_start)))
+			{
+				++nit;
+				continue;
+			}
 
 			// Calculate the overlap of the note over the clip end.
 			const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
@@ -783,7 +787,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			// plays for the whole length of the sample
 			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
-				: (currentNote->length() - noteOverlap) * frames_per_tick;
+				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
