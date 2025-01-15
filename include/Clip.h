@@ -175,7 +175,7 @@ private:
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 	bool m_autoResize;
-	bool m_hasBeenResized;
+	bool m_hasBeenResized = false;
 
 	bool m_selectViewOnCreate;
 
