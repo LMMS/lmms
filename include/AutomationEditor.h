@@ -242,6 +242,8 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
+	void adjustLeftRightScoll(int value);
+
 	TimePos m_currentPosition;
 
 	Action m_action;

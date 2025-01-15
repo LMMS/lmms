@@ -1,7 +1,7 @@
 /*
- * gui_templates.h - GUI-specific templates
+ * Metronome.cpp
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,22 +22,20 @@
  *
  */
 
-#ifndef LMMS_GUI_TEMPLATES_H
-#define LMMS_GUI_TEMPLATES_H
+#include "Metronome.h"
 
-#include <QApplication>
-#include <QFont>
+#include "Engine.h"
+#include "SamplePlayHandle.h"
 
-namespace lmms::gui
+namespace lmms {
+void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset)
 {
+	const auto ticksPerBeat = ticksPerBar / beatsPerBar;
+	if (currentTick % ticksPerBeat != 0 || !m_active) { return; }
 
-// Convenience method to set the font size in pixels
-inline QFont adjustedToPixelSize(QFont font, int size)
-{
-	font.setPixelSize(size);
-	return font;
+	const auto handle = currentTick % ticksPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
+													   : new SamplePlayHandle("misc/metronome01.ogg");
+	handle->setOffset(bufferOffset);
+	Engine::audioEngine()->addPlayHandle(handle);
 }
-
-} // namespace lmms::gui
-
-#endif // LMMS_GUI_TEMPLATES_H
+} // namespace lmms

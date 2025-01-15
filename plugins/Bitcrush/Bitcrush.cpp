@@ -100,13 +100,8 @@ inline float BitcrushEffect::noise( float amt )
 	return fastRandf( amt * 2.0f ) - amt;
 }
 
-bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
 	{
@@ -222,7 +217,6 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 
 	// now downsample and write it back to main buffer
 
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	for (auto f = std::size_t{0}; f < frames; ++f)
@@ -236,12 +230,9 @@ bool BitcrushEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		}
 		buf[f][0] = d * buf[f][0] + w * qBound( -m_outClip, lsum, m_outClip ) * m_outGain;
 		buf[f][1] = d * buf[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

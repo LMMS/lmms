@@ -64,7 +64,6 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	auto highQualityButton = new LedCheckBox(tr("HQ"), this);
 	highQualityButton->setToolTip(tr("Double the resolution and simulate continuous analog-like trace."));
 	highQualityButton->setCheckable(true);
-	highQualityButton->setMinimumSize(70, 12);
 	highQualityButton->setModel(&controls->m_highQualityModel);
 	switch_layout->addWidget(highQualityButton);
 
@@ -72,7 +71,6 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	auto logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
 	logarithmicButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values."));
 	logarithmicButton->setCheckable(true);
-	logarithmicButton->setMinimumSize(70, 12);
 	logarithmicButton->setModel(&controls->m_logarithmicModel);
 	switch_layout->addWidget(logarithmicButton);
 

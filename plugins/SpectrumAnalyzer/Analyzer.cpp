@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-bool Analyzer::processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count)
+Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
@@ -91,14 +91,12 @@ bool Analyzer::processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count)
 		}
 	#endif
 
-	if (!isEnabled() || !isRunning ()) {return false;}
-
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
 	{
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buffer, frame_count, true);
+		m_inputBuffer.write(buf, frames, true);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;
@@ -107,7 +105,7 @@ bool Analyzer::processAudioBuffer(SampleFrame* buffer, const fpp_t frame_count)
 		if (audio_time / 1000000.0 > m_max_execution) {m_max_execution = audio_time / 1000000.0;}
 	#endif
 
-	return isRunning();
+	return ProcessStatus::Continue;
 }
 
 
