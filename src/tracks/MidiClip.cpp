@@ -150,7 +150,7 @@ void MidiClip::updateLength()
 	}
 
 	// If the clip has already been manually resized, don't automatically resize it.
-	// Unless we are a pattern clip, where you can't resize stuff manually
+	// Unless we are in a pattern, where you can't resize stuff manually
 	if (!getHasBeenResized() || getAutoResize())
 	{
 		tick_t max_length = TimePos::ticksPerBar();
@@ -164,6 +164,7 @@ void MidiClip::updateLength()
 		}
 		changeLength( TimePos( max_length ).nextFullBar() *
 							TimePos::ticksPerBar() );
+		setStartTimeOffset(TimePos(0));
 		updatePatternTrack();
 	}
 }
