@@ -70,6 +70,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		{
 			inputDeviceIndex = i;
 			outputDeviceIndex = i;
+			break;
 		}
 	}
 
