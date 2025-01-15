@@ -3028,7 +3028,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
 
-	auto xCoordOfTick = [=](int tick) {
+	auto xCoordOfTick = [this](int tick) {
 		return m_whiteKeyWidth + (
 			(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
 		);
