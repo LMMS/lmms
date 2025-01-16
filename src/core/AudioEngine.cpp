@@ -163,25 +163,6 @@ void AudioEngine::initDevices()
 	emit sampleRateChanged();
 }
 
-
-
-
-void AudioEngine::startProcessing()
-{
-	m_audioDev->startProcessing();
-}
-
-
-
-
-void AudioEngine::stopProcessing()
-{
-	m_audioDev->stopProcessing();
-}
-
-
-
-
 bool AudioEngine::criticalXRuns() const
 {
 	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;

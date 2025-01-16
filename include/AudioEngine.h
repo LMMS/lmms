@@ -315,8 +315,8 @@ private:
 	AudioEngine( bool renderOnly );
 	~AudioEngine() override;
 
-	void startProcessing();
-	void stopProcessing();
+	void startProcessing() { m_audioDev->startProcessing(); }
+	void stopProcessing() { m_audioDev->stopProcessing(); }
 
 
 	AudioDevice * tryAudioDevices();
