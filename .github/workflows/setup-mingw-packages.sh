@@ -15,6 +15,7 @@
 #   portaudio             (CMake cannot find vcpkg's version)
 #   qt5-base              (vcpkg takes too much memory to build)
 
-sudo echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" >> /etc/apt/sources.list
+sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
+  /etc/apt/sources.list.d/tobydox-mingw-w64.list'
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
-sudo apt-get update
+sudo apt-get update -y

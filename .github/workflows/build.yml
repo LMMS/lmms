@@ -287,11 +287,7 @@ jobs:
       MAKEFLAGS: -j2
     steps:
       - name: Configure apt
-        run: |
-          sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
-          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
-          sudo apt-get update -y
+        run: sudo .github/workflows/setup-mingw-packages.sh
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -309,10 +305,8 @@ jobs:
           export VCPKG_INSTALLATION_ROOT="$(pwd)/vcpkg"
       - name: Install system dependencies
         run: |
-          sudo apt-get update
-          .github/workflows/setup-cmake.sh
-          sudo .github/workflows/setup-mingw-packages.sh
-          sudo apt-get install -y $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
+          sudo apt-get install -y --no-install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Cache vcpkg dependencies
         if: ${{ !env.ACT }} # skip during local actions testing
         id: cache-deps
