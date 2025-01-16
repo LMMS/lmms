@@ -288,7 +288,7 @@ public:
 	}
 
 	const SampleFrame* renderNextBuffer();
-	void renderNextBufferChunked(SampleFrame* dst, std::size_t size);
+	void renderNextBuffer(SampleFrame* dst, std::size_t size);
 
 	void changeQuality(const struct qualitySettings & qs);
 
@@ -347,6 +347,7 @@ private:
 
 	std::unique_ptr<SampleFrame[]> m_outputBufferRead;
 	std::unique_ptr<SampleFrame[]> m_outputBufferWrite;
+	std::size_t m_outputBufferIndex = 0;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;

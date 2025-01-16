@@ -238,7 +238,7 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		return paComplete;
 	}
 
-	audioEngine()->renderNextBufferChunked(reinterpret_cast<SampleFrame*>(_outputBuffer), _framesPerBuffer);
+	audioEngine()->renderNextBuffer(reinterpret_cast<SampleFrame*>(_outputBuffer), _framesPerBuffer);
 
 	return paContinue;
 }

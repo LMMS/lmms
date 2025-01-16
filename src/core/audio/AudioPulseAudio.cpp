@@ -241,7 +241,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 
 	if (m_stopped) { return; }
 
-	audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+	audioEngine()->renderNextBuffer(buf.data(), buf.size());
 	const auto bytes = convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
 	if (bytes > 0) { pa_stream_write(m_s, outbuf.data(), bytes, nullptr, 0, PA_SEEK_RELATIVE); }
 }

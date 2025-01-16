@@ -320,7 +320,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 
 	static auto buf = std::vector<SampleFrame>(nframes);
-	audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+	audioEngine()->renderNextBuffer(buf.data(), buf.size());
 
 	for (int c = 0; c < channels(); ++c)
 	{

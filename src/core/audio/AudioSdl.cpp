@@ -180,7 +180,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 		return;
 	}
 
-	audioEngine()->renderNextBufferChunked(reinterpret_cast<SampleFrame*>(_buf), _len / sizeof(SampleFrame));
+	audioEngine()->renderNextBuffer(reinterpret_cast<SampleFrame*>(_buf), _len / sizeof(SampleFrame));
 }
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {

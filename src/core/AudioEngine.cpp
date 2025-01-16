@@ -353,24 +353,22 @@ const SampleFrame* AudioEngine::renderNextBuffer()
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 
+	m_outputBufferIndex = 0;
 	return m_outputBufferRead.get();
 }
 
-void AudioEngine::renderNextBufferChunked(SampleFrame* dst, std::size_t size)
+void AudioEngine::renderNextBuffer(SampleFrame* dst, std::size_t size)
 {
-	static auto buffer = static_cast<const SampleFrame*>(nullptr);
-	static auto index = 0;
-
 	auto framesCopied = std::size_t{0};
 	while (framesCopied != size)
 	{
-		if (index == 0) { buffer = renderNextBuffer(); }
+		if (m_outputBufferIndex == 0) { renderNextBuffer(); }
 
-		const auto numFramesToCopy = std::min(m_framesPerPeriod - index, size - framesCopied);
-		std::copy_n(buffer + index, numFramesToCopy, dst + framesCopied);
+		const auto numFramesToCopy = std::min(m_framesPerPeriod - m_outputBufferIndex, size - framesCopied);
+		std::copy_n(m_outputBufferRead.get() + m_outputBufferIndex, numFramesToCopy, dst + framesCopied);
 
 		framesCopied += numFramesToCopy;
-		index = (index + numFramesToCopy) % m_framesPerPeriod;
+		m_outputBufferIndex = (m_outputBufferIndex + numFramesToCopy) % m_framesPerPeriod;
 	}
 }
 

@@ -281,7 +281,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		}
 
 		auto buf = std::vector<SampleFrame>(frameCount);
-		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+		audioEngine()->renderNextBuffer(buf.data(), buf.size());
 
 		for (const auto& frame : buf)
 		{

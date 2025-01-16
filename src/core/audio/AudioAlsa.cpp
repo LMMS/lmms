@@ -251,7 +251,7 @@ void AudioAlsa::run()
 	{
 		if (m_stopped) { break; }
 
-		audioEngine()->renderNextBufferChunked(buf.data(), buf.size());
+		audioEngine()->renderNextBuffer(buf.data(), buf.size());
 		convertToS16(buf.data(), buf.size(), outbuf.data(), m_convertEndian);
 
 		const auto err = snd_pcm_writei(m_handle, outbuf.data(), buf.size());
