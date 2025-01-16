@@ -90,6 +90,7 @@ OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_GIG		"Include GIG player plugin" ON)
 option(WANT_SID		"Include Sid instrument" ON)
+option(WANT_TUNER	"Include Tuner plugin" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
@@ -353,6 +354,17 @@ if(WANT_SID)
 		set(STATUS_SID "OK")
 	else()
 		set(STATUS_SID "not found, please install perl if you require the Sid instrument")
+	endif()
+endif()
+
+# check for Tuner
+if(WANT_TUNER)
+	find_package(Aubio)
+	if(AUBIO_FOUND)
+		set(LMMS_HAVE_TUNER TRUE)
+		set(STATUS_TUNER "OK")
+	else()
+		set(STATUS_TUNER "not found, please install aubio if you require the Tuner plugin")
 	endif()
 endif()
 
@@ -811,6 +823,7 @@ MESSAGE(
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Sid instrument              : ${STATUS_SID}\n"
+"* Tuner plugin                : ${STATUS_TUNER}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST plugin host             : ${STATUS_VST}\n"
 "  * 32-bit Windows host       : ${STATUS_VST_32}\n"
