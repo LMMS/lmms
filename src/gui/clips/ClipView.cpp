@@ -1294,13 +1294,16 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 		}
 
 		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
-		TimePos mcViewPos = mcView->getMidiClip()->startPosition();
+		TimePos mcViewPos = mcView->getMidiClip()->startPosition() + mcView->getMidiClip()->startTimeOffset();
 
 		for (Note* note: currentClipNotes)
 		{
-			Note* newNote = newMidiClip->addNote(*note, false);
-			TimePos originalNotePos = newNote->pos();
-			newNote->setPos(originalNotePos + (mcViewPos - earliestPos));
+			if (note->pos() >= -mcView->getMidiClip()->startTimeOffset() && note->pos() < mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset())
+			{
+				Note* newNote = newMidiClip->addNote(*note, false);
+				TimePos originalNotePos = newNote->pos();
+				newNote->setPos(originalNotePos + (mcViewPos - earliestPos));
+			}
 		}
 
 		// We disable the journalling system before removing, so the
