@@ -290,7 +290,7 @@ void Song::processNextBuffer()
 			}
 			else if (m_playMode == PlayMode::MidiClip && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_midiClipToPlay->length());
+				enforceLoop(TimePos{0}, m_midiClipToPlay->length() - m_midiClipToPlay->startTimeOffset());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
