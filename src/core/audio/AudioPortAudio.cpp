@@ -38,9 +38,7 @@
 namespace lmms {
 
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
-	: AudioDevice(std::clamp<ch_cnt_t>(ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
-					  DEFAULT_CHANNELS, DEFAULT_CHANNELS),
-		  engine)
+	: AudioDevice(ConfigManager::inst()->value("audioportaudio", "channels").toInt(), engine)
 	, m_paStream(nullptr)
 	, m_wasPAInitError(false)
 	, m_outBuf(std::make_unique<SampleFrame[]>(engine->framesPerPeriod()))
