@@ -3653,7 +3653,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.drawRect(x + m_whiteKeyWidth, y, w, h);
 
 	// TODO: Get this out of paint event
-	int l = ( hasValidMidiClip() )? (int) m_midiClip->length() : 0;
+	int l = ( hasValidMidiClip() )? (int) m_midiClip->length() - m_midiClip->startTimeOffset() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )

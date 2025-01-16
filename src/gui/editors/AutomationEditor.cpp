@@ -1412,7 +1412,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 
 	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() : 0;
+	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
