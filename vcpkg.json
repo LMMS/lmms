@@ -8,13 +8,11 @@
 			"features": [
 				"sse",
 				"sse2"
-			],
-			"platform": "!mingw"
+			]
 		},
 		{
 			"name": "fltk",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "fluidsynth",
@@ -25,18 +23,15 @@
 		},
 		{
 			"name": "libflac",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "libogg",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "libsamplerate",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "libsndfile",
@@ -53,13 +48,11 @@
 		},
 		{
 			"name": "libstk",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "libvorbis",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "lilv",
@@ -75,13 +68,11 @@
 		},
 		{
 			"name": "portaudio",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "sdl2",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "zlib",
