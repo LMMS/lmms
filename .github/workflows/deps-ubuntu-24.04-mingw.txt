@@ -13,7 +13,6 @@ git
 glib2-mingw-w64
 gnupg
 gpg
-lame-mingw-w64
 libc6-dev
 libfltk1.3-dev
 libgig-mingw-w64
@@ -26,7 +25,6 @@ libsoundio-mingw-w64
 libvorbis-mingw-w64
 libxml-perl
 libxml2-utils
-libz-mingw-w64-dev
 lsb-release
 make
 mingw-w64

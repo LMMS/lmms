@@ -71,8 +71,7 @@
 		},
 		{
 			"name": "mp3lame",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		},
 		{
 			"name": "portaudio",
@@ -86,8 +85,7 @@
 		},
 		{
 			"name": "zlib",
-			"default-features": false,
-			"platform": "!mingw"
+			"default-features": false
 		}
 	]
 }
