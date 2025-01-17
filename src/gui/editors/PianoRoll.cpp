@@ -860,7 +860,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		return;
 	}
 
-	m_leftRightScroll->setValue( 0 );
+	// Scroll horizontally to the start of the clip, minus a bar for aesthetics.
+	m_leftRightScroll->setValue(std::max(0, -m_midiClip->startTimeOffset() - TimePos::ticksPerBar()));
 
 	// determine the central key so that we can scroll to it
 	int central_key = 0;
@@ -879,6 +880,13 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		central_key = central_key / total_notes - (NumKeys - m_totalKeysToScroll) / 2;
 		m_startKey = qBound(0, central_key, NumKeys);
 	}
+
+	// Make sure the playhead position isn't out of the clip bounds.
+	Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).setTicks(std::clamp(
+		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).getTicks(),
+		std::max(0, -m_midiClip->startTimeOffset()),
+		m_midiClip->length() - m_midiClip->startTimeOffset()
+	));
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of start-notes and so on...)
