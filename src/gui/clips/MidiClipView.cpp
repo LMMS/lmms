@@ -229,6 +229,8 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 		);
 	}
 
+	_cm->addAction(embed::getIconPixmap("edit_apply_resize"), tr("Discard notes out of bounds"), [this]() { bulkDiscardNotesOutOfBounds(getClickedClips()); });
+
 	if (!isBeat)
 	{
 		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
@@ -348,6 +350,70 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 	newMidiClip->restoreJournallingState();
 	track->restoreJournallingState();
 	// Update song
+	Engine::getSong()->setModified();
+	getGUI()->songEditor()->update();
+}
+
+void MidiClipView::discardNotesOutOfBounds()
+{
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
+	newClip->movePosition(m_clip->startPosition());
+
+	TimePos startBound = -m_clip->startTimeOffset();
+	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
+
+	for (Note const* note: m_clip->m_notes)
+	{
+		if (note->pos() >= startBound && note->endPos() <= endBound)
+		{
+			Note newNote = Note{*note};
+			newNote.setPos(newNote.pos() - startBound);
+			newClip->addNote(newNote);
+		}
+		else if (note->pos() < startBound && note->endPos() > endBound)
+		{
+			Note newNote = Note{*note};
+			newNote.setPos(0);
+			newNote.setLength(endBound - startBound);
+			newClip->addNote(newNote);
+		}
+		else if (note->pos() < startBound && note->endPos() > startBound)
+		{
+			Note newNote = Note{*note};
+			newNote.setPos(0);
+			newNote.setLength(note->endPos() - startBound);
+			newClip->addNote(newNote);
+		}
+		else if (note->pos() < endBound && note->endPos() > endBound)
+		{
+			Note newNote = Note{*note};
+			newNote.setPos(newNote.pos() - startBound);
+			newNote.setLength(endBound - note->pos());
+			newClip->addNote(newNote);
+		}
+	}
+	newClip->updateLength();
+
+	remove();
+	m_clip->getTrack()->restoreJournallingState();
+}
+
+void MidiClipView::bulkDiscardNotesOutOfBounds(QVector<ClipView*> clipvs)
+{
+	for (auto clipv: clipvs)
+	{
+		// Convert ClipV to MidiClipView
+		auto mcView = dynamic_cast<MidiClipView*>(clipv);
+		if (!mcView)
+		{
+			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
+			continue;
+		}
+		mcView->discardNotesOutOfBounds();
+	}
 	Engine::getSong()->setModified();
 	getGUI()->songEditor()->update();
 }
