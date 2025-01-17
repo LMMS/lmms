@@ -121,10 +121,6 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<ClipView *> clipvs );
 	static void toggleMute( QVector<ClipView *> clipvs );
-	static void mergeClips(QVector<ClipView*> clipvs);
-
-	// Returns true if selection can be merged and false if not
-	static bool canMergeSelection(QVector<ClipView*> clipvs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -147,8 +143,7 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute,
-		Merge
+		Mute
 	};
 
 	TrackView * m_trackView;

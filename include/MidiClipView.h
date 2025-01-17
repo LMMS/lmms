@@ -63,6 +63,10 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	static void mergeClips(QVector<ClipView*> clipvs);
+
 public slots:
 	lmms::MidiClip* getMidiClip();
 	void update() override;

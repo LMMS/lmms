@@ -40,7 +40,6 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "InstrumentTrackView.h"
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
@@ -1074,15 +1073,6 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 				? tr("Cut")
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( ContextMenuAction::Cut ); } );
-
-		if (canMergeSelection(selectedClips))
-		{
-			contextMenu.addAction(
-				embed::getIconPixmap("edit_merge"),
-				tr("Merge Selection"),
-				[this]() { contextMenuAction(ContextMenuAction::Merge); }
-			);
-		}
 	}
 
 	contextMenu.addAction(
@@ -1142,9 +1132,6 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			break;
 		case ContextMenuAction::Mute:
 			toggleMute( active );
-			break;
-		case ContextMenuAction::Merge:
-			mergeClips(active);
 			break;
 	}
 }
@@ -1228,104 +1215,6 @@ void ClipView::toggleMute( QVector<ClipView *> clipvs )
 		clipv->getClip()->toggleMute();
 	}
 }
-
-bool ClipView::canMergeSelection(QVector<ClipView*> clipvs)
-{
-	// Can't merge a single Clip
-	if (clipvs.size() < 2) { return false; }
-
-	// We check if the owner of the first Clip is an Instrument Track
-	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(clipvs.at(0)->getTrackView());
-
-	// Then we create a set with all the Clips owners
-	std::set<TrackView*> ownerTracks;
-	for (auto clipv: clipvs) { ownerTracks.insert(clipv->getTrackView()); }
-
-	// Can merge if there's only one owner track and it's an Instrument Track
-	return isInstrumentTrack && ownerTracks.size() == 1;
-}
-
-void ClipView::mergeClips(QVector<ClipView*> clipvs)
-{
-	// Get the track that we are merging Clips in
-	auto track = dynamic_cast<InstrumentTrack*>(clipvs.at(0)->getTrackView()->getTrack());
-
-	if (!track)
-	{
-		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeClips()");
-		return;
-	}
-
-	// For Undo/Redo
-	track->addJournalCheckPoint();
-	track->saveJournallingState(false);
-
-	// Find the earliest position of all the selected ClipVs
-	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
-		[](ClipView* a, ClipView* b)
-		{
-			return a->getClip()->startPosition() <
-				b->getClip()->startPosition();
-		}
-	);
-
-	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
-
-	// Create a clip where all notes will be added
-	auto newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
-	if (!newMidiClip)
-	{
-		qWarning("Warning: Failed to convert Clip to MidiClip on mergeClips");
-		return;
-	}
-
-	newMidiClip->saveJournallingState(false);
-
-	// Add the notes and remove the Clips that are being merged
-	for (auto clipv: clipvs)
-	{
-		// Convert ClipV to MidiClipView
-		auto mcView = dynamic_cast<MidiClipView*>(clipv);
-
-		if (!mcView)
-		{
-			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
-			continue;
-		}
-
-		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
-		TimePos mcViewPos = mcView->getMidiClip()->startPosition() + mcView->getMidiClip()->startTimeOffset();
-
-		for (Note* note: currentClipNotes)
-		{
-			if (note->pos() >= -mcView->getMidiClip()->startTimeOffset() && note->pos() < mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset())
-			{
-				Note* newNote = newMidiClip->addNote(*note, false);
-				TimePos originalNotePos = newNote->pos();
-				newNote->setPos(originalNotePos + (mcViewPos - earliestPos));
-			}
-		}
-
-		// We disable the journalling system before removing, so the
-		// removal doesn't get added to the undo/redo history
-		clipv->getClip()->saveJournallingState(false);
-		// No need to check for nullptr because we check while building the clipvs QVector
-		clipv->remove();
-	}
-
-	// Update length since we might have moved notes beyond the end of the MidiClip length
-	newMidiClip->updateLength();
-	// Rearrange notes because we might have moved them
-	newMidiClip->rearrangeAllNotes();
-	// Restore journalling states now that the operation is finished
-	newMidiClip->restoreJournallingState();
-	track->restoreJournallingState();
-	// Update song
-	Engine::getSong()->setModified();
-	getGUI()->songEditor()->update();
-}
-
-
 
 
 /*! \brief How many pixels a bar takes for this ClipView.
