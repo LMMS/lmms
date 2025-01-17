@@ -27,7 +27,7 @@
 #include <QObject>
 
 #include "JournallingObject.h"
-#include "PlayPos.h"
+#include "TimePos.h"
 
 namespace lmms {
 
@@ -43,9 +43,9 @@ public:
 		KeepPosition
 	};
 
-	auto getPlayPos() const -> const PlayPos& { return m_pos; }
+	auto getPlayPos() const -> const TimePos& { return m_pos; }
 
-	void setPlayPos(PlayPos pos)
+	void setPlayPos(TimePos pos)
 	{
 		m_pos = pos;
 		emit positionChanged();
@@ -59,19 +59,11 @@ public:
 		emit positionChanged();
 	}
 
-	auto currentFrame() const -> float { return m_pos.currentFrame(); }
+	auto getFrameOffset() const -> f_cnt_t { return m_frameOffset; }
+	void setFrameOffset(const f_cnt_t frame) { m_frameOffset = frame; }
 
-	void setCurrentFrame(const float f)
-	{
-		m_pos.setCurrentFrame(f);
-	}
-
-	auto jumped() const -> bool { return m_pos.jumped(); }
-
-	void setJumped(const bool jumped)
-	{
-		m_pos.setJumped(jumped);
-	}
+	auto getJumped() const -> bool { return m_jumped; }
+	void setJumped(const bool jumped) { m_jumped = jumped; }
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
@@ -103,7 +95,10 @@ private:
 	TimePos m_loopBegin = TimePos{0};
 	TimePos m_loopEnd = TimePos{DefaultTicksPerBar};
 	bool m_loopEnabled = false;
-	PlayPos m_pos = PlayPos{0};
+	TimePos m_pos = TimePos{0};
+
+	f_cnt_t m_frameOffset = 0;
+	bool m_jumped = false;
 
 	StopBehaviour m_stopBehaviour = StopBehaviour::BackToStart;
 	TimePos m_playStartPosition = TimePos{-1};

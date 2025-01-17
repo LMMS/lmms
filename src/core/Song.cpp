@@ -93,13 +93,10 @@ Song::Song() :
 	m_length( 0 ),
 	m_midiClipToPlay( nullptr ),
 	m_loopMidiClip( false ),
-	m_elapsedTicks( 0 ),
-	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
-	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
@@ -257,7 +254,7 @@ void Song::processNextBuffer()
 	if (loopEnabled) { enforceLoop(timeline.loopBegin(), timeline.loopEnd()); }
 
 	// Inform VST plugins and sample tracks if the user moved the play head
-	if (getPlayPos().jumped())
+	if (timeline.getJumped())
 	{
 		m_vstSyncController.setPlaybackJumped(true);
 		emit updateSampleTracks();
@@ -271,7 +268,7 @@ void Song::processNextBuffer()
 
 	while (frameOffsetInPeriod < framesPerPeriod)
 	{
-		auto frameOffsetInTick = getPlayPos().currentFrame();
+		auto frameOffsetInTick = timeline.getFrameOffset();
 
 		// If a whole tick has elapsed, update the frame and tick count, and check any loops
 		if (frameOffsetInTick >= framesPerTick)
@@ -280,7 +277,7 @@ void Song::processNextBuffer()
 			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
 			getTimeline().setTicks(getPlayPos().getTicks() + elapsedTicks);
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
-			getTimeline().setCurrentFrame(frameOffsetInTick);
+			getTimeline().setFrameOffset(frameOffsetInTick);
 
 			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
@@ -324,7 +321,7 @@ void Song::processNextBuffer()
 			// This must be done after we've corrected the frame/tick count,
 			// but before actually playing any frames.
 			m_vstSyncController.setAbsolutePosition(getPlayPos().getTicks()
-				+ getPlayPos().currentFrame() / static_cast<double>(framesPerTick));
+				+ timeline.getFrameOffset() / static_cast<double>(framesPerTick));
 			m_vstSyncController.update();
 		}
 
@@ -343,10 +340,7 @@ void Song::processNextBuffer()
 		// Update frame counters
 		frameOffsetInPeriod += framesToPlay;
 		frameOffsetInTick += framesToPlay;
-		getTimeline().setCurrentFrame(frameOffsetInTick);
-		m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] += TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
-		m_elapsedBars = getPlayPos(PlayMode::Song).getBar();
-		m_elapsedTicks = (getPlayPos(PlayMode::Song).getTicks() % ticksPerBar()) / 48;
+		getTimeline().setFrameOffset(frameOffsetInTick);
 	}
 }
 
@@ -599,14 +593,11 @@ void Song::updateLength()
 
 void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 {
-	tick_t ticksFromPlayMode = getPlayPos(playMode).getTicks();
-	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
 	getTimeline(playMode).setTicks(ticks);
-	getTimeline(playMode).setCurrentFrame(0.0f);
+	getTimeline(playMode).setFrameOffset(0.0f);
 	getTimeline(playMode).setJumped(true);
 
-// send a signal if playposition changes during playback
+	// send a signal if playposition changes during playback
 	if( isPlaying() )
 	{
 		emit playbackPositionChanged();
@@ -661,7 +652,6 @@ void Song::stop()
 	{
 		case Timeline::StopBehaviour::BackToZero:
 			getTimeline().setTicks(0);
-			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
 			break;
 
 		case Timeline::StopBehaviour::BackToStart:
@@ -678,15 +668,14 @@ void Song::stop()
 			break;
 	}
 
-	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)] = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
 	getTimeline(PlayMode::None).setTicks(getPlayPos().getTicks());
 
-	getTimeline().setCurrentFrame(0);
+	getTimeline().setFrameOffset(0);
 
 	m_vstSyncController.setPlaybackState( m_exporting );
 	m_vstSyncController.setAbsolutePosition(
 		getPlayPos().getTicks()
-		+ getPlayPos().currentFrame()
+		+ timeline.getFrameOffset()
 		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active

@@ -34,7 +34,6 @@
 #include "AudioEngine.h"
 #include "Controller.h"
 #include "Metronome.h"
-#include "PlayPos.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Timeline.h"
@@ -118,7 +117,7 @@ public:
 
 	inline int getMilliseconds(PlayMode playMode) const
 	{
-		return m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)];
+		return 1000 * getFrames() / Engine::audioEngine()->outputSampleRate();
 	}
 
 	inline void setToTime(TimePos const & pos)
@@ -128,7 +127,6 @@ public:
 
 	inline void setToTime(TimePos const & pos, PlayMode playMode)
 	{
-		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = pos.getTimeInMilliseconds(getTempo());
 		getTimeline(playMode).setTicks(pos.getTicks());
 	}
 
@@ -139,7 +137,6 @@ public:
 
 	inline void setToTimeByTicks(tick_t ticks, PlayMode playMode)
 	{
-		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		getTimeline(playMode).setTicks(ticks);
 	}
 
@@ -228,11 +225,11 @@ public:
 		return m_playMode;
 	}
 
-	inline const PlayPos & getPlayPos( PlayMode pm ) const
+	inline const TimePos & getPlayPos( PlayMode pm ) const
 	{
 		return getTimeline(pm).getPlayPos();
 	}
-	inline const PlayPos & getPlayPos() const
+	inline const TimePos & getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
 	}
@@ -396,8 +393,7 @@ private:
 
 	inline f_cnt_t currentFrame() const
 	{
-		return getPlayPos(m_playMode).getTicks() * Engine::framesPerTick() +
-			getPlayPos(m_playMode).currentFrame();
+		return getTimeline(m_playMode).getTicks() * Engine::framesPerTick() + getTimeline(m_playMode).getFrameOffset();
 	}
 
 	void setPlayPos( tick_t ticks, PlayMode playMode );
@@ -459,10 +455,6 @@ private:
 
 	const MidiClip* m_midiClipToPlay;
 	bool m_loopMidiClip;
-
-	double m_elapsedMilliSeconds[PlayModeCount];
-	tick_t m_elapsedTicks;
-	bar_t m_elapsedBars;
 
 	VstSyncController m_vstSyncController;
     
