@@ -80,7 +80,6 @@ private:
 	QColor m_colorTrace = QColor(60, 255, 130, 255);	// ~LMMS green
 	QColor m_colorGrid = QColor(76, 80, 84, 128);		// ~60 % gray (slightly cold / blue), 50 % transparent
 	QColor m_colorLabels = QColor(76, 80, 84, 255);		// ~60 % gray (slightly cold / blue)
-	QColor m_colorOutline = QColor(30, 34, 38, 255);	// ~40 % gray (slightly cold / blue)
 
 #ifdef VEC_DEBUG
 	float m_executionAvg = 0;
