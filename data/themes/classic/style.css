@@ -1039,7 +1039,7 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 }
 
 lmms--gui--VectorView {
-	qproperty-colorFG: rgba(255, 170, 33, 255);
+	qproperty-colorTrace: rgba(255, 170, 33, 255);
 	qproperty-colorGrid: rgba(76, 80, 84, 128);
 	qproperty-colorLabels: rgba(76, 80, 84, 255);
 }

@@ -93,12 +93,10 @@ void VectorView::paintEvent(QPaintEvent *event)
 	QTransform tracePaintingTransform(gridAndLabelTransform);
 	tracePaintingTransform.scale(m_zoom, m_zoom);
 
-	const auto traceColor = m_colorFG;
 	const auto traceWidth = 2. / (scaleValue * m_zoom);
 
 	// This will add colors so that line intersections produce lighter colors/intensities
 	painter.setCompositionMode(QPainter::CompositionMode_Plus);
-	painter.setPen(QPen(traceColor, traceWidth));
 	painter.setTransform(tracePaintingTransform);
 
 	// Get new samples from the lockless input FIFO buffer
@@ -139,7 +137,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 		// We negate the mid value of the coordinate so that it tilts correctly if we pan hard left and hard right
 		QPointF currentPoint(side, -mid);
 
-		const auto darkenedColor(traceColor.darker(100 + frame));
+		const auto darkenedColor(m_colorTrace.darker(100 + frame));
 		painter.setPen(QPen(darkenedColor, traceWidth));
 
 		if (linesMode)
@@ -225,10 +223,10 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	auto colorDialog = new ColorChooser(m_colorFG, this);
+	auto colorDialog = new ColorChooser(m_colorTrace, this);
 	if (colorDialog->exec())
 	{
-		m_colorFG = colorDialog->currentColor();
+		m_colorTrace = colorDialog->currentColor();
 	}
 }
 
