@@ -215,8 +215,10 @@ void VectorView::paintEvent(QPaintEvent *event)
 // Periodically trigger repaint and check if the widget is visible
 void VectorView::periodicUpdate()
 {
-	m_visible = isVisible();
-	if (m_visible) {update();}
+	if (isVisible())
+	{
+		update();
+	}
 }
 
 

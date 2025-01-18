@@ -66,8 +66,6 @@ private:
 	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
 	LocklessRingBufferReader<SampleFrame> m_bufferReader;
 
-	bool m_visible;
-
 	float m_zoom;
 
 	// State variables for comparison with previous repaint
