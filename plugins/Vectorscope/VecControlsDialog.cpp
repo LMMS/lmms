@@ -44,36 +44,31 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	m_controls(controls)
 {
 	auto master_layout = new QVBoxLayout;
-	master_layout->setContentsMargins(0, 2, 0, 0);
+	master_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(master_layout);
 
 	// Visualizer widget
 	auto display = new VectorView(controls, m_controls->m_effect->getBuffer(), this);
 	master_layout->addWidget(display);
 
-	// Config area located inside visualizer
-	auto internal_layout = new QVBoxLayout(display);
-	auto config_layout = new QHBoxLayout();
-	auto switch_layout = new QVBoxLayout();
-	internal_layout->addStretch();
-	internal_layout->addLayout(config_layout);
-	config_layout->addLayout(switch_layout);
+	auto controlLayout = new QHBoxLayout();
+	master_layout->addLayout(controlLayout);
 
 	// Log. scale switch
 	auto logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
 	logarithmicButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values."));
 	logarithmicButton->setCheckable(true);
 	logarithmicButton->setModel(&controls->m_logarithmicModel);
-	switch_layout->addWidget(logarithmicButton);
+	controlLayout->addWidget(logarithmicButton);
+
+	controlLayout->addStretch();
 
 	// Switch between lines mode and point mode
 	auto linesMode = new LedCheckBox(tr("Lines"), this);
 	linesMode->setToolTip(tr("Render with lines."));
 	linesMode->setCheckable(true);
 	linesMode->setModel(&controls->m_linesModeModel);
-	switch_layout->addWidget(linesMode);
-
-	config_layout->addStretch();
+	controlLayout->addWidget(linesMode);
 }
 
 
