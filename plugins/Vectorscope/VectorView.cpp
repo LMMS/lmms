@@ -358,38 +358,36 @@ void VectorView::paintLinesMode(QPaintEvent *event)
 
 	for (std::size_t frame = 0; frame < frameCount; ++frame)
 	{
-		const auto& sampleFrame = inBuffer[frame];
-
-		float left = sampleFrame.left();
-		float right = sampleFrame.right();
+		auto sampleFrame = inBuffer[frame];
 
 		if (logScale)
 		{
-			const float distance = sqrt(left * left + right * right);
+			const float distance = sqrt(sampleFrame.sumOfSquaredAmplitudes());
 			const float distanceLog = log10(1 + 9 * std::abs(distance));
 
 			if (distance != 0)
 			{
 				const float factor = distanceLog / distance;
-				left  *= factor;
-				right *= factor;
+				sampleFrame *= factor;
 			}
 		}
 
-		// We are doing a mid/side split here.
+		// Perform a mid/side split which will potentially boost signals
 		//
-		// The side is represented by the x coordinate and the mid by the y coordinate.
-		// This also explains why a mono signal which just contains a mid signal is shows as a line
-		// along the y axis. A mono signal carries the same information in the left and right channel.
+		// Represent the side by the x coordinate and the mid by the y coordinate.
+		// 
+		// A mono signal which just contains a mid signal will just show as a line
+		// along the y axis because it carries the same information in the left and right channel.
 		// So we can say: left == right. So lets replace "right" with "left" in the formula below:
 		// (left - left, -(left + left)) = (0, -2*left).
 		// If two signals are completely out of phase the show as a line along the x axis. That's because
 		// each signal is the opposite of the other one, e.g. right = -left. Let's replace again:
 		// (left - (-left), -(left - left)) = (2*left, 0).
 		//
+		const auto mid = sampleFrame.left() + sampleFrame.right();
+		const auto side = sampleFrame.left() - sampleFrame.right();
+
 		// We negate the mid value of the coordinate so that it tilts correctly if we pan hard left and hard right
-		const auto mid = left + right;
-		const auto side = left - right;
 		QPointF currentPoint(side, -mid);
 
 		const auto darkenedColor(traceColor.darker(100 + frame));
