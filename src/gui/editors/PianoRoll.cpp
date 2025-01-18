@@ -905,6 +905,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	connect(m_midiClip->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));
+	connect(m_midiClip, &MidiClip::lengthChanged, this, qOverload<>(&QWidget::update));
 
 	update();
 	emit currentMidiClipChanged();

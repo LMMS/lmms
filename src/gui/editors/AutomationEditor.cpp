@@ -190,6 +190,7 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &AutomationClip::lengthChanged, this, qOverload<>(&QWidget::update));
 	}
 
 	emit currentClipChanged();
