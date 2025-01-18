@@ -57,6 +57,9 @@ public:
 	QString nodeName() const override {return "Vectorscope";}
 	int controlCount() override {return 3;}
 
+	const BoolModel& getLogarithmicModel() const { return m_logarithmicModel; }
+	const BoolModel& getLinesModel() const { return m_linesModeModel; }
+
 private:
 	Vectorscope *m_effect;
 
@@ -64,7 +67,6 @@ private:
 	BoolModel m_linesModeModel;
 
 	friend class gui::VecControlsDialog;
-	friend class gui::VectorView;
 };
 
 

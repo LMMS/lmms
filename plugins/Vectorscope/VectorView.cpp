@@ -63,8 +63,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 	unsigned int drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 #endif
 
-	const bool logScale = m_controls->m_logarithmicModel.value();
-	const bool linesMode = m_controls->m_linesModeModel.value();
+	const bool logScale = m_controls->getLogarithmicModel().value();
+	const bool linesMode = m_controls->getLinesModel().value();
 
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
