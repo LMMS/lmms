@@ -49,6 +49,10 @@ public:
 
 	QSize sizeHint() const override {return QSize(300, 300);}
 
+	Q_PROPERTY(QColor colorFG MEMBER m_colorFG)
+	Q_PROPERTY(QColor colorGrid MEMBER m_colorGrid)
+	Q_PROPERTY(QColor colorLabels MEMBER m_colorLabels)
+
 protected:
 	void paintEvent(QPaintEvent *event) override;
 	void mouseDoubleClickEvent(QMouseEvent *event) override;

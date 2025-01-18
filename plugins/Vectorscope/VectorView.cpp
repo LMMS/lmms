@@ -93,7 +93,6 @@ void VectorView::paintEvent(QPaintEvent *event)
 	QTransform tracePaintingTransform(gridAndLabelTransform);
 	tracePaintingTransform.scale(m_zoom, m_zoom);
 
-	// TODO 255, 170, 33 looks like nice amber. Make themeable?
 	const auto traceColor = m_colorFG;
 	const auto traceWidth = 2. / (scaleValue * m_zoom);
 
