@@ -36,8 +36,6 @@ class VecControls;
 namespace gui
 {
 
-class LedCheckBox;
-class Knob;
 
 //! Top-level widget holding the configuration GUI and vector display
 class VecControlsDialog : public EffectControlDialog
@@ -51,13 +49,7 @@ public:
 	QSize sizeHint() const override;
 
 private:
-	void onLegacyModelChanged();
-
-private:
 	VecControls *m_controls;
-
-	LedCheckBox* m_highQualityButton;
-	Knob* m_persistenceKnob;
 };
 
 

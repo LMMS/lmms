@@ -44,15 +44,13 @@ class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
+	explicit VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, QWidget *parent = 0);
 	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
-	void paintLegacyMode(QPaintEvent *event);
-	void paintLinesMode(QPaintEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event) override;
 	void wheelEvent(QWheelEvent *event) override;
 
@@ -68,19 +66,12 @@ private:
 	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
 	LocklessRingBufferReader<SampleFrame> m_bufferReader;
 
-	std::vector<uchar> m_displayBuffer;
-	const unsigned short m_displaySize;
-
 	bool m_visible;
 
 	float m_zoom;
 
 	// State variables for comparison with previous repaint
-	unsigned int m_persistTimestamp;
 	unsigned int m_zoomTimestamp;
-	bool m_oldHQ;
-	int m_oldX;
-	int m_oldY;
 
 	QPointF m_lastPoint = QPoint();
 
