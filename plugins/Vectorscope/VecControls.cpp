@@ -40,7 +40,9 @@ VecControls::VecControls(Vectorscope *effect) :
 	// initialize models and set default values
 	m_persistenceModel(0.5f, 0.0f, 1.0f, 0.05f, this, tr("Display persistence amount")),
 	m_logarithmicModel(false, this, tr("Logarithmic scale")),
-	m_highQualityModel(false, this, tr("High quality"))
+	m_highQualityModel(false, this, tr("High quality")),
+	m_linesModeModel(true, this, tr("Lines rendering")),
+	m_legacyModeModel(false, this, tr("Legacy rendering"))
 {
 	// Colors (percentages include sRGB gamma correction)
 	m_colorFG = QColor(60, 255, 130, 255);		// ~LMMS green
@@ -62,6 +64,7 @@ void VecControls::loadSettings(const QDomElement &element)
 	m_persistenceModel.loadSettings(element, "Persistence");
 	m_logarithmicModel.loadSettings(element, "Logarithmic");
 	m_highQualityModel.loadSettings(element, "HighQuality");
+	m_linesModeModel.loadSettings(element, "LinesMode");
 }
 
 
@@ -70,6 +73,7 @@ void VecControls::saveSettings(QDomDocument &document, QDomElement &element)
 	m_persistenceModel.saveSettings(document, element, "Persistence");
 	m_logarithmicModel.saveSettings(document, element, "Logarithmic");
 	m_highQualityModel.saveSettings(document, element, "HighQuality");
+	m_linesModeModel.saveSettings(document, element, "LinesMode");
 }
 
 

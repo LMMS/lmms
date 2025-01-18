@@ -51,11 +51,16 @@ public:
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
+	void paintLegacyMode(QPaintEvent *event);
+	void paintLinesMode(QPaintEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event) override;
 	void wheelEvent(QWheelEvent *event) override;
 
 private slots:
 	void periodicUpdate();
+
+private:
+	void drawZoomInfo();
 
 private:
 	VecControls *m_controls;
@@ -76,6 +81,8 @@ private:
 	bool m_oldHQ;
 	int m_oldX;
 	int m_oldY;
+
+	QPointF m_lastPoint = QPoint();
 
 #ifdef VEC_DEBUG
 	float m_executionAvg = 0;

@@ -63,6 +63,8 @@ private:
 	FloatModel m_persistenceModel;
 	BoolModel m_logarithmicModel;
 	BoolModel m_highQualityModel;
+	BoolModel m_linesModeModel;
+	BoolModel m_legacyModeModel;
 
 	QColor m_colorFG;
 	QColor m_colorGrid;

@@ -61,11 +61,11 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	config_layout->addLayout(switch_layout);
 
 	// High-quality switch
-	auto highQualityButton = new LedCheckBox(tr("HQ"), this);
-	highQualityButton->setToolTip(tr("Double the resolution and simulate continuous analog-like trace."));
-	highQualityButton->setCheckable(true);
-	highQualityButton->setModel(&controls->m_highQualityModel);
-	switch_layout->addWidget(highQualityButton);
+	m_highQualityButton = new LedCheckBox(tr("HQ"), this);
+	m_highQualityButton->setToolTip(tr("Double the resolution and simulate continuous analog-like trace."));
+	m_highQualityButton->setCheckable(true);
+	m_highQualityButton->setModel(&controls->m_highQualityModel);
+	switch_layout->addWidget(m_highQualityButton);
 
 	// Log. scale switch
 	auto logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
@@ -74,15 +74,33 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	logarithmicButton->setModel(&controls->m_logarithmicModel);
 	switch_layout->addWidget(logarithmicButton);
 
+	// Switch between lines mode and point mode
+	auto linesMode = new LedCheckBox(tr("Lines"), this);
+	linesMode->setToolTip(tr("Render with lines."));
+	linesMode->setCheckable(true);
+	linesMode->setModel(&controls->m_linesModeModel);
+	switch_layout->addWidget(linesMode);
+
+	// Switch between legacy mode and non-legacy mode
+	auto legacyMode = new LedCheckBox(tr("Legacy"), this);
+	legacyMode->setToolTip(tr("Render in legacy mode."));
+	legacyMode->setCheckable(true);
+	legacyMode->setModel(&controls->m_legacyModeModel);
+	switch_layout->addWidget(legacyMode);
+
 	config_layout->addStretch();
 
 	// Persistence knob
-	auto persistenceKnob = new Knob(KnobType::Small17, this);
-	persistenceKnob->setModel(&controls->m_persistenceModel);
-	persistenceKnob->setLabel(tr("Persist."));
-	persistenceKnob->setToolTip(tr("Trace persistence: higher amount means the trace will stay bright for longer time."));
-	persistenceKnob->setHintText(tr("Trace persistence"), "");
-	config_layout->addWidget(persistenceKnob);
+	m_persistenceKnob = new Knob(KnobType::Small17, this);
+	m_persistenceKnob->setModel(&controls->m_persistenceModel);
+	m_persistenceKnob->setLabel(tr("Persist."));
+	m_persistenceKnob->setToolTip(tr("Trace persistence: higher amount means the trace will stay bright for longer time."));
+	m_persistenceKnob->setHintText(tr("Trace persistence"), "");
+	config_layout->addWidget(m_persistenceKnob);
+
+	connect(&m_controls->m_legacyModeModel, &BoolModel::dataChanged, [this] { onLegacyModelChanged(); });
+
+	onLegacyModelChanged();
 }
 
 
@@ -92,5 +110,11 @@ QSize VecControlsDialog::sizeHint() const
 	return QSize(275, 300);
 }
 
+void VecControlsDialog::onLegacyModelChanged()
+{
+	const auto isPointMode = m_controls->m_legacyModeModel.value();
+	m_highQualityButton->setVisible(isPointMode);
+	m_persistenceKnob->setVisible(isPointMode);
+}
 
 } // namespace lmms::gui
