@@ -78,7 +78,9 @@ void VectorView::paintEvent(QPaintEvent *event)
 	const qreal heightF = qreal(height());
 
 	const auto minOfWidthAndHeight = std::min(widthF, heightF);
-	const auto scaleValue = minOfWidthAndHeight / 4;
+	// If we would divide by 4 then the circle would go to the boundaries
+	// of the widget. We increase the value at bit more to get some margin.
+	const auto scaleValue = minOfWidthAndHeight / 4.1;
 
 	// Compute several transforms that are used to paint various elements
 
