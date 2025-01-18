@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+
+#include <QDebug>
 #include <QImage>
 #include <QPainter>
 
@@ -140,7 +142,10 @@ void VectorView::paintEvent(QPaintEvent *event)
 		const auto darkenedColor(m_colorTrace.darker(100 + frame));
 		painter.setPen(QPen(darkenedColor, traceWidth));
 
-		if (linesMode)
+		// Only draw a line if we can draw a line, i.e. if the point really changes.
+		// Otherwise just produce a point.
+		// Without this check Qt will draw horizontal lines when silence is processed.
+		if (linesMode && m_lastPoint != currentPoint)
 		{
 			painter.drawLine(QLineF(m_lastPoint, currentPoint));
 		}
