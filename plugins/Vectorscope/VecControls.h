@@ -63,11 +63,6 @@ private:
 	BoolModel m_logarithmicModel;
 	BoolModel m_linesModeModel;
 
-	QColor m_colorFG;
-	QColor m_colorGrid;
-	QColor m_colorLabels;
-	QColor m_colorOutline;
-
 	friend class gui::VecControlsDialog;
 	friend class gui::VectorView;
 };

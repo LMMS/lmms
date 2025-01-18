@@ -94,7 +94,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	tracePaintingTransform.scale(m_zoom, m_zoom);
 
 	// TODO 255, 170, 33 looks like nice amber. Make themeable?
-	const auto traceColor = m_controls->m_colorFG;
+	const auto traceColor = m_colorFG;
 	const auto traceWidth = 2. / (scaleValue * m_zoom);
 
 	// This will add colors so that line intersections produce lighter colors/intensities
@@ -160,11 +160,11 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setTransform(gridAndLabelTransform);
 
 	const QPointF origin(0, 0);
-	painter.setPen(QPen(m_controls->m_colorGrid, 2.5 / scaleValue, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_colorGrid, 2.5 / scaleValue, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawEllipse(origin, 2.f, 2.f);
 
 	const qreal root = sqrt(qreal(2.1));
-	painter.setPen(QPen(m_controls->m_colorGrid, 2.5 / scaleValue, Qt::DotLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_colorGrid, 2.5 / scaleValue, Qt::DotLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawLine(origin, QPointF(-root, root));
 	painter.drawLine(origin, QPointF(root, root));
 
@@ -181,7 +181,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	const auto boundingRectL = fm.boundingRect(lText);
 	const auto boundingRectR = fm.boundingRect(rText);
 
-	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.setFont(boldFont);
 
 	QTransform transformL(centerTransform);
@@ -224,10 +224,10 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	auto colorDialog = new ColorChooser(m_controls->m_colorFG, this);
+	auto colorDialog = new ColorChooser(m_colorFG, this);
 	if (colorDialog->exec())
 	{
-		m_controls->m_colorFG = colorDialog->currentColor();
+		m_colorFG = colorDialog->currentColor();
 	}
 }
 
@@ -267,7 +267,7 @@ void VectorView::drawZoomInfo()
 		const auto boundingRect = fm.boundingRect(text);
 		const auto descent = fm.descent();
 
-		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.setPen(QPen(m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.drawText((width() - boundingRect.width()) / 2, height() - descent - 2, text);
 	}
 }
