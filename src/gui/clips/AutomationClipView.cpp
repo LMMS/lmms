@@ -498,7 +498,7 @@ void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 
 
 
-bool AutomationClipView::splitClip(const TimePos pos)
+bool AutomationClipView::splitClip(const TimePos pos, bool splitExplicit)
 {
 	setMarkerEnabled(false);
 

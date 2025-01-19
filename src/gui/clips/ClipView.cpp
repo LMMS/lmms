@@ -721,9 +721,19 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			}
 
 			delete m_hint;
-			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
-						? tr( "Press <%1> and drag to make a copy." )
-						: tr( "Press <%1> for free resizing." );
+			QString hint;
+			if (m_action == Action::Move || m_action == Action::MoveSelection)
+			{
+				hint = tr("Press <%1> and drag to make a copy.");
+			}
+			else if (m_action == Action::Split)
+			{
+				hint = tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for explicit splitting.");
+			}
+			else
+			{
+				hint = tr("Press <%1> or <Alt> for free resizing.");
+			}
 			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
@@ -1019,7 +1029,8 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
 		splitClip(unquantizedModHeld(me) ?
 			relPos :
-			quantizeSplitPos(relPos, me->modifiers() & Qt::ShiftModifier)
+			quantizeSplitPos(relPos, me->modifiers() & Qt::ShiftModifier),
+			me->modifiers() & Qt::ShiftModifier
 		);
 	}
 

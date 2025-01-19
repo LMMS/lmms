@@ -360,6 +360,7 @@ void MidiClipView::discardNotesOutOfBounds()
 	m_clip->getTrack()->saveJournallingState(false);
 
 	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
+	newClip->setHasBeenResized(m_clip->getHasBeenResized());
 	newClip->movePosition(m_clip->startPosition());
 
 	TimePos startBound = -m_clip->startTimeOffset();
@@ -862,11 +863,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 
 
-bool MidiClipView::splitClip(const TimePos pos)
+bool MidiClipView::splitClip(const TimePos pos, bool splitExplicit)
 {
 	setMarkerEnabled(false);
 
 	const TimePos splitPos = m_initialClipPos + pos;
+	const TimePos internalSplitPos = pos - m_clip->startTimeOffset();
 
 	// Don't split if we slid off the Clip or if we're on the clip's start/end
 	// Cutting at exactly the start/end position would create a zero length
@@ -876,15 +878,67 @@ bool MidiClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto rightClip = new MidiClip(*m_clip);
+	if (splitExplicit)
+	{
+		auto leftClip = new MidiClip(m_clip->instrumentTrack());
+		auto rightClip = new MidiClip(m_clip->instrumentTrack());
 
-	m_clip->changeLength(splitPos - m_initialClipPos);
+		for (Note const* note : m_clip->m_notes)
+		{
+			if (note->pos() >= internalSplitPos)
+			{
+				auto movedNote = Note{*note};
+				movedNote.setPos(note->pos() - internalSplitPos);
+				rightClip->addNote(movedNote, false);
+			}
+			else if (note->endPos() > internalSplitPos)
+			{
+				auto movedNote = Note{*note};
+				movedNote.setPos(0);
+				movedNote.setLength(note->endPos() - internalSplitPos);
+				rightClip->addNote(movedNote, false);
+			}
+		}
 
-	rightClip->movePosition(splitPos);
-	rightClip->changeLength(m_initialClipEnd - splitPos);
-	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
-	m_clip->setHasBeenResized(true);
-	rightClip->setHasBeenResized(true);
+		for (Note const* note : m_clip->m_notes)
+		{
+			if (note->endPos() <= internalSplitPos)
+			{
+				leftClip->addNote(*note, false);
+			}
+			else if (note->pos() < internalSplitPos)
+			{
+				auto movedNote = Note{*note};
+				movedNote.setLength(internalSplitPos - note->pos());
+				leftClip->addNote(movedNote, false);
+			}
+		}
+
+		leftClip->movePosition(m_initialClipPos);
+		leftClip->setHasBeenResized(m_clip->getHasBeenResized());
+		leftClip->changeLength(splitPos - m_initialClipPos);
+		leftClip->updateLength();
+		leftClip->setStartTimeOffset(m_clip->startTimeOffset());
+
+		rightClip->movePosition(splitPos);
+		rightClip->setHasBeenResized(m_clip->getHasBeenResized());
+		rightClip->changeLength(m_initialClipEnd - splitPos);
+		rightClip->updateLength();
+
+		remove();
+	}
+	else
+	{
+		auto rightClip = new MidiClip(*m_clip);
+		rightClip->movePosition(splitPos);
+		rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
+
+		m_clip->changeLength(splitPos - m_initialClipPos);
+		rightClip->changeLength(m_initialClipEnd - splitPos);
+
+		m_clip->setHasBeenResized(true);
+		rightClip->setHasBeenResized(true);
+	}
 
 	m_clip->getTrack()->restoreJournallingState();
 	return true;

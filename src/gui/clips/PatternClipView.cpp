@@ -207,7 +207,7 @@ void PatternClipView::update()
 
 
 
-bool PatternClipView::splitClip(const TimePos pos)
+bool PatternClipView::splitClip(const TimePos pos, bool splitExplicit)
 {
 	setMarkerEnabled(false);
 
