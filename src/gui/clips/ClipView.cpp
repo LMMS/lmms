@@ -728,7 +728,9 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			}
 			else if (m_action == Action::Split)
 			{
-				hint = tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for explicit splitting (MIDI clips only).");
+				hint = dynamic_cast<MidiClipView*>(this)
+					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for hard splitting.")
+					: tr("Press <%1> or <Alt> for unquantized splitting.");
 			}
 			else
 			{
