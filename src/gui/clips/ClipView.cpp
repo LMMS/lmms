@@ -728,11 +728,11 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			}
 			else if (m_action == Action::Split)
 			{
-				hint = tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for explicit splitting.");
+				hint = tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for explicit splitting (MIDI clips only).");
 			}
 			else
 			{
-				hint = tr("Press <%1> or <Alt> for free resizing.");
+				hint = tr("Press <%1> or <Alt> for unquantized resizing.");
 			}
 			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
