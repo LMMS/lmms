@@ -229,11 +229,20 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 		);
 	}
 
-	_cm->addAction(embed::getIconPixmap("edit_apply_resize"), tr("Discard notes out of bounds"), [this]() { bulkDiscardNotesOutOfBounds(getClickedClips()); });
+	_cm->addAction(embed::getIconPixmap("edit_apply_resize"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
 
 	if (!isBeat)
 	{
 		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
+
+		_cm->addAction(
+			embed::getIconPixmap("flip_x"),
+			m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
+			[this](){
+				m_clip->setHasBeenResized(!m_clip->getHasBeenResized());
+				m_clip->updateLength();
+			}
+		);
 	}
 	_cm->addSeparator();
 
@@ -354,7 +363,7 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 	getGUI()->songEditor()->update();
 }
 
-void MidiClipView::discardNotesOutOfBounds()
+void MidiClipView::clearNotesOutOfBounds()
 {
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
@@ -396,13 +405,14 @@ void MidiClipView::discardNotesOutOfBounds()
 			newClip->addNote(newNote);
 		}
 	}
+	newClip->changeLength(m_clip->length());
 	newClip->updateLength();
 
 	remove();
 	m_clip->getTrack()->restoreJournallingState();
 }
 
-void MidiClipView::bulkDiscardNotesOutOfBounds(QVector<ClipView*> clipvs)
+void MidiClipView::bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs)
 {
 	for (auto clipv: clipvs)
 	{
@@ -413,7 +423,7 @@ void MidiClipView::bulkDiscardNotesOutOfBounds(QVector<ClipView*> clipvs)
 			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
 			continue;
 		}
-		mcView->discardNotesOutOfBounds();
+		mcView->clearNotesOutOfBounds();
 	}
 	Engine::getSong()->setModified();
 	getGUI()->songEditor()->update();

@@ -66,7 +66,7 @@ public:
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection(QVector<ClipView*> clipvs);
 	static void mergeClips(QVector<ClipView*> clipvs);
-	static void bulkDiscardNotesOutOfBounds(QVector<ClipView*> clipvs);
+	static void bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs);
 
 public slots:
 	lmms::MidiClip* getMidiClip();
@@ -81,7 +81,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void transposeSelection();
-	void discardNotesOutOfBounds();
+	void clearNotesOutOfBounds();
 
 
 protected:
