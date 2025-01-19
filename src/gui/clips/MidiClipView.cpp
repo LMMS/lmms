@@ -941,10 +941,11 @@ bool MidiClipView::splitClip(const TimePos pos, bool splitExplicit)
 	{
 		auto rightClip = new MidiClip(*m_clip);
 		rightClip->movePosition(splitPos);
-		rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
 
 		m_clip->changeLength(splitPos - m_initialClipPos);
 		rightClip->changeLength(m_initialClipEnd - splitPos);
+		
+		rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
 
 		m_clip->setHasBeenResized(true);
 		rightClip->setHasBeenResized(true);
