@@ -353,7 +353,7 @@ void SampleClipView::setAutomationGhost()
 
 
 
-bool SampleClipView::splitClip(const TimePos pos, bool splitExplicit)
+bool SampleClipView::splitClip(const TimePos pos, bool hardSplit)
 {
 	setMarkerEnabled(false);
 

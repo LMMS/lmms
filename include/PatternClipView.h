@@ -66,7 +66,7 @@ private:
 	
 	QStaticText m_staticTextName;
 	
-	bool splitClip(const TimePos pos, bool splitExplicit) override;
+	bool splitClip(const TimePos pos, bool hardSplit) override;
 } ;
 
 

@@ -873,7 +873,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 
 
-bool MidiClipView::splitClip(const TimePos pos, bool splitExplicit)
+bool MidiClipView::splitClip(const TimePos pos, bool hardSplit)
 {
 	setMarkerEnabled(false);
 
@@ -888,7 +888,7 @@ bool MidiClipView::splitClip(const TimePos pos, bool splitExplicit)
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	if (splitExplicit)
+	if (hardSplit)
 	{
 		auto leftClip = new MidiClip(m_clip->instrumentTrack());
 		auto rightClip = new MidiClip(m_clip->instrumentTrack());
