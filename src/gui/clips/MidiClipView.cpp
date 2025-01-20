@@ -229,7 +229,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 		);
 	}
 
-	_cm->addAction(embed::getIconPixmap("edit_apply_resize"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
+	_cm->addAction(embed::getIconPixmap("clear_notes_out_of_bounds"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
 
 	if (!isBeat)
 	{
