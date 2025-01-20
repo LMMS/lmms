@@ -236,7 +236,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
 
 		_cm->addAction(
-			embed::getIconPixmap("flip_x"),
+			m_clip->getHasBeenResized() ? embed::getIconPixmap("auto_resize") : embed::getIconPixmap("auto_resize_disable"),
 			m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
 			[this](){
 				m_clip->setHasBeenResized(!m_clip->getHasBeenResized());
