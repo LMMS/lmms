@@ -187,6 +187,15 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
+	_cm->addAction(
+		embed::getIconPixmap("flip_x"),
+		m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
+		[this](){
+			m_clip->setHasBeenResized(!m_clip->getHasBeenResized());
+			m_clip->updateLength();
+		}
+	);
+	
 	if (!m_clip->m_objects.empty())
 	{
 		_cm->addSeparator();
