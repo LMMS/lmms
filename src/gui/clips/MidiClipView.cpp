@@ -927,12 +927,14 @@ bool MidiClipView::splitClip(const TimePos pos, bool hardSplit)
 		leftClip->movePosition(m_initialClipPos);
 		leftClip->setHasBeenResized(m_clip->getHasBeenResized());
 		leftClip->changeLength(splitPos - m_initialClipPos);
+		leftClip->setHasBeenResized(true);
 		leftClip->updateLength();
 		leftClip->setStartTimeOffset(m_clip->startTimeOffset());
 
 		rightClip->movePosition(splitPos);
 		rightClip->setHasBeenResized(m_clip->getHasBeenResized());
 		rightClip->changeLength(m_initialClipEnd - splitPos);
+		rightClip->setHasBeenResized(true);
 		rightClip->updateLength();
 
 		remove();
