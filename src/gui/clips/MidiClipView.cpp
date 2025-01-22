@@ -243,57 +243,45 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 
 
-void MidiClipView::mousePressEvent( QMouseEvent * _me )
+void MidiClipView::mousePressEvent(QMouseEvent * _me)
 {
-	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
-	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
-		&& _me->y() > BeatStepButtonOffset && _me->y() < BeatStepButtonOffset + m_stepBtnOff.height())
+	const auto optionalStep = getStep(_me->pos());
 
-	// when mouse button is pressed in pattern mode
+	bool const displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
+	bool const isBeatClip = m_clip->m_clipType == MidiClip::Type::BeatClip;
 
+	if (_me->button() == Qt::LeftButton && isBeatClip && displayPattern && optionalStep.has_value())
 	{
-//	get the step number that was clicked on and
-//	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - BORDER_WIDTH ) *
-				float( m_clip -> m_steps ) ) / float(width() - BORDER_WIDTH*2);
+		// Left mouse button pressed in pattern mode
 
-		int step = int( tmp );
+		const int step = optionalStep.value();
 
-//	debugging to ensure we get the correct step...
-//		qDebug( "Step (%f) %d", tmp, step );
+		Note* n = m_clip->noteAtStep(step);
 
-		if( step >= m_clip->m_steps )
+		if (n == nullptr)
 		{
-			qDebug( "Something went wrong in clip.cpp: step %d doesn't exist in clip!", step );
-			return;
-		}
-
-		Note * n = m_clip->noteAtStep( step );
-
-		if( n == nullptr )
-		{
-			m_clip->addStepNote( step );
+			m_clip->addStepNote(step);
 		}
 		else // note at step found
 		{
 			m_clip->addJournalCheckPoint();
-			m_clip->setStep( step, false );
+			m_clip->setStep(step, false);
 		}
 
 		Engine::getSong()->setModified();
+
 		update();
 
-		if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
+		auto * pianoRoll = getGUI()->pianoRoll();
+		if (pianoRoll->currentMidiClip() == m_clip)
 		{
-			getGUI()->pianoRoll()->update();
+			pianoRoll->update();
 		}
 	}
 	else
-
-	// if not in pattern mode, let parent class handle the event
-
 	{
-		ClipView::mousePressEvent( _me );
+		// if not in pattern mode, let parent class handle the event
+		ClipView::mousePressEvent(_me);
 	}
 }
 
@@ -315,21 +303,13 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
+	const auto optionalStep = getStep(we->pos());
+
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				position(we).y() > height() - m_stepBtnOff.height())
+				optionalStep.has_value())
 	{
-//	get the step number that was wheeled on and
-//	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - BORDER_WIDTH) *
-				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
-
-		int step = int( tmp );
-
-		if( step >= m_clip->m_steps )
-		{
-			return;
-		}
+		const int step = optionalStep.value();
 
 		Note * n = m_clip->noteAtStep( step );
 		const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
@@ -456,22 +436,20 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Beat clip paint event (on BB Editor)
 	if (beatClip && displayPattern)
 	{
-		QPixmap stepon0;
-		QPixmap stepon200;
-		QPixmap stepoff;
-		QPixmap stepoffl;
 		const int steps = std::max(1, m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
-		stepon0
-			= m_stepBtnOn0.scaled(w / steps, m_stepBtnOn0.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepon200 = m_stepBtnOn200.scaled(
-			w / steps, m_stepBtnOn200.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoff
-			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoffl = m_stepBtnOffLight.scaled(
-			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		int const stepWidth = w / steps;
+		// Make sure that the pixmaps will be at least 24 pixels wide.
+		// There are artifacts if SVGs are rendered into very small pixmaps.
+		int const sourcePixmapWidth = std::max(stepWidth, 24);
+		int const stepHeight = std::max(24, rect().height() - 2 * BeatStepButtonOffset);
+
+		QPixmap const stepon0 = embed::getIconPixmap("step_btn_on_0", sourcePixmapWidth, stepHeight);
+		QPixmap const stepon200 = embed::getIconPixmap("step_btn_on_200", sourcePixmapWidth, stepHeight);
+		QPixmap const stepoff = embed::getIconPixmap("step_btn_off", sourcePixmapWidth, stepHeight);
+		QPixmap const stepoffl = embed::getIconPixmap("step_btn_off_light", sourcePixmapWidth, stepHeight);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
@@ -481,22 +459,25 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
 			const int y = BeatStepButtonOffset;
 
+			QRect target(x, y, stepWidth, stepHeight);
+			QRect source(0, 0, sourcePixmapWidth, stepHeight);
+
 			if (n)
-			{
+			{	
 				const int vol = n->getVolume();
-				p.drawPixmap(x, y, stepoffl);
-				p.drawPixmap(x, y, stepon0);
+				p.drawPixmap(target, stepoffl, source);
+				p.drawPixmap(target, stepon0, source);
 				p.setOpacity(std::sqrt(vol / 200.0));
-				p.drawPixmap(x, y, stepon200);
+				p.drawPixmap(target, stepon200, source);
 				p.setOpacity(1);
 			}
 			else if ((it / 4) % 2)
 			{
-				p.drawPixmap(x, y, stepoffl);
+				p.drawPixmap(target, stepoffl, source);
 			}
 			else
 			{
-				p.drawPixmap(x, y, stepoff);
+				p.drawPixmap(target, stepoff, source);
 			}
 		} // end for loop
 
@@ -672,6 +653,25 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
+}
+
+std::optional<int> MidiClipView::getStep(const QPoint& point) const
+{
+	const auto x = point.x();
+	const auto y = point.y();
+
+	bool const mouseClickedWithinHeight = BeatStepButtonOffset < y && y < height() - BeatStepButtonOffset;
+
+	int const step = (x - BORDER_WIDTH) * m_clip->m_steps / (width() - BORDER_WIDTH * 2);
+
+	if (mouseClickedWithinHeight && step >= 0 && step < m_clip->m_steps)
+	{
+		return std::optional<int>(step);
+	}
+
+	qDebug("Something went wrong in clip.cpp: step %d doesn't exist in clip!", step);
+
+	return std::optional<int>();
 }
 
 
