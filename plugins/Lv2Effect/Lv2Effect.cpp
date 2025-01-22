@@ -68,9 +68,8 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
 	m_controls.copyBuffersFromLmms(buf, frames);
@@ -83,7 +82,6 @@ bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 	m_controls.copyModelsToLmms();
 	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
 
-	double outSum = .0;
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1 : dryLevel();
 	const float w = corrupt ? 0 : wetLevel();
@@ -91,13 +89,9 @@ bool Lv2Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-		auto l = static_cast<double>(buf[f][0]);
-		auto r = static_cast<double>(buf[f][1]);
-		outSum += l*l + r*r;
 	}
-	checkGate(outSum / frames);
 
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

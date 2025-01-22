@@ -31,7 +31,7 @@
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "TabWidget.h"
 
@@ -83,7 +83,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	m_singleStreamInfoLabel = new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
 	m_singleStreamInfoLabel->setWordWrap(true);
 	// TODO Could also be rendered in system font size...
-	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), 10));
+	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), DEFAULT_FONT_SIZE));
 	m_singleStreamInfoLabel->setFixedWidth(242);
 
 	mainLayout->addWidget(m_singleStreamInfoLabel, 0, Qt::AlignTop);
