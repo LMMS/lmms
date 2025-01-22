@@ -26,7 +26,6 @@
 #include <chrono>
 #include <cmath>
 
-#include <QDebug>
 #include <QImage>
 #include <QPainter>
 
@@ -40,7 +39,7 @@ namespace lmms::gui
 {
 
 
-VectorView::VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, QWidget *parent) :
+VectorView::VectorView(VecControls* controls, LocklessRingBuffer<SampleFrame>* inputBuffer, QWidget* parent) :
 	QWidget(parent),
 	m_controls(controls),
 	m_inputBuffer(inputBuffer),
@@ -113,8 +112,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 		if (logScale)
 		{
-			const float distance = sqrt(sampleFrame.sumOfSquaredAmplitudes());
-			const float distanceLog = log10(1 + 9 * std::abs(distance));
+			const float distance = std::sqrt(sampleFrame.sumOfSquaredAmplitudes());
+			const float distanceLog = std::log10(1 + 9 * std::abs(distance));
 
 			if (distance != 0)
 			{
@@ -167,7 +166,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setPen(QPen(m_colorGrid, 2.5 / scaleValue, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawEllipse(origin, 2.f, 2.f);
 
-	const qreal root = sqrt(qreal(2.1));
+	const qreal root = std::sqrt(qreal(2.1));
 	painter.setPen(QPen(m_colorGrid, 2.5 / scaleValue, Qt::DotLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawLine(origin, QPointF(-root, root));
 	painter.drawLine(origin, QPointF(root, root));
@@ -265,7 +264,7 @@ void VectorView::drawZoomInfo()
 	{
 		QPainter painter(this);
 
-		const auto zoomValue = static_cast<int>(round(m_zoom * 100.));
+		const auto zoomValue = static_cast<int>(std::round(m_zoom * 100.));
 		const auto text = tr("Zoom: %1 %").arg(zoomValue);
 
 		// Measure text
