@@ -86,15 +86,12 @@ set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}:$ENV{PATH}")
 # Promote finding our own libraries first
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional:$ENV{LD_LIBRARY_PATH}")
 
-# Symlink executables so linuxdeploy can find them
-set(ZYN "${APP}/usr/bin/RemoteZynAddSubFx")
-create_symlink("${APP}/usr/lib/${lmms}/RemoteZynAddSubFx" "${ZYN}")
+# Skip slow searching of copyright files https://github.com/linuxdeploy/linuxdeploy/issues/278
+set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 
 # Handle wine32 linking
-set(VST32_BEFORE "${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so")
-set(VST32 "${APP}/usr/bin/RemoteVstPlugin32.exe.so")
-if(EXISTS "${VST32_BEFORE}")
-	create_symlink("${VST32_BEFORE}" "${VST32}")
+set(VST32 "${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so")
+if(EXISTS "${VST32}")
 	execute_process(COMMAND ldd "${VST32}"
 		OUTPUT_VARIABLE LDD_OUTPUT
 		OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -111,10 +108,8 @@ if(EXISTS "${VST32_BEFORE}")
 endif()
 
 # Handle wine64 linking
-set(VST64_BEFORE "${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so")
-set(VST64 "${APP}/usr/bin/RemoteVstPlugin64.exe.so")
-if(EXISTS "${VST64_BEFORE}")
-	create_symlink("${VST64_BEFORE}" "${VST64}")
+set(VST64 "${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so")
+if(EXISTS "${VST64}")
 	execute_process(COMMAND ldd "${VST64}"
 		OUTPUT_VARIABLE LDD_OUTPUT
 		OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -133,26 +128,29 @@ endif()
 # Patch desktop file
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
-# Build list of executables to inform linuxdeploy about
-# e.g. --executable=foo.dylib --executable=bar.dylib
+# Build list of libraries to inform linuxdeploy about
+# e.g. --library=foo.so --library=bar.so
 file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
-#file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
-# TODO: Both Linux and Mac have LADPSA plugins in this listing, but why?
-list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imp_1199.so")
-list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/imbeq_1197.so")
-list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1193.so")
-list(APPEND LIBS "${APP}/usr/lib/lmms/ladspa/pitch_scale_1194.so")
+
+# Inform linuxdeploy about LADSPA plugins; may depend on bundled fftw3f, etc.
+file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
+
+# Inform linuxdeploy about remote plugins
+file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
+list(APPEND REMOTE_PLUGINS "${VST32}")
+list(APPEND REMOTE_PLUGINS "${VST64}")
+
+# Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
-list(APPEND LIBS "${ZYN}")
-list(APPEND LIBS "${VST32}")
-list(APPEND LIBS "${VST64}")
+list(APPEND LIBS ${REMOTE_PLUGINS})
 list(APPEND LIBS ${CPACK_SUIL_MODULES})
+list(REMOVE_DUPLICATES LIBS)
 list(SORT LIBS)
 
 # Construct linuxdeploy parameters
 foreach(_LIB IN LISTS LIBS)
 	if(EXISTS "${_LIB}")
-		list(APPEND EXECUTABLES "--executable=${_LIB}")
+		list(APPEND LIBRARIES "--library=${_LIB}")
 	endif()
 endforeach()
 
@@ -164,7 +162,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--desktop-file "${APP}/usr/share/applications/${lmms}.desktop"
 	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
-	${EXECUTABLES}
+	${LIBRARIES}
 	--verbosity ${VERBOSITY}
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
@@ -180,10 +178,13 @@ file(GLOB EXCLUDE_LIBS
 list(SORT EXCLUDE_LIBS)
 foreach(_LIB IN LISTS EXCLUDE_LIBS)
 	if(EXISTS "${_LIB}")
-		get_filename_component(_LIBNAME "${_LIB}" NAME)
 		file(REMOVE "${_LIB}")
 	endif()
 endforeach()
+
+# FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
+file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/")
+file(REMOVE_RECURSE "${APP}/usr/lib/suil-0/")
 
 # Bundle jack to avoid crash for systems without it
 # See https://github.com/LMMS/lmms/pull/4186
@@ -204,10 +205,10 @@ foreach(line ${LDD_LIST})
 		file(REAL_PATH "${lib}" libreal)
 		get_filename_component(symname "${lib}" NAME)
 		get_filename_component(realname "${libreal}" NAME)
-		file(MAKE_DIRECTORY "${APP}/usr/lib/lmms/optional/")
+		file(MAKE_DIRECTORY "${APP}/usr/lib/${lmms}/optional/")
 		# Copy, but with original symlink name
-		file(COPY "${libreal}" DESTINATION "${APP}/usr/lib/lmms/optional/")
-		file(RENAME "${APP}/usr/lib/lmms/optional/${realname}" "${APP}/usr/lib/lmms/optional/${symname}")
+		file(COPY "${libreal}" DESTINATION "${APP}/usr/lib/${lmms}/optional/")
+		file(RENAME "${APP}/usr/lib/${lmms}/optional/${realname}" "${APP}/usr/lib/${lmms}/optional/${symname}")
 		continue()
 	endif()
 endforeach()
