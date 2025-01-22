@@ -1,6 +1,7 @@
 /* VectorView.cpp - implementation of VectorView class.
  *
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ * Copyright (c) 2025- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  * This program is free software; you can redistribute it and/or
