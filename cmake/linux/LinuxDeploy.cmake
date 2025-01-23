@@ -172,7 +172,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 # Remove libraries that are normally sytem-provided
 file(GLOB EXCLUDE_LIBS
 	"${APP}/usr/lib/libwine*"
-	"${APP}/usr/lib/libcarla*"
+	"${APP}/usr/lib/libcarla_native*"
 	"${APP}/usr/lib/${lmms}/optional/libcarla*"
 	"${APP}/usr/lib/libjack*")
 
