@@ -252,12 +252,20 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 	if( ! QFile( exec ).exists() )
 	{
-		qWarning( "Remote plugin '%s' not found.",
+		qWarning( "Remote plugin '%s' not found, trying fallback...",
 						exec.toUtf8().constData() );
-		m_failed = true;
-		invalidate();
-		unlock();
-		return failed();
+
+		// FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
+		exec = QDir("plugins:").absoluteFilePath("../" + pluginExecutable);
+		if( ! QFile( exec ).exists() )
+        {
+			qWarning( "Remote plugin '%s' not found", exec.toUtf8().constData() );
+
+			m_failed = true;
+			invalidate();
+			unlock();
+			return failed();
+		}
 	}
 
 	// ensure the watcher is ready in case we're running again

@@ -137,8 +137,6 @@ file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
 
 # Inform linuxdeploy about remote plugins
 file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
-list(APPEND REMOTE_PLUGINS "${VST32}")
-list(APPEND REMOTE_PLUGINS "${VST64}")
 
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
@@ -146,6 +144,9 @@ list(APPEND LIBS ${REMOTE_PLUGINS})
 list(APPEND LIBS ${CPACK_SUIL_MODULES})
 list(REMOVE_DUPLICATES LIBS)
 list(SORT LIBS)
+
+# Handle non-relinkable files (e.g. RemoveVstPlugin[32|64])
+list(FILTER LIBS EXCLUDE REGEX "\\/RemoteVst")
 
 # Construct linuxdeploy parameters
 foreach(_LIB IN LISTS LIBS)
@@ -155,7 +156,7 @@ foreach(_LIB IN LISTS LIBS)
 endforeach()
 
 # Call linuxdeploy
-message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... executables]")
+message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries]")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/scalable/apps/${lmms}.svg"
@@ -172,7 +173,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 file(GLOB EXCLUDE_LIBS
 	"${APP}/usr/lib/libwine*"
 	"${APP}/usr/lib/libcarla*"
-	"${APP}/usr/lib/optional/libcarla*"
+	"${APP}/usr/lib/${lmms}/optional/libcarla*"
 	"${APP}/usr/lib/libjack*")
 
 list(SORT EXCLUDE_LIBS)
@@ -183,8 +184,12 @@ foreach(_LIB IN LISTS EXCLUDE_LIBS)
 endforeach()
 
 # FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
-file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/")
-file(REMOVE_RECURSE "${APP}/usr/lib/suil-0/")
+foreach(_LIB IN LISTS LIBS)
+	if(EXISTS "${_LIB}")
+		file(REMOVE "${_LIB}")
+	endif()
+endforeach()
+file(REMOVE_RECURSE "${APP}/usr/lib/suil-0/" "${APP}/usr/lib/${lmms}/ladspa/")
 
 # Bundle jack to avoid crash for systems without it
 # See https://github.com/LMMS/lmms/pull/4186
