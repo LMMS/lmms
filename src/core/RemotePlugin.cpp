@@ -258,7 +258,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		// FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
 		exec = QDir("plugins:").absoluteFilePath("../" + pluginExecutable);
 		if( ! QFile( exec ).exists() )
-        {
+		{
 			qWarning( "Remote plugin '%s' not found", exec.toUtf8().constData() );
 
 			m_failed = true;
