@@ -34,21 +34,20 @@
 namespace lmms::gui
 {
 
-ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
-							QWidget * _parent, bool multi_export=false ) :
-	QDialog( _parent ),
-	Ui::ExportProjectDialog(),
-	m_fileName( _file_name ),
-	m_fileExtension(),
-	m_multiExport( multi_export ),
-	m_renderManager( nullptr )
+ExportProjectDialog::ExportProjectDialog(
+	const QString& exportLocation, bool exportStems, Track* trackToBounce, QWidget* parent)
+	: QDialog(parent)
+	, Ui::ExportProjectDialog()
+	, m_exportLocation(exportLocation)
+	, m_exportTracks(exportStems)
+	, m_trackToBounce(trackToBounce)
+	, m_renderManager(nullptr)
 {
 	setupUi( this );
-	setWindowTitle( tr( "Export project to %1" ).arg(
-					QFileInfo( _file_name ).fileName() ) );
+	setWindowTitle(tr("Export to %1").arg(QFileInfo(exportLocation).fileName()));
 
 	// Get the extension of the chosen file.
-	QStringList parts = _file_name.split( '.' );
+	QStringList parts = exportLocation.split('.');
 	QString fileExt;
 	if( parts.size() > 0 )
 	{
@@ -101,7 +100,6 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	connect( startButton, SIGNAL(clicked()),
 			this, SLOT(startBtnClicked()));
 }
-
 
 void ExportProjectDialog::reject()
 {
@@ -176,10 +174,10 @@ void ExportProjectDialog::startExport()
 
 	// Make sure we have the the correct file extension
 	// so there's no confusion about the codec in use.
-	auto output_name = m_fileName;
-	if (!(m_multiExport || output_name.endsWith(m_fileExtension,Qt::CaseInsensitive)))
+	auto output_name = m_exportLocation;
+	if (!(m_exportTracks || output_name.endsWith(m_exportLocation,Qt::CaseInsensitive)))
 	{
-		output_name+=m_fileExtension;
+		output_name += m_exportExtension;
 	}
 	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
 
@@ -196,14 +194,9 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL(finished()),
 			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
-	if ( m_multiExport )
-	{
-		m_renderManager->renderTracks();
-	}
-	else
-	{
-		m_renderManager->renderProject();
-	}
+	if (m_trackToBounce) { m_renderManager->renderTrack(m_trackToBounce); }
+	else if (m_exportTracks) { m_renderManager->renderTracks(); }
+	else { m_renderManager->renderProject(); }
 }
 
 
@@ -272,7 +265,7 @@ void ExportProjectDialog::startBtnClicked()
 	{
 		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
 		{
-			m_fileExtension = QString( QLatin1String( ProjectRenderer::fileEncodeDevices[i].m_extension ) );
+			m_exportExtension = QString(QLatin1String(ProjectRenderer::fileEncodeDevices[i].m_extension));
 			break;
 		}
 	}
