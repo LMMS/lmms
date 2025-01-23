@@ -221,7 +221,7 @@ bool PatternClipView::splitClip(const TimePos pos, bool hardSplit)
 	m_patternClip->getTrack()->addJournalCheckPoint();
 	m_patternClip->getTrack()->saveJournallingState(false);
 
-	auto rightClip = new PatternClip(m_patternClip->getTrack());
+	auto rightClip = new PatternClip(*m_patternClip);
 
 	m_patternClip->changeLength(splitPos - m_initialClipPos);
 

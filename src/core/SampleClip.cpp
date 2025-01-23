@@ -88,7 +88,9 @@ SampleClip::SampleClip(Track* track)
 }
 
 SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.getTrack(), orig.m_sample, orig.m_isPlaying)
+	Clip(orig),
+	m_sample(orig.m_sample),
+	m_isPlaying(orig.m_isPlaying)
 {
 }
 

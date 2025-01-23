@@ -890,8 +890,11 @@ bool MidiClipView::splitClip(const TimePos pos, bool hardSplit)
 
 	if (hardSplit)
 	{
-		auto leftClip = new MidiClip(m_clip->instrumentTrack());
-		auto rightClip = new MidiClip(m_clip->instrumentTrack());
+		// Using a copy of the original instead of new clips to retain name, color, etc.
+		auto leftClip = new MidiClip(*m_clip);
+		leftClip->clearNotes();
+		auto rightClip = new MidiClip(*m_clip);
+		rightClip->clearNotes();
 
 		for (Note const* note : m_clip->m_notes)
 		{

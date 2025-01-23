@@ -80,7 +80,7 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
-	Clip( _clip_to_copy.m_autoTrack ),
+	Clip(_clip_to_copy),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
 #endif

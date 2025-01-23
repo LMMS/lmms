@@ -54,6 +54,7 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip( Track * track );
+	Clip(const Clip& other);
 	~Clip() override;
 
 	inline Track * getTrack() const
@@ -174,7 +175,7 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_autoResize;
+	bool m_autoResize = false;
 	bool m_hasBeenResized = false;
 
 	bool m_selectViewOnCreate;
