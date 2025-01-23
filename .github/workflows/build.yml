@@ -117,7 +117,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: linux-arm64
           path: build/lmms-*.AppImage
       - name: Trim ccache and print statistics
         run: |
