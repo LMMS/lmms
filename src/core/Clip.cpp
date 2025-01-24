@@ -75,9 +75,9 @@ Clip::Clip(const Clip& other):
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
-	m_selectViewOnCreate{other.m_selectViewOnCreate},
 	m_autoResize(other.m_autoResize),
 	m_hasBeenResized(other.m_hasBeenResized),
+	m_selectViewOnCreate{other.m_selectViewOnCreate},
 	m_color(other.m_color)
 {
 	if(getTrack())
