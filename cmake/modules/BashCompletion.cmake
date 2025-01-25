@@ -35,7 +35,7 @@ if(NOT BASHCOMP_PKG_PATH)
 endif()
 
 # Always provide a fallback for non-root INSTALL()
-# * "lmms" subfolder ensures we don't pollute /usr/local/share/ on default "make instal"l"
+# * "lmms" subfolder ensures we don't pollute /usr/local/share/ on default "make install"
 set(BASHCOMP_USER_PATH "share/${PROJECT_NAME}/bash-completion/completions")
 
 macro(BASHCOMP_INSTALL SCRIPT_NAME)
