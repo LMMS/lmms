@@ -86,7 +86,6 @@ jobs:
           submodules: recursive
       - name: Install system packages
         run: |
-          sudo apt-get install -y --no-install-recommends libgtk2.0-0
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
       - name: Cache ccache data
