@@ -32,7 +32,6 @@
 #include "LocaleHelper.h"
 #include "ProjectJournal.h"
 #include "Song.h"
-#include <QDebug>
 
 namespace lmms
 {
@@ -82,6 +81,8 @@ AutomatableModel::~AutomatableModel()
 	}
 
 	m_valueBuffer.clear();
+
+	if (s_lastChangedModel == this) { s_lastChangedModel = nullptr; }
 
 	emit destroyed( id() );
 }
@@ -295,6 +296,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 
 void AutomatableModel::setValue( const float value )
 {
+	s_lastChangedModel = this;
 	m_oldValue = m_value;
 	++m_setValueDepth;
 	const float old_val = m_value;

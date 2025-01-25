@@ -317,6 +317,11 @@ public:
 		return m_useControllerValue;
 	}
 
+	static AutomatableModel* lastChangedModel()
+	{
+		return s_lastChangedModel;
+	}
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
@@ -340,6 +345,8 @@ protected:
 
 
 private:
+	inline static AutomatableModel* s_lastChangedModel = nullptr;
+
 	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
