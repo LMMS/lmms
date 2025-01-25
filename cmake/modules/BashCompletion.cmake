@@ -35,25 +35,40 @@ if(NOT BASHCOMP_PKG_PATH)
 endif()
 
 # Always provide a fallback for non-root INSTALL()
-set(BASHCOMP_USER_PATH "share/bash-completion/completions")
+# * "lmms" subfolder ensures we don't pollute /usr/local/share/ on default "make instal"l"
+set(BASHCOMP_USER_PATH "share/${PROJECT_NAME}/bash-completion/completions")
 
 macro(BASHCOMP_INSTALL SCRIPT_NAME)
 	# Note:  When running from CPack, message(...) will be supressed unless WARNING
 	if(WIN32)
 		message(STATUS "Bash completion is not supported on this platform.")
-	elseif(APPLE)
-		message(STATUS "Bash completion is not yet implemented for this platform.")
 	else()
+	    # Install a copy of bash completion to the default install prefix
+	    # See also: https://github.com/LMMS/lmms/pull/7252/files#r1815749125
 		install(FILES "${SCRIPT_NAME}" DESTINATION "${BASHCOMP_USER_PATH}")
+
+		# Next, blindly attempt a system-wide install, ignoring failure
+		# See also: https://stackoverflow.com/q/58448332
+		# * CPack doesn't use CMAKE_INSTALL_PREFIX, so the original will be missing when packaging
+		#   and this step will be skipped
+		# * For non-root installs (e.g. ../target), this will silently fail
+		set(BASHCOMP_ORIG "${CMAKE_INSTALL_PREFIX}/${BASHCOMP_USER_PATH}/${CMAKE_PROJECT_NAME}")
+		set(BASHCOMP_LINK "${BASHCOMP_PKG_PATH}/${CMAKE_PROJECT_NAME}")
+
 		if(BASHCOMP_PKG_PATH)
 			# TODO: CMake 3.21 Use "file(COPY_FILE ...)"
 			install(CODE "
-					execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"${SCRIPT_NAME}\" \"${BASHCOMP_PKG_PATH}\" ERROR_QUIET RESULT_VARIABLE result)
-					if(NOT result EQUAL 0)
-						message(STATUS \"Unable to install bash-completion support system-wide: ${BASHCOMP_USER_PATH}/${SCRIPT_NAME}.  This is normal for user-space installs.\")
-					else()
-						message(STATUS \"Bash completion-support has been installed to ${BASHCOMP_USER_PATH}/${SCRIPT_NAME}\")
+				if(EXISTS \"${BASHCOMP_ORIG}\")
+					file(REMOVE \"${BASHCOMP_LINK}\")
+					execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+						\"${BASHCOMP_ORIG}\"
+						\"${BASHCOMP_LINK}\"
+						ERROR_QUIET
+						RESULT_VARIABLE result)
+					if(result EQUAL 0)
+						message(STATUS \"Bash completion-support has been installed to ${BASHCOMP_LINK}\")
 					endif()
+				endif()
 			")
 		endif()
 	endif()

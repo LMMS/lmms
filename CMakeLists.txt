@@ -692,7 +692,7 @@ if(WANT_DEBUG_GPROF)
 	add_link_options(-pg)
 	set(STATUS_GPROF "OK")
 else()
-	set(STATUS_GPROF "DISABLED ${STATUS_GPROF}")
+	set(STATUS_GPROF "Disabled ${STATUS_GPROF}")
 endif()
 
 # add enabled sanitizers
