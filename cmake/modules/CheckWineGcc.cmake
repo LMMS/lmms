@@ -9,10 +9,6 @@ FUNCTION(CheckWineGcc BITNESS WINEGCC_EXECUTABLE RESULT)
 		return 0;
 	}
 	")
-	if(IS_ARM64 AND BITNESS EQUAL 64)
-		# arm64 winegcc is missing -m32 and -m64, shim -mconsole instead
-		set(BITNESS console)
-	endif()
 	EXECUTE_PROCESS(COMMAND ${WINEGCC_EXECUTABLE} "-m${BITNESS}"
 		"${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/winegcc_test.cxx"
 		"-o" "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/winegcc_test"
