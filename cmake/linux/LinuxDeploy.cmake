@@ -109,42 +109,6 @@ set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optiona
 # Skip slow searching of copyright files https://github.com/linuxdeploy/linuxdeploy/issues/278
 set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 
-# Handle wine32 linking
-set(VST32 "${APP}/usr/lib/${lmms}/32/RemoteVstPlugin32.exe.so")
-if(EXISTS "${VST32}")
-	execute_process(COMMAND ldd "${VST32}"
-		OUTPUT_VARIABLE LDD_OUTPUT
-		OUTPUT_STRIP_TRAILING_WHITESPACE
-		COMMAND_ECHO ${COMMAND_ECHO}
-		COMMAND_ERROR_IS_FATAL ANY)
-	string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
-	foreach(line ${LDD_LIST})
-		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_32_LIBRARY_DIRS}:$ENV{LD_LIBRARY_PATH}")
-			message(STATUS "Prepended ${CPACK_WINE_32_LIBRARY_DIRS} to LD_LIBRARY_PATH: $ENV{LD_LIBRARY_PATH}")
-			continue()
-		endif()
-	endforeach()
-endif()
-
-# Handle wine64 linking
-set(VST64 "${APP}/usr/lib/${lmms}/RemoteVstPlugin64.exe.so")
-if(EXISTS "${VST64}")
-	execute_process(COMMAND ldd "${VST64}"
-		OUTPUT_VARIABLE LDD_OUTPUT
-		OUTPUT_STRIP_TRAILING_WHITESPACE
-		COMMAND_ECHO ${COMMAND_ECHO}
-		COMMAND_ERROR_IS_FATAL ANY)
-	string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
-	foreach(line ${LDD_LIST})
-		if(line MATCHES "libwine.so" AND line MATCHES "not found")
-			set(ENV{LD_LIBRARY_PATH} "${CPACK_WINE_64_LIBRARY_DIRS}:$ENV{LD_LIBRARY_PATH}")
-			message(STATUS "Prepended ${CPACK_WINE_64_LIBRARY_DIRS} to LD_LIBRARY_PATH: $ENV{LD_LIBRARY_PATH}")
-			continue()
-		endif()
-	endforeach()
-endif()
-
 # Patch desktop file
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
@@ -209,7 +173,7 @@ foreach(_lib IN LISTS LIBS)
 		file(REMOVE "${_lib}")
 	endif()
 endforeach()
-file(REMOVE_RECURSE "${APP}/usr/lib/suil-0/" "${APP}/usr/lib/${lmms}/ladspa/")
+file(REMOVE_RECURSE "${SUIL_MODULES_TARGET}" "${APP}/usr/lib/${lmms}/ladspa/")
 
 # Bundle jack to avoid crash for systems without it
 # See https://github.com/LMMS/lmms/pull/4186
