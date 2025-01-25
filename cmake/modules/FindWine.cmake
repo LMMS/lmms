@@ -70,9 +70,15 @@ FIND_PROGRAM(WINE_GCC NAMES
 FIND_PROGRAM(WINE_BUILD NAMES winebuild PATHS ${WINE_CXX_LOCATIONS} NO_DEFAULT_PATH)
 # Detect wine paths and handle linking problems
 IF(WINE_CXX)
+	if(IS_ARM64)
+		# arm64 winegcc is missing -m32 and -m64
+		set(M64 "")
+	else()
+		set(M64 -m64)
+	endif()
 	# call wineg++ to obtain implied includes and libs
 	execute_process(COMMAND ${WINE_CXX} -m32 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_32 ERROR_QUIET)
-	execute_process(COMMAND ${WINE_CXX} -m64 -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_64 ERROR_QUIET)
+	execute_process(COMMAND ${WINE_CXX} ${M64} -v /dev/zero OUTPUT_VARIABLE WINEBUILD_OUTPUT_64 ERROR_QUIET)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem/usr/include$" BUGGED_WINEGCC)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem" WINEGCC_INCLUDE_DIR)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "libwinecrt0\\.a.*" WINECRT_32)
