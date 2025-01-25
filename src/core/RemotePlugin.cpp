@@ -235,6 +235,11 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		m_failed = false;
 	}
 	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
+
+	// We may have received a directory via a environment variable
+	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
+			exec = QFileInfo(QDir(env_path), pluginExecutable).absoluteFilePath();
+
 #ifdef LMMS_BUILD_APPLE
 	// search current directory first
 	QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
@@ -252,20 +257,12 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 	if( ! QFile( exec ).exists() )
 	{
-		qWarning( "Remote plugin '%s' not found, trying fallback...",
+		qWarning( "Remote plugin '%s' not found",
 						exec.toUtf8().constData() );
-
-		// FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
-		exec = QDir("plugins:").absoluteFilePath("../" + pluginExecutable);
-		if( ! QFile( exec ).exists() )
-		{
-			qWarning( "Remote plugin '%s' not found", exec.toUtf8().constData() );
-
-			m_failed = true;
-			invalidate();
-			unlock();
-			return failed();
-		}
+		m_failed = true;
+		invalidate();
+		unlock();
+		return failed();
 	}
 
 	// ensure the watcher is ready in case we're running again
