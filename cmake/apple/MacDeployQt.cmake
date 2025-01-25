@@ -1,3 +1,10 @@
+# Create a macOS .dmg desktop installer using macdeployqt
+#
+# Copyright (c) 2025, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 # Variables must be prefixed with "CPACK_" to be visible here
 set(lmms "${CPACK_PROJECT_NAME}")
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
@@ -96,15 +103,25 @@ execute_process(COMMAND install_name_tool -change
 # Build list of executables to inform macdeployqt about
 # e.g. -executable=foo.dylib -executable=bar.dylib
 file(GLOB LIBS "${APP}/Contents/lib/${lmms}/*.so")
+
+# Inform macdeployqt about LADSPA plugins; may depend on bundled fftw3f, etc.
 file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
+
+# Inform linuxdeploy about remote plugins
+list(APPEND REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
+
+# Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
-list(APPEND LIBS "${APP}/Contents/MacOS/RemoteZynAddSubFx")
+list(APPEND LIBS ${REMOTE_PLUGINS})
 list(APPEND LIBS ${CPACK_SUIL_MODULES})
+list(REMOVE_DUPLICATES LIBS)
 list(SORT LIBS)
 
 # Construct macdeployqt parameters
 foreach(_lib IN LISTS LIBS)
-	list(APPEND EXECUTABLES "-executable=${_lib}")
+	if(EXISTS "${_lib}")
+		list(APPEND EXECUTABLES "-executable=${_lib}")
+	endif()
 endforeach()
 
 # Call macdeployqt

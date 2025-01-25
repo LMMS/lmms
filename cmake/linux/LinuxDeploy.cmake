@@ -1,3 +1,13 @@
+# Create a Linux desktop installer using linuxdeploy
+#  * Creates a relocatable LMMS.AppDir installation in build/_CPack_Packages using linuxdeploy
+#    * If CPACK_TOOL=appimagetool or is not set, bundles AppDir into redistributable ".AppImage" file
+#    * If CPACK_TOOL=makeself is provided, bundles into a redistributable ".run" file
+#
+# Copyright (c) 2025, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 # Variables must be prefixed with "CPACK_" to be visible here
 set(lmms "${CPACK_PROJECT_NAME}")
 set(LMMS "${CPACK_PROJECT_NAME_UCASE}")
@@ -9,6 +19,16 @@ set(APPIMAGE_FILE "${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.AppImage")
 set(APPIMAGE_BEFORE_RENAME "${CPACK_BINARY_DIR}/${LMMS}-${ARCH}.AppImage")
 
 set(DESKTOP_FILE "${APP}/usr/share/applications/${lmms}.desktop")
+
+# Determine which packaging tool to use
+if(NOT CPACK_TOOL)
+	# Pick up environmental variable
+	if(DEFINED ENV{CPACK_TOOL})
+		set(CPACK_TOOL "$ENV{CPACK_TOOL}")
+	else()
+		set(CPACK_TOOL "appimagetool")
+	endif()
+endif()
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
@@ -145,18 +165,18 @@ list(APPEND LIBS ${CPACK_SUIL_MODULES})
 list(REMOVE_DUPLICATES LIBS)
 list(SORT LIBS)
 
-# Handle non-relinkable files (e.g. RemoveVstPlugin[32|64])
+# Handle non-relinkable files (e.g. RemoveVstPlugin[32|64], but not NativeLinuxRemoteVstPlugin)
 list(FILTER LIBS EXCLUDE REGEX "\\/RemoteVst")
 
 # Construct linuxdeploy parameters
-foreach(_LIB IN LISTS LIBS)
-	if(EXISTS "${_LIB}")
-		list(APPEND LIBRARIES "--library=${_LIB}")
+foreach(_lib IN LISTS LIBS)
+	if(EXISTS "${_lib}")
+		list(APPEND LIBRARIES "--library=${_lib}")
 	endif()
 endforeach()
 
 # Call linuxdeploy
-message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries]")
+message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/scalable/apps/${lmms}.svg"
@@ -177,16 +197,16 @@ file(GLOB EXCLUDE_LIBS
 	"${APP}/usr/lib/libjack*")
 
 list(SORT EXCLUDE_LIBS)
-foreach(_LIB IN LISTS EXCLUDE_LIBS)
-	if(EXISTS "${_LIB}")
-		file(REMOVE "${_LIB}")
+foreach(_lib IN LISTS EXCLUDE_LIBS)
+	if(EXISTS "${_lib}")
+		file(REMOVE "${_lib}")
 	endif()
 endforeach()
 
 # FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
-foreach(_LIB IN LISTS LIBS)
-	if(EXISTS "${_LIB}")
-		file(REMOVE "${_LIB}")
+foreach(_lib IN LISTS LIBS)
+	if(EXISTS "${_lib}")
+		file(REMOVE "${_lib}")
 	endif()
 endforeach()
 file(REMOVE_RECURSE "${APP}/usr/lib/suil-0/" "${APP}/usr/lib/${lmms}/ladspa/")
@@ -218,10 +238,22 @@ foreach(line ${LDD_LIST})
 	endif()
 endforeach()
 
-if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
+if(CPACK_TOOL STREQUAL "appimagetool")
+	# Create ".AppImage" file using appimagetool (default)
+	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
+	set(ENV{ARCH} "${ARCH}")
+	message(STATUS "Finishing the AppImage...")
+	execute_process(COMMAND ${CPACK_TOOL} "${APP}" "${APPIMAGE_FILE}"
+		${APPIMAGETOOL_VERBOSITY}
+		${OUTPUT_QUIET}
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
+
+	message(STATUS "AppImage created: ${APPIMAGE_FILE}")
+elseif(CPACK_TOOL STREQUAL "makeself")
+	# Create self-extracting ".run" script using makeself
 	find_program(MAKESELF_BIN makeself REQUIRED)
 
-	# Create self-extracting ".run" script using makeself
 	message(STATUS "Finishing the .run file using ${MAKESELF_BIN}...")
 	string(REPLACE ".AppImage" ".run" RUN_FILE "${APPIMAGE_FILE}")
 	configure_file(
@@ -238,7 +270,7 @@ if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
 
 	# makeself.sh [args] archive_dir file_name label startup_script [script_args]
 	file(REMOVE "${RUN_FILE}")
-	execute_process(COMMAND makeself
+	execute_process(COMMAND "${MAKESELF_BIN}"
 		--keep-umask
 		--nox11
 		${MAKESELF_QUIET}
@@ -259,16 +291,6 @@ if(CPACK_TOOL STREQUAL "makeself" OR "$ENV{CPACK_TOOL}" STREQUAL "makeself")
 
 	message(STATUS "Installer created: ${RUN_FILE}")
 else()
-	# Create AppImage (default)
-	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
-	set(ENV{ARCH} "${ARCH}")
-	message(STATUS "Finishing the AppImage...")
-	execute_process(COMMAND appimagetool "${APP}" "${APPIMAGE_FILE}"
-		${APPIMAGETOOL_VERBOSITY}
-		${OUTPUT_QUIET}
-		COMMAND_ECHO ${COMMAND_ECHO}
-		COMMAND_ERROR_IS_FATAL ANY)
-
-	message(STATUS "AppImage created: ${APPIMAGE_FILE}")
+	message(FATAL_ERROR "Packaging tool CPACK_TOOL=\"${CPACK_TOOL}\" is not yet supported")
 endif()
 
