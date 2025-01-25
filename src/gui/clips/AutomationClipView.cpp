@@ -208,9 +208,9 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	if (AutomatableModel::lastChangedModel() != nullptr)
 	{
 		_cm->addAction(tr("Connect last changed model (%1)").arg(
-			!AutomatableModel::lastChangedModel()->displayName().isEmpty()
+			!AutomatableModel::lastChangedModel()->fullDisplayName().isEmpty()
 				? AutomatableModel::lastChangedModel()->fullDisplayName()
-				: "Unknown Model Name"),
+				: "Unknown"),
 			this, &AutomationClipView::connectLastChangedModel);
 	}
 	if (!m_clip->m_objects.empty())
@@ -221,7 +221,11 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 		{
 			if (object)
 			{
-				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
+				a = new QAction(tr("Disconnect \"%1\"").arg(
+					!object->fullDisplayName().isEmpty()
+						? object->fullDisplayName()
+						: "Unknown"
+				), m);
 				a->setData(object->id());
 				m->addAction( a );
 			}
