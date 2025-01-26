@@ -176,11 +176,11 @@ endforeach()
 # Move RemotePlugins into to LMMS_PLUGIN_DIR
 file(GLOB WINE_VST_LIBS
 	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*"
-	"${APP}/usr/lib/${lmms}/32/")
-foreach(_file IN LISTS WINE_64_LIBS)
+	"${APP}/usr/lib/${lmms}/32")
+foreach(_file IN LISTS WINE_VST_LIBS)
 	if(EXISTS "${_file}")
-		get_filename_component(_file "${_file}" NAME)
-		file(RENAME "${_file}" "${APP}/usr/lib/${_file}")
+		get_filename_component(_name "${_file}" NAME)
+		file(RENAME "${_file}" "${APP}/usr/lib/${_name}")
 	endif()
 endforeach()
 file(GLOB WINE_32_LIBS
