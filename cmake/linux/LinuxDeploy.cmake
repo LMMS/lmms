@@ -173,6 +173,17 @@ foreach(_lib IN LISTS LIBS)
 		file(REMOVE "${_lib}")
 	endif()
 endforeach()
+# Move non-relinkable files to LMMS_PLUGIN_DIR
+file(GLOB WINE_VST_LIBS
+	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*"
+	"${APP}/usr/lib/${lmms}/32/RemoteVstPlugin*")
+foreach(_lib IN LISTS WINE_VST_LIBS)
+	if(EXISTS "${_lib}")
+		get_filename_component(_file "${_lib}" NAME)
+		file(RENAME "${_lib}" "${APP}/usr/lib/${_file}")
+	endif()
+endforeach()
+
 file(REMOVE_RECURSE "${SUIL_MODULES_TARGET}" "${APP}/usr/lib/${lmms}/ladspa/")
 
 # Bundle jack to avoid crash for systems without it
