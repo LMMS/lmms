@@ -173,11 +173,19 @@ foreach(_lib IN LISTS LIBS)
 		file(REMOVE "${_lib}")
 	endif()
 endforeach()
-# Move non-relinkable files to LMMS_PLUGIN_DIR
+# Move RemotePlugins into to LMMS_PLUGIN_DIR
 file(GLOB WINE_VST_LIBS
 	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*"
-	"${APP}/usr/lib/${lmms}/32/RemoteVstPlugin*")
-foreach(_lib IN LISTS WINE_VST_LIBS)
+	"${APP}/usr/lib/${lmms}/32/")
+foreach(_file IN LISTS WINE_64_LIBS)
+	if(EXISTS "${_file}")
+		get_filename_component(_file "${_file}" NAME)
+		file(RENAME "${_file}" "${APP}/usr/lib/${_file}")
+	endif()
+endforeach()
+file(GLOB WINE_32_LIBS
+	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*")
+foreach(_lib IN LISTS WINE_64_LIBS)
 	if(EXISTS "${_lib}")
 		get_filename_component(_file "${_lib}" NAME)
 		file(RENAME "${_lib}" "${APP}/usr/lib/${_file}")
