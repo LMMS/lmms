@@ -45,6 +45,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	, m_outBufSize(engine->framesPerPeriod())
 {
 	Pa_Initialize();
+
 	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
