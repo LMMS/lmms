@@ -40,27 +40,19 @@ namespace lmms {
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	: AudioDevice(ConfigManager::inst()->value("audioportaudio", "channels", QString{DEFAULT_CHANNELS}).toInt(), engine)
 	, m_paStream(nullptr)
-	, m_wasPAInitError(false)
 	, m_outBuf(std::make_unique<SampleFrame[]>(engine->framesPerPeriod()))
 	, m_outBufPos(0)
 	, m_outBufSize(engine->framesPerPeriod())
 {
-	successful = false;
-
-	PaError err = Pa_Initialize();
-	if (err != paNoError)
-	{
-		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
-		m_wasPAInitError = true;
-		return;
-	}
-
+	Pa_Initialize();
 	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
-	PaDeviceIndex inputDeviceIndex = Pa_GetDefaultInputDevice();
-	PaDeviceIndex outputDeviceIndex = Pa_GetDefaultOutputDevice();
-	for (int i = 0; i < Pa_GetDeviceCount(); ++i)
+	auto inputDeviceIndex = Pa_GetDefaultInputDevice();
+	auto outputDeviceIndex = Pa_GetDefaultOutputDevice();
+	const auto deviceCount = Pa_GetDeviceCount();
+
+	for (auto i = 0; i < deviceCount; ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 		if (deviceInfo->name == device && Pa_GetHostApiInfo(deviceInfo->hostApi)->name == backend)
@@ -71,60 +63,39 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		}
 	}
 
-	PaStreamParameters* inputParameters = nullptr;
-	PaStreamParameters* outputParameters = nullptr;
+	auto outputParameters = PaStreamParameters{};
+	auto inputParameters = PaStreamParameters{};
 
-	if (outputDeviceIndex >= 0)
-	{
-		m_outputParameters.device = outputDeviceIndex;
-		m_outputParameters.channelCount = channels();
-		m_outputParameters.sampleFormat = paFloat32;
-		m_outputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
-		m_outputParameters.hostApiSpecificStreamInfo = nullptr;
-		outputParameters = &m_outputParameters;
-	}
-	else { return; }
+	outputParameters.device = outputDeviceIndex;
+	outputParameters.channelCount = channels();
+	outputParameters.sampleFormat = paFloat32;
+	outputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
+	outputParameters.hostApiSpecificStreamInfo = nullptr;
 
-	if (inputDeviceIndex >= 0)
-	{
-		m_inputParameters.device = inputDeviceIndex;
-		m_inputParameters.channelCount = channels();
-		m_inputParameters.sampleFormat = paFloat32;
-		m_inputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
-		m_inputParameters.hostApiSpecificStreamInfo = nullptr;
-		inputParameters = &m_inputParameters;
-		m_supportsCapture = true;
-	}
-	else { m_supportsCapture = false; }
+	inputParameters.device = inputDeviceIndex;
+	inputParameters.channelCount = channels();
+	inputParameters.sampleFormat = paFloat32;
+	inputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
+	inputParameters.hostApiSpecificStreamInfo = nullptr;
 
-	err = Pa_OpenStream(&m_paStream, inputParameters, outputParameters, sampleRate(), engine->framesPerPeriod(),
+	auto err = Pa_OpenStream(&m_paStream, &inputParameters, &outputParameters, sampleRate(), engine->framesPerPeriod(),
 		paNoFlag, processCallback, this);
 
 	if (err != paNoError)
 	{
 		std::cerr << "Couldn't open PortAudio: " << Pa_GetErrorText(err) << '\n';
+		successful = false;
 		return;
 	}
 
-	const auto inputDeviceInfo = Pa_GetDeviceInfo(inputDeviceIndex);
-	const auto inputDeviceName = inputDeviceInfo->name;
-	const auto inputDeviceBackend = Pa_GetHostApiInfo(inputDeviceInfo->hostApi)->name;
-
-	const auto outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
-	const auto outputDeviceName = outputDeviceInfo->name;
-	const auto outputDeviceBackend = Pa_GetHostApiInfo(outputDeviceInfo->hostApi)->name;
-
-	std::cout << "Input device: " << inputDeviceName << ", backend: " << inputDeviceBackend << '\n';
-	std::cout << "Output device: " << outputDeviceName << ", backend: " << outputDeviceBackend << '\n';
-
+	m_supportsCapture = true;
 	successful = true;
 }
 
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-
-	if (!m_wasPAInitError) { Pa_Terminate(); }
+	Pa_Terminate();
 }
 
 void AudioPortAudio::startProcessing()
