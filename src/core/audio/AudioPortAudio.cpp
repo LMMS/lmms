@@ -49,7 +49,6 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
-	auto inputDeviceIndex = Pa_GetDefaultInputDevice();
 	auto outputDeviceIndex = Pa_GetDefaultOutputDevice();
 	const auto deviceCount = Pa_GetDeviceCount();
 
@@ -58,31 +57,21 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 		if (deviceInfo->name == device && Pa_GetHostApiInfo(deviceInfo->hostApi)->name == backend)
 		{
-			inputDeviceIndex = i;
 			outputDeviceIndex = i;
 			break;
 		}
 	}
 
-	const auto latency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
+	const auto outputParameters = PaStreamParameters{
+		.device = outputDeviceIndex,
+		.channelCount = channels(),
+		.sampleFormat = paFloat32,
+		.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate(),
+		.hostApiSpecificStreamInfo = nullptr
+	};
 
-	auto outputParameters = PaStreamParameters{};
-	auto inputParameters = PaStreamParameters{};
-
-	outputParameters.device = outputDeviceIndex;
-	outputParameters.channelCount = channels();
-	outputParameters.sampleFormat = paFloat32;
-	outputParameters.suggestedLatency = latency;
-	outputParameters.hostApiSpecificStreamInfo = nullptr;
-
-	inputParameters.device = inputDeviceIndex;
-	inputParameters.channelCount = channels();
-	inputParameters.sampleFormat = paFloat32;
-	inputParameters.suggestedLatency = latency;
-	inputParameters.hostApiSpecificStreamInfo = nullptr;
-
-	auto err = Pa_OpenStream(&m_paStream, &inputParameters, &outputParameters, sampleRate(), engine->framesPerPeriod(),
-		paNoFlag, processCallback, this);
+	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(), paNoFlag,
+		processCallback, this);
 
 	if (err != paNoError)
 	{
@@ -91,7 +80,6 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		return;
 	}
 
-	m_supportsCapture = true;
 	successful = true;
 }
 
@@ -118,8 +106,6 @@ void AudioPortAudio::stopProcessing()
 
 int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer)
 {
-	if (supportsCapture()) { audioEngine()->pushInputFrames((SampleFrame*)inputBuffer, framesPerBuffer); }
-
 	while (framesPerBuffer)
 	{
 		if (m_outBufPos == 0)
