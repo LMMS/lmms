@@ -63,19 +63,21 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		}
 	}
 
+	const auto latency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
+
 	auto outputParameters = PaStreamParameters{};
 	auto inputParameters = PaStreamParameters{};
 
 	outputParameters.device = outputDeviceIndex;
 	outputParameters.channelCount = channels();
 	outputParameters.sampleFormat = paFloat32;
-	outputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
+	outputParameters.suggestedLatency = latency;
 	outputParameters.hostApiSpecificStreamInfo = nullptr;
 
 	inputParameters.device = inputDeviceIndex;
 	inputParameters.channelCount = channels();
 	inputParameters.sampleFormat = paFloat32;
-	inputParameters.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate();
+	inputParameters.suggestedLatency = latency;
 	inputParameters.hostApiSpecificStreamInfo = nullptr;
 
 	auto err = Pa_OpenStream(&m_paStream, &inputParameters, &outputParameters, sampleRate(), engine->framesPerPeriod(),
