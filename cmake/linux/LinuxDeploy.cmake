@@ -96,6 +96,14 @@ if(CPACK_SUIL_MODULES)
 	file(COPY ${CPACK_SUIL_MODULES} DESTINATION "${SUIL_MODULES_TARGET}")
 endif()
 
+# Copy stk/rawwaves
+if(CPACK_STK_RAWWAVE_ROOT)
+	set(STK_RAWWAVE_TARGET "${APP}/usr/share/stk/rawwaves/")
+	file(MAKE_DIRECTORY "${STK_RAWWAVE_TARGET}")
+	file(GLOB RAWWAVES "${CPACK_STK_RAWWAVE_ROOT}/*.raw")
+	file(COPY ${RAWWAVES} DESTINATION "${STK_RAWWAVE_TARGET}")
+endif()
+
 # Ensure project's "qmake" executable is first on the PATH
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 set(ENV{PATH} "${QTBIN}:$ENV{PATH}")

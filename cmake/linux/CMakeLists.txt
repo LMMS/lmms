@@ -8,11 +8,6 @@ if(WANT_CPACK_TARBALL)
 	return()
 endif()
 
-# Copy rawwaves into bundle
-file(GLOB RAWWAVES "${STK_RAWWAVE_ROOT}/*.raw")
-list(SORT RAWWAVES)
-install(FILES ${RAWWAVES} DESTINATION share/stk)
-
 install(FILES launch_lmms.sh DESTINATION bin)
 
 # Standard CPack options
@@ -38,6 +33,7 @@ set(CPACK_PROJECT_VERSION "${VERSION}" PARENT_SCOPE)
 set(CPACK_CMAKE_COMMAND "${CMAKE_COMMAND}" PARENT_SCOPE)
 set(CPACK_SUIL_MODULES "${Suil_MODULES}" PARENT_SCOPE)
 set(CPACK_SUIL_MODULES_PREFIX "${Suil_MODULES_PREFIX}" PARENT_SCOPE)
+set(CPACK_STK_RAWWAVE_ROOT "${STK_RAWWAVE_ROOT}" PARENT_SCOPE)
 
 # TODO: Canidate for DetectMachine.cmake
 if(IS_X86_64)
