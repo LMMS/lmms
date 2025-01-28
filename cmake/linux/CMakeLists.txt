@@ -1,4 +1,4 @@
-install(DIRECTORY icons DESTINATION "${DATA_DIR}/icons/hicolor")
+install(DIRECTORY icons/ DESTINATION "${DATA_DIR}/icons/hicolor")
 install(FILES lmms.desktop DESTINATION "${DATA_DIR}/applications")
 install(FILES lmms.xml DESTINATION "${DATA_DIR}/mime/packages")
 
