@@ -57,26 +57,8 @@ using jo_id_t = uint32_t; // (unique) ID of a journalling object
 
 constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
-constexpr char LADSPA_PATH_SEPERATOR =
-#ifdef LMMS_BUILD_WIN32
-';';
-#else
-':';
-#endif
-
-
-
 #define LMMS_STRINGIFY(s) LMMS_STR(s)
 #define LMMS_STR(PN)	#PN
-
-// Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
-constexpr const char* UI_CTRL_KEY =
-#ifdef LMMS_BUILD_APPLE
-"⌘";
-#else
-"Ctrl";
-#endif
-
 
 } // namespace lmms
 

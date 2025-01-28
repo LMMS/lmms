@@ -38,6 +38,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "NStateButton.h"
+#include "OperatingSystemHelpers.h"
 #include "TextFloat.h"
 
 namespace lmms::gui

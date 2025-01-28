@@ -44,6 +44,7 @@
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
+#include "OperatingSystemHelpers.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "SampleClip.h"
@@ -633,7 +634,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
+		if (me->modifiers() & getOSSpecificModifierKey() && !(sClip && knifeMode))
 		{
 			if( isSelected() )
 			{
@@ -726,7 +727,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), getOSSppecificModifierKeyString(),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -824,7 +825,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
-	if( me->modifiers() & Qt::ControlModifier )
+	if (me->modifiers() & getOSSpecificModifierKey())
 	{
 		delete m_hint;
 		m_hint = nullptr;
