@@ -84,8 +84,6 @@ private:
 
 	SDL_AudioSpec m_audioHandle;
 
-	SampleFrame* m_outBuf;
-
 	size_t m_currentBufferFramePos;
 	size_t m_currentBufferFramesCount;
 

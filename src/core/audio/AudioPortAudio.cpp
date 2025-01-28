@@ -66,13 +66,9 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
-	m_wasPAInitError( false ),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
-	m_outBufPos( 0 )
+	m_wasPAInitError(false)
 {
 	_success_ful = false;
-
-	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -123,7 +119,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 
 	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = audioEngine()->framesPerPeriod();
+	const int samples = audioEngine()->userFramesPerPeriod();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
@@ -193,7 +189,6 @@ AudioPortAudio::~AudioPortAudio()
 	{
 		Pa_Terminate();
 	}
-	delete[] m_outBuf;
 }
 
 
@@ -243,36 +238,7 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		return paComplete;
 	}
 
-	while( _framesPerBuffer )
-	{
-		if( m_outBufPos == 0 )
-		{
-			// frames depend on the sample rate
-			const fpp_t frames = getNextBuffer( m_outBuf );
-			if( !frames )
-			{
-				m_stopped = true;
-				memset( _outputBuffer, 0, _framesPerBuffer *
-					channels() * sizeof(float) );
-				return paComplete;
-			}
-			m_outBufSize = frames;
-		}
-		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
-
-		for( fpp_t frame = 0; frame < min_len; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				(_outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
-			}
-		}
-
-		_outputBuffer += min_len * channels();
-		_framesPerBuffer -= min_len;
-		m_outBufPos += min_len;
-		m_outBufPos %= m_outBufSize;
-	}
+	audioEngine()->renderNextBuffer(reinterpret_cast<SampleFrame*>(_outputBuffer), _framesPerBuffer);
 
 	return paContinue;
 }

@@ -49,6 +49,7 @@ public:
 
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
 
+	virtual void writeBuffer(const SampleFrame* buf, const fpp_t frames) = 0;
 
 protected:
 	int writeData( const void* data, int len );

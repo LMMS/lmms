@@ -55,10 +55,6 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_client(nullptr)
 	, m_active(false)
 	, m_midiClient(nullptr)
-	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
-	, m_framesDoneInCurBuf(0)
-	, m_framesToDoInCurBuf(0)
 {
 	m_stopped = true;
 
@@ -86,10 +82,6 @@ AudioJack::~AudioJack()
 		if (m_active) { jack_deactivate(m_client); }
 		jack_client_close(m_client);
 	}
-
-	delete[] m_tempOutBufs;
-
-	delete[] m_outBuf;
 }
 
 
@@ -299,11 +291,6 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		m_midiClient.load()->JackMidiWrite(nframes);
 	}
 
-	for (int c = 0; c < channels(); ++c)
-	{
-		m_tempOutBufs[c] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_outputPorts[c], nframes);
-	}
-
 #ifdef AUDIO_PORT_SUPPORT
 	const int frames = std::min<int>(nframes, audioEngine()->framesPerPeriod());
 	for (JackPortMap::iterator it = m_portMap.begin(); it != m_portMap.end(); ++it)
@@ -321,38 +308,26 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 #endif
 
-	jack_nframes_t done = 0;
-	while (done < nframes && !m_stopped)
+	if (m_stopped)
 	{
-		jack_nframes_t todo = std::min<jack_nframes_t>(nframes - done, m_framesToDoInCurBuf - m_framesDoneInCurBuf);
 		for (int c = 0; c < channels(); ++c)
 		{
-			jack_default_audio_sample_t* o = m_tempOutBufs[c];
-			for (jack_nframes_t frame = 0; frame < todo; ++frame)
-			{
-				o[done + frame] = m_outBuf[m_framesDoneInCurBuf + frame][c];
-			}
+			auto o = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(m_outputPorts[c], nframes));
+			memset(o, 0, nframes);
 		}
-		done += todo;
-		m_framesDoneInCurBuf += todo;
-		if (m_framesDoneInCurBuf == m_framesToDoInCurBuf)
-		{
-			m_framesToDoInCurBuf = getNextBuffer(m_outBuf);
-			m_framesDoneInCurBuf = 0;
-			if (!m_framesToDoInCurBuf)
-			{
-				m_stopped = true;
-				break;
-			}
-		}
+
+		return 0;
 	}
 
-	if (nframes != done)
+	static auto buf = std::vector<SampleFrame>(nframes);
+	audioEngine()->renderNextBuffer(buf.data(), buf.size());
+
+	for (int c = 0; c < channels(); ++c)
 	{
-		for (int c = 0; c < channels(); ++c)
+		auto o = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(m_outputPorts[c], nframes));
+		for (jack_nframes_t frame = 0; frame < nframes; ++frame)
 		{
-			jack_default_audio_sample_t* b = m_tempOutBufs[c] + done;
-			memset(b, 0, sizeof(*b) * (nframes - done));
+			o[frame] = buf[frame][c];
 		}
 	}
 
