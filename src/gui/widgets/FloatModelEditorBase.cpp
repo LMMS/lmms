@@ -346,41 +346,20 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 void FloatModelEditorBase::setPosition(const QPoint & p)
 {
-	const float value = getValue(p) + m_leftOver;
+	const float valueOffset = getValue(p) + m_leftOver;
+	const float currentValue = model()->value();
+	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
-	const float oldValue = model()->value();
+	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
 
-	if (model()->isScaleLogarithmic()) // logarithmic code
+	if (roundedValue != currentValue)
 	{
-		const float pos = model()->minValue() < 0
-			? oldValue / qMax(qAbs(model()->maxValue()), qAbs(model()->minValue()))
-			: (oldValue - model()->minValue()) / model()->range();
-		const float ratio = 0.1f + qAbs(pos) * 15.f;
-		float newValue = value * ratio;
-		if (qAbs(newValue) >= step)
-		{
-			float roundedValue = qRound((oldValue - value) / step) * step;
-			model()->setValue(roundedValue);
-			m_leftOver = 0.0f;
-		}
-		else
-		{
-			m_leftOver = value;
-		}
+		model()->setValue(roundedValue);
+		m_leftOver = 0.0f;
 	}
-
-	else // linear code
+	else
 	{
-		if (qAbs(value) >= step)
-		{
-			float roundedValue = qRound((oldValue - value) / step) * step;
-			model()->setValue(roundedValue);
-			m_leftOver = 0.0f;
-		}
-		else
-		{
-			m_leftOver = value;
-		}
+		m_leftOver = valueOffset;
 	}
 }
 
