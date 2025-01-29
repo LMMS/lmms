@@ -65,6 +65,7 @@ set(LMMS_SRCS
 	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
+	core/RemotePluginAudioPort.cpp
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/Sample.cpp

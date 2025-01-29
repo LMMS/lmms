@@ -122,6 +122,7 @@ public:
 		else { return extents; }
 	}
 	constexpr auto size_bytes() const -> std::size_t { return size() * sizeof(T); } // NOLINT
+	constexpr auto empty() const -> bool { return size() == 0; }
 
 	constexpr auto operator[](std::size_t idx) const -> const T& { return m_data[idx]; }
 	constexpr auto operator[](std::size_t idx) -> T& { return m_data[idx]; }

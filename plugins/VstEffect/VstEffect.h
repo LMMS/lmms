@@ -29,6 +29,7 @@
 #include <QSharedPointer>
 
 #include "AudioPlugin.h"
+#include "RemotePluginAudioPort.h"
 #include "VstEffectControls.h"
 
 namespace lmms
@@ -36,9 +37,12 @@ namespace lmms
 
 class VstPlugin;
 
-class VstEffect
-	: public AudioPlugin<Effect, float,
-		PluginConfig{ .layout = AudioDataLayout::Split, .customBuffer = true }>
+constexpr auto VstEffectConfig = AudioPluginConfig {
+	.kind = AudioDataKind::F32,
+	.interleaved = false
+};
+
+class VstEffect : public AudioPlugin<Effect, VstEffectConfig, RemotePluginAudioPort<VstEffectConfig>>
 {
 public:
 	VstEffect( Model * _parent,
@@ -54,9 +58,6 @@ public:
 
 
 private:
-	auto bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float,
-		DynamicChannelCount, DynamicChannelCount>* override;
-
 	//! Returns true if plugin was loaded (m_plugin != nullptr)
 	bool openPlugin(const QString& plugin);
 	void closePlugin();

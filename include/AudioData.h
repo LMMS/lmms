@@ -1,7 +1,7 @@
 /*
  * AudioData.h - Audio data types
  *
- * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,62 +33,30 @@
 namespace lmms
 {
 
-//! Conventions for passing audio data
-enum class AudioDataLayout
+
+//! Types of audio data supported in LMMS
+enum class AudioDataKind : std::uint8_t
 {
-	/**
-	 * Given:
-	 *   - N == Frame count
-	 *   - C == Number of channels
-	 *   - i == Sample index, where 0 <= i < N
-	 *   - `samples` has the type sample_t*
-	 *   - `samples` size == N * C
-	 */
-
-	/**
-	 * Layout where the samples for each channel are interleaved.
-	 * i.e. "LRLRLRLR"
-	 *
-	 * Samples for individual channels can be accessed like this:
-	 * - Channel #0 samples: samples[C*i]
-	 * - Channel #1 samples: samples[C*i + 1]
-	 * - Channel #2 samples: samples[C*i + 2]
-	 * - Channel #3 samples: samples[C*i + 3]
-	 * - ...
-	 */
-	Interleaved,
-
-	/**
-	 * Layout where all samples for a particular channel are grouped together.
-	 * i.e. "LLLLRRRR"
-	 *
-	 * Samples for individual channels can be accessed like this:
-	 * - Channel #0 samples: samples[i]
-	 * - Channel #1 samples: samples[1*N + i]
-	 * - Channel #2 samples: samples[2*N + i]
-	 * - Channel #3 samples: samples[3*N + i]
-	 * - ...
-	 */
-	Split
+	SampleFrame,
+	F32,
+	// F64,
+	// I16,
+	// etc.
 };
 
+namespace detail {
 
-/**
- * A simple type alias for floating point audio data types which documents the data layout.
- *
- * For example, `const InterleavedSampleType<sample_t>*` can be used as a replacement for `const sample_t*`
- * parameters in order to document that the data layout of the audio is interleaved.
- *
- * NOTE: Can add support for integer sample types later
- */
-template<AudioDataLayout layout, typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-using SampleType = T;
+//! Specialize this struct to enable the use of an audio data kind
+template<AudioDataKind kind> struct AudioDataType;
 
-template<typename T>
-using SplitSampleType = SampleType<AudioDataLayout::Split, T>;
+template<> struct AudioDataType<AudioDataKind::F32> { using type = float; };
 
-template<typename T>
-using InterleavedSampleType = SampleType<AudioDataLayout::Interleaved, T>;
+} // namespace detail
+
+
+//! Metafunction to convert `AudioDataKind` to its type
+template<AudioDataKind kind>
+using GetAudioDataType = typename detail::AudioDataType<kind>::type;
 
 
 //! Use when the number of channels is not known at compile time
@@ -96,11 +64,11 @@ inline constexpr int DynamicChannelCount = -1;
 
 
 /**
- * Non-owning view for multi-channel "split" (non-interleaved) audio data
+ * Non-owning view for multi-channel non-interleaved audio data
  *
  * TODO C++23: Use std::mdspan
  */
-template<typename SampleT, int channelCount = DynamicChannelCount, typename = SplitSampleType<SampleT>>
+template<typename SampleT, int channelCount = DynamicChannelCount>
 class SplitAudioData
 {
 public:
@@ -112,7 +80,7 @@ public:
 	 *  data[channels][frames]
 	 * Each buffer contains `frames` frames.
 	 */
-	SplitAudioData(SplitSampleType<SampleT>* const* data, pi_ch_t channels, f_cnt_t frames)
+	SplitAudioData(SampleT* const* data, pi_ch_t channels, f_cnt_t frames)
 		: m_data{data}
 		, m_channels{channels}
 		, m_frames{frames}
@@ -133,17 +101,19 @@ public:
 	 * Returns pointer to the buffer of a given channel.
 	 * The size of the buffer is `frames()`.
 	 */
-	auto buffer(pi_ch_t channel) const -> SplitSampleType<SampleT>*
+	auto buffer(pi_ch_t channel) const -> SampleT*
 	{
 		assert(channel < m_channels);
+		assert(m_data != nullptr);
 		return m_data[channel];
 	}
 
 	template<pi_ch_t channel>
-	auto buffer() const -> SplitSampleType<SampleT>*
+	auto buffer() const -> SampleT*
 	{
 		static_assert(channel != DynamicChannelCount);
 		static_assert(channel < channelCount);
+		assert(m_data != nullptr);
 		return m_data[channel];
 	}
 
@@ -161,21 +131,23 @@ public:
 
 	auto frames() const -> f_cnt_t { return m_frames; }
 
+	auto empty() const -> bool { return !m_data || m_channels == 0 || m_frames == 0; }
+
 	/**
 	 * WARNING: This method assumes that internally there is a single
 	 *     contiguous buffer for all channels whose size is channels() * frames().
 	 *     Whether this is true depends on the implementation of the source buffer.
 	 */
-	auto sourceBuffer() const -> SplitSampleType<SampleT>*
+	auto sourceBuffer() const -> Span<SampleT>
 	{
 		assert(m_data != nullptr);
-		return m_data[0];
+		return Span<SampleT>{m_data[0], channels() * frames()};
 	}
 
-	auto data() const -> SplitSampleType<SampleT>* const* { return m_data; }
+	auto data() const -> SampleT* const* { return m_data; }
 
 private:
-	SplitSampleType<SampleT>* const* m_data = nullptr;
+	SampleT* const* m_data = nullptr;
 	pi_ch_t m_channels = 0;
 	f_cnt_t m_frames = 0;
 };

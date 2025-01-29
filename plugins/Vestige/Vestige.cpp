@@ -365,7 +365,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin{m_pluginDLL, pinConnector(), this};
+	m_plugin = new VstInstrumentPlugin{m_pluginDLL, audioPort().controller()};
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -474,15 +474,6 @@ void VestigeInstrument::closePlugin( void )
 	delete m_plugin;
 	m_plugin = nullptr;
 	m_pluginMutex.unlock();
-}
-
-
-
-
-auto VestigeInstrument::bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float,
-	DynamicChannelCount, DynamicChannelCount>*
-{
-	return m_plugin;
 }
 
 

@@ -32,6 +32,7 @@
 
 #include "AudioPlugin.h"
 #include "InstrumentView.h"
+#include "RemotePluginAudioPort.h"
 
 
 class QPixmap;
@@ -55,9 +56,13 @@ class VestigeInstrumentView;
 } // namespace gui
 
 
+constexpr auto VestigeConfig = AudioPluginConfig {
+	.kind = AudioDataKind::F32,
+	.interleaved = false
+};
+
 class VestigeInstrument
-	: public AudioPlugin<Instrument, float,
-		PluginConfig{ .layout = AudioDataLayout::Split, .customBuffer = true }>
+	: public AudioPlugin<Instrument, VestigeConfig, RemotePluginAudioPort<VestigeConfig>>
 {
 	Q_OBJECT
 public:
@@ -84,9 +89,6 @@ protected slots:
 
 private:
 	void closePlugin();
-
-	auto bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float,
-		DynamicChannelCount, DynamicChannelCount>* override;
 
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;

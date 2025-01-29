@@ -27,8 +27,6 @@
 
 #include "AudioData.h"
 #include "RemotePluginBase.h"
-
-#include "PluginPinConnector.h"
 #include "SharedMemory.h"
 #include "lmms_basics.h"
 
@@ -39,8 +37,8 @@
 namespace lmms
 {
 
-
 class RemotePlugin;
+class RemotePluginAudioPortController;
 class SampleFrame;
 
 class ProcessWatcher : public QThread
@@ -74,7 +72,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:
-	explicit RemotePlugin(PluginPinConnector* pinConnector, Model* parent = nullptr);
+	explicit RemotePlugin(RemotePluginAudioPortController& audioPort);
 	~RemotePlugin() override;
 
 	inline bool isRunning()
@@ -103,7 +101,7 @@ public:
 
 	bool process();
 
-	void updateBuffer(int channelsIn, int channelsOut);
+	void updateBuffer(int channelsIn, int channelsOut, fpp_t frames);
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
@@ -147,24 +145,20 @@ public:
 		m_commMutex.unlock();
 	}
 
+	auto audioPort() -> RemotePluginAudioPortController*
+	{
+		return m_audioPort;
+	}
+
+	auto inputBuffer() const -> Span<float> { return m_inputBuffer; }
+	auto outputBuffer() const -> Span<float> { return m_outputBuffer; }
+
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
 
 protected:
 	bool m_failed;
-
-	//! Signal to derived classes
-	virtual void bufferUpdated() {}
-
-	auto frames() const -> f_cnt_t { return m_frames; }
-	auto channelsIn() const -> pi_ch_t { return m_channelsIn; }
-	auto channelsOut() const -> pi_ch_t { return m_channelsOut; }
-
-	auto inputBuffer() const -> Span<float> { return m_inputBuffer; }
-	auto outputBuffer() const -> Span<float> { return m_outputBuffer; }
-
-	PluginPinConnector* const m_pinConnector = nullptr;
 
 private:
 	QProcess m_process;
@@ -178,6 +172,8 @@ private:
 #else
 	QMutex m_commMutex;
 #endif
+
+	RemotePluginAudioPortController* const m_audioPort = nullptr;
 
 	SharedMemory<float[]> m_audioBuffer; // NOLINT
 	std::size_t m_audioBufferSize = 0; // TODO: Move to `SharedMemory`?

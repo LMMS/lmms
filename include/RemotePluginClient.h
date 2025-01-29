@@ -84,18 +84,6 @@ public:
 		return m_bufferSize;
 	}
 
-	void setInputCount( int _i )
-	{
-		m_inputCount = _i;
-		sendMessage( message( IdChangeInputCount ).addInt( _i ) );
-	}
-
-	void setOutputCount( int _i )
-	{
-		m_outputCount = _i;
-		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
-	}
-
 	void setInputOutputCount( int i, int o )
 	{
 		m_inputCount = i;

@@ -2,7 +2,7 @@
  * PluginPinConnector.cpp - Specifies how to route audio channels
  *                          in and out of a plugin.
  *
- * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -41,33 +41,45 @@ PluginPinConnector::PluginPinConnector(bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
-	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &PluginPinConnector::pluginBuffersChanged);
 	setTrackChannelCount(s_totalTrackChannels);
+
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
+		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
+	});
 }
 
 PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
-	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &PluginPinConnector::pluginBuffersChanged);
 	setTrackChannelCount(s_totalTrackChannels);
+	setPluginChannelCountsImpl(pluginChannelCountIn, pluginChannelCountOut);
 
-	if (pluginChannelCountIn == 0 && pluginChannelCountOut == 0)
-	{
-		throw std::invalid_argument{"At least one port count must be non-zero"};
-	}
-
-	if (pluginChannelCountIn != DynamicChannelCount || pluginChannelCountOut != DynamicChannelCount)
-	{
-		setPluginChannelCounts(pluginChannelCountIn, pluginChannelCountOut);
-	}
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
+		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
+	});
 }
 
 void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 {
+	setPluginChannelCountsImpl(inCount, outCount);
+
+	// Now tell the audio buffer to update
+	bufferPropertiesChanged(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
+
+	emit propertiesChanged();
+}
+
+void PluginPinConnector::setPluginChannelCountsImpl(int inCount, int outCount)
+{
 	if (m_trackChannelsUpperBound > MaxTrackChannels)
 	{
 		throw std::runtime_error{"Only up to 256 track channels are allowed"};
+	}
+
+	if (inCount == DynamicChannelCount || outCount == DynamicChannelCount)
+	{
+		return;
 	}
 
 	if (inCount < 0)
@@ -96,9 +108,6 @@ void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 
 	m_in.setPluginChannelCount(this, inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setPluginChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
-
-	emit propertiesChanged();
-	emit pluginBuffersChanged();
 }
 
 void PluginPinConnector::setPluginChannelCountIn(int inCount)

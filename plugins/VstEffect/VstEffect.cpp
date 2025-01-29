@@ -98,7 +98,10 @@ auto VstEffect::processImpl() -> ProcessStatus
 	// Wet/dry mixing only applies to those channels and any additional
 	// channels remain as-is.
 
-	const auto in = m_plugin->inputBuffer();
+	auto buffers = audioPort().buffers();
+	assert(buffers != nullptr);
+
+	const auto in = buffers->inputBuffer();
 	if (in.channels() == 0)
 	{
 		// Do not process wet/dry for an instrument loaded as an effect
@@ -106,7 +109,7 @@ auto VstEffect::processImpl() -> ProcessStatus
 		return ProcessStatus::ContinueIfNotQuiet;
 	}
 
-	auto out = m_plugin->outputBuffer();
+	auto out = buffers->outputBuffer();
 
 	const float w = wetLevel();
 	const float d = dryLevel();
@@ -128,15 +131,6 @@ auto VstEffect::processImpl() -> ProcessStatus
 
 
 
-auto VstEffect::bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float,
-	DynamicChannelCount, DynamicChannelCount>*
-{
-	return m_plugin.get();
-}
-
-
-
-
 bool VstEffect::openPlugin(const QString& plugin)
 {
 	gui::TextFloat* tf = nullptr;
@@ -149,7 +143,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin{plugin, pinConnector(), this});
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin{plugin, audioPort().controller()});
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();

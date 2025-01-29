@@ -1,7 +1,7 @@
 /*
  * PluginPinConnectorTest.cpp
  *
- * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,6 +33,7 @@
 #include "AudioEngine.h"
 #include "AudioPluginBuffer.h"
 #include "Model.h"
+#include "PluginAudioPort.h"
 #include "PluginPinConnector.h"
 #include "SampleFrame.h"
 #include "lmms_basics.h"
@@ -83,12 +84,11 @@ void transformBuffer(CoreAudioBus in, CoreAudioBusMut out, const F& func)
 }
 
 template<class F>
-void transformBuffer(CoreAudioData in, CoreAudioDataMut out, const F& func)
+void transformBuffer(CoreAudioDataMut inOut, const F& func)
 {
-	assert(in.size() == out.size());
-	for (std::size_t frame = 0; frame < in.size(); ++frame)
+	for (SampleFrame& sf : inOut)
 	{
-		out[frame] = func(in[frame]);
+		sf = func(sf);
 	}
 }
 
@@ -351,16 +351,17 @@ private slots:
 		QCOMPARE(pc.m_routedChannels[1], true);
 	}
 
-	//! Verifies correct default routing for 1x1 non-interleaved (split) plugin
-	void Routing_Split1x1_Default()
+	//! Verifies correct default routing for 1x1 non-interleaved plugin
+	void Routing_NonInterleaved1x1_Default()
 	{
 		using namespace lmms;
 
 		// Setup
+		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 1, 1};
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{1, 1, false, &model};
+		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		ap.init();
 		auto coreBus = getCoreBus();
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
 		// Use left channel as plugin input, upmix mono plugin output to stereo
 		// In    Out
@@ -375,6 +376,7 @@ private slots:
 		//       plugin input, following what REAPER does by default.
 
 		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -383,12 +385,11 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Plugin input and output buffers
-		auto bufferSplit1x1 = AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 1, 1, false>{};
-		auto ins = bufferSplit1x1.inputBuffer();
-		auto outs = bufferSplit1x1.outputBuffer();
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
 
 		// Route to plugin
-		auto router = pc.getRouter<AudioDataLayout::Split, float, 1, 1>();
+		auto router = ap.getRouter();
 		router.routeToPlugin(coreBus, ins);
 
 		// Check that plugin inputs have data on frames 0, 1, and 33 (should be left channel's data)
@@ -422,18 +423,20 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct default routing for 2x2 non-interleaved (split) plugin
-	void Routing_Split2x2_Default()
+	//! Verifies correct default routing for 2x2 non-interleaved plugin
+	void Routing_NonInterleaved2x2_Default()
 	{
 		using namespace lmms;
 
 		// Setup
+		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, false, &model};
+		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		ap.init();
 		auto coreBus = getCoreBus();
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
 		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -442,12 +445,11 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Plugin input and output buffers
-		auto bufferSplit2x2 = AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 2, 2, false>{};
-		auto ins = bufferSplit2x2.inputBuffer();
-		auto outs = bufferSplit2x2.outputBuffer();
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
 
 		// Route to plugin
-		auto router = pc.getRouter<AudioDataLayout::Split, float, 2, 2>();
+		auto router = ap.getRouter();
 		router.routeToPlugin(coreBus, ins);
 
 		// Check that plugin inputs have data on frames 0, 1, and 33
@@ -493,16 +495,17 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct partially-bypassed routing for 2x2 non-interleaved (split) plugin
-	void Routing_Split2x2_Bypass()
+	//! Verifies correct partially-bypassed routing for 2x2 non-interleaved plugin
+	void Routing_NonInterleaved2x2_Bypass()
 	{
 		using namespace lmms;
 
 		// Setup
+		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, false, &model};
+		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		ap.init();
 		auto coreBus = getCoreBus();
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
 		// Default input connections, disable right output channel
 		// In    Out
@@ -510,6 +513,7 @@ private slots:
 		// |X| | |X| |
 		// | |X| | | |
 		//  ---   ---
+		auto& pc = ap.pinConnector();
 		pc.in().pins(0)[0]->setValue(true);
 		pc.in().pins(0)[1]->setValue(false);
 		pc.in().pins(1)[0]->setValue(false);
@@ -520,6 +524,7 @@ private slots:
 		pc.out().pins(1)[1]->setValue(false);
 
 		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -528,12 +533,11 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Plugin input and output buffers
-		auto bufferSplit2x2 = AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 2, 2, false>{};
-		auto ins = bufferSplit2x2.inputBuffer();
-		auto outs = bufferSplit2x2.outputBuffer();
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
 
 		// Route to plugin
-		auto router = pc.getRouter<AudioDataLayout::Split, float, 2, 2>();
+		auto router = ap.getRouter();
 		router.routeToPlugin(coreBus, ins);
 
 		// Check that plugin inputs have data on frames 0, 1, and 33
@@ -580,12 +584,16 @@ private slots:
 		using namespace lmms;
 
 		// Setup
+		constexpr auto config = AudioPluginConfig {
+			AudioDataKind::SampleFrame, true, 2, 2, true
+		};
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, false, &model};
+		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		ap.init();
 		auto coreBus = getCoreBus();
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
 		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -593,27 +601,23 @@ private slots:
 		trackChannels[33].setLeft(789.f);
 		trackChannels[33].setRight(987.f);
 
-		// Plugin input and output buffers
-		auto pluginBuffers = AudioPluginBufferDefaultImpl<AudioDataLayout::Interleaved, SampleFrame, 2, 2, true>{};
-		auto ins = pluginBuffers.inputBuffer();
-		auto outs = pluginBuffers.outputBuffer();
-
-		QCOMPARE(ins.data(), outs.data()); // in-place processing - should use same buffer for inputs and outputs
+		// Plugin input/output buffer
+		auto inOut = ap.inputOutputBuffer();
 
 		// Route to plugin
-		auto router = pc.getRouter<AudioDataLayout::Interleaved, SampleFrame, 2, 2>();
-		router.routeToPlugin(coreBus, ins);
+		auto router = ap.getRouter();
+		router.routeToPlugin(coreBus, inOut);
 
 		// Check that plugin inputs have data on frames 0, 1, and 33
-		QCOMPARE(ins[0].left(), 123.f);
-		QCOMPARE(ins[0].right(), 321.f);
-		QCOMPARE(ins[1].left(), 456.f);
-		QCOMPARE(ins[1].right(), 654.f);
-		QCOMPARE(ins[33].left(), 789.f);
-		QCOMPARE(ins[33].right(), 987.f);
+		QCOMPARE(inOut[0].left(), 123.f);
+		QCOMPARE(inOut[0].right(), 321.f);
+		QCOMPARE(inOut[1].left(), 456.f);
+		QCOMPARE(inOut[1].right(), 654.f);
+		QCOMPARE(inOut[33].left(), 789.f);
+		QCOMPARE(inOut[33].right(), 987.f);
 
 		// Do work of processImpl - in this case it doubles the amplitude
-		transformBuffer(ins, outs, [](auto s) { return s * 2; });
+		transformBuffer(inOut, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
@@ -625,7 +629,7 @@ private slots:
 		lmms::zeroBuffer(coreBus);
 
 		// Route from plugin back to Core
-		router.routeFromPlugin(outs, coreBus);
+		router.routeFromPlugin(inOut, coreBus);
 
 		// Should be double the original
 		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
@@ -639,16 +643,17 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct signal summing when routing a 1x2 non-interleaved (split) plugin
-	void Routing_Split1x2_Sum()
+	//! Verifies correct signal summing when routing a 1x2 non-interleaved plugin
+	void Routing_NonInterleaved1x2_Sum()
 	{
 		using namespace lmms;
 
 		// Setup
+		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 1, 2};
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{1, 2, false, &model};
+		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		ap.init();
 		auto coreBus = getCoreBus();
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 
 		// Sum both track channels together for plugin input, and sum the
 		//     two plugin output channels together for the left track channel output
@@ -657,6 +662,7 @@ private slots:
 		// |X|   |X|X|
 		// |X|   | | |
 		//  -     ---
+		auto& pc = ap.pinConnector();
 		pc.in().pins(0)[0]->setValue(true);
 		pc.in().pins(1)[0]->setValue(true);
 		pc.out().pins(0)[0]->setValue(true);
@@ -665,6 +671,7 @@ private slots:
 		pc.out().pins(1)[1]->setValue(false);
 
 		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -673,12 +680,11 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Plugin input and output buffers
-		auto bufferSplit1x2 = AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 1, 2, false>{};
-		auto ins = bufferSplit1x2.inputBuffer();
-		auto outs = bufferSplit1x2.outputBuffer();
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
 
 		// Route to plugin
-		auto router = pc.getRouter<AudioDataLayout::Split, float, 1, 2>();
+		auto router = ap.getRouter();
 		router.routeToPlugin(coreBus, ins);
 
 		// Check that plugin inputs have data on frames 0, 1, and 33 (should be both track channels summed together)

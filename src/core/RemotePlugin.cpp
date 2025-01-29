@@ -38,6 +38,8 @@
 #include "BufferManager.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "Model.h"
+#include "RemotePluginAudioPort.h"
 #include "Song.h"
 
 #include <QCoreApplication>
@@ -132,7 +134,7 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin(PluginPinConnector* pinConnector, Model* parent)
+RemotePlugin::RemotePlugin(RemotePluginAudioPortController& audioPort)
 	: QObject{}
 #ifdef SYNC_WITH_SHM_FIFO
 	, RemotePluginBase{new shmFifo(), new shmFifo()}
@@ -140,11 +142,11 @@ RemotePlugin::RemotePlugin(PluginPinConnector* pinConnector, Model* parent)
 	, RemotePluginBase{}
 #endif
 	, m_failed{true}
-	, m_pinConnector{pinConnector}
 	, m_watcher{this}
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	, m_commMutex{QMutex::Recursive}
 #endif
+	, m_audioPort{&audioPort}
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
@@ -175,6 +177,8 @@ RemotePlugin::RemotePlugin(PluginPinConnector* pinConnector, Model* parent)
 	}
 #endif
 
+	m_audioPort->connectBuffers(this);
+
 	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
 		this, SLOT(processFinished(int,QProcess::ExitStatus)),
 		Qt::DirectConnection );
@@ -190,6 +194,8 @@ RemotePlugin::RemotePlugin(PluginPinConnector* pinConnector, Model* parent)
 
 RemotePlugin::~RemotePlugin()
 {
+	m_audioPort->disconnectBuffers();
+
 	m_watcher.stop();
 	m_watcher.wait();
 
@@ -315,6 +321,9 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	{
 		waitForInitDone();
 	}
+
+	m_audioPort->activate(Engine::audioEngine()->framesPerPeriod());
+
 	unlock();
 
 	return failed();
@@ -327,7 +336,7 @@ bool RemotePlugin::process()
 {
 	if (m_failed || !isRunning())
 	{
-		if (m_outputBuffer.size() != 0)
+		if (!m_outputBuffer.empty())
 		{
 			std::memset(m_outputBuffer.data(), 0, m_outputBuffer.size_bytes());
 		}
@@ -346,7 +355,7 @@ bool RemotePlugin::process()
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if (m_outputBuffer.size() != 0)
+		if (!m_outputBuffer.empty())
 		{
 			std::memset(m_outputBuffer.data(), 0, m_outputBuffer.size_bytes());
 		}
@@ -356,7 +365,7 @@ bool RemotePlugin::process()
 	lock();
 	sendMessage(IdStartProcessing);
 
-	if (m_failed || m_outputBuffer.size() == 0)
+	if (m_failed || m_outputBuffer.empty())
 	{
 		unlock();
 		return false;
@@ -371,15 +380,13 @@ bool RemotePlugin::process()
 
 
 
-void RemotePlugin::updateBuffer(int channelsIn, int channelsOut)
+void RemotePlugin::updateBuffer(int channelsIn, int channelsOut, fpp_t frames)
 {
 	if (channelsIn < 0 || channelsOut < 0)
 	{
 		qCritical() << "Invalid channel count";
 		return;
 	}
-
-	const auto frames = Engine::audioEngine()->framesPerPeriod();
 
 	if (channelsIn == static_cast<int>(m_channelsIn)
 		&& channelsOut == static_cast<int>(m_channelsOut)
@@ -409,8 +416,6 @@ void RemotePlugin::updateBuffer(int channelsIn, int channelsOut)
 
 	m_inputBuffer = Span<float>{m_audioBuffer.get(), m_channelsIn * m_frames};
 	m_outputBuffer = Span<float>{m_audioBuffer.get() + m_inputBuffer.size(), m_channelsOut * m_frames};
-
-	bufferUpdated();
 
 	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
 }
@@ -498,19 +503,8 @@ bool RemotePlugin::processMessage( const message & _m )
 			reply_message.addInt( Engine::audioEngine()->framesPerPeriod() );
 			break;
 
-		case IdChangeInputCount:
-			m_pinConnector->setPluginChannelCountIn(_m.getInt(0));
-			updateBuffer(m_pinConnector->in().channelCount(), m_pinConnector->out().channelCount());
-			break;
-
-		case IdChangeOutputCount:
-			m_pinConnector->setPluginChannelCountOut(_m.getInt(0));
-			updateBuffer(m_pinConnector->in().channelCount(), m_pinConnector->out().channelCount());
-			break;
-
 		case IdChangeInputOutputCount:
-			m_pinConnector->setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
-			updateBuffer(m_pinConnector->in().channelCount(), m_pinConnector->out().channelCount());
+			m_audioPort->pc().setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
 			break;
 
 		case IdDebugMessage:

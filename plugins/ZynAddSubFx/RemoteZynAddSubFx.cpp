@@ -58,7 +58,7 @@ public:
 	{
 		Nio::start();
 
-		setInputCount( 0 );
+		setInputOutputCount(0, 2);
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
@@ -144,7 +144,8 @@ public:
 	void process(const float* in, float* out) override
 	{
 		(void)in;
-		auto output = SplitAudioData<float, 2>{&out, 2, bufferSize()};
+		auto accessBuffer = std::array{out, out + bufferSize()};
+		auto output = SplitAudioData<float, 2>{accessBuffer.data(), 2, bufferSize()};
 		LocalZynAddSubFx::process(output);
 	}
 

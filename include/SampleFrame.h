@@ -53,12 +53,14 @@ public:
 	{
 	}
 
-	InterleavedSampleType<sample_t>* data()
+	//! 2 channels, interleaved
+	sample_t* data()
 	{
 		return m_samples.data();
 	}
 
-	const InterleavedSampleType<sample_t>* data() const
+	//! 2 channels, interleaved
+	const sample_t* data() const
 	{
 		return m_samples.data();
 	}
@@ -186,7 +188,7 @@ public:
 	}
 
 private:
-	std::array<InterleavedSampleType<sample_t>, DEFAULT_CHANNELS> m_samples;
+	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
 };
 
 inline void zeroSampleFrames(SampleFrame* buffer, size_t frames)
@@ -209,7 +211,8 @@ inline SampleFrame getAbsPeakValues(SampleFrame* buffer, size_t frames)
 	return peaks;
 }
 
-inline void copyToSampleFrames(SampleFrame* target, const InterleavedSampleType<float>* source, size_t frames)
+//! `source` is 2-channel interleaved data with length of 2 * `frames`
+inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -218,7 +221,8 @@ inline void copyToSampleFrames(SampleFrame* target, const InterleavedSampleType<
 	}
 }
 
-inline void copyFromSampleFrames(InterleavedSampleType<float>* target, const SampleFrame* source, size_t frames)
+//! `target` is 2-channel interleaved data with length of 2 * `frames`
+inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
 	{
@@ -227,8 +231,12 @@ inline void copyFromSampleFrames(InterleavedSampleType<float>* target, const Sam
 	}
 }
 
+// Enable SampleFrame to use the AudioDataType metafunction
+namespace detail {
+template<> struct AudioDataType<AudioDataKind::SampleFrame> { using type = SampleFrame; };
+} // namespace detail
 
-//! A non-owning `SampleFrame` buffer (interleaved, 2-channel)
+//! A non-owning SampleFrame buffer (interleaved, 2-channel)
 using CoreAudioData = Span<const SampleFrame>;
 
 //! Mutable CoreAudioData

@@ -2,7 +2,7 @@
  * PluginPinConnector.h - Specifies how to route audio channels
  *                        in and out of a plugin.
  *
- * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "AudioData.h"
+#include "AudioPluginConfig.h"
 #include "AutomatableModel.h"
 #include "SampleFrame.h"
 #include "SerializingObject.h"
@@ -198,46 +199,48 @@ public:
 	 *     `inOut`   : track channels from/to LMMS core
 	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
-	template<AudioDataLayout layout, typename SampleT, int channelCountIn, int channelCountOut>
-	class Router;
-
-	//! Non-`SampleFrame` routing
-	template<AudioDataLayout layout, typename SampleT, int channelCountIn, int channelCountOut>
+	template<AudioPluginConfig config, AudioDataKind kind = config.kind, bool interleaved = config.interleaved>
 	class Router
 	{
+		static_assert(always_false_v<Router<config, kind, interleaved>>,
+			"A router for the requested configuration is not implemented yet");
+	};
+
+	//! Non-`SampleFrame` routing
+	template<AudioPluginConfig config, AudioDataKind kind>
+	class Router<config, kind, false>
+	{
+		using SampleT = GetAudioDataType<kind>;
+
 	public:
-		static_assert(layout == AudioDataLayout::Split, "Only split data is implemented so far");
+		explicit Router(const PluginPinConnector& parent) : m_pc{&parent} {}
 
-		Router(PluginPinConnector& parent) : m_pc{&parent} {}
-
-		void routeToPlugin(CoreAudioBus in, SplitAudioData<SampleT, channelCountIn> out) const;
-		void routeFromPlugin(SplitAudioData<const SampleT, channelCountOut> in, CoreAudioBusMut inOut) const;
+		void routeToPlugin(CoreAudioBus in, SplitAudioData<GetAudioDataType<kind>, config.inputs> out) const;
+		void routeFromPlugin(SplitAudioData<const GetAudioDataType<kind>, config.outputs> in, CoreAudioBusMut inOut) const;
 
 	private:
-		PluginPinConnector* m_pc;
+		const PluginPinConnector* m_pc;
 	};
 
 	//! `SampleFrame` routing
-	template<AudioDataLayout layout, int channelCountIn, int channelCountOut>
-	class Router<layout, SampleFrame, channelCountIn, channelCountOut>
+	template<AudioPluginConfig config>
+	class Router<config, AudioDataKind::SampleFrame, true>
 	{
 	public:
-		static_assert(layout == AudioDataLayout::Interleaved);
-
-		Router(PluginPinConnector& parent) : m_pc{&parent} {}
+		explicit Router(const PluginPinConnector& parent) : m_pc{&parent} {}
 
 		void routeToPlugin(CoreAudioBus in, CoreAudioDataMut out) const;
 		void routeFromPlugin(CoreAudioData in, CoreAudioBusMut inOut) const;
 
 	private:
-		PluginPinConnector* m_pc;
+		const PluginPinConnector* m_pc;
 	};
 
 
-	template<AudioDataLayout layout, typename SampleT, int channelCountIn, int channelCountOut>
-	auto getRouter() -> Router<layout, SampleT, channelCountIn, channelCountOut>
+	template<AudioPluginConfig config>
+	auto getRouter() const -> Router<config>
 	{
-		return Router<layout, SampleT, channelCountIn, channelCountOut>{*this};
+		return Router<config>{*this};
 	}
 
 
@@ -248,7 +251,8 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 	auto nodeName() const -> QString override { return "pins"; }
 
-	auto instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*;
+	virtual auto instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*;
+
 	auto getChannelCountText() const -> QString;
 
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
@@ -261,14 +265,21 @@ signals:
 	//! Called when the plugin channel counts change or the track channel counts change
 	//void propertiesChanged(); [from Model base class]
 
-	//! Called when the plugin channel counts change or if the sample rate changes
-	void pluginBuffersChanged();
-
 public slots:
 	void setTrackChannelCount(int count);
 	void updateRoutedChannels(unsigned int trackChannel);
 
+protected:
+	/**
+	 * To be implemented by the plugin's audio port.
+	 * Called when channel counts or sample rate changes.
+	 *
+	 * NOTE: Virtual method, do not call in constructor.
+	 */
+	virtual void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) {}
+
 private:
+	void setPluginChannelCountsImpl(int inCount, int outCount);
 	void updateAllRoutedChannels();
 
 	Matrix m_in{false}; //!< LMMS --> Plugin
@@ -300,11 +311,11 @@ private:
 
 // Non-`SampleFrame` Router out-of-class definitions
 
-template<AudioDataLayout layout, typename SampleT, int channelCountIn, int channelCountOut>
-inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelCountOut>::routeToPlugin(
-	CoreAudioBus in, SplitAudioData<SampleT, channelCountIn> out) const
+template<AudioPluginConfig config, AudioDataKind kind>
+inline void PluginPinConnector::Router<config, kind, false>::routeToPlugin(
+	CoreAudioBus in, SplitAudioData<SampleT, config.inputs> out) const
 {
-	if constexpr (channelCountIn == 0) { return; }
+	if constexpr (config.inputs == 0) { return; }
 
 	assert(m_pc->m_in.channelCount() != DynamicChannelCount);
 	if (m_pc->m_in.channelCount() == 0) { return; }
@@ -312,15 +323,18 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs);
-	assert(out.sourceBuffer() != nullptr);
 
 	// Zero the output buffer - TODO: std::memcpy?
-	std::fill_n(out.sourceBuffer(), out.channels() * out.frames(), SampleT{});
-	//std::memset(out.sourceBuffer(), 0, out.channels() * out.frames() * sizeof(SampleT));
+	{
+		auto source = out.sourceBuffer();
+		assert(source.data() != nullptr);
+		std::fill_n(source.data(), source.size(), SampleT{});
+		//std::memset(source.data(), 0, source.size_bytes());
+	}
 
 	for (std::uint32_t outChannel = 0; outChannel < out.channels(); ++outChannel)
 	{
-		SampleType<layout, SampleT>* outPtr = out.buffer(outChannel);
+		SampleT* outPtr = out.buffer(outChannel);
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 		{
@@ -366,11 +380,11 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 	}
 }
 
-template<AudioDataLayout layout, typename SampleT, int channelCountIn, int channelCountOut>
-inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelCountOut>::routeFromPlugin(
-	SplitAudioData<const SampleT, channelCountOut> in, CoreAudioBusMut inOut) const
+template<AudioPluginConfig config, AudioDataKind kind>
+inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
+	SplitAudioData<const SampleT, config.outputs> in, CoreAudioBusMut inOut) const
 {
-	if constexpr (channelCountOut == 0) { return; }
+	if constexpr (config.outputs == 0) { return; }
 
 	assert(m_pc->m_out.channelCount() != DynamicChannelCount);
 	if (m_pc->m_out.channelCount() == 0) { return; }
@@ -378,7 +392,6 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs);
-	assert(in.sourceBuffer() != nullptr);
 
 	/*
 	 * Routes plugin audio to track channel pair and normalizes the result. For track channels
@@ -420,7 +433,7 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 
 		for (pi_ch_t inChannel = 0; inChannel < in.channels(); ++inChannel)
 		{
-			const SampleType<layout, const SampleT>* inPtr = in.buffer(inChannel);
+			const SampleT* inPtr = in.buffer(inChannel);
 
 			if constexpr (rc == 0b11)
 			{
@@ -507,11 +520,12 @@ inline void PluginPinConnector::Router<layout, SampleT, channelCountIn, channelC
 
 // `SampleFrame` Router out-of-class definitions
 
-template<AudioDataLayout layout, int channelCountIn, int channelCountOut>
-inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, channelCountOut>::routeToPlugin(
+template<AudioPluginConfig config>
+inline void PluginPinConnector::Router<config,
+	AudioDataKind::SampleFrame, true>::routeToPlugin(
 	CoreAudioBus in, CoreAudioDataMut out) const
 {
-	if constexpr (channelCountIn == 0) { return; }
+	if constexpr (config.inputs == 0) { return; }
 
 	assert(m_pc->m_in.channelCount() != DynamicChannelCount);
 	if (m_pc->m_in.channelCount() == 0) { return; }
@@ -598,11 +612,12 @@ inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, chan
 	}
 }
 
-template<AudioDataLayout layout, int channelCountIn, int channelCountOut>
-inline void PluginPinConnector::Router<layout, SampleFrame, channelCountIn, channelCountOut>::routeFromPlugin(
+template<AudioPluginConfig config>
+inline void PluginPinConnector::Router<config,
+	AudioDataKind::SampleFrame, true>::routeFromPlugin(
 	CoreAudioData in, CoreAudioBusMut inOut) const
 {
-	if constexpr (channelCountOut == 0) { return; }
+	if constexpr (config.outputs == 0) { return; }
 
 	assert(m_pc->m_out.channelCount() != DynamicChannelCount);
 	if (m_pc->m_out.channelCount() == 0) { return; }

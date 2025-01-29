@@ -33,9 +33,11 @@
 #include <globals.h>
 
 #include "AudioPlugin.h"
+#include "AudioPluginBuffer.h"
 #include "AutomatableModel.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
+#include "RemotePluginAudioPort.h"
 
 class QPushButton;
 
@@ -55,29 +57,28 @@ class ZynAddSubFxView;
 
 class ZynAddSubFxRemotePlugin
 	: public RemotePlugin
-	, public AudioPluginBufferInterface<AudioDataLayout::Split, float, 0, 2>
 {
 	Q_OBJECT
 public:
-	ZynAddSubFxRemotePlugin(PluginPinConnector* pinConnector);
+	ZynAddSubFxRemotePlugin(RemotePluginAudioPortController& audioPort);
 
 	bool processMessage( const message & _m ) override;
 
-	auto inputBuffer() -> SplitAudioData<float, 0> override;
-	auto outputBuffer() -> SplitAudioData<float, 2> override;
-	void updateBuffers(int channelsIn, int channelsOut) override;
-
 signals:
 	void clickedCloseButton();
+};
 
-private:
-	std::array<float*, 2> m_accessBuffer;
+
+constexpr auto ZynConfig = AudioPluginConfig {
+	.kind = AudioDataKind::F32,
+	.interleaved = false,
+	.inputs = 0,
+	.outputs = 2
 };
 
 
 class ZynAddSubFxInstrument
-	: public AudioPlugin<Instrument, float,
-		PluginConfig{ .layout = AudioDataLayout::Split, .inputs = 0, .outputs = 2, .customBuffer = true }>
+	: public AudioPlugin<Instrument, ZynConfig, ConfigurableAudioPort<ZynConfig>>
 {
 	Q_OBJECT
 public:
@@ -97,8 +98,6 @@ public:
 	QString nodeName() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
-
-	auto bufferInterface() -> AudioPluginBufferInterface<AudioDataLayout::Split, float, 0, 2>* override;
 
 private slots:
 	void reloadPlugin();
@@ -122,9 +121,6 @@ private:
 	QMutex m_pluginMutex;
 	LocalZynAddSubFx * m_localPlugin;
 	ZynAddSubFxRemotePlugin * m_remotePlugin;
-
-	// LocalZynAddSubFx needs to be supplied with a buffer
-	std::optional<AudioPluginBufferDefaultImpl<AudioDataLayout::Split, float, 0, 2, false>> m_localPluginBuffer;
 
 	FloatModel m_portamentoModel;
 	FloatModel m_filterFreqModel;
