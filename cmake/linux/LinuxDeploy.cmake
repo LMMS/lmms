@@ -151,6 +151,7 @@ endforeach()
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
+	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/256x256/apps/${lmms}.png"
 	--desktop-file "${DESKTOP_FILE}"
 	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
