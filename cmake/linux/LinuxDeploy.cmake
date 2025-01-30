@@ -118,11 +118,6 @@ set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optiona
 set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 
 # Patch desktop file
-file(READ "${DESKTOP_FILE}" DESKTOP_FILE_CONTENTS)
-string(REPLACE "Icon=${lmms}" "Icon=${lmms}.png" DESKTOP_FILE_CONTENTS "${DESKTOP_FILE_CONTENTS}")
-file(WRITE "${DESKTOP_FILE}" "${DESKTOP_FILE_CONTENTS}")
-file(COPY "${APP}/usr/icons/128x128@2/apps/${lmms}.png" DESTINATION "${APP}/")
-
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
 # Build list of libraries to inform linuxdeploy about
@@ -235,6 +230,11 @@ endforeach()
 
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
+
+	# Prefer ".png" over ".svg" icon for AppImages
+	file(COPY "${APP}/usr/share/icons/hicolor/128x128@2/apps/${lmms}.png" DESTINATION "${APP}/")
+	file(REMOVE "${APP}/${lmms}.svg")
+
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
 	set(ENV{ARCH} "${ARCH}")
 	message(STATUS "Finishing the AppImage...")
