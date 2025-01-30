@@ -219,6 +219,8 @@ gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 
 	m_deviceComboBox = new QComboBox(this);
 	form->addRow(tr("Device"), m_deviceComboBox);
+
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), [&] { updateDevices(); });
 }
 
 void gui::AudioPortAudioSetupWidget::saveSettings()
