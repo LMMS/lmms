@@ -128,6 +128,7 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
 	m_chipModel( static_cast<int>(ChipModel::MOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
+	reSID::SID sid; // make instrument ready by side effect
 	for( int i = 0; i < 3; ++i )
 	{
 		m_voice[i] = new VoiceObject( this, i );
@@ -471,7 +472,6 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	reSID::SID sid; // make instrument ready by side effect
 
 	setAutoFillBackground( true );
 	QPalette pal;
