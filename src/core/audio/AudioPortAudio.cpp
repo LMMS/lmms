@@ -44,8 +44,6 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	, m_outBufPos(0)
 	, m_outBufSize(engine->framesPerPeriod())
 {
-	Pa_Initialize();
-
 	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
@@ -91,7 +89,6 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-	Pa_Terminate();
 }
 
 void AudioPortAudio::startProcessing()
@@ -151,30 +148,18 @@ int AudioPortAudio::processCallback(const void* inputBuffer, void* outputBuffer,
 
 void gui::AudioPortAudioSetupWidget::updateBackends()
 {
-	PaError err = Pa_Initialize();
-	if (err != paNoError)
-	{
-		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
-		return;
-	}
+	const auto initGuard = PortAudioInitializationGuard{};
 
 	for (int i = 0; i < Pa_GetHostApiCount(); ++i)
 	{
 		const auto hi = Pa_GetHostApiInfo(i);
 		m_backendComboBox->addItem(hi->name);
 	}
-
-	Pa_Terminate();
 }
 
 void gui::AudioPortAudioSetupWidget::updateDevices()
 {
-	PaError err = Pa_Initialize();
-	if (err != paNoError)
-	{
-		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
-		return;
-	}
+	const auto initGuard = PortAudioInitializationGuard{};
 
 	const QString& backend = m_backendComboBox->currentText();
 	int hostApi = 0;
@@ -194,18 +179,12 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 		const auto di = Pa_GetDeviceInfo(i);
 		if (di->hostApi == hostApi) { m_deviceComboBox->addItem(di->name); }
 	}
-	Pa_Terminate();
 }
 
 void gui::AudioPortAudioSetupWidget::updateChannels()
 {
-	PaError err = Pa_Initialize();
-	if (err != paNoError)
-	{
-		std::cerr << "Couldn't initialize PortAudio: " << Pa_GetErrorText(err) << '\n';
-		return;
-	}
-	Pa_Terminate();
+	const auto initGuard = PortAudioInitializationGuard{};
+	// TODO: Implement
 }
 
 gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
