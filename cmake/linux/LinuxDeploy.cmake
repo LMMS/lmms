@@ -232,7 +232,7 @@ if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
 
 	# Prefer ".png" over ".svg" icon for AppImages
-	file(COPY "${APP}/usr/share/icons/hicolor/128x128@2/apps/${lmms}.png" DESTINATION "${APP}/")
+	file(COPY "${APP}/usr/share/icons/hicolor/128x128/apps/${lmms}.png" DESTINATION "${APP}/")
 	file(REMOVE "${APP}/${lmms}.svg")
 
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
