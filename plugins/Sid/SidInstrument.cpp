@@ -471,6 +471,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
+	reSID::SID sid; // make instrument ready by side effect
 
 	setAutoFillBackground( true );
 	QPalette pal;
