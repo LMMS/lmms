@@ -50,14 +50,19 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
 
 	auto outputDeviceIndex = Pa_GetDefaultOutputDevice();
+	auto outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
 	const auto deviceCount = Pa_GetDeviceCount();
 
 	for (auto i = 0; i < deviceCount; ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
-		if (deviceInfo->name == device && Pa_GetHostApiInfo(deviceInfo->hostApi)->name == backend)
+		const auto currentBackendName = Pa_GetHostApiInfo(deviceInfo->hostApi)->name;
+		const auto currentDeviceName = deviceInfo->name;
+
+		if (currentBackendName == backend && currentDeviceName == device)
 		{
 			outputDeviceIndex = i;
+			outputDeviceInfo = deviceInfo;
 			break;
 		}
 	}
@@ -66,7 +71,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		.device = outputDeviceIndex,
 		.channelCount = channels(),
 		.sampleFormat = paFloat32,
-		.suggestedLatency = static_cast<double>(audioEngine()->framesPerPeriod()) / sampleRate(),
+		.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency,
 		.hostApiSpecificStreamInfo = nullptr
 	};
 
@@ -75,7 +80,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	if (err != paNoError)
 	{
-		std::cerr << "Couldn't open PortAudio: " << Pa_GetErrorText(err) << '\n';
+		std::cerr << "Could not open PortAudio: " << Pa_GetErrorText(err) << '\n';
 		successful = false;
 		return;
 	}
