@@ -86,6 +86,7 @@ jobs:
           submodules: recursive
       - name: Install system packages
         run: |
+          sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
       - name: Cache ccache data
