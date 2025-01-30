@@ -118,6 +118,10 @@ set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optiona
 set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 
 # Patch desktop file
+file(READ "${DESKTOP_FILE}" DESKTOP_FILE_CONTENTS)
+string(REPLACE "Icon=${lmms}" "Icon=${lmms}.png" DESKTOP_FILE_CONTENTS "${DESKTOP_FILE_CONTENTS}")
+file(WRITE "${DESKTOP_FILE}" "${DESKTOP_FILE_CONTENTS}")
+
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
 # Build list of libraries to inform linuxdeploy about
@@ -151,8 +155,7 @@ endforeach()
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
-	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/128x128@2/apps/${lmms}.png"
-	--desktop-file "${APP}/usr/share/applications/${lmms}.desktop"
+	--desktop-file "${DESKTOP_FILE}"
 	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
 	${LIBRARIES}
