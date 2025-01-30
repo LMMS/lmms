@@ -38,6 +38,16 @@
 
 class QComboBox;
 
+namespace {
+class PortAudioInitializationGuard
+{
+public:
+	PortAudioInitializationGuard() { Pa_Initialize(); }
+	~PortAudioInitializationGuard() { Pa_Terminate(); }
+};
+
+} // namespace
+
 namespace lmms
 {
 
@@ -84,6 +94,7 @@ private:
 	std::unique_ptr<SampleFrame[]> m_outBuf;
 	std::size_t m_outBufPos;
 	fpp_t m_outBufSize;
+	PortAudioInitializationGuard m_initGuard;
 };
 
 } // namespace lmms
