@@ -231,10 +231,6 @@ endforeach()
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
 
-	# Avoid double-symlinking ".AppIcon -> lmms.svg -> usr/share/..." created by linuxdeploy
-	file(REMOVE "${APP}/${lmms}.svg")
-	file(COPY "${APP}/usr/share/icons/hicolor/scalable/apps/${lmms}.svg" DESTINATION "${APP}")
-
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
 	set(ENV{ARCH} "${ARCH}")
 	message(STATUS "Finishing the AppImage...")
