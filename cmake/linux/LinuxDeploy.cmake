@@ -120,6 +120,11 @@ set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 # Patch desktop file
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
+# Prefer a hard-copy of .DirIcon over appimagetool's symlinking
+file(COPY "${APP}/usr/share/icons/hicolor/64x64/apps/${lmms}.png" DESTINATION "${APP}")
+file(RENAME "${APP}/${lmms}.png" "${APP}/.DirIcon")
+file(COPY "${APP}/usr/share/icons/hicolor/64x64/apps/${lmms}.png" DESTINATION "${APP}")
+
 # Build list of libraries to inform linuxdeploy about
 # e.g. --library=foo.so --library=bar.so
 file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
@@ -159,6 +164,9 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
+
+# Remove recenly deployed svg icon file
+file(REMOVE "${APP}/${lmms}.svg")
 
 # Remove libraries that are normally sytem-provided
 file(GLOB EXCLUDE_LIBS
