@@ -51,7 +51,6 @@ namespace gui
 class CustomTextKnob;
 class ManageVestigeInstrumentView;
 class PixmapButton;
-class PluginPinConnectorView;
 class VestigeInstrumentView;
 } // namespace gui
 
@@ -123,7 +122,6 @@ protected slots:
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
-	void togglePinConnector();
 	void closeWindow();
 
 
@@ -140,8 +138,7 @@ private:
 	QGridLayout * l;
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
-	QPushButton* m_pinConnectorButton;
-	PluginPinConnectorView* m_pinConnector = nullptr;
+	QPushButton * m_closeButton;
 	CustomTextKnob ** vstKnobs;
 
 } ;

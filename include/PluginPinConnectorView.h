@@ -52,7 +52,8 @@ class LMMS_EXPORT PluginPinConnectorView
 	Q_OBJECT
 
 public:
-	PluginPinConnectorView(PluginPinConnector* model, QWidget* parent);
+	PluginPinConnectorView(PluginPinConnector* model);
+	~PluginPinConnectorView() override;
 
 	auto sizeHint() const -> QSize override;
 	auto minimumSizeHint() const -> QSize override;

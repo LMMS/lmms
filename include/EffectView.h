@@ -71,7 +71,7 @@ public:
 
 public slots:
 	void editControls();
-	void editPinConnector();
+	void togglePinConnector();
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
@@ -98,7 +98,7 @@ private:
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	QPushButton* m_pinConnectorButton = nullptr;
-	PluginPinConnectorView* m_pinConnectorView = nullptr;
+	std::unique_ptr<PluginPinConnectorView> m_pinConnectorView;
 
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;

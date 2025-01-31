@@ -198,11 +198,11 @@ void PluginPinConnector::updateAllRoutedChannels()
 	}
 }
 
-auto PluginPinConnector::instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*
+auto PluginPinConnector::instantiateView() const -> std::unique_ptr<gui::PluginPinConnectorView>
 {
 	// This method does not modify the pin connector, but it needs the view to store
 	// a mutable pointer to the pin connector, hence the const_cast.
-	return new gui::PluginPinConnectorView{const_cast<PluginPinConnector*>(this), parent};
+	return std::make_unique<gui::PluginPinConnectorView>(const_cast<PluginPinConnector*>(this));
 }
 
 auto PluginPinConnector::getChannelCountText() const -> QString

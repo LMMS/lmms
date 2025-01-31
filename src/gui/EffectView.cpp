@@ -134,7 +134,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		});
 
 		m_pinConnectorButton->setGeometry(144 + 32, 12, 28, 28);
-		connect(m_pinConnectorButton, &QPushButton::clicked, this, &EffectView::editPinConnector);
+		connect(m_pinConnectorButton, &QPushButton::clicked, this, &EffectView::togglePinConnector);
 	}
 
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
@@ -150,12 +150,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-	if (m_pinConnectorView != nullptr)
-	{
-		m_pinConnectorView->closeWindow();
-		delete m_pinConnectorView;
-		m_pinConnectorView = nullptr;
-	}
+	m_pinConnectorView.reset();
 	delete m_subWindow;
 }
 
@@ -183,14 +178,17 @@ void EffectView::editControls()
 
 
 
-void EffectView::editPinConnector()
+void EffectView::togglePinConnector()
 {
 	auto pc = effect()->pinConnector();
 	if (!pc) { return; }
 
 	if (!m_pinConnectorView)
 	{
-		m_pinConnectorView = pc->instantiateView(this);
+		m_pinConnectorView = pc->instantiateView();
+		connect(pc, &PluginPinConnector::destroyed, [this]() {
+			m_pinConnectorView.reset();
+		});
 	}
 	else
 	{

@@ -251,7 +251,7 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 	auto nodeName() const -> QString override { return "pins"; }
 
-	virtual auto instantiateView(QWidget* parent) const -> gui::PluginPinConnectorView*;
+	virtual auto instantiateView() const -> std::unique_ptr<gui::PluginPinConnectorView>;
 
 	auto getChannelCountText() const -> QString;
 

@@ -86,8 +86,8 @@ private:
 };
 
 
-PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidget* parent)
-	: QWidget{parent}
+PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model)
+	: QWidget{}
 	, ModelView{model, this}
 	, m_inView{new MatrixView{this, model->in(), true}}
 	, m_outView{new MatrixView{this, model->out(), false}}
@@ -143,6 +143,11 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model, QWidge
 
 	updateGeometry();
 	show();
+}
+
+PluginPinConnectorView::~PluginPinConnectorView()
+{
+	closeWindow();
 }
 
 auto PluginPinConnectorView::sizeHint() const -> QSize
