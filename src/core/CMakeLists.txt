@@ -59,11 +59,13 @@ set(LMMS_SRCS
 	core/Plugin.cpp
 	core/PluginIssue.cpp
 	core/PluginFactory.cpp
+	core/PluginPinConnector.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
 	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
+	core/RemotePluginAudioPort.cpp
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/Sample.cpp

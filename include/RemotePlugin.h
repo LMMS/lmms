@@ -25,8 +25,10 @@
 #ifndef LMMS_REMOTE_PLUGIN_H
 #define LMMS_REMOTE_PLUGIN_H
 
+#include "AudioData.h"
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
+#include "lmms_basics.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
@@ -35,15 +37,15 @@
 namespace lmms
 {
 
-
 class RemotePlugin;
+class RemotePluginAudioPortController;
 class SampleFrame;
 
 class ProcessWatcher : public QThread
 {
 	Q_OBJECT
 public:
-	ProcessWatcher( RemotePlugin * );
+	explicit ProcessWatcher(RemotePlugin* plugin);
 	~ProcessWatcher() override = default;
 
 	void stop()
@@ -70,7 +72,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:
-	RemotePlugin();
+	explicit RemotePlugin(RemotePluginAudioPortController& audioPort);
 	~RemotePlugin() override;
 
 	inline bool isRunning()
@@ -97,7 +99,9 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	bool process( const SampleFrame* _in_buf, SampleFrame* _out_buf );
+	bool process();
+
+	void updateBuffer(int channelsIn, int channelsOut, fpp_t frames);
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
@@ -141,22 +145,22 @@ public:
 		m_commMutex.unlock();
 	}
 
+	auto audioPort() -> RemotePluginAudioPortController*
+	{
+		return m_audioPort;
+	}
+
+	auto inputBuffer() const -> Span<float> { return m_inputBuffer; }
+	auto outputBuffer() const -> Span<float> { return m_outputBuffer; }
+
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
 
 protected:
-	inline void setSplittedChannels( bool _on )
-	{
-		m_splitChannels = _on;
-	}
-
-
 	bool m_failed;
+
 private:
-	void resizeSharedProcessingMemory();
-
-
 	QProcess m_process;
 	ProcessWatcher m_watcher;
 
@@ -168,13 +172,18 @@ private:
 #else
 	QMutex m_commMutex;
 #endif
-	bool m_splitChannels;
 
-	SharedMemory<float[]> m_audioBuffer;
-	std::size_t m_audioBufferSize;
+	RemotePluginAudioPortController* const m_audioPort = nullptr;
 
-	int m_inputCount;
-	int m_outputCount;
+	SharedMemory<float[]> m_audioBuffer; // NOLINT
+	std::size_t m_audioBufferSize = 0; // TODO: Move to `SharedMemory`?
+
+	f_cnt_t m_frames = 0;
+	pi_ch_t m_channelsIn = 0;
+	pi_ch_t m_channelsOut = 0;
+
+	Span<float> m_inputBuffer;
+	Span<float> m_outputBuffer;
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;

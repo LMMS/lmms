@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 // ################################# SlicerT ####################################
 
 SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
-	: Instrument(instrumentTrack, &slicert_plugin_descriptor)
+	: Instrument(&slicert_plugin_descriptor, instrumentTrack)
 	, m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr("Note threshold"))
 	, m_fadeOutFrames(10.0f, 0.0f, 100.0f, 0.1f, this, tr("FadeOut"))
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
@@ -75,7 +75,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.setValue(0);
 }
 
-void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
+void SlicerT::playNoteImpl(NotePlayHandle* handle, CoreAudioDataMut out)
 {
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
@@ -121,7 +121,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 		SRC_STATE* resampleState = playbackState->resamplingState();
 		SRC_DATA resampleData;
 		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
-		resampleData.data_out = (workingBuffer + offset)->data();
+		resampleData.data_out = out[offset].data();
 		resampleData.input_frames = noteLeft * m_originalSample.sampleSize();
 		resampleData.output_frames = frames;
 		resampleData.src_ratio = speedRatio;
@@ -140,8 +140,8 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 			fadeValue = cosinusInterpolate(0, 1, fadeValue);
 
-			workingBuffer[i + offset][0] *= fadeValue;
-			workingBuffer[i + offset][1] *= fadeValue;
+			out[i + offset][0] *= fadeValue;
+			out[i + offset][1] *= fadeValue;
 		}
 
 		emit isPlaying(noteDone, sliceStart, sliceEnd);
