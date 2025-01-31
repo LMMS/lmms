@@ -121,9 +121,10 @@ set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
 # Prefer a hard-copy of .DirIcon over appimagetool's symlinking
-file(COPY "${APP}/usr/share/icons/hicolor/scalable/apps/${lmms}.svg" DESTINATION "${APP}")
-file(RENAME "${APP}/${lmms}.svg" "${APP}/.DirIcon")
-file(COPY "${APP}/usr/share/icons/hicolor/scalable/apps/${lmms}.svg" DESTINATION "${APP}")
+# 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
+file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
+file(RENAME "${APP}/${lmms}.png" "${APP}/.DirIcon")
+file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
 
 # Build list of libraries to inform linuxdeploy about
 # e.g. --library=foo.so --library=bar.so
@@ -164,6 +165,9 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
+
+# Remove svg ambitiously placed by linuxdeploy
+file(REMOVE "${APP}/${lmms}.svg")
 
 # Remove libraries that are normally sytem-provided
 file(GLOB EXCLUDE_LIBS
@@ -235,13 +239,6 @@ endforeach()
 
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
-
-	# Paranoia: Delete mimetypes for mystery bugs
-	# TODO: Reword this comment if it works
-	file(GLOB_RECURSE mimetypes LIST_DIRECTORIES true "${APP}/usr/share/icons/hicolor/*")
-	list(FILTER mimetypes INCLUDE REGEX ".*/mimetypes$")
-	list(SORT mimetypes)
-	file(REMOVE_RECURSE ${mimetypes})
 
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
 	set(ENV{ARCH} "${ARCH}")
