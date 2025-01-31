@@ -147,11 +147,16 @@ foreach(_lib IN LISTS LIBS)
 	endif()
 endforeach()
 
+# Ensure lmms.png is in the root of AppDir or the else:
+#  1. "linuxdeploy" invokes "appimagetool" which reads "Icon=lmms" from "lmms.desktop"
+#  2. "appimagetool" deploys ".DirIcon" symlinking to "lmms.svg" symlinking to ".../scalable/apps/lmms.svg"
+#  3.  las -- for reasons unknown -- causes erradic thumbnail behavior
+file(COPY "${APP}/usr/share/icons/hicolor/64x64/apps/${lmms}.png" DESTINATION "${APP}/")
+
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
-	--icon-file "${CPACK_SOURCE_DIR}/cmake/linux/icons/256x256/apps/${lmms}.png"
 	--desktop-file "${DESKTOP_FILE}"
 	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
