@@ -38,14 +38,15 @@
 namespace lmms {
 
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
-	: AudioDevice(ConfigManager::inst()->value("audioportaudio", "channels", QString::number(DEFAULT_CHANNELS)).toInt(), engine)
+	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_paStream(nullptr)
 	, m_outBuf(std::make_unique<SampleFrame[]>(engine->framesPerPeriod()))
 	, m_outBufPos(0)
 	, m_outBufSize(engine->framesPerPeriod())
 {
-	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
-	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
+	const auto backend = ConfigManager::inst()->value("audioportaudio", "backend");
+	const auto device = ConfigManager::inst()->value("audioportaudio", "device");
+	const auto channels = ConfigManager::inst()->value("audioportaudio", "channels");
 
 	auto outputDeviceIndex = Pa_GetDefaultOutputDevice();
 	auto outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
@@ -67,13 +68,13 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	const auto outputParameters = PaStreamParameters{
 		.device = outputDeviceIndex,
-		.channelCount = channels(),
+		.channelCount = std::min(channels.isEmpty() ? DEFAULT_CHANNELS : channels.toInt(), outputDeviceInfo->maxOutputChannels),
 		.sampleFormat = paFloat32,
 		.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency,
 		.hostApiSpecificStreamInfo = nullptr
 	};
 
-	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(), paNoFlag,
+	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, engine->baseSampleRate(), engine->framesPerPeriod(), paNoFlag,
 		processCallback, this);
 
 	if (err != paNoError)
@@ -83,6 +84,8 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		return;
 	}
 
+	setSampleRate(engine->baseSampleRate());
+	setChannels(outputParameters.channelCount);
 	successful = true;
 }
 
@@ -157,7 +160,7 @@ void gui::AudioPortAudioSetupWidget::updateBackends()
 		m_backendComboBox->addItem(backendInfo->name, i);
 	}
 
-	const auto& backend = ConfigManager::inst()->value("audioportaudio", "backend");
+	const auto backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const auto index = std::max(0, m_backendComboBox->findText(backend));
 	m_backendComboBox->setCurrentIndex(index);
 }
@@ -178,7 +181,7 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 		}
 	}
 
-	const auto& device = ConfigManager::inst()->value("audioportaudio", "device");
+	const auto device = ConfigManager::inst()->value("audioportaudio", "device");
 	const auto index = std::max(0, m_deviceComboBox->findText(device));
 	m_deviceComboBox->setCurrentIndex(index);
 }
@@ -188,11 +191,11 @@ void gui::AudioPortAudioSetupWidget::updateChannels()
 	if (m_deviceComboBox->currentData().isNull()) { return; }
 
 	const auto initGuard = PortAudioInitializationGuard{};
-	const auto& channels = ConfigManager::inst()->value("audioportaudio", "channels");
+	const auto channels = ConfigManager::inst()->value("audioportaudio", "channels");
 	const auto maxOutputChannels = Pa_GetDeviceInfo(m_deviceComboBox->currentData().toInt())->maxOutputChannels;
 
 	m_channelModel.setRange(1, maxOutputChannels);
-	m_channelModel.setValue(channels.isEmpty() ? DEFAULT_CHANNELS : channels.toInt());
+	m_channelModel.setValue(std::min(channels.isEmpty() ? DEFAULT_CHANNELS : channels.toInt(), maxOutputChannels));
 	m_channelSpinBox->setNumDigits(QString::number(maxOutputChannels).length());
 }
 
