@@ -55,7 +55,7 @@ if not Path('.gitmodules').is_file():
     print('You need to call this script from the LMMS top directory')
     exit(1)
 
-result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
+result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*', ':!benchmarks/*'],
                         capture_output=True, text=True, check=True)
 
 known_no_namespace_lmms = {
