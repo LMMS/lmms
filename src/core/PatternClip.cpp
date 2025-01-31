@@ -35,16 +35,9 @@ namespace lmms
 {
 
 
-PatternClip::PatternClip(Track* track) :
-	Clip(track)
+PatternClip::PatternClip() :
+	Clip()
 {
-	bar_t t = Engine::patternStore()->lengthOfPattern(patternIndex());
-	if( t > 0 )
-	{
-		saveJournallingState( false );
-		changeLength( TimePos( t, 0 ) );
-		restoreJournallingState();
-	}
 	setAutoResize( false );
 }
 
@@ -100,7 +93,16 @@ void PatternClip::loadSettings(const QDomElement& element)
 	}
 }
 
-
+void PatternClip::onAddedToTrack(Track*)
+{
+	const auto t = Engine::patternStore()->lengthOfPattern(patternIndex());
+	if (t > 0)
+	{
+		saveJournallingState(false);
+		changeLength(TimePos(t, 0));
+		restoreJournallingState();
+	}
+}
 
 int PatternClip::patternIndex()
 {

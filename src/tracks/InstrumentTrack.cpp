@@ -46,8 +46,8 @@ namespace lmms
 {
 
 
-InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
-	Track( Track::Type::Instrument, tc ),
+InstrumentTrack::InstrumentTrack() :
+	Track(Track::Type::Instrument),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_track" ), Engine::audioEngine()->midiClient(),
 								this, this ),
@@ -803,14 +803,16 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-Clip* InstrumentTrack::createClip(const TimePos & pos)
+Clip* InstrumentTrack::createClip()
 {
-	auto p = new MidiClip(this);
-	p->movePosition(pos);
-	return p;
+	return addClip<MidiClip>();
 }
 
 
+bool InstrumentTrack::canAddClip(Clip* clip)
+{
+	return dynamic_cast<MidiClip*>(clip) != nullptr;
+}
 
 
 gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )

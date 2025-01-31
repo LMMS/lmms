@@ -35,25 +35,14 @@
 
 namespace lmms
 {
-
-/*! \brief Create a new Clip
- *
- *  Creates a new clip for the given track.
- *
- * \param _track The track that will contain the new object
- */
-Clip::Clip( Track * track ) :
-	Model( track ),
-	m_track( track ),
+Clip::Clip() :
+	Model(nullptr),
+	m_track(nullptr),
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
-	if( getTrack() )
-	{
-		getTrack()->addClip( this );
-	}
 	setJournalling( false );
 	movePosition( 0 );
 	changeLength( 0 );

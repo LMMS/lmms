@@ -29,6 +29,7 @@
 #include "ClipView.h"
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "SampleTrack.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
@@ -86,7 +87,7 @@ void PatternEditor::removeSteps()
 
 void PatternEditor::addSampleTrack()
 {
-	(void) Track::create( Track::Type::Sample, model() );
+	model()->addTrack<SampleTrack>();
 }
 
 
@@ -94,7 +95,7 @@ void PatternEditor::addSampleTrack()
 
 void PatternEditor::addAutomationTrack()
 {
-	(void) Track::create( Track::Type::Automation, model() );
+	model()->addTrack<AutomationTrack>();
 }
 
 
@@ -131,7 +132,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 	if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
+		Track* t = model()->createTrack(dataFile.content().firstChild().toElement());
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;
@@ -152,7 +153,6 @@ void PatternEditor::dropEvent(QDropEvent* de)
 			t->deleteClips();
 			t->createClipsForPattern(m_ps->numOfPatterns() - 1);
 		}
-		m_ps->updateAfterTrackAdd();
 
 		de->accept();
 	}

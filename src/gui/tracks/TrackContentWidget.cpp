@@ -536,7 +536,8 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 		TimePos shift = TimePos::ticksPerBar() * getGUI()->songEditor()->m_editor->getSnapSize();
 		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
-		Clip * clip = t->createClip( pos );
+		auto clip = t->createClip();
+		clip->movePosition(pos);
 		clip->restoreState( clipElement );
 		clip->movePosition(pos); // Because we restored the state, we need to move the Clip again.
 		if( wasSelection )
@@ -600,7 +601,9 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		getTrack()->addJournalCheckPoint();
 		const TimePos pos = getPosition( me->x() ).getBar() *
 						TimePos::ticksPerBar();
-		getTrack()->createClip(pos);
+
+		auto clip = getTrack()->createClip();
+		clip->movePosition(pos);
 	}
 }
 
