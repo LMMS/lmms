@@ -149,42 +149,47 @@ int AudioPortAudio::processCallback(const void* inputBuffer, void* outputBuffer,
 void gui::AudioPortAudioSetupWidget::updateBackends()
 {
 	const auto initGuard = PortAudioInitializationGuard{};
+	m_backendComboBox->clear();
 
-	for (int i = 0; i < Pa_GetHostApiCount(); ++i)
+	for (auto i = 0; i < Pa_GetHostApiCount(); ++i)
 	{
-		const auto hi = Pa_GetHostApiInfo(i);
-		m_backendComboBox->addItem(hi->name);
+		const auto backendInfo = Pa_GetHostApiInfo(i);
+		m_backendComboBox->addItem(backendInfo->name, i);
 	}
+
+	const auto& backend = ConfigManager::inst()->value("audioportaudio", "backend");
+	const auto index = std::max(0, m_backendComboBox->findText(backend));
+	m_backendComboBox->setCurrentIndex(index);
 }
 
 void gui::AudioPortAudioSetupWidget::updateDevices()
 {
 	const auto initGuard = PortAudioInitializationGuard{};
+	m_deviceComboBox->clear();
 
-	const QString& backend = m_backendComboBox->currentText();
-	int hostApi = 0;
-	for (int i = 0; i < Pa_GetHostApiCount(); ++i)
+	for (auto i = 0; i < Pa_GetDeviceCount(); ++i)
 	{
-		const auto hi = Pa_GetHostApiInfo(i);
-		if (backend == hi->name)
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+		if (deviceInfo->hostApi == m_backendComboBox->currentData().toInt())
 		{
-			hostApi = i;
-			break;
+			m_deviceComboBox->addItem(deviceInfo->name, i);
 		}
 	}
 
-	m_deviceComboBox->clear();
-	for (int i = 0; i < Pa_GetDeviceCount(); ++i)
-	{
-		const auto di = Pa_GetDeviceInfo(i);
-		if (di->hostApi == hostApi) { m_deviceComboBox->addItem(di->name); }
-	}
+	const auto& device = ConfigManager::inst()->value("audioportaudio", "device");
+	const auto index = std::max(0, m_deviceComboBox->findText(device));
+	m_deviceComboBox->setCurrentIndex(index);
 }
 
 void gui::AudioPortAudioSetupWidget::updateChannels()
 {
 	const auto initGuard = PortAudioInitializationGuard{};
-	// TODO: Implement
+	const auto& channels = ConfigManager::inst()->value("audioportaudio", "channels");
+	const auto maxOutputChannels = Pa_GetDeviceInfo(m_deviceComboBox->currentData().toInt())->maxOutputChannels;
+
+	m_channelModel.setRange(1, maxOutputChannels);
+	m_channelModel.setValue(channels.isEmpty() ? DEFAULT_CHANNELS : channels.toInt());
+	m_channelSpinBox->setNumDigits(QString::number(maxOutputChannels).length());
 }
 
 gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
@@ -199,32 +204,28 @@ gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 	m_deviceComboBox = new QComboBox(this);
 	form->addRow(tr("Device"), m_deviceComboBox);
 
-	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), [&] { updateDevices(); });
+	m_channelSpinBox = new LcdSpinBox(1, this);
+	m_channelSpinBox->setModel(&m_channelModel);
+	form->addRow(tr("Channels"), m_channelSpinBox);
+
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::activated), [&] { updateDevices(); });
+	connect(m_deviceComboBox, qOverload<int>(&QComboBox::activated), [&] { updateChannels(); });
 }
 
 void gui::AudioPortAudioSetupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue("audioportaudio", "backend", m_backendComboBox->currentText());
 	ConfigManager::inst()->setValue("audioportaudio", "device", m_deviceComboBox->currentText());
+	ConfigManager::inst()->setValue("audioportaudio", "channels", QString::number(m_channelSpinBox->value<int>()));
 }
 
 void gui::AudioPortAudioSetupWidget::show()
 {
 	if (m_backendComboBox->count() == 0)
 	{
-		// populate the backend model the first time we are shown
 		updateBackends();
-
-		const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
-		const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
-
-		const auto backendIndex = std::max(0, m_backendComboBox->findText(backend));
-		m_backendComboBox->setCurrentIndex(backendIndex);
-
 		updateDevices();
-
-		const auto deviceIndex = std::max(0, m_deviceComboBox->findText(device));
-		m_deviceComboBox->setCurrentIndex(deviceIndex);
+		updateChannels();
 	}
 
 	AudioDeviceSetupWidget::show();

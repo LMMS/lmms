@@ -25,6 +25,7 @@
 #ifndef LMMS_AUDIO_PORTAUDIO_H
 #define LMMS_AUDIO_PORTAUDIO_H
 
+#include "LcdSpinBox.h"
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_PORTAUDIO
@@ -68,6 +69,8 @@ public:
 private:
 	QComboBox* m_backendComboBox;
 	QComboBox* m_deviceComboBox;
+	LcdSpinBox* m_channelSpinBox;
+	IntModel m_channelModel;
 };
 } // namespace gui
 
