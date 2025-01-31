@@ -236,6 +236,13 @@ endforeach()
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
 
+	# Paranoia: Delete mimetypes for mystery bugs
+	# TODO: Reword this comment if it works
+	file(GLOB_RECURSE mimetypes LIST_DIRECTORIES true "${APP}/usr/share/icons/hicolor/*")
+	list(FILTER mimetypes INCLUDE REGEX ".*/mimetypes$")
+	list(SORT mimetypes)
+	file(REMOVE_RECURSE ${mimetypes})
+
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
 	set(ENV{ARCH} "${ARCH}")
 	message(STATUS "Finishing the AppImage...")
