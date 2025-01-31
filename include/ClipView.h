@@ -121,10 +121,6 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<ClipView *> clipvs );
 	static void toggleMute( QVector<ClipView *> clipvs );
-	static void mergeClips(QVector<ClipView*> clipvs);
-
-	// Returns true if selection can be merged and false if not
-	static bool canMergeSelection(QVector<ClipView*> clipvs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -147,8 +143,7 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute,
-		Merge
+		Mute
 	};
 
 	TrackView * m_trackView;
@@ -244,8 +239,13 @@ private:
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
-	//! Return true iff the clip could be split. Currently only implemented for samples
-	virtual bool splitClip( const TimePos pos ){ return false; };
+	
+	/**
+	* Split this Clip into two clips
+	* @param pos the position of the split, relative to the start of the clip
+	* @return true if the clip could be split
+	*/
+	virtual bool splitClip(const TimePos pos, bool hardSplit) = 0;
 	void updateCursor(QMouseEvent * me);
 } ;
 

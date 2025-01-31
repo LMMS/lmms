@@ -54,6 +54,7 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip( Track * track );
+	Clip(const Clip& other);
 	~Clip() override;
 
 	inline Track * getTrack() const
@@ -110,6 +111,22 @@ public:
 		return m_autoResize;
 	}
 
+	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
+	 *
+	 *  If a clip has been resized previously, it will not automatically 
+	 *  resize when editing it.
+	 *
+	 */
+	inline void setHasBeenResized( const bool r )
+	{
+		m_hasBeenResized = r;
+	}
+
+	inline const bool getHasBeenResized() const
+	{
+		return m_hasBeenResized;
+	}
+
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
 
@@ -158,7 +175,8 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_autoResize;
+	bool m_autoResize = false;
+	bool m_hasBeenResized = false;
 
 	bool m_selectViewOnCreate;
 
