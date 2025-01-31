@@ -30,6 +30,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <type_traits>
 #include <vector>
 
