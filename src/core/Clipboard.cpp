@@ -28,6 +28,8 @@
 
 #include "Clipboard.h"
 
+#include "AutomatableModel.h"
+
 
 namespace lmms::Clipboard
 {
@@ -65,11 +67,62 @@ namespace lmms::Clipboard
 	}
 
 
-
-
-	void copyStringPair( const QString & key, const QString & value )
+	QString getStringPairKeyName(StringPairDataType type)
 	{
-		QString finalString = key + ":" + value;
+		switch (type)
+		{
+			case StringPairDataType::FloatValue:
+				return QString("FloatValue");
+			case StringPairDataType::AutomatableModelLink:
+				return QString("AutomatableModelLink");
+			case StringPairDataType::Instrument:
+				return QString("Instrument");
+			case StringPairDataType::PresetFile:
+				return QString("PresetFile");
+			case StringPairDataType::PluginPresetFile:
+				return QString("PluginPresetFile");
+			case StringPairDataType::SampleFile:
+				return QString("SampleFile");
+			case StringPairDataType::SoundFontFile:
+				return QString("SoundFontFile");
+			case StringPairDataType::PatchFile:
+				return QString("PatchFile");
+			case StringPairDataType::VstPluginFile:
+				return QString("VstPluginFile");
+			case StringPairDataType::ImportedProject:
+				return QString("ImportedProject");
+			case StringPairDataType::ProjectFile:
+				return QString("ProjectFile");
+			case StringPairDataType::SampleData:
+				return QString("SampleData");
+			case StringPairDataType::InstrumentTrack:
+				return QString("InstrumentTrack");
+			case StringPairDataType::PatternTrack:
+				return QString("PatternTrack");
+			case StringPairDataType::SampleTrack:
+				return QString("SampleTrack");
+			case StringPairDataType::AutomationTrack:
+				return QString("AutomationTrack");
+			case StringPairDataType::HiddenAutomationTrack:
+				return QString("HiddenAutomationTrack");
+			case StringPairDataType::MidiClip:
+				return QString("MidiClip");
+			case StringPairDataType::PatternClip:
+				return QString("PatternClip");
+			case StringPairDataType::SampleClip:
+				return QString("SampleClip");
+			case StringPairDataType::AutomationClip:
+				return QString("AutomationClip");
+			default:
+				break;
+		};
+		return QString("None_error");
+	}
+
+
+	void copyStringPair(StringPairDataType key, const QString& value)
+	{
+		QString finalString = getStringPairKeyName(key) + ":" + value;
 
 		auto content = new QMimeData;
 		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
@@ -79,9 +132,17 @@ namespace lmms::Clipboard
 
 
 
-	QString decodeKey( const QMimeData * mimeData )
+	StringPairDataType decodeKey(const QMimeData* mimeData)
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
+		QString keyString = QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 0, 0);
+		for (size_t i = 0; i < static_cast<size_t>(StringPairDataType::Count); i++)
+		{
+			if (getStringPairKeyName(static_cast<StringPairDataType>(i)) == keyString)
+			{
+				return static_cast<StringPairDataType>(i);
+			}
+		}
+		return StringPairDataType::None;
 	}
 
 
@@ -90,6 +151,16 @@ namespace lmms::Clipboard
 	QString decodeValue( const QMimeData * mimeData )
 	{
 		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+	}
+	
+	QString encodeFloatValue(float value)
+	{
+		return QString::number(value);
+	}
+	
+	QString encodeAutomatableModelLink(const AutomatableModel& model)
+	{
+		return QString::number(model.id());
 	}
 
 
