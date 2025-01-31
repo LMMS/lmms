@@ -120,19 +120,20 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 			if (err == 0) { return paComplete; }
 		}
 
-		const auto minLen = std::min(framesPerBuffer, m_outBuf.size() - m_outBufPos);
-		for (auto sample = std::size_t{0}; sample < framesPerBuffer * channels(); ++sample)
+		for (auto frame = std::size_t{0}; frame < framesPerBuffer; ++frame)
 		{
 			if (channels() == 1)
 			{
-				outputBuffer[sample] = m_outBuf[sample].average();
+				outputBuffer[frame] = m_outBuf[frame].average();
 			}
-			else 
+			else
 			{
-				outputBuffer[sample] = m_outBuf[sample / channels()][sample % channels()];
+				outputBuffer[frame * channels()] = m_outBuf[frame][0];
+				outputBuffer[frame * channels() + 1] = m_outBuf[frame][1];
 			}
 		}
 
+		const auto minLen = std::min(framesPerBuffer, m_outBuf.size() - m_outBufPos);
 		outputBuffer += minLen * channels();
 		framesPerBuffer -= minLen;
 		m_outBufPos += minLen;
