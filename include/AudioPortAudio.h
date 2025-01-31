@@ -31,7 +31,6 @@
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #include <QObject>
-#include <memory>
 #include <portaudio.h>
 
 #include "AudioDevice.h"
@@ -39,18 +38,15 @@
 
 class QComboBox;
 
-namespace {
+namespace lmms
+{
+
 class PortAudioInitializationGuard
 {
 public:
 	PortAudioInitializationGuard() { Pa_Initialize(); }
 	~PortAudioInitializationGuard() { Pa_Terminate(); }
 };
-
-} // namespace
-
-namespace lmms
-{
 
 namespace gui {
 
