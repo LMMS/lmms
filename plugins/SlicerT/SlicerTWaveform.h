@@ -32,6 +32,8 @@
 #include <QMouseEvent>
 #include <QPainter>
 
+#include "SampleThumbnail.h"
+
 namespace lmms {
 
 class SlicerT;
@@ -108,6 +110,8 @@ private:
 	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
+	
+	SampleThumbnail m_sampleThumbnail;
 
 	SlicerT* m_slicerTParent;
 

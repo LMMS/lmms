@@ -39,7 +39,7 @@
 #include <cmath>
 
 #include "SampleClip.h"
-#include "SampleWaveform.h"
+#include "SampleThumbnail.h"
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -1025,6 +1025,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1217,12 +1218,18 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			
+
 			const auto& sample = m_ghostSample->sample();
-			const auto waveform = SampleWaveform::Parameters{
-				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			SampleWaveform::visualize(waveform, p, rect);
+
+			const auto param = SampleThumbnail::VisualizeParameters{
+				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.amplification = sample.amplification(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.reversed = sample.reversed()
+			};
+
+			m_sampleThumbnail.visualize(param, p);
 		}
 
 		// draw ghost notes
