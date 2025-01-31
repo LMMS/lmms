@@ -164,6 +164,8 @@ void gui::AudioPortAudioSetupWidget::updateBackends()
 
 void gui::AudioPortAudioSetupWidget::updateDevices()
 {
+	if (m_backendComboBox->currentData().isNull()) { return; }
+
 	const auto initGuard = PortAudioInitializationGuard{};
 	m_deviceComboBox->clear();
 
@@ -183,6 +185,8 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 
 void gui::AudioPortAudioSetupWidget::updateChannels()
 {
+	if (m_deviceComboBox->currentData().isNull()) { return; }
+
 	const auto initGuard = PortAudioInitializationGuard{};
 	const auto& channels = ConfigManager::inst()->value("audioportaudio", "channels");
 	const auto maxOutputChannels = Pa_GetDeviceInfo(m_deviceComboBox->currentData().toInt())->maxOutputChannels;
@@ -208,7 +212,11 @@ gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 	m_channelSpinBox->setModel(&m_channelModel);
 	form->addRow(tr("Channels"), m_channelSpinBox);
 
-	connect(m_backendComboBox, qOverload<int>(&QComboBox::activated), [&] { updateDevices(); });
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::activated), [&] {
+		updateDevices();
+		updateChannels();
+	});
+
 	connect(m_deviceComboBox, qOverload<int>(&QComboBox::activated), [&] { updateChannels(); });
 }
 
