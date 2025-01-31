@@ -45,7 +45,8 @@ class ReverbSCEffect : public Effect
 public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~ReverbSCEffect() override;
-	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

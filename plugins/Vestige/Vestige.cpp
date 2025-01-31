@@ -46,7 +46,7 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
@@ -226,7 +226,7 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf(paramStr.data(), "param%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
@@ -290,7 +290,7 @@ void VestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf(paramStr.data(), "param%d", i);
+					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 
@@ -583,12 +583,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_selPresetButton->setMenu(menu);
 
-	constexpr int buttonFontSize = 12;
-
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), buttonFontSize));
+	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), LARGE_FONT_SIZE));
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
@@ -597,7 +595,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), buttonFontSize));
+	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), LARGE_FONT_SIZE));
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
@@ -882,7 +880,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 				tr( "No VST plugin loaded" );
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont(adjustedToPixelSize(f, 10));
+	p.setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
@@ -894,7 +892,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 0, 0, 0 ) );
 		f.setBold( false );
-		p.setFont(adjustedToPixelSize(f, 8));
+		p.setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.setPen( QColor( 255, 255, 255 ) );
@@ -989,7 +987,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf(paramStr.data(), "param%d", i);
+		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
 		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
@@ -998,7 +996,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 		if( !hasKnobModel )
 		{
-			sprintf(paramStr.data(), "%d", i);
+			std::snprintf(paramStr.data(), paramStr.size(), "%d", i);
 			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
 				0.0f, 1.0f, 0.01f, castModel<VestigeInstrument>(), paramStr.data());
 		}
@@ -1061,8 +1059,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 		// those auto-setted values are not jurnaled, tracked for undo / redo
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf(paramStr.data(), "param%d", i);
-    		s_dumpValues = dump[paramStr.data()].split(":");
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );

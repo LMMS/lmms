@@ -1,7 +1,7 @@
 /*
- * noise.cpp - defination of Noise class.
+ * Metronome.cpp
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,25 +22,20 @@
  *
  */
 
-#include "Noise.h"
-#include "lmms_math.h"
+#include "Metronome.h"
 
-namespace lmms
+#include "Engine.h"
+#include "SamplePlayHandle.h"
+
+namespace lmms {
+void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset)
 {
+	const auto ticksPerBeat = ticksPerBar / beatsPerBar;
+	if (currentTick % ticksPerBeat != 0 || !m_active) { return; }
 
-
-Noise::Noise()
-{
-	inv_randmax = 1.0/FAST_RAND_MAX; /* for range of 0 - 1.0 */
+	const auto handle = currentTick % ticksPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
+													   : new SamplePlayHandle("misc/metronome01.ogg");
+	handle->setOffset(bufferOffset);
+	Engine::audioEngine()->addPlayHandle(handle);
 }
-
-
-
-
-float Noise::tick()
-{
-	return (float) ((2.0 * fast_rand() * inv_randmax) - 1.0);
-}
-
-
 } // namespace lmms

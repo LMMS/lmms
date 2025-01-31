@@ -58,28 +58,13 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_borderColor = Qt::black;
 
 	// close, maximize and restore (after maximizing) buttons
-	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString(), this );
-	m_closeBtn->resize( m_buttonSize );
-	m_closeBtn->setFocusPolicy( Qt::NoFocus );
-	m_closeBtn->setCursor( Qt::ArrowCursor );
-	m_closeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_closeBtn->setToolTip( tr( "Close" ) );
+	m_closeBtn = addTitleButton("close", tr("Close"));
 	connect( m_closeBtn, SIGNAL(clicked(bool)), this, SLOT(close()));
 
-	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
-	m_maximizeBtn->resize( m_buttonSize );
-	m_maximizeBtn->setFocusPolicy( Qt::NoFocus );
-	m_maximizeBtn->setCursor( Qt::ArrowCursor );
-	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
+	m_maximizeBtn = addTitleButton("maximize", tr("Maximize"));
 	connect( m_maximizeBtn, SIGNAL(clicked(bool)), this, SLOT(showMaximized()));
 
-	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
-	m_restoreBtn->resize( m_buttonSize );
-	m_restoreBtn->setFocusPolicy( Qt::NoFocus );
-	m_restoreBtn->setCursor( Qt::ArrowCursor );
-	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_restoreBtn->setToolTip( tr( "Restore" ) );
+	m_restoreBtn = addTitleButton("restore", tr("Restore"));
 	connect( m_restoreBtn, SIGNAL(clicked(bool)), this, SLOT(showNormal()));
 
 	// QLabel for the window title and the shadow effect
@@ -93,10 +78,9 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
 
-	// disable the minimize button
-	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
-		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
-		Qt::CustomizeWindowHint );
+	// Disable the minimize button and make sure that the custom window hint is set
+	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
+
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
 
@@ -111,12 +95,14 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
  */
 void SubWindow::paintEvent( QPaintEvent * )
 {
+	// Don't paint any of the other stuff if the sub window is maximized
+	// so that only its child content is painted.
+	if (isMaximized()) { return; }
+
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
 
-	bool isActive = mdiArea()
-			? mdiArea()->activeSubWindow() == this
-			: false;
+	const bool isActive = windowState() & Qt::WindowActive;
 
 	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
 
@@ -260,6 +246,10 @@ int SubWindow::frameWidth() const
 }
 
 
+void SubWindow::updateTitleBar()
+{
+	adjustTitleBar();
+}
 
 
 /**
@@ -295,9 +285,28 @@ void SubWindow::moveEvent( QMoveEvent * event )
  */
 void SubWindow::adjustTitleBar()
 {
+	// Don't show the title or any button if the sub window is maximized. Otherwise they
+	// might show up behind the actual maximized content of the child widget.
+	if (isMaximized())
+	{
+		m_closeBtn->hide();
+		m_maximizeBtn->hide();
+		m_restoreBtn->hide();
+		m_windowTitle->hide();
+
+		return;
+	}
+
+	// The sub window is not maximized, i.e. the title must be shown
+	// as well as some buttons.
+
+	// Title adjustments
+	m_windowTitle->show();
+
 	// button adjustments
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
+	m_closeBtn->show();
 
 	const int rightSpace = 3;
 	const int buttonGap = 1;
@@ -322,12 +331,12 @@ void SubWindow::adjustTitleBar()
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
 		m_restoreBtn->move( middleButtonPos );
-		m_maximizeBtn->setHidden( isMaximized() );
+		m_maximizeBtn->setVisible(true);
 	}
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
-	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
+	m_restoreBtn->setVisible(isMinimized());
 	if( isMinimized() )
 	{
 		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
@@ -401,6 +410,18 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}
+}
+
+QPushButton* SubWindow::addTitleButton(const std::string& iconName, const QString& toolTip)
+{
+	auto button = new QPushButton(embed::getIconPixmap(iconName), QString(), this);
+	button->resize(m_buttonSize);
+	button->setFocusPolicy(Qt::NoFocus);
+	button->setCursor(Qt::ArrowCursor);
+	button->setAttribute(Qt::WA_NoMousePropagation);
+	button->setToolTip(toolTip);
+
+	return button;
 }
 
 

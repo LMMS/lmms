@@ -40,8 +40,8 @@ public:
 	StereoEnhancerEffect( Model * parent,
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoEnhancerEffect() override;
-	bool processAudioBuffer( SampleFrame* _buf,
-		                                          const fpp_t _frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{

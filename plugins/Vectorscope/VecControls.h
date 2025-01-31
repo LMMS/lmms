@@ -57,20 +57,16 @@ public:
 	QString nodeName() const override {return "Vectorscope";}
 	int controlCount() override {return 3;}
 
+	const BoolModel& getLogarithmicModel() const { return m_logarithmicModel; }
+	const BoolModel& getLinesModel() const { return m_linesModeModel; }
+
 private:
 	Vectorscope *m_effect;
 
-	FloatModel m_persistenceModel;
 	BoolModel m_logarithmicModel;
-	BoolModel m_highQualityModel;
-
-	QColor m_colorFG;
-	QColor m_colorGrid;
-	QColor m_colorLabels;
-	QColor m_colorOutline;
+	BoolModel m_linesModeModel;
 
 	friend class gui::VecControlsDialog;
-	friend class gui::VectorView;
 };
 
 

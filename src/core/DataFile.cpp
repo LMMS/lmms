@@ -353,7 +353,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		if (QDir(bundleDir).exists())
 		{
 			showError(SongEditor::tr("Operation denied"),
-				SongEditor::tr("A bundle folder with that name already eists on the "
+				SongEditor::tr("A bundle folder with that name already exists on the "
 				"selected path. Can't overwrite a project bundle. Please select a different "
 				"name."));
 
@@ -414,7 +414,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	if (!outfile.commit())
 	{
 		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("An unknown error has occured and the file could not be saved."));
+			SongEditor::tr("An unknown error has occurred and the file could not be saved."));
 		return false;
 	}
 

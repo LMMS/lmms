@@ -47,7 +47,7 @@ NineButtonSelector::NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int d
 		m_buttons[i]->setActiveGraphic(onOffIcons[i * 2]);
 		m_buttons[i]->setInactiveGraphic(onOffIcons[(i * 2) + 1]);
 		m_buttons[i]->setChecked(false);
-		connect(m_buttons[i].get(), &PixmapButton::clicked, this, [=](){ this->buttonClicked(i); });
+		connect(m_buttons[i].get(), &PixmapButton::clicked, this, [=, this](){ buttonClicked(i); });
 	}
 
 	m_lastBtn = m_buttons[defaultButton].get();

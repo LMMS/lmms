@@ -72,11 +72,11 @@ jobs:
         arch: [ x86_64, arm64 ]
         include:
           - arch: x86_64
-            os: macos-12
-            xcode: "13.1"
+            os: macos-13
+            xcode: "15.2"
           - arch: arm64
             os: macos-14
-            xcode: "14.3.1"
+            xcode: "15.4"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -168,11 +168,7 @@ jobs:
           key: "homebrew-${{ matrix.arch }}\
             -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: ['32', '64']
-    name: mingw${{ matrix.arch }}
+    name: mingw64
     runs-on: ubuntu-latest
     container: ghcr.io/lmms/linux.mingw:20.04
     env:
@@ -201,11 +197,11 @@ jobs:
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+          key: "ccache-${{ github.job }}-64-${{ github.ref }}\
             -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
-            ccache-${{ github.job }}-${{ matrix.arch }}-
+            ccache-${{ github.job }}-64-${{ github.ref }}-
+            ccache-${{ github.job }}-64-
           path: ~/.ccache
       - name: Configure
         run: |
@@ -213,7 +209,7 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_INSTALL_PREFIX=./install \
-                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-${{ matrix.arch }}.cmake" \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -222,7 +218,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mingw${{ matrix.arch }}
+          name: mingw64
           path: build/lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
@@ -234,11 +230,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: ['x86', 'x64']
-    name: msvc-${{ matrix.arch }}
+    name: msvc-x64
     runs-on: windows-2019
     env:
       CCACHE_MAXSIZE: 0
@@ -249,23 +241,29 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Update vcpkg (TEMPORARY)
+        run: |
+          cd $env:VCPKG_INSTALLATION_ROOT
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ matrix.arch }}-
+            vcpkg-x64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
           # yamllint disable rule:line-length
-          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+          key: "ccache-${{ github.job }}-x64-${{ github.ref }}\
             -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
-            ccache-${{ github.job }}-${{ matrix.arch }}-
+            ccache-${{ github.job }}-x64-${{ github.ref }}-
+            ccache-${{ github.job }}-x64-
           path: ~\AppData\Local\ccache
           # yamllint enable rule:line-length
       - name: Install tools
@@ -274,21 +272,13 @@ jobs:
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:
           version: '5.15.2'
-          arch: |-
-            ${{
-              fromJSON('
-                {
-                  "x86": "win32_msvc2019",
-                  "x64": "win64_msvc2019_64"
-                }
-              ')[matrix.arch]
-            }}
+          arch: "win64_msvc2019_64"
           archives: qtbase qtsvg qttools
           cache: true
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@cec98b9d092141f74527d0afa6feb2af698cfe89
         with:
-          arch: ${{ matrix.arch }}
+          arch: x64
       - name: Configure
         run: |
           ccache --zero-stats
@@ -301,8 +291,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `
-            -DVCPKG_TARGET_TRIPLET="${{ matrix.arch }}-windows" `
-            -DVCPKG_HOST_TRIPLET="${{ matrix.arch }}-windows" `
+            -DVCPKG_TARGET_TRIPLET="x64-windows" `
+            -DVCPKG_HOST_TRIPLET="x64-windows" `
             -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
         env:
           should_install_manifest:
@@ -318,7 +308,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: msvc-${{ matrix.arch }}
+          name: msvc-x64
           path: build\lmms-*.exe
       - name: Trim ccache and print statistics
         run: |

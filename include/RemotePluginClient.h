@@ -309,7 +309,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 		default:
 		{
 			char buf[64];
-			sprintf( buf, "undefined message: %d\n", (int) _m.id );
+			std::snprintf(buf, 64, "undefined message: %d\n", _m.id);
 			debugMessage( buf );
 			break;
 		}

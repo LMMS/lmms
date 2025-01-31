@@ -564,7 +564,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	QHBoxLayout * bufferSizeSubLayout = new QHBoxLayout();
 
 	m_bufferSizeSlider = new QSlider(Qt::Horizontal, bufferSizeBox);
-	m_bufferSizeSlider->setRange(1, 128);
+	m_bufferSizeSlider->setRange(1, MAXIMUM_BUFFER_SIZE / BUFFERSIZE_RESOLUTION);
 	m_bufferSizeSlider->setTickInterval(8);
 	m_bufferSizeSlider->setPageStep(8);
 	m_bufferSizeSlider->setValue(m_bufferSize / BUFFERSIZE_RESOLUTION);

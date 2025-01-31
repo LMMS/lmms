@@ -107,18 +107,16 @@ public:
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
 	virtual Clip * createClip( const TimePos & pos ) = 0;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & doc,
-						QDomElement & parent ) = 0;
+	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
+	// Saving and loading of presets which do not necessarily contain all the track information
+	void savePreset(QDomDocument & doc, QDomElement & element);
+	void loadPreset(const QDomElement & element);
 
+	// Saving and loading of full tracks
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
-
-	void setSimpleSerializing()
-	{
-		m_simpleSerializingMode = true;
-	}
 
 	// -- for usage by Clip only ---------------
 	Clip * addClip( Clip * clip );
@@ -210,6 +208,10 @@ public slots:
 	void toggleSolo();
 
 private:
+	void saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode);
+	void loadTrack(const QDomElement& element, bool presetMode);
+
+private:
 	TrackContainer* m_trackContainer;
 	Type m_type;
 	QString m_name;
@@ -221,8 +223,6 @@ protected:
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
-
-	bool m_simpleSerializingMode;
 
 	clipVector m_clips;
 

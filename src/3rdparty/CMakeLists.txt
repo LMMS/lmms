@@ -15,7 +15,7 @@ ADD_SUBDIRECTORY(weakjack)
 add_library(ringbuffer OBJECT
 	ringbuffer/src/lib/ringbuffer.cpp
 )
-target_compile_features(ringbuffer PUBLIC cxx_std_17)
+target_compile_features(ringbuffer PUBLIC cxx_std_20)
 target_include_directories(ringbuffer PUBLIC
 	ringbuffer/include
 	"${CMAKE_CURRENT_BINARY_DIR}"

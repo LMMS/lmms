@@ -63,9 +63,8 @@ public:
 		return "effect";
 	}
 
-	
-	virtual bool processAudioBuffer( SampleFrame* _buf,
-						const fpp_t _frames ) = 0;
+	//! Returns true if audio was processed and should continue being processed
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
 
 	inline ch_cnt_t processorCount() const
 	{
@@ -174,14 +173,29 @@ public:
 
 
 protected:
-	/**
-		Effects should call this at the end of audio processing
+	enum class ProcessStatus
+	{
+		//! Unconditionally continue processing
+		Continue,
 
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate( double _out_sum );
+		//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
+		ContinueIfNotQuiet,
+
+		//! Do not continue processing
+		Sleep
+	};
+
+	/**
+	 * The main audio processing method that runs when plugin is not asleep
+	 */
+	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
+
+	/**
+	 * Optional method that runs when plugin is sleeping (not enabled,
+	 * not running, not in the Okay state, or in the Don't Run state)
+	 */
+	virtual void processBypassedImpl() {}
+
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
@@ -212,6 +226,14 @@ protected:
 
 
 private:
+	/**
+		If the setting "Keep effects running even without input" is disabled,
+		after "decay" ms of a signal below "gate", the effect is turned off
+		and won't be processed again until it receives new audio input
+	*/
+	void checkGate(double outSum);
+
+
 	EffectChain * m_parent;
 	void resample( int _i, const SampleFrame* _src_buf,
 					sample_rate_t _src_sr,

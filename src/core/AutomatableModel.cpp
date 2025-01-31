@@ -350,18 +350,6 @@ float AutomatableModel::inverseScaledValue( float value ) const
 
 
 
-//! @todo: this should be moved into a maths header
-template<class T>
-void roundAt( T& value, const T& where, const T& step_size )
-{
-	if (std::abs(value - where) < F_EPSILON * std::abs(step_size))
-	{
-		value = where;
-	}
-}
-
-
-
 
 template<class T>
 void AutomatableModel::roundAt( T& value, const T& where ) const

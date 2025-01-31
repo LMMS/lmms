@@ -66,18 +66,11 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 // variables for effect
 	int i = 0;
 
-	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
@@ -94,9 +87,9 @@ bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		auto s = std::array{_buf[f][0], _buf[f][1]};
+		auto s = std::array{buf[f][0], buf[f][1]};
 
 // apply input gain
 		s[0] *= *inputPtr;
@@ -138,17 +131,14 @@ bool WaveShaperEffect::processAudioBuffer( SampleFrame* _buf,
 		s[1] *= *outputPtr;
 
 // mix wet/dry signals
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
-		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;
 	}
 
-	checkGate( out_sum / _frames );
-
-	return( isRunning() );
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 
