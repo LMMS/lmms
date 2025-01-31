@@ -94,9 +94,8 @@ private:
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* arg);
 
 	PaStream * m_paStream;
-	std::unique_ptr<SampleFrame[]> m_outBuf;
+	std::vector<SampleFrame> m_outBuf;
 	std::size_t m_outBufPos;
-	fpp_t m_outBufSize;
 	PortAudioInitializationGuard m_initGuard;
 };
 
