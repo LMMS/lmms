@@ -20,9 +20,9 @@ jobs:
     steps:
       - name: Disable SELinux
         run: |
-          sudo sestatus
-          sudo setenforce 0
-          sudo sestatus
+          sestatus
+          setenforce 0
+          sestatus
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
