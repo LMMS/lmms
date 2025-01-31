@@ -40,9 +40,8 @@ namespace lmms {
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_paStream(nullptr)
-	, m_outBuf(std::make_unique<SampleFrame[]>(engine->framesPerPeriod()))
+	, m_outBuf(engine->framesPerPeriod())
 	, m_outBufPos(0)
-	, m_outBufSize(engine->framesPerPeriod())
 {
 	const auto backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const auto device = ConfigManager::inst()->value("audioportaudio", "device");
@@ -111,28 +110,33 @@ void AudioPortAudio::stopProcessing()
 
 int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer)
 {
+	std::fill_n(outputBuffer, framesPerBuffer * channels(), 0.0f);
+
 	while (framesPerBuffer)
 	{
 		if (m_outBufPos == 0)
 		{
-			m_outBufSize = getNextBuffer(m_outBuf.get());
-			if (m_outBufSize == 0)
-			{
-				std::fill_n(outputBuffer, framesPerBuffer * channels(), 0.0f);
-				return paComplete;
-			}
+			const auto err = getNextBuffer(m_outBuf.data());
+			if (err == 0) { return paComplete; }
 		}
 
-		const auto minLen = std::min(framesPerBuffer, m_outBufSize - m_outBufPos);
+		const auto minLen = std::min(framesPerBuffer, m_outBuf.size() - m_outBufPos);
 		for (auto sample = std::size_t{0}; sample < framesPerBuffer * channels(); ++sample)
 		{
-			outputBuffer[sample] = m_outBuf[sample / channels()][sample % channels()];
+			if (channels() == 1)
+			{
+				outputBuffer[sample] = m_outBuf[sample].average();
+			}
+			else 
+			{
+				outputBuffer[sample] = m_outBuf[sample / channels()][sample % channels()];
+			}
 		}
 
 		outputBuffer += minLen * channels();
 		framesPerBuffer -= minLen;
 		m_outBufPos += minLen;
-		m_outBufPos %= m_outBufSize;
+		m_outBufPos %= m_outBuf.size();
 	}
 
 	return paContinue;
