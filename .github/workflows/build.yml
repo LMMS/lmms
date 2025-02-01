@@ -5,8 +5,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  linux:
-    name: linux
+  linux-x86_64:
+    name: linux-x86_64
     runs-on: ubuntu-latest
     container: ghcr.io/lmms/linux.gcc:20.04
     env:
@@ -39,7 +39,6 @@ jobs:
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX=./install \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -49,12 +48,76 @@ jobs:
           ctest --output-on-failure -j2
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target appimage
+          cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux
+          path: build/lmms-*.AppImage
+      - name: Trim ccache and print statistics
+        run: |
+          ccache --cleanup
+          echo "[ccache config]"
+          ccache --show-config
+          echo "[ccache stats]"
+          ccache --show-stats
+        env:
+          CCACHE_MAXSIZE: 500M
+  linux-arm64:
+    name: linux-arm64
+    runs-on: ubuntu-24.04-arm
+    env:
+      CMAKE_OPTS: >-
+        -DUSE_WERROR=ON
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+        -DWANT_DEBUG_CPACK=ON
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Install system packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~/.ccache
+      - name: Configure
+        run: |
+          ccache --zero-stats
+          cmake -S . \
+                -B build \
+                -DWANT_VST_32=OFF \
+                -DWANT_VST_64=OFF \
+                $CMAKE_OPTS
+      - name: Build
+        run: cmake --build build
+      - name: Run tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure -j2
+      - name: Package
+        run: |
+          cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64
           path: build/lmms-*.AppImage
       - name: Trim ccache and print statistics
         run: |
@@ -129,7 +192,6 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX="../target" \
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
@@ -142,8 +204,7 @@ jobs:
           ctest --output-on-failure -j3
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target dmg
+          cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -208,7 +269,6 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX=./install \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 $CMAKE_OPTS
       - name: Build
