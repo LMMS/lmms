@@ -111,7 +111,7 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
 	if (sampleRange <= 0 || sampleRange > 1) { return; }
 
-	const auto targetThumbnailWidth = static_cast<double>(sampleRect.width()) / sampleRange;
+	const auto targetThumbnailWidth = static_cast<int>(static_cast<double>(sampleRect.width()) / sampleRange);
 	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
 		[&](const auto& thumbnail) { return thumbnail.width() >= targetThumbnailWidth; });
 
@@ -124,10 +124,10 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	const auto thumbnailBeginForward = renderRect.x() - sampleRect.x();
-	const auto thumbnailEndForward = renderRect.x() + renderRect.width() - sampleRect.x();
-	const auto thumbnailBegin = parameters.reversed ? sampleRect.width() - thumbnailBeginForward - 1 : thumbnailBeginForward;
-	const auto thumbnailEnd = parameters.reversed ? sampleRect.width() - thumbnailEndForward : thumbnailEndForward;
+	const auto thumbnailBeginForward = std::max<int>(renderRect.x() - sampleRect.x(), static_cast<int>(parameters.sampleStart * targetThumbnailWidth));
+	const auto thumbnailEndForward = std::max<int>(renderRect.x() + renderRect.width() - sampleRect.x(), static_cast<int>(parameters.sampleEnd * targetThumbnailWidth));
+	const auto thumbnailBegin = parameters.reversed ? targetThumbnailWidth - thumbnailBeginForward - 1 : thumbnailBeginForward;
+	const auto thumbnailEnd = parameters.reversed ? targetThumbnailWidth - thumbnailEndForward : thumbnailEndForward;
 	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
 
 	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
