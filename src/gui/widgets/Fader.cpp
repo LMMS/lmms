@@ -697,12 +697,22 @@ void Fader::paintFaderTicks(QPainter& painter)
 {
 	painter.save();
 
-	painter.setPen(QColor(255, 255, 255, 128));
+	const QPen zeroPen(QColor(255, 255, 255, 216), 1.5);
+	const QPen nonZeroPen(QColor(255, 255, 255, 128), 1.);
 
 	for (float i = 6.f; i >= -120.f; i-= 6.f)
 	{
 		const auto scaledRatio = computeScaledRatio(i);
 		const auto maxHeight = height() - (height() - m_knob.height()) * scaledRatio - (m_knob.height() / 2);
+
+		if (approximatelyEqual(i, 0.))
+		{
+			painter.setPen(zeroPen);
+		}
+		else
+		{
+			painter.setPen(nonZeroPen);
+		}
 
 		painter.drawLine(QPointF(0, maxHeight), QPointF(1, maxHeight));
 		painter.drawLine(QPointF(width() - 1, maxHeight), QPointF(width(), maxHeight));
