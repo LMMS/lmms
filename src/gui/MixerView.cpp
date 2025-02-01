@@ -328,9 +328,12 @@ void MixerView::disconnectFromSoloAndMute(int channelIndex)
 }
 
 
-void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
+void MixerView::setCurrentMixerChannel(MixerChannelView* channel, bool keepSelection, bool rangeSelect)
 {
 	// select
+	if (!keepSelection) { m_selectedChannels.clear(); }
+	if (rangeSelect) { selectMixerChannelsInRange(m_currentMixerChannel->channelIndex(), channel->channelIndex()); }
+	m_selectedChannels.insert(channel);
 	m_currentMixerChannel = channel;
 	m_racksLayout->setCurrentWidget(m_mixerChannelViews[channel->channelIndex()]->m_effectRackView);
 
@@ -339,6 +342,20 @@ void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
 	{
 		updateMixerChannel(i);
 	}
+}
+
+void MixerView::selectMixerChannelsInRange(int index1, int index2)
+{
+	for (int i = std::min(index1,index2); i < std::max(index1,index2); i++)
+	{
+		m_selectedChannels.insert(m_mixerChannelViews[i]);
+	}
+}
+
+void MixerView::sanitizeSelection()
+{
+	std::erase_if(m_selectedChannels, [this](auto m){ return !m_mixerChannelViews.contains(m); });
+	setCurrentMixerChannel(std::clamp(0, m_currentMixerChannel->channelIndex(), m_mixerChannelViews.size() - 1), true);
 }
 
 
@@ -379,6 +396,15 @@ void MixerView::updateMixerChannel(int index)
 	thisLine->update();
 }
 
+void MixerView::deleteSelectedChannels()
+{
+	// Create a temporary copy, since the selection may be modified by deleteChannel
+	std::set<MixerChannelView*> tempSelectedChannels = m_selectedChannels;
+	for (int i = m_mixerChannelViews.size() - 1; i > 0; --i)
+	{
+		if (tempSelectedChannels.contains(m_mixerChannelViews[i])) { deleteChannel(i); }
+	}
+}
 
 void MixerView::deleteChannel(int index)
 {
@@ -387,9 +413,6 @@ void MixerView::deleteChannel(int index)
 
 	// Disconnect from the solo/mute models of the channel we are about to delete
 	disconnectFromSoloAndMute(index);
-
-	// remember selected line
-	int selLine = m_currentMixerChannel->channelIndex();
 
 	Mixer* mixer = getMixer();
 	// in case the deleted channel is soloed or the remaining
@@ -413,13 +436,7 @@ void MixerView::deleteChannel(int index)
 	}
 	m_mixerChannelViews.remove(index);
 
-	// select the next channel
-	if (selLine >= m_mixerChannelViews.size())
-	{
-		selLine = m_mixerChannelViews.size() - 1;
-	}
-	setCurrentMixerChannel(selLine);
-
+	sanitizeSelection();
 	updateMaxChannelSelector();
 }
 
@@ -484,7 +501,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
-			deleteChannel(m_currentMixerChannel->channelIndex());
+			deleteSelectedChannels();
 			break;
 		case Qt::Key_Left:
 			if (e->modifiers() & Qt::AltModifier)
@@ -539,11 +556,11 @@ void MixerView::closeEvent(QCloseEvent * ce)
 
 
 
-void MixerView::setCurrentMixerChannel(int channel)
+void MixerView::setCurrentMixerChannel(int channel, bool keepSelection, bool rangeSelect)
 {
 	if (channel >= 0 && channel < m_mixerChannelViews.size())
 	{
-		setCurrentMixerChannel(m_mixerChannelViews[channel]);
+		setCurrentMixerChannel(m_mixerChannelViews[channel], keepSelection, rangeSelect);
 	}
 }
 

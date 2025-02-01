@@ -90,7 +90,7 @@ public slots:
 
 private slots:
 	void renameFinished();
-	void removeChannel();
+	void removeSelectedChannels();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();

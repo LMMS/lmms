@@ -25,6 +25,7 @@
 #include "MixerChannelView.h"
 
 #include <QCheckBox>
+#include <QDebug>
 #include <QFont>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
@@ -167,7 +168,7 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	if (!isMasterChannel()) // no remove-option in master
 	{
 		contextMenu->addAction(
-			embed::getIconPixmap("cancel"), tr("R&emove channel"), this, &MixerChannelView::removeChannel);
+			embed::getIconPixmap("cancel"), tr("R&emove selected channels"), this, &MixerChannelView::removeSelectedChannels);
 		contextMenu->addSeparator();
 	}
 
@@ -192,6 +193,7 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	static constexpr auto outerBorderSize = 1;
 
 	const auto channel = mixerChannel();
+	const auto isSelected = m_mixerView->selectedChannels().contains(this);
 	const auto isActive = m_mixerView->currentMixerChannel() == this;
 	const auto width = rect().width();
 	const auto height = rect().height();
@@ -199,9 +201,9 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 
 	if (channel->color().has_value() && !channel->m_muteModel.value())
 	{
-		painter.fillRect(rect(), channel->color()->darker(isActive ? 120 : 150));
+		painter.fillRect(rect(), channel->color()->darker(isSelected ? 120 : 150));
 	}
-	else { painter.fillRect(rect(), isActive ? backgroundActive().color() : painter.background().color()); }
+	else { painter.fillRect(rect(), isSelected ? backgroundActive().color() : painter.background().color()); }
 
 	// inner border
 	painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());
@@ -212,9 +214,13 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	painter.drawRect(0, 0, width - outerBorderSize, height - outerBorderSize);
 }
 
-void MixerChannelView::mousePressEvent(QMouseEvent*)
+void MixerChannelView::mousePressEvent(QMouseEvent* me)
 {
-	if (m_mixerView->currentMixerChannel() != this) { m_mixerView->setCurrentMixerChannel(this); }
+	bool keepSelection = me->modifiers() & Qt::ControlModifier || me->modifiers() & Qt::ShiftModifier;
+	bool rangeSelect = me->modifiers() & Qt::ShiftModifier;
+	if (m_mixerView->currentMixerChannel() != this) {
+		m_mixerView->setCurrentMixerChannel(this, keepSelection, rangeSelect);
+	}
 }
 
 void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
@@ -357,11 +363,12 @@ bool MixerChannelView::confirmRemoval(int index)
 	return answer == QMessageBox::Ok;
 }
 
-void MixerChannelView::removeChannel()
+void MixerChannelView::removeSelectedChannels()
 {
-	if (!confirmRemoval(m_channelIndex)) { return; }
+	//if (!confirmRemoval(m_channelIndex)) { return; }
+	// TODO, how to warn user for all channels
 	auto mix = getGUI()->mixerView();
-	mix->deleteChannel(m_channelIndex);
+	mix->deleteSelectedChannels();
 }
 
 void MixerChannelView::removeUnusedChannels()
