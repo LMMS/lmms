@@ -118,10 +118,10 @@ private:
 
 		void setCoefs(float sampleRate, float cutoff)
 		{
-		    const float g = std::tan(F_PI * cutoff / sampleRate);
-		    const float ginv = g / (1.f + g * (g + F_SQRT_2));
+		    const float g = std::tan(numbers::pi_v<float> * cutoff / sampleRate);
+		    const float ginv = g / (1.f + g * (g + numbers::sqrt2_v<float>));
 		    m_g1 = ginv;
-		    m_g2 = 2.f * (g + F_SQRT_2) * ginv;
+		    m_g2 = 2.f * (g + numbers::sqrt2_v<float>) * ginv;
 		    m_g3 = g * ginv;
 		    m_g4 = 2.f * ginv;
 		}

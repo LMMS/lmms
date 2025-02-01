@@ -50,10 +50,7 @@ public:
 		m_frequency = frequency;
 		m_increment = m_frequency * m_twoPiOverSr;
 
-		if( m_phase >= F_2PI )
-		{
-			m_phase -= F_2PI;
-		}
+		if (m_phase >= numbers::tau_v<float>)	{	m_phase -= numbers::tau_v<float>;	}
 	}
 
 
@@ -62,7 +59,7 @@ public:
 	inline void setSampleRate ( int samplerate )
 	{
 		m_samplerate = samplerate;
-		m_twoPiOverSr = F_2PI / samplerate;
+		m_twoPiOverSr = numbers::tau_v<float> / samplerate;
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 

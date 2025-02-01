@@ -114,7 +114,7 @@ public:
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
 	{
-		return sinf( _sample * F_2PI );
+		return sinf(_sample * numbers::tau_v<float>);
 	}
 
 	static inline sample_t triangleSample( const float _sample )
