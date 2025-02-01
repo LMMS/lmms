@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Halt on first error
+set -e
+
+DESTDIR="/opt/@CPACK_PROJECT_NAME@"
+BASHCOMPLETIONS="/usr/share/bash-completion/completions"
+if [ "$(id -u)" != "0" ]; then
+	# Prepend "$HOME" so we can install to a writable location
+	DESTDIR="${HOME}${DESTDIR}"
+	BASHCOMPLETIONS="${HOME}/.local/share/bash-completion/completions"
+	echo "Installing as a regular user to ${DESTDIR}/..."
+else
+	echo "Installing as elevated user to ${DESTDIR}/..."
+fi
+
+# Deploy @CPACK_PROJECT_NAME_UCASE@
+mkdir -p "${DESTDIR}"
+unalias cp &> /dev/null || true
+cp -rf ./* "${DESTDIR}"
+rm -f "${DESTDIR}/setup.sh"
+mv "${DESTDIR}/AppRun" "${DESTDIR}/@CPACK_PROJECT_NAME@"
+
+# Install bash completions
+mkdir -p "${BASHCOMPLETIONS}"
+ln -sf "${DESTDIR}/usr/share/@CPACK_PROJECT_NAME@/bash-completion/completions/@CPACK_PROJECT_NAME@" "${BASHCOMPLETIONS}/@CPACK_PROJECT_NAME@"
+
+# Test @CPACK_PROJECT_NAME_UCASE@
+echo "Installation complete... Testing \"@CPACK_PROJECT_NAME@\"..."
+"${DESTDIR}/@CPACK_PROJECT_NAME@" --allowroot --version &> /dev/null
+
+# TODO: Register file associations, desktop icon, etc
+
+echo "@CPACK_PROJECT_NAME_UCASE@ was installed successfully to ${DESTDIR}.  To run:"
+echo "  ${DESTDIR}/@CPACK_PROJECT_NAME@"
