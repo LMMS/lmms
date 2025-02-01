@@ -283,6 +283,11 @@ float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) c
 		// The control key gives more control, i.e. it enables more fine-grained adjustments
 		return 0.1f;
 	}
+	else if (modifiers | Qt::AltModifier)
+	{
+		// Work around a Qt bug in conjunction with the scroll wheel and the Alt key
+		return 0.f;
+	}
 
 	return 1.f;
 }
