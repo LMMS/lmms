@@ -871,12 +871,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 }
 
 
-
-
-bool MidiClipView::splitClip(const TimePos pos, bool hardSplit)
+bool MidiClipView::hardSplitClip(const TimePos pos)
 {
-	setMarkerEnabled(false);
-
 	const TimePos splitPos = m_initialClipPos + pos;
 	const TimePos internalSplitPos = pos - m_clip->startTimeOffset();
 
@@ -888,78 +884,57 @@ bool MidiClipView::splitClip(const TimePos pos, bool hardSplit)
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	if (hardSplit)
+	auto leftClip = m_clip->clone();
+	leftClip->clearNotes();
+	auto rightClip =  m_clip->clone();
+	rightClip->clearNotes();
+
+	for (Note const* note : m_clip->m_notes)
 	{
-		// Using a copy of the original instead of new clips to retain name, color, etc.
-		auto leftClip = new MidiClip(*m_clip);
-		leftClip->clearNotes();
-		auto rightClip = new MidiClip(*m_clip);
-		rightClip->clearNotes();
-
-		for (Note const* note : m_clip->m_notes)
+		if (note->pos() >= internalSplitPos)
 		{
-			if (note->pos() >= internalSplitPos)
-			{
-				auto movedNote = Note{*note};
-				movedNote.setPos(note->pos() - internalSplitPos);
-				rightClip->addNote(movedNote, false);
-			}
-			else if (note->endPos() > internalSplitPos)
-			{
-				auto movedNote = Note{*note};
-				movedNote.setPos(0);
-				movedNote.setLength(note->endPos() - internalSplitPos);
-				rightClip->addNote(movedNote, false);
-			}
+			auto movedNote = Note{*note};
+			movedNote.setPos(note->pos() - internalSplitPos);
+			rightClip->addNote(movedNote, false);
 		}
-
-		for (Note const* note : m_clip->m_notes)
+		else if (note->endPos() > internalSplitPos)
 		{
-			if (note->endPos() <= internalSplitPos)
-			{
-				leftClip->addNote(*note, false);
-			}
-			else if (note->pos() < internalSplitPos)
-			{
-				auto movedNote = Note{*note};
-				movedNote.setLength(internalSplitPos - note->pos());
-				leftClip->addNote(movedNote, false);
-			}
+			auto movedNote = Note{*note};
+			movedNote.setPos(0);
+			movedNote.setLength(note->endPos() - internalSplitPos);
+			rightClip->addNote(movedNote, false);
 		}
-
-		leftClip->movePosition(m_initialClipPos);
-		leftClip->setHasBeenResized(m_clip->getHasBeenResized());
-		leftClip->changeLength(splitPos - m_initialClipPos);
-		leftClip->setHasBeenResized(true);
-		leftClip->updateLength();
-		leftClip->setStartTimeOffset(m_clip->startTimeOffset());
-
-		rightClip->movePosition(splitPos);
-		rightClip->setHasBeenResized(m_clip->getHasBeenResized());
-		rightClip->changeLength(m_initialClipEnd - splitPos);
-		rightClip->setHasBeenResized(true);
-		rightClip->updateLength();
-
-		remove();
-	}
-	else
-	{
-		auto rightClip = new MidiClip(*m_clip);
-		rightClip->movePosition(splitPos);
-
-		m_clip->changeLength(splitPos - m_initialClipPos);
-		rightClip->changeLength(m_initialClipEnd - splitPos);
-		
-		rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
-
-		m_clip->setHasBeenResized(true);
-		rightClip->setHasBeenResized(true);
 	}
 
-	m_clip->getTrack()->restoreJournallingState();
+	for (Note const* note : m_clip->m_notes)
+	{
+		if (note->endPos() <= internalSplitPos)
+		{
+			leftClip->addNote(*note, false);
+		}
+		else if (note->pos() < internalSplitPos)
+		{
+			auto movedNote = Note{*note};
+			movedNote.setLength(internalSplitPos - note->pos());
+			leftClip->addNote(movedNote, false);
+		}
+	}
+
+	leftClip->movePosition(m_initialClipPos);
+	leftClip->setHasBeenResized(m_clip->getHasBeenResized());
+	leftClip->changeLength(splitPos - m_initialClipPos);
+	leftClip->setHasBeenResized(true);
+	leftClip->updateLength();
+	leftClip->setStartTimeOffset(m_clip->startTimeOffset());
+
+	rightClip->movePosition(splitPos);
+	rightClip->setHasBeenResized(m_clip->getHasBeenResized());
+	rightClip->changeLength(m_initialClipEnd - splitPos);
+	rightClip->updateLength();
+
+	remove();
 	return true;
 }
-
 
 
 } // namespace lmms::gui

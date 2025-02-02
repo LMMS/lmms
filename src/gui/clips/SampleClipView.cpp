@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
+#include <QDebug>
 
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
@@ -349,37 +350,5 @@ void SampleClipView::setAutomationGhost()
 	aEditor->show();
 	aEditor->setFocus();
 }
-
-
-
-
-bool SampleClipView::splitClip(const TimePos pos, bool hardSplit)
-{
-	setMarkerEnabled(false);
-
-	const TimePos splitPos = m_initialClipPos + pos;
-
-	// Don't split if we slid off the Clip or if we're on the clip's start/end
-	// Cutting at exactly the start/end position would create a zero length
-	// clip (bad), and a clip the same length as the original one (pointless).
-	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
-
-	m_clip->getTrack()->addJournalCheckPoint();
-	m_clip->getTrack()->saveJournallingState(false);
-
-	auto rightClip = new SampleClip(*m_clip);
-
-	m_clip->changeLength(splitPos - m_initialClipPos);
-
-	rightClip->movePosition(splitPos);
-	rightClip->changeLength(m_initialClipEnd - splitPos);
-	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
-	m_clip->setHasBeenResized(true);
-	rightClip->setHasBeenResized(true);
-
-	m_clip->getTrack()->restoreJournallingState();
-	return true;
-}
-
 
 } // namespace lmms::gui

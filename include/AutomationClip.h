@@ -196,6 +196,11 @@ public:
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 
+	AutomationClip* clone() override
+	{
+		return new AutomationClip(*this);
+	}
+
 public slots:
 	void clear();
 	void objectDestroyed( lmms::jo_id_t );

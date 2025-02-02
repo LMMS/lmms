@@ -111,6 +111,11 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	MidiClip* clone() override
+	{
+		return new MidiClip(*this);
+	}
+
 
 	using Model::dataChanged;
 

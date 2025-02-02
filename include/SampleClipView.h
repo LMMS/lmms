@@ -64,7 +64,6 @@ protected:
 private:
 	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
-	bool splitClip(const TimePos pos, bool hardSplit) override;
 } ;
 
 

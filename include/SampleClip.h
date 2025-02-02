@@ -81,6 +81,11 @@ public:
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
+	SampleClip* clone() override
+	{
+		return new SampleClip(*this);
+	}
+
 public slots:
 	void setSampleFile(const QString& sf);
 	void updateLength();

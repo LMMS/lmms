@@ -28,6 +28,7 @@
 #include <cassert>
 
 #include <QMenu>
+#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 
@@ -1011,6 +1012,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
  */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
+	qDebug() << "Ayy release";
 	// If the Action::CopySelection was chosen as the action due to mouse movement,
 	// it will have been cleared.  At this point Toggle is the desired action.
 	// An active StringPairDrag will prevent this method from being called,
@@ -1029,11 +1031,15 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
-		splitClip(unquantizedModHeld(me) ?
-			relPos :
-			quantizeSplitPos(relPos, me->modifiers() & Qt::ShiftModifier),
-			me->modifiers() & Qt::ShiftModifier
-		);
+		if (me->modifiers() & Qt::ShiftModifier)
+		{
+			hardSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
+		}
+		else
+		{
+			splitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
+		}
+		setMarkerEnabled(false);
 	}
 
 	m_action = Action::None;
@@ -1336,7 +1342,7 @@ int ClipView::knifeMarkerPos( QMouseEvent * me )
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		TimePos midiPos = markerPos * TimePos::ticksPerBar() / ppb;
 		//2: Snap to the correct position, based on modifier keys
-		midiPos = quantizeSplitPos( midiPos, me->modifiers() & Qt::ShiftModifier );
+		midiPos = quantizeSplitPos(midiPos);
 		//3: Convert back to a pixel position
 		return midiPos * ppb / TimePos::ticksPerBar();
 	}
@@ -1345,23 +1351,10 @@ int ClipView::knifeMarkerPos( QMouseEvent * me )
 
 
 
-TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
+TimePos ClipView::quantizeSplitPos(TimePos midiPos)
 {
 	const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-	if ( shiftMode )
-	{	//If shift is held we quantize the length of the new left clip...
-		const TimePos leftPos = midiPos.quantize( snapSize );
-		//...or right clip...
-		const TimePos rightOff = m_clip->length() - midiPos;
-		const TimePos rightPos = m_clip->length() - rightOff.quantize( snapSize );
-		//...whichever gives a position closer to the cursor
-		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
-		else { return rightPos; }
-	}
-	else
-	{
-		return TimePos(midiPos + m_initialClipPos).quantize( snapSize ) - m_initialClipPos;
-	}
+	return TimePos(midiPos + m_initialClipPos).quantize(snapSize) - m_initialClipPos;
 }
 
 
@@ -1409,6 +1402,31 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 auto ClipView::hasCustomColor() const -> bool
 {
 	return m_clip->color().has_value() || m_clip->getTrack()->color().has_value();
+}
+
+bool ClipView::splitClip(const TimePos pos)
+{
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	// Don't split if we slid off the Clip or if we're on the clip's start/end
+	// Cutting at exactly the start/end position would create a zero length
+	// clip (bad), and a clip the same length as the original one (pointless).
+	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
+
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto rightClip = m_clip->clone();
+
+	m_clip->changeLength(splitPos - m_initialClipPos);
+
+	rightClip->movePosition(splitPos);
+	rightClip->changeLength(m_initialClipEnd - splitPos);
+	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
+	m_clip->setHasBeenResized(true);
+
+	m_clip->getTrack()->restoreJournallingState();
+	return true;
 }
 
 } // namespace lmms::gui

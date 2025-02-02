@@ -171,7 +171,7 @@ protected:
 	}
 
 	bool unquantizedModHeld( QMouseEvent * me );
-	TimePos quantizeSplitPos( TimePos, bool shiftMode );
+	TimePos quantizeSplitPos(TimePos);
 
 	float pixelsPerBar();
 
@@ -245,7 +245,15 @@ private:
 	* @param pos the position of the split, relative to the start of the clip
 	* @return true if the clip could be split
 	*/
-	virtual bool splitClip(const TimePos pos, bool hardSplit) = 0;
+	virtual bool splitClip(const TimePos pos);
+	/**
+	* Destructively split this Clip into two clips
+	* @param pos the position of the split, relative to the start of the clip
+	* @return true if the clip could be split
+	*/
+	virtual bool hardSplitClip(const TimePos pos) {
+		return false;
+	};
 	void updateCursor(QMouseEvent * me);
 } ;
 
