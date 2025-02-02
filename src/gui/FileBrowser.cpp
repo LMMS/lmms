@@ -567,6 +567,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	{
 		QMenu contextMenu( this );
 
+		auto pathHeader = new QAction(file->fullName());
+		pathHeader->setDisabled(true);
+		contextMenu.addAction(pathHeader);
+
 		contextMenu.addAction(
 			tr( "Send to active instrument-track" ),
 			[=, this]{ sendToActiveInstrumentTrack(file); }
@@ -592,6 +596,19 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 
 		// We should only show the menu if it contains items
 		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
+	}
+
+	if (const auto dir = dynamic_cast<Directory*>(itemAt(e->pos())); dir != nullptr)
+	{
+		auto contextMenu = QMenu{this};
+		auto pathHeader = new QAction(dir->fullName());
+		pathHeader->setDisabled(true);
+		contextMenu.addAction(pathHeader);
+
+		contextMenu.addSeparator();
+		contextMenu.addAction(dir->isExpanded() ? tr("Close") : tr("Open"), [&] { dir->setExpanded(!dir->isExpanded()); });
+
+		contextMenu.exec(e->globalPos());
 	}
 }
 
