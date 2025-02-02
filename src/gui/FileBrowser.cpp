@@ -197,16 +197,18 @@ void FileBrowser::restoreDirectoriesStates()
 
 void FileBrowser::onSearch(const QString& filter)
 {
-	static auto s_mostRecentTimestamp = 0;
+	static auto s_searching = false;
 
 	if (filter.isEmpty())
 	{
+		s_searching = false;
 		m_searchTreeWidget->hide();
 		m_fileBrowserTreeWidget->show();
 		m_searchIndicator->setRange(0, 1);
 		return;
 	}
 
+	s_searching = true;
 	m_fileBrowserTreeWidget->hide();
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
@@ -226,14 +228,11 @@ void FileBrowser::onSearch(const QString& filter)
 
 		while (dirIt.hasNext())
 		{
-			s_mostRecentTimestamp = QDateTime::currentMSecsSinceEpoch();
-			const auto searchTimestamp = s_mostRecentTimestamp;
-
 			QCoreApplication::processEvents();
 
-			// If the timestamp changed, that means another search had already commenced
-			// when we were processing Qt events
-			if (searchTimestamp != s_mostRecentTimestamp) { break; }
+			// When processing Qt events, sometimes the next event to process is another search.
+			// If a newer search finished, we need to cancel this search by returning early.
+			if (!s_searching) { return; }
 
 			const auto fileInfo = QFileInfo{dirIt.next()};
 			if (!fileInfo.fileName().contains(filter, Qt::CaseInsensitive)) { continue; }
@@ -251,6 +250,7 @@ void FileBrowser::onSearch(const QString& filter)
 		}
 	}
 
+	s_searching = false;
 	m_searchIndicator->setRange(0, 1);
 }
 
