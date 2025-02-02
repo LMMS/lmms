@@ -109,6 +109,8 @@ public slots:
 	void resetColor();
 	void selectColor();
 	void randomizeColor();
+	void toggledSolo();
+	void toggledMute();
 
 private slots:
 	void renameFinished();

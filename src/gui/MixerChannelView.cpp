@@ -124,6 +124,8 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	m_soloButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
 	m_soloButton->setCheckable(true);
 	m_soloButton->setToolTip(tr("Solo this channel"));
+	connect(m_muteButton, &PixmapButton::toggled, this, &MixerChannelView::toggledMute);
+	connect(m_soloButton, &PixmapButton::toggled, this, &MixerChannelView::toggledSolo);
 
 	auto soloMuteLayout = new QVBoxLayout();
 	soloMuteLayout->setContentsMargins(0, 0, 0, 0);
@@ -342,6 +344,44 @@ void MixerChannelView::randomizeColor()
 	}
 	Engine::getSong()->setModified();
 }
+
+void MixerChannelView::toggledMute()
+{
+	if (selectedChannels().contains(this))
+	{
+		for (auto mcv : selectedChannels())
+		{
+			getGUI()->mixerView()->getMixer()->mixerChannel(mcv->channelIndex())->m_muteModel.setValue(Engine::mixer()->mixerChannel(channelIndex())->m_muteModel.value());
+			mcv->update();
+		}
+	}
+	else
+	{
+		update();
+	}
+}
+
+// TODO PLEAE FIX
+void MixerChannelView::toggledSolo()
+{
+	getGUI()->mixerView()->getMixer()->toggledSolo();
+	if (selectedChannels().contains(this))
+	{
+		for (auto mcv : selectedChannels())
+		{
+			if (mcv != this)
+			{
+				getGUI()->mixerView()->getMixer()->mixerChannel(mcv->channelIndex())->m_muteModel.setValue(!getGUI()->mixerView()->getMixer()->mixerChannel(mcv->channelIndex())->m_muteBeforeSolo);
+			}
+			mcv->update();
+		}
+	}
+	else
+	{
+		update();
+	}
+}
+
 
 bool MixerChannelView::confirmRemoval(int index)
 {
