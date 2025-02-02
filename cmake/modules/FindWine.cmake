@@ -35,6 +35,8 @@ list(APPEND WINE_LOCATIONS
 	/opt/wine-staging
 	/opt/wine-devel
 	/opt/wine-stable
+	# Gentoo Systems
+	/etc/eselect/wine
 	/usr/lib/wine)
 
 # Prepare bin search
