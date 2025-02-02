@@ -7,7 +7,7 @@ concurrency:
 jobs:
   linux-x86_64:
     name: linux-x86_64
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
