@@ -1,0 +1,6 @@
+g++-multilib
+gcc-multilib
+libwine-dev
+libwine-dev:i386
+wine64-tools
+
