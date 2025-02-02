@@ -37,7 +37,7 @@ jobs:
           wget -O - https://dl.winehq.org/wine-builds/winehq.key | \
           sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
           sudo wget -NP /etc/apt/sources.list.d/ \
-          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-noble.sources
+          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
           sudo apt-get update -y
           sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
       - name: Cache ccache data
