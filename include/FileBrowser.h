@@ -29,9 +29,7 @@
 #include <QDir>
 #include <QMutex>
 #include <QProgressBar>
-#include <memory>
 
-#include "FileSearch.h"
 #include "embed.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -106,10 +104,7 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
-	void foundSearchMatch(FileSearch* search, const QString& match);
-	void searchCompleted(FileSearch* search);
 	void onSearch(const QString& filter);
-	void displaySearch(bool on);
 
 	void addContentCheckBox();
 
@@ -118,7 +113,6 @@ private:
 
 	QLineEdit * m_filterEdit;
 
-	std::shared_ptr<FileSearch> m_currentSearch;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
@@ -204,7 +198,7 @@ private slots:
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory(const QString& filename, const QString& path, const QString& filter, bool disableEntryPopulation = false);
+	Directory(const QString& filename, const QString& path, const QString& filter);
 
 	void update();
 
@@ -247,7 +241,6 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
-	bool m_disableEntryPopulation = false;
 } ;
 
 
