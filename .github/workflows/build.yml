@@ -30,9 +30,13 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
           $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+      - name: Install winehq
+        run: |
           sudo dpkg --add-architecture i386
-          sudo apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-wine.txt)
+          sudo mkdir -pm755 /etc/apt/keyrings
+          wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-noble.sources
+          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
