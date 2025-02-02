@@ -1,7 +1,7 @@
 #ifndef LMMS_VERSION_INFO_H
 #define LMMS_VERSION_INFO_H
 
-#define LMMS_STRINGIFY(s) #s // a macro used to stringify the plugin name
+#define LMMS_STRINGIFY(s) #s // Macro used to stringify version for msvc, which is numeric by default
 
 #if defined(__GNUC__)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
