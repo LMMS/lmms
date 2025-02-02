@@ -113,12 +113,12 @@ public slots:
 private slots:
 	void renameFinished();
 	static void removeSelectedChannels();
-	void removeUnusedChannels();
-	void moveChannelLeft();
-	void moveChannelRight();
+	static void removeUnusedChannels();
+	static void moveChannelLeft();
+	static void moveChannelRight();
 
 private:
-	bool confirmRemoval(int index);
+	static bool confirmRemoval(int index);
 	QString elideName(const QString& name);
 	MixerChannel* mixerChannel() const;
 	auto isMasterChannel() const -> bool { return m_channelIndex == 0; }

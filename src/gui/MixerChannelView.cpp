@@ -307,9 +307,12 @@ void MixerChannelView::renameFinished()
 
 void MixerChannelView::resetColor()
 {
-	mixerChannel()->setColor(std::nullopt);
+	for (auto mcv : selectedChannels())
+	{
+		mcv->mixerChannel()->setColor(std::nullopt);
+		mcv->update();
+	}
 	Engine::getSong()->setModified();
-	update();
 }
 
 void MixerChannelView::selectColor()
@@ -322,18 +325,22 @@ void MixerChannelView::selectColor()
 
 	if (!newColor.isValid()) { return; }
 
-	channel->setColor(newColor);
-
+	for (auto mcv : selectedChannels())
+	{
+		mcv->mixerChannel()->setColor(newColor);
+		mcv->update();
+	}
 	Engine::getSong()->setModified();
-	update();
 }
 
 void MixerChannelView::randomizeColor()
 {
-	auto channel = mixerChannel();
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	for (auto mcv : selectedChannels())
+	{
+		mcv->mixerChannel()->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+		mcv->update();
+	}
 	Engine::getSong()->setModified();
-	update();
 }
 
 bool MixerChannelView::confirmRemoval(int index)
@@ -345,9 +352,9 @@ bool MixerChannelView::confirmRemoval(int index)
 	// is the channel is not in use, there is no need for user confirmation
 	if (!getGUI()->mixerView()->getMixer()->isChannelInUse(index)) { return true; }
 
-	QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
+	QString messageRemoveTrack = tr("Mixer Channel %1 is being used.\n"
 									"Are you sure you want to remove this channel?\n\n"
-									"Warning: This operation can not be undone.");
+									"Warning: This operation can not be undone.").arg(index);
 
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
@@ -373,12 +380,11 @@ bool MixerChannelView::confirmRemoval(int index)
 
 void MixerChannelView::removeSelectedChannels()
 {
-	//if (!confirmRemoval(m_channelIndex)) { return; }
-	// TODO, how to warn user for all channels
 	auto mix = getGUI()->mixerView();
 	std::set<MixerChannelView*> tempSelectedChannels = selectedChannels();
 	for (auto mcv : tempSelectedChannels)
 	{
+		if (!confirmRemoval(mcv->channelIndex())) { continue; }
 		mix->deleteChannel(mcv->channelIndex());
 		MixerChannelView::deselect(mcv);
 	}
@@ -393,13 +399,39 @@ void MixerChannelView::removeUnusedChannels()
 void MixerChannelView::moveChannelLeft()
 {
 	auto mix = getGUI()->mixerView();
-	mix->moveChannelLeft(m_channelIndex);
+	int oldSelectedIndex = mix->currentMixerChannel()->channelIndex();
+	auto min_channel = *std::min_element(selectedChannels().begin(), selectedChannels().end(), [](auto mcv1, auto mcv2){ return mcv1->channelIndex() < mcv2->channelIndex(); });
+	// Don't shift if it would collide with master
+	if (min_channel->channelIndex() <= 1) { return; }
+
+	std::set<MixerChannelView*> tempSelectedChannels = selectedChannels();
+	std::set<MixerChannelView*> newSelectedChannels;
+	for (auto it = tempSelectedChannels.begin(); it != tempSelectedChannels.end(); ++it)
+	{
+		mix->moveChannelLeft((*it)->channelIndex());
+		newSelectedChannels.insert(mix->m_mixerChannelViews[(*it)->channelIndex() - 1]);
+	}
+	mix->setCurrentMixerChannel(oldSelectedIndex - 1, true);
+	s_selectedChannels = newSelectedChannels;
 }
 
 void MixerChannelView::moveChannelRight()
 {
 	auto mix = getGUI()->mixerView();
-	mix->moveChannelRight(m_channelIndex);
+	int oldSelectedIndex = mix->currentMixerChannel()->channelIndex();
+	auto max_channel = *std::max_element(selectedChannels().begin(), selectedChannels().end(), [](auto mcv1, auto mcv2){ return mcv1->channelIndex() < mcv2->channelIndex(); });
+	// Don't shift if it would go over the end
+	if (max_channel->channelIndex() >= mix->m_mixerChannelViews.size() - 1) { return; }
+
+	std::set<MixerChannelView*> tempSelectedChannels = selectedChannels();
+	std::set<MixerChannelView*> newSelectedChannels;
+	for (auto it = tempSelectedChannels.rbegin(); it != tempSelectedChannels.rend(); ++it)
+	{
+		mix->moveChannelRight((*it)->channelIndex());
+		newSelectedChannels.insert(mix->m_mixerChannelViews[(*it)->channelIndex() + 1]);
+	}
+	mix->setCurrentMixerChannel(oldSelectedIndex + 1, true);
+	s_selectedChannels = newSelectedChannels;
 }
 
 QString MixerChannelView::elideName(const QString& name)
