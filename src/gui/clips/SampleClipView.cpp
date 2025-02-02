@@ -27,7 +27,6 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
-#include <QDebug>
 
 #include "GuiApplication.h"
 #include "AutomationEditor.h"

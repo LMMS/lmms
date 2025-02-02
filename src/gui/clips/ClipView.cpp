@@ -28,7 +28,6 @@
 #include <cassert>
 
 #include <QMenu>
-#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 
@@ -1012,7 +1011,6 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
  */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
-	qDebug() << "Ayy release";
 	// If the Action::CopySelection was chosen as the action due to mouse movement,
 	// it will have been cleared.  At this point Toggle is the desired action.
 	// An active StringPairDrag will prevent this method from being called,
