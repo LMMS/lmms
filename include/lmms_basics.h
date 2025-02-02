@@ -63,7 +63,18 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
+<<<<<<< HEAD
 #define LMMS_STRINGIFY(s) #s
+=======
+// Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
+constexpr const char* UI_CTRL_KEY =
+#ifdef LMMS_BUILD_APPLE
+"⌘";
+#else
+"Ctrl";
+#endif
+
+>>>>>>> bf4436767 (move the stringification to places where they are used, prep to remove the file)
 
 } // namespace lmms
 

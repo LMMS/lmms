@@ -1,7 +1,9 @@
 #ifndef LMMS_VERSION_INFO_H
 #define LMMS_VERSION_INFO_H
 
-#include "lmms_basics.h"
+#ifndef LMMS_STRINGIFY
+#define LMMS_STRINGIFY(s) #s // Macro used to stringify version for msvc, which is numeric by default
+#endif // LMMS_STRINGIFY
 
 #if defined(__GNUC__)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
