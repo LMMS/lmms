@@ -17,7 +17,6 @@ gperf
 gpg
 libasound2-dev
 libc6-dev
-libc6-dev-i386
 libfltk1.3-dev
 libgig-dev
 libjack-jackd2-dev
@@ -47,7 +46,7 @@ sudo
 tar
 unzip
 wget
-wine-staging-dev
-winehq-staging
+wine-stable-dev
+winehq-stable
 zip
 zstd

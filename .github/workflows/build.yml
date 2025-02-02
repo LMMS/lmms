@@ -7,8 +7,7 @@ concurrency:
 jobs:
   linux-x86_64:
     name: linux-x86_64
-    runs-on: ubuntu-20.04
-    container: ubuntu:20.04
+    runs-on: ubuntu-22.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -20,40 +19,26 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
-        run: |
-          apt update && apt install sudo
-          sudo apt-get install --yes git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Prepare to install system packages
+      - name: Install system packages
         run: |
-          echo "APT_DEPENDENCIES=$(xargs < .github/workflows/deps-ubuntu-20.04-gcc.txt)" >> "$GITHUB_ENV"
           .github/workflows/setup-wine.sh
-          .github/workflows/setup-cmake.sh
           # Fix for software-properties-common
           sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
-      - name: Install system packages
-        run: sudo apt-get install -y ${{ env.APT_DEPENDENCIES }}
+          sudo apt-get install -y $(xargs < .github/workflows/deps-ubuntu-22.04-gcc.txt)
       - name: Install Qt
         uses: jurplel/install-qt-action@c6c7281365daef91a238e1c2ddce4eaa94a2991d
         with:
-          version: '5.15.2'
+          version: '5.15.*'
           arch: 'gcc_64'
           archives: qtbase qtsvg qttools qtx11extras icu
           cache: true
           setup-python: false
-      - name: Download and bootstrap vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          cd vcpkg
-          latestTag=$(git describe --tags --abbrev=0)
-          git checkout $latestTag
-          ./bootstrap-vcpkg.sh
-          echo "VCPKG_INSTALLATION_ROOT=${GITHUB_WORKSPACE}/vcpkg" >> "$GITHUB_ENV"
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
