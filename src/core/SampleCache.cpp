@@ -36,7 +36,7 @@ auto SampleCache::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 	// Can be removed if proven that other threads are requesting samples besides the main thread
 	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
 
-	const auto fsPath = PathUtil::pathFromQString(path);
+	const auto fsPath = PathUtil::pathFromQString(PathUtil::toAbsolute(path));
 	auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
 	return get(std::move(entry), s_audioFileMap, path);
 }
