@@ -28,8 +28,6 @@ jobs:
       - name: Install system packages
         run: |
           .github/workflows/setup-wine.sh
-          # Fix for software-properties-common
-          sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
           sudo apt-get install -y $(xargs < .github/workflows/deps-ubuntu-22.04-gcc.txt)
       - name: Install Qt
         uses: jurplel/install-qt-action@c6c7281365daef91a238e1c2ddce4eaa94a2991d
