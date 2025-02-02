@@ -73,7 +73,6 @@ public:
 	template<typename T, typename... Args>
 	T* addTrack(Args&&... args)
 	{
-		// TODO: Use concepts (C++20)
 		static_assert(std::is_base_of_v<Track, T>, "T must be a kind of Track");
 
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
