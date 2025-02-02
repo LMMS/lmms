@@ -227,7 +227,6 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
 				auto clip = createClip();
-				clip->movePosition(TimePos{0});
 				clip->restoreState(node.toElement());
 			}
 		}

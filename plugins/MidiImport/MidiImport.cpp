@@ -255,7 +255,6 @@ public:
 
 			// Create a default pattern
 			p = static_cast<MidiClip*>(it->createClip());
-			p->movePosition(0);
 		}
 		return this;
 	}
@@ -266,7 +265,6 @@ public:
 		if (!p)
 		{
 			p = static_cast<MidiClip*>(it->createClip());
-			p->movePosition(0);
 		}
 		p->addNote(n, false);
 		hasNotes = true;

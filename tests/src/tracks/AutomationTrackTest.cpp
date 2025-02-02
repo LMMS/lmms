@@ -100,7 +100,6 @@ private slots:
 		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1->putValue(0, 0.0, false);
 		c1->putValue(10, 1.0, false);
-		c1->movePosition(0);
 		c1->addObject(&model);
 
 		auto c2 = static_cast<AutomationClip*>(track->createClip());
@@ -207,7 +206,6 @@ private slots:
 
 		auto clip = static_cast<PatternClip*>(patternTrack->createClip());
 		clip->changeLength(TimePos::ticksPerBar() * 2);
-		clip->movePosition(0);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
