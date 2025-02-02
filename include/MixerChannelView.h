@@ -34,10 +34,13 @@
 
 #include "EffectRackView.h"
 #include "Fader.h"
+#include "GuiApplication.h"
 #include "Knob.h"
 #include "LcdWidget.h"
 #include "PixmapButton.h"
 #include "SendButtonIndicator.h"
+
+#include <set>
 
 namespace lmms {
 class MixerChannel;
@@ -82,6 +85,25 @@ public:
 	QColor strokeInnerInactive() const { return m_strokeInnerInactive; }
 	void setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
 
+	static const std::set<MixerChannelView*>& selectedChannels()
+	{
+		return s_selectedChannels;
+	}
+	static void select(MixerChannelView* mcv)
+	{
+		s_selectedChannels.insert(mcv);
+	}
+	static void deselect(MixerChannelView* mcv)
+	{
+		s_selectedChannels.erase(mcv);
+	}
+	static void deselectAll()
+	{
+		s_selectedChannels.clear();
+	}
+	static void sanitizeSelection();
+
+
 public slots:
 	void renameChannel();
 	void resetColor();
@@ -90,7 +112,7 @@ public slots:
 
 private slots:
 	void renameFinished();
-	void removeSelectedChannels();
+	static void removeSelectedChannels();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
@@ -127,6 +149,8 @@ private:
 	QColor m_strokeOuterInactive;
 	QColor m_strokeInnerActive;
 	QColor m_strokeInnerInactive;
+
+	static std::set<MixerChannelView*> s_selectedChannels;
 
 	friend class MixerView;
 };

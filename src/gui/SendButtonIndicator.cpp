@@ -30,7 +30,7 @@ void SendButtonIndicator::mousePressEvent(QMouseEvent* e)
 		// not sending. create a mixer send.
 		mix->createChannelSend(from, to);
 		// create mixer sends for all other selected channels if they don't have them already
-		for (auto mcv : m_mv->selectedChannels())
+		for (auto mcv : MixerChannelView::selectedChannels())
 		{
 			if (mcv->channelIndex() != from && mcv->channelIndex() != to
 				&& mix->channelSendModel(mcv->channelIndex(), to) == nullptr)
@@ -44,7 +44,7 @@ void SendButtonIndicator::mousePressEvent(QMouseEvent* e)
 		// sending. delete the mixer send.
 		mix->deleteChannelSend(from, to);
 		// delete mixer sends for all other selected channels if they have them
-		for (auto mcv : m_mv->selectedChannels())
+		for (auto mcv : MixerChannelView::selectedChannels())
 		{
 			if (mcv->channelIndex() != from && mcv->channelIndex() != to
 				&& mix->channelSendModel(mcv->channelIndex(), to) != nullptr)

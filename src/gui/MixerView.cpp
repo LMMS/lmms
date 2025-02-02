@@ -288,13 +288,21 @@ void MixerView::loadSettings(const QDomElement& domElement)
 void MixerView::toggledSolo()
 {
 	getMixer()->toggledSolo();
-
+	/*for (auto mcv : m_selectedChannels)
+	{
+		getMixer()->mixerChannel(mcv->channelIndex())->m_muteModel.setValue(getMixer()->mixerChannel(mcv->channelIndex())->m_muteBeforeSolo);
+	}*/
 	updateAllMixerChannels();
 }
 
 
 void MixerView::toggledMute()
 {
+	/*bool muted = getMixer()->mixerChannel(m_currentMixerChannel->channelIndex())->m_muteModel.value();
+	for (auto mcv : m_selectedChannels)
+	{
+		getMixer()->mixerChannel(mcv->channelIndex())->m_muteModel.setValue(muted);
+	}*/
 	updateAllMixerChannels();
 }
 
@@ -331,9 +339,9 @@ void MixerView::disconnectFromSoloAndMute(int channelIndex)
 void MixerView::setCurrentMixerChannel(MixerChannelView* channel, bool keepSelection, bool rangeSelect)
 {
 	// select
-	if (!keepSelection) { m_selectedChannels.clear(); }
+	if (!keepSelection) { MixerChannelView::deselectAll(); }
 	if (rangeSelect) { selectMixerChannelsInRange(m_currentMixerChannel->channelIndex(), channel->channelIndex()); }
-	m_selectedChannels.insert(channel);
+	MixerChannelView::select(channel);
 	m_currentMixerChannel = channel;
 	m_racksLayout->setCurrentWidget(m_mixerChannelViews[channel->channelIndex()]->m_effectRackView);
 
@@ -348,16 +356,9 @@ void MixerView::selectMixerChannelsInRange(int index1, int index2)
 {
 	for (int i = std::min(index1,index2); i < std::max(index1,index2); i++)
 	{
-		m_selectedChannels.insert(m_mixerChannelViews[i]);
+		MixerChannelView::select(m_mixerChannelViews[i]);
 	}
 }
-
-void MixerView::sanitizeSelection()
-{
-	std::erase_if(m_selectedChannels, [this](auto m){ return !m_mixerChannelViews.contains(m); });
-	setCurrentMixerChannel(std::clamp(0, m_currentMixerChannel->channelIndex(), m_mixerChannelViews.size() - 1), true);
-}
-
 
 void MixerView::updateMixerChannel(int index)
 {
@@ -396,15 +397,6 @@ void MixerView::updateMixerChannel(int index)
 	thisLine->update();
 }
 
-void MixerView::deleteSelectedChannels()
-{
-	// Create a temporary copy, since the selection may be modified by deleteChannel
-	std::set<MixerChannelView*> tempSelectedChannels = m_selectedChannels;
-	for (int i = m_mixerChannelViews.size() - 1; i > 0; --i)
-	{
-		if (tempSelectedChannels.contains(m_mixerChannelViews[i])) { deleteChannel(i); }
-	}
-}
 
 void MixerView::deleteChannel(int index)
 {
@@ -436,7 +428,7 @@ void MixerView::deleteChannel(int index)
 	}
 	m_mixerChannelViews.remove(index);
 
-	sanitizeSelection();
+	setCurrentMixerChannel(std::clamp(0, m_currentMixerChannel->channelIndex(), m_mixerChannelViews.size() - 1), true);
 	updateMaxChannelSelector();
 }
 
@@ -501,7 +493,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
-			deleteSelectedChannels();
+			MixerChannelView::removeSelectedChannels();
 			break;
 		case Qt::Key_Left:
 			if (e->modifiers() & Qt::AltModifier)

@@ -38,8 +38,6 @@
 #include "embed.h"
 #include "EffectRackView.h"
 
-#include <set>
-
 namespace lmms
 {
 	class Mixer;
@@ -63,11 +61,6 @@ public:
 		return m_currentMixerChannel;
 	}
 
-	inline const std::set<MixerChannelView*>& selectedChannels()
-	{
-		return m_selectedChannels;
-	}
-
 	inline MixerChannelView* channelView(int index)
 	{
 		return m_mixerChannelViews[index];
@@ -87,7 +80,6 @@ public:
 	// display the send button and knob correctly
 	void updateMixerChannel(int index);
 
-	void deleteSelectedChannels();
 	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
 
@@ -138,8 +130,6 @@ private:
 	Mixer* m_mixer;
 
 	void updateMaxChannelSelector();
-
-	std::set<MixerChannelView*> m_selectedChannels;
 
 	friend class MixerChannelView;
 } ;

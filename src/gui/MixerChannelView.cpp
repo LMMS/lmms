@@ -45,6 +45,9 @@
 #include "Song.h"
 
 namespace lmms::gui {
+
+std::set<MixerChannelView*> MixerChannelView::s_selectedChannels;
+
 MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex)
 	: QWidget(parent)
 	, m_mixerView(mixerView)
@@ -152,6 +155,11 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
 }
 
+void MixerChannelView::sanitizeSelection()
+{
+	std::erase_if(MixerChannelView::s_selectedChannels, [](auto m){ return !getGUI()->mixerView()->m_mixerChannelViews.contains(m); });
+}
+
 void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 {
 	auto contextMenu = new CaptionMenu(mixerChannel()->m_name, this);
@@ -193,7 +201,7 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	static constexpr auto outerBorderSize = 1;
 
 	const auto channel = mixerChannel();
-	const auto isSelected = m_mixerView->selectedChannels().contains(this);
+	const auto isSelected = selectedChannels().contains(this);
 	const auto isActive = m_mixerView->currentMixerChannel() == this;
 	const auto width = rect().width();
 	const auto height = rect().height();
@@ -368,7 +376,12 @@ void MixerChannelView::removeSelectedChannels()
 	//if (!confirmRemoval(m_channelIndex)) { return; }
 	// TODO, how to warn user for all channels
 	auto mix = getGUI()->mixerView();
-	mix->deleteSelectedChannels();
+	std::set<MixerChannelView*> tempSelectedChannels = selectedChannels();
+	for (auto mcv : tempSelectedChannels)
+	{
+		mix->deleteChannel(mcv->channelIndex());
+		MixerChannelView::deselect(mcv);
+	}
 }
 
 void MixerChannelView::removeUnusedChannels()
