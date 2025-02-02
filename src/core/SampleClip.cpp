@@ -21,19 +21,19 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClip.h"
 
 #include <QDomElement>
 #include <QFileInfo>
 
-#include "PatternStore.h"
 #include "PathUtil.h"
+#include "PatternStore.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
 #include "SampleLoader.h"
 #include "SampleTrack.h"
-#include "TimeLineWidget.h"
+#include "Song.h"
 
 namespace lmms
 {
@@ -42,6 +42,20 @@ SampleClip::SampleClip(Sample sample, bool isPlaying)
 	: Clip()
 	, m_sample(std::move(sample))
 	, m_isPlaying(false)
+{
+}
+
+SampleClip::SampleClip()
+	: SampleClip(Sample(), false)
+{
+}
+
+SampleClip::SampleClip(const SampleClip& orig) :
+	SampleClip(orig.m_sample, orig.m_isPlaying)
+{
+}
+
+void SampleClip::onAddedToTrack(Track* track)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -62,27 +76,14 @@ SampleClip::SampleClip(Sample sample, bool isPlaying)
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
 	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
+	//care about mute track
+	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()),
+		Qt::DirectConnection );
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
-}
 
-SampleClip::SampleClip()
-	: SampleClip(Sample(), false)
-{
-}
-
-SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.m_sample, orig.m_isPlaying)
-{
-}
-
-void SampleClip::onAddedToTrack(Track* track)
-{
-	connect(getTrack()->getMutedModel(), SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()),
-		Qt::DirectConnection);
-
-	setAutoResize(dynamic_cast<PatternStore*>(track->trackContainer()) != nullptr);
 	updateTrackClips();
+	setAutoResize(dynamic_cast<PatternStore*>(track->trackContainer()) != nullptr);
 }
 
 

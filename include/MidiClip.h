@@ -53,8 +53,6 @@ public:
 	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
-	void init();
-
 	void updateLength();
 	void onAddedToTrack(Track* track) override;
 

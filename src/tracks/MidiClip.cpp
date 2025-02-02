@@ -59,6 +59,19 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	{
 		m_notes.push_back(new Note(*note));
 	}
+
+	setAutoResize(true);
+}
+
+void MidiClip::onAddedToTrack(Track* track)
+{
+	if (track->trackContainer() == Engine::patternStore()) { resizeToFirstTrack(); }
+
+	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)), this, SLOT(changeTimeSignature()));
+	saveJournallingState(false);
+
+	updateLength();
+	restoreJournallingState();
 }
 
 
@@ -98,22 +111,6 @@ void MidiClip::resizeToFirstTrack()
 		}
 	}
 }
-
-
-
-
-void MidiClip::init()
-{
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
-	updateLength();
-	restoreJournallingState();
-}
-
-
-
 
 void MidiClip::updateLength()
 {
@@ -573,12 +570,6 @@ void MidiClip::changeTimeSignature()
 	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
 				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
-}
-
-void MidiClip::onAddedToTrack(Track* track)
-{
-	if (track->trackContainer() == Engine::patternStore()) { resizeToFirstTrack(); }
-	init();
 }
 
 } // namespace lmms
