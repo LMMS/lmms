@@ -68,7 +68,6 @@ public:
 	using TimemapIterator = timeMap::const_iterator;
 
 	AutomationClip( AutomationTrack * _auto_track );
-	AutomationClip( const AutomationClip & _clip_to_copy );
 	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
@@ -207,6 +206,9 @@ public slots:
 	void flipY( int min, int max );
 	void flipY();
 	void flipX( int length = -1 );
+
+protected:
+	AutomationClip( const AutomationClip & _clip_to_copy );
 
 private:
 	void cleanObjects();

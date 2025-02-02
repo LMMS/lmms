@@ -49,7 +49,6 @@ class SampleClip : public Clip
 public:
 	SampleClip(Track* track, Sample sample, bool isPlaying);
 	SampleClip(Track* track);
-	SampleClip( const SampleClip& orig );
 	~SampleClip() override;
 
 	SampleClip& operator=( const SampleClip& that ) = delete;
@@ -93,6 +92,8 @@ public slots:
 	void playbackPositionChanged();
 	void updateTrackClips();
 
+protected:
+	SampleClip( const SampleClip& orig );
 
 private:
 	Sample m_sample;

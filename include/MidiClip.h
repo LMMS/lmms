@@ -53,7 +53,6 @@ public:
 	} ;
 
 	MidiClip( InstrumentTrack* instrumentTrack );
-	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
 	void init();
@@ -126,6 +125,7 @@ public slots:
 	void clear();
 
 protected:
+	MidiClip( const MidiClip& other );
 	void updatePatternTrack();
 
 protected slots:

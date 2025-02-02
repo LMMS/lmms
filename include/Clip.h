@@ -54,7 +54,6 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip( Track * track );
-	Clip(const Clip& other);
 	~Clip() override;
 
 	inline Track * getTrack() const
@@ -170,6 +169,8 @@ signals:
 	void destroyedClip();
 	void colorChanged();
 
+protected:
+	Clip(const Clip& other);
 
 private:
 	Track * m_track;
