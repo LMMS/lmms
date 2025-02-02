@@ -34,8 +34,6 @@
 #include "lmms_export.h"
 
 
-#define LMMS_STRINGIFY(s) #s // a macro used to stringify the plugin name
-
 namespace lmms {
 
 namespace embed {
@@ -80,6 +78,8 @@ private:
 };
 
 #ifdef PLUGIN_NAME
+
+#define LMMS_STRINGIFY(s) #s // a macro used to stringify the plugin name
 
 class PluginPixmapLoader : public PixmapLoader
 {
