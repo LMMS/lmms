@@ -61,7 +61,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		auto journalID = Uuid::FromString(val.toStdString());
+		auto* mod = dynamic_cast<AutomatableModel*>(
+				Engine::projectJournal()->journallingObject(journalID));
 		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->

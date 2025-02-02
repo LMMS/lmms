@@ -40,6 +40,8 @@
 
 #include "Engine.h"
 
+#include "UuidQt.h"
+
 
 namespace lmms::gui
 {
@@ -104,7 +106,7 @@ void AutomationClipView::changeName()
 void AutomationClipView::disconnectObject( QAction * _a )
 {
 	JournallingObject * j = Engine::projectJournal()->
-				journallingObject( _a->data().toInt() );
+				journallingObject( _a->data().value<Uuid::uuid_t>() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
 		float oldMin = m_clip->getMin();
@@ -194,7 +196,7 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 			if (object)
 			{
 				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
-				a->setData(object->id());
+				a->setData(QVariant::fromValue(object->id()));
 				m->addAction( a );
 			}
 		}
@@ -417,7 +419,9 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		auto journalID = Uuid::FromString(val.toStdString());
+		auto* mod = dynamic_cast<AutomatableModel*>(
+				Engine::projectJournal()->journallingObject( journalID));
 		if( mod != nullptr )
 		{
 			bool added = m_clip->addObject( mod );

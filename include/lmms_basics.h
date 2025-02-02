@@ -28,6 +28,7 @@
 #include <cstddef>
 
 #include "lmmsconfig.h"
+#include "UuidUtility.h"
 
 #include <cstdint>
 
@@ -52,7 +53,7 @@ using bpm_t = uint16_t;			// tempo (MIN_BPM to MAX_BPM)
 using bitrate_t = uint16_t;		// bitrate in kbps
 using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
 
-using jo_id_t = uint32_t; // (unique) ID of a journalling object
+using jo_id_t = Uuid::uuid_t;	// (unique) ID of a journalling object
 
 
 constexpr ch_cnt_t DEFAULT_CHANNELS = 2;

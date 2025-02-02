@@ -25,8 +25,9 @@
 #ifndef LMMS_PROJECT_JOURNAL_H
 #define LMMS_PROJECT_JOURNAL_H
 
-#include <QHash>
+#include <unordered_map>
 #include <QStack>
+#include <uuid.h>
 
 #include "lmms_basics.h"
 #include "DataFile.h"
@@ -54,61 +55,58 @@ public:
 	bool canUndo() const;
 	bool canRedo() const;
 
-	void addJournalCheckPoint( JournallingObject *jo );
+	void addJournalCheckPoint(JournallingObject* jo);
 
 	bool isJournalling() const
 	{
 		return m_journalling;
 	}
 
-	void setJournalling( const bool _on )
+	void setJournalling(const bool enabled)
 	{
-		m_journalling = _on;
+		m_journalling = enabled;
 	}
 
-	// alloc new ID and register object _obj to it
-	jo_id_t allocID( JournallingObject * _obj );
+	/**
+	 * @brief alloc new ID and associate the given object with it
+	 * @return New lookup key for the given object.
+	 */
+	jo_id_t allocID(JournallingObject* obj);
 
 	// if there's already something known about ID _id, but it is currently
 	// unused (e.g. after jouralling object was deleted), register object
 	// _obj to this id
-	void reallocID( const jo_id_t _id, JournallingObject * _obj );
+	void reallocID(jo_id_t id, JournallingObject* obj);
 
 	// make ID _id unused, but keep all global journalling information
 	// (order of journalling entries etc.) referring to _id - needed for
 	// restoring a journalling object later
-	void freeID( const jo_id_t _id )
+	void freeID(jo_id_t id)
 	{
-		reallocID( _id, nullptr );
+		reallocID(id, nullptr);
 	}
-
-	//! hack, not used when saving a file
-	static jo_id_t idToSave( jo_id_t id );
-	//! hack, not used when loading a savefile
-	static jo_id_t idFromSave( jo_id_t id );
 
 	void clearJournal();
 	void stopAllJournalling();
-	JournallingObject * journallingObject( const jo_id_t _id )
+	JournallingObject* journallingObject(const jo_id_t id)
 	{
-		if( m_joIDs.contains( _id ) )
+		if(m_joIDs.count(id) != 0) //TODO Under C++20 can be replaced by (m_joIDs.contains(_id))
 		{
-			return m_joIDs[_id];
+			return m_joIDs[id];
 		}
 		return nullptr;
 	}
 
 
 private:
-	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
+	using JoIdMap = std::unordered_map<jo_id_t, JournallingObject*>;
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
+		explicit CheckPoint(jo_id_t initID = Uuid::NullUuid(), const DataFile& initData = DataFile(DataFile::Type::JournalData)) :
 			joID( initID ),
 			data( initData )
-		{
-		}
+		{}
 		jo_id_t joID;
 		DataFile data;
 	} ;

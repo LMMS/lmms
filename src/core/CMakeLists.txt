@@ -83,6 +83,7 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/UuidUtility.cpp
 	core/UpgradeExtendedNoteRange.h
 	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
