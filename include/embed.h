@@ -32,7 +32,9 @@
 #include <QString>
 
 #include "lmms_export.h"
-#include "lmms_basics.h"
+
+
+#define LMMS_STRINGIFY(s) #s // a macro used to get stringified plugin name
 
 namespace lmms {
 
