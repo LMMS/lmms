@@ -26,11 +26,9 @@
 #define LMMS_TYPES_H
 
 #include <cstddef>
-
-#include "lmmsconfig.h"
-
 #include <cstdint>
 
+#include "lmmsconfig.h"
 
 
 namespace lmms
@@ -65,9 +63,7 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
-
-#define LMMS_STRINGIFY(s) LMMS_STR(s)
-#define LMMS_STR(PN)	#PN
+#define LMMS_STRINGIFY(s) #s
 
 } // namespace lmms
 
