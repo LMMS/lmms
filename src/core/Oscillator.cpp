@@ -127,7 +127,7 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 		const float imod = (i - OscillatorConstants::WAVETABLE_LENGTH / 2.f) / OscillatorConstants::WAVETABLE_LENGTH;
 		for (int n = firstBand; n <= bands; n++)
 		{
-			table[i] += (n % 2 ? 1.0f : -1.0f) / n * sinf(numbers::tau_v<float> * n * imod) / numbers::pi_half_v<float>;
+			table[i] += (n % 2 ? 1.0f : -1.0f) / n * std::sinf(numbers::tau_v<float> * n * imod) / numbers::pi_half_v<float>;
 		}
 	}
 }
@@ -143,7 +143,7 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (n & 2 ? -1.0f : 1.0f) / powf(n, 2.0f) *
-				sinf(numbers::tau_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (numbers::pi_sqr_v<float> / 8);
+				std::sinf(numbers::tau_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (numbers::pi_sqr_v<float> / 8);
 		}
 	}
 }
@@ -159,7 +159,7 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (1.0f / n)
-				* sinf(numbers::tau_v<float> * i * n / OscillatorConstants::WAVETABLE_LENGTH)
+				* std::sinf(numbers::tau_v<float> * i * n / OscillatorConstants::WAVETABLE_LENGTH)
 				/ (numbers::pi_v<float> / 4);
 		}
 	}

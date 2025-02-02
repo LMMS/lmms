@@ -80,7 +80,7 @@ public:
 		m_wc4 = wc2 * wc2;
 
 		// k
-		const double k = wc / tan(numbers::pi * freq / m_sampleRate);
+		const double k = wc / std::tan(numbers::pi * freq / m_sampleRate);
 		const double k2 = k * k;
 		const double k3 = k2 * k;
 		m_k4 = k2 * k2;
@@ -800,7 +800,7 @@ public:
 			m_type == FilterType::Highpass_SV ||
 			m_type == FilterType::Notch_SV )
 		{
-			const float f = sinf(std::max(minFreq(), _freq) * m_sampleRatio * numbers::pi_v<float>);
+			const float f = std::sinf(std::max(minFreq(), _freq) * m_sampleRatio * numbers::pi_v<float>);
 			m_svf1 = std::min(f, 0.825f);
 			m_svf2 = std::min(f * 2.0f, 0.825f);
 			m_svq = std::max(0.0001f, 2.0f - (_q * 0.1995f));

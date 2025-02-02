@@ -143,7 +143,7 @@ inline float logToLinearScale(float min, float max, float value)
 		float result = signedPowf(val / mmax, numbers::e_v<float>) * mmax;
 		return std::isnan( result ) ? 0 : result;
 	}
-	float result = powf(value, numbers::e_v<float>) * (max - min) + min;
+	float result = std::powf(value, numbers::e_v<float>) * (max - min) + min;
 	return std::isnan( result ) ? 0 : result;
 }
 
@@ -159,7 +159,7 @@ inline float linearToLogScale(float min, float max, float value)
 		float result = signedPowf(valueLimited / mmax, numbers::inv_e_v<float>) * mmax;
 		return std::isnan( result ) ? 0 : result;
 	}
-	float result = powf(val, numbers::inv_e_v<float>) * (max - min) + min;
+	float result = std::powf(val, numbers::inv_e_v<float>) * (max - min) + min;
 	return std::isnan( result ) ? 0 : result;
 }
 

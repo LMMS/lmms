@@ -522,7 +522,7 @@ void EqHandle::setlp48()
 
 double EqHandle::calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 )
 {
-	const double w = sin(numbers::pi * freq / Engine::audioEngine()->outputSampleRate());
+	const double w = std::sin(numbers::pi * freq / Engine::audioEngine()->outputSampleRate());
 	const double PHI = w * w * 4;
 
 	double gain = 10 * log10( pow( b0 + b1 + b2 , 2 ) + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 )
