@@ -800,7 +800,7 @@ public:
 			m_type == FilterType::Highpass_SV ||
 			m_type == FilterType::Notch_SV )
 		{
-			const float f = std::sinf(std::max(minFreq(), _freq) * m_sampleRatio * numbers::pi_v<float>);
+			const float f = std::sin(std::max(minFreq(), _freq) * m_sampleRatio * numbers::pi_v<float>);
 			m_svf1 = std::min(f, 0.825f);
 			m_svf2 = std::min(f * 2.0f, 0.825f);
 			m_svq = std::max(0.0001f, 2.0f - (_q * 0.1995f));
