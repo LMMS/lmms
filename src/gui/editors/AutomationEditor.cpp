@@ -41,10 +41,6 @@
 #include "SampleClip.h"
 #include "SampleWaveform.h"
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "ActionGroup.h"
 #include "AutomationNode.h"
 #include "ComboBox.h"

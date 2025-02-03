@@ -41,10 +41,6 @@
 #include <QStyleOption>
 #include <QToolButton>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include <cmath>
 #include <utility>
 
