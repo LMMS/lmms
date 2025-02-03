@@ -34,7 +34,8 @@
 
 #ifdef LMMS_HAVE_EXTERNALSYNC
 
-
+#include <chrono>
+#include <thread>
 #include <vector>
 
 #include "Engine.h"
@@ -526,7 +527,48 @@ bool SyncCtl::have()
 }
 
 
+
+/* ExternalSyncTimer : */
+
+enum { ExternalSyncTimerPeriod = 50 } ; // Im ms
+static bool s_threadOn = true;
+static std::thread *s_pulseThread = nullptr;
+
+
+static void s_pulseFunction()
+{
+	while (s_threadOn)
+ 	{
+		if (s_syncJackd) { SyncHook::pulse(); }
+		std::this_thread::sleep_for(std::chrono::milliseconds(ExternalSyncTimerPeriod));
+ 	}
+}
+
+
+void startExternalSyncTimer()
+{
+	s_threadOn = true;
+	s_pulseThread =  new std::thread(s_pulseFunction);
+}
+
+
+void stopExternalSyncTimer()
+{
+	s_threadOn = false;
+	s_pulseThread->join();
+	delete s_pulseThread;
+	s_pulseThread = nullptr;
+}
+
+
+} // namespace lmms 
+
+#else
+
+namespace lmms 
+{
+void startExternalSyncTimer() {}
+void stopExternalSyncTimer() {}
 } // namespace lmms 
 
 #endif // LMMS_HAVE_EXTERNALSYNC
-

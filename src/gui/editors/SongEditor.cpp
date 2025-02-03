@@ -825,10 +825,7 @@ void SongEditor::updatePosition( const TimePos & t )
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
-#ifdef LMMS_HAVE_EXTERNALSYNC
-	//Need be called periodically at least 10 times in second, especially, when song is stopped
-	SyncHook::pulse();
-#endif
+
 	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
 							|| m_scrollBack)
 	{
