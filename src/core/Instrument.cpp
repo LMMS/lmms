@@ -152,7 +152,7 @@ void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[offset + f][ch] *= 0.5 - 0.5 * std::cosf(numbers::pi_v<float> * (float) f / (float) n->m_fadeInLength);
+				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(numbers::pi_v<float> * (float) f / (float) n->m_fadeInLength);
 			}
 		}
 	}

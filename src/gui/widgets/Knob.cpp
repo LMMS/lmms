@@ -26,10 +26,6 @@
 
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"

@@ -259,7 +259,7 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		for (int i = 0; i < guass_size; i++)
 		{
 			temp = (i - guass_center) / delta;
-			sum += guassian[i] = a * std::expf(-0.5f * temp * temp);
+			sum += guassian[i] = a * std::exp(-0.5f * temp * temp);
 		}
 		for (int i = 0; i < guass_size; i++)
 		{

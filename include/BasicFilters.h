@@ -31,10 +31,6 @@
 #ifndef LMMS_BASIC_FILTERS_H
 #define LMMS_BASIC_FILTERS_H
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include <cmath>
 #include <array>
 
