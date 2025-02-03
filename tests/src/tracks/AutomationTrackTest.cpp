@@ -96,20 +96,20 @@ private slots:
 		auto song = Engine::getSong();
 		auto track = song->addTrack<AutomationTrack>();
 
-		auto c1 = static_cast<AutomationClip*>(track->addClip(track->createClip()));
+		auto c1 = static_cast<AutomationClip*>(track->addNewClip());
 		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1->putValue(0, 0.0, false);
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
 
-		auto c2 = static_cast<AutomationClip*>(track->addClip(track->createClip()));
+		auto c2 = static_cast<AutomationClip*>(track->addNewClip());
 		c2->setProgressionType(AutomationClip::ProgressionType::Linear);
 		c2->putValue(0, 0.0, false);
 		c2->putValue(100, 1.0, false);
 		c2->movePosition(100);
 		c2->addObject(&model);
 
-		auto c3 = static_cast<AutomationClip*>(track->addClip(track->createClip()));
+		auto c3 = static_cast<AutomationClip*>(track->addNewClip());
 		c3->addObject(&model);
 		//XXX: Why is this even necessary?
 		c3->clear();
@@ -130,7 +130,7 @@ private slots:
 
 		auto song = Engine::getSong();
 		auto track = song->addTrack<AutomationTrack>();
-		auto c = static_cast<AutomationClip*>(track->addClip(track->createClip()));
+		auto c = static_cast<AutomationClip*>(track->addNewClip());
 
 		c->setProgressionType(AutomationClip::ProgressionType::Linear);
 		c->addObject(&model);
@@ -155,7 +155,7 @@ private slots:
 
 		auto song = Engine::getSong();
 		auto instrumentTrack = song->addTrack<InstrumentTrack>();
-		auto midiClip = static_cast<MidiClip*>(instrumentTrack->addClip(instrumentTrack->createClip()));
+		auto midiClip = static_cast<MidiClip*>(instrumentTrack->addNewClip());
 
 		midiClip->changeLength(TimePos(4, 0));
 		Note* note = midiClip->addNote(Note(TimePos(4, 0)), false);
@@ -204,7 +204,7 @@ private slots:
 		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack->patternIndex())[&model], 0.5f);
 		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2->patternIndex()).size());
 
-		auto clip = static_cast<PatternClip*>(patternTrack->addClip(patternTrack->createClip()));
+		auto clip = static_cast<PatternClip*>(patternTrack->addNewClip());
 		clip->changeLength(TimePos::ticksPerBar() * 2);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
@@ -221,10 +221,10 @@ private slots:
 		auto song = Engine::getSong();
 
 		auto globalTrack = song->globalAutomationTrack();
-		auto globalClip = static_cast<AutomationClip*>(globalTrack->addClip(globalTrack->createClip()));
+		auto globalClip = static_cast<AutomationClip*>(globalTrack->addNewClip());
 
 		auto localTrack = song->addTrack<AutomationTrack>();
-		auto localClip = static_cast<AutomationClip*>(localTrack->addClip(localTrack->createClip()));
+		auto localClip = static_cast<AutomationClip*>(localTrack->addNewClip());
 
 		FloatModel model;
 		globalClip->setProgressionType(AutomationClip::ProgressionType::Discrete);

@@ -77,7 +77,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			auto autoClip = static_cast<AutomationClip*>(getTrack()->addClip(getTrack()->createClip()));
+			auto autoClip = static_cast<AutomationClip*>(getTrack()->addNewClip());
 			autoClip->movePosition(pos);
 			autoClip->addObject( mod );
 		}

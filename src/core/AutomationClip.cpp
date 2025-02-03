@@ -1029,7 +1029,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		}
 	}
 
-	auto a = static_cast<AutomationClip*>(t->addClip(t->createClip()));
+	auto a = static_cast<AutomationClip*>(t->addNewClip());
 	a->addObject(_m, false);
 	return a;
 }

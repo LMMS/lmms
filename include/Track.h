@@ -112,6 +112,7 @@ public:
 	void loadSettings( const QDomElement & element ) override;
 
 	Clip* addClip(std::unique_ptr<Clip> clip);
+	Clip* addNewClip();
 	void removeClip(Clip* clip);
 	void deleteClips();
 

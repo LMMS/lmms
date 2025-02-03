@@ -187,7 +187,7 @@ public:
 		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
 			TimePos pPos = TimePos( time.getBar(), 0 );
-			ap = static_cast<AutomationClip*>(at->addClip(at->createClip()));
+			ap = static_cast<AutomationClip*>(at->addNewClip());
 			ap->movePosition(pPos);
 			ap->addObject(objModel);
 		}
@@ -254,7 +254,7 @@ public:
 			it->pitchRangeModel()->setInitValue( 2 );
 
 			// Create a default pattern
-			p = static_cast<MidiClip*>(it->addClip(it->createClip()));
+			p = static_cast<MidiClip*>(it->addNewClip());
 		}
 		return this;
 	}
@@ -264,7 +264,7 @@ public:
 	{
 		if (!p)
 		{
-			p = static_cast<MidiClip*>(it->addClip(it->createClip()));
+			p = static_cast<MidiClip*>(it->addNewClip());
 		}
 		p->addNote(n, false);
 		hasNotes = true;
@@ -281,7 +281,7 @@ public:
 			if (!newMidiClip || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
 				TimePos pPos = TimePos(n->pos().getBar(), 0);
-				newMidiClip = static_cast<MidiClip*>(it->addClip(it->createClip()));
+				newMidiClip = static_cast<MidiClip*>(it->addNewClip());
 				newMidiClip->movePosition(pPos);
 			}
 			lastEnd = n->pos() + n->length();
@@ -335,10 +335,10 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	auto dt = Engine::getSong()->addTrack<AutomationTrack>();
 
 	dt->setName(tr("MIDI Time Signature Denominator"));
-	auto timeSigNumeratorPat = static_cast<AutomationClip*>(nt->addClip(nt->createClip()));
+	auto timeSigNumeratorPat = static_cast<AutomationClip*>(nt->addNewClip());
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
-	auto timeSigDenominatorPat = static_cast<AutomationClip*>(dt->addClip(dt->createClip()));
+	auto timeSigDenominatorPat = static_cast<AutomationClip*>(dt->addNewClip());
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
 	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 
@@ -363,7 +363,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// Tempo stuff
 	auto tt = Engine::getSong()->addTrack<AutomationTrack>();
 	tt->setName(tr("Tempo"));
-	auto tap = static_cast<AutomationClip*>(tt->addClip(tt->createClip()));
+	auto tap = static_cast<AutomationClip*>(tt->addNewClip());
 	tap->setDisplayName(tr("Tempo"));
 	tap->addObject(&Engine::getSong()->tempoModel());
 	if( tap )
