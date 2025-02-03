@@ -77,9 +77,9 @@ private:
 
 	static inline std::string createKey() {
 #if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_FREEBSD) || defined(LMMS_BUILD_OPENBSD)
-		const int &length = 30; // PSHMNAMLEN=31
+		constexpr int length = 30; // PSHMNAMLEN=31
 #else
-		const int &length = 32; // mimic UUID
+		constexpr int length = 32; // mimic UUID
 #endif
 		std::string key;
 		std::random_device rd;
