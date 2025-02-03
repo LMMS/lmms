@@ -85,7 +85,6 @@ public:
 	} ;
 
 	Track(Type type);
-	~Track() override;
 
 	Track * clone();
 
@@ -223,7 +222,6 @@ private:
 
 
 signals:
-	void destroyedTrack();
 	void nameChanged();
 	void clipAdded( lmms::Clip * );
 	void colorChanged();

@@ -61,23 +61,11 @@ Track::Track(Type type) :
 	m_trackContainer(nullptr),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
+	m_height(-1),
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_clips()        /*!< The clips (segments) */
 {	
-	m_height = -1;
-}
-
-
-
-
-/*! \brief Destroy this track
- *
- *  Delete the clips and remove this track from the track container.
- */
-Track::~Track()
-{
-	emit destroyedTrack();
 }
 
 /*! \brief Clone a track from this track
