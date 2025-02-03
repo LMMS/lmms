@@ -25,25 +25,19 @@
 #ifndef LMMS_TRACK_H
 #define LMMS_TRACK_H
 
-#include <vector>
-
 #include <QColor>
-
-#include "AudioEngine.h"
-#include "AutomatableModel.h"
-#include "Engine.h"
-#include "JournallingObject.h"
-#include "lmms_basics.h"
 #include <optional>
 
+#include "AutomatableModel.h"
+#include "Clip.h"
+#include "JournallingObject.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {
 
 class TimePos;
 class TrackContainer;
-class Clip;
-
 
 namespace gui
 {
