@@ -237,5 +237,11 @@ void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 	}
 }
 
+void PatternTrack::onAddedToTrackContainer(TrackContainer*)
+{
+	Engine::patternStore()->createClipsForPattern(patternIndex());
+	Engine::patternStore()->setCurrentPattern(patternIndex());
+	Engine::patternStore()->updateComboBox();
+}
 
 } // namespace lmms

@@ -60,6 +60,8 @@ public:
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
+	void onAddedToTrackContainer(TrackContainer* trackContainer) override;
+
 	static PatternTrack* findPatternTrack(int pattern_num);
 	static void swapPatternTracks(Track* track1, Track* track2);
 

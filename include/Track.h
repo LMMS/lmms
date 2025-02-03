@@ -95,6 +95,7 @@ public:
 	virtual std::unique_ptr<Clip> createClip() = 0;
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
+	virtual void onAddedToTrackContainer(TrackContainer* trackContainer) {}
 
 	// Saving and loading of presets which do not necessarily contain all the track information
 	void savePreset(QDomDocument & doc, QDomElement & element);
