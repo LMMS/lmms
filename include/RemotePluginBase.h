@@ -125,7 +125,7 @@ public:
 		m_master( true ),
 		m_lockDepth( 0 )
 	{
-		m_data.create(QUuid::createUuid().toString().toStdString());
+		m_data.create();
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
