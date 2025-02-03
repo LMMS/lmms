@@ -114,7 +114,7 @@ public:
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
 
-	virtual void onAddedToTrack(Track* track) = 0;
+	virtual void onAddedToTrack(Track* track) {}
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
