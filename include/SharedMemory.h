@@ -114,9 +114,14 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>};
 	}
 
-	void create(std::string key = "")
+	void create()
 	{
-		m_data = detail::SharedMemoryData{std::move(key.empty() ? detail::createKey() : key), sizeof(T), std::is_const_v<T>};
+		create(detail::createKey());
+	}
+
+	void create(std::string key)
+	{
+		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>};
 	}
 
 	void detach() noexcept
