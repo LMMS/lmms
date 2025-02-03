@@ -57,17 +57,6 @@ TrackContainer::TrackContainer() :
 {
 }
 
-
-
-
-TrackContainer::~TrackContainer()
-{
-	clearAllTracks();
-}
-
-
-
-
 void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( classNodeName() );
@@ -175,6 +164,16 @@ int TrackContainer::countTracks( Track::Type _tt ) const
 	return( cnt );
 }
 
+Track* TrackContainer::addTrack(std::unique_ptr<Track> track)
+{
+	m_tracks.emplace_back(std::move(track));
+	m_tracks.back().get()->setTrackContainer(this);
+	updateAfterTrackAdd(m_tracks.back().get());
+
+	emit trackAdded(m_tracks.back().get());
+	return m_tracks.back().get();
+}
+
 Track* TrackContainer::createTrack(const QDomElement& element)
 {
 	const auto trackType = static_cast<Track::Type>(element.attribute("type").toInt());
@@ -211,7 +210,8 @@ void TrackContainer::removeTrack( Track * _track )
 	//   After checking that index != -1, we need to upgrade the lock to a write locker before changing m_tracks.
 	//   But since Qt offers no function to promote a read lock to a write lock, we must start with the write locker.
 	QWriteLocker lockTracksAccess(&m_tracksMutex);
-	auto it = std::find(m_tracks.begin(), m_tracks.end(), _track);
+
+	const auto it = std::find_if(m_tracks.begin(), m_tracks.end(), [&](auto& x) { return x.get() == _track; });
 	if (it != m_tracks.end())
 	{
 		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
@@ -240,15 +240,15 @@ void TrackContainer::updateAfterTrackAdd(Track* track)
 
 void TrackContainer::clearAllTracks()
 {
-	//m_tracksMutex.lockForWrite();
-	while (!m_tracks.empty())
-	{
-		delete m_tracks.front();
-	}
-	//m_tracksMutex.unlock();
+	m_tracks.clear();
 }
 
-
+std::vector<Track*> TrackContainer::tracks() const
+{
+	auto tracks = std::vector<Track*>(m_tracks.size());
+	std::transform(m_tracks.begin(), m_tracks.end(), tracks.begin(), [](auto& x) { return x.get(); });
+	return tracks;
+}
 
 
 bool TrackContainer::isEmpty() const

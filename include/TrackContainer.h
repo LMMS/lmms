@@ -62,7 +62,6 @@ public:
 	} ;
 
 	TrackContainer();
-	~TrackContainer() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 
@@ -76,34 +75,22 @@ public:
 		static_assert(std::is_base_of_v<Track, T>, "T must be a kind of Track");
 
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
-		auto track = new T(std::forward<Args>(args)...);
+		auto track = std::make_unique<T>(std::forward<Args>(args)...);
 
-		track->lock();
-		m_tracksMutex.lockForWrite();
-
-		m_tracks.push_back(track);
-		track->setTrackContainer(this);
-		updateAfterTrackAdd(track);
-
-		m_tracksMutex.unlock();
-		track->unlock();
-
-		emit trackAdded(track);
-		return track;
+		const auto addedTrack = addTrack(std::move(track));
+		emit trackAdded(addedTrack);
+		return static_cast<T*>(addedTrack);
 	}
 
 	Track* createTrack(const QDomElement& element);
+	Track* addTrack(std::unique_ptr<Track> track);
 	void removeTrack( Track * _track );
 
 	virtual void updateAfterTrackAdd(Track* track);
 
 	void clearAllTracks();
 
-	const TrackList & tracks() const
-	{
-		return m_tracks;
-	}
-
+	std::vector<Track*> tracks() const;
 	bool isEmpty() const;
 
 	static const QString classNodeName()
@@ -132,7 +119,7 @@ protected:
 	mutable QReadWriteLock m_tracksMutex;
 
 private:
-	TrackList m_tracks;
+	std::vector<std::unique_ptr<Track>> m_tracks;
 
 	Type m_TrackContainerType;
 

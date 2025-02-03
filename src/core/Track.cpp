@@ -77,10 +77,7 @@ Track::Track(Type type) :
  */
 Track::~Track()
 {
-	lock();
 	emit destroyedTrack();
-	m_trackContainer->removeTrack( this );
-	unlock();
 }
 
 /*! \brief Clone a track from this track

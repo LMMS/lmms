@@ -1219,8 +1219,8 @@ std::vector<Track*> AutomationClip::combineAllTracks()
 {
 	std::vector<Track*> combinedTrackList;
 
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	auto songTracks = Engine::getSong()->tracks();
+	auto patternStoreTracks = Engine::patternStore()->tracks();
 
 	combinedTrackList.insert(combinedTrackList.end(), songTracks.begin(), songTracks.end());
 	combinedTrackList.insert(combinedTrackList.end(), patternStoreTracks.begin(), patternStoreTracks.end());

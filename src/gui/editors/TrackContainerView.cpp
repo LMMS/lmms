@@ -202,10 +202,10 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	m_scrollLayout->removeWidget( trackView );
 	m_scrollLayout->insertWidget( indexTo, trackView );
 
-	Track * track = m_tc->m_tracks[indexFrom];
+	auto& track = m_tc->m_tracks[indexFrom];
 
 	m_tc->m_tracks.erase(m_tc->m_tracks.begin() + indexFrom);
-	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, track);
+	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, std::move(track));
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();
@@ -296,7 +296,7 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	delete _tv;
 
 	Engine::audioEngine()->requestChangeInModel();
-	delete t;
+	t->trackContainer()->removeTrack(t);
 	Engine::audioEngine()->doneChangeInModel();
 }
 
