@@ -144,9 +144,9 @@ int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool no
 	// common computation for cosine-sum based windows
 	for (unsigned int i = 0; i < length; i++)
 	{
-		window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0))
-						+ a2 * cos(4 * F_PI * i / ((float)length - 1.0))
-						- a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
+		window[i] = (a0 - a1 * std::cos(2 * numbers::pi_v<float> * i / ((float)length - 1.0))
+			+ a2 * std::cos(4 * numbers::pi_v<float> * i / ((float)length - 1.0))
+			- a3 * std::cos(6 * numbers::pi_v<float> * i / ((float)length - 1.0)));
 		gain += window[i];
 	}
 

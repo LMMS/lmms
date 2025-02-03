@@ -26,10 +26,6 @@
 
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
@@ -316,7 +312,7 @@ void Knob::setTextColor( const QColor & c )
 
 QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * F_PI / 180.0;
+	const float rarc = m_angle * numbers::pi_v<float> / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 

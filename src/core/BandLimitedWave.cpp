@@ -103,8 +103,8 @@ void BandLimitedWave::generateWaves()
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
 					const double amp = -1.0 / static_cast<double>( harm );
-					//const double a2 = cos( om * harm * F_2PI );
-					s += amp * /*a2 **/sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
+					//const double a2 = std::cos(om * harm * numbers::tau_v<float>);
+					s += amp * /*a2 **/ std::sin(static_cast<double>(ph * harm) / static_cast<double>(len) * numbers::tau_v<float>);
 					harm++;
 				} while( hlen > 2.0 );
 				s_waveforms[static_cast<std::size_t>(BandLimitedWave::Waveform::BLSaw)].setSampleAt( i, ph, s );
@@ -145,8 +145,8 @@ void BandLimitedWave::generateWaves()
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
 					const double amp = 1.0 / static_cast<double>( harm );
-					//const double a2 = cos( om * harm * F_2PI );
-					s += amp * /*a2 **/ sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
+					//const double a2 = std::cos(om * harm * numbers::tau_v<float>);
+					s += amp * /*a2 **/ std::sin(static_cast<double>(ph * harm) / static_cast<double>(len) * numbers::tau_v<float>);
 					harm += 2;
 				} while( hlen > 2.0 );
 				s_waveforms[static_cast<std::size_t>(BandLimitedWave::Waveform::BLSquare)].setSampleAt( i, ph, s );
@@ -186,9 +186,9 @@ void BandLimitedWave::generateWaves()
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
 					const double amp = 1.0 / static_cast<double>( harm * harm );
-					//const double a2 = cos( om * harm * F_2PI );
-					s += amp * /*a2 **/ sin( ( static_cast<double>( ph * harm ) / static_cast<double>( len ) +
-							( ( harm + 1 ) % 4 == 0 ? 0.5 : 0.0 ) ) * F_2PI );
+					//const double a2 = std::cos(om * harm * numbers::tau_v<float>);
+					s += amp * /*a2 **/ std::sin((static_cast<double>(ph * harm) / static_cast<double>(len) +
+							((harm + 1) % 4 == 0 ? 0.5 : 0.0)) * numbers::tau_v<float>);
 					harm += 2;
 				} while( hlen > 2.0 );
 				s_waveforms[static_cast<std::size_t>(BandLimitedWave::Waveform::BLTriangle)].setSampleAt( i, ph, s );

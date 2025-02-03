@@ -29,7 +29,7 @@
 
 #include "EffectChain.h"
 #include "Mixer.h"
-#include "panning_constants.h"
+#include "panning.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
