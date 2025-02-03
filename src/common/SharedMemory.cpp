@@ -23,9 +23,9 @@
 
 #include "SharedMemory.h"
 
+#include <random>
 #include <system_error>
 #include <utility>
-#include <random>
 
 #include "lmmsconfig.h"
 #include "RaiiHelpers.h"
@@ -76,7 +76,7 @@ class SharedMemoryImpl
 {
 public:
 	SharedMemoryImpl(const std::string& key, bool readOnly) :
-		m_key{"/" + key}
+		m_key{'/' + key}
 	{
 		const auto openFlags = readOnly ? O_RDONLY : O_RDWR;
 		const auto fd = FileDescriptor{
@@ -94,7 +94,7 @@ public:
 	}
 
 	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly) :
-		m_key{"/" + key},
+		m_key{'/' + key},
 		m_size{size}
 	{
 		const auto fd = FileDescriptor{
@@ -125,8 +125,8 @@ public:
 
 private:
 	std::string m_key;
-	std::size_t m_size;
-	void* m_mapping;
+	std::size_t m_size = 0;
+	void* m_mapping = nullptr;
 	ShmObject m_object;
 };
 
@@ -219,8 +219,8 @@ auto createKey() -> std::string
 	auto gen = std::mt19937{rd()}; // mersenne twister, seeded
 	auto distrib = std::uniform_int_distribution{0, 15}; // hex range (0-15)
 
-	key.reserve(length);
-	for (int i = 0; i < length; i++)
+	key.reserve(length + 1);
+	for (int i = 0; i < length; ++i)
 	{
 		key += "0123456789ABCDEF"[distrib(gen)];
 	}
