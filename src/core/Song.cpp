@@ -812,25 +812,6 @@ void Song::addPatternTrack()
 	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
 
-
-
-
-void Song::addSampleTrack()
-{
-	addNewTrack<SampleTrack>();
-}
-
-
-
-
-void Song::addAutomationTrack()
-{
-	addNewTrack<AutomationTrack>();
-}
-
-
-
-
 bpm_t Song::getTempo()
 {
 	return ( bpm_t )m_tempoModel.value();

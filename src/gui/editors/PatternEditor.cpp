@@ -82,25 +82,6 @@ void PatternEditor::removeSteps()
 	}
 }
 
-
-
-
-void PatternEditor::addSampleTrack()
-{
-	model()->addNewTrack<SampleTrack>();
-}
-
-
-
-
-void PatternEditor::addAutomationTrack()
-{
-	model()->addNewTrack<AutomationTrack>();
-}
-
-
-
-
 void PatternEditor::removeViewsForPattern(int pattern)
 {
 	for( TrackView* view : trackViews() )
@@ -262,13 +243,13 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
-						Engine::getSong(), SLOT(addPatternTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
-						m_editor, SLOT(cloneClip()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_sample_track"),	tr("Add sample-track"),
-						m_editor, SLOT(addSampleTrack()));
+		Engine::getSong(), &TrackContainer::addNewTrack<PatternTrack>);
+	trackAndStepActionsToolBar->addAction(
+		embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"), m_editor, SLOT(cloneClip()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_sample_track"), tr("Add sample-track"),
+		m_editor->model(), &TrackContainer::addNewTrack<SampleTrack>);
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
-						m_editor, SLOT(addAutomationTrack()));
+		m_editor->model(), &TrackContainer::addNewTrack<AutomationTrack>);
 
 	auto stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
