@@ -89,7 +89,7 @@ Track* Track::clone()
 	QDomDocument doc;
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
-	const auto track = m_trackContainer->createTrack(parent.firstChild().toElement());
+	const auto track = m_trackContainer->addNewTrack(parent.firstChild().toElement());
 
 	AutomationClip::resolveAllIDs();
 	return track;

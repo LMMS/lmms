@@ -440,7 +440,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		m_tc->createTrack(dataFile.content().firstChild().toElement());
+		m_tc->addNewTrack(dataFile.content().firstChild().toElement());
 		_de->accept();
 	}
 }

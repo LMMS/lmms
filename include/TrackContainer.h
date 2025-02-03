@@ -77,7 +77,7 @@ public:
 		return static_cast<T*>(addTrack(std::move(track)));
 	}
 
-	Track* createTrack(const QDomElement& element);
+	Track* addNewTrack(const QDomElement& element);
 	Track* addTrack(std::unique_ptr<Track> track);
 	void removeTrack( Track * _track );
 
