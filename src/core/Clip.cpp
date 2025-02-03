@@ -60,11 +60,6 @@ Clip::Clip() :
 Clip::~Clip()
 {
 	emit destroyedClip();
-
-	if( getTrack() )
-	{
-		getTrack()->removeClip( this );
-	}
 }
 
 

@@ -95,8 +95,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 		return Engine::patternStore()->play(_start, _frames, _offset, s_infoMap[this]);
 	}
 
-	clipVector clips;
-	getClipsInRange( clips, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
+	const auto clips = getClipsInRange(_start, _start + static_cast<int>(_frames / Engine::framesPerTick()));
 
 	if( clips.size() == 0 )
 	{
@@ -140,17 +139,10 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 
 
-Clip* PatternTrack::createClip()
+std::unique_ptr<Clip> PatternTrack::createClip()
 {
-	return addClip<PatternClip>();
+	return std::make_unique<PatternClip>();
 }
-
-
-bool PatternTrack::canAddClip(Clip* clip)
-{
-	return dynamic_cast<PatternClip*>(clip) != nullptr;
-}
-
 
 void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {

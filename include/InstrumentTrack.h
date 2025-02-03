@@ -129,9 +129,7 @@ public:
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
 
 	// create new track-content-object = clip
-	Clip* createClip() override;
-
-	bool canAddClip(Clip* clip) override;
+	std::unique_ptr<Clip> createClip() override;
 
 	// called by track
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;

@@ -381,11 +381,11 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	values = container->automatedValuesAt(timeStart, clipNum);
 	const TrackList& tracks = container->tracks();
 
-	Track::clipVector clips;
+	auto clips = std::vector<Clip*>{};
 	for (Track* track : tracks)
 	{
 		if (track->type() == Track::Type::Automation) {
-			track->getClipsInRange(clips, 0, timeStart);
+			clips = track->getClipsInRange(0, timeStart);
 		}
 	}
 

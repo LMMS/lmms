@@ -72,8 +72,6 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	using clipVector = std::vector<Clip*>;
-
 	enum class Type
 	{
 		Instrument,
@@ -100,12 +98,8 @@ public:
 	virtual bool play( const TimePos & start, const fpp_t frames,
 						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
-
-
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
-	virtual Clip* createClip() = 0;
-	virtual bool canAddClip(Clip* clip) = 0;
-
+	virtual std::unique_ptr<Clip> createClip() = 0;
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
@@ -117,22 +111,7 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	template<typename T, typename... Args>
-	T* addClip(Args&&... args)
-	{
-		static_assert(std::is_base_of_v<Clip, T>, "T must be a kind of Clip");
-		const auto guard = Engine::audioEngine()->requestChangesGuard();
-
-		auto clip = new T(std::forward<Args>(args)...);
-		assert(canAddClip(clip) && "This clip cannot be added to this track (incompatible types?)");
-
-		m_clips.push_back(clip);
-		clip->setTrack(this);
-		clip->onAddedToTrack(this);
-		emit clipAdded(clip);
-		return clip;
-	}
-
+	Clip* addClip(std::unique_ptr<Clip> clip);
 	void removeClip(Clip* clip);
 	void deleteClips();
 
@@ -140,12 +119,8 @@ public:
 	auto getClip(std::size_t clipNum) -> Clip*;
 	int getClipNum(const Clip* clip );
 
-	const clipVector & getClips() const
-	{
-		return m_clips;
-	}
-	void getClipsInRange( clipVector & clipV, const TimePos & start,
-							const TimePos & end );
+	std::vector<Clip*> getClips() const;
+	std::vector<Clip*> getClipsInRange(const TimePos& start, const TimePos& end);
 	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
 	void createClipsForPattern(int pattern);
@@ -238,7 +213,7 @@ private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
-	clipVector m_clips;
+	std::vector<std::unique_ptr<Clip>> m_clips;
 
 	QMutex m_processingLock;
 	

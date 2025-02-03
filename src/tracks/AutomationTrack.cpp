@@ -55,16 +55,9 @@ gui::TrackView* AutomationTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-Clip* AutomationTrack::createClip()
+std::unique_ptr<Clip> AutomationTrack::createClip()
 {
-	return addClip<AutomationClip>();
-}
-
-
-
-bool AutomationTrack::canAddClip(Clip* clip)
-{
-	return dynamic_cast<AutomationClip*>(clip) != nullptr;
+	return std::make_unique<AutomationClip>();
 }
 
 void AutomationTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)

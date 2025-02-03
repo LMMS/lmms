@@ -448,7 +448,7 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	auto& clips = getTrack()->getClips();
+	auto clips = getTrack()->getClips();
 	int clipNum = getTrack()->getClipNum(this) + offset;
 	if (clipNum < 0 || static_cast<size_t>(clipNum) >= clips.size()) { return nullptr; }
 	return dynamic_cast<MidiClip*>(clips[clipNum]);

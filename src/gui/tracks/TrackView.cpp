@@ -109,7 +109,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
 
 	// create views for already existing clips
-	for (const auto& clip : m_track->m_clips)
+	for (const auto& clip : m_track->getClips())
 	{
 		createClipView(clip);
 	}

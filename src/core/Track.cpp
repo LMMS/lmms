@@ -79,12 +79,6 @@ Track::~Track()
 {
 	lock();
 	emit destroyedTrack();
-
-	while (!m_clips.empty())
-	{
-		delete m_clips.back();
-	}
-
 	m_trackContainer->removeTrack( this );
 	unlock();
 }
@@ -262,13 +256,23 @@ void Track::loadSettings(const QDomElement& element)
 	loadTrack(element, false);
 }
 
+Clip* Track::addClip(std::unique_ptr<Clip> clip)
+{
+	m_clips.emplace_back(std::move(clip));
+	m_clips.back()->setTrack(this);
+	m_clips.back()->onAddedToTrack(this);
+	emit clipAdded(m_clips.back().get());
+	return m_clips.back().get();
+}
+
 /*! \brief Remove a given Clip from this track
  *
  *  \param clip The Clip to remove from this track.
  */
 void Track::removeClip( Clip * clip )
 {
-	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
+	const auto it = std::find_if(m_clips.begin(), m_clips.end(), [&](auto& x) { return x.get() == clip; });
+
 	if( it != m_clips.end() )
 	{
 		m_clips.erase( it );
@@ -284,10 +288,7 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	while (!m_clips.empty())
-	{
-		delete m_clips.front();
-	}
+	m_clips.clear();
 }
 
 
@@ -319,14 +320,14 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 {
 	if( clipNum < m_clips.size() )
 	{
-		return m_clips[clipNum];
+		return m_clips[clipNum].get();
 	}
 	printf( "called Track::getClip( %zu ), "
 			"but Clip %zu doesn't exist\n", clipNum, clipNum );
 
 	auto clip = createClip();
 	clip->movePosition(clipNum * TimePos::ticksPerBar());
-	return clip;
+	return addClip(std::move(clip));
 }
 
 
@@ -340,7 +341,7 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 int Track::getClipNum( const Clip * clip )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfClips(); ++i )
-	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
+	const auto it = std::find_if(m_clips.begin(), m_clips.end(), [&](auto& x) { return x.get() == clip; });
 	if( it != m_clips.end() )
 	{
 /*		if( getClip( i ) == _clip )
@@ -353,8 +354,12 @@ int Track::getClipNum( const Clip * clip )
 	return 0;
 }
 
-
-
+std::vector<Clip*> Track::getClips() const
+{
+	auto clips = std::vector<Clip*>(m_clips.size());
+	std::transform(m_clips.begin(), m_clips.end(), clips.begin(), [](auto& x) { return x.get(); });
+	return clips;
+}
 
 /*! \brief Retrieve a list of clips that fall within a period.
  *
@@ -367,21 +372,22 @@ int Track::getClipNum( const Clip * clip )
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
-							const TimePos & end )
+std::vector<Clip*> Track::getClipsInRange(const TimePos& start, const TimePos& end)
 {
-	for( Clip* clip : m_clips )
+	auto clips = std::vector<Clip*>();
+
+	for (auto& clip : m_clips)
 	{
 		int s = clip->startPosition();
 		int e = clip->endPosition();
 		if( ( s <= end ) && ( e >= start ) )
 		{
-			// Clip is within given range
-			// Insert sorted by Clip's position
-			clipV.insert(std::upper_bound(clipV.begin(), clipV.end(), clip, Clip::comparePosition),
-						clip);
+			clips.push_back(clip.get());
 		}
 	}
+
+	std::sort(clips.begin(), clips.end(), Clip::comparePosition);
+	return clips;
 }
 
 

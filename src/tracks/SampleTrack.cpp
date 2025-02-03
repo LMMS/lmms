@@ -76,9 +76,9 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false; // will be return variable
 
-
-	clipVector clips;
+	auto clips = std::vector<Clip*>{};
 	class PatternTrack * pattern_track = nullptr;
+
 	if( _clip_num >= 0 )
 	{
 		if (_start > getClip(_clip_num)->length())
@@ -175,19 +175,9 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 	return new gui::SampleTrackView( this, tcv );
 }
 
-
-
-
-Clip * SampleTrack::createClip()
+std::unique_ptr<Clip> SampleTrack::createClip()
 {
-	return addClip<SampleClip>();
-}
-
-
-
-bool SampleTrack::canAddClip(Clip* clip)
-{
-	return dynamic_cast<SampleClip*>(clip) != nullptr;
+	return std::make_unique<SampleClip>();
 }
 
 void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)

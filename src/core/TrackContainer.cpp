@@ -273,7 +273,7 @@ AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int clipNum) c
 
 AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int clipNum)
 {
-	Track::clipVector clips;
+	auto clips = std::vector<Clip*>{};
 
 	for (Track* track: tracks)
 	{
@@ -287,7 +287,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		case Track::Type::HiddenAutomation:
 		case Track::Type::Pattern:
 			if (clipNum < 0) {
-				track->getClipsInRange(clips, 0, time);
+				clips = track->getClipsInRange(0, time);
 			} else {
 				Q_ASSERT(track->numOfClips() > clipNum);
 				clips.push_back(track->getClip(clipNum));

@@ -1279,7 +1279,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
 	// Create a clip where all notes will be added
-	auto newMidiClip = static_cast<MidiClip*>(track->createClip());
+	auto newMidiClip = static_cast<MidiClip*>(track->addClip(track->createClip()));
 
 	if (!newMidiClip)
 	{

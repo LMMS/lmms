@@ -706,8 +706,9 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 	const float frames_per_tick = Engine::framesPerTick();
 
-	clipVector clips;
+	auto clips = std::vector<Clip*>{};
 	class PatternTrack * pattern_track = nullptr;
+
 	if( _clip_num >= 0 )
 	{
 		Clip * clip = getClip( _clip_num );
@@ -717,11 +718,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 		}
 	}
-	else
-	{
-		getClipsInRange( clips, _start, _start + static_cast<int>(
-					_frames / frames_per_tick ) );
-	}
+	else { clips = getClipsInRange(_start, _start + static_cast<int>(_frames / frames_per_tick)); }
 
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
@@ -800,20 +797,10 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	return played_a_note;
 }
 
-
-
-
-Clip* InstrumentTrack::createClip()
+std::unique_ptr<Clip> InstrumentTrack::createClip()
 {
-	return addClip<MidiClip>();
+	return std::make_unique<MidiClip>();
 }
-
-
-bool InstrumentTrack::canAddClip(Clip* clip)
-{
-	return dynamic_cast<MidiClip*>(clip) != nullptr;
-}
-
 
 gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )
 {

@@ -982,7 +982,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 	// Add the sample clip to the track
 	Engine::audioEngine()->requestChangeInModel();
-	auto clip = static_cast<SampleClip*>(sampleTrack->createClip());
+	auto clip = static_cast<SampleClip*>(sampleTrack->addClip(sampleTrack->createClip()));
 	clip->setSampleFile(item->fullName());
 	Engine::audioEngine()->doneChangeInModel();
 	return true;
