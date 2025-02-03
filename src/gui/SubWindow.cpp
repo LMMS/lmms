@@ -37,6 +37,7 @@
 #include <QStyleOption>
 
 #include "embed.h"
+#include "QtHelpers.h"
 
 namespace lmms::gui
 {
@@ -398,6 +399,10 @@ void SubWindow::focusChanged( QMdiSubWindow *subWindow )
  */
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
+	if (widget()) {
+		setMinMaxFromChild(*this, *widget(), QSize(8, m_titleBarHeight + 6));
+	}
+
 	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
 	// In that case, we should call QMdiSubWindow::resizeEvent first
 	// to ensure we get the correct window state.
