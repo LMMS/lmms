@@ -94,7 +94,7 @@ private slots:
 		FloatModel model;
 
 		auto song = Engine::getSong();
-		auto track = song->addTrack<AutomationTrack>();
+		auto track = song->addNewTrack<AutomationTrack>();
 
 		auto c1 = static_cast<AutomationClip*>(track->addNewClip());
 		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
@@ -129,7 +129,7 @@ private slots:
 		FloatModel model;
 
 		auto song = Engine::getSong();
-		auto track = song->addTrack<AutomationTrack>();
+		auto track = song->addNewTrack<AutomationTrack>();
 		auto c = static_cast<AutomationClip*>(track->addNewClip());
 
 		c->setProgressionType(AutomationClip::ProgressionType::Linear);
@@ -154,7 +154,7 @@ private slots:
 		using namespace lmms;
 
 		auto song = Engine::getSong();
-		auto instrumentTrack = song->addTrack<InstrumentTrack>();
+		auto instrumentTrack = song->addNewTrack<InstrumentTrack>();
 		auto midiClip = static_cast<MidiClip*>(instrumentTrack->addNewClip());
 
 		midiClip->changeLength(TimePos(4, 0));
@@ -179,8 +179,8 @@ private slots:
 
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
-		auto patternTrack = song->addTrack<PatternTrack>();
-		auto automationTrack = patternStore->addTrack<AutomationTrack>();
+		auto patternTrack = song->addNewTrack<PatternTrack>();
+		auto automationTrack = patternStore->addNewTrack<AutomationTrack>();
 		automationTrack->createClipsForPattern(patternStore->numOfPatterns() - 1);
 
 		QVERIFY(automationTrack->numOfClips());
@@ -199,7 +199,7 @@ private slots:
 		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack->patternIndex())[&model], 1.0f);
 		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack->patternIndex())[&model], 1.0f);
 
-		auto patternTrack2 = song->addTrack<PatternTrack>();
+		auto patternTrack2 = song->addNewTrack<PatternTrack>();
 
 		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack->patternIndex())[&model], 0.5f);
 		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2->patternIndex()).size());
@@ -223,7 +223,7 @@ private slots:
 		auto globalTrack = song->globalAutomationTrack();
 		auto globalClip = static_cast<AutomationClip*>(globalTrack->addNewClip());
 
-		auto localTrack = song->addTrack<AutomationTrack>();
+		auto localTrack = song->addNewTrack<AutomationTrack>();
 		auto localClip = static_cast<AutomationClip*>(localTrack->addNewClip());
 
 		FloatModel model;

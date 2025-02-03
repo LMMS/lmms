@@ -183,18 +183,18 @@ Track* TrackContainer::createTrack(const QDomElement& element)
 	switch (trackType)
 	{
 	case Track::Type::Instrument:
-		track = addTrack<InstrumentTrack>();
+		track = addNewTrack<InstrumentTrack>();
 		break;
 	case Track::Type::Pattern:
-		track = addTrack<PatternTrack>();
+		track = addNewTrack<PatternTrack>();
 		break;
 	case Track::Type::Sample:
-		track = addTrack<SampleTrack>();
+		track = addNewTrack<SampleTrack>();
 		break;
 	case Track::Type::HiddenAutomation:
 		[[fallthrough]];
 	case Track::Type::Automation:
-		track = addTrack<AutomationTrack>();
+		track = addNewTrack<AutomationTrack>();
 		break;
 	default:
 		std::cerr << "TrackContainer::addTrack - unimplemented type\n";

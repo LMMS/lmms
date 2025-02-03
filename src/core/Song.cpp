@@ -808,7 +808,7 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	const auto patternTrack = addTrack<PatternTrack>();
+	const auto patternTrack = addNewTrack<PatternTrack>();
 	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
 
@@ -817,7 +817,7 @@ void Song::addPatternTrack()
 
 void Song::addSampleTrack()
 {
-	addTrack<SampleTrack>();
+	addNewTrack<SampleTrack>();
 }
 
 
@@ -825,7 +825,7 @@ void Song::addSampleTrack()
 
 void Song::addAutomationTrack()
 {
-	addTrack<AutomationTrack>();
+	addNewTrack<AutomationTrack>();
 }
 
 
@@ -958,15 +958,15 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	auto tripleOscTrack = addTrack<InstrumentTrack>();
+	auto tripleOscTrack = addNewTrack<InstrumentTrack>();
 	static_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
 
-	auto kickerTrack = Engine::patternStore()->addTrack<InstrumentTrack>();
+	auto kickerTrack = Engine::patternStore()->addNewTrack<InstrumentTrack>();
 	static_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
 
-	addTrack<SampleTrack>();
-	addTrack<PatternTrack>();
-	addTrack<AutomationTrack>();
+	addNewTrack<SampleTrack>();
+	addNewTrack<PatternTrack>();
+	addNewTrack<AutomationTrack>();
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();

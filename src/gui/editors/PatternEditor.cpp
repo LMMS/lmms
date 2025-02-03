@@ -87,7 +87,7 @@ void PatternEditor::removeSteps()
 
 void PatternEditor::addSampleTrack()
 {
-	model()->addTrack<SampleTrack>();
+	model()->addNewTrack<SampleTrack>();
 }
 
 
@@ -95,7 +95,7 @@ void PatternEditor::addSampleTrack()
 
 void PatternEditor::addAutomationTrack()
 {
-	model()->addTrack<AutomationTrack>();
+	model()->addNewTrack<AutomationTrack>();
 }
 
 

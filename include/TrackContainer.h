@@ -71,7 +71,7 @@ public:
 	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
 	template<typename T, typename... Args>
-	T* addTrack(Args&&... args)
+	T* addNewTrack(Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Track, T>, "T must be a kind of Track");
 
