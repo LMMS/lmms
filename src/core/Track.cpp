@@ -260,7 +260,10 @@ void Track::removeClip( Clip * clip )
 
 	if( it != m_clips.end() )
 	{
-		m_clips.erase( it );
+		const auto ptr = it->release();
+		m_clips.erase(it);
+		it->get_deleter()(ptr);
+
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();

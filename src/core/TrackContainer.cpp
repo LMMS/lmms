@@ -220,7 +220,11 @@ void TrackContainer::removeTrack( Track * _track )
 		if (_track->isSolo()) {
 			_track->setSolo(false);
 		}
+
+		const auto ptr = it->release();
 		m_tracks.erase(it);
+		it->get_deleter()(ptr);
+
 		lockTracksAccess.unlock();
 
 		if( Engine::getSong() )
