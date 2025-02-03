@@ -168,8 +168,6 @@ Track* TrackContainer::addTrack(std::unique_ptr<Track> track)
 {
 	m_tracks.emplace_back(std::move(track));
 	m_tracks.back().get()->setTrackContainer(this);
-	updateAfterTrackAdd(m_tracks.back().get());
-
 	emit trackAdded(m_tracks.back().get());
 	return m_tracks.back().get();
 }
@@ -227,16 +225,6 @@ void TrackContainer::removeTrack( Track * _track )
 		}
 	}
 }
-
-
-
-
-void TrackContainer::updateAfterTrackAdd(Track* track)
-{
-}
-
-
-
 
 void TrackContainer::clearAllTracks()
 {

@@ -78,10 +78,8 @@ public:
 	}
 
 	Track* addNewTrack(const QDomElement& element);
-	Track* addTrack(std::unique_ptr<Track> track);
-	void removeTrack( Track * _track );
-
-	virtual void updateAfterTrackAdd(Track* track);
+	virtual Track* addTrack(std::unique_ptr<Track> track);
+	virtual void removeTrack(Track* track);
 
 	void clearAllTracks();
 
