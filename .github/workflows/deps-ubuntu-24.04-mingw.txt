@@ -1,4 +1,5 @@
 binutils-mingw-w64
+ccache
 cmake
 fftw-mingw-w64
 file
