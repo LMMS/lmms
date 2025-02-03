@@ -25,6 +25,7 @@
 
 #include <system_error>
 #include <utility>
+#include <random>
 
 #include "lmmsconfig.h"
 #include "RaiiHelpers.h"
@@ -194,6 +195,29 @@ private:
 
 #endif
 
+namespace {
+
+std::string createKey()
+{
+	// Max length (minus prepended '/') on macOS (PSHMNAMLEN=31)
+	constexpr int length = 30;
+
+	std::string key;
+	std::random_device rd;
+	auto gen = std::mt19937{rd()}; // mersenne twister, seeded
+	auto distrib = std::uniform_int_distribution{0, 15}; // hex range (0-15)
+
+	key.reserve(length);
+	for (int i = 0; i < length; i++)
+	{
+		key += "0123456789ABCDEF"[distrib(gen)];
+	}
+
+	return key;
+}
+
+} // namespace
+
 SharedMemoryData::SharedMemoryData() noexcept = default;
 
 SharedMemoryData::SharedMemoryData(std::string&& key, bool readOnly) :
@@ -204,6 +228,12 @@ SharedMemoryData::SharedMemoryData(std::string&& key, bool readOnly) :
 
 SharedMemoryData::SharedMemoryData(std::string&& key, std::size_t size, bool readOnly) :
 	m_key{std::move(key)},
+	m_impl{std::make_unique<SharedMemoryImpl>(m_key, std::max(size, std::size_t{1}), readOnly)},
+	m_ptr{m_impl->get()}
+{ }
+
+SharedMemoryData::SharedMemoryData(std::size_t size, bool readOnly) :
+	m_key{createKey()},
 	m_impl{std::make_unique<SharedMemoryImpl>(m_key, std::max(size, std::size_t{1}), readOnly)},
 	m_ptr{m_impl->get()}
 { }

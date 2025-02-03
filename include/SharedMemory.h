@@ -25,10 +25,7 @@
 #ifndef LMMS_SHARED_MEMORY_H
 #define LMMS_SHARED_MEMORY_H
 
-#include "lmmsconfig.h"
-
 #include <memory>
-#include <random>
 #include <string>
 #include <type_traits>
 
@@ -47,6 +44,7 @@ public:
 	SharedMemoryData() noexcept;
 	SharedMemoryData(std::string&& key, bool readOnly);
 	SharedMemoryData(std::string&& key, std::size_t size, bool readOnly);
+	SharedMemoryData(std::size_t size, bool readOnly);
 	~SharedMemoryData();
 
 	SharedMemoryData(SharedMemoryData&& other) noexcept;
@@ -74,25 +72,6 @@ private:
 	void* m_ptr = nullptr;
 };
 
-	static inline std::string createKey() {
-#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_FREEBSD) || defined(LMMS_BUILD_OPENBSD)
-		constexpr int length = 30; // PSHMNAMLEN=31
-#else
-		constexpr int length = 32; // mimic UUID
-#endif
-		std::string key;
-		std::random_device rd;
-		std::mt19937 gen(rd()); // mersenne twister, seeded
-		std::uniform_int_distribution<> distrib(0, 15); // hex range (0-15)
-
-		key.reserve(length);
-		for (int i = 0; i < length; i++) {
-			key += "0123456789ABCDEF"[distrib(gen)];
-		}
-
-		return key;
-	}
-
 } // namespace detail
 
 
@@ -112,14 +91,14 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>};
 	}
 
-	void create()
-	{
-		create(detail::createKey());
-	}
-
 	void create(std::string key)
 	{
 		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>};
+	}
+
+	void create()
+	{
+		m_data = detail::SharedMemoryData{sizeof(T), std::is_const_v<T>};
 	}
 
 	void detach() noexcept
@@ -154,15 +133,14 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>};
 	}
 
-	void create(std::size_t size)
-	{
-		create(detail::createKey(), size);
-	}
-
-
 	void create(std::string key, std::size_t size)
 	{
 		m_data = detail::SharedMemoryData{std::move(key), size * sizeof(T), std::is_const_v<T>};
+	}
+
+	void create(std::size_t size)
+	{
+		m_data = detail::SharedMemoryData{size * sizeof(T), std::is_const_v<T>};
 	}
 
 	void detach() noexcept
