@@ -7,13 +7,13 @@ concurrency:
 jobs:
   linux-x86_64:
     name: linux-x86_64
-    runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.gcc:20.04
+    runs-on: ubuntu-22.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
+        -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -25,6 +25,20 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Configure winehq
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo mkdir -pm755 /etc/apt/keyrings
+          wget -O - https://dl.winehq.org/wine-builds/winehq.key | \
+          sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
+          sudo wget -NP /etc/apt/sources.list.d/ \
+          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
+      - name: Install packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+          $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
