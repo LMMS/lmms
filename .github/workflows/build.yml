@@ -231,7 +231,6 @@ jobs:
   mingw:
     name: mingw64
     runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
         -Werror=dev
@@ -242,12 +241,12 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Enable POSIX MinGW
+      - name: Configure apt
         run: |
-          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
-          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
-          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          sudo add-apt-repository ppa:tobydox/mingw-w64
+          sudo sed -i -e "s/$(lsb_release -cs)/focal/g" \
+          /etc/apt/sources.list.d/tobydox-ubuntu-mingw-w64-$(lsb_release -cs).sources
+          sudo apt-get update -y
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -264,6 +263,10 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
           ccache --zero-stats
