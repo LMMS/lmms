@@ -29,7 +29,6 @@
 
 #include <memory>
 #include <random>
-#include <sstream>
 #include <string>
 #include <type_traits>
 
@@ -86,10 +85,9 @@ private:
 		std::mt19937 gen(rd()); // mersenne twister, seeded
 		std::uniform_int_distribution<> distrib(0, 15); // hex range (0-15)
 
+		key.reserve(length);
 		for (int i = 0; i < length; i++) {
-			std::stringstream ss;
-			ss << std::hex << distrib(gen);
-			key += ss.str();
+			key += "0123456789ABCDEF"[distrib(gen)];
 		}
 
 		return key;
