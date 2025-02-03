@@ -129,7 +129,7 @@ ClipView::ClipView( Clip * clip,
 	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
-	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
+	connect(m_clip, &QObject::destroyed, this, &ClipView::close);
 	setModel( m_clip );
 	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
 

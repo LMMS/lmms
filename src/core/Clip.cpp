@@ -49,22 +49,6 @@ Clip::Clip() :
 	setJournalling( true );
 }
 
-
-
-
-/*! \brief Destroy a Clip
- *
- *  Destroys the given clip.
- *
- */
-Clip::~Clip()
-{
-	emit destroyedClip();
-}
-
-
-
-
 /*! \brief Move this Clip's position in time
  *
  *  If the clip has moved, update its position.  We
