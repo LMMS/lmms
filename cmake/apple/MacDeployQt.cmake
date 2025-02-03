@@ -107,8 +107,8 @@ file(GLOB LIBS "${APP}/Contents/lib/${lmms}/*.so")
 # Inform macdeployqt about LADSPA plugins; may depend on bundled fftw3f, etc.
 file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
 
-# Inform linuxdeploy about remote plugins
-list(APPEND REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
+# Inform macdeployqt about remote plugins
+file(GLOB REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
 
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
