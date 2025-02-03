@@ -121,6 +121,7 @@ public:
 	}
 
 	auto get() const noexcept -> void* { return m_mapping; }
+	auto size_bytes() const noexcept -> std::size_t { return m_size; }
 
 private:
 	std::string m_key;
@@ -164,9 +165,18 @@ public:
 
 		m_view.reset(MapViewOfFile(m_mapping.get(), access, 0, 0, 0));
 		if (!m_view) { throwLastError("SharedMemoryImpl: MapViewOfFile() failed"); }
+
+		MEMORY_BASIC_INFORMATION mbi;
+		if (VirtualQuery(m_view.get(), &mbi, sizeof(mbi)) == 0)
+		{
+			throwLastError("SharedMemoryImpl: VirtualQuery() failed");
+		}
+
+		m_size = static_cast<std::size_t>(mbi.RegionSize);
 	}
 
-	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly)
+	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly) :
+		m_size{size}
 	{
 		const auto [high, low] = sizeToHighAndLow(size);
 		m_mapping.reset(CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, high, low, key.c_str()));
@@ -187,17 +197,19 @@ public:
 	auto operator=(const SharedMemoryImpl&) -> SharedMemoryImpl& = delete;
 
 	auto get() const noexcept -> void* { return m_view.get(); }
+	auto size_bytes() const noexcept -> std::size_t { return m_size; }
 
 private:
 	UniqueHandle m_mapping;
 	FileView m_view;
+	std::size_t m_size = 0;
 };
 
 #endif
 
 namespace {
 
-std::string createKey()
+auto createKey() -> std::string
 {
 	// Max length (minus prepended '/') on macOS (PSHMNAMLEN=31)
 	constexpr int length = 30;
@@ -233,9 +245,7 @@ SharedMemoryData::SharedMemoryData(std::string&& key, std::size_t size, bool rea
 { }
 
 SharedMemoryData::SharedMemoryData(std::size_t size, bool readOnly) :
-	m_key{createKey()},
-	m_impl{std::make_unique<SharedMemoryImpl>(m_key, std::max(size, std::size_t{1}), readOnly)},
-	m_ptr{m_impl->get()}
+	SharedMemoryData{createKey(), size, readOnly}
 { }
 
 SharedMemoryData::~SharedMemoryData() = default;
@@ -245,5 +255,10 @@ SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_impl{std::move(other.m_impl)},
 	m_ptr{std::exchange(other.m_ptr, nullptr)}
 { }
+
+auto SharedMemoryData::size_bytes() const noexcept -> std::size_t
+{
+	return m_impl ? m_impl->size_bytes() : 0;
+}
 
 } // namespace lmms::detail
