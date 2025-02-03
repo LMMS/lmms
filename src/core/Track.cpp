@@ -253,18 +253,13 @@ void Track::loadSettings(const QDomElement& element)
 	loadTrack(element, false);
 }
 
-Clip* Track::addClip(std::unique_ptr<Clip> clip)
+Clip* Track::addNewClip()
 {
-	m_clips.emplace_back(std::move(clip));
+	m_clips.emplace_back(createClip());
 	m_clips.back()->setTrack(this);
 	m_clips.back()->onAddedToTrack(this);
 	emit clipAdded(m_clips.back().get());
 	return m_clips.back().get();
-}
-
-Clip* Track::addNewClip()
-{
-	return addClip(createClip());
 }
 
 /*! \brief Remove a given Clip from this track

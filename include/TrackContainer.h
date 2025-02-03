@@ -73,13 +73,8 @@ public:
 	T* addNewTrack(Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Track, T>, "T must be a kind of Track");
-
-		const auto guard = Engine::audioEngine()->requestChangesGuard();
 		auto track = std::make_unique<T>(std::forward<Args>(args)...);
-
-		const auto addedTrack = addTrack(std::move(track));
-		emit trackAdded(addedTrack);
-		return static_cast<T*>(addedTrack);
+		return static_cast<T*>(addTrack(std::move(track)));
 	}
 
 	Track* createTrack(const QDomElement& element);
