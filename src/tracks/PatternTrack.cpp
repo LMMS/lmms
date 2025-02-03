@@ -71,10 +71,8 @@ PatternTrack::~PatternTrack()
 			--it.value();
 		}
 	}
-	s_infoMap.remove( this );
 
-	// remove us from the Song and update the pattern selection combobox to reflect the change
-	trackContainer()->removeTrack( this );
+	s_infoMap.remove( this );
 	Engine::patternStore()->updateComboBox();
 }
 

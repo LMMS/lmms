@@ -113,7 +113,9 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 
 int PatternStore::numOfPatterns() const
 {
-	return Engine::getSong()->countTracks(Track::Type::Pattern);
+	const auto allTracks = tracks();
+	const auto fn = [&](const auto& track) { return track->type() == Track::Type::Pattern; };
+	return std::count_if(allTracks.begin(), allTracks.end(), fn);
 }
 
 

@@ -576,7 +576,6 @@ void Song::updateLength()
 	if (m_loadingProject) { return; }
 
 	m_length = 0;
-	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
 	{
 		if (m_exporting && track->isMuted())
@@ -590,7 +589,6 @@ void Song::updateLength()
 			m_length = cur;
 		}
 	}
-	m_tracksMutex.unlock();
 
 	emit lengthChanged( m_length );
 }
@@ -778,14 +776,12 @@ void Song::stopExport()
 
 void Song::insertBar()
 {
-	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
 		// FIXME journal batch of tracks instead of each track individually
 		if (track->numOfClips() > 0) { track->addJournalCheckPoint(); }
 		track->insertBar(getPlayPos(PlayMode::Song));
 	}
-	m_tracksMutex.unlock();
 }
 
 
@@ -793,14 +789,12 @@ void Song::insertBar()
 
 void Song::removeBar()
 {
-	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
 		// FIXME journal batch of tracks instead of each track individually
 		if (track->numOfClips() > 0) { track->addJournalCheckPoint(); }
 		track->removeBar(getPlayPos(PlayMode::Song));
 	}
-	m_tracksMutex.unlock();
 }
 
 

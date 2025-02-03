@@ -52,7 +52,6 @@ namespace lmms
 TrackContainer::TrackContainer() :
 	Model( nullptr ),
 	JournallingObject(),
-	m_tracksMutex(),
 	m_tracks()
 {
 }
@@ -62,13 +61,10 @@ void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setTagName( classNodeName() );
 	_this.setAttribute( "type", nodeName() );
 
-	// save settings of each track
-	m_tracksMutex.lockForRead();
 	for (const auto& track : m_tracks)
 	{
 		track->saveState(_doc, _this);
 	}
-	m_tracksMutex.unlock();
 }
 
 
@@ -146,24 +142,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	}
 }
 
-
-
-
-int TrackContainer::countTracks( Track::Type _tt ) const
-{
-	int cnt = 0;
-	m_tracksMutex.lockForRead();
-	for (const auto& track : m_tracks)
-	{
-		if (track->type() == _tt || _tt == Track::Type::Count)
-		{
-			++cnt;
-		}
-	}
-	m_tracksMutex.unlock();
-	return( cnt );
-}
-
 Track* TrackContainer::addTrack(std::unique_ptr<Track> track)
 {
 	m_tracks.emplace_back(std::move(track));
@@ -208,11 +186,6 @@ Track* TrackContainer::addNewTrack(const QDomElement& element)
 
 void TrackContainer::removeTrack( Track * _track )
 {
-	// need a read locker to ensure that m_tracks doesn't change after reading index.
-	//   After checking that index != -1, we need to upgrade the lock to a write locker before changing m_tracks.
-	//   But since Qt offers no function to promote a read lock to a write lock, we must start with the write locker.
-	QWriteLocker lockTracksAccess(&m_tracksMutex);
-
 	const auto it = std::find_if(m_tracks.begin(), m_tracks.end(), [&](auto& x) { return x.get() == _track; });
 	if (it != m_tracks.end())
 	{
@@ -224,8 +197,6 @@ void TrackContainer::removeTrack( Track * _track )
 		const auto ptr = it->release();
 		m_tracks.erase(it);
 		it->get_deleter()(ptr);
-
-		lockTracksAccess.unlock();
 
 		if( Engine::getSong() )
 		{

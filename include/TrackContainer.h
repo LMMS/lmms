@@ -67,8 +67,6 @@ public:
 
 	void loadSettings( const QDomElement & _this ) override;
 
-	int countTracks( Track::Type _tt = Track::Type::Count ) const;
-
 	template<typename T, typename... Args>
 	T* addNewTrack(Args&&... args)
 	{
@@ -108,8 +106,6 @@ signals:
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
-
-	mutable QReadWriteLock m_tracksMutex;
 
 private:
 	std::vector<std::unique_ptr<Track>> m_tracks;
