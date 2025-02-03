@@ -71,6 +71,10 @@ public:
 	int titleBarHeight() const;
 	int frameWidth() const;
 
+	// TODO Needed to update the title bar when replacing instruments.
+	// Update works automatically if QMdiSubWindows are used.
+	void updateTitleBar();
+
 public slots:
 	void detach();
 	void attach();

@@ -179,6 +179,7 @@ lmms--gui--PianoRoll {
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
 	qproperty-stepNoteColor: #9b1313;
+	qproperty-currentStepNoteColor: rgb(245, 3, 139);
 	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
@@ -835,6 +836,21 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-radius: 2px;
 }
 
+/* Instrument */
+
+/* Envelope graph */
+lmms--gui--EnvelopeGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+	qproperty-markerFillColor: rgb(153, 175, 255);
+	qproperty-markerOutlineColor: rgb(0, 0, 0);
+}
+
+/* LFO graph */
+lmms--gui--LfoGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+}
 
 /* Plugins */
 
@@ -1059,6 +1075,12 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
+}
+
+lmms--gui--VectorView {
+	qproperty-colorTrace: rgba(60, 255, 130, 255);
+	qproperty-colorGrid: rgba(76, 80, 84, 128);
+	qproperty-colorLabels: rgba(76, 80, 84, 255);
 }
 
 lmms--gui--BarModelEditor {

@@ -34,6 +34,7 @@
 class QLabel;
 class QLineEdit;
 class QWidget;
+class QMdiSubWindow;
 
 namespace lmms
 {
@@ -133,6 +134,9 @@ private:
 	//! adjust size of any child widget of the main tab
 	//! required to keep the old look when using a variable sized tab widget
 	void adjustTabSize(QWidget *w);
+
+	QMdiSubWindow* findSubWindowInParents();
+	void updateSubWindow();
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;

@@ -21,4 +21,10 @@ else
    echo "Jack does not appear to be installed.  That's OK, we'll use a dummy version instead." >&2
    export LD_LIBRARY_PATH=$DIR/usr/lib/lmms/optional:$LD_LIBRARY_PATH
 fi
-QT_X11_NO_NATIVE_MENUBAR=1 "$DIR"/usr/bin/lmms.real "$@"
+
+# FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
+export LMMS_PLUGIN_DIR="$DIR/usr/lib/"
+export LADSPA_PATH="$DIR/usr/lib/"
+export SUIL_MODULE_DIR="$DIR/usr/lib/"
+
+QT_X11_NO_NATIVE_MENUBAR=1 "$DIR"/usr/bin/lmms "$@"

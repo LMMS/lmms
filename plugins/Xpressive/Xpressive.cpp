@@ -252,14 +252,14 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		const int guass_size = (int)(smoothness * 5) | 1;
 		const int guass_center = guass_size/2;
 		const float delta = smoothness;
-		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
+		const float a = 1.0f / (std::sqrt(numbers::tau_v<float>) * delta);
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;
 		for (int i = 0; i < guass_size; i++)
 		{
 			temp = (i - guass_center) / delta;
-			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
+			sum += guassian[i] = a * std::exp(-0.5f * temp * temp);
 		}
 		for (int i = 0; i < guass_size; i++)
 		{

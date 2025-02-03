@@ -44,7 +44,7 @@ TextFloat::TextFloat() :
 }
 
 TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap & pixmap) :
-	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
+	QWidget(getGUI()->mainWindow(), Qt::Tool | Qt::FramelessWindowHint)
 {
 	QHBoxLayout * mainLayout = new QHBoxLayout();
 	setLayout(mainLayout);
