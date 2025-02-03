@@ -168,7 +168,7 @@ void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				float currentLength = n->m_fadeInLength * (1.0f - (float) f / frames) + new_length * ((float) f / frames);
-				buf[f][ch] *= 0.5 - 0.5 * std::cosf(numbers::pi_v<float> * (float) (total + f) / currentLength);
+				buf[f][ch] *= 0.5 - 0.5 * std::cos(numbers::pi_v<float> * (float) (total + f) / currentLength);
 				if (total + f >= currentLength)
 				{
 					n->m_fadeInLength = currentLength;
