@@ -220,7 +220,7 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 			&& node.nodeName() != "solo"
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
-				auto clip = createClip();
+				auto clip = addClip(createClip());
 				clip->restoreState(node.toElement());
 			}
 		}
@@ -325,9 +325,9 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 	printf( "called Track::getClip( %zu ), "
 			"but Clip %zu doesn't exist\n", clipNum, clipNum );
 
-	auto clip = createClip();
+	auto clip = addClip(createClip());
 	clip->movePosition(clipNum * TimePos::ticksPerBar());
-	return addClip(std::move(clip));
+	return clip;
 }
 
 
@@ -420,7 +420,7 @@ void Track::createClipsForPattern(int pattern)
 	{
 		TimePos position = TimePos( numOfClips(), 0 );
 
-		auto clip = createClip();
+		auto clip = addClip(createClip());
 		clip->movePosition(position);
 		clip->changeLength(TimePos(1, 0));
 	}
