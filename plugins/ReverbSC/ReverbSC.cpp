@@ -26,7 +26,8 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-#define DB2LIN(X) pow(10, X / 20.0f);
+// [TODO] Convert macro to constexpr function in ReverbSC.h
+#define DB2LIN(X) std::pow(10, (X) / 20.0f)
 
 namespace lmms
 {
