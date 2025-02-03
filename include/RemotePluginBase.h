@@ -71,7 +71,6 @@
 #include <QProcess>
 #include <QThread>
 #include <QString>
-#include <QUuid>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
