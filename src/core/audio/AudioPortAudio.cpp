@@ -128,8 +128,8 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 			}
 			else
 			{
-				outputBuffer[frame * channels()] = m_outBuf[frame][0];
-				outputBuffer[frame * channels() + 1] = m_outBuf[frame][1];
+				outputBuffer[frame * channels()] = m_outBuf[m_outBufPos + frame][0];
+				outputBuffer[frame * channels() + 1] = m_outBuf[m_outBufPos + frame][1];
 			}
 		}
 
