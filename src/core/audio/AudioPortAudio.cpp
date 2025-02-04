@@ -76,6 +76,9 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, engine->baseSampleRate(), engine->framesPerPeriod(), paNoFlag,
 		processCallback, this);
 
+	setSampleRate(engine->baseSampleRate());
+	setChannels(outputParameters.channelCount);
+
 	if (err != paNoError)
 	{
 		std::cerr << "Could not open PortAudio: " << Pa_GetErrorText(err) << '\n';
@@ -83,8 +86,6 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		return;
 	}
 
-	setSampleRate(engine->baseSampleRate());
-	setChannels(outputParameters.channelCount);
 	successful = true;
 }
 
