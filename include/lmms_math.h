@@ -51,7 +51,7 @@ namespace lmms
  * If `n` is a power of 2, it may be better to use the bitwise hack
  * `k & (n - 1)` instead.
  */
-constexpr inline int ediv(int k, int n)
+constexpr int ediv(int k, int n)
 {
 	return (k %= n) < 0 ? k + n : k;
 }
