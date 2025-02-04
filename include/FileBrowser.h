@@ -75,19 +75,6 @@ public:
 
 	~FileBrowser() override = default;
 
-	static QStringList excludedPaths()
-	{
-		static auto s_excludedPaths = QStringList{
-#ifdef LMMS_BUILD_LINUX
-			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
-			"/sys"
-#endif
-#ifdef LMMS_BUILD_WIN32
-			"C:\\Windows"
-#endif
-		};
-		return s_excludedPaths;
-	}
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
