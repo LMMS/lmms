@@ -26,6 +26,7 @@
 #include "SaProcessor.h"
 
 #include <algorithm>
+#include "lmms_math.h"
 #ifdef SA_DEBUG
 	#include <chrono>
 #endif
@@ -597,7 +598,7 @@ float SaProcessor::xPixelToFreq(float x, unsigned int width) const
 		float min = std::log10(getFreqRangeMin());
 		float max = std::log10(getFreqRangeMax());
 		float range = max - min;
-		return std::pow(10, min + x / width * range);
+		return fastPow10f(min + x / width * range);
 	}
 	else
 	{
@@ -662,8 +663,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	else
 	{
 		// linear scale: convert returned ranges from dB to linear scale
-		float max = std::pow(10, getAmpRangeMax() / 10);
-		float range = std::pow(10, getAmpRangeMin() / 10) - max;
+		float max = fastPow10f(getAmpRangeMax() / 10);
+		float range = fastPow10f(getAmpRangeMin() / 10) - max;
 		return (amplitude - max) / range * height;
 	}
 }
@@ -683,8 +684,8 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	else
 	{
 		// linear scale: convert returned ranges from dB to linear scale
-		float max = std::pow(10, getAmpRangeMax() / 10);
-		float range = std::pow(10, getAmpRangeMin() / 10) - max;
+		float max = fastPow10f(getAmpRangeMax() / 10);
+		float range = fastPow10f(getAmpRangeMin() / 10) - max;
 		return max + range * (y / height);
 	}
 }

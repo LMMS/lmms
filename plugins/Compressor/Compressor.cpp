@@ -528,22 +528,6 @@ void CompressorEffect::processBypassedImpl()
 	}
 }
 
-// [TODO] Move to lmms_math.h?
-// Regular modulo doesn't handle negative numbers correctly.  This does.
-inline int CompressorEffect::realmod(int k, int n)
-{
-	return (k %= n) < 0 ? k+n : k;
-}
-
-// [TODO] Move to lmms_math.h?
-// Regular fmod doesn't handle negative numbers correctly.  This does.
-inline float CompressorEffect::realfmod(float k, float n)
-{
-	return (k = std::fmod(k, n)) < 0 ? k + n : k;
-}
-
-
-
 inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum)
 {
 	m_tiltOut[filtNum] = m_a0 * inputSample + m_b1 * m_tiltOut[filtNum];

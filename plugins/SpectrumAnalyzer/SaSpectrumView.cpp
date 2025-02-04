@@ -38,6 +38,7 @@
 #include "MainWindow.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
+#include "lmms_math.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
@@ -729,11 +730,11 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 	// to the sizeHint() (denser scale for bigger window).
 	if ((high - low) < 20 * ((float)height() / sizeHint().height()))
 	{
-		increment = std::pow(10, 0.3);	// 3 dB steps when really zoomed in
+		increment = fastPow10f(0.3); // 3 dB steps when really zoomed in
 	}
 	else if (high - low < 45 * ((float)height() / sizeHint().height()))
 	{
-		increment = std::pow(10, 0.6);	// 6 dB steps when sufficiently zoomed in
+		increment = fastPow10f(0.6); // 6 dB steps when sufficiently zoomed in
 	}
 	else
 	{
@@ -766,8 +767,8 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLinearAmpTics(int
 	float split = (float)height() / sizeHint().height() >= 1.5 ? 10.0 : 5.0;
 
 	// convert limits to linear scale
-	float lin_low = std::pow(10, low / 10.0);
-	float lin_high = std::pow(10, high / 10.0);
+	float lin_low = fastPow10f(low / 10.0);
+	float lin_high = fastPow10f(high / 10.0);
 
 	// Linear scale will vary widely, so instead of trying to craft extra nice
 	// multiples, just generate a few evenly spaced increments across the range,

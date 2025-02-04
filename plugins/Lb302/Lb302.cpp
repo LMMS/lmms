@@ -563,7 +563,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 				break;
 
 			case VcoShape::RoundSquare: // p0: width of round
-				vco_k = vco_c < 0.f ? std::sqrt(1.f - (vco_c * vco_c * 4.f)) - 0.5f : -0.5f;
+				vco_k = (vco_c < 0.f) ? (std::sqrt(1.f - (vco_c * vco_c * 4.f)) - 0.5f) : -0.5f;
 				break;
 
 			case VcoShape::Moog: // Maybe the fall should be exponential/sinsoidal instead of quadric.

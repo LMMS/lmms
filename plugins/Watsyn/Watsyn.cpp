@@ -596,32 +596,32 @@ void WatsynInstrument::updateVolumes()
 void WatsynInstrument::updateFreqA1()
 {
 	// calculate frequencies
-	m_lfreq[A1_OSC] = (a1_mult.value() / 8) * std::pow(2, a1_ltune.value() / 1200);
-	m_rfreq[A1_OSC] = (a1_mult.value() / 8) * std::pow(2, a1_rtune.value() / 1200);
+	m_lfreq[A1_OSC] = (a1_mult.value() / 8) * std::exp2(a1_ltune.value() / 1200);
+	m_rfreq[A1_OSC] = (a1_mult.value() / 8) * std::exp2(a1_rtune.value() / 1200);
 }
 
 
 void WatsynInstrument::updateFreqA2()
 {
 	// calculate frequencies
-	m_lfreq[A2_OSC] = (a2_mult.value() / 8) * std::pow(2, a2_ltune.value() / 1200);
-	m_rfreq[A2_OSC] = (a2_mult.value() / 8) * std::pow(2, a2_rtune.value() / 1200);
+	m_lfreq[A2_OSC] = (a2_mult.value() / 8) * std::exp2(a2_ltune.value() / 1200);
+	m_rfreq[A2_OSC] = (a2_mult.value() / 8) * std::exp2(a2_rtune.value() / 1200);
 }
 
 
 void WatsynInstrument::updateFreqB1()
 {
 	// calculate frequencies
-	m_lfreq[B1_OSC] = (b1_mult.value() / 8) * std::pow(2, b1_ltune.value() / 1200);
-	m_rfreq[B1_OSC] = (b1_mult.value() / 8) * std::pow(2, b1_rtune.value() / 1200);
+	m_lfreq[B1_OSC] = (b1_mult.value() / 8) * std::exp2(b1_ltune.value() / 1200);
+	m_rfreq[B1_OSC] = (b1_mult.value() / 8) * std::exp2(b1_rtune.value() / 1200);
 }
 
 
 void WatsynInstrument::updateFreqB2()
 {
 	// calculate frequencies
-	m_lfreq[B2_OSC] = (b2_mult.value() / 8) * std::pow(2, b2_ltune.value() / 1200);
-	m_rfreq[B2_OSC] = (b2_mult.value() / 8) * std::pow(2, b2_rtune.value() / 1200);	
+	m_lfreq[B2_OSC] = (b2_mult.value() / 8) * std::exp2(b2_ltune.value() / 1200);
+	m_rfreq[B2_OSC] = (b2_mult.value() / 8) * std::exp2(b2_rtune.value() / 1200);	
 }
 
 

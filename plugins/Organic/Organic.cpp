@@ -602,12 +602,12 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuning()
 {
-	m_detuningLeft = std::pow(2.0f, OrganicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())]
-				+ (float)m_detuneModel.value() * CENT)
-				/ Engine::audioEngine()->outputSampleRate();
-	m_detuningRight = std::pow(2.0f, OrganicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())]
-				- (float)m_detuneModel.value() * CENT)
-				/ Engine::audioEngine()->outputSampleRate();
+	m_detuningLeft = std::exp2(OrganicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())]
+		+ m_detuneModel.value() * CENT)
+		/ Engine::audioEngine()->outputSampleRate();
+	m_detuningRight = std::exp2(OrganicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())]
+		- m_detuneModel.value() * CENT)
+		/ Engine::audioEngine()->outputSampleRate();
 }
 
 

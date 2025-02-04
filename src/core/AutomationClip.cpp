@@ -647,8 +647,8 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 		float m1 = OUTTAN(v) * numValues * m_tension;
 		float m2 = INTAN(v + 1) * numValues * m_tension;
 
-		auto t2 = std::pow(t, 2);
-		auto t3 = std::pow(t, 3);
+		auto t2 = t * t;
+		auto t3 = t * t * t;
 		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v)
 			+ (t3 - 2 * t2 + t) * m1
 			+ (-2 * t3 + 3 * t2) * INVAL(v + 1)

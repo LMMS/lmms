@@ -272,7 +272,7 @@ public:
 		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
-		float A = std::pow(10, m_gain * 0.025);
+		float A = fastPow10f(m_gain * 0.025);
 		float alpha = s * std::sinh(std::log(2.f) / 2 * m_bw * w0 / std::sin(w0));
 
 		//calc coefficents
@@ -335,7 +335,7 @@ public :
 		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
-		float A = std::pow(10, m_gain * 0.025);
+		float A = fastPow10f(m_gain * 0.025);
 		// float alpha = s / (2 * m_res);
 		float beta = std::sqrt(A) / m_res;
 
@@ -372,7 +372,7 @@ public :
 		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
-		float A = std::pow(10, m_gain * 0.025);
+		float A = fastPow10f(m_gain * 0.025);
 		float beta = std::sqrt(A) / m_res;
 
 		//calc coefficents

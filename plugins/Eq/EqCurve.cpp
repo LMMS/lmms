@@ -82,7 +82,7 @@ float EqHandle::xPixelToFreq( float x , int w )
 	float min = std::log10(20);
 	float max = std::log10(20000);
 	float range = max - min;
-	return std::pow(10 , x * (range / w) + min);
+	return fastPow10f(x * (range / w) + min);
 }
 
 
@@ -205,7 +205,7 @@ float EqHandle::getPeakCurve( float x )
 	double c = std::cos(w0);
 	double s = std::sin(w0);
 	double Q = getResonance();
-	double A = std::pow(10, yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
+	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
 	double alpha = s * std::sinh(std::log(2.0) / 2 * Q * w0 / std::sin(w0));
 
 	//calc coefficents
@@ -240,7 +240,7 @@ float EqHandle::getHighShelfCurve( float x )
 	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
-	double A = std::pow(10, yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) * 0.025);
+	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) * 0.025);
 	double beta = std::sqrt(A) / m_resonance;
 
 	//calc coefficents
@@ -275,7 +275,7 @@ float EqHandle::getLowShelfCurve( float x )
 	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
-	double A = std::pow(10, yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
+	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
 	double beta = std::sqrt(A) / m_resonance;
 
 	//calc coefficents
@@ -525,8 +525,10 @@ double EqHandle::calculateGain(const double freq, const double a1, const double 
 	const double w = std::sin(numbers::pi * freq / Engine::audioEngine()->outputSampleRate());
 	const double PHI = w * w * 4;
 
-	double gain = 10 * std::log10(std::pow(b0 + b1 + b2 , 2) + (b0 * b2 * PHI - (b1 * (b0 + b2) + 4 * b0 * b2)) * PHI)
-		- 10 * std::log10(std::pow(1 + a1 + a2, 2) + (1 * a2 * PHI - (a1 * (1 + a2) + 4 * 1 * a2)) * PHI);
+	auto bb = b0 + b1 + b2;
+	auto aa = 1 + a1 + a2;
+	double gain = 10 * std::log10(bb * bb + (b0 * b2 * PHI - (b1 * (b0 + b2) + 4 * b0 * b2)) * PHI)
+		- 10 * std::log10(aa * aa + (1 * a2 * PHI - (a1 * (1 + a2) + 4 * 1 * a2)) * PHI);
 	return gain;
 }
 

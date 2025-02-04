@@ -1101,7 +1101,7 @@ GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 		if( region->PitchTrack == true )
 		{
 			// Calculate what frequency the provided sample is
-			sampleFreq = 440.0f * std::pow(2.0f, (region->UnityNote - 69 - region->FineTune * 0.01) / 12.0f);
+			sampleFreq = 440.0f * std::exp2((region->UnityNote - 69 - region->FineTune * 0.01) / 12.0f);
 			freqFactor = sampleFreq / desiredFreq;
 		}
 

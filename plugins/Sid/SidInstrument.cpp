@@ -339,7 +339,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		freq = _n->frequency();
 		note = 69.0 + 12.0 * std::log(freq / 440.0) / std::log(2.f);
 		note += m_voice[i]->m_coarseModel.value();
-		freq = 440.0 * std::pow(2.0, (note - 69.0) / 12.0);
+		freq = 440.0 * std::exp2((note - 69.0) / 12.0);
 		data16 = int( freq / float(clockrate) * 16777216.0 );
 
 		sidreg[base+0] = data16&0x00FF;

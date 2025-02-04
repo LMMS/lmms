@@ -38,6 +38,40 @@
 namespace lmms
 {
 
+// [TODO] C++20: Use template<std::signed_integral> instead of int
+/*!
+ * @brief Performs euclidean division on two integers.
+ * @details
+ * Performs euclidean (or "remainder") division. This is similar to
+ * modulo, but it handles negative values for `k` differently.
+ * Like indexing with negative values in python, negative values for `k`
+ * "count backwards" from `n`, so output values will always be in the
+ * range 0..<`n`.
+ *
+ * If `n` is a power of 2, it may be better to use the bitwise hack
+ * `k & (n - 1)` instead.
+ */
+constexpr inline int ediv(int k, int n)
+{
+	return (k %= n) < 0 ? k + n : k;
+}
+
+// [TODO] C++20: Use template<std::floating_point> instead of float
+// [TODO] C++26: Make constexpr, since std::fmod will be constexpr
+/*!
+ * @brief Performs euclidean division on two floats.
+ * @details
+ * Performs euclidean (or "remainder") division. This is similar to
+ * modulo, but it handles negative values for `k` differently.
+ * Like indexing with negative values in python, negative values for `k`
+ * "count backwards" from `n`, so output values will always be in the
+ * range 0..<`n`.
+ */
+inline float ediv(float k, float n)
+{
+	return (k = std::fmod(k, n)) < 0 ? k + n : k;
+}
+
 inline bool approximatelyEqual(float x, float y)
 {
 	return x == y ? true : std::abs(x - y) < F_EPSILON;
