@@ -171,34 +171,26 @@ void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini)
 
 float DrumSynth::waveform(float ph, int form)
 {
-	float w;
+	float w, p = ediv(ph, numbers::tau_v<float>);
 
 	switch (form)
 	{
-	case 0:
-		w = std::sin(std::fmod(ph, numbers::tau_v<float>));
-		break; // sine
-	case 1:
-		w = std::abs(2.0f * std::sin(std::fmod(0.5f * ph, numbers::tau_v<float>)) - 1.f);
-		break; // sine^2
-	case 2:
-		while (ph < numbers::tau_v<float>)
-		{
-			ph += numbers::tau_v<float>;
-		}
-		w = 0.6366197f * (std::fmod(ph, numbers::tau_v<float>) - 1.f); // tri
-		if (w > 1.f)
-		{
-			w = 2.f - w;
-		}
+	case 0: // sine
+		w = std::sin(p);
 		break;
-	case 3:
-		w = ph - numbers::tau_v<float> * static_cast<float>(static_cast<int>(ph / numbers::tau_v<float>)); // saw
-		w = (0.3183098f * w) - 1.f;
+	case 1: // sine^2
+		w = std::abs(2.f * std::sin(.5f * p)) - 1.f;
 		break;
-	default:
-		w = (std::sin(std::fmod(ph, numbers::tau_v<float>)) > 0.0) ? 1.f : -1.f;
-		break; // square
+	case 2: // triangle
+		w = p * 0.6366197f;
+		if (w > 1.f) { w = 2.f - w; }
+		break;
+	case 3: // sawtooth
+		w = p * 0.3183098f - 1.f;
+		break;
+	default: // square
+		w = (p < numbers::pi_v<float>) ? 1.f : -1.f;
+		break;
 	}
 
 	return w;
