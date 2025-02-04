@@ -67,7 +67,7 @@ constexpr int ediv(int k, int n)
  * "count backwards" from `n`, so output values will always be in the
  * range 0..<`n`.
  */
-inline float ediv(float k, float n)
+float ediv(float k, float n)
 {
 	return (k = std::fmod(k, n)) < 0 ? k + n : k;
 }
