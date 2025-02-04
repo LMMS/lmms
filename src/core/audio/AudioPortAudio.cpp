@@ -73,11 +73,11 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		.hostApiSpecificStreamInfo = nullptr
 	};
 
-	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, engine->baseSampleRate(), engine->framesPerPeriod(), paNoFlag,
-		processCallback, this);
-
 	setSampleRate(engine->baseSampleRate());
 	setChannels(outputParameters.channelCount);
+
+	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(), paNoFlag,
+		processCallback, this);
 
 	if (err != paNoError)
 	{
