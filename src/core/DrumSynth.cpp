@@ -28,6 +28,7 @@
 #include <QFile>
 #include <cmath>
 #include <cstring>
+#include <numbers>
 #include <sstream>
 
 #include "lmms_math.h"
@@ -182,11 +183,11 @@ float DrumSynth::waveform(float ph, int form)
 		w = std::abs(2.f * std::sin(.5f * p)) - 1.f;
 		break;
 	case 2: // triangle
-		w = p * 0.6366197f;
+		w = p * 0.6366197f; // [TODO] C++20: Replace magic number with 2 * std::numbers::inv_pi_v<float>
 		if (w > 1.f) { w = 2.f - w; }
 		break;
 	case 3: // sawtooth
-		w = p * 0.3183098f - 1.f;
+		w = p * 0.3183098f - 1.f; // [TODO] C++20: Replace magic number with std::numbers::inv_pi_v<float>
 		break;
 	default: // square
 		w = (p < numbers::pi_v<float>) ? 1.f : -1.f;
