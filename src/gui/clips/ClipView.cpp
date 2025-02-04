@@ -28,6 +28,7 @@
 #include <cassert>
 
 #include <QMenu>
+#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 
@@ -1357,7 +1358,17 @@ int ClipView::knifeMarkerPos( QMouseEvent * me )
 TimePos ClipView::quantizeSplitPos(TimePos midiPos)
 {
 	const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-	return TimePos(midiPos + m_initialClipPos).quantize(snapSize) - m_initialClipPos;
+	// quantize the length of the new left clip...
+	const TimePos leftPos = midiPos.quantize(snapSize);
+	//...or right clip...
+	const TimePos rightOff = m_clip->length() - midiPos;
+	const TimePos rightPos = m_clip->length() - rightOff.quantize(snapSize);
+	//...or the global gridlines
+	const TimePos globalPos = TimePos(midiPos + m_initialClipPos).quantize(snapSize) - m_initialClipPos;
+	//...whichever gives a position closer to the cursor
+	if (abs(leftPos - midiPos) <= abs(rightPos - midiPos) && abs(leftPos - midiPos) <= abs(globalPos - midiPos)) { return leftPos; }
+	else if (abs(rightPos - midiPos) <= abs(leftPos - midiPos) && abs(rightPos - midiPos) <= abs(globalPos - midiPos)) { return rightPos; }
+	else { return globalPos; }
 }
 
 
