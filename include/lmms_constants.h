@@ -42,6 +42,12 @@ template<typename T>
 inline constexpr T tau_v = T(pi_v<T> * 2.0);
 inline constexpr double tau = tau_v<double>;
 
+// [TODO] C++20: Use std::floating_point instead of typename
+// [TODO] C++20: Use std::numbers::inv_pi_v<T> instead of computed value
+template<typename T>
+inline constexpr T inv_pi_v = T(1.0 / pi_v<T>);
+inline constexpr double inv_pi = inv_pi_v<double>;
+
 //TODO C++20: Use std::floating_point instead of typename
 template<typename T>
 inline constexpr T pi_half_v = T(pi_v<T> / 2.0);
