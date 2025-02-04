@@ -51,12 +51,12 @@ namespace lmms
 
 
 /**
-	 Functions to control LMMS position/playing in Slave || Duplex
-	 LMMS react only in if ExSync is on (button is green)
-	 MUST be provided by ExSync driver
+	 Functions to control LMMS position/playing in Follower || Duplex
+	 LMMS react only in if ExternalSync is on (button is green)
+	 MUST be provided by ExternalSync driver
 	 
 	 External code MUST NOT use this functions: this is adapter
-	 from external device events to LMMS (so not included in ExSync.h)
+	 from external device events to LMMS (so not included in ExternalSync.h)
 */
 struct ExSyncCallbacks
 {
@@ -184,7 +184,7 @@ static void jackSlave(bool set)
 
 
 
-static struct ExSyncHandler s_handler = {
+static struct SyncDriverHandler s_jackdHandler = {
 	&jackAvailable,
 	&jackPlay,
 	&jackPosition,
@@ -242,7 +242,7 @@ static sample_rate_t exSyncSampleRate()
 
 
 //! Function used by internal code to send messages to LMMS::Song from
-//! external device (in Slave , Duplex modes)
+//! external device (in Follower , Duplex modes)
 static struct ExSyncCallbacks s_SyncCallbacks = {
 	&exSyncMode,
 	&exSyncPosition,
@@ -250,7 +250,7 @@ static struct ExSyncCallbacks s_SyncCallbacks = {
 };
 
 
-/* -----------------------ExSync public ----------------------------- */
+/* --------------------ExternalSync public --------------------------- */
 
 
 /* Jack Transport target implementation (public part): */
@@ -268,9 +268,9 @@ void syncJackd(jack_client_t* client)
 /* Target independent part: */
 
 
-struct ExSyncHandler * exSyncGetHandler()
+struct SyncDriverHandler * getJackHandler()
 {
-	return &s_handler;
+	return &s_jackdHandler;
 }
 
 /* ExterbalSync Extension holder part:
@@ -371,7 +371,7 @@ static f_cnt_t s_lastFrame = 0; // Save last frame position to catch change
 void SyncHook::pulse()
 {
 	struct ExSyncCallbacks *slaveCallBacks  = getFollowerCallBacks();
-	struct ExSyncHandler *sync = exSyncGetHandler();
+	struct SyncDriverHandler *sync = getJackHandler();
 	auto lSong = Engine::getSong();
 	f_cnt_t lFrame = 0;
 	if (sync && slaveCallBacks && sync->Stopped()) 
@@ -405,7 +405,7 @@ void SyncHook::jump()
 		pos.ticksPerBeat = lSong->getPlayPos().ticksPerBeat( lSong->getTimeSigModel() );
 		pos.tempo = lSong->getTempo();
 		pos.frame = lSong->getFrames();
-		ExSyncHandler * sync =  exSyncGetHandler();
+		SyncDriverHandler * sync =  getJackHandler();
 		if (sync) { sync->sendPosition(&pos); }
 		jumpSyncExtentions(pos.frame);
 	}
@@ -414,7 +414,7 @@ void SyncHook::jump()
 
 void SyncHook::start()
 {
-	struct ExSyncHandler *sync = exSyncGetHandler();
+	struct SyncDriverHandler *sync = getJackHandler();
 	if (sync && s_SyncOn)
 	{
 		startSyncExtentions();
@@ -426,7 +426,7 @@ void SyncHook::start()
 
 void SyncHook::stop()
 {
-	struct ExSyncHandler *sync = exSyncGetHandler();
+	struct SyncDriverHandler *sync = getJackHandler();
 	if (sync && s_SyncOn)
 	{
 		stopSyncExtentions();
@@ -441,7 +441,7 @@ void SyncHook::stop()
 
 SyncCtl::SyncMode SyncCtl::toggleMode()
 {
-	ExSyncHandler * sync =  exSyncGetHandler();
+	SyncDriverHandler * sync =  getJackHandler();
 	if ( !sync->availableNow() ) 
 	{
 		return s_SyncMode;
@@ -468,7 +468,7 @@ SyncCtl::SyncMode SyncCtl::toggleMode()
 
 void SyncCtl::setMode(SyncCtl::SyncMode mode)
 {
-	ExSyncHandler * sync =  exSyncGetHandler();
+	SyncDriverHandler * sync =  getJackHandler();
 	if ( !sync->availableNow() ) 
 	{
 		return;
@@ -478,19 +478,19 @@ void SyncCtl::setMode(SyncCtl::SyncMode mode)
 	case Leader:
 		s_SyncFollow = false;
 		s_SyncLead = true;
-		sync->setSlave(false);
+		sync->setFollow(false);
 		s_followerCallBacks= nullptr;
 		break;
 	case Follower:
 		s_SyncFollow = true;
 		s_SyncLead = false;
-		sync->setSlave(true);
+		sync->setFollow(true);
 		s_followerCallBacks= &s_SyncCallbacks;
 		break;
 	case Duplex:
 		s_SyncFollow = true;
 		s_SyncLead = true;
-		sync->setSlave(true);
+		sync->setFollow(true);
 		s_followerCallBacks= &s_SyncCallbacks;
 		break;
 	default:
@@ -507,7 +507,7 @@ SyncCtl::SyncMode SyncCtl::getMode()
 
 bool SyncCtl::toggleOnOff()
 {
-	ExSyncHandler * sync =  exSyncGetHandler();
+	SyncDriverHandler * sync =  getJackHandler();
 
 	if ( sync->availableNow() )
 	{
@@ -521,7 +521,7 @@ bool SyncCtl::toggleOnOff()
 
 bool SyncCtl::have()
 {
-	ExSyncHandler * sync =  exSyncGetHandler();
+	SyncDriverHandler * sync =  getJackHandler();
 	if ( sync->availableNow() ) { return true; }
 	return false;
 }

@@ -47,8 +47,9 @@ struct SongExtendedPos
 	f_cnt_t frame;
 };
 
-//! Functions, MUST be provided by ExSync driver
-struct ExSyncHandler
+
+//! Functions, MUST be provided by ExternalSync driver
+struct SyncDriverHandler
 {
 	//! true if synchronisation is available (driver is on)
 	bool (* availableNow)(); 
@@ -59,10 +60,9 @@ struct ExSyncHandler
 	//! driver check if target plaing just stopped (after last call) 
 	bool (* Stopped)();
 	//! driver MUST start/stop remote LMMS controling @set true/false
-	void (* setSlave)(bool set);
+	void (* setFollow)(bool set);
 };
 
-struct ExSyncHandler * exSyncGetHandler();
 
 /* ExternalSync Extention handler: */
 
