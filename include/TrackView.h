@@ -98,6 +98,12 @@ public:
 		return m_action == Action::Move;
 	}
 
+	// returns getTrackFixedSettingsWidth() + getTrackFixedOperationsWidth()
+	static const int getTrackFixedWidth();
+	// returns the right compact or not compact width
+	static const int getTrackFixedSettingsWidth();
+	static const int getTrackFixedOperationsWidth();
+
 	virtual void update();
 
 	// Create a menu for assigning/creating channels for this track

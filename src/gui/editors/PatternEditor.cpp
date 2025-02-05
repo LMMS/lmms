@@ -45,7 +45,7 @@ namespace lmms::gui
 
 
 PatternEditor::PatternEditor(PatternStore* ps) :
-	TrackContainerView(ps),
+	TrackContainerView(ps, true),
 	m_ps(ps)
 {
 	setModel(ps);
@@ -79,6 +79,7 @@ void PatternEditor::removeSteps()
 			p->removeSteps();
 		}
 	}
+	realignTracks();
 }
 
 
@@ -192,6 +193,7 @@ void PatternEditor::makeSteps( bool clone )
 			}
 		}
 	}
+	realignTracks();
 }
 
 // Creates a clone of the current pattern track with the same content, but no clips in the song editor
@@ -234,14 +236,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
 
 	// TODO: Use style sheet
-	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
-	{
-		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 384);
-	}
-	else
-	{
-		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
-	}
+	setMinimumWidth(TrackView::getTrackFixedWidth() + 2 * ClipView::BORDER_WIDTH);
 
 	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
 	m_stopAction->setToolTip(tr("Stop playback of current pattern (Space)"));

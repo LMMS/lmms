@@ -31,16 +31,18 @@
 
 #include "AutomationClip.h"
 #include "Clipboard.h"
+#include "ClipView.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "MidiClip.h"
+#include "MidiClipView.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
-#include "ClipView.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -211,6 +213,7 @@ void TrackContentWidget::removeClipView( ClipView * clipv )
  */
 void TrackContentWidget::update()
 {
+	setMinimumWidthBasedOnClips();
 	for (const auto& clipView : m_clipViews)
 	{
 		clipView->setFixedHeight(height() - 1);
@@ -636,6 +639,20 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 
 
 
+void TrackContentWidget::setMinimumWidthBasedOnClips()
+{
+	// if this is in the pattern editor
+	if (m_trackView->trackContainerView()->fixedClips())
+	{
+		if (m_clipViews.size() > 0)
+		{
+			auto minWidth = static_cast<size_t>(m_clipViews[0]->getClip()->length().getTicks());
+			setMinimumWidth(minWidth);
+			//auto minWidth = static_cast<size_t>(m_clipViews[0]->getClip()->length().nextFullBar());
+			//setMinimumWidth(minWidth * m_trackView->trackContainerView()->pixelsPerBar());
+		}
+	}
+}
 
 /*! \brief Updates the background tile pixmap on size changes.
  *
@@ -643,6 +660,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
  */
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
+	setMinimumWidthBasedOnClips();
+
 	// Update backgroud
 	updateBackground();
 	// Force redraw
