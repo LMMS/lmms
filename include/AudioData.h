@@ -26,6 +26,7 @@
 #define LMMS_AUDIO_DATA_H
 
 #include <cassert>
+#include <span>
 #include <type_traits>
 
 #include "lmms_basics.h"
@@ -108,7 +109,7 @@ public:
 		return m_data[channel];
 	}
 
-	template<pi_ch_t channel>
+	template<int channel>
 	auto buffer() const -> SampleT*
 	{
 		static_assert(channel != DynamicChannelCount);
@@ -138,10 +139,10 @@ public:
 	 *     contiguous buffer for all channels whose size is channels() * frames().
 	 *     Whether this is true depends on the implementation of the source buffer.
 	 */
-	auto sourceBuffer() const -> Span<SampleT>
+	auto sourceBuffer() const -> std::span<SampleT>
 	{
 		assert(m_data != nullptr);
-		return Span<SampleT>{m_data[0], channels() * frames()};
+		return std::span<SampleT>{m_data[0], channels() * frames()};
 	}
 
 	auto data() const -> SampleT* const* { return m_data; }

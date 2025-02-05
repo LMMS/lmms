@@ -101,7 +101,11 @@ public:
 
 	bool process();
 
-	void updateBuffer(int channelsIn, int channelsOut, fpp_t frames);
+	/**
+	 * Updates the shared memory input/output audio buffer, then
+	 * returns a pointer to the buffer or nullptr if an error occurred.
+	 */
+	auto updateAudioBuffer(int channelsIn, int channelsOut, fpp_t frames) -> float*;
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
@@ -150,9 +154,6 @@ public:
 		return m_audioPort;
 	}
 
-	auto inputBuffer() const -> Span<float> { return m_inputBuffer; }
-	auto outputBuffer() const -> Span<float> { return m_outputBuffer; }
-
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
@@ -176,14 +177,13 @@ private:
 	RemotePluginAudioPortController* const m_audioPort = nullptr;
 
 	SharedMemory<float[]> m_audioBuffer; // NOLINT
-	std::size_t m_audioBufferSize = 0; // TODO: Move to `SharedMemory`?
 
-	f_cnt_t m_frames = 0;
 	pi_ch_t m_channelsIn = 0;
 	pi_ch_t m_channelsOut = 0;
+	f_cnt_t m_frames = 0;
 
-	Span<float> m_inputBuffer;
-	Span<float> m_outputBuffer;
+	// View into `m_audioBuffer` output buffer
+	std::span<float> m_audioOutputs;
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;

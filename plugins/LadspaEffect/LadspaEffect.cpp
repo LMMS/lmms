@@ -146,7 +146,7 @@ ProcessStatus LadspaEffect::processImpl(CoreAudioDataMut inOut)
 	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
 		outBuf = inOut.data();
-		inOut = Span{sBuf.data(), static_cast<std::size_t>(sBuf.size())};
+		inOut = std::span{sBuf.data(), static_cast<std::size_t>(sBuf.size())};
 		sampleDown(outBuf, inOut.data(), m_maxSampleRate);
 		outFrames = frames * m_maxSampleRate /
 				Engine::audioEngine()->outputSampleRate();

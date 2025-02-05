@@ -107,6 +107,14 @@ public:
 };
 
 
+//! Optimization - Choose std::array or std::vector based on whether size is known at compile time
+template<AudioPluginConfig config>
+using AccessBufferType = std::conditional_t<
+	config.staticChannelCount(),
+	std::array<GetAudioDataType<config.kind>*, static_cast<std::size_t>(config.inputs + config.outputs)>,
+	std::vector<GetAudioDataType<config.kind>*>>;
+
+
 //! Default implementation of `AudioPluginBufferInterface`
 template<AudioPluginConfig config,
 	AudioDataKind kind = config.kind, bool interleaved = config.interleaved, bool inplace = config.inplace>
@@ -117,16 +125,7 @@ template<AudioPluginConfig config, AudioDataKind kind>
 class AudioPluginBufferDefaultImpl<config, kind, false, false>
 	: public AudioPluginBufferInterface<config>
 {
-	static constexpr bool s_hasStaticChannelCount
-		= config.inputs != DynamicChannelCount && config.outputs != DynamicChannelCount;
-
 	using SampleT = GetAudioDataType<kind>;
-
-	// Optimization to avoid need for std::vector if size is known at compile time
-	using AccessBufferType = std::conditional_t<
-		s_hasStaticChannelCount,
-		std::array<SampleT*, static_cast<std::size_t>(config.inputs + config.outputs)>,
-		std::vector<SampleT*>>;
 
 public:
 	AudioPluginBufferDefaultImpl() = default;
@@ -160,7 +159,7 @@ public:
 		const auto channels = static_cast<std::size_t>(channelsIn + channelsOut);
 
 		m_sourceBuffer.resize(channels * frames);
-		if constexpr (!s_hasStaticChannelCount)
+		if constexpr (!config.staticChannelCount())
 		{
 			m_accessBuffer.resize(channels);
 		}
@@ -189,7 +188,7 @@ private:
 	std::vector<SampleT> m_sourceBuffer;
 
 	//! Provides [channel][frame] view into `m_sourceBuffer`
-	AccessBufferType m_accessBuffer;
+	AccessBufferType<config> m_accessBuffer;
 
 	int m_channelsIn = config.inputs;
 	int m_channelsOut = config.outputs;
@@ -202,20 +201,11 @@ template<AudioPluginConfig config, AudioDataKind kind>
 class AudioPluginBufferDefaultImpl<config, kind, false, true>
 	: public AudioPluginBufferInterface<config>
 {
-	static constexpr bool s_hasStaticChannelCount
-		= config.inputs != DynamicChannelCount && config.outputs != DynamicChannelCount;
-
 	static_assert(config.inputs == config.outputs || config.inputs == 0 || config.outputs == 0,
 		"compile-time inplace buffers must have same number of input channels and output channels, "
 		"or one of the channel counts must be fixed at zero");
 
 	using SampleT = GetAudioDataType<kind>;
-
-	// Optimization to avoid need for std::vector if size is known at compile time
-	using AccessBufferType = std::conditional_t<
-		s_hasStaticChannelCount,
-		std::array<SampleT*, static_cast<std::size_t>(config.outputs)>,
-		std::vector<SampleT*>>;
 
 public:
 	AudioPluginBufferDefaultImpl() = default;
@@ -241,7 +231,7 @@ public:
 		const auto channels = std::max<std::size_t>(channelsIn, channelsOut);
 
 		m_sourceBuffer.resize(channels * frames);
-		if constexpr (!s_hasStaticChannelCount)
+		if constexpr (!config.staticChannelCount())
 		{
 			m_accessBuffer.resize(channels);
 		}
@@ -269,7 +259,7 @@ private:
 	std::vector<SampleT> m_sourceBuffer;
 
 	//! Provides [channel][frame] view into `m_sourceBuffer`
-	AccessBufferType m_accessBuffer;
+	AccessBufferType<config> m_accessBuffer;
 
 	int m_channels = config.outputs;
 	f_cnt_t m_frames = 0;

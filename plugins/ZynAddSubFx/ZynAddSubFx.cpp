@@ -440,7 +440,8 @@ void ZynAddSubFxInstrument::initPlugin()
 
 	if( m_hasGUI )
 	{
-		audioPort().useRemote(true);
+		audioPort().setBufferType(true);
+
 		m_remotePlugin = new ZynAddSubFxRemotePlugin(audioPort().controller());
 		m_remotePlugin->lock();
 		m_remotePlugin->waitForInitDone( false );
@@ -468,7 +469,7 @@ void ZynAddSubFxInstrument::initPlugin()
 	}
 	else
 	{
-		audioPort().useRemote(false);
+		audioPort().setBufferType(false);
 
 		m_localPlugin = new LocalZynAddSubFx{};
 		m_localPlugin->setSampleRate(Engine::audioEngine()->outputSampleRate());

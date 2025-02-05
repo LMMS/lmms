@@ -237,10 +237,10 @@ template<> struct AudioDataType<AudioDataKind::SampleFrame> { using type = Sampl
 } // namespace detail
 
 //! A non-owning SampleFrame buffer (interleaved, 2-channel)
-using CoreAudioData = Span<const SampleFrame>;
+using CoreAudioData = std::span<const SampleFrame>;
 
 //! Mutable CoreAudioData
-using CoreAudioDataMut = Span<SampleFrame>;
+using CoreAudioDataMut = std::span<SampleFrame>;
 
 
 } // namespace lmms

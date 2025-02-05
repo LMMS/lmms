@@ -23,17 +23,28 @@
  */
 
 #include "RemotePlugin.h"
+
+#include <algorithm>
 #include <stdexcept>
-#include "lmms_basics.h"
+
+#ifndef SYNC_WITH_SHM_FIFO
+#include <sys/socket.h>
+#include <sys/un.h>
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
 
 //#define DEBUG_REMOTE_PLUGIN
 #ifdef DEBUG_REMOTE_PLUGIN
 #include <QDebug>
 #endif
 
-#ifdef LMMS_BUILD_WIN32
-#include <windows.h>
-#endif
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QUuid>
 
 #include "BufferManager.h"
 #include "AudioEngine.h"
@@ -41,16 +52,8 @@
 #include "Model.h"
 #include "RemotePluginAudioPort.h"
 #include "Song.h"
+#include "lmms_basics.h"
 
-#include <QCoreApplication>
-#include <QDebug>
-#include <QDir>
-#include <QUuid>
-
-#ifndef SYNC_WITH_SHM_FIFO
-#include <sys/socket.h>
-#include <sys/un.h>
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 
@@ -241,9 +244,11 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	}
 	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
 
-	// We may have received a directory via a environment variable
-	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
-			exec = QFileInfo(QDir(env_path), pluginExecutable).absoluteFilePath();
+	// We may have received a directory via an environment variable
+	if (const char* envPath = std::getenv("LMMS_PLUGIN_DIR"))
+	{
+		exec = QFileInfo(QDir(envPath), pluginExecutable).absoluteFilePath();
+	}
 
 #ifdef LMMS_BUILD_APPLE
 	// search current directory first
@@ -341,36 +346,32 @@ bool RemotePlugin::process()
 {
 	if (m_failed || !isRunning())
 	{
-		if (!m_outputBuffer.empty())
-		{
-			std::memset(m_outputBuffer.data(), 0, m_outputBuffer.size_bytes());
-		}
+		std::ranges::fill(m_audioOutputs, 0.f);
 		return false;
 	}
 
 	if (!m_audioBuffer)
 	{
+		// TODO: Is the following logic still correct?
 		// m_audioBuffer being null means we didn't initialize everything so
 		// far so process one message each time (and hope we get
 		// information like SHM-key etc.) until we process messages
 		// in a later stage of this procedure
-		if (m_audioBufferSize == 0)
+		if (m_audioBuffer.size() == 0)
 		{
 			lock();
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if (!m_outputBuffer.empty())
-		{
-			std::memset(m_outputBuffer.data(), 0, m_outputBuffer.size_bytes());
-		}
+
+		std::ranges::fill(m_audioOutputs, 0.f);
 		return false;
 	}
 
 	lock();
 	sendMessage(IdStartProcessing);
 
-	if (m_failed || m_outputBuffer.empty())
+	if (m_failed || m_audioOutputs.empty())
 	{
 		unlock();
 		return false;
@@ -385,44 +386,42 @@ bool RemotePlugin::process()
 
 
 
-void RemotePlugin::updateBuffer(int channelsIn, int channelsOut, fpp_t frames)
+auto RemotePlugin::updateAudioBuffer(int channelsIn, int channelsOut, fpp_t frames) -> float*
 {
 	if (channelsIn < 0 || channelsOut < 0)
 	{
 		qCritical() << "Invalid channel count";
-		return;
+		return nullptr;
 	}
 
 	if (channelsIn == static_cast<int>(m_channelsIn)
 		&& channelsOut == static_cast<int>(m_channelsOut)
 		&& frames == m_frames)
 	{
-		return;
+		return m_audioBuffer.get();
 	}
-
-	const auto size = (channelsIn + channelsOut) * frames;
 
 	try
 	{
-		m_audioBuffer.create(size);
+		m_audioOutputs = {};
+		m_audioBuffer.create((channelsIn + channelsOut) * frames);
 	}
 	catch (const std::runtime_error& error)
 	{
 		qCritical() << "Failed to allocate shared audio buffer:" << error.what();
 		m_audioBuffer.detach();
-		return;
+		return nullptr;
 	}
 
-	m_audioBufferSize = size * sizeof(float);
-
-	m_frames = frames;
 	m_channelsIn = static_cast<pi_ch_t>(channelsIn);
 	m_channelsOut = static_cast<pi_ch_t>(channelsOut);
+	m_frames = frames;
 
-	m_inputBuffer = Span<float>{m_audioBuffer.get(), m_channelsIn * m_frames};
-	m_outputBuffer = Span<float>{m_audioBuffer.get() + m_inputBuffer.size(), m_channelsOut * m_frames};
+	m_audioOutputs = std::span{m_audioBuffer.get() + channelsIn * frames, channelsOut * frames};
 
 	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
+
+	return m_audioBuffer.get();
 }
 
 

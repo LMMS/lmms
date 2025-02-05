@@ -46,6 +46,12 @@ struct AudioPluginConfig
 
 	//! In-place processing - true (always in-place) or false (dynamic, customizable in audio buffer impl)
 	bool inplace = false;
+
+	//! Whether channel counts are known at compile time
+	constexpr auto staticChannelCount() const -> bool
+	{
+		return inputs != DynamicChannelCount && outputs != DynamicChannelCount;
+	}
 };
 
 } // namespace lmms

@@ -25,14 +25,13 @@
 #ifndef LMMS_REMOTE_PLUGIN_AUDIO_PORT_H
 #define LMMS_REMOTE_PLUGIN_AUDIO_PORT_H
 
+#include <optional>
+
 #include "PluginAudioPort.h"
-#include "lmms_basics.h"
+#include "RemotePlugin.h"
 #include "lmms_export.h"
 
-namespace lmms
-{
-
-class RemotePlugin;
+namespace lmms {
 
 /*
  * TODO: A better design would just have `RemotePluginAudioPort<config>` passed to
@@ -49,7 +48,10 @@ class RemotePlugin;
 class LMMS_EXPORT RemotePluginAudioPortController
 {
 public:
-	RemotePluginAudioPortController(PluginPinConnector& pinConnector);
+	RemotePluginAudioPortController(PluginPinConnector& pinConnector)
+		: m_pinConnector{&pinConnector}
+	{
+	}
 
 	//! Connects RemotePlugin's buffers to audio port; Call after buffers are created
 	void connectBuffers(RemotePlugin* buffers)
@@ -72,9 +74,8 @@ public:
 	}
 
 protected:
-	void remotePluginUpdateBuffers(int channelsIn, int channelsOut, fpp_t frames);
-	auto remotePluginInputBuffer() const -> float*;
-	auto remotePluginOutputBuffer() const -> float*;
+	//! Updates the shared memory audio buffer in RemotePlugin
+	auto updateSourceBuffer(int ins, int outs, fpp_t frames) const -> float*;
 
 	RemotePlugin* m_buffers = nullptr;
 	PluginPinConnector* m_pinConnector = nullptr;
@@ -111,6 +112,7 @@ public:
 	{
 		assert(m_buffers != nullptr);
 		updateBuffers(this->in().channelCount(), this->out().channelCount(), frames);
+
 		m_remoteActive = true;
 	}
 
@@ -133,7 +135,7 @@ public:
 		if (!remoteActive()) { return SplitAudioData<SampleT, config.inputs>{}; }
 
 		return SplitAudioData<SampleT, config.inputs> {
-			m_audioBufferIn.data(),
+			m_insOuts,
 			static_cast<pi_ch_t>(this->in().channelCount()),
 			m_frames
 		};
@@ -144,7 +146,7 @@ public:
 		if (!remoteActive()) { return SplitAudioData<SampleT, config.outputs>{}; }
 
 		return SplitAudioData<SampleT, config.outputs> {
-			m_audioBufferOut.data(),
+			m_insOuts + this->in().channelCount(),
 			static_cast<pi_ch_t>(this->out().channelCount()),
 			m_frames
 		};
@@ -157,27 +159,39 @@ public:
 
 	void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) override
 	{
+		// Update the shared memory audio buffer in RemotePlugin
 		if (!m_buffers) { return; }
-		remotePluginUpdateBuffers(channelsIn, channelsOut, frames);
+
+		SampleT* ptr = m_buffers->updateAudioBuffer(channelsIn, channelsOut, frames);
+		if (!ptr)
+		{
+			// Error occurred
+			m_insOuts = nullptr;
+			return;
+		}
+
+		// Update our views into the RemotePlugin buffer
+		const auto channels = static_cast<std::size_t>(channelsIn + channelsOut);
+		if constexpr (!config.staticChannelCount())
+		{
+			m_accessBuffer.resize(channels);
+		}
+		else
+		{
+			// If channel counts are known at compile time, they should never change
+			assert(channelsIn == config.inputs);
+			assert(channelsOut == config.outputs);
+		}
 
 		m_frames = frames;
 
-		// Update the views into the RemotePlugin buffer
-		float* ptr = remotePluginInputBuffer();
-		m_audioBufferIn.resize(channelsIn);
-		for (pi_ch_t idx = 0; idx < channelsIn; ++idx)
+		for (std::size_t channel = 0; channel < channels; ++channel)
 		{
-			m_audioBufferIn[idx] = ptr;
+			m_accessBuffer[channel] = ptr;
 			ptr += frames;
 		}
 
-		ptr = remotePluginOutputBuffer();
-		m_audioBufferOut.resize(channelsOut);
-		for (pi_ch_t idx = 0; idx < channelsOut; ++idx)
-		{
-			m_audioBufferOut[idx] = ptr;
-			ptr += frames;
-		}
+		m_insOuts = m_accessBuffer.data();
 	}
 
 	auto active() const -> bool override { return remoteActive(); }
@@ -186,8 +200,8 @@ private:
 	auto remoteActive() const -> bool { return m_buffers != nullptr && m_remoteActive; }
 
 	// Views into RemotePlugin's shared memory buffer
-	std::vector<float*> m_audioBufferIn;
-	std::vector<float*> m_audioBufferOut;
+	detail::AccessBufferType<config> m_accessBuffer;
+	SampleT** m_insOuts = nullptr;
 
 protected:
 	bool m_remoteActive = false;
@@ -205,24 +219,28 @@ public:
 	ConfigurableAudioPort(bool isInstrument, Model* parent, bool beginAsRemote = true)
 		: RemotePluginAudioPort<config>{isInstrument, parent}
 	{
-		useRemote(beginAsRemote);
+		setBufferType(beginAsRemote);
 	}
 
-	void useRemote(bool remote = true)
+	//! Call this to switch to a different buffer type, then call `activate`
+	void setBufferType(bool remote = true)
 	{
-		if (remote) { m_localActive = false; }
-		else { RemotePluginAudioPort<config>::m_remoteActive = false; }
+		// Deactivate both buffers until activation
+		m_localActive = false;
+		RemotePluginAudioPort<config>::m_remoteActive = false;
 
 		m_isRemote = remote;
 	}
 
 	auto isRemote() const -> bool { return m_isRemote; }
 
+	//! Activates the audio port after switching buffer types
 	void activate(f_cnt_t frames) override
 	{
 		if (isRemote()) { RemotePluginAudioPort<config>::activate(frames); return; }
 
 		updateBuffers(this->in().channelCount(), this->out().channelCount(), frames);
+
 		m_localActive = true;
 	}
 
