@@ -29,6 +29,7 @@
 #include <QDir>
 #include <QMutex>
 #include <QProgressBar>
+#include <future>
 
 #include "embed.h"
 
@@ -84,6 +85,35 @@ private slots:
 	void giveFocusToFilter();
 
 private:
+	class SearchManager
+	{
+	public:
+		~SearchManager() { cancel(); }
+
+		void cancel()
+		{
+			if (m_currentSearchTask.valid())
+			{
+				m_cancel = true;
+				m_currentSearchTask.get();
+				m_cancel = false;
+			}
+		}
+
+		bool cancelled() { return m_cancel; }
+
+		void setCurrentSearchTask(std::future<void> task) { m_currentSearchTask = std::move(task); }
+
+		std::future<void>& currentSearchTask() { return m_currentSearchTask; }
+
+		std::mutex& searchMutex() { return m_mutex; }
+
+	private:
+		std::future<void> m_currentSearchTask;
+		std::atomic<bool> m_cancel;
+		std::mutex m_mutex;
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
@@ -100,6 +130,7 @@ private:
 
 	QLineEdit * m_filterEdit;
 
+	SearchManager m_searchManager;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
@@ -119,9 +150,6 @@ private:
 	QList<QString> m_savedExpandedDirs;
 	QString m_previousFilterValue;
 } ;
-
-
-
 
 class FileBrowserTreeWidget : public QTreeWidget
 {
