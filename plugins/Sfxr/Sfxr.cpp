@@ -214,7 +214,7 @@ void SfxrSynth::update( SampleFrame* buffer, const int32_t frameNum )
 		if(env_stage==0)
 			env_vol=(float)env_time/env_length[0];
 		if(env_stage==1)
-			{ env_vol = 1.0f + std::pow(1.0f - static_cast<float>(env_time) / env_length[1], 1.0f) * 2.0f * s->m_susModel.value(); }
+			{ env_vol = 1.0f + (1.0f - static_cast<float>(env_time) / env_length[1]) * 2.0f * s->m_susModel.value(); }
 		if(env_stage==2)
 			env_vol=1.0f-(float)env_time/env_length[2];
 

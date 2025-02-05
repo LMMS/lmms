@@ -574,7 +574,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 				}
 				else if (vco_k>0.5) {
 					float w = 2.0 * (vco_k - 0.5) - 1.0;
-					vco_k = 0.5 - std::sqrt(1.0-(w*w));
+					vco_k = 0.5 - std::sqrt(1.0 - (w * w));
 				}
 				vco_k *= 2.0;  // MOOG wave gets filtered away
 				break;

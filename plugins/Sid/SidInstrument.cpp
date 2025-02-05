@@ -337,7 +337,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		base = i*7;
 		// freq ( Fn = Fout / Fclk * 16777216 ) + coarse detuning
 		freq = _n->frequency();
-		note = 69.0 + 12.0 * std::log(freq / 440.0) / std::log(2.f);
+		note = 69.0 + 12.0 * std::log2(freq / 440.0);
 		note += m_voice[i]->m_coarseModel.value();
 		freq = 440.0 * std::exp2((note - 69.0) / 12.0);
 		data16 = int( freq / float(clockrate) * 16777216.0 );
