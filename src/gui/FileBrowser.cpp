@@ -230,7 +230,9 @@ void FileBrowser::onSearch(const QString& filter)
 	auto directoryFilters = QDir::AllEntries | QDir::NoDotAndDotDot;
 	if (m_showHiddenContent) { directoryFilters |= QDir::Hidden; }
 
-	s_currentSearchTask = ThreadPool::instance().enqueue([this, directories, directoryFilters, filter] {
+	const auto keywords = filter.split(" ");
+
+	s_currentSearchTask = ThreadPool::instance().enqueue([this, directories, directoryFilters, keywords] {
 		for (const auto& path : directories)
 		{
 			auto dirIt = QDirIterator{path, directoryFilters, QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
@@ -238,7 +240,11 @@ void FileBrowser::onSearch(const QString& filter)
 			while (dirIt.hasNext() && !s_cancelSearch)
 			{
 				const auto fileInfo = QFileInfo{dirIt.next()};
-				if (!fileInfo.fileName().contains(filter, Qt::CaseInsensitive)) { continue; }
+				const auto fileName = fileInfo.fileName();
+				const auto containsAllKeywords = std::all_of(keywords.begin(), keywords.end(),
+					[&](const auto& keyword) { return fileName.contains(keyword, Qt::CaseInsensitive); });
+
+				if (!containsAllKeywords) { continue; }
 
 				// A delay to avoid bogging down Qt's event loop as we find results.
 				std::this_thread::sleep_for(s_delayBetweenResults);
