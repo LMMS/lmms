@@ -70,7 +70,7 @@ ProcessStatus DispersionEffect::processImpl(CoreAudioDataMut inOut)
 	const bool dc = m_dispersionControls.m_dcModel.value();
 	
 	// All-pass coefficient calculation
-	const float w0 = (F_2PI / m_sampleRate) * freq;
+	const float w0 = (numbers::tau_v<float> / m_sampleRate) * freq;
 	const float a0 = 1 + (std::sin(w0) / (reso * 2.f));
 	float apCoeff1 = (1 - (a0 - 1)) / a0;
 	float apCoeff2 = (-2 * std::cos(w0)) / a0;

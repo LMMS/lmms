@@ -7,13 +7,13 @@
     <string>English</string>
 
     <key>CFBundleIconFile</key>
-    <string>@MACOSX_BUNDLE_ICON_FILE@</string>
+    <string>@CPACK_PROJECT_NAME@</string>
 
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 
     <key>CFBundleGetInfoString</key>
-    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ @MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+    <string>@CPACK_PROJECT_NAME_UCASE@ @CPACK_PROJECT_VERSION@</string>
 
 <!--
     #############################################################
@@ -29,38 +29,38 @@
     #############################################################
 -->
     <key>CFBundleSignature</key>
-    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@</string>
+    <string>@CPACK_PROJECT_NAME_UCASE@</string>
 
     <key>CFBundleExecutable</key>
-    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@</string>
+    <string>@CPACK_PROJECT_NAME@</string>
 
     <key>CFBundleVersion</key>
-    <string>@MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+    <string>@CPACK_PROJECT_VERSION@</string>
 
     <key>CFBundleShortVersionString</key>
-    <string>@MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+    <string>@VERSIONCPACK_PROJECT_VERSION@</string>
 
     <key>CFBundleName</key>
-    <string>@MACOSX_BUNDLE_BUNDLE_NAME@</string>
+    <string>@CPACK_PROJECT_NAME_UCASE@</string>
 
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
 
     <key>CFBundleIdentifier</key>
-    <string>@MACOSX_BUNDLE_MIMETYPE_ID@</string>
+    <string>@MACOS_MIMETYPE_ID@</string>
 
     <key>CFBundleDocumentTypes</key>
     <array>
-    
+
       <dict>
         <key>CFBundleTypeExtensions</key>
           <array>
             <string>mmpz</string>
           </array>
         <key>CFBundleTypeIconFile</key>
-        <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+        <string>project</string>
         <key>CFBundleTypeName</key>
-        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+        <string>@CPACK_PROJECT_NAME_UCASE@ Project</string>
         <key>CFBundleTypeOSTypes</key>
            <array>
              <string>mmpz</string>
@@ -69,19 +69,19 @@
         <string>Editor</string>
         <key>CFBundleTypeMIMETypes</key>
         <array>
-           <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+           <string>application/x-@CPACK_PROJECT_NAME@-project</string>
         </array>
       </dict>
-      
+
       <dict>
         <key>CFBundleTypeExtensions</key>
           <array>
             <string>mmp</string>
           </array>
         <key>CFBundleTypeIconFile</key>
-        <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+        <string>project</string>
         <key>CFBundleTypeName</key>
-        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project (uncompressed)</string>
+        <string>@CPACK_PROJECT_NAME_UCASE@ Project (uncompressed)</string>
         <key>CFBundleTypeOSTypes</key>
            <array>
              <string>mmp</string>
@@ -90,23 +90,23 @@
         <string>Editor</string>
         <key>CFBundleTypeMIMETypes</key>
         <array>
-           <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+           <string>application/x-@CPACK_PROJECT_NAME@-project</string>
         </array>
       </dict>
-      
+
     </array>
 
     <key>UTExportedTypeDeclarations</key>
         <array>
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>@MACOSX_BUNDLE_MIMETYPE_ID@.mmpz</string>
+                <string>@MACOS_MIMETYPE_ID@.mmpz</string>
                 <key>UTTypeReferenceURL</key>
-                <string>@MACOSX_BUNDLE_PROJECT_URL@</string>
+                <string>@CPACK_PROJECT_URL@</string>
                 <key>UTTypeDescription</key>
-                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+                <string>@CPACK_PROJECT_VERSIONPROJECT_NAME_UCASE@ Project</string>
                 <key>UTTypeIconFile</key>
-                <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+                <string>project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -122,13 +122,13 @@
 
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>@MACOSX_BUNDLE_MIMETYPE_ID@.mmp</string>
+                <string>@MACOS_MIMETYPE_ID@.mmp</string>
                 <key>UTTypeReferenceURL</key>
-                <string>@MACOSX_BUNDLE_PROJECT_URL@</string>
+                <string>@CPACK_PROJECT_URL@</string>
                 <key>UTTypeDescription</key>
-                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project (uncompressed)</string>
+                <string>@CPACK_PROJECT_NAME_UCASE@ Project (uncompressed)</string>
                 <key>UTTypeIconFile</key>
-                <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+                <string>project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.xml</string>
