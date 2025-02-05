@@ -38,7 +38,7 @@
 namespace lmms
 {
 
-// [TODO] C++20: Use template<std::signed_integral> instead of int
+// TODO C++20: Use template<std::signed_integral> instead of int
 /*!
  * @brief Performs euclidean division on two integers.
  * @details
@@ -56,8 +56,8 @@ constexpr int ediv(int k, int n)
 	return (k %= n) < 0 ? k + n : k;
 }
 
-// [TODO] C++20: Use template<std::floating_point> instead of float
-// [TODO] C++26: Make constexpr, since std::fmod will be constexpr
+// TODO C++20: Use template<std::floating_point> instead of float
+// TODO C++23: Make constexpr, since std::fmod will be constexpr
 /*!
  * @brief Performs euclidean division on two floats.
  * @details

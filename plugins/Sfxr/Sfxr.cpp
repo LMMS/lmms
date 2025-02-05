@@ -114,16 +114,16 @@ void SfxrSynth::resetSample( bool restart )
 		// reset filter
 		fltp=0.0f;
 		fltdp=0.0f;
-		fltw=pow(s->m_lpFilCutModel.value(), 3.0f)*0.1f;
+		fltw = std::pow(s->m_lpFilCutModel.value(), 3.f) * 0.1f;
 		fltw_d=1.0f+s->m_lpFilCutSweepModel.value()*0.0001f;
 		fltdmp = 5.0f / (1.0f + std::pow(s->m_lpFilResoModel.value(), 2.0f) * 20.0f) * (0.01f + fltw);
 		if(fltdmp>0.8f) fltdmp=0.8f;
 		fltphp=0.0f;
-		flthp=pow(s->m_hpFilCutModel.value(), 2.0f)*0.1f;
+		flthp = std::pow(s->m_hpFilCutModel.value(), 2.f) * 0.1f;
 		flthp_d=1.0+s->m_hpFilCutSweepModel.value()*0.0003f;
 		// reset vibrato
 		vib_phase=0.0f;
-		vib_speed=pow(s->m_vibSpeedModel.value(), 2.0f)*0.01f;
+		vib_speed = std::pow(s->m_vibSpeedModel.value(), 2.f) * 0.01f;
 		vib_amp=s->m_vibDepthModel.value()*0.5f;
 		// reset envelope
 		env_vol=0.0f;
@@ -134,9 +134,9 @@ void SfxrSynth::resetSample( bool restart )
 		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*99999.0f)+1;
 		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*99999.0f)+1;
 
-		fphase=pow(s->m_phaserOffsetModel.value(), 2.0f)*1020.0f;
+		fphase = std::pow(s->m_phaserOffsetModel.value(), 2.f) * 1020.f;
 		if(s->m_phaserOffsetModel.value()<0.0f) fphase=-fphase;
-		fdphase=pow(s->m_phaserSweepModel.value(), 2.0f)*1.0f;
+		fdphase = std::pow(s->m_phaserSweepModel.value(), 2.f) * 1.f;
 		if(s->m_phaserSweepModel.value()<0.0f) fdphase=-fdphase;
 		iphase=abs((int)fphase);
 		ipp=0;
