@@ -1030,20 +1030,15 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
-		bool wasClipSplit = false;
 		if (me->modifiers() & Qt::ShiftModifier)
 		{
-			wasClipSplit = hardSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
+			hardSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
 		else
 		{
-			wasClipSplit = splitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
+			splitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
-		if (!wasClipSplit)
-		{
-			setMarkerEnabled(false);
-			update();
-		}
+		setMarkerEnabled(false);
 	}
 
 	m_action = Action::None;
