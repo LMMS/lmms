@@ -27,6 +27,7 @@
 #define LMMS_AUDIO_PLUGIN_H
 
 #include <type_traits>
+
 #include "AudioData.h"
 #include "AudioPluginConfig.h"
 #include "Effect.h"
@@ -389,6 +390,37 @@ public:
 	using Base::Base;
 
 	static constexpr auto pluginConfig() -> AudioPluginConfig { return config; }
+
+private:
+	/**
+	 * Hooks into the plugin's SerializingObject in order to save and load the audio port.
+	 * Plugin implementations do not have to do anything and audio ports will be
+	 * saved and loaded when they need to be.
+	 */
+	class AudioPortSerializer final : public SerializingObjectHook
+	{
+	public:
+		AudioPortSerializer(AudioPlugin* ap)
+			: m_ap{ap}
+		{
+			ap->setHook(this);
+		}
+
+		void saveSettings(QDomDocument& doc, QDomElement& element) final
+		{
+			m_ap->audioPort().saveSettings(doc, element);
+		}
+
+		void loadSettings(const QDomElement& element) final
+		{
+			m_ap->audioPort().loadSettings(element);
+		}
+
+	private:
+		AudioPlugin* m_ap;
+	};
+
+	AudioPortSerializer m_serializer{this};
 };
 
 
