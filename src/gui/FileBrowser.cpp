@@ -237,11 +237,11 @@ void FileBrowser::onSearch(const QString& filter)
 
 			while (dirIt.hasNext() && !s_cancelSearch)
 			{
-				// A delay to avoid bogging down Qt's event loop as we find results.
-				std::this_thread::sleep_for(s_delayBetweenResults);
-
 				const auto fileInfo = QFileInfo{dirIt.next()};
 				if (!fileInfo.fileName().contains(filter, Qt::CaseInsensitive)) { continue; }
+
+				// A delay to avoid bogging down Qt's event loop as we find results.
+				std::this_thread::sleep_for(s_delayBetweenResults);
 
 				const auto invoked = QMetaObject::invokeMethod(qApp, [this, fileInfo] {
 					if (fileInfo.isDir())
