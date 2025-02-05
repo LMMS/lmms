@@ -171,29 +171,20 @@ void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini)
 
 float DrumSynth::waveform(float ph, int form)
 {
-	float w, p = ediv(ph, numbers::tau_v<float>);
-
-	switch (form)
-	{
-	case 0: // sine
-		w = std::sin(p);
-		break;
-	case 1: // sine^2
-		w = std::abs(2.f * std::sin(.5f * p)) - 1.f;
-		break;
-	case 2: // triangle
-		w = p * 2.f * numbers::inv_pi_v<float>;
-		if (w > 1.f) { w = 2.f - w; }
-		break;
-	case 3: // sawtooth
-		w = p * numbers::inv_pi_v<float> - 1.f;
-		break;
-	default: // square
-		w = (p < numbers::pi_v<float>) ? 1.f : -1.f;
-		break;
-	}
-
-	return w;
+	// sine
+	if (form == 0) { return std::sin(ph); }
+	// sine^2
+	if (form == 1) { return 2.f * std::abs(std::sin(.5 * ph)) - 1.f; }
+	// (ph / τ), used for triangle, sawtooth, and square
+	auto ph_tau = ph * numbers::inv_tau_v<float>;
+	// triangle
+	if (form == 2) { return 4.f * std::abs(ph_tau - std::floor(ph_tau + 0.5f)) - 1.f; }
+	// sawtooth with range [0, 1], used for both sawtooth and square
+	auto saw01 = ph_tau - std::floor(ph_tau);
+	// sawtooth
+	if (form == 3) { return 2.f * saw01 - 1.f; }
+	// square
+	return (saw01 < 0.5f) ? 1.f : -1.f;
 }
 
 int DrumSynth::GetPrivateProfileString(
