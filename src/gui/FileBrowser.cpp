@@ -207,13 +207,13 @@ void FileBrowser::onSearch(const QString& filter)
 		s_cancelSearch = true;
 		s_currentSearchTask.get();
 		s_cancelSearch = false;
+		m_searchIndicator->setRange(0, 1);
 	}
 
 	if (filter.isEmpty())
 	{
 		m_searchTreeWidget->hide();
 		m_fileBrowserTreeWidget->show();
-		m_searchIndicator->setRange(0, 1);
 		return;
 	}
 
@@ -249,9 +249,7 @@ void FileBrowser::onSearch(const QString& filter)
 				// A delay to avoid bogging down Qt's event loop as we find results.
 				std::this_thread::sleep_for(s_delayBetweenResults);
 
-				const auto loopOver = !dirIt.hasNext() || s_cancelSearch;
-
-				const auto invoked = QMetaObject::invokeMethod(qApp, [this, fileInfo, loopOver] {
+				const auto invoked = QMetaObject::invokeMethod(qApp, [this, fileInfo] {
 					if (fileInfo.isDir())
 					{
 						const auto item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter);
@@ -262,14 +260,14 @@ void FileBrowser::onSearch(const QString& filter)
 						const auto item = new FileItem(fileInfo.fileName(), fileInfo.dir().path());
 						m_searchTreeWidget->addTopLevelItem(item);
 					}
-
-					if (loopOver) { m_searchIndicator->setRange(0, 1); }
-				}, Qt::QueuedConnection);
+				});
 
 				// If the entry could not be added, it was most likely because the application is closing,
 				// in which case we cancel the search.
 				if (!invoked) { break; }
 			}
+
+			QMetaObject::invokeMethod(qApp, [this] { m_searchIndicator->setRange(0, 1); });
 		}
 	});
 }
