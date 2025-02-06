@@ -32,19 +32,17 @@
 namespace lmms
 {
 
-class InlineAutomation : public FloatModel, public sharedObject
+class InlineAutomation : public FloatModel
 {
 public:
 	InlineAutomation() :
 		FloatModel(),
-		sharedObject(),
 		m_autoClip( nullptr )
 	{
 	}
 
 	InlineAutomation(const InlineAutomation& _copy) :
 		FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>()),
-		sharedObject(),
 		m_autoClip(_copy.m_autoClip->clone())
 	{
 		m_autoClip->clearObjects();
