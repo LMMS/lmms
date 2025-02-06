@@ -106,12 +106,9 @@ private:
 
 		std::future<void>& currentSearchTask() { return m_currentSearchTask; }
 
-		std::mutex& searchMutex() { return m_mutex; }
-
 	private:
 		std::future<void> m_currentSearchTask;
 		std::atomic<bool> m_cancel;
-		std::mutex m_mutex;
 	};
 
 	void keyPressEvent( QKeyEvent * ke ) override;

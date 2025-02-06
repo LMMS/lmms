@@ -221,12 +221,9 @@ void FileBrowser::onSearch(const QString& filter)
 	m_fileBrowserTreeWidget->hide();
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
+	m_searchIndicator->setRange(0, 0);
 
 	m_searchManager.setCurrentSearchTask(ThreadPool::instance().enqueue([this, directories, directoryFilters, keywords] {
-		const auto searchLock = std::lock_guard{m_searchManager.searchMutex()};
-
-		QMetaObject::invokeMethod(m_searchIndicator, [this] { m_searchIndicator->setRange(0, 0); });
-
 		for (const auto& path : directories)
 		{
 			auto dirIt = QDirIterator{path, directoryFilters, QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
