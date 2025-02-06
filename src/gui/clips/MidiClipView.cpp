@@ -931,7 +931,7 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	rightClip->movePosition(splitPos);
 	rightClip->setHasBeenResized(m_clip->getHasBeenResized());
 	rightClip->changeLength(m_initialClipEnd - splitPos);
-	leftClip->setHasBeenResized(true);
+	rightClip->setHasBeenResized(true);
 	rightClip->updateLength();
 
 	remove();
