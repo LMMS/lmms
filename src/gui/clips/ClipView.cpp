@@ -28,7 +28,6 @@
 #include <cassert>
 
 #include <QMenu>
-#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 
@@ -633,10 +632,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	setInitialOffsets();
 	if( !fixedClips() && me->button() == Qt::LeftButton )
 	{
-		auto sClip = dynamic_cast<SampleClip*>(m_clip);
-		auto pClip = dynamic_cast<PatternClip*>(m_clip);
-		auto aClip = dynamic_cast<AutomationClip*>(m_clip);
-		auto mClip = dynamic_cast<MidiClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
 		if (me->modifiers() & Qt::ControlModifier && !knifeMode)
@@ -681,7 +676,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || aClip || mClip))
+				else if (me->x() < RESIZE_GRIP_WIDTH)
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -737,7 +732,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			else if (m_action == Action::Split)
 			{
 				hint = dynamic_cast<MidiClipView*>(this)
-					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for hard splitting.")
+					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
 					: tr("Press <%1> or <Alt> for unquantized splitting.");
 			}
 			else
@@ -1039,7 +1034,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
 		if (me->modifiers() & Qt::ShiftModifier)
 		{
-			hardSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
+			destructiveSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
 		else
 		{

@@ -872,7 +872,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 }
 
 
-bool MidiClipView::hardSplitClip(const TimePos pos)
+bool MidiClipView::destructiveSplitClip(const TimePos pos)
 {
 	const TimePos splitPos = m_initialClipPos + pos;
 	const TimePos internalSplitPos = pos - m_clip->startTimeOffset();

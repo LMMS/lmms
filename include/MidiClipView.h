@@ -110,7 +110,7 @@ private:
 
 	bool m_legacySEPattern;
 	
-	bool hardSplitClip(const TimePos pos) override;
+	bool destructiveSplitClip(const TimePos pos) override;
 } ;
 
 

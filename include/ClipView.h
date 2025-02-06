@@ -255,7 +255,7 @@ private:
 	* @param pos the position of the split, relative to the start of the clip
 	* @return true if the clip could be split
 	*/
-	virtual bool hardSplitClip(const TimePos pos)
+	virtual bool destructiveSplitClip(const TimePos pos)
 	{
 		return false;
 	}
