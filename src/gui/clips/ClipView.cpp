@@ -100,6 +100,7 @@ ClipView::ClipView( Clip * clip,
 	m_textShadowColor( 0, 0, 0 ),
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
+	m_markerColor(0, 0, 0),
 	m_mouseHotspotHand( 0, 0 ),
 	m_mouseHotspotKnife( 0, 0 ),
 	m_cursorHand( QCursor( embed::getIconPixmap( "hand" ) ) ),
@@ -232,6 +233,9 @@ QColor ClipView::patternClipBackground() const
 bool ClipView::gradient() const
 { return m_gradient; }
 
+QColor ClipView::markerColor() const
+{ return m_markerColor; }
+
 //! \brief CSS theming qproperty access method
 void ClipView::setMutedColor( const QColor & c )
 { m_mutedColor = QColor( c ); }
@@ -258,6 +262,9 @@ void ClipView::setPatternClipBackground( const QColor & c )
 
 void ClipView::setGradient( const bool & b )
 { m_gradient = b; }
+
+void ClipView::setMarkerColor(const QColor & c)
+{ m_markerColor = QColor(c); }
 
 // access needsUpdate member variable
 bool ClipView::needsUpdate()

@@ -63,6 +63,7 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor patternClipBackground READ patternClipBackground WRITE setPatternClipBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
+	Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor)
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
 	Q_PROPERTY( QSize mouseHotspotHand MEMBER m_mouseHotspotHand )
@@ -94,6 +95,7 @@ public:
 	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
 	QColor patternClipBackground() const;
+	QColor markerColor() const;
 	bool gradient() const;
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
@@ -103,6 +105,7 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setPatternClipBackground(const QColor& c);
 	void setGradient( const bool & b );
+	void setMarkerColor(const QColor & c);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -219,6 +222,7 @@ private:
 	QColor m_textShadowColor;
 	QColor m_patternClipBackground;
 	bool m_gradient;
+	QColor m_markerColor;
 	QSize m_mouseHotspotHand; // QSize must be used because QPoint
 	QSize m_mouseHotspotKnife; // isn't supported by property system
 	QCursor m_cursorHand;

@@ -306,6 +306,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if ( m_marker )
 	{
+		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	// recording sample tracks is not possible at the moment

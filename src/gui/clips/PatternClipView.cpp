@@ -161,6 +161,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	
 	if (m_marker)
 	{
+		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	
