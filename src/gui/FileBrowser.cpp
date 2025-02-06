@@ -199,7 +199,6 @@ void FileBrowser::restoreDirectoriesStates()
 void FileBrowser::onSearch(const QString& filter)
 {
 	m_searchManager.cancel();
-	m_searchIndicator->setRange(0, 1);
 
 	if (filter.isEmpty())
 	{
@@ -221,38 +220,39 @@ void FileBrowser::onSearch(const QString& filter)
 	m_fileBrowserTreeWidget->hide();
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
-	m_searchIndicator->setRange(0, 0);
 
-	m_searchManager.setCurrentSearchTask(ThreadPool::instance().enqueue([this, directories, directoryFilters, keywords] {
-		for (const auto& path : directories)
-		{
-			auto dirIt = QDirIterator{path, directoryFilters, QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
+	m_searchManager.setCurrentSearchTask(
+		ThreadPool::instance().enqueue([this, directories, directoryFilters, keywords] {
+			QMetaObject::invokeMethod(m_searchIndicator, [this] { m_searchIndicator->setRange(0, 0); });
 
-			while (dirIt.hasNext() && !m_searchManager.cancelled())
+			for (const auto& path : directories)
 			{
-				const auto fileInfo = QFileInfo{dirIt.next()};
-				const auto fileName = fileInfo.fileName();
-				const auto containsAllKeywords = std::all_of(keywords.begin(), keywords.end(),
-					[&](const auto& keyword) { return fileName.contains(keyword, Qt::CaseInsensitive); });
+				auto dirIt = QDirIterator{path, directoryFilters,
+					QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
 
-				if (!containsAllKeywords) { continue; }
-
-				auto item = static_cast<QTreeWidgetItem*>(nullptr);
-				if (fileInfo.isDir())
+				while (dirIt.hasNext() && !m_searchManager.cancelled())
 				{
-					item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter);
-				}
-				else if (fileInfo.isFile())
-				{
-					item = new FileItem(fileInfo.fileName(), fileInfo.dir().path());
-				}
+					const auto fileInfo = QFileInfo{dirIt.next()};
+					const auto fileName = fileInfo.fileName();
+					const auto containsAllKeywords = std::all_of(keywords.begin(), keywords.end(),
+						[&](const auto& keyword) { return fileName.contains(keyword, Qt::CaseInsensitive); });
 
-				QMetaObject::invokeMethod(m_searchTreeWidget, [this, item] { m_searchTreeWidget->addTopLevelItem(item); });
+					if (!containsAllKeywords) { continue; }
+
+					auto item = static_cast<QTreeWidgetItem*>(nullptr);
+					if (fileInfo.isDir())
+					{
+						item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter);
+					}
+					else if (fileInfo.isFile()) { item = new FileItem(fileInfo.fileName(), fileInfo.dir().path()); }
+
+					QMetaObject::invokeMethod(
+						m_searchTreeWidget, [this, item] { m_searchTreeWidget->addTopLevelItem(item); });
+				}
 			}
 
 			QMetaObject::invokeMethod(m_searchIndicator, [this] { m_searchIndicator->setRange(0, 1); });
-		}
-	}));
+		}));
 }
 
 void FileBrowser::reloadTree()
