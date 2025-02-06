@@ -47,11 +47,11 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( nullptr )
+	m_detuning(nullptr)
 {
-	if( detuning )
+	if (detuning)
 	{
-		m_detuning = sharedObject::ref( detuning );
+		m_detuning = new DetuningHelper(*detuning);
 	}
 	else
 	{
@@ -77,9 +77,9 @@ Note::Note( const Note & note ) :
 	m_detuning(nullptr),
 	m_type(note.m_type)
 {
-	if( note.m_detuning )
+	if (note.m_detuning)
 	{
-		m_detuning = sharedObject::ref( note.m_detuning );
+		m_detuning = new DetuningHelper(*note.m_detuning);
 	}
 }
 
@@ -88,10 +88,7 @@ Note::Note( const Note & note ) :
 
 Note::~Note()
 {
-	if( m_detuning )
-	{
-		sharedObject::unref( m_detuning );
-	}
+	delete m_detuning;
 }
 
 

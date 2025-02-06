@@ -200,6 +200,8 @@ public:
 		return new AutomationClip(*this);
 	}
 
+	void clearObjects() { m_objects.clear(); }
+
 public slots:
 	void clear();
 	void objectDestroyed( lmms::jo_id_t );
