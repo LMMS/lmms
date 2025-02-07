@@ -937,9 +937,12 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_vi->m_scrollArea);
-	m_vi->m_scrollArea->setFixedWidth(960);
+	// FIXME: dynamically change the amount of knobs depending on width
+	//        and/or transition to faders
+	m_vi->m_scrollArea->setWidgetResizable(true);
 	m_vi->m_scrollArea->setMinimumHeight(300);
+
+	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
@@ -950,6 +953,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	l->setVerticalSpacing( 10 );
 	l->setHorizontalSpacing( 23 );
 
+	// FIXME: group buttone into a QBoxLayout so they don't slide apart when window is stretched
 	m_syncButton = new QPushButton( tr( "VST Sync" ), this );
 	connect( m_syncButton, SIGNAL( clicked() ), this,
 							SLOT( syncPlugin() ) );
@@ -1026,7 +1030,6 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	}
 
 	l->setRowStretch( ( int( m_vi->paramCount / 10) + 1), 1 );
-	l->setColumnStretch( 10, 1 );
 
 	widget->setLayout(l);
 	widget->setAutoFillBackground(true);
