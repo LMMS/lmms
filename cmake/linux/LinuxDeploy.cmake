@@ -253,7 +253,7 @@ macro(copy_excluded ldd_target name_match destination relocated_lib)
 endmacro()
 
 # copy libjack
-copy_excluded("${APP}/usr/bin/lmms" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
+copy_excluded("${APP}/usr/bin/${lmms}" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
 if(relocated_jack)
 	# libdb's not excluded however we'll re-use the macro as a convenient path calculation
 	# See https://github.com/LMMS/lmms/issues/7689s
