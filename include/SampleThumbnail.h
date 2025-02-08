@@ -50,13 +50,6 @@ namespace lmms {
 class LMMS_EXPORT SampleThumbnail
 {
 public:
-	//! Maximum number of cached sample thumbnails.
-	//! This cache only allows for caching sample thumbnails that have an associated file path.
-	static constexpr auto MaxSampleThumbnailCacheSize = 32;
-
-	//! The number of samples to aggregate per zoom step when building the thumbnail cache.
-	static constexpr auto AggregationPerZoomStep = 10;
-
 	struct VisualizeParameters
 	{
 		QRect sampleRect; //!< A rectangle that covers the entire range of samples.

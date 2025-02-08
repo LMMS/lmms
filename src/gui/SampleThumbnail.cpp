@@ -28,6 +28,11 @@
 #include <QDebug>
 #include <QFileInfo>
 
+namespace {
+	static constexpr auto MaxSampleThumbnailCacheSize = 32;
+	static constexpr auto AggregationPerZoomStep = 10;
+}
+
 namespace lmms {
 
 SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPerPeak)
