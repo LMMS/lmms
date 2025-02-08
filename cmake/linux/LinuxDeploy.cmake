@@ -169,6 +169,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--desktop-file "${DESKTOP_FILE}"
 	--plugin qt
 	${LIBRARIES}
+	${SKIP_LIBRARIES}
 	--verbosity ${VERBOSITY}
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
