@@ -61,6 +61,8 @@ namespace lmms::gui
 {
 
 constexpr auto c_dBScalingExponent = 3.f;
+//! The dbFS amount after which we drop down to -inf dbFS
+constexpr auto c_faderMinDb = -120.f;
 
 SimpleTextFloat* Fader::s_textFloat = nullptr;
 
@@ -125,13 +127,12 @@ void Fader::adjustByDialog()
 
 	if (modelIsLinear())
 	{
-		auto minDB = m_faderMinDb;
 		auto maxDB = ampToDbfs(model()->maxValue());
-		const auto currentValue = model()->value() <= 0. ? m_faderMinDb : ampToDbfs(model()->value());
+		const auto currentValue = model()->value() <= 0. ? c_faderMinDb : ampToDbfs(model()->value());
 
 		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
-							tr("Please enter a new value between %1 and %2:").arg(minDB).arg(maxDB),
-							currentValue, minDB, maxDB, model()->getDigitCount(), &ok);
+							tr("Please enter a new value between %1 and %2:").arg(c_faderMinDb).arg(maxDB),
+							currentValue, c_faderMinDb, maxDB, model()->getDigitCount(), &ok);
 
 		if (ok)
 		{
@@ -304,7 +305,7 @@ void Fader::adjustModelByDBDelta(float value)
 			if (value > 0)
 			{
 				// Otherwise set the model to the minimum value supported by the fader.
-				model()->setValue(dbfsToAmp(m_faderMinDb));
+				model()->setValue(dbfsToAmp(c_faderMinDb));
 			}
 		}
 		else
@@ -314,7 +315,7 @@ void Fader::adjustModelByDBDelta(float value)
 
 			const auto adjustedValue = valueInDB + value;
 
-			model()->setValue(adjustedValue < m_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
+			model()->setValue(adjustedValue < c_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
 		}
 	}
 	else
@@ -352,7 +353,7 @@ int Fader::calculateKnobPosYFromModel() const
 		{
 			// Make sure that we do not get values less that the minimum fader dbFS
 			// for the calculations that will follow.
-			auto const actualDb = std::max(m_faderMinDb, ampToDbfs(value));
+			auto const actualDb = std::max(c_faderMinDb, ampToDbfs(value));
 
 			const auto scaledRatio = computeScaledRatio(actualDb);
 
@@ -414,7 +415,7 @@ void Fader::setVolumeByLocalPixelValue(int y)
 
 			float const maxDb = ampToDbfs(m->maxValue());
 
-			LinearMap<float> dbMap(1., maxDb, 0., m_faderMinDb);
+			LinearMap<float> dbMap(1., maxDb, 0., c_faderMinDb);
 
 			float const dbValue = dbMap.map(knobPos);
 
@@ -422,7 +423,7 @@ void Fader::setVolumeByLocalPixelValue(int y)
 			// This should not happen due to the steps above but let's be sure.
 			// Otherwise compute the amplification value from the mapped dbFS value but make sure that we
 			// do not exceed the maximum dbValue of the model
-			float ampValue = dbValue < m_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
+			float ampValue = dbValue < c_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
 
 			model()->setValue(ampValue);
 		}
@@ -439,7 +440,7 @@ float Fader::computeScaledRatio(float dBValue) const
 {
 	const auto maxDb = ampToDbfs(model()->maxValue());
 
-	const auto ratio = (dBValue - m_faderMinDb) / (maxDb - m_faderMinDb);
+	const auto ratio = (dBValue - c_faderMinDb) / (maxDb - c_faderMinDb);
 
 	return std::pow(ratio, c_dBScalingExponent);
 }

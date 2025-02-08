@@ -183,9 +183,6 @@ private:
 	bool m_levelsDisplayedInDBFS {true};
 	bool m_modelIsLinear {false};
 
-	//! The dbFS amount after which we drop down to -inf dbFS
-	float const m_faderMinDb {-120.};
-
 	static SimpleTextFloat* s_textFloat;
 
 	QColor m_peakOk {10, 212, 92};
