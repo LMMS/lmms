@@ -249,7 +249,7 @@ void PluginFactory::discoverPlugins()
 	m_descriptors = descriptors;
 }
 
-// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="*carla*"
+// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="libcarla"
 void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
 	// Get filter
 	QList<QRegularExpression> excludedPatterns;
