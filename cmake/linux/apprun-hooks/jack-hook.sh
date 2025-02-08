@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 ME="$( basename "${BASH_SOURCE[0]}")"
 # Set language to English
 export LC_ALL=C
-if ldd "$DIR/usr/bin/lmms" |grep "libjack.so.0" |grep "not found" > /dev/null 2>&1; then
+if ldd "$DIR/usr/bin/lmms" |grep "libjack.so" |grep "not found" > /dev/null 2>&1; then
 	echo "[$ME] Jack does not appear to be installed.  That's OK, we'll use a dummy version instead." >&2
 	export LD_LIBRARY_PATH="$DIR/usr/lib/jack:$LD_LIBRARY_PATH"
 else
