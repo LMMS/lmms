@@ -104,6 +104,8 @@ private:
 	QHash<QString, QString> m_errors;
 
 	static std::unique_ptr<PluginFactory> s_instance;
+
+	static QList<QRegularExpression> filterPlugins(QSet<QFileInfo>& files);
 };
 
 //Short-hand function
