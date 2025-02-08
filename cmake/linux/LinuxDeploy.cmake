@@ -160,7 +160,7 @@ foreach(_lib IN LISTS LIBS)
 	endif()
 endforeach()
 
-list(APPEND SKIP_LIBRARIES "--exclude-library=libgallium*")
+list(APPEND SKIP_LIBRARIES "--exclude-library=*libgallium*")
 
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
