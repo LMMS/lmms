@@ -260,6 +260,7 @@ if(relocated_jack)
 	copy_excluded("${relocated_jack}" "libdb-" "${APP}/usr/lib/jack" relocated_libdb)
 	get_filename_component(libdb_name "${relocated_libdb}" NAME)
 	if(relocated_libdb AND EXISTS "${APP}/usr/lib/${libdb_name}")
+		# assume a copy already resides in usr/lib and symlink
 		file(REMOVE "${relocated_libdb}")
 		create_symlink("${APP}/usr/lib/${libdb_name}" "${relocated_libdb}")
 	endif()
