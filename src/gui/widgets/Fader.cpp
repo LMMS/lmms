@@ -706,7 +706,15 @@ void Fader::paintFaderTicks(QPainter& painter)
 	const QPen zeroPen(QColor(255, 255, 255, 216), 1.5);
 	const QPen nonZeroPen(QColor(255, 255, 255, 128), 1.);
 
-	for (float i = 6.f; i >= -120.f; i-= 6.f)
+	// We use the maximum dB value of the model to calculate the nearest multiple
+	// of the step size that we use to paint the ticks so that we know the start point.
+	// This code will paint ticks with steps that are defined by the step size around
+	// the 0 dB marker.
+	const auto maxDB = ampToDbfs(model()->maxValue());
+	const auto stepSize = 6.f;
+	const auto startValue = std::floor(maxDB / stepSize) * stepSize;
+
+	for (float i = startValue; i >= c_faderMinDb; i-= stepSize)
 	{
 		const auto scaledRatio = computeScaledRatio(i);
 		const auto maxHeight = height() - (height() - m_knob.height()) * scaledRatio - (m_knob.height() / 2);
