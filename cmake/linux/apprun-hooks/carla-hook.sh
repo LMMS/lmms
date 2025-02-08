@@ -24,7 +24,7 @@ if command -v carla > /dev/null 2>&1; then
 	done
 else
 	echo "[$ME] Carla does not appear to be installed, we'll remove it from the plugin listing." >&2
-	export "LMMS_EXCLUDE_PLUGINS=*carla*,${LMMS_EXCLUDE_PLUGINS}"
+	export "LMMS_EXCLUDE_PLUGINS=libcarla,${LMMS_EXCLUDE_PLUGINS}"
 fi
 
 # Additional workarounds for library conflicts
