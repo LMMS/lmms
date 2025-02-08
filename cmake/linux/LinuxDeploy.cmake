@@ -255,7 +255,8 @@ endmacro()
 # copy libjack
 copy_excluded("${APP}/usr/bin/lmms" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
 if(relocated_jack)
-	# libdb's not excluded, re-use macro to obtain path for symlink https://github.com/LMMS/lmms/issues/7689
+	# libdb's not excluded however we'll re-use the macro as a convenient path calculation
+	# See https://github.com/LMMS/lmms/issues/7689s
 	copy_excluded("${relocated_jack}" "libdb-" "${APP}/usr/lib/jack" relocated_libdb)
 	get_filename_component(libdb_name "${relocated_libdb}" NAME)
 	if(relocated_libdb AND EXISTS "${APP}/usr/lib/${libdb_name}")
