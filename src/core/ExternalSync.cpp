@@ -82,23 +82,23 @@ static jack_transport_state_t s_lastJackState = JackTransportStopped;
 /*! Function adapt events from Jack Transport to LMMS  */
 static int syncCallBack(jack_transport_state_t state, jack_position_t *pos, void *arg)
 {
-	struct ExSyncCallbacks *slaveCallBacks  = getFollowerCallBacks();
-	// Now slaveCallBacks is local copy - never be changed by other thread ...
-	if (slaveCallBacks)
+	struct ExSyncCallbacks *cb = getFollowerCallBacks();
+	// Now cb is local copy of FollowerCallBacks - never be changed by other thread ...
+	if (cb)
 	{
 		switch(state)
 		{
 		case JackTransportStopped:
-			slaveCallBacks->mode(false);
-			slaveCallBacks->position(pos->frame);
+			cb->mode(false);
+			cb->position(pos->frame);
 			break;
 		case JackTransportStarting:
-			slaveCallBacks->mode(true);
-			slaveCallBacks->position(pos->frame);
+			cb->mode(true);
+			cb->position(pos->frame);
 			break;
 		case JackTransportRolling: //!< mostly not called with this state
-			slaveCallBacks->mode(true);
-			slaveCallBacks->position(pos->frame);
+			cb->mode(true);
+			cb->position(pos->frame);
 			break;
 		default:
 			; // not use JackTransportLooping  and JackTransportNetStarting enum
@@ -159,7 +159,7 @@ static bool jackStopped()
 }
 
 
-static void jackSlave(bool set)
+static void jackLMMSFollow(bool set)
 {
 	if (s_syncJackd)
 	{
@@ -189,7 +189,7 @@ static struct SyncDriverHandler s_jackdHandler = {
 	&jackPlay,
 	&jackPosition,
 	&jackStopped,
-	&jackSlave
+	&jackLMMSFollow
 };
 
 
@@ -370,13 +370,13 @@ struct SyncHandler *getLMMSSyncHandler()
 static f_cnt_t s_lastFrame = 0; // Save last frame position to catch change
 void SyncHook::pulse()
 {
-	struct ExSyncCallbacks *slaveCallBacks  = getFollowerCallBacks();
+	struct ExSyncCallbacks *cb  = getFollowerCallBacks();
 	struct SyncDriverHandler *sync = getJackHandler();
 	auto lSong = Engine::getSong();
 	f_cnt_t lFrame = 0;
-	if (sync && slaveCallBacks && sync->Stopped()) 
+	if (sync && cb && sync->Stopped()) 
 	{ 
-		slaveCallBacks->mode(false); 
+		cb->mode(false); 
 	}
 	if (sync &&  lSong->isStopped())
 	{
@@ -418,8 +418,11 @@ void SyncHook::start()
 	if (sync && s_SyncOn)
 	{
 		startSyncExtentions();
-		sync->sendPlay(true);
-		if( SyncCtl::Leader == s_SyncMode) { jump(); }
+		if ((SyncCtl::Leader == s_SyncMode) || (SyncCtl::Duplex == s_SyncMode))
+		{
+			sync->sendPlay(true);
+			jump();
+		}
 	}
 }
 
@@ -430,8 +433,11 @@ void SyncHook::stop()
 	if (sync && s_SyncOn)
 	{
 		stopSyncExtentions();
-		sync->sendPlay(false);
-		if( SyncCtl::Leader == s_SyncMode) { jump(); }
+		if ((SyncCtl::Leader == s_SyncMode) || (SyncCtl::Duplex == s_SyncMode))
+		{
+			sync->sendPlay(false);
+			jump();
+		}
 	}
 }
 
