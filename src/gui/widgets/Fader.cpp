@@ -703,7 +703,7 @@ void Fader::paintFaderTicks(QPainter& painter)
 {
 	painter.save();
 
-	const QPen zeroPen(QColor(255, 255, 255, 216), 1.5);
+	const QPen zeroPen(QColor(255, 255, 255, 216), 2.5);
 	const QPen nonZeroPen(QColor(255, 255, 255, 128), 1.);
 
 	// We use the maximum dB value of the model to calculate the nearest multiple
