@@ -250,7 +250,7 @@ void PluginFactory::discoverPlugins()
 }
 
 // Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="*carla*"
-QSet<QFileInfo> filterPlugins(QSet<QFileInfo>& files) {
+void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
 	// Get filter
 	QList<QRegularExpression> excludedPatterns;
 	QString excludePatternString = std::getenv("LMMS_EXCLUDE_PLUGINS");

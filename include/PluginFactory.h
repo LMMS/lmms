@@ -105,7 +105,7 @@ private:
 
 	static std::unique_ptr<PluginFactory> s_instance;
 
-	static QList<QRegularExpression> filterPlugins(QSet<QFileInfo>& files);
+	static void filterPlugins(QSet<QFileInfo>& files);
 };
 
 //Short-hand function
