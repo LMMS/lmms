@@ -1,6 +1,6 @@
 # Use weak jack library linking
 if(LMMS_HAVE_WEAKJACK)
-	add_library(weakjack SHARED
+	add_library(weakjack STATIC
 		weakjack/weak_libjack.c
 	)
 	target_include_directories(weakjack PUBLIC weakjack)
@@ -11,6 +11,4 @@ if(LMMS_HAVE_WEAKJACK)
 		USE_WEAK_JACK=1
 		NO_JACK_METADATA=1
 	)
-
-	install(TARGETS weakjack LIBRARY DESTINATION "${PLUGIN_DIR}/optional")
 endif()
