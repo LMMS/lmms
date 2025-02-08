@@ -268,6 +268,9 @@ if(relocated_jack)
 	endif()
 endif()
 
+# cleanup empty directories
+file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/optional/")
+
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
 
