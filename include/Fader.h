@@ -137,14 +137,17 @@ private:
 	int calculateKnobPosYFromModel() const;
 	void setVolumeByLocalPixelValue(int y);
 
-	// Computes the scaled ratio between the maximum dB value supported by the model and the minimum
-	// dB value that's supported by the fader from the given actual dB value.
-	// If the provided input value lies inside the aforementioned interval then the result will be
-	// a value between 0 (value == minimum value) and 1 (value == maximum model value).
-	// If you look at the graphical representation of the fader then 0 represents a point at the bottom
-	// of the fader and 1 a point at the top of the fader.
-	// The ratio is scaled by an internal exponent which is an implementation detail that cannot be
-	// changed for now.
+	/**
+	 * @brief Computes the scaled ratio between the maximum dB value supported by the model and the minimum
+	 * dB value that's supported by the fader from the given actual dB value.
+	 * 
+	 * If the provided input value lies inside the aforementioned interval then the result will be
+	 * a value between 0 (value == minimum value) and 1 (value == maximum model value).
+	 * If you look at the graphical representation of the fader then 0 represents a point at the bottom
+	 * of the fader and 1 a point at the top of the fader.
+	 * The ratio is scaled by an internal exponent which is an implementation detail that cannot be
+	 * changed for now.
+	 */
 	float computeScaledRatio(float dBValue) const;
 
 	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
@@ -169,15 +172,18 @@ private:
 
 	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
 
-	// Stores the offset to the knob center when the user drags the fader knob.
-	// This is needed to make it feel like the users drag the knob without it
-	// jumping immediately to the click position.
+	/**
+	 * @brief Stores the offset to the knob center when the user drags the fader knob
+	 * 
+	 * This is needed to make it feel like the users drag the knob without it
+	 * jumping immediately to the click position.
+	 */
 	int m_knobCenterOffset {0};
 
 	bool m_levelsDisplayedInDBFS {true};
 	bool m_modelIsLinear {false};
 
-	// The dbFS amount after which we drop down to -inf dbFS
+	//! The dbFS amount after which we drop down to -inf dbFS
 	float const m_faderMinDb {-120.};
 
 	static SimpleTextFloat* s_textFloat;

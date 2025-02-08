@@ -126,7 +126,6 @@ void ConfigManager::upgrade_1_1_90()
 void ConfigManager::upgrade_1_1_91()
 {
 	// rename displaydbv to displaydbfs
-	// Note: the value of "displaydbfs" is not evaluated anymore!
 	if (!value("app", "displaydbv").isNull())
 	{
 		setValue("app", "displaydbfs", value("app", "displaydbv"));

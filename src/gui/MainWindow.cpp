@@ -1099,7 +1099,7 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	auto qa = new QAction(tr( "Smooth scroll" ), this);
+	auto qa = new QAction(tr("Smooth scroll"), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
@@ -1129,7 +1129,7 @@ void MainWindow::updateConfig( QAction * _who )
 	QString tag = _who->data().toString();
 	bool checked = _who->isChecked();
 
-	if ( tag == "tooltips" )
+	if (tag == "tooltips")
 	{
 		ConfigManager::inst()->setValue( "tooltips", "disabled",
 						 QString::number(!checked) );
