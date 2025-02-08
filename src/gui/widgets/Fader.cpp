@@ -57,12 +57,15 @@
 #include "ConfigManager.h"
 #include "SimpleTextFloat.h"
 
+namespace
+{
+	constexpr auto c_dBScalingExponent = 3.f;
+	//! The dbFS amount after which we drop down to -inf dbFS
+	constexpr auto c_faderMinDb = -120.f;
+}
+
 namespace lmms::gui
 {
-
-constexpr auto c_dBScalingExponent = 3.f;
-//! The dbFS amount after which we drop down to -inf dbFS
-constexpr auto c_faderMinDb = -120.f;
 
 SimpleTextFloat* Fader::s_textFloat = nullptr;
 
