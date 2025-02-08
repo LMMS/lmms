@@ -25,10 +25,6 @@
 #ifndef LMMS_INTERPOLATION_H
 #define LMMS_INTERPOLATION_H
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include <cmath>
 #include "lmms_constants.h"
 #include "lmms_math.h"
@@ -69,27 +65,27 @@ inline float hermiteInterpolate( float x0, float x1, float x2, float x3,
 
 inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 {
-	float frsq = x*x;
-	float frcu = frsq*v0;
-	float t1 = v3 + 3*v1;
+	float frsq = x * x;
+	float frcu = frsq * v0;
+	float t1 = v1 * 3.f + v3;
 
-	return( v1 + fastFmaf( 0.5f, frcu, x ) * ( v2 - frcu * ( 1.0f/6.0f ) -
-		fastFmaf( t1, ( 1.0f/6.0f ), -v0 ) * ( 1.0f/3.0f ) ) + frsq * x * ( t1 *
-		( 1.0f/6.0f ) - 0.5f * v2 ) + frsq * fastFmaf( 0.5f, v2, -v1 ) );
+	return v1 + (0.5f * frcu + x) * (v2 - frcu * (1.0f / 6.0f) -
+		(t1 * (1.0f / 6.0f) - v0) * (1.0f / 3.0f)) + frsq * x * (t1 *
+		(1.0f / 6.0f) - 0.5f * v2) + frsq * (0.5f * v2 - v1);
 }
 
 
 
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
-	const float f = ( 1.0f - cosf( x * F_PI ) ) * 0.5f;
-	return fastFmaf( f, v1-v0, v0 );
+	const float f = (1.0f - std::cos(x * numbers::pi_v<float>)) * 0.5f;
+	return f * (v1 - v0) + v0;
 }
 
 
 inline float linearInterpolate( float v0, float v1, float x )
 {
-	return fastFmaf( x, v1-v0, v0 );
+	return x * (v1 - v0) + v0;
 }
 
 
@@ -104,7 +100,7 @@ inline float optimalInterpolate( float v0, float v1, float x )
 	const float c2 = even * -0.004541102062639801;
 	const float c3 = odd * -1.57015627178718420;
 	
-	return fastFmaf( fastFmaf( fastFmaf( c3, z, c2 ), z, c1 ), z, c0 );
+	return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
 
@@ -121,7 +117,7 @@ inline float optimal4pInterpolate( float v0, float v1, float v2, float v3, float
 	const float c2 = even1 * -0.246185007019907091 + even2 * 0.24614027139700284;
 	const float c3 = odd1 * -0.36030925263849456 + odd2 * 0.10174985775982505;
 
-	return fastFmaf( fastFmaf( fastFmaf( c3, z, c2 ), z, c1 ), z, c0 );
+	return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
 
@@ -132,7 +128,7 @@ inline float lagrangeInterpolate( float v0, float v1, float v2, float v3, float 
 	const float c1 = v2 - v0 * ( 1.0f / 3.0f ) - v1 * 0.5f - v3 * ( 1.0f / 6.0f );
 	const float c2 = 0.5f * (v0 + v2) - v1;
 	const float c3 = ( 1.0f/6.0f ) * ( v3 - v0 ) + 0.5f * ( v1 - v2 );
-	return fastFmaf( fastFmaf( fastFmaf( c3, x, c2 ), x, c1 ), x, c0 );
+	return ((c3 * x + c2) * x + c1) * x + c0;
 }
 
 

@@ -235,6 +235,11 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		m_failed = false;
 	}
 	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
+
+	// We may have received a directory via a environment variable
+	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
+			exec = QFileInfo(QDir(env_path), pluginExecutable).absoluteFilePath();
+
 #ifdef LMMS_BUILD_APPLE
 	// search current directory first
 	QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
@@ -252,7 +257,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 	if( ! QFile( exec ).exists() )
 	{
-		qWarning( "Remote plugin '%s' not found.",
+		qWarning( "Remote plugin '%s' not found",
 						exec.toUtf8().constData() );
 		m_failed = true;
 		invalidate();
@@ -480,7 +485,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
 	try
 	{
-		m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
+		m_audioBuffer.create(s);
 	}
 	catch (const std::runtime_error& error)
 	{

@@ -135,6 +135,8 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
+	void adjustLeftRightScoll(int value);
+
 	LcdSpinBox * m_tempoSpinBox;
 
 #ifdef LMMS_HAVE_EXTERNALSYNC

@@ -150,6 +150,7 @@ MixerView::MixerView(Mixer* mixer) :
 	newChannelBtn->setObjectName("newChannelBtn");
 	newChannelBtn->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
 	newChannelBtn->setFixedWidth(mixerChannelSize.width());
+	newChannelBtn->setFocusPolicy(Qt::NoFocus);
 	connect(newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget(newChannelBtn, 0);
 
@@ -343,28 +344,37 @@ void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
 
 void MixerView::updateMixerChannel(int index)
 {
-	Mixer * mix = getMixer();
+	const auto mixer = getMixer();
 
-	// does current channel send to this channel?
-	int selIndex = m_currentMixerChannel->channelIndex();
-	auto thisLine = m_mixerChannelViews[index];
+	const auto currentIndex = m_currentMixerChannel->channelIndex();
+	const auto thisLine = m_mixerChannelViews[index];
 	thisLine->setToolTip(getMixer()->mixerChannel(index)->m_name);
 
-	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
-	if (sendModel == nullptr)
+	const auto sendModelCurrentToThis = mixer->channelSendModel(currentIndex, index);
+	if (sendModelCurrentToThis == nullptr)
 	{
-		// does not send, hide send knob
 		thisLine->m_sendKnob->setVisible(false);
+		thisLine->m_sendArrow->setVisible(false);
 	}
 	else
 	{
-		// it does send, show knob and connect
 		thisLine->m_sendKnob->setVisible(true);
-		thisLine->m_sendKnob->setModel(sendModel);
+		thisLine->m_sendKnob->setModel(sendModelCurrentToThis);
+		thisLine->m_sendArrow->setVisible(true);
 	}
 
-	// disable the send button if it would cause an infinite loop
-	thisLine->m_sendButton->setVisible(!mix->isInfiniteLoop(selIndex, index));
+	const auto sendModelThisToCurrent = mixer->channelSendModel(index, currentIndex);
+	if (sendModelThisToCurrent)
+	{
+		thisLine->m_receiveArrowOrSendButton->setVisible(true);
+		thisLine->m_receiveArrowOrSendButton->setCurrentIndex(thisLine->m_receiveArrowStackedIndex);
+	}
+	else
+	{
+		thisLine->m_receiveArrowOrSendButton->setVisible(!mixer->isInfiniteLoop(currentIndex, index));
+		thisLine->m_receiveArrowOrSendButton->setCurrentIndex(thisLine->m_sendButtonStackedIndex);
+	}
+
 	thisLine->m_sendButton->updateLightStatus();
 	thisLine->update();
 }

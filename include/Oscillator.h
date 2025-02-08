@@ -114,7 +114,7 @@ public:
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
 	{
-		return sinf( _sample * F_2PI );
+		return std::sin(_sample * numbers::tau_v<float>);
 	}
 
 	static inline sample_t triangleSample( const float _sample )
@@ -237,7 +237,7 @@ public:
 
 	static inline float freqFromWaveTableBand(int band)
 	{
-		return 440.0f * std::pow(2.0f, (band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
+		return 440.0f * std::exp2((band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
 	}
 
 private:

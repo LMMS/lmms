@@ -40,7 +40,8 @@ class MultitapEchoEffect : public Effect
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~MultitapEchoEffect() override;
-	bool processAudioBuffer( SampleFrame* buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -53,7 +54,7 @@ private:
 
 	inline void setFilterFreq( float fc, StereoOnePole & f )
 	{
-		const float b1 = expf( -2.0f * F_PI * fc );
+		const float b1 = std::exp(-numbers::tau_v<float> * fc);
 		f.setCoeffs( 1.0f - b1, b1 );
 	}
 

@@ -26,14 +26,10 @@
 
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 
 namespace lmms::gui
@@ -139,7 +135,7 @@ void Knob::setLabel( const QString & txt )
 	if( m_knobPixmap )
 	{
 		setFixedSize(qMax<int>( m_knobPixmap->width(),
-					horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), 10)), m_label)),
+					horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label)),
 						m_knobPixmap->height() + 10);
 	}
 
@@ -316,7 +312,7 @@ void Knob::setTextColor( const QColor & c )
 
 QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * F_PI / 180.0;
+	const float rarc = m_angle * numbers::pi_v<float> / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
@@ -459,7 +455,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 	{
 		if (!m_isHtmlLabel)
 		{
-			p.setFont(adjustedToPixelSize(p.font(), 10));
+			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			p.setPen(textColor());
 			p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2,
@@ -468,7 +464,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 		else
 		{
 			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
-			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), 10));
+			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
 			m_tdRenderer->drawContents(&p);
 		}

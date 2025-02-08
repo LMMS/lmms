@@ -1,8 +1,7 @@
 /*
- * panning_constants.h - declaration of some constants, concerning the
- *             panning of a note
+ * Metronome.h
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,19 +22,22 @@
  *
  */
 
-#ifndef LMMS_PANNING_CONSTANTS_H
-#define LMMS_PANNING_CONSTANTS_H
+#ifndef LMMS_METRONOME_H
+#define LMMS_METRONOME_H
 
-namespace lmms
+#include <cstddef>
+
+namespace lmms {
+class Metronome
 {
+public:
+	bool active() const { return m_active; }
+	void setActive(bool active) { m_active = active; }
+	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset);
 
-
-constexpr panning_t PanningRight = ( 0 + 100 );
-constexpr panning_t PanningLeft = - PanningRight;
-constexpr panning_t PanningCenter = 0;
-constexpr panning_t DefaultPanning = PanningCenter;
-
-
+private:
+	bool m_active = false;
+};
 } // namespace lmms
 
-#endif // LMMS_PANNING_CONSTANTS_H
+#endif // LMMS_METRONOME_H

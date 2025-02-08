@@ -1,7 +1,7 @@
 /*
- * noise.h - defination of Noise class.
+ * TrackGrip.h - Grip that can be used to move tracks
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2024- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,23 +22,47 @@
  *
  */
 
-#ifndef NOISE_H
-#define NOISE_H
+#ifndef LMMS_GUI_TRACK_GRIP_H
+#define LMMS_GUI_TRACK_GRIP_H
+
+#include <QWidget>
+
+
+class QPixmap;
 
 namespace lmms
 {
 
+class Track;
 
-class Noise
+namespace gui
 {
+
+class TrackGrip : public QWidget
+{
+	Q_OBJECT
 public:
-	Noise();
-	float tick();
+	TrackGrip(Track* track, QWidget* parent = 0);
+	~TrackGrip() override = default;
+
+signals:
+	void grabbed();
+	void released();
+
+protected:
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void paintEvent(QPaintEvent*) override;
+
 private:
-	double inv_randmax;
+	Track* m_track = nullptr;
+	bool m_isGrabbed = false;
+	static QPixmap* s_grabbedPixmap;
+	static QPixmap* s_releasedPixmap;
 };
 
+} // namespace gui
 
 } // namespace lmms
 
-#endif // NOISE_H
+#endif // LMMS_GUI_TRACK_GRIP_H

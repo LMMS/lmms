@@ -60,10 +60,8 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
-
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -157,17 +155,17 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			double randThing = (fast_rand()/static_cast<double>(FAST_RAND_MAX) * 2. - 1.);
+			double randThing = fast_rand() * static_cast<double>(FAST_RAND_RATIO) * 2. - 1.;
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
 			std::array<float, 2> sprayResult = {0, 0};
 			if (spray > 0)
 			{
-				sprayResult[0] = (fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate;
+				sprayResult[0] = fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate;
 				sprayResult[1] = linearInterpolate(
 					sprayResult[0],
-					(fast_rand() / static_cast<float>(FAST_RAND_MAX)) * spray * m_sampleRate,
+					fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate,
 					spraySpread);
 			}
 			
@@ -245,7 +243,7 @@ bool GranularPitchShifterEffect::processAudioBuffer(SampleFrame* buf, const fpp_
 		changeSampleRate();
 	}
 
-	return isRunning();
+	return Effect::ProcessStatus::ContinueIfNotQuiet;
 }
 
 void GranularPitchShifterEffect::changeSampleRate()
@@ -273,7 +271,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_grainCount = 0;
 	m_grains.reserve(8);// arbitrary
 	
-	m_dcCoeff = std::exp(-2.0 * F_PI * DcRemovalHz / m_sampleRate);
+	m_dcCoeff = std::exp(-numbers::tau_v<float> * DcRemovalHz / m_sampleRate);
 
 	const double pitch = m_granularpitchshifterControls.m_pitchModel.value() * (1. / 12.);
 	const double pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value() * (1. / 24.);
