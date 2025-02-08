@@ -537,7 +537,7 @@ void Fader::paintEvent(QPaintEvent* ev)
 	// Draw the levels with peaks
 	paintLevels(ev, painter, !m_levelsDisplayedInDBFS);
 
-	if (modelIsLinear())
+	if (ConfigManager::inst()->value( "ui", "showfaderticks" ).toInt() && modelIsLinear())
 	{
 		paintFaderTicks(painter);
 	}

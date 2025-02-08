@@ -75,6 +75,7 @@ private slots:
 	void toggleTooltips(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
 	void toggleNoteLabels(bool enabled);
+	void toggleShowFaderTicks(bool enabled);
 	void toggleCompactTrackButtons(bool enabled);
 	void toggleOneInstrumentTrackWindow(bool enabled);
 	void toggleSideBarOnRight(bool enabled);
@@ -136,6 +137,7 @@ private:
 	bool m_tooltips;
 	bool m_displayWaveform;
 	bool m_printNoteLabels;
+	bool m_showFaderTicks;
 	bool m_compactTrackButtons;
 	bool m_oneInstrumentTrackWindow;
 	bool m_sideBarOnRight;
