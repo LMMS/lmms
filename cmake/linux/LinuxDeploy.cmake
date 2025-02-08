@@ -160,6 +160,8 @@ foreach(_lib IN LISTS LIBS)
 	endif()
 endforeach()
 
+list(APPEND SKIP_LIBRARIES "--exclude-library=*libgallium*")
+
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
@@ -167,6 +169,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--desktop-file "${DESKTOP_FILE}"
 	--plugin qt
 	${LIBRARIES}
+	${SKIP_LIBRARIES}
 	--verbosity ${VERBOSITY}
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
@@ -265,6 +268,9 @@ if(relocated_jack)
 		create_symlink("${APP}/usr/lib/${libdb_name}" "${relocated_libdb}")
 	endif()
 endif()
+
+# cleanup empty directories
+file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/optional/")
 
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
