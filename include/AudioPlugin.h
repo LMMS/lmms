@@ -368,9 +368,9 @@ private:
  *
  * A `processImpl` interface method is provided which must be implemented by the plugin implementation.
  *
- * @param ParentT Either `Instrument` or `Effect`
- * @param config Compile time configuration to customize `AudioPlugin`
- * @param AudioPortT The plugin's audio port - must fully implement `PluginAudioPort`
+ * @tparam ParentT Either `Instrument` or `Effect`
+ * @tparam config Compile time configuration to customize `AudioPlugin`
+ * @tparam AudioPortT The plugin's audio port - must fully implement `PluginAudioPort`
  */
 template<class ParentT, AudioPluginConfig config, class AudioPortT = DefaultPluginAudioPort<config>>
 class AudioPlugin
