@@ -116,12 +116,12 @@ public:
 	 *  resize when editing it.
 	 *
 	 */
-	inline void setHasBeenResized( const bool r )
+	void setHasBeenResized(const bool r)
 	{
 		m_hasBeenResized = r;
 	}
 
-	inline const bool getHasBeenResized() const
+	bool getHasBeenResized() const
 	{
 		return m_hasBeenResized;
 	}
