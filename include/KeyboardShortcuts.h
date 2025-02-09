@@ -1,7 +1,7 @@
 /*
  * KeyboardShortcuts.h - Cross-platform handling of keyboard modifier keys
  *
- * Copyright (c) 2025- Michael Gregorius
+ * Copyright (c) 2025 Michael Gregorius
  * Copyright (c) 2015 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
