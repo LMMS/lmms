@@ -105,7 +105,7 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setPatternClipBackground(const QColor& c);
 	void setGradient( const bool & b );
-	void setMarkerColor(const QColor & c);
+	void setMarkerColor(const QColor& c);
 
 	// access needsUpdate member variable
 	bool needsUpdate();

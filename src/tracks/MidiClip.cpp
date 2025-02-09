@@ -460,19 +460,19 @@ void MidiClip::loadSettings( const QDomElement & _this )
 
 	checkType();
 
-	int len = _this.attribute( "len" ).toInt();
-	if( len <= 0 )
+	int len = _this.attribute("len").toInt();
+	if (len <= 0)
 	{
 		// TODO: Handle with an upgrade method
 		updateLength();
 	}
 	else
 	{
-		changeLength( len );
+		changeLength(len);
 	}
 	
-	setHasBeenResized(_this.attribute( "been_resized" ).toInt());
-	setStartTimeOffset(_this.attribute( "off" ).toInt());
+	setHasBeenResized(_this.attribute("been_resized").toInt());
+	setStartTimeOffset(_this.attribute("off").toInt());
 
 	emit dataChanged();
 }

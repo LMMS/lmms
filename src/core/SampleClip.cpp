@@ -318,7 +318,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-	setHasBeenResized(_this.attribute( "been_resized" ).toInt());
+	setHasBeenResized(_this.attribute("been_resized").toInt());
 
 	if (_this.hasAttribute("color"))
 	{

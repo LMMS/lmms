@@ -893,8 +893,8 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
 	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
-	setHasBeenResized(_this.attribute( "been_resized" ).toInt());
-	setStartTimeOffset(_this.attribute( "off" ).toInt());
+	setHasBeenResized(_this.attribute("been_resized").toInt());
+	setStartTimeOffset(_this.attribute("off").toInt());
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )

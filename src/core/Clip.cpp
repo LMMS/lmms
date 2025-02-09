@@ -80,7 +80,7 @@ Clip::Clip(const Clip& other):
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
 	m_color(other.m_color)
 {
-	if(getTrack())
+	if (getTrack())
 	{
 		getTrack()->addClip(this);
 	}
