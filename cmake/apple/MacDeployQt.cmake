@@ -11,6 +11,9 @@ set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
+if(DEFINED ENV{CPACK_DEBUG})
+	set(CPACK_DEBUG "$ENV{CPACK_DEBUG}")
+endif()
 if(NOT CPACK_DEBUG)
 	set(VERBOSITY 1)
 	set(COMMAND_ECHO NONE)

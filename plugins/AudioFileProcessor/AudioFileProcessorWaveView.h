@@ -27,6 +27,7 @@
 
 
 #include "Knob.h"
+#include "SampleThumbnail.h"
 
 
 namespace lmms
@@ -144,6 +145,7 @@ private:
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
+	SampleThumbnail m_sampleThumbnail;
 
 	friend class AudioFileProcessorView;
 
