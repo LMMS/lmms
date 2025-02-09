@@ -176,7 +176,7 @@ float DrumSynth::waveform(float ph, int form)
 	// sine^2
 	if (form == 1) { return std::abs(2.f * std::sin(0.5f * ph)) - 1.f; }
 	// sawtooth with range [0, 1], used to generate triangle, sawtooth, and square
-	auto ph_tau = ph * numbers::inv_tau_v<float>;
+	auto ph_tau = ph / numbers::tau_v<float>;
 	auto saw01 = ph_tau - std::floor(ph_tau);
 	// triangle
 	if (form == 2) { return 1.f - 4.f * std::abs(saw01 - 0.5f); }
