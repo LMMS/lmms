@@ -1,7 +1,8 @@
 /*
- * OperatingSystemHelpers.h - Helpers for OS related concerns
+ * KeyboardShortcuts.h - Cross-platform handling of keyboard modifier keys
  *
  * Copyright (c) 2025- Michael Gregorius
+ * Copyright (c) 2015 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +23,8 @@
  *
  */
 
-#ifndef LMMS_OPERATINGSYSTEMHELPERS_H
-#define LMMS_OPERATINGSYSTEMHELPERS_H
+#ifndef LMMS_KEYBOARDSHORTCUTS_H
+#define LMMS_KEYBOARDSHORTCUTS_H
 
 #include "lmmsconfig.h"
 
@@ -33,14 +34,12 @@
 namespace lmms
 {
 
-constexpr char LADSPA_PATH_SEPERATOR =
-#ifdef LMMS_BUILD_WIN32
-';';
-#else
-':';
-#endif
-
-// Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
+// Qt on macOS maps:
+//  - ControlModifier --> Command keys
+//  - MetaModifier value --> Control keys
+//  - Qt::AltModifier --> Option keys
+//
+// Our UI hints need to be adjusted to accommodate for this
 constexpr const char* UI_CTRL_KEY =
 #ifdef LMMS_BUILD_APPLE
 "⌘";
@@ -55,24 +54,21 @@ constexpr const char* UI_ALT_KEY =
 "Alt";
 #endif
 
-constexpr const char* getOSSppecificModifierKeyString()
-{
+constexpr const char* UI_LINK_KEY =
 #ifdef LMMS_BUILD_APPLE
-    return UI_ALT_KEY;
+UI_ALT_KEY;
 #else
-    return UI_CTRL_KEY;
+UI_CTRL_KEY;
 #endif
-}
 
-constexpr Qt::KeyboardModifier getOSSpecificModifierKey()
-{
+// Shortcut for copying OR linking a UI component
+constexpr Qt::KeyboardModifier KBD_COPY_MODIFIER =
 #ifdef LMMS_BUILD_APPLE
-	return Qt::AltModifier;
+Qt::AltModifier;
 #else
-	return Qt::ControlModifier;
-#endif    
-}
+Qt::ControlModifier;
+#endif
 
 } // namespace lmms
 
-#endif // LMMS_OPERATINGSYSTEMHELPERS_H
+#endif // LMMS_KEYBOARDSHORTCUTS_H

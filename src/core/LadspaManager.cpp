@@ -33,7 +33,6 @@
 
 #include "ConfigManager.h"
 #include "LadspaManager.h"
-#include "OperatingSystemHelpers.h"
 #include "PluginFactory.h"
 
 
