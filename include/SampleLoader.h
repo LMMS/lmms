@@ -1,7 +1,7 @@
 /*
  * SampleLoader.h
  *
- * Copyright (c) 2024 saker
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
