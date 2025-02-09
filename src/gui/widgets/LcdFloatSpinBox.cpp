@@ -42,6 +42,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "FontHelper.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "lmms_math.h"
 
@@ -139,7 +140,7 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 	m_intStep = event->x() < m_wholeDisplay.width();
 
 	if (event->button() == Qt::LeftButton &&
-		!(event->modifiers() & Qt::ControlModifier) &&
+		!(event->modifiers() & KBD_COPY_MODIFIER) &&
 		event->y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;

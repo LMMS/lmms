@@ -29,6 +29,7 @@
 #include "AutomationNode.h"
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
+#include "KeyboardShortcuts.h"
 #include "LocaleHelper.h"
 #include "Note.h"
 #include "PatternStore.h"
@@ -952,7 +953,7 @@ QString AutomationClip::name() const
 	{
 		return m_objects.front()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_COPY_KEY);
 }
 
 
