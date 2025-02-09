@@ -591,7 +591,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return 0;
 	}
 
-	const TimePos & offsetTime = _time - startTimeOffset();
+	const TimePos offsetTime = _time - startTimeOffset();
 
 	// If we have a node at that time, just return its value
 	if (m_timeMap.contains(offsetTime))
