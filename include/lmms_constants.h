@@ -49,15 +49,6 @@ template<std::floating_point T>
 inline constexpr T pi_sqr_v = T(pi_v<T> * pi_v<T>);
 inline constexpr double pi_sqr = pi_sqr_v<double>;
 
-//TODO: Replace entirely with std::numbers::e_v
-template<std::floating_point T>
-inline constexpr T e_v = std::numbers::e_v<T>;
-inline constexpr double e = e_v<double>;
-
-template<std::floating_point T>
-inline constexpr T inv_e_v = T(1.0 / e_v<T>);
-inline constexpr double inv_e = e_v<double>;
-
 }
 
 namespace lmms

@@ -535,7 +535,7 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
 
-		m_data->m_symbol_table.add_constant("e", numbers::e_v<float>);
+		m_data->m_symbol_table.add_constant("e", std::numbers::e_v<float>);
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
 

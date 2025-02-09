@@ -136,14 +136,15 @@ inline float signedPowf(float v, float e)
 //! Value should be within [0,1]
 inline float logToLinearScale(float min, float max, float value)
 {
+	using namespace std::numbers;
 	if (min < 0)
 	{
 		const float mmax = std::max(std::abs(min), std::abs(max));
 		const float val = value * (max - min) + min;
-		float result = signedPowf(val / mmax, numbers::e_v<float>) * mmax;
+		float result = signedPowf(val / mmax, e_v<float>) * mmax;
 		return std::isnan(result) ? 0 : result;
 	}
-	float result = std::pow(value, numbers::e_v<float>) * (max - min) + min;
+	float result = std::pow(value, e_v<float>) * (max - min) + min;
 	return std::isnan(result) ? 0 : result;
 }
 
@@ -151,15 +152,16 @@ inline float logToLinearScale(float min, float max, float value)
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
 inline float linearToLogScale(float min, float max, float value)
 {
+	constexpr float inv_e = 1 / std::numbers::e_v<float>;
 	const float valueLimited = std::clamp(value, min, max);
 	const float val = (valueLimited - min) / (max - min);
 	if (min < 0)
 	{
 		const float mmax = std::max(std::abs(min), std::abs(max));
-		float result = signedPowf(valueLimited / mmax, numbers::inv_e_v<float>) * mmax;
+		float result = signedPowf(valueLimited / mmax, inv_e) * mmax;
 		return std::isnan(result) ? 0 : result;
 	}
-	float result = std::pow(val, numbers::inv_e_v<float>) * (max - min) + min;
+	float result = std::pow(val, inv_e) * (max - min) + min;
 	return std::isnan(result) ? 0 : result;
 }
 
