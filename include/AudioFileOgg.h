@@ -93,17 +93,15 @@ private:
 
 	uint32_t m_serialNo;
 
-	vorbis_comment * m_comments;
-
 	// encoding setup - init by init_ogg_encoding
-	ogg_stream_state	m_os;
-	ogg_page 	 	m_og;
-	ogg_packet	 	m_op;
+	ogg_stream_state m_os;
+	ogg_page m_og;
+	ogg_packet m_op;
 
-	vorbis_dsp_state 	m_vd;
-	vorbis_block     	m_vb;
-	vorbis_info      	m_vi;
-
+	vorbis_dsp_state m_vd;
+	vorbis_block m_vb;
+	vorbis_info m_vi;
+	vorbis_comment m_vc;
 } ;
 
 

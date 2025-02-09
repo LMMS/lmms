@@ -74,9 +74,8 @@ inline int AudioFileOgg::writePage()
 
 bool AudioFileOgg::startEncoding()
 {
-	vorbis_comment vc;
-	vorbis_comment_init(&vc);
-	vorbis_comment_add_tag(&vc, "Cool", "This song has been made using LMMS");
+	vorbis_comment_init(&m_vc);
+	vorbis_comment_add_tag(&m_vc, "Cool", "This song has been made using LMMS");
 
 	m_channels = channels();
 
@@ -97,8 +96,6 @@ bool AudioFileOgg::startEncoding()
 		m_rate = 48000;
 		setSampleRate( 48000 );
 	}
-
-	m_comments 	= &vc;			// comments for ogg-file
 
 	// Have vorbisenc choose a mode for us
 	vorbis_info_init( &m_vi );
@@ -151,8 +148,7 @@ bool AudioFileOgg::startEncoding()
 	ogg_packet header_codebooks;
 
 	// Build the packets
-	vorbis_analysis_headerout( &m_vd, m_comments, &header_main,
-					&header_comments, &header_codebooks );
+	vorbis_analysis_headerout(&m_vd, &m_vc, &header_main, &header_comments, &header_codebooks);
 
 	// And stream them out
 	ogg_stream_packetin( &m_os, &header_main );
@@ -176,7 +172,7 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
 	int eos = 0;
 
-	float** buffer = vorbis_analysis_buffer(&m_vd, _frames * channels());
+	float** buffer = vorbis_analysis_buffer(&m_vd, _frames);
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
@@ -185,7 +181,7 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 		}
 	}
 
-	vorbis_analysis_wrote(&m_vd, _frames * channels());
+	vorbis_analysis_wrote(&m_vd, _frames);
 
 	// While we can get enough data from the library to analyse,
 	// one block at a time...
@@ -245,6 +241,7 @@ void AudioFileOgg::finishEncoding()
 
 		vorbis_block_clear( &m_vb );
 		vorbis_dsp_clear( &m_vd );
+		vorbis_comment_clear(&m_vc);
 		vorbis_info_clear( &m_vi );
 	}
 }
