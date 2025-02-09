@@ -251,17 +251,12 @@ void gui::AudioPortAudioSetupWidget::show()
 PortAudioInitializationGuard::PortAudioInitializationGuard()
 	: m_error(Pa_Initialize())
 {
+	if (m_error != paNoError) { std::cerr << "Failed to initialize PortAudio: " << Pa_GetErrorText(m_error) << '\n'; }
 }
 
 PortAudioInitializationGuard::~PortAudioInitializationGuard()
 {
-	if (m_error == paNoError)
-	{
-		Pa_Terminate();
-		return;
-	}
-
-	std::cerr << "Failed to initialize PortAudio: " << Pa_GetErrorText(m_error);
+	if (m_error == paNoError) { Pa_Terminate(); }
 }
 } // namespace lmms
 
