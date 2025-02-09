@@ -57,6 +57,7 @@
 #include "GuiApplication.h"
 #include "FontHelper.h"
 #include "InstrumentTrack.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
 #include "PatternStore.h"
