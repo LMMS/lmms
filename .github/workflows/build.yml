@@ -318,7 +318,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
