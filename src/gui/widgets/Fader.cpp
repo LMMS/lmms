@@ -55,6 +55,7 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
 
 namespace lmms::gui
@@ -125,8 +126,7 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
 	if (mouseEvent->button() == Qt::LeftButton &&
-			!(mouseEvent->modifiers() & Qt::ControlModifier) &&
-			!(mouseEvent->modifiers() & Qt::AltModifier))
+			!(mouseEvent->modifiers() & KBD_COPY_MODIFIER))
 	{
 		AutomatableModel* thisModel = model();
 		if (thisModel)

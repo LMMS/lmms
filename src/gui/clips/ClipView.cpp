@@ -727,7 +727,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), UI_COPY_KEY,
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_COPY_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
