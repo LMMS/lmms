@@ -97,18 +97,19 @@ void SfxrSynth::resetSample( bool restart )
 	fperiod=100.0/(s->m_startFreqModel.value()*s->m_startFreqModel.value()+0.001);
 	period=(int)fperiod;
 	fmaxperiod=100.0/(s->m_minFreqModel.value()*s->m_minFreqModel.value()+0.001);
-	fslide = 1.0 - std::pow(static_cast<double>(s->m_slideModel.value()), 3.0) * 0.01;
-	fdslide = -std::pow(static_cast<double>(s->m_dSlideModel.value()), 3.0) * 0.000001;
+	const auto sv = static_cast<double>(s->m_slideModel.value());
+	const auto dsv = static_cast<double>(s->m_dSlideModel.value());
+	fslide = 1.0 - sv * sv * sv * 0.01;
+	fdslide = -dsv * dsv * dsv * 0.000001;
 	square_duty=0.5f-s->m_sqrDutyModel.value()*0.5f;
 	square_slide=-s->m_sqrSweepModel.value()*0.00005f;
-	if(s->m_changeAmtModel.value()>=0.0f)
-		{ arp_mod = 1.0 - std::pow(static_cast<double>(s->m_changeAmtModel.value()), 2.0) * 0.9; }
-	else
-		{ arp_mod= 1.0 + std::pow(static_cast<double>(s->m_changeAmtModel.value()), 2.0) * 10.0; }
-	arp_time=0;
-	arp_limit = static_cast<int>(std::pow(1.0f - s->m_changeSpeedModel.value(), 2.0f) * 20000 + 32);
-	if(s->m_changeSpeedModel.value()==1.0f)
-		arp_limit=0;
+	const auto cha = static_cast<double>(s->m_changeAmtModel.value());
+	arp_mod = (cha >= 0.0)
+		? 1.0 - cha * cha * 00.9
+		: 1.0 + cha * cha * 10.0;
+	arp_time = 0;
+	const auto chs = 1.f - s->m_changeSpeedModel.value();
+	arp_limit = (chs == 0.f) ? 0 : static_cast<int>(chs * chs * 20000 + 32);
 	if(!restart)
 	{
 		// reset filter
