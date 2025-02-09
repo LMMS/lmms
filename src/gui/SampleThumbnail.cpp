@@ -107,14 +107,13 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painter) const
 {
 	const auto& sampleRect = parameters.sampleRect;
-	const auto& drawRect = parameters.drawRect.isNull() ? sampleRect : parameters.drawRect;
-	const auto& viewportRect = parameters.viewportRect.isNull() ? drawRect : parameters.viewportRect;
+	const auto& viewportRect = parameters.viewportRect.isNull() ? sampleRect : parameters.viewportRect;
 
-	const auto renderRect = sampleRect.intersected(drawRect).intersected(viewportRect);
+	const auto renderRect = sampleRect.intersected(viewportRect);
 	if (renderRect.isNull()) { return; }
 
 	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
-	if (sampleRange <= 0 || sampleRange > 1) { return; }
+	if (sampleRange <= 0.0f || sampleRange > 1.0f) { return; }
 
 	const auto targetThumbnailWidth = static_cast<int>(static_cast<double>(sampleRect.width()) / sampleRange);
 	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
@@ -136,7 +135,7 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
 
 	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
-	const auto yScale = drawRect.height() / 2 * parameters.amplification;
+	const auto yScale = renderRect.height() / 2 * parameters.amplification;
 
 	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
 		 ++x, i += advanceThumbnailBy)
@@ -145,8 +144,8 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 		const auto endAggregationAt = &(*finerThumbnail)[static_cast<int>(std::ceil((i + 1) * finerThumbnailScaleFactor))];
 		const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
 
-		const auto yMin = drawRect.center().y() - peak.min * yScale;
-		const auto yMax = drawRect.center().y() - peak.max * yScale;
+		const auto yMin = renderRect.center().y() - peak.min * yScale;
+		const auto yMax = renderRect.center().y() - peak.max * yScale;
 
 		painter.drawLine(x, yMin, x, yMax);
 	}

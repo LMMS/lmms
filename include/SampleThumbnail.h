@@ -54,10 +54,8 @@ public:
 	{
 		QRect sampleRect; //!< A rectangle that covers the entire range of samples.
 
-		QRect drawRect; //!< Specifies the location in `sampleRect` where the waveform will be drawn. Equals
-						//!< `sampleRect` when null.
-
-		QRect viewportRect; //!< Clips `drawRect`. Equals `drawRect` when null.
+		QRect viewportRect; //!< Specifies the location in `sampleRect` where the waveform will be drawn. Equals
+							//!< `sampleRect` when null.
 
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 

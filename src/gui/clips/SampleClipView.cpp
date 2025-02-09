@@ -45,7 +45,8 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	m_paintPixmap()
+	m_paintPixmap(),
+	m_paintPixmapXPosition(0)
 {
 	// update UI and tooltip
 	updateSample();
@@ -210,15 +211,20 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if( !needsUpdate() )
 	{
-		painter.drawPixmap( 0, 0, m_paintPixmap );
+		painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 		return;
 	}
 
 	setNeedsUpdate( false );
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	// Use the clip's height to avoid artifacts when rendering while something else is overlaying the clip.
+	const auto viewPortRect = QRect(0, 0, pe->rect().width(), rect().height());
+
+	m_paintPixmapXPosition = pe->rect().x();
+
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != viewPortRect.size())
 	{
-		m_paintPixmap = QPixmap(size());
+		m_paintPixmap = QPixmap(viewPortRect.size());
 	}
 
 	QPainter p( &m_paintPixmap );
@@ -274,12 +280,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
 
 	const auto& sample = m_clip->m_sample;
+
 	if (sample.sampleSize() > 0)
 	{
 		const auto param = SampleThumbnail::VisualizeParameters{
-			.sampleRect = QRect(offsetStart, spacing, sampleLength, height() - spacing),
-			.drawRect = QRect(0, spacing, width(), height() - spacing),
-			.viewportRect = pe->rect(),
+			.sampleRect = QRect(offsetStart - m_paintPixmapXPosition, spacing, sampleLength, height() - spacing),
+			.viewportRect = viewPortRect,
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
 		};
@@ -332,7 +338,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	p.end();
 
-	painter.drawPixmap( 0, 0, m_paintPixmap );
+	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
 
 
