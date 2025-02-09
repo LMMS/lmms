@@ -33,7 +33,9 @@
 #include <QStyleFactory>
 #include <QStyleOption>
 
+#include "embed.h"
 #include "LmmsStyle.h"
+#include "TextFloat.h"
 
 
 namespace lmms::gui
@@ -146,6 +148,13 @@ LmmsStyle::LmmsStyle() :
 			{
 				file.open(QIODevice::ReadOnly);
 				qApp->setStyleSheet(file.readAll());
+				TextFloat::displayMessage(
+					tr("Theme updated"),
+					tr("LMMS theme file %1 has been reloaded.").arg(file.fileName()),
+					embed::getIconPixmap("colorize"),
+					3000
+				);
+				// Handle delete + overwrite events
 				if (!m_styleReloader.files().contains(path))
 				{
 					m_styleReloader.addPath(path);
