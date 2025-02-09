@@ -75,15 +75,8 @@ inline int AudioFileOgg::writePage()
 bool AudioFileOgg::startEncoding()
 {
 	vorbis_comment vc;
-	const char * comments = "Cool=This song has been made using LMMS";
-	std::string user_comments_str(comments);
-	int comment_length = user_comments_str.size();
-	char * user_comments = &user_comments_str[0];
-
-	vc.user_comments = &user_comments;
-	vc.comment_lengths = &comment_length;
-	vc.comments = 1;
-	vc.vendor = nullptr;
+	vorbis_comment_init(&vc);
+	vorbis_comment_add_tag(&vc, "Cool", "This song has been made using LMMS");
 
 	m_channels = channels();
 
@@ -183,9 +176,7 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
 	int eos = 0;
 
-	float * * buffer = vorbis_analysis_buffer( &m_vd, _frames *
-							BYTES_PER_SAMPLE *
-								channels() );
+	float** buffer = vorbis_analysis_buffer(&m_vd, _frames * channels());
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
@@ -194,7 +185,7 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 		}
 	}
 
-	vorbis_analysis_wrote( &m_vd, _frames );
+	vorbis_analysis_wrote(&m_vd, _frames * channels());
 
 	// While we can get enough data from the library to analyse,
 	// one block at a time...
