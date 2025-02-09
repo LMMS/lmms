@@ -81,7 +81,7 @@
 
 
 #ifdef LMMS_DEBUG_FPE
-void signalHandler( int signum ) {
+void fpeHandler( int signum ) {
 
 	// Get a back trace
 	void *array[10];
@@ -98,6 +98,11 @@ void signalHandler( int signum ) {
 	exit(signum);
 }
 #endif
+
+void interruptHandler() {
+	if(qApp != nullptr) qApp->exit(3);
+	exit(3);
+}
 
 static inline QString baseName( const QString & file )
 {
@@ -314,8 +319,9 @@ int main( int argc, char * * argv )
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
-	signal(SIGFPE, signalHandler);
+	signal(SIGFPE, fpeHandler);
 #endif
+	signal(SIGINT, interruptHandler)
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
