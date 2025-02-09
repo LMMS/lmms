@@ -248,6 +248,21 @@ void gui::AudioPortAudioSetupWidget::show()
 	AudioDeviceSetupWidget::show();
 }
 
+PortAudioInitializationGuard::PortAudioInitializationGuard()
+	: m_error(Pa_Initialize())
+{
+}
+
+PortAudioInitializationGuard::~PortAudioInitializationGuard()
+{
+	if (m_error == paNoError)
+	{
+		Pa_Terminate();
+		return;
+	}
+
+	std::cerr << "Failed to initialize PortAudio: " << Pa_GetErrorText(m_error);
+}
 } // namespace lmms
 
 #endif // LMMS_HAVE_PORTAUDIO

@@ -44,8 +44,11 @@ namespace lmms
 class PortAudioInitializationGuard
 {
 public:
-	PortAudioInitializationGuard() { Pa_Initialize(); }
-	~PortAudioInitializationGuard() { Pa_Terminate(); }
+	PortAudioInitializationGuard();
+	~PortAudioInitializationGuard();
+
+private:
+	PaError m_error = paNoError;
 };
 
 namespace gui {
