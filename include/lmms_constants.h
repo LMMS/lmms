@@ -41,14 +41,6 @@ template<std::floating_point T>
 inline constexpr T tau_v = T(pi_v<T> * 2.0);
 inline constexpr double tau = tau_v<double>;
 
-template<std::floating_point T>
-inline constexpr T pi_half_v = T(pi_v<T> / 2.0);
-inline constexpr double pi_half = pi_half_v<double>;
-
-template<std::floating_point T>
-inline constexpr T pi_sqr_v = T(pi_v<T> * pi_v<T>);
-inline constexpr double pi_sqr = pi_sqr_v<double>;
-
 }
 
 namespace lmms
