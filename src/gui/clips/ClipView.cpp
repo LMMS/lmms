@@ -1414,7 +1414,7 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 		endQ = endQ - m_clip->length();
 
 		// Select the position closest to actual position
-		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
+		if (std::abs(newPos - startQ) < std::abs(newPos - endQ)) { newPos = startQ; }
 		else newPos = endQ;
 	}
 	else
@@ -1457,7 +1457,7 @@ TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 		const TimePos rightOff = m_clip->length() - midiPos;
 		const TimePos rightPos = m_clip->length() - rightOff.quantize( snapSize );
 		//...whichever gives a position closer to the cursor
-		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
+		if (std::abs(leftPos - midiPos) < std::abs(rightPos - midiPos)) { return leftPos; }
 		else { return rightPos; }
 	}
 	else

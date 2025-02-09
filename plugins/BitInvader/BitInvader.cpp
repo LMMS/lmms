@@ -86,7 +86,7 @@ BSynth::BSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 		i.e., the absolute value of all samples is <= 1.0 if _factor
 		is different to the default normalization factor. If there is
 		a value > 1.0, clip the sample to 1.0 to limit the range. */
-		if ((_factor != defaultNormalizationFactor) && (fabsf(buf) > 1.0f))
+		if ((_factor != defaultNormalizationFactor) && (std::abs(buf) > 1.0f))
 		{
 			buf = (buf < 0) ? -1.0f : 1.0f;
 		}
@@ -238,7 +238,7 @@ void BitInvader::normalize()
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{
-		const float f = fabsf( samples[i] );
+		const float f = std::abs(samples[i]);
 		if (f > max) { max = f; }
 	}
 	m_normalizeFactor = 1.0 / max;

@@ -77,11 +77,10 @@ public:
 
 	void tick( float *l, float *r )
 	{
-		*l = sinf( m_phase );
-		*r = sinf( m_phase + m_offset );
+		*l = std::sin(m_phase);
+		*r = std::sin(m_phase + m_offset);
 		m_phase += m_increment;
-
-		while (m_phase >= numbers::tau)	{	m_phase -= numbers::tau; }
+		while (m_phase >= numbers::tau)	{ m_phase -= numbers::tau; }
 	}
 
 private:
