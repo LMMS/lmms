@@ -23,6 +23,9 @@
  */
 
 #include "FlangerEffect.h"
+
+#include <numbers>
+
 #include "Engine.h"
 #include "MonoDelay.h"
 #include "QuadratureLfo.h"

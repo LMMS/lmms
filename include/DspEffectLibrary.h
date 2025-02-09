@@ -25,6 +25,8 @@
 #ifndef LMMS_DSPEFFECTLIBRARY_H
 #define LMMS_DSPEFFECTLIBRARY_H
 
+#include <numbers>
+
 #include "lmms_math.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"

@@ -25,6 +25,8 @@
 #ifndef LMMS_QUADRATURE_LFO_H
 #define LMMS_QUADRATURE_LFO_H
 
+#include <numbers>
+
 #include "lmms_math.h"
 
 namespace lmms

@@ -25,6 +25,8 @@
 #ifndef LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 #define LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 
+#include <numbers>
+
 #include "Effect.h"
 #include "GranularPitchShifterControls.h"
 

@@ -26,6 +26,7 @@
 #define LMMS_INTERPOLATION_H
 
 #include <cmath>
+#include <numbers>
 #include "lmms_constants.h"
 #include "lmms_math.h"
 

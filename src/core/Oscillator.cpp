@@ -29,6 +29,7 @@
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
 	#include <thread>
 #endif
+#include <numbers>
 
 #include "BufferManager.h"
 #include "Engine.h"

@@ -31,6 +31,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <numbers>
 
 #include "lmms_constants.h"
 #include "lmmsconfig.h"

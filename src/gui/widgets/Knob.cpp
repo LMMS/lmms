@@ -25,6 +25,7 @@
 #include "Knob.h"
 
 #include <QPainter>
+#include <numbers>
 
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
