@@ -99,7 +99,7 @@ void fpeHandler( int signum ) {
 }
 #endif
 
-void interruptHandler() {
+void interruptHandler(int unused) {
 	if(qApp != nullptr) qApp->exit(3);
 	exit(3);
 }
@@ -321,7 +321,7 @@ int main( int argc, char * * argv )
 	// register signal SIGFPE and signal handler
 	signal(SIGFPE, fpeHandler);
 #endif
-	signal(SIGINT, interruptHandler)
+	signal(SIGINT, interruptHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
