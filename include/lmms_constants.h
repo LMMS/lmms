@@ -58,11 +58,6 @@ template<std::floating_point T>
 inline constexpr T inv_e_v = T(1.0 / e_v<T>);
 inline constexpr double inv_e = e_v<double>;
 
-//TODO: Replace entirely with std::numbers::sqrt_2_v
-template<std::floating_point T>
-inline constexpr T sqrt2_v = std::numbers::sqrt2_v<T>;
-inline constexpr double sqrt2 = sqrt2_v<double>;
-
 }
 
 namespace lmms

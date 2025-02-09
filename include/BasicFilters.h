@@ -69,6 +69,7 @@ public:
 
 	inline void setCoeffs( float freq )
 	{
+		using namespace std::numbers;
 		// wc
 		const double wc = numbers::tau * freq;
 		const double wc2 = wc * wc;
@@ -76,14 +77,14 @@ public:
 		m_wc4 = wc2 * wc2;
 
 		// k
-		const double k = wc / std::tan(numbers::pi * freq / m_sampleRate);
+		const double k = wc / std::tan(pi * freq / m_sampleRate);
 		const double k2 = k * k;
 		const double k3 = k2 * k;
 		m_k4 = k2 * k2;
 
 		// a
-		const double sq_tmp1 = numbers::sqrt2 * wc3 * k;
-		const double sq_tmp2 = numbers::sqrt2 * wc * k3;
+		const double sq_tmp1 = sqrt2 * wc3 * k;
+		const double sq_tmp2 = sqrt2 * wc * k3;
 
 		m_a = 1.0 / ( 4.0 * wc2 * k2 + 2.0 * sq_tmp1 + m_k4 + 2.0 * sq_tmp2 + m_wc4 );
 
