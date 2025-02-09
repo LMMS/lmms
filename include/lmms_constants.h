@@ -25,19 +25,6 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-#include <numbers>
-#include <concepts>
-
-namespace lmms::numbers
-{
-
-//TODO: Replace entirely with (2 * std::numbers::pi_v)
-template<std::floating_point T>
-inline constexpr T tau_v = T(std::numbers::pi_v<T> * 2.0);
-inline constexpr double tau = tau_v<double>;
-
-}
-
 namespace lmms
 {
 

@@ -36,7 +36,6 @@
 #include <numbers>
 
 #include "lmms_basics.h"
-#include "lmms_constants.h"
 #include "interpolation.h"
 
 namespace lmms

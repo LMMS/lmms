@@ -211,18 +211,19 @@ void CompressorEffect::redrawKnee()
 
 void CompressorEffect::calcTiltCoeffs()
 {
+	using namespace std::numbers;
 	m_tiltVal = m_compressorControls.m_tiltModel.value();
 
-	const float amp = 6.f / std::numbers::ln2_v<float>;
+	constexpr float amp = 6.f / ln2_v<float>;
 
-	const float gfactor = 5;
+	constexpr float gfactor = 5;
 	const float g1 = m_tiltVal > 0 ? -gfactor * m_tiltVal : -m_tiltVal;
 	const float g2 = m_tiltVal > 0 ? m_tiltVal : gfactor * m_tiltVal;
 
 	m_lgain = std::exp(g1 / amp) - 1;
 	m_hgain = std::exp(g2 / amp) - 1;
 
-	const float omega = numbers::tau_v<float> * m_compressorControls.m_tiltFreqModel.value();
+	const float omega = 2 * pi_v<float> * m_compressorControls.m_tiltFreqModel.value();
 	const float n = 1 / (m_sampleRate * 3 + omega);
 	m_a0 = 2 * omega * n;
 	m_b1 = (m_sampleRate * 3 - omega) * n;

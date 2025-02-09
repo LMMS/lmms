@@ -413,7 +413,7 @@ struct sin_wave
 	static inline float process(float x)
 	{
 		x = positiveFraction(x);
-		return std::sin(x * numbers::tau_v<float>);
+		return std::sin(x * 2 * std::numbers::pi_v<float>);
 	}
 };
 static freefunc1<float,sin_wave,true> sin_wave_func;

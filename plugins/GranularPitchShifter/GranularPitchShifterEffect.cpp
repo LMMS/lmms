@@ -271,7 +271,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_grainCount = 0;
 	m_grains.reserve(8);// arbitrary
 	
-	m_dcCoeff = std::exp(-numbers::tau_v<float> * DcRemovalHz / m_sampleRate);
+	m_dcCoeff = std::exp(-2 * std::numbers::pi_v<float> * DcRemovalHz / m_sampleRate);
 
 	const double pitch = m_granularpitchshifterControls.m_pitchModel.value() * (1. / 12.);
 	const double pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value() * (1. / 24.);
