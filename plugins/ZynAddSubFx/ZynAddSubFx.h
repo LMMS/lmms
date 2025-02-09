@@ -69,16 +69,13 @@ signals:
 };
 
 
-constexpr auto ZynConfig = AudioPluginConfig {
-	.kind = AudioDataKind::F32,
-	.interleaved = false,
-	.inputs = 0,
-	.outputs = 2
-};
-
-
 class ZynAddSubFxInstrument
-	: public AudioPlugin<Instrument, ZynConfig, ConfigurableAudioPort<ZynConfig>>
+	: public AudioPlugin<Instrument, AudioPluginConfig {
+			.kind = AudioDataKind::F32,
+			.interleaved = false,
+			.inputs = 0,
+			.outputs = 2
+		}, DefaultConfigurableAudioPort>
 {
 	Q_OBJECT
 public:

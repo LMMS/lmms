@@ -37,12 +37,11 @@ namespace lmms
 
 class VstPlugin;
 
-constexpr auto VstEffectConfig = AudioPluginConfig {
-	.kind = AudioDataKind::F32,
-	.interleaved = false
-};
-
-class VstEffect : public AudioPlugin<Effect, VstEffectConfig, RemotePluginAudioPort<VstEffectConfig>>
+class VstEffect
+	: public AudioPlugin<Effect, AudioPluginConfig {
+			.kind = AudioDataKind::F32,
+			.interleaved = false
+		}, RemotePluginAudioPort>
 {
 public:
 	VstEffect( Model * _parent,

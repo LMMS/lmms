@@ -55,13 +55,11 @@ class VestigeInstrumentView;
 } // namespace gui
 
 
-constexpr auto VestigeConfig = AudioPluginConfig {
-	.kind = AudioDataKind::F32,
-	.interleaved = false
-};
-
 class VestigeInstrument
-	: public AudioPlugin<Instrument, VestigeConfig, RemotePluginAudioPort<VestigeConfig>>
+	: public AudioPlugin<Instrument, AudioPluginConfig {
+			.kind = AudioDataKind::F32,
+			.interleaved = false
+		}, RemotePluginAudioPort>
 {
 	Q_OBJECT
 public:

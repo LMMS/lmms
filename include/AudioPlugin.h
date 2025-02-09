@@ -372,18 +372,19 @@ private:
  * @tparam config Compile time configuration to customize `AudioPlugin`
  * @tparam AudioPortT The plugin's audio port - must fully implement `PluginAudioPort`
  */
-template<class ParentT, AudioPluginConfig config, class AudioPortT = DefaultPluginAudioPort<config>>
+template<class ParentT, AudioPluginConfig config,
+	template<AudioPluginConfig> class AudioPortT = DefaultPluginAudioPort>
 class AudioPlugin
-	: public detail::AudioPlugin<ParentT, config, AudioPortT>
+	: public detail::AudioPlugin<ParentT, config, AudioPortT<config>>
 {
 	static_assert(config.kind != AudioDataKind::SampleFrame
 		|| ((config.inputs == 0 || config.inputs == 2) && (config.outputs == 0 || config.outputs == 2)),
 		"Don't use SampleFrame if more than 2 processor channels are needed");
 
-	static_assert(std::is_base_of_v<detail::PluginAudioPortTag, AudioPortT>,
+	static_assert(std::is_base_of_v<detail::PluginAudioPortTag, AudioPortT<config>>,
 		"AudioPortT must be `PluginAudioPort` or inherit from it");
 
-	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortT>;
+	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortT<config>>;
 
 public:
 	//! The last parameter(s) are variadic template parameters passed to the audio port constructor

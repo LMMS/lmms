@@ -209,7 +209,7 @@ protected:
 
 
 //! An audio port that can choose between RemotePlugin or a local buffer at runtime
-template<AudioPluginConfig config, class LocalBufferT = DefaultAudioPluginBuffer<config>>
+template<AudioPluginConfig config, template<AudioPluginConfig> class LocalBufferT>
 class ConfigurableAudioPort
 	: public RemotePluginAudioPort<config>
 {
@@ -295,10 +295,14 @@ public:
 private:
 	auto localActive() const -> bool { return m_localBuffer.has_value() && m_localActive; }
 
-	std::optional<LocalBufferT> m_localBuffer;
+	std::optional<LocalBufferT<config>> m_localBuffer;
 	bool m_localActive = false;
 	bool m_isRemote = true;
 };
+
+
+template<AudioPluginConfig config>
+using DefaultConfigurableAudioPort = ConfigurableAudioPort<config, DefaultAudioPluginBuffer>;
 
 
 } // namespace lmms
