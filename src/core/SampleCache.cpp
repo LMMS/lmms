@@ -24,6 +24,7 @@
 
 #include "SampleCache.h"
 
+#include <QCoreApplication>
 #include <filesystem>
 
 #include "PathUtil.h"
