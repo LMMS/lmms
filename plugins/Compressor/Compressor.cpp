@@ -24,6 +24,8 @@
 
 #include "Compressor.h"
 
+#include <numbers>
+
 #include "embed.h"
 #include "interpolation.h"
 #include "lmms_math.h"
@@ -211,7 +213,7 @@ void CompressorEffect::calcTiltCoeffs()
 {
 	m_tiltVal = m_compressorControls.m_tiltModel.value();
 
-	const float amp = 6.f / std::log(2.f);
+	const float amp = 6.f / std::numbers::ln2_v<float>;
 
 	const float gfactor = 5;
 	const float g1 = m_tiltVal > 0 ? -gfactor * m_tiltVal : -m_tiltVal;

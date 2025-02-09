@@ -25,49 +25,42 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-// #include <numbers>
-// #include <concepts>
+#include <numbers>
+#include <concepts>
 
 namespace lmms::numbers
 {
 
-//TODO C++20: Use std::floating_point instead of typename
-//TODO C++20: Use std::numbers::pi_v<T> instead of literal value
-template<typename T>
-inline constexpr T pi_v = T(3.14159265358979323846264338327950288419716939937510);
+//TODO: Replace entirely with std::numbers::pi_v
+template<std::floating_point T>
+inline constexpr T pi_v = std::numbers::pi_v<T>;
 inline constexpr double pi = pi_v<double>;
 
-//TODO C++20: Use std::floating_point instead of typename
-template<typename T>
+//TODO: Replace entirely with (2 * std::numbers::pi_v)
+template<std::floating_point T>
 inline constexpr T tau_v = T(pi_v<T> * 2.0);
 inline constexpr double tau = tau_v<double>;
 
-//TODO C++20: Use std::floating_point instead of typename
-template<typename T>
+template<std::floating_point T>
 inline constexpr T pi_half_v = T(pi_v<T> / 2.0);
 inline constexpr double pi_half = pi_half_v<double>;
 
-//TODO C++20: Use std::floating_point instead of typename
-template<typename T>
+template<std::floating_point T>
 inline constexpr T pi_sqr_v = T(pi_v<T> * pi_v<T>);
 inline constexpr double pi_sqr = pi_sqr_v<double>;
 
-//TODO C++20: Use std::floating_point instead of typename
-//TODO C++20: Use std::numbers::e_v<T> instead of literal value
-template<typename T>
-inline constexpr T e_v = T(2.71828182845904523536028747135266249775724709369995);
+//TODO: Replace entirely with std::numbers::e_v
+template<std::floating_point T>
+inline constexpr T e_v = std::numbers::e_v<T>;
 inline constexpr double e = e_v<double>;
 
-//TODO C++20: Use std::floating_point instead of typename
-template<typename T>
+template<std::floating_point T>
 inline constexpr T inv_e_v = T(1.0 / e_v<T>);
 inline constexpr double inv_e = e_v<double>;
 
-//TODO C++20: Use std::floating_point instead of typename
-//TODO C++20: Use std::numbers::sqrt2_v<T> instead of literal value
-//TODO C++26: Remove since std::sqrt(2.0) is constexpr
-template<typename T>
-inline constexpr T sqrt2_v = T(1.41421356237309504880168872420969807856967187537695);
+//TODO: Replace entirely with std::numbers::sqrt_2_v
+template<std::floating_point T>
+inline constexpr T sqrt2_v = std::numbers::sqrt2_v<T>;
 inline constexpr double sqrt2 = sqrt2_v<double>;
 
 }
