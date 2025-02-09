@@ -106,13 +106,6 @@ private:
 	static std::unique_ptr<PluginFactory> s_instance;
 };
 
-constexpr char LADSPA_PATH_SEPERATOR =
-#ifdef LMMS_BUILD_WIN32
-';';
-#else
-':';
-#endif
-
 //Short-hand function
 LMMS_EXPORT PluginFactory* getPluginFactory();
 
