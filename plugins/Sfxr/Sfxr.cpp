@@ -105,7 +105,7 @@ void SfxrSynth::resetSample( bool restart )
 	square_slide=-s->m_sqrSweepModel.value()*0.00005f;
 	const auto cha = static_cast<double>(s->m_changeAmtModel.value());
 	arp_mod = (cha >= 0.0)
-		? 1.0 - cha * cha * 00.9
+		? 1.0 - cha * cha * 0.9
 		: 1.0 + cha * cha * 10.0;
 	arp_time = 0;
 	const auto chs = 1.f - s->m_changeSpeedModel.value();
