@@ -24,7 +24,6 @@
 
 #include "SampleCache.h"
 
-#include <QCoreApplication>
 #include <filesystem>
 
 #include "PathUtil.h"
@@ -48,7 +47,14 @@ auto SampleCache::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 		return buffer;
 	}
 
-	return it->second.lock();
+	auto buffer = it->second.lock();
+	if (buffer == nullptr)
+	{
+		buffer = std::make_shared<SampleBuffer>(path);
+		it->second = buffer;
+	}
+
+	return buffer;
 }
 
 auto SampleCache::fetch(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>
