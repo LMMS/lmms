@@ -23,6 +23,7 @@
 #include "EqSpectrumView.h"
 
 #include <cmath>
+#include <numbers>
 #include <QPainter>
 #include <QPen>
 
