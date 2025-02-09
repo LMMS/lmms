@@ -27,6 +27,8 @@
 
 #include "ClipView.h"
 
+#include "SampleThumbnail.h"
+
 namespace lmms
 {
 
@@ -63,6 +65,7 @@ protected:
 
 private:
 	SampleClip * m_clip;
+	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;
 	bool splitClip( const TimePos pos ) override;
 } ;
