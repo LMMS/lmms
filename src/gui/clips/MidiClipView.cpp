@@ -924,11 +924,11 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	leftClip->movePosition(m_initialClipPos);
 	leftClip->setHasBeenResized(true);
 	leftClip->changeLength(splitPos - m_initialClipPos);
-	leftClip->setStartTimeOffset(m_clip->startTimeOffset());
 
 	rightClip->movePosition(splitPos);
 	rightClip->setHasBeenResized(true);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
+	rightClip->setStartTimeOffset(0);
 
 	remove();
 	m_clip->getTrack()->restoreJournallingState();
