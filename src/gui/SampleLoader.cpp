@@ -50,7 +50,6 @@ std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromFile(const QStri
 	}
 	catch (const std::runtime_error& error)
 	{
-		// TODO: Remove calls to `gui::getGUI` from core and use something to signal back to the GUI instead
 		if (gui::getGUI()) { displayError(QString::fromStdString(error.what())); }
 		return SampleBuffer::emptyBuffer();
 	}
@@ -66,7 +65,6 @@ std::shared_ptr<const SampleBuffer> SampleLoader::loadBufferFromBase64(const QSt
 	}
 	catch (const std::runtime_error& error)
 	{
-		// TODO: Remove calls to `gui::getGUI` from core and use something to signal back to the GUI instead
 		if (gui::getGUI()) { displayError(QString::fromStdString(error.what())); }
 		return SampleBuffer::emptyBuffer();
 	}

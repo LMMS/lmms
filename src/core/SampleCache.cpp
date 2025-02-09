@@ -1,7 +1,7 @@
 /*
  * SampleCache.cpp
  *
- * Copyright (c) 2024 saker
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,22 +33,36 @@
 namespace lmms {
 auto SampleCache::fetch(const QString& path) -> std::shared_ptr<SampleBuffer>
 {
-	// To ensure that only the main thread is requesting samples from the cache
-	// Can be removed if proven that other threads are requesting samples besides the main thread
-	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+	namespace fs = std::filesystem;
 
-	const auto fsPath = PathUtil::pathFromQString(PathUtil::toAbsolute(path));
-	auto entry = AudioFileEntry{fsPath, std::filesystem::last_write_time(fsPath)};
-	return get(std::move(entry), s_audioFileMap, path);
+	const auto it = std::find_if(s_audioFileMap.begin(), s_audioFileMap.end(),
+		[&](const auto& entry) { return entry.first.path == PathUtil::pathFromQString(path); });
+
+	auto lastWriteTime = fs::last_write_time(PathUtil::pathFromQString(path));
+
+	if (it == s_audioFileMap.end() || it->first.lastWriteTime != lastWriteTime)
+	{
+		const auto buffer = std::make_shared<SampleBuffer>(path);
+		const auto key = AudioFileEntry{PathUtil::pathFromQString(path), lastWriteTime};
+		s_audioFileMap[std::move(key)] = buffer;
+		return buffer;
+	}
+
+	return it->second.lock();
 }
 
 auto SampleCache::fetch(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>
 {
-	// To ensure that only the main thread is requesting samples from the cache
-	// Can be removed if proven that other threads are requesting samples besides the main thread
-	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+	const auto key = Base64Entry{base64.toStdString(), sampleRate};
+	auto& value = s_base64Map[std::move(key)];
+	auto buffer = value.lock();
 
-	auto entry = Base64Entry{base64.toStdString(), sampleRate};
-	return get(std::move(entry), s_base64Map, base64, sampleRate);
+	if (!buffer)
+	{
+		buffer = std::make_shared<SampleBuffer>(base64, sampleRate);
+		value = buffer;
+	}
+
+	return buffer;
 }
 } // namespace lmms
