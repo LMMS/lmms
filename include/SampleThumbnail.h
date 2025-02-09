@@ -108,9 +108,6 @@ private:
 		Peak& operator[](size_t index) { return m_peaks[index]; }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }
 
-		Peak* peaks() { return m_peaks.data(); }
-		const Peak* peaks() const { return m_peaks.data(); }
-
 		int width() const { return m_peaks.size(); }
 		double samplesPerPeak() const { return m_samplesPerPeak; }
 
