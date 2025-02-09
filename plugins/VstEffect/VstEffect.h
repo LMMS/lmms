@@ -28,24 +28,27 @@
 #include <QMutex>
 #include <QSharedPointer>
 
-#include "Effect.h"
+#include "AudioPlugin.h"
+#include "RemotePluginAudioPort.h"
 #include "VstEffectControls.h"
 
 namespace lmms
 {
 
-
 class VstPlugin;
 
-
-class VstEffect : public Effect
+class VstEffect
+	: public AudioPlugin<Effect, AudioPluginConfig {
+			.kind = AudioDataKind::F32,
+			.interleaved = false
+		}, RemotePluginAudioPort>
 {
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~VstEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	auto processImpl() -> ProcessStatus override;
 
 	EffectControls * controls() override
 	{

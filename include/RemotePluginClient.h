@@ -60,8 +60,7 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	virtual void process( const SampleFrame* _in_buf,
-					SampleFrame* _out_buf ) = 0;
+	virtual void process(const float* in, float* out) = 0;
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
@@ -83,18 +82,6 @@ public:
 	inline fpp_t bufferSize() const
 	{
 		return m_bufferSize;
-	}
-
-	void setInputCount( int _i )
-	{
-		m_inputCount = _i;
-		sendMessage( message( IdChangeInputCount ).addInt( _i ) );
-	}
-
-	void setOutputCount( int _i )
-	{
-		m_outputCount = _i;
-		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
 	}
 
 	void setInputOutputCount( int i, int o )
@@ -344,9 +331,8 @@ void RemotePluginClient::doProcessing()
 {
 	if (m_audioBuffer)
 	{
-		process( (SampleFrame*)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
-				(SampleFrame*)( m_audioBuffer.get() +
-					( m_inputCount*m_bufferSize ) ) );
+		process(m_inputCount > 0 ? m_audioBuffer.get() : nullptr,
+			m_audioBuffer.get() + m_inputCount * m_bufferSize);
 	}
 	else
 	{

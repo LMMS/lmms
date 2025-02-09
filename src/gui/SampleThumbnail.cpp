@@ -95,7 +95,7 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	if (sample.sampleSize() == 0) { return; }
 
 	const auto fullResolutionWidth = sample.sampleSize() * DEFAULT_CHANNELS;
-	m_thumbnailCache->emplace_back(&sample.buffer()->data()->left(), fullResolutionWidth, fullResolutionWidth);
+	m_thumbnailCache->emplace_back(sample.buffer()->data()->data(), fullResolutionWidth, fullResolutionWidth);
 
 	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
 	{
