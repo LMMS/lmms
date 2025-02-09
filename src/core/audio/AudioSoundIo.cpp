@@ -467,7 +467,8 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 	reconnectSoundIo();
 
-	bool ok = connect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
+	[[maybe_unused]] bool ok = connect(&m_backendModel, &ComboBoxModel::dataChanged,
+		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
 	assert(ok);
 
 	m_backend->setModel( &m_backendModel );
@@ -476,7 +477,8 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioSoundIo::setupWidget::~setupWidget()
 {
-	bool ok = disconnect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
+	[[maybe_unused]] bool ok = disconnect(&m_backendModel, &ComboBoxModel::dataChanged,
+		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
 	assert(ok);
 	if (m_soundio)
 	{
