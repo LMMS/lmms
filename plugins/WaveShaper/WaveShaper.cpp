@@ -66,7 +66,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-ProcessStatus WaveShaperEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus WaveShaperEffect::processImpl(std::span<SampleFrame> inOut)
 {
 // variables for effect
 	int i = 0;

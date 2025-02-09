@@ -44,7 +44,7 @@ namespace lmms {
 namespace {
 
 /*
-void zeroBuffer(CoreAudioDataMut buffer)
+void zeroBuffer(std::span<SampleFrame> buffer)
 {
 	zeroSampleFrames(buffer.data(), buffer.size());
 }*/
@@ -84,7 +84,7 @@ void transformBuffer(CoreAudioBus in, CoreAudioBusMut out, const F& func)
 }
 
 template<class F>
-void transformBuffer(CoreAudioDataMut inOut, const F& func)
+void transformBuffer(std::span<SampleFrame> inOut, const F& func)
 {
 	for (SampleFrame& sf : inOut)
 	{
@@ -120,7 +120,7 @@ void compareBuffers(CoreAudioBus actual, CoreAudioBus expected)
 }
 
 /*
-void compareBuffers(CoreAudioData actual, CoreAudioData expected)
+void compareBuffers(std::span<const SampleFrame> actual, std::span<const SampleFrame> expected)
 {
 	QCOMPARE(actual.size(), expected.size());
 	for (std::size_t frame = 0; frame < actual.size(); ++frame)

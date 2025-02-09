@@ -85,7 +85,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-ProcessStatus FlangerEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus FlangerEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

@@ -39,7 +39,7 @@ class LMMS_EXPORT BufferManager
 {
 public:
 	static void init( fpp_t fpp );
-	static CoreAudioDataMut acquire(); //!< owning view
+	static std::span<SampleFrame> acquire(); //!< owning view
 	static void release( SampleFrame* buf );
 
 private:

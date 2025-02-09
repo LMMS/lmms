@@ -46,7 +46,7 @@ public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{

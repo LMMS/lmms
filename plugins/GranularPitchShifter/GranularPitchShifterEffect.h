@@ -49,7 +49,7 @@ public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~GranularPitchShifterEffect() override = default;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{

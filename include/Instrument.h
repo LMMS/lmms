@@ -69,12 +69,12 @@ public:
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per audio engine period
-	void play(CoreAudioDataMut out)
+	void play(std::span<SampleFrame> out)
 	{
 		playImpl(out);
 	}
 
-	void playNote(NotePlayHandle* notesToPlay, CoreAudioDataMut out)
+	void playNote(NotePlayHandle* notesToPlay, std::span<SampleFrame> out)
 	{
 		playNoteImpl(notesToPlay, out);
 	}
@@ -171,10 +171,10 @@ public:
 
 protected:
 	//! To be implemented by AudioPlugin or plugin implementation
-	virtual void playImpl(CoreAudioDataMut out) {}
+	virtual void playImpl(std::span<SampleFrame> out) {}
 
 	//! To be implemented by AudioPlugin or plugin implementation
-	virtual void playNoteImpl(NotePlayHandle* notesToPlay, CoreAudioDataMut out) {}
+	virtual void playNoteImpl(NotePlayHandle* notesToPlay, std::span<SampleFrame> out) {}
 
 	// fade in to prevent clicks
 	void applyFadeIn(SampleFrame* buf, NotePlayHandle * n);

@@ -41,7 +41,7 @@ public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~DualFilterEffect() override;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{

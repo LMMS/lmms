@@ -94,7 +94,7 @@ void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOn
 }
 
 
-ProcessStatus MultitapEchoEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus MultitapEchoEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

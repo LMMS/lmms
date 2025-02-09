@@ -58,7 +58,7 @@ Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatu
 
 
 // Take audio data and store them for processing and display in the GUI thread.
-ProcessStatus Vectorscope::processImpl(CoreAudioDataMut inOut)
+ProcessStatus Vectorscope::processImpl(std::span<SampleFrame> inOut)
 {
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())

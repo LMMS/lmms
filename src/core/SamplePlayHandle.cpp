@@ -85,7 +85,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 
 
-void SamplePlayHandle::play(CoreAudioDataMut buffer)
+void SamplePlayHandle::play(std::span<SampleFrame> buffer)
 {
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )

@@ -64,7 +64,7 @@ SampleRecordHandle::~SampleRecordHandle()
 
 
 
-void SampleRecordHandle::play(CoreAudioDataMut /*buffer*/)
+void SampleRecordHandle::play(std::span<SampleFrame> /*buffer*/)
 {
 	const SampleFrame* recbuf = Engine::audioEngine()->inputBuffer();
 	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();

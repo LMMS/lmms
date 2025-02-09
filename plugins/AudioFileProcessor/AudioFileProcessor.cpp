@@ -105,7 +105,7 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 
 
 
-void AudioFileProcessor::playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out)
+void AudioFileProcessor::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();

@@ -65,7 +65,7 @@ struct AudioDataViewSelector<AudioDataKind::SampleFrame, true, channels, isConst
 {
 	static_assert(channels == 0 || channels == 2,
 		"Plugins using SampleFrame buffers must have exactly 0 or 2 inputs or outputs");
-	using type = std::conditional_t<isConst, CoreAudioData, CoreAudioDataMut>;
+	using type = std::conditional_t<isConst, std::span<const SampleFrame>, std::span<SampleFrame>>;
 };
 
 
@@ -275,9 +275,9 @@ public:
 	AudioPluginBufferDefaultImpl() = default;
 	~AudioPluginBufferDefaultImpl() override = default;
 
-	auto inputOutputBuffer() -> CoreAudioDataMut final
+	auto inputOutputBuffer() -> std::span<SampleFrame> final
 	{
-		return CoreAudioDataMut{m_buffer.data(), m_buffer.size()};
+		return std::span<SampleFrame>{m_buffer.data(), m_buffer.size()};
 	}
 
 	auto frames() const -> fpp_t final

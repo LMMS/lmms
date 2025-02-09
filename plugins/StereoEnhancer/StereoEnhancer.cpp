@@ -82,7 +82,7 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-ProcessStatus StereoEnhancerEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus StereoEnhancerEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

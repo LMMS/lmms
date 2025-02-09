@@ -105,7 +105,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play(CoreAudioDataMut buffer) = 0;
+	virtual void play(std::span<SampleFrame> buffer) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -145,14 +145,14 @@ public:
 	
 	void releaseBuffer();
 	
-	CoreAudioDataMut buffer();
+	std::span<SampleFrame> buffer();
 
 private:
 	Type m_type;
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	CoreAudioDataMut m_playHandleBuffer; //!< owning view
+	std::span<SampleFrame> m_playHandleBuffer; //!< owning view
 	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioPort * m_audioPort;

@@ -187,7 +187,7 @@ int NotePlayHandle::midiKey() const
 
 
 
-void NotePlayHandle::play(CoreAudioDataMut buffer)
+void NotePlayHandle::play(std::span<SampleFrame> buffer)
 {
 	if (m_muted)
 	{

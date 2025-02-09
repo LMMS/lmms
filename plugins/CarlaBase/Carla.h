@@ -189,7 +189,7 @@ public:
     QString nodeName() const override;
     void saveSettings(QDomDocument& doc, QDomElement& parent) override;
     void loadSettings(const QDomElement& elem) override;
-    void playImpl(CoreAudioDataMut out) override;
+    void playImpl(std::span<SampleFrame> out) override;
     bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
     gui::PluginView* instantiateView(QWidget* parent) override;
 

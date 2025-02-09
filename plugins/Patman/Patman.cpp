@@ -133,7 +133,7 @@ QString PatmanInstrument::nodeName() const
 
 
 
-void PatmanInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
+void PatmanInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	if( m_patchFile == "" )
 	{

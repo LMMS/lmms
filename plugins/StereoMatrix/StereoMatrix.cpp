@@ -64,7 +64,7 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-ProcessStatus StereoMatrixEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus StereoMatrixEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	for (fpp_t f = 0; f < inOut.size(); ++f)
 	{	

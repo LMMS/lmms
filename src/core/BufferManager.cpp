@@ -42,9 +42,9 @@ void BufferManager::init( fpp_t fpp )
 }
 
 
-CoreAudioDataMut BufferManager::acquire()
+std::span<SampleFrame> BufferManager::acquire()
 {
-	return CoreAudioDataMut{new SampleFrame[s_framesPerPeriod], s_framesPerPeriod};
+	return std::span<SampleFrame>{new SampleFrame[s_framesPerPeriod], s_framesPerPeriod};
 }
 
 

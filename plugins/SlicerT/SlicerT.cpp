@@ -75,7 +75,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.setValue(0);
 }
 
-void SlicerT::playNoteImpl(NotePlayHandle* handle, CoreAudioDataMut out)
+void SlicerT::playNoteImpl(NotePlayHandle* handle, std::span<SampleFrame> out)
 {
 	if (m_originalSample.sampleSize() <= 1) { return; }
 

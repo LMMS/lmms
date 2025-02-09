@@ -152,8 +152,8 @@ public:
 	Lb302Synth( InstrumentTrack * _instrument_track );
 	~Lb302Synth() override;
 
-	void playImpl(CoreAudioDataMut out) override;
-	void playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out) override;
+	void playImpl(std::span<SampleFrame> out) override;
+	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

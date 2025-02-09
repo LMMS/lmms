@@ -188,7 +188,7 @@ public:
 
 
 protected:
-	virtual bool processAudioBufferImpl(CoreAudioDataMut inOut) = 0;
+	virtual bool processAudioBufferImpl(std::span<SampleFrame> inOut) = 0;
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 

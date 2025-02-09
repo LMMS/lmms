@@ -155,7 +155,7 @@ QString KickerInstrument::nodeName() const
 using DistFX = DspEffectLibrary::Distortion;
 using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
-void KickerInstrument::playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out)
+void KickerInstrument::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();

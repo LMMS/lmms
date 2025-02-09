@@ -39,7 +39,7 @@ public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Vectorscope() override = default;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls *controls() override {return &m_controls;}
 	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}

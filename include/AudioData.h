@@ -45,12 +45,18 @@ enum class AudioDataKind : std::uint8_t
 	// etc.
 };
 
+class SampleFrame;
+
 namespace detail {
 
 //! Specialize this struct to enable the use of an audio data kind
 template<AudioDataKind kind> struct AudioDataType;
 
-template<> struct AudioDataType<AudioDataKind::F32> { using type = float; };
+template<>
+struct AudioDataType<AudioDataKind::F32> { using type = float; };
+
+template<>
+struct AudioDataType<AudioDataKind::SampleFrame> { using type = SampleFrame; };
 
 } // namespace detail
 

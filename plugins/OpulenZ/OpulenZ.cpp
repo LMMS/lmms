@@ -390,7 +390,7 @@ gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void OpulenzInstrument::playImpl(CoreAudioDataMut out)
+void OpulenzInstrument::playImpl(std::span<SampleFrame> out)
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);

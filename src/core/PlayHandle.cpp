@@ -62,7 +62,7 @@ void PlayHandle::doProcessing()
 	}
 	else
 	{
-		play(CoreAudioDataMut{});
+		play(std::span<SampleFrame>{});
 	}
 }
 
@@ -72,9 +72,9 @@ void PlayHandle::releaseBuffer()
 	m_bufferReleased = true;
 }
 
-CoreAudioDataMut PlayHandle::buffer()
+std::span<SampleFrame> PlayHandle::buffer()
 {
-	return m_bufferReleased ? CoreAudioDataMut{} : m_playHandleBuffer;
+	return m_bufferReleased ? std::span<SampleFrame>{} : m_playHandleBuffer;
 };
 
 } // namespace lmms

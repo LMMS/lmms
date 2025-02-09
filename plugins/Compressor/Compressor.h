@@ -42,7 +42,7 @@ public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~CompressorEffect() override = default;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 	void processBypassedImpl() override;
 
 	EffectControls* controls() override

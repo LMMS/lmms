@@ -55,7 +55,7 @@ public:
 	}
 
 
-	void play(CoreAudioDataMut buffer) override;
+	void play(std::span<SampleFrame> buffer) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;

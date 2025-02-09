@@ -220,7 +220,7 @@ QString OrganicInstrument::nodeName() const
 
 
 
-void OrganicInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
+void OrganicInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();

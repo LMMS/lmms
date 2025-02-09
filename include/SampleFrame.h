@@ -231,18 +231,6 @@ inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_
 	}
 }
 
-// Enable SampleFrame to use the AudioDataType metafunction
-namespace detail {
-template<> struct AudioDataType<AudioDataKind::SampleFrame> { using type = SampleFrame; };
-} // namespace detail
-
-//! A non-owning SampleFrame buffer (interleaved, 2-channel)
-using CoreAudioData = std::span<const SampleFrame>;
-
-//! Mutable CoreAudioData
-using CoreAudioDataMut = std::span<SampleFrame>;
-
-
 } // namespace lmms
 
 #endif // LMMS_SAMPLEFRAME_H

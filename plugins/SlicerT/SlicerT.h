@@ -75,7 +75,7 @@ signals:
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 
-	void playNoteImpl(NotePlayHandle* handle, CoreAudioDataMut out) override;
+	void playNoteImpl(NotePlayHandle* handle, std::span<SampleFrame> out) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;

@@ -571,7 +571,7 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote(NotePlayHandle* n, CoreAudioDataMut workingBuffer)
+void InstrumentTrack::playNote(NotePlayHandle* n, std::span<SampleFrame> workingBuffer)
 {
 	// Note: under certain circumstances the working buffer is a nullptr.
 	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.

@@ -661,7 +661,7 @@ void Sf2Instrument::reloadSynth()
 
 
 
-void Sf2Instrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut)
+void Sf2Instrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame>)
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -796,7 +796,7 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::playImpl(CoreAudioDataMut out)
+void Sf2Instrument::playImpl(std::span<SampleFrame> out)
 {
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();

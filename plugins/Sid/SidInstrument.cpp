@@ -289,7 +289,7 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 
 
 // TODO: The real sample type is `short` and there is only one output channel
-void SidInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
+void SidInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
 	const int samplerate = Engine::audioEngine()->outputSampleRate();

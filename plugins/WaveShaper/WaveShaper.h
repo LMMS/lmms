@@ -41,7 +41,7 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~WaveShaperEffect() override = default;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls * controls() override
 	{

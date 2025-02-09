@@ -129,7 +129,7 @@ void LadspaEffect::changeSampleRate()
 
 
 
-ProcessStatus LadspaEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus LadspaEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	m_pluginMutex.lock();
 	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())

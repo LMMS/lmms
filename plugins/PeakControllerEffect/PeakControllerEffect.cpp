@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-ProcessStatus PeakControllerEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus PeakControllerEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 

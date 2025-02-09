@@ -233,7 +233,7 @@ void CompressorEffect::calcMix()
 
 
 
-ProcessStatus CompressorEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus CompressorEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	m_cleanedBuffers = false;
 

@@ -730,7 +730,7 @@ void Lb302Synth::initSlide()
 }
 
 
-void Lb302Synth::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut)
+void Lb302Synth::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame>)
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -789,7 +789,7 @@ void Lb302Synth::processNote( NotePlayHandle * _n )
 
 
 
-void Lb302Synth::playImpl(CoreAudioDataMut out)
+void Lb302Synth::playImpl(std::span<SampleFrame> out)
 {
 	m_notesMutex.lock();
 	while( ! m_notes.isEmpty() )

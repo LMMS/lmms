@@ -1061,7 +1061,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-void MonstroInstrument::playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out)
+void MonstroInstrument::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();

@@ -201,7 +201,7 @@ QString Vibed::nodeName() const
 	return vibedstrings_plugin_descriptor.name;
 }
 
-void Vibed::playNoteImpl(NotePlayHandle* n, CoreAudioDataMut out)
+void Vibed::playNoteImpl(NotePlayHandle* n, std::span<SampleFrame> out)
 {
 	if (!n->m_pluginData)
 	{

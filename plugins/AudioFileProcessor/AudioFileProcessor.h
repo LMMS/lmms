@@ -42,7 +42,7 @@ class AudioFileProcessor : public Instrument
 public:
 	AudioFileProcessor( InstrumentTrack * _instrument_track );
 
-	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) override;
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;

@@ -46,7 +46,7 @@ public:
 
 	~DummyInstrument() override = default;
 
-	void playNoteImpl(NotePlayHandle*, CoreAudioDataMut buffer) override
+	void playNoteImpl(NotePlayHandle*, std::span<SampleFrame> buffer) override
 	{
 		zeroSampleFrames(buffer.data(), buffer.size());
 	}

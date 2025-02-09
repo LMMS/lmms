@@ -177,7 +177,7 @@ bool Lv2Instrument::handleMidiEvent(
 
 // not yet working
 #ifndef LV2_INSTRUMENT_USE_MIDI
-void Lv2Instrument::playNoteImpl(NotePlayHandle *nph, CoreAudioDataMut)
+void Lv2Instrument::playNoteImpl(NotePlayHandle *nph, std::span<SampleFrame>)
 {
 }
 #endif
@@ -185,7 +185,7 @@ void Lv2Instrument::playNoteImpl(NotePlayHandle *nph, CoreAudioDataMut)
 
 
 
-void Lv2Instrument::playImpl(CoreAudioDataMut out)
+void Lv2Instrument::playImpl(std::span<SampleFrame> out)
 {
 	copyModelsFromLmms();
 

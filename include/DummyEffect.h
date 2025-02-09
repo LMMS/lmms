@@ -108,7 +108,7 @@ public:
 		return &m_controls;
 	}
 
-	bool processAudioBufferImpl(CoreAudioDataMut inOut) override
+	bool processAudioBufferImpl(std::span<SampleFrame> inOut) override
 	{
 		return false;
 	}

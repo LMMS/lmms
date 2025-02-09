@@ -79,9 +79,9 @@ public:
 	bool handleMidiEvent(const MidiEvent &event,
 		const TimePos &time = TimePos(), f_cnt_t offset = 0) override;
 #else
-	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut) override;
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame>) override;
 #endif
-	void playImpl(CoreAudioDataMut out) override;
+	void playImpl(std::span<SampleFrame> out) override;
 
 	/*
 		misc

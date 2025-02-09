@@ -67,7 +67,7 @@ class Xpressive : public Instrument
 public:
 	Xpressive(InstrumentTrack* instrument_track );
 
-	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) override;
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 

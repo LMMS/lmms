@@ -58,7 +58,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-ProcessStatus DispersionEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus DispersionEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

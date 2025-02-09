@@ -75,7 +75,7 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-ProcessStatus ReverbSCEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus ReverbSCEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

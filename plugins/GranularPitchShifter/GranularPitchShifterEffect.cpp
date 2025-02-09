@@ -60,7 +60,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-ProcessStatus GranularPitchShifterEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus GranularPitchShifterEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

@@ -206,7 +206,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 
 
 
-void PresetPreviewPlayHandle::play(CoreAudioDataMut buffer)
+void PresetPreviewPlayHandle::play(std::span<SampleFrame> buffer)
 {
 	// Do nothing; the preview instrument is played by m_previewNote, which
 	// has been added to the audio engine

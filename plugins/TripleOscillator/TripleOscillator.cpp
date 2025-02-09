@@ -306,7 +306,7 @@ QString TripleOscillator::nodeName() const
 
 
 
-void TripleOscillator::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
+void TripleOscillator::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	if (!_n->m_pluginData)
 	{

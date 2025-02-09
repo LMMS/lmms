@@ -290,7 +290,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut)
+void GigInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame>)
 {
 	const float LOG440 = 2.643452676f;
 
@@ -321,7 +321,7 @@ void GigInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut)
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::playImpl(CoreAudioDataMut out)
+void GigInstrument::playImpl(std::span<SampleFrame> out)
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	const auto rate = Engine::audioEngine()->outputSampleRate();

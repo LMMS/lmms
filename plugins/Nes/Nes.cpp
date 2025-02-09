@@ -546,7 +546,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 
 
-void NesInstrument::playNoteImpl(NotePlayHandle* n, CoreAudioDataMut out)
+void NesInstrument::playNoteImpl(NotePlayHandle* n, std::span<SampleFrame> out)
 {
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();

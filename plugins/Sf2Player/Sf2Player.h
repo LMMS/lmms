@@ -65,8 +65,8 @@ public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
 	~Sf2Instrument() override;
 
-	void playImpl(CoreAudioDataMut out) override;
-	void playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) override;
+	void playImpl(std::span<SampleFrame> out) override;
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

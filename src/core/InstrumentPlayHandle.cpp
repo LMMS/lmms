@@ -40,7 +40,7 @@ InstrumentPlayHandle::InstrumentPlayHandle(Instrument * instrument, InstrumentTr
 	setAudioPort(instrumentTrack->audioPort());
 }
 
-void InstrumentPlayHandle::play(CoreAudioDataMut buffer)
+void InstrumentPlayHandle::play(std::span<SampleFrame> buffer)
 {
 	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
 

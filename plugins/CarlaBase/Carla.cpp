@@ -495,7 +495,7 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 #endif
 }
 
-void CarlaInstrument::playImpl(CoreAudioDataMut out)
+void CarlaInstrument::playImpl(std::span<SampleFrame> out)
 {
     const auto bufsize = static_cast<std::uint32_t>(out.size());
 

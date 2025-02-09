@@ -57,7 +57,7 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-ProcessStatus AmplifierEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus AmplifierEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

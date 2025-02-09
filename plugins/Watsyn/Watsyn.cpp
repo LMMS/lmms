@@ -326,7 +326,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-void WatsynInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
+void WatsynInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	if (!_n->m_pluginData)
 	{

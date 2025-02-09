@@ -46,7 +46,7 @@ public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~ReverbSCEffect() override;
 
-	ProcessStatus processImpl(CoreAudioDataMut inOut) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{

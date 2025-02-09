@@ -255,7 +255,7 @@ QString BitInvader::nodeName() const
 
 
 
-void BitInvader::playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out)
+void BitInvader::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
 	if (!nph->m_pluginData)
 	{

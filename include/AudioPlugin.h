@@ -179,7 +179,7 @@ protected:
 			: nullptr;
 	}
 
-	void playImpl(CoreAudioDataMut inOut) final
+	void playImpl(std::span<SampleFrame> inOut) final
 	{
 		auto buffers = m_audioPort.buffers();
 		if (!buffers)
@@ -221,7 +221,7 @@ protected:
 		}
 	}
 
-	void playNoteImpl(NotePlayHandle* notesToPlay, CoreAudioDataMut inOut) final
+	void playNoteImpl(NotePlayHandle* notesToPlay, std::span<SampleFrame> inOut) final
 	{
 		/**
 		 * NOTE: Only MIDI-based instruments are currently supported by AudioPlugin.
@@ -268,7 +268,7 @@ protected:
 			: nullptr;
 	}
 
-	auto processAudioBufferImpl(CoreAudioDataMut inOut) -> bool final
+	auto processAudioBufferImpl(std::span<SampleFrame> inOut) -> bool final
 	{
 		if (isSleeping())
 		{

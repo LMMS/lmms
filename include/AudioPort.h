@@ -47,7 +47,7 @@ public:
 		BoolModel * mutedModel = nullptr );
 	virtual ~AudioPort();
 
-	CoreAudioDataMut buffer()
+	std::span<SampleFrame> buffer()
 	{
 		return m_portBuffer;
 	}
@@ -113,7 +113,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	CoreAudioDataMut m_portBuffer; //!< owning view
+	std::span<SampleFrame> m_portBuffer; //!< owning view
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;

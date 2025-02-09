@@ -60,7 +60,7 @@ class PluginPinConnectorView;
 
 
 /**
- * A non-owning span of CoreAudioData.
+ * A non-owning span of std::span<const SampleFrame>.
  *
  * Access like this:
  *   bus[channel pair index][frame index]
@@ -230,8 +230,8 @@ public:
 	public:
 		explicit Router(const PluginPinConnector& parent) : m_pc{&parent} {}
 
-		void routeToPlugin(CoreAudioBus in, CoreAudioDataMut out) const;
-		void routeFromPlugin(CoreAudioData in, CoreAudioBusMut inOut) const;
+		void routeToPlugin(CoreAudioBus in, std::span<SampleFrame> out) const;
+		void routeFromPlugin(std::span<const SampleFrame> in, CoreAudioBusMut inOut) const;
 
 	private:
 		const PluginPinConnector* m_pc;
@@ -524,7 +524,7 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 template<AudioPluginConfig config>
 inline void PluginPinConnector::Router<config,
 	AudioDataKind::SampleFrame, true>::routeToPlugin(
-	CoreAudioBus in, CoreAudioDataMut out) const
+	CoreAudioBus in, std::span<SampleFrame> out) const
 {
 	if constexpr (config.inputs == 0) { return; }
 
@@ -616,7 +616,7 @@ inline void PluginPinConnector::Router<config,
 template<AudioPluginConfig config>
 inline void PluginPinConnector::Router<config,
 	AudioDataKind::SampleFrame, true>::routeFromPlugin(
-	CoreAudioData in, CoreAudioBusMut inOut) const
+	std::span<const SampleFrame> in, CoreAudioBusMut inOut) const
 {
 	if constexpr (config.outputs == 0) { return; }
 

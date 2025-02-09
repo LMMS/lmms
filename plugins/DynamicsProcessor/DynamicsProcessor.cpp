@@ -91,7 +91,7 @@ inline void DynProcEffect::calcRelease()
 }
 
 
-ProcessStatus DynProcEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus DynProcEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 

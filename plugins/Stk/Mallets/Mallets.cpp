@@ -277,7 +277,7 @@ QString MalletsInstrument::nodeName() const
 
 
 
-void MalletsInstrument::playNoteImpl(NotePlayHandle* _n, CoreAudioDataMut out)
+void MalletsInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	if( m_filesMissing )
 	{

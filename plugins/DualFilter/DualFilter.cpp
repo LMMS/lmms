@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-ProcessStatus DualFilterEffect::processImpl(CoreAudioDataMut inOut)
+ProcessStatus DualFilterEffect::processImpl(std::span<SampleFrame> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

@@ -196,7 +196,7 @@ QString Xpressive::nodeName() const {
 	return (xpressive_plugin_descriptor.name);
 }
 
-void Xpressive::playNoteImpl(NotePlayHandle* nph, CoreAudioDataMut out) {
+void Xpressive::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) {
 	m_A1=m_parameterA1.value();
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
