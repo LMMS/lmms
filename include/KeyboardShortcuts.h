@@ -54,7 +54,9 @@ constexpr const char* UI_ALT_KEY =
 "Alt";
 #endif
 
-constexpr const char* UI_LINK_KEY =
+// UI hint for copying OR linking a UI component
+// this MUST be consistent with KBD_COPY_MODIFIER
+constexpr const char* UI_COPY_KEY =
 #ifdef LMMS_BUILD_APPLE
 UI_ALT_KEY;
 #else
@@ -62,6 +64,7 @@ UI_CTRL_KEY;
 #endif
 
 // Shortcut for copying OR linking a UI component
+// this MUST be consistent with UI_COPY_KEY
 constexpr Qt::KeyboardModifier KBD_COPY_MODIFIER =
 #ifdef LMMS_BUILD_APPLE
 Qt::AltModifier;
