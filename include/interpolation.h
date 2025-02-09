@@ -78,7 +78,7 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
-	const float f = (1.0f - std::cos(x * numbers::pi_v<float>)) * 0.5f;
+	const float f = (1.0f - std::cos(x * std::numbers::pi_v<float>)) * 0.5f;
 	return f * (v1 - v0) + v0;
 }
 

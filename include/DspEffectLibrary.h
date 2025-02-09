@@ -328,7 +328,7 @@ namespace lmms::DspEffectLibrary
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
 		{
-			const float toRad = numbers::pi_v<float> / 180;
+			constexpr float toRad = std::numbers::pi_v<float> / 180.f;
 			const sample_t tmp = inLeft;
 			inLeft += inRight * std::sin(m_wideCoeff * toRad * .5f);
 			inRight -= tmp * std::sin(m_wideCoeff * toRad * .5f);

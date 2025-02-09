@@ -31,14 +31,9 @@
 namespace lmms::numbers
 {
 
-//TODO: Replace entirely with std::numbers::pi_v
-template<std::floating_point T>
-inline constexpr T pi_v = std::numbers::pi_v<T>;
-inline constexpr double pi = pi_v<double>;
-
 //TODO: Replace entirely with (2 * std::numbers::pi_v)
 template<std::floating_point T>
-inline constexpr T tau_v = T(pi_v<T> * 2.0);
+inline constexpr T tau_v = T(std::numbers::pi_v<T> * 2.0);
 inline constexpr double tau = tau_v<double>;
 
 }
