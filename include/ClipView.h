@@ -249,15 +249,15 @@ private:
 	* @param pos the position of the split, relative to the start of the clip
 	* @return true if the clip could be split
 	*/
-	virtual bool splitClip(const TimePos pos);
+	bool splitClip(const TimePos pos);
 	/**
-	* Destructively split this Clip into two clips
+	* Destructively split this Clip into two clips. If the clip type does not implement this feature, it will default to normal splitting.
 	* @param pos the position of the split, relative to the start of the clip
 	* @return true if the clip could be split
 	*/
 	virtual bool destructiveSplitClip(const TimePos pos)
 	{
-		return false;
+		return splitClip(pos);
 	}
 	void updateCursor(QMouseEvent * me);
 } ;
