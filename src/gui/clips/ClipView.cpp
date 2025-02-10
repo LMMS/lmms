@@ -741,7 +741,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				hint = tr("Press <%1> or <Alt> for unquantized resizing.");
 			}
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_COPY_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
