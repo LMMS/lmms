@@ -40,6 +40,8 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackView.h"
+#include "KeyboardShortcuts.h"
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
@@ -634,7 +636,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if (me->modifiers() & Qt::ControlModifier && !knifeMode)
+		if (me->modifiers() & KBD_COPY_MODIFIER && !knifeMode)
 		{
 			if( isSelected() )
 			{
@@ -833,7 +835,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
-	if( me->modifiers() & Qt::ControlModifier )
+	if (me->modifiers() & KBD_COPY_MODIFIER)
 	{
 		delete m_hint;
 		m_hint = nullptr;
@@ -1319,7 +1321,7 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 		endQ = endQ - m_clip->length();
 
 		// Select the position closest to actual position
-		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
+		if (std::abs(newPos - startQ) < std::abs(newPos - endQ)) { newPos = startQ; }
 		else newPos = endQ;
 	}
 	else

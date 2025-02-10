@@ -84,7 +84,7 @@ public:
 		m_sum -= m_buffer[ m_pos ];
 		m_sum += m_buffer[ m_pos ] = in * in;
 		++m_pos %= m_size;
-		return sqrtf( m_sum * m_sizef );
+		return std::sqrt(m_sum * m_sizef);
 	}
 
 private:
