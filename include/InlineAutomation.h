@@ -36,8 +36,7 @@ class InlineAutomation : public FloatModel
 {
 public:
 	InlineAutomation() :
-		FloatModel(),
-		m_autoClip( nullptr )
+		FloatModel()
 	{
 	}
 
@@ -51,10 +50,6 @@ public:
 
 	~InlineAutomation() override
 	{
-		if( m_autoClip )
-		{
-			delete m_autoClip;
-		}
 	}
 
 	virtual float defaultValue() const = 0;
@@ -88,10 +83,10 @@ public:
 	{
 		if( m_autoClip == nullptr )
 		{
-			m_autoClip = new AutomationClip( nullptr );
+			m_autoClip = std::make_unique<AutomationClip>(nullptr);
 			m_autoClip->addObject( this );
 		}
-		return m_autoClip;
+		return m_autoClip.get();
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -99,7 +94,7 @@ public:
 
 
 private:
-	AutomationClip * m_autoClip;
+	std::unique_ptr<AutomationClip> m_autoClip;
 
 } ;
 
