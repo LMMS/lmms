@@ -809,6 +809,7 @@ void RemoteVstPlugin::initEditor()
 		dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
 	}
 
+	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 	m_window = CreateWindowEx( WS_EX_APPWINDOW, "LVSL", pluginName(),
 		dwStyle,
 		0, 0, 10, 10, nullptr, nullptr, hInst, nullptr );
