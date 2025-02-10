@@ -1080,7 +1080,7 @@ void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 
    	// Check if the file manager supports the --select option
    	if (supportsSelectOption(fileManager)) {
-   		QProcess::startDetached(fileManager + " --select \"" + path + "\"");
+   		QProcess::startDetached(fileManager, {"--select", path});
    	} else {
    	    QDesktopServices::openUrl(QUrl::fromLocalFile(directory));
    	}
