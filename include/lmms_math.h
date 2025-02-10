@@ -192,7 +192,7 @@ constexpr auto fastPow10f(std::integral auto x)
 template<std::floating_point T = float>
 constexpr auto fastLog10f(T x)
 {
-	constexpr T inv_ln10 = 1.0 / std::numbers::ln10_v<T>;
+	constexpr T inv_ln10 = static_cast<T>(1.0) / std::numbers::ln10_v<T>;
 	return std::log(x) * inv_ln10;
 }
 
