@@ -99,9 +99,14 @@ void fpeHandler( int signum ) {
 }
 #endif
 
-void interruptHandler(int unused) {
-	if(qApp != nullptr) qApp->exit(3);
-	exit(3);
+void interruptHandler(int code) {
+	using namespace lmms::gui;
+
+	if(getGUI() != nullptr) {
+		getGUI()->sendInterrupt(code);
+	} else {
+		exit(3);
+	}
 }
 
 static inline QString baseName( const QString & file )
