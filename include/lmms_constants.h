@@ -28,7 +28,9 @@
 namespace lmms
 {
 
-constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+// This is only used in lmms_math.h, in functions approximatelyEqual()
+// and roundAt(). Should this be available outside lmms_math.h at all?
+inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
 // Microtuner
 constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
