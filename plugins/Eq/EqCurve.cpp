@@ -68,10 +68,10 @@ QRectF EqHandle::boundingRect() const
 float EqHandle::freqToXPixel( float freq , int w )
 {
 	if (approximatelyEqual(freq, 0.0f)) { return 0.0f; }
-	float min = log10f( 20 );
-	float max = log10f( 20000 );
+	float min = std::log10(20);
+	float max = std::log10(20000);
 	float range = max - min;
-	return ( log10f( freq ) - min ) / range * w;
+	return (std::log10(freq) - min) / range * w;
 }
 
 
@@ -79,10 +79,10 @@ float EqHandle::freqToXPixel( float freq , int w )
 
 float EqHandle::xPixelToFreq( float x , int w )
 {
-	float min = log10f( 20 );
-	float max = log10f( 20000 );
+	float min = std::log10(20);
+	float max = std::log10(20000);
 	float range = max - min;
-	return powf( 10 , x * ( range / w ) + min );
+	return fastPow10f(x * (range / w) + min);
 }
 
 
@@ -201,13 +201,12 @@ bool EqHandle::mousePressed() const
 float EqHandle::getPeakCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->outputSampleRate();
-	double w0 = 2 * LD_PI * freqZ / SR ;
-	double c = cosf( w0 );
-	double s = sinf( w0 );
+	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double c = std::cos(w0);
+	double s = std::sin(w0);
 	double Q = getResonance();
-	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
-	double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
+	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
+	double alpha = s * std::sinh(std::log(2.0) / 2 * Q * w0 / std::sin(w0));
 
 	//calc coefficents
 	double b0 = 1 + alpha * A;
@@ -238,12 +237,11 @@ float EqHandle::getPeakCurve( float x )
 float EqHandle::getHighShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->outputSampleRate();
-	double w0 = 2 * LD_PI * freqZ / SR;
-	double c = cosf( w0 );
-	double s = sinf( w0 );
-	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) * 0.025 );
-	double beta = sqrt( A ) / m_resonance;
+	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double c = std::cos(w0);
+	double s = std::sin(w0);
+	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) * 0.025);
+	double beta = std::sqrt(A) / m_resonance;
 
 	//calc coefficents
 	double b0 = A * ((A + 1) + (A - 1) * c + beta * s);
@@ -274,12 +272,11 @@ float EqHandle::getHighShelfCurve( float x )
 float EqHandle::getLowShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->outputSampleRate();
-	double w0 = 2 * LD_PI * freqZ / SR ;
-	double c = cosf( w0 );
-	double s = sinf( w0 );
-	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
-	double beta = sqrt( A ) / m_resonance;
+	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double c = std::cos(w0);
+	double s = std::sin(w0);
+	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
+	double beta = std::sqrt(A) / m_resonance;
 
 	//calc coefficents
 	double b0 = A * ((A + 1) - (A - 1) * c + beta * s);
@@ -310,10 +307,9 @@ float EqHandle::getLowShelfCurve( float x )
 float EqHandle::getLowCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->outputSampleRate();
-	double w0 = 2 * LD_PI * freqZ / SR ;
-	double c = cosf( w0 );
-	double s = sinf( w0 );
+	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double c = std::cos(w0);
+	double s = std::sin(w0);
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
 
@@ -353,10 +349,9 @@ float EqHandle::getLowCutCurve( float x )
 float EqHandle::getHighCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::audioEngine()->outputSampleRate();
-	double w0 = 2 * LD_PI * freqZ / SR ;
-	double c = cosf( w0 );
-	double s = sinf( w0 );
+	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double c = std::cos(w0);
+	double s = std::sin(w0);
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
 
@@ -527,14 +522,13 @@ void EqHandle::setlp48()
 
 double EqHandle::calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 )
 {
-	const int SR = Engine::audioEngine()->outputSampleRate();
+	const double w = std::sin(numbers::pi * freq / Engine::audioEngine()->outputSampleRate());
+	const double PHI = w * w * 4;
 
-	const double w = 2 * LD_PI * freq / SR ;
-	const double PHI = pow( sin( w / 2 ), 2 ) * 4;
-
-	double gain = 10 * log10( pow( b0 + b1 + b2 , 2 ) + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 )
-				+ 4 * b0 * b2 ) ) * PHI ) - 10 * log10( pow( 1 + a1 + a2, 2 )
-				+ ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
+	auto bb = b0 + b1 + b2;
+	auto aa = 1 + a1 + a2;
+	double gain = 10 * std::log10(bb * bb + (b0 * b2 * PHI - (b1 * (b0 + b2) + 4 * b0 * b2)) * PHI)
+		- 10 * std::log10(aa * aa + (1 * a2 * PHI - (a1 * (1 + a2) + 4 * 1 * a2)) * PHI);
 	return gain;
 }
 

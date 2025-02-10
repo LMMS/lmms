@@ -556,7 +556,7 @@ void Sf2Instrument::updateTuning()
 	if (instrumentTrack()->microtuner()->enabledModel()->value())
 	{
 		auto centArray = std::array<double, 128>{};
-		double lowestHz = pow(2., -69. / 12.) * 440.;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
+		double lowestHz = std::exp2(-69. / 12.) * 440.; // Frequency of MIDI note 0, which is approximately 8.175798916 Hz
 		for (int i = 0; i < 128; ++i)
 		{
 			// Get desired Hz of note
