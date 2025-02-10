@@ -34,6 +34,13 @@
 #include <string_view>
 #include <lilv/lilv.h>
 
+#ifdef LMMS_HAVE_SERD
+#include "serd/serd.h"
+#ifdef LMMS_HAVE_SRATOM
+#include "sratom/sratom.h"
+#endif // LMMS_HAVE_SRATOM
+#endif // LMMS_HAVE_SERD
+
 #include "Lv2Basics.h"
 #include "Lv2UridCache.h"
 #include "Lv2UridMap.h"
@@ -78,7 +85,7 @@ namespace lmms
 
 
 //! Class to keep track of all LV2 plugins
-class Lv2Manager
+class LMMS_EXPORT Lv2Manager
 {
 public:
 	void initPlugins();
@@ -149,12 +156,20 @@ public:
 	//! Since we do not generally support UI right now, this will always return false...
 	static bool wantUi();
 
+#if defined(LMMS_HAVE_SRATOM) && defined(LMMS_HAVE_SERD)
+	Sratom* sratom; //!< Atom serialiser
+	Sratom* ui_sratom; //!< Atom serialiser for UI thread
+#endif
+
 private:
 	// general data
 	bool m_debug; //!< if set, debug output will be printed
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
 	std::set<std::string_view> m_supportedFeatureURIs;
+#ifdef LMMS_HAVE_SERD
+	SerdEnv* env;
+#endif
 
 	// feature data that are common for all Lv2Proc
 	UridMap m_uridMap;
