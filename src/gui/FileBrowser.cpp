@@ -67,7 +67,6 @@
 #include "TextFloat.h"
 #include "ThreadPool.h"
 #include "embed.h"
-#include <qdebug.h> //todo: remove before commit
 namespace lmms::gui
 {
 
