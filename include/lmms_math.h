@@ -184,10 +184,21 @@ constexpr auto fastPow10f(T x)
 	return std::exp(std::numbers::ln10_v<T> * x);
 }
 
+constexpr auto fastPow10f(std::integral auto x)
+{
+	return std::exp(std::numbers::ln10 * x);
+}
+
 template<std::floating_point T = float>
 constexpr auto fastLog10f(T x)
 {
 	constexpr T inv_ln10 = 1.0 / std::numbers::ln10_v<T>;
+	return std::log(x) * inv_ln10;
+}
+
+constexpr auto fastLog10f(std::integral auto x)
+{
+	constexpr auto inv_ln10 = 1.0 / std::numbers::ln10_v;
 	return std::log(x) * inv_ln10;
 }
 
