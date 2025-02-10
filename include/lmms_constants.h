@@ -35,8 +35,8 @@ namespace lmms
 inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
 // Microtuner
-inline constexpr std::unsigned_integral auto MaxScaleCount = 10;  //!< number of scales per project
-inline constexpr std::unsigned_integral auto MaxKeymapCount = 10; //!< number of keyboard mappings per project
+inline constexpr std::integral auto MaxScaleCount = 10;  //!< number of scales per project
+inline constexpr std::integral auto MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
