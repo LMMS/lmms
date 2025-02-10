@@ -30,7 +30,6 @@
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
 #include "lmms_basics.h"
-#include "lmms_constants.h"
 
 namespace lmms
 {

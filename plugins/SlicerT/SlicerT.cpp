@@ -34,7 +34,6 @@
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
-#include "lmms_constants.h"
 #include "plugin_export.h"
 
 namespace lmms {

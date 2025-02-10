@@ -30,10 +30,6 @@
 namespace lmms
 {
 
-// This is only used in lmms_math.h, in functions approximatelyEqual()
-// and roundAt(). Should this be available outside lmms_math.h at all?
-inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
-
 // Microtuner
 inline constexpr std::integral auto MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr std::integral auto MaxKeymapCount = 10; //!< number of keyboard mappings per project

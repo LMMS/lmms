@@ -32,7 +32,6 @@
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "lmms_constants.h"
 
 namespace lmms
 {

@@ -31,7 +31,6 @@
 #include "embed.h"
 #include "Engine.h"
 #include "FontHelper.h"
-#include "lmms_constants.h"
 #include "lmms_math.h"
 
 

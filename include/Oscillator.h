@@ -33,7 +33,6 @@
 #include "interpolation.h"
 
 #include "Engine.h"
-#include "lmms_constants.h"
 #include "lmmsconfig.h"
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"

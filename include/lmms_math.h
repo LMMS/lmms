@@ -32,9 +32,16 @@
 #include <cstdint>
 #include <cstring>
 #include <numbers>
+#include <concepts>
 
-#include "lmms_constants.h"
 #include "lmmsconfig.h"
+
+namespace
+{
+
+inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+
+}
 
 namespace lmms
 {
@@ -73,20 +80,25 @@ inline float absFraction(const float x)
 	return x - std::floor(x);
 }
 
-
-constexpr float FAST_RAND_RATIO = 1.0f / 32767;
-inline int fast_rand()
+inline auto fast_rand() noexcept
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
-	return( (unsigned)( next / 65536 ) % 32768 );
+	return static_cast<unsigned>(next / 65536) % 32768;
 }
 
-inline float fastRandf(float range)
+template<std::floating_point T = float>
+inline T fast_rand(T range) noexcept
 {
+	constexpr T FAST_RAND_RATIO = 1.0 / 32767;
 	return fast_rand() * range * FAST_RAND_RATIO;
 }
 
+template<std::floating_point T = float>
+inline T fast_rand(T from, T to) noexcept
+{
+	return from + fast_rand<T>(to - from);
+}
 
 //! Round `value` to `where` depending on step size
 template<class T>
@@ -166,14 +178,17 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan(result) ? 0 : result;
 }
 
-inline float fastPow10f(float x)
+template<std::floating_point T = float>
+constexpr T fastPow10f(T x)
 {
-	return std::exp(2.302585092994046f * x);
+	return std::exp(std::numbers::ln10_v<T> * x);
 }
 
-inline float fastLog10f(float x)
+template<std::floating_point T = float>
+constexpr T fastLog10f(T x)
 {
-	return std::log(x) * 0.4342944819032518f;
+	constexpr T inv_ln10 = 1.0 / std::numbers::ln10_v<T>;
+	return std::log(x) * inv_ln10;
 }
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
@@ -220,8 +235,8 @@ constexpr T lerp(T a, T b, F t)
 	return (1. - t) * a + t * b;
 }
 
+// TODO C++20: use std::formatted_size
 // @brief Calculate number of digits which LcdSpinBox would show for a given number
-// @note Once we upgrade to C++20, we could probably use std::formatted_size
 inline int numDigitsAsInt(float f)
 {
 	// use rounding:

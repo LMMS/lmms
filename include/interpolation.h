@@ -27,7 +27,6 @@
 
 #include <cmath>
 #include <numbers>
-#include "lmms_constants.h"
 #include "lmms_math.h"
 
 namespace lmms

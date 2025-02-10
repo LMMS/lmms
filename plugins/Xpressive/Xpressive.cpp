@@ -40,8 +40,6 @@
 #include "Song.h"
 
 #include "base64.h"
-#include "lmms_constants.h"
-
 #include "embed.h"
 
 #include "ExprSynth.h"
