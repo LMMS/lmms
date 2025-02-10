@@ -198,7 +198,7 @@ constexpr auto fastLog10f(T x)
 
 constexpr auto fastLog10f(std::integral auto x)
 {
-	constexpr auto inv_ln10 = 1.0 / std::numbers::ln10_v;
+	constexpr auto inv_ln10 = 1.0 / std::numbers::ln10;
 	return std::log(x) * inv_ln10;
 }
 
