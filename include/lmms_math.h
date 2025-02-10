@@ -90,7 +90,7 @@ inline auto fast_rand() noexcept
 template<std::floating_point T = float>
 inline T fast_rand(T range) noexcept
 {
-	constexpr T FAST_RAND_RATIO = 1.0 / 32767;
+	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
 	return fast_rand() * range * FAST_RAND_RATIO;
 }
 
