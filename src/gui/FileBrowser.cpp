@@ -651,7 +651,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	   if (file->isTrack()) {
 		   contextMenu.addAction(
 			   tr( "Send to active instrument-track" ),
-			   [=]{ sendToActiveInstrumentTrack(file); }
+			   [=, this]{ sendToActiveInstrumentTrack(file); }
 		   );
 
 		   contextMenu.addSeparator();
@@ -661,7 +661,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		   QIcon(embed::getIconPixmap("folder")),
 
 		   tr("Show in") + " " +fileManager,
-		   [=]{ openContainingFolder(file); }
+		   [=, this]{ openContainingFolder(file); }
 	   );
 
 
@@ -680,7 +680,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	   contextMenu.addAction(
 		   QIcon(embed::getIconPixmap("folder")),
 		   tr("Open in") + " " + fileManager,
-		   [=]{ openDirectory(dir); }
+		   [=, this]{ openDirectory(dir); }
 	   );
    }
 
