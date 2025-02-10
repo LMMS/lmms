@@ -35,6 +35,7 @@
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -66,7 +67,7 @@
 #include "TextFloat.h"
 #include "ThreadPool.h"
 #include "embed.h"
-
+#include <qdebug.h> //todo: remove before commit
 namespace lmms::gui
 {
 
@@ -628,37 +629,63 @@ void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	auto file = dynamic_cast<FileItem*>(itemAt(e->pos()));
-	if( file != nullptr && file->isTrack() )
-	{
-		QMenu contextMenu( this );
+#ifdef LMMS_BUILD_APPLE
+	QString fileManager = tr("Finder");
+#elif defined(LMMS_BUILD_WIN32)
+	QString fileManager = tr("File Explorer");
+#else
+	QString fileManager = tr("file manager");
+#endif
 
-		contextMenu.addAction(
-			tr( "Send to active instrument-track" ),
-			[=, this]{ sendToActiveInstrumentTrack(file); }
-		);
+   QTreeWidgetItem* item = itemAt(e->pos());
 
-		contextMenu.addSeparator();
+   auto file = dynamic_cast<FileItem*>(item);
 
-		contextMenu.addAction(
-			QIcon(embed::getIconPixmap("folder")),
-			tr("Open containing folder"),
-			[=, this]{ openContainingFolder(file); }
-		);
+   QMenu contextMenu( this );
 
-		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-		songEditorHeader->setDisabled(true);
-		contextMenu.addAction( songEditorHeader );
-		contextMenu.addActions( getContextActions(file, true) );
+   auto dir = dynamic_cast<Directory*>(item); // TODO: this might not be a great way to check if it's a directory
 
-		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-		patternEditorHeader->setDisabled(true);
-		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions( getContextActions(file, false) );
 
-		// We should only show the menu if it contains items
-		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
-	}
+   if( file != nullptr)
+   {
+	   if (file->isTrack()) {
+		   contextMenu.addAction(
+			   tr( "Send to active instrument-track" ),
+			   [=]{ sendToActiveInstrumentTrack(file); }
+		   );
+
+		   contextMenu.addSeparator();
+	   }
+
+	   contextMenu.addAction(
+		   QIcon(embed::getIconPixmap("folder")),
+
+		   tr("Show in") + " " +fileManager,
+		   [=]{ openContainingFolder(file); }
+	   );
+
+
+	   auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
+	   songEditorHeader->setDisabled(true);
+	   contextMenu.addAction( songEditorHeader );
+	   contextMenu.addActions( getContextActions(file, true) );
+
+	   auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+	   patternEditorHeader->setDisabled(true);
+	   contextMenu.addAction(patternEditorHeader);
+	   contextMenu.addActions( getContextActions(file, false) );
+
+   } else if (dir) {
+
+	   contextMenu.addAction(
+		   QIcon(embed::getIconPixmap("folder")),
+		   tr("Open in") + " " + fileManager,
+		   [=]{ openDirectory(dir); }
+	   );
+   }
+
+   // We should only show the menu if it contains items
+   if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
 }
 
 
@@ -991,17 +1018,75 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 
 
+void FileBrowserTreeWidget::openDirectory(Directory* directory) {
+   QDesktopServices::openUrl(QUrl::fromLocalFile(directory->fullName()));
+}
+
 void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
-	// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
-	// this will only open the directory but not select the file as this is much more complicated due
-	// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
+   QFileInfo fileInfo(item->fullName());
+   QString path = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+   QString directory = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
 
-	// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
-	// functionality that's already available in Qt.
-	QFileInfo fileInfo(item->fullName());
-	QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
+#ifdef _WIN32
+   // Windows
+	QStringList param;
+	if (!fileInfo.isDir())
+		param += QLatin1String("/select,");
+	param += path;
+	QProcess::startDetached("explorer", param);
+
+#elif __APPLE__
+   // macOS
+	QProcess::startDetached("open", {"-R", path});
+#else
+	// Linux & BSD
+	// there are a lot of potential file managers on these systems so we need to figure out what to use.
+
+	// Check user preferences from environment variable
+	QString fileManager = qgetenv("FILE_MANAGER");
+	if (fileManager.isEmpty()) {
+		fileManager = qgetenv("XDG_FILE_MANAGER");	// not actually in the freedesktop spec but is sometimes used
+	}
+
+   	// If no preference is set, check the desktop environment
+   	if (fileManager.isEmpty()) {
+   		QString desktopEnv = qgetenv("XDG_CURRENT_DESKTOP");
+   		if (desktopEnv.isEmpty()) {
+   			desktopEnv = qgetenv("DESKTOP_SESSION");
+   		}
+
+   		if (desktopEnv.contains("GNOME", Qt::CaseInsensitive)) {
+   			fileManager = "nautilus";
+   		} else if (desktopEnv.contains("KDE", Qt::CaseInsensitive)) {
+   			fileManager = "dolphin";
+   		} else if (desktopEnv.contains("XFCE", Qt::CaseInsensitive)) {
+   			fileManager = "thunar";
+   		} else if (desktopEnv.contains("LXDE", Qt::CaseInsensitive)) {
+   			fileManager = "pcmanfm";
+   		} else if (desktopEnv.contains("CINNAMON", Qt::CaseInsensitive)) {
+   			fileManager = "nemo";
+   		} else if (desktopEnv.contains("MATE", Qt::CaseInsensitive)) {
+   			fileManager = "caja";
+   		} else if (desktopEnv.contains("PANTHEON", Qt::CaseInsensitive)) {
+   			fileManager = "io.elementary.files";
+   		} else if (desktopEnv.contains("LXQT", Qt::CaseInsensitive)) {
+   			fileManager = "pcmanfm-qt";
+   		} else  {
+   			QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+   			return;  // Exit if no suitable file manager found
+   		}
+   	}
+
+   	// Check if the file manager supports the --select option
+   	if (supportsSelectOption(fileManager)) {
+   		QProcess::startDetached(fileManager + " --select \"" + path + "\"");
+   	} else {
+   	    QDesktopServices::openUrl(QUrl::fromLocalFile(directory));
+   	}
+#endif
 }
+
 
 
 

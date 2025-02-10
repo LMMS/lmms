@@ -140,7 +140,7 @@ private:
 } ;
 
 
-
+class Directory;
 
 class FileBrowserTreeWidget : public QTreeWidget
 {
@@ -195,7 +195,13 @@ private slots:
 	bool openInNewSampleTrack( lmms::gui::FileItem* item );
 	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
+	void openDirectory( Directory* directory );
 	void openContainingFolder( lmms::gui::FileItem* item );
+	static bool supportsSelectOption(const QString &fileManager) {
+		return fileManager == "nautilus" || fileManager == "dolphin" || fileManager == "thunar" ||
+		 fileManager == "pcmanfm" || fileManager == "nemo" || fileManager == "caja" ||
+		 fileManager == "io.elementary.files" || fileManager == "spacefm" || fileManager == "pcmanfm-qt";
+	}
 
 } ;
 
