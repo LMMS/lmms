@@ -93,8 +93,8 @@ private:
 			Peak operator+(const Peak& other) const { return Peak(std::min(min, other.min), std::max(max, other.max)); }
 			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
 
-			float min = std::numeric_limits<float>::max();
-			float max = std::numeric_limits<float>::min();
+			float min = std::numeric_limits<float>::infinity();
+			float max = -std::numeric_limits<float>::infinity();
 		};
 
 		Thumbnail() = default;
