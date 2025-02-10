@@ -206,7 +206,6 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
-                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
