@@ -179,13 +179,13 @@ inline float linearToLogScale(float min, float max, float value)
 }
 
 template<std::floating_point T = float>
-constexpr T fastPow10f(T x)
+constexpr auto fastPow10f(T x)
 {
 	return std::exp(std::numbers::ln10_v<T> * x);
 }
 
 template<std::floating_point T = float>
-constexpr T fastLog10f(T x)
+constexpr auto fastLog10f(T x)
 {
 	constexpr T inv_ln10 = 1.0 / std::numbers::ln10_v<T>;
 	return std::log(x) * inv_ln10;
