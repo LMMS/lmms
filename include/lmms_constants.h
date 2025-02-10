@@ -25,6 +25,8 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
+#include <concepts>
+
 namespace lmms
 {
 
@@ -33,12 +35,12 @@ namespace lmms
 inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
 // Microtuner
-constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
-constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per project
+inline constexpr std::unsigned_integral auto MaxScaleCount = 10;  //!< number of scales per project
+inline constexpr std::unsigned_integral auto MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
-constexpr int LOWEST_LOG_FREQ = 5;
+inline constexpr auto LOWEST_LOG_FREQ = 5;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
 enum class FrequencyRange
@@ -50,14 +52,14 @@ enum class FrequencyRange
 	High
 };
 
-constexpr int FRANGE_AUDIBLE_START = 20;
-constexpr int FRANGE_AUDIBLE_END = 20000;
-constexpr int FRANGE_BASS_START = 20;
-constexpr int FRANGE_BASS_END = 300;
-constexpr int FRANGE_MIDS_START = 200;
-constexpr int FRANGE_MIDS_END = 5000;
-constexpr int FRANGE_HIGH_START = 4000;
-constexpr int FRANGE_HIGH_END = 20000;
+inline constexpr auto FRANGE_AUDIBLE_START =    20;
+inline constexpr auto FRANGE_AUDIBLE_END   = 20000;
+inline constexpr auto FRANGE_BASS_START    =    20;
+inline constexpr auto FRANGE_BASS_END      =   300;
+inline constexpr auto FRANGE_MIDS_START    =   200;
+inline constexpr auto FRANGE_MIDS_END      =  5000;
+inline constexpr auto FRANGE_HIGH_START    =  4000;
+inline constexpr auto FRANGE_HIGH_END      = 20000;
 
 // Amplitude ranges (in dBFS).
 // Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
@@ -70,15 +72,14 @@ enum class AmplitudeRange
 	Silent
 };
 
-constexpr int ARANGE_EXTENDED_START = -80;
-constexpr int ARANGE_EXTENDED_END = 20;
-constexpr int ARANGE_AUDIBLE_START = -50;
-constexpr int ARANGE_AUDIBLE_END = 0;
-constexpr int ARANGE_LOUD_START = -30;
-constexpr int ARANGE_LOUD_END = 0;
-constexpr int ARANGE_SILENT_START = -60;
-constexpr int ARANGE_SILENT_END = -10;
-
+inline constexpr auto ARANGE_EXTENDED_START = -80;
+inline constexpr auto ARANGE_EXTENDED_END   =  20;
+inline constexpr auto ARANGE_AUDIBLE_START  = -50;
+inline constexpr auto ARANGE_AUDIBLE_END    =   0;
+inline constexpr auto ARANGE_LOUD_START     = -30;
+inline constexpr auto ARANGE_LOUD_END       =   0;
+inline constexpr auto ARANGE_SILENT_START   = -60;
+inline constexpr auto ARANGE_SILENT_END     = -10;
 
 } // namespace lmms
 
