@@ -135,39 +135,42 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	const auto yScale = renderRect.height() / 2 * parameters.amplification;
 
 	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
-		 ++x, i += advanceThumbnailBy)
+		++x, i += advanceThumbnailBy)
 	{
-		const auto beginIndex = static_cast<size_t>(std::floor(i * finerThumbnailScaleFactor));
-		const auto endIndex = static_cast<size_t>(std::ceil((i + 1) * finerThumbnailScaleFactor));
-
-		auto minPeak = 0.f;
-		auto maxPeak = 0.f;
-
 		if (useOriginalBuffer && drawOriginalBuffer)
 		{
 			const auto value = m_buffer->data()->data()[i];
 			painter.drawPoint(x, renderRect.center().y() - value * yScale);
 			return;
 		}
-		else if (useOriginalBuffer)
-		{
-			const auto flatBuffer = m_buffer->data()->data();
-			const auto [min, max] = std::minmax_element(flatBuffer + beginIndex, flatBuffer + endIndex);
-			minPeak = *min;
-			maxPeak = *max;
-		}
 		else
 		{
-			const auto beginAggregationAt = &(*finerThumbnail)[beginIndex];
-			const auto endAggregationAt = &(*finerThumbnail)[endIndex];
-			const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
-			minPeak = peak.min;
-			maxPeak = peak.max;
-		}
+			const auto beginIndex = static_cast<size_t>(std::floor(i * finerThumbnailScaleFactor));
+			const auto endIndex = static_cast<size_t>(std::ceil((i + 1) * finerThumbnailScaleFactor));
 
-		const auto yMin = renderRect.center().y() - minPeak * yScale;
-		const auto yMax = renderRect.center().y() - maxPeak * yScale;
-		painter.drawLine(x, yMin, x, yMax);
+			auto minPeak = 0.f;
+			auto maxPeak = 0.f;
+
+			if (useOriginalBuffer)
+			{
+				const auto flatBuffer = m_buffer->data()->data();
+				const auto [min, max] = std::minmax_element(flatBuffer + beginIndex, flatBuffer + endIndex);
+				minPeak = *min;
+				maxPeak = *max;
+			}
+			else
+			{
+				const auto beginAggregationAt = &(*finerThumbnail)[beginIndex];
+				const auto endAggregationAt = &(*finerThumbnail)[endIndex];
+				const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
+				minPeak = peak.min;
+				maxPeak = peak.max;
+			}
+
+			const auto yMin = renderRect.center().y() - minPeak * yScale;
+			const auto yMax = renderRect.center().y() - maxPeak * yScale;
+			painter.drawLine(x, yMin, x, yMax);
+		}
 	}
 
 	painter.restore();
