@@ -46,11 +46,13 @@ inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 namespace lmms
 {
 
-constexpr bool approximatelyEqual(float x, float y) noexcept
+// TODO C++23: Make constexpr since std::abs() will be constexpr
+inline bool approximatelyEqual(float x, float y) noexcept
 {
 	return x == y ? true : std::abs(x - y) < F_EPSILON;
 }
 
+// TODO C++23: Make constexpr since std::trunc() will be constexpr
 /*!
  * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
  *
@@ -60,11 +62,13 @@ constexpr bool approximatelyEqual(float x, float y) noexcept
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-constexpr auto fraction(std::floating_point auto x) noexcept
+inline auto fraction(std::floating_point auto x) noexcept
 {
 	return x - std::trunc(x);
 }
 
+
+// TODO C++23: Make constexpr since std::floor() will be constexpr
 /*!
  * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
  *
@@ -75,7 +79,7 @@ constexpr auto fraction(std::floating_point auto x) noexcept
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-constexpr auto absFraction(std::floating_point auto x) noexcept
+inline auto absFraction(std::floating_point auto x) noexcept
 {
 	return x - std::floor(x);
 }
@@ -179,18 +183,21 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan(result) ? 0 : result;
 }
 
+// TODO C++26: Make constexpr since std::exp() will be constexpr
 template<std::floating_point T = float>
-constexpr auto fastPow10f(T x)
+inline auto fastPow10f(T x)
 {
 	return std::exp(std::numbers::ln10_v<T> * x);
 }
 
-constexpr auto fastPow10f(std::integral auto x)
+// TODO C++26: Make constexpr since std::exp() will be constexpr
+inline auto fastPow10f(std::integral auto x)
 {
-	return std::exp(std::numbers::ln10 * x);
+	return std::exp(std::numbers::ln10_v<float> * x);
 }
 
-constexpr auto fastLog10f(float x)
+// TODO C++26: Make constexpr since std::log() will be constexpr
+inline auto fastLog10f(float x)
 {
 	constexpr float inv_ln10 = 1.f / std::numbers::ln10;
 	return std::log(x) * inv_ln10;
