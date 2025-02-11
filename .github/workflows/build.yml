@@ -262,6 +262,16 @@ jobs:
           sudo apt-get update -y
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install wine and p7zip
+        run: |
+          if [ "${{ matrix.arch }}" = "32" ]; then
+            dpkg --add-architecture i386  # add i386 arch for wine32
+          fi
+          apt-get --yes update
+          apt-get --yes install wine-stable p7zip-full
+          if [ "${{ matrix.arch }}" = "32" ]; then
+            apt-get --yes install wine32
+          fi
       - name: Check out
         uses: actions/checkout@v3
         with:
@@ -291,6 +301,10 @@ jobs:
         run: cmake --build build
       - name: Package
         run: cmake --build build --target package
+      - name: Unpack
+        run: |
+          mkdir build/install
+          7z x -obuild/install build/lmms-*.exe
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -381,6 +395,8 @@ jobs:
           ctest --output-on-failure -j2
       - name: Package
         run: cmake --build build --target package
+      - name: Unpack
+        run: 7z x -obuild/install build/lmms-*.exe
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
