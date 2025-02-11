@@ -170,7 +170,7 @@ inline float logToLinearScale(float min, float max, float value)
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
 inline float linearToLogScale(float min, float max, float value)
 {
-	constexpr float inv_e = 1.f / std::numbers::e_v<float>;
+	constexpr auto inv_e = static_cast<float>(1.0 / std::numbers::e);
 	const float valueLimited = std::clamp(value, min, max);
 	const float val = (valueLimited - min) / (max - min);
 	if (min < 0)
@@ -199,7 +199,7 @@ inline auto fastPow10f(std::integral auto x)
 // TODO C++26: Make constexpr since std::log() will be constexpr
 inline auto fastLog10f(float x)
 {
-	constexpr float inv_ln10 = 1.f / std::numbers::ln10;
+	constexpr auto inv_ln10 = static_cast<float>(1.0 / std::numbers::ln10);
 	return std::log(x) * inv_ln10;
 }
 

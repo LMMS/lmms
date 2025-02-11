@@ -22,10 +22,9 @@
  *
  */
 
+#include "Monstro.h"
 
 #include <QDomElement>
-
-#include "Monstro.h"
 
 #include "ComboBox.h"
 #include "Engine.h"
@@ -34,7 +33,6 @@
 #include "interpolation.h"
 
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
