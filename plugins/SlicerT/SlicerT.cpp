@@ -34,6 +34,8 @@
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
+#include "interpolation.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms {

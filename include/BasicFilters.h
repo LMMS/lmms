@@ -31,12 +31,12 @@
 #ifndef LMMS_BASIC_FILTERS_H
 #define LMMS_BASIC_FILTERS_H
 
-#include <cmath>
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <numbers>
 
 #include "lmms_basics.h"
-#include "interpolation.h"
 
 namespace lmms
 {
@@ -207,7 +207,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if (std::abs(s) < 1.0e-10f && std::abs(m_z1[ch]) < 1.0e-10f) return 0.0f;
+		if (std::abs(s) < 1.0e-10f && std::abs(m_z1[ch]) < 1.0e-10f) { return 0.0f; }
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -376,7 +376,7 @@ public:
 				for( int i = 0; i < 4; ++i )
 				{
 					ip += 0.25f;
-					sample_t x = linearInterpolate( m_last[_chnl], _in0, ip ) - m_r * m_y3[_chnl];
+					sample_t x = std::lerp(m_last[_chnl], _in0, ip) - m_r * m_y3[_chnl];
 					
 					m_y1[_chnl] = std::clamp((x + m_oldx[_chnl]) * m_p
 							- m_k * m_y1[_chnl], -10.0f,
@@ -748,8 +748,8 @@ public:
 			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = 1.0f / (linearInterpolate(_f[vowel+0][0], _f[vowel+1][0], fract) * 2 * pi_v<float>);
-			const float f1 = 1.0f / (linearInterpolate(_f[vowel+0][1], _f[vowel+1][1], fract) * 2 * pi_v<float>);
+			const float f0 = 1.f / (std::lerp(_f[vowel+0][0], _f[vowel+1][0], fract) * 2 * pi_v<float>);
+			const float f1 = 1.f / (std::lerp(_f[vowel+0][1], _f[vowel+1][1], fract) * 2 * pi_v<float>);
 
 			// samplerate coeff: depends on oversampling
 			const float sr = m_type == FilterType::FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;

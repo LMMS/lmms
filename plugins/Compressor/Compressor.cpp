@@ -24,10 +24,10 @@
 
 #include "Compressor.h"
 
+#include <cmath>
 #include <numbers>
 
 #include "embed.h"
-#include "interpolation.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
 
@@ -405,21 +405,21 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_
 					if (blend <= 1)// Blend to minimum volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
-						m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
+						m_gainResult[0] = std::lerp(m_gainResult[0], temp1, blend);
+						m_gainResult[1] = std::lerp(m_gainResult[1], temp1, blend);
 					}
 					else if (blend <= 2)// Blend to average volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
 						const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
+						m_gainResult[0] = std::lerp(temp1, temp2, blend - 1);
 						m_gainResult[1] = m_gainResult[0];
 					}
 					else// Blend to maximum volume
 					{
 						const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 						const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
+						m_gainResult[0] = std::lerp(temp1, temp2, blend - 2);
 						m_gainResult[1] = m_gainResult[0];
 					}
 				}

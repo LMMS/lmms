@@ -46,7 +46,7 @@ inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 namespace lmms
 {
 
-inline bool approximatelyEqual(float x, float y)
+constexpr bool approximatelyEqual(float x, float y) noexcept
 {
 	return x == y ? true : std::abs(x - y) < F_EPSILON;
 }
@@ -60,7 +60,7 @@ inline bool approximatelyEqual(float x, float y)
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-inline float fraction(const float x)
+constexpr auto fraction(std::floating_point auto x) noexcept
 {
 	return x - std::trunc(x);
 }
@@ -75,7 +75,7 @@ inline float fraction(const float x)
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-inline float absFraction(const float x)
+constexpr auto absFraction(std::floating_point auto x) noexcept
 {
 	return x - std::floor(x);
 }
@@ -125,10 +125,11 @@ inline double fastPow(double a, double b)
 }
 
 
-//! returns 1.0f if val >= 0.0f, -1.0 else
-inline float sign(float val) 
+//! returns 1.0 if val >= 0.0, -1.0 else
+template<typename T>
+constexpr T sign(T val) noexcept
 { 
-	return val >= 0.0f ? 1.0f : -1.0f; 
+	return val >= 0.0 ? 1.0 : -1.0; 
 }
 
 
@@ -165,7 +166,7 @@ inline float logToLinearScale(float min, float max, float value)
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
 inline float linearToLogScale(float min, float max, float value)
 {
-	constexpr float inv_e = 1 / std::numbers::e_v<float>;
+	constexpr float inv_e = 1.f / std::numbers::e_v<float>;
 	const float valueLimited = std::clamp(value, min, max);
 	const float val = (valueLimited - min) / (max - min);
 	if (min < 0)
@@ -189,16 +190,9 @@ constexpr auto fastPow10f(std::integral auto x)
 	return std::exp(std::numbers::ln10 * x);
 }
 
-template<std::floating_point T = float>
-constexpr auto fastLog10f(T x)
+constexpr auto fastLog10f(float x)
 {
-	constexpr T inv_ln10 = static_cast<T>(1.0) / std::numbers::ln10_v<T>;
-	return std::log(x) * inv_ln10;
-}
-
-constexpr auto fastLog10f(std::integral auto x)
-{
-	constexpr auto inv_ln10 = 1.0 / std::numbers::ln10;
+	constexpr float inv_ln10 = 1.f / std::numbers::ln10;
 	return std::log(x) * inv_ln10;
 }
 
@@ -237,14 +231,6 @@ inline float safeDbfsToAmp(float dbfs)
 	return std::isinf(dbfs) ? 0.0f : dbfsToAmp(dbfs);
 }
 
-
-
-//! Returns the linear interpolation of the two values
-template<class T, class F>
-constexpr T lerp(T a, T b, F t)
-{
-	return (1. - t) * a + t * b;
-}
 
 // TODO C++20: use std::formatted_size
 // @brief Calculate number of digits which LcdSpinBox would show for a given number

@@ -24,6 +24,7 @@
 
 #include "LOMM.h"
 
+#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -312,11 +313,11 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 				{
 					if (downward * depth <= 1)
 					{
-						aboveGain = linearInterpolate(yDbfs, aboveGain, downward * depth);
+						aboveGain = std::lerp(yDbfs, aboveGain, downward * depth);
 					}
 					else
 					{
-						aboveGain = linearInterpolate(aboveGain, aThresh[j], downward * depth - 1);
+						aboveGain = std::lerp(aboveGain, aThresh[j], downward * depth - 1);
 					}
 				}
 				
@@ -338,11 +339,11 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 				{
 					if (upward * depth <= 1)
 					{
-						belowGain = linearInterpolate(yDbfs, belowGain, upward * depth);
+						belowGain = std::lerp(yDbfs, belowGain, upward * depth);
 					}
 					else
 					{
-						belowGain = linearInterpolate(belowGain, bThresh[j], upward * depth - 1);
+						belowGain = std::lerp(belowGain, bThresh[j], upward * depth - 1);
 					}
 				}
 				
@@ -396,12 +397,12 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 				
 				bands[j][i] *= outBandVol[j];
 				
-				bands[j][i] = linearInterpolate(bandsDry[j][i], bands[j][i], mix);
+				bands[j][i] = std::lerp(bandsDry[j][i], bands[j][i], mix);
 			}
 			
 			s[i] = bands[0][i] + bands[1][i] + bands[2][i];
 			
-			s[i] *= linearInterpolate(1.f, outVol, mix * (depthScaling ? depth : 1));
+			s[i] *= std::lerp(1.f, outVol, mix * (depthScaling ? depth : 1));
 		}
 		
 		// Convert mid/side back to left/right.

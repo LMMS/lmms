@@ -27,7 +27,6 @@
 
 #include <cmath>
 #include <numbers>
-#include "lmms_math.h"
 
 namespace lmms
 {
@@ -80,12 +79,6 @@ inline float cosinusInterpolate( float v0, float v1, float x )
 {
 	const float f = (1.0f - std::cos(x * std::numbers::pi_v<float>)) * 0.5f;
 	return f * (v1 - v0) + v0;
-}
-
-
-inline float linearInterpolate( float v0, float v1, float x )
-{
-	return x * (v1 - v0) + v0;
 }
 
 

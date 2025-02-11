@@ -24,6 +24,7 @@
 #ifndef LMMS_GUI_COLOR_HELPER_H
 #define LMMS_GUI_COLOR_HELPER_H
 
+#include <cmath>
 #include <QColor>
 
 namespace lmms::gui
@@ -40,10 +41,11 @@ public:
 		qreal br, bg, bb, ba;
 		b.getRgbF(&br, &bg, &bb, &ba);
 
-		const float interH = lerp(ar, br, t);
-		const float interS = lerp(ag, bg, t);
-		const float interV = lerp(ab, bb, t);
-		const float interA = lerp(aa, ba, t);
+		const auto t2 = static_cast<qreal>(t);
+		const float interH = std::lerp(ar, br, t2);
+		const float interS = std::lerp(ag, bg, t2);
+		const float interV = std::lerp(ab, bb, t2);
+		const float interA = std::lerp(aa, ba, t2);
 
 		return QColor::fromRgbF(interH, interS, interV, interA);
 	}

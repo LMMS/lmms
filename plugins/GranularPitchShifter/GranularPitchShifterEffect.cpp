@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 
@@ -155,7 +156,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			double randThing = fast_rand<double>(-1.0, +1.0);
+			auto randThing = fast_rand<double>(-1.0, +1.0);
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
@@ -163,10 +164,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 			if (spray > 0)
 			{
 				sprayResult[0] = fast_rand(spray * m_sampleRate);
-				sprayResult[1] = linearInterpolate(
-					sprayResult[0],
-					fast_rand(spray * m_sampleRate),
-					spraySpread);
+				sprayResult[1] = std::lerp(sprayResult[0], fast_rand(spray * m_sampleRate), spraySpread);
 			}
 			
 			std::array<int, 2> readPoint;

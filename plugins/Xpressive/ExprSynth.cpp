@@ -31,7 +31,6 @@
 #include <random>
 #include <numbers>
 
-#include "interpolation.h"
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
 #include "SampleFrame.h"
@@ -220,7 +219,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 		const T x = positiveFraction(index) * m_size;
 		const int ix = (int)x;
 		const float xfrc = fraction(x);
-		return linearInterpolate(m_vec[ix], m_vec[(ix + 1) % m_size], xfrc);
+		return std::lerp(m_vec[ix], m_vec[(ix + 1) % m_size], xfrc);
 	}
 	const T *m_vec;
 	const std::size_t m_size;

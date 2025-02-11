@@ -625,8 +625,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 			sub = qBound( 0.0f, sub, 1.0f );
 		}
 
-		sample_t O3L = linearInterpolate( O3AL, O3BL, sub );
-		sample_t O3R = linearInterpolate( O3AR, O3BR, sub );
+		sample_t O3L = std::lerp(O3AL, O3BL, sub);
+		sample_t O3R = std::lerp(O3AR, O3BR, sub);
 
 		// modulate volume
 		O3L *= o3lv;
@@ -665,8 +665,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		_buf[f][0] = linearInterpolate( L, m_l_last, m_parent->m_integrator );
-		_buf[f][1] = linearInterpolate( R, m_r_last, m_parent->m_integrator );
+		_buf[f][0] = std::lerp(L, m_l_last, m_parent->m_integrator);
+		_buf[f][1] = std::lerp(R, m_r_last, m_parent->m_integrator);
 
 		m_l_last = L;
 		m_r_last = R;
