@@ -85,7 +85,7 @@ inline auto fastRand() noexcept
 	return static_cast<unsigned>(next / 65536) % 32768;
 }
 
-template<std::floating_point T = float>
+template<std::floating_point T>
 inline T fastRand(T range) noexcept
 {
 	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
@@ -178,7 +178,7 @@ inline float linearToLogScale(float min, float max, float value)
 }
 
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-template<std::floating_point T = float>
+template<std::floating_point T>
 inline auto fastPow10f(T x)
 {
 	return std::exp(std::numbers::ln10_v<T> * x);
