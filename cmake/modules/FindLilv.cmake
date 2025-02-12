@@ -5,7 +5,7 @@
 
 include(ImportedTargetHelpers)
 
-find_package_config_mode_with_fallback(lilv Lilv::lilv
+find_package_config_mode_with_fallback(Lilv Lilv::lilv
 	LIBRARY_NAMES "lilv" "lilv-0"
 	INCLUDE_NAMES "lilv/lilv.h"
 	PKG_CONFIG "lilv-0"
