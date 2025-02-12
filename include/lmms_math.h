@@ -123,11 +123,11 @@ inline double fastPow(double a, double b)
 }
 
 
-//! returns 1.0 if val >= 0.0, -1.0 else
+//! returns +1 if val >= 0, else -1
 template<typename T>
 constexpr T sign(T val) noexcept
 { 
-	return val >= 0.0 ? 1.0 : -1.0; 
+	return val >= 0 ? 1 : -1; 
 }
 
 
