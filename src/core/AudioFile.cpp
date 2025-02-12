@@ -46,7 +46,7 @@ AudioFile::AudioFile(const std::filesystem::path& path, Mode mode)
 		if (codec->open(path, mode))
 		{
 			m_codec = std::move(codec);
-			break;
+			return;
 		}
 	}
 
