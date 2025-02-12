@@ -109,8 +109,16 @@ auto AudioFile::LibSndFileCodec::read(SampleFrame* dst, std::size_t size) -> std
 
 	for (auto i = std::size_t{0}; i < size; ++i)
 	{
-		tmp[i * m_sfInfo.channels] = dst[i][0];
-		tmp[i * m_sfInfo.channels + 1] = dst[i][1];
+		if (m_sfInfo.channels == 1)
+		{
+			dst[i][0] = tmp[i];
+			dst[i][1] = tmp[i];
+		}
+		else
+		{
+			dst[i][0] = tmp[i * m_sfInfo.channels];
+			dst[i][1] = tmp[i * m_sfInfo.channels + 1];
+		}
 	}
 
 	return tmp.size();
@@ -124,8 +132,15 @@ auto AudioFile::LibSndFileCodec::write(const SampleFrame* src, std::size_t size)
 	auto tmp = std::vector<float>(size * m_sfInfo.channels);
 	for (auto i = std::size_t{0}; i < size; ++i)
 	{
-		tmp[i * m_sfInfo.channels] = src[i][0];
-		tmp[i * m_sfInfo.channels + 1] = src[i][1];
+		if (m_sfInfo.channels == 1)
+		{
+			tmp[i] = src[i].average();
+		}
+		else
+		{
+			tmp[i * m_sfInfo.channels] = src[i][0];
+			tmp[i * m_sfInfo.channels + 1] = src[i][1];
+		}
 	}
 
 	sf_writef_float(m_sndfile, tmp.data(), tmp.size());
