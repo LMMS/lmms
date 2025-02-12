@@ -338,10 +338,8 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 		{
 			const TimePos clipStartTime = -mcView->getMidiClip()->startTimeOffset();
 			const TimePos clipEndTime = mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset();
-			const TimePos originalNoteStart = note->pos();
-			const TimePos originalNoteEnd = note->endPos();
-			const TimePos newNoteStart = std::max(originalNoteStart, clipStartTime);
-			const TimePos newNoteEnd = std::min(originalNoteEnd, clipEndTime);
+			const TimePos newNoteStart = std::max(note->pos(), clipStartTime);
+			const TimePos newNoteEnd = std::min(note->endPos(), clipEndTime);
 			const TimePos newLength = newNoteEnd - newNoteStart;
 			if (newLength > 0)
 			{
@@ -384,31 +382,14 @@ void MidiClipView::clearNotesOutOfBounds()
 
 	for (Note const* note: m_clip->m_notes)
 	{
-		if (note->pos() >= startBound && note->endPos() <= endBound)
+		const TimePos newNoteStart = std::max(note->pos(), startBound) - startBound;
+		const TimePos newNoteEnd = std::min(note->endPos(), endBound) - startBound;
+		const TimePos newLength = newNoteEnd - newNoteStart;
+		if (newLength > 0)
 		{
 			Note newNote = Note{*note};
-			newNote.setPos(newNote.pos() - startBound);
-			newClip->addNote(newNote);
-		}
-		else if (note->pos() < startBound && note->endPos() > endBound)
-		{
-			Note newNote = Note{*note};
-			newNote.setPos(0);
-			newNote.setLength(endBound - startBound);
-			newClip->addNote(newNote);
-		}
-		else if (note->pos() < startBound && note->endPos() > startBound)
-		{
-			Note newNote = Note{*note};
-			newNote.setPos(0);
-			newNote.setLength(note->endPos() - startBound);
-			newClip->addNote(newNote);
-		}
-		else if (note->pos() < endBound && note->endPos() > endBound)
-		{
-			Note newNote = Note{*note};
-			newNote.setPos(newNote.pos() - startBound);
-			newNote.setLength(endBound - note->pos());
+			newNote.setPos(newNoteStart);
+			newNote.setLength(newLength);
 			newClip->addNote(newNote);
 		}
 	}
