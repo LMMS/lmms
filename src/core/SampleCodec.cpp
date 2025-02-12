@@ -1,5 +1,5 @@
 /*
- * SampleDecoder.cpp - Decodes audio files in various formats
+ * SampleCodec.cpp - Decodes audio files in various formats
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "SampleDecoder.h"
+#include "SampleCodec.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -43,12 +43,12 @@ namespace lmms {
 
 namespace {
 
-using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&);
+using Decoder = std::optional<SampleCodec::Result> (*)(const QString&);
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleCodec::Result>;
+auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleCodec::Result>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleCodec::Result>;
 #endif
 
 static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
@@ -57,7 +57,7 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 #endif
 	&decodeSampleDS};
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleCodec::Result>
 {
 	SNDFILE* sndFile = nullptr;
 	auto sfInfo = SF_INFO{};
@@ -92,10 +92,10 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 		}
 	}
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
+	return SampleCodec::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
 }
 
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleCodec::Result>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
@@ -110,11 +110,11 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	auto result = std::vector<SampleFrame>(frames);
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate)};
+	return SampleCodec::Result{std::move(result), static_cast<int>(engineRate)};
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleCodec::Result>
 {
 	static auto s_read = [](void* buffer, size_t size, size_t count, void* stream) -> size_t {
 		auto file = static_cast<QFile*>(stream);
@@ -181,12 +181,12 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 	}
 
 	ov_clear(&vorbisFile);
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate)};
+	return SampleCodec::Result{std::move(result), static_cast<int>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace
 
-auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
+auto SampleCodec::supportedAudioTypes() -> const std::vector<AudioType>&
 {
 	static const auto s_audioTypes = [] {
 		auto types = std::vector<AudioType>();
@@ -221,7 +221,7 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 	return s_audioTypes;
 }
 
-auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
+auto SampleCodec::decode(const QString& audioFile) -> std::optional<Result>
 {
 	auto result = std::optional<Result>{};
 	for (const auto& decoder : decoders)

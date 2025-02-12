@@ -120,7 +120,7 @@ void SampleClip::changeLengthToSampleLength()
 
 
 
-const QString& SampleClip::sampleFile() const
+QString SampleClip::sampleFile() const
 {
 	return m_sample.sampleFile();
 }

@@ -4,6 +4,7 @@ set(LMMS_SRCS
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
+	core/AudioFile.cpp
 	core/AudioResampler.cpp
 	core/AutomatableModel.cpp
 	core/AutomationClip.cpp
@@ -69,7 +70,6 @@ set(LMMS_SRCS
 	core/Sample.cpp
 	core/SampleBuffer.cpp
 	core/SampleClip.cpp
-	core/SampleDecoder.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp

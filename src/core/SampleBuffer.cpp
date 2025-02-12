@@ -23,11 +23,10 @@
  */
 
 #include "SampleBuffer.h"
+
 #include <cstring>
 
-#include "PathUtil.h"
-#include "SampleDecoder.h"
-#include "lmms_basics.h"
+#include "AudioFile.h"
 
 namespace lmms {
 
@@ -37,22 +36,11 @@ SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sample
 {
 }
 
-SampleBuffer::SampleBuffer(const QString& audioFile)
+SampleBuffer::SampleBuffer(const QString& path)
 {
-	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	const auto absolutePath = PathUtil::toAbsolute(audioFile);
-
-	if (auto decodedResult = SampleDecoder::decode(absolutePath))
-	{
-		auto& [data, sampleRate] = *decodedResult;
-		m_data = std::move(data);
-		m_sampleRate = sampleRate;
-		m_audioFile = PathUtil::toShortestRelative(audioFile);
-		return;
-	}
-
-	throw std::runtime_error{
-		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
+	const auto audioFile = AudioFile{PathUtil::pathFromQString(path), AudioFile::Mode::Read};
+	audioFile.read(m_data.data(), m_data.size());
+	m_sampleRate = audioFile.sampleRate();
 }
 
 SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
@@ -70,14 +58,6 @@ SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
 {
 }
 
-void swap(SampleBuffer& first, SampleBuffer& second) noexcept
-{
-	using std::swap;
-	swap(first.m_data, second.m_data);
-	swap(first.m_audioFile, second.m_audioFile);
-	swap(first.m_sampleRate, second.m_sampleRate);
-}
-
 QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
@@ -89,7 +69,7 @@ QString SampleBuffer::toBase64() const
 
 auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 {
-	static auto s_buffer = std::make_shared<const SampleBuffer>();
+	static auto s_buffer = std::make_shared<SampleBuffer>();
 	return s_buffer;
 }
 

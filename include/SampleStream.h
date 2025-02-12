@@ -25,9 +25,9 @@
 #ifndef LMMS_SAMPLE_STREAM_H
 #define LMMS_SAMPLE_STREAM_H
 
-#include <filesystem>
 #include <future>
 #include <vector>
+#include "AudioFile.h"
 
 namespace lmms {
 
@@ -38,14 +38,14 @@ class SampleStream
 {
 public:
 	/**
-		Creates a new sample stream object that streams data from the given sample decoder in a way that is suitable
+		Creates a new sample stream object that streams data from the given audio file at `path` in a way that is suitable
 		for real-time playback.
 
 		`size` specifies the maximum number of sample frames the stream can hold at once.
 
 		The sample stream delegates disk reading to a dedicated thread running on the `ThreadPool`.
 	**/
-	SampleStream(const std::filesystem::path& path, std::size_t size);
+	SampleStream(const QString& path, std::size_t size);
 
 	//! Stops the sample stream and its dedicated disk streaming thread.
 	~SampleStream();

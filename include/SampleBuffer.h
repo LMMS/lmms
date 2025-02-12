@@ -27,13 +27,14 @@
 
 #include <QByteArray>
 #include <QString>
+#include <filesystem>
 #include <memory>
-#include <optional>
 #include <samplerate.h>
 #include <vector>
 
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "PathUtil.h"
 #include "lmms_basics.h"
 #include "lmms_export.h"
 
@@ -52,16 +53,14 @@ public:
 	using const_reverse_iterator = std::vector<SampleFrame>::const_reverse_iterator;
 
 	SampleBuffer() = default;
-	explicit SampleBuffer(const QString& audioFile);
-	SampleBuffer(const QString& base64, int sampleRate);
+	SampleBuffer(const QString& path);
+	SampleBuffer(const SampleFrame* src, std::size_t size, int sampleRate);
 	SampleBuffer(std::vector<SampleFrame> data, int sampleRate);
-	SampleBuffer(
-		const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	SampleBuffer(const QString& base64, int sampleRate);
 
-	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
 
-	auto audioFile() const -> const QString& { return m_audioFile; }
+	auto audioFile() const -> QString { return PathUtil::qStringFromPath(m_path); }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
 	auto begin() -> iterator { return m_data.begin(); }
@@ -90,7 +89,7 @@ public:
 
 private:
 	std::vector<SampleFrame> m_data;
-	QString m_audioFile;
+	std::filesystem::path m_path;
 	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
 };
 

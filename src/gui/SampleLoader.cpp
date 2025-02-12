@@ -28,12 +28,11 @@
 #include <QMessageBox>
 #include <memory>
 
+#include "AudioFile.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "PathUtil.h"
-#include "SampleDecoder.h"
-#include "Song.h"
 
 namespace lmms::gui {
 QString SampleLoader::openAudioFile(const QString& previousFile)
@@ -49,7 +48,7 @@ QString SampleLoader::openAudioFile(const QString& previousFile)
 	auto fileTypes = QStringList{};
 	auto allFileTypes = QStringList{};
 	auto nameFilters = QStringList{};
-	const auto& supportedAudioTypes = SampleDecoder::supportedAudioTypes();
+	const auto& supportedAudioTypes = AudioFile::supportedTypes();
 
 	for (const auto& audioType : supportedAudioTypes)
 	{

@@ -30,6 +30,7 @@
 
 #include "AudioResampler.h"
 #include "Note.h"
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
@@ -81,7 +82,7 @@ public:
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other);
-	explicit Sample(const QString& audioFile);
+	explicit Sample(const QString& path);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
@@ -91,7 +92,7 @@ public:
 		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
+	auto sampleFile() const -> QString { return m_buffer->audioFile(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> size_t { return m_buffer->size(); }
 
@@ -121,6 +122,7 @@ private:
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:
+
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
