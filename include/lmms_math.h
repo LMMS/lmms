@@ -82,20 +82,20 @@ inline auto fastRand() noexcept
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
-	return static_cast<unsigned>(next / 65536) % 32768;
+	return next / 65536 % 32768;
 }
 
 template<std::floating_point T>
-inline T fastRand(T range) noexcept
+inline auto fastRand(T range) noexcept
 {
 	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
 template<std::floating_point T>
-inline T fastRand(T from, T to) noexcept
+inline auto fastRand(T from, T to) noexcept
 {
-	return from + fastRand<T>(to - from);
+	return from + fastRand(to - from);
 }
 
 //! Round `value` to `where` depending on step size
