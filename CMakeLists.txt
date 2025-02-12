@@ -245,7 +245,7 @@ if(WANT_LV2)
 
 	find_package(Lilv)
 	if(Lilv_FOUND)
-		set(LILV_LIBRARIES lilv::lilv)
+		set(LILV_LIBRARIES Lilv::lilv)
 	endif()
 
 	# Ensure both dependencies are found

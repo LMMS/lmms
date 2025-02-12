@@ -5,11 +5,10 @@
 
 include(ImportedTargetHelpers)
 
-find_package_config_mode_with_fallback(lilv lilv::lilv
+find_package_config_mode_with_fallback(lilv Lilv::lilv
 	LIBRARY_NAMES "lilv" "lilv-0"
 	INCLUDE_NAMES "lilv/lilv.h"
 	PKG_CONFIG "lilv-0"
-	PREFIX Lilv
 )
 
 include(FindPackageHandleStandardArgs)
