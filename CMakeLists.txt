@@ -251,15 +251,15 @@ if(WANT_LV2)
 		endif()
 	endif()
 
-	find_package(LILV)
-	if(LILV_FOUND)
+	find_package(Lilv)
+	if(Lilv_FOUND)
 		set(LILV_LIBRARIES lilv::lilv)
 	endif()
 
 	# Ensure both dependencies are found
 	if(NOT LV2_FOUND)
 		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
-	elseif(NOT LILV_FOUND)
+	elseif(NOT Lilv_FOUND)
 		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
 	else()
 		set(LMMS_HAVE_LV2 TRUE)

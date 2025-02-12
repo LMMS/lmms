@@ -9,12 +9,12 @@ find_package_config_mode_with_fallback(lilv lilv::lilv
 	LIBRARY_NAMES "lilv" "lilv-0"
 	INCLUDE_NAMES "lilv/lilv.h"
 	PKG_CONFIG "lilv-0"
-	PREFIX LILV
+	PREFIX Lilv
 )
 
 include(FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args(LILV
-	REQUIRED_VARS LILV_LIBRARY LILV_INCLUDE_DIRS
-	VERSION_VAR LILV_VERSION
+find_package_handle_standard_args(Lilv
+	REQUIRED_VARS Lilv_LIBRARY Lilv_INCLUDE_DIRS
+	VERSION_VAR Lilv_VERSION
 )
