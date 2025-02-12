@@ -333,11 +333,12 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 
 		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
 		TimePos mcViewPos = mcView->getMidiClip()->startPosition() + mcView->getMidiClip()->startTimeOffset();
+		
+		const TimePos clipStartTime = -mcView->getMidiClip()->startTimeOffset();
+		const TimePos clipEndTime = mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset();
 
 		for (Note* note: currentClipNotes)
 		{
-			const TimePos clipStartTime = -mcView->getMidiClip()->startTimeOffset();
-			const TimePos clipEndTime = mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset();
 			const TimePos newNoteStart = std::max(note->pos(), clipStartTime);
 			const TimePos newNoteEnd = std::min(note->endPos(), clipEndTime);
 			const TimePos newLength = newNoteEnd - newNoteStart;
