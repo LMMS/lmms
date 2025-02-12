@@ -25,44 +25,44 @@
 #ifndef LMMS_SAMPLE_STREAM_H
 #define LMMS_SAMPLE_STREAM_H
 
-#include <filesystem>
-
-#include "SampleFrame.h"
+#include <future>
+#include <vector>
 
 namespace lmms {
+
+class SampleFrame;
+class SampleDecoder;
 
 class SampleStream
 {
 public:
 	/**
-		Creates a new sample stream object targeting the audio file at the given`path`.
+		Creates a new sample stream object that streams data from the given sample decoder in a way that is suitable
+		for real-time playback.
 
-		`readSize` specifies the amount of sample frames that will be read at any given time.
-
-		When there is not enough data in the stream, an underrun occurs.
-		`fetchSize` specifes how much data to fetch when an underrun happens.
-
-		The `threshold` specifies the minimum number of bytes that can exist in the stream before more sample frames is
-		retrieved.
-
-		The number of sample frames achieved after crossing `threshold` equals the `fetchSize`.
+		`size` specifies the maximum number of sample frames the stream can hold at once.
 
 		The sample stream delegates disk reading to a dedicated thread running on the `ThreadPool`.
 	**/
-	SampleStream(std::filesystem::path& path, std::size_t readSize, std::size_t fetchSize, std::size_t threshold);
+	SampleStream(const SampleDecoder* decoder, std::size_t size);
 
 	//! Stops the sample stream and its dedicated disk streaming thread.
 	~SampleStream();
 
 	/**
-		Reads a buffer the size of `readSize` into `dst`.
+		Reads `size` frames from the stream into the buffer `dst`.
 
-		This function outputs silence on an underrun.
+		This function outputs silence if there is an underrun.
+        To keep underruns at a minimum, the size of the stream should be a specified appropriately according
+        to the number of bytes being read.
 
-		If there are less than `readSize` frames left to read,
-        the remaining sample frames are returned and the stream is considered complete.
+		A call to `read` tells the dedicated disk streaming thread to start fetching more data if more can
+        be fetched (given the constraints of the stream size).
+
+		If there are less than `size` frames left to read from the stream,
+		the remaining frames are returned and the stream is considered complete.
 	*/
-	void read(SampleFrame* dst);
+	void read(SampleFrame* dst, std::size_t size);
 
 	//! Returns the number of sample frames in the stream.
 	auto size() const -> std::size_t;
@@ -75,10 +75,11 @@ public:
 
 private:
 	void fetch();
-	std::filesystem::path m_path;
-	std::size_t readSize = 0;
-	std::size_t fetchSize = 0;
-	std::size_t threshold = 0;
+	void runDiskStream();
+	std::vector<SampleFrame> m_buffer;
+    std::future<void> m_diskStream;
+    std::atomic<std::size_t> m_readIndex = 0;
+    std::atomic<std::size_t> m_writeIndex = 0;
 };
 
 } // namespace lmms
