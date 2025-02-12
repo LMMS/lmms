@@ -98,7 +98,7 @@ inline float BitcrushEffect::depthCrush( float in )
 
 inline float BitcrushEffect::noise( float amt )
 {
-	return fast_rand(-amt, +amt);
+	return fastRand(-amt, +amt);
 }
 
 Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)

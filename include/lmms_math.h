@@ -36,20 +36,13 @@
 
 #include "lmmsconfig.h"
 
-namespace
-{
-
-inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
-
-}
-
 namespace lmms
 {
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
 {
-	return x == y ? true : std::abs(x - y) < F_EPSILON;
+	return x == y || std::abs(x - y) < F_EPSILON;
 }
 
 // TODO C++23: Make constexpr since std::trunc() will be constexpr
@@ -84,7 +77,7 @@ inline auto absFraction(std::floating_point auto x) noexcept
 	return x - std::floor(x);
 }
 
-inline auto fast_rand() noexcept
+inline auto fastRand() noexcept
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
@@ -92,14 +85,14 @@ inline auto fast_rand() noexcept
 }
 
 template<std::floating_point T = float>
-inline T fast_rand(T range) noexcept
+inline T fastRand(T range) noexcept
 {
 	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
 	return fast_rand() * range * FAST_RAND_RATIO;
 }
 
-template<std::floating_point T = float>
-inline T fast_rand(T from, T to) noexcept
+template<std::floating_point T>
+inline T fastRand(T from, T to) noexcept
 {
 	return from + fast_rand<T>(to - from);
 }

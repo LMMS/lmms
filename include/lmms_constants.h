@@ -25,14 +25,16 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-#include <concepts>
-
 namespace lmms
 {
 
+// Prefer using `approximatelyEqual()` from lmms_math.h rather than
+// using this directly
+inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+
 // Microtuner
-inline constexpr std::integral auto MaxScaleCount = 10;  //!< number of scales per project
-inline constexpr std::integral auto MaxKeymapCount = 10; //!< number of keyboard mappings per project
+inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
+inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
