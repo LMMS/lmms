@@ -241,7 +241,9 @@ endif()
 find_package(Perl)
 
 if(WANT_LV2)
-	pkg_check_modules(LV2 lv2)
+	if(PKG_CONFIG_FOUND)
+		pkg_check_modules(LV2 lv2)
+	endif()
 
 	find_package(Lilv)
 	if(Lilv_FOUND)
