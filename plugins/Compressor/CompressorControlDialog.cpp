@@ -455,7 +455,7 @@ void CompressorControlDialog::drawVisPixmap()
 	{
 		const int temp = std::lerp(
 			m_lastPoint + m_lastGainPoint,
-			m_yPoint+m_yGainPoint,
+			m_yPoint + m_yGainPoint,
 			static_cast<float>(i) / static_cast<float>(m_compPixelMovement)
 		);
 		m_p.drawLine(m_windowSizeX-m_compPixelMovement+i, temp, m_windowSizeX-m_compPixelMovement+i, m_windowSizeY);
