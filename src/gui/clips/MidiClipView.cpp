@@ -306,8 +306,18 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 				b->getClip()->startPosition();
 		}
 	);
-
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
+
+	// Find the latest position of all the selected ClipVs
+	const auto latestClipV = std::max_element(clipvs.constBegin(), clipvs.constEnd(),
+	[](ClipView* a, ClipView* b)
+	{
+		return a->getClip()->endPosition() <
+			b->getClip()->endPosition();
+	}
+	);
+	const TimePos latestPos = (*latestClipV)->getClip()->endPosition();
+
 
 	// Create a clip where all notes will be added
 	auto newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
@@ -333,7 +343,7 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 
 		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
 		TimePos mcViewPos = mcView->getMidiClip()->startPosition() + mcView->getMidiClip()->startTimeOffset();
-		
+
 		const TimePos clipStartTime = -mcView->getMidiClip()->startTimeOffset();
 		const TimePos clipEndTime = mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset();
 
@@ -357,8 +367,9 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 		clipv->remove();
 	}
 
-	// Update length since we might have moved notes beyond the end of the MidiClip length
-	newMidiClip->updateLength();
+	// Update length to extend from the start of the first clip to the end of the last clip
+	newMidiClip->setHasBeenResized(true);
+	newMidiClip->changeLength(latestPos - earliestPos);
 	// Rearrange notes because we might have moved them
 	newMidiClip->rearrangeAllNotes();
 	// Restore journalling states now that the operation is finished
