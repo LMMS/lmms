@@ -25,6 +25,7 @@
 #ifndef LMMS_SAMPLE_STREAM_H
 #define LMMS_SAMPLE_STREAM_H
 
+#include <filesystem>
 #include <future>
 #include <vector>
 
@@ -44,7 +45,7 @@ public:
 
 		The sample stream delegates disk reading to a dedicated thread running on the `ThreadPool`.
 	**/
-	SampleStream(const SampleDecoder* decoder, std::size_t size);
+	SampleStream(const std::filesystem::path& path, std::size_t size);
 
 	//! Stops the sample stream and its dedicated disk streaming thread.
 	~SampleStream();
@@ -53,11 +54,11 @@ public:
 		Reads `size` frames from the stream into the buffer `dst`.
 
 		This function outputs silence if there is an underrun.
-        To keep underruns at a minimum, the size of the stream should be a specified appropriately according
-        to the number of bytes being read.
+		To keep underruns at a minimum, the size of the stream should be a specified appropriately according
+		to the number of bytes being read.
 
 		A call to `read` tells the dedicated disk streaming thread to start fetching more data if more can
-        be fetched (given the constraints of the stream size).
+		be fetched (given the constraints of the stream size).
 
 		If there are less than `size` frames left to read from the stream,
 		the remaining frames are returned and the stream is considered complete.
@@ -77,9 +78,9 @@ private:
 	void fetch();
 	void runDiskStream();
 	std::vector<SampleFrame> m_buffer;
-    std::future<void> m_diskStream;
-    std::atomic<std::size_t> m_readIndex = 0;
-    std::atomic<std::size_t> m_writeIndex = 0;
+	std::future<void> m_diskStream;
+	std::atomic<std::size_t> m_readIndex = 0;
+	std::atomic<std::size_t> m_writeIndex = 0;
 };
 
 } // namespace lmms
