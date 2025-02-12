@@ -35,6 +35,7 @@
 #include <concepts>
 
 #include "lmmsconfig.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -88,13 +89,13 @@ template<std::floating_point T = float>
 inline T fastRand(T range) noexcept
 {
 	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
-	return fast_rand() * range * FAST_RAND_RATIO;
+	return fastRand() * range * FAST_RAND_RATIO;
 }
 
 template<std::floating_point T>
 inline T fastRand(T from, T to) noexcept
 {
-	return from + fast_rand<T>(to - from);
+	return from + fastRand<T>(to - from);
 }
 
 //! Round `value` to `where` depending on step size
