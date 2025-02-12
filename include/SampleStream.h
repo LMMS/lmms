@@ -1,5 +1,5 @@
 /*
- * SampleStream.h
+ * SampleStream.h - an object meant to stream audio files
  *
  * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
@@ -27,6 +27,7 @@
 
 #include <future>
 #include <vector>
+
 #include "AudioFile.h"
 
 namespace lmms {
@@ -37,15 +38,23 @@ class SampleDecoder;
 class SampleStream
 {
 public:
+	static constexpr auto DefaultStreamCapacity = 8192;
+
 	/**
-		Creates a new sample stream object that streams data from the given audio file at `path` in a way that is suitable
-		for real-time playback.
+		Creates a new sample stream object that streams data from the given audio file at `path` in a way that is
+	suitable for real-time playback.
 
 		`size` specifies the maximum number of sample frames the stream can hold at once.
 
 		The sample stream delegates disk reading to a dedicated thread running on the `ThreadPool`.
 	**/
-	SampleStream(const QString& path, std::size_t size);
+	SampleStream(const std::filesystem::path& path, std::size_t size = DefaultStreamCapacity);
+
+	SampleStream(const SampleStream& stream);
+	SampleStream& operator=(const SampleStream& stream);
+
+	SampleStream(SampleStream&& stream) noexcept;
+	SampleStream& operator=(SampleStream&& stream) noexcept;
 
 	//! Stops the sample stream and its dedicated disk streaming thread.
 	~SampleStream();
@@ -61,24 +70,27 @@ public:
 		be fetched (given the constraints of the stream size).
 
 		If there are less than `size` frames left to read from the stream,
-		the remaining frames are returned and the stream is considered complete.
-	*/
-	void read(SampleFrame* dst, std::size_t size);
+		the remaining frames are copied into `dst` and the stream is considered complete.
 
-	//! Returns the number of sample frames in the stream.
-	auto size() const -> std::size_t;
+		Returns the number of frames actually written into `dst`.
+	*/
+	auto read(SampleFrame* dst, std::size_t size) -> std::size_t;
+
+	//! Returns the number of sample frames that can be read from the stream.
+	auto streamSize() const -> std::size_t { return m_writeIndex - m_readIndex; }
+
+	//! Returns the maximum number of sample frames that can be contained within the stream.
+	auto streamCapacity() const -> std::size_t { return m_buffer.size(); }
 
 	//! Returns the sample rate of the stream.
-	auto sampleRate() const -> std::size_t;
-
-	//! Returns `true` if the stream is complete (i.e., no more sample frames can be read), and `false` otherwise.
-	auto complete() const -> bool;
+	auto sampleRate() const -> int { return m_audioFile.sampleRate();}
 
 private:
-	void fetch();
 	void runDiskStream();
+	AudioFile m_audioFile;
 	std::vector<SampleFrame> m_buffer;
 	std::future<void> m_diskStream;
+	std::atomic<bool> m_quit = false;
 	std::atomic<std::size_t> m_readIndex = 0;
 	std::atomic<std::size_t> m_writeIndex = 0;
 };

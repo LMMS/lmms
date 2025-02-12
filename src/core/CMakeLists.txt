@@ -72,6 +72,7 @@ set(LMMS_SRCS
 	core/SampleClip.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
+	core/SampleStream.cpp
 	core/Scale.cpp
 	core/LmmsSemaphore.cpp
 	core/SerializingObject.cpp
