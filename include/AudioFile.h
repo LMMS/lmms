@@ -133,7 +133,7 @@ private:
 
 		auto supportedTypes() -> std::vector<AudioFile::Type> override
 		{
-			static auto type = std::vector<Type>{Type{"DrumSynth", "*.ds"}};
+			static auto type = std::vector<Type>{Type{"DrumSynth", "ds"}};
 			return type;
 		}
 
