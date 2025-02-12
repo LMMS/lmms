@@ -241,7 +241,7 @@ endif()
 find_package(Perl)
 
 if(WANT_LV2)
-	find_package(LV2 CONFIG QUIET)
+	find_package(lv2 CONFIG QUIET)
 
 	# Try pkg-config for LV2 if CONFIG mode fails
 	if(NOT LV2_FOUND)
