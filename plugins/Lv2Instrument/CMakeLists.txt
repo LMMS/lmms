@@ -1,6 +1,6 @@
 IF(LMMS_HAVE_LV2)
 	include_directories(SYSTEM ${LV2_INCLUDE_DIRS})
-	include_directories(SYSTEM ${LILV_INCLUDE_DIRS})
+	include_directories(SYSTEM ${Lilv_INCLUDE_DIRS})
 	include_directories(SYSTEM ${SUIL_INCLUDE_DIRS})
 	INCLUDE(BuildPlugin)
 	BUILD_PLUGIN(lv2instrument Lv2Instrument.cpp Lv2Instrument.h MOCFILES Lv2Instrument.h EMBEDDED_RESOURCES logo.png)
