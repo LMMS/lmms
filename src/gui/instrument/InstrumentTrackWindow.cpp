@@ -139,36 +139,53 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
+	
+	auto soloMuteLayout = new QVBoxLayout();
+	soloMuteLayout->setContentsMargins(0, 0, 0, 0);
+	soloMuteLayout->setSpacing(0);
+
+	m_muteBtn = new PixmapButton(this, tr("Mute"));
+	m_muteBtn->setModel(&m_track->m_mutedModel);
+	m_muteBtn->setActiveGraphic(embed::getIconPixmap("led_off"));
+	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("led_green"));
+	m_muteBtn->setCheckable(true);
+	m_muteBtn->setToolTip(tr("Mute this instrument"));
+	soloMuteLayout->addWidget(m_muteBtn, 0, Qt::AlignHCenter);
+
+	m_soloBtn = new PixmapButton(this, tr("Solo"));
+	m_soloBtn->setModel(&m_track->m_soloModel);
+	m_soloBtn->setActiveGraphic(embed::getIconPixmap("led_red"));
+	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("led_off"));
+	m_soloBtn->setCheckable(true);
+	m_soloBtn->setToolTip(tr("Solo this instrument"));
+	soloMuteLayout->addWidget(m_soloBtn, 0, Qt::AlignHCenter);
+
+	basicControlsLayout->addLayout(soloMuteLayout, 0, 0);
+
+	auto label = new QLabel(tr("VOLUME"), this);
+	label->setStyleSheet(labelStyleSheet);
+	basicControlsLayout->addWidget(label, 1, 0, 1, 2);
+	basicControlsLayout->setAlignment(label, labelAlignment);
 
 	// set up volume knob
 	m_volumeKnob = new Knob( KnobType::Bright26, nullptr, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 
-	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
+	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
-
-	auto label = new QLabel(tr("VOL"), this);
-	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( label, 1, 0);
-	basicControlsLayout->setAlignment( label, labelAlignment );
-
 
 	// set up panning knob
 	m_panningKnob = new Knob( KnobType::Bright26, nullptr, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ), "" );
 
-	basicControlsLayout->addWidget( m_panningKnob, 0, 1 );
+	basicControlsLayout->addWidget(m_panningKnob, 0, 2);
 	basicControlsLayout->setAlignment( m_panningKnob, widgetAlignment );
 
 	label = new QLabel( tr( "PAN" ), this );
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( label, 1, 1);
+	basicControlsLayout->addWidget(label, 1, 2);
 	basicControlsLayout->setAlignment( label, labelAlignment );
-
-
-	basicControlsLayout->setColumnStretch(2, 1);
-
 
 	// set up pitch knob
 	m_pitchKnob = new Knob( KnobType::Bright26, nullptr, tr( "Pitch" ) );
