@@ -29,13 +29,13 @@
 
 namespace lmms {
 SampleStream::SampleStream(const std::filesystem::path& path, std::size_t size)
-	: m_audioFile(path, SampleFile::Mode::Read)
+	: m_sampleFile(path, SampleFile::Mode::Read)
 	, m_buffer(size)
 {
 }
 
 SampleStream::SampleStream(SampleStream&& stream) noexcept
-    : m_audioFile(std::move(stream.m_audioFile))
+    : m_sampleFile(std::move(stream.m_sampleFile))
     , m_buffer(std::move(stream.m_buffer))
     , m_diskStream(std::move(stream.m_diskStream))
     , m_quit(stream.m_quit.load())
@@ -48,7 +48,7 @@ SampleStream::SampleStream(SampleStream&& stream) noexcept
 
 SampleStream& SampleStream::operator=(SampleStream&& stream) noexcept
 {
-    m_audioFile = std::move(stream.m_audioFile);
+    m_sampleFile = std::move(stream.m_sampleFile);
     m_buffer = std::move(stream.m_buffer);
     m_diskStream = std::move(stream.m_diskStream);
     m_quit = stream.m_quit.load();
@@ -122,12 +122,12 @@ void SampleStream::runDiskStream()
         {
             const auto writeToEndSize = std::min(writeSize, m_buffer.size() - m_writeIndex);
             const auto wrapAroundSize = writeSize - writeToEndSize;
-            m_audioFile.read(m_buffer.data() + m_writeIndex, writeToEndSize);
-            m_audioFile.read(m_buffer.data(), wrapAroundSize);
+            m_sampleFile.read(m_buffer.data() + m_writeIndex, writeToEndSize);
+            m_sampleFile.read(m_buffer.data(), wrapAroundSize);
         }
         else
         {
-            m_audioFile.read(m_buffer.data() + m_writeIndex, writeSize);
+            m_sampleFile.read(m_buffer.data() + m_writeIndex, writeSize);
         }
 
         m_writeIndex = (m_writeIndex + writeSize) % m_buffer.size();

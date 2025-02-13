@@ -85,17 +85,17 @@ public:
 	auto read(SampleFrame* dst, std::size_t size) -> std::size_t;
 
 	//! Returns the total number of sample frames that can be read from the stream over a period of its lifetime.
-	auto streamSize() const -> std::size_t { return m_audioFile.frames(); }
+	auto streamSize() const -> std::size_t { return m_sampleFile.frames(); }
 
 	//! Returns the maximum number of sample frames that can be contained within the stream.
 	auto streamCapacity() const -> std::size_t { return m_buffer.size(); }
 
 	//! Returns the sample rate of the stream.
-	auto sampleRate() const -> int { return m_audioFile.sampleRate(); }
+	auto sampleRate() const -> int { return m_sampleFile.sampleRate(); }
 
 private:
 	void runDiskStream();
-	SampleFile m_audioFile;
+	SampleFile m_sampleFile;
 	std::vector<SampleFrame> m_buffer;
 	std::future<void> m_diskStream;
 	std::atomic<bool> m_quit = false;
