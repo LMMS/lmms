@@ -116,8 +116,6 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DWANT_VST_32=OFF \
-                -DWANT_VST_64=OFF \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
