@@ -26,9 +26,11 @@
 #ifndef LMMS_SAMPLE_PLAY_HANDLE_H
 #define LMMS_SAMPLE_PLAY_HANDLE_H
 
-#include "Sample.h"
+#include <variant>
+
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
+#include "Sample.h"
 #include "SampleStream.h"
 
 namespace lmms
