@@ -20,7 +20,6 @@ libc6-dev
 libfltk1.3-dev
 libgig-dev
 libjack-jackd2-dev
-liblilv-dev
 liblist-moreutils-perl
 libsndio-dev
 libsuil-dev
@@ -31,7 +30,6 @@ libxcb-util0-dev
 libxml-perl
 libxml2-utils
 lsb-release
-lv2-dev
 make
 nasm
 perl
