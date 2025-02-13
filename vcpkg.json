@@ -58,13 +58,11 @@
 		},
 		{
 			"name": "lilv",
-			"default-features": false,
-			"platform": "!linux"
+			"default-features": false
 		},
 		{
 			"name": "lv2",
-			"default-features": false,
-			"platform": "!linux"
+			"default-features": false
 		},
 		{
 			"name": "mp3lame",
