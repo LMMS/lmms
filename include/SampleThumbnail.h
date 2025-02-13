@@ -54,10 +54,8 @@ public:
 	{
 		QRect sampleRect; //!< A rectangle that covers the entire range of samples.
 
-		QRect drawRect; //!< Specifies the location in `sampleRect` where the waveform will be drawn. Equals
-						//!< `sampleRect` when null.
-
-		QRect viewportRect; //!< Clips `drawRect`. Equals `drawRect` when null.
+		QRect viewportRect; //!< Specifies the location in `sampleRect` where the waveform will be drawn. Equals
+							//!< `sampleRect` when null.
 
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
 
@@ -95,8 +93,8 @@ private:
 			Peak operator+(const Peak& other) const { return Peak(std::min(min, other.min), std::max(max, other.max)); }
 			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
 
-			float min = std::numeric_limits<float>::max();
-			float max = std::numeric_limits<float>::min();
+			float min = std::numeric_limits<float>::infinity();
+			float max = -std::numeric_limits<float>::infinity();
 		};
 
 		Thumbnail() = default;
@@ -134,7 +132,7 @@ private:
 
 	using ThumbnailCache = std::vector<Thumbnail>;
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
-
+	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
 };
 
