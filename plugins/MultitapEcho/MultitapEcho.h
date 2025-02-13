@@ -54,7 +54,7 @@ private:
 
 	inline void setFilterFreq( float fc, StereoOnePole & f )
 	{
-		const float b1 = std::exp(-numbers::tau_v<float> * fc);
+		const float b1 = std::exp(-2 * std::numbers::pi_v<float> * fc);
 		f.setCoeffs( 1.0f - b1, b1 );
 	}
 

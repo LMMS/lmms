@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <cmath>
 #include <QDomElement>
 
 #include "BitInvader.h"
@@ -36,10 +36,9 @@
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "interpolation.h"
+#include "lmms_math.h"
 
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
@@ -121,7 +120,7 @@ sample_t BSynth::nextStringSample( float sample_length )
 	}
 
 	const auto nextIndex = currentIndex < sample_length - 1 ? currentIndex + 1 : 0;
-	return linearInterpolate(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
+	return std::lerp(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
 }	
 
 /***********************************************************************

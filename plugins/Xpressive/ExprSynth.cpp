@@ -29,9 +29,8 @@
 #include <vector>
 #include <cmath>
 #include <random>
+#include <numbers>
 
-
-#include "interpolation.h"
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
 #include "SampleFrame.h"
@@ -220,7 +219,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 		const T x = positiveFraction(index) * m_size;
 		const int ix = (int)x;
 		const float xfrc = fraction(x);
-		return linearInterpolate(m_vec[ix], m_vec[(ix + 1) % m_size], xfrc);
+		return std::lerp(m_vec[ix], m_vec[(ix + 1) % m_size], xfrc);
 	}
 	const T *m_vec;
 	const std::size_t m_size;
@@ -413,7 +412,7 @@ struct sin_wave
 	static inline float process(float x)
 	{
 		x = positiveFraction(x);
-		return std::sin(x * numbers::tau_v<float>);
+		return std::sin(x * 2 * std::numbers::pi_v<float>);
 	}
 };
 static freefunc1<float,sin_wave,true> sin_wave_func;
@@ -535,7 +534,7 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
 
-		m_data->m_symbol_table.add_constant("e", numbers::e_v<float>);
+		m_data->m_symbol_table.add_constant("e", std::numbers::e_v<float>);
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
 

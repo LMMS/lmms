@@ -25,6 +25,7 @@
 #include "Knob.h"
 
 #include <QPainter>
+#include <numbers>
 
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
@@ -312,7 +313,7 @@ void Knob::setTextColor( const QColor & c )
 
 QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * numbers::pi_v<float> / 180.0;
+	const float rarc = m_angle * std::numbers::pi_v<float> / 180.0;
 	const float ca = std::cos(rarc);
 	const float sa = -std::sin(rarc);
 

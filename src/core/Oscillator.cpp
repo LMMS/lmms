@@ -29,6 +29,7 @@
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
 	#include <thread>
 #endif
+#include <numbers>
 
 #include "BufferManager.h"
 #include "Engine.h"
@@ -118,6 +119,7 @@ void Oscillator::update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 
 void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 {
+	using namespace std::numbers;
 	// sawtooth wave contain both even and odd harmonics
 	// hence sinewaves are added for all bands
 	// https://en.wikipedia.org/wiki/Sawtooth_wave
@@ -127,7 +129,7 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 		const float imod = (i - OscillatorConstants::WAVETABLE_LENGTH / 2.f) / OscillatorConstants::WAVETABLE_LENGTH;
 		for (int n = firstBand; n <= bands; n++)
 		{
-			table[i] += (n % 2 ? 1.0f : -1.0f) / n * std::sin(numbers::tau_v<float> * n * imod) / numbers::pi_half_v<float>;
+			table[i] += (n % 2 ? 1.0f : -1.0f) / n * std::sin(2 * pi_v<float> * n * imod) / (pi_v<float> * 0.5f);
 		}
 	}
 }
@@ -135,6 +137,8 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 
 void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int firstBand)
 {
+	using namespace std::numbers;
+	constexpr float pi_sqr = pi_v<float> * pi_v<float>;
 	// triangle waves contain only odd harmonics
 	// hence sinewaves are added for alternate bands
 	// https://en.wikipedia.org/wiki/Triangle_wave
@@ -142,8 +146,8 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 	{
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
-			table[i] += (n & 2 ? -1.0f : 1.0f) / (n * n) *
-				std::sin(numbers::tau_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (numbers::pi_sqr_v<float> / 8.0f);
+			table[i] += (n & 2 ? -1.0f : 1.0f) / (n * n)
+				* std::sin(2 * pi_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (pi_sqr / 8.f);
 		}
 	}
 }
@@ -151,6 +155,7 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 
 void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBand)
 {
+	using namespace std::numbers;
 	// square waves only contain odd harmonics,
 	// at diffrent levels when compared to triangle waves
 	// https://en.wikipedia.org/wiki/Square_wave
@@ -159,8 +164,8 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (1.0f / n)
-				* std::sin(numbers::tau_v<float> * i * n / OscillatorConstants::WAVETABLE_LENGTH)
-				/ (numbers::pi_v<float> / 4);
+				* std::sin(2 * pi_v<float> * i * n / OscillatorConstants::WAVETABLE_LENGTH)
+				/ (pi_v<float> / 4.f);
 		}
 	}
 }
