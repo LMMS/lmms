@@ -17,6 +17,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -25,20 +26,27 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Configure winehq
+      - name: Install system packages
         run: |
-          sudo dpkg --add-architecture i386
-          sudo mkdir -pm755 /etc/apt/keyrings
-          wget -O - https://dl.winehq.org/wine-builds/winehq.key | \
-          sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
-          sudo wget -NP /etc/apt/sources.list.d/ \
-          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
-      - name: Install packages
-        run: |
-          sudo apt-get update -y
+          .github/workflows/setup-wine.sh
           sudo apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
+            $(xargs < .github/workflows/deps-ubuntu-22.04-gcc.txt)
+      - name: Install Qt
+        uses: jurplel/install-qt-action@c6c7281365daef91a238e1c2ddce4eaa94a2991d
+        with:
+          version: '5.15.*'
+          arch: 'gcc_64'
+          archives: qtbase qtsvg qttools qtx11extras icu
+          cache: true
+          setup-python: false
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-linux-x86_64-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-linux-x86_64-
+          path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -50,10 +58,16 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
+                --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+                -DVCPKG_TARGET_TRIPLET="x64-linux" \
+                -DVCPKG_HOST_TRIPLET="x64-linux" \
+                -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
                 $CMAKE_OPTS
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Run tests
