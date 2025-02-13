@@ -34,17 +34,10 @@
 namespace lmms
 {
 
-
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort) :
-	PlayHandle( Type::SamplePlayHandle ),
-	m_sample(sample),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( ownAudioPort ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( nullptr ),
-	m_patternTrack( nullptr )
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort)
+	: PlayHandle(Type::SamplePlayHandle)
+	, m_sample(sample)
+	, m_ownAudioPort(ownAudioPort)
 {
 	if (ownAudioPort)
 	{
@@ -52,8 +45,18 @@ SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort) :
 	}
 }
 
+SamplePlayHandle::SamplePlayHandle(SampleStream stream, bool ownAudioPort)
+	: PlayHandle(Type::SamplePlayHandle)
+	, m_sample(std::move(stream))
+	, m_ownAudioPort(ownAudioPort)
+{
+	if (ownAudioPort)
+	{
+		setAudioPort(new AudioPort("SamplePlayHandle", false));
+	}
 
-
+	std::get<SampleStream>(m_sample).start();
+}
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 	SamplePlayHandle(new Sample(sampleFile), true)
@@ -75,11 +78,8 @@ SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 
 SamplePlayHandle::~SamplePlayHandle()
 {
-	if( m_ownAudioPort )
-	{
-		delete audioPort();
-		delete m_sample;
-	}
+	if (m_ownAudioPort) { delete audioPort(); }
+	if (std::holds_alternative<Sample*>(m_sample)) { delete std::get<Sample*>(m_sample); }
 }
 
 
@@ -114,9 +114,16 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 				m_volumeModel->value() / DefaultVolume } };*/
 		// SamplePlayHandle always plays the sample at its original pitch;
 		// it is used only for previews, SampleTracks and the metronome.
-		if (!m_sample->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
+
+		std::fill_n(workingBuffer, frames, SampleFrame{});
+
+		if (std::holds_alternative<Sample*>(m_sample))
 		{
-			zeroSampleFrames(workingBuffer, frames);
+			std::get<Sample*>(m_sample)->play(workingBuffer, &m_state, frames, DefaultBaseFreq);
+		}
+		else if (std::holds_alternative<SampleStream>(m_sample))
+		{
+			std::get<SampleStream>(m_sample).read(workingBuffer, frames);
 		}
 	}
 
@@ -144,8 +151,23 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return (m_sample->endFrame() - m_sample->startFrame()) *
-			(static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->sampleRate());
+	auto size = 0;
+	auto sampleRate = 0;
+
+	if (std::holds_alternative<Sample*>(m_sample))
+	{
+		const auto& sample = std::get<Sample*>(m_sample);
+		size = sample->endFrame() - sample->startFrame();
+		sampleRate = sample->sampleRate();
+	}
+	else if (std::holds_alternative<SampleStream>(m_sample))
+	{
+		const auto& stream = std::get<SampleStream>(m_sample);
+		size = stream.streamSize();
+		sampleRate = stream.sampleRate();
+	}
+
+	return size * (static_cast<float>(Engine::audioEngine()->outputSampleRate()) / sampleRate);
 }
 
 
