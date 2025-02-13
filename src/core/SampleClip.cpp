@@ -89,9 +89,47 @@ SampleClip::SampleClip(Track* track)
 
 SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
-	m_sample(orig.m_sample),
+	m_sample(std::move(orig.m_sample)),
 	m_isPlaying(orig.m_isPlaying)
 {
+	saveJournallingState( false );
+	setSampleFile( "" );
+	restoreJournallingState();
+
+	// we need to receive bpm-change-events, because then we have to
+	// change length of this Clip
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+					this, SLOT(updateLength()), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+					this, SLOT(updateLength()));
+
+	//playbutton clicked or space key / on Export Song set isPlaying to false
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about loops and jumps
+	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about mute Clips
+	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
+	//care about mute track
+	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about Clip position
+	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
+
+	switch( getTrack()->trackContainer()->type() )
+	{
+		case TrackContainer::Type::Pattern:
+			setAutoResize( true );
+			break;
+
+		case TrackContainer::Type::Song:
+			// move down
+		default:
+			setAutoResize( false );
+			break;
+	}
+	updateTrackClips();
 }
 
 
