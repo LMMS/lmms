@@ -46,6 +46,7 @@ qtbase5-dev
 qtbase5-dev-tools
 qtbase5-private-dev
 qttools5-dev-tools
+qtwayland5
 software-properties-common
 ssh-client
 stk
