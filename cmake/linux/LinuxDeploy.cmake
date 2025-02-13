@@ -57,19 +57,16 @@ file(GLOB cleanup "${CPACK_BINARY_DIR}/${lmms}-*.json"
 list(SORT cleanup)
 file(REMOVE ${cleanup})
 
-# Download linuxdeploy, expose bundled appimagetool to PATH
+# Download and extract linuxdeploy
 download_binary(LINUXDEPLOY_BIN
 	"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
 	linuxdeploy-${ARCH}.AppImage
 	FALSE)
 
-# Symlink nested appimagetool
-set(_APPIMAGETOOL_LINK "${CPACK_CURRENT_BINARY_DIR}/appimagetool")
-if(NOT EXISTS "${_APPIMAGETOOL_LINK}")
-	set(_APPIMAGETOOL "${CPACK_CURRENT_BINARY_DIR}/.linuxdeploy-${ARCH}.AppImage/squashfs-root/plugins/linuxdeploy-plugin-appimage/appimagetool-prefix/AppRun")
-	message(STATUS "Creating a symbolic link ${_APPIMAGETOOL_LINK} which points to ${_APPIMAGETOOL}")
-	create_symlink("${_APPIMAGETOOL}" "${_APPIMAGETOOL_LINK}")
-endif()
+# Guess the path to appimagetool
+set(APPIMAGETOOL_BIN "${CPACK_CURRENT_BINARY_DIR}/.linuxdeploy-${ARCH}.AppImage/squashfs-root/plugins/linuxdeploy-plugin-appimage/appimagetool-prefix/AppRun")
+# Remove symlink from previous versions
+file(REMOVE "${CPACK_CURRENT_BINARY_DIR}/appimagetool")
 
 # Download linuxdeploy-plugin-qt
 download_binary(LINUXDEPLOY_PLUGIN_BIN
@@ -110,9 +107,6 @@ endif()
 # Ensure project's "qmake" executable is first on the PATH
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
-
-# Ensure "linuxdeploy-<arch>.AppImage" and "appimagetool" binaries are first on the PATH
-set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}:$ENV{PATH}")
 
 # Promote finding our own libraries first
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional:$ENV{LD_LIBRARY_PATH}")
@@ -171,6 +165,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	${LIBRARIES}
 	${SKIP_LIBRARIES}
 	--verbosity ${VERBOSITY}
+	WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
@@ -278,7 +273,7 @@ if(CPACK_TOOL STREQUAL "appimagetool")
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
 	set(ENV{ARCH} "${ARCH}")
 	message(STATUS "Finishing the AppImage...")
-	execute_process(COMMAND ${CPACK_TOOL} "${APP}" "${APPIMAGE_FILE}"
+	execute_process(COMMAND "${APPIMAGETOOL_BIN}" "${APP}" "${APPIMAGE_FILE}"
 		${APPIMAGETOOL_VERBOSITY}
 		${OUTPUT_QUIET}
 		COMMAND_ECHO ${COMMAND_ECHO}
