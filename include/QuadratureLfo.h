@@ -37,7 +37,7 @@ public:
 	QuadratureLfo( int sampleRate ) :
 		m_frequency(0),
 		m_phase(0),
-		m_offset(D_PI / 2)
+		m_offset(numbers::pi_half)
 	{
 		setSampleRate(sampleRate);
 	}
@@ -64,7 +64,7 @@ public:
 	inline void setSampleRate ( int samplerate )
 	{
 		m_samplerate = samplerate;
-		m_twoPiOverSr = F_2PI / samplerate;
+		m_twoPiOverSr = numbers::tau_v<float> / samplerate;
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 
@@ -77,14 +77,10 @@ public:
 
 	void tick( float *l, float *r )
 	{
-		*l = sinf( m_phase );
-		*r = sinf( m_phase + m_offset );
+		*l = std::sin(m_phase);
+		*r = std::sin(m_phase + m_offset);
 		m_phase += m_increment;
-
-		while (m_phase >= D_2PI)
-		{
-			m_phase -= D_2PI;
-		}
+		while (m_phase >= numbers::tau)	{ m_phase -= numbers::tau; }
 	}
 
 private:

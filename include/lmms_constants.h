@@ -25,36 +25,55 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-namespace lmms
+// #include <numbers>
+// #include <concepts>
+
+namespace lmms::numbers
 {
 
+//TODO C++20: Use std::floating_point instead of typename
+//TODO C++20: Use std::numbers::pi_v<T> instead of literal value
+template<typename T>
+inline constexpr T pi_v = T(3.14159265358979323846264338327950288419716939937510);
+inline constexpr double pi = pi_v<double>;
 
-constexpr long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
-constexpr long double LD_2PI = LD_PI * 2.0;
-constexpr long double LD_PI_2 = LD_PI * 0.5;
-constexpr long double LD_PI_R = 1.0 / LD_PI;
-constexpr long double LD_PI_SQR = LD_PI * LD_PI;
-constexpr long double LD_E = 2.71828182845904523536028747135266249775724709369995;
-constexpr long double LD_E_R = 1.0 / LD_E;
-constexpr long double LD_SQRT_2 = 1.41421356237309504880168872420969807856967187537695;
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T tau_v = T(pi_v<T> * 2.0);
+inline constexpr double tau = tau_v<double>;
 
-constexpr double D_PI = (double) LD_PI;
-constexpr double D_2PI = (double) LD_2PI;
-constexpr double D_PI_2 = (double) LD_PI_2;
-constexpr double D_PI_R = (double) LD_PI_R;
-constexpr double D_PI_SQR = (double) LD_PI_SQR;
-constexpr double D_E = (double) LD_E;
-constexpr double D_E_R = (double) LD_E_R;
-constexpr double D_SQRT_2 = (double) LD_SQRT_2;
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T pi_half_v = T(pi_v<T> / 2.0);
+inline constexpr double pi_half = pi_half_v<double>;
 
-constexpr float F_PI = (float) LD_PI;
-constexpr float F_2PI = (float) LD_2PI;
-constexpr float F_PI_2 = (float) LD_PI_2;
-constexpr float F_PI_R = (float) LD_PI_R;
-constexpr float F_PI_SQR = (float) LD_PI_SQR;
-constexpr float F_E = (float) LD_E;
-constexpr float F_E_R = (float) LD_E_R;
-constexpr float F_SQRT_2 = (float) LD_SQRT_2;
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T pi_sqr_v = T(pi_v<T> * pi_v<T>);
+inline constexpr double pi_sqr = pi_sqr_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+//TODO C++20: Use std::numbers::e_v<T> instead of literal value
+template<typename T>
+inline constexpr T e_v = T(2.71828182845904523536028747135266249775724709369995);
+inline constexpr double e = e_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+template<typename T>
+inline constexpr T inv_e_v = T(1.0 / e_v<T>);
+inline constexpr double inv_e = e_v<double>;
+
+//TODO C++20: Use std::floating_point instead of typename
+//TODO C++20: Use std::numbers::sqrt2_v<T> instead of literal value
+//TODO C++26: Remove since std::sqrt(2.0) is constexpr
+template<typename T>
+inline constexpr T sqrt2_v = T(1.41421356237309504880168872420969807856967187537695);
+inline constexpr double sqrt2 = sqrt2_v<double>;
+
+}
+
+namespace lmms
+{
 
 constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 

@@ -13,6 +13,7 @@ jobs:
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
+        -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -28,7 +29,8 @@ jobs:
       - name: Install system packages
         run: |
           .github/workflows/setup-wine.sh
-          sudo apt-get install -y $(xargs < .github/workflows/deps-ubuntu-22.04-gcc.txt)
+          sudo apt-get install -y --no-install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-22.04-gcc.txt)
       - name: Install Qt
         uses: jurplel/install-qt-action@c6c7281365daef91a238e1c2ddce4eaa94a2991d
         with:
@@ -41,9 +43,9 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-linux-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-linux-
+            vcpkg-linux-x86_64-
           path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
@@ -218,7 +220,6 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
-                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
@@ -257,7 +258,6 @@ jobs:
   mingw:
     name: mingw64
     runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
         -Werror=dev
@@ -268,12 +268,12 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Enable POSIX MinGW
+      - name: Configure apt
         run: |
-          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
-          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
-          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
+          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
+          sudo apt-get update -y
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -290,6 +290,10 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
           ccache --zero-stats
@@ -331,9 +335,9 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-x64-
+            vcpkg-msvc-x86_64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3

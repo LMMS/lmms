@@ -33,7 +33,7 @@ namespace lmms
 Lfo::Lfo( int samplerate )
 {
 	m_samplerate = samplerate;
-	m_twoPiOverSr = F_2PI / samplerate;
+	m_twoPiOverSr = numbers::tau_v<float> / samplerate;
 }
 
 
@@ -41,7 +41,7 @@ Lfo::Lfo( int samplerate )
 
 float Lfo::tick()
 {
-	float output = sinf( m_phase );
+	float output = std::sin(m_phase);
 	m_phase += m_increment;
 
 	return output;
