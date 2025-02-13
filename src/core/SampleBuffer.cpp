@@ -26,7 +26,7 @@
 
 #include <cstring>
 
-#include "AudioFile.h"
+#include "SampleFile.h"
 
 namespace lmms {
 
@@ -38,7 +38,7 @@ SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sample
 
 SampleBuffer::SampleBuffer(const QString& path)
 {
-	const auto audioFile = AudioFile{PathUtil::pathFromQString(path), AudioFile::Mode::Read};
+	const auto audioFile = SampleFile{PathUtil::pathFromQString(path), SampleFile::Mode::Read};
 	m_data.resize(audioFile.frames());
 	audioFile.read(m_data.data(), m_data.size());
 	m_sampleRate = audioFile.sampleRate();

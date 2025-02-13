@@ -28,7 +28,7 @@
 #include <QMessageBox>
 #include <memory>
 
-#include "AudioFile.h"
+#include "SampleFile.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
@@ -48,7 +48,7 @@ QString SampleLoader::openAudioFile(const QString& previousFile)
 	auto fileTypes = QStringList{};
 	auto allFileTypes = QStringList{};
 	auto nameFilters = QStringList{};
-	const auto& supportedAudioTypes = AudioFile::supportedTypes();
+	const auto& supportedAudioTypes = SampleFile::supportedTypes();
 
 	for (const auto& audioType : supportedAudioTypes)
 	{

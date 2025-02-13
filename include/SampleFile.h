@@ -1,5 +1,5 @@
 /*
- * AudioFile.h - abstraction for audio files on the filesystem
+ * SampleFile.h - abstraction for audio files on the filesystem
  *
  * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
@@ -37,7 +37,7 @@ namespace lmms {
 
 class SampleFrame;
 
-class AudioFile
+class SampleFile
 {
 public:
 	enum class Mode
@@ -53,18 +53,18 @@ public:
 		std::string extension;
 	};
 
-	AudioFile(const std::filesystem::path& path, Mode mode);
+	SampleFile(const std::filesystem::path& path, Mode mode);
 
-	~AudioFile()
+	~SampleFile()
 	{
 		if (m_codec.get() != nullptr) { m_codec->close(); }
 	}
 
-	AudioFile(const AudioFile&) = delete;
-	AudioFile& operator=(const AudioFile&) = delete;
+	SampleFile(const SampleFile&) = delete;
+	SampleFile& operator=(const SampleFile&) = delete;
 
-	AudioFile(AudioFile&&) noexcept;
-	AudioFile& operator=(AudioFile&&) noexcept;
+	SampleFile(SampleFile&&) noexcept;
+	SampleFile& operator=(SampleFile&&) noexcept;
 
 	auto read(SampleFrame* dst, std::size_t size) const -> std::size_t
 	{
@@ -96,7 +96,7 @@ private:
 	public:
 		virtual ~Codec() = default;
 
-		virtual auto open(const std::filesystem::path& path, AudioFile::Mode mode) -> bool = 0;
+		virtual auto open(const std::filesystem::path& path, SampleFile::Mode mode) -> bool = 0;
 		virtual void close() = 0;
 
 		virtual auto read(SampleFrame* dst, std::size_t size) -> std::size_t = 0;
@@ -107,13 +107,13 @@ private:
 		virtual auto frames() const -> std::size_t = 0;
 		virtual auto sampleRate() const -> int = 0;
 
-		virtual auto supportedTypes() -> std::vector<AudioFile::Type> = 0;
+		virtual auto supportedTypes() -> std::vector<SampleFile::Type> = 0;
 	};
 
 	class LibSndFileCodec : public Codec
 	{
 	public:
-		auto open(const std::filesystem::path& path, AudioFile::Mode mode) -> bool override;
+		auto open(const std::filesystem::path& path, SampleFile::Mode mode) -> bool override;
 		void close() override;
 
 		auto read(SampleFrame* dst, std::size_t size) -> std::size_t override;
@@ -124,10 +124,10 @@ private:
 		auto frames() const -> std::size_t override { return m_sfInfo.frames; }
 		auto sampleRate() const -> int override { return m_sfInfo.samplerate; }
 
-		auto supportedTypes() -> std::vector<AudioFile::Type> override;
+		auto supportedTypes() -> std::vector<SampleFile::Type> override;
 
 	private:
-		static auto sndfileMode(AudioFile::Mode) -> int;
+		static auto sndfileMode(SampleFile::Mode) -> int;
 		SNDFILE* m_sndfile = nullptr;
 		SF_INFO m_sfInfo;
 	};
@@ -135,7 +135,7 @@ private:
 	class DrumSynthCodec : public Codec
 	{
 	public:
-		auto open(const std::filesystem::path& path, AudioFile::Mode mode) -> bool override;
+		auto open(const std::filesystem::path& path, SampleFile::Mode mode) -> bool override;
 		void close() override {}
 
 		auto read(SampleFrame* dst, std::size_t size) -> std::size_t override;
@@ -146,7 +146,7 @@ private:
 		auto frames() const -> std::size_t override { return m_size / DEFAULT_CHANNELS; }
 		auto sampleRate() const -> int override { return Engine::audioEngine()->outputSampleRate(); }
 
-		auto supportedTypes() -> std::vector<AudioFile::Type> override
+		auto supportedTypes() -> std::vector<SampleFile::Type> override
 		{
 			static auto type = std::vector<Type>{Type{"DrumSynth", "ds"}};
 			return type;

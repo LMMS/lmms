@@ -29,7 +29,7 @@
 
 namespace lmms {
 SampleStream::SampleStream(const std::filesystem::path& path, std::size_t size)
-	: m_audioFile(path, AudioFile::Mode::Read)
+	: m_audioFile(path, SampleFile::Mode::Read)
 	, m_buffer(size)
 {
 }

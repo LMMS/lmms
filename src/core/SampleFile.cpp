@@ -1,5 +1,5 @@
 /*
- * AudioFile.cpp - abstraction for audio files on the filesystem
+ * SampleFile.cpp - abstraction for audio files on the filesystem
  *
  * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "AudioFile.h"
+#include "SampleFile.h"
 
 #include <QString>
 #include <algorithm>
@@ -35,7 +35,7 @@
 #include "SampleFrame.h"
 
 namespace lmms {
-AudioFile::AudioFile(const std::filesystem::path& path, Mode mode)
+SampleFile::SampleFile(const std::filesystem::path& path, Mode mode)
 	: m_path(path)
 {
 	auto codecs = std::array<std::unique_ptr<Codec>, 2>{
@@ -53,20 +53,20 @@ AudioFile::AudioFile(const std::filesystem::path& path, Mode mode)
 	throw std::runtime_error{"No codec could process the audio file given"};
 }
 
-AudioFile::AudioFile(AudioFile&& other) noexcept
+SampleFile::SampleFile(SampleFile&& other) noexcept
 	: m_path(std::move(other.m_path))
 	, m_codec(std::move(other.m_codec))
 {
 }
 
-AudioFile& AudioFile::operator=(AudioFile&& other) noexcept
+SampleFile& SampleFile::operator=(SampleFile&& other) noexcept
 {
 	m_path = std::move(other.m_path);
 	m_codec = std::move(other.m_codec);
 	return *this;
 }
 
-auto AudioFile::supportedTypes() -> std::vector<Type>
+auto SampleFile::supportedTypes() -> std::vector<Type>
 {
 	static const auto s_audioTypes = [] {
 		auto types = std::vector<Type>();
@@ -83,7 +83,7 @@ auto AudioFile::supportedTypes() -> std::vector<Type>
 	return s_audioTypes;
 }
 
-auto AudioFile::LibSndFileCodec::open(const std::filesystem::path& path, AudioFile::Mode mode) -> bool
+auto SampleFile::LibSndFileCodec::open(const std::filesystem::path& path, SampleFile::Mode mode) -> bool
 {
 #ifdef LMMS_BUILD_WIN32
 	m_sndfile = sf_wchar_open(path.c_str(), LibSndFileCodec::sndfileMode(mode), &m_sfInfo);
@@ -93,13 +93,13 @@ auto AudioFile::LibSndFileCodec::open(const std::filesystem::path& path, AudioFi
 	return m_sndfile != nullptr;
 }
 
-void AudioFile::LibSndFileCodec::close()
+void SampleFile::LibSndFileCodec::close()
 {
 	if (m_sndfile == nullptr) { return; }
 	sf_close(m_sndfile);
 }
 
-auto AudioFile::LibSndFileCodec::read(SampleFrame* dst, std::size_t size) -> std::size_t
+auto SampleFile::LibSndFileCodec::read(SampleFrame* dst, std::size_t size) -> std::size_t
 {
 	if (m_sndfile == nullptr) { return 0; }
 	if (m_sfInfo.channels == DEFAULT_CHANNELS) { return sf_readf_float(m_sndfile, dst->data(), size); }
@@ -124,7 +124,7 @@ auto AudioFile::LibSndFileCodec::read(SampleFrame* dst, std::size_t size) -> std
 	return tmp.size();
 }
 
-auto AudioFile::LibSndFileCodec::write(const SampleFrame* src, std::size_t size) -> std::size_t
+auto SampleFile::LibSndFileCodec::write(const SampleFrame* src, std::size_t size) -> std::size_t
 {
 	if (m_sndfile == nullptr) { return 0; }
 	if (m_sfInfo.channels == DEFAULT_CHANNELS) { return sf_writef_float(m_sndfile, src->data(), size); }
@@ -147,27 +147,27 @@ auto AudioFile::LibSndFileCodec::write(const SampleFrame* src, std::size_t size)
 	return tmp.size();
 }
 
-auto AudioFile::LibSndFileCodec::seek(std::size_t offset, int whence) -> std::size_t
+auto SampleFile::LibSndFileCodec::seek(std::size_t offset, int whence) -> std::size_t
 {
 	return sf_seek(m_sndfile, offset, whence);
 }
 
-auto AudioFile::LibSndFileCodec::sndfileMode(AudioFile::Mode mode) -> int
+auto SampleFile::LibSndFileCodec::sndfileMode(SampleFile::Mode mode) -> int
 {
 	switch (mode)
 	{
-	case AudioFile::Mode::Read:
+	case SampleFile::Mode::Read:
 		return SFM_READ;
-	case AudioFile::Mode::Write:
+	case SampleFile::Mode::Write:
 		return SFM_WRITE;
-	case AudioFile::Mode::ReadAndWrite:
+	case SampleFile::Mode::ReadAndWrite:
 		return SFM_RDWR;
 	default:
 		return -1;
 	}
 }
 
-auto AudioFile::LibSndFileCodec::supportedTypes() -> std::vector<AudioFile::Type>
+auto SampleFile::LibSndFileCodec::supportedTypes() -> std::vector<SampleFile::Type>
 {
 	static const auto s_audioTypes = [] {
 		auto types = std::vector<Type>();
@@ -196,7 +196,7 @@ auto AudioFile::LibSndFileCodec::supportedTypes() -> std::vector<AudioFile::Type
 	return s_audioTypes;
 }
 
-auto AudioFile::DrumSynthCodec::open(const std::filesystem::path& path, AudioFile::Mode mode) -> bool
+auto SampleFile::DrumSynthCodec::open(const std::filesystem::path& path, SampleFile::Mode mode) -> bool
 {
 	const auto qPath = PathUtil::qStringFromPath(path);
 
@@ -208,7 +208,7 @@ auto AudioFile::DrumSynthCodec::open(const std::filesystem::path& path, AudioFil
 	return error != 0;
 }
 
-auto AudioFile::DrumSynthCodec::read(SampleFrame* dst, std::size_t size) -> std::size_t
+auto SampleFile::DrumSynthCodec::read(SampleFrame* dst, std::size_t size) -> std::size_t
 {
 	for (auto i = std::size_t{0}; i < size; ++i)
 	{
@@ -225,7 +225,7 @@ auto AudioFile::DrumSynthCodec::read(SampleFrame* dst, std::size_t size) -> std:
 	return m_pos;
 }
 
-auto AudioFile::DrumSynthCodec::write(const SampleFrame* src, std::size_t size) -> std::size_t
+auto SampleFile::DrumSynthCodec::write(const SampleFrame* src, std::size_t size) -> std::size_t
 {
 	for (auto i = std::size_t{0}; i < size; ++i)
 	{
@@ -237,7 +237,7 @@ auto AudioFile::DrumSynthCodec::write(const SampleFrame* src, std::size_t size) 
 	return m_pos;
 }
 
-auto AudioFile::DrumSynthCodec::seek(std::size_t offset, int whence) -> std::size_t
+auto SampleFile::DrumSynthCodec::seek(std::size_t offset, int whence) -> std::size_t
 {
 	static constexpr auto seekSet = 0;
 	static constexpr auto seekCur = 1;

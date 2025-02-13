@@ -28,7 +28,7 @@
 #include <future>
 #include <vector>
 
-#include "AudioFile.h"
+#include "SampleFile.h"
 
 namespace lmms {
 
@@ -95,7 +95,7 @@ public:
 
 private:
 	void runDiskStream();
-	AudioFile m_audioFile;
+	SampleFile m_audioFile;
 	std::vector<SampleFrame> m_buffer;
 	std::future<void> m_diskStream;
 	std::atomic<bool> m_quit = false;
