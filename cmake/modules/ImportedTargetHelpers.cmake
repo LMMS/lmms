@@ -139,13 +139,19 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
 		)
 
+		# Use libraries from DEPENDS parameter (if any) and those found through pkg-config
+		set(_link_libraries
+			"${_fpcmwf_DEPENDS}"
+			"${${_pkg_config_prefix}_LIBRARIES}"
+		)
+
 		# Create an imported target if we succeeded in finding the package
 		if(${_library_var} AND ${_include_var})
 			add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
 			set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
 				IMPORTED_LOCATION "${${_library_var}}"
 				INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-				INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
+				INTERFACE_LINK_LIBRARIES "${_link_libraries}"
 			)
 		endif()
 
