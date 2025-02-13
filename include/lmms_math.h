@@ -31,18 +31,22 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <numbers>
+#include <concepts>
 
-#include "lmms_constants.h"
 #include "lmmsconfig.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
 
-inline bool approximatelyEqual(float x, float y)
+// TODO C++23: Make constexpr since std::abs() will be constexpr
+inline bool approximatelyEqual(float x, float y) noexcept
 {
-	return x == y ? true : std::abs(x - y) < F_EPSILON;
+	return x == y || std::abs(x - y) < F_EPSILON;
 }
 
+// TODO C++23: Make constexpr since std::trunc() will be constexpr
 /*!
  * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
  *
@@ -52,11 +56,13 @@ inline bool approximatelyEqual(float x, float y)
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-inline float fraction(const float x)
+inline auto fraction(std::floating_point auto x) noexcept
 {
 	return x - std::trunc(x);
 }
 
+
+// TODO C++23: Make constexpr since std::floor() will be constexpr
 /*!
  * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
  *
@@ -67,25 +73,30 @@ inline float fraction(const float x)
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-inline float absFraction(const float x)
+inline auto absFraction(std::floating_point auto x) noexcept
 {
 	return x - std::floor(x);
 }
 
-
-constexpr float FAST_RAND_RATIO = 1.0f / 32767;
-inline int fast_rand()
+inline auto fastRand() noexcept
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
-	return( (unsigned)( next / 65536 ) % 32768 );
+	return next / 65536 % 32768;
 }
 
-inline float fastRandf(float range)
+template<std::floating_point T>
+inline auto fastRand(T range) noexcept
 {
-	return fast_rand() * range * FAST_RAND_RATIO;
+	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
+	return fastRand() * range * FAST_RAND_RATIO;
 }
 
+template<std::floating_point T>
+inline auto fastRand(T from, T to) noexcept
+{
+	return from + fastRand(to - from);
+}
 
 //! Round `value` to `where` depending on step size
 template<class T>
@@ -112,10 +123,11 @@ inline double fastPow(double a, double b)
 }
 
 
-//! returns 1.0f if val >= 0.0f, -1.0 else
-inline float sign(float val) 
+//! returns +1 if val >= 0, else -1
+template<typename T>
+constexpr T sign(T val) noexcept
 { 
-	return val >= 0.0f ? 1.0f : -1.0f; 
+	return val >= 0 ? 1 : -1; 
 }
 
 
@@ -136,14 +148,15 @@ inline float signedPowf(float v, float e)
 //! Value should be within [0,1]
 inline float logToLinearScale(float min, float max, float value)
 {
+	using namespace std::numbers;
 	if (min < 0)
 	{
 		const float mmax = std::max(std::abs(min), std::abs(max));
 		const float val = value * (max - min) + min;
-		float result = signedPowf(val / mmax, numbers::e_v<float>) * mmax;
+		float result = signedPowf(val / mmax, e_v<float>) * mmax;
 		return std::isnan(result) ? 0 : result;
 	}
-	float result = std::pow(value, numbers::e_v<float>) * (max - min) + min;
+	float result = std::pow(value, e_v<float>) * (max - min) + min;
 	return std::isnan(result) ? 0 : result;
 }
 
@@ -151,26 +164,37 @@ inline float logToLinearScale(float min, float max, float value)
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
 inline float linearToLogScale(float min, float max, float value)
 {
+	constexpr auto inv_e = static_cast<float>(1.0 / std::numbers::e);
 	const float valueLimited = std::clamp(value, min, max);
 	const float val = (valueLimited - min) / (max - min);
 	if (min < 0)
 	{
 		const float mmax = std::max(std::abs(min), std::abs(max));
-		float result = signedPowf(valueLimited / mmax, numbers::inv_e_v<float>) * mmax;
+		float result = signedPowf(valueLimited / mmax, inv_e) * mmax;
 		return std::isnan(result) ? 0 : result;
 	}
-	float result = std::pow(val, numbers::inv_e_v<float>) * (max - min) + min;
+	float result = std::pow(val, inv_e) * (max - min) + min;
 	return std::isnan(result) ? 0 : result;
 }
 
-inline float fastPow10f(float x)
+// TODO C++26: Make constexpr since std::exp() will be constexpr
+template<std::floating_point T>
+inline auto fastPow10f(T x)
 {
-	return std::exp(2.302585092994046f * x);
+	return std::exp(std::numbers::ln10_v<T> * x);
 }
 
-inline float fastLog10f(float x)
+// TODO C++26: Make constexpr since std::exp() will be constexpr
+inline auto fastPow10f(std::integral auto x)
 {
-	return std::log(x) * 0.4342944819032518f;
+	return std::exp(std::numbers::ln10_v<float> * x);
+}
+
+// TODO C++26: Make constexpr since std::log() will be constexpr
+inline auto fastLog10f(float x)
+{
+	constexpr auto inv_ln10 = static_cast<float>(1.0 / std::numbers::ln10);
+	return std::log(x) * inv_ln10;
 }
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
@@ -209,16 +233,8 @@ inline float safeDbfsToAmp(float dbfs)
 }
 
 
-
-//! Returns the linear interpolation of the two values
-template<class T, class F>
-constexpr T lerp(T a, T b, F t)
-{
-	return (1. - t) * a + t * b;
-}
-
+// TODO C++20: use std::formatted_size
 // @brief Calculate number of digits which LcdSpinBox would show for a given number
-// @note Once we upgrade to C++20, we could probably use std::formatted_size
 inline int numDigitsAsInt(float f)
 {
 	// use rounding:

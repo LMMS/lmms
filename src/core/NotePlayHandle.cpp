@@ -26,12 +26,12 @@
 #include "NotePlayHandle.h"
 
 #include "AudioEngine.h"
-#include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
 #include "Song.h"
+#include "lmms_math.h"
 
 namespace lmms
 {

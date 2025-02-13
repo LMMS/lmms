@@ -26,11 +26,12 @@
 #ifndef KICKER_OSC_H
 #define KICKER_OSC_H
 
+#include <cmath>
+
 #include "DspEffectLibrary.h"
 #include "Oscillator.h"
 
 #include "lmms_math.h"
-#include "interpolation.h"
 
 namespace lmms
 {
@@ -72,7 +73,7 @@ public:
 			// update distortion envelope if necessary
 			if( m_hasDistEnv && m_counter < m_length )
 			{
-				float thres = linearInterpolate( m_distStart, m_distEnd, m_counter / m_length );
+				float thres = std::lerp(m_distStart, m_distEnd, m_counter / m_length);
 				m_FX.leftFX().setThreshold( thres );
 				m_FX.rightFX().setThreshold( thres );
 			}

@@ -30,10 +30,10 @@
 #include <fftw3.h>
 #include <memory>
 #include <cstdlib>
-#include "interpolation.h"
+#include <cmath>
 
 #include "Engine.h"
-#include "lmms_constants.h"
+#include "lmms_math.h"
 #include "lmmsconfig.h"
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"
@@ -114,7 +114,7 @@ public:
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
 	{
-		return std::sin(_sample * numbers::tau_v<float>);
+		return std::sin(_sample * 2 * std::numbers::pi_v<float>);
 	}
 
 	static inline sample_t triangleSample( const float _sample )
@@ -173,7 +173,7 @@ public:
 		const auto frame = absFraction(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
 
-		return linearInterpolate(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
+		return std::lerp(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
 	}
 
 	struct wtSampleControl {
@@ -202,24 +202,25 @@ public:
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
-		return linearInterpolate(table[control.band][control.f1],
-				table[control.band][control.f2], fraction(control.frame));
+		return std::lerp(table[control.band][control.f1], table[control.band][control.f2], fraction(control.frame));
 	}
 
 	sample_t wtSample(const OscillatorConstants::waveform_t* table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
-		return linearInterpolate((*table)[control.band][control.f1],
-				(*table)[control.band][control.f2], fraction(control.frame));
+		return std::lerp(
+			(*table)[control.band][control.f1],
+			(*table)[control.band][control.f2],
+			fraction(control.frame)
+		);
 	}
 
 	inline sample_t wtSample(sample_t **table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
-		return linearInterpolate(table[control.band][control.f1],
-				table[control.band][control.f2], fraction(control.frame));
+		return std::lerp(table[control.band][control.f1], table[control.band][control.f2], fraction(control.frame));
 	}
 
 	static inline int waveTableBandFromFreq(float freq)
