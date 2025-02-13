@@ -52,20 +52,15 @@ public:
 	class BitRateSettings
 	{
 	public:
-		BitRateSettings(bitrate_t bitRate, bool isVariableBitRate) :
-			m_bitRate(bitRate),
-			m_isVariableBitRate(isVariableBitRate)
+		BitRateSettings(bitrate_t bitRate)
+			: m_bitRate(bitRate)
 		{}
-
-		bool isVariableBitRate() const { return m_isVariableBitRate; }
-		void setVariableBitrate(bool variableBitRate = true) { m_isVariableBitRate = variableBitRate; }
 
 		bitrate_t getBitRate() const { return m_bitRate; }
 		void setBitRate(bitrate_t bitRate) { m_bitRate = bitRate; }
 
 	private:
 		bitrate_t m_bitRate;
-		bool m_isVariableBitRate;
 	};
 
 public:
