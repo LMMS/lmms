@@ -85,7 +85,7 @@ auto SampleFile::supportedTypes() -> std::vector<Type>
 
 auto SampleFile::LibSndFileCodec::open(const std::filesystem::path& path, SampleFile::Mode mode) -> bool
 {
-#ifdef LMMS_BUILD_WIN32
+#ifdef _WIN32
 	m_sndfile = sf_wchar_open(path.c_str(), LibSndFileCodec::sndfileMode(mode), &m_sfInfo);
 #else
 	m_sndfile = sf_open(path.c_str(), LibSndFileCodec::sndfileMode(mode), &m_sfInfo);
