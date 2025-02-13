@@ -322,9 +322,9 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-x64-
+            vcpkg-msvc-x86_64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
