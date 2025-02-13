@@ -496,7 +496,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 #ifdef LMMS_HAVE_PORTAUDIO
 	m_audioIfaceSetupWidgets[AudioPortAudio::name()] =
-			new AudioPortAudio::setupWidget(as_w);
+			new AudioPortAudioSetupWidget(as_w);
 #endif
 
 #ifdef LMMS_HAVE_SOUNDIO

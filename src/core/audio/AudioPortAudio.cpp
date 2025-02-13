@@ -23,444 +23,241 @@
  *
  */
 
-
 #include "AudioPortAudio.h"
-
-#ifndef LMMS_HAVE_PORTAUDIO
-namespace lmms
-{
-
-
-void AudioPortAudioSetupUtil::updateBackends()
-{
-}
-
-void AudioPortAudioSetupUtil::updateDevices()
-{
-}
-
-void AudioPortAudioSetupUtil::updateChannels()
-{
-}
-
-
-} // namespace lmms
-#endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
+#include <QComboBox>
 #include <QFormLayout>
+#include <iostream>
 
-#include "Engine.h"
-#include "ConfigManager.h"
-#include "ComboBox.h"
 #include "AudioEngine.h"
+#include "ConfigManager.h"
+#include "Engine.h"
 
-namespace lmms
+namespace lmms {
+
+AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
+	: AudioDevice(DEFAULT_CHANNELS, engine)
+	, m_paStream(nullptr)
+	, m_outBuf(engine->framesPerPeriod())
+	, m_outBufPos(0)
 {
+	const auto backend = ConfigManager::inst()->value("audioportaudio", "backend");
+	const auto device = ConfigManager::inst()->value("audioportaudio", "device");
+	const auto channels = ConfigManager::inst()->value("audioportaudio", "channels");
 
+	auto outputDeviceIndex = Pa_GetDefaultOutputDevice();
+	auto outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
+	const auto deviceCount = Pa_GetDeviceCount();
 
-AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_paStream( nullptr ),
-	m_wasPAInitError( false ),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
-	m_outBufPos( 0 )
-{
-	_success_ful = false;
-
-	m_outBufSize = audioEngine()->framesPerPeriod();
-
-	PaError err = Pa_Initialize();
-	
-	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
-		m_wasPAInitError = true;
-		return;
-	}
-
-	if( Pa_GetDeviceCount() <= 0 )
+	for (auto i = 0; i < deviceCount; ++i)
 	{
-		return;
-	}
-	
-	const QString& backend = ConfigManager::inst()->value( "audioportaudio", "backend" );
-	const QString& device = ConfigManager::inst()->value( "audioportaudio", "device" );
-		
-	PaDeviceIndex inDevIdx = -1;
-	PaDeviceIndex outDevIdx = -1;
-	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
-	{
-		const auto di = Pa_GetDeviceInfo(i);
-		if( di->name == device &&
-			Pa_GetHostApiInfo( di->hostApi )->name == backend )
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+		const auto currentBackendName = Pa_GetHostApiInfo(deviceInfo->hostApi)->name;
+		const auto currentDeviceName = deviceInfo->name;
+
+		if (currentBackendName == backend && currentDeviceName == device)
 		{
-			inDevIdx = i;
-			outDevIdx = i;
+			outputDeviceIndex = i;
+			outputDeviceInfo = deviceInfo;
+			break;
 		}
 	}
 
-	if( inDevIdx < 0 )
-	{
-		inDevIdx = Pa_GetDefaultInputDevice();
-	}
-	
-	if( outDevIdx < 0 )
-	{
-		outDevIdx = Pa_GetDefaultOutputDevice();
-	}
+	const auto outputParameters = PaStreamParameters{
+		.device = outputDeviceIndex,
+		.channelCount = std::min(channels.isEmpty() ? DEFAULT_CHANNELS : channels.toInt(), outputDeviceInfo->maxOutputChannels),
+		.sampleFormat = paFloat32,
+		.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency,
+		.hostApiSpecificStreamInfo = nullptr
+	};
 
-	if( inDevIdx < 0 || outDevIdx < 0 )
+	setSampleRate(engine->baseSampleRate());
+	setChannels(outputParameters.channelCount);
+
+	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(), paNoFlag,
+		processCallback, this);
+
+	if (err != paNoError)
 	{
+		std::cerr << "Could not open PortAudio: " << Pa_GetErrorText(err) << '\n';
+		successful = false;
 		return;
 	}
 
-	double inLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
-
-	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
-	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = audioEngine()->framesPerPeriod();
-	
-	// Configure output parameters.
-	m_outputParameters.device = outDevIdx;
-	m_outputParameters.channelCount = channels();
-	m_outputParameters.sampleFormat = paFloat32; // 32 bit floating point output
-	m_outputParameters.suggestedLatency = outLatency;
-	m_outputParameters.hostApiSpecificStreamInfo = nullptr;
-	
-	// Configure input parameters.
-	m_inputParameters.device = inDevIdx;
-	m_inputParameters.channelCount = DEFAULT_CHANNELS;
-	m_inputParameters.sampleFormat = paFloat32; // 32 bit floating point input
-	m_inputParameters.suggestedLatency = inLatency;
-	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
-	
-	// Open an audio I/O stream. 
-	err = Pa_OpenStream(
-			&m_paStream,
-			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
-			&m_outputParameters,	// The outputparameter
-			sampleRate(),
-			samples,
-			paNoFlag,		// Don't use any flags
-			_process_callback, 	// our callback function
-			this );
-
-	if( err == paInvalidDevice && sampleRate() < 48000 )
-	{
-		printf("Pa_OpenStream() failed with 44,1 KHz, trying again with 48 KHz\n");
-		// some backends or drivers do not allow 32 bit floating point data
-		// with a samplerate of 44100 Hz
-		setSampleRate( 48000 );
-		err = Pa_OpenStream(
-				&m_paStream,
-				supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
-				&m_outputParameters,	// The outputparameter
-				sampleRate(),
-				samples,
-				paNoFlag,		// Don't use any flags
-				_process_callback, 	// our callback function
-				this );
-	}
-
-	if( err != paNoError )
-	{
-		printf( "Couldn't open PortAudio: %s\n", Pa_GetErrorText( err ) );
-		return;
-	}
-
-	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
-	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
-
-	// TODO: debug AudioEngine::pushInputFrames()
-	//m_supportsCapture = true;
-
-	_success_ful = true;
+	successful = true;
 }
-
-
-
 
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-
-	if( !m_wasPAInitError )
-	{
-		Pa_Terminate();
-	}
-	delete[] m_outBuf;
 }
-
-
-
 
 void AudioPortAudio::startProcessing()
 {
-	m_stopped = false;
-	PaError err = Pa_StartStream( m_paStream );
-	
-	if( err != paNoError )
-	{
-		m_stopped = true;
-		printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-	}
+	PaError err = Pa_StartStream(m_paStream);
+	if (err != paNoError) { std::cerr << "Failed to start PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 }
-
-
-
 
 void AudioPortAudio::stopProcessing()
 {
-	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
+	if (m_paStream && Pa_IsStreamActive(m_paStream))
 	{
-		m_stopped = true;
-		PaError err = Pa_StopStream( m_paStream );
-	
-		if( err != paNoError )
-		{
-			printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-		}
+		PaError err = Pa_StopStream(m_paStream);
+		if (err != paNoError) { std::cerr << "Failed to stop PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 	}
 }
 
-
-int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer)
+int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer)
 {
-	if( supportsCapture() )
-	{
-		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
-	}
+	std::fill_n(outputBuffer, framesPerBuffer * channels(), 0.0f);
 
-	if( m_stopped )
+	while (framesPerBuffer)
 	{
-		memset( _outputBuffer, 0, _framesPerBuffer *
-			channels() * sizeof(float) );
-		return paComplete;
-	}
-
-	while( _framesPerBuffer )
-	{
-		if( m_outBufPos == 0 )
+		if (m_outBufPos == 0)
 		{
-			// frames depend on the sample rate
-			const fpp_t frames = getNextBuffer( m_outBuf );
-			if( !frames )
-			{
-				m_stopped = true;
-				memset( _outputBuffer, 0, _framesPerBuffer *
-					channels() * sizeof(float) );
-				return paComplete;
-			}
-			m_outBufSize = frames;
+			const auto err = getNextBuffer(m_outBuf.data());
+			if (err == 0) { return paComplete; }
 		}
-		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
 
-		for( fpp_t frame = 0; frame < min_len; ++frame )
+		for (auto frame = std::size_t{0}; frame < framesPerBuffer; ++frame)
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			if (channels() == 1)
 			{
-				(_outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
+				outputBuffer[frame] = m_outBuf[frame].average();
+			}
+			else
+			{
+				outputBuffer[frame * channels()] = m_outBuf[m_outBufPos + frame][0];
+				outputBuffer[frame * channels() + 1] = m_outBuf[m_outBufPos + frame][1];
 			}
 		}
 
-		_outputBuffer += min_len * channels();
-		_framesPerBuffer -= min_len;
-		m_outBufPos += min_len;
-		m_outBufPos %= m_outBufSize;
+		const auto minLen = std::min(framesPerBuffer, m_outBuf.size() - m_outBufPos);
+		outputBuffer += minLen * channels();
+		framesPerBuffer -= minLen;
+		m_outBufPos += minLen;
+		m_outBufPos %= m_outBuf.size();
 	}
 
 	return paContinue;
 }
 
-
-
-int AudioPortAudio::_process_callback(
-	const void *_inputBuffer,
-	void * _outputBuffer,
-	unsigned long _framesPerBuffer,
-	const PaStreamCallbackTimeInfo * _timeInfo,
-	PaStreamCallbackFlags _statusFlags,
-	void * _arg )
+int AudioPortAudio::processCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
+	const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* arg)
 {
-	Q_UNUSED(_timeInfo);
-	Q_UNUSED(_statusFlags);
+	Q_UNUSED(timeInfo);
+	Q_UNUSED(statusFlags);
 
-	auto _this = static_cast<AudioPortAudio*>(_arg);
-	return _this->process_callback( (const float*)_inputBuffer,
-		(float*)_outputBuffer, _framesPerBuffer );
+	auto _this = static_cast<AudioPortAudio*>(arg);
+	return _this->processCallback(
+		static_cast<const float*>(inputBuffer), static_cast<float*>(outputBuffer), framesPerBuffer);
 }
 
-
-
-
-void AudioPortAudioSetupUtil::updateBackends()
+void gui::AudioPortAudioSetupWidget::updateBackends()
 {
-	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
-		return;
-	}
+	const auto initGuard = PortAudioInitializationGuard{};
+	m_backendComboBox->clear();
 
-	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
+	for (auto i = 0; i < Pa_GetHostApiCount(); ++i)
 	{
-		const auto hi = Pa_GetHostApiInfo(i);
-		m_backendModel.addItem( hi->name );
+		const auto backendInfo = Pa_GetHostApiInfo(i);
+		m_backendComboBox->addItem(backendInfo->name, i);
 	}
 
-	Pa_Terminate();
+	const auto backend = ConfigManager::inst()->value("audioportaudio", "backend");
+	const auto index = std::max(0, m_backendComboBox->findText(backend));
+	m_backendComboBox->setCurrentIndex(index);
 }
 
-
-
-
-void AudioPortAudioSetupUtil::updateDevices()
+void gui::AudioPortAudioSetupWidget::updateDevices()
 {
-	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
-		return;
-	}
+	if (m_backendComboBox->currentData().isNull()) { return; }
 
-	// get active backend 
-	const QString& backend = m_backendModel.currentText();
-	int hostApi = 0;
-	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
+	const auto initGuard = PortAudioInitializationGuard{};
+	m_deviceComboBox->clear();
+
+	for (auto i = 0; i < Pa_GetDeviceCount(); ++i)
 	{
-		const auto hi = Pa_GetHostApiInfo(i);
-		if( backend == hi->name )
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+		if (deviceInfo->hostApi == m_backendComboBox->currentData().toInt())
 		{
-			hostApi = i;
-			break;
+			m_deviceComboBox->addItem(deviceInfo->name, i);
 		}
 	}
 
-	// get devices for selected backend
-	m_deviceModel.clear();
-	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
+	const auto device = ConfigManager::inst()->value("audioportaudio", "device");
+	const auto index = std::max(0, m_deviceComboBox->findText(device));
+	m_deviceComboBox->setCurrentIndex(index);
+}
+
+void gui::AudioPortAudioSetupWidget::updateChannels()
+{
+	if (m_deviceComboBox->currentData().isNull()) { return; }
+
+	const auto initGuard = PortAudioInitializationGuard{};
+	const auto channels = ConfigManager::inst()->value("audioportaudio", "channels");
+	const auto maxOutputChannels = Pa_GetDeviceInfo(m_deviceComboBox->currentData().toInt())->maxOutputChannels;
+
+	m_channelModel.setRange(1, maxOutputChannels);
+	m_channelModel.setValue(std::min(channels.isEmpty() ? DEFAULT_CHANNELS : channels.toInt(), maxOutputChannels));
+	m_channelSpinBox->setNumDigits(QString::number(maxOutputChannels).length());
+}
+
+gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
+	: AudioDeviceSetupWidget(AudioPortAudio::name(), _parent)
+{
+	QFormLayout* form = new QFormLayout(this);
+	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
+
+	m_backendComboBox = new QComboBox(this);
+	form->addRow(tr("Backend"), m_backendComboBox);
+
+	m_deviceComboBox = new QComboBox(this);
+	form->addRow(tr("Device"), m_deviceComboBox);
+
+	m_channelSpinBox = new LcdSpinBox(1, this);
+	m_channelSpinBox->setModel(&m_channelModel);
+	form->addRow(tr("Channels"), m_channelSpinBox);
+
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::activated), [&] {
+		updateDevices();
+		updateChannels();
+	});
+
+	connect(m_deviceComboBox, qOverload<int>(&QComboBox::activated), [&] { updateChannels(); });
+}
+
+void gui::AudioPortAudioSetupWidget::saveSettings()
+{
+	ConfigManager::inst()->setValue("audioportaudio", "backend", m_backendComboBox->currentText());
+	ConfigManager::inst()->setValue("audioportaudio", "device", m_deviceComboBox->currentText());
+	ConfigManager::inst()->setValue("audioportaudio", "channels", QString::number(m_channelSpinBox->value<int>()));
+}
+
+void gui::AudioPortAudioSetupWidget::show()
+{
+	if (m_backendComboBox->count() == 0)
 	{
-		const auto di = Pa_GetDeviceInfo(i);
-		if( di->hostApi == hostApi )
-		{
-			m_deviceModel.addItem( di->name );
-		}
-	}
-	Pa_Terminate();
-}
-
-
-
-
-void AudioPortAudioSetupUtil::updateChannels()
-{
-	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
-		return;
-	}
-	// get active backend 
-	Pa_Terminate();
-}
-
-
-
-
-AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
-{
-	using gui::ComboBox;
-
-	QFormLayout * form = new QFormLayout(this);
-
-	m_backend = new ComboBox( this, "BACKEND" );
-	form->addRow(tr("Backend"), m_backend);
-
-	m_device = new ComboBox( this, "DEVICE" );
-	form->addRow(tr("Device"), m_device);
-	
-/*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
-	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audioportaudio",
-							"channels" ).toInt() );
-
-	m_channels = new LcdSpinBox( 1, this );
-	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 308, 20 );*/
-
-	connect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateDevices()));
-			
-	connect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateChannels()));
-			
-	m_backend->setModel( &m_setupUtil.m_backendModel );
-	m_device->setModel( &m_setupUtil.m_deviceModel );
-}
-
-
-
-
-AudioPortAudio::setupWidget::~setupWidget()
-{
-	disconnect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateDevices()));
-			
-	disconnect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
-			&m_setupUtil, SLOT(updateChannels()));
-}
-
-
-
-
-void AudioPortAudio::setupWidget::saveSettings()
-{
-
-	ConfigManager::inst()->setValue( "audioportaudio", "backend",
-							m_setupUtil.m_backendModel.currentText() );
-	ConfigManager::inst()->setValue( "audioportaudio", "device",
-							m_setupUtil.m_deviceModel.currentText() );
-/*	ConfigManager::inst()->setValue( "audioportaudio", "channels",
-				QString::number( m_channels->value<int>() ) );*/
-
-}
-
-
-
-
-void AudioPortAudio::setupWidget::show()
-{
-	if( m_setupUtil.m_backendModel.size() == 0 )
-	{
-		// populate the backend model the first time we are shown
-		m_setupUtil.updateBackends();
-
-		const QString& backend = ConfigManager::inst()->value(
-			"audioportaudio", "backend" );
-		const QString& device = ConfigManager::inst()->value(
-			"audioportaudio", "device" );
-		
-		int i = std::max(0, m_setupUtil.m_backendModel.findText(backend));
-		m_setupUtil.m_backendModel.setValue( i );
-		
-		m_setupUtil.updateDevices();
-		
-		i = std::max(0, m_setupUtil.m_deviceModel.findText(device));
-		m_setupUtil.m_deviceModel.setValue( i );
+		updateBackends();
+		updateDevices();
+		updateChannels();
 	}
 
 	AudioDeviceSetupWidget::show();
 }
 
+PortAudioInitializationGuard::PortAudioInitializationGuard()
+	: m_error(Pa_Initialize())
+{
+	if (m_error != paNoError) { std::cerr << "Failed to initialize PortAudio: " << Pa_GetErrorText(m_error) << '\n'; }
+}
+
+PortAudioInitializationGuard::~PortAudioInitializationGuard()
+{
+	if (m_error == paNoError) { Pa_Terminate(); }
+}
 } // namespace lmms
 
-
 #endif // LMMS_HAVE_PORTAUDIO
-
-
-
