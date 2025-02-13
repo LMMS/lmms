@@ -56,7 +56,7 @@ public:
 
 	void changeLength( const TimePos & _length ) override;
 	void changeLengthToSampleLength();
-	QString sampleFile() const;
+	const QString& sampleFile() const;
 	bool hasSampleFileLoaded(const QString & filename) const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
