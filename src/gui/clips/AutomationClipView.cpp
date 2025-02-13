@@ -191,8 +191,21 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 		m_clip->getHasBeenResized() ? embed::getIconPixmap("auto_resize") : embed::getIconPixmap("auto_resize_disable"),
 		m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
 		[this](){
-			m_clip->setHasBeenResized(!m_clip->getHasBeenResized());
-			m_clip->updateLength();
+			for (auto clipv: getClickedClips())
+			{
+				AutomationClip* aClip = dynamic_cast<AutomationClip*>(clipv->getClip());
+				MidiClip* mClip = dynamic_cast<MidiClip*>(clipv->getClip());
+				if (aClip)
+				{
+					aClip->setHasBeenResized(!m_clip->getHasBeenResized());
+					aClip->updateLength();
+				}
+				else if (mClip)
+				{
+					mClip->setHasBeenResized(!m_clip->getHasBeenResized());
+					mClip->updateLength();
+				}
+			}
 		}
 	);
 	
