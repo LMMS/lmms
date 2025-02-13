@@ -132,10 +132,7 @@ auto SampleFile::LibSndFileCodec::write(const SampleFrame* src, std::size_t size
 	auto tmp = std::vector<float>(size * m_sfInfo.channels);
 	for (auto i = std::size_t{0}; i < size; ++i)
 	{
-		if (m_sfInfo.channels == 1)
-		{
-			tmp[i] = src[i].average();
-		}
+		if (m_sfInfo.channels == 1) { tmp[i] = src[i].average(); }
 		else
 		{
 			tmp[i * m_sfInfo.channels] = src[i][0];
