@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_AUDIO_FILE_H
-#define LMMS_AUDIO_FILE_H
+#ifndef LMMS_SAMPLE_FILE_H
+#define LMMS_SAMPLE_FILE_H
 
 #include <filesystem>
 #include <sndfile.h>
@@ -163,4 +163,4 @@ private:
 };
 } // namespace lmms
 
-#endif // LMMS_AUDIO_FILE_H
+#endif // LMMS_SAMPLE_FILE_H
