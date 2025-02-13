@@ -67,11 +67,17 @@ public:
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
+	void sendInterrupt(int signal);
+
 public slots:
 	void displayInitProgress(const QString &msg);
 
 private slots:
 	void childDestroyed(QObject *obj);
+	void processInterrupt(int signal);
+
+signals:
+    void interruptOccurred(int signal);
 
 private:
 	static GuiApplication* s_instance;

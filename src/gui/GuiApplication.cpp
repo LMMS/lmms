@@ -46,6 +46,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <csignal>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -75,6 +76,9 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication()
 {
+	// Add interrupt handler as early as possible
+	connect(this, SIGNAL(interruptOccurred(int)), this, SLOT(processInterrupt(int)), Qt::QueuedConnection);
+
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
 		QMessageBox::question( nullptr,
@@ -237,6 +241,19 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_controllerRackView)
 	{
 		m_controllerRackView = nullptr;
+	}
+}
+
+void GuiApplication::sendInterrupt(int signal) {
+	emit interruptOccurred(signal);
+}
+
+// Slot for handling interrupts from main()
+void GuiApplication::processInterrupt(int signal) {
+	switch(signal) {
+		case SIGINT:
+			// add last minute resource clean-up goes here
+			qApp->exit(3);
 	}
 }
 
