@@ -91,7 +91,6 @@ public slots:
 	void selectAllClips( bool select );
 
 protected:
-	void closeEvent( QCloseEvent * ce ) override;
 	void mousePressEvent(QMouseEvent * me) override;
 	void mouseMoveEvent(QMouseEvent * me) override;
 	void mouseReleaseEvent(QMouseEvent * me) override;
