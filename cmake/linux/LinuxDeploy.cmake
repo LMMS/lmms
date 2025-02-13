@@ -65,8 +65,6 @@ download_binary(LINUXDEPLOY_BIN
 
 # Guess the path to appimagetool
 set(APPIMAGETOOL_BIN "${CPACK_CURRENT_BINARY_DIR}/.linuxdeploy-${ARCH}.AppImage/squashfs-root/plugins/linuxdeploy-plugin-appimage/appimagetool-prefix/AppRun")
-# Remove symlink from previous versions
-file(REMOVE "${CPACK_CURRENT_BINARY_DIR}/appimagetool")
 
 # Download linuxdeploy-plugin-qt
 download_binary(LINUXDEPLOY_PLUGIN_BIN
