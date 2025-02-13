@@ -54,7 +54,11 @@ public:
 	};
 
 	AudioFile(const std::filesystem::path& path, Mode mode);
-	~AudioFile() { m_codec->close(); }
+
+	~AudioFile()
+	{
+		if (m_codec.get() != nullptr) { m_codec->close(); }
+	}
 
 	AudioFile(const AudioFile&) = delete;
 	AudioFile& operator=(const AudioFile&) = delete;
@@ -62,13 +66,24 @@ public:
 	AudioFile(AudioFile&&) noexcept;
 	AudioFile& operator=(AudioFile&&) noexcept;
 
-	auto read(SampleFrame* dst, std::size_t size) const -> std::size_t { return m_codec->read(dst, size); }
-	auto write(const SampleFrame* src, std::size_t size) -> std::size_t { return m_codec->write(src, size); }
+	auto read(SampleFrame* dst, std::size_t size) const -> std::size_t
+	{
+		return m_codec.get() != nullptr ? m_codec->read(dst, size) : 0;
+	}
 
-	auto seek(std::size_t offset, int whence) -> std::size_t { return m_codec->seek(offset, whence); }
+	auto write(const SampleFrame* src, std::size_t size) -> std::size_t
+	{
+		return m_codec.get() != nullptr ? m_codec->write(src, size) : 0;
+	}
 
-	auto frames() const -> std::size_t { return m_codec->frames(); }
-	auto sampleRate() const -> int { return m_codec->sampleRate(); }
+	auto seek(std::size_t offset, int whence) -> std::size_t
+	{
+		return m_codec.get() != nullptr ? m_codec->seek(offset, whence) : 0;
+	}
+
+	auto frames() const -> std::size_t { return m_codec.get() != nullptr ? m_codec->frames() : 0; }
+
+	auto sampleRate() const -> int { return m_codec.get() != nullptr ? m_codec->sampleRate() : 0; }
 
 	auto path() const -> const std::filesystem::path& { return m_path; }
 	auto bytes() const -> std::size_t { return std::filesystem::file_size(m_path); }
