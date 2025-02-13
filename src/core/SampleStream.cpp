@@ -23,6 +23,7 @@
  */
 
 #include "SampleStream.h"
+#include <qdebug.h>
 
 #include "ThreadPool.h"
 
@@ -30,37 +31,108 @@ namespace lmms {
 SampleStream::SampleStream(const std::filesystem::path& path, std::size_t size)
 	: m_audioFile(path, AudioFile::Mode::Read)
 	, m_buffer(size)
-	, m_diskStream(ThreadPool::instance().enqueue(&SampleStream::runDiskStream, this))
 {
+}
+
+SampleStream::SampleStream(SampleStream&& stream) noexcept
+    : m_audioFile(std::move(stream.m_audioFile))
+    , m_buffer(std::move(stream.m_buffer))
+    , m_diskStream(std::move(stream.m_diskStream))
+    , m_quit(stream.m_quit.load())
+    , m_readIndex(stream.m_readIndex.load())
+    , m_writeIndex(stream.m_writeIndex.load())
+{
+    stop();
+    start();
+}
+
+SampleStream& SampleStream::operator=(SampleStream&& stream) noexcept
+{
+    m_audioFile = std::move(stream.m_audioFile);
+    m_buffer = std::move(stream.m_buffer);
+    m_diskStream = std::move(stream.m_diskStream);
+    m_quit = stream.m_quit.load();
+    m_readIndex = stream.m_readIndex.load();
+    m_writeIndex = stream.m_writeIndex.load();
+
+    stop();
+    start();
+
+    return *this;
 }
 
 SampleStream::~SampleStream()
 {
+    stop();
+}
+
+void SampleStream::start()
+{
+    if (m_diskStream.valid()) { return; }
+
+    m_quit = false;
+    m_diskStream = ThreadPool::instance().enqueue(&SampleStream::runDiskStream, this);
+}
+
+void SampleStream::stop()
+{
+    if (!m_diskStream.valid()) { return; }
+
     m_quit = true;
 	m_diskStream.wait();
 }
 
 auto SampleStream::read(SampleFrame* dst, std::size_t size) -> std::size_t
 {
-    const auto numFramesToRead = std::min({size, streamSize(), m_buffer.size()});
-    assert(numFramesToRead > 0);
-
     std::fill_n(dst, size, SampleFrame{});
-    if (m_readIndex >= m_writeIndex || numFramesToRead == 0) { return 0; }
 
-    std::copy_n(m_buffer.begin() + m_readIndex, numFramesToRead, dst);
-    m_readIndex += numFramesToRead % m_buffer.size();
-    return numFramesToRead;
+    const auto framesAvailable = (m_writeIndex + m_buffer.size() - m_readIndex) % m_buffer.size();
+	if (framesAvailable == 0) { return 0; }
+
+	const auto readSize = std::min(framesAvailable, size);
+
+    if (m_readIndex + readSize > m_buffer.size())
+    {
+        const auto readToEndSize = std::min(readSize, m_buffer.size() - m_readIndex);
+        const auto wrapAroundSize = readSize - readToEndSize;
+        std::copy_n(m_buffer.begin() + m_readIndex, readToEndSize, dst);
+        std::copy_n(m_buffer.begin(), wrapAroundSize, dst + readToEndSize);
+    }
+    else
+    {
+        std::copy_n(m_buffer.begin() + m_readIndex, readSize, dst);
+    }
+
+    m_readIndex = (m_readIndex + readSize) % m_buffer.size();
+    return readSize;
 }
 
 void SampleStream::runDiskStream()
 {
-    while (!m_quit)
-    {
-        if (m_writeIndex <= m_readIndex) { continue; }
-        const auto numFramesToWrite = m_buffer.size() - m_writeIndex;
-        m_audioFile.read(m_buffer.data() + m_writeIndex, numFramesToWrite);
-    }
+    auto framesWritten = std::size_t{0};
+
+	while (framesWritten < streamSize() && !m_quit)
+	{
+		const auto framesAvailable = (m_readIndex + m_buffer.size() - m_writeIndex - 1) % m_buffer.size();
+		if (framesAvailable == 0) { continue; }
+
+        const auto writeSize = std::min(framesAvailable, streamSize() - framesWritten);
+
+        if (m_writeIndex + writeSize > m_buffer.size())
+        {
+            const auto writeToEndSize = std::min(writeSize, m_buffer.size() - m_writeIndex);
+            const auto wrapAroundSize = writeSize - writeToEndSize;
+            m_audioFile.read(m_buffer.data() + m_writeIndex, writeToEndSize);
+            m_audioFile.read(m_buffer.data(), wrapAroundSize);
+        }
+        else
+        {
+            m_audioFile.read(m_buffer.data() + m_writeIndex, writeSize);
+        }
+
+        m_writeIndex = (m_writeIndex + writeSize) % m_buffer.size();
+        framesWritten += writeSize;
+	}
 }
 
 } // namespace lmms
