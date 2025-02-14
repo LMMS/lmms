@@ -315,10 +315,7 @@ void Alg_midifile_reader::binary_msg(int len, unsigned char *msg, const char *at
 {
 	Alg_parameter parameter;
 	char *hexstr = new char[len * 2 + 1];
-	for (int i = 0; i < len; i++)
-	{
-		snprintf(hexstr + 2 * i, 3, "%02x", (0xFF & msg[i]));
-	}
+	for (int i = 0; i < len; i++) { snprintf(&hexstr[2 * i], 3, "%02x", msg[i]); }
 	parameter.s = hexstr;
 	parameter.set_attr(symbol_table.insert_string(attr_string));
 	update(meta_channel, -1, &parameter);
