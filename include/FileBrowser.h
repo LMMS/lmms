@@ -29,9 +29,8 @@
 #include <QDir>
 #include <QMutex>
 #include <QProgressBar>
-#include <memory>
+#include <future>
 
-#include "FileSearch.h"
 #include "embed.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -77,19 +76,6 @@ public:
 
 	~FileBrowser() override = default;
 
-	static QStringList excludedPaths()
-	{
-		static auto s_excludedPaths = QStringList{
-#ifdef LMMS_BUILD_LINUX
-			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
-			"/sys"
-#endif
-#ifdef LMMS_BUILD_WIN32
-			"C:\\Windows"
-#endif
-		};
-		return s_excludedPaths;
-	}
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
@@ -99,6 +85,32 @@ private slots:
 	void giveFocusToFilter();
 
 private:
+	class SearchManager
+	{
+	public:
+		~SearchManager() { cancel(); }
+
+		void cancel()
+		{
+			if (m_currentSearchTask.valid())
+			{
+				m_cancel = true;
+				m_currentSearchTask.get();
+				m_cancel = false;
+			}
+		}
+
+		bool cancelled() { return m_cancel; }
+
+		void setCurrentSearchTask(std::future<void> task) { m_currentSearchTask = std::move(task); }
+
+		std::future<void>& currentSearchTask() { return m_currentSearchTask; }
+
+	private:
+		std::future<void> m_currentSearchTask;
+		std::atomic<bool> m_cancel;
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
@@ -106,10 +118,7 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
-	void foundSearchMatch(FileSearch* search, const QString& match);
-	void searchCompleted(FileSearch* search);
 	void onSearch(const QString& filter);
-	void displaySearch(bool on);
 
 	void addContentCheckBox();
 
@@ -118,7 +127,7 @@ private:
 
 	QLineEdit * m_filterEdit;
 
-	std::shared_ptr<FileSearch> m_currentSearch;
+	SearchManager m_searchManager;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
@@ -138,9 +147,6 @@ private:
 	QList<QString> m_savedExpandedDirs;
 	QString m_previousFilterValue;
 } ;
-
-
-
 
 class FileBrowserTreeWidget : public QTreeWidget
 {
@@ -204,7 +210,7 @@ private slots:
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory(const QString& filename, const QString& path, const QString& filter, bool disableEntryPopulation = false);
+	Directory(const QString& filename, const QString& path, const QString& filter);
 
 	void update();
 
@@ -247,7 +253,6 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
-	bool m_disableEntryPopulation = false;
 } ;
 
 
