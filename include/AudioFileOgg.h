@@ -56,11 +56,8 @@ public:
 		return new AudioFileOgg( outputSettings, channels, successful, outputFilename, audioEngine );
 	}
 
-
-
 private:
 	void writeBuffer(const SampleFrame* _ab, const fpp_t _frames) override;
-	float calculateBaseQuality(int bitrate) { return (static_cast<float>(bitrate) - 32) / (500 - 32); }
 	vorbis_info m_vi;
 	vorbis_dsp_state m_vds;
 	vorbis_comment m_vc;
