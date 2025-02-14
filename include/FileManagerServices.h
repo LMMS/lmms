@@ -37,7 +37,7 @@ public:
 #if defined(_WIN32)
 	static QString getDefaultFileManager() { return QString("explorer"); }
 	static bool canSelect() { return true; }
-#else defined(__APPLE__)
+#elif defined(__APPLE__)
 	static QString getDefaultFileManager() { return QString("finder"); };
 	static bool canSelect() { return true; }
 #else
