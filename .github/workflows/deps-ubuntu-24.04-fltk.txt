@@ -1,0 +1,4 @@
+libcairo2-dev
+libgtk-3-dev
+libpango1.0-dev
+wayland-protocols
