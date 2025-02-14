@@ -162,9 +162,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	basicControlsLayout->addLayout(soloMuteLayout, 0, 0);
 
-	auto label = new QLabel(tr("VOLUME"), this);
+	auto label = new QLabel(tr("M/S"), this);
 	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 0, 1, 2);
+	basicControlsLayout->addWidget(label, 1, 0);
 	basicControlsLayout->setAlignment(label, labelAlignment);
 
 	// set up volume knob
@@ -174,6 +174,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
+
+	label = new QLabel(tr( "VOL"), this);
+	label->setStyleSheet(labelStyleSheet);
+	basicControlsLayout->addWidget(label, 1, 1);
+	basicControlsLayout->setAlignment(label, labelAlignment);
 
 	// set up panning knob
 	m_panningKnob = new Knob( KnobType::Bright26, nullptr, tr( "Panning" ) );
