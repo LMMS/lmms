@@ -640,7 +640,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 #ifdef LMMS_BUILD_APPLE
 	QString fileManager = tr("Finder");
 #elif defined(LMMS_BUILD_WIN32)
-	QString fileManager = tr("File Explorer");
+	QString fileManager = tr("Explorer");
 #else
 	QString fileManager = tr("file manager");
 #endif
