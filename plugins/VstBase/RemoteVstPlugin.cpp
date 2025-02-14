@@ -1007,10 +1007,10 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	}
 
 	const char id[5] = {
-		static_cast<char>(unique_id >> 24),
-		static_cast<char>(unique_id >> 16),
-		static_cast<char>(unique_id >>  8),
-		static_cast<char>(unique_id      ),
+		static_cast<char>(m_plugin->uniqueID >> 24),
+		static_cast<char>(m_plugin->uniqueID >> 16),
+		static_cast<char>(m_plugin->uniqueID >>  8),
+		static_cast<char>(m_plugin->uniqueID      ),
 		0
 	};
 
