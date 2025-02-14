@@ -788,6 +788,38 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::reverseNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+	m_midiClip->addJournalCheckPoint();
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	TimePos firstPos = notes.front()->pos();
+	TimePos lastPos = notes.back()->endPos();
+	// Find the actual min/max positions
+	for (auto note : notes)
+	{
+		if (note->pos() < firstPos) { firstPos = note->pos(); }
+		if (note->endPos() > lastPos) { lastPos = note->endPos(); }
+	}
+
+	for (auto note : notes)
+	{
+		TimePos oldStart = note->pos();
+		TimePos newStart = lastPos - (oldStart - firstPos) - note->length();
+		note->setPos(newStart);
+	}
+	
+	m_midiClip->rearrangeAllNotes();
+	m_midiClip->dataChanged();
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -4869,12 +4901,17 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
+	auto reverseAction = new QAction(embed::getIconPixmap("back_to_start"), tr("Reverse Notes"), noteToolsButton);
+	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
+	reverseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_R));
+
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
+	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
