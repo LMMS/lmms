@@ -30,6 +30,7 @@
  *
  */
 
+ #include <cmath>
 
 #include "lmmsconfig.h"
 
@@ -1005,13 +1006,14 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		return false;
 	}
 
+	const char id[5] = {
+		static_cast<char>(unique_id >> 24),
+		static_cast<char>(unique_id >> 16),
+		static_cast<char>(unique_id >>  8),
+		static_cast<char>(unique_id      ),
+		0
+	};
 
-	char id[5];
-	sprintf( id, "%c%c%c%c", ((char *)&m_plugin->uniqueID)[3],
-					 ((char *)&m_plugin->uniqueID)[2],
-					 ((char *)&m_plugin->uniqueID)[1],
-					 ((char *)&m_plugin->uniqueID)[0] );
-	id[4] = 0;
 	sendMessage( message( IdVstPluginUniqueID ).addString( id ) );
 
 	pluginDispatch( effOpen );
@@ -1238,9 +1240,13 @@ void RemoteVstPlugin::getParameterLabels()
 void RemoteVstPlugin::sendCurrentProgramName()
 {
 	char presName[64];
-	sprintf( presName, "%d/%d: %s", pluginDispatch( effGetProgram ) + 1, m_plugin->numPrograms, programName() );
-
-	sendMessage( message( IdVstCurrentProgramName ).addString( presName ) );
+	snprintf(presName, sizeof(presName),
+		"%d/%d: %s",
+		pluginDispatch(effGetProgram) + 1,
+		m_plugin->numPrograms,
+		programName()
+	);
+	sendMessage(message(IdVstCurrentProgramName).addString(presName));
 }
 
 
@@ -1365,36 +1371,48 @@ void RemoteVstPlugin::rotateProgram( int offset )
 
 void RemoteVstPlugin::getProgramNames()
 {
-	char presName[1024+256*30];
+	char presName[1024 + 256 * 30];
 	char curProgName[30];
-	if (isInitialized() == false) return;
-	bool progNameIndexed = ( pluginDispatch( 29, 0, -1, curProgName ) == 1 );
+	if (!isInitialized()) { return; }
+	const bool progNameIndexed = pluginDispatch(29, 0, -1, curProgName) == 1;
 
-	if (m_plugin->numPrograms > 1) {
-		if (progNameIndexed) {
-			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++)
+	if (m_plugin->numPrograms > 1)
+	{
+		const auto maxPrograms = std::min(m_plugin->numPrograms, 256);
+		if (progNameIndexed)
+		{
+			for (int i = 0; i < maxPrograms; i++)
 			{
-				pluginDispatch( 29, i, -1, curProgName );
-				if (i == 0) 	sprintf( presName, "%s", curProgName );
-				else		sprintf( presName + strlen(presName), "|%s", curProgName );
+				pluginDispatch(29, i, -1, curProgName);
+				if (i == 0) { snprintf(presName, sizeof(presName), "%s", curProgName); }
+				else
+				{
+					const auto len = strlen(presName);
+					const auto remaining = std::min(len, sizeof(presName));
+					snprintf(presName + len, remaining, "|%s", curProgName);
+				}
 			}
 		}
 		else
 		{
-			int currProgram = pluginDispatch( effGetProgram );
-			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++)
+			const int currProgram = pluginDispatch(effGetProgram);
+			for (int i = 0; i < maxPrograms; i++)
 			{
-				pluginDispatch( effSetProgram, 0, i );
-				if (i == 0) 	sprintf( presName, "%s", programName() );
-				else		sprintf( presName + strlen(presName), "|%s", programName() );
+				pluginDispatch(effSetProgram, 0, i);
+				if (i == 0) { snprintf(presName, sizeof(presName), "%s", programName()); }
+				else
+				{
+					const auto len = strlen(presName);
+					const auto remaining = std::min(len, sizeof(presName));
+					snprintf(presName + len, remaining, "|%s", programName());
+				}
 			}
-			pluginDispatch( effSetProgram, 0, currProgram );
+			pluginDispatch(effSetProgram, 0, currProgram);
 		}
-	} else sprintf( presName, "%s", programName() );
+	} else snprintf(presName, sizeof(presName), "%s", programName());
 
-	presName[sizeof(presName)-1] = 0;
-
-	sendMessage( message( IdVstProgramNames ).addString( presName ) );
+	presName[sizeof(presName) - 1] = 0;
+	sendMessage(message(IdVstProgramNames).addString(presName));
 }
 
 
@@ -1683,18 +1701,11 @@ int RemoteVstPlugin::updateInOutCount()
 	setInputOutputCount( inputCount(), outputCount() );
 
 	char buf[64];
-	sprintf( buf, "inputs: %d  output: %d\n", inputCount(), outputCount() );
-	debugMessage( buf );
+	snprintf(buf, sizeof(buf), "inputs: %d; outputs: %d\n", inputCount(), outputCount());
+	debugMessage(buf);
 
-	if( inputCount() > 0 )
-	{
-		m_inputs = new float * [inputCount()];
-	}
-
-	if( outputCount() > 0 )
-	{
-		m_outputs = new float * [outputCount()];
-	}
+	if (inputCount() > 0) { m_inputs = new float*[inputCount()]; }
+	if (outputCount() > 0) { m_outputs = new float*[outputCount()]; }
 
 	return 1;
 }
@@ -1723,8 +1734,8 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 	static VstTimeInfo _timeInfo;
 #ifdef DEBUG_CALLBACKS
 	char buf[64];
-	sprintf( buf, "host-callback, opcode = %d\n", (int) _opcode );
-	SHOW_CALLBACK( buf );
+	snprintf(buf, sizeof(buf), "host-callback, opcode = %d\n", static_cast<int>(_opcode));
+	SHOW_CALLBACK(buf);
 #endif
 
 	// workaround for early callbacks by some plugins
