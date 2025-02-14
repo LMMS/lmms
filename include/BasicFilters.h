@@ -208,7 +208,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if (std::abs(s) < F_EPSILON && std::abs(m_z1[ch]) < F_EPSILON) { return 0.0f; }
+		if (approximatelyEqual(s, 0.0f) && approximatelyEqual(m_z1[ch], 0.0f)) { return 0.0f; }
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -594,7 +594,7 @@ public:
 			case FilterType::Formantfilter:
 			case FilterType::FastFormant:
 			{
-				if (std::abs(_in0) < F_EPSILON && std::abs(m_vflast[0][_chnl]) < F_EPSILON) { return 0.0f; } // performance hack - skip processing when the numbers get too small
+				if (approximatelyEqual(_in0, 0.0f) && approximatelyEqual(m_vflast[0][_chnl], 0.0f)) { return 0.0f; } // performance hack - skip processing when the numbers get too small
 
 				const int os = m_type == FilterType::FastFormant ? 1 : 4; // no oversampling for fast formant
 				for( int o = 0; o < os; ++o )
