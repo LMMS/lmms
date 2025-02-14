@@ -22,15 +22,15 @@
  *
  */
 
+
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
+#include "LmmsTypeDeclarations.h"
+
 namespace lmms
 {
-
-// Prefer using `approximatelyEqual()` from lmms_math.h rather than
-// using this directly
-inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
 // Microtuner
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
@@ -78,6 +78,13 @@ inline constexpr auto ARANGE_LOUD_START     = -30;
 inline constexpr auto ARANGE_LOUD_END       =   0;
 inline constexpr auto ARANGE_SILENT_START   = -60;
 inline constexpr auto ARANGE_SILENT_END     = -10;
+
+inline constexpr char LADSPA_PATH_SEPERATOR =
+#ifdef LMMS_BUILD_WIN32
+';';
+#else
+':';
+#endif
 
 } // namespace lmms
 

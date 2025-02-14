@@ -32,7 +32,8 @@
 #include <QString>
 
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#include "Plugin.h" // for the stringify macro
+
 
 namespace lmms {
 

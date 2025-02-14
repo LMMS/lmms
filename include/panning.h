@@ -26,7 +26,7 @@
 #ifndef LMMS_PANNING_H
 #define LMMS_PANNING_H
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 #include "Midi.h"
 #include "volume.h"
 
