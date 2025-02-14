@@ -69,6 +69,10 @@ QString FileManagerServices::getDefaultFileManager()
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
 
+	if (fileManager.endsWith(".desktop")) {
+		fileManager.chop(8);
+	}
+
 	if (fileManager.isEmpty())
 	{
 		fileManager = qgetenv("FILE_MANAGER");

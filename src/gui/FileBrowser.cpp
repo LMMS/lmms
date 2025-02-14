@@ -1040,7 +1040,6 @@ void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 
 
 
-
 void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
