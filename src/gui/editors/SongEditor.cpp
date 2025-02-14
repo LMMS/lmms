@@ -35,7 +35,6 @@
 #include <QTimeLine>
 
 #include "ActionGroup.h"
-#include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ClipView.h"
@@ -912,7 +911,7 @@ ComboBoxModel *SongEditor::snappingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::audioEngine()->audioDev()->supportsCapture(), false),
+	Editor(true, false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( nullptr ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
@@ -1029,6 +1028,17 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
+
+	// In case our current audio device does not support capture,
+	// disable the record buttons.
+	if (!Engine::audioEngine()->captureDeviceAvailable())
+	{
+		for (auto &recordAction : {m_recordAccompanyAction, m_recordAction})
+		{
+			recordAction->setEnabled(false);
+			recordAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
+		}
+	}
 }
 
 QSize SongEditorWindow::sizeHint() const
