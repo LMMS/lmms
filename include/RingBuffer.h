@@ -28,7 +28,7 @@
 
 #include <cmath>
 #include <QObject>
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 #include "lmms_export.h"
 
 

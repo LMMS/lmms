@@ -35,7 +35,7 @@
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 #include "Song.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"

@@ -32,7 +32,7 @@
 #include "AutomatableModel.h"
 #include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms
 {
