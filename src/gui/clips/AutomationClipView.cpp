@@ -23,6 +23,8 @@
  */
 #include "AutomationClipView.h"
 
+#include <set>
+
 #include <QApplication>
 #include <QMouseEvent>
 #include <QPainter>
@@ -192,17 +194,20 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 		m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
 		[this](){
 			const bool newState = !m_clip->getHasBeenResized();
+			std::set<Track*> journaledTracks;
 			for (auto clipv: getClickedClips())
 			{
 				AutomationClip* aClip = dynamic_cast<AutomationClip*>(clipv->getClip());
 				MidiClip* mClip = dynamic_cast<MidiClip*>(clipv->getClip());
 				if (aClip)
 				{
+					if (journaledTracks.insert(aClip->getTrack()).second) { aClip->getTrack()->addJournalCheckPoint(); }
 					aClip->setHasBeenResized(newState);
 					aClip->updateLength();
 				}
 				else if (mClip)
 				{
+					if (journaledTracks.insert(mClip->getTrack()).second) { mClip->getTrack()->addJournalCheckPoint(); }
 					mClip->setHasBeenResized(newState);
 					mClip->updateLength();
 				}
