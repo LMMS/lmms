@@ -1099,10 +1099,11 @@ void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 	QString fileManager = getDefaultFileManager();
 
 	if (fileManager.isEmpty()) {
-		QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));
 		return;
 	}
 
+	// If the file manager supports --select, use it. Otherwise, open the directory.
 	if (supportsSelectOption(fileManager)) {
 		QProcess::startDetached(fileManager, {"--select", path});
 	} else {
