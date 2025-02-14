@@ -217,7 +217,8 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
-		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
+		auto sClip = static_cast<SampleClip*>(getTrack()->addNewClip());
+		sClip->movePosition(clipPos);
 		if (sClip) { sClip->setSampleFile(value); }
 	}
 }

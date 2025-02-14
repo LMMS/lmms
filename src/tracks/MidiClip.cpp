@@ -39,17 +39,11 @@
 namespace lmms
 {
 
-MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
-	Clip( _instrument_track ),
-	m_instrumentTrack( _instrument_track ),
+MidiClip::MidiClip() :
+	Clip(),
 	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	if (_instrument_track->trackContainer()	== Engine::patternStore())
-	{
-		resizeToFirstTrack();
-	}
-	init();
 	setAutoResize( true );
 }
 
@@ -57,8 +51,7 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 
 
 MidiClip::MidiClip( const MidiClip& other ) :
-	Clip( other.m_instrumentTrack ),
-	m_instrumentTrack( other.m_instrumentTrack ),
+	Clip(),
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
@@ -67,19 +60,18 @@ MidiClip::MidiClip( const MidiClip& other ) :
 		m_notes.push_back(new Note(*note));
 	}
 
-	init();
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
+	setAutoResize(true);
+}
 
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
+void MidiClip::onAddedToTrack(Track* track)
+{
+	if (track->trackContainer() == Engine::patternStore()) { resizeToFirstTrack(); }
+
+	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)), this, SLOT(changeTimeSignature()));
+	saveJournallingState(false);
+
+	updateLength();
+	restoreJournallingState();
 }
 
 
@@ -102,14 +94,14 @@ void MidiClip::resizeToFirstTrack()
 {
 	// Resize this track to be the same as existing tracks in the pattern
 	const TrackContainer::TrackList & tracks =
-		m_instrumentTrack->trackContainer()->tracks();
+		getTrack()->trackContainer()->tracks();
 	for (const auto& track : tracks)
 	{
 		if (track->type() == Track::Type::Instrument)
 		{
-			if (track != m_instrumentTrack)
+			if (track != getTrack())
 			{
-				const auto& instrumentTrackClips = m_instrumentTrack->getClips();
+				const auto& instrumentTrackClips = getTrack()->getClips();
 				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
 				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
 					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
@@ -119,22 +111,6 @@ void MidiClip::resizeToFirstTrack()
 		}
 	}
 }
-
-
-
-
-void MidiClip::init()
-{
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
-	updateLength();
-	restoreJournallingState();
-}
-
-
-
 
 void MidiClip::updateLength()
 {
@@ -472,8 +448,8 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	auto& clips = m_instrumentTrack->getClips();
-	int clipNum = m_instrumentTrack->getClipNum(this) + offset;
+	auto clips = getTrack()->getClips();
+	int clipNum = getTrack()->getClipNum(this) + offset;
 	if (clipNum < 0 || static_cast<size_t>(clipNum) >= clips.size()) { return nullptr; }
 	return dynamic_cast<MidiClip*>(clips[clipNum]);
 }
@@ -595,6 +571,5 @@ void MidiClip::changeTimeSignature()
 				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
 }
-
 
 } // namespace lmms

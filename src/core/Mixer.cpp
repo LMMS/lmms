@@ -293,8 +293,8 @@ void Mixer::deleteChannel( int index )
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
 
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	auto songTracks = Engine::getSong()->tracks();
+	auto patternStoreTracks = Engine::patternStore()->tracks();
 	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
 	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
@@ -854,8 +854,8 @@ bool Mixer::isChannelInUse(int index)
 	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
 	TrackContainer::TrackList tracks;
 
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	auto songTracks = Engine::getSong()->tracks();
+	auto patternStoreTracks = Engine::patternStore()->tracks();
 	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
 	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 

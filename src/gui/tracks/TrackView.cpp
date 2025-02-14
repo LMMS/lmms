@@ -88,8 +88,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	setAcceptDrops( true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 
+	connect(m_track, &QObject::destroyed, this, &TrackView::close);
 
-	connect( m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
 	connect( m_track,
 		SIGNAL(clipAdded(lmms::Clip*)),
 			this, SLOT(createClipView(lmms::Clip*)),
@@ -109,7 +109,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
 
 	// create views for already existing clips
-	for (const auto& clip : m_track->m_clips)
+	for (const auto& clip : m_track->getClips())
 	{
 		createClipView(clip);
 	}
@@ -195,7 +195,7 @@ void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
 	Q_ASSERT( m_track != nullptr );
-	connect( m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
+	connect(m_track, &QObject::destroyed, this, &TrackView::close);
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
 	ModelView::modelChanged();

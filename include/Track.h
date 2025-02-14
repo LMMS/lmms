@@ -25,23 +25,19 @@
 #ifndef LMMS_TRACK_H
 #define LMMS_TRACK_H
 
-#include <vector>
-
 #include <QColor>
-
-#include "AutomatableModel.h"
-#include "JournallingObject.h"
-#include "lmms_basics.h"
 #include <optional>
 
+#include "AutomatableModel.h"
+#include "Clip.h"
+#include "JournallingObject.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {
 
 class TimePos;
 class TrackContainer;
-class Clip;
-
 
 namespace gui
 {
@@ -70,8 +66,6 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	using clipVector = std::vector<Clip*>;
-
 	enum class Type
 	{
 		Instrument,
@@ -84,14 +78,9 @@ public:
 		Count
 	} ;
 
-	Track( Type type, TrackContainer * tc );
-	~Track() override;
+	Track(Type type);
 
-	static Track * create( Type tt, TrackContainer * tc );
-	static Track * create( const QDomElement & element,
-							TrackContainer * tc );
 	Track * clone();
-
 
 	// pure virtual functions
 	Type type() const
@@ -102,13 +91,11 @@ public:
 	virtual bool play( const TimePos & start, const fpp_t frames,
 						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
-
-
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
-	virtual Clip * createClip( const TimePos & pos ) = 0;
-
+	virtual std::unique_ptr<Clip> createClip() = 0;
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
+	virtual void onAddedToTrackContainer(TrackContainer* trackContainer) {}
 
 	// Saving and loading of presets which do not necessarily contain all the track information
 	void savePreset(QDomDocument & doc, QDomElement & element);
@@ -118,22 +105,16 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	// -- for usage by Clip only ---------------
-	Clip * addClip( Clip * clip );
-	void removeClip( Clip * clip );
-	// -------------------------------------------------------
+	Clip* addNewClip();
+	void removeClip(Clip* clip);
 	void deleteClips();
 
 	int numOfClips();
 	auto getClip(std::size_t clipNum) -> Clip*;
 	int getClipNum(const Clip* clip );
 
-	const clipVector & getClips() const
-	{
-		return m_clips;
-	}
-	void getClipsInRange( clipVector & clipV, const TimePos & start,
-							const TimePos & end );
+	std::vector<Clip*> getClips() const;
+	std::vector<Clip*> getClipsInRange(const TimePos& start, const TimePos& end);
 	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
 	void createClipsForPattern(int pattern);
@@ -149,6 +130,8 @@ public:
 	{
 		return m_trackContainer;
 	}
+
+	void setTrackContainer(TrackContainer* trackContainer) { m_trackContainer = trackContainer; }
 
 	// name-stuff
 	virtual const QString & name() const
@@ -224,7 +207,7 @@ private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
-	clipVector m_clips;
+	std::vector<std::unique_ptr<Clip>> m_clips;
 
 	QMutex m_processingLock;
 	
@@ -234,7 +217,6 @@ private:
 
 
 signals:
-	void destroyedTrack();
 	void nameChanged();
 	void clipAdded( lmms::Clip * );
 	void colorChanged();

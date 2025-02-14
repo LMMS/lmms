@@ -28,8 +28,12 @@
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
+#include <iostream>
 
 #include "AutomationClip.h"
+#include "AutomationTrack.h"
+#include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "embed.h"
 #include "TrackContainer.h"
 #include "PatternClip.h"
@@ -48,34 +52,19 @@ namespace lmms
 TrackContainer::TrackContainer() :
 	Model( nullptr ),
 	JournallingObject(),
-	m_tracksMutex(),
 	m_tracks()
 {
 }
-
-
-
-
-TrackContainer::~TrackContainer()
-{
-	clearAllTracks();
-}
-
-
-
 
 void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( classNodeName() );
 	_this.setAttribute( "type", nodeName() );
 
-	// save settings of each track
-	m_tracksMutex.lockForRead();
 	for (const auto& track : m_tracks)
 	{
 		track->saveState(_doc, _this);
 	}
-	m_tracksMutex.unlock();
 }
 
 
@@ -138,7 +127,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
 			}
-			Track::create( node.toElement(), this );
+			addNewTrack(node.toElement());
 		}
 		node = node.nextSibling();
 	}
@@ -153,58 +142,61 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	}
 }
 
-
-
-
-int TrackContainer::countTracks( Track::Type _tt ) const
+Track* TrackContainer::addTrack(std::unique_ptr<Track> track)
 {
-	int cnt = 0;
-	m_tracksMutex.lockForRead();
-	for (const auto& track : m_tracks)
-	{
-		if (track->type() == _tt || _tt == Track::Type::Count)
-		{
-			++cnt;
-		}
-	}
-	m_tracksMutex.unlock();
-	return( cnt );
+	m_tracks.emplace_back(std::move(track));
+
+	const auto addedTrack = m_tracks.back().get();
+	addedTrack->setTrackContainer(this);
+	addedTrack->onAddedToTrackContainer(this);
+
+	emit trackAdded(addedTrack);
+	return addedTrack;
 }
 
-
-
-
-void TrackContainer::addTrack( Track * _track )
+Track* TrackContainer::addNewTrack(const QDomElement& element)
 {
-	if( _track->type() != Track::Type::HiddenAutomation )
+	const auto trackType = static_cast<Track::Type>(element.attribute("type").toInt());
+	auto track = static_cast<Track*>(nullptr);
+
+	switch (trackType)
 	{
-		_track->lock();
-		m_tracksMutex.lockForWrite();
-		m_tracks.push_back( _track );
-		m_tracksMutex.unlock();
-		_track->unlock();
-		emit trackAdded( _track );
+	case Track::Type::Instrument:
+		track = addNewTrack<InstrumentTrack>();
+		break;
+	case Track::Type::Pattern:
+		track = addNewTrack<PatternTrack>();
+		break;
+	case Track::Type::Sample:
+		track = addNewTrack<SampleTrack>();
+		break;
+	case Track::Type::HiddenAutomation:
+		[[fallthrough]];
+	case Track::Type::Automation:
+		track = addNewTrack<AutomationTrack>();
+		break;
+	default:
+		std::cerr << "TrackContainer::addTrack - unimplemented type\n";
+		return nullptr;
 	}
+
+	track->restoreState(element);
+	return track;
 }
-
-
-
 
 void TrackContainer::removeTrack( Track * _track )
 {
-	// need a read locker to ensure that m_tracks doesn't change after reading index.
-	//   After checking that index != -1, we need to upgrade the lock to a write locker before changing m_tracks.
-	//   But since Qt offers no function to promote a read lock to a write lock, we must start with the write locker.
-	QWriteLocker lockTracksAccess(&m_tracksMutex);
-	auto it = std::find(m_tracks.begin(), m_tracks.end(), _track);
+	const auto it = std::find_if(m_tracks.begin(), m_tracks.end(), [&](auto& x) { return x.get() == _track; });
 	if (it != m_tracks.end())
 	{
 		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
 		if (_track->isSolo()) {
 			_track->setSolo(false);
 		}
+
+		const auto ptr = it->release();
 		m_tracks.erase(it);
-		lockTracksAccess.unlock();
+		it->get_deleter()(ptr);
 
 		if( Engine::getSong() )
 		{
@@ -213,27 +205,17 @@ void TrackContainer::removeTrack( Track * _track )
 	}
 }
 
-
-
-
-void TrackContainer::updateAfterTrackAdd()
-{
-}
-
-
-
-
 void TrackContainer::clearAllTracks()
 {
-	//m_tracksMutex.lockForWrite();
-	while (!m_tracks.empty())
-	{
-		delete m_tracks.front();
-	}
-	//m_tracksMutex.unlock();
+	m_tracks.clear();
 }
 
-
+std::vector<Track*> TrackContainer::tracks() const
+{
+	auto tracks = std::vector<Track*>(m_tracks.size());
+	std::transform(m_tracks.begin(), m_tracks.end(), tracks.begin(), [](auto& x) { return x.get(); });
+	return tracks;
+}
 
 
 bool TrackContainer::isEmpty() const
@@ -258,7 +240,7 @@ AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int clipNum) c
 
 AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int clipNum)
 {
-	Track::clipVector clips;
+	auto clips = std::vector<Clip*>{};
 
 	for (Track* track: tracks)
 	{
@@ -272,7 +254,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		case Track::Type::HiddenAutomation:
 		case Track::Type::Pattern:
 			if (clipNum < 0) {
-				track->getClipsInRange(clips, 0, time);
+				clips = track->getClipsInRange(0, time);
 			} else {
 				Q_ASSERT(track->numOfClips() > clipNum);
 				clips.push_back(track->getClip(clipNum));
