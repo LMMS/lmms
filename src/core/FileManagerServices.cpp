@@ -31,7 +31,6 @@ namespace lmms {
 void FileManagerServices::select(const QFileInfo item)
 {
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
-	QString directory = QDir::toNativeSeparators(item.canonicalFilePath());
 
 #ifdef _WIN32
 	// Windows
