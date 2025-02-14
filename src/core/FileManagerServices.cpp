@@ -1,5 +1,5 @@
 /*
-* FileManagerServices.cpp - Helper file for cross platform file management
+ * FileManagerServices.cpp - Helper file for cross platform file management
  *
  * Copyright (c) 2025 Andrew Wiltshire
  *
@@ -22,26 +22,26 @@
  *
  */
 
-#include <QProcess>
-#include <QDir>
-
 #include "FileManagerServices.h"
 
+#include <QDir>
+#include <QProcess>
+
 namespace lmms {
-void FileManagerServices::select(const QFileInfo item) {
+void FileManagerServices::select(const QFileInfo item)
+{
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QString directory = QDir::toNativeSeparators(item.canonicalFilePath());
 
 #ifdef _WIN32
-   // Windows
+	// Windows
 	QStringList param;
-	if (!item.isDir())
-		param += QLatin1String("/select,");
+	if (!item.isDir()) param += QLatin1String("/select,");
 	param += path;
 	QProcess::startDetached("explorer", param);
 
 #elif __APPLE__
-   // macOS
+	// macOS
 	QProcess::startDetached("open", {"-R", path});
 #else
 	// Linux, BSD and other *nix systems
@@ -52,7 +52,8 @@ void FileManagerServices::select(const QFileInfo item) {
 }
 
 #if !defined(_WIN32) && !defined(__APPLE__)
-bool FileManagerServices::supportsSelectOption(const QString &fileManager) {
+bool FileManagerServices::supportsSelectOption(const QString& fileManager)
+{
 	QProcess process;
 	process.start(fileManager, {"--help"});
 	process.waitForFinished();
@@ -61,26 +62,27 @@ bool FileManagerServices::supportsSelectOption(const QString &fileManager) {
 	return output.contains("--select", Qt::CaseInsensitive);
 }
 
-QString FileManagerServices::getDefaultFileManager() {
+QString FileManagerServices::getDefaultFileManager()
+{
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 	process.waitForFinished();
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
 
-	if (fileManager.isEmpty()) {
+	if (fileManager.isEmpty())
+	{
 		fileManager = qgetenv("FILE_MANAGER");
-		if (fileManager.isEmpty()) {
-			fileManager = qgetenv("XDG_FILE_MANAGER");
-		}
+		if (fileManager.isEmpty()) { fileManager = qgetenv("XDG_FILE_MANAGER"); }
 	}
 
 	return fileManager;
 }
 
-static bool canSelect() {
+static bool canSelect()
+{
 	return supportsSelectOption(getDefaultFileManager());
 }
 #endif
 
-} // lmms
+} // namespace lmms

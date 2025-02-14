@@ -1,5 +1,5 @@
 /*
-* FileManagerServices.h - include file for FileManagerServices
+ * FileManagerServices.h - include file for FileManagerServices
  *
  * Copyright (c) 2025 Andrew Wiltshire
  *
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef LLMS_CORE_FILEMANAGER_SERVICES_H
 #define LLMS_CORE_FILEMANAGER_SERVICES_H
 #include <QFileInfo>
@@ -30,7 +29,8 @@
 
 namespace lmms {
 
-class FileManagerServices {
+class FileManagerServices
+{
 public:
 	static void select(QFileInfo directoryPath);
 #if !defined(_WIN32) && !defined(__APPLE__)
@@ -42,10 +42,9 @@ public:
 
 protected:
 #if !defined(_WIN32) && defined(__APPLE__)
-	static bool supportsSelectOption(const QString &fileManager);
+	static bool supportsSelectOption(const QString& fileManager);
 #endif
-
 };
 
-}
+} // namespace lmms
 #endif // LLMS_CORE_FILEMANAGER_SERVICES_H
