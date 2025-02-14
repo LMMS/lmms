@@ -24,6 +24,7 @@
  */
 
 #include "Bitcrush.h"
+#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -97,7 +98,7 @@ inline float BitcrushEffect::depthCrush( float in )
 
 inline float BitcrushEffect::noise( float amt )
 {
-	return fastRandf( amt * 2.0f ) - amt;
+	return fastRand(-amt, +amt);
 }
 
 Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)

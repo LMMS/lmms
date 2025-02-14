@@ -29,6 +29,7 @@
 #include "AutomationNode.h"
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
+#include "KeyboardShortcuts.h"
 #include "LocaleHelper.h"
 #include "Note.h"
 #include "PatternStore.h"
@@ -647,8 +648,7 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 		float m1 = OUTTAN(v) * numValues * m_tension;
 		float m2 = INTAN(v + 1) * numValues * m_tension;
 
-		auto t2 = pow(t, 2);
-		auto t3 = pow(t, 3);
+		auto t2 = t * t, t3 = t2 * t;
 		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v)
 			+ (t3 - 2 * t2 + t) * m1
 			+ (-2 * t3 + 3 * t2) * INVAL(v + 1)
@@ -953,7 +953,7 @@ QString AutomationClip::name() const
 	{
 		return m_objects.front()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_COPY_KEY);
 }
 
 

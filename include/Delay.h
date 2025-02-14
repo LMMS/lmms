@@ -26,9 +26,9 @@
 #ifndef LMMS_DELAY_H
 #define LMMS_DELAY_H
 
+#include <cmath>
+
 #include "lmms_basics.h"
-#include "lmms_math.h"
-#include "interpolation.h"
 
 namespace lmms
 {
@@ -114,7 +114,7 @@ public:
 		int readPos = m_position - m_delay;
 		if( readPos < 0 ) { readPos += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos][ch], m_buffer[( readPos + 1 ) % m_size][ch], m_fraction );
+		const double y = std::lerp(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction);
 		
 		++m_position %= m_size;
 		
@@ -185,7 +185,7 @@ class CombFeedfwd
 		int readPos = m_position - m_delay;
 		if( readPos < 0 ) { readPos += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos][ch], m_buffer[( readPos + 1 ) % m_size][ch], m_fraction ) + in * m_gain;
+		const double y = std::lerp(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction) + in * m_gain;
 		
 		++m_position %= m_size;
 		
@@ -262,8 +262,8 @@ class CombFeedbackDualtap
 		int readPos2 = m_position - m_delay2;
 		if( readPos2 < 0 ) { readPos2 += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos1][ch], m_buffer[( readPos1 + 1 ) % m_size][ch], m_fraction1 ) + 
-			linearInterpolate( m_buffer[readPos2][ch], m_buffer[( readPos2 + 1 ) % m_size][ch], m_fraction2 );
+		const double y = std::lerp(m_buffer[readPos1][ch], m_buffer[(readPos1 + 1) % m_size][ch], m_fraction1)
+			+ std::lerp(m_buffer[readPos2][ch], m_buffer[(readPos2 + 1) % m_size][ch], m_fraction2);
 		
 		++m_position %= m_size;
 		
@@ -337,7 +337,7 @@ public:
 		int readPos = m_position - m_delay;
 		if( readPos < 0 ) { readPos += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos][ch], m_buffer[( readPos + 1 ) % m_size][ch], m_fraction ) + in * -m_gain;
+		const double y = std::lerp(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction) + in * -m_gain;
 		const double x = in + m_gain * y;
 		
 		++m_position %= m_size;

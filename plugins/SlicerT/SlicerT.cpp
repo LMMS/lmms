@@ -34,7 +34,7 @@
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
-#include "lmms_constants.h"
+#include "interpolation.h"
 #include "plugin_export.h"
 
 namespace lmms {
@@ -183,7 +183,7 @@ void SlicerT::findSlices()
 	for (auto i = std::size_t{0}; i < singleChannel.size(); i++)
 	{
 		singleChannel[i] /= maxMag;
-		if (sign(lastValue) != sign(singleChannel[i]))
+		if ((lastValue >= 0) != (singleChannel[i] >= 0))
 		{
 			zeroCrossings.push_back(i);
 			lastValue = singleChannel[i];

@@ -71,7 +71,7 @@ bool isSilent( const SampleFrame* src, int frames )
 
 	for( int i = 0; i < frames; ++i )
 	{
-		if( fabsf( src[i][0] ) >= silenceThreshold || fabsf( src[i][1] ) >= silenceThreshold )
+		if (std::abs(src[i][0]) >= silenceThreshold || std::abs(src[i][1]) >= silenceThreshold)
 		{
 			return false;
 		}
