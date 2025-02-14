@@ -176,8 +176,7 @@ float DrumSynth::waveform(float ph, int form)
 	// sine^2
 	if (form == 1) { return std::abs(2.f * std::sin(0.5f * ph)) - 1.f; }
 	// sawtooth with range [0, 1], used to generate triangle, sawtooth, and square
-	auto ph_tau = ph / numbers::tau_v<float>;
-	auto saw01 = ph_tau - std::floor(ph_tau);
+	auto saw01 = absFraction(ph / (2 * std::numbers::pi_v<float>));
 	// triangle
 	if (form == 2) { return 1.f - 4.f * std::abs(saw01 - 0.5f); }
 	// sawtooth
@@ -304,6 +303,7 @@ float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float 
 
 int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sample_rate_t Fs)
 {
+	using namespace std::numbers;
 	// input file
 	char sec[32];
 	char ver[32];
@@ -429,12 +429,12 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	sliLev[0] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
 	TL = static_cast<float>(sliLev[0] * sliLev[0]) * mem_t;
 	GetEnv(1, sec, "Envelope", dsfile);
-	F1 = MasterTune * numbers::tau_v<float> * GetPrivateProfileFloat(sec, "F1", 200.0, dsfile) / Fs;
+	F1 = MasterTune * 2 * pi_v<float> * GetPrivateProfileFloat(sec, "F1", 200.0, dsfile) / Fs;
 	if (std::abs(F1) < 0.001f)
 	{
 		F1 = 0.001f; // to prevent overtone ratio div0
 	}
-	F2 = MasterTune * numbers::tau_v<float> * GetPrivateProfileFloat(sec, "F2", 120.0, dsfile) / Fs;
+	F2 = MasterTune * 2 * pi_v<float> * GetPrivateProfileFloat(sec, "F2", 120.0, dsfile) / Fs;
 	TDroopRate = GetPrivateProfileFloat(sec, "Droop", 0.f, dsfile);
 	if (TDroopRate > 0.f)
 	{
@@ -460,8 +460,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	GetEnv(3, sec, "Envelope1", dsfile);
 	GetEnv(4, sec, "Envelope2", dsfile);
 	OMode = GetPrivateProfileInt(sec, "Method", 2, dsfile);
-	OF1 = MasterTune * numbers::tau_v<float> * GetPrivateProfileFloat(sec, "F1", 200.0, dsfile) / Fs;
-	OF2 = MasterTune * numbers::tau_v<float> * GetPrivateProfileFloat(sec, "F2", 120.0, dsfile) / Fs;
+	OF1 = MasterTune * 2 * pi_v<float> * GetPrivateProfileFloat(sec, "F1", 200.0, dsfile) / Fs;
+	OF2 = MasterTune * 2 * pi_v<float> * GetPrivateProfileFloat(sec, "F2", 120.0, dsfile) / Fs;
 	OW1 = GetPrivateProfileInt(sec, "Wave1", 0, dsfile);
 	OW2 = GetPrivateProfileInt(sec, "Wave2", 0, dsfile);
 	OBal2 = static_cast<float>(GetPrivateProfileInt(sec, "Param", 50, dsfile));
@@ -489,8 +489,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	OcQ = OcA * OcA;
 	OcF = (1.8f - 0.7f * OcQ) * 0.92f; // multiply by env 2
 	OcA *= 1.0f + 4.0f * OBal1;		   // level is a compromise!
-	Ocf1 = numbers::tau_v<float> / OF1;
-	Ocf2 = numbers::tau_v<float> / OF2;
+	Ocf1 = 2 * pi_v<float> / OF1;
+	Ocf2 = 2 * pi_v<float> / OF2;
 	for (i = 0; i < 6; i++)
 	{
 		Oc[i][0] = Oc[i][1] = Ocf1 + (Ocf2 - Ocf1) * 0.2f * static_cast<float>(i);
@@ -502,8 +502,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	BON = chkOn[3];
 	sliLev[3] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
 	BL = static_cast<float>(sliLev[3] * sliLev[3]) * mem_b;
-	BF = MasterTune * numbers::tau_v<float> * GetPrivateProfileFloat(sec, "F", 1000.0, dsfile) / Fs;
-	BPhi = numbers::tau_v<float> / 8.f;
+	BF = MasterTune * 2 * pi_v<float> * GetPrivateProfileFloat(sec, "F", 1000.0, dsfile) / Fs;
+	BPhi = pi_v<float> / 4.f;
 	GetEnv(5, sec, "Envelope", dsfile);
 	BFStep = GetPrivateProfileInt(sec, "dF", 50, dsfile);
 	BQ = static_cast<float>(BFStep);
@@ -515,8 +515,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	BON2 = chkOn[4];
 	sliLev[4] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
 	BL2 = static_cast<float>(sliLev[4] * sliLev[4]) * mem_b;
-	BF2 = MasterTune * numbers::tau_v<float> * GetPrivateProfileFloat(sec, "F", 1000.0, dsfile) / Fs;
-	BPhi2 = numbers::tau_v<float> / 8.f;
+	BF2 = MasterTune * 2 * pi_v<float> * GetPrivateProfileFloat(sec, "F", 1000.0, dsfile) / Fs;
+	BPhi2 = pi_v<float> / 4.f;
 	GetEnv(6, sec, "Envelope", dsfile);
 	BFStep2 = GetPrivateProfileInt(sec, "dF", 50, dsfile);
 	BQ2 = static_cast<float>(BFStep2);
@@ -662,7 +662,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 					UpdateEnv(1, t);
 				}
 				Tphi = Tphi + phi[totmp];
-				DF[totmp] += TL * envData[1][ENV] * std::sin(std::fmod(Tphi, numbers::tau_v<float>)); // overflow?
+				DF[totmp] += TL * envData[1][ENV] * std::sin(Tphi); // overflow?
 			}
 			if (t >= envData[1][MAX])
 			{
@@ -695,7 +695,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				BPhi = BPhi + BF + BQ * BdF;
 				botmp = t - tpos;
-				DF[botmp] = DF[botmp] + std::cos(std::fmod(BPhi, numbers::tau_v<float>)) * envData[5][ENV] * BL;
+				DF[botmp] = DF[botmp] + std::cos(BPhi) * envData[5][ENV] * BL;
 			}
 			if (t >= envData[5][MAX])
 			{
@@ -721,7 +721,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				BPhi2 = BPhi2 + BF2 + BQ2 * BdF2;
 				botmp = t - tpos;
-				DF[botmp] = DF[botmp] + std::cos(std::fmod(BPhi2, numbers::tau_v<float>)) * envData[6][ENV] * BL2;
+				DF[botmp] = DF[botmp] + std::cos(BPhi2) * envData[6][ENV] * BL2;
 			}
 			if (t >= envData[6][MAX])
 			{

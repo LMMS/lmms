@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 
@@ -155,18 +156,15 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			double randThing = fast_rand() * static_cast<double>(FAST_RAND_RATIO) * 2. - 1.;
+			auto randThing = fastRand<double>(-1.0, +1.0);
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
 			std::array<float, 2> sprayResult = {0, 0};
 			if (spray > 0)
 			{
-				sprayResult[0] = fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate;
-				sprayResult[1] = linearInterpolate(
-					sprayResult[0],
-					fast_rand() * FAST_RAND_RATIO * spray * m_sampleRate,
-					spraySpread);
+				sprayResult[0] = fastRand(spray * m_sampleRate);
+				sprayResult[1] = std::lerp(sprayResult[0], fastRand(spray * m_sampleRate), spraySpread);
 			}
 			
 			std::array<int, 2> readPoint;
@@ -271,7 +269,7 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_grainCount = 0;
 	m_grains.reserve(8);// arbitrary
 	
-	m_dcCoeff = std::exp(-numbers::tau_v<float> * DcRemovalHz / m_sampleRate);
+	m_dcCoeff = std::exp(-2 * std::numbers::pi_v<float> * DcRemovalHz / m_sampleRate);
 
 	const double pitch = m_granularpitchshifterControls.m_pitchModel.value() * (1. / 12.);
 	const double pitchSpread = m_granularpitchshifterControls.m_pitchSpreadModel.value() * (1. / 24.);
