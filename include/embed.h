@@ -32,6 +32,7 @@
 #include <QString>
 
 #include "lmms_export.h"
+#include "plugin.h" // for the stringify macro
 
 
 namespace lmms {
@@ -78,10 +79,6 @@ private:
 };
 
 #ifdef PLUGIN_NAME
-
-#ifndef LMMS_STRINGIFY
-#define LMMS_STRINGIFY(s) #s // a macro used to stringify the plugin name
-#endif // LMMS_STRINGIFY
 
 class PluginPixmapLoader : public PixmapLoader
 {

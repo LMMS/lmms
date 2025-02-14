@@ -31,9 +31,8 @@
 #include "JournallingObject.h"
 #include "Model.h"
 
-#ifndef LMMS_STRINGIFY
-#define LMMS_STRINGIFY(s) #s // a macro used to stringify the plugin name
-#endif // LMMS_STRINGIFY
+#define LMMS_STRINGIFY(PN) LMMS_STR(PN) // a macro used to stringify the plugin name
+#define LMMS_STR(s) #s
 
 class QWidget;
 
