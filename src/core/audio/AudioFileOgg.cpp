@@ -43,7 +43,7 @@ AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings, const ch_cnt_t 
 {
 	vorbis_info_init(&m_vi);
 
-	const auto bitrate = outputSettings.getBitRateSettings().getBitRate();
+	const auto bitrate = outputSettings.bitrate();
 	static constexpr auto maxBitrate = 320;
 
 	if (vorbis_encode_init_vbr(&m_vi, channels, sampleRate(), static_cast<float>(bitrate) / maxBitrate))

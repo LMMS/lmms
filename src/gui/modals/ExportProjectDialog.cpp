@@ -159,12 +159,11 @@ void ExportProjectDialog::startExport()
 	const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
-	OutputSettings::BitRateSettings bitRateSettings(bitrates[bitrateCB->currentIndex()]);
-	OutputSettings os = OutputSettings(
-			samplerates[ samplerateCB->currentIndex() ],
-			bitRateSettings,
-			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
-			mapToStereoMode(stereoModeComboBox->currentIndex()) );
+	const auto bitrate = bitrates[bitrateCB->currentIndex()];
+
+	OutputSettings os = OutputSettings(samplerates[samplerateCB->currentIndex()], bitrate,
+		static_cast<OutputSettings::BitDepth>(depthCB->currentIndex()),
+		mapToStereoMode(stereoModeComboBox->currentIndex()));
 
 	if (compressionWidget->isVisible())
 	{
