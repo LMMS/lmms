@@ -114,7 +114,7 @@ struct ERect
 #endif
 
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclaration.h"
 #include "Midi.h"
 #include "communication.h"
 #include "IoHelper.h"

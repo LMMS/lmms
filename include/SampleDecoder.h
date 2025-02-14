@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclaration.h"
 #include "SampleFrame.h"
 
 namespace lmms {

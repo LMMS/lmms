@@ -33,7 +33,7 @@
 #include <QRgb>
 #include <vector>
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclaration.h"
 
 
 namespace lmms

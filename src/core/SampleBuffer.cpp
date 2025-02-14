@@ -27,7 +27,7 @@
 
 #include "PathUtil.h"
 #include "SampleDecoder.h"
-#include "lmms_basics.h"
+#include "LmmsTypeDeclaration.h"
 
 namespace lmms {
 

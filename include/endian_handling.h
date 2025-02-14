@@ -27,7 +27,7 @@
 
 #include <QSysInfo>
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclaration.h"
 
 
 namespace lmms
