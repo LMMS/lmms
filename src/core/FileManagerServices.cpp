@@ -67,8 +67,7 @@ QString FileManagerServices::getDefaultFileManager()
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 	process.waitForFinished();
 
-	QString output = QString::fromUtf8(process.readAllStandardOutput() + process.readAllStandardError());
-
+	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
 
 	if (fileManager.endsWith(".desktop")) {
 		fileManager.chop(8);

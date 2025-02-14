@@ -32,17 +32,17 @@ namespace lmms {
 class FileManagerServices
 {
 public:
-	static void select(QFileInfo directoryPath);
+	[[maybe_unused]] static void select(QFileInfo directoryPath);
 
 #if defined(_WIN32)
-	static QString getDefaultFileManager() { return QString("explorer"); }
-	static bool canSelect() { return true; }
+	[[maybe_unused]] static QString getDefaultFileManager() { return QString("explorer"); }
+	[[maybe_unused]] static bool canSelect() { return true; }
 #elif defined(__APPLE__)
-	static QString getDefaultFileManager() { return QString("finder"); };
-	static bool canSelect() { return true; }
+	[[maybe_unused]] static QString getDefaultFileManager() { return QString("finder"); };
+	[[maybe_unused]] static bool canSelect() { return true; }
 #else
-	static bool canSelect();
-	static QString getDefaultFileManager();
+	[[maybe_unused]] static QString getDefaultFileManager();
+	[[maybe_unused]] static bool canSelect();
 #endif
 
 protected:
