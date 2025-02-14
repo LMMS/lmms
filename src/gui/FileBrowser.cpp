@@ -68,9 +68,17 @@
 #include "TextFloat.h"
 #include "ThreadPool.h"
 #include "embed.h"
+
+#if !defined(_WIN32) && !defined(__APPLE__)
+#include <QHash>
+#endif
+
 namespace lmms::gui
 {
 
+#if !defined(_WIN32) && !defined(__APPLE__)
+QHash<QString, bool> selectOptionCache;
+#endif
 
 enum TreeWidgetItemTypes
 {
@@ -1022,6 +1030,51 @@ void FileBrowserTreeWidget::openDirectory(Directory* directory) {
    QDesktopServices::openUrl(QUrl::fromLocalFile(directory->fullName()));
 }
 
+#if !defined(_WIN32) && !defined(__APPLE__)
+
+bool supportsSelectOption(const QString &fileManager) {
+	if (selectOptionCache.contains(fileManager)) {
+		return selectOptionCache[fileManager];
+	}
+
+	QProcess process;
+	process.start(fileManager, {"--help"});
+
+	// Ensure we don't block forever
+	if (!process.waitForFinished(1000)) {
+		selectOptionCache[fileManager] = false;
+		return false;
+	}
+
+	// Capture both stdout and stderr (some apps print help to stderr)
+	QString output = QString::fromUtf8(process.readAllStandardOutput() + process.readAllStandardError());
+
+	// Some file managers return non-zero exit codes for --help, so we ignore it
+	bool supportsSelect = output.contains("--select", Qt::CaseInsensitive);
+
+	selectOptionCache[fileManager] = supportsSelect; // Cache the result
+	return supportsSelect;
+}
+
+
+static QString getDefaultFileManager() {
+	QProcess process;
+	process.start("xdg-mime", {"query", "default", "inode/directory"});
+	process.waitForFinished();
+
+	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+
+	if (fileManager.isEmpty()) {
+		fileManager = qgetenv("FILE_MANAGER");
+		if (fileManager.isEmpty()) {
+			fileManager = qgetenv("XDG_FILE_MANAGER");
+		}
+	}
+
+	return fileManager;
+}
+#endif
+
 void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
    QFileInfo fileInfo(item->fullName());
@@ -1043,47 +1096,18 @@ void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 	// Linux & BSD
 	// there are a lot of potential file managers on these systems so we need to figure out what to use.
 
-	// Check user preferences from environment variable
-	QString fileManager = qgetenv("FILE_MANAGER");
+	QString fileManager = getDefaultFileManager();
+
 	if (fileManager.isEmpty()) {
-		fileManager = qgetenv("XDG_FILE_MANAGER");	// not actually in the freedesktop spec but is sometimes used
+		QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+		return;
 	}
 
-   	// If no preference is set, check the desktop environment
-   	if (fileManager.isEmpty()) {
-   		QString desktopEnv = qgetenv("XDG_CURRENT_DESKTOP");
-   		if (desktopEnv.isEmpty()) {
-   			desktopEnv = qgetenv("DESKTOP_SESSION");
-   		}
-
-   		if (desktopEnv.contains("GNOME", Qt::CaseInsensitive)) {
-   			fileManager = "nautilus";
-   		} else if (desktopEnv.contains("KDE", Qt::CaseInsensitive)) {
-   			fileManager = "dolphin";
-   		} else if (desktopEnv.contains("XFCE", Qt::CaseInsensitive)) {
-   			fileManager = "thunar";
-   		} else if (desktopEnv.contains("LXDE", Qt::CaseInsensitive)) {
-   			fileManager = "pcmanfm";
-   		} else if (desktopEnv.contains("CINNAMON", Qt::CaseInsensitive)) {
-   			fileManager = "nemo";
-   		} else if (desktopEnv.contains("MATE", Qt::CaseInsensitive)) {
-   			fileManager = "caja";
-   		} else if (desktopEnv.contains("PANTHEON", Qt::CaseInsensitive)) {
-   			fileManager = "io.elementary.files";
-   		} else if (desktopEnv.contains("LXQT", Qt::CaseInsensitive)) {
-   			fileManager = "pcmanfm-qt";
-   		} else  {
-   			QDesktopServices::openUrl(QUrl::fromLocalFile(path));
-   			return;  // Exit if no suitable file manager found
-   		}
-   	}
-
-   	// Check if the file manager supports the --select option
-   	if (supportsSelectOption(fileManager)) {
-   		QProcess::startDetached(fileManager, {"--select", path});
-   	} else {
-   	    QDesktopServices::openUrl(QUrl::fromLocalFile(directory));
-   	}
+	if (supportsSelectOption(fileManager)) {
+		QProcess::startDetached(fileManager, {"--select", path});
+	} else {
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));
+	}
 #endif
 }
 
