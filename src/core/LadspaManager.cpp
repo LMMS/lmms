@@ -34,6 +34,7 @@
 #include "ConfigManager.h"
 #include "LadspaManager.h"
 #include "PluginFactory.h"
+#include "lmms_constants.h"
 
 
 namespace lmms

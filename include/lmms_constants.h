@@ -22,6 +22,8 @@
  *
  */
 
+#include "LmmsTypeDeclaration.h"
+
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
