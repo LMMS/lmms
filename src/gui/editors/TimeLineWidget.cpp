@@ -59,7 +59,6 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_begin{begin},
 	m_mode{mode}
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
 
 	setMouseTracking(true);

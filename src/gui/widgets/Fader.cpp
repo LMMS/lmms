@@ -73,7 +73,6 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	}
 
 	setWindowTitle(name);
-	setAttribute(Qt::WA_OpaquePaintEvent, false);
 	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
 	constexpr QSize minimumSize(23, 116);
 	setMinimumSize(minimumSize);
