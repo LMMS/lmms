@@ -601,77 +601,8 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	}
 }
 
-
-NotePlayHandle ** NotePlayHandleManager::s_available;
-QReadWriteLock NotePlayHandleManager::s_mutex;
-std::atomic_int NotePlayHandleManager::s_availableIndex;
-int NotePlayHandleManager::s_size;
-
-
-void NotePlayHandleManager::init()
-{
-	s_available = new NotePlayHandle*[INITIAL_NPH_CACHE];
-
-	auto n = static_cast<NotePlayHandle *>(std::malloc(sizeof(NotePlayHandle) * INITIAL_NPH_CACHE));
-
-	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
-	{
-		s_available[ i ] = n;
-		++n;
-	}
-	s_availableIndex = INITIAL_NPH_CACHE - 1;
-	s_size = INITIAL_NPH_CACHE;
-}
-
-
-NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrack,
-				const f_cnt_t offset,
-				const f_cnt_t frames,
-				const Note& noteToPlay,
-				NotePlayHandle* parent,
-				int midiEventChannel,
-				NotePlayHandle::Origin origin )
-{
-	// TODO: use some lockless data structures
-	s_mutex.lockForWrite();
-	if (s_availableIndex < 0) { extend(NPH_CACHE_INCREMENT); }
-	NotePlayHandle * nph = s_available[s_availableIndex--];
-	s_mutex.unlock();
-
-	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
-	return nph;
-}
-
-
-void NotePlayHandleManager::release( NotePlayHandle * nph )
-{
-	nph->NotePlayHandle::~NotePlayHandle();
-	s_mutex.lockForRead();
-	s_available[++s_availableIndex] = nph;
-	s_mutex.unlock();
-}
-
-
-void NotePlayHandleManager::extend( int c )
-{
-	s_size += c;
-	auto tmp = new NotePlayHandle*[s_size];
-	delete[] s_available;
-	s_available = tmp;
-
-	auto n = static_cast<NotePlayHandle *>(std::malloc(sizeof(NotePlayHandle) * c));
-
-	for( int i=0; i < c; ++i )
-	{
-		s_available[++s_availableIndex] = n;
-		++n;
-	}
-}
-
-void NotePlayHandleManager::free()
-{
-	delete[] s_available;
-}
+const size_t INITIAL_NPH_CACHE = 256;
+MemoryPool<NotePlayHandle> NotePlayHandlePool{INITIAL_NPH_CACHE};
 
 
 } // namespace lmms
