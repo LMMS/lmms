@@ -292,15 +292,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	subWin->hide();
 }
 
-void InstrumentTrackWindow::resizeEvent(QResizeEvent * event) {
-	/* m_instrumentView->resize(QSize(size().width()-1, maxHeight)); */
-	adjustTabSize(m_instrumentView);
-	adjustTabSize(m_instrumentFunctionsView);
-	adjustTabSize(m_ssView);
-	adjustTabSize(m_effectView);
-	adjustTabSize(m_midiView);
-	adjustTabSize(m_tuningView);
-}
 
 
 
@@ -468,16 +459,21 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
-
 		adjustTabSize(m_instrumentView);
+
 		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
 		// adjust window size
 		layout()->invalidate();
 		resize(sizeHint());
-		if (parentWidget())
+
+		if(m_tabWidget->minimumSize() == m_tabWidget->maximumSize())
 		{
-			parentWidget()->resize(parentWidget()->sizeHint());
+			setFixedSize(sizeHint());
+			setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 		}
+		else
+			resize(sizeHint());
+
 		update();
 		m_instrumentView->update();
 	}

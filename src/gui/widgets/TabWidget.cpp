@@ -34,6 +34,7 @@
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "QtHelpers.h"
 
 namespace lmms::gui
 {
@@ -68,12 +69,15 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 }
 
+
+
+
 void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int idx)
 {
 	// Append tab when position is not given
-	if (idx < 0/* || m_widgets.contains(idx) == true*/)
+	if (idx < 0/* || m_widgets.contains(idx)*/)
 	{
-		while(m_widgets.contains(++idx) == true)
+		while(m_widgets.contains(++idx))
 		{
 		}
 	}
@@ -85,9 +89,21 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	widgetDesc d = {w, pixmap, name, tab_width};
 	m_widgets[idx] = d;
 
-	// Position tab's window
-	if (!m_resizable)
+	// Position tab's window and update size
+	if (m_resizable)
 	{
+		// If the child has a maximum, we cannot grow larger
+		setMinMaxFromChild(*this, *w, QSize(4, m_tabbarHeight));
+
+		// Now that the size might have changed: resize all widgets
+		for (const auto& widget : m_widgets)
+		{
+			widget.w->resize(width() - 4, height() - m_tabbarHeight);
+		}
+	}
+	else
+	{
+		// Tab widget is fixed -> child must be fixed
 		w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 	}
 	w->move(2, m_tabbarHeight - 1);
@@ -197,9 +213,17 @@ void TabWidget::mousePressEvent(QMouseEvent* me)
 
 
 
-void TabWidget::resizeEvent(QResizeEvent*)
+void TabWidget::resizeEvent(QResizeEvent* ev)
 {
-	if (!m_resizable)
+	if (m_resizable)
+	{
+		for (const auto& widget : m_widgets)
+		{
+			widget.w->resize(width() - 4, height() - m_tabbarHeight);
+		}
+		QWidget::resizeEvent(ev);
+	}
+	else
 	{
 		for (const auto& widget : m_widgets)
 		{
