@@ -33,16 +33,23 @@ class FileManagerServices
 {
 public:
 	static void select(QFileInfo directoryPath);
-#if !defined(_WIN32) && !defined(__APPLE__)
+
+#if defined(_WIN32)
+	static QString getDefaultFileManager() { return QString("explorer"); }
+	static bool canSelect() { return true; }
+#else defined(__APPLE__)
+	static QString getDefaultFileManager() { return QString("finder"); };
+	static bool canSelect() { return true; }
+#else
 	static bool canSelect();
 	static QString getDefaultFileManager();
-#else
-	static bool canSelect() { return true; }
 #endif
 
 protected:
-#if !defined(_WIN32) && defined(__APPLE__)
+#if !defined(_WIN32) && !defined(__APPLE__)
 	static bool supportsSelectOption(const QString& fileManager);
+#else
+	static bool supportsSelectOption(const QString& fileManager) { return true; };
 #endif
 };
 
