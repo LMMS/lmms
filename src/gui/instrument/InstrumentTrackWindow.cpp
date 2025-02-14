@@ -175,7 +175,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
 
-	label = new QLabel(tr( "VOL"), this);
+	label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 1);
 	basicControlsLayout->setAlignment(label, labelAlignment);
