@@ -436,8 +436,8 @@ float LadspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 				if( LADSPA_IS_HINT_LOGARITHMIC
 							( hintDescriptor ) )
 				{
-					return( exp( log( portRangeHint->LowerBound ) * 0.75 +
-								 log( portRangeHint->UpperBound ) * 0.25 ) );
+					return std::exp(std::log(portRangeHint->LowerBound)
+						* 0.75 + std::log(portRangeHint->UpperBound) * 0.25);
 				}
 				else 
 				{
@@ -448,8 +448,7 @@ float LadspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 				if( LADSPA_IS_HINT_LOGARITHMIC
 						( hintDescriptor ) ) 
 				{
-					return( sqrt( portRangeHint->LowerBound
-								  * portRangeHint->UpperBound ) );
+					return std::sqrt(portRangeHint->LowerBound * portRangeHint->UpperBound);
 				}
 				else 
 				{
@@ -460,8 +459,8 @@ float LadspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 				if( LADSPA_IS_HINT_LOGARITHMIC
 						( hintDescriptor ) ) 
 				{
-					return( exp( log( portRangeHint->LowerBound ) * 0.25 +
-								 log( portRangeHint->UpperBound ) * 0.75 ) );
+					return std::exp(std::log(portRangeHint->LowerBound)
+						* 0.25 + std::log(portRangeHint->UpperBound) * 0.75);
 				}
 				else 
 				{

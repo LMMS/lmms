@@ -35,7 +35,6 @@
 #include "AutomatableModel.h"
 #include "EqCurve.h"
 #include "EqParameterWidget.h"
-#include "lmms_constants.h"
 
 
 namespace lmms::gui

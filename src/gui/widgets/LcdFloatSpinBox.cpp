@@ -42,7 +42,9 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "FontHelper.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
+#include "lmms_math.h"
 
 namespace lmms::gui
 {
@@ -109,7 +111,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 
 void LcdFloatSpinBox::update()
 {
-	const int digitValue = std::pow(10.f, m_fractionDisplay.numDigits());
+	const int digitValue = fastPow10f(m_fractionDisplay.numDigits());
 	float value = model()->value();
 	int fraction = std::abs(std::round((value - static_cast<int>(value)) * digitValue));
 	if (fraction == digitValue)
@@ -138,7 +140,7 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 	m_intStep = event->x() < m_wholeDisplay.width();
 
 	if (event->button() == Qt::LeftButton &&
-		!(event->modifiers() & Qt::ControlModifier) &&
+		!(event->modifiers() & KBD_COPY_MODIFIER) &&
 		event->y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;

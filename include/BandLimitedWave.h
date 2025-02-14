@@ -156,11 +156,11 @@ public:
 		t += 1;
 		const sample_t s3 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lookup );
 		const sample_t s4 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 1 ) % tlen );
-		const sample_t s34 = linearInterpolate( s3, s4, ip );
+		const sample_t s34 = std::lerp(s3, s4, ip);
 
 		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
 
-		return linearInterpolate( s12, s34, ip2 );
+		return std::lerp(s12, s34, ip2);
 		*/
 	};
 

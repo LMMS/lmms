@@ -342,8 +342,7 @@ void OrganicInstrument::deleteNotePluginData( NotePlayHandle * _n )
 float inline OrganicInstrument::waveshape(float in, float amount)
 {
 	float k = 2.0f * amount / ( 1.0f - amount );
-
-	return( ( 1.0f + k ) * in / ( 1.0f + k * fabs( in ) ) );
+	return (1.0f + k) * in / (1.0f + k * std::abs(in));
 }
 
 
@@ -603,12 +602,11 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuning()
 {
-	m_detuningLeft = powf( 2.0f, OrganicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
-				+ (float)m_detuneModel.value() * CENT ) /
-				Engine::audioEngine()->outputSampleRate();
-	m_detuningRight = powf( 2.0f, OrganicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
-				- (float)m_detuneModel.value() * CENT ) /
-				Engine::audioEngine()->outputSampleRate();
+	const auto harmonic = OrganicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())];
+	const auto sr = Engine::audioEngine()->outputSampleRate();
+
+	m_detuningLeft = std::exp2(harmonic + m_detuneModel.value() * CENT) / sr;
+	m_detuningRight = std::exp2(harmonic - m_detuneModel.value() * CENT) / sr;
 }
 
 
