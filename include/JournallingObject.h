@@ -27,7 +27,7 @@
 
 #include <QStack>
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 #include "SerializingObject.h"
 
 namespace lmms

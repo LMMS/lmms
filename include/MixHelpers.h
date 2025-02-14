@@ -25,7 +25,7 @@
 #ifndef LMMS_MIX_HELPERS_H
 #define LMMS_MIX_HELPERS_H
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms
 {

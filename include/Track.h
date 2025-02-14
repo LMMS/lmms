@@ -31,7 +31,7 @@
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 #include <optional>
 
 

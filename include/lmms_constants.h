@@ -22,8 +22,11 @@
  *
  */
 
+
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
+
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms
 {

@@ -36,7 +36,7 @@
 #include <cmath>
 #include <numbers>
 
-#include "lmms_basics.h"
+#include "LmmsTypeDeclarations.h"
 #include "lmms_math.h"
 
 namespace lmms
