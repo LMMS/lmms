@@ -27,11 +27,6 @@
 
 namespace lmms
 {
-
-// Prefer using `approximatelyEqual()` from lmms_math.h rather than
-// using this directly
-inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
-
 // Microtuner
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
