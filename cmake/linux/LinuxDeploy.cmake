@@ -135,6 +135,10 @@ file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
 # Inform linuxdeploy about remote plugins
 file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
 
+# Inform linuxdeploy-plugin-qt about wayland plugin
+set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
+set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
+
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS ${REMOTE_PLUGINS})
