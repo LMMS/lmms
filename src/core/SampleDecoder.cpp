@@ -37,7 +37,7 @@
 #include "AudioEngine.h"
 #include "DrumSynth.h"
 #include "Engine.h"
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms {
 

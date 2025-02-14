@@ -30,7 +30,7 @@
 
 #include "EffectChain.h"
 #include "ModelView.h"
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 class QScrollArea;
 class QVBoxLayout;

@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "Flags.h"
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 #include "PluginIssue.h"
 
 

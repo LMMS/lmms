@@ -34,7 +34,7 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 #include "lmms_export.h"
 
 namespace lmms {

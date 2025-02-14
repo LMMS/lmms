@@ -27,7 +27,7 @@
 #include <QWidget>
 
 #include "fft_helpers.h"
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms
 {

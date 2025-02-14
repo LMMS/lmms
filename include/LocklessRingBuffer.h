@@ -30,7 +30,7 @@
 
 #include <ringbuffer/ringbuffer.h>
 
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms
 {

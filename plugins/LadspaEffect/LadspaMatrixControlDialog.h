@@ -28,7 +28,7 @@
 
 #include "EffectControlDialog.h"
 
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 
 class QGridLayout;

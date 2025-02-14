@@ -29,7 +29,7 @@
 
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 namespace lmms
 {

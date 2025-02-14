@@ -22,7 +22,7 @@
  *
  */
 
-#include "LmmsTypeDeclaration.h"
+#include "LmmsTypeDeclarations.h"
 
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
