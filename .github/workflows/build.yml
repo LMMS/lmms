@@ -57,9 +57,8 @@ jobs:
             ccache-${{ github.job }}-
           path: ~/.ccache
       - name: Configure fltk
-        run: |
-          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-            -DFLTK_USE_LIBDECOR_GTK=OFF   
+        run: cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+          -DFLTK_USE_LIBDECOR_GTK=OFF    
       - name: Install fltk
         run: |
           cmake --build fltk/build
@@ -138,9 +137,8 @@ jobs:
             ccache-${{ github.job }}-
           path: ~/.ccache
       - name: Configure fltk
-        run: |
-          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-            -DFLTK_USE_LIBDECOR_GTK=OFF   
+        run: cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+          -DFLTK_USE_LIBDECOR_GTK=OFF   
       - name: Install fltk
         run: |
           cmake --build fltk/build
