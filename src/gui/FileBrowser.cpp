@@ -47,6 +47,7 @@
 #include "DataFile.h"
 #include "Engine.h"
 #include "FileBrowser.h"
+#include "FileManagerServices.h"
 #include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -69,16 +70,8 @@
 #include "ThreadPool.h"
 #include "embed.h"
 
-#if !defined(_WIN32) && !defined(__APPLE__)
-#include <QHash>
-#endif
-
 namespace lmms::gui
 {
-
-#if !defined(_WIN32) && !defined(__APPLE__)
-QHash<QString, bool> selectOptionCache;
-#endif
 
 enum TreeWidgetItemTypes
 {
@@ -1030,86 +1023,18 @@ void FileBrowserTreeWidget::openDirectory(Directory* directory) {
    QDesktopServices::openUrl(QUrl::fromLocalFile(directory->fullName()));
 }
 
-#if !defined(_WIN32) && !defined(__APPLE__)
-
-bool supportsSelectOption(const QString &fileManager) {
-	if (selectOptionCache.contains(fileManager)) {
-		return selectOptionCache[fileManager];
-	}
-
-	QProcess process;
-	process.start(fileManager, {"--help"});
-
-	// Ensure we don't block forever
-	if (!process.waitForFinished(1000)) {
-		selectOptionCache[fileManager] = false;
-		return false;
-	}
-
-	// Capture both stdout and stderr (some apps print help to stderr)
-	QString output = QString::fromUtf8(process.readAllStandardOutput() + process.readAllStandardError());
-
-	// Some file managers return non-zero exit codes for --help, so we ignore it
-	bool supportsSelect = output.contains("--select", Qt::CaseInsensitive);
-
-	selectOptionCache[fileManager] = supportsSelect; // Cache the result
-	return supportsSelect;
-}
-
-
-static QString getDefaultFileManager() {
-	QProcess process;
-	process.start("xdg-mime", {"query", "default", "inode/directory"});
-	process.waitForFinished();
-
-	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
-
-	if (fileManager.isEmpty()) {
-		fileManager = qgetenv("FILE_MANAGER");
-		if (fileManager.isEmpty()) {
-			fileManager = qgetenv("XDG_FILE_MANAGER");
-		}
-	}
-
-	return fileManager;
-}
-#endif
-
 void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
-   QFileInfo fileInfo(item->fullName());
-   QString path = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
-   QString directory = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+	QFileInfo fileInfo(item->fullName());
 
-#ifdef _WIN32
-   // Windows
-	QStringList param;
-	if (!fileInfo.isDir())
-		param += QLatin1String("/select,");
-	param += path;
-	QProcess::startDetached("explorer", param);
-
-#elif __APPLE__
-   // macOS
-	QProcess::startDetached("open", {"-R", path});
-#else
-	// Linux & BSD
-	// there are a lot of potential file managers on these systems so we need to figure out what to use.
-
-	QString fileManager = getDefaultFileManager();
-
-	if (fileManager.isEmpty()) {
-		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));
-		return;
-	}
-
-	// If the file manager supports --select, use it. Otherwise, open the directory.
-	if (supportsSelectOption(fileManager)) {
-		QProcess::startDetached(fileManager, {"--select", path});
-	} else {
+	if (FileManagerServices::canSelect())
+	{
+		FileManagerServices::select(fileInfo);
+	} else
+	{
+		QString path = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));
 	}
-#endif
 }
 
 
