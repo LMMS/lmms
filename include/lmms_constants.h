@@ -27,6 +27,8 @@
 
 namespace lmms
 {
+inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
+
 // Microtuner
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
@@ -73,6 +75,13 @@ inline constexpr auto ARANGE_LOUD_START     = -30;
 inline constexpr auto ARANGE_LOUD_END       =   0;
 inline constexpr auto ARANGE_SILENT_START   = -60;
 inline constexpr auto ARANGE_SILENT_END     = -10;
+
+inline constexpr char LADSPA_PATH_SEPERATOR =
+#ifdef LMMS_BUILD_WIN32
+';';
+#else
+':';
+#endif
 
 } // namespace lmms
 
