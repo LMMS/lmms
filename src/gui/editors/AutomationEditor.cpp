@@ -336,6 +336,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 		x += xstep;
 		m_clip->removeNode(TimePos(x));
 		m_clip->putValue( TimePos( x ), y );
+		m_clip->updateLength();
 	}
 }
 
@@ -402,6 +403,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		if (node != m_clip->getTimeMap().end())
 		{
 			m_clip->removeNode(POS(node));
+			m_clip->updateLength();
 			Engine::getSong()->setModified();
 		}
 	};
