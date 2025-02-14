@@ -189,31 +189,6 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
-	_cm->addAction(
-		m_clip->getHasBeenResized() ? embed::getIconPixmap("auto_resize") : embed::getIconPixmap("auto_resize_disable"),
-		m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
-		[this](){
-			const bool newState = !m_clip->getHasBeenResized();
-			std::set<Track*> journaledTracks;
-			for (auto clipv: getClickedClips())
-			{
-				AutomationClip* aClip = dynamic_cast<AutomationClip*>(clipv->getClip());
-				MidiClip* mClip = dynamic_cast<MidiClip*>(clipv->getClip());
-				if (aClip)
-				{
-					if (journaledTracks.insert(aClip->getTrack()).second) { aClip->getTrack()->addJournalCheckPoint(); }
-					aClip->setHasBeenResized(newState);
-					aClip->updateLength();
-				}
-				else if (mClip)
-				{
-					if (journaledTracks.insert(mClip->getTrack()).second) { mClip->getTrack()->addJournalCheckPoint(); }
-					mClip->setHasBeenResized(newState);
-					mClip->updateLength();
-				}
-			}
-		}
-	);
 	
 	if (!m_clip->m_objects.empty())
 	{

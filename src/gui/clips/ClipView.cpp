@@ -1127,6 +1127,12 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
 	contextMenu.addMenu(&colorMenu);
 
+	contextMenu.addAction(
+		m_clip->getHasBeenResized() ? embed::getIconPixmap("auto_resize") : embed::getIconPixmap("auto_resize_disable"),
+		m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
+		this, &ClipView::toggleSelectedAutoResize
+	);
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -1238,6 +1244,18 @@ void ClipView::toggleMute( QVector<ClipView *> clipvs )
 	}
 }
 
+void ClipView::toggleSelectedAutoResize()
+{
+	const bool newState = !m_clip->getHasBeenResized();
+	std::set<Track*> journaledTracks;
+	for (auto clipv: getClickedClips())
+	{
+		Clip* clip = clipv->getClip();
+		if (journaledTracks.insert(clip->getTrack()).second) { clip->getTrack()->addJournalCheckPoint(); }
+		clip->setHasBeenResized(newState);
+		clip->updateLength();
+	}
+}
 
 /*! \brief How many pixels a bar takes for this ClipView.
  *

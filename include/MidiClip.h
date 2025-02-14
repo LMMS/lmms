@@ -57,7 +57,7 @@ public:
 
 	void init();
 
-	void updateLength();
+	void updateLength() override;
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );

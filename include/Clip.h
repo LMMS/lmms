@@ -131,6 +131,7 @@ public:
 
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
+	virtual void updateLength() {};
 
 	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 

@@ -89,7 +89,7 @@ public:
 	void setTension( QString _new_tension );
 
 	TimePos timeMapLength() const;
-	void updateLength();
+	void updateLength() override;
 
 	TimePos putValue(
 		const TimePos & time,

@@ -125,6 +125,8 @@ public:
 	static void remove( QVector<ClipView *> clipvs );
 	static void toggleMute( QVector<ClipView *> clipvs );
 
+	void toggleSelectedAutoResize();
+
 	QColor getColorForDisplay( QColor );
 
 	void inline setMarkerPos(int x) { m_markerPos = x; }
