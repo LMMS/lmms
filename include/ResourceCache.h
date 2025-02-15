@@ -45,7 +45,7 @@ public:
 	};
 
 	template <typename T, typename _Enable = std::enable_if<std::is_base_of_v<Resource, T>>, typename... Args>
-	static auto fetch(const std::filesystem::path& key, Args&&... args) -> std::shared_ptr<const Resource>
+	static auto fetch(const std::filesystem::path& key, std::shared_ptr<const T> defaultValue, Args&&... args) -> std::shared_ptr<const T>
 	{
 		if (!std::filesystem::exists(key)) { return nullptr; }
 
@@ -67,16 +67,25 @@ public:
 		if (resource == nullptr)
 		{
 			if (s_resources.size() == CacheSize) { evict(); }
-			resource = std::make_shared<T>(key, std::forward<Args>(args)...);
-			return resource;
+
+			try
+			{
+				resource = std::make_shared<T>(key, std::forward<Args>(args)...);
+			}
+			catch (const std::runtime_error& error)
+			{
+				return defaultValue;
+			}
+
+			return std::static_pointer_cast<const T>(resource);
 		}
 
 		++resource->m_age;
-		return resource;
+		return std::static_pointer_cast<const T>(resource);
 	}
 
 	template <typename T, typename... Args>
-	static auto fetch(const std::string& key, Args&&... args) -> std::shared_ptr<const Resource>
+	static auto fetch(const std::string& key, std::shared_ptr<const T> defaultValue, Args&&... args) -> std::shared_ptr<const T>
 	{
 		const auto data = QByteArray::fromStdString(key);
 		const auto digest = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toStdString();
@@ -85,12 +94,21 @@ public:
 		if (resource == nullptr)
 		{
 			if (s_resources.size() == CacheSize) { evict(); }
-			resource = std::make_shared<T>(key, std::forward<Args>(args)...);
-			return resource;
+
+			try
+			{
+				resource = std::make_shared<T>(key, std::forward<Args>(args)...);
+			}
+			catch (const std::runtime_error& error)
+			{
+				return defaultValue;
+			}
+
+			return std::static_pointer_cast<const T>(resource);
 		}
 
 		++resource->m_age;
-		return resource;
+		return std::static_pointer_cast<const T>(resource);
 	}
 
 	static auto instance() -> ResourceCache&
