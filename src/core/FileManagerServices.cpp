@@ -55,7 +55,7 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 {
 	QProcess process;
 	process.start(fileManager, {"--help"});
-	process.waitForFinished();
+	process.waitForFinished(3000);
 
 	QString output = process.readAllStandardOutput() + process.readAllStandardError();
 	return output.contains("--select", Qt::CaseInsensitive);
