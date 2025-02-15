@@ -23,7 +23,6 @@
  */
  
 #include "SampleClipView.h"
-
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
@@ -33,6 +32,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
+#include "SampleFilePicker.h"
 #include "SampleLoader.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
@@ -126,7 +126,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleLoader::loadBufferFromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -183,7 +183,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = SampleFilePicker::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
@@ -193,7 +193,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		auto sampleBuffer = SampleLoader::loadBufferFromFile(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);

@@ -1,7 +1,7 @@
 /*
- * SampleLoader.h
+ * SampleFilePicker.h
  *
- * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,23 +22,19 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_LOADER_H
-#define LMMS_SAMPLE_LOADER_H
+#ifndef LMMS_GUI_SAMPLE_FILE_PICKER_H
+#define LMMS_GUI_SAMPLE_FILE_PICKER_H
 
 #include <QString>
-#include <memory>
-
-#include "SampleBuffer.h"
 #include "lmms_export.h"
 
-namespace lmms {
-class LMMS_EXPORT SampleLoader
+namespace lmms::gui {
+class LMMS_EXPORT SampleFilePicker
 {
 public:
-	static std::shared_ptr<const SampleBuffer> loadBufferFromFile(const QString& filePath);
-	static std::shared_ptr<const SampleBuffer> loadBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	static QString openAudioFile(const QString& previousFile = "");
+	static QString openWaveformFile(const QString& previousFile = "");
 };
-} // namespace lmms
+} // namespace lmms::gui
 
-#endif // LMMS_SAMPLE_LOADER_H
+#endif // LMMS_GUI_SAMPLE_FILE_PICKER_H
