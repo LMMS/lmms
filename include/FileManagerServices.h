@@ -26,6 +26,7 @@
 #define LLMS_CORE_FILEMANAGER_SERVICES_H
 #include <QFileInfo>
 #include <QString>
+#include <optional>
 
 namespace lmms {
 
@@ -36,13 +37,13 @@ public:
 
 #if defined(_WIN32)
 	[[maybe_unused]] static QString getDefaultFileManager() { return QString("explorer"); }
-	[[maybe_unused]] static bool canSelect() { return true; }
+	[[maybe_unused]] static bool canSelect(bool useCache = true) { return true; }
 #elif defined(__APPLE__)
 	[[maybe_unused]] static QString getDefaultFileManager() { return QString("open"); };
-	[[maybe_unused]] static bool canSelect() { return true; }
+	[[maybe_unused]] static bool canSelect(bool useCache = true) { return true; }
 #else
 	[[maybe_unused]] static QString getDefaultFileManager();
-	[[maybe_unused]] static bool canSelect();
+	[[maybe_unused]] static bool canSelect(bool useCache = true);
 #endif
 
 protected:
@@ -50,6 +51,13 @@ protected:
 	static bool supportsSelectOption(const QString& fileManager);
 #else
 	static bool supportsSelectOption(const QString& fileManager) { return true; };
+#endif
+
+private:
+#if !defined(_WIN32) && !defined(__APPLE__)
+	static inline std::optional<bool> cachedCanSelect;
+#else
+	static inline std::optional<bool> cachedCanSelect = true;
 #endif
 };
 

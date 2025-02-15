@@ -78,9 +78,15 @@ QString FileManagerServices::getDefaultFileManager()
 	return fileManager;
 }
 
-bool FileManagerServices::canSelect()
+bool FileManagerServices::canSelect(bool useCache)
 {
-	return supportsSelectOption(getDefaultFileManager());
+	if (useCache && cachedCanSelect.has_value()) {
+		return cachedCanSelect.value();
+	}
+
+	bool result = supportsSelectOption(getDefaultFileManager());
+	cachedCanSelect = result;
+	return result;
 }
 
 #endif
