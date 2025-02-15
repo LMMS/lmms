@@ -113,7 +113,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 void SampleClip::changeLengthToSampleLength()
 {
-	int length = m_sample.buffer()->size() / Engine::framesPerTick();
+	int length = m_sample.sampleSize() / Engine::framesPerTick();
 	changeLength(length);
 }
 
@@ -231,7 +231,7 @@ void SampleClip::updateLength()
 
 TimePos SampleClip::sampleLength() const
 {
-	return static_cast<int>(m_sample.buffer()->size() / Engine::framesPerTick(m_sample.sampleRate()));
+	return static_cast<int>(m_sample.sampleSize() / Engine::framesPerTick(m_sample.sampleRate()));
 }
 
 

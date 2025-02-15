@@ -94,9 +94,9 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	}
 
 	if (!sample.buffer()) { throw std::runtime_error{"Cannot create a sample thumbnail with no buffer"}; }
-	if (sample.buffer()->size() == 0) { return; }
+	if (sample.sampleSize() == 0) { return; }
 
-	const auto fullResolutionWidth = sample.buffer()->size() * DEFAULT_CHANNELS;
+	const auto fullResolutionWidth = sample.sampleSize() * DEFAULT_CHANNELS;
 	m_thumbnailCache->emplace_back(&sample.buffer()->data()[0][0], fullResolutionWidth, fullResolutionWidth);
 
 	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)

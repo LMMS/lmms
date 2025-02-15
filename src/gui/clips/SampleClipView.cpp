@@ -274,7 +274,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
 
 	const auto& sample = m_clip->m_sample;
-	if (sample.buffer()->size() > 0)
+	if (sample.sampleSize() > 0)
 	{
 		const auto param = SampleThumbnail::VisualizeParameters{
 			.sampleRect = QRect(offsetStart, spacing, sampleLength, height() - spacing),

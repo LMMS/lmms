@@ -1202,9 +1202,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// draw ghost sample
-		if (m_ghostSample != nullptr && m_ghostSample->sample().buffer()->size() > 1 && m_renderSample)
+		if (m_ghostSample != nullptr && m_ghostSample->sample().sampleSize() > 1 && m_renderSample)
 		{
-			int sampleFrames = m_ghostSample->sample().buffer()->size();
+			int sampleFrames = m_ghostSample->sample().sampleSize();
 			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
 			int editorHeight = grid_bottom - TOP_MARGIN;
 
