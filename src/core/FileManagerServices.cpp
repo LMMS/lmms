@@ -58,7 +58,7 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 	process.waitForFinished(3000);
 
 	QString output = process.readAllStandardOutput() + process.readAllStandardError();
-	return output.contains("--select", Qt::CaseInsensitive);
+	return output.contains("--select");
 }
 
 QString FileManagerServices::getDefaultFileManager()
