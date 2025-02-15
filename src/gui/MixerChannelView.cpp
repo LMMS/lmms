@@ -337,9 +337,10 @@ void MixerChannelView::selectColor()
 
 void MixerChannelView::randomizeColor()
 {
+	const QColor randomColor = ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48];
 	for (auto mcv : selectedChannels())
 	{
-		mcv->mixerChannel()->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+		mcv->mixerChannel()->setColor(randomColor);
 		mcv->update();
 	}
 	Engine::getSong()->setModified();
