@@ -625,10 +625,7 @@ void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
 	QTreeWidget::focusOutEvent(fe);
 }
 
-
-
-
-void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
+void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 {
 #ifdef LMMS_BUILD_APPLE
 	QString fileManager = tr("Finder");
@@ -638,55 +635,47 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	QString fileManager = tr("file manager");
 #endif
 
-   QTreeWidgetItem* item = itemAt(e->pos());
+	QTreeWidgetItem* item = itemAt(e->pos());
 
-   auto file = dynamic_cast<FileItem*>(item);
+	auto file = dynamic_cast<FileItem*>(item);
 
-   QMenu contextMenu( this );
+	QMenu contextMenu(this);
 
-   auto dir = dynamic_cast<Directory*>(item); // TODO: this might not be a great way to check if it's a directory
+	auto dir = dynamic_cast<Directory*>(item); // TODO: this might not be a great way to check if it's a directory
 
+	if (file != nullptr)
+	{
+		if (file->isTrack())
+		{
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
 
-   if( file != nullptr)
-   {
-	   if (file->isTrack()) {
-		   contextMenu.addAction(
-			   tr( "Send to active instrument-track" ),
-			   [=, this]{ sendToActiveInstrumentTrack(file); }
-		   );
+			contextMenu.addSeparator();
+		}
 
-		   contextMenu.addSeparator();
-	   }
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
 
-	   contextMenu.addAction(
-		   QIcon(embed::getIconPixmap("folder")),
+			tr("Show in %1").arg(fileManager), [=, this] { openContainingFolder(file); });
 
-		   tr("Show in %1").arg(fileManager),
-		   [=, this]{ openContainingFolder(file); }
-	   );
+		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
+		songEditorHeader->setDisabled(true);
+		contextMenu.addAction(songEditorHeader);
+		contextMenu.addActions(getContextActions(file, true));
 
+		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+		patternEditorHeader->setDisabled(true);
+		contextMenu.addAction(patternEditorHeader);
+		contextMenu.addActions(getContextActions(file, false));
+	}
+	else if (dir)
+	{
 
-	   auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-	   songEditorHeader->setDisabled(true);
-	   contextMenu.addAction( songEditorHeader );
-	   contextMenu.addActions( getContextActions(file, true) );
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
+			[=, this] { openDirectory(dir); });
+	}
 
-	   auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-	   patternEditorHeader->setDisabled(true);
-	   contextMenu.addAction(patternEditorHeader);
-	   contextMenu.addActions( getContextActions(file, false) );
-
-   } else if (dir) {
-
-	   contextMenu.addAction(
-		   QIcon(embed::getIconPixmap("folder")),
-		   tr("Open in %1").arg(fileManager),
-		   [=, this]{ openDirectory(dir); }
-	   );
-   }
-
-   // We should only show the menu if it contains items
-   if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
+	// We should only show the menu if it contains items
+	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
 
