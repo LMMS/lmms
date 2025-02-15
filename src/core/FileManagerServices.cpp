@@ -31,23 +31,22 @@ namespace lmms {
 void FileManagerServices::select(const QFileInfo item)
 {
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
+	QStringList params;
 
 #ifdef _WIN32
-	// Windows
-	QStringList param;
-	if (!item.isDir()) param += QLatin1String("/select,");
-	param += path;
-	QProcess::startDetached("explorer", param);
-
+	if (!item.isDir()) {
+		// explorer /select,[object]: Selects the file in the new explorer window
+		params += QLatin1String("/select,");
+	}
 #elif __APPLE__
-	// macOS
-	QProcess::startDetached("open", {"-R", path});
+	// Finder -R, --reveal: Selects in finder
+	params += "-R";
 #else
-	// Linux, BSD and other *nix systems
-	QString fileManager = getDefaultFileManager();
-
-	QProcess::startDetached(fileManager, {"--select", path});
+	// --select: Linux, BSD and other *nix systems
+	params += "--select";
 #endif
+	params += path;
+	QProcess::startDetached(getDefaultFileManager(), params);
 }
 
 #if !defined(_WIN32) && !defined(__APPLE__)
