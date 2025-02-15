@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
 #include "interpolation.h"
@@ -77,7 +76,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 
 void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	if (m_originalSample.buffer()->size() <= 1) { return; }
 
 	int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
@@ -116,24 +115,24 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 
 	if (noteLeft > 0)
 	{
-		int noteFrame = noteDone * m_originalSample.sampleSize();
+		int noteFrame = noteDone * m_originalSample.buffer()->size();
 
 		SRC_STATE* resampleState = playbackState->resamplingState();
 		SRC_DATA resampleData;
-		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
+		resampleData.data_in = (&m_originalSample.buffer()->data()[0] + noteFrame)->data();
 		resampleData.data_out = (workingBuffer + offset)->data();
-		resampleData.input_frames = noteLeft * m_originalSample.sampleSize();
+		resampleData.input_frames = noteLeft * m_originalSample.buffer()->size();
 		resampleData.output_frames = frames;
 		resampleData.src_ratio = speedRatio;
 
 		src_process(resampleState, &resampleData);
 
-		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.sampleSize();
+		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.buffer()->size();
 		playbackState->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
-		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
+		int noteFramesLeft = noteLeft * m_originalSample.buffer()->size() * speedRatio;
 		for (auto i = std::size_t{0}; i < frames; i++)
 		{
 			float fadeValue = static_cast<float>(noteFramesLeft - static_cast<int>(i)) / fadeOutFrames;
@@ -160,7 +159,7 @@ void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
 // http://www.iro.umontreal.ca/~pift6080/H09/documents/papers/bello_onset_tutorial.pdf
 void SlicerT::findSlices()
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	if (m_originalSample.buffer()->size() <= 1) { return; }
 	m_slicePoints = {};
 
 	const int windowSize = 512;
@@ -170,10 +169,10 @@ void SlicerT::findSlices()
 	int minDist = sampleRate * minBeatLength;
 
 	float maxMag = -1;
-	std::vector<float> singleChannel(m_originalSample.sampleSize(), 0);
-	for (auto i = std::size_t{0}; i < m_originalSample.sampleSize(); i++)
+	std::vector<float> singleChannel(m_originalSample.buffer()->size(), 0);
+	for (auto i = std::size_t{0}; i < m_originalSample.buffer()->size(); i++)
 	{
-		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
+		singleChannel[i] = (m_originalSample.buffer()->data()[i][0] + m_originalSample.buffer()->data()[i][1]) / 2;
 		maxMag = std::max(maxMag, singleChannel[i]);
 	}
 
@@ -231,7 +230,7 @@ void SlicerT::findSlices()
 		spectralFlux = 1E-10f; // again for no divison by zero
 	}
 
-	m_slicePoints.push_back(m_originalSample.sampleSize());
+	m_slicePoints.push_back(m_originalSample.buffer()->size());
 
 	for (float& sliceValue : m_slicePoints)
 	{
@@ -241,7 +240,7 @@ void SlicerT::findSlices()
 	}
 
 	float beatsPerMin = m_originalBPM.value() / 60.0f;
-	float samplesPerBeat = m_originalSample.sampleRate() / beatsPerMin * 4.0f;
+	float samplesPerBeat = m_originalSample.buffer()->size() / beatsPerMin * 4.0f;
 	int noteSnap = m_sliceSnap.value();
 	int sliceLock = samplesPerBeat / std::exp2(noteSnap + 1);
 	if (noteSnap == 0) { sliceLock = 1; }
@@ -255,7 +254,7 @@ void SlicerT::findSlices()
 
 	for (float& sliceIndex : m_slicePoints)
 	{
-		sliceIndex /= m_originalSample.sampleSize();
+		sliceIndex /= m_originalSample.buffer()->size();
 	}
 
 	m_slicePoints[0] = 0;
@@ -268,10 +267,10 @@ void SlicerT::findSlices()
 // and lies in the 100 - 200 bpm range
 void SlicerT::findBPM()
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	if (m_originalSample.buffer()->size() <= 1) { return; }
 
 	float sampleRate = m_originalSample.sampleRate();
-	float totalFrames = m_originalSample.sampleSize();
+	float totalFrames = m_originalSample.sampleRate();
 	float sampleLength = totalFrames / sampleRate;
 
 	float bpmEstimate = 240.0f / sampleLength;
@@ -295,7 +294,7 @@ std::vector<Note> SlicerT::getMidi()
 	std::vector<Note> outputNotes;
 
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
-	float outFrames = m_originalSample.sampleSize() * speedRatio;
+	float outFrames = m_originalSample.buffer()->size() * speedRatio;
 
 	float framesPerTick = Engine::framesPerTick();
 	float totalTicks = outFrames / framesPerTick;
@@ -320,7 +319,8 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = SampleLoader::loadBufferFromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	const auto buffer = ResourceCache::fetch(PathUtil::pathFromQString(file), SampleBuffer::emptyBuffer());
+	m_originalSample = Sample{std::move(buffer)};
 
 	findBPM();
 	findSlices();
@@ -339,7 +339,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	element.setAttribute("src", m_originalSample.sampleFile());
 	if (m_originalSample.sampleFile().isEmpty())
 	{
-		element.setAttribute("sampledata", m_originalSample.toBase64());
+		element.setAttribute("sampledata", QString::fromStdString(m_originalSample.buffer()->toBase64()));
 	}
 
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
@@ -360,7 +360,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = SampleLoader::loadBufferFromFile(srcFile);
+			auto buffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(srcFile), SampleBuffer::emptyBuffer());
 			m_originalSample = Sample(std::move(buffer));
 		}
 		else
@@ -371,8 +371,8 @@ void SlicerT::loadSettings(const QDomElement& element)
 	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = SampleLoader::loadBufferFromBase64(sampleData);
-		m_originalSample = Sample(std::move(buffer));
+		auto buffer = ResourceCache::fetch<SampleBuffer>(sampleData.toStdString(), SampleBuffer::emptyBuffer());
+		m_originalSample = Sample{std::move(buffer)};
 	}
 
 	if (!element.attribute("totalSlices").isEmpty())

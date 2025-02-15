@@ -28,8 +28,11 @@
 #include <cmath>
 #include <memory>
 
+#include "AudioEngine.h"
 #include "AudioResampler.h"
+#include "Engine.h"
 #include "Note.h"
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
@@ -90,14 +93,11 @@ public:
 	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
 
-	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
-	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
+	auto sampleFile() const -> QString { return PathUtil::qStringFromPath(m_buffer->path()); }
 	auto sampleSize() const -> size_t { return m_buffer->size(); }
+	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
+	auto sampleDuration() const -> std::chrono::milliseconds;
 
-	auto toBase64() const -> QString { return m_buffer->toBase64(); }
-
-	auto data() const -> const SampleFrame* { return m_buffer->data(); }
 	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
 	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }

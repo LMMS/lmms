@@ -1202,9 +1202,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// draw ghost sample
-		if (m_ghostSample != nullptr && m_ghostSample->sample().sampleSize() > 1 && m_renderSample)
+		if (m_ghostSample != nullptr && m_ghostSample->sample().buffer()->size() > 1 && m_renderSample)
 		{
-			int sampleFrames = m_ghostSample->sample().sampleSize();
+			int sampleFrames = m_ghostSample->sample().buffer()->size();
 			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
 			int editorHeight = grid_bottom - TOP_MARGIN;
 
@@ -1220,8 +1220,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			const auto param = SampleThumbnail::VisualizeParameters{
 				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
 				.amplification = sample.amplification(),
-				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
-				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleRate(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleRate(),
 				.reversed = sample.reversed()
 			};
 

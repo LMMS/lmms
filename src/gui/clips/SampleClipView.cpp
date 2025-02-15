@@ -33,7 +33,6 @@
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleFilePicker.h"
-#include "SampleLoader.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -66,11 +65,9 @@ void SampleClipView::updateSample()
 
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
-			: tr("Double-click to open sample")
-	);
+
+	const auto sampleFile = m_clip->m_sample.sampleFile();
+	setToolTip(!sampleFile.isEmpty() ? PathUtil::toAbsolute(sampleFile) : tr("Double-click to open sample"));
 }
 
 
@@ -126,7 +123,10 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::loadBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		const auto de = StringPairDrag::decodeValue(_de);
+		const auto path = PathUtil::pathFromQString(de);
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+		m_clip->setSampleBuffer(std::move(buffer));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -193,7 +193,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = SampleLoader::loadBufferFromFile(selectedAudioFile);
+		auto sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(selectedAudioFile), SampleBuffer::emptyBuffer());
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
@@ -274,7 +274,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
 
 	const auto& sample = m_clip->m_sample;
-	if (sample.sampleSize() > 0)
+	if (sample.buffer()->size() > 0)
 	{
 		const auto param = SampleThumbnail::VisualizeParameters{
 			.sampleRect = QRect(offsetStart, spacing, sampleLength, height() - spacing),

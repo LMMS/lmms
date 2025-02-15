@@ -27,6 +27,7 @@
 
 #include <QDebug>
 #include <QFileInfo>
+#include "PathUtil.h"
 
 namespace {
 	constexpr auto MaxSampleThumbnailCacheSize = 32;
@@ -72,6 +73,7 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 SampleThumbnail::SampleThumbnail(const Sample& sample)
 {
 	auto entry = SampleThumbnailEntry{sample.sampleFile(), QFileInfo{sample.sampleFile()}.lastModified()};
+
 	if (!entry.filePath.isEmpty())
 	{
 		const auto it = s_sampleThumbnailCacheMap.find(entry);
@@ -92,10 +94,10 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 	}
 
 	if (!sample.buffer()) { throw std::runtime_error{"Cannot create a sample thumbnail with no buffer"}; }
-	if (sample.sampleSize() == 0) { return; }
+	if (sample.buffer()->size() == 0) { return; }
 
-	const auto fullResolutionWidth = sample.sampleSize() * DEFAULT_CHANNELS;
-	m_thumbnailCache->emplace_back(&sample.buffer()->data()->left(), fullResolutionWidth, fullResolutionWidth);
+	const auto fullResolutionWidth = sample.buffer()->size() * DEFAULT_CHANNELS;
+	m_thumbnailCache->emplace_back(&sample.buffer()->data()[0][0], fullResolutionWidth, fullResolutionWidth);
 
 	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
 	{

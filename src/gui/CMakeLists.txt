@@ -34,7 +34,6 @@ SET(LMMS_SRCS
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
 	gui/SampleFilePicker.cpp
-	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SampleThumbnail.cpp
 	gui/SendButtonIndicator.cpp

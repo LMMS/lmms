@@ -168,8 +168,8 @@ public:
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
-		if (buffer == nullptr || buffer->size() == 0) { return 0; }
-		const auto frames = buffer->size();
+		if (buffer == nullptr || buffer->data().size() == 0) { return 0; }
+		const auto frames = buffer->data().size();
 		const auto frame = absFraction(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
 

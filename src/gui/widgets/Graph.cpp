@@ -26,8 +26,8 @@
 #include <QPainter>
 
 #include "Graph.h"
+#include "PathUtil.h"
 #include "SampleFilePicker.h"
-#include "SampleLoader.h"
 #include "StringPairDrag.h"
 #include "Oscillator.h"
 
@@ -590,12 +590,13 @@ void graphModel::setWaveToNoise()
 QString graphModel::setWaveToUser()
 {
 	QString fileName = gui::SampleFilePicker::openWaveformFile();
-	if( fileName.isEmpty() == false )
+	if (!fileName.isEmpty())
 	{
-		auto sampleBuffer = SampleLoader::loadBufferFromFile(fileName);
+		const auto path = PathUtil::pathFromQString(fileName);
+		auto buffer = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
 		for( int i = 0; i < length(); i++ )
 		{
-			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));
+			m_samples[i] = Oscillator::userWaveSample(buffer.get(), i / static_cast<float>(length()));
 		}
 	}
 

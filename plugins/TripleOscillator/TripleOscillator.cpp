@@ -37,7 +37,6 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
-#include "SampleLoader.h"
 #include "SampleFilePicker.h"
 #include "Song.h"
 #include "embed.h"
@@ -140,10 +139,10 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	auto af = gui::SampleFilePicker::openWaveformFile();
 	if( af != "" )
 	{
-		m_sampleBuffer = SampleLoader::loadBufferFromFile(af);
+		m_sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(af), SampleBuffer::emptyBuffer());
 		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 		// TODO:
-		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
+		//m_usrWaveBtn->setToolTip(PathUtil::qStringFromPath(m_sampleBuffer->path()));
 	}
 }
 
@@ -252,8 +251,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+		_this.setAttribute("userwavefile" + is, PathUtil::qStringFromPath(m_osc[i]->m_sampleBuffer->path()));
 	}
 }
 
@@ -285,7 +283,8 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				m_osc[i]->m_sampleBuffer = SampleLoader::loadBufferFromFile(userWaveFile);
+				const auto path = PathUtil::pathFromQString(userWaveFile);
+				m_osc[i]->m_sampleBuffer = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
 				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }

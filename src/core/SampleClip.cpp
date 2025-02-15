@@ -30,7 +30,6 @@
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
-#include "SampleLoader.h"
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
@@ -114,13 +113,13 @@ void SampleClip::changeLength( const TimePos & _length )
 
 void SampleClip::changeLengthToSampleLength()
 {
-	int length = m_sample.sampleSize() / Engine::framesPerTick();
+	int length = m_sample.buffer()->size() / Engine::framesPerTick();
 	changeLength(length);
 }
 
 
 
-const QString& SampleClip::sampleFile() const
+QString SampleClip::sampleFile() const
 {
 	return m_sample.sampleFile();
 }
@@ -150,7 +149,8 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(SampleLoader::loadBufferFromFile(sf));
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(sf.toStdString(), SampleBuffer::emptyBuffer());
+		m_sample = Sample{std::move(buffer)};
 		length = sampleLength();
 	}
 
@@ -231,7 +231,7 @@ void SampleClip::updateLength()
 
 TimePos SampleClip::sampleLength() const
 {
-	return static_cast<int>(m_sample.sampleSize() / Engine::framesPerTick(m_sample.sampleRate()));
+	return static_cast<int>(m_sample.buffer()->size() / Engine::framesPerTick(m_sample.sampleRate()));
 }
 
 
@@ -270,7 +270,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( sampleFile() == "" )
 	{
 		QString s;
-		_this.setAttribute("data", m_sample.toBase64());
+		_this.setAttribute("data", QString::fromStdString(m_sample.buffer()->toBase64()));
 	}
 
 	_this.setAttribute( "sample_rate", m_sample.sampleRate());
@@ -309,7 +309,8 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->outputSampleRate();
 
-		auto buffer = SampleLoader::loadBufferFromBase64(_this.attribute("data"), sampleRate);
+		auto buffer = ResourceCache::fetch<SampleBuffer>(
+			_this.attribute("data").toStdString(), SampleBuffer::emptyBuffer(), sampleRate);
 		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
