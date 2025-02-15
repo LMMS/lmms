@@ -746,14 +746,11 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 		
 		const auto path = PathUtil::pathFromQString(fileName);
-		const auto buffer = ResourceCache::fetch<SampleBuffer>(path, nullptr);
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(path);
 
-		if (buffer)
-		{
-			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
-			s->setDoneMayReturnTrue(false);
-			newPPH = s;
-		}
+		auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
+		s->setDoneMayReturnTrue(false);
+		newPPH = s;
 		delete tf;
 	}
 	else if (

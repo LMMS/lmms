@@ -139,7 +139,7 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	auto af = gui::SampleFilePicker::openWaveformFile();
 	if( af != "" )
 	{
-		m_sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(af), SampleBuffer::emptyBuffer());
+		m_sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(af));
 		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 		// TODO:
 		//m_usrWaveBtn->setToolTip(PathUtil::qStringFromPath(m_sampleBuffer->path()));
@@ -284,7 +284,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
 				const auto path = PathUtil::pathFromQString(userWaveFile);
-				m_osc[i]->m_sampleBuffer = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+				m_osc[i]->m_sampleBuffer = ResourceCache::fetch<SampleBuffer>(path);
 				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }

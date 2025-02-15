@@ -243,7 +243,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	if( type == "samplefile" )
 	{
 		const auto path = PathUtil::pathFromQString(value);
-		m_params->m_userWave = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+		m_params->m_userWave = ResourceCache::fetch<SampleBuffer>(path);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -257,7 +257,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 					firstChildElement().attribute("src");
 
 		const auto path = PathUtil::pathFromQString(file);
-		m_params->m_userWave = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+		m_params->m_userWave = ResourceCache::fetch<SampleBuffer>(path);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();

@@ -78,10 +78,4 @@ std::string SampleBuffer::toBase64() const
 	return byteArray.toBase64().toStdString();
 }
 
-auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
-{
-	static auto emptyBuffer = std::make_shared<SampleBuffer>();
-	return emptyBuffer;
-}
-
 } // namespace lmms

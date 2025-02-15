@@ -44,73 +44,40 @@ public:
 		friend class ResourceCache;
 	};
 
-	template <typename T, typename _Enable = std::enable_if<std::is_base_of_v<Resource, T>>, typename... Args>
-	static auto fetch(const std::filesystem::path& key, std::shared_ptr<const T> defaultValue, Args&&... args) -> std::shared_ptr<const T>
+	template <typename V, typename K,
+		typename Enable
+		= std::enable_if_t<std::conjunction_v<std::is_base_of<Resource, V>, std::is_default_constructible<V>>>,
+		typename... Args>
+	static auto fetch(const K& key, Args&&... args) -> std::shared_ptr<const V>
 	{
-		if (!std::filesystem::exists(key)) { return defaultValue; }
+		const auto digest = hash(key);
+		if (digest.empty()) { return std::make_shared<V>(); }
 
-		static constexpr auto blockSize = 8192;
-		static auto block = std::array<char, blockSize>{};
-		static auto hash = QCryptographicHash{QCryptographicHash::Sha256};
-
-		auto fstream = std::fstream{key, std::ios::in | std::ios::binary};
-		if (!fstream.is_open()) { return defaultValue; }
-
-		do
-		{
-			fstream.read(block.data(), blockSize);
-			hash.addData(block.data(), fstream.gcount());
-		}
-		while (fstream.gcount() > 0);
-
-		const auto digest = hash.result().toStdString();
 		auto& resource = s_resources[digest];
 
 		if (resource == nullptr)
 		{
-			if (s_resources.size() == CacheSize) { evict(); }
+			if (s_resources.size() == CacheSize)
+			{
+				const auto it = std::min_element(s_resources.begin(), s_resources.end(),
+					[](const auto& first, const auto& second) { return first.second->m_age < first.second->m_age; });
+				s_resources.erase(it);
+			}
 
 			try
 			{
-				resource = std::make_shared<T>(key, std::forward<Args>(args)...);
+				resource = std::make_shared<V>(key, std::forward<Args>(args)...);
 			}
 			catch (const std::runtime_error& error)
 			{
-				return defaultValue;
+				return std::make_shared<V>();
 			}
 
-			return std::static_pointer_cast<const T>(resource);
+			return std::static_pointer_cast<const V>(resource);
 		}
 
 		++resource->m_age;
-		return std::static_pointer_cast<const T>(resource);
-	}
-
-	template <typename T, typename... Args>
-	static auto fetch(const std::string& key, std::shared_ptr<const T> defaultValue, Args&&... args) -> std::shared_ptr<const T>
-	{
-		const auto data = QByteArray::fromStdString(key);
-		const auto digest = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toStdString();
-		auto& resource = s_resources[digest];
-
-		if (resource == nullptr)
-		{
-			if (s_resources.size() == CacheSize) { evict(); }
-
-			try
-			{
-				resource = std::make_shared<T>(key, std::forward<Args>(args)...);
-			}
-			catch (const std::runtime_error& error)
-			{
-				return defaultValue;
-			}
-
-			return std::static_pointer_cast<const T>(resource);
-		}
-
-		++resource->m_age;
-		return std::static_pointer_cast<const T>(resource);
+		return std::static_pointer_cast<const V>(resource);
 	}
 
 	static auto instance() -> ResourceCache&
@@ -120,11 +87,31 @@ public:
 	}
 
 private:
-	static void evict()
+	static auto hash(const std::filesystem::path& path) -> std::string
 	{
-		const auto it = std::min_element(s_resources.begin(), s_resources.end(),
-			[](const auto& first, const auto& second) { return first.second->m_age < first.second->m_age; });
-		s_resources.erase(it);
+		if (!std::filesystem::exists(path)) { return std::string{}; }
+
+		static constexpr auto blockSize = 8192;
+		static auto block = std::array<char, blockSize>{};
+		static auto hash = QCryptographicHash{QCryptographicHash::Sha256};
+
+		auto fstream = std::fstream{path, std::ios::in | std::ios::binary};
+		if (!fstream.is_open()) { return std::string{}; }
+
+		do
+		{
+			fstream.read(block.data(), blockSize);
+			hash.addData(block.data(), fstream.gcount());
+		} while (fstream.gcount() > 0);
+
+		return hash.result().toStdString();
+	}
+
+	static auto hash(const std::string& key) -> std::string
+	{
+		const auto data = QByteArray::fromStdString(key);
+		const auto hash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toStdString();
+		return hash;
 	}
 
 	ResourceCache() { s_resources.reserve(CacheSize); }

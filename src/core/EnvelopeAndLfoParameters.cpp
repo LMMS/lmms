@@ -389,7 +389,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
 			const auto path = PathUtil::pathFromQString(_this.attribute("userwavefile"));
-			m_userWave = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+			m_userWave = ResourceCache::fetch<SampleBuffer>(path);
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
 	}

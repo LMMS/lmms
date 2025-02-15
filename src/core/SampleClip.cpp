@@ -149,7 +149,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		const auto buffer = ResourceCache::fetch<SampleBuffer>(sf.toStdString(), SampleBuffer::emptyBuffer());
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(sf.toStdString());
 		m_sample = Sample{std::move(buffer)};
 		length = sampleLength();
 	}
@@ -309,8 +309,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->outputSampleRate();
 
-		auto buffer = ResourceCache::fetch<SampleBuffer>(
-			_this.attribute("data").toStdString(), SampleBuffer::emptyBuffer(), sampleRate);
+		auto buffer = ResourceCache::fetch<SampleBuffer>(_this.attribute("data").toStdString(), sampleRate);
 		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );

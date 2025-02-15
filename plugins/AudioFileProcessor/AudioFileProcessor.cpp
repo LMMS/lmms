@@ -223,7 +223,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		const auto base64 = ResourceCache::fetch<SampleBuffer>(sampleData.toStdString(), SampleBuffer::emptyBuffer());
+		const auto base64 = ResourceCache::fetch<SampleBuffer>(sampleData.toStdString());
 		m_sample = Sample{std::move(base64)};
 	}
 
@@ -314,7 +314,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	const auto buffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(_audio_file), SampleBuffer::emptyBuffer());
+	const auto buffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(_audio_file));
 	m_sample = Sample{std::move(buffer)};
 
 	loopPointChanged();

@@ -125,7 +125,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	{
 		const auto de = StringPairDrag::decodeValue(_de);
 		const auto path = PathUtil::pathFromQString(de);
-		const auto buffer = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(path);
 		m_clip->setSampleBuffer(std::move(buffer));
 		m_clip->updateLength();
 		update();
@@ -193,11 +193,8 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(selectedAudioFile), SampleBuffer::emptyBuffer());
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
-		{
-			m_clip->setSampleBuffer(sampleBuffer);
-		}
+		auto sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(selectedAudioFile));
+		m_clip->setSampleBuffer(sampleBuffer);
 	}
 }
 

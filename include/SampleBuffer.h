@@ -62,8 +62,6 @@ public:
 	auto end() const { return m_data.end(); }
 	auto end() { return m_data.end(); }
 
-	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
-
 private:
 	std::vector<SampleFrame> m_data;
 	std::filesystem::path m_path;

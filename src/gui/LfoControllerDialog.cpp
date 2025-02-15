@@ -218,7 +218,7 @@ void LfoControllerDialog::askUserDefWave()
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
-	buffer = ResourceCache::fetch<SampleBuffer>(path, SampleBuffer::emptyBuffer());
+	buffer = ResourceCache::fetch<SampleBuffer>(path);
 
 	m_userWaveBtn->setToolTip(PathUtil::qStringFromPath(buffer->path()));
 }
