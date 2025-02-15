@@ -661,7 +661,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	   contextMenu.addAction(
 		   QIcon(embed::getIconPixmap("folder")),
 
-		   tr("Show in") + " " +fileManager,
+		   tr("Show in %1").arg(fileManager),
 		   [=, this]{ openContainingFolder(file); }
 	   );
 
