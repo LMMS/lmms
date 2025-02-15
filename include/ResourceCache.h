@@ -25,49 +25,71 @@
 #ifndef LMMS_RESOURCE_CACHE_H
 #define LMMS_RESOURCE_CACHE_H
 
-#include <algorithm>
+#include <QCryptographicHash>
+#include <array>
+#include <filesystem>
+#include <fstream>
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 namespace lmms {
 class ResourceCache
 {
 public:
-	static constexpr auto CacheSize = 64;
+	static constexpr auto CacheSize = 32;
 
 	class Resource
 	{
-	public:
-		virtual bool invalid() = 0;
-		virtual void update() = 0;
+		int m_age = 0;
+		friend class ResourceCache;
 	};
 
-	template <typename T, typename... Args> static auto fetch(Args&&... args) -> std::shared_ptr<const T>
+	template <typename T, typename _Enable = std::enable_if<std::is_base_of_v<Resource, T>>, typename... Args>
+	static auto fetch(const std::filesystem::path& key, Args&&... args) -> std::shared_ptr<const Resource>
 	{
-		auto key = typeid(T).name();
-		((key += "_" + std::to_string(std::hash<std::decay_t<Args>>{}(args))), ...);
+		if (!std::filesystem::exists(key)) { return nullptr; }
 
-		const auto it
-			= std::find_if(s_resources.begin(), s_resources.end(), [](const auto& entry) { return entry.key == key; });
+		auto fstream = std::fstream{key, std::ios::binary};
 
-		if (it == s_resources.end())
+		static constexpr auto blockSize = 4096;
+		auto block = std::array<char, blockSize>{};
+		auto hash = QCryptographicHash{QCryptographicHash::Sha256};
+
+		while (!fstream.eof())
 		{
-			if (s_resources.size() == CacheSize)
-			{
-				const auto entry = std::min_element(s_resources.begin(), s_resources.end(),
-					[](const auto& first, const auto& second) { return first.age < second.age; });
-				s_resources.erase(entry);
-			}
+			fstream.read(block.data(), blockSize);
+			hash.addData(block.data(), blockSize);
+		}
 
-			const auto resource = std::make_shared<T>(std::forward<Args>(args)...);
-			s_resources.emplace_back(std::move(key), resource, 0);
+		const auto digest = hash.result().toStdString();
+		auto& resource = s_resources[digest];
+
+		if (resource == nullptr)
+		{
+			if (s_resources.size() == CacheSize) { evict(); }
+			resource = std::make_shared<T>(key, std::forward<Args>(args)...);
 			return resource;
 		}
 
-		const auto resource = it->resource;
-		if (resource->invalid()) { resource->update(); }
-		++resource->age;
+		++resource->m_age;
+		return resource;
+	}
 
+	template <typename T, typename... Args>
+	static auto fetch(const std::string& key, Args&&... args) -> std::shared_ptr<const Resource>
+	{
+		const auto data = QByteArray::fromStdString(key);
+		const auto digest = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toStdString();
+		auto& resource = s_resources[digest];
+
+		if (resource == nullptr)
+		{
+			if (s_resources.size() == CacheSize) { evict(); }
+			resource = std::make_shared<T>(key, std::forward<Args>(args)...);
+			return resource;
+		}
+
+		++resource->m_age;
 		return resource;
 	}
 
@@ -78,15 +100,15 @@ public:
 	}
 
 private:
-	struct Entry
+	static void evict()
 	{
-		std::string key;
-		std::shared_ptr<Resource> resource;
-		int age;
-	};
+		const auto it = std::min_element(s_resources.begin(), s_resources.end(),
+			[](const auto& first, const auto& second) { return first.second->m_age < first.second->m_age; });
+		s_resources.erase(it);
+	}
 
 	ResourceCache() { s_resources.reserve(CacheSize); }
-	inline static std::vector<Entry> s_resources;
+	inline static std::unordered_map<std::string, std::shared_ptr<Resource>> s_resources;
 };
 } // namespace lmms
 
