@@ -331,17 +331,17 @@ void SlicerTWaveform::updateClosest(QMouseEvent* me)
 			
 			if (currentDistance < s_distanceForClick)
 			{
-                if( currentDistance < nearestSoFar)
-                {
-                    m_closestObject = UIObjects::SlicePoint;
-                    m_closestSlice = i;
-                    nearestSoFar = currentDistance;
-                }
-                else
-                {
-                    // Done, this can't get any better
-                    break;
-                }
+				if( currentDistance < nearestSoFar)
+				{
+					m_closestObject = UIObjects::SlicePoint;
+					m_closestSlice = i;
+					nearestSoFar = currentDistance;
+				}
+				else
+				{
+					// Done, this can't get any better
+					break;
+				}
 			}
 		}
 	}
