@@ -47,19 +47,21 @@ public:
 	template <typename T, typename _Enable = std::enable_if<std::is_base_of_v<Resource, T>>, typename... Args>
 	static auto fetch(const std::filesystem::path& key, std::shared_ptr<const T> defaultValue, Args&&... args) -> std::shared_ptr<const T>
 	{
-		if (!std::filesystem::exists(key)) { return nullptr; }
+		if (!std::filesystem::exists(key)) { return defaultValue; }
 
-		auto fstream = std::fstream{key, std::ios::binary};
+		static constexpr auto blockSize = 8192;
+		static auto block = std::array<char, blockSize>{};
+		static auto hash = QCryptographicHash{QCryptographicHash::Sha256};
 
-		static constexpr auto blockSize = 4096;
-		auto block = std::array<char, blockSize>{};
-		auto hash = QCryptographicHash{QCryptographicHash::Sha256};
+		auto fstream = std::fstream{key, std::ios::in | std::ios::binary};
+		if (!fstream.is_open()) { return defaultValue; }
 
-		while (!fstream.eof())
+		do
 		{
 			fstream.read(block.data(), blockSize);
-			hash.addData(block.data(), blockSize);
+			hash.addData(block.data(), fstream.gcount());
 		}
+		while (fstream.gcount() > 0);
 
 		const auto digest = hash.result().toStdString();
 		auto& resource = s_resources[digest];
