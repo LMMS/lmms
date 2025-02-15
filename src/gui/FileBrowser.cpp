@@ -680,7 +680,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 
 	   contextMenu.addAction(
 		   QIcon(embed::getIconPixmap("folder")),
-		   tr("Open in") + " " + fileManager,
+		   tr("Open in %1").arg(fileManager),
 		   [=, this]{ openDirectory(dir); }
 	   );
    }
