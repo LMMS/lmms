@@ -38,7 +38,7 @@ public:
 	[[maybe_unused]] static QString getDefaultFileManager() { return QString("explorer"); }
 	[[maybe_unused]] static bool canSelect() { return true; }
 #elif defined(__APPLE__)
-	[[maybe_unused]] static QString getDefaultFileManager() { return QString("finder"); };
+	[[maybe_unused]] static QString getDefaultFileManager() { return QString("open"); };
 	[[maybe_unused]] static bool canSelect() { return true; }
 #else
 	[[maybe_unused]] static QString getDefaultFileManager();
