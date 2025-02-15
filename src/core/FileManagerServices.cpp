@@ -84,10 +84,11 @@ QString FileManagerServices::getDefaultFileManager()
 	return fileManager;
 }
 
-static bool canSelect()
+bool FileManagerServices::canSelect()
 {
 	return supportsSelectOption(getDefaultFileManager());
 }
+
 #endif
 
 } // namespace lmms
