@@ -8,20 +8,20 @@ int sp_create(sp_data **spp) { return sp_createn(spp, 1); }
 
 int sp_createn(sp_data **spp, int nchan)
 {
-	sp_data *sp = malloc(sizeof(sp_data));
-	*sp = (sp_data){ .out = calloc(nchan, sizeof(SPFLOAT)), .sr = 44100, .nchan = nchan, .pos = 0, .rand = 0 };
-	sp->len = 5 * sp->sr;
-	snprintf(sp->filename, sizeof(sp->filename), "test.wav");
-	*spp = sp;
+	const uint32_t sr = 44100; // TODO C23: constexpr auto
+	const unsigned long len_seconds = 5; // TODO C23: constexpr auto
+	*spp = malloc(sizeof(sp_data));
+	**spp = (sp_data){ .out = calloc(nchan, sizeof(float)), .sr = sr,
+		.nchan = nchan, .len = len_seconds * sr, .pos = 0,
+		.filename = "test.wav", .rand = 0 };
 	return 0;
 }
 
 int sp_destroy(sp_data **spp)
 {
-    sp_data *sp = *spp;
-    free(sp->out);
-    free(*spp);
-    return 0;
+	free((*spp)->out);
+	free(*spp);
+	return 0;
 }
 
 #ifndef NO_LIBSNDFILE
