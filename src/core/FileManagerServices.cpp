@@ -75,12 +75,6 @@ QString FileManagerServices::getDefaultFileManager()
 	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
 	fileManager = fileManager.section('.', -1);
 
-	if (fileManager.isEmpty())
-	{
-		fileManager = qgetenv("FILE_MANAGER");
-		if (fileManager.isEmpty()) { fileManager = qgetenv("XDG_FILE_MANAGER"); }
-	}
-
 	return fileManager;
 }
 
