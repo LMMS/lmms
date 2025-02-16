@@ -79,7 +79,7 @@ public:
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
-	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
+	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb, const QString& name);
 
 public slots:
 	void setSampleFile(const QString& sf);
@@ -91,6 +91,7 @@ public slots:
 
 private:
 	Sample m_sample;
+	QString m_sampleFile;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
