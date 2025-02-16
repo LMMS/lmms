@@ -26,7 +26,6 @@
 
 #include "AudioSampleRecorder.h"
 #include "SampleBuffer.h"
-#include "debug.h"
 
 
 namespace lmms

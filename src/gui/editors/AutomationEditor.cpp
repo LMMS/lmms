@@ -58,7 +58,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "debug.h"
 #include "embed.h"
 #include "FontHelper.h"
 

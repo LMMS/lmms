@@ -51,7 +51,6 @@
 #include <mididata.h>
 
 #include "embed.h"
-#include "debug.h"
 
 #include "Knob.h"
 #include "PixmapButton.h"
