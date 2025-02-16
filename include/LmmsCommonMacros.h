@@ -25,7 +25,12 @@
 #ifndef LMMS_COMMON_MACROS_H
 #define LMMS_COMMON_MACROS_H
 
+namespace lmms
+{
+
 #define LMMS_STRINGIFY(s) LMMS_STR(s) // a macro used to stringify the plugin name
 #define LMMS_STR(PN) #PN
+
+} // namespace lmms
 
 #endif // LMMS_COMMON_MACROS_H
