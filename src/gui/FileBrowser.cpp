@@ -637,42 +637,38 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 	QTreeWidgetItem* item = itemAt(e->pos());
 
-	auto file = dynamic_cast<FileItem*>(item);
-
 	QMenu contextMenu(this);
 
-	auto dir = dynamic_cast<Directory*>(item); // TODO: this might not be a great way to check if it's a directory
+	switch(item->type()) {
+		case TypeFileItem: {
+			auto file = dynamic_cast<FileItem*>(item);
+			if (file->isTrack()) {
+				contextMenu.addAction(
+					tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+				contextMenu.addSeparator();
+			}
 
-	if (file != nullptr)
-	{
-		if (file->isTrack())
-		{
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+			contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
+				tr("Show in %1").arg(fileManager), [=, this] { openContainingFolder(file); });
 
-			contextMenu.addSeparator();
+			auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
+			songEditorHeader->setDisabled(true);
+			contextMenu.addAction(songEditorHeader);
+			contextMenu.addActions(getContextActions(file, true));
+
+			auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+			patternEditorHeader->setDisabled(true);
+			contextMenu.addAction(patternEditorHeader);
+			contextMenu.addActions(getContextActions(file, false));
+			break;
 		}
-
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
-
-			tr("Show in %1").arg(fileManager), [=, this] { openContainingFolder(file); });
-
-		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-		songEditorHeader->setDisabled(true);
-		contextMenu.addAction(songEditorHeader);
-		contextMenu.addActions(getContextActions(file, true));
-
-		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-		patternEditorHeader->setDisabled(true);
-		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions(getContextActions(file, false));
-	}
-	else if (dir)
-	{
-
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
-			[=, this] { openDirectory(dir); });
-	}
+		case TypeDirectoryItem: {
+			auto dir = dynamic_cast<Directory*>(item);
+			contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
+				[=, this] { openDirectory(dir); });
+			break;
+		}
+		}
 
 	// We should only show the menu if it contains items
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
