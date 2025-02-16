@@ -34,18 +34,18 @@ namespace lmms {
 class FileManagerServices
 {
 public:
-	[[maybe_unused]] static void openDir(QString& path);
-	[[maybe_unused]] static void select(QFileInfo item);
+	static void openDir(QString& path);
+	static void select(QFileInfo item);
 
 #if defined(_WIN32)
-	[[maybe_unused]] static QString getDefaultFileManager() { return QString("explorer"); }
-	[[maybe_unused]] static bool canSelect(bool useCache = true) { return true; }
+	static QString getDefaultFileManager() { return QString("explorer"); }
+	static bool canSelect(bool useCache = true) { return true; }
 #elif defined(__APPLE__)
-	[[maybe_unused]] static QString getDefaultFileManager() { return QString("open"); };
-	[[maybe_unused]] static bool canSelect(bool useCache = true) { return true; }
+	static QString getDefaultFileManager() { return QString("open"); };
+	static bool canSelect(bool useCache = true) { return true; }
 #else
-	[[maybe_unused]] static QString getDefaultFileManager();
-	[[maybe_unused]] static bool canSelect(bool useCache = true);
+	static QString getDefaultFileManager();
+	static bool canSelect(bool useCache = true);
 #endif
 
 protected:
