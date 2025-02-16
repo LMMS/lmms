@@ -64,4 +64,4 @@ private:
 };
 
 } // namespace lmms
-#endif // LMMS_CORE_FILEMANAGER_SERVICES_H
+#endif // LMMS_FILEMANAGER_SERVICES_H
