@@ -93,10 +93,12 @@ private:
 
 		static constexpr auto blockSize = 8192;
 		static auto block = std::array<char, blockSize>{};
-		static auto hash = QCryptographicHash{QCryptographicHash::Sha256};
+		static auto hash = QCryptographicHash{QCryptographicHash::Md5};
 
 		auto fstream = std::fstream{path, std::ios::in | std::ios::binary};
 		if (!fstream.is_open()) { return std::string{}; }
+
+		hash.reset();
 
 		do
 		{
@@ -110,7 +112,7 @@ private:
 	static auto hash(const std::string& key) -> std::string
 	{
 		const auto data = QByteArray::fromStdString(key);
-		const auto hash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toStdString();
+		const auto hash = QCryptographicHash::hash(data, QCryptographicHash::Md5).toStdString();
 		return hash;
 	}
 
