@@ -25,6 +25,9 @@
 #ifndef SA_CONSTANTS_H
 #define SA_CONSTANTS_H
 
+namespace lmms
+{
+
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
 inline constexpr auto LOWEST_LOG_FREQ = 5;
@@ -67,5 +70,7 @@ inline constexpr auto ARANGE_LOUD_START     = -30;
 inline constexpr auto ARANGE_LOUD_END       =   0;
 inline constexpr auto ARANGE_SILENT_START   = -60;
 inline constexpr auto ARANGE_SILENT_END     = -10;
+
+} // namespace lmms
 
 #endif // SA_CONSTANTS_H
