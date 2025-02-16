@@ -87,7 +87,7 @@ QString FileManagerServices::getDefaultFileManager(bool useCache)
 	return defaultFileManager.value();
 #else
 
-	if (useCache && defaultFileManager.has_value()) {return defaultFileManager.value();}
+	if (useCache && defaultFileManager.has_value()) { return defaultFileManager.value(); }
 
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
