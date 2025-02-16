@@ -64,16 +64,14 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		}
 	}
 
-	const auto outputParameters = PaStreamParameters{
-		.device = outputDeviceIndex,
+	const auto outputParameters = PaStreamParameters{.device = outputDeviceIndex,
 		.channelCount = channels(),
 		.sampleFormat = paFloat32,
 		.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency,
-		.hostApiSpecificStreamInfo = nullptr
-	};
+		.hostApiSpecificStreamInfo = nullptr};
 
-	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(), paNoFlag,
-		processCallback, this);
+	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(),
+		paNoFlag, processCallback, this);
 
 	if (err != paNoError)
 	{
@@ -113,10 +111,7 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 	{
 		if (m_outBufPos == 0 && getNextBuffer(m_outBuf.data()) == 0) { return paComplete; }
 
-		if (channels() == 1)
-		{
-			outputBuffer[frame] = m_outBuf[m_outBufPos].average();
-		}
+		if (channels() == 1) { outputBuffer[frame] = m_outBuf[m_outBufPos].average(); }
 		else
 		{
 			outputBuffer[frame * channels()] = m_outBuf[m_outBufPos][0];
@@ -166,7 +161,7 @@ void gui::AudioPortAudioSetupWidget::updateDevices()
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 		if (deviceInfo->hostApi == m_backendComboBox->currentData().toInt())
 		{
- 			m_deviceComboBox->addItem(deviceInfo->name, i);
+			m_deviceComboBox->addItem(deviceInfo->name, i);
 		}
 	}
 
@@ -191,7 +186,7 @@ void gui::AudioPortAudioSetupWidget::updateChannels()
 gui::AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* _parent)
 	: AudioDeviceSetupWidget(AudioPortAudio::name(), _parent)
 {
-	QFormLayout* form = new QFormLayout(this);
+	const auto form = new QFormLayout(this);
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
 	m_backendComboBox = new QComboBox(this);
