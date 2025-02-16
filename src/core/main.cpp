@@ -813,9 +813,7 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
-		new GuiApplication();
-		// immediately register our SIGINT handler
-		getGUI()->createSocketNotifier(sigintFd);
+		new GuiApplication(sigintFd);
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure

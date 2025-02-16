@@ -78,8 +78,11 @@ GuiApplication* GuiApplication::instance()
 
 
 
-GuiApplication::GuiApplication()
+GuiApplication::GuiApplication(int* sigintFd)
 {
+	// Immediately register our SIGINT handler
+	createSocketNotifier(sigintFd);
+
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
 		QMessageBox::question( nullptr,
@@ -252,15 +255,16 @@ void GuiApplication::createSocketNotifier(int* sigintFd) {
 
 	// Listen on the file descriptor for SIGINT
 	m_sigintNotifier = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
-	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(signintHandler()));
+	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(signintHandler()), Qt::QueuedConnection);
 }
 
 // Handle the SIGINT event
 void GuiApplication::signintHandler() {
 	m_sigintNotifier->setEnabled(false);
-	qDebug() << "\nShutting down...";
+	qDebug() << "Shutting down...";
 	// cleanup, etc
 	qApp->exit(3);
+	m_sigintNotifier->setEnabled(true);
 }
 
 #ifdef LMMS_BUILD_WIN32

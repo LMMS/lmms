@@ -50,7 +50,7 @@ class LMMS_EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
 public:
-	explicit GuiApplication();
+	explicit GuiApplication(int* sigintFd);
 	~GuiApplication() override;
 
 	static GuiApplication* instance();
