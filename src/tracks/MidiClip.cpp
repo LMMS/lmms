@@ -358,6 +358,8 @@ void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key
 
 	for (const auto& note : notesCopy)
 	{
+		if (note->key() < std::min(key1, key2) || note->key() > std::max(key1, key2)) { continue; }
+
 		TimePos keyIntercept = slope * (note->key() - key1) + pos1;
 		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
 		{
