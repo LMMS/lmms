@@ -28,7 +28,7 @@
 #include <memory>
 #include <cstdlib>
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

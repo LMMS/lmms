@@ -31,7 +31,7 @@
 #include <QPixmap>
 #include <QWidget>
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 
 namespace lmms::gui

@@ -23,7 +23,7 @@
  */
 
 #include "AudioSdl.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SDL
 

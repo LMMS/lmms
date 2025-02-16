@@ -27,7 +27,7 @@
 #define LMMS_BUFFER_MANAGER_H
 
 #include "lmms_export.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

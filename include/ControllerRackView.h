@@ -29,7 +29,7 @@
 #include <QCloseEvent>
 
 #include "SerializingObject.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 
 class QPushButton;

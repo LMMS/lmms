@@ -26,7 +26,7 @@
 #ifndef LMMS_VOLUME_H
 #define LMMS_VOLUME_H
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

@@ -30,7 +30,7 @@
 
 #include "Flags.h"
 #include "lmms_export.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 #include "Plugin.h"
 #include "TimePos.h"
 

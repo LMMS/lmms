@@ -26,7 +26,7 @@
 #ifndef LMMS_SAMPLEFRAME_H
 #define LMMS_SAMPLEFRAME_H
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 #include "lmms_constants.h"
 
 #include <algorithm>

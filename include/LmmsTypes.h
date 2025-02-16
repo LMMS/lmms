@@ -1,5 +1,5 @@
 /*
- * lmms_basics.h - typedefs for common types that are used in the whole app
+ * LmmsTypes.h - typedefs for common types that are used in the whole app
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_TYPE_DECLARATIONS_H
-#define LMMS_TYPE_DECLARATIONS_H
+#ifndef LMMS_TYPES_H
+#define LMMS_TYPES_H
 
 #include <cstddef>
 #include <cstdint>
@@ -67,4 +67,4 @@ constexpr const char* UI_CTRL_KEY =
 
 } // namespace lmms
 
-#endif // LMMS_TYPE_DECLARATIONS_H
+#endif // LMMS_TYPES_H
