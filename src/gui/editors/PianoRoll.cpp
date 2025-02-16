@@ -2764,12 +2764,12 @@ void PianoRoll::updateKnifePos(QMouseEvent* me, bool initial)
 	int mouseViewportPosX = me->x() - m_whiteKeyWidth;
 	int mouseViewportPosY = keyAreaBottom() - 1 - me->y();
 	int mouseTickPos = mouseViewportPosX * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-	int mouseKey = mouseViewportPosY / m_keyLineHeight + m_startKey - 1;
+	int mouseKey = std::round(1.f * mouseViewportPosY / m_keyLineHeight) + m_startKey - 1;
 
 	// If ctrl is not pressed, quantize the position
 	if (!(me->modifiers() & Qt::ControlModifier))
 	{
-		mouseTickPos = floor(mouseTickPos / quantization()) * quantization();
+		mouseTickPos = std::round(1.f * mouseTickPos / quantization()) * quantization();
 	}
 
 	if (initial)
