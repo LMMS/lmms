@@ -28,6 +28,18 @@
 #include <QProcess>
 
 namespace lmms {
+void FileManagerServices::openDir(QString& path)
+{
+	QString nativePath = QDir::toNativeSeparators(path);
+
+#if defined(_WIN32)
+	QProcess::startDetached("explorer", {nativePath});
+#elif defined(__APPLE__)
+	QProcess::startDetached("open", {nativePath});
+#else
+	QProcess::startDetached("xdg-open", {nativePath});
+#endif
+}
 void FileManagerServices::select(const QFileInfo item)
 {
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());

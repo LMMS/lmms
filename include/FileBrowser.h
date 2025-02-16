@@ -195,7 +195,6 @@ private slots:
 	bool openInNewSampleTrack( lmms::gui::FileItem* item );
 	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
-	void openDirectory(Directory* directory);
 	void openContainingFolder( lmms::gui::FileItem* item );
 } ;
 
