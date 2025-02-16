@@ -359,9 +359,11 @@ void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key
 
 	for (const auto& note : notesCopy)
 	{
-		if (note->key() < minKey || note->key() > maxKey) { continue; }
+		// Continuing if the key is <= to minKey, since the line is drawn from the top of minKey to the top of maxKey, but only passes through maxKey - minKey - 1 total keys.
+		if (note->key() <= minKey || note->key() > maxKey) { continue; }
 
-		const TimePos keyIntercept = slope * (note->key() - key1) + pos1;
+		// Subtracting 0.5 to get the line's intercept at the "center" of the key, not the top.
+		const TimePos keyIntercept = slope * (note->key() - 0.5 - key1) + pos1;
 		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
 		{
 			auto newNote1 = Note{*note};
