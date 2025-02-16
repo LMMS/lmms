@@ -44,16 +44,18 @@ public:
 		friend class ResourceCache;
 	};
 
-	template <typename V, typename K,
-		typename Enable
-		= std::enable_if_t<std::conjunction_v<std::is_base_of<Resource, V>, std::is_default_constructible<V>>>,
+	template <typename T, typename Enable = std::enable_if_t<std::is_base_of_v<Resource, T>>,
 		typename... Args>
-	static auto fetch(const K& key, Args&&... args) -> std::shared_ptr<const V>
+	static auto fetch(Args&&... args) -> std::shared_ptr<const T>
 	{
-		const auto digest = hash(key);
-		if (digest.empty()) { return std::make_shared<V>(); }
+		static auto hasher = QCryptographicHash{QCryptographicHash::Algorithm::Md5};
+	
+		hasher.reset();
+		hasher.addData(typeid(T).name());
+		hash(hasher, std::forward<Args>(args)...);
 
-		auto& resource = s_resources[digest];
+		const auto digest = hasher.result().toStdString();
+		auto& resource = s_resources[std::move(digest)];
 
 		if (resource == nullptr)
 		{
@@ -64,20 +66,12 @@ public:
 				s_resources.erase(it);
 			}
 
-			try
-			{
-				resource = std::make_shared<V>(key, std::forward<Args>(args)...);
-			}
-			catch (const std::runtime_error& error)
-			{
-				return std::make_shared<V>();
-			}
-
-			return std::static_pointer_cast<const V>(resource);
+			resource = std::make_shared<T>(std::forward<Args>(args)...);
+			return std::static_pointer_cast<const T>(resource);
 		}
 
 		++resource->m_age;
-		return std::static_pointer_cast<const V>(resource);
+		return std::static_pointer_cast<const T>(resource);
 	}
 
 	static auto instance() -> ResourceCache&
@@ -87,33 +81,28 @@ public:
 	}
 
 private:
-	static auto hash(const std::filesystem::path& path) -> std::string
+	static void hash(QCryptographicHash& hasher, const std::filesystem::path& path)
 	{
-		if (!std::filesystem::exists(path)) { return std::string{}; }
-
 		static constexpr auto blockSize = 8192;
 		static auto block = std::array<char, blockSize>{};
-		static auto hash = QCryptographicHash{QCryptographicHash::Md5};
-
 		auto fstream = std::fstream{path, std::ios::in | std::ios::binary};
-		if (!fstream.is_open()) { return std::string{}; }
-
-		hash.reset();
 
 		do
 		{
 			fstream.read(block.data(), blockSize);
-			hash.addData(block.data(), fstream.gcount());
+			hasher.addData(block.data(), fstream.gcount());
 		} while (fstream.gcount() > 0);
-
-		return hash.result().toStdString();
 	}
 
-	static auto hash(const std::string& key) -> std::string
+	static void hash(QCryptographicHash& hasher, const std::string& base64Audio, int sampleRate)
 	{
-		const auto data = QByteArray::fromStdString(key);
-		const auto hash = QCryptographicHash::hash(data, QCryptographicHash::Md5).toStdString();
-		return hash;
+		hasher.addData(QByteArray::fromStdString(base64Audio));
+		hasher.addData(reinterpret_cast<const char*>(&sampleRate), sizeof(sampleRate));
+	}
+
+	static void hash(QCryptographicHash& hasher, const std::string& str)
+	{
+		hasher.addData(QByteArray::fromStdString(str));
 	}
 
 	ResourceCache() { s_resources.reserve(CacheSize); }
