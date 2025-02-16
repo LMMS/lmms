@@ -1,7 +1,7 @@
 /*
  * FileManagerServices.h - include file for FileManagerServices
  *
- * Copyright (c) 2025 Andrew Wiltshire
+ * Copyright (c) 2025 Andrew Wiltshire <aw1lt / at/ proton/ dot/me >
  *
  * This file is part of LMMS - https://lmms.io
  *

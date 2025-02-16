@@ -1,7 +1,7 @@
 /*
  * FileManagerServices.cpp - Helper file for cross platform file management
  *
- * Copyright (c) 2025 Andrew Wiltshire
+ * Copyright (c) 2025 Andrew Wiltshire <aw1lt / at/ proton/ dot/me >
  *
  * This file is part of LMMS - https://lmms.io
  *
