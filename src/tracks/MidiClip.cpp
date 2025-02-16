@@ -344,6 +344,36 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 	}
 }
 
+void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key2)
+{
+	if (m_notes.empty()) { return; }
+	// Don't split if the line is horitzontal
+	if (key1 == key2) { return; }
+
+	addJournalCheckPoint();
+
+	NoteVector notesCopy = m_notes;
+
+	float slope = 1.f * (pos2 - pos1) / (key2 - key1);
+
+	for (const auto& note : notesCopy)
+	{
+		TimePos keyIntercept = slope * (note->key() - key1) + pos1;
+		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
+		{
+			Note newNote1 = Note(*note);
+			newNote1.setLength(keyIntercept - note->pos());
+			addNote(newNote1, false);
+
+			Note newNote2 = Note(*note);
+			newNote2.setPos(keyIntercept);
+			newNote2.setLength(note->endPos() - keyIntercept);
+			addNote(newNote2, false);
+
+			removeNote(note);
+		}
+	}
+}
 
 
 

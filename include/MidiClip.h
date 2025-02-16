@@ -82,6 +82,9 @@ public:
 	// Split the list of notes on the given position
 	void splitNotes(const NoteVector& notes, TimePos pos);
 
+	// Split the list of notes along a line
+	void splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key2);
+
 	// clip-type stuff
 	inline Type type() const
 	{
