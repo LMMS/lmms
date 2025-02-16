@@ -639,46 +639,44 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 	QMenu contextMenu(this);
 
-	switch(item->type()) {
-		case TypeFileItem: {
-			auto file = dynamic_cast<FileItem*>(item);
-			if (file->isTrack()) {
-				contextMenu.addAction(
-					tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
-				contextMenu.addSeparator();
-			}
-
-			contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
-				tr("Show in %1").arg(fileManager), [=, this] { openContainingFolder(file); });
-
-			auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-			songEditorHeader->setDisabled(true);
-			contextMenu.addAction(songEditorHeader);
-			contextMenu.addActions(getContextActions(file, true));
-
-			auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-			patternEditorHeader->setDisabled(true);
-			contextMenu.addAction(patternEditorHeader);
-			contextMenu.addActions(getContextActions(file, false));
-			break;
+	switch (item->type())
+	{
+	case TypeFileItem: {
+		auto file = dynamic_cast<FileItem*>(item);
+		if (file->isTrack())
+		{
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+			contextMenu.addSeparator();
 		}
-		case TypeDirectoryItem: {
-			auto dir = dynamic_cast<Directory*>(item);
-			contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
-				[=, this] {
-					auto dirname = dir->fullName();
-					FileManagerServices::openDir(dirname);
-				});
-			break;
-		}
-		}
+
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
+			[=, this] { openContainingFolder(file); });
+
+		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
+		songEditorHeader->setDisabled(true);
+		contextMenu.addAction(songEditorHeader);
+		contextMenu.addActions(getContextActions(file, true));
+
+		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+		patternEditorHeader->setDisabled(true);
+		contextMenu.addAction(patternEditorHeader);
+		contextMenu.addActions(getContextActions(file, false));
+		break;
+	}
+	case TypeDirectoryItem: {
+		auto dir = dynamic_cast<Directory*>(item);
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
+			auto dirname = dir->fullName();
+			FileManagerServices::openDir(dirname);
+		});
+		break;
+	}
+	}
 
 	// We should only show the menu if it contains items
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
-
-
-
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {

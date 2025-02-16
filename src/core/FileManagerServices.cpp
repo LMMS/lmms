@@ -46,7 +46,8 @@ void FileManagerServices::select(const QFileInfo item)
 	QStringList params;
 
 #ifdef _WIN32
-	if (!item.isDir()) {
+	if (!item.isDir())
+	{
 		// explorer /select,[object]: Selects the file in the new explorer window
 		params += QLatin1String("/select,");
 	}
@@ -80,9 +81,7 @@ QString FileManagerServices::getDefaultFileManager()
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
 
-	if (fileManager.endsWith(".desktop")) {
-		fileManager.chop(8);
-	}
+	if (fileManager.endsWith(".desktop")) { fileManager.chop(8); }
 
 	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
 	fileManager = fileManager.section('.', -1);
@@ -92,9 +91,7 @@ QString FileManagerServices::getDefaultFileManager()
 
 bool FileManagerServices::canSelect(bool useCache)
 {
-	if (useCache && cachedCanSelect.has_value()) {
-		return cachedCanSelect.value();
-	}
+	if (useCache && cachedCanSelect.has_value()) { return cachedCanSelect.value(); }
 
 	bool result = supportsSelectOption(getDefaultFileManager());
 	cachedCanSelect = result;

@@ -34,7 +34,7 @@ namespace lmms {
 class FileManagerServices
 {
 public:
-	[[maybe_unused]] static void openDir(QString &path);
+	[[maybe_unused]] static void openDir(QString& path);
 	[[maybe_unused]] static void select(QFileInfo item);
 
 #if defined(_WIN32)
