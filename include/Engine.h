@@ -30,7 +30,7 @@
 
 #include "lmmsconfig.h"
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
