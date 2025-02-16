@@ -55,6 +55,8 @@
 #include <sys/prctl.h>
 #endif
 
+#include <csignal>  // To register the signal handler
+
 #include "MainApplication.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -74,7 +76,6 @@
 #include <fenv.h> // For feenableexcept
 #include <execinfo.h> // For backtrace and backtrace_symbols_fd
 #include <unistd.h> // For STDERR_FILENO
-#include <csignal> // To register the signal handler
 #endif
 
 #ifdef LMMS_DEBUG_FPE
