@@ -49,12 +49,12 @@
 #include <QSplashScreen>
 #include <QSocketNotifier>
 #include <csignal>
-#include <unistd.h>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #else
 #include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 namespace lmms
