@@ -29,11 +29,29 @@ void SendButtonIndicator::mousePressEvent(QMouseEvent* e)
 	{
 		// not sending. create a mixer send.
 		mix->createChannelSend(from, to);
+		// create mixer sends for all other selected channels if they don't have them already
+		for (auto mcv : MixerChannelView::selectedChannels())
+		{
+			if (mcv->channelIndex() != from && mcv->channelIndex() != to
+				&& mix->channelSendModel(mcv->channelIndex(), to) == nullptr)
+			{
+				mix->createChannelSend(mcv->channelIndex(), to);
+			}
+		}
 	}
 	else
 	{
 		// sending. delete the mixer send.
 		mix->deleteChannelSend(from, to);
+		// delete mixer sends for all other selected channels if they have them
+		for (auto mcv : MixerChannelView::selectedChannels())
+		{
+			if (mcv->channelIndex() != from && mcv->channelIndex() != to
+				&& mix->channelSendModel(mcv->channelIndex(), to) != nullptr)
+			{
+				mix->deleteChannelSend(mcv->channelIndex(), to);
+			}
+		}
 	}
 
 	m_mv->updateMixerChannel(m_parent->channelIndex());
