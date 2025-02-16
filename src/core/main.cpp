@@ -103,7 +103,7 @@ static int sigintFd[2];
 // SIGINT: Write to a file descriptor that GuiApplication is listening on
 static void intHandler(int code) {
 	char a = 1;
-	::write(sigintFd[0], &a, sizeof(a));
+	(void)!::write(sigintFd[0], &a, sizeof(a));
 }
 
 static inline QString baseName( const QString & file )
