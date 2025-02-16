@@ -30,7 +30,6 @@
 
 #include "AudioEngine.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -223,7 +222,7 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_phaseModel.saveSettings( _doc, _this, "phase" );
 	m_waveModel.saveSettings( _doc, _this, "wave" );
 	m_multiplierModel.saveSettings( _doc, _this, "multiplier" );
-	_this.setAttribute("userwavefile", m_userDefSampleBuffer->audioFile());
+	_this.setAttribute("userwavefile", PathUtil::qStringFromPath(m_userDefSampleBuffer->path()));
 }
 
 
@@ -243,7 +242,8 @@ void LfoController::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			const auto path = PathUtil::pathFromQString(_this.attribute(userWaveFile));
+			m_userDefSampleBuffer = ResourceCache::fetch<SampleBuffer>(path);
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

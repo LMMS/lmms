@@ -32,11 +32,12 @@
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "SampleLoader.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "DataFile.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
+#include "SampleFrame.h"
 #include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
 #include "TextFloat.h"
@@ -241,7 +242,8 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
+		const auto path = PathUtil::pathFromQString(value);
+		m_params->m_userWave = ResourceCache::fetch<SampleBuffer>(path);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -253,7 +255,9 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
+
+		const auto path = PathUtil::pathFromQString(file);
+		m_params->m_userWave = ResourceCache::fetch<SampleBuffer>(path);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -269,7 +273,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 	if( static_cast<EnvelopeAndLfoParameters::LfoShape>(m_params->m_lfoWaveModel.value()) ==
 				EnvelopeAndLfoParameters::LfoShape::UserDefinedWave )
 	{
-		if (m_params->m_userWave->size() <= 1)
+		if (m_params->m_userWave->data().size() <= 1)
 		{
 			TextFloat::displayMessage( tr( "Hint" ),
 				tr( "Drag and drop a sample into this window." ),
