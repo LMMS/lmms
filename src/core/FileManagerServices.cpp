@@ -77,13 +77,18 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 #endif
 }
 
-QString FileManagerServices::getDefaultFileManager()
+QString FileManagerServices::getDefaultFileManager(bool useCache)
 {
 #if defined(_WIN32)
-	return QString("explorer");
+	defaultFileManager = "explorer";
+	return defaultFileManager.value();
 #elif defined(__APPLE__)
-	return QString("open");
+	defaultFileManager = "open";
+	return defaultFileManager.value();
 #else
+
+	if (useCache && defaultFileManager.has_value()) {return defaultFileManager.value();}
+
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 	process.waitForFinished(3000);

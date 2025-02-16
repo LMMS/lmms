@@ -34,7 +34,7 @@ namespace lmms {
 class FileManagerServices
 {
 public:
-	static QString getDefaultFileManager();
+	static QString getDefaultFileManager(bool useCache = true);
 	static void openDir(QString& path);
 	static bool canSelect(bool useCache = true);
 	static void select(QFileInfo item);
@@ -43,7 +43,8 @@ protected:
 	static bool supportsSelectOption(const QString& fileManager);
 
 private:
-	static inline std::optional<bool> cachedCanSelect = true;
+	static inline std::optional<QString> defaultFileManager;
+	static inline std::optional<bool> cachedCanSelect;
 };
 
 } // namespace lmms
