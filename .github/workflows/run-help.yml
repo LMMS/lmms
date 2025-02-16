@@ -46,9 +46,8 @@ jobs:
         config:
           - arch: 'x86_64'
             runner: 'macos-latest'
-          # ARM is currently disabled because there seems to be no runner available
-          # - arch: 'arm64'
-          #   runner: 'macos-14-arm64'
+          - arch: 'arm64'
+            runner: 'macos-latest'
     name: help-macos-${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runner }}
     steps:
