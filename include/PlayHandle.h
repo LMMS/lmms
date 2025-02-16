@@ -32,7 +32,7 @@
 
 #include "Flags.h"
 #include "ThreadableJob.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 class QThread;
 

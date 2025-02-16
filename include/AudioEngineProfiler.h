@@ -29,7 +29,7 @@
 #include <atomic>
 #include <QFile>
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 #include "MicroTimer.h"
 
 namespace lmms

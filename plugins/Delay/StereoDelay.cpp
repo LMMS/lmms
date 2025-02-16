@@ -24,7 +24,7 @@
 
 #include "StereoDelay.h"
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 #include "SampleFrame.h"
 
 namespace lmms
