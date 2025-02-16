@@ -97,21 +97,20 @@ void fpeHandler( int signum ) {
 }
 #endif
 
-// SIGINT file descriptor
-static int sigintFd[2];
-
+#ifndef LMMS_BUILD_WIN32
 // SIGINT: Write to a file descriptor that GuiApplication is listening on
+static int sigintFd[2];
 static void intHandler(int code) {
 	char a = 1;
 	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
 }
+#endif
 
 static inline QString baseName( const QString & file )
 {
 	return QFileInfo( file ).absolutePath() + "/" +
 			QFileInfo( file ).completeBaseName();
 }
-
 
 #ifdef LMMS_BUILD_WIN32
 // Workaround for old MinGW
