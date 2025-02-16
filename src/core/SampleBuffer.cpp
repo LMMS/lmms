@@ -24,8 +24,13 @@
 
 #include "SampleBuffer.h"
 
+#include <QApplication>
+#include <QMessageBox>
+#include <QWidget>
 #include <cstring>
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
 
@@ -50,8 +55,12 @@ SampleBuffer::SampleBuffer(const std::filesystem::path& path)
 		return;
 	}
 
-	throw std::runtime_error{"Failed to decode audio file: The audio codec is possibly unsupported, the audio file "
-							 "corrupted, or the path is invalid."};
+	// TODO: Move GUI error handling outside the core
+	if (gui::getGUI())
+	{
+		QMessageBox::critical(gui::getGUI()->mainWindow(), QObject::tr("Failed to load audio file"),
+			QObject::tr("The audio codec is possibly unsupported, the audio file corrupted, or the path is invalid."));
+	}
 }
 
 SampleBuffer::SampleBuffer(const std::string& base64, int sampleRate)
