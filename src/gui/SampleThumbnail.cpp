@@ -92,7 +92,7 @@ SampleThumbnail::SampleThumbnail(const std::filesystem::path& path)
 }
 
 SampleThumbnail::SampleThumbnail(const std::string& base64)
-	: SampleThumbnail(ResourceCache::fetch<SampleBuffer>(base64, Engine::audioEngine()->outputSampleRate()))
+	: SampleThumbnail(ResourceCache::fetch<SampleBuffer>(base64))
 {
 }
 

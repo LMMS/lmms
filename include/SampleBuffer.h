@@ -27,9 +27,10 @@
 
 #include <vector>
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "ResourceCache.h"
 #include "SampleFrame.h"
-
 #include "lmms_export.h"
 
 namespace lmms {
@@ -39,7 +40,7 @@ class LMMS_EXPORT SampleBuffer : public ResourceCache::Resource
 public:
 	SampleBuffer() = default;
 	explicit SampleBuffer(const std::filesystem::path& path);
-	SampleBuffer(const std::string& base64, int sampleRate);
+	SampleBuffer(const std::string& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	SampleBuffer(const SampleFrame* buffer, size_t size, int sampleRate);
 	SampleBuffer(std::vector<SampleFrame> buffer, int sampleRate);
 
