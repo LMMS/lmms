@@ -149,7 +149,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		const auto buffer = ResourceCache::fetch<SampleBuffer>(sf.toStdString());
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(sf));
 		m_sample = Sample{std::move(buffer)};
 		length = sampleLength();
 	}
