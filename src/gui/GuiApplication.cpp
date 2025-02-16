@@ -53,8 +53,9 @@
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
-#endif
+#else
 #include <sys/socket.h>
+#endif
 
 namespace lmms
 {
@@ -250,8 +251,10 @@ void GuiApplication::childDestroyed(QObject *obj)
 
 // Create our unix signal notifiers
 void GuiApplication::createSocketNotifier(int* sigintFd) {
+#ifndef LMMS_BUILD_WIN32
 	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigintFd))
 	   qFatal("Couldn't create SIGINT socketpair");
+#endif
 
 	// Listen on the file descriptor for SIGINT
 	m_sigintNotifier = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
