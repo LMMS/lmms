@@ -630,7 +630,7 @@ IF(NOT CMAKE_BUILD_TYPE)
 		"MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
-IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+IF(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_compile_definitions(NDEBUG)
 ENDIF()
 
