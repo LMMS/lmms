@@ -62,19 +62,28 @@ void FileManagerServices::select(const QFileInfo item)
 	QProcess::startDetached(getDefaultFileManager(), params);
 }
 
-#if !defined(_WIN32) && !defined(__APPLE__)
 bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 {
+#if !defined(_WIN32) && !defined(__APPLE__)
+
 	QProcess process;
 	process.start(fileManager, {"--help"});
 	process.waitForFinished(3000);
 
 	QString output = process.readAllStandardOutput() + process.readAllStandardError();
 	return output.contains("--select");
+#else
+	return true;
+#endif
 }
 
 QString FileManagerServices::getDefaultFileManager()
 {
+#if defined(_WIN32)
+	return QString("explorer");
+#elif defined(__APPLE__)
+	return QString("open");
+#else
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 	process.waitForFinished(3000);
@@ -87,17 +96,19 @@ QString FileManagerServices::getDefaultFileManager()
 	fileManager = fileManager.section('.', -1);
 
 	return fileManager;
+#endif
 }
 
 bool FileManagerServices::canSelect(bool useCache)
 {
+#if defined(_WIN32) || !defined(__APPLE__)
+	cachedCanSelect = true;
+#endif
 	if (useCache && cachedCanSelect.has_value()) { return cachedCanSelect.value(); }
 
 	bool result = supportsSelectOption(getDefaultFileManager());
 	cachedCanSelect = result;
 	return result;
 }
-
-#endif
 
 } // namespace lmms

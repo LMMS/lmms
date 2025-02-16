@@ -34,33 +34,16 @@ namespace lmms {
 class FileManagerServices
 {
 public:
+	static QString getDefaultFileManager();
 	static void openDir(QString& path);
+	static bool canSelect(bool useCache = true);
 	static void select(QFileInfo item);
 
-#if defined(_WIN32)
-	static QString getDefaultFileManager() { return QString("explorer"); }
-	static bool canSelect(bool useCache = true) { return true; }
-#elif defined(__APPLE__)
-	static QString getDefaultFileManager() { return QString("open"); };
-	static bool canSelect(bool useCache = true) { return true; }
-#else
-	static QString getDefaultFileManager();
-	static bool canSelect(bool useCache = true);
-#endif
-
 protected:
-#if !defined(_WIN32) && !defined(__APPLE__)
 	static bool supportsSelectOption(const QString& fileManager);
-#else
-	static bool supportsSelectOption(const QString& fileManager) { return true; };
-#endif
 
 private:
-#if !defined(_WIN32) && !defined(__APPLE__)
-	static inline std::optional<bool> cachedCanSelect;
-#else
 	static inline std::optional<bool> cachedCanSelect = true;
-#endif
 };
 
 } // namespace lmms
