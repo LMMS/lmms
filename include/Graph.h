@@ -32,7 +32,7 @@
 
 #include "Model.h"
 #include "ModelView.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

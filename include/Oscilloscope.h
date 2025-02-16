@@ -28,7 +28,7 @@
 #include <QWidget>
 #include <QPixmap>
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

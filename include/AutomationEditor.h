@@ -37,7 +37,7 @@
 #include "MidiClip.h"
 #include "SampleClip.h"
 #include "TimePos.h"
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 #include "SampleThumbnail.h"
 
 class QPainter;

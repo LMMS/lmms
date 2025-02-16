@@ -28,7 +28,7 @@
 #include <QHash>
 #include <QStack>
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 #include "DataFile.h"
 
 

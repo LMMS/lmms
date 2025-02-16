@@ -26,7 +26,7 @@
 #ifndef LMMS_OUTPUT_SETTINGS_H
 #define LMMS_OUTPUT_SETTINGS_H
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

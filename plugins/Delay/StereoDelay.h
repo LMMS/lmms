@@ -25,7 +25,7 @@
 #ifndef STEREODELAY_H
 #define STEREODELAY_H
 
-#include "LmmsTypeDeclarations.h"
+#include "LmmsTypes.h"
 
 
 namespace lmms
