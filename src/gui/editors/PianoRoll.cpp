@@ -3551,8 +3551,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			p.setPen(QPen(m_knifeCutLineColor, 1));
 			p.drawLine(x1, y1, x2, y2);
-
-			setCursor(Qt::BlankCursor);
 		}
 		// -- End knife tool
 
