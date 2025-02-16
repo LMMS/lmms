@@ -347,33 +347,33 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds)
 {
 	if (m_notes.empty()) { return; }
+
 	// Don't split if the line is horitzontal
 	if (key1 == key2) { return; }
 
 	addJournalCheckPoint();
 
-	NoteVector notesCopy = m_notes;
-
-	float slope = 1.f * (pos2 - pos1) / (key2 - key1);
+	const auto notesCopy = m_notes;
+	const auto slope = 1.f * (pos2 - pos1) / (key2 - key1);
+	const auto& [minKey, maxKey] = std::minmax(key1, key2);
 
 	for (const auto& note : notesCopy)
 	{
-		if (note->key() < std::min(key1, key2) || note->key() > std::max(key1, key2)) { continue; }
+		if (note->key() < minKey || note->key() > maxKey) { continue; }
 
-		TimePos keyIntercept = slope * (note->key() - key1) + pos1;
+		const TimePos keyIntercept = slope * (note->key() - key1) + pos1;
 		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
 		{
-			Note newNote1 = Note(*note);
+			auto newNote1 = Note{*note};
 			newNote1.setLength(keyIntercept - note->pos());
 
-			Note newNote2 = Note(*note);
+			auto newNote2 = Note{*note};
 			newNote2.setPos(keyIntercept);
 			newNote2.setLength(note->endPos() - keyIntercept);
 
 			if (deleteShortEnds)
 			{
-				if (newNote1.length() >= newNote2.length()) { addNote(newNote1, false); }
-				else { addNote(newNote2, false); }
+				addNote(newNote1.length() >= newNote2.length() ? newNote1 : newNote2, false);
 			}
 			else
 			{
