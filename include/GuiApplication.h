@@ -52,6 +52,7 @@ class LMMS_EXPORT GuiApplication : public QObject
 public:
 	explicit GuiApplication();
 	~GuiApplication() override;
+
 	static GuiApplication* instance();
 #ifdef LMMS_BUILD_WIN32
 	static QFont getWin32SystemFont();

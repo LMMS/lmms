@@ -255,6 +255,7 @@ void GuiApplication::createSocketNotifier(int* sigintFd) {
 	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(signintHandler()));
 }
 
+// Handle the SIGINT event
 void GuiApplication::signintHandler() {
 	m_sigintNotifier->setEnabled(false);
 	qDebug() << "\nShutting down...";
