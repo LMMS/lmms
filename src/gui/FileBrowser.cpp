@@ -1014,7 +1014,8 @@ void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 	if (FileManagerServices::canSelect())
 	{
 		FileManagerServices::select(fileInfo);
-	} else
+	}
+	else
 	{
 		QString path = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));

@@ -22,8 +22,9 @@
  *
  */
 
-#ifndef LLMS_CORE_FILEMANAGER_SERVICES_H
-#define LLMS_CORE_FILEMANAGER_SERVICES_H
+#ifndef LMMS_FILEMANAGER_SERVICES_H
+#define LMMS_FILEMANAGER_SERVICES_H
+
 #include <QFileInfo>
 #include <QString>
 #include <optional>
@@ -62,4 +63,4 @@ private:
 };
 
 } // namespace lmms
-#endif // LLMS_CORE_FILEMANAGER_SERVICES_H
+#endif // LMMS_CORE_FILEMANAGER_SERVICES_H
