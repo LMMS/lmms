@@ -2270,7 +2270,8 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		}
 		else if (m_action == Action::Knife)
 		{
-			m_midiClip->splitNotesAlongLine(TimePos(m_knifeStartTickPos), m_knifeStartKey, TimePos(m_knifeEndTickPos), m_knifeEndKey);
+			bool deleteShortEnds = me->modifiers() & Qt::ShiftModifier;
+			m_midiClip->splitNotesAlongLine(TimePos(m_knifeStartTickPos), m_knifeStartKey, TimePos(m_knifeEndTickPos), m_knifeEndKey, deleteShortEnds);
 			m_knifeDown = false;
 		}
 

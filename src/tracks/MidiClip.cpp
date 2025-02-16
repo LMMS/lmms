@@ -344,7 +344,7 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 	}
 }
 
-void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key2)
+void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds)
 {
 	if (m_notes.empty()) { return; }
 	// Don't split if the line is horitzontal
@@ -365,12 +365,21 @@ void MidiClip::splitNotesAlongLine(TimePos pos1, int key1, TimePos pos2, int key
 		{
 			Note newNote1 = Note(*note);
 			newNote1.setLength(keyIntercept - note->pos());
-			addNote(newNote1, false);
 
 			Note newNote2 = Note(*note);
 			newNote2.setPos(keyIntercept);
 			newNote2.setLength(note->endPos() - keyIntercept);
-			addNote(newNote2, false);
+
+			if (deleteShortEnds)
+			{
+				if (newNote1.length() >= newNote2.length()) { addNote(newNote1, false); }
+				else { addNote(newNote2, false); }
+			}
+			else
+			{
+				addNote(newNote1, false);
+				addNote(newNote2, false);
+			}
 
 			removeNote(note);
 		}
