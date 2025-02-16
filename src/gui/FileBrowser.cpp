@@ -665,7 +665,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		case TypeDirectoryItem: {
 			auto dir = dynamic_cast<Directory*>(item);
 			contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
-				[=, this] { openDirectory(dir); });
+				[=, this] {
+					auto dirname = dir->fullName();
+					FileManagerServices::openDir(dirname);
+				});
 			break;
 		}
 		}
@@ -1002,10 +1005,6 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 
 
-
-void FileBrowserTreeWidget::openDirectory(Directory* directory) {
-   QDesktopServices::openUrl(QUrl::fromLocalFile(directory->fullName()));
-}
 
 void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
