@@ -55,8 +55,6 @@
 #include <sys/prctl.h>
 #endif
 
-#include <csignal>
-
 #include "MainApplication.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -79,7 +77,6 @@
 #include <csignal> // To register the signal handler
 #endif
 
-
 #ifdef LMMS_DEBUG_FPE
 void fpeHandler( int signum ) {
 
@@ -99,14 +96,13 @@ void fpeHandler( int signum ) {
 }
 #endif
 
-void interruptHandler(int code) {
-	using namespace lmms::gui;
+// SIGINT file descriptor
+static int sigintFd[2];
 
-	if(getGUI() != nullptr) {
-		getGUI()->sendInterrupt(code);
-	} else {
-		exit(3);
-	}
+// SIGINT: Write to a file descriptor that GuiApplication is listening on
+static void intHandler(int code) {
+	char a = 1;
+	::write(sigintFd[0], &a, sizeof(a));
 }
 
 static inline QString baseName( const QString & file )
@@ -326,7 +322,7 @@ int main( int argc, char * * argv )
 	// register signal SIGFPE and signal handler
 	signal(SIGFPE, fpeHandler);
 #endif
-	signal(SIGINT, interruptHandler);
+	signal(SIGINT, intHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
@@ -817,6 +813,8 @@ int main( int argc, char * * argv )
 		using namespace lmms::gui;
 
 		new GuiApplication();
+		// immediately register our SIGINT handler
+		getGUI()->createSocketNotifier(sigintFd);
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure

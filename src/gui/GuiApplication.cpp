@@ -41,16 +41,20 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QDir>
 #include <QtGlobal>
 #include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <QSocketNotifier>
 #include <csignal>
+#include <unistd.h>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #endif
+#include <sys/socket.h>
 
 namespace lmms
 {
@@ -76,9 +80,6 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication()
 {
-	// Add interrupt handler as early as possible
-	connect(this, SIGNAL(interruptOccurred(int)), this, SLOT(processInterrupt(int)), Qt::QueuedConnection);
-
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
 		QMessageBox::question( nullptr,
@@ -244,17 +245,21 @@ void GuiApplication::childDestroyed(QObject *obj)
 	}
 }
 
-void GuiApplication::sendInterrupt(int signal) {
-	emit interruptOccurred(signal);
+// Create our unix signal notifiers
+void GuiApplication::createSocketNotifier(int* sigintFd) {
+	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigintFd))
+	   qFatal("Couldn't create SIGINT socketpair");
+
+	// Listen on the file descriptor for SIGINT
+	m_sigintNotifier = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
+	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(signintHandler()));
 }
 
-// Slot for handling interrupts from main()
-void GuiApplication::processInterrupt(int signal) {
-	switch(signal) {
-		case SIGINT:
-			// add last minute resource clean-up goes here
-			qApp->exit(3);
-	}
+void GuiApplication::signintHandler() {
+	m_sigintNotifier->setEnabled(false);
+	qDebug() << "\nShutting down...";
+	// cleanup, etc
+	qApp->exit(3);
 }
 
 #ifdef LMMS_BUILD_WIN32
