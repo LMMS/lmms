@@ -139,9 +139,6 @@ private:
 	QString m_previousFilterValue;
 } ;
 
-
-class Directory;
-
 class FileBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
