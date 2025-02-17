@@ -306,6 +306,8 @@ void ClipView::remove()
 	// as actually deleting the Clip with the deleteLater function. That being said, it shouldn't
 	// be possible to make a Clip without a Track (i.e., Clip::getTrack is never nullptr).
 	m_clip->deleteLater();
+
+	m_trackView->update();
 }
 
 
