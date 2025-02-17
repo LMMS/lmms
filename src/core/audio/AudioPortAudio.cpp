@@ -45,6 +45,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 {
 	auto configBackendName = ConfigManager::inst()->value("audioportaudio", "backend");
 	auto configDeviceName = ConfigManager::inst()->value("audioportaudio", "device");
+	auto configChannelCount = ConfigManager::inst()->value("audioportaudio", "channels");
 
 	auto backendIndex = Pa_GetDefaultHostApi();
 	auto backendInfo = Pa_GetHostApiInfo(backendIndex);
@@ -83,6 +84,10 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	}
 	else
 	{
+		const auto channelCount = std::min(configChannelCount.toInt(), outputDeviceInfo->maxOutputChannels);
+		ConfigManager::inst()->setValue("audioportaudio", "channels", QString::number(channelCount));
+		setChannels(channelCount);
+
 		ConfigManager::inst()->setValue("audioportaudio", "backend", backendInfo->name);
 		ConfigManager::inst()->setValue("audioportaudio", "device", outputDeviceInfo->name);
 	}
