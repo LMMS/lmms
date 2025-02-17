@@ -24,8 +24,10 @@
 
 #include "FileManagerServices.h"
 
+#include <QDesktopServices>
 #include <QDir>
 #include <QProcess>
+#include <QUrl>
 
 namespace lmms {
 void FileManagerServices::openDir(QString& path)
@@ -36,6 +38,7 @@ void FileManagerServices::openDir(QString& path)
 }
 void FileManagerServices::select(const QFileInfo item)
 {
+	if (!canSelect()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.absolutePath())); }
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 

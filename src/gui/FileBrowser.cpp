@@ -26,10 +26,8 @@
 #include "FileBrowser.h"
 
 #include <QApplication>
-#include <QDesktopServices>
 #include <QDirIterator>
 #include <QHBoxLayout>
-#include <QKeyEvent>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -46,7 +44,6 @@
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
-#include "FileBrowser.h"
 #include "FileManagerServices.h"
 #include "FileSearch.h"
 #include "GuiApplication.h"
@@ -1007,16 +1004,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
 	QFileInfo fileInfo(item->fullName());
-
-	if (FileManagerServices::canSelect())
-	{
-		FileManagerServices::select(fileInfo);
-	}
-	else
-	{
-		QString path = QDir::toNativeSeparators(fileInfo.canonicalFilePath());
-		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));
-	}
+	FileManagerServices::select(fileInfo);
 }
 
 
