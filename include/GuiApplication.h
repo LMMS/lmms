@@ -26,6 +26,7 @@
 #define LMMS_GUI_GUI_APPLICATION_H
 
 #include <QObject>
+#include <QSocketNotifier>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"
@@ -49,13 +50,15 @@ class LMMS_EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
 public:
-	explicit GuiApplication();
+	explicit GuiApplication(int* sigintFd);
 	~GuiApplication() override;
 
 	static GuiApplication* instance();
 #ifdef LMMS_BUILD_WIN32
 	static QFont getWin32SystemFont();
 #endif
+
+	void createSocketNotifier(int* sigintFd);
 
 	MainWindow* mainWindow() { return m_mainWindow; }
 	MixerView* mixerView() { return m_mixerView; }
@@ -72,6 +75,7 @@ public slots:
 
 private slots:
 	void childDestroyed(QObject *obj);
+	void signintHandler();
 
 private:
 	static GuiApplication* s_instance;
@@ -86,6 +90,7 @@ private:
 	MicrotunerConfig* m_microtunerConfig;
 	ControllerRackView* m_controllerRackView;
 	QLabel* m_loadingProgressLabel;
+	QSocketNotifier* m_sigintNotifier;
 };
 
 // Short-hand function

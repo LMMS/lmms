@@ -41,14 +41,20 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QDir>
 #include <QtGlobal>
 #include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <QSocketNotifier>
+#include <csignal>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
+#else
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 namespace lmms
@@ -73,8 +79,11 @@ GuiApplication* GuiApplication::instance()
 
 
 
-GuiApplication::GuiApplication()
+GuiApplication::GuiApplication(int* sigintFd)
 {
+	// Immediately register our SIGINT handler
+	createSocketNotifier(sigintFd);
+
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
 		QMessageBox::question( nullptr,
@@ -238,6 +247,27 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_controllerRackView = nullptr;
 	}
+}
+
+// Create our unix signal notifiers
+void GuiApplication::createSocketNotifier(int* sigintFd) {
+#ifndef LMMS_BUILD_WIN32
+	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigintFd))
+	   qFatal("Couldn't create SIGINT socketpair");
+#endif
+
+	// Listen on the file descriptor for SIGINT
+	m_sigintNotifier = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
+	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(signintHandler()), Qt::QueuedConnection);
+}
+
+// Handle the SIGINT event
+void GuiApplication::signintHandler() {
+	m_sigintNotifier->setEnabled(false);
+	qDebug() << "Shutting down...";
+	// cleanup, etc
+	qApp->exit(3);
+	m_sigintNotifier->setEnabled(true);
 }
 
 #ifdef LMMS_BUILD_WIN32
