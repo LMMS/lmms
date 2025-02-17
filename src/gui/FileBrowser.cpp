@@ -651,7 +651,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=, this] { openContainingFolder(fileName); });
+			[=, this] { FileManagerServices::reveal(fileName); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -666,13 +666,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
+		QString dirname = dir->fullName();
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
-			auto dirname = dir->fullName();
-			FileManagerServices::openDir(dirname);
+			auto _dirname = dirname;
+			FileManagerServices::openDir(_dirname);
 		});
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager), [=, this] {
-			auto dirname = dir->fullName();
-			openContainingFolder(dirname);
+			FileManagerServices::reveal(dirname);
 		});
 		break;
 	}
@@ -1011,14 +1011,6 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 	clip->setSampleFile(item->fullName());
 	Engine::audioEngine()->doneChangeInModel();
 	return true;
-}
-
-
-
-
-void FileBrowserTreeWidget::openContainingFolder(QString item)
-{
-	FileManagerServices::reveal(item);
 }
 
 
