@@ -75,7 +75,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	if (err != paNoError)
 	{
-		std::cerr << "Could not open PortAudio stream: " << Pa_GetErrorText(err) << '\n';
+		std::cerr << "Failed to open PortAudio stream: " << Pa_GetErrorText(err) << '\n';
 		successful = false;
 		return;
 	}
@@ -86,6 +86,9 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
+
+	const auto err = Pa_CloseStream(&m_paStream);
+	if (err != paNoError) { std::cerr << "Failed to close PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 }
 
 void AudioPortAudio::startProcessing()
