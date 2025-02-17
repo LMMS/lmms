@@ -104,17 +104,17 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	{
 		std::cerr << "Failed to support PortAudio format: " << Pa_GetErrorText(err) << '\n';
 
+		if (backendInfo != nullptr)
+		{
+			std::cerr << "Backend: " << backendInfo->name << '\n';
+			std::cerr << "Backend device count: " << backendInfo->deviceCount << '\n';
+		}
+
 		if (outputDeviceInfo != nullptr)
 		{
 			std::cerr << "Output device max channel count: " << outputDeviceInfo->maxOutputChannels << '\n';
 			std::cerr << "Output device default sample rate: " << outputDeviceInfo->defaultSampleRate << '\n';
 			std::cerr << "Output device name: " << outputDeviceInfo->name;
-		}
-
-		if (backendInfo != nullptr)
-		{
-			std::cerr << "Backend: " << backendInfo->name << '\n';
-			std::cerr << "Backend device count: " << backendInfo->deviceCount << '\n';
 		}
 
 		std::cerr << "Output sample rate: " << sampleRate() << '\n';
