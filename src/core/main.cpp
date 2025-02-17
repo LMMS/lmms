@@ -97,14 +97,18 @@ void fpeHandler( int signum ) {
 }
 #endif
 
-static int sigintFd[2];
-#ifndef LMMS_BUILD_WIN32
 // SIGINT: Write to a file descriptor that GuiApplication is listening on
+static int sigintFd[2];
 static void intHandler(int code) {
+#ifndef LMMS_BUILD_WIN32
 	char a = 1;
 	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
-}
+#else
+	char message[] = "Sorry, SIGINT is unhandled on this platform\n";
+	std::ignore = _write(_fileno(stderr), message, sizeof(message));
 #endif
+}
+
 
 static inline QString baseName( const QString & file )
 {
