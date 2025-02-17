@@ -281,10 +281,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto& sample = m_clip->m_sample;
 
+	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
+
 	if (sample.sampleSize() > 0)
 	{
 		const auto param = SampleThumbnail::VisualizeParameters{
-			.sampleRect = QRect(offsetStart - m_paintPixmapXPosition, spacing, sampleLength, height() - spacing),
+			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
 			.viewportRect = viewPortRect,
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
@@ -301,12 +303,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 135 ) );
-	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+	p.drawRect(
+		-m_paintPixmapXPosition + 1,
+		1,
+		rect().right() - BORDER_WIDTH,
 		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 200 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+	p.drawRect( -m_paintPixmapXPosition, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
