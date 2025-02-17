@@ -30,6 +30,7 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+#include "AutomatableModel.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
@@ -47,6 +48,7 @@ namespace lmms::gui
 
 
 class TabBar;
+class LcdFloatSpinBox;
 
 class SetupDialog : public QDialog
 {
@@ -183,6 +185,7 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
+	FloatModel m_sampleRateModel;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
