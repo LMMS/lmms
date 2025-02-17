@@ -79,6 +79,8 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 
 QString FileManagerServices::getDefaultFileManager()
 {
+
+    if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
 #if defined(_WIN32)
 	defaultFileManager = "explorer";
 	return defaultFileManager.value();
@@ -87,7 +89,6 @@ QString FileManagerServices::getDefaultFileManager()
 	return defaultFileManager.value();
 #else
 
-	if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
 
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
