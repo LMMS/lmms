@@ -46,11 +46,8 @@ void FileManagerServices::select(const QFileInfo item)
 	QStringList params;
 
 #ifdef _WIN32
-	if (!item.isDir())
-	{
-		// explorer /select,[object]: Selects the file in the new explorer window
-		params += QLatin1String("/select,");
-	}
+	// explorer /select,[object]: Selects the file in the new explorer window
+	params += QLatin1String("/select,");
 #elif __APPLE__
 	// Finder -R, --reveal: Selects in finder
 	params += "-R";
