@@ -128,11 +128,8 @@ int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffe
 }
 
 int AudioPortAudio::processCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
-	const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* arg)
+	const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* arg)
 {
-	Q_UNUSED(timeInfo);
-	Q_UNUSED(statusFlags);
-
 	auto _this = static_cast<AudioPortAudio*>(arg);
 	return _this->processCallback(
 		static_cast<const float*>(inputBuffer), static_cast<float*>(outputBuffer), framesPerBuffer);
