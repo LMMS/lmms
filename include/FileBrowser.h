@@ -99,9 +99,9 @@ private slots:
 	void giveFocusToFilter();
 
 private:
-	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyPressEvent(QKeyEvent* ke) override;
 
-	void addItems( const QString & path );
+	void addItems(const QString& path);
 
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
@@ -113,16 +113,16 @@ private:
 
 	void addContentCheckBox();
 
-	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
-	FileBrowserTreeWidget * m_searchTreeWidget;
+	FileBrowserTreeWidget* m_fileBrowserTreeWidget;
+	FileBrowserTreeWidget* m_searchTreeWidget;
 
-	QLineEdit * m_filterEdit;
+	QLineEdit* m_filterEdit;
 
 	std::shared_ptr<FileSearch> m_currentSearch;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
-	QString m_filter; //!< Filter as used in QDir::match()
+	QString m_filter;	   //!< Filter as used in QDir::match()
 
 	bool m_dirsAsItems;
 
@@ -130,36 +130,35 @@ private:
 	QCheckBox* m_showFactoryContent = nullptr;
 	QCheckBox* m_showHiddenContent = nullptr;
 
-	QBoxLayout *filterWidgetLayout = nullptr;
-	QBoxLayout *hiddenWidgetLayout = nullptr;
-	QBoxLayout *outerLayout = nullptr;
+	QBoxLayout* filterWidgetLayout = nullptr;
+	QBoxLayout* hiddenWidgetLayout = nullptr;
+	QBoxLayout* outerLayout = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
 	QList<QString> m_savedExpandedDirs;
 	QString m_previousFilterValue;
-} ;
+};
 
 class FileBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
 public:
-	FileBrowserTreeWidget( QWidget * parent );
+	FileBrowserTreeWidget(QWidget* parent);
 	~FileBrowserTreeWidget() override = default;
 
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
-	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
+	QList<QString> expandedDirs(QTreeWidgetItem* item = nullptr) const;
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * e ) override;
-	void mousePressEvent( QMouseEvent * me ) override;
-	void mouseMoveEvent( QMouseEvent * me ) override;
-	void mouseReleaseEvent( QMouseEvent * me ) override;
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-	void hideEvent( QHideEvent * he ) override;
-	void focusOutEvent( QFocusEvent * fe ) override;
-
+	void contextMenuEvent(QContextMenuEvent* e) override;
+	void mousePressEvent(QMouseEvent* me) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
+	void mouseReleaseEvent(QMouseEvent* me) override;
+	void keyPressEvent(QKeyEvent* ke) override;
+	void keyReleaseEvent(QKeyEvent* ke) override;
+	void hideEvent(QHideEvent* he) override;
+	void focusOutEvent(QFocusEvent* fe) override;
 
 private:
 	//! Start a preview of a file item
@@ -167,17 +166,16 @@ private:
 	//! If a preview is playing, stop it.
 	void stopPreview();
 
-	void handleFile( FileItem * fi, InstrumentTrack * it );
-	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
-
+	void handleFile(FileItem* fi, InstrumentTrack* it);
+	void openInNewInstrumentTrack(TrackContainer* tc, FileItem* item);
 
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
 	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
-	
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 	QRecursiveMutex m_pphMutex;
 #else
 	QMutex m_pphMutex;
@@ -185,17 +183,14 @@ private:
 
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
-
 private slots:
-	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
-	bool openInNewSampleTrack( lmms::gui::FileItem* item );
-	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
-	void updateDirectory( QTreeWidgetItem * item );
-	static void openContainingFolder( QString item );
-} ;
-
-
+	void activateListItem(QTreeWidgetItem* item, int column);
+	void openInNewInstrumentTrack(lmms::gui::FileItem* item, bool songEditor);
+	bool openInNewSampleTrack(lmms::gui::FileItem* item);
+	void sendToActiveInstrumentTrack(lmms::gui::FileItem* item);
+	void updateDirectory(QTreeWidgetItem* item);
+	static void openContainingFolder(QString item);
+};
 
 class Directory : public QTreeWidgetItem
 {
