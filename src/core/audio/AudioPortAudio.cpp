@@ -90,17 +90,14 @@ AudioPortAudio::~AudioPortAudio()
 
 void AudioPortAudio::startProcessing()
 {
-	PaError err = Pa_StartStream(m_paStream);
+	const auto err = Pa_StartStream(m_paStream);
 	if (err != paNoError) { std::cerr << "Failed to start PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 }
 
 void AudioPortAudio::stopProcessing()
 {
-	if (m_paStream && Pa_IsStreamActive(m_paStream))
-	{
-		PaError err = Pa_StopStream(m_paStream);
-		if (err != paNoError) { std::cerr << "Failed to stop PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
-	}
+	const auto err = Pa_StopStream(m_paStream);
+	if (err != paNoError) { std::cerr << "Failed to stop PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 }
 
 int AudioPortAudio::processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer)
