@@ -234,7 +234,11 @@ PortAudioInitializationGuard::PortAudioInitializationGuard()
 
 PortAudioInitializationGuard::~PortAudioInitializationGuard()
 {
-	if (m_error == paNoError) { Pa_Terminate(); }
+	if (m_error == paNoError)
+	{
+		const auto err = Pa_Terminate();
+		if (err != paNoError) { std::cerr << "Failed to terminate PortAudio: " << Pa_GetErrorText(err) << '\n'; }
+	}
 }
 } // namespace lmms
 
