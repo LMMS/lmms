@@ -32,7 +32,7 @@ void FileManagerServices::openDir(QString& path)
 {
 	QString nativePath = QDir::toNativeSeparators(path);
 
-QProcess::startDetached(getDefaultFileManager(), {nativePath});
+	QProcess::startDetached(getDefaultFileManager(), {nativePath});
 }
 void FileManagerServices::select(const QFileInfo item)
 {
@@ -71,7 +71,7 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 QString FileManagerServices::getDefaultFileManager()
 {
 
-    if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
+	if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
 #if defined(_WIN32)
 	defaultFileManager = "explorer";
 	return defaultFileManager.value();
@@ -79,7 +79,6 @@ QString FileManagerServices::getDefaultFileManager()
 	defaultFileManager = "open";
 	return defaultFileManager.value();
 #else
-
 
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
