@@ -57,22 +57,19 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	for (auto i = 0; i < backendCount; ++i)
 	{
 		const auto currentBackendInfo = Pa_GetHostApiInfo(i);
-		if (currentBackendInfo->name == configBackendName)
-		{
-			backendIndex = i;
-			backendInfo = currentBackendInfo;
-		}
+		if (currentBackendInfo->name != configBackendName) { continue; }
+
+		backendIndex = i;
+		backendInfo = currentBackendInfo;
 
 		for (auto j = 0; j < currentBackendInfo->deviceCount; ++j)
 		{
 			const auto currentDeviceIndex = Pa_HostApiDeviceIndexToDeviceIndex(i, j);
 			const auto currentDeviceInfo = Pa_GetDeviceInfo(currentDeviceIndex);
+			if (currentDeviceInfo->name != configDeviceName) { continue; }
 
-			if (currentDeviceInfo->name == configDeviceName)
-			{
-				outputDeviceIndex = currentDeviceIndex;
-				outputDeviceInfo = currentDeviceInfo;
-			}
+			outputDeviceIndex = currentDeviceIndex;
+			outputDeviceInfo = currentDeviceInfo;
 		}
 	}
 
