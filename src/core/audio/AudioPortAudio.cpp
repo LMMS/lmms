@@ -48,18 +48,19 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	auto outputDeviceIndex = Pa_GetDefaultOutputDevice();
 	auto outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
+	auto outputBackend = Pa_GetHostApiInfo(Pa_GetDefaultHostApi());
 	const auto deviceCount = Pa_GetDeviceCount();
 
 	for (auto i = 0; i < deviceCount; ++i)
 	{
-		const auto deviceInfo = Pa_GetDeviceInfo(i);
-		const auto currentBackendName = Pa_GetHostApiInfo(deviceInfo->hostApi)->name;
-		const auto currentDeviceName = deviceInfo->name;
+		const auto currentDeviceInfo = Pa_GetDeviceInfo(i);
+		const auto currentBackend = Pa_GetHostApiInfo(currentDeviceInfo->hostApi);
 
-		if (currentBackendName == backend && currentDeviceName == device)
+		if (currentBackend->name == backend && currentDeviceInfo->name == device)
 		{
 			outputDeviceIndex = i;
-			outputDeviceInfo = deviceInfo;
+			outputDeviceInfo = currentDeviceInfo;
+			outputBackend = currentBackend;
 			break;
 		}
 	}
@@ -75,12 +76,18 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	if (err != paFormatIsSupported)
 	{
 		std::cerr << "Failed to support PortAudio format: " << Pa_GetErrorText(err) << '\n';
-		std::cerr << "Device range: " << "[0, " << deviceCount - 1 << "]\n";
 
 		if (outputDeviceInfo != nullptr)
 		{
-			std::cerr << "Max channel count: " << outputDeviceInfo->maxOutputChannels << '\n';
-			std::cerr << "Default sample rate: " << outputDeviceInfo->defaultSampleRate << '\n';
+			std::cerr << "Output max channel count: " << outputDeviceInfo->maxOutputChannels << '\n';
+			std::cerr << "Output default sample rate: " << outputDeviceInfo->defaultSampleRate << '\n';
+			std::cerr << "Output device name: " << outputDeviceInfo->name;
+		}
+
+		if (outputBackend != nullptr)
+		{
+			std::cerr << "Output backend: " << outputBackend->name << '\n';
+			std::cerr << "Output backend device count: " << outputBackend->deviceCount << '\n';
 		}
 
 		std::cerr << "Output sample rate: " << sampleRate() << '\n';
@@ -99,6 +106,13 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		std::cerr << "Failed to open PortAudio stream: " << Pa_GetErrorText(err) << '\n';
 		successful = false;
 		return;
+	}
+
+	if (const auto streamInfo = Pa_GetStreamInfo(m_paStream); streamInfo != nullptr)
+	{
+		std::cout << "Stream sample rate: " << streamInfo->sampleRate << '\n';
+		std::cout << "Stream input latency: " << streamInfo->inputLatency << '\n';
+		std::cout << "Stream output latency: " << streamInfo->outputLatency << '\n';
 	}
 
 	successful = true;
