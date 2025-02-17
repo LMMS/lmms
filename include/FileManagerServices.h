@@ -34,9 +34,9 @@ namespace lmms {
 class FileManagerServices
 {
 public:
-	static QString getDefaultFileManager(bool useCache = true);
+	static QString getDefaultFileManager();
 	static void openDir(QString& path);
-	static bool canSelect(bool useCache = true);
+	static bool canSelect();
 	static void select(QFileInfo item);
 
 protected:

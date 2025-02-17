@@ -77,7 +77,7 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 #endif
 }
 
-QString FileManagerServices::getDefaultFileManager(bool useCache)
+QString FileManagerServices::getDefaultFileManager()
 {
 #if defined(_WIN32)
 	defaultFileManager = "explorer";
@@ -87,7 +87,7 @@ QString FileManagerServices::getDefaultFileManager(bool useCache)
 	return defaultFileManager.value();
 #else
 
-	if (useCache && defaultFileManager.has_value()) { return defaultFileManager.value(); }
+	if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
 
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
@@ -104,12 +104,13 @@ QString FileManagerServices::getDefaultFileManager(bool useCache)
 #endif
 }
 
-bool FileManagerServices::canSelect(bool useCache)
+bool FileManagerServices::canSelect()
 {
+
+	if (cachedCanSelect.has_value()) { return cachedCanSelect.value(); }
 #if defined(_WIN32) || !defined(__APPLE__)
 	cachedCanSelect = true;
 #endif
-	if (useCache && cachedCanSelect.has_value()) { return cachedCanSelect.value(); }
 
 	bool result = supportsSelectOption(getDefaultFileManager());
 	cachedCanSelect = result;
