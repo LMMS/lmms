@@ -101,7 +101,7 @@ AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
 
-	const auto err = Pa_CloseStream(&m_paStream);
+	const auto err = Pa_CloseStream(m_paStream);
 	if (err != paNoError) { std::cerr << "Failed to close PortAudio stream: " << Pa_GetErrorText(err) << '\n'; }
 }
 
