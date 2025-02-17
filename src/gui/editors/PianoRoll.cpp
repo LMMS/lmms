@@ -4907,11 +4907,11 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto upwardInversionAction = new QAction(embed::getIconPixmap("flip_y"), tr("Upward Inversion"), noteToolsButton);
 	connect(upwardInversionAction, &QAction::triggered, [this](){ m_editor->invertSelection(true); });
-	upwardInversionAction->setShortcut(combine(Qt::SHIFT, Qt::Key_I));
+	upwardInversionAction->setShortcut(combine(Qt::SHIFT, Qt::Key_U));
 
 	auto downwardInversionAction = new QAction(embed::getIconPixmap("flip_y"), tr("Downward Inversion"), noteToolsButton);
 	connect(downwardInversionAction, &QAction::triggered, [this](){ m_editor->invertSelection(false); });
-	downwardInversionAction->setShortcut(combine(Qt::SHIFT, Qt::Key_U));
+	downwardInversionAction->setShortcut(combine(Qt::SHIFT, Qt::Key_I));
 
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
