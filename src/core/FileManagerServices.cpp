@@ -38,7 +38,7 @@ void FileManagerServices::openDir(QString& path)
 }
 void FileManagerServices::reveal(const QFileInfo item)
 {
-	if (!canReveal()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.absolutePath())); }
+	if (!canSelect()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.absolutePath())); }
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 
@@ -98,16 +98,16 @@ QString FileManagerServices::getDefaultFileManager()
 #endif
 }
 
-bool FileManagerServices::canReveal()
+bool FileManagerServices::canSelect()
 {
 
-	if (cachedCanReveal.has_value()) { return cachedCanReveal.value(); }
+	if (cachedCanSelect.has_value()) { return cachedCanSelect.value(); }
 #if defined(_WIN32) || !defined(__APPLE__)
-	cachedCanReveal = true;
+	cachedCanSelect = true;
 #endif
 
 	bool result = supportsSelectOption(getDefaultFileManager());
-	cachedCanReveal = result;
+	cachedCanSelect = result;
 	return result;
 }
 
