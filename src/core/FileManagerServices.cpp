@@ -73,16 +73,12 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 
 QString FileManagerServices::getDefaultFileManager()
 {
-
 	if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
 #if defined(_WIN32)
 	defaultFileManager = "explorer";
-	return defaultFileManager.value();
 #elif defined(__APPLE__)
 	defaultFileManager = "open";
-	return defaultFileManager.value();
 #else
-
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 	process.waitForFinished(3000);
@@ -93,9 +89,9 @@ QString FileManagerServices::getDefaultFileManager()
 
 	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
 	fileManager = fileManager.section('.', -1);
-
-	return fileManager;
+	defaultFileManager = fileManager;
 #endif
+	return defaultFileManager.value();
 }
 
 bool FileManagerServices::canSelect()
