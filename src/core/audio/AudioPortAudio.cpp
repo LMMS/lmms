@@ -70,7 +70,21 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency,
 		.hostApiSpecificStreamInfo = nullptr};
 
-	const auto err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(),
+	auto err = Pa_IsFormatSupported(nullptr, &outputParameters, sampleRate());
+
+	if (err != paFormatIsSupported)
+	{
+		std::cerr << "Failed to support PortAudio format: " << Pa_GetErrorText(err) << '\n';
+		std::cerr << "Device range: " << "[0, " << deviceCount - 1 << "]\n";	
+		std::cerr << "Output sample rate: " << sampleRate() << '\n';
+		std::cerr << "Output device index: " << outputParameters.device << '\n';
+		std::cerr << "Output channel count: " << outputParameters.channelCount << '\n';
+		std::cerr << "Output sample format: " << outputParameters.sampleFormat << '\n';
+		std::cerr << "Output suggested latency: " << outputParameters.suggestedLatency << '\n';
+		std::cerr << "Output host API stream info?: " << (outputParameters.hostApiSpecificStreamInfo == nullptr ? "N" : "Y") << '\n';
+	}
+
+	err = Pa_OpenStream(&m_paStream, nullptr, &outputParameters, sampleRate(), engine->framesPerPeriod(),
 		paNoFlag, processCallback, this);
 
 	if (err != paNoError)
