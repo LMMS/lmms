@@ -139,9 +139,6 @@ private:
 	QString m_previousFilterValue;
 } ;
 
-
-
-
 class FileBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
@@ -196,7 +193,6 @@ private slots:
 	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
 	void openContainingFolder( lmms::gui::FileItem* item );
-
 } ;
 
 
