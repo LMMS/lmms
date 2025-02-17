@@ -633,6 +633,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 #endif
 
 	QTreeWidgetItem* item = itemAt(e->pos());
+	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
 
 	QMenu contextMenu(this);
 
@@ -640,6 +641,8 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
+		QString fileName = file->fullName();
+
 		if (file->isTrack())
 		{
 			contextMenu.addAction(
@@ -648,7 +651,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=, this] { openContainingFolder(file); });
+			[=, this] { openContainingFolder(fileName); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -662,6 +665,18 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		break;
 	}
 	case TypeDirectoryItem: {
+		auto dir = dynamic_cast<Directory*>(item);
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
+			auto dirname = dir->fullName();
+			FileManagerServices::openDir(dirname);
+		});
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager), [=, this] {
+			auto dirname = dir->fullName();
+			openContainingFolder(dirname);
+		});
+		break;
+	}
+	case TypeDirectoryItem || TypeFileItem: {
 		auto dir = dynamic_cast<Directory*>(item);
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
 			auto dirname = dir->fullName();
@@ -1001,12 +1016,10 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 
 
-void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
+void FileBrowserTreeWidget::openContainingFolder(QString item)
 {
-	QFileInfo fileInfo(item->fullName());
-	FileManagerServices::reveal(fileInfo);
+	FileManagerServices::reveal(item);
 }
-
 
 
 
