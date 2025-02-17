@@ -40,6 +40,7 @@
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
+#include <stdio.h>
 #include <windows.h>
 #endif
 
