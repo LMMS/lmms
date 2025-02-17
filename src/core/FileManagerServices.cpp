@@ -32,7 +32,7 @@ void FileManagerServices::openDir(QString& path)
 {
 	QString nativePath = QDir::toNativeSeparators(path);
 
-QProcess::startDetached(getDefaultFileManager(), {nativePath});
+	QProcess::startDetached(getDefaultFileManager(), {nativePath});
 }
 void FileManagerServices::select(const QFileInfo item)
 {
