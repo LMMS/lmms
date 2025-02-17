@@ -36,15 +36,15 @@ class FileManagerServices
 public:
 	static QString getDefaultFileManager();
 	static void openDir(QString& path);
-	static bool canSelect();
-	static void select(QFileInfo item);
+	static bool canReveal();
+	static void reveal(QFileInfo item);
 
 protected:
 	static bool supportsSelectOption(const QString& fileManager);
 
 private:
 	static inline std::optional<QString> defaultFileManager;
-	static inline std::optional<bool> cachedCanSelect;
+	static inline std::optional<bool> cachedCanReveal;
 };
 
 } // namespace lmms

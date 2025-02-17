@@ -1004,7 +1004,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
 	QFileInfo fileInfo(item->fullName());
-	FileManagerServices::select(fileInfo);
+	FileManagerServices::reveal(fileInfo);
 }
 
 
