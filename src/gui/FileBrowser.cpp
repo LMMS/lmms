@@ -669,7 +669,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
 			FileRevealer::openDir(dir->fullName());
 		});
-		});
 		break;
 	}
 	}
