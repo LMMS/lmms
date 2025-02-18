@@ -118,6 +118,7 @@ static inline QString baseName( const QString & file )
 			QFileInfo( file ).completeBaseName();
 }
 
+
 #ifdef LMMS_BUILD_WIN32
 // Workaround for old MinGW
 #ifdef __MINGW32__
