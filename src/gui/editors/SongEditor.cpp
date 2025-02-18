@@ -584,6 +584,8 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 
 void SongEditor::mousePressEvent(QMouseEvent *me)
 {
+	const auto pos = position(me);
+	
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
@@ -597,8 +599,8 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		rubberBand()->show();
 
 		//the trackView(index) and the time position where the mouse was clicked
-		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartTimePos = TimePos((me->x() - m_trackHeadWidth)
+		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(pos.y());
+		m_rubberbandStartTimePos = TimePos((pos.x() - m_trackHeadWidth)
 											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}

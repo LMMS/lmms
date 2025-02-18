@@ -30,6 +30,7 @@
 #include "LcdSpinBox.h"
 #include "KeyboardShortcuts.h"
 #include "CaptionMenu.h"
+#include "DeprecationHelper.h"
 
 
 namespace lmms::gui
@@ -79,9 +80,11 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
+	const auto pos = position(event);
+
 	if( event->button() == Qt::LeftButton &&
-		! (event->modifiers() & KBD_COPY_MODIFIER) &&
-						event->y() < cellHeight() + 2  )
+		! ( event->modifiers() & KBD_COPY_MODIFIER ) &&
+						pos.y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
 		m_lastMousePos = event->globalPos();

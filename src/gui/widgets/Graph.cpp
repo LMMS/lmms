@@ -26,6 +26,7 @@
 #include <QPainter>
 
 #include "Graph.h"
+#include "DeprecationHelper.h"
 #include "SampleLoader.h"
 #include "StringPairDrag.h"
 #include "SampleBuffer.h"
@@ -100,9 +101,11 @@ void graph::loadSampleFromFile( const QString & _filename )
 
 void Graph::mouseMoveEvent ( QMouseEvent * _me )
 {
+	const auto pos = position(_me);
+
 	// get position
-	int x = _me->x();
-	int y = _me->y();
+	int x = pos.x();
+	int y = pos.y();
 
 /*	static bool skip = false;
 
@@ -147,13 +150,15 @@ void Graph::mouseMoveEvent ( QMouseEvent * _me )
 
 void Graph::mousePressEvent( QMouseEvent * _me )
 {
+	const auto pos = position(_me);
+
 	if( _me->button() == Qt::LeftButton )
 	{
 		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
 		{
 			// get position
-			int x = _me->x();
-			int y = _me->y();
+			int x = pos.x();
+			int y = pos.y();
 
 			changeSampleAt( x, y );
 
@@ -166,8 +171,8 @@ void Graph::mousePressEvent( QMouseEvent * _me )
 		{
 			//when shift-clicking, draw a line from last position to current
 			//position
-			int x = _me->x();
-			int y = _me->y();
+			int x = pos.x();
+			int y = pos.y();
 
 			drawLineAt( x, y, m_lastCursorX );
 
