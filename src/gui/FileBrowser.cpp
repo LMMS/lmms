@@ -656,13 +656,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
-		contextMenu.addAction(songEditorHeader);
-		contextMenu.addActions(getContextActions(file, true));
+		contextMenu.addAction( songEditorHeader );
+		contextMenu.addActions( getContextActions(file, true) );
 
 		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
 		patternEditorHeader->setDisabled(true);
 		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions(getContextActions(file, false));
+		contextMenu.addActions( getContextActions(file, false) );
 		break;
 	}
 	case TypeDirectoryItem: {
