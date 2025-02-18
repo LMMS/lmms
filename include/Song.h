@@ -229,6 +229,17 @@ public:
 	{
 		return m_recording;
 	}
+
+	inline bool isMidiClipLooping() const
+	{
+		return m_loopMidiClip;
+	}
+
+	inline void setMidiClipLooping(bool loop)
+	{
+		m_loopMidiClip = loop;
+	}
+	
 	
 	inline void setLoopRenderCount(int count)
 	{
