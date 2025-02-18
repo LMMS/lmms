@@ -82,7 +82,7 @@ QString FileManagerServices::getDefaultFileManager()
 #if defined(_WIN32)
 	fileManagerCache = "explorer";
 #elif defined(__APPLE__)
-	defaultFileManager = "open";
+	fileManagerCache  = "open";
 #else
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
@@ -94,7 +94,7 @@ QString FileManagerServices::getDefaultFileManager()
 
 	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
 	fileManager = fileManager.section('.', -1);
-	defaultFileManager = fileManager;
+	fileManagerCache  = fileManager;
 #endif
 	return fileManagerCache.value();
 }
