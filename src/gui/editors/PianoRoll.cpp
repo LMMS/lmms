@@ -4860,7 +4860,6 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto glueAction = new QAction(embed::getIconPixmap("glue"), tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
-
 	glueAction->setShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_G)));
 
 	auto knifeAction = new QAction(embed::getIconPixmap("edit_knife"), tr("Knife"), noteToolsButton);
