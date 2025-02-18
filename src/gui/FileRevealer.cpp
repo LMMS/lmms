@@ -101,11 +101,10 @@ bool FileRevealer::canSelect()
 	if (canSelectCache.has_value()) { return canSelectCache.value(); }
 #if defined(_WIN32) || !defined(__APPLE__)
 	canSelectCache = true;
+#else
+	canSelectCache = supportsSelectOption(getDefaultFileManager());
 #endif
-
-	bool result = supportsSelectOption(getDefaultFileManager());
-	canSelectCache = result;
-	return result;
+	return canSelectCache;
 }
 
 } // namespace lmms
