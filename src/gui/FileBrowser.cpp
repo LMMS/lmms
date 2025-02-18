@@ -652,7 +652,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=, this] { FileRevealer::reveal(QFileInfo(fileName)); });
+			[=, this] { FileRevealer::reveal(file->fullName()); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
