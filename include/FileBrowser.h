@@ -139,6 +139,9 @@ private:
 	QString m_previousFilterValue;
 } ;
 
+
+
+
 class FileBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
@@ -176,7 +179,6 @@ private:
 
 	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
-
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QRecursiveMutex m_pphMutex;
 #else
@@ -193,6 +195,8 @@ private slots:
 	void sendToActiveInstrumentTrack(lmms::gui::FileItem* item);
 	void updateDirectory(QTreeWidgetItem* item);
 };
+
+
 
 class Directory : public QTreeWidgetItem
 {

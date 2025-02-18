@@ -70,6 +70,7 @@
 namespace lmms::gui
 {
 
+
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -943,6 +944,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 		case FileItem::FileHandling::NotSupported:
 		default:
 			break;
+
 	}
 	Engine::audioEngine()->doneChangeInModel();
 }
