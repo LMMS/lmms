@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
+#include <QRegularExpression>
 #include <memory>
 #include "lmmsconfig.h"
 
@@ -157,6 +158,9 @@ void PluginFactory::discoverPlugins()
 #endif
 	}
 
+	// Apply any plugin filters from environment LMMS_EXCLUDE_PLUGINS
+	filterPlugins(files);
+
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
 	// all libraries twice we ensure that libZynAddSubFxCore is found.
 	for (const QFileInfo& file : files)
@@ -245,7 +249,47 @@ void PluginFactory::discoverPlugins()
 	m_descriptors = descriptors;
 }
 
+// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="libcarla"
+void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
+	// Get filter
+	QList<QRegularExpression> excludedPatterns;
+	QString excludePatternString = std::getenv("LMMS_EXCLUDE_PLUGINS");
 
+	if (!excludePatternString.isEmpty()) {
+		QStringList patterns = excludePatternString.split(',');
+		for (const QString& pattern : patterns) {
+			QRegularExpression regex(pattern.trimmed());
+			if (!pattern.trimmed().isEmpty() && regex.isValid()) {
+				excludedPatterns << regex;
+			} else {
+				qWarning() << "Invalid regular expression:" << pattern;
+			}
+		}
+	}
+
+  	// Get files to remove
+	QSet<QFileInfo> filesToRemove;
+	for (const QFileInfo& fileInfo : files) {
+		bool excluded = false;
+		QString filePath = fileInfo.filePath();
+
+		for (const QRegularExpression& pattern : excludedPatterns) {
+			if (pattern.match(filePath).hasMatch()) {
+				excluded = true;
+				break;
+			}
+		}
+
+		if (excluded) {
+			filesToRemove.insert(fileInfo);
+		}
+	}
+
+	// Remove them
+	for (const QFileInfo& fileInfo : filesToRemove) {
+		files.remove(fileInfo);
+	}
+}
 
 QString PluginFactory::PluginInfo::name() const
 {
