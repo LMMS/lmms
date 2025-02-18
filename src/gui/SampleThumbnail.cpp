@@ -160,8 +160,8 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 			}
 			else
 			{
-				const auto beginAggregationAt = &(*finerThumbnail)[beginIndex];
-				const auto endAggregationAt = &(*finerThumbnail)[endIndex];
+				const auto beginAggregationAt = finerThumbnail->data() + beginIndex;
+				const auto endAggregationAt = finerThumbnail->data() + endIndex;
 				const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
 				minPeak = peak.min;
 				maxPeak = peak.max;

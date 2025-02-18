@@ -103,6 +103,7 @@ private:
 
 		Thumbnail zoomOut(float factor) const;
 
+		Peak* data() { return m_peaks.data(); }
 		Peak& operator[](size_t index) { return m_peaks[index]; }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }
 
