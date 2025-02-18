@@ -58,6 +58,7 @@ void FileManagerServices::reveal(const QFileInfo item)
 
 bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 {
+	if (selectOptionCache.contains(fileManager)) { return selectOptionCache[fileManager]; }
 #if !defined(_WIN32) && !defined(__APPLE__)
 
 	QProcess process;
@@ -65,17 +66,21 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 	process.waitForFinished(3000);
 
 	QString output = process.readAllStandardOutput() + process.readAllStandardError();
-	return output.contains("--select");
+	bool supports = output.contains("--select");
+
+	selectOptionCache.insert(fileManager, supports);
+	return supports;
 #else
+	selectOptionCache.insert(fileManager, true);
 	return true;
 #endif
 }
 
 QString FileManagerServices::getDefaultFileManager()
 {
-	if (defaultFileManager.has_value()) { return defaultFileManager.value(); }
+	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
 #if defined(_WIN32)
-	defaultFileManager = "explorer";
+	fileManagerCache = "explorer";
 #elif defined(__APPLE__)
 	defaultFileManager = "open";
 #else
@@ -91,19 +96,19 @@ QString FileManagerServices::getDefaultFileManager()
 	fileManager = fileManager.section('.', -1);
 	defaultFileManager = fileManager;
 #endif
-	return defaultFileManager.value();
+	return fileManagerCache.value();
 }
 
 bool FileManagerServices::canSelect()
 {
 
-	if (cachedCanSelect.has_value()) { return cachedCanSelect.value(); }
+	if (canSelectCache.has_value()) { return canSelectCache.value(); }
 #if defined(_WIN32) || !defined(__APPLE__)
-	cachedCanSelect = true;
+	canSelectCache = true;
 #endif
 
 	bool result = supportsSelectOption(getDefaultFileManager());
-	cachedCanSelect = result;
+	canSelectCache = result;
 	return result;
 }
 
