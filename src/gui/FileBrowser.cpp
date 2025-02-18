@@ -662,7 +662,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
 		patternEditorHeader->setDisabled(true);
 		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions(getContextActions(file, false));
+		contextMenu.addActions( getContextActions(file, false) );
 		break;
 	}
 	case TypeDirectoryItem: {
