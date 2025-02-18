@@ -30,15 +30,15 @@
 #include <QUrl>
 
 namespace lmms {
-void FileRevealer::openDir(QString& path)
+void FileRevealer::openDir(const QFileInfo item)
 {
-	QString nativePath = QDir::toNativeSeparators(path);
+	QString nativePath = QDir::toNativeSeparators(item.canonicalFilePath());
 
 	QProcess::startDetached(getDefaultFileManager(), {nativePath});
 }
 void FileRevealer::reveal(const QFileInfo item)
 {
-	if (!canSelect()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.absolutePath())); }
+	if (!canSelect()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath())); }
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 

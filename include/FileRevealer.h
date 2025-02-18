@@ -35,7 +35,7 @@ class FileRevealer
 {
 public:
 	static QString getDefaultFileManager();
-	static void openDir(QString& path);
+	static void openDir(QFileInfo item);
 	static bool canSelect();
 	static void reveal(QFileInfo item);
 

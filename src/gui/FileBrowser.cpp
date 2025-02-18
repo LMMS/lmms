@@ -652,7 +652,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=, this] { FileRevealer::reveal(fileName); });
+			[=, this] { FileRevealer::reveal(QFileInfo(fileName)); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -670,7 +670,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		QString dirname = dir->fullName();
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
 			auto _dirname = dirname;
-			FileRevealer::openDir(_dirname);
+			FileRevealer::openDir(QFileInfo(_dirname));
 		});
 		break;
 	}
