@@ -40,17 +40,13 @@ namespace lmms
 PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
-PatternTrack::PatternTrack(TrackContainer* tc) :
-	Track(Track::Type::Pattern, tc)
+PatternTrack::PatternTrack() :
+	Track(Track::Type::Pattern)
 {
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
 
 	setName(tr("Pattern %1").arg(patternNum));
-	Engine::patternStore()->createClipsForPattern(patternNum);
-	Engine::patternStore()->setCurrentPattern(patternNum);
-	Engine::patternStore()->updateComboBox();
-
 	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
 }
@@ -75,10 +71,8 @@ PatternTrack::~PatternTrack()
 			--it.value();
 		}
 	}
-	s_infoMap.remove( this );
 
-	// remove us from the Song and update the pattern selection combobox to reflect the change
-	trackContainer()->removeTrack( this );
+	s_infoMap.remove( this );
 	Engine::patternStore()->updateComboBox();
 }
 
@@ -99,8 +93,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 		return Engine::patternStore()->play(_start, _frames, _offset, s_infoMap[this]);
 	}
 
-	clipVector clips;
-	getClipsInRange( clips, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
+	const auto clips = getClipsInRange(_start, _start + static_cast<int>(_frames / Engine::framesPerTick()));
 
 	if( clips.size() == 0 )
 	{
@@ -144,15 +137,10 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 
 
-Clip* PatternTrack::createClip(const TimePos & pos)
+std::unique_ptr<Clip> PatternTrack::createClip()
 {
-	auto pc = new PatternClip(this);
-	pc->movePosition(pos);
-	return pc;
+	return std::make_unique<PatternClip>();
 }
-
-
-
 
 void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {
@@ -247,5 +235,11 @@ void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 	}
 }
 
+void PatternTrack::onAddedToTrackContainer(TrackContainer*)
+{
+	Engine::patternStore()->createClipsForPattern(patternIndex());
+	Engine::patternStore()->setCurrentPattern(patternIndex());
+	Engine::patternStore()->updateComboBox();
+}
 
 } // namespace lmms

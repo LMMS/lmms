@@ -130,7 +130,7 @@ ClipView::ClipView( Clip * clip,
 	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
-	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
+	connect(m_clip, &QObject::destroyed, this, &ClipView::close);
 	setModel( m_clip );
 	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
 
@@ -298,15 +298,9 @@ void ClipView::remove()
 
 	if (m_clip->getTrack())
 	{
-		auto guard = Engine::audioEngine()->requestChangesGuard();
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
 		m_clip->getTrack()->removeClip(m_clip);
 	}
-
-	// TODO: Clip::~Clip should not be responsible for removing the Clip from the Track.
-	// One would expect that a call to Track::removeClip would already do that for you, as well
-	// as actually deleting the Clip with the deleteLater function. That being said, it shouldn't
-	// be possible to make a Clip without a Track (i.e., Clip::getTrack is never nullptr).
-	m_clip->deleteLater();
 }
 
 
@@ -1280,13 +1274,15 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
 	// Create a clip where all notes will be added
-	auto newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
+	auto newMidiClip = static_cast<MidiClip*>(track->addNewClip());
+
 	if (!newMidiClip)
 	{
 		qWarning("Warning: Failed to convert Clip to MidiClip on mergeClips");
 		return;
 	}
 
+	newMidiClip->movePosition(earliestPos);
 	newMidiClip->saveJournallingState(false);
 
 	// Add the notes and remove the Clips that are being merged

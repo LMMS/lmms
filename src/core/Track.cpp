@@ -56,106 +56,17 @@ namespace lmms
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-Track::Track( Type type, TrackContainer * tc ) :
-	Model( tc ),                   /*!< The track Model */
-	m_trackContainer( tc ),        /*!< The track container object */
+Track::Track(Type type) :
+	Model(nullptr),                   /*!< The track Model */
+	m_trackContainer(nullptr),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
+	m_height(-1),
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_clips()        /*!< The clips (segments) */
 {	
-	m_trackContainer->addTrack( this );
-	m_height = -1;
 }
-
-
-
-
-/*! \brief Destroy this track
- *
- *  Delete the clips and remove this track from the track container.
- */
-Track::~Track()
-{
-	lock();
-	emit destroyedTrack();
-
-	while (!m_clips.empty())
-	{
-		delete m_clips.back();
-	}
-
-	m_trackContainer->removeTrack( this );
-	unlock();
-}
-
-
-
-
-/*! \brief Create a track based on the given track type and container.
- *
- *  \param tt The type of track to create
- *  \param tc The track container to attach to
- */
-Track * Track::create( Type tt, TrackContainer * tc )
-{
-	Engine::audioEngine()->requestChangeInModel();
-
-	Track * t = nullptr;
-
-	switch( tt )
-	{
-		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
-		case Type::Pattern: t = new class PatternTrack( tc ); break;
-		case Type::Sample: t = new class SampleTrack( tc ); break;
-//		case Type::Event:
-//		case Type::Video:
-		case Type::Automation: t = new class AutomationTrack( tc ); break;
-		case Type::HiddenAutomation:
-						t = new class AutomationTrack( tc, true ); break;
-		default: break;
-	}
-
-	if (tc == Engine::patternStore() && t)
-	{
-		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
-	}
-
-	tc->updateAfterTrackAdd();
-
-	Engine::audioEngine()->doneChangeInModel();
-
-	return t;
-}
-
-
-
-
-/*! \brief Create a track inside TrackContainer from track type in a QDomElement and restore state from XML
- *
- *  \param element The QDomElement containing the type of track to create
- *  \param tc The track container to attach to
- */
-Track * Track::create( const QDomElement & element, TrackContainer * tc )
-{
-	Engine::audioEngine()->requestChangeInModel();
-
-	Track * t = create(
-		static_cast<Type>( element.attribute( "type" ).toInt() ),
-									tc );
-	if( t != nullptr )
-	{
-		t->restoreState( element );
-	}
-
-	Engine::audioEngine()->doneChangeInModel();
-
-	return t;
-}
-
-
-
 
 /*! \brief Clone a track from this track
  *
@@ -166,10 +77,10 @@ Track* Track::clone()
 	QDomDocument doc;
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
-	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
+	const auto track = m_trackContainer->addNewTrack(parent.firstChild().toElement());
 
 	AutomationClip::resolveAllIDs();
-	return t;
+	return track;
 }
 
 
@@ -294,9 +205,8 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 			&& node.nodeName() != "solo"
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
-				Clip * clip = createClip(
-								TimePos( 0 ) );
-				clip->restoreState( node.toElement() );
+				auto clip = addNewClip();
+				clip->restoreState(node.toElement());
 			}
 		}
 		node = node.nextSibling();
@@ -331,24 +241,14 @@ void Track::loadSettings(const QDomElement& element)
 	loadTrack(element, false);
 }
 
-
-
-
-/*! \brief Add another Clip into this track
- *
- *  \param clip The Clip to attach to this track.
- */
-Clip * Track::addClip( Clip * clip )
+Clip* Track::addNewClip()
 {
-	m_clips.push_back( clip );
-
-	emit clipAdded( clip );
-
-	return clip; // just for convenience
+	m_clips.emplace_back(createClip());
+	m_clips.back()->setTrack(this);
+	m_clips.back()->onAddedToTrack(this);
+	emit clipAdded(m_clips.back().get());
+	return m_clips.back().get();
 }
-
-
-
 
 /*! \brief Remove a given Clip from this track
  *
@@ -356,10 +256,14 @@ Clip * Track::addClip( Clip * clip )
  */
 void Track::removeClip( Clip * clip )
 {
-	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
+	const auto it = std::find_if(m_clips.begin(), m_clips.end(), [&](auto& x) { return x.get() == clip; });
+
 	if( it != m_clips.end() )
 	{
-		m_clips.erase( it );
+		const auto ptr = it->release();
+		m_clips.erase(it);
+		it->get_deleter()(ptr);
+
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();
@@ -372,10 +276,7 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	while (!m_clips.empty())
-	{
-		delete m_clips.front();
-	}
+	m_clips.clear();
 }
 
 
@@ -407,12 +308,14 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 {
 	if( clipNum < m_clips.size() )
 	{
-		return m_clips[clipNum];
+		return m_clips[clipNum].get();
 	}
 	printf( "called Track::getClip( %zu ), "
 			"but Clip %zu doesn't exist\n", clipNum, clipNum );
-	return createClip( clipNum * TimePos::ticksPerBar() );
 
+	auto clip = addNewClip();
+	clip->movePosition(clipNum * TimePos::ticksPerBar());
+	return clip;
 }
 
 
@@ -426,7 +329,7 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 int Track::getClipNum( const Clip * clip )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfClips(); ++i )
-	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
+	const auto it = std::find_if(m_clips.begin(), m_clips.end(), [&](auto& x) { return x.get() == clip; });
 	if( it != m_clips.end() )
 	{
 /*		if( getClip( i ) == _clip )
@@ -439,8 +342,12 @@ int Track::getClipNum( const Clip * clip )
 	return 0;
 }
 
-
-
+std::vector<Clip*> Track::getClips() const
+{
+	auto clips = std::vector<Clip*>(m_clips.size());
+	std::transform(m_clips.begin(), m_clips.end(), clips.begin(), [](auto& x) { return x.get(); });
+	return clips;
+}
 
 /*! \brief Retrieve a list of clips that fall within a period.
  *
@@ -453,21 +360,22 @@ int Track::getClipNum( const Clip * clip )
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
-							const TimePos & end )
+std::vector<Clip*> Track::getClipsInRange(const TimePos& start, const TimePos& end)
 {
-	for( Clip* clip : m_clips )
+	auto clips = std::vector<Clip*>();
+
+	for (auto& clip : m_clips)
 	{
 		int s = clip->startPosition();
 		int e = clip->endPosition();
 		if( ( s <= end ) && ( e >= start ) )
 		{
-			// Clip is within given range
-			// Insert sorted by Clip's position
-			clipV.insert(std::upper_bound(clipV.begin(), clipV.end(), clip, Clip::comparePosition),
-						clip);
+			clips.push_back(clip.get());
 		}
 	}
+
+	std::sort(clips.begin(), clips.end(), Clip::comparePosition);
+	return clips;
 }
 
 
@@ -499,8 +407,10 @@ void Track::createClipsForPattern(int pattern)
 	while( numOfClips() < pattern + 1 )
 	{
 		TimePos position = TimePos( numOfClips(), 0 );
-		Clip * clip = createClip( position );
-		clip->changeLength( TimePos( 1, 0 ) );
+
+		auto clip = addNewClip();
+		clip->movePosition(position);
+		clip->changeLength(TimePos(1, 0));
 	}
 }
 

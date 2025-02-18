@@ -401,8 +401,6 @@ public slots:
 private slots:
 	void insertBar();
 	void removeBar();
-	void addSampleTrack();
-	void addAutomationTrack();
 
 	void setTempo();
 	void setTimeSignature();

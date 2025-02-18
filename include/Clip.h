@@ -53,13 +53,14 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	Clip( Track * track );
-	~Clip() override;
+	Clip();
 
 	inline Track * getTrack() const
 	{
 		return m_track;
 	}
+
+	void setTrack(Track* track) { m_track = track; }
 
 	inline const QString & name() const
 	{
@@ -113,6 +114,7 @@ public:
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
 
+	virtual void onAddedToTrack(Track* track) {}
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
@@ -144,7 +146,6 @@ public slots:
 signals:
 	void lengthChanged();
 	void positionChanged();
-	void destroyedClip();
 	void colorChanged();
 
 

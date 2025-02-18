@@ -46,12 +46,11 @@ const float AutomationClip::DEFAULT_MIN_VALUE = 0;
 const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 
 
-AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
-	Clip( _auto_track ),
+AutomationClip::AutomationClip() :
+	Clip(),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
 #endif
-	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
 	m_progressionType( ProgressionType::Discrete ),
@@ -60,32 +59,16 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( TimePos( 1, 0 ) );
-	if( getTrack() )
-	{
-		switch( getTrack()->trackContainer()->type() )
-		{
-			case TrackContainer::Type::Pattern:
-				setAutoResize( true );
-				break;
-
-			case TrackContainer::Type::Song:
-				// move down
-			default:
-				setAutoResize( false );
-				break;
-		}
-	}
 }
 
 
 
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
-	Clip( _clip_to_copy.m_autoTrack ),
+	Clip(),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
 #endif
-	m_autoTrack( _clip_to_copy.m_autoTrack ),
 	m_objects( _clip_to_copy.m_objects ),
 	m_tension( _clip_to_copy.m_tension ),
 	m_progressionType( _clip_to_copy.m_progressionType )
@@ -101,19 +84,6 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 		m_timeMap[POS(it)] = it.value();
 		// Sets the node's clip to this one
 		m_timeMap[POS(it)].setClip(this);
-	}
-	if (!getTrack()){ return; }
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
 	}
 }
 
@@ -144,7 +114,10 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 	return true;
 }
 
-
+void AutomationClip::onAddedToTrack(Track* track)
+{
+	setAutoResize(dynamic_cast<PatternStore*>(track->trackContainer()) != nullptr);
+}
 
 
 void AutomationClip::setProgressionType(
@@ -1056,8 +1029,8 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		}
 	}
 
-	auto a = new AutomationClip(t);
-	a->addObject( _m, false );
+	auto a = static_cast<AutomationClip*>(t->addNewClip());
+	a->addObject(_m, false);
 	return a;
 }
 
@@ -1246,8 +1219,8 @@ std::vector<Track*> AutomationClip::combineAllTracks()
 {
 	std::vector<Track*> combinedTrackList;
 
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	auto songTracks = Engine::getSong()->tracks();
+	auto patternStoreTracks = Engine::patternStore()->tracks();
 
 	combinedTrackList.insert(combinedTrackList.end(), songTracks.begin(), songTracks.end());
 	combinedTrackList.insert(combinedTrackList.end(), patternStoreTracks.begin(), patternStoreTracks.end());

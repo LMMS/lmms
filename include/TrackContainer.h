@@ -28,14 +28,19 @@
 
 #include <QReadWriteLock>
 
-#include "Track.h"
+#include "AudioEngine.h"
+#include "AutomationTrack.h"
+#include "Engine.h"
+#include "InstrumentTrack.h"
 #include "JournallingObject.h"
+#include "PatternTrack.h"
+#include "SampleTrack.h"
+#include "Track.h"
 
 namespace lmms
 {
 
 class AutomationClip;
-class InstrumentTrack;
 
 namespace gui
 {
@@ -57,27 +62,26 @@ public:
 	} ;
 
 	TrackContainer();
-	~TrackContainer() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 
 	void loadSettings( const QDomElement & _this ) override;
 
-	int countTracks( Track::Type _tt = Track::Type::Count ) const;
+	template<typename T, typename... Args>
+	T* addNewTrack(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<Track, T>, "T must be a kind of Track");
+		auto track = std::make_unique<T>(std::forward<Args>(args)...);
+		return static_cast<T*>(addTrack(std::move(track)));
+	}
 
-
-	void addTrack( Track * _track );
-	void removeTrack( Track * _track );
-
-	virtual void updateAfterTrackAdd();
+	Track* addNewTrack(const QDomElement& element);
+	virtual Track* addTrack(std::unique_ptr<Track> track);
+	virtual void removeTrack(Track* track);
 
 	void clearAllTracks();
 
-	const TrackList & tracks() const
-	{
-		return m_tracks;
-	}
-
+	std::vector<Track*> tracks() const;
 	bool isEmpty() const;
 
 	static const QString classNodeName()
@@ -103,10 +107,8 @@ signals:
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
 
-	mutable QReadWriteLock m_tracksMutex;
-
 private:
-	TrackList m_tracks;
+	std::vector<std::unique_ptr<Track>> m_tracks;
 
 	Type m_TrackContainerType;
 

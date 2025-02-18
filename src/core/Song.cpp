@@ -52,6 +52,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "SampleTrack.h"
 #include "Scale.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
@@ -67,9 +68,7 @@ tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 Song::Song() :
 	TrackContainer(),
-	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
-				Track::create( Track::Type::HiddenAutomation,
-								this ) ) ),
+	m_globalAutomationTrack(new AutomationTrack(true)),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
@@ -99,6 +98,8 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
+	m_globalAutomationTrack->setTrackContainer(this);
+
 	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
@@ -380,11 +381,11 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	values = container->automatedValuesAt(timeStart, clipNum);
 	const TrackList& tracks = container->tracks();
 
-	Track::clipVector clips;
+	auto clips = std::vector<Clip*>{};
 	for (Track* track : tracks)
 	{
 		if (track->type() == Track::Type::Automation) {
-			track->getClipsInRange(clips, 0, timeStart);
+			clips = track->getClipsInRange(0, timeStart);
 		}
 	}
 
@@ -575,7 +576,6 @@ void Song::updateLength()
 	if (m_loadingProject) { return; }
 
 	m_length = 0;
-	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
 	{
 		if (m_exporting && track->isMuted())
@@ -589,7 +589,6 @@ void Song::updateLength()
 			m_length = cur;
 		}
 	}
-	m_tracksMutex.unlock();
 
 	emit lengthChanged( m_length );
 }
@@ -777,14 +776,12 @@ void Song::stopExport()
 
 void Song::insertBar()
 {
-	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
 		// FIXME journal batch of tracks instead of each track individually
 		if (track->numOfClips() > 0) { track->addJournalCheckPoint(); }
 		track->insertBar(getPlayPos(PlayMode::Song));
 	}
-	m_tracksMutex.unlock();
 }
 
 
@@ -792,14 +789,12 @@ void Song::insertBar()
 
 void Song::removeBar()
 {
-	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
 		// FIXME journal batch of tracks instead of each track individually
 		if (track->numOfClips() > 0) { track->addJournalCheckPoint(); }
 		track->removeBar(getPlayPos(PlayMode::Song));
 	}
-	m_tracksMutex.unlock();
 }
 
 
@@ -807,28 +802,9 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	Track * t = Track::create(Track::Type::Pattern, this);
-	Engine::patternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
+	const auto patternTrack = addNewTrack<PatternTrack>();
+	Engine::patternStore()->setCurrentPattern(static_cast<PatternTrack*>(patternTrack)->patternIndex());
 }
-
-
-
-
-void Song::addSampleTrack()
-{
-	( void )Track::create( Track::Type::Sample, this );
-}
-
-
-
-
-void Song::addAutomationTrack()
-{
-	( void )Track::create( Track::Type::Automation, this );
-}
-
-
-
 
 bpm_t Song::getTempo()
 {
@@ -957,15 +933,15 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	auto tripleOscTrack = Track::create(Track::Type::Instrument, this);
-	dynamic_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
+	auto tripleOscTrack = addNewTrack<InstrumentTrack>();
+	static_cast<InstrumentTrack*>(tripleOscTrack)->loadInstrument("tripleoscillator");
 
-	auto kickerTrack = Track::create(Track::Type::Instrument, Engine::patternStore());
-	dynamic_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
+	auto kickerTrack = Engine::patternStore()->addNewTrack<InstrumentTrack>();
+	static_cast<InstrumentTrack*>(kickerTrack)->loadInstrument("kicker");
 
-	Track::create( Track::Type::Sample, this );
-	Track::create( Track::Type::Pattern, this );
-	Track::create( Track::Type::Automation, this );
+	addNewTrack<SampleTrack>();
+	addNewTrack<PatternTrack>();
+	addNewTrack<AutomationTrack>();
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();
@@ -976,7 +952,6 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 	updateLength();
-	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 
