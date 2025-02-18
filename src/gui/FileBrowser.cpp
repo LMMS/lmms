@@ -679,7 +679,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	}
 
-	// We should only show the menu if it contains items
+	// Only show the menu if it contains items
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
