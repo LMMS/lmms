@@ -26,6 +26,7 @@
 #include "ProjectNotes.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QColorDialog>
