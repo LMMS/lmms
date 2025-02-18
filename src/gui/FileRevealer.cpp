@@ -22,7 +22,7 @@
  *
  */
 
-#include "../../include/FileRevealer.h"
+#include "FileRevealer.h"
 
 #include <QDesktopServices>
 #include <QDir>
