@@ -31,6 +31,7 @@
 #include <sndfile.h>
 
 #ifdef LMMS_HAVE_OGGVORBIS
+#define OV_EXCLUDE_STATIC_CALLBACKS
 #include <vorbis/vorbisfile.h>
 #endif
 
