@@ -677,14 +677,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		});
 		break;
 	}
-	case TypeDirectoryItem || TypeFileItem: {
-		auto dir = dynamic_cast<Directory*>(item);
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
-			auto dirname = dir->fullName();
-			FileManagerServices::openDir(dirname);
-		});
-		break;
-	}
 	}
 
 	// We should only show the menu if it contains items
