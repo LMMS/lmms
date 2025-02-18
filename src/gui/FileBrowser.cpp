@@ -667,10 +667,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		QString dirname = dir->fullName();
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
-			auto _dirname = dirname;
-			FileRevealer::openDir(QFileInfo(_dirname));
+			FileRevealer::openDir(dir->fullName());
+		});
 		});
 		break;
 	}
