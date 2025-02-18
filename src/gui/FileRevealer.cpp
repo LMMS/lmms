@@ -104,7 +104,7 @@ bool FileRevealer::canSelect()
 #else
 	canSelectCache = supportsSelectOption(getDefaultFileManager());
 #endif
-	return canSelectCache;
+	return canSelectCache.value();
 }
 
 } // namespace lmms
