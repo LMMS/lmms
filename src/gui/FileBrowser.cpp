@@ -642,7 +642,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		QString fileName = file->fullName();
 
 		if (file->isTrack())
 		{
