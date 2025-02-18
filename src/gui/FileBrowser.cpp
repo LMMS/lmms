@@ -44,7 +44,7 @@
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
-#include "FileManagerServices.h"
+#include "FileRevealer.h"
 #include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -652,7 +652,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=, this] { FileManagerServices::reveal(fileName); });
+			[=, this] { FileRevealer::reveal(fileName); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -670,10 +670,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		QString dirname = dir->fullName();
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=, this] {
 			auto _dirname = dirname;
-			FileManagerServices::openDir(_dirname);
+			FileRevealer::openDir(_dirname);
 		});
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager), [=, this] {
-			FileManagerServices::reveal(dirname);
+			FileRevealer::reveal(dirname);
 		});
 		break;
 	}

@@ -42,6 +42,7 @@ SET(LMMS_SRCS
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/ToolPluginView.cpp
+	gui/FileRevealer.cpp
 
 	gui/clips/AutomationClipView.cpp
 	gui/clips/ClipView.cpp

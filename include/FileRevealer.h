@@ -1,5 +1,5 @@
 /*
- * FileManagerServices.h - include file for FileManagerServices
+ * FileRevealer.h - include file for FileRevealer
  *
  * Copyright (c) 2025 Andrew Wiltshire <aw1lt / at/ proton/ dot/me >
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_FILEMANAGER_SERVICES_H
-#define LMMS_FILEMANAGER_SERVICES_H
+#ifndef LMMS_FILE_REVEALER_H
+#define LMMS_FILE_REVEALER_H
 
 #include <QFileInfo>
 #include <QString>
@@ -31,7 +31,7 @@
 
 namespace lmms {
 
-class FileManagerServices
+class FileRevealer
 {
 public:
 	static QString getDefaultFileManager();
@@ -48,4 +48,4 @@ private:
 };
 
 } // namespace lmms
-#endif // LMMS_FILEMANAGER_SERVICES_H
+#endif // LMMS_FILE_REVEALER_H

@@ -1,5 +1,5 @@
 /*
- * FileManagerServices.cpp - Helper file for cross platform file management
+ * FileRevealer.cpp - Helper file for cross platform file revealing
  *
  * Copyright (c) 2025 Andrew Wiltshire <aw1lt / at/ proton/ dot/me >
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "FileManagerServices.h"
+#include "../../include/FileRevealer.h"
 
 #include <QDesktopServices>
 #include <QDir>
@@ -30,13 +30,13 @@
 #include <QUrl>
 
 namespace lmms {
-void FileManagerServices::openDir(QString& path)
+void FileRevealer::openDir(QString& path)
 {
 	QString nativePath = QDir::toNativeSeparators(path);
 
 	QProcess::startDetached(getDefaultFileManager(), {nativePath});
 }
-void FileManagerServices::reveal(const QFileInfo item)
+void FileRevealer::reveal(const QFileInfo item)
 {
 	if (!canSelect()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.absolutePath())); }
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
@@ -56,7 +56,7 @@ void FileManagerServices::reveal(const QFileInfo item)
 	QProcess::startDetached(getDefaultFileManager(), params);
 }
 
-bool FileManagerServices::supportsSelectOption(const QString& fileManager)
+bool FileRevealer::supportsSelectOption(const QString& fileManager)
 {
 #if !defined(_WIN32) && !defined(__APPLE__)
 
@@ -67,14 +67,13 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 	QString output = process.readAllStandardOutput() + process.readAllStandardError();
 	bool supports = output.contains("--select");
 
-	selectOptionCache.insert(fileManager, supports);
 	return supports;
 #else
 	return true;
 #endif
 }
 
-QString FileManagerServices::getDefaultFileManager()
+QString FileRevealer::getDefaultFileManager()
 {
 	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
 #if defined(_WIN32)
@@ -97,7 +96,7 @@ QString FileManagerServices::getDefaultFileManager()
 	return fileManagerCache.value();
 }
 
-bool FileManagerServices::canSelect()
+bool FileRevealer::canSelect()
 {
 
 	if (canSelectCache.has_value()) { return canSelectCache.value(); }
