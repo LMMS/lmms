@@ -14,6 +14,7 @@ SET(LMMS_SRCS
 	gui/EffectView.cpp
 	gui/embed.cpp
 	gui/FileBrowser.cpp
+	gui/FileRevealer.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -42,7 +43,6 @@ SET(LMMS_SRCS
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/ToolPluginView.cpp
-	gui/FileRevealer.cpp
 
 	gui/clips/AutomationClipView.cpp
 	gui/clips/ClipView.cpp
