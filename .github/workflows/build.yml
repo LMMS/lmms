@@ -30,7 +30,7 @@ jobs:
         with:
           repository: fltk/fltk
           path: fltk
-          ref: 27d991f
+          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
           fetch-depth: 1
       - name: Configure winehq
         run: |
@@ -120,7 +120,7 @@ jobs:
         with:
           repository: fltk/fltk
           path: fltk
-          ref: 27d991f
+          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
           fetch-depth: 1
       - name: Install system packages
         run: |
