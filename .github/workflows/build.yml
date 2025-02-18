@@ -30,7 +30,7 @@ jobs:
         with:
           repository: fltk/fltk
           path: fltk
-          ref: release-1.4.1
+          ref: 27d991f
           fetch-depth: 1
       - name: Configure winehq
         run: |
@@ -57,8 +57,9 @@ jobs:
             ccache-${{ github.job }}-
           path: ~/.ccache
       - name: Configure fltk
-        run: cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-          -DFLTK_USE_LIBDECOR_GTK=OFF    
+        run: |
+          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+            -DFLTK_USE_LIBDECOR_GTK=OFF
       - name: Install fltk
         run: |
           cmake --build fltk/build
@@ -119,7 +120,7 @@ jobs:
         with:
           repository: fltk/fltk
           path: fltk
-          ref: release-1.4.1
+          ref: 27d991f
           fetch-depth: 1
       - name: Install system packages
         run: |
@@ -137,8 +138,9 @@ jobs:
             ccache-${{ github.job }}-
           path: ~/.ccache
       - name: Configure fltk
-        run: cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-          -DFLTK_USE_LIBDECOR_GTK=OFF   
+        run: |
+          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+            -DFLTK_USE_LIBDECOR_GTK=OFF
       - name: Install fltk
         run: |
           cmake --build fltk/build
