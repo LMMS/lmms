@@ -58,7 +58,6 @@ void FileManagerServices::reveal(const QFileInfo item)
 
 bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 {
-	if (selectOptionCache.contains(fileManager)) { return selectOptionCache[fileManager]; }
 #if !defined(_WIN32) && !defined(__APPLE__)
 
 	QProcess process;
@@ -71,7 +70,6 @@ bool FileManagerServices::supportsSelectOption(const QString& fileManager)
 	selectOptionCache.insert(fileManager, supports);
 	return supports;
 #else
-	selectOptionCache.insert(fileManager, true);
 	return true;
 #endif
 }
@@ -82,7 +80,7 @@ QString FileManagerServices::getDefaultFileManager()
 #if defined(_WIN32)
 	fileManagerCache = "explorer";
 #elif defined(__APPLE__)
-	fileManagerCache  = "open";
+	fileManagerCache = "open";
 #else
 	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
@@ -94,7 +92,7 @@ QString FileManagerServices::getDefaultFileManager()
 
 	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
 	fileManager = fileManager.section('.', -1);
-	fileManagerCache  = fileManager;
+	fileManagerCache = fileManager;
 #endif
 	return fileManagerCache.value();
 }

@@ -45,7 +45,6 @@ protected:
 private:
 	static inline std::optional<QString> fileManagerCache;
 	static inline std::optional<bool> canSelectCache;
-	static inline QHash<QString, bool> selectOptionCache;
 };
 
 } // namespace lmms
