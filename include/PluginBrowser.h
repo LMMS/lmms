@@ -66,7 +66,6 @@ public:
 	void openInNewInstrumentTrack(QString value);
 
 protected:
-	// Todo : cleanup once QT 5 support is dropped
 	#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
 	void enterEvent( QEnterEvent * _e) override;
 	#else
