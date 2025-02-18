@@ -80,6 +80,7 @@
 #include <unistd.h> // For STDERR_FILENO
 #endif
 
+
 #ifdef LMMS_DEBUG_FPE
 void sigfpeHandler( int signum ) {
 
@@ -101,7 +102,7 @@ void sigfpeHandler( int signum ) {
 
 // SIGINT: Write to a file descriptor that GuiApplication is listening on
 static int sigintFd[2];
-static void sigintHandler(int code) {
+static void sigintHandler(int unused) {
 #ifndef LMMS_BUILD_WIN32
 	char a = 1;
 	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
@@ -316,7 +317,6 @@ int main( int argc, char * * argv )
 			fullscreen = false;
 		}
 	}
-
 
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
