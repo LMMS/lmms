@@ -88,6 +88,7 @@ template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ..
 constexpr int combine(Args... args)
 {
 	return (0 | ... | static_cast<int>(args));
+}
 
 /**
  * @brief position is a backwards-compatible adapter for

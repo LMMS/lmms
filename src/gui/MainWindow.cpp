@@ -294,11 +294,11 @@ void MainWindow::finalize()
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
 					this, SLOT(saveProjectAs()),
-					QKeySequence(combine(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
+					QKeySequence(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_S)));
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save as New &Version" ),
 					this, SLOT(saveProjectAsNewVersion()),
-					QKeySequence(combine(Qt::CTRL | Qt::ALT | Qt::Key_S));
+					QKeySequence(combine(Qt::CTRL, Qt::ALT, Qt::Key_S)));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save as default template" ),
@@ -313,23 +313,23 @@ void MainWindow::finalize()
 					tr( "E&xport..." ),
 					this,
 					SLOT(onExportProject()),
-					QKeySequence(combine(Qt::CTRL | Qt::Key_E));
+					QKeySequence(combine(Qt::CTRL, Qt::Key_E)));
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
 					this,
 					SLOT(onExportProjectTracks()),
-					QKeySequence(combine(Qt::CTRL | Qt::SHIFT | Qt::Key_E)));
+					QKeySequence(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_E)));
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					this,
 					SLOT(onExportProjectMidi()),
-					QKeySequence(combine(Qt::CTRL | Qt::Key_M)));
+					QKeySequence(combine(Qt::CTRL, Qt::Key_M)));
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT(closeAllWindows()),
-					QKeySequence(combine(Qt::CTRL | Qt::Key_Q)));
+					QKeySequence(combine(Qt::CTRL, Qt::Key_Q)));
 
 	auto edit_menu = new QMenu(this);
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
@@ -447,31 +447,31 @@ void MainWindow::finalize()
 	// window-toolbar
 	auto song_editor_window = new ToolButton(embed::getIconPixmap("songeditor"), tr("Song Editor") + " (Ctrl+1)", this,
 		SLOT(toggleSongEditorWin()), m_toolBar);
-	song_editor_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_1)));
+	song_editor_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_1)));
 
 	auto pattern_editor_window = new ToolButton(embed::getIconPixmap("pattern_track_btn"),
 		tr("Pattern Editor") + " (Ctrl+2)", this, SLOT(togglePatternEditorWin()), m_toolBar);
-	pattern_editor_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_2)));
+	pattern_editor_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_2)));
 
 	auto piano_roll_window = new ToolButton(
 		embed::getIconPixmap("piano"), tr("Piano Roll") + " (Ctrl+3)", this, SLOT(togglePianoRollWin()), m_toolBar);
-	piano_roll_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_3)));
+	piano_roll_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_3)));
 
 	auto automation_editor_window = new ToolButton(embed::getIconPixmap("automation"),
 		tr("Automation Editor") + " (Ctrl+4)", this, SLOT(toggleAutomationEditorWin()), m_toolBar);
-	automation_editor_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_4)));
+	automation_editor_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_4)));
 
 	auto mixer_window = new ToolButton(
 		embed::getIconPixmap("mixer"), tr("Mixer") + " (Ctrl+5)", this, SLOT(toggleMixerWin()), m_toolBar);
-	mixer_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_5)));
+	mixer_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_5)));
 
 	auto controllers_window = new ToolButton(embed::getIconPixmap("controller"),
 		tr("Show/hide controller rack") + " (Ctrl+6)", this, SLOT(toggleControllerRack()), m_toolBar);
-	controllers_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_6)));
+	controllers_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_6)));
 
 	auto project_notes_window = new ToolButton(embed::getIconPixmap("project_notes"),
 		tr("Show/hide project notes") + " (Ctrl+7)", this, SLOT(toggleProjectNotesWin()), m_toolBar);
-	project_notes_window->setShortcut(QKeySequence(combine(Qt::CTRL | Qt::Key_7)));
+	project_notes_window->setShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_7)));
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );

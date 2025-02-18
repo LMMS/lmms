@@ -1,13 +1,9 @@
 SET(PLUGIN_FILES "")
 IF(LMMS_BUILD_WIN32)
-<<<<<<< HEAD
-        INSTALL(FILES $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> DESTINATION platforms)
-        INSTALL(FILES $<TARGET_FILE:Qt5::QSvgIconPlugin> DESTINATION iconengines)
-        INSTALL(FILES $<TARGET_FILE:Qt5::QSvgPlugin> DESTINATION imageformats)
-        INSTALL(FILES $<TARGET_FILE:Qt5::Svg> DESTINATION .)
-=======
-	INSTALL(FILES $<TARGET_FILE:Qt${QT_VERSION_MAJOR}::QWindowsIntegrationPlugin> DESTINATION platforms)
->>>>>>> 2b679ebc4 (Add experimental Qt 6 support flags. (#7182))
+        INSTALL(FILES $<TARGET_FILE:Qt${QT_VERSION_MAJOR}::QWindowsIntegrationPlugin> DESTINATION platforms)
+        INSTALL(FILES $<TARGET_FILE:Qt${QT_VERSION_MAJOR}::QSvgIconPlugin> DESTINATION iconengines)
+        INSTALL(FILES $<TARGET_FILE:Qt${QT_VERSION_MAJOR}::QSvgPlugin> DESTINATION imageformats)
+        INSTALL(FILES $<TARGET_FILE:Qt${QT_VERSION_MAJOR}::Svg> DESTINATION .)
 ENDIF()
 
 IF(LMMS_BUILD_WIN32 OR LMMS_INSTALL_DEPENDENCIES)
