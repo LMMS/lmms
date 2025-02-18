@@ -75,7 +75,7 @@ public slots:
 
 private slots:
 	void childDestroyed(QObject *obj);
-	void signintHandler();
+	void sigintOccurred();
 
 private:
 	static GuiApplication* s_instance;

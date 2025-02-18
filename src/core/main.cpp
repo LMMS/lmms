@@ -81,7 +81,7 @@
 #endif
 
 #ifdef LMMS_DEBUG_FPE
-void fpeHandler( int signum ) {
+void sigfpeHandler( int signum ) {
 
 	// Get a back trace
 	void *array[10];
@@ -101,7 +101,7 @@ void fpeHandler( int signum ) {
 
 // SIGINT: Write to a file descriptor that GuiApplication is listening on
 static int sigintFd[2];
-static void intHandler(int code) {
+static void sigintHandler(int code) {
 #ifndef LMMS_BUILD_WIN32
 	char a = 1;
 	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
@@ -326,9 +326,9 @@ int main( int argc, char * * argv )
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
-	signal(SIGFPE, fpeHandler);
+	signal(SIGFPE, sigfpeHandler);
 #endif
-	signal(SIGINT, intHandler);
+	signal(SIGINT, sigintHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here

@@ -258,11 +258,10 @@ void GuiApplication::createSocketNotifier(int* sigintFd) {
 
 	// Listen on the file descriptor for SIGINT
 	m_sigintNotifier = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
-	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(signintHandler()), Qt::QueuedConnection);
+	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(sigintOccurred()), Qt::QueuedConnection);
 }
 
-// Handle the SIGINT event
-void GuiApplication::signintHandler() {
+void GuiApplication::sigintOccurred() {
 	m_sigintNotifier->setEnabled(false);
 	qDebug() << "Shutting down...";
 	// cleanup, etc
