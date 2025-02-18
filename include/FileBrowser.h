@@ -179,7 +179,7 @@ private:
 
 	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
-
+	
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QRecursiveMutex m_pphMutex;
 #else
@@ -190,12 +190,12 @@ private:
 
 
 private slots:
-	void activateListItem(QTreeWidgetItem* item, int column);
-	void openInNewInstrumentTrack(lmms::gui::FileItem* item, bool songEditor);
-	bool openInNewSampleTrack(lmms::gui::FileItem* item);
-	void sendToActiveInstrumentTrack(lmms::gui::FileItem* item);
-	void updateDirectory(QTreeWidgetItem* item);
-};
+	void activateListItem( QTreeWidgetItem * item, int column );
+	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
+	bool openInNewSampleTrack( lmms::gui::FileItem* item );
+	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
+	void updateDirectory( QTreeWidgetItem * item );
+} ;
 
 
 
