@@ -672,9 +672,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			auto _dirname = dirname;
 			FileRevealer::openDir(_dirname);
 		});
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager), [=, this] {
-			FileRevealer::reveal(dirname);
-		});
 		break;
 	}
 	}
