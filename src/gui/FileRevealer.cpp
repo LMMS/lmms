@@ -42,10 +42,10 @@ void FileRevealer::reveal(const QFileInfo item)
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 
-#ifdef _WIN32
+#ifdef LMMS_BUILD_WIN32
 	// explorer /select,[object]: Selects the file in the new explorer window
 	params += QLatin1String("/select,");
-#elif __APPLE__
+#elif LMMS_BUILD_APPLE
 	// Finder -R, --reveal: Selects in finder
 	params += "-R";
 #else
@@ -58,7 +58,7 @@ void FileRevealer::reveal(const QFileInfo item)
 
 bool FileRevealer::supportsSelectOption(const QString& fileManager)
 {
-#if !defined(_WIN32) && !defined(__APPLE__)
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE)
 
 	QProcess process;
 	process.start(fileManager, {"--help"});
@@ -77,9 +77,9 @@ const QString& FileRevealer::getDefaultFileManager()
 {
 	static std::optional<QString> fileManagerCache;
 	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
-#if defined(_WIN32)
+#if defined(LMMS_BUILD_WIN32)
 	fileManagerCache = "explorer";
-#elif defined(__APPLE__)
+#elif defined(LMMS_BUILD_APPLE)
 	fileManagerCache = "open";
 #else
 	QProcess process;
@@ -101,7 +101,7 @@ bool FileRevealer::canSelect()
 {
 	static std::optional<bool> canSelectCache;
 	if (canSelectCache.has_value()) { return canSelectCache.value(); }
-#if defined(_WIN32) || defined(__APPLE__)
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_APPLE)
 	canSelectCache = true;
 #else
 	canSelectCache = supportsSelectOption(getDefaultFileManager());
