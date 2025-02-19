@@ -1388,8 +1388,7 @@ void RemoteVstPlugin::getProgramNames()
 				else
 				{
 					const auto len = strlen(presName);
-					const auto remaining = std::min(len, sizeof(presName));
-					snprintf(presName + len, remaining, "|%s", curProgName);
+					snprintf(presName + len, sizeof(presName) - len, "|%s", curProgName);
 				}
 			}
 		}
