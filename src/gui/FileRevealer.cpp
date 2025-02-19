@@ -75,6 +75,7 @@ bool FileRevealer::supportsSelectOption(const QString& fileManager)
 
 QString FileRevealer::getDefaultFileManager()
 {
+	static std::optional<QString> fileManagerCache;
 	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
 #if defined(_WIN32)
 	fileManagerCache = "explorer";
