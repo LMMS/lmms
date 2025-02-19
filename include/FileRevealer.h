@@ -41,10 +41,6 @@ public:
 
 protected:
 	static bool supportsSelectOption(const QString& fileManager);
-
-private:
-	static inline std::optional<QString> fileManagerCache;
-	static inline std::optional<bool> canSelectCache;
 };
 
 } // namespace lmms
