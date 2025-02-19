@@ -73,7 +73,7 @@ bool FileRevealer::supportsSelectOption(const QString& fileManager)
 #endif
 }
 
-QString FileRevealer::getDefaultFileManager()
+const QString& FileRevealer::getDefaultFileManager()
 {
 	static std::optional<QString> fileManagerCache;
 	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
