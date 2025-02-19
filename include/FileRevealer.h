@@ -34,7 +34,7 @@ namespace lmms {
 class FileRevealer
 {
 public:
-	static QString getDefaultFileManager();
+	static const QString& getDefaultFileManager();
 	static void openDir(QFileInfo item);
 	static bool canSelect();
 	static void reveal(QFileInfo item);
