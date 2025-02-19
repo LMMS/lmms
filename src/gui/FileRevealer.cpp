@@ -101,7 +101,7 @@ bool FileRevealer::canSelect()
 {
 	static std::optional<bool> canSelectCache;
 	if (canSelectCache.has_value()) { return canSelectCache.value(); }
-#if defined(_WIN32) || !defined(__APPLE__)
+#if defined(_WIN32) || defined(__APPLE__)
 	canSelectCache = true;
 #else
 	canSelectCache = supportsSelectOption(getDefaultFileManager());
