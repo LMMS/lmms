@@ -29,6 +29,8 @@
 #include <QString>
 #include <optional>
 
+#include "lmmsconfig.h"
+
 namespace lmms {
 
 class FileRevealer
