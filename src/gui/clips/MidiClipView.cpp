@@ -393,7 +393,7 @@ void MidiClipView::clearNotesOutOfBounds()
 			Note newNote = Note{*note};
 			newNote.setPos(newNoteStart);
 			newNote.setLength(newLength);
-			newClip->addNote(newNote);
+			newClip->addNote(newNote, false);
 		}
 	}
 	newClip->changeLength(m_clip->length());
