@@ -33,15 +33,43 @@
 
 namespace lmms {
 
+/**
+ * @class FileRevealer
+ * @brief A utility class for revealing files and directories in the system's file manager.
+ */
 class FileRevealer
 {
 public:
+	/**
+	 * @brief Retrieves the default file manager for the current platform.
+	 * @return The name or command of the default file manager.
+	 */
 	static const QString& getDefaultFileManager();
+
+	/**
+	 * @brief Opens the directory containing the specified file or folder in the file manager.
+	 * @param item The QFileInfo object representing the file or folder.
+	 */
 	static void openDir(QFileInfo item);
+
+	/**
+	 * @brief Checks whether the file manager supports selecting a specific file.
+	 * @return True if selection is supported, otherwise false.
+	 */
 	static bool canSelect();
+
+	/**
+	 * @brief Opens the file manager and selects the specified file if supported.
+	 * @param item The QFileInfo object representing the file to reveal.
+	 */
 	static void reveal(QFileInfo item);
 
 protected:
+	/**
+	 * @brief Determines if the given file manager supports the "--select" option.
+	 * @param fileManager The name of the file manager to check.
+	 * @return True if the file manager supports "--select", otherwise false.
+	 */
 	static bool supportsSelectOption(const QString& fileManager);
 };
 
