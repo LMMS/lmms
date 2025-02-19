@@ -42,10 +42,10 @@ void FileRevealer::reveal(const QFileInfo item)
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32)
 	// explorer /select,[object]: Selects the file in the new explorer window
 	params += QLatin1String("/select,");
-#elif LMMS_BUILD_APPLE
+#elif defined(LMMS_BUILD_APPLE)
 	// Finder -R, --reveal: Selects in finder
 	params += "-R";
 #else
