@@ -47,7 +47,7 @@ public:
 		colorType br, bg, bb, ba;
 		b.getRgbF(&br, &bg, &bb, &ba);
 
-		const auto t2 = static_cast<qreal>(t);
+		const auto t2 = static_cast<colorType>(t);
 		const colorType interH = std::lerp(ar, br, t2);
 		const colorType interS = std::lerp(ag, bg, t2);
 		const colorType interV = std::lerp(ab, bb, t2);
