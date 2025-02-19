@@ -141,7 +141,7 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 		{
 			const auto value = m_buffer->data()->data()[i];
 			painter.drawPoint(x, renderRect.center().y() - value * yScale);
-			return;
+			continue;
 		}
 		else
 		{
