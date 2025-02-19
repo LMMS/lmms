@@ -339,7 +339,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:
-          version: '5.15.2'
+          version: '6.5.*'
           arch: "win64_msvc2019_64"
           archives: qtbase qtsvg qttools
           cache: true
@@ -357,6 +357,7 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DWANT_QT6=ON `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="x64-windows" `
