@@ -119,10 +119,11 @@ void FileRevealer::reveal(const QFileInfo item)
 		params << selectCommand.toLatin1();
 #else
 		params << selectCommand;
+#endif
 	}
 
 	params << path;
-#endif
+
 		QProcess::startDetached(defaultFileManager, params);
 	}
 }
