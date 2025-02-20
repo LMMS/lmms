@@ -67,7 +67,7 @@ void FileRevealer::openDir(const QFileInfo item)
 
 const QString& FileRevealer::getSelectCommand()
 {
-	static std::optional<QString> selectCommandCache = "";
+	static std::optional<QString> selectCommandCache;
 
 	if (selectCommandCache.has_value()) { return selectCommandCache.value(); }
 
@@ -89,11 +89,13 @@ const QString& FileRevealer::getSelectCommand()
 	}
 
 	// Parse "<command> --help" and look for the "--select" for file managers that we don't know
-	if (supportsArg(getDefaultFileManager(), "--select"))
-	{
-		selectCommandCache = "--select";
+	if(supportsArg(getDefaultFileManager(), "--select")) {
 		canSelect = true;
+		selectCommandCache = "--select";
 	}
+
+	// Fallback to empty string
+	selectCommandCache = "";
 	return selectCommandCache.value();
 }
 
@@ -111,10 +113,13 @@ void FileRevealer::reveal(const QFileInfo item)
 	QString defaultFileManager = getDefaultFileManager();
 	QStringList params;
 
+	if (!selectCommand.isEmpty()) {
 #if defined(LMMS_BUILD_WIN32)
-	params = << QLatin1String(selectCommand) << path;
+    	params = << QLatin1String(selectCommand);
 #else
-	if (selectCommand.isEmpty()) { params << selectCommand; }
+		params << selectCommand;
+	}
+
 	params << path;
 #endif
 
