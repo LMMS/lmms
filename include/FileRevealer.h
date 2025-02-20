@@ -70,8 +70,8 @@ private:
 protected:
 	/**
 	 * @brief Determines if the given command supports the argument
-	 * @param fileManager The name of the file manager to check.
-	 * @param arg The command line argument ot parse for
+	 * @param command The name of the file manager to check.
+	 * @param arg The command line argument to parse for
 	 * @return True if the file command the argument, otherwise false.
 	 */
 	static bool supportsArg(const QString& command, const QString& arg);
