@@ -112,16 +112,4 @@ bool FileRevealer::supportsSelectOption(const QString& fileManager)
 #endif
 }
 
-bool FileRevealer::canSelect()
-{
-	static std::optional<bool> canSelectCache;
-	if (canSelectCache.has_value()) { return canSelectCache.value(); }
-#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_APPLE)
-	canSelectCache = true;
-#else
-	canSelectCache = supportsSelectOption(getDefaultFileManager());
-#endif
-	return canSelectCache.value();
-}
-
 } // namespace lmms
