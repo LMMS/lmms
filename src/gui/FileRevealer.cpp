@@ -118,11 +118,7 @@ void FileRevealer::reveal(const QFileInfo item)
 
 	if (!selectCommand.isEmpty())
 	{
-#if defined(LMMS_BUILD_WIN32)
 		params << selectCommand;
-#else
-		params << selectCommand;
-#endif
 	}
 
 	params << path;
