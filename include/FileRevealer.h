@@ -27,7 +27,6 @@
 
 #include <QFileInfo>
 #include <QString>
-#include <optional>
 
 #include "lmmsconfig.h"
 
