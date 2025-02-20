@@ -77,12 +77,12 @@ const QString& FileRevealer::getSelectCommand()
 	};
 
 	// Skip calling "--help" for file managers that we know
-	for (const auto& pair : argMap)
+	for (const auto& [fileManager, arg] : argMap)
 	{
-		if (pair.first == getDefaultFileManager())
+		if (fileManager == getDefaultFileManager())
 		{
 			canSelect = true;
-			selectCommandCache = pair.second;
+			selectCommandCache = arg;
 			return selectCommandCache.value();
 		}
 	}
