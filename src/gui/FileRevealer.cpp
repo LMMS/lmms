@@ -31,7 +31,6 @@
 #include <optional>
 
 namespace lmms {
-
 bool lmms::FileRevealer::canSelect = false;
 
 const QString& FileRevealer::getDefaultFileManager()
@@ -89,7 +88,8 @@ const QString& FileRevealer::getSelectCommand()
 	}
 
 	// Parse "<command> --help" and look for the "--select" for file managers that we don't know
-	if(supportsArg(getDefaultFileManager(), "--select")) {
+	if (supportsArg(getDefaultFileManager(), "--select"))
+	{
 		canSelect = true;
 		selectCommandCache = "--select";
 	}
@@ -113,16 +113,18 @@ void FileRevealer::reveal(const QFileInfo item)
 	QString defaultFileManager = getDefaultFileManager();
 	QStringList params;
 
-	if (!selectCommand.isEmpty()) {
+	if (!selectCommand.isEmpty())
+	{
 #if defined(LMMS_BUILD_WIN32)
-    	params << selectCommand.toLatin1();
+		params << selectCommand.toLatin1();
 #else
 		params << selectCommand;
 	}
 
 	params << path;
 #endif
-	QProcess::startDetached(defaultFileManager, params);
+		QProcess::startDetached(defaultFileManager, params);
+	}
 }
 
 bool FileRevealer::supportsArg(const QString& command, const QString& arg)
