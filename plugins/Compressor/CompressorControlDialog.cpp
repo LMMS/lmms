@@ -48,7 +48,6 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_controls(controls)
 {
 	setAutoFillBackground(false);
-	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	
 	setMinimumSize(MIN_COMP_SCREEN_X, MIN_COMP_SCREEN_Y);
