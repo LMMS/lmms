@@ -61,7 +61,7 @@ public:
 	static void reveal(const QFileInfo item);
 
 private:
-	static bool canSelect;
+	static bool s_canSelect;
 
 protected:
 	/**

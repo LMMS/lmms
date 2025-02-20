@@ -34,7 +34,7 @@
 #include "lmmsconfig.h"
 
 namespace lmms {
-bool FileRevealer::canSelect = false;
+bool FileRevealer::s_canSelect = false;
 
 const QString& FileRevealer::getDefaultFileManager()
 {
@@ -84,7 +84,7 @@ const QString& FileRevealer::getSelectCommand()
 	{
 		if (fileManager == getDefaultFileManager())
 		{
-			canSelect = true;
+			s_canSelect = true;
 			selectCommandCache = arg;
 			return selectCommandCache.value();
 		}
@@ -93,7 +93,7 @@ const QString& FileRevealer::getSelectCommand()
 	// Parse "<command> --help" and look for the "--select" for file managers that we don't know
 	if (supportsArg(getDefaultFileManager(), "--select"))
 	{
-		canSelect = true;
+		s_canSelect = true;
 		selectCommandCache = "--select";
 		return selectCommandCache.value();
 	}
@@ -107,7 +107,7 @@ void FileRevealer::reveal(const QFileInfo item)
 {
 	// Sets selectCommandCache, canSelect
 	const QString& selectCommand = getSelectCommand();
-	if (!canSelect)
+	if (!s_canSelect)
 	{
 		QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath()));
 		return;
