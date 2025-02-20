@@ -27,9 +27,9 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QProcess>
+#include <QString>
 #include <QUrl>
 #include <optional>
-#include <QString>
 
 #include "lmmsconfig.h"
 
@@ -95,6 +95,7 @@ const QString& FileRevealer::getSelectCommand()
 	{
 		canSelect = true;
 		selectCommandCache = "--select";
+		return selectCommandCache.value();
 	}
 
 	// Fallback to empty string
