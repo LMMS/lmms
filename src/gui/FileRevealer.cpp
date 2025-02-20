@@ -28,7 +28,6 @@
 #include <QDir>
 #include <QProcess>
 #include <QUrl>
-
 #include <optional>
 
 namespace lmms {
@@ -79,8 +78,10 @@ const QString& FileRevealer::getSelectCommand()
 	};
 
 	// Skip calling "--help" for file managers that we know
-	for (const auto& pair : argMap) {
-		if (pair.first == getDefaultFileManager()) {
+	for (const auto& pair : argMap)
+	{
+		if (pair.first == getDefaultFileManager())
+		{
 			canSelect = true;
 			selectCommandCache = pair.second;
 			return selectCommandCache.value();
@@ -88,7 +89,8 @@ const QString& FileRevealer::getSelectCommand()
 	}
 
 	// Parse "<command> --help" and look for the "--select" for file managers that we don't know
-	if(supportsArg(getDefaultFileManager(), "--select")) {
+	if (supportsArg(getDefaultFileManager(), "--select"))
+	{
 		selectCommandCache = "--select";
 		canSelect = true;
 	}
@@ -99,7 +101,8 @@ void FileRevealer::reveal(const QFileInfo item)
 {
 	// Sets selectCommandCache, canSelect
 	const QString& selectCommand = getSelectCommand();
-	if (!canSelect) {
+	if (!canSelect)
+	{
 		QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath()));
 		return;
 	}
@@ -111,9 +114,7 @@ void FileRevealer::reveal(const QFileInfo item)
 #if defined(LMMS_BUILD_WIN32)
 	params = << QLatin1String(selectCommand) << path;
 #else
-	if (selectCommand.isEmpty()) {
-		params << selectCommand;
-	}
+	if (selectCommand.isEmpty()) { params << selectCommand; }
 	params << path;
 #endif
 
