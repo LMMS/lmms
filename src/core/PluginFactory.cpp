@@ -257,7 +257,7 @@ QList<QRegularExpression> PluginFactory::getExcludePatterns(const char* envVar) 
 	if (!excludePatternString.isEmpty()) {
 		QStringList patterns = excludePatternString.split(',');
 		for (const QString& pattern : patterns) {
-			if(pattern.trimmed().isEmpty()) {
+			if (pattern.trimmed().isEmpty()) {
 				continue;
 			}
 			QRegularExpression regex(pattern.trimmed());
