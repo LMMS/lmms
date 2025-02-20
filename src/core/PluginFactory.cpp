@@ -249,11 +249,10 @@ void PluginFactory::discoverPlugins()
 	m_descriptors = descriptors;
 }
 
-// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="libcarla"
-void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
-	// Get filter
-	QList<QRegularExpression> excludedPatterns;
-	QString excludePatternString = std::getenv("LMMS_EXCLUDE_PLUGINS");
+// Builds QList<QRegularExpression> based on environment variable envVar
+QList<QRegularExpression> PluginFactory::getExcludePatterns(const char* envVar) {
+	QList<QRegularExpression> excludePatterns;
+	QString excludePatternString = std::getenv(envVar);
 
 	if (!excludePatternString.isEmpty()) {
 		QStringList patterns = excludePatternString.split(',');
@@ -269,21 +268,31 @@ void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
 			}
 		}
 	}
+	return excludePatterns;
+}
+
+// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="libcarla"
+void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
+	// Get filter
+	QList<QRegularExpression> excludePatterns = getExcludePatterns("LMMS_EXCLUDE_PLUGINS");
+	if(excludePatterns.size() == 0) {
+		return;
+	}
 
   	// Get files to remove
 	QSet<QFileInfo> filesToRemove;
 	for (const QFileInfo& fileInfo : files) {
-		bool excluded = false;
+		bool exclude = false;
 		QString filePath = fileInfo.filePath();
 
-		for (const QRegularExpression& pattern : excludedPatterns) {
+		for (const QRegularExpression& pattern : excludePatterns) {
 			if (pattern.match(filePath).hasMatch()) {
-				excluded = true;
+				exclude = true;
 				break;
 			}
 		}
 
-		if (excluded) {
+		if (exclude) {
 			filesToRemove.insert(fileInfo);
 		}
 	}
