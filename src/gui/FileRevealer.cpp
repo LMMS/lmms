@@ -38,25 +38,27 @@ void FileRevealer::openDir(const QFileInfo item)
 }
 void FileRevealer::reveal(const QFileInfo item)
 {
-	if (!canSelect()) {
+	if (!canSelect())
+	{
 		QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath()));
 		return;
 	}
+
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
-	QStringList params;
+	QString defaultFileManager = getDefaultFileManager();
 
 #if defined(LMMS_BUILD_WIN32)
-	// explorer /select,[object]: Selects the file in the new explorer window
-	params += QLatin1String("/select,");
+	QStringList params = {QLatin1String("/select,"), path};
 #elif defined(LMMS_BUILD_APPLE)
-	// open -R, --reveal: Selects in finder
-	params += "-R";
+	QStringList params = {"-R", path};
 #else
-	// --select: Linux, BSD and other *nix systems
-	params += "--select";
+	QStringList params;
+	if (defaultFileManager == "nemo") { params = {"-R", path}; }
+
+	params = {path, "--select"};
 #endif
-	params += path;
-	QProcess::startDetached(getDefaultFileManager(), params);
+
+	QProcess::startDetached(defaultFileManager, params);
 }
 
 bool FileRevealer::supportsSelectOption(const QString& fileManager)
