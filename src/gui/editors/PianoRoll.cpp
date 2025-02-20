@@ -27,6 +27,7 @@
 #include "PianoRoll.h"
 
 #include <QtMath>
+#include <QDebug>
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -58,6 +59,7 @@
 #include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "KeyboardShortcuts.h"
+#include "lmms_math.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
 #include "PatternStore.h"
@@ -1398,7 +1400,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			}
 
 		case Qt::Key_A:
-			if( ke->modifiers() & Qt::ControlModifier )
+			if( ke->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Strum && m_editMode != EditMode::Knife)
 			{
 				ke->accept();
 				if (ke->modifiers() & Qt::ShiftModifier)
@@ -1416,10 +1418,14 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Escape:
-			// On the Knife mode, ESC cancels it
+			// On the Knife mode or Strum mode, ESC cancels it
 			if (m_editMode == EditMode::Knife)
 			{
 				cancelKnifeAction();
+			}
+			else if (m_editMode == EditMode::Strum)
+			{
+				cancelStrumAction();
 			}
 			else
 			{
@@ -1472,7 +1478,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		case Qt::Key_Control:
 			// Ctrl will not enter selection mode if we are
 			// in Knife mode, but unquantize it
-			if (m_editMode == EditMode::Knife)
+			if (m_editMode == EditMode::Knife || m_editMode == EditMode::Strum)
 			{
 				break;
 			}
@@ -1515,7 +1521,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	switch( ke->key() )
 	{
 		case Qt::Key_Control:
-			if (m_editMode == EditMode::Knife)
+			if (m_editMode == EditMode::Knife || m_editMode == EditMode::Strum)
 			{
 				break;
 			}
@@ -1623,6 +1629,15 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			m_midiClip->splitNotes(n, TimePos(m_knifeTickPos));
 		}
 
+		update();
+		return;
+	}
+
+	if (m_editMode == EditMode::Strum && me->button() == Qt::LeftButton)
+	{
+		qDebug() << "Strum mouse down!";
+		updateStrumPos(me, true, me->modifiers() & Qt::ShiftModifier);
+		m_strumEnabled = true;
 		update();
 		return;
 	}
@@ -2152,7 +2167,26 @@ void PianoRoll::cancelKnifeAction()
 	update();
 }
 
+void PianoRoll::setStrumAction()
+{
+	if (m_editMode != EditMode::Strum)
+	{
+		m_strumMode = m_editMode;
+		m_editMode = EditMode::Strum;
+		m_action = Action::Strum;
+		m_strumEnabled = false;
+		setCursor(Qt::ArrowCursor);
+		update();
+	}
+}
 
+void PianoRoll::cancelStrumAction()
+{
+	m_editMode = m_strumMode;
+	m_action = Action::None;
+	m_strumEnabled = false;
+	update();
+}
 
 void PianoRoll::testPlayKey( int key, int velocity, int pan )
 {
@@ -2252,10 +2286,14 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	s_textFloat->hide();
 
-	// Quit knife mode if we pressed and released the right mouse button
+	// Quit knife mode or strum mode if we pressed and released the right mouse button
 	if (m_editMode == EditMode::Knife && me->button() == Qt::RightButton)
 	{
 		cancelKnifeAction();
+	}
+	else if (m_editMode == EditMode::Strum && me->button() == Qt::RightButton)
+	{
+		cancelStrumAction();
 	}
 
 	if( me->button() & Qt::LeftButton )
@@ -2276,6 +2314,11 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			// time in the note-array of clip
 			m_midiClip->rearrangeAllNotes();
 
+		}
+
+		if (m_action == Action::Strum || m_strumEnabled)
+		{
+			m_strumEnabled = false;
 		}
 
 		if( m_action == Action::MoveNote || m_action == Action::ResizeNote )
@@ -2317,7 +2360,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	m_currentNote = nullptr;
 
-	if (m_action != Action::Knife)
+	if (m_action != Action::Knife && m_action != Action::Strum)
 	{
 		m_action = Action::None;
 	}
@@ -2381,6 +2424,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	if (m_editMode == EditMode::Knife)
 	{
 		updateKnifePos(me);
+	}
+
+	// Update Strum position if we are on knife mode
+	if (m_editMode == EditMode::Strum && m_strumEnabled)
+	{
+		updateStrumPos(me, false, me->modifiers() & Qt::ShiftModifier);
 	}
 
 	if( me->y() > PR_TOP_MARGIN || m_action != Action::None )
@@ -2665,7 +2714,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 			}
 		}
-		else if (me->buttons() == Qt::NoButton && m_editMode != EditMode::Draw && m_editMode != EditMode::Knife)
+		else if (me->buttons() == Qt::NoButton && m_editMode != EditMode::Draw && m_editMode != EditMode::Knife && m_editMode != EditMode::Strum)
 		{
 			// Is needed to restore cursor when it previously was set to
 			// Qt::SizeVerCursor (between keyAreaBottom and noteEditTop)
@@ -2776,6 +2825,115 @@ void PianoRoll::updateKnifePos(QMouseEvent* me)
 	m_knifeTickPos = mouseTickPos;
 }
 
+void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
+{
+	// Calculate the TimePos from the mouse
+	int mouseViewportPos = me->x() - m_whiteKeyWidth;
+	int mouseTickPos = mouseViewportPos * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+	// Should we add quantization? probably not?
+	if (initial)
+	{
+		m_strumStartTime = mouseTickPos;
+		m_strumStartVertical =  me->y();
+	}
+	m_strumCurrentTime = mouseTickPos;
+	m_strumCurrentVertical =  me->y();
+	int strumTicksHorizontal = m_strumCurrentTime - m_strumStartTime;
+	float strumPower = fastPow10f(0.01f * (m_strumCurrentVertical - m_strumStartVertical));
+
+	// for all selected notes, find distinct chords. Distict chords must be like islands.
+	// - for each note, if it's start/end lies in the current groups start/end, it's part of the group. Else start a new group.
+	// - store the groups in vectors of note vector pointers?
+	// - 
+	// find the dragged note, find the base and top of that chord. Find the difference, divide by notes along branch, take max.
+	// for each chord, start from the note proportionally in order closest to dragged note. Number the other notes, top and bottom, based on their start pos, move them by such
+	
+	//
+	// Setup chords
+	//
+	if (initial)
+	{
+		m_midiClip->addJournalCheckPoint();
+
+		m_selectedChords.clear();
+		m_midiClip->rearrangeAllNotes();
+
+		const NoteVector& selectedNotes = getSelectedNotes();
+		if (selectedNotes.empty()) { return; }
+
+		Note* clickedNote = noteUnderMouse();
+		if (clickedNote == nullptr) { return; }
+
+		int clickedNoteChordIndex = 0;
+
+		int maxTime = -1;
+		NoteVector currentChord;
+		for (Note* note: selectedNotes)
+		{
+			// If the note is not in the current chord range (and this isn't the first chord), start a new chord.
+			note->setOldPos(note->pos());
+			if (note->pos() >= maxTime && maxTime != -1)
+			{
+				// Sort the notes by key before adding the chord to the vector
+				std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
+				m_selectedChords.push_back(currentChord);
+				currentChord.clear();
+				maxTime = note->endPos();
+			}
+			maxTime = std::max(maxTime, static_cast<int>(note->endPos()));
+			currentChord.push_back(note);
+			if (note == clickedNote) { clickedNoteChordIndex = m_selectedChords.size(); }
+		}
+		// Add final chord
+		std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
+		m_selectedChords.push_back(currentChord);
+
+		NoteVector clickedNoteChord = m_selectedChords.at(clickedNoteChordIndex);
+		if (clickedNoteChord.size() > 1)
+		{
+			// Now we need to find the amount/ratio how far up the chord the clicked note is. 0 = bottom, 1 = top
+			// Since the chord notes are sorted by key, this is easy
+			m_strumHeightRatio = 1.f * std::distance(clickedNoteChord.begin(), std::find(clickedNoteChord.begin(), clickedNoteChord.end(), clickedNote)) / (clickedNoteChord.size() - 1);
+		}
+	}
+
+	//
+	// Perform the Strum
+	// Depending on how high each note is in each chord (compared to the selected note in the selected chord), they are strummed up/down
+	// Holding shift raises the amount of movement to a power, causing the strum to be curved/warped.
+	//
+	for (NoteVector chord: m_selectedChords)
+	{
+		// Don't strum a chord with only one note
+		if (chord.size() <= 1) { continue; }
+		int i = 0;
+		for (Note* note: chord)
+		{
+			float heightRatio = 1.f * i / (chord.size() - 1);
+			float ratio = 0.0f;
+			if (heightRatio == m_strumHeightRatio)
+			{
+				ratio = 1.f;
+			}
+			else if (heightRatio < m_strumHeightRatio)
+			{
+				ratio = heightRatio / m_strumHeightRatio;
+			}
+			else
+			{
+				ratio = (1.f - heightRatio) / (1.f - m_strumHeightRatio);
+			}
+
+			if (warp)
+			{
+				ratio = std::powf(ratio, strumPower);
+			}
+			note->setPos(note->oldPos() + ratio * strumTicksHorizontal);
+			i++;
+		}
+	}
+	m_midiClip->rearrangeAllNotes();
+}
 
 
 
@@ -3696,6 +3854,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case EditMode::Knife:
 				cursor = &m_toolKnife;
 				break;
+			case EditMode::Strum:
+				cursor = &m_toolStrum;
+				break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 		if( cursor != nullptr && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
@@ -3910,7 +4071,13 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 	if (m_editMode == EditMode::Knife) {
 		m_editMode = m_knifeMode;
 		m_action = Action::None;
-	} else {
+	}
+	else if (m_editMode == EditMode::Strum) {
+		m_editMode = m_strumMode;
+		m_action = Action::None;
+	}
+	else
+	{
 		m_editMode = m_ctrlMode;
 	}
 	update();
@@ -4855,6 +5022,10 @@ PianoRollWindow::PianoRollWindow() :
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
 	knifeAction->setShortcut(combine(Qt::SHIFT, Qt::Key_K));
 
+	auto strumAction = new QAction(embed::getIconPixmap("edit_strum"), tr("Strum"), noteToolsButton);
+	connect(strumAction, &QAction::triggered, m_editor, &PianoRoll::setStrumAction);
+	strumAction->setShortcut(combine(Qt::SHIFT, Qt::Key_J));
+
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
 	fillAction->setShortcut(combine(Qt::SHIFT, Qt::Key_F));
@@ -4871,6 +5042,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
+	noteToolsButton->addAction(strumAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);

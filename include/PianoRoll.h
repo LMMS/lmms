@@ -112,7 +112,8 @@ public:
 		Erase,
 		Select,
 		Detuning,
-		Knife
+		Knife,
+		Strum
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -268,7 +269,8 @@ private:
 		SelectNotes,
 		ChangeNoteProperty,
 		ResizeNoteEditArea,
-		Knife
+		Knife,
+		Strum
 	};
 
 	enum class NoteEditMode
@@ -324,6 +326,9 @@ private:
 	void setKnifeAction();
 	void cancelKnifeAction();
 
+	void setStrumAction();
+	void cancelStrumAction();
+
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -347,6 +352,7 @@ private:
 	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
 	QPixmap m_toolOpen = embed::getIconPixmap("automation");
 	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
+	QPixmap m_toolStrum = embed::getIconPixmap("edit_strum");
 
 	static std::array<KeyType, 12> prKeyOrder;
 
@@ -437,6 +443,7 @@ private:
 	EditMode m_editMode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 	EditMode m_knifeMode; // mode they where in before entering knife mode
+	EditMode m_strumMode; // mode they where in before entering strum mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -459,6 +466,15 @@ private:
 	// Variable that holds the position in ticks for the knife action
 	int m_knifeTickPos;
 	void updateKnifePos(QMouseEvent* me);
+
+	TimePos m_strumStartTime;
+	TimePos m_strumCurrentTime;
+	int m_strumStartVertical;
+	int m_strumCurrentVertical;
+	float m_strumHeightRatio;
+	bool m_strumEnabled = false;
+	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
+	std::vector<NoteVector> m_selectedChords;
 
 	friend class PianoRollWindow;
 
