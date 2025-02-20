@@ -30,11 +30,45 @@
 #include <QUrl>
 
 namespace lmms {
+const QString& FileRevealer::getDefaultFileManager()
+{
+	static std::optional<QString> fileManagerCache;
+	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
+#if defined(LMMS_BUILD_WIN32)
+	fileManagerCache = "explorer";
+#elif defined(LMMS_BUILD_APPLE)
+	fileManagerCache = "open";
+#else
+	QProcess process;
+	process.start("xdg-mime", {"query", "default", "inode/directory"});
+	process.waitForFinished(3000);
+
+	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
+
+	if (fileManager.endsWith(".desktop")) { fileManager.chop(8); }
+
+	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
+	fileManager = fileManager.section('.', -1);
+	fileManagerCache = fileManager;
+#endif
+	return fileManagerCache.value();
+}
 void FileRevealer::openDir(const QFileInfo item)
 {
 	QString nativePath = QDir::toNativeSeparators(item.canonicalFilePath());
 
 	QProcess::startDetached(getDefaultFileManager(), {nativePath});
+}
+bool FileRevealer::canSelect()
+{
+	static std::optional<bool> canSelectCache;
+	if (canSelectCache.has_value()) { return canSelectCache.value(); }
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_APPLE)
+	canSelectCache = true;
+#else
+	canSelectCache = supportsSelectOption(getDefaultFileManager());
+#endif
+	return canSelectCache.value();
 }
 void FileRevealer::reveal(const QFileInfo item)
 {
@@ -76,30 +110,6 @@ bool FileRevealer::supportsSelectOption(const QString& fileManager)
 #else
 	return true;
 #endif
-}
-
-const QString& FileRevealer::getDefaultFileManager()
-{
-	static std::optional<QString> fileManagerCache;
-	if (fileManagerCache.has_value()) { return fileManagerCache.value(); }
-#if defined(LMMS_BUILD_WIN32)
-	fileManagerCache = "explorer";
-#elif defined(LMMS_BUILD_APPLE)
-	fileManagerCache = "open";
-#else
-	QProcess process;
-	process.start("xdg-mime", {"query", "default", "inode/directory"});
-	process.waitForFinished(3000);
-
-	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
-
-	if (fileManager.endsWith(".desktop")) { fileManager.chop(8); }
-
-	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
-	fileManager = fileManager.section('.', -1);
-	fileManagerCache = fileManager;
-#endif
-	return fileManagerCache.value();
 }
 
 bool FileRevealer::canSelect()
