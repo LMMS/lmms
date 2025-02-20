@@ -47,7 +47,7 @@ LadspaManager::LadspaManager()
 	// Make sure plugin search paths are set up
 	PluginFactory::setupSearchPaths();
 
-	QList<QRegularExpression> excludePatterns = PluginFactory::getExcludePatterns("LMMS_LADSPA_EXCLUDE_PLUGINS");
+	QList<QRegularExpression> excludePatterns = PluginFactory::getExcludePatterns("LMMS_EXCLUDE_LADSPA");
 
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );
