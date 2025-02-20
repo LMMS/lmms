@@ -27,7 +27,6 @@
 #include "PianoRoll.h"
 
 #include <QtMath>
-#include <QDebug>
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -1635,7 +1634,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if (m_editMode == EditMode::Strum && me->button() == Qt::LeftButton)
 	{
-		qDebug() << "Strum mouse down!";
 		updateStrumPos(me, true, me->modifiers() & Qt::ShiftModifier);
 		m_strumEnabled = true;
 		update();
@@ -2841,15 +2839,11 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 	int strumTicksHorizontal = m_strumCurrentTime - m_strumStartTime;
 	float strumPower = fastPow10f(0.01f * (m_strumCurrentVertical - m_strumStartVertical));
 
-	// for all selected notes, find distinct chords. Distict chords must be like islands.
-	// - for each note, if it's start/end lies in the current groups start/end, it's part of the group. Else start a new group.
-	// - store the groups in vectors of note vector pointers?
-	// - 
-	// find the dragged note, find the base and top of that chord. Find the difference, divide by notes along branch, take max.
-	// for each chord, start from the note proportionally in order closest to dragged note. Number the other notes, top and bottom, based on their start pos, move them by such
-	
 	//
 	// Setup chords
+	//
+	// A chord is an island of notes--as the loop goes over the notes, if the notes overlap,
+	// they are part of the same chord. Else, they are part of a new chord.
 	//
 	if (initial)
 	{
@@ -2870,8 +2864,9 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 		NoteVector currentChord;
 		for (Note* note: selectedNotes)
 		{
-			// If the note is not in the current chord range (and this isn't the first chord), start a new chord.
+			// Save the current note position
 			note->setOldPos(note->pos());
+			// If the note is not in the current chord range (and this isn't the first chord), start a new chord.
 			if (note->pos() >= maxTime && maxTime != -1)
 			{
 				// Sort the notes by key before adding the chord to the vector
@@ -2882,24 +2877,26 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 			}
 			maxTime = std::max(maxTime, static_cast<int>(note->endPos()));
 			currentChord.push_back(note);
+			// If this is the clicked note, save it's chord index. It will be used to calculate how high in the chord it is.
 			if (note == clickedNote) { clickedNoteChordIndex = m_selectedChords.size(); }
 		}
 		// Add final chord
 		std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
 		m_selectedChords.push_back(currentChord);
 
+		// Now we need to find the amount/ratio how far up the chord the clicked note is. 0 = bottom, 1 = top
+		// Since the chord notes are sorted by key, this is easy
 		NoteVector clickedNoteChord = m_selectedChords.at(clickedNoteChordIndex);
 		if (clickedNoteChord.size() > 1)
 		{
-			// Now we need to find the amount/ratio how far up the chord the clicked note is. 0 = bottom, 1 = top
-			// Since the chord notes are sorted by key, this is easy
 			m_strumHeightRatio = 1.f * std::distance(clickedNoteChord.begin(), std::find(clickedNoteChord.begin(), clickedNoteChord.end(), clickedNote)) / (clickedNoteChord.size() - 1);
 		}
 	}
 
 	//
 	// Perform the Strum
-	// Depending on how high each note is in each chord (compared to the selected note in the selected chord), they are strummed up/down
+	//
+	// Note above the clicked note (relative to each chord) will be strummed down, notes below will be strummed up.
 	// Holding shift raises the amount of movement to a power, causing the strum to be curved/warped.
 	//
 	for (NoteVector chord: m_selectedChords)
@@ -2911,6 +2908,7 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 		{
 			float heightRatio = 1.f * i / (chord.size() - 1);
 			float ratio = 0.0f;
+
 			if (heightRatio == m_strumHeightRatio)
 			{
 				ratio = 1.f;
