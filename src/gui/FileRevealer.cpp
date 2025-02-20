@@ -115,14 +115,13 @@ void FileRevealer::reveal(const QFileInfo item)
 
 	if (!selectCommand.isEmpty()) {
 #if defined(LMMS_BUILD_WIN32)
-    	params = << QLatin1String(selectCommand);
+    	params << selectCommand.toLatin1();
 #else
 		params << selectCommand;
 	}
 
 	params << path;
 #endif
-
 	QProcess::startDetached(defaultFileManager, params);
 }
 
