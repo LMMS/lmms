@@ -110,7 +110,6 @@ void FileRevealer::reveal(const QFileInfo item)
 	}
 
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
-	QString defaultFileManager = getDefaultFileManager();
 	QStringList params;
 
 	if (!selectCommand.isEmpty())
@@ -123,7 +122,7 @@ void FileRevealer::reveal(const QFileInfo item)
 	}
 
 	params << path;
-	QProcess::startDetached(defaultFileManager, params);
+	QProcess::startDetached(getDefaultFileManager(), params);
 }
 
 bool FileRevealer::supportsArg(const QString& command, const QString& arg)
