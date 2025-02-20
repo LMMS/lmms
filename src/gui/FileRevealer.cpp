@@ -89,7 +89,11 @@ void FileRevealer::reveal(const QFileInfo item)
 	QStringList params;
 	if (defaultFileManager == "nemo") { params = {"-R", path}; }
 
-	params = {path, "--select"};
+	if (params.size() == 0)
+	{
+		// default params if no params have been set
+		params = {path, "--select"};
+	}
 #endif
 
 	QProcess::startDetached(defaultFileManager, params);
