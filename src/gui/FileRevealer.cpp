@@ -46,7 +46,7 @@ void FileRevealer::reveal(const QFileInfo item)
 	// explorer /select,[object]: Selects the file in the new explorer window
 	params += QLatin1String("/select,");
 #elif defined(LMMS_BUILD_APPLE)
-	// Finder -R, --reveal: Selects in finder
+	// open -R, --reveal: Selects in finder
 	params += "-R";
 #else
 	// --select: Linux, BSD and other *nix systems
