@@ -56,7 +56,7 @@ public:
 	 * @brief Checks whether the file manager supports selecting a specific file.
 	 * @return True if selection is supported, otherwise false.
 	 */
-	static bool canSelect();
+	static const QString& getSelectCommand();
 
 	/**
 	 * @brief Opens the file manager and selects the specified file if supported.
@@ -64,13 +64,17 @@ public:
 	 */
 	static void reveal(QFileInfo item);
 
+private:
+	static bool canSelect;
+
 protected:
 	/**
-	 * @brief Determines if the given file manager supports the "--select" option.
+	 * @brief Determines if the given command supports the argument
 	 * @param fileManager The name of the file manager to check.
-	 * @return True if the file manager supports "--select", otherwise false.
+	 * @param arg The command line argument ot parse for
+	 * @return True if the file command the argument, otherwise false.
 	 */
-	static bool supportsSelectOption(const QString& fileManager);
+	static bool supportsArg(const QString& command, const QString& arg);
 };
 
 } // namespace lmms

@@ -29,7 +29,12 @@
 #include <QProcess>
 #include <QUrl>
 
+#include <optional>
+
 namespace lmms {
+
+bool lmms::FileRevealer::canSelect = false;
+
 const QString& FileRevealer::getDefaultFileManager()
 {
 	static std::optional<QString> fileManagerCache;
@@ -53,69 +58,76 @@ const QString& FileRevealer::getDefaultFileManager()
 #endif
 	return fileManagerCache.value();
 }
+
 void FileRevealer::openDir(const QFileInfo item)
 {
 	QString nativePath = QDir::toNativeSeparators(item.canonicalFilePath());
 
 	QProcess::startDetached(getDefaultFileManager(), {nativePath});
 }
-bool FileRevealer::canSelect()
+
+const QString& FileRevealer::getSelectCommand()
 {
-	static std::optional<bool> canSelectCache;
-	if (canSelectCache.has_value()) { return canSelectCache.value(); }
-#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_APPLE)
-	canSelectCache = true;
-#else
-	canSelectCache = supportsSelectOption(getDefaultFileManager());
-#endif
-	return canSelectCache.value();
+	static std::optional<QString> selectCommandCache = "";
+
+	if (selectCommandCache.has_value()) { return selectCommandCache.value(); }
+
+	static const std::map<QString, QString> argMap = {
+		{"open", "-R"},
+		{"explorer", "/select,"},
+		{"nemo", ""},
+	};
+
+	// Skip calling "--help" for file managers that we know
+	for (const auto& pair : argMap) {
+		if (pair.first == getDefaultFileManager()) {
+			canSelect = true;
+			selectCommandCache = pair.second;
+			return selectCommandCache.value();
+		}
+	}
+
+	// Parse "<command> --help" and look for the "--select" for file managers that we don't know
+	if(supportsArg(getDefaultFileManager(), "--select")) {
+		selectCommandCache = "--select";
+		canSelect = true;
+	}
+	return selectCommandCache.value();
 }
+
 void FileRevealer::reveal(const QFileInfo item)
 {
-	if (!canSelect())
-	{
+	// Sets selectCommandCache, canSelect
+	const QString& selectCommand = getSelectCommand();
+	if (!canSelect) {
 		QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath()));
 		return;
 	}
 
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QString defaultFileManager = getDefaultFileManager();
+	QStringList params;
 
 #if defined(LMMS_BUILD_WIN32)
-	QStringList params = {QLatin1String("/select,"), path};
-#elif defined(LMMS_BUILD_APPLE)
-	QStringList params = {"-R", path};
+	params = << QLatin1String(selectCommand) << path;
 #else
-	QStringList params;
-	if (defaultFileManager == "nemo")
-	{
-		params = {"-R", path};
+	if (selectCommand.isEmpty()) {
+		params << selectCommand;
 	}
-	else
-	{
-		// default params if no params have been set
-		params = {path, "--select"};
-	}
+	params << path;
 #endif
 
 	QProcess::startDetached(defaultFileManager, params);
 }
 
-bool FileRevealer::supportsSelectOption(const QString& fileManager)
+bool FileRevealer::supportsArg(const QString& command, const QString& arg)
 {
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE)
-
 	QProcess process;
-	process.start(fileManager, {"--help"});
+	process.start(command, {"--help"});
 	process.waitForFinished(3000);
 
 	QString output = process.readAllStandardOutput() + process.readAllStandardError();
-	bool supports = output.contains("--select");
-
-	return supports;
-#else
-	return true;
-#endif
+	return output.contains(arg);
 }
 
 } // namespace lmms
