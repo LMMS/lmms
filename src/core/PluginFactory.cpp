@@ -258,8 +258,11 @@ void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
 	if (!excludePatternString.isEmpty()) {
 		QStringList patterns = excludePatternString.split(',');
 		for (const QString& pattern : patterns) {
+			if(pattern.trimmed().isEmpty()) {
+				continue;
+			}
 			QRegularExpression regex(pattern.trimmed());
-			if (!pattern.trimmed().isEmpty() && regex.isValid()) {
+			if (regex.isValid()) {
 				excludedPatterns << regex;
 			} else {
 				qWarning() << "Invalid regular expression:" << pattern;
