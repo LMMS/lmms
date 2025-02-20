@@ -271,8 +271,6 @@ PianoRoll::PianoRoll() :
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
 		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
