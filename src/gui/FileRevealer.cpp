@@ -123,9 +123,7 @@ void FileRevealer::reveal(const QFileInfo item)
 	}
 
 	params << path;
-
-		QProcess::startDetached(defaultFileManager, params);
-	}
+	QProcess::startDetached(defaultFileManager, params);
 }
 
 bool FileRevealer::supportsArg(const QString& command, const QString& arg)
