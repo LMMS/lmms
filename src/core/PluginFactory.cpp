@@ -262,7 +262,7 @@ QList<QRegularExpression> PluginFactory::getExcludePatterns(const char* envVar) 
 			}
 			QRegularExpression regex(pattern.trimmed());
 			if (regex.isValid()) {
-				excludedPatterns << regex;
+				excludePatterns << regex;
 			} else {
 				qWarning() << "Invalid regular expression:" << pattern;
 			}
