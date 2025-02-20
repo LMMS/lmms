@@ -29,9 +29,12 @@
 #include <QProcess>
 #include <QUrl>
 #include <optional>
+#include <QString>
+
+#include "lmmsconfig.h"
 
 namespace lmms {
-bool lmms::FileRevealer::canSelect = false;
+bool FileRevealer::canSelect = false;
 
 const QString& FileRevealer::getDefaultFileManager()
 {

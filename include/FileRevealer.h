@@ -26,9 +26,6 @@
 #define LMMS_FILE_REVEALER_H
 
 #include <QFileInfo>
-#include <QString>
-
-#include "lmmsconfig.h"
 
 namespace lmms {
 
@@ -49,7 +46,7 @@ public:
 	 * @brief Opens the directory containing the specified file or folder in the file manager.
 	 * @param item The QFileInfo object representing the file or folder.
 	 */
-	static void openDir(QFileInfo item);
+	static void openDir(const QFileInfo item);
 
 	/**
 	 * @brief Checks whether the file manager supports selecting a specific file.
@@ -61,7 +58,7 @@ public:
 	 * @brief Opens the file manager and selects the specified file if supported.
 	 * @param item The QFileInfo object representing the file to reveal.
 	 */
-	static void reveal(QFileInfo item);
+	static void reveal(const QFileInfo item);
 
 private:
 	static bool canSelect;
