@@ -23,7 +23,6 @@
  */
  
 #include "SampleClipView.h"
-
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
@@ -33,7 +32,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
+#include "SampleFilePicker.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -62,15 +61,13 @@ void SampleClipView::updateSample()
 {
 	update();
 
-	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
+	m_sampleThumbnail = ResourceCache::fetch<SampleThumbnail>(m_clip->m_sample.buffer()->path());
 
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
-			: tr("Double-click to open sample")
-	);
+
+	const auto sampleFile = m_clip->m_sample.sampleFile();
+	setToolTip(!sampleFile.isEmpty() ? PathUtil::toAbsolute(sampleFile) : tr("Double-click to open sample"));
 }
 
 
@@ -126,7 +123,10 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		const auto de = StringPairDrag::decodeValue(_de);
+		const auto path = PathUtil::pathFromQString(de);
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(path);
+		m_clip->setSampleBuffer(std::move(buffer));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -183,7 +183,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = SampleFilePicker::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
@@ -193,11 +193,8 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
-		{
-			m_clip->setSampleBuffer(sampleBuffer);
-		}
+		auto sampleBuffer = ResourceCache::fetch<SampleBuffer>(PathUtil::pathFromQString(selectedAudioFile));
+		m_clip->setSampleBuffer(sampleBuffer);
 	}
 }
 
@@ -284,7 +281,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			.reversed = sample.reversed()
 		};
 
-		m_sampleThumbnail.visualize(param, p);
+		m_sampleThumbnail->visualize(param, p);
 	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());

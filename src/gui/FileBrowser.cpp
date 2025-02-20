@@ -54,12 +54,12 @@
 #include "InstrumentTrackWindow.h"
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
+#include "PathUtil.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -744,12 +744,13 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
-		{
-			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
-			s->setDoneMayReturnTrue(false);
-			newPPH = s;
-		}
+		
+		const auto path = PathUtil::pathFromQString(fileName);
+		const auto buffer = ResourceCache::fetch<SampleBuffer>(path);
+
+		auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
+		s->setDoneMayReturnTrue(false);
+		newPPH = s;
 		delete tf;
 	}
 	else if (
