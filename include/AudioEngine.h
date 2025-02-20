@@ -55,6 +55,10 @@ constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
 constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
 constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
 
+constexpr auto MINIMUM_SAMPLE_RATE = 8000;
+constexpr auto MAXIMUM_SAMPLE_RATE = 192000;
+constexpr auto DEFAULT_SAMPLE_RATE = 44100;
+
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
 constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
