@@ -38,7 +38,10 @@ void FileRevealer::openDir(const QFileInfo item)
 }
 void FileRevealer::reveal(const QFileInfo item)
 {
-	if (!canSelect()) { QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath())); }
+	if (!canSelect()) {
+		QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath()));
+		return;
+	}
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 
