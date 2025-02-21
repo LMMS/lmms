@@ -82,7 +82,7 @@ LadspaManager::LadspaManager()
 				continue;
 			}
 
-			if(!f.isFile() || f.fileName().right( 3 ).toLower() !=
+			if (!f.isFile() || f.fileName().right(3).toLower() !=
 #ifdef LMMS_BUILD_WIN32
 													"dll"
 #else
