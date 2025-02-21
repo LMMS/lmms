@@ -172,7 +172,7 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 target_link_libraries(lmmsobjs
 	${LMMS_REQUIRED_LIBS}
 )
-target_static_libraries(lmmsobjs ringbuffer)
+target_static_libraries(lmmsobjs ringbuffer cds)
 
 set_target_properties(lmms PROPERTIES
 	ENABLE_EXPORTS ON
