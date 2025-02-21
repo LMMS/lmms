@@ -75,6 +75,7 @@ LadspaManager::LadspaManager()
 			for (const auto& pattern : excludePatterns) {
 				if (pattern.match(f.filePath()).hasMatch()) {
 					exclude = true;
+					break;
 				}
 			}
 
