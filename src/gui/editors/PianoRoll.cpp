@@ -2935,6 +2935,8 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 		}
 	}
 	m_midiClip->rearrangeAllNotes();
+	m_midiClip->updateLength();
+	m_midiClip->dataChanged();
 }
 
 
