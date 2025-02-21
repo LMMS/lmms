@@ -25,7 +25,7 @@ endif()
 
 if(MSVC)
 	# enable updated C++ language standards, disable certain permissive behavior
-	set(CMAKE_CXX_FLAGS  "/Zc:__cplusplus /permissive-")
+	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /Zc:__cplusplus /permissive-")
 	# workaround _WIN32 vs WIN32 differences
 	add_compile_definitions(WIN32)
 else()
