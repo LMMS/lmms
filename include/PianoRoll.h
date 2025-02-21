@@ -467,14 +467,18 @@ private:
 	int m_knifeTickPos;
 	void updateKnifePos(QMouseEvent* me);
 
+
+	std::vector<NoteVector> m_selectedChords;
+	void setupSelectedChords();
+
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
 	int m_strumStartVertical;
 	int m_strumCurrentVertical;
-	float m_strumHeightRatio;
+	float m_strumHeightRatio = 0.0f;
 	bool m_strumEnabled = false;
 	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
-	std::vector<NoteVector> m_selectedChords;
+
 
 	friend class PianoRollWindow;
 

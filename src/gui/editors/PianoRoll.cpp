@@ -2173,6 +2173,7 @@ void PianoRoll::setStrumAction()
 		m_editMode = EditMode::Strum;
 		m_action = Action::Strum;
 		m_strumEnabled = false;
+		setupSelectedChords();
 		setCursor(Qt::ArrowCursor);
 		update();
 	}
@@ -2822,6 +2823,42 @@ void PianoRoll::updateKnifePos(QMouseEvent* me)
 	m_knifeTickPos = mouseTickPos;
 }
 
+void PianoRoll::setupSelectedChords()
+{
+	//
+	// Setup chords
+	//
+	// A chord is an island of notes--as the loop goes over the notes, if the notes overlap,
+	// they are part of the same chord. Else, they are part of a new chord.
+	//
+
+	m_selectedChords.clear();
+	m_midiClip->rearrangeAllNotes();
+
+	const NoteVector& selectedNotes = getSelectedNotes();
+	if (selectedNotes.empty()) { return; }
+
+	int maxTime = -1;
+	NoteVector currentChord;
+	for (Note* note: selectedNotes)
+	{
+		// If the note is not in the current chord range (and this isn't the first chord), start a new chord.
+		if (note->pos() >= maxTime && maxTime != -1)
+		{
+			// Sort the notes by key before adding the chord to the vector
+			std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
+			m_selectedChords.push_back(currentChord);
+			currentChord.clear();
+			maxTime = note->endPos();
+		}
+		maxTime = std::max(maxTime, static_cast<int>(note->endPos()));
+		currentChord.push_back(note);
+	}
+	// Add final chord
+	std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
+	m_selectedChords.push_back(currentChord);
+}
+
 void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 {
 	// Calculate the TimePos from the mouse
@@ -2838,57 +2875,25 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 	int strumTicksHorizontal = m_strumCurrentTime - m_strumStartTime;
 	float strumPower = fastPow10f(0.01f * (m_strumCurrentVertical - m_strumStartVertical));
 
-	//
-	// Setup chords
-	//
-	// A chord is an island of notes--as the loop goes over the notes, if the notes overlap,
-	// they are part of the same chord. Else, they are part of a new chord.
-	//
 	if (initial)
 	{
 		m_midiClip->addJournalCheckPoint();
 
-		m_selectedChords.clear();
-		m_midiClip->rearrangeAllNotes();
-
-		const NoteVector& selectedNotes = getSelectedNotes();
-		if (selectedNotes.empty()) { return; }
-
 		Note* clickedNote = noteUnderMouse();
 		if (clickedNote == nullptr) { return; }
 
-		int clickedNoteChordIndex = 0;
-
-		int maxTime = -1;
-		NoteVector currentChord;
-		for (Note* note: selectedNotes)
+		for (NoteVector chord: m_selectedChords)
 		{
-			// Save the current note position
-			note->setOldPos(note->pos());
-			// If the note is not in the current chord range (and this isn't the first chord), start a new chord.
-			if (note->pos() >= maxTime && maxTime != -1)
+			for (Note* note: chord)
 			{
-				// Sort the notes by key before adding the chord to the vector
-				std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
-				m_selectedChords.push_back(currentChord);
-				currentChord.clear();
-				maxTime = note->endPos();
+				// Save the current note position
+				note->setOldPos(note->pos());
+				// if this is the clicked note, calculate it's ratio up the chord
+				if (note == clickedNote && chord.size() > 1)
+				{
+					m_strumHeightRatio = 1.f * std::distance(chord.begin(), std::find(chord.begin(), chord.end(), clickedNote)) / (chord.size() - 1);
+				}
 			}
-			maxTime = std::max(maxTime, static_cast<int>(note->endPos()));
-			currentChord.push_back(note);
-			// If this is the clicked note, save it's chord index. It will be used to calculate how high in the chord it is.
-			if (note == clickedNote) { clickedNoteChordIndex = m_selectedChords.size(); }
-		}
-		// Add final chord
-		std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
-		m_selectedChords.push_back(currentChord);
-
-		// Now we need to find the amount/ratio how far up the chord the clicked note is. 0 = bottom, 1 = top
-		// Since the chord notes are sorted by key, this is easy
-		NoteVector clickedNoteChord = m_selectedChords.at(clickedNoteChordIndex);
-		if (clickedNoteChord.size() > 1)
-		{
-			m_strumHeightRatio = 1.f * std::distance(clickedNoteChord.begin(), std::find(clickedNoteChord.begin(), clickedNoteChord.end(), clickedNote)) / (clickedNoteChord.size() - 1);
 		}
 	}
 
