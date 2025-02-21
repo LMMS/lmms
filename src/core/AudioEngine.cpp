@@ -71,6 +71,8 @@ static thread_local bool s_renderingThread = false;
 
 
 
+extern void startExternalSyncTimer(); // From ExternalSync.cpp
+
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
@@ -148,10 +150,14 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		}
 		m_workers.push_back( wt );
 	}
+
+	startExternalSyncTimer(); // From ExternalSync.cpp
 }
 
 
 
+
+extern void stopExternalSyncTimer(); // From ExternalSync.cpp
 
 AudioEngine::~AudioEngine()
 {
@@ -181,6 +187,8 @@ AudioEngine::~AudioEngine()
 	{
 		delete[] input;
 	}
+
+	stopExternalSyncTimer(); // From ExternalSync.cpp
 }
 
 
