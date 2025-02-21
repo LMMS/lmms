@@ -108,7 +108,7 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 )
 target_static_libraries(lmms PUBLIC lmmsobjs)
 
-# Workaround for a build fail on MSVC with Qt 6
+# Enable updated C++ language standards
 IF(MSVC)
 	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")
 ENDIF()
