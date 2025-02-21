@@ -1634,9 +1634,12 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if (m_editMode == EditMode::Strum && me->button() == Qt::LeftButton)
 	{
-		updateStrumPos(me, true, me->modifiers() & Qt::ShiftModifier);
-		m_strumEnabled = true;
-		update();
+		if (noteUnderMouse())
+		{
+			updateStrumPos(me, true, me->modifiers() & Qt::ShiftModifier);
+			m_strumEnabled = true;
+			update();
+		}
 		return;
 	}
 
