@@ -180,7 +180,7 @@ public:
 		doneChangeInModel();
 	}
 
-	void removeAudioBusHandle(AudioBusHandle * busHandle);
+	void removeAudioBusHandle(AudioBusHandle* busHandle);
 
 
 	// MIDI-client-stuff

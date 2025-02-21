@@ -61,9 +61,9 @@ public:
 	// (e.g. channel-tracks) can register themselves for making
 	// audio-driver able to collect their individual output and provide
 	// them at a specific port - currently only supported by JACK
-	virtual void registerPort(AudioBusHandle * port);
-	virtual void unregisterPort(AudioBusHandle * port);
-	virtual void renamePort(AudioBusHandle * port);
+	virtual void registerPort(AudioBusHandle* port);
+	virtual void unregisterPort(AudioBusHandle* port);
+	virtual void renamePort(AudioBusHandle* port);
 
 	inline bool supportsCapture() const
 	{

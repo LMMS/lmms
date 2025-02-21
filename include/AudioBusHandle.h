@@ -53,26 +53,26 @@ class BoolModel;
 class AudioBusHandle : public ThreadableJob
 {
 public:
-	AudioBusHandle(const QString & name, bool hasEffectChain = true,
+	AudioBusHandle(const QString& name, bool hasEffectChain = true,
 		FloatModel* volumeModel = nullptr, FloatModel* panningModel = nullptr,
 		BoolModel* mutedModel = nullptr);
 	virtual ~AudioBusHandle();
 
-	inline SampleFrame* buffer() { return m_buffer; }
+	SampleFrame* buffer() { return m_buffer; }
 
 	// indicate whether JACK & Co should provide output-buffer at ext. port
-	inline bool extOutputEnabled() const { return m_extOutputEnabled; }
+	bool extOutputEnabled() const { return m_extOutputEnabled; }
 	void setExtOutputEnabled(bool enabled);
 
 	// next mixer-channel after this audio-bus-handle
 	// (-1 = none  0 = master)
-	inline mix_ch_t nextMixerChannel() const { return m_nextMixerChannel; }
+	mix_ch_t nextMixerChannel() const { return m_nextMixerChannel; }
 	void setNextMixerChannel(const mix_ch_t chnl) { m_nextMixerChannel = chnl; }
 
-	const QString & name() const { return m_name; }
-	void setName(const QString & newName);
+	const QString& name() const { return m_name; }
+	void setName(const QString& newName);
 
-	inline EffectChain * effects() { return m_effects.get(); }
+	EffectChain* effects() { return m_effects.get(); }
 	bool processEffects();
 
 	// ThreadableJob stuff
