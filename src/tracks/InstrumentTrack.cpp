@@ -935,7 +935,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				m_midiPort.restoreState( node.toElement() );
 			}
-			else if( m_audioBusHandle.effects()->nodeName() == node.nodeName() )
+			else if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
 				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}

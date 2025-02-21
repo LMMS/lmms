@@ -109,21 +109,21 @@ void AudioDevice::stopProcessingThread( QThread * thread )
 
 
 
-void AudioDevice::registerPort(AudioBusHandle* )
+void AudioDevice::registerPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::unregisterPort(AudioBusHandle* )
+void AudioDevice::unregisterPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::renamePort(AudioBusHandle* )
+void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 

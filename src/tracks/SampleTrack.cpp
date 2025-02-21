@@ -205,9 +205,9 @@ void SampleTrack::loadTrackSpecificSettings(const QDomElement & thisElem)
 	m_audioBusHandle.effects()->clear();
 	while(!node.isNull())
 	{
-		if(node.isElement())
+		if (node.isElement())
 		{
-			if(m_audioBusHandle.effects()->nodeName() == node.nodeName())
+			if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
 				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}

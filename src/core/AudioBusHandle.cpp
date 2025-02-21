@@ -69,7 +69,7 @@ AudioBusHandle::~AudioBusHandle()
 
 void AudioBusHandle::setExtOutputEnabled(bool enabled)
 {
-	if(enabled != m_extOutputEnabled)
+	if (enabled != m_extOutputEnabled)
 	{
 		m_extOutputEnabled = enabled;
 		if(m_extOutputEnabled)
