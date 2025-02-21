@@ -352,7 +352,7 @@ private:
 	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
 	QPixmap m_toolOpen = embed::getIconPixmap("automation");
 	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
-	QPixmap m_toolStrum = embed::getIconPixmap("edit_strum");
+	QPixmap m_toolStrum = embed::getIconPixmap("arp_free");
 
 	static std::array<KeyType, 12> prKeyOrder;
 

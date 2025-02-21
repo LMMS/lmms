@@ -5020,7 +5020,7 @@ PianoRollWindow::PianoRollWindow() :
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
 	knifeAction->setShortcut(combine(Qt::SHIFT, Qt::Key_K));
 
-	auto strumAction = new QAction(embed::getIconPixmap("edit_strum"), tr("Strum"), noteToolsButton);
+	auto strumAction = new QAction(embed::getIconPixmap("arp_free"), tr("Strum"), noteToolsButton);
 	connect(strumAction, &QAction::triggered, m_editor, &PianoRoll::setStrumAction);
 	strumAction->setShortcut(combine(Qt::SHIFT, Qt::Key_J));
 
