@@ -1743,6 +1743,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 		__plugin->m_plugin = _effect;
 	}
 
+	const auto p = static_cast<char*>(_ptr);
 	switch( _opcode )
 	{
 		case audioMasterAutomate:
@@ -2059,7 +2060,6 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterCanDo:
 			SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
-			const auto p = static_cast<char*>(_ptr);
 			return !std::strncmp(p, "sendVstEvents", sizeof("sendVstEvents"))
 				|| !std::strncmp(p, "sendVstMidiEvent", sizeof("sendVstMidiEvent"))
 				|| !std::strncmp(p, "sendVstTimeInfo", sizeof("sendVstTimeInfo"))
