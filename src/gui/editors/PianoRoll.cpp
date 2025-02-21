@@ -2928,7 +2928,7 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 
 			if (warp)
 			{
-				ratio = std::powf(ratio, strumPower);
+				ratio = std::pow(ratio, strumPower);
 			}
 			note->setPos(note->oldPos() + ratio * strumTicksHorizontal);
 			i++;
