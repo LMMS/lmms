@@ -2313,8 +2313,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			m_midiClip->rearrangeAllNotes();
 
 		}
-
-		if (m_action == Action::Strum || m_strumEnabled)
+		else if (m_action == Action::Strum || m_strumEnabled)
 		{
 			m_strumEnabled = false;
 		}
