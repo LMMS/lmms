@@ -53,7 +53,8 @@ const QString& FileRevealer::getDefaultFileManager()
 
 	// Handle multiple entries by taking the last non-empty one
 	QStringList fileManagers = fileManager.split(';', Qt::SkipEmptyParts);
-	if (!fileManagers.isEmpty()) {
+	if (!fileManagers.isEmpty())
+	{
 		fileManager = fileManagers.last(); // Take the last registered manager
 	}
 
@@ -122,10 +123,7 @@ void FileRevealer::reveal(const QFileInfo item)
 	QString path = QDir::toNativeSeparators(item.canonicalFilePath());
 	QStringList params;
 
-	if (!selectCommand.isEmpty())
-	{
-		params << selectCommand;
-	}
+	if (!selectCommand.isEmpty()) { params << selectCommand; }
 
 	params << path;
 	QProcess::startDetached(getDefaultFileManager(), params);
