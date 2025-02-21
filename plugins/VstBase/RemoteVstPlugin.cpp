@@ -2037,15 +2037,14 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK( "amc: audioMasterGetVendorString\n" );
 			// fills <ptr> with a string identifying the vendor
 			// (max 64 char)
-			strcpy( (char *) _ptr, "Tobias Doerffel" );
+			std::memcpy(_ptr, "Tobias Doerffel", sizeof("Tobias Doerffel"));
 			return 1;
 
 		case audioMasterGetProductString:
 			SHOW_CALLBACK( "amc: audioMasterGetProductString\n" );
 			// fills <ptr> with a string with product name
 			// (max 64 char)
-			strcpy( (char *) _ptr,
-					"LMMS VST Support Layer (LVSL)" );
+			std::memcpy(_ptr, "LMMS VST Support Layer (LVSL)", sizeof("LMMS VST Support Layer (LVSL)"));
 			return 1;
 
 		case audioMasterGetVendorVersion:
@@ -2060,11 +2059,12 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterCanDo:
 			SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
-			return !strcmp( (char *) _ptr, "sendVstEvents" ) ||
-				!strcmp( (char *) _ptr, "sendVstMidiEvent" ) ||
-				!strcmp( (char *) _ptr, "sendVstTimeInfo" ) ||
-				!strcmp( (char *) _ptr, "sizeWindow" ) ||
-				!strcmp( (char *) _ptr, "supplyIdle" );
+			const p = static_cast<char*>(_ptr);
+			return !std::strncmp(_ptr, "sendVstEvents", sizeof("sendVstEvents"))
+				|| !std::strncmp(_ptr, "sendVstMidiEvent", sizeof("sendVstMidiEvent"))
+				|| !std::strncmp(_ptr, "sendVstTimeInfo", sizeof("sendVstTimeInfo"))
+				|| !std::strncmp(_ptr, "sizeWindow", sizeof("sizeWindow"))
+				|| !std::strncmp(_ptr, "supplyIdle", sizeof("supplyIdle"));
 
 		case audioMasterGetLanguage:
 			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
