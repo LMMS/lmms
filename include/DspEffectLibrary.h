@@ -28,7 +28,7 @@
 #include <numbers>
 
 #include "lmms_math.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "SampleFrame.h"
 
 namespace lmms::DspEffectLibrary

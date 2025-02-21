@@ -31,7 +31,7 @@ class QString;
 
 #include "lmms_export.h"
 #include "interpolation.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "lmms_math.h"
 #include "Engine.h"
 #include "AudioEngine.h"

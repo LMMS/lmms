@@ -25,7 +25,7 @@
 #ifndef LMMS_THREADABLE_JOB_H
 #define LMMS_THREADABLE_JOB_H
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 #include <atomic>
 
