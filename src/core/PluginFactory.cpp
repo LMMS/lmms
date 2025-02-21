@@ -275,7 +275,7 @@ QList<QRegularExpression> PluginFactory::getExcludePatterns(const char* envVar) 
 void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
 	// Get filter
 	QList<QRegularExpression> excludePatterns = getExcludePatterns("LMMS_EXCLUDE_PLUGINS");
-	if(excludePatterns.size() == 0) {
+	if (excludePatterns.isEmpty()) {
 		return;
 	}
 
