@@ -24,7 +24,7 @@ if(NOT MSVC AND (LMMS_HOST_X86 OR LMMS_HOST_X86_64))
 endif()
 
 if(MSVC)
-	# enable updated C++ language standards, treat nonconformant code as warnings
+	# enable updated C++ language standards, disable certain permissive behavior
 	set(CMAKE_CXX_FLAGS  "/Zc:__cplusplus /permissive-")
 else()
 	# build ZynAddSubFX with full optimizations, treat nonconformant code as warnings
