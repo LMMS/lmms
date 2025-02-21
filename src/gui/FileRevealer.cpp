@@ -51,6 +51,12 @@ const QString& FileRevealer::getDefaultFileManager()
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
 
+	// Handle multiple entries by taking the last non-empty one
+	QStringList fileManagers = fileManager.split(';', Qt::SkipEmptyParts);
+	if (!fileManagers.isEmpty()) {
+		fileManager = fileManagers.last(); // Take the last registered manager
+	}
+
 	if (fileManager.endsWith(".desktop")) { fileManager.chop(8); }
 
 	// If the fileManager contains dots (e.g., "org.kde.dolphin"), extract only the last part
