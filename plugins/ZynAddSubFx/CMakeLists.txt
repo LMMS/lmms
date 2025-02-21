@@ -23,8 +23,11 @@ if(NOT MSVC AND (LMMS_HOST_X86 OR LMMS_HOST_X86_64))
 	ADD_DEFINITIONS(-DASM_F2I_YES)
 endif()
 
-# build ZynAddSubFX with full optimizations
-if(NOT MSVC)
+if(MSVC)
+	# enable updated C++ language standards, treat nonconformant code as warnings
+	set(CMAKE_CXX_FLAGS  "/Zc:__cplusplus /permissive-")
+else()
+	# build ZynAddSubFX with full optimizations, treat nonconformant code as warnings
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fpermissive")
 endif()
 
@@ -132,11 +135,6 @@ target_link_libraries(ZynAddSubFxCore INTERFACE
 	ZLIB::ZLIB
 )
 
-# Workaround for a build fail on MSVC with Qt 6
-IF(MSVC)
-	TARGET_COMPILE_OPTIONS(ZynAddSubFxCore PUBLIC "/Zc:__cplusplus" "/permissive-")
-ENDIF()
-
 LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
 IF(LMMS_BUILD_LINUX)
 	LINK_LIBRARIES(-Wl,--enable-new-dtags)
@@ -176,11 +174,6 @@ INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
 SET_PROPERTY(GLOBAL APPEND PROPERTY PLUGINS_BUILT "RemoteZynAddSubFx")
 
 TARGET_COMPILE_DEFINITIONS(RemoteZynAddSubFx PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
-
-# Workaround for a build fail on MSVC with Qt 6
-IF(MSVC)
-	TARGET_COMPILE_OPTIONS(RemoteZynAddSubFx PUBLIC "/Zc:__cplusplus" "/permissive-")
-ENDIF()
 
 IF(LMMS_BUILD_WIN32)
 	target_link_options(RemoteZynAddSubFx PRIVATE "-mwindows")
