@@ -396,13 +396,17 @@ public:
 
 		message & addInt( int _i )
 		{
-			data.emplace_back(std::to_string(_i));
+			char buf[32];
+			std::snprintf(buf, 32, "%d", _i);
+			data.emplace_back( buf );
 			return *this;
 		}
 
 		message & addFloat( float _f )
 		{
-			data.emplace_back(std::to_string(_f));
+			char buf[32];
+			std::snprintf(buf, 32, "%f", _f);
+			data.emplace_back( buf );
 			return *this;
 		}
 
