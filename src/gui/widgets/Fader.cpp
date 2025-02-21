@@ -58,14 +58,22 @@
 #include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
 
+namespace
+{
+	constexpr auto c_dBScalingExponent = 3.f;
+	//! The dbFS amount after which we drop down to -inf dbFS
+	constexpr auto c_faderMinDb = -120.f;
+}
+
 namespace lmms::gui
 {
 
 SimpleTextFloat* Fader::s_textFloat = nullptr;
 
-Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
 	QWidget(parent),
-	FloatModelView(model, this)
+	FloatModelView(model, this),
+	m_modelIsLinear(modelIsLinear)
 {
 	if (s_textFloat == nullptr)
 	{
@@ -82,15 +90,74 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	setHintText("Volume:", "%");
 
 	m_conversionFactor = 100.0;
+
+	if (model)
+	{
+		// We currently assume that the model is not changed later on and only connect here once
+
+		// This is for example used to update the tool tip which shows the current value of the fader
+		connect(model, &FloatModel::dataChanged, this, &Fader::modelValueChanged);
+
+		// Trigger manually so that the tool tip is initialized correctly
+		modelValueChanged();
+	}
 }
 
 
-Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob) :
-	Fader(model, name, parent)
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob, bool modelIsLinear) :
+	Fader(model, name, parent, modelIsLinear)
 {
 	m_knob = knob;
 }
 
+void Fader::adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction)
+{
+	const auto adjustmentDb = determineAdjustmentDelta(modifiers) * (direction == AdjustmentDirection::Down ? -1. : 1.);
+	adjustByDecibelDelta(adjustmentDb);
+}
+
+void Fader::adjustByDecibelDelta(float value)
+{
+	adjustModelByDBDelta(value);
+
+	updateTextFloat();
+	s_textFloat->setVisibilityTimeOut(1000);
+}
+
+void Fader::adjustByDialog()
+{
+	bool ok;
+
+	if (modelIsLinear())
+	{
+		auto maxDB = ampToDbfs(model()->maxValue());
+		const auto currentValue = model()->value() <= 0. ? c_faderMinDb : ampToDbfs(model()->value());
+
+		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
+							tr("Please enter a new value between %1 and %2:").arg(c_faderMinDb).arg(maxDB),
+							currentValue, c_faderMinDb, maxDB, model()->getDigitCount(), &ok);
+
+		if (ok)
+		{
+			model()->setValue(dbfsToAmp(enteredValue));
+		}
+		return;
+	}
+	else
+	{
+		// The model already is in dB
+		auto minv = model()->minValue() * m_conversionFactor;
+		auto maxv = model()->maxValue() * m_conversionFactor;
+		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
+							tr("Please enter a new value between %1 and %2:").arg(minv).arg(maxv),
+							model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok);
+
+		if (ok)
+		{
+			model()->setValue(enteredValue / m_conversionFactor);
+		}
+	}
+}
 
 void Fader::contextMenuEvent(QContextMenuEvent* ev)
 {
@@ -105,18 +172,13 @@ void Fader::contextMenuEvent(QContextMenuEvent* ev)
 
 void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-	if (m_moveStartPoint >= 0)
-	{
-		int dy = m_moveStartPoint - mouseEvent->globalY();
+	const int localY = mouseEvent->y();
 
-		float delta = dy * (model()->maxValue() - model()->minValue()) / (float)(height() - (m_knob).height());
+	setVolumeByLocalPixelValue(localY);
 
-		const auto step = model()->step<float>();
-		float newValue = static_cast<float>(static_cast<int>((m_startValue + delta) / step + 0.5)) * step;
-		model()->setValue(newValue);
+	updateTextFloat();
 
-		updateTextFloat();
-	}
+	mouseEvent->accept();
 }
 
 
@@ -134,20 +196,37 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			thisModel->saveJournallingState(false);
 		}
 
-		if (mouseEvent->y() >= knobPosY() - (m_knob).height() && mouseEvent->y() < knobPosY())
+		const int localY = mouseEvent->y();
+		const auto knobLowerPosY = calculateKnobPosYFromModel();
+		const auto knobUpperPosY = knobLowerPosY - m_knob.height();
+
+		const auto clickedOnKnob = localY >= knobUpperPosY && localY <= knobLowerPosY;
+
+		if (clickedOnKnob)
 		{
-			updateTextFloat();
-			s_textFloat->show();
+			// If the users clicked on the knob we want to compensate for the offset to the center line
+			// of the knob when dealing with mouse move events.
+			// This will make it feel like the users have grabbed the knob where they clicked.
+			const auto knobCenterPos = knobLowerPosY - (m_knob.height() / 2);
+			m_knobCenterOffset = localY - knobCenterPos;
 
-			m_moveStartPoint = mouseEvent->globalY();
-			m_startValue = model()->value();
-
-			mouseEvent->accept();
+			// In this case we also will not call setVolumeByLocalPixelValue, i.e. we do not make any immediate
+			// changes. This should only happen if the users actually move the mouse while grabbing the knob.
+			// This makes the knobs less "jumpy".
 		}
 		else
 		{
-			m_moveStartPoint = -1;
+			// If the users did not click on the knob then we assume that the fader knob's center should move to
+			// the position of the click. We do not compensate for any offset.
+			m_knobCenterOffset = 0;
+
+			setVolumeByLocalPixelValue(localY);
 		}
+
+		updateTextFloat();
+		s_textFloat->show();
+
+		mouseEvent->accept();
 	}
 	else
 	{
@@ -159,18 +238,9 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 
 void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
-	bool ok;
-	// TODO: dbFS handling
-	auto minv = model()->minValue() * m_conversionFactor;
-	auto maxv = model()->maxValue() * m_conversionFactor;
-	float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
-						 tr("Please enter a new value between %1 and %2:").arg(minv).arg(maxv),
-						 model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok);
+	adjustByDialog();
 
-	if (ok)
-	{
-		model()->setValue(enteredValue / m_conversionFactor);
-	}
+	mouseEvent->accept();
 }
 
 
@@ -186,20 +256,197 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 		}
 	}
 
+	// Always reset the offset to 0 regardless of which mouse button is pressed
+	m_knobCenterOffset = 0;
+
 	s_textFloat->hide();
 }
 
 
 void Fader::wheelEvent (QWheelEvent* ev)
 {
-	ev->accept();
 	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	model()->incValue(direction);
-	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut(1000);
+	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
+
+	adjustByDecibelDelta(increment);
+
+	ev->accept();
 }
 
+float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const
+{
+	if (modifiers == Qt::ShiftModifier)
+	{
+		// The shift is intended to go through the values in very coarse steps as in:
+		// "Shift into overdrive"
+		return 3.f;
+	}
+	else if (modifiers == Qt::ControlModifier)
+	{
+		// The control key gives more control, i.e. it enables more fine-grained adjustments
+		return 0.1f;
+	}
+	else if (modifiers & Qt::AltModifier)
+	{
+		// Work around a Qt bug in conjunction with the scroll wheel and the Alt key
+		return 0.f;
+	}
+
+	return 1.f;
+}
+
+void Fader::adjustModelByDBDelta(float value)
+{
+	if (modelIsLinear())
+	{
+		const auto modelValue = model()->value();
+
+		if (modelValue <= 0.)
+		{
+			// We are at -inf dB. Do nothing if we user wishes to decrease.
+			if (value > 0)
+			{
+				// Otherwise set the model to the minimum value supported by the fader.
+				model()->setValue(dbfsToAmp(c_faderMinDb));
+			}
+		}
+		else
+		{
+			// We can safely compute the dB value as the value is greater than 0
+			const auto valueInDB = ampToDbfs(modelValue);
+
+			const auto adjustedValue = valueInDB + value;
+
+			model()->setValue(adjustedValue < c_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
+		}
+	}
+	else
+	{
+		const auto adjustedValue = std::clamp(model()->value() + value, model()->minValue(), model()->maxValue());
+
+		model()->setValue(adjustedValue);
+	}
+}
+
+int Fader::calculateKnobPosYFromModel() const
+{
+	auto* m = model();
+
+	auto const minV = m->minValue();
+	auto const maxV = m->maxValue();
+	auto const value = m->value();
+
+	if (modelIsLinear())
+	{
+		// This method calculates the pixel position where the lower end of
+		// the fader knob should be for the amplification value in the model.
+		//
+		// The following assumes that the model describes an amplification,
+		// i.e. that values are in [0, max] and that 1 is unity, i.e. 0 dbFS.
+
+		auto const distanceToMin = value - minV;
+
+		// Prevent dbFS calculations with zero or negative values
+		if (distanceToMin <= 0)
+		{
+			return height();
+		}
+		else
+		{
+			// Make sure that we do not get values less that the minimum fader dbFS
+			// for the calculations that will follow.
+			auto const actualDb = std::max(c_faderMinDb, ampToDbfs(value));
+
+			const auto scaledRatio = computeScaledRatio(actualDb);
+
+			// This returns results between:
+			// * m_knob.height()  for a ratio of 1
+			// * height()         for a ratio of 0
+			return height() - (height() - m_knob.height()) * scaledRatio;
+		}
+	}
+	else
+	{
+		// The model is in dB so we just show that in a linear fashion
+		
+		auto const clampedValue = std::clamp(value, minV, maxV);
+
+		auto const ratio = (clampedValue - minV) / (maxV - minV);
+
+		// This returns results between:
+		// * m_knob.height()  for a ratio of 1
+		// * height()         for a ratio of 0
+		return height() - (height() - m_knob.height()) * ratio;
+	}
+}
+
+
+void Fader::setVolumeByLocalPixelValue(int y)
+{
+	auto* m = model();
+
+	// Compensate the offset where users have actually clicked
+	y -= m_knobCenterOffset;
+
+	// The y parameter gives us where the mouse click went.
+	// Assume that the middle of the fader should go there.
+	int const lowerFaderKnob = y + (m_knob.height() / 2);
+
+	// In some cases we need the clamped lower position of the fader knob so we can ensure
+	// that we only set allowed values in the model range.
+	int const clampedLowerFaderKnob = std::clamp(lowerFaderKnob, m_knob.height(), height());
+
+	if (modelIsLinear())
+	{
+		if (lowerFaderKnob >= height())
+		{
+			// Check the non-clamped value because otherwise we wouldn't be able to set -inf dB!
+			model()->setValue(0);
+		}
+		else
+		{
+			// We are in the case where we set a value that's different from -inf dB so we use the clamped value
+			// of the lower knob position so that we only set allowed values in the model range.
+
+			// First map the lower knob position to [0, 1] so that we can apply some curve mapping, e.g.
+			// square, cube, etc.
+			LinearMap<float> knobMap(float(m_knob.height()), 1., float(height()), 0.);
+
+			// Apply the inverse of what is done in calculateKnobPosYFromModel
+			auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./c_dBScalingExponent);
+
+			float const maxDb = ampToDbfs(m->maxValue());
+
+			LinearMap<float> dbMap(1., maxDb, 0., c_faderMinDb);
+
+			float const dbValue = dbMap.map(knobPos);
+
+			// Pull everything that's quieter than the minimum fader dbFS value down to 0 amplification.
+			// This should not happen due to the steps above but let's be sure.
+			// Otherwise compute the amplification value from the mapped dbFS value but make sure that we
+			// do not exceed the maximum dbValue of the model
+			float ampValue = dbValue < c_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
+
+			model()->setValue(ampValue);
+		}
+	}
+	else
+	{
+		LinearMap<float> valueMap(float(m_knob.height()), model()->maxValue(), float(height()), model()->minValue());
+
+		model()->setValue(valueMap.map(clampedLowerFaderKnob));
+	}
+}
+
+float Fader::computeScaledRatio(float dBValue) const
+{
+	const auto maxDb = ampToDbfs(model()->maxValue());
+
+	const auto ratio = (dBValue - c_faderMinDb) / (maxDb - c_faderMinDb);
+
+	return std::pow(ratio, c_dBScalingExponent);
+}
 
 
 ///
@@ -246,28 +493,45 @@ void Fader::setPeak_R(float fPeak)
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if (ConfigManager::inst()->value("app", "displaydbfs").toInt() && m_conversionFactor == 100.0)
+	if (m_conversionFactor == 100.0)
 	{
-		QString label(tr("Volume: %1 dBFS"));
-
-		auto const modelValue = model()->value();
-		if (modelValue <= 0.)
-		{
-			s_textFloat->setText(label.arg("-∞"));
-		}
-		else
-		{
-			s_textFloat->setText(label.arg(ampToDbfs(modelValue), 3, 'f', 2));
-		}
+		s_textFloat->setText(getModelValueAsDbString());
 	}
 	else
 	{
 		s_textFloat->setText(m_description + " " + QString("%1 ").arg(model()->value() * m_conversionFactor) + " " + m_unit);
 	}
 
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, calculateKnobPosYFromModel() - s_textFloat->height() / 2));
 }
 
+void Fader::modelValueChanged()
+{
+	setToolTip(getModelValueAsDbString());
+}
+
+QString Fader::getModelValueAsDbString() const
+{
+	const auto value = model()->value();
+
+	QString label(tr("Volume: %1 dB"));
+
+	if (modelIsLinear())
+	{
+		if (value <= 0.)
+		{
+			return label.arg(tr("-inf"));
+		}
+		else
+		{
+			return label.arg(ampToDbfs(value), 3, 'f', 2);
+		}
+	}
+	else
+	{
+		return label.arg(value, 3, 'f', 2);
+	}
+}
 
 void Fader::paintEvent(QPaintEvent* ev)
 {
@@ -276,8 +540,13 @@ void Fader::paintEvent(QPaintEvent* ev)
 	// Draw the levels with peaks
 	paintLevels(ev, painter, !m_levelsDisplayedInDBFS);
 
+	if (ConfigManager::inst()->value( "ui", "showfaderticks" ).toInt() && modelIsLinear())
+	{
+		paintFaderTicks(painter);
+	}
+
 	// Draw the knob
-	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
+	painter.drawPixmap((width() - m_knob.width()) / 2, calculateKnobPosYFromModel() - m_knob.height(), m_knob);
 }
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
@@ -428,6 +697,42 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	{
 		const auto peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
 		painter.fillRect(peakRectR, linearGrad);
+	}
+
+	painter.restore();
+}
+
+void Fader::paintFaderTicks(QPainter& painter)
+{
+	painter.save();
+
+	const QPen zeroPen(QColor(255, 255, 255, 216), 2.5);
+	const QPen nonZeroPen(QColor(255, 255, 255, 128), 1.);
+
+	// We use the maximum dB value of the model to calculate the nearest multiple
+	// of the step size that we use to paint the ticks so that we know the start point.
+	// This code will paint ticks with steps that are defined by the step size around
+	// the 0 dB marker.
+	const auto maxDB = ampToDbfs(model()->maxValue());
+	const auto stepSize = 6.f;
+	const auto startValue = std::floor(maxDB / stepSize) * stepSize;
+
+	for (float i = startValue; i >= c_faderMinDb; i-= stepSize)
+	{
+		const auto scaledRatio = computeScaledRatio(i);
+		const auto maxHeight = height() - (height() - m_knob.height()) * scaledRatio - (m_knob.height() / 2);
+
+		if (approximatelyEqual(i, 0.))
+		{
+			painter.setPen(zeroPen);
+		}
+		else
+		{
+			painter.setPen(nonZeroPen);
+		}
+
+		painter.drawLine(QPointF(0, maxHeight), QPointF(1, maxHeight));
+		painter.drawLine(QPointF(width() - 1, maxHeight), QPointF(width(), maxHeight));
 	}
 
 	painter.restore();
