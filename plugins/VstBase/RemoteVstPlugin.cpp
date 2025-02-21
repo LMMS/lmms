@@ -2059,12 +2059,12 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterCanDo:
 			SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
-			const p = static_cast<char*>(_ptr);
-			return !std::strncmp(_ptr, "sendVstEvents", sizeof("sendVstEvents"))
-				|| !std::strncmp(_ptr, "sendVstMidiEvent", sizeof("sendVstMidiEvent"))
-				|| !std::strncmp(_ptr, "sendVstTimeInfo", sizeof("sendVstTimeInfo"))
-				|| !std::strncmp(_ptr, "sizeWindow", sizeof("sizeWindow"))
-				|| !std::strncmp(_ptr, "supplyIdle", sizeof("supplyIdle"));
+			const auto p = static_cast<char*>(_ptr);
+			return !std::strncmp(p, "sendVstEvents", sizeof("sendVstEvents"))
+				|| !std::strncmp(p, "sendVstMidiEvent", sizeof("sendVstMidiEvent"))
+				|| !std::strncmp(p, "sendVstTimeInfo", sizeof("sendVstTimeInfo"))
+				|| !std::strncmp(p, "sizeWindow", sizeof("sizeWindow"))
+				|| !std::strncmp(p, "supplyIdle", sizeof("supplyIdle"));
 
 		case audioMasterGetLanguage:
 			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
