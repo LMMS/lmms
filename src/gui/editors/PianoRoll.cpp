@@ -2909,8 +2909,7 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 	{
 		// Don't strum a chord with only one note
 		if (chord.size() <= 1) { continue; }
-		int i = 0;
-		for (Note* note: chord)
+		for (size_t i = 0; i < chord.size(); ++i)
 		{
 			float heightRatio = 1.f * i / (chord.size() - 1);
 			float ratio = 0.0f;
@@ -2932,8 +2931,7 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 			{
 				ratio = std::pow(ratio, strumPower);
 			}
-			note->setPos(note->oldPos() + ratio * strumTicksHorizontal);
-			i++;
+			chord.at(i)->setPos(std::max(0, static_cast<tick_t>(chord.at(i)->oldPos() + ratio * strumTicksHorizontal)));
 		}
 	}
 	m_midiClip->rearrangeAllNotes();
