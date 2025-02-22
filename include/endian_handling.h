@@ -25,9 +25,8 @@
 #ifndef LMMS_ENDIAN_HANDLING_H
 #define LMMS_ENDIAN_HANDLING_H
 
+#include <cstdint>
 #include <QSysInfo>
-
-#include "LmmsTypes.h"
 
 
 namespace lmms
