@@ -1,9 +1,10 @@
 /*
- * TextFloat.h - class textFloat, a floating text-label
+ * DetachableWindow.cpp - Allows a window to be detached from
+ *                        LMMS's main window
  *
- * Copyright (c) 2023 LMMS team
-*
-* This file is part of LMMS - https://lmms.io
+ * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -20,48 +21,34 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
  *
-*/
+ */
 
+#include "DetachableWindow.h"
 
-#ifndef SIMPLE_TEXT_FLOAT_H
-#define SIMPLE_TEXT_FLOAT_H
+#include <QCloseEvent>
 
-#include <QWidget>
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
-#include "lmms_export.h"
+namespace lmms::gui {
 
-class QTimer;
-
-namespace lmms::gui
+void DetachableWindow::closeEvent(QCloseEvent* ce)
 {
-
-class LMMS_EXPORT SimpleTextFloat : public QWidget
-{
-	Q_OBJECT
-public:
-	SimpleTextFloat();
-	~SimpleTextFloat() override = default;
-
-	void setText(const QString & text);
-
-	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
-
-	void setVisibilityTimeOut(int msecs);
-
-	void moveGlobal(QWidget * w, const QPoint & offset)
+	if (windowFlags().testFlag(Qt::Window))
 	{
-		move(w->mapToGlobal(QPoint(0, 0)) + offset);
+		ce->accept();
 	}
-
-	void hide();
-	void show();
-
-private:
-	QString m_text;
-	QTimer * m_showTimer;
-	QTimer * m_hideTimer;
-};
+	else if (getGUI()->mainWindow()->workspace())
+	{
+		parentWidget()->hide();
+		ce->ignore();
+	}
+	else
+	{
+		hide();
+		ce->ignore();
+	}
+	emit closed();
+}
 
 } // namespace lmms::gui
-
-#endif
