@@ -44,6 +44,7 @@ PatternStore::PatternStore() :
 	// not change upon setCurrentPattern()-call
 	connect(&m_patternComboBoxModel, SIGNAL(dataUnchanged()),
 			this, SLOT(currentPatternChanged()));
+
 	setType(Type::Pattern);
 }
 
@@ -76,12 +77,15 @@ bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum
 
 
 
-void PatternStore::updateAfterTrackAdd()
+Track* PatternStore::addTrack(std::unique_ptr<Track> track)
 {
 	if (numOfPatterns() == 0 && !Engine::getSong()->isLoadingProject())
 	{
 		Engine::getSong()->addPatternTrack();
 	}
+
+	track->createClipsForPattern(numOfPatterns() - 1);
+	return TrackContainer::addTrack(std::move(track));
 }
 
 
@@ -109,7 +113,9 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 
 int PatternStore::numOfPatterns() const
 {
-	return Engine::getSong()->countTracks(Track::Type::Pattern);
+	const auto allTracks = tracks();
+	const auto fn = [&](const auto& track) { return track->type() == Track::Type::Pattern; };
+	return std::count_if(allTracks.begin(), allTracks.end(), fn);
 }
 
 

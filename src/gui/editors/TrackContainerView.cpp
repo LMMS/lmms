@@ -202,10 +202,10 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	m_scrollLayout->removeWidget( trackView );
 	m_scrollLayout->insertWidget( indexTo, trackView );
 
-	Track * track = m_tc->m_tracks[indexFrom];
+	auto& track = m_tc->m_tracks[indexFrom];
 
 	m_tc->m_tracks.erase(m_tc->m_tracks.begin() + indexFrom);
-	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, track);
+	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, std::move(track));
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();
@@ -296,7 +296,7 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	delete _tv;
 
 	Engine::audioEngine()->requestChangeInModel();
-	delete t;
+	t->trackContainer()->removeTrack(t);
 	Engine::audioEngine()->doneChangeInModel();
 }
 
@@ -395,7 +395,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "instrument" )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		auto it = m_tc->addNewTrack<InstrumentTrack>();
 		auto ilt = new InstrumentLoaderThread(this, it, value);
 		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
@@ -405,7 +405,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		auto it = m_tc->addNewTrack<InstrumentTrack>();
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
@@ -416,7 +416,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		auto it = m_tc->addNewTrack<InstrumentTrack>();
 		it->loadPreset(dataFile.content().toElement());
 
 		//it->toggledInstrumentTrackButton( true );
@@ -440,7 +440,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		Track::create( dataFile.content().firstChild().toElement(), m_tc );
+		m_tc->addNewTrack(dataFile.content().firstChild().toElement());
 		_de->accept();
 	}
 }

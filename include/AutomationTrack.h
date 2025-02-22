@@ -32,11 +32,11 @@
 namespace lmms
 {
 
-class AutomationTrack : public Track
+class LMMS_EXPORT AutomationTrack : public Track
 {
 	Q_OBJECT
 public:
-	AutomationTrack( TrackContainer* tc, bool _hidden = false );
+	AutomationTrack(bool hidden = false);
 	~AutomationTrack() override = default;
 
 	bool play( const TimePos & _start, const fpp_t _frames,
@@ -48,7 +48,7 @@ public:
 	}
 
 	gui::TrackView * createView( gui::TrackContainerView* ) override;
-	Clip* createClip(const TimePos & pos) override;
+	std::unique_ptr<Clip> createClip() override;
 
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;

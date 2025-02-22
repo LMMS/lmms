@@ -44,8 +44,8 @@ namespace lmms
 {
 
 
-SampleTrack::SampleTrack(TrackContainer* tc) :
-	Track(Track::Type::Sample, tc),
+SampleTrack::SampleTrack() :
+	Track(Track::Type::Sample),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
 	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
@@ -76,9 +76,9 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false; // will be return variable
 
-
-	clipVector clips;
+	auto clips = std::vector<Clip*>{};
 	class PatternTrack * pattern_track = nullptr;
+
 	if( _clip_num >= 0 )
 	{
 		if (_start > getClip(_clip_num)->length())
@@ -175,18 +175,10 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 	return new gui::SampleTrackView( this, tcv );
 }
 
-
-
-
-Clip * SampleTrack::createClip(const TimePos & pos)
+std::unique_ptr<Clip> SampleTrack::createClip()
 {
-	auto sClip = new SampleClip(this);
-	sClip->movePosition(pos);
-	return sClip;
+	return std::make_unique<SampleClip>();
 }
-
-
-
 
 void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
 {

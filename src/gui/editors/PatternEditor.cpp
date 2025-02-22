@@ -29,6 +29,7 @@
 #include "ClipView.h"
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "SampleTrack.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
@@ -81,25 +82,6 @@ void PatternEditor::removeSteps()
 	}
 }
 
-
-
-
-void PatternEditor::addSampleTrack()
-{
-	(void) Track::create( Track::Type::Sample, model() );
-}
-
-
-
-
-void PatternEditor::addAutomationTrack()
-{
-	(void) Track::create( Track::Type::Automation, model() );
-}
-
-
-
-
 void PatternEditor::removeViewsForPattern(int pattern)
 {
 	for( TrackView* view : trackViews() )
@@ -131,7 +113,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 	if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
+		Track* t = model()->addNewTrack(dataFile.content().firstChild().toElement());
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;
@@ -152,7 +134,6 @@ void PatternEditor::dropEvent(QDropEvent* de)
 			t->deleteClips();
 			t->createClipsForPattern(m_ps->numOfPatterns() - 1);
 		}
-		m_ps->updateAfterTrackAdd();
 
 		de->accept();
 	}
@@ -262,13 +243,13 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
-						Engine::getSong(), SLOT(addPatternTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
-						m_editor, SLOT(cloneClip()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_sample_track"),	tr("Add sample-track"),
-						m_editor, SLOT(addSampleTrack()));
+		Engine::getSong(), &TrackContainer::addNewTrack<PatternTrack>);
+	trackAndStepActionsToolBar->addAction(
+		embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"), m_editor, SLOT(cloneClip()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_sample_track"), tr("Add sample-track"),
+		m_editor->model(), &TrackContainer::addNewTrack<SampleTrack>);
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
-						m_editor, SLOT(addAutomationTrack()));
+		m_editor->model(), &TrackContainer::addNewTrack<AutomationTrack>);
 
 	auto stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

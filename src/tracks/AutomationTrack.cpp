@@ -32,9 +32,8 @@
 namespace lmms
 {
 
-
-AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	Track( _hidden ? Type::HiddenAutomation : Type::Automation, tc )
+AutomationTrack::AutomationTrack(bool hidden)
+	: Track(hidden ? Type::HiddenAutomation : Type::Automation)
 {
 	setName( tr( "Automation track" ) );
 }
@@ -56,15 +55,10 @@ gui::TrackView* AutomationTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-Clip* AutomationTrack::createClip(const TimePos & pos)
+std::unique_ptr<Clip> AutomationTrack::createClip()
 {
-	auto p = new AutomationClip(this);
-	p->movePosition(pos);
-	return p;
+	return std::make_unique<AutomationClip>();
 }
-
-
-
 
 void AutomationTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {

@@ -46,8 +46,8 @@ namespace lmms
 {
 
 
-InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
-	Track( Track::Type::Instrument, tc ),
+InstrumentTrack::InstrumentTrack() :
+	Track(Track::Type::Instrument),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_track" ), Engine::audioEngine()->midiClient(),
 								this, this ),
@@ -706,8 +706,9 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 	const float frames_per_tick = Engine::framesPerTick();
 
-	clipVector clips;
+	auto clips = std::vector<Clip*>{};
 	class PatternTrack * pattern_track = nullptr;
+
 	if( _clip_num >= 0 )
 	{
 		Clip * clip = getClip( _clip_num );
@@ -717,11 +718,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 		}
 	}
-	else
-	{
-		getClipsInRange( clips, _start, _start + static_cast<int>(
-					_frames / frames_per_tick ) );
-	}
+	else { clips = getClipsInRange(_start, _start + static_cast<int>(_frames / frames_per_tick)); }
 
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
@@ -800,18 +797,10 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	return played_a_note;
 }
 
-
-
-
-Clip* InstrumentTrack::createClip(const TimePos & pos)
+std::unique_ptr<Clip> InstrumentTrack::createClip()
 {
-	auto p = new MidiClip(this);
-	p->movePosition(pos);
-	return p;
+	return std::make_unique<MidiClip>();
 }
-
-
-
 
 gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )
 {
