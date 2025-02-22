@@ -236,9 +236,9 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 		for( int i = m_numOscillators - 1; i >= 0; --i )
 		{
 			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i]
-				= rand() / ( RAND_MAX + 1.0f );
+				= rand() / (static_cast<float>(RAND_MAX) + 1.0f);
 			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i]
-				= rand() / ( RAND_MAX + 1.0f );
+				= rand() / (static_cast<float>(RAND_MAX) + 1.0f);
 
 			// initialise ocillators
 
