@@ -46,30 +46,29 @@ namespace lmms
 {
 
 
-InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
-	Track( Track::Type::Instrument, tc ),
+InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
+	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), Engine::audioEngine()->midiClient(),
-								this, this ),
+	m_midiPort(tr("unnamed_track"), Engine::audioEngine()->midiClient(), this, this),
 	m_notes(),
-	m_sustainPedalPressed( false ),
-	m_silentBuffersProcessed( false ),
-	m_previewMode( false ),
+	m_sustainPedalPressed(false),
+	m_silentBuffersProcessed(false),
+	m_previewMode(false),
 	m_baseNoteModel(0, 0, NumKeys - 1, this, tr("Base note")),
 	m_firstKeyModel(0, 0, NumKeys - 1, this, tr("First note")),
 	m_lastKeyModel(0, 0, NumKeys - 1, this, tr("Last note")),
-	m_hasAutoMidiDev( false ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
-	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
-	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
-	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
-	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
-	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
-	m_instrument( nullptr ),
-	m_soundShaping( this ),
-	m_arpeggio( this ),
-	m_noteStacking( this ),
+	m_hasAutoMidiDev(false),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_audioBusHandle(tr("unnamed_track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_pitchModel(0, MinPitchDefault, MaxPitchDefault, 1, this, tr("Pitch")),
+	m_pitchRangeModel(1, 1, 60, this, tr("Pitch range")),
+	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
+	m_useMasterPitchModel(true, this, tr("Master pitch")),
+	m_instrument(nullptr),
+	m_soundShaping(this),
+	m_arpeggio(this),
+	m_noteStacking(this),
 	m_piano(this),
 	m_microtuner()
 {
@@ -250,7 +249,7 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 
 	// if effects "went to sleep" because there was no input, wake them up
 	// now
-	m_audioPort.effects()->startRunning();
+	m_audioBusHandle.effects()->startRunning();
 
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
@@ -620,11 +619,11 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 
 
-void InstrumentTrack::setName( const QString & _new_name )
+void InstrumentTrack::setName(const QString& new_name)
 {
-	Track::setName( _new_name );
-	m_midiPort.setName( name() );
-	m_audioPort.setName( name() );
+	Track::setName(new_name);
+	m_midiPort.setName(name());
+	m_audioBusHandle.setName(name());
 }
 
 
@@ -672,7 +671,7 @@ void InstrumentTrack::updatePitchRange()
 
 void InstrumentTrack::updateMixerChannel()
 {
-	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
+	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
 }
 
 
@@ -877,7 +876,7 @@ void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& 
 		autoAssignMidiDevice(hasAuto);
 	}
 
-	m_audioPort.effects()->saveState( doc, thisElement );
+	m_audioBusHandle.effects()->saveState(doc, thisElement);
 }
 
 
@@ -909,7 +908,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
-	m_audioPort.effects()->clear();
+	m_audioBusHandle.effects()->clear();
 
 	// We set MIDI CC enable to false so the knobs don't trigger MIDI CC events while
 	// they are being loaded. After all knobs are loaded we load the right value of m_midiCCEnable.
@@ -936,9 +935,9 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				m_midiPort.restoreState( node.toElement() );
 			}
-			else if( m_audioPort.effects()->nodeName() == node.nodeName() )
+			else if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
-				m_audioPort.effects()->restoreState( node.toElement() );
+				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}
 			else if(node.nodeName() == "instrument")
 			{
