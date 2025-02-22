@@ -55,7 +55,8 @@ const QString& FileRevealer::getDefaultFileManager()
 	QStringList fileManagers = fileManager.split(';', Qt::SkipEmptyParts);
 	if (!fileManagers.isEmpty())
 	{
-		fileManager = fileManagers.last(); // Take the last registered manager
+		// The highest priority file manager is last
+		fileManager = fileManagers.last();
 	}
 
 	if (fileManager.endsWith(".desktop")) { fileManager.chop(8); }
