@@ -1,12 +1,11 @@
-#include <sys/stat.h>
+#include "LocalFileMng.h"
+
 #include <cctype>
 
 #include <QDomDocument>
 #include <QFile>
 #include <QLocale>
-#include <QTextCodec>
 
-#include "LocalFileMng.h"
 
 namespace lmms
 {
@@ -197,10 +196,7 @@ QDomDocument LocalFileMng::openXmlDocument( const QString& filename )
 		return QDomDocument();
 
 	if( TinyXMLCompat ) {
-	    QString enc = QTextCodec::codecForLocale()->name();
-	    if( enc == QString("System") ) {
-		    enc = "UTF-8";
-	    }
+		const QString enc = "UTF-8"; // unknown encoding, so assume utf-8 and call it a day
 	    QByteArray line;
 	    QByteArray buf = QString("<?xml version='1.0' encoding='%1' ?>\n")
 		.arg( enc )

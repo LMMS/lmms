@@ -1,8 +1,7 @@
 /*
- * panning_constants.h - declaration of some constants, concerning the
- *             panning of a note
+ * TrackGrip.h - Grip that can be used to move tracks
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,19 +22,47 @@
  *
  */
 
-#ifndef LMMS_PANNING_CONSTANTS_H
-#define LMMS_PANNING_CONSTANTS_H
+#ifndef LMMS_GUI_TRACK_GRIP_H
+#define LMMS_GUI_TRACK_GRIP_H
+
+#include <QWidget>
+
+
+class QPixmap;
 
 namespace lmms
 {
 
+class Track;
 
-constexpr panning_t PanningRight = ( 0 + 100 );
-constexpr panning_t PanningLeft = - PanningRight;
-constexpr panning_t PanningCenter = 0;
-constexpr panning_t DefaultPanning = PanningCenter;
+namespace gui
+{
 
+class TrackGrip : public QWidget
+{
+	Q_OBJECT
+public:
+	TrackGrip(Track* track, QWidget* parent = 0);
+	~TrackGrip() override = default;
+
+signals:
+	void grabbed();
+	void released();
+
+protected:
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void paintEvent(QPaintEvent*) override;
+
+private:
+	Track* m_track = nullptr;
+	bool m_isGrabbed = false;
+	static QPixmap* s_grabbedPixmap;
+	static QPixmap* s_releasedPixmap;
+};
+
+} // namespace gui
 
 } // namespace lmms
 
-#endif // LMMS_PANNING_CONSTANTS_H
+#endif // LMMS_GUI_TRACK_GRIP_H

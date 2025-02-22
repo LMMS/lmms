@@ -34,7 +34,7 @@
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
-#include "lmms_constants.h"
+#include "interpolation.h"
 #include "plugin_export.h"
 
 namespace lmms {
@@ -183,7 +183,7 @@ void SlicerT::findSlices()
 	for (auto i = std::size_t{0}; i < singleChannel.size(); i++)
 	{
 		singleChannel[i] /= maxMag;
-		if (sign(lastValue) != sign(singleChannel[i]))
+		if ((lastValue >= 0) != (singleChannel[i] >= 0))
 		{
 			zeroCrossings.push_back(i);
 			lastValue = singleChannel[i];
@@ -214,7 +214,7 @@ void SlicerT::findSlices()
 			float magnitude = std::sqrt(real * real + imag * imag);
 
 			// using L2-norm (euclidean distance)
-			float diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
+			float diff = std::abs(magnitude - prevMags[j]);
 			spectralFlux += diff;
 
 			prevMags[j] = magnitude;

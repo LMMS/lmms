@@ -71,7 +71,6 @@
 #include <QProcess>
 #include <QThread>
 #include <QString>
-#include <QUuid>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
@@ -125,7 +124,7 @@ public:
 		m_master( true ),
 		m_lockDepth( 0 )
 	{
-		m_data.create(QUuid::createUuid().toString().toStdString());
+		m_data.create();
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
@@ -398,7 +397,7 @@ public:
 		message & addInt( int _i )
 		{
 			char buf[32];
-			sprintf( buf, "%d", _i );
+			std::snprintf(buf, 32, "%d", _i);
 			data.emplace_back( buf );
 			return *this;
 		}
@@ -406,7 +405,7 @@ public:
 		message & addFloat( float _f )
 		{
 			char buf[32];
-			sprintf( buf, "%f", _f );
+			std::snprintf(buf, 32, "%f", _f);
 			data.emplace_back( buf );
 			return *this;
 		}

@@ -38,15 +38,9 @@ VecControls::VecControls(Vectorscope *effect) :
 	m_effect(effect),
 
 	// initialize models and set default values
-	m_persistenceModel(0.5f, 0.0f, 1.0f, 0.05f, this, tr("Display persistence amount")),
 	m_logarithmicModel(false, this, tr("Logarithmic scale")),
-	m_highQualityModel(false, this, tr("High quality"))
+	m_linesModeModel(true, this, tr("Lines rendering"))
 {
-	// Colors (percentages include sRGB gamma correction)
-	m_colorFG = QColor(60, 255, 130, 255);		// ~LMMS green
-	m_colorGrid = QColor(76, 80, 84, 128);		// ~60 % gray (slightly cold / blue), 50 % transparent
-	m_colorLabels = QColor(76, 80, 84, 255);	// ~60 % gray (slightly cold / blue)
-	m_colorOutline = QColor(30, 34, 38, 255);	// ~40 % gray (slightly cold / blue)
 }
 
 
@@ -59,17 +53,15 @@ gui::EffectControlDialog* VecControls::createView()
 
 void VecControls::loadSettings(const QDomElement &element)
 {
-	m_persistenceModel.loadSettings(element, "Persistence");
 	m_logarithmicModel.loadSettings(element, "Logarithmic");
-	m_highQualityModel.loadSettings(element, "HighQuality");
+	m_linesModeModel.loadSettings(element, "LinesMode");
 }
 
 
 void VecControls::saveSettings(QDomDocument &document, QDomElement &element)
 {
-	m_persistenceModel.saveSettings(document, element, "Persistence");
 	m_logarithmicModel.saveSettings(document, element, "Logarithmic");
-	m_highQualityModel.saveSettings(document, element, "HighQuality");
+	m_linesModeModel.saveSettings(document, element, "LinesMode");
 }
 
 

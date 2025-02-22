@@ -179,6 +179,7 @@ lmms--gui--PianoRoll {
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
 	qproperty-stepNoteColor: #9b1313;
+	qproperty-currentStepNoteColor: rgb(245, 3, 139);
 	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
@@ -411,7 +412,7 @@ lmms--gui--TrackContentWidget {
 
 /* gear button in tracks */
 
-lmms--gui--TrackOperationsWidget > QPushButton {
+lmms--gui--TrackOperationsWidget QPushButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -420,7 +421,7 @@ lmms--gui--TrackOperationsWidget > QPushButton {
 	border: none;
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
 	image: url("resources:trackop.png");
 	subcontrol-origin: padding;
 	subcontrol-position: center;
@@ -428,8 +429,8 @@ lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
 	top: 1px;
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:pressed,
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:checked {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:pressed,
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:checked {
 	image: url("resources:trackop.png");
 	position: relative;
 	top: 2px;
@@ -601,17 +602,11 @@ lmms--gui--TrackLabelButton:hover {
 	background: #3B424A;
 	border: 1px solid #515B66;
 	border-radius: none;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:pressed {
 	background: #262B30;
 	border-radius: none;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:checked {
@@ -619,17 +614,12 @@ lmms--gui--TrackLabelButton:checked {
 	background: #1C1F24;
 	background-image: url("resources:track_shadow_p.png");
 	border-radius: none;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
 	background-image: url("resources:track_shadow_p.png");
-	font-size: 11px;
-	padding: 2px 1px;
 	font-weight: solid;
 }
 
@@ -846,6 +836,21 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-radius: 2px;
 }
 
+/* Instrument */
+
+/* Envelope graph */
+lmms--gui--EnvelopeGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+	qproperty-markerFillColor: rgb(153, 175, 255);
+	qproperty-markerOutlineColor: rgb(0, 0, 0);
+}
+
+/* LFO graph */
+lmms--gui--LfoGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+}
 
 /* Plugins */
 
@@ -1070,6 +1075,12 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
+}
+
+lmms--gui--VectorView {
+	qproperty-colorTrace: rgba(60, 255, 130, 255);
+	qproperty-colorGrid: rgba(76, 80, 84, 128);
+	qproperty-colorLabels: rgba(76, 80, 84, 255);
 }
 
 lmms--gui--BarModelEditor {
