@@ -2826,15 +2826,14 @@ void PianoRoll::updateKnifePos(QMouseEvent* me)
 	m_knifeTickPos = mouseTickPos;
 }
 
+/*
+ * Setup chords
+ *
+ * A chord is an island of notes--as the loop goes over the notes, if the notes overlap,
+ * they are part of the same chord. Else, they are part of a new chord.
+*/
 void PianoRoll::setupSelectedChords()
 {
-	//
-	// Setup chords
-	//
-	// A chord is an island of notes--as the loop goes over the notes, if the notes overlap,
-	// they are part of the same chord. Else, they are part of a new chord.
-	//
-
 	m_selectedChords.clear();
 	m_midiClip->rearrangeAllNotes();
 
@@ -2862,6 +2861,12 @@ void PianoRoll::setupSelectedChords()
 	m_selectedChords.push_back(currentChord);
 }
 
+/*
+ * Perform the Strum
+ *
+ * Notes above the clicked note (relative to each chord) will be strummed down, notes below will be strummed up.
+ * Holding shift raises the amount of movement to a power, causing the strum to be curved/warped.
+*/
 void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 {
 	// Calculate the TimePos from the mouse
@@ -2900,12 +2905,6 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 		}
 	}
 
-	//
-	// Perform the Strum
-	//
-	// Note above the clicked note (relative to each chord) will be strummed down, notes below will be strummed up.
-	// Holding shift raises the amount of movement to a power, causing the strum to be curved/warped.
-	//
 	for (NoteVector chord: m_selectedChords)
 	{
 		// Don't strum a chord with only one note
