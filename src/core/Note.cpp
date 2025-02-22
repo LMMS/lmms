@@ -46,12 +46,11 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_volume(std::clamp(volume, MinVolume, MaxVolume)),
 	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
-	m_pos( pos ),
-	m_detuning( nullptr )
+	m_pos( pos )
 {
-	if( detuning )
+	if (detuning)
 	{
-		m_detuning = sharedObject::ref( detuning );
+		m_detuning = std::make_unique<DetuningHelper>(*detuning);
 	}
 	else
 	{
@@ -74,13 +73,34 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning(nullptr),
 	m_type(note.m_type)
 {
-	if( note.m_detuning )
+	if (note.m_detuning)
 	{
-		m_detuning = sharedObject::ref( note.m_detuning );
+		m_detuning = std::make_unique<DetuningHelper>(*note.m_detuning);
 	}
+}
+
+Note& Note::operator=(const Note& note)
+{
+	m_selected = note.m_selected;
+	m_oldKey = note.m_oldKey;
+	m_oldPos = note.m_oldPos;
+	m_oldLength = note.m_oldLength;
+	m_isPlaying = note.m_isPlaying;
+	m_key = note.m_key;
+	m_volume = note.m_volume;
+	m_panning = note.m_panning;
+	m_length = note.m_length;
+	m_pos = note.m_pos;
+	m_type = note.m_type;
+
+	if (note.m_detuning)
+	{
+		m_detuning = std::make_unique<DetuningHelper>(*note.m_detuning);
+	}
+
+	return *this;
 }
 
 
@@ -88,10 +108,6 @@ Note::Note( const Note & note ) :
 
 Note::~Note()
 {
-	if( m_detuning )
-	{
-		sharedObject::unref( m_detuning );
-	}
 }
 
 
@@ -218,7 +234,7 @@ void Note::createDetuning()
 {
 	if( m_detuning == nullptr )
 	{
-		m_detuning = new DetuningHelper;
+		m_detuning = std::make_unique<DetuningHelper>();
 		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
 		m_detuning->automationClip()->setProgressionType( AutomationClip::ProgressionType::Linear );
