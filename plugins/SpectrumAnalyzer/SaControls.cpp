@@ -27,6 +27,7 @@
 #include <QDomElement>
 
 #include "Analyzer.h"
+#include "SaConstants.h"
 #include "SaControlsDialog.h"
 
 namespace lmms

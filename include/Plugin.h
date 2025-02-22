@@ -29,6 +29,7 @@
 #include <QMap>
 
 #include "JournallingObject.h"
+#include "LmmsCommonMacros.h"
 #include "Model.h"
 
 
