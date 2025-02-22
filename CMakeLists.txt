@@ -635,8 +635,10 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 if(NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR LMMS_DEBUG))
     add_compile_definitions(NDEBUG)
+	SET(STATUS_ASSERTIONS "DISABLED")
 else()
     remove_definitions(-DNDEBUG)
+	SET(STATUS_ASSERTIONS "ENABLED")
 endif()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
@@ -871,6 +873,7 @@ MESSAGE(
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
+"* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
 )
 
 MESSAGE(
