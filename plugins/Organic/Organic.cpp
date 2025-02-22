@@ -431,7 +431,7 @@ OrganicInstrumentView::OrganicInstrumentView( Instrument * _instrument,
 
 	// setup volume-knob
 	m_volKnob = new OrganicKnob( this );
-	m_volKnob->setVolumeKnob( true );
+	m_volKnob->setVolKnobType(VolKnobType::RelVol);
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ), "%" );
@@ -499,7 +499,7 @@ void OrganicInstrumentView::modelChanged()
 
 		// setup volume-knob
 		auto volKnob = new Knob(KnobType::Styled, this);
-		volKnob->setVolumeKnob( true );
+		volKnob->setVolKnobType(VolKnobType::AbsVol);
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
@@ -514,9 +514,9 @@ void OrganicInstrumentView::modelChanged()
 		// setup knob for fine-detuning
 		Knob * detuneKnob = new OrganicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
-		detuneKnob->setHintText( tr( "Osc %1 stereo detuning" ).arg( i + 1 )
+		detuneKnob->setHintText(tr("Osc %1 stereo detuning:").arg(i + 1)
 							, " " +
-							tr( "cents" ) );
+							tr("cents"));
 
 		m_oscKnobs[i] = OscillatorKnobs( harmKnob, volKnob, oscKnob, panKnob, detuneKnob );
 
