@@ -78,22 +78,19 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	
 	// knobs
 
-	auto stepLength = new TempoSyncKnob(KnobType::Bright26, this);
+	auto stepLength = TempoSyncKnob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("Length"), this);
 	stepLength->move( 100, 245 );
 	stepLength->setModel( & controls->m_stepLength );
-	stepLength->setLabel( tr( "Length" ) );
 	stepLength->setHintText( tr( "Step length:" ) , " ms" );
 
-	auto dryGain = new Knob(KnobType::Bright26, this);
+	auto dryGain = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("Dry"), this);
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
-	dryGain->setLabel( tr( "Dry" ) );
 	dryGain->setHintText( tr( "Dry gain:" ) , " dBFS" );
 
-	auto stages = new Knob(KnobType::Bright26, this);
+	auto stages = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("Stages"), this);
 	stages->move( 200, 245 );
 	stages->setModel( & controls->m_stages );
-	stages->setLabel( tr( "Stages" ) );
 	stages->setHintText( tr( "Low-pass stages:" ) , "x" );
 	// switch led
 

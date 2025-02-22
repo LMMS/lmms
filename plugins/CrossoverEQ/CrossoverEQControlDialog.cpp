@@ -49,22 +49,19 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 	setFixedSize( 167, 178 );
 	
 	// knobs
-	auto xover12 = new Knob(KnobType::Bright26, this);
+	auto xover12 = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, "1/2", this);
 	xover12->move( 29, 11 );
 	xover12->setModel( & controls->m_xover12 );
-	xover12->setLabel( "1/2" );
 	xover12->setHintText( tr( "Band 1/2 crossover:" ), " Hz" );
 
-	auto xover23 = new Knob(KnobType::Bright26, this);
+	auto xover23 = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, "2/3", this);
 	xover23->move( 69, 11 );
 	xover23->setModel( & controls->m_xover23 );
-	xover23->setLabel( "2/3" );
 	xover23->setHintText( tr( "Band 2/3 crossover:" ), " Hz" );
 
-	auto xover34 = new Knob(KnobType::Bright26, this);
+	auto xover34 = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, "3/4", this);
 	xover34->move( 109, 11 );
 	xover34->setModel( & controls->m_xover34 );
-	xover34->setLabel( "3/4" );
 	xover34->setHintText( tr( "Band 3/4 crossover:" ), " Hz" );
 	
 	QPixmap const fader_knob(PLUGIN_NAME::getIconPixmap("fader_knob2"));
