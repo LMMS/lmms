@@ -443,7 +443,7 @@ private:
 	EditMode m_editMode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 	EditMode m_knifeMode; // mode they where in before entering knife mode
-	EditMode m_strumMode; // mode they where in before entering strum mode
+	EditMode m_strumMode; //< mode they where in before entering strum mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
