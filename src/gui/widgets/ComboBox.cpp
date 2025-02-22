@@ -32,7 +32,7 @@
 #include <QScreen>
 
 #include "CaptionMenu.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 #define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 #if !QT_SUPPORTS_WIDGET_SCREEN
@@ -53,7 +53,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	setFont(adjustedToPixelSize(font(), 10));
+	setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
 	connect( &m_menu, SIGNAL(triggered(QAction*)),
 				this, SLOT(setItem(QAction*)));
@@ -220,7 +220,8 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
+		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
+		model()->setInitValue(model()->value() + direction);
 		update();
 		event->accept();
 	}

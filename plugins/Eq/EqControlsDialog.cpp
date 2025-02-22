@@ -109,8 +109,8 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		auto resKnob = new Knob(KnobType::Bright26, this);
 		resKnob->move( distance, 440 );
 		resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
-		if(i > 1 && i < 6) { resKnob->setHintText(tr("Bandwidth: "), tr( " octaves")); }
-		else { resKnob->setHintText(tr("Resonance: " ), ""); }
+		if (i > 1 && i < 6) { resKnob->setHintText(tr("Bandwidth: "), tr(" octaves")); }
+		else { resKnob->setHintText(tr("Resonance: "), ""); }
 
 		auto freqKnob = new Knob(KnobType::Bright26, this);
 		freqKnob->move( distance, 396 );
@@ -122,10 +122,10 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		activeButton->setCheckable(true);
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 
-		QString iconActiveFileName = "bandLabel" + QString::number(i+1);
-		QString iconInactiveFileName = "bandLabel" + QString::number(i+1) + "off";
-		activeButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( iconActiveFileName.toLatin1() ) );
-		activeButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( iconInactiveFileName.toLatin1() ) );
+		const auto iconActiveFileName = "bandLabel" + std::to_string(i + 1);
+		const auto iconInactiveFileName = iconActiveFileName + "off";
+		activeButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(iconActiveFileName));
+		activeButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(iconInactiveFileName));
 		activeButton->move( distance - 2, 276 );
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 

@@ -106,6 +106,7 @@ GuiApplication::GuiApplication()
 
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
+	splashScreen.setFixedSize(splashScreen.pixmap().size());
 	splashScreen.show();
 
 	QHBoxLayout layout;
@@ -252,7 +253,7 @@ QFont GuiApplication::getWin32SystemFont()
 	{
 		// height is in pixels, convert to points
 		HDC hDC = GetDC( nullptr );
-		pointSize = MulDiv( abs( pointSize ), 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
+		pointSize = MulDiv(std::abs(pointSize), 72, GetDeviceCaps(hDC, LOGPIXELSY));
 		ReleaseDC( nullptr, hDC );
 	}
 

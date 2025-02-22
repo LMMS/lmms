@@ -39,11 +39,7 @@
 #include <cmath>
 
 #include "SampleClip.h"
-#include "SampleWaveform.h"
-
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
+#include "SampleThumbnail.h"
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
@@ -64,7 +60,7 @@
 #include "TimeLineWidget.h"
 #include "debug.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 
 
 namespace lmms::gui
@@ -115,12 +111,10 @@ AutomationEditor::AutomationEditor() :
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
-	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
+	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
@@ -1025,6 +1019,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1040,7 +1035,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	p.setFont(adjustedToPixelSize(p.font(), 10));
+	p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 
@@ -1217,12 +1212,18 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			
+
 			const auto& sample = m_ghostSample->sample();
-			const auto waveform = SampleWaveform::Parameters{
-				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			SampleWaveform::visualize(waveform, p, rect);
+
+			const auto param = SampleThumbnail::VisualizeParameters{
+				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.amplification = sample.amplification(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.reversed = sample.reversed()
+			};
+
+			m_sampleThumbnail.visualize(param, p);
 		}
 
 		// draw ghost notes
@@ -1560,7 +1561,11 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 	update();
 }
 
-
+void AutomationEditor::adjustLeftRightScoll(int value)
+{
+	m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							value * 0.3f / m_zoomXLevels[m_zoomingXModel.value()]);
+}
 
 
 // TODO: Move this method up so it's closer to the other mouse events
@@ -1623,15 +1628,13 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15);
+		adjustLeftRightScoll(we->angleDelta().x());
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15);
+		adjustLeftRightScoll(we->angleDelta().y());
 	}
 	else
 	{
@@ -1647,14 +1650,14 @@ float AutomationEditor::getLevel(int y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
+	float level = std::roundf( ( m_bottomLevel + ( m_y_auto ?
 			( m_maxLevel - m_minLevel ) * ( level_line_y - y )
 					/ (float)( level_line_y - ( TOP_MARGIN + 2 ) ) :
 			( level_line_y - y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
-	level = qBound( m_bottomLevel, level, m_topLevel );
+	level = qBound(std::roundf(m_bottomLevel), level, std::roundf(m_topLevel));
 
-	return( level );
+	return level;
 }
 
 
@@ -2035,17 +2038,17 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	auto editModeGroup = new ActionGroup(this);
 	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawAction->setShortcut(combine(Qt::SHIFT, Qt::Key_D));
 	m_drawAction->setChecked(true);
 
 	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_E));
 
 	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
-	m_drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	m_drawOutAction->setShortcut(combine(Qt::SHIFT, Qt::Key_C));
 
 	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
-	m_editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_editTanAction->setShortcut(combine(Qt::SHIFT, Qt::Key_T));
 	m_editTanAction->setEnabled(false);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
@@ -2107,7 +2110,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
 	{
-		m_editor->m_zoomingXModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_editor->m_zoomingXModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
 	m_editor->m_zoomingXModel.setValue( m_editor->m_zoomingXModel.findText( "100%" ) );
 

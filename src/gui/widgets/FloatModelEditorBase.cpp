@@ -29,14 +29,11 @@
 #include <QInputDialog>
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "lmms_math.h"
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "GuiApplication.h"
+#include "KeyboardShortcuts.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
@@ -159,7 +156,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
 	if (me->button() == Qt::LeftButton &&
-			! (me->modifiers() & Qt::ControlModifier) &&
+			! (me->modifiers() & KBD_COPY_MODIFIER) &&
 			! (me->modifiers() & Qt::ShiftModifier))
 	{
 		AutomatableModel *thisModel = model();
@@ -324,6 +321,11 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 				direction = deltaX > 0 ? 1 : -1;
 			}
 		}
+	}
+
+	// Handle "natural" scrolling, which is common on trackpads and touch devices
+	if (we->inverted()) {
+		direction = -direction;
 	}
 
 	// Compute the number of steps but make sure that we always do at least one step

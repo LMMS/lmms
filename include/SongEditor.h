@@ -128,6 +128,8 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
+	void adjustLeftRightScoll(int value);
+
 	LcdSpinBox * m_tempoSpinBox;
 
 	TimeLineWidget * m_timeLine;
@@ -164,6 +166,7 @@ private:
 
 signals:
 	void pixelsPerBarChanged(float);
+	void proportionalSnapChanged();
 } ;
 
 

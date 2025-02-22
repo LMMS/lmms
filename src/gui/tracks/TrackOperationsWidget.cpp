@@ -24,6 +24,7 @@
 
 #include "TrackOperationsWidget.h"
 
+#include <QBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -39,11 +40,13 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "KeyboardShortcuts.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "TrackContainerView.h"
+#include "TrackGrip.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -68,41 +71,86 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	setObjectName( "automationEnabled" );
 
+	auto layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	layout->setAlignment(Qt::AlignTop);
 
-	m_trackOps = new QPushButton( this );
-	m_trackOps->move( 12, 1 );
+	m_trackGrip = new TrackGrip(m_trackView->getTrack(), this);
+	layout->addWidget(m_trackGrip);
+
+	// This widget holds the gear icon and the mute and solo
+	// buttons in a layout.
+	auto operationsWidget = new QWidget(this);
+	auto operationsLayout = new QHBoxLayout(operationsWidget);
+	operationsLayout->setContentsMargins(0, 0, 0, 0);
+	operationsLayout->setSpacing(0);
+
+	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
 	m_trackOps->setToolTip(tr("Actions"));
 
+	// This helper lambda wraps a PixmapButton in a QWidget. This is necessary due to some strange effect where the
+	// PixmapButtons are resized to a size that's larger than their minimum/fixed size when the method "show" is called
+	// in "TrackContainerView::realignTracks". Specifically, with the default theme the buttons are resized from
+	// (16, 14) to (26, 26). This then makes them behave not as expected in layouts.
+	// The resizing is not done for QWidgets. Therefore we wrap the PixmapButton in a QWidget which is set to a
+	// fixed size that will be able to show the active and inactive pixmap. We can then use the QWidget in layouts
+	// without any disturbances.
+	//
+	// The resizing only seems to affect the track view hierarchy and is triggered by Qt's internal mechanisms.
+	// For example the buttons in the mixer view do not seem to be affected.
+	// If you want to debug this simply override "PixmapButton::resizeEvent" and trigger a break point in there.
+	auto buildPixmapButtonWrappedInWidget = [](QWidget* parent, const QString& toolTip,
+		std::string_view activeGraphic, std::string_view inactiveGraphic, PixmapButton*& pixmapButton)
+	{
+		const auto activePixmap = embed::getIconPixmap(activeGraphic);
+		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
 
-	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
-	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
-	m_muteBtn->setCheckable( true );
+		auto necessarySize = activePixmap.size().expandedTo(inactivePixmap.size());
 
-	m_soloBtn = new PixmapButton( this, tr( "Solo" ) );
-	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
-	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_soloBtn->setCheckable( true );
+		auto wrapperWidget = new QWidget(parent);
+		wrapperWidget->setFixedSize(necessarySize);
+
+		auto button = new PixmapButton(wrapperWidget, toolTip);
+		button->setCheckable(true);
+		button->setActiveGraphic(activePixmap);
+		button->setInactiveGraphic(inactivePixmap);
+		button->setToolTip(toolTip);
+
+		pixmapButton = button;
+
+		return wrapperWidget;
+	};
+
+	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "led_off", "led_green", m_muteBtn);
+	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "led_red", "led_off", m_soloBtn);
+
+	operationsLayout->addWidget(m_trackOps, Qt::AlignCenter);
+	operationsLayout->addSpacing(5);
 
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
-		m_muteBtn->move( 46, 0 );
-		m_soloBtn->move( 46, 16 );
+		auto vlayout = new QVBoxLayout();
+		vlayout->setContentsMargins(0, 0, 0, 0);
+		vlayout->setSpacing(0);
+		vlayout->addStretch(1);
+		vlayout->addWidget(muteWidget);
+		vlayout->addWidget(soloWidget);
+		vlayout->addStretch(1);
+		operationsLayout->addLayout(vlayout);
 	}
 	else
 	{
-		m_muteBtn->move( 46, 8 );
-		m_soloBtn->move( 62, 8 );
+		operationsLayout->addWidget(muteWidget, Qt::AlignCenter);
+		operationsLayout->addWidget(soloWidget, Qt::AlignCenter);
 	}
 
-	m_muteBtn->show();
-	m_muteBtn->setToolTip(tr("Mute"));
+	operationsLayout->addStretch(1);
 
-	m_soloBtn->show();
-	m_soloBtn->setToolTip(tr("Solo"));
+	layout->addWidget(operationsWidget, 0, Qt::AlignTop);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
@@ -133,9 +181,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
  */
 void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
-	if( me->button() == Qt::LeftButton &&
-		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::Type::Pattern)
+	if (me->button() == Qt::LeftButton && me->modifiers() & KBD_COPY_MODIFIER &&
+		m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
 		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
@@ -154,31 +201,17 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 
 
 
-/*! \brief Repaint the trackOperationsWidget
+/*!
+ * \brief Repaint the trackOperationsWidget
  *
- *  If we're not moving, and in the Pattern Editor, then turn
- *  automation on or off depending on its previous state and show
- *  ourselves.
- *
- *  Otherwise, hide ourselves.
- *
- *  \todo Flesh this out a bit - is it correct?
- *  \param pe The paint event to respond to
+ * Only things that's done for now is to paint the background
+ * with the brush of the window from the palette.
  */
-void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
+void TrackOperationsWidget::paintEvent(QPaintEvent*)
 {
 	QPainter p( this );
 
 	p.fillRect(rect(), palette().brush(QPalette::Window));
-
-	if (m_trackView->getTrack()->color().has_value() && !m_trackView->getTrack()->getMutedModel()->value()) 
-	{
-		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
-
-		p.fillRect(coloredRect, m_trackView->getTrack()->color().value());
-	}
-
-	p.drawPixmap(2, 2, embed::getIconPixmap(m_trackView->isMovingTrack() ? "track_op_grip_c" : "track_op_grip"));
 }
 
 
@@ -199,7 +232,7 @@ bool TrackOperationsWidget::confirmRemoval()
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
 	});
 
-	QMessageBox mb(this);
+	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
 	mb.setWindowTitle(messageTitleRemoveTrack);
 	mb.setIcon(QMessageBox::Warning);
@@ -235,6 +268,12 @@ void TrackOperationsWidget::cloneTrack()
 	{
 		tcView->moveTrackView( newTrackView, i - 1 );
 		i--;
+	}
+
+	if (m_soloBtn->model()->value())
+	{
+		// if this track was solo, make the new track the new solo
+		newTrack->toggleSolo();
 	}
 }
 

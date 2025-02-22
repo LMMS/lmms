@@ -32,8 +32,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "Instrument.h"
-#include "SampleBuffer.h"
+#include "SampleThumbnail.h"
 
 namespace lmms {
 
@@ -54,8 +53,9 @@ public:
 
 	// predefined sizes
 	static constexpr int s_seekerHorMargin = 5;
-	static constexpr int s_seekerHeight = 38; // used to calcualte all vertical sizes
+	static constexpr int s_seekerVerMargin = 6;
 	static constexpr int s_middleMargin = 6;
+	static constexpr int s_arrowHeight = 5;
 
 	// interaction behavior values
 	static constexpr float s_distanceForClick = 0.02f;
@@ -80,11 +80,13 @@ protected:
 	void wheelEvent(QWheelEvent* we) override;
 
 	void paintEvent(QPaintEvent* pe) override;
+	void resizeEvent(QResizeEvent* event) override;
 
 private:
 	int m_width;
 	int m_height;
 
+	int m_seekerHeight; // used to calcualte all vertical sizes
 	int m_seekerWidth;
 	int m_editorHeight;
 	int m_editorWidth;
@@ -108,6 +110,8 @@ private:
 	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
+	
+	SampleThumbnail m_sampleThumbnail;
 
 	SlicerT* m_slicerTParent;
 

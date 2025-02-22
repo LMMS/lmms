@@ -29,6 +29,7 @@
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
 	#include <thread>
 #endif
+#include <numbers>
 
 #include "BufferManager.h"
 #include "Engine.h"
@@ -77,11 +78,11 @@ Oscillator::Oscillator(const IntModel *wave_shape_model,
 
 
 
-void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator)
+void Oscillator::update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator)
 {
 	if (m_freq >= Engine::audioEngine()->outputSampleRate() / 2)
 	{
-		BufferManager::clear(ab, frames);
+		zeroSampleFrames(ab, frames);
 		return;
 	}
 	// If this oscillator is used to PM or PF modulate another oscillator, take a note.
@@ -118,6 +119,7 @@ void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 
 void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 {
+	using namespace std::numbers;
 	// sawtooth wave contain both even and odd harmonics
 	// hence sinewaves are added for all bands
 	// https://en.wikipedia.org/wiki/Sawtooth_wave
@@ -127,7 +129,7 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 		const float imod = (i - OscillatorConstants::WAVETABLE_LENGTH / 2.f) / OscillatorConstants::WAVETABLE_LENGTH;
 		for (int n = firstBand; n <= bands; n++)
 		{
-			table[i] += (n % 2 ? 1.0f : -1.0f) / n * sinf(F_2PI * n * imod) / F_PI_2;
+			table[i] += (n % 2 ? 1.0f : -1.0f) / n * std::sin(2 * pi_v<float> * n * imod) / (pi_v<float> * 0.5f);
 		}
 	}
 }
@@ -135,6 +137,8 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 
 void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int firstBand)
 {
+	using namespace std::numbers;
+	constexpr float pi_sqr = pi_v<float> * pi_v<float>;
 	// triangle waves contain only odd harmonics
 	// hence sinewaves are added for alternate bands
 	// https://en.wikipedia.org/wiki/Triangle_wave
@@ -142,8 +146,8 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 	{
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
-			table[i] += (n & 2 ? -1.0f : 1.0f) / powf(n, 2.0f) *
-				sinf(F_2PI * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (F_PI_SQR / 8);
+			table[i] += (n & 2 ? -1.0f : 1.0f) / (n * n)
+				* std::sin(2 * pi_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (pi_sqr / 8.f);
 		}
 	}
 }
@@ -151,6 +155,7 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 
 void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBand)
 {
+	using namespace std::numbers;
 	// square waves only contain odd harmonics,
 	// at diffrent levels when compared to triangle waves
 	// https://en.wikipedia.org/wiki/Square_wave
@@ -158,7 +163,9 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 	{
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
-			table[i] += (1.0f / n) * sinf(F_2PI * i * n / OscillatorConstants::WAVETABLE_LENGTH) / (F_PI / 4);
+			table[i] += (1.0f / n)
+				* std::sin(2 * pi_v<float> * i * n / OscillatorConstants::WAVETABLE_LENGTH)
+				/ (pi_v<float> / 4.f);
 		}
 	}
 }
@@ -316,7 +323,7 @@ void Oscillator::generateWaveTables()
 
 
 
-void Oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -352,7 +359,7 @@ void Oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -388,7 +395,7 @@ void Oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -424,7 +431,7 @@ void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -460,7 +467,7 @@ void Oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -496,7 +503,7 @@ void Oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -535,7 +542,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 // should be called every time phase-offset is changed...
 inline void Oscillator::recalcPhase()
 {
-	if( !typeInfo<float>::isEqual( m_phaseOffset, m_ext_phaseOffset ) )
+	if (!approximatelyEqual(m_phaseOffset, m_ext_phaseOffset))
 	{
 		m_phase -= m_phaseOffset;
 		m_phaseOffset = m_ext_phaseOffset;
@@ -558,7 +565,7 @@ inline bool Oscillator::syncOk( float _osc_coeff )
 
 
 
-float Oscillator::syncInit( sampleFrame * _ab, const fpp_t _frames,
+float Oscillator::syncInit( SampleFrame* _ab, const fpp_t _frames,
 						const ch_cnt_t _chnl )
 {
 	if( m_subOsc != nullptr )
@@ -574,7 +581,7 @@ float Oscillator::syncInit( sampleFrame * _ab, const fpp_t _frames,
 
 // if we have no sub-osc, we can't do any modulation... just get our samples
 template<Oscillator::WaveShape W>
-void Oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	recalcPhase();
@@ -592,7 +599,7 @@ void Oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 
 // do pm by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, true );
@@ -613,7 +620,7 @@ void Oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 
 // do am by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, false );
@@ -632,7 +639,7 @@ void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 
 // do mix by using sub-osc as mix-sample
 template<Oscillator::WaveShape W>
-void Oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, false );
@@ -652,7 +659,7 @@ void Oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 // sync with sub-osc (every time sub-osc starts new period, we also start new
 // period)
 template<Oscillator::WaveShape W>
-void Oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
@@ -675,7 +682,7 @@ void Oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 
 // do fm by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
+void Oscillator::updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, true );

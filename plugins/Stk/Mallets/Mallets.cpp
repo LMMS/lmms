@@ -41,6 +41,7 @@
 #include "InstrumentTrack.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -114,7 +115,7 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	
 	// TubeBell
 	m_presetsModel.addItem( tr( "Tubular bells" ) );
-	m_scalers.append( 1.8 );
+	m_scalers.append(1.8f);
 	
 	// BandedWG
 	m_presetsModel.addItem( tr( "Uniform bar" ) );
@@ -278,7 +279,7 @@ QString MalletsInstrument::nodeName() const
 
 
 void MalletsInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if( m_filesMissing )
 	{
@@ -305,26 +306,26 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 		if (p < 9)
 		{
-			hardness += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			hardness += random * fastRand(-64.f, +64.f);
 			hardness = std::clamp(hardness, 0.0f, 128.0f);
 
-			position += random * (static_cast<float>(fast_rand() % 64) - 32.0);
+			position += random * fastRand(-32.f, +32.f);
 			position = std::clamp(position, 0.0f, 64.0f);
 		}
 		else if (p == 9)
 		{
-			modulator += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			modulator += random * fastRand(-64.f, +64.f);
 			modulator = std::clamp(modulator, 0.0f, 128.0f);
 
-			crossfade += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			crossfade += random * fastRand(-64.f, +64.f);
 			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
 		}
 		else
 		{
-			pressure += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			pressure += random * fastRand(-64.f, +64.f);
 			pressure = std::clamp(pressure, 0.0f, 128.0f);
 
-			speed += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			speed += random * fastRand(-64.f, +64.f);
 			speed = std::clamp(speed, 0.0f, 128.0f);
 		}
 

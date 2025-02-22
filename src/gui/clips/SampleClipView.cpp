@@ -34,7 +34,7 @@
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
-#include "SampleWaveform.h"
+#include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -61,6 +61,9 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 void SampleClipView::updateSample()
 {
 	update();
+
+	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
+
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
@@ -267,14 +270,22 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
-
-	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	QRect r = QRect( offset, spacing,
-			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
+	float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
 
 	const auto& sample = m_clip->m_sample;
-	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	SampleWaveform::visualize(waveform, p, r);
+	if (sample.sampleSize() > 0)
+	{
+		const auto param = SampleThumbnail::VisualizeParameters{
+			.sampleRect = QRect(offsetStart, spacing, sampleLength, height() - spacing),
+			.drawRect = QRect(0, spacing, width(), height() - spacing),
+			.viewportRect = pe->rect(),
+			.amplification = sample.amplification(),
+			.reversed = sample.reversed()
+		};
+
+		m_sampleThumbnail.visualize(param, p);
+	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
@@ -330,6 +341,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 void SampleClipView::reverseSample()
 {
 	m_clip->m_sample.setReversed(!m_clip->m_sample.reversed());
+	m_clip->setStartTimeOffset(m_clip->length() - m_clip->startTimeOffset() - m_clip->sampleLength());
 	Engine::getSong()->setModified();
 	update();
 }

@@ -30,12 +30,11 @@
 #include "Effect.h"
 
 #include "BasicFilters.h"
-#include "lmms_math.h"
 
 namespace lmms
 {
 
-constexpr inline float LOMM_MIN_FLOOR = 0.00012589;// -72 dBFS
+constexpr inline float LOMM_MIN_FLOOR = 0.00012589f;// -72 dBFS
 constexpr inline float LOMM_MAX_LOOKAHEAD = 20.f;
 constexpr inline float LOMM_AUTO_TIME_ADJUST = 5.f;
 
@@ -45,7 +44,8 @@ class LOMMEffect : public Effect
 public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -54,7 +54,7 @@ public:
 	
 	inline float msToCoeff(float ms)
 	{
-		return (ms == 0) ? 0 : exp(m_coeffPrecalc / ms);
+		return (ms == 0) ? 0 : std::exp(m_coeffPrecalc / ms);
 	}
 
 private slots:

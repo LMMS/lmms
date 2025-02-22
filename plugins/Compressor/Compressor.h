@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-constexpr float COMP_LOG = -2.2;
+constexpr float COMP_LOG = -2.2f;
 
 class CompressorEffect : public Effect
 {
@@ -43,7 +43,9 @@ class CompressorEffect : public Effect
 public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~CompressorEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	void processBypassedImpl() override;
 
 	EffectControls* controls() override
 	{
@@ -76,8 +78,6 @@ private:
 	float msToCoeff(float ms);
 
 	inline void calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum);
-	inline int realmod(int k, int n);
-	inline float realfmod(float k, float n);
 
 	enum class StereoLinkMode { Unlinked, Maximum, Average, Minimum, Blend };
 
@@ -105,7 +105,7 @@ private:
 
 	float m_coeffPrecalc;
 
-	sampleFrame m_maxLookaheadVal;
+	SampleFrame m_maxLookaheadVal;
 
 	int m_maxLookaheadTimer[2] = {1, 1};
 	

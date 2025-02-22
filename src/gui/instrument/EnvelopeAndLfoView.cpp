@@ -25,11 +25,14 @@
 
 #include "EnvelopeAndLfoView.h"
 
+#include <string_view>
+
+#include <QBoxLayout>
+
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "SampleLoader.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "DataFile.h"
@@ -38,9 +41,6 @@
 #include "TempoSyncKnob.h"
 #include "TextFloat.h"
 #include "Track.h"
-
-#include <QBoxLayout>
-
 
 namespace lmms
 {
@@ -63,7 +63,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 		return knob;
 	};
 
-	auto buildPixmapButton = [&](const QString& activePixmap, const QString& inactivePixmap)
+	auto buildPixmapButton = [&](std::string_view activePixmap, std::string_view inactivePixmap)
 	{
 		auto button = new PixmapButton(this, nullptr);
 		button->setActiveGraphic(embed::getIconPixmap(activePixmap));

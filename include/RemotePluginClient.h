@@ -44,6 +44,8 @@
 namespace lmms
 {
 
+class SampleFrame;
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:
@@ -58,8 +60,8 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	virtual void process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf ) = 0;
+	virtual void process( const SampleFrame* _in_buf,
+					SampleFrame* _out_buf ) = 0;
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
@@ -307,7 +309,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 		default:
 		{
 			char buf[64];
-			sprintf( buf, "undefined message: %d\n", (int) _m.id );
+			std::snprintf(buf, 64, "undefined message: %d\n", _m.id);
 			debugMessage( buf );
 			break;
 		}
@@ -342,8 +344,8 @@ void RemotePluginClient::doProcessing()
 {
 	if (m_audioBuffer)
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
-				(sampleFrame *)( m_audioBuffer.get() +
+		process( (SampleFrame*)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
+				(SampleFrame*)( m_audioBuffer.get() +
 					( m_inputCount*m_bufferSize ) ) );
 	}
 	else

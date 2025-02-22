@@ -41,6 +41,7 @@
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
+#include "KeyboardShortcuts.h"
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
@@ -113,7 +114,6 @@ ClipView::ClipView( Clip * clip,
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
 	setCursor( m_cursorHand );
@@ -356,7 +356,7 @@ void ClipView::selectColor()
 	// Get a color from the user
 	const auto newColor = ColorChooser{this}
 		.withPalette(ColorChooser::Palette::Track)
-		->getColor(m_clip->color().value_or(palette().background().color()));
+		->getColor(m_clip->color().value_or(palette().window().color()));
 	if (newColor.isValid()) { setColor(newColor); }
 }
 
@@ -534,8 +534,9 @@ DataFile ClipView::createClipDataFiles(
 	{
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
-		int trackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack));
-		assert(trackIndex != tc->tracks().size());
+		const auto trackIt = std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack);
+		assert(trackIt != tc->tracks().end());
+		int trackIndex = std::distance(tc->tracks().begin(), trackIt);
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", static_cast<int>(clipTrack->type()) );
@@ -632,7 +633,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
+		if (me->modifiers() & KBD_COPY_MODIFIER && !(sClip && knifeMode))
 		{
 			if( isSelected() )
 			{
@@ -725,7 +726,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_COPY_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -823,7 +824,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
-	if( me->modifiers() & Qt::ControlModifier )
+	if (me->modifiers() & KBD_COPY_MODIFIER)
 	{
 		delete m_hint;
 		m_hint = nullptr;
@@ -1413,7 +1414,7 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 		endQ = endQ - m_clip->length();
 
 		// Select the position closest to actual position
-		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
+		if (std::abs(newPos - startQ) < std::abs(newPos - endQ)) { newPos = startQ; }
 		else newPos = endQ;
 	}
 	else
@@ -1456,7 +1457,7 @@ TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 		const TimePos rightOff = m_clip->length() - midiPos;
 		const TimePos rightPos = m_clip->length() - rightOff.quantize( snapSize );
 		//...whichever gives a position closer to the cursor
-		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
+		if (std::abs(leftPos - midiPos) < std::abs(rightPos - midiPos)) { return leftPos; }
 		else { return rightPos; }
 	}
 	else

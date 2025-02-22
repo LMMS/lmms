@@ -22,10 +22,9 @@
  *
  */
 
+#include "Monstro.h"
 
 #include <QDomElement>
-
-#include "Monstro.h"
 
 #include "ComboBox.h"
 #include "Engine.h"
@@ -34,7 +33,6 @@
 #include "interpolation.h"
 
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
@@ -110,7 +108,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 }
 
 
-void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
+void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 {
 	float modtmp; // temp variable for freq modulation
 // macros for modulating with env/lfos
@@ -120,7 +118,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_e2 != 0.0f ) modtmp += m_env[1][f] * mod##_e2; \
 		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0][f] * mod##_l1; \
 		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1][f] * mod##_l2; \
-		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
+		(car) = qBound( MIN_FREQ, (car) * std::exp2(modtmp), MAX_FREQ);
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
@@ -514,7 +512,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 		
 		sample_t O2R = 0.;
-		if (len_r != 0.)
+		if (pd_r != 0.)
 		{
 			len_r = BandLimitedWave::pdToLen(pd_r);
 			if (m_counter2r > 0)
@@ -625,8 +623,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			sub = qBound( 0.0f, sub, 1.0f );
 		}
 
-		sample_t O3L = linearInterpolate( O3AL, O3BL, sub );
-		sample_t O3R = linearInterpolate( O3AR, O3BR, sub );
+		sample_t O3L = std::lerp(O3AL, O3BL, sub);
+		sample_t O3R = std::lerp(O3AR, O3BR, sub);
 
 		// modulate volume
 		O3L *= o3lv;
@@ -665,8 +663,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		_buf[f][0] = linearInterpolate( L, m_l_last, m_parent->m_integrator );
-		_buf[f][1] = linearInterpolate( R, m_r_last, m_parent->m_integrator );
+		_buf[f][0] = std::lerp(L, m_l_last, m_parent->m_integrator);
+		_buf[f][1] = std::lerp(R, m_r_last, m_parent->m_integrator);
 
 		m_l_last = L;
 		m_r_last = R;
@@ -685,7 +683,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 }
 
 
-inline void MonstroSynth::updateModulators( float * env1, float * env2, float * lfo1, float * lfo2, int frames )
+inline void MonstroSynth::updateModulators(float * env1, float * env2, float * lfo1, float * lfo2, f_cnt_t frames)
 {
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
@@ -790,7 +788,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 		// attack
 		for( f_cnt_t f = 0; f < frames; ++f )
 		{
-			if( tfp + f < m_lfoatt[i] ) lfo[i][f] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
+			if (tfp + f < static_cast<f_cnt_t>(m_lfoatt[i])) { lfo[i][f] *= static_cast<sample_t>(tfp) / m_lfoatt[i]; }
 		}
 
 
@@ -858,38 +856,38 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 {
 	if( m_parent->m_slope[slope] == 1.0f ) return s;
 	if( s == 0.0f ) return s;
-	return fastPow( s, m_parent->m_slope[slope] );
+	return fastPow(s, m_parent->m_slope[slope]);
 }
 
 
 MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		Instrument( _instrument_track, &monstro_plugin_descriptor ),
 
-		m_osc1Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 1 volume" ) ),
-		m_osc1Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 1 panning" ) ),
+		m_osc1Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 1 volume")),
+		m_osc1Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 1 panning")),
 		m_osc1Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 1 coarse detune" ) ),
 		m_osc1Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 fine detune left" ) ),
 		m_osc1Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 fine detune right" ) ),
-		m_osc1Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 1 stereo phase offset" ) ),
-		m_osc1Pw( 50.0, PW_MIN, PW_MAX, 0.01, this, tr( "Osc 1 pulse width" ) ),
+		m_osc1Spo(0.f, -180.f, 180.f, 0.1f, this, tr("Osc 1 stereo phase offset")),
+		m_osc1Pw(50.f, PW_MIN, PW_MAX, 0.01f, this, tr("Osc 1 pulse width")),
 		m_osc1SSR( false, this, tr( "Osc 1 sync send on rise" ) ),
 		m_osc1SSF( false, this, tr( "Osc 1 sync send on fall" ) ),
 
-		m_osc2Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 2 volume" ) ),
-		m_osc2Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 2 panning" ) ),
+		m_osc2Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 2 volume")),
+		m_osc2Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 2 panning")),
 		m_osc2Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 2 coarse detune" ) ),
 		m_osc2Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 fine detune left" ) ),
 		m_osc2Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 fine detune right" ) ),
-		m_osc2Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 2 stereo phase offset" ) ),
+		m_osc2Spo(0.f, -180.f, 180.f, 0.1f, this, tr("Osc 2 stereo phase offset")),
 		m_osc2Wave( this, tr( "Osc 2 waveform" ) ),
 		m_osc2SyncH( false, this, tr( "Osc 2 sync hard" ) ),
 		m_osc2SyncR( false, this, tr( "Osc 2 sync reverse" ) ),
 
-		m_osc3Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 3 volume" ) ),
-		m_osc3Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 panning" ) ),
+		m_osc3Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 3 volume")),
+		m_osc3Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 3 panning")),
 		m_osc3Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 3 coarse detune" ) ),
-		m_osc3Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 3 Stereo phase offset" ) ),
-		m_osc3Sub( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 sub-oscillator mix" ) ),
+		m_osc3Spo(0.f, -180.f, 180.f, 0.1f, this, tr("Osc 3 Stereo phase offset")),
+		m_osc3Sub(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 3 sub-oscillator mix")),
 		m_osc3Wave1( this, tr( "Osc 3 waveform 1" ) ),
 		m_osc3Wave2( this, tr( "Osc 3 waveform 2" ) ),
 		m_osc3SyncH( false, this, tr( "Osc 3 sync hard" ) ),
@@ -897,13 +895,13 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 		m_lfo1Wave( this, tr( "LFO 1 waveform" ) ),
 		m_lfo1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 1 attack" ) ),
-		m_lfo1Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 1 rate" ) ),
-		m_lfo1Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 1 phase" ) ),
+		m_lfo1Rate(1.0f, 0.1f, 10000.f, 0.1f, 10000.0f, this, tr("LFO 1 rate")),
+		m_lfo1Phs(0.f, -180.f, 180.f, 0.1f, this, tr("LFO 1 phase")),
 
 		m_lfo2Wave( this, tr( "LFO 2 waveform" ) ),
 		m_lfo2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 2 attack" ) ),
-		m_lfo2Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 2 rate" ) ),
-		m_lfo2Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 2 phase" ) ),
+		m_lfo2Rate(1.0f, 0.1f, 10000.f, 0.1f, 10000.0f, this, tr("LFO 2 rate")),
+		m_lfo2Phs(0.0, -180.f, 180.f, 0.1f, this, tr("LFO 2 phase")),
 
 		m_env1Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 pre-delay" ) ),
 		m_env1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 attack" ) ),
@@ -1062,7 +1060,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 
 void MonstroInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -1361,25 +1359,25 @@ void MonstroInstrument::updateVolume3()
 
 void MonstroInstrument::updateFreq1()
 {
-	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc1Ftl.value() / 1200.0f );
-	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc1Ftr.value() / 1200.0f );
+	m_osc1l_freq = std::exp2(m_osc1Crs.value() / 12.0f)
+		* std::exp2(m_osc1Ftl.value() / 1200.0f);
+	m_osc1r_freq = std::exp2(m_osc1Crs.value() / 12.0f)
+		* std::exp2(m_osc1Ftr.value() / 1200.0f);
 }
 
 
 void MonstroInstrument::updateFreq2()
 {
-	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc2Ftl.value() / 1200.0f );
-	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc2Ftr.value() / 1200.0f );
+	m_osc2l_freq = std::exp2(m_osc2Crs.value() / 12.0f)
+		* std::exp2(m_osc2Ftl.value() / 1200.0f);
+	m_osc2r_freq = std::exp2(m_osc2Crs.value() / 12.0f)
+		* std::exp2(m_osc2Ftr.value() / 1200.0f);
 }
 
 
 void MonstroInstrument::updateFreq3()
 {
-	m_osc3_freq = powf( 2.0f, m_osc3Crs.value() / 12.0f );
+	m_osc3_freq = std::exp2(m_osc3Crs.value() / 12.0f);
 }
 
 
@@ -1462,14 +1460,14 @@ void MonstroInstrument::updateSamplerate()
 void MonstroInstrument::updateSlope1()
 {
 	const float slope = m_env1Slope.value();
-	m_slope[0] = std::pow(10.f, slope * -1.0f );
+	m_slope[0] = fastPow10f(-slope);
 }
 
 
 void MonstroInstrument::updateSlope2()
 {
 	const float slope = m_env2Slope.value();
-	m_slope[1] = std::pow(10.f, slope * -1.0f );
+	m_slope[1] = fastPow10f(-slope);
 }
 
 

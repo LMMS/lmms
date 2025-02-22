@@ -59,7 +59,6 @@
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
-#include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -105,7 +104,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString& ) ),
 				this, SLOT( textChanged( const QString& ) ) );
 
-	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	nameAndChangeTrackLayout->addWidget(m_nameLineEdit, 1);
 
 
@@ -118,7 +117,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
-
+	nameAndChangeTrackWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	generalSettingsLayout->addWidget( nameAndChangeTrackWidget );
 
 	auto basicControlsLayout = new QGridLayout;
@@ -137,7 +136,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 #endif
 
-	QString labelStyleSheet = "font-size: 6pt;";
+	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
@@ -238,8 +237,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
 
 	// FUNC tab
-	auto instrumentFunctions = new QWidget(m_tabWidget);
-	auto instrumentFunctionsLayout = new QVBoxLayout(instrumentFunctions);
+	m_instrumentFunctionsView = new QWidget(m_tabWidget);
+	auto instrumentFunctionsLayout = new QVBoxLayout(m_instrumentFunctionsView);
 	instrumentFunctionsLayout->setContentsMargins(5, 5, 5, 5);
 	m_noteStackingView = new InstrumentFunctionNoteStackingView( &m_track->m_noteStacking );
 	m_arpeggioView = new InstrumentFunctionArpeggioView( &m_track->m_arpeggio );
@@ -259,20 +258,20 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	m_tabWidget->addTab(m_ssView, tr("Envelope, filter & LFO"), "env_lfo_tab", 1);
-	m_tabWidget->addTab(instrumentFunctions, tr("Chord stacking & arpeggio"), "func_tab", 2);
+	m_tabWidget->addTab(m_instrumentFunctionsView, tr("Chord stacking & arpeggio"), "func_tab", 2);
 	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", 3);
 	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", 4);
 	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
-	adjustTabSize(m_ssView);
-	adjustTabSize(instrumentFunctions);
-	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
-	adjustTabSize(m_midiView);
-	adjustTabSize(m_tuningView);
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
 	m_pianoView->setMinimumHeight( PIANO_HEIGHT );
 	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
+
+	// setup sizes and policies
+	generalSettingsWidget->setMaximumHeight(90);
+	generalSettingsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	vlayout->addWidget( generalSettingsWidget );
 	// Use QWidgetItem explicitly to make the size hint change on instrument changes
@@ -281,25 +280,27 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
-	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
-
 	updateInstrumentView();
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at( 2 )->setVisible( false ); // Size
-	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
+	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 
-	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
-	subWin->setMinimumSize( subWin->size() );
+	// The previous call should have given us a sub window parent. Therefore
+	// we can reuse this method.
+	updateSubWindow();
+
+	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
 }
 
+void InstrumentTrackWindow::resizeEvent(QResizeEvent * event) {
+	/* m_instrumentView->resize(QSize(size().width()-1, maxHeight)); */
+	adjustTabSize(m_instrumentView);
+	adjustTabSize(m_instrumentFunctionsView);
+	adjustTabSize(m_ssView);
+	adjustTabSize(m_effectView);
+	adjustTabSize(m_midiView);
+	adjustTabSize(m_tuningView);
+}
 
 
 
@@ -391,6 +392,8 @@ void InstrumentTrackWindow::modelChanged()
 	m_tuningView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
 	m_tuningView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
+
+	updateSubWindow();
 }
 
 
@@ -424,8 +427,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		DataFile dataFile(DataFile::Type::InstrumentTrackSettings);
 		QDomElement& content(dataFile.content());
 
-		m_track->setSimpleSerializing();
-		m_track->saveSettings(dataFile, content);
+		m_track->savePreset(dataFile, content);
 		//We don't want to save muted & solo settings when we're saving a preset
 		content.setAttribute("muted", 0);
 		content.setAttribute("solo", 0);
@@ -669,6 +671,13 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 	}
 	Q_ASSERT(bringToFront);
 	bringToFront->getInstrumentTrackWindow()->setFocus();
+	Qt::WindowFlags flags = windowFlags();
+	if (!m_instrumentView->isResizable()) {
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+	} else {
+		flags &= ~Qt::MSWindowsFixedSizeDialogHint;
+	}
+	setWindowFlags( flags );
 }
 
 void InstrumentTrackWindow::viewNextInstrument()
@@ -685,8 +694,79 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	// "-1" :
 	// in "TabWidget::addTab", under "Position tab's window", the widget is
 	// moved up by 1 pixel
-	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
+	w->resize(width() - 4, height() - 180);
+	w->update();
 }
 
+QMdiSubWindow* InstrumentTrackWindow::findSubWindowInParents()
+{
+	// TODO Move to helper? Does not seem to be provided by Qt.
+	auto p = parentWidget();
+
+	while (p != nullptr)
+	{
+		auto mdiSubWindow = dynamic_cast<QMdiSubWindow*>(p);
+		if (mdiSubWindow)
+		{
+			return mdiSubWindow;
+		}
+		else
+		{
+			p = p->parentWidget();
+		}
+	}
+
+	return nullptr;
+}
+
+void InstrumentTrackWindow::updateSubWindow()
+{
+	auto subWindow = findSubWindowInParents();
+	if (subWindow && m_instrumentView)
+	{
+		Qt::WindowFlags flags = subWindow->windowFlags();
+
+		const auto instrumentViewResizable = m_instrumentView->isResizable();
+
+		if (instrumentViewResizable)
+		{
+			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
+			const auto extraSpace = QSize(12, 208);
+			subWindow->setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
+			subWindow->setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
+
+			flags &= ~Qt::MSWindowsFixedSizeDialogHint;
+			flags |= Qt::WindowMaximizeButtonHint;
+		}
+		else
+		{
+			flags |= Qt::MSWindowsFixedSizeDialogHint;
+			flags &= ~Qt::WindowMaximizeButtonHint;
+
+			// The sub window might be reused from an instrument that was maximized. Show the sub window
+			// as normal, i.e. not maximized, if the instrument view is not resizable.
+			if (subWindow->isMaximized())
+			{
+				subWindow->showNormal();
+			}
+		}
+
+		subWindow->setWindowFlags(flags);
+
+		// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
+		QMenu * systemMenu = subWindow->systemMenu();
+		systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
+		systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
+		
+		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
+		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
+		// missing some implementation details that QMdiSubWindow has.
+		auto subWin = dynamic_cast<SubWindow*>(subWindow);
+		if (subWin)
+		{
+			subWin->updateTitleBar();
+		}
+	}
+}
 
 } // namespace lmms::gui

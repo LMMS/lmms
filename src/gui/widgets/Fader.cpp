@@ -55,6 +55,7 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
 
 namespace lmms::gui
@@ -72,7 +73,6 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	}
 
 	setWindowTitle(name);
-	setAttribute(Qt::WA_OpaquePaintEvent, false);
 	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
 	constexpr QSize minimumSize(23, 116);
 	setMinimumSize(minimumSize);
@@ -125,7 +125,7 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
 	if (mouseEvent->button() == Qt::LeftButton &&
-			!(mouseEvent->modifiers() & Qt::ControlModifier))
+			!(mouseEvent->modifiers() & KBD_COPY_MODIFIER))
 	{
 		AutomatableModel* thisModel = model();
 		if (thisModel)
@@ -193,15 +193,9 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 void Fader::wheelEvent (QWheelEvent* ev)
 {
 	ev->accept();
+	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	if (ev->angleDelta().y() > 0)
-	{
-		model()->incValue(1);
-	}
-	else
-	{
-		model()->incValue(-1);
-	}
+	model()->incValue(direction);
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut(1000);
 }
@@ -213,8 +207,6 @@ void Fader::wheelEvent (QWheelEvent* ev)
 ///
 void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer)
 {
-	fPeak = std::clamp(fPeak, m_fMinPeak, m_fMaxPeak);
-
 	if (targetPeak != fPeak)
 	{
 		targetPeak = fPeak;
@@ -222,6 +214,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 		{
 			persistentPeak = targetPeak;
 			lastPeakTimer.restart();
+			emit peakChanged(persistentPeak);
 		}
 		update();
 	}
@@ -229,6 +222,7 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
 		persistentPeak = qMax<float>(0, persistentPeak-0.05);
+		emit peakChanged(persistentPeak);
 		update();
 	}
 }
@@ -288,20 +282,17 @@ void Fader::paintEvent(QPaintEvent* ev)
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 {
-	std::function<float(float value)> mapper = [this](float value) { return ampToDbfs(qMax<float>(0.0001, value)); };
+	const auto mapper = linear
+		? +[](float value) -> float { return value; }
+		: +[](float value) -> float { return ampToDbfs(qMax(0.0001f, value)); };
 
-	if (linear)
-	{
-		mapper = [this](float value) { return value; };
-	}
-
-	const float mappedMinPeak(mapper(m_fMinPeak));
-	const float mappedMaxPeak(mapper(m_fMaxPeak));
-	const float mappedPeakL(mapper(m_fPeakValue_L));
-	const float mappedPeakR(mapper(m_fPeakValue_R));
-	const float mappedPersistentPeakL(mapper(m_persistentPeak_L));
-	const float mappedPersistentPeakR(mapper(m_persistentPeak_R));
-	const float mappedUnity(mapper(1.f));
+	const float mappedMinPeak = mapper(m_fMinPeak);
+	const float mappedMaxPeak = mapper(m_fMaxPeak);
+	const float mappedPeakL = mapper(m_fPeakValue_L);
+	const float mappedPeakR = mapper(m_fPeakValue_R);
+	const float mappedPersistentPeakL = mapper(m_persistentPeak_L);
+	const float mappedPersistentPeakR = mapper(m_persistentPeak_R);
+	const float mappedUnity = mapper(1.f);
 
 	painter.save();
 
@@ -381,10 +372,10 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// Please ensure that "clip starts" is the maximum value and that "ok ends"
 	// is the minimum value and that all other values lie inbetween. Otherwise
 	// there will be warnings when the gradient is defined.
-	const float mappedClipStarts(mapper(dbfsToAmp(0.f)));
-	const float mappedWarnEnd(mapper(dbfsToAmp(-0.01)));
-	const float mappedWarnStart(mapper(dbfsToAmp(-6.f)));
-	const float mappedOkEnd(mapper(dbfsToAmp(-12.f)));
+	const float mappedClipStarts = mapper(dbfsToAmp(0.f));
+	const float mappedWarnEnd = mapper(dbfsToAmp(-0.01f));
+	const float mappedWarnStart = mapper(dbfsToAmp(-6.f));
+	const float mappedOkEnd = mapper(dbfsToAmp(-12.f));
 
 	// Prepare the gradient for the meters
 	//

@@ -28,7 +28,7 @@
 
 #include "Oscilloscope.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -51,13 +51,12 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	m_buffer = new sampleFrame[frames];
+	m_buffer = new SampleFrame[frames];
 
-	BufferManager::clear( m_buffer, frames );
+	zeroSampleFrames(m_buffer, frames);
 
 
 	setToolTip(tr("Oscilloscope"));
@@ -75,12 +74,12 @@ Oscilloscope::~Oscilloscope()
 
 
 
-void Oscilloscope::updateAudioBuffer( const surroundSampleFrame * buffer )
+void Oscilloscope::updateAudioBuffer(const SampleFrame* buffer)
 {
 	if( !Engine::getSong()->isExporting() )
 	{
 		const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
-		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
+		memcpy(m_buffer, buffer, sizeof(SampleFrame) * fpp);
 	}
 }
 
@@ -96,8 +95,8 @@ void Oscilloscope::setActive( bool _active )
 					SIGNAL(periodicUpdate()),
 					this, SLOT(update()));
 		connect( Engine::audioEngine(),
-			SIGNAL(nextAudioBuffer(const lmms::surroundSampleFrame*)),
-			this, SLOT(updateAudioBuffer(const lmms::surroundSampleFrame*)) );
+			SIGNAL(nextAudioBuffer(const lmms::SampleFrame*)),
+			this, SLOT(updateAudioBuffer(const lmms::SampleFrame*)));
 	}
 	else
 	{
@@ -105,8 +104,8 @@ void Oscilloscope::setActive( bool _active )
 					SIGNAL(periodicUpdate()),
 					this, SLOT(update()));
 		disconnect( Engine::audioEngine(),
-			SIGNAL( nextAudioBuffer( const lmms::surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const lmms::surroundSampleFrame* ) ) );
+			SIGNAL(nextAudioBuffer(const lmms::SampleFrame*)),
+			this, SLOT(updateAudioBuffer(const lmms::SampleFrame*)));
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();
@@ -168,10 +167,10 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 		float masterOutput = audioEngine->masterGain();
 
 		const fpp_t frames = audioEngine->framesPerPeriod();
-		AudioEngine::StereoSample peakValues = audioEngine->getPeakValues(m_buffer, frames);
+		SampleFrame peakValues = getAbsPeakValues(m_buffer, frames);
 
-		auto const leftChannelClips = clips(peakValues.left * masterOutput);
-		auto const rightChannelClips = clips(peakValues.right * masterOutput);
+		auto const leftChannelClips = clips(peakValues.left() * masterOutput);
+		auto const rightChannelClips = clips(peakValues.right() * masterOutput);
 
 		p.setRenderHint( QPainter::Antialiasing );
 
@@ -190,7 +189,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 				otherChannelsColor(); // Any other channel
 			p.setPen(QPen(color, width));
 
-			for( int frame = 0; frame < frames; ++frame )
+			for (auto frame = std::size_t{0}; frame < frames; ++frame)
 			{
 				sample_t const clippedSample = AudioEngine::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(
@@ -203,7 +202,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	else
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont(adjustedToPixelSize(p.font(), 10));
+		p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
 		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }
