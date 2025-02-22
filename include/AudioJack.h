@@ -37,13 +37,13 @@
 #include <atomic>
 #include <vector>
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
-	#include <QMap>
+#include <QMap>
 #endif
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
-	#include "AudioBusHandle.h"
+#include "AudioBusHandle.h"
 #endif
 
 class QLineEdit;
