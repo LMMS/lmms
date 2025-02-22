@@ -28,8 +28,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "lmmsconfig.h"
-
 
 namespace lmms
 {
