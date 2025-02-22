@@ -630,6 +630,13 @@ IF(NOT CMAKE_BUILD_TYPE)
 		"MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
+if(NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR LMMS_DEBUG))
+    add_compile_definitions(NDEBUG)
+else()
+    remove_definitions(-DNDEBUG)
+endif()
+
+
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
