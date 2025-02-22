@@ -29,7 +29,7 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
-#include "BufferManager.h"
+#include "BufferPool.h"
 
 namespace lmms
 {
@@ -38,7 +38,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
 		BoolModel * mutedModel ) :
 	m_bufferUsage( false ),
-	m_portBuffer( BufferManager::acquire() ),
+	m_portBuffer( BufferPool::acquire() ),
 	m_extOutputEnabled( false ),
 	m_nextMixerChannel( 0 ),
 	m_name( "unnamed port" ),
@@ -58,7 +58,7 @@ AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
 	Engine::audioEngine()->removeAudioPort( this );
-	BufferManager::release( m_portBuffer );
+	BufferPool::release( m_portBuffer );
 }
 
 
