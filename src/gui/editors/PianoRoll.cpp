@@ -1399,7 +1399,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			}
 
 		case Qt::Key_A:
-			if( ke->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Strum && m_editMode != EditMode::Knife)
+			if (ke->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Strum && m_editMode != EditMode::Knife)
 			{
 				ke->accept();
 				if (ke->modifiers() & Qt::ShiftModifier)
@@ -4079,7 +4079,8 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 		m_editMode = m_knifeMode;
 		m_action = Action::None;
 	}
-	else if (m_editMode == EditMode::Strum) {
+	else if (m_editMode == EditMode::Strum)
+	{
 		m_editMode = m_strumMode;
 		m_action = Action::None;
 	}
