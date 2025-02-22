@@ -34,7 +34,6 @@
 
 #include "Engine.h"
 #include "lmms_math.h"
-#include "lmmsconfig.h"
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
