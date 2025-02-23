@@ -67,8 +67,12 @@ public:
 	}
 
 
-	void setCurrentMixerChannel(MixerChannelView* channel);
-	void setCurrentMixerChannel(int channel);
+	void setCurrentMixerChannel(MixerChannelView* channel, bool keepSelection = false, bool rangeSelect = false);
+	void setCurrentMixerChannel(int channel, bool keepSelection = false, bool rangeSelect = false);
+
+	void selectMixerChannelsInRange(int index1, int index2);
+
+	void sanitizeSelection();
 
 	void clear();
 
@@ -101,17 +105,9 @@ protected:
 
 private slots:
 	void updateFaders();
-	// TODO This should be improved. Currently the solo and mute models are connected via
-	// the MixerChannelView's constructor with the MixerView. It would already be an improvement
-	// if the MixerView connected itself to each new MixerChannel that it creates/handles.
-	void toggledSolo();
-	void toggledMute();
 
 private:
 	Mixer* getMixer() const;
-	void updateAllMixerChannels();
-	void connectToSoloAndMute(int channelIndex);
-	void disconnectFromSoloAndMute(int channelIndex);
 
 private:
 	QVector<MixerChannelView*> m_mixerChannelViews;
