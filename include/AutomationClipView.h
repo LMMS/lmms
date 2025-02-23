@@ -60,6 +60,7 @@ protected slots:
 	void toggleRecording();
 	void flipY();
 	void flipX();
+	void connectLastChangedModel();
 
 protected:
 	void constructContextMenu( QMenu * ) override;
