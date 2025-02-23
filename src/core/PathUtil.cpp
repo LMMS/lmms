@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <filesystem>
 
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -188,4 +189,21 @@ namespace lmms::PathUtil
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
+	std::filesystem::path pathFromQString(const QString& path)
+	{
+#ifdef LMMS_BUILD_WIN32
+		return std::filesystem::path{path.toStdWString()};
+#else
+		return std::filesystem::path{path.toUtf8().constData()};
+#endif
+	}
+
+	QString qStringFromPath(const std::filesystem::path& path)
+	{
+#ifdef LMMS_BUILD_WIN32
+		return QString::fromWCharArray(path.c_str());
+#else
+		return QString::fromUtf8(path.c_str());
+#endif
+	}
 } // namespace lmms::PathUtil
