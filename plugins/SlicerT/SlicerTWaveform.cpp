@@ -51,7 +51,7 @@ static QColor s_playHighlightColor = QColor(255, 255, 255, 70); // now playing n
 // slice markers
 static QColor s_sliceColor = QColor(218, 193, 255);			 // color of slice marker
 static QColor s_sliceShadowColor = QColor(136, 120, 158);	 // color of dark side of slice marker
-static QColor s_sliceHighlightColor = QColor(255, 0, 0);     // color of highlighted slice marker
+static QColor s_sliceHighlightColor = QColor(200, 50, 50);     // color of highlighted slice marker
 
 // seeker rect colors
 static QColor s_seekerColor = QColor(178, 115, 255);			   // outline of seeker
@@ -476,6 +476,17 @@ void SlicerTWaveform::wheelEvent(QWheelEvent* we)
 	m_zoomLevel = std::max(0.0f, m_zoomLevel);
 
 	updateUI();
+}
+
+void SlicerTWaveform::leaveEvent(QEvent *event)
+{
+	m_closestObject = UIObjects::Nothing;
+	m_closestSlice = -1;
+
+	updateCursor();
+	drawSeeker();
+	drawEditor();
+	update();
 }
 
 void SlicerTWaveform::paintEvent(QPaintEvent* pe)
