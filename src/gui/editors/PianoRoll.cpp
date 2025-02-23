@@ -1634,6 +1634,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if (m_editMode == EditMode::Strum && me->button() == Qt::LeftButton)
 	{
+		// Only strum if the user is dragging a selected note
 		const auto& selectedNotes = getSelectedNotes();
 		if (std::find(selectedNotes.begin(), selectedNotes.end(), noteUnderMouse()) != selectedNotes.end())
 		{
