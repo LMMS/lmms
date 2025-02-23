@@ -467,8 +467,9 @@ private:
 	int m_knifeTickPos;
 	void updateKnifePos(QMouseEvent* me);
 
-
+	// Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;
+	// Computes which notes belog to which chords
 	void setupSelectedChords();
 
 	TimePos m_strumStartTime;
@@ -477,6 +478,7 @@ private:
 	int m_strumCurrentVertical;
 	float m_strumHeightRatio = 0.0f;
 	bool m_strumEnabled = false;
+	// Handles updating all of the note positions when performing a strum
 	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
 
 
