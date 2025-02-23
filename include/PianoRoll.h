@@ -456,9 +456,14 @@ private:
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
 
-	// Variable that holds the position in ticks for the knife action
-	int m_knifeTickPos;
-	void updateKnifePos(QMouseEvent* me);
+	// Variables that hold the start and end position for the knife line
+	TimePos m_knifeStartTickPos;
+	int m_knifeStartKey;
+	TimePos m_knifeEndTickPos;
+	int m_knifeEndKey;
+	bool m_knifeDown;
+
+	void updateKnifePos(QMouseEvent* me, bool initial);
 
 	friend class PianoRollWindow;
 
