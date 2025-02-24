@@ -414,7 +414,9 @@ void TrackView::wheelEvent(QWheelEvent* we)
 	{
 		resizeToHeight(height() + stepSize * direction);
 		we->accept();
+		return;
 	}
+	we->ignore();
 }
 
 
