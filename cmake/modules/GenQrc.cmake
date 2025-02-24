@@ -58,7 +58,7 @@ function(add_gen_qrc RCC_OUT QRC_NAME)
 	# generators. See issue #6177.
 	add_custom_command(
 		OUTPUT "${CPP_FILE}"
-		COMMAND Qt5::rcc
+		COMMAND Qt${QT_VERSION_MAJOR}::rcc
 			--name "${RESOURCE_NAME}"
 			--output "${CPP_FILE}"
 			"${QRC_FILE}"
