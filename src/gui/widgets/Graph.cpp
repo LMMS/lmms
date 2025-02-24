@@ -735,7 +735,6 @@ void graphModel::clearInvisible()
 void graphModel::drawSampleAt(int x, float val)
 {
 	// snap to the grid
-	// Should there be validation to make sure m_step <= 2 * maxvalue()?
 	if (m_step > 0.f) { val = std::floor(val / m_step) * m_step; }
 	// boundary crop
 	x = std::clamp(x, 0, length() - 1);
