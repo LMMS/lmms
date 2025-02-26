@@ -52,7 +52,7 @@ public:
 	 * @brief Checks whether the file manager supports selecting a specific file.
 	 * @return True if selection is supported, otherwise false.
 	 */
-	static const QString& getSelectCommand();
+	static const QStringList& getSelectCommand();
 
 	/**
 	 * @brief Opens the file manager and selects the specified file if supported.

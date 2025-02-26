@@ -86,14 +86,19 @@ void FileRevealer::openDir(const QFileInfo item)
 	QProcess::startDetached(getDefaultFileManager(), {nativePath});
 }
 
-const QString& FileRevealer::getSelectCommand()
+const QStringList& FileRevealer::getSelectCommand()
 {
-	static std::optional<QString> selectCommandCache;
+	static std::optional<QStringList> selectCommandCache;
 
 	if (selectCommandCache.has_value()) { return selectCommandCache.value(); }
 
-	static const std::map<QString, QString> argMap = {
-		{"open", "-R"}, {"explorer", "/select,"}, {"nemo", ""}, {"thunar", ""}, {"exo-open", "--launch FileManager"}};
+	static const std::map<QString, QStringList> argMap = {
+		{"open", {"-R"}},
+		{"explorer", {"/select,"}},
+		{"nemo", {""}},
+		{"thunar", {""}},
+		{"exo-open", {"--launch", "FileManager"}},
+	};
 
 	// Skip calling "--help" for file managers that we know
 	for (const auto& [fileManager, arg] : argMap)
@@ -110,19 +115,19 @@ const QString& FileRevealer::getSelectCommand()
 	if (supportsArg(getDefaultFileManager(), "--select"))
 	{
 		s_canSelect = true;
-		selectCommandCache = "--select";
+		selectCommandCache = {"--select"};
 		return selectCommandCache.value();
 	}
 
-	// Fallback to empty string
-	selectCommandCache = "";
+	// Fallback to empty list
+	selectCommandCache = {};
 	return selectCommandCache.value();
 }
 
 void FileRevealer::reveal(const QFileInfo item)
 {
 	// Sets selectCommandCache, canSelect
-	const QString& selectCommand = getSelectCommand();
+	const QStringList& selectCommand = getSelectCommand();
 	if (!s_canSelect)
 	{
 		QDesktopServices::openUrl(QUrl::fromLocalFile(item.canonicalPath()));
