@@ -50,7 +50,6 @@ const QString& FileRevealer::getDefaultFileManager()
 
 	QString desktopEnv = qgetenv("XDG_CURRENT_DESKTOP").trimmed().toLower();
 
-	// Check for XFCE (exo-open)
 	if (desktopEnv.contains("xfce"))
 	{
 		fileManagerCache = "exo-open";
