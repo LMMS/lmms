@@ -58,7 +58,8 @@ const QString& FileRevealer::getDefaultFileManager()
 	}
 
 	QProcess process;
-	if(desktopEnv.contains("gnome")) {
+	if(desktopEnv.contains("gnome"))
+	{
 		process.start("gio", {"mime", "inode/directory"});
 	}
 	else {
