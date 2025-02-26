@@ -45,13 +45,8 @@ const QString& FileRevealer::getDefaultFileManager()
 #elif defined(LMMS_BUILD_APPLE)
 	fileManagerCache = "open";
 #else
-	QProcess process;
 
-	QString desktopEnv = qgetenv("XDG_SESSION_DESKTOP");
-	if (desktopEnv.isEmpty())
-	{
-		desktopEnv = qgetenv("XDG_CURRENT_DESKTOP").trimmed().toLower().split(':', Qt::SkipEmptyParts).first();
-	}
+	QString desktopEnv = qgetenv("XDG_CURRENT_DESKTOP").trimmed().toLower();
 
 	// Check for XFCE (exo-open)
 	if (desktopEnv.contains("xfce"))
@@ -60,6 +55,7 @@ const QString& FileRevealer::getDefaultFileManager()
 		return fileManagerCache.value();
 	}
 
+	QProcess process;
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 
 	process.waitForFinished(3000);
