@@ -50,11 +50,12 @@ const QString& FileRevealer::getDefaultFileManager()
 	QString desktopEnv = qgetenv("XDG_SESSION_DESKTOP");
 	if (desktopEnv.isEmpty())
 	{
-		desktopEnv = qgetenv("XDG_CURRENT_DESKTOP").trimmed().toLower().split(':').first();
+		desktopEnv = qgetenv("XDG_CURRENT_DESKTOP").trimmed().toLower().split(':', Qt::SkipEmptyParts).first();
 	}
 
 	// Check for XFCE (exo-open)
-	if (desktopEnv.contains("xfce")) {
+	if (desktopEnv.contains("xfce"))
+	{
 		fileManagerCache = "exo-open";
 		return fileManagerCache.value();
 	}
@@ -96,12 +97,7 @@ const QString& FileRevealer::getSelectCommand()
 	if (selectCommandCache.has_value()) { return selectCommandCache.value(); }
 
 	static const std::map<QString, QString> argMap = {
-		{"open", "-R"},
-		{"explorer", "/select,"},
-		{"nemo", ""},
-		{"thunar", ""},
-		{"exo-open", "--launch FileManager"}
-	};
+		{"open", "-R"}, {"explorer", "/select,"}, {"nemo", ""}, {"thunar", ""}, {"exo-open", "--launch FileManager"}};
 
 	// Skip calling "--help" for file managers that we know
 	for (const auto& [fileManager, arg] : argMap)
