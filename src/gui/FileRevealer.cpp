@@ -56,7 +56,14 @@ const QString& FileRevealer::getDefaultFileManager()
 		return fileManagerCache.value();
 	}
 
-	process.start("xdg-mime", {"query", "default", "inode/directory"});
+	if (!desktopEnv.contains("gnome"))
+	{
+		process.start("xdg-mime", {"query", "default", "inode/directory"});
+	} else
+	{
+		process.start("geo", {"mime", "inode/directory"});
+	}
+
 	process.waitForFinished(3000);
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
