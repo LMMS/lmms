@@ -47,22 +47,19 @@ const QString& FileRevealer::getDefaultFileManager()
 #else
 	QProcess process;
 
+	QString desktopEnv = qgetenv("XDG_SESSION_DESKTOP");
+	if (desktopEnv.isEmpty())
+	{
+		desktopEnv = qgetenv("XDG_CURRENT_DESKTOP").trimmed().toLower().split(':').first();
+	}
+
 	// Check for XFCE (exo-open)
-	process.start("xdg-current-desktop");
-	process.waitForFinished(1000);
-	QString desktopEnv = QString::fromUtf8(process.readAllStandardOutput()).trimmed().toLower();
 	if (desktopEnv.contains("xfce")) {
 		fileManagerCache = "exo-open";
 		return fileManagerCache.value();
 	}
 
-	if (!desktopEnv.contains("gnome"))
-	{
-		process.start("xdg-mime", {"query", "default", "inode/directory"});
-	} else
-	{
-		process.start("geo", {"mime", "inode/directory"});
-	}
+	process.start("xdg-mime", {"query", "default", "inode/directory"});
 
 	process.waitForFinished(3000);
 
