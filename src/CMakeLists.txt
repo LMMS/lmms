@@ -108,7 +108,7 @@ if(LMMS_BUILD_WIN32)
 	target_include_directories(lmms-console PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 	set_target_properties(lmms-console PROPERTIES WIN32_EXECUTABLE OFF)
 	target_static_libraries(lmms-console PUBLIC lmmsobjs)
-	install(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+	install(TARGETS lmms-console RUNTIME DESTINATION "${BIN_DIR}")
 endif()
 
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
