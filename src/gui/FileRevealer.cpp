@@ -46,6 +46,16 @@ const QString& FileRevealer::getDefaultFileManager()
 	fileManagerCache = "open";
 #else
 	QProcess process;
+
+	// Check for XFCE (exo-open)
+	process.start("xdg-current-desktop");
+	process.waitForFinished(1000);
+	QString desktopEnv = QString::fromUtf8(process.readAllStandardOutput()).trimmed().toLower();
+	if (desktopEnv.contains("xfce")) {
+		fileManagerCache = "exo-open";
+		return fileManagerCache.value();
+	}
+
 	process.start("xdg-mime", {"query", "default", "inode/directory"});
 	process.waitForFinished(3000);
 
@@ -86,6 +96,7 @@ const QString& FileRevealer::getSelectCommand()
 		{"explorer", "/select,"},
 		{"nemo", ""},
 		{"thunar", ""},
+		{"exo-open", "--launch FileManager"}
 	};
 
 	// Skip calling "--help" for file managers that we know
