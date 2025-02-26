@@ -85,6 +85,7 @@ const QString& FileRevealer::getSelectCommand()
 		{"open", "-R"},
 		{"explorer", "/select,"},
 		{"nemo", ""},
+		{"thunar", ""},
 	};
 
 	// Skip calling "--help" for file managers that we know
