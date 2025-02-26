@@ -102,6 +102,15 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 )
 target_static_libraries(lmms PUBLIC lmmsobjs)
 
+# Create a lmms-console CLI version for windows
+if(LMMS_BUILD_WIN32)
+	add_executable(lmms-console core/main.cpp "${WINRC}")
+	target_include_directories(lmms-console PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+	set_target_properties(lmms-console PROPERTIES WIN32_EXECUTABLE OFF)
+	target_static_libraries(lmms-console PUBLIC lmmsobjs)
+	install(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+endif()
+
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
 # See the documentation of DEFINE_SYMBOL for details.
 # Also add LMMS_STATIC_DEFINE for targets linking against it.
@@ -176,7 +185,7 @@ target_static_libraries(lmmsobjs ringbuffer)
 
 set_target_properties(lmms PROPERTIES
 	ENABLE_EXPORTS ON
-	WIN32_EXECUTABLE $<NOT:$<CONFIG:DEBUG>>
+	WIN32_EXECUTABLE ON
 )
 
 set_target_properties(lmmsobjs PROPERTIES AUTOUIC_SEARCH_PATHS "gui/modals")
