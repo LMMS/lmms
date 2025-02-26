@@ -264,9 +264,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
 
 	// setup piano-widget
+	auto pianoLayout = new QHBoxLayout(this);
 	m_pianoView = new PianoView( this );
 	m_pianoView->setMinimumHeight( PIANO_HEIGHT );
 	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
+	pianoLayout->addWidget(m_pianoView);
 
 	// setup sizes and policies
 	generalSettingsWidget->setMaximumHeight(90);
@@ -277,7 +279,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// Use QWidgetItem explicitly to make the size hint change on instrument changes
 	// QLayout::addWidget() uses QWidgetItemV2 with size hint caching
 	vlayout->insertItem(1, new QWidgetItem(m_tabWidget));
-	vlayout->addWidget( m_pianoView );
+	vlayout->addLayout(pianoLayout);
 	setModel( _itv->model() );
 
 	updateInstrumentView();
