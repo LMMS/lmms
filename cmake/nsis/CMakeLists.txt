@@ -63,6 +63,14 @@ if(CPACK_DEBUG)
 endif()
 
 # Windows resource compilers
+set(PROJECT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/project.ico")
+
+# lmms-console.exe icon
+set(EXE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/console.ico")
+configure_file("lmms.rc.in" "${CMAKE_BINARY_DIR}/lmms-console.rc")
+
+# lmms.exe icon
+set(EXE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.ico")
 CONFIGURE_FILE("lmms.rc.in"             "${CMAKE_BINARY_DIR}/lmms.rc")
 CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/ZynAddSubFx/zynaddsubfx.rc")
 

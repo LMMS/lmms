@@ -33,6 +33,7 @@ INCLUDE_DIRECTORIES(
 
 IF(WIN32 AND MSVC)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmms.rc")
+	set(WINRC_CONSOLE "${CMAKE_BINARY_DIR}/lmms-console.rc")
 ELSEIF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
@@ -41,6 +42,14 @@ ELSEIF(WIN32)
 					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
 					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
 				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
+
+	set(WINRC_CONSOLE "${CMAKE_BINARY_DIR}/console.obj")
+	add_custom_command(OUTPUT "${WINRC_CONSOLE}"
+				COMMAND "${CMAKE_RC_COMPILER}"
+					"-I\"${CMAKE_SOURCE_DIR}\""
+					"-o\"${CMAKE_BINARY_DIR}/console.obj\""
+					"-i\"${CMAKE_BINARY_DIR}/lmms-console.rc\""
+				DEPENDS "${CMAKE_BINARY_DIR}/lmms-console.rc")
 ENDIF()
 
 INCLUDE(GenQrc)
@@ -104,9 +113,9 @@ target_static_libraries(lmms PUBLIC lmmsobjs)
 
 # Create a lmms-console CLI version for windows
 if(LMMS_BUILD_WIN32)
-	add_executable(lmms-console core/main.cpp "${WINRC}")
+	add_executable(lmms-console core/main.cpp "${WINRC_CONSOLE}")
 	target_include_directories(lmms-console PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-	set_target_properties(lmms-console PROPERTIES WIN32_EXECUTABLE OFF)
+	set_target_properties(lmms-console PROPERTIES ENABLE_EXPORTS ON WIN32_EXECUTABLE OFF)
 	target_static_libraries(lmms-console PUBLIC lmmsobjs)
 	install(TARGETS lmms-console RUNTIME DESTINATION "${BIN_DIR}")
 endif()
