@@ -25,9 +25,11 @@
 #include "FileRevealer.h"
 
 #include <QDesktopServices>
+#include <QDebug>
 #include <QDir>
 #include <QProcess>
 #include <QString>
+#include <QRegularExpression>
 #include <QUrl>
 #include <optional>
 
@@ -56,18 +58,40 @@ const QString& FileRevealer::getDefaultFileManager()
 	}
 
 	QProcess process;
-	process.start("xdg-mime", {"query", "default", "inode/directory"});
+	if(desktopEnv.contains("gnome")) {
+		process.start("gio", {"mime", "inode/directory"});
+	}
+	else {
+		process.start("xdg-mime", {"query", "default", "inode/directory"});
+	}
 
 	process.waitForFinished(3000);
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
 
-	// Handle multiple entries by taking the last non-empty one
-	QStringList fileManagers = fileManager.split(';', Qt::SkipEmptyParts);
-	if (!fileManagers.isEmpty())
+	if(fileManager.contains("inode/directory"))
 	{
-		// The highest priority file manager is last
-		fileManager = fileManagers.last();
+		// gio format: split on ":" or "\n", take second element
+		QStringList fileManagers = fileManager.split(QRegularExpression("[:\n]"), Qt::SkipEmptyParts);
+		if(fileManagers.length() >= 2)
+		{
+			fileManagers.removeFirst();
+			fileManager = fileManagers.first().trimmed();
+		}
+		else {
+			// Fallback to something sane
+			fileManager = "xdg-open";
+		}
+	}
+	else
+	{
+		// xdg-mime format: split on ";", take the last non-empty element
+		QStringList fileManagers = fileManager.split(';', Qt::SkipEmptyParts);
+		if (!fileManagers.isEmpty())
+		{
+			// The highest priority file manager is last
+			fileManager = fileManagers.last();
+		}
 	}
 
 	if (fileManager.endsWith(".desktop")) { fileManager.chop(8); }
@@ -76,6 +100,7 @@ const QString& FileRevealer::getDefaultFileManager()
 	fileManager = fileManager.section('.', -1);
 	fileManagerCache = fileManager;
 #endif
+	qDebug() << "FileRevealer: Default app for inode/directory:" << fileManagerCache.value();
 	return fileManagerCache.value();
 }
 
