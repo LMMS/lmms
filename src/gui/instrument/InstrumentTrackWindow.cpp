@@ -141,31 +141,26 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 	
 	auto soloMuteLayout = new QVBoxLayout();
-	soloMuteLayout->setContentsMargins(0, 0, 0, 0);
-	soloMuteLayout->setSpacing(0);
+	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
+	soloMuteLayout->setSpacing(2);
 
 	m_muteBtn = new PixmapButton(this, tr("Mute"));
 	m_muteBtn->setModel(&m_track->m_mutedModel);
-	m_muteBtn->setActiveGraphic(embed::getIconPixmap("led_off"));
-	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("led_green"));
+	m_muteBtn->setActiveGraphic(embed::getIconPixmap("mute_active"));
+	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("mute_inactive"));
 	m_muteBtn->setCheckable(true);
 	m_muteBtn->setToolTip(tr("Mute this instrument"));
-	soloMuteLayout->addWidget(m_muteBtn, 0, Qt::AlignHCenter);
+	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
 
 	m_soloBtn = new PixmapButton(this, tr("Solo"));
 	m_soloBtn->setModel(&m_track->m_soloModel);
-	m_soloBtn->setActiveGraphic(embed::getIconPixmap("led_red"));
-	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("led_off"));
+	m_soloBtn->setActiveGraphic(embed::getIconPixmap("solo_active"));
+	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("solo_inactive"));
 	m_soloBtn->setCheckable(true);
 	m_soloBtn->setToolTip(tr("Solo this instrument"));
-	soloMuteLayout->addWidget(m_soloBtn, 0, Qt::AlignHCenter);
+	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
 
-	basicControlsLayout->addLayout(soloMuteLayout, 0, 0);
-
-	auto label = new QLabel(tr("M&S"), this);
-	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 0);
-	basicControlsLayout->setAlignment(label, labelAlignment);
+	basicControlsLayout->addLayout(soloMuteLayout, 0, 0, 2, 1, widgetAlignment);
 
 	// set up volume knob
 	m_volumeKnob = new Knob( KnobType::Bright26, nullptr, tr( "Volume" ) );
@@ -175,7 +170,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
 
-	label = new QLabel(tr("VOL"), this);
+	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 1);
 	basicControlsLayout->setAlignment(label, labelAlignment);

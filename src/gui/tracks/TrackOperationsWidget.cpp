@@ -84,7 +84,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
 	operationsLayout->setContentsMargins(0, 0, 0, 0);
-	operationsLayout->setSpacing(0);
+	operationsLayout->setSpacing(2);
 
 	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
@@ -124,33 +124,14 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		return wrapperWidget;
 	};
 
-	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "led_off", "led_green", m_muteBtn);
-	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "led_red", "led_off", m_soloBtn);
+	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "mute_active", "mute_inactive", m_muteBtn);
+	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "solo_active", "solo_inactive", m_soloBtn);
 
-	operationsLayout->addWidget(m_trackOps, Qt::AlignCenter);
-	operationsLayout->addSpacing(5);
+	operationsLayout->addWidget(m_trackOps);
+	operationsLayout->addWidget(muteWidget);
+	operationsLayout->addWidget(soloWidget);
 
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		auto vlayout = new QVBoxLayout();
-		vlayout->setContentsMargins(0, 0, 0, 0);
-		vlayout->setSpacing(0);
-		vlayout->addStretch(1);
-		vlayout->addWidget(muteWidget);
-		vlayout->addWidget(soloWidget);
-		vlayout->addStretch(1);
-		operationsLayout->addLayout(vlayout);
-	}
-	else
-	{
-		operationsLayout->addWidget(muteWidget, Qt::AlignCenter);
-		operationsLayout->addWidget(soloWidget, Qt::AlignCenter);
-	}
-
-	operationsLayout->addStretch(1);
-
-	layout->addWidget(operationsWidget, 0, Qt::AlignTop);
+	layout->addWidget(operationsWidget, 0, Qt::AlignCenter | Qt::AlignLeading);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
