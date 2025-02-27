@@ -14,7 +14,7 @@ if(STK_INCLUDE_DIRS)
 	list(GET STK_INCLUDE_DIRS 0 STK_INCLUDE_DIR)
 	find_path(STK_RAWWAVE_ROOT
 		NAMES silence.raw sinewave.raw
-		HINTS "${STK_INCLUDE_DIR}/.."
+		HINTS "${STK_INCLUDE_DIR}/.." "${STK_INCLUDE_DIR}/../.."
 		PATH_SUFFIXES share/stk/rawwaves share/libstk/rawwaves
 	)
 endif()
@@ -22,6 +22,6 @@ endif()
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(STK
-	REQUIRED_VARS STK_LIBRARY STK_INCLUDE_DIR
+	REQUIRED_VARS STK_LIBRARY STK_INCLUDE_DIR STK_RAWWAVE_ROOT
 	# STK doesn't appear to expose its version, so we can't pass it here
 )
