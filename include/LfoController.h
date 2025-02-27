@@ -32,7 +32,6 @@
 #include "Controller.h"
 #include "ControllerDialog.h"
 #include "TempoSyncKnobModel.h"
-#include "Oscillator.h"
 
 namespace lmms
 {
