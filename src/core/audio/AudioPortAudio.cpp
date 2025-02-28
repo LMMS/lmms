@@ -36,13 +36,13 @@
 namespace {
 constexpr auto configTag = "audioportaudio";
 
-constexpr auto outputDeviceAttribute = "outputdevice";
-constexpr auto outputDeviceBackendAttribute = "outputbackend";
-constexpr auto outputDeviceChannelsAttribute = "outputchannels";
+constexpr auto configOutputDeviceAttribute = "outputdevice";
+constexpr auto configOutputDeviceBackendAttribute = "outputbackend";
+constexpr auto configOutputDeviceChannelsAttribute = "outputchannels";
 
-constexpr auto inputDeviceAttribute = "inputdevice";
-constexpr auto inputDeviceBackendAttribute = "inputbackend";
-constexpr auto inputDeviceChannelsAttribute = "inputchannels";
+constexpr auto configInputDeviceAttribute = "inputdevice";
+constexpr auto configInputDeviceBackendAttribute = "inputbackend";
+constexpr auto configInputDeviceChannelsAttribute = "inputchannels";
 } // namespace
 
 namespace lmms {
@@ -52,16 +52,16 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 {
 	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
 
-	const auto outputDeviceName = ConfigManager::inst()->value(configTag, outputDeviceAttribute);
-	const auto outputDeviceBackend = ConfigManager::inst()->value(configTag, outputDeviceBackendAttribute);
-	const auto outputDeviceChannels = ConfigManager::inst()->value(configTag, outputDeviceChannelsAttribute);
+	const auto configOutputDeviceValue = ConfigManager::inst()->value(configTag, configOutputDeviceAttribute);
+	const auto configOutputDeviceBackendValue = ConfigManager::inst()->value(configTag, configOutputDeviceBackendAttribute);
+	const auto configOutputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configOutputDeviceChannelsAttribute);
 
-	const auto inputDeviceName = ConfigManager::inst()->value(configTag, inputDeviceAttribute);
-	const auto inputDeviceBackend = ConfigManager::inst()->value(configTag, inputDeviceBackendAttribute);
-	const auto inputDeviceChannels = ConfigManager::inst()->value(configTag, inputDeviceChannelsAttribute);
+	const auto configInputDeviceValue = ConfigManager::inst()->value(configTag, configInputDeviceAttribute);
+	const auto configInputDeviceBackendValue = ConfigManager::inst()->value(configTag, configInputDeviceBackendAttribute);
+	const auto configInputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configInputDeviceChannelsAttribute);
 
-	auto outputDevice = paNoDevice;
-	auto inputDevice = paNoDevice;
+	auto outputDeviceIndex = paNoDevice;
+	auto inputDeviceIndex = paNoDevice;
 
 	const auto deviceCount = Pa_GetDeviceCount();
 	if (deviceCount < 0) { throw std::runtime_error{"PortAudio: no available devices"}; }
@@ -77,70 +77,82 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 		const auto backendInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
 
-		if (outputDeviceName == deviceInfo->name && outputDeviceBackend == backendInfo->name)
+		if (configOutputDeviceValue == deviceInfo->name && configOutputDeviceBackendValue == backendInfo->name)
 		{
-			outputDevice = i;
+			outputDeviceIndex = i;
 			outputDeviceInfo = deviceInfo;
 			outputBackendInfo = backendInfo;
 		}
 
-		if (inputDeviceName == deviceInfo->name && inputDeviceBackend == backendInfo->name)
+		if (configInputDeviceValue == deviceInfo->name && configInputDeviceBackendValue == backendInfo->name)
 		{
-			inputDevice = i;
+			inputDeviceIndex = i;
 			inputDeviceInfo = deviceInfo;
 			inputBackendInfo = backendInfo;
 		}
 	}
 
-	outputDevice = outputDevice == paNoDevice ? Pa_GetDefaultOutputDevice() : outputDevice;
-	outputDeviceInfo = Pa_GetDeviceInfo(outputDevice);
-
-	inputDevice = inputDevice == paNoDevice ? Pa_GetDefaultInputDevice() : inputDevice;
-	inputDeviceInfo = Pa_GetDeviceInfo(inputDevice);
-
-	if (outputDevice == paNoDevice || inputDevice == paNoDevice)
+	if (outputDeviceIndex == paNoDevice)
 	{
-		throw std::runtime_error{"PortAudio: could not load input and output device"};
+		outputDeviceIndex = Pa_GetDefaultOutputDevice();
+		outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
+		outputBackendInfo = outputDeviceInfo == nullptr ? nullptr : Pa_GetHostApiInfo(outputDeviceInfo->hostApi);
 	}
 
-	auto outputDeviceChannelCount = outputDeviceChannels.toInt();
+	if (inputDeviceIndex == paNoDevice)
+	{
+		inputDeviceIndex = Pa_GetDefaultInputDevice();
+		inputDeviceInfo = Pa_GetDeviceInfo(inputDeviceIndex);
+		inputBackendInfo = inputDeviceInfo == nullptr ? nullptr : Pa_GetHostApiInfo(inputDeviceInfo->hostApi);
+	}
+
+	if (outputDeviceIndex == paNoDevice)
+	{
+		throw std::runtime_error{"PortAudio: could not find output device"};
+	}
+
+	if (inputDeviceIndex != paNoDevice)
+	{
+		m_supportsCapture = true;
+	}
+
+	auto outputDeviceChannelCount = configOutputDeviceChannelsValue.toInt();
 	if (outputDeviceChannelCount == 0) { outputDeviceChannelCount = DEFAULT_CHANNELS; }
 
-	auto inputDeviceChannelCount = inputDeviceChannels.toInt();
+	auto inputDeviceChannelCount = configInputDeviceChannelsValue.toInt();
 	if (inputDeviceChannelCount == 0) { inputDeviceChannelCount = DEFAULT_CHANNELS; }
 
 	const auto sampleRate = static_cast<double>(engine->outputSampleRate());
 	const auto framesPerBuffer = engine->framesPerPeriod();
 	const auto latency = framesPerBuffer / sampleRate;
 
-	const auto outputParameters = PaStreamParameters{.device = outputDevice,
+	const auto outputParameters = PaStreamParameters{.device = outputDeviceIndex,
 		.channelCount = outputDeviceChannelCount,
 		.sampleFormat = paFloat32,
 		.suggestedLatency = latency,
 		.hostApiSpecificStreamInfo = nullptr};
 
-	const auto inputParameters = PaStreamParameters{.device = inputDevice,
+	const auto inputParameters = PaStreamParameters{.device = inputDeviceIndex,
 		.channelCount = inputDeviceChannelCount,
 		.sampleFormat = paFloat32,
 		.suggestedLatency = latency,
 		.hostApiSpecificStreamInfo = nullptr};
 
-	const auto err = Pa_OpenStream(&m_paStream, &inputParameters, &outputParameters, sampleRate, framesPerBuffer,
-		paNoFlag, &processCallback, this);
+	const auto err = Pa_OpenStream(&m_paStream, inputDeviceIndex == paNoDevice ? nullptr : &inputParameters,
+		&outputParameters, sampleRate, framesPerBuffer, paNoFlag, &processCallback, this);
 
 	if (err != paNoError)
 	{
 		throw std::runtime_error{std::string{"PortAudio: could not open stream, "} + Pa_GetErrorText(err)};
 	}
 
-	ConfigManager::inst()->setValue(configTag, outputDeviceBackendAttribute, outputBackendInfo->name);
-	ConfigManager::inst()->setValue(configTag, outputDeviceAttribute, outputDeviceInfo->name);
-	ConfigManager::inst()->setValue(
-		configTag, outputDeviceChannelsAttribute, QString::number(outputDeviceChannelCount));
+	ConfigManager::inst()->setValue(configTag, configOutputDeviceAttribute, outputDeviceInfo->name);
+	ConfigManager::inst()->setValue(configTag, configOutputDeviceBackendAttribute, outputBackendInfo->name);
+	ConfigManager::inst()->setValue(configTag, configOutputDeviceChannelsAttribute, QString::number(outputDeviceChannelCount));
 
-	ConfigManager::inst()->setValue(configTag, inputDeviceBackendAttribute, inputBackendInfo->name);
-	ConfigManager::inst()->setValue(configTag, inputDeviceAttribute, inputDeviceInfo->name);
-	ConfigManager::inst()->setValue(configTag, inputDeviceChannelsAttribute, QString::number(inputDeviceChannelCount));
+	ConfigManager::inst()->setValue(configTag, configInputDeviceAttribute, inputDeviceInfo->name);
+	ConfigManager::inst()->setValue(configTag, configInputDeviceBackendAttribute, inputBackendInfo->name);
+	ConfigManager::inst()->setValue(configTag, configInputDeviceChannelsAttribute, QString::number(inputDeviceChannelCount));
 }
 
 AudioPortAudio::~AudioPortAudio()
