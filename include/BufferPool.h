@@ -1,5 +1,5 @@
 /*
- * BufferManager.h - A buffer caching/memory management system
+ * BufferPool.h
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef LMMS_BUFFER_MANAGER_H
-#define LMMS_BUFFER_MANAGER_H
+#pragma once
 
 #include "lmms_export.h"
 #include "lmms_basics.h"
@@ -34,7 +33,8 @@ namespace lmms
 
 class SampleFrame;
 
-class LMMS_EXPORT BufferManager
+/// Legacy interface for buffer re-use. Uses MemoryPool internally now.
+class LMMS_EXPORT BufferPool
 {
 public:
 	static void init( fpp_t fpp );
@@ -47,5 +47,3 @@ private:
 
 
 } // namespace lmms
-
-#endif // LMMS_BUFFER_MANAGER_H
