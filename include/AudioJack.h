@@ -36,9 +36,15 @@
 
 #include <atomic>
 #include <vector>
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#include <QMap>
+#endif
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#include "AudioBusHandle.h"
+#endif
 
 class QLineEdit;
 
@@ -94,9 +100,9 @@ private:
 	void startProcessing() override;
 	void stopProcessing() override;
 
-	void registerPort(AudioPort* port) override;
-	void unregisterPort(AudioPort* port) override;
-	void renamePort(AudioPort* port) override;
+	void registerPort(AudioBusHandle* port) override;
+	void unregisterPort(AudioBusHandle* port) override;
+	void renamePort(AudioBusHandle* port) override;
 
 	int processCallback(jack_nframes_t nframes);
 
@@ -116,13 +122,13 @@ private:
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
 
-#ifdef AUDIO_PORT_SUPPORT
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
 	struct StereoPort
 	{
 		jack_port_t* ports[2];
 	};
 
-	using JackPortMap = QMap<AudioPort*, StereoPort>;
+	using JackPortMap = QMap<AudioBusHandle*, StereoPort>;
 	JackPortMap m_portMap;
 #endif
 

@@ -329,7 +329,10 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	}
 
 	// Compute the number of steps but make sure that we always do at least one step
-	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
+	const float currentValue = model()->value();
+	const float valueOffset = range / numberOfStepsForFullSweep;
+	const float scaledValueOffset = model()->scaledValue(model()->inverseScaledValue(currentValue) + valueOffset) - currentValue;
+	const float stepMult = std::max(scaledValueOffset / step, 1.f);
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
@@ -343,40 +346,26 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 void FloatModelEditorBase::setPosition(const QPoint & p)
 {
-	const float value = getValue(p) + m_leftOver;
+	const float valueOffset = getValue(p) + m_leftOver;
+	const float currentValue = model()->value();
+	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
-	const float oldValue = model()->value();
+	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
 
-	if (model()->isScaleLogarithmic()) // logarithmic code
+	if (!approximatelyEqual(roundedValue, currentValue))
 	{
-		const float pos = model()->minValue() < 0
-			? oldValue / qMax(qAbs(model()->maxValue()), qAbs(model()->minValue()))
-			: (oldValue - model()->minValue()) / model()->range();
-		const float ratio = 0.1f + qAbs(pos) * 15.f;
-		float newValue = value * ratio;
-		if (qAbs(newValue) >= step)
-		{
-			float roundedValue = qRound((oldValue - value) / step) * step;
-			model()->setValue(roundedValue);
-			m_leftOver = 0.0f;
-		}
-		else
-		{
-			m_leftOver = value;
-		}
+		model()->setValue(roundedValue);
+		m_leftOver = 0.0f;
 	}
-
-	else // linear code
+	else
 	{
-		if (qAbs(value) >= step)
+		if (valueOffset > 0 && approximatelyEqual(currentValue, model()->minValue()))
 		{
-			float roundedValue = qRound((oldValue - value) / step) * step;
-			model()->setValue(roundedValue);
 			m_leftOver = 0.0f;
 		}
 		else
 		{
-			m_leftOver = value;
+			m_leftOver = valueOffset;
 		}
 	}
 }
