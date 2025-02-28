@@ -75,14 +75,20 @@ public:
 	// Update works automatically if QMdiSubWindows are used.
 	void updateTitleBar();
 
+public slots:
+	void detach();
+	void attach();
+
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
 	void moveEvent( QMoveEvent * event ) override;
 	void resizeEvent( QResizeEvent * event ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
+	void showEvent(QShowEvent* event) override;
+	bool eventFilter(QObject* obj, QEvent* event) override;
 
-	QPushButton* addTitleButton(const std::string& iconName, const QString& toolTip);
+	bool isDetached() const;
 
 signals:
 	void focusLost();
@@ -93,6 +99,7 @@ private:
 	QPushButton * m_closeBtn;
 	QPushButton * m_maximizeBtn;
 	QPushButton * m_restoreBtn;
+	QPushButton* m_detachBtn;
 	QBrush m_activeColor;
 	QColor m_textShadowColor;
 	QColor m_borderColor;

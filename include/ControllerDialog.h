@@ -26,8 +26,7 @@
 #ifndef LMMS_GUI_CONTROLLER_DIALOG_H
 #define LMMS_GUI_CONTROLLER_DIALOG_H
 
-#include <QWidget>
-
+#include "DetachableWidget.h"
 #include "ModelView.h"
 
 namespace lmms
@@ -38,24 +37,12 @@ class Controller;
 namespace gui
 {
 
-class ControllerDialog : public QWidget, public ModelView
+class ControllerDialog : public DetachableWidget, public ModelView
 {
-    Q_OBJECT
 public:
-	ControllerDialog( Controller * _controller, QWidget * _parent );
-
+	ControllerDialog(Controller* controller, QWidget* parent);
 	~ControllerDialog() override = default;
-
-
-signals:
-	void closed();
-
-
-protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-
-} ;
-
+};
 
 } // namespace gui
 

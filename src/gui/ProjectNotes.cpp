@@ -27,7 +27,6 @@
 
 #include <QAction>
 #include <QApplication>
-#include <QCloseEvent>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QFontDatabase>
@@ -49,8 +48,8 @@ namespace lmms::gui
 {
 
 
-ProjectNotes::ProjectNotes() :
-	QMainWindow( getGUI()->mainWindow()->workspace() )
+ProjectNotes::ProjectNotes()
+	: DetachableWindow{getGUI()->mainWindow()->workspace()}
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( true );
@@ -387,21 +386,5 @@ void ProjectNotes::loadSettings( const QDomElement & _this )
 	MainWindow::restoreWidgetState( this, _this );
 	m_edit->setHtml( _this.text() );
 }
-
-
-
-
-void ProjectNotes::closeEvent( QCloseEvent * _ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
 
 } // namespace lmms::gui
