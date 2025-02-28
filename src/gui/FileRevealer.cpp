@@ -79,7 +79,8 @@ const QString& FileRevealer::getDefaultFileManager()
 			fileManagers.removeFirst();
 			fileManager = fileManagers.first().trimmed();
 		}
-		else {
+		else
+		{
 			// Fallback to something sane
 			fileManager = "xdg-open";
 		}
