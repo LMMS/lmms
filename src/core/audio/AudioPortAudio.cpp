@@ -33,13 +33,12 @@
 
 namespace {
 constexpr auto configTag = "audioportaudio";
+constexpr auto configBackendAttribute = "backend";
 
 constexpr auto configOutputDeviceAttribute = "outputdevice";
-constexpr auto configOutputDeviceBackendAttribute = "outputbackend";
 constexpr auto configOutputDeviceChannelsAttribute = "outputchannels";
 
 constexpr auto configInputDeviceAttribute = "inputdevice";
-constexpr auto configInputDeviceBackendAttribute = "inputbackend";
 constexpr auto configInputDeviceChannelsAttribute = "inputchannels";
 } // namespace
 
@@ -53,43 +52,38 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		throw std::runtime_error{"PortAudio: could not initialize - " + std::string(Pa_GetErrorText(Pa_Initialize()))};
 	}
 
+	const auto configBackendValue = ConfigManager::inst()->value(configTag, configBackendAttribute);
+
 	const auto configOutputDeviceValue = ConfigManager::inst()->value(configTag, configOutputDeviceAttribute);
-	const auto configOutputDeviceBackendValue = ConfigManager::inst()->value(configTag, configOutputDeviceBackendAttribute);
 	const auto configOutputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configOutputDeviceChannelsAttribute);
-
+	
 	const auto configInputDeviceValue = ConfigManager::inst()->value(configTag, configInputDeviceAttribute);
-	const auto configInputDeviceBackendValue = ConfigManager::inst()->value(configTag, configInputDeviceBackendAttribute);
 	const auto configInputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configInputDeviceChannelsAttribute);
-
+	
 	auto outputDeviceIndex = paNoDevice;
 	auto inputDeviceIndex = paNoDevice;
-
+	
 	const auto deviceCount = Pa_GetDeviceCount();
 	if (deviceCount < 0) { throw std::runtime_error{"PortAudio: no available devices"}; }
-
+	
 	auto outputDeviceInfo = static_cast<const PaDeviceInfo*>(nullptr);
 	auto inputDeviceInfo = static_cast<const PaDeviceInfo*>(nullptr);
 
-	auto outputBackendInfo = static_cast<const PaHostApiInfo*>(nullptr);
-	auto inputBackendInfo = static_cast<const PaHostApiInfo*>(nullptr);
-
 	for (auto i = 0; i < deviceCount; ++i)
 	{
-		const auto deviceInfo = Pa_GetDeviceInfo(i);
-		const auto backendInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
+		const auto currentDeviceInfo = Pa_GetDeviceInfo(i);
+		const auto currentBackendInfo = Pa_GetHostApiInfo(currentDeviceInfo->hostApi);
 
-		if (configOutputDeviceValue == deviceInfo->name && configOutputDeviceBackendValue == backendInfo->name)
+		if (configOutputDeviceValue == currentDeviceInfo->name && configBackendValue == currentBackendInfo->name)
 		{
 			outputDeviceIndex = i;
-			outputDeviceInfo = deviceInfo;
-			outputBackendInfo = backendInfo;
+			outputDeviceInfo = currentDeviceInfo;
 		}
 
-		if (configInputDeviceValue == deviceInfo->name && configInputDeviceBackendValue == backendInfo->name)
+		if (configInputDeviceValue == currentDeviceInfo->name && configBackendValue == currentBackendInfo->name)
 		{
 			inputDeviceIndex = i;
-			inputDeviceInfo = deviceInfo;
-			inputBackendInfo = backendInfo;
+			inputDeviceInfo = currentDeviceInfo;
 		}
 	}
 
@@ -97,14 +91,12 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	{
 		outputDeviceIndex = Pa_GetDefaultOutputDevice();
 		outputDeviceInfo = Pa_GetDeviceInfo(outputDeviceIndex);
-		outputBackendInfo = outputDeviceInfo == nullptr ? nullptr : Pa_GetHostApiInfo(outputDeviceInfo->hostApi);
 	}
 
 	if (inputDeviceIndex == paNoDevice)
 	{
 		inputDeviceIndex = Pa_GetDefaultInputDevice();
 		inputDeviceInfo = Pa_GetDeviceInfo(inputDeviceIndex);
-		inputBackendInfo = inputDeviceInfo == nullptr ? nullptr : Pa_GetHostApiInfo(inputDeviceInfo->hostApi);
 	}
 
 	if (outputDeviceIndex == paNoDevice)
@@ -149,12 +141,13 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 
 	setChannels(outputDeviceChannelCount);
 
+	const auto backendInfo = Pa_GetHostApiInfo(outputDeviceInfo->hostApi);
+	ConfigManager::inst()->setValue(configTag, configBackendAttribute, backendInfo->name);
+
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceAttribute, outputDeviceInfo->name);
-	ConfigManager::inst()->setValue(configTag, configOutputDeviceBackendAttribute, outputBackendInfo->name);
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceChannelsAttribute, QString::number(outputDeviceChannelCount));
 
 	ConfigManager::inst()->setValue(configTag, configInputDeviceAttribute, inputDeviceInfo->name);
-	ConfigManager::inst()->setValue(configTag, configInputDeviceBackendAttribute, inputBackendInfo->name);
 	ConfigManager::inst()->setValue(configTag, configInputDeviceChannelsAttribute, QString::number(inputDeviceChannelCount));
 }
 
@@ -212,44 +205,33 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	}
 
 	const auto form = new QFormLayout(this);
-	form->setRowWrapPolicy(QFormLayout::WrapAllRows);
-	form->setVerticalSpacing(10);
+	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
-	const auto outputGroup = new QGroupBox(this);
-	const auto inputGroup = new QGroupBox(this);
+	const auto outputGroup = new QHBoxLayout();
+	const auto inputGroup = new QHBoxLayout();
 
-	const auto outputForm = new QFormLayout(outputGroup);
-	outputForm->setRowWrapPolicy(QFormLayout::WrapLongRows);
+	m_backendComboBox = new QComboBox();
 
-	const auto inputForm = new QFormLayout(inputGroup);
-	inputForm->setRowWrapPolicy(QFormLayout::WrapLongRows);
-
-	m_outputDeviceComboBox = new QComboBox(outputGroup);
-	m_outputBackendComboBox = new QComboBox(outputGroup);
-	m_outputChannelsSpinBox = new LcdSpinBox(1, outputGroup);
+	m_outputDeviceComboBox = new QComboBox();
+	m_outputChannelsSpinBox = new LcdSpinBox(1, nullptr);
 	m_outputChannelsSpinBox->setModel(&m_outputChannelsModel);
 
-	outputForm->addRow(tr("Backend"), m_outputBackendComboBox);
-	outputForm->addRow(tr("Device"), m_outputDeviceComboBox);
-	outputForm->addRow(tr("Channels"), m_outputChannelsSpinBox);
-
-	m_inputDeviceComboBox = new QComboBox(inputGroup);
-	m_inputBackendComboBox = new QComboBox(inputGroup);
-	m_inputChannelsSpinBox = new LcdSpinBox(1, inputGroup);
+	m_inputDeviceComboBox = new QComboBox();
+	m_inputChannelsSpinBox = new LcdSpinBox(1, nullptr);
 	m_inputChannelsSpinBox->setModel(&m_inputChannelsModel);
 
-	inputForm->addRow(tr("Backend"), m_inputBackendComboBox);
-	inputForm->addRow(tr("Device"), m_inputDeviceComboBox);
-	inputForm->addRow(tr("Channels"), m_inputChannelsSpinBox);
+	outputGroup->addWidget(m_outputDeviceComboBox);
+	outputGroup->addWidget(m_outputChannelsSpinBox);
 
+	inputGroup->addWidget(m_inputDeviceComboBox);
+	inputGroup->addWidget(m_inputChannelsSpinBox);
+
+	form->addRow(tr("Backend"), m_backendComboBox);
 	form->addRow(tr("Output device"), outputGroup);
 	form->addRow(tr("Input device"), inputGroup);
 
-	connect(m_outputBackendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[&] { updateDevices(false, true); });
-
-	connect(m_inputBackendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[&] { updateDevices(true, false); });
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[&] { updateDevices(); });
 
 	connect(m_outputDeviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
 		[&] { updateChannels(false, true); });
@@ -268,44 +250,38 @@ void AudioPortAudioSetupWidget::show()
 	updateBackends();
 	updateDevices();
 	
+	const auto configBackendValue = ConfigManager::inst()->value(configTag, configBackendAttribute);
+	
 	const auto configOutputDeviceValue = ConfigManager::inst()->value(configTag, configOutputDeviceAttribute);
-	const auto configOutputDeviceBackendValue = ConfigManager::inst()->value(configTag, configOutputDeviceBackendAttribute);
 	const auto configOutputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configOutputDeviceChannelsAttribute);
-
+	
 	const auto configInputDeviceValue = ConfigManager::inst()->value(configTag, configInputDeviceAttribute);
-	const auto configInputDeviceBackendValue = ConfigManager::inst()->value(configTag, configInputDeviceBackendAttribute);
 	const auto configInputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configInputDeviceChannelsAttribute);
 	
-	const auto outputBackendIndex = std::max(0, m_outputBackendComboBox->findText(configOutputDeviceBackendValue));
-	const auto outputDeviceIndex = std::max(0, m_outputDeviceComboBox->findText(configOutputDeviceValue));
-
-	m_outputBackendComboBox->setCurrentIndex(outputBackendIndex);
-	m_outputDeviceComboBox->setCurrentIndex(outputDeviceIndex);
-	m_outputChannelsModel.setValue(configOutputDeviceChannelsValue.toInt());
+	const auto backendIndex = std::max(0, m_backendComboBox->findText(configBackendValue));
+	m_backendComboBox->setCurrentIndex(backendIndex);
 
 	const auto inputDeviceIndex = std::max(0, m_inputDeviceComboBox->findText(configInputDeviceValue));
-	const auto inputBackendIndex = std::max(0, m_inputBackendComboBox->findText(configInputDeviceBackendValue));
-
 	m_inputDeviceComboBox->setCurrentIndex(inputDeviceIndex);
-	m_inputBackendComboBox->setCurrentIndex(inputBackendIndex);
+	m_inputDeviceComboBox->setCurrentIndex(inputDeviceIndex);
 	m_inputChannelsModel.setValue(configInputDeviceChannelsValue.toInt());
+
+	const auto outputDeviceIndex = std::max(0, m_outputDeviceComboBox->findText(configOutputDeviceValue));
+	m_outputDeviceComboBox->setCurrentIndex(outputDeviceIndex);
+	m_outputChannelsModel.setValue(configOutputDeviceChannelsValue.toInt());
 
 	AudioDeviceSetupWidget::show();
 }
 
-void AudioPortAudioSetupWidget::updateBackends(bool updateInput, bool updateOutput)
+void AudioPortAudioSetupWidget::updateBackends()
 {
 	const auto backendCount = Pa_GetHostApiCount();
 	if (backendCount < 0) { return; }
 
-	if (updateOutput) { m_outputBackendComboBox->clear(); }
-	if (updateInput) { m_inputBackendComboBox->clear(); }
-	
 	for (auto i = 0; i < backendCount; ++i)
 	{
 		const auto backendInfo = Pa_GetHostApiInfo(i);
-		if (updateOutput) { m_outputBackendComboBox->addItem(backendInfo->name, i); }
-		if (updateInput) { m_inputBackendComboBox->addItem(backendInfo->name, i); }
+		m_backendComboBox->addItem(backendInfo->name, i);
 	}
 }
 
@@ -317,25 +293,21 @@ void AudioPortAudioSetupWidget::updateDevices(bool updateInput, bool updateOutpu
 	if (updateOutput) { m_outputDeviceComboBox->clear(); }
 	if (updateInput) { m_inputDeviceComboBox->clear(); }
 
-	const auto selectedOuputBackend = m_outputBackendComboBox->currentData();
-	if (!selectedOuputBackend.isValid() && updateOutput) { return; }
+	const auto backend = m_backendComboBox->currentData();
+	if (!backend.isValid() && updateOutput) { return; }
 
-	const auto selectedInputBackend = m_inputBackendComboBox->currentData();
-	if (!selectedInputBackend.isValid() && updateInput) { return; }
-
-	const auto selectedOuputBackendIndex = selectedOuputBackend.toInt();
-	const auto selectedInputBackendIndex = selectedInputBackend.toInt();
+	const auto backendIndex = backend.toInt();
 
 	for (auto i = 0; i < deviceCount; ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 
-		if (deviceInfo->maxOutputChannels > 0 && deviceInfo->hostApi == selectedOuputBackendIndex && updateOutput)
+		if (deviceInfo->maxOutputChannels > 0 && deviceInfo->hostApi == backendIndex && updateOutput)
 		{
 			m_outputDeviceComboBox->addItem(deviceInfo->name, i);
 		}
 
-		if (deviceInfo->maxInputChannels > 0 && deviceInfo->hostApi == selectedInputBackendIndex && updateInput)
+		if (deviceInfo->maxInputChannels > 0 && deviceInfo->hostApi == backendIndex && updateInput)
 		{
 			m_inputDeviceComboBox->addItem(deviceInfo->name, i);
 		}
@@ -371,12 +343,12 @@ void AudioPortAudioSetupWidget::updateChannels(bool updateInput, bool updateOutp
 
 void AudioPortAudioSetupWidget::saveSettings()
 {
+	ConfigManager::inst()->setValue(configTag, configBackendAttribute, m_backendComboBox->currentText());
+
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceAttribute, m_outputDeviceComboBox->currentText());
-	ConfigManager::inst()->setValue(configTag, configOutputDeviceBackendAttribute, m_outputBackendComboBox->currentText());
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceChannelsAttribute, QString::number(m_outputChannelsModel.value()));
 
 	ConfigManager::inst()->setValue(configTag, configInputDeviceAttribute, m_inputDeviceComboBox->currentText());
-	ConfigManager::inst()->setValue(configTag, configInputDeviceBackendAttribute, m_inputBackendComboBox->currentText());
 	ConfigManager::inst()->setValue(configTag, configInputDeviceChannelsAttribute, QString::number(m_inputChannelsModel.value()));
 }
 } // namespace lmms::gui

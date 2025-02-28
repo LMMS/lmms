@@ -72,17 +72,17 @@ public:
 	void saveSettings() override;
 
 private:
-	void updateBackends(bool updateInput = true, bool updateOutput = true);
+	void updateBackends();
 	void updateDevices(bool updateInput = true, bool updateOutput = true);
 	void updateChannels(bool updateInput = true, bool updateOutput = true);
 
+	QComboBox* m_backendComboBox = nullptr;
+
 	QComboBox* m_outputDeviceComboBox = nullptr;
-	QComboBox* m_outputBackendComboBox = nullptr;
 	IntModel m_outputChannelsModel;
 	LcdSpinBox* m_outputChannelsSpinBox = nullptr;
 
 	QComboBox* m_inputDeviceComboBox = nullptr;
-	QComboBox* m_inputBackendComboBox = nullptr;
 	IntModel m_inputChannelsModel;
 	LcdSpinBox* m_inputChannelsSpinBox = nullptr;
 };
