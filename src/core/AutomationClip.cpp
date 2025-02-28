@@ -234,7 +234,8 @@ void AutomationClip::updateLength()
 	{
 		// Using 1 bar as the min length for an un-resized clip. 
 		// This does not prevent the user from resizing the clip to be less than a bar later on.
-		changeLength(std::max(TimePos::ticksPerBar(), timeMapLength() + startTimeOffset()));
+		changeLength(std::max(TimePos::ticksPerBar(), static_cast<tick_t>(timeMapLength())));
+		setStartTimeOffset(TimePos(0));
 	}
 }
 
