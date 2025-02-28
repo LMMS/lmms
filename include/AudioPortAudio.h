@@ -66,9 +66,16 @@ class AudioPortAudioSetupWidget : public AudioDeviceSetupWidget
 {
 public:
 	AudioPortAudioSetupWidget(QWidget* parent);
+	~AudioPortAudioSetupWidget();
+
+	void show() override;
 	void saveSettings() override;
 
 private:
+	void updateBackends(bool updateInput = true, bool updateOutput = true);
+	void updateDevices(bool updateInput = true, bool updateOutput = true);
+	void updateChannels(bool updateInput = true, bool updateOutput = true);
+
 	QComboBox* m_outputDeviceComboBox = nullptr;
 	QComboBox* m_outputBackendComboBox = nullptr;
 	LcdSpinBox* m_outputChannelsSpinBox = nullptr;

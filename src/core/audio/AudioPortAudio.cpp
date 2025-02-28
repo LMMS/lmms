@@ -201,6 +201,8 @@ namespace lmms::gui {
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioPortAudio::name(), parent)
 {
+	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"Could not initialize PortAudio"}; }
+
 	const auto form = new QFormLayout(this);
 	form->setRowWrapPolicy(QFormLayout::WrapAllRows);
 	form->setVerticalSpacing(10);
@@ -232,6 +234,84 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 
 	form->addRow(tr("Output device"), outputGroup);
 	form->addRow(tr("Input device"), inputGroup);
+
+	connect(m_outputBackendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[&] { updateDevices(false, true); });
+
+	connect(m_inputBackendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[&] { updateDevices(true, false); });
+
+	connect(m_outputDeviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[&] { updateChannels(false, true); });
+
+	connect(m_inputDeviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[&] { updateChannels(true, false); });
+}
+
+AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
+{
+	Pa_Terminate();
+}
+
+void AudioPortAudioSetupWidget::show()
+{
+	updateBackends();
+	updateDevices();
+	AudioDeviceSetupWidget::show();
+}
+
+void AudioPortAudioSetupWidget::updateBackends(bool updateInput, bool updateOutput)
+{
+	const auto backendCount = Pa_GetHostApiCount();
+	if (backendCount < 0) { return; }
+
+	if (updateOutput) { m_outputBackendComboBox->clear(); }
+	if (updateInput) { m_inputBackendComboBox->clear(); }
+	
+	for (auto i = 0; i < backendCount; ++i)
+	{
+		const auto backendInfo = Pa_GetHostApiInfo(i);
+		if (updateOutput) { m_outputBackendComboBox->addItem(backendInfo->name, i); }
+		if (updateInput) { m_inputBackendComboBox->addItem(backendInfo->name, i); }
+	}
+}
+
+void AudioPortAudioSetupWidget::updateDevices(bool updateInput, bool updateOutput)
+{
+	const auto deviceCount = Pa_GetDeviceCount();
+	if (deviceCount < 0) { return; }
+
+	if (updateOutput) { m_outputDeviceComboBox->clear(); }
+	if (updateInput) { m_inputDeviceComboBox->clear(); }
+
+	const auto selectedOuputBackend = m_outputBackendComboBox->currentData();
+	if (!selectedOuputBackend.isValid() && updateOutput) { return; }
+
+	const auto selectedInputBackend = m_inputBackendComboBox->currentData();
+	if (!selectedInputBackend.isValid() && updateInput) { return; }
+
+	const auto selectedOuputBackendIndex = selectedOuputBackend.toInt();
+	const auto selectedInputBackendIndex = selectedInputBackend.toInt();
+
+	for (auto i = 0; i < deviceCount; ++i)
+	{
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+
+		if (deviceInfo->maxOutputChannels > 0 && deviceInfo->hostApi == selectedOuputBackendIndex && updateOutput)
+		{
+			m_outputDeviceComboBox->addItem(deviceInfo->name, i);
+		}
+
+		if (deviceInfo->maxInputChannels > 0 && deviceInfo->hostApi == selectedInputBackendIndex && updateInput)
+		{
+			m_inputDeviceComboBox->addItem(deviceInfo->name, i);
+		}
+	}
+}
+
+void AudioPortAudioSetupWidget::updateChannels(bool updateInput, bool updateOutput)
+{
+
 }
 
 void AudioPortAudioSetupWidget::saveSettings()
