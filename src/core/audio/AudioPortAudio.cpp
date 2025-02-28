@@ -27,8 +27,6 @@
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <iostream>
-
 #include "AudioEngine.h"
 #include "AudioPortAudio.h"
 #include "ConfigManager.h"
@@ -164,18 +162,12 @@ AudioPortAudio::~AudioPortAudio()
 
 void AudioPortAudio::startProcessing()
 {
-	if (const auto err = Pa_StartStream(m_paStream); err != paNoError)
-	{
-		std::cerr << "PortAudio: could not start stream,  " << Pa_GetErrorText(err) << '\n';
-	}
+	Pa_StartStream(m_paStream);
 }
 
 void AudioPortAudio::stopProcessing()
 {
-	if (const auto err = Pa_StopStream(m_paStream); err != paNoError)
-	{
-		std::cerr << "PortAudio: could not stop stream,  " << Pa_GetErrorText(err) << '\n';
-	}
+	Pa_StopStream(m_paStream);
 }
 
 int AudioPortAudio::processCallback(const void* input, void* output, unsigned long frameCount,
