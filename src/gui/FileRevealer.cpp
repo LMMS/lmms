@@ -74,7 +74,7 @@ const QString& FileRevealer::getDefaultFileManager()
 	{
 		// gio format: split on ":" or "\n", take second element
 		QStringList fileManagers = fileManager.split(QRegularExpression("[:\n]"), Qt::SkipEmptyParts);
-		if(fileManagers.length() >= 2)
+		if (fileManagers.length() >= 2)
 		{
 			fileManagers.removeFirst();
 			fileManager = fileManagers.first().trimmed();
