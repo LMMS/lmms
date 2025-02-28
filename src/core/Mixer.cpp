@@ -44,7 +44,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
 	m_amount(amount, 0, 1, 0.001f, nullptr,
-			tr("Amount to send from channel %1 to channel %2").arg(m_from->getIndex()).arg(m_to->getIndex()))
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->index()).arg(m_to->index()))
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
@@ -54,7 +54,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 void MixerRoute::updateName()
 {
 	m_amount.setDisplayName(
-			tr("Amount to send from channel %1 to channel %2").arg(m_from->getIndex()).arg(m_to->getIndex()));
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->index()).arg(m_to->index()));
 }
 
 

@@ -72,7 +72,7 @@ class MixerChannel : public ThreadableJob
 		// pointers to other channels that send to this one
 		MixerRouteVector m_receives;
 
-		const int & getIndex() { return m_channelIndex; }
+		int index() const { return m_channelIndex; }
 		void setIndex(int index) { m_channelIndex = index; }
 
 		bool isMaster() { return m_channelIndex == 0; }
@@ -106,12 +106,12 @@ public:
 
 	mix_ch_t senderIndex() const
 	{
-		return m_from->getIndex();
+		return m_from->index();
 	}
 
 	mix_ch_t receiverIndex() const
 	{
-		return m_to->getIndex();
+		return m_to->index();
 	}
 
 	FloatModel * amount()

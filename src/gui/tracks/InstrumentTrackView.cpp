@@ -385,7 +385,7 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 
 		if ( currentChannel != mixerChannel )
 		{
-			auto index = currentChannel->getIndex();
+			auto index = currentChannel->index();
 			QString label = tr( "%1: %2" ).arg(index).arg(currentChannel->m_name);
 			mixerMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
