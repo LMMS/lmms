@@ -23,9 +23,9 @@
  *
  */
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_PORTAUDIO
+ #include "lmmsconfig.h"
+ 
+ #ifdef LMMS_HAVE_PORTAUDIO
 
 #include "AudioEngine.h"
 #include "AudioPortAudio.h"
@@ -201,6 +201,37 @@ namespace lmms::gui {
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioPortAudio::name(), parent)
 {
+	const auto form = new QFormLayout(this);
+	form->setRowWrapPolicy(QFormLayout::WrapAllRows);
+	form->setVerticalSpacing(10);
+
+	const auto outputGroup = new QGroupBox(this);
+	const auto inputGroup = new QGroupBox(this);
+
+	const auto outputForm = new QFormLayout(outputGroup);
+	outputForm->setRowWrapPolicy(QFormLayout::WrapLongRows);
+
+	const auto inputForm = new QFormLayout(inputGroup);
+	inputForm->setRowWrapPolicy(QFormLayout::WrapLongRows);
+
+	m_outputDeviceComboBox = new QComboBox(outputGroup);
+	m_outputBackendComboBox = new QComboBox(outputGroup);
+	m_outputChannelsSpinBox = new LcdSpinBox(1, outputGroup);
+
+	outputForm->addRow(tr("Backend"), m_outputBackendComboBox);
+	outputForm->addRow(tr("Device"), m_outputDeviceComboBox);
+	outputForm->addRow(tr("Channels"), m_outputChannelsSpinBox);
+
+	m_inputDeviceComboBox = new QComboBox(inputGroup);
+	m_inputBackendComboBox = new QComboBox(inputGroup);
+	m_inputChannelsSpinBox = new LcdSpinBox(1, inputGroup);
+
+	inputForm->addRow(tr("Backend"), m_inputBackendComboBox);
+	inputForm->addRow(tr("Device"), m_inputDeviceComboBox);
+	inputForm->addRow(tr("Channels"), m_inputChannelsSpinBox);
+
+	form->addRow(tr("Output device"), outputGroup);
+	form->addRow(tr("Input device"), inputGroup);
 }
 
 void AudioPortAudioSetupWidget::saveSettings()
