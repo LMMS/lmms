@@ -78,10 +78,12 @@ private:
 
 	QComboBox* m_outputDeviceComboBox = nullptr;
 	QComboBox* m_outputBackendComboBox = nullptr;
+	IntModel m_outputChannelsModel;
 	LcdSpinBox* m_outputChannelsSpinBox = nullptr;
 
 	QComboBox* m_inputDeviceComboBox = nullptr;
 	QComboBox* m_inputBackendComboBox = nullptr;
+	IntModel m_inputChannelsModel;
 	LcdSpinBox* m_inputChannelsSpinBox = nullptr;
 };
 } // namespace lmms::gui

@@ -219,6 +219,7 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	m_outputDeviceComboBox = new QComboBox(outputGroup);
 	m_outputBackendComboBox = new QComboBox(outputGroup);
 	m_outputChannelsSpinBox = new LcdSpinBox(1, outputGroup);
+	m_outputChannelsSpinBox->setModel(&m_outputChannelsModel);
 
 	outputForm->addRow(tr("Backend"), m_outputBackendComboBox);
 	outputForm->addRow(tr("Device"), m_outputDeviceComboBox);
@@ -227,6 +228,7 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	m_inputDeviceComboBox = new QComboBox(inputGroup);
 	m_inputBackendComboBox = new QComboBox(inputGroup);
 	m_inputChannelsSpinBox = new LcdSpinBox(1, inputGroup);
+	m_inputChannelsSpinBox->setModel(&m_inputChannelsModel);
 
 	inputForm->addRow(tr("Backend"), m_inputBackendComboBox);
 	inputForm->addRow(tr("Device"), m_inputDeviceComboBox);
@@ -257,6 +259,29 @@ void AudioPortAudioSetupWidget::show()
 {
 	updateBackends();
 	updateDevices();
+	
+	const auto configOutputDeviceValue = ConfigManager::inst()->value(configTag, configOutputDeviceAttribute);
+	const auto configOutputDeviceBackendValue = ConfigManager::inst()->value(configTag, configOutputDeviceBackendAttribute);
+	const auto configOutputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configOutputDeviceChannelsAttribute);
+
+	const auto configInputDeviceValue = ConfigManager::inst()->value(configTag, configInputDeviceAttribute);
+	const auto configInputDeviceBackendValue = ConfigManager::inst()->value(configTag, configInputDeviceBackendAttribute);
+	const auto configInputDeviceChannelsValue = ConfigManager::inst()->value(configTag, configInputDeviceChannelsAttribute);
+	
+	const auto outputBackendIndex = std::max(0, m_outputBackendComboBox->findText(configOutputDeviceBackendValue));
+	const auto outputDeviceIndex = std::max(0, m_outputDeviceComboBox->findText(configOutputDeviceValue));
+
+	m_outputBackendComboBox->setCurrentIndex(outputBackendIndex);
+	m_outputDeviceComboBox->setCurrentIndex(outputDeviceIndex);
+	m_outputChannelsModel.setValue(configOutputDeviceChannelsValue.toInt());
+
+	const auto inputDeviceIndex = std::max(0, m_inputDeviceComboBox->findText(configInputDeviceValue));
+	const auto inputBackendIndex = std::max(0, m_inputBackendComboBox->findText(configInputDeviceBackendValue));
+
+	m_inputDeviceComboBox->setCurrentIndex(inputDeviceIndex);
+	m_inputBackendComboBox->setCurrentIndex(inputBackendIndex);
+	m_inputChannelsModel.setValue(configInputDeviceChannelsValue.toInt());
+
 	AudioDeviceSetupWidget::show();
 }
 
@@ -310,12 +335,41 @@ void AudioPortAudioSetupWidget::updateDevices(bool updateInput, bool updateOutpu
 }
 
 void AudioPortAudioSetupWidget::updateChannels(bool updateInput, bool updateOutput)
-{
+{	
+	if (updateOutput)
+	{
+		const auto selectedOutputDevice = m_outputDeviceComboBox->currentData();
+		if (!selectedOutputDevice.isValid()) { return; }
+		
+		const auto selectedOutputDeviceIndex = selectedOutputDevice.toInt();
+		const auto outputDeviceInfo = Pa_GetDeviceInfo(selectedOutputDeviceIndex);
 
+		m_outputChannelsModel.setRange(1, outputDeviceInfo->maxOutputChannels);
+		m_outputChannelsSpinBox->setNumDigits(QString::number(outputDeviceInfo->maxOutputChannels).length());
+	}
+	
+	if (updateInput)
+	{
+		const auto selectedInputDevice = m_inputDeviceComboBox->currentData();
+		if (!selectedInputDevice.isValid() && updateInput) { return; }
+	
+		const auto selectedInputDeviceIndex = selectedInputDevice.toInt();
+		const auto inputDeviceInfo = Pa_GetDeviceInfo(selectedInputDeviceIndex);
+
+		m_inputChannelsModel.setRange(1, inputDeviceInfo->maxInputChannels);
+		m_inputChannelsSpinBox->setNumDigits(QString::number(inputDeviceInfo->maxInputChannels).length());
+	}
 }
 
 void AudioPortAudioSetupWidget::saveSettings()
 {
+	ConfigManager::inst()->setValue(configTag, configOutputDeviceAttribute, m_outputDeviceComboBox->currentText());
+	ConfigManager::inst()->setValue(configTag, configOutputDeviceBackendAttribute, m_outputBackendComboBox->currentText());
+	ConfigManager::inst()->setValue(configTag, configOutputDeviceChannelsAttribute, QString::number(m_outputChannelsModel.value()));
+
+	ConfigManager::inst()->setValue(configTag, configInputDeviceAttribute, m_inputDeviceComboBox->currentText());
+	ConfigManager::inst()->setValue(configTag, configInputDeviceBackendAttribute, m_inputBackendComboBox->currentText());
+	ConfigManager::inst()->setValue(configTag, configInputDeviceChannelsAttribute, QString::number(m_inputChannelsModel.value()));
 }
 } // namespace lmms::gui
 
