@@ -72,7 +72,7 @@ void AudioBusHandle::setExtOutputEnabled(bool enabled)
 	if (enabled != m_extOutputEnabled)
 	{
 		m_extOutputEnabled = enabled;
-		if(m_extOutputEnabled)
+		if (m_extOutputEnabled)
 		{
 			Engine::audioEngine()->audioDev()->registerPort(this);
 		}
@@ -97,7 +97,7 @@ void AudioBusHandle::setName(const QString& newName)
 
 bool AudioBusHandle::processEffects()
 {
-	if(m_effects)
+	if (m_effects)
 	{
 		bool more = m_effects->processAudioBuffer(m_buffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage);
 		return more;
@@ -108,7 +108,7 @@ bool AudioBusHandle::processEffects()
 
 void AudioBusHandle::doProcessing()
 {
-	if(m_mutedModel && m_mutedModel->value())
+	if (m_mutedModel && m_mutedModel->value())
 	{
 		return;
 	}
@@ -119,11 +119,11 @@ void AudioBusHandle::doProcessing()
 	zeroSampleFrames(m_buffer, fpp);
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
-	for(PlayHandle * ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
+	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
 	{
-		if(ph->buffer())
+		if (ph->buffer())
 		{
-			if(ph->usesBuffer()
+			if (ph->usesBuffer()
 				&& (ph->type() == PlayHandle::Type::NotePlayHandle
 					|| !MixHelpers::isSilent(ph->buffer(), fpp)))
 			{
@@ -135,19 +135,19 @@ void AudioBusHandle::doProcessing()
 		}
 	}
 
-	if(m_bufferUsage)
+	if (m_bufferUsage)
 	{
 		// handle volume and panning
 		// has both vol and pan models
-		if(m_volumeModel && m_panningModel)
+		if (m_volumeModel && m_panningModel)
 		{
 			ValueBuffer* volBuf = m_volumeModel->valueBuffer();
 			ValueBuffer* panBuf = m_panningModel->valueBuffer();
 
 			// both vol and pan have s.ex.data:
-			if(volBuf && panBuf)
+			if (volBuf && panBuf)
 			{
-				for(f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					float p = panBuf->values()[f] * 0.01f;
@@ -157,12 +157,12 @@ void AudioBusHandle::doProcessing()
 			}
 
 			// only vol has s.ex.data:
-			else if(volBuf)
+			else if (volBuf)
 			{
 				float p = m_panningModel->value() * 0.01f;
 				float l = (p <= 0 ? 1.0f : 1.0f - p);
 				float r = (p >= 0 ? 1.0f : 1.0f + p);
-				for(f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					m_buffer[f][0] *= v * l;
@@ -171,10 +171,10 @@ void AudioBusHandle::doProcessing()
 			}
 
 			// only pan has s.ex.data:
-			else if(panBuf)
+			else if (panBuf)
 			{
 				float v = m_volumeModel->value() * 0.01f;
-				for(f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float p = panBuf->values()[f] * 0.01f;
 					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
@@ -187,7 +187,7 @@ void AudioBusHandle::doProcessing()
 			{
 				float p = m_panningModel->value() * 0.01f;
 				float v = m_volumeModel->value() * 0.01f;
-				for(f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
 					m_buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
@@ -196,13 +196,13 @@ void AudioBusHandle::doProcessing()
 		}
 
 		// has vol model only
-		else if(m_volumeModel)
+		else if (m_volumeModel)
 		{
 			ValueBuffer* volBuf = m_volumeModel->valueBuffer();
 
-			if(volBuf)
+			if (volBuf)
 			{
-				for(f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					m_buffer[f][0] *= v;
@@ -212,7 +212,7 @@ void AudioBusHandle::doProcessing()
 			else
 			{
 				float v = m_volumeModel->value() * 0.01f;
-				for(f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					m_buffer[f][0] *= v;
 					m_buffer[f][1] *= v;
@@ -225,7 +225,7 @@ void AudioBusHandle::doProcessing()
 
 	// handle effects
 	const bool anyOutputAfterEffects = processEffects();
-	if(anyOutputAfterEffects || m_bufferUsage)
+	if (anyOutputAfterEffects || m_bufferUsage)
 	{
 		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel);	// send output to mixer
 																		// TODO: improve the flow here - convert to pull model
@@ -234,18 +234,18 @@ void AudioBusHandle::doProcessing()
 }
 
 
-void AudioBusHandle::addPlayHandle(PlayHandle * handle)
+void AudioBusHandle::addPlayHandle(PlayHandle* handle)
 {
 	QMutexLocker lockGuard(&m_playHandleLock);
 	m_playHandles.append(handle);
 }
 
 
-void AudioBusHandle::removePlayHandle(PlayHandle * handle)
+void AudioBusHandle::removePlayHandle(PlayHandle* handle)
 {
 	QMutexLocker lockGuard(&m_playHandleLock);
 	PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), handle);
-	if(it != m_playHandles.end())
+	if (it != m_playHandles.end())
 	{
 		m_playHandles.erase(it);
 	}
