@@ -658,17 +658,18 @@ QString Track::findUniqueName(const QString& sourceName) const
 {
 	QString output = sourceName;
 	// removing number from `sourceName`
-	bool isSeparatedWithWhiteSpace = false;
-	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName, &isSeparatedWithWhiteSpace).size();
+	bool isSeparatedWithWhitespace = false;
+	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName, &isSeparatedWithWhitespace).size();
 	if (sourceNumberLength > 0)
 	{
 		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
-		sourceNumberLength = isSeparatedWithWhiteSpace ? sourceNumberLength + 1 : sourceNumberLength;
+		sourceNumberLength = isSeparatedWithWhitespace ? sourceNumberLength + 1 : sourceNumberLength;
 		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
 	}
 	
 	const TrackContainer::TrackList& trackList = m_trackContainer->tracks();
 	
+	//! will store the max number found at the end of `sourceName` named tracks
 	size_t maxNameCounter = 0;
 	bool found = false;
 	
@@ -684,15 +685,16 @@ QString Track::findUniqueName(const QString& sourceName) const
 	
 	if (found)
 	{
-		output = output + " " + QString::number(maxNameCounter + 1);
+		if (isSeparatedWithWhitespace) { output = output + ' '; }
+		output = output + QString::number(maxNameCounter + 1);
 	}
 
 	return output;
 }
 
-QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace)
+QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhitespace)
 {
-	QString numberString = "";
+	QString numberOutput = "";
 
 	//! `it` will point to where the numbers start in `name`
 	auto it = name.end();
@@ -702,9 +704,9 @@ QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhi
 		it--;
 		if (it->isDigit() == false)
 		{
-			if (isSeparatedWithWhiteSpace != nullptr)
+			if (isSeparatedWithWhitespace != nullptr)
 			{
-				*isSeparatedWithWhiteSpace = *it == ' ';
+				*isSeparatedWithWhitespace = *it == ' ';
 			}
 			// the last character was not a number
 			// increase `it` to account for this (and make it point to a digit)
@@ -716,11 +718,11 @@ QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhi
 
 	if (digitCount > 0)
 	{
-		numberString.resize(digitCount);
-		std::copy(it, name.end(), numberString.begin());
+		numberOutput.resize(digitCount);
+		std::copy(it, name.end(), numberOutput.begin());
 	}
 		
-	return numberString;
+	return numberOutput;
 }
 
 void Track::setName(const QString& newName)
