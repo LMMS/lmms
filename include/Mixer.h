@@ -91,8 +91,6 @@ class MixerChannel : public ThreadableJob
 		
 	private:
 		void doProcessing() override;
-
-	private:
 		int m_channelIndex;
 		std::optional<QColor> m_color;
 };

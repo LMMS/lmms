@@ -118,6 +118,7 @@ void MixerChannel::unmuteForSolo()
 		{
 			sendsRoute->receiver()->unmuteSenderForSolo();
 		}
+
 		for (const MixerRoute* receiverRoute : m_receives)
 		{
 			receiverRoute->sender()->unmuteReceiverForSolo();
@@ -151,6 +152,7 @@ void MixerChannel::unmuteReceiverForSolo()
 		{
 			receiverRoute->sender()->unmuteReceiverForSolo();
 		}
+
 		for (const MixerRoute* sendsRoute : m_sends)
 		{
 			sendsRoute->receiver()->unmuteSenderForSolo();
