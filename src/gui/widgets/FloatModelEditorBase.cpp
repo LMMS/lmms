@@ -362,7 +362,14 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 	}
 	else
 	{
-		m_leftOver = valueOffset;
+		if (valueOffset > 0 && currentValue == model()->minValue())
+		{
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = valueOffset;
+		}
 	}
 }
 
