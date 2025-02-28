@@ -144,6 +144,8 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		throw std::runtime_error{std::string{"PortAudio: could not open stream, "} + Pa_GetErrorText(err)};
 	}
 
+	setChannels(outputDeviceChannelCount);
+
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceAttribute, outputDeviceInfo->name);
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceBackendAttribute, outputBackendInfo->name);
 	ConfigManager::inst()->setValue(configTag, configOutputDeviceChannelsAttribute, QString::number(outputDeviceChannelCount));
