@@ -25,80 +25,47 @@
 #ifndef LMMS_AUDIO_PORTAUDIO_H
 #define LMMS_AUDIO_PORTAUDIO_H
 
-#include "LcdSpinBox.h"
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <QObject>
+#include <QString>
+#include <QWidget>
 #include <portaudio.h>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-class QComboBox;
-
-namespace lmms
-{
-
-class PortAudioInitializationGuard
-{
-public:
-	PortAudioInitializationGuard();
-	~PortAudioInitializationGuard();
-
-private:
-	PaError m_error = paNoError;
-};
-
-namespace gui {
-
-class AudioPortAudioSetupWidget : public gui::AudioDeviceSetupWidget
-{
-public:
-	AudioPortAudioSetupWidget(QWidget* _parent);
-
-	void updateBackends();
-	void updateDevices();
-	void updateChannels();
-
-	void saveSettings() override;
-	void show() override;
-
-private:
-	QComboBox* m_backendComboBox;
-	QComboBox* m_deviceComboBox;
-	LcdSpinBox* m_channelSpinBox;
-	IntModel m_channelModel;
-};
-} // namespace gui
-
+namespace lmms {
 class AudioPortAudio : public AudioDevice
 {
 public:
-	AudioPortAudio(bool& successful, AudioEngine* engine);
+	AudioPortAudio(AudioEngine* engine);
 	~AudioPortAudio() override;
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
-	}
-
-private:
 	void startProcessing() override;
 	void stopProcessing() override;
 
-	int processCallback(const float* inputBuffer, float* outputBuffer, f_cnt_t framesPerBuffer);
-	static int processCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
-		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* arg);
+	static auto name() -> QString { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio"); }
 
-	PaStream * m_paStream;
+private:
+	static int processCallback(const void* input, void* output, unsigned long frameCount,
+		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
+
+	PaStream* m_paStream = nullptr;
 	std::vector<SampleFrame> m_outBuf;
-	std::size_t m_outBufPos;
-	PortAudioInitializationGuard m_initGuard;
+	std::size_t m_outBufPos = 0;
 };
-
 } // namespace lmms
+
+namespace lmms::gui {
+class AudioPortAudioSetupWidget : public AudioDeviceSetupWidget
+{
+public:
+	AudioPortAudioSetupWidget(QWidget* parent);
+	void saveSettings() override;
+};
+} // namespace lmms::gui
 
 #endif // LMMS_HAVE_PORTAUDIO
 
