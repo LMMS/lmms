@@ -355,14 +355,14 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 	const auto step = model()->step<float>();
 	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
 
-	if (roundedValue != currentValue)
+	if (!approximatelyEqual(roundedValue, currentValue))
 	{
 		model()->setValue(roundedValue);
 		m_leftOver = 0.0f;
 	}
 	else
 	{
-		if (valueOffset > 0 && currentValue == model()->minValue())
+		if (valueOffset > 0 && approximatelyEqual(currentValue, model()->minValue()))
 		{
 			m_leftOver = 0.0f;
 		}
