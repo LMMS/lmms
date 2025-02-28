@@ -170,13 +170,9 @@ void AudioPortAudio::stopProcessing()
 	Pa_StopStream(m_paStream);
 }
 
-int AudioPortAudio::processCallback(const void* input, void* output, unsigned long frameCount,
-	const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
+int AudioPortAudio::processCallback(const void*, void* output, unsigned long frameCount,
+	const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userData)
 {
-	(void)input;
-	(void)timeInfo;
-	(void)statusFlags;
-
 	const auto outputBuffer = static_cast<float*>(output);
 	const auto device = static_cast<AudioPortAudio*>(userData);
 
@@ -186,13 +182,14 @@ int AudioPortAudio::processCallback(const void* input, void* output, unsigned lo
 	{
 		if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0) { return paComplete; }
 
-		if (device->channels() == 1) { outputBuffer[frame] = device->m_outBuf[device->m_outBufPos].average(); }
-		else
+		if (device->channels() == 1)
 		{
-			outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
-			outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
+			outputBuffer[frame] = device->m_outBuf[device->m_outBufPos].average();
+			continue;
 		}
 
+		outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
+		outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
 		device->m_outBufPos = frame % device->m_outBuf.size();
 	}
 
