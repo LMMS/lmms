@@ -114,7 +114,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		setUsesBuffer( false );
 	}
 
-	setAudioPort( instrumentTrack->audioPort() );
+	setAudioBusHandle(instrumentTrack->audioBusHandle());
 
 	unlock();
 }

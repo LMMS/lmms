@@ -251,7 +251,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_midiView = new InstrumentMidiIOView(m_tabWidget);
 
 	// FX tab
-	m_effectView = new EffectRackView(m_track->m_audioPort.effects(), m_tabWidget);
+	m_effectView = new EffectRackView(m_track->m_audioBusHandle.effects(), m_tabWidget);
 
 	// Tuning tab
 	m_tuningView = new InstrumentTuningView(m_track, m_tabWidget);
@@ -381,11 +381,11 @@ void InstrumentTrackWindow::modelChanged()
 		m_tuningView->microtunerGroupBox()->show();
 	}
 
-	m_ssView->setModel( &m_track->m_soundShaping );
-	m_noteStackingView->setModel( &m_track->m_noteStacking );
-	m_arpeggioView->setModel( &m_track->m_arpeggio );
-	m_midiView->setModel( &m_track->m_midiPort );
-	m_effectView->setModel( m_track->m_audioPort.effects() );
+	m_ssView->setModel(&m_track->m_soundShaping);
+	m_noteStackingView->setModel(&m_track->m_noteStacking);
+	m_arpeggioView->setModel(&m_track->m_arpeggio);
+	m_midiView->setModel(&m_track->m_midiPort);
+	m_effectView->setModel(m_track->m_audioBusHandle.effects());
 	m_tuningView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
 	m_tuningView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
 	m_tuningView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
