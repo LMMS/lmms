@@ -48,7 +48,10 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_outBuf(engine->framesPerPeriod())
 {
-	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
+	if (Pa_Initialize() != paNoError)
+	{
+		throw std::runtime_error{"PortAudio: could not initialize - " + std::string(Pa_GetErrorText(Pa_Initialize()))};
+	}
 
 	const auto configOutputDeviceValue = ConfigManager::inst()->value(configTag, configOutputDeviceAttribute);
 	const auto configOutputDeviceBackendValue = ConfigManager::inst()->value(configTag, configOutputDeviceBackendAttribute);
@@ -203,7 +206,10 @@ namespace lmms::gui {
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioPortAudio::name(), parent)
 {
-	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"Could not initialize PortAudio"}; }
+	if (Pa_Initialize() != paNoError)
+	{
+		throw std::runtime_error{"PortAudio: could not initialize - " + std::string(Pa_GetErrorText(Pa_Initialize()))};
+	}
 
 	const auto form = new QFormLayout(this);
 	form->setRowWrapPolicy(QFormLayout::WrapAllRows);
