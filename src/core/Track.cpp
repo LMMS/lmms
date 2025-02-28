@@ -660,7 +660,8 @@ QString Track::findUniqueName(const QString& sourceName) const
 	// removing number from `sourceName`
 	bool isSeparatedWithWhitespace = false;
 	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName, &isSeparatedWithWhitespace).size();
-	if (sourceNumberLength > 0)
+	bool isOverflow = sourceNumberLength >= 9;
+	if (sourceNumberLength > 0 && isOverflow == false)
 	{
 		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
 		sourceNumberLength = isSeparatedWithWhitespace ? sourceNumberLength + 1 : sourceNumberLength;
@@ -669,9 +670,8 @@ QString Track::findUniqueName(const QString& sourceName) const
 	
 	const TrackContainer::TrackList& trackList = m_trackContainer->tracks();
 	
-	//! will store the max number found at the end of `sourceName` named tracks
+	//! will store the largest number found at the end of `sourceName` named tracks
 	size_t maxNameCounter = 0;
-	bool found = false;
 	
 	for (const Track* it : trackList)
 	{
@@ -679,15 +679,11 @@ QString Track::findUniqueName(const QString& sourceName) const
 		{
 			size_t nameCount = Track::getNameNumberEnding(it->name()).toInt();
 			maxNameCounter = maxNameCounter < nameCount ? nameCount : maxNameCounter;
-			found = true;
 		}
 	}
 	
-	if (found)
-	{
-		if (isSeparatedWithWhitespace) { output = output + ' '; }
-		output = output + QString::number(maxNameCounter + 1);
-	}
+	if (isSeparatedWithWhitespace || sourceNumberLength <= 0 || isOverflow) { output = output + ' '; }
+	output = output + QString::number(maxNameCounter + 1);
 
 	return output;
 }
