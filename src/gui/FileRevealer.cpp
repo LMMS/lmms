@@ -120,8 +120,8 @@ const QStringList& FileRevealer::getSelectCommand()
 	static const std::map<QString, QStringList> argMap = {
 		{"open", {"-R"}},
 		{"explorer", {"/select,"}},
-		{"nemo", {""}},
-		{"thunar", {""}},
+		{"nemo", {}},
+		{"thunar", {}},
 		{"exo-open", {"--launch", "FileManager"}},
 	};
 
