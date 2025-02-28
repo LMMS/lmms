@@ -61,7 +61,8 @@ const QString& FileRevealer::getDefaultFileManager()
 	{
 		process.start("gio", {"mime", "inode/directory"});
 	}
-	else {
+	else
+	{
 		process.start("xdg-mime", {"query", "default", "inode/directory"});
 	}
 
