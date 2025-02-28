@@ -69,7 +69,7 @@ const QString& FileRevealer::getDefaultFileManager()
 
 	QString fileManager = QString::fromUtf8(process.readAllStandardOutput()).toLower().trimmed();
 
-	if(fileManager.contains("inode/directory"))
+	if (fileManager.contains("inode/directory"))
 	{
 		// gio format: split on ":" or "\n", take second element
 		QStringList fileManagers = fileManager.split(QRegularExpression("[:\n]"), Qt::SkipEmptyParts);
