@@ -191,6 +191,9 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	{
 		throw std::runtime_error{std::string{"PortAudio: could not open stream, "} + Pa_GetErrorText(err)};
 	}
+
+    setSampleRate(sampleRate);
+    setChannels(outputStreamParameters.channelCount);
 }
 
 AudioPortAudio::~AudioPortAudio()
