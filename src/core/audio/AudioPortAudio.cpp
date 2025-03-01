@@ -268,6 +268,10 @@ public:
 		m_channelSpinBox->setModel(&m_channelModel);
 		layout->addRow(tr(rowHeader), m_deviceComboBox);
 		layout->addRow(tr("Channels"), m_channelSpinBox);
+
+        connect(m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&]{
+            refreshChannelRange();
+        });
 	}
 
 	void refreshFromConfig(PaHostApiIndex backendIndex)
@@ -291,18 +295,22 @@ public:
 		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(m_direction));
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
+        
+        refreshChannelRange();
 
 		const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
 		const auto selectedNumChannels
-			= ConfigManager::inst()->value(tag(), channelsAttribute(m_direction), defaultNumChannels);
+        = ConfigManager::inst()->value(tag(), channelsAttribute(m_direction), defaultNumChannels);
 		m_channelModel.setValue(selectedNumChannels.toInt());
+	}
 
-		const auto deviceIndex = m_deviceComboBox->currentData().toInt();
+    void refreshChannelRange()
+    {
+        const auto deviceIndex = m_deviceComboBox->currentData().toInt();
 		const auto deviceSpec = DeviceSpec::loadFromIndex(deviceIndex, m_direction);
-
 		m_channelModel.setRange(1, deviceSpec.maxChannels());
 		m_channelSpinBox->setNumDigits(QString::number(deviceSpec.maxChannels()).length());
-	}
+    }
 
 	void saveToConfig()
 	{
