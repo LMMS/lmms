@@ -259,7 +259,7 @@ public:
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
 	}
-	
+
 	void refreshChannels(PaDeviceIndex deviceIndex, Direction direction)
 	{
 		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), direction);
