@@ -200,7 +200,7 @@ public:
 	//! returns a name that isn't used by any track and conatins `sourceName`
 	QString findUniqueName(const QString& sourceName) const;
 public slots:
-	virtual void setName(const QString& newName);
+	virtual void setName(const QString& newName, bool shouldCreateUnique);
 
 	void setMutedBeforeSolo(const bool muted)
 	{

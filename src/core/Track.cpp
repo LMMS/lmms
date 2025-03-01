@@ -168,7 +168,7 @@ Track* Track::clone()
 	saveState(doc, parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
 	// giving different name to cloned track
-	t->setName(findUniqueName(name()));
+	t->setName(name(), true);
 
 	AutomationClip::resolveAllIDs();
 	return t;
@@ -248,8 +248,8 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 							"settings-node!\n" );
 	}
 
-	setName( element.hasAttribute( "name" ) ? element.attribute( "name" ) :
-			element.firstChild().toElement().attribute( "name" ) );
+	setName(element.hasAttribute("name") ? element.attribute("name") :
+			element.firstChild().toElement().attribute("name"), false);
 
 	m_mutedModel.loadSettings( element, "muted" );
 	m_soloModel.loadSettings( element, "solo" );
@@ -738,11 +738,12 @@ QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhi
 	return numberOutput;
 }
 
-void Track::setName(const QString& newName)
+void Track::setName(const QString& newName, bool shouldCreateUnique)
 {
-	if (m_name != newName)
+	const QString changedName = shouldCreateUnique ? findUniqueName(newName) : newName;
+	if (m_name != changedName)
 	{
-		m_name = newName;
+		m_name = changedName;
 
 		if (auto song = Engine::getSong())
 		{
