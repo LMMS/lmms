@@ -236,7 +236,7 @@ public:
 		layout->addRow(tr("Channels"), m_channelSpinBox);
 
 		connect(m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-			[&] { refreshChannelRange(direction); });
+			[this, direction](int index) { refreshChannels(m_deviceComboBox->itemData(index).toInt(), direction); });
 	}
 
 	void refreshFromConfig(PaHostApiIndex backendIndex, Direction direction)
@@ -258,16 +258,13 @@ public:
 		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(direction));
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
-
-		refreshChannelRange(direction);
-		m_channelModel.setValue(numChannelsFromConfig(direction).toInt());
 	}
-
-	void refreshChannelRange(Direction direction)
+	
+	void refreshChannels(PaDeviceIndex deviceIndex, Direction direction)
 	{
-		const auto deviceIndex = m_deviceComboBox->currentData().toInt();
 		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), direction);
 		m_channelModel.setRange(1, maxChannelCount);
+		m_channelModel.setValue(numChannelsFromConfig(direction).toInt());
 		m_channelSpinBox->setNumDigits(QString::number(maxChannelCount).length());
 	}
 
@@ -298,9 +295,9 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->addRow(m_outputDevice);
 	form->addRow(m_inputDevice);
 
-	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&] {
-		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Input);
-		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Output);
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+		m_inputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt(), Direction::Input);
+		m_outputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt(), Direction::Output);
 	});
 }
 
@@ -321,10 +318,7 @@ void AudioPortAudioSetupWidget::show()
 
 		const auto selectedBackendName = ConfigManager::inst()->value(tag(), backendAttribute());
 		const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
-
 		m_backendComboBox->setCurrentIndex(selectedBackendIndex);
-		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Input);
-		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Output);
 	}
 
 	AudioDeviceSetupWidget::show();
