@@ -376,8 +376,7 @@ void FloatModelEditorBase::enterValue()
 	bool ok;
 	float new_val;
 
-	if (isVolumeKnob() &&
-		ConfigManager::inst()->value("app", "displaydbfs").toInt())
+	if (isVolumeKnob())
 	{
 		auto const initalValue = model()->getRoundedValue() / 100.0;
 		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
@@ -430,8 +429,7 @@ void FloatModelEditorBase::friendlyUpdate()
 
 QString FloatModelEditorBase::displayValue() const
 {
-	if (isVolumeKnob() &&
-		ConfigManager::inst()->value("app", "displaydbfs").toInt())
+	if (isVolumeKnob())
 	{
 		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
 		return m_description.trimmed() + (
