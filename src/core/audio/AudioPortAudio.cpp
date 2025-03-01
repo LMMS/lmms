@@ -192,8 +192,8 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		throw std::runtime_error{std::string{"PortAudio: could not open stream, "} + Pa_GetErrorText(err)};
 	}
 
-    setSampleRate(sampleRate);
-    setChannels(outputStreamParameters.channelCount);
+	setSampleRate(sampleRate);
+	setChannels(outputStreamParameters.channelCount);
 }
 
 AudioPortAudio::~AudioPortAudio()
@@ -249,19 +249,19 @@ public:
 		: QGroupBox{parent}
 		, m_direction(direction)
 	{
-        m_deviceComboBox = new QComboBox{this};
-        m_channelSpinBox = new LcdSpinBox{1, this};
+		m_deviceComboBox = new QComboBox{this};
+		m_channelSpinBox = new LcdSpinBox{1, this};
 
 		const auto layout = new QFormLayout{this};
-        auto rowHeader = "";
+		auto rowHeader = "";
 
-        switch (direction)
-        {
+		switch (direction)
+		{
 		case Direction::Input:
-            rowHeader = "Input device";
-            break;
+			rowHeader = "Input device";
+			break;
 		case Direction::Output:
-            rowHeader = "Output device";
+			rowHeader = "Output device";
 			break;
 		}
 
@@ -295,22 +295,22 @@ public:
 		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(m_direction));
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
-        
-        refreshChannelRange();
+
+		refreshChannelRange();
 
 		const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
 		const auto selectedNumChannels
-        = ConfigManager::inst()->value(tag(), channelsAttribute(m_direction), defaultNumChannels);
+			= ConfigManager::inst()->value(tag(), channelsAttribute(m_direction), defaultNumChannels);
 		m_channelModel.setValue(selectedNumChannels.toInt());
 	}
 
-    void refreshChannelRange()
-    {
-        const auto deviceIndex = m_deviceComboBox->currentData().toInt();
+	void refreshChannelRange()
+	{
+		const auto deviceIndex = m_deviceComboBox->currentData().toInt();
 		const auto deviceSpec = DeviceSpec::loadFromIndex(deviceIndex, m_direction);
 		m_channelModel.setRange(1, deviceSpec.maxChannels());
 		m_channelSpinBox->setNumDigits(QString::number(deviceSpec.maxChannels()).length());
-    }
+	}
 
 	void saveToConfig()
 	{
@@ -328,22 +328,11 @@ private:
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget{AudioPortAudio::name(), parent}
 {
-	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
-
 	const auto form = new QFormLayout{this};
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 	form->setVerticalSpacing(10);
 
-	m_backendComboBox = new QComboBox{};
-	for (auto i = 0, backendCount = Pa_GetHostApiCount(); i < backendCount; ++i)
-	{
-		m_backendComboBox->addItem(Pa_GetHostApiInfo(i)->name, i);
-	}
-
-	const auto selectedBackendName = ConfigManager::inst()->value(tag(), backendAttribute());
-	const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
-	m_backendComboBox->setCurrentIndex(selectedBackendIndex);
-
+	m_backendComboBox = new QComboBox{this};
 	m_inputDevice = new DeviceSpecWidget{Direction::Input};
 	m_outputDevice = new DeviceSpecWidget{Direction::Output};
 
@@ -351,18 +340,41 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->addRow(m_outputDevice);
 	form->addRow(m_inputDevice);
 
-	const auto onBackendIndexChanged = [&] {
+	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&] {
 		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
 		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
-	};
+	});
+}
 
-	onBackendIndexChanged();
-	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, onBackendIndexChanged);
+void AudioPortAudioSetupWidget::show()
+{
+    if (m_portAudioInitError == paNoError)
+    {
+        m_portAudioInitError = Pa_Initialize();
+		if (m_portAudioInitError != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
+	}
+
+	if (m_backendComboBox->count() == 0)
+	{
+		for (auto i = 0, backendCount = Pa_GetHostApiCount(); i < backendCount; ++i)
+		{
+			m_backendComboBox->addItem(Pa_GetHostApiInfo(i)->name, i);
+		}
+
+		const auto selectedBackendName = ConfigManager::inst()->value(tag(), backendAttribute());
+		const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
+
+		m_backendComboBox->setCurrentIndex(selectedBackendIndex);
+        m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+        m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+	}
+
+    AudioDeviceSetupWidget::show();
 }
 
 AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
 {
-	Pa_Terminate();
+	if (m_portAudioInitError == paNoError) { Pa_Terminate(); }
 }
 
 void AudioPortAudioSetupWidget::saveSettings()
