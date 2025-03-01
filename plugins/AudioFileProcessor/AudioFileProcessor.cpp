@@ -313,7 +313,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 				m_sample.sampleFile().isEmpty()))
 	{
 		// then set it to new one
-		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
+		instrumentTrack()->setName(instrumentTrack()->findUniqueName(PathUtil::cleanName(_audio_file)));
 	}
 	// else we don't touch the track-name, because the user named it self
 
