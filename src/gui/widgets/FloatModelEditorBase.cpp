@@ -49,7 +49,7 @@ SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
-	m_volumeKnob(false),
+	m_volKnobType(VolKnobType::Normal),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
 	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
@@ -376,18 +376,16 @@ void FloatModelEditorBase::enterValue()
 	bool ok;
 	float new_val;
 
-	if (isVolumeKnob() &&
+	if (volKnobType() != VolKnobType::Normal &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
 		auto const initalValue = model()->getRoundedValue() / 100.0;
 		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
 
-		new_val = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:"),
-				initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
-
+		new_val = QInputDialog::getDouble(this, tr("Set value"),
+			tr(volKnobType() == VolKnobType::AbsVol ? "Please enter a new value between -96.0 dBFS and 6.0 dBFS:"
+													: "Please enter a new value between -96.0 dB and 6.0 dB:"),
+			initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
 		if (new_val <= -96.0)
 		{
 			new_val = 0.0f;
@@ -430,14 +428,15 @@ void FloatModelEditorBase::friendlyUpdate()
 
 QString FloatModelEditorBase::displayValue() const
 {
-	if (isVolumeKnob() &&
+	if (volKnobType() != VolKnobType::Normal &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
+		const auto dbLabel = QString{volKnobType() == VolKnobType::AbsVol ? " %1 dBFS" : " %1 dB"};
 		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
 		return m_description.trimmed() + (
 			valueToVolumeRatio == 0.
-			? QString(" -∞ dBFS")
-			: QString(" %1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
+			? QString(" -∞ " + dbLabel)
+			: QString(" %1 " + dbLabel).arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
 		);
 	}
 

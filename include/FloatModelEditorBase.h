@@ -35,13 +35,17 @@
 namespace lmms::gui
 {
 
+enum class VolKnobType
+{
+	Normal, AbsVol, RelVol
+};
+
 class SimpleTextFloat;
 
 class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(bool, isVolumeKnob, setVolumeKnob, m_volumeKnob);
 	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
 
 	void initUi(const QString & name); //!< to be called by ctors
@@ -52,6 +56,16 @@ public:
 		Vertical,
 		Horizontal
 	};
+
+	VolKnobType volKnobType() const
+	{
+		return m_volKnobType;
+	}
+
+	void setVolKnobType(const VolKnobType val)
+	{
+		m_volKnobType = val;
+	}
 
 	FloatModelEditorBase(DirectionOfManipulation directionOfManipulation = DirectionOfManipulation::Vertical, QWidget * _parent = nullptr, const QString & _name = QString()); //!< default ctor
 	FloatModelEditorBase(const FloatModelEditorBase& other) = delete;
@@ -106,7 +120,7 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	BoolModel m_volumeKnob;
+	VolKnobType m_volKnobType;
 	FloatModel m_volumeRatio;
 
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent

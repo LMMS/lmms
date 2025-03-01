@@ -73,25 +73,25 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 	auto gain1 = new Fader(&controls->m_gain1, tr("Band 1 gain"), this, fader_knob);
 	gain1->move( 7, 56 );
 	gain1->setDisplayConversion( false );
-	gain1->setHintText( tr( "Band 1 gain:" ), " dBFS" );
+	gain1->setHintText(tr("Band 1 gain: "), "dB");
 	gain1->setRenderUnityLine(false);
 
 	auto gain2 = new Fader(&controls->m_gain2, tr("Band 2 gain"), this, fader_knob);
 	gain2->move( 47, 56 );
 	gain2->setDisplayConversion( false );
-	gain2->setHintText( tr( "Band 2 gain:" ), " dBFS" );
+	gain2->setHintText(tr("Band 2 gain: "), "dB");
 	gain2->setRenderUnityLine(false);
 
 	auto gain3 = new Fader(&controls->m_gain3, tr("Band 3 gain"), this, fader_knob);
 	gain3->move( 87, 56 );
 	gain3->setDisplayConversion( false );
-	gain3->setHintText( tr( "Band 3 gain:" ), " dBFS" );
+	gain3->setHintText(tr("Band 3 gain: "), "dB");
 	gain3->setRenderUnityLine(false);
 
 	auto gain4 = new Fader(&controls->m_gain4, tr("Band 4 gain"), this, fader_knob);
 	gain4->move( 127, 56 );
 	gain4->setDisplayConversion( false );
-	gain4->setHintText( tr( "Band 4 gain:" ), " dBFS" );
+	gain4->setHintText(tr("Band 4 gain: "), "dB");
 	gain4->setRenderUnityLine(false);
 	
 	// leds

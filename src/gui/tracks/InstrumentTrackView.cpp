@@ -79,7 +79,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Volume" ) );
-	m_volumeKnob->setVolumeKnob( true );
+	m_volumeKnob->setVolKnobType(VolKnobType::RelVol);
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );

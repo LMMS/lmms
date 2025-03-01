@@ -699,18 +699,18 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 
 
 	// OP1 knobs & buttons...
-	KNOB_GEN(op1_a_kn, "Attack", "", 6, 48);
-	KNOB_GEN(op1_d_kn, "Decay", "", 34, 48);
-	KNOB_GEN(op1_s_kn, "Sustain", "", 62, 48);
-	KNOB_GEN(op1_r_kn, "Release", "", 90, 48);
-	KNOB_GEN(op1_lvl_kn, "Level", "", 166, 48);
-	KNOB_GEN(op1_scale_kn, "Scale", "", 194, 48);
-	KNOB_GEN(op1_mul_kn, "Frequency multiplier", "", 222, 48);
+	KNOB_GEN(op1_a_kn, "Attack:", "", 6, 48);
+	KNOB_GEN(op1_d_kn, "Decay:", "", 34, 48);
+	KNOB_GEN(op1_s_kn, "Sustain:", "", 62, 48);
+	KNOB_GEN(op1_r_kn, "Release:", "", 90, 48);
+	KNOB_GEN(op1_lvl_kn, "Level:", "", 166, 48);
+	KNOB_GEN(op1_scale_kn, "Scale:", "", 194, 48);
+	KNOB_GEN(op1_mul_kn, "Frequency multiplier:", "", 222, 48);
 	BUTTON_GEN(op1_ksr_btn, "Keyboard scaling rate", 9, 87);
 	BUTTON_GEN(op1_perc_btn, "Percussive envelope", 36, 87);
 	BUTTON_GEN(op1_trem_btn, "Tremolo", 65, 87);
 	BUTTON_GEN(op1_vib_btn, "Vibrato", 93, 87);
-	KNOB_GEN(feedback_kn, "Feedback", "", 128, 48);
+	KNOB_GEN(feedback_kn, "Feedback:", "", 128, 48);
 
 	op1_waveform = new automatableButtonGroup( this );
 	WAVEBUTTON_GEN(op1_w0_btn,"Sine", 154, 86, "wave1_on", "wave1_off", op1_waveform);
@@ -720,13 +720,13 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 
 
 	// And the same for OP2
-	KNOB_GEN(op2_a_kn, "Attack", "", 6, 138);
-	KNOB_GEN(op2_d_kn, "Decay", "", 34, 138);
-	KNOB_GEN(op2_s_kn, "Sustain", "", 62, 138);
-	KNOB_GEN(op2_r_kn, "Release", "", 90, 138);
-	KNOB_GEN(op2_lvl_kn, "Level", "", 166, 138);
-	KNOB_GEN(op2_scale_kn, "Scale", "", 194, 138);
-	KNOB_GEN(op2_mul_kn, "Frequency multiplier", "", 222, 138);
+	KNOB_GEN(op2_a_kn, "Attack:", "", 6, 138);
+	KNOB_GEN(op2_d_kn, "Decay:", "", 34, 138);
+	KNOB_GEN(op2_s_kn, "Sustain:", "", 62, 138);
+	KNOB_GEN(op2_r_kn, "Release:", "", 90, 138);
+	KNOB_GEN(op2_lvl_kn, "Level:", "", 166, 138);
+	KNOB_GEN(op2_scale_kn, "Scale:", "", 194, 138);
+	KNOB_GEN(op2_mul_kn, "Frequency multiplier:", "", 222, 138);
 	BUTTON_GEN(op2_ksr_btn, "Keyboard scaling rate", 9, 177);
 	BUTTON_GEN(op2_perc_btn, "Percussive envelope", 36, 177);
 	BUTTON_GEN(op2_trem_btn, "Tremolo", 65, 177);
@@ -736,7 +736,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	WAVEBUTTON_GEN(op2_w0_btn,"Sine", 154, 176, "wave1_on", "wave1_off", op2_waveform);
 	WAVEBUTTON_GEN(op2_w1_btn,"Half sine", 178, 176, "wave2_on", "wave2_off", op2_waveform);
 	WAVEBUTTON_GEN(op2_w2_btn,"Absolute sine", 199, 176, "wave3_on", "wave3_off", op2_waveform);
-	WAVEBUTTON_GEN(op2_w3_btn,"Quarter Sine", 220, 176, "wave4_on", "wave4_off", op2_waveform);
+	WAVEBUTTON_GEN(op2_w3_btn,"Quarter sine", 220, 176, "wave4_on", "wave4_off", op2_waveform);
 
 	BUTTON_GEN(fm_btn, "FM", 9, 220);
 	BUTTON_GEN(vib_depth_btn, "Vibrato depth", 65, 220);
@@ -787,22 +787,22 @@ void OpulenzInstrumentView::updateKnobHints()
 
 	auto m = castModel<OpulenzInstrument>();
 
-	op1_a_kn->setHintText( tr( "Attack" ),
-						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
-	op2_a_kn->setHintText( tr( "Attack" ),
-						   " (" + knobHintHelper(attack_times[(int)m->op2_a_mdl.value()]) + ")");
-	op1_d_kn->setHintText( tr( "Decay" ),
-						   " (" + knobHintHelper(dr_times[(int)m->op1_d_mdl.value()]) + ")");
-	op2_d_kn->setHintText( tr( "Decay" ),
-						   " (" + knobHintHelper(dr_times[(int)m->op2_d_mdl.value()]) + ")");
-	op1_r_kn->setHintText( tr( "Release" ),
-						   " (" + knobHintHelper(dr_times[(int)m->op1_r_mdl.value()]) + ")");
-	op2_r_kn->setHintText( tr( "Release" ),
-						   " (" + knobHintHelper(dr_times[(int)m->op2_r_mdl.value()]) + ")");
-	op1_mul_kn->setHintText( tr( "Frequency multiplier" ),
-			       " (" + QString::number(fmultipliers[(int)m->op1_mul_mdl.value()]) + " semitones)");
-	op2_mul_kn->setHintText( tr( "Frequency multiplier" ),
-			       " (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
+	op1_a_kn->setHintText(tr("Attack:"),
+								" (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
+	op2_a_kn->setHintText(tr("Attack:"),
+								" (" + knobHintHelper(attack_times[(int)m->op2_a_mdl.value()]) + ")");
+	op1_d_kn->setHintText(tr("Decay:"),
+								" (" + knobHintHelper(dr_times[(int)m->op1_d_mdl.value()]) + ")");
+	op2_d_kn->setHintText(tr("Decay:"),
+								" (" + knobHintHelper(dr_times[(int)m->op2_d_mdl.value()]) + ")");
+	op1_r_kn->setHintText(tr("Release:"),
+								" (" + knobHintHelper(dr_times[(int)m->op1_r_mdl.value()]) + ")");
+	op2_r_kn->setHintText(tr("Release:"),
+								" (" + knobHintHelper(dr_times[(int)m->op2_r_mdl.value()]) + ")");
+	op1_mul_kn->setHintText(tr("Frequency multiplier:"),
+								" (" + QString::number(fmultipliers[(int)m->op1_mul_mdl.value()]) + " semitones)");
+	op2_mul_kn->setHintText(tr("Frequency multiplier:"),
+								" (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
 }
 
 void OpulenzInstrumentView::modelChanged()

@@ -62,7 +62,6 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	controlLayout->addWidget(logarithmicButton);
 
 	controlLayout->addStretch();
-
 	// Switch between lines mode and point mode
 	auto linesMode = new LedCheckBox(tr("Lines"), this);
 	linesMode->setToolTip(tr("Render with lines."));

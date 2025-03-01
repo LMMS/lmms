@@ -553,7 +553,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 		// setup volume-knob
 		auto vk = new Knob(KnobType::Styled, this);
-		vk->setVolumeKnob( true );
+		vk->setVolKnobType(VolKnobType::AbsVol);
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(
