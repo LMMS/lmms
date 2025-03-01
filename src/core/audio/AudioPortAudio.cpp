@@ -239,20 +239,35 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 
 namespace lmms::gui {
 
-class AudioPortAudioSetupWidget::DeviceSpecWidget : public QWidget
+class AudioPortAudioSetupWidget::DeviceSpecWidget : public QGroupBox
 {
 public:
 	DeviceSpecWidget(Direction direction, QWidget* parent = nullptr)
-		: QWidget{parent}
-		, m_deviceComboBox{new QComboBox{this}}
-		, m_channelSpinBox{new lmms::gui::LcdSpinBox{1, this}}
+		: QGroupBox{parent}
 		, m_direction(direction)
 	{
-		(void)new QHBoxLayout{this};
+        m_deviceComboBox = new QComboBox{this};
+        m_channelSpinBox = new LcdSpinBox{1, this};
+
+		const auto layout = new QFormLayout{this};
+        auto rowHeader = "";
+
+        switch (direction)
+        {
+		case Direction::Input:
+            rowHeader = "Input device";
+            break;
+		case Direction::Output:
+            rowHeader = "Output device";
+			break;
+		}
+
 		m_channelSpinBox->setModel(&m_channelModel);
+		layout->addRow(tr(rowHeader), m_deviceComboBox);
+		layout->addRow(tr("Channels"), m_channelSpinBox);
 	}
 
-	void refresh(PaHostApiIndex backendIndex)
+	void refreshFromConfig(PaHostApiIndex backendIndex)
 	{
 		using namespace lmms;
 
@@ -280,7 +295,10 @@ public:
 		m_channelModel.setValue(selectedNumChannels.toInt());
 
 		const auto deviceIndex = m_deviceComboBox->currentData().toInt();
-		m_channelModel.setRange(1, DeviceSpec::loadFromIndex(deviceIndex, m_direction).maxChannels());
+		const auto deviceSpec = DeviceSpec::loadFromIndex(deviceIndex, m_direction);
+
+		m_channelModel.setRange(1, deviceSpec.maxChannels());
+		m_channelSpinBox->setNumDigits(QString::number(deviceSpec.maxChannels()).length());
 	}
 
 	void saveToConfig()
@@ -303,7 +321,7 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 
 	const auto form = new QFormLayout{this};
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
-	form->setVerticalSpacing(15);
+	form->setVerticalSpacing(10);
 
 	m_backendComboBox = new QComboBox{};
 	for (auto i = 0, backendCount = Pa_GetHostApiCount(); i < backendCount; ++i)
@@ -323,8 +341,8 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->addRow(m_inputDevice);
 
 	const auto onBackendIndexChanged = [&] {
-		m_inputDevice->refresh(m_backendComboBox->currentData().toInt());
-		m_outputDevice->refresh(m_backendComboBox->currentData().toInt());
+		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
 	};
 
 	onBackendIndexChanged();
