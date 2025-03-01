@@ -657,35 +657,52 @@ BoolModel *Track::getMutedModel()
 QString Track::findUniqueName(const QString& sourceName) const
 {
 	QString output = sourceName;
-	// removing number from `sourceName`
-	bool isSeparatedWithWhitespace = false;
-	size_t sourceNumberLength = Track::getNameNumberEnding(sourceName, &isSeparatedWithWhitespace).size();
-	bool isOverflow = sourceNumberLength >= 9;
-	if (sourceNumberLength > 0 && isOverflow == false)
+	QString sourceNameEnd = Track::getNameNumberEnding(sourceName, nullptr);
+
+	// if overflow, treat number as part of the name
+	// or if the number starts with a "0", because usually it is part of the name in that case
+	if (sourceNameEnd.size() >= 9 || (sourceNameEnd.size() > 1 && sourceNameEnd.startsWith("0")))
 	{
-		// whitespace needs to be removed so we add + 1 to `sourceNumberLength`
-		sourceNumberLength = isSeparatedWithWhitespace ? sourceNumberLength + 1 : sourceNumberLength;
+		sourceNameEnd.clear();
+	}
+
+	size_t sourceNumberLength = sourceNameEnd.size();
+
+	// removing number from `sourceName`
+	if (sourceNumberLength > 0)
+	{
 		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
 	}
 	
 	const TrackContainer::TrackList& trackList = m_trackContainer->tracks();
 	
 	//! will store the largest number found at the end of `sourceName` named tracks
-	size_t maxNameCounter = 0;
+	size_t maxNameCounter = sourceNameEnd.toInt();
+	bool shouldIncrease = false;
 	
 	for (const Track* it : trackList)
 	{
 		if (it->name().startsWith(output))
 		{
-			size_t nameCount = Track::getNameNumberEnding(it->name()).toInt();
-			maxNameCounter = maxNameCounter < nameCount ? nameCount : maxNameCounter;
+			const QString curNameEnd = Track::getNameNumberEnding(it->name());
+			size_t nameCount = (curNameEnd.size() > 1 && curNameEnd.startsWith("0")) ? 0 : curNameEnd.toInt();
+			if (maxNameCounter <= nameCount)
+			{
+				maxNameCounter = nameCount;
+				shouldIncrease = true;
+			}
 		}
 	}
 	
-	if (isSeparatedWithWhitespace || sourceNumberLength <= 0 || isOverflow) { output = output + ' '; }
-	output = output + QString::number(maxNameCounter + 1);
-
-	return output;
+	// if a name exists with a bigger number at the end
+	// return a name with that number + 1
+	if (shouldIncrease)
+	{
+		if (sourceNumberLength <= 0) { output = output + ' '; }
+		output = output + QString::number(maxNameCounter + 1);
+		return output;
+	}
+	return sourceName;
 }
 
 QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhitespace)
