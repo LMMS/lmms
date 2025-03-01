@@ -52,7 +52,7 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
-	setName(findUniqueName(tr("Sample track")));
+	setName(tr("Sample track"), true);
 	m_panningModel.setCenterValue(DefaultPanning);
 	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
 
