@@ -87,15 +87,20 @@ int maxChannels(const PaDeviceInfo* info, Direction direction)
 	return 0;
 }
 
+QString numChannelsFromConfig(Direction direction)
+{
+	using namespace lmms;
+	const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
+	const auto numChannels = ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
+	return numChannels;
+}
+
 PaStreamParameters createStreamParameters(PaDeviceIndex index, double suggestedLatency, Direction direction)
 {
 	using namespace lmms;
 
-	const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
-	const auto numChannels = ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
-
 	return PaStreamParameters{.device = index,
-		.channelCount = numChannels.toInt(),
+		.channelCount = numChannelsFromConfig(direction).toInt(),
 		.sampleFormat = paFloat32,
 		.suggestedLatency = suggestedLatency,
 		.hostApiSpecificStreamInfo = nullptr};
@@ -255,11 +260,7 @@ public:
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
 
 		refreshChannelRange(direction);
-
-		const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
-		const auto selectedNumChannels
-			= ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
-		m_channelModel.setValue(selectedNumChannels.toInt());
+		m_channelModel.setValue(numChannelsFromConfig(direction).toInt());
 	}
 
 	void refreshChannelRange(Direction direction)
