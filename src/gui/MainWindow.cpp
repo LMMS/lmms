@@ -1638,10 +1638,10 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 	{
 		if (curWindow->isVisible())
 		{
-			minX = minX > curWindow->x() ? curWindow->x() : minX;
-			maxX = maxX < curWindow->x() + curWindow->width() ? curWindow->x() + curWindow->width() : maxX;
-			minY = minY > curWindow->y() ? curWindow->y() : minY;
-			maxY = maxY < curWindow->y() + curWindow->height() ? curWindow->y() + curWindow->height() : maxY;
+			minX = std::min(minX, curWindow->x());
+			maxX = std::max(maxX, curWindow->x() + curWindow->width());
+			minY = std::min(minY, curWindow->y());
+			maxY = std::max(maxY, curWindow->y() + curWindow->height());
 		}
 	}
 
