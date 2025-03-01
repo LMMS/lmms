@@ -71,10 +71,10 @@ public:
 	void saveSettings() override;
 
 private:
-	class DeviceSpecWidget;
+	class DeviceSelectorWidget;
 	QComboBox* m_backendComboBox = nullptr;
-	DeviceSpecWidget* m_inputDevice = nullptr;
-	DeviceSpecWidget* m_outputDevice = nullptr;
+	DeviceSelectorWidget* m_inputDevice = nullptr;
+	DeviceSelectorWidget* m_outputDevice = nullptr;
 	PaError m_portAudioInitError = paNoError;
 };
 } // namespace lmms::gui

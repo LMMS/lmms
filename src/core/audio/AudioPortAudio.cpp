@@ -242,10 +242,10 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 
 namespace lmms::gui {
 
-class AudioPortAudioSetupWidget::DeviceSpecWidget : public QGroupBox
+class AudioPortAudioSetupWidget::DeviceSelectorWidget : public QGroupBox
 {
 public:
-	DeviceSpecWidget(Direction direction, QWidget* parent = nullptr)
+	DeviceSelectorWidget(Direction direction, QWidget* parent = nullptr)
 		: QGroupBox{parent}
 		, m_direction(direction)
 	{
@@ -332,8 +332,8 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->setVerticalSpacing(10);
 
 	m_backendComboBox = new QComboBox{this};
-	m_inputDevice = new DeviceSpecWidget{Direction::Input};
-	m_outputDevice = new DeviceSpecWidget{Direction::Output};
+	m_inputDevice = new DeviceSelectorWidget{Direction::Input};
+	m_outputDevice = new DeviceSelectorWidget{Direction::Output};
 
 	form->addRow(tr("Backend"), m_backendComboBox);
 	form->addRow(m_outputDevice);
