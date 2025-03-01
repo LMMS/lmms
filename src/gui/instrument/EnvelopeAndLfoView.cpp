@@ -28,6 +28,7 @@
 #include <string_view>
 
 #include <QBoxLayout>
+#include <QSizePolicy>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
@@ -85,6 +86,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 
 	m_envelopeGraph = new EnvelopeGraph(this);
 	graphAndAmountLayout->addWidget(m_envelopeGraph);
+	m_envelopeGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	m_amountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
 	graphAndAmountLayout->addWidget(m_amountKnob, 0, Qt::AlignCenter);
@@ -124,6 +126,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	lfoLayout->addLayout(graphAndTypesLayout);
 
 	m_lfoGraph = new LfoGraph(this);
+	m_lfoGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	graphAndTypesLayout->addWidget(m_lfoGraph);
 
 	QHBoxLayout* typesLayout = new QHBoxLayout();
