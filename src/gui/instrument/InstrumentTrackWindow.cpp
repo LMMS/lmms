@@ -500,7 +500,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 void InstrumentTrackWindow::textChanged( const QString& newName )
 {
-	m_track->setName( newName );
+	m_track->setName(newName, false);
 	Engine::getSong()->setModified();
 }
 
