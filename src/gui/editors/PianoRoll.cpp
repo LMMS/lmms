@@ -2845,6 +2845,7 @@ void PianoRoll::updateKnifePos(QMouseEvent* me)
 */
 void PianoRoll::setupSelectedChords()
 {
+	if (!hasValidMidiClip()) { return; }
 	m_selectedChords.clear();
 	m_midiClip->rearrangeAllNotes();
 
@@ -2878,6 +2879,7 @@ void PianoRoll::setupSelectedChords()
 */
 void PianoRoll::setupClickedChord()
 {
+	if (!hasValidMidiClip()) { return; }
 	m_selectedChords.clear();
 	m_midiClip->rearrangeAllNotes();
 
