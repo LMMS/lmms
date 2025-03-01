@@ -33,7 +33,6 @@
 #include "LcdSpinBox.h"
 
 namespace {
-
 enum class Direction
 {
 	Input,
@@ -75,95 +74,69 @@ constexpr auto channelsAttribute(Direction direction)
 	return "";
 }
 
-struct DeviceSpec
+int maxChannels(const PaDeviceInfo* info, Direction direction)
 {
-	int maxChannels() const
+	switch (direction)
+	{
+	case Direction::Input:
+		return info->maxInputChannels;
+	case Direction::Output:
+		return info->maxOutputChannels;
+	}
+
+	return 0;
+}
+
+PaStreamParameters createStreamParameters(PaDeviceIndex index, double suggestedLatency, Direction direction)
+{
+	using namespace lmms;
+
+	const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
+	const auto numChannels = ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
+
+	return PaStreamParameters{.device = index,
+		.channelCount = numChannels.toInt(),
+		.sampleFormat = paFloat32,
+		.suggestedLatency = suggestedLatency,
+		.hostApiSpecificStreamInfo = nullptr};
+}
+
+PaDeviceIndex findDeviceFromConfig(Direction direction)
+{
+	using namespace lmms;
+
+	const auto backendName = ConfigManager::inst()->value(tag(), backendAttribute());
+	const auto deviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(direction));
+
+	auto deviceIndex = paNoDevice;
+
+	for (auto i = 0, deviceCount = Pa_GetDeviceCount(); i < deviceCount; ++i)
+	{
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+		const auto backendInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
+
+		if (deviceInfo->name == deviceName && backendInfo->name == backendName)
+		{
+			deviceIndex = i;
+			break;
+		}
+	}
+
+	if (deviceIndex == paNoDevice)
 	{
 		switch (direction)
 		{
 		case Direction::Input:
-			return deviceInfo->maxInputChannels;
+			deviceIndex = Pa_GetDefaultInputDevice();
+			break;
 		case Direction::Output:
-			return deviceInfo->maxOutputChannels;
+			deviceIndex = Pa_GetDefaultOutputDevice();
+			break;
 		}
-
-		return 0;
 	}
 
-	PaStreamParameters createStreamParameters(double suggestedLatency) const
-	{
-		using namespace lmms;
-
-		const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
-		const auto numChannels = ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
-
-		return PaStreamParameters{.device = index,
-			.channelCount = numChannels.toInt(),
-			.sampleFormat = paFloat32,
-			.suggestedLatency = suggestedLatency,
-			.hostApiSpecificStreamInfo = nullptr};
-	}
-
-	static DeviceSpec loadFromIndex(PaDeviceIndex index, Direction direction)
-	{
-		const auto deviceInfo = Pa_GetDeviceInfo(index);
-		const auto backendInfo = Pa_GetHostApiInfo(index);
-		const auto deviceSpec
-			= DeviceSpec{.index = index, .deviceInfo = deviceInfo, .backendInfo = backendInfo, .direction = direction};
-		return deviceSpec;
-	}
-
-	static DeviceSpec loadFromConfig(Direction direction)
-	{
-		using namespace lmms;
-
-		const auto backendName = ConfigManager::inst()->value(tag(), backendAttribute());
-		const auto deviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(direction));
-
-		auto deviceIndex = paNoDevice;
-		auto deviceInfo = static_cast<const PaDeviceInfo*>(nullptr);
-		auto backendInfo = static_cast<const PaHostApiInfo*>(nullptr);
-
-		for (auto i = 0, deviceCount = Pa_GetDeviceCount(); i < deviceCount; ++i)
-		{
-			deviceInfo = Pa_GetDeviceInfo(i);
-			backendInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
-
-			if (deviceInfo->name == deviceName && backendInfo->name == backendName)
-			{
-				deviceIndex = i;
-				break;
-			}
-		}
-
-		if (deviceIndex == paNoDevice)
-		{
-			switch (direction)
-			{
-			case Direction::Input:
-				deviceIndex = Pa_GetDefaultInputDevice();
-				break;
-			case Direction::Output:
-				deviceIndex = Pa_GetDefaultOutputDevice();
-				break;
-			}
-
-			deviceInfo = Pa_GetDeviceInfo(deviceIndex);
-			backendInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
-		}
-
-		return DeviceSpec{
-			.index = deviceIndex, .deviceInfo = deviceInfo, .backendInfo = backendInfo, .direction = direction};
-	}
-
-	bool valid() const { return index != paNoDevice; }
-
-	const PaDeviceIndex index = paNoDevice;
-	const PaDeviceInfo* deviceInfo = nullptr;
-	const PaHostApiInfo* backendInfo = nullptr;
-	const Direction direction;
-};
-
+	return deviceIndex;
+}
 } // namespace
 
 namespace lmms {
@@ -173,20 +146,20 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 {
 	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
 
-	auto inputDevice = DeviceSpec::loadFromConfig(Direction::Input);
-	m_supportsCapture = inputDevice.valid();
+	auto inputDevice = findDeviceFromConfig(Direction::Input);
+	m_supportsCapture = inputDevice != paNoDevice;
 
-	auto outputDevice = DeviceSpec::loadFromConfig(Direction::Output);
-	if (!outputDevice.valid()) { throw std::runtime_error{"PortAudio: could not load output device"}; }
+	auto outputDevice = findDeviceFromConfig(Direction::Output);
+	if (outputDevice == paNoDevice) { throw std::runtime_error{"PortAudio: could not load output device"}; }
 
 	const auto sampleRate = engine->baseSampleRate();
 	const auto framesPerBuffer = engine->framesPerPeriod();
 	const auto suggestedLatency = static_cast<double>(framesPerBuffer) / sampleRate;
 
-	auto inputStreamParameters = inputDevice.createStreamParameters(suggestedLatency);
-	auto outputStreamParameters = outputDevice.createStreamParameters(suggestedLatency);
+	auto inputStreamParameters = createStreamParameters(inputDevice, suggestedLatency, Direction::Input);
+	auto outputStreamParameters = createStreamParameters(outputDevice, suggestedLatency, Direction::Output);
 
-	if (const auto err = Pa_OpenStream(&m_paStream, inputDevice.valid() ? &inputStreamParameters : nullptr,
+	if (const auto err = Pa_OpenStream(&m_paStream, inputDevice == paNoDevice ? nullptr : &inputStreamParameters,
 			&outputStreamParameters, sampleRate, framesPerBuffer, paNoFlag, &processCallback, this))
 	{
 		throw std::runtime_error{std::string{"PortAudio: could not open stream, "} + Pa_GetErrorText(err)};
@@ -245,35 +218,23 @@ namespace lmms::gui {
 class AudioPortAudioSetupWidget::DeviceSelectorWidget : public QGroupBox
 {
 public:
-	DeviceSelectorWidget(Direction direction, QWidget* parent = nullptr)
+	DeviceSelectorWidget(const QString& deviceLabel, Direction direction, QWidget* parent = nullptr)
 		: QGroupBox{parent}
-		, m_direction(direction)
 	{
 		m_deviceComboBox = new QComboBox{this};
 		m_channelSpinBox = new LcdSpinBox{1, this};
 
 		const auto layout = new QFormLayout{this};
-		auto rowHeader = "";
-
-		switch (direction)
-		{
-		case Direction::Input:
-			rowHeader = "Input device";
-			break;
-		case Direction::Output:
-			rowHeader = "Output device";
-			break;
-		}
 
 		m_channelSpinBox->setModel(&m_channelModel);
-		layout->addRow(tr(rowHeader), m_deviceComboBox);
+		layout->addRow(deviceLabel, m_deviceComboBox);
 		layout->addRow(tr("Channels"), m_channelSpinBox);
 
-		connect(
-			m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&] { refreshChannelRange(); });
+		connect(m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+			[&] { refreshChannelRange(direction); });
 	}
 
-	void refreshFromConfig(PaHostApiIndex backendIndex)
+	void refreshFromConfig(PaHostApiIndex backendIndex, Direction direction)
 	{
 		using namespace lmms;
 
@@ -282,46 +243,43 @@ public:
 		for (auto i = 0, deviceCount = Pa_GetDeviceCount(); i < deviceCount; ++i)
 		{
 			const auto deviceInfo = Pa_GetDeviceInfo(i);
-			const auto canAddInputDevice = m_direction == Direction::Input && deviceInfo->maxInputChannels > 0;
-			const auto canAddOutputDevice = m_direction == Direction::Output && deviceInfo->maxOutputChannels > 0;
 
-			if ((canAddInputDevice || canAddOutputDevice) && deviceInfo->hostApi == backendIndex)
+			if (maxChannels(deviceInfo, direction) > 0 && deviceInfo->hostApi == backendIndex)
 			{
 				m_deviceComboBox->addItem(deviceInfo->name, i);
 			}
 		}
 
-		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(m_direction));
+		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(direction));
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
 
-		refreshChannelRange();
+		refreshChannelRange(direction);
 
 		const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
 		const auto selectedNumChannels
-			= ConfigManager::inst()->value(tag(), channelsAttribute(m_direction), defaultNumChannels);
+			= ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
 		m_channelModel.setValue(selectedNumChannels.toInt());
 	}
 
-	void refreshChannelRange()
+	void refreshChannelRange(Direction direction)
 	{
 		const auto deviceIndex = m_deviceComboBox->currentData().toInt();
-		const auto deviceSpec = DeviceSpec::loadFromIndex(deviceIndex, m_direction);
-		m_channelModel.setRange(1, deviceSpec.maxChannels());
-		m_channelSpinBox->setNumDigits(QString::number(deviceSpec.maxChannels()).length());
+		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), direction);
+		m_channelModel.setRange(1, maxChannelCount);
+		m_channelSpinBox->setNumDigits(QString::number(maxChannelCount).length());
 	}
 
-	void saveToConfig()
+	void saveToConfig(Direction direction)
 	{
-		ConfigManager::inst()->setValue(tag(), deviceNameAttribute(m_direction), m_deviceComboBox->currentText());
-		ConfigManager::inst()->setValue(tag(), channelsAttribute(m_direction), QString::number(m_channelModel.value()));
+		ConfigManager::inst()->setValue(tag(), deviceNameAttribute(direction), m_deviceComboBox->currentText());
+		ConfigManager::inst()->setValue(tag(), channelsAttribute(direction), QString::number(m_channelModel.value()));
 	}
 
 private:
 	QComboBox* m_deviceComboBox = nullptr;
 	lmms::gui::LcdSpinBox* m_channelSpinBox = nullptr;
 	lmms::IntModel m_channelModel;
-	Direction m_direction;
 };
 
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
@@ -332,16 +290,16 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->setVerticalSpacing(10);
 
 	m_backendComboBox = new QComboBox{this};
-	m_inputDevice = new DeviceSelectorWidget{Direction::Input};
-	m_outputDevice = new DeviceSelectorWidget{Direction::Output};
+	m_inputDevice = new DeviceSelectorWidget{tr("Input device"), Direction::Input};
+	m_outputDevice = new DeviceSelectorWidget{tr("Output device"), Direction::Output};
 
 	form->addRow(tr("Backend"), m_backendComboBox);
 	form->addRow(m_outputDevice);
 	form->addRow(m_inputDevice);
 
 	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&] {
-		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
-		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Input);
+		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Output);
 	});
 }
 
@@ -364,8 +322,8 @@ void AudioPortAudioSetupWidget::show()
 		const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
 
 		m_backendComboBox->setCurrentIndex(selectedBackendIndex);
-		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
-		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Input);
+		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt(), Direction::Output);
 	}
 
 	AudioDeviceSetupWidget::show();
@@ -379,8 +337,8 @@ AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
 void AudioPortAudioSetupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue(tag(), backendAttribute(), m_backendComboBox->currentText());
-	m_inputDevice->saveToConfig();
-	m_outputDevice->saveToConfig();
+	m_inputDevice->saveToConfig(Direction::Input);
+	m_outputDevice->saveToConfig(Direction::Output);
 }
 } // namespace lmms::gui
 
