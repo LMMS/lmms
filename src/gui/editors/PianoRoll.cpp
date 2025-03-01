@@ -1477,7 +1477,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		case Qt::Key_Control:
 			// Ctrl will not enter selection mode if we are
 			// in Knife mode, but unquantize it
-			if (m_editMode == EditMode::Knife || m_editMode == EditMode::Strum)
+			if (m_editMode == EditMode::Knife)
 			{
 				break;
 			}
@@ -1520,12 +1520,13 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	switch( ke->key() )
 	{
 		case Qt::Key_Control:
-			if (m_editMode == EditMode::Knife || m_editMode == EditMode::Strum)
+			if (m_editMode == EditMode::Knife)
 			{
 				break;
 			}
 			computeSelectedNotes( ke->modifiers() & Qt::ShiftModifier);
 			m_editMode = m_ctrlMode;
+			if (m_editMode == EditMode::Strum) { setupSelectedChords(); }
 			update();
 			break;
 
