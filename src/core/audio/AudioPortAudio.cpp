@@ -269,9 +269,8 @@ public:
 		layout->addRow(tr(rowHeader), m_deviceComboBox);
 		layout->addRow(tr("Channels"), m_channelSpinBox);
 
-        connect(m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&]{
-            refreshChannelRange();
-        });
+		connect(
+			m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [&] { refreshChannelRange(); });
 	}
 
 	void refreshFromConfig(PaHostApiIndex backendIndex)
@@ -348,9 +347,9 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 
 void AudioPortAudioSetupWidget::show()
 {
-    if (m_portAudioInitError == paNoError)
-    {
-        m_portAudioInitError = Pa_Initialize();
+	if (m_portAudioInitError == paNoError)
+	{
+		m_portAudioInitError = Pa_Initialize();
 		if (m_portAudioInitError != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
 	}
 
@@ -365,11 +364,11 @@ void AudioPortAudioSetupWidget::show()
 		const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
 
 		m_backendComboBox->setCurrentIndex(selectedBackendIndex);
-        m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
-        m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+		m_inputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
+		m_outputDevice->refreshFromConfig(m_backendComboBox->currentData().toInt());
 	}
 
-    AudioDeviceSetupWidget::show();
+	AudioDeviceSetupWidget::show();
 }
 
 AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
