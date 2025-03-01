@@ -234,9 +234,9 @@ public:
 
 	static TimePos quantized( const TimePos & m, const int qGrid );
 
-	DetuningHelper * detuning() const
+	DetuningHelper* detuning() const
 	{
-		return m_detuning;
+		return m_detuning.get();
 	}
 	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
