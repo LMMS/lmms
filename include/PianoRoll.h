@@ -469,8 +469,10 @@ private:
 
 	//! Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;
-	//! Computes which notes belog to which chords
+	//! Computes which notes belong to which chords from the selection
 	void setupSelectedChords();
+	//! Computes which notes belong to a single chord based on the clicked note
+	void setupClickedChord();
 
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;

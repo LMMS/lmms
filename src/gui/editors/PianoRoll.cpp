@@ -1642,6 +1642,14 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			m_strumEnabled = true;
 			update();
 		}
+		// Or, if no notes are selected, setup the notes overlapping the clicked note as the chord
+		if (selectedNotes.empty() && noteUnderMouse())
+		{
+			setupClickedChord();
+			updateStrumPos(me, true, me->modifiers() & Qt::ShiftModifier);
+			m_strumEnabled = true;
+			update();
+		}
 		return;
 	}
 
@@ -2861,6 +2869,44 @@ void PianoRoll::setupSelectedChords()
 	// Add final chord
 	std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
 	m_selectedChords.push_back(currentChord);
+}
+
+/*
+ * Setup selected chords, but without the selection.
+ * This is meant for using the strum tool without first selecting notes. If no notes are selected, this treats the notes overlapping the clicked note as the chord.
+*/
+void PianoRoll::setupClickedChord()
+{
+	m_selectedChords.clear();
+	m_midiClip->rearrangeAllNotes();
+
+	const NoteVector& selectedNotes = getSelectedNotes();
+	if (!selectedNotes.empty()) { return; }
+
+	Note* clickedNote = noteUnderMouse();
+	if (clickedNote)
+	{
+		int maxTime = -1;
+		NoteVector currentChord;
+		bool foundClickedNote = false;
+		for (Note* note: m_midiClip->notes())
+		{
+			// If the note is not in the current chord range (and this isn't the first chord), start a new chord.
+			// If this current chord contains the clicked note, then the search is done, and we can use this chord as the selected chord.
+			if (note->pos() >= maxTime && maxTime != -1)
+			{
+				if (foundClickedNote) { break; }
+				currentChord.clear();
+				maxTime = note->endPos();
+			}
+			maxTime = std::max(maxTime, static_cast<int>(note->endPos()));
+			currentChord.push_back(note);
+			if (note == clickedNote) { foundClickedNote = true; }
+		}
+		// Sort the notes by key before adding the chord to the vector
+		std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
+		m_selectedChords.push_back(currentChord);
+	}
 }
 
 /*
