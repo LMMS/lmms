@@ -161,8 +161,8 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	const auto framesPerBuffer = engine->framesPerPeriod();
 	const auto suggestedLatency = static_cast<double>(framesPerBuffer) / sampleRate;
 
-	auto inputStreamParameters = createStreamParameters(inputDevice, suggestedLatency, Direction::Input);
-	auto outputStreamParameters = createStreamParameters(outputDevice, suggestedLatency, Direction::Output);
+	const auto inputStreamParameters = createStreamParameters(inputDevice, suggestedLatency, Direction::Input);
+	const auto outputStreamParameters = createStreamParameters(outputDevice, suggestedLatency, Direction::Output);
 
 	if (const auto err = Pa_OpenStream(&m_paStream, inputDevice == paNoDevice ? nullptr : &inputStreamParameters,
 			&outputStreamParameters, sampleRate, framesPerBuffer, paNoFlag, &processCallback, this))
