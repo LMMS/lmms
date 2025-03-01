@@ -37,7 +37,6 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LcdSpinBox.h"
 
 namespace lmms {
 class AudioPortAudio : public AudioDevice
@@ -68,23 +67,13 @@ public:
 	AudioPortAudioSetupWidget(QWidget* parent);
 	~AudioPortAudioSetupWidget();
 
-	void show() override;
 	void saveSettings() override;
 
 private:
-	void updateBackends();
-	void updateDevices(bool updateInput = true, bool updateOutput = true);
-	void updateChannels(bool updateInput = true, bool updateOutput = true);
-
+	class DeviceSpecWidget;
 	QComboBox* m_backendComboBox = nullptr;
-
-	QComboBox* m_outputDeviceComboBox = nullptr;
-	IntModel m_outputChannelsModel;
-	LcdSpinBox* m_outputChannelsSpinBox = nullptr;
-
-	QComboBox* m_inputDeviceComboBox = nullptr;
-	IntModel m_inputChannelsModel;
-	LcdSpinBox* m_inputChannelsSpinBox = nullptr;
+	DeviceSpecWidget* m_inputDevice = nullptr;
+	DeviceSpecWidget* m_outputDevice = nullptr;
 };
 } // namespace lmms::gui
 
