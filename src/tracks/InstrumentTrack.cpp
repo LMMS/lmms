@@ -104,7 +104,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 			this, [this, i]{ processCCEvent(i); }, Qt::DirectConnection);
 	}
 
-	setName(findUniqueName(tr("Default preset")));
+	setName(tr("Default preset"), true);
 
 	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
@@ -620,9 +620,9 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 
 
-void InstrumentTrack::setName( const QString & _new_name )
+void InstrumentTrack::setName(const QString& newName, bool shouldCreateUnique)
 {
-	Track::setName( _new_name );
+	Track::setName(newName, shouldCreateUnique);
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );
 }
@@ -1056,7 +1056,7 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 	m_instrument = Instrument::instantiate(_plugin_name, this,
 					key, keyFromDnd);
 	unlock();
-	setName(findUniqueName(m_instrument->displayName()));
+	setName(m_instrument->displayName(), true);
 
 	emit instrumentChanged();
 
