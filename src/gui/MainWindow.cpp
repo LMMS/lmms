@@ -179,8 +179,8 @@ MainWindow::MainWindow() :
 	}
 
 	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
@@ -942,12 +942,6 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 		parent->hide();
 		refocus();
 	}
-
-	// Workaround for Qt Bug #260116
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 }
 
 
@@ -1609,6 +1603,7 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
+
 MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
 	QMdiArea(parent),
 	m_isBeingMoved(false),
@@ -1628,18 +1623,39 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_isBeingMoved == false) { return; }
 
+	int minXBoundary = window()->width() - 100;
+	int maxXBoundary = 100;
+	int minYBoundary = window()->height() - 100;
+	int maxYBoundary = 100;
 
-	if (m_lastX != event->x())
+	int minX = minXBoundary;
+	int maxX = maxXBoundary;
+	int minY = minYBoundary;
+	int maxY = maxYBoundary;
+
+	auto subWindows = subWindowList();
+	for (auto* curWindow : subWindows)
 	{
-		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_lastX - event->x());
-		m_lastX = event->x();
+		if (curWindow->isVisible())
+		{
+			minX = minX > curWindow->x() ? curWindow->x() : minX;
+			maxX = maxX < curWindow->x() + curWindow->width() ? curWindow->x() + curWindow->width() : maxX;
+			minY = minY > curWindow->y() ? curWindow->y() : minY;
+			maxY = maxY < curWindow->y() + curWindow->height() ? curWindow->y() + curWindow->height() : maxY;
+		}
 	}
 
-	if (m_lastY != event->y())
-	{
-		verticalScrollBar()->setValue(verticalScrollBar()->value() + m_lastY - event->y());
-		m_lastY = event->y();
-	}
+	int scrollX = m_lastX - event->x();
+	int scrollY = m_lastY - event->y();
+
+	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
+	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
+	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
+	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
+
+	scrollContentsBy(-scrollX, -scrollY);
+	m_lastX = event->x();
+	m_lastY = event->y();
 }
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
