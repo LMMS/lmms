@@ -565,29 +565,28 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	QString fileManager = tr("file manager");
 #endif
 
-	QTreeWidgetItem* item = itemAt(e->pos());
-	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
+	auto item = itemAt(e->pos());
+	if (item == nullptr) { return; }
 
-	QMenu contextMenu(this);
+	auto header = new QAction{item->text(0)};
+	header->setDisabled(true);
+
+	auto contextMenu = QMenu{this};
+	contextMenu.addAction(header);
+	contextMenu.addSeparator();
 
 	switch (item->type())
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		auto header = new QAction(file->text(0));
-
-		header->setDisabled(true);
-		contextMenu.addAction(header);
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
+			[file] { FileRevealer::reveal(file->fullName()); });
 
 		if (file->isTrack())
 		{
 			contextMenu.addAction(
 				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
-			contextMenu.addSeparator();
 		}
-
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=] { FileRevealer::reveal(file->fullName()); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -602,13 +601,8 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		auto header = new QAction(dir->text(0));
-
-		header->setDisabled(true);
-		contextMenu.addAction(header);
-
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
-			[=] { FileRevealer::openDir(dir->fullName()); });
+			[dir] { FileRevealer::openDir(dir->fullName()); });
 		break;
 	}
 	}
