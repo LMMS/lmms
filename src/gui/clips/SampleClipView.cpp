@@ -311,7 +311,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	// outer border
 	p.setPen( c.darker( 200 ) );
-	p.drawRect( -m_paintPixmapXPosition, 0, rect().right(), rect().bottom() );
+	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
 
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
