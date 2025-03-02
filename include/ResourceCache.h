@@ -31,6 +31,7 @@
 #include <fstream>
 #include <memory>
 #include <unordered_map>
+#include "SampleFrame.h"
 
 namespace lmms {
 class ResourceCache
@@ -96,13 +97,27 @@ private:
 
 	static void hash(QCryptographicHash& hasher, const std::string& base64Audio, int sampleRate)
 	{
-		hasher.addData(QByteArray::fromStdString(base64Audio));
+		hash(hasher, base64Audio);
 		hasher.addData(reinterpret_cast<const char*>(&sampleRate), sizeof(sampleRate));
 	}
 
 	static void hash(QCryptographicHash& hasher, const std::string& str)
 	{
 		hasher.addData(QByteArray::fromStdString(str));
+	}
+
+	static void hash(QCryptographicHash& hasher, const SampleFrame* data, size_t size, int sampleRate)
+	{
+		hash(hasher, data, size);
+		hasher.addData(reinterpret_cast<const char*>(&sampleRate), sizeof(sampleRate));
+	}
+
+	static void hash(QCryptographicHash& hasher, const SampleFrame* data, size_t size)
+	{
+		for (auto i = std::size_t{0}; i < size; ++i)
+		{
+			hasher.addData(reinterpret_cast<const char*>(data + i), sizeof(SampleFrame));
+		}
 	}
 
 	ResourceCache() { s_resources.reserve(CacheSize); }
