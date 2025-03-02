@@ -562,11 +562,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
 
-	m_sampleRateSlider = new QSlider{Qt::Horizontal, sampleRateBox};
+	m_sampleRateSlider = new QSlider{Qt::Horizontal};
 	m_sampleRateSlider->setRange(0, SUPPORTED_SAMPLERATES.size() - 1);
 	m_sampleRateSlider->setTickPosition(QSlider::TicksBelow);
 
-	auto sampleRateResetButton = new QPushButton{embed::getIconPixmap("reload"), "", sampleRateBox};
+	auto sampleRateResetButton = new QPushButton{embed::getIconPixmap("reload"), ""};
 	sampleRateResetButton->setFixedSize(32, 32);
 
 	auto sampleRateSubLayout = new QHBoxLayout{};
@@ -586,17 +586,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_sampleRate = SUPPORTED_SAMPLERATES[index];
 		m_sampleRateSlider->setValue(index);
 		sampleRateLabel->setText(tr("Sample rate: %1").arg(m_sampleRate));
-
-		showRestartWarning();
 	};
+
+	setSampleRate(m_sampleRate);
 
 	connect(m_sampleRateSlider, &QSlider::valueChanged, this,
 		[setSampleRate](int value) { setSampleRate(SUPPORTED_SAMPLERATES[value]); });
 
 	connect(sampleRateResetButton, &QPushButton::clicked, this,
 		[setSampleRate] { setSampleRate(SUPPORTED_SAMPLERATES.front()); });
-
-	setSampleRate(m_sampleRate);
 
 	// Buffer size group
 	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
