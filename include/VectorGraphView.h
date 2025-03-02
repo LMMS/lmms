@@ -1,7 +1,7 @@
 /*
  * VecorGraph.h - Vector graph widget implementation
  *
- * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,22 +25,23 @@
 #ifndef LMMS_GUI_VECTORGRAPHVIEW_H
 #define LMMS_GUI_VECTORGRAPHVIEW_H
 
-#include <vector>
 #include <array>
-#include <QPainterPath>
-#include <QWidget>
+#include <vector>
+
 #include <QCursor>
 #include <QMenu>
 #include <QMutex>
+#include <QPainterPath>
+#include <QWidget>
 
-#include "VectorGraphViewBase.h"
-#include "VectorGraphModel.h"
-#include "Model.h"
-#include "ModelView.h"
-#include "lmms_basics.h"
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
+#include "lmms_basics.h"
+#include "Model.h"
+#include "ModelView.h"
 #include "SubWindow.h"
+#include "VectorGraphModel.h"
+#include "VectorGraphViewBase.h"
 
 namespace lmms
 {
@@ -230,7 +231,7 @@ private:
 	QColor m_vectorGraphSecondaryActiveColor;
 	QColor m_vectorGraphSecondaryFillColor;
 
-	friend class lmms::gui::VectorGraphCotnrolDialog;
+	friend class lmms::gui::VectorGraphControlDialog;
 };
 
 } // namespace gui
