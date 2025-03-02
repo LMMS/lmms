@@ -590,6 +590,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setSampleRate(m_sampleRate);
 
+	connect(m_sampleRateSlider, &QSlider::valueChanged, this, &SetupDialog::showRestartWarning);
+
 	connect(m_sampleRateSlider, &QSlider::valueChanged, this,
 		[setSampleRate](int value) { setSampleRate(SUPPORTED_SAMPLERATES[value]); });
 
