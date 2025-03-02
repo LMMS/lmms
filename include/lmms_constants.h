@@ -32,6 +32,10 @@ namespace lmms
 // using this directly
 inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
+// This should not be used directly, prefer calling one of the many
+// overloads of fastRand() instead
+inline constexpr auto FAST_RAND_MAX = 32767;
+
 // Microtuner
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
