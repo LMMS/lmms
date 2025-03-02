@@ -206,11 +206,13 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 		if (device->channels() == 1)
 		{
 			outputBuffer[frame] = device->m_outBuf[device->m_outBufPos].average();
-			continue;
+		}
+		else
+		{
+			outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
+			outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
 		}
 
-		outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
-		outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
 		device->m_outBufPos = frame % device->m_outBuf.size();
 	}
 
