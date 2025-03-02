@@ -36,7 +36,7 @@ namespace lmms
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
-						DetuningHelper * detuning ) :
+		std::shared_ptr<DetuningHelper> detuning) :
 	m_selected( false ),
 	m_oldKey(std::clamp(key, 0, NumKeys)),
 	m_oldPos( pos ),
@@ -47,16 +47,8 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( nullptr )
+	m_detuning(detuning)
 {
-	if( detuning )
-	{
-		m_detuning = sharedObject::ref( detuning );
-	}
-	else
-	{
-		createDetuning();
-	}
 }
 
 
@@ -74,26 +66,10 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning(nullptr),
+	m_detuning(note.m_detuning),
 	m_type(note.m_type)
 {
-	if( note.m_detuning )
-	{
-		m_detuning = sharedObject::ref( note.m_detuning );
-	}
 }
-
-
-
-
-Note::~Note()
-{
-	if( m_detuning )
-	{
-		sharedObject::unref( m_detuning );
-	}
-}
-
 
 
 
@@ -216,9 +192,9 @@ void Note::loadSettings( const QDomElement & _this )
 
 void Note::createDetuning()
 {
-	if( m_detuning == nullptr )
+	if(!m_detuning)
 	{
-		m_detuning = new DetuningHelper;
+		m_detuning = std::make_shared<DetuningHelper>();
 		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
 		m_detuning->automationClip()->setProgressionType( AutomationClip::ProgressionType::Linear );

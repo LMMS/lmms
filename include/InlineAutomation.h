@@ -27,17 +27,15 @@
 
 #include "AutomationNode.h"
 #include "AutomationClip.h"
-#include "shared_object.h"
 
 namespace lmms
 {
 
-class InlineAutomation : public FloatModel, public sharedObject
+class InlineAutomation : public FloatModel
 {
 public:
 	InlineAutomation() :
 		FloatModel(),
-		sharedObject(),
 		m_autoClip( nullptr )
 	{
 	}

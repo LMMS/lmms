@@ -28,7 +28,9 @@
 
 #include <cmath>
 
-#include "lmms_basics.h"
+#include "lmms_math.h"
+#include "LmmsTypes.h"
+#include "interpolation.h"
 
 namespace lmms
 {

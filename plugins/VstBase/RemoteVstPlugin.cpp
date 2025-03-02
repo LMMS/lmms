@@ -41,10 +41,6 @@
 
 #ifdef LMMS_BUILD_LINUX
 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -114,7 +110,7 @@ struct ERect
 #endif
 
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "Midi.h"
 #include "communication.h"
 #include "IoHelper.h"

@@ -1,8 +1,8 @@
 /*
- * lmms_constants.h - defines system constants
+ * SaConstants.h - Some constants used in spectrum analyser
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2025 Roshan M R (Ross Maxx) <mrroshan127/at/gmail/dot/com>
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,19 +22,11 @@
  *
  */
 
-#ifndef LMMS_CONSTANTS_H
-#define LMMS_CONSTANTS_H
-
-#include "lmmsconfig.h"
-#include "LmmsTypes.h"
+#ifndef SA_CONSTANTS_H
+#define SA_CONSTANTS_H
 
 namespace lmms
 {
-inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
-
-// Microtuner
-inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
-inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
@@ -81,4 +73,4 @@ inline constexpr auto ARANGE_SILENT_END     = -10;
 
 } // namespace lmms
 
-#endif // LMMS_CONSTANTS_H
+#endif // SA_CONSTANTS_H
