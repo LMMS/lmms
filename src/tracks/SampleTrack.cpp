@@ -49,7 +49,7 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
 	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
-	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_audioBusHandle(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
 	setName(tr("Sample track"));
@@ -73,7 +73,7 @@ SampleTrack::~SampleTrack()
 bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _clip_num )
 {
-	m_audioPort.effects()->startRunning();
+	m_audioBusHandle.effects()->startRunning();
 	bool played_a_note = false; // will be return variable
 
 
@@ -188,36 +188,36 @@ Clip * SampleTrack::createClip(const TimePos & pos)
 
 
 
-void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
+void SampleTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& thisElem, bool /*presetMode*/)
 {
-	m_audioPort.effects()->saveState( _doc, _this );
-	m_volumeModel.saveSettings( _doc, _this, "vol" );
-	m_panningModel.saveSettings( _doc, _this, "pan" );
-	m_mixerChannelModel.saveSettings( _doc, _this, "mixch" );
+	m_audioBusHandle.effects()->saveState(doc, thisElem);
+	m_volumeModel.saveSettings(doc, thisElem, "vol");
+	m_panningModel.saveSettings(doc, thisElem, "pan");
+	m_mixerChannelModel.saveSettings(doc, thisElem, "mixch");
 }
 
 
 
 
-void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void SampleTrack::loadTrackSpecificSettings(const QDomElement & thisElem)
 {
-	QDomNode node = _this.firstChild();
-	m_audioPort.effects()->clear();
-	while( !node.isNull() )
+	QDomNode node = thisElem.firstChild();
+	m_audioBusHandle.effects()->clear();
+	while(!node.isNull())
 	{
-		if( node.isElement() )
+		if (node.isElement())
 		{
-			if( m_audioPort.effects()->nodeName() == node.nodeName() )
+			if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
-				m_audioPort.effects()->restoreState( node.toElement() );
+				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}
 		}
 		node = node.nextSibling();
 	}
-	m_volumeModel.loadSettings( _this, "vol" );
-	m_panningModel.loadSettings( _this, "pan" );
-	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels() - 1 );
-	m_mixerChannelModel.loadSettings( _this, "mixch" );
+	m_volumeModel.loadSettings(thisElem, "vol");
+	m_panningModel.loadSettings(thisElem, "pan");
+	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels() - 1);
+	m_mixerChannelModel.loadSettings(thisElem, "mixch");
 }
 
 
@@ -247,7 +247,7 @@ void SampleTrack::setPlayingClips( bool isPlaying )
 
 void SampleTrack::updateMixerChannel()
 {
-	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
+	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
 }
 
 

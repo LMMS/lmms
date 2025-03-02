@@ -24,9 +24,8 @@
 #include "ReverbSC.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
-
-#define DB2LIN(X) pow(10, X / 20.0f);
 
 namespace lmms
 {
@@ -92,10 +91,10 @@ ProcessStatus ReverbSCEffect::processImpl(std::span<SampleFrame> inOut)
 	{
 		auto s = std::array{inOut[f][0], inOut[f][1]};
 
-		const auto inGain
-			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
-		const auto outGain
-			= (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()));
+		const auto inGain = static_cast<SPFLOAT>(fastPow10f(
+			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f));
+		const auto outGain = static_cast<SPFLOAT>(fastPow10f(
+			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f));
 
 		s[0] *= inGain;
 		s[1] *= inGain;

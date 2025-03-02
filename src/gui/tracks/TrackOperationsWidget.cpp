@@ -40,6 +40,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "KeyboardShortcuts.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -180,9 +181,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
  */
 void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
-	if( me->button() == Qt::LeftButton &&
-		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::Type::Pattern)
+	if (me->button() == Qt::LeftButton && me->modifiers() & KBD_COPY_MODIFIER &&
+		m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
 		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );

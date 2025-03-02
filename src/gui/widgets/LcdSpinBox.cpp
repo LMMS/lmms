@@ -28,6 +28,7 @@
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
+#include "KeyboardShortcuts.h"
 #include "CaptionMenu.h"
 
 
@@ -79,7 +80,7 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton &&
-		! ( event->modifiers() & Qt::ControlModifier ) &&
+		! (event->modifiers() & KBD_COPY_MODIFIER) &&
 						event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
