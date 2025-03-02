@@ -40,11 +40,13 @@
 namespace lmms
 {
 
-class VectorGraphView;
 class FloatModel;
 
 namespace gui
 {
+
+class VectorGraphView;
+
 class LMMS_EXPORT VectorGraphViewBase : public QWidget
 {
 	Q_OBJECT
@@ -65,8 +67,6 @@ protected:
 private:
 	SimpleTextFloat* m_hintText;
 };
-
-class VectorGraphView;
 
 class LMMS_EXPORT VectorGraphControlDialog : public QWidget, public ModelView
 {

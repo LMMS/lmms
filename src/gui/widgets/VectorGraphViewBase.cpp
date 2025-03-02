@@ -22,6 +22,7 @@
  *
  */
 
+#include "VectorGraphViewBase.h"
 
 #include <vector>
 
@@ -30,9 +31,6 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "VectorGraphViewBase.h"
-#include "VectorGraphView.h"
-
 #include "AutomatableModel.h"
 #include "ComboBox.h"
 #include "embed.h" // context menu
@@ -40,6 +38,8 @@
 #include "Knob.h"
 #include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
+#include "VectorGraphModel.h"
+#include "VectorGraphView.h"
 
 
 namespace lmms
@@ -101,10 +101,10 @@ std::pair<float, float> VectorGraphViewBase::showCoordInputDialog(std::pair<floa
 	return pointPosition;
 }
 
-VectorGraphControlDialog::VectorGraphControlDialog(QWidget* parent, VectorGraphView* targetVectorGraphModel) :
+VectorGraphControlDialog::VectorGraphControlDialog(QWidget* parent, VectorGraphView* targetVectorGraphView) :
 	QWidget(parent),
 	ModelView(nullptr, this),
-	m_vectorGraphView(targetVectorGraphModel),
+	m_vectorGraphView(targetVectorGraphView),
 	m_curAutomationModel(nullptr),
 	m_curAutomationModelKnob(nullptr),
 	m_automationLayout(nullptr),
