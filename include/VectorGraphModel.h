@@ -1,7 +1,7 @@
 /*
- * VecorGraph.h - Vector graph model implementation
+ * VecorGraphModel.h - Vector graph model implementation
  *
- * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,27 +25,30 @@
 #ifndef LMMS_GUI_VECTORGRAPHMODEL_H
 #define LMMS_GUI_VECTORGRAPHMODEL_H
 
-#include <vector>
 #include <array>
-#include <QPainterPath>
-#include <QWidget>
+#include <vector>
+
 #include <QCursor>
 #include <QMenu>
 #include <QMutex>
+#include <QPainterPath>
+#include <QWidget>
 
-#include "VectorGraphView.h"
-#include "Model.h"
-#include "ModelView.h"
-#include "lmms_basics.h"
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
+#include "lmms_basics.h"
+#include "Model.h"
+#include "ModelView.h"
 #include "SubWindow.h"
+
+//#include "VectorGraphView.h"
 
 namespace lmms
 {
 
-class VectorGraphDataArray;
 class FloatModel;
+class VectorGraphDataArray;
+//class lmms::gui::VectorGraphView;
 
 using PointF = std::pair<float, float>;
 
@@ -105,6 +108,9 @@ public:
 	void unlockGetSamplesAccess();
 	void lockBakedSamplesAccess();
 	void unlockBakedSamplesAccess();
+	
+	// addJournalCheckpoint
+	void modelAddJournalCheckPoint();
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
@@ -121,8 +127,6 @@ public slots:
 	void dataArrayClearedEvent(int arrayId);
 	void dataArrayStyleChanged();
 private:
-	// addJournalCheckpoint
-	void modelAddJournalCheckPoint();
 
 	std::vector<VectorGraphDataArray> m_dataArrays;
 	unsigned int m_maxLength;
@@ -131,7 +135,7 @@ private:
 	// a dataArray's getSamples() at the same time
 	QMutex m_getSamplesAccess;
 	QMutex m_bakedSamplesAccess;
-	friend class lmms::gui::VectorGraphView;
+	//friend class lmms::gui::VectorGraphView;
 };
 
 class LMMS_EXPORT VectorGraphDataArray
