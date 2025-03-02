@@ -563,18 +563,18 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
 
-	m_sampleRateSlider = new QSlider{Qt::Horizontal};
+	m_sampleRateSlider = new QSlider{Qt::Horizontal, sampleRateBox};
 	m_sampleRateSlider->setRange(0, SUPPORTED_SAMPLERATES.size() - 1);
 	m_sampleRateSlider->setTickPosition(QSlider::TicksBelow);
 
-	auto sampleRateResetButton = new QPushButton{embed::getIconPixmap("reload"), ""};
+	auto sampleRateResetButton = new QPushButton{embed::getIconPixmap("reload"), "", sampleRateBox};
 	sampleRateResetButton->setFixedSize(32, 32);
 
 	auto sampleRateSubLayout = new QHBoxLayout{};
 	sampleRateSubLayout->addWidget(m_sampleRateSlider);
 	sampleRateSubLayout->addWidget(sampleRateResetButton);
 
-	auto sampleRateLabel = new QLabel{};
+	auto sampleRateLabel = new QLabel{sampleRateBox};
 	auto sampleRateLayout = new QVBoxLayout{sampleRateBox};
 	sampleRateLayout->addLayout(sampleRateSubLayout);
 	sampleRateLayout->addWidget(sampleRateLabel);
