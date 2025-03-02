@@ -251,7 +251,7 @@ void SfxrSynth::update( SampleFrame* buffer, const int32_t frameNum )
 				sample=1.0f-fp*2;
 				break;
 			case 2: // sine
-				sample = sin(fp * 2.f * std::numbers::pi_v<float>);
+				sample = std::sin(fp * 2.f * std::numbers::pi_v<float>);
 				break;
 			case 3: // noise
 				sample=noise_buffer[phase*32/period];
