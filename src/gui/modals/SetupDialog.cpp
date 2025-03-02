@@ -33,7 +33,6 @@
 #include <QScrollArea>
 
 #include "AudioEngine.h"
-#include "LcdFloatSpinBox.h"
 #include "debug.h"
 #include "embed.h"
 #include "Engine.h"
