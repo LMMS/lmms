@@ -142,6 +142,24 @@ PaDeviceIndex findDeviceFromConfig(Direction direction)
 
 	return deviceIndex;
 }
+
+class PortAudioInitializationGuard
+{
+public:
+	PortAudioInitializationGuard()
+		: m_error(Pa_Initialize())
+	{
+		if (m_error != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
+	}
+
+	~PortAudioInitializationGuard()
+	{
+		if (m_error == paNoError) { Pa_Terminate(); }
+	}
+
+private:
+	PaError m_error = paNoError;
+};
 } // namespace
 
 namespace lmms {
@@ -149,7 +167,7 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_outBuf(engine->framesPerPeriod())
 {
-	if (Pa_Initialize() != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
+	static auto initGuard = PortAudioInitializationGuard{};
 
 	auto inputDevice = findDeviceFromConfig(Direction::Input);
 	m_supportsCapture = inputDevice != paNoDevice;
@@ -178,7 +196,6 @@ AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
 	Pa_CloseStream(m_paStream);
-	Pa_Terminate();
 }
 
 void AudioPortAudio::startProcessing()
@@ -305,11 +322,7 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 
 void AudioPortAudioSetupWidget::show()
 {
-	if (m_portAudioInitError == paNoError)
-	{
-		m_portAudioInitError = Pa_Initialize();
-		if (m_portAudioInitError != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
-	}
+	static auto initGuard = PortAudioInitializationGuard{};
 
 	if (m_backendComboBox->count() == 0)
 	{
@@ -324,11 +337,6 @@ void AudioPortAudioSetupWidget::show()
 	}
 
 	AudioDeviceSetupWidget::show();
-}
-
-AudioPortAudioSetupWidget::~AudioPortAudioSetupWidget()
-{
-	if (m_portAudioInitError == paNoError) { Pa_Terminate(); }
 }
 
 void AudioPortAudioSetupWidget::saveSettings()

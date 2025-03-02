@@ -65,7 +65,6 @@ class AudioPortAudioSetupWidget : public AudioDeviceSetupWidget
 {
 public:
 	AudioPortAudioSetupWidget(QWidget* parent);
-	~AudioPortAudioSetupWidget();
 
 	void show() override;
 	void saveSettings() override;
@@ -75,7 +74,6 @@ private:
 	QComboBox* m_backendComboBox = nullptr;
 	DeviceSelectorWidget* m_inputDevice = nullptr;
 	DeviceSelectorWidget* m_outputDevice = nullptr;
-	PaError m_portAudioInitError = paNoError;
 };
 } // namespace lmms::gui
 
