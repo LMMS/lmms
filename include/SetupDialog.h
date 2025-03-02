@@ -48,7 +48,6 @@ namespace lmms::gui
 
 
 class TabBar;
-class LcdFloatSpinBox;
 
 class SetupDialog : public QDialog
 {
