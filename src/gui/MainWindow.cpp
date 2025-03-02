@@ -159,7 +159,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new QMdiArea(splitter);
+	m_workspace = new MovableQMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -179,8 +179,8 @@ MainWindow::MainWindow() :
 	}
 
 	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
@@ -529,8 +529,6 @@ void MainWindow::finalize()
 		connect( subWindow, SIGNAL(windowStateChanged(Qt::WindowStates,Qt::WindowStates)), this, SLOT(resetWindowTitle()));
 	}
 }
-
-
 
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
@@ -944,12 +942,6 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 		parent->hide();
 		refocus();
 	}
-
-	// Workaround for Qt Bug #260116
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 }
 
 
@@ -1600,5 +1592,65 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
+
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
+	QMdiArea(parent),
+	m_isBeingMoved(false),
+	m_lastX(0),
+	m_lastY(0)
+{}
+
+void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+{
+	m_lastX = event->x();
+	m_lastY = event->y();
+	m_isBeingMoved = true;
+	setCursor(Qt::ClosedHandCursor);
+}
+
+void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+{
+	if (m_isBeingMoved == false) { return; }
+
+	int minXBoundary = window()->width() - 100;
+	int maxXBoundary = 100;
+	int minYBoundary = window()->height() - 100;
+	int maxYBoundary = 100;
+
+	int minX = minXBoundary;
+	int maxX = maxXBoundary;
+	int minY = minYBoundary;
+	int maxY = maxYBoundary;
+
+	auto subWindows = subWindowList();
+	for (auto* curWindow : subWindows)
+	{
+		if (curWindow->isVisible())
+		{
+			minX = std::min(minX, curWindow->x());
+			maxX = std::max(maxX, curWindow->x() + curWindow->width());
+			minY = std::min(minY, curWindow->y());
+			maxY = std::max(maxY, curWindow->y() + curWindow->height());
+		}
+	}
+
+	int scrollX = m_lastX - event->x();
+	int scrollY = m_lastY - event->y();
+
+	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
+	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
+	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
+	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
+
+	scrollContentsBy(-scrollX, -scrollY);
+	m_lastX = event->x();
+	m_lastY = event->y();
+}
+
+void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+{
+	setCursor(Qt::ArrowCursor);
+	m_isBeingMoved = false;
+}
 
 } // namespace lmms::gui
