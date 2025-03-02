@@ -811,18 +811,15 @@ int main( int argc, char * * argv )
 			const auto msg = MainWindow::tr("The LMMS working directory %1 does not exist. Create it now?"
 				" You can change the directory later via Edit -> Settings.")
 				.arg(ConfigManager::inst()->workingDir());
+			const auto res = QMessageBox::question(nullptr, MainWindow::tr("Working directory"), msg,
+				QMessageBox::Yes | QMessageBox::No | QMessageBox::Abort, QMessageBox::Yes);
 
-			switch (QMessageBox::question(nullptr, MainWindow::tr("Working directory"), msg,
-				QMessageBox::Yes | QMessageBox::No | QMessageBox::Abort, QMessageBox::Yes))
+			if (res == QMessageBox::Abort)
 			{
-			case QMessageBox::Abort:
 				if (destroyEngine) { Engine::destroy(); }
 				return EXIT_SUCCESS;
-			case QMessageBox::Yes:
-				ConfigManager::inst()->createWorkingDir();
-				break;
-			default: break;
 			}
+			else if (res == QMessageBox::Yes) { ConfigManager::inst()->createWorkingDir(); }
 		}
 
 		new GuiApplication();
