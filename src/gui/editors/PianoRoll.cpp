@@ -2268,10 +2268,11 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			m_midiClip->rearrangeAllNotes();
 
 		}
-		else if (m_action == Action::Knife)
+		else if (m_action == Action::Knife && hasValidMidiClip())
 		{
 			bool deleteShortEnds = me->modifiers() & Qt::ShiftModifier;
-			m_midiClip->splitNotesAlongLine(TimePos(m_knifeStartTickPos), m_knifeStartKey, TimePos(m_knifeEndTickPos), m_knifeEndKey, deleteShortEnds);
+			const NoteVector selectedNotes = getSelectedNotes();
+			m_midiClip->splitNotesAlongLine(!selectedNotes.empty() ? selectedNotes : m_midiClip->notes(), TimePos(m_knifeStartTickPos), m_knifeStartKey, TimePos(m_knifeEndTickPos), m_knifeEndKey, deleteShortEnds);
 			m_knifeDown = false;
 		}
 
