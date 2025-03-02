@@ -40,15 +40,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace
+{
+inline constexpr auto C64_PAL_CYCLES_PER_SEC = 985248;
+inline constexpr auto NUMSIDREGS = 0x19;
+inline constexpr auto SIDWRITEDELAY = 9; // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
+inline constexpr auto SIDWAVEDELAY = 4; // and $xxxx,x 4 cycles extra
+}
+
 namespace lmms
 {
-
-
-#define C64_PAL_CYCLES_PER_SEC  985248
-
-#define NUMSIDREGS 0x19
-#define SIDWRITEDELAY 9 // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
-#define SIDWAVEDELAY 4 // and $xxxx,x 4 cycles extra
 
 auto sidorder = std::array<unsigned char, 25>
   {0x15,0x16,0x18,0x17,
@@ -247,7 +248,8 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 		// Extra delay for loading the waveform (and mt_chngate,x)
 		if (o == 4 || o == 11 || o == 18)
 		{
-			const int result = sid->clock(SIDWAVEDELAY, ptr, samples);
+			auto dt = SIDWAVEDELAY;
+			const int result = sid->clock(dt, ptr, samples);
 			total += result;
 			ptr += result;
 			samples -= result;
@@ -266,7 +268,8 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 
 		sid->write(o, sidreg[o]);
 
-		const int result = sid->clock(SIDWRITEDELAY, ptr, samples);
+		auto dt = SIDWRITEDELAY;
+		const int result = sid->clock(dt, ptr, samples);
 		total += result;
 		ptr += result;
 		samples -= result;
