@@ -1,7 +1,7 @@
 /*
  * VectorGraphViewBase.h - contains implementations of lmms widget classes for VectorGraph
  *
- * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,17 +25,17 @@
 #ifndef LMMS_GUI_VECTORGRAPHVIEWBASE_H
 #define LMMS_GUI_VECTORGRAPHVIEWBASE_H
 
-#include <QWidget>
 #include <QCursor>
-#include <QMenu>
 #include <QLayout>
+#include <QMenu>
+#include <QWidget>
 
+#include "AutomatableModel.h"
+#include "ComboBox.h"
+#include "ComboBoxModel.h"
+#include "Knob.h"
 #include "ModelView.h"
 #include "SimpleTextFloat.h"
-#include "AutomatableModel.h"
-#include "Knob.h"
-#include "ComboBoxModel.h"
-#include "ComboBox.h"
 
 namespace lmms
 {
@@ -59,32 +59,26 @@ protected:
 	// AutomationTrack
 	void connectToAutomationTrack(QMouseEvent* me, FloatModel* automationModel, QWidget* thisWidget);
 
-	// context menu
-	//void showContextMenu(const QPoint point, FloatModel* automationModel, QString displayName, QString controlName);
-
 	// inputDialog
 	std::pair<float, float> showCoordInputDialog(std::pair<float, float> pointPosition);
 
 private:
-	// context menu
-	//void addDefaultActions(QMenu* menu, QString controlDisplayText);
-
 	SimpleTextFloat* m_hintText;
 };
 
 class VectorGraphView;
 
-class LMMS_EXPORT VectorGraphCotnrolDialog : public QWidget, public ModelView
+class LMMS_EXPORT VectorGraphControlDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	VectorGraphCotnrolDialog(QWidget* parent, VectorGraphView* targetVectorGraphView);
-	~VectorGraphCotnrolDialog();
+	VectorGraphControlDialog(QWidget* parent, VectorGraphView* targetVectorGraphView);
+	~VectorGraphControlDialog();
 
 	// deletes m_curAutomationModelKnob connected to the VectorGraphDataArray::m_automationModelArray
 	void hideAutomation();
 	// connects or adds m_curAutomationModelKnob to the gui, sets the selected point
-	void switchPoint(unsigned int selectedArray, unsigned int selectedLocation);
+	void switchPoint(size_t selectedArray, size_t selectedLocation);
 
 public slots:
 	void controlValueChanged();
@@ -110,9 +104,9 @@ private:
 	// VectorGraphView should run hideAutomation()
 	// to notify that these are invalid
 	// selected VectorGraphDataArray
-	unsigned int m_curSelectedArray;
+	size_t m_curSelectedArray;
 	// selected VectorGraphPoint
-	unsigned int m_curSelectedLocation;
+	size_t m_curSelectedLocation;
 	bool m_isValidSelection;
 
 	ComboBoxModel m_lineTypeModel;
@@ -140,7 +134,6 @@ private:
 		tr("none"), tr("\"add\" effect"), tr("\"subtract\" effect"), tr("\"multiply\" effect"), tr("\"divide\" effect"),
 		tr("\"power\" effect"), tr("\"log\" effect"), tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
-
 
 	std::vector<FloatModel*> m_controlModelArray;
 	std::vector<Knob*> m_hideableKnobs;

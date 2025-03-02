@@ -1,7 +1,7 @@
 /*
  * VectorGraphViewBase.cpp - contains implementations of lmms widget classes for VectorGraph
  *
- * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,23 +23,23 @@
  */
 
 
-#include "VectorGraphViewBase.h"
-#include "VectorGraphView.h"
-
 #include <vector>
+
 #include <QInputDialog> // showInputDialog()
 #include <QLayout>
 #include <QLabel>
 #include <QPushButton>
 
+#include "VectorGraphViewBase.h"
+#include "VectorGraphView.h"
 
-#include "StringPairDrag.h"
+#include "AutomatableModel.h"
+#include "ComboBox.h"
 #include "embed.h" // context menu
 #include "GuiApplication.h" // getGUI
-#include "SimpleTextFloat.h"
-#include "AutomatableModel.h"
 #include "Knob.h"
-#include "ComboBox.h"
+#include "SimpleTextFloat.h"
+#include "StringPairDrag.h"
 
 
 namespace lmms
@@ -101,7 +101,7 @@ std::pair<float, float> VectorGraphViewBase::showCoordInputDialog(std::pair<floa
 	return pointPosition;
 }
 
-VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphView* targetVectorGraphModel) :
+VectorGraphControlDialog::VectorGraphControlDialog(QWidget* parent, VectorGraphView* targetVectorGraphModel) :
 	QWidget(parent),
 	ModelView(nullptr, this),
 	m_vectorGraphView(targetVectorGraphModel),
@@ -158,7 +158,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 		m_hideableKnobs.push_back(newKnob);
 
 		connect(curModel, &AutomatableModel::setValueEvent,
-				this, &VectorGraphCotnrolDialog::controlValueChanged);
+				this, &VectorGraphControlDialog::controlValueChanged);
 	}
 	
 	QVBoxLayout* settingLayout = new QVBoxLayout(nullptr);
@@ -281,17 +281,17 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 	show();
 
 	connect(&m_lineTypeModel, &AutomatableModel::setValueEvent,
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			this, &VectorGraphControlDialog::controlValueChanged);
 	connect(&m_automatedAttribModel, &AutomatableModel::setValueEvent,
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			this, &VectorGraphControlDialog::controlValueChanged);
 	connect(&m_effectedAttribModel, &AutomatableModel::setValueEvent,
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			this, &VectorGraphControlDialog::controlValueChanged);
 	connect(&m_effectModelA, &AutomatableModel::setValueEvent,
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			this, &VectorGraphControlDialog::controlValueChanged);
 	connect(&m_effectModelB, &AutomatableModel::setValueEvent,
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			this, &VectorGraphControlDialog::controlValueChanged);
 	connect(&m_effectModelC, &AutomatableModel::setValueEvent,
-			this, &VectorGraphCotnrolDialog::controlValueChanged);
+			this, &VectorGraphControlDialog::controlValueChanged);
 
 	QObject::connect(effectPointButton, SIGNAL(clicked(bool)),
 			this, SLOT(effectedPointClicked(bool)));
@@ -301,7 +301,7 @@ VectorGraphCotnrolDialog::VectorGraphCotnrolDialog(QWidget* parent, VectorGraphV
 			this, SLOT(deleteAutomationClicked(bool)));
 }
 
-VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
+VectorGraphControlDialog::~VectorGraphControlDialog()
 {
 	hideAutomation();
 	for (auto i : m_controlModelArray)
@@ -313,7 +313,7 @@ VectorGraphCotnrolDialog::~VectorGraphCotnrolDialog()
 	}
 }
 
-void VectorGraphCotnrolDialog::hideAutomation()
+void VectorGraphControlDialog::hideAutomation()
 {
 	m_isValidSelection = false;
 	m_curAutomationModel = nullptr;
@@ -326,7 +326,7 @@ void VectorGraphCotnrolDialog::hideAutomation()
 	}
 }
 
-void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned int selectedLocation)
+void VectorGraphControlDialog::switchPoint(size_t selectedArray, size_t selectedLocation)
 {
 	// set current point location
 	m_curSelectedArray = selectedArray;
@@ -373,24 +373,24 @@ void VectorGraphCotnrolDialog::switchPoint(unsigned int selectedArray, unsigned 
 	updateControls();
 }
 
-void VectorGraphCotnrolDialog::controlValueChanged()
+void VectorGraphControlDialog::controlValueChanged()
 {
 	updateVectorGraphAttribs();
 }
 
-void VectorGraphCotnrolDialog::effectedPointClicked(bool isChecked)
+void VectorGraphControlDialog::effectedPointClicked(bool isChecked)
 {
 	float currentValue = m_vectorGraphView->getInputAttribValue(11);
 	m_vectorGraphView->setInputAttribValue(11, currentValue >= 0.5f ? 0.0f : 1.0f);
 }
 
-void VectorGraphCotnrolDialog::effectedLineClicked(bool isChecked)
+void VectorGraphControlDialog::effectedLineClicked(bool isChecked)
 {
 	float currentValue = m_vectorGraphView->getInputAttribValue(12);
 	m_vectorGraphView->setInputAttribValue(12, currentValue >= 0.5f ? 0.0f : 1.0f);
 }
 
-void VectorGraphCotnrolDialog::deleteAutomationClicked(bool isChecked)
+void VectorGraphControlDialog::deleteAutomationClicked(bool isChecked)
 {
 	if (m_isValidSelection == false) { hideAutomation(); return; }
 	
@@ -401,7 +401,7 @@ void VectorGraphCotnrolDialog::deleteAutomationClicked(bool isChecked)
 	m_isValidSelection = swapIsValidSelection;
 }
 
-void VectorGraphCotnrolDialog::closeEvent(QCloseEvent * ce)
+void VectorGraphControlDialog::closeEvent(QCloseEvent * ce)
 {
 	// we need to ignore this event
 	// because Qt::WA_DeleteOnClose was activated by MainWindow::addWindowedWidget
@@ -411,7 +411,7 @@ void VectorGraphCotnrolDialog::closeEvent(QCloseEvent * ce)
 	parentWidget()->hide();
 }
 
-void VectorGraphCotnrolDialog::updateControls()
+void VectorGraphControlDialog::updateControls()
 {
 	if (m_isValidSelection == false) { hideAutomation(); return; }
 
@@ -477,14 +477,14 @@ void VectorGraphCotnrolDialog::updateControls()
 	m_effectModelC.setAutomatedValue(m_vectorGraphView->getInputAttribValue(10));
 }
 
-void VectorGraphCotnrolDialog::updateVectorGraphAttribs()
+void VectorGraphControlDialog::updateVectorGraphAttribs()
 {
 	if (m_isValidSelection == false) { hideAutomation(); return; }
 
 	// set / load knob's values into the selected point's values
 	for (size_t i = 0; i < m_controlModelArray.size(); i++)
 	{
-		m_vectorGraphView->setInputAttribValue(static_cast<unsigned int>(i), m_controlModelArray[i]->value());
+		m_vectorGraphView->setInputAttribValue(static_cast<size_t>(i), m_controlModelArray[i]->value());
 	}
 
 	m_vectorGraphView->setInputAttribValue(5, m_lineTypeModel.value());
