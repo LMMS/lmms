@@ -95,11 +95,11 @@ inline auto fastRand(T range) noexcept
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
-template<std::floating_point T, typename R, R range>
-requires std::is_arithmetic_v<R>
+template<auto range>
+requires std::is_arithmetic_v<decltype(range)>
 inline auto fastRand() noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(range / FAST_RAND_MAX);
+	constexpr auto FAST_RAND_RATIO = static_cast<float>(range) / FAST_RAND_MAX;
 	return fastRand() * FAST_RAND_RATIO;
 }
 
@@ -109,11 +109,11 @@ inline auto fastRand(T from, T to) noexcept
 	return from + fastRand(to - from);
 }
 
-template<std::floating_point T, typename R, R from, R to>
-requires std::is_arithmetic_v<R>
+template<auto to, auto from>
+requires std::is_arithmetic_v<decltype(to)> && std::is_arithmetic_v<decltype(from)>
 inline auto fastRand() noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>((to - from) / FAST_RAND_MAX);
+	constexpr auto FAST_RAND_RATIO = static_cast<float>(to - from) / FAST_RAND_MAX;
 	return from + fastRand() * FAST_RAND_RATIO;
 }
 
