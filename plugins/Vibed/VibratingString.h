@@ -103,19 +103,16 @@ private:
 	 */
 	void setDelayLine(DelayLine* dl, int pick, const float* values, int len, float scale, bool state)
 	{
+		const auto randAmt = m_randomize / 2.f - m_randomize;
 		if (!state)
 		{
 			for (int i = 0; i < pick; ++i)
 			{
-				float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-				float offset = (m_randomize / 2.0f - m_randomize) * r;
-				dl->data[i] = scale * values[dl->length - i - 1] + offset;
+				dl->data[i] = scale * values[dl->length - i - 1] + fastRand(randAmt);
 			}
 			for (int i = pick; i < dl->length; ++i)
 			{
-				float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-				float offset = (m_randomize / 2.0f - m_randomize) * r;
-				dl->data[i] = scale * values[i - pick]  + offset;
+				dl->data[i] = scale * values[i - pick] + fastRand(randAmt);
 			}
 		}
 		else
@@ -124,18 +121,14 @@ private:
 			{
 				for (int i = pick; i < dl->length; ++i)
 				{
-					float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-					float offset = (m_randomize / 2.0f - m_randomize) * r;
-					dl->data[i] = scale * values[i - pick] + offset;
+					dl->data[i] = scale * values[i - pick] + fastRand(randAmt);
 				}
 			}
 			else
 			{
 				for (int i = 0; i < len; ++i)
 				{
-					float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-					float offset = (m_randomize / 2.0f - m_randomize) * r;
-					dl->data[i+pick] = scale * values[i] + offset;
+					dl->data[i+pick] = scale * values[i] + fastRand(randAmt);
 				}
 			}
 		}

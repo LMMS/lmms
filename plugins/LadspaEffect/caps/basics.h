@@ -139,6 +139,7 @@ T clamp (T value, T lower, T upper)
 	return value;
 }
 
+[[deprecated("Use lmms::fastRand() instead")]]
 static inline float
 frandom()
 {
