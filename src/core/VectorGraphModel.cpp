@@ -1,7 +1,7 @@
 /*
  * VectorGraphModel.cpp - Vector graph model and helper class implementation
  *
- * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,6 +29,7 @@
 #include <cmath> // sine
 #include <cstdlib> // rand
 #include <vector>
+
 #include <QMutex> // locking when getSamples
 
 #include "AutomatableModel.h"
@@ -37,9 +38,6 @@
 #include "JournallingObject.h"
 #include "MainWindow.h" // getting main window for control dialog
 #include "ProjectJournal.h"
-
-//#define VECTORGRAPH_DEBUG_USER_INTERACTION
-//#define VECTORGRAPH_DEBUG_PAINT_EVENT
 
 namespace lmms
 {
