@@ -49,21 +49,21 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 224, 274 );
+	setFixedSize(462, 500);
 
-	m_vectorGraphWidget = new VectorGraphView(this, 204, 205, 8, 30, false);
+	m_vectorGraphWidget = new VectorGraphView(this, 450, 450, 8, 30, false);
 	m_vectorGraphWidget->setModel(&_controls->m_vectorGraphModel);
 	m_vectorGraphWidget->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
 	// this can cause problems with custom colors
 	m_vectorGraphWidget->applyDefaultColors();
 	// custom colors can be set this way (but this garph uses applyDefaultColros()):
 	// example: m_vectorGraphWidget->setLineColor(QColor(210, 50, 50, 255), arrayLocation);
-	m_vectorGraphWidget->move(10, 6);
+	m_vectorGraphWidget->move(6, 5);
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
-	inputKnob -> move( 26, 225 );
+	inputKnob->move(26, 462);
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
@@ -71,27 +71,27 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	auto outputKnob = new Knob(KnobType::Bright26, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
-	outputKnob -> move( 76, 225 );
+	outputKnob->move(76, 462);
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
-	resetButton -> move(162, 225);
+	resetButton->move(190, 462);
 	resetButton -> resize( 13, 46 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	resetButton->setToolTip(tr("Reset wavegraph"));
 
 	auto simplifyButton = new PixmapButton(this, tr("Simplify graph displayed"));
-	simplifyButton->move(112, 225);
+	simplifyButton->move(130, 462);
 	simplifyButton->resize(13, 46);
 	simplifyButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("simplify_active"));
 	simplifyButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("simplify_inactive"));
 	simplifyButton->setToolTip(tr("Simplify the graph display for performance"));
 
 	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::LedColor::Green);
-	clipInputToggle -> move( 131, 252 );
+	clipInputToggle->move(130, 483);
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
 	clipInputToggle->setToolTip(tr("Clip input signal to 0 dB"));
 
