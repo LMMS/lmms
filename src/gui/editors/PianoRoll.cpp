@@ -41,10 +41,6 @@
 #include <QStyleOption>
 #include <QToolButton>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include <cmath>
 #include <utility>
 
@@ -61,6 +57,7 @@
 #include "GuiApplication.h"
 #include "FontHelper.h"
 #include "InstrumentTrack.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
 #include "PatternStore.h"
@@ -273,8 +270,6 @@ PianoRoll::PianoRoll() :
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
@@ -2817,7 +2812,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			TimePos mousePosQ = mousePos.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
 			TimePos mousePosEndQ = mousePosEnd.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
 
-			bool snapEnd = abs(mousePosEndQ - mousePosEnd) < abs(mousePosQ - mousePos);
+			bool snapEnd = std::abs(mousePosEndQ - mousePosEnd) < std::abs(mousePosQ - mousePos);
 
 			// Set the offset
 			noteOffset = snapEnd
@@ -3882,7 +3877,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		adjustLeftRightScoll(we->angleDelta().x());
 	}

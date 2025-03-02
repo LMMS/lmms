@@ -107,13 +107,13 @@ private:
 		{
 			for (int i = 0; i < pick; ++i)
 			{
-				float r = static_cast<float>(std::rand()) / RAND_MAX;
+				float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 				float offset = (m_randomize / 2.0f - m_randomize) * r;
 				dl->data[i] = scale * values[dl->length - i - 1] + offset;
 			}
 			for (int i = pick; i < dl->length; ++i)
 			{
-				float r = static_cast<float>(std::rand()) / RAND_MAX;
+				float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 				float offset = (m_randomize / 2.0f - m_randomize) * r;
 				dl->data[i] = scale * values[i - pick]  + offset;
 			}
@@ -124,7 +124,7 @@ private:
 			{
 				for (int i = pick; i < dl->length; ++i)
 				{
-					float r = static_cast<float>(std::rand()) / RAND_MAX;
+					float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 					float offset = (m_randomize / 2.0f - m_randomize) * r;
 					dl->data[i] = scale * values[i - pick] + offset;
 				}
@@ -133,7 +133,7 @@ private:
 			{
 				for (int i = 0; i < len; ++i)
 				{
-					float r = static_cast<float>(std::rand()) / RAND_MAX;
+					float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 					float offset = (m_randomize / 2.0f - m_randomize) * r;
 					dl->data[i+pick] = scale * values[i] + offset;
 				}

@@ -25,8 +25,10 @@
 
 
 #include "DynamicsProcessor.h"
+
+#include <cmath>
+
 #include "lmms_math.h"
-#include "interpolation.h"
 #include "RmsHelper.h"
 
 #include "embed.h"
@@ -189,7 +191,7 @@ Effect::ProcessStatus DynProcEffect::processImpl(SampleFrame* buf, const fpp_t f
 			{
 				float gain;
 				if (lookup < 1) { gain = frac * samples[0]; }
-				else if (lookup < 200) { gain = linearInterpolate(samples[lookup - 1], samples[lookup], frac); }
+				else if (lookup < 200) { gain = std::lerp(samples[lookup - 1], samples[lookup], frac); }
 				else { gain = samples[199]; }
 
 				s[i] *= gain;

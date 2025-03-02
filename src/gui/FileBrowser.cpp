@@ -26,15 +26,14 @@
 #include "FileBrowser.h"
 
 #include <QApplication>
-#include <QDesktopServices>
 #include <QDirIterator>
 #include <QHBoxLayout>
-#include <QKeyEvent>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -46,11 +45,13 @@
 #include "DataFile.h"
 #include "Engine.h"
 #include "FileBrowser.h"
+#include "FileRevealer.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
@@ -554,63 +555,68 @@ void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
 	QTreeWidget::focusOutEvent(fe);
 }
 
-
-
-
-void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
+void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 {
-	auto file = dynamic_cast<FileItem*>(itemAt(e->pos()));
-	if( file != nullptr && file->isTrack() )
+#ifdef LMMS_BUILD_APPLE
+	QString fileManager = tr("Finder");
+#elif defined(LMMS_BUILD_WIN32)
+	QString fileManager = tr("Explorer");
+#else
+	QString fileManager = tr("file manager");
+#endif
+
+	QTreeWidgetItem* item = itemAt(e->pos());
+	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
+
+	QMenu contextMenu(this);
+
+	switch (item->type())
 	{
-		QMenu contextMenu( this );
+	case TypeFileItem: {
+		auto file = dynamic_cast<FileItem*>(item);
 
 		auto pathHeader = new QAction(file->fullName());
 		pathHeader->setDisabled(true);
 		contextMenu.addAction(pathHeader);
 
-		contextMenu.addAction(
-			tr( "Send to active instrument-track" ),
-			[=, this]{ sendToActiveInstrumentTrack(file); }
-		);
+		if (file->isTrack())
+		{
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+			contextMenu.addSeparator();
+		}
 
-		contextMenu.addSeparator();
-
-		contextMenu.addAction(
-			QIcon(embed::getIconPixmap("folder")),
-			tr("Open containing folder"),
-			[=, this]{ openContainingFolder(file); }
-		);
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
+			[=] { FileRevealer::reveal(file->fullName()); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
-		contextMenu.addAction( songEditorHeader );
-		contextMenu.addActions( getContextActions(file, true) );
+		contextMenu.addAction(songEditorHeader);
+		contextMenu.addActions(getContextActions(file, true));
 
 		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
 		patternEditorHeader->setDisabled(true);
 		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions( getContextActions(file, false) );
-
-		// We should only show the menu if it contains items
-		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
+		contextMenu.addActions(getContextActions(file, false));
+		break;
 	}
+	case TypeDirectoryItem: {
+		auto dir = dynamic_cast<Directory*>(item);
 
-	if (const auto dir = dynamic_cast<Directory*>(itemAt(e->pos())); dir != nullptr)
-	{
-		auto contextMenu = QMenu{this};
 		auto pathHeader = new QAction(dir->fullName());
 		pathHeader->setDisabled(true);
+
 		contextMenu.addAction(pathHeader);
 
-		contextMenu.addSeparator();
-		contextMenu.addAction(dir->isExpanded() ? tr("Close") : tr("Open"), [&] { dir->setExpanded(!dir->isExpanded()); });
-
-		contextMenu.exec(e->globalPos());
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
+			[=] { FileRevealer::openDir(dir->fullName()); });
+		break;
 	}
+	}
+
+	// Only show the menu if it contains items
+	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
-
-
-
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
@@ -935,22 +941,6 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 	Engine::audioEngine()->doneChangeInModel();
 	return true;
 }
-
-
-
-
-void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
-{
-	// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
-	// this will only open the directory but not select the file as this is much more complicated due
-	// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
-
-	// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
-	// functionality that's already available in Qt.
-	QFileInfo fileInfo(item->fullName());
-	QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
-}
-
 
 
 
