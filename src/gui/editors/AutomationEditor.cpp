@@ -1019,7 +1019,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
-	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
+	m_sampleThumbnail = ResourceCache::fetch<SampleThumbnail>(newGhostSample->sample().buffer()->path());
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1218,12 +1218,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			const auto param = SampleThumbnail::VisualizeParameters{
 				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
 				.amplification = sample.amplification(),
-				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
-				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleRate(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleRate(),
 				.reversed = sample.reversed()
 			};
 
-			m_sampleThumbnail.visualize(param, p);
+			m_sampleThumbnail->visualize(param, p);
 		}
 
 		// draw ghost notes

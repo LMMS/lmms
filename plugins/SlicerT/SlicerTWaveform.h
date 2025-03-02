@@ -111,7 +111,7 @@ private:
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
 	
-	SampleThumbnail m_sampleThumbnail;
+	std::shared_ptr<const SampleThumbnail> m_sampleThumbnail = std::make_shared<SampleThumbnail>();
 
 	SlicerT* m_slicerTParent;
 
