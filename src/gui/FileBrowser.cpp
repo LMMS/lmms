@@ -575,10 +575,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
 
-		auto pathHeader = new QAction(file->fullName());
-		pathHeader->setDisabled(true);
-		contextMenu.addAction(pathHeader);
-
 		if (file->isTrack())
 		{
 			contextMenu.addAction(
@@ -587,7 +583,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=] { FileRevealer::reveal(file->fullName()); });
+			[file] { FileRevealer::reveal(file->fullName()); });
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -602,14 +598,8 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-
-		auto pathHeader = new QAction(dir->fullName());
-		pathHeader->setDisabled(true);
-
-		contextMenu.addAction(pathHeader);
-
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
-			[=] { FileRevealer::openDir(dir->fullName()); });
+			[dir] { FileRevealer::openDir(dir->fullName()); });
 		break;
 	}
 	}
