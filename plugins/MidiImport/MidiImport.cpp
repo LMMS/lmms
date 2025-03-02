@@ -168,7 +168,7 @@ public:
 			at = dynamic_cast<AutomationTrack *>( Track::create( Track::Type::Automation, tc ) );
 		}
 		if( tn != "") {
-			at->setName(tn, false);
+			at->setName(tn, true);
 		}
 		return *this;
 	}
@@ -248,7 +248,7 @@ public:
 #endif
 			trackName = tn;
 			if( trackName != "") {
-				it->setName(tn, false);
+				it->setName(tn, true);
 			}
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue( 2 );
