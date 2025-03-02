@@ -821,6 +821,7 @@ int main( int argc, char * * argv )
 			case QMessageBox::Yes:
 				ConfigManager::inst()->createWorkingDir();
 				break;
+			default: break;
 			}
 		}
 
