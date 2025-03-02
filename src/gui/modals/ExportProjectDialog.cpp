@@ -156,17 +156,14 @@ void ExportProjectDialog::startExport()
 {
 	auto qs = AudioEngine::qualitySettings(
 		static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()));
-	const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
 	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
 
 	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], useVariableBitRate);
-	OutputSettings os = OutputSettings(
-			samplerates[ samplerateCB->currentIndex() ],
-			bitRateSettings,
-			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
-			mapToStereoMode(stereoModeComboBox->currentIndex()) );
+	OutputSettings os = OutputSettings(SUPPORTED_SAMPLERATES[samplerateCB->currentIndex()], bitRateSettings,
+		static_cast<OutputSettings::BitDepth>(depthCB->currentIndex()),
+		mapToStereoMode(stereoModeComboBox->currentIndex()));
 
 	if (compressionWidget->isVisible())
 	{

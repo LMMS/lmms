@@ -185,7 +185,8 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
-	FloatModel m_sampleRateModel;
+	int m_sampleRate;
+	QSlider* m_sampleRateSlider;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
