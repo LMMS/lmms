@@ -25,14 +25,16 @@
 
 
 #include <vector>
+
 #include <QDomElement>
 
 #include "WaveShaperControls.h"
-#include "WaveShaper.h"
-#include "VectorGraphModel.h"
+
+#include "base64.h"
 #include "Engine.h"
 #include "Song.h"
-#include "base64.h"
+#include "VectorGraphModel.h"
+#include "WaveShaper.h"
 
 namespace lmms
 {
@@ -49,7 +51,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_clipModel( false, this ),
 	m_vectorGraphSampleBuffer(200)
 {
-	unsigned int arrayLocation = m_vectorGraphModel.addDataArray();
+	size_t arrayLocation = m_vectorGraphModel.addDataArray();
 	// see other settings avalible for VectorGraphDataArray in VectorGraphModel.h
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
@@ -58,7 +60,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
 
-	unsigned int arrayLocationB = m_vectorGraphModel.addDataArray();
+	size_t arrayLocationB = m_vectorGraphModel.addDataArray();
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatable(true);
@@ -135,7 +137,7 @@ std::vector<float>* WaveShaperControls::getGraphSamples()
 
 void WaveShaperControls::setDefaultShape()
 {
-	for (unsigned int i = 0; i < m_vectorGraphModel.getDataArraySize(); i++)
+	for (size_t i = 0; i < m_vectorGraphModel.getDataArraySize(); i++)
 	{
 		// clearing the VectorGraphDataArray-s insied VectorGraphModel
 		m_vectorGraphModel.getDataArray(i)->clear();
