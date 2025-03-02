@@ -38,6 +38,8 @@
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
+#include "PluginPinConnector.h"
+#include "PluginPinConnectorView.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
 
@@ -89,10 +91,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		auto ctls_btn = new QPushButton(tr("Controls"), this);
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
-		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		auto ctls_btn = new QPushButton(embed::getIconPixmap("trackop", 20, 20), "", this);
+		ctls_btn->setToolTip(tr("Controls"));
+		ctls_btn->setGeometry(144, 12, 28, 28);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
@@ -120,7 +121,22 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-	
+
+	if (auto pc = effect()->pinConnector())
+	{
+		const auto formatString = tr("Pin connector\n%1");
+
+		m_pinConnectorButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
+		m_pinConnectorButton->setToolTip(formatString.arg(pc->getChannelCountText()));
+
+		connect(pc, &PluginPinConnector::propertiesChanged, [=, this]() {
+			m_pinConnectorButton->setToolTip(formatString.arg(effect()->pinConnector()->getChannelCountText()));
+		});
+
+		m_pinConnectorButton->setGeometry(144 + 32, 12, 28, 28);
+		connect(m_pinConnectorButton, &QPushButton::clicked, this, &EffectView::togglePinConnector);
+	}
+
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
@@ -134,6 +150,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
+	m_pinConnectorView.reset();
 	delete m_subWindow;
 }
 
@@ -155,6 +172,27 @@ void EffectView::editControls()
 			m_subWindow->hide();
 			effect()->controls()->setViewVisible( false );
 		}
+	}
+}
+
+
+
+
+void EffectView::togglePinConnector()
+{
+	auto pc = effect()->pinConnector();
+	if (!pc) { return; }
+
+	if (!m_pinConnectorView)
+	{
+		m_pinConnectorView = pc->instantiateView();
+		connect(pc, &PluginPinConnector::destroyed, [this]() {
+			m_pinConnectorView.reset();
+		});
+	}
+	else
+	{
+		m_pinConnectorView->toggleVisibility();
 	}
 }
 

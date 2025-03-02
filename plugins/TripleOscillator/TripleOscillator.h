@@ -111,8 +111,7 @@ public:
 	TripleOscillator( InstrumentTrack * _track );
 	~TripleOscillator() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

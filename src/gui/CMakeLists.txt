@@ -32,6 +32,7 @@ SET(LMMS_SRCS
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PluginBrowser.cpp
+	gui/PluginPinConnectorView.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
 	gui/SampleLoader.cpp

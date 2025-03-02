@@ -41,6 +41,7 @@
 
 
 #include "AudioEngine.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CustomTextKnob.h"
 #include "Engine.h"
@@ -152,7 +153,7 @@ private:
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &vestige_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
+	AudioPlugin(&vestige_plugin_descriptor, _instrument_track, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_plugin( nullptr ),
 	m_pluginMutex(),
 	m_subWindow( nullptr ),
@@ -363,7 +364,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
+	m_plugin = new VstInstrumentPlugin{m_pluginDLL, audioPort().controller()};
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -395,17 +396,17 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 
 
-void VestigeInstrument::play( SampleFrame* _buf )
+void VestigeInstrument::processImpl()
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
 
-	if( m_plugin == nullptr )
+	if (m_plugin == nullptr)
 	{
 		m_pluginMutex.unlock();
 		return;
 	}
 
-	m_plugin->process( nullptr, _buf );
+	m_plugin->process();
 
 	m_pluginMutex.unlock();
 }
@@ -476,16 +477,18 @@ void VestigeInstrument::closePlugin( void )
 
 
 
+
 gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 {
 	return new gui::VestigeInstrumentView( this, _parent );
 }
 
 
+
 namespace gui
 {
 
-VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
+VestigeInstrumentView::VestigeInstrumentView( VestigeInstrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
@@ -600,7 +603,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							SLOT( noteOffAll() ) );
 
 	setAcceptDrops( true );
-	_instrument2 = _instrument;
+	m_instrument2 = _instrument;
 	_parent2 = _parent;
 }
 
@@ -608,7 +611,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 void VestigeInstrumentView::managePlugin( void )
 {
 	if ( m_vi->m_plugin != nullptr && m_vi->m_subWindow == nullptr ) {
-		m_vi->p_subWindow = new ManageVestigeInstrumentView( _instrument2, _parent2, m_vi);
+		m_vi->p_subWindow = new ManageVestigeInstrumentView( m_instrument2, _parent2, m_vi);
 	} else if (m_vi->m_subWindow != nullptr) {
 		if (m_vi->m_subWindow->widget()->isVisible() == false ) {
 			m_vi->m_scrollArea->show();
@@ -910,8 +913,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 
 
-ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrument,
-							QWidget * _parent, VestigeInstrument * m_vi2 ) :
+ManageVestigeInstrumentView::ManageVestigeInstrumentView( VestigeInstrument * _instrument,
+							QWidget * _parent, VestigeInstrument * _vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
 #if QT_VERSION < 0x50C00
@@ -925,7 +928,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 #endif
 
-	m_vi = m_vi2;
+	m_vi = _vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
