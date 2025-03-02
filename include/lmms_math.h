@@ -83,8 +83,8 @@ inline auto absFraction(floating_point auto x) noexcept
 	return x - std::floor(x);
 }
 
-
-inline auto fastRand() noexcept
+//! @brief Returns a psuedorandom integer between 0 and FAST_RAND_MAX, inclusive.
+inline integral auto fastRand() noexcept
 {
 	thread_local unsigned long s_next = 1;
 	s_next = s_next * 1103515245 + 12345;
@@ -92,6 +92,7 @@ inline auto fastRand() noexcept
 }
 
 
+//! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
 template<floating_point T>
 inline auto fastRand(T range) noexcept
 {
@@ -100,6 +101,7 @@ inline auto fastRand(T range) noexcept
 }
 
 
+//! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
 inline auto fastRand(integral auto range) noexcept
 {
 	constexpr auto FAST_RAND_RATIO = static_cast<float>(1.0 / FAST_RAND_MAX);
@@ -107,32 +109,19 @@ inline auto fastRand(integral auto range) noexcept
 }
 
 
-template<auto range>
-inline auto fastRand() noexcept
-{
-	constexpr auto FAST_RAND_RATIO = static_cast<float>(range) / FAST_RAND_MAX;
-	return fastRand() * FAST_RAND_RATIO;
-}
-
-
+//! @brief Returns a psuedorandom number between @p from and @p to, inclusive.
 inline auto fastRand(auto from, auto to) noexcept
 {
 	return from + fastRand(to - from);
 }
 
 
-template<auto to, auto from>
-inline auto fastRand() noexcept
-{
-	constexpr auto FAST_RAND_RATIO = static_cast<float>(to - from) / FAST_RAND_MAX;
-	return from + fastRand() * FAST_RAND_RATIO;
-}
-
-
+//! @brief Returns true one in @p chance times at random.
 inline bool oneIn(unsigned chance) noexcept
 {
-	return !(fastRand() % chance);
+	return 0 == (fastRand() % chance);
 }
+
 
 //! Round `value` to `where` depending on step size
 template<class T>

@@ -323,7 +323,7 @@ void MixerChannelView::selectColor()
 void MixerChannelView::randomizeColor()
 {
 	auto channel = mixerChannel();
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand<47>()]);
+	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(47)]);
 	Engine::getSong()->setModified();
 	update();
 }

@@ -591,7 +591,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				x[2] = x[1];
 				x[1] = x[0];
-				x[0] = fastRand<-1.f, +1.f>();
+				x[0] = fastRand(-1.f, +1.f);
 				TT = a * x[0] + b * x[1] + c * x[2] + d * TT;
 				DF[t - tpos] = TT * g * envData[2][ENV];
 			}
@@ -666,7 +666,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				if ((t % BFStep) == 0)
 				{
-					BdF = fastRand<-0.5f, +0.5f>();
+					BdF = fastRand(-0.5f, +0.5f);
 				}
 				BPhi = BPhi + BF + BQ * BdF;
 				botmp = t - tpos;
@@ -692,7 +692,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				if ((t % BFStep2) == 0)
 				{
-					BdF2 = fastRand<-0.5f, +0.5f>();
+					BdF2 = fastRand(-0.5f, +0.5f);
 				}
 				BPhi2 = BPhi2 + BF2 + BQ2 * BdF2;
 				botmp = t - tpos;

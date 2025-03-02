@@ -415,28 +415,21 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		frames_processed += remaining_frames_for_cur_arp;
 
 		// Skip notes randomly
-		if( m_arpSkipModel.value() )
+		if (m_arpSkipModel.value() && fastRand(100) < m_arpSkipModel.value())
 		{
-			if (fastRand<100>() < m_arpSkipModel.value())
-			{
-				// update counters
-				frames_processed += arp_frames;
-				cur_frame += arp_frames;
-				continue;
-			}
+			// update counters
+			frames_processed += arp_frames;
+			cur_frame += arp_frames;
+			continue;
 		}
 
 		auto dir = static_cast<ArpDirection>(m_arpDirectionModel.value());
 
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
-
-		if( m_arpMissModel.value() )
+		if (m_arpMissModel.value() && fastRand(100) < m_arpMissModel.value())
 		{
-			if (fastRand<100>() < m_arpMissModel.value())
-			{
-				dir = ArpDirection::Random;
-			}
+			dir = ArpDirection::Random;
 		}
 
 		int cur_arp_idx = 0;

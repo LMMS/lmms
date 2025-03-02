@@ -366,7 +366,7 @@ void ClipView::selectColor()
 
 void ClipView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand<47>()]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(47)]);
 }
 
 void ClipView::resetColor()
