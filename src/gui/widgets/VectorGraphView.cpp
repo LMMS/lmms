@@ -1,7 +1,7 @@
 /*
  * VectorGraph.cpp - Vector graph widget class implementation
  *
- * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,22 +22,21 @@
  *
  */
 
-#include "VectorGraphView.h"
-#include "VectorGraphViewBase.h"
 
 #include <array>
 #include <vector>
+
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+
+#include "VectorGraphView.h"
+#include "VectorGraphViewBase.h"
 
 #include "AutomatableModel.h"
 #include "GuiApplication.h" // getGUI
 #include "MainWindow.h" // getting main window for control dialog
 #include "ProjectJournal.h"
-
-//#define VECTORGRAPH_DEBUG_USER_INTERACTION
-//#define VECTORGRAPH_DEBUG_PAINT_EVENT
 
 namespace lmms
 {
@@ -48,7 +47,7 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 	unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors) :
 		VectorGraphViewBase(parent),
 		ModelView(new VectorGraphModel(2048, nullptr, false), this),
-		m_controlDialog(getGUI()->mainWindow()->addWindowedWidget(new VectorGraphCotnrolDialog(getGUI()->mainWindow(), this)))
+		m_controlDialog(getGUI()->mainWindow()->addWindowedWidget(new VectorGraphControlDialog(getGUI()->mainWindow(), this)))
 {
 	resize(widgetWidth, widgetHeight);
 
@@ -80,8 +79,6 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 	m_isEditingActive = false;
 	// set in .h
 	//m_controlText
-	//m_controlLineTypeText
-	//m_controlIsFloat
 
 	m_lastTrackPoint.first = -1;
 	m_lastTrackPoint.second = 0;
@@ -234,7 +231,7 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 
 	// a point's FloatModel might be deleted after this
 	// cleaning up connected Knob in the dialog
-	reinterpret_cast<VectorGraphCotnrolDialog*>(m_controlDialog->widget())->hideAutomation();
+	reinterpret_cast<VectorGraphControlDialog*>(m_controlDialog->widget())->hideAutomation();
 	m_controlDialog->hide();
 	if (m_isSelected == true)
 	{
@@ -885,7 +882,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 			m_controlDialog->show();
 			if (m_isSelected == true)
 			{
-				reinterpret_cast<VectorGraphCotnrolDialog*>(m_controlDialog->widget())->switchPoint(m_selectedArray, m_selectedLocation);
+				reinterpret_cast<VectorGraphControlDialog*>(m_controlDialog->widget())->switchPoint(m_selectedArray, m_selectedLocation);
 			}
 			hideHintText();
 		}
