@@ -40,16 +40,15 @@
 #include "Model.h"
 #include "ModelView.h"
 #include "SubWindow.h"
+
 #include "VectorGraphModel.h"
 #include "VectorGraphViewBase.h"
 
 namespace lmms
 {
 
-//class VectorGraphView;
-class VectorGraphModel;
-class VectorGraphDataArray;
-//class FloatModel;
+//class VectorGraphDataArray;
+//class VectorGraphModel;
 
 using PointF = std::pair<float, float>;
 using PointInt = std::pair<int, int>;

@@ -1,5 +1,5 @@
 /*
- * VectorGraph.cpp - Vector graph widget class implementation
+ * VectorGraphView.cpp - Vector graph widget class implementation
  *
  * Copyright (c) 2024 - 2025 szeli1 </at/gmail/dot/com> TODO
  *
@@ -32,6 +32,7 @@
 
 #include "VectorGraphView.h"
 #include "VectorGraphViewBase.h"
+#include "VectorGraphModel.h"
 
 #include "AutomatableModel.h"
 #include "GuiApplication.h" // getGUI
@@ -47,7 +48,7 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 	unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors) :
 		VectorGraphViewBase(parent),
 		ModelView(new VectorGraphModel(2048, nullptr, false), this),
-		m_controlDialog(getGUI()->mainWindow()->addWindowedWidget(new VectorGraphControlDialog(getGUI()->mainWindow(), this)))
+		m_controlDialog(getGUI()->mainWindow()->addWindowedWidget(new VectorGraphControlDialog(this, this)))
 {
 	resize(widgetWidth, widgetHeight);
 
