@@ -32,7 +32,6 @@
 
 #include "AudioEngine.h"
 #include "EffectChain.h"
-#include "lmms_math.h"
 #include "plugins/PeakControllerEffect/PeakControllerEffect.h"
 
 namespace lmms
