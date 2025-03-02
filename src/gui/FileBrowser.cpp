@@ -574,10 +574,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
+		auto header = new QAction(file->text(0));
 
-		auto pathHeader = new QAction(file->fullName());
-		pathHeader->setDisabled(true);
-		contextMenu.addAction(pathHeader);
+		header->setDisabled(true);
+		contextMenu.addAction(header);
 
 		if (file->isTrack())
 		{
@@ -602,11 +602,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
+		auto header = new QAction(dir->text(0));
 
-		auto pathHeader = new QAction(dir->fullName());
-		pathHeader->setDisabled(true);
-
-		contextMenu.addAction(pathHeader);
+		header->setDisabled(true);
+		contextMenu.addAction(header);
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager),
 			[=] { FileRevealer::openDir(dir->fullName()); });
