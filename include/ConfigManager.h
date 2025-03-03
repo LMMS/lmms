@@ -268,6 +268,7 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
+	static const QString& removeTrailingSeparators(QString& path);
 
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();

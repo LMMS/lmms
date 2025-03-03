@@ -299,6 +299,25 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 	m_backgroundPicFile = backgroundPicFile;
 }
 
+const QString& ConfigManager::removeTrailingSeparators(QString& path) {
+	const QStringList separators = { "/", "\\" }; // Define the separators to remove
+	bool hasTrailingSeparator = true;
+
+	while (hasTrailingSeparator) {
+		hasTrailingSeparator = false; // Assume no trailing separator initially
+		for (const QString& separator : separators) {
+			if (path.endsWith(separator)) {
+				path = path.left(path.length() - separator.length());
+				hasTrailingSeparator = true; // Found a trailing separator
+				break; // Exit the for loop to check again
+			}
+		}
+	}
+	return path; // Return the modified path
+}
+
+
+
 
 
 

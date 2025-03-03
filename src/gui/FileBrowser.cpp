@@ -344,9 +344,9 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	for (const auto& item : m_items)
+	for (auto& item : m_items)
 	{
-		QFileInfo entry = QFileInfo(item);
+		QFileInfo entry = QFileInfo(ConfigManager::removeTrailingSeparators(item));
 		addEntry(entry, entry.absoluteDir().absolutePath());
 	}
 
@@ -680,14 +680,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
 
-		std::function<void()> starAction = !starred
-		? std::function([=]{ mainWindow->starItem(file->fullName()); })
-		: std::function([=]{ mainWindow->unstarItem(file->fullName()); });
-
 
 		contextMenu.addAction(
 		   !starred ? tr("Star file") : tr("Unstar file"),
-		   starAction
+		std::function([=] {
+				!starred ? mainWindow->starItem(file->fullName()) : mainWindow->unstarItem(file->fullName());
+			})
 		);
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
@@ -709,13 +707,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			FileRevealer::openDir(dir->fullName());
 		});
 
-		std::function<void()> dirStarAction = !starred
-		? std::function([=]{ mainWindow->starItem(dir->fullName()); })
-		: std::function([=]{ mainWindow->unstarItem(dir->fullName()); });
-
 		contextMenu.addAction(
 			!starred ? tr("Star folder") : tr("Unstar folder"),
-			dirStarAction
+			std::function([=] {
+					!starred ? mainWindow->starItem(dir->fullName()) : mainWindow->unstarItem(dir->fullName());
+			})
 		);
 		break;
 	}

@@ -543,10 +543,7 @@ void MainWindow::finalize()
 void MainWindow::starItem(QString item) {
 	ConfigManager* confMgr = ConfigManager::inst();
 
-	// Remove trailing separator if it exists
-	if (item.endsWith(QDir::separator())) {
-		item.chop(1); // Remove the last character if it's a '/'
-	}
+	item = ConfigManager::removeTrailingSeparators(item);
 	confMgr->addStarredItem(QDir::toNativeSeparators(item));
 	m_starredItemBrowser->m_items.push_back(item);
 	m_starredItemBrowser->reloadTree();
@@ -556,11 +553,7 @@ void MainWindow::unstarItem(QString item)
 {
 	ConfigManager* confMgr = ConfigManager::inst();
 
-	// Remove trailing separator if it exists
-	if (item.endsWith(QDir::separator())) {
-		item.chop(1); // Remove the last character if it's a '/'
-	}
-
+	item = ConfigManager::removeTrailingSeparators(item);
 	confMgr->removeStarredItem(item);
 	m_starredItemBrowser->m_items.removeAll(item);
 	m_starredItemBrowser->reloadTree();
@@ -570,11 +563,7 @@ bool MainWindow::isStarred(QString item)
 {
 	ConfigManager* confMgr = ConfigManager::inst();
 
-	// Remove trailing separator if it exists
-	if (item.endsWith('/')) {
-		item.chop(1); // Remove the last character if it's a '/'
-	}
-
+	item = ConfigManager::removeTrailingSeparators(item);
 	return confMgr->isStarred(item);
 }
 
