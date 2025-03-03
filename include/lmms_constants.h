@@ -36,6 +36,7 @@ inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
+<<<<<<< HEAD
 inline constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
 ';';
@@ -43,6 +44,8 @@ inline constexpr char LADSPA_PATH_SEPERATOR =
 ':';
 #endif
 
+=======
+>>>>>>> 39f1ceae6 (these constants have been moved to spectrum analyser)
 constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
 ';';
