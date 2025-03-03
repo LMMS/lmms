@@ -527,17 +527,19 @@ private:
 
 	// baking
 
-	// getSamples() will return m_bakedSamples if lines are unchanged
-	// else it will recalculate the changed line's values, update m_bakedSamples
-	// getSamples() needs to know where did lines change so it updates
-	// m_needsUpdating by running getUpdatingFromEffector()
-	// if m_isDataChanged is true, then getSamples recalculates all the lines/samples
-	// getSamples() clears m_needsUpdating after it has run
-	// updating a line means recalculating m_bakedSamples in getSamples()
-	// based on the changed points (stored in m_needsUpdating)
-	// changes in a point will causes its line to update (line started by the point)
-	// changes in position needs to cause the line before to update too
-	// addition or deletion needs to cause all the lines to update
+	/*
+	* getSamples() will return m_bakedSamples if lines are unchanged
+	* else it will recalculate the changed line's values, update m_bakedSamples
+	* getSamples() needs to know where did lines change so it updates
+	* m_needsUpdating by running getUpdatingFromEffector()
+	* if m_isDataChanged is true, then getSamples recalculates all the lines/samples
+	* getSamples() clears m_needsUpdating after it has run
+	* updating a line means recalculating m_bakedSamples in getSamples()
+	* based on the changed points (stored in m_needsUpdating)
+	* changes in a point will causes its line to update (line started by the point)
+	* changes in position needs to cause the line before to update too
+	* addition or deletion needs to cause all the lines to update
+	*/
 
 	// if we want to update all (the full line in getSamples())
 	bool m_isDataChanged;
