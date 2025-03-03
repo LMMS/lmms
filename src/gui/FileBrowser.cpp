@@ -85,13 +85,14 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString& factoryDir,
 			const QStringList & items
 			):
-	SideBarWidget( title, pm, parent ),
-	m_directories( directories ),
-	m_filter( filter ),
-	m_dirsAsItems( dirs_as_items ),
-	m_factoryDir(factoryDir),
+	SideBarWidget(title, pm, parent),
+	m_items(items),
+	m_directories(directories),
+	m_filter(filter),
+	m_dirsAsItems(dirs_as_items),
 	m_userDir(userDir),
-	m_items(items)
+	m_factoryDir(factoryDir)
+
 {
 	setWindowTitle( tr( "Browser" ) );
 
