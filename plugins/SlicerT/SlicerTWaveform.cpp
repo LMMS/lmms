@@ -116,7 +116,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	m_sampleThumbnail = SampleThumbnail{sample};
+	m_sampleThumbnail = ResourceCache::fetch<SampleThumbnail>(sample.buffer()->path());
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_seekerWaveform.rect(),
@@ -126,7 +126,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 		.reversed = sample.reversed()
 	};
 
-	m_sampleThumbnail.visualize(param, brush);
+	m_sampleThumbnail->visualize(param, brush);
 
 
 	// increase brightness in inner color
@@ -184,7 +184,7 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	m_sampleThumbnail = SampleThumbnail{sample};
+	m_sampleThumbnail = ResourceCache::fetch<SampleThumbnail>(sample.buffer()->path());
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
@@ -194,7 +194,7 @@ void SlicerTWaveform::drawEditorWaveform()
 		.reversed = sample.reversed(),
 	};
 
-	m_sampleThumbnail.visualize(param, brush);
+	m_sampleThumbnail->visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);

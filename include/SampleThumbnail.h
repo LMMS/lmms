@@ -31,7 +31,9 @@
 #include <QRect>
 #include <memory>
 
-#include "Sample.h"
+#include "ResourceCache.h"
+#include "SampleBuffer.h"
+#include "SampleFrame.h"
 #include "lmms_export.h"
 
 namespace lmms {
@@ -47,7 +49,7 @@ namespace lmms {
    the visualization however (i.e., we are not reading from original sample data when drawing), this provides a
    significant performance boost that wouldn't be possible otherwise.
  */
-class LMMS_EXPORT SampleThumbnail
+class LMMS_EXPORT SampleThumbnail : public ResourceCache::Resource
 {
 public:
 	struct VisualizeParameters
@@ -69,7 +71,9 @@ public:
 	};
 
 	SampleThumbnail() = default;
-	SampleThumbnail(const Sample& sample);
+	SampleThumbnail(std::shared_ptr<const SampleBuffer> buffer);
+	SampleThumbnail(const std::filesystem::path& path);
+	SampleThumbnail(const std::string& base64);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
 
 private:
@@ -116,26 +120,7 @@ private:
 		double m_samplesPerPeak = 0.0;
 	};
 
-	struct SampleThumbnailEntry
-	{
-		QString filePath;
-		QDateTime lastModified;
-
-		friend bool operator==(const SampleThumbnailEntry& first, const SampleThumbnailEntry& second)
-		{
-			return first.filePath == second.filePath && first.lastModified == second.lastModified;
-		}
-	};
-
-	struct Hash
-	{
-		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept { return qHash(entry.filePath); }
-	};
-
-	using ThumbnailCache = std::vector<Thumbnail>;
-	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
-
-	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
+	std::vector<Thumbnail> m_thumbnails;
 };
 
 } // namespace lmms
