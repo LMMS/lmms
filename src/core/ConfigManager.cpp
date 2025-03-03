@@ -357,27 +357,36 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-void ConfigManager::addStarredItem(const QString & item)
+void ConfigManager::addStarredItem(QString& item)
 {
-	QFileInfo starredItem(item);
-	m_starredItems.push_back(item);
-	ConfigManager::inst()->saveConfigFile();
+	auto instance = inst();
+	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
+
+	instance->m_starredItems.push_back(item);
+	instance->saveConfigFile();
 }
 
-void ConfigManager::removeStarredItem(const QString & item)
+void ConfigManager::removeStarredItem(QString& item)
 {
-	m_starredItems.removeAll(item);
-	ConfigManager::inst()->saveConfigFile();
+	auto instance = inst();
+	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
+
+	instance->m_starredItems.removeAll(item);
+	instance->saveConfigFile();
 }
 
-bool ConfigManager::isStarred(QString & path) const
+bool ConfigManager::isStarred(QString & item)
 {
-	// Remove trailing separator if it exists
-	if (path.endsWith('/')) {
-		path.chop(1); // Remove the last character if it's a '/'
+	auto instance = inst();
+	for (auto starred_item : instance->starredItems())
+	{
+		if (QFileInfo(item) == QFileInfo(starred_item))
+		{
+			return true;
+		}
 	}
 
-	return starredItems().contains(path);
+	return false;
 }
 
 

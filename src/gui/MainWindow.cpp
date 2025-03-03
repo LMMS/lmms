@@ -544,7 +544,7 @@ void MainWindow::starItem(QString item) {
 	ConfigManager* confMgr = ConfigManager::inst();
 
 	item = ConfigManager::removeTrailingSeparators(item);
-	confMgr->addStarredItem(QDir::toNativeSeparators(item));
+	confMgr->addStarredItem(item);
 	m_starredItemBrowser->m_items.push_back(item);
 	m_starredItemBrowser->reloadTree();
 }

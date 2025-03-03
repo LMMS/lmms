@@ -245,9 +245,9 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	void addStarredItem(const QString& item);
-	void removeStarredItem(const QString& item);
-	bool isStarred(QString& path) const;
+	static void addStarredItem(QString& item);
+	static void removeStarredItem(QString& item);
+	static bool isStarred(QString& item);
 
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
