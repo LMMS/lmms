@@ -377,8 +377,7 @@ void ConfigManager::removeStarredItem(QString& item)
 
 bool ConfigManager::isStarred(QString & item)
 {
-	auto instance = inst();
-	for (auto starred_item : instance->starredItems())
+	for (auto starred_item : inst()->starredItems())
 	{
 		if (QFileInfo(item) == QFileInfo(starred_item))
 		{
