@@ -25,7 +25,6 @@
 #ifndef OPULENZ_H
 #define OPULENZ_H
 
-#include <QMutex>
 
 #include "AutomatableModel.h"
 #include "Instrument.h"

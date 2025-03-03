@@ -26,7 +26,7 @@
 #define LMMS_GUI_GUI_APPLICATION_H
 
 #include <QObject>
-#include <QSocketNotifier>
+class QSocketNotifier;
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"

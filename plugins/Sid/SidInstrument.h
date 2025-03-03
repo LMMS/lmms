@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {

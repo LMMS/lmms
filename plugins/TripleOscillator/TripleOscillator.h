@@ -38,8 +38,7 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
-class SampleBuffer;
+class NotePlayHandle;  // IWYU pragma: keep
 class Oscillator;
 
 

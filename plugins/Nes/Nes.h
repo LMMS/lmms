@@ -25,7 +25,6 @@
 #ifndef NES_H
 #define NES_H
 
-#include <cmath>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -84,7 +83,7 @@ class NesInstrument;
 
 namespace gui
 {
-class Knob;
+class Knob;  // IWYU pragma: keep
 class NesInstrumentView;
 } // namespace gui
 

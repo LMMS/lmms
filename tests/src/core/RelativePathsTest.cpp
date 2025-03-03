@@ -22,13 +22,11 @@
  *
  */
 
-#include <QDir>
 #include <QObject>
 #include <QtTest/QtTest>
 
 #include "ConfigManager.h"
 #include "PathUtil.h"
-#include "SampleBuffer.h"
 
 class RelativePathsTest : public QObject
 {

@@ -27,7 +27,6 @@
 #include <QPainter>
 #include <numbers>
 
-#include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"

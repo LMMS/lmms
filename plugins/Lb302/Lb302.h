@@ -32,7 +32,6 @@
 #ifndef LB302_H
 #define LB302_H
 
-#include "DspEffectLibrary.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "NotePlayHandle.h"
@@ -44,8 +43,11 @@ namespace lmms
 
 static const int NUM_FILTERS = 2;
 
-class NotePlayHandle;
 
+namespace DspEffectLibrary
+{
+class Distortion;
+}
 
 namespace gui
 {

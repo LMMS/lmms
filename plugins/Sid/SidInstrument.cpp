@@ -24,7 +24,6 @@
  */
 
 
-#include <QDomElement>
 
 #include <cmath>
 #include <cstdio>
