@@ -226,8 +226,6 @@ private:
 
 	MovableQMdiArea * m_workspace;
 
-	QMdiArea * m_workspace;
-
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
 	FileBrowser* m_starredItemBrowser;
