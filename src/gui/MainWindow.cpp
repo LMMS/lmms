@@ -159,6 +159,13 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
+	m_starredItemBrowser = new FileBrowser("", FileItem::defaultFilters(), "Starred Items",
+		embed::getIconPixmap("folder").transformed(QTransform().rotate(90).scale(2, 2)), splitter,
+		dirs_as_items, "", "", confMgr->starredItems()
+	);
+
+	sideBar->appendTab(m_starredItemBrowser);
+
 	m_workspace = new QMdiArea(splitter);
 
 	// Load background
@@ -528,6 +535,47 @@ void MainWindow::finalize()
 	{
 		connect( subWindow, SIGNAL(windowStateChanged(Qt::WindowStates,Qt::WindowStates)), this, SLOT(resetWindowTitle()));
 	}
+}
+
+
+
+
+void MainWindow::starItem(QString item) {
+	ConfigManager* confMgr = ConfigManager::inst();
+
+	// Remove trailing separator if it exists
+	if (item.endsWith(QDir::separator())) {
+		item.chop(1); // Remove the last character if it's a '/'
+	}
+	confMgr->addStarredItem(QDir::toNativeSeparators(item));
+	m_starredItemBrowser->m_items.push_back(item);
+	m_starredItemBrowser->reloadTree();
+}
+
+void MainWindow::unstarItem(QString item)
+{
+	ConfigManager* confMgr = ConfigManager::inst();
+
+	// Remove trailing separator if it exists
+	if (item.endsWith(QDir::separator())) {
+		item.chop(1); // Remove the last character if it's a '/'
+	}
+
+	confMgr->removeStarredItem(item);
+	m_starredItemBrowser->m_items.removeAll(item);
+	m_starredItemBrowser->reloadTree();
+}
+
+bool MainWindow::isStarred(QString item)
+{
+	ConfigManager* confMgr = ConfigManager::inst();
+
+	// Remove trailing separator if it exists
+	if (item.endsWith('/')) {
+		item.chop(1); // Remove the last character if it's a '/'
+	}
+
+	return confMgr->isStarred(item);
 }
 
 

@@ -338,6 +338,32 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
+void ConfigManager::addStarredItem(const QString & item)
+{
+	QFileInfo starredItem(item);
+	m_starredItems.push_back(item);
+	ConfigManager::inst()->saveConfigFile();
+}
+
+void ConfigManager::removeStarredItem(const QString & item)
+{
+	m_starredItems.removeAll(item);
+	ConfigManager::inst()->saveConfigFile();
+}
+
+bool ConfigManager::isStarred(QString & path) const
+{
+	// Remove trailing separator if it exists
+	if (path.endsWith('/')) {
+		path.chop(1); // Remove the last character if it's a '/'
+	}
+
+	return starredItems().contains(path);
+}
+
+
+
+
 QString ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
 {
 	if (m_settings.find(cls) != m_settings.end())
@@ -468,6 +494,20 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 						{
 							m_recentlyOpenedProjects <<
 									n.toElement().attribute("path");
+						}
+						n = n.nextSibling();
+					}
+				}
+				else if(node.nodeName() == "starreditems")
+				{
+					m_starredItems.clear();
+					QDomNode n = node.firstChild();
+					while(!n.isNull())
+					{
+						if(n.isElement() && n.toElement().hasAttributes())
+						{
+							m_starredItems <<
+								n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
 					}
@@ -618,6 +658,17 @@ void ConfigManager::saveConfigFile()
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);
+
+	QDomElement starred_items = doc.createElement("starreditems");
+
+	for (const auto& starredItem : m_starredItems)
+	{
+		QDomElement n = doc.createElement("item");
+		n.setAttribute("path", starredItem);
+		starred_items.appendChild(n);
+	}
+
+	lmms_config.appendChild(starred_items);
 
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
 

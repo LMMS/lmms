@@ -45,6 +45,7 @@ class ConfigManager;
 namespace gui
 {
 
+class FileBrowser;
 class PluginView;
 class SubWindow;
 class ToolButton;
@@ -147,6 +148,10 @@ public:
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
+	void starItem(QString item);
+	void unstarItem(QString item);
+	static bool isStarred(QString item);
+
 public slots:
 	void resetWindowTitle();
 
@@ -202,6 +207,8 @@ private:
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
+
+	FileBrowser* m_starredItemBrowser;
 
 	QMdiArea * m_workspace;
 

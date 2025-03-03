@@ -73,7 +73,9 @@ public:
 			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false,
 			const QString& userDir = "",
-			const QString& factoryDir = "");
+			const QString& factoryDir = "",
+			const QStringList& items = {}
+			);
 
 	~FileBrowser() override = default;
 
@@ -93,15 +95,20 @@ public:
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
-private slots:
+	QStringList m_items;
+
+public slots:
 	void reloadTree();
+
+private slots:
 	void expandItems(const QList<QString>& expandedDirs, QTreeWidgetItem* item = nullptr);
 	void giveFocusToFilter();
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
 
-	void addItems( const QString & path );
+	void addEntry(const QFileInfo & entry, const QString & path);
+	void addItems(const QString & path);
 
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
@@ -227,6 +234,7 @@ public:
 
 
 private:
+	void addEntry(const QFileInfo & entry, const QString & path);
 	bool addItems( const QString & path );
 
 

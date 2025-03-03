@@ -214,6 +214,11 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	inline const QStringList & starredItems() const
+	{
+		return m_starredItems;
+	}
+
 	QString localeDir() const
 	{
 		return m_dataDir + LOCALE_PATH;
@@ -239,6 +244,10 @@ public:
 	bool hasWorkingDir() const;
 
 	void addRecentlyOpenedProject(const QString & _file);
+
+	void addStarredItem(const QString& item);
+	void removeStarredItem(const QString& item);
+	bool isStarred(QString& path) const;
 
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
@@ -299,6 +308,7 @@ private:
 	QString m_version;
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
+	QStringList m_starredItems;
 
 	using stringPairVector = std::vector<QPair<QString, QString>>;
 	using settingsMap = QMap<QString, stringPairVector>;
