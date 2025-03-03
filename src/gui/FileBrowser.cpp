@@ -1145,7 +1145,6 @@ bool Directory::addItems(const QString& path)
 	for (const auto& entry : entries)
 	{
 		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
-
 		QString fileName = entry.fileName();
 		if (entry.isDir())
 		{
@@ -1159,9 +1158,7 @@ bool Directory::addItems(const QString& path)
 			addChild(fileItem);
 		}
 	}
-
 	treeWidget()->setUpdatesEnabled(true);
-
 	// return true if we added any child items
 	return childCount() > 0;
 }
