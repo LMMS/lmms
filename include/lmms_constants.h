@@ -43,6 +43,13 @@ inline constexpr char LADSPA_PATH_SEPERATOR =
 ':';
 #endif
 
+constexpr char LADSPA_PATH_SEPERATOR =
+#ifdef LMMS_BUILD_WIN32
+';';
+#else
+':';
+#endif
+
 } // namespace lmms
 
 #endif // LMMS_CONSTANTS_H
