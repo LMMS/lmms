@@ -51,19 +51,6 @@ using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
 using jo_id_t = uint32_t; // (unique) ID of a journalling object
 
 
-<<<<<<< HEAD
-#define LMMS_STRINGIFY(s) #s
-=======
-// Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
-constexpr const char* UI_CTRL_KEY =
-#ifdef LMMS_BUILD_APPLE
-"⌘";
-#else
-"Ctrl";
-#endif
-
->>>>>>> bf4436767 (move the stringification to places where they are used, prep to remove the file)
-
 } // namespace lmms
 
 #endif // LMMS_TYPES_H
