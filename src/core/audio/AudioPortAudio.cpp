@@ -157,6 +157,11 @@ public:
 		if (m_error == paNoError) { Pa_Terminate(); }
 	}
 
+	PortAudioInitializationGuard(const PortAudioInitializationGuard&) = default;
+	PortAudioInitializationGuard(PortAudioInitializationGuard&&) = delete;
+	PortAudioInitializationGuard& operator=(const PortAudioInitializationGuard&) = default;
+	PortAudioInitializationGuard& operator=(PortAudioInitializationGuard&&) = delete;
+
 private:
 	PaError m_error = paNoError;
 };
@@ -167,7 +172,7 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_outBuf(engine->framesPerPeriod())
 {
-	static auto initGuard = PortAudioInitializationGuard{};
+	static auto s_initGuard = PortAudioInitializationGuard{};
 
 	auto inputDevice = findDeviceFromConfig(Direction::Input);
 	m_supportsCapture = inputDevice != paNoDevice;
@@ -244,13 +249,12 @@ class AudioPortAudioSetupWidget::DeviceSelectorWidget : public QGroupBox
 public:
 	DeviceSelectorWidget(const QString& deviceLabel, Direction direction, QWidget* parent = nullptr)
 		: QGroupBox{parent}
+		, m_deviceComboBox{new QComboBox{this}}
+		, m_channelSpinBox{new LcdSpinBox{1, this}}
 	{
-		m_deviceComboBox = new QComboBox{this};
-		m_channelSpinBox = new LcdSpinBox{1, this};
+		m_channelSpinBox->setModel(&m_channelModel);
 
 		const auto layout = new QFormLayout{this};
-
-		m_channelSpinBox->setModel(&m_channelModel);
 		layout->addRow(deviceLabel, m_deviceComboBox);
 		layout->addRow(tr("Channels"), m_channelSpinBox);
 
@@ -282,8 +286,8 @@ public:
 	void refreshChannels(PaDeviceIndex deviceIndex, Direction direction)
 	{
 		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), direction);
-		m_channelModel.setRange(1, maxChannelCount);
-		m_channelModel.setValue(numChannelsFromConfig(direction).toInt());
+		m_channelModel.setRange(1, static_cast<float>(maxChannelCount));
+		m_channelModel.setValue(static_cast<float>(numChannelsFromConfig(direction).toInt()));
 		m_channelSpinBox->setNumDigits(QString::number(maxChannelCount).length());
 	}
 
@@ -301,14 +305,14 @@ private:
 
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget{AudioPortAudio::name(), parent}
+	, m_backendComboBox{new QComboBox{this}}
+	, m_inputDevice{new DeviceSelectorWidget{tr("Input device"), Direction::Input}}
+	, m_outputDevice(new DeviceSelectorWidget{tr("Output device"), Direction::Output})
 {
+	constexpr auto formVerticalSpacing = 10;
 	const auto form = new QFormLayout{this};
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
-	form->setVerticalSpacing(10);
-
-	m_backendComboBox = new QComboBox{this};
-	m_inputDevice = new DeviceSelectorWidget{tr("Input device"), Direction::Input};
-	m_outputDevice = new DeviceSelectorWidget{tr("Output device"), Direction::Output};
+	form->setVerticalSpacing(formVerticalSpacing);
 
 	form->addRow(tr("Backend"), m_backendComboBox);
 	form->addRow(m_outputDevice);
@@ -322,7 +326,7 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 
 void AudioPortAudioSetupWidget::show()
 {
-	static auto initGuard = PortAudioInitializationGuard{};
+	static auto s_initGuard = PortAudioInitializationGuard{};
 
 	if (m_backendComboBox->count() == 0)
 	{

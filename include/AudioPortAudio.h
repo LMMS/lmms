@@ -45,6 +45,11 @@ public:
 	AudioPortAudio(AudioEngine* engine);
 	~AudioPortAudio() override;
 
+	AudioPortAudio(const AudioPortAudio&) = delete;
+	AudioPortAudio(AudioPortAudio&&) = delete;
+	AudioPortAudio& operator=(const AudioPortAudio&) = delete;
+	AudioPortAudio& operator=(AudioPortAudio&&) = delete;
+
 	void startProcessing() override;
 	void stopProcessing() override;
 
