@@ -2877,6 +2877,7 @@ void PianoRoll::setupSelectedChords()
 */
 void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 {
+	if (!hasValidMidiClip()) { return; }
 	// Calculate the TimePos from the mouse
 	int mouseViewportPos = me->x() - m_whiteKeyWidth;
 	int mouseTickPos = mouseViewportPos * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
