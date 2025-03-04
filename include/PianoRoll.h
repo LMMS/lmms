@@ -471,8 +471,6 @@ private:
 	std::vector<NoteVector> m_selectedChords;
 	//! Computes which notes belong to which chords from the selection
 	void setupSelectedChords();
-	//! Computes which notes belong to a single chord based on the clicked note
-	void setupClickedChord();
 
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
