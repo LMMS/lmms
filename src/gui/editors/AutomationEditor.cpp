@@ -111,8 +111,6 @@ AutomationEditor::AutomationEditor() :
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 

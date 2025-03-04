@@ -163,7 +163,7 @@ public:
 
 	static inline sample_t noiseSample( const float )
 	{
-		return 1.0f - rand() * 2.0f / RAND_MAX;
+		return 1.0f - rand() * 2.0f / static_cast<float>(RAND_MAX);
 	}
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
