@@ -36,7 +36,9 @@ namespace lmms
 class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
-	
+	Ladspa2LMMS();
+	~Ladspa2LMMS() override = default;
+
 	inline l_sortable_plugin_t getInstruments()
 	{
 		return( m_instruments );
@@ -65,9 +67,6 @@ public:
 	QString getShortName( const ladspa_key_t & _key );
 
 private:
-	Ladspa2LMMS();
-	~Ladspa2LMMS() override = default;
-
 	l_sortable_plugin_t m_instruments;
 	l_sortable_plugin_t m_validEffects;
 	l_sortable_plugin_t m_invalidEffects;
