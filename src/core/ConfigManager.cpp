@@ -299,27 +299,19 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 	m_backgroundPicFile = backgroundPicFile;
 }
 
-const QString& ConfigManager::removeTrailingSeparators(QString& path) {
-	const QStringList separators = { "/", "\\" }; // Define the separators to remove
-	bool hasTrailingSeparator = true;
+const QString& ConfigManager::removeTrailingSeparators(QString& path)
+{
+	const QStringList separators = {"/", "\\"};
 
-	while (hasTrailingSeparator) {
-		hasTrailingSeparator = false; // Assume no trailing separator initially
-		for (const QString& separator : separators) {
-			if (path.endsWith(separator)) {
-				path = path.left(path.length() - separator.length());
-				hasTrailingSeparator = true; // Found a trailing separator
-				break; // Exit the for loop to check again
-			}
-		}
+	while (!path.isEmpty() && std::find_if(separators.begin(), separators.end(), [&](const QString& separator) {
+		return path.endsWith(separator);
+	}) != separators.end())
+	{
+		path.chop(1);
 	}
-	return path; // Return the modified path
+
+	return path;
 }
-
-
-
-
-
 
 void ConfigManager::createWorkingDir()
 {
@@ -359,18 +351,18 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 void ConfigManager::addfavoriteItem(QString& item)
 {
-	auto instance = inst();
 	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
 
+	auto instance = inst();
 	instance->m_favoriteItems.push_back(item);
 	instance->saveConfigFile();
 }
 
 void ConfigManager::removefavoriteItem(QString& item)
 {
-	auto instance = inst();
 	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
 
+	auto instance = inst();
 	instance->m_favoriteItems.removeAll(item);
 	instance->saveConfigFile();
 }
