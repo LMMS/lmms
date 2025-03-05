@@ -662,8 +662,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 	QMenu contextMenu(this);
 
-	MainWindow* mainWindow = GuiApplication::instance()->mainWindow();
-
 	switch (item->type())
 	{
 	case TypeFileItem: {
