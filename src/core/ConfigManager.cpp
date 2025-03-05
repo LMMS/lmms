@@ -377,9 +377,9 @@ void ConfigManager::removefavoriteItem(QString& item)
 
 bool ConfigManager::isfavorite(QString & item)
 {
-	for (auto favorite_item : inst()->favoriteItems())
+	for (auto favouriteItem : inst()->favoriteItems())
 	{
-		if (QFileInfo(item) == QFileInfo(favorite_item))
+		if (QFileInfo(item) == QFileInfo(favouriteItem))
 		{
 			return true;
 		}
@@ -525,16 +525,15 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 						n = n.nextSibling();
 					}
 				}
-				else if(node.nodeName() == "favoriteitems")
+				else if (node.nodeName() == "favoriteitems")
 				{
 					m_favoriteItems.clear();
 					QDomNode n = node.firstChild();
-					while(!n.isNull())
+					while (!n.isNull())
 					{
-						if(n.isElement() && n.toElement().hasAttributes())
+						if (n.isElement() && n.toElement().hasAttributes())
 						{
-							m_favoriteItems <<
-								n.toElement().attribute("path");
+							m_favoriteItems << n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
 					}
