@@ -92,7 +92,6 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_dirsAsItems(dirs_as_items),
 	m_userDir(userDir),
 	m_factoryDir(factoryDir)
-
 {
 	setWindowTitle( tr( "Browser" ) );
 
