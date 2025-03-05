@@ -668,7 +668,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		bool starred = mainWindow->isStarred(file->fullName());
+		bool isFavorite = mainWindow->isFavorite(file->fullName());
 
 		if (file->isTrack())
 		{
@@ -682,9 +682,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 
 		contextMenu.addAction(
-		   !starred ? tr("Star file") : tr("Unstar file"),
+		   !isFavorite ? tr("Add favorite file") : tr("Remove favorite file"),
 		std::function([=] {
-				!starred ? mainWindow->starItem(file->fullName()) : mainWindow->unstarItem(file->fullName());
+				!isFavorite ? mainWindow->addFavorite(file->fullName()) : mainWindow->removeFavorite(file->fullName());
 			})
 		);
 
@@ -701,16 +701,16 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		bool starred = mainWindow->isStarred(dir->fullName());
+		bool isFavorite = mainWindow->isFavorite(dir->fullName());
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
 
 		contextMenu.addAction(
-			!starred ? tr("Star folder") : tr("Unstar folder"),
+			!isFavorite ? tr("Add favorite folder") : tr("Remove favorite folder"),
 			std::function([=] {
-					!starred ? mainWindow->starItem(dir->fullName()) : mainWindow->unstarItem(dir->fullName());
+					!isFavorite ? mainWindow->addFavorite(dir->fullName()) : mainWindow->removeFavorite(dir->fullName());
 			})
 		);
 		break;

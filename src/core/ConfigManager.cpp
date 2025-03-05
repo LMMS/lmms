@@ -357,29 +357,29 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-void ConfigManager::addStarredItem(QString& item)
+void ConfigManager::addfavoriteItem(QString& item)
 {
 	auto instance = inst();
 	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
 
-	instance->m_starredItems.push_back(item);
+	instance->m_favoriteItems.push_back(item);
 	instance->saveConfigFile();
 }
 
-void ConfigManager::removeStarredItem(QString& item)
+void ConfigManager::removefavoriteItem(QString& item)
 {
 	auto instance = inst();
 	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
 
-	instance->m_starredItems.removeAll(item);
+	instance->m_favoriteItems.removeAll(item);
 	instance->saveConfigFile();
 }
 
-bool ConfigManager::isStarred(QString & item)
+bool ConfigManager::isfavorite(QString & item)
 {
-	for (auto starred_item : inst()->starredItems())
+	for (auto favorite_item : inst()->favoriteItems())
 	{
-		if (QFileInfo(item) == QFileInfo(starred_item))
+		if (QFileInfo(item) == QFileInfo(favorite_item))
 		{
 			return true;
 		}
@@ -525,15 +525,15 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 						n = n.nextSibling();
 					}
 				}
-				else if(node.nodeName() == "starreditems")
+				else if(node.nodeName() == "favoriteitems")
 				{
-					m_starredItems.clear();
+					m_favoriteItems.clear();
 					QDomNode n = node.firstChild();
 					while(!n.isNull())
 					{
 						if(n.isElement() && n.toElement().hasAttributes())
 						{
-							m_starredItems <<
+							m_favoriteItems <<
 								n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
@@ -686,16 +686,16 @@ void ConfigManager::saveConfigFile()
 	}
 	lmms_config.appendChild(recent_files);
 
-	QDomElement starred_items = doc.createElement("starreditems");
+	QDomElement favorite_items = doc.createElement("favoriteitems");
 
-	for (const auto& starredItem : m_starredItems)
+	for (const auto& favoriteItem : m_favoriteItems)
 	{
 		QDomElement n = doc.createElement("item");
-		n.setAttribute("path", starredItem);
-		starred_items.appendChild(n);
+		n.setAttribute("path", favoriteItem);
+		favorite_items.appendChild(n);
 	}
 
-	lmms_config.appendChild(starred_items);
+	lmms_config.appendChild(favorite_items);
 
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
 

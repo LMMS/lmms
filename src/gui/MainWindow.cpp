@@ -159,12 +159,12 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_starredItemBrowser = new FileBrowser("", FileItem::defaultFilters(), "Starred Items",
+	m_favoritesBrowser = new FileBrowser("", FileItem::defaultFilters(), "My Favorites",
 		embed::getIconPixmap("folder").transformed(QTransform().rotate(90).scale(2, 2)), splitter,
-		dirs_as_items, "", "", confMgr->starredItems()
+		dirs_as_items, "", "", confMgr->favoriteItems()
 	);
 
-	sideBar->appendTab(m_starredItemBrowser);
+	sideBar->appendTab(m_favoritesBrowser);
 
 	m_workspace = new MovableQMdiArea(splitter);
 
@@ -540,31 +540,31 @@ void MainWindow::finalize()
 
 
 
-void MainWindow::starItem(QString item) {
+void MainWindow::addFavorite(QString item) {
 	ConfigManager* confMgr = ConfigManager::inst();
 
 	item = ConfigManager::removeTrailingSeparators(item);
-	confMgr->addStarredItem(item);
-	m_starredItemBrowser->m_items.push_back(item);
-	m_starredItemBrowser->reloadTree();
+	confMgr->addfavoriteItem(item);
+	m_favoritesBrowser->m_items.push_back(item);
+	m_favoritesBrowser->reloadTree();
 }
 
-void MainWindow::unstarItem(QString item)
+void MainWindow::removeFavorite(QString item)
 {
 	ConfigManager* confMgr = ConfigManager::inst();
 
 	item = ConfigManager::removeTrailingSeparators(item);
-	confMgr->removeStarredItem(item);
-	m_starredItemBrowser->m_items.removeAll(item);
-	m_starredItemBrowser->reloadTree();
+	confMgr->removefavoriteItem(item);
+	m_favoritesBrowser->m_items.removeAll(item);
+	m_favoritesBrowser->reloadTree();
 }
 
-bool MainWindow::isStarred(QString item)
+bool MainWindow::isFavorite(QString item)
 {
 	ConfigManager* confMgr = ConfigManager::inst();
 
 	item = ConfigManager::removeTrailingSeparators(item);
-	return confMgr->isStarred(item);
+	return confMgr->isfavorite(item);
 }
 
 

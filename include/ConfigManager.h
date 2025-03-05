@@ -214,9 +214,9 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
-	const QStringList & starredItems() const
+	const QStringList & favoriteItems() const
 	{
-		return m_starredItems;
+		return m_favoriteItems;
 	}
 
 	QString localeDir() const
@@ -245,9 +245,9 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	static void addStarredItem(QString& item);
-	static void removeStarredItem(QString& item);
-	static bool isStarred(QString& item);
+	static void addfavoriteItem(QString& item);
+	static void removefavoriteItem(QString& item);
+	static bool isfavorite(QString& item);
 
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
@@ -309,7 +309,7 @@ private:
 	QString m_version;
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
-	QStringList m_starredItems;
+	QStringList m_favoriteItems;
 
 	using stringPairVector = std::vector<QPair<QString, QString>>;
 	using settingsMap = QMap<QString, stringPairVector>;

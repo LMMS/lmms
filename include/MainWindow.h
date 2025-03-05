@@ -149,9 +149,9 @@ public:
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
-	void starItem(QString item);
-	void unstarItem(QString item);
-	static bool isStarred(QString item);
+	void addFavorite(QString item);
+	void removeFavorite(QString item);
+	static bool isFavorite(QString item);
 
 public slots:
 	void resetWindowTitle();
@@ -228,7 +228,7 @@ private:
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
-	FileBrowser* m_starredItemBrowser;
+	FileBrowser* m_favoritesBrowser;
 
 	struct keyModifiers
 	{
