@@ -214,7 +214,7 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
-	inline const QStringList & starredItems() const
+	const QStringList & starredItems() const
 	{
 		return m_starredItems;
 	}
