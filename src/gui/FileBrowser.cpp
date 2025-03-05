@@ -681,7 +681,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		contextMenu.addAction(
 		   !_isFavorite ? tr("Add favorite file") : tr("Remove favorite file"),
-		std::function([=] {
+		std::function([=, this] {
 				!_isFavorite ? addFavorite(file->fullName()) : removeFavorite(file->fullName());
 			})
 		);
@@ -707,7 +707,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		contextMenu.addAction(
 			!_isFavorite ? tr("Add favorite folder") : tr("Remove favorite folder"),
-			std::function([=] {
+			std::function([=, this] {
 					!_isFavorite ? addFavorite(dir->fullName()) : removeFavorite(dir->fullName());
 			})
 		);

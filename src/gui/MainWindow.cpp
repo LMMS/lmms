@@ -111,6 +111,11 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
+	m_favoritesBrowser = new FileBrowser("", FileItem::defaultFilters(), "My Favorites",
+		embed::getIconPixmap("folder").transformed(QTransform().rotate(90).scale(2, 2)), splitter,
+		false, "", "", confMgr->favoriteItems()
+	);
+	sideBar->appendTab(m_favoritesBrowser);
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
@@ -158,13 +163,6 @@ MainWindow::MainWindow() :
 
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
-
-	m_favoritesBrowser = new FileBrowser("", FileItem::defaultFilters(), "My Favorites",
-		embed::getIconPixmap("folder").transformed(QTransform().rotate(90).scale(2, 2)), splitter,
-		dirs_as_items, "", "", confMgr->favoriteItems()
-	);
-
-	sideBar->appendTab(m_favoritesBrowser);
 
 	m_workspace = new MovableQMdiArea(splitter);
 
