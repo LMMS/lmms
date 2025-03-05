@@ -117,6 +117,11 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
+	FileBrowser* getFavouritesBrowser()
+	{
+		return m_favoritesBrowser;
+	}
+
 	enum class SessionState
 	{
 		Normal,
@@ -148,10 +153,6 @@ public:
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
-
-	void addFavorite(QString item);
-	void removeFavorite(QString item);
-	static bool isFavorite(QString item);
 
 public slots:
 	void resetWindowTitle();

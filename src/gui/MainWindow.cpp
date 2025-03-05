@@ -540,36 +540,6 @@ void MainWindow::finalize()
 
 
 
-void MainWindow::addFavorite(QString item) {
-	ConfigManager* confMgr = ConfigManager::inst();
-
-	item = ConfigManager::removeTrailingSeparators(item);
-	confMgr->addfavoriteItem(item);
-	m_favoritesBrowser->m_items.push_back(item);
-	m_favoritesBrowser->reloadTree();
-}
-
-void MainWindow::removeFavorite(QString item)
-{
-	ConfigManager* confMgr = ConfigManager::inst();
-
-	item = ConfigManager::removeTrailingSeparators(item);
-	confMgr->removefavoriteItem(item);
-	m_favoritesBrowser->m_items.removeAll(item);
-	m_favoritesBrowser->reloadTree();
-}
-
-bool MainWindow::isFavorite(QString item)
-{
-	ConfigManager* confMgr = ConfigManager::inst();
-
-	item = ConfigManager::removeTrailingSeparators(item);
-	return confMgr->isfavorite(item);
-}
-
-
-
-
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
 	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;

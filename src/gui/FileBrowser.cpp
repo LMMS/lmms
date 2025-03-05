@@ -668,7 +668,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		bool isFavorite = mainWindow->isFavorite(file->fullName());
+		bool _isFavorite = isFavorite(file->fullName());
 
 		if (file->isTrack())
 		{
@@ -682,9 +682,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 
 		contextMenu.addAction(
-		   !isFavorite ? tr("Add favorite file") : tr("Remove favorite file"),
+		   !_isFavorite ? tr("Add favorite file") : tr("Remove favorite file"),
 		std::function([=] {
-				!isFavorite ? mainWindow->addFavorite(file->fullName()) : mainWindow->removeFavorite(file->fullName());
+				!_isFavorite ? addFavorite(file->fullName()) : removeFavorite(file->fullName());
 			})
 		);
 
@@ -701,16 +701,16 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		bool isFavorite = mainWindow->isFavorite(dir->fullName());
+		bool _isFavorite = isFavorite(dir->fullName());
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
 
 		contextMenu.addAction(
-			!isFavorite ? tr("Add favorite folder") : tr("Remove favorite folder"),
+			!_isFavorite ? tr("Add favorite folder") : tr("Remove favorite folder"),
 			std::function([=] {
-					!isFavorite ? mainWindow->addFavorite(dir->fullName()) : mainWindow->removeFavorite(dir->fullName());
+					!_isFavorite ? addFavorite(dir->fullName()) : removeFavorite(dir->fullName());
 			})
 		);
 		break;
@@ -747,6 +747,31 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	return result;
 }
 
+void FileBrowserTreeWidget::addFavorite(QString item)
+{
+	FileBrowser* favouritesBrowser = GuiApplication::instance()->mainWindow()->getFavouritesBrowser();
+
+	item = ConfigManager::removeTrailingSeparators(item);
+	ConfigManager::addfavoriteItem(item);
+	favouritesBrowser->m_items.push_back(item);
+	favouritesBrowser->reloadTree();
+}
+
+void FileBrowserTreeWidget::removeFavorite(QString item)
+{
+	FileBrowser* favouritesBrowser = GuiApplication::instance()->mainWindow()->getFavouritesBrowser();
+
+	item = ConfigManager::removeTrailingSeparators(item);
+	ConfigManager::removefavoriteItem(item);
+	favouritesBrowser->m_items.removeAll(item);
+	favouritesBrowser->reloadTree();
+}
+
+bool FileBrowserTreeWidget::isFavorite(QString item)
+{
+	item = ConfigManager::removeTrailingSeparators(item);
+	return ConfigManager::isfavorite(item);
+}
 
 
 

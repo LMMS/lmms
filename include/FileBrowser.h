@@ -160,6 +160,10 @@ public:
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
+	void addFavorite(QString item);
+	void removeFavorite(QString item);
+	static bool isFavorite(QString item);
+
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;
 	void mousePressEvent( QMouseEvent * me ) override;
