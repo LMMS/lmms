@@ -47,7 +47,7 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 {
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
-		resizeToFirstTrack();
+		connect(_instrument_track, &Track::clipAdded, this, &MidiClip::resizeToFirstTrack);
 	}
 	init();
 	setAutoResize( true );
