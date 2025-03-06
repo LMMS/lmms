@@ -2,9 +2,9 @@ INCLUDE(BuildPlugin)
 
 # HACK Silence portsmf warnings-as-errors, remove this once portsmf gets fixed
 IF(MSVC)
-	add_compile_options("-Wno-error")
-ELSE()
 	add_compile_options("/w")
+ELSE()
+	add_compile_options("-Wno-error")
 ENDIF()
 
 BUILD_PLUGIN(midiimport MidiImport.cpp MidiImport.h
