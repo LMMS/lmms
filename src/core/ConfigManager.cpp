@@ -369,15 +369,9 @@ void ConfigManager::removefavoriteItem(QString& item)
 
 bool ConfigManager::isfavorite(QString & item)
 {
-	for (auto favouriteItem : inst()->favoriteItems())
-	{
-		if (QFileInfo(item) == QFileInfo(favouriteItem))
-		{
-			return true;
-		}
-	}
-
-	return false;
+	const auto items = inst()->favoriteItems();
+	const auto it = std::find_if(items.begin(), items.end(), [&](const auto& favoriteItem) { return QFileInfo{item} == QFileInfo{favoriteItem}; });
+	return it != items.end();
 }
 
 
