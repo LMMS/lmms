@@ -1,5 +1,7 @@
 INCLUDE(BuildPlugin)
 
+# HACK Silence portsmf warnings-as-errors, remove this once portsmf gets fixed
+add_compile_options("-Wno-error")
 BUILD_PLUGIN(midiimport MidiImport.cpp MidiImport.h
 	portsmf/allegro.cpp portsmf/allegro.h portsmf/allegrosmfwr.cpp
 	portsmf/allegrord.cpp portsmf/allegrowr.cpp portsmf/allegrosmfrd.cpp
