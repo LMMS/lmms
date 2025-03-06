@@ -77,6 +77,8 @@ enum TreeWidgetItemTypes
 	TypeDirectoryItem
 } ;
 
+FileBrowser* FileBrowser::m_favoritesBrowserInstance = nullptr;
+
 
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
