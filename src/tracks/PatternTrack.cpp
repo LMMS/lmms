@@ -148,7 +148,7 @@ Clip* PatternTrack::createClip(const TimePos & pos)
 {
 	auto pc = new PatternClip(this);
 	pc->movePosition(pos);
-	return pc;
+	return addClip(pc);
 }
 
 

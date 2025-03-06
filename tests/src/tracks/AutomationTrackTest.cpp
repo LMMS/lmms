@@ -97,6 +97,8 @@ private slots:
 		AutomationTrack track(song);
 
 		AutomationClip c1(&track);
+		track.addClip(&c1);
+
 		c1.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1.putValue(0, 0.0, false);
 		c1.putValue(10, 1.0, false);
@@ -104,6 +106,8 @@ private slots:
 		c1.addObject(&model);
 
 		AutomationClip c2(&track);
+		track.addClip(&c2);
+
 		c2.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c2.putValue(0, 0.0, false);
 		c2.putValue(100, 1.0, false);
@@ -111,6 +115,8 @@ private slots:
 		c2.addObject(&model);
 
 		AutomationClip c3(&track);
+		track.addClip(&c3);
+
 		c3.addObject(&model);
 		//XXX: Why is this even necessary?
 		c3.clear();
@@ -133,6 +139,8 @@ private slots:
 		AutomationTrack track(song);
 
 		AutomationClip c(&track);
+		track.addClip(&c);
+
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c.addObject(&model);
 
@@ -159,6 +167,8 @@ private slots:
 		InstrumentTrack instrumentTrack(song);
 
 		MidiClip midiClip(&instrumentTrack);
+		instrumentTrack.addClip(&midiClip);
+
 		midiClip.changeLength(TimePos(4, 0));
 		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
@@ -207,6 +217,8 @@ private slots:
 		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.patternIndex()).size());
 
 		PatternClip clip(&patternTrack);
+		patternTrack.addClip(&clip);
+
 		clip.changeLength(TimePos::ticksPerBar() * 2);
 		clip.movePosition(0);
 
@@ -224,10 +236,13 @@ private slots:
 		auto song = Engine::getSong();
 
 		auto globalTrack = song->globalAutomationTrack();
+
 		AutomationClip globalClip(globalTrack);
+		globalTrack->addClip(&globalClip);
 
 		AutomationTrack localTrack(song);
 		AutomationClip localClip(&localTrack);
+		localTrack.addClip(&localClip);
 
 		FloatModel model;
 		globalClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
