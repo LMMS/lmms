@@ -12,7 +12,7 @@
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <title
-   id="title1">LMMS solo button (active)</title>
+   id="title1">LMMS solo button (inactive)</title>
   <defs
    id="defs2"><linearGradient
      xlink:href="#a"
@@ -21,45 +21,42 @@
      x2="16"
      y1="27.5"
      y2="4.5"
-     gradientTransform="matrix(.826 0 0 .826 -3.217 -3.217)"
+     gradientTransform="matrix(0.826,0,0,0.826,-3.217,-3.217)"
      gradientUnits="userSpaceOnUse" /><linearGradient
      id="a">
       <stop
    offset="0"
-   style="stop-color:#07090a;stop-opacity:1"
+   style="stop-color:#35cbd2;stop-opacity:1;"
    id="stop1" />
       <stop
    offset="1"
-   style="stop-color:#171a1d;stop-opacity:1"
+   style="stop-color:#54e2e9;stop-opacity:1;"
    id="stop2" />
     </linearGradient></defs>
   <rect
    width="19"
    height="19"
-   x=".5"
-   y=".5"
+   x="0.5"
+   y="0.5"
    fill="url(#b)"
    stroke="#000"
    stroke-linecap="round"
    stroke-linejoin="bevel"
-   ry="2.065"
-   style="display:inline;fill-opacity:1"
-   id="btn-active" />
+   ry="2.0650001"
+   style="display:inline;fill:url(#b);fill-opacity:1;stroke:#35cbd2;stroke-opacity:1"
+   id="button" />
   <path
-   d="M2.56444 1C1.6888 1 1 1.6888 1 2.56445V3c0-.554.446-1 1-1h16c.55399 0 1 .446 1 1v-.43555C19 1.6888 18.31119 1 17.43555 1Z"
-   style="opacity:.1;fill:#fff;fill-opacity:1;stroke:none"
+   d="M 2.56445,1 C 1.6888,1 1,1.6888 1,2.56445 V 3 C 1,2.446 1.446,2 2,2 h 16 c 0.554,0 1,0.446 1,1 V 2.56445 C 19,1.6888 18.3112,1 17.43555,1 Z"
+   style="display:inline;opacity:0.15;fill:#ffffff;fill-opacity:1;stroke:none"
    id="highlight" />
-  <path
-   d="M2.56444 19C1.6888 19 1 18.3112 1 17.43555V17c0 .554.446 1 1 1h16c.55399 0 1-.446 1-1v.43555C19 18.3112 18.31119 19 17.43555 19Z"
-   style="opacity:.3;fill:#000;fill-opacity:1;stroke:none"
-   id="shadow" />
+  
   <metadata
    id="metadata3">
     <rdf:RDF>
       <cc:Work>
         <cc:license
    rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
-        <dc:title>LMMS solo button (active)</dc:title>
+        <dc:title>LMMS solo button (inactive)</dc:title>
         <dc:creator>
           <cc:Agent>
             <dc:title>Rebecca Noel Ati, Stakeout Punch</dc:title>
@@ -74,12 +71,6 @@
      rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF>
   </metadata>
 <path
-   style="display:inline;fill:none;fill-opacity:1;stroke:#20d3db;stroke-width:2;stroke-dasharray:none;stroke-opacity:1"
-   id="headband"
-   d="m 4,10 a 6,6 0 0 1 6,-6 6,6 0 0 1 6,6" /><path
-   style="display:inline;fill:#20d3db;fill-opacity:1;stroke:none;stroke-width:2;stroke-dasharray:none;stroke-opacity:1"
-   d="m 3,10 v 6 c 0,0.5 0.5,1 1,1 h 3 c 0.5,0 1,-0.5 1,-1 V 12 C 8,11.5 7.5,11 7,11 H 6 5 v -1"
-   id="left-ear" /><path
-   style="display:inline;fill:#20d3db;fill-opacity:1;stroke:none;stroke-width:2;stroke-dasharray:none;stroke-opacity:1"
-   d="m 15,10 v 1 h -2 c -0.5,0 -1,0.5 -1,1 0,0 0,2.666665 0,4 0,0.5 0.5,1 1,1 h 3 c 0.5,0 1,-0.5 1,-1 v -6 z"
-   id="right-ear" /></svg>
+   id="path6"
+   style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2;stroke-dasharray:none;stroke-opacity:1"
+   d="m 10,4.0000248 c -1.472525,0.00403 -2.993968,0.4818935 -4.136604,1.5 C 4.72076,6.5181313 4,8.0872298 4,10.000025 c 0,1.60032 0,3.357065 0,5 0,0.5 0.5,1 1,1 h 2 c 0.5,0 1,-0.5 1,-1 v -3 c 0,-0.5 -0.5,-1 -1,-1 H 6 c 0,-0.5 0,-0.5 0,-1 0,-1.4114252 0.513729,-2.3474522 1.246094,-3.0000002 0.732364,-0.6525475 1.726429,-0.9971905 2.753906,-1 1.027475,-0.00281 2.03517,0.354394 2.765625,1.0039065 C 13.490632,7.6486008 13.992038,8.5905738 14,10.000025 v 1 h -1 c -0.5,0 -1,0.5 -1,1 v 3 c 0,0.5 0.5,1 1,1 h 2 c 0.5,0 1,-0.5 1,-1 v -5 C 15.992284,8.0891328 15.265582,6.5121893 14.127288,5.5000248 12.982744,4.4823023 11.472523,3.9959983 10,4.0000248 Z" /></svg>

@@ -77,13 +77,6 @@
      rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF>
   </metadata>
 <path
-   style="display:inline;fill:#ffffff;stroke-width:0.06"
-   d="M 0,0.1 C 0,0.08880414 0.01,0.08 0.02,0.08 h 0.03 c 0.01,0 0.01,0 0.02,-0.01 L 0.11,0.03 C 0.12,0.02 0.12,0.02 0.13,0.02 H 0.14 V 0.25999999 H 0.13 c -0.01,0 -0.01,0 -0.02,-0.01 l -0.04,-0.04 c -0.01,-0.01 -0.01,-0.01 -0.02,-0.01 H 0.02 C 0.01,0.2 0,0.19 0,0.18 Z"
-   id="speaker"
-   transform="matrix(50,0,0,50,3,3.0000002)" /><path
-   style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1.4;stroke-dasharray:none;stroke-opacity:1"
-   d="m 11.5,7.5000002 c 2,2 2,2.9999998 0,4.9999998"
-   id="sound-wave-inner" /><path
-   style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1.4;stroke-dasharray:none;stroke-opacity:1"
-   d="m 13.5,5.5000002 c 3,3 3,5.9999998 0,8.9999998"
-   id="sound-wave-outer" /></svg>
+   id="path1"
+   style="display:inline;fill:#ffffff;stroke-width:0;stroke-dasharray:none;fill-opacity:1"
+   d="m 9.3339845,4.0000002 c -0.341797,0.00684 -0.3964845,0.0625 -0.8339845,0.5 l -2,2 c -0.5,0.5 -0.5,0.5 -1,0.5 H 4 c -0.5,0 -1,0.440207 -1,1 V 12 c 0,0.5 0.5,1 1,1 h 1.5 c 0.5,0 0.5,0 1,0.5 l 2,2 C 9,16 9,16 9.5,16 H 10 V 4.0000002 H 9.5 c -0.0625,0 -0.1172,-9.765e-4 -0.1660155,0 z m 4.6660155,1 -1,1 C 14.417505,7.4175047 15,8.7333337 15,10 c 0,1.266665 -0.582495,2.582495 -2,4 l 1,1 c 1.582495,-1.582495 2.367188,-3.266665 2.367188,-5 0,-1.7333348 -0.784693,-3.4175038 -2.367188,-4.9999998 z m -2,2 -1,1 c 0.95875,0.958755 1.375,1.56111 1.375,1.9999998 0,0.4389 -0.41625,1.04125 -1.375,2 l 1,1 c 1.04125,-1.04125 1.703125,-1.938885 1.703125,-3 C 13.703125,8.9388902 13.04125,8.0412492 12,7.0000002 Z" /></svg>
