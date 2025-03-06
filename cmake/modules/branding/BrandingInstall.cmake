@@ -1,7 +1,7 @@
 # Provide branding steps
 # - macOS, Linux: This script is intended to be run during install phase
 # - Windows: Due to (.rc) resource files being part of the compile process must be done at either configure or compile time
-# - Branding-related files will be outputted to cmake/branding
+# - Branding-related files will be outputted to build/branded
 
 cmake_policy(SET CMP0011 NEW)
 
