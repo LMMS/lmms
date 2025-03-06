@@ -1642,6 +1642,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			return;
 		}
 
+		m_midiClip->addJournalCheckPoint();
+
 		m_detuningDown = true;
 		m_lastDetuneTick = -1;
 		updateDetuningPos(me);
@@ -1649,6 +1651,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	}
 	else if (m_editMode == EditMode::Detuning && me->button() == Qt::RightButton)
 	{
+		m_midiClip->addJournalCheckPoint();
+
 		m_detuningDownRight = true;
 		m_detuningDown = true;
 		m_lastDetuneTick = -1;
@@ -2822,7 +2826,7 @@ void PianoRoll::updateDetuningPos(QMouseEvent* me)
 		{
 			if (m_lastDetuneTick != -1)
 			{
-				note->detuning()->automationClip()->removeNodes(m_lastDetuneTick - clickedNote->key(), relativePos);
+				note->detuning()->automationClip()->removeNodes(m_lastDetuneTick - clickedNote->pos(), relativePos);
 			}
 			else
 			{
