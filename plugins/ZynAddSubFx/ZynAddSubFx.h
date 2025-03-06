@@ -33,11 +33,10 @@
 #include <globals.h>
 
 #include "AudioPlugin.h"
-#include "AudioPluginBuffer.h"
 #include "AutomatableModel.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
-#include "RemotePluginAudioPort.h"
+#include "RemotePluginAudioPorts.h"
 
 class QPushButton;
 
@@ -60,7 +59,7 @@ class ZynAddSubFxRemotePlugin
 {
 	Q_OBJECT
 public:
-	ZynAddSubFxRemotePlugin(RemotePluginAudioPortController& audioPort);
+	ZynAddSubFxRemotePlugin(RemotePluginAudioPortsController& audioPort);
 
 	bool processMessage( const message & _m ) override;
 
@@ -70,12 +69,12 @@ signals:
 
 
 class ZynAddSubFxInstrument
-	: public AudioPlugin<Instrument, AudioPluginConfig {
+	: public AudioPlugin<Instrument, AudioPortsConfig {
 			.kind = AudioDataKind::F32,
 			.interleaved = false,
 			.inputs = 0,
 			.outputs = 2
-		}, DefaultConfigurableAudioPort>
+		}, DefaultConfigurableAudioPorts>
 {
 	Q_OBJECT
 public:

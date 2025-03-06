@@ -42,7 +42,7 @@ namespace lmms::gui
 class EffectControlDialog;
 class Knob;
 class LedCheckBox;
-class PluginPinConnectorView;
+class PinConnector;
 class TempoSyncKnob;
 
 
@@ -98,7 +98,7 @@ private:
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	QPushButton* m_pinConnectorButton = nullptr;
-	std::unique_ptr<PluginPinConnectorView> m_pinConnectorView;
+	std::unique_ptr<PinConnector> m_pinConnectorView;
 
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;

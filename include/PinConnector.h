@@ -1,5 +1,5 @@
 /*
- * PluginPinConnectorView.h - Displays pin connectors
+ * PinConnector.h - View for AudioPortsModel
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_GUI_PLUGIN_PIN_CONNECTOR_VIEW_H
-#define LMMS_GUI_PLUGIN_PIN_CONNECTOR_VIEW_H
+#ifndef LMMS_GUI_PIN_CONNECTOR_H
+#define LMMS_GUI_PIN_CONNECTOR_H
 
 #include <QWidget>
 
@@ -38,22 +38,22 @@ namespace lmms
 {
 
 class BoolModel;
-class PluginPinConnector;
+class AudioPortsModel;
 
 namespace gui
 {
 
 class SubWindow;
 
-class LMMS_EXPORT PluginPinConnectorView
+class LMMS_EXPORT PinConnector
 	: public QWidget
 	, public ModelView
 {
 	Q_OBJECT
 
 public:
-	PluginPinConnectorView(PluginPinConnector* model);
-	~PluginPinConnectorView() override;
+	PinConnector(AudioPortsModel* model);
+	~PinConnector() override;
 
 	auto sizeHint() const -> QSize override;
 	auto minimumSizeHint() const -> QSize override;
@@ -80,4 +80,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_GUI_PLUGIN_PIN_CONNECTOR_VIEW_H
+#endif // LMMS_GUI_PIN_CONNECTOR_H

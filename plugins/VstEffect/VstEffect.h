@@ -29,7 +29,7 @@
 #include <QSharedPointer>
 
 #include "AudioPlugin.h"
-#include "RemotePluginAudioPort.h"
+#include "RemotePluginAudioPorts.h"
 #include "VstEffectControls.h"
 
 namespace lmms
@@ -38,10 +38,10 @@ namespace lmms
 class VstPlugin;
 
 class VstEffect
-	: public AudioPlugin<Effect, AudioPluginConfig {
+	: public AudioPlugin<Effect, AudioPortsConfig {
 			.kind = AudioDataKind::F32,
 			.interleaved = false
-		}, RemotePluginAudioPort>
+		}, RemotePluginAudioPorts>
 {
 public:
 	VstEffect( Model * _parent,

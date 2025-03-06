@@ -38,7 +38,7 @@ namespace lmms
 {
 
 class RemotePlugin;
-class RemotePluginAudioPortController;
+class RemotePluginAudioPortsController;
 class SampleFrame;
 
 class ProcessWatcher : public QThread
@@ -72,7 +72,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:
-	explicit RemotePlugin(RemotePluginAudioPortController& audioPort);
+	explicit RemotePlugin(RemotePluginAudioPortsController& audioPorts);
 	~RemotePlugin() override;
 
 	inline bool isRunning()
@@ -149,9 +149,9 @@ public:
 		m_commMutex.unlock();
 	}
 
-	auto audioPort() -> RemotePluginAudioPortController*
+	auto audioPorts() -> RemotePluginAudioPortsController*
 	{
-		return m_audioPort;
+		return m_audioPorts;
 	}
 
 public slots:
@@ -174,7 +174,7 @@ private:
 	QMutex m_commMutex;
 #endif
 
-	RemotePluginAudioPortController* const m_audioPort = nullptr;
+	RemotePluginAudioPortsController* const m_audioPorts = nullptr;
 
 	SharedMemory<float[]> m_audioBuffer; // NOLINT
 

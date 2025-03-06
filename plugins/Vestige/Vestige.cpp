@@ -364,7 +364,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin{m_pluginDLL, audioPort().controller()};
+	m_plugin = new VstInstrumentPlugin{m_pluginDLL, audioPorts().controller()};
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();

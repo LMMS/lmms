@@ -39,7 +39,7 @@
 namespace lmms
 {
 
-class RemotePluginAudioPortController;
+class RemotePluginAudioPortsController;
 
 class VSTBASE_EXPORT VstPlugin
 	: public RemotePlugin
@@ -47,7 +47,7 @@ class VSTBASE_EXPORT VstPlugin
 {
 	Q_OBJECT
 public:
-	VstPlugin(const QString& plugin, RemotePluginAudioPortController& audioPort);
+	VstPlugin(const QString& plugin, RemotePluginAudioPortsController& audioPorts);
 	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );

@@ -53,7 +53,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
-#include "RemotePluginAudioPort.h"
+#include "RemotePluginAudioPorts.h"
 #include "Song.h"
 #include "FileDialog.h"
 
@@ -122,8 +122,8 @@ enum class ExecutableType
 	Unknown, Win32, Win64, Linux64,
 };
 
-VstPlugin::VstPlugin(const QString& plugin, RemotePluginAudioPortController& audioPort)
-	: RemotePlugin{audioPort}
+VstPlugin::VstPlugin(const QString& plugin, RemotePluginAudioPortsController& audioPorts)
+	: RemotePlugin{audioPorts}
 	, m_plugin{PathUtil::toAbsolute(plugin)}
 	, m_pluginWindowID{0}
 	, m_embedMethod{(gui::getGUI() != nullptr)
@@ -265,7 +265,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 		setParameterDump( dump );
 	}
 
-	audioPort()->pc().loadSettings(_this);
+	audioPorts()->audioPortsModel().loadSettings(_this);
 }
 
 
@@ -309,7 +309,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "program", currentProgram() );
-	audioPort()->pc().saveSettings(_doc, _this);
+	audioPorts()->audioPortsModel().saveSettings(_doc, _this);
 }
 
 void VstPlugin::toggleUI()

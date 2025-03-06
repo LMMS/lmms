@@ -1,6 +1,6 @@
 /*
  * AudioPlugin.h - Interface for audio plugins which provides
- *                 pin connector support and compile-time customizations
+ *                 audio ports and compile-time customizations
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -29,11 +29,11 @@
 #include <type_traits>
 
 #include "AudioData.h"
-#include "AudioPluginConfig.h"
+#include "AudioPorts.h"
+#include "AudioPortsConfig.h"
 #include "Effect.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "PluginAudioPort.h"
 
 namespace lmms
 {
@@ -141,47 +141,47 @@ protected:
 	virtual auto processImpl() -> ProcessStatus = 0;
 };
 
-//! Connects the core audio channels to the instrument or effect using the pin connector
-template<class ParentT, AudioPluginConfig config, class AudioPortT>
+//! Connects the core audio channels to the instrument or effect using the audio ports
+template<class ParentT, AudioPortsConfig config, class AudioPortsT>
 class AudioPlugin
 {
 	static_assert(always_false_v<ParentT>, "ParentT must be either Instrument or Effect");
 };
 
 //! Instrument specialization
-template<AudioPluginConfig config, class AudioPortT>
-class AudioPlugin<Instrument, config, AudioPortT>
+template<AudioPortsConfig config, class AudioPortsT>
+class AudioPlugin<Instrument, config, AudioPortsT>
 	: public Instrument
 	, public AudioProcessingMethod<Instrument,
 		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type,
 		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, true>::type,
-		config.inplace, AudioPortT::provideProcessBuffers()>
+		config.inplace, AudioPortsT::provideProcessBuffers()>
 {
 public:
-	template<typename... AudioPortArgsT>
+	template<typename... AudioPortsArgsT>
 	AudioPlugin(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr,
 		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 		Instrument::Flags flags = Instrument::Flag::NoFlags,
-		AudioPortArgsT&&... audioPortArgs)
+		AudioPortsArgsT&&... audioPortArgs)
 		: Instrument{desc, parent, key, flags}
-		, m_audioPort{true, this, std::forward<AudioPortArgsT>(audioPortArgs)...}
+		, m_audioPorts{true, this, std::forward<AudioPortsArgsT>(audioPortArgs)...}
 	{
-		m_audioPort.init();
+		m_audioPorts.init();
 	}
 
 protected:
-	auto audioPort() -> AudioPortT& { return m_audioPort; }
+	auto audioPorts() -> AudioPortsT& { return m_audioPorts; }
 
-	auto pinConnector() const -> const PluginPinConnector* final
+	auto audioPortsModel() const -> const AudioPortsModel* final
 	{
-		return m_audioPort.active()
-			? &m_audioPort.pinConnector()
+		return m_audioPorts.active()
+			? &m_audioPorts.model()
 			: nullptr;
 	}
 
 	void playImpl(std::span<SampleFrame> inOut) final
 	{
-		auto buffers = m_audioPort.buffers();
+		auto buffers = m_audioPorts.buffers();
 		if (!buffers)
 		{
 			// Plugin is not running
@@ -190,7 +190,7 @@ protected:
 
 		SampleFrame* temp = inOut.data();
 		const auto bus = CoreAudioBusMut{&temp, 1, inOut.size()};
-		auto router = m_audioPort.getRouter();
+		auto router = m_audioPorts.getRouter();
 
 		if constexpr (config.inplace)
 		{
@@ -199,7 +199,7 @@ protected:
 			router.routeToPlugin(bus, pluginInOut);
 
 			// Process
-			if constexpr (AudioPortT::provideProcessBuffers()) { this->processImpl(pluginInOut); }
+			if constexpr (AudioPortsT::provideProcessBuffers()) { this->processImpl(pluginInOut); }
 			else { this->processImpl(); }
 
 			// Write plugin output buffer to core
@@ -213,7 +213,7 @@ protected:
 			router.routeToPlugin(bus, pluginIn);
 
 			// Process
-			if constexpr (AudioPortT::provideProcessBuffers()) { this->processImpl(pluginIn, pluginOut); }
+			if constexpr (AudioPortsT::provideProcessBuffers()) { this->processImpl(pluginIn, pluginOut); }
 			else { this->processImpl(); }
 
 			// Write plugin output buffer to core
@@ -226,8 +226,8 @@ protected:
 		/**
 		 * NOTE: Only MIDI-based instruments are currently supported by AudioPlugin.
 		 * NotePlayHandle-based instruments use buffers from their play handles, and more work
-		 * would be needed to integrate that system with the AudioPluginBufferInterface system
-		 * used by AudioPlugin. AudioPluginBufferInterface is also not thread-safe.
+		 * would be needed to integrate that system with the AudioBuffer system
+		 * used by AudioPlugin. AudioBuffer is also not thread-safe.
 		 *
 		 * The `Instrument::playNote()` method is still called for MIDI-based instruments when
 		 * notes are played, so this method is a no-op.
@@ -235,36 +235,36 @@ protected:
 	}
 
 private:
-	AudioPortT m_audioPort;
+	AudioPortsT m_audioPorts;
 };
 
 //! Effect specialization
-template<AudioPluginConfig config, class AudioPortT>
-class AudioPlugin<Effect, config, AudioPortT>
+template<AudioPortsConfig config, class AudioPortsT>
+class AudioPlugin<Effect, config, AudioPortsT>
 	: public Effect
 	, public AudioProcessingMethod<Effect,
 		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type,
 		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, true>::type,
-		config.inplace, AudioPortT::provideProcessBuffers()>
+		config.inplace, AudioPortsT::provideProcessBuffers()>
 {
 public:
-	template<typename... AudioPortArgsT>
+	template<typename... AudioPortsArgsT>
 	AudioPlugin(const Plugin::Descriptor* desc, Model* parent = nullptr,
 		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
-		AudioPortArgsT&&... audioPortArgs)
+		AudioPortsArgsT&&... audioPortArgs)
 		: Effect{desc, parent, key}
-		, m_audioPort{false, this, std::forward<AudioPortArgsT>(audioPortArgs)...}
+		, m_audioPorts{false, this, std::forward<AudioPortsArgsT>(audioPortArgs)...}
 	{
-		m_audioPort.init();
+		m_audioPorts.init();
 	}
 
 protected:
-	auto audioPort() -> AudioPortT& { return m_audioPort; }
+	auto audioPorts() -> AudioPortsT& { return m_audioPorts; }
 
-	auto pinConnector() const -> const PluginPinConnector* final
+	auto audioPortsModel() const -> const AudioPortsModel* final
 	{
-		return m_audioPort.active()
-			? &m_audioPort.pinConnector()
+		return m_audioPorts.active()
+			? &m_audioPorts.model()
 			: nullptr;
 	}
 
@@ -276,12 +276,12 @@ protected:
 			return false;
 		}
 
-		auto buffers = m_audioPort.buffers();
+		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
 		SampleFrame* temp = inOut.data();
 		const auto bus = CoreAudioBusMut{&temp, 1, inOut.size()};
-		auto router = m_audioPort.getRouter();
+		auto router = m_audioPorts.getRouter();
 
 		ProcessStatus status;
 
@@ -292,7 +292,7 @@ protected:
 			router.routeToPlugin(bus, pluginInOut);
 
 			// Process
-			if constexpr (AudioPortT::provideProcessBuffers()) { status = this->processImpl(pluginInOut); }
+			if constexpr (AudioPortsT::provideProcessBuffers()) { status = this->processImpl(pluginInOut); }
 			else { status = this->processImpl(); }
 
 			// Write plugin output buffer to core
@@ -306,7 +306,7 @@ protected:
 			router.routeToPlugin(bus, pluginIn);
 
 			// Process
-			if constexpr (AudioPortT::provideProcessBuffers()) { status = this->processImpl(pluginIn, pluginOut); }
+			if constexpr (AudioPortsT::provideProcessBuffers()) { status = this->processImpl(pluginIn, pluginOut); }
 			else { status = this->processImpl(); }
 
 			// Write plugin output buffer to core
@@ -346,7 +346,7 @@ protected:
 	}
 
 private:
-	AudioPortT m_audioPort;
+	AudioPortsT m_audioPorts;
 };
 
 
@@ -370,31 +370,31 @@ private:
  *
  * @tparam ParentT Either `Instrument` or `Effect`
  * @tparam config Compile time configuration to customize `AudioPlugin`
- * @tparam AudioPortT The plugin's audio port - must fully implement `PluginAudioPort`
+ * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
  */
-template<class ParentT, AudioPluginConfig config,
-	template<AudioPluginConfig> class AudioPortT = DefaultPluginAudioPort>
+template<class ParentT, AudioPortsConfig config,
+	template<AudioPortsConfig> class AudioPortsT = DefaultAudioPorts>
 class AudioPlugin
-	: public detail::AudioPlugin<ParentT, config, AudioPortT<config>>
+	: public detail::AudioPlugin<ParentT, config, AudioPortsT<config>>
 {
 	static_assert(config.kind != AudioDataKind::SampleFrame
 		|| ((config.inputs == 0 || config.inputs == 2) && (config.outputs == 0 || config.outputs == 2)),
 		"Don't use SampleFrame if more than 2 processor channels are needed");
 
-	static_assert(std::is_base_of_v<detail::PluginAudioPortTag, AudioPortT<config>>,
-		"AudioPortT must be `PluginAudioPort` or inherit from it");
+	static_assert(std::is_base_of_v<detail::AudioPortsTag, AudioPortsT<config>>,
+		"AudioPortT must be `AudioPorts` or inherit from it");
 
-	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortT<config>>;
+	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortsT<config>>;
 
 public:
 	//! The last parameter(s) are variadic template parameters passed to the audio port constructor
 	using Base::Base;
 
-	static constexpr auto pluginConfig() -> AudioPluginConfig { return config; }
+	static constexpr auto pluginConfig() -> AudioPortsConfig { return config; }
 
 private:
 	/**
-	 * Hooks into the plugin's SerializingObject in order to save and load the audio port.
+	 * Hooks into the plugin's SerializingObject in order to save and load the audio ports.
 	 * Plugin implementations do not have to do anything and audio ports will be
 	 * saved and loaded when they need to be.
 	 */
@@ -409,12 +409,12 @@ private:
 
 		void saveSettings(QDomDocument& doc, QDomElement& element) final
 		{
-			m_ap->audioPort().saveSettings(doc, element);
+			m_ap->audioPorts().saveSettings(doc, element);
 		}
 
 		void loadSettings(const QDomElement& element) final
 		{
-			m_ap->audioPort().loadSettings(element);
+			m_ap->audioPorts().loadSettings(element);
 		}
 
 	private:
@@ -426,14 +426,14 @@ private:
 
 
 // NOTE: NotePlayHandle-based instruments are not supported yet
-using DefaultMidiInstrument = AudioPlugin<Instrument, AudioPluginConfig {
+using DefaultMidiInstrument = AudioPlugin<Instrument, AudioPortsConfig {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 0,
 	.outputs = 2,
 	.inplace = true }>;
 
-using DefaultEffect = AudioPlugin<Effect, AudioPluginConfig {
+using DefaultEffect = AudioPlugin<Effect, AudioPortsConfig {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 2,

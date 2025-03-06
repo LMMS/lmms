@@ -50,7 +50,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Model.h"
-#include "RemotePluginAudioPort.h"
+#include "RemotePluginAudioPorts.h"
 #include "Song.h"
 #include "lmms_basics.h"
 
@@ -137,7 +137,7 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin(RemotePluginAudioPortController& audioPort)
+RemotePlugin::RemotePlugin(RemotePluginAudioPortsController& audioPorts)
 	: QObject{}
 #ifdef SYNC_WITH_SHM_FIFO
 	, RemotePluginBase{new shmFifo(), new shmFifo()}
@@ -149,7 +149,7 @@ RemotePlugin::RemotePlugin(RemotePluginAudioPortController& audioPort)
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	, m_commMutex{QMutex::Recursive}
 #endif
-	, m_audioPort{&audioPort}
+	, m_audioPorts{&audioPorts}
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
@@ -180,7 +180,7 @@ RemotePlugin::RemotePlugin(RemotePluginAudioPortController& audioPort)
 	}
 #endif
 
-	m_audioPort->connectBuffers(this);
+	m_audioPorts->connectBuffers(this);
 
 	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
 		this, SLOT(processFinished(int,QProcess::ExitStatus)),
@@ -197,7 +197,7 @@ RemotePlugin::RemotePlugin(RemotePluginAudioPortController& audioPort)
 
 RemotePlugin::~RemotePlugin()
 {
-	m_audioPort->disconnectBuffers();
+	m_audioPorts->disconnectBuffers();
 
 	m_watcher.stop();
 	m_watcher.wait();
@@ -332,7 +332,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		waitForInitDone();
 	}
 
-	m_audioPort->activate(Engine::audioEngine()->framesPerPeriod());
+	m_audioPorts->activate(Engine::audioEngine()->framesPerPeriod());
 
 	unlock();
 
@@ -508,7 +508,7 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdChangeInputOutputCount:
-			m_audioPort->pc().setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
+			m_audioPorts->audioPortsModel().setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
 			break;
 
 		case IdDebugMessage:

@@ -32,21 +32,21 @@
 #include <QMenu>
 
 #include "AudioEngine.h"
+#include "AudioPortsModel.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Knob.h"
-#include "MidiCCRackView.h"
-#include "Mixer.h"
-#include "MixerView.h"
 #include "GuiApplication.h"
 #include "Instrument.h"
 #include "InstrumentTrackWindow.h"
+#include "Knob.h"
 #include "MainWindow.h"
+#include "MidiCCRackView.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
-#include "PluginPinConnector.h"
-#include "PluginPinConnectorView.h"
+#include "Mixer.h"
+#include "MixerView.h"
+#include "PinConnector.h"
 #include "TrackLabelButton.h"
 
 
@@ -215,13 +215,13 @@ void InstrumentTrackView::togglePinConnector()
 	const auto inst = it->instrument();
 	if (!inst) { return; }
 
-	auto pc = inst->pinConnector();
-	if (!pc) { return; }
+	auto ap = inst->audioPortsModel();
+	if (!ap) { return; }
 
 	if (!m_pinConnectorView)
 	{
-		m_pinConnectorView = pc->instantiateView();
-		connect(pc, &PluginPinConnector::destroyed, [this]() {
+		m_pinConnectorView = ap->instantiateView();
+		connect(ap, &AudioPortsModel::destroyed, [this]() {
 			m_pinConnectorView.reset();
 		});
 	}
@@ -428,7 +428,7 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 void InstrumentTrackView::addPinConnectorAction(QMenu* menu)
 {
 	assert(menu != nullptr);
-	const auto addAction = [=, this](const PluginPinConnector* pc = nullptr) {
+	const auto addAction = [=, this](const AudioPortsModel* pc = nullptr) {
 		if (pc)
 		{
 			auto pcAction = menu->addAction(embed::getIconPixmap("tool"), tr("Pin connector"),
@@ -449,8 +449,8 @@ void InstrumentTrackView::addPinConnectorAction(QMenu* menu)
 	const auto inst = it->instrument();
 	if (!inst) { addAction(); return; }
 
-	const auto pc = inst->pinConnector();
-	addAction(pc);
+	const auto ap = inst->audioPortsModel();
+	addAction(ap);
 }
 
 QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack* instrumentTrack)

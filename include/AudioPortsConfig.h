@@ -1,5 +1,5 @@
 /*
- * AudioPluginConfig.h - Audio plugin configuration
+ * AudioPortsConfig.h - Audio ports configuration
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef LMMS_AUDIO_PLUGIN_CONFIG_H
-#define LMMS_AUDIO_PLUGIN_CONFIG_H
+#ifndef LMMS_AUDIO_PORTS_CONFIG_H
+#define LMMS_AUDIO_PORTS_CONFIG_H
 
 #include "AudioData.h"
 
 namespace lmms {
 
 //! Compile time customizations for an audio plugin
-struct AudioPluginConfig
+struct AudioPortsConfig
 {
 	//! The audio data type used by the plugin
 	AudioDataKind kind;
@@ -56,4 +56,4 @@ struct AudioPluginConfig
 
 } // namespace lmms
 
-#endif // LMMS_AUDIO_PLUGIN_CONFIG_H
+#endif // LMMS_AUDIO_PORTS_CONFIG_H

@@ -1,6 +1,6 @@
 /*
- * PluginPinConnector.cpp - Specifies how to route audio channels
- *                          in and out of a plugin.
+ * AudioPortsModel.cpp - Specifies how to route audio channels
+ *                       in and out of a plugin.
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -23,7 +23,7 @@
  *
  */
 
-#include "PluginPinConnector.h"
+#include "AudioPortsModel.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -32,12 +32,12 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "PluginPinConnectorView.h"
+#include "PinConnector.h"
 
 namespace lmms
 {
 
-PluginPinConnector::PluginPinConnector(bool isInstrument, Model* parent)
+AudioPortsModel::AudioPortsModel(bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
@@ -48,7 +48,7 @@ PluginPinConnector::PluginPinConnector(bool isInstrument, Model* parent)
 	});
 }
 
-PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent)
+AudioPortsModel::AudioPortsModel(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
@@ -60,7 +60,7 @@ PluginPinConnector::PluginPinConnector(int pluginChannelCountIn, int pluginChann
 	});
 }
 
-void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
+void AudioPortsModel::setPluginChannelCounts(int inCount, int outCount)
 {
 	setPluginChannelCountsImpl(inCount, outCount);
 
@@ -70,7 +70,7 @@ void PluginPinConnector::setPluginChannelCounts(int inCount, int outCount)
 	emit propertiesChanged();
 }
 
-void PluginPinConnector::setPluginChannelCountsImpl(int inCount, int outCount)
+void AudioPortsModel::setPluginChannelCountsImpl(int inCount, int outCount)
 {
 	if (m_trackChannelsUpperBound > MaxTrackChannels)
 	{
@@ -110,17 +110,17 @@ void PluginPinConnector::setPluginChannelCountsImpl(int inCount, int outCount)
 	m_out.setPluginChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
 }
 
-void PluginPinConnector::setPluginChannelCountIn(int inCount)
+void AudioPortsModel::setPluginChannelCountIn(int inCount)
 {
 	setPluginChannelCounts(inCount, out().channelCount());
 }
 
-void PluginPinConnector::setPluginChannelCountOut(int outCount)
+void AudioPortsModel::setPluginChannelCountOut(int outCount)
 {
 	setPluginChannelCounts(in().channelCount(), outCount);
 }
 
-void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
+void AudioPortsModel::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	auto pins = doc.createElement(nodeName());
 	elem.appendChild(pins);
@@ -142,7 +142,7 @@ void PluginPinConnector::saveSettings(QDomDocument& doc, QDomElement& elem)
 	m_out.saveSettings(doc, pinsOut);
 }
 
-void PluginPinConnector::loadSettings(const QDomElement& elem)
+void AudioPortsModel::loadSettings(const QDomElement& elem)
 {
 	const auto pins = elem.firstChildElement(nodeName());
 	if (pins.isNull()) { return; }
@@ -160,7 +160,7 @@ void PluginPinConnector::loadSettings(const QDomElement& elem)
 	m_out.loadSettings(pins.firstChildElement("out_matrix"));
 }
 
-void PluginPinConnector::setTrackChannelCount(int count)
+void AudioPortsModel::setTrackChannelCount(int count)
 {
 	if (count < 2) { throw std::invalid_argument{"There must be at least 2 track channels"}; }
 	if (count % 2 != 0) { throw std::invalid_argument{"There must be an even number of track channels"}; }
@@ -182,7 +182,7 @@ void PluginPinConnector::setTrackChannelCount(int count)
 	emit propertiesChanged();
 }
 
-void PluginPinConnector::updateRoutedChannels(unsigned int trackChannel)
+void AudioPortsModel::updateRoutedChannels(unsigned int trackChannel)
 {
 	const auto& pins = m_out.m_pins.at(trackChannel);
 	m_routedChannels[trackChannel] = std::any_of(pins.begin(), pins.end(), [](BoolModel* m) {
@@ -190,7 +190,7 @@ void PluginPinConnector::updateRoutedChannels(unsigned int trackChannel)
 	});
 }
 
-void PluginPinConnector::updateAllRoutedChannels()
+void AudioPortsModel::updateAllRoutedChannels()
 {
 	for (unsigned int tc = 0; tc < s_totalTrackChannels; ++tc)
 	{
@@ -198,21 +198,21 @@ void PluginPinConnector::updateAllRoutedChannels()
 	}
 }
 
-auto PluginPinConnector::instantiateView() const -> std::unique_ptr<gui::PluginPinConnectorView>
+auto AudioPortsModel::instantiateView() const -> std::unique_ptr<gui::PinConnector>
 {
-	// This method does not modify the pin connector, but it needs the view to store
-	// a mutable pointer to the pin connector, hence the const_cast.
-	return std::make_unique<gui::PluginPinConnectorView>(const_cast<PluginPinConnector*>(this));
+	// This method does not modify AudioPortsModel, but it needs PinConnector to store
+	// a mutable pointer to the AudioPortsModel, hence the const_cast.
+	return std::make_unique<gui::PinConnector>(const_cast<AudioPortsModel*>(this));
 }
 
-auto PluginPinConnector::getChannelCountText() const -> QString
+auto AudioPortsModel::getChannelCountText() const -> QString
 {
 	const auto inText = QString{"%1"}.arg(in().channelCount());
 	const auto outText = QString{"%1"}.arg(out().channelCount());
 	return QString{tr("%1 in %2 out")}.arg(inText).arg(outText);
 }
 
-auto PluginPinConnector::Matrix::channelName(int channel) const -> QString
+auto AudioPortsModel::Matrix::channelName(int channel) const -> QString
 {
 	// Custom name (if supported)
 	assert(channel >= 0);
@@ -240,7 +240,7 @@ auto PluginPinConnector::Matrix::channelName(int channel) const -> QString
 	throw std::invalid_argument{"Too many channels"};
 }
 
-void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent, int count,
+void AudioPortsModel::Matrix::setTrackChannelCount(AudioPortsModel* parent, int count,
 	const QString& nameFormat)
 {
 	auto oldSize = static_cast<int>(m_pins.size());
@@ -274,13 +274,13 @@ void PluginPinConnector::Matrix::setTrackChannelCount(PluginPinConnector* parent
 				{
 					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
 				}
-				parentModel->connect(model, &BoolModel::dataChanged, parent, &PluginPinConnector::dataChanged);
+				parentModel->connect(model, &BoolModel::dataChanged, parent, &AudioPortsModel::dataChanged);
 			}
 		}
 	}
 }
 
-void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* parent, int count,
+void AudioPortsModel::Matrix::setPluginChannelCount(AudioPortsModel* parent, int count,
 	const QString& nameFormat)
 {
 	auto parentModel = parent->parentModel();
@@ -302,7 +302,7 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 				{
 					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
 				}
-				parentModel->connect(model, &BoolModel::dataChanged, parent, &PluginPinConnector::dataChanged);
+				parentModel->connect(model, &BoolModel::dataChanged, parent, &AudioPortsModel::dataChanged);
 			}
 		}
 	}
@@ -327,7 +327,7 @@ void PluginPinConnector::Matrix::setPluginChannelCount(PluginPinConnector* paren
 	}
 }
 
-void PluginPinConnector::Matrix::setDefaultConnections()
+void AudioPortsModel::Matrix::setDefaultConnections()
 {
 	assert(m_pins.size() >= 2u);
 
@@ -352,7 +352,7 @@ void PluginPinConnector::Matrix::setDefaultConnections()
 	}
 }
 
-void PluginPinConnector::Matrix::saveSettings(QDomDocument& doc, QDomElement& elem) const
+void AudioPortsModel::Matrix::saveSettings(QDomDocument& doc, QDomElement& elem) const
 {
 	// Only saves connections that are actually used, otherwise could bloat project file
 	for (std::size_t trackChannel = 0; trackChannel < m_pins.size(); ++trackChannel)
@@ -369,7 +369,7 @@ void PluginPinConnector::Matrix::saveSettings(QDomDocument& doc, QDomElement& el
 	}
 }
 
-void PluginPinConnector::Matrix::loadSettings(const QDomElement& elem)
+void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 {
 	const auto trackChannelCount = static_cast<int>(m_pins.size());
 	assert(m_channelCount == (trackChannelCount > 0 ? static_cast<int>(m_pins[0].size()) : 0));

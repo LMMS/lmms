@@ -1,5 +1,5 @@
 /*
- * PluginPinConnectorTest.cpp
+ * AudioPortsModelTest.cpp
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -31,10 +31,10 @@
 #define LMMS_TESTING
 #include "AudioData.h"
 #include "AudioEngine.h"
-#include "AudioPluginBuffer.h"
+#include "AudioBuffer.h"
 #include "Model.h"
-#include "PluginAudioPort.h"
-#include "PluginPinConnector.h"
+#include "AudioPorts.h"
+#include "AudioPortsModel.h"
 #include "SampleFrame.h"
 #include "lmms_basics.h"
 
@@ -150,7 +150,7 @@ void compareBuffers(SplitAudioData<SampleT, extent> actual, SplitAudioData<Sampl
 } // namespace lmms
 
 
-class PluginPinConnectorTest : public QObject
+class AudioPortsModelTest : public QObject
 {
 	Q_OBJECT
 
@@ -192,27 +192,27 @@ private slots:
 		auto model = Model{nullptr};
 
 		// Channel counts should stay zero until known
-		auto pcNxN = PluginPinConnector{DynamicChannelCount, DynamicChannelCount, false, &model};
-		QCOMPARE(pcNxN.in().channelCount(), 0);
-		QCOMPARE(pcNxN.out().channelCount(), 0);
+		auto apmNxN = AudioPortsModel{DynamicChannelCount, DynamicChannelCount, false, &model};
+		QCOMPARE(apmNxN.in().channelCount(), 0);
+		QCOMPARE(apmNxN.out().channelCount(), 0);
 
-		pcNxN.setPluginChannelCountIn(4);
-		QCOMPARE(pcNxN.in().channelCount(), 4);
-		QCOMPARE(pcNxN.out().channelCount(), 0);
+		apmNxN.setPluginChannelCountIn(4);
+		QCOMPARE(apmNxN.in().channelCount(), 4);
+		QCOMPARE(apmNxN.out().channelCount(), 0);
 
-		pcNxN.setPluginChannelCountOut(8);
-		QCOMPARE(pcNxN.in().channelCount(), 4);
-		QCOMPARE(pcNxN.out().channelCount(), 8);
+		apmNxN.setPluginChannelCountOut(8);
+		QCOMPARE(apmNxN.in().channelCount(), 4);
+		QCOMPARE(apmNxN.out().channelCount(), 8);
 
 		// stereo/stereo effect
-		auto pc2x2 = PluginPinConnector{2, 2, false, &model};
-		QCOMPARE(pc2x2.in().channelCount(), 2);
-		QCOMPARE(pc2x2.out().channelCount(), 2);
+		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
+		QCOMPARE(apm2x2.in().channelCount(), 2);
+		QCOMPARE(apm2x2.out().channelCount(), 2);
 
 		// stereo instrument
-		auto pc0x2 = PluginPinConnector{0, 2, true, &model};
-		QCOMPARE(pc0x2.in().channelCount(), 0);
-		QCOMPARE(pc0x2.out().channelCount(), 2);
+		auto apm0x2 = AudioPortsModel{0, 2, true, &model};
+		QCOMPARE(apm0x2.in().channelCount(), 0);
+		QCOMPARE(apm0x2.out().channelCount(), 2);
 	}
 
 	//! Verifies that the correct default connections are used for different channel counts
@@ -230,16 +230,16 @@ private slots:
 		// | |X| | |X|
 		//  ---   ---
 
-		auto pc2x2 = PluginPinConnector{2, 2, false, &model};
-		QCOMPARE(pc2x2.in().enabled(0, 0), true);
-		QCOMPARE(pc2x2.in().enabled(0, 1), false);
-		QCOMPARE(pc2x2.in().enabled(1, 0), false);
-		QCOMPARE(pc2x2.in().enabled(1, 1), true);
+		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
+		QCOMPARE(apm2x2.in().enabled(0, 0), true);
+		QCOMPARE(apm2x2.in().enabled(0, 1), false);
+		QCOMPARE(apm2x2.in().enabled(1, 0), false);
+		QCOMPARE(apm2x2.in().enabled(1, 1), true);
 
-		QCOMPARE(pc2x2.out().enabled(0, 0), true);
-		QCOMPARE(pc2x2.out().enabled(0, 1), false);
-		QCOMPARE(pc2x2.out().enabled(1, 0), false);
-		QCOMPARE(pc2x2.out().enabled(1, 1), true);
+		QCOMPARE(apm2x2.out().enabled(0, 0), true);
+		QCOMPARE(apm2x2.out().enabled(0, 1), false);
+		QCOMPARE(apm2x2.out().enabled(1, 0), false);
+		QCOMPARE(apm2x2.out().enabled(1, 1), true);
 
 		// 1 input, 1 output (mono/mono effect)
 		//
@@ -249,12 +249,12 @@ private slots:
 		// | |   |X|
 		//  -     -
 
-		auto pc1x1 = PluginPinConnector{1, 1, false, &model};
-		QCOMPARE(pc1x1.in().enabled(0, 0), true);
-		QCOMPARE(pc1x1.in().enabled(1, 0), false);
+		auto apm1x1 = AudioPortsModel{1, 1, false, &model};
+		QCOMPARE(apm1x1.in().enabled(0, 0), true);
+		QCOMPARE(apm1x1.in().enabled(1, 0), false);
 
-		QCOMPARE(pc1x1.out().enabled(0, 0), true);
-		QCOMPARE(pc1x1.out().enabled(1, 0), true);
+		QCOMPARE(apm1x1.out().enabled(0, 0), true);
+		QCOMPARE(apm1x1.out().enabled(1, 0), true);
 
 		// 1 input, >2 outputs
 		//
@@ -264,18 +264,18 @@ private slots:
 		// | |   | |X| | |
 		//  -     -------
 
-		auto pc1x4 = PluginPinConnector{1, 4, false, &model};
-		QCOMPARE(pc1x4.in().enabled(0, 0), true);
-		QCOMPARE(pc1x4.in().enabled(1, 0), false);
+		auto apm1x4 = AudioPortsModel{1, 4, false, &model};
+		QCOMPARE(apm1x4.in().enabled(0, 0), true);
+		QCOMPARE(apm1x4.in().enabled(1, 0), false);
 
-		QCOMPARE(pc1x4.out().enabled(0, 0), true);
-		QCOMPARE(pc1x4.out().enabled(0, 1), false);
-		QCOMPARE(pc1x4.out().enabled(0, 2), false);
-		QCOMPARE(pc1x4.out().enabled(0, 3), false);
-		QCOMPARE(pc1x4.out().enabled(1, 0), false);
-		QCOMPARE(pc1x4.out().enabled(1, 1), true);
-		QCOMPARE(pc1x4.out().enabled(1, 2), false);
-		QCOMPARE(pc1x4.out().enabled(1, 3), false);
+		QCOMPARE(apm1x4.out().enabled(0, 0), true);
+		QCOMPARE(apm1x4.out().enabled(0, 1), false);
+		QCOMPARE(apm1x4.out().enabled(0, 2), false);
+		QCOMPARE(apm1x4.out().enabled(0, 3), false);
+		QCOMPARE(apm1x4.out().enabled(1, 0), false);
+		QCOMPARE(apm1x4.out().enabled(1, 1), true);
+		QCOMPARE(apm1x4.out().enabled(1, 2), false);
+		QCOMPARE(apm1x4.out().enabled(1, 3), false);
 
 		// 2 inputs, 2 outputs (stereo instrument with stereo sidechain input)
 		//
@@ -285,16 +285,16 @@ private slots:
 		// | | | | |X|
 		//  ---   ---
 
-		auto pc2x2Inst = PluginPinConnector{2, 2, true, &model};
-		QCOMPARE(pc2x2Inst.in().enabled(0, 0), false);
-		QCOMPARE(pc2x2Inst.in().enabled(0, 1), false);
-		QCOMPARE(pc2x2Inst.in().enabled(1, 0), false);
-		QCOMPARE(pc2x2Inst.in().enabled(1, 1), false);
+		auto apm2x2Inst = AudioPortsModel{2, 2, true, &model};
+		QCOMPARE(apm2x2Inst.in().enabled(0, 0), false);
+		QCOMPARE(apm2x2Inst.in().enabled(0, 1), false);
+		QCOMPARE(apm2x2Inst.in().enabled(1, 0), false);
+		QCOMPARE(apm2x2Inst.in().enabled(1, 1), false);
 
-		QCOMPARE(pc2x2Inst.out().enabled(0, 0), true);
-		QCOMPARE(pc2x2Inst.out().enabled(0, 1), false);
-		QCOMPARE(pc2x2Inst.out().enabled(1, 0), false);
-		QCOMPARE(pc2x2Inst.out().enabled(1, 1), true);
+		QCOMPARE(apm2x2Inst.out().enabled(0, 0), true);
+		QCOMPARE(apm2x2Inst.out().enabled(0, 1), false);
+		QCOMPARE(apm2x2Inst.out().enabled(1, 0), false);
+		QCOMPARE(apm2x2Inst.out().enabled(1, 1), true);
 	}
 
 	//! Verifies that the routed channels optimization works
@@ -304,7 +304,7 @@ private slots:
 
 		// Setup
 		auto model = Model{nullptr};
-		auto pc = PluginPinConnector{2, 2, false, &model};
+		auto apm = AudioPortsModel{2, 2, false, &model};
 
 		// Out
 		//  ___
@@ -313,8 +313,8 @@ private slots:
 		//  ---
 
 		// Track channels 0 and 1 should both have a plugin output channel routed to them
-		QCOMPARE(pc.m_routedChannels[0], true);
-		QCOMPARE(pc.m_routedChannels[1], true);
+		QCOMPARE(apm.m_routedChannels[0], true);
+		QCOMPARE(apm.m_routedChannels[1], true);
 
 		// Out
 		//  ___
@@ -322,11 +322,11 @@ private slots:
 		// | |X| 1
 		//  ---
 
-		pc.out().pins(0)[0]->setValue(false);
+		apm.out().pins(0)[0]->setValue(false);
 
 		// Now only track channel 1 should have a plugin channel routed to it
-		QCOMPARE(pc.m_routedChannels[0], false);
-		QCOMPARE(pc.m_routedChannels[1], true);
+		QCOMPARE(apm.m_routedChannels[0], false);
+		QCOMPARE(apm.m_routedChannels[1], true);
 
 		// Out
 		//  ___
@@ -334,10 +334,10 @@ private slots:
 		// | |X| 1
 		//  ---
 
-		pc.out().pins(0)[1]->setValue(true);
+		apm.out().pins(0)[1]->setValue(true);
 
-		QCOMPARE(pc.m_routedChannels[0], true);
-		QCOMPARE(pc.m_routedChannels[1], true);
+		QCOMPARE(apm.m_routedChannels[0], true);
+		QCOMPARE(apm.m_routedChannels[1], true);
 
 		// Out
 		//  ___
@@ -345,10 +345,10 @@ private slots:
 		// |X|X| 1
 		//  ---
 
-		pc.out().pins(1)[0]->setValue(true);
+		apm.out().pins(1)[0]->setValue(true);
 
-		QCOMPARE(pc.m_routedChannels[0], true);
-		QCOMPARE(pc.m_routedChannels[1], true);
+		QCOMPARE(apm.m_routedChannels[0], true);
+		QCOMPARE(apm.m_routedChannels[1], true);
 	}
 
 	//! Verifies correct default routing for 1x1 non-interleaved plugin
@@ -357,9 +357,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 1, 1};
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 1};
 		auto model = Model{nullptr};
-		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		auto ap = DefaultAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -429,9 +429,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 2, 2};
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		auto ap = DefaultAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -501,9 +501,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 2, 2};
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		auto ap = DefaultAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -513,15 +513,15 @@ private slots:
 		// |X| | |X| |
 		// | |X| | | |
 		//  ---   ---
-		auto& pc = ap.pinConnector();
-		pc.in().pins(0)[0]->setValue(true);
-		pc.in().pins(0)[1]->setValue(false);
-		pc.in().pins(1)[0]->setValue(false);
-		pc.in().pins(1)[1]->setValue(true);
-		pc.out().pins(0)[0]->setValue(true);
-		pc.out().pins(0)[1]->setValue(false);
-		pc.out().pins(1)[0]->setValue(false);
-		pc.out().pins(1)[1]->setValue(false);
+		auto& apm = ap.model();
+		apm.in().pins(0)[0]->setValue(true);
+		apm.in().pins(0)[1]->setValue(false);
+		apm.in().pins(1)[0]->setValue(false);
+		apm.in().pins(1)[1]->setValue(true);
+		apm.out().pins(0)[0]->setValue(true);
+		apm.out().pins(0)[1]->setValue(false);
+		apm.out().pins(1)[0]->setValue(false);
+		apm.out().pins(1)[1]->setValue(false);
 
 		// Data on frames 0, 1, and 33
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
@@ -584,11 +584,11 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPluginConfig {
+		constexpr auto config = AudioPortsConfig {
 			AudioDataKind::SampleFrame, true, 2, 2, true
 		};
 		auto model = Model{nullptr};
-		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		auto ap = DefaultAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -649,9 +649,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPluginConfig{AudioDataKind::F32, false, 1, 2};
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 2};
 		auto model = Model{nullptr};
-		auto ap = DefaultPluginAudioPort<config>{false, &model};
+		auto ap = DefaultAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -662,13 +662,13 @@ private slots:
 		// |X|   |X|X|
 		// |X|   | | |
 		//  -     ---
-		auto& pc = ap.pinConnector();
-		pc.in().pins(0)[0]->setValue(true);
-		pc.in().pins(1)[0]->setValue(true);
-		pc.out().pins(0)[0]->setValue(true);
-		pc.out().pins(0)[1]->setValue(true);
-		pc.out().pins(1)[0]->setValue(false);
-		pc.out().pins(1)[1]->setValue(false);
+		auto& apm = ap.model();
+		apm.in().pins(0)[0]->setValue(true);
+		apm.in().pins(1)[0]->setValue(true);
+		apm.out().pins(0)[0]->setValue(true);
+		apm.out().pins(0)[1]->setValue(true);
+		apm.out().pins(1)[0]->setValue(false);
+		apm.out().pins(1)[1]->setValue(false);
 
 		// Data on frames 0, 1, and 33
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
@@ -721,5 +721,5 @@ private slots:
 	}
 };
 
-QTEST_GUILESS_MAIN(PluginPinConnectorTest)
-#include "PluginPinConnectorTest.moc"
+QTEST_GUILESS_MAIN(AudioPortsModelTest)
+#include "AudioPortsModelTest.moc"

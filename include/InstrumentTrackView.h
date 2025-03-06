@@ -38,7 +38,7 @@ namespace lmms::gui
 class InstrumentTrackWindow;
 class Knob;
 class MidiCCRackView;
-class PluginPinConnectorView;
+class PinConnector;
 class TrackContainerView;
 class TrackLabelButton;
 
@@ -115,7 +115,7 @@ private:
 	QAction * m_midiOutputAction;
 
 	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
-	std::unique_ptr<PluginPinConnectorView> m_pinConnectorView;
+	std::unique_ptr<PinConnector> m_pinConnectorView;
 
 	QPoint m_lastPos;
 

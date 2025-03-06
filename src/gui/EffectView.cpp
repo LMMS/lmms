@@ -23,25 +23,26 @@
  *
  */
 
+#include "EffectView.h"
+
 #include <QGraphicsOpacityEffect>
 #include <QLayout>
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
 
-#include "EffectView.h"
-#include "DummyEffect.h"
+#include "AudioPortsModel.h"
 #include "CaptionMenu.h"
-#include "embed.h"
-#include "GuiApplication.h"
+#include "DummyEffect.h"
 #include "FontHelper.h"
+#include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
-#include "PluginPinConnector.h"
-#include "PluginPinConnectorView.h"
+#include "PinConnector.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -122,15 +123,15 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		}
 	}
 
-	if (auto pc = effect()->pinConnector())
+	if (auto ap = effect()->audioPortsModel())
 	{
 		const auto formatString = tr("Pin connector\n%1");
 
 		m_pinConnectorButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
-		m_pinConnectorButton->setToolTip(formatString.arg(pc->getChannelCountText()));
+		m_pinConnectorButton->setToolTip(formatString.arg(ap->getChannelCountText()));
 
-		connect(pc, &PluginPinConnector::propertiesChanged, [=, this]() {
-			m_pinConnectorButton->setToolTip(formatString.arg(effect()->pinConnector()->getChannelCountText()));
+		connect(ap, &AudioPortsModel::propertiesChanged, [=, this]() {
+			m_pinConnectorButton->setToolTip(formatString.arg(effect()->audioPortsModel()->getChannelCountText()));
 		});
 
 		m_pinConnectorButton->setGeometry(144 + 32, 12, 28, 28);
@@ -180,13 +181,13 @@ void EffectView::editControls()
 
 void EffectView::togglePinConnector()
 {
-	auto pc = effect()->pinConnector();
-	if (!pc) { return; }
+	auto ap = effect()->audioPortsModel();
+	if (!ap) { return; }
 
 	if (!m_pinConnectorView)
 	{
-		m_pinConnectorView = pc->instantiateView();
-		connect(pc, &PluginPinConnector::destroyed, [this]() {
+		m_pinConnectorView = ap->instantiateView();
+		connect(ap, &AudioPortsModel::destroyed, [this]() {
 			m_pinConnectorView.reset();
 		});
 	}

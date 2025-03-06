@@ -98,7 +98,7 @@ auto VstEffect::processImpl() -> ProcessStatus
 	// Wet/dry mixing only applies to those channels and any additional
 	// channels remain as-is.
 
-	auto buffers = audioPort().buffers();
+	auto buffers = audioPorts().buffers();
 	assert(buffers != nullptr);
 
 	const auto in = buffers->inputBuffer();
@@ -143,7 +143,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin{plugin, audioPort().controller()});
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin{plugin, audioPorts().controller()});
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();

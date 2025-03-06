@@ -22,8 +22,7 @@
  *
  */
 
-#include "RemotePluginAudioPort.h"
-#include "lmmsconfig.h"
+#include "ZynAddSubFx.h"
 
 #include <QDir>
 #include <QDomDocument>
@@ -33,23 +32,23 @@
 #include <QGridLayout>
 #include <QPushButton>
 
-#include "ZynAddSubFx.h"
-#include "ConfigManager.h"
-#include "Engine.h"
-#include "Knob.h"
-#include "LedCheckBox.h"
-#include "DataFile.h"
-#include "InstrumentPlayHandle.h"
-#include "InstrumentTrack.h"
-#include "Song.h"
-#include "StringPairDrag.h"
-#include "RemoteZynAddSubFx.h"
-#include "LocalZynAddSubFx.h"
 #include "AudioEngine.h"
 #include "Clipboard.h"
-
-#include "embed.h"
+#include "ConfigManager.h"
+#include "DataFile.h"
+#include "Engine.h"
 #include "FontHelper.h"
+#include "Knob.h"
+#include "InstrumentPlayHandle.h"
+#include "InstrumentTrack.h"
+#include "LedCheckBox.h"
+#include "LocalZynAddSubFx.h"
+#include "RemotePluginAudioPorts.h"
+#include "RemoteZynAddSubFx.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "embed.h"
+#include "lmmsconfig.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -77,8 +76,8 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 
 
 
-ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin(RemotePluginAudioPortController& audioPort)
-	: RemotePlugin{audioPort}
+ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin(RemotePluginAudioPortsController& audioPorts)
+	: RemotePlugin{audioPorts}
 {
 	init( "RemoteZynAddSubFx", false );
 }
@@ -342,7 +341,7 @@ void ZynAddSubFxInstrument::processImpl()
 	}
 	else
 	{
-		m_localPlugin->process(audioPort().outputBuffer());
+		m_localPlugin->process(audioPorts().outputBuffer());
 	}
 	m_pluginMutex.unlock();
 }
@@ -440,9 +439,9 @@ void ZynAddSubFxInstrument::initPlugin()
 
 	if( m_hasGUI )
 	{
-		audioPort().setBufferType(true);
+		audioPorts().setBufferType(true);
 
-		m_remotePlugin = new ZynAddSubFxRemotePlugin(audioPort().controller());
+		m_remotePlugin = new ZynAddSubFxRemotePlugin(audioPorts().controller());
 		m_remotePlugin->lock();
 		m_remotePlugin->waitForInitDone( false );
 
@@ -469,13 +468,13 @@ void ZynAddSubFxInstrument::initPlugin()
 	}
 	else
 	{
-		audioPort().setBufferType(false);
+		audioPorts().setBufferType(false);
 
 		m_localPlugin = new LocalZynAddSubFx{};
 		m_localPlugin->setSampleRate(Engine::audioEngine()->outputSampleRate());
 		m_localPlugin->setBufferSize(Engine::audioEngine()->framesPerPeriod());
 
-		audioPort().activate(Engine::audioEngine()->framesPerPeriod());
+		audioPorts().activate(Engine::audioEngine()->framesPerPeriod());
 	}
 
 	m_pluginMutex.unlock();

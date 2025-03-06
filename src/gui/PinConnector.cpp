@@ -1,5 +1,5 @@
 /*
- * PluginPinConnectorView.cpp - Displays pin connectors
+ * PinConnector.cpp - View for AudioPortsModel
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "PluginPinConnectorView.h"
+#include "PinConnector.h"
 
 #include <QBoxLayout>
 #include <QMouseEvent>
@@ -33,7 +33,7 @@
 #include "FontHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "PluginPinConnector.h"
+#include "AudioPortsModel.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
 
@@ -53,10 +53,10 @@ constexpr auto DefaultMaxWindowSize = QSize{400, 256};
 } // namespace
 
 
-class PluginPinConnectorView::MatrixView : public QWidget
+class PinConnector::MatrixView : public QWidget
 {
 public:
-	MatrixView(PluginPinConnectorView* view, const PluginPinConnector::Matrix& matrix, bool isIn);
+	MatrixView(PinConnector* view, const AudioPortsModel::Matrix& matrix, bool isIn);
 	~MatrixView() override = default;
 	auto sizeHint() const -> QSize override;
 	auto minimumSizeHint() const -> QSize override;
@@ -73,8 +73,8 @@ private:
 	auto calculateSize() const -> QSize;
 	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
 
-	PluginPinConnector* m_model;
-	const PluginPinConnector::Matrix* m_matrix;
+	AudioPortsModel* m_model;
+	const AudioPortsModel::Matrix* m_matrix;
 
 	QPixmap m_buttonOffBlack = embed::getIconPixmap("step_btn_off", s_buttonSize, s_buttonSize);
 	QPixmap m_buttonOffGray = embed::getIconPixmap("step_btn_off_light", s_buttonSize, s_buttonSize);
@@ -86,14 +86,14 @@ private:
 };
 
 
-PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model)
+PinConnector::PinConnector(AudioPortsModel* model)
 	: QWidget{}
 	, ModelView{model, this}
 	, m_inView{new MatrixView{this, model->in(), true}}
 	, m_outView{new MatrixView{this, model->out(), false}}
 {
 	assert(model != nullptr);
-	connect(model, &PluginPinConnector::propertiesChanged, this, &PluginPinConnectorView::updateGeometry);
+	connect(model, &AudioPortsModel::propertiesChanged, this, &PinConnector::updateGeometry);
 
 	const Model* parentModel = model->parentModel();
 	assert(parentModel != nullptr);
@@ -121,7 +121,7 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model)
 	};
 
 	auto spacer = new QSpacerItem{getSpacerWidth(), 1, QSizePolicy::Fixed};
-	connect(model, &PluginPinConnector::propertiesChanged, this, [&]() {
+	connect(model, &AudioPortsModel::propertiesChanged, this, [&]() {
 		spacer->changeSize(getSpacerWidth(), 1, QSizePolicy::Fixed);
 	});
 	hLayout->addSpacerItem(spacer);
@@ -145,12 +145,12 @@ PluginPinConnectorView::PluginPinConnectorView(PluginPinConnector* model)
 	show();
 }
 
-PluginPinConnectorView::~PluginPinConnectorView()
+PinConnector::~PinConnector()
 {
 	closeWindow();
 }
 
-auto PluginPinConnectorView::sizeHint() const -> QSize
+auto PinConnector::sizeHint() const -> QSize
 {
 	const auto inSize = m_inView->size();
 	const auto outSize = m_outView->size();
@@ -160,7 +160,7 @@ auto PluginPinConnectorView::sizeHint() const -> QSize
 	return WindowMarginTotal + centerMargin + inSize + outSize;
 }
 
-auto PluginPinConnectorView::minimumSizeHint() const -> QSize
+auto PinConnector::minimumSizeHint() const -> QSize
 {
 	const auto minSize = sizeHint();
 	return QSize {
@@ -169,7 +169,7 @@ auto PluginPinConnectorView::minimumSizeHint() const -> QSize
 	};
 }
 
-void PluginPinConnectorView::toggleVisibility()
+void PinConnector::toggleVisibility()
 {
 	if (m_subWindow->isVisible())
 	{
@@ -186,19 +186,19 @@ void PluginPinConnectorView::toggleVisibility()
 	}
 }
 
-void PluginPinConnectorView::closeWindow()
+void PinConnector::closeWindow()
 {
 	m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 	m_subWindow->close();
 }
 
-void PluginPinConnectorView::paintEvent(QPaintEvent*)
+void PinConnector::paintEvent(QPaintEvent*)
 {
 	auto p = QPainter{this};
 	p.setRenderHint(QPainter::Antialiasing);
 	p.fillRect(rect(), p.background());
 
-	const auto* model = castModel<PluginPinConnector>();
+	const auto* model = castModel<AudioPortsModel>();
 	if (!model) { return; }
 
 	constexpr int cellSize = MatrixView::cellSize();
@@ -281,7 +281,7 @@ void PluginPinConnectorView::paintEvent(QPaintEvent*)
 	p.restore();
 }
 
-void PluginPinConnectorView::updateGeometry()
+void PinConnector::updateGeometry()
 {
 	m_inView->updateSize();
 	m_outView->updateSize();
@@ -294,14 +294,14 @@ void PluginPinConnectorView::updateGeometry()
 
 //////////////////////////////////////////////
 
-PluginPinConnectorView::MatrixView::MatrixView(PluginPinConnectorView* view,
-	const PluginPinConnector::Matrix& matrix, bool isIn)
+PinConnector::MatrixView::MatrixView(PinConnector* view,
+	const AudioPortsModel::Matrix& matrix, bool isIn)
 	: QWidget{nullptr}
-	, m_model{view->castModel<PluginPinConnector>()}
+	, m_model{view->castModel<AudioPortsModel>()}
 	, m_matrix{&matrix}
 {
 	assert(m_model != nullptr);
-	connect(m_model, &PluginPinConnector::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
+	connect(m_model, &AudioPortsModel::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
 
 	const Model* parentModel = m_model->parentModel();
 	assert(parentModel != nullptr);
@@ -314,17 +314,17 @@ PluginPinConnectorView::MatrixView::MatrixView(PluginPinConnectorView* view,
 	updateSize();
 }
 
-auto PluginPinConnectorView::MatrixView::sizeHint() const -> QSize
+auto PinConnector::MatrixView::sizeHint() const -> QSize
 {
 	return calculateSize();
 }
 
-auto PluginPinConnectorView::MatrixView::minimumSizeHint() const -> QSize
+auto PinConnector::MatrixView::minimumSizeHint() const -> QSize
 {
 	return calculateSize();
 }
 
-void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
+void PinConnector::MatrixView::paintEvent(QPaintEvent*)
 {
 	auto p = QPainter{this};
 	p.setRenderHint(QPainter::Antialiasing);
@@ -353,7 +353,7 @@ void PluginPinConnectorView::MatrixView::paintEvent(QPaintEvent*)
 	}
 }
 
-void PluginPinConnectorView::MatrixView::mouseMoveEvent(QMouseEvent* me)
+void PinConnector::MatrixView::mouseMoveEvent(QMouseEvent* me)
 {
 	me->ignore();
 
@@ -374,7 +374,7 @@ void PluginPinConnectorView::MatrixView::mouseMoveEvent(QMouseEvent* me)
 	setCursor(Qt::PointingHandCursor);
 }
 
-void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
+void PinConnector::MatrixView::mousePressEvent(QMouseEvent* me)
 {
 	int xIdx = 0;
 	int yIdx = 0;
@@ -400,7 +400,7 @@ void PluginPinConnectorView::MatrixView::mousePressEvent(QMouseEvent* me)
 	me->accept();
 }
 
-void PluginPinConnectorView::MatrixView::updateSize()
+void PinConnector::MatrixView::updateSize()
 {
 	const auto newSize = calculateSize();
 
@@ -417,7 +417,7 @@ void PluginPinConnectorView::MatrixView::updateSize()
 	}
 }
 
-auto PluginPinConnectorView::MatrixView::getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool
+auto PinConnector::MatrixView::getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool
 {
 	if (!rect().contains(mousePos, true)) { return false; }
 
@@ -434,7 +434,7 @@ auto PluginPinConnectorView::MatrixView::getCell(const QPoint& mousePos, int& xI
 	return true;
 }
 
-auto PluginPinConnectorView::MatrixView::calculateSize() const -> QSize
+auto PinConnector::MatrixView::calculateSize() const -> QSize
 {
 	const auto tcc = static_cast<int>(m_model->trackChannelCount());
 	if (tcc == 0) { return QSize{0, 0}; }
@@ -448,7 +448,7 @@ auto PluginPinConnectorView::MatrixView::calculateSize() const -> QSize
 	return {pcSize, tcSize};
 }
 
-auto PluginPinConnectorView::MatrixView::getIcon(const BoolModel& model, int trackChannel, int pluginChannel)
+auto PinConnector::MatrixView::getIcon(const BoolModel& model, int trackChannel, int pluginChannel)
 	-> const QPixmap&
 {
 	// TODO: Alternate b/w black and gray icons?

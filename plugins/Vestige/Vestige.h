@@ -32,7 +32,7 @@
 
 #include "AudioPlugin.h"
 #include "InstrumentView.h"
-#include "RemotePluginAudioPort.h"
+#include "RemotePluginAudioPorts.h"
 
 
 class QPixmap;
@@ -56,10 +56,10 @@ class VestigeInstrumentView;
 
 
 class VestigeInstrument
-	: public AudioPlugin<Instrument, AudioPluginConfig {
+	: public AudioPlugin<Instrument, AudioPortsConfig {
 			.kind = AudioDataKind::F32,
 			.interleaved = false
-		}, RemotePluginAudioPort>
+		}, RemotePluginAudioPorts>
 {
 	Q_OBJECT
 public:

@@ -35,9 +35,9 @@
 namespace lmms
 {
 
+class AudioPortsModel;
 class EffectChain;
 class EffectControls;
-class PluginPinConnector;
 
 namespace gui
 {
@@ -164,8 +164,8 @@ public:
 		return !isOkay() || dontRun() || !isEnabled() || !isRunning();
 	}
 
-	//! Returns nullptr if the effect does not have a pin connector
-	virtual auto pinConnector() const -> const PluginPinConnector*
+	//! Returns nullptr if the effect does not have audio ports
+	virtual auto audioPortsModel() const -> const AudioPortsModel*
 	{
 		return nullptr;
 	}

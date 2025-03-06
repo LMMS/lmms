@@ -40,10 +40,10 @@ namespace lmms
 {
 
 // forward-declarations
+class AudioPortsModel;
 class InstrumentTrack;
 class MidiEvent;
 class NotePlayHandle;
-class PluginPinConnector;
 class Track;
 
 
@@ -142,8 +142,8 @@ public:
 		return !m_flags.testFlag(Instrument::Flag::IsNotBendable);
 	}
 
-	//! Returns nullptr if the instrument does not have a pin connector
-	virtual auto pinConnector() const -> const PluginPinConnector*
+	//! Returns nullptr if the instrument does not have audio ports
+	virtual auto audioPortsModel() const -> const AudioPortsModel*
 	{
 		return nullptr;
 	}

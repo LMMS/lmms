@@ -1,5 +1,5 @@
 /*
- * AudioPluginBuffer.h - Customizable working buffer for plugins
+ * AudioBuffer.h - Customizable audio buffer
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,14 +22,14 @@
  *
  */
 
-#ifndef LMMS_AUDIO_PLUGIN_BUFFER_H
-#define LMMS_AUDIO_PLUGIN_BUFFER_H
+#ifndef LMMS_AUDIO_BUFFER_H
+#define LMMS_AUDIO_BUFFER_H
 
 #include <type_traits>
 #include <vector>
 
 #include "AudioData.h"
-#include "AudioPluginConfig.h"
+#include "AudioPortsConfig.h"
 #include "SampleFrame.h"
 #include "lmms_basics.h"
 
@@ -70,15 +70,15 @@ struct AudioDataViewSelector<AudioDataKind::SampleFrame, true, channels, isConst
 
 
 //! Provides a view into a plugin's input and output audio buffers
-template<AudioPluginConfig config, bool inplace = config.inplace>
-class AudioPluginBufferInterface;
+template<AudioPortsConfig config, bool inplace = config.inplace>
+class AudioBuffer;
 
 //! Non-inplace specialization
-template<AudioPluginConfig config>
-class AudioPluginBufferInterface<config, false>
+template<AudioPortsConfig config>
+class AudioBuffer<config, false>
 {
 public:
-	virtual ~AudioPluginBufferInterface() = default;
+	virtual ~AudioBuffer() = default;
 
 	virtual auto inputBuffer()
 		-> typename detail::AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type = 0;
@@ -92,11 +92,11 @@ public:
 };
 
 //! Inplace specialization
-template<AudioPluginConfig config>
-class AudioPluginBufferInterface<config, true>
+template<AudioPortsConfig config>
+class AudioBuffer<config, true>
 {
 public:
-	virtual ~AudioPluginBufferInterface() = default;
+	virtual ~AudioBuffer() = default;
 
 	virtual auto inputOutputBuffer()
 		-> typename detail::AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type = 0;
@@ -108,28 +108,28 @@ public:
 
 
 //! Optimization - Choose std::array or std::vector based on whether size is known at compile time
-template<AudioPluginConfig config>
+template<AudioPortsConfig config>
 using AccessBufferType = std::conditional_t<
 	config.staticChannelCount(),
 	std::array<GetAudioDataType<config.kind>*, static_cast<std::size_t>(config.inputs + config.outputs)>,
 	std::vector<GetAudioDataType<config.kind>*>>;
 
 
-//! Default implementation of `AudioPluginBufferInterface`
-template<AudioPluginConfig config,
+//! Default implementation of `AudioBuffer`
+template<AudioPortsConfig config,
 	AudioDataKind kind = config.kind, bool interleaved = config.interleaved, bool inplace = config.inplace>
-class AudioPluginBufferDefaultImpl;
+class DefaultAudioBuffer;
 
 //! Specialization for non-inplace, non-interleaved buffers
-template<AudioPluginConfig config, AudioDataKind kind>
-class AudioPluginBufferDefaultImpl<config, kind, false, false>
-	: public AudioPluginBufferInterface<config>
+template<AudioPortsConfig config, AudioDataKind kind>
+class DefaultAudioBuffer<config, kind, false, false>
+	: public AudioBuffer<config>
 {
 	using SampleT = GetAudioDataType<kind>;
 
 public:
-	AudioPluginBufferDefaultImpl() = default;
-	~AudioPluginBufferDefaultImpl() override = default;
+	DefaultAudioBuffer() = default;
+	~DefaultAudioBuffer() override = default;
 
 	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> final
 	{
@@ -197,9 +197,9 @@ private:
 
 
 //! Specialization for inplace, non-interleaved buffers
-template<AudioPluginConfig config, AudioDataKind kind>
-class AudioPluginBufferDefaultImpl<config, kind, false, true>
-	: public AudioPluginBufferInterface<config>
+template<AudioPortsConfig config, AudioDataKind kind>
+class DefaultAudioBuffer<config, kind, false, true>
+	: public AudioBuffer<config>
 {
 	static_assert(config.inputs == config.outputs || config.inputs == 0 || config.outputs == 0,
 		"compile-time inplace buffers must have same number of input channels and output channels, "
@@ -208,8 +208,8 @@ class AudioPluginBufferDefaultImpl<config, kind, false, true>
 	using SampleT = GetAudioDataType<kind>;
 
 public:
-	AudioPluginBufferDefaultImpl() = default;
-	~AudioPluginBufferDefaultImpl() override = default;
+	DefaultAudioBuffer() = default;
+	~DefaultAudioBuffer() override = default;
 
 	auto inputOutputBuffer() -> SplitAudioData<SampleT, config.outputs> final
 	{
@@ -267,13 +267,13 @@ private:
 
 
 //! Specialization for 2-channel SampleFrame buffers
-template<AudioPluginConfig config>
-class AudioPluginBufferDefaultImpl<config, AudioDataKind::SampleFrame, true, true>
-	: public AudioPluginBufferInterface<config>
+template<AudioPortsConfig config>
+class DefaultAudioBuffer<config, AudioDataKind::SampleFrame, true, true>
+	: public AudioBuffer<config>
 {
 public:
-	AudioPluginBufferDefaultImpl() = default;
-	~AudioPluginBufferDefaultImpl() override = default;
+	DefaultAudioBuffer() = default;
+	~DefaultAudioBuffer() override = default;
 
 	auto inputOutputBuffer() -> std::span<SampleFrame> final
 	{
@@ -299,16 +299,16 @@ private:
 } // namespace detail
 
 
-//! Provides a view into a plugin's input and output audio buffers
-template<AudioPluginConfig config>
-using AudioPluginBufferInterface = detail::AudioPluginBufferInterface<config>;
+//! Interface for accessing input/output audio buffers
+template<AudioPortsConfig config>
+using AudioBuffer = detail::AudioBuffer<config>;
 
 
-//! Default implementation of `AudioPluginBufferInterface`
-template<AudioPluginConfig config>
-using DefaultAudioPluginBuffer = detail::AudioPluginBufferDefaultImpl<config>;
+//! Default implementation of `AudioBuffer`
+template<AudioPortsConfig config>
+using DefaultAudioBuffer = detail::DefaultAudioBuffer<config>;
 
 
 } // namespace lmms
 
-#endif // LMMS_AUDIO_PLUGIN_BUFFER_H
+#endif // LMMS_AUDIO_BUFFER_H

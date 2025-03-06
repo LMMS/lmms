@@ -1,6 +1,6 @@
 /*
- * PluginPinConnector.h - Specifies how to route audio channels
- *                        in and out of a plugin.
+ * AudioPortsModel.h - Specifies how to route audio channels
+ *                     in and out of a plugin.
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef LMMS_PLUGIN_PIN_CONNECTOR_H
-#define LMMS_PLUGIN_PIN_CONNECTOR_H
+#ifndef LMMS_AUDIO_PORTS_MODEL_H
+#define LMMS_AUDIO_PORTS_MODEL_H
 
 #include <algorithm>
 #include <cassert>
@@ -35,7 +35,7 @@
 #include <vector>
 
 #include "AudioData.h"
-#include "AudioPluginConfig.h"
+#include "AudioPortsConfig.h"
 #include "AutomatableModel.h"
 #include "SampleFrame.h"
 #include "SerializingObject.h"
@@ -45,7 +45,7 @@
 class QWidget;
 
 #ifdef LMMS_TESTING
-class PluginPinConnectorTest;
+class AudioPortsModelTest;
 #endif
 
 namespace lmms
@@ -54,7 +54,7 @@ namespace lmms
 namespace gui
 {
 
-class PluginPinConnectorView;
+class PinConnector;
 
 } // namespace gui
 
@@ -104,7 +104,7 @@ using CoreAudioBusMut = AudioBus<SampleFrame>;
 
 
 //! Configuration for audio channel routing in/out of plugin
-class LMMS_EXPORT PluginPinConnector
+class LMMS_EXPORT AudioPortsModel
 	: public Model
 	, public SerializingObject
 {
@@ -137,11 +137,11 @@ public:
 
 		auto isOutput() const -> bool { return m_isOutput; }
 
-		friend class PluginPinConnector;
+		friend class AudioPortsModel;
 
 	private:
-		void setTrackChannelCount(PluginPinConnector* parent, int count, const QString& nameFormat);
-		void setPluginChannelCount(PluginPinConnector* parent, int count, const QString& nameFormat);
+		void setTrackChannelCount(AudioPortsModel* parent, int count, const QString& nameFormat);
+		void setPluginChannelCount(AudioPortsModel* parent, int count, const QString& nameFormat);
 
 		void setDefaultConnections();
 
@@ -154,8 +154,8 @@ public:
 		std::vector<QString> m_channelNames; //!< optional
 	};
 
-	PluginPinConnector(bool isInstrument, Model* parent);
-	PluginPinConnector(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent);
+	AudioPortsModel(bool isInstrument, Model* parent);
+	AudioPortsModel(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent);
 
 	/**
 	 * Getters
@@ -164,7 +164,7 @@ public:
 	auto out() const -> const Matrix& { return m_out; }
 	auto trackChannelCount() const -> std::size_t { return s_totalTrackChannels; }
 
-	//! The pin connector is initialized once the number of in/out channels are known TODO: Remove?
+	//! This class is initialized once the number of in/out channels are known TODO: Remove?
 	auto initialized() const -> bool { return m_in.m_channelCount != 0 || m_out.m_channelCount != 0; }
 
 	auto isInstrument() const -> bool { return m_isInstrument; }
@@ -178,10 +178,10 @@ public:
 
 
 	/*
-	 * Pin connector router
+	 * Audio port router
 	 *
 	 * `routeToPlugin`
-	 *     Routes audio from LMMS track channels to plugin inputs according to the plugin pin connector configuration.
+	 *     Routes audio from LMMS track channels to plugin inputs according to the audio port configuration.
 	 *
 	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
 	 *     If no audio is routed to an output channel, the output channel's buffer is zeroed.
@@ -191,7 +191,7 @@ public:
 	 *     `out`    : plugin input channel buffers
 	 *
 	 * `routeFromPlugin`
-	 *     Routes audio from plugin outputs to LMMS track channels according to the plugin pin connector configuration.
+	 *     Routes audio from plugin outputs to LMMS track channels according to the audio port configuration.
 	 *
 	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
 	 *     If no audio is routed to an output channel, `inOut` remains unchanged for audio bypass behavior.
@@ -200,7 +200,7 @@ public:
 	 *     `inOut`   : track channels from/to LMMS core
 	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
-	template<AudioPluginConfig config, AudioDataKind kind = config.kind, bool interleaved = config.interleaved>
+	template<AudioPortsConfig config, AudioDataKind kind = config.kind, bool interleaved = config.interleaved>
 	class Router
 	{
 		static_assert(always_false_v<Router<config, kind, interleaved>>,
@@ -208,37 +208,37 @@ public:
 	};
 
 	//! Non-`SampleFrame` routing
-	template<AudioPluginConfig config, AudioDataKind kind>
+	template<AudioPortsConfig config, AudioDataKind kind>
 	class Router<config, kind, false>
 	{
 		using SampleT = GetAudioDataType<kind>;
 
 	public:
-		explicit Router(const PluginPinConnector& parent) : m_pc{&parent} {}
+		explicit Router(const AudioPortsModel& parent) : m_ap{&parent} {}
 
 		void routeToPlugin(CoreAudioBus in, SplitAudioData<GetAudioDataType<kind>, config.inputs> out) const;
 		void routeFromPlugin(SplitAudioData<const GetAudioDataType<kind>, config.outputs> in, CoreAudioBusMut inOut) const;
 
 	private:
-		const PluginPinConnector* m_pc;
+		const AudioPortsModel* m_ap;
 	};
 
 	//! `SampleFrame` routing
-	template<AudioPluginConfig config>
+	template<AudioPortsConfig config>
 	class Router<config, AudioDataKind::SampleFrame, true>
 	{
 	public:
-		explicit Router(const PluginPinConnector& parent) : m_pc{&parent} {}
+		explicit Router(const AudioPortsModel& parent) : m_ap{&parent} {}
 
 		void routeToPlugin(CoreAudioBus in, std::span<SampleFrame> out) const;
 		void routeFromPlugin(std::span<const SampleFrame> in, CoreAudioBusMut inOut) const;
 
 	private:
-		const PluginPinConnector* m_pc;
+		const AudioPortsModel* m_ap;
 	};
 
 
-	template<AudioPluginConfig config>
+	template<AudioPortsConfig config>
 	auto getRouter() const -> Router<config>
 	{
 		return Router<config>{*this};
@@ -252,14 +252,14 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 	auto nodeName() const -> QString override { return "pins"; }
 
-	virtual auto instantiateView() const -> std::unique_ptr<gui::PluginPinConnectorView>;
+	virtual auto instantiateView() const -> std::unique_ptr<gui::PinConnector>;
 
 	auto getChannelCountText() const -> QString;
 
 	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
 #ifdef LMMS_TESTING
-	friend class ::PluginPinConnectorTest;
+	friend class ::AudioPortsModelTest;
 #endif
 
 signals:
@@ -312,17 +312,17 @@ private:
 
 // Non-`SampleFrame` Router out-of-class definitions
 
-template<AudioPluginConfig config, AudioDataKind kind>
-inline void PluginPinConnector::Router<config, kind, false>::routeToPlugin(
+template<AudioPortsConfig config, AudioDataKind kind>
+inline void AudioPortsModel::Router<config, kind, false>::routeToPlugin(
 	CoreAudioBus in, SplitAudioData<SampleT, config.inputs> out) const
 {
 	if constexpr (config.inputs == 0) { return; }
 
-	assert(m_pc->m_in.channelCount() != DynamicChannelCount);
-	if (m_pc->m_in.channelCount() == 0) { return; }
+	assert(m_ap->m_in.channelCount() != DynamicChannelCount);
+	if (m_ap->m_in.channelCount() == 0) { return; }
 
 	// Ignore all unused track channels for better performance
-	const auto inSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
+	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs);
 
 	// Zero the output buffer - TODO: std::memcpy?
@@ -343,8 +343,8 @@ inline void PluginPinConnector::Router<config, kind, false>::routeToPlugin(
 
 			const std::uint8_t inChannel = inChannelPairIdx * 2;
 			const std::uint8_t enabledPins =
-				(static_cast<std::uint8_t>(m_pc->m_in.enabled(inChannel, outChannel)) << 1u)
-				| static_cast<std::uint8_t>(m_pc->m_in.enabled(inChannel + 1, outChannel));
+				(static_cast<std::uint8_t>(m_ap->m_in.enabled(inChannel, outChannel)) << 1u)
+				| static_cast<std::uint8_t>(m_ap->m_in.enabled(inChannel + 1, outChannel));
 
 			switch (enabledPins)
 			{
@@ -381,17 +381,17 @@ inline void PluginPinConnector::Router<config, kind, false>::routeToPlugin(
 	}
 }
 
-template<AudioPluginConfig config, AudioDataKind kind>
-inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
+template<AudioPortsConfig config, AudioDataKind kind>
+inline void AudioPortsModel::Router<config, kind, false>::routeFromPlugin(
 	SplitAudioData<const SampleT, config.outputs> in, CoreAudioBusMut inOut) const
 {
 	if constexpr (config.outputs == 0) { return; }
 
-	assert(m_pc->m_out.channelCount() != DynamicChannelCount);
-	if (m_pc->m_out.channelCount() == 0) { return; }
+	assert(m_ap->m_out.channelCount() != DynamicChannelCount);
+	if (m_ap->m_out.channelCount() == 0) { return; }
 
 	// Ignore all unused track channels for better performance
-	const auto inOutSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
+	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs);
 
 	/*
@@ -439,9 +439,9 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 			if constexpr (rc == 0b11)
 			{
 				// This input channel could be routed to either left, right, both, or neither output channels
-				if (m_pc->m_out.enabled(outChannel, inChannel))
+				if (m_ap->m_out.enabled(outChannel, inChannel))
 				{
-					if (m_pc->m_out.enabled(outChannel + 1, inChannel))
+					if (m_ap->m_out.enabled(outChannel + 1, inChannel))
 					{
 						for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 						{
@@ -457,7 +457,7 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 						}
 					}
 				}
-				else if (m_pc->m_out.enabled(outChannel + 1, inChannel))
+				else if (m_ap->m_out.enabled(outChannel + 1, inChannel))
 				{
 					for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 					{
@@ -468,7 +468,7 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 			else if constexpr (rc == 0b10)
 			{
 				// This input channel may or may not be routed to the left output channel
-				if (!m_pc->m_out.enabled(outChannel, inChannel)) { continue; }
+				if (!m_ap->m_out.enabled(outChannel, inChannel)) { continue; }
 
 				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 				{
@@ -478,7 +478,7 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 			else if constexpr (rc == 0b01)
 			{
 				// This input channel may or may not be routed to the right output channel
-				if (!m_pc->m_out.enabled(outChannel + 1, inChannel)) { continue; }
+				if (!m_ap->m_out.enabled(outChannel + 1, inChannel)) { continue; }
 
 				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
 				{
@@ -495,8 +495,8 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 		const auto outChannel = static_cast<ch_cnt_t>(outChannelPairIdx * 2);
 
 		const std::uint8_t routedChannels =
-				(static_cast<std::uint8_t>(m_pc->m_routedChannels[outChannel]) << 1u)
-				| static_cast<std::uint8_t>(m_pc->m_routedChannels[outChannel + 1]);
+				(static_cast<std::uint8_t>(m_ap->m_routedChannels[outChannel]) << 1u)
+				| static_cast<std::uint8_t>(m_ap->m_routedChannels[outChannel + 1]);
 
 		switch (routedChannels)
 		{
@@ -521,19 +521,19 @@ inline void PluginPinConnector::Router<config, kind, false>::routeFromPlugin(
 
 // `SampleFrame` Router out-of-class definitions
 
-template<AudioPluginConfig config>
-inline void PluginPinConnector::Router<config,
+template<AudioPortsConfig config>
+inline void AudioPortsModel::Router<config,
 	AudioDataKind::SampleFrame, true>::routeToPlugin(
 	CoreAudioBus in, std::span<SampleFrame> out) const
 {
 	if constexpr (config.inputs == 0) { return; }
 
-	assert(m_pc->m_in.channelCount() != DynamicChannelCount);
-	if (m_pc->m_in.channelCount() == 0) { return; }
-	assert(m_pc->m_in.channelCount() == 2); // SampleFrame routing only allows exactly 0 or 2 channels
+	assert(m_ap->m_in.channelCount() != DynamicChannelCount);
+	if (m_ap->m_in.channelCount() == 0) { return; }
+	assert(m_ap->m_in.channelCount() == 2); // SampleFrame routing only allows exactly 0 or 2 channels
 
 	// Ignore all unused track channels for better performance
-	const auto inSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
+	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs);
 	assert(out.data() != nullptr);
 
@@ -583,10 +583,10 @@ inline void PluginPinConnector::Router<config,
 
 		const std::uint8_t inChannel = inChannelPairIdx * 2;
 		const std::uint8_t enabledPins =
-			(static_cast<std::uint8_t>(m_pc->m_in.enabled(inChannel, 0)) << 3u)
-			| (static_cast<std::uint8_t>(m_pc->m_in.enabled(inChannel + 1, 0)) << 2u)
-			| (static_cast<std::uint8_t>(m_pc->m_in.enabled(inChannel, 1)) << 1u)
-			| static_cast<std::uint8_t>(m_pc->m_in.enabled(inChannel + 1, 1));
+			(static_cast<std::uint8_t>(m_ap->m_in.enabled(inChannel, 0)) << 3u)
+			| (static_cast<std::uint8_t>(m_ap->m_in.enabled(inChannel + 1, 0)) << 2u)
+			| (static_cast<std::uint8_t>(m_ap->m_in.enabled(inChannel, 1)) << 1u)
+			| static_cast<std::uint8_t>(m_ap->m_in.enabled(inChannel + 1, 1));
 
 		switch (enabledPins)
 		{
@@ -613,19 +613,19 @@ inline void PluginPinConnector::Router<config,
 	}
 }
 
-template<AudioPluginConfig config>
-inline void PluginPinConnector::Router<config,
+template<AudioPortsConfig config>
+inline void AudioPortsModel::Router<config,
 	AudioDataKind::SampleFrame, true>::routeFromPlugin(
 	std::span<const SampleFrame> in, CoreAudioBusMut inOut) const
 {
 	if constexpr (config.outputs == 0) { return; }
 
-	assert(m_pc->m_out.channelCount() != DynamicChannelCount);
-	if (m_pc->m_out.channelCount() == 0) { return; }
-	assert(m_pc->m_out.channelCount() == 2); // SampleFrame routing only allows exactly 0 or 2 channels
+	assert(m_ap->m_out.channelCount() != DynamicChannelCount);
+	if (m_ap->m_out.channelCount() == 0) { return; }
+	assert(m_ap->m_out.channelCount() == 2); // SampleFrame routing only allows exactly 0 or 2 channels
 
 	// Ignore all unused track channels for better performance
-	const auto inOutSizeConstrained = m_pc->m_trackChannelsUpperBound / 2;
+	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs);
 	assert(in.data() != nullptr);
 
@@ -684,10 +684,10 @@ inline void PluginPinConnector::Router<config,
 
 		const ch_cnt_t outChannel = outChannelPairIdx * 2;
 		const std::uint8_t enabledPins =
-			(static_cast<std::uint8_t>(m_pc->m_out.enabled(outChannel, 0)) << 3u)
-			| (static_cast<std::uint8_t>(m_pc->m_out.enabled(outChannel, 1)) << 2u)
-			| (static_cast<std::uint8_t>(m_pc->m_out.enabled(outChannel + 1, 0)) << 1u)
-			| static_cast<std::uint8_t>(m_pc->m_out.enabled(outChannel + 1, 1));
+			(static_cast<std::uint8_t>(m_ap->m_out.enabled(outChannel, 0)) << 3u)
+			| (static_cast<std::uint8_t>(m_ap->m_out.enabled(outChannel, 1)) << 2u)
+			| (static_cast<std::uint8_t>(m_ap->m_out.enabled(outChannel + 1, 0)) << 1u)
+			| static_cast<std::uint8_t>(m_ap->m_out.enabled(outChannel + 1, 1));
 
 		switch (enabledPins)
 		{
@@ -717,4 +717,4 @@ inline void PluginPinConnector::Router<config,
 
 } // namespace lmms
 
-#endif // LMMS_PLUGIN_PIN_CONNECTOR_H
+#endif // LMMS_AUDIO_PORTS_MODEL_H

@@ -1,5 +1,5 @@
 /*
- * PluginAudioPort.h
+ * AudioPorts.h
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,36 +22,36 @@
  *
  */
 
-#ifndef LMMS_PLUGIN_AUDIO_PORT_H
-#define LMMS_PLUGIN_AUDIO_PORT_H
+#ifndef LMMS_AUDIO_PORTS_H
+#define LMMS_AUDIO_PORTS_H
 
 #include "AudioEngine.h"
-#include "AudioPluginBuffer.h"
-#include "AudioPluginConfig.h"
+#include "AudioBuffer.h"
+#include "AudioPortsConfig.h"
+#include "AudioPortsModel.h"
 #include "Engine.h"
-#include "PluginPinConnector.h"
 
 namespace lmms
 {
 
 
 namespace detail {
-struct PluginAudioPortTag {};
+struct AudioPortsTag {};
 } // namespace detail
 
 
 /**
  * Interface for an audio port implementation.
- * Contains a pin connector and provides access to the audio buffers.
+ * Contains the audio port model and provides access to the audio buffers.
  */
-template<AudioPluginConfig config>
-class PluginAudioPort
-	: public PluginPinConnector
-	, public detail::PluginAudioPortTag
+template<AudioPortsConfig config>
+class AudioPorts
+	: public AudioPortsModel
+	, public detail::AudioPortsTag
 {
 public:
-	PluginAudioPort(bool isInstrument, Model* parent)
-		: PluginPinConnector{config.inputs, config.outputs, isInstrument, parent}
+	AudioPorts(bool isInstrument, Model* parent)
+		: AudioPortsModel{config.inputs, config.outputs, isInstrument, parent}
 	{
 	}
 
@@ -70,24 +70,24 @@ public:
 		}
 	}
 
-	auto pinConnector() const -> const PluginPinConnector&
+	auto model() const -> const AudioPortsModel&
 	{
-		return *static_cast<const PluginPinConnector*>(this);
+		return *static_cast<const AudioPortsModel*>(this);
 	}
 
-	auto pinConnector() -> PluginPinConnector&
+	auto model() -> AudioPortsModel&
 	{
-		return *static_cast<PluginPinConnector*>(this);
+		return *static_cast<AudioPortsModel*>(this);
 	}
 
-	//! Returns the pin connector's router
-	auto getRouter() const -> PluginPinConnector::Router<config>
+	//! Returns the audio port router
+	auto getRouter() const -> AudioPortsModel::Router<config>
 	{
-		return static_cast<const PluginPinConnector*>(this)->getRouter<config>();
+		return static_cast<const AudioPortsModel*>(this)->getRouter<config>();
 	}
 
 	//! Returns nullptr if the port is unavailable (i.e. Vestige with no plugin loaded)
-	virtual auto buffers() -> AudioPluginBufferInterface<config>* = 0;
+	virtual auto buffers() -> AudioBuffer<config>* = 0;
 
 	/**
 	 * Returns false if the plugin is not loaded.
@@ -106,59 +106,63 @@ public:
 	 */
 	constexpr static auto provideProcessBuffers() -> bool { return true; }
 
-	static constexpr auto pluginConfig() -> AudioPluginConfig { return config; }
+	static constexpr auto pluginConfig() -> AudioPortsConfig { return config; }
 };
 
 
+namespace detail {
+
 /**
  * The default audio port for plugins that do not provide their own.
- * Contains a pin connector and audio buffers.
+ * Contains an audio port model and audio buffers.
  *
  * This audio port still has *some* ability for customization by using a custom `BufferT`,
  * but for full control, you'll need to provide your own audio port implementation.
  */
-template<AudioPluginConfig config, template<AudioPluginConfig> class BufferT>
-class PluginAudioPortDefaultImpl
-	: public PluginAudioPort<config>
+template<AudioPortsConfig config, template<AudioPortsConfig> class BufferT>
+class DefaultAudioPorts
+	: public AudioPorts<config>
 	, public BufferT<config>
 {
-	static_assert(std::is_base_of_v<AudioPluginBufferInterface<config>, BufferT<config>>,
-		"BufferT must derive from AudioPluginBufferInterface");
+	static_assert(std::is_base_of_v<AudioBuffer<config>, BufferT<config>>,
+		"BufferT must derive from AudioBuffer");
 
 public:
-	using PluginAudioPort<config>::PluginAudioPort;
+	using AudioPorts<config>::AudioPorts;
 
 	auto buffers() -> BufferT<config>* final { return static_cast<BufferT<config>*>(this); }
 
 private:
 	void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) final
 	{
-		// Connects the pin connector to the buffers
+		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
 	}
 };
 
+} // namespace detail
+
 
 //! Default audio port
-template<AudioPluginConfig config>
-using DefaultPluginAudioPort = PluginAudioPortDefaultImpl<config, DefaultAudioPluginBuffer>;
+template<AudioPortsConfig config>
+using DefaultAudioPorts = detail::DefaultAudioPorts<config, DefaultAudioBuffer>;
 
 
 //! Custom audio port - audio buffer interface to be implementated in child class
-template<AudioPluginConfig config>
-class CustomPluginAudioPort
-	: public PluginAudioPort<config>
-	, public AudioPluginBufferInterface<config>
+template<AudioPortsConfig config>
+class CustomAudioPorts
+	: public AudioPorts<config>
+	, public AudioBuffer<config>
 {
 public:
-	using PluginAudioPort<config>::PluginAudioPort;
+	using AudioPorts<config>::AudioPorts;
 
 	constexpr static auto provideProcessBuffers() -> bool { return false; }
 
 private:
 	void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) final
 	{
-		// Connects the pin connector to the buffers
+		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
 	}
 };
@@ -166,4 +170,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_PLUGIN_AUDIO_PORT_H
+#endif // LMMS_AUDIO_PORTS_H
