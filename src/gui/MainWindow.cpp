@@ -535,8 +535,6 @@ void MainWindow::finalize()
 }
 
 
-
-
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
 	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
