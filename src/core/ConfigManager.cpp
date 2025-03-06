@@ -349,7 +349,7 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-void ConfigManager::addfavoriteItem(QString& item)
+void ConfigManager::addFavoriteItem(QString& item)
 {
 	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
 
@@ -358,7 +358,7 @@ void ConfigManager::addfavoriteItem(QString& item)
 	instance->saveConfigFile();
 }
 
-void ConfigManager::removefavoriteItem(QString& item)
+void ConfigManager::removeFavoriteItem(QString& item)
 {
 	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
 
@@ -367,11 +367,11 @@ void ConfigManager::removefavoriteItem(QString& item)
 	instance->saveConfigFile();
 }
 
-bool ConfigManager::isfavorite(QString & item)
+bool ConfigManager::isFavorite(QString & item)
 {
-	for (auto favouriteItem : inst()->favoriteItems())
+	for (auto favoriteItem : inst()->favoriteItems())
 	{
-		if (QFileInfo(item) == QFileInfo(favouriteItem))
+		if (QFileInfo(item) == QFileInfo(favoriteItem))
 		{
 			return true;
 		}

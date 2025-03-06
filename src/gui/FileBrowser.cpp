@@ -83,16 +83,18 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			QWidget * parent, bool dirs_as_items,
 			const QString& userDir,
 			const QString& factoryDir,
-			const QStringList & items
+			const bool isFavoritesBrowser
 			):
 	SideBarWidget(title, pm, parent),
-	m_items(items),
+	m_isFavoritesBrowser(isFavoritesBrowser),
 	m_directories(directories),
 	m_filter(filter),
 	m_dirsAsItems(dirs_as_items),
 	m_userDir(userDir),
 	m_factoryDir(factoryDir)
 {
+	if (isFavoritesBrowser) { m_favoritesBrowserInstance = this; }
+
 	setWindowTitle( tr( "Browser" ) );
 
 	addContentCheckBox();
@@ -344,10 +346,13 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	for (auto& item : m_items)
+	if (m_isFavoritesBrowser)
 	{
-		QFileInfo entry = QFileInfo(ConfigManager::removeTrailingSeparators(item));
-		addEntry(entry, entry.absoluteDir().absolutePath());
+		for (auto& item : ConfigManager::getFavorites())
+		{
+			QFileInfo entry = QFileInfo(ConfigManager::removeTrailingSeparators(item));
+			addEntry(entry, entry.absoluteDir().absolutePath());
+		}
 	}
 
 	if (!paths.isEmpty())
@@ -747,28 +752,22 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 void FileBrowserTreeWidget::addFavorite(QString item)
 {
-	FileBrowser* favouritesBrowser = GuiApplication::instance()->mainWindow()->getFavouritesBrowser();
-
 	item = ConfigManager::removeTrailingSeparators(item);
-	ConfigManager::addfavoriteItem(item);
-	favouritesBrowser->m_items.push_back(item);
-	favouritesBrowser->reloadTree();
+	ConfigManager::addFavoriteItem(item);
+	FileBrowser::getFavoritesBrowserInstance()->reloadTree();
 }
 
 void FileBrowserTreeWidget::removeFavorite(QString item)
 {
-	FileBrowser* favouritesBrowser = GuiApplication::instance()->mainWindow()->getFavouritesBrowser();
-
 	item = ConfigManager::removeTrailingSeparators(item);
-	ConfigManager::removefavoriteItem(item);
-	favouritesBrowser->m_items.removeAll(item);
-	favouritesBrowser->reloadTree();
+	ConfigManager::removeFavoriteItem(item);
+	FileBrowser::getFavoritesBrowserInstance()->reloadTree();
 }
 
 bool FileBrowserTreeWidget::isFavorite(QString item)
 {
 	item = ConfigManager::removeTrailingSeparators(item);
-	return ConfigManager::isfavorite(item);
+	return ConfigManager::isFavorite(item);
 }
 
 

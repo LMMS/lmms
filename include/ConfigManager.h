@@ -245,9 +245,13 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	static void addfavoriteItem(QString& item);
-	static void removefavoriteItem(QString& item);
-	static bool isfavorite(QString& item);
+	static void addFavoriteItem(QString& item);
+	static void removeFavoriteItem(QString& item);
+	static bool isFavorite(QString& item);
+	static QStringList getFavorites()
+	{
+		return inst()->favoriteItems();
+	}
 
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 

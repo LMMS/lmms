@@ -117,11 +117,6 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	FileBrowser* getFavouritesBrowser()
-	{
-		return m_favoritesBrowser;
-	}
-
 	enum class SessionState
 	{
 		Normal,
@@ -229,7 +224,6 @@ private:
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
-	FileBrowser* m_favoritesBrowser;
 
 	struct keyModifiers
 	{

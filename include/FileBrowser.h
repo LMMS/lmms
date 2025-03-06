@@ -74,7 +74,7 @@ public:
 			QWidget * parent, bool dirs_as_items = false,
 			const QString& userDir = "",
 			const QString& factoryDir = "",
-			const QStringList& items = {}
+			bool isFavoritesBrowser = false
 			);
 
 	~FileBrowser() override = default;
@@ -95,6 +95,12 @@ public:
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
+	static FileBrowser* getFavoritesBrowserInstance()
+	{
+		return m_favoritesBrowserInstance;
+	}
+
+	bool m_isFavoritesBrowser;
 	QStringList m_items;
 
 public slots:
@@ -119,6 +125,8 @@ private:
 	void displaySearch(bool on);
 
 	void addContentCheckBox();
+
+	static FileBrowser* m_favoritesBrowserInstance;
 
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 	FileBrowserTreeWidget * m_searchTreeWidget;
