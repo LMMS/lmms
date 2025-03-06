@@ -90,6 +90,16 @@ elseif(APPLE)
 	include(IconUtilConvert)
 	icns_convert("${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
 	icns_convert("${project_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/project.icns")
+
+	# dmg background
+	svg_recolor(
+		"${svg_patterns_search}"
+		"${svg_patterns_replace}"
+		"${LMMS_SOURCE_DIR}/data/scalable/dmg_background.svg"
+		dmg_svg_rebranded
+	)
+	set(bg_sizes 705 705@2)
+	svg_convert("${bg_sizes}" "${dmg_svg_rebranded}" "${CPACK_BRANDED_DIR}/dmg_background@%mult%x.png")
 else()
 	# Linux, Unix
 	set(THEMES_DIR usr/share/lmms/themes)

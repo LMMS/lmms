@@ -15,6 +15,7 @@ if(CPACK_BRANDING_NEEDED)
 endif()
 
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${APP_NAME}.app")
+set(DMG_BACKGROUND "${CPACK_SOURCE_DIR}/cmake/apple/background.png")
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
@@ -83,6 +84,8 @@ if(CPACK_BRANDING_NEEDED)
 	foreach(item IN LISTS branded_items)
 		file(COPY "${item}" DESTINATION "${APP}")
 	endforeach()
+	# @2x size automatically handled by appdmg
+	set(DMG_BACKGROUND "${CPACK_BRANDED_DIR}/dmg_background.png")
 endif()
 
 # Copy Suil modules
