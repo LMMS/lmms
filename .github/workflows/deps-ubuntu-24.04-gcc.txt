@@ -8,6 +8,7 @@ gcc
 git
 gpg
 g++
+imagemagick
 libasound2-dev
 libc6-dev
 libfftw3-dev
@@ -21,6 +22,7 @@ libmp3lame-dev
 libogg-dev
 libqt5svg5-dev
 libqt5x11extras5-dev
+librsvg2-bin
 libsamplerate0-dev
 libsdl2-dev
 libsndfile1-dev

@@ -13,9 +13,11 @@ gcc-mingw-w64-i686
 gcc-mingw-w64-x86-64
 git
 glib2-mingw-w64
+imagemagick
 lame-mingw-w64
 libgig-mingw-w64
 liblist-moreutils-perl
+librsvg2-bin
 libsamplerate-mingw-w64
 libsndfile-mingw-w64
 libsoundio-mingw-w64

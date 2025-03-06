@@ -369,7 +369,7 @@ jobs:
           path: ~\AppData\Local\ccache
           # yamllint enable rule:line-length
       - name: Install tools
-        run: choco install ccache
+        run: choco install ccache rsvg-convert imagemagick
       - name: Install Qt
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:

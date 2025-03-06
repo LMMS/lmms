@@ -43,6 +43,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 
 	versionLabel->setText( versionLabel->text().
 					arg( LMMS_VERSION ).
+					arg( LMMS_RELEASE_TYPE ).
 					arg( LMMS_BUILDCONF_PLATFORM ).
 					arg( LMMS_BUILDCONF_MACHINE ).
 					arg( QT_VERSION_STR ).
