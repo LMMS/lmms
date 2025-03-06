@@ -213,16 +213,6 @@ void TrackContainer::removeTrack( Track * _track )
 	}
 }
 
-
-
-
-void TrackContainer::updateAfterTrackAdd()
-{
-}
-
-
-
-
 void TrackContainer::clearAllTracks()
 {
 	//m_tracksMutex.lockForWrite();

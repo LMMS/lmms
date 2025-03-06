@@ -111,6 +111,7 @@ public:
 
 	bool empty();
 
+	void resizeToFirstTrack();
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
@@ -136,7 +137,6 @@ private:
 	void setType( Type _new_clip_type );
 	void checkType();
 
-	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;
 

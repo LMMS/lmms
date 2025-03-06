@@ -117,14 +117,6 @@ Track * Track::create( Type tt, TrackContainer * tc )
 	}
 
 	tc->addTrack(t);
-	tc->updateAfterTrackAdd();
-
-	if (tc == Engine::patternStore() && t)
-	{
-		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
-	}
-
-	if (dynamic_cast<PatternTrack*>(t)) { Engine::patternStore()->updateComboBox(); }
 
 	Engine::audioEngine()->doneChangeInModel();
 

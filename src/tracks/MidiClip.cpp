@@ -45,16 +45,6 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	// TODO: PatternStore should be responsible for managing the number of steps and updating the clip lengths as
-	// necessary and not MidiClip itself.
-	if (_instrument_track->trackContainer()	== Engine::patternStore())
-	{
-		connect(_instrument_track, &Track::clipAdded, this, [this](const auto clip) {
-			if (clip != this) { return; }
-			resizeToFirstTrack();
-		});
-	}
-
 	init();
 	setAutoResize( true );
 }

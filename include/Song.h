@@ -378,6 +378,8 @@ public:
 
 	Metronome& metronome() { return m_metronome; }
 
+	void addTrack(Track* track) override;
+
 public slots:
 	void playSong();
 	void record();

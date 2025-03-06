@@ -71,7 +71,7 @@ public:
 
 	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int clipNum = -1);
 
-	void updateAfterTrackAdd() override;
+	void addTrack(Track* track) override;
 
 	inline QString nodeName() const override
 	{

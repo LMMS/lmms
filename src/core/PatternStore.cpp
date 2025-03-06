@@ -76,8 +76,11 @@ bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum
 
 
 
-void PatternStore::updateAfterTrackAdd()
+void PatternStore::addTrack(Track* track)
 {
+	TrackContainer::addTrack(track);
+	track->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
+
 	if (numOfPatterns() == 0 && !Engine::getSong()->isLoadingProject())
 	{
 		Engine::getSong()->addPatternTrack();
