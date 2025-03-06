@@ -365,6 +365,7 @@ private:
 	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
+	NoteVector m_selectedDetuningNotes;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const
@@ -448,6 +449,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	Note* detuningNoteUnderMouse();
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
@@ -464,6 +466,11 @@ private:
 	bool m_knifeDown;
 
 	void updateKnifePos(QMouseEvent* me, bool initial);
+
+	bool m_detuningDown = false;
+	bool m_detuningDownRight = false;
+	int m_lastDetuneTick = -1;
+	void updateDetuningPos(QMouseEvent* me);
 
 	friend class PianoRollWindow;
 

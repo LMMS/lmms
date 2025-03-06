@@ -1138,6 +1138,11 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			}
 		}
 
+		if (m_editMode == EditMode::Detuning && _n->selected())
+		{
+			_p.drawEllipse(cur_x - 5, cur_y - 5, 10, 10);
+		}
+
 		old_x = cur_x;
 		old_y = cur_y;
 	}
@@ -1614,22 +1619,40 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if( m_editMode == EditMode::Detuning && noteUnderMouse() )
+	if (m_editMode == EditMode::Detuning && me->button() == Qt::LeftButton)
 	{
-		static QPointer<AutomationClip> detuningClip = nullptr;
-		if (detuningClip.data() != nullptr)
+		if (!getSelectedNotes().empty()) { m_selectedDetuningNotes = getSelectedNotes(); }
+		else if (noteUnderMouse()) { m_selectedDetuningNotes.assign(1, noteUnderMouse()); noteUnderMouse()->setSelected(true); }
+		else { return; }
+
+		for (Note* note: m_selectedDetuningNotes)
 		{
-			detuningClip->disconnect(this);
+			if (note->detuning() == nullptr)
+			{
+				note->createDetuning();
+				AutomationClip* detuningClip = note->detuning()->automationClip();
+				connect(detuningClip, SIGNAL(dataChanged()), this, SLOT(update()));
+			}
 		}
-		Note* n = noteUnderMouse();
-		if (n->detuning() == nullptr)
+
+		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
 		{
-			n->createDetuning();
+			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
+			getGUI()->automationEditor()->open(noteUnderMouse()->detuning()->automationClip());
+			return;
 		}
-		detuningClip = n->detuning()->automationClip();
-		connect(detuningClip.data(), SIGNAL(dataChanged()), this, SLOT(update()));
-		getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
-		getGUI()->automationEditor()->open(detuningClip);
+
+		m_detuningDown = true;
+		m_lastDetuneTick = -1;
+		updateDetuningPos(me);
+		return;
+	}
+	else if (m_editMode == EditMode::Detuning && me->button() == Qt::RightButton)
+	{
+		m_detuningDownRight = true;
+		m_detuningDown = true;
+		m_lastDetuneTick = -1;
+		updateDetuningPos(me);
 		return;
 	}
 
@@ -2285,6 +2308,22 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		}
 	}
 
+	if (m_editMode == EditMode::Detuning)
+	{
+		if (m_detuningDown && me->button() & Qt::LeftButton)
+		{
+			for (Note* note: m_selectedDetuningNotes)
+			{
+				note->detuning()->automationClip()->applyDragValue();
+			}
+		}
+		if (me->button() & Qt::RightButton)
+		{
+			m_detuningDownRight = false;
+		}
+		m_detuningDown = false;
+	}
+
 	if( me->button() & Qt::RightButton )
 	{
 		m_mouseDownRight = false;
@@ -2377,6 +2416,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	if (m_editMode == EditMode::Knife)
 	{
 		updateKnifePos(me, false);
+	}
+
+	if (m_editMode == EditMode::Detuning && m_detuningDown)
+	{
+		updateDetuningPos(me);
 	}
 
 	if( me->y() > PR_TOP_MARGIN || m_action != Action::None )
@@ -2754,6 +2798,40 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	update();
 }
 
+
+void PianoRoll::updateDetuningPos(QMouseEvent* me)
+{
+	Note* clickedNote = detuningNoteUnderMouse();
+	if (!clickedNote) { return; }
+
+	int key_num = getKey( me->y() );
+	int pos_ticks = (me->x() - m_whiteKeyWidth) *
+			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+	TimePos relativePos = pos_ticks - clickedNote->pos();
+	int relativeKey = key_num - clickedNote->key();
+
+	AutomationClip::setQuantization(quantization());
+	for (Note* note: m_selectedDetuningNotes)
+	{
+		if (!m_detuningDownRight)
+		{
+			note->detuning()->automationClip()->setDragValue(relativePos, relativeKey);
+		}
+		else
+		{
+			if (m_lastDetuneTick != -1)
+			{
+				note->detuning()->automationClip()->removeNodes(m_lastDetuneTick - clickedNote->key(), relativePos);
+			}
+			else
+			{
+				note->detuning()->automationClip()->removeNode(relativePos);
+			}
+		}
+	}
+	m_lastDetuneTick = pos_ticks;
+}
 
 
 
@@ -4716,6 +4794,43 @@ Note * PianoRoll::noteUnderMouse()
 	}
 
 	return nullptr;
+}
+
+
+Note * PianoRoll::detuningNoteUnderMouse()
+{
+	QPoint pos = mapFromGlobal( QCursor::pos() );
+
+	if (pos.x() <= m_whiteKeyWidth
+		|| pos.x() > width() - SCROLLBAR_SIZE
+		|| pos.y() < PR_TOP_MARGIN
+		|| pos.y() > keyAreaBottom() )
+	{
+		return nullptr;
+	}
+
+	int key_num = getKey( pos.y() );
+	int pos_ticks = (pos.x() - m_whiteKeyWidth) *
+			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+	// Loop through all detuning notes
+	int minDifference = -1;
+	Note* closestNote = nullptr;
+	for(Note* note : m_selectedDetuningNotes)
+	{
+		if (pos_ticks < note->pos() || pos_ticks > note->endPos()) { continue; }
+		// Get realtive position
+		TimePos relativePos = pos_ticks - note->pos();
+		// Get relative key
+		int relativeKey = key_num - note->key();
+		// Calculate distance to detuning curve
+		int differenceFromCurve = std::abs(relativeKey - note->detuning()->automationClip()->valueAt(relativePos));
+		if (differenceFromCurve < minDifference || minDifference == -1)
+		{
+			minDifference = differenceFromCurve;
+			closestNote = note;
+		}
+	}
+	return closestNote;
 }
 
 void PianoRoll::changeSnapMode()
