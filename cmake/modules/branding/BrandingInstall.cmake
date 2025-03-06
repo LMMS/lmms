@@ -28,8 +28,9 @@ set(svg_patterns_replace "svg_patterns_${LMMS_BRANDING_COLOR}")
 
 # SVG color replacements
 set(svg_patterns_green "#27ab5f;#249a56;#34d07b;opacity=\".1\" fill=\"#fff\"")
-set(svg_patterns_blue "#3992cb;#2b6fc5;#62a8d4;opacity=\".1\" fill=\"#fff\"")
+set(svg_patterns_yellow "#db9300;#bf8000;#fac457;opacity=\".05\" fill=\"#fff\"")
 set(svg_patterns_purple "#5547bd;#493ba1;#7871c5;opacity=\".05\" fill=\"#fff\"")
+set(svg_patterns_blue "#3992cb;#2b6fc5;#62a8d4;opacity=\".1\" fill=\"#fff\"")
 
 file(REMOVE_RECURSE "${CPACK_BRANDED_DIR}")
 

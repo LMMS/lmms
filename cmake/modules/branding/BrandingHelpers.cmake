@@ -86,7 +86,11 @@ function(calculate_branding version_var type_var release_var color_var status_va
 	# Process version information to calculate stable|alpha|nightly
 	# TODO: Test this calculation logic against different version patterns
 	set(version "${${version_var}}")
-	if(version MATCHES "\\+")
+	if(version MATCHES "\\+pr")
+		set(${type_var} "feature")
+		set(${release_var} "Feature")
+		set(${color_var} "yellow")
+	elseif(version MATCHES "\\+")
 		set(${type_var} "nightly")
 		set(${release_var} "Nightly")
 		set(${color_var} "purple")
@@ -109,6 +113,7 @@ function(calculate_branding version_var type_var release_var color_var status_va
 	# Colorize output
 	string(ASCII 27 Esc)
 	set(reset "${Esc}[m")
+	set(yellow "${Esc}[33m")
 	set(purple "${Esc}[35m")
 	set(blue "${Esc}[36m")
 	set(${status_var} "${${${color_var}}}${${type_var}}${reset}")
