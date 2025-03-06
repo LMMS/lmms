@@ -103,8 +103,9 @@ elseif(APPLE)
 else()
 	# Linux, Unix
 	set(THEMES_DIR usr/share/lmms/themes)
-	# AppImage icon
-	svg_convert(64 "${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/lmms.png")
+	# AppImage Icons: 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
+	svg_convert(256 "${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/lmms.png")
+	svg_convert(256 "${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/.DirIcon")
 	# /usr/share/icons
 	set(xdg_sizes 16 16@2 24 24@2 32 32@2 48 48@2 64 64@2 128 128@2 256)
 	svg_convert("${xdg_sizes}" "${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/usr/share/icons/hicolor/%size%x%size%@%mult%/%name%.png")

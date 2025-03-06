@@ -120,7 +120,7 @@ file(COPY "${CPACK_SOURCE_DIR}/cmake/linux/apprun-hooks" DESTINATION "${APP}")
 file(REMOVE "${APP}/apprun-hooks/README.md")
 
 # Prefer a hard-copy of .DirIcon over appimagetool's symlinking
-# 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
+# AppImage icon: 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
 file(RENAME "${APP}/${lmms}.png" "${APP}/.DirIcon")
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
