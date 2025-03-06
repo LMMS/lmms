@@ -2,6 +2,11 @@
 # - macOS, Linux: This script is intended to be run during install phase
 # - Windows: Due to (.rc) resource files being part of the compile process must be done at either configure or compile time
 # - Branding-related files will be outputted to build/branded
+#
+# Copyright (c) 2025, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 cmake_policy(SET CMP0011 NEW)
 
@@ -62,14 +67,14 @@ if(WIN32)
 	file(REMOVE "${temp_icon}")
 
 	# used by both winrc and nsis
-    ico_convert("${lmms_svg_branded}" "${CPACK_BRANDED_DIR}/icon.ico")
-    # used only by winrc
-    ico_convert("${project_svg_branded}" "${CPACK_BRANDED_DIR}/project.ico")
+	ico_convert("${lmms_svg_branded}" "${CPACK_BRANDED_DIR}/icon.ico")
+	# used only by winrc
+	ico_convert("${project_svg_branded}" "${CPACK_BRANDED_DIR}/project.ico")
 elseif(APPLE)
 	set(THEMES_DIR Contents/share/lmms/themes)
 	include(IconUtilConvert)
-    icns_convert("${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
-    icns_convert("${project_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/project.icns")
+	icns_convert("${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
+	icns_convert("${project_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/project.icns")
 else()
 	# Linux, Unix
 	set(THEMES_DIR usr/share/lmms/themes)

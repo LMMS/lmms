@@ -1,3 +1,10 @@
+# Shared branding variables
+#
+# Copyright (c) 2025, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 # Public vars e.g. CPACK_BRANDED_DIR, CPACK_BRANDED_APP_DIR
 macro(setup_public_env)
 	# branded output directory

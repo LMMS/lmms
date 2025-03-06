@@ -1,3 +1,13 @@
+# Branding helpers
+# - install_branding: Calls BrandingInstall.cmake at install() using code injection
+# - add_branded_target: Calls BrandingInstall.cmake at compile using add_custom_target and cmake -P
+# - calculate_branding: Calculates if this build needs branding, and what type (e.g. "Nightly"), sets vars accordingly
+#
+# Copyright (c) 2025, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 include(SetupBrandingEnv)
 setup_public_env()
 

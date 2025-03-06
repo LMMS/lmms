@@ -4,6 +4,7 @@
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 cmake_policy(SET CMP0053 NEW)
 
 function(svg_convert size_list source_file output_pattern)
