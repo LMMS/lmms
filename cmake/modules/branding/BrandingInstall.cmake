@@ -61,13 +61,28 @@ if(WIN32)
 	set(THEMES_DIR data/themes)
 	include(MagickConvert)
 	# used only by nsis
+	# - top banner
 	set(temp_icon "${CPACK_BRANDED_DIR}/temp_icon.png")
 	svg_convert(64 "${lmms_svg_branded}" "${temp_icon}")
 	nsis_banner("${temp_icon}" "${CPACK_BRANDED_DIR}/nsis_branding.bmp" 150x57)
 	file(REMOVE "${temp_icon}")
+	# - left side banner
+	#   - recolor welcome side banner
+    svg_recolor(
+    	"${svg_patterns_search}"
+    	"${svg_patterns_replace}"
+    	"${LMMS_SOURCE_DIR}/data/scalable/nsis_welcome.svg"
+    	welcome_svg_rebranded
+    )
+    #   - convert welcome side banner to BMP3
+    set(temp_welcome "${CPACK_BRANDED_DIR}/temp_welcome.png")
+	svg_convert(164 "${welcome_svg_rebranded}" "${temp_welcome}")
+	nsis_bmp("${temp_welcome}" "${CPACK_BRANDED_DIR}/nsis_welcome.bmp")
+	file(REMOVE "${temp_welcome}")
 
 	# used by both winrc and nsis
 	ico_convert("${lmms_svg_branded}" "${CPACK_BRANDED_DIR}/icon.ico")
+
 	# used only by winrc
 	ico_convert("${project_svg_branded}" "${CPACK_BRANDED_DIR}/project.ico")
 elseif(APPLE)

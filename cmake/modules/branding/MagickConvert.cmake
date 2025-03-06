@@ -7,6 +7,7 @@
 
 find_program(MagickConvert_FOUND magick)
 
+# Create NSIS-suitable-BMP3 top banner image by drawing the LMMS icon on a white canvas
 function(nsis_banner source_file destination_file size)
 	include(SetupBrandingEnv)
 	setup_env()
@@ -45,6 +46,26 @@ function(nsis_banner source_file destination_file size)
 	file(REMOVE "${temp_file}")
 endfunction()
 
+# Convert a png to a NSIS-suitable-BMP3
+function(nsis_bmp source_file destination_file)
+	include(SetupBrandingEnv)
+	setup_env()
+
+	# Convert image to BMP3
+	get_filename_component(destination_dir "${destination_file}" DIRECTORY)
+	get_filename_component(file_name "${destination_file}" NAME)
+	execute_process(COMMAND magick
+		"${source_file}"
+		-depth 8 -compress none
+		"BMP3:${file_name}" # imagemagick format specifiers don't allow full paths
+		WORKING_DIRECTORY "${destination_dir}"
+		OUTPUT_QUIET
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+endfunction()
+
+# Convert the source image to a multi-res Windows ".ico" file
 function(ico_convert source_file destination_file)
 	include(SvgConvert)
 	include(SetupBrandingEnv)
