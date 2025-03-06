@@ -49,6 +49,7 @@ endmacro()
 # Check for branding dependencies, calculate branding type & color
 # If successful:
 # - Variable passed as type_var will be set to "alpha" or "nightly"
+# - Variable passed as release_var will be set to "Alpha" or "Nightly"
 # - Variable passed as color_var will be set to "blue" or "purple"
 # - Variable passed as status_var will be set to a bash-colored "alpha" or "nightly"
 function(calculate_branding version_var type_var release_var color_var status_var)
