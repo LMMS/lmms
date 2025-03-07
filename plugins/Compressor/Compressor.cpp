@@ -24,8 +24,10 @@
 
 #include "Compressor.h"
 
+#include <cmath>
+#include <numbers>
+
 #include "embed.h"
-#include "interpolation.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
 
@@ -209,18 +211,19 @@ void CompressorEffect::redrawKnee()
 
 void CompressorEffect::calcTiltCoeffs()
 {
+	using namespace std::numbers;
 	m_tiltVal = m_compressorControls.m_tiltModel.value();
 
-	const float amp = 6.f / std::log(2.f);
+	constexpr float amp = 6.f / ln2_v<float>;
 
-	const float gfactor = 5;
+	constexpr float gfactor = 5;
 	const float g1 = m_tiltVal > 0 ? -gfactor * m_tiltVal : -m_tiltVal;
 	const float g2 = m_tiltVal > 0 ? m_tiltVal : gfactor * m_tiltVal;
 
 	m_lgain = std::exp(g1 / amp) - 1;
 	m_hgain = std::exp(g2 / amp) - 1;
 
-	const float omega = numbers::tau_v<float> * m_compressorControls.m_tiltFreqModel.value();
+	const float omega = 2 * pi_v<float> * m_compressorControls.m_tiltFreqModel.value();
 	const float n = 1 / (m_sampleRate * 3 + omega);
 	m_a0 = 2 * omega * n;
 	m_b1 = (m_sampleRate * 3 - omega) * n;
@@ -402,21 +405,21 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_
 					if (blend <= 1)// Blend to minimum volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
-						m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
+						m_gainResult[0] = std::lerp(m_gainResult[0], temp1, blend);
+						m_gainResult[1] = std::lerp(m_gainResult[1], temp1, blend);
 					}
 					else if (blend <= 2)// Blend to average volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
 						const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
+						m_gainResult[0] = std::lerp(temp1, temp2, blend - 1);
 						m_gainResult[1] = m_gainResult[0];
 					}
 					else// Blend to maximum volume
 					{
 						const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 						const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
+						m_gainResult[0] = std::lerp(temp1, temp2, blend - 2);
 						m_gainResult[1] = m_gainResult[0];
 					}
 				}

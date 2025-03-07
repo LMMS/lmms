@@ -71,7 +71,7 @@
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>99</number>
+         <number>2147483647</number> <!-- INT_MAX -->
         </property>
         <property name="value">
          <number>1</number>
@@ -336,13 +336,6 @@
                <string>320 KBit/s</string>
               </property>
              </item>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBoxVariableBitRate">
-             <property name="text">
-              <string>Use variable bitrate</string>
-             </property>
             </widget>
            </item>
           </layout>

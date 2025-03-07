@@ -85,7 +85,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
-	&DataFile::findProblematicLadspaPlugins
+	&DataFile::findProblematicLadspaPlugins,
+	&DataFile::upgrade_noHiddenAutomationTracks
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1635,6 +1636,51 @@ void DataFile::upgrade_1_3_0()
 				}
 			}
 		}
+	}
+}
+
+void DataFile::upgrade_noHiddenAutomationTracks()
+{
+	// convert global automation tracks to non-hidden
+	QDomElement song = firstChildElement("lmms-project")
+		.firstChildElement("song");
+	QDomElement trackContainer = song.firstChildElement("trackcontainer");
+	QDomElement globalAutomationTrack = song.firstChildElement("track");
+	if (!globalAutomationTrack.isNull()
+		&& globalAutomationTrack.attribute("type").toInt() == static_cast<int>(Track::Type::HiddenAutomation))
+	{
+		// global automation clips
+		QDomNodeList automationClips = globalAutomationTrack.elementsByTagName("automationclip");
+		QList<QDomNode> tracksToInsert;
+		for (int i = 0; i < automationClips.length(); ++i)
+		{
+			QDomElement automationClip = automationClips.item(i).toElement();
+			// If automationClip has time nodes, move it to trackcontainer
+			// There are times when an <object> node is present without an
+			// object with the same ID in the file, so we ignore that node
+			if (automationClip.elementsByTagName("time").length() > 1)
+			{
+				QDomElement automationTrackForClip = createElement("track");
+				automationTrackForClip.setAttribute("muted", QString::number(false));
+				automationTrackForClip.setAttribute("solo", QString::number(false));
+				automationTrackForClip.setAttribute("type",
+					QString::number(static_cast<int>(Track::Type::Automation)));
+				automationTrackForClip.setAttribute("name",
+					automationClip.attribute("name", "Automation Track"));
+				QDomElement at = createElement("automationtrack");
+				automationTrackForClip.appendChild(at);
+				automationTrackForClip.appendChild(automationClips.item(i).cloneNode());
+				tracksToInsert.prepend(automationTrackForClip); // To preserve orders
+			}
+		}
+
+		// Insert the tracks at the beginning of trackContainer, preserving their order
+		for (const auto& track : tracksToInsert) {
+			trackContainer.insertBefore(track, trackContainer.firstChild());
+		}
+
+		// Remove the track object just in case
+		globalAutomationTrack.parentNode().removeChild(globalAutomationTrack);
 	}
 }
 

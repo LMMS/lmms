@@ -25,12 +25,11 @@
 #include "Instrument.h"
 
 #include <cmath>
+#include <numbers>
 
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
 #include "lmms_basics.h"
-#include "lmms_constants.h"
-
 
 namespace lmms
 {
@@ -152,7 +151,7 @@ void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(numbers::pi_v<float> * (float) f / (float) n->m_fadeInLength);
+				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(f) / static_cast<float>(n->m_fadeInLength));
 			}
 		}
 	}
@@ -168,7 +167,7 @@ void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				float currentLength = n->m_fadeInLength * (1.0f - (float) f / frames) + new_length * ((float) f / frames);
-				buf[f][ch] *= 0.5 - 0.5 * std::cos(numbers::pi_v<float> * (float) (total + f) / currentLength);
+				buf[f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(total + f) / currentLength);
 				if (total + f >= currentLength)
 				{
 					n->m_fadeInLength = currentLength;
