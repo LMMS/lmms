@@ -365,6 +365,7 @@ private:
 	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
+	//! Vector of notes which have their detuning/other parameter being edited.
 	NoteVector m_selectedParameterEditNotes;
 	NoteVector m_ghostNotes;
 
@@ -468,12 +469,17 @@ private:
 
 	void updateKnifePos(QMouseEvent* me, bool initial);
 
+	//! Varaibles which hold which mouse buttons are being held while editing the detuning/parameter of notes.
 	bool m_parameterEditDown = false;
 	bool m_parameterEditDownRight = false;
+	//! Stores the last edited position for the note detuning/parameter curves. When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed.
 	int m_lastParameterEditTick = -1;
 
+	//! Function to update the currently dragged node position in the detuning/parameter curve of the selected notes.
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Function to apply the dragging of the current node of the detuning/parameter curves
 	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Function to initialize the currently selected notes for detuning. If any notes are selected, it uses those. If none are selected but there is a note under the mouse, it will select that note.
 	bool setupParameterEditNotes(Note::ParameterType paramType);
 
 	friend class PianoRollWindow;

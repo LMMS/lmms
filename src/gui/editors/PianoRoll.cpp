@@ -1621,9 +1621,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if (m_editMode == EditMode::Detuning)
 	{
+		// Setup the currently selected notes/note under mouse
 		bool notesFound = setupParameterEditNotes(Note::ParameterType::Detuning);
 		if (!notesFound) { return; }
 
+		// Create detuning curves for each note if they don't have them already
 		for (Note* note: m_selectedParameterEditNotes)
 		{
 			if (note->detuning() == nullptr)
@@ -1634,7 +1636,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			}
 		}
 
-		// Let users access automation editor with shift-click
+		// Let users access automation editor with shift-click, if they want the old functionality
 		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
 		{
 			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
@@ -1644,6 +1646,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 		m_midiClip->addJournalCheckPoint();
 
+		// Perform the dragging/adding/removing of automation nodes
 		updateParameterEditPos(me, Note::ParameterType::Detuning);
 		return;
 	}
@@ -2401,6 +2404,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 	if (m_editMode == EditMode::Detuning && m_parameterEditDown)
 	{
+		// Update the current dragging/adding/removal of automation nodes in the detuning curves of the selected notes.
 		updateParameterEditPos(me, Note::ParameterType::Detuning);
 	}
 
@@ -2782,23 +2786,30 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
+	// If this is the first time this function is called (not mouseMove or mouseRelease), initialize the variables.
 	if (me->type() == QEvent::MouseButtonPress) {
 		m_parameterEditDown = true;
 		m_parameterEditDownRight = me->button() & Qt::RightButton;
 		m_lastParameterEditTick = -1;
 	}
 
+	// Get the note with the closest automation curve to the mouse cursor
 	Note* clickedNote = parameterEditNoteUnderMouse(paramType);
 	if (!clickedNote) { return; }
 
+	// Calculate the key and time of the mouse cursor in the piano roll
 	int key_num = getKey( me->y() );
 	int pos_ticks = (me->x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
+	// Calculate the relative position of the mouse with respect to the note.
 	TimePos relativePos = pos_ticks - clickedNote->pos();
 	int relativeKey = key_num - clickedNote->key();
 
+	// Set the quantization of the automation editor to match the piano roll. This is not an ideal system, but it works.
 	AutomationClip::setQuantization(quantization());
+
+	// Loop through all of the selected notes and update the drag position in each.
 	for (Note* note: m_selectedParameterEditNotes)
 	{
 		AutomationClip * aClip = nullptr;
@@ -2810,14 +2821,17 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			default:
 				continue;
 		}
+		// If left-clicking, add/drag a node.
 		if (!m_parameterEditDownRight)
 		{
 			aClip->setDragValue(relativePos, relativeKey);
 		}
+		// If right-clicking, remove nodes. If the last position of the mouse is not -1, remove all nodes in that range.
 		else if (m_lastParameterEditTick != -1)
 		{
 				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
 		}
+		// Or just remove at that one time pos
 		else
 		{
 				aClip->removeNode(relativePos);
@@ -2828,6 +2842,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 
 void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
+	// If the left button was just released, apply the drag on all of the notes' automation clips.
 	if (m_parameterEditDown && me->button() & Qt::LeftButton)
 	{
 		for (Note* note: m_selectedParameterEditNotes)
@@ -2844,12 +2859,14 @@ void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType param
 			aClip->applyDragValue();
 		}
 	}
-	m_parameterEditDownRight = !(me->button() & Qt::RightButton);
+	m_parameterEditDownRight = false;
 	m_parameterEditDown = false;
 }
 
 bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
 {
+	// If the user has selected notes, use those for the detuning/parameter editing
+	// Else, if the user is clicking on a note, select that note and use it.
 	if (!getSelectedNotes().empty())
 	{
 		m_selectedParameterEditNotes = getSelectedNotes();
@@ -2858,6 +2875,7 @@ bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
 	else if (noteUnderMouse())
 	{
 		m_selectedParameterEditNotes.assign(1, noteUnderMouse());
+		// The note is also set to be selected so that it can be tracked even when the user drags automation nodes above/below the note.
 		noteUnderMouse()->setSelected(true);
 		return true;
 	}
@@ -4839,20 +4857,22 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 		return nullptr;
 	}
 
+	// Get the key and time pos of the cursor
 	int key_num = getKey( pos.y() );
 	int pos_ticks = (pos.x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-	// Loop through all parameter edit notes
+
+	// Loop through all notes having their detuning/parameter being edited, and find the one whose automation curve is closest to the mouse.
 	int minDifference = -1;
 	Note* closestNote = nullptr;
 	for(Note* note : m_selectedParameterEditNotes)
 	{
+		// Skip note if the mouse is outside of its start/end time
 		if (pos_ticks < note->pos() || pos_ticks > note->endPos()) { continue; }
-		// Get realtive position
+
 		TimePos relativePos = pos_ticks - note->pos();
-		// Get relative key
 		int relativeKey = key_num - note->key();
-		// Calculate distance to parameter curve
+
 		AutomationClip* aClip = nullptr;
 		switch (paramType)
 		{
@@ -4864,7 +4884,9 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 		}
 		if (aClip == nullptr) { continue; }
 
+		// Calculate the vertical distance from the automation curve to the mouse.
 		int differenceFromCurve = std::abs(relativeKey - aClip->valueAt(relativePos));
+		// If it's less than the current min, set this note as the closest note so far.
 		if (differenceFromCurve < minDifference || minDifference == -1)
 		{
 			minDifference = differenceFromCurve;
