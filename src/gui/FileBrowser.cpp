@@ -667,16 +667,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	QTreeWidgetItem* item = itemAt(e->pos());
 	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
 
-	QString itemName;
-	bool isFavoriteItem;
-
 	QMenu contextMenu(this);
 
 	switch (item->type())
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		bool isFavoriteItem = isFavorite(file->fullName());
 
 		if (file->isTrack())
 		{
@@ -685,16 +681,17 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			contextMenu.addSeparator();
 		}
 
+		if (isFavorite(file->fullName()))
+		{
+			contextMenu.addAction(tr("Remove favorite file"), [&] { removeFavorite(file->fullName()); });
+		}
+		else
+		{
+			contextMenu.addAction(tr("Add favorite file"), [&] { addFavorite(file->fullName()); });
+		}
+
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
-
-
-		contextMenu.addAction(
-		   !isFavoriteItem ? tr("Add favorite file") : tr("Remove favorite file"),
-		std::function([=, this] {
-				!isFavoriteItem ? addFavorite(file->fullName()) : removeFavorite(file->fullName());
-			})
-		);
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -709,18 +706,19 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		bool isFavoriteItem = isFavorite(dir->fullName());
+
+		if (isFavorite(dir->fullName()))
+		{
+			contextMenu.addAction(tr("Remove favorite folder"), [&] { removeFavorite(dir->fullName()); });
+		}
+		else
+		{
+			contextMenu.addAction(tr("Add favorite folder"), [&] { addFavorite(dir->fullName()); });
+		}
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
-
-		contextMenu.addAction(
-			!isFavoriteItem ? tr("Add favorite folder") : tr("Remove favorite folder"),
-			std::function([=, this] {
-					!isFavoriteItem ? addFavorite(dir->fullName()) : removeFavorite(dir->fullName());
-			})
-		);
 		break;
 	}
 	}
