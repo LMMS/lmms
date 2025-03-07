@@ -98,6 +98,14 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	compressionWidget->setVisible(false);
 #endif
 
+	for (const auto sampleRate : SUPPORTED_SAMPLERATES)
+	{
+		samplerateCB->addItem(tr("%1 Hz").arg(sampleRate), sampleRate);
+	}
+
+	const auto currentIndex = std::max(0, samplerateCB->findData(Engine::audioEngine()->outputSampleRate()));
+	samplerateCB->setCurrentIndex(currentIndex);
+
 	connect( startButton, SIGNAL(clicked()),
 			this, SLOT(startBtnClicked()));
 }
@@ -161,7 +169,7 @@ void ExportProjectDialog::startExport()
 	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
 
 	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], useVariableBitRate);
-	OutputSettings os = OutputSettings(SUPPORTED_SAMPLERATES[samplerateCB->currentIndex()], bitRateSettings,
+	OutputSettings os = OutputSettings(samplerateCB->currentData().toInt(), bitRateSettings,
 		static_cast<OutputSettings::BitDepth>(depthCB->currentIndex()),
 		mapToStereoMode(stereoModeComboBox->currentIndex()));
 
