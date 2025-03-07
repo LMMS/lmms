@@ -449,6 +449,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	//! Calculates the closest note to the mouse given their parameter automation curve
 	Note* parameterEditNoteUnderMouse(Note::ParameterType paramType);
 
 	// turn a selection rectangle into selected notes
@@ -470,6 +471,7 @@ private:
 	bool m_parameterEditDown = false;
 	bool m_parameterEditDownRight = false;
 	int m_lastParameterEditTick = -1;
+	
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	bool setupParameterEditNotes(Note::ParameterType paramType);
