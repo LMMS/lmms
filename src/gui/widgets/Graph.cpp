@@ -459,8 +459,8 @@ void Graph::updateGraph()
 
 } // namespace gui
 
-graphModel::graphModel(float ymin, float ymax, int length, Model* parent, bool default_constructed, float step) :
-	Model(parent, tr("Graph"), default_constructed),
+graphModel::graphModel(float ymin, float ymax, int length, Model* parent, bool defaultConstructed, float step) :
+	Model(parent, tr("Graph"), defaultConstructed),
 	m_samples(length),
 	m_length(length),
 	m_minValue(ymin),
