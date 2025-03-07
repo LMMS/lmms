@@ -674,12 +674,8 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
 
-		if (file->isTrack())
-		{
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
-			contextMenu.addSeparator();
-		}
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
+			[=] { FileRevealer::reveal(file->fullName()); });
 
 		if (isFavorite(file->fullName()))
 		{
@@ -690,8 +686,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			contextMenu.addAction(tr("Add favorite file"), [&] { addFavorite(file->fullName()); });
 		}
 
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=] { FileRevealer::reveal(file->fullName()); });
+		if (file->isTrack())
+		{
+			contextMenu.addSeparator();
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+		}
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -707,6 +707,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
 
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
+			FileRevealer::openDir(dir->fullName());
+		});
+
 		if (isFavorite(dir->fullName()))
 		{
 			contextMenu.addAction(tr("Remove favorite folder"), [&] { removeFavorite(dir->fullName()); });
@@ -715,10 +719,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		{
 			contextMenu.addAction(tr("Add favorite folder"), [&] { addFavorite(dir->fullName()); });
 		}
-
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
-			FileRevealer::openDir(dir->fullName());
-		});
 		break;
 	}
 	}
