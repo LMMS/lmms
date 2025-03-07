@@ -25,8 +25,8 @@
       </cc:License>
     </rdf:RDF>
   </metadata>
-  <rect width="19" height="19" x=".5" y=".5" fill="#1997cf"
-    stroke="#006b9f" stroke-linecap="round" stroke-linejoin="bevel"
+  <rect width="19" height="19" x=".5" y=".5" fill="#2696d1"
+    stroke="#055f89" stroke-linecap="round" stroke-linejoin="bevel"
     ry="2.065" id="button" />
   <path id="highlight" fill="#fff" opacity=".1"
     d="M2.56445 1C1.6888 1 1 1.6888 1 2.56445V3c0-.554.446-1 1-1h16c.554 0 1 .446 1 1v-.43555C19 1.6888 18.3112 1 17.43555 1Z" />
