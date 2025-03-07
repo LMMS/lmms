@@ -2812,15 +2812,8 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	// Loop through all of the selected notes and update the drag position in each.
 	for (Note* note: m_selectedParameterEditNotes)
 	{
-		AutomationClip * aClip = nullptr;
-		switch (paramType)
-		{
-			case Note::ParameterType::Detuning:
-				aClip = note->detuning()->automationClip();
-				break;
-			default:
-				continue;
-		}
+		AutomationClip* aClip = note->getParameterCurve(paramType);
+		if (aClip == nullptr) { continue; }
 		// If left-clicking, add/drag a node.
 		if (!m_parameterEditDownRight)
 		{
@@ -2847,15 +2840,9 @@ void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType param
 	{
 		for (Note* note: m_selectedParameterEditNotes)
 		{
-			AutomationClip * aClip = nullptr;
-			switch (paramType)
-			{
-				case Note::ParameterType::Detuning:
-					aClip = note->detuning()->automationClip();
-					break;
-				default:
-					continue;
-			}
+			AutomationClip* aClip = note->getParameterCurve(paramType);
+			if (aClip == nullptr) { continue; }
+
 			aClip->applyDragValue();
 		}
 	}
@@ -4873,15 +4860,7 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 		TimePos relativePos = pos_ticks - note->pos();
 		int relativeKey = key_num - note->key();
 
-		AutomationClip* aClip = nullptr;
-		switch (paramType)
-		{
-			case Note::ParameterType::Detuning:
-				aClip = note->detuning()->automationClip();
-				break;
-			default:
-				continue;
-		}
+		AutomationClip* aClip = note->getParameterCurve(paramType);
 		if (aClip == nullptr) { continue; }
 
 		// Calculate the vertical distance from the automation curve to the mouse.
