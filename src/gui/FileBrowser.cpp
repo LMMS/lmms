@@ -670,17 +670,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	QString itemName;
 	bool isFavoriteItem;
 
-	auto favoriteAction
-		= std::function([isFavoriteItem, itemName] { !isFavoriteItem ? addFavorite(itemName) : removeFavorite(itemName); });
-
 	QMenu contextMenu(this);
 
 	switch (item->type())
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		itemName = file->fullName();
-		isFavoriteItem = isFavorite(itemName);
+		bool isFavoriteItem = isFavorite(file->fullName());
 
 		if (file->isTrack())
 		{
@@ -692,7 +688,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
 
-		contextMenu.addAction(!isFavoriteItem ? tr("Add favorite file") : tr("Remove favorite file"), favoriteAction);
+
+		contextMenu.addAction(
+		   !isFavoriteItem ? tr("Add favorite file") : tr("Remove favorite file"),
+		std::function([=, this] {
+				!isFavoriteItem ? addFavorite(file->fullName()) : removeFavorite(file->fullName());
+			})
+		);
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -707,14 +709,18 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		itemName = dir->fullName();
-		isFavoriteItem = isFavorite(itemName);
+		bool isFavoriteItem = isFavorite(dir->fullName());
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
 
-		contextMenu.addAction(!isFavoriteItem ? tr("Add favorite folder") : tr("Remove favorite folder"), favoriteAction);
+		contextMenu.addAction(
+			!isFavoriteItem ? tr("Add favorite folder") : tr("Remove favorite folder"),
+			std::function([=, this] {
+					!isFavoriteItem ? addFavorite(dir->fullName()) : removeFavorite(dir->fullName());
+			})
+		);
 		break;
 	}
 	}
