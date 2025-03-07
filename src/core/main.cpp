@@ -40,6 +40,8 @@
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
+#include <io.h>
+#include <stdio.h>
 #include <windows.h>
 #endif
 
@@ -55,7 +57,7 @@
 #include <sys/prctl.h>
 #endif
 
-#include <csignal>
+#include <csignal>  // To register the signal handler
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
@@ -76,12 +78,11 @@
 #include <fenv.h> // For feenableexcept
 #include <execinfo.h> // For backtrace and backtrace_symbols_fd
 #include <unistd.h> // For STDERR_FILENO
-#include <csignal> // To register the signal handler
 #endif
 
 
 #ifdef LMMS_DEBUG_FPE
-void signalHandler( int signum ) {
+void sigfpeHandler( int signum ) {
 
 	// Get a back trace
 	void *array[10];
@@ -98,6 +99,19 @@ void signalHandler( int signum ) {
 	exit(signum);
 }
 #endif
+
+// SIGINT: Write to a file descriptor that GuiApplication is listening on
+static int sigintFd[2];
+static void sigintHandler(int unused) {
+#ifndef LMMS_BUILD_WIN32
+	char a = 1;
+	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
+#else
+	char message[] = "Sorry, SIGINT is unhandled on this platform\n";
+	std::ignore = _write(_fileno(stderr), message, sizeof(message));
+#endif
+}
+
 
 static inline QString baseName( const QString & file )
 {
@@ -314,8 +328,9 @@ int main( int argc, char * * argv )
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
-	signal(SIGFPE, signalHandler);
+	signal(SIGFPE, sigfpeHandler);
 #endif
+	signal(SIGINT, sigintHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
@@ -803,7 +818,7 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
-		new GuiApplication();
+		new GuiApplication(sigintFd);
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
