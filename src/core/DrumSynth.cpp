@@ -249,7 +249,7 @@ int DrumSynth::GetPrivateProfileString(
 	if (len == 0)
 	{
 		len = strlen(def);
-		std::memcpy(buffer, def, size);
+		std::memcpy(buffer, def, std::min(len, size));
 	}
 
 	free(line);
