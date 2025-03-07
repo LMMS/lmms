@@ -168,8 +168,8 @@ public:
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
-	void addFavorite(QString item);
-	void removeFavorite(QString item);
+	static void addFavorite(QString item);
+	static void removeFavorite(QString item);
 	static bool isFavorite(QString item);
 
 protected:

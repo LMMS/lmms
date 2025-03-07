@@ -350,7 +350,7 @@ void FileBrowser::reloadTree()
 
 	if (m_isFavoritesBrowser)
 	{
-		for (auto& item : ConfigManager::getFavorites())
+		for (auto& item : ConfigManager::favoriteItems())
 		{
 			QFileInfo entry = QFileInfo(ConfigManager::removeTrailingSeparators(item));
 			addEntry(entry, entry.absoluteDir().absolutePath());
@@ -667,13 +667,20 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	QTreeWidgetItem* item = itemAt(e->pos());
 	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
 
+	QString itemName;
+	bool isFavoriteItem;
+
+	auto favoriteAction
+		= std::function([isFavoriteItem, itemName] { !isFavoriteItem ? addFavorite(itemName) : removeFavorite(itemName); });
+
 	QMenu contextMenu(this);
 
 	switch (item->type())
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		bool _isFavorite = isFavorite(file->fullName());
+		itemName = file->fullName();
+		isFavoriteItem = isFavorite(itemName);
 
 		if (file->isTrack())
 		{
@@ -685,13 +692,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
 
-
-		contextMenu.addAction(
-		   !_isFavorite ? tr("Add favorite file") : tr("Remove favorite file"),
-		std::function([=, this] {
-				!_isFavorite ? addFavorite(file->fullName()) : removeFavorite(file->fullName());
-			})
-		);
+		contextMenu.addAction(!isFavoriteItem ? tr("Add favorite file") : tr("Remove favorite file"), favoriteAction);
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -706,18 +707,14 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
-		bool _isFavorite = isFavorite(dir->fullName());
+		itemName = dir->fullName();
+		isFavoriteItem = isFavorite(itemName);
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
 
-		contextMenu.addAction(
-			!_isFavorite ? tr("Add favorite folder") : tr("Remove favorite folder"),
-			std::function([=, this] {
-					!_isFavorite ? addFavorite(dir->fullName()) : removeFavorite(dir->fullName());
-			})
-		);
+		contextMenu.addAction(!isFavoriteItem ? tr("Add favorite folder") : tr("Remove favorite folder"), favoriteAction);
 		break;
 	}
 	}

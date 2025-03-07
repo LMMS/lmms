@@ -111,10 +111,9 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
-	sideBar->appendTab(	new FileBrowser("", FileItem::defaultFilters(), "My Favorites",
-		embed::getIconPixmap("folder").transformed(QTransform().rotate(90).scale(2, 2)), splitter,
-		false, "", "", true
-	));
+	sideBar->appendTab(new FileBrowser("", FileItem::defaultFilters(), "My Favorites",
+		embed::getIconPixmap("folder").transformed(QTransform().rotate(90).scale(2, 2)), splitter, false, "", "",
+		true));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),

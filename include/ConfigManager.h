@@ -214,9 +214,9 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
-	const QStringList & favoriteItems() const
+	static QStringList & favoriteItems()
 	{
-		return m_favoriteItems;
+		return inst()->m_favoriteItems;
 	}
 
 	QString localeDir() const
@@ -248,10 +248,6 @@ public:
 	static void addFavoriteItem(QString& item);
 	static void removeFavoriteItem(QString& item);
 	static bool isFavorite(QString& item);
-	static QStringList getFavorites()
-	{
-		return inst()->favoriteItems();
-	}
 
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
