@@ -240,7 +240,7 @@ int DrumSynth::GetPrivateProfileString(
 					while ((k >= b) && (*k == ' ' || *k == '\t')) { --k; }
 					k[1] = '\0';
 					len = std::min(static_cast<int>(k - b), size - 1);
-					std::memcpy(buffer, b, len);
+					std::memcpy(buffer, b, len + 1);
 				}
 				break;
 			}
