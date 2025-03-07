@@ -1239,8 +1239,8 @@ void RemoteVstPlugin::getParameterLabels()
 
 void RemoteVstPlugin::sendCurrentProgramName()
 {
-	char presName[64];
-	snprintf(presName, sizeof(presName),
+	char presName[64] = {0};
+	snprintf(presName, sizeof(presName) - 1,
 		"%d/%d: %s",
 		pluginDispatch(effGetProgram) + 1,
 		m_plugin->numPrograms,
@@ -1371,8 +1371,9 @@ void RemoteVstPlugin::rotateProgram( int offset )
 
 void RemoteVstPlugin::getProgramNames()
 {
-	char presName[1024 + 256 * 30];
-	char curProgName[30];
+	char presName[1024 + 256 * 30] = {};
+	constexpr auto maxlen = sizeof(presName) - 1;
+	char curProgName[30] = {};
 	if (!isInitialized()) { return; }
 	const bool progNameIndexed = pluginDispatch(29, 0, -1, curProgName) == 1;
 
@@ -1384,11 +1385,11 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i < maxPrograms; i++)
 			{
 				pluginDispatch(29, i, -1, curProgName);
-				if (i == 0) { snprintf(presName, sizeof(presName), "%s", curProgName); }
+				if (i == 0) { snprintf(presName, maxlen, "%s", curProgName); }
 				else
 				{
 					const auto len = strlen(presName);
-					snprintf(presName + len, sizeof(presName) - len, "|%s", curProgName);
+					snprintf(presName + len, maxlen - len, "|%s", curProgName);
 				}
 			}
 		}
@@ -1398,19 +1399,18 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i < maxPrograms; i++)
 			{
 				pluginDispatch(effSetProgram, 0, i);
-				if (i == 0) { snprintf(presName, sizeof(presName), "%s", programName()); }
+				if (i == 0) { snprintf(presName, maxlen, "%s", programName()); }
 				else
 				{
 					const auto len = strlen(presName);
-					const auto remaining = std::min(len, sizeof(presName));
+					const auto remaining = std::min(len, maxlen);
 					snprintf(presName + len, remaining, "|%s", programName());
 				}
 			}
 			pluginDispatch(effSetProgram, 0, currProgram);
 		}
-	} else snprintf(presName, sizeof(presName), "%s", programName());
+	} else snprintf(presName, maxlen, "%s", programName());
 
-	presName[sizeof(presName) - 1] = 0;
 	sendMessage(message(IdVstProgramNames).addString(presName));
 }
 
@@ -1699,8 +1699,8 @@ int RemoteVstPlugin::updateInOutCount()
 
 	setInputOutputCount( inputCount(), outputCount() );
 
-	char buf[64];
-	snprintf(buf, sizeof(buf), "inputs: %d; outputs: %d\n", inputCount(), outputCount());
+	char buf[64] = {};
+	snprintf(buf, sizeof(buf) - 1, "inputs: %d; outputs: %d\n", inputCount(), outputCount());
 	debugMessage(buf);
 
 	if (inputCount() > 0) { m_inputs = new float*[inputCount()]; }
@@ -1732,8 +1732,8 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 {
 	static VstTimeInfo _timeInfo;
 #ifdef DEBUG_CALLBACKS
-	char buf[64];
-	snprintf(buf, sizeof(buf), "host-callback, opcode = %d\n", static_cast<int>(_opcode));
+	char buf[64] = {};
+	snprintf(buf, sizeof(buf) - 1, "host-callback, opcode = %d\n", static_cast<int>(_opcode));
 	SHOW_CALLBACK(buf);
 #endif
 
