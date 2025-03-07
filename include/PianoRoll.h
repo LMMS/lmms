@@ -471,7 +471,7 @@ private:
 	bool m_parameterEditDown = false;
 	bool m_parameterEditDownRight = false;
 	int m_lastParameterEditTick = -1;
-	
+
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	bool setupParameterEditNotes(Note::ParameterType paramType);
