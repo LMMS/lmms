@@ -2814,16 +2814,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		{
 			aClip->setDragValue(relativePos, relativeKey);
 		}
+		else if (m_lastParameterEditTick != -1)
+		{
+				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
+		}
 		else
 		{
-			if (m_lastParameterEditTick != -1)
-			{
-				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
-			}
-			else
-			{
 				aClip->removeNode(relativePos);
-			}
 		}
 	}
 	m_lastParameterEditTick = pos_ticks;
