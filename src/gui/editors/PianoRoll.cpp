@@ -1619,13 +1619,12 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if (m_editMode == EditMode::Detuning && me->button() == Qt::LeftButton)
+	if (m_editMode == EditMode::Detuning)
 	{
-		if (!getSelectedNotes().empty()) { m_selectedDetuningNotes = getSelectedNotes(); }
-		else if (noteUnderMouse()) { m_selectedDetuningNotes.assign(1, noteUnderMouse()); noteUnderMouse()->setSelected(true); }
-		else { return; }
+		bool notesFound = setupParameterEditNotes(Note::ParameterType::Detuning);
+		if (!notesFound) { return; }
 
-		for (Note* note: m_selectedDetuningNotes)
+		for (Note* note: m_selectedParameterEditNotes)
 		{
 			if (note->detuning() == nullptr)
 			{
@@ -1635,6 +1634,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			}
 		}
 
+		// Let users access automation editor with shift-click
 		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
 		{
 			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
@@ -1644,19 +1644,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 		m_midiClip->addJournalCheckPoint();
 
-		m_detuningDown = true;
-		m_lastDetuneTick = -1;
-		updateDetuningPos(me);
-		return;
-	}
-	else if (m_editMode == EditMode::Detuning && me->button() == Qt::RightButton)
-	{
-		m_midiClip->addJournalCheckPoint();
-
-		m_detuningDownRight = true;
-		m_detuningDown = true;
-		m_lastDetuneTick = -1;
-		updateDetuningPos(me);
+		updateParameterEditPos(me, Note::ParameterType::Detuning);
 		return;
 	}
 
@@ -2314,18 +2302,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if (m_editMode == EditMode::Detuning)
 	{
-		if (m_detuningDown && me->button() & Qt::LeftButton)
-		{
-			for (Note* note: m_selectedDetuningNotes)
-			{
-				note->detuning()->automationClip()->applyDragValue();
-			}
-		}
-		if (me->button() & Qt::RightButton)
-		{
-			m_detuningDownRight = false;
-		}
-		m_detuningDown = false;
+		applyParameterEditPos(me, Note::ParameterType::Detuning);
 	}
 
 	if( me->button() & Qt::RightButton )
@@ -2422,9 +2399,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		updateKnifePos(me, false);
 	}
 
-	if (m_editMode == EditMode::Detuning && m_detuningDown)
+	if (m_editMode == EditMode::Detuning && m_parameterEditDown)
 	{
-		updateDetuningPos(me);
+		updateParameterEditPos(me, Note::ParameterType::Detuning);
 	}
 
 	if( me->y() > PR_TOP_MARGIN || m_action != Action::None )
@@ -2803,9 +2780,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 }
 
 
-void PianoRoll::updateDetuningPos(QMouseEvent* me)
+void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
-	Note* clickedNote = detuningNoteUnderMouse();
+	if (me->type() == QEvent::MouseButtonPress) {
+		m_parameterEditDown = true;
+		m_parameterEditDownRight = me->button() & Qt::RightButton;
+		m_lastParameterEditTick = -1;
+	}
+
+	Note* clickedNote = parameterEditNoteUnderMouse(paramType);
 	if (!clickedNote) { return; }
 
 	int key_num = getKey( me->y() );
@@ -2816,27 +2799,76 @@ void PianoRoll::updateDetuningPos(QMouseEvent* me)
 	int relativeKey = key_num - clickedNote->key();
 
 	AutomationClip::setQuantization(quantization());
-	for (Note* note: m_selectedDetuningNotes)
+	for (Note* note: m_selectedParameterEditNotes)
 	{
-		if (!m_detuningDownRight)
+		AutomationClip * aClip = nullptr;
+		switch (paramType)
 		{
-			note->detuning()->automationClip()->setDragValue(relativePos, relativeKey);
+			case Note::ParameterType::Detuning:
+				aClip = note->detuning()->automationClip();
+				break;
+			default:
+				continue;
+		}
+		if (!m_parameterEditDownRight)
+		{
+			aClip->setDragValue(relativePos, relativeKey);
 		}
 		else
 		{
-			if (m_lastDetuneTick != -1)
+			if (m_lastParameterEditTick != -1)
 			{
-				note->detuning()->automationClip()->removeNodes(m_lastDetuneTick - clickedNote->pos(), relativePos);
+				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
 			}
 			else
 			{
-				note->detuning()->automationClip()->removeNode(relativePos);
+				aClip->removeNode(relativePos);
 			}
 		}
 	}
-	m_lastDetuneTick = pos_ticks;
+	m_lastParameterEditTick = pos_ticks;
 }
 
+void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
+{
+	if (m_parameterEditDown && me->button() & Qt::LeftButton)
+	{
+		for (Note* note: m_selectedParameterEditNotes)
+		{
+			AutomationClip * aClip = nullptr;
+			switch (paramType)
+			{
+				case Note::ParameterType::Detuning:
+					aClip = note->detuning()->automationClip();
+					break;
+				default:
+					continue;
+			}
+			aClip->applyDragValue();
+		}
+	}
+	if (me->button() & Qt::RightButton)
+	{
+		m_parameterEditDownRight = false;
+	}
+	m_parameterEditDown = false;
+}
+
+bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
+{
+	if (!getSelectedNotes().empty())
+	{
+		m_selectedParameterEditNotes = getSelectedNotes();
+		return true;
+	}
+	else if (noteUnderMouse())
+	{
+		m_selectedParameterEditNotes.assign(1, noteUnderMouse());
+		noteUnderMouse()->setSelected(true);
+		return true;
+	}
+	return false;
+}
 
 
 void PianoRoll::updateKnifePos(QMouseEvent* me, bool initial)
@@ -4801,7 +4833,7 @@ Note * PianoRoll::noteUnderMouse()
 }
 
 
-Note * PianoRoll::detuningNoteUnderMouse()
+Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 {
 	QPoint pos = mapFromGlobal( QCursor::pos() );
 
@@ -4816,18 +4848,29 @@ Note * PianoRoll::detuningNoteUnderMouse()
 	int key_num = getKey( pos.y() );
 	int pos_ticks = (pos.x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-	// Loop through all detuning notes
+	// Loop through all parameter edit notes
 	int minDifference = -1;
 	Note* closestNote = nullptr;
-	for(Note* note : m_selectedDetuningNotes)
+	for(Note* note : m_selectedParameterEditNotes)
 	{
 		if (pos_ticks < note->pos() || pos_ticks > note->endPos()) { continue; }
 		// Get realtive position
 		TimePos relativePos = pos_ticks - note->pos();
 		// Get relative key
 		int relativeKey = key_num - note->key();
-		// Calculate distance to detuning curve
-		int differenceFromCurve = std::abs(relativeKey - note->detuning()->automationClip()->valueAt(relativePos));
+		// Calculate distance to parameter curve
+		AutomationClip* aClip = nullptr;
+		switch (paramType)
+		{
+			case Note::ParameterType::Detuning:
+				aClip = note->detuning()->automationClip();
+				break;
+			default:
+				continue;
+		}
+		if (aClip == nullptr) { continue; }
+
+		int differenceFromCurve = std::abs(relativeKey - aClip->valueAt(relativePos));
 		if (differenceFromCurve < minDifference || minDifference == -1)
 		{
 			minDifference = differenceFromCurve;

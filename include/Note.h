@@ -117,6 +117,11 @@ public:
 	Type type() const { return m_type; }
 	inline void setType(Type t) { m_type = t; }
 
+	enum class ParameterType
+	{
+		Detuning = 0
+	};
+
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
 	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
