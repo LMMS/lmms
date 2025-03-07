@@ -2847,10 +2847,7 @@ void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType param
 			aClip->applyDragValue();
 		}
 	}
-	if (me->button() & Qt::RightButton)
-	{
-		m_parameterEditDownRight = false;
-	}
+	m_parameterEditDownRight = !(me->button() & Qt::RightButton)
 	m_parameterEditDown = false;
 }
 
