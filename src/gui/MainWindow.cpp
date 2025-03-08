@@ -113,7 +113,7 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing file browsers"));
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Favorites, ConfigManager::inst()->favoriteItems().join("*"), FileItem::defaultFilters(), "My Favorites",
-		embed::getIconPixmap("hq_mode").transformed(QTransform().rotate(90).scale(1.5, 1.5)), splitter, false, "", ""));
+		embed::getIconPixmap("star").transformed(QTransform().rotate(90)), splitter, false, "", ""));
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
 		confMgr->userProjectsDir() + "*" + confMgr->factoryProjectsDir(), "*.mmp *.mmpz *.xml *.mid *.mpt",

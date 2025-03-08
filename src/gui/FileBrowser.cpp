@@ -673,12 +673,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
 			contextMenu.addAction(
-				QIcon(embed::getIconPixmap("hq_mode")), tr("Remove favorite file"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+				QIcon(embed::getIconPixmap("star")), tr("Remove favorite file"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
 		}
 		else
 		{
 			contextMenu.addAction(
-				QIcon(embed::getIconPixmap("hq_mode")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 
 		if (file->isTrack())
@@ -709,11 +709,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
 		{
-			contextMenu.addAction(QIcon(embed::getIconPixmap("hq_mode")), tr("Remove favorite folder"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Remove favorite folder"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
 		}
 		else
 		{
-			contextMenu.addAction(QIcon(embed::getIconPixmap("hq_mode")), tr("Add favorite folder"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Add favorite folder"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 		break;
 	}
