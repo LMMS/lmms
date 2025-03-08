@@ -234,7 +234,6 @@ public:
 
 
 private:
-	void addEntry(const QFileInfo & entry, const QString & path);
 	bool addItems( const QString & path );
 
 
