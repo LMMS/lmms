@@ -26,6 +26,7 @@
 #define LMMS_GUI_VECTORGRAPHMODEL_H
 
 #include <array>
+#include <cinttypes>
 #include <vector>
 
 #include <QCursor>
@@ -56,22 +57,22 @@ class LMMS_EXPORT VectorGraphModel : public Model, public JournallingObject
 {
 Q_OBJECT
 public:
-	VectorGraphModel(unsigned int arrayMaxLength, Model* parent, bool defaultConstructed);
+	VectorGraphModel(size_t arrayMaxLength, Model* parent, bool defaultConstructed);
 	~VectorGraphModel();
 
 	inline size_t getDataArraySize()
 	{
 		return m_dataArrays.size();
 	}
-	inline VectorGraphDataArray* getDataArray(unsigned int arrayLocation)
+	inline VectorGraphDataArray* getDataArray(size_t arrayLocation)
 	{
 		return &m_dataArrays[arrayLocation];
 	}
-	inline unsigned int getMaxLength()
+	inline size_t getMaxLength()
 	{
 		return m_maxLength;
 	}
-	inline void setMaxLength(unsigned int arrayMaxLength)
+	inline void setMaxLength(size_t arrayMaxLength)
 	{
 		if (m_maxLength != arrayMaxLength)
 		{
@@ -81,10 +82,10 @@ public:
 		}
 	}
 	// returns added VectorGraphDataArray location
-	unsigned int addDataArray();
+	size_t addDataArray();
 	// deletes VectorGraphDataArray at arrayLocation
 	// preservs the order
-	void deleteDataArray(unsigned int arrayLocation);
+	void deleteDataArray(size_t arrayLocation);
 	inline void clearDataArray()
 	{
 		m_dataArrays.clear();
@@ -129,7 +130,7 @@ public slots:
 private:
 
 	std::vector<VectorGraphDataArray> m_dataArrays;
-	unsigned int m_maxLength;
+	size_t m_maxLength;
 
 	// block threads that want to access
 	// a dataArray's getSamples() at the same time
@@ -202,7 +203,7 @@ public:
 	int add(float newX);
 	// checks m_isFixedSize (== false)
 	// deletes the point in pointLocation location
-	void deletePoint(unsigned int pointLocation);
+	void deletePoint(size_t pointLocation);
 	// clears m_dataArray without any checks
 	inline void clear()
 	{
@@ -224,46 +225,46 @@ public:
 
 
 	// get attribute: -------------------
-	inline float getX(unsigned int pointLocation)
+	inline float getX(size_t pointLocation)
 	{
 		return m_dataArray[pointLocation].m_x;
 	}
-	inline float getY(unsigned int pointLocation)
+	inline float getY(size_t pointLocation)
 	{
 		return m_dataArray[pointLocation].m_y;
 	}
-	inline float getC(unsigned int pointLocation)
+	inline float getC(size_t pointLocation)
 	{
 		return m_dataArray[pointLocation].m_c;
 	}
-	inline float getValA(unsigned int pointLocation)
+	inline float getValA(size_t pointLocation)
 	{
 		return m_dataArray[pointLocation].m_valA;
 	}
-	inline float getValB(unsigned int pointLocation)
+	inline float getValB(size_t pointLocation)
 	{
 		return m_dataArray[pointLocation].m_valB;
 	}
-	inline unsigned int getType(unsigned int pointLocation)
+	inline unsigned int getType(size_t pointLocation)
 	{
 		return m_dataArray[pointLocation].m_type;
 	}
 	// returns attribLocation: 0 = m_y, 1 = m_c, 2 = m_valA, 3 = m_valB (int VectorGraphPoint)
-	unsigned int getAutomatedAttribLocation(unsigned int pointLocation);
-	unsigned int getEffectedAttribLocation(unsigned int pointLocation);
+	uint8_t getAutomatedAttribLocation(size_t pointLocation);
+	uint8_t getEffectedAttribLocation(size_t pointLocation);
 	// returns true when m_effectPoints is true or
 	// when getEffectedAttribLocation() > 0 (y is uneffected)
-	bool getEffectPoints(unsigned int pointLocation);
+	bool getEffectPoints(size_t pointLocation);
 	// returns true when m_effectLines is true and
 	// when getEffectedAttribLocation() == 0 (y is effected)
-	bool getEffectLines(unsigned int pointLocation);
+	bool getEffectLines(size_t pointLocation);
 	// returns the effect type of the selected id or slot
 	// effectSlot: which effect slot (m_effectTypeA / B / C)
-	unsigned int getEffect(unsigned int pointLocation, unsigned int effectSlot);
+	unsigned int getEffect(size_t pointLocation, size_t effectSlot);
 	// true when the automationModel's value changed since last check
-	bool getIsAutomationValueChanged(unsigned int pointLocation);
+	bool getIsAutomationValueChanged(size_t pointLocation);
 	// can return nullptr
-	FloatModel* getAutomationModel(unsigned int pointLocation);
+	FloatModel* getAutomationModel(size_t pointLocation);
 
 
 	// get: -------------------
@@ -277,7 +278,7 @@ public:
 
 	// returns the latest updated graph values
 	// targetSizeIn is the retuned vector's size
-	void getSamples(unsigned int targetSizeIn, std::vector<float>* sampleBufferOut);
+	void getSamples(size_t targetSizeIn, std::vector<float>* sampleBufferOut);
 	// returns m_bakedSamples without updating
 	void getLastSamples(std::vector<float>* sampleBufferOut);
 	std::vector<int> getEffectorArrayLocations();
@@ -296,49 +297,49 @@ public:
 	// ()the std::vector<PointF>* inputDataArray modifies the array)
 	void setDataArray(std::vector<PointF>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
 	void setDataArray(std::vector<float>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
-	void setDataArray(float* inputDataArray, unsigned int size, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
+	void setDataArray(float* inputDataArray, size_t size, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
 
 
 	// set attribute: -------------------
 	// checks m_isFixedX (== false)
 	// sets x position, returns final location
 	// returns the location of found point if there is a point already at newX
-	unsigned int setX(unsigned int pointLocation, float newX);
+	size_t setX(size_t pointLocation, float newX);
 	// checks m_isFixedY (== false)
 	// sets y position
-	void setY(unsigned int pointLocation, float newY);
+	void setY(size_t pointLocation, float newY);
 	// checks m_isEditableAttrib
 	// sets curve
-	void setC(unsigned int pointLocation, float newC);
+	void setC(size_t pointLocation, float newC);
 	// checks m_isEditableAttrib
 	// sets 1. attribute value
-	void setValA(unsigned int pointLocation, float fValue);
+	void setValA(size_t pointLocation, float fValue);
 	// checks m_isEditableAttrib
 	// sets 2. attribute value
-	void setValB(unsigned int pointLocation, float fValue);
+	void setValB(size_t pointLocation, float fValue);
 	// checks m_isEditableAttrib
 	// sets line type
-	void setType(unsigned int pointLocation, unsigned int newType);
+	void setType(size_t pointLocation, unsigned int newType);
 	// checks m_isAutomatable and m_isEditableAttrib
 	// sets what attribute gets automated (by point's FloatModel)
-	void setAutomatedAttrib(unsigned int pointLocation, unsigned int attribLocation);
+	void setAutomatedAttrib(size_t pointLocation, uint8_t attribLocation);
 	// checks m_isEffectable and m_isEditableAttrib
 	// sets what attribute gets effected (by effector array)
-	void setEffectedAttrib(unsigned int pointLocation, unsigned int attribLocation);
+	void setEffectedAttrib(size_t pointLocation, uint8_t attribLocation);
 	// checks m_isEffectable and m_isEditableAttrib
 	// if bValue is true then the effector array will effect the point's attributes
-	void setEffectPoints(unsigned int pointLocation, bool bValue);
+	void setEffectPoints(size_t pointLocation, bool bValue);
 	// checks m_isEffectable and m_isEditableAttribs
 	// if bValue is true then the effector array will effect the line's individual samples (only when y is effected)
-	void setEffectLines(unsigned int pointLocation, bool bValue);
+	void setEffectLines(size_t pointLocation, bool bValue);
 	// checks m_isEffectable and m_isEditableAttrib
 	// sets the point's effect type
 	// effectSlot: which effect slot (m_effectTypeA / B / C), effectType: what kind of effect (add, exct)
-	void setEffect(unsigned int pointLocation, unsigned int effectSlot, unsigned int effectType);
+	void setEffect(size_t pointLocation, size_t effectSlot, unsigned int effectType);
 	// checks m_isAutomatable
 	// if bValue is true then make a new FloatModel and connect it, else delete
 	// the currently used FloatModel
-	void setAutomated(unsigned int pointLocation, bool bValue);
+	void setAutomated(size_t pointLocation, bool bValue);
 
 
 // signals: // not qt
@@ -356,7 +357,7 @@ private:
 	// encodes m_dataArray to QString
 	QString getSavedDataArray();
 	// decodes and sets m_dataArray from QString
-	void loadDataArray(QString data, unsigned int arraySize, bool callDataChanged);
+	void loadDataArray(QString data, size_t arraySize, bool callDataChanged);
 
 	class VectorGraphPoint
 	{
@@ -392,7 +393,9 @@ private:
 		// the effected attrib location is
 		// stored here
 		// use getAutomatedAttrib or getEffectedAttrib to get it
-		unsigned int m_automatedEffectedAttribLocations = 0;
+		//unsigned int m_automatedEffectedAttribLocations = 0;
+		uint8_t m_automatedAttribute = 0;
+		uint8_t m_effectedAttribute = 0;
 
 		// what effect will be applyed if effected
 		// effects:
@@ -427,14 +430,14 @@ private:
 	void deleteAutomationModel(int modelLocation, bool callDataChanged);
 	// swapping values, "shouldShiftBetween" moves the values (between) once left or right to keep the order
 	// handle m_isFixedEndPoints when using this
-	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool shouldShiftBetween);
+	void swap(size_t pointLocationA, size_t pointLocationB, bool shouldShiftBetween);
 
 	// returns effected attribute value from base attribValue (input attribute value), does clamp
 	// this function applies the point Effects (like add effect) based on attribValue and effectValue
-	float processEffect(unsigned int pointLocation, float attribValue, unsigned int attribLocation, float effectValue);
-	float processSingleEffect(unsigned int pointLocation, unsigned int effectSlot, float attribValue, float effectValue);
+	float processEffect(size_t pointLocation, float attribValue, uint8_t attribLocation, float effectValue);
+	float processSingleEffect(size_t pointLocation, size_t effectSlot, float attribValue, float effectValue);
 	// returns automated attribute value from base attribValue (input attribute value), does clamp
-	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
+	float processAutomation(size_t pointLocation, float attribValue, uint8_t attribLocation);
 
 	// line types, m_type is used for this
 	// fadeInStartVal: from what relative x value should the line type fade out
@@ -443,24 +446,24 @@ private:
 	// startLoc: from where to apply line type
 	// endLoc: where to stop applying line type
 	// other inputs: mostly between -1 and 1
-	void processBezier(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	void processBezier(std::vector<float>* samplesOut, std::vector<float>* xArray, size_t startLoc, size_t endLoc,
 		float yBefore, float yAfter, float targetYBefore, float targetYAfter, float curveStrength);
-	void processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	void processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, size_t startLoc, size_t endLoc,
 		float sineAmp, float sineFreq, float fadeInStartVal);
-	void processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	void processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, size_t startLoc, size_t endLoc,
 		float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal);
-	void processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	void processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, size_t startLoc, size_t endLoc,
 		float peakAmp, float peakX, float peakWidth, float fadeInStartVal);
-	void processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	void processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, size_t startLoc, size_t endLoc,
 		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartVal);
-	void processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	void processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, size_t startLoc, size_t endLoc,
 		float randomAmp, float randomCount, float randomSeed, float fadeInStartVal);
 
 	// updating
 	// adds the m_dataArray points that are
 	// effected by the changed effector array points.
 	// ONLY WORKS IN SORTED ARRAYS
-	void getUpdatingFromEffector(std::vector<unsigned int>* effectorUpdatedPoints);
+	void getUpdatingFromEffector(std::vector<size_t>* effectorUpdatedPoints);
 	// if pointLocation >= 0 -> adds the location to m_needsUpdating
 	// else it will update the whole m_dataArray and m_bakedSamples
 	// changes in the size of m_dataArray (addtition, deletion, ect.)
@@ -474,12 +477,12 @@ private:
 	void getUpdatingOriginals();
 
 	// real getSamples processing
-	void getSamplesInner(unsigned int targetSizeIn, bool* isChangedOut,
-		std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
+	void getSamplesInner(size_t targetSizeIn, bool* isChangedOut,
+		std::vector<size_t>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// redraw lines
 	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
-		std::vector<float>* sampleXLocations, unsigned int pointLocation, float stepSize);
-	bool isEffectedPoint(unsigned int pointLocation);
+		std::vector<float>* sampleXLocations, size_t pointLocation, float stepSize);
+	bool isEffectedPoint(size_t pointLocation);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
 	void formatDataArrayEndPoints();
@@ -550,7 +553,7 @@ private:
 	// unsorted array of locations in m_dataArray
 	// that need to be updated
 	// sorted in getUpdatingOriginals() because some functions need this to be sorted
-	std::vector<unsigned int> m_needsUpdating;
+	std::vector<size_t> m_needsUpdating;
 
 	// this stores all the FloatModels, unsorted, should only contain currently used FloatModels
 	// used for automation
