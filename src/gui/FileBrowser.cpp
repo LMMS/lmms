@@ -667,6 +667,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
+		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
@@ -674,12 +675,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
 			contextMenu.addAction(
-				tr("Remove favorite file"), [&] { ConfigManager::inst()->removeFavoriteItem(file->fullName()); });
+				tr("Remove favorite file"), [&] { ConfigManager::inst()->removeFavoriteItem(path); });
 		}
 		else
 		{
 			contextMenu.addAction(
-				tr("Add favorite file"), [&] { ConfigManager::inst()->addFavoriteItem(file->fullName()); });
+				tr("Add favorite file"), [&] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 
 		if (file->isTrack())
@@ -702,17 +703,19 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
+		const auto path = QFileInfo{dir->fullName()}.absoluteFilePath();
+
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
 
 		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
 		{
-			contextMenu.addAction(tr("Remove favorite folder"), [&] { ConfigManager::inst()->removeFavoriteItem(dir->fullName()); });
+			contextMenu.addAction(tr("Remove favorite folder"), [&] { ConfigManager::inst()->removeFavoriteItem(path); });
 		}
 		else
 		{
-			contextMenu.addAction(tr("Add favorite folder"), [&] { ConfigManager::inst()->addFavoriteItem(dir->fullName()); });
+			contextMenu.addAction(tr("Add favorite folder"), [&] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 		break;
 	}
