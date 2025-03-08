@@ -735,7 +735,7 @@ void graphModel::clearInvisible()
 void graphModel::drawSampleAt( int x, float val )
 {
 	//snap to the grid
-	val -= ( m_step != 0.0 ) ? fmod( val, m_step ) * m_step : 0;
+	val -= (m_step != 0.0) ? std::fmod(val, m_step) * m_step : 0;
 
 	// boundary crop
 	x = qMax( 0, qMin( length()-1, x ) );

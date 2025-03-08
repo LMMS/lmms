@@ -374,7 +374,7 @@ int main( int argc, char * * argv )
 					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
-	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
+	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
 	// second of two command-line parsing stages
@@ -574,9 +574,7 @@ int main( int argc, char * * argv )
 
 			if( br >= 64 && br <= 384 )
 			{
-				OutputSettings::BitRateSettings bitRateSettings = os.getBitRateSettings();
-				bitRateSettings.setBitRate(br);
-				os.setBitRateSettings(bitRateSettings);
+				os.setBitrate(br);
 			}
 			else
 			{
