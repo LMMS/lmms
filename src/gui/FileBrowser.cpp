@@ -355,21 +355,19 @@ void FileBrowser::reloadTree()
 			break;
 		case Type::Favorites:
 			auto info = QFileInfo{path};
-			auto item = static_cast<QTreeWidgetItem*>(nullptr);
 
 			if (info.isDir())
 			{
 				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
 				dir->update();
-				item = dir;
+				m_fileBrowserTreeWidget->addTopLevelItem(dir);
 			}
 			else if (info.isFile())
 			{
 				auto file = new FileItem(info.fileName(), info.path());
-				item = file;
+				m_fileBrowserTreeWidget->addTopLevelItem(file);
 			}
 
-			m_fileBrowserTreeWidget->addTopLevelItem(item);
 			break;
 		}
 	}
