@@ -48,7 +48,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
 	m_vectorGraphModel(1024, this, false),
-	m_clipModel( false, this ),
+	m_clipModel(false, this),
 	m_vectorGraphSampleBuffer(200)
 {
 	size_t arrayLocation = m_vectorGraphModel.addDataArray();
@@ -91,7 +91,7 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 		if (m_vectorGraphModel.getDataArraySize() > 0)
 		{
 			int size = 0;
-			char * dst = 0;
+			char* dst = nullptr;
 			base64::decode(_this.attribute("waveShape"), &dst, &size);
 			float* graphSampleArray = (float*)dst;
 
