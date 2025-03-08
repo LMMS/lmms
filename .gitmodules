@@ -49,4 +49,4 @@
 	url = https://github.com/LostRobotMusic/hiir
 [submodule "plugins/MidiImport/portsmf"]
 	path = plugins/MidiImport/portsmf
-	url = https://github.com/rbdannenberg/portsmf
+	url = https://github.com/rubiefawn/portsmf
