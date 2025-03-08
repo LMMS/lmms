@@ -753,9 +753,8 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	return result;
 }
 
-void FileBrowserTreeWidget::addFavorite(QString item)
+void FileBrowserTreeWidget::addFavorite(const QString& path)
 {
-	item = ConfigManager::removeTrailingSeparators(item);
 	ConfigManager::addFavoriteItem(item);
 	FileBrowser::getFavoritesBrowserInstance()->reloadTree();
 }
