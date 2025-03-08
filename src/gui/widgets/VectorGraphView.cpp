@@ -44,8 +44,8 @@ namespace lmms
 
 namespace gui
 {
-VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
-	unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors) :
+VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHeight, size_t pointSize,
+	size_t controlHeight, bool shouldApplyDefaultVectorGraphColors) :
 		VectorGraphViewBase(parent),
 		ModelView(new VectorGraphModel(2048, nullptr, false), this),
 		m_controlDialog(getGUI()->mainWindow()->addWindowedWidget(new VectorGraphControlDialog(this, this)))
@@ -107,7 +107,7 @@ VectorGraphView::~VectorGraphView()
 	}
 }
 
-void VectorGraphView::setLineColor(QColor color, unsigned int dataArrayLocation)
+void VectorGraphView::setLineColor(QColor color, size_t dataArrayLocation)
 {
 	if (model()->getDataArraySize() > dataArrayLocation)
 	{
@@ -115,7 +115,7 @@ void VectorGraphView::setLineColor(QColor color, unsigned int dataArrayLocation)
 		updateGraph();
 	}
 }
-void VectorGraphView::setActiveColor(QColor color, unsigned int dataArrayLocation)
+void VectorGraphView::setActiveColor(QColor color, size_t dataArrayLocation)
 {
 	if (model()->getDataArraySize() > dataArrayLocation)
 	{
@@ -123,7 +123,7 @@ void VectorGraphView::setActiveColor(QColor color, unsigned int dataArrayLocatio
 		updateGraph();
 	}
 }
-void VectorGraphView::setFillColor(QColor color, unsigned int dataArrayLocation)
+void VectorGraphView::setFillColor(QColor color, size_t dataArrayLocation)
 {
 	if (model()->getDataArraySize() > dataArrayLocation)
 	{
@@ -131,7 +131,7 @@ void VectorGraphView::setFillColor(QColor color, unsigned int dataArrayLocation)
 		updateGraph();
 	}
 }
-void VectorGraphView::setAutomatedColor(QColor color, unsigned int dataArrayLocation)
+void VectorGraphView::setAutomatedColor(QColor color, size_t dataArrayLocation)
 {
 	if (model()->getDataArraySize() > dataArrayLocation)
 	{
@@ -142,7 +142,7 @@ void VectorGraphView::setAutomatedColor(QColor color, unsigned int dataArrayLoca
 void VectorGraphView::applyDefaultColors()
 {
 	m_isDefaultColorsApplyed = true;
-	unsigned int size = model()->getDataArraySize();
+	size_t size = model()->getDataArraySize();
 	if (size > 0)
 	{
 		setLineColor(m_vectorGraphDefaultLineColor, 0);
@@ -158,12 +158,12 @@ void VectorGraphView::applyDefaultColors()
 		}
 	}
 }
-void VectorGraphView::setPointSize(unsigned int pointSize)
+void VectorGraphView::setPointSize(size_t pointSize)
 {
 	m_pointSize = pointSize;
 	updateGraph();
 }
-void VectorGraphView::setControlHeight(unsigned int controlHeight)
+void VectorGraphView::setControlHeight(size_t controlHeight)
 {
 	m_controlHeight = controlHeight;
 	updateGraph();
@@ -448,7 +448,7 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 			if (success == false)
 			{
 				// trying to add to all the selected arrays
-				for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
+				for(size_t i = 0; i < model()->getDataArraySize(); i++)
 				{
 					success = addPoint(i, x, m_graphHeight - y);
 					if (success == true)
@@ -542,7 +542,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	{
 		// updating arrays that do not effect other arrays first
 		// (this step will run getSamples() on effector arrays (-> every array will be updated about once))
-		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+		for (size_t i = 0; i < model()->getDataArraySize(); i++)
 		{
 			if (model()->getDataArray(i)->getIsAnEffector() == false)
 			{
@@ -571,13 +571,13 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	emit drawn();
 }
 
-void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::vector<float>* sampleBuffer)
+void VectorGraphView::paintGraph(QPainter* p, size_t arrayLocation, std::vector<float>* sampleBuffer)
 {
 #ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
 	qDebug("paintGraph start: data arrayLocation: %d", arrayLocation);
 #endif
 	VectorGraphDataArray* dataArray = model()->getDataArray(arrayLocation);
-	unsigned int length = dataArray->size();
+	size_t length = dataArray->size();
 	if (length <= 0) { return; }
 
 	p->setPen(QPen(*dataArray->getLineColor(), 2));
@@ -596,7 +596,7 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 		// get the currently drawed VectorGraphDataArray samples
 		dataArray->getLastSamples(sampleBuffer);
 
-		for (unsigned int j = 0; j < sampleBuffer->size(); j++)
+		for (size_t j = 0; j < sampleBuffer->size(); j++)
 		{
 			// if nonNegative then only the dataArray output (getDataValues)
 			// is bigger than 0 so it matters only here
@@ -643,7 +643,7 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 		QColor automatedFillColor(getFillColorFromBaseColor(*dataArray->getAutomatedColor()));
 		bool drawPoints = dataArray->getIsSelectable() && width() / length > m_pointSize * 2;
 		bool resetColor = false;
-		for (unsigned int j = 0; j < length; j++)
+		for (size_t j = 0; j < length; j++)
 		{
 			posB = mapDataPos(dataArray->getX(j), dataArray->getY(j), false);
 			// draw point
@@ -718,7 +718,7 @@ void VectorGraphView::paintEditing(QPainter* p)
 		int segmentLength = width() / (m_controlDisplayCount);
 		// draw inputs
 		p->setPen(QPen(textColor, 1));
-		for (unsigned int i = 0; i < m_controlDisplayCount; i++)
+		for (size_t i = 0; i < m_controlDisplayCount; i++)
 		{
 			QColor curForeColor = *dataArray->getFillColor();
 			p->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curForeColor);
@@ -805,7 +805,7 @@ PointInt VectorGraphView::mapDataCurvePos(int xA, int yA, int xB, int yB, float 
 		(xA + xB) / 2,
 		yA + static_cast<int>((curve / 2.0f + 0.5f) * (yB - yA)));
 }
-int VectorGraphView::mapControlInputX(float inputValue, unsigned int displayLength)
+int VectorGraphView::mapControlInputX(float inputValue, size_t displayLength)
 {
 	return (inputValue / 2.0f + 0.5f) * displayLength;
 }
@@ -819,7 +819,7 @@ float VectorGraphView::getDistanceF(float xA, float yA, float xB, float yB)
 	return std::sqrt((xA - xB) * (xA - xB) + (yA - yB) * (yA - yB));
 }
 
-bool VectorGraphView::addPoint(unsigned int arrayLocation, int mouseX, int mouseY)
+bool VectorGraphView::addPoint(size_t arrayLocation, int mouseX, int mouseY)
 {
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 	qDebug("addPoint: arrayLocation: %d, position (x, y): %d, %d", arrayLocation, mouseX, mouseY);
@@ -890,7 +890,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 		else if (pressLocation == 1)
 		{
 			// if the "switch graph" button was pressed in editing mode
-			unsigned int oldSelectedArray = m_selectedArray;
+			size_t oldSelectedArray = m_selectedArray;
 			m_selectedLocation = 0;
 			m_selectedArray = 0;
 			m_isLastSelectedArray = false;
@@ -900,7 +900,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 
 			// looping throught the data arrays to get a new
 			// selected data array
-			for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+			for (size_t i = 0; i < model()->getDataArraySize(); i++)
 			{
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 				qDebug("mouseReleaseEvent select dataArray: i: [%d], m_selectedArray: %d, oldSelectedArray: %d", i, m_selectedArray, oldSelectedArray);
@@ -952,7 +952,7 @@ int VectorGraphView::getPressedControlInput(int mouseX, int mouseY, size_t contr
 	}
 	return output;
 }
-float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation)
+float VectorGraphView::getInputAttribValue(size_t controlArrayLocation)
 {
 	float output = 0.0f;
 	if (m_isSelected == false) { return output; }
@@ -1004,7 +1004,7 @@ float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocation)
 	}
 	return output;
 }
-void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, float floatValue)
+void VectorGraphView::setInputAttribValue(size_t controlArrayLocation, float floatValue)
 {
 #ifdef VECTORGRAPH_DEBUG_USER_INTERACTION
 	qDebug("setInputAttribute start: control input: %d, set floatValue: %f", controlArrayLocation, floatValue);
@@ -1012,7 +1012,7 @@ void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, flo
 	if (m_isSelected == false) { return; }
 
 	float clampedValue = std::clamp(floatValue, -1.0f, 1.0f);
-	unsigned int clampedValueB = 0;
+	size_t clampedValueB = 0;
 	switch (controlArrayLocation)
 	{
 		case 0:
@@ -1032,29 +1032,29 @@ void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocation, flo
 			break;
 		case 5:
 			// type
-			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 6.0f));
+			clampedValueB = static_cast<size_t>(std::clamp(floatValue, 0.0f, 6.0f));
 			model()->getDataArray(m_selectedArray)->setType(m_selectedLocation, clampedValueB);
 			break;
 		case 6:
 			// automation location
-			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 4.0f));
+			clampedValueB = static_cast<size_t>(std::clamp(floatValue, 0.0f, 4.0f));
 			model()->getDataArray(m_selectedArray)->setAutomatedAttrib(m_selectedLocation, clampedValueB);
 			break;
 		case 7:
 			// effect location
-			clampedValueB = static_cast<unsigned int>(std::clamp(floatValue, 0.0f, 4.0f));
+			clampedValueB = static_cast<size_t>(std::clamp(floatValue, 0.0f, 4.0f));
 			model()->getDataArray(m_selectedArray)->setEffectedAttrib(m_selectedLocation, clampedValueB);
 			break;
 		case 8:
-			clampedValueB = static_cast<unsigned int>(floatValue);
+			clampedValueB = static_cast<size_t>(floatValue);
 			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, clampedValueB);
 			break;
 		case 9:
-			clampedValueB = static_cast<unsigned int>(floatValue);
+			clampedValueB = static_cast<size_t>(floatValue);
 			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, clampedValueB);
 			break;
 		case 10:
-			clampedValueB = static_cast<unsigned int>(floatValue);
+			clampedValueB = static_cast<size_t>(floatValue);
 			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, clampedValueB);
 			break;
 		case 11:
@@ -1142,7 +1142,7 @@ void VectorGraphView::selectData(int mouseX, int mouseY)
 		m_isEditingActive = false;
 		//m_isLastSelectedArray = false;
 
-		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+		for (size_t i = 0; i < model()->getDataArraySize(); i++)
 		{
 			VectorGraphDataArray* dataArray = model()->getDataArray(i);
 			if (dataArray->getIsSelectable() == true)
@@ -1162,7 +1162,7 @@ void VectorGraphView::selectData(int mouseX, int mouseY)
 		}
 		if (m_isSelected == false)
 		{
-			for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+			for (size_t i = 0; i < model()->getDataArraySize(); i++)
 			{
 				VectorGraphDataArray* dataArray = model()->getDataArray(i);
 				if (dataArray->getIsSelectable() == true)
