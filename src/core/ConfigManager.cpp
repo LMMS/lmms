@@ -349,10 +349,8 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-void ConfigManager::addFavoriteItem(QString& item)
+void ConfigManager::addFavoriteItem(const QString& path)
 {
-	item = QDir::toNativeSeparators(removeTrailingSeparators(item));
-
 	auto instance = inst();
 	instance->m_favoriteItems.push_back(item);
 	instance->saveConfigFile();
