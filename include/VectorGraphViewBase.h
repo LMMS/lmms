@@ -75,9 +75,9 @@ public:
 	VectorGraphControlDialog(QWidget* parent, VectorGraphView* targetVectorGraphView);
 	~VectorGraphControlDialog();
 
-	// deletes m_curAutomationModelKnob connected to the VectorGraphDataArray::m_automationModelArray
+	//! deletes m_curAutomationModelKnob connected to the VectorGraphDataArray::m_automationModelArray
 	void hideAutomation();
-	// connects or adds m_curAutomationModelKnob to the gui, sets the selected point
+	//! connects or adds m_curAutomationModelKnob to the gui, sets the selected point
 	void switchPoint(size_t selectedArray, size_t selectedLocation);
 
 public slots:
@@ -87,13 +87,13 @@ public slots:
 	void effectedLineClicked(bool isChecked);
 	void deleteAutomationClicked(bool isChecked);
 protected slots:
-	// needs to be used
-	// to not delete this control dialog widget when closing
+	//! needs to be used
+	//! to not delete this control dialog widget when closing
 	void closeEvent(QCloseEvent * ce);
 private:
-	// loads in the selected point's values, settings and attributes
+	//! loads in the selected point's values, settings and attributes
 	void updateControls();
-	// sets the selected point's values to the control knob's values
+	//! sets the selected point's values to the control knob's values
 	void updateVectorGraphAttribs();
 
 	VectorGraphView* m_vectorGraphView;
@@ -101,11 +101,11 @@ private:
 	FloatModel* m_curAutomationModel;
 	Knob* m_curAutomationModelKnob;
 	QVBoxLayout* m_automationLayout;
-	// VectorGraphView should run hideAutomation()
-	// to notify that these are invalid
-	// selected VectorGraphDataArray
+	//! VectorGraphView should run hideAutomation()
+	//! to notify that these are invalid
+	//! selected VectorGraphDataArray
 	size_t m_curSelectedArray;
-	// selected VectorGraphPoint
+	//! selected VectorGraphPoint
 	size_t m_curSelectedLocation;
 	bool m_isValidSelection;
 
