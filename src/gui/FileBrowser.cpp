@@ -77,26 +77,16 @@ enum TreeWidgetItemTypes
 	TypeDirectoryItem
 } ;
 
-FileBrowser* FileBrowser::m_favoritesBrowserInstance = nullptr;
-
-
-FileBrowser::FileBrowser(const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items,
-			const QString& userDir,
-			const QString& factoryDir,
-			const bool isFavoritesBrowser
-			):
-	SideBarWidget(title, pm, parent),
-	m_isFavoritesBrowser(isFavoritesBrowser),
-	m_directories(directories),
-	m_filter(filter),
-	m_dirsAsItems(dirs_as_items),
-	m_userDir(userDir),
-	m_factoryDir(factoryDir)
+FileBrowser::FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
+	QWidget* parent, bool dirs_as_items, const QString& userDir, const QString& factoryDir)
+	: SideBarWidget(title, pm, parent)
+	, m_type(type)
+	, m_directories(directories)
+	, m_filter(filter)
+	, m_dirsAsItems(dirs_as_items)
+	, m_userDir(userDir)
+	, m_factoryDir(factoryDir)
 {
-	if (isFavoritesBrowser) { m_favoritesBrowserInstance = this; }
-
 	setWindowTitle( tr( "Browser" ) );
 
 	addContentCheckBox();
@@ -142,6 +132,11 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	m_previousFilterValue = "";
+
+	if (m_type == Type::Favorites)
+	{
+		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, this, &FileBrowser::reloadTree);
+	}
 
 	reloadTree();
 	show();
@@ -348,21 +343,24 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	if (m_isFavoritesBrowser)
+	switch (m_type)
 	{
-		for (auto& item : ConfigManager::favoriteItems())
-		{
-			QFileInfo entry = QFileInfo(ConfigManager::removeTrailingSeparators(item));
-			addEntry(entry, entry.absoluteDir().absolutePath());
-		}
-	}
+	case Type::Normal:
 
-	if (!paths.isEmpty())
-	{
-		for (const auto& path : paths)
+		if (!paths.isEmpty())
 		{
-			addItems(path);
+			for (const auto& path : paths)
+			{
+				addItems(path);
+			}
 		}
+		break;
+	case Type::Favorites:
+		for (const auto& item : ConfigManager::favoriteItems())
+		{
+			addEntry(QFileInfo{item});
+		}
+		break;
 	}
 
 	if (m_filterEdit->text().isEmpty())
@@ -411,9 +409,7 @@ void FileBrowser::giveFocusToFilter()
 	}
 }
 
-
-
-void FileBrowser::addEntry(const QFileInfo & entry, const QString & path)
+void FileBrowser::addEntry(const QFileInfo& entry)
 {
 	if (excludedPaths().contains(entry.absoluteFilePath())) { return; }
 
@@ -425,10 +421,13 @@ void FileBrowser::addEntry(const QFileInfo & entry, const QString & path)
 		normalizedPath.chop(1); // Remove the last character if it's a '/'
 	}
 
-	// Now get the file name from the normalized path
-	QString fileName = QFileInfo(normalizedPath).fileName();
+	const auto path = entry.absoluteDir().absolutePath();
 
-	if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) return;
+	// Now get the file name from the normalized path
+	const auto fileName = QFileInfo(normalizedPath).fileName();
+
+	if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) { return; }
+
 	if (entry.isDir())
 	{
 		// Merge dirs together
@@ -482,25 +481,25 @@ void FileBrowser::addEntry(const QFileInfo & entry, const QString & path)
 
 void FileBrowser::addItems(const QString & path )
 {
-   if (FileBrowser::excludedPaths().contains(path)) { return; }
+	if (FileBrowser::excludedPaths().contains(path)) { return; }
 
-   if( m_dirsAsItems )
-   {
-	   m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
-	   return;
-   }
+	if (m_dirsAsItems)
+	{
+		m_fileBrowserTreeWidget->addTopLevelItem(new Directory(path, QString(), m_filter));
+		return;
+	}
 
-   // try to add all directories from file system alphabetically into the tree
-   QDir cdir(path);
-   if (!cdir.isReadable()) { return; }
-   QFileInfoList entries = cdir.entryInfoList(
-	   m_filter.split(' '),
-	   dirFilters(),
-	   QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
-   for (const auto& entry : entries)
-   {
-	   addEntry(entry, path);
-   }
+	// try to add all directories from file system alphabetically into the tree
+	QDir cdir(path);
+	if (!cdir.isReadable()) { return; }
+
+	QFileInfoList entries = cdir.entryInfoList(
+		m_filter.split(' '), dirFilters(), QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+
+	for (const auto& entry : entries)
+	{
+		addEntry(entry);
+	}
 }
 
 
@@ -677,13 +676,15 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
 
-		if (isFavorite(file->fullName()))
+		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
-			contextMenu.addAction(tr("Remove favorite file"), [&] { removeFavorite(file->fullName()); });
+			contextMenu.addAction(
+				tr("Remove favorite file"), [&] { ConfigManager::inst()->removeFavoriteItem(file->fullName()); });
 		}
 		else
 		{
-			contextMenu.addAction(tr("Add favorite file"), [&] { addFavorite(file->fullName()); });
+			contextMenu.addAction(
+				tr("Add favorite file"), [&] { ConfigManager::inst()->addFavoriteItem(file->fullName()); });
 		}
 
 		if (file->isTrack())
@@ -711,13 +712,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			FileRevealer::openDir(dir->fullName());
 		});
 
-		if (isFavorite(dir->fullName()))
+		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
 		{
-			contextMenu.addAction(tr("Remove favorite folder"), [&] { removeFavorite(dir->fullName()); });
+			contextMenu.addAction(tr("Remove favorite folder"), [&] { ConfigManager::inst()->removeFavoriteItem(dir->fullName()); });
 		}
 		else
 		{
-			contextMenu.addAction(tr("Add favorite folder"), [&] { addFavorite(dir->fullName()); });
+			contextMenu.addAction(tr("Add favorite folder"), [&] { ConfigManager::inst()->addFavoriteItem(dir->fullName()); });
 		}
 		break;
 	}
@@ -752,25 +753,6 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	return result;
 }
-
-void FileBrowserTreeWidget::addFavorite(const QString& path)
-{
-	ConfigManager::addFavoriteItem(item);
-	FileBrowser::getFavoritesBrowserInstance()->reloadTree();
-}
-
-void FileBrowserTreeWidget::removeFavorite(const QString& path)
-{
-	ConfigManager::removeFavoriteItem(item);
-	FileBrowser::getFavoritesBrowserInstance()->reloadTree();
-}
-
-bool FileBrowserTreeWidget::isFavorite(const QString& path)
-{
-	return ConfigManager::isFavorite(item);
-}
-
-
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {

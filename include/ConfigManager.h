@@ -245,9 +245,9 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	static void addFavoriteItem(const QString& item);
-	static void removeFavoriteItem(QString& item);
-	static bool isFavorite(QString& item);
+	void addFavoriteItem(const QString& item);
+	void removeFavoriteItem(const QString& item);
+	bool isFavoriteItem(const QString& item);
 
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
@@ -268,13 +268,13 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
-	static const QString& removeTrailingSeparators(const QString& path);
 
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();
 
 signals:
 	void valueChanged( QString cls, QString attribute, QString value );
+	void favoritesChanged();
 
 private:
 	static ConfigManager * s_instanceOfMe;
