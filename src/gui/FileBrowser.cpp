@@ -135,7 +135,10 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 
 	if (m_type == Type::Favorites)
 	{
-		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, this, &FileBrowser::reloadTree);
+		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, [this] {
+			m_directories = ConfigManager::favoriteItems().join("*");
+			reloadTree();
+		});
 	}
 
 	reloadTree();
@@ -331,7 +334,7 @@ void FileBrowser::reloadTree()
 
 	m_fileBrowserTreeWidget->clear();
 
-	QStringList paths = m_directories.split('*');
+	auto paths = m_directories.isEmpty() ? QStringList{} : m_directories.split('*');
 
 	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
@@ -343,20 +346,32 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	switch (m_type)
+	for (const auto& path : paths)
 	{
-	case Type::Normal:
-
-		if (!paths.isEmpty())
+		switch (m_type)
 		{
-			for (const auto& path : paths)
+		case Type::Normal:
+			addItems(path);
+			break;
+		case Type::Favorites:
+			auto info = QFileInfo{path};
+			auto item = static_cast<QTreeWidgetItem*>(nullptr);
+
+			if (info.isDir())
 			{
-				addItems(path);
+				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
+				dir->update();
+				item = dir;
 			}
+			else if (info.isFile())
+			{
+				auto file = new FileItem(info.fileName(), info.path());
+				item = file;
+			}
+
+			m_fileBrowserTreeWidget->addTopLevelItem(item);
+			break;
 		}
-		break;
-	case Type::Favorites:
-		break;
 	}
 
 	if (m_filterEdit->text().isEmpty())
