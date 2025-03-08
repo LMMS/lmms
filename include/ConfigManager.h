@@ -245,7 +245,7 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	static void addFavoriteItem(QString& item);
+	static void addFavoriteItem(const QString& item);
 	static void removeFavoriteItem(QString& item);
 	static bool isFavorite(QString& item);
 
@@ -268,7 +268,7 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
-	static const QString& removeTrailingSeparators(QString& path);
+	static const QString& removeTrailingSeparators(const QString& path);
 
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();

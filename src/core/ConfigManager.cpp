@@ -299,18 +299,19 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 	m_backgroundPicFile = backgroundPicFile;
 }
 
-const QString& ConfigManager::removeTrailingSeparators(QString& path)
+const QString& ConfigManager::removeTrailingSeparators(const QString& path)
 {
+	QString res;
 	const QStringList separators = {"/", "\\"};
 
 	while (!path.isEmpty() && std::find_if(separators.begin(), separators.end(), [&](const QString& separator) {
 		return path.endsWith(separator);
 	}) != separators.end())
 	{
-		path.chop(1);
+		res.chop(1);
 	}
 
-	return path;
+	return res;
 }
 
 void ConfigManager::createWorkingDir()
@@ -349,10 +350,10 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-void ConfigManager::addFavoriteItem(const QString& path)
+void ConfigManager::addFavoriteItem(const QString& item)
 {
 	auto instance = inst();
-	instance->m_favoriteItems.push_back(item);
+	instance->m_favoriteItems.push_back(removeTrailingSeparators(item));
 	instance->saveConfigFile();
 }
 
@@ -365,10 +366,11 @@ void ConfigManager::removeFavoriteItem(QString& item)
 	instance->saveConfigFile();
 }
 
-bool ConfigManager::isFavorite(QString & item)
+bool ConfigManager::isFavorite(QString& item)
 {
 	const auto items = inst()->favoriteItems();
-	const auto it = std::find_if(items.begin(), items.end(), [&](const auto& favoriteItem) { return QFileInfo{item} == QFileInfo{favoriteItem}; });
+	const auto it = std::find_if(items.begin(), items.end(),
+		[&](const auto& favoriteItem) { return QFileInfo{item} == QFileInfo{favoriteItem}; });
 	return it != items.end();
 }
 
