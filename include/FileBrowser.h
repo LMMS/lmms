@@ -224,8 +224,7 @@ public:
 		{
 			path += QDir::separator();
 		}
-		return( QDir::cleanPath( path + text( 0 ) ) +
-							QDir::separator() );
+		return QDir::cleanPath(path + text(0));
 	}
 
 	inline void addDirectory( const QString & dir )
