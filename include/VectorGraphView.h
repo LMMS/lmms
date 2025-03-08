@@ -70,17 +70,17 @@ class LMMS_EXPORT VectorGraphView : public VectorGraphViewBase, public ModelView
 	Q_PROPERTY(int fontSize MEMBER m_fontSize)
 public:
 
-	VectorGraphView(QWidget* parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
-		unsigned int controlHeight, bool shouldApplyDefaultVectorGraphColors);
+	VectorGraphView(QWidget* parent, int widgetWidth, int widgetHeight, size_t pointSize,
+		size_t controlHeight, bool shouldApplyDefaultVectorGraphColors);
 	~VectorGraphView();
 
-	void setLineColor(QColor color, unsigned int dataArrayLocation);
-	void setActiveColor(QColor color, unsigned int dataArrayLocation);
-	void setFillColor(QColor color, unsigned int dataArrayLocation);
-	void setAutomatedColor(QColor color, unsigned int dataArrayLocation);
+	void setLineColor(QColor color, size_t dataArrayLocation);
+	void setActiveColor(QColor color, size_t dataArrayLocation);
+	void setFillColor(QColor color, size_t dataArrayLocation);
+	void setAutomatedColor(QColor color, size_t dataArrayLocation);
 	void applyDefaultColors();
-	void setPointSize(unsigned int pointSize);
-	void setControlHeight(unsigned int controlHeight);
+	void setPointSize(size_t pointSize);
+	void setControlHeight(size_t controlHeight);
 
 
 	inline VectorGraphModel* model()
@@ -89,27 +89,27 @@ public:
 	}
 
 
-	// draws estimated line, does not call getSamples()
-	// does not fill graphs with VectorGraphDataArray FillColor
+	//! draws estimated line, does not call getSamples()
+	//! does not fill graphs with VectorGraphDataArray FillColor
 	void setIsSimplified(bool isSimplified);
 	bool getIsSimplified();
 
-	// returns -1.0f at .first when nothing is selected
+	//! returns -1.0f at .first when nothing is selected
 	PointF getSelectedData();
-	// returns -1 it can not return an array location
+	//! returns -1 it can not return an array location
 	int getLastSelectedArray();
-	// sets the position of the currently selected point
+	//! sets the position of the currently selected point
 	void setSelectedData(PointF data);
-	// sets the background pixmap
+	//! sets the background pixmap
 	void setBackground(const QPixmap backgound);
 	
-	// if this function is called
-	// paintEvent will not call getSamples() (optimization)
-	// insted calls getLastSamples
-	// resets after every paint event
+	//! if this function is called
+	//! paintEvent will not call getSamples() (optimization)
+	//! insted calls getLastSamples
+	//! resets after every paint event
 	void useGetLastSamples();
 signals:
-	// emited after paintEvent
+	//! emited after paintEvent
 	void drawn();
 	void changedDefaultColors();
 protected:
@@ -125,89 +125,89 @@ protected slots:
 	void updateGraph(bool shouldUseGetLastSamples);
 	void updateDefaultColors();
 private:
-	void paintGraph(QPainter* p, unsigned int arrayLocation, std::vector<float>* sampleBuffer);
+	void paintGraph(QPainter* p, size_t arrayLocation, std::vector<float>* sampleBuffer);
 	void paintEditing(QPainter* p);
 
 	void modelChanged() override;
 
-	// utility
-	// calculate graph coords from screen space coords
+	//! utility
+	//! calculate graph coords from screen space coords
 	PointF mapMousePos(int x, int y);
-	// calculate gui curve point's position
+	//! calculate gui curve point's position
 	PointF mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve);
 	PointInt mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
-	// calculate screen space coords from graph coords
-	// isNonNegative can only be true when graph line / getSamples() is mapped
+	//! calculate screen space coords from graph coords
+	//! isNonNegative can only be true when graph line / getSamples() is mapped
 	PointInt mapDataPos(float x, float y, bool isNonNegative);
-	// map where each Control is displayed when m_isEdtitingActive is true
-	int mapControlInputX(float inputValue, unsigned int displayLength);
+	//! map where each Control is displayed when m_isEdtitingActive is true
+	int mapControlInputX(float inputValue, size_t displayLength);
 
 	float getDistance(int xA, int yA, int xB, int yB);
 	float getDistanceF(float xA, float yA, float xB, float yB);
 
-	// adds point to the selected VectorGraphDataArray
-	bool addPoint(unsigned int arrayLocation, int mouseX, int mouseY);
+	//! adds point to the selected VectorGraphDataArray
+	bool addPoint(size_t arrayLocation, int mouseX, int mouseY);
 
-	// editing menu / controls
-	// returns true if the graph was clicked
+	//! editing menu / controls
+	//! returns true if the graph was clicked
 	bool isGraphPressed(int mouseY);
-	// returns true if the control window was clicked while in editing mode
+	//! returns true if the control window was clicked while in editing mode
 	bool isControlWindowPressed(int mouseY);
 	void processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving);
-	// returns -1 if no control / input was clicked
-	// returns displayed absolute control / input location based on inputCount
+	//! returns -1 if no control / input was clicked
+	//! returns displayed absolute control / input location based on inputCount
 	int getPressedControlInput(int mouseX, int mouseY, size_t controlCount);
-	// returns a float attrib value
-	float getInputAttribValue(unsigned int controlArrayLocation);
-	// sets the selected point's attrib (controlArrayLocation) to floatValue
-	void setInputAttribValue(unsigned int controlArrayLocation, float floatValue);
-	// calculates the ideal text color
+	//! returns a float attrib value
+	float getInputAttribValue(size_t controlArrayLocation);
+	//! sets the selected point's attrib (controlArrayLocation) to floatValue
+	void setInputAttribValue(size_t controlArrayLocation, float floatValue);
+	//! calculates the ideal text color
 	QColor getTextColorFromBaseColor(QColor baseColor);
-	// calculates a replacement background fill color
+	//! calculates a replacement background fill color
 	QColor getFillColorFromBaseColor(QColor baseColor);
 
 	SubWindow* m_controlDialog;
 
-	// selection
-	// searches VectorGraphDataArray-s to select
-	// near clicked location
+	//! selection
+	//! searches VectorGraphDataArray-s to select
+	//! near clicked location
 	void selectData(int mouseX, int mouseY);
-	// searches for point in a given VectorGraphDataArray
-	// returns found location, when a point
-	// was found in the given distance
-	// else it returns -1
+	//! searches for point in a given VectorGraphDataArray
+	//! returns found location, when a point
+	//! was found in the given distance
+	//! else it returns -1
 	int searchForData(int mouseX, int mouseY, float maxDistance, VectorGraphDataArray* dataArray, bool isCurved);
 
-	// if the mouse is not moved
+	//! if the mouse is not moved
 	bool m_mousePress;
-	// decides addition or deletion
+	//! decides addition or deletion
 	bool m_addition;
 
-	// radius, rx = ry
-	unsigned int m_pointSize;
-	unsigned int m_fontSize;
-	// draw simplified lines
+	//! radius, rx = ry
+	size_t m_pointSize;
+	size_t m_fontSize;
+	//! draw simplified lines
 	bool m_isSimplified;
-	// true when applyDefaultColors is called, used when defaultColors are loading
+	//! true when applyDefaultColors is called, used when defaultColors are loading
 	bool m_isDefaultColorsApplyed;
 	QPixmap m_background;
-	// for 1 draw, it will use the VectorGraphDataArray
-	// m_bakedSamples without calling getSamples()
+	//! for 1 draw, it will use the VectorGraphDataArray
+	//! m_bakedSamples without calling getSamples()
 	bool m_useGetLastSamples;
 
-	// if m_isLastSelectedArray == true then
-	// m_selectedArray can be used
-	// else if m_isSelected == false then
-	// m_selectedLocation and m_selectedArray should not be used
-	unsigned int m_selectedLocation;
-	unsigned int m_selectedArray;
+	//! if m_isLastSelectedArray == true then
+	//! m_selectedArray can be used
+	//! else if m_isSelected == false then
+	//! m_selectedLocation and m_selectedArray should not be used
+	size_t m_selectedLocation;
+	size_t m_selectedArray;
 	bool m_isSelected;
 	bool m_isCurveSelected;
-	// if m_selectedArray was the last array selected
+	//! if m_selectedArray was the last array selected
 	bool m_isLastSelectedArray;
 
-	unsigned int m_graphHeight;
-	unsigned int m_controlHeight;
+	size_t m_graphHeight;
+	size_t m_controlHeight;
 	// displayed control count
 	size_t m_controlDisplayCount;
 	bool m_isEditingActive;
@@ -219,8 +219,8 @@ private:
 	PointInt m_lastTrackPoint;
 	PointInt m_lastScndTrackPoint;
 
-	// default VectorGraphDataArray colors
-	// applyed in constructor
+	//! default VectorGraphDataArray colors
+	//! applyed in constructor
 	QColor m_vectorGraphDefaultAutomatedColor;
 
 	QColor m_vectorGraphDefaultLineColor;
