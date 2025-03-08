@@ -1033,29 +1033,29 @@ void VectorGraphView::setInputAttribValue(size_t controlArrayLocation, float flo
 		case 5:
 			// type
 			clampedValueB = static_cast<size_t>(std::clamp(floatValue, 0.0f, 6.0f));
-			model()->getDataArray(m_selectedArray)->setType(m_selectedLocation, clampedValueB);
+			model()->getDataArray(m_selectedArray)->setType(m_selectedLocation, static_cast<unsigned int>(clampedValueB));
 			break;
 		case 6:
 			// automation location
 			clampedValueB = static_cast<size_t>(std::clamp(floatValue, 0.0f, 4.0f));
-			model()->getDataArray(m_selectedArray)->setAutomatedAttrib(m_selectedLocation, clampedValueB);
+			model()->getDataArray(m_selectedArray)->setAutomatedAttrib(m_selectedLocation, static_cast<uint8_t>(clampedValueB));
 			break;
 		case 7:
 			// effect location
 			clampedValueB = static_cast<size_t>(std::clamp(floatValue, 0.0f, 4.0f));
-			model()->getDataArray(m_selectedArray)->setEffectedAttrib(m_selectedLocation, clampedValueB);
+			model()->getDataArray(m_selectedArray)->setEffectedAttrib(m_selectedLocation, static_cast<uint8_t>(clampedValueB));
 			break;
 		case 8:
 			clampedValueB = static_cast<size_t>(floatValue);
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, clampedValueB);
+			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, static_cast<unsigned int>(clampedValueB));
 			break;
 		case 9:
 			clampedValueB = static_cast<size_t>(floatValue);
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, clampedValueB);
+			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, static_cast<unsigned int>(clampedValueB));
 			break;
 		case 10:
 			clampedValueB = static_cast<size_t>(floatValue);
-			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, clampedValueB);
+			model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, static_cast<unsigned int>(clampedValueB));
 			break;
 		case 11:
 			model()->getDataArray(m_selectedArray)->setEffectPoints(m_selectedLocation, floatValue >= 0.5f);
