@@ -97,10 +97,8 @@ public:
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
-public slots:
-	void reloadTree();
-
 private slots:
+	void reloadTree();
 	void expandItems(const QList<QString>& expandedDirs, QTreeWidgetItem* item = nullptr);
 	void giveFocusToFilter();
 
