@@ -87,8 +87,8 @@ function(calculate_branding version_var type_var release_var color_var status_va
 	# TODO: Test this calculation logic against different version patterns
 	set(version "${${version_var}}")
 	if(version MATCHES "\\+pr")
-		set(${type_var} "feature")
-		set(${release_var} "Feature")
+		set(${type_var} "draft")
+		set(${release_var} "Draft")
 		set(${color_var} "yellow")
 	elseif(version MATCHES "\\+")
 		set(${type_var} "nightly")
