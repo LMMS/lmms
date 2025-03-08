@@ -107,7 +107,6 @@ private slots:
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
 
-	void addEntry(const QFileInfo& entry);
 	void addItems(const QString & path);
 
 	void saveDirectoriesStates();
