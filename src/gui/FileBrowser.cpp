@@ -673,12 +673,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
 			contextMenu.addAction(
-				tr("Remove favorite file"), [&] { ConfigManager::inst()->removeFavoriteItem(path); });
+				tr("Remove favorite file"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
 		}
 		else
 		{
 			contextMenu.addAction(
-				tr("Add favorite file"), [&] { ConfigManager::inst()->addFavoriteItem(path); });
+				tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 
 		if (file->isTrack())
@@ -709,11 +709,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
 		{
-			contextMenu.addAction(tr("Remove favorite folder"), [&] { ConfigManager::inst()->removeFavoriteItem(path); });
+			contextMenu.addAction(tr("Remove favorite folder"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
 		}
 		else
 		{
-			contextMenu.addAction(tr("Add favorite folder"), [&] { ConfigManager::inst()->addFavoriteItem(path); });
+			contextMenu.addAction(tr("Add favorite folder"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 		break;
 	}
