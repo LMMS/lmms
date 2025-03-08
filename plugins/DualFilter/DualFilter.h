@@ -27,7 +27,7 @@
 #ifndef DUALFILTER_H
 #define DUALFILTER_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "DualFilterControls.h"
 #include "BasicFilters.h"
 
@@ -35,13 +35,13 @@ namespace lmms
 {
 
 
-class DualFilterEffect : public Effect
+class DualFilterEffect : public DefaultEffect
 {
 public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~DualFilterEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{
