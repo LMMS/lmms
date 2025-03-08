@@ -214,10 +214,7 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
-	static QStringList & favoriteItems()
-	{
-		return inst()->m_favoriteItems;
-	}
+	const QStringList& favoriteItems() { return m_favoriteItems; }
 
 	QString localeDir() const
 	{

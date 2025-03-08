@@ -136,7 +136,7 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	if (m_type == Type::Favorites)
 	{
 		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, [this] {
-			m_directories = ConfigManager::favoriteItems().join("*");
+			m_directories = ConfigManager::inst()->favoriteItems().join("*");
 			reloadTree();
 		});
 	}
