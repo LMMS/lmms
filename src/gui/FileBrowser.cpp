@@ -766,9 +766,8 @@ void FileBrowserTreeWidget::removeFavorite(const QString& path)
 	FileBrowser::getFavoritesBrowserInstance()->reloadTree();
 }
 
-bool FileBrowserTreeWidget::isFavorite(QString item)
+bool FileBrowserTreeWidget::isFavorite(const QString& path)
 {
-	item = ConfigManager::removeTrailingSeparators(item);
 	return ConfigManager::isFavorite(item);
 }
 
