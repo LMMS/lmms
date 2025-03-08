@@ -42,14 +42,11 @@
 #include "ModelView.h"
 #include "SubWindow.h"
 
-//#include "VectorGraphView.h"
-
 namespace lmms
 {
 
 class FloatModel;
 class VectorGraphDataArray;
-//class lmms::gui::VectorGraphView;
 
 using PointF = std::pair<float, float>;
 
