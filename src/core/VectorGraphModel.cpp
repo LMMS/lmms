@@ -46,7 +46,6 @@ VectorGraphModel::VectorGraphModel(size_t arrayMaxLength, Model* parent, bool de
 	Model(parent, tr("VectorGraphModel"), defaultConstructed)
 {
 	m_maxLength = arrayMaxLength;
-	//m_dataArrays
 }
 
 VectorGraphModel::~VectorGraphModel()
@@ -241,32 +240,26 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 		{
 			// getting the start of the attribute name
 			QString readLocation = "a" + QString::number(i) + "-";
-			if (i < m_dataArrays.size() && curElement.hasAttribute(readLocation + "DataArraySize") == true)
+			if (i >= m_dataArrays.size() || curElement.hasAttribute(readLocation + "DataArraySize") == false) { break; }
+			size_t dataArraySize = curElement.attribute(readLocation + "DataArraySize").toInt();
+			size_t automationSize = curElement.attribute(readLocation + "AutomationSize").toInt();
+			// load m_dataArray
+			if (dataArraySize > 0)
 			{
-				size_t dataArraySize = curElement.attribute(readLocation + "DataArraySize").toInt();
-				size_t automationSize = curElement.attribute(readLocation + "AutomationSize").toInt();
-				// load m_dataArray
-				if (dataArraySize > 0)
-				{
-					m_dataArrays[i].loadDataArray(curElement.attribute(readLocation + "DataArray"), dataArraySize, true);
-				}
-
-				// load automationModelDataArray
-				std::vector<FloatModel*>* automationModels = m_dataArrays[i].getAutomationModelArray();
-				for (size_t j = 0; j < automationSize; j++)
-				{
-					QString readLocationB = QString::number(j) + "-";
-					FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, this, QString(), false);
-					curModel->loadSettings(curElement, readLocation + readLocationB + "AutomationModel");
-					automationModels->push_back(curModel);
-#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
-					printf("loadSettings loaded automatinModel: arrayLocation (i): %d, model (j): %d", i, j);
-#endif
-				}
+				m_dataArrays[i].loadDataArray(curElement.attribute(readLocation + "DataArray"), dataArraySize, true);
 			}
-			else
+
+			// load automationModelDataArray
+			std::vector<FloatModel*>* automationModels = m_dataArrays[i].getAutomationModelArray();
+			for (size_t j = 0; j < automationSize; j++)
 			{
-				break;
+				QString readLocationB = QString::number(j) + "-";
+				FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, this, QString(), false);
+				curModel->loadSettings(curElement, readLocation + readLocationB + "AutomationModel");
+				automationModels->push_back(curModel);
+#ifdef VECTORGRAPH_DEBUG_PAINT_EVENT
+				printf("loadSettings loaded automatinModel: arrayLocation (i): %d, model (j): %d", i, j);
+#endif
 			}
 		}
 	}
@@ -324,12 +317,7 @@ VectorGraphDataArray::VectorGraphDataArray()
 
 	m_effectorLocation = -1;
 
-	// m_dataArray
 	m_isDataChanged = false;
-	// m_bakedSamples;
-	// m_updatingBakedSamples
-	// m_needsUpdating;
-	// m_automationModelArray;
 
 	m_id = -1;
 }
@@ -359,13 +347,7 @@ VectorGraphDataArray::VectorGraphDataArray(
 	m_effectorLocation = -1;
 	m_isAnEffector = false;
 
-	// m_dataArray;
 	m_isDataChanged = false;
-	// m_bakedSamples;
-	// m_updatingBakedSamples
-	// m_needsUpdating;
-	// m_automationModelArray;
-	// m_universalSampleBuffer
 
 	m_id = arrayId;
 	updateConnections(parent);
@@ -1023,58 +1005,51 @@ void VectorGraphDataArray::setDataArray(float* inputDataArray, size_t size,
 size_t VectorGraphDataArray::setX(size_t pointLocation, float newX)
 {
 	int location = pointLocation;
-	if (m_isFixedX == false && newX <= 1.0f)
-	{
-		bool found = false;
-		bool isBefore = false;
-		location = getNearestLocation(newX, &found, &isBefore);
-		// if an other point was not found exactly at newX
-		// and if dataArray end points are changeable
-		if (found == false && ((m_isFixedEndPoints == true &&
-			pointLocation < m_dataArray.size() - 1 && pointLocation > 0) ||
-			m_isFixedEndPoints == false))
-		{
-			int targetLocation = location;
-			// bool dataChangedVal = false;
-			// if getNearestLocation returned a value
-			if (location >= 0)
-			{
-				if (location < static_cast<int>(pointLocation) && isBefore == true)
-				{
-					if (targetLocation + 1 < static_cast<int>(m_dataArray.size()))
-					{
-						targetLocation++;
-					}
-				}
-				else if (location > static_cast<int>(pointLocation) && isBefore == false)
-				{
-					if (targetLocation > 0)
-					{
-						targetLocation--;
-					}
-				}
-				m_dataArray[pointLocation].m_x = newX;
-				swap(pointLocation, targetLocation, true);
-				location = targetLocation;
+	if (m_isFixedX == true || newX > 1.0f) { return location; }
+	bool found = false;
+	bool isBefore = false;
+	location = getNearestLocation(newX, &found, &isBefore);
 
-				getUpdatingFromPoint(-1);
-				// changes in the position can change lines before
-				// so the point before this is updated
-				if (location > 0)
-				{
-					getUpdatingFromPoint(location - 1);
-				}
-				dataChanged();
-			}
-			else
-			{
-				location = pointLocation;
-			}
-		}
-		else
+	// if an other point was not found exactly at newX
+	// and if dataArray end points are changeable
+	if (found == false && ((m_isFixedEndPoints == true &&
+		pointLocation < m_dataArray.size() - 1 && pointLocation > 0) ||
+		m_isFixedEndPoints == false))
+	{
+		int targetLocation = location;
+		// bool dataChangedVal = false;
+		// if getNearestLocation returned a value
+		if (location < 0) { return pointLocation; }
+		if (location < static_cast<int>(pointLocation) && isBefore == true)
 		{
-			location = pointLocation;
+			if (targetLocation + 1 < static_cast<int>(m_dataArray.size()))
+			{
+				targetLocation++;
+			}
 		}
+		else if (location > static_cast<int>(pointLocation) && isBefore == false)
+		{
+			if (targetLocation > 0)
+			{
+				targetLocation--;
+			}
+		}
+		m_dataArray[pointLocation].m_x = newX;
+		swap(pointLocation, targetLocation, true);
+		location = targetLocation;
+
+		getUpdatingFromPoint(-1);
+		// changes in the position can change lines before
+		// so the point before this is updated
+		if (location > 0)
+		{
+			getUpdatingFromPoint(location - 1);
+		}
+		dataChanged();
+	}
+	else
+	{
+		location = pointLocation;
 	}
 	return location;
 }
@@ -1515,58 +1490,56 @@ float VectorGraphDataArray::processSingleEffect(size_t pointLocation, size_t eff
 {
 	// calculating an effect on attribValue
 	float output = attribValue;
+	uint8_t effectType = getEffect(pointLocation, effectSlot);
 
 	// none
-	if (getEffect(pointLocation, effectSlot) == 0) { return output; }
+	if (effectType == 0) { return output; }
 
 	// effects
-	if (getEffect(pointLocation, effectSlot) == 1)
+	switch (effectType)
 	{
+	case 1:
 		// add
 		output += effectValue;
-	}
-	else if (getEffect(pointLocation, effectSlot) == 2)
-	{
+	case 2:
 		// subtract
 		output -= effectValue;
-	}
-	else if (getEffect(pointLocation, effectSlot) == 3)
-	{
+		break;
+	case 3:
 		// multiply
 		output = output * 5.0f * effectValue;
-	}
-	else if (getEffect(pointLocation, effectSlot) == 4 && effectValue != 0.0f)
-	{
+		break;
+	case 4:
+		if (effectValue == 0.0f) { break; }
 		// divide
 		output = output / 5.0f / effectValue;
-	}
-	else if (getEffect(pointLocation, effectSlot) == 5 && output > 0.0f)
-	{
+		break;
+	case 5:
+		if (output <= 0.0f) { break; }
 		// power
 		output = std::pow(output, effectValue * 5.0f);
 		output = std::clamp(output, -1.0f, 1.0f);
-	}
-	else if (getEffect(pointLocation, effectSlot) == 6 && output > 0.0f && effectValue > 0.0f)
-	{
+		break;
+	case 6:
+		if (output <= 0.0f || effectValue <= 0.0f) { break; }
 		// log
 		output = std::log(output) / std::log(effectValue);
 		output = std::clamp(output, -1.0f, 1.0f);
-	}
-	else if (getEffect(pointLocation, effectSlot) == 7)
-	{
+		break;
+	case 7:
 		// sine
 		output = output + std::sin(effectValue * 100.0f);
-	}
-	else if (getEffect(pointLocation, effectSlot) == 8)
-	{
+		break;
+	case 8:
 		// clamp lower
 		output = std::max(effectValue, output);
-	}
-	else if (getEffect(pointLocation, effectSlot) == 9)
-	{
+		break;
+	case 9:
 		// clamp upper
 		output = std::min(effectValue, output);
+		break;
 	}
+
 	return output;
 }
 
