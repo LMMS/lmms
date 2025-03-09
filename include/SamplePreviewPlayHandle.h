@@ -47,18 +47,20 @@ public:
 
 	~SamplePreviewPlayHandle() noexcept;
 
-	void play(SampleFrame* buffer) override;
+	void play(SampleFrame* dst) override;
 	bool isFromTrack(const Track* _track) const override { return false; };
 	bool isFinished() const override { return !m_diskStream.valid(); }
 
 private:
 	void runDiskStream();
-	void mixCopy(SampleFrame* dst, const float* src, std::size_t frames, int channels);
+	float* bufferAt(std::size_t frameIndex) { return &m_buffer[frameIndex * DEFAULT_CHANNELS]; }
+	std::size_t numFrames() const { return m_buffer.size() / DEFAULT_CHANNELS; }
+
 	SNDFILE* m_sndfile = nullptr;
 	std::vector<float> m_buffer;
 	std::atomic<bool> m_quit = false;
-	std::atomic<std::size_t> m_readIndex = 0;
-	std::atomic<std::size_t> m_writeIndex = 0;
+	std::atomic<std::size_t> m_readFrameIndex = 0;
+	std::atomic<std::size_t> m_writeFrameIndex = 0;
 	SF_INFO m_sfinfo = SF_INFO{};
 	std::future<void> m_diskStream;
 	static constexpr auto DefaultStreamCapacity = 8192;

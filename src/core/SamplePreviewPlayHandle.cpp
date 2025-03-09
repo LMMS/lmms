@@ -42,7 +42,6 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 #endif
 
 	if (m_sndfile == nullptr) { throw std::runtime_error{"Failed to create sample preview stream"}; }
-
 	m_diskStream = ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this);
 	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
 }
@@ -57,57 +56,50 @@ SamplePreviewPlayHandle::~SamplePreviewPlayHandle() noexcept
 	delete audioBusHandle();
 }
 
-void SamplePreviewPlayHandle::play(SampleFrame* buffer)
+void SamplePreviewPlayHandle::play(SampleFrame* dst)
 {
 	const auto size = Engine::audioEngine()->framesPerPeriod();
-	std::fill_n(buffer, size, SampleFrame{});
+	const auto framesAvailable = (m_writeFrameIndex + numFrames() - m_readFrameIndex) % numFrames();
+	const auto framesToRead = std::min(framesAvailable, size);
 
-	const auto framesAvailable = (m_writeIndex + m_buffer.size() - m_readIndex) % m_buffer.size();
-	const auto readSize = std::min(framesAvailable, size);
-	if (readSize == 0) { return; }
-
-	if (m_readIndex + readSize > m_buffer.size())
+	if (framesToRead == 0)
 	{
-		const auto readToEndSize = std::min(readSize, m_buffer.size() - m_readIndex);
-		const auto wrapAroundSize = readSize - readToEndSize;
-		mixCopy(buffer, m_buffer.data() + static_cast<int>(m_readIndex), readToEndSize, m_sfinfo.channels);
-		mixCopy(buffer, m_buffer.data(), wrapAroundSize, m_sfinfo.channels);
+		std::fill_n(dst, size, SampleFrame{});
+		return;
 	}
-	else { mixCopy(buffer, m_buffer.data() + static_cast<int>(m_readIndex), readSize, m_sfinfo.channels); }
 
-	m_readIndex = (m_readIndex + readSize) % m_buffer.size();
+	const auto readIndex = m_readFrameIndex.load();
+	for (auto i = std::size_t{0}; i < framesToRead; ++i)
+	{
+		const auto buffer = bufferAt((readIndex + i) % numFrames());
+		dst[i][0] = buffer[0];
+		dst[i][1] = m_sfinfo.channels == 1 ? buffer[0] : buffer[1];
+	}
+
+	std::fill_n(dst + framesToRead, size - framesToRead, SampleFrame{});
+	m_readFrameIndex = (m_readFrameIndex + framesToRead) % numFrames();
+
 }
 
 void SamplePreviewPlayHandle::runDiskStream()
 {
 	auto framesWritten = std::size_t{0};
-	while (framesWritten < static_cast<std::size_t>(m_sfinfo.frames) && !m_quit)
+	const auto framesToWrite = static_cast<std::size_t>(m_sfinfo.frames);
+
+	while (framesWritten < framesToWrite && !m_quit)
 	{
-		const auto framesAvailable = (m_readIndex + m_buffer.size() - m_writeIndex - 1) % m_buffer.size();
-		const auto writeSize = std::min(framesAvailable, m_buffer.size() - framesWritten);
+		const auto framesAvailable = (m_readFrameIndex + numFrames() - m_writeFrameIndex - 1) % numFrames();
+		const auto writeSize = std::min(framesAvailable, framesToWrite - framesWritten);
 		if (writeSize == 0) { continue; }
 
-		if (m_writeIndex + writeSize > m_buffer.size())
-		{
-			const auto writeToEndSize = std::min(writeSize, m_buffer.size() - m_writeIndex);
-			const auto wrapAroundSize = writeSize - writeToEndSize;
-			sf_readf_float(m_sndfile, m_buffer.data() + m_writeIndex, static_cast<sf_count_t>(writeToEndSize));
-			sf_readf_float(m_sndfile, m_buffer.data(), static_cast<sf_count_t>(wrapAroundSize));
-		}
-		else { sf_readf_float(m_sndfile, m_buffer.data() + m_writeIndex, static_cast<sf_count_t>(writeSize)); }
+		const auto writeToEndSize = std::min(writeSize, numFrames() - m_writeFrameIndex);
+		sf_readf_float(m_sndfile, bufferAt(m_writeFrameIndex), static_cast<sf_count_t>(writeToEndSize));
 
-		m_writeIndex = (m_writeIndex + writeSize) % m_buffer.size();
+		const auto wrapAroundSize = writeSize - writeToEndSize;
+		sf_readf_float(m_sndfile, bufferAt(0), static_cast<sf_count_t>(wrapAroundSize));
+
 		framesWritten += writeSize;
+		m_writeFrameIndex = (m_writeFrameIndex + writeSize) % numFrames();
 	}
 }
-
-void SamplePreviewPlayHandle::mixCopy(SampleFrame* dst, const float* src, std::size_t frames, int channels)
-{
-	for (auto i = std::size_t{0}; i < frames; ++i)
-	{
-		dst[i][0] = src[i];
-		dst[i][1] = m_sfinfo.channels == 1 ? src[i] : src[i + 1];
-	}
-}
-
 } // namespace lmms
