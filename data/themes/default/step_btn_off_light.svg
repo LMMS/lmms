@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg5367"
+   version="1.1"
+   viewBox="0 0 6.3499999 6.3500002"
+   height="24"
+   width="24"
+   sodipodi:docname="step_btn_off_light.svg"
+   inkscape:version="0.92.1 r">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1355"
+     id="namedview1794"
+     showgrid="false"
+     inkscape:zoom="9.8333333"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5367" />
+  <defs
+     id="defs5361">
+    <linearGradient
+       xlink:href="#Silver"
+       id="linearGradient5300"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.3728863,0,0,0.43137171,510.64549,-263.66803)"
+       x1="153.81233"
+       y1="98.912476"
+       x2="153.81233"
+       y2="149.91257" />
+    <linearGradient
+       id="Silver">
+      <stop
+         id="stop8818"
+         offset="0"
+         style="stop-color:#c2c9cf;stop-opacity:1;" />
+      <stop
+         style="stop-color:#6e7883;stop-opacity:1;"
+         offset="1"
+         id="stop10868" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#Hightlight4"
+       id="linearGradient5297"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.37759433,0,0,0.37759433,511.05946,-257.35061)"
+       x1="132.25977"
+       y1="96.268982"
+       x2="132.25977"
+       y2="154.53258" />
+    <linearGradient
+       id="Hightlight4">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop6754-1" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop6756-5" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#Hightlight4"
+       id="linearGradient5293"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-117.13393,-240.6428)"
+       x1="685.13391"
+       y1="22.642815"
+       x2="685.13391"
+       y2="38.642811" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#Silver"
+       id="linearGradient5300-9"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.39774539,0,0,0.46012982,544.68852,-281.2459)"
+       x1="153.81233"
+       y1="98.912476"
+       x2="153.81233"
+       y2="149.91257" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#Hightlight4"
+       id="linearGradient5297-0"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.40276729,0,0,0.40276729,545.13009,-274.50732)"
+       x1="132.25977"
+       y1="96.268982"
+       x2="132.25977"
+       y2="154.53258" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#Hightlight4"
+       id="linearGradient5293-0"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0666667,0,0,1.0666667,-124.94286,-256.68565)"
+       x1="685.13391"
+       y1="22.642815"
+       x2="685.13391"
+       y2="38.642811" />
+  </defs>
+  <metadata
+     id="metadata5364">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     style="display:inline"
+     id="g4771"
+     inkscape:export-filename="/media/freedrive/RebeccaCurrent2016/Personal Projects/LMMS Theme Source Files/design_elements/step_btn_off_light.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"
+     transform="matrix(0.24804688,0,0,0.24804688,-147.10834,58.737499)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path5089"
+       d="m 593.06667,-236.79999 v 25.6 h 25.6 v -25.6 z"
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.06666672;filter:url(#filter5497)"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       sodipodi:nodetypes="ccccccc"
+       inkscape:connector-curvature="0"
+       id="path5091"
+       d="m 605.87117,-235.73332 h -11.73784 v 23.46666 H 605.87117 617.6 v -23.46666 z"
+       style="display:inline;opacity:0.7;fill:url(#linearGradient5300-9);fill-opacity:1;stroke:none;stroke-width:1.06666672;filter:url(#filter5497)" />
+    <path
+       style="display:inline;opacity:0.4;fill:url(#linearGradient5297-0);fill-opacity:1;stroke:none;stroke-width:1.06666672;filter:url(#filter5497)"
+       d="m 594.13333,-235.73332 v 11.73333 H 595.2 v -10.54231 l 21.33333,-0.12436 v 10.66667 H 617.6 v -11.73333 z"
+       id="path5093"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccc" />
+    <rect
+       ry="0"
+       rx="0"
+       y="-234.66666"
+       x="595.20001"
+       height="21.333332"
+       width="21.333334"
+       id="rect10876"
+       style="fill:#191d21;fill-opacity:1;stroke:none;stroke-width:1.06666672" />
+    <rect
+       rx="1.0666478"
+       ry="1.0486935"
+       y="-232.53331"
+       x="597.33331"
+       height="17.066664"
+       width="17.066668"
+       id="rect10878"
+       style="opacity:0.1;fill:url(#linearGradient5293-0);fill-opacity:1;stroke:none;stroke-width:1.06666672" />
+    <path
+       sodipodi:nodetypes="cccccsssssssss"
+       inkscape:connector-curvature="0"
+       style="fill:#050506;fill-opacity:1;stroke:none;stroke-width:1.06666672"
+       d="m 595.19994,-234.66666 v 21.33334 h 21.33333 v -21.33334 z m 2.13333,1.06667 h 17.06667 c 0.59093,0 1.06666,0.47573 1.06666,1.06667 v 17.06666 c 0,0.59094 -0.47573,1.06667 -1.06666,1.06667 h -17.06667 c -0.59093,0 -1.06667,-0.47573 -1.06667,-1.06667 v -17.06666 c 0,-0.59094 0.47574,-1.06667 1.06667,-1.06667 z"
+       id="path10870" />
+  </g>
+</svg>
