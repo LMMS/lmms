@@ -148,7 +148,7 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 			cutoffParameters.fillLevel(cutBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 		}
 
-		if (resonanceParameters.isUsed() )
+		if (resonanceParameters.isUsed())
 		{
 			resonanceParameters.fillLevel(resBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 		}
