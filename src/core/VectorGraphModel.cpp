@@ -41,7 +41,7 @@
 
 namespace lmms
 {
-const std::vector<float> VectorGraphModel::s_presudoRandomNumbers(VectorGraphModel::generatePresudoRandomNumbers(2000));
+const std::vector<float> VectorGraphModel::s_presudoRandomNumbers(VectorGraphModel::generatePresudoRandomNumbers(4202));
 
 VectorGraphModel::VectorGraphModel(size_t arrayMaxLength, Model* parent, bool defaultConstructed) :
 	Model(parent, tr("VectorGraphModel"), defaultConstructed)
