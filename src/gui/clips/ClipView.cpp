@@ -42,6 +42,7 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
 #include "KeyboardShortcuts.h"
+#include "lmms_math.h"
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
@@ -362,7 +363,7 @@ void ClipView::selectColor()
 
 void ClipView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(47)]);
 }
 
 void ClipView::resetColor()
