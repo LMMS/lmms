@@ -1,5 +1,5 @@
 /*
- * SamplePreviewPlayHandle.cpp - an object meant to stream audio files
+ * SamplePreviewPlayHandle.cpp
  *
  * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
