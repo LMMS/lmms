@@ -297,7 +297,7 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 
 	auto& volumeParameters = getVolumeParameters();
 
-	if (volumeParameters.isUsed() )
+	if (volumeParameters.isUsed())
 	{
 		return volumeParameters.releaseFrames();
 	}
