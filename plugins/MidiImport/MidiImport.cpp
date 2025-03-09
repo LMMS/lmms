@@ -467,7 +467,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 				if( update == "programi" )
 				{
-					long prog = evt->get_integer_value();
+					long prog = evt->get_int64_value();
 					if( ch->isSF2 )
 					{
 						auto& pc = pcs[evt->chan];
