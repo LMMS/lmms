@@ -213,7 +213,7 @@ private:
 	bool m_isEditingActive;
 	const std::array<QString, 2> m_controlText =
 	{
-		tr("edit point"), tr("switch graph")
+		tr("Edit point"), tr("Switch graph")
 	};
 
 	PointInt m_lastTrackPoint;
