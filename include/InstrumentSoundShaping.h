@@ -26,13 +26,13 @@
 #define LMMS_INSTRUMENT_SOUND_SHAPING_H
 
 #include "ComboBoxModel.h"
+#include "EnvelopeAndLfoParameters.h"
 
 namespace lmms
 {
 
 
 class InstrumentTrack;
-class EnvelopeAndLfoParameters;
 class NotePlayHandle;
 class SampleFrame;
 
@@ -52,14 +52,19 @@ public:
 	void processAudioBuffer( SampleFrame* _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	enum class Target
-	{
-		Volume,
-		Cut,
-		Resonance,
-		Count
-	} ;
-	constexpr static auto NumTargets = static_cast<std::size_t>(Target::Count);
+	const EnvelopeAndLfoParameters& getVolumeParameters() const { return m_volumeParameters; }
+	EnvelopeAndLfoParameters& getVolumeParameters() { return m_volumeParameters; }
+
+	const EnvelopeAndLfoParameters& getCutoffParameters() const { return m_cutoffParameters; }
+	EnvelopeAndLfoParameters& getCutoffParameters() { return m_cutoffParameters; }
+
+	const EnvelopeAndLfoParameters& getResonanceParameters() const { return m_resonanceParameters; }
+	EnvelopeAndLfoParameters& getResonanceParameters() { return m_resonanceParameters; }
+
+	BoolModel& getFilterEnabledModel() { return m_filterEnabledModel; }
+	ComboBoxModel& getFilterModel() { return m_filterModel; }
+	FloatModel& getFilterCutModel() { return m_filterCutModel; }
+	FloatModel& getFilterResModel() { return m_filterResModel; }
 
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;
@@ -74,22 +79,23 @@ public:
 		return "eldata";
 	}
 
+private:
+	QString getVolumeNodeName() const;
+	QString getCutoffNodeName() const;
+	QString getResonanceNodeName() const;
 
 private:
-	EnvelopeAndLfoParameters * m_envLfoParameters[NumTargets];
 	InstrumentTrack * m_instrumentTrack;
+
+	EnvelopeAndLfoParameters m_volumeParameters;
+	EnvelopeAndLfoParameters m_cutoffParameters;
+	EnvelopeAndLfoParameters m_resonanceParameters;
 
 	BoolModel m_filterEnabledModel;
 	ComboBoxModel m_filterModel;
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
-
-	static const char *const targetNames[NumTargets][3];
-
-
-	friend class gui::InstrumentSoundShapingView;
-
-} ;
+};
 
 
 } // namespace lmms
