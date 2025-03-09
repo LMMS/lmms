@@ -567,9 +567,9 @@ QString VectorGraphHelpView::s_helpText =
 "<h5>random:</h5>"
 "<ul>"
 "<li><b>description</b> - draws a line with random values added to it</li>"
-"<li><b>curve</b> - random seed, this setting will slide the random values between a given amount of seeds gradually</li>"
+"<li><b>curve</b> - random seed, this setting will slide the random values between 20 seeds gradually</li>"
 "<li><b>1. attribute</b> - random value amplitude</li>"
-"<li><b>1. attribute (b)</b> - random value count (count = 50 * (b + 1) * 2, -1 &lt;= b &lt;= 1)</li>"
+"<li><b>1. attribute (b)</b> - random value count (count = 200 * b, -1 &lt;= b &lt;= 1)</li>"
 "</ul>"
 
 "<h3>automation:</h3>"
