@@ -318,6 +318,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 		{
 			m_mousePress = false;
 			startMoving = true;
+			m_isEditingActive = false;
 
 			model()->modelAddJournalCheckPoint();
 		}
@@ -722,7 +723,7 @@ void VectorGraphView::paintEditing(QPainter* p)
 		{
 			QColor curForeColor = *dataArray->getFillColor();
 			p->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curForeColor);
-			p->drawText(i * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize, m_controlText[i]);
+			p->drawText(i * segmentLength + 4, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize, m_controlText[i]);
 		}
 
 		// draw outline
