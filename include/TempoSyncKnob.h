@@ -45,6 +45,7 @@ public:
 	~TempoSyncKnob() override;
 
 	static TempoSyncKnob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent);
+	static TempoSyncKnob* buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name = QString());
 	static TempoSyncKnob* buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent);
 
 	const QString & syncDescription();

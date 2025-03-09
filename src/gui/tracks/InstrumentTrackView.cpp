@@ -78,19 +78,15 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	const auto f = adjustedToPixelSize(font(), 9);
+	constexpr int knobLabelPixelSize = 8;
 
-	m_volumeKnob = new Knob(KnobType::Small17, getTrackSettingsWidget(), tr("Volume"));
-	m_volumeKnob->setFont(f);
-	m_volumeKnob->setLabel(tr("VOL"));
+	m_volumeKnob = Knob::buildKnobWithFixedPixelFont(KnobType::Small17, tr("VOL"), knobLabelPixelSize, getTrackSettingsWidget(), tr("VOL"));
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob(KnobType::Small17, getTrackSettingsWidget(), tr("Panning"));
-	m_panningKnob->setFont(f);
-	m_panningKnob->setLabel(tr("PAN"));
+	m_panningKnob = Knob::buildKnobWithFixedPixelFont(KnobType::Small17, tr("PAN"), knobLabelPixelSize, getTrackSettingsWidget(), tr("Panning"));
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText(tr("Panning:"), "%");
 	m_panningKnob->show();

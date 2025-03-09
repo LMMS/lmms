@@ -82,6 +82,7 @@ public:
 	Knob( const Knob& other ) = delete;
 
 	static Knob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
+	static Knob* buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name = QString());
 	static Knob* buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
 
 	void setLabel(const QString& txt);
