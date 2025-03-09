@@ -69,7 +69,6 @@ class LMMS_EXPORT VectorGraphView : public VectorGraphViewBase, public ModelView
 
 	Q_PROPERTY(int fontSize MEMBER m_fontSize)
 public:
-
 	VectorGraphView(QWidget* parent, int widgetWidth, int widgetHeight, size_t pointSize,
 		size_t controlHeight, bool shouldApplyDefaultVectorGraphColors);
 	~VectorGraphView();
