@@ -54,13 +54,13 @@ public:
 private:
 	void runDiskStream();
 	void mixCopy(SampleFrame* dst, const float* src, std::size_t frames, int channels);
+	SNDFILE* m_sndfile = nullptr;
 	std::vector<float> m_buffer;
-	std::future<void> m_diskStream;
 	std::atomic<bool> m_quit = false;
 	std::atomic<std::size_t> m_readIndex = 0;
 	std::atomic<std::size_t> m_writeIndex = 0;
-	SNDFILE* m_sndfile = nullptr;
 	SF_INFO m_sfinfo = SF_INFO{};
+	std::future<void> m_diskStream;
 	static constexpr auto DefaultStreamCapacity = 8192;
 };
 

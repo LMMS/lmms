@@ -34,22 +34,16 @@ namespace lmms {
 SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& path, std::size_t size)
 	: PlayHandle(Type::SamplePreviewPlayHandle)
 	, m_buffer(size * DEFAULT_CHANNELS)
-	, m_diskStream(ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this))
-	, m_sndfile(
-#ifdef LMMS_BUILD_WIN32
-		  sf_wchar_open(path.c_str(), SFM_READ, &m_sfinfo)
-#else
-		  sf_open(path.c_str(), SFM_READ, &m_sfinfo)
-#endif
-	  )
 {
-	if (m_sndfile == nullptr)
-	{
-		m_quit = true;
-		m_diskStream.wait();
-		throw std::runtime_error{"Failed to create sample preview stream"};
-	}
+#ifdef LMMS_BUILD_WIN32
+	m_sndfile = sf_wchar_open(path.c_str(), SFM_READ, &m_sfinfo);
+#else
+	m_sndfile = sf_open(path.c_str(), SFM_READ, &m_sfinfo);
+#endif
 
+	if (m_sndfile == nullptr) { throw std::runtime_error{"Failed to create sample preview stream"}; }
+
+	m_diskStream = ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this);
 	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
 }
 
