@@ -211,7 +211,17 @@ void Note::loadSettings( const QDomElement & _this )
 }
 
 
-
+AutomationClip* Note::getParameterCurve(ParameterType paramType)
+{
+	switch (paramType)
+	{
+		// TODO: Add more per-note parameter curves besides detuning
+		case ParameterType::Detuning:
+			return detuning()->automationClip();
+		default:
+			return nullptr;
+	}
+}
 
 
 void Note::createDetuning()
