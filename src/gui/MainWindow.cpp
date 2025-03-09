@@ -1299,6 +1299,27 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 			{
 				QMainWindow::keyPressEvent( _ke );
 			}
+			else
+			{
+				switch(Engine::getSong()->lastPlayMode())
+				{
+					case Song::PlayMode::Song:
+						getGUI()->songEditor()->togglePlayStop();
+						break;
+					case Song::PlayMode::MidiClip:
+						getGUI()->pianoRoll()->togglePlayStop();
+						break;
+					case Song::PlayMode::Pattern:
+						getGUI()->patternEditor()->togglePlayStop();
+						break;
+					case Song::PlayMode::AutomationClip:
+						getGUI()->automationEditor()->togglePlayStop();
+						break;
+					default:
+						getGUI()->songEditor()->togglePlayStop();
+						break;
+				}
+			}
 		}
 	}
 }
