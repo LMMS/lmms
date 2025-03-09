@@ -598,8 +598,9 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const TimePos pos = getPosition( me->x() ).getBar() *
-						TimePos::ticksPerBar();
+		const tick_t snapSizeTicks = getGUI()->songEditor()->m_editor->getSnapSize() * TimePos::ticksPerBar();
+		// Manually quantize with modulo to ensure the position is always rounded down.
+		const TimePos pos = getPosition(me->x()).getTicks() - (getPosition(me->x()).getTicks() % snapSizeTicks);
 		getTrack()->createClip(pos);
 	}
 }
