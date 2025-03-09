@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_STREAM_H
-#define LMMS_SAMPLE_STREAM_H
+#ifndef LMMS_SAMPLE_PREVIEW_PLAY_HANDLE_H
+#define LMMS_SAMPLE_PREVIEW_PLAY_HANDLE_H
 
 #include <filesystem>
 #include <future>
@@ -66,4 +66,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_SAMPLE_STREAM_H
+#endif // LMMS_SAMPLE_PREVIEW_PLAY_HANDLE_H
