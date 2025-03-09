@@ -36,6 +36,7 @@
 #include "embed.h" // context menu
 #include "GuiApplication.h" // getGUI
 #include "Knob.h"
+#include "MainWindow.h"
 #include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
 #include "VectorGraphModel.h"
@@ -82,7 +83,7 @@ std::pair<float, float> VectorGraphViewBase::showCoordInputDialog(std::pair<floa
 	// show position input dialog
 	bool ok;
 	double changedX = QInputDialog::getDouble(this, tr("Set value"),
-		tr("Please enter a new value between 0 and 100"),
+		tr("X pos: Please enter a new value between 0 and 100"),
 		static_cast<double>(pointPosition.first * 100.0f),
 		0.0, 100.0, 2, &ok);
 	if (ok == true)
@@ -91,7 +92,7 @@ std::pair<float, float> VectorGraphViewBase::showCoordInputDialog(std::pair<floa
 	}
 
 	double changedY = QInputDialog::getDouble(this, tr("Set value"),
-		tr("Please enter a new value between -100 and 100"),
+		tr("Y pos: Please enter a new value between -100 and 100"),
 		static_cast<double>(pointPosition.second * 100.0f),
 		-100.0, 100.0, 2, &ok);
 	if (ok == true)
@@ -261,6 +262,11 @@ VectorGraphControlDialog::VectorGraphControlDialog(QWidget* parent, VectorGraphV
 	m_automationLayout = new QVBoxLayout(nullptr);
 	mainLayout->addLayout(m_automationLayout);
 
+	QPushButton* helpButton = new QPushButton(tr("?"), this);
+	m_automationLayout->addWidget(helpButton);
+	m_automationLayout->setAlignment(helpButton, Qt::AlignHCenter);
+	connect(helpButton, SIGNAL(clicked()), this, SLOT(showHelpWindowClicked()));
+
 	QPushButton* effectPointButton = new QPushButton(tr("effect point"), this);
 	m_automationLayout->addWidget(effectPointButton);
 	m_automationLayout->setAlignment(effectPointButton, Qt::AlignHCenter);
@@ -401,6 +407,12 @@ void VectorGraphControlDialog::deleteAutomationClicked(bool isChecked)
 	m_isValidSelection = swapIsValidSelection;
 }
 
+void VectorGraphControlDialog::showHelpWindowClicked()
+{
+	VectorGraphHelpView::getInstance()->close();
+	VectorGraphHelpView::getInstance()->show();
+}
+
 void VectorGraphControlDialog::closeEvent(QCloseEvent * ce)
 {
 	// we need to ignore this event
@@ -493,6 +505,113 @@ void VectorGraphControlDialog::updateVectorGraphAttribs()
 	m_vectorGraphView->setInputAttribValue(8, m_effectModelA.value());
 	m_vectorGraphView->setInputAttribValue(9, m_effectModelB.value());
 	m_vectorGraphView->setInputAttribValue(10, m_effectModelC.value());
+}
+
+
+QString VectorGraphHelpView::s_helpText =
+"<div style='text-align: center;'>"
+"<b> Vector graph </b><br>"
+"</div>"
+"<h3>Basics:</h3>"
+"<b>x</b> - represents the x coordinate of the point<br>"
+"<b>y</b> - represents the y coordinate of the point<br>"
+"<b>curve</b> - sets the curve amount between the selected point and the point after that, functionality depends on line type<br>"
+"<b>1. attribute</b> - adjusts an additional parameter of the line, functionality depends on line type<br>"
+"<b>2. attribute</b> - adjusts an additional parameter of the line, functionality depends on line type<br>"
+"<b>note:</b> all variables are between -1 and 1, except 0 &lt;= x &lt;= 1 and in some cases 0 &lt;= y &lt;= 1<br>"
+
+
+"<h3>Line type:</h3>"
+"<h5>none:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a simple line</li>"
+"<li><b>curve</b> - changes the curve (default)</li>"
+"<li><b>1. attribute</b> - none</li>"
+"<li><b>1. attribute</b> - none</li>"
+"</ul>"
+"<h5>bézier:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a bézier curve</li>"
+"<li><b>curve</b> - changes the curve strength</li>"
+"<li><b>1. attribute</b> - curve direction for the selected point</li>"
+"<li><b>1. attribute</b> - curve direction for the point after the selected point</li>"
+"</ul>"
+"<h5>sine:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a sine curve</li>"
+"<li><b>curve</b> - default</li>"
+"<li><b>1. attribute (a)</b> - the amplitude of the sine (a * sine, -1 &lt;= a &lt;= 1)</li>"
+"<li><b>1. attribute (b)</b> - the freq of the sine (sine(x * 200 * pi * b), 0 &lt;= x &lt;= 1, -1 &lt;= b &lt;= 1)</li>"
+"</ul>"
+"<h5>phase changeable sine:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a sine curve, but the phase is changeable</li>"
+"<li><b>curve (c)</b> - the phase of the sine (sine(x + c * 100))</li>"
+"<li><b>1. attribute (a)</b> - the amplitude of the sine (a * sine, -1 &lt;= a &lt;= 1)</li>"
+"<li><b>1. attribute (b)</b> - the freq of the sine (sine(x * 200 * pi * b), 0 &lt;= x &lt;= 1, -1 &lt;= b &lt;= 1)</li>"
+"</ul>"
+"<h5>peak:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a shape similar to a peak filter</li>"
+"<li><b>curve</b> - peak width</li>"
+"<li><b>1. attribute</b> - peak amplitude</li>"
+"<li><b>1. attribute</b> - peak x location</li>"
+"</ul>"
+"<h5>steps:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a line but the y values will be rounded down to some common y values</li>"
+"<li><b>curve</b> - default</li>"
+"<li><b>1. attribute (a)</b> - step count (count = (1 + a) / 2 * 19 + 1, -1 &lt;= a &lt;= 1)</li>"
+"<li><b>1. attribute</b> - smoothens the edges</li>"
+"</ul>"
+"<h5>random:</h5>"
+"<ul>"
+"<li><b>description</b> - draws a line with random values added to it</li>"
+"<li><b>curve</b> - random seed, this setting will slide the random values between a given amount of seeds gradually</li>"
+"<li><b>1. attribute</b> - random value amplitude</li>"
+"<li><b>1. attribute (b)</b> - random value count (count = 50 * (b + 1) * 2, -1 &lt;= b &lt;= 1)</li>"
+"</ul>"
+
+"<h3>automation:</h3>"
+"<b>automated attribute</b> - decides what point attribute can be automated, only 1 can be automated<br>"
+"<b>effected attribute</b> - decides what point attribute can be effected, only 1 can be automated<br>"
+"<h3>effects:</h3>"
+"if more than 1 wave shape is available for the widget, effects decide how the wave shapes interact. For example one waveshape's y values can be added to an other one's y values, meaning more complex shapes can be made. These settings may not be available."
+"<h5>effects:</h5>"
+"<b>note:</b> a = selected attribute, b = effector grap's y value, -1 &lt;= a &lt;= 1, -1 &lt;= b &lt;= 1<br>"
+"<ul>"
+"<li><b>none</b> - skips this step</li>"
+"<li><b>add</b> - a + b</li>"
+"<li><b>subtract</b> - a - b</li>"
+"<li><b>multiply</b> - a * 5 * b</li>"
+"<li><b>divide</b> - a / 5 / b</li>"
+"<li><b>power</b> - a ^ (b * 5)</li>"
+"<li><b>log</b> - log(a) / log(b)</li>"
+"<li><b>sine</b> - a + sin(b * 100)</li>"
+"<li><b>clamp lower</b> - b &lt;= a &lt;= 1</li>"
+"<li><b>clamp upper</b> - -1 &lt;= a &lt;= b</li>"
+"</ul>"
+
+"<b>effect point</b> - can the point's attributes be effected (for example if the y attribute is effected, should the point move up and down)<br>"
+"<b>effect line</b> - can the line between the selected point and the point after that be effected (only avaiable if y attribute is effected, for example should the effector graph be added to the line's values)<br>"
+;
+
+VectorGraphHelpView::VectorGraphHelpView():QTextEdit(s_helpText)
+{
+#if (QT_VERSION < QT_VERSION_CHECK(5,12,0))
+	// Bug workaround: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+	using ::operator|;
+#endif
+	setWindowTitle(tr("VectorGraph Help"));
+	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
+	getGUI()->mainWindow()->addWindowedWidget(this);
+	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
+	//parentWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
+	
+	// No maximize button
+	Qt::WindowFlags flags = parentWidget()->windowFlags();
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	parentWidget()->setWindowFlags(flags);
 }
 
 

@@ -29,6 +29,7 @@
 #include <QLayout>
 #include <QMenu>
 #include <QWidget>
+#include <QTextEdit>
 
 #include "AutomatableModel.h"
 #include "ComboBox.h"
@@ -86,6 +87,7 @@ public slots:
 	void effectedPointClicked(bool isChecked);
 	void effectedLineClicked(bool isChecked);
 	void deleteAutomationClicked(bool isChecked);
+	void showHelpWindowClicked();
 protected slots:
 	//! needs to be used
 	//! to not delete this control dialog widget when closing
@@ -125,7 +127,7 @@ private:
 		tr("none"),
 		tr("bézier"),
 		tr("sine"),
-		tr("phase changable sine"),
+		tr("phase changeable sine"),
 		tr("peak"),
 		tr("steps"),
 		tr("random")
@@ -138,6 +140,21 @@ private:
 	std::vector<FloatModel*> m_controlModelArray;
 	std::vector<Knob*> m_hideableKnobs;
 	std::vector<ComboBox*> m_hideableComboBoxes;
+};
+
+class VectorGraphHelpView : public QTextEdit
+{
+	Q_OBJECT
+public:
+	static VectorGraphHelpView* getInstance()
+	{
+		static VectorGraphHelpView instance;
+		return &instance;
+	}
+
+private:
+	VectorGraphHelpView();
+	static QString s_helpText;
 };
 
 } // namespace gui
