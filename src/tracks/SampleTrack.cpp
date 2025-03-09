@@ -182,7 +182,7 @@ Clip * SampleTrack::createClip(const TimePos & pos)
 {
 	auto sClip = new SampleClip(this);
 	sClip->movePosition(pos);
-	return sClip;
+	return addClip(sClip);
 }
 
 

@@ -152,7 +152,6 @@ void PatternEditor::dropEvent(QDropEvent* de)
 			t->deleteClips();
 			t->createClipsForPattern(m_ps->numOfPatterns() - 1);
 		}
-		m_ps->updateAfterTrackAdd();
 
 		de->accept();
 	}

@@ -118,10 +118,8 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	// -- for usage by Clip only ---------------
-	Clip * addClip( Clip * clip );
-	void removeClip( Clip * clip );
-	// -------------------------------------------------------
+	virtual Clip* addClip(Clip* clip);
+	virtual void removeClip(Clip* clip);
 	void deleteClips();
 
 	int numOfClips();

@@ -49,7 +49,6 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	setName(tr("Pattern %1").arg(patternNum));
 	Engine::patternStore()->createClipsForPattern(patternNum);
 	Engine::patternStore()->setCurrentPattern(patternNum);
-	Engine::patternStore()->updateComboBox();
 
 	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
@@ -148,7 +147,7 @@ Clip* PatternTrack::createClip(const TimePos & pos)
 {
 	auto pc = new PatternClip(this);
 	pc->movePosition(pos);
-	return pc;
+	return addClip(pc);
 }
 
 

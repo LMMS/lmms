@@ -976,7 +976,6 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 	updateLength();
-	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 
@@ -1547,5 +1546,15 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	std::atomic_store(&m_keymaps[index], newMap);
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
+}
+
+void Song::addTrack(Track* track)
+{
+	TrackContainer::addTrack(track);
+
+	if (dynamic_cast<PatternTrack*>(track))
+	{
+		Engine::patternStore()->updateComboBox();
+	}
 }
 } // namespace lmms

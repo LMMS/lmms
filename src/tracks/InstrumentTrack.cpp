@@ -806,11 +806,15 @@ Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
 	auto p = new MidiClip(this);
 	p->movePosition(pos);
-	return p;
+	return addClip(p);
 }
 
-
-
+Clip* InstrumentTrack::addClip(Clip* clip)
+{
+	Track::addClip(clip);
+	if (trackContainer() == Engine::patternStore()) { dynamic_cast<MidiClip*>(clip)->resizeToFirstTrack(); }
+	return clip;
+}
 
 gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )
 {

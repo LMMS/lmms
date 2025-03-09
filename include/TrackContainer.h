@@ -65,12 +65,8 @@ public:
 
 	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
-
-	void addTrack( Track * _track );
-	void removeTrack( Track * _track );
-
-	virtual void updateAfterTrackAdd();
-
+	virtual void addTrack(Track* track);
+	virtual void removeTrack(Track* track);
 	void clearAllTracks();
 
 	const TrackList & tracks() const
