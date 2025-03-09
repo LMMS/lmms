@@ -24,6 +24,7 @@
 
 #include "SamplePreviewPlayHandle.h"
 
+#include "AudioBusHandle.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "SampleFrame.h"
@@ -48,30 +49,35 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 		m_diskStream.wait();
 		throw std::runtime_error{"Failed to create sample preview stream"};
 	}
+
+	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
 }
 
 SamplePreviewPlayHandle::~SamplePreviewPlayHandle() noexcept
 {
-    m_quit = true;
-    m_diskStream.wait();
+	m_quit = true;
+	m_diskStream.wait();
 	sf_close(m_sndfile);
+
+	// TODO: Should be handled by base class
+	delete audioBusHandle();
 }
 
 void SamplePreviewPlayHandle::play(SampleFrame* buffer)
 {
 	const auto size = Engine::audioEngine()->framesPerPeriod();
-    std::fill_n(buffer, size, SampleFrame{});
+	std::fill_n(buffer, size, SampleFrame{});
 
 	const auto framesAvailable = (m_writeIndex + m_buffer.size() - m_readIndex) % m_buffer.size();
 	const auto readSize = std::min(framesAvailable, size);
-    if (readSize == 0) { return; }
+	if (readSize == 0) { return; }
 
 	if (m_readIndex + readSize > m_buffer.size())
 	{
 		const auto readToEndSize = std::min(readSize, m_buffer.size() - m_readIndex);
 		const auto wrapAroundSize = readSize - readToEndSize;
-        mixCopy(buffer, m_buffer.data() + static_cast<int>(m_readIndex), readToEndSize, m_sfinfo.channels);
-        mixCopy(buffer, m_buffer.data(), wrapAroundSize, m_sfinfo.channels);
+		mixCopy(buffer, m_buffer.data() + static_cast<int>(m_readIndex), readToEndSize, m_sfinfo.channels);
+		mixCopy(buffer, m_buffer.data(), wrapAroundSize, m_sfinfo.channels);
 	}
 	else { mixCopy(buffer, m_buffer.data() + static_cast<int>(m_readIndex), readSize, m_sfinfo.channels); }
 
@@ -81,7 +87,7 @@ void SamplePreviewPlayHandle::play(SampleFrame* buffer)
 void SamplePreviewPlayHandle::runDiskStream()
 {
 	auto framesWritten = std::size_t{0};
-	while (framesWritten < m_sfinfo.frames && !m_quit)
+	while (framesWritten < static_cast<std::size_t>(m_sfinfo.frames) && !m_quit)
 	{
 		const auto framesAvailable = (m_readIndex + m_buffer.size() - m_writeIndex - 1) % m_buffer.size();
 		const auto writeSize = std::min(framesAvailable, m_buffer.size() - framesWritten);
@@ -90,7 +96,7 @@ void SamplePreviewPlayHandle::runDiskStream()
 		if (m_writeIndex + writeSize > m_buffer.size())
 		{
 			const auto writeToEndSize = std::min(writeSize, m_buffer.size() - m_writeIndex);
-			const auto wrapAroundSize = writeSize - writeToEndSize;            
+			const auto wrapAroundSize = writeSize - writeToEndSize;
 			sf_readf_float(m_sndfile, m_buffer.data() + m_writeIndex, static_cast<sf_count_t>(writeToEndSize));
 			sf_readf_float(m_sndfile, m_buffer.data(), static_cast<sf_count_t>(wrapAroundSize));
 		}
@@ -103,11 +109,11 @@ void SamplePreviewPlayHandle::runDiskStream()
 
 void SamplePreviewPlayHandle::mixCopy(SampleFrame* dst, const float* src, std::size_t frames, int channels)
 {
-    for (auto i = 0; i < frames; ++i)
-    {
-        dst[i][0] = src[i];
-        dst[i][1] = m_sfinfo.channels == 1 ? src[i] : src[i + 1];
-    }
+	for (auto i = std::size_t{0}; i < frames; ++i)
+	{
+		dst[i][0] = src[i];
+		dst[i][1] = m_sfinfo.channels == 1 ? src[i] : src[i + 1];
+	}
 }
 
 } // namespace lmms
