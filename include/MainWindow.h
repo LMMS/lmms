@@ -46,6 +46,7 @@ class ConfigManager;
 namespace gui
 {
 
+class FileBrowser;
 class PluginView;
 class SubWindow;
 class ToolButton;
