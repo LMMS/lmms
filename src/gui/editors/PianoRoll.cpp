@@ -4852,7 +4852,7 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 	// Loop through all notes having their detuning/parameter being edited, and find the one whose automation curve is closest to the mouse.
 	int minDifference = -1;
 	Note* closestNote = nullptr;
-	for(Note* note : m_selectedParameterEditNotes)
+	for (Note* note : m_selectedParameterEditNotes)
 	{
 		// Skip note if the mouse is outside of its start/end time
 		if (pos_ticks < note->pos() || pos_ticks > note->endPos()) { continue; }
