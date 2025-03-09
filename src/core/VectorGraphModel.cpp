@@ -1496,6 +1496,7 @@ float VectorGraphDataArray::processSingleEffect(size_t pointLocation, size_t eff
 	if (effectType == 0) { return output; }
 
 	// effects
+	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
 	switch (effectType)
 	{
 	case 1:
@@ -1644,6 +1645,7 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 	{
 		// 628.318531f = 100.0f * 2.0f * pi
 		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
+		// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
 		m_universalSampleBuffer[i] = sineAmp * std::sin(
 			(*xArray)[startLoc + i] * 628.318531f * tValB + sinePhase * 100.0f);
 	}
@@ -1677,10 +1679,7 @@ void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesO
 	float startLocVal = (*samplesOut)[startLoc];
 	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	if (count < 0)
-	{
-		count = 0;
-	}
+	count = count < 0 ? 0 : count;
 	for (size_t i = 0; i < static_cast<size_t>(count); i++)
 	{
 		(*samplesOut)[startLoc + i] += std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
@@ -1712,6 +1711,7 @@ void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samples
 		count = 0;
 	}
 
+	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
 	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
 	for (size_t i = 0; i < static_cast<size_t>(count); i++)
 	{
@@ -1744,6 +1744,7 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 		count = 0;
 	}
 
+	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
 	size_t randomValuesSize = static_cast<size_t>(50.0f * (randomCount + 1.0f)) * 2;
 
 	if (randomValuesSize <= 0) { return; }
