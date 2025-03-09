@@ -177,7 +177,7 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
-		else if(cutoffParameters.isUsed())
+		else if (cutoffParameters.isUsed())
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
