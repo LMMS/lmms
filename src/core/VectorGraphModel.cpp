@@ -41,6 +41,7 @@
 
 namespace lmms
 {
+const std::vector<float> VectorGraphModel::s_presudoRandomNumbers(VectorGraphModel::generatePresudoRandomNumbers(2000));
 
 VectorGraphModel::VectorGraphModel(size_t arrayMaxLength, Model* parent, bool defaultConstructed) :
 	Model(parent, tr("VectorGraphModel"), defaultConstructed)
@@ -291,6 +292,20 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 void VectorGraphModel::modelAddJournalCheckPoint()
 {
 	addJournalCheckPoint();
+}
+const std::vector<float>* VectorGraphModel::getRandomValues()
+{
+	return &VectorGraphModel::s_presudoRandomNumbers;
+}
+std::vector<float> VectorGraphModel::generatePresudoRandomNumbers(size_t amount)
+{
+	std::vector<float> output(amount);
+	unsigned int seed = 0;
+	for (auto& i : output)
+	{
+		i = std::fmod(rand_r(&seed) / 100000.0f, 2) - 1.0f;
+	}
+	return output;
 }
 
 // VectorGraphDataArray ------
@@ -1706,10 +1721,7 @@ void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samples
 	float startLocVal = (*samplesOut)[startLoc];
 	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	if (count < 0)
-	{
-		count = 0;
-	}
+	count = count < 0 ? 0 : count;
 
 	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
 	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
@@ -1739,51 +1751,35 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 	float randomAmp, float randomCount, float randomSeed, float fadeInStartVal)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	if (count < 0)
-	{
-		count = 0;
-	}
+	count = count < 0 ? 0 : count;
 
 	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
-	size_t randomValuesSize = static_cast<size_t>(50.0f * (randomCount + 1.0f)) * 2;
+	constexpr size_t maxRandomValueCount = 200;
+	constexpr size_t maxRandomValueSeed = 20;
+	const size_t randomValueCount = static_cast<size_t>(maxRandomValueCount * ((randomCount + 1.0f) * 0.5f));
 
-	if (randomValuesSize <= 0) { return; }
+	if (randomValueCount <= 0) { return; }
 
-	// "allocate" "randomValuesSize" amount of floats
-	// for generating random values
-	// in the universal buffer
-	if (m_universalSampleBuffer.size() < randomValuesSize)
-	{
-		m_universalSampleBuffer.resize(randomValuesSize);
-	}
+	const float seedAsFloat = ((randomSeed + 1.0f) * 0.5f) * static_cast<float>(maxRandomValueSeed - 1);
+	size_t seed = static_cast<size_t>(seedAsFloat);
+	const float blend = seedAsFloat - static_cast<float>(seed);
+	seed = seed * randomValueCount;
+	const size_t seedPlusOne = seed + randomValueCount;
 
-	float blend = 10.0f + randomSeed * 10.0f;
-	int randomSeedB = static_cast<int>(blend);
-	blend = blend - randomSeedB;
+	const std::vector<float>* randomNumbers = VectorGraphModel::getRandomValues();
+	if (seedPlusOne + randomValueCount + 1 >= randomNumbers->size()) { return; }
 
-	std::srand(randomSeedB);
-
-	// getting the random values
-	// generating 2 seeds and blending in between them
-	for (size_t i = 0; i < randomValuesSize / 2; i++)
-	{
-		m_universalSampleBuffer[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
-	}
-	std::srand(randomSeedB + 1);
-	for (size_t i = randomValuesSize / 2; i < randomValuesSize; i++)
-	{
-		m_universalSampleBuffer[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
-	}
-
-	// blending
-	// real size
-	float size = static_cast<float>(randomValuesSize / 2);
 	for (size_t i = 0; i < static_cast<size_t>(count); i++)
 	{
-		float randomValueX = (*xArray)[startLoc + i] * size;
-		float randomValueLocation = std::floor(randomValueX);
-		(*samplesOut)[startLoc + i] += -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
-			(m_universalSampleBuffer[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + m_universalSampleBuffer[static_cast<int>(randomValueLocation + size)] * blend) * randomAmp;
+		const float randomLocationAsFloat = ((*xArray)[startLoc + i] * randomValueCount);
+		const size_t randomLocation = static_cast<size_t>(randomLocationAsFloat);
+		const float curBlend = randomLocationAsFloat - static_cast<float>(randomLocation);
+		const float curInvBlend = 1.0f - curBlend;
+
+		(*samplesOut)[startLoc + i] += (((*randomNumbers)[seed + randomLocation] * (1.0f - curBlend * curBlend) +
+			(*randomNumbers)[seed + randomLocation + 1] * (1.0f - curInvBlend * curInvBlend)) * (1.0f - blend) +
+			((*randomNumbers)[seedPlusOne + randomLocation] * (1.0f - curBlend * curBlend) +
+			(*randomNumbers)[seedPlusOne + randomLocation + 1] * (1.0f - curInvBlend * curInvBlend)) * (blend)) * randomAmp;
 	}
 }
 

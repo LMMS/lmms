@@ -109,6 +109,8 @@ public:
 	
 	// addJournalCheckpoint
 	void modelAddJournalCheckPoint();
+	//! stores random values from -1.0 to 1.0
+	static const std::vector<float>* getRandomValues();
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
@@ -125,6 +127,7 @@ public slots:
 	void dataArrayClearedEvent(int arrayId);
 	void dataArrayStyleChanged();
 private:
+	static std::vector<float> generatePresudoRandomNumbers(size_t amount);
 
 	std::vector<VectorGraphDataArray> m_dataArrays;
 	size_t m_maxLength;
@@ -133,12 +136,12 @@ private:
 	// a dataArray's getSamples() at the same time
 	QMutex m_getSamplesAccess;
 	QMutex m_bakedSamplesAccess;
-	//friend class lmms::gui::VectorGraphView;
+	
+	static const std::vector<float> s_presudoRandomNumbers;
 };
 
 class LMMS_EXPORT VectorGraphDataArray
 {
-
 public:
 	// avoid using this or run updateConnections() after initialization
 	VectorGraphDataArray();
