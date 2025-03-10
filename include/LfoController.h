@@ -31,8 +31,8 @@
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
+#include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
-#include "Oscillator.h"
 
 namespace lmms
 {
