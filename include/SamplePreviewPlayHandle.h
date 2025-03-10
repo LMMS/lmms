@@ -37,7 +37,7 @@ namespace lmms {
 class SamplePreviewPlayHandle : public PlayHandle
 {
 public:
-	SamplePreviewPlayHandle(const std::filesystem::path& path, std::size_t size = DefaultStreamCapacity);
+	SamplePreviewPlayHandle(const std::filesystem::path& path);
 
 	SamplePreviewPlayHandle(const SamplePreviewPlayHandle&) = delete;
 	SamplePreviewPlayHandle(SamplePreviewPlayHandle&&) = delete;
@@ -49,21 +49,28 @@ public:
 
 	void play(SampleFrame* dst) override;
 	bool isFromTrack(const Track* _track) const override { return false; };
-	bool isFinished() const override { return !m_diskStream.valid(); }
+	bool isFinished() const override { return false; }
 
 private:
 	void runDiskStream();
-	float* bufferAt(std::size_t frameIndex) { return &m_buffer[frameIndex * DEFAULT_CHANNELS]; }
-	std::size_t numFrames() const { return m_buffer.size() / DEFAULT_CHANNELS; }
+	std::size_t samplesAvailableToRead() const { return (m_writeIndex - m_readIndex + m_buffer.size()) % m_buffer.size(); }
+	std::size_t samplesAvailableToWrite() const { return m_buffer.size() - samplesAvailableToRead() - 1; }
+
+	std::vector<float> m_buffer;
+
+	std::atomic<std::size_t> m_readIndex = 0;
+	std::atomic<std::size_t> m_writeIndex = 0;
+	std::atomic<bool> m_quit = false;
+
+	std::size_t m_samplesWritten = 0;
 
 	SNDFILE* m_sndfile = nullptr;
-	std::vector<float> m_buffer;
-	std::atomic<bool> m_quit = false;
-	std::atomic<std::size_t> m_readFrameIndex = 0;
-	std::atomic<std::size_t> m_writeFrameIndex = 0;
 	SF_INFO m_sfinfo = SF_INFO{};
+
 	std::future<void> m_diskStream;
-	static constexpr auto DefaultStreamCapacity = 8192;
+
+	std::size_t m_chunkSize = DefaultChunkSize;
+	static constexpr auto DefaultChunkSize = std::size_t{256};
 };
 
 } // namespace lmms

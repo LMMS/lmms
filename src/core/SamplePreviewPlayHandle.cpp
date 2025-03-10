@@ -31,9 +31,10 @@
 #include "ThreadPool.h"
 
 namespace lmms {
-SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& path, std::size_t size)
+SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& path)
 	: PlayHandle(Type::SamplePreviewPlayHandle)
-	, m_buffer(size * DEFAULT_CHANNELS)
+	, m_buffer(Engine::audioEngine()->outputSampleRate())
+	, m_chunkSize(Engine::audioEngine()->framesPerPeriod())
 {
 #ifdef LMMS_BUILD_WIN32
 	m_sndfile = sf_wchar_open(path.c_str(), SFM_READ, &m_sfinfo);
@@ -42,14 +43,21 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 #endif
 
 	if (m_sndfile == nullptr) { throw std::runtime_error{"Failed to create sample preview stream"}; }
+
+	const auto preloadWriteCount
+		= std::min(static_cast<sf_count_t>(samplesAvailableToWrite()), m_sfinfo.frames * m_sfinfo.channels);
+
+	m_samplesWritten = sf_read_float(m_sndfile, &m_buffer[m_writeIndex], preloadWriteCount);
+	m_writeIndex = (m_writeIndex + m_samplesWritten) % m_buffer.size();
 	m_diskStream = ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this);
+
 	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
 }
 
 SamplePreviewPlayHandle::~SamplePreviewPlayHandle() noexcept
 {
 	m_quit = true;
-	m_diskStream.wait();
+	m_diskStream.get();
 	sf_close(m_sndfile);
 
 	// TODO: Should be handled by base class
@@ -59,47 +67,45 @@ SamplePreviewPlayHandle::~SamplePreviewPlayHandle() noexcept
 void SamplePreviewPlayHandle::play(SampleFrame* dst)
 {
 	const auto size = Engine::audioEngine()->framesPerPeriod();
-	const auto framesAvailable = (m_writeFrameIndex + numFrames() - m_readFrameIndex) % numFrames();
-	const auto framesToRead = std::min(framesAvailable, size);
+	const auto samplesToRead = std::min(samplesAvailableToRead(), size * DEFAULT_CHANNELS);
 
-	if (framesToRead == 0)
+	if (samplesToRead == 0)
 	{
 		std::fill_n(dst, size, SampleFrame{});
 		return;
 	}
 
-	const auto readIndex = m_readFrameIndex.load();
-	for (auto i = std::size_t{0}; i < framesToRead; ++i)
+	for (auto i = std::size_t{0}; i < samplesToRead; i += m_sfinfo.channels)
 	{
-		const auto buffer = bufferAt((readIndex + i) % numFrames());
-		dst[i][0] = buffer[0];
-		dst[i][1] = m_sfinfo.channels == 1 ? buffer[0] : buffer[1];
+		const auto frame = i / m_sfinfo.channels;
+		dst[frame][0] = m_buffer[(m_readIndex + i) % m_buffer.size()];
+		dst[frame][1] = m_sfinfo.channels == 1 ? dst[frame][0] : m_buffer[(m_readIndex + i + 1) % m_buffer.size()];
 	}
 
-	std::fill_n(dst + framesToRead, size - framesToRead, SampleFrame{});
-	m_readFrameIndex = (m_readFrameIndex + framesToRead) % numFrames();
-
+	m_readIndex = (m_readIndex + samplesToRead) % m_buffer.size();
 }
 
 void SamplePreviewPlayHandle::runDiskStream()
 {
-	auto framesWritten = std::size_t{0};
-	const auto framesToWrite = static_cast<std::size_t>(m_sfinfo.frames);
-
-	while (framesWritten < framesToWrite && !m_quit)
+	auto totalSamplesToWrite = static_cast<std::size_t>(m_sfinfo.frames * m_sfinfo.channels);
+	while (m_samplesWritten < totalSamplesToWrite && !m_quit)
 	{
-		const auto framesAvailable = (m_readFrameIndex + numFrames() - m_writeFrameIndex - 1) % numFrames();
-		const auto writeSize = std::min(framesAvailable, framesToWrite - framesWritten);
-		if (writeSize == 0) { continue; }
+		const auto samplesToWrite
+			= std::min({samplesAvailableToWrite(), totalSamplesToWrite - m_samplesWritten, m_chunkSize});
 
-		const auto writeToEndSize = std::min(writeSize, numFrames() - m_writeFrameIndex);
-		sf_readf_float(m_sndfile, bufferAt(m_writeFrameIndex), static_cast<sf_count_t>(writeToEndSize));
+		if (samplesToWrite == 0) { continue; }
 
-		const auto wrapAroundSize = writeSize - writeToEndSize;
-		sf_readf_float(m_sndfile, bufferAt(0), static_cast<sf_count_t>(wrapAroundSize));
+		auto samplesWriteToEnd = std::min(m_buffer.size() - m_writeIndex, samplesToWrite);
+		samplesWriteToEnd
+			= sf_read_float(m_sndfile, &m_buffer[m_writeIndex], static_cast<sf_count_t>(samplesWriteToEnd));
 
-		framesWritten += writeSize;
-		m_writeFrameIndex = (m_writeFrameIndex + writeSize) % numFrames();
+		auto samplesWrapped = samplesToWrite - samplesWriteToEnd;
+		samplesWrapped = sf_read_float(m_sndfile, &m_buffer[(m_writeIndex + samplesWriteToEnd) % m_buffer.size()],
+			static_cast<sf_count_t>(samplesWrapped));
+
+		const auto actualSamplesWrittten = samplesWriteToEnd + samplesWrapped;
+		m_samplesWritten += actualSamplesWrittten;
+		m_writeIndex = (m_writeIndex + actualSamplesWrittten) % m_buffer.size();
 	}
 }
 } // namespace lmms
