@@ -27,7 +27,6 @@
 #include <algorithm> // sort
 #include <array>
 #include <cmath> // sine
-#include <cstdlib> // rand
 #include <vector>
 
 #include <QMutex> // locking when getSamples
@@ -35,6 +34,7 @@
 #include "AutomatableModel.h"
 #include "base64.h"
 #include "GuiApplication.h" // getGUI
+#include "lmms_math.h" // fastRand
 #include "JournallingObject.h"
 #include "MainWindow.h" // getting main window for control dialog
 #include "ProjectJournal.h"
@@ -300,10 +300,9 @@ const std::vector<float>* VectorGraphModel::getRandomValues()
 std::vector<float> VectorGraphModel::generatePresudoRandomNumbers(size_t amount)
 {
 	std::vector<float> output(amount);
-	unsigned int seed = 0;
 	for (auto& i : output)
 	{
-		i = std::fmod(rand_r(&seed) / 100000.0f, 2) - 1.0f;
+		i = std::fmod(fastRand() / 10000.0f, 2) - 1.0f;
 	}
 	return output;
 }
