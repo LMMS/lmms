@@ -1,6 +1,6 @@
 INCLUDE(BuildPlugin)
 
-IF(NOT WIN32)
+IF(NOT MSVC)
 	# Tons of false positives portsmf with this enabled
 	add_compile_options("-Wno-maybe-uninitialized")
 ENDIF()
