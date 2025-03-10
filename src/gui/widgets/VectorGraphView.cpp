@@ -62,7 +62,6 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 
 	m_pointSize = pointSize;
 	// gets set in style
-	//m_fontSize = 12; // set in css
 	m_isSimplified = false;
 	m_isDefaultColorsApplyed = false;
 	//m_background;

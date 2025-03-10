@@ -184,7 +184,7 @@ private:
 
 	//! radius, rx = ry
 	size_t m_pointSize;
-	size_t m_fontSize;
+	int m_fontSize;
 	//! draw simplified lines
 	bool m_isSimplified;
 	//! true when applyDefaultColors is called, used when defaultColors are loading
