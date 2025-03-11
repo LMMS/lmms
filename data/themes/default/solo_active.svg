@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xml:space="preserve" width="20" height="20" version="1.1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title>LMMS solo button (active)</title>
+  <metadata>
+    <rdf:RDF>
+      <cc:Work>
+        <cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:title>LMMS solo button (active)</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Rebecca Noel Ati, Stakeout Punch</dc:title>
+          </cc:Agent>
+        </dc:creator>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <rect width="19" height="19" x=".5" y=".5" fill="#2696d1"
+    stroke="#055f89" stroke-linecap="round" stroke-linejoin="bevel"
+    ry="2.065" id="button" />
+  <path id="highlight" fill="#fff" opacity=".1"
+    d="M2.56445 1C1.6888 1 1 1.6888 1 2.56445V3c0-.554.446-1 1-1h16c.554 0 1 .446 1 1v-.43555C19 1.6888 18.3112 1 17.43555 1Z" />
+  <path id="shadow" fill="#000" opacity=".1"
+    d="M2.56445 19C1.6888 19 1 18.3112 1 17.43555V17c0 .554.446 1 1 1h16c.554 0 1-.446 1-1v.43555C19 18.3112 18.3112 19 17.43555 19Z" />
+  <path id="headphones" fill="#fff"
+    d="m 10,4.0000248 c -1.472525,0.00403 -2.993968,0.4818935 -4.136604,1.5 C 4.72076,6.5181313 4,8.0872298 4,10.000025 c 0,1.60032 0,3.357065 0,5 0,0.5 0.5,1 1,1 h 2 c 0.5,0 1,-0.5 1,-1 v -3 c 0,-0.5 -0.5,-1 -1,-1 H 6 c 0,-0.5 0,-0.5 0,-1 0,-1.4114252 0.513729,-2.3474522 1.246094,-3.0000002 0.732364,-0.6525475 1.726429,-0.9971905 2.753906,-1 1.027475,-0.00281 2.03517,0.354394 2.765625,1.0039065 C 13.490632,7.6486008 13.992038,8.5905738 14,10.000025 v 1 h -1 c -0.5,0 -1,0.5 -1,1 v 3 c 0,0.5 0.5,1 1,1 h 2 c 0.5,0 1,-0.5 1,-1 v -5 C 15.992284,8.0891328 15.265582,6.5121893 14.127288,5.5000248 12.982744,4.4823023 11.472523,3.9959983 10,4.0000248 Z" />
+</svg>
