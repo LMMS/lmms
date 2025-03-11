@@ -139,7 +139,7 @@ void AudioSndio::stopProcessing()
 	stopProcessingThread( this );
 }
 
-void AudioSndio::run()
+void AudioSndio::run() LMMS_NONBLOCKING
 {
 	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];

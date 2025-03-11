@@ -165,17 +165,14 @@ void AudioSdl::stopProcessing()
 	}
 }
 
-void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
+void AudioSdl::sdlAudioCallback(void* _udata, Uint8* _buf, int _len) LMMS_NONBLOCKING
 {
 	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlAudioCallback( _buf, _len );
 }
 
-
-
-
-void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
+void AudioSdl::sdlAudioCallback(Uint8* _buf, int _len) LMMS_NONBLOCKING
 {
 	if( m_stopped )
 	{
@@ -211,13 +208,13 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 	}
 }
 
-void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
+void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) LMMS_NONBLOCKING {
 	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlInputAudioCallback( _buf, _len );
 }
 
-void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
+void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) LMMS_NONBLOCKING {
 	auto samples_buffer = (SampleFrame*)_buf;
 	fpp_t frames = _len / sizeof ( SampleFrame );
 

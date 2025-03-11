@@ -240,7 +240,7 @@ void AudioAlsa::stopProcessing()
 	stopProcessingThread( this );
 }
 
-void AudioAlsa::run()
+void AudioAlsa::run() LMMS_NONBLOCKING
 {
 	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
