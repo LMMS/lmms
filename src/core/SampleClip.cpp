@@ -387,15 +387,7 @@ gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 void SampleClip::exportSampleBuffer(const QString& fileName)
 {
 	m_exportedSampleName = fileName;
-	s_sampleExporter->startExporting(fileName, m_sample.buffer(), &SampleClip::exportSampleBufferCallback, this);
-}
-
-void SampleClip::exportSampleBufferCallback(void* thisObject)
-{
-	if (thisObject == nullptr) { return; }
-	SampleClip* castedThis = static_cast<SampleClip*>(thisObject);
-	castedThis->setSampleFile(castedThis->m_exportedSampleName);
-	castedThis->m_exportedSampleName.clear();
+	s_sampleExporter->startExporting(fileName, m_sample.buffer());
 }
 
 

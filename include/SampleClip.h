@@ -98,7 +98,6 @@ protected:
 
 private:
 	void exportSampleBuffer(const QString& fileName);
-	static void exportSampleBufferCallback(void* thisObject);
 
 	Sample m_sample;
 	BoolModel m_recordModel;
