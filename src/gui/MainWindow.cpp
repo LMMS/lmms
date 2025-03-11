@@ -1644,7 +1644,7 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 
 	for (auto* curWindow : subWindows)
 	{
-		if (curWindow->isVisible() && curWindow->isMaximized() == false)
+		if (curWindow->isMaximized() == false)
 		{
 			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
 		}
