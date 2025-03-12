@@ -546,12 +546,12 @@ float SaProcessor::getFreqRangeMin(bool linear) const
 {
 	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FrequencyRange::Audible: return FRANGE_AUDIBLE_START;
-		case FrequencyRange::Bass: return FRANGE_BASS_START;
-		case FrequencyRange::Mids: return FRANGE_MIDS_START;
-		case FrequencyRange::High: return FRANGE_HIGH_START;
+		case FrequencyRange::Audible: return FrequencyRangeAudibleStart;
+		case FrequencyRange::Bass: return FrequencyRangeBassStart;
+		case FrequencyRange::Mids: return FrequencyRangeMidsStart;
+		case FrequencyRange::High: return FrequencyRangeHighStart;
 		default:
-		case FrequencyRange::Full: return linear ? 0 : LOWEST_LOG_FREQ;
+		case FrequencyRange::Full: return linear ? 0 : LowestLogFreq;
 	}
 }
 
@@ -560,10 +560,10 @@ float SaProcessor::getFreqRangeMax() const
 {
 	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FrequencyRange::Audible: return FRANGE_AUDIBLE_END;
-		case FrequencyRange::Bass: return FRANGE_BASS_END;
-		case FrequencyRange::Mids: return FRANGE_MIDS_END;
-		case FrequencyRange::High: return FRANGE_HIGH_END;
+		case FrequencyRange::Audible: return FrequencyRangeAudibleEnd;
+		case FrequencyRange::Bass: return FrequencyRangeBassEnd;
+		case FrequencyRange::Mids: return FrequencyRangeMidsEnd;
+		case FrequencyRange::High: return FrequencyRangeHighEnd;
 		default:
 		case FrequencyRange::Full: return getNyquistFreq();
 	}
@@ -620,11 +620,11 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 	if (linear) {return -900;}
 	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case AmplitudeRange::Extended: return ARANGE_EXTENDED_START;
-		case AmplitudeRange::Silent: return ARANGE_SILENT_START;
-		case AmplitudeRange::Loud: return ARANGE_LOUD_START;
+		case AmplitudeRange::Extended: return AmplitudeRangeExtendedStart;
+		case AmplitudeRange::Silent: return AmplitudeRangeSilentStart;
+		case AmplitudeRange::Loud: return AmplitudeRangeLoudStart;
 		default:
-		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_START;
+		case AmplitudeRange::Audible: return AmplitudeRangeAudibleStart;
 	}
 }
 
@@ -633,11 +633,11 @@ float SaProcessor::getAmpRangeMax() const
 {
 	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case AmplitudeRange::Extended: return ARANGE_EXTENDED_END;
-		case AmplitudeRange::Silent: return ARANGE_SILENT_END;
-		case AmplitudeRange::Loud: return ARANGE_LOUD_END;
+		case AmplitudeRange::Extended: return AmplitudeRangeExtendedEnd;
+		case AmplitudeRange::Silent: return AmplitudeRangeSilentEnd;
+		case AmplitudeRange::Loud: return AmplitudeRangeLoudEnd;
 		default:
-		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_END;
+		case AmplitudeRange::Audible: return AmplitudeRangeAudibleEnd;
 	}
 }
 
