@@ -83,9 +83,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	// buttons in a layout.
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
-	operationsLayout->setContentsMargins(0, 0, 0, 0);
+	operationsLayout->setContentsMargins(0, 3, 0, 0);
 	operationsLayout->setSpacing(2);
-	operationsLayout->setAlignment(Qt::AlignTop);
 
 	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
@@ -146,11 +145,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 }
 
 
-
-
-
-
-
 /*! \brief Respond to trackOperationsWidget mouse events
  *
  *  If it's the left mouse button, and Ctrl is held down, and we're
@@ -179,8 +173,6 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 		me->ignore();
 	}
 }
-
-
 
 
 /*!
@@ -223,16 +215,8 @@ bool TrackOperationsWidget::confirmRemoval()
 	mb.setCheckBox(askAgainCheckBox);
 	mb.setDefaultButton(QMessageBox::Cancel);
 
-	int answer = mb.exec();
-
-	if( answer == QMessageBox::Ok )
-	{
-		return true;
-	}
-	return false;
+	return mb.exec() == QMessageBox::Ok;
 }
-
-
 
 /*! \brief Clone this track
  *
@@ -269,7 +253,6 @@ void TrackOperationsWidget::clearTrack()
 	t->deleteClips();
 	t->unlock();
 }
-
 
 
 /*! \brief Remove this track from the track list
@@ -324,6 +307,7 @@ void TrackOperationsWidget::resetClipColors()
 	}
 	Engine::getSong()->setModified();
 }
+
 
 /*! \brief Update the trackOperationsWidget context menu
  *
@@ -389,7 +373,6 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		atv->update();
 	}
 }
-
 
 
 void TrackOperationsWidget::recordingOn()
