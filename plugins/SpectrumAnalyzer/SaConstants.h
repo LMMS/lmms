@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SA_CONSTANTS_H
-#define SA_CONSTANTS_H
+#ifndef LMMS_SA_CONSTANTS_H
+#define LMMS_SA_CONSTANTS_H
 
 namespace lmms
 {
@@ -73,4 +73,4 @@ inline constexpr auto ARANGE_SILENT_END     = -10;
 
 } // namespace lmms
 
-#endif // SA_CONSTANTS_H
+#endif // LMMS_SA_CONSTANTS_H
