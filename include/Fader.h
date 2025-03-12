@@ -74,8 +74,8 @@ public:
 	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
 	Q_PROPERTY(QColor unityMarker MEMBER m_unityMarker)
 
-	Fader(FloatModel* model, const QString& name, QWidget* parent);
-	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
+	Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear = true);
+	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob, bool modelIsLinear = true);
 	~Fader() override = default;
 
 	void setPeak_L(float fPeak);
@@ -92,6 +92,17 @@ public:
 
 	inline bool getRenderUnityLine() const { return m_renderUnityLine; }
 	inline void setRenderUnityLine(bool value = true) { m_renderUnityLine = value; }
+
+	enum class AdjustmentDirection
+	{
+		Up,
+		Down
+	};
+
+	void adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction);
+	void adjustByDecibelDelta(float value);
+
+	void adjustByDialog();
 
 	void setDisplayConversion(bool b)
 	{
@@ -118,18 +129,34 @@ private:
 	void paintEvent(QPaintEvent* ev) override;
 
 	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
+	void paintFaderTicks(QPainter& painter);
 
-	int knobPosY() const
-	{
-		float fRange = model()->maxValue() - model()->minValue();
-		float realVal = model()->value() - model()->minValue();
+	float determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const;
+	void adjustModelByDBDelta(float value);
 
-		return height() - ((height() - m_knob.height()) * (realVal / fRange));
-	}
+	int calculateKnobPosYFromModel() const;
+	void setVolumeByLocalPixelValue(int y);
+
+	/**
+	 * @brief Computes the scaled ratio between the maximum dB value supported by the model and the minimum
+	 * dB value that's supported by the fader from the given actual dB value.
+	 * 
+	 * If the provided input value lies inside the aforementioned interval then the result will be
+	 * a value between 0 (value == minimum value) and 1 (value == maximum model value).
+	 * If you look at the graphical representation of the fader then 0 represents a point at the bottom
+	 * of the fader and 1 a point at the top of the fader.
+	 * The ratio is scaled by an internal exponent which is an implementation detail that cannot be
+	 * changed for now.
+	 */
+	float computeScaledRatio(float dBValue) const;
 
 	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
 
 	void updateTextFloat();
+	void modelValueChanged();
+	QString getModelValueAsDbString() const;
+
+	bool modelIsLinear() const { return m_modelIsLinear; }
 
 	// Private members
 private:
@@ -145,10 +172,16 @@ private:
 
 	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
 
-	bool m_levelsDisplayedInDBFS {true};
+	/**
+	 * @brief Stores the offset to the knob center when the user drags the fader knob
+	 * 
+	 * This is needed to make it feel like the users drag the knob without it
+	 * jumping immediately to the click position.
+	 */
+	int m_knobCenterOffset {0};
 
-	int m_moveStartPoint {-1};
-	float m_startValue {0.};
+	bool m_levelsDisplayedInDBFS {true};
+	bool m_modelIsLinear {false};
 
 	static SimpleTextFloat* s_textFloat;
 

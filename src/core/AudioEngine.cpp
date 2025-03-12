@@ -30,7 +30,7 @@
 #include "lmmsconfig.h"
 
 #include "AudioEngineWorkerThread.h"
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -299,13 +299,13 @@ void AudioEngine::renderStageNoteSetup()
 
 		if( it != m_playHandles.end() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
+			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			m_playHandles.erase( it );
+			m_playHandles.erase(it);
 		}
 
 		it_rem = m_playHandlesToRemove.erase( it_rem );
@@ -347,7 +347,7 @@ void AudioEngine::renderStageEffects()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
+	AudioEngineWorkerThread::fillJobQueue(m_audioBusHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
@@ -362,13 +362,13 @@ void AudioEngine::renderStageEffects()
 		}
 		if( ( *it )->isFinished() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
+			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			it = m_playHandles.erase( it );
+			it = m_playHandles.erase(it);
 		}
 		else
 		{
@@ -556,14 +556,14 @@ void AudioEngine::restoreAudioDevice()
 
 
 
-void AudioEngine::removeAudioPort(AudioPort * port)
+void AudioEngine::removeAudioBusHandle(AudioBusHandle* busHandle)
 {
 	requestChangeInModel();
 
-	auto it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
-	if (it != m_audioPorts.end())
+	auto it = std::find(m_audioBusHandles.begin(), m_audioBusHandles.end(), busHandle);
+	if (it != m_audioBusHandles.end())
 	{
-		m_audioPorts.erase(it);
+		m_audioBusHandles.erase(it);
 	}
 	doneChangeInModel();
 }
@@ -577,7 +577,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
 		m_newPlayHandles.push( handle );
-		handle->audioPort()->addPlayHandle( handle );
+		handle->audioBusHandle()->addPlayHandle(handle);
 		return true;
 	}
 
@@ -598,7 +598,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 	// which were created in a thread different than the audio engine thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
-		ph->audioPort()->removePlayHandle(ph);
+		ph->audioBusHandle()->removePlayHandle(ph);
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
@@ -657,13 +657,13 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
+			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			it = m_playHandles.erase( it );
+			it = m_playHandles.erase(it);
 		}
 		else
 		{

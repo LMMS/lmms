@@ -344,6 +344,48 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 	}
 }
 
+void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds)
+{
+	if (notes.empty()) { return; }
+
+	// Don't split if the line is horitzontal
+	if (key1 == key2) { return; }
+
+	addJournalCheckPoint();
+
+	const auto slope = 1.f * (pos2 - pos1) / (key2 - key1);
+	const auto& [minKey, maxKey] = std::minmax(key1, key2);
+
+	for (const auto& note : notes)
+	{
+		// Skip if the key is <= to minKey, since the line is drawn from the top of minKey to the top of maxKey, but only passes through maxKey - minKey - 1 total keys.
+		if (note->key() <= minKey || note->key() > maxKey) { continue; }
+
+		// Subtracting 0.5 to get the line's intercept at the "center" of the key, not the top.
+		const TimePos keyIntercept = slope * (note->key() - 0.5 - key1) + pos1;
+		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
+		{
+			auto newNote1 = Note{*note};
+			newNote1.setLength(keyIntercept - note->pos());
+
+			auto newNote2 = Note{*note};
+			newNote2.setPos(keyIntercept);
+			newNote2.setLength(note->endPos() - keyIntercept);
+
+			if (deleteShortEnds)
+			{
+				addNote(newNote1.length() >= newNote2.length() ? newNote1 : newNote2, false);
+			}
+			else
+			{
+				addNote(newNote1, false);
+				addNote(newNote2, false);
+			}
+
+			removeNote(note);
+		}
+	}
+}
 
 
 
