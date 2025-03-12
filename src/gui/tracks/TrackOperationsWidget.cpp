@@ -85,6 +85,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
 	operationsLayout->setContentsMargins(0, 0, 0, 0);
 	operationsLayout->setSpacing(2);
+	operationsLayout->setAlignment(Qt::AlignTop);
 
 	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
@@ -131,7 +132,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	operationsLayout->addWidget(muteWidget);
 	operationsLayout->addWidget(soloWidget);
 
-	layout->addWidget(operationsWidget, 0, Qt::AlignCenter | Qt::AlignLeading);
+	layout->addWidget(operationsWidget, 0, Qt::AlignTop | Qt::AlignLeading);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
