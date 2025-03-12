@@ -26,10 +26,13 @@
 #include "AudioEngine.h"
 #include "AudioBusHandle.h"
 #include "Engine.h"
+#include "MixHelpers.h"
 #include "Note.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
 #include "SampleTrack.h"
+
+#include <QDebug>
 
 namespace lmms
 {
@@ -44,6 +47,7 @@ SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle) :
 	m_defaultVolumeModel(DefaultVolume, MinVolume, MaxVolume, 1),
 	m_volumeModel(&m_defaultVolumeModel),
 	m_track(nullptr),
+	m_clip(nullptr),
 	m_patternTrack(nullptr)
 {
 	if (ownAudioBusHandle)
@@ -66,6 +70,7 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 	SamplePlayHandle(&clip->sample(), false)
 {
+	m_clip = clip;
 	m_track = clip->getTrack();
 	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
 }
@@ -106,6 +111,28 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 		frames -= offset();
 	}
 
+	float crossfadeAmount = 1.0f;
+	bool inCrossfade = false;
+	if (m_clip)
+	{
+	 	const f_cnt_t startCrossfadeFrames = m_clip->startCrossfadeLength() * Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
+		const f_cnt_t endCrossfadeFrames = m_clip->endCrossfadeLength() * Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
+		const f_cnt_t framesPerTick = Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
+		const int framesRelativeToClipStart = m_state.frameIndex() + m_clip->startTimeOffset() * framesPerTick;
+		const int framesRelativeToClipEnd = m_clip->length() * framesPerTick - framesRelativeToClipStart;
+	
+		if (framesRelativeToClipStart < static_cast<int>(startCrossfadeFrames))
+		{
+			crossfadeAmount *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames));
+			inCrossfade = true;
+		}
+		if (framesRelativeToClipEnd < static_cast<int>(endCrossfadeFrames))
+		{
+			crossfadeAmount *= std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+			inCrossfade = true;
+		}
+	}
+
 	if( !( m_track && m_track->isMuted() )
 				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
@@ -117,6 +144,10 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 		if (!m_sample->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
 			zeroSampleFrames(workingBuffer, frames);
+		}
+		if (inCrossfade)
+		{
+			MixHelpers::multiply(workingBuffer, crossfadeAmount, frames);
 		}
 	}
 

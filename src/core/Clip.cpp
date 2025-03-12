@@ -47,6 +47,9 @@ Clip::Clip( Track * track ) :
 	m_track( track ),
 	m_startPosition(),
 	m_length(),
+	m_startCrossfadeLength(0),
+	m_endCrossfadeLength(0),
+	m_autoCrossfade{true},
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
@@ -76,6 +79,7 @@ Clip::~Clip()
 	{
 		getTrack()->removeClip( this );
 	}
+	deleteCrossfades();
 }
 
 
@@ -99,8 +103,91 @@ void Clip::movePosition( const TimePos & pos )
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}
+	updateCrossfades();
 }
 
+
+void Clip::updateCrossfades()
+{
+	if (m_autoCrossfade)
+	{
+		// If the left or right crossfade isn't valid anymore, remove them
+		if (m_leftCrossfadeClip && (
+			m_leftCrossfadeClip->endPosition() <= startPosition()
+			|| m_leftCrossfadeClip->startPosition() >= startPosition()
+			|| !m_leftCrossfadeClip->autoCrossfade()))
+		{
+			m_leftCrossfadeClip->setEndCrossfadeLength(0);
+			m_leftCrossfadeClip->m_rightCrossfadeClip = nullptr;
+			setStartCrossfadeLength(0);
+			m_leftCrossfadeClip = nullptr;
+		}
+		if (m_rightCrossfadeClip && (
+			m_rightCrossfadeClip->startPosition() >= endPosition()
+			|| m_rightCrossfadeClip->endPosition() <= endPosition()
+			|| !m_rightCrossfadeClip->autoCrossfade()))
+		{
+			m_rightCrossfadeClip->setStartCrossfadeLength(0);
+			m_rightCrossfadeClip->m_leftCrossfadeClip = nullptr;
+			setEndCrossfadeLength(0);
+			m_rightCrossfadeClip = nullptr;
+		}
+		// If there isn't a left or right crossfade yet, add them
+		if (!m_rightCrossfadeClip || !m_leftCrossfadeClip)
+		{
+			for (Clip* clip: m_track->getClips())
+			{
+				if (clip && clip != this && clip->autoCrossfade())
+				{
+					if (clip->startPosition() <= startPosition() && clip->endPosition() >= endPosition()) { continue; }
+					if (clip->startPosition() >= startPosition() && clip->endPosition() <= endPosition()) { continue; }
+					if (clip->startPosition() < endPosition() && clip->endPosition() > endPosition() && !m_rightCrossfadeClip && !clip->m_leftCrossfadeClip)
+					{
+						clip->m_leftCrossfadeClip = this;
+						m_rightCrossfadeClip = clip;
+					}
+					else if (clip->endPosition() > startPosition() && clip->startPosition() < startPosition() && !m_leftCrossfadeClip && !clip->m_rightCrossfadeClip)
+					{
+						clip->m_rightCrossfadeClip = this;
+						m_leftCrossfadeClip = clip;
+					}
+				}
+			}
+		}
+		// If we do have a left/right crossfade, update the length.
+		if (m_leftCrossfadeClip)
+		{
+			const TimePos overlap = m_leftCrossfadeClip->endPosition() - startPosition();
+			m_leftCrossfadeClip->setEndCrossfadeLength(overlap);
+			setStartCrossfadeLength(overlap);
+			emit m_leftCrossfadeClip->crossfadesChanged();
+		}
+		if (m_rightCrossfadeClip)
+		{
+			const TimePos overlap = endPosition() - m_rightCrossfadeClip->startPosition();
+			m_rightCrossfadeClip->setStartCrossfadeLength(overlap);
+			setEndCrossfadeLength(overlap);
+			emit m_rightCrossfadeClip->crossfadesChanged();
+		}
+	}
+	emit crossfadesChanged();
+}
+
+void Clip::deleteCrossfades()
+{
+	if (m_leftCrossfadeClip)
+	{
+		m_leftCrossfadeClip->m_rightCrossfadeClip = nullptr;
+		m_leftCrossfadeClip->setEndCrossfadeLength(0);
+		m_leftCrossfadeClip = nullptr;
+	}
+	if (m_rightCrossfadeClip)
+	{
+		m_rightCrossfadeClip->m_leftCrossfadeClip = nullptr;
+		m_leftCrossfadeClip->setStartCrossfadeLength(0);
+		m_rightCrossfadeClip = nullptr;
+	}
+}
 
 
 
@@ -114,6 +201,7 @@ void Clip::movePosition( const TimePos & pos )
 void Clip::changeLength( const TimePos & length )
 {
 	m_length = length;
+	updateCrossfades();
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }

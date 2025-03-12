@@ -134,6 +134,38 @@ public:
 	TimePos startTimeOffset() const;
 	void setStartTimeOffset( const TimePos &startTimeOffset );
 
+	TimePos startCrossfadeLength() const
+	{
+		return m_startCrossfadeLength;
+	}
+	void setStartCrossfadeLength(const TimePos &startCrossfadeLength)
+	{
+		m_startCrossfadeLength = std::max(TimePos{0}, startCrossfadeLength);
+	}
+	Clip* leftCrossfadeClip() { return m_leftCrossfadeClip; }
+
+	TimePos endCrossfadeLength() const
+	{
+		return m_endCrossfadeLength;
+	}
+	void setEndCrossfadeLength(const TimePos &endCrossfadeLength)
+	{
+		m_endCrossfadeLength = std::max(TimePos{0}, endCrossfadeLength);
+	}
+	Clip* rightCrossfadeClip() { return m_rightCrossfadeClip; }
+
+	bool autoCrossfade() const
+	{
+		return m_autoCrossfade;
+	}
+	void setAutoCrossfade(bool autoCrossfade)
+	{
+		m_autoCrossfade = autoCrossfade;
+	}
+
+	void updateCrossfades();
+	void deleteCrossfades();
+
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
 
@@ -144,6 +176,7 @@ public slots:
 signals:
 	void lengthChanged();
 	void positionChanged();
+	void crossfadesChanged();
 	void destroyedClip();
 	void colorChanged();
 
@@ -155,6 +188,12 @@ private:
 	TimePos m_startPosition;
 	TimePos m_length;
 	TimePos m_startTimeOffset;
+
+	TimePos m_startCrossfadeLength;
+	TimePos m_endCrossfadeLength;
+	Clip* m_leftCrossfadeClip = nullptr;
+	Clip* m_rightCrossfadeClip = nullptr;
+	bool m_autoCrossfade;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
