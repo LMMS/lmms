@@ -1038,6 +1038,12 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--VectorView {
+	qproperty-colorTrace: rgba(255, 170, 33, 255);
+	qproperty-colorGrid: rgba(76, 80, 84, 128);
+	qproperty-colorLabels: rgba(76, 80, 84, 255);
+}
+
 lmms--gui--BarModelEditor {
 	qproperty-backgroundBrush: rgba(28, 73, 51, 255);
 	qproperty-barBrush: rgba(17, 136, 71, 255);

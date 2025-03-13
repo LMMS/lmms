@@ -175,9 +175,8 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuningLeft()
 {
-	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
-				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-				/ Engine::audioEngine()->outputSampleRate();
+	m_detuningLeft = std::exp2((m_coarseModel.value() * 100.0f + m_fineLeftModel.value()) / 1200.0f)
+		/ Engine::audioEngine()->outputSampleRate();
 }
 
 
@@ -185,9 +184,8 @@ void OscillatorObject::updateDetuningLeft()
 
 void OscillatorObject::updateDetuningRight()
 {
-	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
-				+ (float)m_fineRightModel.value() ) / 1200.0f )
-				/ Engine::audioEngine()->outputSampleRate();
+	m_detuningRight = std::exp2((m_coarseModel.value() * 100.0f + m_fineRightModel.value()) / 1200.0f)
+		/ Engine::audioEngine()->outputSampleRate();
 }
 
 

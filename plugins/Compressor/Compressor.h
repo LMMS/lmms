@@ -78,8 +78,6 @@ private:
 	float msToCoeff(float ms);
 
 	inline void calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum);
-	inline int realmod(int k, int n);
-	inline float realfmod(float k, float n);
 
 	enum class StereoLinkMode { Unlinked, Maximum, Average, Minimum, Blend };
 
