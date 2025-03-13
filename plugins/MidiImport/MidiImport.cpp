@@ -333,13 +333,13 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	auto dt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
 	dt->setName(tr("MIDI Time Signature Denominator"));
 
-	auto timeSigNumeratorPat = new AutomationClip(nt);
+	auto timeSigNumeratorPat = new AutomationClip();
 	nt->addClip(timeSigNumeratorPat);
 
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
 
-	auto timeSigDenominatorPat = new AutomationClip(dt);
+	auto timeSigDenominatorPat = new AutomationClip();
 	dt->addClip(timeSigDenominatorPat);
 
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
@@ -367,7 +367,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
 	tt->setName(tr("Tempo"));
 
-	auto tap = new AutomationClip(tt);
+	auto tap = new AutomationClip();
 	tt->addClip(tap);
 
 	tap->setDisplayName(tr("Tempo"));
