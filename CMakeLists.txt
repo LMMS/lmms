@@ -102,7 +102,7 @@ option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
-option(WANT_DEBUG_RTSAN	"Enable RealtimeSanitizer" OFF)
+option(WANT_RTSAN	"Enable RealtimeSanitizer" OFF)
 option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
@@ -697,14 +697,19 @@ else()
 endif()
 
 # add enabled sanitizers
-function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
+function(add_sanitizer sanitizer supported_compilers want_flag status_flag build_type)
 	if(${want_flag})
 		if(CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}")
 			set("${status_flag}" "Enabled" PARENT_SCOPE)
 			string(REPLACE ";" " " additional_flags "${ARGN}")
 			# todo CMake 3.13: use add_compile_options/add_link_options instead
-			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
-			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			if (build_type STREQUAL "debug")
+				set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+				set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			elseif(build_type STREQUAL "any")
+				set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			endif()
 		else()
 			set("${status_flag}" "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
 		endif()
@@ -713,17 +718,17 @@ function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	endif()
 endfunction()
 
-add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN)
-add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN)
-add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-pointer)
+add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN debug)
+add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN debug)
+add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN debug -fno-omit-frame-pointer)
 
 # UBSan does not link with vptr enabled due to a problem with references from PeakControllerEffect
 # not being found by PeakController
-add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
+add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN debug -fno-sanitize=vptr)
 
-add_sanitizer(realtime "Clang" WANT_DEBUG_RTSAN STATUS_DEBUG_RTSAN)
+add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN any)
 
-if(WANT_DEBUG_RTSAN)
+if(WANT_RTSAN)
 	add_compile_definitions(LMMS_NONBLOCKING=[[clang::nonblocking]])
 else()
 	add_compile_definitions(LMMS_NONBLOCKING)
@@ -872,7 +877,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Debug using RealtimeSanitizer     : ${STATUS_DEBUG_RTSAN}\n"
+"* Debug using RealtimeSanitizer     : ${STATUS_RTSAN}\n"
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
 )
