@@ -154,7 +154,7 @@ void Editor::closeEvent(QCloseEvent * event)
 	event->ignore();
  }
 
- void Editor::keyPressEvent(QKeyEvent * ke)
+ void Editor::keyPressEvent(QKeyEvent *ke)
  {
 	if (ke->key() == Qt::Key_Space)
 	{
