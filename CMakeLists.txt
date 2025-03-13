@@ -722,7 +722,12 @@ add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-p
 add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
 
 add_sanitizer(realtime "Clang" WANT_DEBUG_RTSAN STATUS_DEBUG_RTSAN)
-set(LMMS_NONBLOCKING $<WANT_DEBUG_RTSAN:[[clang::nonblocking]]>)
+
+if(WANT_DEBUG_RTSAN)
+	add_compile_definitions(LMMS_NONBLOCKING=[[clang::nonblocking]])
+else()
+	add_compile_definitions(LMMS_NONBLOCKING)
+endif()
 
 # Add warning and error flags
 include(ErrorFlags)
