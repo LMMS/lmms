@@ -338,13 +338,6 @@
              </item>
             </widget>
            </item>
-           <item>
-            <widget class="QCheckBox" name="checkBoxVariableBitRate">
-             <property name="text">
-              <string>Use variable bitrate</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
