@@ -369,6 +369,7 @@ int main( int argc, char * * argv )
 	}
 #endif
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	// QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);

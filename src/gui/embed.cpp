@@ -24,11 +24,14 @@
 
 #include "embed.h"
 
-#include <QDebug>
-#include <QDir>
+#include <QDIR>
+#include <QGuiApplication>
 #include <QImageReader>
+#include <QPainter>
 #include <QPixmapCache>
 #include <QResource>
+#include <QScreen>
+#include <QSvgRenderer>
 
 namespace lmms::embed {
 
@@ -36,19 +39,72 @@ namespace {
 
 auto loadPixmap(const QString& name, int width, int height, const char* const* xpm) -> QPixmap
 {
-	if (xpm) { return QPixmap{xpm}; }
+    if (xpm) { return QPixmap{xpm}; }
 
-	const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
-	auto reader = QImageReader{resourceName};
-	if (width > 0 && height > 0) { reader.setScaledSize(QSize{width, height}); }
+    const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
 
-	const auto pixmap = QPixmap::fromImageReader(&reader);
-	if (pixmap.isNull()) {
-		qWarning().nospace() << "Error loading icon pixmap " << name << ": " << reader.errorString();
-		return QPixmap{1, 1};
-	}
-	return pixmap;
+	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
+
+    // Check if the resource is an SVG or a raster image
+    QImageReader reader(resourceName);
+    const QByteArray format = reader.format();
+
+    if (format.toLower() == "svg") {
+        // Handle SVG with QSvgRenderer
+        QFile file(resourceName + ".svg");
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning() << "Failed to open resource for SVG: " << resourceName;
+            return QPixmap{1, 1};
+        }
+
+        QByteArray svgData = file.readAll();
+        QSvgRenderer renderer(svgData);
+        if (!renderer.isValid()) {
+            qWarning() << "Error loading SVG file: " << resourceName;
+            return QPixmap{1, 1};
+        }
+
+    	// Get the default size of the SVG (without scaling)
+    	QSize svgSize = renderer.defaultSize();
+
+    	// If width/height are provided, use them
+    	if (width >= 0) svgSize.setWidth(width);
+    	if (height >= 0) svgSize.setHeight(height);
+
+    	// Scale the svg
+    	svgSize.setWidth(static_cast<int>(svgSize.width() * devicePixelRatio));
+    	svgSize.setHeight(static_cast<int>(svgSize.height() * devicePixelRatio));
+
+        QImage image(svgSize.width(), svgSize.height(), QImage::Format_ARGB32);
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        renderer.render(&painter);
+    	painter.end();
+
+    	auto pixmap = QPixmap::fromImage(image);
+    	pixmap.setDevicePixelRatio(devicePixelRatio);
+
+        return pixmap;
+    }
+
+	if (!format.isEmpty()) {
+        // Handle other formats (PNG, JPG, etc.) with QImageReader
+        if (width > 0 && height > 0) {
+            reader.setScaledSize(QSize(width, height));
+        }
+
+        QPixmap pixmap = QPixmap::fromImageReader(&reader);
+        if (pixmap.isNull()) {
+            qWarning().nospace() << "Error loading icon pixmap " << name << ": " << reader.errorString();
+            return QPixmap{1, 1};
+        }
+        return pixmap;
+    }
+
+    qWarning() << "Unsupported image format: " << resourceName;
+    return QPixmap{1, 1};
 }
+
 
 } // namespace
 
