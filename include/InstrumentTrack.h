@@ -64,7 +64,7 @@ class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
-	InstrumentTrack( TrackContainer* tc );
+	InstrumentTrack();
 	~InstrumentTrack() override;
 
 	// used by instrument

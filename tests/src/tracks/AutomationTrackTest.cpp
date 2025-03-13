@@ -95,7 +95,7 @@ private slots:
 
 		auto song = Engine::getSong();
 
-		AutomationTrack track(song);
+		AutomationTrack track;
 		song->addTrack(&track);
 
 		AutomationClip c1;
@@ -139,7 +139,7 @@ private slots:
 
 		auto song = Engine::getSong();
 
-		AutomationTrack track(song);
+		AutomationTrack track;
 		song->addTrack(&track);
 
 		AutomationClip c;
@@ -168,7 +168,7 @@ private slots:
 
 		auto song = Engine::getSong();
 
-		InstrumentTrack instrumentTrack(song);
+		InstrumentTrack instrumentTrack;
 		song->addTrack(&instrumentTrack);
 
 		MidiClip midiClip;
@@ -197,10 +197,10 @@ private slots:
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
 
-		PatternTrack patternTrack(song);
+		PatternTrack patternTrack;
 		song->addTrack(&patternTrack);
 
-		AutomationTrack automationTrack(patternStore);
+		AutomationTrack automationTrack;
 		patternStore->addTrack(&automationTrack);
 
 		automationTrack.createClipsForPattern(patternStore->numOfPatterns() - 1);
@@ -221,7 +221,7 @@ private slots:
 		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.patternIndex())[&model], 1.0f);
 		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.patternIndex())[&model], 1.0f);
 
-		PatternTrack patternTrack2(song);
+		PatternTrack patternTrack2;
 		song->addTrack(&patternTrack2);
 
 		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.patternIndex())[&model], 0.5f);
@@ -251,7 +251,7 @@ private slots:
 		AutomationClip globalClip;
 		globalTrack->addClip(&globalClip);
 
-		AutomationTrack localTrack(song);
+		AutomationTrack localTrack;
 		song->addTrack(&localTrack);
 
 		AutomationClip localClip;

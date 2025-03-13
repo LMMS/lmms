@@ -84,7 +84,7 @@ public:
 		Count
 	} ;
 
-	Track( Type type, TrackContainer * tc );
+	Track(Type type);
 	~Track() override;
 
 	static Track * create( Type tt, TrackContainer * tc );
