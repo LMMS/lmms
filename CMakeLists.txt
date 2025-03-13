@@ -731,7 +731,7 @@ add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN any)
 if(WANT_RTSAN)
 	add_compile_definitions(LMMS_NONBLOCKING=[[clang::nonblocking]])
 else()
-	add_compile_definitions(LMMS_NONBLOCKING)
+	add_compile_definitions(LMMS_NONBLOCKING=[[]])
 endif()
 
 # Add warning and error flags
