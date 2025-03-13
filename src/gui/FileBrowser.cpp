@@ -346,14 +346,12 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	for (const auto& path : paths)
+	switch (m_type)
 	{
-		switch (m_type)
+	case Type::Favorites:
+		for (const auto& path : paths)
 		{
-		case Type::Normal:
-			addItems(path);
-			break;
-		case Type::Favorites:
+
 			auto info = QFileInfo{path};
 
 			if (info.isDir())
@@ -367,9 +365,14 @@ void FileBrowser::reloadTree()
 				auto file = new FileItem(info.fileName(), info.path());
 				m_fileBrowserTreeWidget->addTopLevelItem(file);
 			}
-
-			break;
 		}
+		break;
+	case Type::Normal:
+		for (const auto& path : paths)
+		{
+			addItems(path);
+		}
+		break;
 	}
 
 	if (m_filterEdit->text().isEmpty())
