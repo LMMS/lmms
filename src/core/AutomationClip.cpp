@@ -45,19 +45,20 @@ int AutomationClip::s_quantization = 1;
 const float AutomationClip::DEFAULT_MIN_VALUE = 0;
 const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 
-
-AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
-	Clip( _auto_track ),
+AutomationClip::AutomationClip()
+	: Clip()
+	,
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_clipMutex(QMutex::Recursive),
+	m_clipMutex(QMutex::Recursive)
+	,
 #endif
-	m_autoTrack( _auto_track ),
-	m_objects(),
-	m_tension( 1.0 ),
-	m_progressionType( ProgressionType::Discrete ),
-	m_dragging( false ),
-	m_isRecording( false ),
-	m_lastRecordedValue( 0 )
+	m_autoTrack(nullptr)
+	, m_objects()
+	, m_tension(1.0)
+	, m_progressionType(ProgressionType::Discrete)
+	, m_dragging(false)
+	, m_isRecording(false)
+	, m_lastRecordedValue(0)
 {
 	changeLength( TimePos( 1, 0 ) );
 	if( getTrack() )
@@ -81,7 +82,7 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
-	Clip( _clip_to_copy.m_autoTrack ),
+	Clip(),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
 #endif
@@ -1056,7 +1057,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		}
 	}
 
-	auto a = new AutomationClip(t);
+	auto a = new AutomationClip();
 	a->addObject( _m, false );
 	t->addClip(a);
 	return a;

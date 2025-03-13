@@ -804,7 +804,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
-	auto p = new MidiClip(this);
+	auto p = new MidiClip();
 	p->movePosition(pos);
 	return addClip(p);
 }

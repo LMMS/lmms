@@ -34,15 +34,13 @@
 namespace lmms
 {
 
-
-PatternClip::PatternClip(Track* track) :
-	Clip(track)
+PatternClip::PatternClip(int patternIndex)
+	: Clip()
 {
-	bar_t t = Engine::patternStore()->lengthOfPattern(patternIndex());
-	if( t > 0 )
+	if (const auto patternLen = Engine::patternStore()->lengthOfPattern(patternIndex); patternLen > 0)
 	{
 		saveJournallingState( false );
-		changeLength( TimePos( t, 0 ) );
+		changeLength(TimePos(patternLen, 0));
 		restoreJournallingState();
 	}
 	setAutoResize( false );

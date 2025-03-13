@@ -67,7 +67,7 @@ public:
 
 	using TimemapIterator = timeMap::const_iterator;
 
-	AutomationClip( AutomationTrack * _auto_track );
+	AutomationClip();
 	AutomationClip( const AutomationClip & _clip_to_copy );
 	~AutomationClip() override = default;
 

@@ -52,7 +52,7 @@ public:
 		MelodyClip
 	} ;
 
-	MidiClip( InstrumentTrack* instrumentTrack );
+	MidiClip();
 	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 

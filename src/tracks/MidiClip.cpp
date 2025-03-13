@@ -39,11 +39,11 @@
 namespace lmms
 {
 
-MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
-	Clip( _instrument_track ),
-	m_instrumentTrack( _instrument_track ),
-	m_clipType( Type::BeatClip ),
-	m_steps( TimePos::stepsPerBar() )
+MidiClip::MidiClip()
+	: Clip()
+	, m_instrumentTrack(nullptr)
+	, m_clipType(Type::BeatClip)
+	, m_steps(TimePos::stepsPerBar())
 {
 	init();
 	setAutoResize( true );
@@ -53,7 +53,7 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 
 
 MidiClip::MidiClip( const MidiClip& other ) :
-	Clip( other.m_instrumentTrack ),
+	Clip(),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )

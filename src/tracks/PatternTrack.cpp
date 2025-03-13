@@ -145,7 +145,7 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 Clip* PatternTrack::createClip(const TimePos & pos)
 {
-	auto pc = new PatternClip(this);
+	auto pc = new PatternClip(patternIndex());
 	pc->movePosition(pos);
 	return addClip(pc);
 }

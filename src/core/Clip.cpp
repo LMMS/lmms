@@ -42,13 +42,13 @@ namespace lmms
  *
  * \param _track The track that will contain the new object
  */
-Clip::Clip( Track * track ) :
-	Model( track ),
-	m_track( track ),
-	m_startPosition(),
-	m_length(),
-	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate{false}
+Clip::Clip()
+	: Model(nullptr)
+	, m_track(nullptr)
+	, m_startPosition()
+	, m_length()
+	, m_mutedModel(false, this, tr("Mute"))
+	, m_selectViewOnCreate{false}
 {
 	setJournalling( false );
 	movePosition( 0 );
