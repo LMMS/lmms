@@ -377,9 +377,7 @@ void Track::deleteClips()
 {
 	while (!m_clips.empty())
 	{
-		const auto clip = m_clips.front();
-		removeClip(clip);
-		delete clip;
+		delete m_clips.front();
 	}
 }
 
