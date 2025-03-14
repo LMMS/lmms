@@ -38,6 +38,7 @@
 #include "ConfigManager.h"
 #include "FontHelper.h"
 #include "GuiApplication.h"
+#include "lmms_math.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PeakIndicator.h"
@@ -317,7 +318,7 @@ void MixerChannelView::selectColor()
 void MixerChannelView::randomizeColor()
 {
 	auto channel = mixerChannel();
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(47)]);
 	Engine::getSong()->setModified();
 	update();
 }
