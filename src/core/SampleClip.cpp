@@ -61,9 +61,7 @@ SampleClip::SampleClip(Sample sample, bool isPlaying)
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
 	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
-	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
-			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
@@ -92,7 +90,20 @@ SampleClip::~SampleClip()
 	}
 }
 
+void SampleClip::setTrack(Track* track)
+{
+	Clip::setTrack(track);
 
+	if (getTrack())
+	{
+		disconnect(getTrack()->getMutedModel(), &Track::dataChanged, this, &SampleClip::playbackPositionChanged);
+	}
+
+	if (track)
+	{
+		connect(track->getMutedModel(), &Track::dataChanged, this, &SampleClip::playbackPositionChanged, Qt::DirectConnection);
+	}
+}
 
 
 void SampleClip::changeLength( const TimePos & _length )
@@ -172,8 +183,7 @@ void SampleClip::toggleRecord()
 void SampleClip::playbackPositionChanged()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::Type::SamplePlayHandle );
-	auto st = dynamic_cast<SampleTrack*>(getTrack());
-	st->setPlayingClips( false );
+	if (auto st = dynamic_cast<SampleTrack*>(getTrack())) { st->setPlayingClips(false); }
 }
 
 

@@ -62,7 +62,7 @@ public:
 		return m_track;
 	}
 
-	void setTrack(Track* track) { m_track = track; }
+	virtual void setTrack(Track* track) { m_track = track; }
 
 	inline const QString & name() const
 	{

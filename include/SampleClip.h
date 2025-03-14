@@ -81,6 +81,8 @@ public:
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
+	void setTrack(Track* track) override;
+
 public slots:
 	void setSampleFile(const QString& sf);
 	void updateLength();
