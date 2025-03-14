@@ -44,6 +44,15 @@ PatternStore::PatternStore() :
 	// not change upon setCurrentPattern()-call
 	connect(&m_patternComboBoxModel, SIGNAL(dataUnchanged()),
 			this, SLOT(currentPatternChanged()));
+
+	connect(Engine::getSong(), &Song::trackAdded, this, [this](Track* track) {
+		if (dynamic_cast<PatternTrack*>(track)) { updateComboBox(); }
+	});
+
+	connect(Engine::getSong(), &Song::trackRemoved, this, [this](Track* track) {
+		if (dynamic_cast<PatternTrack*>(track)) { updateComboBox(); }
+	});
+
 	setType(Type::Pattern);
 }
 

@@ -208,6 +208,7 @@ void TrackContainer::removeTrack( Track * _track )
 		m_tracks.erase(it);
 		_track->setTrackContainer(nullptr);
 		lockTracksAccess.unlock();
+		emit trackRemoved(_track);
 
 		if( Engine::getSong() )
 		{

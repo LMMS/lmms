@@ -1548,13 +1548,4 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	Engine::audioEngine()->doneChangeInModel();
 }
 
-void Song::addTrack(Track* track)
-{
-	TrackContainer::addTrack(track);
-
-	if (dynamic_cast<PatternTrack*>(track))
-	{
-		Engine::patternStore()->updateComboBox();
-	}
-}
 } // namespace lmms
