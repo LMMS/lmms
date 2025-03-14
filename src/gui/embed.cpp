@@ -48,8 +48,7 @@ auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixma
 		return QPixmap{1, 1};
 	}
 
-	QByteArray svgData = file.readAll();
-	QSvgRenderer renderer(svgData);
+	QSvgRenderer renderer(file.readAll());
 	if (!renderer.isValid())
 	{
 		qWarning() << "Error loading SVG file: " << resourceName;
@@ -85,32 +84,21 @@ auto loadPixmap(const QString& name, int width, int height, const char* const* x
 	if (xpm) { return QPixmap{xpm}; }
 
 	const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
+	auto reader = QImageReader{resourceName};
 
-	// Check if the resource is an SVG or a raster image
-	QImageReader reader(resourceName);
-	const QByteArray format = reader.format();
-
-	if (format.toLower() == "svg")
+	if (reader.format().toLower() == "svg")
 	{
 		return loadSvgPixmap(resourceName, width, height);
 	}
 
-	if (!format.isEmpty())
-	{
-		// Handle other formats (PNG, JPG, etc.) with QImageReader
-		if (width > 0 && height > 0) { reader.setScaledSize(QSize(width, height)); }
+	if (width > 0 && height > 0) { reader.setScaledSize(QSize{width, height}); }
 
-		QPixmap pixmap = QPixmap::fromImageReader(&reader);
-		if (pixmap.isNull())
-		{
-			qWarning().nospace() << "Error loading icon pixmap " << name << ": " << reader.errorString();
-			return QPixmap{1, 1};
-		}
-		return pixmap;
+	const auto pixmap = QPixmap::fromImageReader(&reader);
+	if (pixmap.isNull()) {
+		qWarning().nospace() << "Error loading icon pixmap " << name << ": " << reader.errorString();
+		return QPixmap{1, 1};
 	}
-
-	qWarning() << "Unsupported image format: " << resourceName;
-	return QPixmap{1, 1};
+	return pixmap;
 }
 
 } // namespace
