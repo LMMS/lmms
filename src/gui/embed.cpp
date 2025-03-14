@@ -64,15 +64,13 @@ auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixma
 	QSize svgSize = renderer.defaultSize();
 
 	// If width/height are provided, use them
-	if (width >= 0) svgSize.setWidth(width);
-	if (height >= 0) svgSize.setHeight(height);
+	if (width > 0 && height > 0) svgSize.scale(width, height, Qt::IgnoreAspectRatio);
 
 	// Scale the svg
 	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
-	svgSize.setWidth(static_cast<int>(svgSize.width() * devicePixelRatio));
-	svgSize.setHeight(static_cast<int>(svgSize.height() * devicePixelRatio));
+	svgSize *= devicePixelRatio;
 
-	QImage image(svgSize.width(), svgSize.height(), QImage::Format_ARGB32);
+	QImage image(svgSize, QImage::Format_ARGB32);
 	image.fill(Qt::transparent);
 	QPainter painter(&image);
 	renderer.render(&painter);
