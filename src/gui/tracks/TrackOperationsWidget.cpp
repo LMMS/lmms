@@ -108,7 +108,9 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		const auto activePixmap = embed::getIconPixmap(activeGraphic);
 		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
 
-		auto necessarySize = activePixmap.size().expandedTo(inactivePixmap.size());
+		const auto activeSize = activePixmap.size() / activePixmap.devicePixelRatio();
+		const auto inactiveSize = inactivePixmap.size() / inactivePixmap.devicePixelRatio();
+		auto necessarySize = activeSize.expandedTo(inactiveSize);
 
 		auto wrapperWidget = new QWidget(parent);
 		wrapperWidget->setFixedSize(necessarySize);
