@@ -24,7 +24,7 @@
 
 #include "embed.h"
 
-#include <QDIR>
+#include <QDir>
 #include <QGuiApplication>
 #include <QImageReader>
 #include <QPainter>
