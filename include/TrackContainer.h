@@ -67,6 +67,7 @@ public:
 
 	virtual void addTrack(Track* track);
 	virtual void removeTrack(Track* track);
+	bool containsTrack(Track* track) { return std::find(m_tracks.begin(), m_tracks.end(), track) != m_tracks.end(); }
 	void clearAllTracks();
 
 	const TrackList & tracks() const
