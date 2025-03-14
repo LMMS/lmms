@@ -396,7 +396,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
 			const AutomatableModel* recordedModel = p->firstObject();
-			p->recordValue(relTime, recordedModel->value<float>());
+			p->recordValue(relTime, recordedModel->inverseScaledValue(recordedModel->value<float>()));
 
 			recordedModels << recordedModel;
 		}
