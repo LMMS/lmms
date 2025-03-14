@@ -215,11 +215,11 @@ AutomationClip* Note::getParameterCurve(ParameterType paramType)
 {
 	switch (paramType)
 	{
-		// TODO: Add more per-note parameter curves besides detuning
-		case ParameterType::Detuning:
-			return detuning()->automationClip();
-		default:
-			return nullptr;
+	// TODO: In the future, more per-note parameters which can be automated are planned. Perhaps velocity, panning, and/or some other plugin-specific parameter.
+	case ParameterType::Detuning:
+		return detuning()->automationClip();
+	default:
+		return nullptr;
 	}
 }
 
