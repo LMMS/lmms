@@ -108,16 +108,15 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		const auto activePixmap = embed::getIconPixmap(activeGraphic);
 		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
 
-		auto necessarySize = activePixmap.size().expandedTo(inactivePixmap.size());
-
 		auto wrapperWidget = new QWidget(parent);
-		wrapperWidget->setFixedSize(necessarySize);
 
 		auto button = new PixmapButton(wrapperWidget, toolTip);
 		button->setCheckable(true);
 		button->setActiveGraphic(activePixmap);
 		button->setInactiveGraphic(inactivePixmap);
 		button->setToolTip(toolTip);
+
+		wrapperWidget->setFixedSize(button->minimumSizeHint());
 
 		pixmapButton = button;
 
