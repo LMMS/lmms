@@ -41,7 +41,6 @@ namespace lmms
 
 MidiClip::MidiClip()
 	: Clip()
-	, m_instrumentTrack(nullptr)
 	, m_clipType(Type::BeatClip)
 	, m_steps(TimePos::stepsPerBar())
 {
@@ -54,7 +53,6 @@ MidiClip::MidiClip()
 
 MidiClip::MidiClip( const MidiClip& other ) :
 	Clip(other),
-	m_instrumentTrack( other.m_instrumentTrack ),
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
@@ -85,15 +83,14 @@ MidiClip::~MidiClip()
 void MidiClip::resizeToFirstTrack()
 {
 	// Resize this track to be the same as existing tracks in the pattern
-	const TrackContainer::TrackList & tracks =
-		m_instrumentTrack->trackContainer()->tracks();
+	const TrackContainer::TrackList& tracks = instrumentTrack()->trackContainer()->tracks();
 	for (const auto& track : tracks)
 	{
 		if (track->type() == Track::Type::Instrument)
 		{
-			if (track != m_instrumentTrack)
+			if (track != instrumentTrack())
 			{
-				const auto& instrumentTrackClips = m_instrumentTrack->getClips();
+				const auto& instrumentTrackClips = instrumentTrack()->getClips();
 				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
 				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
 					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
@@ -498,8 +495,8 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	auto& clips = m_instrumentTrack->getClips();
-	int clipNum = m_instrumentTrack->getClipNum(this) + offset;
+	auto& clips = instrumentTrack()->getClips();
+	int clipNum = instrumentTrack()->getClipNum(this) + offset;
 	if (clipNum < 0 || static_cast<size_t>(clipNum) >= clips.size()) { return nullptr; }
 	return dynamic_cast<MidiClip*>(clips[clipNum]);
 }

@@ -28,13 +28,11 @@
 
 #include "Clip.h"
 #include "Note.h"
-
+#include "InstrumentTrack.h"
 
 namespace lmms
 {
 
-
-class InstrumentTrack;
 
 namespace gui
 {
@@ -104,10 +102,7 @@ public:
 		return "midiclip";
 	}
 
-	inline InstrumentTrack * instrumentTrack() const
-	{
-		return m_instrumentTrack;
-	}
+	InstrumentTrack* instrumentTrack() const { return dynamic_cast<InstrumentTrack*>(getTrack()); }
 
 	bool empty();
 
@@ -137,8 +132,6 @@ private:
 	void setType( Type _new_clip_type );
 	void checkType();
 
-
-	InstrumentTrack * m_instrumentTrack;
 
 	Type m_clipType;
 
