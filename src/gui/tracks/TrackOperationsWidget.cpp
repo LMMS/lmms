@@ -83,7 +83,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	// buttons in a layout.
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
-	operationsLayout->setContentsMargins(0, 3, 0, 0);
+	operationsLayout->setContentsMargins(2, 6, 0, 6);
 	operationsLayout->setSpacing(2);
 
 	m_trackOps = new QPushButton(operationsWidget);

@@ -413,27 +413,34 @@ lmms--gui--TrackContentWidget {
 /* gear button in tracks */
 
 lmms--gui--TrackOperationsWidget QPushButton {
-	max-height: 26px;
-	max-width: 26px;
-	min-height: 26px;
-	min-width: 26px;
-	background: none;
-	border: none;
+	height: 18px;
+	min-height: 18px;
+	max-height: 18px;
+	min-width: 18px;
+	max-width: 20px;
+	border-top: 1px solid #778394;
+	border-bottom: 1px solid #1e2226;
+	border-radius: 2px;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #636c7a, stop:1 #343840);
 }
 
 lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
-	image: url("resources:trackop.png");
-	subcontrol-origin: padding;
+	image: url("resources:trackop.svg");
+	subcontrol-origin: content;
 	subcontrol-position: center;
-	position: relative;
-	top: 1px;
 }
 
-lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:pressed,
-lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:checked {
-	image: url("resources:trackop.png");
-	position: relative;
-	top: 2px;
+lmms--gui--TrackOperationsWidget QPushButton:hover {
+	border-top: 1px solid #909eb3;
+	border-bottom: 1px solid #1e2226;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #7c8799, stop:1 #343840)
+}
+
+lmms--gui--TrackOperationsWidget QPushButton:pressed,
+lmms--gui--TrackOperationsWidget QPushButton:checked {
+	border-top: 1px solid #778394;
+	border-bottom: 1px solid #1e2226;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #636c7a, stop:1 #262b30);
 }
 
 /* font sizes */
