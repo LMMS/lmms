@@ -45,10 +45,9 @@ namespace lmms
 Clip::Clip()
 	: Model(nullptr)
 	, m_track(nullptr)
-	, m_startPosition()
-	, m_length()
 	, m_mutedModel(false, this, tr("Mute"))
-	, m_selectViewOnCreate{false}
+	, m_autoResize(false)
+	, m_selectViewOnCreate(false)
 {
 	setJournalling( false );
 	movePosition( 0 );
@@ -56,7 +55,18 @@ Clip::Clip()
 	setJournalling( true );
 }
 
-
+Clip::Clip(const Clip& clip)
+	: Model(nullptr)
+	, m_track(nullptr)
+	, m_mutedModel(false, this, tr("Mute"))
+	, m_autoResize(false)
+	, m_selectViewOnCreate(false)
+{
+	setJournalling(false);
+	movePosition(clip.m_startPosition);
+	changeLength(clip.m_length);
+	setJournalling(true);
+}
 
 
 /*! \brief Destroy a Clip

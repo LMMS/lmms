@@ -53,7 +53,7 @@ MidiClip::MidiClip()
 
 
 MidiClip::MidiClip( const MidiClip& other ) :
-	Clip(),
+	Clip(other),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
@@ -64,18 +64,6 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	}
 
 	init();
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
 }
 
 

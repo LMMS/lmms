@@ -67,18 +67,6 @@ SampleClip::SampleClip(Sample sample, bool isPlaying)
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
 	updateTrackClips();
 }
 

@@ -61,28 +61,13 @@ AutomationClip::AutomationClip()
 	, m_lastRecordedValue(0)
 {
 	changeLength( TimePos( 1, 0 ) );
-	if( getTrack() )
-	{
-		switch( getTrack()->trackContainer()->type() )
-		{
-			case TrackContainer::Type::Pattern:
-				setAutoResize( true );
-				break;
-
-			case TrackContainer::Type::Song:
-				// move down
-			default:
-				setAutoResize( false );
-				break;
-		}
-	}
 }
 
 
 
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
-	Clip(),
+	Clip(_clip_to_copy),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
 #endif
@@ -102,19 +87,6 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 		m_timeMap[POS(it)] = it.value();
 		// Sets the node's clip to this one
 		m_timeMap[POS(it)].setClip(this);
-	}
-	if (!getTrack()){ return; }
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
 	}
 }
 

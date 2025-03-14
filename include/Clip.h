@@ -54,6 +54,7 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip();
+	Clip(const Clip& clip);
 	~Clip() override;
 
 	inline Track * getTrack() const
