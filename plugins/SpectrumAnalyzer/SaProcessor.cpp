@@ -26,27 +26,71 @@
 #include "SaProcessor.h"
 
 #include <algorithm>
-#include "lmms_math.h"
+#include <cassert>
+#include <cmath>
+#include <limits>
+
+#include <QMutexLocker>
+
 #ifdef SA_DEBUG
 	#include <chrono>
-#endif
-#include <cmath>
-#ifdef SA_DEBUG
 	#include <iomanip>
 	#include <iostream>
 #endif
-#include <QMutexLocker>
+
 
 #include "fft_helpers.h"
-#include "lmms_constants.h"
+#include "lmms_math.h"
 #include "LocklessRingBuffer.h"
+
 #include "SaControls.h"
 
-#include <cassert>
-#include <limits>
 
 namespace lmms
 {
+// Some constants used only in this file
+// Frequency ranges (in Hz).
+// Arbitrary low limit for logarithmic frequency scale; >1 Hz.
+inline constexpr auto LowestLogFreq = 5;
+
+// Full range is defined by LowestLogFreq and current sample rate.
+enum class FrequencyRange
+{
+	Full = 0,
+	Audible,
+	Bass,
+	Mids,
+	High
+};
+
+inline constexpr auto FrequencyRangeAudibleStart =    20;
+inline constexpr auto FrequencyRangeAudibleEnd   = 20000;
+inline constexpr auto FrequencyRangeBassStart    =    20;
+inline constexpr auto FrequencyRangeBassEnd      =   300;
+inline constexpr auto FrequencyRangeMidsStart    =   200;
+inline constexpr auto FrequencyRangeMidsEnd      =  5000;
+inline constexpr auto FrequencyRangeHighStart    =  4000;
+inline constexpr auto FrequencyRangeHighEnd      = 20000;
+
+// Amplitude ranges (in dBFS).
+// Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
+// Doubling or halving the amplitude produces 3 dB difference.
+enum class AmplitudeRange
+{
+	Extended = 0,
+	Audible,
+	Loud,
+	Silent
+};
+
+inline constexpr auto AmplitudeRangeExtendedStart = -80;
+inline constexpr auto AmplitudeRangeExtendedEnd   =  20;
+inline constexpr auto AmplitudeRangeAudibleStart  = -50;
+inline constexpr auto AmplitudeRangeAudibleEnd    =   0;
+inline constexpr auto AmplitudeRangeLoudStart     = -30;
+inline constexpr auto AmplitudeRangeLoudEnd       =   0;
+inline constexpr auto AmplitudeRangeSilentStart   = -60;
+inline constexpr auto AmplitudeRangeSilentEnd     = -10;
 
 
 SaProcessor::SaProcessor(const SaControls *controls) :
@@ -544,12 +588,12 @@ float SaProcessor::getFreqRangeMin(bool linear) const
 {
 	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FrequencyRange::Audible: return FRANGE_AUDIBLE_START;
-		case FrequencyRange::Bass: return FRANGE_BASS_START;
-		case FrequencyRange::Mids: return FRANGE_MIDS_START;
-		case FrequencyRange::High: return FRANGE_HIGH_START;
+		case FrequencyRange::Audible: return FrequencyRangeAudibleStart;
+		case FrequencyRange::Bass: return FrequencyRangeBassStart;
+		case FrequencyRange::Mids: return FrequencyRangeMidsStart;
+		case FrequencyRange::High: return FrequencyRangeHighStart;
 		default:
-		case FrequencyRange::Full: return linear ? 0 : LOWEST_LOG_FREQ;
+		case FrequencyRange::Full: return linear ? 0 : LowestLogFreq;
 	}
 }
 
@@ -558,10 +602,10 @@ float SaProcessor::getFreqRangeMax() const
 {
 	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FrequencyRange::Audible: return FRANGE_AUDIBLE_END;
-		case FrequencyRange::Bass: return FRANGE_BASS_END;
-		case FrequencyRange::Mids: return FRANGE_MIDS_END;
-		case FrequencyRange::High: return FRANGE_HIGH_END;
+		case FrequencyRange::Audible: return FrequencyRangeAudibleEnd;
+		case FrequencyRange::Bass: return FrequencyRangeBassEnd;
+		case FrequencyRange::Mids: return FrequencyRangeMidsEnd;
+		case FrequencyRange::High: return FrequencyRangeHighEnd;
 		default:
 		case FrequencyRange::Full: return getNyquistFreq();
 	}
@@ -618,11 +662,11 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 	if (linear) {return -900;}
 	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case AmplitudeRange::Extended: return ARANGE_EXTENDED_START;
-		case AmplitudeRange::Silent: return ARANGE_SILENT_START;
-		case AmplitudeRange::Loud: return ARANGE_LOUD_START;
+		case AmplitudeRange::Extended: return AmplitudeRangeExtendedStart;
+		case AmplitudeRange::Silent: return AmplitudeRangeSilentStart;
+		case AmplitudeRange::Loud: return AmplitudeRangeLoudStart;
 		default:
-		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_START;
+		case AmplitudeRange::Audible: return AmplitudeRangeAudibleStart;
 	}
 }
 
@@ -631,11 +675,11 @@ float SaProcessor::getAmpRangeMax() const
 {
 	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case AmplitudeRange::Extended: return ARANGE_EXTENDED_END;
-		case AmplitudeRange::Silent: return ARANGE_SILENT_END;
-		case AmplitudeRange::Loud: return ARANGE_LOUD_END;
+		case AmplitudeRange::Extended: return AmplitudeRangeExtendedEnd;
+		case AmplitudeRange::Silent: return AmplitudeRangeSilentEnd;
+		case AmplitudeRange::Loud: return AmplitudeRangeLoudEnd;
 		default:
-		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_END;
+		case AmplitudeRange::Audible: return AmplitudeRangeAudibleEnd;
 	}
 }
 
