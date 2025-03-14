@@ -48,11 +48,13 @@ class LMMS_EXPORT PlayHandle : public ThreadableJob
 public:
 	enum class Type
 	{
-		NotePlayHandle = 0x01,
-		InstrumentPlayHandle = 0x02,
-		SamplePlayHandle = 0x04,
-		PresetPreviewHandle = 0x08
-	} ;
+		NotePlayHandle,
+		InstrumentPlayHandle,
+		SamplePlayHandle,
+		SamplePreviewPlayHandle,
+		PresetPreviewHandle
+	};
+
 	using Types = Flags<Type>;
 
 	constexpr static std::size_t MaxNumber = 1024;
