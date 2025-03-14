@@ -1287,6 +1287,28 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
 		case Qt::Key_Shift: m_keyMods.m_shift = true; break;
 		case Qt::Key_Alt: m_keyMods.m_alt = true; break;
+		case Qt::Key_Space:
+		{
+			switch(Engine::getSong()->lastPlayMode())
+			{
+			case Song::PlayMode::Song:
+				getGUI()->songEditor()->togglePlayStop();
+				break;
+			case Song::PlayMode::MidiClip:
+				getGUI()->pianoRoll()->togglePlayStop();
+				break;
+			case Song::PlayMode::Pattern:
+				getGUI()->patternEditor()->togglePlayStop();
+				break;
+			case Song::PlayMode::AutomationClip:
+				getGUI()->automationEditor()->togglePlayStop();
+				break;
+			default:
+				getGUI()->songEditor()->togglePlayStop();
+				break;
+			}
+			break;
+		}
 		default:
 		{
 			InstrumentTrackWindow * w =
