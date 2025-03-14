@@ -62,7 +62,7 @@ auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixma
 	QSize svgSize = renderer.defaultSize();
 
 	// If width/height are provided, use them
-	if (width > 0 && height > 0) svgSize.scale(width, height, Qt::IgnoreAspectRatio);
+	if (width > 0 && height > 0) { svgSize.scale(width, height, Qt::IgnoreAspectRatio); }
 
 	// Scale the svg
 	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
