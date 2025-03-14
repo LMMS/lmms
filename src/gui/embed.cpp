@@ -42,9 +42,7 @@ auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixma
 {
 	// QFile requires the file extension to be present, unlike QImageReader
 	QString fileName = resourceName;
-	if (!fileName.endsWith(".svg", Qt::CaseInsensitive)) {
-		fileName += ".svg";
-	}
+	if (!fileName.endsWith(".svg", Qt::CaseInsensitive)) { fileName += ".svg"; }
 
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly))
