@@ -222,7 +222,9 @@ void TrackContainer::clearAllTracks()
 	//m_tracksMutex.lockForWrite();
 	while (!m_tracks.empty())
 	{
-		delete m_tracks.front();
+		const auto track = m_tracks.front();
+		removeTrack(track);
+		delete track;
 	}
 	//m_tracksMutex.unlock();
 }
