@@ -83,7 +83,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	// buttons in a layout.
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
-	operationsLayout->setContentsMargins(0, 0, 0, 0);
+	operationsLayout->setContentsMargins(0, 3, 0, 0);
 	operationsLayout->setSpacing(2);
 
 	m_trackOps = new QPushButton(operationsWidget);
@@ -108,16 +108,15 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		const auto activePixmap = embed::getIconPixmap(activeGraphic);
 		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
 
-		auto necessarySize = activePixmap.size().expandedTo(inactivePixmap.size());
-
 		auto wrapperWidget = new QWidget(parent);
-		wrapperWidget->setFixedSize(necessarySize);
 
 		auto button = new PixmapButton(wrapperWidget, toolTip);
 		button->setCheckable(true);
 		button->setActiveGraphic(activePixmap);
 		button->setInactiveGraphic(inactivePixmap);
 		button->setToolTip(toolTip);
+
+		wrapperWidget->setFixedSize(button->minimumSizeHint());
 
 		pixmapButton = button;
 
@@ -131,7 +130,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	operationsLayout->addWidget(muteWidget);
 	operationsLayout->addWidget(soloWidget);
 
-	layout->addWidget(operationsWidget, 0, Qt::AlignCenter | Qt::AlignLeading);
+	layout->addWidget(operationsWidget, 0, Qt::AlignTop | Qt::AlignLeading);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
@@ -143,11 +142,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
-
-
-
-
-
 
 
 /*! \brief Respond to trackOperationsWidget mouse events
@@ -178,8 +172,6 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 		me->ignore();
 	}
 }
-
-
 
 
 /*!
@@ -222,16 +214,8 @@ bool TrackOperationsWidget::confirmRemoval()
 	mb.setCheckBox(askAgainCheckBox);
 	mb.setDefaultButton(QMessageBox::Cancel);
 
-	int answer = mb.exec();
-
-	if( answer == QMessageBox::Ok )
-	{
-		return true;
-	}
-	return false;
+	return mb.exec() == QMessageBox::Ok;
 }
-
-
 
 /*! \brief Clone this track
  *
@@ -268,7 +252,6 @@ void TrackOperationsWidget::clearTrack()
 	t->deleteClips();
 	t->unlock();
 }
-
 
 
 /*! \brief Remove this track from the track list
@@ -323,6 +306,7 @@ void TrackOperationsWidget::resetClipColors()
 	}
 	Engine::getSong()->setModified();
 }
+
 
 /*! \brief Update the trackOperationsWidget context menu
  *
@@ -388,7 +372,6 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		atv->update();
 	}
 }
-
 
 
 void TrackOperationsWidget::recordingOn()
