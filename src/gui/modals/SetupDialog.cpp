@@ -549,7 +549,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
+#else
+	connect(m_audioInterfaces, SIGNAL(textActivated(const QString&)),
+#endif
 			this, SLOT(audioInterfaceChanged(const QString&)));
 
 	// Advanced setting, hidden for now
@@ -685,7 +689,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	connect(m_midiInterfaces, SIGNAL(activated(const QString&)),
+#else
+	connect(m_midiInterfaces, SIGNAL(textActivated(const QString&)),
+#endif
 			this, SLOT(midiInterfaceChanged(const QString&)));
 
 
