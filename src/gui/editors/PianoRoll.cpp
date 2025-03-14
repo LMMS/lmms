@@ -1138,13 +1138,21 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			}
 		}
 
-		if (m_editMode == EditMode::Detuning && _n->selected())
-		{
-			_p.drawEllipse(cur_x - 5, cur_y - 5, 10, 10);
-		}
-
 		old_x = cur_x;
 		old_y = cur_y;
+	}
+
+	if (m_editMode == EditMode::Detuning && _n->selected())
+	{
+		for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
+		{
+			// Current node values
+			int cur_ticks = POS(it);
+			int cur_x = _x + cur_ticks * m_ppb / TimePos::ticksPerBar();
+			const float cur_level = INVAL(it);
+			int cur_y = middle_y - cur_level * m_keyLineHeight;
+			_p.drawEllipse(cur_x - 5, cur_y - 5, 10, 10);
+		}
 	}
 }
 
