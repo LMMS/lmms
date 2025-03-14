@@ -61,6 +61,8 @@ public:
 		return m_track;
 	}
 
+	void setTrack(Track* track) { m_track = track; }
+
 	inline const QString & name() const
 	{
 		return m_name;

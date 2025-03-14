@@ -342,11 +342,10 @@ void Track::loadSettings(const QDomElement& element)
  */
 Clip * Track::addClip( Clip * clip )
 {
-	m_clips.push_back( clip );
-
-	emit clipAdded( clip );
-
-	return clip; // just for convenience
+	clip->setTrack(this);
+	m_clips.push_back(clip);
+	emit clipAdded(clip);
+	return clip;
 }
 
 
@@ -361,7 +360,9 @@ void Track::removeClip( Clip * clip )
 	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
 	if( it != m_clips.end() )
 	{
-		m_clips.erase( it );
+		m_clips.erase(it);
+		clip->setTrack(nullptr);
+
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();
