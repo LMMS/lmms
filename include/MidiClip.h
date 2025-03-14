@@ -50,12 +50,11 @@ public:
 		MelodyClip
 	} ;
 
-	MidiClip();
+	MidiClip(Type clipType = Type::BeatClip, int steps = TimePos::stepsPerBar());
 	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
-	void init();
-
+	void setTrack(Track * track) override;
 	void updateLength();
 
 	// note management

@@ -39,29 +39,24 @@
 namespace lmms
 {
 
-MidiClip::MidiClip()
+MidiClip::MidiClip(Type clipType, int steps)
 	: Clip()
-	, m_clipType(Type::BeatClip)
-	, m_steps(TimePos::stepsPerBar())
+	, m_clipType(clipType)
+	, m_steps(steps)
 {
-	init();
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+				this, SLOT(changeTimeSignature()));
+
 	setAutoResize( true );
 }
 
-
-
-
-MidiClip::MidiClip( const MidiClip& other ) :
-	Clip(other),
-	m_clipType( other.m_clipType ),
-	m_steps( other.m_steps )
+MidiClip::MidiClip(const MidiClip& other)
+	: MidiClip(other.m_clipType, other.m_steps)
 {
 	for (const auto& note : other.m_notes)
 	{
 		m_notes.push_back(new Note(*note));
 	}
-
-	init();
 }
 
 
@@ -101,21 +96,11 @@ void MidiClip::resizeToFirstTrack()
 	}
 }
 
-
-
-
-void MidiClip::init()
+void MidiClip::setTrack(Track * track)
 {
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
+	Clip::setTrack(track);
 	updateLength();
-	restoreJournallingState();
 }
-
-
-
 
 void MidiClip::updateLength()
 {
