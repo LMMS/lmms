@@ -148,6 +148,8 @@ public:
 		return m_trackContainer;
 	}
 
+	void setTrackContainer(TrackContainer* trackContainer) { m_trackContainer = trackContainer; }
+
 	// name-stuff
 	virtual const QString & name() const
 	{

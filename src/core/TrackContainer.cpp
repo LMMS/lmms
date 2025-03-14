@@ -180,6 +180,7 @@ void TrackContainer::addTrack( Track * _track )
 	{
 		_track->lock();
 		m_tracksMutex.lockForWrite();
+		_track->setTrackContainer(this);
 		m_tracks.push_back( _track );
 		m_tracksMutex.unlock();
 		_track->unlock();
@@ -203,7 +204,9 @@ void TrackContainer::removeTrack( Track * _track )
 		if (_track->isSolo()) {
 			_track->setSolo(false);
 		}
+
 		m_tracks.erase(it);
+		_track->setTrackContainer(nullptr);
 		lockTracksAccess.unlock();
 
 		if( Engine::getSong() )
