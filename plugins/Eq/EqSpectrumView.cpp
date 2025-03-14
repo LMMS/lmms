@@ -76,56 +76,64 @@ EqAnalyser::~EqAnalyser()
 
 
 
-void EqAnalyser::analyze( SampleFrame* buf, const fpp_t frames )
+void EqAnalyser::analyze(SampleFrame* buf, const fpp_t frames)
 {
-	//only analyse if the view is visible
-	if ( m_active )
-	{
-		m_inProgress=true;
-		const int FFT_BUFFER_SIZE = 2048;
-		fpp_t f = 0;
-		if( frames > FFT_BUFFER_SIZE )
-		{
-			m_framesFilledUp = 0;
-			f = frames - FFT_BUFFER_SIZE;
-		}
-		// meger channels
-		for( ; f < frames; ++f )
-		{
-			m_buffer[m_framesFilledUp] =
-					( buf[f][0] + buf[f][1] ) * 0.5;
-			++m_framesFilledUp;
-		}
-
-		if( m_framesFilledUp < FFT_BUFFER_SIZE )
-		{
-			m_inProgress = false;
-			return;
-		}
-
-		m_sampleRate = Engine::audioEngine()->outputSampleRate();
-		const int LOWEST_FREQ = 0;
-		const int HIGHEST_FREQ = m_sampleRate / 2;
-
-		//apply FFT window
-		for( int i = 0; i < FFT_BUFFER_SIZE; i++ )
-		{
-			m_buffer[i] = m_buffer[i] * m_fftWindow[i];
-		}
-
-		fftwf_execute( m_fftPlan );
-		absspec( m_specBuf, m_absSpecBuf, FFT_BUFFER_SIZE+1 );
-
-		compressbands( m_absSpecBuf, m_bands, FFT_BUFFER_SIZE+1,
-					   MAX_BANDS,
-					   ( int )( LOWEST_FREQ * ( FFT_BUFFER_SIZE + 1 ) / ( float )( m_sampleRate / 2 ) ),
-					   ( int )( HIGHEST_FREQ * ( FFT_BUFFER_SIZE +  1) / ( float )( m_sampleRate / 2 ) ) );
-		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
-
-		m_framesFilledUp = 0;
-		m_inProgress = false;
-		m_active = false;
-	}
+    //only analyze if the view is visible
+    if (!m_active)
+        return;
+    
+    m_inProgress = true;
+    const int FFT_BUFFER_SIZE = 2048;
+    
+    //determine starting frame position
+    fpp_t startFrame = 0;
+    if (frames > FFT_BUFFER_SIZE) {
+        m_framesFilledUp = 0;
+        startFrame = frames - FFT_BUFFER_SIZE;
+    }
+    
+    //merge channels
+    for (fpp_t f = startFrame; f < frames; ++f) {
+        m_buffer[m_framesFilledUp] = (buf[f][0] + buf[f][1]) * 0.5;
+        ++m_framesFilledUp;
+    }
+    
+    //check if we have enough frames
+    if (m_framesFilledUp < FFT_BUFFER_SIZE) {
+        m_inProgress = false;
+        return;
+    }
+    
+    //get current sample rate
+    m_sampleRate = Engine::audioEngine()->outputSampleRate();
+    const int LOWEST_FREQ = 0;
+    const int HIGHEST_FREQ = m_sampleRate / 2;
+    
+    //apply FFT window
+    for (int i = 0; i < FFT_BUFFER_SIZE; i++) {
+        m_buffer[i] *= m_fftWindow[i];
+    }
+    
+    //perform FFT
+    fftwf_execute(m_fftPlan);
+    
+    //process the results
+    absspec(m_specBuf, m_absSpecBuf, FFT_BUFFER_SIZE + 1);
+    
+    //compress bands
+    int lowestBin = static_cast<int>(LOWEST_FREQ * (FFT_BUFFER_SIZE + 1) / static_cast<float>(m_sampleRate / 2));
+    int highestBin = static_cast<int>(HIGHEST_FREQ * (FFT_BUFFER_SIZE + 1) / static_cast<float>(m_sampleRate / 2));
+    
+    compressbands(m_absSpecBuf, m_bands, FFT_BUFFER_SIZE + 1,
+                  MAX_BANDS, lowestBin, highestBin);
+    
+    //calculate energy
+    m_energy = maximum(m_bands, MAX_BANDS) / maximum(m_buffer, FFT_BUFFER_SIZE);
+    
+    //reset state
+    m_framesFilledUp = 0;
+    m_inProgress = false;
+    m_active = false;
 }
 
 
@@ -209,64 +217,75 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
-	const float energy = m_analyser->getEnergy();
-	if (energy <= 0. && m_peakSum <= 0) { return; }
-
-	const int fh = height();
-	const int LOWER_Y = -36;	// dB
-	QPainter painter( this );
-	painter.setPen( QPen( m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
-	painter.setRenderHint(QPainter::Antialiasing, true);
-
-	if( m_analyser->getInProgress() || m_periodicalUpdate == false )
-	{
-		//only paint the cached path
-		painter.fillPath( m_path, QBrush( m_color ) );
-		return;
-	}
-
-	m_periodicalUpdate = false;
-	//Now we calculate the path
-	m_path = QPainterPath();
-	float *bands = m_analyser->m_bands;
-	m_path.moveTo( 0, height() );
-	m_peakSum = 0;
-	const float fallOff = 1.07f;
-	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
-	{
-		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * std::log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
-
-		if( peak < 0 )
-		{
-			peak = 0;
-		}
-		else if( peak >= fh )
-		{
-			continue;
-		}
-
-		if ( peak > m_bandHeight[x] )
-		{
-			m_bandHeight[x] = peak;
-		}
-		else
-		{
-			m_bandHeight[x] = m_bandHeight[x] / fallOff;
-		}
-
-		if( m_bandHeight[x] < 0 )
-		{
-			m_bandHeight[x] = 0;
-		}
-
-		m_path.lineTo( EqHandle::freqToXPixel( bandToFreq( x ), width() ), fh - m_bandHeight[x] );
-		m_peakSum += m_bandHeight[x];
-	}
-
-	m_path.lineTo( width(), height() );
-	m_path.closeSubpath();
-	painter.fillPath( m_path, QBrush( m_color ) );
-	painter.drawPath( m_path );
+    const float energy = m_analyser->getEnergy();
+    
+    //early return if no energy and no peaks
+    if (energy <= 0. && m_peakSum <= 0) {
+        return;
+    }
+    
+    const int fh = height();
+    const int LOWER_Y = -36;  // dB
+    
+    QPainter painter(this);
+    painter.setPen(QPen(m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    
+    //if analysis is in progress or not a periodical update, just paint the cached path
+    if (m_analyser->getInProgress() || m_periodicalUpdate == false) {
+        painter.fillPath(m_path, QBrush(m_color));
+        return;
+    }
+    
+    m_periodicalUpdate = false;
+    
+    //calculate the path
+    m_path = QPainterPath();
+    float *bands = m_analyser->m_bands;
+    m_path.moveTo(0, height());
+    m_peakSum = 0;
+    const float fallOff = 1.07f;
+    
+    //process each frequency band
+    for (int x = 0; x < MAX_BANDS; ++x, ++bands) {
+        //calculate peak height
+        float peak = *bands != 0. ? 
+            (fh * 2.0 / 3.0 * (20. * std::log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
+        
+        //clamp peak values
+        if (peak < 0) {
+            peak = 0;
+        } else if (peak >= fh) {
+            continue;
+        }
+        
+        //apply peak falloff behavior
+        if (peak > m_bandHeight[x]) {
+            m_bandHeight[x] = peak;
+        } else {
+            m_bandHeight[x] = m_bandHeight[x] / fallOff;
+        }
+        
+        if (m_bandHeight[x] < 0) {
+            m_bandHeight[x] = 0;
+        }
+        
+        //add point to path
+        m_path.lineTo(
+            EqHandle::freqToXPixel(bandToFreq(x), width()),
+            fh - m_bandHeight[x]
+        );
+        
+        m_peakSum += m_bandHeight[x];
+    }
+    
+    //complete the path
+    m_path.lineTo(width(), height());
+    m_path.closeSubpath();
+    
+    //draw the path
+    painter.fillPath(m_path, QBrush(m_color));
+    painter.drawPath(m_path);
 }
 
 
