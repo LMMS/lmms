@@ -48,7 +48,7 @@ class LMMS_EXPORT PatternTrack : public Track
 {
 	Q_OBJECT
 public:
-	PatternTrack(TrackContainer* tc);
+	PatternTrack();
 	~PatternTrack() override;
 
 	bool play( const TimePos & _start, const fpp_t _frames,

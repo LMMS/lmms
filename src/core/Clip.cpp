@@ -42,25 +42,31 @@ namespace lmms
  *
  * \param _track The track that will contain the new object
  */
-Clip::Clip( Track * track ) :
-	Model( track ),
-	m_track( track ),
-	m_startPosition(),
-	m_length(),
-	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate{false}
+Clip::Clip()
+	: Model(nullptr)
+	, m_track(nullptr)
+	, m_mutedModel(false, this, tr("Mute"))
+	, m_autoResize(false)
+	, m_selectViewOnCreate(false)
 {
-	if( getTrack() )
-	{
-		getTrack()->addClip( this );
-	}
 	setJournalling( false );
 	movePosition( 0 );
 	changeLength( 0 );
 	setJournalling( true );
 }
 
-
+Clip::Clip(const Clip& clip)
+	: Model(nullptr)
+	, m_track(nullptr)
+	, m_mutedModel(false, this, tr("Mute"))
+	, m_autoResize(false)
+	, m_selectViewOnCreate(false)
+{
+	setJournalling(false);
+	movePosition(clip.m_startPosition);
+	changeLength(clip.m_length);
+	setJournalling(true);
+}
 
 
 /*! \brief Destroy a Clip
