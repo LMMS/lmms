@@ -40,8 +40,13 @@ namespace {
 // QPixmapCache and HiDPI compatible SVG-->QPixmap wrapper
 auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixmap
 {
-	// Handle SVG with QSvgRenderer. QFile requires the file extension to be present, unlike QImageReader
-	QFile file(resourceName + ".svg");
+	// QFile requires the file extension to be present, unlike QImageReader
+	QString fileName = resourceName;
+	if (!fileName.endsWith(".svg", Qt::CaseInsensitive)) {
+		fileName += ".svg";
+	}
+
+	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly))
 	{
 		qWarning() << "Failed to open resource for SVG: " << resourceName;
