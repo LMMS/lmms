@@ -43,15 +43,13 @@ auto loadPixmap(const QString& name, int width, int height, const char* const* x
 
 	const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
 
-	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
-
 	// Check if the resource is an SVG or a raster image
 	QImageReader reader(resourceName);
 	const QByteArray format = reader.format();
 
 	if (format.toLower() == "svg")
 	{
-		// Handle SVG with QSvgRenderer
+		// Handle SVG with QSvgRenderer. QFile requires the file extension to be present, unlike QPixmap
 		QFile file(resourceName + ".svg");
 		if (!file.open(QIODevice::ReadOnly))
 		{
@@ -75,6 +73,7 @@ auto loadPixmap(const QString& name, int width, int height, const char* const* x
 		if (height >= 0) svgSize.setHeight(height);
 
 		// Scale the svg
+		qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
 		svgSize.setWidth(static_cast<int>(svgSize.width() * devicePixelRatio));
 		svgSize.setHeight(static_cast<int>(svgSize.height() * devicePixelRatio));
 
