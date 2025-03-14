@@ -99,7 +99,7 @@ void MidiClip::resizeToFirstTrack()
 void MidiClip::setTrack(Track * track)
 {
 	Clip::setTrack(track);
-	updateLength();
+	if (track) { updateLength(); }
 }
 
 void MidiClip::updateLength()
