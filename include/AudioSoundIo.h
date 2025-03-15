@@ -126,22 +126,22 @@ private:
 	void underflowCallback();
 
 	static void staticWriteCallback(
-		SoundIoOutStream* outstream, int frame_count_min, int frame_count_max) LMMS_NONBLOCKING
+		SoundIoOutStream* outstream, int frame_count_min, int frame_count_max) noexcept LMMS_NONBLOCKING
 	{
 		return ((AudioSoundIo *)outstream->userdata)->writeCallback(frame_count_min, frame_count_max);
 	}
 
-	static void staticErrorCallback(SoundIoOutStream* outstream, int err) LMMS_NONBLOCKING
+	static void staticErrorCallback(SoundIoOutStream* outstream, int err) noexcept LMMS_NONBLOCKING
 	{
 		return ((AudioSoundIo *)outstream->userdata)->errorCallback(err);
 	}
 
-	static void staticUnderflowCallback(SoundIoOutStream* outstream) LMMS_NONBLOCKING
+	static void staticUnderflowCallback(SoundIoOutStream* outstream) noexcept LMMS_NONBLOCKING
 	{
 		return ((AudioSoundIo *)outstream->userdata)->underflowCallback();
 	}
 
-	static void staticOnBackendDisconnect(SoundIo* soundio, int err) LMMS_NONBLOCKING
+	static void staticOnBackendDisconnect(SoundIo* soundio, int err) noexcept LMMS_NONBLOCKING
 	{
 		return ((AudioSoundIo *)soundio->userdata)->onBackendDisconnect(err);
 	}

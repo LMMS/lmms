@@ -253,7 +253,7 @@ void AudioOss::stopProcessing()
 	stopProcessingThread( this );
 }
 
-void AudioOss::run() LMMS_NONBLOCKING
+void AudioOss::run() noexcept LMMS_NONBLOCKING
 {
 	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];

@@ -110,7 +110,7 @@ public:
 
 
 private:
-	void run() override;
+	void run() noexcept override;
 
 	static JobQueue globalJobQueue;
 	static QWaitCondition * queueReadyWaitCond;

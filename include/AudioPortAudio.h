@@ -107,11 +107,8 @@ private:
 	void stopProcessing() override;
 
 #ifdef PORTAUDIO_V19
-	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
-		unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo * _timeInfo,
-		PaStreamCallbackFlags _statusFlags,
-		void *arg );
+	static int _process_callback(const void* _inputBuffer, void* _outputBuffer, unsigned long _framesPerBuffer,
+		const PaStreamCallbackTimeInfo* _timeInfo, PaStreamCallbackFlags _statusFlags, void* arg) noexcept;
 
 #else
 

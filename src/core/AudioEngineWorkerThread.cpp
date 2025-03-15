@@ -164,7 +164,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 
 
-void AudioEngineWorkerThread::run() LMMS_NONBLOCKING
+void AudioEngineWorkerThread::run() noexcept LMMS_NONBLOCKING
 {
 	disable_denormals();
 

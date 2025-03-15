@@ -76,10 +76,10 @@ private:
 	void startProcessing() override;
 	void stopProcessing() override;
 
-	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
+	static void sdlAudioCallback(void* _udata, Uint8* _buf, int _len) noexcept;
 	void sdlAudioCallback( Uint8 * _buf, int _len );
 
-	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
+	static void sdlInputAudioCallback(void* _udata, Uint8* _buf, int _len) noexcept;
 	void sdlInputAudioCallback( Uint8 * _buf, int _len );
 
 	SDL_AudioSpec m_audioHandle;
