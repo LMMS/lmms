@@ -4901,7 +4901,7 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
-	auto reverseAction = new QAction(embed::getIconPixmap("back_to_start"), tr("Reverse Notes"), noteToolsButton);
+	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_R));
 
