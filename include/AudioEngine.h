@@ -358,7 +358,7 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const SampleFrame* renderNextBuffer();
+	const SampleFrame* renderNextBuffer() noexcept;
 
 	void swapBuffers();
 
