@@ -98,11 +98,11 @@ OPTION(WANT_VST_32	"Include 32-bit Windows VST support" ON)
 OPTION(WANT_VST_64	"Include 64-bit Windows VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
-option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
-option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
-option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
-option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
-option(WANT_RTSAN	"Enable RealtimeSanitizer" OFF)
+option(WANT_ASAN 	"Enable AddressSanitizer" OFF)
+option(WANT_TSAN 	"Enable ThreadSanitizer" OFF)
+option(WANT_MSAN 	"Enable MemorySanitizer" OFF)
+option(WANT_UBSAN 	"Enable UndefinedBehaviorSanitizer" OFF)
+option(WANT_RTSAN 	"Enable RealtimeSanitizer" OFF)
 option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
@@ -697,23 +697,14 @@ else()
 endif()
 
 # add enabled sanitizers
-function(add_sanitizer sanitizer supported_compilers want_flag status_flag build_type)
+function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	if(${want_flag})
 		if(CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}")
-			if (build_type STREQUAL "debug")
-				set(C_FLAGS CMAKE_C_FLAGS_DEBUG)
-				set(CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG)
-			elseif(build_type STREQUAL "any")
-				set(C_FLAGS CMAKE_C_FLAGS)
-				set(CXX_FLAGS CMAKE_CXX_FLAGS)
-			endif()
-
 			set("${status_flag}" "Enabled" PARENT_SCOPE)
 			string(REPLACE ";" " " additional_flags "${ARGN}")
 
-			# todo CMake 3.13: use add_compile_options/add_link_options instead
-			set(${C_FLAGS} "${${C_FLAGS}} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
-			set(${CXX_FLAGS} "${${CXX_FLAGS}} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			add_compile_options(-fsanitize=${sanitizer} ${additional_flags})
+			add_link_options(-fsanitize=${sanitizer} ${additional_flags})
 		else()
 			set("${status_flag}" "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
 		endif()
@@ -722,20 +713,20 @@ function(add_sanitizer sanitizer supported_compilers want_flag status_flag build
 	endif()
 endfunction()
 
-add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN debug)
-add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN debug)
-add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN debug -fno-omit-frame-pointer)
+add_sanitizer(address "GNU|Clang|MSVC" WANT_ASAN STATUS_ASAN)
+add_sanitizer(thread "GNU|Clang" WANT_TSAN STATUS_TSAN)
+add_sanitizer(memory "Clang" WANT_MSAN STATUS_MSAN -fno-omit-frame-pointer)
 
 # UBSan does not link with vptr enabled due to a problem with references from PeakControllerEffect
 # not being found by PeakController
-add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN debug -fno-sanitize=vptr)
+add_sanitizer(undefined "GNU|Clang" WANT_UBSAN STATUS_UBSAN -fno-sanitize=vptr)
 
-add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN any)
+add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN)
 
 if(WANT_RTSAN)
-	add_compile_definitions(LMMS_NONBLOCKING=[[clang::nonblocking]])
+	set(LMMS_NONBLOCKING "[[clang::nonblocking]]")
 else()
-	add_compile_definitions(LMMS_NONBLOCKING=[[]])
+	set(LMMS_NONBLOCKING "[[]]")
 endif()
 
 # Add warning and error flags
@@ -877,13 +868,13 @@ MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
 "* Debug FP exceptions               : ${STATUS_DEBUG_FPE}\n"
-"* Debug using AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
-"* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
-"* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
-"* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Debug using RealtimeSanitizer     : ${STATUS_RTSAN}\n"
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
+"* Sanitize using AddressSanitizer   : ${STATUS_ASAN}\n"
+"* Sanitize using ThreadSanitizer    : ${STATUS_TSAN}\n"
+"* Sanitize using MemorySanitizer    : ${STATUS_MSAN}\n"
+"* Sanitize using UBSanitizer        : ${STATUS_UBSAN}\n"
+"* Sanitize using RealtimeSanitizer  : ${STATUS_RTSAN}\n"
 )
 
 MESSAGE(
