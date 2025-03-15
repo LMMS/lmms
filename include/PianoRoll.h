@@ -247,6 +247,7 @@ protected slots:
 	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
+	void reverseNotes();
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
