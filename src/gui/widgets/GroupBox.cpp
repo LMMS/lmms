@@ -25,14 +25,9 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "GroupBox.h"
 #include "embed.h"
-#include "gui_templates.h"
-
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -111,7 +106,7 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 
 	// draw text
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont(adjustedToPixelSize(font(), 10));
+	p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
 	int const captionX = ledButtonShown() ? 22 : 6;
 	p.drawText(captionX, m_titleBarHeight, m_caption);

@@ -24,6 +24,9 @@
 
 #include "MixerChannelLcdSpinBox.h"
 
+#include <QInputDialog>
+#include <QMouseEvent>
+
 #include "CaptionMenu.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -40,6 +43,13 @@ void MixerChannelLcdSpinBox::setTrackView(TrackView * tv)
 
 void MixerChannelLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
 {
+	if (!(event->modifiers() & Qt::ShiftModifier) &&
+		!(event->modifiers() & Qt::ControlModifier))
+	{
+		enterValue();
+		return;
+	}
+
 	getGUI()->mixerView()->setCurrentMixerChannel(model()->value());
 
 	getGUI()->mixerView()->parentWidget()->show();
@@ -69,5 +79,18 @@ void MixerChannelLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 	contextMenu->exec(QCursor::pos());
 }
 
+void MixerChannelLcdSpinBox::enterValue()
+{
+	const auto val = model()->value();
+	const auto min = model()->minValue();
+	const auto max = model()->maxValue();
+	const auto step = model()->step<int>();
+	const auto label = tr("Please enter a new value between %1 and %2:").arg(min).arg(max);
+
+	auto ok = false;
+	const auto newVal = QInputDialog::getInt(this, tr("Set value"), label, val, min, max, step, &ok);
+
+	if (ok) { model()->setValue(newVal); }
+}
 
 } // namespace lmms::gui

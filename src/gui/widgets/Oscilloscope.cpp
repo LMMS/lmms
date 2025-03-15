@@ -28,7 +28,7 @@
 
 #include "Oscilloscope.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -51,7 +51,6 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
@@ -203,7 +202,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	else
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont(adjustedToPixelSize(p.font(), 10));
+		p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
 		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }

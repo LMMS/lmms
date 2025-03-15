@@ -155,8 +155,8 @@ QMenu * SampleTrackView::createMixerMenu(QString title, QString newMixerLabel)
 
 		if (currentChannel != mixerChannel)
 		{
-			const auto index = currentChannel->m_channelIndex;
-			QString label = tr("%1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
+			const auto index = currentChannel->index();
+			QString label = tr("%1: %2").arg(index).arg(currentChannel->m_name);
 			mixerMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
 			});

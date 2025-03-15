@@ -89,11 +89,15 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
+
+	// The main layout - by default it only contains the scroll area,
+	// but SongEditor uses the layout to add a TimeLineWidget on top
 	auto layout = new QVBoxLayout(this);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 	layout->addWidget( m_scrollArea );
 
+	// The widget that will contain all TrackViews
 	auto scrollContent = new QWidget;
 	m_scrollLayout = new QVBoxLayout( scrollContent );
 	m_scrollLayout->setContentsMargins(0, 0, 0, 0);
@@ -101,6 +105,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_scrollLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
 
 	m_scrollArea->setWidget( scrollContent );
+	m_scrollArea->setWidgetResizable(true);
 
 	m_scrollArea->show();
 	m_rubberBand->hide();
@@ -254,10 +259,6 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	m_scrollArea->widget()->setFixedWidth(width());
-	m_scrollArea->widget()->setFixedHeight(
-				m_scrollArea->widget()->minimumSizeHint().height());
-
 	for (const auto& trackView : m_trackViews)
 	{
 		trackView->show();
@@ -416,8 +417,8 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	{
 		DataFile dataFile( value );
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		it->setSimpleSerializing();
-		it->loadSettings( dataFile.content().toElement() );
+		it->loadPreset(dataFile.content().toElement());
+
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
@@ -442,15 +443,6 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		Track::create( dataFile.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
-}
-
-
-
-
-void TrackContainerView::resizeEvent( QResizeEvent * _re )
-{
-	realignTracks();
-	QWidget::resizeEvent( _re );
 }
 
 

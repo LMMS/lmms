@@ -148,6 +148,7 @@ lmms--gui--PianoRoll {
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
 	qproperty-stepNoteColor: #9b1313;
+	qproperty-currentStepNoteColor: rgb(245, 3, 139);
 	qproperty-noteTextColor: rgb( 255, 255, 255 );
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
@@ -375,7 +376,7 @@ lmms--gui--TrackContentWidget {
 
 /* gear button in tracks */
 
-lmms--gui--TrackOperationsWidget > QPushButton {
+lmms--gui--TrackOperationsWidget QPushButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -384,7 +385,7 @@ lmms--gui--TrackOperationsWidget > QPushButton {
 	border: none;
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
 	image: url("resources:trackop.png");
 	subcontrol-origin: padding;
 	subcontrol-position: center;
@@ -392,12 +393,12 @@ lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
 	top: 1px;
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:hover {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:hover {
 	image: url("resources:trackop_h.png");
 }
 
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:pressed,
-lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:checked {
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:pressed,
+lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:checked {
 	image: url("resources:trackop_c.png");
 	position: relative;
 	top: 2px;
@@ -796,6 +797,21 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-radius: 2px;
 }
 
+/* Instrument */
+
+/* Envelope graph */
+lmms--gui--EnvelopeGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+	qproperty-markerFillColor: rgb(153, 175, 255);
+	qproperty-markerOutlineColor: rgb(0, 0, 0);
+}
+
+/* LFO graph */
+lmms--gui--LfoGraph {
+	qproperty-noAmountColor: rgb(96, 91, 96);
+	qproperty-fullAmountColor: rgb(0, 255, 128);
+}
 
 /* Plugins */
 
@@ -1020,6 +1036,12 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
+}
+
+lmms--gui--VectorView {
+	qproperty-colorTrace: rgba(255, 170, 33, 255);
+	qproperty-colorGrid: rgba(76, 80, 84, 128);
+	qproperty-colorLabels: rgba(76, 80, 84, 255);
 }
 
 lmms--gui--BarModelEditor {

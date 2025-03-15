@@ -63,7 +63,6 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
-	m_simpleSerializingMode( false ),
 	m_clips()        /*!< The clips (segments) */
 {	
 	m_trackContainer->addTrack( this );
@@ -174,10 +173,6 @@ Track* Track::clone()
 }
 
 
-
-
-
-
 /*! \brief Save this track's settings to file
  *
  *  We save the track type and its muted state and solo state, then append the track-
@@ -186,12 +181,13 @@ Track* Track::clone()
  *
  *  \param doc The QDomDocument to use to save
  *  \param element The The QDomElement to save into
+ *  \param presetMode Describes whether to save the track as a preset or not.
  *  \todo Does this accurately describe the parameters?  I think not!?
  *  \todo Save the track height
  */
-void Track::saveSettings( QDomDocument & doc, QDomElement & element )
+void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 {
-	if( !m_simpleSerializingMode )
+	if (!presetMode)
 	{
 		element.setTagName( "track" );
 	}
@@ -215,11 +211,10 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, PatternTrack, SampleTrack etc.) save its settings
 	element.appendChild( tsDe );
-	saveTrackSpecificSettings( doc, tsDe );
+	saveTrackSpecificSettings(doc, tsDe, presetMode);
 
-	if( m_simpleSerializingMode )
+	if (presetMode)
 	{
-		m_simpleSerializingMode = false;
 		return;
 	}
 
@@ -229,9 +224,6 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		clip->saveState(doc, element);
 	}
 }
-
-
-
 
 /*! \brief Load the settings from a file
  *
@@ -243,9 +235,10 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
  *  one at a time.
  *
  *  \param element the QDomElement to load track settings from
+ *  \param presetMode Indicates if a preset or a full track is loaded
  *  \todo Load the track height.
  */
-void Track::loadSettings( const QDomElement & element )
+void Track::loadTrack(const QDomElement& element, bool presetMode)
 {
 	if( static_cast<Type>(element.attribute( "type" ).toInt()) != type() )
 	{
@@ -267,7 +260,7 @@ void Track::loadSettings( const QDomElement & element )
 		setColor(QColor{element.attribute("color")});
 	}
 
-	if( m_simpleSerializingMode )
+	if (presetMode)
 	{
 		QDomNode node = element.firstChild();
 		while( !node.isNull() )
@@ -279,7 +272,7 @@ void Track::loadSettings( const QDomElement & element )
 			}
 			node = node.nextSibling();
 		}
-		m_simpleSerializingMode = false;
+
 		return;
 	}
 
@@ -314,6 +307,28 @@ void Track::loadSettings( const QDomElement & element )
 	{
 		m_height = storedHeight;
 	}
+}
+
+void Track::savePreset(QDomDocument & doc, QDomElement & element)
+{
+	saveTrack(doc, element, true);
+}
+
+void Track::loadPreset(const QDomElement & element)
+{
+	loadTrack(element, true);
+}
+
+void Track::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	// Assume that everything should be saved if we are called through SerializingObject::saveSettings
+	saveTrack(doc, element, false);
+}
+
+void Track::loadSettings(const QDomElement& element)
+{
+	// Assume that everything should be loaded if we are called through SerializingObject::loadSettings 
+	loadTrack(element, false);
 }
 
 

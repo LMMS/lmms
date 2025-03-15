@@ -1,6 +1,7 @@
 /* VectorView.cpp - implementation of VectorView class.
  *
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ * Copyright (c) 2025- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  * This program is free software; you can redistribute it and/or
@@ -25,11 +26,13 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+
 #include <QImage>
 #include <QPainter>
 
 #include "ColorChooser.h"
 #include "GuiApplication.h"
+#include "FontHelper.h"
 #include "MainWindow.h"
 #include "VecControls.h"
 
@@ -37,31 +40,23 @@ namespace lmms::gui
 {
 
 
-VectorView::VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
+VectorView::VectorView(VecControls* controls, LocklessRingBuffer<SampleFrame>* inputBuffer, QWidget* parent) :
 	QWidget(parent),
 	m_controls(controls),
 	m_inputBuffer(inputBuffer),
 	m_bufferReader(*inputBuffer),
-	m_displaySize(displaySize),
 	m_zoom(1.f),
-	m_persistTimestamp(0),
-	m_zoomTimestamp(0),
-	m_oldHQ(m_controls->m_highQualityModel.value()),
-	m_oldX(m_displaySize / 2),
-	m_oldY(m_displaySize / 2)
+	m_zoomTimestamp(0)
 {
 	setMinimumSize(200, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
-	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
-
 #ifdef VEC_DEBUG
 	m_executionAvg = 0;
 #endif
 }
-
 
 // Compose and draw all the content; called by Qt.
 void VectorView::paintEvent(QPaintEvent *event)
@@ -70,229 +65,153 @@ void VectorView::paintEvent(QPaintEvent *event)
 	unsigned int drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 #endif
 
-	// All drawing done in this method, local variables are sufficient for the boundary
-	const int displayTop = 2;
-	const int displayBottom = height() - 2;
-	const int displayLeft = 2;
-	const int displayRight = width() - 2;
-	const int displayWidth = displayRight - displayLeft;
-	const int displayHeight = displayBottom - displayTop;
+	const bool logScale = m_controls->getLogarithmicModel().value();
+	const bool linesMode = m_controls->getLinesModel().value();
 
-	const float centerX = displayLeft + (displayWidth / 2.f);
-	const float centerY = displayTop + (displayWidth / 2.f);
-
-	const int margin = 4;
-	const int gridCorner = 30;
-
-	// Setup QPainter and font sizes
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	QFont normalFont, boldFont;
-	boldFont.setPixelSize(26);
-	boldFont.setBold(true);
-	const int labelWidth = 26;
-	const int labelHeight = 26;
+	// Paint background
+	painter.fillRect(rect(), Qt::black);
 
-	bool hq = m_controls->m_highQualityModel.value();
+	const qreal widthF = qreal(width());
+	const qreal heightF = qreal(height());
 
-	// Clear display buffer if quality setting was changed
-	if (hq != m_oldHQ)
-	{
-		m_oldHQ = hq;
-		for (std::size_t i = 0; i < m_displayBuffer.size(); i++)
-		{
-			m_displayBuffer.data()[i] = 0;
-		}
-	}
+	const auto minOfWidthAndHeight = std::min(widthF, heightF);
+	// If we would divide by 4 then the circle would go to the boundaries
+	// of the widget. We increase the value at bit more to get some margin.
+	const auto scaleValue = minOfWidthAndHeight / 4.1;
 
-	// Dim stored image based on persistence setting and elapsed time.
-	// Update period is limited to 50 ms (20 FPS) for non-HQ mode and 10 ms (100 FPS) for HQ mode.
-	const unsigned int currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>
-	(
-		std::chrono::high_resolution_clock::now().time_since_epoch()
-	).count();
-	const unsigned int elapsed = currentTimestamp - m_persistTimestamp;
-	const unsigned int threshold = hq ? 10 : 50;
-	if (elapsed > threshold)
-	{
-		m_persistTimestamp = currentTimestamp;
-		// Non-HQ mode uses half the resolution → use limited buffer space.
-		const std::size_t useableBuffer = hq ? m_displayBuffer.size() : m_displayBuffer.size() / 4;
-		// The knob value is interpreted on log. scale, otherwise the effect would ramp up too slowly.
-		// Persistence value specifies fraction of light intensity that remains after 10 ms.
-		// → Compensate it based on elapsed time (exponential decay).
-		const float persist = log10(1 + 9 * m_controls->m_persistenceModel.value());
-		const float persistPerFrame = pow(persist, elapsed / 10.f);
-		// Note that for simplicity and performance reasons, this implementation only dims all stored
-		// values by a given factor. A true simulation would also do the inverse of desaturation that
-		// occurs in high-intensity traces in HQ mode.
-		for (std::size_t i = 0; i < useableBuffer; i++)
-		{
-			m_displayBuffer.data()[i] *= persistPerFrame;
-		}
-	}
+	// Compute several transforms that are used to paint various elements
+
+	// This transform moves the origin/center to the middle of the widget width and to the correct height
+	QTransform centerTransform;
+	centerTransform.translate(widthF / 2., minOfWidthAndHeight / 2.);
+
+	// This transform is used to center and scale the painting of data and of the grid and labels
+	QTransform gridAndLabelTransform(centerTransform);
+	// Invert the Y axis while we are at it so that we can paint in a "normal" coordinate system
+	gridAndLabelTransform.scale(scaleValue, -scaleValue);
+
+	// This transform is used to paint the traces. It takes the zoom factor as an "extra" scale into account as well.
+	QTransform tracePaintingTransform(gridAndLabelTransform);
+	tracePaintingTransform.scale(m_zoom, m_zoom);
+
+	const auto traceWidth = 2. / (scaleValue * m_zoom);
+
+	// This will add colors so that line intersections produce lighter colors/intensities
+	painter.setCompositionMode(QPainter::CompositionMode_Plus);
+	painter.setTransform(tracePaintingTransform);
 
 	// Get new samples from the lockless input FIFO buffer
-	auto inBuffer = m_bufferReader.read_max(m_inputBuffer->capacity());
-	std::size_t frameCount = inBuffer.size();
+	const auto inBuffer = m_bufferReader.read_max(m_inputBuffer->capacity());
+	const std::size_t frameCount = inBuffer.size();
 
-	// Draw new points on top
-
-	const bool logScale = m_controls->m_logarithmicModel.value();
-	const unsigned short activeSize = hq ? m_displaySize : m_displaySize / 2;
-
-	// Helper lambda functions for better readability
-	// Make sure pixel stays within display bounds:
-	auto saturate = [=](short pixelPos) {return qBound((short)0, pixelPos, (short)(activeSize - 1));};
-	// Take existing pixel and brigthen it. Very bright light should reduce saturation and become
-	// white. This effect is easily approximated by capping elementary colors to 255 individually.
-	auto updatePixel = [&](unsigned short x, unsigned short y, QColor addedColor)
+	for (std::size_t frame = 0; frame < frameCount; ++frame)
 	{
-		QColor currentColor = ((QRgb*)m_displayBuffer.data())[x + y * activeSize];
-		currentColor.setRed(std::min(currentColor.red() + addedColor.red(), 255));
-		currentColor.setGreen(std::min(currentColor.green() + addedColor.green(), 255));
-		currentColor.setBlue(std::min(currentColor.blue() + addedColor.blue(), 255));
-		((QRgb*)m_displayBuffer.data())[x + y * activeSize] = currentColor.rgb();
-	};
+		auto sampleFrame = inBuffer[frame];
 
-	if (hq)
-	{
-		// High quality mode: check distance between points and draw a line.
-		// The longer the line is, the dimmer, simulating real electron trace on luminescent screen.
-		for (std::size_t frame = 0; frame < frameCount; frame++)
+		if (logScale)
 		{
-			float left = 0.0f;
-			float right = 0.0f;
-			float inLeft = inBuffer[frame][0] * m_zoom;
-			float inRight = inBuffer[frame][1] * m_zoom;
-			// Scale left and right channel from (-1.0, 1.0) to display range
-			if (logScale)
+			const float distance = std::sqrt(sampleFrame.sumOfSquaredAmplitudes());
+			const float distanceLog = std::log10(1 + 9 * std::abs(distance));
+
+			if (distance != 0)
 			{
-				// To better preserve shapes, the log scale is applied to the distance from origin,
-				// not the individual channels.
-				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
-				const float distanceLog = log10(1 + 9 * std::abs(distance));
-				const float angleCos = inLeft / distance;
-				const float angleSin = inRight / distance;
-				left  = distanceLog * angleCos * (activeSize - 1) / 4;
-				right = distanceLog * angleSin * (activeSize - 1) / 4;
+				const float factor = distanceLog / distance;
+				sampleFrame *= factor;
 			}
-			else
-			{
-				left  = inLeft * (activeSize - 1) / 4;
-				right = inRight * (activeSize - 1) / 4;
-			}
-
-			// Rotate display coordinates 45 degrees, flip Y axis and make sure the result stays within bounds
-			int x = saturate(right - left + activeSize / 2.f);
-			int y = saturate(activeSize - (right + left + activeSize / 2.f));
-
-			// Estimate number of points needed to fill space between the old and new pixel. Cap at 100.
-			unsigned char points = std::min((int)sqrt((m_oldX - x) * (m_oldX - x) + (m_oldY - y) * (m_oldY - y)), 100);
-
-			// Large distance = dim trace. The curve for darker() is choosen so that:
-			// - no movement (0 points) actually _increases_ brightness slightly,
-			// - one point between samples = returns exactly the specified color,
-			// - one to 99 points between samples = follows a sharp "1/x" decaying curve,
-			// - 100 points between samples = returns approximately 5 % brightness.
-			// Everything else is discarded (by the 100 point cap) because there is not much to see anyway.
-			QColor addedColor = m_controls->m_colorFG.darker(75 + 20 * points).rgb();
-
-			// Draw the new pixel: the beam sweeps across area that may have been excited before
-			// → add new value to existing pixel state.
-			updatePixel(x, y, addedColor);
-
-			// Draw interpolated points between the old pixel and the new one
-			int newX = right - left + activeSize / 2.f;
-			int newY = activeSize - (right + left + activeSize / 2.f);
-			for (unsigned char i = 1; i < points; i++)
-			{
-				x = saturate(((points - i) * m_oldX + i * newX) / points);
-				y = saturate(((points - i) * m_oldY + i * newY) / points);
-				updatePixel(x, y, addedColor);
-			}
-			m_oldX = newX;
-			m_oldY = newY;
 		}
-	}
-	else
-	{
-		// To improve performance, non-HQ mode uses smaller display size and only
-		// one full-color pixel per sample.
-		for (std::size_t frame = 0; frame < frameCount; frame++)
+
+		// Perform a mid/side split which will potentially boost signals
+		//
+		// Represent the side by the x coordinate and the mid by the y coordinate.
+		// 
+		// A mono signal which just contains a mid signal will just show as a line
+		// along the y axis because it carries the same information in the left and right channel.
+		// So we can say: left == right. So lets replace "right" with "left" in the formula below:
+		// (left - left, -(left + left)) = (0, -2*left).
+		// If two signals are completely out of phase the show as a line along the x axis. That's because
+		// each signal is the opposite of the other one, e.g. right = -left. Let's replace again:
+		// (left - (-left), -(left - left)) = (2*left, 0).
+		//
+		const auto mid = sampleFrame.left() + sampleFrame.right();
+		const auto side = sampleFrame.left() - sampleFrame.right();
+
+		// We negate the mid value of the coordinate so that it tilts correctly if we pan hard left and hard right
+		QPointF currentPoint(side, -mid);
+
+		const auto darkenedColor(m_colorTrace.darker(100 + frame));
+		painter.setPen(QPen(darkenedColor, traceWidth));
+
+		// Only draw a line if we can draw a line, i.e. if the point really changes.
+		// Otherwise just produce a point.
+		// Without this check Qt will draw horizontal lines when silence is processed.
+		if (linesMode && m_lastPoint != currentPoint)
 		{
-			float left = 0.0f;
-			float right = 0.0f;
-			float inLeft = inBuffer[frame][0] * m_zoom;
-			float inRight = inBuffer[frame][1] * m_zoom;
-			if (logScale) {
-				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
-				const float distanceLog = log10(1 + 9 * std::abs(distance));
-				const float angleCos = inLeft / distance;
-				const float angleSin = inRight / distance;
-				left  = distanceLog * angleCos * (activeSize - 1) / 4;
-				right = distanceLog * angleSin * (activeSize - 1) / 4;
-			} else {
-				left  = inLeft * (activeSize - 1) / 4;
-				right = inRight * (activeSize - 1) / 4;
-			}
-			int x = saturate(right - left + activeSize / 2.f);
-			int y = saturate(activeSize - (right + left + activeSize / 2.f));
-			((QRgb*)m_displayBuffer.data())[x + y * activeSize] = m_controls->m_colorFG.rgb();
+			painter.drawLine(QLineF(m_lastPoint, currentPoint));
 		}
+		else
+		{
+			painter.drawPoint(currentPoint);
+		}
+
+		m_lastPoint = currentPoint;
 	}
 
-	// Draw background
-	painter.fillRect(displayLeft, displayTop, displayWidth, displayHeight, QColor(0,0,0));
+	// Draw grid and labels overlay
+	painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+	painter.setTransform(gridAndLabelTransform);
 
-	// Draw the final image
-	QImage temp = QImage(m_displayBuffer.data(),
-						 activeSize,
-						 activeSize,
-						 QImage::Format_RGB32);
-	temp.setDevicePixelRatio(devicePixelRatio());
-	painter.drawImage(displayLeft, displayTop,
-					  temp.scaledToWidth(displayWidth * devicePixelRatio(),
-					  Qt::SmoothTransformation));
+	const QPointF origin(0, 0);
+	painter.setPen(QPen(m_colorGrid, 2.5 / scaleValue, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.drawEllipse(origin, 2.f, 2.f);
 
-	// Draw the grid and labels
-	painter.setPen(QPen(m_controls->m_colorGrid, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawEllipse(QPointF(centerX, centerY), displayWidth / 2.f, displayWidth / 2.f);
-	painter.setPen(QPen(m_controls->m_colorGrid, 1.5, Qt::DotLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawLine(QPointF(centerX, centerY), QPointF(displayLeft + gridCorner, displayTop + gridCorner));
-	painter.drawLine(QPointF(centerX, centerY), QPointF(displayRight - gridCorner, displayTop + gridCorner));
+	const qreal root = std::sqrt(qreal(2.1));
+	painter.setPen(QPen(m_colorGrid, 2.5 / scaleValue, Qt::DotLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.drawLine(origin, QPointF(-root, root));
+	painter.drawLine(origin, QPointF(root, root));
 
-	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.resetTransform();
+
+	// Draw L/R text
+	const auto lText = QString("L");
+	const auto rText = QString("R");
+
+	QFont boldFont = adjustedToPixelSize(painter.font(), 26);
+	boldFont.setBold(true);
+
+	QFontMetrics fm(boldFont);
+	const auto boundingRectL = fm.boundingRect(lText);
+	const auto boundingRectR = fm.boundingRect(rText);
+
+	painter.setPen(QPen(m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.setFont(boldFont);
-	painter.drawText(displayLeft + margin, displayTop,
-					 labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
-					 QString("L"));
-	painter.drawText(displayRight - margin - labelWidth, displayTop,
-					 labelWidth, labelHeight, Qt::AlignRight| Qt::AlignTop | Qt::TextDontClip,
-					 QString("R"));
 
-	// Draw the outline
-	painter.setPen(QPen(m_controls->m_colorOutline, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.f, 2.f);
+	QTransform transformL(centerTransform);
+	transformL.rotate(-45.);
+	transformL.translate(-boundingRectL.width() / 2, -(minOfWidthAndHeight / 2) - 10);
+	painter.setTransform(transformL);
+	painter.drawText(0, 0, lText);
 
-	// Draw zoom info if changed within last second (re-using timestamp acquired for dimming)
-	if (currentTimestamp - m_zoomTimestamp < 1000)
-	{
-		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.setFont(normalFont);
-		painter.drawText(displayWidth / 2 - 50, displayBottom - 20, 100, 16, Qt::AlignCenter,
-						 QString("Zoom: ").append(std::to_string((int)round(m_zoom * 100)).c_str()).append(" %"));
-	}
+	QTransform transformR(centerTransform);
+	transformR.rotate(45.);
+	transformR.translate(-boundingRectR.width() / 2, -(minOfWidthAndHeight / 2) - 10);
+	painter.setTransform(transformR);
+	painter.drawText(0, 0, rText);
 
-	// Optionally measure drawing performance
+	drawZoomInfo();
+
+		// Optionally measure drawing performance
 #ifdef VEC_DEBUG
+	QPainter debugPainter(this);
+
 	drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - drawTime;
 	m_executionAvg = 0.95f * m_executionAvg + 0.05f * drawTime / 1000000.f;
-	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.setFont(normalFont);
-	painter.drawText(displayWidth / 2 - 50, displayBottom - 16, 100, 16, Qt::AlignLeft,
-					 QString("Exec avg.: ").append(std::to_string(m_executionAvg).substr(0, 5).c_str()).append(" ms"));
+
+	QString debugText = tr("Exec avg.: %1 ms").arg(static_cast<int>(round(m_executionAvg)));
+	debugPainter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	debugPainter.drawText(0, height(), debugText);
 #endif
 }
 
@@ -300,8 +219,10 @@ void VectorView::paintEvent(QPaintEvent *event)
 // Periodically trigger repaint and check if the widget is visible
 void VectorView::periodicUpdate()
 {
-	m_visible = isVisible();
-	if (m_visible) {update();}
+	if (isVisible())
+	{
+		update();
+	}
 }
 
 
@@ -309,10 +230,10 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	auto colorDialog = new ColorChooser(m_controls->m_colorFG, this);
+	auto colorDialog = new ColorChooser(m_colorTrace, this);
 	if (colorDialog->exec())
 	{
-		m_controls->m_colorFG = colorDialog->currentColor();
+		m_colorTrace = colorDialog->currentColor();
 	}
 }
 
@@ -331,6 +252,30 @@ void VectorView::wheelEvent(QWheelEvent *event)
 		std::chrono::high_resolution_clock::now().time_since_epoch()
 	).count();
 
+}
+
+void VectorView::drawZoomInfo()
+{
+	const unsigned int currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>
+	(
+		std::chrono::high_resolution_clock::now().time_since_epoch()
+	).count();
+
+	if (currentTimestamp - m_zoomTimestamp < 1000)
+	{
+		QPainter painter(this);
+
+		const auto zoomValue = static_cast<int>(std::round(m_zoom * 100.));
+		const auto text = tr("Zoom: %1 %").arg(zoomValue);
+
+		// Measure text
+		const auto fm = painter.fontMetrics();
+		const auto boundingRect = fm.boundingRect(text);
+		const auto descent = fm.descent();
+
+		painter.setPen(QPen(m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawText((width() - boundingRect.width()) / 2, height() - descent - 2, text);
+	}
 }
 
 

@@ -70,25 +70,25 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 	QPixmap const fader_knob(PLUGIN_NAME::getIconPixmap("fader_knob2"));
 	
 	// faders
-	auto gain1 = new Fader(&controls->m_gain1, tr("Band 1 gain"), this, fader_knob);
+	auto gain1 = new Fader(&controls->m_gain1, tr("Band 1 gain"), this, fader_knob, false);
 	gain1->move( 7, 56 );
 	gain1->setDisplayConversion( false );
 	gain1->setHintText( tr( "Band 1 gain:" ), " dBFS" );
 	gain1->setRenderUnityLine(false);
 
-	auto gain2 = new Fader(&controls->m_gain2, tr("Band 2 gain"), this, fader_knob);
+	auto gain2 = new Fader(&controls->m_gain2, tr("Band 2 gain"), this, fader_knob, false);
 	gain2->move( 47, 56 );
 	gain2->setDisplayConversion( false );
 	gain2->setHintText( tr( "Band 2 gain:" ), " dBFS" );
 	gain2->setRenderUnityLine(false);
 
-	auto gain3 = new Fader(&controls->m_gain3, tr("Band 3 gain"), this, fader_knob);
+	auto gain3 = new Fader(&controls->m_gain3, tr("Band 3 gain"), this, fader_knob, false);
 	gain3->move( 87, 56 );
 	gain3->setDisplayConversion( false );
 	gain3->setHintText( tr( "Band 3 gain:" ), " dBFS" );
 	gain3->setRenderUnityLine(false);
 
-	auto gain4 = new Fader(&controls->m_gain4, tr("Band 4 gain"), this, fader_knob);
+	auto gain4 = new Fader(&controls->m_gain4, tr("Band 4 gain"), this, fader_knob, false);
 	gain4->move( 127, 56 );
 	gain4->setDisplayConversion( false );
 	gain4->setHintText( tr( "Band 4 gain:" ), " dBFS" );

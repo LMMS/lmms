@@ -368,17 +368,13 @@ int main( int argc, char * * argv )
 		return EXIT_FAILURE;
 	}
 #endif
-#ifdef LMMS_BUILD_LINUX
-	// don't let OS steal the menu bar. FIXME: only effective on Qt4
-	QCoreApplication::setAttribute( Qt::AA_DontUseNativeMenuBar );
-#endif
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
-	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
+	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
 	// second of two command-line parsing stages
@@ -578,9 +574,7 @@ int main( int argc, char * * argv )
 
 			if( br >= 64 && br <= 384 )
 			{
-				OutputSettings::BitRateSettings bitRateSettings = os.getBitRateSettings();
-				bitRateSettings.setBitRate(br);
-				os.setBitRateSettings(bitRateSettings);
+				os.setBitrate(br);
 			}
 			else
 			{

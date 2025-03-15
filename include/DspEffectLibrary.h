@@ -25,8 +25,9 @@
 #ifndef LMMS_DSPEFFECTLIBRARY_H
 #define LMMS_DSPEFFECTLIBRARY_H
 
+#include <numbers>
+
 #include "lmms_math.h"
-#include "lmms_constants.h"
 #include "lmms_basics.h"
 #include "SampleFrame.h"
 
@@ -289,7 +290,7 @@ namespace lmms::DspEffectLibrary
 		{
 			if( in >= m_threshold || in < -m_threshold )
 			{
-				return ( fabsf( fabsf( fmodf( in - m_threshold, m_threshold*4 ) ) - m_threshold*2 ) - m_threshold ) * m_gain;
+				return (std::abs(std::abs(std::fmod(in - m_threshold, m_threshold * 4)) - m_threshold * 2) - m_threshold) * m_gain;
 			}
 			return in * m_gain;
 		}
@@ -303,7 +304,7 @@ namespace lmms::DspEffectLibrary
 
 		sample_t nextSample( sample_t in )
 		{
-			return m_gain * ( in * ( fabsf( in )+m_threshold ) / ( in*in +( m_threshold-1 )* fabsf( in ) + 1 ) );
+			return m_gain * (in * (std::abs(in) + m_threshold) / (in * in + (m_threshold - 1) * std::abs(in) + 1));
 		}
 	} ;
 
@@ -328,10 +329,10 @@ namespace lmms::DspEffectLibrary
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
 		{
-			const float toRad = F_PI / 180;
+			constexpr float toRad = std::numbers::pi_v<float> / 180.f;
 			const sample_t tmp = inLeft;
-			inLeft += inRight * sinf( m_wideCoeff * ( .5 * toRad ) );
-			inRight -= tmp * sinf( m_wideCoeff * ( .5 * toRad ) );
+			inLeft += inRight * std::sin(m_wideCoeff * toRad * .5f);
+			inRight -= tmp * std::sin(m_wideCoeff * toRad * .5f);
 		}
 
 	private:

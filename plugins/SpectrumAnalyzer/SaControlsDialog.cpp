@@ -341,7 +341,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	m_waterfall = new SaWaterfallView(controls, processor, this);
 	display_splitter->addWidget(m_waterfall);
 	m_waterfall->setVisible(m_controls->m_waterfallModel.value());
-	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, [=] {m_waterfall->updateVisibility();});
 }
 
 

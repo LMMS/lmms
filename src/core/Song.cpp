@@ -235,9 +235,6 @@ void Song::processNextBuffer()
 			return;
 	}
 
-	// If we have no tracks to play, there is nothing to do
-	if (trackList.empty()) { return; }
-
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
@@ -335,6 +332,8 @@ void Song::processNextBuffer()
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
+			processMetronome(frameOffsetInPeriod);
+
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
@@ -427,6 +426,17 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 			it.key()->setUseControllerValue(true);
 		}
 	}
+}
+
+void Song::processMetronome(size_t bufferOffset)
+{
+	const auto currentPlayMode = playMode();
+	const auto supported = currentPlayMode == PlayMode::MidiClip
+		|| currentPlayMode == PlayMode::Song
+		|| currentPlayMode == PlayMode::Pattern;
+
+	if (!supported || m_exporting) { return; } 
+	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
 }
 
 void Song::setModified(bool value)
@@ -1069,12 +1079,6 @@ void Song::loadProject( const QString & fileName )
 
 	getTimeline(PlayMode::Song).setLoopEnabled(false);
 
-	if( !dataFile.content().firstChildElement( "track" ).isNull() )
-	{
-		m_globalAutomationTrack->restoreState( dataFile.content().
-						firstChildElement( "track" ) );
-	}
-
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
@@ -1229,7 +1233,6 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	saveState( dataFile, dataFile.content() );
 
-	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
 	{
@@ -1545,6 +1548,4 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
-
-
 } // namespace lmms

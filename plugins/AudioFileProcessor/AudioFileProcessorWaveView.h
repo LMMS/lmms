@@ -27,6 +27,7 @@
 
 
 #include "Knob.h"
+#include "SampleThumbnail.h"
 
 
 namespace lmms
@@ -118,6 +119,8 @@ private:
 	enum class DraggingType
 	{
 		Wave,
+		SlideWave,
+		ZoomWave,
 		SampleStart,
 		SampleEnd,
 		SampleLoop
@@ -142,6 +145,7 @@ private:
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
+	SampleThumbnail m_sampleThumbnail;
 
 	friend class AudioFileProcessorView;
 
@@ -158,8 +162,8 @@ private:
 	void zoom(const bool out = false);
 	void slide(int px);
 	void slideSamplePointByPx(Point point, int px);
-	void slideSamplePointByFrames(Point point, f_cnt_t frames, bool slide_to = false);
-	void slideSampleByFrames(f_cnt_t frames);
+	void slideSamplePointByFrames(Point point, long frameOffset, bool slideTo = false);
+	void slideSampleByFrames(long frameOffset);
 
 	void slideSamplePointToFrames(Point point, f_cnt_t frames)
 	{

@@ -40,7 +40,7 @@ namespace lmms
 {
 
 class Track;
-class AudioPort;
+class AudioBusHandle;
 class SampleFrame;
 
 class LMMS_EXPORT PlayHandle : public ThreadableJob
@@ -65,7 +65,7 @@ public:
 		m_offset = p.m_offset;
 		m_affinity = p.m_affinity;
 		m_usesBuffer = p.m_usesBuffer;
-		m_audioPort = p.m_audioPort;
+		m_audioBusHandle = p.m_audioBusHandle;
 		return *this;
 	}
 
@@ -134,14 +134,14 @@ public:
 		m_usesBuffer = b;
 	}
 	
-	AudioPort * audioPort()
+	AudioBusHandle* audioBusHandle()
 	{
-		return m_audioPort;
+		return m_audioBusHandle;
 	}
 	
-	void setAudioPort( AudioPort * port )
+	void setAudioBusHandle(AudioBusHandle* busHandle)
 	{
-		m_audioPort = port;
+		m_audioBusHandle = busHandle;
 	}
 	
 	void releaseBuffer();
@@ -156,7 +156,7 @@ private:
 	SampleFrame* m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
-	AudioPort * m_audioPort;
+	AudioBusHandle* m_audioBusHandle;
 } ;
 
 using PlayHandleList = QList<PlayHandle*>;
