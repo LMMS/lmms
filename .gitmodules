@@ -12,7 +12,7 @@
 	url = https://github.com/adplug/adplug.git
 [submodule "plugins/LadspaEffect/calf/veal"]
 	path = plugins/LadspaEffect/calf/veal
-	url = https://github.com/messmerd/veal
+	url = https://github.com/lmms/veal
 [submodule "plugins/Xpressive/exprtk"]
 	path = plugins/Xpressive/exprtk
 	url = https://github.com/ArashPartow/exprtk
