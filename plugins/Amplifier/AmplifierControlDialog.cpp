@@ -42,14 +42,14 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	
 	auto makeKnob = [this](int x, int y, const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
 	{
-        Knob* newKnob = new Knob(KnobType::Bright26, this);
-        newKnob->move(x, y);
-        newKnob->setModel(model);
-        newKnob->setLabel(label);
-        newKnob->setHintText(hintText, unit);
-        newKnob->setVolumeKnob(isVolume);
-        return newKnob;
-    };
+		Knob* newKnob = new Knob(KnobType::Bright26, this);
+		newKnob->move(x, y);
+		newKnob->setModel(model);
+		newKnob->setLabel(label);
+		newKnob->setHintText(hintText, unit);
+		newKnob->setVolumeKnob(isVolume);
+		return newKnob;
+	};
 
 	makeKnob(16, 10, tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, true);
 	makeKnob(57, 10, tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false);
