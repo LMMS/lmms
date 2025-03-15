@@ -73,14 +73,13 @@ SimpleTextFloat* Fader::s_textFloat = nullptr;
 Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
 	QWidget(parent),
 	FloatModelView(model, this),
-	m_modelIsLinear(modelIsLinear)
+	m_modelIsLinear(modelIsLinear),
+	m_knobSize(m_knob.size() / m_knob.devicePixelRatio())
 {
 	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
-
-	m_knobSize = m_knob.size() / m_knob.devicePixelRatio();
 
 	setWindowTitle(name);
 	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme

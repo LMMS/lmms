@@ -24,7 +24,6 @@
 
 #include "embed.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QGuiApplication>
 #include <QImageReader>
@@ -120,9 +119,6 @@ auto getIconPixmap(std::string_view name, int width, int height, const char* con
 	// Load the pixmap and cache it before returning
 	const auto pixmap = loadPixmap(pixmapName, width, height, xpm);
 	QPixmapCache::insert(cacheName, pixmap);
-
-	if(name == "fader_knob")
-		qDebug() << "pixmap.size(): " << pixmap.size();
 
 	return pixmap;
 }
