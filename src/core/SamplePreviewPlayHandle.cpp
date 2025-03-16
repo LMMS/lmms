@@ -73,8 +73,9 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 
 	const auto srcFramesNeeded = std::ceil(dstFrameCount / resamplingRatio());
 	const auto srcFramesToRead = std::min<sf_count_t>(framesAvailableToRead(), srcFramesNeeded);
-	const auto channelsToRead = std::min(m_sfinfo.channels, static_cast<int>(DEFAULT_CHANNELS));
+	if (srcFramesToRead == 0) { return; }
 
+	const auto channelsToRead = std::min(m_sfinfo.channels, static_cast<int>(DEFAULT_CHANNELS));
 	const auto frameReadIndex = m_frameReadIndex.load(std::memory_order::acquire);
 
 	for (auto dstFrameIndex = 0; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
