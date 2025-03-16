@@ -48,29 +48,37 @@ public:
 	~SamplePreviewPlayHandle() noexcept;
 
 	void play(SampleFrame* dst) override;
-	bool isFromTrack(const Track* _track) const override { return false; };
-	bool isFinished() const override { return false; }
+	bool isFromTrack(const Track* _track) const override { return false; }
+	bool isFinished() const override { return m_framesWritten == m_sfinfo.frames && m_framesRead == m_sfinfo.frames; }
 
 private:
 	void runDiskStream();
-	std::size_t samplesAvailableToRead() const { return (m_writeIndex - m_readIndex + m_buffer.size()) % m_buffer.size(); }
-	std::size_t samplesAvailableToWrite() const { return m_buffer.size() - samplesAvailableToRead() - 1; }
 
-	std::vector<float> m_buffer;
+	sf_count_t framesInBuffer() const { return static_cast<sf_count_t>(m_buffer.size()) / m_sfinfo.channels; }
 
-	std::atomic<std::size_t> m_readIndex = 0;
-	std::atomic<std::size_t> m_writeIndex = 0;
-	std::atomic<bool> m_quit = false;
+	sf_count_t framesAvailableToRead() const
+	{
+		return (m_frameWriteIndex - m_frameReadIndex + framesInBuffer()) % framesInBuffer();
+	}
 
-	std::size_t m_samplesWritten = 0;
+	sf_count_t framesAvailableToWrite() const { return framesInBuffer() - framesAvailableToRead() - 1; }
+
+	float* bufferAt(sf_count_t frame) { return &m_buffer[frame * m_sfinfo.channels % m_buffer.size()]; }
 
 	SNDFILE* m_sndfile = nullptr;
 	SF_INFO m_sfinfo = SF_INFO{};
 
-	std::future<void> m_diskStream;
+	std::vector<float> m_buffer;
 
-	std::size_t m_chunkSize = DefaultChunkSize;
-	static constexpr auto DefaultChunkSize = std::size_t{256};
+	std::atomic<sf_count_t> m_framesRead = 0;
+	std::atomic<sf_count_t> m_framesWritten = 0;
+	std::atomic<sf_count_t> m_frameReadIndex = 0;
+	std::atomic<sf_count_t> m_frameWriteIndex = 0;
+	const sf_count_t m_writeChunkSize = 0;
+
+	std::atomic<bool> m_quit = false;
+
+	std::future<void> m_diskStream;
 };
 
 } // namespace lmms

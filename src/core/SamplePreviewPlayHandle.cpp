@@ -33,8 +33,7 @@
 namespace lmms {
 SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& path)
 	: PlayHandle(Type::SamplePreviewPlayHandle)
-	, m_buffer(Engine::audioEngine()->outputSampleRate())
-	, m_chunkSize(Engine::audioEngine()->framesPerPeriod())
+	, m_writeChunkSize(static_cast<sf_count_t>(Engine::audioEngine()->framesPerPeriod()))
 {
 #ifdef LMMS_BUILD_WIN32
 	m_sndfile = sf_wchar_open(path.c_str(), SFM_READ, &m_sfinfo);
@@ -42,15 +41,19 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 	m_sndfile = sf_open(path.c_str(), SFM_READ, &m_sfinfo);
 #endif
 
-	if (m_sndfile == nullptr) { throw std::runtime_error{"Failed to create sample preview stream"}; }
+	if (m_sndfile == nullptr || m_sfinfo.channels == 0 || m_sfinfo.frames == 0)
+	{
+		throw std::runtime_error{"Failed to create sample preview stream"};
+	}
 
-	const auto preloadWriteCount
-		= std::min(static_cast<sf_count_t>(samplesAvailableToWrite()), m_sfinfo.frames * m_sfinfo.channels);
+	const auto initialFrameCount = std::min(static_cast<sf_count_t>(m_sfinfo.samplerate), m_sfinfo.frames);
+	m_buffer.resize((initialFrameCount + 1) * m_sfinfo.channels);
+	sf_readf_float(m_sndfile, m_buffer.data(), initialFrameCount);
 
-	m_samplesWritten = sf_read_float(m_sndfile, &m_buffer[m_writeIndex], preloadWriteCount);
-	m_writeIndex = (m_writeIndex + m_samplesWritten) % m_buffer.size();
+	m_frameWriteIndex = (m_frameWriteIndex + initialFrameCount) % framesInBuffer();
+	m_framesWritten += initialFrameCount;
+
 	m_diskStream = ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this);
-
 	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
 }
 
@@ -59,56 +62,76 @@ SamplePreviewPlayHandle::~SamplePreviewPlayHandle() noexcept
 	m_quit = true;
 	m_diskStream.get();
 	sf_close(m_sndfile);
-
-	// TODO: Should be handled by base class
 	delete audioBusHandle();
 }
 
 void SamplePreviewPlayHandle::play(SampleFrame* dst)
 {
-	const auto size = Engine::audioEngine()->framesPerPeriod();
-	const auto samplesToRead = std::min(samplesAvailableToRead(), size * m_sfinfo.channels);
+	// TODO: Should be a parameter in the function
+	const auto dstFrameCount = static_cast<sf_count_t>(Engine::audioEngine()->framesPerPeriod());
+	std::fill_n(dst, dstFrameCount, SampleFrame{});
 
-	if (samplesToRead == 0)
+	const auto resamplingRatio = Engine::audioEngine()->outputSampleRate() / static_cast<double>(m_sfinfo.samplerate);
+	const auto srcFramesNeeded = std::ceil(dstFrameCount / resamplingRatio);
+
+	const auto srcFramesToRead = std::min<sf_count_t>(framesAvailableToRead(), srcFramesNeeded);
+	const auto channelsToRead = std::min(m_sfinfo.channels, static_cast<int>(DEFAULT_CHANNELS));
+
+	const auto frameReadIndex = m_frameReadIndex.load(std::memory_order::acquire);
+
+	for (auto dstFrameIndex = 0; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
 	{
-		std::fill_n(dst, size, SampleFrame{});
-		return;
+		const auto srcFrameIndex = dstFrameIndex / resamplingRatio;
+
+		const auto currentFrameReadIndex = static_cast<double>(frameReadIndex) + srcFrameIndex;
+		const auto prevFrameReadIndex = std::floor(currentFrameReadIndex);
+		const auto nextFrameReadIndex = std::ceil(currentFrameReadIndex);
+
+		const auto prevSrcFrame = bufferAt(static_cast<sf_count_t>(prevFrameReadIndex));
+		const auto nextSrcFrame = bufferAt(static_cast<sf_count_t>(nextFrameReadIndex));
+
+		const auto interpolatedSrcFramePos = currentFrameReadIndex - prevFrameReadIndex;
+
+		for (auto channel = 0; channel < channelsToRead; ++channel)
+		{
+			const auto interpolatedSample
+				= std::lerp(prevSrcFrame[channel], nextSrcFrame[channel], interpolatedSrcFramePos);
+
+			if (channelsToRead == 1)
+			{
+				dst[dstFrameIndex][0] = static_cast<float>(interpolatedSample);
+				dst[dstFrameIndex][1] = static_cast<float>(interpolatedSample);
+			}
+			else
+			{
+				dst[dstFrameIndex][channel] = static_cast<float>(interpolatedSample);
+			}
+		}
 	}
 
-	const auto readIndex = m_readIndex.load(std::memory_order::acquire);
-	for (auto i = std::size_t{0}; i < samplesToRead; i += m_sfinfo.channels)
-	{
-		const auto frame = i / m_sfinfo.channels;
-		dst[frame][0] = m_buffer[(readIndex + i) % m_buffer.size()];
-		dst[frame][1] = m_sfinfo.channels == 1 ? dst[frame][0] : m_buffer[(readIndex + i + 1) % m_buffer.size()];
-	}
-
-	m_readIndex.store((readIndex + samplesToRead) % m_buffer.size(), std::memory_order_release);
+	m_frameReadIndex.store((frameReadIndex + srcFramesToRead) % framesInBuffer(), std::memory_order_release);
+	m_framesRead += srcFramesToRead;
 }
 
 void SamplePreviewPlayHandle::runDiskStream()
 {
-	auto totalSamplesToWrite = static_cast<std::size_t>(m_sfinfo.frames * m_sfinfo.channels);
-	while (m_samplesWritten < totalSamplesToWrite && !m_quit)
+	while (m_framesWritten < m_sfinfo.frames && !m_quit)
 	{
-		const auto samplesToWrite
-			= std::min({samplesAvailableToWrite(), totalSamplesToWrite - m_samplesWritten, m_chunkSize});
+		const auto framesToWrite
+			= std::min({framesAvailableToWrite(), m_sfinfo.frames - m_framesWritten, m_writeChunkSize});
+		if (framesToWrite == 0) { continue; }
 
-		if (samplesToWrite == 0) { continue; }
+		const auto frameWriteIndex = m_frameWriteIndex.load(std::memory_order_acquire);
 
-		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
+		const auto framesToWriteUntilEnd = std::min(framesInBuffer() - frameWriteIndex, framesToWrite);
+		sf_readf_float(m_sndfile, bufferAt(frameWriteIndex), framesToWriteUntilEnd);
 
-		auto samplesWriteToEnd = std::min(m_buffer.size() - writeIndex, samplesToWrite);
-		samplesWriteToEnd
-			= sf_read_float(m_sndfile, &m_buffer[writeIndex], static_cast<sf_count_t>(samplesWriteToEnd));
+		const auto framesToWriteAtBegin = framesToWrite - framesToWriteUntilEnd;
+		sf_readf_float(m_sndfile, bufferAt(0), framesToWriteAtBegin);
 
-		auto samplesWrapped = samplesToWrite - samplesWriteToEnd;
-		samplesWrapped = sf_read_float(m_sndfile, &m_buffer[(writeIndex + samplesWriteToEnd) % m_buffer.size()],
-			static_cast<sf_count_t>(samplesWrapped));
-
-		const auto actualSamplesWrittten = samplesWriteToEnd + samplesWrapped;
-		m_samplesWritten += actualSamplesWrittten;
-		m_writeIndex.store((writeIndex + actualSamplesWrittten) % m_buffer.size(), std::memory_order_release);
+		m_frameWriteIndex.store((frameWriteIndex + framesToWrite) % framesInBuffer(), std::memory_order_release);
+		m_framesWritten += framesToWrite;
 	}
 }
+
 } // namespace lmms
