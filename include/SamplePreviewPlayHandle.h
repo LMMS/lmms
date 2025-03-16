@@ -27,8 +27,15 @@
 
 #include <filesystem>
 #include <future>
-#include <sndfile.h>
 #include <vector>
+
+#ifdef LMMS_BUILD_WIN32
+	#include <windows.h>
+	#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+	#include <sndfile.h>
+#else
+	#include <sndfile.h>
+#endif
 
 #include "AudioEngine.h"
 #include "Engine.h"
