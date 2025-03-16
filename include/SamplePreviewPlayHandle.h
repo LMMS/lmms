@@ -29,7 +29,7 @@
 #include <future>
 #include <vector>
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef _WIN32
 	#include <windows.h>
 	#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
 	#include <sndfile.h>
