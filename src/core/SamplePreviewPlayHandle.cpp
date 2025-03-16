@@ -51,7 +51,7 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 	sf_readf_float(m_sndfile, m_buffer.data(), initialFrameCount);
 
 	m_frameWriteIndex = (m_frameWriteIndex + initialFrameCount) % framesInBuffer();
-	m_framesWritten += initialFrameCount;
+	m_srcFramesWritten += initialFrameCount;
 
 	m_diskStream = ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this);
 	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
@@ -82,6 +82,13 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 	{
 		const auto srcFrameIndex = dstFrameIndex / resamplingRatio();
 
+		if (srcFrameIndex >= srcFramesToRead)
+		{
+			dst[dstFrameIndex][0] = 0.f;
+			dst[dstFrameIndex][1] = 0.f;
+			continue;
+		}
+
 		const auto currentFrameReadIndex = static_cast<double>(frameReadIndex) + srcFrameIndex;
 		const auto prevFrameReadIndex = std::floor(currentFrameReadIndex);
 		const auto nextFrameReadIndex = std::ceil(currentFrameReadIndex);
@@ -101,23 +108,20 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 				dst[dstFrameIndex][0] = static_cast<float>(interpolatedSample);
 				dst[dstFrameIndex][1] = static_cast<float>(interpolatedSample);
 			}
-			else
-			{
-				dst[dstFrameIndex][channel] = static_cast<float>(interpolatedSample);
-			}
+			else { dst[dstFrameIndex][channel] = static_cast<float>(interpolatedSample); }
 		}
 	}
 
 	m_frameReadIndex.store((frameReadIndex + srcFramesToRead) % framesInBuffer(), std::memory_order_release);
-	m_framesRead += srcFramesToRead;
+	m_srcFramesRead += srcFramesToRead;
 }
 
 void SamplePreviewPlayHandle::runDiskStream()
 {
-	while (m_framesWritten < m_sfinfo.frames && !m_quit)
+	while (m_srcFramesWritten < m_sfinfo.frames && !m_quit)
 	{
 		const auto framesToWrite
-			= std::min({framesAvailableToWrite(), m_sfinfo.frames - m_framesWritten, m_writeChunkSize});
+			= std::min({framesAvailableToWrite(), m_sfinfo.frames - m_srcFramesWritten, m_writeChunkSize});
 		if (framesToWrite == 0) { continue; }
 
 		const auto frameWriteIndex = m_frameWriteIndex.load(std::memory_order_acquire);
@@ -129,7 +133,7 @@ void SamplePreviewPlayHandle::runDiskStream()
 		sf_readf_float(m_sndfile, bufferAt(0), framesToWriteAtBegin);
 
 		m_frameWriteIndex.store((frameWriteIndex + framesToWrite) % framesInBuffer(), std::memory_order_release);
-		m_framesWritten += framesToWrite;
+		m_srcFramesWritten += framesToWrite;
 	}
 }
 

@@ -57,8 +57,7 @@ public:
 
 	bool isFinished() const override
 	{
-		return m_framesRead == static_cast<sf_count_t>(std::ceil(m_sfinfo.frames * resamplingRatio()))
-			&& m_framesWritten == m_sfinfo.frames;
+		return m_srcFramesRead == m_sfinfo.frames && m_srcFramesWritten == m_sfinfo.frames;
 	}
 
 private:
@@ -85,8 +84,8 @@ private:
 
 	std::vector<float> m_buffer;
 
-	std::atomic<sf_count_t> m_framesRead = 0;
-	std::atomic<sf_count_t> m_framesWritten = 0;
+	std::atomic<sf_count_t> m_srcFramesRead = 0;
+	std::atomic<sf_count_t> m_srcFramesWritten = 0;
 	std::atomic<sf_count_t> m_frameReadIndex = 0;
 	std::atomic<sf_count_t> m_frameWriteIndex = 0;
 	const sf_count_t m_writeChunkSize = 0;
