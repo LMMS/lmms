@@ -71,9 +71,7 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 	const auto dstFrameCount = static_cast<sf_count_t>(Engine::audioEngine()->framesPerPeriod());
 	std::fill_n(dst, dstFrameCount, SampleFrame{});
 
-	const auto resamplingRatio = Engine::audioEngine()->outputSampleRate() / static_cast<double>(m_sfinfo.samplerate);
-	const auto srcFramesNeeded = std::ceil(dstFrameCount / resamplingRatio);
-
+	const auto srcFramesNeeded = std::ceil(dstFrameCount / resamplingRatio());
 	const auto srcFramesToRead = std::min<sf_count_t>(framesAvailableToRead(), srcFramesNeeded);
 	const auto channelsToRead = std::min(m_sfinfo.channels, static_cast<int>(DEFAULT_CHANNELS));
 
@@ -81,7 +79,7 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 
 	for (auto dstFrameIndex = 0; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
 	{
-		const auto srcFrameIndex = dstFrameIndex / resamplingRatio;
+		const auto srcFrameIndex = dstFrameIndex / resamplingRatio();
 
 		const auto currentFrameReadIndex = static_cast<double>(frameReadIndex) + srcFrameIndex;
 		const auto prevFrameReadIndex = std::floor(currentFrameReadIndex);

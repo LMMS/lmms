@@ -30,6 +30,8 @@
 #include <sndfile.h>
 #include <vector>
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "PlayHandle.h"
 
 namespace lmms {
@@ -49,10 +51,20 @@ public:
 
 	void play(SampleFrame* dst) override;
 	bool isFromTrack(const Track* _track) const override { return false; }
-	bool isFinished() const override { return m_framesWritten == m_sfinfo.frames && m_framesRead == m_sfinfo.frames; }
+
+	bool isFinished() const override
+	{
+		return m_framesRead == static_cast<sf_count_t>(std::ceil(m_sfinfo.frames * resamplingRatio()))
+			&& m_framesWritten == m_sfinfo.frames;
+	}
 
 private:
 	void runDiskStream();
+
+	double resamplingRatio() const
+	{
+		return Engine::audioEngine()->outputSampleRate() / static_cast<double>(m_sfinfo.samplerate);
+	}
 
 	sf_count_t framesInBuffer() const { return static_cast<sf_count_t>(m_buffer.size()) / m_sfinfo.channels; }
 
