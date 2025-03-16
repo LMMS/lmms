@@ -470,7 +470,7 @@ private:
 	void updateKnifePos(QMouseEvent* me, bool initial);
 
 	//! Varaibles which hold which mouse buttons are being held while editing the detuning/parameter of notes.
-	bool m_parameterEditDown = false;
+	bool m_parameterEditDownLeft = false;
 	bool m_parameterEditDownRight = false;
 	//! Stores the last edited position for the note detuning/parameter curves. When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed.
 	int m_lastParameterEditTick = -1;

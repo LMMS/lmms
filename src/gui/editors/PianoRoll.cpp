@@ -2410,7 +2410,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		updateKnifePos(me, false);
 	}
 
-	if (m_editMode == EditMode::Detuning && m_parameterEditDown)
+	if (m_editMode == EditMode::Detuning && (m_parameterEditDownLeft || m_parameterEditDownRight))
 	{
 		// Update the current dragging/adding/removal of automation nodes in the detuning curves of the selected notes.
 		updateParameterEditPos(me, Note::ParameterType::Detuning);
@@ -2796,8 +2796,10 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 {
 	// If this is the first time this function is called (not mouseMove or mouseRelease), initialize the variables.
 	if (me->type() == QEvent::MouseButtonPress) {
-		m_parameterEditDown = true;
-		m_parameterEditDownRight = me->button() & Qt::RightButton;
+		// Mouse button press event does not seem to remember buttons which are already pressed, so the || keeps the previous state.
+		m_parameterEditDownLeft = m_parameterEditDownLeft || me->button() & Qt::LeftButton;
+		// Do not allow right click mode if left click is already held.
+		m_parameterEditDownRight = (m_parameterEditDownRight || me->button() & Qt::RightButton) && !m_parameterEditDownLeft;
 		m_lastParameterEditTick = -1;
 	}
 
@@ -2823,19 +2825,23 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		AutomationClip* aClip = note->getParameterCurve(paramType);
 		if (aClip == nullptr) { continue; }
 		// If left-clicking, add/drag a node.
-		if (!m_parameterEditDownRight)
+		if (m_parameterEditDownLeft)
 		{
 			aClip->setDragValue(relativePos, relativeKey);
 		}
-		// If right-clicking, remove nodes. If the last position of the mouse is not -1, remove all nodes in that range.
-		else if (m_lastParameterEditTick != -1)
+		// If right-clicking, remove nodes.
+		else if (m_parameterEditDownRight)
 		{
+			if (m_lastParameterEditTick != -1)
+			{
+				// If the last position of the mouse is not -1, remove all nodes in that range.
 				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
-		}
-		// Or just remove at that one time pos
-		else
-		{
+			}
+			else
+			{
+				// Or just remove at that one time pos
 				aClip->removeNode(relativePos);
+			}
 		}
 	}
 	m_lastParameterEditTick = pos_ticks;
@@ -2844,7 +2850,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
 	// If the left button was just released, apply the drag on all of the notes' automation clips.
-	if (m_parameterEditDown && !m_parameterEditDownRight)
+	if (m_parameterEditDownLeft)
 	{
 		for (Note* note: m_selectedParameterEditNotes)
 		{
@@ -2855,7 +2861,7 @@ void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType param
 		}
 	}
 	m_parameterEditDownRight = false;
-	m_parameterEditDown = false;
+	m_parameterEditDownLeft = false;
 }
 
 bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
