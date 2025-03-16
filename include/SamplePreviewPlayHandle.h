@@ -52,6 +52,9 @@ public:
 	void play(SampleFrame* dst) override;
 	bool isFromTrack(const Track* _track) const override { return false; }
 
+	// TODO: Remove error prone affinity logic
+	bool affinityMatters() const override { return true; }
+
 	bool isFinished() const override
 	{
 		return m_framesRead == static_cast<sf_count_t>(std::ceil(m_sfinfo.frames * resamplingRatio()))
