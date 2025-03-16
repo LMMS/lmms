@@ -791,29 +791,11 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 void PianoRoll::reverseNotes()
 {
 	if (!hasValidMidiClip()) { return; }
-	m_midiClip->addJournalCheckPoint();
 
 	const NoteVector selectedNotes = getSelectedNotes();
 	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
-	TimePos firstPos = notes.front()->pos();
-	TimePos lastPos = notes.back()->endPos();
-	// Find the actual min/max positions
-	for (auto note : notes)
-	{
-		if (note->pos() < firstPos) { firstPos = note->pos(); }
-		if (note->endPos() > lastPos) { lastPos = note->endPos(); }
-	}
-
-	for (auto note : notes)
-	{
-		TimePos oldStart = note->pos();
-		TimePos newStart = lastPos - (oldStart - firstPos) - note->length();
-		note->setPos(newStart);
-	}
-	
-	m_midiClip->rearrangeAllNotes();
-	m_midiClip->dataChanged();
+	m_midiClip->reverseNotes(notes);
 
 	update();
 	getGUI()->songEditor()->update();
