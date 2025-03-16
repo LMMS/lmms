@@ -2844,7 +2844,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
 	// If the left button was just released, apply the drag on all of the notes' automation clips.
-	if (m_parameterEditDown && me->button() & Qt::LeftButton)
+	if (m_parameterEditDown && !m_parameterEditDownRight)
 	{
 		for (Note* note: m_selectedParameterEditNotes)
 		{
