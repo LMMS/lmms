@@ -696,21 +696,22 @@ else()
 	set(STATUS_GPROF "Disabled ${STATUS_GPROF}")
 endif()
 
-# add enabled sanitizers
 function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
-	if(${want_flag})
-		if(CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}")
-			set("${status_flag}" "Enabled" PARENT_SCOPE)
-			string(REPLACE ";" " " additional_flags "${ARGN}")
-
-			add_compile_options(-fsanitize=${sanitizer} ${additional_flags})
-			add_link_options(-fsanitize=${sanitizer} ${additional_flags})
-		else()
-			set("${status_flag}" "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
-		endif()
-	else()
-		set("${status_flag}" "Disabled" PARENT_SCOPE)
+	if(NOT ${want_flag})
+		set(${status_flag} "Disabled" PARENT_SCOPE)
+		return()
 	endif()
+
+	if(NOT (CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}"))
+		set(${status_flag} "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
+		return()
+	endif()
+
+	set("${status_flag}" "Enabled" PARENT_SCOPE)
+	string(REPLACE ";" " " additional_flags "${ARGN}")
+
+	add_compile_options(-fsanitize=${sanitizer} ${additional_flags})
+	add_link_options(-fsanitize=${sanitizer} ${additional_flags})
 endfunction()
 
 add_sanitizer(address "GNU|Clang|MSVC" WANT_ASAN STATUS_ASAN)
