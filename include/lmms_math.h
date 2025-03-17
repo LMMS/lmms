@@ -34,11 +34,11 @@
 #include <numbers>
 #include <concepts>
 
+#include "lmms_constants.h"
+
 
 namespace lmms
 {
-inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
-
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
 {

@@ -30,6 +30,10 @@
 
 namespace lmms
 {
+// Prefer using `approximatelyEqual()` from lmms_math.h rather than
+// using this directly
+inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+
 inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
 // Microtuner
