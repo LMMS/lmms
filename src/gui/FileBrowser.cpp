@@ -752,13 +752,6 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	// handling() rather than directly creating a SamplePlayHandle
 	if (file->type() == FileItem::FileType::Sample)
 	{
-		TextFloat * tf = TextFloat::displayMessage(
-			tr("Loading sample"),
-			tr("Please wait, loading sample for preview..."),
-			embed::getIconPixmap("sample_file", 24, 24), 0);
-		// TODO: this can be removed once we do this outside the event thread
-		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
 		try
 		{
 			newPPH = new SamplePreviewPlayHandle(PathUtil::qStringToPath(fileName));
@@ -772,8 +765,6 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 				newPPH = s;
 			}
 		}
-
-		delete tf;
 	}
 	else if (
 		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
