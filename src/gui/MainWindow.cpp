@@ -1644,6 +1644,8 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 
 	for (auto* curWindow : subWindows)
 	{
+		// if widgets are maximized, then they shouldn't be moved
+		// moving a maximized window's normalGeometry is not implemented because of difficulties
 		if (curWindow->isMaximized() == false)
 		{
 			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
