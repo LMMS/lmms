@@ -33,7 +33,6 @@
 namespace lmms {
 SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& path)
 	: PlayHandle(Type::SamplePreviewPlayHandle)
-	, m_writeChunkSize(static_cast<sf_count_t>(Engine::audioEngine()->framesPerPeriod()))
 {
 #ifdef LMMS_BUILD_WIN32
 	m_sndfile = sf_wchar_open(path.c_str(), SFM_READ, &m_sfinfo);
@@ -51,8 +50,6 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 	sf_readf_float(m_sndfile, m_buffer.data(), initialFrameCount);
 
 	m_frameWriteIndex = (m_frameWriteIndex + initialFrameCount) % framesInBuffer();
-	m_srcFramesWritten += initialFrameCount;
-
 	m_diskStream = ThreadPool::instance().enqueue(&SamplePreviewPlayHandle::runDiskStream, this);
 	setAudioBusHandle(new AudioBusHandle("SamplePreviewPlayHandle", false));
 }
@@ -114,15 +111,18 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 	}
 
 	m_frameReadIndex.store((frameReadIndex + srcFramesToRead) % framesInBuffer(), std::memory_order_release);
-	m_srcFramesRead += srcFramesToRead;
 }
 
 void SamplePreviewPlayHandle::runDiskStream()
 {
-	while (m_srcFramesWritten < m_sfinfo.frames && !m_quit)
+	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
+	const auto chunkSize = static_cast<sf_count_t>(std::ceil(framesPerPeriod / resamplingRatio()));
+
+	auto framesWritten = framesAvailableToRead();
+	while (framesWritten < m_sfinfo.frames && !m_quit)
 	{
-		const auto framesToWrite
-			= std::min({framesAvailableToWrite(), m_sfinfo.frames - m_srcFramesWritten, m_writeChunkSize});
+		const auto framesLeftToWrite = m_sfinfo.frames - framesWritten;
+		const auto framesToWrite = std::min({framesAvailableToWrite(), framesLeftToWrite, chunkSize});
 		if (framesToWrite == 0) { continue; }
 
 		const auto frameWriteIndex = m_frameWriteIndex.load(std::memory_order_acquire);
@@ -134,8 +134,10 @@ void SamplePreviewPlayHandle::runDiskStream()
 		sf_readf_float(m_sndfile, bufferAt(0), framesToWriteAtBegin);
 
 		m_frameWriteIndex.store((frameWriteIndex + framesToWrite) % framesInBuffer(), std::memory_order_release);
-		m_srcFramesWritten += framesToWrite;
+		framesWritten += framesToWrite;
 	}
+
+	m_complete = true;
 }
 
 } // namespace lmms

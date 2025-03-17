@@ -58,14 +58,10 @@ public:
 
 	void play(SampleFrame* dst) override;
 	bool isFromTrack(const Track* _track) const override { return false; }
+	bool isFinished() const override { return m_complete && framesAvailableToRead() == 0; }
 
 	// TODO: Remove error prone affinity logic
 	bool affinityMatters() const override { return true; }
-
-	bool isFinished() const override
-	{
-		return m_srcFramesRead == m_sfinfo.frames && m_srcFramesWritten == m_sfinfo.frames;
-	}
 
 private:
 	void runDiskStream();
@@ -88,17 +84,11 @@ private:
 
 	SNDFILE* m_sndfile = nullptr;
 	SF_INFO m_sfinfo = SF_INFO{};
-
 	std::vector<float> m_buffer;
-
-	std::atomic<sf_count_t> m_srcFramesRead = 0;
-	std::atomic<sf_count_t> m_srcFramesWritten = 0;
 	std::atomic<sf_count_t> m_frameReadIndex = 0;
 	std::atomic<sf_count_t> m_frameWriteIndex = 0;
-	const sf_count_t m_writeChunkSize = 0;
-
 	std::atomic<bool> m_quit = false;
-
+	std::atomic<bool> m_complete = false;
 	std::future<void> m_diskStream;
 };
 
