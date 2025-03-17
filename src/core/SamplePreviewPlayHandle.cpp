@@ -71,7 +71,7 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 	const auto dstFrameCount = static_cast<sf_count_t>(Engine::audioEngine()->framesPerPeriod());
 	std::fill_n(dst, dstFrameCount, SampleFrame{});
 
-	const auto srcFramesNeeded = std::ceil(dstFrameCount / resamplingRatio());
+	const auto srcFramesNeeded = static_cast<sf_count_t>(std::ceil(dstFrameCount / resamplingRatio()));
 	const auto srcFramesToRead = std::min<sf_count_t>(framesAvailableToRead(), srcFramesNeeded);
 	if (srcFramesToRead == 0) { return; }
 
@@ -82,7 +82,7 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 	{
 		const auto srcFrameIndex = dstFrameIndex / resamplingRatio();
 
-		if (srcFrameIndex >= srcFramesToRead)
+		if (srcFrameIndex >= static_cast<double>(srcFramesToRead))
 		{
 			dst[dstFrameIndex][0] = 0.f;
 			dst[dstFrameIndex][1] = 0.f;
@@ -100,8 +100,9 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 
 		for (auto channel = 0; channel < channelsToRead; ++channel)
 		{
-			const auto interpolatedSample
-				= std::lerp(prevSrcFrame[channel], nextSrcFrame[channel], interpolatedSrcFramePos);
+			const auto prevSrcSample = static_cast<double>(prevSrcFrame[channel]);
+			const auto nextSrcSample = static_cast<double>(nextSrcFrame[channel]);
+			const auto interpolatedSample = std::lerp(prevSrcSample, nextSrcSample, interpolatedSrcFramePos);
 
 			if (channelsToRead == 1)
 			{
