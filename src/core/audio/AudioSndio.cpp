@@ -127,6 +127,8 @@ AudioSndio::~AudioSndio()
 
 void AudioSndio::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -136,6 +138,8 @@ void AudioSndio::startProcessing()
 
 void AudioSndio::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	stopProcessingThread( this );
 }
 

@@ -182,6 +182,8 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
@@ -226,6 +228,8 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_stopped = true;
 }
 
