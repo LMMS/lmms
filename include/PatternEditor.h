@@ -37,6 +37,7 @@ namespace gui
 {
 
 class ComboBox;
+class TimeLineWidget;
 
 
 class PatternEditor : public TrackContainerView
@@ -62,13 +63,18 @@ public slots:
 	void addSampleTrack();
 	void addAutomationTrack();
 	void cloneClip();
+	void updateMaxSteps();
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
+	void resizeEvent(QResizeEvent * de ) override;
 	void updatePosition();
 
 private:
 	PatternStore* m_ps;
+	TimeLineWidget * m_timeLine;
+	int m_trackHeadWidth;
+	int m_maxSteps;
 	void makeSteps( bool clone );
 };
 

@@ -73,6 +73,11 @@ public:
 		return m_track;
 	}
 
+	inline const std::vector<ClipView*>& getClipViews()
+	{
+		return m_clipViews;
+	}
+
 	inline TrackContainerView* trackContainerView()
 	{
 		return m_trackContainerView;
@@ -151,6 +156,7 @@ private:
 
 	Track * m_track;
 	TrackContainerView * m_trackContainerView;
+	std::vector<ClipView*> m_clipViews;
 
 	TrackOperationsWidget m_trackOperationsWidget;
 	QWidget m_trackSettingsWidget;
