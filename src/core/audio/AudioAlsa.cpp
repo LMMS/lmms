@@ -226,6 +226,8 @@ int AudioAlsa::handleError( int _err )
 
 void AudioAlsa::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -237,6 +239,8 @@ void AudioAlsa::startProcessing()
 
 void AudioAlsa::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	stopProcessingThread( this );
 }
 

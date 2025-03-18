@@ -94,7 +94,7 @@ private:
 		while( true )
 		{
 			timer.reset();
-			audioEngine()->renderNextBuffer();
+			if (!getNextBuffer()) { break; }
 
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )

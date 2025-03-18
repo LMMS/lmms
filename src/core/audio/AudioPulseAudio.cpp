@@ -93,6 +93,8 @@ QString AudioPulseAudio::probeDevice()
 
 void AudioPulseAudio::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -104,6 +106,8 @@ void AudioPulseAudio::startProcessing()
 
 void AudioPulseAudio::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_quit = true;
 	stopProcessingThread( this );
 }

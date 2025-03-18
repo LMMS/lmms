@@ -208,6 +208,8 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = audioEngine()->framesPerPeriod();
@@ -239,6 +241,8 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_stopped = true;
 	if (m_outstream)
 	{

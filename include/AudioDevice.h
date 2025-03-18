@@ -77,8 +77,8 @@ public:
 
 	void processNextBuffer();
 
-	virtual void startProcessing();
-	virtual void stopProcessing();
+	virtual void startProcessing() { m_running.test_and_set(std::memory_order_acquire); }
+	virtual void stopProcessing() { m_running.clear(std::memory_order_release); }
 
 protected:
 	// subclasses can re-implement this for being used in conjunction with
@@ -86,7 +86,7 @@ protected:
 	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(SampleFrame* _ab);
+	fpp_t getNextBuffer(SampleFrame* _ab = nullptr);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
@@ -129,7 +129,7 @@ private:
 	QMutex m_devMutex;
 
 	SampleFrame* m_buffer;
-
+	std::atomic_flag m_running = ATOMIC_FLAG_INIT;
 };
 
 } // namespace lmms
