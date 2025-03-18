@@ -60,7 +60,7 @@ auto LMMS_EXPORT getText(std::string_view name) -> QString;
 [[deprecated("Use QPixmap::deviceIndependentSize() instead; See "
              "https://doc.qt.io/qt-6/qpixmap.html#deviceIndependentSize")]]
 #endif
-inline auto LMMS_EXPORT logicalSize(const QPixmap &pixmap)
+inline auto logicalSize(const QPixmap &pixmap) noexcept
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
 	return pixmap.deviceIndependentSize().toSize();
