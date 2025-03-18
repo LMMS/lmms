@@ -164,7 +164,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
+			double latency = static_cast<double>(_this->framesPerPeriod()) / _this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
@@ -233,7 +233,7 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = audioEngine()->framesPerPeriod();
+		const fpp_t fpp = framesPerPeriod();
 		auto temp = new SampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
@@ -252,7 +252,7 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = audioEngine()->framesPerPeriod();
+	const fpp_t fpp = framesPerPeriod();
 	auto temp = new SampleFrame[fpp];
 	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 

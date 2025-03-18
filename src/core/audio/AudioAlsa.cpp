@@ -250,7 +250,7 @@ void AudioAlsa::run()
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
 
-	int outbuf_size = audioEngine()->framesPerPeriod() * channels();
+	int outbuf_size = framesPerPeriod() * channels();
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
