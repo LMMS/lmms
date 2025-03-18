@@ -254,7 +254,8 @@ void AudioAlsa::run()
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
-	while (true)
+	bool quit = false;
+	while( quit == false )
 	{
 		int_sample_t * ptr = pcmbuf;
 		int len = pcmbuf_size;
@@ -264,9 +265,11 @@ void AudioAlsa::run()
 			{
 				// frames depend on the sample rate
 				const fpp_t frames = getNextBuffer( temp );
-				if (!frames)
+				if( !frames )
 				{
-					memset(ptr, 0, len * sizeof(int_sample_t));
+					quit = true;
+					memset( ptr, 0, len
+						* sizeof( int_sample_t ) );
 					break;
 				}
 				outbuf_size = frames * channels();
