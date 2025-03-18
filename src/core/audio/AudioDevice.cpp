@@ -62,6 +62,12 @@ void AudioDevice::processNextBuffer()
 
 fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 {
+	if (!m_running.test_and_set(std::memory_order_acquire) || !_ab)
+	{
+		m_running.clear(std::memory_order_release);
+		return 0;
+	}
+
 	fpp_t frames = audioEngine()->framesPerPeriod();
 	const SampleFrame* b = audioEngine()->renderNextBuffer();
 
@@ -69,19 +75,6 @@ fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 
 	return frames;
 }
-
-
-
-void AudioDevice::startProcessing()
-{
-}
-
-void AudioDevice::stopProcessing()
-{
-}
-
-
-
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
