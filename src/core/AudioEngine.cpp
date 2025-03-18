@@ -68,7 +68,11 @@ static thread_local bool s_renderingThread = false;
 
 AudioEngine::AudioEngine(bool renderOnly)
 	: m_renderOnly(renderOnly)
-	, m_framesPerPeriod(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toInt())
+	, m_framesPerPeriod(
+		  std::clamp(ConfigManager::inst()
+						 ->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
+						 .toULong(),
+			  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
 	, m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), 44100))
 	, m_inputBufferRead(0)
 	, m_inputBufferWrite(1)
