@@ -61,14 +61,8 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, Song::PlayMode::Pattern, this
 	);
-	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
+	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
 	static_cast<QVBoxLayout*>( layout() )->insertWidget( 0, m_timeLine );
-
-
-	// TO BE REMOVED after Timeline signals are refactored (#7454)
-	auto updateTimer = new QTimer(this);
-	connect(updateTimer, &QTimer::timeout, this, &PatternEditor::updatePosition);
-	updateTimer->start( 1000 / 60 );  // 60 fps
 }
 
 
