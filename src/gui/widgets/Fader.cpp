@@ -73,7 +73,7 @@ SimpleTextFloat* Fader::s_textFloat = nullptr;
 Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
 	QWidget(parent),
 	FloatModelView(model, this),
-	m_knobSize(m_knob.size() / m_knob.devicePixelRatio()),
+	m_knobSize(embed::logicalSize(m_knob)),
 	m_modelIsLinear(modelIsLinear)
 {
 	if (s_textFloat == nullptr)
