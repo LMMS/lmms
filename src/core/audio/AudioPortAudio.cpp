@@ -67,12 +67,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
+	m_outBuf(new SampleFrame[framesPerPeriod()]),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
-	m_outBufSize = audioEngine()->framesPerPeriod();
+	m_outBufSize = framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	

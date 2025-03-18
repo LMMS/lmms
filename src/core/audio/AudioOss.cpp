@@ -259,8 +259,8 @@ void AudioOss::stopProcessing()
 
 void AudioOss::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	auto temp = new SampleFrame[framesPerPeriod()];
+	auto outbuf = new int_sample_t[framesPerPeriod() * channels()];
 
 	while( true )
 	{

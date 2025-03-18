@@ -164,7 +164,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = static_cast<double>(framesPerPeriod()) / currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -212,7 +212,7 @@ void AudioSoundIo::startProcessing()
 
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
-	m_outBufSize = audioEngine()->framesPerPeriod();
+	m_outBufSize = framesPerPeriod();
 
 	m_outBuf = new SampleFrame[m_outBufSize];
 

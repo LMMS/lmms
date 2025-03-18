@@ -49,7 +49,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_outBuf(new SampleFrame[framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
