@@ -51,7 +51,6 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngin
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_s( nullptr ),
-	m_quit( false ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -108,7 +107,6 @@ void AudioPulseAudio::stopProcessing()
 {
 	AudioDevice::stopProcessing();
 
-	m_quit = true;
 	stopProcessingThread( this );
 }
 
@@ -222,11 +220,7 @@ void AudioPulseAudio::run()
 	if( m_connected )
 	{
 		int ret = 0;
-		m_quit = false;
-		while( m_quit == false
-			&& pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
-		{
-		}
+		while (pa_mainloop_iterate(mainLoop, 1, &ret) >= 0) {}
 
 		pa_stream_disconnect( m_s );
 		pa_stream_unref( m_s );
@@ -257,14 +251,11 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
-	while( fd < length/4 && m_quit == false )
+	while (fd < length / 4)
 	{
 		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			m_quit = true;
-			break;
-		}
+		if (!frames) { break; }
+
 		int bytes = convertToS16(temp, frames, pcmbuf, m_convertEndian);
 		if( bytes > 0 )
 		{
