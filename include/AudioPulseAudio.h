@@ -90,8 +90,6 @@ private:
 	void stopProcessing() override;
 	void run() override;
 
-	volatile bool m_quit;
-
 	bool m_convertEndian;
 
 	bool m_connected;

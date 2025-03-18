@@ -91,7 +91,6 @@ private:
 	void resizeInputBuffer(jack_nframes_t nframes);
 
 	void startProcessing() override;
-	void stopProcessing() override;
 
 	void registerPort(AudioBusHandle* port) override;
 	void unregisterPort(AudioBusHandle* port) override;
@@ -105,7 +104,6 @@ private:
 	jack_client_t* m_client;
 
 	bool m_active;
-	std::atomic<bool> m_stopped;
 
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;

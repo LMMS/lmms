@@ -141,7 +141,6 @@ void AudioSdl::startProcessing()
 {
 	AudioDevice::startProcessing();
 
-	m_stopped = false;
 	SDL_PauseAudioDevice (m_outputDevice, 0);
 	SDL_PauseAudioDevice (m_inputDevice, 0);
 }
@@ -157,8 +156,6 @@ void AudioSdl::stopProcessing()
 	{
 		SDL_LockAudioDevice (m_inputDevice);
 		SDL_LockAudioDevice (m_outputDevice);
-
-		m_stopped = true;
 
 		SDL_PauseAudioDevice (m_inputDevice,	1);
 		SDL_PauseAudioDevice (m_outputDevice,	1);
@@ -180,12 +177,6 @@ void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 
 void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 {
-	if( m_stopped )
-	{
-		memset( _buf, 0, _len );
-		return;
-	}
-
 	// SDL2: process float samples
 	while( _len )
 	{
