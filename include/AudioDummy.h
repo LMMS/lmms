@@ -94,15 +94,7 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const SampleFrame* b = audioEngine()->nextBuffer();
-			if( !b )
-			{
-				break;
-			}
-			if( audioEngine()->hasFifoWriter() )
-			{
-				delete[] b;
-			}
+			audioEngine()->renderNextBuffer();
 
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
