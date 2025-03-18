@@ -75,6 +75,8 @@ public:
 		return m_sampleRate;
 	}
 
+	fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
+
 	void processNextBuffer();
 
 	virtual void startProcessing() { m_running.test_and_set(std::memory_order_acquire); }
@@ -114,6 +116,7 @@ protected:
 		return m_audioEngine;
 	}
 
+
 	static void stopProcessingThread( QThread * thread );
 
 
@@ -122,6 +125,7 @@ protected:
 
 
 private:
+	fpp_t m_framesPerPeriod;
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	AudioEngine* m_audioEngine;

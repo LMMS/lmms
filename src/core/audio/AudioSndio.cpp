@@ -74,7 +74,7 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = audioEngine()->framesPerPeriod();
+	m_par.round = framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
 	if ( (isLittleEndian() && (m_par.le == 0)) ||
@@ -145,8 +145,8 @@ void AudioSndio::stopProcessing()
 
 void AudioSndio::run()
 {
-	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	SampleFrame* temp = new SampleFrame[framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[framesPerPeriod() * channels()];
 
 	while( true )
 	{
