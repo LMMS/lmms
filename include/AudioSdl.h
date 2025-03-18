@@ -89,6 +89,8 @@ private:
 	size_t m_currentBufferFramePos;
 	size_t m_currentBufferFramesCount;
 
+	bool m_stopped;
+
 	SDL_AudioDeviceID m_outputDevice;
 
 	SDL_AudioSpec m_inputAudioHandle;

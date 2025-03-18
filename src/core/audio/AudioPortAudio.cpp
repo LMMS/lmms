@@ -203,10 +203,12 @@ void AudioPortAudio::startProcessing()
 {
 	AudioDevice::startProcessing();
 
+	m_stopped = false;
 	PaError err = Pa_StartStream( m_paStream );
 	
 	if( err != paNoError )
 	{
+		m_stopped = true;
 		printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
 	}
 }
@@ -220,7 +222,9 @@ void AudioPortAudio::stopProcessing()
 
 	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
 	{
+		m_stopped = true;
 		PaError err = Pa_StopStream( m_paStream );
+	
 		if( err != paNoError )
 		{
 			printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
@@ -236,15 +240,24 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
+	if( m_stopped )
+	{
+		memset( _outputBuffer, 0, _framesPerBuffer *
+			channels() * sizeof(float) );
+		return paComplete;
+	}
+
 	while( _framesPerBuffer )
 	{
 		if( m_outBufPos == 0 )
 		{
 			// frames depend on the sample rate
 			const fpp_t frames = getNextBuffer( m_outBuf );
-			if (!frames)
+			if( !frames )
 			{
-				memset(_outputBuffer, 0, _framesPerBuffer * channels() * sizeof(float));
+				m_stopped = true;
+				memset( _outputBuffer, 0, _framesPerBuffer *
+					channels() * sizeof(float) );
 				return paComplete;
 			}
 			m_outBufSize = frames;

@@ -53,6 +53,8 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
+	m_stopped = true;
+
 	successful = initJackClient();
 	if (successful) {
 		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
@@ -199,7 +201,11 @@ void AudioJack::startProcessing()
 {
 	AudioDevice::startProcessing();
 
-	if (m_active || m_client == nullptr) { return; }
+	if (m_active || m_client == nullptr)
+	{
+		m_stopped = false;
+		return;
+	}
 
 	if (jack_activate(m_client))
 	{
@@ -230,7 +236,18 @@ void AudioJack::startProcessing()
 		}
 	}
 
+	m_stopped = false;
 	jack_free(ports);
+}
+
+
+
+
+void AudioJack::stopProcessing()
+{
+	AudioDevice::stopProcessing();
+
+	m_stopped = true;
 }
 
 void AudioJack::registerPort(AudioBusHandle* port)
@@ -325,7 +342,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 #endif
 
 	jack_nframes_t done = 0;
-	while (done < nframes)
+	while (done < nframes && !m_stopped)
 	{
 		jack_nframes_t todo = std::min<jack_nframes_t>(nframes - done, m_framesToDoInCurBuf - m_framesDoneInCurBuf);
 		for (int c = 0; c < channels(); ++c)
@@ -342,7 +359,11 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		{
 			m_framesToDoInCurBuf = getNextBuffer(m_outBuf);
 			m_framesDoneInCurBuf = 0;
-			if (!m_framesToDoInCurBuf) { break; }
+			if (!m_framesToDoInCurBuf)
+			{
+				m_stopped = true;
+				break;
+			}
 		}
 	}
 

@@ -50,6 +50,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
+	m_stopped = true;
 	m_outstreamStarted = false;
 
 	m_soundio = soundio_create();
@@ -227,8 +228,11 @@ void AudioSoundIo::startProcessing()
 		}
 	}
 
+	m_stopped = false;
+
 	if (int err = soundio_outstream_pause(m_outstream, false))
 	{
+		m_stopped = true;
 		fprintf(stderr, 
 			"AudioSoundIo::startProcessing() :: resuming result error: %s\n", 
 			soundio_strerror(err));
@@ -239,6 +243,7 @@ void AudioSoundIo::stopProcessing()
 {
 	AudioDevice::stopProcessing();
 
+	m_stopped = true;
 	if (m_outstream)
 	{
 		if (int err = soundio_outstream_pause(m_outstream, true))
@@ -268,6 +273,7 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
+	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
 	SoundIoChannelArea* areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
@@ -285,13 +291,27 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		if (!frameCount)
 			break;
 
+		
+		if (m_stopped)
+		{
+			for (int channel = 0; channel < layout->channel_count; ++channel)
+			{
+				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
+				areas[channel].ptr += areas[channel].step * frameCount;
+			}
+			continue;
+		}
+
 		for (int frame = 0; frame < frameCount; frame += 1)
 		{
 			if (m_outBufFrameIndex >= m_outBufFramesTotal)
 			{
 				m_outBufFramesTotal = getNextBuffer(m_outBuf);
-				if (m_outBufFramesTotal == 0) { break; }
-
+				if (m_outBufFramesTotal == 0)
+				{
+					m_stopped = true;
+					break;
+				}
 				m_outBufFrameIndex = 0;
 			}
 
