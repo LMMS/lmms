@@ -286,8 +286,6 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Configure apt
-        run: sudo .github/workflows/setup-mingw-packages.sh
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -305,6 +303,7 @@ jobs:
           export VCPKG_INSTALLATION_ROOT="$(pwd)/vcpkg"
       - name: Install system dependencies
         run: |
+          sudo .github/workflows/setup-mingw-packages.sh
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Cache vcpkg dependencies
