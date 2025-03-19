@@ -94,7 +94,7 @@ std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QSt
 
 	try
 	{
-		return std::make_shared<SampleBuffer>(filePath);
+		return SampleBuffer::loadFromCache(filePath);
 	}
 	catch (const std::runtime_error& error)
 	{

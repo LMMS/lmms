@@ -27,7 +27,6 @@
 
 #include "PathUtil.h"
 #include "SampleDecoder.h"
-#include "lmms_basics.h"
 
 namespace lmms {
 
@@ -53,6 +52,10 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 
 	throw std::runtime_error{
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
+}
+
+SampleBuffer::SampleBuffer(const std::filesystem::path& audioFile) : SampleBuffer(PathUtil::pathToQString(audioFile))
+{
 }
 
 SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
@@ -91,6 +94,16 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 {
 	static auto s_buffer = std::make_shared<const SampleBuffer>();
 	return s_buffer;
+}
+
+auto SampleBuffer::loadFromCache(const std::filesystem::path& path) -> std::shared_ptr<const SampleBuffer>
+{
+	return m_fileCache.get(path);
+}
+
+auto SampleBuffer::loadFromCache(const QString& path) -> std::shared_ptr<const SampleBuffer>
+{
+	return m_fileCache.get(PathUtil::qStringToPath(path));
 }
 
 } // namespace lmms

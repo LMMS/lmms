@@ -31,7 +31,7 @@
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
-	: m_buffer(std::make_shared<SampleBuffer>(audioFile))
+	: m_buffer(SampleBuffer::loadFromCache(audioFile))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)

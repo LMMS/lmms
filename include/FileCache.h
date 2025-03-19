@@ -43,14 +43,14 @@ public:
 
 		if (entry.resource && latestWriteTime == entry.time)
 		{
-			++entry.s_nextAge;
+			++s_nextAge;
             ++entry.age;
 			return entry.resource;
 		}
 
 		if (m_cache.size() == Capacity) { evict(); }
 
-		entry.resourcee = std::make_shared<V>(path);
+		entry.resource = std::make_shared<V>(path);
 		entry.age = s_nextAge++;
 		return entry.resource;
 	}
@@ -59,7 +59,7 @@ protected:
 	void evict() override
 	{
 		const auto it = std::min_element(m_cache.begin(), m_cache.end(),
-			[&](const auto& first, const auto& second) { return first.age < second.age; });
+			[&](const auto& first, const auto& second) { return first.second.age < second.second.age; });
         if (it != m_cache.end()) { m_cache.erase(it); }
 	}
 
