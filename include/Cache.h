@@ -1,7 +1,7 @@
 /*
  * Cache.h
  *
- * Copyright (c) 2024 Sotonye Atemie <satemiej@gmail.com>
+ * Copyright (c) 2025 Sotonye Atemie <satemiej@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -32,17 +32,14 @@ template <typename K, typename V> class Cache
 {
 public:
 	//! Gets the cached resource `V` from `key`.
-	//! On cache miss, a new resource should be created, added to the cache, and then returned.
-	//! On cache hit, the cached resource can simply be returned.
-	auto get(const K& key) -> std::shared_ptr<V> = 0;
+	//! On cache miss, the cache should evict another resource if necessary, a new resource should be created, added to
+	//! the cache, and then returned.
+	//! On cache hit, the cached resource is simply returned.
+	virtual auto get(const K& key) -> std::shared_ptr<V> = 0;
 
-	//! Adds a new resource with the specified `key` if it isn't already cached.
-    //! Returns `true` if a resource was added to the cache and `false` otherwise.
-	bool add(const K& key) = 0;
-
-	//! Removes a resource with the specified `key` if it is already cached.
-    //! Returns `true` if a resource was removed to the cache and `false` otherwise.
-	bool remove(const K& key) = 0;
+protected:
+	//! Evicts a cached resource.
+	virtual void evict() = 0;
 };
 } // namespace lmms
 
