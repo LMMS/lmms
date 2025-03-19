@@ -35,7 +35,7 @@ template <typename T>
 class FileCache
 {
 public:
-	auto get(const std::filesystem::path& path) -> std::shared_ptr<T> override
+	auto get(const std::filesystem::path& path) -> std::shared_ptr<T>
 	{
 		const auto latestWriteTime = std::filesystem::last_write_time(path);
 		auto& entry = m_cache[path];
