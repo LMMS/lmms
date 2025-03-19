@@ -369,7 +369,7 @@ int Fader::calculateKnobPosYFromModel() const
 	else
 	{
 		// The model is in dB so we just show that in a linear fashion
-
+		
 		auto const clampedValue = std::clamp(value, minV, maxV);
 
 		auto const ratio = (clampedValue - minV) / (maxV - minV);
