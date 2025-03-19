@@ -29,14 +29,13 @@
 #include <filesystem>
 #include <unordered_map>
 
-#include "Cache.h"
-
 namespace lmms {
 
-template <typename V> class FileCache : public Cache<std::filesystem::path, V>
+template <typename T>
+class FileCache
 {
 public:
-	auto get(const std::filesystem::path& path) -> std::shared_ptr<V> override
+	auto get(const std::filesystem::path& path) -> std::shared_ptr<T> override
 	{
 		const auto latestWriteTime = std::filesystem::last_write_time(path);
 		auto& entry = m_cache[path];
@@ -50,24 +49,23 @@ public:
 
 		if (m_cache.size() == Capacity) { evict(); }
 
-		entry.resource = std::make_shared<V>(path);
+		entry.resource = std::make_shared<T>(path);
 		entry.time = latestWriteTime;
 		entry.age = s_nextAge++;
 		return entry.resource;
 	}
 
-protected:
-	void evict() override
+private:
+	void evict()
 	{
 		const auto it = std::min_element(m_cache.begin(), m_cache.end(),
 			[&](const auto& first, const auto& second) { return first.second.age < second.second.age; });
         if (it != m_cache.end()) { m_cache.erase(it); }
 	}
 
-private:
 	struct Entry
 	{
-		std::shared_ptr<V> resource;
+		std::shared_ptr<T> resource;
 		std::filesystem::file_time_type time;
 		int age = 0;
 
