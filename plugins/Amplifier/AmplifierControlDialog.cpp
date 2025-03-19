@@ -47,12 +47,12 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
 	{
 		Knob* newKnob = new Knob(KnobType::Bright26, this);
-        newKnob->setModel(model);
+		newKnob->setModel(model);
 		newKnob->setLabel(label);
-        newKnob->setHintText(hintText, unit);
-        newKnob->setVolumeKnob(isVolume);
-        return newKnob;
-    };
+		newKnob->setHintText(hintText, unit);
+		newKnob->setVolumeKnob(isVolume);
+		return newKnob;
+	};
 
 	gridLayout->addWidget(makeKnob(tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, true), 0, 0, Qt::AlignHCenter);
 	gridLayout->addWidget(makeKnob(tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false), 0, 1, Qt::AlignHCenter);
