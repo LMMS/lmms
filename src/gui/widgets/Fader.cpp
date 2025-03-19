@@ -512,9 +512,16 @@ void Fader::modelValueChanged()
 
 QString Fader::getModelValueAsDbString() const
 {
-	const auto value = model()->value();
-
 	QString label(tr("Volume: %1 dB"));
+	// Check that the pointer isn't dangling, which can happen if the
+	// model was dropped in order to load a new project from an existing one.
+	auto* newModel = model();
+	if (!newModel)
+	{
+		// model() was a dangling pointer, so return a sane default value.
+		return label.arg(tr("-inf"));
+	}
+	const auto value = newModel->value();
 
 	if (modelIsLinear())
 	{
