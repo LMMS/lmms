@@ -66,10 +66,16 @@ void AudioDevice::processNextBuffer()
 
 fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 {
-	if (!m_running.test_and_set(std::memory_order_acquire) || !_ab)
+	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
 		m_running.clear(std::memory_order_release);
 		return 0;
+	}
+
+	if (!_ab)
+	{
+		m_audioEngine->renderNextBuffer();
+		return m_framesPerPeriod;
 	}
 
 	static auto s_renderedBuffer = static_cast<const SampleFrame*>(nullptr);

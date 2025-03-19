@@ -80,11 +80,13 @@ public:
 private:
 	void startProcessing() override
 	{
+		AudioDevice::startProcessing();
 		start();
 	}
 
 	void stopProcessing() override
 	{
+		AudioDevice::stopProcessing();
 		stopProcessingThread( this );
 	}
 
