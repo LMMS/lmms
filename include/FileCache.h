@@ -51,6 +51,7 @@ public:
 		if (m_cache.size() == Capacity) { evict(); }
 
 		entry.resource = std::make_shared<V>(path);
+		entry.time = latestWriteTime;
 		entry.age = s_nextAge++;
 		return entry.resource;
 	}
