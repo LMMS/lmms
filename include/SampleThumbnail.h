@@ -69,8 +69,10 @@ public:
 	};
 
 	SampleThumbnail() = default;
-	SampleThumbnail(const Sample& sample);
+	SampleThumbnail(const std::filesystem::path& path);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
+
+	static auto loadFromCache(const std::filesystem::path& path) -> std::shared_ptr<const SampleThumbnail>;
 
 private:
 	class Thumbnail
@@ -132,10 +134,8 @@ private:
 		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept { return qHash(entry.filePath); }
 	};
 
-	using ThumbnailCache = std::vector<Thumbnail>;
-	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
-
-	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
+	std::vector<Thumbnail> m_thumbnails;
+	inline static FileCache<SampleThumbnail> s_fileCache;
 };
 
 } // namespace lmms

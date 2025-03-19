@@ -24,6 +24,7 @@
 
 #include "AudioFileProcessorWaveView.h"
 
+#include "PathUtil.h"
 #include "Sample.h"
 #include "ConfigManager.h"
 #include "SampleThumbnail.h"
@@ -82,7 +83,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_reversed(false),
 	m_framesPlayed(0),
 	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt()),
-	m_sampleThumbnail(*buf)
+	m_sampleThumbnail(SampleThumbnail::loadFromCache(PathUtil::qStringToPath(m_sample->sampleFile())))
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
@@ -340,7 +341,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	m_sampleThumbnail = SampleThumbnail{*m_sample};
+	m_sampleThumbnail = SampleThumbnail::loadFromCache(PathUtil::qStringToPath(m_sample->sampleFile()));
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_graph.rect(),
@@ -350,7 +351,7 @@ void AudioFileProcessorWaveView::updateGraph()
 		.reversed = m_sample->reversed(),
 	};
 
-	m_sampleThumbnail.visualize(param, p);
+	m_sampleThumbnail->visualize(param, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)
