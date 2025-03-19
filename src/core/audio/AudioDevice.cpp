@@ -34,9 +34,9 @@ namespace lmms
 AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
 	: m_supportsCapture(false)
 	, m_framesPerPeriod(
-		  std::clamp(ConfigManager::inst()
-						 ->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
-						 .toULong(),
+		  std::clamp<fpp_t>(ConfigManager::inst()
+								->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
+								.toULong(),
 			  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
 	, m_sampleRate(_audioEngine->outputSampleRate())
 	, m_channels(_channels)
