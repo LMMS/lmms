@@ -150,13 +150,9 @@ void AudioSndio::run()
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
+		if (!getNextBuffer(temp, framesPerPeriod())) { break; }
 
-		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
+		uint bytes = convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;
