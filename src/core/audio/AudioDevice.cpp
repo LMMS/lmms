@@ -41,7 +41,7 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
 	, m_sampleRate(_audioEngine->outputSampleRate())
 	, m_channels(_channels)
 	, m_audioEngine(_audioEngine)
-	, m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_buffer(new SampleFrame[m_framesPerPeriod])
 {
 }
 
@@ -72,12 +72,25 @@ fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 		return 0;
 	}
 
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->renderNextBuffer();
+	static auto s_renderedBuffer = static_cast<const SampleFrame*>(nullptr);
+	static auto s_renderedBufferIndex = std::size_t{0};
+	const auto renderedBufferSize = m_audioEngine->framesPerPeriod();
 
-	memcpy(_ab, b, frames * sizeof(SampleFrame));
+	auto framesRead = std::size_t{0};
+	while (framesRead != m_framesPerPeriod)
+	{
+		if (!s_renderedBuffer) { s_renderedBuffer = m_audioEngine->renderNextBuffer(); }
 
-	return frames;
+		const auto framesToRead = std::min(renderedBufferSize - s_renderedBufferIndex, m_framesPerPeriod - framesRead);
+		std::copy_n(s_renderedBuffer + s_renderedBufferIndex, framesToRead, _ab + framesRead);
+
+		s_renderedBufferIndex = (s_renderedBufferIndex + framesToRead) % renderedBufferSize;
+		framesRead += framesToRead;
+
+		if (s_renderedBufferIndex == 0) { s_renderedBuffer = nullptr; }
+	}
+
+	return m_framesPerPeriod;
 }
 
 void AudioDevice::stopProcessingThread( QThread * thread )
