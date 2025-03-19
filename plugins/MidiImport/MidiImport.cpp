@@ -29,6 +29,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 
+#include <cstdint>
 #include <sstream>
 #include <unordered_map>
 
@@ -467,7 +468,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 				if( update == "programi" )
 				{
-					long prog = evt->get_int64_value();
+					int_fast64_t prog = evt->get_int64_value();
 					if( ch->isSF2 )
 					{
 						auto& pc = pcs[evt->chan];
