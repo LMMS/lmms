@@ -63,6 +63,9 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	);
 	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
 	static_cast<QVBoxLayout*>( layout() )->insertWidget( 0, m_timeLine );
+
+	connect( Engine::getSong(), &Song::timeSignatureChanged,
+		this, &PatternEditor::updateMaxSteps);
 }
 
 
@@ -182,8 +185,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 
 void PatternEditor::resizeEvent(QResizeEvent* re)
 {
-	setPixelsPerBar((width() - m_trackHeadWidth) * TimePos::stepsPerBar() / m_maxSteps);
-	m_timeLine->setPixelsPerBar(pixelsPerBar());
+	updatePixelsPerBar();
 }
 
 
@@ -202,6 +204,13 @@ void PatternEditor::updatePosition()
 	emit positionChanged( m_currentPosition );
 }
 
+void PatternEditor::updatePixelsPerBar()
+{
+	//const int num = Engine::getSong()->getTimeSigModel().getNumerator();
+	//const int den = Engine::getSong()->getTimeSigModel().getDenominator();
+	setPixelsPerBar((width() - m_trackHeadWidth) * TimePos::stepsPerBar() / m_maxSteps);
+	m_timeLine->setPixelsPerBar(pixelsPerBar());
+}
 
 void PatternEditor::updateMaxSteps()
 {
@@ -216,8 +225,7 @@ void PatternEditor::updateMaxSteps()
 			m_maxSteps = std::max(m_maxSteps, p->steps());
 		}
 	}
-	setPixelsPerBar((width() - m_trackHeadWidth) * TimePos::stepsPerBar() / m_maxSteps);
-	m_timeLine->setPixelsPerBar(pixelsPerBar());
+	updatePixelsPerBar();
 }
 
 
