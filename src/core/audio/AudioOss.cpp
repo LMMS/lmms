@@ -264,13 +264,9 @@ void AudioOss::run()
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
+		if (!getNextBuffer(temp, framesPerPeriod())) { break; }
 
-		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
+		int bytes = convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;

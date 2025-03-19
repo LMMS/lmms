@@ -306,12 +306,14 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		{
 			if (m_outBufFrameIndex >= m_outBufFramesTotal)
 			{
-				m_outBufFramesTotal = getNextBuffer(m_outBuf);
-				if (m_outBufFramesTotal == 0)
+				if (!getNextBuffer(m_outBuf, framesPerPeriod()))
 				{
+					m_outBufFramesTotal = 0;
 					m_stopped = true;
 					break;
 				}
+
+				m_outBufFramesTotal = framesPerPeriod();
 				m_outBufFrameIndex = 0;
 			}
 

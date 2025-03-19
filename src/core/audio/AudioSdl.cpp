@@ -192,13 +192,12 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 		if( m_currentBufferFramePos == 0 )
 		{
 			// frames depend on the sample rate
-			const fpp_t frames = getNextBuffer( m_outBuf );
-			if( !frames )
+			if (!getNextBuffer(m_outBuf, framesPerPeriod()))
 			{
 				memset( _buf, 0, _len );
 				return;
 			}
-			m_currentBufferFramesCount = frames;
+			m_currentBufferFramesCount = framesPerPeriod();
 
 		}
 		const uint min_frames_count = std::min(_len/sizeof(SampleFrame),

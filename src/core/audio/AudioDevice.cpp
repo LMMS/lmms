@@ -60,22 +60,21 @@ AudioDevice::~AudioDevice()
 
 void AudioDevice::processNextBuffer()
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if (frames) { writeBuffer(m_buffer, frames); }
+	if (getNextBuffer(m_buffer, m_framesPerPeriod)) { writeBuffer(m_buffer, m_framesPerPeriod); }
 }
 
-fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
+bool AudioDevice::getNextBuffer(SampleFrame* dst, std::size_t size)
 {
 	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
 		m_running.clear(std::memory_order_release);
-		return 0;
+		return false;
 	}
 
-	if (!_ab)
+	if (!dst)
 	{
 		m_audioEngine->renderNextBuffer();
-		return m_framesPerPeriod;
+		return true;
 	}
 
 	static auto s_renderedBuffer = static_cast<const SampleFrame*>(nullptr);
@@ -83,12 +82,12 @@ fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 	const auto renderedBufferSize = m_audioEngine->framesPerPeriod();
 
 	auto framesRead = std::size_t{0};
-	while (framesRead != m_framesPerPeriod)
+	while (framesRead != size)
 	{
 		if (!s_renderedBuffer) { s_renderedBuffer = m_audioEngine->renderNextBuffer(); }
 
 		const auto framesToRead = std::min(renderedBufferSize - s_renderedBufferIndex, m_framesPerPeriod - framesRead);
-		std::copy_n(s_renderedBuffer + s_renderedBufferIndex, framesToRead, _ab + framesRead);
+		std::copy_n(s_renderedBuffer + s_renderedBufferIndex, framesToRead, dst + framesRead);
 
 		s_renderedBufferIndex = (s_renderedBufferIndex + framesToRead) % renderedBufferSize;
 		framesRead += framesToRead;
@@ -96,7 +95,7 @@ fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 		if (s_renderedBufferIndex == 0) { s_renderedBuffer = nullptr; }
 	}
 
-	return m_framesPerPeriod;
+	return true;
 }
 
 void AudioDevice::stopProcessingThread( QThread * thread )

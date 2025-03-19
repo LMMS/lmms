@@ -251,16 +251,15 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 	{
 		if( m_outBufPos == 0 )
 		{
-			// frames depend on the sample rate
-			const fpp_t frames = getNextBuffer( m_outBuf );
-			if( !frames )
+			if (!getNextBuffer(m_outBuf, framesPerPeriod()))
 			{
 				m_stopped = true;
 				memset( _outputBuffer, 0, _framesPerBuffer *
 					channels() * sizeof(float) );
 				return paComplete;
 			}
-			m_outBufSize = frames;
+
+			m_outBufSize = framesPerPeriod();
 		}
 		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
 

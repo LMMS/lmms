@@ -357,13 +357,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		m_framesDoneInCurBuf += todo;
 		if (m_framesDoneInCurBuf == m_framesToDoInCurBuf)
 		{
-			m_framesToDoInCurBuf = getNextBuffer(m_outBuf);
-			m_framesDoneInCurBuf = 0;
-			if (!m_framesToDoInCurBuf)
+			if (!getNextBuffer(m_outBuf, framesPerPeriod()))
 			{
+				m_framesToDoInCurBuf = 0;
+				m_framesDoneInCurBuf = 0;
 				m_stopped = true;
 				break;
 			}
+
+			m_framesToDoInCurBuf = framesPerPeriod();
+			m_framesDoneInCurBuf = 0;
 		}
 	}
 

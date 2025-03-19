@@ -88,7 +88,7 @@ protected:
 	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(SampleFrame* _ab);
+	bool getNextBuffer(SampleFrame* dst, std::size_t size);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf

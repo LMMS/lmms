@@ -235,9 +235,7 @@ void AudioPulseAudio::run()
 	{
 		const fpp_t fpp = framesPerPeriod();
 		auto temp = new SampleFrame[fpp];
-		while( getNextBuffer( temp ) )
-		{
-		}
+		while (getNextBuffer(temp, framesPerPeriod())) {}
 		delete[] temp;
 	}
 
@@ -259,19 +257,18 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 	size_t fd = 0;
 	while( fd < length/4 && m_quit == false )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
+		if (!getNextBuffer(temp, framesPerPeriod()))
 		{
 			m_quit = true;
 			break;
 		}
-		int bytes = convertToS16(temp, frames, pcmbuf, m_convertEndian);
+		int bytes = convertToS16(temp, framesPerPeriod(), pcmbuf, m_convertEndian);
 		if( bytes > 0 )
 		{
 			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
 							PA_SEEK_RELATIVE );
 		}
-		fd += frames;
+		fd += framesPerPeriod();
 	}
 
 	pa_xfree( pcmbuf );
