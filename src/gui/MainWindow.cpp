@@ -1639,7 +1639,16 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
 	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
 
-	scrollContentsBy(-scrollX, -scrollY);
+	for (auto* curWindow : subWindows)
+	{
+		// if widgets are maximized, then they shouldn't be moved
+		// moving a maximized window's normalGeometry is not implemented because of difficulties
+		if (curWindow->isMaximized() == false)
+		{
+			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
+		}
+	}
+
 	m_lastX = event->x();
 	m_lastY = event->y();
 }
