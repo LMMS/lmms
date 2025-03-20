@@ -228,10 +228,9 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 /*! \brief Create and assign a new mixer Channel for this track */
 void SampleTrackView::createMixerLine()
 {
-	int channelIndex = getGUI()->mixerView()->addNewChannel();
+	int channelIndex = getGUI()->mixerView()->addNewChannel(getTrack()->name());
 	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
-	channel->m_name = getTrack()->name();
 	channel->setColor(getTrack()->color());
 
 	assignMixerLine(channelIndex);

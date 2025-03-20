@@ -90,11 +90,12 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	const auto mixerName = mixerChannel->m_name;
 	setToolTip(mixerName);
 
-	m_renameLineEdit = new QLineEdit{mixerName, nullptr};
+	m_renameLineEdit = new QLineEdit{};
 	m_renameLineEdit->setFixedWidth(65);
 	m_renameLineEdit->setFont(adjustedToPixelSize(font(), LARGE_FONT_SIZE));
 	m_renameLineEdit->setReadOnly(true);
 	m_renameLineEdit->installEventFilter(this);
+	m_renameLineEdit->setText(elideName(mixerName));
 
 	auto renameLineEditScene = new QGraphicsScene{};
 	m_renameLineEditView = new QGraphicsView{};
@@ -196,14 +197,6 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	const auto width = rect().width();
 	const auto height = rect().height();
 	auto painter = QPainter{this};
-
-	// If name was updated without rename, such as when a channel is
-	// created for a track, forcefully update the name
-	const auto elidedName = elideName(channel->m_name);
-	if (!m_inRename && m_renameLineEdit->text() != elidedName)
-	{
-		m_renameLineEdit->setText(elidedName);
-	}
 
 	if (channel->color().has_value() && !channel->m_muteModel.value())
 	{

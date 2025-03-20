@@ -182,12 +182,12 @@ MixerView::MixerView(Mixer* mixer) :
 
 
 
-int MixerView::addNewChannel()
+int MixerView::addNewChannel(std::optional<QString> name)
 {
 	// add new mixer channel and redraw the form.
 	Mixer * mix = getMixer();
 
-	int newChannelIndex = mix->createChannel();
+	int newChannelIndex = mix->createChannel(name);
 	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this, newChannelIndex));
 	connectToSoloAndMute(newChannelIndex);
 	chLayout->addWidget(m_mixerChannelViews[newChannelIndex]);

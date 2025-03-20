@@ -227,10 +227,9 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 /*! \brief Create and assign a new mixer Channel for this track */
 void InstrumentTrackView::createMixerLine()
 {
-	int channelIndex = getGUI()->mixerView()->addNewChannel();
+	int channelIndex = getGUI()->mixerView()->addNewChannel(getTrack()->name());
 	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
-	channel->m_name = getTrack()->name();
 	channel->setColor(getTrack()->color());
 
 	assignMixerLine(channelIndex);
