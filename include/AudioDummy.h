@@ -80,11 +80,13 @@ public:
 private:
 	void startProcessing() override
 	{
+		AudioDevice::startProcessing();
 		start();
 	}
 
 	void stopProcessing() override
 	{
+		AudioDevice::stopProcessing();
 		stopProcessingThread( this );
 	}
 
@@ -94,15 +96,7 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const SampleFrame* b = audioEngine()->nextBuffer();
-			if( !b )
-			{
-				break;
-			}
-			if( audioEngine()->hasFifoWriter() )
-			{
-				delete[] b;
-			}
+			if (!getNextBuffer(nullptr, 0)) { break; }
 
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )

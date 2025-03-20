@@ -239,6 +239,8 @@ QString AudioOss::probeDevice()
 
 void AudioOss::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -250,23 +252,21 @@ void AudioOss::startProcessing()
 
 void AudioOss::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	stopProcessingThread( this );
 }
 
 void AudioOss::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	auto temp = new SampleFrame[framesPerPeriod()];
+	auto outbuf = new int_sample_t[framesPerPeriod() * channels()];
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
+		if (!getNextBuffer(temp, framesPerPeriod())) { break; }
 
-		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
+		int bytes = convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;

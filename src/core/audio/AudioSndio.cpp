@@ -74,7 +74,7 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = audioEngine()->framesPerPeriod();
+	m_par.round = framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
 	if ( (isLittleEndian() && (m_par.le == 0)) ||
@@ -127,6 +127,8 @@ AudioSndio::~AudioSndio()
 
 void AudioSndio::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -136,23 +138,21 @@ void AudioSndio::startProcessing()
 
 void AudioSndio::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	stopProcessingThread( this );
 }
 
 void AudioSndio::run()
 {
-	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	SampleFrame* temp = new SampleFrame[framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[framesPerPeriod() * channels()];
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
+		if (!getNextBuffer(temp, framesPerPeriod())) { break; }
 
-		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
+		uint bytes = convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;

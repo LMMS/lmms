@@ -226,6 +226,8 @@ int AudioAlsa::handleError( int _err )
 
 void AudioAlsa::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -237,6 +239,8 @@ void AudioAlsa::startProcessing()
 
 void AudioAlsa::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	stopProcessingThread( this );
 }
 
@@ -246,7 +250,7 @@ void AudioAlsa::run()
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
 
-	int outbuf_size = audioEngine()->framesPerPeriod() * channels();
+	int outbuf_size = framesPerPeriod() * channels();
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
@@ -260,17 +264,16 @@ void AudioAlsa::run()
 			if( outbuf_pos == 0 )
 			{
 				// frames depend on the sample rate
-				const fpp_t frames = getNextBuffer( temp );
-				if( !frames )
+				if (!getNextBuffer(temp, framesPerPeriod()))
 				{
 					quit = true;
 					memset( ptr, 0, len
 						* sizeof( int_sample_t ) );
 					break;
 				}
-				outbuf_size = frames * channels();
 
-				convertToS16(temp, frames, outbuf, m_convertEndian);
+				outbuf_size = framesPerPeriod() * channels();
+				convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
 			}
 			int min_len = std::min(len, outbuf_size - outbuf_pos);
 			memcpy( ptr, outbuf + outbuf_pos,

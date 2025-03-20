@@ -56,7 +56,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_outBuf(new SampleFrame[framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
@@ -182,6 +182,8 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
@@ -226,6 +228,8 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_stopped = true;
 }
 
@@ -337,13 +341,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		m_framesDoneInCurBuf += todo;
 		if (m_framesDoneInCurBuf == m_framesToDoInCurBuf)
 		{
-			m_framesToDoInCurBuf = getNextBuffer(m_outBuf);
-			m_framesDoneInCurBuf = 0;
-			if (!m_framesToDoInCurBuf)
+			if (!getNextBuffer(m_outBuf, framesPerPeriod()))
 			{
+				m_framesToDoInCurBuf = 0;
+				m_framesDoneInCurBuf = 0;
 				m_stopped = true;
 				break;
 			}
+
+			m_framesToDoInCurBuf = framesPerPeriod();
+			m_framesDoneInCurBuf = 0;
 		}
 	}
 

@@ -93,6 +93,8 @@ QString AudioPulseAudio::probeDevice()
 
 void AudioPulseAudio::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -104,6 +106,8 @@ void AudioPulseAudio::startProcessing()
 
 void AudioPulseAudio::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_quit = true;
 	stopProcessingThread( this );
 }
@@ -160,7 +164,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
+			double latency = static_cast<double>(_this->framesPerPeriod()) / _this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
@@ -229,11 +233,9 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = audioEngine()->framesPerPeriod();
+		const fpp_t fpp = framesPerPeriod();
 		auto temp = new SampleFrame[fpp];
-		while( getNextBuffer( temp ) )
-		{
-		}
+		while (getNextBuffer(temp, framesPerPeriod())) {}
 		delete[] temp;
 	}
 
@@ -248,26 +250,25 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = audioEngine()->framesPerPeriod();
+	const fpp_t fpp = framesPerPeriod();
 	auto temp = new SampleFrame[fpp];
 	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
 	while( fd < length/4 && m_quit == false )
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
+		if (!getNextBuffer(temp, framesPerPeriod()))
 		{
 			m_quit = true;
 			break;
 		}
-		int bytes = convertToS16(temp, frames, pcmbuf, m_convertEndian);
+		int bytes = convertToS16(temp, framesPerPeriod(), pcmbuf, m_convertEndian);
 		if( bytes > 0 )
 		{
 			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
 							PA_SEEK_RELATIVE );
 		}
-		fd += frames;
+		fd += framesPerPeriod();
 	}
 
 	pa_xfree( pcmbuf );

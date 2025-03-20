@@ -75,14 +75,12 @@ public:
 		return m_sampleRate;
 	}
 
+	fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
+
 	void processNextBuffer();
 
-	virtual void startProcessing()
-	{
-		m_inProcess = true;
-	}
-
-	virtual void stopProcessing();
+	virtual void startProcessing() { m_running.test_and_set(std::memory_order_acquire); }
+	virtual void stopProcessing() { m_running.clear(std::memory_order_release); }
 
 protected:
 	// subclasses can re-implement this for being used in conjunction with
@@ -90,7 +88,7 @@ protected:
 	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(SampleFrame* _ab);
+	bool getNextBuffer(SampleFrame* dst, std::size_t size);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
@@ -118,6 +116,7 @@ protected:
 		return m_audioEngine;
 	}
 
+
 	static void stopProcessingThread( QThread * thread );
 
 
@@ -126,15 +125,15 @@ protected:
 
 
 private:
+	fpp_t m_framesPerPeriod;
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	AudioEngine* m_audioEngine;
-	bool m_inProcess;
 
 	QMutex m_devMutex;
 
 	SampleFrame* m_buffer;
-
+	std::atomic_flag m_running = ATOMIC_FLAG_INIT;
 };
 
 } // namespace lmms

@@ -165,7 +165,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = static_cast<double>(framesPerPeriod()) / currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -209,9 +209,11 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
-	m_outBufSize = audioEngine()->framesPerPeriod();
+	m_outBufSize = framesPerPeriod();
 
 	m_outBuf = new SampleFrame[m_outBufSize];
 
@@ -240,6 +242,8 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_stopped = true;
 	if (m_outstream)
 	{
@@ -303,12 +307,14 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		{
 			if (m_outBufFrameIndex >= m_outBufFramesTotal)
 			{
-				m_outBufFramesTotal = getNextBuffer(m_outBuf);
-				if (m_outBufFramesTotal == 0)
+				if (!getNextBuffer(m_outBuf, framesPerPeriod()))
 				{
+					m_outBufFramesTotal = 0;
 					m_stopped = true;
 					break;
 				}
+
+				m_outBufFramesTotal = framesPerPeriod();
 				m_outBufFrameIndex = 0;
 			}
 
