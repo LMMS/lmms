@@ -64,7 +64,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
 	static_cast<QVBoxLayout*>( layout() )->insertWidget( 0, m_timeLine );
 
-	connect(Engine::getSong(), &Song::timeSignatureChanged,
+	connect(m_ps, &PatternStore::trackUpdated,
 		this, &PatternEditor::updateMaxSteps);
 }
 
@@ -206,8 +206,6 @@ void PatternEditor::updatePosition()
 
 void PatternEditor::updatePixelsPerBar()
 {
-	//const int num = Engine::getSong()->getTimeSigModel().getNumerator();
-	//const int den = Engine::getSong()->getTimeSigModel().getDenominator();
 	setPixelsPerBar((width() - m_trackHeadWidth) * TimePos::stepsPerBar() / m_maxSteps);
 	m_timeLine->setPixelsPerBar(pixelsPerBar());
 }
@@ -216,7 +214,7 @@ void PatternEditor::updateMaxSteps()
 {
 	const TrackContainer::TrackList& tl = model()->tracks();
 
-	m_maxSteps = TimePos::stepsPerBar();
+	m_maxSteps = 0;
 	for (const auto& track : tl)
 	{
 		if (track->type() == Track::Type::Instrument)
