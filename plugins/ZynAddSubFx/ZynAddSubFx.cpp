@@ -181,6 +181,9 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 	m_resCenterFreqModel.saveSettings( _doc, _this, "rescenterfreq" );
 	m_resBandwidthModel.saveSettings( _doc, _this, "resbandwidth" );
 
+	// We always modify the cutoff freq (see CTOR), so save this change
+	m_modifiedControllers[C_filtercutoff] = true;
+
 	QString modifiedControllers;
 	for( QMap<int, bool>::ConstIterator it = m_modifiedControllers.begin();
 									it != m_modifiedControllers.end(); ++it )
@@ -319,6 +322,10 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 	instrumentTrack()->setName(QFileInfo(_file).baseName().replace(QRegularExpression("^[0-9]{4}-"), QString()));
 
 	m_modifiedControllers.clear();
+
+	// While we use "100" in the CTOR, for old XIZ files, we use the old value
+	m_filterFreqModel.setValue(64);
+	updateFilterFreq();
 
 	emit settingsChanged();
 }
