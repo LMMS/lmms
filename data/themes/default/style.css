@@ -3,7 +3,12 @@
  ********************/
 
 /* most foreground text items */
-QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar, QCheckBox {
+QLabel,
+QTreeWidget,
+QListWidget,
+QGroupBox,
+QMenuBar,
+QCheckBox {
 	color: #d1d8e4;
 }
 
@@ -40,8 +45,7 @@ QMdiArea {
 	background-color: #111314;
 }
 
-lmms--gui--FileBrowser QCheckBox
-{
+lmms--gui--FileBrowser QCheckBox {
 	font-size: 8pt;
 	color: white;
 }
@@ -64,7 +68,7 @@ lmms--gui--AutomationEditor {
 	qproperty-beatLineColor: #4a3bba;
 	qproperty-barLineColor: #8173fe;
 
-	qproperty-graphColor: rgba(69,42,153,180);
+	qproperty-graphColor: rgba(69, 42, 153, 180);
 	qproperty-scaleColor: #262b30;
 	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
 	qproperty-detuningNoteColor: rgba(248, 11, 11, 125);
@@ -93,7 +97,11 @@ QLineEdit:focus {
 /* Set color and selection background color for various inputs.
    SpinBoxes are used in QInputDialogs */
 
-QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+QTextEdit,
+QLineEdit:focus,
+QComboBox:focus,
+QSpinBox:focus,
+QDoubleSpinBox:focus {
 	color: #d1d8e4;
 	selection-background-color: #17793b;
 }
@@ -104,7 +112,8 @@ QToolTip {
 	color: #d1d8e4;
 }
 
-lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
+lmms--gui--TextFloat,
+lmms--gui--SimpleTextFloat {
 	background: #040506;
 	color: #d1d8e4;
 }
@@ -182,7 +191,8 @@ lmms--gui--PianoRoll {
 	qproperty-currentStepNoteColor: rgb(245, 3, 139);
 	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
-	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
+	qproperty-noteBorders: false;
+	/* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: #064d79;
 	qproperty-ghostNoteColor: #1e1e1e;
 	qproperty-ghostNoteTextColor: #ffffff;
@@ -257,6 +267,7 @@ QScrollBar:horizontal {
 	height: 12px;
 	margin: 0px 12px;
 }
+
 QScrollBar:vertical {
 	border-left: 3px solid #262b30;
 	background: #262b30;
@@ -266,14 +277,18 @@ QScrollBar:vertical {
 
 /* scrollbar: trough clicky things */
 
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
 	background: none;
 }
 
-QScrollBar::add-page:horizontal:pressed, QScrollBar::sub-page:horizontal:pressed,
-QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
-	background: rgba(0,0,0,50);
+QScrollBar::add-page:horizontal:pressed,
+QScrollBar::sub-page:horizontal:pressed,
+QScrollBar::add-page:vertical:pressed,
+QScrollBar::sub-page:vertical:pressed {
+	background: rgba(0, 0, 0, 50);
 }
 
 /* scrollbar: handles (sliders) */
@@ -308,13 +323,14 @@ QScrollBar::handle:vertical:pressed {
 	background: #ffffff;
 }
 
-QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
+QScrollBar::handle:horizontal:disabled,
+QScrollBar::handle:vertical:disabled {
 	background: #262b30;
 	border-radius: 1px;
 	border: none;
 }
 
-lmms--gui--EffectRackView QScrollBar::handle:vertical:disabled  {
+lmms--gui--EffectRackView QScrollBar::handle:vertical:disabled {
 	background: #3f4750;
 	border: none;
 	border-radius: 4px;
@@ -322,58 +338,110 @@ lmms--gui--EffectRackView QScrollBar::handle:vertical:disabled  {
 
 /* arrow buttons */
 
-QScrollBar::add-line, QScrollBar::sub-line {
+QScrollBar::add-line,
+QScrollBar::sub-line {
 	background: #262b30;
 	border-radius: 0px;
 	border: none;
 	subcontrol-origin: margin;
 }
 
-QScrollBar::add-line:horizontal 	{  	subcontrol-position: right; width: 12px;}
-QScrollBar::sub-line:horizontal 	{ 	subcontrol-position: left; width: 12px;}
-QScrollBar::add-line:vertical 		{ 	subcontrol-position: bottom; height: 12px;}
-QScrollBar::sub-line:vertical 		{ 	subcontrol-position: top; height: 12px;}
+QScrollBar::add-line:horizontal {
+	subcontrol-position: right;
+	width: 12px;
+}
 
-QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
+QScrollBar::sub-line:horizontal {
+	subcontrol-position: left;
+	width: 12px;
+}
+
+QScrollBar::add-line:vertical {
+	subcontrol-position: bottom;
+	height: 12px;
+}
+
+QScrollBar::sub-line:vertical {
+	subcontrol-position: top;
+	height: 12px;
+}
+
+QScrollBar::add-line:hover,
+QScrollBar::sub-line:hover {
 	background: #262b30;
 }
 
-QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
+QScrollBar::add-line:pressed,
+QScrollBar::sub-line:pressed {
 	background: #262b30;
 }
 
-QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
+QScrollBar::add-line:disabled,
+QScrollBar::sub-line:disabled {
 	background: #262b30;
 }
 
 /* arrow button arrows */
 
-QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal,
-QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+QScrollBar::left-arrow:horizontal,
+QScrollBar::right-arrow:horizontal,
+QScrollBar::up-arrow:vertical,
+QScrollBar::down-arrow:vertical {
 	border: none;
 	background-color: none;
 	width: 5px;
 	height: 5px;
 }
 
-QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+QScrollBar::left-arrow:horizontal,
+QScrollBar::right-arrow:horizontal {
 	margin-top: 3px;
 }
 
-QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+QScrollBar::up-arrow:vertical,
+QScrollBar::down-arrow:vertical {
 	margin-left: 3px;
 }
 
-QScrollBar::left-arrow:horizontal { background-image: url("resources:sbarrow_left.png");}
-QScrollBar::right-arrow:horizontal { background-image: url("resources:sbarrow_right.png");}
-QScrollBar::up-arrow:vertical { background-image: url("resources:sbarrow_up.png");}
-QScrollBar::down-arrow:vertical { background-image: url("resources:sbarrow_down.png");}
-QScrollBar::left-arrow:horizontal:disabled { background-image: url("resources:sbarrow_left_d.png");}
-QScrollBar::right-arrow:horizontal:disabled { background-image: url("resources:sbarrow_right_d.png");}
-QScrollBar::up-arrow:vertical:disabled { background-image: url("resources:sbarrow_up_d.png");}
-QScrollBar::down-arrow:vertical:disabled { background-image: url("resources:sbarrow_down_d.png");}
-lmms--gui--EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url("resources:sbarrow_up.png");}
-lmms--gui--EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url("resources:sbarrow_down.png");}
+QScrollBar::left-arrow:horizontal {
+	background-image: url("resources:sbarrow_left.png");
+}
+
+QScrollBar::right-arrow:horizontal {
+	background-image: url("resources:sbarrow_right.png");
+}
+
+QScrollBar::up-arrow:vertical {
+	background-image: url("resources:sbarrow_up.png");
+}
+
+QScrollBar::down-arrow:vertical {
+	background-image: url("resources:sbarrow_down.png");
+}
+
+QScrollBar::left-arrow:horizontal:disabled {
+	background-image: url("resources:sbarrow_left_d.png");
+}
+
+QScrollBar::right-arrow:horizontal:disabled {
+	background-image: url("resources:sbarrow_right_d.png");
+}
+
+QScrollBar::up-arrow:vertical:disabled {
+	background-image: url("resources:sbarrow_up_d.png");
+}
+
+QScrollBar::down-arrow:vertical:disabled {
+	background-image: url("resources:sbarrow_down_d.png");
+}
+
+lmms--gui--EffectRackView QScrollBar::up-arrow:vertical:disabled {
+	background-image: url("resources:sbarrow_up.png");
+}
+
+lmms--gui--EffectRackView QScrollBar::down-arrow:vertical:disabled {
+	background-image: url("resources:sbarrow_down.png");
+}
 
 /* background for song editor and pattern editor */
 
@@ -382,7 +450,7 @@ lmms--gui--TrackContainerView QFrame {
 }
 
 /* background for track controls */
-lmms--gui--TrackView > QWidget {
+lmms--gui--TrackView>QWidget {
 	background-color: #3B424A;
 }
 
@@ -398,13 +466,13 @@ lmms--gui--TrackContentWidget {
 	qproperty-fineGridColor: #262B30;
 	qproperty-horizontalColor: #3C444C;
 	qproperty-embossColor: rgba(0, 0, 0, 0);
-	
+
 	/* line widths */
 	qproperty-coarseGridWidth: 2;
 	qproperty-fineGridWidth: 1;
 	qproperty-horizontalWidth: 1;
 	qproperty-embossWidth: 0;
-	
+
 	/* positive offset shifts emboss to the right */
 	qproperty-embossOffset: 0;
 }
@@ -424,7 +492,7 @@ lmms--gui--TrackOperationsWidget QPushButton {
 }
 
 lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
-	image: url("resources:trackop.svg");
+	image: url("resources:gear.svg");
 	subcontrol-origin: content;
 	subcontrol-position: center;
 }
@@ -444,8 +512,8 @@ lmms--gui--TrackOperationsWidget QPushButton:checked {
 
 /* font sizes */
 
-lmms--gui--Sf2InstrumentView > QLabel {
-	font-size:10px;
+lmms--gui--Sf2InstrumentView>QLabel {
+	font-size: 10px;
 }
 
 /* main toolbar sliders (master vol, master pitch) */
@@ -540,14 +608,15 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-button {
+QToolButton,
+QToolButton::menu-button {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;
 	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #636c7a, stop:1 #343840);
-	font-size:10px;
+	font-size: 10px;
 	color: #fff;
 }
 
@@ -633,7 +702,7 @@ lmms--gui--TrackLabelButton:checked:pressed {
 
 lmms--gui--SideBar {
 	subcontrol-position: center;
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1D2122,  stop:1 #262B30);
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1D2122, stop:1 #262B30);
 }
 
 lmms--gui--SideBar QToolButton {
@@ -736,14 +805,14 @@ lmms--gui--TimeLineWidget {
 	qproperty-inactiveLoopColor: #3B424A;
 	qproperty-inactiveLoopBrush: #3B424A;
 	qproperty-inactiveLoopInnerColor: #3B424A;
-	qproperty-inactiveLoopHandleColor: rgba( 192, 192, 192, 100 );
+	qproperty-inactiveLoopHandleColor: rgba(192, 192, 192, 100);
 
 	/* Properties for the loop indicator rectangle in active state.
 	   See above for detailed description. */
 	qproperty-activeLoopColor: #21A14F;
 	qproperty-activeLoopBrush: #21A14F;
 	qproperty-activeLoopInnerColor: #21A14F;
-	qproperty-activeLoopHandleColor: rgba( 192, 192, 192, 200 );
+	qproperty-activeLoopHandleColor: rgba(192, 192, 192, 200);
 
 	/* Vertical padding for the loop indicator rectangle.
 	   A value of zero draws the rectangle at the full height of the widget. */
@@ -751,31 +820,31 @@ lmms--gui--TimeLineWidget {
 	/* Width of loop marker handles (when handle mode is active) */
 	qproperty-loopHandleWidth: 8;
 
-	qproperty-barLineColor: rgb( 192, 192, 192 );
-	qproperty-barNumberColor: rgb( 192, 192, 192 );
+	qproperty-barLineColor: rgb(192, 192, 192);
+	qproperty-barNumberColor: rgb(192, 192, 192);
 
 	/* Cursor hotspots for loop marker adjustment */
 	qproperty-mouseHotspotSelLeft: 0px 16px;
 	qproperty-mouseHotspotSelRight: 32px 16px;
 }
 
-lmms--gui--TrackContainerView QLabel
-{
+lmms--gui--TrackContainerView QLabel {
 	background: none;
 }
 
 /* Clips */
 
 /* common clip colors */
-lmms--gui--ClipView   {
-	qproperty-mutedColor: rgba(255,255,255,100);
+lmms--gui--ClipView {
+	qproperty-mutedColor: rgba(255, 255, 255, 100);
 	qproperty-mutedBackgroundColor: #373d48;
 	qproperty-selectedColor: #006B65;
 	qproperty-patternClipBackground: #373d48;
 	qproperty-textColor: #fff;
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
-	qproperty-textShadowColor: rgba(0,0,0,200);
-	qproperty-gradient: false; /* boolean property, set true to have a gradient */
+	qproperty-textShadowColor: rgba(0, 0, 0, 200);
+	qproperty-gradient: false;
+	/* boolean property, set true to have a gradient */
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 7px 2px;
 	qproperty-mouseHotspotKnife: 0px 0px;
@@ -786,7 +855,7 @@ lmms--gui--ClipView   {
 /* MIDI (instrument) clip */
 lmms--gui--MidiClipView {
 	background-color: #21A14F;
-	color: rgba(255,255,255,220);
+	color: rgba(255, 255, 255, 220);
 
 	qproperty-noteFillColor: rgba(255, 255, 255, 220);
 	qproperty-noteBorderColor: rgb(33, 161, 79);
@@ -796,19 +865,20 @@ lmms--gui--MidiClipView {
 
 /* sample track clip */
 lmms--gui--SampleClipView {
-	background-color: rgba(42,51,59,255);
+	background-color: rgba(42, 51, 59, 255);
 	color: #FF8F05;
 }
 
 /* automation clip */
 lmms--gui--AutomationClipView {
 	background-color: #663DE1;
-	color: rgba(255,255,255,90);
+	color: rgba(255, 255, 255, 90);
 }
 
 /* pattern clip */
 lmms--gui--PatternClipView {
-	background-color: #20BDB2; /* default colour for pattern tracks */
+	background-color: #20BDB2;
+	/* default colour for pattern tracks */
 }
 
 /* Subwindows in MDI-Area */
@@ -820,24 +890,24 @@ lmms--gui--SubWindow {
 }
 
 /* Subwindow title text */
-lmms--gui--SubWindow > QLabel {
+lmms--gui--SubWindow>QLabel {
 	color: #d1d8e4;
 	font-size: 12px;
 	font-style: normal;
 }
 
 /* SubWindow titlebar button */
-lmms--gui--SubWindow > QPushButton {
-	background-color: rgba( 255, 255, 255, 0% );
+lmms--gui--SubWindow>QPushButton {
+	background-color: rgba(255, 255, 255, 0%);
 	border-width: 0px;
 	border-color: none;
 	border-style: none;
 }
 
-lmms--gui--SubWindow > QPushButton:hover{
-	background-color: rgba( 255, 255, 255, 15% );
+lmms--gui--SubWindow>QPushButton:hover {
+	background-color: rgba(255, 255, 255, 15%);
 	border-width: 1px;
-	border-color: rgba( 0, 0, 0, 20% );
+	border-color: rgba(0, 0, 0, 20%);
 	border-style: solid;
 	border-radius: 2px;
 }
@@ -861,8 +931,8 @@ lmms--gui--LfoGraph {
 /* Plugins */
 
 lmms--gui--TripleOscillatorView lmms--gui--Knob {
-	color: rgb(255,255,255);
-	qproperty-outerColor: rgb(255,255,255);
+	color: rgb(255, 255, 255);
+	qproperty-outerColor: rgb(255, 255, 255);
 	qproperty-innerRadius: 2;
 	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 13.0;
@@ -948,51 +1018,51 @@ lmms--gui--SfxrInstrumentView lmms--gui--Knob {
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#envKnob {
-	color:	#263352;
+	color: #263352;
 	qproperty-outerColor: #4b66a4;
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#freqKnob {
-	color:	#1e4a22;
+	color: #1e4a22;
 	qproperty-outerColor: #3c9544;
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#changeKnob {
-	color:	#591c1c;
+	color: #591c1c;
 	qproperty-outerColor: #b23737;
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#sqrKnob {
-	color:	#3b2714;
+	color: #3b2714;
 	qproperty-outerColor: #724c27;
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#repeatKnob {
-	color:	#292929;
+	color: #292929;
 	qproperty-outerColor: #515151;
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#phaserKnob {
-	color:	#144c4d;
+	color: #144c4d;
 	qproperty-outerColor: #299899;
 }
 
 lmms--gui--SfxrInstrumentView lmms--gui--Knob#filterKnob {
-	color:	#47224c;
+	color: #47224c;
 	qproperty-outerColor: #8e4397;
 }
 
 lmms--gui--OpulenzInstrumentView lmms--gui--Knob {
-	color: rgb(128,128,128);
-	qproperty-outerColor: rgb(255,255,255);
+	color: rgb(128, 128, 128);
+	qproperty-outerColor: rgb(255, 255, 255);
 	qproperty-innerRadius: 2;
 	qproperty-outerRadius: 9;
 	qproperty-lineWidth: 2;
 }
 
 lmms--gui--SidInstrumentView lmms--gui--Knob {
-	color: rgb(113,95,80);
-	qproperty-outerColor: rgb( 255,255,255 );
+	color: rgb(113, 95, 80);
+	qproperty-outerColor: rgb(255, 255, 255);
 	qproperty-innerRadius: 2;
 	qproperty-outerRadius: 7;
 	qproperty-lineWidth: 2;
@@ -1000,7 +1070,7 @@ lmms--gui--SidInstrumentView lmms--gui--Knob {
 
 lmms--gui--SlicerTView lmms--gui--Knob {
 	color: rgb(162, 128, 226);
-	qproperty-outerColor: rgb( 162, 128, 226 );
+	qproperty-outerColor: rgb(162, 128, 226);
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 11;
 	qproperty-lineWidth: 3;
@@ -1102,7 +1172,7 @@ lmms--gui--LmmsPalette {
 	qproperty-base: #101213;
 	qproperty-text: #d1d8e4;
 	qproperty-button: #3f4750;
-	qproperty-shadow: rgb(0,0,0);
+	qproperty-shadow: rgb(0, 0, 0);
 	qproperty-buttonText: #d1d8e4;
 	qproperty-brightText: #d1d8e4;
 	qproperty-highlight: #262b30;
