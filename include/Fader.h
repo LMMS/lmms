@@ -171,6 +171,7 @@ private:
 	QElapsedTimer m_lastPeakTimer_R;
 
 	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
+	QSize m_knobSize;
 
 	/**
 	 * @brief Stores the offset to the knob center when the user drags the fader knob

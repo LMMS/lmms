@@ -51,6 +51,24 @@ auto LMMS_EXPORT getIconPixmap(std::string_view name,
 	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap;
 auto LMMS_EXPORT getText(std::string_view name) -> QString;
 
+/**
+ * @brief Temporary shim for QPixmap::deviceIndependentSize.
+ * @param pixmap The pixmap to get the size of.
+ * @return The device-independent size of the pixmap.
+ */
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+[[deprecated("Use QPixmap::deviceIndependentSize() instead; See "
+             "https://doc.qt.io/qt-6/qpixmap.html#deviceIndependentSize")]]
+#endif
+inline auto logicalSize(const QPixmap &pixmap) noexcept
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+	return pixmap.deviceIndependentSize().toSize();
+#else
+	return pixmap.isNull() ? QSize() : pixmap.size() / pixmap.devicePixelRatio();
+#endif
+}
+
 } // namespace embed
 
 class PixmapLoader
