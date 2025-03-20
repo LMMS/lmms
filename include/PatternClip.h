@@ -37,7 +37,7 @@ namespace lmms
 class PatternClip : public Clip
 {
 public:
-	PatternClip(Track* track);
+	PatternClip(int patternIndex);
 	~PatternClip() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;

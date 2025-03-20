@@ -47,8 +47,8 @@ class SampleClip : public Clip
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleClip(Track* track, Sample sample, bool isPlaying);
-	SampleClip(Track* track);
+	SampleClip(Sample sample, bool isPlaying);
+	SampleClip();
 	SampleClip( const SampleClip& orig );
 	~SampleClip() override;
 
@@ -80,6 +80,8 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
+
+	void setTrack(Track* track) override;
 
 public slots:
 	void setSampleFile(const QString& sf);
