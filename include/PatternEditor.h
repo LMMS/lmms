@@ -67,7 +67,7 @@ public slots:
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
-	void resizeEvent(QResizeEvent * de ) override;
+	void resizeEvent(QResizeEvent* de) override;
 	void updatePosition();
 	void updatePixelsPerBar();
 

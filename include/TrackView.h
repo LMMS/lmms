@@ -73,7 +73,7 @@ public:
 		return m_track;
 	}
 
-	inline const std::vector<ClipView*>& getClipViews()
+	const std::vector<ClipView*>& getClipViews()
 	{
 		return m_clipViews;
 	}

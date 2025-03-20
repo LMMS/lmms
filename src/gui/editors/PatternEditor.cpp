@@ -64,7 +64,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
 	static_cast<QVBoxLayout*>( layout() )->insertWidget( 0, m_timeLine );
 
-	connect( Engine::getSong(), &Song::timeSignatureChanged,
+	connect(Engine::getSong(), &Song::timeSignatureChanged,
 		this, &PatternEditor::updateMaxSteps);
 }
 

@@ -91,7 +91,7 @@ public:
 		return m_clipType;
 	}
 
-	inline int steps() const
+	int steps() const
 	{
 		return m_steps;
 	}
