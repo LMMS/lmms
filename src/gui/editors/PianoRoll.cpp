@@ -1141,6 +1141,19 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		old_x = cur_x;
 		old_y = cur_y;
 	}
+
+	if (m_editMode == EditMode::Detuning && _n->selected())
+	{
+		for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
+		{
+			// Current node values
+			int cur_ticks = POS(it);
+			int cur_x = _x + cur_ticks * m_ppb / TimePos::ticksPerBar();
+			const float cur_level = INVAL(it);
+			int cur_y = middle_y - cur_level * m_keyLineHeight;
+			_p.drawEllipse(cur_x - 5, cur_y - 5, 10, 10);
+		}
+	}
 }
 
 
@@ -1614,22 +1627,35 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if( m_editMode == EditMode::Detuning && noteUnderMouse() )
+	if (m_editMode == EditMode::Detuning)
 	{
-		static QPointer<AutomationClip> detuningClip = nullptr;
-		if (detuningClip.data() != nullptr)
+		// Setup the currently selected notes/note under mouse
+		bool notesFound = setupParameterEditNotes(Note::ParameterType::Detuning);
+		if (!notesFound) { return; }
+
+		// Create detuning curves for each note if they don't have them already
+		for (Note* note: m_selectedParameterEditNotes)
 		{
-			detuningClip->disconnect(this);
+			if (note->detuning() == nullptr)
+			{
+				note->createDetuning();
+				AutomationClip* detuningClip = note->detuning()->automationClip();
+				connect(detuningClip, SIGNAL(dataChanged()), this, SLOT(update()));
+			}
 		}
-		Note* n = noteUnderMouse();
-		if (n->detuning() == nullptr)
+
+		// Let users access automation editor with shift-click, if they want the old functionality
+		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
 		{
-			n->createDetuning();
+			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
+			getGUI()->automationEditor()->open(noteUnderMouse()->detuning()->automationClip());
+			return;
 		}
-		detuningClip = n->detuning()->automationClip();
-		connect(detuningClip.data(), SIGNAL(dataChanged()), this, SLOT(update()));
-		getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
-		getGUI()->automationEditor()->open(detuningClip);
+
+		m_midiClip->addJournalCheckPoint();
+
+		// Perform the dragging/adding/removing of automation nodes
+		updateParameterEditPos(me, Note::ParameterType::Detuning);
 		return;
 	}
 
@@ -2285,6 +2311,11 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		}
 	}
 
+	if (m_editMode == EditMode::Detuning)
+	{
+		applyParameterEditPos(me, Note::ParameterType::Detuning);
+	}
+
 	if( me->button() & Qt::RightButton )
 	{
 		m_mouseDownRight = false;
@@ -2377,6 +2408,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	if (m_editMode == EditMode::Knife)
 	{
 		updateKnifePos(me, false);
+	}
+
+	if (m_editMode == EditMode::Detuning && (m_parameterEditDownLeft || m_parameterEditDownRight))
+	{
+		// Update the current dragging/adding/removal of automation nodes in the detuning curves of the selected notes.
+		updateParameterEditPos(me, Note::ParameterType::Detuning);
 	}
 
 	if( me->y() > PR_TOP_MARGIN || m_action != Action::None )
@@ -2755,6 +2792,96 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 }
 
 
+void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
+{
+	// If this is the first time this function is called (not mouseMove or mouseRelease), initialize the variables.
+	if (me->type() == QEvent::MouseButtonPress) {
+		// Mouse button press event does not seem to remember buttons which are already pressed, so the || keeps the previous state.
+		m_parameterEditDownLeft = m_parameterEditDownLeft || me->button() & Qt::LeftButton;
+		// Do not allow right click mode if left click is already held.
+		m_parameterEditDownRight = (m_parameterEditDownRight || me->button() & Qt::RightButton) && !m_parameterEditDownLeft;
+		m_lastParameterEditTick = -1;
+	}
+
+	// Get the note with the closest automation curve to the mouse cursor
+	Note* clickedNote = parameterEditNoteUnderMouse(paramType);
+	if (!clickedNote) { return; }
+
+	// Calculate the key and time of the mouse cursor in the piano roll
+	int key_num = getKey( me->y() );
+	int pos_ticks = (me->x() - m_whiteKeyWidth) *
+			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+	// Calculate the relative position of the mouse with respect to the note.
+	TimePos relativePos = pos_ticks - clickedNote->pos();
+	int relativeKey = key_num - clickedNote->key();
+
+	// Set the quantization of the automation editor to match the piano roll. This is not an ideal system, but it works.
+	AutomationClip::setQuantization(quantization());
+
+	// Loop through all of the selected notes and update the drag position in each.
+	for (Note* note: m_selectedParameterEditNotes)
+	{
+		AutomationClip* aClip = note->getParameterCurve(paramType);
+		if (aClip == nullptr) { continue; }
+		// If left-clicking, add/drag a node.
+		if (m_parameterEditDownLeft)
+		{
+			aClip->setDragValue(relativePos, relativeKey);
+		}
+		// If right-clicking, remove nodes.
+		else if (m_parameterEditDownRight)
+		{
+			if (m_lastParameterEditTick != -1)
+			{
+				// If the last position of the mouse is not -1, remove all nodes in that range.
+				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
+			}
+			else
+			{
+				// Or just remove at that one time pos
+				aClip->removeNode(relativePos);
+			}
+		}
+	}
+	m_lastParameterEditTick = pos_ticks;
+}
+
+void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
+{
+	// If the left button was just released, apply the drag on all of the notes' automation clips.
+	if (m_parameterEditDownLeft)
+	{
+		for (Note* note: m_selectedParameterEditNotes)
+		{
+			AutomationClip* aClip = note->getParameterCurve(paramType);
+			if (aClip == nullptr) { continue; }
+
+			aClip->applyDragValue();
+		}
+	}
+	m_parameterEditDownRight = false;
+	m_parameterEditDownLeft = false;
+}
+
+bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
+{
+	// If the user has selected notes, use those for the detuning/parameter editing
+	// Else, if the user is clicking on a note, select that note and use it.
+	if (!getSelectedNotes().empty())
+	{
+		m_selectedParameterEditNotes = getSelectedNotes();
+		return true;
+	}
+	else if (noteUnderMouse())
+	{
+		m_selectedParameterEditNotes.assign(1, noteUnderMouse());
+		// The note is also set to be selected so that it can be tracked even when the user drags automation nodes above/below the note.
+		noteUnderMouse()->setSelected(true);
+		return true;
+	}
+	return false;
+}
 
 
 void PianoRoll::updateKnifePos(QMouseEvent* me, bool initial)
@@ -4716,6 +4843,50 @@ Note * PianoRoll::noteUnderMouse()
 	}
 
 	return nullptr;
+}
+
+
+Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
+{
+	QPoint pos = mapFromGlobal( QCursor::pos() );
+
+	if (pos.x() <= m_whiteKeyWidth
+		|| pos.x() > width() - SCROLLBAR_SIZE
+		|| pos.y() < PR_TOP_MARGIN
+		|| pos.y() > keyAreaBottom() )
+	{
+		return nullptr;
+	}
+
+	// Get the key and time pos of the cursor
+	int key_num = getKey( pos.y() );
+	int pos_ticks = (pos.x() - m_whiteKeyWidth) *
+			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+	// Loop through all notes having their detuning/parameter being edited, and find the one whose automation curve is closest to the mouse.
+	int minDifference = -1;
+	Note* closestNote = nullptr;
+	for (Note* note : m_selectedParameterEditNotes)
+	{
+		// Skip note if the mouse is outside of its start/end time
+		if (pos_ticks < note->pos() || pos_ticks > note->endPos()) { continue; }
+
+		TimePos relativePos = pos_ticks - note->pos();
+		int relativeKey = key_num - note->key();
+
+		AutomationClip* aClip = note->getParameterCurve(paramType);
+		if (aClip == nullptr) { continue; }
+
+		// Calculate the vertical distance from the automation curve to the mouse.
+		int differenceFromCurve = std::abs(relativeKey - aClip->valueAt(relativePos));
+		// If it's less than the current min, set this note as the closest note so far.
+		if (differenceFromCurve < minDifference || minDifference == -1)
+		{
+			minDifference = differenceFromCurve;
+			closestNote = note;
+		}
+	}
+	return closestNote;
 }
 
 void PianoRoll::changeSnapMode()
