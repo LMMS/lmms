@@ -194,12 +194,7 @@ void PatternEditor::updatePosition()
 	//realignTracks();
 	for (const auto& trackView : trackViews())
 	{
-		if (trackView->getTrack()->type() == Track::Type::Instrument)
-		{
-			// Currently there is no way to get the clipviews corresponding to the current pattern index, so
-			// all of them get updated at once. It's not ideal but it works.
-			for (ClipView* cv : trackView->getClipViews()) { cv->update(); }
-		}
+		trackView->update();
 	}
 	emit positionChanged( m_currentPosition );
 }
