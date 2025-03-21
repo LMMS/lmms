@@ -261,14 +261,14 @@ Mixer::~Mixer()
 
 
 
-int Mixer::createChannel(std::optional<QString> name)
+int Mixer::createChannel()
 {
 	const int index = m_mixerChannels.size();
 	// create new channel
 	m_mixerChannels.push_back( new MixerChannel( index, this ) );
 
 	// reset channel state
-	clearChannel(index, name);
+	clearChannel( index );
 
 	// if there is a soloed channel, mute the new track
 	if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
@@ -755,14 +755,14 @@ void Mixer::clear()
 
 
 
-void Mixer::clearChannel(mix_ch_t index, std::optional<QString> name)
+void Mixer::clearChannel(mix_ch_t index)
 {
 	MixerChannel * ch = m_mixerChannels[index];
 	ch->m_fxChain.clear();
 	ch->m_volumeModel.setValue( 1.0f );
 	ch->m_muteModel.setValue( false );
 	ch->m_soloModel.setValue( false );
-	ch->m_name = name.value_or(index ? tr("Channel %1").arg(index) : tr("Master"));
+	ch->m_name = ( index == 0 ) ? tr( "Master" ) : tr( "Channel %1" ).arg( index );
 	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
 	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
 	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );

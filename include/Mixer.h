@@ -182,7 +182,7 @@ public:
 
 	// add a new channel to the mixer.
 	// returns the index of the channel that was just added
-	int createChannel(std::optional<QString> name = std::nullopt);
+	int createChannel();
 
 	// delete a channel from the mixer.
 	void deleteChannel(int index);
@@ -195,7 +195,7 @@ public:
 	void moveChannelRight(int index);
 
 	// reset a channel's name, fx, sends, etc
-	void clearChannel(mix_ch_t channelIndex, std::optional<QString> name = std::nullopt);
+	void clearChannel(mix_ch_t channelIndex);
 
 	// rename channels when moving etc. if they still have their original name
 	void validateChannelName( int index, int oldIndex );

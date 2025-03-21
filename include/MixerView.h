@@ -94,7 +94,7 @@ public:
 	void refreshDisplay();
 
 public slots:
-	int addNewChannel(std::optional<QString> name = std::nullopt);
+	int addNewChannel();
 
 protected:
 	void closeEvent(QCloseEvent* ce) override;
