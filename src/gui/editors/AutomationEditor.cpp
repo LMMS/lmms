@@ -38,6 +38,7 @@
 #include <QToolTip>
 #include <cmath>
 
+#include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleThumbnail.h"
 
@@ -1019,7 +1020,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
-	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
+	m_sampleThumbnail = SampleThumbnail::loadFromCache(PathUtil::qStringToPath(newGhostSample->sample().sampleFile()));
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1223,7 +1224,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				.reversed = sample.reversed()
 			};
 
-			m_sampleThumbnail.visualize(param, p);
+			m_sampleThumbnail->visualize(param, p);
 		}
 
 		// draw ghost notes
