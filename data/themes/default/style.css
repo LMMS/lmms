@@ -492,7 +492,7 @@ lmms--gui--TrackOperationsWidget QPushButton {
 	border: 1 solid #0f1621;
 	border-top: 1 solid #18202b;
 	border-bottom: 1 solid #02060f;
-	border-radius: 4;
+	border-radius: 2;
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 20%), stop:0.1 rgba(255, 255, 255, 2%), stop:0.9 rgba(0, 0, 0, 2%), stop:1 rgba(0, 0, 0, 40%));
 	image: url("resources:gear.svg");
 }
