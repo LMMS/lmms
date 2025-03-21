@@ -34,12 +34,11 @@
 #include <numbers>
 #include <concepts>
 
-#include "lmmsconfig.h"
 #include "lmms_constants.h"
+
 
 namespace lmms
 {
-
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
 {
