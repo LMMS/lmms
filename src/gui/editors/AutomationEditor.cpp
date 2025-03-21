@@ -288,6 +288,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		default:
+			ke->ignore();
 			break;
 	}
 }
