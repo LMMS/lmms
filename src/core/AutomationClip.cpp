@@ -81,14 +81,17 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
-	Clip( _clip_to_copy.m_autoTrack ),
+	Clip(_clip_to_copy),
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
 #endif
 	m_autoTrack( _clip_to_copy.m_autoTrack ),
 	m_objects( _clip_to_copy.m_objects ),
 	m_tension( _clip_to_copy.m_tension ),
-	m_progressionType( _clip_to_copy.m_progressionType )
+	m_progressionType(_clip_to_copy.m_progressionType),
+	m_dragging(false),
+	m_isRecording(_clip_to_copy.m_isRecording),
+	m_lastRecordedValue(0)
 {
 	// Locks the mutex of the copied AutomationClip to make sure it
 	// doesn't change while it's being copied
@@ -225,8 +228,15 @@ TimePos AutomationClip::timeMapLength() const
 
 void AutomationClip::updateLength()
 {
-	// Do not resize down in case user manually extended up
-	changeLength(std::max(length(), timeMapLength()));
+	// Technically it only matters if the clip has been resized from the right, but this
+	// checks if it has been resized from either direction.
+	if (!getHasBeenResized())
+	{
+		// Using 1 bar as the min length for an un-resized clip. 
+		// This does not prevent the user from resizing the clip to be less than a bar later on.
+		changeLength(std::max(TimePos::ticksPerBar(), static_cast<tick_t>(timeMapLength())));
+		setStartTimeOffset(TimePos(0));
+	}
 }
 
 
@@ -583,17 +593,19 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return 0;
 	}
 
+	const TimePos offsetTime = _time - startTimeOffset();
+
 	// If we have a node at that time, just return its value
-	if (m_timeMap.contains(_time))
+	if (m_timeMap.contains(offsetTime))
 	{
 		// When the time is exactly the node's time, we want the inValue
-		return m_timeMap[_time].getInValue();
+		return m_timeMap[offsetTime].getInValue();
 	}
 
 	// lowerBound returns next value with equal or greater key. Since we already
 	// checked if the key contains a node, we know the returned node has a greater
 	// key than _time. Therefore we take the previous element to calculate the current value
-	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
+	timeMap::const_iterator v = m_timeMap.lowerBound(offsetTime);
 
 	if( v == m_timeMap.begin() )
 	{
@@ -605,7 +617,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return OUTVAL(v - 1);
 	}
 
-	return valueAt(v - 1, _time - POS(v - 1));
+	return valueAt(v - 1, offsetTime - POS(v - 1));
 }
 
 
@@ -830,6 +842,8 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
+	_this.setAttribute("off", startTimeOffset());
+	_this.setAttribute("been_resized", QString::number(getHasBeenResized()));
 
 	if (const auto& c = color())
 	{
@@ -880,6 +894,8 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
 	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
+	setHasBeenResized(_this.attribute("been_resized").toInt());
+	setStartTimeOffset(_this.attribute("off").toInt());
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )
