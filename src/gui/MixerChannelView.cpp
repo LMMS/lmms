@@ -197,17 +197,6 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	const auto height = rect().height();
 	auto painter = QPainter{this};
 
-	// HACK If name was updated without rename, such as when a channel
-	// is created for a track, forcefully update the name
-	// TODO When a mixer refactor happens, make it capable of having
-	// the correct name before it has a chance to get painted rather
-	// than setting the correct name after the fact
-	const auto elidedName = elideName(channel->m_name);
-	if (!m_inRename && m_renameLineEdit->text() != elidedName)
-	{
-		m_renameLineEdit->setText(elidedName);
-	}
-
 	if (channel->color().has_value() && !channel->m_muteModel.value())
 	{
 		painter.fillRect(rect(), channel->color()->darker(isActive ? 120 : 150));
