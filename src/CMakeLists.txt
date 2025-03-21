@@ -31,18 +31,6 @@ INCLUDE_DIRECTORIES(
 	"${CMAKE_SOURCE_DIR}/include"
 )
 
-IF(WIN32 AND MSVC)
-	SET(WINRC "${CMAKE_BINARY_DIR}/lmms.rc")
-ELSEIF(WIN32)
-	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
-	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${CMAKE_RC_COMPILER}"
-					"-I\"${CMAKE_SOURCE_DIR}\""
-					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
-					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
-				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
-ENDIF()
-
 INCLUDE(GenQrc)
 ADD_GEN_QRC(LMMS_RCC_OUT lmms.qrc
 	"${CMAKE_SOURCE_DIR}/doc/AUTHORS"
@@ -95,12 +83,20 @@ GENERATE_EXPORT_HEADER(lmmsobjs
 
 ADD_EXECUTABLE(lmms
 	core/main.cpp
-	"${WINRC}"
 )
 TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_static_libraries(lmms PUBLIC lmmsobjs)
+
+# Set icon/info for the lmms.exe file
+if(LMMS_BUILD_WIN32)
+	# branding must occure before lmms.exe is created for lmms.rc
+	if(LMMS_BRANDING_NEEDED)
+		add_branded_target(lmms)
+	endif()
+	target_sources(lmms PRIVATE "${CMAKE_BINARY_DIR}/lmms.rc")
+endif()
 
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
 # See the documentation of DEFINE_SYMBOL for details.
