@@ -376,6 +376,7 @@ void MixerView::updateMixerChannel(int index)
 	}
 
 	thisLine->m_sendButton->updateLightStatus();
+	thisLine->m_renameLineEdit->setText(thisLine->elideName(thisLine->mixerChannel()->m_name));
 	thisLine->update();
 }
 
