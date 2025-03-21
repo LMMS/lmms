@@ -25,8 +25,6 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
-#include <optional>
-
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QStackedLayout>
