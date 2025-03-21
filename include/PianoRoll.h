@@ -479,8 +479,8 @@ private:
 
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
-	int m_strumStartVertical;
-	int m_strumCurrentVertical;
+	int m_strumStartVertical = 0;
+	int m_strumCurrentVertical = 0;
 	float m_strumHeightRatio = 0.0f;
 	bool m_strumEnabled = false;
 	//! Handles updating all of the note positions when performing a strum
