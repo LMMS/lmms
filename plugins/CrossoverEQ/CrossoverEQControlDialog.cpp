@@ -92,20 +92,16 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	makeFader(&controls->m_gain3, tr("Band 3 gain"), 2);
 	makeFader(&controls->m_gain4, tr("Band 4 gain"), 3);
 
-	const auto muteOn = embed::getIconPixmap("mute_active");
-	const auto muteOff = embed::getIconPixmap("mute_inactive");
-
-	const auto makeMuteBtn = [this, bandsLayout, muteOn, muteOff](
+	const auto makeMuteBtn = [this, bandsLayout](
 		BoolModel *model,
 		const QString &label,
 		int column
 	) {
-		auto b = new PixmapButton(this, label);
-		b->setActiveGraphic(muteOff);
-		b->setInactiveGraphic(muteOn);
+		auto b = new AutomatableButton(this, label);
 		b->setCheckable(true);
 		b->setModel(model);
 		b->setToolTip(label);
+		b->setObjectName("btn-mute-inv");
 		bandsLayout->addWidget(b, 1, column, Qt::AlignCenter);
 	};
 
