@@ -200,7 +200,7 @@ namespace lmms::PathUtil
 	QString pathToQString(const std::filesystem::path& path)
 	{
 #ifdef LMMS_BUILD_WIN32
-		return QString::fromStdWString(path.native())
+		return QString::fromStdWString(path.native());
 #else
 		return QString::fromStdString(path.native());
 #endif
