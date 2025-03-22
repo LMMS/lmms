@@ -77,10 +77,10 @@ namespace lmms::PathUtil
 	std::filesystem::path toShortestRelative(const std::filesystem::path& path, bool allowLocal = false);
 	
 	//! Converts a `QString` to a `std::filesystem::path`
-	std::filesystem::path LMMS_EXPORT qStringToPath(const QString& path);
+	std::filesystem::path LMMS_EXPORT fsConvert(const QString& path);
 
 	//! Converts a `std::filesystem::path` to a `QString`
-	QString LMMS_EXPORT pathToQString(const std::filesystem::path& path);
+	QString LMMS_EXPORT fsConvert(const std::filesystem::path& path);
 
 } // namespace lmms::PathUtil
 

@@ -253,7 +253,7 @@ void SlicerTView::paintEvent(QPaintEvent* pe)
 	brush.setPen(QColor(255, 255, 255, 180));
 	brush.setFont(QFont(brush.font().family(), 8, -1, false));
 
-	auto sampleName = PathUtil::pathToQString(m_slicerTParent->getSampleName());
+	auto sampleName = PathUtil::fsConvert(m_slicerTParent->getSampleName());
 	if (sampleName.isEmpty()) { sampleName = "No sample loaded"; }
 
 	brush.drawText(5, boxTopY - s_sampleBoxHeight, width(), s_sampleBoxHeight, Qt::AlignLeft, sampleName);

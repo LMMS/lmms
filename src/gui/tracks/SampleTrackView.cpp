@@ -219,7 +219,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 						).quantize(1.0);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
-		if (sClip) { sClip->setSampleFile(PathUtil::qStringToPath(value)); }
+		if (sClip) { sClip->setSampleFile(PathUtil::fsConvert(value)); }
 	}
 }
 

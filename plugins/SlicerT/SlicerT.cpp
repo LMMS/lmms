@@ -320,7 +320,7 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = SampleLoader::createBufferFromFile(PathUtil::qStringToPath(file))) { m_originalSample = Sample(std::move(buffer)); }
+	if (auto buffer = SampleLoader::createBufferFromFile(PathUtil::fsConvert(file))) { m_originalSample = Sample(std::move(buffer)); }
 
 	findBPM();
 	findSlices();
@@ -336,7 +336,7 @@ void SlicerT::updateSlices()
 void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("version", "1");
-	element.setAttribute("src", PathUtil::pathToQString(m_originalSample.sampleFile()));
+	element.setAttribute("src", PathUtil::fsConvert(m_originalSample.sampleFile()));
 
 	if (m_originalSample.sampleFile().empty())
 	{
@@ -361,7 +361,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = SampleLoader::createBufferFromFile(PathUtil::qStringToPath(srcFile));
+			auto buffer = SampleLoader::createBufferFromFile(PathUtil::fsConvert(srcFile));
 			m_originalSample = Sample(std::move(buffer));
 		}
 		else

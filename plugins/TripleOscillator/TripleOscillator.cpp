@@ -140,7 +140,7 @@ void OscillatorObject::oscUserDefWaveDblClick()
 {
 	// TODO: Move function out of lmms namespace (i.e., Core)
 
-	auto af = PathUtil::qStringToPath(gui::SampleFilePicker::openWaveformFile());
+	auto af = PathUtil::fsConvert(gui::SampleFilePicker::openWaveformFile());
 	if (af.empty()) { return; }
 
 	m_sampleBuffer = SampleLoader::createBufferFromFile(af);
@@ -255,7 +255,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute("userwavefile" + is, PathUtil::pathToQString(m_osc[i]->m_sampleBuffer->audioFile()));
+		_this.setAttribute("userwavefile" + is, PathUtil::fsConvert(m_osc[i]->m_sampleBuffer->audioFile()));
 	}
 }
 
@@ -287,7 +287,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				m_osc[i]->m_sampleBuffer = SampleLoader::createBufferFromFile(PathUtil::qStringToPath(userWaveFile));
+				m_osc[i]->m_sampleBuffer = SampleLoader::createBufferFromFile(PathUtil::fsConvert(userWaveFile));
 				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }

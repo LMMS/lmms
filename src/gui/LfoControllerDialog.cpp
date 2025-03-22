@@ -210,14 +210,14 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	const auto fileName = PathUtil::qStringToPath(SampleFilePicker::openWaveformFile());
+	const auto fileName = PathUtil::fsConvert(SampleFilePicker::openWaveformFile());
 	if (fileName.empty()) { return; }
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
 	buffer = SampleLoader::createBufferFromFile(fileName);
 
-	m_userWaveBtn->setToolTip(PathUtil::pathToQString(buffer->audioFile()));
+	m_userWaveBtn->setToolTip(PathUtil::fsConvert(buffer->audioFile()));
 }
 
 

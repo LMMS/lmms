@@ -194,7 +194,7 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("src", PathUtil::pathToQString(m_sample.sampleFile()));
+	elem.setAttribute("src", PathUtil::fsConvert(m_sample.sampleFile()));
 
 	if (m_sample.sampleFile().empty())
 	{
@@ -310,7 +310,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
 	// is current channel-name equal to previous-filename??
 	if (_rename
-		&& (instrumentTrack()->name() == PathUtil::pathToQString(m_sample.sampleFile())
+		&& (instrumentTrack()->name() == PathUtil::fsConvert(m_sample.sampleFile())
 			|| m_sample.sampleFile().empty()))
 	{
 		// then set it to new one
@@ -318,7 +318,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleLoader::createBufferFromFile(PathUtil::qStringToPath(_audio_file)));
+	m_sample = Sample(SampleLoader::createBufferFromFile(PathUtil::fsConvert(_audio_file)));
 	loopPointChanged();
 	emit sampleUpdated();
 }

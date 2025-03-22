@@ -154,7 +154,7 @@ namespace lmms::PathUtil
 	std::filesystem::path toAbsolute(const std::filesystem::path& input, bool* error)
 	{
 		// TODO: This should be the default overload, not the QString version
-		return qStringToPath(toAbsolute(pathToQString(input), error));
+		return fsConvert(toAbsolute(fsConvert(input), error));
 	}
 
 	QString relativeOrAbsolute(const QString & input, const Base base)
@@ -197,10 +197,10 @@ namespace lmms::PathUtil
 	std::filesystem::path toShortestRelative(const std::filesystem::path& path, bool allowLocal)
 	{
 		// TODO: This should be the default overload, not the QString version
-		return qStringToPath(toShortestRelative(pathToQString(path), allowLocal));
+		return fsConvert(toShortestRelative(fsConvert(path), allowLocal));
 	}
 
-	std::filesystem::path qStringToPath(const QString& path)
+	std::filesystem::path fsConvert(const QString& path)
 	{
 #ifdef LMMS_BUILD_WIN32
 		return toAbsolute(path).toStdWString().c_str();
@@ -209,7 +209,7 @@ namespace lmms::PathUtil
 #endif
 	}
 
-	QString pathToQString(const std::filesystem::path& path)
+	QString fsConvert(const std::filesystem::path& path)
 	{
 #ifdef LMMS_BUILD_WIN32
 		return QString::fromStdWString(path.native());

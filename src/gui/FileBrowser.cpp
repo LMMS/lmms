@@ -757,7 +757,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(PathUtil::qStringToPath(fileName)))
+		if (auto buffer = SampleLoader::createBufferFromFile(PathUtil::fsConvert(fileName)))
 		{
 			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);
@@ -998,7 +998,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 	Engine::audioEngine()->requestChangeInModel();
 	SampleClip* clip = static_cast<SampleClip*>(sampleTrack->createClip(0));
 
-	clip->setSampleFile(PathUtil::qStringToPath(item->fullName()));
+	clip->setSampleFile(PathUtil::fsConvert(item->fullName()));
 	Engine::audioEngine()->doneChangeInModel();
 
 	return true;

@@ -258,7 +258,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute("src", PathUtil::pathToQString(sampleFile()));
+	_this.setAttribute("src", PathUtil::fsConvert(sampleFile()));
 	_this.setAttribute( "off", startTimeOffset() );
 	if( sampleFile() == "" )
 	{
@@ -292,7 +292,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			setSampleFile(PathUtil::qStringToPath(srcFile));
+			setSampleFile(PathUtil::fsConvert(srcFile));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}

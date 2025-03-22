@@ -61,7 +61,7 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 
 void SampleClipView::updateSample()
 {
-	const auto sampleFile = PathUtil::pathToQString(m_clip->m_sample.sampleFile());
+	const auto sampleFile = PathUtil::fsConvert(m_clip->m_sample.sampleFile());
 
 	if (sampleFile.isEmpty())
 	{
@@ -120,7 +120,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 {
 	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
-		m_clip->setSampleFile(PathUtil::qStringToPath(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleFile(PathUtil::fsConvert(StringPairDrag::decodeValue(_de)));
 		_de->accept();
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
@@ -182,7 +182,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	const auto selectedAudioFile = PathUtil::qStringToPath(SampleFilePicker::openAudioFile());
+	const auto selectedAudioFile = PathUtil::fsConvert(SampleFilePicker::openAudioFile());
 
 	if (selectedAudioFile.empty()) { return; }
 	
@@ -286,7 +286,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail->visualize(param, p);
 	}
 
-	const auto sampleFile = PathUtil::pathToQString(m_clip->m_sample.sampleFile());
+	const auto sampleFile = PathUtil::fsConvert(m_clip->m_sample.sampleFile());
 	const auto name = PathUtil::cleanName(sampleFile);
 	paintTextLabel(name, p);
 
