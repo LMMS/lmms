@@ -75,7 +75,7 @@ private:
 	PatternStore* m_ps;
 	TimeLineWidget * m_timeLine;
 	int m_trackHeadWidth;
-	int m_maxSteps;
+	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
 };
 

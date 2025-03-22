@@ -52,7 +52,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
-	m_maxSteps(TimePos::stepsPerBar())
+	m_maxClipLength(TimePos::ticksPerBar())
 {
 	setModel(ps);
 
@@ -201,7 +201,9 @@ void PatternEditor::updatePosition()
 
 void PatternEditor::updatePixelsPerBar()
 {
-	setPixelsPerBar((width() - m_trackHeadWidth) * TimePos::stepsPerBar() / m_maxSteps);
+	setPixelsPerBar(m_maxClipLength != 0
+		? (width() - m_trackHeadWidth) * TimePos::ticksPerBar() / m_maxClipLength
+		: (width() - m_trackHeadWidth));
 	m_timeLine->setPixelsPerBar(pixelsPerBar());
 }
 
@@ -209,13 +211,13 @@ void PatternEditor::updateMaxSteps()
 {
 	const TrackContainer::TrackList& tl = model()->tracks();
 
-	m_maxSteps = 0;
+	m_maxClipLength = 0;
 	for (const auto& track : tl)
 	{
 		if (track->type() == Track::Type::Instrument)
 		{
-			auto p = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
-			m_maxSteps = std::max(m_maxSteps, p->steps());
+			auto mClip = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
+			m_maxClipLength = std::max(m_maxClipLength, static_cast<tick_t>(mClip->length()));
 		}
 	}
 	updatePixelsPerBar();
