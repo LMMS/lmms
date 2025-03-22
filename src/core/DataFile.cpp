@@ -1944,6 +1944,48 @@ void DataFile::upgrade_sampleAndHold()
 }
 
 
+/** \brief The knobs in the envelope/lfo section of instruments were changed to use linear scaling
+ * Previously, the knobs used quadratic scaling relative to the max env/lfo length,
+ * which meant the value stored in the model was essentially meaningless to the user.
+ * Older projects which had their env/lfo knobs stored with their quadratic scaling need to be upgraded to use linear values.
+ */
+void DataFile::upgrade_envelope_lfo_knob_scaling()
+{
+	QDomNodeList elvol = elementsByTagName("elvol");
+	QDomNodeList elcut = elementsByTagName("elcut");
+	QDomNodeList elres = elementsByTagName("elres");
+
+	for (auto nodeList : {elvol, elcut, elres})
+	{
+		for (int i = 0; i < nodeList.length(); ++i)
+		{
+			if (nodeList.item(i).isNull()) { continue; }
+			auto e = nodeList.item(i).toElement();
+			// Envelope knobs
+			for (QString attribute : {"pdel", "att", "hold", "dec", "sustain", "rel"})
+			{
+				float oldValue = e.attribute(attribute, "0").toFloat();
+				// Envelope knobs used to be scaled by 5; multiplying by 0.2 reverses that.
+				float newValue = oldValue > 0.0f
+					? std::sqrt(oldValue * 0.2f)
+					: std::sqrt(-oldValue * 0.2f);
+				e.setAttribute(attribute, newValue);
+			}
+			// LFO knobs
+			for (QString attribute : {"lshp", "lpdel", "latt"})
+			{
+				float oldValue = e.attribute(attribute, "0").toFloat();
+				// LFO knobs were multiplied by 20; multiplying by 0.05 reverses that.
+				float newValue = oldValue > 0.0f
+					? std::sqrt(oldValue * 0.05f)
+					: std::sqrt(-oldValue * 0.05f);
+				e.setAttribute(attribute, newValue);
+			}
+		}
+	}
+}
+
+
 static QMap<QString, QString> buildReplacementMap()
 {
 	static constexpr auto loopBPMs = std::array{
