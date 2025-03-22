@@ -67,6 +67,8 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	m_microtunerNotSupportedLabel = new QLabel(tr("Microtuner is not available for MIDI-based instruments."));
 	m_microtunerNotSupportedLabel->setWordWrap(true);
 	m_microtunerNotSupportedLabel->hide();
+	// HACK This is also how InstrumentSoundShapingView does it
+	m_microtunerNotSupportedLabel->setFixedWidth(242);
 	layout->addWidget(m_microtunerNotSupportedLabel);
 
 	m_microtunerGroupBox = new GroupBox(tr("MICROTUNER"));
