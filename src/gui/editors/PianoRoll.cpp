@@ -4848,18 +4848,18 @@ Note * PianoRoll::noteUnderMouse()
 
 Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 {
-	QPoint pos = mapFromGlobal( QCursor::pos() );
+	QPoint pos = mapFromGlobal(QCursor::pos());
 
 	if (pos.x() <= m_whiteKeyWidth
 		|| pos.x() > width() - SCROLLBAR_SIZE
 		|| pos.y() < PR_TOP_MARGIN
-		|| pos.y() > keyAreaBottom() )
+		|| pos.y() > keyAreaBottom())
 	{
 		return nullptr;
 	}
 
 	// Get the key and time pos of the cursor
-	int key_num = getKey( pos.y() );
+	int key_num = getKey(pos.y());
 	int pos_ticks = (pos.x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
