@@ -203,9 +203,9 @@ namespace lmms::PathUtil
 	std::filesystem::path qStringToPath(const QString& path)
 	{
 #ifdef LMMS_BUILD_WIN32
-		return path.toStdWString().c_str();
+		return toAbsolute(path).toStdWString().c_str();
 #else
-		return path.toStdString().c_str();
+		return toAbsolute(path).toStdString().c_str();
 #endif
 	}
 
