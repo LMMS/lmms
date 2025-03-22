@@ -67,7 +67,13 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	m_microtunerNotSupportedLabel = new QLabel(tr("Microtuner is not available for MIDI-based instruments."));
 	m_microtunerNotSupportedLabel->setWordWrap(true);
 	m_microtunerNotSupportedLabel->hide();
-	// HACK This is also how InstrumentSoundShapingView does it
+	// HACK Gives the label a fixed width, since the overall window
+	// width is determined by the greatest width from among all tabs,
+	// even if the instrument is an InstrumentViewFixedSize. This is
+	// also how InstrumentSoundShapingView does it
+	// (see d447cb0648cff249f0f4c2311ea17217576354e4).
+	// A better solution for both tab views would be to restrict the
+	// maximum width of all tabs to that of the instrument view tab.
 	m_microtunerNotSupportedLabel->setFixedWidth(242);
 	layout->addWidget(m_microtunerNotSupportedLabel);
 
