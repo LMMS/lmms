@@ -151,12 +151,6 @@ namespace lmms::PathUtil
 		return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
 	}
 
-	std::filesystem::path toAbsolute(const std::filesystem::path& input, bool* error)
-	{
-		// TODO: This should be the default overload, not the QString version
-		return fsConvert(toAbsolute(fsConvert(input), error));
-	}
-
 	QString relativeOrAbsolute(const QString & input, const Base base)
 	{
 		if (input.isEmpty()) { return input; }
@@ -192,12 +186,6 @@ namespace lmms::PathUtil
 			}
 		}
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
-	}
-
-	std::filesystem::path toShortestRelative(const std::filesystem::path& path, bool allowLocal)
-	{
-		// TODO: This should be the default overload, not the QString version
-		return fsConvert(toShortestRelative(fsConvert(path), allowLocal));
 	}
 
 	std::filesystem::path fsConvert(const QString& path)
