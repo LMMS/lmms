@@ -34,7 +34,7 @@
 #include "InstrumentView.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
+#include "SampleFilePicker.h"
 #include "SlicerT.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -137,7 +137,7 @@ void SlicerTView::exportMidi()
 
 void SlicerTView::openFiles()
 {
-	const auto audioFile = SampleLoader::openAudioFile();
+	const auto audioFile = SampleFilePicker::openAudioFile();
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);
 }

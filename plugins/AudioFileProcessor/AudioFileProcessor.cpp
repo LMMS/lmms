@@ -226,7 +226,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(sampleData));
+		m_sample = Sample(SampleLoader::createBufferFromBase64(sampleData));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -318,7 +318,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
+	m_sample = Sample(SampleLoader::createBufferFromFile(PathUtil::qStringToPath(_audio_file)));
 	loopPointChanged();
 	emit sampleUpdated();
 }

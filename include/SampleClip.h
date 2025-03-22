@@ -82,7 +82,7 @@ public:
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
 public slots:
-	void setSampleFile(const QString& sf);
+	void setSampleFile(const std::filesystem::path& sf);
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();

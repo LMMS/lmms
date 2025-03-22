@@ -28,6 +28,7 @@
 #include <QMenu>
 
 #include "ConfigManager.h"
+#include "PathUtil.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
@@ -218,7 +219,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 						).quantize(1.0);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
-		if (sClip) { sClip->setSampleFile(value); }
+		if (sClip) { sClip->setSampleFile(PathUtil::qStringToPath(value)); }
 	}
 }
 
