@@ -108,7 +108,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_decayKnob = buildKnob(tr("DEC"), tr("Decay:"));
 	envKnobsLayout->addWidget(m_decayKnob);
 
-	m_sustainKnob = buildKnob(tr("SUST"), tr("Sustain:"));
+	m_sustainKnob = new Knob(KnobType::Bright26, this);
+	m_sustainKnob->setLabel(tr("SUST"));
+	m_sustainKnob->setHintText(tr("Sustain:"), "");
 	envKnobsLayout->addWidget(m_sustainKnob);
 
 	m_releaseKnob = buildKnob(tr("REL"), tr("Release:"));

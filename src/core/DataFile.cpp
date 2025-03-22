@@ -1962,25 +1962,36 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 			if (nodeList.item(i).isNull()) { continue; }
 			auto e = nodeList.item(i).toElement();
 			// Envelope knobs
-			for (QString attribute : {"pdel", "att", "hold", "dec", "sustain", "rel"})
+			for (QString attribute : {"pdel", "att", "hold", "rel"})
 			{
 				float oldValue = e.attribute(attribute, "0").toFloat();
-				// Envelope knobs used to be scaled by 5; multiplying by 0.2 reverses that.
+				// Envelope knobs used to be multiplied by 5
 				float newValue = oldValue > 0.0f
-					? std::sqrt(oldValue * 0.2f)
-					: std::sqrt(-oldValue * 0.2f);
+				? oldValue * oldValue * 5.0f
+				: -oldValue * oldValue * 5.0f;
 				e.setAttribute(attribute, newValue);
 			}
+			// The decay knob was multiplied by 1-sustain before being squared, and then multiplied by 5.
+			// To revert it, first multiply by (1 - sustain), square it while keeping the sign, then multiply by 5, then divide by (1 - sustain).
+			// But the (1 - sustain) will cancel out, so it only has to be multiplied once.
+			float oldDecay = e.attribute("dec", "0").toFloat();
+			float sustain = e.attribute("sustain", "0").toFloat();
+			float newDecay = oldDecay > 0.0f
+				? oldDecay * (1.0f - sustain) * oldDecay * 5
+				: -oldDecay * (1.0f - sustain) * oldDecay * 5;
+			e.setAttribute("dec", newDecay);
 			// LFO knobs
 			for (QString attribute : {"lshp", "lpdel", "latt"})
 			{
 				float oldValue = e.attribute(attribute, "0").toFloat();
-				// LFO knobs were multiplied by 20; multiplying by 0.05 reverses that.
+				// LFO knobs were multiplied by 20
 				float newValue = oldValue > 0.0f
-					? std::sqrt(oldValue * 0.05f)
-					: std::sqrt(-oldValue * 0.05f);
+					? oldValue * oldValue * 20.0f
+					: -oldValue * oldValue * 20.0f;
 				e.setAttribute(attribute, newValue);
 			}
+			// The LFO speed knob was not squared, but was multiplied by 20
+			e.setAttribute("lspd", e.attribute("lspd", "0").toFloat() * 20.0f);
 		}
 	}
 }

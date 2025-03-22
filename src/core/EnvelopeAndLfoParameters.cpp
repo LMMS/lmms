@@ -97,7 +97,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_attackModel(0.f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env attack")),
 	m_holdModel(0.5f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env hold")),
 	m_decayModel(0.5f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env decay")),
-	m_sustainModel(0.5f, 0.f, 10.f, 0.001f, 10000.f, this, tr("Env sustain")),
+	m_sustainModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Env sustain")),
 	m_releaseModel(0.1f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env release")),
 	m_amountModel(0.f, -1.f, 1.f, 0.005f, this, tr("Env mod amount")),
 	m_valueForZeroAmount( _value_for_zero_amount ),

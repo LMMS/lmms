@@ -166,7 +166,7 @@ private:
 	TempoSyncKnobModel m_attackModel;
 	TempoSyncKnobModel m_holdModel;
 	TempoSyncKnobModel m_decayModel;
-	TempoSyncKnobModel m_sustainModel;
+	FloatModel m_sustainModel;
 	TempoSyncKnobModel m_releaseModel;
 	FloatModel m_amountModel;
 
