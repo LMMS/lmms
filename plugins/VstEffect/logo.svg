@@ -1,46 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="48"
-   height="48"
-   viewBox="0 0 48 48"
-   version="1.1"
-   id="svg1"
-   xml:space="preserve"
-   sodipodi:docname="logo.svg"
-   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"><sodipodi:namedview
-     id="namedview1"
-     pagecolor="#505050"
-     bordercolor="#eeeeee"
-     borderopacity="1"
-     inkscape:showpageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#505050"
-     inkscape:zoom="8.0520833"
-     inkscape:cx="42.846054"
-     inkscape:cy="16.952135"
-     inkscape:window-width="1920"
-     inkscape:window-height="991"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg1" /><defs
-     id="defs1" /><metadata
-     id="metadata34"><rdf:RDF><cc:Work
-         rdf:about=""><cc:license
-           rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" /></cc:Work><cc:License
-         rdf:about="http://creativecommons.org/publicdomain/zero/1.0/"><cc:permits
-           rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
-           rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
-           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><path
-     id="rect24"
-     style="display:inline;opacity:1;mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke-width:0"
-     d="M 4.009766,0 C 1.787882,0 0,1.787881 0,4.009765 V 43.990234 C 0,46.212118 1.787882,48 4.009766,48 h 39.980468 c 2.221884,0 4.009764,-1.787882 4.009764,-4.009766 V 4.009765 C 47.999998,1.787881 46.212118,0 43.990234,0 Z m 5.978515,16.003906 h 16.019532 v 3.992188 h -6.003907 v 8.015625 h 6.003907 V 32 H 10 L 1.996094,23.996094 Z m 18.019532,0 h 9.996093 L 45.996094,23.996094 37.992187,32 H 28.007813 V 26.007813 H 22 v -4 h 6.007813 z" /></svg>
+<svg version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<path d="m4.0098 0c-2.2219 0-4.0098 1.7879-4.0098 4.0098v39.98c0 2.2219 1.7879 4.0098 4.0098 4.0098h39.98c2.2219 0 4.0098-1.7879 4.0098-4.0098v-39.98c0-2.2219-1.7879-4.0098-4.0098-4.0098zm5.9785 16.004h16.02v3.9922h-6.0039v8.0156h6.0039v3.9883h-16.008l-8.0039-8.0039zm18.02 0h9.9961l7.9922 7.9922-8.0039 8.0039h-9.9844v-5.9922h-6.0078v-4h6.0078z" fill="#fff" stroke-width="0" style="mix-blend-mode:normal"/>
+</svg>
