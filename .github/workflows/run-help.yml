@@ -19,6 +19,8 @@ jobs:
     name: help-linux-${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runner }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Extract artifact
         uses: ./.github/actions/extract-artifact
         with:
@@ -40,6 +42,8 @@ jobs:
     name: help-macos-${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runner }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Extract artifact
         uses: ./.github/actions/extract-artifact
         with:
