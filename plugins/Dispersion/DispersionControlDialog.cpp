@@ -24,12 +24,14 @@
 
 
 #include "DispersionControlDialog.h"
+#include <QBoxLayout>
+#include <qnamespace.h>
+#include "AutomatableButton.h"
 #include "DispersionControls.h"
 
 #include "embed.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "PixmapButton.h"
 
 #include <QHBoxLayout>
 
@@ -64,6 +66,7 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	Knob * feedbackKnob = new Knob(KnobType::Bright26, tr("FEED"), this);
 	feedbackKnob->setModel(&controls->m_feedbackModel);
 	feedbackKnob->setHintText(tr("Feedback:") , "");
+	topRow->addWidget(feedbackKnob);
 	
 	PixmapButton * dcButton = new PixmapButton(this, tr("DC Offset Removal"));
 	dcButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("dc_active"));
