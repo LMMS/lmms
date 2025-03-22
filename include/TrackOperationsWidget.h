@@ -70,8 +70,8 @@ private:
 
 	TrackGrip* m_trackGrip;
 	QPushButton * m_trackOps;
-	AutomatableButton *m_muteBtn;
-	AutomatableButton *m_soloBtn;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 
 
 	friend class TrackView;

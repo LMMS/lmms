@@ -91,8 +91,8 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	AutomatableButton *m_muteBtn;
-	AutomatableButton *m_soloBtn;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;

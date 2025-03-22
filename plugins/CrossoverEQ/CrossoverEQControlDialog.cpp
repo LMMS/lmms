@@ -56,9 +56,9 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	layout->addLayout(knobsLayout);
 
 	const auto makeKnob = [this, knobsLayout](
-		FloatModel *model,
-		const QString &label,
-		const QString &txt_before
+		FloatModel* model,
+		const QString& label,
+		const QString& txt_before
 	) {
 		auto k = new Knob(KnobType::Bright26, this);
 		k->setModel(model);
@@ -76,8 +76,8 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	layout->addLayout(bandsLayout);
 
 	const auto makeFader = [this, bandsLayout](
-		FloatModel *model,
-		const QString &label,
+		FloatModel* model,
+		const QString& label,
 		int column
 	) {
 		auto f = new Fader(model, label, this, false);
@@ -93,8 +93,8 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	makeFader(&controls->m_gain4, tr("Band 4 gain"), 3);
 
 	const auto makeMuteBtn = [this, bandsLayout](
-		BoolModel *model,
-		const QString &label,
+		BoolModel* model,
+		const QString& label,
 		int column
 	) {
 		auto b = new AutomatableButton(this, label);
