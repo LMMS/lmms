@@ -1,0 +1,37 @@
+name: Extract Artifact
+description: Waits for build, downloads and extracts the artifact
+inputs:
+  check-name:
+    description: "Check name to wait for"
+    required: true
+  artifact-name:
+    description: "Name of the artifact to download"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Wait for build
+      uses: lewagon/wait-on-check-action@v1.3.4
+      with:
+        ref: ${{ github.event.pull_request.head.sha || github.sha }}
+        check-name: ${{ inputs.check-name }}
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        wait-interval: 30
+
+    - name: Download workflow artifact
+      uses: dawidd6/action-download-artifact@v6
+      with:
+        workflow: build.yml
+        name: ${{ inputs.artifact-name }}
+
+    - name: Extract artifact (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        chmod +x lmms-*.AppImage
+        ./lmms-*.AppImage --appimage-extract
+
+    - name: Mount DMG (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
+        cp -R ~/tmpvolume/LMMS.app /tmp/
