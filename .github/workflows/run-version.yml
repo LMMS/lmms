@@ -53,7 +53,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Display version
         run: |
-          /tmp/LMMS.app/Contents/MacOS/lmms --version | grep "Usage: lmms"
+          /tmp/LMMS.app/Contents/MacOS/lmms --version | grep "Copyright (c) .* LMMS Developers"
 
 # Windows (does not work due to actions/extract-artifact issues)
 #     - name: Display version
