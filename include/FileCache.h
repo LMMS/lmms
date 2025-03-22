@@ -75,7 +75,15 @@ private:
 		}
 	};
 
-	std::unordered_map<std::filesystem::path, Entry> m_cache;
+	struct Hash
+	{
+		std::size_t operator()(const std::filesystem::path& path) const
+		{
+			return std::filesystem::hash_value(path);
+		}
+	};
+
+	std::unordered_map<std::filesystem::path, Entry, Hash> m_cache;
     inline static int s_nextAge = 0;
 	static constexpr auto Capacity = 32;
 };
