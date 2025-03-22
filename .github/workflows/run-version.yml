@@ -1,11 +1,11 @@
 ---
-name: run-help
+name: run-version
 'on': [push, pull_request]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  help-linux:
+  version-linux:
     strategy:
       fail-fast: false
       matrix:
@@ -16,7 +16,7 @@ jobs:
           - arch: 'arm64'
             runner: 'ubuntu-24.04-arm'
             suffix: '-arm64'
-    name: help-linux-${{ matrix.config.arch }}
+    name: version-linux-${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runner }}
     steps:
       - name: Checkout repository
@@ -27,11 +27,11 @@ jobs:
           check-name: linux-${{ matrix.config.arch }}
           artifact-name: linux${{ matrix.config.suffix }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Display help
+      - name: Display version
         run: |
           cd squashfs-root/
-          ./AppRun --help | grep "Usage: lmms"
-  help-macos:
+          ./AppRun --version | grep "Copyright (c) .* LMMS Developers"
+  version-macos:
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +40,7 @@ jobs:
             runner: 'macos-latest'
           - arch: 'arm64'
             runner: 'macos-latest'
-    name: help-macos-${{ matrix.config.arch }}
+    name: version-macos-${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runner }}
     steps:
       - name: Checkout repository
@@ -51,13 +51,13 @@ jobs:
           check-name: macos-${{ matrix.config.arch }}
           artifact-name: macos-${{ matrix.config.arch }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Display help
+      - name: Display version
         run: |
-          /tmp/LMMS.app/Contents/MacOS/lmms --help | grep "Usage: lmms"
+          /tmp/LMMS.app/Contents/MacOS/lmms --version | grep "Usage: lmms"
 
 # Windows (does not work due to actions/extract-artifact issues)
-#     - name: Display help
+#     - name: Display version
 #       run: >
-#         $result = & "${env:ProgramFiles${{ matrix.config.programfiles-suffix }}}/LMMS/lmms.exe" "--help" |
-#         Select-String "Usage: lmms";
+#         $result = & "${env:ProgramFiles${{ matrix.config.programfiles-suffix }}}/LMMS/lmms.exe" "--version" |
+#         Select-String -Pattern "Copyright \(c\) .* LMMS Developers";
 #         if($result.Matches.Count -eq 0) { exit 1 }

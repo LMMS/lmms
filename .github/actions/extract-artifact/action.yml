@@ -40,3 +40,8 @@ runs:
       run: |
         hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
         cp -R ~/tmpvolume/LMMS.app /tmp/
+
+    # Windows: Not working because (1) #7732 and (2) the unzip failed
+    #- name: Unpack installer (Windows)
+    #  if: runner.os == 'Windows'
+    #  run: Start-Process @(gci build/lmms-*.exe)[0] -ArgumentList /S -Wait
