@@ -26,6 +26,7 @@ jobs:
         with:
           check-name: linux-${{ matrix.config.arch }}
           artifact-name: linux${{ matrix.config.suffix }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Display help
         run: |
           cd squashfs-root/
@@ -49,6 +50,7 @@ jobs:
         with:
           check-name: macos-${{ matrix.config.arch }}
           artifact-name: macos-${{ matrix.config.arch }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Display help
         run: |
           /tmp/LMMS.app/Contents/MacOS/lmms --help | grep "Usage: lmms"

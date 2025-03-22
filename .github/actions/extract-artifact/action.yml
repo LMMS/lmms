@@ -7,6 +7,9 @@ inputs:
   artifact-name:
     description: "Name of the artifact to download"
     required: true
+  github-token:
+    description: "GitHub token for authentication"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -15,7 +18,7 @@ runs:
       with:
         ref: ${{ github.event.pull_request.head.sha || github.sha }}
         check-name: ${{ inputs.check-name }}
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token: ${{ inputs.github-token }}
         wait-interval: 30
 
     - name: Download workflow artifact
@@ -26,12 +29,14 @@ runs:
 
     - name: Extract artifact (Linux)
       if: runner.os == 'Linux'
+      shell: bash
       run: |
         chmod +x lmms-*.AppImage
         ./lmms-*.AppImage --appimage-extract
 
     - name: Mount DMG (macOS)
       if: runner.os == 'macOS'
+      shell: bash
       run: |
         hdiutil attach lmms-*.dmg -mountpoint ~/tmpvolume
         cp -R ~/tmpvolume/LMMS.app /tmp/
