@@ -64,7 +64,7 @@ auto decodeSampleSF(const std::filesystem::path& audioFile) -> std::optional<Sam
 	auto sfInfo = SF_INFO{};
 
 #ifdef LMMS_BUILD_WIN32
-	const auto sndFile = sf_wchar_open(audioFile.c_str(), SFM_READ, &sfinfo);
+	const auto sndFile = sf_wchar_open(audioFile.c_str(), SFM_READ, &sfInfo);
 #else
 	const auto sndFile = sf_open(audioFile.c_str(), SFM_READ, &sfInfo);
 #endif
