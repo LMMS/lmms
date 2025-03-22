@@ -171,6 +171,8 @@ public:
 		return m_audioDev;
 	}
 
+	bool captureDeviceAvailable() const;
+
 
 	// audio-bus-handle-stuff
 	inline void addAudioBusHandle(AudioBusHandle* busHandle)
@@ -352,6 +354,11 @@ private:
 
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
+
+	const AudioDevice* audioDev() const
+	{
+		return m_audioDev;
+	}
 
 	void renderStageNoteSetup();
 	void renderStageInstruments();
