@@ -60,21 +60,19 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 
 void SampleClipView::updateSample()
 {
-	update();
+	const auto sampleFile = PathUtil::pathToQString(m_clip->m_sample.sampleFile());
 
-	m_sampleThumbnail = SampleThumbnail::loadFromCache(PathUtil::qStringToPath(m_clip->m_sample.sampleFile()));
-
-	// set tooltip to filename so that user can see what sample this
-	// sample-clip contains
-	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
-			: tr("Double-click to open sample")
-	);
+	if (sampleFile.isEmpty())
+	{
+		setToolTip(tr("Double-click to open sample"));
+	}
+	else
+	{
+		update();
+		m_sampleThumbnail = SampleThumbnail::loadFromCache(m_clip->m_sample.sampleFile());
+		setToolTip(PathUtil::toAbsolute(sampleFile));
+	}
 }
-
-
-
 
 void SampleClipView::constructContextMenu(QMenu* cm)
 {
@@ -187,7 +185,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
-	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
+	if (m_clip->hasSampleFileLoaded(PathUtil::qStringToPath(selectedAudioFile)))
 	{
 		m_clip->changeLengthToSampleLength();
 	}
@@ -287,7 +285,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail->visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	const auto sampleFile = PathUtil::pathToQString(m_clip->m_sample.sampleFile());
+	const auto name = PathUtil::cleanName(sampleFile);
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

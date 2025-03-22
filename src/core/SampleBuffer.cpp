@@ -36,9 +36,10 @@ SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sample
 {
 }
 
-SampleBuffer::SampleBuffer(const QString& audioFile)
+SampleBuffer::SampleBuffer(const std::filesystem::path& audioFile)
 {
-	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
+	if (audioFile.empty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
+	
 	const auto absolutePath = PathUtil::toAbsolute(audioFile);
 
 	if (auto decodedResult = SampleDecoder::decode(absolutePath))
@@ -52,10 +53,6 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 
 	throw std::runtime_error{
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
-}
-
-SampleBuffer::SampleBuffer(const std::filesystem::path& audioFile) : SampleBuffer(PathUtil::pathToQString(audioFile))
-{
 }
 
 SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
@@ -99,11 +96,6 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 auto SampleBuffer::loadFromCache(const std::filesystem::path& path) -> std::shared_ptr<const SampleBuffer>
 {
 	return m_fileCache.get(path);
-}
-
-auto SampleBuffer::loadFromCache(const QString& path) -> std::shared_ptr<const SampleBuffer>
-{
-	return m_fileCache.get(PathUtil::qStringToPath(path));
 }
 
 } // namespace lmms

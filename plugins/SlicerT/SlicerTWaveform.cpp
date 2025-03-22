@@ -117,7 +117,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	m_sampleThumbnail = SampleThumbnail::loadFromCache(PathUtil::qStringToPath(sample.sampleFile()));
+	m_sampleThumbnail = SampleThumbnail::loadFromCache(sample.sampleFile());
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_seekerWaveform.rect(),
@@ -185,7 +185,7 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	m_sampleThumbnail = SampleThumbnail::loadFromCache(PathUtil::qStringToPath(sample.sampleFile()));
+	m_sampleThumbnail = SampleThumbnail::loadFromCache(sample.sampleFile());
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),

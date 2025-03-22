@@ -63,8 +63,8 @@ private slots:
 		QString empty = QString("");
 		QCOMPARE(PathUtil::stripPrefix(""), empty);
 		QCOMPARE(PathUtil::cleanName(""), empty);
-		QCOMPARE(PathUtil::toAbsolute(""), empty);
-		QCOMPARE(PathUtil::toShortestRelative(""), empty);
+		QCOMPARE(PathUtil::toAbsolute(QString{""}), empty);
+		QCOMPARE(PathUtil::toShortestRelative(QString{""}), empty);
 	}
 };
 

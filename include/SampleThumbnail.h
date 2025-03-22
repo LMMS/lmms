@@ -69,10 +69,10 @@ public:
 	};
 
 	SampleThumbnail() = default;
-	SampleThumbnail(const std::filesystem::path& path);
+	SampleThumbnail(const std::filesystem::path& audioFile);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
 
-	static auto loadFromCache(const std::filesystem::path& path) -> std::shared_ptr<const SampleThumbnail>;
+	static auto loadFromCache(const std::filesystem::path& audioFile) -> std::shared_ptr<const SampleThumbnail>;
 
 private:
 	class Thumbnail

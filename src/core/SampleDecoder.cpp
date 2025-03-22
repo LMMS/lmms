@@ -27,6 +27,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QString>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <sndfile.h>
 
@@ -43,12 +45,12 @@ namespace lmms {
 
 namespace {
 
-using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&);
+using Decoder = std::optional<SampleDecoder::Result> (*)(const std::filesystem::path&);
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleSF(const std::filesystem::path& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleDS(const std::filesystem::path& audioFile) -> std::optional<SampleDecoder::Result>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleOggVorbis(const std::filesystem::path& audioFile) -> std::optional<SampleDecoder::Result>;
 #endif
 
 static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
@@ -57,23 +59,22 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 #endif
 	&decodeSampleDS};
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleSF(const std::filesystem::path& audioFile) -> std::optional<SampleDecoder::Result>
 {
-	SNDFILE* sndFile = nullptr;
 	auto sfInfo = SF_INFO{};
 
-	// TODO: Remove use of QFile
-	auto file = QFile{audioFile};
-	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
+#ifdef LMMS_BUILD_WIN32
+	const auto sndFile = sf_wchar_open(audioFile.c_str(), SFM_READ, &sfinfo);
+#else
+	const auto sndFile = sf_open(audioFile.c_str(), SFM_READ, &sfInfo);
+#endif
 
-	sndFile = sf_open_fd(file.handle(), SFM_READ, &sfInfo, false);
 	if (sf_error(sndFile) != 0) { return std::nullopt; }
 
 	auto buf = std::vector<sample_t>(sfInfo.channels * sfInfo.frames);
 	sf_read_float(sndFile, buf.data(), buf.size());
 
 	sf_close(sndFile);
-	file.close();
 
 	auto result = std::vector<SampleFrame>(sfInfo.frames);
 	for (int i = 0; i < static_cast<int>(result.size()); ++i)
@@ -95,7 +96,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
 }
 
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleDS(const std::filesystem::path& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
@@ -114,41 +115,44 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleOggVorbis(const std::filesystem::path& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	static auto s_read = [](void* buffer, size_t size, size_t count, void* stream) -> size_t {
-		auto file = static_cast<QFile*>(stream);
-		return file->read(static_cast<char*>(buffer), size * count);
+		auto file = static_cast<std::ifstream*>(stream);
+		file->read(static_cast<char*>(buffer), size * count);
+		return file->gcount();
 	};
 
 	static auto s_seek = [](void* stream, ogg_int64_t offset, int whence) -> int {
-		auto file = static_cast<QFile*>(stream);
-		if (whence == SEEK_SET) { file->seek(offset); }
-		else if (whence == SEEK_CUR) { file->seek(file->pos() + offset); }
-		else if (whence == SEEK_END) { file->seek(file->size() + offset); }
+		auto file = static_cast<std::ifstream*>(stream);
+		if (whence == SEEK_SET) { file->seekg(offset); }
+		else if (whence == SEEK_CUR) { file->seekg(offset, std::ios_base::cur); }
+		else if (whence == SEEK_END) { file->seekg(offset, std::ios_base::end); }
 		else { return -1; }
 		return 0;
 	};
 
 	static auto s_close = [](void* stream) -> int {
-		auto file = static_cast<QFile*>(stream);
+		auto file = static_cast<std::ifstream*>(stream);
 		file->close();
 		return 0;
 	};
 
 	static auto s_tell = [](void* stream) -> long {
-		auto file = static_cast<QFile*>(stream);
-		return file->pos();
+		auto file = static_cast<std::ifstream*>(stream);
+		return file->tellg();
 	};
 
 	static ov_callbacks s_callbacks = {s_read, s_seek, s_close, s_tell};
 
-	// TODO: Remove use of QFile
-	auto file = QFile{audioFile};
-	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
 
+	auto fileStream = std::ifstream{audioFile};
 	auto vorbisFile = OggVorbis_File{};
-	if (ov_open_callbacks(&file, &vorbisFile, nullptr, 0, s_callbacks) < 0) { return std::nullopt; }
+
+	if (!fileStream.is_open() || ov_open_callbacks(&fileStream, &vorbisFile, nullptr, 0, s_callbacks) < 0)
+	{
+		return std::nullopt;
+	}
 
 	const auto vorbisInfo = ov_info(&vorbisFile, -1);
 	if (vorbisInfo == nullptr) { return std::nullopt; }
@@ -221,7 +225,7 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 	return s_audioTypes;
 }
 
-auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
+auto SampleDecoder::decode(const std::filesystem::path& audioFile) -> std::optional<Result>
 {
 	auto result = std::optional<Result>{};
 	for (const auto& decoder : decoders)

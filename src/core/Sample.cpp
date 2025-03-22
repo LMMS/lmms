@@ -30,7 +30,7 @@
 
 namespace lmms {
 
-Sample::Sample(const QString& audioFile)
+Sample::Sample(const std::filesystem::path& audioFile)
 	: m_buffer(SampleBuffer::loadFromCache(audioFile))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -78,7 +78,7 @@ Sample::Sample(const Sample& other)
 {
 }
 
-Sample::Sample(Sample&& other)
+Sample::Sample(Sample&& other) noexcept
 	: m_buffer(std::move(other.m_buffer))
 	, m_startFrame(other.startFrame())
 	, m_endFrame(other.endFrame())

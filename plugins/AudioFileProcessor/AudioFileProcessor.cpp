@@ -194,11 +194,13 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("src", m_sample.sampleFile());
-	if (m_sample.sampleFile().isEmpty())
+	elem.setAttribute("src", PathUtil::pathToQString(m_sample.sampleFile()));
+
+	if (m_sample.sampleFile().empty())
 	{
 		elem.setAttribute("sampledata", m_sample.toBase64());
 	}
+
 	m_reverseModel.saveSettings(doc, elem, "reversed");
 	m_loopModel.saveSettings(doc, elem, "looped");
 	m_ampModel.saveSettings(doc, elem, "amp");
@@ -307,10 +309,9 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
 	// is current channel-name equal to previous-filename??
-	if( _rename &&
-		( instrumentTrack()->name() ==
-			QFileInfo(m_sample.sampleFile()).fileName() ||
-				m_sample.sampleFile().isEmpty()))
+	if (_rename
+		&& (instrumentTrack()->name() == PathUtil::pathToQString(m_sample.sampleFile())
+			|| m_sample.sampleFile().empty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );

@@ -336,8 +336,9 @@ void SlicerT::updateSlices()
 void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("version", "1");
-	element.setAttribute("src", m_originalSample.sampleFile());
-	if (m_originalSample.sampleFile().isEmpty())
+	element.setAttribute("src", PathUtil::pathToQString(m_originalSample.sampleFile()));
+
+	if (m_originalSample.sampleFile().empty())
 	{
 		element.setAttribute("sampledata", m_originalSample.toBase64());
 	}

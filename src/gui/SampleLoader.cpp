@@ -94,7 +94,8 @@ std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QSt
 
 	try
 	{
-		return SampleBuffer::loadFromCache(filePath);
+		// TODO: Remove use of Qt
+		return SampleBuffer::loadFromCache(PathUtil::qStringToPath(filePath));
 	}
 	catch (const std::runtime_error& error)
 	{

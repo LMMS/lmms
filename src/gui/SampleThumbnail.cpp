@@ -130,9 +130,9 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	painter.restore();
 }
 
-auto SampleThumbnail::loadFromCache(const std::filesystem::path& path) -> std::shared_ptr<const SampleThumbnail>
+auto SampleThumbnail::loadFromCache(const std::filesystem::path& audioFile) -> std::shared_ptr<const SampleThumbnail>
 {
-	return s_fileCache.get(path);
+	return s_fileCache.get(audioFile);
 }
 
 } // namespace lmms

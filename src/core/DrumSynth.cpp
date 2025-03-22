@@ -29,6 +29,7 @@
 #include <cmath>
 #include <cstring>
 #include <sstream>
+#include <fstream>
 
 #include "lmms_math.h"
 
@@ -123,7 +124,7 @@ void DrumSynth::UpdateEnv(int e, long t)
 	envData[e][PNT] = envData[e][PNT] + 1.0f;
 }
 
-void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini)
+void DrumSynth::GetEnv(int env, const char* sec, const char* key, const std::filesystem::path& ini)
 {
 	char en[256], s[8];
 	int i = 0, o = 0, ep = 0;
@@ -186,20 +187,20 @@ float DrumSynth::waveform(float ph, int form)
 }
 
 int DrumSynth::GetPrivateProfileString(
-	const char* sec, const char* key, const char* def, char* buffer, int size, QString file)
+	const char* sec, const char* key, const char* def, char* buffer, int size, const std::filesystem::path& file)
 {
-	stringstream is;
+	std::stringstream is;
 	bool inSection = false;
 	int len = 0;
 
 	char* line = static_cast<char*>(malloc(200));
 
-	// Use QFile to handle unicode file name on Windows
-	// Previously we used ifstream directly
-	QFile f(file);
-	f.open(QIODevice::ReadOnly);
-	QByteArray dat = f.readAll().constData();
-	is.str(string(dat.constData(), dat.size()));
+	auto fstream = std::ifstream{file, std::ios::binary};
+	const auto fsize = std::filesystem::file_size(file);
+
+	auto dat = std::vector<char>(fsize);
+	fstream.read(dat.data(), fsize);
+	is.str(std::string(dat.data(), dat.size()));
 
 	while (is.good())
 	{
@@ -266,7 +267,7 @@ int DrumSynth::GetPrivateProfileString(
 	return len;
 }
 
-int DrumSynth::GetPrivateProfileInt(const char* sec, const char* key, int def, QString file)
+int DrumSynth::GetPrivateProfileInt(const char* sec, const char* key, int def, const std::filesystem::path& file)
 {
 	char tmp[16];
 	int i = 0;
@@ -281,7 +282,7 @@ int DrumSynth::GetPrivateProfileInt(const char* sec, const char* key, int def, Q
 	return i;
 }
 
-float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float def, QString file)
+float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float def, const std::filesystem::path& file)
 {
 	char tmp[16];
 	float f = 0.f;
@@ -301,7 +302,7 @@ float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float 
 //  an associative array or something once we have a datastructure to load in to.
 //  llama
 
-int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sample_rate_t Fs)
+int DrumSynth::GetDSFileSamples(const std::filesystem::path& dsfile, int16_t*& wave, int channels, sample_rate_t Fs)
 {
 	using namespace std::numbers;
 	// input file
