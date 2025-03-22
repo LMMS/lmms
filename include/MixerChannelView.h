@@ -115,8 +115,8 @@ private:
 	QLineEdit* m_renameLineEdit;
 	QGraphicsView* m_renameLineEditView;
 	QLabel* m_sendArrow;
-	AutomatableButton *m_muteButton;
-	AutomatableButton *m_soloButton;
+	AutomatableButton* m_muteButton;
+	AutomatableButton* m_soloButton;
 	PeakIndicator* m_peakIndicator = nullptr;
 	Fader* m_fader;
 	EffectRackView* m_effectRackView;
