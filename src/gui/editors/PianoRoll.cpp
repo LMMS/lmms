@@ -1492,6 +1492,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			}
 			break;
 		default:
+			ke->ignore();
 			break;
 	}
 
