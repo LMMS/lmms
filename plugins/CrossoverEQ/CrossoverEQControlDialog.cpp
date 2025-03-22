@@ -25,91 +25,95 @@
  */
  
 
-#include "CrossoverEQControlDialog.h"
-#include "CrossoverEQControls.h"
-#include "embed.h"
-#include "LedCheckBox.h"
-#include "Knob.h"
-#include "Fader.h"
-
-#include <QPixmap>
-
-
-namespace lmms::gui
-{
-
-
-CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls) :
-	EffectControlDialog(controls)
-{
-	setAutoFillBackground(true);
-	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
-	setPalette(pal);
-	setFixedSize(167, 218);
-	auto layout = new QVBoxLayout(this);
-
-	auto knobsLayout = new QHBoxLayout();
-	layout->addLayout(knobsLayout);
-
-	const auto makeKnob = [this, knobsLayout](
-		FloatModel *model,
-		const QString &label,
-		const QString &txt_before
-	) {
-		auto k = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, label, this);
-		k->setModel(model);
-		k->setHintText(txt_before, "Hz");
-		knobsLayout->addWidget(k, 0, Qt::AlignHCenter);
-	};
-
-	makeKnob(&controls->m_xover12, "1/2", tr("Band 1/2 crossover"));
-	makeKnob(&controls->m_xover23, "2/3", tr("Band 2/3 crossover"));
-	makeKnob(&controls->m_xover34, "3/4", tr("Band 3/4 crossover"));
-	
-	auto bandsLayout = new QGridLayout();
-	bandsLayout->setContentsMargins(4, 10, 4, 5);
-	layout->addLayout(bandsLayout);
-
-	const auto makeFader = [this, bandsLayout](
-		FloatModel *model,
-		const QString &label,
-		int column
-	) {
-		auto f = new Fader(model, label, this, false);
-		f->setHintText(label, "dBFS");
-		f->setDisplayConversion(false);
-		f->setRenderUnityLine(false);
-		bandsLayout->addWidget(f, 0, column, Qt::AlignHCenter);
-	};
-
-	makeFader(&controls->m_gain1, tr("Band 1 gain"), 0);
-	makeFader(&controls->m_gain2, tr("Band 2 gain"), 1);
-	makeFader(&controls->m_gain3, tr("Band 3 gain"), 2);
-	makeFader(&controls->m_gain4, tr("Band 4 gain"), 3);
-
-	const auto muteOn = embed::getIconPixmap("mute_active");
-	const auto muteOff = embed::getIconPixmap("mute_inactive");
-
-	const auto makeMuteBtn = [this, bandsLayout, muteOn, muteOff](
-		BoolModel *model,
-		const QString &label,
-		int column
-	) {
-		auto b = new PixmapButton(this, label);
-		b->setActiveGraphic(muteOff);
-		b->setInactiveGraphic(muteOn);
-		b->setCheckable(true);
-		b->setModel(model);
-		b->setToolTip(label);
-		bandsLayout->addWidget(b, 1, column, Qt::AlignCenter);
-	};
-
-	makeMuteBtn(&controls->m_mute1, tr("Mute band 1"), 0);
-	makeMuteBtn(&controls->m_mute2, tr("Mute band 2"), 1);
-	makeMuteBtn(&controls->m_mute3, tr("Mute band 3"), 2);
-	makeMuteBtn(&controls->m_mute4, tr("Mute band 4"), 3);
-}
-
-
-} // namespace lmms::gui
+ #include "CrossoverEQControlDialog.h"
+ #include "CrossoverEQControls.h"
+ #include "embed.h"
+ #include "LedCheckBox.h"
+ #include "Knob.h"
+ #include "Fader.h"
+ #include "PixmapButton.h"
+ 
+ #include <QPixmap>
+ #include <QHBoxLayout>
+ #include <QVBoxLayout>
+ 
+ 
+ namespace lmms::gui
+ {
+ 
+ 
+ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls) :
+	 EffectControlDialog(controls)
+ {
+	 setAutoFillBackground(true);
+	 QPalette pal;
+	 pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	 setPalette(pal);
+	 setFixedSize(167, 218);
+	 auto layout = new QVBoxLayout(this);
+ 
+	 auto knobsLayout = new QHBoxLayout();
+	 layout->addLayout(knobsLayout);
+ 
+	 const auto makeKnob = [this, knobsLayout](
+		 FloatModel *model,
+		 const QString &label,
+		 const QString &txt_before
+	 ) {
+		 auto k = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, label, this);
+		 k->setModel(model);
+		 k->setHintText(txt_before, "Hz");
+		 knobsLayout->addWidget(k, 0, Qt::AlignHCenter);
+	 };
+ 
+	 makeKnob(&controls->m_xover12, "1/2", tr("Band 1/2 crossover"));
+	 makeKnob(&controls->m_xover23, "2/3", tr("Band 2/3 crossover"));
+	 makeKnob(&controls->m_xover34, "3/4", tr("Band 3/4 crossover"));
+	 
+	 auto bandsLayout = new QGridLayout();
+	 bandsLayout->setContentsMargins(4, 10, 4, 5);
+	 layout->addLayout(bandsLayout);
+ 
+	 const auto makeFader = [this, bandsLayout](
+		 FloatModel *model,
+		 const QString &label,
+		 int column
+	 ) {
+		 auto f = new Fader(model, label, this, false);
+		 f->setHintText(label, "dBFS");
+		 f->setDisplayConversion(false);
+		 f->setRenderUnityLine(false);
+		 bandsLayout->addWidget(f, 0, column, Qt::AlignHCenter);
+	 };
+ 
+	 makeFader(&controls->m_gain1, tr("Band 1 gain"), 0);
+	 makeFader(&controls->m_gain2, tr("Band 2 gain"), 1);
+	 makeFader(&controls->m_gain3, tr("Band 3 gain"), 2);
+	 makeFader(&controls->m_gain4, tr("Band 4 gain"), 3);
+ 
+	 const auto muteOn = embed::getIconPixmap("mute_active");
+	 const auto muteOff = embed::getIconPixmap("mute_inactive");
+ 
+	 const auto makeMuteBtn = [this, bandsLayout, muteOn, muteOff](
+		 BoolModel *model,
+		 const QString &label,
+		 int column
+	 ) {
+		 auto b = new PixmapButton(this, label);
+		 b->setActiveGraphic(muteOff);
+		 b->setInactiveGraphic(muteOn);
+		 b->setCheckable(true);
+		 b->setModel(model);
+		 b->setToolTip(label);
+		 bandsLayout->addWidget(b, 1, column, Qt::AlignCenter);
+	 };
+ 
+	 makeMuteBtn(&controls->m_mute1, tr("Mute band 1"), 0);
+	 makeMuteBtn(&controls->m_mute2, tr("Mute band 2"), 1);
+	 makeMuteBtn(&controls->m_mute3, tr("Mute band 3"), 2);
+	 makeMuteBtn(&controls->m_mute4, tr("Mute band 4"), 3);
+ }
+ 
+ 
+ } // namespace lmms::gui
+ 
