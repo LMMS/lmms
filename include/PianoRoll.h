@@ -112,7 +112,8 @@ public:
 		Erase,
 		Select,
 		Detuning,
-		Knife
+		Knife,
+		Strum
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -268,7 +269,8 @@ private:
 		SelectNotes,
 		ChangeNoteProperty,
 		ResizeNoteEditArea,
-		Knife
+		Knife,
+		Strum
 	};
 
 	enum class NoteEditMode
@@ -324,6 +326,9 @@ private:
 	void setKnifeAction();
 	void cancelKnifeAction();
 
+	void setStrumAction();
+	void cancelStrumAction();
+
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -347,6 +352,7 @@ private:
 	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
 	QPixmap m_toolOpen = embed::getIconPixmap("automation");
 	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
+	QPixmap m_toolStrum = embed::getIconPixmap("arp_free");
 
 	static std::array<KeyType, 12> prKeyOrder;
 
@@ -439,6 +445,7 @@ private:
 	EditMode m_editMode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 	EditMode m_knifeMode; // mode they where in before entering knife mode
+	EditMode m_strumMode; //< mode they where in before entering strum mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -481,6 +488,21 @@ private:
 	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	//! Function to initialize the currently selected notes for detuning. If any notes are selected, it uses those. If none are selected but there is a note under the mouse, it will select that note.
 	bool setupParameterEditNotes(Note::ParameterType paramType);
+  
+	//! Stores the chords for the strum tool
+	std::vector<NoteVector> m_selectedChords;
+	//! Computes which notes belong to which chords from the selection
+	void setupSelectedChords();
+
+	TimePos m_strumStartTime;
+	TimePos m_strumCurrentTime;
+	int m_strumStartVertical = 0;
+	int m_strumCurrentVertical = 0;
+	float m_strumHeightRatio = 0.0f;
+	bool m_strumEnabled = false;
+	//! Handles updating all of the note positions when performing a strum
+	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
+
 
 	friend class PianoRollWindow;
 

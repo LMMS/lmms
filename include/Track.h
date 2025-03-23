@@ -219,9 +219,9 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 
 private:
-	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
 	clipVector m_clips;

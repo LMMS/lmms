@@ -28,6 +28,7 @@
 #include <QWidget>
 
 #include "ModelView.h"
+#include "PixmapButton.h"
 #include "SerializingObject.h"
 #include "PluginView.h"
 
@@ -147,6 +148,8 @@ private:
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
+	PixmapButton *m_muteBtn;
+	PixmapButton *m_soloBtn;
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;

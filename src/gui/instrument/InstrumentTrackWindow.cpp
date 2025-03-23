@@ -139,74 +139,90 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
+	
+	auto soloMuteLayout = new QVBoxLayout();
+	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
+	soloMuteLayout->setSpacing(2);
+
+	m_muteBtn = new PixmapButton(this, tr("Mute"));
+	m_muteBtn->setModel(&m_track->m_mutedModel);
+	m_muteBtn->setActiveGraphic(embed::getIconPixmap("mute_active"));
+	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("mute_inactive"));
+	m_muteBtn->setCheckable(true);
+	m_muteBtn->setToolTip(tr("Mute this instrument"));
+	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
+
+	m_soloBtn = new PixmapButton(this, tr("Solo"));
+	m_soloBtn->setModel(&m_track->m_soloModel);
+	m_soloBtn->setActiveGraphic(embed::getIconPixmap("solo_active"));
+	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("solo_inactive"));
+	m_soloBtn->setCheckable(true);
+	m_soloBtn->setToolTip(tr("Solo this instrument"));
+	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
+
+	basicControlsLayout->addLayout(soloMuteLayout, 0, 0, 2, 1, widgetAlignment);
 
 	// set up volume knob
 	m_volumeKnob = new Knob( KnobType::Bright26, nullptr, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 
-	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
+	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
 
 	auto label = new QLabel(tr("VOL"), this);
-	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( label, 1, 0);
-	basicControlsLayout->setAlignment( label, labelAlignment );
-
+	label->setStyleSheet(labelStyleSheet);
+	basicControlsLayout->addWidget(label, 1, 1);
+	basicControlsLayout->setAlignment(label, labelAlignment);
 
 	// set up panning knob
 	m_panningKnob = new Knob( KnobType::Bright26, nullptr, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ), "" );
 
-	basicControlsLayout->addWidget( m_panningKnob, 0, 1 );
+	basicControlsLayout->addWidget(m_panningKnob, 0, 2);
 	basicControlsLayout->setAlignment( m_panningKnob, widgetAlignment );
 
 	label = new QLabel( tr( "PAN" ), this );
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( label, 1, 1);
+	basicControlsLayout->addWidget(label, 1, 2);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
-
-	basicControlsLayout->setColumnStretch(2, 1);
-
+	basicControlsLayout->setColumnStretch(3, 1);
 
 	// set up pitch knob
 	m_pitchKnob = new Knob( KnobType::Bright26, nullptr, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ), " " + tr( "cents" ) );
 
-	basicControlsLayout->addWidget( m_pitchKnob, 0, 3 );
+	basicControlsLayout->addWidget(m_pitchKnob, 0, 4);
 	basicControlsLayout->setAlignment( m_pitchKnob, widgetAlignment );
 
 	m_pitchLabel = new QLabel( tr( "PITCH" ), this );
 	m_pitchLabel->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( m_pitchLabel, 1, 3);
+	basicControlsLayout->addWidget(m_pitchLabel, 1, 4);
 	basicControlsLayout->setAlignment( m_pitchLabel, labelAlignment );
-
 
 	// set up pitch range knob
 	m_pitchRangeSpinBox= new LcdSpinBox( 2, nullptr, tr( "Pitch range (semitones)" ) );
 
-	basicControlsLayout->addWidget( m_pitchRangeSpinBox, 0, 4 );
+	basicControlsLayout->addWidget(m_pitchRangeSpinBox, 0, 5);
 	basicControlsLayout->setAlignment( m_pitchRangeSpinBox, widgetAlignment );
 
 	m_pitchRangeLabel = new QLabel( tr( "RANGE" ), this );
 	m_pitchRangeLabel->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( m_pitchRangeLabel, 1, 4);
+	basicControlsLayout->addWidget(m_pitchRangeLabel, 1, 5);
 	basicControlsLayout->setAlignment( m_pitchRangeLabel, labelAlignment );
 
-
-	basicControlsLayout->setColumnStretch(5, 1);
-
+	basicControlsLayout->setColumnStretch(6, 1);
 
 	// setup spinbox for selecting Mixer-channel
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_itv);
 
-	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
+	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 7);
 	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );
 
-	label = new QLabel( tr( "CHANNEL" ), this );
+	label = new QLabel(tr("CHAN"), this);
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( label, 1, 6);
+	basicControlsLayout->addWidget(label, 1, 7);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
 	auto saveSettingsBtn = new QPushButton(embed::getIconPixmap("project_save"), QString());
@@ -216,11 +232,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	saveSettingsBtn->setToolTip(tr("Save current instrument track settings in a preset file"));
 
-	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
+	basicControlsLayout->addWidget(saveSettingsBtn, 0, 8);
 
 	label = new QLabel( tr( "SAVE" ), this );
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget( label, 1, 7);
+	basicControlsLayout->addWidget(label, 1, 8);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
 	generalSettingsLayout->addLayout( basicControlsLayout );
