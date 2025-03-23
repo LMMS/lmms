@@ -278,7 +278,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 	}
 
 	// set the sample format
-	if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_S32); err < 0)
+	if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_FLOAT); err < 0)
 	{
 		printf("Failed to set PCM format: %s", snd_strerror(err));
 		return err;
