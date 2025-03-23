@@ -98,9 +98,6 @@ private:
 
 	snd_pcm_hw_params_t * m_hwParams;
 	snd_pcm_sw_params_t * m_swParams;
-
-	bool m_convertEndian;
-
 } ;
 
 } // namespace lmms

@@ -42,8 +42,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		DEFAULT_CHANNELS), _audioEngine),
 	m_handle( nullptr ),
 	m_hwParams( nullptr ),
-	m_swParams( nullptr ),
-	m_convertEndian( false )
+	m_swParams( nullptr )
 {
 	_success_ful = false;
 
@@ -246,73 +245,15 @@ void AudioAlsa::stopProcessing()
 
 void AudioAlsa::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
-	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
-
-	int outbuf_size = framesPerPeriod() * channels();
-	int outbuf_pos = 0;
-	int pcmbuf_size = m_periodSize * channels();
-
-	bool quit = false;
-	while( quit == false )
+	auto buf = std::vector<float>(framesPerPeriod() * channels());
+	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
-		int_sample_t * ptr = pcmbuf;
-		int len = pcmbuf_size;
-		while( len )
+		if (const auto framesWritten = snd_pcm_writei(m_handle, buf.data(), framesPerPeriod()); framesWritten < 0)
 		{
-			if( outbuf_pos == 0 )
-			{
-				// frames depend on the sample rate
-				if (!getNextBuffer(temp, framesPerPeriod()))
-				{
-					quit = true;
-					memset( ptr, 0, len
-						* sizeof( int_sample_t ) );
-					break;
-				}
-
-				outbuf_size = framesPerPeriod() * channels();
-				convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
-			}
-			int min_len = std::min(len, outbuf_size - outbuf_pos);
-			memcpy( ptr, outbuf + outbuf_pos,
-					min_len * sizeof( int_sample_t ) );
-			ptr += min_len;
-			len -= min_len;
-			outbuf_pos += min_len;
-			outbuf_pos %= outbuf_size;
-		}
-
-		f_cnt_t frames = m_periodSize;
-		ptr = pcmbuf;
-
-		while( frames )
-		{
-			int err = snd_pcm_writei( m_handle, ptr, frames );
-
-			if( err == -EAGAIN )
-			{
-				continue;
-			}
-
-			if( err < 0 )
-			{
-				if( handleError( err ) < 0 )
-				{
-					printf( "Write error: %s\n",
-							snd_strerror( err ) );
-				}
-				break;	// skip this buffer
-			}
-			ptr += err * channels();
-			frames -= err;
+			handleError(framesWritten);
+			continue;
 		}
 	}
-
-	delete[] temp;
-	delete[] outbuf;
-	delete[] pcmbuf;
 }
 
 
@@ -337,19 +278,10 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 	}
 
 	// set the sample format
-	if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_S16_LE); err < 0)
+	if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_S32); err < 0)
 	{
-		if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_S16_BE); err < 0)
-		{
-			printf( "Neither little- nor big-endian available for "
-					"playback: %s\n", snd_strerror( err ) );
-			return err;
-		}
-		m_convertEndian = isLittleEndian();
-	}
-	else
-	{
-		m_convertEndian = !isLittleEndian();
+		printf("Failed to set PCM format: %s", snd_strerror(err));
+		return err;
 	}
 
 	// set the count of channels
