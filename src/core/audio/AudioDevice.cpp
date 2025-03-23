@@ -67,7 +67,7 @@ bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t d
 		return true;
 	}
 
-	for (auto dstFrameIndex = 0; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
+	for (auto dstFrameIndex = std::size_t{0}; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
 
@@ -87,7 +87,7 @@ bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t d
 				dstBuffer[(dstFrameIndex + 1) * dstChannelCount] = srcFrame.right();
 
 				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
-				for (auto channel = 2; channel < dstChannelCount; ++channel)
+				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
 				{
 					std::fill_n(dstBuffer + (dstFrameIndex + 2) * dstChannelCount, dstChannelCount - 2, 0.f);
 				}
@@ -107,7 +107,7 @@ bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t d
 				dstBuffer[1][dstFrameIndex] = srcFrame.right();
 
 				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
-				for (auto channel = 2; channel < dstChannelCount; ++channel)
+				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
 				{
 					std::fill_n(dstBuffer[channel], dstFrameCount, 0.f);
 				}
