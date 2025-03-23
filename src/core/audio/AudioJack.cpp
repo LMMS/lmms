@@ -158,7 +158,7 @@ bool AudioJack::initJackClient()
 				clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
 
-	m_inputFrameBuffer = new jack_default_audio_sample_t[channels() * jack_get_buffer_size(m_client)];
+	m_inputFrameBuffer.resize(channels() * jack_get_buffer_size(m_client));
 
 	jack_set_buffer_size_callback(m_client, setBufferSizeCallback, this);
 
@@ -301,8 +301,7 @@ void AudioJack::renamePort(AudioBusHandle* port)
 int AudioJack::setBufferSizeCallback(jack_nframes_t nframes, void* udata)
 {
 	auto thisClass = static_cast<AudioJack*>(udata);
-	delete[] thisClass->m_inputFrameBuffer;
-	thisClass->m_inputFrameBuffer = new jack_default_audio_sample_t[thisClass->channels() * nframes];
+	thisClass->m_inputFrameBuffer.resize(thisClass->channels() * nframes);
 	return 0;
 }
 
@@ -383,7 +382,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 			m_inputFrameBuffer[frame * channels() + c] = jack_input_buffer[frame];
 		}
 	}
-	audioEngine()->pushInputFrames ((SampleFrame*) m_inputFrameBuffer, nframes);
+	audioEngine()->pushInputFrames ((SampleFrame*) m_inputFrameBuffer.data(), nframes);
 	return 0;
 }
 

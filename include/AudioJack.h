@@ -119,7 +119,7 @@ private:
 	std::vector<jack_port_t*> m_outputPorts;
 	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
-	jack_default_audio_sample_t* m_inputFrameBuffer;
+	std::vector<jack_default_audio_sample_t> m_inputFrameBuffer;
 	SampleFrame* m_outBuf;
 	SampleFrame* m_inBuf;
 
