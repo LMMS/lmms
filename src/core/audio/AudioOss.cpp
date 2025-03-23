@@ -265,7 +265,7 @@ void AudioOss::run()
 
 	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
-		for (auto i = 0; i < buf.size(); ++i)
+		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{
 			pcmBuf[i] = static_cast<int16_t>(buf[i] * OUTPUT_SAMPLE_MULTIPLIER);
 		}
