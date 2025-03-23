@@ -173,7 +173,6 @@ public:
 	}
 
 
-
 	// audio-bus-handle-stuff
 	inline void addAudioBusHandle(AudioBusHandle* busHandle)
 	{
