@@ -273,35 +273,38 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped) { return; }
-
+	const auto layout = static_cast<SoundIoChannelLayout*>(&m_outstream->layout);
 	auto areas = static_cast<SoundIoChannelArea*>(nullptr);
-	const auto layout = &m_outstream->layout;
+	auto framesLeft = frameCountMax;
 
-	static auto buffers = [&]
+	while (framesLeft > 0)
 	{
-		auto bufs = std::vector<void*>(layout->channel_count);
-
-		for (int i = 0; i < bufs.size(); ++i)
+		auto frameCount = framesLeft;
+		if (int error = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
 		{
-			bufs[i] = areas[i].ptr;
+			errorCallback(error);
+			return;
 		}
 
-		return bufs;
-	}();
+		if (!frameCount) { break; }
 
-	if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCountMax))
-	{
-		errorCallback(err);
-		return;
-	}
+		auto buffers = std::array<float*, SOUNDIO_MAX_CHANNELS>{};
+		buffers.fill(nullptr);
 
-	nextBuffer(buffers.data(), frameCountMax, layout->channel_count, false);
+		for (auto i = 0; i < layout->channel_count; ++i)
+		{
+			buffers[i] = reinterpret_cast<float*>(areas[i].ptr);
+		}
 
-	if (int err = soundio_outstream_end_write(m_outstream))
-	{
-		errorCallback(err);
-		return;
+		if (!nextBuffer(buffers.data(), frameCount, layout->channel_count, false)) { break; }
+
+		if (int err = soundio_outstream_end_write(m_outstream))
+		{
+			errorCallback(err);
+			return;
+		}
+
+		framesLeft -= frameCount;
 	}
 }
 
