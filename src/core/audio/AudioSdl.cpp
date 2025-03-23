@@ -180,7 +180,7 @@ void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 
 void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 {
-	if (m_stopped || !nextBuffer(_buf, framesPerPeriod(), channels()))
+	if (m_stopped || !nextBuffer(_buf, _len / sizeof(float) / channels(), channels()))
 	{
 		memset( _buf, 0, _len );
 		return;
