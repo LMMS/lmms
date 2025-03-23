@@ -127,6 +127,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 
 	m_lfoPredelayModel.setScaleLogarithmic(true);
 	m_lfoAttackModel.setScaleLogarithmic(true);
+	m_lfoSpeedModel.setScaleLogarithmic(true);
 
 	m_amountModel.setCenterValue( 0 );
 	m_lfoAmountModel.setCenterValue( 0 );
@@ -414,15 +415,13 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	const auto predelay_frames = static_cast<f_cnt_t>(sampleRate * (m_predelayModel.value()));
 
 	const f_cnt_t attack_frames = std::max(minimumFrames,
-					static_cast<f_cnt_t>(sampleRate *
-					(m_attackModel.value())));
+					static_cast<f_cnt_t>(sampleRate * m_attackModel.value()));
 
 	const auto hold_frames = static_cast<f_cnt_t>(sampleRate * (m_holdModel.value()));
 
 	const f_cnt_t decay_frames = std::max(minimumFrames,
 					static_cast<f_cnt_t>(sampleRate *
-					(m_decayModel.value() *
-					(1 - m_sustainModel.value()))));
+					m_decayModel.value() * (1 - m_sustainModel.value())));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -437,8 +436,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	m_pahdFrames = predelay_frames + attack_frames + hold_frames +
 								decay_frames;
-	m_rFrames = static_cast<f_cnt_t>( sampleRate *
-					( m_releaseModel.value() ) );
+	m_rFrames = static_cast<f_cnt_t>(sampleRate * m_releaseModel.value());
 	m_rFrames = std::max(minimumFrames, m_rFrames);
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
@@ -506,12 +504,9 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_sustainLevel = m_sustainLevel * m_amount + m_amountAdd;
 
 
-	m_lfoPredelayFrames = static_cast<f_cnt_t>( sampleRate *
-				( m_lfoPredelayModel.value() ) );
-	m_lfoAttackFrames = static_cast<f_cnt_t>( sampleRate *
-				( m_lfoAttackModel.value() ) );
-	m_lfoOscillationFrames = static_cast<f_cnt_t>(
-				sampleRate * m_lfoSpeedModel.value() );
+	m_lfoPredelayFrames = static_cast<f_cnt_t>(sampleRate * m_lfoPredelayModel.value());
+	m_lfoAttackFrames = static_cast<f_cnt_t>(sampleRate * m_lfoAttackModel.value());
+	m_lfoOscillationFrames = static_cast<f_cnt_t>(sampleRate * m_lfoSpeedModel.value());
 	if( m_x100Model.value() )
 	{
 		m_lfoOscillationFrames /= 100;
