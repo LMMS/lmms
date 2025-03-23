@@ -145,8 +145,8 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 		}
 		else
 		{
-			const auto beginIndex = static_cast<size_t>(std::floor(i * finerThumbnailScaleFactor));
-			const auto endIndex = static_cast<size_t>(std::ceil((i + 1) * finerThumbnailScaleFactor));
+			const auto beginIndex = std::clamp<size_t>(std::floor(i * finerThumbnailScaleFactor), 0, finerThumbnail->width() - 1);
+			const auto endIndex = std::clamp<size_t>(std::ceil((i + 1) * finerThumbnailScaleFactor), 0, finerThumbnail->width() - 1);
 
 			auto minPeak = 0.f;
 			auto maxPeak = 0.f;
