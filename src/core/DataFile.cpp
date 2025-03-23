@@ -1947,20 +1947,20 @@ void DataFile::upgrade_sampleAndHold()
 /** \brief The knobs in the envelope/lfo section of instruments were changed to use linear scaling
  * Previously, the knobs used quadratic scaling relative to the max env/lfo length,
  * which meant the value stored in the model was essentially meaningless to the user.
- * Older projects which had their env/lfo knobs stored with their quadratic scaling need to be upgraded to use linear values.
  */
 void DataFile::upgrade_envelope_lfo_knob_scaling()
 {
-	QDomNodeList elvol = elementsByTagName("elvol");
-	QDomNodeList elcut = elementsByTagName("elcut");
-	QDomNodeList elres = elementsByTagName("elres");
+	QDomNodeList vol = elementsByTagName("elvol");
+	QDomNodeList cut = elementsByTagName("elcut");
+	QDomNodeList res = elementsByTagName("elres");
 
-	for (auto nodeList : {elvol, elcut, elres})
+	for (auto nodeList : {vol, cut, res})
 	{
 		for (int i = 0; i < nodeList.length(); ++i)
 		{
 			if (nodeList.item(i).isNull()) { continue; }
 			auto e = nodeList.item(i).toElement();
+
 			// Envelope knobs
 			for (QString attribute : {"pdel", "att", "hold", "rel"})
 			{
@@ -1980,6 +1980,7 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 				? oldDecay * (1.0f - sustain) * oldDecay * 5
 				: -oldDecay * (1.0f - sustain) * oldDecay * 5;
 			e.setAttribute("dec", newDecay);
+
 			// LFO knobs
 			for (QString attribute : {"lshp", "lpdel", "latt"})
 			{
