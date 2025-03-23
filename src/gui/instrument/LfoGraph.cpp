@@ -83,7 +83,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	int graphBaseX = 2;
 	int graphBaseY = margin + lfoGraphHeight / 2;
 
-	const float framesForGraph = Engine::audioEngine()->baseSampleRate() / 10; // fix
+	const float framesForGraph = 2 * Engine::audioEngine()->baseSampleRate();
 
 	float oscFrames = oscillationFrames * (x100 ? 100. : 1.);
 
