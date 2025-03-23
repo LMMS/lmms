@@ -1,7 +1,7 @@
 /*
  * SampleLoader.h - Load audio and waveform files
  *
- * Copyright (c) 2025 Sotonye Atemie <satemiej@gmail.com>
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
