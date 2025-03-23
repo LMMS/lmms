@@ -259,22 +259,18 @@ void AudioOss::stopProcessing()
 
 void AudioOss::run()
 {
-	auto temp = new SampleFrame[framesPerPeriod()];
-	auto outbuf = new int_sample_t[framesPerPeriod() * channels()];
+	auto buf = std::vector<float>(framesPerPeriod() * channels());
+	auto pcmBuf = std::vector<int16_t>(buf.size());
 
-	while( true )
+	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
-		if (!getNextBuffer(temp, framesPerPeriod())) { break; }
-
-		int bytes = convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
-		if( write( m_audioFD, outbuf, bytes ) != bytes )
+		for (auto i = 0; i < buf.size(); ++i)
 		{
-			break;
+			pcmBuf[i] = static_cast<int16_t>(buf[i] * OUTPUT_SAMPLE_MULTIPLIER);
 		}
-	}
 
-	delete[] temp;
-	delete[] outbuf;
+		write(m_audioFD, pcmBuf.data(), sizeof(int16_t));
+	}
 }
 
 

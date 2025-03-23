@@ -41,7 +41,6 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
 	, m_sampleRate(_audioEngine->outputSampleRate())
 	, m_channels(_channels)
 	, m_audioEngine(_audioEngine)
-	, m_buffer(new SampleFrame[m_framesPerPeriod])
 {
 }
 
@@ -50,13 +49,14 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
 
 AudioDevice::~AudioDevice()
 {
-	delete[] m_buffer;
 	m_devMutex.tryLock();
 	unlock();
 }
 
-bool AudioDevice::getNextBuffer(SampleFrame* dst, std::size_t size)
+bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t dstChannelCount, bool interleaved)
 {
+	assert(dstChannelCount > 0);
+
 	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
 		m_running.clear(std::memory_order_release);
@@ -69,22 +69,64 @@ bool AudioDevice::getNextBuffer(SampleFrame* dst, std::size_t size)
 		return true;
 	}
 
-	static auto s_renderedBuffer = static_cast<const SampleFrame*>(nullptr);
-	static auto s_renderedBufferIndex = std::size_t{0};
-	const auto renderedBufferSize = m_audioEngine->framesPerPeriod();
-
+	const auto srcBufferFrameCount = m_audioEngine->framesPerPeriod();
 	auto framesRead = std::size_t{0};
-	while (framesRead != size)
+
+	while (framesRead != dstFrameCount)
 	{
-		if (!s_renderedBuffer) { s_renderedBuffer = m_audioEngine->renderNextBuffer(); }
+		if (!m_audioEngineBuffer) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
 
-		const auto framesToRead = std::min(renderedBufferSize - s_renderedBufferIndex, m_framesPerPeriod - framesRead);
-		std::copy_n(s_renderedBuffer + s_renderedBufferIndex, framesToRead, dst + framesRead);
+		// The number of frames to read equal either the number of frames we can read, or how many frames we need to
+		// read left. Whichever one is smaller.
+		const auto framesToRead = std::min(srcBufferFrameCount - m_audioEngineBufferIndex, dstFrameCount - framesRead);
 
-		s_renderedBufferIndex = (s_renderedBufferIndex + framesToRead) % renderedBufferSize;
+		if (interleaved)
+		{
+			const auto dstBuffer = static_cast<float*>(dst);
+
+			for (auto frame = std::size_t{0}; frame < framesToRead; ++frame)
+			{
+				const auto dstFrameIndex = framesRead + frame;
+				const auto srcFrameIndex = m_audioEngineBufferIndex + frame;
+
+				if (dstChannelCount == 1)
+				{
+					dstBuffer[dstFrameIndex * dstChannelCount] = m_audioEngineBuffer[srcFrameIndex].average();
+				}
+				else
+				{
+					dstBuffer[dstFrameIndex * dstChannelCount] = m_audioEngineBuffer[srcFrameIndex].left();
+					dstBuffer[dstFrameIndex * dstChannelCount + 1] = m_audioEngineBuffer[srcFrameIndex].right();
+
+					// If dst has more channels than 2 (stereo), then silence them. LMMS only outputs stereo audio.
+					std::fill_n(dstBuffer + dstFrameIndex * dstChannelCount + 2, dstChannelCount - 2, 0.f);
+				}
+			}
+		}
+		else
+		{
+			const auto dstBuffer = static_cast<float**>(dst);
+
+			for (auto channel = std::size_t{0}; channel < dstChannelCount; ++channel)
+			{
+				// If dst has more channels than 2 (stereo), then silence them. LMMS only outputs stereo audio.
+				if (channel > 1)
+				{
+					std::fill_n(dstBuffer[channel] + framesRead, framesToRead, 0.f);
+					break;
+				}
+
+				for (auto frame = std::size_t{0}; frame < framesToRead; ++frame)
+				{
+					const auto& srcFrame = m_audioEngineBuffer[m_audioEngineBufferIndex + frame];
+					dstBuffer[channel][frame] = dstChannelCount == 1 ? srcFrame.average() : srcFrame[channel];
+				}
+			}
+		}
+
+		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + framesToRead) % srcBufferFrameCount;
 		framesRead += framesToRead;
-
-		if (s_renderedBufferIndex == 0) { s_renderedBuffer = nullptr; }
+		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = nullptr; }
 	}
 
 	return true;

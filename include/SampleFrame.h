@@ -53,6 +53,11 @@ public:
 	{
 	}
 
+	operator const sample_t*() const
+	{
+		return m_samples.data();
+	}
+
 	sample_t* data()
 	{
 		return m_samples.data();

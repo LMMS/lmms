@@ -273,66 +273,35 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped) {return;}
-	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea* areas;
-	int bytesPerSample = m_outstream->bytes_per_sample;
-	int framesLeft = frameCountMax;
+	if (m_stopped) { return; }
 
-	while (framesLeft > 0)
+	auto areas = static_cast<SoundIoChannelArea*>(nullptr);
+	const auto layout = &m_outstream->layout;
+
+	static auto buffers = [&]
 	{
-		int frameCount = framesLeft;
-		if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
+		auto bufs = std::vector<void*>(layout->channel_count);
+
+		for (int i = 0; i < bufs.size(); ++i)
 		{
-			errorCallback(err);
-			return;
+			bufs[i] = areas[i].ptr;
 		}
 
-		if (!frameCount)
-			break;
+		return bufs;
+	}();
 
-		
-		if (m_stopped)
-		{
-			for (int channel = 0; channel < layout->channel_count; ++channel)
-			{
-				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
-				areas[channel].ptr += areas[channel].step * frameCount;
-			}
-			continue;
-		}
+	if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCountMax))
+	{
+		errorCallback(err);
+		return;
+	}
 
-		for (int frame = 0; frame < frameCount; frame += 1)
-		{
-			if (m_outBufFrameIndex >= m_outBufFramesTotal)
-			{
-				if (!getNextBuffer(m_outBuf, framesPerPeriod()))
-				{
-					m_outBufFramesTotal = 0;
-					m_stopped = true;
-					break;
-				}
+	nextBuffer(buffers.data(), frameCountMax, layout->channel_count, false);
 
-				m_outBufFramesTotal = framesPerPeriod();
-				m_outBufFrameIndex = 0;
-			}
-
-			for (int channel = 0; channel < layout->channel_count; channel += 1)
-			{
-				float sample = m_outBuf[m_outBufFrameIndex][channel];
-				memcpy(areas[channel].ptr, &sample, bytesPerSample);
-				areas[channel].ptr += areas[channel].step;
-			}
-			m_outBufFrameIndex += 1;
-		}
-
-		if (int err = soundio_outstream_end_write(m_outstream))
-		{
-			errorCallback(err);
-			return;
-		}
-
-		framesLeft -= frameCount;
+	if (int err = soundio_outstream_end_write(m_outstream))
+	{
+		errorCallback(err);
+		return;
 	}
 }
 

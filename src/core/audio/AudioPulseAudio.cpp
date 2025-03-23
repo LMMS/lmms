@@ -235,7 +235,7 @@ void AudioPulseAudio::run()
 	{
 		const fpp_t fpp = framesPerPeriod();
 		auto temp = new SampleFrame[fpp];
-		while (getNextBuffer(temp, framesPerPeriod())) {}
+		while (nextBuffer(nullptr, 0, 0)) {}
 		delete[] temp;
 	}
 
@@ -250,29 +250,12 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = framesPerPeriod();
-	auto temp = new SampleFrame[fpp];
-	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
+	auto buf = std::vector<float>(framesPerPeriod() * channels());
 
-	size_t fd = 0;
-	while( fd < length/4 && m_quit == false )
+	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
-		if (!getNextBuffer(temp, framesPerPeriod()))
-		{
-			m_quit = true;
-			break;
-		}
-		int bytes = convertToS16(temp, framesPerPeriod(), pcmbuf, m_convertEndian);
-		if( bytes > 0 )
-		{
-			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
-							PA_SEEK_RELATIVE );
-		}
-		fd += framesPerPeriod();
+		pa_stream_write(m_s, buf.data(), buf.size() * sizeof(float), nullptr, 0, PA_SEEK_RELATIVE);
 	}
-
-	pa_xfree( pcmbuf );
-	delete[] temp;
 }
 
 

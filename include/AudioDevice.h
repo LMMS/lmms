@@ -81,51 +81,51 @@ public:
 	virtual void stopProcessing() { m_running.clear(std::memory_order_release); }
 
 protected:
-	bool getNextBuffer(SampleFrame* dst, std::size_t size);
+	/*
+		Copy `frames` frames, with each frame having `channels` channels from the audio engine into `dst`.
+
+		If `interleaved == true`, `dst` points to interleaved floating-point audio (i.e., `float*`, LRLR...).
+		Otherwise, `dst` points to non-interleaved floating-point audio (i.e., `float**`, LLRR...).
+		`dst` is treated as being interleaved by default.
+
+		Returns `false` if no audio could be copied into `dst`.
+
+		Returns `true` if audio could be copied into `dst`, or if `dst == nullptr`, which simply invokes the audio
+		engine to render the next buffer.
+
+		Returns `false` in all cases if the audio device is not running.
+	*/
+	bool nextBuffer(void* dst, std::size_t frames, std::size_t channels, bool interleaved = true);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16(const SampleFrame* _ab,
-						const fpp_t _frames,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian = false );
+	int convertToS16(
+		const SampleFrame* _ab, const fpp_t _frames, int_sample_t* _output_buffer, const bool _convert_endian = false);
 
 	// clear given signed-int-16-buffer
-	void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames );
+	void clearS16Buffer(int_sample_t* _outbuf, const fpp_t _frames);
 
-	ch_cnt_t channels() const
-	{
-		return m_channels;
-	}
+	ch_cnt_t channels() const { return m_channels; }
 
-	inline void setSampleRate( const sample_rate_t _new_sr )
-	{
-		m_sampleRate = _new_sr;
-	}
+	AudioEngine* audioEngine() { return m_audioEngine; }
 
-	AudioEngine* audioEngine()
-	{
-		return m_audioEngine;
-	}
-
+	void setSampleRate(const sample_rate_t _new_sr) { m_sampleRate = _new_sr; }
 
 	static void stopProcessingThread( QThread * thread );
-
-
 protected:
 	bool m_supportsCapture;
-
 
 private:
 	fpp_t m_framesPerPeriod;
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	AudioEngine* m_audioEngine;
+
+	AudioEngine* m_audioEngine = nullptr;
+	const SampleFrame* m_audioEngineBuffer = nullptr;
+	std::size_t m_audioEngineBufferIndex = 0;
 
 	QMutex m_devMutex;
 
-	SampleFrame* m_buffer;
 	std::atomic_flag m_running = ATOMIC_FLAG_INIT;
 };
 

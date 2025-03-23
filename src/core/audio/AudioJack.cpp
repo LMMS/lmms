@@ -341,54 +341,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 #endif
 
-	jack_nframes_t done = 0;
-	while (done < nframes && !m_stopped)
-	{
-		jack_nframes_t todo = std::min<jack_nframes_t>(nframes - done, m_framesToDoInCurBuf - m_framesDoneInCurBuf);
-		for (int c = 0; c < channels(); ++c)
-		{
-			jack_default_audio_sample_t* o = m_tempOutBufs[c];
-			for (jack_nframes_t frame = 0; frame < todo; ++frame)
-			{
-				o[done + frame] = m_outBuf[m_framesDoneInCurBuf + frame][c];
-			}
-		}
-		done += todo;
-		m_framesDoneInCurBuf += todo;
-		if (m_framesDoneInCurBuf == m_framesToDoInCurBuf)
-		{
-			if (!getNextBuffer(m_outBuf, framesPerPeriod()))
-			{
-				m_framesToDoInCurBuf = 0;
-				m_framesDoneInCurBuf = 0;
-				m_stopped = true;
-				break;
-			}
-
-			m_framesToDoInCurBuf = framesPerPeriod();
-			m_framesDoneInCurBuf = 0;
-		}
-	}
-
-	if (nframes != done)
-	{
-		for (int c = 0; c < channels(); ++c)
-		{
-			jack_default_audio_sample_t* b = m_tempOutBufs[c] + done;
-			memset(b, 0, sizeof(*b) * (nframes - done));
-		}
-	}
-
-	for (int c = 0; c < channels(); ++c)
-	{
-		jack_default_audio_sample_t* jack_input_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(m_inputPorts[c], nframes);
-
-		for (jack_nframes_t frame = 0; frame < nframes; frame++)
-		{
-			m_inputFrameBuffer[frame][c] = static_cast<sample_t>(jack_input_buffer[frame]);
-		}
-	}
-	audioEngine()->pushInputFrames (m_inputFrameBuffer.data(), nframes);
+	nextBuffer(m_tempOutBufs, nframes, channels(), false);
 	return 0;
 }
 

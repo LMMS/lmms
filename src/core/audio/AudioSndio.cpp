@@ -145,22 +145,12 @@ void AudioSndio::stopProcessing()
 
 void AudioSndio::run()
 {
-	SampleFrame* temp = new SampleFrame[framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[framesPerPeriod() * channels()];
+	auto buf = std::vector<float>(framesPerPeriod() * channels());
 
-	while( true )
+	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
-		if (!getNextBuffer(temp, framesPerPeriod())) { break; }
-
-		uint bytes = convertToS16(temp, framesPerPeriod(), outbuf, m_convertEndian);
-		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 

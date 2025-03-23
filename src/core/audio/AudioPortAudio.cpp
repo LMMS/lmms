@@ -247,36 +247,7 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		return paComplete;
 	}
 
-	while( _framesPerBuffer )
-	{
-		if( m_outBufPos == 0 )
-		{
-			if (!getNextBuffer(m_outBuf, framesPerPeriod()))
-			{
-				m_stopped = true;
-				memset( _outputBuffer, 0, _framesPerBuffer *
-					channels() * sizeof(float) );
-				return paComplete;
-			}
-
-			m_outBufSize = framesPerPeriod();
-		}
-		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
-
-		for( fpp_t frame = 0; frame < min_len; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				(_outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
-			}
-		}
-
-		_outputBuffer += min_len * channels();
-		_framesPerBuffer -= min_len;
-		m_outBufPos += min_len;
-		m_outBufPos %= m_outBufSize;
-	}
-
+	nextBuffer(_outputBuffer, framesPerPeriod(), channels());
 	return paContinue;
 }
 
