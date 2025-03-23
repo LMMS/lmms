@@ -247,7 +247,7 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		return paComplete;
 	}
 
-	nextBuffer(_outputBuffer, framesPerPeriod(), channels());
+	nextBuffer(_outputBuffer, _framesPerBuffer, channels());
 	return paContinue;
 }
 
