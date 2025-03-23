@@ -1289,24 +1289,27 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Alt: m_keyMods.m_alt = true; break;
 		case Qt::Key_Space:
 		{
+			Editor* lastEditor = nullptr;
 			switch(Engine::getSong()->lastPlayMode())
 			{
 			case Song::PlayMode::Song:
-				getGUI()->songEditor()->togglePlayStop();
+				lastEditor = getGUI()->songEditor();
 				break;
 			case Song::PlayMode::MidiClip:
-				getGUI()->pianoRoll()->togglePlayStop();
+				lastEditor = getGUI()->pianoRoll();
 				break;
 			case Song::PlayMode::Pattern:
-				getGUI()->patternEditor()->togglePlayStop();
+				lastEditor = getGUI()->patternEditor();
 				break;
 			case Song::PlayMode::AutomationClip:
-				getGUI()->automationEditor()->togglePlayStop();
+				lastEditor = getGUI()->automationEditor();
 				break;
 			default:
-				getGUI()->songEditor()->togglePlayStop();
+				lastEditor = getGUI()->songEditor();
 				break;
 			}
+			if (m_keyMods.m_shift) { lastEditor->togglePause(); }
+			else { lastEditor->togglePlayStop(); }
 			break;
 		}
 		default:
