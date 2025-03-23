@@ -4290,6 +4290,12 @@ void PianoRoll::verScrolled( int new_pos )
 
 void PianoRoll::setEditMode(int mode)
 {
+	if (static_cast<EditMode>(mode) == EditMode::Detuning)
+	{
+		TextFloat::displayMessage(tr("Pitch Bending"),
+			tr("Click on a note or selection to edit its detuning curves\nShift-click to open in Automation Editor"),
+			embed::getIconPixmap("automation"), 4000);
+	}
 	m_ctrlMode = m_editMode = (EditMode) mode;
 }
 
