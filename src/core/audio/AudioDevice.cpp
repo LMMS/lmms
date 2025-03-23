@@ -55,14 +55,6 @@ AudioDevice::~AudioDevice()
 	unlock();
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
-{
-	if (getNextBuffer(m_buffer, m_framesPerPeriod)) { writeBuffer(m_buffer, m_framesPerPeriod); }
-}
-
 bool AudioDevice::getNextBuffer(SampleFrame* dst, std::size_t size)
 {
 	if (!m_running.test_and_set(std::memory_order_acquire))
