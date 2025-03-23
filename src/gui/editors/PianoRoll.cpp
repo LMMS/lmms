@@ -116,6 +116,9 @@ const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
 
+// Radius of the automation node circles which appear when pitchbending a note
+const int DETUNING_HANDLE_RADIUS = 3;
+
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
 static std::array<QString, 12> s_noteStrings {
@@ -1068,6 +1071,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 								int _y ) const
 {
 	int middle_y = _y + m_keyLineHeight / 2;
+	_p.setBrush(QBrush(m_noteColor));
 	_p.setPen(m_noteColor);
 	_p.setClipRect(
 		m_whiteKeyWidth,
@@ -1146,12 +1150,15 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	{
 		for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
 		{
-			// Current node values
 			int cur_ticks = POS(it);
 			int cur_x = _x + cur_ticks * m_ppb / TimePos::ticksPerBar();
 			const float cur_level = INVAL(it);
 			int cur_y = middle_y - cur_level * m_keyLineHeight;
-			_p.drawEllipse(cur_x - 5, cur_y - 5, 10, 10);
+			_p.drawEllipse(
+				cur_x - DETUNING_HANDLE_RADIUS,
+				cur_y - DETUNING_HANDLE_RADIUS,
+				2 * DETUNING_HANDLE_RADIUS,
+				2 * DETUNING_HANDLE_RADIUS);
 		}
 	}
 }
