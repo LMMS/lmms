@@ -55,8 +55,6 @@ AudioDevice::~AudioDevice()
 
 bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t dstChannelCount, bool interleaved)
 {
-	assert(dstChannelCount > 0);
-
 	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
 		m_running.clear(std::memory_order_release);
