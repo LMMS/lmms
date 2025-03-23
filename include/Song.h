@@ -257,7 +257,7 @@ public:
 		return m_playMode;
 	}
 
-	inline PlayMode lastPlayMode() const { return m_lastPlayMode; }
+	PlayMode lastPlayMode() const { return m_lastPlayMode; }
 	inline PlayPos & getPlayPos( PlayMode pm )
 	{
 		return m_playPos[static_cast<std::size_t>(pm)];

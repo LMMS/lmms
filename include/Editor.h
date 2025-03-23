@@ -59,9 +59,9 @@ protected:
 	void closeEvent(QCloseEvent * event) override;
 	void keyPressEvent(QKeyEvent *ke) override;
 public slots:
-	/// Called by pressing the space key. Plays or stops.
+	//! Called by pressing the space key. Plays or stops.
 	void togglePlayStop();
-	/// Called by pressing shift+space. Toggles pause state.
+	//! Called by pressing shift+space. Toggles pause state.
 	void togglePause();
 
 protected slots:

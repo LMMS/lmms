@@ -1290,7 +1290,7 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Space:
 		{
 			Editor* lastEditor = nullptr;
-			switch(Engine::getSong()->lastPlayMode())
+			switch (Engine::getSong()->lastPlayMode())
 			{
 			case Song::PlayMode::Song:
 				lastEditor = getGUI()->songEditor();
