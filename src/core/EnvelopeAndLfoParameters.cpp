@@ -123,7 +123,6 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_attackModel.setScaleLogarithmic(true);
 	m_holdModel.setScaleLogarithmic(true);
 	m_decayModel.setScaleLogarithmic(true);
-	m_sustainModel.setScaleLogarithmic(true);
 	m_releaseModel.setScaleLogarithmic(true);
 
 	m_lfoPredelayModel.setScaleLogarithmic(true);
