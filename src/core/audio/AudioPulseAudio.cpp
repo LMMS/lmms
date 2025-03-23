@@ -245,17 +245,18 @@ void AudioPulseAudio::run()
 	pa_mainloop_free( mainLoop );
 }
 
-
-
-
-void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
+void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 {
-	auto buf = std::vector<float>(framesPerPeriod() * channels());
+	auto buf = static_cast<void*>(nullptr);
+	auto maxBufSizeInBytes = framesPerPeriod() * channels() * sizeof(float);
 
-	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
-	{
-		pa_stream_write(m_s, buf.data(), buf.size() * sizeof(float), nullptr, 0, PA_SEEK_RELATIVE);
-	}
+	pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes);
+	if (!buf) { return; }
+
+	const auto numFrames = maxBufSizeInBytes / sizeof(float) / channels();
+	nextBuffer(buf, numFrames, channels());
+
+	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
 }
 
 
