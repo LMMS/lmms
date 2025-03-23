@@ -261,6 +261,7 @@ void AudioOss::run()
 {
 	auto buf = std::vector<float>(framesPerPeriod() * channels());
 	auto pcmBuf = std::vector<int16_t>(buf.size());
+	const auto bytesToWrite = pcmBuf.size() * sizeof(int16_t);
 
 	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
@@ -269,7 +270,7 @@ void AudioOss::run()
 			pcmBuf[i] = static_cast<int16_t>(buf[i] * OUTPUT_SAMPLE_MULTIPLIER);
 		}
 
-		write(m_audioFD, pcmBuf.data(), sizeof(int16_t));
+		if (write(m_audioFD, pcmBuf.data(), bytesToWrite) != bytesToWrite) { break; }
 	}
 }
 
