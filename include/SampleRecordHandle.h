@@ -72,7 +72,7 @@ private:
 
 	// The offset from the start of m_track that the record has
 	// started from.
-	TimePos m_startRecordTimeOffset;
+	const TimePos m_startRecordTimeOffset;
 } ;
 
 
