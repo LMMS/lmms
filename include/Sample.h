@@ -80,8 +80,8 @@ public:
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
-	Sample(Sample&& other);
-	explicit Sample(const QString& audioFile);
+	Sample(Sample&& other) noexcept;
+	explicit Sample(const std::filesystem::path& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
@@ -91,7 +91,7 @@ public:
 		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
+	auto sampleFile() const -> const std::filesystem::path& { return m_buffer->audioFile(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> size_t { return m_buffer->size(); }
 

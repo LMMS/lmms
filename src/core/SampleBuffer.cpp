@@ -27,7 +27,6 @@
 
 #include "PathUtil.h"
 #include "SampleDecoder.h"
-#include "lmms_basics.h"
 
 namespace lmms {
 
@@ -37,17 +36,16 @@ SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sample
 {
 }
 
-SampleBuffer::SampleBuffer(const QString& audioFile)
+SampleBuffer::SampleBuffer(const std::filesystem::path& audioFile)
 {
-	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	const auto absolutePath = PathUtil::toAbsolute(audioFile);
-
-	if (auto decodedResult = SampleDecoder::decode(absolutePath))
+	if (audioFile.empty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
+	
+	if (auto decodedResult = SampleDecoder::decode(audioFile))
 	{
 		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::move(data);
 		m_sampleRate = sampleRate;
-		m_audioFile = PathUtil::toShortestRelative(audioFile);
+		m_audioFile = audioFile;
 		return;
 	}
 
@@ -91,6 +89,11 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 {
 	static auto s_buffer = std::make_shared<const SampleBuffer>();
 	return s_buffer;
+}
+
+auto SampleBuffer::loadFromCache(const std::filesystem::path& path) -> std::shared_ptr<const SampleBuffer>
+{
+	return m_fileCache.get(path);
 }
 
 } // namespace lmms

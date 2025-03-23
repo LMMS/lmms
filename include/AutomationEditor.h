@@ -292,7 +292,7 @@ private:
 	QColor m_detuningNoteColor;
 	QColor m_ghostSampleColor;
 	
-	SampleThumbnail m_sampleThumbnail;
+	std::shared_ptr<const SampleThumbnail> m_sampleThumbnail;
 
 	friend class AutomationEditorWindow;
 

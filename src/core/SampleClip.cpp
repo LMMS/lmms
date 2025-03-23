@@ -118,16 +118,9 @@ void SampleClip::changeLengthToSampleLength()
 	changeLength(length);
 }
 
-
-
-const QString& SampleClip::sampleFile() const
+bool SampleClip::hasSampleFileLoaded(const std::filesystem::path& sampleFile) const
 {
-	return m_sample.sampleFile();
-}
-
-bool SampleClip::hasSampleFileLoaded(const QString & filename) const
-{
-	return m_sample.sampleFile() == filename;
+	return m_sample.sampleFile() == sampleFile;
 }
 
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
@@ -143,14 +136,14 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	Engine::getSong()->setModified();
 }
 
-void SampleClip::setSampleFile(const QString& sf)
+void SampleClip::setSampleFile(const std::filesystem::path& sf)
 {
 	int length = 0;
 
-	if (!sf.isEmpty())
+	if (!sf.empty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
+		m_sample = Sample(SampleLoader::createBufferFromFile(sf));
 		length = sampleLength();
 	}
 
@@ -265,7 +258,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "src", sampleFile() );
+	_this.setAttribute("src", PathUtil::fsConvert(sampleFile()));
 	_this.setAttribute( "off", startTimeOffset() );
 	if( sampleFile() == "" )
 	{
@@ -299,17 +292,17 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			setSampleFile(srcFile);
+			setSampleFile(PathUtil::fsConvert(srcFile));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
 
-	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
+	if (sampleFile().empty() && _this.hasAttribute("data"))
 	{
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->outputSampleRate();
 
-		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
+		auto buffer = SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
 		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );

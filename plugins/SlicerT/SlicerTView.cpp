@@ -32,8 +32,9 @@
 #include "DataFile.h"
 #include "InstrumentTrack.h"
 #include "InstrumentView.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
+#include "SampleFilePicker.h"
 #include "SlicerT.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -136,7 +137,7 @@ void SlicerTView::exportMidi()
 
 void SlicerTView::openFiles()
 {
-	const auto audioFile = SampleLoader::openAudioFile();
+	const auto audioFile = SampleFilePicker::openAudioFile();
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);
 }
@@ -251,8 +252,9 @@ void SlicerTView::paintEvent(QPaintEvent* pe)
 
 	brush.setPen(QColor(255, 255, 255, 180));
 	brush.setFont(QFont(brush.font().family(), 8, -1, false));
-	QString sampleName = m_slicerTParent->getSampleName();
-	if (sampleName == "") { sampleName = "No sample loaded"; }
+
+	auto sampleName = PathUtil::fsConvert(m_slicerTParent->getSampleName());
+	if (sampleName.isEmpty()) { sampleName = "No sample loaded"; }
 
 	brush.drawText(5, boxTopY - s_sampleBoxHeight, width(), s_sampleBoxHeight, Qt::AlignLeft, sampleName);
 }

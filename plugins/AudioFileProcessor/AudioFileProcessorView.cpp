@@ -33,7 +33,7 @@
 #include "DataFile.h"
 #include "FontHelper.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
+#include "SampleFilePicker.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -225,7 +225,7 @@ void AudioFileProcessorView::paintEvent(QPaintEvent*)
 
 	QString file_name = "";
 
-	int idx = a->sample().sampleFile().length();
+	int idx = a->sample().sampleFile().native().length();
 
 	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
@@ -236,7 +236,7 @@ void AudioFileProcessorView::paintEvent(QPaintEvent*)
 	while(idx > 0 &&
 		fm.size(Qt::TextSingleLine, file_name + "...").width() < 210)
 	{
-		file_name = a->sample().sampleFile()[--idx] + file_name;
+		file_name = a->sample().sampleFile().native()[--idx] + file_name;
 	}
 
 	if (idx > 0)
@@ -257,7 +257,7 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = SampleFilePicker::openAudioFile();
 	if (af.isEmpty()) { return; }
 
 	castModel<AudioFileProcessor>()->setAudioFile(af);

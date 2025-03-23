@@ -39,6 +39,7 @@
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
 #include "SampleLoader.h"
+#include "SampleFilePicker.h"
 #include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -137,14 +138,16 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	auto af = gui::SampleLoader::openWaveformFile();
-	if( af != "" )
-	{
-		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
-		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
-		// TODO:
-		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
-	}
+	// TODO: Move function out of lmms namespace (i.e., Core)
+
+	auto af = PathUtil::fsConvert(gui::SampleFilePicker::openWaveformFile());
+	if (af.empty()) { return; }
+
+	m_sampleBuffer = SampleLoader::createBufferFromFile(af);
+	m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
+
+	// TODO:
+	//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 }
 
 
@@ -252,8 +255,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+		_this.setAttribute("userwavefile" + is, PathUtil::fsConvert(m_osc[i]->m_sampleBuffer->audioFile()));
 	}
 }
 
@@ -285,7 +287,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(userWaveFile);
+				m_osc[i]->m_sampleBuffer = SampleLoader::createBufferFromFile(PathUtil::fsConvert(userWaveFile));
 				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }

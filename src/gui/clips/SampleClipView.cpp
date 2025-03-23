@@ -21,22 +21,23 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
+#include "SampleFilePicker.h"
 #include "SampleLoader.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -60,21 +61,19 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 
 void SampleClipView::updateSample()
 {
-	update();
+	const auto sampleFile = PathUtil::fsConvert(m_clip->m_sample.sampleFile());
 
-	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
-
-	// set tooltip to filename so that user can see what sample this
-	// sample-clip contains
-	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
-			: tr("Double-click to open sample")
-	);
+	if (sampleFile.isEmpty())
+	{
+		setToolTip(tr("Double-click to open sample"));
+	}
+	else
+	{
+		update();
+		m_sampleThumbnail = SampleThumbnail::loadFromCache(m_clip->m_sample.sampleFile());
+		setToolTip(PathUtil::toAbsolute(sampleFile));
+	}
 }
-
-
-
 
 void SampleClipView::constructContextMenu(QMenu* cm)
 {
@@ -121,7 +120,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 {
 	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
+		m_clip->setSampleFile(PathUtil::fsConvert(StringPairDrag::decodeValue(_de)));
 		_de->accept();
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
@@ -183,9 +182,9 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const auto selectedAudioFile = PathUtil::fsConvert(SampleFilePicker::openAudioFile());
 
-	if (selectedAudioFile.isEmpty()) { return; }
+	if (selectedAudioFile.empty()) { return; }
 	
 	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
@@ -284,10 +283,11 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			.reversed = sample.reversed()
 		};
 
-		m_sampleThumbnail.visualize(param, p);
+		m_sampleThumbnail->visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	const auto sampleFile = PathUtil::fsConvert(m_clip->m_sample.sampleFile());
+	const auto name = PathUtil::cleanName(sampleFile);
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

@@ -26,12 +26,11 @@
 #define LMMS_SAMPLE_DECODER_H
 
 #include <QString>
-#include <functional>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include "lmms_basics.h"
 #include "SampleFrame.h"
 
 namespace lmms {
@@ -50,7 +49,7 @@ public:
 		std::string extension;
 	};
 
-	static auto decode(const QString& audioFile) -> std::optional<Result>;
+	static auto decode(const std::filesystem::path& audioFile) -> std::optional<Result>;
 	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
 };
 } // namespace lmms
