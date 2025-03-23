@@ -27,6 +27,7 @@
 
 #include <QWidget>
 
+#include "AutomatableButton.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
 #include "PluginView.h"
