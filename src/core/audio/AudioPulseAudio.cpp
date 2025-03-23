@@ -56,7 +56,7 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngin
 {
 	_success_ful = false;
 
-	m_sampleSpec.format = PA_SAMPLE_S16LE;
+	m_sampleSpec.format = PA_SAMPLE_FLOAT32;
 	m_sampleSpec.rate = sampleRate();
 	m_sampleSpec.channels = channels();
 
