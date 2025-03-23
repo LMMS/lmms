@@ -253,8 +253,13 @@ void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 	pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes);
 	if (!buf) { return; }
 
-	const auto numFrames = maxBufSizeInBytes / sizeof(float) / channels();
-	nextBuffer(buf, numFrames, channels());
+	const auto numSamples = maxBufSizeInBytes / sizeof(float);
+	const auto numFrames = numSamples / channels();
+
+	if (!nextBuffer(buf, numFrames, channels()))
+	{
+		std::fill_n(static_cast<float*>(buf), numSamples, 0.f);
+	}
 
 	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
 }
