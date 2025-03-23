@@ -537,6 +537,9 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_F2:
 			renameChannel(m_currentMixerChannel->channelIndex());
 			break;
+		default:
+			e->ignore();
+			break;
 	}
 }
 
