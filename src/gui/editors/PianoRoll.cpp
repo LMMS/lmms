@@ -4864,12 +4864,12 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// Loop through all notes having their detuning/parameter being edited, and find the one whose automation curve is closest to the mouse.
-	int minDifference = -1;
+	int minScore = -1;
 	Note* closestNote = nullptr;
 	for (Note* note : m_selectedParameterEditNotes)
 	{
-		// Skip note if the mouse is outside of its start/end time
-		if (pos_ticks < note->pos() || pos_ticks > note->endPos()) { continue; }
+		// Skip note if the mouse is outside of its start time
+		if (pos_ticks < note->pos()) { continue; }
 
 		TimePos relativePos = pos_ticks - note->pos();
 		int relativeKey = key_num - note->key();
@@ -4877,12 +4877,17 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 		AutomationClip* aClip = note->getParameterCurve(paramType);
 		if (aClip == nullptr) { continue; }
 
-		// Calculate the vertical distance from the automation curve to the mouse.
 		int differenceFromCurve = std::abs(relativeKey - aClip->valueAt(relativePos));
-		// If it's less than the current min, set this note as the closest note so far.
-		if (differenceFromCurve < minDifference || minDifference == -1)
+		int verticalPixelOffset = differenceFromCurve * m_keyLineHeight;
+
+		int lastNodeTime = !aClip->getTimeMap().isEmpty() ? aClip->getTimeMap().lastKey() : 0;
+		int horizontalPixelOffset = (pos_ticks > note->endPos() && relativePos > lastNodeTime) ? (relativePos - lastNodeTime) * m_ppb / TimePos::ticksPerBar() : 0;
+		
+		int distanceScore = verticalPixelOffset * verticalPixelOffset + horizontalPixelOffset * horizontalPixelOffset;
+
+		if (distanceScore < minScore || minScore == -1)
 		{
-			minDifference = differenceFromCurve;
+			minScore = distanceScore;
 			closestNote = note;
 		}
 	}
