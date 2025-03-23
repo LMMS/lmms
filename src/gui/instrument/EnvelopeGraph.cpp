@@ -158,7 +158,7 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	{
 		const float sumOfSegments = predelayPercentage + attackPercentage + holdPercentage + decayPercentage + releasePercentage;
 
-		float preliminarySegmentWidth = 2.f * availableWidth;
+		float preliminarySegmentWidth = 4.f * availableWidth;
 		
 		const float neededWidth = sumOfSegments * preliminarySegmentWidth;
 		
