@@ -28,7 +28,6 @@
 #include <QWidget>
 
 #include "ModelView.h"
-#include "PixmapButton.h"
 #include "SerializingObject.h"
 #include "PluginView.h"
 

@@ -28,7 +28,6 @@
 #include <QWidget>
 
 #include "ModelView.h"
-#include "PixmapButton.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
 
