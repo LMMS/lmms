@@ -142,6 +142,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "disableautoquit", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
+	m_detectInvalidMixerOutput(ConfigManager::inst()->value(
+			"audioengine", "detectinvalidmixeroutput", "0").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
 			"midi", "autoquantize", "0").toInt() != 0),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
@@ -587,11 +589,20 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
+	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
+	const auto otherBoxLayout = new QVBoxLayout{otherBox};
+
+	const auto detectInvalidMixerOutputCheckbox = new QCheckBox{};
+	detectInvalidMixerOutputCheckbox->setText(tr("Detect invalid mixer output"));
+	detectInvalidMixerOutputCheckbox->setChecked(m_detectInvalidMixerOutput);
+	otherBoxLayout->addWidget(detectInvalidMixerOutputCheckbox);
+	connect(detectInvalidMixerOutputCheckbox, &QCheckBox::stateChanged, this, &SetupDialog::showRestartWarning);
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
 	audio_layout->addWidget(bufferSizeBox);
+	audio_layout->addWidget(otherBox);
 	audio_layout->addStretch();
 
 
@@ -955,6 +966,8 @@ void SetupDialog::accept()
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
+	ConfigManager::inst()->setValue(
+		"audioengine", "detectinvalidmixeroutput", QString::number(m_detectInvalidMixerOutput));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
