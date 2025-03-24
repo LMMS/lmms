@@ -27,24 +27,18 @@
 
 #include <algorithm>
 #include "lmms_math.h"
-
 #include <cmath>
-
-
 #ifdef SA_DEBUG
 	#include <chrono>
 	#include <iomanip>
 	#include <iostream>
 #endif
-
 #include <QMutexLocker>
 
 #include "fft_helpers.h"
 #include "lmms_constants.h"
 #include "LocklessRingBuffer.h"
-
 #include "SaControls.h"
-
 
 #include <cassert>
 #include <limits>
