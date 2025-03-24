@@ -340,6 +340,7 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addSeparator();
 		toMenu->addMenu(trackView->midiMenu());
+		trackView->addPinConnectorAction(toMenu);
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
