@@ -182,7 +182,7 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
-	bool m_detectInvalidMixerOutput;
+	bool m_silenceInvalidMixerOutput;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
