@@ -140,8 +140,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "vstalwaysontop").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
-	m_NaNHandler(ConfigManager::inst()->value(
-			"app", "nanhandler", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
@@ -552,12 +550,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
 			this, SLOT(audioInterfaceChanged(const QString&)));
 
-	// Advanced setting, hidden for now
-	// // TODO Handle or remove.
-	// auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
-	// audio_layout->addWidget(useNaNHandler);
-	// useNaNHandler->setChecked(m_NaNHandler);
-
 	// Buffer size group
 	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
@@ -961,8 +953,6 @@ void SetupDialog::accept()
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("audioengine", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("app", "nanhandler",
-					QString::number(m_NaNHandler));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
