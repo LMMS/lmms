@@ -31,6 +31,7 @@
 
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
+#include "lmms_constants.h"
 
 namespace lmms::gui
 {
