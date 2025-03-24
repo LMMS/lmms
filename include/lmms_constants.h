@@ -40,6 +40,51 @@ inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
+
+// Frequency ranges (in Hz).
+// Arbitrary low limit for logarithmic frequency scale; >1 Hz.
+inline constexpr auto LOWEST_LOG_FREQ = 5;
+
+// Full range is defined by LOWEST_LOG_FREQ and current sample rate.
+enum class FrequencyRange
+{
+	Full = 0,
+	Audible,
+	Bass,
+	Mids,
+	High
+};
+
+inline constexpr auto FRANGE_AUDIBLE_START =    20;
+inline constexpr auto FRANGE_AUDIBLE_END   = 20000;
+inline constexpr auto FRANGE_BASS_START    =    20;
+inline constexpr auto FRANGE_BASS_END      =   300;
+inline constexpr auto FRANGE_MIDS_START    =   200;
+inline constexpr auto FRANGE_MIDS_END      =  5000;
+inline constexpr auto FRANGE_HIGH_START    =  4000;
+inline constexpr auto FRANGE_HIGH_END      = 20000;
+
+// Amplitude ranges (in dBFS).
+// Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
+// Doubling or halving the amplitude produces 3 dB difference.
+enum class AmplitudeRange
+{
+	Extended = 0,
+	Audible,
+	Loud,
+	Silent
+};
+
+inline constexpr auto ARANGE_EXTENDED_START = -80;
+inline constexpr auto ARANGE_EXTENDED_END   =  20;
+inline constexpr auto ARANGE_AUDIBLE_START  = -50;
+inline constexpr auto ARANGE_AUDIBLE_END    =   0;
+inline constexpr auto ARANGE_LOUD_START     = -30;
+inline constexpr auto ARANGE_LOUD_END       =   0;
+inline constexpr auto ARANGE_SILENT_START   = -60;
+inline constexpr auto ARANGE_SILENT_END     = -10;
+
+
 constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
 ';';

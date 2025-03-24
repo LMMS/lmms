@@ -40,11 +40,11 @@
 
 
 #include "fft_helpers.h"
+#include "lmms_constants.h"
 #include "lmms_math.h"
 #include "LocklessRingBuffer.h"
 
 #include "SaControls.h"
-#include "SaConstants.h"
 
 
 namespace lmms
