@@ -26,11 +26,10 @@
 #include "SaProcessor.h"
 
 #include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <limits>
+#include "lmms_math.h"
 
-#include <QMutexLocker>
+#include <cmath>
+
 
 #ifdef SA_DEBUG
 	#include <chrono>
@@ -38,14 +37,17 @@
 	#include <iostream>
 #endif
 
+#include <QMutexLocker>
 
 #include "fft_helpers.h"
 #include "lmms_constants.h"
-#include "lmms_math.h"
 #include "LocklessRingBuffer.h"
 
 #include "SaControls.h"
 
+
+#include <cassert>
+#include <limits>
 
 namespace lmms
 {
