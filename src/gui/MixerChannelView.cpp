@@ -215,6 +215,7 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 void MixerChannelView::mousePressEvent(QMouseEvent*)
 {
 	if (m_mixerView->currentMixerChannel() != this) { m_mixerView->setCurrentMixerChannel(this); }
+	setFocus();
 }
 
 void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
