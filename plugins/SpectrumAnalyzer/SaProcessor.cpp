@@ -44,53 +44,11 @@
 #include "LocklessRingBuffer.h"
 
 #include "SaControls.h"
+#include "SaConstants.h"
 
 
 namespace lmms
 {
-// Some constants used only in this file
-// Frequency ranges (in Hz).
-// Arbitrary low limit for logarithmic frequency scale; >1 Hz.
-inline constexpr auto LowestLogFreq = 5;
-
-// Full range is defined by LowestLogFreq and current sample rate.
-enum class FrequencyRange
-{
-	Full = 0,
-	Audible,
-	Bass,
-	Mids,
-	High
-};
-
-inline constexpr auto FrequencyRangeAudibleStart =    20;
-inline constexpr auto FrequencyRangeAudibleEnd   = 20000;
-inline constexpr auto FrequencyRangeBassStart    =    20;
-inline constexpr auto FrequencyRangeBassEnd      =   300;
-inline constexpr auto FrequencyRangeMidsStart    =   200;
-inline constexpr auto FrequencyRangeMidsEnd      =  5000;
-inline constexpr auto FrequencyRangeHighStart    =  4000;
-inline constexpr auto FrequencyRangeHighEnd      = 20000;
-
-// Amplitude ranges (in dBFS).
-// Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
-// Doubling or halving the amplitude produces 3 dB difference.
-enum class AmplitudeRange
-{
-	Extended = 0,
-	Audible,
-	Loud,
-	Silent
-};
-
-inline constexpr auto AmplitudeRangeExtendedStart = -80;
-inline constexpr auto AmplitudeRangeExtendedEnd   =  20;
-inline constexpr auto AmplitudeRangeAudibleStart  = -50;
-inline constexpr auto AmplitudeRangeAudibleEnd    =   0;
-inline constexpr auto AmplitudeRangeLoudStart     = -30;
-inline constexpr auto AmplitudeRangeLoudEnd       =   0;
-inline constexpr auto AmplitudeRangeSilentStart   = -60;
-inline constexpr auto AmplitudeRangeSilentEnd     = -10;
 
 
 SaProcessor::SaProcessor(const SaControls *controls) :
