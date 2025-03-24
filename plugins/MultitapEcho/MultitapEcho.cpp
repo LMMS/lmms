@@ -25,7 +25,7 @@
 
 #include "MultitapEcho.h"
 #include "embed.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
 
