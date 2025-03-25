@@ -213,8 +213,6 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 			setChannels(outputStreamParameters.channelCount);
 
 			ConfigManager::inst()->setValue("audioengine", "samplerate", QString::number(sampleRate));
-			ConfigManager::inst()->setValue(tag(), channelsAttribute(Direction::Input), QString::number(inputStreamParameters.channelCount));
-			ConfigManager::inst()->setValue(tag(), channelsAttribute(Direction::Output), QString::number(outputStreamParameters.channelCount));
 			break;
 		}
 	}
