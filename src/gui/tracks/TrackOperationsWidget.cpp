@@ -83,8 +83,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	// buttons in a layout.
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
-	operationsLayout->setContentsMargins(0, 0, 0, 0);
-	operationsLayout->setSpacing(0);
+	operationsLayout->setContentsMargins(0, 3, 0, 0);
+	operationsLayout->setSpacing(2);
 
 	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
@@ -108,10 +108,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		const auto activePixmap = embed::getIconPixmap(activeGraphic);
 		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
 
-		auto necessarySize = activePixmap.size().expandedTo(inactivePixmap.size());
-
 		auto wrapperWidget = new QWidget(parent);
-		wrapperWidget->setFixedSize(necessarySize);
 
 		auto button = new PixmapButton(wrapperWidget, toolTip);
 		button->setCheckable(true);
@@ -119,38 +116,21 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		button->setInactiveGraphic(inactivePixmap);
 		button->setToolTip(toolTip);
 
+		wrapperWidget->setFixedSize(button->minimumSizeHint());
+
 		pixmapButton = button;
 
 		return wrapperWidget;
 	};
 
-	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "led_off", "led_green", m_muteBtn);
-	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "led_red", "led_off", m_soloBtn);
+	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "mute_active", "mute_inactive", m_muteBtn);
+	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "solo_active", "solo_inactive", m_soloBtn);
 
-	operationsLayout->addWidget(m_trackOps, Qt::AlignCenter);
-	operationsLayout->addSpacing(5);
+	operationsLayout->addWidget(m_trackOps);
+	operationsLayout->addWidget(muteWidget);
+	operationsLayout->addWidget(soloWidget);
 
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		auto vlayout = new QVBoxLayout();
-		vlayout->setContentsMargins(0, 0, 0, 0);
-		vlayout->setSpacing(0);
-		vlayout->addStretch(1);
-		vlayout->addWidget(muteWidget);
-		vlayout->addWidget(soloWidget);
-		vlayout->addStretch(1);
-		operationsLayout->addLayout(vlayout);
-	}
-	else
-	{
-		operationsLayout->addWidget(muteWidget, Qt::AlignCenter);
-		operationsLayout->addWidget(soloWidget, Qt::AlignCenter);
-	}
-
-	operationsLayout->addStretch(1);
-
-	layout->addWidget(operationsWidget, 0, Qt::AlignTop);
+	layout->addWidget(operationsWidget, 0, Qt::AlignTop | Qt::AlignLeading);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
@@ -162,11 +142,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
-
-
-
-
-
 
 
 /*! \brief Respond to trackOperationsWidget mouse events
@@ -197,8 +172,6 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 		me->ignore();
 	}
 }
-
-
 
 
 /*!
@@ -241,16 +214,8 @@ bool TrackOperationsWidget::confirmRemoval()
 	mb.setCheckBox(askAgainCheckBox);
 	mb.setDefaultButton(QMessageBox::Cancel);
 
-	int answer = mb.exec();
-
-	if( answer == QMessageBox::Ok )
-	{
-		return true;
-	}
-	return false;
+	return mb.exec() == QMessageBox::Ok;
 }
-
-
 
 /*! \brief Clone this track
  *
@@ -287,7 +252,6 @@ void TrackOperationsWidget::clearTrack()
 	t->deleteClips();
 	t->unlock();
 }
-
 
 
 /*! \brief Remove this track from the track list
@@ -342,6 +306,7 @@ void TrackOperationsWidget::resetClipColors()
 	}
 	Engine::getSong()->setModified();
 }
+
 
 /*! \brief Update the trackOperationsWidget context menu
  *
@@ -407,7 +372,6 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		atv->update();
 	}
 }
-
 
 
 void TrackOperationsWidget::recordingOn()

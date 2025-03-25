@@ -27,6 +27,8 @@
 
 #include "MidiEvent.h"
 
+#include "lmmsconfig.h"
+
 #include <atomic>
 #include <vector>
 #include <cstdio>
