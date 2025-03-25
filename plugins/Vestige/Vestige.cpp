@@ -80,7 +80,11 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 #ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
 	"dll,so",
+#else
+	"so",
+#endif
 #else
 	"dll",
 #endif
@@ -669,13 +673,19 @@ void VestigeInstrumentView::openPlugin()
 
 	// set filters
 	QStringList types;
-	types << tr( "DLL-files (*.dll)" )
-		<< tr( "EXE-files (*.exe)" )
 #ifdef LMMS_BUILD_LINUX
-		<< tr( "SO-files (*.so)" )
+#if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+	types << tr("All VST files (*.dll *.so)")
+		<< tr("Windows VST2 files (*.dll)" )
+		<< tr("LinuxVST files (*.so)");
+#else
+	types << tr("LinuxVST files (*.so)");
 #endif
-		;
-	ofd.setNameFilters( types );
+#else
+	types << tr("VST2 files (*.dll)" )
+#endif
+
+	ofd.setNameFilters(types);
 
 	if( m_vi->m_pluginDLL != "" )
 	{
