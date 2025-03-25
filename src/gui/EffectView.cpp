@@ -63,23 +63,21 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_bypass->setToolTip(tr("On/Off"));
 
+	constexpr int knobLabelSize = 8;
 
-	m_wetDry = new Knob( KnobType::Bright26, this );
-	m_wetDry->setLabel( tr( "W/D" ) );
+	m_wetDry = Knob::buildKnobWithFixedPixelFont(KnobType::Bright26, tr("W/D"), knobLabelSize, this);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
-	m_autoQuit = new TempoSyncKnob( KnobType::Bright26, this );
-	m_autoQuit->setLabel( tr( "DECAY" ) );
+	m_autoQuit = TempoSyncKnob::buildKnobWithFixedPixelFont(KnobType::Bright26, tr("DECAY"), knobLabelSize, this);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
 	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
-	m_gate = new Knob( KnobType::Bright26, this );
-	m_gate->setLabel( tr( "GATE" ) );
+	m_gate = Knob::buildKnobWithFixedPixelFont(KnobType::Bright26, tr("GATE"), knobLabelSize, this);
 	m_gate->move( 116 - m_gate->width() / 2, 5 );
 	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
