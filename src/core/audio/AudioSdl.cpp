@@ -63,7 +63,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 						// to convert the buffers
 
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = std::max(f_cnt_t{1024}, framesPerPeriod() * 2);
+	m_audioHandle.samples = framesPerPeriod();
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -140,8 +140,6 @@ AudioSdl::~AudioSdl()
 void AudioSdl::startProcessing()
 {
 	AudioDevice::startProcessing();
-
-	m_stopped = false;
 	SDL_PauseAudioDevice (m_outputDevice, 0);
 	SDL_PauseAudioDevice (m_inputDevice, 0);
 }
@@ -157,8 +155,6 @@ void AudioSdl::stopProcessing()
 	{
 		SDL_LockAudioDevice (m_inputDevice);
 		SDL_LockAudioDevice (m_outputDevice);
-
-		m_stopped = true;
 
 		SDL_PauseAudioDevice (m_inputDevice,	1);
 		SDL_PauseAudioDevice (m_outputDevice,	1);
@@ -180,11 +176,13 @@ void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 
 void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 {
-	if (m_stopped || !nextBuffer(_buf, _len / sizeof(float) / channels(), channels()))
+	const auto frameCount = _len / sizeof(float) / channels();
+
+	if (!nextBuffer(_buf, frameCount, channels()))
 	{
 		memset( _buf, 0, _len );
 		return;
-	}	
+	}
 }
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {

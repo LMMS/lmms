@@ -84,7 +84,7 @@ bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t d
 			else
 			{
 				dstBuffer[dstFrameIndex * dstChannelCount] = srcFrame.left(); 
-				dstBuffer[(dstFrameIndex + 1) * dstChannelCount] = srcFrame.right();
+				dstBuffer[dstFrameIndex * dstChannelCount + 1] = srcFrame.right();
 
 				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
 				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
