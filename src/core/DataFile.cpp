@@ -1947,6 +1947,9 @@ void DataFile::upgrade_sampleAndHold()
 /** \brief The knobs in the envelope/lfo section of instruments were changed to use linear scaling
  * Previously, the knobs used quadratic scaling relative to the max env/lfo length,
  * which meant the value stored in the model was essentially meaningless to the user.
+ *
+ * This upgrade also automatically sets the appropriate knobs to be logarithmic,
+ * but this is merely a cosmetic change and does not affect the internal value.
  */
 void DataFile::upgrade_envelope_lfo_knob_scaling()
 {
@@ -1964,35 +1967,103 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 			// Envelope knobs
 			for (QString attribute : {"pdel", "att", "hold", "rel"})
 			{
-				float oldValue = e.attribute(attribute, "0").toFloat();
+				// Models can either be stored as attributes if they are simple, or as child nodes if they have connections or a scale type.
+				// Since the new knobs will be log by default, here we remove any old attribute-based knobs and add a child element instead.
+				QDomElement newElem;
+				float oldValue;
+				if (e.namedItem(attribute).isNull())
+				{
+					oldValue = e.attribute(attribute, "0").toFloat();
+					e.removeAttribute(attribute);
+					newElem = createElement(attribute);
+					newElem.setAttribute("id", -1);
+					e.appendChild(newElem);
+				}
+				else
+				{
+					newElem = e.namedItem(attribute).toElement();
+					oldValue = newElem.attribute("value").toFloat();
+				}
 				// Envelope knobs used to be multiplied by 5
 				float newValue = oldValue > 0.0f
-				? oldValue * oldValue * 5.0f
-				: -oldValue * oldValue * 5.0f;
-				e.setAttribute(attribute, newValue);
+					? oldValue * oldValue * 5.0f
+					: -oldValue * oldValue * 5.0f;
+
+				newElem.setAttribute("value", newValue);
+				newElem.setAttribute("scale_type", "log");
 			}
 			// The decay knob was multiplied by 1-sustain before being squared, and then multiplied by 5.
 			// To revert it, first multiply by (1 - sustain), square it while keeping the sign, then multiply by 5, then divide by (1 - sustain).
 			// But the (1 - sustain) will cancel out, so it only has to be multiplied once.
-			float oldDecay = e.attribute("dec", "0").toFloat();
+			QDomElement newDecayElem;
+			float oldDecay;
 			float sustain = e.attribute("sustain", "0").toFloat();
+			if (e.namedItem("dec").isNull())
+			{
+				oldDecay = e.attribute("dec", "0").toFloat();
+				e.removeAttribute("dec");
+				newDecayElem = createElement("dec");
+				newDecayElem.setAttribute("id", -1);
+				e.appendChild(newDecayElem);
+			}
+			else
+			{
+				newDecayElem = e.namedItem("dec").toElement();
+				oldDecay = newDecayElem.attribute("value").toFloat();
+			}
 			float newDecay = oldDecay > 0.0f
 				? oldDecay * (1.0f - sustain) * oldDecay * 5
 				: -oldDecay * (1.0f - sustain) * oldDecay * 5;
-			e.setAttribute("dec", newDecay);
+				newDecayElem.setAttribute("value", newDecay);
+				newDecayElem.setAttribute("scale_type", "log");
 
 			// LFO knobs
 			for (QString attribute : {"lshp", "lpdel", "latt"})
 			{
-				float oldValue = e.attribute(attribute, "0").toFloat();
+				QDomElement newElem;
+				float oldValue;
+				if (e.namedItem(attribute).isNull())
+				{
+					oldValue = e.attribute(attribute, "0").toFloat();
+					e.removeAttribute(attribute);
+					newElem = createElement(attribute);
+					newElem.setAttribute("id", -1);
+					e.appendChild(newElem);
+				}
+				else
+				{
+					newElem = e.namedItem(attribute).toElement();
+					oldValue = newElem.attribute("value").toFloat();
+				}
 				// LFO knobs were multiplied by 20
 				float newValue = oldValue > 0.0f
 					? oldValue * oldValue * 20.0f
 					: -oldValue * oldValue * 20.0f;
 				e.setAttribute(attribute, newValue);
+
+				newElem.setAttribute("value", newValue);
+				newElem.setAttribute("scale_type", "log");
 			}
+
 			// The LFO speed knob was not squared, but was multiplied by 20
-			e.setAttribute("lspd", e.attribute("lspd", "0").toFloat() * 20.0f);
+			QDomElement newElem;
+			float oldValue;
+			if (e.namedItem("lspd").isNull())
+			{
+				oldValue = e.attribute("lspd", "0").toFloat();
+				e.removeAttribute("lspd");
+				newElem = createElement("lspd");
+				newElem.setAttribute("id", -1);
+				e.appendChild(newElem);
+			}
+			else
+			{
+				newElem = e.namedItem("lspd").toElement();
+				oldValue = newElem.attribute("value").toFloat();
+			}
+			float newValue = oldValue * 20.0f;
+			newElem.setAttribute("value", newValue);
+			newElem.setAttribute("scale_type", "log");
 		}
 	}
 }

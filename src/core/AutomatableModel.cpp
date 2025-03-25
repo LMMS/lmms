@@ -258,7 +258,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( node.isElement() )
 	{
 		QDomElement nodeElement = node.toElement();
-		changeID( nodeElement.attribute( "id" ).toInt() );
+		if (nodeElement.attribute( "id" ).toInt() != -1) { changeID(nodeElement.attribute( "id" ).toInt()); }
 		setValue( LocaleHelper::toFloat( nodeElement.attribute( "value" ) ) );
 		if( nodeElement.hasAttribute( "scale_type" ) )
 		{
