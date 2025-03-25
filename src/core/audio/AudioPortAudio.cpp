@@ -180,21 +180,44 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	auto outputDevice = findDeviceFromConfig(Direction::Output);
 	if (outputDevice == paNoDevice) { throw std::runtime_error{"PortAudio: could not load output device"}; }
 
-	const auto sampleRate = engine->baseSampleRate();
 	const auto framesPerBuffer = engine->framesPerPeriod();
-	const auto suggestedLatency = static_cast<double>(framesPerBuffer) / sampleRate;
+	auto inputStreamParameters = createStreamParameters(inputDevice, 0., Direction::Input);
+	auto outputStreamParameters = createStreamParameters(outputDevice, 0., Direction::Output);
 
-	const auto inputStreamParameters = createStreamParameters(inputDevice, suggestedLatency, Direction::Input);
-	const auto outputStreamParameters = createStreamParameters(outputDevice, suggestedLatency, Direction::Output);
+	auto sampleRateSuggestions = SUPPORTED_SAMPLERATES;
+	const auto currentSampleRate = ConfigManager::inst()->value("audioengine", "samplerate").toInt();
 
-	if (const auto err = Pa_OpenStream(&m_paStream, inputDevice == paNoDevice ? nullptr : &inputStreamParameters,
-			&outputStreamParameters, sampleRate, framesPerBuffer, paNoFlag, &processCallback, this))
+	if (currentSampleRate != 0)
 	{
-		throw std::runtime_error{std::string{"PortAudio: could not open stream, "} + Pa_GetErrorText(err)};
+		// Prioritize the current sample rate if it is supported
+		std::stable_partition(sampleRateSuggestions.begin(), sampleRateSuggestions.end(),
+			[&](const auto rate) { return rate == currentSampleRate; });
 	}
 
-	setSampleRate(sampleRate);
-	setChannels(outputStreamParameters.channelCount);
+	for (auto i = std::size_t{0}; i < sampleRateSuggestions.size(); ++i)
+	{
+		const auto sampleRate = sampleRateSuggestions[i];
+		const auto suggestedLatency = static_cast<double>(framesPerBuffer) / sampleRate;
+
+		inputStreamParameters.suggestedLatency = suggestedLatency;
+		outputStreamParameters.suggestedLatency = suggestedLatency;
+
+		const auto err = Pa_OpenStream(&m_paStream, inputDevice == paNoDevice ? nullptr : &inputStreamParameters,
+			&outputStreamParameters, sampleRate, framesPerBuffer, paNoFlag, &processCallback, this);
+
+		if (err == paNoError)
+		{
+			setSampleRate(sampleRate);
+
+			// TODO: We should also be setting the input channel count
+			setChannels(outputStreamParameters.channelCount);
+
+			ConfigManager::inst()->setValue("audioengine", "samplerate", QString::number(sampleRate));
+			ConfigManager::inst()->setValue(tag(), channelsAttribute(Direction::Input), QString::number(inputStreamParameters.channelCount));
+			ConfigManager::inst()->setValue(tag(), channelsAttribute(Direction::Output), QString::number(outputStreamParameters.channelCount));
+			break;
+		}
+	}
 }
 
 AudioPortAudio::~AudioPortAudio()
