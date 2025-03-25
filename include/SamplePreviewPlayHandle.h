@@ -1,5 +1,5 @@
 /*
- * SampleStream.h
+ * SamplePreviewPlayHandle.h
  *
  * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
