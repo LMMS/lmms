@@ -37,6 +37,7 @@
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -217,10 +218,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	setNeedsUpdate( false );
 
-	// Use the clip's height to avoid artifacts when rendering while something else is overlaying the clip.
-	const auto viewPortRect = QRect(0, 0, pe->rect().width(), rect().height());
+	const auto trackViewWidth = getTrackView()->rect().width();
 
-	m_paintPixmapXPosition = pe->rect().x();
+	// Use the clip's height to avoid artifacts when rendering while something else is overlaying the clip.
+	const auto viewPortRect = QRect(0, 0, trackViewWidth * 2, rect().height());
+
+	m_paintPixmapXPosition = std::max(0, pe->rect().x() - trackViewWidth);
 
 	if (m_paintPixmap.isNull() || m_paintPixmap.size() != viewPortRect.size())
 	{
