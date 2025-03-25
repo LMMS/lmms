@@ -596,7 +596,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	silenceInvalidMixerOutputCheckbox->setText(tr("Silence invalid mixer output"));
 	silenceInvalidMixerOutputCheckbox->setChecked(m_silenceInvalidMixerOutput);
 	otherBoxLayout->addWidget(silenceInvalidMixerOutputCheckbox);
-	connect(silenceInvalidMixerOutputCheckbox, &QCheckBox::stateChanged, this, &SetupDialog::showRestartWarning);
+
+	connect(silenceInvalidMixerOutputCheckbox, &QCheckBox::stateChanged, [silenceInvalidMixerOutputCheckbox, this] {
+		m_silenceInvalidMixerOutput = silenceInvalidMixerOutputCheckbox->isChecked();
+		showRestartWarning();
+	});
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
