@@ -314,6 +314,25 @@ void MidiClip::setStep( int step, bool enabled )
 
 
 
+void MidiClip::reverseNotes(const NoteVector& notes)
+{
+	addJournalCheckPoint();
+
+	TimePos firstPos = (*std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); }))->pos();
+	TimePos lastPos = (*std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); }))->endPos();
+
+	for (auto note : notes)
+	{
+		TimePos oldStart = note->pos();
+		TimePos newStart = lastPos - (oldStart - firstPos) - note->length();
+		note->setPos(newStart);
+	}
+
+	rearrangeAllNotes();
+	emit dataChanged();
+}
+
+
 
 void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 {
