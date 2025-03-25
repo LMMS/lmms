@@ -30,6 +30,7 @@
 #include "ModelView.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
+#include "AutomatableButton.h"
 
 class QLineEdit;
 
