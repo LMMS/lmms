@@ -35,6 +35,8 @@
 #include "MainWindow.h"
 #include "SimpleTextFloat.h"
 
+#include <iostream> // DEBUG REMOVE TODO
+
 namespace lmms::gui
 {
 
@@ -146,6 +148,7 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 {
 	qDebug("HandleKeyPress 1");
+	std::cout << "InteractiveModelView::HandleKeyPress this:" << this << "\n";
 	std::vector<ModelShortcut> shortcuts(getShortcuts());
 	qDebug("HandleKeyPress 2");
 	
@@ -265,6 +268,7 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 bool InteractiveModelView::processPaste(const QMimeData* mimeData)
 {
 	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
+	std::cout << "InteractiveModelView::processPaste this:" << this << "\n";
 
 	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
 	QString value = Clipboard::decodeValue(mimeData);
