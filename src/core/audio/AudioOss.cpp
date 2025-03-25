@@ -239,6 +239,8 @@ QString AudioOss::probeDevice()
 
 void AudioOss::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -250,31 +252,26 @@ void AudioOss::startProcessing()
 
 void AudioOss::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	stopProcessingThread( this );
 }
 
 void AudioOss::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	auto buf = std::vector<float>(framesPerPeriod() * channels());
+	auto pcmBuf = std::vector<int16_t>(buf.size());
+	const auto bytesToWrite = static_cast<int>(pcmBuf.size() * sizeof(int16_t));
 
-	while( true )
+	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
+		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{
-			break;
+			pcmBuf[i] = static_cast<int16_t>(buf[i] * OUTPUT_SAMPLE_MULTIPLIER);
 		}
 
-		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
-		if( write( m_audioFD, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		if (write(m_audioFD, pcmBuf.data(), bytesToWrite) != bytesToWrite) { break; }
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 

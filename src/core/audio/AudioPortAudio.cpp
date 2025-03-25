@@ -67,12 +67,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
+	m_outBuf(new SampleFrame[framesPerPeriod()]),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
-	m_outBufSize = audioEngine()->framesPerPeriod();
+	m_outBufSize = framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -201,6 +201,8 @@ AudioPortAudio::~AudioPortAudio()
 
 void AudioPortAudio::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	m_stopped = false;
 	PaError err = Pa_StartStream( m_paStream );
 	
@@ -216,6 +218,8 @@ void AudioPortAudio::startProcessing()
 
 void AudioPortAudio::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
 	{
 		m_stopped = true;
@@ -236,42 +240,10 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
-	if( m_stopped )
+	if (!nextBuffer(_outputBuffer, _framesPerBuffer, channels()))
 	{
-		memset( _outputBuffer, 0, _framesPerBuffer *
-			channels() * sizeof(float) );
+		std::fill_n(_outputBuffer, _framesPerBuffer * channels(), 0.f);
 		return paComplete;
-	}
-
-	while( _framesPerBuffer )
-	{
-		if( m_outBufPos == 0 )
-		{
-			// frames depend on the sample rate
-			const fpp_t frames = getNextBuffer( m_outBuf );
-			if( !frames )
-			{
-				m_stopped = true;
-				memset( _outputBuffer, 0, _framesPerBuffer *
-					channels() * sizeof(float) );
-				return paComplete;
-			}
-			m_outBufSize = frames;
-		}
-		const auto min_len = std::min(_framesPerBuffer, m_outBufSize - m_outBufPos);
-
-		for( fpp_t frame = 0; frame < min_len; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				(_outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
-			}
-		}
-
-		_outputBuffer += min_len * channels();
-		_framesPerBuffer -= min_len;
-		m_outBufPos += min_len;
-		m_outBufPos %= m_outBufSize;
 	}
 
 	return paContinue;
