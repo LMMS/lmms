@@ -177,11 +177,11 @@ private:
 	QComboBox * m_audioInterfaces;
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
-	bool m_NaNHandler;
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
+	bool m_silenceInvalidMixerOutput;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;

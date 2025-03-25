@@ -25,14 +25,15 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
-#include "Model.h"
-#include "EffectChain.h"
-#include "JournallingObject.h"
-#include "ThreadableJob.h"
-
+#include <QColor>
 #include <atomic>
 #include <optional>
-#include <QColor>
+
+#include "ConfigManager.h"
+#include "EffectChain.h"
+#include "JournallingObject.h"
+#include "Model.h"
+#include "ThreadableJob.h"
 
 namespace lmms
 {
@@ -88,11 +89,20 @@ class MixerChannel : public ThreadableJob
 		std::atomic_size_t m_dependenciesMet;
 		void incrementDeps();
 		void processed();
-		
+
+		auto silenced() -> bool { return m_silenced.load(std::memory_order_relaxed); }
+
+		static auto silenceInvalidOutput() -> bool
+		{
+			static auto s_value = ConfigManager::inst()->value("audioengine", "silenceinvalidmixeroutput", "0").toInt();
+			return s_value;
+		}
+
 	private:
 		void doProcessing() override;
 		int m_channelIndex;
 		std::optional<QColor> m_color;
+		std::atomic<bool> m_silenced = false;
 };
 
 class MixerRoute : public QObject

@@ -191,15 +191,12 @@ bool EffectChain::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bo
 		return false;
 	}
 
-	MixHelpers::sanitize( _buf, _frames );
-
 	bool moreEffects = false;
 	for (const auto& effect : m_effects)
 	{
 		if (hasInputNoise || effect->isRunning())
 		{
 			moreEffects |= effect->processAudioBuffer(_buf, _frames);
-			MixHelpers::sanitize(_buf, _frames);
 		}
 	}
 

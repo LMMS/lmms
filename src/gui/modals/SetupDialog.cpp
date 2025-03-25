@@ -139,10 +139,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "vstalwaysontop").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
-	m_NaNHandler(ConfigManager::inst()->value(
-			"app", "nanhandler", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
+	m_silenceInvalidMixerOutput(ConfigManager::inst()->value(
+			"audioengine", "silenceinvalidmixeroutput", "0").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
 			"midi", "autoquantize", "0").toInt() != 0),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
@@ -551,12 +551,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
 			this, SLOT(audioInterfaceChanged(const QString&)));
 
-	// Advanced setting, hidden for now
-	// // TODO Handle or remove.
-	// auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
-	// audio_layout->addWidget(useNaNHandler);
-	// useNaNHandler->setChecked(m_NaNHandler);
-
 	// Buffer size group
 	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
@@ -594,11 +588,24 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
+	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
+	const auto otherBoxLayout = new QVBoxLayout{otherBox};
+
+	const auto silenceInvalidMixerOutputCheckbox = new QCheckBox{};
+	silenceInvalidMixerOutputCheckbox->setText(tr("Silence invalid mixer output"));
+	silenceInvalidMixerOutputCheckbox->setChecked(m_silenceInvalidMixerOutput);
+	otherBoxLayout->addWidget(silenceInvalidMixerOutputCheckbox);
+
+	connect(silenceInvalidMixerOutputCheckbox, &QCheckBox::stateChanged, [silenceInvalidMixerOutputCheckbox, this] {
+		m_silenceInvalidMixerOutput = silenceInvalidMixerOutputCheckbox->isChecked();
+		showRestartWarning();
+	});
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
 	audio_layout->addWidget(bufferSizeBox);
+	audio_layout->addWidget(otherBox);
 	audio_layout->addStretch();
 
 
@@ -960,10 +967,10 @@ void SetupDialog::accept()
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("audioengine", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("app", "nanhandler",
-					QString::number(m_NaNHandler));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
+	ConfigManager::inst()->setValue(
+		"audioengine", "silenceinvalidmixeroutput", QString::number(m_silenceInvalidMixerOutput));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
