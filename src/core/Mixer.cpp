@@ -28,8 +28,10 @@
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
-#include "BufferManager.h"
-#include "ConfigManager.h"
+#include "Mixer.h"
+#include "MixHelpers.h"
+#include "Song.h"
+
 #include "InstrumentTrack.h"
 #include "MixHelpers.h"
 #include "PatternStore.h"

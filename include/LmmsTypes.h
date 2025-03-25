@@ -1,5 +1,5 @@
 /*
- * lmms_basics.h - typedefs for common types that are used in the whole app
+ * LmmsTypes.h - typedefs for common types that are used in the whole app
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -26,11 +26,7 @@
 #define LMMS_TYPES_H
 
 #include <cstddef>
-
-#include "lmmsconfig.h"
-
 #include <cstdint>
-
 
 
 namespace lmms
@@ -54,20 +50,6 @@ using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
 
 using jo_id_t = uint32_t; // (unique) ID of a journalling object
 
-
-constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
-
-constexpr char LADSPA_PATH_SEPERATOR =
-#ifdef LMMS_BUILD_WIN32
-';';
-#else
-':';
-#endif
-
-
-
-#define LMMS_STRINGIFY(s) LMMS_STR(s)
-#define LMMS_STR(PN)	#PN
 
 } // namespace lmms
 

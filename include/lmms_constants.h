@@ -25,17 +25,23 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
+#include "lmmsconfig.h"
+#include "LmmsTypes.h"
+
 namespace lmms
 {
-
 // Prefer using `approximatelyEqual()` from lmms_math.h rather than
 // using this directly
 inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
+
+inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
 // Microtuner
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project
 inline constexpr unsigned MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
+
+// Note: All constants below are used only in spectrum analyser
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
 inline constexpr auto LOWEST_LOG_FREQ = 5;
@@ -78,6 +84,15 @@ inline constexpr auto ARANGE_LOUD_START     = -30;
 inline constexpr auto ARANGE_LOUD_END       =   0;
 inline constexpr auto ARANGE_SILENT_START   = -60;
 inline constexpr auto ARANGE_SILENT_END     = -10;
+
+
+// This macro is used to handle path seperation properly in windows
+constexpr char LADSPA_PATH_SEPERATOR =
+#ifdef LMMS_BUILD_WIN32
+';';
+#else
+':';
+#endif
 
 } // namespace lmms
 
