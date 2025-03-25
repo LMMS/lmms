@@ -1957,6 +1957,38 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 	QDomNodeList cut = elementsByTagName("elcut");
 	QDomNodeList res = elementsByTagName("elres");
 
+	// Envelope knobs used to be multiplied by 5 after squaring.
+	auto envUpgrade = [](float oldValue)
+	{
+		return oldValue > 0.0f
+			? oldValue * oldValue * 5.0f
+			: -oldValue * oldValue * 5.0f;
+	};
+
+	// The decay knob was multiplied by 1-sustain before being squared, and then multiplied by 5.
+	// To revert it, first multiply by (1 - sustain), square it while keeping the sign, then multiply by 5, then divide by (1 - sustain).
+	// But the (1 - sustain) will cancel out, so it only has to be multiplied once.
+	auto decUpgrade = [](float oldDecay, float sustain)
+	{
+		return oldDecay > 0.0f
+			? oldDecay * (1.0f - sustain) * oldDecay * 5
+			: -oldDecay * (1.0f - sustain) * oldDecay * 5;
+	};
+
+	// LFO knobs were multiplied by 20 after squaring.
+	auto lfoUpgrade = [](float oldValue)
+	{
+		return oldValue > 0.0f
+			? oldValue * oldValue * 20.0f
+			: -oldValue * oldValue * 20.0f;
+	};
+
+	// The LFO speed knob was not squared, but was multiplied by 20
+	auto lspdUpgrade = [](float oldValue)
+	{
+		return oldValue * 20.0f;
+	};
+
 	for (auto nodeList : {vol, cut, res})
 	{
 		for (int i = 0; i < nodeList.length(); ++i)
@@ -1964,11 +1996,10 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 			if (nodeList.item(i).isNull()) { continue; }
 			auto e = nodeList.item(i).toElement();
 
-			// Envelope knobs
-			for (QString attribute : {"pdel", "att", "hold", "rel"})
+			for (QString attribute : {"pdel", "att", "hold", "dec", "rel", "lpdel", "latt", "lspd"})
 			{
 				// Models can either be stored as attributes if they are simple, or as child nodes if they have connections or a scale type.
-				// Since the new knobs will be log by default, here we remove any old attribute-based knobs and add a child element instead.
+				// Since the new knobs will have a log scale type by default, here we remove any old attribute-based knobs and add a child element instead.
 				QDomElement newElem;
 				float oldValue;
 				if (e.namedItem(attribute).isNull())
@@ -1984,86 +2015,31 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 					newElem = e.namedItem(attribute).toElement();
 					oldValue = newElem.attribute("value").toFloat();
 				}
-				// Envelope knobs used to be multiplied by 5
-				float newValue = oldValue > 0.0f
-					? oldValue * oldValue * 5.0f
-					: -oldValue * oldValue * 5.0f;
+
+				float newValue;
+				if (attribute == "pdel" || attribute == "att" || attribute == "hold" ||attribute == "rel")
+				{
+					newValue = envUpgrade(oldValue);
+				}
+				else if (attribute == "dec")
+				{
+					float sustain = e.namedItem("sustain").isNull()
+						? e.attribute("sustain", "0").toFloat()
+						: e.namedItem("sustain").toElement().attribute("value").toFloat();
+					newValue = decUpgrade(oldValue, sustain);
+				}
+				else if (attribute == "lpdel" || attribute == "latt")
+				{
+					newValue = lfoUpgrade(oldValue);
+				}
+				else if (attribute == "lspd")
+				{
+					newValue = lspdUpgrade(oldValue);
+				}
 
 				newElem.setAttribute("value", newValue);
 				newElem.setAttribute("scale_type", "log");
 			}
-			// The decay knob was multiplied by 1-sustain before being squared, and then multiplied by 5.
-			// To revert it, first multiply by (1 - sustain), square it while keeping the sign, then multiply by 5, then divide by (1 - sustain).
-			// But the (1 - sustain) will cancel out, so it only has to be multiplied once.
-			QDomElement newDecayElem;
-			float oldDecay;
-			float sustain = e.attribute("sustain", "0").toFloat();
-			if (e.namedItem("dec").isNull())
-			{
-				oldDecay = e.attribute("dec", "0").toFloat();
-				e.removeAttribute("dec");
-				newDecayElem = createElement("dec");
-				newDecayElem.setAttribute("id", -1);
-				e.appendChild(newDecayElem);
-			}
-			else
-			{
-				newDecayElem = e.namedItem("dec").toElement();
-				oldDecay = newDecayElem.attribute("value").toFloat();
-			}
-			float newDecay = oldDecay > 0.0f
-				? oldDecay * (1.0f - sustain) * oldDecay * 5
-				: -oldDecay * (1.0f - sustain) * oldDecay * 5;
-				newDecayElem.setAttribute("value", newDecay);
-				newDecayElem.setAttribute("scale_type", "log");
-
-			// LFO knobs
-			for (QString attribute : {"lshp", "lpdel", "latt"})
-			{
-				QDomElement newElem;
-				float oldValue;
-				if (e.namedItem(attribute).isNull())
-				{
-					oldValue = e.attribute(attribute, "0").toFloat();
-					e.removeAttribute(attribute);
-					newElem = createElement(attribute);
-					newElem.setAttribute("id", -1);
-					e.appendChild(newElem);
-				}
-				else
-				{
-					newElem = e.namedItem(attribute).toElement();
-					oldValue = newElem.attribute("value").toFloat();
-				}
-				// LFO knobs were multiplied by 20
-				float newValue = oldValue > 0.0f
-					? oldValue * oldValue * 20.0f
-					: -oldValue * oldValue * 20.0f;
-				e.setAttribute(attribute, newValue);
-
-				newElem.setAttribute("value", newValue);
-				newElem.setAttribute("scale_type", "log");
-			}
-
-			// The LFO speed knob was not squared, but was multiplied by 20
-			QDomElement newElem;
-			float oldValue;
-			if (e.namedItem("lspd").isNull())
-			{
-				oldValue = e.attribute("lspd", "0").toFloat();
-				e.removeAttribute("lspd");
-				newElem = createElement("lspd");
-				newElem.setAttribute("id", -1);
-				e.appendChild(newElem);
-			}
-			else
-			{
-				newElem = e.namedItem("lspd").toElement();
-				oldValue = newElem.attribute("value").toFloat();
-			}
-			float newValue = oldValue * 20.0f;
-			newElem.setAttribute("value", newValue);
-			newElem.setAttribute("scale_type", "log");
 		}
 	}
 }
