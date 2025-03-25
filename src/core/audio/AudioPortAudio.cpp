@@ -27,6 +27,8 @@
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
+#include <iostream>
+
 #include "AudioEngine.h"
 #include "AudioPortAudio.h"
 #include "ConfigManager.h"
@@ -194,6 +196,7 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 			[&](const auto rate) { return rate == currentSampleRate; });
 	}
 
+	auto openStreamErr = PaError{paNoError};
 	for (auto i = std::size_t{0}; i < sampleRateSuggestions.size(); ++i)
 	{
 		const auto sampleRate = sampleRateSuggestions[i];
@@ -202,10 +205,10 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		inputStreamParameters.suggestedLatency = suggestedLatency;
 		outputStreamParameters.suggestedLatency = suggestedLatency;
 
-		const auto err = Pa_OpenStream(&m_paStream, inputDevice == paNoDevice ? nullptr : &inputStreamParameters,
+		openStreamErr = Pa_OpenStream(&m_paStream, inputDevice == paNoDevice ? nullptr : &inputStreamParameters,
 			&outputStreamParameters, sampleRate, framesPerBuffer, paNoFlag, &processCallback, this);
 
-		if (err == paNoError)
+		if (openStreamErr == paNoError)
 		{
 			setSampleRate(sampleRate);
 
@@ -216,22 +219,37 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 			break;
 		}
 	}
+
+	if (openStreamErr != paNoError)
+	{
+		throw std::runtime_error{"PortAudio: failure to open stream - " + std::string{Pa_GetErrorText(openStreamErr)}};
+	}
 }
 
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-	Pa_CloseStream(m_paStream);
+
+	if (const auto err = Pa_CloseStream(m_paStream); err != paNoError)
+	{
+		std::cerr << "PortAudio: failure to close stream - " << Pa_GetErrorText(err) << '\n';
+	}
 }
 
 void AudioPortAudio::startProcessing()
 {
-	Pa_StartStream(m_paStream);
+	if (const auto err = Pa_StartStream(m_paStream); err != paNoError)
+	{
+		std::cerr << "PortAudio: failure to start stream - " << Pa_GetErrorText(err) << '\n';
+	}
 }
 
 void AudioPortAudio::stopProcessing()
 {
-	Pa_StopStream(m_paStream);
+	if (const auto err = Pa_StopStream(m_paStream); err != paNoError)
+	{
+		std::cerr << "PortAudio: failure to stop stream - " << Pa_GetErrorText(err) << '\n';
+	}
 }
 
 int AudioPortAudio::processCallback(const void*, void* output, unsigned long frameCount,
