@@ -44,15 +44,15 @@ namespace detail {
  * given the layout, sample type, and channel count
  */
 template<AudioDataKind kind, bool interleaved, int channels, bool isConst>
-struct AudioDataViewSelector
+struct AudioDataViewTypeHelper
 {
-	static_assert(always_false_v<AudioDataViewSelector<kind, interleaved, channels, isConst>>,
+	static_assert(always_false_v<AudioDataViewTypeHelper<kind, interleaved, channels, isConst>>,
 		"Unsupported audio data type");
 };
 
 //! Non-interleaved specialization
 template<AudioDataKind kind, int channels, bool isConst>
-struct AudioDataViewSelector<kind, false, channels, isConst>
+struct AudioDataViewTypeHelper<kind, false, channels, isConst>
 {
 	using type = SplitAudioData<
 		std::conditional_t<isConst, const GetAudioDataType<kind>, GetAudioDataType<kind>>,
@@ -61,48 +61,50 @@ struct AudioDataViewSelector<kind, false, channels, isConst>
 
 //! SampleFrame specialization
 template<int channels, bool isConst>
-struct AudioDataViewSelector<AudioDataKind::SampleFrame, true, channels, isConst>
+struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
 {
 	static_assert(channels == 0 || channels == 2,
 		"Plugins using SampleFrame buffers must have exactly 0 or 2 inputs or outputs");
 	using type = std::conditional_t<isConst, std::span<const SampleFrame>, std::span<SampleFrame>>;
 };
 
+} // namespace detail
+
+
+//! Metafunction to select the appropriate non-owning audio buffer view
+template<AudioPortsConfig config, bool isOutput, bool isConst>
+using AudioDataViewType = typename detail::AudioDataViewTypeHelper<
+	config.kind, config.interleaved, (isOutput ? config.outputs : config.inputs), isConst>::type;
+
+
+namespace detail {
 
 //! Provides a view into a plugin's input and output audio buffers
 template<AudioPortsConfig config, bool inplace = config.inplace>
 class AudioBuffer;
 
-//! Non-inplace specialization
+//! Dynamically in-place specialization
 template<AudioPortsConfig config>
 class AudioBuffer<config, false>
 {
 public:
 	virtual ~AudioBuffer() = default;
 
-	virtual auto inputBuffer()
-		-> typename detail::AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type = 0;
-
-	virtual auto outputBuffer()
-		-> typename detail::AudioDataViewSelector<config.kind, config.interleaved, config.outputs, false>::type = 0;
-
+	virtual auto inputBuffer() -> AudioDataViewType<config, false, false> = 0;
+	virtual auto outputBuffer() -> AudioDataViewType<config, true, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
-
 	virtual void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) = 0;
 };
 
-//! Inplace specialization
+//! Statically in-place specialization
 template<AudioPortsConfig config>
 class AudioBuffer<config, true>
 {
 public:
 	virtual ~AudioBuffer() = default;
 
-	virtual auto inputOutputBuffer()
-		-> typename detail::AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type = 0;
-
+	virtual auto inputOutputBuffer() -> AudioDataViewType<config, false, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
-
 	virtual void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) = 0;
 };
 
@@ -120,7 +122,7 @@ template<AudioPortsConfig config,
 	AudioDataKind kind = config.kind, bool interleaved = config.interleaved, bool inplace = config.inplace>
 class DefaultAudioBuffer;
 
-//! Specialization for non-inplace, non-interleaved buffers
+//! Specialization for dynamically in-place, non-interleaved buffers
 template<AudioPortsConfig config, AudioDataKind kind>
 class DefaultAudioBuffer<config, kind, false, false>
 	: public AudioBuffer<config>
@@ -196,13 +198,13 @@ private:
 };
 
 
-//! Specialization for inplace, non-interleaved buffers
+//! Specialization for statically in-place, non-interleaved buffers
 template<AudioPortsConfig config, AudioDataKind kind>
 class DefaultAudioBuffer<config, kind, false, true>
 	: public AudioBuffer<config>
 {
 	static_assert(config.inputs == config.outputs || config.inputs == 0 || config.outputs == 0,
-		"compile-time inplace buffers must have same number of input channels and output channels, "
+		"in-place buffers must have same number of input channels and output channels, "
 		"or one of the channel counts must be fixed at zero");
 
 	using SampleT = GetAudioDataType<kind>;
@@ -255,7 +257,7 @@ public:
 	}
 
 private:
-	//! All input buffers followed by all output buffers
+	//! Input/output buffers
 	std::vector<SampleT> m_sourceBuffer;
 
 	//! Provides [channel][frame] view into `m_sourceBuffer`

@@ -34,6 +34,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "AudioBuffer.h"
 #include "AudioData.h"
 #include "AudioPortsConfig.h"
 #include "AutomatableModel.h"
@@ -94,6 +95,11 @@ struct AudioBus
 	{
 	}
 
+	auto trackChannelPair(ch_cnt_t pairIndex) const -> std::span<T>
+	{
+		return {bus[pairIndex], frames};
+	}
+
 	T* const* bus = nullptr; //!< [channel pair index][frame index]
 	ch_cnt_t channelPairs = 0;
 	f_cnt_t frames = 0;
@@ -101,6 +107,42 @@ struct AudioBus
 
 using CoreAudioBus = AudioBus<const SampleFrame>;
 using CoreAudioBusMut = AudioBus<SampleFrame>;
+
+namespace detail {
+
+template<AudioPortsConfig config, class R, class F>
+inline void processHelper(R& router, CoreAudioBusMut coreInOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+{
+	if constexpr (config.inplace)
+	{
+		// Write core to device input buffer
+		const auto deviceInOut = deviceBuffers.inputOutputBuffer();
+		router.routeToPlugin(coreInOut, deviceInOut);
+
+		// Process
+		if constexpr (!config.buffered) { processFunc(deviceInOut); }
+		else { processFunc(); }
+
+		// Write device output buffer to core
+		router.routeFromPlugin(deviceInOut, coreInOut);
+	}
+	else
+	{
+		// Write core to device input buffer
+		const auto deviceIn = deviceBuffers.inputBuffer();
+		const auto deviceOut = deviceBuffers.outputBuffer();
+		router.routeToPlugin(coreInOut, deviceIn);
+
+		// Process
+		if constexpr (!config.buffered) { processFunc(deviceIn, deviceOut); }
+		else { processFunc(); }
+
+		// Write device output buffer to core
+		router.routeFromPlugin(deviceOut, coreInOut);
+	}
+}
+
+} // namespace detail
 
 
 //! Configuration for audio channel routing in/out of plugin
@@ -162,7 +204,7 @@ public:
 	 */
 	auto in() const -> const Matrix& { return m_in; }
 	auto out() const -> const Matrix& { return m_out; }
-	auto trackChannelCount() const -> std::size_t { return s_totalTrackChannels; }
+	auto trackChannelCount() const -> std::size_t { return m_totalTrackChannels; }
 
 	//! This class is initialized once the number of in/out channels are known TODO: Remove?
 	auto initialized() const -> bool { return m_in.m_channelCount != 0 || m_out.m_channelCount != 0; }
@@ -180,23 +222,33 @@ public:
 	/*
 	 * Audio port router
 	 *
+	 * `process`
+	 *     Routes audio to the audio device's input buffers, then calls `processFunc` (the audio device's process
+	 *     method), then routes audio from the device's output buffers back to LMMS track channels.
+	 *
+	 *     `inOut`         : track channels from LMMS core (currently just the main track channel pair)
+	 *     `deviceBuffers` : the audio device's AudioBuffer
+	 *     `processFunc`   : the audio device's process method - a callable object with the signature
+	 *                       `void(buffers...)` where `buffers` is the expected audio buffer(s) (if any)
+	 *                       for the given `config`.
+	 *
 	 * `routeToPlugin`
-	 *     Routes audio from LMMS track channels to plugin inputs according to the audio port configuration.
+	 *     Routes audio from LMMS track channels to device inputs according to the audio port configuration.
 	 *
 	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
 	 *     If no audio is routed to an output channel, the output channel's buffer is zeroed.
 	 *
 	 *     `in`     : track channels from LMMS core (currently just the main track channel pair)
 	 *                `in.frames` provides the number of frames in each `in`/`out` audio buffer
-	 *     `out`    : plugin input channel buffers
+	 *     `out`    : device audio input buffers
 	 *
 	 * `routeFromPlugin`
-	 *     Routes audio from plugin outputs to LMMS track channels according to the audio port configuration.
+	 *     Routes audio from device outputs to LMMS track channels according to the audio port configuration.
 	 *
 	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
 	 *     If no audio is routed to an output channel, `inOut` remains unchanged for audio bypass behavior.
 	 *
-	 *     `in`      : plugin output channel buffers
+	 *     `in`      : device audio output buffers
 	 *     `inOut`   : track channels from/to LMMS core
 	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
@@ -207,7 +259,7 @@ public:
 			"A router for the requested configuration is not implemented yet");
 	};
 
-	//! Non-`SampleFrame` routing
+	//! Non-SampleFrame routing
 	template<AudioPortsConfig config, AudioDataKind kind>
 	class Router<config, kind, false>
 	{
@@ -216,24 +268,56 @@ public:
 	public:
 		explicit Router(const AudioPortsModel& parent) : m_ap{&parent} {}
 
-		void routeToPlugin(CoreAudioBus in, SplitAudioData<GetAudioDataType<kind>, config.inputs> out) const;
-		void routeFromPlugin(SplitAudioData<const GetAudioDataType<kind>, config.outputs> in, CoreAudioBusMut inOut) const;
+		template<class F>
+		void process(CoreAudioBusMut inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+		{
+			detail::processHelper<config>(*this, inOut, deviceBuffers, std::forward<F>(processFunc));
+		}
+
+		void routeToPlugin(CoreAudioBus in, SplitAudioData<SampleT, config.inputs> out) const;
+		void routeFromPlugin(SplitAudioData<const SampleT, config.outputs> in, CoreAudioBusMut inOut) const;
 
 	private:
 		const AudioPortsModel* m_ap;
 	};
 
-	//! `SampleFrame` routing
+	//! SampleFrame routing
 	template<AudioPortsConfig config>
 	class Router<config, AudioDataKind::SampleFrame, true>
 	{
 	public:
 		explicit Router(const AudioPortsModel& parent) : m_ap{&parent} {}
 
+		/**
+		 * Routes core audio to device inputs, calls `processFunc`, then routes audio from plugin
+		 * outputs back to the core.
+		 */
+		template<class F>
+		void process(CoreAudioBusMut inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+		{
+			if (const auto dr = m_ap->m_directRouting)
+			{
+				// The "direct routing" optimization can be applied
+				processDirectRouting(inOut.trackChannelPair(*dr), deviceBuffers, std::forward<F>(processFunc));
+			}
+			else
+			{
+				// Route normally without "direct routing" optimization
+				detail::processHelper<config>(*this, inOut, deviceBuffers, std::forward<F>(processFunc));
+			}
+		}
+
 		void routeToPlugin(CoreAudioBus in, std::span<SampleFrame> out) const;
 		void routeFromPlugin(std::span<const SampleFrame> in, CoreAudioBusMut inOut) const;
 
 	private:
+		/**
+		 * Applies the "direct routing" optimization for more efficient processing.
+		 * Does not use `routeToPlugin` or `routeFromPlugin` at all.
+		 */
+		template<class F>
+		void processDirectRouting(std::span<SampleFrame> inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc);
+
 		const AudioPortsModel* m_ap;
 	};
 
@@ -282,14 +366,13 @@ protected:
 private:
 	void setPluginChannelCountsImpl(int inCount, int outCount);
 	void updateAllRoutedChannels();
+	void updateDirectRouting();
 
 	Matrix m_in{false}; //!< LMMS --> Plugin
 	Matrix m_out{true}; //!< Plugin --> LMMS
 
-	//! TODO: Move this somewhere else; Will be >= 2 once there is support for adding new track channels
-	static constexpr std::size_t s_totalTrackChannels = DEFAULT_CHANNELS;
-
-	// TODO: When full routing is added, get LMMS channel counts from bus or router class
+	// TODO: When full routing is added, get LMMS channel counts from bus or audio router class
+	std::size_t m_totalTrackChannels = DEFAULT_CHANNELS;
 
 	//! This value is <= to the total number of track channels (currently always 2)
 	unsigned int m_trackChannelsUpperBound = DEFAULT_CHANNELS; // TODO: Need to recalculate when pins are set/unset
@@ -303,6 +386,20 @@ private:
 	std::vector<bool> m_routedChannels; // TODO: Need to calculate when pins are set/unset
 
 	/**
+	 * Any SampleFrame-based device (2-channel interleaved) connected to the track channels in the default
+	 * pin configuration (L --> L, R --> R) can be connected directly without without the need for the audio port buffers
+	 * or the audio port router, which allows a significant performance optimization.
+	 *
+	 * In theory, the performance when this optimization is enabled (which should be the case for most plugins most
+	 * of the time) should be about the same as if the plugin did not use the pin connector at all.
+	 *
+	 * This variable caches whether that optimization is currently possible.
+	 * When std::nullopt, the optimization is disabled, otherwise the value equals the index of the track channel pair
+	 * currently routed to/from the device.
+	 */
+	std::optional<ch_cnt_t> m_directRouting;
+
+	/**
 	 * This needs to be known because the default connections (and view?) for instruments with sidechain
 	 * inputs is different from effects, even though they may both have the same channel counts.
 	 */
@@ -310,7 +407,7 @@ private:
 };
 
 
-// Non-`SampleFrame` Router out-of-class definitions
+// Non-SampleFrame Router out-of-class definitions
 
 template<AudioPortsConfig config, AudioDataKind kind>
 inline void AudioPortsModel::Router<config, kind, false>::routeToPlugin(
@@ -519,11 +616,10 @@ inline void AudioPortsModel::Router<config, kind, false>::routeFromPlugin(
 	}
 }
 
-// `SampleFrame` Router out-of-class definitions
+// SampleFrame Router out-of-class definitions
 
 template<AudioPortsConfig config>
-inline void AudioPortsModel::Router<config,
-	AudioDataKind::SampleFrame, true>::routeToPlugin(
+inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::routeToPlugin(
 	CoreAudioBus in, std::span<SampleFrame> out) const
 {
 	if constexpr (config.inputs == 0) { return; }
@@ -614,8 +710,7 @@ inline void AudioPortsModel::Router<config,
 }
 
 template<AudioPortsConfig config>
-inline void AudioPortsModel::Router<config,
-	AudioDataKind::SampleFrame, true>::routeFromPlugin(
+inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::routeFromPlugin(
 	std::span<const SampleFrame> in, CoreAudioBusMut inOut) const
 {
 	if constexpr (config.outputs == 0) { return; }
@@ -710,6 +805,129 @@ inline void AudioPortsModel::Router<config,
 			default:
 				unreachable();
 				break;
+		}
+	}
+}
+
+template<AudioPortsConfig config>
+template<class F>
+inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::processDirectRouting(
+	std::span<SampleFrame> coreBuffer, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+{
+	if constexpr (config.inplace)
+	{
+		if constexpr (config.buffered)
+		{
+			// Can avoid calling routing methods, but must write to and read from device's buffers
+
+			// Write core to device input buffer
+			const auto deviceInOut = deviceBuffers.inputOutputBuffer();
+			if constexpr (config.inputs != 0)
+			{
+				if (m_ap->in().channelCount() != 0)
+				{
+					assert(deviceInOut.data() != nullptr);
+					std::memcpy(deviceInOut.data(), coreBuffer.data(), coreBuffer.size_bytes());
+				}
+			}
+
+			// Process
+			processFunc();
+
+			// Write device output buffer to core
+			if constexpr (config.outputs != 0)
+			{
+				if (m_ap->out().channelCount() != 0)
+				{
+					assert(deviceInOut.data() != nullptr);
+					std::memcpy(coreBuffer.data(), deviceInOut.data(), coreBuffer.size_bytes());
+				}
+			}
+		}
+		else
+		{
+			// Can avoid using device's input/output buffers AND avoid calling routing methods
+			processFunc(coreBuffer);
+		}
+	}
+	else
+	{
+		if constexpr (config.buffered)
+		{
+			// Can avoid calling routing methods, but must write to and read from device's buffers
+
+			// Write core to device input buffer
+			const auto deviceIn = deviceBuffers.inputBuffer();
+			if constexpr (config.inputs != 0)
+			{
+				if (m_ap->in().channelCount() != 0)
+				{
+					assert(deviceIn.data() != nullptr);
+					std::memcpy(deviceIn.data(), coreBuffer.data(), coreBuffer.size_bytes());
+				}
+			}
+
+			// Process
+			processFunc();
+
+			// Write device output buffer to core
+			const auto deviceOut = deviceBuffers.outputBuffer();
+			if constexpr (config.outputs != 0)
+			{
+				if (m_ap->out().channelCount() != 0)
+				{
+					assert(deviceOut.data() != nullptr);
+					std::memcpy(coreBuffer.data(), deviceOut.data(), coreBuffer.size_bytes());
+				}
+			}
+		}
+		else
+		{
+			// Can avoid calling routing methods, but a buffer copy may be needed
+
+			const auto deviceIn = deviceBuffers.inputBuffer();
+			const auto deviceOut = deviceBuffers.outputBuffer();
+
+			// Check if device is dynamically using in-place processing
+			if (deviceIn.data() != deviceOut.data() || deviceIn.size() != deviceOut.size())
+			{
+				// Not using in-place processing - the device implementation may be written under the assumption
+				// that the input and output buffers are two different buffers, so we can't break that
+				// assumption here. If the device has both inputs and outputs, a buffer copy is needed.
+
+				if (!deviceIn.empty())
+				{
+					assert(m_ap->in().channelCount() == 2);
+					if (!deviceOut.empty())
+					{
+						// Device has inputs and outputs - need to copy buffer
+						assert(m_ap->out().channelCount() == 2);
+						assert(deviceOut.data() != nullptr);
+
+						// Process
+						processFunc(coreBuffer, deviceOut);
+
+						// Write device output buffer to core
+						std::memcpy(coreBuffer.data(), deviceOut.data(), coreBuffer.size_bytes());
+					}
+					else
+					{
+						// Input-only device - no buffer copy needed
+						processFunc(coreBuffer, deviceOut);
+					}
+				}
+				else
+				{
+					// Output-only device - no buffer copy needed
+					processFunc(deviceIn, coreBuffer);
+				}
+			}
+			else
+			{
+				// Using in-place processing - the input and output buffers
+				// are allowed to be the same buffer, so no buffer copy is needed.
+				processFunc(coreBuffer, coreBuffer);
+			}
 		}
 	}
 }

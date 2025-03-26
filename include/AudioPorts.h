@@ -95,17 +95,6 @@ public:
 	 */
 	virtual auto active() const -> bool { return true; }
 
-	/**
-	 * `AudioPlugin` calls this to decide whether to pass the audio buffers to
-	 * the `processImpl` methods.
-	 *
-	 * Sending the audio buffers to `processImpl` in the plugin implementation may be
-	 * pointless for custom audio port implementations that manage their own buffers,
-	 * so in that case reimplementing this method in a child class to return `false`
-	 * results in a cleaner interface.
-	 */
-	constexpr static auto provideProcessBuffers() -> bool { return true; }
-
 	static constexpr auto pluginConfig() -> AudioPortsConfig { return config; }
 };
 
@@ -148,7 +137,7 @@ template<AudioPortsConfig config>
 using DefaultAudioPorts = detail::DefaultAudioPorts<config, DefaultAudioBuffer>;
 
 
-//! Custom audio port - audio buffer interface to be implementated in child class
+//! Custom audio port - audio buffer interface to be implemented in child class
 template<AudioPortsConfig config>
 class CustomAudioPorts
 	: public AudioPorts<config>
@@ -156,8 +145,6 @@ class CustomAudioPorts
 {
 public:
 	using AudioPorts<config>::AudioPorts;
-
-	constexpr static auto provideProcessBuffers() -> bool { return false; }
 
 private:
 	void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) final

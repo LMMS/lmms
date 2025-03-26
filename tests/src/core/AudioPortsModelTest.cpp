@@ -351,6 +351,95 @@ private slots:
 		QCOMPARE(apm.m_routedChannels[1], true);
 	}
 
+	//! Verifies that the direct routing optimization works
+	void DirectRoutingOptimization()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto model = Model{nullptr};
+		auto apm = AudioPortsModel{2, 2, false, &model};
+
+		// In    Out
+		//  ___   ___
+		// |X| | |X| |
+		// | |X| | |X|
+		//  ---   ---
+
+		// The default pin connections for a 2x2 plugin should allow direct routing
+		QCOMPARE(apm.m_directRouting.value_or(99), 0);
+
+		// Should still work after increasing the track channel count
+		apm.setTrackChannelCount(4);
+		QCOMPARE(apm.trackChannelCount(), 4);
+		QCOMPARE(apm.m_directRouting.value_or(99), 0);
+
+		// In    Out
+		//  ___   ___
+		// | | | |X| |
+		// | |X| | |X|
+		// | | | | | |
+		// | | | | | |
+		//  ---   ---
+
+		// Disabling a pin should prevent the optimization
+		apm.in().pins(0)[0]->setValue(false);
+		QCOMPARE(apm.m_directRouting.has_value(), false);
+
+		// In    Out
+		//  ___   ___
+		// | | | |X| |
+		// | | | | |X|
+		// |X| | | | |
+		// | |X| | | |
+		//  ---   ---
+
+		// The direct routing optimization requires the same track channel pairs on the input and output sides
+		apm.in().pins(1)[1]->setValue(false);
+		apm.in().pins(2)[0]->setValue(true);
+		apm.in().pins(3)[1]->setValue(true);
+		QCOMPARE(apm.m_directRouting.has_value(), false);
+
+		// In    Out
+		//  ___   ___
+		// | | | | | |
+		// | | | | | |
+		// |X| | |X| |
+		// | |X| | |X|
+		//  ---   ---
+
+		// But if the output side is also moved down, should be able to directly route the 2nd track channel pair
+		apm.out().pins(0)[0]->setValue(false);
+		apm.out().pins(1)[1]->setValue(false);
+		apm.out().pins(2)[0]->setValue(true);
+		apm.out().pins(3)[1]->setValue(true);
+		QCOMPARE(apm.m_directRouting.value_or(99), 1);
+
+		// Out
+		//  ___
+		// | | |
+		// | | |
+		// |X| |
+		// | |X|
+		//  ---
+
+		// If plugin input channels are removed, the optimization should still apply
+		apm.setPluginChannelCountIn(0);
+		QCOMPARE(apm.m_directRouting.value_or(99), 1);
+
+		// Out
+		//  _____
+		// | | | |
+		// | | | |
+		// |X| | |
+		// | |X| |
+		//  -----
+
+		// Adding a 3rd output channel should disable the optimization (only 0 or 2 channels allowed)
+		apm.setPluginChannelCountOut(3);
+		QCOMPARE(apm.m_directRouting.has_value(), false);
+	}
+
 	//! Verifies correct default routing for 1x1 non-interleaved plugin
 	void Routing_NonInterleaved1x1_Default()
 	{

@@ -41,7 +41,7 @@ AudioPortsModel::AudioPortsModel(bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
-	setTrackChannelCount(s_totalTrackChannels);
+	setTrackChannelCount(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
 
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
 		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
@@ -52,7 +52,7 @@ AudioPortsModel::AudioPortsModel(int pluginChannelCountIn, int pluginChannelCoun
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
-	setTrackChannelCount(s_totalTrackChannels);
+	setTrackChannelCount(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
 	setPluginChannelCountsImpl(pluginChannelCountIn, pluginChannelCountOut);
 
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
@@ -108,6 +108,8 @@ void AudioPortsModel::setPluginChannelCountsImpl(int inCount, int outCount)
 
 	m_in.setPluginChannelCount(this, inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setPluginChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
+
+	updateDirectRouting();
 }
 
 void AudioPortsModel::setPluginChannelCountIn(int inCount)
@@ -124,11 +126,6 @@ void AudioPortsModel::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	auto pins = doc.createElement(nodeName());
 	elem.appendChild(pins);
-
-	if (m_trackChannelsUpperBound != s_totalTrackChannels)
-	{
-		pins.setAttribute("tc_used", m_trackChannelsUpperBound);
-	}
 
 	pins.setAttribute("num_in", in().channelCount());
 	pins.setAttribute("num_out", out().channelCount());
@@ -147,10 +144,6 @@ void AudioPortsModel::loadSettings(const QDomElement& elem)
 	const auto pins = elem.firstChildElement(nodeName());
 	if (pins.isNull()) { return; }
 
-	// Until full routing support is added, track channel count should always be 2
-	m_trackChannelsUpperBound = pins.attribute("tc_used", QString::number(s_totalTrackChannels)).toUInt(); // TODO: Calculate m_trackChannelsUpperBound instead
-	assert(m_trackChannelsUpperBound == 2);
-
 	// TODO: Assert port counts are what was expected?
 	const auto pluginInCount = pins.attribute("num_in", "0").toInt();
 	const auto pluginOutCount = pins.attribute("num_out", "0").toInt();
@@ -158,6 +151,9 @@ void AudioPortsModel::loadSettings(const QDomElement& elem)
 
 	m_in.loadSettings(pins.firstChildElement("in_matrix"));
 	m_out.loadSettings(pins.firstChildElement("out_matrix"));
+
+	updateAllRoutedChannels();
+	updateDirectRouting();
 }
 
 void AudioPortsModel::setTrackChannelCount(int count)
@@ -173,6 +169,7 @@ void AudioPortsModel::setTrackChannelCount(int count)
 
 	m_trackChannelsUpperBound = std::min<unsigned>(m_trackChannelsUpperBound, count);
 	m_routedChannels.resize(static_cast<std::size_t>(count));
+	m_totalTrackChannels = static_cast<std::size_t>(count);
 
 	m_in.setTrackChannelCount(this, count, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setTrackChannelCount(this, count, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
@@ -192,9 +189,103 @@ void AudioPortsModel::updateRoutedChannels(unsigned int trackChannel)
 
 void AudioPortsModel::updateAllRoutedChannels()
 {
-	for (unsigned int tc = 0; tc < s_totalTrackChannels; ++tc)
+	for (unsigned int tc = 0; tc < m_totalTrackChannels; ++tc)
 	{
 		updateRoutedChannels(tc);
+	}
+}
+
+void AudioPortsModel::updateDirectRouting()
+{
+	const auto ins = in().channelCount();
+	const auto outs = out().channelCount();
+
+	if (ins == 0 && outs == 0)
+	{
+		m_directRouting.reset();
+		return;
+	}
+
+	if ((ins != 0 && ins != 2) || (outs != 0 && outs != 2))
+	{
+		// If one of the inputs or outputs is not 2 channels (or nonexistent),
+		// the optimization is impossible
+		m_directRouting.reset();
+		return;
+	}
+
+	// In order for the optimization to be possible, the pin connections must look
+	// like this for all ports with > 0 channels for exactly one track channel pair:
+	//  ___
+	// |X| |
+	// | |X|
+	//  ---
+
+	auto check = [&, this](const PinMap& pins) -> std::optional<ch_cnt_t> {
+		auto ret = std::optional<ch_cnt_t>{};
+		int nonzeroCount = 0;
+		for (ch_cnt_t tc = 0; tc < trackChannelCount(); tc += 2)
+		{
+			// Check for any enabled pins
+			if (pins[tc][0]->value() || pins[tc][1]->value()
+				|| pins[tc + 1][0]->value() || pins[tc + 1][1]->value())
+			{
+				++nonzeroCount;
+				if (nonzeroCount > 1)
+				{
+					// More than one track channel pair is connected to/from
+					// the plugin channels, so the optimization is impossible
+					return std::nullopt;
+				}
+			}
+
+			// Check for direct connection
+			if (!ret && pins[tc][0]->value() && !pins[tc][1]->value()
+				&& !pins[tc + 1][0]->value() && pins[tc + 1][1]->value())
+			{
+				ret = tc / 2;
+			}
+		}
+
+		return ret;
+	};
+
+	if (ins == 0)
+	{
+		m_directRouting = check(out().pins());
+	}
+	else if (outs == 0)
+	{
+		m_directRouting = check(in().pins());
+	}
+	else
+	{
+		// 2x2 plugin
+		auto inOpt = check(in().pins());
+		if (!inOpt)
+		{
+			// The optimization cannot be applied to the input matrix
+			m_directRouting.reset();
+			return;
+		}
+
+		auto outOpt = check(out().pins());
+		if (!outOpt)
+		{
+			// The optimization cannot be applied to the output matrix
+			m_directRouting.reset();
+			return;
+		}
+
+		if (inOpt != outOpt)
+		{
+			// This optimization only supports in-place processing for now,
+			// so the same track channel pair must be used on the input and output.
+			m_directRouting.reset();
+			return;
+		}
+
+		m_directRouting = inOpt;
 	}
 }
 
@@ -272,9 +363,20 @@ void AudioPortsModel::Matrix::setTrackChannelCount(AudioPortsModel* parent, int 
 				BoolModel* model = channels.emplace_back(new BoolModel{false, parentModel, name});
 				if (isOutput())
 				{
-					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
+					parentModel->connect(model, &BoolModel::dataChanged, [=]() {
+						// TODO: Updating is expensive when loading/saving all the pins
+						parent->updateRoutedChannels(tcIdx);
+						parent->updateDirectRouting();
+						emit parent->dataChanged();
+					});
 				}
-				parentModel->connect(model, &BoolModel::dataChanged, parent, &AudioPortsModel::dataChanged);
+				else
+				{
+					parentModel->connect(model, &BoolModel::dataChanged, [=]() {
+						parent->updateDirectRouting();
+						emit parent->dataChanged();
+					});
+				}
 			}
 		}
 	}
@@ -300,9 +402,19 @@ void AudioPortsModel::Matrix::setPluginChannelCount(AudioPortsModel* parent, int
 				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parentModel, name});
 				if (isOutput())
 				{
-					parentModel->connect(model, &BoolModel::dataChanged, [=]() { parent->updateRoutedChannels(tcIdx); });
+					parentModel->connect(model, &BoolModel::dataChanged, [=]() {
+						parent->updateRoutedChannels(tcIdx);
+						parent->updateDirectRouting();
+						emit parent->dataChanged();
+					});
 				}
-				parentModel->connect(model, &BoolModel::dataChanged, parent, &AudioPortsModel::dataChanged);
+				else
+				{
+					parentModel->connect(model, &BoolModel::dataChanged, [=]() {
+						parent->updateDirectRouting();
+						emit parent->dataChanged();
+					});
+				}
 			}
 		}
 	}
@@ -362,8 +474,10 @@ void AudioPortsModel::Matrix::saveSettings(QDomDocument& doc, QDomElement& elem)
 		{
 			if (trackChannels[pluginChannel]->value() || trackChannels[pluginChannel]->isAutomatedOrControlled())
 			{
-				trackChannels[pluginChannel]->saveSettings(doc, elem,
-					QString{"c%1_%2"}.arg(trackChannel + 1).arg(pluginChannel + 1));
+				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(pluginChannel + 1);
+				assert(!AutomatableModel::mustQuoteName(name));
+
+				trackChannels[pluginChannel]->saveSettings(doc, elem, name);
 			}
 		}
 	}

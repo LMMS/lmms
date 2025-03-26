@@ -56,38 +56,43 @@ namespace detail
 {
 
 //! Provides the correct `processImpl` interface for instruments or effects to implement
-template<class ParentT, typename BufferT, typename ConstBufferT, bool inplace, bool provideBuffers>
+template<class ParentT, AudioPortsConfig config, bool inplace = config.inplace, bool buffered = config.buffered>
 class AudioProcessingMethod;
 
 //! Instrument specialization
-template<typename BufferT, typename ConstBufferT>
-class AudioProcessingMethod<Instrument, BufferT, ConstBufferT, false, true>
+template<AudioPortsConfig config>
+class AudioProcessingMethod<Instrument, config, false, false>
 {
+	using InBufferT = AudioDataViewType<config, false, true>;
+	using OutBufferT = AudioDataViewType<config, true, false>;
+
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
 	//! NOTE: NotePlayHandle-based instruments are currently unsupported
-	//virtual void processImpl(NotePlayHandle* nph, ConstBufferT in, BufferT out) {}
+	//virtual void processImpl(NotePlayHandle* nph, InBufferT in, OutBufferT out) {}
 
 	//! The main audio processing method for MIDI-based Instruments
-	virtual void processImpl(ConstBufferT in, BufferT out) = 0;
+	virtual void processImpl(InBufferT in, OutBufferT out) = 0;
 };
 
 //! Instrument specialization (in-place)
-template<typename BufferT, typename ConstBufferT>
-class AudioProcessingMethod<Instrument, BufferT, ConstBufferT, true, true>
+template<AudioPortsConfig config>
+class AudioProcessingMethod<Instrument, config, true, false>
 {
+	using InOutBufferT = AudioDataViewType<config, false, false>;
+
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
 	//! NOTE: NotePlayHandle-based instruments are currently unsupported
-	//virtual void processImpl(NotePlayHandle* nph, BufferT inOut) {}
+	//virtual void processImpl(NotePlayHandle* nph, InOutBufferT inOut) {}
 
 	//! The main audio processing method for MIDI-based Instruments
-	virtual void processImpl(BufferT inOut) = 0;
+	virtual void processImpl(InOutBufferT inOut) = 0;
 };
 
-//! Instrument specialization (custom working buffers)
-template<typename BufferT, typename ConstBufferT, bool inplace>
-class AudioProcessingMethod<Instrument, BufferT, ConstBufferT, inplace, false>
+//! Instrument specialization (buffered)
+template<AudioPortsConfig config, bool inplace>
+class AudioProcessingMethod<Instrument, config, inplace, true>
 {
 protected:
 	/**
@@ -105,32 +110,37 @@ protected:
 };
 
 //! Effect specialization
-template<typename BufferT, typename ConstBufferT>
-class AudioProcessingMethod<Effect, BufferT, ConstBufferT, false, true>
+template<AudioPortsConfig config>
+class AudioProcessingMethod<Effect, config, false, false>
 {
+	using InBufferT = AudioDataViewType<config, false, true>;
+	using OutBufferT = AudioDataViewType<config, true, false>;
+
 protected:
 	/**
 	 * The main audio processing method for Effects. Runs when plugin is not asleep.
 	 * The implementation is expected to perform wet/dry mixing for the first 2 channels.
 	 */
-	virtual auto processImpl(ConstBufferT in, BufferT out) -> ProcessStatus = 0;
+	virtual auto processImpl(InBufferT in, OutBufferT out) -> ProcessStatus = 0;
 };
 
 //! Effect specialization (in-place)
-template<typename BufferT, typename ConstBufferT>
-class AudioProcessingMethod<Effect, BufferT, ConstBufferT, true, true>
+template<AudioPortsConfig config>
+class AudioProcessingMethod<Effect, config, true, false>
 {
+	using InOutBufferT = AudioDataViewType<config, false, false>;
+
 protected:
 	/**
 	 * The main audio processing method for inplace Effects. Runs when plugin is not asleep.
 	 * The implementation is expected to perform wet/dry mixing for the first 2 channels.
 	 */
-	virtual auto processImpl(BufferT inOut) -> ProcessStatus = 0;
+	virtual auto processImpl(InOutBufferT inOut) -> ProcessStatus = 0;
 };
 
-//! Effect specialization (custom working buffers)
-template<typename BufferT, typename ConstBufferT, bool inplace>
-class AudioProcessingMethod<Effect, BufferT, ConstBufferT, inplace, false>
+//! Effect specialization (buffered)
+template<AudioPortsConfig config, bool inplace>
+class AudioProcessingMethod<Effect, config, inplace, true>
 {
 protected:
 	/**
@@ -152,10 +162,7 @@ class AudioPlugin
 template<AudioPortsConfig config, class AudioPortsT>
 class AudioPlugin<Instrument, config, AudioPortsT>
 	: public Instrument
-	, public AudioProcessingMethod<Instrument,
-		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type,
-		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, true>::type,
-		config.inplace, AudioPortsT::provideProcessBuffers()>
+	, public AudioProcessingMethod<Instrument, config>
 {
 public:
 	template<typename... AudioPortsArgsT>
@@ -192,33 +199,9 @@ protected:
 		const auto bus = CoreAudioBusMut{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
-		if constexpr (config.inplace)
-		{
-			// Write core to plugin input buffer
-			const auto pluginInOut = buffers->inputOutputBuffer();
-			router.routeToPlugin(bus, pluginInOut);
-
-			// Process
-			if constexpr (AudioPortsT::provideProcessBuffers()) { this->processImpl(pluginInOut); }
-			else { this->processImpl(); }
-
-			// Write plugin output buffer to core
-			router.routeFromPlugin(pluginInOut, bus);
-		}
-		else
-		{
-			// Write core to plugin input buffer
-			const auto pluginIn = buffers->inputBuffer();
-			const auto pluginOut = buffers->outputBuffer();
-			router.routeToPlugin(bus, pluginIn);
-
-			// Process
-			if constexpr (AudioPortsT::provideProcessBuffers()) { this->processImpl(pluginIn, pluginOut); }
-			else { this->processImpl(); }
-
-			// Write plugin output buffer to core
-			router.routeFromPlugin(pluginOut, bus);
-		}
+		router.process(bus, *buffers, [this](auto... buffers) {
+			this->processImpl(buffers...);
+		});
 	}
 
 	void playNoteImpl(NotePlayHandle* notesToPlay, std::span<SampleFrame> inOut) final
@@ -242,10 +225,7 @@ private:
 template<AudioPortsConfig config, class AudioPortsT>
 class AudioPlugin<Effect, config, AudioPortsT>
 	: public Effect
-	, public AudioProcessingMethod<Effect,
-		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, false>::type,
-		typename AudioDataViewSelector<config.kind, config.interleaved, config.inputs, true>::type,
-		config.inplace, AudioPortsT::provideProcessBuffers()>
+	, public AudioProcessingMethod<Effect, config>
 {
 public:
 	template<typename... AudioPortsArgsT>
@@ -284,34 +264,9 @@ protected:
 		auto router = m_audioPorts.getRouter();
 
 		ProcessStatus status;
-
-		if constexpr (config.inplace)
-		{
-			// Write core to plugin input buffer
-			const auto pluginInOut = buffers->inputOutputBuffer();
-			router.routeToPlugin(bus, pluginInOut);
-
-			// Process
-			if constexpr (AudioPortsT::provideProcessBuffers()) { status = this->processImpl(pluginInOut); }
-			else { status = this->processImpl(); }
-
-			// Write plugin output buffer to core
-			router.routeFromPlugin(pluginInOut, bus);
-		}
-		else
-		{
-			// Write core to plugin input buffer
-			const auto pluginIn = buffers->inputBuffer();
-			const auto pluginOut = buffers->outputBuffer();
-			router.routeToPlugin(bus, pluginIn);
-
-			// Process
-			if constexpr (AudioPortsT::provideProcessBuffers()) { status = this->processImpl(pluginIn, pluginOut); }
-			else { status = this->processImpl(); }
-
-			// Write plugin output buffer to core
-			router.routeFromPlugin(pluginOut, bus);
-		}
+		router.process(bus, *buffers, [&status, this](auto... buffers) {
+			status = this->processImpl(buffers...);
+		});
 
 		switch (status)
 		{
@@ -431,14 +386,16 @@ using DefaultMidiInstrument = AudioPlugin<Instrument, AudioPortsConfig {
 	.interleaved = true,
 	.inputs = 0,
 	.outputs = 2,
-	.inplace = true }>;
+	.inplace = true,
+	.buffered = false }>;
 
 using DefaultEffect = AudioPlugin<Effect, AudioPortsConfig {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 2,
 	.outputs = 2,
-	.inplace = true }>;
+	.inplace = true,
+	.buffered = false }>;
 
 
 } // namespace lmms
