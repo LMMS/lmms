@@ -761,6 +761,7 @@ lmms--gui--ClipView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	qproperty-markerColor: rgb(0, 0, 0);
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 3px 3px;
 	qproperty-mouseHotspotKnife: 0px 0px;
