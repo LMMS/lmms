@@ -32,7 +32,7 @@
 
 namespace lmms {
 SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& path)
-	: PlayHandle(Type::SamplePreviewPlayHandle)
+	: PlayHandle(Type::SamplePlayHandle)
 {
 #ifdef LMMS_BUILD_WIN32
 	m_sndfile = sf_wchar_open(path.c_str(), SFM_READ, &m_sfinfo);
