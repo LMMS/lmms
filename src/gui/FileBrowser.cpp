@@ -1222,9 +1222,18 @@ void FileItem::determineFileType()
 		m_type = FileType::Midi;
 		m_handling = FileHandling::ImportAsProject;
 	}
-	else if( ext == "dll"
-#ifdef LMMS_BUILD_LINUX
-		|| ext == "so" 
+	else if (
+#ifdef LMMS_HAVE_VST
+#	if defined(LMMS_BUILD_WIN32)
+		ext == "dll"
+#	elif defined(LMMS_BUILD_LINUX)
+		ext == "so"
+#		if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+			|| ext == "dll"
+#		endif
+#	endif
+#else
+		false
 #endif
 	)
 	{
