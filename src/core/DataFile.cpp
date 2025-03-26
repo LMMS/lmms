@@ -2016,7 +2016,7 @@ void DataFile::upgrade_envelope_lfo_knob_scaling()
 					oldValue = newElem.attribute("value").toFloat();
 				}
 
-				float newValue;
+				float newValue = 0.f;
 				if (attribute == "pdel" || attribute == "att" || attribute == "hold" ||attribute == "rel")
 				{
 					newValue = envUpgrade(oldValue);
