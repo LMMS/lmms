@@ -196,7 +196,7 @@ protected:
 		}
 
 		SampleFrame* temp = inOut.data();
-		const auto bus = CoreAudioBusMut{&temp, 1, inOut.size()};
+		const auto bus = AudioBus<SampleFrame>{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
 		router.process(bus, *buffers, [this](auto... buffers) {
@@ -260,7 +260,7 @@ protected:
 		assert(buffers != nullptr);
 
 		SampleFrame* temp = inOut.data();
-		const auto bus = CoreAudioBusMut{&temp, 1, inOut.size()};
+		const auto bus = AudioBus<SampleFrame>{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
 		ProcessStatus status;

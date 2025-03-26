@@ -59,7 +59,7 @@ void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
 	}
 }
 
-void zeroBuffer(CoreAudioBusMut bus)
+void zeroBuffer(AudioBus<SampleFrame> bus)
 {
 	for (ch_cnt_t channelPair = 0; channelPair < bus.channelPairs; ++channelPair)
 	{
@@ -69,7 +69,7 @@ void zeroBuffer(CoreAudioBusMut bus)
 }
 
 template<class F>
-void transformBuffer(CoreAudioBus in, CoreAudioBusMut out, const F& func)
+void transformBuffer(AudioBus<const SampleFrame> in, AudioBus<SampleFrame> out, const F& func)
 {
 	assert(in.channelPairs == out.channelPairs);
 	assert(in.frames == out.frames);
@@ -105,7 +105,7 @@ void transformBuffer(SplitAudioData<SampleT, extent> in, SplitAudioData<SampleT,
 	}
 }
 
-void compareBuffers(CoreAudioBus actual, CoreAudioBus expected)
+void compareBuffers(AudioBus<const SampleFrame> actual, AudioBus<const SampleFrame> expected)
 {
 	QCOMPARE(actual.channelPairs, expected.channelPairs);
 	QCOMPARE(actual.frames, expected.frames);
@@ -161,14 +161,14 @@ private:
 	std::vector<lmms::SampleFrame> m_coreBuffer;
 	lmms::SampleFrame* m_coreBufferPtr = nullptr;
 
-	auto getCoreBus() -> lmms::CoreAudioBusMut
+	auto getCoreBus() -> lmms::AudioBus<lmms::SampleFrame>
 	{
 		m_coreBuffer.resize(MaxFrames);
 		m_coreBufferPtr = m_coreBuffer.data();
 
 		std::fill_n(m_coreBuffer.data(), m_coreBuffer.size(), lmms::SampleFrame{});
 
-		return lmms::CoreAudioBusMut{&m_coreBufferPtr, 1, MaxFrames};
+		return lmms::AudioBus<lmms::SampleFrame>{&m_coreBufferPtr, 1, MaxFrames};
 	}
 
 private slots:
@@ -492,7 +492,7 @@ private slots:
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 		coreBusExpected.bus[0][0] = SampleFrame{123.f * 2, 123.f * 2};
 		coreBusExpected.bus[0][1] = SampleFrame{456.f * 2, 456.f * 2};
 		coreBusExpected.bus[0][33] = SampleFrame{789.f * 2, 789.f * 2};
@@ -555,7 +555,7 @@ private slots:
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 		// Sanity check for transformBuffer
@@ -643,7 +643,7 @@ private slots:
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 		for (f_cnt_t frame = 0; frame < coreBus.frames; ++frame)
 		{
 			SampleFrame& sf = coreBusExpected.bus[0][frame];
@@ -711,7 +711,7 @@ private slots:
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 		// Zero core bus just to be sure what the plugin output is
@@ -789,7 +789,7 @@ private slots:
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = CoreAudioBusMut{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 		coreBusExpected.bus[0][0] = SampleFrame{(123.f + 321.f) * 2, 321.f};
 		coreBusExpected.bus[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
 		coreBusExpected.bus[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};

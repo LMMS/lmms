@@ -43,8 +43,6 @@
 #include "lmms_basics.h"
 #include "lmms_export.h"
 
-class QWidget;
-
 #ifdef LMMS_TESTING
 class AudioPortsModelTest;
 #endif
@@ -105,13 +103,11 @@ struct AudioBus
 	f_cnt_t frames = 0;
 };
 
-using CoreAudioBus = AudioBus<const SampleFrame>;
-using CoreAudioBusMut = AudioBus<SampleFrame>;
 
 namespace detail {
 
 template<AudioPortsConfig config, class R, class F>
-inline void processHelper(R& router, CoreAudioBusMut coreInOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+inline void processHelper(R& router, AudioBus<SampleFrame> coreInOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
 {
 	if constexpr (config.inplace)
 	{
@@ -269,13 +265,13 @@ public:
 		explicit Router(const AudioPortsModel& parent) : m_ap{&parent} {}
 
 		template<class F>
-		void process(CoreAudioBusMut inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+		void process(AudioBus<SampleFrame> inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
 		{
 			detail::processHelper<config>(*this, inOut, deviceBuffers, std::forward<F>(processFunc));
 		}
 
-		void routeToPlugin(CoreAudioBus in, SplitAudioData<SampleT, config.inputs> out) const;
-		void routeFromPlugin(SplitAudioData<const SampleT, config.outputs> in, CoreAudioBusMut inOut) const;
+		void routeToPlugin(AudioBus<const SampleFrame> in, SplitAudioData<SampleT, config.inputs> out) const;
+		void routeFromPlugin(SplitAudioData<const SampleT, config.outputs> in, AudioBus<SampleFrame> inOut) const;
 
 	private:
 		const AudioPortsModel* m_ap;
@@ -293,7 +289,7 @@ public:
 		 * outputs back to the core.
 		 */
 		template<class F>
-		void process(CoreAudioBusMut inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
+		void process(AudioBus<SampleFrame> inOut, AudioBuffer<config>& deviceBuffers, F&& processFunc)
 		{
 			if (const auto dr = m_ap->m_directRouting)
 			{
@@ -307,8 +303,8 @@ public:
 			}
 		}
 
-		void routeToPlugin(CoreAudioBus in, std::span<SampleFrame> out) const;
-		void routeFromPlugin(std::span<const SampleFrame> in, CoreAudioBusMut inOut) const;
+		void routeToPlugin(AudioBus<const SampleFrame> in, std::span<SampleFrame> out) const;
+		void routeFromPlugin(std::span<const SampleFrame> in, AudioBus<SampleFrame> inOut) const;
 
 	private:
 		/**
@@ -411,7 +407,7 @@ private:
 
 template<AudioPortsConfig config, AudioDataKind kind>
 inline void AudioPortsModel::Router<config, kind, false>::routeToPlugin(
-	CoreAudioBus in, SplitAudioData<SampleT, config.inputs> out) const
+	AudioBus<const SampleFrame> in, SplitAudioData<SampleT, config.inputs> out) const
 {
 	if constexpr (config.inputs == 0) { return; }
 
@@ -480,7 +476,7 @@ inline void AudioPortsModel::Router<config, kind, false>::routeToPlugin(
 
 template<AudioPortsConfig config, AudioDataKind kind>
 inline void AudioPortsModel::Router<config, kind, false>::routeFromPlugin(
-	SplitAudioData<const SampleT, config.outputs> in, CoreAudioBusMut inOut) const
+	SplitAudioData<const SampleT, config.outputs> in, AudioBus<SampleFrame> inOut) const
 {
 	if constexpr (config.outputs == 0) { return; }
 
@@ -620,7 +616,7 @@ inline void AudioPortsModel::Router<config, kind, false>::routeFromPlugin(
 
 template<AudioPortsConfig config>
 inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::routeToPlugin(
-	CoreAudioBus in, std::span<SampleFrame> out) const
+	AudioBus<const SampleFrame> in, std::span<SampleFrame> out) const
 {
 	if constexpr (config.inputs == 0) { return; }
 
@@ -711,7 +707,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::r
 
 template<AudioPortsConfig config>
 inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::routeFromPlugin(
-	std::span<const SampleFrame> in, CoreAudioBusMut inOut) const
+	std::span<const SampleFrame> in, AudioBus<SampleFrame> inOut) const
 {
 	if constexpr (config.outputs == 0) { return; }
 
