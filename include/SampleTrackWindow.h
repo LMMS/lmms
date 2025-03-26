@@ -28,9 +28,9 @@
 #include <QWidget>
 
 #include "ModelView.h"
-#include "PixmapButton.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
+#include "AutomatableButton.h"
 
 class QLineEdit;
 
@@ -91,8 +91,8 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	PixmapButton *m_muteBtn;
-	PixmapButton *m_soloBtn;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;
