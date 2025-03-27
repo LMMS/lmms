@@ -1239,8 +1239,8 @@ void RemoteVstPlugin::getParameterLabels()
 
 void RemoteVstPlugin::sendCurrentProgramName()
 {
-	char presName[64] = {0};
-	snprintf(presName, sizeof(presName) - 1,
+	char presName[64] = {};
+	std::snprintf(presName, sizeof(presName) - 1,
 		"%d/%d: %s",
 		pluginDispatch(effGetProgram) + 1,
 		m_plugin->numPrograms,
@@ -1385,11 +1385,11 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i < maxPrograms; i++)
 			{
 				pluginDispatch(29, i, -1, curProgName);
-				if (i == 0) { snprintf(presName, maxlen, "%s", curProgName); }
+				if (i == 0) { std::snprintf(presName, maxlen, "%s", curProgName); }
 				else
 				{
-					const auto len = strlen(presName);
-					snprintf(presName + len, maxlen - len, "|%s", curProgName);
+					const auto len = std::strlen(presName);
+					std::snprintf(presName + len, maxlen - len, "|%s", curProgName);
 				}
 			}
 		}
@@ -1399,17 +1399,18 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i < maxPrograms; i++)
 			{
 				pluginDispatch(effSetProgram, 0, i);
-				if (i == 0) { snprintf(presName, maxlen, "%s", programName()); }
+				if (i == 0) { std::snprintf(presName, maxlen, "%s", programName()); }
 				else
 				{
-					const auto len = strlen(presName);
+					const auto len = std::strlen(presName);
 					const auto remaining = std::min(len, maxlen);
-					snprintf(presName + len, remaining, "|%s", programName());
+					std::snprintf(presName + len, remaining, "|%s", programName());
 				}
 			}
 			pluginDispatch(effSetProgram, 0, currProgram);
 		}
-	} else snprintf(presName, maxlen, "%s", programName());
+	}
+	else { std::snprintf(presName, maxlen, "%s", programName()); }
 
 	sendMessage(message(IdVstProgramNames).addString(presName));
 }
@@ -1700,7 +1701,7 @@ int RemoteVstPlugin::updateInOutCount()
 	setInputOutputCount( inputCount(), outputCount() );
 
 	char buf[64] = {};
-	snprintf(buf, sizeof(buf) - 1, "inputs: %d; outputs: %d\n", inputCount(), outputCount());
+	std::snprintf(buf, sizeof(buf) - 1, "inputs: %d; outputs: %d\n", inputCount(), outputCount());
 	debugMessage(buf);
 
 	if (inputCount() > 0) { m_inputs = new float*[inputCount()]; }
@@ -1733,7 +1734,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 	static VstTimeInfo _timeInfo;
 #ifdef DEBUG_CALLBACKS
 	char buf[64] = {};
-	snprintf(buf, sizeof(buf) - 1, "host-callback, opcode = %d\n", static_cast<int>(_opcode));
+	std::snprintf(buf, sizeof(buf) - 1, "host-callback, opcode = %d\n", static_cast<int>(_opcode));
 	SHOW_CALLBACK(buf);
 #endif
 
