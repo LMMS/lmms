@@ -61,7 +61,7 @@ public:
 	void contextMenuEvent(QContextMenuEvent*) override;
 	void mousePressEvent(QMouseEvent*) override;
 	void mouseDoubleClickEvent(QMouseEvent*) override;
-	bool eventFilter(QObject* dist, QEvent* event) override;
+	void keyPressEvent(QKeyEvent* ke) override;
 
 	void reset();
 	int channelIndex() const { return m_channelIndex; }
