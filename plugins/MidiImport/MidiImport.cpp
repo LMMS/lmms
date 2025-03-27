@@ -49,17 +49,15 @@
 
 #include "plugin_export.h"
 
-#include "portsmf/allegro.h"
+#include "portsmf/include/allegro.h"
 
 namespace lmms
 {
 
-
-#define makeID(_c0, _c1, _c2, _c3) \
-		( 0 | \
-		( ( _c0 ) | ( ( _c1 ) << 8 ) | ( ( _c2 ) << 16 ) | ( ( _c3 ) << 24 ) ) )
-
-
+constexpr std::int32_t makeID(char c0, char c1, char c2, char c3)
+{
+	return 0 | ((c0) | ((c1) << 8) | ((c2) << 16) | ((c3) << 24));
+}
 
 extern "C"
 {
@@ -468,7 +466,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 				if( update == "programi" )
 				{
-					int_fast64_t prog = evt->get_int64_value();
+					const auto prog = evt->get_integer_value();
 					if( ch->isSF2 )
 					{
 						auto& pc = pcs[evt->chan];
