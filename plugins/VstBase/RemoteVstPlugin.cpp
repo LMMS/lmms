@@ -1403,8 +1403,7 @@ void RemoteVstPlugin::getProgramNames()
 				else
 				{
 					const auto len = std::strlen(presName);
-					const auto remaining = std::min(len, maxlen);
-					std::snprintf(presName + len, remaining, "|%s", programName());
+					std::snprintf(presName + len, maxlen - len, "|%s", programName());
 				}
 			}
 			pluginDispatch(effSetProgram, 0, currProgram);
