@@ -252,7 +252,7 @@ int DrumSynth::GetPrivateProfileString(
 		len = strlen(def);
 		const auto maxlen = std::min(len, size - 1);
 		std::memcpy(buffer, def, maxlen);
-		if (maxlen < len) { buffer[maxlen] = 0; }
+		buffer[maxlen] = '\0';
 	}
 
 	free(line);
