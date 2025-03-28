@@ -236,19 +236,11 @@ int DrumSynth::GetPrivateProfileString(
 				}
 				else
 				{
-					k = static_cast<char*>(b + strlen(b) - 1);
-					while ((k >= b) && (*k == ' ' || *k == '\t'))
-					{
-						--k;
-					}
-					*(k + 1) = '\0';
-
-					len = strlen(b);
-					if (len > size - 1)
-					{
-						len = size - 1;
-					}
-					strncpy(buffer, b, len + 1);
+					k = &b[strlen(b) - 1];
+					while ((k >= b) && (*k == ' ' || *k == '\t')) { --k; }
+					k[1] = '\0';
+					len = std::min(static_cast<int>(1 + k - b), size - 1);
+					std::memcpy(buffer, b, len + 1);
 				}
 				break;
 			}
@@ -258,7 +250,9 @@ int DrumSynth::GetPrivateProfileString(
 	if (len == 0)
 	{
 		len = strlen(def);
-		strncpy(buffer, def, size);
+		const auto maxlen = std::min(len, size - 1);
+		std::memcpy(buffer, def, maxlen);
+		buffer[maxlen] = '\0';
 	}
 
 	free(line);
@@ -345,7 +339,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	}
 
 	// try to read version from input file
-	strcpy(sec, "General");
+	std::strcpy(sec, "General");
 	GetPrivateProfileString(sec, "Version", "", ver, sizeof(ver), dsfile);
 	ver[9] = 0;
 	if ((strcasecmp(ver, "DrumSynth") != 0) // input fail
@@ -398,7 +392,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	GetEnv(7, sec, "FilterEnv", dsfile);
 
 	// read noise parameters
-	strcpy(sec, "Noise");
+	std::strcpy(sec, "Noise");
 	chkOn[1] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	sliLev[1] = GetPrivateProfileInt(sec, "Level", 0, dsfile);
 	NT = GetPrivateProfileInt(sec, "Slope", 0, dsfile);
