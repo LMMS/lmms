@@ -204,6 +204,12 @@ private slots:
 		QCOMPARE(apmNxN.in().channelCount(), 4);
 		QCOMPARE(apmNxN.out().channelCount(), 8);
 
+		// The track channel count is 2 by default
+		QCOMPARE(apmNxN.trackChannelCount(), 2);
+
+		apmNxN.setTrackChannelCount(4);
+		QCOMPARE(apmNxN.trackChannelCount(), 4);
+
 		// stereo/stereo effect
 		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
 		QCOMPARE(apm2x2.in().channelCount(), 2);
