@@ -174,7 +174,7 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if (event->button() == Qt::LeftButton && event->modifiers() & KBD_COPY_MODIFIER)
 	{
-		new gui::StringPairDrag(Clipboard::StringPairDataType::AutomatableModelLink,
+		new gui::StringPairDrag(Clipboard::DataType::AutomatableModelLink,
 			Clipboard::encodeAutomatableModelLink((*modelUntyped())), QPixmap(), widget());
 		event->accept();
 	}

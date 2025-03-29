@@ -71,8 +71,8 @@ protected:
 	const std::vector<ModelShortcut>& getShortcuts() override;
 	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
 	QString getShortcutMessage() override;
-	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
-	bool processPasteImplementation(Clipboard::StringPairDataType type, QString& value) override;
+	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 
 private:
 	AutomationClip * m_clip;

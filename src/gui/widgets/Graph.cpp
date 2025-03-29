@@ -410,10 +410,10 @@ void Graph::paintEvent( QPaintEvent * )
 
 void Graph::dropEvent( QDropEvent * _de )
 {
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(_de);
+	Clipboard::DataType type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue( _de );
 
-	if (type == Clipboard::StringPairDataType::SampleFile)
+	if (type == Clipboard::DataType::SampleFile)
 	{
 		// TODO: call setWaveToUser
 		// loadSampleFromFile( value );
@@ -423,7 +423,7 @@ void Graph::dropEvent( QDropEvent * _de )
 
 void Graph::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if (StringPairDrag::processDragEnterEvent(_dee, Clipboard::StringPairDataType::SampleFile) == false)
+	if (StringPairDrag::processDragEnterEvent(_dee, Clipboard::DataType::SampleFile) == false)
 	{
 		_dee->ignore();
 	}

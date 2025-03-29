@@ -56,7 +56,7 @@ public:
 	~InteractiveModelView() override;
 
 	//! highlight every InteractiveModelView that accepts dataType
-	static void startHighlighting(Clipboard::StringPairDataType dataType);
+	static void startHighlighting(Clipboard::DataType dataType);
 	static void stopHighlighting();
 	static void showMessage(QString& message);
 	static void hideMessage();
@@ -125,11 +125,11 @@ protected:
 	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
 	virtual QString getShortcutMessage() = 0;
 	//! returns true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
-	virtual bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) = 0;
+	virtual bool canAcceptClipboardData(Clipboard::DataType dataType) = 0;
 	//! should implement dragging and dropping widgets or pasting from clipboard
 	//! should return if `QDropEvent` event can be accepted
 	//! force implement this method
-	virtual bool processPasteImplementation(Clipboard::StringPairDataType type, QString& value) = 0;
+	virtual bool processPasteImplementation(Clipboard::DataType type, QString& value) = 0;
 	//! calls `processPasteImplementation()` to process paste
 	bool processPaste(const QMimeData* mimeData);
 	//! override this if the widget requires custom updating code

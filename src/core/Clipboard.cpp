@@ -67,51 +67,51 @@ namespace lmms::Clipboard
 	}
 
 
-	QString getStringPairKeyName(StringPairDataType type)
+	QString getStringPairKeyName(DataType type)
 	{
 		switch (type)
 		{
-			case StringPairDataType::FloatValue:
+			case DataType::FloatValue:
 				return QString("FloatValue");
-			case StringPairDataType::AutomatableModelLink:
+			case DataType::AutomatableModelLink:
 				return QString("AutomatableModelLink");
-			case StringPairDataType::Instrument:
+			case DataType::Instrument:
 				return QString("Instrument");
-			case StringPairDataType::PresetFile:
+			case DataType::PresetFile:
 				return QString("PresetFile");
-			case StringPairDataType::PluginPresetFile:
+			case DataType::PluginPresetFile:
 				return QString("PluginPresetFile");
-			case StringPairDataType::SampleFile:
+			case DataType::SampleFile:
 				return QString("SampleFile");
-			case StringPairDataType::SoundFontFile:
+			case DataType::SoundFontFile:
 				return QString("SoundFontFile");
-			case StringPairDataType::PatchFile:
+			case DataType::PatchFile:
 				return QString("PatchFile");
-			case StringPairDataType::VstPluginFile:
+			case DataType::VstPluginFile:
 				return QString("VstPluginFile");
-			case StringPairDataType::ImportedProject:
+			case DataType::ImportedProject:
 				return QString("ImportedProject");
-			case StringPairDataType::ProjectFile:
+			case DataType::ProjectFile:
 				return QString("ProjectFile");
-			case StringPairDataType::SampleData:
+			case DataType::SampleData:
 				return QString("SampleData");
-			case StringPairDataType::InstrumentTrack:
+			case DataType::InstrumentTrack:
 				return QString("InstrumentTrack");
-			case StringPairDataType::PatternTrack:
+			case DataType::PatternTrack:
 				return QString("PatternTrack");
-			case StringPairDataType::SampleTrack:
+			case DataType::SampleTrack:
 				return QString("SampleTrack");
-			case StringPairDataType::AutomationTrack:
+			case DataType::AutomationTrack:
 				return QString("AutomationTrack");
-			case StringPairDataType::HiddenAutomationTrack:
+			case DataType::HiddenAutomationTrack:
 				return QString("HiddenAutomationTrack");
-			case StringPairDataType::MidiClip:
+			case DataType::MidiClip:
 				return QString("MidiClip");
-			case StringPairDataType::PatternClip:
+			case DataType::PatternClip:
 				return QString("PatternClip");
-			case StringPairDataType::SampleClip:
+			case DataType::SampleClip:
 				return QString("SampleClip");
-			case StringPairDataType::AutomationClip:
+			case DataType::AutomationClip:
 				return QString("AutomationClip");
 			default:
 				break;
@@ -120,7 +120,7 @@ namespace lmms::Clipboard
 	}
 
 
-	void copyStringPair(StringPairDataType key, const QString& value)
+	void copyStringPair(DataType key, const QString& value)
 	{
 		QString finalString = getStringPairKeyName(key) + ":" + value;
 
@@ -132,17 +132,17 @@ namespace lmms::Clipboard
 
 
 
-	StringPairDataType decodeKey(const QMimeData* mimeData)
+	DataType decodeKey(const QMimeData* mimeData)
 	{
 		QString keyString = QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 0, 0);
-		for (size_t i = 0; i < static_cast<size_t>(StringPairDataType::Count); i++)
+		for (size_t i = 0; i < static_cast<size_t>(DataType::Count); i++)
 		{
-			if (getStringPairKeyName(static_cast<StringPairDataType>(i)) == keyString)
+			if (getStringPairKeyName(static_cast<DataType>(i)) == keyString)
 			{
-				return static_cast<StringPairDataType>(i);
+				return static_cast<DataType>(i);
 			}
 		}
-		return StringPairDataType::None;
+		return DataType::None;
 	}
 
 

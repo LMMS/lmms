@@ -191,7 +191,7 @@ void SampleTrackView::modelChanged()
 
 void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, Clipboard::StringPairDataType::SampleFile);
+	StringPairDrag::processDragEnterEvent(dee, Clipboard::DataType::SampleFile);
 }
 
 
@@ -199,10 +199,10 @@ void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
 
 void SampleTrackView::dropEvent(QDropEvent *de)
 {
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(de);
+	Clipboard::DataType type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue(de);
 
-	if (type == Clipboard::StringPairDataType::SampleFile)
+	if (type == Clipboard::DataType::SampleFile)
 	{
 		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT

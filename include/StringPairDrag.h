@@ -45,15 +45,15 @@ namespace lmms::gui
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
-	StringPairDrag(Clipboard::StringPairDataType key, const QString& _value,
+	StringPairDrag(Clipboard::DataType key, const QString& _value,
 					const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets = true);
 	~StringPairDrag() override;
 
 	static bool processDragEnterEvent(QDragEnterEvent* _dee,
-						Clipboard::StringPairDataType allowedKey);
+						Clipboard::DataType allowedKey);
 	static bool processDragEnterEvent(QDragEnterEvent* _dee,
-						const std::vector<Clipboard::StringPairDataType>* allowedKeys);
-	static Clipboard::StringPairDataType decodeKey(QDropEvent * _de);
+						const std::vector<Clipboard::DataType>* allowedKeys);
+	static Clipboard::DataType decodeKey(QDropEvent * _de);
 	static QString decodeValue( QDropEvent * _de );
 } ;
 

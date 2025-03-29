@@ -240,15 +240,15 @@ QString AutomationClipView::getShortcutMessage()
 	return m_shortcutMessage;
 }
 
-bool AutomationClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+bool AutomationClipView::canAcceptClipboardData(Clipboard::DataType dataType)
 {
-	return dataType == Clipboard::StringPairDataType::AutomatableModelLink || ClipView::canAcceptClipboardData(dataType);
+	return dataType == Clipboard::DataType::AutomatableModelLink || ClipView::canAcceptClipboardData(dataType);
 }
 
-bool AutomationClipView::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
+bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	bool shouldAccept = false;
-	if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	if (type == Clipboard::DataType::AutomatableModelLink)
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
 		if (mod != nullptr)
@@ -485,7 +485,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent(_dee, Clipboard::StringPairDataType::AutomatableModelLink);
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::DataType::AutomatableModelLink);
 	if( !_dee->isAccepted() )
 	{
 		ClipView::dragEnterEvent( _dee );

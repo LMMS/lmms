@@ -344,7 +344,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QDropEvent* d
 {
 	const QMimeData * mimeData = de->mimeData();
 
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	Clipboard::DataType type = Clipboard::decodeKey(mimeData);
 	QString value = Clipboard::decodeValue(mimeData);
 
 	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
@@ -355,7 +355,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QDropEvent* d
 }
 
 // Overloaded method to make it possible to call this method without a Drag&Drop event
-bool TrackContentWidget::canPasteSelection(TimePos clipPos, Clipboard::StringPairDataType type, QString& value, bool allowSameBar)
+bool TrackContentWidget::canPasteSelection(TimePos clipPos, Clipboard::DataType type, QString& value, bool allowSameBar)
 {
 	Track * t = getTrack();
 
@@ -437,7 +437,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, QDropEvent * de )
 {
 	const QMimeData * mimeData = de->mimeData();
 
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	Clipboard::DataType type = Clipboard::decodeKey(mimeData);
 	QString value = Clipboard::decodeValue(mimeData);
 
 	if (canPasteSelection(clipPos, type, value) == false)
@@ -450,7 +450,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, QDropEvent * de )
 }
 
 // Overloaded method so we can call it without a Drag&Drop event
-bool TrackContentWidget::pasteSelection(TimePos clipPos, Clipboard::StringPairDataType type, QString& value, bool skipSafetyCheck)
+bool TrackContentWidget::pasteSelection(TimePos clipPos, Clipboard::DataType type, QString& value, bool skipSafetyCheck)
 {
 	// When canPasteSelection was already called before, skipSafetyCheck will skip this
 	if (skipSafetyCheck == false && canPasteSelection(clipPos, type, value) == false)
@@ -686,7 +686,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, ContextMenuAction::Paste ); } );
 	
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(Clipboard::getMimeData());
+	Clipboard::DataType type = Clipboard::decodeKey(Clipboard::getMimeData());
 	QString value = Clipboard::decodeValue(Clipboard::getMimeData());
 	
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
@@ -703,7 +703,7 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 		// Paste the selection on the TimePos of the context menu event
 		TimePos clipPos = getPosition( cme->x() );
 
-		Clipboard::StringPairDataType type = Clipboard::decodeKey(Clipboard::getMimeData());
+		Clipboard::DataType type = Clipboard::decodeKey(Clipboard::getMimeData());
 		QString value = Clipboard::decodeValue(Clipboard::getMimeData());
 
 		pasteSelection(clipPos, type, value);

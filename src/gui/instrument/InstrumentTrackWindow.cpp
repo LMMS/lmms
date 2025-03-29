@@ -558,10 +558,10 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
-		Clipboard::StringPairDataType::Instrument,
-		Clipboard::StringPairDataType::PresetFile,
-		Clipboard::StringPairDataType::PluginPresetFile
+	std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::Instrument,
+		Clipboard::DataType::PresetFile,
+		Clipboard::DataType::PluginPresetFile
 	};
 	StringPairDrag::processDragEnterEvent(event, &acceptedKeys);
 }
@@ -579,10 +579,10 @@ void InstrumentTrackWindow::dragEnterEvent( QDragEnterEvent* event )
 
 void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 {
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(event);
+	Clipboard::DataType type = StringPairDrag::decodeKey(event);
 	QString value = StringPairDrag::decodeValue( event );
 
-	if (type == Clipboard::StringPairDataType::Instrument)
+	if (type == Clipboard::DataType::Instrument)
 	{
 		m_track->loadInstrument( value, nullptr, true /* DnD */ );
 
@@ -591,14 +591,14 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		event->accept();
 		setFocus();
 	}
-	else if (type == Clipboard::StringPairDataType::PresetFile)
+	else if (type == Clipboard::DataType::PresetFile)
 	{
 		DataFile dataFile(value);
 		m_track->replaceInstrument(dataFile);
 		event->accept();
 		setFocus();
 	}
-	else if (type == Clipboard::StringPairDataType::PluginPresetFile)
+	else if (type == Clipboard::DataType::PluginPresetFile)
 	{
 		const QString ext = FileItem::extension( value );
 		Instrument * i = m_track->instrument();

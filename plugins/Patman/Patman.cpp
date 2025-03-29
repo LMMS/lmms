@@ -598,7 +598,7 @@ void PatmanView::dropEvent( QDropEvent * _de )
 {
 	auto type = StringPairDrag::decodeKey( _de );
 	QString value = StringPairDrag::decodeValue( _de );
-	if (type == Clipboard::StringPairDataType::SampleFile)
+	if (type == Clipboard::DataType::SampleFile)
 	{
 		m_pi->setFile( value );
 		_de->accept();

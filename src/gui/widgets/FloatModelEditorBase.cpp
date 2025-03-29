@@ -142,9 +142,9 @@ void FloatModelEditorBase::toggleScale()
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
-		Clipboard::StringPairDataType::FloatValue,
-		Clipboard::StringPairDataType::AutomatableModelLink
+	std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::FloatValue,
+		Clipboard::DataType::AutomatableModelLink
 	};
 	StringPairDrag::processDragEnterEvent(dee, &acceptedKeys);
 }
@@ -196,7 +196,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 	else if (me->button() == Qt::LeftButton &&
 			(me->modifiers() & Qt::ShiftModifier))
 	{
-		new StringPairDrag(Clipboard::StringPairDataType::FloatValue,
+		new StringPairDrag(Clipboard::DataType::FloatValue,
 					Clipboard::encodeFloatValue(model()->value()),
 							QPixmap(), this);
 	}
@@ -306,14 +306,14 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 	{
 		case 0:
 			qDebug("processShortcutPressed 2, val: %f", (model()->value() * getConversionFactor()));
-			Clipboard::copyStringPair(Clipboard::StringPairDataType::FloatValue, Clipboard::encodeFloatValue(model()->value() * getConversionFactor()));
-			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::FloatValue);
+			Clipboard::copyStringPair(Clipboard::DataType::FloatValue, Clipboard::encodeFloatValue(model()->value() * getConversionFactor()));
+			InteractiveModelView::startHighlighting(Clipboard::DataType::FloatValue);
 			qDebug("processShortcutPressed 3");
 			break;
 		case 1:
 			qDebug("processShortcutPressed 4, THISid: %d", model()->id());
-			Clipboard::copyStringPair(Clipboard::StringPairDataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*model()));
-			InteractiveModelView::startHighlighting(Clipboard::StringPairDataType::AutomatableModelLink);
+			Clipboard::copyStringPair(Clipboard::DataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*model()));
+			InteractiveModelView::startHighlighting(Clipboard::DataType::AutomatableModelLink);
 			qDebug("processShortcutPressed 5");
 			break;
 		case 2:
@@ -345,25 +345,25 @@ QString FloatModelEditorBase::getShortcutMessage()
 	return m_shortcutMessage;
 }
 
-bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::DataType dataType)
 {
 	qDebug("canAcceptClipboardData 1, THISid: %d", model()->id());
-	return dataType == Clipboard::StringPairDataType::FloatValue
-		|| dataType == Clipboard::StringPairDataType::AutomatableModelLink;
+	return dataType == Clipboard::DataType::FloatValue
+		|| dataType == Clipboard::DataType::AutomatableModelLink;
 }
 
-bool FloatModelEditorBase::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
+bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	qDebug("processPasteImplementation 1, THISid: %d", model()->id());
 	bool shouldAccept = false;
-	if (type == Clipboard::StringPairDataType::FloatValue)
+	if (type == Clipboard::DataType::FloatValue)
 	{
 		qDebug("processPasteImplementation 2");
 		model()->setValue(LocaleHelper::toFloat(value));
 		shouldAccept = true;
 		qDebug("processPasteImplementation 3");
 	}
-	else if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	else if (type == Clipboard::DataType::AutomatableModelLink)
 	{
 		qDebug("processPasteImplementation 4, id: %d", value.toInt());
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));

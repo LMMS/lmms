@@ -108,9 +108,9 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	std::vector<Clipboard::StringPairDataType> acceptedKeys = {
-		Clipboard::StringPairDataType::SampleFile,
-		Clipboard::StringPairDataType::SampleData
+	std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::SampleFile,
+		Clipboard::DataType::SampleData
 	};
 	if (StringPairDrag::processDragEnterEvent(_dee, &acceptedKeys) == false)
 	{
@@ -347,22 +347,22 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
 
-bool SampleClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+bool SampleClipView::canAcceptClipboardData(Clipboard::DataType dataType)
 {
-	return dataType == Clipboard::StringPairDataType::SampleFile
-		|| dataType == Clipboard::StringPairDataType::SampleData
+	return dataType == Clipboard::DataType::SampleFile
+		|| dataType == Clipboard::DataType::SampleData
 		|| ClipView::canAcceptClipboardData(dataType);
 }
 
-bool SampleClipView::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
+bool SampleClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	bool shouldAccept = false;
-	if (type == Clipboard::StringPairDataType::SampleFile)
+	if (type == Clipboard::DataType::SampleFile)
 	{
 		m_clip->setSampleFile(value);
 		shouldAccept = true;
 	}
-	else if (type == Clipboard::StringPairDataType::SampleData)
+	else if (type == Clipboard::DataType::SampleData)
 	{
 		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
 		m_clip->updateLength();

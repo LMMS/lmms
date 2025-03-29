@@ -885,33 +885,33 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 			{
 				case FileItem::FileType::Preset:
 					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsPreset ?
-							Clipboard::StringPairDataType::PresetFile : Clipboard::StringPairDataType::PluginPresetFile,
+							Clipboard::DataType::PresetFile : Clipboard::DataType::PluginPresetFile,
 							f->fullName(),
 							embed::getIconPixmap( "preset_file" ), this );
 					break;
 
 				case FileItem::FileType::Sample:
-					new StringPairDrag(Clipboard::StringPairDataType::SampleFile, f->fullName(),
+					new StringPairDrag(Clipboard::DataType::SampleFile, f->fullName(),
 							embed::getIconPixmap( "sample_file" ), this );
 					break;
 				case FileItem::FileType::SoundFont:
-					new StringPairDrag(Clipboard::StringPairDataType::SoundFontFile, f->fullName(),
+					new StringPairDrag(Clipboard::DataType::SoundFontFile, f->fullName(),
 							embed::getIconPixmap( "soundfont_file" ), this );
 					break;
 				case FileItem::FileType::Patch:
-					new StringPairDrag(Clipboard::StringPairDataType::PatchFile, f->fullName(),
+					new StringPairDrag(Clipboard::DataType::PatchFile, f->fullName(),
 							embed::getIconPixmap( "sample_file" ), this );
 					break;
 				case FileItem::FileType::VstPlugin:
-					new StringPairDrag(Clipboard::StringPairDataType::VstPluginFile, f->fullName(),
+					new StringPairDrag(Clipboard::DataType::VstPluginFile, f->fullName(),
 							embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
 				case FileItem::FileType::Midi:
-					new StringPairDrag(Clipboard::StringPairDataType::ImportedProject, f->fullName(),
+					new StringPairDrag(Clipboard::DataType::ImportedProject, f->fullName(),
 							embed::getIconPixmap( "midi_file" ), this );
 					break;
 				case FileItem::FileType::Project:
-					new StringPairDrag(Clipboard::StringPairDataType::ProjectFile, f->fullName(),
+					new StringPairDrag(Clipboard::DataType::ProjectFile, f->fullName(),
 							embed::getIconPixmap( "project_file" ), this );
 					break;
 
