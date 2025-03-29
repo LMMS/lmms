@@ -54,7 +54,7 @@ public:
 	bool canUndo() const;
 	bool canRedo() const;
 
-	void addJournalCheckPoint( JournallingObject *jo );
+	void addJournalCheckPoint(JournallingObject *jo, QString reason);
 
 	bool isJournalling() const
 	{
@@ -98,21 +98,26 @@ public:
 		return nullptr;
 	}
 
-
-private:
-	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
-
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
-			joID( initID ),
-			data( initData )
+		CheckPoint(jo_id_t initID = 0, const DataFile& initData = DataFile(DataFile::Type::JournalData), QString description = "") :
+			joID(initID),
+			data(initData),
+			description(description)
 		{
 		}
 		jo_id_t joID;
 		DataFile data;
+		QString description;
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
+
+	const CheckPointStack& undoCheckPoints() { return m_undoCheckPoints; }
+	const CheckPointStack& redoCheckPoints() { return m_redoCheckPoints; }
+
+
+private:
+	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
 
 	JoIdMap m_joIDs;
 

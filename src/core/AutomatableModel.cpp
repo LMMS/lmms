@@ -302,7 +302,7 @@ void AutomatableModel::setValue( const float value )
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
-		addJournalCheckPoint();
+		addJournalCheckPoint(tr("Set value of %1").arg(fullDisplayName()));
 
 		// notify linked models
 		for (const auto& linkedModel : m_linkedModels)

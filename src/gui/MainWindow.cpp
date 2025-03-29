@@ -71,6 +71,7 @@
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
+#include "UndoRedoMenu.h"
 #include "VersionedSaveDialog.h"
 
 #include "lmmsversion.h"
@@ -333,14 +334,15 @@ void MainWindow::finalize()
 
 	auto edit_menu = new QMenu(this);
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
-					tr( "Undo" ),
-					this, SLOT(undo()),
-					QKeySequence::Undo );
-	m_redoAction = edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
-					tr( "Redo" ),
-					this, SLOT(redo()),
-					QKeySequence::Redo );
+
+	m_undoMenu = new UndoRedoMenu(this, true);
+	edit_menu->addMenu(m_undoMenu);
+	m_redoMenu = new UndoRedoMenu(this, false);
+	edit_menu->addMenu(m_redoMenu);
+
+	new QShortcut(QKeySequence::Undo, this, SLOT(undo()));
+	new QShortcut(QKeySequence::Redo, this, SLOT(redo()));
+
 	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
 	if (QKeySequence(QKeySequence::Redo) != QKeySequence(combine(Qt::CTRL, Qt::Key_Y)))
 	{
@@ -1203,8 +1205,8 @@ void MainWindow::updateUndoRedoButtons()
 {
 	// when the edit menu is shown, grey out the undo/redo buttons if there's nothing to undo/redo
 	// else, un-grey them
-	m_undoAction->setEnabled(Engine::projectJournal()->canUndo());
-	m_redoAction->setEnabled(Engine::projectJournal()->canRedo());
+	m_undoMenu->setEnabled(Engine::projectJournal()->canUndo());
+	m_redoMenu->setEnabled(Engine::projectJournal()->canRedo());
 }
 
 

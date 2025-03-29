@@ -55,11 +55,11 @@ JournallingObject::~JournallingObject()
 
 
 
-void JournallingObject::addJournalCheckPoint()
+void JournallingObject::addJournalCheckPoint(QString reason)
 {
 	if( isJournalling() )
 	{
-		Engine::projectJournal()->addJournalCheckPoint( this );
+		Engine::projectJournal()->addJournalCheckPoint(this, reason);
 	}
 }
 

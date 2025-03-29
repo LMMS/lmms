@@ -75,6 +75,7 @@ SET(LMMS_SRCS
 	gui/menus/MidiPortMenu.cpp
 	gui/menus/RecentProjectsMenu.cpp
 	gui/menus/TemplatesMenu.cpp
+	gui/menus/UndoRedoMenu.cpp
 
 	gui/modals/AboutDialog.cpp
 	gui/modals/ColorChooser.cpp
