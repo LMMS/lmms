@@ -470,11 +470,11 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 void ClipView::dropEvent( QDropEvent * de )
 {
 	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return; }
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(de);
+	Clipboard::DataType type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue( de );
 
 	// Track must be the same type to paste into
-	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::StringPairDataType::None)
+	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::DataType::None)
 	{
 		return;
 	}
@@ -1170,7 +1170,7 @@ void ClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
 	{
 		case 0:
 			contextMenuAction(ContextMenuAction::Copy);
-			//static void startHighlighting(Clipboard::StringPairDataType dataType);
+			//static void startHighlighting(Clipboard::DataType dataType);
 			break;
 		case 1:
 			contextMenuAction(ContextMenuAction::Paste);
@@ -1191,15 +1191,15 @@ QString ClipView::getShortcutMessage()
 	return m_shortcutMessage;
 }
 
-bool ClipView::canAcceptClipboardData(Clipboard::StringPairDataType dataType)
+bool ClipView::canAcceptClipboardData(Clipboard::DataType dataType)
 {
 	return dataType == getClipStringPairType(m_clip->getTrack());;
 }
 
-bool ClipView::processPasteImplementation(Clipboard::StringPairDataType type, QString& value)
+bool ClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	// Track must be the same type to paste into
-	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::StringPairDataType::None) { return false; }
+	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::DataType::None) { return false; }
 
 	bool shouldAccept = false;
 
@@ -1577,29 +1577,29 @@ auto ClipView::hasCustomColor() const -> bool
 	return m_clip->color().has_value() || m_clip->getTrack()->color().has_value();
 }
 
-Clipboard::StringPairDataType ClipView::getClipStringPairType(Track* track)
+Clipboard::DataType ClipView::getClipStringPairType(Track* track)
 {
 	switch (track->type())
 	{
 		case Track::Type::Instrument:
-			return Clipboard::StringPairDataType::MidiClip;
+			return Clipboard::DataType::MidiClip;
 			break;
 		case Track::Type::Pattern:
-			return Clipboard::StringPairDataType::PatternClip;
+			return Clipboard::DataType::PatternClip;
 			break;
 		case Track::Type::Sample:
-			return Clipboard::StringPairDataType::SampleClip;
+			return Clipboard::DataType::SampleClip;
 			break;
 		case Track::Type::Automation:
-			return Clipboard::StringPairDataType::AutomationClip;
+			return Clipboard::DataType::AutomationClip;
 			break;
 		case Track::Type::HiddenAutomation:
-			return Clipboard::StringPairDataType::AutomationClip;
+			return Clipboard::DataType::AutomationClip;
 			break;
 		default:
 			break;
 	}
-	return Clipboard::StringPairDataType::None;
+	return Clipboard::DataType::None;
 }
 
 } // namespace lmms::gui

@@ -67,18 +67,6 @@ public slots:
 	}
 
 protected:
-	
-	// InteractiveModelView methods
-	/*
-	inline std::vector<ModelShortcut> getShortcuts() override { return std::vector<ModelShortcut>(); };
-	inline void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override {};
-	inline QString& getShortcutMessage() override
-	{
-		return m_tempString;
-	};
-	inline bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override { return false; };
-	inline bool processPaste(const QMimeData* mimeData) override { return false; };
-	*/
 
 private:
 	bool m_selected;

@@ -46,7 +46,7 @@ namespace Clipboard
 		Default
 	};
 	
-	enum StringPairDataType
+	enum DataType
 	{
 		None, //!< only use for error handling
 		FloatValue,
@@ -87,9 +87,9 @@ namespace Clipboard
 	QString getString( MimeType mT );
 
 	// Helper methods for String Pair data
-	QString getStringPairKeyName(StringPairDataType type);
-	void copyStringPair(StringPairDataType key, const QString& value);
-	StringPairDataType decodeKey(const QMimeData* mimeData);
+	QString getStringPairKeyName(DataType type);
+	void copyStringPair(DataType key, const QString& value);
+	DataType decodeKey(const QMimeData* mimeData);
 	QString decodeValue( const QMimeData * mimeData );
 
 	QString encodeFloatValue(float value);

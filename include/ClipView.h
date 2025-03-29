@@ -127,8 +127,8 @@ public:
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection(QVector<ClipView*> clipvs);
 	
-	//! used for getting the correct clip `StringPairDataType` for a given track
-	static Clipboard::StringPairDataType getClipStringPairType(Track* track);
+	//! used for getting the correct clip `DataType` for a given track
+	static Clipboard::DataType getClipStringPairType(Track* track);
 
 	QColor getColorForDisplay( QColor );
 
@@ -183,8 +183,8 @@ protected:
 	const std::vector<ModelShortcut>& getShortcuts() override;
 	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
 	QString getShortcutMessage() override;
-	bool canAcceptClipboardData(Clipboard::StringPairDataType dataType) override;
-	bool processPasteImplementation(Clipboard::StringPairDataType type, QString& value) override;
+	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
 
 	bool unquantizedModHeld( QMouseEvent * me );

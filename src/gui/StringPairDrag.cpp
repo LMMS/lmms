@@ -41,7 +41,7 @@ namespace lmms::gui
 {
 
 
-StringPairDrag::StringPairDrag(Clipboard::StringPairDataType key, const QString& _value,
+StringPairDrag::StringPairDrag(Clipboard::DataType key, const QString& _value,
 				const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets) :
 	QDrag( _w )
 {
@@ -85,13 +85,13 @@ StringPairDrag::~StringPairDrag()
 
 
 bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
-	Clipboard::StringPairDataType allowedKey)
+	Clipboard::DataType allowedKey)
 {
 	if (!_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
 		return(false);
 	}
-	Clipboard::StringPairDataType curKey = Clipboard::decodeKey(_dee->mimeData());
+	Clipboard::DataType curKey = Clipboard::decodeKey(_dee->mimeData());
 	if (allowedKey == curKey)
 	{
 		_dee->acceptProposedAction();
@@ -102,13 +102,13 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
 }
 
 bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
-	const std::vector<Clipboard::StringPairDataType>* allowedKeys)
+	const std::vector<Clipboard::DataType>* allowedKeys)
 {
 	if (!_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
 		return(false);
 	}
-	Clipboard::StringPairDataType curKey = Clipboard::decodeKey(_dee->mimeData());
+	Clipboard::DataType curKey = Clipboard::decodeKey(_dee->mimeData());
 	for (auto& i : (*allowedKeys))
 	{
 		if (i == curKey)
@@ -122,7 +122,7 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
 }
 
 
-Clipboard::StringPairDataType StringPairDrag::decodeKey(QDropEvent * _de)
+Clipboard::DataType StringPairDrag::decodeKey(QDropEvent * _de)
 {
 	return Clipboard::decodeKey(_de->mimeData());
 }

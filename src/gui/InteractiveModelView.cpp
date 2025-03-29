@@ -66,7 +66,7 @@ InteractiveModelView::~InteractiveModelView()
 	}
 }
 
-void InteractiveModelView::startHighlighting(Clipboard::StringPairDataType dataType)
+void InteractiveModelView::startHighlighting(Clipboard::DataType dataType)
 {
 	if (s_highlightTimer == nullptr)
 	{
@@ -270,7 +270,7 @@ bool InteractiveModelView::processPaste(const QMimeData* mimeData)
 	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
 	std::cout << "InteractiveModelView::processPaste this:" << this << "\n";
 
-	Clipboard::StringPairDataType type = Clipboard::decodeKey(mimeData);
+	Clipboard::DataType type = Clipboard::decodeKey(mimeData);
 	QString value = Clipboard::decodeValue(mimeData);
 	bool shouldAccept = processPasteImplementation(type, value);
 	if (shouldAccept)

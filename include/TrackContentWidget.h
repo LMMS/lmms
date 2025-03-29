@@ -79,9 +79,9 @@ public:
 	}
 
 	bool canPasteSelection( TimePos clipPos, const QDropEvent *de );
-	bool canPasteSelection(TimePos clipPos, Clipboard::StringPairDataType type, QString& value, bool allowSameBar = false);
+	bool canPasteSelection(TimePos clipPos, Clipboard::DataType type, QString& value, bool allowSameBar = false);
 	bool pasteSelection( TimePos clipPos, QDropEvent * de );
-	bool pasteSelection(TimePos clipPos, Clipboard::StringPairDataType type, QString& value, bool skipSafetyCheck = false);
+	bool pasteSelection(TimePos clipPos, Clipboard::DataType type, QString& value, bool skipSafetyCheck = false);
 
 	TimePos endPosition( const TimePos & posStart );
 

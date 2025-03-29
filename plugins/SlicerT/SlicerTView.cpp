@@ -162,15 +162,15 @@ void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 
 void SlicerTView::dropEvent(QDropEvent* de)
 {
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(de);
+	Clipboard::DataType type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue(de);
-	if (type == Clipboard::StringPairDataType::SampleFile)
+	if (type == Clipboard::DataType::SampleFile)
 	{
 		// set m_wf wave file
 		m_slicerTParent->updateFile(value);
 		return;
 	}
-	else if (type == Clipboard::StringPairDataType::SampleClip)
+	else if (type == Clipboard::DataType::SampleClip)
 	{
 		DataFile dataFile(value.toUtf8());
 		m_slicerTParent->updateFile(dataFile.content().firstChild().toElement().attribute("src"));

@@ -49,7 +49,7 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent(_dee, Clipboard::StringPairDataType::AutomatableModelLink);
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::DataType::AutomatableModelLink);
 }
 
 
@@ -57,9 +57,9 @@ void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
-	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(_de);
+	Clipboard::DataType type = StringPairDrag::decodeKey(_de);
 	QString val = StringPairDrag::decodeValue( _de );
-	if (type == Clipboard::StringPairDataType::AutomatableModelLink)
+	if (type == Clipboard::DataType::AutomatableModelLink)
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )

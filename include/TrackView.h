@@ -105,7 +105,7 @@ public:
 	// Currently instrument track and sample track supports it
 	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
 
-	static Clipboard::StringPairDataType getTrackStringPairType(Track* track);
+	static Clipboard::DataType getTrackStringPairType(Track* track);
 public slots:
 	virtual bool close();
 
