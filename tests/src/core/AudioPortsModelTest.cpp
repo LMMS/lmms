@@ -808,6 +808,112 @@ private slots:
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
 	}
+
+	//! Verifies correct routing when the direct routing optimization is active
+	void Routing_SampleFrame2x2_DirectRouting()
+	{
+		using namespace lmms;
+
+		auto model = Model{nullptr};
+
+		// Helper for running this test with different configurations
+		auto testWithConfig = [&]<AudioPortsConfig config>(DefaultAudioPorts<config>& ap) {
+			ap.init();
+
+			// Data on frames 0, 1, and 33
+			auto coreBus = getCoreBus();
+			SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+			trackChannels[0].setLeft(123.f);
+			trackChannels[0].setRight(321.f);
+			trackChannels[1].setLeft(456.f);
+			trackChannels[1].setRight(654.f);
+			trackChannels[33].setLeft(789.f);
+			trackChannels[33].setRight(987.f);
+
+			// Construct buffer with the expected core bus result
+			auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+			auto coreBufferPtrExpected = coreBufferExpected.data();
+			auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+			transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
+
+			// Plugin process method that doubles the amplitude. Works for any AudioPortsConfig.
+			struct Process
+			{
+				DefaultAudioPorts<config>& ap;
+
+				// Statically in-place config
+				void operator()(std::span<SampleFrame> inOut)
+				{
+					for (auto& s : inOut) { s *= 2; }
+				}
+
+				// Dynamically in-place config
+				void operator()(std::span<const SampleFrame> in, std::span<SampleFrame> out)
+				{
+					for (std::size_t frame = 0; frame < in.size(); ++frame)
+					{
+						out[frame] = in[frame] * 2;
+					}
+				}
+
+				// Buffered config
+				void operator()()
+				{
+					if constexpr (config.inplace)
+					{
+						auto inOut = ap.inputOutputBuffer();
+						(*this)(inOut);
+					}
+					else
+					{
+						auto in = ap.inputBuffer();
+						auto out = ap.outputBuffer();
+						(*this)(in, out);
+					}
+				}
+			};
+
+			QCOMPARE(ap.m_directRouting.value_or(99), 0);
+
+			// Use the Router::process method which handles routing into and out of plugin,
+			// and calls the plugin process method we provide (in this case it doubles the amplitude).
+			// Also applies the "direct routing" optimization.
+			auto router = ap.getRouter();
+			router.process(coreBus, *ap.buffers(), Process{ap});
+
+			// Should be double the original
+			QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
+			QCOMPARE(coreBus.bus[0][0].right(), 321.f * 2);
+			QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
+			QCOMPARE(coreBus.bus[0][1].right(), 654.f * 2);
+			QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
+			QCOMPARE(coreBus.bus[0][33].right(), 987.f * 2);
+
+			// Test the rest of the buffer
+			compareBuffers(coreBus, coreBusExpected);
+		};
+
+		// Test statically in-place, non-buffered
+		{
+			constexpr auto config = AudioPortsConfig {
+				AudioDataKind::SampleFrame, true, 2, 2, true, false
+			};
+			auto ap = DefaultAudioPorts<config>{false, &model};
+			testWithConfig(ap);
+		}
+
+		// Test statically in-place, buffered
+		{
+			constexpr auto config = AudioPortsConfig {
+				AudioDataKind::SampleFrame, true, 2, 2, true, true
+			};
+			auto ap = DefaultAudioPorts<config>{false, &model};
+			testWithConfig(ap);
+		}
+
+		// TODO: If/when SampleFrame-based plugins support dynamically in-place
+		//       processing, add those tests here
+	}
 };
 
 QTEST_GUILESS_MAIN(AudioPortsModelTest)
