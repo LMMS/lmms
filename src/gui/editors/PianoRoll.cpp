@@ -1752,7 +1752,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				if (it == notes.rend())
 				{
 					is_new_note = true;
-					m_midiClip->addJournalCheckPoint();
+					m_midiClip->addJournalCheckPoint(tr("Add note"));
 
 					// then set new note
 
@@ -1846,7 +1846,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
 					&& m_currentNote->length() > 0 )
 				{
-					m_midiClip->addJournalCheckPoint();
+					m_midiClip->addJournalCheckPoint(tr("Resize note"));
 					// then resize the note
 					m_action = Action::ResizeNote;
 
