@@ -10,6 +10,9 @@ set(LMMS_TESTS
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/tracks/AutomationTrackTest.cpp
+	src/tracks/InstrumentTrackTest.cpp
+	src/tracks/PatternTrackTest.cpp
+	src/tracks/SampleTrackTest.cpp
 )
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)

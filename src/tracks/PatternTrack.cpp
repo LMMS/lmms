@@ -40,8 +40,8 @@ namespace lmms
 PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
-PatternTrack::PatternTrack(TrackContainer* tc) :
-	Track(Track::Type::Pattern, tc)
+PatternTrack::PatternTrack() :
+	Track(Track::Type::Pattern)
 {
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
@@ -49,7 +49,6 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	setName(tr("Pattern %1").arg(patternNum));
 	Engine::patternStore()->createClipsForPattern(patternNum);
 	Engine::patternStore()->setCurrentPattern(patternNum);
-	Engine::patternStore()->updateComboBox();
 
 	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
@@ -76,10 +75,6 @@ PatternTrack::~PatternTrack()
 		}
 	}
 	s_infoMap.remove( this );
-
-	// remove us from the Song and update the pattern selection combobox to reflect the change
-	trackContainer()->removeTrack( this );
-	Engine::patternStore()->updateComboBox();
 }
 
 
@@ -146,9 +141,9 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 Clip* PatternTrack::createClip(const TimePos & pos)
 {
-	auto pc = new PatternClip(this);
+	auto pc = new PatternClip(patternIndex());
 	pc->movePosition(pos);
-	return pc;
+	return addClip(pc);
 }
 
 
