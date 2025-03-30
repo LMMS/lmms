@@ -34,7 +34,6 @@
 #include <numbers>
 #include <concepts>
 
-#include "lmmsconfig.h"
 #include "lmms_constants.h"
 
 namespace lmms

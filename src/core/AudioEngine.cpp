@@ -36,7 +36,6 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
-#include "SamplePlayHandle.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -74,7 +73,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
-	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), 44100)),
+	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front())),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),

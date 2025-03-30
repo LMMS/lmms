@@ -1,8 +1,8 @@
 /*
- * debug.h - header file to be included for debugging purposes
+ * LmmsCommonMacros.h - defines some common macros used in the codebase
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
+ * Copyright (c) 2025 Roshan M R (Ross Maxx) <mrroshan127/at/gmail/dot/com>
+ * 
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,20 +22,15 @@
  *
  */
 
-#ifndef LMMS_DEBUG_H
-#define LMMS_DEBUG_H
+#ifndef LMMS_COMMON_MACROS_H
+#define LMMS_COMMON_MACROS_H
 
-#include "lmmsconfig.h"
+namespace lmms
+{
 
-// Define standard macro NDEBUG when building without debug flag to make sure asserts become no-ops.
-#ifndef LMMS_DEBUG
-#ifndef NDEBUG
-	#define NDEBUG
-#endif
-#endif // LMMS_DEBUG
+#define LMMS_STRINGIFY(s) LMMS_STR(s) // a macro used to stringify the plugin name
+#define LMMS_STR(PN) #PN
 
-#include <cassert>
-#include <cstdio>
+} // namespace lmms
 
-
-#endif // LMMS_DEBUG_H
+#endif // LMMS_COMMON_MACROS_H
