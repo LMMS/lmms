@@ -258,11 +258,13 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 	const auto outputBuffer = static_cast<float*>(output);
 	const auto device = static_cast<AudioPortAudio*>(userData);
 
-	std::fill_n(outputBuffer, frameCount * device->channels(), 0.f);
-
 	for (auto frame = std::size_t{0}; frame < frameCount; ++frame)
 	{
-		if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0) { return paComplete; }
+		if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0)
+		{
+			std::fill(outputBuffer + frame * device->channels(), outputBuffer + frameCount * device->channels(), 0.f);
+			return paComplete;
+		}
 
 		if (device->channels() == 1)
 		{
