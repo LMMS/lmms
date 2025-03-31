@@ -29,7 +29,8 @@
 #include <span>
 #include <type_traits>
 
-#include "lmms_basics.h"
+#include "LmmsPolyfill.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

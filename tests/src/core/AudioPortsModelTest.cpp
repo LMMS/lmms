@@ -36,7 +36,6 @@
 #include "AudioPorts.h"
 #include "AudioPortsModel.h"
 #include "SampleFrame.h"
-#include "lmms_basics.h"
 
 
 namespace lmms {

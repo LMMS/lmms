@@ -29,9 +29,9 @@
 #include <QMutex>
 
 #include "Flags.h"
+#include "LmmsTypes.h"
 #include "SampleFrame.h"
 #include "ThreadableJob.h"
-#include "lmms_basics.h"
 #include "lmms_export.h"
 
 class QThread;

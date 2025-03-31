@@ -1,5 +1,5 @@
 /*
- * lmms_basics.h - typedefs for common types that are used in the whole app
+ * LmmsTypes.h - typedefs for common types that are used in the whole app
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -28,7 +28,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "lmmsconfig.h"
 
 namespace lmms
 {
@@ -52,47 +51,6 @@ using track_ch_t = uint16_t;    // track channel index/count (0-256)
 using proc_ch_t = uint16_t;     // audio processor channel index/count
 
 using jo_id_t = uint32_t; // (unique) ID of a journalling object
-
-
-constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
-
-constexpr char LADSPA_PATH_SEPERATOR =
-#ifdef LMMS_BUILD_WIN32
-';';
-#else
-':';
-#endif
-
-
-#define LMMS_STRINGIFY(s) LMMS_STR(s)
-#define LMMS_STR(PN)	#PN
-
-
-/**
- * Stand-in for C++23's std::unreachable
- * Taken from https://en.cppreference.com/w/cpp/utility/unreachable
- *
- * TODO C++23: Use std::unreachable instead
- */
-[[noreturn]] inline void unreachable()
-{
-#if defined(_MSC_VER) && !defined(__clang__) // MSVC
-	__assume(false);
-#else // GCC, Clang
-	__builtin_unreachable();
-#endif
-}
-
-
-/**
- * Can be used with static_assert() in an uninstantiated template
- * as a workaround for static_assert(false)
- *
- * TODO C++23: No longer needed with resolution of CWG2518
- */
-template<class... T>
-inline constexpr bool always_false_v = false;
-
 
 } // namespace lmms
 

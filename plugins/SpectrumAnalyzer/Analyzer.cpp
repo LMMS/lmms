@@ -33,7 +33,7 @@
 #endif
 
 #include "embed.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "plugin_export.h"
 
 namespace lmms

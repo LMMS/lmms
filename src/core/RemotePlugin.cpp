@@ -36,11 +36,6 @@
 #include <windows.h>
 #endif
 
-//#define DEBUG_REMOTE_PLUGIN
-#ifdef DEBUG_REMOTE_PLUGIN
-#include <QDebug>
-#endif
-
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -52,7 +47,6 @@
 #include "Model.h"
 #include "RemotePluginAudioPorts.h"
 #include "Song.h"
-#include "lmms_basics.h"
 
 
 #ifdef LMMS_BUILD_WIN32

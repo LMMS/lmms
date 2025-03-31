@@ -30,7 +30,7 @@
 #include "ComboBoxModel.h"
 #include "Instrument.h"
 #include "Sample.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 
 namespace lmms
