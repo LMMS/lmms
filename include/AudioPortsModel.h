@@ -78,7 +78,7 @@ struct AudioBus
 	AudioBus() = default;
 	AudioBus(const AudioBus&) = default;
 
-	AudioBus(T* const* bus, ch_cnt_t channelPairs, f_cnt_t frames)
+	AudioBus(T* const* bus, track_ch_t channelPairs, f_cnt_t frames)
 		: bus{bus}
 		, channelPairs{channelPairs}
 		, frames{frames}
@@ -93,13 +93,13 @@ struct AudioBus
 	{
 	}
 
-	auto trackChannelPair(ch_cnt_t pairIndex) const -> std::span<T>
+	auto trackChannelPair(track_ch_t pairIndex) const -> std::span<T>
 	{
 		return {bus[pairIndex], frames};
 	}
 
 	T* const* bus = nullptr; //!< [channel pair index][frame index]
-	ch_cnt_t channelPairs = 0;
+	track_ch_t channelPairs = 0;
 	f_cnt_t frames = 0;
 };
 
@@ -173,13 +173,13 @@ public:
 		}
 
 		auto pins() const -> const PinMap& { return m_pins; }
-		auto pins(ch_cnt_t trackChannel) const -> const std::vector<BoolModel*>& { return m_pins[trackChannel]; }
+		auto pins(track_ch_t trackChannel) const -> const std::vector<BoolModel*>& { return m_pins[trackChannel]; }
 
-		auto channelCount() const -> int { return m_channelCount; }
+		auto channelCount() const -> proc_ch_t { return m_channelCount; }
 
-		auto channelName(int channel) const -> QString;
+		auto channelName(proc_ch_t channel) const -> QString;
 
-		auto enabled(ch_cnt_t trackChannel, proc_ch_t processorChannel) const -> bool
+		auto enabled(track_ch_t trackChannel, proc_ch_t processorChannel) const -> bool
 		{
 			return m_pins[trackChannel][processorChannel]->value();
 		}
@@ -189,8 +189,8 @@ public:
 		friend class AudioPortsModel;
 
 	private:
-		void setTrackChannelCount(AudioPortsModel* parent, int count, const QString& nameFormat);
-		void setChannelCount(AudioPortsModel* parent, int count, const QString& nameFormat);
+		void setTrackChannelCount(AudioPortsModel* parent, track_ch_t count, const QString& nameFormat);
+		void setChannelCount(AudioPortsModel* parent, proc_ch_t count, const QString& nameFormat);
 
 		void setDefaultConnections();
 
@@ -198,20 +198,20 @@ public:
 		void loadSettings(const QDomElement& elem);
 
 		PinMap m_pins;
-		int m_channelCount = 0;
+		proc_ch_t m_channelCount = 0;
 		const bool m_isOutput = false;
 		std::vector<QString> m_channelNames; //!< optional
 	};
 
 	AudioPortsModel(bool isInstrument, Model* parent);
-	AudioPortsModel(int channelCountIn, int channelCountOut, bool isInstrument, Model* parent);
+	AudioPortsModel(proc_ch_t channelCountIn, proc_ch_t channelCountOut, bool isInstrument, Model* parent);
 
 	/**
 	 * Getters
 	 */
 	auto in() const -> const Matrix& { return m_in; }
 	auto out() const -> const Matrix& { return m_out; }
-	auto trackChannelCount() const -> std::size_t { return m_totalTrackChannels; }
+	auto trackChannelCount() const -> track_ch_t { return m_totalTrackChannels; }
 
 	//! This class is initialized once the number of in/out channels are known TODO: Remove?
 	auto initialized() const -> bool { return m_in.m_channelCount != 0 || m_out.m_channelCount != 0; }
@@ -221,9 +221,9 @@ public:
 	/**
 	 * Setters
 	 */
-	void setChannelCounts(int inCount, int outCount);
-	void setChannelCountIn(int inCount);
-	void setChannelCountOut(int outCount);
+	void setChannelCounts(proc_ch_t inCount, proc_ch_t outCount);
+	void setChannelCountIn(proc_ch_t inCount);
+	void setChannelCountOut(proc_ch_t outCount);
 
 
 	/**
@@ -348,7 +348,7 @@ public:
 
 	auto getChannelCountText() const -> QString;
 
-	static constexpr std::size_t MaxTrackChannels = 256; // TODO: Move somewhere else
+	static constexpr track_ch_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
 #ifdef LMMS_TESTING
 	friend class ::AudioPortsModelTest;
@@ -359,8 +359,8 @@ signals:
 	//void propertiesChanged(); // from Model
 
 public slots:
-	void setTrackChannelCount(int count);
-	void updateRoutedChannels(unsigned int trackChannel);
+	void setTrackChannelCount(track_ch_t count);
+	void updateRoutedChannels(track_ch_t trackChannel);
 
 protected:
 	/**
@@ -369,10 +369,10 @@ protected:
 	 *
 	 * NOTE: Virtual method, do not call in constructor.
 	 */
-	virtual void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) {}
+	virtual void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) {}
 
 private:
-	void setChannelCountsImpl(int inCount, int outCount);
+	void setChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount);
 	void updateAllRoutedChannels();
 	void updateDirectRouting();
 
@@ -380,10 +380,10 @@ private:
 	Matrix m_out{true}; //!< audio processor --> LMMS
 
 	// TODO: When full routing is added, get LMMS channel counts from bus or audio router class
-	std::size_t m_totalTrackChannels = DEFAULT_CHANNELS;
+	track_ch_t m_totalTrackChannels = DEFAULT_CHANNELS;
 
 	//! This value is <= to the total number of track channels (currently always 2)
-	unsigned int m_trackChannelsUpperBound = DEFAULT_CHANNELS; // TODO: Need to recalculate when pins are set/unset
+	track_ch_t m_trackChannelsUpperBound = DEFAULT_CHANNELS; // TODO: Need to recalculate when pins are set/unset
 
 	/**
 	 * Caches whether any output channels are routed to a given track channel (meaning the
@@ -405,7 +405,7 @@ private:
 	 * When std::nullopt, the optimization is disabled, otherwise the value equals the index of the track channel
 	 * pair currently routed to/from the processor.
 	 */
-	std::optional<ch_cnt_t> m_directRouting;
+	std::optional<track_ch_t> m_directRouting;
 
 	/**
 	 * This needs to be known because the default connections (and view?) for instruments with sidechain
@@ -504,7 +504,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 	 * without any processor audio routed to it, the track channel is unmodified for "bypass"
 	 * behavior.
 	 */
-	const auto routeNx2 = [&](SampleFrame* outPtr, ch_cnt_t outChannel, auto routedChannels) {
+	const auto routeNx2 = [&](SampleFrame* outPtr, track_ch_t outChannel, auto routedChannels) {
 		constexpr std::uint8_t rc = routedChannels();
 
 		if constexpr (rc == 0b00)
@@ -594,10 +594,10 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 	};
 
 
-	for (ch_cnt_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
+	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
 		SampleFrame* outPtr = inOut.bus[outChannelPairIdx]; // L/R track channel pair
-		const auto outChannel = static_cast<ch_cnt_t>(outChannelPairIdx * 2);
+		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 
 		const std::uint8_t routedChannels =
 				(static_cast<std::uint8_t>(m_ap->m_routedChannels[outChannel]) << 1u)
@@ -780,12 +780,12 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::r
 	};
 
 
-	for (ch_cnt_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
+	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
 		sample_t* outPtr = inOut.bus[outChannelPairIdx]->data(); // L/R track channel pair
 		assert(outPtr != nullptr);
 
-		const ch_cnt_t outChannel = outChannelPairIdx * 2;
+		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 		const std::uint8_t enabledPins =
 			(static_cast<std::uint8_t>(m_ap->m_out.enabled(outChannel, 0)) << 3u)
 			| (static_cast<std::uint8_t>(m_ap->m_out.enabled(outChannel, 1)) << 2u)

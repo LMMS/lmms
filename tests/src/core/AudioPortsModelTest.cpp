@@ -49,7 +49,7 @@ void zeroBuffer(std::span<SampleFrame> buffer)
 	zeroSampleFrames(buffer.data(), buffer.size());
 }*/
 
-template<typename SampleT, int extent>
+template<typename SampleT, proc_ch_t extent>
 void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
 {
 	for (proc_ch_t idx = 0; idx < buffer.channels(); ++idx)
@@ -61,7 +61,7 @@ void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
 
 void zeroBuffer(AudioBus<SampleFrame> bus)
 {
-	for (ch_cnt_t channelPair = 0; channelPair < bus.channelPairs; ++channelPair)
+	for (track_ch_t channelPair = 0; channelPair < bus.channelPairs; ++channelPair)
 	{
 		SampleFrame* buffer = bus.bus[channelPair];
 		zeroSampleFrames(buffer, bus.frames);
@@ -73,7 +73,7 @@ void transformBuffer(AudioBus<const SampleFrame> in, AudioBus<SampleFrame> out, 
 {
 	assert(in.channelPairs == out.channelPairs);
 	assert(in.frames == out.frames);
-	for (ch_cnt_t channelPair = 0; channelPair < in.channelPairs; ++channelPair)
+	for (track_ch_t channelPair = 0; channelPair < in.channelPairs; ++channelPair)
 	{
 		for (std::size_t frame = 0; frame < in.frames; ++frame)
 		{
@@ -92,7 +92,7 @@ void transformBuffer(std::span<SampleFrame> inOut, const F& func)
 	}
 }
 
-template<typename SampleT, int extent, class F>
+template<typename SampleT, proc_ch_t extent, class F>
 void transformBuffer(SplitAudioData<SampleT, extent> in, SplitAudioData<SampleT, extent> out, const F& func)
 {
 	assert(in.channels() == out.channels());
@@ -109,7 +109,7 @@ void compareBuffers(AudioBus<const SampleFrame> actual, AudioBus<const SampleFra
 {
 	QCOMPARE(actual.channelPairs, expected.channelPairs);
 	QCOMPARE(actual.frames, expected.frames);
-	for (ch_cnt_t channelPair = 0; channelPair < actual.channelPairs; ++channelPair)
+	for (track_ch_t channelPair = 0; channelPair < actual.channelPairs; ++channelPair)
 	{
 		for (std::size_t frame = 0; frame < actual.frames; ++frame)
 		{
@@ -130,7 +130,7 @@ void compareBuffers(std::span<const SampleFrame> actual, std::span<const SampleF
 	}
 }*/
 
-template<typename SampleT, int extent>
+template<typename SampleT, proc_ch_t extent>
 void compareBuffers(SplitAudioData<SampleT, extent> actual, SplitAudioData<SampleT, extent> expected)
 {
 	QCOMPARE(actual.channels(), expected.channels());

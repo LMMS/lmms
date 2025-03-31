@@ -386,17 +386,15 @@ bool RemotePlugin::process()
 
 
 
-auto RemotePlugin::updateAudioBuffer(int channelsIn, int channelsOut, fpp_t frames) -> float*
+auto RemotePlugin::updateAudioBuffer(proc_ch_t channelsIn, proc_ch_t channelsOut, fpp_t frames) -> float*
 {
-	if (channelsIn < 0 || channelsOut < 0)
+	if (channelsIn == 0 && channelsOut == 0)
 	{
 		qCritical() << "Invalid channel count";
 		return nullptr;
 	}
 
-	if (channelsIn == static_cast<int>(m_channelsIn)
-		&& channelsOut == static_cast<int>(m_channelsOut)
-		&& frames == m_frames)
+	if (channelsIn == m_channelsIn && channelsOut == m_channelsOut && frames == m_frames)
 	{
 		return m_audioBuffer.get();
 	}
@@ -413,8 +411,8 @@ auto RemotePlugin::updateAudioBuffer(int channelsIn, int channelsOut, fpp_t fram
 		return nullptr;
 	}
 
-	m_channelsIn = static_cast<proc_ch_t>(channelsIn);
-	m_channelsOut = static_cast<proc_ch_t>(channelsOut);
+	m_channelsIn = channelsIn;
+	m_channelsOut = channelsOut;
 	m_frames = frames;
 
 	m_audioOutputs = std::span{m_audioBuffer.get() + channelsIn * frames, channelsOut * frames};
@@ -508,7 +506,8 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdChangeInputOutputCount:
-			m_audioPorts->audioPortsModel().setChannelCounts(_m.getInt(0), _m.getInt(1));
+			m_audioPorts->audioPortsModel().setChannelCounts(
+				static_cast<proc_ch_t>(_m.getInt(0)), static_cast<proc_ch_t>(_m.getInt(1)));
 			break;
 
 		case IdDebugMessage:

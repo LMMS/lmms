@@ -105,7 +105,7 @@ public:
 	 * Updates the shared memory input/output audio buffer, then
 	 * returns a pointer to the buffer or nullptr if an error occurred.
 	 */
-	auto updateAudioBuffer(int channelsIn, int channelsOut, fpp_t frames) -> float*;
+	auto updateAudioBuffer(proc_ch_t channelsIn, proc_ch_t channelsOut, fpp_t frames) -> float*;
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 

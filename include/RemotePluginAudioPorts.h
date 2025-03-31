@@ -130,24 +130,16 @@ public:
 
 	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> override
 	{
-		if (!remoteActive()) { return SplitAudioData<SampleT, config.inputs>{}; }
+		if (!remoteActive()) { return {}; }
 
-		return SplitAudioData<SampleT, config.inputs> {
-			m_insOuts,
-			static_cast<proc_ch_t>(this->in().channelCount()),
-			m_frames
-		};
+		return {m_insOuts, this->in().channelCount(), m_frames};
 	}
 
 	auto outputBuffer() -> SplitAudioData<SampleT, config.outputs> override
 	{
-		if (!remoteActive()) { return SplitAudioData<SampleT, config.outputs>{}; }
+		if (!remoteActive()) { return {}; }
 
-		return SplitAudioData<SampleT, config.outputs> {
-			m_insOuts + this->in().channelCount(),
-			static_cast<proc_ch_t>(this->out().channelCount()),
-			m_frames
-		};
+		return {m_insOuts + this->in().channelCount(), this->out().channelCount(), m_frames};
 	}
 
 	auto frames() const -> fpp_t override
@@ -155,7 +147,7 @@ public:
 		return remoteActive() ? m_frames : 0;
 	}
 
-	void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) override
+	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) override
 	{
 		// Update the shared memory audio buffer in RemotePlugin
 		if (!m_buffers) { return; }
@@ -169,7 +161,7 @@ public:
 		}
 
 		// Update our views into the RemotePlugin buffer
-		const auto channels = static_cast<std::size_t>(channelsIn + channelsOut);
+		const auto channels = channelsIn + channelsOut;
 		if constexpr (!config.staticChannelCount())
 		{
 			m_accessBuffer.resize(channels);
@@ -183,7 +175,7 @@ public:
 
 		m_frames = frames;
 
-		for (std::size_t channel = 0; channel < channels; ++channel)
+		for (proc_ch_t channel = 0; channel < channels; ++channel)
 		{
 			m_accessBuffer[channel] = ptr;
 			ptr += frames;
@@ -270,7 +262,7 @@ public:
 		return localActive() ? m_localBuffer->frames() : 0;
 	}
 
-	void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) override
+	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) override
 	{
 		if (isRemote())
 		{

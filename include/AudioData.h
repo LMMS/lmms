@@ -67,7 +67,7 @@ using GetAudioDataType = typename detail::AudioDataType<kind>::type;
 
 
 //! Use when the number of channels is not known at compile time
-inline constexpr int DynamicChannelCount = -1;
+inline constexpr auto DynamicChannelCount = static_cast<proc_ch_t>(-1);
 
 
 /**
@@ -75,7 +75,7 @@ inline constexpr int DynamicChannelCount = -1;
  *
  * TODO C++23: Use std::mdspan
  */
-template<typename SampleT, int channelCount = DynamicChannelCount>
+template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
 class SplitAudioData
 {
 public:
@@ -96,7 +96,7 @@ public:
 	}
 
 	//! Contruct const from mutable
-	template<typename T = SampleT, std::enable_if_t<std::is_const_v<T>, bool> = true>
+	template<typename T = SampleT> requires (std::is_const_v<T>)
 	SplitAudioData(const SplitAudioData<std::remove_const_t<T>, channelCount>& other)
 		: m_data{other.data()}
 		, m_channels{other.channels()}
@@ -115,7 +115,7 @@ public:
 		return m_data[channel];
 	}
 
-	template<int channel>
+	template<proc_ch_t channel>
 	auto buffer() const -> SampleT*
 	{
 		static_assert(channel != DynamicChannelCount);
@@ -132,7 +132,7 @@ public:
 		}
 		else
 		{
-			return static_cast<proc_ch_t>(channelCount);
+			return channelCount;
 		}
 	}
 
@@ -148,7 +148,7 @@ public:
 	auto sourceBuffer() const -> std::span<SampleT>
 	{
 		assert(m_data != nullptr);
-		return std::span<SampleT>{m_data[0], channels() * frames()};
+		return {m_data[0], channels() * frames()};
 	}
 
 	auto data() const -> SampleT* const* { return m_data; }

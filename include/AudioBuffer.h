@@ -43,7 +43,7 @@ namespace detail {
  * Metafunction to select the appropriate non-owning audio buffer view
  * given the layout, sample type, and channel count
  */
-template<AudioDataKind kind, bool interleaved, int channels, bool isConst>
+template<AudioDataKind kind, bool interleaved, proc_ch_t channels, bool isConst>
 struct AudioDataViewTypeHelper
 {
 	static_assert(always_false_v<AudioDataViewTypeHelper<kind, interleaved, channels, isConst>>,
@@ -51,7 +51,7 @@ struct AudioDataViewTypeHelper
 };
 
 //! Non-interleaved specialization
-template<AudioDataKind kind, int channels, bool isConst>
+template<AudioDataKind kind, proc_ch_t channels, bool isConst>
 struct AudioDataViewTypeHelper<kind, false, channels, isConst>
 {
 	using type = SplitAudioData<
@@ -60,7 +60,7 @@ struct AudioDataViewTypeHelper<kind, false, channels, isConst>
 };
 
 //! SampleFrame specialization
-template<int channels, bool isConst>
+template<proc_ch_t channels, bool isConst>
 struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
 {
 	static_assert(channels == 0 || channels == 2,
@@ -93,7 +93,7 @@ public:
 	virtual auto inputBuffer() -> AudioDataViewType<config, false, false> = 0;
 	virtual auto outputBuffer() -> AudioDataViewType<config, true, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
-	virtual void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) = 0;
+	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
 
 //! Statically in-place specialization
@@ -105,7 +105,7 @@ public:
 
 	virtual auto inputOutputBuffer() -> AudioDataViewType<config, false, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
-	virtual void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) = 0;
+	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
 
 
@@ -113,7 +113,7 @@ public:
 template<AudioPortsConfig config>
 using AccessBufferType = std::conditional_t<
 	config.staticChannelCount(),
-	std::array<GetAudioDataType<config.kind>*, static_cast<std::size_t>(config.inputs + config.outputs)>,
+	std::array<GetAudioDataType<config.kind>*, config.inputs + config.outputs>,
 	std::vector<GetAudioDataType<config.kind>*>>;
 
 
@@ -135,18 +135,12 @@ public:
 
 	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> final
 	{
-		return SplitAudioData<SampleT, config.inputs> {
-			m_accessBuffer.data(), static_cast<proc_ch_t>(m_channelsIn), m_frames
-		};
+		return {m_accessBuffer.data(), m_channelsIn, m_frames};
 	}
 
 	auto outputBuffer() -> SplitAudioData<SampleT, config.outputs> final
 	{
-		return SplitAudioData<SampleT, config.outputs> {
-			m_accessBuffer.data() + static_cast<proc_ch_t>(m_channelsIn),
-			static_cast<proc_ch_t>(m_channelsOut),
-			m_frames
-		};
+		return {m_accessBuffer.data() + m_channelsIn, m_channelsOut, m_frames};
 	}
 
 	auto frames() const -> fpp_t final
@@ -154,7 +148,7 @@ public:
 		return m_frames;
 	}
 
-	void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) final
+	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) final
 	{
 		if (channelsIn == DynamicChannelCount || channelsOut == DynamicChannelCount) { return; }
 
@@ -192,8 +186,8 @@ private:
 	//! Provides [channel][frame] view into `m_sourceBuffer`
 	AccessBufferType<config> m_accessBuffer;
 
-	int m_channelsIn = config.inputs;
-	int m_channelsOut = config.outputs;
+	proc_ch_t m_channelsIn = config.inputs;
+	proc_ch_t m_channelsOut = config.outputs;
 	f_cnt_t m_frames = 0;
 };
 
@@ -215,9 +209,7 @@ public:
 
 	auto inputOutputBuffer() -> SplitAudioData<SampleT, config.outputs> final
 	{
-		return SplitAudioData<SampleT, config.outputs> {
-			m_accessBuffer.data(), static_cast<proc_ch_t>(m_channels), m_frames
-		};
+		return {m_accessBuffer.data(), m_channels, m_frames};
 	}
 
 	auto frames() const -> fpp_t final
@@ -225,12 +217,12 @@ public:
 		return m_frames;
 	}
 
-	void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) final
+	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) final
 	{
 		assert(channelsIn == channelsOut || channelsIn == 0 || channelsOut == 0);
 		if (channelsIn == DynamicChannelCount || channelsOut == DynamicChannelCount) { return; }
 
-		const auto channels = std::max<std::size_t>(channelsIn, channelsOut);
+		const auto channels = std::max(channelsIn, channelsOut);
 
 		m_sourceBuffer.resize(channels * frames);
 		if constexpr (!config.staticChannelCount())
@@ -247,7 +239,7 @@ public:
 		m_frames = frames;
 
 		SampleT* ptr = m_sourceBuffer.data();
-		for (std::size_t channel = 0; channel < channels; ++channel)
+		for (proc_ch_t channel = 0; channel < channels; ++channel)
 		{
 			m_accessBuffer[channel] = ptr;
 			ptr += frames;
@@ -263,7 +255,7 @@ private:
 	//! Provides [channel][frame] view into `m_sourceBuffer`
 	AccessBufferType<config> m_accessBuffer;
 
-	int m_channels = config.outputs;
+	proc_ch_t m_channels = config.outputs;
 	f_cnt_t m_frames = 0;
 };
 
@@ -279,7 +271,7 @@ public:
 
 	auto inputOutputBuffer() -> std::span<SampleFrame> final
 	{
-		return std::span<SampleFrame>{m_buffer.data(), m_buffer.size()};
+		return m_buffer;
 	}
 
 	auto frames() const -> fpp_t final
@@ -287,7 +279,7 @@ public:
 		return m_buffer.size();
 	}
 
-	void updateBuffers(int channelsIn, int channelsOut, f_cnt_t frames) final
+	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) final
 	{
 		(void)channelsIn;
 		(void)channelsOut;

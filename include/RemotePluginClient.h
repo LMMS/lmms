@@ -84,7 +84,7 @@ public:
 		return m_bufferSize;
 	}
 
-	void setInputOutputCount( int i, int o )
+	void setInputOutputCount(proc_ch_t i, proc_ch_t o)
 	{
 		m_inputCount = i;
 		m_outputCount = o;
@@ -93,12 +93,12 @@ public:
 				.addInt( o ) );
 	}
 
-	virtual int inputCount() const
+	virtual proc_ch_t inputCount() const
 	{
 		return m_inputCount;
 	}
 
-	virtual int outputCount() const
+	virtual proc_ch_t outputCount() const
 	{
 		return m_outputCount;
 	}
@@ -116,8 +116,8 @@ private:
 	SharedMemory<float[]> m_audioBuffer;
 	SharedMemory<const VstSyncData> m_vstSyncData;
 
-	int m_inputCount;
-	int m_outputCount;
+	proc_ch_t m_inputCount;
+	proc_ch_t m_outputCount;
 
 	sample_rate_t m_sampleRate;
 	fpp_t m_bufferSize;

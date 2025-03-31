@@ -283,21 +283,21 @@ public:
 	void savePreset( const std::string & _file );
 
 	// number of inputs
-	int inputCount() const override
+	proc_ch_t inputCount() const override
 	{
 		if( m_plugin )
 		{
-			return m_plugin->numInputs;
+			return static_cast<proc_ch_t>(m_plugin->numInputs);
 		}
 		return 0;
 	}
 
 	// number of outputs
-	int outputCount() const override
+	proc_ch_t outputCount() const override
 	{
 		if( m_plugin )
 		{
-			return m_plugin->numOutputs;
+			return static_cast<proc_ch_t>(m_plugin->numOutputs);
 		}
 		return 0;
 	}

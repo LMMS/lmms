@@ -122,7 +122,7 @@ public:
 	auto buffers() -> BufferT<config>* final { return static_cast<BufferT<config>*>(this); }
 
 private:
-	void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) final
+	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
 	{
 		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
@@ -147,7 +147,7 @@ public:
 	using AudioPorts<config>::AudioPorts;
 
 private:
-	void bufferPropertiesChanged(int inChannels, int outChannels, f_cnt_t frames) final
+	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
 	{
 		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);

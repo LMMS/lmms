@@ -39,10 +39,10 @@ struct AudioPortsConfig
 	bool interleaved;
 
 	//! The number of input channels, or `DynamicChannelCount` if unknown at compile time
-	int inputs = DynamicChannelCount;
+	proc_ch_t inputs = DynamicChannelCount;
 
 	//! The number of output channels, or `DynamicChannelCount` if unknown at compile time
-	int outputs = DynamicChannelCount;
+	proc_ch_t outputs = DynamicChannelCount;
 
 	/**
 	 * In-place processing
