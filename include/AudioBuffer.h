@@ -79,7 +79,7 @@ using AudioDataViewType = typename detail::AudioDataViewTypeHelper<
 
 namespace detail {
 
-//! Provides a view into a plugin's input and output audio buffers
+//! Interface for accessing input/output audio buffers
 template<AudioPortsConfig config, bool inplace = config.inplace>
 class AudioBuffer;
 
@@ -136,15 +136,15 @@ public:
 	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> final
 	{
 		return SplitAudioData<SampleT, config.inputs> {
-			m_accessBuffer.data(), static_cast<pi_ch_t>(m_channelsIn), m_frames
+			m_accessBuffer.data(), static_cast<proc_ch_t>(m_channelsIn), m_frames
 		};
 	}
 
 	auto outputBuffer() -> SplitAudioData<SampleT, config.outputs> final
 	{
 		return SplitAudioData<SampleT, config.outputs> {
-			m_accessBuffer.data() + static_cast<pi_ch_t>(m_channelsIn),
-			static_cast<pi_ch_t>(m_channelsOut),
+			m_accessBuffer.data() + static_cast<proc_ch_t>(m_channelsIn),
+			static_cast<proc_ch_t>(m_channelsOut),
 			m_frames
 		};
 	}
@@ -216,7 +216,7 @@ public:
 	auto inputOutputBuffer() -> SplitAudioData<SampleT, config.outputs> final
 	{
 		return SplitAudioData<SampleT, config.outputs> {
-			m_accessBuffer.data(), static_cast<pi_ch_t>(m_channels), m_frames
+			m_accessBuffer.data(), static_cast<proc_ch_t>(m_channels), m_frames
 		};
 	}
 

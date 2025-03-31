@@ -178,8 +178,8 @@ private:
 
 	SharedMemory<float[]> m_audioBuffer; // NOLINT
 
-	pi_ch_t m_channelsIn = 0;
-	pi_ch_t m_channelsOut = 0;
+	proc_ch_t m_channelsIn = 0;
+	proc_ch_t m_channelsOut = 0;
 	f_cnt_t m_frames = 0;
 
 	// View into `m_audioBuffer` output buffer

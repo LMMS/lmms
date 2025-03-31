@@ -134,7 +134,7 @@ public:
 
 		return SplitAudioData<SampleT, config.inputs> {
 			m_insOuts,
-			static_cast<pi_ch_t>(this->in().channelCount()),
+			static_cast<proc_ch_t>(this->in().channelCount()),
 			m_frames
 		};
 	}
@@ -145,7 +145,7 @@ public:
 
 		return SplitAudioData<SampleT, config.outputs> {
 			m_insOuts + this->in().channelCount(),
-			static_cast<pi_ch_t>(this->out().channelCount()),
+			static_cast<proc_ch_t>(this->out().channelCount()),
 			m_frames
 		};
 	}

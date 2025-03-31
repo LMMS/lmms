@@ -90,19 +90,19 @@ public:
 	virtual auto buffers() -> AudioBuffer<config>* = 0;
 
 	/**
-	 * Returns false if the plugin is not loaded.
-	 * Custom audio ports with a "plugin not loaded" state should override this.
+	 * Returns true if the audio port can be used.
+	 * Custom audio ports with an unusable state (i.e. a "plugin not loaded" state) should override this.
 	 */
 	virtual auto active() const -> bool { return true; }
 
-	static constexpr auto pluginConfig() -> AudioPortsConfig { return config; }
+	static constexpr auto configuration() -> AudioPortsConfig { return config; }
 };
 
 
 namespace detail {
 
 /**
- * The default audio port for plugins that do not provide their own.
+ * The default audio port for audio processors that do not provide their own.
  * Contains an audio port model and audio buffers.
  *
  * This audio port still has *some* ability for customization by using a custom `BufferT`,

@@ -1,6 +1,6 @@
 /*
- * AudioPortsModel.cpp - Specifies how to route audio channels
- *                       in and out of a plugin.
+ * AudioPortsModel.cpp - The model for audio ports used by the
+ *                       pin connector
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -48,21 +48,21 @@ AudioPortsModel::AudioPortsModel(bool isInstrument, Model* parent)
 	});
 }
 
-AudioPortsModel::AudioPortsModel(int pluginChannelCountIn, int pluginChannelCountOut, bool isInstrument, Model* parent)
+AudioPortsModel::AudioPortsModel(int channelCountIn, int channelCountOut, bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
 	setTrackChannelCount(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
-	setPluginChannelCountsImpl(pluginChannelCountIn, pluginChannelCountOut);
+	setChannelCountsImpl(channelCountIn, channelCountOut);
 
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
 		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
 	});
 }
 
-void AudioPortsModel::setPluginChannelCounts(int inCount, int outCount)
+void AudioPortsModel::setChannelCounts(int inCount, int outCount)
 {
-	setPluginChannelCountsImpl(inCount, outCount);
+	setChannelCountsImpl(inCount, outCount);
 
 	// Now tell the audio buffer to update
 	bufferPropertiesChanged(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
@@ -70,7 +70,7 @@ void AudioPortsModel::setPluginChannelCounts(int inCount, int outCount)
 	emit propertiesChanged();
 }
 
-void AudioPortsModel::setPluginChannelCountsImpl(int inCount, int outCount)
+void AudioPortsModel::setChannelCountsImpl(int inCount, int outCount)
 {
 	if (m_trackChannelsUpperBound > MaxTrackChannels)
 	{
@@ -106,20 +106,20 @@ void AudioPortsModel::setPluginChannelCountsImpl(int inCount, int outCount)
 		return;
 	}
 
-	m_in.setPluginChannelCount(this, inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
-	m_out.setPluginChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
+	m_in.setChannelCount(this, inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
+	m_out.setChannelCount(this, outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
 
 	updateDirectRouting();
 }
 
-void AudioPortsModel::setPluginChannelCountIn(int inCount)
+void AudioPortsModel::setChannelCountIn(int inCount)
 {
-	setPluginChannelCounts(inCount, out().channelCount());
+	setChannelCounts(inCount, out().channelCount());
 }
 
-void AudioPortsModel::setPluginChannelCountOut(int outCount)
+void AudioPortsModel::setChannelCountOut(int outCount)
 {
-	setPluginChannelCounts(in().channelCount(), outCount);
+	setChannelCounts(in().channelCount(), outCount);
 }
 
 void AudioPortsModel::saveSettings(QDomDocument& doc, QDomElement& elem)
@@ -127,8 +127,8 @@ void AudioPortsModel::saveSettings(QDomDocument& doc, QDomElement& elem)
 	auto pins = doc.createElement(nodeName());
 	elem.appendChild(pins);
 
-	pins.setAttribute("num_in", in().channelCount());
-	pins.setAttribute("num_out", out().channelCount());
+	pins.setAttribute("inputs", in().channelCount());
+	pins.setAttribute("outputs", out().channelCount());
 
 	auto pinsIn = doc.createElement("in_matrix");
 	pins.appendChild(pinsIn);
@@ -145,9 +145,9 @@ void AudioPortsModel::loadSettings(const QDomElement& elem)
 	if (pins.isNull()) { return; }
 
 	// TODO: Assert port counts are what was expected?
-	const auto pluginInCount = pins.attribute("num_in", "0").toInt();
-	const auto pluginOutCount = pins.attribute("num_out", "0").toInt();
-	setPluginChannelCounts(pluginInCount, pluginOutCount);
+	const auto inputs = pins.attribute("inputs", "0").toInt();
+	const auto outputs = pins.attribute("outputs", "0").toInt();
+	setChannelCounts(inputs, outputs);
 
 	m_in.loadSettings(pins.firstChildElement("in_matrix"));
 	m_out.loadSettings(pins.firstChildElement("out_matrix"));
@@ -234,7 +234,7 @@ void AudioPortsModel::updateDirectRouting()
 				if (nonzeroCount > 1)
 				{
 					// More than one track channel pair is connected to/from
-					// the plugin channels, so the optimization is impossible
+					// the processor channels, so the optimization is impossible
 					return std::nullopt;
 				}
 			}
@@ -260,7 +260,7 @@ void AudioPortsModel::updateDirectRouting()
 	}
 	else
 	{
-		// 2x2 plugin
+		// 2x2 audio processor
 		auto inOpt = check(in().pins());
 		if (!inOpt)
 		{
@@ -382,7 +382,7 @@ void AudioPortsModel::Matrix::setTrackChannelCount(AudioPortsModel* parent, int 
 	}
 }
 
-void AudioPortsModel::Matrix::setPluginChannelCount(AudioPortsModel* parent, int count,
+void AudioPortsModel::Matrix::setChannelCount(AudioPortsModel* parent, int count,
 	const QString& nameFormat)
 {
 	auto parentModel = parent->parentModel();
@@ -394,12 +394,12 @@ void AudioPortsModel::Matrix::setPluginChannelCount(AudioPortsModel* parent, int
 	{
 		for (unsigned tcIdx = 0; tcIdx < m_pins.size(); ++tcIdx)
 		{
-			auto& pluginChannels = m_pins[tcIdx];
-			pluginChannels.reserve(count);
+			auto& processorChannels = m_pins[tcIdx];
+			processorChannels.reserve(count);
 			for (int pcIdx = channelCount(); pcIdx < count; ++pcIdx)
 			{
 				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
-				BoolModel* model = pluginChannels.emplace_back(new BoolModel{false, parentModel, name});
+				BoolModel* model = processorChannels.emplace_back(new BoolModel{false, parentModel, name});
 				if (isOutput())
 				{
 					parentModel->connect(model, &BoolModel::dataChanged, [=]() {
@@ -420,13 +420,13 @@ void AudioPortsModel::Matrix::setPluginChannelCount(AudioPortsModel* parent, int
 	}
 	else if (channelCount() > count)
 	{
-		for (auto& pluginChannels : m_pins)
+		for (auto& processorChannels : m_pins)
 		{
 			for (int pcIdx = count; pcIdx < channelCount(); ++pcIdx)
 			{
-				delete pluginChannels[pcIdx];
+				delete processorChannels[pcIdx];
 			}
-			pluginChannels.erase(pluginChannels.begin() + count, pluginChannels.end());
+			processorChannels.erase(processorChannels.begin() + count, processorChannels.end());
 		}
 	}
 
@@ -450,9 +450,9 @@ void AudioPortsModel::Matrix::setDefaultConnections()
 			m_pins[0][0]->setValue(true);
 			if (isOutput())
 			{
-				// Only the first track channel is routed to mono-input
-				// plugins, otherwise the pin connector's input-summing behavior
-				// would cause mono plugins to be louder than stereo ones.
+				// Only the first track channel is routed to mono-input audio
+				// processors, otherwise the pin connector's input-summing behavior
+				// would cause mono processors to be louder than stereo ones.
 				// This behavior matches what REAPER's plug-in pin connector does.
 				m_pins[1][0]->setValue(true);
 			}
@@ -469,15 +469,16 @@ void AudioPortsModel::Matrix::saveSettings(QDomDocument& doc, QDomElement& elem)
 	// Only saves connections that are actually used, otherwise could bloat project file
 	for (std::size_t trackChannel = 0; trackChannel < m_pins.size(); ++trackChannel)
 	{
-		auto& trackChannels = m_pins[trackChannel];
-		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
+		auto& processorChannels = m_pins[trackChannel];
+		for (std::size_t processorChannel = 0; processorChannel < processorChannels.size(); ++processorChannel)
 		{
-			if (trackChannels[pluginChannel]->value() || trackChannels[pluginChannel]->isAutomatedOrControlled())
+			if (processorChannels[processorChannel]->value()
+				|| processorChannels[processorChannel]->isAutomatedOrControlled())
 			{
-				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(pluginChannel + 1);
+				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(processorChannel + 1);
 				assert(!AutomatableModel::mustQuoteName(name));
 
-				trackChannels[pluginChannel]->saveSettings(doc, elem, name);
+				processorChannels[processorChannel]->saveSettings(doc, elem, name);
 			}
 		}
 	}
@@ -490,9 +491,9 @@ void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 
 	std::vector<std::vector<bool>> connectionsToLoad;
 	connectionsToLoad.resize(trackChannelCount);
-	for (auto& pluginChannels : connectionsToLoad)
+	for (auto& processorChannels : connectionsToLoad)
 	{
-		pluginChannels.resize(m_channelCount);
+		processorChannels.resize(m_channelCount);
 	}
 
 	auto addConnection = [&connectionsToLoad](const QString& name) {
@@ -505,12 +506,12 @@ void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 #endif
 
 		auto trackChannel = name.midRef(1, pos - 1).toInt();
-		auto pluginChannel = name.midRef(pos + 1).toInt();
+		auto processorChannel = name.midRef(pos + 1).toInt();
 #ifndef NDEBUG
-		if (trackChannel == 0 || pluginChannel == 0) { throw std::runtime_error{"failed to parse integer"}; }
+		if (trackChannel == 0 || processorChannel == 0) { throw std::runtime_error{"failed to parse integer"}; }
 #endif
 
-		connectionsToLoad.at(trackChannel - 1).at(pluginChannel - 1) = true;
+		connectionsToLoad.at(trackChannel - 1).at(processorChannel - 1) = true;
 	};
 
 	// Get non-automated pin connector connections
@@ -532,18 +533,18 @@ void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 	// Lastly, load the connections
 	for (std::size_t trackChannel = 0; trackChannel < m_pins.size(); ++trackChannel)
 	{
-		auto& trackChannels = m_pins[trackChannel];
-		auto& trackChannelsToLoad = connectionsToLoad[trackChannel];
-		for (std::size_t pluginChannel = 0; pluginChannel < trackChannels.size(); ++pluginChannel)
+		auto& processorChannels = m_pins[trackChannel];
+		auto& processorChannelsToLoad = connectionsToLoad[trackChannel];
+		for (std::size_t processorChannel = 0; processorChannel < processorChannels.size(); ++processorChannel)
 		{
-			if (trackChannelsToLoad[pluginChannel])
+			if (processorChannelsToLoad[processorChannel])
 			{
-				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(pluginChannel + 1);
-				trackChannels[pluginChannel]->loadSettings(elem, name);
+				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(processorChannel + 1);
+				processorChannels[processorChannel]->loadSettings(elem, name);
 			}
 			else
 			{
-				trackChannels[pluginChannel]->setValue(0);
+				processorChannels[processorChannel]->setValue(0);
 			}
 		}
 	}

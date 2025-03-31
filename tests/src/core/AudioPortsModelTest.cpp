@@ -52,7 +52,7 @@ void zeroBuffer(std::span<SampleFrame> buffer)
 template<typename SampleT, int extent>
 void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
 {
-	for (pi_ch_t idx = 0; idx < buffer.channels(); ++idx)
+	for (proc_ch_t idx = 0; idx < buffer.channels(); ++idx)
 	{
 		auto ptr = buffer.buffer(idx);
 		std::fill_n(ptr, buffer.frames(), 0);
@@ -97,7 +97,7 @@ void transformBuffer(SplitAudioData<SampleT, extent> in, SplitAudioData<SampleT,
 {
 	assert(in.channels() == out.channels());
 	assert(in.frames() == out.frames());
-	for (pi_ch_t idx = 0; idx < in.channels(); ++idx)
+	for (proc_ch_t idx = 0; idx < in.channels(); ++idx)
 	{
 		auto inPtr = in.buffer(idx);
 		auto outPtr = out.buffer(idx);
@@ -135,7 +135,7 @@ void compareBuffers(SplitAudioData<SampleT, extent> actual, SplitAudioData<Sampl
 {
 	QCOMPARE(actual.channels(), expected.channels());
 	QCOMPARE(actual.frames(), expected.frames());
-	for (pi_ch_t idx = 0; idx < actual.channels(); ++idx)
+	for (proc_ch_t idx = 0; idx < actual.channels(); ++idx)
 	{
 		auto actualPtr = actual.buffer(idx);
 		auto expectedPtr = expected.buffer(idx);
@@ -196,11 +196,11 @@ private slots:
 		QCOMPARE(apmNxN.in().channelCount(), 0);
 		QCOMPARE(apmNxN.out().channelCount(), 0);
 
-		apmNxN.setPluginChannelCountIn(4);
+		apmNxN.setChannelCountIn(4);
 		QCOMPARE(apmNxN.in().channelCount(), 4);
 		QCOMPARE(apmNxN.out().channelCount(), 0);
 
-		apmNxN.setPluginChannelCountOut(8);
+		apmNxN.setChannelCountOut(8);
 		QCOMPARE(apmNxN.in().channelCount(), 4);
 		QCOMPARE(apmNxN.out().channelCount(), 8);
 
@@ -318,7 +318,7 @@ private slots:
 		// | |X| 1
 		//  ---
 
-		// Track channels 0 and 1 should both have a plugin output channel routed to them
+		// Track channels 0 and 1 should both have a processor output channel routed to them
 		QCOMPARE(apm.m_routedChannels[0], true);
 		QCOMPARE(apm.m_routedChannels[1], true);
 
@@ -330,7 +330,7 @@ private slots:
 
 		apm.out().pins(0)[0]->setValue(false);
 
-		// Now only track channel 1 should have a plugin channel routed to it
+		// Now only track channel 1 should have a processor channel routed to it
 		QCOMPARE(apm.m_routedChannels[0], false);
 		QCOMPARE(apm.m_routedChannels[1], true);
 
@@ -372,7 +372,7 @@ private slots:
 		// | |X| | |X|
 		//  ---   ---
 
-		// The default pin connections for a 2x2 plugin should allow direct routing
+		// The default pin connections for a 2x2 audio processor should allow direct routing
 		QCOMPARE(apm.m_directRouting.value_or(99), 0);
 
 		// Should still work after increasing the track channel count
@@ -429,8 +429,8 @@ private slots:
 		// | |X|
 		//  ---
 
-		// If plugin input channels are removed, the optimization should still apply
-		apm.setPluginChannelCountIn(0);
+		// If processor input channels are removed, the optimization should still apply
+		apm.setChannelCountIn(0);
 		QCOMPARE(apm.m_directRouting.value_or(99), 1);
 
 		// Out
@@ -442,11 +442,11 @@ private slots:
 		//  -----
 
 		// Adding a 3rd output channel should disable the optimization (only 0 or 2 channels allowed)
-		apm.setPluginChannelCountOut(3);
+		apm.setChannelCountOut(3);
 		QCOMPARE(apm.m_directRouting.has_value(), false);
 	}
 
-	//! Verifies correct default routing for 1x1 non-interleaved plugin
+	//! Verifies correct default routing for 1x1 non-interleaved audio processor
 	void Routing_NonInterleaved1x1_Default()
 	{
 		using namespace lmms;
@@ -458,7 +458,7 @@ private slots:
 		ap.init();
 		auto coreBus = getCoreBus();
 
-		// Use left channel as plugin input, upmix mono plugin output to stereo
+		// Use left channel as processor input, upmix mono processor output to stereo
 		// In    Out
 		//  _     _
 		// |X|   |X|
@@ -468,7 +468,7 @@ private slots:
 		// NOTE: If both channels were connected to the mono input, the signals would
 		//       be summed together and the amplitude would be doubled which is
 		//       undesirable, so the pin connector uses only the left channel as the
-		//       plugin input, following what REAPER does by default.
+		//       processor input, following what REAPER does by default.
 
 		// Data on frames 0, 1, and 33
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
@@ -479,15 +479,15 @@ private slots:
 		trackChannels[33].setLeft(789.f);
 		trackChannels[33].setRight(987.f);
 
-		// Plugin input and output buffers
+		// Processor input and output buffers
 		auto ins = ap.inputBuffer();
 		auto outs = ap.outputBuffer();
 
-		// Route to plugin
+		// Route to processor
 		auto router = ap.getRouter();
-		router.routeToPlugin(coreBus, ins);
+		router.send(coreBus, ins);
 
-		// Check that plugin inputs have data on frames 0, 1, and 33 (should be left channel's data)
+		// Check that processor inputs have data on frames 0, 1, and 33 (should be left channel's data)
 		QCOMPARE(ins.buffer(0)[0], 123.f);
 		QCOMPARE(ins.buffer(0)[1], 456.f);
 		QCOMPARE(ins.buffer(0)[33], 789.f);
@@ -503,8 +503,8 @@ private slots:
 		coreBusExpected.bus[0][1] = SampleFrame{456.f * 2, 456.f * 2};
 		coreBusExpected.bus[0][33] = SampleFrame{789.f * 2, 789.f * 2};
 
-		// Route from plugin back to Core
-		router.routeFromPlugin(outs, coreBus);
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
 
 		// Check that result is the original left track channel with doubled amplitude
 		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
@@ -518,7 +518,7 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct default routing for 2x2 non-interleaved plugin
+	//! Verifies correct default routing for 2x2 non-interleaved audio processor
 	void Routing_NonInterleaved2x2_Default()
 	{
 		using namespace lmms;
@@ -539,15 +539,15 @@ private slots:
 		trackChannels[33].setLeft(789.f);
 		trackChannels[33].setRight(987.f);
 
-		// Plugin input and output buffers
+		// Processor input and output buffers
 		auto ins = ap.inputBuffer();
 		auto outs = ap.outputBuffer();
 
-		// Route to plugin
+		// Route to processor
 		auto router = ap.getRouter();
-		router.routeToPlugin(coreBus, ins);
+		router.send(coreBus, ins);
 
-		// Check that plugin inputs have data on frames 0, 1, and 33
+		// Check that processor inputs have data on frames 0, 1, and 33
 		QCOMPARE(ins.buffer(0)[0], 123.f);
 		QCOMPARE(ins.buffer(1)[0], 321.f);
 		QCOMPARE(ins.buffer(0)[1], 456.f);
@@ -572,11 +572,11 @@ private slots:
 		QCOMPARE(outs.buffer(0)[33], 789.f * 2);
 		QCOMPARE(outs.buffer(1)[33], 987.f * 2);
 
-		// Zero core bus just to be sure what the plugin output is
+		// Zero core bus just to be sure what the processor output is
 		lmms::zeroBuffer(coreBus);
 
-		// Route from plugin back to Core
-		router.routeFromPlugin(outs, coreBus);
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
 
 		// Should be double the original
 		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
@@ -590,7 +590,7 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct partially-bypassed routing for 2x2 non-interleaved plugin
+	//! Verifies correct partially-bypassed routing for 2x2 non-interleaved audio processor
 	void Routing_NonInterleaved2x2_Bypass()
 	{
 		using namespace lmms;
@@ -627,15 +627,15 @@ private slots:
 		trackChannels[33].setLeft(789.f);
 		trackChannels[33].setRight(987.f);
 
-		// Plugin input and output buffers
+		// Processor input and output buffers
 		auto ins = ap.inputBuffer();
 		auto outs = ap.outputBuffer();
 
-		// Route to plugin
+		// Route to processor
 		auto router = ap.getRouter();
-		router.routeToPlugin(coreBus, ins);
+		router.send(coreBus, ins);
 
-		// Check that plugin inputs have data on frames 0, 1, and 33
+		// Check that processor inputs have data on frames 0, 1, and 33
 		QCOMPARE(ins.buffer(0)[0], 123.f);
 		QCOMPARE(ins.buffer(1)[0], 321.f);
 		QCOMPARE(ins.buffer(0)[1], 456.f);
@@ -653,15 +653,15 @@ private slots:
 		for (f_cnt_t frame = 0; frame < coreBus.frames; ++frame)
 		{
 			SampleFrame& sf = coreBusExpected.bus[0][frame];
-			sf.leftRef() = coreBus.bus[0][frame].left() * 2; // left channel:  doubled output from plugin
+			sf.leftRef() = coreBus.bus[0][frame].left() * 2; // left channel:  doubled output from processor
 			sf.rightRef() = coreBus.bus[0][frame].right();   // right channel: bypassed
 		}
 
-		// Route from plugin back to Core
-		router.routeFromPlugin(outs, coreBus);
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
 
 		// Right track channel should pass through, but left track channel
-		// should be overwritten with plugin's left output channel
+		// should be overwritten with processor's left output channel
 		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
 		QCOMPARE(coreBus.bus[0][0].right(), 321.f);
 		QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
@@ -673,7 +673,7 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct default routing for 2x2 SampleFrame-based plugin
+	//! Verifies correct default routing for 2x2 SampleFrame-based audio processor
 	void Routing_SampleFrame2x2_Default()
 	{
 		using namespace lmms;
@@ -696,14 +696,14 @@ private slots:
 		trackChannels[33].setLeft(789.f);
 		trackChannels[33].setRight(987.f);
 
-		// Plugin input/output buffer
+		// Processor input/output buffer
 		auto inOut = ap.inputOutputBuffer();
 
-		// Route to plugin
+		// Route to processor
 		auto router = ap.getRouter();
-		router.routeToPlugin(coreBus, inOut);
+		router.send(coreBus, inOut);
 
-		// Check that plugin inputs have data on frames 0, 1, and 33
+		// Check that processor inputs have data on frames 0, 1, and 33
 		QCOMPARE(inOut[0].left(), 123.f);
 		QCOMPARE(inOut[0].right(), 321.f);
 		QCOMPARE(inOut[1].left(), 456.f);
@@ -720,11 +720,11 @@ private slots:
 		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
-		// Zero core bus just to be sure what the plugin output is
+		// Zero core bus just to be sure what the processor output is
 		lmms::zeroBuffer(coreBus);
 
-		// Route from plugin back to Core
-		router.routeFromPlugin(inOut, coreBus);
+		// Route from processor back to Core
+		router.receive(inOut, coreBus);
 
 		// Should be double the original
 		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
@@ -738,7 +738,7 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct signal summing when routing a 1x2 non-interleaved plugin
+	//! Verifies correct signal summing when routing a 1x2 non-interleaved audio processor
 	void Routing_NonInterleaved1x2_Sum()
 	{
 		using namespace lmms;
@@ -750,8 +750,8 @@ private slots:
 		ap.init();
 		auto coreBus = getCoreBus();
 
-		// Sum both track channels together for plugin input, and sum the
-		//     two plugin output channels together for the left track channel output
+		// Sum both track channels together for processor input, and sum the
+		//     two processor output channels together for the left track channel output
 		// In    Out
 		//  _     ___
 		// |X|   |X|X|
@@ -774,15 +774,15 @@ private slots:
 		trackChannels[33].setLeft(789.f);
 		trackChannels[33].setRight(987.f);
 
-		// Plugin input and output buffers
+		// Processor input and output buffers
 		auto ins = ap.inputBuffer();
 		auto outs = ap.outputBuffer();
 
-		// Route to plugin
+		// Route to processor
 		auto router = ap.getRouter();
-		router.routeToPlugin(coreBus, ins);
+		router.send(coreBus, ins);
 
-		// Check that plugin inputs have data on frames 0, 1, and 33 (should be both track channels summed together)
+		// Check that processor inputs have data on frames 0, 1, and 33 (should be both track channels summed together)
 		QCOMPARE(ins.buffer(0)[0], 123.f + 321.f);
 		QCOMPARE(ins.buffer(0)[1], 456.f + 654.f);
 		QCOMPARE(ins.buffer(0)[33], 789.f + 987.f);
@@ -800,8 +800,8 @@ private slots:
 		coreBusExpected.bus[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
 		coreBusExpected.bus[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};
 
-		// Route from plugin back to Core
-		router.routeFromPlugin(outs, coreBus);
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
 
 		// Check that result is the two original track channels added together then doubled
 		QCOMPARE(coreBus.bus[0][0].left(), (123.f + 321.f) * 2);
@@ -842,7 +842,7 @@ private slots:
 			auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 			transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
-			// Plugin process method that doubles the amplitude. Works for any AudioPortsConfig.
+			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsConfig.
 			struct Process
 			{
 				DefaultAudioPorts<config>& ap;
@@ -881,8 +881,8 @@ private slots:
 
 			QCOMPARE(ap.m_directRouting.value_or(99), 0);
 
-			// Use the Router::process method which handles routing into and out of plugin,
-			// and calls the plugin process method we provide (in this case it doubles the amplitude).
+			// Use the Router::process method which handles routing into and out of the audio processor,
+			// and calls the processor's process method we provide (in this case it doubles the amplitude).
 			// Also applies the "direct routing" optimization.
 			auto router = ap.getRouter();
 			router.process(coreBus, *ap.buffers(), Process{ap});
@@ -917,7 +917,7 @@ private slots:
 			testWithConfig(ap);
 		}
 
-		// TODO: If/when SampleFrame-based plugins support dynamically in-place
+		// TODO: If/when SampleFrame-based audio processors support dynamically in-place
 		//       processing, add those tests here
 	}
 };

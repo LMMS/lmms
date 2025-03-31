@@ -345,7 +345,7 @@ public:
 	//! The last parameter(s) are variadic template parameters passed to the audio port constructor
 	using Base::Base;
 
-	static constexpr auto pluginConfig() -> AudioPortsConfig { return config; }
+	static constexpr auto configuration() -> AudioPortsConfig { return config; }
 
 private:
 	/**

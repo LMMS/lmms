@@ -87,7 +87,7 @@ public:
 	 *  data[channels][frames]
 	 * Each buffer contains `frames` frames.
 	 */
-	SplitAudioData(SampleT* const* data, pi_ch_t channels, f_cnt_t frames)
+	SplitAudioData(SampleT* const* data, proc_ch_t channels, f_cnt_t frames)
 		: m_data{data}
 		, m_channels{channels}
 		, m_frames{frames}
@@ -108,7 +108,7 @@ public:
 	 * Returns pointer to the buffer of a given channel.
 	 * The size of the buffer is `frames()`.
 	 */
-	auto buffer(pi_ch_t channel) const -> SampleT*
+	auto buffer(proc_ch_t channel) const -> SampleT*
 	{
 		assert(channel < m_channels);
 		assert(m_data != nullptr);
@@ -124,7 +124,7 @@ public:
 		return m_data[channel];
 	}
 
-	constexpr auto channels() const -> pi_ch_t
+	constexpr auto channels() const -> proc_ch_t
 	{
 		if constexpr (channelCount == DynamicChannelCount)
 		{
@@ -132,7 +132,7 @@ public:
 		}
 		else
 		{
-			return static_cast<pi_ch_t>(channelCount);
+			return static_cast<proc_ch_t>(channelCount);
 		}
 	}
 
@@ -155,7 +155,7 @@ public:
 
 private:
 	SampleT* const* m_data = nullptr;
-	pi_ch_t m_channels = 0;
+	proc_ch_t m_channels = 0;
 	f_cnt_t m_frames = 0;
 };
 

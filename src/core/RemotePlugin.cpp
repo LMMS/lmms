@@ -413,8 +413,8 @@ auto RemotePlugin::updateAudioBuffer(int channelsIn, int channelsOut, fpp_t fram
 		return nullptr;
 	}
 
-	m_channelsIn = static_cast<pi_ch_t>(channelsIn);
-	m_channelsOut = static_cast<pi_ch_t>(channelsOut);
+	m_channelsIn = static_cast<proc_ch_t>(channelsIn);
+	m_channelsOut = static_cast<proc_ch_t>(channelsOut);
 	m_frames = frames;
 
 	m_audioOutputs = std::span{m_audioBuffer.get() + channelsIn * frames, channelsOut * frames};
@@ -508,7 +508,7 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdChangeInputOutputCount:
-			m_audioPorts->audioPortsModel().setPluginChannelCounts(_m.getInt(0), _m.getInt(1));
+			m_audioPorts->audioPortsModel().setChannelCounts(_m.getInt(0), _m.getInt(1));
 			break;
 
 		case IdDebugMessage:
