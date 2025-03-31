@@ -30,7 +30,6 @@
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
