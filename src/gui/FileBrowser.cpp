@@ -1222,15 +1222,21 @@ void FileItem::determineFileType()
 		m_type = FileType::Midi;
 		m_handling = FileHandling::ImportAsProject;
 	}
-	else if( ext == "dll"
-#ifdef LMMS_BUILD_LINUX
-		|| ext == "so" 
-#endif
+#ifdef LMMS_HAVE_VST
+	else if (
+#	if defined(LMMS_BUILD_LINUX)
+		ext == "so" ||
+#	endif
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		ext == "dll" ||
+#	endif
+		false
 	)
 	{
 		m_type = FileType::VstPlugin;
 		m_handling = FileHandling::LoadByPlugin;
 	}
+#endif
 	else if ( ext == "lv2" )
 	{
 		m_type = FileType::Preset;
