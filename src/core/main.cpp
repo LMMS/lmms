@@ -140,15 +140,16 @@ inline void loadTranslation( const QString & tname,
 
 void printVersion( char *executableName )
 {
-	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+	printf("LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+		"Build options:\n%s\n\n"
 		"Copyright (c) %s\n\n"
 		"This program is free software; you can redistribute it and/or\n"
 		"modify it under the terms of the GNU General Public\n"
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
-		LMMS_PROJECT_COPYRIGHT, executableName );
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION, LMMS_BUILD_OPTIONS,
+		LMMS_PROJECT_COPYRIGHT, executableName);
 }
 
 
