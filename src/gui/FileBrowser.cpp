@@ -228,7 +228,8 @@ void FileBrowser::onSearch(const QString& filter)
 
 			for (const auto& path : directories)
 			{
-				auto dirIt = QDirIterator{path, directoryFilters,
+				const auto extensionFilters = FileItem::defaultFilters().split(" ");
+				auto dirIt = QDirIterator{path, extensionFilters, directoryFilters,
 					QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
 
 				while (dirIt.hasNext() && !m_searchManager.cancelled())
