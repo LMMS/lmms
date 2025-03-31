@@ -86,7 +86,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
 	&DataFile::findProblematicLadspaPlugins,
-	&DataFile::upgrade_noHiddenAutomationTracks
+	&DataFile::upgrade_noHiddenAutomationTracks,
+	&DataFile::upgrade_envelope_lfo_knob_scaling
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1938,6 +1939,107 @@ void DataFile::upgrade_sampleAndHold()
 		if (e.attribute("wave").toInt() == 6)
 		{
 			e.setAttribute("speed", 0.01f);
+		}
+	}
+}
+
+
+/** \brief The knobs in the envelope/lfo section of instruments were changed to use linear scaling
+ * Previously, the knobs used quadratic scaling relative to the max env/lfo length,
+ * which meant the value stored in the model was essentially meaningless to the user.
+ *
+ * This upgrade also automatically sets the appropriate knobs to be logarithmic,
+ * but this is merely a cosmetic change and does not affect the internal value.
+ */
+void DataFile::upgrade_envelope_lfo_knob_scaling()
+{
+	QDomNodeList vol = elementsByTagName("elvol");
+	QDomNodeList cut = elementsByTagName("elcut");
+	QDomNodeList res = elementsByTagName("elres");
+
+	// Envelope knobs used to be multiplied by 5 after squaring.
+	auto envUpgrade = [](float oldValue)
+	{
+		return oldValue > 0.0f
+			? oldValue * oldValue * 5.0f
+			: -oldValue * oldValue * 5.0f;
+	};
+
+	// The decay knob was multiplied by 1-sustain before being squared, and then multiplied by 5.
+	// To revert it, first multiply by (1 - sustain), square it while keeping the sign, then multiply by 5, then divide by (1 - sustain).
+	// But the (1 - sustain) will cancel out, so it only has to be multiplied once.
+	auto decUpgrade = [](float oldDecay, float sustain)
+	{
+		return oldDecay > 0.0f
+			? oldDecay * (1.0f - sustain) * oldDecay * 5
+			: -oldDecay * (1.0f - sustain) * oldDecay * 5;
+	};
+
+	// LFO knobs were multiplied by 20 after squaring.
+	auto lfoUpgrade = [](float oldValue)
+	{
+		return oldValue > 0.0f
+			? oldValue * oldValue * 20.0f
+			: -oldValue * oldValue * 20.0f;
+	};
+
+	// The LFO speed knob was not squared, but was multiplied by 20
+	auto lspdUpgrade = [](float oldValue)
+	{
+		return oldValue * 20.0f;
+	};
+
+	for (auto nodeList : {vol, cut, res})
+	{
+		for (int i = 0; i < nodeList.length(); ++i)
+		{
+			if (nodeList.item(i).isNull()) { continue; }
+			auto e = nodeList.item(i).toElement();
+
+			for (QString attribute : {"pdel", "att", "hold", "dec", "rel", "lpdel", "latt", "lspd"})
+			{
+				// Models can either be stored as attributes if they are simple, or as child nodes if they have connections or a scale type.
+				// Since the new knobs will have a log scale type by default, here we remove any old attribute-based knobs and add a child element instead.
+				QDomElement newElem;
+				float oldValue;
+				if (e.namedItem(attribute).isNull())
+				{
+					oldValue = e.attribute(attribute, "0").toFloat();
+					e.removeAttribute(attribute);
+					newElem = createElement(attribute);
+					newElem.setAttribute("id", -1);
+					e.appendChild(newElem);
+				}
+				else
+				{
+					newElem = e.namedItem(attribute).toElement();
+					oldValue = newElem.attribute("value").toFloat();
+				}
+
+				float newValue = 0.f;
+				if (attribute == "pdel" || attribute == "att" || attribute == "hold" ||attribute == "rel")
+				{
+					newValue = envUpgrade(oldValue);
+				}
+				else if (attribute == "dec")
+				{
+					float sustain = e.namedItem("sustain").isNull()
+						? e.attribute("sustain", "0").toFloat()
+						: e.namedItem("sustain").toElement().attribute("value").toFloat();
+					newValue = decUpgrade(oldValue, sustain);
+				}
+				else if (attribute == "lpdel" || attribute == "latt")
+				{
+					newValue = lfoUpgrade(oldValue);
+				}
+				else if (attribute == "lspd")
+				{
+					newValue = lspdUpgrade(oldValue);
+				}
+
+				newElem.setAttribute("value", newValue);
+				newElem.setAttribute("scale_type", "log");
+			}
 		}
 	}
 }

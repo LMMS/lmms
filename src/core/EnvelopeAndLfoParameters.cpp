@@ -37,10 +37,6 @@
 namespace lmms
 {
 
-// how long should be each envelope-segment maximal (e.g. attack)?
-extern const float SECS_PER_ENV_SEGMENT = 5.0f;
-// how long should be one LFO-oscillation maximal?
-extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
 // minimum number of frames for ENV/LFO stages that mustn't be '0'
 const f_cnt_t minimumFrames = 1;
 
@@ -97,12 +93,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 							Model * _parent ) :
 	Model( _parent ),
 	m_used( false ),
-	m_predelayModel(0.f, 0.f, 2.f, 0.001f, this, tr("Env pre-delay")),
-	m_attackModel(0.f, 0.f, 2.f, 0.001f, this, tr("Env attack")),
-	m_holdModel(0.5f, 0.f, 2.f, 0.001f, this, tr("Env hold")),
-	m_decayModel(0.5f, 0.f, 2.f, 0.001f, this, tr("Env decay")),
+	m_predelayModel(0.f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env pre-delay")),
+	m_attackModel(0.f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env attack")),
+	m_holdModel(1.25f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env hold")),
+	m_decayModel(0.625f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env decay")),
 	m_sustainModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Env sustain")),
-	m_releaseModel(0.1f, 0.f, 2.f, 0.001f, this, tr("Env release")),
+	m_releaseModel(0.05f, 0.f, 20.f, 0.001f, 20000.f, this, tr("Env release")),
 	m_amountModel(0.f, -1.f, 1.f, 0.005f, this, tr("Env mod amount")),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
@@ -111,11 +107,9 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_rEnv( nullptr ),
 	m_pahdBufSize( 0 ),
 	m_rBufSize( 0 ),
-	m_lfoPredelayModel(0.f, 0.f, 1.f, 0.001f, this, tr("LFO pre-delay")),
-	m_lfoAttackModel(0.f, 0.f, 1.f, 0.001f, this, tr("LFO attack")),
-	m_lfoSpeedModel(0.1f, 0.001f, 1.f, 0.0001f,
-				SECS_PER_LFO_OSCILLATION * 1000.f, this,
-							tr("LFO frequency")),
+	m_lfoPredelayModel(0.f, 0.f, 20.f, 0.001f, 20000.f, this, tr("LFO pre-delay")),
+	m_lfoAttackModel(0.f, 0.f, 20.f, 0.001f, 20000.f, this, tr("LFO attack")),
+	m_lfoSpeedModel(2.0f, 0.001f, 20.f, 0.0001f, 20000.f, this, tr("LFO period")),
 	m_lfoAmountModel(0.f, -1.f, 1.f, 0.005f, this, tr("LFO mod amount")),
 	m_lfoWaveModel( static_cast<int>(LfoShape::SineWave), 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
 	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
@@ -124,6 +118,16 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_lfoAmountIsZero( false ),
 	m_lfoShapeData(nullptr)
 {
+	m_predelayModel.setScaleLogarithmic(true);
+	m_attackModel.setScaleLogarithmic(true);
+	m_holdModel.setScaleLogarithmic(true);
+	m_decayModel.setScaleLogarithmic(true);
+	m_releaseModel.setScaleLogarithmic(true);
+
+	m_lfoPredelayModel.setScaleLogarithmic(true);
+	m_lfoAttackModel.setScaleLogarithmic(true);
+	m_lfoSpeedModel.setScaleLogarithmic(true);
+
 	m_amountModel.setCenterValue( 0 );
 	m_lfoAmountModel.setCenterValue( 0 );
 
@@ -404,22 +408,19 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 {
 	QMutexLocker m(&m_paramMutex);
 
-	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				Engine::audioEngine()->outputSampleRate();
+	const f_cnt_t sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
-	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
+	const auto predelay_frames = static_cast<f_cnt_t>(sampleRate * (m_predelayModel.value()));
 
 	const f_cnt_t attack_frames = std::max(minimumFrames,
-					static_cast<f_cnt_t>(frames_per_env_seg *
-					expKnobVal(m_attackModel.value())));
+					static_cast<f_cnt_t>(sampleRate * m_attackModel.value()));
 
-	const auto hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
+	const auto hold_frames = static_cast<f_cnt_t>(sampleRate * (m_holdModel.value()));
 
 	const f_cnt_t decay_frames = std::max(minimumFrames,
-					static_cast<f_cnt_t>(frames_per_env_seg *
-					expKnobVal(m_decayModel.value() *
-					(1 - m_sustainModel.value()))));
+					static_cast<f_cnt_t>(sampleRate *
+					m_decayModel.value() * (1 - m_sustainModel.value())));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -434,8 +435,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	m_pahdFrames = predelay_frames + attack_frames + hold_frames +
 								decay_frames;
-	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_releaseModel.value() ) );
+	m_rFrames = static_cast<f_cnt_t>(sampleRate * m_releaseModel.value());
 	m_rFrames = std::max(minimumFrames, m_rFrames);
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
@@ -503,15 +503,9 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_sustainLevel = m_sustainLevel * m_amount + m_amountAdd;
 
 
-	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-				Engine::audioEngine()->outputSampleRate();
-	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
-				expKnobVal( m_lfoPredelayModel.value() ) );
-	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
-				expKnobVal( m_lfoAttackModel.value() ) );
-	m_lfoOscillationFrames = static_cast<f_cnt_t>(
-						frames_per_lfo_oscillation *
-						m_lfoSpeedModel.value() );
+	m_lfoPredelayFrames = static_cast<f_cnt_t>(sampleRate * m_lfoPredelayModel.value());
+	m_lfoAttackFrames = static_cast<f_cnt_t>(sampleRate * m_lfoAttackModel.value());
+	m_lfoOscillationFrames = static_cast<f_cnt_t>(sampleRate * m_lfoSpeedModel.value());
 	if( m_x100Model.value() )
 	{
 		m_lfoOscillationFrames /= 100;
