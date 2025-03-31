@@ -36,7 +36,9 @@
 #include <cmath>
 #include <numbers>
 
-#include "lmms_basics.h"
+#include "lmms_constants.h"
+#include "LmmsTypes.h"
+
 
 namespace lmms
 {
@@ -207,7 +209,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if (std::abs(s) < 1.0e-10f && std::abs(m_z1[ch]) < 1.0e-10f) { return 0.0f; }
+		if (std::abs(s) < F_EPSILON && std::abs(m_z1[ch]) < F_EPSILON) { return 0.0f; }
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -593,7 +595,7 @@ public:
 			case FilterType::Formantfilter:
 			case FilterType::FastFormant:
 			{
-				if (std::abs(_in0) < 1.0e-10f && std::abs(m_vflast[0][_chnl]) < 1.0e-10f) { return 0.0f; } // performance hack - skip processing when the numbers get too small
+				if (std::abs(_in0) < F_EPSILON && std::abs(m_vflast[0][_chnl]) < F_EPSILON) { return 0.0f; } // performance hack - skip processing when the numbers get too small
 
 				const int os = m_type == FilterType::FastFormant ? 1 : 4; // no oversampling for fast formant
 				for( int o = 0; o < os; ++o )
