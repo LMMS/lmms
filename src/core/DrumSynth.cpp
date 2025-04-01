@@ -191,8 +191,9 @@ int DrumSynth::GetPrivateProfileString(
 	stringstream is;
 	bool inSection = false;
 	int len = 0;
+	constexpr auto linelen = 200;
 
-	char* line = static_cast<char*>(malloc(200));
+	auto line = new char[linelen];
 
 	// Use QFile to handle unicode file name on Windows
 	// Previously we used ifstream directly
@@ -209,38 +210,36 @@ int DrumSynth::GetPrivateProfileString(
 
 			if (!is.eof())
 			{
-				is.getline(line, 200, ']');
-				if (strcasecmp(line, sec) == 0)
-				{
-					inSection = true;
-				}
+				is.getline(line, linelen, ']');
+				if (strcasecmp(line, sec) == 0) { inSection = true; }
 			}
 		}
 		else if (!is.eof())
 		{
-			is.getline(line, 200);
-			if (line[0] == '[')
-			{
-				break;
-			}
+			is.getline(line, linelen);
+			if (line[0] == '[') { break; }
 
 			char* k = strtok(line, " \t=");
 			char* b = strtok(nullptr, "\n\r\0");
 
-			if (k != 0 && strcasecmp(k, key) == 0)
+			if (k && strcasecmp(k, key) == 0)
 			{
-				if (b == 0)
+				if (!b)
 				{
 					len = 0;
-					buffer[0] = 0;
+					buffer[0] = '\0';
 				}
 				else
 				{
+					// Trim whitespace off the end of b
+					// k will be the address of the last non-space char
 					k = &b[strlen(b) - 1];
 					while ((k >= b) && (*k == ' ' || *k == '\t')) { --k; }
-					k[1] = '\0';
-					len = std::min(static_cast<int>(1 + k - b), size - 1);
-					std::memcpy(buffer, b, len + 1);
+					k[1] = '\0'; // Set new null terminator for b
+					// New length of b (sans null terminator)
+					len = std::min(static_cast<int>(k - b), size - 1);
+					std::memcpy(buffer, b, len);
+					buffer[len] = '\0'; // Ensure there is always a null terminator
 				}
 				break;
 			}
@@ -255,8 +254,7 @@ int DrumSynth::GetPrivateProfileString(
 		buffer[maxlen] = '\0';
 	}
 
-	free(line);
-
+	delete[] line;
 	return len;
 }
 
