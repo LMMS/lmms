@@ -993,7 +993,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		const auto & description = s_dumpValues.at(1);
 
 		auto knob = CustomTextKnob::buildKnobWithSmallPixelFont(KnobType::Bright26, this, description, description.left(15));
-		knob->setDescription(description + ":" );
+		knob->setDescription(description + ":");
 		vstKnobs[i] = knob;
 
 		if( !hasKnobModel )

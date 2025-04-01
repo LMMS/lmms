@@ -32,6 +32,8 @@
 #include "embed.h"
 #include "FontHelper.h"
 
+#include <algorithm>
+
 
 namespace lmms::gui
 {
@@ -200,7 +202,7 @@ void Knob::updateFixedSize()
 		{
 			// In legacy mode only the width of the label is taken into account while the height is not
 			const int labelWidth = horizontalAdvance(QFontMetrics(font()), m_label);
-			const int width = qMax<int>( m_knobPixmap->width(), labelWidth);
+			const int width = std::max(m_knobPixmap->width(), labelWidth);
 
 			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
 			setFixedSize(width, m_knobPixmap->height() + 10);

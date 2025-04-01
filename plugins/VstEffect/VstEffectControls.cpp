@@ -392,7 +392,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		const auto & description = s_dumpValues.at(1);
 
 		auto knob = CustomTextKnob::buildKnobWithSmallPixelFont(KnobType::Bright26, widget, description, description.left(15));
-		knob->setDescription(description + ":" );
+		knob->setDescription(description + ":");
 		vstKnobs[i] = knob;
 
 		if( !hasKnobModel )
