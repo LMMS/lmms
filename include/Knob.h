@@ -88,28 +88,6 @@ public:
 	void setLabel(const QString& txt);
 	void setHtmlLabel( const QString &htmltxt );
 
-	/*!
-	 * Legacy mode affects how the label of the knob is rendered.
-	 *
-	 * In non-legacy mode (the default) the height of the label text is taken into account when a new fixed
-	 * size is computed for the Knob. When the label text is painted the descent of the font is used to
-	 * compute the base line.
-	 * 
-	 * Enabling legacy mode leads to the following behavior:
-	 * * The height of the label is not taken into account when the new fixed height of the Knob is computed.
-	 *   Instead a fixed size of 10 is added for the label.
-	 * * When the knob is painted the baseline of the font is always set to 2 pixels away from the lower side
-	 *   of the Knob's rectangle.
-	 */
-	bool legacyMode() const { return m_legacyMode; }
-
-	/*!
-	 * Set the button to legacy mode (true) or non-legacy mode (false).
-	 *
-	 * @see legacyMode().
-	 */
-	void setLegacyMode(bool legacyMode);
-
 	void setTotalAngle( float angle );
 
 	// Begin styled knob accessors
@@ -142,6 +120,28 @@ protected:
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
+
+	/*!
+	 * Legacy mode affects how the label of the knob is rendered.
+	 *
+	 * In non-legacy mode (the default) the height of the label text is taken into account when a new fixed
+	 * size is computed for the Knob. When the label text is painted the descent of the font is used to
+	 * compute the base line.
+	 * 
+	 * Enabling legacy mode leads to the following behavior:
+	 * * The height of the label is not taken into account when the new fixed height of the Knob is computed.
+	 *   Instead a fixed size of 10 is added for the label.
+	 * * When the knob is painted the baseline of the font is always set to 2 pixels away from the lower side
+	 *   of the Knob's rectangle.
+	 */
+	bool legacyMode() const { return m_legacyMode; }
+
+	/*!
+	 * Set the button to legacy mode (true) or non-legacy mode (false).
+	 *
+	 * @see legacyMode().
+	 */
+	void setLegacyMode(bool legacyMode);
 
 private:
 	QLineF calculateLine( const QPointF & _mid, float _radius,
