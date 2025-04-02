@@ -45,7 +45,7 @@ class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
-	SampleTrack( TrackContainer* tc );
+	SampleTrack();
 	~SampleTrack() override;
 
 	bool play( const TimePos & _start, const fpp_t _frames,

@@ -65,12 +65,9 @@ public:
 
 	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
-
-	void addTrack( Track * _track );
-	void removeTrack( Track * _track );
-
-	virtual void updateAfterTrackAdd();
-
+	virtual void addTrack(Track* track);
+	virtual void removeTrack(Track* track);
+	bool containsTrack(Track* track) { return std::find(m_tracks.begin(), m_tracks.end(), track) != m_tracks.end(); }
 	void clearAllTracks();
 
 	const TrackList & tracks() const
@@ -99,6 +96,7 @@ public:
 
 signals:
 	void trackAdded( lmms::Track * _track );
+	void trackRemoved(lmms::Track* track);
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);

@@ -56,16 +56,15 @@ namespace lmms
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-Track::Track( Type type, TrackContainer * tc ) :
-	Model( tc ),                   /*!< The track Model */
-	m_trackContainer( tc ),        /*!< The track container object */
+Track::Track(Type type) :
+	Model(nullptr),                   /*!< The track Model */
+	m_trackContainer(nullptr),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_clips()        /*!< The clips (segments) */
 {	
-	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
 
@@ -86,7 +85,7 @@ Track::~Track()
 		delete m_clips.back();
 	}
 
-	m_trackContainer->removeTrack( this );
+	if (m_trackContainer) { m_trackContainer->removeTrack(this); }
 	unlock();
 }
 
@@ -104,25 +103,28 @@ Track * Track::create( Type tt, TrackContainer * tc )
 
 	Track * t = nullptr;
 
-	switch( tt )
+	switch (tt)
 	{
-		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
-		case Type::Pattern: t = new class PatternTrack( tc ); break;
-		case Type::Sample: t = new class SampleTrack( tc ); break;
-//		case Type::Event:
-//		case Type::Video:
-		case Type::Automation: t = new class AutomationTrack( tc ); break;
-		case Type::HiddenAutomation:
-						t = new class AutomationTrack( tc, true ); break;
-		default: break;
+	case Type::Instrument:
+		t = new InstrumentTrack();
+		break;
+	case Type::Pattern:
+		t = new PatternTrack();
+		break;
+	case Type::Sample:
+		t = new SampleTrack();
+		break;
+	case Type::Automation:
+		t = new AutomationTrack();
+		break;
+	case Type::HiddenAutomation:
+		t = new AutomationTrack(true);
+		break;
+	default:
+		break;
 	}
 
-	if (tc == Engine::patternStore() && t)
-	{
-		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
-	}
-
-	tc->updateAfterTrackAdd();
+	tc->addTrack(t);
 
 	Engine::audioEngine()->doneChangeInModel();
 
@@ -340,11 +342,10 @@ void Track::loadSettings(const QDomElement& element)
  */
 Clip * Track::addClip( Clip * clip )
 {
-	m_clips.push_back( clip );
-
-	emit clipAdded( clip );
-
-	return clip; // just for convenience
+	clip->setTrack(this);
+	m_clips.push_back(clip);
+	emit clipAdded(clip);
+	return clip;
 }
 
 
@@ -359,7 +360,9 @@ void Track::removeClip( Clip * clip )
 	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
 	if( it != m_clips.end() )
 	{
-		m_clips.erase( it );
+		m_clips.erase(it);
+		clip->setTrack(nullptr);
+
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();
