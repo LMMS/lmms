@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 
+#include "ThreadedExportManager.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
@@ -37,10 +38,14 @@
 namespace lmms
 {
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
-	, m_sample(std::move(sample))
-	, m_isPlaying(false)
+std::unique_ptr<ThreadedExportManager> SampleClip::s_sampleExporter = std::make_unique<ThreadedExportManager>();
+
+
+SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
+	Clip(_track),
+	m_sample(std::move(sample)),
+	m_isPlaying(false),
+	m_exportedSampleName("")
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -79,6 +84,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 			setAutoResize( false );
 			break;
 	}
+
 	updateTrackClips();
 }
 
@@ -334,6 +340,12 @@ void SampleClip::loadSettings( const QDomElement & _this )
 gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 {
 	return new gui::SampleClipView( this, _tv );
+}
+
+void SampleClip::exportSampleBuffer(const QString& fileName)
+{
+	m_exportedSampleName = fileName;
+	s_sampleExporter->startExporting(fileName, m_sample.buffer());
 }
 
 
