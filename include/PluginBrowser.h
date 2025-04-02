@@ -66,7 +66,11 @@ public:
 	void openInNewInstrumentTrack(QString value);
 
 protected:
-	void enterEvent( QEvent * _e ) override;
+	#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
+	void enterEvent( QEnterEvent * _e) override;
+	#else
+	void enterEvent(QEvent* _e) override;
+	#endif
 	void leaveEvent( QEvent * _e ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;

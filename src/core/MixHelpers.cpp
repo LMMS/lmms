@@ -29,6 +29,8 @@
 #endif
 
 #include <cmath>
+#include <algorithm>
+
 #include <QtGlobal>
 
 #include "ValueBuffer.h"
