@@ -26,7 +26,7 @@
 #ifndef MULTITAP_ECHO_H
 #define MULTITAP_ECHO_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "MultitapEchoControls.h"
 #include "RingBuffer.h"
 #include "BasicFilters.h"
@@ -35,13 +35,13 @@ namespace lmms
 {
 
 
-class MultitapEchoEffect : public Effect
+class MultitapEchoEffect : public DefaultEffect
 {
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~MultitapEchoEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{

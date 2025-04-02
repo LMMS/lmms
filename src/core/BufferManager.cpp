@@ -40,9 +40,9 @@ void BufferManager::init( fpp_t fpp )
 }
 
 
-SampleFrame* BufferManager::acquire()
+std::span<SampleFrame> BufferManager::acquire()
 {
-	return new SampleFrame[s_framesPerPeriod];
+	return std::span<SampleFrame>{new SampleFrame[s_framesPerPeriod], s_framesPerPeriod};
 }
 
 
