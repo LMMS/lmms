@@ -113,6 +113,11 @@ protected:
 		m_sampleRate = _new_sr;
 	}
 
+	void setChannels(const ch_cnt_t channels)
+	{
+		m_channels = channels;
+	}
+
 	AudioEngine* audioEngine()
 	{
 		return m_audioEngine;
