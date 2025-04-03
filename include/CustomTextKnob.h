@@ -42,6 +42,8 @@ public:
 
 	CustomTextKnob( const Knob& other ) = delete;
 
+	static CustomTextKnob* buildKnobWithSmallPixelFont(KnobType knobNum, QWidget* parent, const QString& description, const QString& label);
+
 	inline void setValueText(const QString & _value_text)
 	{
 		m_value_text = _value_text;
