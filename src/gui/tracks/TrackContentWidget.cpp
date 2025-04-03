@@ -597,7 +597,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		{
 			so.at( i )->setSelected( false);
 		}
-		getTrack()->addJournalCheckPoint();
+		getTrack()->addJournalCheckPoint(tr("Add clip to %1").arg(getTrack()->name()));
 		const TimePos pos = getPosition( me->x() ).getBar() *
 						TimePos::ticksPerBar();
 		getTrack()->createClip(pos);

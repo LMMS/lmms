@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 #include <QDomElement>
+#include <QDebug>
 
 #include "ProjectJournal.h"
 #include "Engine.h"
@@ -75,8 +76,10 @@ void ProjectJournal::undo()
 			{
 				AutomationClip::resolveAllIDs();
 			}
+			emit undoTriggered();
 			break;
 		}
+		qWarning() << "Journalling object id" << c.joID << "for" << c.description << "is not valid! This may point to an unresolved issue somewhere in the undo system.";
 	}
 }
 
@@ -100,8 +103,10 @@ void ProjectJournal::redo()
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
+			emit redoTriggered();
 			break;
 		}
+		qWarning() << "Journalling object id" << c.joID << "for" << c.description << "is not valid! This may point to an unresolved issue somewhere in the undo system.";
 	}
 }
 
@@ -131,6 +136,7 @@ void ProjectJournal::addJournalCheckPoint(JournallingObject *jo, QString reason)
 		{
 			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
 		}
+		emit checkPointAdded();
 	}
 }
 

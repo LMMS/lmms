@@ -26,21 +26,56 @@
 #define LMMS_GUI_UNDO_REDO_MENU_H
 
 #include <QMenu>
+#include <QTreeWidget>
+#include <QTextEdit>
+
+#include "SideBarWidget.h"
+#include "ProjectJournal.h"
 
 namespace lmms::gui
 {
 
+class UndoRedoTreeWidget;
 
-class UndoRedoMenu : public QMenu
+class UndoRedoMenu : public SideBarWidget
 {
 	Q_OBJECT
 public:
-	UndoRedoMenu(QWidget *parent = nullptr, bool isUndo = true);
-
+	UndoRedoMenu(QWidget *parent = nullptr);
 private slots:
-	void fillMenu();
+	void reloadTree();
 private:
-	bool m_isUndo = true;
+	UndoRedoTreeWidget* m_undoRedoTree;
+};
+
+class UndoRedoTreeWidget : public QTreeWidget
+{
+	Q_OBJECT
+public:
+	UndoRedoTreeWidget(QWidget * parent);
+	~UndoRedoTreeWidget() override = default;
+protected:
+	void contextMenuEvent(QContextMenuEvent * e) override;
+private:
+	void applyUndoRedoEntry(QTreeWidgetItem * item, int column);
+};
+
+class UndoRedoTreeWidgetItem : public QTreeWidgetItem
+{
+public:
+	UndoRedoTreeWidgetItem(QTreeWidget* parent, ProjectJournal::CheckPoint* cp, int index, bool isUndo);
+private:
+	int m_index;
+	bool m_isUndo;
+	ProjectJournal::CheckPoint* m_checkpoint;
+	friend class UndoRedoTreeWidget;
+};
+
+class UndoRedoMenuDetailsWindow : public QTextEdit
+{
+	Q_OBJECT
+public:
+	UndoRedoMenuDetailsWindow(QString text);
 };
 
 

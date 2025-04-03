@@ -162,7 +162,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 		AutomatableModel *thisModel = model();
 		if (thisModel)
 		{
-			thisModel->addJournalCheckPoint();
+			thisModel->addJournalCheckPoint(tr("Change %1").arg(thisModel->fullDisplayName()));
 			thisModel->saveJournallingState(false);
 		}
 

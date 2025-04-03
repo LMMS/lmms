@@ -296,14 +296,13 @@ void AutomatableModel::setValue( const float value )
 {
 	m_oldValue = m_value;
 	++m_setValueDepth;
-	const float old_val = m_value;
 
-	m_value = fittedValue( value );
-	if( old_val != m_value )
+	if( m_value != value )
 	{
 		// add changes to history so user can undo it
-		addJournalCheckPoint(tr("Set value of %1").arg(fullDisplayName()));
+		addJournalCheckPoint(tr("Set %1 to %2").arg(fullDisplayName(), QString::number(value)));
 
+		m_value = fittedValue( value );
 		// notify linked models
 		for (const auto& linkedModel : m_linkedModels)
 		{

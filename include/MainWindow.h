@@ -238,8 +238,8 @@ private:
 	} m_keyMods;
 
 	QMenu * m_toolsMenu;
-	QMenu * m_undoMenu;
-	QMenu * m_redoMenu;
+	QAction * m_undoAction;
+	QAction * m_redoAction;
 	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;

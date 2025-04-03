@@ -27,6 +27,7 @@
 
 #include <QHash>
 #include <QStack>
+#include <QObject>
 
 #include "LmmsTypes.h"
 #include "DataFile.h"
@@ -40,8 +41,9 @@ class JournallingObject;
 
 
 //! @warning many parts of this class may be rewritten soon
-class ProjectJournal
+class ProjectJournal : public QObject
 {
+	Q_OBJECT
 public:
 	static const int MAX_UNDO_STATES;
 
@@ -112,9 +114,13 @@ public:
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
 
-	const CheckPointStack& undoCheckPoints() { return m_undoCheckPoints; }
-	const CheckPointStack& redoCheckPoints() { return m_redoCheckPoints; }
+	CheckPointStack& undoCheckPoints() { return m_undoCheckPoints; }
+	CheckPointStack& redoCheckPoints() { return m_redoCheckPoints; }
 
+signals:
+	void undoTriggered();
+	void redoTriggered();
+	void checkPointAdded();
 
 private:
 	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
