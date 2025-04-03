@@ -192,7 +192,7 @@ int DrumSynth::GetPrivateProfileString(
 	bool inSection = false;
 	int len = 0;
 	constexpr auto linelen = 200;
-	char line[linelen] = {};
+	std::array<char, linelen> line = {};
 
 	// Use QFile to handle unicode file name on Windows
 	// Previously we used ifstream directly
@@ -209,16 +209,16 @@ int DrumSynth::GetPrivateProfileString(
 
 			if (!is.eof())
 			{
-				is.getline(line, linelen, ']');
-				if (strcasecmp(line, sec) == 0) { inSection = true; }
+				is.getline(line.data(), linelen, ']');
+				if (strcasecmp(line.data(), sec) == 0) { inSection = true; }
 			}
 		}
 		else if (!is.eof())
 		{
-			is.getline(line, linelen);
+			is.getline(line.data(), linelen);
 			if (line[0] == '[') { break; }
 
-			char* k = strtok(line, " \t=");
+			char* k = strtok(line.data(), " \t=");
 			char* b = strtok(nullptr, "\n\r\0");
 
 			if (k && strcasecmp(k, key) == 0)
