@@ -192,7 +192,7 @@ int DrumSynth::GetPrivateProfileString(
 	bool inSection = false;
 	int len = 0;
 	constexpr auto linelen = 200;
-	std::array<char, linelen> line = {};
+	char line[linelen] = {};
 
 	// Use QFile to handle unicode file name on Windows
 	// Previously we used ifstream directly
