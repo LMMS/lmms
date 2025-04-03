@@ -192,8 +192,7 @@ int DrumSynth::GetPrivateProfileString(
 	bool inSection = false;
 	int len = 0;
 	constexpr auto linelen = 200;
-
-	auto line = new char[linelen];
+	std::array<char, linelen> line = {};
 
 	// Use QFile to handle unicode file name on Windows
 	// Previously we used ifstream directly
@@ -233,7 +232,7 @@ int DrumSynth::GetPrivateProfileString(
 				{
 					// Trim whitespace off the end of b
 					// k will be the address of the last non-space char
-					k = &b[strlen(b) - 1];
+					k = &b[std::strlen(b) - 1];
 					while ((k >= b) && (*k == ' ' || *k == '\t')) { --k; }
 					k[1] = '\0'; // Set new null terminator for b
 					// New length of b (sans null terminator)
@@ -254,7 +253,6 @@ int DrumSynth::GetPrivateProfileString(
 		buffer[maxlen] = '\0';
 	}
 
-	delete[] line;
 	return len;
 }
 
