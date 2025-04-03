@@ -1525,6 +1525,8 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	{
 		fprintf( stderr,
 			"Error opening file for loading preset.\n" );
+		delete[] (unsigned int*)pLen;
+		delete[] (sBank*)pBank;
 		return;
 	}
 	if ( fread ( pBank, 1, 56, stream ) != 56 )
