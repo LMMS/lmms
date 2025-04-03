@@ -57,6 +57,13 @@ protected:
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
 	void closeEvent(QCloseEvent * event) override;
+	void keyPressEvent(QKeyEvent *ke) override;
+public slots:
+	//! Called by pressing the space key. Plays or stops.
+	void togglePlayStop();
+	//! Called by pressing shift+space. Toggles pause state.
+	void togglePause();
+
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
@@ -65,12 +72,6 @@ protected slots:
 	virtual void stop() {}
 
 private slots:
-	/// Called by pressing the space key. Plays or stops.
-	void togglePlayStop();
-	
-	/// Called by pressing shift+space. Toggles pause state.
-	void togglePause();
-
 	void toggleMaximize();
 
 signals:
