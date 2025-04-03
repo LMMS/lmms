@@ -428,6 +428,7 @@ void TrackView::createClipView( Clip * clip )
 		tv->setSelected( true );
 	}
 	clip->selectViewOnCreate( false );
+	m_clipViews.push_back(tv);
 }
 
 
