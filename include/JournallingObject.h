@@ -58,7 +58,7 @@ public:
 		}
 	}
 
-	void addJournalCheckPoint();
+	void addJournalCheckPoint(QString reason = "Unknown");
 
 	QDomElement saveState( QDomDocument & _doc,
 									QDomElement & _parent ) override;

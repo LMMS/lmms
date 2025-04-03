@@ -55,11 +55,11 @@ JournallingObject::~JournallingObject()
 
 
 
-void JournallingObject::addJournalCheckPoint()
+void JournallingObject::addJournalCheckPoint(QString reason)
 {
 	if( isJournalling() )
 	{
-		Engine::projectJournal()->addJournalCheckPoint( this );
+		Engine::projectJournal()->addJournalCheckPoint(this, reason);
 	}
 }
 
@@ -97,7 +97,7 @@ void JournallingObject::restoreState( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		if( node.isElement() && node.nodeName() == "journal" )
+		if(node.isElement() && node.nodeName() == "journallingObject")
 		{
 			const jo_id_t new_id = node.toElement().attribute( "id" ).toInt();
 			if( new_id )
