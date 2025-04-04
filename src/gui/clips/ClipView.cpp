@@ -1402,26 +1402,22 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 	if ( me->button() != Qt::NoButton || unquantizedModHeld(me) )
 	{	// We want to preserve this adjusted offset,  even if the user switches to snapping
-		setInitialPos( m_initialMousePos );
+		setInitialPos(m_initialMousePos);
+		return newPos;
 	}
-	else if ( me->modifiers() & Qt::ShiftModifier )
-	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
-		// or end position, whichever is closest to the actual position
-		TimePos startQ = newPos.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-		// Find start position that gives snapped clip end position
-		TimePos endQ = ( newPos + m_clip->length() );
-		endQ = endQ.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-		endQ = endQ - m_clip->length();
 
-		// Select the position closest to actual position
-		if (std::abs(newPos - startQ) < std::abs(newPos - endQ)) { newPos = startQ; }
-		else newPos = endQ;
-	}
-	else
-	{	// Otherwise, quantize moved distance (preserves user offsets)
-		newPos = m_initialClipPos + offset.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-	}
-	return newPos;
+	// Quantize position, (Default in 1.2.0 and earlier)
+	// end position, or offset, whichever is closest to the actual position
+	TimePos startQ = newPos.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
+	// Find start position that gives snapped clip end position
+	TimePos endQ = TimePos(newPos + m_clip->length()).quantize(getGUI()->songEditor()->m_editor->getSnapSize()) - m_clip->length();
+	// Calculate quantized offset position
+	TimePos offsetQ = m_initialClipPos + offset.quantize(getGUI()->songEditor()->m_editor->getSnapSize());
+
+	// Select the position closest to actual position
+	if (std::abs(newPos - startQ) <= std::abs(newPos - endQ) && std::abs(newPos - startQ) <= std::abs(newPos - offsetQ)) { return startQ; }
+	if (std::abs(newPos - endQ) <= std::abs(newPos - startQ) && std::abs(newPos - endQ) <= std::abs(newPos - offsetQ)) { return endQ; }
+	else { return offsetQ; }
 }
 
 
