@@ -42,7 +42,7 @@ namespace lmms
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( Type::BeatClip ),
+	m_clipType( Type::MelodyClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
@@ -403,10 +403,13 @@ void MidiClip::setType( Type _new_clip_type )
 
 void MidiClip::checkType()
 {
-	// If all notes are StepNotes, we have a BeatClip
-	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
+	// Clip type can only be checked if there are notes
+	if (!m_notes.empty()) {
+		// If all notes are StepNotes, we have a BeatClip
+		const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
 
-	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
+		setType(beatClip ? Type::BeatClip : Type::MelodyClip);
+	}
 }
 
 
@@ -416,7 +419,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
-	
+
 	if (const auto& c = color())
 	{
 		_this.setAttribute("color", c->name());
