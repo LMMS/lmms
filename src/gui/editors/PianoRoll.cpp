@@ -273,13 +273,11 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
-		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
+		&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &PianoRoll::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PianoRoll::updatePosition, Qt::QueuedConnection);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this);
@@ -289,7 +287,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany, Qt::QueuedConnection);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -1437,8 +1435,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLine->model()->setTicks(0);
 			ke->accept();
 			break;
 
@@ -4585,7 +4582,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
+			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLine->model()->getPlayPos(), quantization()));
 
 			// select it
 			cur_note.setSelected( true );
@@ -4651,8 +4648,9 @@ void PianoRoll::autoScroll( const TimePos & t )
 
 
 
-void PianoRoll::updatePosition(const TimePos & t)
+void PianoRoll::updatePosition()
 {
+	const TimePos& t = m_timeLine->model()->getPlayPos();
 	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
 			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
@@ -4663,7 +4661,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->model()->getPlayPos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
@@ -4686,8 +4684,9 @@ void PianoRoll::updatePositionLineHeight()
 
 
 
-void PianoRoll::updatePositionAccompany( const TimePos & t )
+void PianoRoll::updatePositionAccompany()
 {
+	const TimePos& t = Engine::getSong()->getPlayPos(Song::PlayMode::Song);
 	Song * s = Engine::getSong();
 
 	if( m_recording && hasValidMidiClip() &&
@@ -4700,7 +4699,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 		}
 		if( (int) pos > 0 )
 		{
-			s->getPlayPos( Song::PlayMode::MidiClip ).setTicks( pos );
+			s->getTimeline(Song::PlayMode::MidiClip).setTicks(pos);
 			autoScroll( pos );
 		}
 	}
