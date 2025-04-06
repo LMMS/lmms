@@ -744,10 +744,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	{
 		m_assignableMidiDevices->addItem("all");
 	}
-	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
+	QString autoAssignDevice = ConfigManager::inst()->value("midi", "midiautoassign");
+	int current = m_assignableMidiDevices->findText(autoAssignDevice);
 	if (current >= 0)
 	{
 		m_assignableMidiDevices->setCurrentIndex(current);
+	} else
+	{
+		m_assignableMidiDevices->addItem(QIcon(embed::getIconPixmap("error")), autoAssignDevice);
+		m_assignableMidiDevices->setCurrentIndex(m_assignableMidiDevices->findText(autoAssignDevice));
 	}
 
 	// MIDI Recording tab
