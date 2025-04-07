@@ -118,7 +118,6 @@ public:
 	}
 
 
-	virtual void createUI(QWidget *parent);
 	bool eventFilter(QObject *obj, QEvent *event) override;
 
 	QString embedMethod() const;
@@ -138,7 +137,6 @@ public slots:
 
 	void showUI() override;
 	void hideUI() override;
-	void toggleUI() override;
 
 	void handleClientEmbed();
 

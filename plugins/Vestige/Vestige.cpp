@@ -127,21 +127,6 @@ class VstInstrumentPlugin : public VstPlugin
 public:
 	using VstPlugin::VstPlugin;
 
-	void createUI( QWidget *parent ) override
-	{
-		Q_UNUSED(parent);
-		if ( !hasEditor() ) {
-			return;
-		}
-		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
-			VstPlugin::createUI( m_pluginSubWindow.get() );
-			m_pluginSubWindow->setWidget(pluginWidget());
-		} else {
-			VstPlugin::createUI( nullptr );
-		}
-	}
-
 	/// Overwrite editor() to return the sub window instead of the embed widget
 	/// itself. This makes toggleUI() and related functions toggle the
 	/// sub window's visibility.
@@ -380,7 +365,6 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 	if ( !(instrumentTrack() != nullptr && instrumentTrack()->isPreviewMode()))
 	{
-		m_plugin->createUI(nullptr);
 		m_plugin->showUI();
 	}
 

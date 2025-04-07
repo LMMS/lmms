@@ -65,35 +65,13 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 	bool embed_vst = false;
 
-	if( _ctl != nullptr && _ctl->m_effect != nullptr &&
-					_ctl->m_effect->m_plugin != nullptr )
-	{
-		m_plugin = _ctl->m_effect->m_plugin;
-		embed_vst = m_plugin->embedMethod() != "none";
-
-		if (embed_vst) {
-			if (m_plugin->hasEditor() && ! m_plugin->pluginWidget()) {
-				m_plugin->createUI(this);
-			}
-			m_pluginWidget = m_plugin->pluginWidget();
-		}
-	}
-
 	if (m_plugin)
 	{
 		setWindowTitle( m_plugin->name() );
 
 		auto btn = new QPushButton(tr("Show/hide"));
 
-		if (embed_vst) {
-			btn->setCheckable( true );
-			btn->setChecked( true );
-			connect( btn, SIGNAL( toggled( bool ) ),
-						SLOT( togglePluginUI( bool ) ) );
-		} else {
-			connect( btn, SIGNAL( clicked() ),
-						m_plugin.data(), SLOT( toggleUI() ) );
-		}
+		connect(btn, SIGNAL(clicked()), m_plugin.data(), SLOT(toggleUI()));
 
 		btn->setMinimumWidth( 78 );
 		btn->setMaximumWidth( 78 );
