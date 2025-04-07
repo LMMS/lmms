@@ -194,18 +194,6 @@ bool ConfigManager::enableBlockedPlugins()
 	return (envVar && *envVar);
 }
 
-QStringList ConfigManager::availableVstEmbedMethods()
-{
-	QStringList methods;
-	methods.append("none");
-	return methods;
-}
-
-QString ConfigManager::vstEmbedMethod() const
-{
-	return "none";
-}
-
 bool ConfigManager::hasWorkingDir() const
 {
 	return QDir(m_workingDir).exists();

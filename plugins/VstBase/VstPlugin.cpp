@@ -41,7 +41,6 @@
 #	include <QLayout>
 #endif
 
-
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
@@ -52,6 +51,7 @@
 #include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
+#	include <QX11Info>
 #	include <X11/Xlib.h>
 #endif
 
@@ -268,8 +268,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if ( visible != -1 )
 	{
 		_this.setAttribute( "guivisible", visible );
-	}
-	
+	}	
 
 	// try to save all settings in a chunk
 	QByteArray chunk = saveChunk();
@@ -292,8 +291,6 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	_this.setAttribute( "program", currentProgram() );
 }
-
-
 
 
 void VstPlugin::setTempo( bpm_t _bpm )
@@ -386,6 +383,11 @@ bool VstPlugin::processMessage( const message & _m )
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
 					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
+#endif
+#ifdef LMMS_BUILD_LINUX
+			XSetTransientForHint( QX11Info::display(),
+					m_pluginWindowID,
+					gui::getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;
@@ -675,6 +677,15 @@ void VstPlugin::toggleEditorVisibility( int visible )
 		visible = ! w->isVisible();
 	}
 	w->setVisible( visible );
+}
+
+void VstPlugin::createUI( QWidget * parent )
+{
+	if ( m_pluginWidget ) {
+		qWarning() << "VstPlugin::createUI called twice";
+		m_pluginWidget->setParent( parent );
+		return;
+	}
 }
 
 

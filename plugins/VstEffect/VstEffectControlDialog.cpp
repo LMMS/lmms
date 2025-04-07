@@ -63,8 +63,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	l->setVerticalSpacing( 2 );
 	l->setHorizontalSpacing( 2 );
 
-	bool embed_vst = false;
-
 	if (m_plugin)
 	{
 		setWindowTitle( m_plugin->name() );

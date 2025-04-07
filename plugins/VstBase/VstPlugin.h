@@ -117,8 +117,7 @@ public:
 		return "vstplugin";
 	}
 
-
-	bool eventFilter(QObject *obj, QEvent *event) override;
+	virtual void createUI(QWidget *parent);
 
 	QString embedMethod() const;
 

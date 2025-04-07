@@ -865,12 +865,38 @@ void RemoteVstPlugin::initEditor()
 
 
 void RemoteVstPlugin::showEditor() {
+	if (!HEADLESS && m_window)
+	{
+#ifndef NATIVE_LINUX_VST
+		ShowWindow( m_window, SW_SHOWNORMAL );
+#else
+		if (!m_x11WindowVisible)
+		{
+			XMapWindow(m_display, m_window);
+			XFlush(m_display);
+			m_x11WindowVisible = true;
+		}
+#endif
+	}
 }
 
 
 
 
 void RemoteVstPlugin::hideEditor() {
+	if (!HEADLESS && m_window)
+	{
+#ifndef NATIVE_LINUX_VST
+		ShowWindow( m_window, SW_HIDE );
+#else
+		if (m_x11WindowVisible)
+		{
+			XUnmapWindow(m_display, m_window);
+			XFlush(m_display);
+			m_x11WindowVisible = false;
+		}
+#endif
+	}
 }
 
 
@@ -2162,7 +2188,6 @@ void * RemoteVstPlugin::processingThread(void * _param)
 	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
 	{
-		
 		if( m.id == IdStartProcessing
 			|| m.id == IdMidiEvent
 			|| m.id == IdVstSetParameter
