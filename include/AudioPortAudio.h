@@ -39,6 +39,29 @@
 #include "AudioDeviceSetupWidget.h"
 
 namespace lmms {
+class PortAudioInitializationGuard
+{
+public:
+	PortAudioInitializationGuard()
+		: m_error(Pa_Initialize())
+	{
+		if (m_error != paNoError) { throw std::runtime_error{"PortAudio: could not initialize"}; }
+	}
+
+	~PortAudioInitializationGuard()
+	{
+		if (m_error == paNoError) { Pa_Terminate(); }
+	}
+
+	PortAudioInitializationGuard(const PortAudioInitializationGuard&) = default;
+	PortAudioInitializationGuard(PortAudioInitializationGuard&&) = delete;
+	PortAudioInitializationGuard& operator=(const PortAudioInitializationGuard&) = default;
+	PortAudioInitializationGuard& operator=(PortAudioInitializationGuard&&) = delete;
+
+private:
+	PaError m_error = paNoError;
+};
+
 class AudioPortAudio : public AudioDevice
 {
 public:
@@ -59,7 +82,13 @@ private:
 	static int processCallback(const void* input, void* output, unsigned long frameCount,
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
+	PortAudioInitializationGuard m_initGuard;
+
 	PaStream* m_paStream = nullptr;
+	PaDeviceIndex m_inputDeviceIndex = paNoDevice;
+	PaDeviceIndex m_outputDeviceIndex = paNoDevice;
+	PaStreamParameters m_inputParameters = PaStreamParameters{};
+	PaStreamParameters m_outputParameters = PaStreamParameters{};
 	std::vector<SampleFrame> m_outBuf;
 	std::size_t m_outBufPos = 0;
 };
@@ -77,6 +106,7 @@ public:
 private:
 	class DeviceSelectorWidget;
 	QComboBox* m_backendComboBox = nullptr;
+	QComboBox* m_bitDepthComboBox = nullptr;
 	DeviceSelectorWidget* m_inputDevice = nullptr;
 	DeviceSelectorWidget* m_outputDevice = nullptr;
 };
