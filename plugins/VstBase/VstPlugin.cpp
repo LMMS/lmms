@@ -36,6 +36,11 @@
 
 #include <QWindow>
 
+#ifdef LMMS_BUILD_WIN32
+#	include <windows.h>
+#	include <QLayout>
+#endif
+
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -381,12 +386,6 @@ bool VstPlugin::processMessage( const message & _m )
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
 					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
-#endif
-
-#ifdef LMMS_BUILD_LINUX
-			XSetTransientForHint( QX11Info::display(),
-					m_pluginWindowID,
-					gui::getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;

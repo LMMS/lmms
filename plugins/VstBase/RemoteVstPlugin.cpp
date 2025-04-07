@@ -586,6 +586,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			return true;
 
 		case IdIsUIVisible:
+		{
 #ifndef NATIVE_LINUX_VST
 			bool visible = m_window && IsWindowVisible( m_window );
 #else
@@ -594,7 +595,11 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage( message( IdIsUIVisible )
 						 .addInt( visible ? 1 : 0 ) );
 			return true;
+		}
+	}
 
+	switch( _m.id )
+	{
 		case IdVstLoadPlugin:
 			init( _m.getString() );
 			break;
@@ -782,7 +787,7 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
+	DWORD dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
 
 	m_window = CreateWindowEx( WS_EX_APPWINDOW, "LVSL", pluginName(),
 		dwStyle,
@@ -860,20 +865,12 @@ void RemoteVstPlugin::initEditor()
 
 
 void RemoteVstPlugin::showEditor() {
-	if (!HEADLESS && m_window)
-	{
-		ShowWindow( m_window, SW_SHOWNORMAL );
-	}
 }
 
 
 
 
 void RemoteVstPlugin::hideEditor() {
-	if (!HEADLESS && m_window)
-	{
-		ShowWindow( m_window, SW_HIDE );
-	}
 }
 
 

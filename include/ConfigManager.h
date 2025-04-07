@@ -232,6 +232,9 @@ public:
 
 	static bool enableBlockedPlugins();
 
+	static QStringList availableVstEmbedMethods();
+	QString vstEmbedMethod() const;
+
 	// Returns true if the working dir (e.g. ~/lmms) exists on disk.
 	bool hasWorkingDir() const;
 
