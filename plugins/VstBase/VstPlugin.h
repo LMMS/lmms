@@ -137,8 +137,6 @@ public slots:
 	void showUI() override;
 	void hideUI() override;
 
-	void handleClientEmbed();
-
 private:
 	void loadChunk( const QByteArray & _chunk );
 	QByteArray saveChunk();
