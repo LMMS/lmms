@@ -96,6 +96,7 @@ private slots:
 
 private:
 	bool initJackClient();
+	void resizeInputBuffer(jack_nframes_t nframes);
 
 	void startProcessing() override;
 	void stopProcessing() override;
@@ -106,7 +107,6 @@ private:
 
 	int processCallback(jack_nframes_t nframes);
 
-	static int setBufferSizeCallback(jack_nframes_t nframes, void* udata);
 	static int staticProcessCallback(jack_nframes_t nframes, void* udata);
 	static void shutdownCallback(void* _udata);
 
@@ -119,7 +119,7 @@ private:
 	std::vector<jack_port_t*> m_outputPorts;
 	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
-	std::vector<jack_default_audio_sample_t> m_inputFrameBuffer;
+	std::vector<SampleFrame> m_inputFrameBuffer;
 	SampleFrame* m_outBuf;
 	SampleFrame* m_inBuf;
 
