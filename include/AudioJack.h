@@ -96,6 +96,7 @@ private slots:
 
 private:
 	bool initJackClient();
+	void resizeInputBuffer(jack_nframes_t nframes);
 
 	void startProcessing() override;
 	void stopProcessing() override;
@@ -116,8 +117,11 @@ private:
 
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
+	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
+	std::vector<SampleFrame> m_inputFrameBuffer;
 	SampleFrame* m_outBuf;
+	SampleFrame* m_inBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
