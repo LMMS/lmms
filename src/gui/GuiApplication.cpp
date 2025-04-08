@@ -51,6 +51,8 @@
 #include <csignal>
 
 #ifdef LMMS_BUILD_WIN32
+#include <io.h>
+#include <stdio.h>
 #include <windows.h>
 #else
 #include <sys/socket.h>
