@@ -50,7 +50,7 @@ class LMMS_EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
 public:
-	explicit GuiApplication(int* sigintFd);
+	explicit GuiApplication();
 	~GuiApplication() override;
 
 	static GuiApplication* instance();
@@ -58,7 +58,7 @@ public:
 	static QFont getWin32SystemFont();
 #endif
 
-	void createSocketNotifier(int* sigintFd);
+	void createSocketNotifier();
 
 	MainWindow* mainWindow() { return m_mainWindow; }
 	MixerView* mixerView() { return m_mixerView; }
@@ -69,6 +69,9 @@ public:
 	MicrotunerConfig* getMicrotunerConfig() { return m_microtunerConfig; }
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
+
+	//! File descriptors for unix socketpair, used to receive SIGINT
+	static inline int* s_sigintFd = nullptr;
 
 public slots:
 	void displayInitProgress(const QString &msg);

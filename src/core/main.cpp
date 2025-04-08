@@ -820,7 +820,8 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
-		new GuiApplication(sigintFd);
+		GuiApplication::s_sigintFd = sigintFd;
+		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure

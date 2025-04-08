@@ -79,10 +79,10 @@ GuiApplication* GuiApplication::instance()
 
 
 
-GuiApplication::GuiApplication(int* sigintFd)
+GuiApplication::GuiApplication()
 {
 	// Immediately register our SIGINT handler
-	createSocketNotifier(sigintFd);
+	createSocketNotifier();
 
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
@@ -250,14 +250,14 @@ void GuiApplication::childDestroyed(QObject *obj)
 }
 
 // Create our unix signal notifiers
-void GuiApplication::createSocketNotifier(int* sigintFd) {
+void GuiApplication::createSocketNotifier() {
 #ifndef LMMS_BUILD_WIN32
-	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigintFd))
+	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigintFd))
 	   qFatal("Couldn't create SIGINT socketpair");
 #endif
 
 	// Listen on the file descriptor for SIGINT
-	m_sigintNotifier = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
+	m_sigintNotifier = new QSocketNotifier(s_sigintFd[1], QSocketNotifier::Read, this);
 	connect(m_sigintNotifier, SIGNAL(activated(QSocketDescriptor)), this, SLOT(sigintOccurred()), Qt::QueuedConnection);
 }
 
