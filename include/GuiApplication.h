@@ -54,6 +54,7 @@ public:
 	~GuiApplication() override;
 
 	static GuiApplication* instance();
+	static void sigintHandler(int);
 #ifdef LMMS_BUILD_WIN32
 	static QFont getWin32SystemFont();
 #endif
@@ -71,7 +72,7 @@ public:
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
 	//! File descriptors for unix socketpair, used to receive SIGINT
-	static inline int* s_sigintFd = nullptr;
+	static inline int s_sigintFd[2];
 
 public slots:
 	void displayInitProgress(const QString &msg);

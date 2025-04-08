@@ -100,19 +100,6 @@ void sigfpeHandler(int signum) {
 }
 #endif
 
-// SIGINT: Write to a file descriptor that GuiApplication is listening on
-static int sigintFd[2];
-static void sigintHandler(int) {
-#ifndef LMMS_BUILD_WIN32
-	char a = 1;
-	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
-#else
-	char message[] = "Sorry, SIGINT is unhandled on this platform\n";
-	std::ignore = _write(_fileno(stderr), message, sizeof(message));
-#endif
-}
-
-
 static inline QString baseName( const QString & file )
 {
 	return QFileInfo( file ).absolutePath() + "/" +
@@ -330,7 +317,7 @@ int main( int argc, char * * argv )
 	// register signal SIGFPE and signal handler
 	signal(SIGFPE, sigfpeHandler);
 #endif
-	signal(SIGINT, sigintHandler);
+	signal(SIGINT, gui::GuiApplication::sigintHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
@@ -820,7 +807,6 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
-		GuiApplication::s_sigintFd = sigintFd;
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
