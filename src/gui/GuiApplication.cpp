@@ -253,7 +253,9 @@ void GuiApplication::childDestroyed(QObject *obj)
 void GuiApplication::createSocketNotifier() {
 #ifndef LMMS_BUILD_WIN32
 	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigintFd))
-	   qFatal("Couldn't create SIGINT socketpair");
+	{
+		qFatal("Couldn't create SIGINT socketpair");
+	}
 #endif
 
 	// Listen on the file descriptor for SIGINT

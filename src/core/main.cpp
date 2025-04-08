@@ -82,7 +82,7 @@
 
 
 #ifdef LMMS_DEBUG_FPE
-void sigfpeHandler( int signum ) {
+void sigfpeHandler(int signum) {
 
 	// Get a back trace
 	void *array[10];
@@ -102,7 +102,7 @@ void sigfpeHandler( int signum ) {
 
 // SIGINT: Write to a file descriptor that GuiApplication is listening on
 static int sigintFd[2];
-static void sigintHandler(int unused) {
+static void sigintHandler(int) {
 #ifndef LMMS_BUILD_WIN32
 	char a = 1;
 	std::ignore = ::write(sigintFd[0], &a, sizeof(a));
