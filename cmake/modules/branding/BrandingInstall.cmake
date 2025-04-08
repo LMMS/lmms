@@ -87,9 +87,17 @@ if(WIN32)
 	# used only by winrc
 	ico_convert("${project_svg_branded}" "${CPACK_BRANDED_DIR}/project.ico")
 elseif(APPLE)
+	# apple's style guidelines for the bundle's dock icon differ; use a dedicated svg
+	svg_recolor(
+    	"${svg_patterns_search}"
+    	"${svg_patterns_replace}"
+    	"${LMMS_SOURCE_DIR}/data/scalable/lmms-apple.svg"
+    	bundle_svg_branded
+    )
+
 	set(THEMES_DIR Contents/share/lmms/themes)
 	include(IconUtilConvert)
-	icns_convert("${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
+	icns_convert("${bundle_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
 	icns_convert("${project_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/project.icns")
 
 	# dmg background
