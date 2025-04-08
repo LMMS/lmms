@@ -80,7 +80,8 @@
 
 
 #ifdef LMMS_DEBUG_FPE
-void sigfpeHandler(int signum) {
+void sigfpeHandler(int signum)
+{
 
 	// Get a back trace
 	void *array[10];
