@@ -284,6 +284,7 @@ void GuiApplication::createSocketNotifier() {
 #endif
 }
 
+// Handle the shutdown event
 void GuiApplication::sigintOccurred() {
 	m_sigintNotifier->setEnabled(false);
 	qDebug() << "Shutting down...";
