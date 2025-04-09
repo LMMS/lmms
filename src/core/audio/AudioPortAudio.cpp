@@ -158,19 +158,28 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		  static_cast<double>(engine->framesPerPeriod()) / engine->baseSampleRate(), Direction::Output))
 	, m_outBuf(engine->framesPerPeriod())
 {
-	m_supportsCapture = m_inputDeviceIndex != paNoDevice;
-	if (m_outputDeviceIndex == paNoDevice) { throw std::runtime_error{"PortAudio: could not load output device"}; }
+	const auto inputParameters = m_inputDeviceIndex == paNoDevice ? nullptr : &m_inputParameters;
+	if (!inputParameters) { std::cerr << "PortAudio: no input device can be found, capture support will be disabled\n"; }
 
-	const auto err = Pa_OpenStream(&m_paStream, m_supportsCapture ? nullptr : &m_inputParameters, &m_outputParameters,
-		engine->baseSampleRate(), engine->framesPerPeriod(), paNoFlag, &processCallback, this);
+	const auto outputParameters = m_outputDeviceIndex == paNoDevice ? nullptr : &m_outputParameters;
+	if (!outputParameters) { throw std::runtime_error{"PortAudio: no output device can be found"}; }
 
-	if (err != paNoError)
+	const auto formatErr = Pa_IsFormatSupported(inputParameters, outputParameters, engine->baseSampleRate());
+	if (formatErr != paFormatIsSupported)
 	{
-		throw std::runtime_error{"PortAudio: failure to open stream - " + std::string{Pa_GetErrorText(err)}};
+		throw std::runtime_error{"PortAudio: unsupported format - " + std::string{Pa_GetErrorText(formatErr)}};
+	}
+
+	const auto openErr = Pa_OpenStream(&m_paStream, m_supportsCapture ? nullptr : &m_inputParameters, &m_outputParameters,
+		engine->baseSampleRate(), engine->framesPerPeriod(), paNoFlag, &processCallback, this);
+	if (openErr != paNoError)
+	{
+		throw std::runtime_error{"PortAudio: failure to open stream - " + std::string{Pa_GetErrorText(openErr)}};
 	}
 
 	setSampleRate(engine->baseSampleRate());
 	setChannels(m_outputParameters.channelCount);
+	m_supportsCapture = inputParameters != nullptr;
 }
 
 AudioPortAudio::~AudioPortAudio()
