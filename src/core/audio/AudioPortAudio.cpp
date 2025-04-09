@@ -158,7 +158,8 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		  static_cast<double>(engine->framesPerPeriod()) / engine->baseSampleRate(), Direction::Output))
 	, m_outBuf(engine->framesPerPeriod())
 {
-	std::cout << Pa_GetVersionInfo()->versionText << '\n';
+	// TODO PortAudio >= v19.5.0: Use Pa_GetVersionInfo()->versionText instead
+	std::cout << Pa_GetVersionText() << '\n';
 
 	const auto inputParameters = m_inputDeviceIndex == paNoDevice ? nullptr : &m_inputParameters;
 	if (!inputParameters) { std::cerr << "PortAudio: no input device can be found, capture support will be disabled\n"; }
