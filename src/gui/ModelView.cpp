@@ -22,6 +22,8 @@
  *
  */
 
+
+#include <QMessageBox>
 #include <QWidget>
 
 #include "ModelView.h"
@@ -81,6 +83,17 @@ void ModelView::setModel( Model* model, bool isOldModelValid )
 void ModelView::unsetModel()
 {
 	setModel(new Model(nullptr, QString(), true));
+}
+
+void ModelView::execAssertFailedDialog(const QString& type) const
+{
+	QMessageBox errorDialog;
+	errorDialog.setText("ModelView error, model() == nullptr, type: " + type);
+	errorDialog.setWindowTitle("ModelView error");
+	errorDialog.setIcon(QMessageBox::Warning);
+	errorDialog.addButton(QMessageBox::Ok);
+
+	errorDialog.exec();
 }
 
 
