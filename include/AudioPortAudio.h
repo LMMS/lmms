@@ -106,7 +106,6 @@ public:
 private:
 	class DeviceSelectorWidget;
 	QComboBox* m_backendComboBox = nullptr;
-	QComboBox* m_bitDepthComboBox = nullptr;
 	DeviceSelectorWidget* m_inputDevice = nullptr;
 	DeviceSelectorWidget* m_outputDevice = nullptr;
 };

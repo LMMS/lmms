@@ -51,11 +51,6 @@ constexpr auto backendAttribute()
 	return "backend";
 }
 
-constexpr auto bitDepthAttribute()
-{
-	return "bitdepth";
-}
-
 constexpr auto deviceNameAttribute(Direction direction)
 {
 	switch (direction)
@@ -103,20 +98,13 @@ QString numChannelsFromConfig(Direction direction)
 	return numChannels;
 }
 
-PaSampleFormat bitDepthFromConfig()
-{
-	using namespace lmms;
-	const auto bitDepth = ConfigManager::inst()->value(tag(), bitDepthAttribute(), QString::number(paFloat32));
-	return bitDepth.toInt();
-}
-
 PaStreamParameters createStreamParameters(PaDeviceIndex index, double suggestedLatency, Direction direction)
 {
 	using namespace lmms;
 
 	return PaStreamParameters{.device = index,
 		.channelCount = numChannelsFromConfig(direction).toInt(),
-		.sampleFormat = bitDepthFromConfig(),
+		.sampleFormat = paFloat32,
 		.suggestedLatency = suggestedLatency,
 		.hostApiSpecificStreamInfo = nullptr};
 }
@@ -216,40 +204,26 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 {
 	const auto device = static_cast<AudioPortAudio*>(userData);
 
-	if (device->m_outputParameters.sampleFormat == paFloat32)
+	const auto outputBuffer = static_cast<float*>(output);
+	for (auto frame = std::size_t{0}; frame < frameCount; ++frame)
 	{
-		const auto outputBuffer = static_cast<float*>(output);
-		for (auto frame = std::size_t{0}; frame < frameCount; ++frame)
-		{
-			if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0)
-			{
-				std::fill(outputBuffer + frame * device->channels(), outputBuffer + frameCount * device->channels(), 0);
-				return paComplete;
-			}
-
-			if (device->channels() == 1) { outputBuffer[frame] = device->m_outBuf[device->m_outBufPos].average(); }
-			else
-			{
-				outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
-				outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
-			}
-
-			device->m_outBufPos = frame % device->m_outBuf.size();
-		}
-	}
-	else
-	{
-		assert(device->m_outputParameters.sampleFormat == paInt16);
-		const auto outputBuffer = static_cast<int_sample_t*>(output);
-
 		if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0)
 		{
-			std::fill(outputBuffer, outputBuffer + frameCount * device->channels(), 0);
+			std::fill(outputBuffer + frame * device->channels(), outputBuffer + frameCount * device->channels(), 0);
 			return paComplete;
 		}
 
-		device->convertToS16(device->m_outBuf.data() + device->m_outBufPos, frameCount, outputBuffer);
-		device->m_outBufPos = (device->m_outBufPos + frameCount) % device->m_outBuf.size();
+		if (device->channels() == 1)
+		{
+			outputBuffer[frame] = device->m_outBuf[device->m_outBufPos].average();
+		}
+		else
+		{
+			outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
+			outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
+		}
+
+		device->m_outBufPos = frame % device->m_outBuf.size();
 	}
 
 	return paContinue;
@@ -320,7 +294,6 @@ private:
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget{AudioPortAudio::name(), parent}
 	, m_backendComboBox{new QComboBox{this}}
-	, m_bitDepthComboBox(new QComboBox{this})
 	, m_inputDevice{new DeviceSelectorWidget{tr("Input device"), Direction::Input}}
 	, m_outputDevice(new DeviceSelectorWidget{tr("Output device"), Direction::Output})
 {
@@ -330,7 +303,6 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->setVerticalSpacing(formVerticalSpacing);
 
 	form->addRow(tr("Backend"), m_backendComboBox);
-	form->addRow(tr("Bit depth"), m_bitDepthComboBox);
 	form->addRow(m_outputDevice);
 	form->addRow(m_inputDevice);
 
@@ -339,11 +311,6 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 		m_outputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt(), Direction::Output);
 	});
 
-	m_bitDepthComboBox->addItem(tr("32-bit float"), QVariant::fromValue(paFloat32));
-	m_bitDepthComboBox->addItem(tr("16-bit int"), QVariant::fromValue(paInt16));
-
-	const auto bitDepthIndex = std::max(0, m_bitDepthComboBox->findData(QVariant::fromValue(bitDepthFromConfig())));
-	m_bitDepthComboBox->setCurrentIndex(bitDepthIndex);
 }
 
 void AudioPortAudioSetupWidget::show()
@@ -368,8 +335,6 @@ void AudioPortAudioSetupWidget::show()
 void AudioPortAudioSetupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue(tag(), backendAttribute(), m_backendComboBox->currentText());
-	ConfigManager::inst()->setValue(
-		tag(), bitDepthAttribute(), QString::number(m_bitDepthComboBox->currentData().toULongLong()));
 	m_inputDevice->saveToConfig(Direction::Input);
 	m_outputDevice->saveToConfig(Direction::Output);
 }
