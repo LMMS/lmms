@@ -170,8 +170,8 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 		throw std::runtime_error{"PortAudio: unsupported format - " + std::string{Pa_GetErrorText(formatErr)}};
 	}
 
-	const auto openErr = Pa_OpenStream(&m_paStream, m_supportsCapture ? nullptr : &m_inputParameters, &m_outputParameters,
-		engine->baseSampleRate(), engine->framesPerPeriod(), paNoFlag, &processCallback, this);
+	const auto openErr = Pa_OpenStream(&m_paStream, inputParameters, outputParameters, engine->baseSampleRate(),
+		engine->framesPerPeriod(), paNoFlag, &processCallback, this);
 	if (openErr != paNoError)
 	{
 		throw std::runtime_error{"PortAudio: failure to open stream - " + std::string{Pa_GetErrorText(openErr)}};
