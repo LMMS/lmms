@@ -260,18 +260,21 @@ void GuiApplication::childDestroyed(QObject *obj)
  */
 void GuiApplication::sigintHandler(int)
 {
-#ifndef LMMS_BUILD_WIN32
-	char a = 1;
-	std::ignore = ::write(s_sigintFd[0], &a, sizeof(a));
-#else
+#ifdef LMMS_BUILD_WIN32
 	char message[] = "Sorry, SIGINT is unhandled on this platform\n";
 	std::ignore = _write(_fileno(stderr), message, sizeof(message));
+#else
+	char a = 1;
+	std::ignore = ::write(s_sigintFd[0], &a, sizeof(a));
 #endif
 }
 
 // Create our unix signal notifiers
-void GuiApplication::createSocketNotifier() {
-#ifndef LMMS_BUILD_WIN32
+void GuiApplication::createSocketNotifier()
+{
+#ifdef LMMS_BUILD_WIN32
+	// no-op
+#else
 	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigintFd))
 	{
 		qFatal("Couldn't create SIGINT socketpair");
@@ -285,7 +288,8 @@ void GuiApplication::createSocketNotifier() {
 }
 
 // Handle the shutdown event
-void GuiApplication::sigintOccurred() {
+void GuiApplication::sigintOccurred()
+{
 	m_sigintNotifier->setEnabled(false);
 	qDebug() << "Shutting down...";
 	// cleanup, etc
