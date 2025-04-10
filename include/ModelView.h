@@ -43,11 +43,13 @@ public:
 
 	Model* model()
 	{
+		assertModel<Model>();
 		return m_model;
 	}
 
 	const Model* model() const
 	{
+		assertModel<Model>();
 		return m_model;
 	}
 
@@ -55,14 +57,19 @@ public:
 	T* castModel()
 	{
 		assertModel<T>();
-		return dynamic_cast<T*>( model() );
+		return dynamic_cast<T*>(m_model.data());
 	}
 
 	template<class T>
 	const T* castModel() const
 	{
 		assertModel<T>();
-		return dynamic_cast<const T*>( model() );
+		return dynamic_cast<const T*>(m_model.data());
+	}
+	
+	bool isModelValid() const
+	{
+		return m_model != nullptr;
 	}
 
 
@@ -84,7 +91,7 @@ private:
 	template<class T>
 	void assertModel() const
 	{
-		if (model()) { return; }
+		if (m_model.data()) { return; }
 
 		QString type = typeid(T).name();
 		execAssertFailedDialog(type);
