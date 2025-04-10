@@ -27,10 +27,10 @@ set(svg_patterns_search "svg_patterns_green")
 set(svg_patterns_replace "svg_patterns_${LMMS_BRANDING_COLOR}")
 
 # SVG color replacements
-set(svg_patterns_green "#27ab5f;#249a56;#34d07b;opacity=\".1\" fill=\"#fff\"")
-set(svg_patterns_yellow "#db9300;#bf8000;#fac457;opacity=\".1\" fill=\"#fff\"")
-set(svg_patterns_purple "#5547bd;#493ba1;#7871c5;opacity=\".05\" fill=\"#fff\"")
-set(svg_patterns_blue "#3992cb;#2b6fc5;#62a8d4;opacity=\".1\" fill=\"#fff\"")
+set(svg_patterns_green "#09b960;#009a4d;#00d36d;opacity=\".1\" fill=\"#fff\"")
+set(svg_patterns_yellow "#fcab00;#d48e00;#ffc976;opacity=\".1\" fill=\"#fff\"")
+set(svg_patterns_purple "#9884ff;#805bfe;#ada3ff;opacity=\".05\" fill=\"#fff\"")
+set(svg_patterns_blue "#289fff;#0083e0;#6db6ff;opacity=\".1\" fill=\"#fff\"")
 
 file(REMOVE_RECURSE "${CPACK_BRANDED_DIR}")
 
@@ -87,17 +87,9 @@ if(WIN32)
 	# used only by winrc
 	ico_convert("${project_svg_branded}" "${CPACK_BRANDED_DIR}/project.ico")
 elseif(APPLE)
-	# apple's style guidelines for the bundle's dock icon differ; use a dedicated svg
-	svg_recolor(
-    	"${svg_patterns_search}"
-    	"${svg_patterns_replace}"
-    	"${LMMS_SOURCE_DIR}/data/scalable/lmms-apple.svg"
-    	bundle_svg_branded
-    )
-
 	set(THEMES_DIR Contents/share/lmms/themes)
 	include(IconUtilConvert)
-	icns_convert("${bundle_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
+	icns_convert("${lmms_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/lmms.icns")
 	icns_convert("${project_svg_branded}" "${CPACK_BRANDED_APP_DIR}/Contents/Resources/project.icns")
 
 	# dmg background
