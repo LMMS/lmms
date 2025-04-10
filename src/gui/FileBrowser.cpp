@@ -756,14 +756,9 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		{
 			newPPH = new SamplePreviewPlayHandle(PathUtil::qStringToPath(fileName));
 		}
-		catch (const std::runtime_error&)
+		catch (const std::runtime_error& e)
 		{
-			if (auto buffer = SampleLoader::createBufferFromFile(fileName))
-			{
-				auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
-				s->setDoneMayReturnTrue(false);
-				newPPH = s;
-			}
+			QMessageBox::critical(nullptr, tr("Failure to load sample file"), tr(e.what()));
 		}
 	}
 	else if (

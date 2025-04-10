@@ -42,7 +42,7 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 
 	if (m_sndfile == nullptr || m_sfinfo.channels == 0 || m_sfinfo.frames == 0)
 	{
-		throw std::runtime_error{"Failed to create sample preview stream"};
+		throw std::runtime_error{"Could not open file for reading"};
 	}
 
 	const auto initialFrameCount = std::min(static_cast<sf_count_t>(m_sfinfo.samplerate), m_sfinfo.frames);
