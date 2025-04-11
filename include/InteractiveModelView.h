@@ -1,7 +1,7 @@
 /*
  * InteractiveModelView.h - Implements shortcut system, StringPair system and highlighting for widgets
  *
- * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot/com>
+ * Copyright (c) 2024 -2025 szeli1 <TODO/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -34,6 +34,7 @@
 #include <QColor>
 
 #include "Clipboard.h"
+#include "GuiAction.h"
 #include "lmms_export.h"
 #include "ModelView.h"
 
@@ -46,6 +47,47 @@ namespace lmms::gui
 {
 
 class SimpleTextFloat;
+
+struct ActionStruct
+{
+	ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType);
+	ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::FloatActionFn doFn, GuiAction::FloatActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType);
+	void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop);
+	//! display name
+	QString actionName = "";
+	//! hint or description
+	QString actionHint = "";
+
+	//! function pointers needed for `GuiAction`
+	GuiAction::ActionFn doFn = nullptr;
+	GuiAction::ActionFn undoFn = nullptr;
+	GuiAction::FloatActionFn doFloatFn = nullptr;
+	GuiAction::FloatActionFn undoFloatFn = nullptr;
+
+	//! if the action can not be performed with other kinds of widgets (example for false: delete)
+	bool isTypeSpecific = true;
+	bool isShortcut = false;
+
+	//! what kind of data does this action accept
+	Clipboard::DataType acceptedType = Clipboard::DataType::Any;
+
+	// shortcut logic
+	Qt::Key key = Qt::Key_F35;
+	Qt::KeyboardModifier modifier = Qt::NoModifier;
+	//! how many times do the keys need to be pressed to activate this shortcut
+	size_t times = 0;
+	//! should it loop back if m_times is reached
+	bool isLoop = false;
+	
+	void resetShortcut();
+	
+	bool doesShortcutMatch(QKeyEvent* event) const;
+	bool doesShortcutMatch(const ActionStruct& otherShortcut) const;
+	bool doesFullShortcutMatch(const ActionStruct& otherShortcut) const;
+	bool doesTypeMatch(Clipboard::DataType type);
+	bool doesActionMatch(const ActionStruct& otherAction) const;
+}
+
 
 class LMMS_EXPORT InteractiveModelView : public QWidget
 {
@@ -74,58 +116,19 @@ public:
 	//! checks if QKeyEvent maches with a known shortcut and calls `processShortcutPressed()`
 	bool HandleKeyPress(QKeyEvent* event);
 protected:
-	struct ModelShortcut
-	{
-		ModelShortcut() {}
-		ModelShortcut(Qt::Key key, Qt::KeyboardModifier modifier, unsigned int times, QString description, bool shouldLoop) :
-			key(key),
-			modifier(modifier),
-			times(times),
-			shortcutDescription(description),
-			shouldLoop(shouldLoop)
-		{
-		}
-
-		bool operator==(ModelShortcut& rhs)
-		{
-			return key == rhs.key
-				&& modifier == rhs.modifier
-				&& times == rhs.times
-				&& shouldLoop == rhs.shouldLoop;
-		}
-
-		void reset()
-		{
-			key = Qt::Key_F35;
-			modifier = Qt::NoModifier;
-			times = 0;
-			shortcutDescription = "";
-			shouldLoop = false;
-		}
-
-		Qt::Key key = Qt::Key_F35;
-		Qt::KeyboardModifier modifier = Qt::NoModifier;
-		//! how many times do the keys need to be pressed to activate this shortcut
-		unsigned int times = 0;
-		//! what the shortcut does
-		QString shortcutDescription = "";
-		//! should it loop back if m_times is reached
-		bool shouldLoop = false;
-	};
-
 	void keyPressEvent(QKeyEvent* event) override;
 	void enterEvent(QEvent* event) override;
 	void leaveEvent(QEvent* event) override;
 	
 	//! returns the avalible shortcuts for the widget
-	virtual const std::vector<ModelShortcut>& getShortcuts() = 0;
-	//! called when a shortcut from `getShortcuts()` is pressed
-	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
+	virtual const std::vector<ActionStruct>& getActions() = 0;
+	//! TODO
+	void doAction(size_t actionIndex);
+	void doAction(size_t actionIndex, const std::vector<ActionStruct>& actions);
+	static doActions(size_t actionIndex, const std::vector<InteractiveModelView*> widgets, const std::vector<ActionStruct>& actions);
 	//! called when a shortcut message needs to be displayed
 	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
 	virtual QString getShortcutMessage() = 0;
-	//! returns true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
-	virtual bool canAcceptClipboardData(Clipboard::DataType dataType) = 0;
 	//! should implement dragging and dropping widgets or pasting from clipboard
 	//! should return if `QDropEvent` event can be accepted
 	//! force implement this method
@@ -134,10 +137,17 @@ protected:
 	bool processPaste(const QMimeData* mimeData);
 	//! override this if the widget requires custom updating code
 	virtual void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
+	
+	
+	//! called when a shortcut from `getActions()` is pressed
+	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
+	//! returns true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
+	virtual bool canAcceptClipboardData(Clipboard::DataType dataType) = 0;
+	
 
 	//! draws the highlight automatically for the widget if highlighted
 	void drawAutoHighlight(QPainter* painter);
-	//! builds a string from `getShortcuts()`
+	//! builds a string from `getActions()`
 	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;
@@ -150,13 +160,12 @@ private slots:
 		stopHighlighting();
 	}
 private:
-	bool doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event) const;
-	bool doesShortcutMatch(const ModelShortcut* shortcutA, const ModelShortcut* shortcutB) const;
 
 	bool m_isHighlighted;
 	
-	ModelShortcut m_lastShortcut;
-	unsigned int m_lastShortcutCounter;
+	ActionStruct m_lastShortcut;
+	//! how many times was the last shortcut pressed
+	size_t m_lastShortcutCounter;
 
 	static std::unique_ptr<QColor> s_highlightColor;
 	static std::unique_ptr<QColor> s_usedHighlightColor;
