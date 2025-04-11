@@ -71,7 +71,7 @@ namespace lmms::Clipboard
 	{
 		switch (type)
 		{
-			case DataType::All:
+			case DataType::Any:
 				return QString("Any");
 			case DataType::FloatValue:
 				return QString("FloatValue");
