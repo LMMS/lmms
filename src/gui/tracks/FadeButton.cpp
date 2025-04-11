@@ -47,7 +47,7 @@ FadeButton::FadeButton(const QColor & _normal_color,
 	m_activatedColor( _activated_color ),
 	m_holdColor( holdColor )
 {
-	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
+	setCursor(Qt::PointingHandCursor);
 	setFocusPolicy(Qt::NoFocus);
 	activeNotes = 0;
 }
