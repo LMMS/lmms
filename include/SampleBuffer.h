@@ -38,6 +38,17 @@
 #include "lmms_export.h"
 
 namespace lmms {
+/**
+	A class that stores sample data from an audio file
+	or anywhere else.
+
+	TODO: The downside of this class is that it is always
+	allocated on the heap. It would be better if we stuck with
+	using `std::array<SampleFrame>` or `std::vector<SampleFrame>` to
+	represent a buffer of samples (or any other container), in which case
+	this class is mostly redundant. The sample rate information should also
+	be stored separately when necessary.
+ */
 class LMMS_EXPORT SampleBuffer
 {
 public:

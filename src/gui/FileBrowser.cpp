@@ -758,6 +758,8 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		}
 		catch (const std::runtime_error&)
 		{
+			// If we cannot create a preview, try to load the entire buffer.
+			// This is needed for certain files like DrumSynth since we cannot stream from them.
 			if (auto buffer = SampleLoader::createBufferFromFile(fileName))
 			{
 				auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});

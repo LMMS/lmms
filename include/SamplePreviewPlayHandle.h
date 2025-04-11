@@ -42,7 +42,18 @@
 #include "PlayHandle.h"
 
 namespace lmms {
+/**
+	A `PlayHandle` that can stream from an audio file on disk.
+	Streaming occurs on a separate non-realtime thread, while
+	the audio callback reads from it. The streamer writes data
+	as it is being read.
 
+	TODO: We may want to consider adding a sample file stream abstraction
+	so that plugins, sample clips, etc can stream from a sample file if they
+	choose to do so. In this case, the `Sample` class will need to support
+	real-time streaming from it instead of always loading the entire sample file.
+	Afterwards, this class can be removed and `SamplePlayHandle` can be used instead.
+ */
 class SamplePreviewPlayHandle : public PlayHandle
 {
 public:
