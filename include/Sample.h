@@ -34,6 +34,12 @@
 #include "lmms_export.h"
 
 namespace lmms {
+/**
+	A class used for playback from a `SampleBuffer`.
+	TODO: Add support for streaming from an audio file.
+	TODO: To avoid confusion with numerical samples (e.g. floats), we may consider
+	renaming this class to something related to playback of samples.
+ */
 class LMMS_EXPORT Sample
 {
 public:
