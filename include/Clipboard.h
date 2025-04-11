@@ -49,6 +49,7 @@ namespace Clipboard
 	enum DataType
 	{
 		None, //!< only use for error handling
+		Any, //!< use for any type of data
 		FloatValue,
 		AutomatableModelLink,
 		Instrument,
