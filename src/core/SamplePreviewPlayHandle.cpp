@@ -66,7 +66,6 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 {
 	// TODO: Should be a parameter in the function
 	const auto dstFrameCount = static_cast<sf_count_t>(Engine::audioEngine()->framesPerPeriod());
-	std::fill_n(dst, dstFrameCount, SampleFrame{});
 
 	const auto srcFramesNeeded = static_cast<sf_count_t>(std::ceil(dstFrameCount / resamplingRatio()));
 	const auto srcFramesToRead = std::min<sf_count_t>(framesAvailableToRead(), srcFramesNeeded);
