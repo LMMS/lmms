@@ -44,7 +44,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob( new Knob( KnobType::Bright26 ) )
+	m_chordRangeKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("RANGE"), this))
 {
 	auto topLayout = new QHBoxLayout(this);
 	topLayout->setContentsMargins(0, 0, 0, 0);
@@ -59,7 +59,6 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	auto chordLabel = new QLabel(tr("Chord:"));
 	chordLabel->setFont(adjustedToPixelSize(chordLabel->font(), DEFAULT_FONT_SIZE));
 
-	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
 
 	mainLayout->addWidget( chordLabel, 0, 0 );
@@ -98,13 +97,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_a( arp ),
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
-	m_arpRangeKnob( new Knob( KnobType::Bright26 ) ),
-	m_arpRepeatsKnob( new Knob( KnobType::Bright26 ) ),
-	m_arpCycleKnob( new Knob( KnobType::Bright26 ) ),
-	m_arpSkipKnob( new Knob( KnobType::Bright26 ) ),
-	m_arpMissKnob( new Knob( KnobType::Bright26 ) ),
-	m_arpTimeKnob( new TempoSyncKnob( KnobType::Bright26 ) ),
-	m_arpGateKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpRangeKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("RANGE"), this)),
+	m_arpRepeatsKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("REP"), this)),
+	m_arpCycleKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("CYCLE"), this)),
+	m_arpSkipKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("SKIP"), this)),
+	m_arpMissKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("MISS"), this)),
+	m_arpTimeKnob(TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("TIME"), this)),
+	m_arpGateKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("GATE"), this)),
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {
@@ -118,31 +117,12 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->setHorizontalSpacing( 20 );
 	mainLayout->setVerticalSpacing( 1 );
 
-	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
-
-
-	m_arpRepeatsKnob->setLabel( tr( "REP" ) );
 	m_arpRepeatsKnob->setHintText( tr( "Note repeats:" ) + " ", " " + tr( "time(s)" ) );
-
-
-	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
 	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
-
-
-	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
 	m_arpSkipKnob->setHintText( tr( "Skip rate:" ), tr( "%" ) );
-
-
-	m_arpMissKnob->setLabel( tr( "MISS" ) );
 	m_arpMissKnob->setHintText( tr( "Miss rate:" ), tr( "%" ) );
-
-
-	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
-
-
-	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
 	auto arpChordLabel = new QLabel(tr("Chord:"));

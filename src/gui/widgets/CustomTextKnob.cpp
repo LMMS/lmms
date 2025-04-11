@@ -23,6 +23,7 @@
  */
 
 #include "CustomTextKnob.h"
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -35,6 +36,16 @@ CustomTextKnob::CustomTextKnob( KnobType _knob_num, QWidget * _parent, const QSt
 CustomTextKnob::CustomTextKnob( QWidget * _parent, const QString & _name, const QString & _value_text ) : //!< default ctor
 	Knob( _parent, _name ),
 	m_value_text( _value_text ) {}
+
+CustomTextKnob* CustomTextKnob::buildKnobWithSmallPixelFont(KnobType knobNum, QWidget* parent, const QString& description, const QString& label)
+{
+	auto result = new CustomTextKnob(knobNum, parent, description);
+
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
+
+	return result;
+}
 
 QString CustomTextKnob::displayValue() const
 {

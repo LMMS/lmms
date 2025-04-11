@@ -47,35 +47,34 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 240, 80 );
 
 	m_baseKnob = new Knob( KnobType::Bright26, this );
-	m_baseKnob->setLabel( tr( "BASE" ) );
+	m_baseKnob->setLabel(tr("BASE"));
 	m_baseKnob->setModel( &_controls->m_baseModel );
 	m_baseKnob->setHintText( tr( "Base:" ) , "" );
 
 	m_amountKnob = new Knob( KnobType::Bright26, this );
-	m_amountKnob->setLabel( tr( "AMNT" ) );
+	m_amountKnob->setLabel(tr("AMNT"));
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) , "" );
 
 	m_amountMultKnob = new Knob( KnobType::Bright26, this );
-	m_amountMultKnob->setLabel( tr( "MULT" ) );
+	m_amountMultKnob->setLabel(tr("MULT"));
 	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
 	m_amountMultKnob->setHintText( tr( "Amount multiplicator:" ) , "" );
 
 	m_attackKnob = new Knob( KnobType::Bright26, this );
-	m_attackKnob->setLabel( tr( "ATCK" ) );
+	m_attackKnob->setLabel(tr("ATCK"));
 	m_attackKnob->setModel( &_controls->m_attackModel );
 	m_attackKnob->setHintText( tr( "Attack:" ) , "" );
 
 	m_decayKnob = new Knob( KnobType::Bright26, this );
-	m_decayKnob->setLabel( tr( "DCAY" ) );
+	m_decayKnob->setLabel(tr("DCAY"));
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release:" ) , "" );
 	
 	m_tresholdKnob = new Knob( KnobType::Bright26, this );
-	m_tresholdKnob->setLabel( tr( "TRSH" ) );
+	m_tresholdKnob->setLabel(tr("TRSH"));
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
 	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
 

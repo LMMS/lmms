@@ -30,6 +30,7 @@
 #include "Engine.h"
 #include "CaptionMenu.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
@@ -63,6 +64,31 @@ TempoSyncKnob::~TempoSyncKnob()
 }
 
 
+TempoSyncKnob* TempoSyncKnob::buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent)
+{
+	auto result = new TempoSyncKnob(knobNum, parent);
+
+	result->setLegacyMode(true);
+	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
+	result->setLabel(label);
+
+	return result;
+}
+
+TempoSyncKnob* TempoSyncKnob::buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name)
+{
+	auto result = new TempoSyncKnob(knobNum, parent, name);
+
+	result->setFont(adjustedToPixelSize(result->font(), pixelSize));
+	result->setLabel(label);
+
+	return result;
+}
+
+TempoSyncKnob* TempoSyncKnob::buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent)
+{
+	return buildKnobWithFixedPixelFont(knobNum, label, SMALL_FONT_SIZE, parent);
+}
 
 
 void TempoSyncKnob::modelChanged()
