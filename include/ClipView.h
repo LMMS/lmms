@@ -180,12 +180,14 @@ protected:
 	}
 	
 	// InteractiveModelView methods
-	const std::vector<ModelShortcut>& getShortcuts() override;
-	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
-	QString getShortcutMessage() override;
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	//const std::vector<ActionStruct>& getActions() override;
+	//QString getShortcutMessage() override;
 	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
+	//size_t getTypeId() override { return typeid(*this).hash_code(); }
+	void copyAction(InteractiveWidget* widget);
+	void pasteAction(InteractiveWidget* widget);
+	void cutAction(InteractiveWidget* widget);
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos( TimePos, bool shiftMode );
@@ -218,8 +220,7 @@ private:
 	} ;
 
 	static TextFloat * s_textFloat;
-	static QString m_shortcutMessage;
-	static std::vector<InteractiveModelView::ModelShortcut> s_shortcutArray;
+	static std::vector<ActionStruct> s_actionArray;
 
 	Clip * m_clip;
 	Action m_action;
