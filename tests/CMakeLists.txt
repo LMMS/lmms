@@ -28,5 +28,5 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 		${QT_QTTEST_LIBRARY}
 	)
 
-	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_17)
+	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
 endforeach()

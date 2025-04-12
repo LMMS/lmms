@@ -39,11 +39,7 @@
 #include <cmath>
 
 #include "SampleClip.h"
-#include "SampleWaveform.h"
-
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
+#include "SampleThumbnail.h"
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
@@ -62,7 +58,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "debug.h"
 #include "embed.h"
 #include "FontHelper.h"
 
@@ -114,8 +109,6 @@ AutomationEditor::AutomationEditor() :
 				Qt::QueuedConnection );
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
@@ -1025,6 +1018,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1217,12 +1211,18 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			
+
 			const auto& sample = m_ghostSample->sample();
-			const auto waveform = SampleWaveform::Parameters{
-				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			SampleWaveform::visualize(waveform, p, rect);
+
+			const auto param = SampleThumbnail::VisualizeParameters{
+				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.amplification = sample.amplification(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.reversed = sample.reversed()
+			};
+
+			m_sampleThumbnail.visualize(param, p);
 		}
 
 		// draw ghost notes
@@ -1627,7 +1627,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		adjustLeftRightScoll(we->angleDelta().x());
 	}
@@ -2037,17 +2037,17 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	auto editModeGroup = new ActionGroup(this);
 	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawAction->setShortcut(combine(Qt::SHIFT, Qt::Key_D));
 	m_drawAction->setChecked(true);
 
 	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_E));
 
 	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
-	m_drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	m_drawOutAction->setShortcut(combine(Qt::SHIFT, Qt::Key_C));
 
 	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
-	m_editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_editTanAction->setShortcut(combine(Qt::SHIFT, Qt::Key_T));
 	m_editTanAction->setEnabled(false);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);

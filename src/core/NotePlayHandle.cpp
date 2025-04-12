@@ -26,12 +26,12 @@
 #include "NotePlayHandle.h"
 
 #include "AudioEngine.h"
-#include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
 #include "Song.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -114,7 +114,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		setUsesBuffer( false );
 	}
 
-	setAudioPort( instrumentTrack->audioPort() );
+	setAudioBusHandle(instrumentTrack->audioBusHandle());
 
 	unlock();
 }
@@ -532,8 +532,8 @@ void NotePlayHandle::updateFrequency()
 		if (m_instrumentTrack->isKeyMapped(transposedKey))
 		{
 			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(transposedKey, baseNote);
-			m_frequency = frequency * powf(2.f, (detune + instrumentPitch / 100) / 12.f);
-			m_unpitchedFrequency = frequency * powf(2.f, detune / 12.f);
+			m_frequency = frequency * std::exp2((detune + instrumentPitch / 100) / 12.f);
+			m_unpitchedFrequency = frequency * std::exp2(detune / 12.f);
 		}
 		else
 		{
@@ -544,8 +544,8 @@ void NotePlayHandle::updateFrequency()
 	{
 		// default key mapping and 12-TET frequency computation with default 440 Hz base note frequency
 		const float pitch = (key() - baseNote + masterPitch + detune) / 12.0f;
-		m_frequency = DefaultBaseFreq * powf(2.0f, pitch + instrumentPitch / (100 * 12.0f));
-		m_unpitchedFrequency = DefaultBaseFreq * powf(2.0f, pitch);
+		m_frequency = DefaultBaseFreq * std::exp2(pitch + instrumentPitch / (100 * 12.0f));
+		m_unpitchedFrequency = DefaultBaseFreq * std::exp2(pitch);
 	}
 
 	for (auto it : m_subNotes)

@@ -38,6 +38,7 @@
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
 #include "ControllerRackView.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
@@ -158,7 +159,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new QMdiArea(splitter);
+	m_workspace = new MovableQMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -178,8 +179,8 @@ MainWindow::MainWindow() :
 	}
 
 	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
@@ -293,11 +294,11 @@ void MainWindow::finalize()
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
 					this, SLOT(saveProjectAs()),
-					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
+					combine(Qt::CTRL, Qt::SHIFT, Qt::Key_S));
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save as New &Version" ),
 					this, SLOT(saveProjectAsNewVersion()),
-					Qt::CTRL + Qt::ALT + Qt::Key_S );
+					combine(Qt::CTRL, Qt::ALT, Qt::Key_S));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save as default template" ),
@@ -312,23 +313,23 @@ void MainWindow::finalize()
 					tr( "E&xport..." ),
 					this,
 					SLOT(onExportProject()),
-					Qt::CTRL + Qt::Key_E );
+					combine(Qt::CTRL, Qt::Key_E));
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
 					this,
 					SLOT(onExportProjectTracks()),
-					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
+					combine(Qt::CTRL, Qt::SHIFT, Qt::Key_E));
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					this,
 					SLOT(onExportProjectMidi()),
-					Qt::CTRL + Qt::Key_M );
+					combine(Qt::CTRL, Qt::Key_M));
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT(closeAllWindows()),
-					Qt::CTRL + Qt::Key_Q );
+					combine(Qt::CTRL, Qt::Key_Q));
 
 	auto edit_menu = new QMenu(this);
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
@@ -341,13 +342,13 @@ void MainWindow::finalize()
 					this, SLOT(redo()),
 					QKeySequence::Redo );
 	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
-	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::Key_Y))
+	if (QKeySequence(QKeySequence::Redo) != QKeySequence(combine(Qt::CTRL, Qt::Key_Y)))
 	{
-		new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_Y ), this, SLOT(redo()));
+		new QShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_Y)), this, SLOT(redo()));
 	}
-	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Z ))
+	if (QKeySequence(QKeySequence::Redo) != QKeySequence(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_Z)))
 	{
-		new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Z ), this, SLOT(redo()));
+		new QShortcut(QKeySequence(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_Z)), this, SLOT(redo()));
 	}
 
 	edit_menu->addSeparator();
@@ -446,31 +447,31 @@ void MainWindow::finalize()
 	// window-toolbar
 	auto song_editor_window = new ToolButton(embed::getIconPixmap("songeditor"), tr("Song Editor") + " (Ctrl+1)", this,
 		SLOT(toggleSongEditorWin()), m_toolBar);
-	song_editor_window->setShortcut( Qt::CTRL + Qt::Key_1 );
+	song_editor_window->setShortcut(combine(Qt::CTRL, Qt::Key_1));
 
 	auto pattern_editor_window = new ToolButton(embed::getIconPixmap("pattern_track_btn"),
 		tr("Pattern Editor") + " (Ctrl+2)", this, SLOT(togglePatternEditorWin()), m_toolBar);
-	pattern_editor_window->setShortcut(Qt::CTRL + Qt::Key_2);
+	pattern_editor_window->setShortcut(combine(Qt::CTRL, Qt::Key_2));
 
 	auto piano_roll_window = new ToolButton(
 		embed::getIconPixmap("piano"), tr("Piano Roll") + " (Ctrl+3)", this, SLOT(togglePianoRollWin()), m_toolBar);
-	piano_roll_window->setShortcut( Qt::CTRL + Qt::Key_3 );
+	piano_roll_window->setShortcut(combine(Qt::CTRL, Qt::Key_3));
 
 	auto automation_editor_window = new ToolButton(embed::getIconPixmap("automation"),
 		tr("Automation Editor") + " (Ctrl+4)", this, SLOT(toggleAutomationEditorWin()), m_toolBar);
-	automation_editor_window->setShortcut( Qt::CTRL + Qt::Key_4 );
+	automation_editor_window->setShortcut(combine(Qt::CTRL, Qt::Key_4));
 
 	auto mixer_window = new ToolButton(
 		embed::getIconPixmap("mixer"), tr("Mixer") + " (Ctrl+5)", this, SLOT(toggleMixerWin()), m_toolBar);
-	mixer_window->setShortcut( Qt::CTRL + Qt::Key_5 );
+	mixer_window->setShortcut(combine(Qt::CTRL, Qt::Key_5));
 
 	auto controllers_window = new ToolButton(embed::getIconPixmap("controller"),
 		tr("Show/hide controller rack") + " (Ctrl+6)", this, SLOT(toggleControllerRack()), m_toolBar);
-	controllers_window->setShortcut( Qt::CTRL + Qt::Key_6 );
+	controllers_window->setShortcut(combine(Qt::CTRL, Qt::Key_6));
 
 	auto project_notes_window = new ToolButton(embed::getIconPixmap("project_notes"),
 		tr("Show/hide project notes") + " (Ctrl+7)", this, SLOT(toggleProjectNotesWin()), m_toolBar);
-	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_7 );
+	project_notes_window->setShortcut(combine(Qt::CTRL, Qt::Key_7));
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );
@@ -528,8 +529,6 @@ void MainWindow::finalize()
 		connect( subWindow, SIGNAL(windowStateChanged(Qt::WindowStates,Qt::WindowStates)), this, SLOT(resetWindowTitle()));
 	}
 }
-
-
 
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
@@ -943,12 +942,6 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 		parent->hide();
 		refocus();
 	}
-
-	// Workaround for Qt Bug #260116
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 }
 
 
@@ -1098,13 +1091,7 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	auto qa = new QAction(tr("Volume as dBFS"), this);
-	qa->setData("displaydbfs");
-	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
-	m_viewMenu->addAction(qa);
-
-	qa = new QAction(tr( "Smooth scroll" ), this);
+	auto qa = new QAction(tr("Smooth scroll"), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
@@ -1134,12 +1121,7 @@ void MainWindow::updateConfig( QAction * _who )
 	QString tag = _who->data().toString();
 	bool checked = _who->isChecked();
 
-	if( tag == "displaydbfs" )
-	{
-		ConfigManager::inst()->setValue( "app", "displaydbfs",
-						 QString::number(checked) );
-	}
-	else if ( tag == "tooltips" )
+	if (tag == "tooltips")
 	{
 		ConfigManager::inst()->setValue( "tooltips", "disabled",
 						 QString::number(!checked) );
@@ -1610,5 +1592,74 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
+
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
+	QMdiArea(parent),
+	m_isBeingMoved(false),
+	m_lastX(0),
+	m_lastY(0)
+{}
+
+void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+{
+	m_lastX = event->x();
+	m_lastY = event->y();
+	m_isBeingMoved = true;
+	setCursor(Qt::ClosedHandCursor);
+}
+
+void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+{
+	if (m_isBeingMoved == false) { return; }
+
+	int minXBoundary = window()->width() - 100;
+	int maxXBoundary = 100;
+	int minYBoundary = window()->height() - 100;
+	int maxYBoundary = 100;
+
+	int minX = minXBoundary;
+	int maxX = maxXBoundary;
+	int minY = minYBoundary;
+	int maxY = maxYBoundary;
+
+	auto subWindows = subWindowList();
+	for (auto* curWindow : subWindows)
+	{
+		if (curWindow->isVisible())
+		{
+			minX = std::min(minX, curWindow->x());
+			maxX = std::max(maxX, curWindow->x() + curWindow->width());
+			minY = std::min(minY, curWindow->y());
+			maxY = std::max(maxY, curWindow->y() + curWindow->height());
+		}
+	}
+
+	int scrollX = m_lastX - event->x();
+	int scrollY = m_lastY - event->y();
+
+	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
+	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
+	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
+	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
+
+	for (auto* curWindow : subWindows)
+	{
+		// if widgets are maximized, then they shouldn't be moved
+		// moving a maximized window's normalGeometry is not implemented because of difficulties
+		if (curWindow->isMaximized() == false)
+		{
+			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
+		}
+	}
+
+	m_lastX = event->x();
+	m_lastY = event->y();
+}
+
+void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+{
+	setCursor(Qt::ArrowCursor);
+	m_isBeingMoved = false;
+}
 
 } // namespace lmms::gui
