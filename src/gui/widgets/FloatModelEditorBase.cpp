@@ -46,14 +46,25 @@ namespace lmms::gui
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 QString FloatModelEditorBase::m_shortcutMessage = "";
-std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::s_shortcutArray =
+std::vector<ActionStruct> FloatModelEditorBase::s_actionArray =
 {
+	//ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType);
+
+	ActionStruct(QString(tr("Copy value")), QString(tr("Copy value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
+	ActionStruct(QString(tr("Link widget")), QString(tr("Link widget")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
+	ActionStruct(QString(tr("Paste value")), QString(tr("Paste value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::FloatValue),
+	ActionStruct(QString(tr("Increase value")), QString(tr("Increase value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
+	ActionStruct(QString(tr("Decrease value")), QString(tr("Decrease value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
+	ActionStruct(QString(tr("Unlink widget")), QString(tr("Unlink widget")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any)
+
+	/*
 	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
 	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
 	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false),
 	InteractiveModelView::ModelShortcut(Qt::Key_E, Qt::ShiftModifier, 0, QString(tr("Increase value")), false),
 	InteractiveModelView::ModelShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, QString(tr("Decrease value")), false),
 	InteractiveModelView::ModelShortcut(Qt::Key_U, Qt::ControlModifier, 0, QString(tr("Unlink widget")), false)
+	*/
 };
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
@@ -78,6 +89,13 @@ void FloatModelEditorBase::initUi(const QString & name)
 	if (m_shortcutMessage == "")
 	{
 		m_shortcutMessage = buildShortcutMessage();
+		s_actionArray[0].setShortcut(Qt::Key_C, Qt::ControlModifier, 0, false);
+		s_actionArray[1].setShortcut(Qt::Key_C, Qt::ControlModifier, 1, false);
+		s_actionArray[2].setShortcut(Qt::Key_V, Qt::ControlModifier, 0, false);
+		s_actionArray[2].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink);
+		s_actionArray[3].setShortcut(Qt::Key_E, Qt::ShiftModifier, 0, false);
+		s_actionArray[4].setShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, false);
+		s_actionArray[5].setShortcut(Qt::Key_U, Qt::ControlModifier, 0, false);
 	}
 
 	setWindowTitle(name);
@@ -291,11 +309,7 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	drawAutoHighlight(&p);
 }
 
-const std::vector<InteractiveModelView::ModelShortcut>& FloatModelEditorBase::getShortcuts()
-{
-	return s_shortcutArray;
-}
-
+/*
 void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
 {
 	switch (shortcutLocation)
@@ -324,17 +338,15 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 			break;
 	}
 }
+*/
 
-QString FloatModelEditorBase::getShortcutMessage()
-{
-	return m_shortcutMessage;
-}
-
+/*
 bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::DataType dataType)
 {
 	return dataType == Clipboard::DataType::FloatValue
 		|| dataType == Clipboard::DataType::AutomatableModelLink;
 }
+*/
 
 bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
