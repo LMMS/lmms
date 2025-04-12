@@ -62,8 +62,11 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
 
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	// InteractiveModelView methods
+	const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
+	QString getShortcutMessage() override { return m_shortcutMessage; }
 	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
+	size_t getTypeId() { return typeid(*this).hash_code(); }
 
 private:
 	SampleClip * m_clip;
@@ -71,6 +74,9 @@ private:
 	QPixmap m_paintPixmap;
 	long m_paintPixmapXPosition;
 	bool splitClip( const TimePos pos ) override;
+	
+	static QString m_shortcutMessage;
+	static std::vector<ActionStruct> s_actionArray;
 } ;
 
 

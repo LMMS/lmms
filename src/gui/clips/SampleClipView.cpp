@@ -43,6 +43,9 @@ namespace lmms::gui
 {
 
 
+QString SampleClipView::m_shortcutMessage = "";
+std::vector<ActionStruct> SampleClipView::s_actionArray = {};
+
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
@@ -58,6 +61,18 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+
+	if (m_shortcutMessage == "")
+	{
+		s_actionArray = ClipView::getActions();
+		if (s_actionArray.size() > 2)
+		{
+			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
+			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::SampleFile);
+			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::SampleData);
+		}
+		m_shortcutMessage = buildShortcutMessage();
+	}
 }
 
 void SampleClipView::updateSample()
@@ -341,13 +356,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.end();
 
 	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
-}
-
-bool SampleClipView::canAcceptClipboardData(Clipboard::DataType dataType)
-{
-	return dataType == Clipboard::DataType::SampleFile
-		|| dataType == Clipboard::DataType::SampleData
-		|| ClipView::canAcceptClipboardData(dataType);
 }
 
 bool SampleClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
