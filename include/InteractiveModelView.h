@@ -50,9 +50,21 @@ class SimpleTextFloat;
 
 struct ActionStruct
 {
+	/*
+	* actionName: short string that will be displayed (in shortcuts and context menus)
+	* actionHint: description of the action
+	* doFn: what function should run if this action is triggered
+	* undoFn: what function should run if this action is undone
+	* isTypeSpecific: if the action can not be performed with other kinds of widgets (example for false: delete action)
+	* acceptedType: what kind of datatype does this action accept, use `Clipboard::DataType::Ignore` if datatype doesn't matter, use `Clipboard::DataType::Error` to later define the datatype
+	*/
 	ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType);
 	ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::FloatActionFn doFn, GuiAction::FloatActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType);
+	ActionStruct() { resetShortcut(); }
+	//! sets the shortcut and isShortcut will be true
 	void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop);
+	//! use this to add more datatypes to an action `Clipboard::DataType::Error` will not be added
+	void addAcceptedDataType(Clipboard::DataType type);
 	//! display name
 	QString actionName = "";
 	//! hint or description
@@ -64,12 +76,12 @@ struct ActionStruct
 	GuiAction::FloatActionFn doFloatFn = nullptr;
 	GuiAction::FloatActionFn undoFloatFn = nullptr;
 
-	//! if the action can not be performed with other kinds of widgets (example for false: delete)
+	//! if the action can not be performed with other kinds of widgets (example for false: delete action)
 	bool isTypeSpecific = true;
 	bool isShortcut = false;
 
 	//! what kind of data does this action accept
-	Clipboard::DataType acceptedType = Clipboard::DataType::Any;
+	std::vector<Clipboard::DataType> acceptedType = {Clipboard::DataType::Any};
 
 	// shortcut logic
 	Qt::Key key = Qt::Key_F35;
@@ -78,15 +90,19 @@ struct ActionStruct
 	size_t times = 0;
 	//! should it loop back if m_times is reached
 	bool isLoop = false;
-	
+
+	//! resets the shortcut and isShortcut will be false
 	void resetShortcut();
 	
 	bool doesShortcutMatch(QKeyEvent* event) const;
 	bool doesShortcutMatch(const ActionStruct& otherShortcut) const;
 	bool doesFullShortcutMatch(const ActionStruct& otherShortcut) const;
-	bool doesTypeMatch(Clipboard::DataType type);
+	//! true if `type` is in `acceptedType`, isn't true if `acceptedType` has `Clipboard::DataType::Any`
+	bool doesTypeMatch(Clipboard::DataType type) const;
+	//! true if `type` is in `acceptedType`, true if `acceptedType` has `Clipboard::DataType::Any`
+	bool isTypeAccepted(Clipboard::DataType type) const;
 	bool doesActionMatch(const ActionStruct& otherAction) const;
-}
+};
 
 
 class LMMS_EXPORT InteractiveModelView : public QWidget
@@ -125,7 +141,7 @@ protected:
 	//! TODO
 	void doAction(size_t actionIndex);
 	void doAction(size_t actionIndex, const std::vector<ActionStruct>& actions);
-	static doActions(size_t actionIndex, const std::vector<InteractiveModelView*> widgets, const std::vector<ActionStruct>& actions);
+	static void doActions(size_t actionIndex, const std::vector<InteractiveModelView*> widgets, const std::vector<ActionStruct>& actions);
 	//! called when a shortcut message needs to be displayed
 	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
 	virtual QString getShortcutMessage() = 0;
@@ -135,14 +151,17 @@ protected:
 	virtual bool processPasteImplementation(Clipboard::DataType type, QString& value) = 0;
 	//! calls `processPasteImplementation()` to process paste
 	bool processPaste(const QMimeData* mimeData);
+
 	//! override this if the widget requires custom updating code
+	//! shouldOverrideUpdate: should `update()` widget if `isHighlighted` didn't changed but for example color changed
 	virtual void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
+	virtual size_t getTypeId();
 	
 	
 	//! called when a shortcut from `getActions()` is pressed
-	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
+	//virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
 	//! returns true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
-	virtual bool canAcceptClipboardData(Clipboard::DataType dataType) = 0;
+	//virtual bool canAcceptClipboardData(Clipboard::DataType dataType) = 0;
 	
 
 	//! draws the highlight automatically for the widget if highlighted

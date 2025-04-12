@@ -25,6 +25,7 @@
 #include "InteractiveModelView.h"
 
 #include <algorithm>
+#include <cassert>
 
 #include <QKeyEvent>
 #include <QKeySequence> // displaying qt key names
@@ -54,7 +55,7 @@ InteractiveModelView::InteractiveModelView(QWidget* widget) :
 {
 	s_interactiveWidgets.push_back(this);
 
-	m_lastShortcut.reset();
+	m_lastShortcut.resetShortcut();
 }
 
 InteractiveModelView::~InteractiveModelView()
@@ -77,9 +78,18 @@ void InteractiveModelView::startHighlighting(Clipboard::DataType dataType)
 
 	bool shouldOverrideUpdate = *s_usedHighlightColor != *s_highlightColor;
 	if (shouldOverrideUpdate) { s_usedHighlightColor = std::make_unique<QColor>(*s_highlightColor); }
+
+	// highlighting the widgets that accept the data type
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		(*it)->overrideSetIsHighlighted((*it)->canAcceptClipboardData(dataType), shouldOverrideUpdate);
+		bool found = false;
+		const std::vector<ActionStruct>& actions = (*it)->getActions();
+		// this could be optimized by logging `getTypeId()`s and comparing it's Id to the already accepted Ids
+		for (auto& curAction : actions)
+		{
+			if (curAction.doesTypeMatch(dataType)) { found = true; break; }
+		}
+		(*it)->overrideSetIsHighlighted(found, shouldOverrideUpdate);
 	}
 	s_highlightTimer->start(10000);
 }
@@ -152,7 +162,7 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 =======
 	qDebug("HandleKeyPress 1");
 	std::cout << "InteractiveModelView::HandleKeyPress this:" << this << "\n";
-	std::vector<ActionStruct>& actions(getActions());
+	const std::vector<ActionStruct>& actions = getActions();
 	qDebug("HandleKeyPress 2");
 >>>>>>> f0d9b5a58 (InteractiveModelView_moving_to_actions)
 	
@@ -187,7 +197,7 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 				// or finding the shortcut where m_lastShortcutCounter == actions[i].times 
 				if (m_lastShortcutCounter == actions[i].times)
 				{
-					m_lastShortcutCounter = actions[i].shouldLoop ? 0 : m_lastShortcutCounter + 1;
+					m_lastShortcutCounter = actions[i].isLoop ? 0 : m_lastShortcutCounter + 1;
 					foundIndex = i;
 					break;
 				}
@@ -239,7 +249,7 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 		processShortcutPressed(foundIndex, event);
 =======
 		qDebug("HandleKeyPress 9");
-		QString message = actions[foundIndex].shortcutName;
+		QString message = actions[foundIndex].actionName;
 		qDebug("HandleKeyPress 10");
 		showMessage(message);
 		qDebug("HandleKeyPress 11");
@@ -273,7 +283,7 @@ void InteractiveModelView::keyPressEvent(QKeyEvent* event)
 void InteractiveModelView::enterEvent(QEvent* event)
 {
 	m_lastShortcutCounter = 0;
-	m_lastShortcut.reset();
+	m_lastShortcut.resetShortcut();
 
 	QString message = getShortcutMessage();
 	showMessage(message);
@@ -313,8 +323,8 @@ void InteractiveModelView::doAction(size_t actionIndex, const std::vector<Action
 {
 	if (actionIndex > actions.size()) { return; }
 	// if the action accepts the current clipboard data
-	// Clipboard::DataType::Any will accept anything
-	if (actions[actionIndex].doesTypeMatch(Clipboard::decodeKey(Clipboard::getMimeData()))) { return; }
+	// `Clipboard::DataType::Any` will accept anything
+	if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData()))) { return; }
 
 	// check for data type
 	// check for type specific
@@ -322,18 +332,24 @@ void InteractiveModelView::doAction(size_t actionIndex, const std::vector<Action
 	if (actions[actionIndex].doFn != nullptr)
 	{
 		//undoStack->push(new GuiAction(actions[actionIndex].name, this, actions[actionIndex].doFn, actions[actionIndex].undoFn, 0));
-		(*this.*actions[actionIndex].doFn)();
+		(*actions[actionIndex].doFn)(this);
 	}
 	else
 	{
 		//undoStack->push(new GuiAction(actions[actionIndex].name, this, actions[actionIndex].doFloatFn, actions[actionIndex].undoFloatFn, 0.0f, 0.0f));
-		(*this.*actions[actionIndex].doFn)(0, 0);
+		(*actions[actionIndex].doFloatFn)(this, 0.0f, 0.0f);
 	}
 }
 
 void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
 {
 	setIsHighlighted(isHighlighted, shouldOverrideUpdate);
+}
+
+size_t InteractiveModelView::getTypeId()
+{
+	// could be replaced by typenames, but then constructing
+	return typeid(*this).hash_code();
 }
 
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
@@ -355,7 +371,7 @@ void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 QString InteractiveModelView::buildShortcutMessage()
 {
 	QString message = "";
-	std::vector<ActionStruct>& actions(getActions());
+	const std::vector<ActionStruct>& actions = getActions();
 	for (size_t i = 0; i < actions.size(); i++)
 	{
 		if (actions[i].isShortcut == true)
@@ -367,7 +383,7 @@ QString InteractiveModelView::buildShortcutMessage()
 				message = message + QString(" (x") + QString::number(actions[i].times + 1) + QString(")");
 			}
 			message = message + QString("\": ")
-				+ actions[i].shortcutDescription;
+				+ actions[i].actionName;
 			if (i + 1 < actions.size())
 			{
 				message = message + QString(", ");
@@ -394,44 +410,54 @@ void InteractiveModelView::setIsHighlighted(bool isHighlighted, bool shouldOverr
 	}
 }
 
-ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific) :
+ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
 	actionName(actionName),
-	actionHing(actionHing),
+	actionHint(actionHint),
 	doFn(doFn),
 	undoFn(undoFn),
 	doFloatFn(nullptr),
 	undoFloatFn(nullptr),
-	isTypeSpecific(isTypeSpecific)
+	isTypeSpecific(isTypeSpecific),
 	isShortcut(false)
-{}
+{
+	addAcceptedDataType(acceptedType);
+}
 
-ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::FloatActionFn doFn, GuiAction::FloatActionFn undoFn, bool isTypeSpecific)
-{}
+ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::FloatActionFn doFn, GuiAction::FloatActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
 	actionName(actionName),
-	actionHing(actionHing),
+	actionHint(actionHint),
 	doFn(nullptr),
 	undoFn(nullptr),
 	doFloatFn(doFn),
 	undoFloatFn(undoFn),
-	isTypeSpecific(isTypeSpecific)
-	isShortcut(false),
-	
-{}
-
-void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop)
+	isTypeSpecific(isTypeSpecific),
+	isShortcut(false)
 {
+	addAcceptedDataType(acceptedType);
+}
+
+void ActionStruct::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop)
+{
+	isShortcut = true;
 	key = shortcutKey;
 	modifier = shortcutModifier;
 	times = shortcutTimes;
 	isLoop = isShortcutLoop;
 }
 
+void ActionStruct::addAcceptedDataType(Clipboard::DataType type)
+{
+	if (type == Clipboard::DataType::Error) { return; }
+	acceptedType.push_back(type);
+}
+
 void ActionStruct::resetShortcut()
 {
+	isShortcut = false;
 	key = Qt::Key_F35;
 	modifier = Qt::NoModifier;
 	times = 0;
-	shouldLoop = false;
+	isLoop = false;
 }
 
 bool ActionStruct::doesShortcutMatch(QKeyEvent* event) const
@@ -443,17 +469,30 @@ bool ActionStruct::doesShortcutMatch(QKeyEvent* event) const
 
 bool ActionStruct::doesShortcutMatch(const ActionStruct& otherShortcut) const
 {
-	return isShortcut && key == ohterShortcut.key && (modifier & ohterShortcut.modifier) && times == otherShortcut.times;
+	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier) && times == otherShortcut.times;
 }
 
 bool ActionStruct::doesFullShortcutMatch(const ActionStruct& otherShortcut) const
 {
-	return isShortcut && key == ohterShortcut.key && (modifier & ohterShortcut.modifier) && times == otherShortcut.times && isLoop == otherShortcut.isLoop;
+	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier) && times == otherShortcut.times && isLoop == otherShortcut.isLoop;
 }
 
-bool ActionStruct::doesTypeMatch(Clipboard::DataType type)
+bool ActionStruct::doesTypeMatch(Clipboard::DataType type) const
 {
-	return acceptedType == Clipboard::DataType::Any || acceptedType == type;
+	for (Clipboard::DataType curType : acceptedType)
+	{
+		if (curType == type) { return true; }
+	}
+	return false;
+}
+
+bool ActionStruct::isTypeAccepted(Clipboard::DataType type) const
+{
+	for (Clipboard::DataType curType : acceptedType)
+	{
+		if (curType == Clipboard::DataType::Any || curType == type) { return true; }
+	}
+	return false;
 }
 
 bool ActionStruct::doesActionMatch(const ActionStruct& otherAction) const
