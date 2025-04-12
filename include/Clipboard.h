@@ -48,8 +48,10 @@ namespace Clipboard
 	
 	enum DataType
 	{
-		None, //!< only use for error handling
-		Any, //!< use for any type of data
+		Error, //!< only use for error handling
+		All, //!< use if all kinds of data is accepted (used by actions)
+		Any, //!< use if the data type is ignored when parsing (used by actions)
+	
 		FloatValue,
 		AutomatableModelLink,
 		Instrument,

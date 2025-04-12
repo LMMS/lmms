@@ -71,6 +71,8 @@ namespace lmms::Clipboard
 	{
 		switch (type)
 		{
+			case DataType::All:
+				return QString("All");
 			case DataType::Any:
 				return QString("Any");
 			case DataType::FloatValue:
@@ -118,7 +120,7 @@ namespace lmms::Clipboard
 			default:
 				break;
 		};
-		return QString("None_error");
+		return QString("Error");
 	}
 
 
@@ -144,7 +146,7 @@ namespace lmms::Clipboard
 				return static_cast<DataType>(i);
 			}
 		}
-		return DataType::None;
+		return DataType::Error;
 	}
 
 
