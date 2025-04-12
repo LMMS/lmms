@@ -33,14 +33,13 @@ namespace lmms::gui
 
 class InteractiveModelView;
 
-typedef void (*ActionFn)();
-typedef void (*FloatActionFn)(float, float);
-
 //template<typename BaseType>
 class LMMS_EXPORT GuiAction : public QUndoCommand
 {
 public:
-	using 
+	typedef void (*ActionFn)(InteractiveModelView*);
+	typedef void (*FloatActionFn)(InteractiveModelView*, float, float);
+
 	GuiAction(const QString& name, InteractiveModelView* object, ActionFn doFn, ActionFn undoFn, size_t runAmount);
 	GuiAction(const QString& name, InteractiveModelView* object, FloatActionFn doFn, FloatActionFn undoFn, float valueA, float valueB);
 	~GuiAction();
