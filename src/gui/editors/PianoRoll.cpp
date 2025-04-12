@@ -769,7 +769,7 @@ void PianoRoll::cutOverlappingNotes()
 
 
 
-bool fillGapsBetweenNotesInVector(
+static bool fillGapsBetweenNotesInVector(
 	const NoteVector& notes,
 	bool onlyEditSelected)
 {
