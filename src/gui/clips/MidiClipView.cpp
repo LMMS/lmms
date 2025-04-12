@@ -48,6 +48,9 @@ namespace lmms::gui
 
 constexpr int BeatStepButtonOffset = 4;
 
+QString MidiClipView::m_shortcutMessage = "";
+std::vector<ActionStruct> MidiClipView::s_actionArray = {};
+
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
 	m_clip( clip ),
@@ -62,6 +65,16 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
 			this, SLOT(update()));
 	update();
+
+	if (m_shortcutMessage == "")
+	{
+		s_actionArray = ClipView::getActions();
+		if (s_actionArray.size() > 2)
+		{
+			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
+		}
+		m_shortcutMessage = buildShortcutMessage();
+	}
 
 	setStyle( QApplication::style() );
 }

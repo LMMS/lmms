@@ -85,6 +85,10 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void wheelEvent( QWheelEvent * _we ) override;
 
+	// InteractiveModelView methods
+	const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
+	QString getShortcutMessage() override { return m_shortcutMessage; }
+	size_t getTypeId() { return typeid(*this).hash_code(); }
 
 private:
 	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
@@ -103,6 +107,9 @@ private:
 	QStaticText m_staticTextName;
 
 	bool m_legacySEPattern;
+	
+	static QString m_shortcutMessage;
+	static std::vector<ActionStruct> s_actionArray;
 } ;
 
 
