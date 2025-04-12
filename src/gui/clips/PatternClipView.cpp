@@ -38,6 +38,8 @@
 namespace lmms::gui
 {
 
+QString PatternClipView::m_shortcutMessage = "";
+std::vector<ActionStruct> PatternClipView::s_actionArray = {};
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
@@ -46,6 +48,16 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 {
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
 			this, SLOT(update()));
+
+	if (m_shortcutMessage == "")
+	{
+		s_actionArray = ClipView::getActions();
+		if (s_actionArray.size() > 2)
+		{
+			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
+		}
+		m_shortcutMessage = buildShortcutMessage();
+	}
 
 	setStyle( QApplication::style() );
 }

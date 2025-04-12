@@ -53,6 +53,10 @@ protected slots:
 	void resetName();
 	void changeName();
 
+	// InteractiveModelView methods
+	const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
+	QString getShortcutMessage() override { return m_shortcutMessage; }
+	size_t getTypeId() { return typeid(*this).hash_code(); }
 
 protected:
 	void paintEvent( QPaintEvent * pe ) override;
@@ -65,6 +69,9 @@ private:
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
+	
+	static QString m_shortcutMessage;
+	static std::vector<ActionStruct> s_actionArray;
 } ;
 
 
