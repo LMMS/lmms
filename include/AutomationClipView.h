@@ -68,21 +68,21 @@ protected:
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 	
-	const std::vector<ModelShortcut>& getShortcuts() override;
-	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
-	QString getShortcutMessage() override;
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	// InteractiveModelView methods
+	const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
+	QString getShortcutMessage() override { return m_shortcutMessage; }
 	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
+	size_t getTypeId() { return typeid(*this).hash_code(); }
 
 private:
 	AutomationClip * m_clip;
 	QPixmap m_paintPixmap;
 	
-	static QString m_shortcutMessage;
-	static std::vector<InteractiveModelView::ModelShortcut> s_shortcutArray;
-	
 	QStaticText m_staticTextName;
 	void scaleTimemapToFit( float oldMin, float oldMax );
+	
+	static QString m_shortcutMessage;
+	static std::vector<ActionStruct> s_actionArray;
 } ;
 
 

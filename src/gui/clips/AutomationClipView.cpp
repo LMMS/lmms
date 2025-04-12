@@ -45,7 +45,7 @@ namespace lmms::gui
 {
 
 QString AutomationClipView::m_shortcutMessage = "";
-std::vector<InteractiveModelView::ModelShortcut> AutomationClipView::s_shortcutArray = {};
+std::vector<ActionStruct> AutomationClipView::s_actionArray = {};
 
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
@@ -60,8 +60,15 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 	if (m_shortcutMessage == "")
 	{
-		s_shortcutArray = ClipView::getShortcuts();
-		s_shortcutArray.emplace_back(Qt::Key_F, Qt::ControlModifier, 0, QString(tr("Open in Automation editor")), false);
+		s_actionArray = ClipView::getActions();
+		if (s_actionArray.size() > 2)
+		{
+			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
+			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink);
+		}
+		s_actionArray.emplace_back(ActionStruct(QString(tr("Open in editor")), QString(tr("Open in Automation editor")), GuiAction::ActionFn(nullptr), nullptr, true, Clipboard::DataType::Any));
+		s_actionArray[s_actionArray.size() - 1].setShortcut(Qt::Key_F, Qt::ControlModifier, 0, false);
+
 		m_shortcutMessage = buildShortcutMessage();
 	}
 
@@ -212,11 +219,7 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	}
 }
 
-const std::vector<InteractiveModelView::ModelShortcut>& AutomationClipView::getShortcuts()
-{
-	return s_shortcutArray;
-}
-
+/*
 void AutomationClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
 {
 	switch (shortcutLocation)
@@ -229,16 +232,7 @@ void AutomationClipView::processShortcutPressed(size_t shortcutLocation, QKeyEve
 			break;
 	}
 }
-
-QString AutomationClipView::getShortcutMessage()
-{
-	return m_shortcutMessage;
-}
-
-bool AutomationClipView::canAcceptClipboardData(Clipboard::DataType dataType)
-{
-	return dataType == Clipboard::DataType::AutomatableModelLink || ClipView::canAcceptClipboardData(dataType);
-}
+*/
 
 bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
