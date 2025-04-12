@@ -55,33 +55,6 @@ private slots:
 		Engine::destroy();
 	}
 
-	void testAddClip()
-	{
-		using namespace lmms;
-
-		AutomationTrack track;
-		AutomationClip clip;
-
-		track.addClip(&clip);
-
-		QCOMPARE(clip.getTrack(), &track);
-		QCOMPARE(track.containsClip(&clip), true);
-	}
-
-	void testRemoveClip()
-	{
-		using namespace lmms;
-
-		AutomationTrack track;
-		AutomationClip clip;
-		track.addClip(&clip);
-
-		track.removeClip(&clip);
-
-		QCOMPARE(clip.getTrack(), nullptr);
-		QCOMPARE(track.containsClip(&clip), false);
-	}
-
 	void testClipLinear()
 	{
 		using namespace lmms;

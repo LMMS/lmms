@@ -125,7 +125,6 @@ public:
 	int numOfClips();
 	auto getClip(std::size_t clipNum) -> Clip*;
 	int getClipNum(const Clip* clip );
-	bool containsClip(const Clip* clip) { return std::find(m_clips.begin(), m_clips.end(), clip) != m_clips.end(); }
 
 	const clipVector & getClips() const
 	{
