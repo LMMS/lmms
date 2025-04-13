@@ -262,9 +262,10 @@ int main( int argc, char * * argv )
 	bool renderTracks = false;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
+	QApplication* temporaryApp = new QApplication(argc, argv);
 	ConfigManager::inst()->loadConfigFile(configFile);
-
 	qputenv("QT_SCALE_FACTOR", ConfigManager::inst()->value("app", "uiscalefactor", "1").toUtf8());
+	delete temporaryApp;
 
 	// first of two command-line parsing stages
 	for (int i = 1; i < argc; ++i)
