@@ -25,6 +25,7 @@
 
 #include "UndoRedoMenu.h"
 
+#include <QApplication>
 #include <QContextMenuEvent>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -123,6 +124,7 @@ void UndoRedoTreeWidget::applyUndoRedoEntry(QTreeWidgetItem * item, int column)
 	{
 		if (isUndo) { Engine::projectJournal()->undo(); }
 		else { Engine::projectJournal()->redo(); }
+		QApplication::processEvents();
 	}
 }
 
