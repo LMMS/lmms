@@ -277,9 +277,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_UIScaleFactorSlider->setTickPosition(QSlider::TicksBelow);
 
 	connect(m_UIScaleFactorSlider, &QSlider::valueChanged,
-			this, &ConfigManager::UIScaleFactorChanged);
+			this, &SetupDialog::UIScaleFactorChanged);
 	connect(m_UIScaleFactorSlider, &QSlider::valueChanged,
-			this, &ConfigManager::showRestartWarning);
+			this, &SetupDialog::showRestartWarning);
 	guiGroupLayout->addWidget(m_UIScaleFactorSlider);
 
 	m_UIScaleFactorLbl = new QLabel(QString("%1%").arg(m_UIScaleFactor * 100), guiGroupBox);
