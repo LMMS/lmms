@@ -229,24 +229,25 @@ void FileBrowser::onSearch(const QString& filter)
 			for (const auto& path : directories)
 			{
 				const auto extensionFilters = FileItem::defaultFilters().split(" ");
-				auto dirIt = QDirIterator{path, extensionFilters, directoryFilters,
+				auto dirIt = QDirIterator{path, directoryFilters,
 					QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
 
 				while (dirIt.hasNext() && !m_searchManager.cancelled())
 				{
 					const auto fileInfo = QFileInfo{dirIt.next()};
 					const auto fileName = fileInfo.fileName();
+
 					const auto containsAllKeywords = std::all_of(keywords.begin(), keywords.end(),
 						[&](const auto& keyword) { return fileName.contains(keyword, Qt::CaseInsensitive); });
 
-					if (!containsAllKeywords) { continue; }
+					const auto validDir = fileInfo.isDir() && containsAllKeywords;
+					const auto validFile = fileInfo.isFile() && containsAllKeywords
+						&& extensionFilters.contains(QString{"*.%1"}.arg(fileInfo.completeSuffix()));
 
 					auto item = static_cast<QTreeWidgetItem*>(nullptr);
-					if (fileInfo.isDir())
-					{
-						item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter);
-					}
-					else if (fileInfo.isFile()) { item = new FileItem(fileInfo.fileName(), fileInfo.dir().path()); }
+					if (validDir) { item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter); }
+					else if (validFile) { item = new FileItem(fileInfo.fileName(), fileInfo.dir().path()); }
+					else { continue; }
 
 					QMetaObject::invokeMethod(
 						m_searchTreeWidget, [this, item] { m_searchTreeWidget->addTopLevelItem(item); });
