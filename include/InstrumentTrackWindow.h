@@ -27,6 +27,7 @@
 
 #include <QWidget>
 
+#include "AutomatableButton.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
 #include "PluginView.h"
@@ -34,6 +35,7 @@
 class QLabel;
 class QLineEdit;
 class QWidget;
+class QMdiSubWindow;
 
 namespace lmms
 {
@@ -134,6 +136,9 @@ private:
 	//! required to keep the old look when using a variable sized tab widget
 	void adjustTabSize(QWidget *w);
 
+	QMdiSubWindow* findSubWindowInParents();
+	void updateSubWindow();
+
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
 
@@ -143,6 +148,8 @@ private:
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
