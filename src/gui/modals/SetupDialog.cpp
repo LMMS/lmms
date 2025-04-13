@@ -119,6 +119,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
+	m_UIScaleFactor(ConfigManager::inst()->value(
+		"app", "uiscalefactor", "1.0").toFloat()),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -267,6 +269,21 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
+
+	guiGroupLayout->addWidget(new QLabel{tr("UI Scale Factor"), guiGroupBox});
+	m_UIScaleFactorSlider = new QSlider(Qt::Horizontal, guiGroupBox);
+	m_UIScaleFactorSlider->setRange(100, 300);
+	m_UIScaleFactorSlider->setValue(m_UIScaleFactor * 100);
+	m_UIScaleFactorSlider->setTickPosition(QSlider::TicksBelow);
+
+	connect(m_UIScaleFactorSlider, &QSlider::valueChanged,
+			this, &ConfigManager::UIScaleFactorChanged);
+	connect(m_UIScaleFactorSlider, &QSlider::valueChanged,
+			this, &ConfigManager::showRestartWarning);
+	guiGroupLayout->addWidget(m_UIScaleFactorSlider);
+
+	m_UIScaleFactorLbl = new QLabel(QString("%1%").arg(m_UIScaleFactor * 100), guiGroupBox);
+	guiGroupLayout->addWidget(m_UIScaleFactorLbl);
 
 	generalControlsLayout->addWidget(guiGroupBox);
 
@@ -982,6 +999,8 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
+	ConfigManager::inst()->setValue("app", "uiscalefactor",
+					QString::number(m_UIScaleFactor));
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
@@ -1123,6 +1142,12 @@ void SetupDialog::toggleOpenLastProject(bool enabled)
 void SetupDialog::loopMarkerModeChanged()
 {
 	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
+}
+
+void SetupDialog::UIScaleFactorChanged()
+{
+	m_UIScaleFactor = m_UIScaleFactorSlider->value() * 0.01f;
+	m_UIScaleFactorLbl->setText(QString("%1%").arg(m_UIScaleFactor * 100));
 }
 
 
