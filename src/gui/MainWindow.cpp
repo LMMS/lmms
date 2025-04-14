@@ -179,8 +179,8 @@ MainWindow::MainWindow() :
 	}
 
 	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
-	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
@@ -942,6 +942,12 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 		parent->hide();
 		refocus();
 	}
+
+	// Workaround for Qt Bug #260116
+	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 }
 
 
@@ -1091,7 +1097,13 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	auto qa = new QAction(tr("Smooth scroll"), this);
+	auto qa = new QAction(tr("Volume as dBFS"), this);
+	qa->setData("displaydbfs");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
+	m_viewMenu->addAction(qa);
+
+	qa = new QAction(tr( "Smooth scroll" ), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
@@ -1121,7 +1133,12 @@ void MainWindow::updateConfig( QAction * _who )
 	QString tag = _who->data().toString();
 	bool checked = _who->isChecked();
 
-	if (tag == "tooltips")
+	if( tag == "displaydbfs" )
+	{
+		ConfigManager::inst()->setValue( "app", "displaydbfs",
+						 QString::number(checked) );
+	}
+	else if ( tag == "tooltips" )
 	{
 		ConfigManager::inst()->setValue( "tooltips", "disabled",
 						 QString::number(!checked) );
@@ -1592,7 +1609,6 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
-
 MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
 	QMdiArea(parent),
 	m_isBeingMoved(false),
@@ -1612,48 +1628,18 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_isBeingMoved == false) { return; }
 
-	int minXBoundary = window()->width() - 100;
-	int maxXBoundary = 100;
-	int minYBoundary = window()->height() - 100;
-	int maxYBoundary = 100;
 
-	int minX = minXBoundary;
-	int maxX = maxXBoundary;
-	int minY = minYBoundary;
-	int maxY = maxYBoundary;
-
-	auto subWindows = subWindowList();
-	for (auto* curWindow : subWindows)
+	if (m_lastX != event->x())
 	{
-		if (curWindow->isVisible())
-		{
-			minX = std::min(minX, curWindow->x());
-			maxX = std::max(maxX, curWindow->x() + curWindow->width());
-			minY = std::min(minY, curWindow->y());
-			maxY = std::max(maxY, curWindow->y() + curWindow->height());
-		}
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_lastX - event->x());
+		m_lastX = event->x();
 	}
 
-	int scrollX = m_lastX - event->x();
-	int scrollY = m_lastY - event->y();
-
-	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
-	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
-	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
-	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
-
-	for (auto* curWindow : subWindows)
+	if (m_lastY != event->y())
 	{
-		// if widgets are maximized, then they shouldn't be moved
-		// moving a maximized window's normalGeometry is not implemented because of difficulties
-		if (curWindow->isMaximized() == false)
-		{
-			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
-		}
+		verticalScrollBar()->setValue(verticalScrollBar()->value() + m_lastY - event->y());
+		m_lastY = event->y();
 	}
-
-	m_lastX = event->x();
-	m_lastY = event->y();
 }
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
