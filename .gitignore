@@ -10,3 +10,4 @@
 /plugins/ZynAddSubFx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
 Brewfile.lock.json
+/.cache/
