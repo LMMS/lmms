@@ -11,3 +11,4 @@
 /data/locale/*.qm
 Brewfile.lock.json
 /.cache/
+compile_commands.json
