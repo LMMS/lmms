@@ -38,6 +38,7 @@ class PositionLine : public QWidget
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
 public:
 	PositionLine(QWidget* parent);
+	bool isRecording = false;
 
 public slots:
 	void zoomChange(float zoom);
