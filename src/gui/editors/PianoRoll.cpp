@@ -5288,8 +5288,6 @@ void PianoRollWindow::play()
 void PianoRollWindow::stop()
 {
 	m_editor->stop();
-
-	// this->m_editor->m_positionLine->isRecording = false;
 }
 
 
@@ -5300,8 +5298,6 @@ void PianoRollWindow::record()
 	stopStepRecording(); //step recording mode is mutually exclusive with other record modes
 
 	m_editor->record();
-
-	// this->m_editor->m_positionLine->isRecording = true;
 }
 
 
@@ -5312,7 +5308,6 @@ void PianoRollWindow::recordAccompany()
 	stopStepRecording(); //step recording mode is mutually exclusive with other record modes
 
 	m_editor->recordAccompany();
-	// this->m_editor->m_positionLine->isRecording = true;
 }
 
 
@@ -5541,7 +5536,6 @@ void PianoRollWindow::stopStepRecording()
 	{
 		m_editor->toggleStepRecording();
 		updateStepRecordingIcon();
-		this->m_editor->m_positionLine->isRecording = false;
 	}
 }
 
