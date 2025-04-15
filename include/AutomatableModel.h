@@ -317,6 +317,8 @@ public:
 		return m_useControllerValue;
 	}
 
+	static bool mustQuoteName(const QString &name);
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
@@ -338,7 +340,6 @@ protected:
 	//! doing your own calculations.
 	float fittedValue( float value ) const;
 
-
 private:
 	// dynamicCast implementation
 	template<class Target>
@@ -355,8 +356,6 @@ private:
 		const Target* result = nullptr;
 		void visit(const Target& tar) { result = &tar; }
 	};
-
-	static bool mustQuoteName(const QString &name);
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
