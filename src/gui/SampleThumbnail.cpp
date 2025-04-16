@@ -26,11 +26,11 @@
 #include "SampleThumbnail.h"
 
 #include <QDebug>
-#include <QFileInfo>
+
+#include "PathUtil.h"
 
 namespace {
-	constexpr auto MaxSampleThumbnailCacheSize = 32;
-	constexpr auto AggregationPerZoomStep = 10;
+constexpr auto AggregationPerZoomStep = 10;
 }
 
 namespace lmms {
@@ -69,39 +69,22 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
 }
 
-SampleThumbnail::SampleThumbnail(const Sample& sample)
+SampleThumbnail::SampleThumbnail(const QString& path)
 {
-	auto entry = SampleThumbnailEntry{sample.sampleFile(), QFileInfo{sample.sampleFile()}.lastModified()};
-	if (!entry.filePath.isEmpty())
+	const auto buffer = SampleBuffer::loadFromCache(path);
+	const auto fullResolutionWidth = buffer->size() * DEFAULT_CHANNELS;
+	m_thumbnails.emplace_back(&buffer->data()->left(), fullResolutionWidth, fullResolutionWidth);
+
+	while (m_thumbnails.back().width() >= AggregationPerZoomStep)
 	{
-		const auto it = s_sampleThumbnailCacheMap.find(entry);
-		if (it != s_sampleThumbnailCacheMap.end())
-		{
-			m_thumbnailCache = it->second;
-			return;
-		}
-
-		if (s_sampleThumbnailCacheMap.size() == MaxSampleThumbnailCacheSize)
-		{
-			const auto leastUsed = std::min_element(s_sampleThumbnailCacheMap.begin(), s_sampleThumbnailCacheMap.end(),
-				[](const auto& a, const auto& b) { return a.second.use_count() < b.second.use_count(); });
-			s_sampleThumbnailCacheMap.erase(leastUsed->first);
-		}
-
-		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
+		auto zoomedOutThumbnail = m_thumbnails.back().zoomOut(AggregationPerZoomStep);
+		m_thumbnails.emplace_back(std::move(zoomedOutThumbnail));
 	}
+}
 
-	if (!sample.buffer()) { throw std::runtime_error{"Cannot create a sample thumbnail with no buffer"}; }
-	if (sample.sampleSize() == 0) { return; }
-
-	const auto fullResolutionWidth = sample.sampleSize() * DEFAULT_CHANNELS;
-	m_thumbnailCache->emplace_back(&sample.buffer()->data()->left(), fullResolutionWidth, fullResolutionWidth);
-
-	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
-	{
-		auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(AggregationPerZoomStep);
-		m_thumbnailCache->emplace_back(std::move(zoomedOutThumbnail));
-	}
+SampleThumbnail::SampleThumbnail(const std::filesystem::path& path)
+	: SampleThumbnail(PathUtil::fsConvert(path))
+{
 }
 
 void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painter) const
@@ -117,10 +100,10 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	if (sampleRange <= 0 || sampleRange > 1) { return; }
 
 	const auto targetThumbnailWidth = static_cast<int>(static_cast<double>(sampleRect.width()) / sampleRange);
-	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
+	const auto finerThumbnail = std::find_if(m_thumbnails.rbegin(), m_thumbnails.rend(),
 		[&](const auto& thumbnail) { return thumbnail.width() >= targetThumbnailWidth; });
 
-	if (finerThumbnail == m_thumbnailCache->rend())
+	if (finerThumbnail == m_thumbnails.rend())
 	{
 		qDebug() << "Could not find closest finer thumbnail for a target width of" << targetThumbnailWidth;
 		return;
@@ -129,9 +112,12 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	const auto thumbnailBeginForward = std::max<int>(renderRect.x() - sampleRect.x(), static_cast<int>(parameters.sampleStart * targetThumbnailWidth));
-	const auto thumbnailEndForward = std::max<int>(renderRect.x() + renderRect.width() - sampleRect.x(), static_cast<int>(parameters.sampleEnd * targetThumbnailWidth));
-	const auto thumbnailBegin = parameters.reversed ? targetThumbnailWidth - thumbnailBeginForward - 1 : thumbnailBeginForward;
+	const auto thumbnailBeginForward = std::max<int>(
+		renderRect.x() - sampleRect.x(), static_cast<int>(parameters.sampleStart * targetThumbnailWidth));
+	const auto thumbnailEndForward = std::max<int>(renderRect.x() + renderRect.width() - sampleRect.x(),
+		static_cast<int>(parameters.sampleEnd * targetThumbnailWidth));
+	const auto thumbnailBegin
+		= parameters.reversed ? targetThumbnailWidth - thumbnailBeginForward - 1 : thumbnailBeginForward;
 	const auto thumbnailEnd = parameters.reversed ? targetThumbnailWidth - thumbnailEndForward : thumbnailEndForward;
 	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
 
@@ -139,10 +125,11 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	const auto yScale = drawRect.height() / 2 * parameters.amplification;
 
 	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
-		 ++x, i += advanceThumbnailBy)
+		++x, i += advanceThumbnailBy)
 	{
 		const auto beginAggregationAt = &(*finerThumbnail)[static_cast<int>(std::floor(i * finerThumbnailScaleFactor))];
-		const auto endAggregationAt = &(*finerThumbnail)[static_cast<int>(std::ceil((i + 1) * finerThumbnailScaleFactor))];
+		const auto endAggregationAt
+			= &(*finerThumbnail)[static_cast<int>(std::ceil((i + 1) * finerThumbnailScaleFactor))];
 		const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
 
 		const auto yMin = drawRect.center().y() - peak.min * yScale;
@@ -152,6 +139,11 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	}
 
 	painter.restore();
+}
+
+auto SampleThumbnail::loadFromCache(const QString& audioFile) -> std::shared_ptr<const SampleThumbnail>
+{
+	return s_fileCache.get(PathUtil::fsConvert(audioFile));
 }
 
 } // namespace lmms
