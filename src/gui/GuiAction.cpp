@@ -29,47 +29,74 @@
 namespace lmms::gui
 {
 
-class InteractiveModelView;
-
-template<typename BaseType, DataType>
-class LMMS_EXPORT ActionSafeFnPtrTyped
+template<typename DataType>
+GuiAction::GuiAction(const QString& name, InteractiveModelView* object, TypelessFn doFn, TypelessFn undoFn, size_t runAmount) :
+	m_target(object),
+	m_runAmount(runAmount),
+	m_data(nullptr),
+	m_doFn(doFn),
+	m_undoFn(undoFn),
+	m_doTypedFn(nullptr),
+	m_undoTypedFn(nullptr)
 {
-public:
-typedef void (BaseType::*FunctionPointer)(BaseType*, DataType);
-
-template<typename BaseType, DataType>
-ActionSafeFnPtrTyped::ActionSafeFnPtrTyped(FunctionPointer<BaseType> function)
-{
-	m_functionPtr = function;
-	m_baseTypeId = typeid(BaseType).hash_code();
-	m_dataTypeId = typeid(DataType).hash_code();
 }
 
-template<typename BaseType, DataType>
-ActionSafeFnPtrTyped::callFn(BaseType* object, std::shared_ptr<DataType> data)
+template<typename DataType>
+GuiAction::GuiAction(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, std::shared_ptr<DataType> data) :
+	m_target(object),
+	m_runAmount(0),
+	m_data(data),
+	m_doFn(nullptr),
+	m_undoFn(nullptr),
+	m_doTypedFn(doFn),
+	m_undoTypedFn(undoFn)
 {
-	assert();
 }
 
-private:
-	size_t m_baseTypeId;
-	size_t m_dataTypeId;
-	
-	FunctionPointer m_functionPtr;
-};
-
-
-template<typename BaseType>
-class LMMS_EXPORT ActionSafeFnPtr
+template<typename DataType>
+GuiAction::~GuiAction()
 {
-public:
-	typedef void (BaseType::*FunctionPointer)();
-	ActionSafeFnPtr(FunctionPointer function);
-	callFn(BaseType* object);
-private:
-	size_t m_baseTypeId;
-	
-	FunctionPointer m_functionPtr;
-};
+}
 
+template<typename DataType>
+void GuiAction::undo()
+{
+	if (m_target == nullptr) { return false; }
+	if (m_undoFn != nullptr)
+	{
+		*m_undoFn(object);
+	}
+	else if (m_doTypedFn.isValid())
+	{
+		m_undoTypedFn.callFn<DataType>(m_target, m_data);
+	}
+}
 
+template<typename DataType>
+void GuiAction::redo()
+{
+	if (m_target == nullptr) { return false; }
+	if (m_doFn != nullptr)
+	{
+		*m_doFn(object);
+	}
+	else if (m_doTypedFn.isValid())
+	{
+		m_doTypedFn.callFn<DataType>(m_target, m_data);
+	}
+}
+
+template<typename DataType>
+bool GuiAction::clearObjectIfMatch(InteractiveModelView* object)
+{
+	if (m_target == nullptr) { return false; }
+	if (object == m_target)
+	{
+		m_target = nullptr;
+		m_data = nullptr;
+		return true;
+	}
+	return false;
+}
+
+} // template<typename DataType>

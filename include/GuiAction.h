@@ -36,68 +36,52 @@ namespace lmms::gui
 
 class InteractiveModelView;
 
-class LMMS_EXPORT ActionSafeFnPtrTyped
+class LMMS_EXPORT ActionSafeFnPtr
 {
 public:
-	// the typenames are placed in this way so
-	// the class is the same size with different types -> doesn't have to be casted when stored + avoids mistakes
-	// still enforces member functions
-	template<typename BaseType, DataType>
-	typedef void (BaseType::*FunctionPointer)(std::shared_ptr<DataType>)
-	template<typename BaseType, DataType>
-	ActionSafeFnPtrTyped(FunctionPointer function)
+	// the typenames are placed in this way -> doesn't have to be casted when stored
+	// the class is the same size with different types -> avoids mistakes
+	// still enforces the right function format
+	template<typename DataType>
+	typedef void (*FunctionPointer)(InteractiveModelView*, std::shared_ptr<DataType>)
+	template<typename DataType>
+	ActionSafeFnPtr(FunctionPointer function)
 	{
 		m_functionPtr = function;
-		m_baseTypeId = typeid(BaseType).hash_code();
 		m_dataTypeId = typeid(DataType).hash_code();
 	}
-	template<typename BaseType, DataType>
-	void callFn(BaseType* object, std::shared_ptr<DataType> data)
+	template<typename DataType>
+	void callFn(InteractiveModelView* object, std::shared_ptr<DataType> data)
 	{
-		assert(m_baseTypeId == typeid(BaseType).hash_code());
 		assert(m_dataTypeId == typeid(DataType).hash_code());
-		// firstly the `FunctionPointer<BaseType, DataType>` will be casted to a `void*`,
-		// then it will be casted back to `FunctionPointer<BaseType, DataType>`
-		((*object).*((FunctionPointer<BaseType, DataType>)(m_functionPtr)))(data);
+		// firstly the `FunctionPointer<DataType>` will be casted to a `void*`, so it can be stored without templates,
+		// then it will be casted back to `FunctionPointer<DataType>`, so it is safe to use
+		*((FunctionPointer<DataType>)(m_functionPtr))(object, data);
 	}
+	bool isValid() const { return m_functionPtr; }
 private:
-	size_t m_baseTypeId;
 	size_t m_dataTypeId;
 	void* m_functionPtr;
 };
 
 
-
-class LMMS_EXPORT ActionSafeFnPtr
-{
-public:
-	// the typenames are placed in this way so
-	// the class is the same size with different types -> doesn't have to be casted when stored + avoids mistakes
-	// still enforces member functions
-	template<typename BaseType>
-	typedef void (BaseType::*FunctionPointer)();
-	template<typename BaseType>
-	ActionSafeFnPtr(FunctionPointer<BaseType> function);
-	template<typename BaseType>
-	void callFn(BaseType* object);
-private:
-	size_t m_baseTypeId;
-	void* m_functionPtr;
-};
-
-
-template<typename BaseType, DataType>
+template<typename DataType>
 class LMMS_EXPORT GuiAction : public QUndoCommand
 {
 public:
-	GuiAction(const QString& name, BaseType* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, size_t runAmount);
-	GuiAction(const QString& name, BaseType* object, ActionSafeFnPtrTyped doFn, ActionSafeFnPtrTyped undoFn, std::shared_ptr<DataType> data);
+	typedef void (*TypelessFn)(InteractiveModelView*);
+	GuiAction(const QString& name, InteractiveModelView* object, TypelessFn doFn, TypelessFn undoFn, size_t runAmount);
+	GuiAction(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, std::shared_ptr<DataType> data);
 	~GuiAction();
 	
 	void undo() override;
-    void redo() override;
+	void redo() override;
+	
+	//! returns true if cleared, use this to delete pointers to destructing objects
+	bool clearObjectIfMatch(InteractiveModelView* object);
 private:
 	const QString m_name;
+	InteractiveModelView* m_target;
 	
 	int m_runAmount;
 	std::shared_ptr<DataType> m_data;
