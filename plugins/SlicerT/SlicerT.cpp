@@ -91,8 +91,6 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	speedRatio *= pitchRatio;
 	speedRatio *= Engine::audioEngine()->outputSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
-	if ( m_clearAll.value() ) { exit(0); } // I was expecting that clicking the "CLEAR" button closes LMMS, even by force. It does not! :)
-
 	float sliceStart, sliceEnd;
 	if (noteIndex == 0) // full sample at base note
 	{
