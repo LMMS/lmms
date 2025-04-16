@@ -119,7 +119,8 @@ Knob* SlicerTView::createStyledKnob()
 
 // Clear all notes
 void SlicerTView::clearAll() {
-	printf("Hello!\n");
+	m_slicerTParent->m_slicePoints.clear();
+	emit m_slicerTParent->dataChanged();
 }
 
 // copied from piano roll
