@@ -74,7 +74,7 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_clearButton = new PixmapButton(this, "Clear all slices"); // Missing tr
 	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_active"));
 	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_inactive"));
-	m_clearButton->setToolTip("Clear all cut points"); // Missing tr
+	m_clearButton->setToolTip("Clear all slices"); // Missing tr
 	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearAll);
 
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
