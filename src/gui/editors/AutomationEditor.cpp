@@ -2239,9 +2239,9 @@ const AutomationClip* AutomationEditorWindow::currentClip()
 
 void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
+	Clipboard::StringPairDataType type = StringPairDrag::decodeKey(_de);
 	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "automatable_model" )
+	if (type == Clipboard::StringPairDataType::AutomatableModelLink)
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
@@ -2267,7 +2267,7 @@ void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
 	if (! m_editor->validClip() ) {
 		return;
 	}
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::StringPairDataType::AutomatableModelLink);
 }
 
 void AutomationEditorWindow::open(AutomationClip* clip)

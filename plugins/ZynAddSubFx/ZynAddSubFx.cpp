@@ -601,9 +601,9 @@ void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 {
-	const QString type = StringPairDrag::decodeKey( _de );
+	const auto type = StringPairDrag::decodeKey(_de);
 	const QString value = StringPairDrag::decodeValue( _de );
-	if( type == "pluginpresetfile" )
+	if (type == Clipboard::StringPairDataType::PluginPresetFile)
 	{
 		castModel<ZynAddSubFxInstrument>()->loadFile( value );
 		_de->accept();
