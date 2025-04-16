@@ -74,7 +74,6 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_clearButton = new PixmapButton(this, tr("Sync sample"));
 	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_active"));
 	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_inactive"));
-	m_clearButton->setCheckable(false);
 	m_clearButton->setToolTip("Clear all cut points"); // Missing tr
 	m_clearButton->setModel(&m_slicerTParent->m_clearAll);
 
