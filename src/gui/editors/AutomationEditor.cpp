@@ -1018,7 +1018,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
-	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample().sampleFile()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
