@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.cpp - Implements shortcut system, StringPair system and highlighting for widgets
+ * InteractiveModelView.cpp - Implements shortcut and action system for widgets
  *
  * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot/com>
  *
