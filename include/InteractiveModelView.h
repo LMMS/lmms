@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.h - Implements shortcut system, StringPair system and highlighting for widgets
+ * InteractiveModelView.h - Implements shortcut and action system for widgets
  *
  * Copyright (c) 2024 -2025 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -192,6 +192,12 @@ private:
 	static SimpleTextFloat* s_simpleTextFloat;
 	static std::list<InteractiveModelView*> s_interactiveWidgets;
 };
+
+template<typename DataType>
+class LMMS_EXPORT InteractiveModelViewTyped : public InteractiveModelView
+{
+	
+}
 
 } // namespace lmms::gui
 
