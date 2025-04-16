@@ -273,6 +273,8 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 {
 	m_y1 = height() - s_bottomBoxOffset;
 
+	printf("---> %d\n", s_bottomBoxOffset);
+
 	// left box
 	m_noteThresholdKnob->move(s_x1 - 25, m_y1);
 	m_fadeOutKnob->move(s_x2 - 25, m_y1);
@@ -284,8 +286,8 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 	m_snapSetting->move(s_x6 - 8, m_y1 + 3);
 
 	// right box
-	m_syncToggle->move((width() - 100), m_y1 + 5);
-	m_clearButton->move((width() - 100), m_y1 + 30);
+	m_syncToggle->move((width() - 100), m_y1 - 6);
+	m_clearButton->move((width() - 100), m_y1 + 16);
 
 	m_folderButton->move(width() - 20, height() - s_bottomBoxHeight - s_sampleBoxHeight + 1);
 
