@@ -71,6 +71,13 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
+	m_clearButton = new PixmapButton(this, tr("Sync sample"));
+	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_active"));
+	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_inactive"));
+	m_clearButton->setCheckable(false);
+	m_clearButton->setToolTip("Clear all cut points"); // Missing tr
+	m_clearButton->setModel(&m_slicerTParent->m_clearAll);
+
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
 	m_bpmBox->setToolTip(tr("Original sample BPM"));
 	m_bpmBox->setModel(&m_slicerTParent->m_originalBPM);
@@ -273,6 +280,7 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 
 	// right box
 	m_syncToggle->move((width() - 100), m_y1 + 5);
+	m_clearButton->move((width() - 100), m_y1 + 30);
 
 	m_folderButton->move(width() - 20, height() - s_bottomBoxHeight - s_sampleBoxHeight + 1);
 

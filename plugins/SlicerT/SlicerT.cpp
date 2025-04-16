@@ -62,6 +62,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
 	, m_sliceSnap(this, tr("Slice snap"))
 	, m_enableSync(false, this, tr("BPM sync"))
+	, m_clearAll(false, this, "Clear all points") // Missing tr
 	, m_originalSample()
 	, m_parentTrack(instrumentTrack)
 {
@@ -89,6 +90,8 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	if (!m_enableSync.value()) { speedRatio = 1; }
 	speedRatio *= pitchRatio;
 	speedRatio *= Engine::audioEngine()->outputSampleRate() / static_cast<float>(m_originalSample.sampleRate());
+
+	if ( m_clearAll.value() ) { exit(0); } // I was expecting that clicking the "CLEAR" button closes LMMS, even by force. It does not! :)
 
 	float sliceStart, sliceEnd;
 	if (noteIndex == 0) // full sample at base note
