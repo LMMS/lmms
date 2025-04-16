@@ -273,8 +273,6 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 {
 	m_y1 = height() - s_bottomBoxOffset;
 
-	printf("---> %d\n", s_bottomBoxOffset);
-
 	// left box
 	m_noteThresholdKnob->move(s_x1 - 25, m_y1);
 	m_fadeOutKnob->move(s_x2 - 25, m_y1);
