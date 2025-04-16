@@ -95,7 +95,6 @@ private slots:
 	void toggleRunningAutoSave(bool enabled);
 	void toggleSmoothScroll(bool enabled);
 	void toggleAnimateAFP(bool enabled);
-	void vstEmbedMethodChanged();
 	void toggleVSTAlwaysOnTop(bool en);
 	void toggleDisableAutoQuit(bool enabled);
 
@@ -162,9 +161,6 @@ private:
 	QCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
-	QLabel * m_vstEmbedLbl;
-	QComboBox* m_vstEmbedComboBox;
-	QString m_vstEmbedMethod;
 	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
 	bool m_disableAutoQuit;

@@ -133,13 +133,9 @@ public:
 		if ( !hasEditor() ) {
 			return;
 		}
-		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
-			VstPlugin::createUI( m_pluginSubWindow.get() );
-			m_pluginSubWindow->setWidget(pluginWidget());
-		} else {
-			VstPlugin::createUI( nullptr );
-		}
+		
+		VstPlugin::createUI( nullptr );
+
 	}
 
 	/// Overwrite editor() to return the sub window instead of the embed widget

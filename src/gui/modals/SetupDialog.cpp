@@ -134,7 +134,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "smoothscroll").toInt()),
 	m_animateAFP(ConfigManager::inst()->value(
 			"ui", "animateafp", "1").toInt()),
-	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
 	m_vstAlwaysOnTop(ConfigManager::inst()->value(
 			"ui", "vstalwaysontop").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
@@ -417,31 +416,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Plugins group
 	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performance_w);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
-
-	m_vstEmbedLbl = new QLabel(pluginsBox);
-	m_vstEmbedLbl->setText(tr("VST plugins embedding:"));
-	pluginsLayout->addWidget(m_vstEmbedLbl);
-
-	m_vstEmbedComboBox = new QComboBox(pluginsBox);
-
-	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
-	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
-	if(embedMethods.contains("qt"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using Qt API"), "qt");
-	}
-	if(embedMethods.contains("win32"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"), "win32");
-	}
-	if(embedMethods.contains("xembed"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed");
-	}
-	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(m_vstEmbedMethod));
-	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)),
-			this, SLOT(vstEmbedMethodChanged()));
-	pluginsLayout->addWidget(m_vstEmbedComboBox);
 
 	m_vstAlwaysOnTopCheckBox = addCheckBox(tr("Keep plugin windows on top when not embedded"), pluginsBox, pluginsLayout,
 		m_vstAlwaysOnTop, SLOT(toggleVSTAlwaysOnTop(bool)), false);
@@ -993,8 +967,6 @@ void SetupDialog::accept()
 					QString::number(m_smoothScroll));
 	ConfigManager::inst()->setValue("ui", "animateafp",
 					QString::number(m_animateAFP));
-	ConfigManager::inst()->setValue("ui", "vstembedmethod",
-					m_vstEmbedComboBox->currentData().toString());
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
@@ -1184,13 +1156,6 @@ void SetupDialog::toggleSmoothScroll(bool enabled)
 void SetupDialog::toggleAnimateAFP(bool enabled)
 {
 	m_animateAFP = enabled;
-}
-
-
-void SetupDialog::vstEmbedMethodChanged()
-{
-	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
-	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
 }
 
 
