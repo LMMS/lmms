@@ -24,16 +24,24 @@
 
 #include "PatternClipView.h"
 
+#include <set>
+
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
+#include "AutomationClip.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "PatternClip.h"
+#include "PatternTrack.h"
+#include "PatternTrackView.h"
 #include "PatternStore.h"
 #include "RenameDialog.h"
+#include "SampleClip.h"
+#include "Song.h"
 
 namespace lmms::gui
 {
@@ -63,10 +71,123 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT(changeName()));
+	if (canCopySelectionToNewTrack())
+	{
+		_cm->addAction(
+			embed::getIconPixmap("pattern_track"),
+			tr("Copy to New Pattern Track"),
+			this,
+			&PatternClipView::copySelectionToNewPatternTrack
+		);
+	}
 }
 
+bool PatternClipView::canCopySelectionToNewTrack()
+{
+	QVector<ClipView*> clipvs = getClickedClips();
+	// We check if the owner of the first Clip is a Pattern Track
+	bool isPatternTrack = dynamic_cast<PatternTrackView*>(clipvs.at(0)->getTrackView());
+	if (!isPatternTrack) { return false; }
+	// Make sure every track is a pattern track
+	for (auto clipv: clipvs) {
+		if (!dynamic_cast<PatternTrackView*>(clipv->getTrackView())) { return false; }
+	}
+	return true;
+}
 
+void PatternClipView::copySelectionToNewPatternTrack()
+{
+	QVector<ClipView*> clipvs = getClickedClips();
+	std::set<TrackView*> ownerTracks;
 
+	// Find the first clip's start position in the selection
+	TimePos firstClipStartPos = m_patternClip->startPosition();
+	for (auto clipv: clipvs)
+	{
+		firstClipStartPos = std::min(firstClipStartPos, clipv->getClip()->startPosition());
+		// And build up a set of the affected pattern tracks
+		ownerTracks.insert(clipv->getTrackView());
+	}
+
+	// Create new pattern track and clip
+	Track* new_track = Track::create(Track::Type::Pattern, Engine::getSong());
+	PatternClip* new_clip = new PatternClip(new_track);
+
+	new_clip->movePosition(firstClipStartPos);
+
+	//const int oldPatternTrackIndex = static_cast<PatternTrack*>(m_patternClip->getTrack())->patternIndex();
+	const int newPatternTrackIndex = static_cast<PatternTrack*>(new_track)->patternIndex();
+
+	TimePos maxNotePos = 0;
+
+	for (const auto& patternTrack : ownerTracks)
+	{
+		for (const auto& track : Engine::patternStore()->tracks())
+		{
+			int ownerPatternTrackIndex = static_cast<PatternTrack*>(patternTrack->getTrack())->patternIndex();
+			Clip* clip = track->getClip(ownerPatternTrackIndex);
+			auto sClip = dynamic_cast<SampleClip*>(clip);
+			auto mClip = dynamic_cast<MidiClip*>(clip);
+			auto aClip = dynamic_cast<AutomationClip*>(clip);
+			Clip* newClip = track->getClip(newPatternTrackIndex);
+			if (sClip)
+			{
+				// TODO
+				Clip::copyStateTo(clip, newClip);
+			}
+			else if (mClip)
+			{
+				MidiClip* newMidiClip = dynamic_cast<MidiClip*>(newClip);
+				for (auto clipv: clipvs)
+				{
+					if (clipv->getTrackView() != patternTrack) { continue; }
+					// Figure out how many times this clip repeats itself. At maximum it could touch (length roudned up + 1) bars
+					// when accounting for the fact that the start offset could make it play the end of a bar before starting the first full bar.
+					// Here we go the safe way and iterate through the maximum possible repetitions, and discard any notes outside of the range.
+					// First +1 for ceiling, second +1 for possible previous bar.
+					int maxPossibleRepetitions = clipv->getClip()->length() / mClip->length() + 1 + 1; 
+
+					TimePos clipRelativePos = clipv->getClip()->startPosition() - firstClipStartPos;
+					TimePos startTimeOffset = clipv->getClip()->startTimeOffset();
+
+					for (Note const* note : mClip->notes())
+					{
+						// Start loop at i = -1 to get the bar touched by start offset
+						for (int i = -1; i < maxPossibleRepetitions - 1; i++)
+						{
+							auto newNote = Note{*note};
+
+							TimePos newNotePos = note->pos() + clipRelativePos + startTimeOffset + i * mClip->length().nextFullBar() * TimePos::ticksPerBar();
+							TimePos newNotePosRelativeToClip = note->pos() + startTimeOffset + i * mClip->length().nextFullBar()  * TimePos::ticksPerBar();
+							
+							if (newNotePosRelativeToClip < 0 || newNotePosRelativeToClip >= clipv->getClip()->length()) { continue; }
+
+							newNote.setPos(newNotePos);
+							newMidiClip->addNote(newNote, false);
+							maxNotePos = std::max(maxNotePos, newNotePos);
+						}
+					}
+				}
+			}
+			else if (aClip)
+			{
+				// TODO
+				Clip::copyStateTo(clip, newClip);
+			}
+		}
+	}
+	// Update the number of steps/bars for all tracks. For some reason addNote for midi clips does not update the length automatically.
+	for (const auto& track : Engine::patternStore()->tracks())
+	{
+		for (int i = 0; i < maxNotePos.getBar(); i++)
+		{
+			static_cast<MidiClip*>(track->getClip(newPatternTrackIndex))->addSteps();
+		}
+	}
+
+	// Now that we know the maximum number of bars, set the length of the new pattern clip
+	new_clip->changeLength(maxNotePos.nextFullBar() * TimePos::ticksPerBar());
+}
 
 void PatternClipView::mouseDoubleClickEvent(QMouseEvent*)
 {

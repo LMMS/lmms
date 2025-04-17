@@ -61,6 +61,9 @@ protected:
 
 
 private:
+	bool canCopySelectionToNewTrack();
+	void copySelectionToNewPatternTrack();
+
 	PatternClip* m_patternClip;
 	QPixmap m_paintPixmap;
 	
