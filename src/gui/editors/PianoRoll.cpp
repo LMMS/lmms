@@ -1653,7 +1653,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if(m_editMode == EditMode::Detuning)
+	if (m_editMode == EditMode::Detuning)
 	{
 		// Setup the currently selected notes/note under mouse
 		bool notesFound = setupParameterEditNotes(Note::ParameterType::Detuning);
@@ -2853,11 +2853,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
 	// If this is the first time this function is called (not mouseMove or mouseRelease), initialize the variables.
-	if (me->type() == QEvent::MouseButtonPress) {
+	if (me->type() == QEvent::MouseButtonPress)
+	{
 		// Mouse button press event does not seem to remember buttons which are already pressed, so the || keeps the previous state.
 		m_parameterEditDownLeft = m_parameterEditDownLeft || me->button() & Qt::LeftButton;
 		// Do not allow right click mode if left click is already held.
-		m_parameterEditDownRight = (m_parameterEditDownRight || me->button() & Qt::RightButton) && !m_parameterEditDownLeft;
+		m_parameterEditDownRight = (m_parameterEditDownRight || me->button() & Qt::RightButton) && m_parameterEditDownLeft == false;
 		m_lastParameterEditTick = -1;
 	}
 
