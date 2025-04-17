@@ -481,6 +481,8 @@ private:
 	bool m_parameterEditDownRight = false;
 	//! Stores the last edited position for the note detuning/parameter curves. When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed.
 	int m_lastParameterEditTick = -1;
+	//! The current note whose detuning/parameter curve is being edited.
+	Note* m_parameterEditClickedNote;
 
 	//! Function to update the currently dragged node position in the detuning/parameter curve of the selected notes.
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);

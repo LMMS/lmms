@@ -2860,11 +2860,11 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		// Do not allow right click mode if left click is already held.
 		m_parameterEditDownRight = (m_parameterEditDownRight || me->button() & Qt::RightButton) && m_parameterEditDownLeft == false;
 		m_lastParameterEditTick = -1;
+		// Get the note with the closest automation curve to the mouse cursor
+		m_parameterEditClickedNote = parameterEditNoteUnderMouse(paramType);
 	}
 
-	// Get the note with the closest automation curve to the mouse cursor
-	Note* clickedNote = parameterEditNoteUnderMouse(paramType);
-	if (!clickedNote) { return; }
+	if (!m_parameterEditClickedNote) { return; }
 
 	// Calculate the key and time of the mouse cursor in the piano roll
 	int key_num = getKey( me->y() );
@@ -2872,8 +2872,8 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// Calculate the relative position of the mouse with respect to the note.
-	TimePos relativePos = pos_ticks - clickedNote->pos();
-	int relativeKey = key_num - clickedNote->key();
+	TimePos relativePos = pos_ticks - m_parameterEditClickedNote->pos();
+	int relativeKey = key_num - m_parameterEditClickedNote->key();
 
 	// Set the quantization of the automation editor to match the piano roll. This is not an ideal system, but it works.
 	AutomationClip::setQuantization(quantization());
@@ -2894,7 +2894,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			if (m_lastParameterEditTick != -1)
 			{
 				// If the last position of the mouse is not -1, remove all nodes in that range.
-				aClip->removeNodes(m_lastParameterEditTick - clickedNote->pos(), relativePos);
+				aClip->removeNodes(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), relativePos);
 			}
 			else
 			{
@@ -2921,6 +2921,7 @@ void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType param
 	}
 	m_parameterEditDownRight = false;
 	m_parameterEditDownLeft = false;
+	m_parameterEditClickedNote = nullptr;
 }
 
 bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
