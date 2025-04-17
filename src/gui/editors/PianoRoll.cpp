@@ -3760,11 +3760,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			int pos_ticks = note->pos();
 
+			int detuning_length = note->detuning()->automationClip()->getTimeMap().lastKey() * m_ppb / TimePos::ticksPerBar();
+
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 			const int x = ( pos_ticks - m_currentPosition ) *
 					m_ppb / TimePos::ticksPerBar();
-			// skip this note if not in visible area at all
-			if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth))
+			// Skip this note if not in visible area at all
+			// But still draw the note if the detuning curve extends past the end of it.
+			if (!(x + std::max(note_width, detuning_length) >= 0 && x <= width() - m_whiteKeyWidth))
 			{
 				continue;
 			}
