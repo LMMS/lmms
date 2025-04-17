@@ -181,6 +181,7 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
+				// Why is expKnobVal used here?
 				float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cutBuffer[frame] ) *
 								CUT_FREQ_MULTIPLIER + fcv;
 
