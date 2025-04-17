@@ -49,7 +49,7 @@ class SlicerTView : public InstrumentView
 public slots:
 	void exportMidi();
 	void openFiles();
-	void clearAll();
+	void clearSlices();
 
 public:
 	SlicerTView(SlicerT* instrument, QWidget* parent);

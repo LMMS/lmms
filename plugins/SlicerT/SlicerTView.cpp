@@ -72,10 +72,10 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
 	m_clearButton = new PixmapButton(this, "Clear all slices"); // Missing tr
-	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_active"));
-	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearAll_inactive"));
+	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_active"));
+	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_inactive"));
 	m_clearButton->setToolTip("Clear all slices"); // Missing tr
-	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearAll);
+	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearSlices);
 
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
 	m_bpmBox->setToolTip(tr("Original sample BPM"));
@@ -118,7 +118,7 @@ Knob* SlicerTView::createStyledKnob()
 }
 
 // Clear all notes
-void SlicerTView::clearAll() {
+void SlicerTView::clearSlices() {
 	m_slicerTParent->m_slicePoints.clear();
 	emit m_slicerTParent->dataChanged();
 }
