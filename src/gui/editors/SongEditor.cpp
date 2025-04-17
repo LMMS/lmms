@@ -275,11 +275,13 @@ SongEditor::SongEditor( Song * song ) :
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
+	m_timeLine->saveSettings(doc, element);
 }
 
 void SongEditor::loadSettings( const QDomElement& element )
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+	m_timeLine->loadSettings(element);
 }
 
 
