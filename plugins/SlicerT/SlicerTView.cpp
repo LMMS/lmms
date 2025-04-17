@@ -71,10 +71,10 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
-	m_clearButton = new PixmapButton(this, "Clear all slices"); // Missing tr
+	m_clearButton = new PixmapButton(this, tr("Clear all slices"));
 	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_active"));
 	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_inactive"));
-	m_clearButton->setToolTip("Clear all slices"); // Missing tr
+	m_clearButton->setToolTip(tr("Clear all slices"));
 	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearSlices);
 
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
