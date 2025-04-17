@@ -29,74 +29,30 @@
 namespace lmms::gui
 {
 
-template<typename DataType>
-GuiAction::GuiAction(const QString& name, InteractiveModelView* object, TypelessFn doFn, TypelessFn undoFn, size_t runAmount) :
-	m_target(object),
-	m_runAmount(runAmount),
-	m_data(nullptr),
-	m_doFn(doFn),
-	m_undoFn(undoFn),
-	m_doTypedFn(nullptr),
-	m_undoTypedFn(nullptr)
+ActionSafeFnPtr::ActionSafeFnPtr()
 {
+	setFn(std::make_pair(nullptr, 0));
 }
-
-template<typename DataType>
-GuiAction::GuiAction(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, std::shared_ptr<DataType> data) :
-	m_target(object),
-	m_runAmount(0),
-	m_data(data),
-	m_doFn(nullptr),
-	m_undoFn(nullptr),
-	m_doTypedFn(doFn),
-	m_undoTypedFn(undoFn)
+ActionSafeFnPtr::ActionSafeFnPtr(std::pair<FunctionPointer, size_t> input)
 {
+	setFn(input);
 }
-
-template<typename DataType>
-GuiAction::~GuiAction()
+ActionSafeFnPtr::ActionSafeFnPtr(const ActionSafeFnPtr& ref)
 {
-}
-
-template<typename DataType>
-void GuiAction::undo()
-{
-	if (m_target == nullptr) { return false; }
-	if (m_undoFn != nullptr)
+	if (ref.m_functionPtr == nullptr)
 	{
-		*m_undoFn(object);
+		setFn(std::make_pair(nullptr, 0));
 	}
-	else if (m_doTypedFn.isValid())
+	else
 	{
-		m_undoTypedFn.callFn<DataType>(m_target, m_data);
+		m_functionPtr = ref.m_functionPtr;
+		m_dataTypeId = ref.m_dataTypeId;
 	}
 }
-
-template<typename DataType>
-void GuiAction::redo()
+void ActionSafeFnPtr::setFn(std::pair<FunctionPointer, size_t> input)
 {
-	if (m_target == nullptr) { return false; }
-	if (m_doFn != nullptr)
-	{
-		*m_doFn(object);
-	}
-	else if (m_doTypedFn.isValid())
-	{
-		m_doTypedFn.callFn<DataType>(m_target, m_data);
-	}
-}
-
-template<typename DataType>
-bool GuiAction::clearObjectIfMatch(InteractiveModelView* object)
-{
-	if (m_target == nullptr) { return false; }
-	if (object == m_target)
-	{
-		m_target = nullptr;
-		m_data = nullptr;
-		return true;
-	}
-	return false;
+	m_functionPtr = reinterpret_cast<void*>(input.first);
+	m_dataTypeId = input.second;
 }
 
 } // template<typename DataType>
