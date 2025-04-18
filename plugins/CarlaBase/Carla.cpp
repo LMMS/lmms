@@ -1029,7 +1029,7 @@ void CarlaParamsView::refreshKnobs()
 
 			// Store biggest knob width per group (so we can calc how many knobs we can fit horizontally)
 			auto & maxGroupWidth = m_maxKnobWidthPerGroup[currentParamModel->groupId()];
-			maxGroupWidth = std::max(maxGroupWidth, static_cast<u_int16_t>(currentKnob->width()));
+			maxGroupWidth = std::max(maxGroupWidth, static_cast<uint16_t>(currentKnob->width()));
 		}
 	}
 
