@@ -284,8 +284,8 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 	m_snapSetting->move(s_x6 - 8, m_y1 + 3);
 
 	// right box
-	m_syncToggle->move((width() - 100), m_y1 - 6);
-	m_clearButton->move((width() - 100), m_y1 + 16);
+	m_syncToggle->move((width() - 100), m_y1 - 6 - 1);
+	m_clearButton->move((width() - 100), m_y1 + 16 + 1);
 
 	m_folderButton->move(width() - 20, height() - s_bottomBoxHeight - s_sampleBoxHeight + 1);
 
