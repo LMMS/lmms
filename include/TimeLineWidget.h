@@ -52,7 +52,7 @@ class TextFloat;
 class SongEditor;
 
 
-class TimeLineWidget : public QWidget, public JournallingObject
+class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
 public:
@@ -157,11 +157,6 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-	auto nodeName() const -> QString override { return "timelinewidget"; }
-
-	void saveSettings(QDomDocument& doc, QDomElement& element) override;
-	void loadSettings(const QDomElement& element) override;
-
 signals:
 	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
@@ -219,7 +214,6 @@ private:
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
 	AutoScrollState m_autoScroll = AutoScrollState::Stepped;
-	NStateButton* m_autoScrollButton;
 
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;

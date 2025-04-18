@@ -87,13 +87,14 @@ void TimeLineWidget::setXOffset(const int x)
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
-	m_autoScrollButton = new NStateButton(_tool_bar);
-	m_autoScrollButton->setGeneralToolTip(tr("Auto scrolling"));
-	m_autoScrollButton->addState(embed::getIconPixmap("autoscroll_stepped_on"), tr("Stepped auto scrolling"));
-	m_autoScrollButton->addState(embed::getIconPixmap("autoscroll_continuous_on"), tr("Continuous auto scrolling"));
-	m_autoScrollButton->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
-	connect(m_autoScrollButton, SIGNAL(changedState(int)), this,
+	auto autoScroll = new NStateButton(_tool_bar);
+	autoScroll->setGeneralToolTip(tr("Auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap("autoscroll_stepped_on"), tr("Stepped auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap("autoscroll_continuous_on"), tr("Continuous auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
+	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
+	autoScroll->changeState(ConfigManager::inst()->value("ui", "autoscrollstate").toInt());
 
 	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
@@ -126,7 +127,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	);
 	behaviourAtStop->changeState(static_cast<int>(m_timeline->stopBehaviour()));
 
-	_tool_bar->addWidget(m_autoScrollButton);
+	_tool_bar->addWidget( autoScroll );
 	_tool_bar->addWidget( loopPoints );
 	_tool_bar->addWidget( behaviourAtStop );
 }
@@ -140,6 +141,7 @@ void TimeLineWidget::updatePosition()
 void TimeLineWidget::toggleAutoScroll( int _n )
 {
 	m_autoScroll = static_cast<AutoScrollState>( _n );
+	ConfigManager::inst()->setValue("ui", "autoscrollstate", QString::number(_n));
 }
 
 void TimeLineWidget::paintEvent( QPaintEvent * )
@@ -454,19 +456,5 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 
 	menu.exec(event->globalPos());
 }
-
-
-void TimeLineWidget::saveSettings(QDomDocument& doc, QDomElement& element)
-{
-	element.setAttribute("autoscroll", static_cast<int>(m_autoScroll));
-}
-
-void TimeLineWidget::loadSettings(const QDomElement& element)
-{
-	toggleAutoScroll(element.attribute("autoscroll").toInt());
-	m_autoScrollButton->changeState(element.attribute("autoscroll").toInt());
-}
-
-
 
 } // namespace lmms::gui

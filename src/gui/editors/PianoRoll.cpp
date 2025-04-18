@@ -5356,8 +5356,6 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 	de.setAttribute("stopbehaviour", static_cast<int>(
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).stopBehaviour()));
 
-	m_editor->m_timeLine->saveSettings(doc, de);
-
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -5381,7 +5379,6 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	qm.setLeft(m_editor->m_whiteKeyWidth);
 	m_editor->m_stepRecorderWidget.setMargins(qm);
 	m_editor->m_timeLine->setXOffset(m_editor->m_whiteKeyWidth);
-	m_editor->m_timeLine->loadSettings(de);
 }
 
 
