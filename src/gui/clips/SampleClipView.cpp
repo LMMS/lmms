@@ -31,6 +31,7 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "FileDialog.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -85,6 +86,13 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_clip, SLOT(toggleRecord()));*/
+
+	cm->addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("Export sample buffer"),
+		this,
+		SLOT(exportSampleBuffer())
+	);
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -399,6 +407,16 @@ bool SampleClipView::splitClip( const TimePos pos )
 		return true;
 	}
 	else { return false; }
+}
+
+void SampleClipView::exportSampleBuffer()
+{
+	const auto outputFilename = FileDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+
+	if (!outputFilename.isEmpty())
+	{
+		m_clip->exportSampleBuffer(outputFilename);
+	}	
 }
 
 
