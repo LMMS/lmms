@@ -26,7 +26,7 @@
 #include "interpolation.h"
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 #include <algorithm>
 #include <cstdlib>
