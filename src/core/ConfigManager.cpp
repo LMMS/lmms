@@ -22,19 +22,20 @@
  *
  */
 
+#include "ConfigManager.h"
 
-#include <QDomElement>
-#include <QDir>
-#include <QMessageBox>
+#include <PathUtil.h>
 #include <QApplication>
+#include <QDir>
+#include <QDomElement>
+#include <QMessageBox>
 #include <QStandardPaths>
 #include <QTextStream>
+#include <qdebug.h>
 
-#include "ConfigManager.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
-#include "GuiApplication.h"
-
 #include "lmmsversion.h"
 
 namespace lmms
@@ -496,7 +497,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 					{
 						if (n.isElement() && n.toElement().hasAttributes())
 						{
-							m_favoriteItems << n.toElement().attribute("path");
+							m_favoriteItems << PathUtil::toAbsolute(n.toElement().attribute("path"));
 						}
 						n = n.nextSibling();
 					}
@@ -653,7 +654,7 @@ void ConfigManager::saveConfigFile()
 	for (const auto& favoriteItem : m_favoriteItems)
 	{
 		QDomElement n = doc.createElement("item");
-		n.setAttribute("path", favoriteItem);
+		n.setAttribute("path", PathUtil::toShortestRelative(favoriteItem));
 		favorite_items.appendChild(n);
 	}
 
