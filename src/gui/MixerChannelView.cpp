@@ -147,6 +147,8 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
 	connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
+
+	setFocusPolicy(Qt::StrongFocus);
 }
 
 void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -213,7 +215,6 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 void MixerChannelView::mousePressEvent(QMouseEvent*)
 {
 	if (m_mixerView->currentMixerChannel() != this) { m_mixerView->setCurrentMixerChannel(this); }
-	setFocus();
 }
 
 void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
