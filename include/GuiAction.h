@@ -43,28 +43,29 @@ public:
 	// the typenames are placed in this way -> doesn't have to be casted when stored
 	// the class is the same size with different types -> avoids mistakes
 	// still enforces the right function format
-	typedef void (*FunctionPointer)(InteractiveModelView*, void*);
 	template<typename DataType>
-	static std::pair<FunctionPointer, size_t> helpConstruct(void (*inputFunction)(InteractiveModelView*, DataType*))
+	static std::pair<void*, size_t> helpConstruct(void (*inputFunction)(InteractiveModelView*, DataType))
 	{
-		return std::make_pair(reinterpret_cast<ActionSafeFnPtr::FunctionPointer>(inputFunction), typeid(DataType).hash_code());
+		return std::make_pair(reinterpret_cast<void*>(inputFunction), typeid(DataType).hash_code());
 	}
 	ActionSafeFnPtr();
-	ActionSafeFnPtr(std::pair<FunctionPointer, size_t> input);
+	ActionSafeFnPtr(std::pair<void*, size_t> input);
 	ActionSafeFnPtr(const ActionSafeFnPtr& ref);
-	void setFn(std::pair<FunctionPointer, size_t> input);
+	void setFn(std::pair<void*, size_t> input);
 	template<typename DataType>
-	void callFn(InteractiveModelView* object, DataType* data)
+	constexpr void callFn(InteractiveModelView* object, DataType data)
 	{
+		qDebug("type assert debug: %ld, %ld, %s", m_dataTypeId, typeid(DataType).hash_code(), typeid(DataType).name());
 		if (m_functionPtr == nullptr) { return; }
 		assert(m_dataTypeId == typeid(DataType).hash_code());
-		// firstly the `FunctionPointer<DataType>` will be casted to a `void*`, so it can be stored without templates,
-		// then it will be casted back to `FunctionPointer<DataType>`, so it is safe to use
-		void (*functionPtr)(InteractiveModelView*, DataType*);
-		functionPtr = reinterpret_cast<void (*)(InteractiveModelView*, DataType*)>(m_functionPtr);
+		// firstly the FunctionPointer will be casted to a `void*`, so it can be stored without templates,
+		// then it will be casted back to FunctionPointer, so it is safe to use
+		void (*functionPtr)(InteractiveModelView*, DataType);
+		functionPtr = reinterpret_cast<void (*)(InteractiveModelView*, DataType)>(m_functionPtr);
 		functionPtr(object, data);
 	}
 	bool isValid() const { return m_functionPtr; }
+	bool isMatch(void* functionPtr) const { return functionPtr == m_functionPtr; }
 private:
 	size_t m_dataTypeId;
 	void* m_functionPtr;
@@ -85,7 +86,7 @@ public:
 		m_doTypedFn(),
 		m_undoTypedFn()
 	{}
-	GuiAction(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, DataType* data, bool linkBack) :
+	GuiAction(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, DataType data, bool linkBack) :
 		m_target(object),
 		m_runAmount(0),
 		m_data(nullptr),
@@ -94,10 +95,7 @@ public:
 		m_doTypedFn(doFn),
 		m_undoTypedFn(undoFn)
 	{
-		if (data != nullptr)
-		{
-			m_data = std::make_shared<DataType>(data);
-		}
+		m_data = std::make_unique<DataType>(data);
 	}
 
 	void undo()// override
@@ -105,11 +103,14 @@ public:
 		if (m_target == nullptr) { return; }
 		if (m_undoFn != nullptr)
 		{
-			m_undoFn(m_target);
+			for (size_t i = 0; i < m_runAmount; i++)
+			{
+				m_undoFn(m_target);
+			}
 		}
 		else if (m_doTypedFn.isValid())
 		{
-			m_undoTypedFn.callFn<DataType>(m_target, m_data.get());
+			m_undoTypedFn.callFn<DataType>(m_target, *m_data.get());
 		}
 	}
 	void redo()// override
@@ -117,11 +118,14 @@ public:
 		if (m_target == nullptr) { return; }
 		if (m_doFn != nullptr)
 		{
-			m_doFn(m_target);
+			for (size_t i = 0; i < m_runAmount; i++)
+			{
+				m_doFn(m_target);
+			}
 		}
 		else if (m_doTypedFn.isValid())
 		{
-			m_doTypedFn.callFn<DataType>(m_target, m_data.get());
+			m_doTypedFn.callFn<DataType>(m_target, *m_data.get());
 		}
 	}
 	//! returns true if cleared, use this to delete pointers to destructing objects
@@ -141,8 +145,8 @@ private:
 	InteractiveModelView* m_target;
 	bool m_isLinkedBack; //! if this is undone, undo the one before this
 	
-	int m_runAmount;
-	std::shared_ptr<DataType> m_data;
+	size_t m_runAmount;
+	std::unique_ptr<DataType> m_data;
 	
 	ActionTypelessFnPtr m_doFn;
 	ActionTypelessFnPtr m_undoFn;

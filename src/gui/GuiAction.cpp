@@ -33,7 +33,7 @@ ActionSafeFnPtr::ActionSafeFnPtr()
 {
 	setFn(std::make_pair(nullptr, 0));
 }
-ActionSafeFnPtr::ActionSafeFnPtr(std::pair<FunctionPointer, size_t> input)
+ActionSafeFnPtr::ActionSafeFnPtr(std::pair<void*, size_t> input)
 {
 	setFn(input);
 }
@@ -49,9 +49,9 @@ ActionSafeFnPtr::ActionSafeFnPtr(const ActionSafeFnPtr& ref)
 		m_dataTypeId = ref.m_dataTypeId;
 	}
 }
-void ActionSafeFnPtr::setFn(std::pair<FunctionPointer, size_t> input)
+void ActionSafeFnPtr::setFn(std::pair<void*, size_t> input)
 {
-	m_functionPtr = reinterpret_cast<void*>(input.first);
+	m_functionPtr = input.first;
 	m_dataTypeId = input.second;
 }
 
