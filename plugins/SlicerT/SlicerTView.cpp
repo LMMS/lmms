@@ -122,6 +122,8 @@ void SlicerTView::clearSlices() {
 
 	m_slicerTParent->m_slicePoints.clear();
 
+	// Points are added to the start (0) and end (1) of the sample,
+	// so the whole sample can still be copied using MIDI.
 	m_slicerTParent->m_slicePoints.push_back(0);
 	m_slicerTParent->m_slicePoints.push_back(1);
 
@@ -279,7 +281,7 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 {
 	m_y1 = height() - s_bottomBoxOffset;
 
-	// left box
+	// Left box
 	m_noteThresholdKnob->move(s_x1 - 25, m_y1);
 	m_fadeOutKnob->move(s_x2 - 25, m_y1);
 
@@ -289,9 +291,10 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 	m_bpmBox->move(s_x5 - 13, m_y1 + 4);
 	m_snapSetting->move(s_x6 - 8, m_y1 + 3);
 
-	// right box
-	m_syncToggle->move((width() - 100), m_y1 - 6 - 1);
-	m_clearButton->move((width() - 100), m_y1 + 16 + 1);
+	// Right box
+	// For explanation on the choice of constants, look at #7850
+	m_syncToggle->move((width() - 100), m_y1 - 7);
+	m_clearButton->move((width() - 100), m_y1 + 17);
 
 	m_folderButton->move(width() - 20, height() - s_bottomBoxHeight - s_sampleBoxHeight + 1);
 
