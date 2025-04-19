@@ -5356,6 +5356,15 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 	de.setAttribute("stopbehaviour", static_cast<int>(
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).stopBehaviour()));
 
+	de.setAttribute("key", m_editor->m_keyModel.value());
+	de.setAttribute("chord", m_editor->m_chordModel.value());
+	de.setAttribute("scale", m_editor->m_scaleModel.value());
+	de.setAttribute("zoom", m_editor->m_zoomingModel.value());
+	de.setAttribute("zoomvertical", m_editor->m_zoomingYModel.value());
+	de.setAttribute("quantization", m_editor->m_quantizeModel.value());
+	de.setAttribute("notelength", m_editor->m_noteLenModel.value());
+	de.setAttribute("snap", m_editor->m_snapModel.value());
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -5371,6 +5380,15 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 
 	Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setStopBehaviour(
 		static_cast<Timeline::StopBehaviour>(de.attribute("stopbehaviour").toInt()));
+
+	m_editor->m_keyModel.setValue(de.attribute("key").toInt());
+	m_editor->m_chordModel.setValue(de.attribute("chord").toInt());
+	m_editor->m_scaleModel.setValue(de.attribute("scale").toInt());
+	m_editor->m_zoomingModel.setValue(de.attribute("zoom", QString::number(m_editor->m_zoomingModel.findText("100%"))).toInt());
+	m_editor->m_zoomingYModel.setValue(de.attribute("zoomvertical", QString::number(m_editor->m_zoomingYModel.findText("100%"))).toInt());
+	m_editor->m_quantizeModel.setValue(de.attribute("quantization", QString::number(m_editor->m_quantizeModel.findText("1/16"))).toInt());
+	m_editor->m_noteLenModel.setValue(de.attribute("notelength").toInt());
+	m_editor->m_snapModel.setValue(de.attribute("snap").toInt());
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the

@@ -27,6 +27,7 @@
 #include <cmath>
 
 #include <QAction>
+#include <QDomElement>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
@@ -274,11 +275,15 @@ SongEditor::SongEditor( Song * song ) :
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
+	element.setAttribute("zoom", m_zoomingModel->value());
+	element.setAttribute("snap", m_snappingModel->value());
 	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
 void SongEditor::loadSettings( const QDomElement& element )
 {
+	m_zoomingModel->setValue(element.attribute("zoom", QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
+	m_snappingModel->setValue(element.attribute("snap", QString::number(m_snappingModel->findText("1/4 Bar"))).toInt());
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
 
