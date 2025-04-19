@@ -24,23 +24,24 @@
 
 #include "SampleTrackView.h"
 
+#include <Clipboard.h>
 #include <QApplication>
+#include <QFileInfo>
 #include <QMenu>
 
 #include "ConfigManager.h"
-#include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Mixer.h"
-#include "MixerView.h"
 #include "GuiApplication.h"
 #include "Knob.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "SampleClip.h"
 #include "SampleTrackWindow.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
-
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -188,21 +189,40 @@ void SampleTrackView::modelChanged()
 
 
 
-void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
+void SampleTrackView::dragEnterEvent(QDragEnterEvent* event)
 {
-	StringPairDrag::processDragEnterEvent(dee, QString("samplefile"));
+	const QMimeData* mime = event->mimeData();
+
+	if (mime->hasUrls())
+	{
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString path = urls.first().toLocalFile();
+			QString ext = QFileInfo(path).suffix().toLower();
+
+			if (Clipboard::audioExtensions.contains(ext))
+			{
+				event->acceptProposedAction();
+				return;
+			}
+		}
+	}
+	event->ignore();
 }
 
 
 
 
-void SampleTrackView::dropEvent(QDropEvent *de)
+void SampleTrackView::dropEvent(QDropEvent * de)
 {
-	QString type  = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue(de);
+	const QList<QUrl> urls = de->mimeData()->urls();
+	if (urls.isEmpty()) return;
 
-	if (type == "samplefile")
-	{
+	QString filePath = urls.first().toLocalFile();
+	QString ext = QFileInfo(filePath).suffix().toLower();
+
+	if (Clipboard::audioExtensions.contains(ext)) {
 		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
@@ -218,7 +238,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 						).quantize(1.0);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
-		if (sClip) { sClip->setSampleFile(value); }
+		if (sClip) { sClip->setSampleFile(filePath); }
 	}
 }
 

@@ -24,11 +24,13 @@
 
 #include "AudioFileProcessorView.h"
 
+#include <QFileInfo>
+#include <QPainter>
+#include <iostream>
+
 #include "AudioFileProcessor.h"
 #include "AudioFileProcessorWaveView.h"
-
-#include <QPainter>
-
+#include "Clipboard.h"
 #include "ComboBox.h"
 #include "DataFile.h"
 #include "FontHelper.h"
@@ -37,8 +39,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
-#include "Clipboard.h"
-
 
 namespace lmms
 {
@@ -149,31 +149,32 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 
 void AudioFileProcessorView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
 
-	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
+	QString txt = dee->mimeData()->data(Clipboard::mimeType(Clipboard::MimeType::StringPair));
+	if (txt.section(':', 0, 0) == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
-		QString txt = dee->mimeData()->data(
-						mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == QString("clip_%1").arg(
-							static_cast<int>(Track::Type::Sample)))
+		dee->acceptProposedAction();
+		return;
+	}
+
+	const QMimeData* mime = dee->mimeData();
+	if (mime->hasUrls())
+	{
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
 		{
-			dee->acceptProposedAction();
-		}
-		else if (txt.section(':', 0, 0) == "samplefile")
-		{
-			dee->acceptProposedAction();
-		}
-		else
-		{
-			dee->ignore();
+			QString filePath = urls.first().toLocalFile();
+			QString ext = QFileInfo(filePath).suffix().toLower();
+
+			if (Clipboard::audioExtensions.contains(ext))
+			{
+				dee->acceptProposedAction();
+				return;
+			}
 		}
 	}
-	else
-	{
-		dee->ignore();
-	}
+
+	dee->ignore();
 }
 
 void AudioFileProcessorView::newWaveView()
@@ -197,7 +198,17 @@ void AudioFileProcessorView::dropEvent(QDropEvent* de)
 	const auto type = StringPairDrag::decodeKey(de);
 	const auto value = StringPairDrag::decodeValue(de);
 
-	if (type == "samplefile") { castModel<AudioFileProcessor>()->setAudioFile(value); }
+	const QList<QUrl> urls = de->mimeData()->urls();
+	if (!urls.isEmpty())
+	{
+		QString filePath = urls.first().toLocalFile();
+		QString ext = QFileInfo(filePath).suffix().toLower();
+
+		if (Clipboard::audioExtensions.contains(ext))
+		{
+			castModel<AudioFileProcessor>()->setAudioFile(filePath);
+		}
+	}
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
 		DataFile dataFile(value.toUtf8());

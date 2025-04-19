@@ -26,19 +26,18 @@
 
 #include <QDebug>
 #include <QDragEnterEvent>
+#include <QFileInfo>
 #include <QPushButton>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Lv2SubPluginFeatures.h"
 #include "StringPairDrag.h"
-#include "Clipboard.h"
-
 #include "embed.h"
 #include "plugin_export.h"
-
 
 namespace lmms
 {
@@ -257,21 +256,23 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	void (QDragEnterEvent::*reaction)() = &QDragEnterEvent::ignore;
-
-	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
+	const QMimeData* mime = _dee->mimeData();
+	if (mime->hasUrls())
 	{
-		const QString txt =
-			_dee->mimeData()->data( mimeType( MimeType::StringPair ) );
-		if (txt.section(':', 0, 0) == "pluginpresetfile") {
-			reaction = &QDragEnterEvent::acceptProposedAction;
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString path = urls.first().toLocalFile();
+			QString ext = QFileInfo(path).suffix().toLower();
+
+			if (Clipboard::audioExtensions.contains(ext))
+			{
+				_dee->acceptProposedAction();
+				return;
+			}
 		}
 	}
-
-	(_dee->*reaction)();
+	_dee->ignore();
 }
 
 
@@ -279,13 +280,21 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 
 void Lv2InsView::dropEvent(QDropEvent *_de)
 {
-	const QString type = StringPairDrag::decodeKey(_de);
-	const QString value = StringPairDrag::decodeValue(_de);
-	if (type == "pluginpresetfile")
+	const QMimeData* mime = _de->mimeData();
+	if (mime->hasUrls())
 	{
-		castModel<Lv2Instrument>()->loadFile(value);
-		_de->accept();
-		return;
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString filePath = urls.first().toLocalFile();
+			QString ext = QFileInfo(filePath).suffix().toLower();
+			if (Clipboard::presetExtensions.contains(ext))
+			{
+				castModel<Lv2Instrument>()->loadFile(filePath);
+				_de->accept();
+				return;
+			}
+		}
 	}
 	_de->ignore();
 }

@@ -815,61 +815,72 @@ void FileBrowserTreeWidget::stopPreview()
 
 
 
-void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
+void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent* me)
 {
-	if( m_mousePressed == true &&
-		( m_pressPos - me->pos() ).manhattanLength() >
-					QApplication::startDragDistance() )
+	if (m_mousePressed && (m_pressPos - me->pos()).manhattanLength() > QApplication::startDragDistance())
 	{
 		// make sure any playback is stopped
-		mouseReleaseEvent( nullptr );
+		mouseReleaseEvent(nullptr);
 
 		auto f = dynamic_cast<FileItem*>(itemAt(m_pressPos));
-		if( f != nullptr )
+		if (f == nullptr) return;
+
+		QDrag* drag = new QDrag(this);
+		QMimeData* mimeData = new QMimeData();
+
+		QString internalType;
+		QString iconName;
+
+		switch (f->type())
 		{
-			switch( f->type() )
-			{
-				case FileItem::FileType::Preset:
-					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsPreset ?
-							"presetfile" : "pluginpresetfile",
-							f->fullName(),
-							embed::getIconPixmap( "preset_file" ), this );
-					break;
-
-				case FileItem::FileType::Sample:
-					new StringPairDrag( "samplefile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::FileType::SoundFont:
-					new StringPairDrag( "soundfontfile", f->fullName(),
-							embed::getIconPixmap( "soundfont_file" ), this );
-					break;
-				case FileItem::FileType::Patch:
-					new StringPairDrag( "patchfile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::FileType::VstPlugin:
-					new StringPairDrag( "vstpluginfile", f->fullName(),
-							embed::getIconPixmap( "vst_plugin_file" ), this );
-					break;
-				case FileItem::FileType::Midi:
-					new StringPairDrag( "importedproject", f->fullName(),
-							embed::getIconPixmap( "midi_file" ), this );
-					break;
-				case FileItem::FileType::Project:
-					new StringPairDrag( "projectfile", f->fullName(),
-							embed::getIconPixmap( "project_file" ), this );
-					break;
-
-				default:
-					break;
-			}
+		case FileItem::FileType::Preset:
+			internalType = f->handling() == FileItem::FileHandling::LoadAsPreset ? "presetfile" : "pluginpresetfile";
+			iconName = "preset_file";
+			break;
+		case FileItem::FileType::Sample:
+			internalType = "samplefile";
+			iconName = "sample_file";
+			break;
+		case FileItem::FileType::SoundFont:
+			internalType = "soundfontfile";
+			iconName = "soundfont_file";
+			break;
+		case FileItem::FileType::Patch:
+			internalType = "patchfile";
+			iconName = "sample_file";
+			break;
+		case FileItem::FileType::VstPlugin:
+			internalType = "vstpluginfile";
+			iconName = "vst_plugin_file";
+			break;
+		case FileItem::FileType::Midi:
+			internalType = "importedproject";
+			iconName = "midi_file";
+			break;
+		case FileItem::FileType::Project:
+			internalType = "projectfile";
+			iconName = "project_file";
+			break;
+		default:
+			return;
 		}
+
+		QString filePath = QUrl::fromLocalFile(f->fullName()).toString();
+
+		// Internal LMMS type
+		mimeData->setData("application/x-lmms-type", internalType.toUtf8());
+		mimeData->setData("application/x-lmms-path", f->fullName().toUtf8());
+
+		// For external applications
+		QList<QUrl> urls;
+		urls << QUrl::fromLocalFile(f->fullName());
+		mimeData->setUrls(urls); // This sets the "text/uri-list" MIME type
+
+		drag->setMimeData(mimeData);
+		drag->setPixmap(embed::getIconPixmap(iconName.toStdString()));
+		drag->exec(Qt::CopyAction);
 	}
 }
-
-
-
 
 void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {

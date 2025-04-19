@@ -81,10 +81,21 @@ StringPairDrag::~StringPairDrag()
 
 
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys )
+						const QString & _allowed_keys)
 {
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
+
+	const QMimeData* mime = _dee->mimeData();
+
+	if (mime->hasUrls())
+	{
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			return false;
+		}
+	}
 
 	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{

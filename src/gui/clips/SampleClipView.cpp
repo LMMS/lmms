@@ -21,16 +21,16 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
+#include <Clipboard.h>
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -38,6 +38,7 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackView.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -104,24 +105,39 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 
 
-
-void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
+void SampleClipView::dragEnterEvent(QDragEnterEvent* event)
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	const QMimeData* mime = event->mimeData();
+
+	if (mime->hasUrls())
 	{
-		ClipView::dragEnterEvent( _dee );
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString path = urls.first().toLocalFile();
+			QString ext = QFileInfo(path).suffix().toLower();
+
+			if (Clipboard::audioExtensions.contains(ext))
+			{
+				event->acceptProposedAction();
+				return;
+			}
+		}
 	}
+	event->ignore();
 }
-
-
-
-
-
 
 void SampleClipView::dropEvent( QDropEvent * _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	const QList<QUrl> urls = _de->mimeData()->urls();
+	if (!urls.isEmpty())
+	{
+		QString filePath = urls.first().toLocalFile();
+		QString ext = QFileInfo(filePath).suffix().toLower();
+		if (Clipboard::audioExtensions.contains(ext)) { m_clip->setSampleFile(filePath); }
+	}
+
+	if ( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
 		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();

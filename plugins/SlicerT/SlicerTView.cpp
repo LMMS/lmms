@@ -25,6 +25,7 @@
 #include "SlicerTView.h"
 
 #include <QDropEvent>
+#include <QFileInfo>
 #include <qpixmap.h>
 #include <qpushbutton.h>
 
@@ -144,32 +145,46 @@ void SlicerTView::openFiles()
 // all the drag stuff is copied from AudioFileProcessor
 void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
+	const QMimeData* mime = dee->mimeData();
 
-	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
+	QString txt = dee->mimeData()->data(Clipboard::mimeType(Clipboard::MimeType::StringPair));
+	if (txt.section(':', 0, 0) == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
-		QString txt = dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
-		{
-			dee->acceptProposedAction();
-		}
-		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
-		else { dee->ignore(); }
+		dee->acceptProposedAction();
 	}
-	else { dee->ignore(); }
+
+	if (mime->hasUrls())
+	{
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString path = urls.first().toLocalFile();
+			QString ext = QFileInfo(path).suffix().toLower();
+
+			if (Clipboard::audioExtensions.contains(ext))
+			{
+				dee->acceptProposedAction();
+				return;
+			}
+		}
+	}
+	dee->ignore();
 }
 
 void SlicerTView::dropEvent(QDropEvent* de)
 {
 	QString type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue(de);
-	if (type == "samplefile")
+
+	const QList<QUrl> urls = de->mimeData()->urls();
+	if (!urls.isEmpty())
 	{
-		// set m_wf wave file
-		m_slicerTParent->updateFile(value);
-		return;
+		QString filePath = urls.first().toLocalFile();
+		QString ext = QFileInfo(filePath).suffix().toLower();
+
+		if (Clipboard::audioExtensions.contains(ext)) { m_slicerTParent->updateFile(filePath); }
 	}
+
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
 		DataFile dataFile(value.toUtf8());
