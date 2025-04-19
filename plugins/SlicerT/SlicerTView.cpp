@@ -71,6 +71,12 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
+	m_clearButton = new PixmapButton(this, tr("Clear all slices"));
+	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_active"));
+	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_inactive"));
+	m_clearButton->setToolTip(tr("Clear all slices"));
+	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearSlices);
+
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
 	m_bpmBox->setToolTip(tr("Original sample BPM"));
 	m_bpmBox->setModel(&m_slicerTParent->m_originalBPM);
@@ -109,6 +115,12 @@ Knob* SlicerTView::createStyledKnob()
 	newKnob->setCenterPointX(24.0);
 	newKnob->setCenterPointY(15.0);
 	return newKnob;
+}
+
+// Clear all notes
+void SlicerTView::clearSlices() {
+	m_slicerTParent->m_slicePoints.clear();
+	emit m_slicerTParent->dataChanged();
 }
 
 // copied from piano roll
@@ -272,7 +284,8 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 	m_snapSetting->move(s_x6 - 8, m_y1 + 3);
 
 	// right box
-	m_syncToggle->move((width() - 100), m_y1 + 5);
+	m_syncToggle->move((width() - 100), m_y1 - 6 - 1);
+	m_clearButton->move((width() - 100), m_y1 + 16 + 1);
 
 	m_folderButton->move(width() - 20, height() - s_bottomBoxHeight - s_sampleBoxHeight + 1);
 
