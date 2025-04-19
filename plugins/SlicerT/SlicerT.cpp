@@ -62,7 +62,6 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
 	, m_sliceSnap(this, tr("Slice snap"))
 	, m_enableSync(false, this, tr("BPM sync"))
-	, m_clearAll(false, this, tr("Clear all slices"))
 	, m_originalSample()
 	, m_parentTrack(instrumentTrack)
 {

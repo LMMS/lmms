@@ -72,8 +72,8 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
 	m_clearButton = new PixmapButton(this, tr("Clear all slices"));
-	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_active"));
-	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clearSlices_inactive"));
+	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clear_slices_active"));
+	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clear_slices_inactive"));
 	m_clearButton->setToolTip(tr("Clear all slices"));
 	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearSlices);
 
@@ -119,8 +119,14 @@ Knob* SlicerTView::createStyledKnob()
 
 // Clear all notes
 void SlicerTView::clearSlices() {
+
 	m_slicerTParent->m_slicePoints.clear();
+
+	m_slicerTParent->m_slicePoints.push_back(0);
+	m_slicerTParent->m_slicePoints.push_back(1);
+
 	emit m_slicerTParent->dataChanged();
+
 }
 
 // copied from piano roll
