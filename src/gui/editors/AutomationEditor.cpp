@@ -1241,6 +1241,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				if (note->detuning()->automationClip() == m_clip) {
 					detuningOffset = note->pos();
+					m_detuningOffset = detuningOffset;
 					detuningNote = note;
 				}
 
@@ -1683,6 +1684,7 @@ void AutomationEditor::play()
 		if( Engine::getSong()->playMode() != Song::PlayMode::MidiClip )
 		{
 			Engine::getSong()->stop();
+			Engine::getSong()->setToTime(m_detuningOffset, Song::PlayMode::MidiClip);
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 		else if( Engine::getSong()->isStopped() == false )
@@ -1691,6 +1693,7 @@ void AutomationEditor::play()
 		}
 		else
 		{
+			Engine::getSong()->setToTime(m_detuningOffset, Song::PlayMode::MidiClip);
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
@@ -1702,6 +1705,7 @@ void AutomationEditor::play()
 	{
 		if( Engine::getSong()->isStopped() == true )
 		{
+			Engine::getSong()->setToTime(m_clip->startPosition().getTicks(), Song::PlayMode::Song);
 			Engine::getSong()->playSong();
 		}
 		else
