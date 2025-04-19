@@ -48,10 +48,11 @@ QTimer* InteractiveModelView::s_highlightTimer = nullptr;
 SimpleTextFloat* InteractiveModelView::s_simpleTextFloat = nullptr;
 std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
 
-InteractiveModelView::InteractiveModelView(QWidget* widget) :
+InteractiveModelView::InteractiveModelView(QWidget* widget, size_t typeId) :
 	QWidget(widget),
 	m_isHighlighted(false),
-	m_lastShortcutCounter(0)
+	m_lastShortcutCounter(0),
+	m_interactiveModelViewTypeId(typeId)
 {
 	s_interactiveWidgets.push_back(this);
 
@@ -84,7 +85,7 @@ void InteractiveModelView::startHighlighting(Clipboard::DataType dataType)
 	{
 		bool found = false;
 		const std::vector<ActionStruct>& actions = (*it)->getActions();
-		// this could be optimized by logging `getTypeId()`s and comparing it's Id to the already accepted Ids
+		// this could be optimized by logging `getStoredTypeId()`s and comparing it's Id to the already accepted Ids
 		for (auto& curAction : actions)
 		{
 			if (curAction.doesTypeMatch(dataType)) { found = true; break; }
@@ -254,7 +255,7 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 		showMessage(message);
 		qDebug("HandleKeyPress 11");
 		//processShortcutPressed(foundIndex, event);
-		doAction(foundIndex, actions);
+		doAction(foundIndex);
 		qDebug("HandleKeyPress 12");
 >>>>>>> f0d9b5a58 (InteractiveModelView_moving_to_actions)
 
@@ -314,31 +315,23 @@ bool InteractiveModelView::processPaste(const QMimeData* mimeData)
 	return shouldAccept;
 }
 
-void InteractiveModelView::doAction(size_t actionIndex)
+size_t InteractiveModelView::getFromFn(void* functionPtr)
 {
-	doAction(actionIndex, getActions());
+	const std::vector<ActionStruct>& actions = getActions();
+	for (size_t i = 0; i < actions.size(); i++)
+	{
+		if (actions[i].doFn == functionPtr || actions[i].doTypedFn.isMatch(functionPtr))
+		{
+			return i;
+		}
+	}
+	return actions.size();
 }
 
-void InteractiveModelView::doAction(size_t actionIndex, const std::vector<ActionStruct>& actions)
+void InteractiveModelView::doAction(size_t actionIndex, bool shouldLinkBack)
 {
-	if (actionIndex > actions.size()) { return; }
-	// if the action accepts the current clipboard data
-	// `Clipboard::DataType::Any` will accept anything
-	if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData()))) { return; }
-
-	// check for data type
-	// check for type specific
-	
-	if (actions[actionIndex].doFn != nullptr)
-	{
-		//undoStack->push(new GuiAction(actions[actionIndex].name, this, actions[actionIndex].doFn, actions[actionIndex].undoFn, 0));
-		(*actions[actionIndex].doFn)(this);
-	}
-	else
-	{
-		//undoStack->push(new GuiAction(actions[actionIndex].name, this, actions[actionIndex].doFloatFn, actions[actionIndex].undoFloatFn, 0.0f, 0.0f));
-		(*actions[actionIndex].doFloatFn)(this, 0.0f, 0.0f);
-	}
+	qDebug("doAction typeless version");
+	doAction<bool>(actionIndex, false, shouldLinkBack);
 }
 
 void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
@@ -346,10 +339,9 @@ void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool sho
 	setIsHighlighted(isHighlighted, shouldOverrideUpdate);
 }
 
-size_t InteractiveModelView::getTypeId()
+size_t InteractiveModelView::getStoredTypeId()
 {
-	// could be replaced by typenames, but then constructing
-	return typeid(*this).hash_code();
+	return m_interactiveModelViewTypeId;
 }
 
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
@@ -368,10 +360,9 @@ void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 	}
 }
 
-QString InteractiveModelView::buildShortcutMessage()
+QString InteractiveModelView::buildShortcutMessage(const std::vector<ActionStruct>& actions)
 {
 	QString message = "";
-	const std::vector<ActionStruct>& actions = getActions();
 	for (size_t i = 0; i < actions.size(); i++)
 	{
 		if (actions[i].isShortcut == true)
@@ -410,26 +401,26 @@ void InteractiveModelView::setIsHighlighted(bool isHighlighted, bool shouldOverr
 	}
 }
 
-ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
+ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
 	actionName(actionName),
 	actionHint(actionHint),
 	doFn(doFn),
 	undoFn(undoFn),
-	doFloatFn(nullptr),
-	undoFloatFn(nullptr),
+	doTypedFn(),
+	undoTypedFn(),
 	isTypeSpecific(isTypeSpecific),
 	isShortcut(false)
 {
 	addAcceptedDataType(acceptedType);
 }
 
-ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::FloatActionFn doFn, GuiAction::FloatActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
+ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
 	actionName(actionName),
 	actionHint(actionHint),
 	doFn(nullptr),
 	undoFn(nullptr),
-	doFloatFn(doFn),
-	undoFloatFn(undoFn),
+	doTypedFn(doFn),
+	undoTypedFn(undoFn),
 	isTypeSpecific(isTypeSpecific),
 	isShortcut(false)
 {
