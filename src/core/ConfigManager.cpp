@@ -483,8 +483,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 					{
 						if(n.isElement() && n.toElement().hasAttributes())
 						{
-							m_recentlyOpenedProjects <<
-									n.toElement().attribute("path");
+							m_recentlyOpenedProjects << PathUtil::toAbsolute(n.toElement().attribute("path"));
 						}
 						n = n.nextSibling();
 					}
@@ -644,7 +643,7 @@ void ConfigManager::saveConfigFile()
 	for (const auto& recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
-		n.setAttribute("path", recentlyOpenedProject);
+		n.setAttribute("path", PathUtil::toShortestRelative(recentlyOpenedProject));
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);
