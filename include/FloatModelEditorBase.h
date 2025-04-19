@@ -38,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelViewTyped<FloatModelEditorBase>, public FloatModelView
 {
 	Q_OBJECT
 
@@ -64,11 +64,22 @@ public:
 		setUnit(txt_after);
 	}
 
+	static void copyValueAction(InteractiveModelView* widget);
+	static void pasteNoReturnAction(InteractiveModelView* widget);
+	static void pasteAction(InteractiveModelView* widget, bool* isSuccessful);
+	static void linkAction(InteractiveModelView* widget, int id);
+	static void unlinkAction(InteractiveModelView* widget, int id);
+	static void getLinkAction(InteractiveModelView* widget);
+	static void unlinkAllAction(InteractiveModelView* widget);
+	static void increaseValueAction(InteractiveModelView* widget);
+	static void decreaseValueAction(InteractiveModelView* widget);
+	static void addValueAction(InteractiveModelView* widget, float floatValue);
+	static void subtractValueAction(InteractiveModelView* widget, float floatValue);
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
-
 
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
@@ -86,10 +97,10 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	// InteractiveModelView methods
-	const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
-	QString getShortcutMessage() override { return m_shortcutMessage; }
+	//const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
+	//QString getShortcutMessage() override { return m_shortcutMessage; }
 	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-	size_t getTypeId() override { return typeid(*this).hash_code(); }
+	//size_t getTypeId() override { return typeid(*this).hash_code(); }
 
 	virtual float getValue(const QPoint & p);
 
@@ -112,8 +123,8 @@ private:
 	}
 
 	static SimpleTextFloat * s_textFloat;
-	static QString m_shortcutMessage;
-	static std::vector<ActionStruct> s_actionArray;
+	//static QString m_shortcutMessage; TODO remove
+	//static std::vector<ActionStruct> s_actionArray; TODO remove
 
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;

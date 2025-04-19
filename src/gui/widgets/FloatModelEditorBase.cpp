@@ -44,31 +44,48 @@
 namespace lmms::gui
 {
 
-SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
-QString FloatModelEditorBase::m_shortcutMessage = "";
-std::vector<ActionStruct> FloatModelEditorBase::s_actionArray =
+template <>
+std::vector<ActionStruct> InteractiveModelViewTyped<FloatModelEditorBase>::addActions(QString& shortcutMessage)
 {
-	//ActionStruct(const QString& actionName, const QString& actionHint, GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType);
+	// NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
+	// actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	std::vector<ActionStruct> output =
+	{
+		ActionStruct(QString(tr("Copy value")), QString(tr("Copy value")), &FloatModelEditorBase::copyValueAction, nullptr,
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Link widget")), QString(tr("Link widget")), &FloatModelEditorBase::getLinkAction, nullptr, 
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Paste value")), QString(tr("Paste value")), &FloatModelEditorBase::pasteNoReturnAction, nullptr,
+			true, Clipboard::DataType::FloatValue),
+		ActionStruct(QString(tr("Increase value")), QString(tr("Increase value")), &FloatModelEditorBase::increaseValueAction, nullptr,
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Decrease value")), QString(tr("Decrease value")), &FloatModelEditorBase::decreaseValueAction, nullptr,
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Unlink widget")), QString(tr("Unlink widget")), &FloatModelEditorBase::unlinkAllAction, nullptr,
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Set value")), QString(tr("Set value")), ActionSafeFnPtr(ActionSafeFnPtr::helpConstruct<float>(&FloatModelEditorBase::addValueAction)),
+			ActionSafeFnPtr(ActionSafeFnPtr::helpConstruct<float>(&FloatModelEditorBase::subtractValueAction)),
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Set link")), QString(tr("Set link")), ActionSafeFnPtr(ActionSafeFnPtr::helpConstruct<int>(&FloatModelEditorBase::linkAction)),
+			ActionSafeFnPtr(ActionSafeFnPtr::helpConstruct<int>(&FloatModelEditorBase::unlinkAction)),
+			true, Clipboard::DataType::Any)
+	};
+	output[0].setShortcut(Qt::Key_C, Qt::ControlModifier, 0, false);
+	output[1].setShortcut(Qt::Key_C, Qt::ControlModifier, 1, false);
+	output[2].setShortcut(Qt::Key_V, Qt::ControlModifier, 0, false);
+	output[2].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink);
+	output[3].setShortcut(Qt::Key_E, Qt::ShiftModifier, 0, false);
+	output[4].setShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, false);
+	output[5].setShortcut(Qt::Key_U, Qt::ControlModifier, 0, false);
 
-	ActionStruct(QString(tr("Copy value")), QString(tr("Copy value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
-	ActionStruct(QString(tr("Link widget")), QString(tr("Link widget")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
-	ActionStruct(QString(tr("Paste value")), QString(tr("Paste value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::FloatValue),
-	ActionStruct(QString(tr("Increase value")), QString(tr("Increase value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
-	ActionStruct(QString(tr("Decrease value")), QString(tr("Decrease value")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any),
-	ActionStruct(QString(tr("Unlink widget")), QString(tr("Unlink widget")), GuiAction::ActionFn doFn, GuiAction::ActionFn undoFn, true, Clipboard::DataType::Any)
+	shortcutMessage = InteractiveModelView::buildShortcutMessage(output);
+	return output;
+}
 
-	/*
-	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_E, Qt::ShiftModifier, 0, QString(tr("Increase value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, QString(tr("Decrease value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_U, Qt::ControlModifier, 0, QString(tr("Unlink widget")), false)
-	*/
-};
+SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
-	InteractiveModelView(parent),
+	InteractiveModelViewTyped<FloatModelEditorBase>(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
 	m_volumeKnob(false),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
@@ -86,23 +103,121 @@ void FloatModelEditorBase::initUi(const QString & name)
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	if (m_shortcutMessage == "")
-	{
-		m_shortcutMessage = buildShortcutMessage();
-		s_actionArray[0].setShortcut(Qt::Key_C, Qt::ControlModifier, 0, false);
-		s_actionArray[1].setShortcut(Qt::Key_C, Qt::ControlModifier, 1, false);
-		s_actionArray[2].setShortcut(Qt::Key_V, Qt::ControlModifier, 0, false);
-		s_actionArray[2].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink);
-		s_actionArray[3].setShortcut(Qt::Key_E, Qt::ShiftModifier, 0, false);
-		s_actionArray[4].setShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, false);
-		s_actionArray[5].setShortcut(Qt::Key_U, Qt::ControlModifier, 0, false);
-	}
-
 	setWindowTitle(name);
 
 	setFocusPolicy(Qt::ClickFocus);
 
 	doConnections();
+}
+
+void FloatModelEditorBase::copyValueAction(InteractiveModelView* widget)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+
+	qDebug("processShortcutPressed 2, val: %f", (castedWidget->model()->value() * castedWidget->getConversionFactor()));
+	Clipboard::copyStringPair(Clipboard::DataType::FloatValue, Clipboard::encodeFloatValue(castedWidget->model()->value() * castedWidget->getConversionFactor()));
+	InteractiveModelView::startHighlighting(Clipboard::DataType::FloatValue);
+}
+void FloatModelEditorBase::pasteNoReturnAction(InteractiveModelView* widget)
+{
+	FloatModelEditorBase::pasteAction(widget, nullptr);
+}
+void FloatModelEditorBase::pasteAction(InteractiveModelView* widget, bool* isSuccesful)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+
+	Clipboard::DataType type = Clipboard::decodeKey(Clipboard::getMimeData());
+	QString value = Clipboard::decodeValue(Clipboard::getMimeData());
+	qDebug("paste action 1");
+
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::FloatValue)
+	{
+	qDebug("paste action 2");
+		float increasedValue = LocaleHelper::toFloat(value) - castedWidget->model()->value();
+	qDebug("paste action 2.1");
+		castedWidget->doAction<float>(6, increasedValue, true);
+		shouldAccept = true;
+	qDebug("paste action 3");
+	}
+	else if (type == Clipboard::DataType::AutomatableModelLink)
+	{
+	qDebug("paste action 4");
+		castedWidget->doAction<int>(7, value.toInt(), true);
+		shouldAccept = true;
+	qDebug("paste action 5");
+	}
+	if (shouldAccept)
+	{
+	qDebug("paste action 6");
+		if (isSuccesful != nullptr) { *isSuccesful = true; }
+		InteractiveModelView::stopHighlighting();
+	qDebug("paste action 7");
+	}
+}
+void FloatModelEditorBase::linkAction(InteractiveModelView* widget, int id)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+
+	auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(id));
+	if (mod != nullptr)
+	{
+		AutomatableModel::linkModels(castedWidget->model(), mod);
+		mod->setValue(castedWidget->model()->value());
+	}
+}
+void FloatModelEditorBase::unlinkAction(InteractiveModelView* widget, int id)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+
+	auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(id));
+	if (mod != nullptr)
+	{
+		AutomatableModel::unlinkModels(castedWidget->model(), mod);
+	}
+}
+void FloatModelEditorBase::getLinkAction(InteractiveModelView* widget)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+	Clipboard::copyStringPair(Clipboard::DataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*castedWidget->model()));
+	InteractiveModelView::startHighlighting(Clipboard::DataType::AutomatableModelLink);
+}
+void FloatModelEditorBase::unlinkAllAction(InteractiveModelView* widget)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+	castedWidget->model()->unlinkAllModels();
+}
+void FloatModelEditorBase::increaseValueAction(InteractiveModelView* widget)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+	castedWidget->doAction<float>(6, castedWidget->model()->range() / 20.0f, true);
+}
+void FloatModelEditorBase::decreaseValueAction(InteractiveModelView* widget)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+	castedWidget->doAction<float>(6, -castedWidget->model()->range() / 20.0f, true);
+}
+void FloatModelEditorBase::addValueAction(InteractiveModelView* widget, float floatValue)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+	qDebug("addValueAction 1");
+	castedWidget->model()->setValue(castedWidget->model()->value() + floatValue);
+	qDebug("addValueAction 2");
+}
+void FloatModelEditorBase::subtractValueAction(InteractiveModelView* widget, float floatValue)
+{
+	if (widget == nullptr || widget->getStoredTypeId() != getTypeId<FloatModelEditorBase>()) { return; }
+	auto castedWidget = static_cast<FloatModelEditorBase*>(widget);
+	castedWidget->model()->setValue(castedWidget->model()->value() - floatValue);
 }
 
 
