@@ -1517,9 +1517,9 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 {
 	void * chunk = nullptr;
-	auto pLen = new unsigned int[1];
+	unsigned int pLen;
 	unsigned int len = 0;
-	auto pBank = (sBank*)new char[sizeof(sBank)];
+	sBank pBank;
 	FILE * stream = F_OPEN_UTF8( _file, "rb" );
 	if (!stream)
 	{
@@ -1527,36 +1527,34 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			"Error opening file for loading preset.\n" );
 		return;
 	}
-	if ( fread ( pBank, 1, 56, stream ) != 56 )
+	if ( fread ( &pBank, 1, 56, stream ) != 56 )
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
 	}
-        pBank->fxID = endian_swap( pBank->fxID );
-	pBank->numPrograms = endian_swap( pBank->numPrograms );
+    pBank.fxID = endian_swap( pBank.fxID );
+	pBank.numPrograms = endian_swap( pBank.numPrograms );
 	unsigned int toUInt;
 	float * pFloat;
 
-	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != pBank->fxID) {
+	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != pBank.fxID) {
 		sendMessage( message( IdVstCurrentProgramName ).
 					addString( "Error: Plugin UniqID not match" ) );
 		fclose( stream );
-		delete[] (unsigned int*)pLen;
-		delete[] (sBank*)pBank;
 		return;
 	}
 
 	if( _file.substr( _file.find_last_of( "." ) + 1 ) != "fxp" )
 		fseek ( stream , 156 , SEEK_SET );
 
-	if(pBank->fxMagic != 0x6B427846) {
-		if(pBank->fxMagic != 0x6B437846) {
-			if ( fread (pLen, 1, 4, stream) != 4 )
+	if(pBank.fxMagic != 0x6B427846) {
+		if(pBank.fxMagic != 0x6B437846) {
+			if ( fread (&pLen, 1, 4, stream) != 4 )
 			{
 				fprintf( stderr,
 					"Error loading preset file.\n" );
 			}
-			chunk = new char[len = endian_swap(*pLen)];
-		} else chunk = new char[len = sizeof(float)*pBank->numPrograms];
+			chunk = new char[len = endian_swap(pLen)];
+		} else chunk = new char[len = sizeof(float)*pBank.numPrograms];
 		if ( fread (chunk, len, 1, stream) != 1 )
 		{
 			fprintf( stderr, "Error loading preset file.\n" );
@@ -1565,14 +1563,14 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	}
 
 	if(_file.substr(_file.find_last_of(".") + 1) == "fxp") {
-		pBank->prgName[23] = 0;
-		pluginDispatch( 4, 0, 0, pBank->prgName );
-		if(pBank->fxMagic != 0x6B437846)
+		pBank.prgName[23] = 0;
+		pluginDispatch( 4, 0, 0, pBank.prgName );
+		if(pBank.fxMagic != 0x6B437846)
 			pluginDispatch( 24, 1, len, chunk );
 		else
 		{
 			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk);
-			for (auto i = 0u; i < pBank->numPrograms; i++)
+			for (auto i = 0u; i < pBank.numPrograms; i++)
 			{
 				toUInt = endian_swap( toUIntArray[ i ] );
 				pFloat = ( float* ) &toUInt;
@@ -1580,16 +1578,16 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			}
 		}
 	} else {
-		if(pBank->fxMagic != 0x6B427846) {
+		if(pBank.fxMagic != 0x6B427846) {
 			pluginDispatch( 24, 0, len, chunk );
 		} else {
-			int numPrograms = pBank->numPrograms;
+			int numPrograms = pBank.numPrograms;
 			unsigned int * toUIntArray;
 			int currProgram = pluginDispatch( effGetProgram );
 			chunk = new char[ len = sizeof(float)*m_plugin->numParams ];
 			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
 			for (int i =0; i < numPrograms; i++) {
-				if ( fread (pBank, 1, 56, stream) != 56 )
+				if ( fread (&pBank, 1, 56, stream) != 56 )
 				{
 					fprintf( stderr,
 					"Error loading preset file.\n" );
@@ -1600,8 +1598,8 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 					"Error loading preset file.\n" );
 				}
 				pluginDispatch( effSetProgram, 0, i );
-				pBank->prgName[23] = 0;
-				pluginDispatch( 4, 0, 0, pBank->prgName );
+				pBank.prgName[23] = 0;
+				pluginDispatch( 4, 0, 0, pBank.prgName );
 				for (int j = 0; j < m_plugin->numParams; j++ ) {
 					toUInt = endian_swap( toUIntArray[ j ] );
 					pFloat = ( float* ) &toUInt;
@@ -1615,8 +1613,6 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 	sendCurrentProgramName();
 
-	delete[] (unsigned int*)pLen;
-	delete[] (sBank*)pBank;
 	delete[] (char*)chunk;
 }
 
