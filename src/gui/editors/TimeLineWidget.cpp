@@ -94,6 +94,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
+	autoScroll->changeState(ConfigManager::inst()->value("ui", "autoscrollstate").toInt());
 
 	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
@@ -140,6 +141,7 @@ void TimeLineWidget::updatePosition()
 void TimeLineWidget::toggleAutoScroll( int _n )
 {
 	m_autoScroll = static_cast<AutoScrollState>( _n );
+	ConfigManager::inst()->setValue("ui", "autoscrollstate", QString::number(_n));
 }
 
 void TimeLineWidget::paintEvent( QPaintEvent * )
