@@ -38,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelViewTyped<FloatModelEditorBase>, public FloatModelView
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView, public InteractiveModelViewTyped<FloatModelEditorBase>
 {
 	Q_OBJECT
 
@@ -75,6 +75,9 @@ public:
 	static void decreaseValueAction(InteractiveModelView* widget);
 	static void addValueAction(InteractiveModelView* widget, float floatValue);
 	static void subtractValueAction(InteractiveModelView* widget, float floatValue);
+	static void openInputDialogAction(InteractiveModelView* widget);
+	static void setScaleLinearAction(InteractiveModelView* widget);
+	static void setScaleLogarithmicAction(InteractiveModelView* widget);
 
 signals:
 	void sliderPressed();
@@ -82,24 +85,24 @@ signals:
 	void sliderMoved(float value);
 
 protected:
-	void contextMenuEvent(QContextMenuEvent * me) override;
-	void dragEnterEvent(QDragEnterEvent * dee) override;
-	void dropEvent(QDropEvent * de) override;
+	void contextMenuEvent(QContextMenuEvent * me) override; // TODO
+	void dragEnterEvent(QDragEnterEvent * dee) override; // TODO
+	void dropEvent(QDropEvent * de) override; // TODO
 	void focusOutEvent(QFocusEvent * fe) override;
 	void mousePressEvent(QMouseEvent * me) override;
 	void mouseReleaseEvent(QMouseEvent * me) override;
 	void mouseMoveEvent(QMouseEvent * me) override;
-	void mouseDoubleClickEvent(QMouseEvent * me) override;
+	void mouseDoubleClickEvent(QMouseEvent * me) override; // TODO
 	void paintEvent(QPaintEvent * me) override;
-	void wheelEvent(QWheelEvent * me) override;
+	void wheelEvent(QWheelEvent * me) override; // TODO
 
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 
 	// InteractiveModelView methods
-	//const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
-	//QString getShortcutMessage() override { return m_shortcutMessage; }
-	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
+	const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
+	const QString& getShortcutMessage() override { return getShortcutMessageT(); }
+	//bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 	//size_t getTypeId() override { return typeid(*this).hash_code(); }
 
 	virtual float getValue(const QPoint & p);
