@@ -57,6 +57,7 @@ public:
 	{
 		qDebug("type assert debug: %ld, %ld, %s", m_dataTypeId, typeid(DataType).hash_code(), typeid(DataType).name());
 		if (m_functionPtr == nullptr) { return; }
+		// if this assert fails, you need to change your `DataType` template to the one this one was constructed with (`helpConstruct<DataType>`)
 		assert(m_dataTypeId == typeid(DataType).hash_code());
 		// firstly the FunctionPointer will be casted to a `void*`, so it can be stored without templates,
 		// then it will be casted back to FunctionPointer, so it is safe to use
@@ -71,87 +72,64 @@ private:
 	void* m_functionPtr;
 };
 
-typedef void (*ActionTypelessFnPtr)(InteractiveModelView*);
 
-template<typename DataType>
-class GuiAction// : public QUndoCommand
+class AbstractGuiAction// : public QUndoCommand
 {
 public:
-	GuiAction(const QString& name, InteractiveModelView* object, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, size_t runAmount, bool linkBack) :
-		m_target(object),
-		m_runAmount(runAmount),
-		m_data(nullptr),
-		m_doFn(doFn),
-		m_undoFn(undoFn),
-		m_doTypedFn(),
-		m_undoTypedFn()
-	{}
-	GuiAction(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, DataType data, bool linkBack) :
-		m_target(object),
-		m_runAmount(0),
-		m_data(nullptr),
-		m_doFn(nullptr),
-		m_undoFn(nullptr),
-		m_doTypedFn(doFn),
-		m_undoTypedFn(undoFn)
-	{
-		m_data = std::make_unique<DataType>(data);
-	}
-
-	void undo()// override
-	{
-		if (m_target == nullptr) { return; }
-		if (m_undoFn != nullptr)
-		{
-			for (size_t i = 0; i < m_runAmount; i++)
-			{
-				m_undoFn(m_target);
-			}
-		}
-		else if (m_doTypedFn.isValid())
-		{
-			m_undoTypedFn.callFn<DataType>(m_target, *m_data.get());
-		}
-	}
-	void redo()// override
-	{
-		if (m_target == nullptr) { return; }
-		if (m_doFn != nullptr)
-		{
-			for (size_t i = 0; i < m_runAmount; i++)
-			{
-				m_doFn(m_target);
-			}
-		}
-		else if (m_doTypedFn.isValid())
-		{
-			m_doTypedFn.callFn<DataType>(m_target, *m_data.get());
-		}
-	}
+	AbstractGuiAction(const QString& name, InteractiveModelView* object, bool linkBack);
+	~AbstractGuiAction() {}
+	//! should be undone along with the action before this
+	bool getShouldLinkBack();
 	//! returns true if cleared, use this to delete pointers to destructing objects
-	bool clearObjectIfMatch(InteractiveModelView* object)
-	{
-		if (m_target == nullptr) { return false; }
-		if (object == m_target)
-		{
-			m_target = nullptr;
-			m_data = nullptr;
-			return true;
-		}
-		return false;
-	}
-private:
+	bool clearObjectIfMatch(InteractiveModelView* object);
+protected:
 	const QString m_name;
 	InteractiveModelView* m_target;
 	bool m_isLinkedBack; //! if this is undone, undo the one before this
-	
+};
+
+
+typedef void (*ActionTypelessFnPtr)(InteractiveModelView*);
+class GuiAction : public AbstractGuiAction
+{
+public:
+	GuiAction(const QString& name, InteractiveModelView* object, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, size_t runAmount, bool linkBack);
+	void undo();// override
+	void redo();// override
+private:
 	size_t m_runAmount;
-	std::unique_ptr<DataType> m_data;
-	
 	ActionTypelessFnPtr m_doFn;
 	ActionTypelessFnPtr m_undoFn;
-	ActionSafeFnPtr m_doTypedFn;
-	ActionSafeFnPtr m_undoTypedFn;
+};
+
+
+
+template<typename DataType>
+class GuiActionTyped : public AbstractGuiAction
+{
+public:
+	GuiActionTyped(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, DataType data, bool linkBack) :
+		AbstractGuiAction(name, object, linkBack),
+		m_data(nullptr),
+		m_doFn(doFn),
+		m_undoFn(undoFn)
+	{
+		m_data = std::make_unique<DataType>(data);
+	}
+	void undo()// override
+	{
+		if (m_target == nullptr || m_undoFn.isValid() == false) { return; }
+		m_undoFn.callFn<DataType>(m_target, *m_data.get());
+	}
+	void redo()// override
+	{
+		if (m_target == nullptr || m_doFn.isValid() == false) { return; }
+		m_doFn.callFn<DataType>(m_target, *m_data.get());
+	}
+private:
+	std::unique_ptr<DataType> m_data;
+	ActionSafeFnPtr m_doFn;
+	ActionSafeFnPtr m_undoFn;
 };
 
 } // namespace lmms::gui

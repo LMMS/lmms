@@ -55,4 +55,49 @@ void ActionSafeFnPtr::setFn(std::pair<void*, size_t> input)
 	m_dataTypeId = input.second;
 }
 
+AbstractGuiAction::AbstractGuiAction(const QString& name, InteractiveModelView* object, bool linkBack) :
+	m_name(name),
+	m_target(object),
+	m_isLinkedBack(linkBack)
+{
+	assert(m_target != nullptr);
+}
+bool AbstractGuiAction::getShouldLinkBack()
+{
+	return m_isLinkedBack;
+}
+bool AbstractGuiAction::clearObjectIfMatch(InteractiveModelView* object)
+{
+	if (m_target == nullptr) { return false; }
+	if (object == m_target)
+	{
+		m_target = nullptr;
+		return true;
+	}
+	return false;
+}
+GuiAction::GuiAction(const QString& name, InteractiveModelView* object, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, size_t runAmount, bool linkBack) :
+	AbstractGuiAction(name, object, linkBack),
+	m_runAmount(runAmount),
+	m_doFn(doFn),
+	m_undoFn(undoFn)
+{
+}
+void GuiAction::undo()
+{
+	if (m_target == nullptr || m_undoFn == nullptr) { return; }
+	for (size_t i = 0; i < m_runAmount; i++)
+	{
+		m_undoFn(m_target);
+	}
+}
+void GuiAction::redo()
+{
+	if (m_target == nullptr || m_doFn == nullptr) { return; }
+	for (size_t i = 0; i < m_runAmount; i++)
+	{
+		m_doFn(m_target);
+	}
+}
+
 } // template<typename DataType>
