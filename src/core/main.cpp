@@ -55,7 +55,7 @@
 #include <sys/prctl.h>
 #endif
 
-#include <csignal>
+#include <csignal>  // To register the signal handler
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
@@ -76,12 +76,12 @@
 #include <fenv.h> // For feenableexcept
 #include <execinfo.h> // For backtrace and backtrace_symbols_fd
 #include <unistd.h> // For STDERR_FILENO
-#include <csignal> // To register the signal handler
 #endif
 
 
 #ifdef LMMS_DEBUG_FPE
-void signalHandler( int signum ) {
+void sigfpeHandler(int signum)
+{
 
 	// Get a back trace
 	void *array[10];
@@ -140,15 +140,16 @@ inline void loadTranslation( const QString & tname,
 
 void printVersion( char *executableName )
 {
-	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+	printf("LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+		"Build options:\n%s\n\n"
 		"Copyright (c) %s\n\n"
 		"This program is free software; you can redistribute it and/or\n"
 		"modify it under the terms of the GNU General Public\n"
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
-		LMMS_PROJECT_COPYRIGHT, executableName );
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION, LMMS_BUILD_OPTIONS,
+		LMMS_PROJECT_COPYRIGHT, executableName);
 }
 
 
@@ -314,8 +315,9 @@ int main( int argc, char * * argv )
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
-	signal(SIGFPE, signalHandler);
+	signal(SIGFPE, sigfpeHandler);
 #endif
+	signal(SIGINT, gui::GuiApplication::sigintHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
@@ -374,7 +376,7 @@ int main( int argc, char * * argv )
 					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
-	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
+	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
 	// second of two command-line parsing stages
@@ -574,9 +576,7 @@ int main( int argc, char * * argv )
 
 			if( br >= 64 && br <= 384 )
 			{
-				OutputSettings::BitRateSettings bitRateSettings = os.getBitRateSettings();
-				bitRateSettings.setBitRate(br);
-				os.setBitRateSettings(bitRateSettings);
+				os.setBitrate(br);
 			}
 			else
 			{

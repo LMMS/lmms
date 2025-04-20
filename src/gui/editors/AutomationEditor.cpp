@@ -58,7 +58,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "debug.h"
 #include "embed.h"
 #include "FontHelper.h"
 
@@ -110,8 +109,6 @@ AutomationEditor::AutomationEditor() :
 				Qt::QueuedConnection );
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
@@ -1219,6 +1216,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			const auto param = SampleThumbnail::VisualizeParameters{
 				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.viewportRect = rect(),
 				.amplification = sample.amplification(),
 				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
 				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),

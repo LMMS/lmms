@@ -314,6 +314,25 @@ void MidiClip::setStep( int step, bool enabled )
 
 
 
+void MidiClip::reverseNotes(const NoteVector& notes)
+{
+	addJournalCheckPoint();
+
+	// Find the very first start position and the very last end position of all the notes.
+	TimePos firstPos = (*std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); }))->pos();
+	TimePos lastPos = (*std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); }))->endPos();
+
+	for (auto note : notes)
+	{
+		TimePos newStart = lastPos - (note->pos() - firstPos) - note->length();
+		note->setPos(newStart);
+	}
+
+	rearrangeAllNotes();
+	emit dataChanged();
+}
+
+
 
 void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 {
@@ -344,6 +363,48 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 	}
 }
 
+void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds)
+{
+	if (notes.empty()) { return; }
+
+	// Don't split if the line is horitzontal
+	if (key1 == key2) { return; }
+
+	addJournalCheckPoint();
+
+	const auto slope = 1.f * (pos2 - pos1) / (key2 - key1);
+	const auto& [minKey, maxKey] = std::minmax(key1, key2);
+
+	for (const auto& note : notes)
+	{
+		// Skip if the key is <= to minKey, since the line is drawn from the top of minKey to the top of maxKey, but only passes through maxKey - minKey - 1 total keys.
+		if (note->key() <= minKey || note->key() > maxKey) { continue; }
+
+		// Subtracting 0.5 to get the line's intercept at the "center" of the key, not the top.
+		const TimePos keyIntercept = slope * (note->key() - 0.5 - key1) + pos1;
+		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
+		{
+			auto newNote1 = Note{*note};
+			newNote1.setLength(keyIntercept - note->pos());
+
+			auto newNote2 = Note{*note};
+			newNote2.setPos(keyIntercept);
+			newNote2.setLength(note->endPos() - keyIntercept);
+
+			if (deleteShortEnds)
+			{
+				addNote(newNote1.length() >= newNote2.length() ? newNote1 : newNote2, false);
+			}
+			else
+			{
+				addNote(newNote1, false);
+				addNote(newNote2, false);
+			}
+
+			removeNote(note);
+		}
+	}
+}
 
 
 
