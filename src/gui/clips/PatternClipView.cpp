@@ -38,26 +38,13 @@
 namespace lmms::gui
 {
 
-QString PatternClipView::m_shortcutMessage = "";
-std::vector<ActionStruct> PatternClipView::s_actionArray = {};
-
-PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
-	ClipView( _clip, _tv ),
-	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
+PatternClipView::PatternClipView(Clip* clip, TrackView* tv) :
+	ClipView(clip, tv, InteractiveModelView::getTypeId<PatternClipView()),
+	m_patternClip(dynamic_cast<PatternClip*>(clip)),
 	m_paintPixmap()
 {
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
 			this, SLOT(update()));
-
-	if (m_shortcutMessage == "")
-	{
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-		}
-		m_shortcutMessage = buildShortcutMessage();
-	}
 
 	setStyle( QApplication::style() );
 }
@@ -166,8 +153,8 @@ void PatternClipView::paintEvent(QPaintEvent*)
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-	
-	drawAutoHighlight(&p);
+	// TODO remove "//"
+	//drawAutoHighlight(&p);
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );

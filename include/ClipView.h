@@ -51,7 +51,7 @@ class TextFloat;
 class TrackView;
 
 
-class ClipView : public selectableObject, public ModelView
+class ClipView : public selectableObject, public ModelView, public InteractiveModelViewTyped<ClipView>
 {
 	Q_OBJECT
 
@@ -72,7 +72,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	ClipView(Clip* clip, TrackView* tv, size_t typeId);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -135,6 +135,16 @@ public:
 	void inline setMarkerPos(int x) { m_markerPos = x; }
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
 
+	static void addClipAction(InteractiveModelView* widget); // TODO
+	static void removeClipAction(InteractiveModelView* widget); // TODO
+	static void cutAction(InteractiveModelView* widget); // TODO
+	static void copyAction(InteractiveModelView* widget); // TODO
+	static void pasteNoReturnAction(InteractiveModelView* widget);
+	static void pasteAction(InteractiveModelView* widget, bool* isSuccessful); // TODO
+	static void muteAction(InteractiveModelView* widget); // TODO
+	static void unmuteAction(InteractiveModelView* widget); // TODO
+	static void mergeAction(InteractiveModelView* widget); // TODO
+
 public slots:
 	virtual bool close();
 	void remove();
@@ -180,14 +190,13 @@ protected:
 	}
 	
 	// InteractiveModelView methods
-	//const std::vector<ActionStruct>& getActions() override;
-	//QString getShortcutMessage() override;
-	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
+	const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
+	const QString& getShortcutMessage() override { return getShortcutMessageT(); }
+	//virtual bool processPasteImplementation(Clipboard::DataType type, QString& value);// override;
+	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);// override;
+	//virtual size_t getTypeId() { return typeid(*this).hash_code(); } // TODO remove
 	//size_t getTypeId() override { return typeid(*this).hash_code(); }
-	void copyAction(InteractiveWidget* widget);
-	void pasteAction(InteractiveWidget* widget);
-	void cutAction(InteractiveWidget* widget);
+	
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos( TimePos, bool shiftMode );
@@ -205,7 +214,6 @@ protected slots:
 	void updateLength();
 	void updatePosition();
 
-	static QString getDefaultSortcutMessage();
 private:
 	enum class Action
 	{
@@ -263,7 +271,6 @@ private:
 	virtual bool splitClip( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);
 } ;
-
 
 } // namespace gui
 

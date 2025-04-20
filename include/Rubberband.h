@@ -39,8 +39,8 @@ class selectableObject : public InteractiveModelView
 {
 	Q_OBJECT
 public:
-	selectableObject(QWidget* parent) :
-		InteractiveModelView(parent),
+	selectableObject(QWidget* parent, size_t typeId) :
+		InteractiveModelView(parent, typeId),
 		m_selected( false )
 	{
 	}

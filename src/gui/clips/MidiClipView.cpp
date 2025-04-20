@@ -48,11 +48,40 @@ namespace lmms::gui
 
 constexpr int BeatStepButtonOffset = 4;
 
-QString MidiClipView::m_shortcutMessage = "";
-std::vector<ActionStruct> MidiClipView::s_actionArray = {};
+template <>
+std::vector<ActionStruct> InteractiveModelViewTyped<MidiClipView>::addActions(QString& shortcutMessage)
+{
+	// NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
+	// actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	//
+	//
+	qDebug("InteractiveModelViewTyped<MidiClipView>::addActions");
+	std::vector<ActionStruct> output = InteractiveModelViewTyped<ClipView>::addActions(shortcutMessage);
+	//output.emplace_back();
+	/*
+	{
+		ActionStruct(QString(tr("Copy clip")), QString(tr("Copy clip")), &ClipView::copyAction, nullptr,
+			true, Clipboard::DataType::Any),
+		ActionStruct(QString(tr("Paste clip")), QString(tr("Paste clip")), ActionSafeFnPtr(ActionSafeFnPtr::helpConstruct<bool*>(&ClipView::pasteAction)), ActionSafeFnPtr,
+			true, Clipboard::DataType::Any)
+	};nullptr
 
-MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
-	ClipView( clip, parent ),
+	output[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
+	output[2].addAcceptedDataType(Clipboard::DataType::SampleFile);
+	output[2].addAcceptedDataType(Clipboard::DataType::SampleData);
+	*/
+	if (output.size() > 2)
+	{
+		output[2].addAcceptedDataType(Clipboard::DataType::MidiClip);
+	}
+	shortcutMessage = InteractiveModelView::buildShortcutMessage(output);
+
+	qDebug("InteractiveModelViewTyped<MidiClipView>::addActions b, %ld, %ld", output.size(), s_actionArray.size());
+	return output;
+}
+
+MidiClipView::MidiClipView(MidiClip* clip, TrackView* parent) :
+	ClipView(clip, parent, InteractiveModelView::getTypeId<MidiClipView()),
 	m_clip( clip ),
 	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),
@@ -65,16 +94,6 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
 			this, SLOT(update()));
 	update();
-
-	if (m_shortcutMessage == "")
-	{
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-		}
-		m_shortcutMessage = buildShortcutMessage();
-	}
 
 	setStyle( QApplication::style() );
 }
@@ -683,8 +702,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-
-	drawAutoHighlight(&p);
+	// TODO remove "//"
+	//drawAutoHighlight(&p);
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 

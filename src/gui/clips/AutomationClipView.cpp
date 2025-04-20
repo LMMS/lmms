@@ -44,12 +44,8 @@
 namespace lmms::gui
 {
 
-QString AutomationClipView::m_shortcutMessage = "";
-std::vector<ActionStruct> AutomationClipView::s_actionArray = {};
-
-AutomationClipView::AutomationClipView( AutomationClip * _clip,
-						TrackView * _parent ) :
-	ClipView( _clip, _parent ),
+AutomationClipView::AutomationClipView(AutomationClip* _clip, TrackView* _parent) :
+	ClipView(_clip, _parent, InteractiveModelView::getTypeId<AutomationClipView()),
 	m_clip( _clip ),
 	m_paintPixmap()
 {
@@ -57,20 +53,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 			this, SLOT(update()));
 	connect( getGUI()->automationEditor(), SIGNAL(currentClipChanged()),
 			this, SLOT(update()));
-
-	if (m_shortcutMessage == "")
-	{
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink);
-		}
-		s_actionArray.emplace_back(ActionStruct(QString(tr("Open in editor")), QString(tr("Open in Automation editor")), GuiAction::ActionFn(nullptr), nullptr, true, Clipboard::DataType::Any));
-		s_actionArray[s_actionArray.size() - 1].setShortcut(Qt::Key_F, Qt::ControlModifier, 0, false);
-
-		m_shortcutMessage = buildShortcutMessage();
-	}
 
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
@@ -234,6 +216,7 @@ void AutomationClipView::processShortcutPressed(size_t shortcutLocation, QKeyEve
 }
 */
 
+/*
 bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	bool shouldAccept = false;
@@ -267,6 +250,7 @@ bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QS
 	}
 	return shouldAccept;
 }
+*/
 
 
 
@@ -454,8 +438,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-
-	drawAutoHighlight(&p);
+// TODO remove "//"
+	//drawAutoHighlight(&p);
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
@@ -478,7 +462,7 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	bool shouldAccept = processPaste(_de->mimeData());
+	bool shouldAccept = false; //processPaste(_de->mimeData()); TODO remove "//"
 
 	if (shouldAccept)
 	{
