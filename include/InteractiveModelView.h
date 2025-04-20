@@ -145,25 +145,17 @@ public:
 	template<typename DataType>
 	void doAction(size_t actionIndex, DataType data, bool shouldLinkBack = false)
 	{
-		qDebug("doAction start, %d", actionIndex);
 		const std::vector<ActionStruct>& actions = getActions();
 		if (actionIndex > actions.size()) { return; }
-		qDebug("doAction 2");
 		// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
 		if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
-		qDebug("doAction 3");
-		if (actions[actionIndex].doFn != nullptr)
-		{
-			qDebug("doAction typeless, %d", actionIndex);
-			GuiAction<DataType> action(actions[actionIndex].actionName, this, actions[actionIndex].doFn, actions[actionIndex].undoFn, 1, shouldLinkBack);
-			action.redo();
-		}
-		else if (actions[actionIndex].doTypedFn.isValid())
-		{
-			qDebug("doAction typed, %d", actionIndex);
-			GuiAction<DataType> action(actions[actionIndex].actionName, this, actions[actionIndex].doTypedFn, actions[actionIndex].undoTypedFn, data, shouldLinkBack);
-			action.redo();
-		}
+
+		// if this assert fails, you will need to call the typeless `doAction()`
+		assert(actions[actionIndex].doTypedFn.isValid());
+
+		qDebug("doAction typed, %d", actionIndex);
+		GuiActionTyped<DataType> action(actions[actionIndex].actionName, this, actions[actionIndex].doTypedFn, actions[actionIndex].undoTypedFn, data, shouldLinkBack);
+		action.redo();
 	}
 
 	//! should return a unique id for different widget classes
@@ -179,13 +171,7 @@ protected:
 	virtual const std::vector<ActionStruct>& getActions() = 0;
 	//! called when a shortcut message needs to be displayed
 	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
-	virtual QString getShortcutMessage() = 0;
-	//! should implement dragging and dropping widgets or pasting from clipboard
-	//! should return if `QDropEvent` event can be accepted
-	//! force implement this method
-	virtual bool processPasteImplementation(Clipboard::DataType type, QString& value) = 0;
-	//! calls `processPasteImplementation()` to process paste
-	bool processPaste(const QMimeData* mimeData);
+	virtual const QString& getShortcutMessage() = 0;
 	//! override this if the widget requires custom updating code
 	//! shouldOverrideUpdate: should `update()` widget if `isHighlighted` didn't changed but for example color changed
 	virtual void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
@@ -223,18 +209,14 @@ private:
 
 
 template<typename BaseType>
-class LMMS_EXPORT InteractiveModelViewTyped : public InteractiveModelView
+class LMMS_EXPORT InteractiveModelViewTyped
 {
 public:
-	InteractiveModelViewTyped(QWidget* widget) :
-		InteractiveModelView(widget, getTypeId<BaseType>())
-	{}
-protected:
 	//! use Template Specialization to add customized actions
-	static std::vector<ActionStruct> addActions(QString& shortcutMessage) { return std::vector<ActionStruct>(); }
-
-	const std::vector<ActionStruct>& getActions() override { return s_actionArray; }
-	QString getShortcutMessage() override { return s_shortcutMessage; }
+	static std::vector<ActionStruct> addActions(QString& shortcutMessage) { qDebug("addActionStruct %s", typeid(BaseType).name()); return std::vector<ActionStruct>(); }
+protected:
+	static const std::vector<ActionStruct>& getActionsT() { return s_actionArray; }
+	static QString& getShortcutMessageT() { return s_shortcutMessage; }
 	
 	static QString s_shortcutMessage;
 	static std::vector<ActionStruct> s_actionArray;

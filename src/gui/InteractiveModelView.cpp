@@ -158,14 +158,10 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 
 bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 {
-<<<<<<< HEAD
-	std::vector<ModelShortcut> shortcuts(getShortcuts());
-=======
 	qDebug("HandleKeyPress 1");
 	std::cout << "InteractiveModelView::HandleKeyPress this:" << this << "\n";
 	const std::vector<ActionStruct>& actions = getActions();
 	qDebug("HandleKeyPress 2");
->>>>>>> f0d9b5a58 (InteractiveModelView_moving_to_actions)
 	
 	size_t foundIndex = 0;
 	size_t minMaxTimes = 0;
@@ -180,12 +176,8 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 		// but if this doesn't exist, the shortcut with the highest `times` will be the output
 		for (size_t i = 0; i < actions.size(); i++)
 		{
-<<<<<<< HEAD
-			if (doesShortcutMatch(&shortcuts[i], event))
-=======
 			qDebug("HandleKeyPress 3");
 			if (actions[i].doesShortcutMatch(event))
->>>>>>> f0d9b5a58 (InteractiveModelView_moving_to_actions)
 			{
 				// finding the shortcut with the largest m_times
 				if (found == false || minMaxTimes < actions[i].times)
@@ -207,18 +199,6 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	}
 	else
 	{
-<<<<<<< HEAD
-		// find the lowest `ModelShortcut::times`
-		for (size_t i = 0; i < shortcuts.size(); i++)
-		{
-			if (doesShortcutMatch(&shortcuts[i], event))
-			{
-				// selecting the shortcut with the lowest `ModelShortcut::times`
-				if (found == false || minMaxTimes > shortcuts[i].times)
-				{
-					foundIndex = i;
-					minMaxTimes = shortcuts[i].times;
-=======
 		qDebug("HandleKeyPress 5");
 		// when a new shortcut is pressed (not the last)
 		// find it with the lowest `ActionStruct::times`
@@ -234,7 +214,6 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 					foundIndex = i;
 					minMaxTimes = actions[i].times;
 					qDebug("HandleKeyPress 8");
->>>>>>> f0d9b5a58 (InteractiveModelView_moving_to_actions)
 				}
 				m_lastShortcut = actions[i];
 				m_lastShortcutCounter = 1;
@@ -244,20 +223,13 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	}
 	if (found)
 	{
-<<<<<<< HEAD
-		QString message = shortcuts[foundIndex].shortcutDescription;
-		showMessage(message);
-		processShortcutPressed(foundIndex, event);
-=======
 		qDebug("HandleKeyPress 9");
 		QString message = actions[foundIndex].actionName;
 		qDebug("HandleKeyPress 10");
 		showMessage(message);
 		qDebug("HandleKeyPress 11");
-		//processShortcutPressed(foundIndex, event);
 		doAction(foundIndex);
 		qDebug("HandleKeyPress 12");
->>>>>>> f0d9b5a58 (InteractiveModelView_moving_to_actions)
 
 		event->accept();
 	}
@@ -301,20 +273,6 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 	hideMessage();
 }
 
-bool InteractiveModelView::processPaste(const QMimeData* mimeData)
-{
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
-
-	Clipboard::DataType type = Clipboard::decodeKey(mimeData);
-	QString value = Clipboard::decodeValue(mimeData);
-	bool shouldAccept = processPasteImplementation(type, value);
-	if (shouldAccept)
-	{
-		InteractiveModelView::stopHighlighting();
-	}
-	return shouldAccept;
-}
-
 size_t InteractiveModelView::getFromFn(void* functionPtr)
 {
 	const std::vector<ActionStruct>& actions = getActions();
@@ -330,8 +288,17 @@ size_t InteractiveModelView::getFromFn(void* functionPtr)
 
 void InteractiveModelView::doAction(size_t actionIndex, bool shouldLinkBack)
 {
-	qDebug("doAction typeless version");
-	doAction<bool>(actionIndex, false, shouldLinkBack);
+	const std::vector<ActionStruct>& actions = getActions();
+	if (actionIndex > actions.size()) { return; }
+	// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
+	if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
+
+	// if this assert fails, you will need to call the typed `doAction()`
+	assert(actions[actionIndex].doFn != nullptr);
+
+	qDebug("doAction typeless, %d", actionIndex);
+	GuiAction action(actions[actionIndex].actionName, this, actions[actionIndex].doFn, actions[actionIndex].undoFn, 1, shouldLinkBack);
+	action.redo();
 }
 
 void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
