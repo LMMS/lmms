@@ -80,12 +80,12 @@ namespace lmms::PathUtil
 		switch (base)
 		{
 			case Base::ProjectDir       : return QStringLiteral("userprojects:");
-			case Base::FactoryProjects   : return QStringLiteral("factoryprojects:");
+			case Base::FactoryProjects  : return QStringLiteral("factoryprojects:");
 			case Base::FactorySample    : return QStringLiteral("factorysample:");
 			case Base::UserSample       : return QStringLiteral("usersample:");
 			case Base::UserVST          : return QStringLiteral("uservst:");
 			case Base::Preset           : return QStringLiteral("preset:");
-			case Base::FactoryPresets    : return QStringLiteral("factorypreset:");
+			case Base::FactoryPresets   : return QStringLiteral("factorypreset:");
 			case Base::UserLADSPA       : return QStringLiteral("userladspa:");
 			case Base::DefaultLADSPA    : return QStringLiteral("defaultladspa:");
 			case Base::UserSoundfont    : return QStringLiteral("usersoundfont:");
