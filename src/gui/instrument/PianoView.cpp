@@ -111,7 +111,7 @@ PianoView::PianoView(QWidget *parent) :
 	connect( m_pianoScroll, SIGNAL(valueChanged(int)),
 			this, SLOT(pianoScrolled(int)));
 
-	// create a layout for ourselvesr
+	// create a layout for ourselves
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing( 0 );
 	layout->setContentsMargins(0, 0, 0, 0);
@@ -589,7 +589,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
-	// focusing is wird, workaround PianoView's agressive focus and see if InteractiveModelView can accept it
+	// focusing is weird, workaround PianoView's agressive focus and see if InteractiveModelView can accept it
 	bool accepted = getGUI()->mainWindow()->focusedInteractiveModelHandleKeyPress(_ke);
 	if (accepted) { return; }
 	
