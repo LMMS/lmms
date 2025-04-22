@@ -33,6 +33,8 @@
 
 namespace lmms {
 
+//! An audio resampler.
+//! This can be used to resample or transpose an audio signal with various interpolation modes.
 class LMMS_EXPORT AudioResampler
 {
 public:
@@ -56,13 +58,25 @@ public:
 	//! process their callback.
 	using WriteCallback = long (*)(SampleFrame* dst, std::size_t frames, void* data);
 
+	//! Create a resampler with the given @p interpolationMode.
 	AudioResampler(InterpolationMode interpolationMode);
-	AudioResampler(const AudioResampler&) = delete;
-	AudioResampler(AudioResampler&&) = delete;
+
+	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
 
-	AudioResampler& operator=(const AudioResampler&);
-	AudioResampler& operator=(AudioResampler&&) noexcept = delete;
+	//! Resamplers cannot be copied.
+	AudioResampler(const AudioResampler&) = delete;
+
+	//! Resamplers cannot be copied.
+	AudioResampler& operator=(const AudioResampler&) = delete;
+
+	//! Moves the state from one resampler to another.
+	//! Use of the moved from resampler is a no-op.
+	AudioResampler(AudioResampler&&) noexcept;
+
+	//! Moves the state from one resampler to another.
+	//! Use of the moved from resampler is a no-op.
+	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Resample the audio outputted from the write callback at the given conversion @p ratio.
 	//! @p dst is expected to consist of @p frames frames (number of samples / number of channels)

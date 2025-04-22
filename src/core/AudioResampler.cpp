@@ -27,6 +27,7 @@
 #include <samplerate.h>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace lmms {
 
@@ -44,11 +45,26 @@ AudioResampler::AudioResampler(InterpolationMode interpolationMode)
 
 AudioResampler::~AudioResampler()
 {
-	src_delete(m_state);
+	if (m_state) { src_delete(m_state); }
+}
+
+AudioResampler::AudioResampler(AudioResampler&& other) noexcept
+	: m_state(std::exchange(other.m_state, nullptr))
+	, m_data(std::exchange(other.m_data, SRC_DATA{}))
+{
+}
+
+AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
+{
+	m_state = std::exchange(other.m_state, nullptr);
+	m_data = std::exchange(other.m_data, SRC_DATA{});
+	return *this;
 }
 
 void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
 {
+	if (!m_state) { return; }
+
 	m_data.data_out = &dst[0][0];
 	m_data.output_frames = static_cast<long>(frames);
 	m_data.src_ratio = ratio;
