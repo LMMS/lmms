@@ -369,7 +369,7 @@ void TrackContainerView::clearAllTracks()
 
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	std::vector<Clipboard::DataType> acceptedKeys = {
+	static std::vector<Clipboard::DataType> acceptedKeys = {
 		Clipboard::DataType::PresetFile,
 		Clipboard::DataType::PluginPresetFile,
 		Clipboard::DataType::SampleFile,
