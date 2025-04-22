@@ -55,7 +55,7 @@ public:
 	//! process their callback.
 	using WriteCallback = std::size_t (*)(SampleFrame* dst, std::size_t frames, void* data);
 
-	AudioResampler(InterpolationMode interpolationMode, int channels);
+	AudioResampler(InterpolationMode interpolationMode);
 	AudioResampler(const AudioResampler&) = delete;
 	AudioResampler(AudioResampler&&) = delete;
 	~AudioResampler();
@@ -71,7 +71,7 @@ public:
 	auto interpolationMode() const -> InterpolationMode { return m_interpolationMode; }
 
 	//! Returns the number of channels expected by the resampler.
-	auto channels() const -> int { return m_channels; }
+	constexpr auto channels() const -> int { return DEFAULT_CHANNELS; }
 
 	//! Returns the textual name for the given interpolation mode.
 	static auto interpolationModeName(InterpolationMode mode) -> const char* { return src_get_name(static_cast<int>(mode)); }
@@ -80,7 +80,6 @@ private:
 	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;
 	std::array<SampleFrame, 32> m_writeBuffer;
 	SRC_STATE* m_state = nullptr;
-	int m_channels = 0;
 	int m_error = 0;
 };
 } // namespace lmms

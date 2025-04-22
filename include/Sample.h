@@ -48,7 +48,7 @@ public:
 	{
 
 		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
-			: resampler(static_cast<AudioResampler::InterpolationMode>(interpolationMode), DEFAULT_CHANNELS)
+			: resampler(static_cast<AudioResampler::InterpolationMode>(interpolationMode))
 			, varyingPitch(varyingPitch)
 		{
 		}

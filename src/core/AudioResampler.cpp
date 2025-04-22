@@ -30,10 +30,9 @@
 
 namespace lmms {
 
-AudioResampler::AudioResampler(InterpolationMode interpolationMode, int channels)
+AudioResampler::AudioResampler(InterpolationMode interpolationMode)
 	: m_interpolationMode(interpolationMode)
-	, m_state(src_new(static_cast<int>(interpolationMode), channels, &m_error))
-	, m_channels(channels)
+	, m_state(src_new(static_cast<int>(interpolationMode), DEFAULT_CHANNELS, &m_error))
 {
 	if (!m_state)
 	{
