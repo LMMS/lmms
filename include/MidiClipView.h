@@ -38,7 +38,7 @@ namespace gui
 {
 
 
-class MidiClipView : public ClipView, public InteractiveModelViewTyped<MidiClipView>
+class MidiClipView : public ClipView
 {
 	Q_OBJECT
 
@@ -86,9 +86,8 @@ protected:
 	void wheelEvent( QWheelEvent * _we ) override;
 
 	// InteractiveModelView methods
-	const std::vector<ActionStruct>& getActions() override { return InteractiveModelViewTyped<MidiClipView>::getActionsT(); }
-	const QString& getShortcutMessage() override { return InteractiveModelViewTyped<MidiClipView>::getShortcutMessageT(); }
-	//size_t getTypeId() { return typeid(*this).hash_code(); }
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 private:
 	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
@@ -107,16 +106,9 @@ private:
 	QStaticText m_staticTextName;
 
 	bool m_legacySEPattern;
+	
+	static QString s_shortcutMessage;
 } ;
-
-/*
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-		}
-		m_shortcutMessage = buildShortcutMessage();
-*/
 
 } // namespace gui
 
