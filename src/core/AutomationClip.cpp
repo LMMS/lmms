@@ -354,8 +354,6 @@ void AutomationClip::removeNode(const TimePos & time)
 	}
 	generateTangents(it, 3);
 
-	updateLength();
-
 	emit dataChanged();
 }
 
@@ -372,6 +370,7 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	if (tick0 == tick1)
 	{
 		removeNode(TimePos(tick0));
+		updateLength();
 		return;
 	}
 
@@ -391,6 +390,12 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	for (auto node: nodesToRemove)
 	{
 		removeNode(node);
+	}
+
+	if (!nodesToRemove.empty())
+	{
+		// Only update the length if we have actually removed nodes
+		updateLength();
 	}
 }
 
@@ -461,6 +466,7 @@ void AutomationClip::recordValue(TimePos time, float value)
 	else if( valueAt( time ) != value )
 	{
 		removeNode(time);
+		updateLength();
 	}
 }
 
