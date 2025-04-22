@@ -109,7 +109,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_plugin( nullptr ),
 	m_remotePlugin( nullptr ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
-	m_filterFreqModel( 127, 0, 127, 1, this, tr( "Filter frequency" ) ),
+	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
 	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM gain" ) ),
@@ -143,11 +143,6 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
-
-	// ZynAddSubFX's internal value that LMMS's FREQ knob controls
-	// isn't set properly when the instrument is first loaded in,
-	// and doesn't update until the FREQ knob is moved
-	updateFilterFreq();
 }
 
 
