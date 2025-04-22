@@ -230,7 +230,7 @@ void EnvelopeAndLfoView::modelChanged()
 
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	std::vector<Clipboard::DataType> acceptedKeys = {
+	static std::vector<Clipboard::DataType> acceptedKeys = {
 		Clipboard::DataType::SampleFile,
 		Clipboard::DataType::SampleClip
 	};
