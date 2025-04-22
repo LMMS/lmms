@@ -558,7 +558,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	std::vector<Clipboard::DataType> acceptedKeys = {
+	static std::vector<Clipboard::DataType> acceptedKeys = {
 		Clipboard::DataType::Instrument,
 		Clipboard::DataType::PresetFile,
 		Clipboard::DataType::PluginPresetFile
