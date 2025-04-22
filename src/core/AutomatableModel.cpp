@@ -492,34 +492,24 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	qDebug("AutomatableModel::linkModels 1");
 	auto model1ContainsModel2 = std::find(model1->m_linkedModels.begin(), model1->m_linkedModels.end(), model2) != model1->m_linkedModels.end();
 	if (!model1ContainsModel2 && model1 != model2)
 	{
-		qDebug("AutomatableModel::linkModels 2");
 		// copy data
 		model1->m_value = model2->m_value;
-		qDebug("AutomatableModel::linkModels 3");
 		if (model1->valueBuffer() && model2->valueBuffer())
 		{
-			qDebug("AutomatableModel::linkModels 3.1");
 			std::copy_n(model2->valueBuffer()->data(),
 				model1->valueBuffer()->length(),
 				model1->valueBuffer()->data());
-			qDebug("AutomatableModel::linkModels 4");
 		}
 		// send dataChanged() before linking (because linking will
 		// connect the two dataChanged() signals)
-		qDebug("AutomatableModel::linkModels 4.1");
 		emit model1->dataChanged();
-		qDebug("AutomatableModel::linkModels 5");
 		// finally: link the models
 		model1->linkModel( model2 );
-		qDebug("AutomatableModel::linkModels 6");
 		model2->linkModel( model1 );
-		qDebug("AutomatableModel::linkModels 7");
 	}
-	qDebug("AutomatableModel::linkModels 8");
 }
 
 

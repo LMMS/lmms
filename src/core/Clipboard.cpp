@@ -155,13 +155,11 @@ namespace lmms::Clipboard
 	
 	QString encodeFloatValue(float value)
 	{
-		qDebug("encodeFloatValue, outout: %f", value);
 		return QString::number(value);
 	}
 	
 	QString encodeAutomatableModelLink(const AutomatableModel& model)
 	{
-		qDebug("encodeAutomatableModelLink, outout: %d", model.id());
 		return QString::number(model.id());
 	}
 

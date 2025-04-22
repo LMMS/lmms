@@ -152,9 +152,7 @@ void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	qDebug("dropEvent 1, THISid: %d", model()->id());
 	bool canAccept = processPaste(de->mimeData());
-	qDebug("dropEvent 2");
 	if (canAccept == true)
 	{
 		de->accept();
@@ -295,41 +293,29 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 
 const std::vector<InteractiveModelView::ModelShortcut>& FloatModelEditorBase::getShortcuts()
 {
-	qDebug("getShortcuts 1, THISid: %d", model()->id());
 	return s_shortcutArray;
 }
 
 void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
 {
-	qDebug("processShortcutPressed 1, THISid: %d", model()->id());
 	switch (shortcutLocation)
 	{
 		case 0:
-			qDebug("processShortcutPressed 2, val: %f", (model()->value() * getConversionFactor()));
 			Clipboard::copyStringPair(Clipboard::DataType::FloatValue, Clipboard::encodeFloatValue(model()->value() * getConversionFactor()));
 			InteractiveModelView::startHighlighting(Clipboard::DataType::FloatValue);
-			qDebug("processShortcutPressed 3");
 			break;
 		case 1:
-			qDebug("processShortcutPressed 4, THISid: %d", model()->id());
 			Clipboard::copyStringPair(Clipboard::DataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*model()));
 			InteractiveModelView::startHighlighting(Clipboard::DataType::AutomatableModelLink);
-			qDebug("processShortcutPressed 5");
 			break;
 		case 2:
-			qDebug("processShortcutPressed 6");
 			processPaste(Clipboard::getMimeData());
-			qDebug("processShortcutPressed 7");
 			break;
 		case 3:
-			qDebug("processShortcutPressed 8");
 			model()->setValue(model()->value() + model()->range() / 20.0f);
-			qDebug("processShortcutPressed 9");
 			break;
 		case 4:
-			qDebug("processShortcutPressed 10");
 			model()->setValue(model()->value() - model()->range() / 20.0f);
-			qDebug("processShortcutPressed 11");
 			break;
 		case 5:
 			model()->unlinkAllModels();
@@ -341,44 +327,33 @@ void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyE
 
 QString FloatModelEditorBase::getShortcutMessage()
 {
-	qDebug("getShortcutMessage 1, THISid: %d", model()->id());
 	return m_shortcutMessage;
 }
 
 bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::DataType dataType)
 {
-	qDebug("canAcceptClipboardData 1, THISid: %d", model()->id());
 	return dataType == Clipboard::DataType::FloatValue
 		|| dataType == Clipboard::DataType::AutomatableModelLink;
 }
 
 bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
-	qDebug("processPasteImplementation 1, THISid: %d", model()->id());
 	bool shouldAccept = false;
 	if (type == Clipboard::DataType::FloatValue)
 	{
-		qDebug("processPasteImplementation 2");
 		model()->setValue(LocaleHelper::toFloat(value));
 		shouldAccept = true;
-		qDebug("processPasteImplementation 3");
 	}
 	else if (type == Clipboard::DataType::AutomatableModelLink)
 	{
-		qDebug("processPasteImplementation 4, id: %d", value.toInt());
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
-		qDebug("processPasteImplementation 5");
 		if (mod != nullptr)
 		{
-			qDebug("processPasteImplementation 6");
 			AutomatableModel::linkModels(model(), mod);
-			qDebug("processPasteImplementation 6 + 1");
 			mod->setValue(model()->value());
 			shouldAccept = true;
-			qDebug("processPasteImplementation 7");
 		}
 	}
-	qDebug("processPasteImplementation 8");
 	return shouldAccept;
 }
 
@@ -522,29 +497,22 @@ void FloatModelEditorBase::enterValue()
 
 void FloatModelEditorBase::friendlyUpdate()
 {
-	qDebug("friendlyUpdate 1");
 	if (model())
 	{
-		qDebug("friendlyUpdate 2");
 		bool shouldUpdate = false;
 		if (model()->controllerConnection() == nullptr)
 		{
-			qDebug("friendlyUpdate 3");
 			shouldUpdate = true;
 		}
 		else
 		{
 			if (model()->controllerConnection()->getController()->frequentUpdates() == false)
-			{ shouldUpdate = true; qDebug("friendlyUpdate 4"); } else
 			{
-				if (Controller::runningFrames() % (256*4) == 0) { shouldUpdate = true; qDebug("friendlyUpdate 5"); }
-				qDebug("friendlyUpdate 6");
+				if (Controller::runningFrames() % (256*4) == 0) { shouldUpdate = true; }
 			}
-			qDebug("friendlyUpdate 7");
 		}
 		if (shouldUpdate)
 		{
-			qDebug("friendlyUpdate 8");
 			update();
 		}
 	}

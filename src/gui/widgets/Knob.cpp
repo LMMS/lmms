@@ -449,17 +449,13 @@ void Knob::drawKnob( QPainter * _p )
 
 void Knob::paintEvent( QPaintEvent * _me )
 {
-	qDebug("Knob::paintEvent 1");
 	QPainter p( this );
 
-	qDebug("Knob::paintEvent 2");
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		qDebug("Knob::paintEvent 3");
 		if (!m_isHtmlLabel)
 		{
-			qDebug("Knob::paintEvent 4");
 			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			p.setPen(textColor());
 			p.drawText(width() / 2 -
@@ -468,19 +464,15 @@ void Knob::paintEvent( QPaintEvent * _me )
 		}
 		else
 		{
-			qDebug("Knob::paintEvent 5");
 			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
 			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
 			m_tdRenderer->drawContents(&p);
-			qDebug("Knob::paintEvent 6");
 		}
 	}
 	
-	qDebug("Knob::paintEvent 7");
 	// draw `InteractiveModelView` highlight
 	drawAutoHighlight(&p);
-	qDebug("Knob::paintEvent 8");
 }
 
 void Knob::changeEvent(QEvent * ev)

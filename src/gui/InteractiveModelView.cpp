@@ -147,13 +147,9 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 
 bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 {
-	qDebug("HandleKeyPress 1");
 	std::cout << "InteractiveModelView::HandleKeyPress this:" << this << "\n";
 	std::vector<ModelShortcut> shortcuts(getShortcuts());
-	qDebug("HandleKeyPress 2");
 	
-	qDebug("HandleKeyPress 2 + 1, shortcut: " + QKeySequence(event->modifiers()).toString().toLatin1() + " " + QKeySequence(event->key()).toString().toLatin1());
-
 	size_t foundIndex = 0;
 	unsigned int minMaxTimes = 0;
 	bool found = false;
@@ -165,7 +161,6 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 		// the shortcut that's `ModelShortcut::times` == m_lastShortcutCounter
 		for (size_t i = 0; i < shortcuts.size(); i++)
 		{
-			qDebug("HandleKeyPress 3");
 			if (doesShortcutMatch(&shortcuts[i], event))
 			{
 				// selecting the shortcut with the largest m_times
@@ -180,7 +175,6 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 				{
 					m_lastShortcutCounter = shortcuts[i].shouldLoop ? 0 : m_lastShortcutCounter + 1;
 					foundIndex = i;
-					qDebug("HandleKeyPress 4");
 					break;
 				}
 			}
@@ -188,20 +182,16 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	}
 	else
 	{
-		qDebug("HandleKeyPress 5");
 		// find the lowest `ModelShortcut::times`
 		for (size_t i = 0; i < shortcuts.size(); i++)
 		{
-			qDebug("HandleKeyPress 6");
 			if (doesShortcutMatch(&shortcuts[i], event))
 			{
-				qDebug("HandleKeyPress 7");
 				// selecting the shortcut with the lowest `ModelShortcut::times`
 				if (found == false || minMaxTimes > shortcuts[i].times)
 				{
 					foundIndex = i;
 					minMaxTimes = shortcuts[i].times;
-					qDebug("HandleKeyPress 8");
 				}
 				m_lastShortcut = shortcuts[i];
 				m_lastShortcutCounter = 1;
@@ -211,31 +201,23 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	}
 	if (found)
 	{
-		qDebug("HandleKeyPress 9");
 		QString message = shortcuts[foundIndex].shortcutDescription;
-		qDebug("HandleKeyPress 10");
 		showMessage(message);
-		qDebug("HandleKeyPress 11");
 		processShortcutPressed(foundIndex, event);
-		qDebug("HandleKeyPress 12");
 
 		event->accept();
 	}
 	else
 	{
-		qDebug("HandleKeyPress 13");
 		// reset focus
 		if (event->key() != Qt::Key_Control
 			&& event->key() != Qt::Key_Shift
 			&& event->key() != Qt::Key_Alt
 			&& event->key() != Qt::Key_AltGr)
 		{
-			qDebug("HandleKeyPress 14");
 			getGUI()->mainWindow()->setFocusedInteractiveModel(nullptr);
-			qDebug("HandleKeyPress 15");
 		}
 	}
-	qDebug("HandleKeyPress 16");
 	return found;
 }
 
