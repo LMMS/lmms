@@ -133,15 +133,10 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
 	auto callbackData = CallbackData{.sample = this, .state = state, .loopMode = loopMode};
-	const auto resampleResult
-		= state->resampler.resample(dst, static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData);
-	advance(state, resampleResult.inputFramesUsed, loopMode);
-
-	const auto outputFrames = static_cast<f_cnt_t>(resampleResult.outputFramesGenerated);
-	if (outputFrames < numFrames) { std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{}); }
+	state->resampler.resample(dst, static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData);
 
 	const auto amplification = m_amplification.load(std::memory_order_relaxed);
-	for (auto i = std::size_t{0}; i < outputFrames; ++i)
+	for (auto i = std::size_t{0}; i < numFrames; ++i)
 	{
 		dst[i][0] *= amplification;
 		dst[i][1] *= amplification;
@@ -210,45 +205,6 @@ void Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 		const auto value = sample->m_buffer->data()[sample->m_reversed ? sample->m_buffer->size() - index - 1 : index];
 		dst[frame] = value;
 		backwards ? --index : ++index;
-	}
-}
-
-void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
-{
-	state->frameIndex += (state->backwards ? -1 : 1) * advanceAmount;
-	if (loopMode == Loop::Off) { return; }
-
-	const auto distanceFromLoopStart = std::abs(state->frameIndex - m_loopStartFrame);
-	const auto distanceFromLoopEnd = std::abs(state->frameIndex - m_loopEndFrame);
-	const auto loopSize = m_loopEndFrame - m_loopStartFrame;
-	if (loopSize == 0) { return; }
-
-	switch (loopMode)
-	{
-	case Loop::On:
-		if (state->frameIndex < m_loopStartFrame && state->backwards)
-		{
-			state->frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % loopSize;
-		}
-		else if (state->frameIndex >= m_loopEndFrame)
-		{
-			state->frameIndex = m_loopStartFrame + distanceFromLoopEnd % loopSize;
-		}
-		break;
-	case Loop::PingPong:
-		if (state->frameIndex < m_loopStartFrame && state->backwards)
-		{
-			state->frameIndex = m_loopStartFrame + distanceFromLoopStart % loopSize;
-			state->backwards = false;
-		}
-		else if (state->frameIndex >= m_loopEndFrame)
-		{
-			state->frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % loopSize;
-			state->backwards = true;
-		}
-		break;
-	default:
-		break;
 	}
 }
 

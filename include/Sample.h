@@ -109,9 +109,6 @@ public:
 
 private:
 	static void render(SampleFrame* dst, std::size_t frames, void* data);
-	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
-
-private:
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
