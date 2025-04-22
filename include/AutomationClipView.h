@@ -47,9 +47,12 @@ public:
 	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
 	~AutomationClipView() override = default;
 
+	void pasteAction(bool* isSuccessful) override;
+	//! Opens this view's clip in the global automation editor
+	void openInAutomationEditorAction();
+	void linkToClipAction(int modelId);
+	void unlinkToClipAction(int modelId); // TODO
 public slots:
-	/// Opens this view's clip in the global automation editor
-	void openInAutomationEditor();
 	void update() override;
 
 
@@ -69,10 +72,8 @@ protected:
 	void dropEvent( QDropEvent * _de ) override;
 	
 	// InteractiveModelView methods
-	//const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
-	//const QString& getShortcutMessage() override { return getShortcutMessageT(); }
-	//bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-	//size_t getTypeId() override { return typeid(*this).hash_code(); }
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 private:
 	AutomationClip * m_clip;
@@ -80,21 +81,9 @@ private:
 	
 	QStaticText m_staticTextName;
 	void scaleTimemapToFit( float oldMin, float oldMax );
+	
+	static QString s_shortcutMessage;
 } ;
-
-/*
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink);
-		}
-		s_actionArray.emplace_back(ActionStruct(QString(tr("Open in editor")), QString(tr("Open in Automation editor")), GuiAction::ActionFn(nullptr), nullptr, true, Clipboard::DataType::Any));
-		s_actionArray[s_actionArray.size() - 1].setShortcut(Qt::Key_F, Qt::ControlModifier, 0, false);
-
-		m_shortcutMessage = buildShortcutMessage();
-*/
-
 
 } // namespace gui
 
