@@ -38,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView, public InteractiveModelViewTyped<FloatModelEditorBase>
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView
 {
 	Q_OBJECT
 
@@ -64,20 +64,20 @@ public:
 		setUnit(txt_after);
 	}
 
-	static void copyValueAction(InteractiveModelView* widget);
-	static void pasteNoReturnAction(InteractiveModelView* widget);
-	static void pasteAction(InteractiveModelView* widget, bool* isSuccessful);
-	static void linkAction(InteractiveModelView* widget, int id);
-	static void unlinkAction(InteractiveModelView* widget, int id);
-	static void getLinkAction(InteractiveModelView* widget);
-	static void unlinkAllAction(InteractiveModelView* widget);
-	static void increaseValueAction(InteractiveModelView* widget);
-	static void decreaseValueAction(InteractiveModelView* widget);
-	static void addValueAction(InteractiveModelView* widget, float floatValue);
-	static void subtractValueAction(InteractiveModelView* widget, float floatValue);
-	static void openInputDialogAction(InteractiveModelView* widget);
-	static void setScaleLinearAction(InteractiveModelView* widget);
-	static void setScaleLogarithmicAction(InteractiveModelView* widget);
+	void copyValueAction();
+	void pasteNoReturnAction();
+	void pasteAction(bool* isSuccessful);
+	void linkAction(int id);
+	void unlinkAction(int id);
+	void getLinkAction();
+	void unlinkAllAction();
+	void increaseValueAction();
+	void decreaseValueAction();
+	void addValueAction(float floatValue);
+	void subtractValueAction(float floatValue);
+	void openInputDialogAction();
+	void setScaleLinearAction();
+	void setScaleLogarithmicAction();
 
 signals:
 	void sliderPressed();
@@ -100,10 +100,8 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	// InteractiveModelView methods
-	const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
-	const QString& getShortcutMessage() override { return getShortcutMessageT(); }
-	//bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-	//size_t getTypeId() override { return typeid(*this).hash_code(); }
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 	virtual float getValue(const QPoint & p);
 
@@ -137,6 +135,8 @@ private:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+	
+	static QString s_shortcutMessage;
 };
 
 } // namespace lmms::gui
