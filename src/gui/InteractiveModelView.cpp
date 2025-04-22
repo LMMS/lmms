@@ -50,6 +50,7 @@ std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
 
 InteractiveModelView::InteractiveModelView(QWidget* widget, size_t typeId) :
 	QWidget(widget),
+	m_actionArray(),
 	m_isHighlighted(false),
 	m_lastShortcutCounter(0),
 	m_interactiveModelViewTypeId(typeId)
@@ -215,7 +216,7 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 					minMaxTimes = actions[i].times;
 					qDebug("HandleKeyPress 8");
 				}
-				m_lastShortcut = actions[i];
+				m_lastShortcut.copyShortcut(actions[i]);
 				m_lastShortcutCounter = 1;
 				found = true;
 			}
@@ -224,11 +225,11 @@ bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 	if (found)
 	{
 		qDebug("HandleKeyPress 9");
-		QString message = actions[foundIndex].actionName;
+		QString message = actions[foundIndex].getText();
 		qDebug("HandleKeyPress 10");
 		showMessage(message);
 		qDebug("HandleKeyPress 11");
-		doAction(foundIndex);
+		doActionAt(foundIndex);
 		qDebug("HandleKeyPress 12");
 
 		event->accept();
@@ -273,31 +274,32 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 	hideMessage();
 }
 
-size_t InteractiveModelView::getFromFn(void* functionPtr)
+void InteractiveModelView::doAction(size_t actionId, bool shouldLinkBack)
 {
-	const std::vector<ActionStruct>& actions = getActions();
-	for (size_t i = 0; i < actions.size(); i++)
-	{
-		if (actions[i].doFn == functionPtr || actions[i].doTypedFn.isMatch(functionPtr))
-		{
-			return i;
-		}
-	}
-	return actions.size();
+	InteractiveModelView::doActionAt(getIndexFromId(actionId), GuiActionIO(), shouldLinkBack);
 }
-
-void InteractiveModelView::doAction(size_t actionIndex, bool shouldLinkBack)
+void InteractiveModelView::doAction(size_t actionId, GuiActionIO data, bool shouldLinkBack)
 {
-	const std::vector<ActionStruct>& actions = getActions();
+	InteractiveModelView::doActionAt(getIndexFromId(actionId), data, shouldLinkBack);
+}
+void InteractiveModelView::doActionAt(size_t actionIndex, bool shouldLinkBack)
+{
+	InteractiveModelView::doActionAt(actionIndex, GuiActionIO(), shouldLinkBack);
+}
+void InteractiveModelView::doActionAt(size_t actionIndex, GuiActionIO data, bool shouldLinkBack)
+{
+	std::vector<ActionStruct>& actions = getActionsNotConst();
 	if (actionIndex > actions.size()) { return; }
 	// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
+	qDebug("doActionAt before type return");
 	if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
+	qDebug("doActionAt after type return");
 
 	// if this assert fails, you will need to call the typed `doAction()`
 	assert(actions[actionIndex].doFn != nullptr);
 
-	qDebug("doAction typeless, %d", actionIndex);
-	GuiAction action(actions[actionIndex].actionName, this, actions[actionIndex].doFn, actions[actionIndex].undoFn, 1, shouldLinkBack);
+	qDebug("doAction, %ld", actionIndex);
+	GuiAction action(actions[actionIndex], data, 1, shouldLinkBack);
 	action.redo();
 }
 
@@ -340,8 +342,7 @@ QString InteractiveModelView::buildShortcutMessage(const std::vector<ActionStruc
 			{
 				message = message + QString(" (x") + QString::number(actions[i].times + 1) + QString(")");
 			}
-			message = message + QString("\": ")
-				+ actions[i].actionName;
+			message = message + QString("\": ") + actions[i].getText();
 			if (i + 1 < actions.size())
 			{
 				message = message + QString(", ");
@@ -368,30 +369,34 @@ void InteractiveModelView::setIsHighlighted(bool isHighlighted, bool shouldOverr
 	}
 }
 
-ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
-	actionName(actionName),
-	actionHint(actionHint),
-	doFn(doFn),
-	undoFn(undoFn),
-	doTypedFn(),
-	undoTypedFn(),
+size_t InteractiveModelView::getIndexFromId(size_t id)
+{
+	const std::vector<ActionStruct>& actions = getActions();
+	for (size_t i = 0; i < actions.size(); i++)
+	{
+		if (actions[i].actionId == id)
+		{
+			return i;
+		}
+	}
+	return actions.size();
+}
+
+
+ActionStruct::ActionStruct(size_t id, QAction& doFnIn, QAction* undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
+	actionId(id),
+	//actionName(actionName),
+	doFn(&doFnIn),
+	undoFn(undoFnIn),
 	isTypeSpecific(isTypeSpecific),
 	isShortcut(false)
 {
 	addAcceptedDataType(acceptedType);
 }
 
-ActionStruct::ActionStruct(const QString& actionName, const QString& actionHint, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
-	actionName(actionName),
-	actionHint(actionHint),
-	doFn(nullptr),
-	undoFn(nullptr),
-	doTypedFn(doFn),
-	undoTypedFn(undoFn),
-	isTypeSpecific(isTypeSpecific),
-	isShortcut(false)
+ActionStruct::~ActionStruct()
 {
-	addAcceptedDataType(acceptedType);
+	// TODO delete from history
 }
 
 void ActionStruct::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop)
@@ -435,6 +440,15 @@ bool ActionStruct::doesFullShortcutMatch(const ActionStruct& otherShortcut) cons
 	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier) && times == otherShortcut.times && isLoop == otherShortcut.isLoop;
 }
 
+void ActionStruct::copyShortcut(const ActionStruct& otherShortcut)
+{
+	isShortcut = otherShortcut.isShortcut;
+	key = otherShortcut.key;
+	modifier = otherShortcut.modifier;
+	times = otherShortcut.times;
+	isLoop = otherShortcut.isLoop;
+}
+
 bool ActionStruct::doesTypeMatch(Clipboard::DataType type) const
 {
 	for (Clipboard::DataType curType : acceptedType)
@@ -453,8 +467,20 @@ bool ActionStruct::isTypeAccepted(Clipboard::DataType type) const
 	return false;
 }
 
-bool ActionStruct::doesActionMatch(const ActionStruct& otherAction) const
+const QString ActionStruct::getText() const
 {
+	return doFn->text();
 }
+
+GuiActionIO* ActionStruct::getData()
+{
+	return &data;
+}
+
+void ActionStruct::setData(const GuiActionIO& newData)
+{
+	data = newData;
+}
+
 
 } // namespace lmms::gui
