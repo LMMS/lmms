@@ -32,7 +32,6 @@ namespace lmms {
 
 AudioResampler::AudioResampler(InterpolationMode interpolationMode, int channels)
 	: m_interpolationMode(interpolationMode)
-	, m_writeBuffer({})
 	, m_state(src_new(static_cast<int>(interpolationMode), channels, &m_error))
 	, m_channels(channels)
 {
@@ -49,14 +48,12 @@ AudioResampler::~AudioResampler()
 	src_delete(m_state);
 }
 
-auto AudioResampler::resample(
-	SampleFrame* dst, size_t frames, double ratio, WriteCallback writeCallback, void* writeCallbackData) -> Result
+void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
 {
-	auto result = Result{};
 	while (frames > 0)
 	{
-		const auto numInputFrames = std::min(m_writeBuffer.size(), frames);
-		writeCallback(m_writeBuffer.data(), numInputFrames, writeCallbackData);
+		const auto maxInputFrames = std::min(m_writeBuffer.size(), frames);
+		const auto numInputFrames = callback(m_writeBuffer.data(), maxInputFrames, callbackData);
 
 		auto data = SRC_DATA{.data_in = &m_writeBuffer.data()[0][0],
 			.data_out = &dst[0][0],
@@ -65,16 +62,15 @@ auto AudioResampler::resample(
 			.end_of_input = 0,
 			.src_ratio = ratio};
 
-		result.error = src_process(m_state, &data);
-		if (result.error) { break; }
+		if (src_process(m_state, &data))
+		{
+			std::fill_n(dst, frames, SampleFrame{});
+			break;
+		}
 
 		dst += data.output_frames_gen;
 		frames -= data.output_frames_gen;
-		result.inputFramesUsed += data.input_frames_used;
-		result.outputFramesGenerated += data.output_frames_gen;
 	}
-
-	return result;
 }
 
 } // namespace lmms

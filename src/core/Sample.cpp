@@ -160,7 +160,7 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-void Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
+std::size_t Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 {
 	const auto callbackData = static_cast<CallbackData*>(data);
 	const auto state = callbackData->state;
@@ -175,12 +175,7 @@ void Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 		switch (loopMode)
 		{
 		case Loop::Off:
-			if (index < 0 || index >= sample->m_endFrame)
-			{
-				std::fill(dst + frame, dst + frames, SampleFrame{});
-				return;
-			}
-
+			if (index < 0 || index >= sample->m_endFrame) { return frame; }
 			break;
 		case Loop::On:
 			if (index < sample->m_loopStartFrame && backwards) { index = sample->m_loopEndFrame - 1; }
@@ -206,6 +201,8 @@ void Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 		dst[frame] = value;
 		backwards ? --index : ++index;
 	}
+
+	return frames;
 }
 
 } // namespace lmms
