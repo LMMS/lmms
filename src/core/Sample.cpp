@@ -1,7 +1,7 @@
 /*
- * Sample.cpp - State for container-class SampleBuffer
+ * Sample.cpp
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
