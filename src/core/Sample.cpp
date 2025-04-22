@@ -24,8 +24,6 @@
 
 #include "Sample.h"
 
-#include "lmms_math.h"
-
 #include <cassert>
 
 namespace lmms {
