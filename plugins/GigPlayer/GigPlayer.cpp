@@ -436,8 +436,14 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				// Factor for pitch shifting as well as resampling
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
+				// values for buffer margins, used for various libsamplerate interpolation modes
+				// the array positions correspond to the converter_type parameter values in libsamplerate
+				// if there appears problems with playback on some interpolation mode, then the value for that mode
+				// may need to be higher - conversely, to optimize, some may work with lower values
+				static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
+
 				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
+				samples = frames / freq_factor + s_interpolationMargins[m_interpolation];
 			}
 
 			// Load this note's data

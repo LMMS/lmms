@@ -634,6 +634,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
+	// Resampling quality group
+	auto resamplingQuality = new QGroupBox(tr("Resampling quality"), audio_w);
+	auto liveResamplingQualityBox = new QComboBox(resamplingQuality);
+	
+
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);

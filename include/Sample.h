@@ -37,12 +37,6 @@ namespace lmms {
 class LMMS_EXPORT Sample
 {
 public:
-	// values for buffer margins, used for various libsamplerate interpolation modes
-	// the array positions correspond to the converter_type parameter values in libsamplerate
-	// if there appears problems with playback on some interpolation mode, then the value for that mode
-	// may need to be higher - conversely, to optimize, some may work with lower values
-	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
-
 	enum class Loop
 	{
 		Off,
@@ -50,30 +44,27 @@ public:
 		PingPong
 	};
 
-	class LMMS_EXPORT PlaybackState
+	struct LMMS_EXPORT PlaybackState
 	{
-	public:
+
 		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
-			: m_resampler(interpolationMode, DEFAULT_CHANNELS)
-			, m_varyingPitch(varyingPitch)
+			: resampler(static_cast<AudioResampler::InterpolationMode>(interpolationMode), DEFAULT_CHANNELS)
+			, varyingPitch(varyingPitch)
 		{
 		}
 
-		auto resampler() -> AudioResampler& { return m_resampler; }
-		auto frameIndex() const -> int { return m_frameIndex; }
-		auto varyingPitch() const -> bool { return m_varyingPitch; }
-		auto backwards() const -> bool { return m_backwards; }
-
-		void setFrameIndex(int frameIndex) { m_frameIndex = frameIndex; }
-		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
-		void setBackwards(bool backwards) { m_backwards = backwards; }
-
-	private:
-		AudioResampler m_resampler;
-		int m_frameIndex = 0;
-		bool m_varyingPitch = false;
-		bool m_backwards = false;
+		AudioResampler resampler;
+		int frameIndex = 0;
+		bool varyingPitch = false;
+		bool backwards = false;
 		friend class Sample;
+	};
+
+	struct CallbackData
+	{
+		const Sample* sample = nullptr;
+		PlaybackState* state = nullptr;
+		Loop loopMode = Loop::Off;
 	};
 
 	Sample() = default;
@@ -117,7 +108,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	void playRaw(SampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
+	static void render(float* dst, std::size_t frames, std::size_t channels, void* data);
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:
