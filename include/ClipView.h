@@ -51,7 +51,7 @@ class TextFloat;
 class TrackView;
 
 
-class ClipView : public selectableObject, public ModelView, public InteractiveModelViewTyped<ClipView>
+class ClipView : public selectableObject, public ModelView
 {
 	Q_OBJECT
 
@@ -135,15 +135,15 @@ public:
 	void inline setMarkerPos(int x) { m_markerPos = x; }
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
 
-	static void addClipAction(InteractiveModelView* widget); // TODO
-	static void removeClipAction(InteractiveModelView* widget); // TODO
-	static void cutAction(InteractiveModelView* widget); // TODO
-	static void copyAction(InteractiveModelView* widget); // TODO
-	static void pasteNoReturnAction(InteractiveModelView* widget);
-	static void pasteAction(InteractiveModelView* widget, bool* isSuccessful); // TODO
-	static void muteAction(InteractiveModelView* widget); // TODO
-	static void unmuteAction(InteractiveModelView* widget); // TODO
-	static void mergeAction(InteractiveModelView* widget); // TODO
+	void addClipAction(); // TODO
+	void removeClipAction(); // TODO
+	void cutAction(); // TODO
+	void copyAction(); // TODO
+	void pasteNoReturnAction();
+	virtual void pasteAction(bool* isSuccessful); // TODO
+	void muteAction();
+	void unmuteAction();
+	void mergeAction(); // TODO
 
 public slots:
 	virtual bool close();
@@ -190,10 +190,11 @@ protected:
 	}
 	
 	// InteractiveModelView methods
-	const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
-	const QString& getShortcutMessage() override { return getShortcutMessageT(); }
+	//const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
+	//const QString& getShortcutMessage() override { return getShortcutMessageT(); }
 	//virtual bool processPasteImplementation(Clipboard::DataType type, QString& value);// override;
 	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);// override;
+	void addActions(std::vector<ActionStruct>& targetList) override;
 	//virtual size_t getTypeId() { return typeid(*this).hash_code(); } // TODO remove
 	//size_t getTypeId() override { return typeid(*this).hash_code(); }
 	
@@ -228,7 +229,6 @@ private:
 	} ;
 
 	static TextFloat * s_textFloat;
-	static std::vector<ActionStruct> s_actionArray;
 
 	Clip * m_clip;
 	Action m_action;
