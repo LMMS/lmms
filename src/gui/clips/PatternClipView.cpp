@@ -38,15 +38,29 @@
 namespace lmms::gui
 {
 
+QString PatternClipView::s_shortcutMessage = "";
+
 PatternClipView::PatternClipView(Clip* clip, TrackView* tv) :
-	ClipView(clip, tv, InteractiveModelView::getTypeId<PatternClipView()),
+	ClipView(clip, tv, InteractiveModelView::getTypeId<PatternClipView>()),
 	m_patternClip(dynamic_cast<PatternClip*>(clip)),
 	m_paintPixmap()
 {
-	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
-			this, SLOT(update()));
+	// inherited from `InteractiveModelView`
+	addActions(m_actionArray);
+
+	connect(clip->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+}
+
+void PatternClipView::addActions(std::vector<ActionStruct>& targetList)
+{
+	// NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
+	// actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	if (s_shortcutMessage.size() <= 0)
+	{
+		s_shortcutMessage = InteractiveModelView::buildShortcutMessage(getActions());
+	}
 }
 
 void PatternClipView::constructContextMenu(QMenu* _cm)
@@ -63,8 +77,6 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 						tr( "Change name" ),
 						this, SLOT(changeName()));
 }
-
-
 
 
 void PatternClipView::mouseDoubleClickEvent(QMouseEvent*)
@@ -153,8 +165,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-	// TODO remove "//"
-	//drawAutoHighlight(&p);
+	drawAutoHighlight(&p);
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );

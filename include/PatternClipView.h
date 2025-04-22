@@ -44,7 +44,6 @@ public:
 	PatternClipView(Clip* clip, TrackView* tv);
 	~PatternClipView() override = default;
 
-
 public slots:
 	void update() override;
 
@@ -54,9 +53,8 @@ protected slots:
 	void changeName();
 
 	// InteractiveModelView methods
-	//const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
-	//const QString& getShortcutMessage() override { return getShortcutMessageT(); }
-	//size_t getTypeId() override { return typeid(*this).hash_code(); }
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 protected:
 	void paintEvent( QPaintEvent * pe ) override;
@@ -69,17 +67,9 @@ private:
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
+	
+	static QString s_shortcutMessage;
 } ;
-
-/*
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-		}
-		m_shortcutMessage = buildShortcutMessage();
-*/
-
 
 } // namespace gui
 
