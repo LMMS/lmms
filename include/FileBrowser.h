@@ -203,16 +203,22 @@ private slots:
 	void updateDirectory( QTreeWidgetItem * item );
 } ;
 
+class FileBrowserWidgetItem : public QTreeWidgetItem
+{
+public:
+	FileBrowserWidgetItem(const QStringList& strings, int type, QTreeWidget* parent = nullptr);
+	virtual QString fullName(QString path = QString{}) const = 0;
+};
 
 
-class Directory : public QTreeWidgetItem
+class Directory : public FileBrowserWidgetItem
 {
 public:
 	Directory(const QString& filename, const QString& path, const QString& filter);
 
 	void update();
 
-	inline QString fullName( QString path = QString() )
+	QString fullName(QString path = QString{})  const override
 	{
 		if( path.isEmpty() )
 		{
@@ -256,7 +262,7 @@ private:
 
 
 
-class FileItem : public QTreeWidgetItem
+class FileItem : public FileBrowserWidgetItem
 {
 public:
 	enum class FileType
@@ -285,7 +291,7 @@ public:
 							const QString & path );
 	FileItem( const QString & name, const QString & path );
 
-	QString fullName() const
+	QString fullName(QString path = QString{}) const override
 	{
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
