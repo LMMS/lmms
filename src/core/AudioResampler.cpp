@@ -49,33 +49,31 @@ AudioResampler::~AudioResampler()
 
 void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
 {
-	auto data = SRC_DATA{.data_in = &m_writeBuffer.data()[0][0],
-		.data_out = &dst[0][0],
-		.input_frames = 0,
-		.output_frames = static_cast<long>(frames),
-		.end_of_input = 0,
-		.src_ratio = ratio};
+	m_data.data_out = &dst[0][0];
+	m_data.output_frames = static_cast<long>(frames);
+	m_data.src_ratio = ratio;
+	m_data.end_of_input = 0;
 
-	while (data.output_frames > 0)
+	while (m_data.output_frames > 0)
 	{
-		if (data.input_frames == 0)
+		if (m_data.input_frames == 0)
 		{
 			const auto numInputFrames = callback(m_writeBuffer.data(), m_writeBuffer.size(), callbackData);
-			data.data_in = &m_writeBuffer.data()[0][0];
-			data.input_frames = numInputFrames;
+			m_data.data_in = &m_writeBuffer.data()[0][0];
+			m_data.input_frames = numInputFrames;
 		}
 
-		if (data.input_frames < 0 || src_process(m_state, &data))
+		if (m_data.input_frames < 0 || src_process(m_state, &m_data))
 		{
-			std::fill_n(data.data_out, data.output_frames * DEFAULT_CHANNELS, 0.0f);
+			std::fill_n(m_data.data_out, m_data.output_frames * DEFAULT_CHANNELS, 0.0f);
 			break;
 		}
 
-		data.data_in += data.input_frames_used * DEFAULT_CHANNELS;
-		data.input_frames -= data.input_frames_used;
+		m_data.data_in += m_data.input_frames_used * DEFAULT_CHANNELS;
+		m_data.input_frames -= m_data.input_frames_used;
 
-		data.data_out += data.output_frames_gen * DEFAULT_CHANNELS;
-		data.output_frames -= data.output_frames_gen;
+		m_data.data_out += m_data.output_frames_gen * DEFAULT_CHANNELS;
+		m_data.output_frames -= m_data.output_frames_gen;
 	}
 }
 

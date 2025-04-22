@@ -64,7 +64,7 @@ public:
 	AudioResampler& operator=(const AudioResampler&);
 	AudioResampler& operator=(AudioResampler&&) noexcept = delete;
 
-	//! Resample the audio outputted from the write callback at the given conversion @p ratio. 
+	//! Resample the audio outputted from the write callback at the given conversion @p ratio.
 	//! @p dst is expected to consist of @p frames frames (number of samples / number of channels)
 	void resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback writeCallback, void* writeCallbackData);
 
@@ -75,12 +75,16 @@ public:
 	constexpr auto channels() const -> int { return DEFAULT_CHANNELS; }
 
 	//! Returns the textual name for the given interpolation mode.
-	static auto interpolationModeName(InterpolationMode mode) -> const char* { return src_get_name(static_cast<int>(mode)); }
+	static auto interpolationModeName(InterpolationMode mode) -> const char*
+	{
+		return src_get_name(static_cast<int>(mode));
+	}
 
 private:
 	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;
 	std::array<SampleFrame, 32> m_writeBuffer;
 	SRC_STATE* m_state = nullptr;
+	SRC_DATA m_data = SRC_DATA{};
 	int m_error = 0;
 };
 } // namespace lmms
