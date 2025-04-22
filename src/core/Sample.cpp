@@ -126,9 +126,9 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto pastBounds = state->frameIndex >= m_endFrame || (state->frameIndex < 0 && state->backwards);
 	if (loopMode == Loop::Off && pastBounds) { return false; }
 
-	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * desiredFrequency;
-	const auto inputSampleRate = m_buffer->sampleRate() * m_frequency;
-	const auto resampleRatio = outputSampleRate / inputSampleRate;
+	const auto outputRatio = Engine::audioEngine()->outputSampleRate() * m_frequency;
+	const auto inputRatio = m_buffer->sampleRate() * desiredFrequency;
+	const auto resampleRatio = outputRatio / inputRatio;
 
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
