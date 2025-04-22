@@ -46,12 +46,11 @@ public:
 	SampleClipView( SampleClip * _clip, TrackView * _tv );
 	~SampleClipView() override = default;
 
+	void pasteAction(bool* isSuccessful) override;
 public slots:
 	void updateSample();
 	void reverseSample();
 	void setAutomationGhost();
-
-
 
 protected:
 	void constructContextMenu(QMenu* cm) override;
@@ -63,10 +62,8 @@ protected:
 	void paintEvent( QPaintEvent * ) override;
 
 	// InteractiveModelView methods
-	//const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
-	//const QString& getShortcutMessage() override { return getShortcutMessageT(); }
-	//bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-	//size_t getTypeId() { return typeid(*this).hash_code(); }
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 private:
 	SampleClip * m_clip;
@@ -74,21 +71,9 @@ private:
 	QPixmap m_paintPixmap;
 	long m_paintPixmapXPosition;
 	bool splitClip( const TimePos pos ) override;
+	
+	static QString s_shortcutMessage;
 } ;
-
-/*
-	if (m_shortcutMessage == "")
-	{
-		s_actionArray = ClipView::getActions();
-		if (s_actionArray.size() > 2)
-		{
-			s_actionArray[2].addAcceptedDataType(getClipStringPairType(getClip()->getTrack()));
-			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::SampleFile);
-			s_actionArray[2].addAcceptedDataType(Clipboard::DataType::SampleData);
-		}
-		m_shortcutMessage = buildShortcutMessage();
-	}
-*/
 
 } // namespace gui
 

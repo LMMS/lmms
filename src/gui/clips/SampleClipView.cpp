@@ -42,9 +42,10 @@
 namespace lmms::gui
 {
 
+QString SampleClipView::s_shortcutMessage = "";
 
 SampleClipView::SampleClipView(SampleClip* clip, TrackView* tv) :
-	ClipView(clip, tv, InteractiveModelView::getTypeId<SampleClipView()),
+	ClipView(clip, tv, InteractiveModelView::getTypeId<SampleClipView>()),
 	m_clip(clip),
 	m_paintPixmap()
 {
@@ -57,6 +58,51 @@ SampleClipView::SampleClipView(SampleClip* clip, TrackView* tv) :
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+}
+
+void SampleClipView::addActions(std::vector<ActionStruct>& targetList)
+{
+	// NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
+	// actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	
+	targetList = ClipView::getActions(); // NOT `addActions()`
+
+	targetList[getIndexFromId(2)].addAcceptedDataType(Clipboard::DataType::SampleFile); // paste action
+	targetList[getIndexFromId(2)].addAcceptedDataType(Clipboard::DataType::SampleData); // paste action
+	targetList[getIndexFromId(9)].addAcceptedDataType(Clipboard::DataType::SampleFile); // paste action
+	targetList[getIndexFromId(9)].addAcceptedDataType(Clipboard::DataType::SampleData); // paste action
+
+	if (s_shortcutMessage.size() <= 0)
+	{
+		s_shortcutMessage = InteractiveModelView::buildShortcutMessage(targetList);
+	}
+}
+
+void SampleClipView::pasteAction(bool* isSuccessful)
+{
+	Clipboard::DataType type = Clipboard::decodeKey(Clipboard::getMimeData());
+	QString value = Clipboard::decodeValue(Clipboard::getMimeData());
+
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::SampleFile)
+	{
+		m_clip->setSampleFile(value);
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::DataType::SampleData)
+	{
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
+		m_clip->updateLength();
+		update();
+		shouldAccept = true;
+	}
+
+	if (shouldAccept)
+	{
+		if (isSuccessful != nullptr) { *isSuccessful = true; }
+		InteractiveModelView::stopHighlighting();
+	}
+	else { ClipView::pasteAction(isSuccessful); }
 }
 
 void SampleClipView::updateSample()
@@ -122,8 +168,9 @@ void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 void SampleClipView::dropEvent( QDropEvent * _de )
-{// TODO remove "//"
-	bool shouldAccept = false;//processPaste(_de->mimeData());
+{
+	bool shouldAccept = false;
+	doAction(9, GuiActionIO(&shouldAccept));
 
 	if (shouldAccept)
 	{
@@ -335,37 +382,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
-// TODO remove "//"
-	//drawAutoHighlight(&p);
+	drawAutoHighlight(&p);
 	p.end();
 
 	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
 
-/*
-bool SampleClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
-{
-	bool shouldAccept = false;
-	if (type == Clipboard::DataType::SampleFile)
-	{
-		m_clip->setSampleFile(value);
-		shouldAccept = true;
-	}
-	else if (type == Clipboard::DataType::SampleData)
-	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
-		m_clip->updateLength();
-		update();
-		shouldAccept = true;
-	}
-
-	if (shouldAccept == false)
-	{
-		shouldAccept = ClipView::processPasteImplementation(type, value);
-	}
-	return shouldAccept;
-}
-*/
 
 
 void SampleClipView::reverseSample()
