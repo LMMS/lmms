@@ -142,7 +142,7 @@ void FloatModelEditorBase::toggleScale()
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	std::vector<Clipboard::DataType> acceptedKeys = {
+	static std::vector<Clipboard::DataType> acceptedKeys = {
 		Clipboard::DataType::FloatValue,
 		Clipboard::DataType::AutomatableModelLink
 	};
