@@ -42,7 +42,7 @@ namespace lmms
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( Type::MelodyClip ),
+	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
