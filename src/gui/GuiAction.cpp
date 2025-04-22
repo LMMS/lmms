@@ -22,82 +22,96 @@
  *
  */
 
-#include <cassert>
+#include <QAction>
 
 #include "GuiAction.h"
+#include "InteractiveModelView.h"
 
 namespace lmms::gui
 {
 
-ActionSafeFnPtr::ActionSafeFnPtr()
-{
-	setFn(std::make_pair(nullptr, 0));
-}
-ActionSafeFnPtr::ActionSafeFnPtr(std::pair<void*, size_t> input)
-{
-	setFn(input);
-}
-ActionSafeFnPtr::ActionSafeFnPtr(const ActionSafeFnPtr& ref)
-{
-	if (ref.m_functionPtr == nullptr)
-	{
-		setFn(std::make_pair(nullptr, 0));
-	}
-	else
-	{
-		m_functionPtr = ref.m_functionPtr;
-		m_dataTypeId = ref.m_dataTypeId;
-	}
-}
-void ActionSafeFnPtr::setFn(std::pair<void*, size_t> input)
-{
-	m_functionPtr = input.first;
-	m_dataTypeId = input.second;
-}
+GuiActionIO::GuiActionIO()
+{}
 
-AbstractGuiAction::AbstractGuiAction(const QString& name, InteractiveModelView* object, bool linkBack) :
-	m_name(name),
-	m_target(object),
-	m_isLinkedBack(linkBack)
-{
-	assert(m_target != nullptr);
-}
-bool AbstractGuiAction::getShouldLinkBack()
-{
-	return m_isLinkedBack;
-}
-bool AbstractGuiAction::clearObjectIfMatch(InteractiveModelView* object)
-{
-	if (m_target == nullptr) { return false; }
-	if (object == m_target)
-	{
-		m_target = nullptr;
-		return true;
-	}
-	return false;
-}
-GuiAction::GuiAction(const QString& name, InteractiveModelView* object, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, size_t runAmount, bool linkBack) :
-	AbstractGuiAction(name, object, linkBack),
+GuiActionIO::GuiActionIO(const GuiActionIO& ref) :
+	m_typeId(ref.m_typeId),
+	m_valueA(ref.m_valueA),
+	m_valueB(ref.m_valueB),
+	m_valueC(ref.m_valueC),
+	m_valueD(ref.m_valueD),
+	m_valueE(ref.m_valueE),
+	m_valueF(ref.m_valueF)
+{}
+
+GuiActionIO::GuiActionIO(const size_t& value) :
+	m_typeId(GuiActionIO::getTypeId<size_t>()),
+	m_valueA(value)
+{}
+
+GuiActionIO::GuiActionIO(const int& value) :
+	m_typeId(GuiActionIO::getTypeId<int>()),
+	m_valueB(value)
+{}
+
+GuiActionIO::GuiActionIO(const float& value) :
+	m_typeId(GuiActionIO::getTypeId<float>()),
+	m_valueC(value)
+{}
+
+GuiActionIO::GuiActionIO(const std::pair<float, float>& value) :
+	m_typeId(GuiActionIO::getTypeId<std::pair<float, float>>()),
+	m_valueD(value)
+{}
+
+GuiActionIO::GuiActionIO(const std::vector<float>& value) :
+	m_typeId(GuiActionIO::getTypeId<std::vector<float>>()),
+	m_valueE(value)
+{}
+
+GuiActionIO::GuiActionIO(bool* value) :
+	m_typeId(GuiActionIO::getTypeId<bool*>()),
+	m_valueF(value)
+{}
+
+GuiAction::GuiAction(ActionStruct& parentAction, const GuiActionIO& data, size_t runAmount, bool linkBack) :
+	m_name(""),
+	m_isLinkedBack(linkBack),
 	m_runAmount(runAmount),
-	m_doFn(doFn),
-	m_undoFn(undoFn)
+	m_data(data),
+	m_parentAction(&parentAction)
 {
+	m_name = m_parentAction->getText();
 }
 void GuiAction::undo()
 {
-	if (m_target == nullptr || m_undoFn == nullptr) { return; }
+	if (m_parentAction == nullptr || m_parentAction->undoFn == nullptr) { return; }
+	m_parentAction->setData(m_data);
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
-		m_undoFn(m_target);
+		m_parentAction->undoFn->trigger();
 	}
 }
 void GuiAction::redo()
 {
-	if (m_target == nullptr || m_doFn == nullptr) { return; }
+	if (m_parentAction == nullptr || m_parentAction->doFn == nullptr) { return; }
+	m_parentAction->setData(m_data);
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
-		m_doFn(m_target);
+		m_parentAction->doFn->trigger();
 	}
+}
+
+bool GuiAction::getShouldLinkBack()
+{
+	return m_isLinkedBack;
+}
+
+bool GuiAction::clearActionIfMatch(ActionStruct* action)
+{
+	if (action != m_parentAction) { return false; }
+
+	m_parentAction = nullptr;
+	return true;
 }
 
 } // template<typename DataType>

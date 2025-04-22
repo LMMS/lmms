@@ -28,6 +28,7 @@
 #include <cassert>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <QString>
 //#include <QUndoCommand>
@@ -35,102 +36,118 @@
 namespace lmms::gui
 {
 
-class InteractiveModelView;
+class ActionStruct;
 
-class ActionSafeFnPtr
+class GuiActionIO
 {
 public:
-	// the typenames are placed in this way -> doesn't have to be casted when stored
-	// the class is the same size with different types -> avoids mistakes
-	// still enforces the right function format
+	GuiActionIO();
+	GuiActionIO(const GuiActionIO& ref);
+	GuiActionIO(const size_t& value);
+	GuiActionIO(const int& value);
+	GuiActionIO(const float& value);
+	GuiActionIO(const std::pair<float, float>& value);
+	GuiActionIO(const std::vector<float>& value);
+	GuiActionIO(bool* value);
+
 	template<typename DataType>
-	static std::pair<void*, size_t> helpConstruct(void (*inputFunction)(InteractiveModelView*, DataType))
-	{
-		return std::make_pair(reinterpret_cast<void*>(inputFunction), typeid(DataType).hash_code());
-	}
-	ActionSafeFnPtr();
-	ActionSafeFnPtr(std::pair<void*, size_t> input);
-	ActionSafeFnPtr(const ActionSafeFnPtr& ref);
-	void setFn(std::pair<void*, size_t> input);
+	static constexpr size_t getTypeId() { return 0; }
 	template<typename DataType>
-	constexpr void callFn(InteractiveModelView* object, DataType data)
+	constexpr DataType* getValue()
 	{
-		qDebug("type assert debug: %ld, %ld, %s", m_dataTypeId, typeid(DataType).hash_code(), typeid(DataType).name());
-		if (m_functionPtr == nullptr) { return; }
-		// if this assert fails, you need to change your `DataType` template to the one this one was constructed with (`helpConstruct<DataType>`)
-		assert(m_dataTypeId == typeid(DataType).hash_code());
-		// firstly the FunctionPointer will be casted to a `void*`, so it can be stored without templates,
-		// then it will be casted back to FunctionPointer, so it is safe to use
-		void (*functionPtr)(InteractiveModelView*, DataType);
-		functionPtr = reinterpret_cast<void (*)(InteractiveModelView*, DataType)>(m_functionPtr);
-		functionPtr(object, data);
+		// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+		assert(false);
+		return nullptr;
 	}
-	bool isValid() const { return m_functionPtr; }
-	bool isMatch(void* functionPtr) const { return functionPtr == m_functionPtr; }
+
+	bool isValid() { return m_typeId != 0; };
 private:
-	size_t m_dataTypeId;
-	void* m_functionPtr;
+	size_t m_typeId = 0;
+
+	size_t m_valueA = 0;
+	int m_valueB = 0;
+	float m_valueC = 0.0f;
+	std::pair<float, float> m_valueD = {0.0f, 0.0f};
+	std::vector<float> m_valueE = {};
+	bool* m_valueF = nullptr;
 };
 
-
-class AbstractGuiAction// : public QUndoCommand
+class GuiAction// : public QUndoCommand
 {
 public:
-	AbstractGuiAction(const QString& name, InteractiveModelView* object, bool linkBack);
-	~AbstractGuiAction() {}
+	GuiAction(ActionStruct& parentAction, const GuiActionIO& data, size_t runAmount, bool linkBack);
+	void undo();// override
+	void redo();// override
 	//! should be undone along with the action before this
 	bool getShouldLinkBack();
 	//! returns true if cleared, use this to delete pointers to destructing objects
-	bool clearObjectIfMatch(InteractiveModelView* object);
-protected:
-	const QString m_name;
-	InteractiveModelView* m_target;
+	bool clearActionIfMatch(ActionStruct* action);
+private:
+	QString m_name;
 	bool m_isLinkedBack; //! if this is undone, undo the one before this
-};
-
-
-typedef void (*ActionTypelessFnPtr)(InteractiveModelView*);
-class GuiAction : public AbstractGuiAction
-{
-public:
-	GuiAction(const QString& name, InteractiveModelView* object, ActionTypelessFnPtr doFn, ActionTypelessFnPtr undoFn, size_t runAmount, bool linkBack);
-	void undo();// override
-	void redo();// override
-private:
 	size_t m_runAmount;
-	ActionTypelessFnPtr m_doFn;
-	ActionTypelessFnPtr m_undoFn;
+	GuiActionIO m_data;
+	ActionStruct* m_parentAction;
 };
 
+template<>
+constexpr inline size_t GuiActionIO::getTypeId<size_t>() { return 1; }
+template<>
+constexpr inline size_t GuiActionIO::getTypeId<int>() { return 2; }
+template<>
+constexpr inline size_t GuiActionIO::getTypeId<float>() { return 3; }
+template<>
+constexpr inline size_t GuiActionIO::getTypeId<std::pair<float, float>>() { return 4; }
+template<>
+constexpr inline size_t GuiActionIO::getTypeId<std::vector<float>>() { return 5; }
+template<>
+constexpr inline size_t GuiActionIO::getTypeId<std::vector<bool*>>() { return 6; }
 
-
-template<typename DataType>
-class GuiActionTyped : public AbstractGuiAction
+template<>
+constexpr inline size_t* GuiActionIO::getValue()
 {
-public:
-	GuiActionTyped(const QString& name, InteractiveModelView* object, ActionSafeFnPtr doFn, ActionSafeFnPtr undoFn, DataType data, bool linkBack) :
-		AbstractGuiAction(name, object, linkBack),
-		m_data(nullptr),
-		m_doFn(doFn),
-		m_undoFn(undoFn)
-	{
-		m_data = std::make_unique<DataType>(data);
-	}
-	void undo()// override
-	{
-		if (m_target == nullptr || m_undoFn.isValid() == false) { return; }
-		m_undoFn.callFn<DataType>(m_target, *m_data.get());
-	}
-	void redo()// override
-	{
-		if (m_target == nullptr || m_doFn.isValid() == false) { return; }
-		m_doFn.callFn<DataType>(m_target, *m_data.get());
-	}
-private:
-	std::unique_ptr<DataType> m_data;
-	ActionSafeFnPtr m_doFn;
-	ActionSafeFnPtr m_undoFn;
-};
+	// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+	assert(getTypeId<size_t>() == m_typeId);
+	return &m_valueA;
+}
+template<>
+constexpr inline int* GuiActionIO::getValue()
+{
+	// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+	assert(getTypeId<int>() == m_typeId);
+	return &m_valueB;
+}
+template<>
+constexpr inline float* GuiActionIO::getValue()
+{
+	// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+	//qDebug("GuiActionIO %ld, %ld", getTypeId<float>(), m_typeId);
+	assert(getTypeId<float>() == m_typeId);
+	return &m_valueC;
+}
+template<>
+constexpr inline std::pair<float, float>* GuiActionIO::getValue()
+{
+	// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+	assert((getTypeId<std::pair<float, float>>() == m_typeId));
+	return &m_valueD;
+}
+template<>
+constexpr inline std::vector<float>* GuiActionIO::getValue()
+{
+	// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+	assert(getTypeId<std::vector<float>>() == m_typeId);
+	return &m_valueE;
+}
+template<>
+constexpr inline bool** GuiActionIO::getValue()
+{
+	// if this assert fails, you need to change your `DataType` template to the one this one was constructed with
+	//qDebug("GuiActionIO %ld, %ld", getTypeId<float>(), m_typeId);
+	assert(getTypeId<bool*>() == m_typeId);
+	return &m_valueF;
+}
+
 
 } // namespace lmms::gui
 
