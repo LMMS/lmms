@@ -87,6 +87,8 @@ public:
 		return m_journallingStateStack.isEmpty();
 	}
 
+	constexpr static auto JO_NODE_NAME = "journallingObject";
+
 protected:
 	void changeID( jo_id_t _id );
 
