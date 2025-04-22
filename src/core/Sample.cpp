@@ -126,24 +126,25 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto pastBounds = state->frameIndex >= m_endFrame || (state->frameIndex < 0 && state->backwards);
 	if (loopMode == Loop::Off && pastBounds) { return false; }
 
-	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
-	const auto inputSampleRate = m_buffer->sampleRate();
-	const auto resampleRatio = outputSampleRate / static_cast<float>(inputSampleRate);
+	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * desiredFrequency;
+	const auto inputSampleRate = m_buffer->sampleRate() * m_frequency;
+	const auto resampleRatio = outputSampleRate / inputSampleRate;
 
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
 	auto callbackData = CallbackData{.sample = this, .state = state, .loopMode = loopMode};
-	const auto resampleResult = state->resampler.resample(
-		&dst[0][0], static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData);
+	const auto resampleResult
+		= state->resampler.resample(dst, static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData);
 	advance(state, resampleResult.inputFramesUsed, loopMode);
 
 	const auto outputFrames = static_cast<f_cnt_t>(resampleResult.outputFramesGenerated);
 	if (outputFrames < numFrames) { std::fill_n(dst + outputFrames, numFrames - outputFrames, SampleFrame{}); }
 
-	for (auto i = std::size_t{0}; i < numFrames; ++i)
+	const auto amplification = m_amplification.load(std::memory_order_relaxed);
+	for (auto i = std::size_t{0}; i < outputFrames; ++i)
 	{
-		dst[i][0] *= m_amplification;
-		dst[i][1] *= m_amplification;
+		dst[i][0] *= amplification;
+		dst[i][1] *= amplification;
 	}
 
 	return true;
@@ -164,7 +165,7 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-void Sample::render(float* dst, const std::size_t frames, const std::size_t channels, void* data)
+void Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 {
 	const auto callbackData = static_cast<CallbackData*>(data);
 	const auto state = callbackData->state;
@@ -176,18 +177,15 @@ void Sample::render(float* dst, const std::size_t frames, const std::size_t chan
 
 	for (size_t frame = 0; frame < frames; ++frame)
 	{
-		const auto frameValue = sample->m_buffer->data()[sample->m_reversed ? sample->m_buffer->size() - index - 1 : index];
-		for (size_t channel = 0; channel < channels; ++channel)
-		{
-			dst[frame * state->resampler.channels() + channel] = frameValue[channel];
-		}
-
-		backwards ? --index : ++index;
-
 		switch (loopMode)
 		{
 		case Loop::Off:
-			if (index < 0 || index >= sample->m_endFrame) { return; }
+			if (index < 0 || index >= sample->m_endFrame)
+			{
+				std::fill(dst + frame, dst + frames, SampleFrame{});
+				return;
+			}
+
 			break;
 		case Loop::On:
 			if (index < sample->m_loopStartFrame && backwards) { index = sample->m_loopEndFrame - 1; }
@@ -208,6 +206,10 @@ void Sample::render(float* dst, const std::size_t frames, const std::size_t chan
 		default:
 			break;
 		}
+
+		const auto value = sample->m_buffer->data()[sample->m_reversed ? sample->m_buffer->size() - index - 1 : index];
+		dst[frame] = value;
+		backwards ? --index : ++index;
 	}
 }
 

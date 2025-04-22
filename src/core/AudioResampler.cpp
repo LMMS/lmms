@@ -50,26 +50,25 @@ AudioResampler::~AudioResampler()
 }
 
 auto AudioResampler::resample(
-	float* dst, long frames, double ratio, WriteCallback writeCallback, void* writeCallbackData) -> Result
+	SampleFrame* dst, size_t frames, double ratio, WriteCallback writeCallback, void* writeCallbackData) -> Result
 {
 	auto result = Result{};
 	while (frames > 0)
 	{
-		const auto numWriteBufferFrames = static_cast<long>(m_writeBuffer.size() / m_channels);
-		const auto framesToWrite = std::min(numWriteBufferFrames, frames);
-		writeCallback(m_writeBuffer.data(), framesToWrite, m_channels, writeCallbackData);
+		const auto numInputFrames = std::min(m_writeBuffer.size(), frames);
+		writeCallback(m_writeBuffer.data(), numInputFrames, writeCallbackData);
 
-		auto data = SRC_DATA{.data_in = m_writeBuffer.data(),
-			.data_out = dst,
-			.input_frames = framesToWrite,
-			.output_frames = frames,
-			.end_of_input = framesToWrite < numWriteBufferFrames,
+		auto data = SRC_DATA{.data_in = &m_writeBuffer.data()[0][0],
+			.data_out = &dst[0][0],
+			.input_frames = static_cast<long>(numInputFrames),
+			.output_frames = static_cast<long>(frames),
+			.end_of_input = 0,
 			.src_ratio = ratio};
 
 		result.error = src_process(m_state, &data);
 		if (result.error) { break; }
 
-		dst += data.output_frames_gen * m_channels;
+		dst += data.output_frames_gen;
 		frames -= data.output_frames_gen;
 		result.inputFramesUsed += data.input_frames_used;
 		result.outputFramesGenerated += data.output_frames_gen;

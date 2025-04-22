@@ -28,6 +28,7 @@
 #include <array>
 #include <samplerate.h>
 
+#include "SampleFrame.h"
 #include "lmms_export.h"
 
 namespace lmms {
@@ -58,7 +59,7 @@ public:
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
 	//! @p data is an optional parameter that can be specified by callers for any additional context needed to
 	//! process their callback.
-	using WriteCallback = void (*)(float* dst, std::size_t frames, std::size_t channels, void* data);
+	using WriteCallback = void (*)(SampleFrame* dst, std::size_t frames, void* data);
 
 	AudioResampler(InterpolationMode interpolationMode, int channels);
 	AudioResampler(const AudioResampler&) = delete;
@@ -69,9 +70,8 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept = delete;
 
 	//! Resample the audio outputted from the write callback at the given conversion @p ratio. 
-	//! @p dst is expected to be a interleaved audio buffer (e.g. LRLRLR for stereo)
 	//! @p dst is expected to consist of @p frames frames (number of samples / number of channels)
-	auto resample(float* dst, long frames, double ratio, WriteCallback writeCallback, void* writeCallbackData) -> Result;
+	auto resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback writeCallback, void* writeCallbackData) -> Result;
 
 	//! Returns the interpolation mode the resampler is using.
 	auto interpolationMode() const -> InterpolationMode { return m_interpolationMode; }
@@ -84,7 +84,7 @@ public:
 
 private:
 	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;
-	std::array<float, 64> m_writeBuffer;
+	std::array<SampleFrame, 32> m_writeBuffer;
 	SRC_STATE* m_state = nullptr;
 	int m_channels = 0;
 	int m_error = 0;

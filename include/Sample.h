@@ -108,7 +108,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	static void render(float* dst, std::size_t frames, std::size_t channels, void* data);
+	static void render(SampleFrame* dst, std::size_t frames, void* data);
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:
