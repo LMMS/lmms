@@ -158,7 +158,7 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-std::size_t Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
+long Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 {
 	const auto callbackData = static_cast<CallbackData*>(data);
 	const auto state = callbackData->state;
@@ -173,7 +173,7 @@ std::size_t Sample::render(SampleFrame* dst, const std::size_t frames, void* dat
 		switch (loopMode)
 		{
 		case Loop::Off:
-			if (index < 0 || index >= sample->m_endFrame) { return frame; }
+			if (index < 0 || index >= sample->m_endFrame) { return -1; }
 			break;
 		case Loop::On:
 			if (index < sample->m_loopStartFrame && backwards) { index = sample->m_loopEndFrame - 1; }

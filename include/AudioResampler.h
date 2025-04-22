@@ -51,9 +51,10 @@ public:
 
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
 	//! The callback should return the number of frames actually written to @p dst.
+	//! When the callback cannot write any more data or an error occurred, a value less than zero should be returned.
 	//! @p data is an optional parameter that can be specified by callers for any additional context needed to
 	//! process their callback.
-	using WriteCallback = std::size_t (*)(SampleFrame* dst, std::size_t frames, void* data);
+	using WriteCallback = long (*)(SampleFrame* dst, std::size_t frames, void* data);
 
 	AudioResampler(InterpolationMode interpolationMode);
 	AudioResampler(const AudioResampler&) = delete;

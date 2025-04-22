@@ -49,26 +49,33 @@ AudioResampler::~AudioResampler()
 
 void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
 {
-	while (frames > 0)
+	auto data = SRC_DATA{.data_in = &m_writeBuffer.data()[0][0],
+		.data_out = &dst[0][0],
+		.input_frames = 0,
+		.output_frames = static_cast<long>(frames),
+		.end_of_input = 0,
+		.src_ratio = ratio};
+
+	while (data.output_frames > 0)
 	{
-		const auto maxInputFrames = std::min(m_writeBuffer.size(), frames);
-		const auto numInputFrames = callback(m_writeBuffer.data(), maxInputFrames, callbackData);
-
-		auto data = SRC_DATA{.data_in = &m_writeBuffer.data()[0][0],
-			.data_out = &dst[0][0],
-			.input_frames = static_cast<long>(numInputFrames),
-			.output_frames = static_cast<long>(frames),
-			.end_of_input = 0,
-			.src_ratio = ratio};
-
-		if (src_process(m_state, &data))
+		if (data.input_frames == 0)
 		{
-			std::fill_n(dst, frames, SampleFrame{});
+			const auto numInputFrames = callback(m_writeBuffer.data(), m_writeBuffer.size(), callbackData);
+			data.data_in = &m_writeBuffer.data()[0][0];
+			data.input_frames = numInputFrames;
+		}
+
+		if (data.input_frames < 0 || src_process(m_state, &data))
+		{
+			std::fill_n(data.data_out, data.output_frames * DEFAULT_CHANNELS, 0.0f);
 			break;
 		}
 
-		dst += data.output_frames_gen;
-		frames -= data.output_frames_gen;
+		data.data_in += data.input_frames_used * DEFAULT_CHANNELS;
+		data.input_frames -= data.input_frames_used;
+
+		data.data_out += data.output_frames_gen * DEFAULT_CHANNELS;
+		data.output_frames -= data.output_frames_gen;
 	}
 }
 
