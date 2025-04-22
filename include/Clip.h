@@ -137,6 +137,7 @@ public:
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
 
+	void setMute(bool shouldMute);
 public slots:
 	void toggleMute();
 
