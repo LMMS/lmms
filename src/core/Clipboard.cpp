@@ -132,7 +132,7 @@ namespace lmms::Clipboard
 
 
 
-	DataType decodeKey(const QMimeData* mimeData)
+	Clipboard::DataType decodeKey(const QMimeData* mimeData)
 	{
 		QString keyString = QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 0, 0);
 		for (size_t i = 0; i < static_cast<size_t>(DataType::Count); i++)
