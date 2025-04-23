@@ -147,7 +147,6 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 
 bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 {
-	std::cout << "InteractiveModelView::HandleKeyPress this:" << this << "\n";
 	std::vector<ModelShortcut> shortcuts(getShortcuts());
 	
 	size_t foundIndex = 0;
@@ -250,7 +249,6 @@ void InteractiveModelView::leaveEvent(QEvent* event)
 bool InteractiveModelView::processPaste(const QMimeData* mimeData)
 {
 	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return false; }
-	std::cout << "InteractiveModelView::processPaste this:" << this << "\n";
 
 	Clipboard::DataType type = Clipboard::decodeKey(mimeData);
 	QString value = Clipboard::decodeValue(mimeData);
