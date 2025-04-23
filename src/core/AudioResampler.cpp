@@ -76,7 +76,7 @@ bool AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, Wri
 		{
 			const auto numInputFrames = callback(m_writeBuffer.data(), m_writeBuffer.size(), callbackData);
 			m_data.data_in = &m_writeBuffer.data()[0][0];
-			m_data.input_frames = numInputFrames;
+			m_data.input_frames = static_cast<long>(numInputFrames);
 			m_data.end_of_input = numInputFrames < m_writeBuffer.size();
 		}
 

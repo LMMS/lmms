@@ -157,7 +157,7 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-long Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
+std::size_t Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 {
 	const auto callbackData = static_cast<CallbackData*>(data);
 	const auto state = callbackData->state;

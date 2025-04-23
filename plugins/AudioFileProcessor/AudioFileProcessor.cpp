@@ -144,7 +144,8 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 				srcmode = SRC_SINC_MEDIUM_QUALITY;
 				break;
 		}
-		_n->m_pluginData = new Sample::PlaybackState(_n->hasDetuningInfo(), srcmode);
+
+		_n->m_pluginData = new Sample::PlaybackState(srcmode);
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->frameIndex = m_nextPlayStartPoint;
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->backwards = m_nextPlayBackwards;
 

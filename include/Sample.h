@@ -47,15 +47,13 @@ public:
 	struct LMMS_EXPORT PlaybackState
 	{
 
-		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
+		PlaybackState(int interpolationMode = SRC_LINEAR)
 			: resampler(static_cast<AudioResampler::InterpolationMode>(interpolationMode))
-			, varyingPitch(varyingPitch)
 		{
 		}
 
 		AudioResampler resampler;
 		int frameIndex = 0;
-		bool varyingPitch = false;
 		bool backwards = false;
 		friend class Sample;
 	};
@@ -108,7 +106,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	static long render(SampleFrame* dst, std::size_t frames, void* data);
+	static std::size_t render(SampleFrame* dst, std::size_t frames, void* data);
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
