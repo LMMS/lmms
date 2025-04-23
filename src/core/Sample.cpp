@@ -128,16 +128,18 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
 	auto callbackData = CallbackData{.sample = this, .state = state, .loopMode = loopMode};
-	state->resampler.resample(dst, static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData);
-
-	const auto amplification = m_amplification.load(std::memory_order_relaxed);
-	for (auto i = std::size_t{0}; i < numFrames; ++i)
+	if (state->resampler.resample(dst, static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData))
 	{
-		dst[i][0] *= amplification;
-		dst[i][1] *= amplification;
-	}
+		const auto amplification = m_amplification.load(std::memory_order_relaxed);
+		for (auto i = std::size_t{0}; i < numFrames; ++i)
+		{
+			dst[i][0] *= amplification;
+			dst[i][1] *= amplification;
+		}
 
-	return true;
+		return true;
+	}
+	else { return false; }
 }
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
@@ -170,7 +172,7 @@ long Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
 		switch (loopMode)
 		{
 		case Loop::Off:
-			if (index < 0 || index >= sample->m_endFrame) { return -1; }
+			if (index < 0 || index >= sample->m_endFrame) { return frame; }
 			break;
 		case Loop::On:
 			if (index < sample->m_loopStartFrame && backwards) { index = sample->m_loopEndFrame - 1; }

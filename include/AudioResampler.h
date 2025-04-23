@@ -53,9 +53,6 @@ public:
 
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
 	//! The callback should return the number of frames actually written to @p dst.
-	//! When the callback cannot write any more data or an error occurred, a value less than zero should be returned.
-	//! @p data is an optional parameter that can be specified by callers for any additional context needed to
-	//! process their callback.
 	using WriteCallback = long (*)(SampleFrame* dst, std::size_t frames, void* data);
 
 	//! Create a resampler with the given @p interpolationMode.
@@ -80,7 +77,8 @@ public:
 
 	//! Resample the audio outputted from the write callback at the given conversion @p ratio.
 	//! @p dst is expected to consist of @p frames frames (number of samples / number of channels)
-	void resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback writeCallback, void* writeCallbackData);
+	//! Returns `true` if the resampling was successful and `false` otherwise or no more audio can be resampled.
+	bool resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback writeCallback, void* writeCallbackData);
 
 	//! Returns the interpolation mode the resampler is using.
 	auto interpolationMode() const -> InterpolationMode { return m_interpolationMode; }

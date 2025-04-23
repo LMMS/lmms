@@ -61,14 +61,14 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
+bool AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
 {
-	if (!m_state) { return; }
+	std::fill_n(dst, frames, SampleFrame{});
+	if (!m_state) { return false; }
 
 	m_data.data_out = &dst[0][0];
 	m_data.output_frames = static_cast<long>(frames);
 	m_data.src_ratio = ratio;
-	m_data.end_of_input = 0;
 
 	while (m_data.output_frames > 0)
 	{
@@ -77,13 +77,11 @@ void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, Wri
 			const auto numInputFrames = callback(m_writeBuffer.data(), m_writeBuffer.size(), callbackData);
 			m_data.data_in = &m_writeBuffer.data()[0][0];
 			m_data.input_frames = numInputFrames;
+			m_data.end_of_input = numInputFrames < m_writeBuffer.size();
 		}
 
-		if (m_data.input_frames < 0 || src_process(m_state, &m_data))
-		{
-			std::fill_n(m_data.data_out, m_data.output_frames * DEFAULT_CHANNELS, 0.0f);
-			break;
-		}
+		if (src_process(m_state, &m_data)) { return false; }
+		if (m_data.end_of_input && m_data.output_frames_gen == 0) { return false; }
 
 		m_data.data_in += m_data.input_frames_used * DEFAULT_CHANNELS;
 		m_data.input_frames -= m_data.input_frames_used;
@@ -91,6 +89,8 @@ void AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, Wri
 		m_data.data_out += m_data.output_frames_gen * DEFAULT_CHANNELS;
 		m_data.output_frames -= m_data.output_frames_gen;
 	}
+
+	return true;
 }
 
 } // namespace lmms
