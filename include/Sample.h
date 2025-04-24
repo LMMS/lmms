@@ -106,7 +106,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	static std::size_t render(SampleFrame* dst, std::size_t frames, void* data);
+	std::size_t render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;

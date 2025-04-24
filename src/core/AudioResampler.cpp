@@ -61,35 +61,25 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-bool AudioResampler::resample(SampleFrame* dst, size_t frames, double ratio, WriteCallback callback, void* callbackData)
+bool AudioResampler::resample(double ratio)
 {
-	std::fill_n(dst, frames, SampleFrame{});
 	if (!m_state) { return false; }
 
-	m_data.data_out = &dst[0][0];
-	m_data.output_frames = static_cast<long>(frames);
+	m_data.data_in = &m_inputBuffer.data()[0][0] + m_inputBufferReaderIndex * DEFAULT_CHANNELS;
+	m_data.input_frames
+		= availableContiguousSpaceReading(m_inputBufferReaderIndex, m_inputBufferWriterIndex, BufferSize);
+
+	m_data.data_out = &m_outputBuffer.data()[0][0] + m_outputBufferWriterIndex * DEFAULT_CHANNELS;
+	m_data.output_frames
+		= availableContiguousSpaceWriting(m_outputBufferReaderIndex, m_outputBufferWriterIndex, BufferSize);
+
 	m_data.src_ratio = ratio;
+	m_data.end_of_input = 0;
 
-	while (m_data.output_frames > 0)
-	{
-		if (m_data.input_frames == 0)
-		{
-			const auto numInputFrames = callback(m_writeBuffer.data(), m_writeBuffer.size(), callbackData);
-			m_data.data_in = &m_writeBuffer.data()[0][0];
-			m_data.input_frames = static_cast<long>(numInputFrames);
-			m_data.end_of_input = numInputFrames < m_writeBuffer.size();
-		}
+	if (src_process(m_state, &m_data) || m_data.output_frames_gen == 0) { return false; }
 
-		if (src_process(m_state, &m_data)) { return false; }
-		if (m_data.end_of_input && m_data.output_frames_gen == 0) { return false; }
-
-		m_data.data_in += m_data.input_frames_used * DEFAULT_CHANNELS;
-		m_data.input_frames -= m_data.input_frames_used;
-
-		m_data.data_out += m_data.output_frames_gen * DEFAULT_CHANNELS;
-		m_data.output_frames -= m_data.output_frames_gen;
-	}
-
+	m_inputBufferReaderIndex = (m_inputBufferReaderIndex + m_data.input_frames_used) % BufferSize;
+	m_outputBufferWriterIndex = (m_outputBufferWriterIndex + m_data.output_frames_gen) % BufferSize;
 	return true;
 }
 

@@ -116,30 +116,69 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loopMode) const
+bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loop) const
 {
-	assert(numFrames > 0);
-	assert(desiredFrequency > 0);
-
-	const auto outputRatio = Engine::audioEngine()->outputSampleRate() * m_frequency;
-	const auto inputRatio = m_buffer->sampleRate() * desiredFrequency;
+	const auto outputRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) * m_frequency;
+	const auto inputRatio = static_cast<double>(m_buffer->sampleRate()) * desiredFrequency;
 	const auto resampleRatio = outputRatio / inputRatio;
 
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
+	std::fill_n(dst, numFrames, SampleFrame{});
 
-	auto callbackData = CallbackData{.sample = this, .state = state, .loopMode = loopMode};
-	if (state->resampler.resample(dst, static_cast<long>(numFrames), resampleRatio, &Sample::render, &callbackData))
+	while (numFrames > 0)
 	{
-		const auto amplification = m_amplification.load(std::memory_order_relaxed);
-		for (auto i = std::size_t{0}; i < numFrames; ++i)
+		const auto resamplerInputView = state->resampler.inputWriterView();
+		const auto numFramesRendered = render(resamplerInputView.data(), resamplerInputView.size(), state, loop);
+		state->resampler.commitInputWrite(static_cast<long>(numFramesRendered));
+		if (!state->resampler.resample(resampleRatio)) { return false; }
+
+		const auto resamplerOutputView = state->resampler.outputReaderView();
+		const auto outputFramesToRead = std::min(numFrames, resamplerOutputView.size());
+		std::copy_n(resamplerOutputView.begin(), outputFramesToRead, dst);
+		state->resampler.commitOutputRead(static_cast<long>(outputFramesToRead));
+
+		dst += outputFramesToRead;
+		numFrames -= outputFramesToRead;
+	}
+
+	return true;
+}
+
+std::size_t Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
+{
+	for (std::size_t frame = 0; frame < size; ++frame)
+	{
+		switch (loop)
 		{
-			dst[i][0] *= amplification;
-			dst[i][1] *= amplification;
+		case Loop::Off:
+			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame) { return frame; }
+			break;
+		case Loop::On:
+			if (state->frameIndex < m_loopStartFrame && state->backwards) { state->frameIndex = m_loopEndFrame - 1; }
+			else if (state->frameIndex >= m_loopEndFrame) { state->frameIndex = m_loopStartFrame; }
+			break;
+		case Loop::PingPong:
+			if (state->frameIndex < m_loopStartFrame && state->backwards)
+			{
+				state->frameIndex = m_loopStartFrame;
+				state->backwards = false;
+			}
+			else if (state->frameIndex >= m_loopEndFrame)
+			{
+				state->frameIndex = m_loopEndFrame - 1;
+				state->backwards = true;
+			}
+			break;
+		default:
+			break;
 		}
 
-		return true;
+		const auto value = m_buffer->data()[m_reversed ? m_buffer->size() - state->frameIndex - 1 : state->frameIndex];
+		dst[frame] = value * m_amplification;
+		state->backwards ? --state->frameIndex : ++state->frameIndex;
 	}
-	else { return false; }
+
+	return size;
 }
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
@@ -155,51 +194,6 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setEndFrame(endFrame);
 	setLoopStartFrame(loopStartFrame);
 	setLoopEndFrame(loopEndFrame);
-}
-
-std::size_t Sample::render(SampleFrame* dst, const std::size_t frames, void* data)
-{
-	const auto callbackData = static_cast<CallbackData*>(data);
-	const auto state = callbackData->state;
-	const auto sample = callbackData->sample;
-	const auto loopMode = callbackData->loopMode;
-
-	auto& index = state->frameIndex;
-	auto& backwards = state->backwards;
-
-	for (size_t frame = 0; frame < frames; ++frame)
-	{
-		switch (loopMode)
-		{
-		case Loop::Off:
-			if (index < 0 || index >= sample->m_endFrame) { return frame; }
-			break;
-		case Loop::On:
-			if (index < sample->m_loopStartFrame && backwards) { index = sample->m_loopEndFrame - 1; }
-			else if (index >= sample->m_loopEndFrame) { index = sample->m_loopStartFrame; }
-			break;
-		case Loop::PingPong:
-			if (index < sample->m_loopStartFrame && backwards)
-			{
-				index = sample->m_loopStartFrame;
-				backwards = false;
-			}
-			else if (index >= sample->m_loopEndFrame)
-			{
-				index = sample->m_loopEndFrame - 1;
-				backwards = true;
-			}
-			break;
-		default:
-			break;
-		}
-
-		const auto value = sample->m_buffer->data()[sample->m_reversed ? sample->m_buffer->size() - index - 1 : index];
-		dst[frame] = value;
-		backwards ? --index : ++index;
-	}
-
-	return frames;
 }
 
 } // namespace lmms
