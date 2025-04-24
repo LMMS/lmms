@@ -263,6 +263,7 @@ TimePos AutomationClip::putValue(
 	cleanObjects();
 
 	TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
+	newTime = std::max(TimePos(0), newTime);
 
 	// Create a node or replace the existing one on newTime
 	m_timeMap[newTime] = AutomationNode(this, value, newTime);
@@ -318,6 +319,7 @@ TimePos AutomationClip::putValues(
 	cleanObjects();
 
 	TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
+	newTime = std::max(TimePos(0), newTime);
 
 	// Create a node or replace the existing one on newTime
 	m_timeMap[newTime] = AutomationNode(this, inValue, outValue, newTime);
@@ -465,12 +467,12 @@ void AutomationClip::recordValue(TimePos time, float value)
 
 	if( value != m_lastRecordedValue )
 	{
-		putValue( time, value, true );
+		putValue(time - startTimeOffset(), value, true);
 		m_lastRecordedValue = value;
 	}
-	else if( valueAt( time ) != value )
+	else if( valueAt(time - startTimeOffset()) != value )
 	{
-		removeNode(time);
+		removeNode(time - startTimeOffset());
 	}
 }
 
@@ -593,19 +595,17 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return 0;
 	}
 
-	const TimePos offsetTime = _time - startTimeOffset();
-
 	// If we have a node at that time, just return its value
-	if (m_timeMap.contains(offsetTime))
+	if (m_timeMap.contains(_time))
 	{
 		// When the time is exactly the node's time, we want the inValue
-		return m_timeMap[offsetTime].getInValue();
+		return m_timeMap[_time].getInValue();
 	}
 
 	// lowerBound returns next value with equal or greater key. Since we already
 	// checked if the key contains a node, we know the returned node has a greater
 	// key than _time. Therefore we take the previous element to calculate the current value
-	timeMap::const_iterator v = m_timeMap.lowerBound(offsetTime);
+	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 
 	if( v == m_timeMap.begin() )
 	{
@@ -617,7 +617,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return OUTVAL(v - 1);
 	}
 
-	return valueAt(v - 1, offsetTime - POS(v - 1));
+	return valueAt(v - 1, _time - POS(v - 1));
 }
 
 
@@ -733,90 +733,61 @@ void AutomationClip::flipY()
 
 
 
-void AutomationClip::flipX(int length)
+void AutomationClip::flipX(int start, int end)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	timeMap::const_iterator it = m_timeMap.lowerBound(0);
+	timeMap::const_iterator firstIterator = m_timeMap.lowerBound(0);
 
-	if (it == m_timeMap.end()) { return; }
+	if (firstIterator == m_timeMap.end()) { return; }
+
+	if (start == -1 && end == -1) { start = 0; end = length() - startTimeOffset(); }
+	else if (!(end >= 0 && start >= 0 && end > start)) { return; }
 
 	// Temporary map where we will store the flipped version
 	// of our clip
 	timeMap tempMap;
 
-	float tempValue = 0;
-	float tempOutValue = 0;
-
-	// We know the QMap isn't empty, making this safe:
-	float realLength = m_timeMap.lastKey();
-
-	// If we have a positive length, we want to flip the area covered by that
-	// length, even if it goes beyond the clip. A negative length means that
-	// we just want to flip the nodes we have
-	if (length >= 0 && length != realLength)
+	for (auto it = m_timeMap.begin(); it != m_timeMap.end(); ++it)
 	{
-		// If length to be flipped is bigger than the real length
-		if (realLength < length)
+		if (POS(it) < start || POS(it) > end)
 		{
-			// We are flipping an area that goes beyond the last node. So we add a node to the
-			// beginning of the flipped timeMap representing the value of the end of the area
-			tempValue = valueAt(length);
-			tempMap[0] = AutomationNode(this, tempValue, 0);
-
-			// Now flip the nodes we have in relation to the length
-			do
-			{
-				// We swap the inValue and outValue when flipping horizontally
-				tempValue = OUTVAL(it);
-				tempOutValue = INVAL(it);
-				auto newTime = TimePos(length - POS(it));
-
-				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
-
-				++it;
-			} while (it != m_timeMap.end());
+			tempMap[POS(it)] = *it;
 		}
-		else // If the length to be flipped is smaller than the real length
+		else
 		{
-			do
+			// If the first node in the clip is not at the start, it can break things when clipping, so
+			// we have to set its in value to 0.
+			if (it == firstIterator && POS(firstIterator) > 0)
 			{
-				TimePos newTime;
-
-				// Only flips the length to be flipped and keep the remaining values in place
-				// We also only swap the inValue and outValue if we are flipping the node
-				if (POS(it) <= length)
-				{
-					newTime = length - POS(it);
-					tempValue = OUTVAL(it);
-					tempOutValue = INVAL(it);
-				}
-				else
-				{
-					newTime = POS(it);
-					tempValue = INVAL(it);
-					tempOutValue = OUTVAL(it);
-				}
-
-				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
-
-				++it;
-			} while (it != m_timeMap.end());
+				tempMap[end - (POS(it) - start)] = AutomationNode(this, OUTVAL(it), 0, end - (POS(it) - start));
+			}
+			else
+			{
+				tempMap[end - (POS(it) - start)] = AutomationNode(this, OUTVAL(it), INVAL(it), end - (POS(it) - start));
+			}
 		}
 	}
-	else // Length to be flipped is the same as the real length
+
+	if (m_timeMap.contains(start) && m_timeMap.contains(end))
 	{
-		do
-		{
-			// Swap the inValue and outValue
-			tempValue = OUTVAL(it);
-			tempOutValue = INVAL(it);
-
-			auto newTime = TimePos(realLength - POS(it));
-			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
-
-			++it;
-		} while (it != m_timeMap.end());
+		tempMap[start] = AutomationNode(this, m_timeMap[start].getInValue(), m_timeMap[end].getInValue(), start);
+		tempMap[end] = AutomationNode(this, m_timeMap[start].getOutValue(), m_timeMap[end].getOutValue(), end);
+	}
+	else if (m_timeMap.contains(start))
+	{
+		tempMap[start] = AutomationNode(this, m_timeMap[start].getInValue(), valueAt(end), start);
+		tempMap[end] = AutomationNode(this, m_timeMap[start].getOutValue(), valueAt(end), end);
+	}
+	else if (m_timeMap.contains(end))
+	{
+		tempMap[start] = AutomationNode(this, valueAt(start), m_timeMap[end].getInValue(), start);
+		tempMap[end] = AutomationNode(this, valueAt(start), m_timeMap[end].getOutValue(), end);
+	}
+	else
+	{
+		tempMap[start] = AutomationNode(this, valueAt(start), valueAt(end), start);
+		tempMap[end] = AutomationNode(this, valueAt(start), valueAt(end), end);
 	}
 
 	m_timeMap.clear();

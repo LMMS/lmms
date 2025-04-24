@@ -207,7 +207,7 @@ public slots:
 	void objectDestroyed( lmms::jo_id_t );
 	void flipY( int min, int max );
 	void flipY();
-	void flipX( int length = -1 );
+	void flipX(int start = -1, int end = -1);
 
 protected:
 	AutomationClip( const AutomationClip & _clip_to_copy );

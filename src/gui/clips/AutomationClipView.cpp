@@ -153,7 +153,7 @@ void AutomationClipView::flipY()
 
 void AutomationClipView::flipX()
 {
-	m_clip->flipX( m_clip->length() );
+	m_clip->flipX(std::max(0, -m_clip->startTimeOffset()), std::max(0, m_clip->length() - m_clip->startTimeOffset()));
 	update();
 }
 
