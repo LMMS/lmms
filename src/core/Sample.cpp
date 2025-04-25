@@ -122,15 +122,16 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto inputRatio = static_cast<double>(m_buffer->sampleRate()) * desiredFrequency;
 	const auto resampleRatio = outputRatio / inputRatio;
 
-	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 	std::fill_n(dst, numFrames, SampleFrame{});
+	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
 	while (numFrames > 0)
 	{
 		const auto resamplerInputView = state->resampler.inputWriterView();
 		const auto numFramesRendered = render(resamplerInputView.data(), resamplerInputView.size(), state, loop);
 		state->resampler.commitInputWrite(static_cast<long>(numFramesRendered));
-		if (!state->resampler.resample(resampleRatio)) { return false; }
+
+		if (!state->resampler.resample(resampleRatio) && numFramesRendered == 0) { return false; }
 
 		const auto resamplerOutputView = state->resampler.outputReaderView();
 		const auto outputFramesToRead = std::min(numFrames, resamplerOutputView.size());

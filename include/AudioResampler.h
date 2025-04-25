@@ -26,9 +26,11 @@
 #define LMMS_AUDIO_RESAMPLER_H
 
 #include <array>
+#include <cassert>
 #include <samplerate.h>
 #include <span>
 
+#include "BipBuffer.h"
 #include "SampleFrame.h"
 #include "lmms_export.h"
 
@@ -39,11 +41,6 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
-	//! The input and output buffer capacity for the resampler.
-	//! The buffer size is the number of sample frames contained in each buffer.
-	//! The buffer size is kept quite small so it can fit on the stack.
-	static constexpr auto BufferSize = 32;
-
 	//! The interpolation modes supported by this resampler.
 	//! Note that this is subject to change if the resampler is implemented differently.
 	enum class InterpolationMode : int
@@ -82,38 +79,21 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Returns a view into the input buffer that callers can write to.
-	auto inputWriterView() -> std::span<SampleFrame>
-	{
-		const auto begin = m_inputBuffer.begin() + m_inputBufferWriterIndex;
-		const auto end
-			= begin + availableContiguousSpaceWriting(m_inputBufferReaderIndex, m_inputBufferWriterIndex, BufferSize);
-		return {begin, end};
-	}
+	auto inputWriterView() -> std::span<SampleFrame> { return m_inputBuffer.reserve(); }
 
 	//! Returns a view into the output buffer that callers can read from.
-	auto outputReaderView() const -> std::span<const SampleFrame>
-	{
-		const auto begin = m_outputBuffer.begin() + m_outputBufferReaderIndex;
-		const auto end
-			= begin + availableContiguousSpaceReading(m_outputBufferReaderIndex, m_outputBufferWriterIndex, BufferSize);
-		return {begin, end};
-	}
+	auto outputReaderView() const -> std::span<const SampleFrame> { return m_outputBuffer.view(); }
 
 	//! Commit to writing @p frames to the input buffer.
-	//! This lets the resampler know input samples were written.
-	void commitInputWrite(long frames) { m_inputBufferWriterIndex = (m_inputBufferWriterIndex + frames) % BufferSize; }
+	void commitInputWrite(std::size_t frames) { m_inputBuffer.commit(frames); }
 
 	//! Commit to reading @p frames from the output buffer.
-	//! This lets the resampler know output samples were read.
-	void commitOutputRead(long frames)
-	{
-		m_outputBufferReaderIndex = (m_outputBufferReaderIndex + frames) % BufferSize;
-	}
+	void commitOutputRead(std::size_t frames) { m_outputBuffer.decommit(frames); }
 
 	//! Resamples the audio from the input buffer at the given @p ratio.
 	//! Returns `true` if data was resampled and ended up in the output buffer.
 	//! Returns `false` on error or no more audio was resampled.
-	bool resample(double ratio);
+	auto resample(double ratio) -> bool;
 
 	//! Returns the interpolation mode the resampler is using.
 	auto interpolationMode() const -> InterpolationMode { return m_interpolationMode; }
@@ -128,27 +108,12 @@ public:
 	}
 
 private:
-	long availableContiguousSpaceReading(long readerIndex, long writerIndex, long size) const
-	{
-		if (readerIndex <= writerIndex) { return writerIndex - readerIndex; }
-		return size - readerIndex;
-	}
-
-	long availableContiguousSpaceWriting(long readerIndex, long writerIndex, long size) const
-	{
-		if (readerIndex <= writerIndex) { return size - writerIndex - (readerIndex == 0 ? 1 : 0); }
-		return readerIndex - writerIndex - 1;
-	}
-
-	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;
-	std::array<SampleFrame, BufferSize> m_inputBuffer;
-	std::array<SampleFrame, BufferSize> m_outputBuffer;
+	static constexpr auto BufferSize = 32;
+	BipBuffer<SampleFrame, std::array<SampleFrame, BufferSize>> m_inputBuffer;
+	BipBuffer<SampleFrame, std::array<SampleFrame, BufferSize>> m_outputBuffer;
 	SRC_STATE* m_state = nullptr;
 	SRC_DATA m_data = SRC_DATA{};
-	long m_inputBufferReaderIndex = 0;
-	long m_inputBufferWriterIndex = 0;
-	long m_outputBufferReaderIndex = 0;
-	long m_outputBufferWriterIndex = 0;
+	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;
 	int m_error = 0;
 };
 } // namespace lmms

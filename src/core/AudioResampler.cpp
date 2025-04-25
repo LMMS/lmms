@@ -32,8 +32,8 @@
 namespace lmms {
 
 AudioResampler::AudioResampler(InterpolationMode interpolationMode)
-	: m_interpolationMode(interpolationMode)
-	, m_state(src_new(static_cast<int>(interpolationMode), DEFAULT_CHANNELS, &m_error))
+	: m_state(src_new(static_cast<int>(interpolationMode), DEFAULT_CHANNELS, &m_error))
+	, m_interpolationMode(interpolationMode)
 {
 	if (!m_state)
 	{
@@ -61,25 +61,26 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-bool AudioResampler::resample(double ratio)
+auto AudioResampler::resample(double ratio) -> bool
 {
 	if (!m_state) { return false; }
 
-	m_data.data_in = &m_inputBuffer.data()[0][0] + m_inputBufferReaderIndex * DEFAULT_CHANNELS;
-	m_data.input_frames
-		= availableContiguousSpaceReading(m_inputBufferReaderIndex, m_inputBufferWriterIndex, BufferSize);
+	const auto input = m_inputBuffer.view();
+	const auto output = m_outputBuffer.reserve();
 
-	m_data.data_out = &m_outputBuffer.data()[0][0] + m_outputBufferWriterIndex * DEFAULT_CHANNELS;
-	m_data.output_frames
-		= availableContiguousSpaceWriting(m_outputBufferReaderIndex, m_outputBufferWriterIndex, BufferSize);
+	m_data.data_in = &input[0][0];
+	m_data.data_out = &output[0][0];
+
+	m_data.input_frames = static_cast<long>(input.size());
+	m_data.output_frames = static_cast<long>(output.size());
 
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
 
 	if (src_process(m_state, &m_data) || m_data.output_frames_gen == 0) { return false; }
 
-	m_inputBufferReaderIndex = (m_inputBufferReaderIndex + m_data.input_frames_used) % BufferSize;
-	m_outputBufferWriterIndex = (m_outputBufferWriterIndex + m_data.output_frames_gen) % BufferSize;
+	m_inputBuffer.decommit(m_data.input_frames_used);
+	m_outputBuffer.commit(m_data.output_frames_gen);
 	return true;
 }
 
