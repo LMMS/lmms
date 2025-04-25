@@ -83,13 +83,42 @@ public:
 	// list seq-ports from ALSA
 	QStringList readablePorts() const override
 	{
-		return m_readablePorts;
+		return m_readablePortMap.keys();
 	}
 
 	QStringList writablePorts() const override
 	{
-		return m_writablePorts;
+		return m_writablePortMap.keys();
 	}
+
+	QStringList friendlyReadablePorts() const override
+	{
+		return m_readablePortMap.values();
+	}
+
+	QStringList friendlyWritablePorts() const override
+	{
+		return m_writablePortMap.values();
+	}
+
+	QString toFriendly(const QString& port) const
+	{
+		return m_readablePortMap.value(port, m_writablePortMap.value(port, port));
+	}
+
+	QString fromFriendly(const QString& friendlyPort) const
+	{
+		QString key = m_readablePortMap.key(friendlyPort);
+		if (!key.isEmpty())
+			return key;
+
+		key = m_writablePortMap.key(friendlyPort);
+		if (!key.isEmpty())
+			return key;
+
+		return friendlyPort;
+	}
+
 
 	// return name of port which specified MIDI event came from
 	QString sourcePortName( const MidiEvent & ) const override;
@@ -141,8 +170,9 @@ private:
 	volatile bool m_quit;
 
 	QTimer m_portListUpdateTimer;
-	QStringList m_readablePorts;
-	QStringList m_writablePorts;
+
+	QMap<QString, QString> m_readablePortMap = QMap<QString, QString>();
+	QMap<QString, QString> m_writablePortMap = QMap<QString, QString>();
 
 	int m_pipe[2];
 

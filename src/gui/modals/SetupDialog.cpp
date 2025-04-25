@@ -733,18 +733,22 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
 	QVBoxLayout * midiAutoAssignLayout = new QVBoxLayout(midiAutoAssignBox);
 
+	MidiClient* midiClient = Engine::audioEngine()->midiClient();
+
 	m_assignableMidiDevices = new QComboBox(midiAutoAssignBox);
 	midiAutoAssignLayout->addWidget(m_assignableMidiDevices);
 	m_assignableMidiDevices->addItem("none");
-	if ( !Engine::audioEngine()->midiClient()->isRaw() )
+
+	if (!midiClient->isRaw())
 	{
-		m_assignableMidiDevices->addItems(Engine::audioEngine()->midiClient()->readablePorts());
+		m_assignableMidiDevices->addItems(midiClient->friendlyReadablePorts());
 	}
 	else
 	{
 		m_assignableMidiDevices->addItem("all");
 	}
-	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
+
+	int current = m_assignableMidiDevices->findText(midiClient->toFriendly(ConfigManager::inst()->value("midi", "midiautoassign")));
 	if (current >= 0)
 	{
 		m_assignableMidiDevices->setCurrentIndex(current);
@@ -1010,7 +1014,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("audioengine", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
-					m_assignableMidiDevices->currentText());
+					Engine::audioEngine()->midiClient()->fromFriendly(m_assignableMidiDevices->currentText()));
 	ConfigManager::inst()->setValue("midi", "autoquantize", QString::number(m_midiAutoQuantize));
 
 
