@@ -171,7 +171,12 @@ private:
 
 	QTimer m_portListUpdateTimer;
 
+	//! key: unique name
+	//! value: friendly name
 	QMap<QString, QString> m_readablePortMap = QMap<QString, QString>();
+
+	//! key: unique name
+	//! value: friendly name
 	QMap<QString, QString> m_writablePortMap = QMap<QString, QString>();
 
 	int m_pipe[2];
