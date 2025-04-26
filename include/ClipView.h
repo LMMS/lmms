@@ -32,6 +32,7 @@
 #include "ModelView.h"
 #include "Rubberband.h"
 #include "Clip.h"
+#include "Clipboard.h"
 
 
 class QMenu;
@@ -71,7 +72,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	ClipView(Clip* clip, TrackView* tv, size_t typeId);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -125,11 +126,24 @@ public:
 
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	
+	//! used for getting the correct clip `DataType` for a given track
+	static Clipboard::DataType getClipStringPairType(Track* track);
 
 	QColor getColorForDisplay( QColor );
 
 	void inline setMarkerPos(int x) { m_markerPos = x; }
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
+
+	void addClipAction(); // TODO
+	void removeClipAction(); // TODO
+	void cutAction(); // TODO
+	void copyAction(); // TODO
+	void pasteNoReturnAction();
+	virtual void pasteAction(bool* isSuccessful); // TODO
+	void muteAction();
+	void unmuteAction();
+	void mergeAction(); // TODO
 
 public slots:
 	virtual bool close();
@@ -174,6 +188,16 @@ protected:
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
+	
+	// InteractiveModelView methods
+	//const std::vector<ActionStruct>& getActions() override { return getActionsT(); }
+	//const QString& getShortcutMessage() override { return getShortcutMessageT(); }
+	//virtual bool processPasteImplementation(Clipboard::DataType type, QString& value);// override;
+	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);// override;
+	void addActions(std::vector<ActionStruct>& targetList) override;
+	//virtual size_t getTypeId() { return typeid(*this).hash_code(); } // TODO remove
+	//size_t getTypeId() override { return typeid(*this).hash_code(); }
+	
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos( TimePos, bool shiftMode );
@@ -190,7 +214,6 @@ protected:
 protected slots:
 	void updateLength();
 	void updatePosition();
-
 
 private:
 	enum class Action
@@ -248,7 +271,6 @@ private:
 	virtual bool splitClip( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);
 } ;
-
 
 } // namespace gui
 

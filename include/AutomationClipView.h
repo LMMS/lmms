@@ -47,9 +47,12 @@ public:
 	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
 	~AutomationClipView() override = default;
 
+	void pasteAction(bool* isSuccessful) override;
+	//! Opens this view's clip in the global automation editor
+	void openInAutomationEditorAction();
+	void linkToClipAction(int modelId);
+	void unlinkToClipAction(int modelId); // TODO
 public slots:
-	/// Opens this view's clip in the global automation editor
-	void openInAutomationEditor();
 	void update() override;
 
 
@@ -67,7 +70,10 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
-
+	
+	// InteractiveModelView methods
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 private:
 	AutomationClip * m_clip;
@@ -75,8 +81,9 @@ private:
 	
 	QStaticText m_staticTextName;
 	void scaleTimemapToFit( float oldMin, float oldMax );
+	
+	static QString s_shortcutMessage;
 } ;
-
 
 } // namespace gui
 

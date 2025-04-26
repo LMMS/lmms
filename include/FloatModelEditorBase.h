@@ -30,6 +30,7 @@
 #include <QPoint>
 
 #include "AutomatableModelView.h"
+#include "InteractiveModelView.h"
 
 
 namespace lmms::gui
@@ -37,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView
 {
 	Q_OBJECT
 
@@ -63,26 +64,44 @@ public:
 		setUnit(txt_after);
 	}
 
+	void copyValueAction();
+	void pasteNoReturnAction();
+	void pasteAction(bool* isSuccessful);
+	void linkAction(int id);
+	void unlinkAction(int id);
+	void getLinkAction();
+	void unlinkAllAction();
+	void increaseValueAction();
+	void decreaseValueAction();
+	void addValueAction(float floatValue);
+	void subtractValueAction(float floatValue);
+	void openInputDialogAction();
+	void setScaleLinearAction();
+	void setScaleLogarithmicAction();
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
 
-
 protected:
-	void contextMenuEvent(QContextMenuEvent * me) override;
-	void dragEnterEvent(QDragEnterEvent * dee) override;
-	void dropEvent(QDropEvent * de) override;
+	void contextMenuEvent(QContextMenuEvent * me) override; // TODO
+	void dragEnterEvent(QDragEnterEvent * dee) override; // TODO
+	void dropEvent(QDropEvent * de) override; // TODO
 	void focusOutEvent(QFocusEvent * fe) override;
 	void mousePressEvent(QMouseEvent * me) override;
 	void mouseReleaseEvent(QMouseEvent * me) override;
 	void mouseMoveEvent(QMouseEvent * me) override;
-	void mouseDoubleClickEvent(QMouseEvent * me) override;
+	void mouseDoubleClickEvent(QMouseEvent * me) override; // TODO
 	void paintEvent(QPaintEvent * me) override;
-	void wheelEvent(QWheelEvent * me) override;
+	void wheelEvent(QWheelEvent * me) override; // TODO
 
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
+
+	// InteractiveModelView methods
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 	virtual float getValue(const QPoint & p);
 
@@ -105,6 +124,8 @@ private:
 	}
 
 	static SimpleTextFloat * s_textFloat;
+	//static QString m_shortcutMessage; TODO remove
+	//static std::vector<ActionStruct> s_actionArray; TODO remove
 
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
@@ -114,6 +135,8 @@ private:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+	
+	static QString s_shortcutMessage;
 };
 
 } // namespace lmms::gui

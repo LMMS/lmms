@@ -85,6 +85,9 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void wheelEvent( QWheelEvent * _we ) override;
 
+	// InteractiveModelView methods
+	const QString& getShortcutMessage() override { return s_shortcutMessage; }
+	void addActions(std::vector<ActionStruct>& targetList) override;
 
 private:
 	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
@@ -103,8 +106,9 @@ private:
 	QStaticText m_staticTextName;
 
 	bool m_legacySEPattern;
+	
+	static QString s_shortcutMessage;
 } ;
-
 
 } // namespace gui
 

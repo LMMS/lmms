@@ -152,7 +152,11 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 
 
 
-
+void Clip::setMute(bool shouldMute)
+{
+	m_mutedModel.setValue(shouldMute);
+	emit dataChanged();
+}
 /*! \brief Mutes this Clip
  *
  *  Restore the previous state of this clip. This will

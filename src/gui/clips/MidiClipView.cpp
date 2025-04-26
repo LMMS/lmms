@@ -48,8 +48,10 @@ namespace lmms::gui
 
 constexpr int BeatStepButtonOffset = 4;
 
-MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
-	ClipView( clip, parent ),
+QString MidiClipView::s_shortcutMessage = "";
+
+MidiClipView::MidiClipView(MidiClip* clip, TrackView* parent) :
+	ClipView(clip, parent, InteractiveModelView::getTypeId<MidiClipView>()),
 	m_clip( clip ),
 	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),
@@ -59,6 +61,9 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	// TODO if this option is ever added to the GUI, rename it to legacysepattern
 	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
 {
+	// inherited from `InteractiveModelView`
+	addActions(m_actionArray);
+
 	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
 			this, SLOT(update()));
 	update();
@@ -66,6 +71,15 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	setStyle( QApplication::style() );
 }
 
+void MidiClipView::addActions(std::vector<ActionStruct>& targetList)
+{
+	// NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
+	// actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	if (s_shortcutMessage.size() <= 0)
+	{
+		s_shortcutMessage = InteractiveModelView::buildShortcutMessage(getActions());
+	}
+}
 
 
 
@@ -670,7 +684,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-
+	drawAutoHighlight(&p);
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 

@@ -15,7 +15,9 @@ SET(LMMS_SRCS
 	gui/embed.cpp
 	gui/FileBrowser.cpp
 	gui/FileRevealer.cpp
+	gui/GuiAction.cpp
 	gui/GuiApplication.cpp
+	gui/InteractiveModelView.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
 	gui/LinkedModelGroupViews.cpp

@@ -44,12 +44,16 @@
 namespace lmms::gui
 {
 
-AutomationClipView::AutomationClipView( AutomationClip * _clip,
-						TrackView * _parent ) :
-	ClipView( _clip, _parent ),
+QString AutomationClipView::s_shortcutMessage = "";
+
+AutomationClipView::AutomationClipView(AutomationClip* _clip, TrackView* _parent) :
+	ClipView(_clip, _parent, InteractiveModelView::getTypeId<AutomationClipView>()),
 	m_clip( _clip ),
 	m_paintPixmap()
 {
+	// inherited from `InteractiveModelView`
+	addActions(m_actionArray);
+
 	connect( m_clip, SIGNAL(dataChanged()),
 			this, SLOT(update()));
 	connect( getGUI()->automationEditor(), SIGNAL(currentClipChanged()),
@@ -60,13 +64,89 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	update();
 }
 
+void AutomationClipView::addActions(std::vector<ActionStruct>& targetList)
+{
+	// NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
+	// actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	
+	auto openAc = new QAction(tr("Open in Automation editor"), this);
+	auto linkToClipAc = new QAction(tr("Link to clip"), this);
+	auto unlinkToClipAc = new QAction(tr("Unlink from clip"), this);
+
+	targetList = ClipView::getActions(); // NOT `addActions()`
+
+	targetList[getIndexFromId(2)].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink); // paste action
+	targetList[getIndexFromId(9)].addAcceptedDataType(Clipboard::DataType::AutomatableModelLink); // paste action
+
+	targetList.push_back(ActionStruct(10, *openAc, nullptr, true, Clipboard::DataType::Any));
+	targetList.push_back(ActionStruct(11, *linkToClipAc, unlinkToClipAc, true, Clipboard::DataType::Any));
+
+	connect(openAc, &QAction::triggered, this, &AutomationClipView::openInAutomationEditorAction);
+	connect(linkToClipAc, &QAction::triggered, this, [this, &targetList]{ linkToClipAction(*targetList[getIndexFromId(11)].getData()->getValue<int>()); });
+	connect(unlinkToClipAc, &QAction::triggered, this, [this, &targetList]{ unlinkToClipAction(*targetList[getIndexFromId(11)].getData()->getValue<int>()); });
+
+	targetList[getIndexFromId(10)].setShortcut(Qt::Key_F, Qt::ControlModifier, 0, false);
+
+	if (s_shortcutMessage.size() <= 0)
+	{
+		s_shortcutMessage = InteractiveModelView::buildShortcutMessage(targetList);
+	}
+}
 
 
 
-void AutomationClipView::openInAutomationEditor()
+
+void AutomationClipView::openInAutomationEditorAction()
 {
 	if(getGUI() != nullptr)
 		getGUI()->automationEditor()->open(m_clip);
+}
+
+void AutomationClipView::pasteAction(bool* isSuccessful)
+{
+	Clipboard::DataType type = Clipboard::decodeKey(Clipboard::getMimeData());
+	QString value = Clipboard::decodeValue(Clipboard::getMimeData());
+
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::AutomatableModelLink)
+	{
+		shouldAccept = true;
+		doAction(11, GuiActionIO(value.toInt()));
+
+		update();
+
+		if (getGUI()->automationEditor()
+			&& getGUI()->automationEditor()->currentClip() == m_clip)
+		{
+			getGUI()->automationEditor()->setCurrentClip(m_clip);
+		}
+	}
+
+	if (shouldAccept)
+	{
+		if (isSuccessful != nullptr) { *isSuccessful = true; }
+		InteractiveModelView::stopHighlighting();
+	}
+	else { ClipView::pasteAction(isSuccessful); }
+}
+
+void AutomationClipView::linkToClipAction(int modelId)
+{
+	auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(modelId));
+	if (mod != nullptr)
+	{
+		bool added = m_clip->addObject(mod);
+		if (added == false)
+		{
+			TextFloat::displayMessage(mod->displayName(),
+				tr("Model is already connected to this clip."),
+				embed::getIconPixmap("automation"), 2000);
+		}
+	}
+}
+void AutomationClipView::unlinkToClipAction(int modelId)
+{
+	// TODO
 }
 
 
@@ -160,7 +240,7 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 {
 	auto a = new QAction(embed::getIconPixmap("automation"), tr("Open in Automation editor"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
-	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
+	connect(a, &QAction::triggered, this, &AutomationClipView::openInAutomationEditorAction);
 	_cm->insertSeparator( _cm->actions()[1] );
 
 	_cm->addSeparator();
@@ -212,7 +292,7 @@ void AutomationClipView::mouseDoubleClickEvent( QMouseEvent * me )
 		me->ignore();
 		return;
 	}
-	openInAutomationEditor();
+	openInAutomationEditorAction();
 }
 
 
@@ -388,9 +468,9 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-
+	drawAutoHighlight(&p);
 	p.end();
-
+	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
@@ -399,7 +479,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::DataType::AutomatableModelLink);
 	if( !_dee->isAccepted() )
 	{
 		ClipView::dragEnterEvent( _dee );
@@ -411,34 +491,12 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "automatable_model" )
-	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if( mod != nullptr )
-		{
-			bool added = m_clip->addObject( mod );
-			if ( !added )
-			{
-				TextFloat::displayMessage( mod->displayName(),
-							   tr( "Model is already connected "
-							   "to this clip." ),
-							   embed::getIconPixmap( "automation" ),
-							   2000 );
-			}
-		}
-		update();
+	bool shouldAccept = false;
+	doAction(9, GuiActionIO(&shouldAccept));
 
-		if( getGUI()->automationEditor() &&
-			getGUI()->automationEditor()->currentClip() == m_clip )
-		{
-			getGUI()->automationEditor()->setCurrentClip( m_clip );
-		}
-	}
-	else
+	if (shouldAccept)
 	{
-		ClipView::dropEvent( _de );
+		_de->accept();
 	}
 }
 
