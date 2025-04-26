@@ -25,8 +25,9 @@
 #ifndef LMMS_BIP_BUFFER_H
 #define LMMS_BIP_BUFFER_H
 
+#include <atomic>
+#include <cassert>
 #include <span>
-#include <utility>
 #include <vector>
 
 namespace lmms {
@@ -45,83 +46,116 @@ public:
 	//! Returns the reserved region or an empty one if the reserve was unsuccessful.
 	auto reserve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
-		if (size == static_cast<std::size_t>(-1))
-		{
-			size = std::max(unreservedReadWriteRegionSpace(), unreservedWrapRegionSpace());
-		}
+		auto readWriteRegion = m_readWriteRegion.load(std::memory_order_acquire);
+		auto [readWriteRegionBegin, readWriteRegionEnd] = unpackRegion(readWriteRegion);
 
-		if (unreservedReadWriteRegionSpace() >= unreservedWrapRegionSpace())
-		{
-			return reserveRegionSpace(m_readWriteRegion, size);
-		}
-		else { return reserveRegionSpace(m_wrapRegion, size); }
+		auto wrapRegion = m_wrapRegion.load(std::memory_order_acquire);
+		auto [wrapRegionBegin, wrapRegionEnd] = unpackRegion(wrapRegion);
 
-		return std::span<T>{};
+		const auto readWriteRegionFreeSpace = static_cast<std::uint32_t>(m_buffer.size()) - readWriteRegionEnd;
+		const auto wrapRegionFreeSpace = readWriteRegionBegin - wrapRegionEnd;
+
+		if (size == static_cast<std::size_t>(-1)) { size = std::max(readWriteRegionFreeSpace, wrapRegionFreeSpace); }
+
+		if (readWriteRegionFreeSpace >= wrapRegionFreeSpace)
+		{
+			const auto begin = m_buffer.begin() + readWriteRegionEnd;
+			const auto end = begin + size;
+			return begin == end ? std::span<T>{} : std::span<T>{begin, end};
+		}
+		else
+		{
+			const auto begin = m_buffer.begin() + wrapRegionEnd;
+			const auto end = begin + size;
+			return begin == end ? std::span<T>{} : std::span<T>{begin, end};
+		}
 	}
 
 	//! Returns a contiguous region in the buffer where elements can be read from.
 	auto view() const -> std::span<const T>
 	{
-		const auto begin = m_buffer.begin() + m_readWriteRegion.beginIndex();
-		const auto end = m_buffer.begin() + m_readWriteRegion.endIndex();
-		return std::span<const T>{begin, end};
+		const auto readWriteRegion = m_readWriteRegion.load(std::memory_order_acquire);
+		const auto [readWriteRegionBegin, readWriteRegionEnd] = unpackRegion(readWriteRegion);
+		const auto span = std::span<const T>{m_buffer.begin() + readWriteRegionBegin, m_buffer.begin() + readWriteRegionEnd};
+		return readWriteRegionBegin == readWriteRegionEnd ? std::span<const T>{} : span;
 	}
 
 	//! Acknowledges that @p size `T` elements were written into the buffer.
 	void commit(std::size_t size)
 	{
-		if (unreservedReadWriteRegionSpace() >= unreservedWrapRegionSpace())
-		{
-			assert(size <= unreservedReadWriteRegionSpace());
-			m_readWriteRegion.grow(size);
-			return;
-		}
+		if (size == 0) { return; }
 
-		assert(size <= unreservedWrapRegionSpace());
-		m_wrapRegion.grow(size);
+		auto readWriteRegion = m_readWriteRegion.load(std::memory_order_acquire);
+		auto [readWriteRegionBegin, readWriteRegionEnd] = unpackRegion(readWriteRegion);
+
+		auto wrapRegion = m_wrapRegion.load(std::memory_order_acquire);
+		auto [wrapRegionBegin, wrapRegionEnd] = unpackRegion(wrapRegion);
+
+		const auto readWriteRegionFreeSpace = static_cast<std::uint32_t>(m_buffer.size()) - readWriteRegionEnd;
+		const auto wrapRegionFreeSpace = readWriteRegionBegin - wrapRegionEnd;
+
+		if (readWriteRegionFreeSpace >= wrapRegionFreeSpace)
+		{
+			assert(size <= readWriteRegionFreeSpace);
+			readWriteRegionEnd += size;
+			readWriteRegion = packRegion(readWriteRegionBegin, readWriteRegionEnd);
+			m_readWriteRegion.store(readWriteRegion, std::memory_order_release);
+		}
+		else
+		{
+			assert(size <= wrapRegionFreeSpace);
+			wrapRegionEnd += size;
+			wrapRegion = packRegion(wrapRegionBegin, wrapRegionEnd);
+			m_wrapRegion.store(wrapRegion, std::memory_order_release);
+		}
 	}
 
 	//! Acknowledges that @p size `T` elements were read from the buffer.
 	void decommit(std::size_t size)
 	{
-		assert(size <= m_readWriteRegion.length());
-		m_readWriteRegion.shrink(size);
-		if (m_readWriteRegion.empty()) { m_readWriteRegion = std::exchange(m_wrapRegion, Region{}); }
+		if (size == 0) { return; }
+
+		auto readWriteRegion = m_readWriteRegion.load(std::memory_order_acquire);
+		auto [readWriteRegionBegin, readWriteRegionEnd] = unpackRegion(readWriteRegion);
+
+		auto wrapRegion = m_wrapRegion.load(std::memory_order_acquire);
+		auto [wrapRegionBegin, wrapRegionEnd] = unpackRegion(wrapRegion);
+
+		const auto readWriteRegionSize = readWriteRegionEnd - readWriteRegionBegin;
+		const auto wrapRegionSize = wrapRegionEnd - wrapRegionBegin;
+		assert(readWriteRegionSize > 0 || wrapRegionSize > 0);
+
+		if (readWriteRegionSize > 0)
+		{
+			assert(size <= readWriteRegionSize);
+			readWriteRegionBegin += size;
+			readWriteRegion = packRegion(readWriteRegionBegin, readWriteRegionEnd);
+			m_readWriteRegion.store(readWriteRegion, std::memory_order_release);
+		}
+		else if (wrapRegionSize > 0)
+		{
+			assert(size <= wrapRegionSize);
+			wrapRegionBegin += size;
+			wrapRegionBegin = packRegion(wrapRegionBegin, wrapRegionEnd);
+			m_wrapRegion.store(wrapRegion, std::memory_order_release);
+		}
 	}
 
 private:
-	class Region
+	static std::uint64_t packRegion(std::uint32_t begin, std::uint32_t end)
 	{
-	public:
-		auto grow(std::size_t size) { m_endIndex += size; }
-		auto shrink(std::size_t size) { m_beginIndex += size; }
-
-		auto length() const { return m_endIndex - m_beginIndex; }
-		auto empty() const { return m_beginIndex == m_endIndex; }
-
-		auto beginIndex() const { return m_beginIndex; }
-		auto endIndex() const { return m_endIndex; }
-
-	private:
-		std::size_t m_beginIndex = 0;
-		std::size_t m_endIndex = 0;
-	};
-
-	auto reserveRegionSpace(Region region, std::size_t size) -> std::span<T>
-	{
-		const auto begin = m_buffer.begin() + region.endIndex();
-		const auto end = begin + size;
-		return {begin, end};
+		return static_cast<std::uint64_t>(begin) << 32 | end;
 	}
 
-	auto unreservedReadWriteRegionSpace() { return m_buffer.size() - m_readWriteRegion.endIndex(); }
-	auto unreservedWrapRegionSpace() { return m_readWriteRegion.beginIndex() - m_wrapRegion.endIndex(); }
+	static std::pair<std::uint32_t, std::uint32_t> unpackRegion(std::uint64_t region)
+	{
+		return {static_cast<std::uint32_t>(region >> 32), static_cast<std::uint32_t>(region)};
+	}
 
 	Container m_buffer;
-	Region m_readWriteRegion;
-	Region m_wrapRegion;
+	std::atomic_uint64_t m_readWriteRegion = 0;
+	std::atomic_uint64_t m_wrapRegion = 0;
 };
-
 } // namespace lmms
 
 #endif // LMMS_CIRCULAR_BUFFER_H
