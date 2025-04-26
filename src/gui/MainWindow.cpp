@@ -59,6 +59,7 @@
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "ProjectPropertiesDialog.h"
 #include "ProjectRenderer.h"
 #include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
@@ -354,6 +355,8 @@ void MainWindow::finalize()
 	edit_menu->addSeparator();
 	edit_menu->addAction(embed::getIconPixmap("microtuner"), tr("Scales and keymaps"),
 		this, SLOT(toggleMicrotunerWin()));
+	edit_menu->addAction(embed::getIconPixmap("setup_general"), tr("Project Properties"),
+		this, SLOT(showProjectPropertiesDialog()));
 	edit_menu->addAction(embed::getIconPixmap("setup_general"), tr("Settings"),
 		this, SLOT(showSettingsDialog()));
 
@@ -1041,6 +1044,11 @@ void MainWindow::toggleMicrotunerWin()
 }
 
 
+void MainWindow::showProjectPropertiesDialog()
+{
+	ProjectPropertiesDialog ppd;
+	ppd.exec();
+}
 
 
 void MainWindow::updateViewMenu()
