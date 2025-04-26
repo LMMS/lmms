@@ -40,6 +40,7 @@
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleTrack.h"
+#include "VideoTrack.h"
 #include "Song.h"
 
 
@@ -110,7 +111,7 @@ Track * Track::create( Type tt, TrackContainer * tc )
 		case Type::Pattern: t = new class PatternTrack( tc ); break;
 		case Type::Sample: t = new class SampleTrack( tc ); break;
 //		case Type::Event:
-//		case Type::Video:
+		case Type::Video: t = new class VideoTrack(tc); break;
 		case Type::Automation: t = new class AutomationTrack( tc ); break;
 		case Type::HiddenAutomation:
 						t = new class AutomationTrack( tc, true ); break;

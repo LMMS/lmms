@@ -55,6 +55,7 @@
 #include "TrackContainer.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VideoClip.h"
 
 namespace lmms::gui
 {
@@ -496,10 +497,11 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	auto sClip = dynamic_cast<SampleClip*>(m_clip);
 	auto pClip = dynamic_cast<PatternClip*>(m_clip);
+	auto vClip = dynamic_cast<VideoClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip))))
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || vClip))))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -633,6 +635,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
+		auto vClip = dynamic_cast<VideoClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
 		if (me->modifiers() & KBD_COPY_MODIFIER && !(sClip && knifeMode))
@@ -677,12 +680,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip) )
+				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip || vClip) )
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( sClip && knifeMode )
+				else if( (sClip || vClip) && knifeMode )
 				{
 					m_action = Action::Split;
 					setCursor( m_cursorKnife );
@@ -745,12 +748,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		if (m_action == Action::Split)
 		{
 			m_action = Action::None;
-			auto sClip = dynamic_cast<SampleClip*>(m_clip);
-			if (sClip)
-			{
-				setMarkerEnabled( false );
-				update();
-			}
+			setMarkerEnabled( false );
+			update();
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
@@ -916,7 +915,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		{
 			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			auto pClip = dynamic_cast<PatternClip*>(m_clip);
-			if( sClip || pClip )
+			auto vClip = dynamic_cast<VideoClip*>(m_clip);
+			if( sClip || pClip || vClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
@@ -969,6 +969,10 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
 						pClip->setStartTimeOffset(position);
 					}
+					else if (vClip)
+					{
+						vClip->setStartTimeOffset(vClip->startTimeOffset() + positionOffset);
+					}
 				}
 			}
 		}
@@ -986,11 +990,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		auto sClip = dynamic_cast<SampleClip*>(m_clip);
-		if (sClip) {
-			setCursor( m_cursorKnife );
-			setMarkerPos( knifeMarkerPos( me ) );
-		}
+		setCursor( m_cursorKnife );
+		setMarkerPos( knifeMarkerPos( me ) );
 		update();
 	}
 	// None of the actions above, we will just handle the cursor

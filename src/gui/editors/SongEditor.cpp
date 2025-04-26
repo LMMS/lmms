@@ -945,13 +945,18 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
 											 tr("Add automation-track"), this);
 
+	m_addVideoTrackAction = new QAction(embed::getIconPixmap("add_video_track"),
+											 tr("Add video-track"), this);
+
 	connect(m_addPatternTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addPatternTrack()));
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
+	connect(m_addVideoTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addVideoTrack()));
 
-	trackActionsToolBar->addAction( m_addPatternTrackAction );
-	trackActionsToolBar->addAction( m_addSampleTrackAction );
-	trackActionsToolBar->addAction( m_addAutomationTrackAction );
+	trackActionsToolBar->addAction(m_addPatternTrackAction);
+	trackActionsToolBar->addAction(m_addSampleTrackAction);
+	trackActionsToolBar->addAction(m_addAutomationTrackAction);
+	trackActionsToolBar->addAction(m_addVideoTrackAction);
 
 
 	// Edit actions

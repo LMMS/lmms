@@ -5,6 +5,7 @@ set(LMMS_SRCS
 	tracks/MidiClip.cpp
 	tracks/PatternTrack.cpp
 	tracks/SampleTrack.cpp
+	tracks/VideoTrack.cpp
 
 	PARENT_SCOPE
 )
