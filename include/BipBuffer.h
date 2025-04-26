@@ -47,19 +47,14 @@ public:
 	{
 		if (size == static_cast<std::size_t>(-1))
 		{
-			size = m_wrapRegion.empty() ? m_buffer.size() - m_readWriteRegion.endIndex()
-										: m_readWriteRegion.beginIndex() - m_wrapRegion.endIndex();
+			size = std::max(unreservedReadWriteRegionSpace(), unreservedWrapRegionSpace());
 		}
 
-		if (m_readWriteRegion.endIndex() + size <= m_buffer.size())
+		if (unreservedReadWriteRegionSpace() >= unreservedWrapRegionSpace())
 		{
 			return reserveRegionSpace(m_readWriteRegion, size);
 		}
-
-		if (m_wrapRegion.endIndex() + size <= m_readWriteRegion.beginIndex())
-		{
-			return reserveRegionSpace(m_wrapRegion, size);
-		}
+		else { return reserveRegionSpace(m_wrapRegion, size); }
 
 		return std::span<T>{};
 	}
@@ -75,15 +70,15 @@ public:
 	//! Acknowledges that @p size `T` elements were written into the buffer.
 	void commit(std::size_t size)
 	{
-		if (!m_wrapRegion.empty())
+		if (unreservedReadWriteRegionSpace() >= unreservedWrapRegionSpace())
 		{
-			assert(size <= m_readWriteRegion.beginIndex() - m_wrapRegion.endIndex());
-			m_wrapRegion.grow(size);
+			assert(size <= unreservedReadWriteRegionSpace());
+			m_readWriteRegion.grow(size);
 			return;
 		}
 
-		assert(size <= m_buffer.size() - m_readWriteRegion.endIndex());
-		m_readWriteRegion.grow(size);
+		assert(size <= unreservedWrapRegionSpace());
+		m_wrapRegion.grow(size);
 	}
 
 	//! Acknowledges that @p size `T` elements were read from the buffer.
@@ -118,6 +113,9 @@ private:
 		const auto end = begin + size;
 		return {begin, end};
 	}
+
+	auto unreservedReadWriteRegionSpace() { return m_buffer.size() - m_readWriteRegion.endIndex(); }
+	auto unreservedWrapRegionSpace() { return m_readWriteRegion.beginIndex() - m_wrapRegion.endIndex(); }
 
 	Container m_buffer;
 	Region m_readWriteRegion;
