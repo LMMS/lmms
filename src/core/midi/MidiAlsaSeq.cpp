@@ -51,9 +51,15 @@ static QString portName( snd_seq_client_info_t * _cinfo,
 					arg( snd_seq_port_info_get_name( _pinfo ) );
 }
 
-static QString friendlyPortName(snd_seq_client_info_t* _cinfo)
+static QString friendlyPortName(snd_seq_client_info_t* _cinfo, snd_seq_port_info_t * _pinfo)
 {
-	return snd_seq_client_info_get_name( _cinfo );
+	QString name = snd_seq_client_info_get_name(_cinfo);
+	if (name == "LMMS")
+	{
+		return QString("[LMMS] %1").arg(snd_seq_port_info_get_name(_pinfo));
+	}
+
+	return name;
 }
 
 static QString portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
@@ -669,7 +675,7 @@ void MidiAlsaSeq::updatePortList()
 			}
 
 			QString portId = portName(cinfo, pinfo);
-			QString portName = friendlyPortName(cinfo);
+			QString portName = friendlyPortName(cinfo, pinfo);
 
 			const int cap = snd_seq_port_info_get_capability( pinfo );
 			if( ( cap & ( SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ ) ) ==

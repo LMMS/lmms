@@ -737,7 +737,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	m_assignableMidiDevices = new QComboBox(midiAutoAssignBox);
 	midiAutoAssignLayout->addWidget(m_assignableMidiDevices);
-	m_assignableMidiDevices->addItem("none");
+	m_assignableMidiDevices->addItem("None");
 
 	if (!midiClient->isRaw())
 	{
