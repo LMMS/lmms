@@ -119,6 +119,39 @@ public:
 		return friendlyPort;
 	}
 
+	static int findDeviceIndex(const QStringList& portList, const QString& portName)
+	{
+		int index = portList.indexOf(portName);
+		if (index >= 0)
+		{
+			return index;
+		}
+
+		QStringList portNameSections = portName.split("::");
+
+		if (portNameSections.isEmpty())
+		{
+			return -1;
+		}
+
+		// if item isn't found, try searching without the Client ID (Client ID changes on system restart sometimes)
+		portNameSections.pop_front(); // remove Client ID which isn't persistent
+		for (QString _port : portList)
+		{
+			index++;
+
+			QStringList _portSections = _port.split("::");
+			_portSections.pop_front();
+
+			if (portNameSections == _portSections)
+			{
+				return index;
+			}
+		}
+
+		return -1;
+	}
+
 
 	// return name of port which specified MIDI event came from
 	QString sourcePortName( const MidiEvent & ) const override;

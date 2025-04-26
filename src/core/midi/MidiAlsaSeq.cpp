@@ -44,7 +44,7 @@ const int EventPollTimeOut = 250;
 static QString portName( snd_seq_client_info_t * _cinfo,
 								snd_seq_port_info_t * _pinfo )
 {
-	return QString( "%1:%2 %3:%4" ).
+	return QString( "%1::%2::%3::%4" ).
 					arg( snd_seq_port_info_get_client( _pinfo ) ).
 					arg( snd_seq_port_info_get_port( _pinfo ) ).
 					arg( snd_seq_client_info_get_name( _cinfo ) ).

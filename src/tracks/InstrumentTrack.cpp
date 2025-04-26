@@ -23,19 +23,21 @@
  */
 #include "InstrumentTrack.h"
 
+#include <MidiAlsaSeq.h>
+
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
 #include "GuiApplication.h"
-#include "Mixer.h"
-#include "InstrumentTrackView.h"
 #include "Instrument.h"
+#include "InstrumentTrackView.h"
 #include "Keymap.h"
 #include "MidiClient.h"
 #include "MidiClip.h"
 #include "MixHelpers.h"
+#include "Mixer.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "PianoRoll.h"
@@ -1090,10 +1092,13 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 		return;
 	}
 
+	QStringList readablePorts = Engine::audioEngine()->midiClient()->readablePorts();
+	int deviceIndex = MidiAlsaSeq::findDeviceIndex(readablePorts, device);
+
 	// Check if the device exists
-	if ( Engine::audioEngine()->midiClient()->readablePorts().indexOf(device) >= 0 )
+	if (deviceIndex >= 0)
 	{
-		m_midiPort.subscribeReadablePort(device, assign);
+		m_midiPort.subscribeReadablePort(readablePorts[deviceIndex], assign);
 		m_hasAutoMidiDev = assign;
 	}
 }
