@@ -137,7 +137,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 
 void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
 {
-	delete static_cast<PlaybackState*>(handle->m_pluginData);
+	delete static_cast<Sample::PlaybackState*>(handle->m_pluginData);
 	emit isPlaying(-1, 0, 0);
 }
 

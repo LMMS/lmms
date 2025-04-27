@@ -35,12 +35,6 @@
 
 namespace lmms {
 
-struct PlaybackState
-{
-	float noteDone;
-	Sample::PlaybackState playbackState;
-};
-
 class SlicerT : public Instrument
 {
 	Q_OBJECT
