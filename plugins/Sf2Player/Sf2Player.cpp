@@ -123,7 +123,7 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_srcState( nullptr ),
+	m_resampler(static_cast<AudioResampler::InterpolationMode>(Engine::audioEngine()->currentQualitySettings().libsrcInterpolation())),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -235,11 +235,6 @@ Sf2Instrument::~Sf2Instrument()
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
-	if( m_srcState != nullptr )
-	{
-		src_delete( m_srcState );
-	}
-
 }
 
 
@@ -630,21 +625,7 @@ void Sf2Instrument::reloadSynth()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() )
-	{
-		m_synthMutex.lock();
-		if( m_srcState != nullptr )
-		{
-			src_delete( m_srcState );
-		}
-		int error;
-		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
-		if( m_srcState == nullptr || error )
-		{
-			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
-		}
-		m_synthMutex.unlock();
-	}
+
 	updateReverb();
 	updateChorus();
 	updateReverbOn();
@@ -886,41 +867,26 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() &&
-							m_srcState != nullptr )
-	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
-#ifdef __GNUC__
-		SampleFrame tmp[f];
-#else
-		SampleFrame* tmp = new SampleFrame[f];
-#endif
-		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
 
-		SRC_DATA src_data;
-		src_data.data_in = (float *)tmp;
-		src_data.data_out = (float *)buf;
-		src_data.input_frames = f;
-		src_data.output_frames = frames;
-		src_data.src_ratio = (double) frames / f;
-		src_data.end_of_input = 0;
-		int error = src_process( m_srcState, &src_data );
-#ifndef __GNUC__
-		delete[] tmp;
-#endif
-		if( error )
-		{
-			qCritical( "Sf2Instrument: error while resampling: %s", src_strerror( error ) );
-		}
-		if (static_cast<f_cnt_t>(src_data.output_frames_gen) < frames)
-		{
-			qCritical("Sf2Instrument: not enough frames: %ld / %zu", src_data.output_frames_gen, frames);
-		}
-	}
-	else
+	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
+	while (frames > 0)
 	{
-		fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
+		const auto inputView = m_resampler.inputWriterView();
+		fluid_synth_write_float(m_synth, inputView.size(), inputView.data(), 0, 2, inputView.data(), 1, 2);
+		m_resampler.commitInputWrite(inputView.size());
+
+		const auto error = m_resampler.resample(ratio);
+		if (error) { qCritical("Sf2Instrument: error while resampling: %s", src_strerror(error)); }
+
+		const auto outputView = m_resampler.outputReaderView();
+		const auto outputFramesToRead = std::min(frames, outputView.size());
+		std::copy_n(outputView.begin(), outputFramesToRead, buf);
+		m_resampler.commitOutputRead(outputFramesToRead);
+
+		buf += outputFramesToRead;
+		frames -= outputFramesToRead;
 	}
+
 	m_synthMutex.unlock();
 }
 

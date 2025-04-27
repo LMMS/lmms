@@ -32,6 +32,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
@@ -104,7 +105,7 @@ public slots:
 	void updateTuning();
 
 private:
-	SRC_STATE * m_srcState;
+	AudioResampler m_resampler;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
