@@ -74,7 +74,7 @@ Sample::Sample(const Sample& other)
 {
 }
 
-Sample::Sample(Sample&& other)
+Sample::Sample(Sample&& other) noexcept
 	: m_buffer(std::move(other.m_buffer))
 	, m_startFrame(other.startFrame())
 	, m_endFrame(other.endFrame())
@@ -100,7 +100,7 @@ auto Sample::operator=(const Sample& other) -> Sample&
 	return *this;
 }
 
-auto Sample::operator=(Sample&& other) -> Sample&
+auto Sample::operator=(Sample&& other) noexcept -> Sample&
 {
 	m_buffer = std::move(other.m_buffer);
 	m_startFrame = other.startFrame();

@@ -46,7 +46,6 @@ public:
 
 	struct LMMS_EXPORT PlaybackState
 	{
-
 		PlaybackState(int interpolationMode = SRC_LINEAR, int frameIndex = 0)
 			: resampler(static_cast<AudioResampler::InterpolationMode>(interpolationMode))
 			, frameIndex(frameIndex)
@@ -59,23 +58,18 @@ public:
 		friend class Sample;
 	};
 
-	struct CallbackData
-	{
-		const Sample* sample = nullptr;
-		PlaybackState* state = nullptr;
-		Loop loopMode = Loop::Off;
-	};
-
 	Sample() = default;
+	~Sample() = default;
+
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
-	Sample(Sample&& other);
+	Sample(Sample&& other) noexcept;
 	explicit Sample(const QString& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
-	auto operator=(Sample&&) -> Sample&;
+	auto operator=(Sample&&) noexcept -> Sample&;
 
 	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loopMode = Loop::Off, double ratio = 1.0) const
 		-> bool;
