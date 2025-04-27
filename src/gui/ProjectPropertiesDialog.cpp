@@ -62,11 +62,11 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 ProjectPropertiesDialog::ProjectPropertiesDialog():
-	m_metaTitle(ProjectProperties::inst()->value("meta","title", QFileInfo(Engine::getSong()->projectFileName()).baseName())),
-	m_metaArtist(ProjectProperties::inst()->value("meta","artist", "")),
-	m_metaAlbum(ProjectProperties::inst()->value("meta","album", "")),
-	m_metaYear(ProjectProperties::inst()->value("meta","year", "")),
-	m_metaComment(ProjectProperties::inst()->value("meta","comment", "Created with LMMS"))
+	m_metaTitle(ProjectProperties::inst()->value("meta", "title", QFileInfo(Engine::getSong()->projectFileName()).baseName())),
+	m_metaArtist(ProjectProperties::inst()->value("meta", "artist")),
+	m_metaAlbum(ProjectProperties::inst()->value("meta", "album")),
+	m_metaYear(ProjectProperties::inst()->value("meta", "year")),
+	m_metaComment(ProjectProperties::inst()->value("meta", "comment"))
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Project Properties"));
@@ -163,7 +163,7 @@ ProjectPropertiesDialog::ProjectPropertiesDialog():
 
 	// Major tabs ordering.
 	m_tabBar->addTab(general_w,
-			tr("General"), 0, false, true, false)->setIcon(
+			tr("General"), 0, true, true, false)->setIcon(
 					embed::getIconPixmap("setup_general"));
 
 	m_tabBar->setActiveTab(0);
