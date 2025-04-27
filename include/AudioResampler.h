@@ -53,10 +53,6 @@ public:
 		Count
 	};
 
-	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
-	//! The callback should return the number of frames actually written to @p dst.
-	using WriteCallback = std::size_t (*)(SampleFrame* dst, std::size_t frames, void* data);
-
 	//! Create a resampler with the given @p interpolationMode.
 	AudioResampler(InterpolationMode interpolationMode);
 
