@@ -114,8 +114,6 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 	return *this;
 }
 
-// TODO: This function can take in the source buffer as a parameter, while the shared ownership
-// of that buffer should belong to the caller.
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
