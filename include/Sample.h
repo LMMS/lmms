@@ -76,8 +76,8 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) -> Sample&;
 
-	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
-		Loop loopMode = Loop::Off) const -> bool;
+	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loopMode = Loop::Off, double ratio = 1.0) const
+		-> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }

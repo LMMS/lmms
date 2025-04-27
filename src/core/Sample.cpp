@@ -114,12 +114,11 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loop) const
+// TODO: This function can take in the source buffer as a parameter, while the shared ownership
+// of that buffer should belong to the caller.
+bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
-	const auto outputRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) * m_frequency;
-	const auto inputRatio = static_cast<double>(m_buffer->sampleRate()) * desiredFrequency;
-	const auto resampleRatio = outputRatio / inputRatio;
-
+	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
 	std::fill_n(dst, numFrames, SampleFrame{});
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
@@ -129,7 +128,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 		const auto numFramesRendered = render(resamplerInputView.data(), resamplerInputView.size(), state, loop);
 		state->resampler.commitInputWrite(static_cast<long>(numFramesRendered));
 
-		if (!state->resampler.resample(resampleRatio) && numFramesRendered == 0) { return false; }
+		if (!state->resampler.resample(ratio) && numFramesRendered == 0) { return false; }
 
 		const auto resamplerOutputView = state->resampler.outputReaderView();
 		const auto outputFramesToRead = std::min(numFrames, resamplerOutputView.size());

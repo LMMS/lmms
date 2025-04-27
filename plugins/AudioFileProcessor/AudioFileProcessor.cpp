@@ -159,8 +159,8 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 	{
 		if (m_sample.play(_working_buffer + offset,
 						static_cast<Sample::PlaybackState*>(_n->m_pluginData),
-						frames, _n->frequency(),
-						static_cast<Sample::Loop>(m_loopModel.value())))
+						frames, static_cast<Sample::Loop>(m_loopModel.value()),
+						DefaultBaseFreq / _n->frequency()))
 		{
 			applyRelease( _working_buffer, _n );
 			emit isPlaying(static_cast<Sample::PlaybackState*>(_n->m_pluginData)->frameIndex);
