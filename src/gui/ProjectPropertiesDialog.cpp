@@ -65,10 +65,8 @@ ProjectPropertiesDialog::ProjectPropertiesDialog():
 	m_metaTitle(ProjectProperties::inst()->value("meta","title", QFileInfo(Engine::getSong()->projectFileName()).baseName())),
 	m_metaArtist(ProjectProperties::inst()->value("meta","artist", "")),
 	m_metaAlbum(ProjectProperties::inst()->value("meta","album", "")),
-	m_metaYear(ProjectProperties::inst()->value("meta","year", "1970")),
-	m_metaComment(ProjectProperties::inst()->value("meta","comment", "")),
-	m_metaGenre(ProjectProperties::inst()->value("meta","genre", "")),
-	m_metaSoftware(ProjectProperties::inst()->value("meta","software", "LMMS"))
+	m_metaYear(ProjectProperties::inst()->value("meta","year", "")),
+	m_metaComment(ProjectProperties::inst()->value("meta","comment", "Created with LMMS"))
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Project Properties"));
@@ -144,8 +142,6 @@ ProjectPropertiesDialog::ProjectPropertiesDialog():
 	addMetaDataLine(tr("Album"), m_metaAlbumLineEdit, &m_metaAlbum);
 	addMetaDataLine(tr("Year"), m_metaYearLineEdit, &m_metaYear);
 	addMetaDataLine(tr("Comment"), m_metaCommentLineEdit, &m_metaComment);
-	addMetaDataLine(tr("Genre"), m_metaGenreLineEdit, &m_metaGenre);
-	addMetaDataLine(tr("Software"), m_metaSoftwareLineEdit, &m_metaSoftware);
 
 	generalControlsLayout->addWidget(metaDataGroupBox);
 	generalControlsLayout->addSpacing(10);
@@ -224,8 +220,6 @@ void ProjectPropertiesDialog::accept()
 	ProjectProperties::inst()->setValue("meta", "album", m_metaAlbum);
 	ProjectProperties::inst()->setValue("meta", "year", m_metaYear);
 	ProjectProperties::inst()->setValue("meta", "comment", m_metaComment);
-	ProjectProperties::inst()->setValue("meta", "genre", m_metaGenre);
-	ProjectProperties::inst()->setValue("meta", "software", m_metaSoftware);
 }
 
 

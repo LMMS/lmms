@@ -33,6 +33,7 @@
 #include <vorbis/vorbisenc.h>
 
 #include "AudioEngine.h"
+#include "ProjectProperties.h"
 
 namespace lmms
 {
@@ -54,7 +55,11 @@ AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings, const ch_cnt_t 
 
 	vorbis_analysis_init(&m_vds, &m_vi);
 	vorbis_comment_init(&m_vc);
-	vorbis_comment_add_tag(&m_vc, "Cool", "This song has been made using LMMS");
+	vorbis_comment_add_tag(&m_vc, "Title", ProjectProperties::inst()->value("meta", "title").toLocal8Bit().constData());
+	vorbis_comment_add_tag(&m_vc, "Artist", ProjectProperties::inst()->value("meta", "artist").toLocal8Bit().constData());
+	vorbis_comment_add_tag(&m_vc, "Album", ProjectProperties::inst()->value("meta", "album").toLocal8Bit().constData());
+	vorbis_comment_add_tag(&m_vc, "Year", ProjectProperties::inst()->value("meta", "year").toLocal8Bit().constData()); // TODO why does this not show up in nautilus?
+	vorbis_comment_add_tag(&m_vc, "Comment", ProjectProperties::inst()->value("meta", "comment", "Created with LMMS").toLocal8Bit().constData());
 
 	auto headerPackets = std::array<ogg_packet, 3>{};
 	vorbis_analysis_headerout(&m_vds, &m_vc, &headerPackets[0], &headerPackets[1], &headerPackets[2]);
