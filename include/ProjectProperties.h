@@ -61,6 +61,8 @@ public:
 
 	void deleteValue(const QString & cls, const QString & attribute);
 
+	void reset();
+
 
 	QString nodeName() const override
 	{

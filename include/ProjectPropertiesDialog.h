@@ -27,6 +27,9 @@
 
 #include <QDialog>
 
+
+class QLineEdit;
+
 namespace lmms::gui
 {
 
@@ -43,6 +46,22 @@ protected slots:
 
 private:
 	TabBar * m_tabBar;
+
+	QString m_metaTitle;
+	QString m_metaArtist;
+	QString m_metaAlbum;
+	QString m_metaYear;
+	QString m_metaComment;
+	QString m_metaGenre;
+	QString m_metaSoftware;
+
+	QLineEdit * m_metaTitleLineEdit;
+	QLineEdit * m_metaArtistLineEdit;
+	QLineEdit * m_metaAlbumLineEdit;
+	QLineEdit * m_metaYearLineEdit;
+	QLineEdit * m_metaCommentLineEdit;
+	QLineEdit * m_metaGenreLineEdit;
+	QLineEdit * m_metaSoftwareLineEdit;
 
 };
 

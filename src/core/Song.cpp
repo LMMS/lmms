@@ -917,6 +917,8 @@ void Song::clearProject()
 
 	removeAllControllers();
 
+	ProjectProperties::inst()->reset();
+
 	emit dataChanged();
 
 	Engine::projectJournal()->clearJournal();

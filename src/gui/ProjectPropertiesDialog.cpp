@@ -25,16 +25,22 @@
 
 #include "ProjectPropertiesDialog.h"
 
+#include <QFileInfo>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QScrollArea>
 
 #include "embed.h"
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "ProjectProperties.h"
 #include "TabBar.h"
 #include "TabButton.h"
+#include "Song.h"
 
 namespace lmms::gui
 {
@@ -55,13 +61,19 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 
-ProjectPropertiesDialog::ProjectPropertiesDialog()
+ProjectPropertiesDialog::ProjectPropertiesDialog():
+	m_metaTitle(ProjectProperties::inst()->value("meta","title", QFileInfo(Engine::getSong()->projectFileName()).baseName())),
+	m_metaArtist(ProjectProperties::inst()->value("meta","artist", "")),
+	m_metaAlbum(ProjectProperties::inst()->value("meta","album", "")),
+	m_metaYear(ProjectProperties::inst()->value("meta","year", "1970")),
+	m_metaComment(ProjectProperties::inst()->value("meta","comment", "")),
+	m_metaGenre(ProjectProperties::inst()->value("meta","genre", "")),
+	m_metaSoftware(ProjectProperties::inst()->value("meta","software", "LMMS"))
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Project Properties"));
 	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	setModal(true);
-
 
 
 	// Main widget.
@@ -87,10 +99,6 @@ ProjectPropertiesDialog::ProjectPropertiesDialog()
 
 	QVBoxLayout * settingsLayout = new QVBoxLayout(settings_w);
 
-
-
-
-
 	// General widget.
 	auto general_w = new QWidget(settings_w);
 	auto general_layout = new QVBoxLayout(general_w);
@@ -112,7 +120,36 @@ ProjectPropertiesDialog::ProjectPropertiesDialog()
 	generalControlsLayout->setContentsMargins(0, 0, 0, 0);
 
 
-	generalControlsLayout->addWidget(new QLabel{tr("Loop edit mode"), generalControls});
+	auto metaDataGroupBox = new QGroupBox(tr("Metadata"), generalControls);
+
+	auto metaDataVBox = new QVBoxLayout(metaDataGroupBox);
+	metaDataVBox->setSpacing(5);
+	metaDataVBox->setContentsMargins(0, 0, 0, 0);
+
+	auto addMetaDataLine = [metaDataVBox, metaDataGroupBox](QString name, QLineEdit* lineEdit, QString* value)
+	{
+		auto line_w = new QWidget(metaDataGroupBox);
+		auto lineLayout = new QVBoxLayout(line_w);
+		lineLayout->setSpacing(2);
+		lineLayout->setContentsMargins(0, 0, 0, 0);
+		lineLayout->addWidget(new QLabel{name, line_w});
+		lineEdit = new QLineEdit(*value, line_w);
+		connect(lineEdit, &QLineEdit::textChanged, [value](const QString& text){ *value = text; });
+		lineLayout->addWidget(lineEdit);
+		metaDataVBox->addWidget(line_w);
+	};
+
+	addMetaDataLine(tr("Title"), m_metaTitleLineEdit, &m_metaTitle);
+	addMetaDataLine(tr("Artist"), m_metaArtistLineEdit, &m_metaArtist);
+	addMetaDataLine(tr("Album"), m_metaAlbumLineEdit, &m_metaAlbum);
+	addMetaDataLine(tr("Year"), m_metaYearLineEdit, &m_metaYear);
+	addMetaDataLine(tr("Comment"), m_metaCommentLineEdit, &m_metaComment);
+	addMetaDataLine(tr("Genre"), m_metaGenreLineEdit, &m_metaGenre);
+	addMetaDataLine(tr("Software"), m_metaSoftwareLineEdit, &m_metaSoftware);
+
+	generalControlsLayout->addWidget(metaDataGroupBox);
+	generalControlsLayout->addSpacing(10);
+
 
 
 	// General layout ordering.
@@ -122,17 +159,18 @@ ProjectPropertiesDialog::ProjectPropertiesDialog()
 	generalScroll->setWidgetResizable(true);
 	general_layout->addWidget(generalScroll, 1);
 
+
+
 	// Add all main widgets to the layout of the settings widget
 	// This is needed so that we automatically get the correct sizes.
 	settingsLayout->addWidget(general_w);
 
 	// Major tabs ordering.
 	m_tabBar->addTab(general_w,
-		tr("General"), 0, false, true, false)->setIcon(
-				embed::getIconPixmap("setup_general"));
+			tr("General"), 0, false, true, false)->setIcon(
+					embed::getIconPixmap("setup_general"));
 
 	m_tabBar->setActiveTab(0);
-
 
 	// Horizontal layout ordering.
 	hlayout->addSpacing(2);
@@ -140,7 +178,6 @@ ProjectPropertiesDialog::ProjectPropertiesDialog()
 	hlayout->addSpacing(10);
 	hlayout->addWidget(settings_w);
 	hlayout->addSpacing(10);
-
 
 	// Extras widget and layout.
 	auto extras_w = new QWidget(this);
@@ -158,6 +195,14 @@ ProjectPropertiesDialog::ProjectPropertiesDialog()
 	connect(cancel_btn, SIGNAL(clicked()),
 			this, SLOT(reject()));
 
+	// Extras layout ordering.
+	extras_layout->addStretch();
+	extras_layout->addWidget(ok_btn);
+	extras_layout->addSpacing(10);
+	extras_layout->addWidget(cancel_btn);
+	extras_layout->addSpacing(10);
+
+	// Vertical layout ordering.
 	vlayout->addWidget(main_w, 1);
 	vlayout->addSpacing(10);
 	vlayout->addWidget(extras_w);
@@ -173,6 +218,14 @@ ProjectPropertiesDialog::ProjectPropertiesDialog()
 void ProjectPropertiesDialog::accept()
 {
 	QDialog::accept();
+
+	ProjectProperties::inst()->setValue("meta", "title", m_metaTitle);
+	ProjectProperties::inst()->setValue("meta", "artist", m_metaArtist);
+	ProjectProperties::inst()->setValue("meta", "album", m_metaAlbum);
+	ProjectProperties::inst()->setValue("meta", "year", m_metaYear);
+	ProjectProperties::inst()->setValue("meta", "comment", m_metaComment);
+	ProjectProperties::inst()->setValue("meta", "genre", m_metaGenre);
+	ProjectProperties::inst()->setValue("meta", "software", m_metaSoftware);
 }
 
 

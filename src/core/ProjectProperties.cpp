@@ -98,15 +98,47 @@ void ProjectProperties::deleteValue(const QString & cls, const QString & attribu
 	}
 }
 
+void ProjectProperties::reset()
+{
+	m_settings.clear();
+}
+
 void ProjectProperties::saveSettings(QDomDocument& doc, QDomElement& element)
 {
-
+	for (auto it = m_settings.begin(); it != m_settings.end(); ++it)
+	{
+		QDomElement n = doc.createElement(it.key());
+		for (const auto& [first, second] : *it)
+		{
+			n.setAttribute(first, second);
+		}
+		element.appendChild(n);
+	}
 }
 
 
 void ProjectProperties::loadSettings(const QDomElement& element)
 {
+	QDomNode node = element.firstChild();
 
+	while(!node.isNull())
+	{
+		if(node.isElement() && node.toElement().hasAttributes())
+		{
+			stringPairVector attr;
+			QDomNamedNodeMap node_attr = node.toElement().attributes();
+			for(int i = 0; i < node_attr.count(); ++i)
+			{
+				QDomNode n = node_attr.item(i);
+				if(n.isAttr())
+				{
+					attr.push_back(qMakePair(n.toAttr().name(), n.toAttr().value()));
+				}
+			}
+			m_settings[node.nodeName()] = attr;
+		}
+		node = node.nextSibling();
+	}
 }
 
 

@@ -25,6 +25,7 @@
 
 #include "AudioFileMP3.h"
 
+#include "ProjectProperties.h"
 #include "SampleFrame.h"
 
 #ifdef LMMS_HAVE_MP3LAME
@@ -120,7 +121,11 @@ bool AudioFileMP3::initEncoder()
 
 	// Add a comment
 	id3tag_init(m_lame);
-	id3tag_set_comment(m_lame, "Created with LMMS");
+	id3tag_set_title(m_lame, ProjectProperties::inst()->value("meta", "title").toLocal8Bit().constData());
+	id3tag_set_artist(m_lame, ProjectProperties::inst()->value("meta", "artist").toLocal8Bit().constData());
+	id3tag_set_album(m_lame, ProjectProperties::inst()->value("meta", "album").toLocal8Bit().constData());
+	id3tag_set_year(m_lame, ProjectProperties::inst()->value("meta", "year").toLocal8Bit().constData());
+	id3tag_set_comment(m_lame, ProjectProperties::inst()->value("meta", "comment", "Created with LMMS").toLocal8Bit().constData());
 
 	return lame_init_params(m_lame) != -1;
 }
