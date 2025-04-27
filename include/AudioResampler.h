@@ -30,7 +30,6 @@
 #include <samplerate.h>
 #include <span>
 
-#include "BipBuffer.h"
 #include "SampleFrame.h"
 #include "lmms_export.h"
 
@@ -79,19 +78,21 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Returns a view into the input buffer that callers can write to.
-	auto inputWriterView() -> std::span<SampleFrame> { return m_inputBuffer.reserve(); }
+	//! If there is already input waiting to be read, an empty view is returned.
+	auto inputWriterView() -> std::span<SampleFrame>;
 
 	//! Returns a view into the output buffer that callers can read from.
-	auto outputReaderView() const -> std::span<const SampleFrame> { return m_outputBuffer.view(); }
+	//! An empty view is returned if there are no output frames that can be read.
+	auto outputReaderView() const -> std::span<const SampleFrame>;
 
 	//! Commit to writing @p frames to the input buffer.
-	void commitInputWrite(std::size_t frames) { m_inputBuffer.commit(frames); }
+	void commitInputWrite(std::size_t frames);
 
 	//! Commit to reading @p frames from the output buffer.
-	void commitOutputRead(std::size_t frames) { m_outputBuffer.decommit(frames); }
+	void commitOutputRead(std::size_t frames);
 
 	//! Resamples the audio from the input buffer at the given @p ratio.
-	//! Returns `true` if data was resampled and ended up in the output buffer.
+	//! Returns `true` if audio was resampled or audio was already resampled and waiting to be read out.
 	//! Returns `false` on error or no more audio was resampled.
 	auto resample(double ratio) -> bool;
 
@@ -102,15 +103,18 @@ public:
 	constexpr auto channels() const -> int { return DEFAULT_CHANNELS; }
 
 	//! Returns the textual name for the given interpolation mode.
-	static auto interpolationModeName(InterpolationMode mode) -> const char*
-	{
-		return src_get_name(static_cast<int>(mode));
-	}
+	static auto interpolationModeName(InterpolationMode mode) -> const char*;
 
 private:
-	static constexpr auto BufferSize = 32;
-	BipBuffer<SampleFrame, std::array<SampleFrame, BufferSize>> m_inputBuffer;
-	BipBuffer<SampleFrame, std::array<SampleFrame, BufferSize>> m_outputBuffer;
+	struct Stream
+	{
+		std::array<SampleFrame, 32> buffer;
+		long readerIndex = 0;
+		long writerIndex = 0;
+	};
+
+	Stream m_input;
+	Stream m_output;
 	SRC_STATE* m_state = nullptr;
 	SRC_DATA m_data = SRC_DATA{};
 	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;

@@ -64,24 +64,67 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 auto AudioResampler::resample(double ratio) -> bool
 {
 	if (!m_state) { return false; }
+	if (m_output.readerIndex < m_output.writerIndex) { return true; }
 
-	const auto input = m_inputBuffer.view();
-	const auto output = m_outputBuffer.reserve();
+	m_data.data_in = &m_input.buffer.data()[0][0] + m_input.readerIndex * DEFAULT_CHANNELS;
+	m_data.data_out = &m_output.buffer.data()[0][0] + m_output.writerIndex * DEFAULT_CHANNELS;
 
-	m_data.data_in = &input[0][0];
-	m_data.data_out = &output[0][0];
-
-	m_data.input_frames = static_cast<long>(input.size());
-	m_data.output_frames = static_cast<long>(output.size());
+	m_data.input_frames = m_input.writerIndex - m_input.readerIndex;
+	m_data.output_frames = static_cast<long>(m_output.buffer.size()) - m_output.writerIndex;
 
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
 
-	if (src_process(m_state, &m_data) || m_data.output_frames_gen == 0) { return false; }
+	if (src_process(m_state, &m_data)) { return false; }
+	m_input.readerIndex += m_data.input_frames_used;
+	m_output.writerIndex += m_data.output_frames_gen;
 
-	m_inputBuffer.decommit(m_data.input_frames_used);
-	m_outputBuffer.commit(m_data.output_frames_gen);
-	return true;
+	if (m_input.readerIndex == static_cast<long>(m_input.buffer.size()))
+	{
+		m_input.readerIndex = 0;
+		m_input.writerIndex = 0;
+	}
+
+	return m_data.output_frames_gen > 0;
+}
+
+auto AudioResampler::inputWriterView() -> std::span<SampleFrame>
+{
+	if (m_input.readerIndex < m_input.writerIndex) { return std::span<SampleFrame>{}; }
+	const auto begin = m_input.buffer.begin() + m_input.writerIndex;
+	const auto end = m_input.buffer.end();
+	return {begin, end};
+}
+
+auto AudioResampler::outputReaderView() const -> std::span<const SampleFrame>
+{
+	if (m_output.readerIndex == m_output.writerIndex) { return std::span<SampleFrame>{}; }
+	const auto begin = m_output.buffer.begin() + m_output.readerIndex;
+	const auto end = m_output.buffer.begin() + m_output.writerIndex;
+	return {begin, end};
+}
+
+void AudioResampler::commitInputWrite(std::size_t frames)
+{
+	assert(m_input.writerIndex + frames <= m_input.buffer.size());
+	m_input.writerIndex += static_cast<long>(frames);
+}
+
+void AudioResampler::commitOutputRead(std::size_t frames)
+{
+	assert(m_output.readerIndex + frames <= m_output.writerIndex);
+	m_output.readerIndex += static_cast<long>(frames);
+
+	if (m_output.readerIndex == static_cast<long>(m_output.buffer.size()))
+	{
+		m_output.readerIndex = 0;
+		m_output.writerIndex = 0;
+	}
+}
+
+auto AudioResampler::interpolationModeName(InterpolationMode mode) -> const char*
+{
+	return src_get_name(static_cast<int>(mode));
 }
 
 } // namespace lmms

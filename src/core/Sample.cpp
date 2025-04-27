@@ -24,8 +24,6 @@
 
 #include "Sample.h"
 
-#include <cassert>
-
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
