@@ -64,7 +64,6 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 auto AudioResampler::resample(double ratio) -> bool
 {
 	if (!m_state) { return false; }
-	if (m_output.readerIndex < m_output.writerIndex) { return true; }
 
 	m_data.data_in = &m_input.buffer.data()[0][0] + m_input.readerIndex * DEFAULT_CHANNELS;
 	m_data.data_out = &m_output.buffer.data()[0][0] + m_output.writerIndex * DEFAULT_CHANNELS;
@@ -90,18 +89,16 @@ auto AudioResampler::resample(double ratio) -> bool
 
 auto AudioResampler::inputWriterView() -> std::span<SampleFrame>
 {
-	if (m_input.readerIndex < m_input.writerIndex) { return std::span<SampleFrame>{}; }
 	const auto begin = m_input.buffer.begin() + m_input.writerIndex;
 	const auto end = m_input.buffer.end();
-	return {begin, end};
+	return begin == end ? std::span<SampleFrame>{} : std::span{begin, end};
 }
 
 auto AudioResampler::outputReaderView() const -> std::span<const SampleFrame>
 {
-	if (m_output.readerIndex == m_output.writerIndex) { return std::span<SampleFrame>{}; }
 	const auto begin = m_output.buffer.begin() + m_output.readerIndex;
 	const auto end = m_output.buffer.begin() + m_output.writerIndex;
-	return {begin, end};
+	return begin == end ? std::span<SampleFrame>{} : std::span{begin, end};
 }
 
 void AudioResampler::commitInputWrite(std::size_t frames)
