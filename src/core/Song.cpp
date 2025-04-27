@@ -493,6 +493,7 @@ void Song::playSong()
 	}
 
 	m_playMode = PlayMode::Song;
+	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -532,6 +533,7 @@ void Song::playPattern()
 	}
 
 	m_playMode = PlayMode::Pattern;
+	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -558,6 +560,7 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 	if( m_midiClipToPlay != nullptr )
 	{
 		m_playMode = PlayMode::MidiClip;
+		m_lastPlayMode = m_playMode;
 		m_playing = true;
 		m_paused = false;
 	}

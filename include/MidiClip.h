@@ -79,6 +79,9 @@ public:
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
 
+	//! Horizontally flip the positions of the given notes.
+	void reverseNotes(const NoteVector& notes);
+
 	// Split the list of notes on the given position
 	void splitNotes(const NoteVector& notes, TimePos pos);
 
