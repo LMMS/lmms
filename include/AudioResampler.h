@@ -74,11 +74,9 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Returns a view into the input buffer that callers can write to.
-	//! If there is already input waiting to be read, an empty view is returned.
 	auto inputWriterView() -> std::span<SampleFrame>;
 
 	//! Returns a view into the output buffer that callers can read from.
-	//! An empty view is returned if there are no output frames that can be read.
 	auto outputReaderView() const -> std::span<const SampleFrame>;
 
 	//! Commit to writing @p frames to the input buffer.
