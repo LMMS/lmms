@@ -124,7 +124,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 
 	while (numFrames > 0)
 	{
-		if (loop == Loop::Off && static_cast<size_t>(state->frameIndex) >= m_endFrame) { return false; }
+		if (loop == Loop::Off && state->frameIndex >= m_endFrame) { return false; }
 
 		const auto resamplerInputView = state->resampler.inputWriterView();
 		const auto numFramesRendered = render(resamplerInputView.data(), resamplerInputView.size(), state, loop);
