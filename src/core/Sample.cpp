@@ -24,6 +24,8 @@
 
 #include "Sample.h"
 
+#include <iostream>
+
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
@@ -122,11 +124,18 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 
 	while (numFrames > 0)
 	{
+		if (loop == Loop::Off && static_cast<size_t>(state->frameIndex) >= m_endFrame) { return false; }
+
 		const auto resamplerInputView = state->resampler.inputWriterView();
 		const auto numFramesRendered = render(resamplerInputView.data(), resamplerInputView.size(), state, loop);
 		state->resampler.commitInputWrite(static_cast<long>(numFramesRendered));
 
-		if (!state->resampler.resample(ratio) && numFramesRendered == 0) { return false; }
+		if (const auto error = state->resampler.resample(ratio))
+		{
+			// TODO: Use a real-time safe solution for logging errors
+			std::cerr << "Resampling error: " << AudioResampler::errorDescription(error) << '\n';
+			return false;
+		}
 
 		const auto resamplerOutputView = state->resampler.outputReaderView();
 		const auto outputFramesToRead = std::min(numFrames, resamplerOutputView.size());

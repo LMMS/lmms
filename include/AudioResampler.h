@@ -92,9 +92,8 @@ public:
 	void commitOutputRead(std::size_t frames);
 
 	//! Resamples the audio from the input buffer at the given @p ratio.
-	//! Returns `true` if audio was resampled or audio was already resampled and waiting to be read out.
-	//! Returns `false` on error or no more audio was resampled.
-	auto resample(double ratio) -> bool;
+	//! Returns non-zero on error;
+	auto resample(double ratio) -> int;
 
 	//! Returns the interpolation mode the resampler is using.
 	auto interpolationMode() const -> InterpolationMode { return m_interpolationMode; }
@@ -104,6 +103,9 @@ public:
 
 	//! Returns the textual name for the given interpolation mode.
 	static auto interpolationModeName(InterpolationMode mode) -> const char*;
+
+	//! Returns the description for a resampling error.
+	static auto errorDescription(int error) -> const char*;
 
 private:
 	struct Stream

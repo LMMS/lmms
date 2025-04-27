@@ -61,10 +61,8 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::resample(double ratio) -> bool
+auto AudioResampler::resample(double ratio) -> int
 {
-	if (!m_state) { return false; }
-
 	m_data.data_in = &m_input.buffer.data()[0][0] + m_input.readerIndex * DEFAULT_CHANNELS;
 	m_data.data_out = &m_output.buffer.data()[0][0] + m_output.writerIndex * DEFAULT_CHANNELS;
 
@@ -74,7 +72,9 @@ auto AudioResampler::resample(double ratio) -> bool
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
 
-	if (src_process(m_state, &m_data)) { return false; }
+	const auto error = src_process(m_state, &m_data);
+	if (error != 0) { return error; }
+
 	m_input.readerIndex += m_data.input_frames_used;
 	m_output.writerIndex += m_data.output_frames_gen;
 
@@ -84,7 +84,7 @@ auto AudioResampler::resample(double ratio) -> bool
 		m_input.writerIndex = 0;
 	}
 
-	return m_data.output_frames_gen > 0;
+	return 0;
 }
 
 auto AudioResampler::inputWriterView() -> std::span<SampleFrame>
@@ -122,6 +122,11 @@ void AudioResampler::commitOutputRead(std::size_t frames)
 auto AudioResampler::interpolationModeName(InterpolationMode mode) -> const char*
 {
 	return src_get_name(static_cast<int>(mode));
+}
+
+auto AudioResampler::errorDescription(int error) -> const char*
+{
+	return src_strerror(error);
 }
 
 } // namespace lmms
