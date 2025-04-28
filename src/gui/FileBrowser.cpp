@@ -25,6 +25,7 @@
 
 #include "FileBrowser.h"
 
+#include <PathUtil.h>
 #include <QApplication>
 #include <QDirIterator>
 #include <QHBoxLayout>
@@ -39,6 +40,7 @@
 #include <QStringList>
 #include <cassert>
 #include <queue>
+#include <QDebug>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -349,19 +351,25 @@ void FileBrowser::reloadTree()
 	switch (m_type)
 	{
 	case Type::Favorites:
-		for (const auto& path : paths)
+		for (auto& path : paths)
 		{
+			while (path.endsWith('/') || path.endsWith('\\') || path.endsWith("."))
+			{
+				path.chop(1);
+			}
 
-			auto info = QFileInfo{path};
+			auto info = QFileInfo{PathUtil::toAbsolute(path)};
 
 			if (info.isDir())
 			{
+				qDebug() << "dir";
 				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
 				dir->update();
 				m_fileBrowserTreeWidget->addTopLevelItem(dir);
 			}
 			else if (info.isFile())
 			{
+				qDebug() << "file";
 				auto file = new FileItem(info.fileName(), info.path());
 				m_fileBrowserTreeWidget->addTopLevelItem(file);
 			}

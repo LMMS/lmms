@@ -483,7 +483,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 					{
 						if(n.isElement() && n.toElement().hasAttributes())
 						{
-							m_recentlyOpenedProjects << PathUtil::toAbsolute(n.toElement().attribute("path"));
+							m_recentlyOpenedProjects << n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
 					}
@@ -496,7 +496,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 					{
 						if (n.isElement() && n.toElement().hasAttributes())
 						{
-							m_favoriteItems << PathUtil::toAbsolute(n.toElement().attribute("path"));
+							m_favoriteItems << n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
 					}
@@ -599,6 +599,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	if(hasWorkingDir())
 	{
 		createWorkingDir();
+	}
+
+	for (auto& file : m_recentlyOpenedProjects)
+	{
+		file = PathUtil::toAbsolute(file);
+	}
+
+	for (auto& file : m_favoriteItems)
+	{
+		file = PathUtil::toAbsolute(file);
 	}
 }
 
