@@ -1,6 +1,6 @@
 [submodule "src/3rdparty/qt5-x11embed"]
 	path = src/3rdparty/qt5-x11embed
-	url = https://github.com/tresf/qt5-x11embed.git
+	url = https://github.com/Lukas-W/qt5-x11embed.git
 [submodule "plugins/ZynAddSubFx/zynaddsubfx"]
 	path = plugins/ZynAddSubFx/zynaddsubfx
 	url = https://github.com/lmms/zynaddsubfx.git
