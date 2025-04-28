@@ -40,7 +40,6 @@
 #include <QStringList>
 #include <cassert>
 #include <queue>
-#include <QDebug>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -362,14 +361,12 @@ void FileBrowser::reloadTree()
 
 			if (info.isDir())
 			{
-				qDebug() << "dir";
 				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
 				dir->update();
 				m_fileBrowserTreeWidget->addTopLevelItem(dir);
 			}
 			else if (info.isFile())
 			{
-				qDebug() << "file";
 				auto file = new FileItem(info.fileName(), info.path());
 				m_fileBrowserTreeWidget->addTopLevelItem(file);
 			}
