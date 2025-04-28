@@ -39,6 +39,7 @@ class AudioEngine;
 class Mixer;
 class PatternStore;
 class ProjectJournal;
+class SampleFolder;
 class Song;
 class Ladspa2LMMS;
 
@@ -64,6 +65,11 @@ public:
 	static Mixer * mixer()
 	{
 		return s_mixer;
+	}
+
+	static SampleFolder * getSampleFolder()
+	{
+		return s_sampleFolder;
 	}
 
 	static Song * getSong()
@@ -134,6 +140,7 @@ private:
 	// core
 	static AudioEngine *s_audioEngine;
 	static Mixer * s_mixer;
+	static SampleFolder * s_sampleFolder;
 	static Song * s_song;
 	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;

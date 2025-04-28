@@ -23,6 +23,7 @@
  */
 
 #include "Song.h"
+#include <QDir>
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
@@ -52,6 +53,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "SampleFolder.h"
 #include "Scale.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
@@ -1427,6 +1429,15 @@ void Song::setProjectFileName(QString const & projectFileName)
 	if (m_fileName != projectFileName)
 	{
 		m_fileName = projectFileName;
+
+		if (isSavedInSampleFolder() && projectFileName.size() > 0)
+		{
+			Engine::getSampleFolder()->setTargetFolderPath(projectFileName, true);
+		}
+		else
+		{
+			Engine::getSampleFolder()->resetTargetFolderPath();
+		}
 		emit projectFileNameChanged();
 	}
 }
@@ -1551,4 +1562,17 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
+
+bool Song::isSavedInSampleFolder() const
+{
+	bool output = false;
+	QString projectPath = projectFileName();
+	if (projectPath.size() <= 0) { return output; }
+
+	QDir projectDir (QFileInfo(projectPath).absoluteDir());
+	projectDir.cdUp();
+	output = projectDir.exists(QFileInfo(projectPath).baseName());
+	return output;
+}
+
 } // namespace lmms

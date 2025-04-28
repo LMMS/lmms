@@ -25,6 +25,7 @@
 #include "SampleClipView.h"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QMenu>
 #include <QPainter>
 
@@ -33,6 +34,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
+#include "SampleFolder.h"
 #include "SampleLoader.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
@@ -69,8 +71,8 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+		m_clip->m_sample.buffer()->empty() == false
+			? m_clip->m_sampleFile
 			: tr("Double-click to open sample")
 	);
 }
@@ -91,6 +93,13 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		tr("Reverse sample"),
 		this,
 		SLOT(reverseSample())
+	);
+
+	cm->addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("save to sample folder"),
+		this,
+		SLOT(exportSampleToSampleFolder())
 	);
 
 	cm->addAction(
@@ -128,7 +137,8 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		std::shared_ptr<const SampleBuffer> buffer = SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de));
+		m_clip->setSampleBuffer(buffer, buffer->audioFile());
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -195,10 +205,11 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	}
 	else
 	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		QString audioFileFinalName = selectedAudioFile;
+		auto sampleBuffer = Engine::getSampleFolder()->loadSample(selectedAudioFile, &audioFileFinalName);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
-			m_clip->setSampleBuffer(sampleBuffer);
+			m_clip->setSampleBuffer(sampleBuffer, audioFileFinalName);
 		}
 	}
 }
@@ -298,7 +309,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail.visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	QString name = PathUtil::cleanName(m_clip->m_sampleFile);
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -360,6 +371,12 @@ void SampleClipView::reverseSample()
 	update();
 }
 
+void SampleClipView::exportSampleToSampleFolder()
+{
+	QString newName = QFileInfo(m_clip->sampleFile()).baseName();
+	Engine::getSampleFolder()->saveSample(m_clip->sample().buffer(), newName, true, true, &newName);
+	m_clip->setSampleFile(newName);
+}
 
 
 void SampleClipView::setAutomationGhost()

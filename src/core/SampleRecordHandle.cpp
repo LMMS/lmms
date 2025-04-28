@@ -50,7 +50,7 @@ SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
 
 SampleRecordHandle::~SampleRecordHandle()
 {
-	if (!m_buffers.empty()) { m_clip->setSampleBuffer(createSampleBuffer()); }
+	if (!m_buffers.empty()) { m_clip->setSampleBuffer(createSampleBuffer(), QString("recording")); }
 
 	while( !m_buffers.empty() )
 	{

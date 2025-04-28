@@ -39,6 +39,7 @@ set(LMMS_SRCS
 	core/LadspaManager.cpp
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
+	core/LmmsExporterSample.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
 	core/Metronome.cpp
@@ -71,6 +72,7 @@ set(LMMS_SRCS
 	core/SampleBuffer.cpp
 	core/SampleClip.cpp
 	core/SampleDecoder.cpp
+	core/SampleFolder.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp

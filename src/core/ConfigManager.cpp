@@ -303,6 +303,9 @@ void ConfigManager::createWorkingDir()
 {
 	QDir().mkpath(m_workingDir);
 
+	QDir().mkpath(commonSampleFolderDir());
+	QDir().mkpath(commonSampleFolderDir() + COMMON_SAMPLE_FOLDER_USED);
+	QDir().mkpath(commonSampleFolderDir() + COMMON_SAMPLE_FOLDER_UNUSED);
 	QDir().mkpath(userProjectsDir());
 	QDir().mkpath(userTemplateDir());
 	QDir().mkpath(userSamplesDir());

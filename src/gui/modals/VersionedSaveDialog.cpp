@@ -188,8 +188,13 @@ SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 	m_saveAsProjectBundleCheckbox->setText(tr("Save As Project Bundle (with resources)"));
 	m_saveAsProjectBundleCheckbox->setModel(&saveOptions.saveAsProjectBundle);
 
+	m_makeSampleFolderForProject = new LedCheckBox(nullptr);
+	m_makeSampleFolderForProject->setText(tr("Save project inside sample folder"));
+	m_makeSampleFolderForProject->setModel(&saveOptions.makeSampleFolderForProject);
+
 	layout->addWidget(m_discardMIDIConnectionsCheckbox);
 	layout->addWidget(m_saveAsProjectBundleCheckbox);
+	layout->addWidget(m_makeSampleFolderForProject);
 
 	setLayout(layout);
 }

@@ -62,6 +62,7 @@
 #include "ProjectRenderer.h"
 #include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
+#include "SampleFolder.h" // SampleFolder::makeSampleFolderDirs();
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
@@ -821,6 +822,18 @@ bool MainWindow::saveProjectAs()
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		QString fname = sfd.selectedFiles()[0] ;
+
+		// making sample folder
+		if (Engine::getSong()->getSaveOptions().makeSampleFolderForProject.value() == true)
+		{
+			QString originalFileName(fname);
+			QString folderName(QFileInfo(fname).baseName());
+			QFileInfo(fname).absoluteDir().mkdir(folderName);
+			// making the file path include the new folder
+			fname = QFileInfo(originalFileName).absoluteDir().path() + "/" + folderName + "/" + QFileInfo(originalFileName).fileName();
+			SampleFolder::makeSampleFolderDirs(fname);
+		}
+
 		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
 		{
 			// Remove the default suffix
@@ -1546,9 +1559,13 @@ void MainWindow::handleSaveResult(QString const & filename, bool songSavedSucces
 
 bool MainWindow::guiSaveProject()
 {
+	Engine::getSampleFolder()->resetSavedStatus();
+
 	Song * song = Engine::getSong();
 	bool const songSaveResult = song->guiSaveProject();
 	handleSaveResult(song->projectFileName(), songSaveResult);
+
+	Engine::getSampleFolder()->sortManagedFiles();
 
 	return songSaveResult;
 }

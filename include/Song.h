@@ -91,10 +91,13 @@ public:
 		 * Should we save the project as a project bundle? (with resources)
 		 */
 		BoolModel saveAsProjectBundle{false};
+		//! Should the project be saved in a sample folder
+		BoolModel makeSampleFolderForProject{false};
 
 		void setDefaultOptions() {
 			discardMIDIConnections.setValue(false);
 			saveAsProjectBundle.setValue(false);
+			makeSampleFolderForProject.setValue(false);
 		}
 	};
 
@@ -378,6 +381,9 @@ public:
 	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
 
 	Metronome& metronome() { return m_metronome; }
+
+	//! returns true if the project is saved inside a folder that's name maches the project's name
+	bool isSavedInSampleFolder() const;
 
 public slots:
 	void playSong();
