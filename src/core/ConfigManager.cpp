@@ -31,7 +31,6 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QTextStream>
-#include <qdebug.h>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
