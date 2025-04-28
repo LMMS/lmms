@@ -69,15 +69,13 @@ public:
 	//! @p dst is expected to be an interleaved floating-point buffer (e.g. [LRLRLR...]).
 	//! Returns `false` on error or when no more input can be resampled and outputted into @p dst.
 	//! Returns `true` if all of @p dst was successfully filled with resampled audio data.
-	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> int;
+	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> bool;
 
 	//! Resamples audio into @p dst frames at the given @p ratio.
 	//! @p src is used as a source for retrieving input to resample.
 	//! @p dst is expected to be an interleaved floating-point buffer (e.g. [LRLRLR...]).
-	//! Callers should ensure that all of the frames in @p src have been consumed.
-	//! Returns `false` on error or if not all of @p src was consumed.
-	//! Returns `true` when all of @p src has been resampled and outputted into @p dst.
-	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int;
+	//! Callers are expected to give enough size to fit @p src into @p dst when resampled.
+	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> bool;
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }

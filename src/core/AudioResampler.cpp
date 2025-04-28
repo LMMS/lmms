@@ -61,7 +61,7 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallback callback) -> int
+auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallback callback) -> bool
 {
 	if (!m_state) { return false; }
 
@@ -97,8 +97,12 @@ auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallba
 	return true;
 }
 
-auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int
+auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> bool
 {
+	// This is to avoid having skipped frames if not all of
+	// the source buffer was read
+	assert(srcFrames * ratio <= dstFrames && "Invalid destination size");
+
 	auto data = SRC_DATA{
 		.data_in = src,
 		.data_out = dst,
