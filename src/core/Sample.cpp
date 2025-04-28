@@ -132,14 +132,17 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	return true;
 }
 
-std::size_t Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
+AudioResampler::WriteCallbackResult Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
 {
 	for (std::size_t frame = 0; frame < size; ++frame)
 	{
 		switch (loop)
 		{
 		case Loop::Off:
-			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame) { return frame; }
+			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame)
+			{
+				return {.done = true, .frames = static_cast<long>(frame)};
+			}
 			break;
 		case Loop::On:
 			if (state->frameIndex < m_loopStartFrame && state->backwards) { state->frameIndex = m_loopEndFrame - 1; }
@@ -166,7 +169,7 @@ std::size_t Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* st
 		state->backwards ? --state->frameIndex : ++state->frameIndex;
 	}
 
-	return size;
+	return {.done = false, .frames = static_cast<long>(size)};
 }
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds

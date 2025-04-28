@@ -71,8 +71,8 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) noexcept -> Sample&;
 
-	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loopMode = Loop::Off, double ratio = 1.0) const
-		-> bool;
+	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loopMode = Loop::Off,
+		double ratio = 1.0) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
@@ -101,7 +101,8 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	std::size_t render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const;
+	AudioResampler::WriteCallbackResult render(
+		SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;

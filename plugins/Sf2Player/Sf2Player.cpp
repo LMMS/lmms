@@ -871,7 +871,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
 	m_resampler.resample(&buf[0][0], frames, ratio, [&](float* dst, long frames, int channels) {
 		fluid_synth_write_float(m_synth, frames, dst, 0, 2, dst, 1, 2);
-		return frames;
+		return AudioResampler::WriteCallbackResult{.done = false, .frames = frames};
 	});
 
 	m_synthMutex.unlock();

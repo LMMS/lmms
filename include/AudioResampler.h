@@ -34,14 +34,20 @@
 
 namespace lmms {
 
-//! An RAII wrapper over libsamplerate.
-//! Also simplifies its usage.
+//! A RAII wrapper over libsamplerate meant to simplify its usage.
 class LMMS_EXPORT AudioResampler
 {
 public:
+	//! A result returned by @ref `WriteCallback`.
+	struct WriteCallbackResult
+	{
+		bool done = false; //! The callback should set this to `true` if the callback is done streaming input.
+		long frames = 0;   //! The number of frames the callback has written in.
+	};
+
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
-	//! The callback should return the number of frames actually written to @p dst.
-	using WriteCallback = std::function<long(float* dst, long frames, int channels)>;
+	//! The callback should return the number of frames actually written to @p dst, or
+	using WriteCallback = std::function<WriteCallbackResult(float* dst, long frames, int channels)>;
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
@@ -66,15 +72,14 @@ public:
 
 	//! Resamples audio into @p dst with at the given @p ratio.
 	//! The source audio is fetched periodically from @p callback.
-	//! @p dst is expected to be an interleaved floating-point buffer (e.g. [LRLRLR...]).
 	//! Returns `false` on error or when no more input can be resampled and outputted into @p dst.
 	//! Returns `true` if all of @p dst was successfully filled with resampled audio data.
 	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> bool;
 
 	//! Resamples audio into @p dst frames at the given @p ratio.
 	//! @p src is used as a source for retrieving input to resample.
-	//! @p dst is expected to be an interleaved floating-point buffer (e.g. [LRLRLR...]).
 	//! Callers are expected to give enough size to fit @p src into @p dst when resampled.
+	//! Returns `true` when all input has been resampled and stored in @p dst, and `false` otherwise.
 	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> bool;
 
 	//! Returns the number of channels expected by the resampler.
