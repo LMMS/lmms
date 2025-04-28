@@ -119,32 +119,15 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	std::fill_n(dst, numFrames, SampleFrame{});
+
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
+	if (loop == Loop::Off && state->frameIndex >= m_endFrame) { return false; }
 
-	while (numFrames > 0)
-	{
-		if (loop == Loop::Off && state->frameIndex >= m_endFrame) { return false; }
-
-		const auto resamplerInputView = state->resampler.inputWriterView();
-		const auto numFramesRendered = render(resamplerInputView.data(), resamplerInputView.size(), state, loop);
-		state->resampler.commitInputWrite(static_cast<long>(numFramesRendered));
-
-		if (const auto error = state->resampler.resample(ratio))
-		{
-			// TODO: Use a real-time safe solution for logging errors
-			std::cerr << "Resampling error: " << AudioResampler::errorDescription(error) << '\n';
-			return false;
-		}
-
-		const auto resamplerOutputView = state->resampler.outputReaderView();
-		const auto outputFramesToRead = std::min(numFrames, resamplerOutputView.size());
-		std::copy_n(resamplerOutputView.begin(), outputFramesToRead, dst);
-		state->resampler.commitOutputRead(static_cast<long>(outputFramesToRead));
-
-		dst += outputFramesToRead;
-		numFrames -= outputFramesToRead;
-	}
+	std::fill_n(dst, numFrames, SampleFrame{});
+	state->resampler.resample(&dst[0][0], numFrames, ratio, [this, state, loop](float* dst, long frames, int channels) {
+		assert(channels == DEFAULT_CHANNELS);
+		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
+	});
 
 	return true;
 }

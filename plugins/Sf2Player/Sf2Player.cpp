@@ -123,7 +123,7 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_resampler(static_cast<AudioResampler::InterpolationMode>(Engine::audioEngine()->currentQualitySettings().libsrcInterpolation())),
+	m_resampler(Engine::audioEngine()->currentQualitySettings().libsrcInterpolation()),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -869,23 +869,10 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
-	while (frames > 0)
-	{
-		const auto inputView = m_resampler.inputWriterView();
-		fluid_synth_write_float(m_synth, inputView.size(), inputView.data(), 0, 2, inputView.data(), 1, 2);
-		m_resampler.commitInputWrite(inputView.size());
-
-		const auto error = m_resampler.resample(ratio);
-		if (error) { qCritical("Sf2Instrument: error while resampling: %s", src_strerror(error)); }
-
-		const auto outputView = m_resampler.outputReaderView();
-		const auto outputFramesToRead = std::min(frames, outputView.size());
-		std::copy_n(outputView.begin(), outputFramesToRead, buf);
-		m_resampler.commitOutputRead(outputFramesToRead);
-
-		buf += outputFramesToRead;
-		frames -= outputFramesToRead;
-	}
+	m_resampler.resample(&buf[0][0], frames, ratio, [&](float* dst, long frames, int channels) {
+		fluid_synth_write_float(m_synth, frames, dst, 0, 2, dst, 1, 2);
+		return frames;
+	});
 
 	m_synthMutex.unlock();
 }

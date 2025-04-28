@@ -31,9 +31,11 @@
 
 namespace lmms {
 
-AudioResampler::AudioResampler(InterpolationMode interpolationMode)
-	: m_state(src_new(static_cast<int>(interpolationMode), DEFAULT_CHANNELS, &m_error))
-	, m_interpolationMode(interpolationMode)
+AudioResampler::AudioResampler(int mode, int channels)
+	: m_state(src_new(mode, channels, &m_error))
+	, m_data(SRC_DATA{.data_in = m_buffer.data(), .input_frames = 0})
+	, m_channels(channels)
+	, m_mode(mode)
 {
 	if (!m_state)
 	{
@@ -50,83 +52,75 @@ AudioResampler::~AudioResampler()
 
 AudioResampler::AudioResampler(AudioResampler&& other) noexcept
 	: m_state(std::exchange(other.m_state, nullptr))
-	, m_data(std::exchange(other.m_data, SRC_DATA{}))
 {
 }
 
 AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 {
 	m_state = std::exchange(other.m_state, nullptr);
-	m_data = std::exchange(other.m_data, SRC_DATA{});
 	return *this;
 }
 
-auto AudioResampler::resample(double ratio) -> int
+auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallback callback) -> int
 {
-	m_data.data_in = &m_input.buffer.data()[0][0] + m_input.readerIndex * DEFAULT_CHANNELS;
-	m_data.data_out = &m_output.buffer.data()[0][0] + m_output.writerIndex * DEFAULT_CHANNELS;
+	if (!m_state) { return false; }
 
-	m_data.input_frames = m_input.writerIndex - m_input.readerIndex;
-	m_data.output_frames = static_cast<long>(m_output.buffer.size()) - m_output.writerIndex;
+	m_data.data_out = dst;
+	m_data.output_frames = frames;
 
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
 
-	const auto error = src_process(m_state, &m_data);
-	if (error != 0) { return error; }
+	std::fill_n(dst, frames * m_channels, 0.f);
+	const auto maxInputFrames = static_cast<long>(m_buffer.size()) / m_channels;
 
-	m_input.readerIndex += m_data.input_frames_used;
-	m_output.writerIndex += m_data.output_frames_gen;
-
-	if (m_input.readerIndex == static_cast<long>(m_input.buffer.size()))
+	while (m_data.output_frames > 0)
 	{
-		m_input.readerIndex = 0;
-		m_input.writerIndex = 0;
+		if (m_data.input_frames == 0)
+		{
+			const auto framesWritten = callback(m_buffer.data(), maxInputFrames, m_channels);
+			m_data.data_in = m_buffer.data();
+			m_data.input_frames = framesWritten;
+			m_data.end_of_input = framesWritten < maxInputFrames;
+		}
+
+		if (src_process(m_state, &m_data)) { return false; }
+		if (m_data.end_of_input && m_data.output_frames_gen == 0) { return true; }
+
+		m_data.data_in += m_data.input_frames_used * m_channels;
+		m_data.data_out += m_data.output_frames_gen * m_channels;
+
+		m_data.input_frames -= m_data.input_frames_used;
+		m_data.output_frames -= m_data.output_frames_gen;
 	}
 
-	return 0;
+	return true;
 }
 
-auto AudioResampler::inputWriterView() -> std::span<SampleFrame>
+auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int
 {
-	const auto begin = m_input.buffer.begin() + m_input.writerIndex;
-	const auto end = m_input.buffer.end();
-	return begin == end ? std::span<SampleFrame>{} : std::span{begin, end};
-}
+	auto data = SRC_DATA{
+		.data_in = src,
+		.data_out = dst,
+		.input_frames = srcFrames,
+		.output_frames = dstFrames,
+		.end_of_input = 0,
+		.src_ratio = ratio
+	};
 
-auto AudioResampler::outputReaderView() const -> std::span<const SampleFrame>
-{
-	const auto begin = m_output.buffer.begin() + m_output.readerIndex;
-	const auto end = m_output.buffer.begin() + m_output.writerIndex;
-	return begin == end ? std::span<SampleFrame>{} : std::span{begin, end};
-}
-
-void AudioResampler::commitInputWrite(std::size_t frames)
-{
-	assert(m_input.writerIndex + frames <= m_input.buffer.size());
-	m_input.writerIndex += static_cast<long>(frames);
-}
-
-void AudioResampler::commitOutputRead(std::size_t frames)
-{
-	assert(m_output.readerIndex + frames <= m_output.writerIndex);
-	m_output.readerIndex += static_cast<long>(frames);
-
-	if (m_output.readerIndex == static_cast<long>(m_output.buffer.size()))
+	std::fill_n(dst, dstFrames * m_channels, 0.f);
+	while (data.output_frames > 0)
 	{
-		m_output.readerIndex = 0;
-		m_output.writerIndex = 0;
+		if (src_process(m_state, &data)) { return false; }
+
+		data.data_in += data.input_frames_used * m_channels;
+		data.data_out += data.output_frames_gen * m_channels;
+
+		data.input_frames -= data.input_frames_used;
+		data.output_frames -= data.output_frames_gen;
 	}
-}
 
-auto AudioResampler::interpolationModeName(InterpolationMode mode) -> const char*
-{
-	return src_get_name(static_cast<int>(mode));
-}
-
-auto AudioResampler::errorDescription(int error) -> const char*
-{
-	return src_strerror(error);
+	return data.input_frames == 0;
 }
 
 } // namespace lmms

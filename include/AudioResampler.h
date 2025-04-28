@@ -25,40 +25,27 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <array>
 #include <cassert>
+#include <functional>
 #include <samplerate.h>
-#include <span>
 
-#include "SampleFrame.h"
+#include "lmms_constants.h"
 #include "lmms_export.h"
 
 namespace lmms {
 
-//! An audio resampler.
-//! This can be used to resample or transpose an audio signal with various interpolation modes.
+//! An RAII wrapper over libsamplerate.
+//! Also simplifies its usage.
 class LMMS_EXPORT AudioResampler
 {
 public:
-	//! The interpolation modes supported by this resampler.
-	//! Note that this is subject to change if the resampler is implemented differently.
-	enum class InterpolationMode : int
-	{
-		None = -1,
-		ZeroOrderHold = SRC_ZERO_ORDER_HOLD,
-		Linear = SRC_LINEAR,
-		SincFast = SRC_SINC_FASTEST,
-		SincMedium = SRC_SINC_MEDIUM_QUALITY,
-		SincBest = SRC_SINC_BEST_QUALITY,
-		Count
-	};
-
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
 	//! The callback should return the number of frames actually written to @p dst.
-	using WriteCallback = std::size_t (*)(SampleFrame* dst, std::size_t frames, void* data);
+	using WriteCallback = std::function<long(float* dst, long frames, int channels)>;
 
-	//! Create a resampler with the given @p interpolationMode.
-	AudioResampler(InterpolationMode interpolationMode);
+	//! Create a resampler with the given interpolation mode and number of channels.
+	//! The constructor assumes stereo audio by default.
+	AudioResampler(int mode, int channels = DEFAULT_CHANNELS);
 
 	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
@@ -77,47 +64,33 @@ public:
 	//! Use of the moved from resampler is a no-op.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
-	//! Returns a view into the input buffer that callers can write to.
-	auto inputWriterView() -> std::span<SampleFrame>;
+	//! Resamples audio into @p dst with at the given @p ratio.
+	//! The source audio is fetched periodically from @p callback.
+	//! @p dst is expected to be an interleaved floating-point buffer (e.g. [LRLRLR...]).
+	//! Returns `false` on error or when no more input can be resampled and outputted into @p dst.
+	//! Returns `true` if all of @p dst was successfully filled with resampled audio data.
+	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> int;
 
-	//! Returns a view into the output buffer that callers can read from.
-	auto outputReaderView() const -> std::span<const SampleFrame>;
-
-	//! Commit to writing @p frames to the input buffer.
-	void commitInputWrite(std::size_t frames);
-
-	//! Commit to reading @p frames from the output buffer.
-	void commitOutputRead(std::size_t frames);
-
-	//! Resamples the audio from the input buffer at the given @p ratio.
-	//! Returns non-zero on error;
-	auto resample(double ratio) -> int;
-
-	//! Returns the interpolation mode the resampler is using.
-	auto interpolationMode() const -> InterpolationMode { return m_interpolationMode; }
+	//! Resamples audio into @p dst frames at the given @p ratio.
+	//! @p src is used as a source for retrieving input to resample.
+	//! @p dst is expected to be an interleaved floating-point buffer (e.g. [LRLRLR...]).
+	//! Callers should ensure that all of the frames in @p src have been consumed.
+	//! Returns `false` on error or if not all of @p src was consumed.
+	//! Returns `true` when all of @p src has been resampled and outputted into @p dst.
+	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int;
 
 	//! Returns the number of channels expected by the resampler.
-	constexpr auto channels() const -> int { return DEFAULT_CHANNELS; }
+	auto channels() const -> int { return m_channels; }
 
-	//! Returns the textual name for the given interpolation mode.
-	static auto interpolationModeName(InterpolationMode mode) -> const char*;
-
-	//! Returns the description for a resampling error.
-	static auto errorDescription(int error) -> const char*;
+	//! Returns the interpolation mode used by this resampler.
+	auto mode() const -> int { return m_mode; }
 
 private:
-	struct Stream
-	{
-		std::array<SampleFrame, 32> buffer;
-		long readerIndex = 0;
-		long writerIndex = 0;
-	};
-
-	Stream m_input;
-	Stream m_output;
+	std::array<float, 256> m_buffer{};
 	SRC_STATE* m_state = nullptr;
 	SRC_DATA m_data = SRC_DATA{};
-	InterpolationMode m_interpolationMode = AudioResampler::InterpolationMode::None;
+	int m_channels = 0;
+	int m_mode = 0;
 	int m_error = 0;
 };
 } // namespace lmms
