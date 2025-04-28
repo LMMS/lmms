@@ -109,6 +109,8 @@ private:
 	QStaticText m_staticTextName;
 
 	bool m_legacySEPattern;
+
+	bool isResizableBeforeStart() override { return false; }
 	
 	bool destructiveSplitClip(const TimePos pos) override;
 } ;

@@ -935,6 +935,11 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 								m_trackView->trackContainerView()->currentPosition() +
 								static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
 
+			if (!isResizableBeforeStart())
+			{
+				t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
+			}
+
 			if( unquantizedModHeld(me) )
 			{	// We want to preserve this adjusted offset,
 				// even if the user switches to snapping later

@@ -246,6 +246,8 @@ private:
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
 	
+	//! Returns whether the user can left-resize this clip so that the start of the clip bounds is before the start of the clip content.
+	virtual bool isResizableBeforeStart() { return true; };
 	/**
 	* Split this Clip into two clips
 	* @param pos the position of the split, relative to the start of the clip
