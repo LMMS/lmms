@@ -1,10 +1,5 @@
 set_directory_properties(PROPERTIES SYSTEM TRUE)
 
-if(LMMS_BUILD_LINUX AND LMMS_HAVE_VST)
-	set(BUILD_SHARED_LIBS OFF)
-	add_subdirectory(qt5-x11embed)
-ENDIF()
-
 add_library(jack_headers INTERFACE)
 target_include_directories(jack_headers INTERFACE jack2/common)
 

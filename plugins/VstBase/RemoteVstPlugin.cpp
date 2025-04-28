@@ -121,9 +121,6 @@ using namespace std;
 
 static lmms::VstHostLanguage hlang = lmms::VstHostLanguage::English;
 
-static bool EMBED = false;
-static bool EMBED_X11 = false;
-static bool EMBED_WIN32 = false;
 static bool HEADLESS = false;
 
 namespace lmms
@@ -561,10 +558,9 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 bool RemoteVstPlugin::processMessage( const message & _m )
 {
-	if (! EMBED)
+	
+	switch( _m.id )
 	{
-		switch( _m.id )
-		{
 		case IdShowUI:
 			showEditor();
 			return true;
@@ -590,6 +586,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			return true;
 
 		case IdIsUIVisible:
+		{
 #ifndef NATIVE_LINUX_VST
 			bool visible = m_window && IsWindowVisible( m_window );
 #else
@@ -599,14 +596,6 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 						 .addInt( visible ? 1 : 0 ) );
 			return true;
 		}
-	}
-	else if (EMBED && _m.id == IdShowUI)
-	{
-#ifndef NATIVE_LINUX_VST
-		ShowWindow( m_window, SW_SHOWNORMAL );
-		UpdateWindow( m_window );
-#endif
-		return true;
 	}
 
 	switch( _m.id )
@@ -798,12 +787,7 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	DWORD dwStyle;
-	if (EMBED) {
-		dwStyle = WS_POPUP | WS_SYSMENU | WS_BORDER;
-	} else {
-		dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
-	}
+	DWORD dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
 
 	m_window = CreateWindowEx( WS_EX_APPWINDOW, "LVSL", pluginName(),
 		dwStyle,
@@ -881,7 +865,7 @@ void RemoteVstPlugin::initEditor()
 
 
 void RemoteVstPlugin::showEditor() {
-	if( !EMBED && !HEADLESS && m_window )
+	if (!HEADLESS && m_window)
 	{
 #ifndef NATIVE_LINUX_VST
 		ShowWindow( m_window, SW_SHOWNORMAL );
@@ -900,7 +884,7 @@ void RemoteVstPlugin::showEditor() {
 
 
 void RemoteVstPlugin::hideEditor() {
-	if( !EMBED && !HEADLESS && m_window )
+	if (!HEADLESS && m_window)
 	{
 #ifndef NATIVE_LINUX_VST
 		ShowWindow( m_window, SW_HIDE );
@@ -2200,7 +2184,6 @@ void * RemoteVstPlugin::processingThread(void * _param)
 	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
 	{
-		
 		if( m.id == IdStartProcessing
 			|| m.id == IdMidiEvent
 			|| m.id == IdVstSetParameter
@@ -2450,41 +2433,19 @@ int main( int _argc, char * * _argv )
 		if ( embedMethod == "none" )
 		{
 			std::cerr << "Starting detached." << std::endl;
-			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
-		}
-		else if ( embedMethod == "win32" )
-		{
-			std::cerr << "Starting using Win32-native embedding." << std::endl;
-			EMBED = EMBED_WIN32 = true; EMBED_X11 = HEADLESS = false;
-		}
-		else if ( embedMethod == "qt" )
-		{
-			std::cerr << "Starting using Qt-native embedding." << std::endl;
-			EMBED = true; EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
-		}
-		else if ( embedMethod == "xembed" )
-		{
-			std::cerr << "Starting using X11Embed protocol." << std::endl;
-			EMBED = EMBED_X11 = true; EMBED_WIN32 = HEADLESS = false;
+			HEADLESS = false;
 		}
 		else if ( embedMethod == "headless" )
 		{
 			std::cerr << "Starting without UI." << std::endl;
-			HEADLESS = true; EMBED = EMBED_X11 = EMBED_WIN32 = false;
+			HEADLESS = true;
 		}
 		else
 		{
 			std::cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << std::endl;
-			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
+			HEADLESS = false;
 		}
 	}
-
-#ifdef NATIVE_LINUX_VST
-	if (EMBED)
-	{
-		std::cerr << "Native linux VST works only without embedding." << std::endl;
-	}
-#endif
 	
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it

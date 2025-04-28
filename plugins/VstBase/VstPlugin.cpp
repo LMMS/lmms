@@ -34,13 +34,7 @@
 #include <QLocale>
 #include <QTemporaryFile>
 
-#ifdef LMMS_BUILD_LINUX
-#	include <QX11Info>
-#	include <X11EmbedContainer.h>
-#endif
-
 #include <QWindow>
-
 
 #ifdef LMMS_BUILD_WIN32
 #	include <windows.h>
@@ -57,6 +51,7 @@
 #include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
+#	include <QX11Info>
 #	include <X11/Xlib.h>
 #endif
 
@@ -124,9 +119,7 @@ enum class ExecutableType
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( (gui::getGUI() != nullptr)
-			? ConfigManager::inst()->vstEmbedMethod()
-			: "headless" ),
+	m_embedMethod((gui::getGUI() != nullptr) ? "none" : "headless"),
 	m_version( 0 ),
 	m_currentProgram()
 {
@@ -270,22 +263,12 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
-{
-	if ( m_embedMethod != "none" )
+{	
+	int visible = isUIVisible();
+	if ( visible != -1 )
 	{
-		if( pluginWidget() != nullptr )
-		{
-			_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
-		}
-	}
-	else
-	{
-		int visible = isUIVisible();
-		if ( visible != -1 )
-		{
-			_this.setAttribute( "guivisible", visible );
-		}
-	}
+		_this.setAttribute( "guivisible", visible );
+	}	
 
 	// try to save all settings in a chunk
 	QByteArray chunk = saveChunk();
@@ -308,20 +291,6 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	_this.setAttribute( "program", currentProgram() );
 }
-
-void VstPlugin::toggleUI()
-{
-	if ( m_embedMethod == "none" )
-	{
-		RemotePlugin::toggleUI();
-	}
-	else if (pluginWidget())
-	{
-		toggleEditorVisibility();
-	}
-}
-
-
 
 
 void VstPlugin::setTempo( bpm_t _bpm )
@@ -415,7 +384,6 @@ bool VstPlugin::processMessage( const message & _m )
 					GWLP_HWNDPARENT,
 					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
-
 #ifdef LMMS_BUILD_LINUX
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
@@ -656,15 +624,6 @@ void VstPlugin::hideUI()
 	}
 }
 
-// X11Embed only
-void VstPlugin::handleClientEmbed()
-{
-	lock();
-	sendMessage( IdShowUI );
-	unlock();
-}
-
-
 
 void VstPlugin::loadChunk( const QByteArray & _chunk )
 {
@@ -727,87 +686,8 @@ void VstPlugin::createUI( QWidget * parent )
 		m_pluginWidget->setParent( parent );
 		return;
 	}
-
-	if( m_pluginWindowID == 0 )
-	{
-		return;
-	}
-
-	QWidget* container = nullptr;
-
-	if (m_embedMethod == "qt" )
-	{
-		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
-		container = QWidget::createWindowContainer(vw, parent );
-		container->installEventFilter(this);
-	} else
-
-#ifdef LMMS_BUILD_WIN32
-	if (m_embedMethod == "win32" )
-	{
-		QWidget * helper = new QWidget;
-		QHBoxLayout * l = new QHBoxLayout( helper );
-		QWidget * target = new QWidget( helper );
-		l->setSpacing( 0 );
-		l->setContentsMargins(0, 0, 0, 0);
-		l->addWidget( target );
-
-		// we've to call that for making sure, Qt created the windows
-		helper->winId();
-		HWND targetHandle = (HWND)target->winId();
-		HWND pluginHandle = (HWND)(intptr_t)m_pluginWindowID;
-
-		DWORD style = GetWindowLong(pluginHandle, GWL_STYLE);
-		style = style & ~(WS_POPUP);
-		style = style | WS_CHILD;
-		SetWindowLong(pluginHandle, GWL_STYLE, style);
-		SetParent(pluginHandle, targetHandle);
-
-		DWORD threadId = GetWindowThreadProcessId(pluginHandle, nullptr);
-		DWORD currentThreadId = GetCurrentThreadId();
-		AttachThreadInput(currentThreadId, threadId, true);
-
-		container = helper;
-		RemotePlugin::showUI();
-
-	} else
-#endif
-
-#ifdef LMMS_BUILD_LINUX
-	if (m_embedMethod == "xembed" )
-	{
-		if (parent)
-		{
-			parent->setAttribute(Qt::WA_NativeWindow);
-		}
-		auto embedContainer = new QX11EmbedContainer(parent);
-		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
-		embedContainer->embedClient( m_pluginWindowID );
-		container = embedContainer;
-	} else
-#endif
-	{
-		qCritical() << "Unknown embed method" << m_embedMethod;
-		return;
-	}
-
-	container->setFixedSize( m_pluginGeometry );
-	container->setWindowTitle( name() );
-
-	m_pluginWidget = container;
 }
 
-bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
-{
-	if (embedMethod() == "qt" && obj == m_pluginWidget)
-	{
-		if (event->type() == QEvent::Show) {
-			RemotePlugin::showUI();
-		}
-		qDebug() << obj << event;
-	}
-	return false;
-}
 
 QString VstPlugin::embedMethod() const
 {

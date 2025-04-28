@@ -194,32 +194,6 @@ bool ConfigManager::enableBlockedPlugins()
 	return (envVar && *envVar);
 }
 
-QStringList ConfigManager::availableVstEmbedMethods()
-{
-	QStringList methods;
-	methods.append("none");
-	methods.append("qt");
-#ifdef LMMS_BUILD_WIN32
-	methods.append("win32");
-#endif
-#ifdef LMMS_BUILD_LINUX
-	if (static_cast<QGuiApplication*>(QApplication::instance())->
-		platformName() == "xcb")
-	{
-		methods.append("xembed");
-	}
-#endif
-	return methods;
-}
-
-QString ConfigManager::vstEmbedMethod() const
-{
-	QStringList methods = availableVstEmbedMethods();
-	QString defaultMethod = *(methods.end() - 1);
-	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
-	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
-}
-
 bool ConfigManager::hasWorkingDir() const
 {
 	return QDir(m_workingDir).exists();
