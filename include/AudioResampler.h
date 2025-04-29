@@ -34,7 +34,8 @@
 
 namespace lmms {
 
-//! A RAII wrapper over libsamplerate meant to simplify its usage.
+//! An audio resampler.
+//! This can be used to convert sample rates, transpose a signal in pitch, etc.
 class LMMS_EXPORT AudioResampler
 {
 public:
@@ -62,31 +63,30 @@ public:
 	//! Resamplers cannot be copied.
 	AudioResampler& operator=(const AudioResampler&) = delete;
 
-	//! Moves the state from one resampler to another.
-	//! Use of the moved from resampler is a no-op.
+	//! Moves the internal state from one resampler to another.
 	AudioResampler(AudioResampler&&) noexcept;
 
-	//! Moves the state from one resampler to another.
-	//! Use of the moved from resampler is a no-op.
+	//! Moves the internal state from one resampler to another.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Resamples audio into @p dst with at the given @p ratio.
 	//! The source audio is fetched periodically from @p callback.
-	//! Returns `false` on error or when no more input can be resampled and outputted into @p dst.
-	//! Returns `true` if all of @p dst was successfully filled with resampled audio data.
-	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> bool;
+	//! Returns non-zero on error.
+	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> int;
 
 	//! Resamples audio into @p dst frames at the given @p ratio.
 	//! @p src is used as a source for retrieving input to resample.
-	//! Callers are expected to give enough size to fit @p src into @p dst when resampled.
-	//! Returns `true` when all input has been resampled and stored in @p dst, and `false` otherwise.
-	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> bool;
+	//! Returns non-zero on error.
+	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int;
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
 
 	//! Returns the interpolation mode used by this resampler.
 	auto mode() const -> int { return m_mode; }
+
+	//! Returns an error description for errors returned by \ref resample.
+	static auto errorDescription(int error) -> const char* { return src_strerror(error); }
 
 private:
 	std::array<float, 256> m_buffer{};

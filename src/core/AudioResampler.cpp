@@ -33,12 +33,6 @@ namespace lmms {
 
 AudioResampler::AudioResampler(int mode, int channels)
 	: m_state(src_new(mode, channels, &m_error))
-	, m_data(SRC_DATA{.data_in = m_buffer.data(),
-		  .data_out = nullptr,
-		  .input_frames = 0,
-		  .output_frames = 0,
-		  .end_of_input = 0,
-		  .src_ratio = 1.0})
 	, m_channels(channels)
 	, m_mode(mode)
 {
@@ -52,7 +46,7 @@ AudioResampler::AudioResampler(int mode, int channels)
 
 AudioResampler::~AudioResampler()
 {
-	if (m_state) { src_delete(m_state); }
+	src_delete(m_state);
 }
 
 AudioResampler::AudioResampler(AudioResampler&& other) noexcept
@@ -66,17 +60,14 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallback callback) -> bool
+auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallback callback) -> int
 {
-	if (!m_state) { return false; }
-
 	m_data.data_out = dst;
 	m_data.output_frames = frames;
 
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
 
-	std::fill_n(dst, frames * m_channels, 0.f);
 	const auto maxInputFrames = static_cast<long>(m_buffer.size()) / m_channels;
 	auto latestCallbackResult = WriteCallbackResult{};
 
@@ -89,8 +80,8 @@ auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallba
 			m_data.input_frames = latestCallbackResult.frames;
 		}
 
-		if (src_process(m_state, &m_data)) { return false; }
-		if (latestCallbackResult.done && m_data.output_frames_gen == 0) { return true; }
+		m_error = src_process(m_state, &m_data);
+		if (m_error || (latestCallbackResult.done && m_data.output_frames_gen == 0)) { break; }
 
 		m_data.data_in += m_data.input_frames_used * m_channels;
 		m_data.data_out += m_data.output_frames_gen * m_channels;
@@ -99,31 +90,43 @@ auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallba
 		m_data.output_frames -= m_data.output_frames_gen;
 	}
 
-	return true;
+	// Silence any unfilled output
+	std::fill(dst + (frames - m_data.output_frames) * m_channels, dst + frames * m_channels, 0.f);
+	return 0;
 }
 
-auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> bool
+auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int
 {
-	auto data = SRC_DATA{.data_in = src,
-		.data_out = dst,
-		.input_frames = srcFrames,
-		.output_frames = dstFrames,
-		.end_of_input = 0,
-		.src_ratio = ratio};
+	m_data.data_out = dst;
+	m_data.output_frames = dstFrames;
 
-	std::fill_n(dst, dstFrames * m_channels, 0.f);
-	while (data.output_frames > 0 && data.input_frames > 0)
+	m_data.src_ratio = ratio;
+	m_data.end_of_input = 0;
+
+	while (m_data.output_frames > 0)
 	{
-		if (src_process(m_state, &data)) { return false; }
+		if (m_data.input_frames == 0)
+		{
+			// Dont try to read from src again, thats all the extra input we have
+			if (m_data.data_in == src) { break; }
 
-		data.data_in += data.input_frames_used * m_channels;
-		data.data_out += data.output_frames_gen * m_channels;
+			m_data.data_in = src;
+			m_data.input_frames = srcFrames;
+		}
 
-		data.input_frames -= data.input_frames_used;
-		data.output_frames -= data.output_frames_gen;
+		m_error = src_process(m_state, &m_data);
+		if (m_error) { break; }
+
+		m_data.data_in += m_data.input_frames_used * m_channels;
+		m_data.data_out += m_data.output_frames_gen * m_channels;
+
+		m_data.input_frames -= m_data.input_frames_used;
+		m_data.output_frames -= m_data.output_frames_gen;
 	}
 
-	return data.input_frames == 0 && data.output_frames == 0;
+	// Silence any unfilled output
+	std::fill(dst + (dstFrames - m_data.output_frames) * m_channels, dst + dstFrames * m_channels, 0.f);
+	return 0;
 }
 
 } // namespace lmms
