@@ -102,7 +102,8 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0),
-	m_ghostNoteColor(0, 0, 0)
+	m_ghostNoteColor(0, 0, 0),
+	m_outOfBoundsShade(0, 0, 0, 128)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -182,6 +183,7 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &AutomationClip::lengthChanged, this, qOverload<>(&QWidget::update));
 	}
 
 	emit currentClipChanged();
@@ -1381,6 +1383,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				drawAutomationTangents(p, it);
 			}
 		}
+
+		// draw clip bounds overlay
+		p.fillRect(
+			xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
+			TOP_MARGIN,
+			width() - 10,
+			grid_bottom,
+			m_outOfBoundsShade
+		);
+		p.fillRect(
+			0,
+			TOP_MARGIN,
+			xCoordOfTick(-m_clip->startTimeOffset()),
+			grid_bottom,
+			m_outOfBoundsShade
+		);
 	}
 	else
 	{
@@ -1397,7 +1415,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 
 	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() : 0;
+	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )

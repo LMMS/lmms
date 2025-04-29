@@ -61,7 +61,30 @@ Clip::Clip( Track * track ) :
 }
 
 
-
+/*! \brief Copy a Clip
+ *
+ *  Creates a duplicate clip of the one provided.
+ *
+ * \param other The clip object which will be copied.
+ */
+Clip::Clip(const Clip& other):
+	Model(other.m_track),
+	m_track(other.m_track),
+	m_name(other.m_name),
+	m_startPosition(other.m_startPosition),
+	m_length(other.m_length),
+	m_startTimeOffset(other.m_startTimeOffset),
+	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
+	m_resizable(other.m_resizable),
+	m_autoResize(other.m_autoResize),
+	m_selectViewOnCreate{other.m_selectViewOnCreate},
+	m_color(other.m_color)
+{
+	if (getTrack())
+	{
+		getTrack()->addClip(this);
+	}
+}
 
 /*! \brief Destroy a Clip
  *

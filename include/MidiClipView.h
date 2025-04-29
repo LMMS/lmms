@@ -63,6 +63,11 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	static void mergeClips(QVector<ClipView*> clipvs);
+	static void bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs);
+
 public slots:
 	lmms::MidiClip* getMidiClip();
 	void update() override;
@@ -76,6 +81,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void transposeSelection();
+	void clearNotesOutOfBounds();
 
 
 protected:
@@ -103,6 +109,10 @@ private:
 	QStaticText m_staticTextName;
 
 	bool m_legacySEPattern;
+
+	bool isResizableBeforeStart() override { return false; }
+	
+	bool destructiveSplitClip(const TimePos pos) override;
 } ;
 
 
