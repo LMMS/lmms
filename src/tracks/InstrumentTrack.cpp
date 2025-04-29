@@ -751,7 +751,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		TimePos cur_start = _start;
 		if( _clip_num < 0 )
 		{
-			cur_start -= c->startPosition();
+			cur_start -= c->startPosition() + c->startTimeOffset();
 		}
 
 		// get all notes from the given clip...
@@ -762,25 +762,33 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
 
-
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-bar
-			while( nit != notes.end() && ( *nit )->pos() < cur_start )
+			// skip notes which end before start-bar
+			while( nit != notes.end() && ( *nit )->endPos() < cur_start )
 			{
 				++nit;
 			}
 		}
 
-		while (nit != notes.end() && (*nit)->pos() == cur_start)
+		while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset())
 		{
 			const auto currentNote = *nit;
+			// Skip any notes note at the current time pos or not overlapping with the start.
+			if (!(currentNote->pos() == cur_start
+				|| (cur_start == -c->startTimeOffset() && (*nit)->pos() < cur_start && (*nit)->endPos() > cur_start)))
+			{
+				++nit;
+				continue;
+			}
 
+			// Calculate the overlap of the note over the clip end.
+			const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
 			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
 			// plays for the whole length of the sample
 			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
-				: currentNote->length().frames(frames_per_tick);
+				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
@@ -789,7 +797,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );
