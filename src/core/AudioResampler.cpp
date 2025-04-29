@@ -124,6 +124,13 @@ auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long
 		m_data.output_frames -= m_data.output_frames_gen;
 	}
 
+	// Enforce that the entire source buffer must be resampled into the destination buffer
+	// This avoids having to worry about dropped source audio after this function completes.
+	if (m_data.input_frames > 0)
+	{
+		throw std::logic_error{"Cannot resample entire source buffer into destination buffer"};
+	}
+
 	// Silence any unfilled output
 	std::fill(dst + (dstFrames - m_data.output_frames) * m_channels, dst + dstFrames * m_channels, 0.f);
 	return 0;

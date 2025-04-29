@@ -36,13 +36,14 @@ namespace lmms {
 
 //! An audio resampler.
 //! This can be used to convert sample rates, transpose a signal in pitch, etc.
+//! Only works with interleaved audio (i.e, [LRLRLR...])
 class LMMS_EXPORT AudioResampler
 {
 public:
 	//! A result returned by @ref `WriteCallback`.
 	struct WriteCallbackResult
 	{
-		bool done = false; //! The callback should set this to `true` if the callback is done streaming input.
+		bool done = false; //! The callback should set this to `true` if it is is done streaming input.
 		long frames = 0;   //! The number of frames the callback has written in.
 	};
 
@@ -76,6 +77,7 @@ public:
 
 	//! Resamples audio into @p dst frames at the given @p ratio.
 	//! @p src is used as a source for retrieving input to resample.
+	//! It is required that the entire source buffer can be resampled into the destination buffer.
 	//! Returns non-zero on error.
 	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int;
 
