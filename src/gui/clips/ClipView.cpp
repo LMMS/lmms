@@ -903,7 +903,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				setInitialPos( m_initialMousePos );
 				// Don't resize to less than 1 tick
 				m_clip->changeLength( qMax<int>( 1, l ) );
-				m_clip->setHasBeenResized(true);
+				m_clip->setAutoResize(false);
 			}
 			else if ( me->modifiers() & Qt::ShiftModifier )
 			{	// If shift is held, quantize clip's end position
@@ -912,7 +912,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				TimePos min = m_initialClipPos.quantize( snapSize );
 				if ( min <= m_initialClipPos ) min += snapLength;
 				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
-				m_clip->setHasBeenResized(true);
+				m_clip->setAutoResize(false);
 			}
 			else
 			{	// Otherwise, resize in fixed increments
@@ -922,7 +922,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				auto min = TimePos(initialLength % snapLength);
 				if (min < 1) min += snapLength;
 				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
-				m_clip->setHasBeenResized(true);
+				m_clip->setAutoResize(false);
 			}
 		}
 		else
@@ -985,7 +985,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				{
 					m_clip->setStartTimeOffset(m_clip->startTimeOffset() + positionOffset);
 				}
-				m_clip->setHasBeenResized(true);
+				m_clip->setAutoResize(false);
 			}
 		}
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
@@ -1134,8 +1134,8 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	contextMenu.addMenu(&colorMenu);
 
 	contextMenu.addAction(
-		m_clip->getHasBeenResized() ? embed::getIconPixmap("auto_resize") : embed::getIconPixmap("auto_resize_disable"),
-		m_clip->getHasBeenResized() ? tr("Enable auto-resize") : tr("Disable auto-resize"),
+		m_clip->getAutoResize() ? embed::getIconPixmap("auto_resize_disable") : embed::getIconPixmap("auto_resize"),
+		m_clip->getAutoResize() ? tr("Disable auto-resize") : tr("Enable auto-resize"),
 		this, &ClipView::toggleSelectedAutoResize
 	);
 
@@ -1252,13 +1252,13 @@ void ClipView::toggleMute( QVector<ClipView *> clipvs )
 
 void ClipView::toggleSelectedAutoResize()
 {
-	const bool newState = !m_clip->getHasBeenResized();
+	const bool newState = !m_clip->getAutoResize();
 	std::set<Track*> journaledTracks;
 	for (auto clipv: getClickedClips())
 	{
 		Clip* clip = clipv->getClip();
 		if (journaledTracks.insert(clip->getTrack()).second) { clip->getTrack()->addJournalCheckPoint(); }
-		clip->setHasBeenResized(newState);
+		clip->setAutoResize(newState);
 		clip->updateLength();
 	}
 }
@@ -1456,12 +1456,12 @@ bool ClipView::splitClip(const TimePos pos)
 	auto rightClip = m_clip->clone();
 
 	m_clip->changeLength(splitPos - m_initialClipPos);
-	m_clip->setHasBeenResized(true);
+	m_clip->setAutoResize(false);
 
 	rightClip->movePosition(splitPos);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
 	rightClip->setStartTimeOffset(m_clip->startTimeOffset() - m_clip->length());
-	rightClip->setHasBeenResized(true);
+	rightClip->setAutoResize(false);
 
 	m_clip->getTrack()->restoreJournallingState();
 	return true;

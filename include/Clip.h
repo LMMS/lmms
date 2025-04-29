@@ -116,14 +116,14 @@ public:
 	 *  resize when editing it.
 	 *
 	 */
-	void setHasBeenResized(const bool r)
+	void setAutoResize(const bool r)
 	{
-		m_hasBeenResized = r;
+		m_autoResize = r;
 	}
 
-	bool getHasBeenResized() const
+	bool getAutoResize() const
 	{
-		return m_hasBeenResized;
+		return m_autoResize;
 	}
 
 	auto color() const -> const std::optional<QColor>& { return m_color; }
@@ -184,7 +184,7 @@ private:
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 	bool m_resizable = true;
-	bool m_hasBeenResized = false;
+	bool m_autoResize = true;
 
 	bool m_selectViewOnCreate;
 

@@ -359,8 +359,8 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 	}
 
 	// Update length to extend from the start of the first clip to the end of the last clip
-	newMidiClip->setHasBeenResized(true);
 	newMidiClip->changeLength(latestPos - earliestPos);
+	newMidiClip->setAutoResize(false);
 	// Rearrange notes because we might have moved them
 	newMidiClip->rearrangeAllNotes();
 	// Restore journalling states now that the operation is finished
@@ -377,7 +377,7 @@ void MidiClipView::clearNotesOutOfBounds()
 	m_clip->getTrack()->saveJournallingState(false);
 
 	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
-	newClip->setHasBeenResized(m_clip->getHasBeenResized());
+	newClip->setAutoResize(m_clip->getAutoResize());
 	newClip->movePosition(m_clip->startPosition());
 
 	TimePos startBound = -m_clip->startTimeOffset();
@@ -913,12 +913,12 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	}
 
 	leftClip->movePosition(m_initialClipPos);
-	leftClip->setHasBeenResized(true);
+	leftClip->setAutoResize(false);
 	leftClip->changeLength(splitPos - m_initialClipPos);
 	leftClip->setStartTimeOffset(m_clip->startTimeOffset());
 
 	rightClip->movePosition(splitPos);
-	rightClip->setHasBeenResized(true);
+	rightClip->setAutoResize(false);
 	rightClip->changeLength(m_initialClipEnd - splitPos);
 	rightClip->setStartTimeOffset(0);
 

@@ -151,7 +151,7 @@ void MidiClip::updateLength()
 
 	// If the clip has already been manually resized, don't automatically resize it.
 	// Unless we are in a pattern, where you can't resize stuff manually
-	if (!getHasBeenResized() || !getResizable())
+	if (getAutoResize() || !getResizable())
 	{
 		tick_t max_length = TimePos::ticksPerBar();
 
@@ -426,7 +426,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
-	_this.setAttribute("been_resized", QString::number(getHasBeenResized()));
+	_this.setAttribute("autoresize", QString::number(getAutoResize()));
 	_this.setAttribute("off", startTimeOffset());
 	
 	if (const auto& c = color())
@@ -513,7 +513,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		changeLength(len);
 	}
 	
-	setHasBeenResized(_this.attribute("been_resized").toInt());
+	setAutoResize(_this.attribute("autoresize").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
 
 	emit dataChanged();
