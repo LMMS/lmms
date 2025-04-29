@@ -70,13 +70,13 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
+			setResizable(false);
 			break;
 
 		case TrackContainer::Type::Song:
 			// move down
 		default:
-			setAutoResize( false );
+			setResizable(true);
 			break;
 	}
 	updateTrackClips();
@@ -120,13 +120,13 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
+			setResizable(false);
 			break;
 
 		case TrackContainer::Type::Song:
 			// move down
 		default:
-			setAutoResize( false );
+			setResizable(true);
 			break;
 	}
 	updateTrackClips();

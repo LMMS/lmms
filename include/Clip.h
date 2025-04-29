@@ -100,14 +100,14 @@ public:
 	 *  resized by clicking and dragging its edge.
 	 *
 	 */
-	inline void setAutoResize( const bool r )
+	inline void setResizable( const bool r )
 	{
-		m_autoResize = r;
+		m_resizable = r;
 	}
 
-	inline const bool getAutoResize() const
+	inline const bool getResizable() const
 	{
-		return m_autoResize;
+		return m_resizable;
 	}
 
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
@@ -183,7 +183,7 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_autoResize = false;
+	bool m_resizable = true;
 	bool m_hasBeenResized = false;
 
 	bool m_selectViewOnCreate;

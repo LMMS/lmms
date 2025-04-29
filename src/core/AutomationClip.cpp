@@ -65,13 +65,13 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 		switch( getTrack()->trackContainer()->type() )
 		{
 			case TrackContainer::Type::Pattern:
-				setAutoResize( true );
+				setResizable(false);
 				break;
 
 			case TrackContainer::Type::Song:
 				// move down
 			default:
-				setAutoResize( false );
+				setResizable(true);
 				break;
 		}
 	}
@@ -109,13 +109,13 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
+			setResizable(false);
 			break;
 
 		case TrackContainer::Type::Song:
 			// move down
 		default:
-			setAutoResize( false );
+			setResizable(true);
 			break;
 	}
 }
