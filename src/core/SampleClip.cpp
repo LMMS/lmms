@@ -37,8 +37,8 @@
 namespace lmms
 {
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
+SampleClip::SampleClip(Sample sample, bool isPlaying)
+	: Clip()
 	, m_sample(std::move(sample))
 	, m_isPlaying(false)
 {
@@ -61,34 +61,20 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
 	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
-	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
-			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
 	updateTrackClips();
 }
 
-SampleClip::SampleClip(Track* track)
-	: SampleClip(track, Sample(), false)
+SampleClip::SampleClip()
+	: SampleClip(Sample(), false)
 {
 }
 
 SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.getTrack(), orig.m_sample, orig.m_isPlaying)
+	SampleClip(orig.m_sample, orig.m_isPlaying)
 {
 }
 
@@ -104,7 +90,20 @@ SampleClip::~SampleClip()
 	}
 }
 
+void SampleClip::setTrack(Track* track)
+{
+	Clip::setTrack(track);
 
+	if (getTrack())
+	{
+		disconnect(getTrack()->getMutedModel(), &Track::dataChanged, this, &SampleClip::playbackPositionChanged);
+	}
+
+	if (track)
+	{
+		connect(track->getMutedModel(), &Track::dataChanged, this, &SampleClip::playbackPositionChanged, Qt::DirectConnection);
+	}
+}
 
 
 void SampleClip::changeLength( const TimePos & _length )
@@ -184,8 +183,7 @@ void SampleClip::toggleRecord()
 void SampleClip::playbackPositionChanged()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::Type::SamplePlayHandle );
-	auto st = dynamic_cast<SampleTrack*>(getTrack());
-	st->setPlayingClips( false );
+	if (auto st = dynamic_cast<SampleTrack*>(getTrack())) { st->setPlayingClips(false); }
 }
 
 

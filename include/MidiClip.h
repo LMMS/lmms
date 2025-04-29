@@ -28,13 +28,11 @@
 
 #include "Clip.h"
 #include "Note.h"
-
+#include "InstrumentTrack.h"
 
 namespace lmms
 {
 
-
-class InstrumentTrack;
 
 namespace gui
 {
@@ -52,12 +50,11 @@ public:
 		MelodyClip
 	} ;
 
-	MidiClip( InstrumentTrack* instrumentTrack );
+	MidiClip(Type clipType = Type::BeatClip, int steps = TimePos::stepsPerBar());
 	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
-	void init();
-
+	void setTrack(Track * track) override;
 	void updateLength();
 
 	// note management
@@ -107,13 +104,11 @@ public:
 		return "midiclip";
 	}
 
-	inline InstrumentTrack * instrumentTrack() const
-	{
-		return m_instrumentTrack;
-	}
+	InstrumentTrack* instrumentTrack() const { return dynamic_cast<InstrumentTrack*>(getTrack()); }
 
 	bool empty();
 
+	void resizeToFirstTrack();
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
@@ -139,9 +134,6 @@ private:
 	void setType( Type _new_clip_type );
 	void checkType();
 
-	void resizeToFirstTrack();
-
-	InstrumentTrack * m_instrumentTrack;
 
 	Type m_clipType;
 

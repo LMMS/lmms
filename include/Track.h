@@ -84,7 +84,7 @@ public:
 		Count
 	} ;
 
-	Track( Type type, TrackContainer * tc );
+	Track(Type type);
 	~Track() override;
 
 	static Track * create( Type tt, TrackContainer * tc );
@@ -118,10 +118,8 @@ public:
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
 
-	// -- for usage by Clip only ---------------
-	Clip * addClip( Clip * clip );
-	void removeClip( Clip * clip );
-	// -------------------------------------------------------
+	virtual Clip* addClip(Clip* clip);
+	virtual void removeClip(Clip* clip);
 	void deleteClips();
 
 	int numOfClips();
@@ -149,6 +147,8 @@ public:
 	{
 		return m_trackContainer;
 	}
+
+	void setTrackContainer(TrackContainer* trackContainer) { m_trackContainer = trackContainer; }
 
 	// name-stuff
 	virtual const QString & name() const

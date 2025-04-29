@@ -388,6 +388,7 @@ bool SampleClipView::splitClip( const TimePos pos )
 		m_clip->getTrack()->saveJournallingState( false );
 
 		auto rightClip = new SampleClip(*m_clip);
+		rightClip->getTrack()->addClip(rightClip);
 
 		m_clip->changeLength( splitPos - m_initialClipPos );
 
