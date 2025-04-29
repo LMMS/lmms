@@ -67,13 +67,12 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 
 }
 
-
-LadspaEffect::LadspaEffect( Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
-	m_controls( nullptr ),
-	m_maxSampleRate( 0 ),
-	m_key( LadspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
+LadspaEffect::LadspaEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
+	: Effect(&ladspaeffect_plugin_descriptor, _parent, _key)
+	, m_resampler(Engine::audioEngine()->currentQualitySettings().libsrcInterpolation())
+	, m_controls(nullptr)
+	, m_maxSampleRate(0)
+	, m_key(LadspaSubPluginFeatures::subPluginKeyToLadspaKey(_key))
 {
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == nullptr )
@@ -138,6 +137,9 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 		return ProcessStatus::Sleep;
 	}
 
+	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
+	const auto resampleRatio = static_cast<double>(m_maxSampleRate) / Engine::audioEngine()->outputSampleRate();
+
 	auto outFrames = frames;
 	SampleFrame* outBuf = nullptr;
 	QVarLengthArray<SampleFrame> sBuf(frames);
@@ -146,9 +148,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 	{
 		outBuf = buf;
 		buf = sBuf.data();
-		sampleDown(outBuf, buf, m_maxSampleRate);
-		outFrames = frames * m_maxSampleRate /
-				Engine::audioEngine()->outputSampleRate();
+		m_resampler.resample(&buf[0][0], frames, &outBuf[0][0], frames, resampleRatio);
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
@@ -249,7 +249,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 
 	if (outBuf != nullptr)
 	{
-		sampleBack(buf, outBuf, m_maxSampleRate);
+		m_resampler.resample(&outBuf[0][0], framesPerPeriod, &buf[0][0], framesPerPeriod, 1.0 / resampleRatio);
 	}
 
 	m_pluginMutex.unlock();
