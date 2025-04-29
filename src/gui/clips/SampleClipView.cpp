@@ -37,6 +37,7 @@
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainerView.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -185,6 +186,8 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
@@ -327,6 +330,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if ( m_marker )
 	{
+		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	// recording sample tracks is not possible at the moment
@@ -370,36 +374,5 @@ void SampleClipView::setAutomationGhost()
 	aEditor->show();
 	aEditor->setFocus();
 }
-
-//! Split this Clip.
-/*! \param pos the position of the split, relative to the start of the clip */
-bool SampleClipView::splitClip( const TimePos pos )
-{
-	setMarkerEnabled( false );
-
-	const TimePos splitPos = m_initialClipPos + pos;
-
-	//Don't split if we slid off the Clip or if we're on the clip's start/end
-	//Cutting at exactly the start/end position would create a zero length
-	//clip (bad), and a clip the same length as the original one (pointless).
-	if ( splitPos > m_initialClipPos && splitPos < m_initialClipEnd )
-	{
-		m_clip->getTrack()->addJournalCheckPoint();
-		m_clip->getTrack()->saveJournallingState( false );
-
-		auto rightClip = new SampleClip(*m_clip);
-
-		m_clip->changeLength( splitPos - m_initialClipPos );
-
-		rightClip->movePosition( splitPos );
-		rightClip->changeLength( m_initialClipEnd - splitPos );
-		rightClip->setStartTimeOffset( m_clip->startTimeOffset() - m_clip->length() );
-
-		m_clip->getTrack()->restoreJournallingState();
-		return true;
-	}
-	else { return false; }
-}
-
 
 } // namespace lmms::gui
