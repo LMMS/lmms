@@ -25,7 +25,7 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <cassert>
+#include <array>
 #include <functional>
 #include <samplerate.h>
 
