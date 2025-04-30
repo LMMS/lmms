@@ -422,7 +422,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500MB
   msys2:
-    name: msys2-clangarm64
+    name: windows-arm64
     runs-on: windows-11-arm
     defaults:
       run:
@@ -445,9 +445,9 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: msys2-clangarm64-${{ hashFiles('.github/workflows/deps-msys2-clangarm64.txt') }}
+          key: windows-arm64-${{ hashFiles('.github/workflows/deps-msys2-clangarm64.txt') }}
           restore-keys: |
-            msys2-clangarm64-
+            windows-arm64-
           path: \msys64\var\cache\pacman\pkg
       - name: Install msys2
         uses: msys2/setup-msys2@v2
@@ -475,7 +475,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: msys2-clangarm64
+          name: windows-arm64
           path: build\lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
