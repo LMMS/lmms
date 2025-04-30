@@ -24,15 +24,61 @@
 
 #include "embed.h"
 
-#include <QDebug>
 #include <QDir>
+#include <QGuiApplication>
 #include <QImageReader>
+#include <QPainter>
 #include <QPixmapCache>
 #include <QResource>
+#include <QScreen>
+#include <QSvgRenderer>
 
 namespace lmms::embed {
 
 namespace {
+
+// QPixmapCache and HiDPI compatible SVG-->QPixmap wrapper
+auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixmap
+{
+	// QFile requires the file extension to be present, unlike QImageReader
+	QString fileName = resourceName;
+	if (!fileName.endsWith(".svg", Qt::CaseInsensitive)) { fileName += ".svg"; }
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly))
+	{
+		qWarning() << "Failed to open resource for SVG: " << resourceName;
+		return QPixmap{1, 1};
+	}
+
+	QSvgRenderer renderer(file.readAll());
+	if (!renderer.isValid())
+	{
+		qWarning() << "Error loading SVG file: " << resourceName;
+		return QPixmap{1, 1};
+	}
+
+	// Get the default size of the SVG (without scaling)
+	QSize svgSize = renderer.defaultSize();
+
+	// If width/height are provided, use them
+	if (width > 0 && height > 0) { svgSize.scale(width, height, Qt::IgnoreAspectRatio); }
+
+	// Scale the svg
+	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
+	svgSize *= devicePixelRatio;
+
+	QImage image(svgSize, QImage::Format_ARGB32);
+	image.fill(Qt::transparent);
+	QPainter painter(&image);
+	renderer.render(&painter);
+	painter.end();
+
+	auto pixmap = QPixmap::fromImage(image);
+	pixmap.setDevicePixelRatio(devicePixelRatio);
+
+	return pixmap;
+}
 
 auto loadPixmap(const QString& name, int width, int height, const char* const* xpm) -> QPixmap
 {
@@ -40,6 +86,12 @@ auto loadPixmap(const QString& name, int width, int height, const char* const* x
 
 	const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
 	auto reader = QImageReader{resourceName};
+
+	if (reader.format().toLower() == "svg")
+	{
+		return loadSvgPixmap(resourceName, width, height);
+	}
+
 	if (width > 0 && height > 0) { reader.setScaledSize(QSize{width, height}); }
 
 	const auto pixmap = QPixmap::fromImageReader(&reader);

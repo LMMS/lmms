@@ -39,11 +39,7 @@
 #include <cmath>
 
 #include "SampleClip.h"
-#include "SampleWaveform.h"
-
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
+#include "SampleThumbnail.h"
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
@@ -62,7 +58,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "debug.h"
 #include "embed.h"
 #include "FontHelper.h"
 
@@ -107,15 +102,14 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0),
-	m_ghostNoteColor(0, 0, 0)
+	m_ghostNoteColor(0, 0, 0),
+	m_outOfBoundsShade(0, 0, 0, 128)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
 				Qt::QueuedConnection );
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
@@ -189,6 +183,7 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &AutomationClip::lengthChanged, this, qOverload<>(&QWidget::update));
 	}
 
 	emit currentClipChanged();
@@ -294,6 +289,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		default:
+			ke->ignore();
 			break;
 	}
 }
@@ -1025,6 +1021,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1217,12 +1214,19 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			
+
 			const auto& sample = m_ghostSample->sample();
-			const auto waveform = SampleWaveform::Parameters{
-				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			SampleWaveform::visualize(waveform, p, rect);
+
+			const auto param = SampleThumbnail::VisualizeParameters{
+				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.viewportRect = rect(),
+				.amplification = sample.amplification(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.reversed = sample.reversed()
+			};
+
+			m_sampleThumbnail.visualize(param, p);
 		}
 
 		// draw ghost notes
@@ -1379,6 +1383,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				drawAutomationTangents(p, it);
 			}
 		}
+
+		// draw clip bounds overlay
+		p.fillRect(
+			xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
+			TOP_MARGIN,
+			width() - 10,
+			grid_bottom,
+			m_outOfBoundsShade
+		);
+		p.fillRect(
+			0,
+			TOP_MARGIN,
+			xCoordOfTick(-m_clip->startTimeOffset()),
+			grid_bottom,
+			m_outOfBoundsShade
+		);
 	}
 	else
 	{
@@ -1395,7 +1415,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 
 	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() : 0;
+	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
@@ -1627,7 +1647,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		adjustLeftRightScoll(we->angleDelta().x());
 	}

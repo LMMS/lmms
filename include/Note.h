@@ -26,6 +26,7 @@
 #ifndef LMMS_NOTE_H
 #define LMMS_NOTE_H
 
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -106,6 +107,8 @@ public:
 		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
 	~Note() override;
+
+	Note& operator=(const Note& note);
 
 	// Note types
 	enum class Type
@@ -236,7 +239,7 @@ public:
 
 	DetuningHelper * detuning() const
 	{
-		return m_detuning;
+		return m_detuning.get();
 	}
 	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
@@ -262,7 +265,7 @@ private:
 	panning_t m_panning;
 	TimePos m_length;
 	TimePos m_pos;
-	DetuningHelper * m_detuning;
+	std::unique_ptr<DetuningHelper> m_detuning;
 
 	Type m_type = Type::Regular;
 };
