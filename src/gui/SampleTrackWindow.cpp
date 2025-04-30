@@ -39,7 +39,6 @@
 #include "MixerChannelLcdSpinBox.h"
 #include "SampleTrackView.h"
 #include "Song.h"
-#include "SongEditor.h"
 #include "SubWindow.h"
 #include "TrackLabelButton.h"
 
@@ -268,7 +267,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 		hide();
 	}
 
-	getGUI()->songEditor()->parentWidget()->setFocus();
+	m_stv->parentWidget()->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 

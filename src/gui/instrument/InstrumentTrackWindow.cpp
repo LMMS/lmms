@@ -60,7 +60,6 @@
 #include "PianoView.h"
 #include "PluginFactory.h"
 #include "Song.h"
-#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
 #include "TabWidget.h"
@@ -540,7 +539,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	getGUI()->songEditor()->parentWidget()->setFocus();
+	m_itv->parentWidget()->setFocus();
 	m_itv->m_tlb->setChecked(false);
 }
 
