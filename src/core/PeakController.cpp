@@ -37,53 +37,35 @@
 namespace lmms
 {
 
-
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
 int PeakController::m_loadCount;
 bool PeakController::m_buggedFile;
 
-
-PeakController::PeakController( Model * _parent,
-		PeakControllerEffect * _peak_effect ) :
-	Controller( ControllerType::Peak, _parent, tr( "Peak Controller" ) ),
-	m_peakEffect( _peak_effect ),
-	m_currentSample( 0.0f )
+PeakController::PeakController(Model * _parent,
+		PeakControllerEffect * _peak_effect) :
+	Controller( ControllerType::Peak, _parent, tr("Peak Controller")),
+	m_peakEffect(_peak_effect),
+	m_currentSample(0.0f)
 {
-	setSampleExact( true );
-	if( m_peakEffect )
+	setSampleExact(true);
+	if(m_peakEffect)
 	{
 		connect( m_peakEffect, SIGNAL(destroyed()),
 			this, SLOT(handleDestroyedEffect()));
 	}
-	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
-	connect( m_peakEffect->attackModel(), SIGNAL(dataChanged()),
-			this, SLOT(updateCoeffs()), Qt::DirectConnection );
-	connect( m_peakEffect->decayModel(), SIGNAL(dataChanged()),
-			this, SLOT(updateCoeffs()), Qt::DirectConnection );
-	m_coeffNeedsUpdate = true;
 }
-
-
-
 
 PeakController::~PeakController()
 {
 	if( m_peakEffect != nullptr && m_peakEffect->effectChain() != nullptr )
 	{
-		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
+		m_peakEffect->effectChain()->removeEffect(m_peakEffect);
 	}
 }
 
-
 void PeakController::updateValueBuffer()
 {
-	if( m_coeffNeedsUpdate )
-	{
-		m_coeff = 100.0f / Engine::audioEngine()->outputSampleRate();
-		m_coeffNeedsUpdate = false;
-	}
-
 	if( m_peakEffect )
 	{
 		float targetSample = m_peakEffect->lastSample();
@@ -92,31 +74,25 @@ void PeakController::updateValueBuffer()
 			const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 			float * values = m_valueBuffer.values();
 
-			for( f_cnt_t f = 0; f < frames; ++f )
+			float coeff = 1.0f / frames;
+			const float diff = (targetSample - m_currentSample);
+			for(f_cnt_t f = 0; f < frames; ++f)
 			{
-				const float diff = ( targetSample - m_currentSample );
-				m_currentSample += diff * m_coeff;
+				m_currentSample += diff * coeff;
 				values[f] = m_currentSample;
 			}
 		}
 		else
 		{
-			m_valueBuffer.fill( m_currentSample );
+			m_valueBuffer.fill(m_currentSample);
 		}
 	}
 	else
 	{
-		m_valueBuffer.fill( 0 );
+		m_valueBuffer.fill(0);
 	}
 	m_bufferLastUpdated = s_periods;
 }
-
-
-void PeakController::updateCoeffs()
-{
-	m_coeffNeedsUpdate = true;
-}
-
 
 void PeakController::handleDestroyedEffect()
 {

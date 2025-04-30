@@ -61,7 +61,6 @@ public:
 public slots:
 	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
 	void handleDestroyedEffect();
-	void updateCoeffs();
 
 protected:
 	// The internal per-controller get-value function
@@ -77,9 +76,6 @@ private:
 	static int m_getCount;
 	static int m_loadCount;
 	static bool m_buggedFile;
-	
-	float m_coeff;
-	bool m_coeffNeedsUpdate;
 } ;
 
 namespace gui
