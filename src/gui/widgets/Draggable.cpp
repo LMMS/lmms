@@ -114,7 +114,7 @@ void Draggable::mouseMoveEvent(QMouseEvent *me)
 
 void Draggable::handleMovement()
 {
-	float newCoord = linearInterpolate(m_pointA, m_pointB, (model()->value() - model()->minValue()) / (model()->maxValue() - model()->minValue()));
+	float newCoord = std::lerp(m_pointA, m_pointB, (model()->value() - model()->minValue()) / (model()->maxValue() - model()->minValue()));
 	if (m_directionOfManipulation == DirectionOfManipulation::Vertical)
 	{
 		move(x(), newCoord - m_pixmap.height() / 2.f);

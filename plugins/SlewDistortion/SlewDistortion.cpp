@@ -590,9 +590,9 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					case 4: { // sinusodal
 						// using a polynomial approximation so it matches with the SSE2 code
 						// x - x^3 / 6 + x^5 / 120
-						float modInput = std::fmod(distIn - F_PI * 0.5f, 2.f * F_PI);
-						if (modInput < 0) {modInput += 2.f * F_PI;}
-						const float x = std::abs(modInput - F_PI) - F_PI * 0.5f;
+						float modInput = std::fmod(distIn - std::numbers::pi_v<float> * 0.5f, 2.f * std::numbers::pi_v<float>);
+						if (modInput < 0) {modInput += 2.f * std::numbers::pi_v<float>;}
+						const float x = std::abs(modInput - std::numbers::pi_v<float>) - std::numbers::pi_v<float> * 0.5f;
 						const float x2 = x * x;
 						const float x3 = x2 * x;
 						const float x5 = x3 * x2;
@@ -640,9 +640,9 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 				
 				if (dcRemove) { distOut -= m_dcOffset[i]; }
 				
-				distOut *= linearInterpolate(1.f, m_inEnv[i] / m_outEnv[i], dynamics[i]);
+				distOut *= std::lerp(1.f, m_inEnv[i] / m_outEnv[i], dynamics[i]);
 				
-				out[i] = linearInterpolate(in[i], distOut, mix[i]) * outVol[i];
+				out[i] = std::lerp(in[i], distOut, mix[i]) * outVol[i];
 			}
 			
 			m_outPeakDisplay[0] = std::max(m_outPeakDisplay[0], std::abs(out[0]));
@@ -697,7 +697,7 @@ void SlewDistortion::changeSampleRate()
 	
 	m_coeffPrecalc = -1.f / (sampleRateOver * 0.001f);
 	
-	m_dcCoeff = std::exp(-2.f * F_PI * SLEW_DISTORTION_DC_FREQ / sampleRateOver);
+	m_dcCoeff = std::exp(-2.f * std::numbers::pi_v<float> * SLEW_DISTORTION_DC_FREQ / sampleRateOver);
 	
 	std::fill(std::begin(m_inPeakDisplay), std::end(m_inPeakDisplay), 0.0f);
 	std::fill(std::begin(m_slewOut), std::end(m_slewOut), 0.0f);
