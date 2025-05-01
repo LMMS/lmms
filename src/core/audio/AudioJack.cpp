@@ -34,7 +34,6 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
 
@@ -419,13 +418,6 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	m_clientName = new QLineEdit(cn, this);
 
 	form->addRow(tr("Client name"), m_clientName);
-}
-
-
-
-
-AudioJack::setupWidget::~setupWidget()
-{
 }
 
 

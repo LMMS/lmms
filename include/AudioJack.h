@@ -77,8 +77,6 @@ public:
 	{
 	public:
 		setupWidget(QWidget* parent);
-		~setupWidget() override;
-
 		void saveSettings() override;
 
 	private:
