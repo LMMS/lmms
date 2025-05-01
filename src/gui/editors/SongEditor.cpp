@@ -27,7 +27,6 @@
 #include <cmath>
 
 #include <QAction>
-#include <QDomElement>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
@@ -245,6 +244,8 @@ SongEditor::SongEditor( Song * song ) :
 	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
+	m_zoomingModel->setValue(ConfigManager::inst()->value("ui","songeditorzoom",QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
+	zoomingChanged();
 	//zoom connects
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
@@ -264,26 +265,26 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1/4 Bar" ) );
+	m_snappingModel->setInitValue(ConfigManager::inst()->value("ui", "songeditorsnap", QString::number(m_snappingModel->findText( "1/4 Bar" ))).toInt());
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
-
+SongEditor::~SongEditor()
+{
+	ConfigManager::inst()->setValue("ui", "songeditorzoom", QString::number(m_zoomingModel->value()));
+	ConfigManager::inst()->setValue("ui", "songeditorsnap", QString::number(m_snappingModel->value()));
+}
 
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
-	element.setAttribute("zoom", m_zoomingModel->value());
-	element.setAttribute("snap", m_snappingModel->value());
 	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
 void SongEditor::loadSettings( const QDomElement& element )
 {
-	m_zoomingModel->setValue(element.attribute("zoom", QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
-	m_snappingModel->setValue(element.attribute("snap", QString::number(m_snappingModel->findText("1/4 Bar"))).toInt());
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
 
