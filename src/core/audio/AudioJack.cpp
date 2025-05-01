@@ -44,13 +44,7 @@ namespace lmms
 
 AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	: AudioDevice(
-		// clang-format off
-		std::clamp<int>(
-			ConfigManager::inst()->value("audiojack", "channels").toInt(),
-			DEFAULT_CHANNELS,
-			DEFAULT_CHANNELS
-		),
-		// clang-format on
+		DEFAULT_CHANNELS,
 		audioEngineParam)
 	, m_client(nullptr)
 	, m_active(false)
@@ -425,16 +419,6 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	m_clientName = new QLineEdit(cn, this);
 
 	form->addRow(tr("Client name"), m_clientName);
-
-	auto m = new gui::LcdSpinBoxModel(/* this */);
-	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audiojack", "channels").toInt());
-
-	m_channels = new gui::LcdSpinBox(1, this);
-	m_channels->setModel(m);
-
-	form->addRow(tr("Channels"), m_channels);
 }
 
 
@@ -442,7 +426,6 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 AudioJack::setupWidget::~setupWidget()
 {
-	delete m_channels->model();
 }
 
 
@@ -451,7 +434,6 @@ AudioJack::setupWidget::~setupWidget()
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
-	ConfigManager::inst()->setValue("audiojack", "channels", QString::number(m_channels->value<int>()));
 }
 
 
