@@ -53,11 +53,6 @@ namespace lmms
 
 class MidiJack;
 
-namespace gui
-{
-class LcdSpinBox;
-}
-
 
 class AudioJack : public QObject, public AudioDevice
 {
@@ -88,7 +83,6 @@ public:
 
 	private:
 		QLineEdit* m_clientName;
-		gui::LcdSpinBox* m_channels;
 	};
 
 private slots:
