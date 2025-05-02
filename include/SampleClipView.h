@@ -68,7 +68,6 @@ private:
 	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;
 	long m_paintPixmapXPosition;
-	bool splitClip( const TimePos pos ) override;
 } ;
 
 
