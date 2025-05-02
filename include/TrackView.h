@@ -140,13 +140,15 @@ protected:
 
 private:
 	void resizeToHeight(int height);
+	void resizeToWidth(int width);
 
 private:
 	enum class Action
 	{
 		None,
 		Move,
-		Resize
+		ResizeVertical,
+		ResizeHorizontal
 	} ;
 
 	Track * m_track;

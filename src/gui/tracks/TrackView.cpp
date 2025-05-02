@@ -31,6 +31,7 @@
 #include <QPainter>
 #include <QStyleOption>
 #include <QtGlobal>
+#include <QDebug>
 
 
 #include "AudioEngine.h"
@@ -48,6 +49,9 @@
 
 namespace lmms::gui
 {
+/*! The width of the resize grip in pixels
+	*/
+const int RESIZE_GRIP_WIDTH = 6;
 
 /*! \brief Create a new track View.
  *
@@ -86,6 +90,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	resizeEvent( nullptr );
 
 	setAcceptDrops( true );
+	setMouseTracking(true);
+	m_trackSettingsWidget.setMouseTracking(true);
 	setAttribute( Qt::WA_DeleteOnClose, true );
 
 
@@ -281,13 +287,17 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 	else if( me->button() == Qt::LeftButton )
 	{
-		if( me->modifiers() & Qt::ShiftModifier )
+		if (me->modifiers() & Qt::ShiftModifier || (me->y() > height() - RESIZE_GRIP_WIDTH && me->x() <= widgetTotal))
 		{
-			m_action = Action::Resize;
+			m_action = Action::ResizeVertical;
 			QCursor::setPos( mapToGlobal( QPoint( me->x(),
 								height() ) ) );
 			QCursor c( Qt::SizeVerCursor);
 			QApplication::setOverrideCursor( c );
+		}
+		else if (me->x() > widgetTotal - RESIZE_GRIP_WIDTH)
+		{
+			m_action = Action::ResizeHorizontal;
 		}
 
 		me->accept();
@@ -351,14 +361,31 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( m_action == Action::Resize )
+	else if( m_action == Action::ResizeVertical )
 	{
 		resizeToHeight(me->y());
+	}
+	else if( m_action == Action::ResizeHorizontal )
+	{
+		resizeToWidth(me->x());
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
 	{
 		setToolTip(m_track->m_name);
+	}
+
+	if (me->y() > height() - RESIZE_GRIP_WIDTH && me->x() <= widgetTotal)
+	{
+		setCursor(Qt::SizeVerCursor);
+	}
+	else if (me->x() > widgetTotal - RESIZE_GRIP_WIDTH && me->x() <= widgetTotal)
+	{
+		setCursor(Qt::SizeHorCursor);
+	}
+	else
+	{
+		setCursor(Qt::ArrowCursor);
 	}
 }
 
@@ -376,6 +403,7 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 		QApplication::restoreOverrideCursor();
 	}
 	m_trackOperationsWidget.update();
+	setCursor(Qt::ArrowCursor);
 
 	QWidget::mouseReleaseEvent( me );
 }
@@ -466,5 +494,10 @@ void TrackView::resizeToHeight(int h)
 	m_track->setHeight(height());
 }
 
+void TrackView::resizeToWidth(int width)
+{
+	setFixedWidth(width);
+	m_trackSettingsWidget.setFixedWidth(width - m_trackOperationsWidget.width());
+}
 
 } // namespace lmms::gui

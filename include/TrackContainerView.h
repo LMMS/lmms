@@ -140,6 +140,9 @@ public:
 	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
+	int getTrackViewWidth() const { return m_trackViewWidth; }
+	void setTrackViewWidth(int width) { m_trackViewWidth = width; }
+
 	void clearAllTracks();
 
 	QString nodeName() const override
@@ -195,6 +198,8 @@ private:
 	QVBoxLayout * m_scrollLayout;
 
 	float m_ppb;
+
+	int m_trackViewWidth = 100;
 
 	RubberBand * m_rubberBand;
 
