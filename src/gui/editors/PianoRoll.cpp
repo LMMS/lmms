@@ -786,6 +786,20 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::reverseNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	m_midiClip->reverseNotes(notes);
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -5035,6 +5049,10 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
+	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
+	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
+	reverseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_R));
+
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
@@ -5042,6 +5060,7 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
+	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
