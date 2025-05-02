@@ -49,7 +49,7 @@ AutomatableModelView::AutomatableModelView( Model* model, QWidget* _this ) :
 	m_conversionFactor( 1.0 )
 {
 	widget()->setAcceptDrops( true );
-	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	widget()->setCursor(Qt::PointingHandCursor);
 }
 
 void AutomatableModelView::addDefaultActions( QMenu* menu )
