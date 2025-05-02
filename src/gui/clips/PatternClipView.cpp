@@ -38,6 +38,8 @@
 #include "PatternTrack.h"
 #include "RenameDialog.h"
 #include "SampleClip.h"
+#include "TrackContainerView.h"
+#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -74,6 +76,8 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 
 void PatternClipView::mouseDoubleClickEvent(QMouseEvent*)
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	openInPatternEditor();
 }
 
@@ -213,6 +217,12 @@ void PatternClipView::paintEvent(QPaintEvent*)
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
+	if (m_marker)
+	{
+		p.setPen(markerColor());
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
+	
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
@@ -252,6 +262,5 @@ void PatternClipView::update()
 
 	ClipView::update();
 }
-
 
 } // namespace lmms::gui

@@ -210,7 +210,7 @@ void ProjectRenderer::abortProcessing()
 
 void ProjectRenderer::updateConsoleProgress()
 {
-	const int cols = 50;
+	constexpr int cols = 50;
 	static int rot = 0;
 	auto buf = std::array<char, 80>{};
 	auto prog = std::array<char, cols + 1>{};
@@ -221,9 +221,9 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const auto activity = (const char*)"|/-\\";
+	const auto activity = "|/-\\";
 	std::fill(buf.begin(), buf.end(), 0);
-	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
+	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 

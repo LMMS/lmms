@@ -24,6 +24,7 @@
 
 #include "Editor.h"
 
+#include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
@@ -117,9 +118,8 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
-	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Space), this, SLOT(togglePause()));
-	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F11), this, SLOT(toggleMaximize()));
+	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
+	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
@@ -152,6 +152,16 @@ void Editor::closeEvent(QCloseEvent * event)
 	}
 	getGUI()->mainWindow()->refocus();
 	event->ignore();
+ }
+
+ void Editor::keyPressEvent(QKeyEvent *ke)
+ {
+	if (ke->key() == Qt::Key_Space)
+	{
+		togglePlayStop();
+		return;
+	}
+	ke->ignore();
  }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
