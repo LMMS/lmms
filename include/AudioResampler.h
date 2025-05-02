@@ -67,7 +67,7 @@ public:
 	void setSource(WriteCallback callback);
 
 	//! Retrieve source data from @p src when resampling next.
-	void setSource(const float* src, std::size_t size);
+	void setSource(const float* src, std::size_t frames);
 
 	//! Resamples audio into @p dst with at the given @p ratio.
 	void resample(float* dst, std::size_t frames, double ratio);

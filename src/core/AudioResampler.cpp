@@ -97,10 +97,10 @@ void AudioResampler::setSource(WriteCallback callback)
 	m_callback = callback;
 }
 
-void AudioResampler::setSource(const float* src, std::size_t size)
+void AudioResampler::setSource(const float* src, std::size_t frames)
 {
 	m_data.data_in = src;
-	m_data.input_frames = static_cast<long>(size) / m_channels;
+	m_data.input_frames = static_cast<long>(frames);
 }
 
 } // namespace lmms

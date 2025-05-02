@@ -870,8 +870,8 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
 
-	m_resampler.setSource([&](float* dst, long frames, int channels) {
-		fluid_synth_write_float(m_synth, frames, dst, 0, 2, dst, 1, 2);
+	m_resampler.setSource([&](float* dst, std::size_t frames, int channels) {
+		fluid_synth_write_float(m_synth, static_cast<int>(frames), dst, 0, 2, dst, 1, 2);
 		return frames;
 	});
 
