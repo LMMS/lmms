@@ -24,8 +24,6 @@
 
 #include "Sample.h"
 
-#include <iostream>
-
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
@@ -123,26 +121,24 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 	if (loop == Loop::Off && state->frameIndex >= m_endFrame) { return false; }
 
-	std::fill_n(dst, numFrames, SampleFrame{});
-	state->resampler.resample(&dst[0][0], numFrames, ratio, [this, state, loop](float* dst, long frames, int channels) {
+	state->resampler.setSource([this, state, loop](float* dst, long frames, int channels) {
 		assert(channels == DEFAULT_CHANNELS);
 		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
 	});
 
+	state->resampler.resample(&dst[0][0], numFrames, ratio);
+
 	return true;
 }
 
-AudioResampler::WriteCallbackResult Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
+std::size_t Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
 {
 	for (std::size_t frame = 0; frame < size; ++frame)
 	{
 		switch (loop)
 		{
 		case Loop::Off:
-			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame)
-			{
-				return {.done = true, .frames = static_cast<long>(frame)};
-			}
+			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame) { return frame; }
 			break;
 		case Loop::On:
 			if (state->frameIndex < m_loopStartFrame && state->backwards) { state->frameIndex = m_loopEndFrame - 1; }
@@ -169,7 +165,7 @@ AudioResampler::WriteCallbackResult Sample::render(SampleFrame* dst, std::size_t
 		state->backwards ? --state->frameIndex : ++state->frameIndex;
 	}
 
-	return {.done = false, .frames = static_cast<long>(size)};
+	return size;
 }
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds

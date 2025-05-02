@@ -190,8 +190,8 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		const auto error = resampler.resample(_dst, WAVELEN, _src, GRAPHLEN, WAVERATIO);
-		if (error) { qDebug("Watsyn resample error: %s", AudioResampler::errorDescription(error)); }
+		resampler.setSource(_src, GRAPHLEN);
+		resampler.resample(_dst, WAVELEN, WAVERATIO);
 	}
 
 	// memcpy utilizing cubic interpolation

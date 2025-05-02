@@ -26,7 +26,6 @@
 
 #include <samplerate.h>
 #include <stdexcept>
-#include <string>
 #include <utility>
 
 namespace lmms {
@@ -36,12 +35,7 @@ AudioResampler::AudioResampler(int mode, int channels)
 	, m_channels(channels)
 	, m_mode(mode)
 {
-	if (!m_state)
-	{
-		const auto errorMessage = std::string{src_strerror(m_error)};
-		const auto fullMessage = std::string{"Failed to create an AudioResampler: "} + errorMessage;
-		throw std::runtime_error{fullMessage};
-	}
+	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
 }
 
 AudioResampler::~AudioResampler()
@@ -60,28 +54,35 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallback callback) -> int
+void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 {
 	m_data.data_out = dst;
-	m_data.output_frames = frames;
+	m_data.output_frames = static_cast<long>(frames);
 
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
-
-	const auto maxInputFrames = static_cast<long>(m_buffer.size()) / m_channels;
-	auto latestCallbackResult = WriteCallbackResult{};
 
 	while (m_data.output_frames > 0)
 	{
 		if (m_data.input_frames == 0)
 		{
-			latestCallbackResult = callback(m_buffer.data(), maxInputFrames, m_channels);
-			m_data.data_in = m_buffer.data();
-			m_data.input_frames = latestCallbackResult.frames;
+			auto framesWritten = std::size_t{0};
+			if (m_callback)
+			{
+				framesWritten = m_callback(m_buffer.data(), m_buffer.size() / m_channels, m_channels);
+				m_data.data_in = m_buffer.data();
+				m_data.input_frames = static_cast<long>(framesWritten);
+			}
+
+			if (framesWritten == 0)
+			{
+				// Silence unfilled output
+				std::fill(dst + (frames - m_data.output_frames) * m_channels, dst + frames * m_channels, 0.f);
+				return;
+			}
 		}
 
-		m_error = src_process(m_state, &m_data);
-		if (m_error || (latestCallbackResult.done && m_data.output_frames_gen == 0)) { break; }
+		if ((m_error = src_process(m_state, &m_data))) { throw std::runtime_error{src_strerror(m_error)}; }
 
 		m_data.data_in += m_data.input_frames_used * m_channels;
 		m_data.data_out += m_data.output_frames_gen * m_channels;
@@ -89,51 +90,17 @@ auto AudioResampler::resample(float* dst, long frames, double ratio, WriteCallba
 		m_data.input_frames -= m_data.input_frames_used;
 		m_data.output_frames -= m_data.output_frames_gen;
 	}
-
-	// Silence any unfilled output
-	std::fill(dst + (frames - m_data.output_frames) * m_channels, dst + frames * m_channels, 0.f);
-	return 0;
 }
 
-auto AudioResampler::resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int
+void AudioResampler::setSource(WriteCallback callback)
 {
-	m_data.data_out = dst;
-	m_data.output_frames = dstFrames;
+	m_callback = callback;
+}
 
-	m_data.src_ratio = ratio;
-	m_data.end_of_input = 0;
-
-	while (m_data.output_frames > 0)
-	{
-		if (m_data.input_frames == 0)
-		{
-			// Dont try to read from src again, thats all the extra input we have
-			if (m_data.data_in == src) { break; }
-
-			m_data.data_in = src;
-			m_data.input_frames = srcFrames;
-		}
-
-		m_error = src_process(m_state, &m_data);
-		if (m_error) { break; }
-
-		m_data.data_in += m_data.input_frames_used * m_channels;
-		m_data.data_out += m_data.output_frames_gen * m_channels;
-
-		m_data.input_frames -= m_data.input_frames_used;
-		m_data.output_frames -= m_data.output_frames_gen;
-	}
-
-	// Enforce that the entire source buffer must be resampled into the destination buffer
-	// This avoids having to worry about dropped source audio after this function completes.
-	if (m_data.input_frames > 0)
-	{
-		throw std::logic_error{"Cannot resample entire source buffer into destination buffer"};
-	}
-
-	// Silence any unfilled output
-	std::fill(dst + (dstFrames - m_data.output_frames) * m_channels, dst + dstFrames * m_channels, 0.f);
-	return 0;
+void AudioResampler::setSource(const float* src, std::size_t size)
+{
+	m_data.data_in = src;
+	m_data.input_frames = static_cast<long>(size) / m_channels;
 }
 
 } // namespace lmms

@@ -148,7 +148,9 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 	{
 		outBuf = buf;
 		buf = sBuf.data();
-		m_resampler.resample(&buf[0][0], frames, &outBuf[0][0], frames, resampleRatio);
+
+		m_resampler.setSource(&outBuf[0][0], frames);
+		m_resampler.resample(&buf[0][0], frames, resampleRatio);
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
@@ -249,7 +251,8 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 
 	if (outBuf != nullptr)
 	{
-		m_resampler.resample(&outBuf[0][0], framesPerPeriod, &buf[0][0], framesPerPeriod, 1.0 / resampleRatio);
+		m_resampler.setSource(&buf[0][0], framesPerPeriod);
+		m_resampler.resample(&outBuf[0][0], framesPerPeriod, 1.0 / resampleRatio);
 	}
 
 	m_pluginMutex.unlock();

@@ -40,16 +40,9 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
-	//! A result returned by @ref `WriteCallback`.
-	struct WriteCallbackResult
-	{
-		bool done = false; //! The callback should set this to `true` if it is is done streaming input.
-		long frames = 0;   //! The number of frames the callback has written in.
-	};
-
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
-	//! The callback should return the number of frames actually written to @p dst, or
-	using WriteCallback = std::function<WriteCallbackResult(float* dst, long frames, int channels)>;
+	//! The callback should return the number of frames written into @p dst.
+	using WriteCallback = std::function<std::size_t(float* dst, std::size_t frames, int channels)>;
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
@@ -70,16 +63,14 @@ public:
 	//! Moves the internal state from one resampler to another.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
-	//! Resamples audio into @p dst with at the given @p ratio.
-	//! The source audio is fetched periodically from @p callback.
-	//! Returns non-zero on error.
-	auto resample(float* dst, long frames, double ratio, WriteCallback callback) -> int;
+	//! Fetch source data from a callback when resampling next.
+	void setSource(WriteCallback callback);
 
-	//! Resamples audio into @p dst frames at the given @p ratio.
-	//! @p src is used as a source for retrieving input to resample.
-	//! It is required that the entire source buffer can be resampled into the destination buffer.
-	//! Returns non-zero on error.
-	auto resample(float* dst, long dstFrames, const float* src, long srcFrames, double ratio) -> int;
+	//! Retrieve source data from @p src when resampling next.
+	void setSource(const float* src, std::size_t size);
+
+	//! Resamples audio into @p dst with at the given @p ratio.
+	void resample(float* dst, std::size_t frames, double ratio);
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
@@ -92,8 +83,9 @@ public:
 
 private:
 	std::array<float, 256> m_buffer{};
-	SRC_STATE* m_state = nullptr;
 	SRC_DATA m_data = SRC_DATA{};
+	WriteCallback m_callback;
+	SRC_STATE* m_state = nullptr;
 	int m_channels = 0;
 	int m_mode = 0;
 	int m_error = 0;
