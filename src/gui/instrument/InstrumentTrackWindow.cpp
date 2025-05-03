@@ -539,7 +539,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	m_itv->parentWidget()->setFocus();
+	m_itv->setFocus();
 	m_itv->m_tlb->setChecked(false);
 }
 
