@@ -366,7 +366,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		break;
 	case PlayMode::Pattern:
 	{
-		if (tracklist.size() != 1) { return; }
+		if (tracklist.empty() { return; }
 		Q_ASSERT(tracklist.at(0)->type() == Track::Type::Pattern);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
 		container = Engine::patternStore();
