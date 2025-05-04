@@ -532,7 +532,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		changeLength(len);
 	}
 	
-	setAutoResize(_this.attribute("autoresize").toInt());
+	setAutoResize(_this.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
 
 	emit dataChanged();
