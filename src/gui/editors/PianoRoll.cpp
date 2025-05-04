@@ -801,6 +801,38 @@ void PianoRoll::reverseNotes()
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::duplicateNotes(bool quanitized)
+{
+	if (!hasValidMidiClip()) { return; }
+
+	m_midiClip->addJournalCheckPoint();
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	// Find the very first start position and the very last end position of all the notes.
+	TimePos firstPos = (*std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); }))->pos();
+	TimePos lastPos = (*std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); }))->endPos();
+
+	TimePos unquantizedLength = lastPos - firstPos;
+	// If the length should be inferred from the note positions, it's just rounded up to the nearest power of 2 bar length.
+	TimePos quantizedLength = TimePos::ticksPerBar() * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / TimePos::ticksPerBar())));
+
+	for (auto note : notes)
+	{
+		Note newNote = Note{*note};
+		newNote.setPos(note->pos() + (quanitized ? quantizedLength : unquantizedLength));
+		m_midiClip->addNote(newNote, false);
+		note->setSelected(false);
+	}
+
+	m_midiClip->rearrangeAllNotes();
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -5075,11 +5107,11 @@ PianoRollWindow::PianoRollWindow() :
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
 
-	auto duplicateQuantizedAction = new QAction(embed::getIconPixmap("back_to_start"), tr("Duplicate Notes (Quantized Endpoint)"), noteToolsButton);
+	auto duplicateQuantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate Notes (Quantized)"), noteToolsButton);
 	connect(duplicateQuantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(true); });
 	duplicateQuantizedAction->setShortcut(combine(Qt::CTRL, Qt::Key_D));
 
-	auto duplicateUnquantizedAction = new QAction(embed::getIconPixmap("back_to_start"), tr("Duplicate Notes (Unquantized Endpoint)"), noteToolsButton);
+	auto duplicateUnquantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate Notes (Unquantized)"), noteToolsButton);
 	connect(duplicateUnquantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(false); });
 	duplicateUnquantizedAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_D));
 
