@@ -124,8 +124,8 @@ void SlicerTView::clearSlices()
 
 	// Points are added to the start (0) and end (1) of the sample,
 	// so the whole sample can still be copied using MIDI.
-	m_slicerTParent->m_slicePoints.push_back(0);
-	m_slicerTParent->m_slicePoints.push_back(1);
+	m_slicerTParent->m_slicePoints.emplace_back(0);
+	m_slicerTParent->m_slicePoints.emplace_back(1);
 
 	emit m_slicerTParent->dataChanged();
 }
