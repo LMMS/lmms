@@ -421,3 +421,68 @@ jobs:
           ccache --show-stats --verbose
         env:
           CCACHE_MAXSIZE: 500MB
+  msys2:
+    name: windows-arm64
+    runs-on: windows-11-arm
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      CMAKE_OPTS: >-
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+        -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j2
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache msys2 dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: windows-arm64-${{ hashFiles('.github/workflows/deps-msys2-clangarm64.txt') }}
+          restore-keys: |
+            windows-arm64-
+          path: \msys64\var\cache\pacman\pkg
+      - name: Install msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANGARM64
+          update: true
+      - name: Install dependencies
+        run: pacman --needed --noconfirm -S - < .github/workflows/deps-msys2-clangarm64.txt
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~\AppData\Local\ccache
+      - name: Configure
+        run: |
+          /clang64/bin/ccache.exe --zero-stats
+          cmake -B build $CMAKE_OPTS
+      - name: Build
+        run: cmake --build build
+      - name: Package
+        run: cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-arm64
+          path: build\lmms-*.exe
+      - name: Trim ccache and print statistics
+        run: |
+          /clang64/bin/ccache.exe --cleanup
+          echo "[ccache config]"
+          /clang64/bin/ccache.exe --show-config
+          echo "[ccache stats]"
+          /clang64/bin/ccache.exe --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB

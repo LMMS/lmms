@@ -25,6 +25,7 @@
 
 #include "FileBrowser.h"
 
+#include <PathUtil.h>
 #include <QApplication>
 #include <QDirIterator>
 #include <QHBoxLayout>
@@ -77,18 +78,15 @@ enum TreeWidgetItemTypes
 	TypeDirectoryItem
 } ;
 
-
-FileBrowser::FileBrowser(const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items,
-			const QString& userDir,
-			const QString& factoryDir):
-	SideBarWidget( title, pm, parent ),
-	m_directories( directories ),
-	m_filter( filter ),
-	m_dirsAsItems( dirs_as_items ),
-	m_userDir(userDir),
-	m_factoryDir(factoryDir)
+FileBrowser::FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
+	QWidget* parent, bool dirs_as_items, const QString& userDir, const QString& factoryDir)
+	: SideBarWidget(title, pm, parent)
+	, m_type(type)
+	, m_directories(directories)
+	, m_filter(filter)
+	, m_dirsAsItems(dirs_as_items)
+	, m_userDir(userDir)
+	, m_factoryDir(factoryDir)
 {
 	setWindowTitle( tr( "Browser" ) );
 
@@ -135,6 +133,14 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	m_previousFilterValue = "";
+
+	if (m_type == Type::Favorites)
+	{
+		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, [this] {
+			m_directories = ConfigManager::inst()->favoriteItems().join("*");
+			reloadTree();
+		});
+	}
 
 	reloadTree();
 	show();
@@ -329,7 +335,7 @@ void FileBrowser::reloadTree()
 
 	m_fileBrowserTreeWidget->clear();
 
-	QStringList paths = m_directories.split('*');
+	auto paths = m_directories.isEmpty() ? QStringList{} : m_directories.split('*');
 
 	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
@@ -341,12 +347,37 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	if (!paths.isEmpty())
+	switch (m_type)
 	{
+	case Type::Favorites:
+		for (auto& path : paths)
+		{
+			while (path.endsWith('/') || path.endsWith('\\') || path.endsWith("."))
+			{
+				path.chop(1);
+			}
+
+			auto info = QFileInfo{PathUtil::toAbsolute(path)};
+
+			if (info.isDir())
+			{
+				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
+				dir->update();
+				m_fileBrowserTreeWidget->addTopLevelItem(dir);
+			}
+			else if (info.isFile())
+			{
+				auto file = new FileItem(info.fileName(), info.path());
+				m_fileBrowserTreeWidget->addTopLevelItem(file);
+			}
+		}
+		break;
+	case Type::Normal:
 		for (const auto& path : paths)
 		{
 			addItems(path);
 		}
+		break;
 	}
 
 	if (m_filterEdit->text().isEmpty())
@@ -642,16 +673,28 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-
-		if (file->isTrack())
-		{
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
-			contextMenu.addSeparator();
-		}
+		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[=] { FileRevealer::reveal(file->fullName()); });
+
+		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
+		{
+			contextMenu.addAction(
+				QIcon(embed::getIconPixmap("star")), tr("Remove favorite file"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+		}
+		else
+		{
+			contextMenu.addAction(
+				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+		}
+
+		if (file->isTrack())
+		{
+			contextMenu.addSeparator();
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+		}
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -666,9 +709,20 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	}
 	case TypeDirectoryItem: {
 		auto dir = dynamic_cast<Directory*>(item);
+		const auto path = QFileInfo{dir->fullName()}.absoluteFilePath();
+
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
 			FileRevealer::openDir(dir->fullName());
 		});
+
+		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
+		{
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Remove favorite folder"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+		}
+		else
+		{
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Add favorite folder"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+		}
 		break;
 	}
 	}
