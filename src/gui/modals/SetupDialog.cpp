@@ -33,7 +33,6 @@
 #include <QScrollArea>
 
 #include "AudioEngine.h"
-#include "debug.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
@@ -144,6 +143,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"app", "nanhandler", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
+	m_sampleRate(ConfigManager::inst()->value(
+			"audioengine", "samplerate").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
 			"midi", "autoquantize", "0").toInt() != 0),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
@@ -558,6 +559,44 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// audio_layout->addWidget(useNaNHandler);
 	// useNaNHandler->setChecked(m_NaNHandler);
 
+	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
+
+	m_sampleRateSlider = new QSlider{Qt::Horizontal};
+	m_sampleRateSlider->setRange(0, SUPPORTED_SAMPLERATES.size() - 1);
+	m_sampleRateSlider->setTickPosition(QSlider::TicksBelow);
+
+	auto sampleRateResetButton = new QPushButton{embed::getIconPixmap("reload"), ""};
+	sampleRateResetButton->setFixedSize(32, 32);
+
+	auto sampleRateSubLayout = new QHBoxLayout{};
+	sampleRateSubLayout->addWidget(m_sampleRateSlider);
+	sampleRateSubLayout->addWidget(sampleRateResetButton);
+
+	auto sampleRateLabel = new QLabel{sampleRateBox};
+	auto sampleRateLayout = new QVBoxLayout{sampleRateBox};
+	sampleRateLayout->addLayout(sampleRateSubLayout);
+	sampleRateLayout->addWidget(sampleRateLabel);
+
+	auto setSampleRate = [this, sampleRateLabel](int sampleRate)
+	{	
+		const auto it = std::find(SUPPORTED_SAMPLERATES.begin(), SUPPORTED_SAMPLERATES.end(), sampleRate);
+		const auto index = it == SUPPORTED_SAMPLERATES.end() ? 0 : std::distance(SUPPORTED_SAMPLERATES.begin(), it);
+
+		m_sampleRate = SUPPORTED_SAMPLERATES[index];
+		m_sampleRateSlider->setValue(index);
+		sampleRateLabel->setText(tr("Sample rate: %1").arg(m_sampleRate));
+	};
+
+	setSampleRate(m_sampleRate);
+
+	connect(m_sampleRateSlider, &QSlider::valueChanged, this, &SetupDialog::showRestartWarning);
+
+	connect(m_sampleRateSlider, &QSlider::valueChanged, this,
+		[setSampleRate](int value) { setSampleRate(SUPPORTED_SAMPLERATES[value]); });
+
+	connect(sampleRateResetButton, &QPushButton::clicked, this,
+		[setSampleRate] { setSampleRate(SUPPORTED_SAMPLERATES.front()); });
+
 	// Buffer size group
 	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
@@ -599,6 +638,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
+	audio_layout->addWidget(sampleRateBox);
 	audio_layout->addWidget(bufferSizeBox);
 	audio_layout->addStretch();
 
@@ -963,6 +1003,8 @@ void SetupDialog::accept()
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("app", "nanhandler",
 					QString::number(m_NaNHandler));
+	ConfigManager::inst()->setValue("audioengine", "samplerate",
+					QString::number(m_sampleRate));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("audioengine", "mididev",

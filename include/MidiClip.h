@@ -53,12 +53,11 @@ public:
 	} ;
 
 	MidiClip( InstrumentTrack* instrumentTrack );
-	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
 	void init();
 
-	void updateLength();
+	void updateLength() override;
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
@@ -79,8 +78,14 @@ public:
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
 
+	//! Horizontally flip the positions of the given notes.
+	void reverseNotes(const NoteVector& notes);
+
 	// Split the list of notes on the given position
 	void splitNotes(const NoteVector& notes, TimePos pos);
+
+	// Split the list of notes along a line
+	void splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds);
 
 	// clip-type stuff
 	inline Type type() const
@@ -111,6 +116,11 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	MidiClip* clone() override
+	{
+		return new MidiClip(*this);
+	}
+
 
 	using Model::dataChanged;
 
@@ -121,6 +131,7 @@ public slots:
 	void clear();
 
 protected:
+	MidiClip( const MidiClip& other );
 	void updatePatternTrack();
 
 protected slots:
