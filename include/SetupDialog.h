@@ -30,7 +30,6 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
 
@@ -72,10 +71,10 @@ protected slots:
 
 private slots:
 	// General settings widget.
-	void toggleDisplaydBFS(bool enabled);
 	void toggleTooltips(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
 	void toggleNoteLabels(bool enabled);
+	void toggleShowFaderTicks(bool enabled);
 	void toggleCompactTrackButtons(bool enabled);
 	void toggleOneInstrumentTrackWindow(bool enabled);
 	void toggleSideBarOnRight(bool enabled);
@@ -134,10 +133,10 @@ private:
 	TabBar * m_tabBar;
 
 	// General settings widgets.
-	bool m_displaydBFS;
 	bool m_tooltips;
 	bool m_displayWaveform;
 	bool m_printNoteLabels;
+	bool m_showFaderTicks;
 	bool m_compactTrackButtons;
 	bool m_oneInstrumentTrackWindow;
 	bool m_sideBarOnRight;
@@ -183,6 +182,8 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
+	int m_sampleRate;
+	QSlider* m_sampleRateSlider;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
