@@ -138,6 +138,8 @@ file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
 # Inform linuxdeploy-plugin-qt about wayland plugin
 set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
 set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
+# Toggle experimental platform theming support
+set(ENV{DEPLOY_PLATFORM_THEMES} 1)
 
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
