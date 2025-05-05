@@ -49,6 +49,7 @@ class SlicerTView : public InstrumentView
 public slots:
 	void exportMidi();
 	void openFiles();
+	void clearSlices();
 
 public:
 	SlicerTView(SlicerT* instrument, QWidget* parent);
@@ -87,6 +88,7 @@ private:
 	LcdSpinBox* m_bpmBox;
 	ComboBox* m_snapSetting;
 	PixmapButton* m_syncToggle;
+	PixmapButton* m_clearButton;
 	PixmapButton* m_folderButton;
 
 	QPushButton* m_resetButton;
