@@ -41,6 +41,7 @@ make
 perl
 portaudio19-dev
 qt5-qmake
+qt5-xdgdesktopportal-platformtheme
 qtbase5-dev
 qtbase5-dev-tools
 qtbase5-private-dev
