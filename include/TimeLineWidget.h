@@ -31,6 +31,7 @@
 #include <QSize>
 #include <QWidget>
 
+#include "ExternalSync.h"
 #include "Song.h"
 #include "embed.h"
 
@@ -157,6 +158,11 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	inline bool syncShouldSend() { return m_parentIsSongEditor; }
+	inline void syncSetShouldSend() { m_parentIsSongEditor = true; }
+#endif
+
 signals:
 	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
@@ -187,6 +193,10 @@ private:
 		MoveLoop,
 		SelectSongClip,
 	};
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	bool m_parentIsSongEditor; // used only by ExternalSync
+#endif
 
 	auto getClickedTime(int xPosition) const -> TimePos;
 	auto getLoopAction(QMouseEvent* event) const -> Action;
