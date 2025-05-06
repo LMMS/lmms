@@ -86,6 +86,7 @@ private slots:
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
 	void loopMarkerModeChanged();
+	void UIScaleFactorChanged();
 	void setLanguage(int lang);
 
 	// Performance settings widget.
@@ -149,6 +150,9 @@ private:
 	bool m_openLastProject;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
+	float m_UIScaleFactor;
+	QSlider * m_UIScaleFactorSlider;
+	QLabel * m_UIScaleFactorLbl;
 	QString m_lang;
 	QStringList m_languages;
 
