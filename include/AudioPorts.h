@@ -43,6 +43,9 @@ struct AudioPortsTag {};
 /**
  * Interface for an audio port implementation.
  * Contains the audio port model and provides access to the audio buffers.
+ *
+ * Used by `AudioPlugin` to handle all the customizable aspects of the plugin's
+ * audio ports.
  */
 template<AudioPortsConfig config>
 class AudioPorts

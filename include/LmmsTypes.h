@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_BASICS_H
-#define LMMS_BASICS_H
+#ifndef LMMS_TYPES_H
+#define LMMS_TYPES_H
 
 #include <cstddef>
 #include <cstdint>
@@ -54,4 +54,4 @@ using jo_id_t = uint32_t; // (unique) ID of a journalling object
 
 } // namespace lmms
 
-#endif // LMMS_BASICS_H
+#endif // LMMS_TYPES_H
