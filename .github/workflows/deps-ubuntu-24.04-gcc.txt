@@ -40,6 +40,7 @@ lv2-dev
 make
 perl
 portaudio19-dev
+qt5-gtk-platformtheme
 qt5-qmake
 qt5-xdgdesktopportal-platformtheme
 qtbase5-dev
