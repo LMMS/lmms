@@ -796,18 +796,31 @@ bool MainWindow::saveProject()
 bool MainWindow::saveProjectAs()
 {
 	auto optionsWidget = new SaveOptionsWidget(Engine::getSong()->getSaveOptions());
-	VersionedSaveDialog sfd( this, optionsWidget, tr( "Save Project" ), "",
-			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
-				tr( "LMMS Project Template" ) + " (*.mpt)" );
+	bool native = ConfigManager::inst()->value("ui", "nativefiledialog").toInt();
+
+	FileDialog* sfd;
+
+	if (native)
+	{
+		sfd = new FileDialog( this, tr( "Save Project" ), "",
+		tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
+			tr( "LMMS Project Template" ) + " (*.mpt)" );
+	} else
+	{
+		sfd = new VersionedSaveDialog( this, optionsWidget, tr( "Save Project" ), "",
+tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
+	tr( "LMMS Project Template" ) + " (*.mpt)" );
+	}
+
 	QString f = Engine::getSong()->projectFileName();
 	if( f != "" )
 	{
-		sfd.setDirectory( QFileInfo( f ).absolutePath() );
-		sfd.selectFile( QFileInfo( f ).fileName() );
+		sfd->setDirectory( QFileInfo( f ).absolutePath() );
+		sfd->selectFile( QFileInfo( f ).fileName() );
 	}
 	else
 	{
-		sfd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+		sfd->setDirectory( ConfigManager::inst()->userProjectsDir() );
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
@@ -815,34 +828,89 @@ bool MainWindow::saveProjectAs()
 							"nommpz" ).toInt() == 0
 						? "mmpz"
 						: "mmp" ;
-	sfd.setDefaultSuffix( suffix );
+	sfd->setDefaultSuffix( suffix );
 
-	if( sfd.exec () == FileDialog::Accepted &&
-		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	QString fileName;
+
+	if (native)
 	{
-		QString fname = sfd.selectedFiles()[0] ;
-		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
+		fileName = sfd->getSaveFileName();
+		if (fileName.isEmpty())
 		{
-			// Remove the default suffix
-			fname.remove( "." + suffix );
-			if( !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
+			delete sfd;
+			return false;
+		}
+	}
+	else
+	{
+		if(sfd->exec() != FileDialog::Accepted || sfd->selectedFiles().isEmpty() || sfd->selectedFiles()[0] == "" )
+		{
+			delete sfd;
+			return false;
+		}
+
+		fileName = sfd->selectedFiles()[0] ;
+	}
+
+	if( sfd->selectedNameFilter().contains( "(*.mpt)" ) )
+	{
+		// Remove the default suffix
+		fileName.remove( "." + suffix );
+		if( !sfd->selectedFiles()[0].endsWith( ".mpt" ) )
+		{
+			if( VersionedSaveDialog::fileExistsQuery( fileName + ".mpt",
+					tr( "Save project template" ) ) )
 			{
-				if( VersionedSaveDialog::fileExistsQuery( fname + ".mpt",
-						tr( "Save project template" ) ) )
-				{
-					fname += ".mpt";
-				}
+				fileName += ".mpt";
 			}
 		}
-		if( this->guiSaveProjectAs( fname ) )
+	}
+
+	delete sfd;
+
+	if (native)
+	{
+		// Show SaveOptionsWidget in its own dialog
+		QDialog* optionsDialog = new QDialog(this);
+		optionsDialog->setWindowTitle(tr("Save Options"));
+		QVBoxLayout* layout = new QVBoxLayout(optionsDialog);
+		layout->addWidget(optionsWidget);
+
+		// Add OK/Cancel buttons
+		QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+		layout->addWidget(buttons);
+		connect(buttons, &QDialogButtonBox::accepted, optionsDialog, &QDialog::accept);
+		connect(buttons, &QDialogButtonBox::rejected, optionsDialog, &QDialog::reject);
+
+		if (optionsDialog->exec() == QDialog::Accepted)
+		{
+			if( this->guiSaveProjectAs( fileName ) )
+			{
+				if( getSession() == SessionState::Recover )
+				{
+					sessionCleanup();
+				}
+
+				delete optionsDialog;
+				return true;
+			}
+		}
+		delete optionsDialog;
+		return false;
+	} else
+	{
+		if( this->guiSaveProjectAs( fileName ) )
 		{
 			if( getSession() == SessionState::Recover )
 			{
 				sessionCleanup();
 			}
+
 			return true;
 		}
 	}
+
+
 	return false;
 }
 
