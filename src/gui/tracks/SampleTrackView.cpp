@@ -37,6 +37,7 @@
 #include "Knob.h"
 #include "SampleClip.h"
 #include "SampleTrackWindow.h"
+#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
@@ -211,11 +212,12 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? trackHeadWidth
 				: de->pos().x();
 
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		TimePos clipPos = trackContainerView()->fixedClips()
 				? TimePos(0)
 				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
-						).quantize(1.0);
+						).quantize(snapSize, true);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
 		if (sClip) { sClip->setSampleFile(value); }

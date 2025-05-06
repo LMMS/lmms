@@ -95,6 +95,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		auto ctls_btn = new QPushButton(embed::getIconPixmap("gear", 20, 20), "", this);
 		ctls_btn->setToolTip(tr("Controls"));
 		ctls_btn->setGeometry(144, 12, 28, 28);
+		ctls_btn->setFocusPolicy(Qt::NoFocus);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
