@@ -178,6 +178,7 @@ public:
 		auto pins(track_ch_t trackChannel) const -> const std::vector<BoolModel*>& { return m_pins[trackChannel]; }
 
 		auto channelCount() const -> proc_ch_t { return m_channelCount; }
+		auto trackChannelCount() const -> track_ch_t { return m_pins.size(); }
 
 		auto channelName(proc_ch_t channel) const -> QString;
 

@@ -53,39 +53,6 @@ constexpr auto DefaultMaxWindowSize = QSize{400, 256};
 } // namespace
 
 
-class PinConnector::MatrixView : public QWidget
-{
-public:
-	MatrixView(PinConnector* view, const AudioPortsModel::Matrix& matrix, bool isIn);
-	~MatrixView() override = default;
-	auto sizeHint() const -> QSize override;
-	auto minimumSizeHint() const -> QSize override;
-	void paintEvent(QPaintEvent*) override;
-	void mouseMoveEvent(QMouseEvent* me) override;
-	void mousePressEvent(QMouseEvent* me) override;
-	void updateSize();
-
-	//! Side length of square cells
-	static constexpr auto cellSize() -> int { return s_buttonSize + s_gridMargin; }
-
-private:
-	auto getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool;
-	auto calculateSize() const -> QSize;
-	auto getIcon(const BoolModel& model, int trackChannel, int pluginChannel) -> const QPixmap&;
-
-	AudioPortsModel* m_model;
-	const AudioPortsModel::Matrix* m_matrix;
-
-	QPixmap m_buttonOffBlack = embed::getIconPixmap("step_btn_off", s_buttonSize, s_buttonSize);
-	QPixmap m_buttonOffGray = embed::getIconPixmap("step_btn_off_light", s_buttonSize, s_buttonSize);
-	//QPixmap m_buttonOn0 = embed::getIconPixmap("step_btn_on_0", s_buttonSize, s_buttonSize);
-	QPixmap m_buttonOn = embed::getIconPixmap("step_btn_on_200", s_buttonSize, s_buttonSize);
-
-	static constexpr int s_buttonSize = 24;
-	static constexpr int s_gridMargin = 2;
-};
-
-
 PinConnector::PinConnector(AudioPortsModel* model)
 	: QWidget{}
 	, ModelView{model, this}
@@ -202,9 +169,8 @@ void PinConnector::paintEvent(QPaintEvent*)
 	if (!model) { return; }
 
 	constexpr int cellSize = MatrixView::cellSize();
-	constexpr auto textHeight = static_cast<int>(cellSize * 0.9);
 
-	QFont f = adjustedToPixelSize(font(), 16);
+	auto f = adjustedToPixelSize(font(), static_cast<int>(cellSize * 0.9));
 	f.setBold(false);
 	p.setFont(f);
 	p.setPen(palette().text().color());
@@ -219,10 +185,10 @@ void PinConnector::paintEvent(QPaintEvent*)
 	if (model->in().channelCount() != 0)
 	{
 		const auto width = inMatrixRect.left() - 4;
-		int yPos = inMatrixRect.y();
+		int yPos = inMatrixRect.y() + MatrixView::BorderWidth;
 		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
 		{
-			p.drawText(0, yPos, width, textHeight, Qt::AlignRight,
+			p.drawText(0, yPos, width, cellSize, Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
 
 			yPos += cellSize;
@@ -233,11 +199,11 @@ void PinConnector::paintEvent(QPaintEvent*)
 	if (model->out().channelCount() != 0)
 	{
 		const int xPos = outMatrixRect.right() + 4;
-		int yPos = outMatrixRect.y();
+		int yPos = outMatrixRect.y() + MatrixView::BorderWidth;
 		const int width = this->width() - outMatrixRect.right() - 4;
 		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
 		{
-			p.drawText(xPos, yPos, width, textHeight, Qt::AlignLeft,
+			p.drawText(xPos, yPos, width, cellSize, Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
 
 			yPos += cellSize;
@@ -248,31 +214,31 @@ void PinConnector::paintEvent(QPaintEvent*)
 
 	// TODO: Draw instruments with sidechain inputs differently?
 
-	// Draw plugin channel text (in)
+	// Draw processor channel text (in)
 	int yPos = inMatrixRect.top() - 4;
-	int xPos = inMatrixRect.x();
+	int xPos = inMatrixRect.x() + MatrixView::BorderWidth;
 	for (int idx = 0; idx < model->in().channelCount(); ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
 
 		const auto name = model->in().channelName(idx);
-		p.drawText(0, 0, yPos, textHeight, Qt::AlignLeft,
+		p.drawText(0, 0, yPos, cellSize, Qt::AlignLeft,
 			QString::fromUtf16(u"\U0001F82E %1").arg(name));
 
 		xPos += cellSize;
 	}
 
-	// Draw plugin channel text (out)
+	// Draw processor channel text (out)
 	yPos = outMatrixRect.top() - 4;
-	xPos = outMatrixRect.x();
+	xPos = outMatrixRect.x() + MatrixView::BorderWidth;
 	for (int idx = 0; idx < model->out().channelCount(); ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
 
 		const auto name = model->out().channelName(idx);
-		p.drawText(0, 0, yPos, textHeight, Qt::AlignLeft,
+		p.drawText(0, 0, yPos, cellSize, Qt::AlignLeft,
 			QString::fromUtf16(u"\U0001F82C %1").arg(name));
 
 		xPos += cellSize;
@@ -330,26 +296,41 @@ void PinConnector::MatrixView::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 	p.fillRect(rect(), p.background());
 
-	const auto& pins = m_matrix->pins();
-	if (pins.empty() || pins[0].empty()) { return; }
+	const auto tcCount = m_matrix->trackChannelCount();
+	const auto pcCount = m_matrix->channelCount();
+	if (tcCount == 0 || pcCount == 0) { return; }
 
-	assert(m_model->trackChannelCount() >= 2);
-	assert(m_model->trackChannelCount() <= pins.size());
+	// Draw border
+	p.fillRect(rect(), m_lineColor);
+	p.fillRect(rect().adjusted(BorderWidth, BorderWidth, -BorderWidth, -BorderWidth), p.background());
 
-	auto drawXY = QPoint{0, 0};
-	for (std::size_t tcIdx = 0; tcIdx < pins.size(); ++tcIdx)
+	// Draw vertical lines of grid
+	for (int drawX = BorderWidth; drawX < width(); drawX += cellSize())
 	{
-		drawXY.rx() = 0;
-		auto& pluginChannels = pins[tcIdx];
-		for (std::size_t pcIdx = 0; pcIdx < pluginChannels.size(); ++pcIdx)
-		{
-			BoolModel* pin = pluginChannels[pcIdx];
-			p.drawPixmap(drawXY, getIcon(*pin, tcIdx, pcIdx));
+		p.fillRect(drawX, BorderWidth, s_lineThickness, height() - BorderWidth, m_lineColor);
+	}
 
-			drawXY.rx() += cellSize();
+	// Draw horizontal lines of grid
+	for (int drawY = BorderWidth; drawY < height(); drawY += cellSize())
+	{
+		p.fillRect(BorderWidth, drawY, width() - BorderWidth, s_lineThickness, m_lineColor);
+	}
+
+	// Draw pin connector pins
+	int drawX;
+	int drawY = BorderWidth + s_lineThickness;
+	for (track_ch_t tc = 0; tc < tcCount; ++tc)
+	{
+		drawX = BorderWidth + s_lineThickness;
+		for (proc_ch_t pc = 0; pc < pcCount; ++pc)
+		{
+			p.fillRect(drawX + s_pinInnerMargin, drawY + s_pinInnerMargin,
+				s_pinSize, s_pinSize, getColor(tc, pc));
+
+			drawX += cellSize();
 		}
 
-		drawXY.ry() += cellSize();
+		drawY += cellSize();
 	}
 }
 
@@ -363,8 +344,8 @@ void PinConnector::MatrixView::mouseMoveEvent(QMouseEvent* me)
 		return;
 	}
 
-	int xIdx;
-	int yIdx;
+	int xIdx = 0;
+	int yIdx = 0;
 	if (!getCell(me->pos(), xIdx, yIdx))
 	{
 		unsetCursor();
@@ -389,8 +370,7 @@ void PinConnector::MatrixView::mousePressEvent(QMouseEvent* me)
 	if (me->modifiers() & Qt::ControlModifier)
 	{
 		// Taken from AutomatableModelView::mousePressEvent
-		new gui::StringPairDrag{"automatable_model", QString::number(model->id()),
-			getIcon(*model, yIdx, xIdx), this};
+		new gui::StringPairDrag{"automatable_model", QString::number(model->id()), QPixmap{}, this};
 	}
 	else
 	{
@@ -419,43 +399,43 @@ void PinConnector::MatrixView::updateSize()
 
 auto PinConnector::MatrixView::getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool
 {
-	if (!rect().contains(mousePos, true)) { return false; }
+	if (!rect().adjusted(BorderWidth, BorderWidth, -BorderWidth, -BorderWidth)
+		.contains(mousePos, true)) { return false; }
 
-	xIdx = mousePos.x() / cellSize();
-	yIdx = mousePos.y() / cellSize();
+	const auto mousePosAdj = mousePos - QPoint{BorderWidth + s_lineThickness, BorderWidth + s_lineThickness};
+
+	xIdx = mousePosAdj.x() / cellSize();
+	yIdx = mousePosAdj.y() / cellSize();
 
 	// Check if within margin
-	int relPos = mousePos.x() - xIdx * cellSize();
-	if (relPos >= s_buttonSize || relPos <= 0) { return false; }
+	int relPos = mousePosAdj.x() - xIdx * cellSize();
+	if (relPos > (cellSize() - s_lineThickness) || relPos < 0) { return false; }
 
-	relPos = mousePos.y() - yIdx * cellSize();
-	if (relPos >= s_buttonSize || relPos <= 0) { return false; } // NOLINT
+	relPos = mousePosAdj.y() - yIdx * cellSize();
+	if (relPos > (cellSize() - s_lineThickness) || relPos < 0) { return false; } // NOLINT
 
 	return true;
 }
 
-auto PinConnector::MatrixView::calculateSize() const -> QSize
+auto PinConnector::MatrixView::getColor(track_ch_t trackChannel, proc_ch_t processorChannel) -> QColor
 {
-	const auto tcc = static_cast<int>(m_model->trackChannelCount());
-	if (tcc == 0) { return QSize{0, 0}; }
-
-	const int pcc = m_matrix->channelCount();
-	if (pcc == 0) { return QSize{0, 0}; }
-
-	const int pcSize = pcc * cellSize() - s_gridMargin;
-	const int tcSize = tcc * cellSize() - s_gridMargin;
-
-	return {pcSize, tcSize};
+	return m_matrix->enabled(trackChannel, processorChannel)
+		? m_enabledColor
+		: m_disabledColor;
 }
 
-auto PinConnector::MatrixView::getIcon(const BoolModel& model, int trackChannel, int pluginChannel)
-	-> const QPixmap&
+auto PinConnector::MatrixView::calculateSize() const -> QSize
 {
-	// TODO: Alternate b/w black and gray icons?
-	(void)trackChannel;
-	(void)pluginChannel;
-	const auto* offIcon = &m_buttonOffBlack;
-	return model.value() ? m_buttonOn : *offIcon;
+	const auto tcc = static_cast<int>(m_matrix->trackChannelCount());
+	if (tcc == 0) { return {0, 0}; }
+
+	const int pcc = static_cast<int>(m_matrix->channelCount());
+	if (pcc == 0) { return {0, 0}; }
+
+	const int pcSize = pcc * cellSize() + s_lineThickness + BorderWidth * 2;
+	const int tcSize = tcc * cellSize() + s_lineThickness + BorderWidth * 2;
+
+	return {pcSize, tcSize};
 }
 
 } // namespace lmms::gui

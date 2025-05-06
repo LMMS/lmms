@@ -29,16 +29,15 @@
 
 #include "embed.h"
 #include "lmms_export.h"
+#include "AudioPortsModel.h"
 #include "ModelView.h"
 
 class QPixmap;
-//class QScrollArea;
 
 namespace lmms
 {
 
 class BoolModel;
-class AudioPortsModel;
 
 namespace gui
 {
@@ -50,6 +49,8 @@ class LMMS_EXPORT PinConnector
 	, public ModelView
 {
 	Q_OBJECT
+
+	Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor)
 
 public:
 	PinConnector(AudioPortsModel* model);
@@ -74,6 +75,52 @@ private:
 
 	MatrixView* m_inView = nullptr;
 	MatrixView* m_outView = nullptr;
+
+	QColor m_backgroundColor;
+};
+
+
+class PinConnector::MatrixView : public QWidget
+{
+	Q_OBJECT
+
+	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+	Q_PROPERTY(QColor enabledColor MEMBER m_enabledColor)
+	Q_PROPERTY(QColor disabledColor MEMBER m_disabledColor)
+
+public:
+	MatrixView(PinConnector* view, const AudioPortsModel::Matrix& matrix, bool isIn);
+	~MatrixView() override = default;
+	auto sizeHint() const -> QSize override;
+	auto minimumSizeHint() const -> QSize override;
+	void paintEvent(QPaintEvent*) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
+	void mousePressEvent(QMouseEvent* me) override;
+	void updateSize();
+
+	//! Side length of square cells
+	static constexpr auto cellSize() -> int
+	{
+		return s_pinSize + (s_pinInnerMargin * 2) + s_lineThickness;
+	}
+
+	static constexpr int BorderWidth = 1;
+
+private:
+	auto getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool;
+	auto getColor(track_ch_t trackChannel, proc_ch_t processorChannel) -> QColor;
+	auto calculateSize() const -> QSize;
+
+	AudioPortsModel* m_model = nullptr;
+	const AudioPortsModel::Matrix* m_matrix = nullptr;
+
+	QColor m_lineColor;
+	QColor m_enabledColor;
+	QColor m_disabledColor;
+
+	static constexpr int s_pinSize = 13;
+	static constexpr int s_pinInnerMargin = 1;
+	static constexpr int s_lineThickness = 1;
 };
 
 } // namespace gui
