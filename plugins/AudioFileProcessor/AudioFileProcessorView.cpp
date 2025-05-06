@@ -120,15 +120,15 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	m_ampKnob->setHintText(tr("Amplify:"), "%");
 
 	m_startKnob = new AudioFileProcessorWaveView::knob(this);
-	m_startKnob->move(45, 108);
+	m_startKnob->move(50, 108);
 	m_startKnob->setHintText(tr("Start point:"), "");
 
 	m_endKnob = new AudioFileProcessorWaveView::knob(this);
-	m_endKnob->move(125, 108);
+	m_endKnob->move(130, 108);
 	m_endKnob->setHintText(tr("End point:"), "");
 
 	m_loopKnob = new AudioFileProcessorWaveView::knob(this);
-	m_loopKnob->move(85, 108);
+	m_loopKnob->move(90, 108);
 	m_loopKnob->setHintText(tr("Loopback point:"), "");
 
 // interpolation selector
