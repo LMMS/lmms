@@ -65,13 +65,13 @@ PinConnector::PinConnector(AudioPortsModel* model)
 	const Model* parentModel = model->parentModel();
 	assert(parentModel != nullptr);
 
-	setWindowTitle(parentModel->fullDisplayName());
+	setWindowTitle(tr("%1 Pin Connector").arg(parentModel->fullDisplayName()));
 	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(this);
 	m_subWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 	setWindowIcon(embed::getIconPixmap("tool"));
 
 	// No maximize button
-	Qt::WindowFlags flags = m_subWindow->windowFlags();
+	auto flags = m_subWindow->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	m_subWindow->setWindowFlags(flags);
 
@@ -79,7 +79,7 @@ PinConnector::PinConnector(AudioPortsModel* model)
 	hLayout->addSpacing(WindowMarginSide.width());
 	hLayout->addWidget(m_inView, 0, Qt::AlignmentFlag::AlignRight);
 
-	auto getSpacerWidth = [&]() {
+	auto getSpacerWidth = [=]() {
 		const bool singleMatrix = model->trackChannelCount() == 0
 			|| model->in().channelCount() == 0
 			|| model->out().channelCount() == 0;
@@ -88,14 +88,13 @@ PinConnector::PinConnector(AudioPortsModel* model)
 	};
 
 	auto spacer = new QSpacerItem{getSpacerWidth(), 1, QSizePolicy::Fixed};
-	connect(model, &AudioPortsModel::propertiesChanged, this, [&]() {
+	connect(model, &AudioPortsModel::propertiesChanged, this, [=]() {
 		spacer->changeSize(getSpacerWidth(), 1, QSizePolicy::Fixed);
 	});
 	hLayout->addSpacerItem(spacer);
 
 	hLayout->addWidget(m_outView, 0, Qt::AlignmentFlag::AlignLeft);
 	hLayout->addSpacing(WindowMarginSide.width());
-
 
 	auto vLayout = new QVBoxLayout{this};
 	vLayout->addSpacing(WindowMarginTop.height());
@@ -165,7 +164,7 @@ void PinConnector::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 	p.fillRect(rect(), p.background());
 
-	const auto* model = castModel<AudioPortsModel>();
+	auto* model = castModel<AudioPortsModel>();
 	if (!model) { return; }
 
 	constexpr int cellSize = MatrixView::cellSize();
@@ -261,15 +260,15 @@ void PinConnector::updateGeometry()
 //////////////////////////////////////////////
 
 PinConnector::MatrixView::MatrixView(PinConnector* view,
-	const AudioPortsModel::Matrix& matrix, bool isIn)
+	AudioPortsModel::Matrix& matrix, bool isIn)
 	: QWidget{nullptr}
-	, m_model{view->castModel<AudioPortsModel>()}
 	, m_matrix{&matrix}
 {
-	assert(m_model != nullptr);
-	connect(m_model, &AudioPortsModel::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
+	auto model = view->castModel<AudioPortsModel>();
+	assert(model != nullptr);
+	connect(model, &AudioPortsModel::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
 
-	const Model* parentModel = m_model->parentModel();
+	const Model* parentModel = model->parentModel();
 	assert(parentModel != nullptr);
 
 	const char* formatText = isIn ? "LMMS to %1 input(s)" : "%1 output(s) to LMMS";
@@ -365,16 +364,17 @@ void PinConnector::MatrixView::mousePressEvent(QMouseEvent* me)
 		return;
 	}
 
-	BoolModel* model = m_matrix->pins().at(yIdx).at(xIdx);
-
+#if PIN_CONNECTOR_AUTOMATABLE_PINS
 	if (me->modifiers() & Qt::ControlModifier)
 	{
 		// Taken from AutomatableModelView::mousePressEvent
+		BoolModel* model = m_matrix->pins().at(yIdx).at(xIdx);
 		new gui::StringPairDrag{"automatable_model", QString::number(model->id()), QPixmap{}, this};
 	}
 	else
+#endif
 	{
-		model->setValue(!model->value());
+		m_matrix->setPin(yIdx, xIdx, !m_matrix->enabled(yIdx, xIdx));
 	}
 
 	me->accept();

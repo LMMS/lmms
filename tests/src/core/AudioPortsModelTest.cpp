@@ -37,6 +37,7 @@
 #include "AudioPortsModel.h"
 #include "SampleFrame.h"
 
+// TODO: Add a save/load test
 
 namespace lmms {
 
@@ -327,7 +328,7 @@ private slots:
 		// | |X| 1
 		//  ---
 
-		apm.out().pins(0)[0]->setValue(false);
+		apm.out().setPin(0, 0, false);
 
 		// Now only track channel 1 should have a processor channel routed to it
 		QCOMPARE(apm.m_routedChannels[0], false);
@@ -339,7 +340,7 @@ private slots:
 		// | |X| 1
 		//  ---
 
-		apm.out().pins(0)[1]->setValue(true);
+		apm.out().setPin(0, 1, true);
 
 		QCOMPARE(apm.m_routedChannels[0], true);
 		QCOMPARE(apm.m_routedChannels[1], true);
@@ -350,7 +351,7 @@ private slots:
 		// |X|X| 1
 		//  ---
 
-		apm.out().pins(1)[0]->setValue(true);
+		apm.out().setPin(1, 0, true);
 
 		QCOMPARE(apm.m_routedChannels[0], true);
 		QCOMPARE(apm.m_routedChannels[1], true);
@@ -388,7 +389,7 @@ private slots:
 		//  ---   ---
 
 		// Disabling a pin should prevent the optimization
-		apm.in().pins(0)[0]->setValue(false);
+		apm.in().setPin(0, 0, false);
 		QCOMPARE(apm.m_directRouting.has_value(), false);
 
 		// In    Out
@@ -400,9 +401,9 @@ private slots:
 		//  ---   ---
 
 		// The direct routing optimization requires the same track channel pairs on the input and output sides
-		apm.in().pins(1)[1]->setValue(false);
-		apm.in().pins(2)[0]->setValue(true);
-		apm.in().pins(3)[1]->setValue(true);
+		apm.in().setPin(1, 1, false);
+		apm.in().setPin(2, 0, true);
+		apm.in().setPin(3, 1, true);
 		QCOMPARE(apm.m_directRouting.has_value(), false);
 
 		// In    Out
@@ -414,10 +415,10 @@ private slots:
 		//  ---   ---
 
 		// But if the output side is also moved down, should be able to directly route the 2nd track channel pair
-		apm.out().pins(0)[0]->setValue(false);
-		apm.out().pins(1)[1]->setValue(false);
-		apm.out().pins(2)[0]->setValue(true);
-		apm.out().pins(3)[1]->setValue(true);
+		apm.out().setPin(0, 0, false);
+		apm.out().setPin(1, 1, false);
+		apm.out().setPin(2, 0, true);
+		apm.out().setPin(3, 1, true);
 		QCOMPARE(apm.m_directRouting.value_or(99), 1);
 
 		// Out
@@ -608,14 +609,14 @@ private slots:
 		// | |X| | | |
 		//  ---   ---
 		auto& apm = ap.model();
-		apm.in().pins(0)[0]->setValue(true);
-		apm.in().pins(0)[1]->setValue(false);
-		apm.in().pins(1)[0]->setValue(false);
-		apm.in().pins(1)[1]->setValue(true);
-		apm.out().pins(0)[0]->setValue(true);
-		apm.out().pins(0)[1]->setValue(false);
-		apm.out().pins(1)[0]->setValue(false);
-		apm.out().pins(1)[1]->setValue(false);
+		apm.in().setPin(0, 0, true);
+		apm.in().setPin(0, 1, false);
+		apm.in().setPin(1, 0, false);
+		apm.in().setPin(1, 1, true);
+		apm.out().setPin(0, 0, true);
+		apm.out().setPin(0, 1, false);
+		apm.out().setPin(1, 0, false);
+		apm.out().setPin(1, 1, false);
 
 		// Data on frames 0, 1, and 33
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
@@ -757,12 +758,12 @@ private slots:
 		// |X|   | | |
 		//  -     ---
 		auto& apm = ap.model();
-		apm.in().pins(0)[0]->setValue(true);
-		apm.in().pins(1)[0]->setValue(true);
-		apm.out().pins(0)[0]->setValue(true);
-		apm.out().pins(0)[1]->setValue(true);
-		apm.out().pins(1)[0]->setValue(false);
-		apm.out().pins(1)[1]->setValue(false);
+		apm.in().setPin(0, 0, true);
+		apm.in().setPin(1, 0, true);
+		apm.out().setPin(0, 0, true);
+		apm.out().setPin(0, 1, true);
+		apm.out().setPin(1, 0, false);
+		apm.out().setPin(1, 1, false);
 
 		// Data on frames 0, 1, and 33
 		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1

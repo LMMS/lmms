@@ -89,8 +89,9 @@ class PinConnector::MatrixView : public QWidget
 	Q_PROPERTY(QColor disabledColor MEMBER m_disabledColor)
 
 public:
-	MatrixView(PinConnector* view, const AudioPortsModel::Matrix& matrix, bool isIn);
+	MatrixView(PinConnector* view, AudioPortsModel::Matrix& matrix, bool isIn);
 	~MatrixView() override = default;
+
 	auto sizeHint() const -> QSize override;
 	auto minimumSizeHint() const -> QSize override;
 	void paintEvent(QPaintEvent*) override;
@@ -111,8 +112,7 @@ private:
 	auto getColor(track_ch_t trackChannel, proc_ch_t processorChannel) -> QColor;
 	auto calculateSize() const -> QSize;
 
-	AudioPortsModel* m_model = nullptr;
-	const AudioPortsModel::Matrix* m_matrix = nullptr;
+	AudioPortsModel::Matrix* m_matrix = nullptr;
 
 	QColor m_lineColor;
 	QColor m_enabledColor;

@@ -49,6 +49,18 @@
 class AudioPortsModelTest;
 #endif
 
+/**
+ * NOTE: The automatable pin functionality is currently disabled out of an abundance
+ * of caution (support cannot really be removed once users start using it) and also
+ * due to potential performance issues when loading/saving projects (each pin triggers
+ * the routed channels and direct routing caches to update).
+ *
+ * Set this macro to 1 to enable automatable pin connector pins.
+ */
+#ifndef PIN_CONNECTOR_AUTOMATABLE_PINS
+#define PIN_CONNECTOR_AUTOMATABLE_PINS 0
+#endif
+
 namespace lmms
 {
 
@@ -163,19 +175,24 @@ class LMMS_EXPORT AudioPortsModel
 
 public:
 	//! [track channel][audio processor channel]
+#if PIN_CONNECTOR_AUTOMATABLE_PINS
 	using PinMap = std::vector<std::vector<BoolModel*>>;
+#else
+	using PinMap = std::vector<std::vector<bool>>;
+#endif
 
 	//! A processor's input or output connections and other info
 	class Matrix
 	{
 	public:
-		explicit Matrix(bool isOutput)
+		explicit Matrix(AudioPortsModel* parent, bool isOutput)
 			: m_isOutput{isOutput}
+			, m_parent{parent}
 		{
 		}
 
 		auto pins() const -> const PinMap& { return m_pins; }
-		auto pins(track_ch_t trackChannel) const -> const std::vector<BoolModel*>& { return m_pins[trackChannel]; }
+		auto pins(track_ch_t trackChannel) -> const auto& { return m_pins[trackChannel]; }
 
 		auto channelCount() const -> proc_ch_t { return m_channelCount; }
 		auto trackChannelCount() const -> track_ch_t { return m_pins.size(); }
@@ -184,16 +201,35 @@ public:
 
 		auto enabled(track_ch_t trackChannel, proc_ch_t processorChannel) const -> bool
 		{
+#if PIN_CONNECTOR_AUTOMATABLE_PINS
 			return m_pins[trackChannel][processorChannel]->value();
+#else
+			return m_pins[trackChannel][processorChannel];
+#endif
 		}
 
+		//! Sets a pin connector pin, updates the cache, then emits a dataChanged signal if needed
+		void setPin(track_ch_t trackChannel, proc_ch_t processorChannel, bool value);
+
+#if !PIN_CONNECTOR_AUTOMATABLE_PINS
+		//! Sets a pin connector pin without updating the cache or emitting a dataChanged signal
+		void setPinSilent(track_ch_t trackChannel, proc_ch_t processorChannel, bool value)
+		{
+			// TODO: Is there a way to do this when using AutomatableModel?
+			m_pins[trackChannel][processorChannel] = value;
+		}
+#endif
+
 		auto isOutput() const -> bool { return m_isOutput; }
+
+		//! Calls the parent's updateRoutedChannels and updateDirectRouting methods
+		void updateCache(track_ch_t trackChannel);
 
 		friend class AudioPortsModel;
 
 	private:
-		void setTrackChannelCount(AudioPortsModel* parent, track_ch_t count, const QString& nameFormat);
-		void setChannelCount(AudioPortsModel* parent, proc_ch_t count, const QString& nameFormat);
+		void setTrackChannelCount(track_ch_t count, const QString& nameFormat);
+		void setChannelCount(proc_ch_t count, const QString& nameFormat);
 
 		void setDefaultConnections();
 
@@ -204,6 +240,7 @@ public:
 		proc_ch_t m_channelCount = 0;
 		const bool m_isOutput = false;
 		std::vector<QString> m_channelNames; //!< optional
+		AudioPortsModel* m_parent = nullptr;
 	};
 
 	AudioPortsModel(bool isInstrument, Model* parent);
@@ -212,7 +249,9 @@ public:
 	/**
 	 * Getters
 	 */
+	auto in() -> Matrix& { return m_in; }
 	auto in() const -> const Matrix& { return m_in; }
+	auto out() -> Matrix& { return m_out; }
 	auto out() const -> const Matrix& { return m_out; }
 	auto trackChannelCount() const -> track_ch_t { return m_totalTrackChannels; }
 
@@ -379,8 +418,8 @@ private:
 	void updateAllRoutedChannels();
 	void updateDirectRouting();
 
-	Matrix m_in{false}; //!< LMMS --> audio processor
-	Matrix m_out{true}; //!< audio processor --> LMMS
+	Matrix m_in{this, false}; //!< LMMS --> audio processor
+	Matrix m_out{this, true}; //!< audio processor --> LMMS
 
 	// TODO: When full routing is added, get LMMS channel counts from bus or audio router class
 	track_ch_t m_totalTrackChannels = DEFAULT_CHANNELS;
