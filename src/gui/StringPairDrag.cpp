@@ -45,9 +45,6 @@ StringPairDrag::StringPairDrag(Clipboard::DataType key, const QString& _value,
 				const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets) :
 	QDrag( _w )
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
 	if( _icon.isNull() && _w )
 	{
 		setPixmap( _w->grab().scaled(
@@ -61,12 +58,13 @@ StringPairDrag::StringPairDrag(Clipboard::DataType key, const QString& _value,
 	}
 	QString txt = Clipboard::getStringPairKeyName(key) + ":" + _value;
 	auto m = new QMimeData();
-	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
-	setMimeData( m );
+	m->setData(Clipboard::mimeType(Clipboard::MimeType::StringPair), txt.toUtf8());
+	setMimeData(m); // QDrag
 	if (shouldHighlightWidgets)
 	{
 		InteractiveModelView::startHighlighting(key);
 	}
+
 	exec( Qt::CopyAction, Qt::CopyAction );
 }
 

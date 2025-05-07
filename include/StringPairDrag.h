@@ -45,6 +45,7 @@ namespace lmms::gui
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
+	// use this class if you want to drag and drop, use `Clipboard::copyStringPair` to copy to clipboard
 	StringPairDrag(Clipboard::DataType key, const QString& _value,
 					const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets = true);
 	~StringPairDrag() override;
