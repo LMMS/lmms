@@ -146,12 +146,14 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	masterLayout->setContentsMargins(0, 1, 0, 0);
 	auto layout = new QHBoxLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
-	layout->setSpacing(0);
+	layout->setSpacing(3);
 	layout->addWidget(m_tlb);
+	//layout->addStretch();
 	layout->addWidget(m_mixerChannelNumber);
 	layout->addWidget(m_activityIndicator);
 	layout->addWidget(m_volumeKnob);
 	layout->addWidget(m_panningKnob);
+	layout->addSpacing(4);
 	masterLayout->addLayout(layout);
 	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 

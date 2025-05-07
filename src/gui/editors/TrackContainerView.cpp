@@ -84,6 +84,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppb( DEFAULT_PIXELS_PER_BAR ),
+	m_trackViewWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() ? MINIMUM_TRACK_WIDTH : DEFAULT_TRACK_WIDTH),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
 	m_tc->setHook( this );
@@ -350,6 +351,14 @@ void TrackContainerView::setPixelsPerBar( int ppb )
 	}
 }
 
+
+
+void TrackContainerView::setTrackViewWidth(int width)
+{
+	m_trackViewWidth = std::max(width, MINIMUM_TRACK_WIDTH);
+
+	emit trackViewWidthChanged(m_trackViewWidth);
+}
 
 
 

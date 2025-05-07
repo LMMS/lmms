@@ -141,7 +141,7 @@ public:
 	// -------------------------------------------------------
 
 	int getTrackViewWidth() const { return m_trackViewWidth; }
-	void setTrackViewWidth(int width) { m_trackViewWidth = width; }
+	void setTrackViewWidth(int width);
 
 	void clearAllTracks();
 
@@ -199,13 +199,14 @@ private:
 
 	float m_ppb;
 
-	int m_trackViewWidth = 100;
+	int m_trackViewWidth;
 
 	RubberBand * m_rubberBand;
 
 signals:
 	void positionChanged( const lmms::TimePos & _pos );
 	void tracksRealigned();
+	void trackViewWidthChanged(int width);
 
 
 } ;

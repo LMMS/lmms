@@ -24,6 +24,9 @@
  */
  
 #include "AutomationTrackView.h"
+
+#include <QLayout>
+
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "embed.h"
@@ -42,8 +45,17 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
         setFixedHeight( 32 );
 		auto tlb = new TrackLabelButton(this, getTrackSettingsWidget());
 		tlb->setIcon(embed::getIconPixmap("automation_track"));
-		tlb->move(3, 1);
 		tlb->show();
+
+		auto masterLayout = new QVBoxLayout(getTrackSettingsWidget());
+		masterLayout->setContentsMargins(0, 1, 0, 0);
+		auto layout = new QHBoxLayout();
+		layout->setContentsMargins(0, 0, 0, 0);
+		layout->addWidget(tlb);
+		layout->addSpacing(4);
+		masterLayout->addLayout(layout);
+		masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
 		setModel(_at);
 }
 
