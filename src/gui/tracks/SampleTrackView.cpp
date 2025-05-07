@@ -206,7 +206,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 	if (type == "samplefile")
 	{
-		int trackHeadWidth = trackContainerView()->getTrackViewWidth();
+		int trackHeadWidth = trackContainerView()->getTrackHeadWidth();
 
 		int xPos = de->pos().x() < trackHeadWidth
 				? trackHeadWidth

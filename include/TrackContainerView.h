@@ -140,8 +140,8 @@ public:
 	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
-	int getTrackViewWidth() const { return m_trackViewWidth; }
-	void setTrackViewWidth(int width);
+	int getTrackHeadWidth() const { return m_trackHeadWidth; }
+	void setTrackHeadWidth(int width);
 
 	void clearAllTracks();
 
@@ -199,14 +199,14 @@ private:
 
 	float m_ppb;
 
-	int m_trackViewWidth;
+	int m_trackHeadWidth;
 
 	RubberBand * m_rubberBand;
 
 signals:
 	void positionChanged( const lmms::TimePos & _pos );
 	void tracksRealigned();
-	void trackViewWidthChanged(int width);
+	void trackHeadWidthChanged(int width);
 
 
 } ;

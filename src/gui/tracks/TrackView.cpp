@@ -110,7 +110,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
 			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
 	
-	connect(m_trackContainerView, &TrackContainerView::trackViewWidthChanged, this, &TrackView::updateWidth);
+	connect(m_trackContainerView, &TrackContainerView::trackHeadWidthChanged, this, &TrackView::updateWidth);
 
 	auto trackGrip = m_trackOperationsWidget.getTrackGrip();
 	connect(trackGrip, &TrackGrip::grabbed, this, &TrackView::onTrackGripGrabbed);
@@ -139,7 +139,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 void TrackView::resizeEvent( QResizeEvent * re )
 {
 	m_trackOperationsWidget.setFixedSize(TRACK_OP_WIDTH, height() - 1);
-	m_trackSettingsWidget.setFixedSize(m_trackContainerView->getTrackViewWidth() - m_trackOperationsWidget.width(), height() - 1);
+	m_trackSettingsWidget.setFixedSize(m_trackContainerView->getTrackHeadWidth() - m_trackOperationsWidget.width(), height() - 1);
 
 	m_trackContentWidget.setFixedHeight(height());
 }
@@ -271,7 +271,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 
 
-	int widgetTotal = m_trackContainerView->getTrackViewWidth();
+	int widgetTotal = m_trackContainerView->getTrackHeadWidth();
 
 	if( m_trackContainerView->allowRubberband() == true  && me->x() > widgetTotal )
 	{
@@ -321,7 +321,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
  */
 void TrackView::mouseMoveEvent( QMouseEvent * me )
 {
-	int widgetTotal = m_trackContainerView->getTrackViewWidth();
+	int widgetTotal = m_trackContainerView->getTrackHeadWidth();
 
 	if( m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal )
 	{
@@ -357,7 +357,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::ResizeHorizontal )
 	{
-		m_trackContainerView->setTrackViewWidth(me->x());
+		m_trackContainerView->setTrackHeadWidth(me->x());
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )

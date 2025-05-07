@@ -25,6 +25,7 @@
 #include "PatternEditor.h"
 
 #include <QAction>
+#include <QDomElement>
 
 #include "ClipView.h"
 #include "ComboBox.h"
@@ -115,11 +116,13 @@ void PatternEditor::removeViewsForPattern(int pattern)
 void PatternEditor::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
+	element.setAttribute("trackheadwidth", getTrackHeadWidth());
 }
 
 void PatternEditor::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+	setTrackHeadWidth(element.attribute("trackheadwidth", QString::number(getTrackHeadWidth())).toInt());
 }
 
 
