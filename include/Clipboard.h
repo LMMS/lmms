@@ -88,7 +88,7 @@ namespace Clipboard
 
 	// Helper methods for String Pair data
 	QString getStringPairKeyName(DataType type);
-	void copyStringPair(DataType key, const QString& value);
+	void copyStringPair(DataType key, const QString& value, bool shouldHighlightWidgets = true);
 	DataType decodeKey(const QMimeData* mimeData);
 	QString decodeValue( const QMimeData * mimeData );
 

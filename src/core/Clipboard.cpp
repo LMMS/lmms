@@ -29,6 +29,7 @@
 #include "Clipboard.h"
 
 #include "AutomatableModel.h"
+#include "InteractiveModelView.h"
 
 
 namespace lmms::Clipboard
@@ -120,13 +121,18 @@ namespace lmms::Clipboard
 	}
 
 
-	void copyStringPair(DataType key, const QString& value)
+	void copyStringPair(DataType key, const QString& value, bool shouldHighlightWidgets)
 	{
 		QString finalString = getStringPairKeyName(key) + ":" + value;
 
 		auto content = new QMimeData;
-		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
-		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+		content->setData(mimeType(MimeType::StringPair), finalString.toUtf8());
+		QApplication::clipboard()->setMimeData(content, QClipboard::Clipboard);
+
+		if (shouldHighlightWidgets)
+		{
+			lmms::gui::InteractiveModelView::startHighlighting(key);
+		}
 	}
 
 
