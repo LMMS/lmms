@@ -84,7 +84,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppb( DEFAULT_PIXELS_PER_BAR ),
-	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() ? MINIMUM_TRACK_WIDTH : DEFAULT_TRACK_WIDTH),
+	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() ? COMPACT_TRACK_WIDTH : DEFAULT_TRACK_WIDTH),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
 	m_tc->setHook( this );

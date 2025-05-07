@@ -45,6 +45,7 @@
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
+#include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 
 
@@ -76,6 +77,11 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
+
+	connect(trackContainerView(), &TrackContainerView::trackHeadWidthChanged, this, [this](int width){
+		if (width < COMPACT_TRACK_WIDTH) { m_mixerChannelNumber->hide(); }
+		else { m_mixerChannelNumber->show(); }
+	});
 
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Volume" ) );

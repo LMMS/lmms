@@ -241,7 +241,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	// TODO: Use style sheet
 	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
-		setMinimumWidth(MINIMUM_TRACK_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
+		setMinimumWidth(COMPACT_TRACK_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
 	}
 	else
 	{
