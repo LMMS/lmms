@@ -589,10 +589,6 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
-	// focusing is weird, workaround PianoView's agressive focus and see if InteractiveModelView can accept it
-	bool accepted = getGUI()->mainWindow()->focusedInteractiveModelHandleKeyPress(_ke);
-	if (accepted) { return; }
-	
 	const int key_num = getKeyFromKeyEvent( _ke );
 
 	if( _ke->isAutoRepeat() == false && key_num > -1 )

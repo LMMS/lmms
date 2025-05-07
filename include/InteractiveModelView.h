@@ -69,61 +69,8 @@ public:
 	//! shouldStopHighlightingOrhers: calls `stopHighlighting()`,
 	//! should be false if multiple widgets are highlighted and `this` is not the first one
 	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);
-
-	//! returns true if successful
-	//! checks if QKeyEvent maches with a known shortcut and calls `processShortcutPressed()`
-	bool HandleKeyPress(QKeyEvent* event);
 protected:
-	struct ModelShortcut
-	{
-		ModelShortcut() {}
-		ModelShortcut(Qt::Key key, Qt::KeyboardModifier modifier, unsigned int times, QString description, bool shouldLoop) :
-			key(key),
-			modifier(modifier),
-			times(times),
-			shortcutDescription(description),
-			shouldLoop(shouldLoop)
-		{
-		}
 
-		bool operator==(ModelShortcut& rhs)
-		{
-			return key == rhs.key
-				&& modifier == rhs.modifier
-				&& times == rhs.times
-				&& shouldLoop == rhs.shouldLoop;
-		}
-
-		void reset()
-		{
-			key = Qt::Key_F35;
-			modifier = Qt::NoModifier;
-			times = 0;
-			shortcutDescription = "";
-			shouldLoop = false;
-		}
-
-		Qt::Key key = Qt::Key_F35;
-		Qt::KeyboardModifier modifier = Qt::NoModifier;
-		//! how many times do the keys need to be pressed to activate this shortcut
-		unsigned int times = 0;
-		//! what the shortcut does
-		QString shortcutDescription = "";
-		//! should it loop back if m_times is reached
-		bool shouldLoop = false;
-	};
-
-	void keyPressEvent(QKeyEvent* event) override;
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
-	
-	//! returns the avalible shortcuts for the widget
-	virtual const std::vector<ModelShortcut>& getShortcuts() = 0;
-	//! called when a shortcut from `getShortcuts()` is pressed
-	virtual void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) = 0;
-	//! called when a shortcut message needs to be displayed
-	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
-	virtual QString getShortcutMessage() = 0;
 	//! returns true if the widget supports pasting / dropping `dataType` (used for StringPairDrag and Copying)
 	virtual bool canAcceptClipboardData(Clipboard::DataType dataType) = 0;
 	//! should implement dragging and dropping widgets or pasting from clipboard
@@ -137,8 +84,6 @@ protected:
 
 	//! draws the highlight automatically for the widget if highlighted
 	void drawAutoHighlight(QPainter* painter);
-	//! builds a string from `getShortcuts()`
-	QString buildShortcutMessage();
 
 	bool getIsHighlighted() const;
 	//! shouldOverrideUpdate: should update if visible, ignore optimizations
@@ -150,13 +95,8 @@ private slots:
 		stopHighlighting();
 	}
 private:
-	bool doesShortcutMatch(const ModelShortcut* shortcut, QKeyEvent* event) const;
-	bool doesShortcutMatch(const ModelShortcut* shortcutA, const ModelShortcut* shortcutB) const;
 
 	bool m_isHighlighted;
-	
-	ModelShortcut m_lastShortcut;
-	unsigned int m_lastShortcutCounter;
 
 	static std::unique_ptr<QColor> s_highlightColor;
 	static std::unique_ptr<QColor> s_usedHighlightColor;

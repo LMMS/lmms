@@ -1269,15 +1269,6 @@ void MainWindow::setFocusedInteractiveModel(InteractiveModelView* model)
 	m_focusedInteractiveModel = model;
 }
 
-bool MainWindow::focusedInteractiveModelHandleKeyPress(QKeyEvent* event)
-{
-	if (m_focusedInteractiveModel != nullptr)
-	{
-		return m_focusedInteractiveModel->HandleKeyPress(event);
-	}
-	return false;
-}
-
 
 void MainWindow::focusOutEvent( QFocusEvent * _fe )
 {
@@ -1325,9 +1316,6 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		}
 		default:
 		{
-			bool accepted = focusedInteractiveModelHandleKeyPress(_ke);
-			if (accepted) { break; }
-			
 			InstrumentTrackWindow * w =
 						InstrumentTrackView::topLevelInstrumentTrackWindow();
 			if( w )

@@ -45,16 +45,6 @@ namespace lmms::gui
 {
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
-QString FloatModelEditorBase::m_shortcutMessage = "";
-std::vector<InteractiveModelView::ModelShortcut> FloatModelEditorBase::s_shortcutArray =
-{
-	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 1, QString(tr("Link widget")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_E, Qt::ShiftModifier, 0, QString(tr("Increase value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_Q, Qt::ShiftModifier, 0, QString(tr("Decrease value")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_U, Qt::ControlModifier, 0, QString(tr("Unlink widget")), false)
-};
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	InteractiveModelView(parent),
@@ -73,11 +63,6 @@ void FloatModelEditorBase::initUi(const QString & name)
 	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
-	}
-
-	if (m_shortcutMessage == "")
-	{
-		m_shortcutMessage = buildShortcutMessage();
 	}
 
 	setWindowTitle(name);
@@ -289,45 +274,6 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	p.setBrush(foreground);
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
 	drawAutoHighlight(&p);
-}
-
-const std::vector<InteractiveModelView::ModelShortcut>& FloatModelEditorBase::getShortcuts()
-{
-	return s_shortcutArray;
-}
-
-void FloatModelEditorBase::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
-{
-	switch (shortcutLocation)
-	{
-		case 0:
-			Clipboard::copyStringPair(Clipboard::DataType::FloatValue, Clipboard::encodeFloatValue(model()->value() * getConversionFactor()));
-			InteractiveModelView::startHighlighting(Clipboard::DataType::FloatValue);
-			break;
-		case 1:
-			Clipboard::copyStringPair(Clipboard::DataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*model()));
-			InteractiveModelView::startHighlighting(Clipboard::DataType::AutomatableModelLink);
-			break;
-		case 2:
-			processPaste(Clipboard::getMimeData());
-			break;
-		case 3:
-			model()->setValue(model()->value() + model()->range() / 20.0f);
-			break;
-		case 4:
-			model()->setValue(model()->value() - model()->range() / 20.0f);
-			break;
-		case 5:
-			model()->unlinkAllModels();
-			break;
-		default:
-			break;
-	}
-}
-
-QString FloatModelEditorBase::getShortcutMessage()
-{
-	return m_shortcutMessage;
 }
 
 bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::DataType dataType)

@@ -48,9 +48,6 @@
 namespace lmms::gui
 {
 
-QString AutomationClipView::m_shortcutMessage = "";
-std::vector<InteractiveModelView::ModelShortcut> AutomationClipView::s_shortcutArray = {};
-
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
 	ClipView( _clip, _parent ),
@@ -61,13 +58,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 			this, SLOT(update()));
 	connect( getGUI()->automationEditor(), SIGNAL(currentClipChanged()),
 			this, SLOT(update()));
-
-	if (m_shortcutMessage == "")
-	{
-		s_shortcutArray = ClipView::getShortcuts();
-		s_shortcutArray.emplace_back(Qt::Key_F, Qt::ControlModifier, 0, QString(tr("Open in Automation editor")), false);
-		m_shortcutMessage = buildShortcutMessage();
-	}
 
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
@@ -215,29 +205,6 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 				this, SLOT(disconnectObject(QAction*)));
 		_cm->addMenu( m );
 	}
-}
-
-const std::vector<InteractiveModelView::ModelShortcut>& AutomationClipView::getShortcuts()
-{
-	return s_shortcutArray;
-}
-
-void AutomationClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
-{
-	switch (shortcutLocation)
-	{
-		case 3:
-			openInAutomationEditor();
-			break;
-		default:
-			ClipView::processShortcutPressed(shortcutLocation, event);
-			break;
-	}
-}
-
-QString AutomationClipView::getShortcutMessage()
-{
-	return m_shortcutMessage;
 }
 
 bool AutomationClipView::canAcceptClipboardData(Clipboard::DataType dataType)

@@ -86,9 +86,6 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	// InteractiveModelView methods
-	const std::vector<ModelShortcut>& getShortcuts() override;
-	void processShortcutPressed(size_t shortcutLocation, QKeyEvent* event) override;
-	QString getShortcutMessage() override;
 	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
 	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 
@@ -113,8 +110,6 @@ private:
 	}
 
 	static SimpleTextFloat * s_textFloat;
-	static QString m_shortcutMessage;
-	static std::vector<InteractiveModelView::ModelShortcut> s_shortcutArray;
 
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;

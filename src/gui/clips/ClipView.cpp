@@ -73,21 +73,6 @@ const int RESIZE_GRIP_WIDTH = 4;
  */
 TextFloat * ClipView::s_textFloat = nullptr;
 
-/*! QString holding the generated shortcut description.
- *
- * Update with `InteractiveModelView::buildShortcutMessage()`
- */
-QString ClipView::m_shortcutMessage = "";
-
-/*! Vector storing the widget's shortcuts.
- */
-std::vector<InteractiveModelView::ModelShortcut> ClipView::s_shortcutArray =
-{
-	InteractiveModelView::ModelShortcut(Qt::Key_C, Qt::ControlModifier, 0, QString(tr("Copy clip")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_V, Qt::ControlModifier, 0, QString(tr("Paste clip")), false),
-	InteractiveModelView::ModelShortcut(Qt::Key_X, Qt::ControlModifier, 0, QString(tr("Cut out clip")), false)
-};
-
 
 /*! \brief Create a new ClipView
  *
@@ -128,10 +113,6 @@ ClipView::ClipView( Clip * clip,
 	{
 		s_textFloat = new TextFloat;
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
-	}
-	if (m_shortcutMessage == "")
-	{
-		m_shortcutMessage = buildShortcutMessage();
 	}
 
 	setAttribute( Qt::WA_DeleteOnClose, true );
@@ -379,11 +360,6 @@ void ClipView::updatePosition()
 	m_trackView->trackContainerView()->update();
 }
 
-QString ClipView::getDefaultSortcutMessage()
-{
-	return m_shortcutMessage;
-}
-
 
 void ClipView::selectColor()
 {
@@ -476,16 +452,6 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
  */
 void ClipView::dropEvent( QDropEvent * de )
 {
-	if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return; }
-	Clipboard::DataType type = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue( de );
-
-	// Track must be the same type to paste into
-	if (type != getClipStringPairType(m_clip->getTrack()) || type == Clipboard::DataType::None)
-	{
-		return;
-	}
-
 	bool shouldAccept = processPaste(de->mimeData());
 
 	if (shouldAccept)
@@ -1171,38 +1137,6 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 	}
 }
 
-const std::vector<InteractiveModelView::ModelShortcut>& ClipView::getShortcuts()
-{
-	return s_shortcutArray;
-}
-
-void ClipView::processShortcutPressed(size_t shortcutLocation, QKeyEvent* event)
-{
-	switch (shortcutLocation)
-	{
-		case 0:
-			contextMenuAction(ContextMenuAction::Copy);
-			//static void startHighlighting(Clipboard::DataType dataType);
-			break;
-		case 1:
-			contextMenuAction(ContextMenuAction::Paste);
-			break;
-		case 2:
-			if (fixedClips() == false)
-			{
-				contextMenuAction(ContextMenuAction::Cut);
-			}
-			break;
-		default:
-			break;
-	}
-}
-
-QString ClipView::getShortcutMessage()
-{
-	return m_shortcutMessage;
-}
-
 bool ClipView::canAcceptClipboardData(Clipboard::DataType dataType)
 {
 	return dataType == getClipStringPairType(m_clip->getTrack());;
@@ -1272,7 +1206,6 @@ void ClipView::copy( QVector<ClipView *> clipvs )
 
 	// Copy the Clip type as a key and the Clip data file to the clipboard
 	Clipboard::copyStringPair(getClipStringPairType(m_clip->getTrack()), dataFile.toString());
-	InteractiveModelView::startHighlighting(getClipStringPairType(m_clip->getTrack()));
 }
 
 void ClipView::cut( QVector<ClipView *> clipvs )
