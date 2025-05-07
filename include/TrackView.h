@@ -52,7 +52,7 @@ const int TRACK_OP_WIDTH = 78;
 
 const int DEFAULT_TRACK_WIDTH = 338;
 const int COMPACT_TRACK_WIDTH = 214;
-const int MINIMUM_TRACK_WIDTH = 165;
+const int MINIMUM_TRACK_WIDTH = 168;
 
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
