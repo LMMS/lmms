@@ -38,9 +38,6 @@
 namespace lmms
 {
 
-std::unique_ptr<ThreadedExportManager> SampleClip::s_sampleExporter = std::make_unique<ThreadedExportManager>();
-
-
 SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
 	Clip(_track),
 	m_sample(std::move(sample)),
@@ -387,7 +384,7 @@ gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 void SampleClip::exportSampleBuffer(const QString& fileName)
 {
 	m_exportedSampleName = fileName;
-	s_sampleExporter->startExporting(fileName, m_sample.buffer());
+	Engine::exportManager()->startExporting(fileName, m_sample.buffer());
 }
 
 
