@@ -368,7 +368,7 @@ void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count, const QStri
 	}
 	else if (oldSize < count)
 	{
-		auto parentModel = m_parent->parentModel();
+		[[maybe_unused]] auto parentModel = m_parent->parentModel();
 		assert(parentModel != nullptr);
 
 		m_pins.resize(count);
@@ -396,7 +396,7 @@ void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count, const QStri
 
 void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count, const QString& nameFormat)
 {
-	auto parentModel = m_parent->parentModel();
+	[[maybe_unused]] auto parentModel = m_parent->parentModel();
 	assert(parentModel != nullptr);
 
 	const bool initialSetup = m_channelCount == 0;
@@ -503,13 +503,12 @@ void AudioPortsModel::Matrix::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 {
-	const auto trackChannelCount = m_pins.size();
-	assert(m_channelCount == (trackChannelCount > 0 ? static_cast<proc_ch_t>(m_pins[0].size()) : 0));
+	assert(m_channelCount == (trackChannelCount() > 0 ? static_cast<proc_ch_t>(m_pins[0].size()) : 0));
 
 #if PIN_CONNECTOR_AUTOMATABLE_PINS
 	// Helper to delay loading/setting each AutomatableModel until the end
 	std::vector<std::vector<bool>> connectionsToLoad;
-	connectionsToLoad.resize(trackChannelCount);
+	connectionsToLoad.resize(trackChannelCount());
 	for (auto& processorChannels : connectionsToLoad)
 	{
 		processorChannels.resize(m_channelCount);
