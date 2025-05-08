@@ -49,26 +49,18 @@ public:
 	ThreadedExportManager();
 	~ThreadedExportManager();
 
-	//! outputLocationAndName: should include path and name, could include ".flac"
+	//! @param outputLocationAndName: should include path and name, could include ".flac"
 	void startExporting(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer, callbackFn callbackFunction = nullptr, void* callbackObject = nullptr);
 	void stopExporting();
-	
-	//void writeBuffer(const SampleFrame* _ab, fpp_t const frames);
 
 private:
-	static void threadedExportFunction(ThreadedExportManager* thisExporter, volatile std::atomic<bool>* abortExport);
-
-	void stopThread();
-	bool openFile(const QString& outputLocationAndName, std::shared_ptr<const SampleBuffer> buffer);
-	void exportBuffer(std::shared_ptr<const SampleBuffer> buffer);
-	void closeFile();
+	static void threadedExportMethod(ThreadedExportManager* thisExporter, std::atomic<bool>* abortExport);
 
 	std::vector<std::tuple<QString, std::shared_ptr<const SampleBuffer>, callbackFn, void*>> m_buffers;
 
-	volatile std::atomic<bool> m_abortExport;
-	bool m_isThreadRunning;
+	std::atomic<bool> m_isThreadRunning = false;
 	std::mutex m_readMutex;
-	std::thread* m_thread;
+	std::thread* m_thread = nullptr;
 };
 
 } // namespace lmms

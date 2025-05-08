@@ -30,11 +30,7 @@
 namespace lmms
 {
 
-ThreadedExportManager::ThreadedExportManager() :
-	m_abortExport(false),
-	m_isThreadRunning(false),
-	m_readMutex(),
-	m_thread(nullptr)
+ThreadedExportManager::ThreadedExportManager()
 {}
 
 ThreadedExportManager::~ThreadedExportManager()
@@ -53,7 +49,7 @@ void ThreadedExportManager::startExporting(const QString& outputLocationAndName,
 	{
 		stopExporting();
 		m_isThreadRunning = true;
-		m_thread = new std::thread(&ThreadedExportManager::threadedExportFunction, this, &m_abortExport);
+		m_thread = new std::thread(&ThreadedExportManager::threadedExportMethod, this, &m_isThreadRunning);
 	}
 }
 
@@ -61,23 +57,16 @@ void ThreadedExportManager::stopExporting()
 {
 	if (m_thread != nullptr)
 	{
-		if (m_isThreadRunning == true)
-		{
-			m_abortExport = true;
-		}
+		m_isThreadRunning = false;
 		m_thread->join();
 		delete m_thread;
 		m_thread = nullptr;
-		m_isThreadRunning = false;
-		m_abortExport = false;
 	}
 }
 
 
-void ThreadedExportManager::threadedExportFunction(ThreadedExportManager* thisExporter, volatile std::atomic<bool>* abortExport)
+void ThreadedExportManager::threadedExportMethod(ThreadedExportManager* thisExporter, std::atomic<bool>* abortExport)
 {
-	thisExporter->m_isThreadRunning = true;
-
 	while (*abortExport == false)
 	{
 		std::tuple<QString, std::shared_ptr<const SampleBuffer>, callbackFn, void*> curBuffer = std::make_tuple(QString(""), nullptr, nullptr, nullptr);
@@ -92,6 +81,7 @@ void ThreadedExportManager::threadedExportFunction(ThreadedExportManager* thisEx
 		if (shouldExit) { break; }
 
 		// important new scope
+		// can't call back if flacExporter's file is open
 		{
 			FlacExporter flacExporter(std::get<1>(curBuffer)->sampleRate(), 24, std::get<0>(curBuffer));
 			if (flacExporter.getIsSuccesful())
@@ -106,8 +96,6 @@ void ThreadedExportManager::threadedExportFunction(ThreadedExportManager* thisEx
 			std::get<2>(curBuffer)(std::get<3>(curBuffer));
 		}
 	}
-
-	thisExporter->m_isThreadRunning = false;
 }
 
 } // namespace lmms
