@@ -25,6 +25,7 @@
 #include "RemotePlugin.h"
 
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -384,7 +385,7 @@ auto RemotePlugin::updateAudioBuffer(proc_ch_t channelsIn, proc_ch_t channelsOut
 {
 	if (channelsIn == 0 && channelsOut == 0)
 	{
-		qCritical() << "Invalid channel count";
+		std::cerr << "Invalid channel count for shared audio buffer\n";
 		return nullptr;
 	}
 
@@ -400,7 +401,7 @@ auto RemotePlugin::updateAudioBuffer(proc_ch_t channelsIn, proc_ch_t channelsOut
 	}
 	catch (const std::runtime_error& error)
 	{
-		qCritical() << "Failed to allocate shared audio buffer:" << error.what();
+		std::cerr << "Failed to allocate shared audio buffer: " << error.what() << '\n';
 		m_audioBuffer.detach();
 		return nullptr;
 	}
