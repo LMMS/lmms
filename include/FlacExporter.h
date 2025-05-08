@@ -42,10 +42,10 @@ public:
 
 	void writeThisBuffer(const SampleFrame* samples, size_t sampleCount);
 	bool getIsSuccesful() const;
-	
+
 private:
-	bool m_isSuccesful;
-	SNDFILE* m_fileDescriptor;
+	bool m_isSuccesful = false;
+	SNDFILE* m_fileDescriptor = nullptr;
 };
 
 } // namespace lmms

@@ -22,6 +22,7 @@
  *
  */
 
+#include <algorithm>
 #include <vector>
 
 #include <sndfile.h>
@@ -33,9 +34,7 @@
 namespace lmms
 {
 
-FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLocationAndName) :
-	m_isSuccesful(false),
-	m_fileDescriptor(NULL)
+FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLocationAndName)
 {
 	constexpr int channelCount = 2;
 	SF_INFO exportInfo;
@@ -60,7 +59,7 @@ FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLo
 	QByteArray characters = outputLocationAndName.toUtf8();
 	m_fileDescriptor = sf_open(characters.data(), SFM_WRITE, &exportInfo);
 
-	m_isSuccesful = m_fileDescriptor != NULL;
+	m_isSuccesful = m_fileDescriptor != nullptr;
 
 	if (m_isSuccesful == false)
 	{
@@ -70,7 +69,7 @@ FlacExporter::FlacExporter(int sampleRate, int bitDepth, const QString& outputLo
 
 FlacExporter::~FlacExporter()
 {
-	if (m_fileDescriptor == NULL) { return; }
+	if (m_fileDescriptor == nullptr) { return; }
 	sf_write_sync(m_fileDescriptor);
 	m_isSuccesful = sf_close(m_fileDescriptor) == 0;
 	if (m_isSuccesful == false)
@@ -81,7 +80,7 @@ FlacExporter::~FlacExporter()
 
 void FlacExporter::writeThisBuffer(const SampleFrame* samples, size_t sampleCount)
 {
-	if (m_fileDescriptor == NULL) { m_isSuccesful = false; return; }
+	if (m_fileDescriptor == nullptr) { m_isSuccesful = false; return; }
 	constexpr size_t channelCount = 2;
 	// multiply by 2 since there is 2 channels
 	std::vector<float> outputBuffer(sampleCount * channelCount);
@@ -90,8 +89,8 @@ void FlacExporter::writeThisBuffer(const SampleFrame* samples, size_t sampleCoun
 	{
 		outputBuffer[i] = static_cast<float>((samples + j)->left());
 		outputBuffer[i + 1] = static_cast<float>((samples + j)->right());
-		outputBuffer[i] = outputBuffer[i] > 1.0f ? 1.0f : outputBuffer[i] < -1.0f ? -1.0f : outputBuffer[i];
-		outputBuffer[i + 1] = outputBuffer[i + 1] > 1.0f ? 1.0f : outputBuffer[i + 1] < -1.0f ? -1.0f : outputBuffer[i + 1];
+		outputBuffer[i] = std::clamp(outputBuffer[i], -1.0f, 1.0f);
+		outputBuffer[i + 1] = std::clamp(outputBuffer[i + 1], -1.0f, 1.0f);
 		i = i + channelCount;
 	}
 	size_t count = sf_writef_float(m_fileDescriptor, outputBuffer.data(), static_cast<sf_count_t>(sampleCount));
