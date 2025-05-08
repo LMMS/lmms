@@ -65,8 +65,8 @@ public:
 	static void setHighlightColor(QColor& color);
 
 	//! highlights this widgets specifically
-	//! duration: highlight time in milliseconds
-	//! shouldStopHighlightingOrhers: calls `stopHighlighting()`,
+	//! @param duration highlight time in milliseconds
+	//! @param shouldStopHighlightingOrhers calls `stopHighlighting()`,
 	//! should be false if multiple widgets are highlighted and `this` is not the first one
 	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);
 protected:
@@ -86,7 +86,7 @@ protected:
 	void drawAutoHighlight(QPainter* painter);
 
 	bool getIsHighlighted() const;
-	//! shouldOverrideUpdate: should update if visible, ignore optimizations
+	//! @param shouldOverrideUpdate should update if visible, ignore optimizations
 	//! shouldOverrideUpdate could be needed if the color was changed
 	void setIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
 private slots:
