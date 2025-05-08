@@ -89,7 +89,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 						m_clip, SLOT(toggleRecord()));*/
 
 	cm->addAction(
-		embed::getIconPixmap("flip_x"),
+		embed::getIconPixmap("project_export"),
 		tr("Export sample buffer"),
 		this,
 		SLOT(exportSampleBuffer())
@@ -420,7 +420,7 @@ void SampleClipView::exportSampleBuffer()
 	if (!outputFilename.isEmpty())
 	{
 		m_clip->exportSampleBuffer(outputFilename);
-	}	
+	}
 }
 
 } // namespace lmms::gui
