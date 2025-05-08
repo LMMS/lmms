@@ -58,8 +58,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#include "BufferManager.h"
-
 namespace lmms
 {
 
@@ -130,9 +128,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	// allocte the FIFO from the determined size
 	m_fifo = new Fifo( fifoSize );
-
-	// now that framesPerPeriod is fixed initialize global BufferManager
-	BufferManager::init( m_framesPerPeriod );
 
 	m_outputBufferRead = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 	m_outputBufferWrite = std::make_unique<SampleFrame[]>(m_framesPerPeriod);

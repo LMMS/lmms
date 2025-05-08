@@ -32,7 +32,6 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
-#include "BufferManager.h"
 
 namespace lmms
 {
@@ -41,7 +40,8 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	FloatModel* volumeModel, FloatModel* panningModel,
 	BoolModel* mutedModel) :
 	m_bufferUsage(false),
-	m_buffer(BufferManager::acquire()),
+	m_bufferSize(Engine::audioEngine()->framesPerPeriod()),
+	m_buffer(std::make_unique<SampleFrame[]>(m_bufferSize)),
 	m_extOutputEnabled(false),
 	m_nextMixerChannel(0),
 	m_name(name),
@@ -61,7 +61,7 @@ AudioBusHandle::~AudioBusHandle()
 {
 	setExtOutputEnabled(false);
 	Engine::audioEngine()->removeAudioBusHandle(this);
-	BufferManager::release(m_buffer.data());
+	m_buffer.reset();
 }
 
 
@@ -99,7 +99,7 @@ bool AudioBusHandle::processEffects()
 {
 	if (m_effects)
 	{
-		bool more = m_effects->processAudioBuffer(m_buffer.data(), m_buffer.size(), m_bufferUsage);
+		bool more = m_effects->processAudioBuffer(m_buffer.get(), m_bufferSize, m_bufferUsage);
 		return more;
 	}
 	return false;
@@ -113,23 +113,21 @@ void AudioBusHandle::doProcessing()
 		return;
 	}
 
-	const fpp_t fpp = m_buffer.size();
-
 	// clear the buffer
-	zeroSampleFrames(m_buffer.data(), fpp);
+	zeroSampleFrames(m_buffer.get(), m_bufferSize);
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
 	{
 		if (auto phBuffer = ph->buffer(); phBuffer.data() != nullptr)
 		{
-			assert(phBuffer.size() == fpp);
+			assert(phBuffer.size() == m_bufferSize);
 			if (ph->usesBuffer()
 				&& (ph->type() == PlayHandle::Type::NotePlayHandle
 					|| !MixHelpers::isSilent(phBuffer.data(), phBuffer.size())))
 			{
 				m_bufferUsage = true;
-				MixHelpers::add(m_buffer.data(), phBuffer.data(), fpp);
+				MixHelpers::add(m_buffer.get(), phBuffer.data(), m_bufferSize);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -148,7 +146,7 @@ void AudioBusHandle::doProcessing()
 			// both vol and pan have s.ex.data:
 			if (volBuf && panBuf)
 			{
-				for (f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < m_bufferSize; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					float p = panBuf->values()[f] * 0.01f;
@@ -163,7 +161,7 @@ void AudioBusHandle::doProcessing()
 				float p = m_panningModel->value() * 0.01f;
 				float l = (p <= 0 ? 1.0f : 1.0f - p);
 				float r = (p >= 0 ? 1.0f : 1.0f + p);
-				for (f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < m_bufferSize; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					m_buffer[f][0] *= v * l;
@@ -175,7 +173,7 @@ void AudioBusHandle::doProcessing()
 			else if (panBuf)
 			{
 				float v = m_volumeModel->value() * 0.01f;
-				for (f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < m_bufferSize; ++f)
 				{
 					float p = panBuf->values()[f] * 0.01f;
 					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
@@ -188,7 +186,7 @@ void AudioBusHandle::doProcessing()
 			{
 				float p = m_panningModel->value() * 0.01f;
 				float v = m_volumeModel->value() * 0.01f;
-				for (f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < m_bufferSize; ++f)
 				{
 					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
 					m_buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
@@ -203,7 +201,7 @@ void AudioBusHandle::doProcessing()
 
 			if (volBuf)
 			{
-				for (f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < m_bufferSize; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					m_buffer[f][0] *= v;
@@ -213,7 +211,7 @@ void AudioBusHandle::doProcessing()
 			else
 			{
 				float v = m_volumeModel->value() * 0.01f;
-				for (f_cnt_t f = 0; f < fpp; ++f)
+				for (f_cnt_t f = 0; f < m_bufferSize; ++f)
 				{
 					m_buffer[f][0] *= v;
 					m_buffer[f][1] *= v;
@@ -228,7 +226,7 @@ void AudioBusHandle::doProcessing()
 	const bool anyOutputAfterEffects = processEffects();
 	if (anyOutputAfterEffects || m_bufferUsage)
 	{
-		Engine::mixer()->mixToChannel(m_buffer.data(), m_nextMixerChannel);	// send output to mixer
+		Engine::mixer()->mixToChannel(m_buffer.get(), m_nextMixerChannel);	// send output to mixer
 																		// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}

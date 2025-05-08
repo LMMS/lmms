@@ -25,6 +25,7 @@
 #ifndef LMMS_PLAY_HANDLE_H
 #define LMMS_PLAY_HANDLE_H
 
+#include <memory>
 #include <QList>
 #include <QMutex>
 
@@ -69,7 +70,7 @@ public:
 		return *this;
 	}
 
-	virtual ~PlayHandle();
+	virtual ~PlayHandle() = default;
 
 	virtual bool affinityMatters() const
 	{
@@ -153,7 +154,8 @@ private:
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	std::span<SampleFrame> m_playHandleBuffer; //!< owning view
+	f_cnt_t m_playHandleBufferSize;
+	std::unique_ptr<SampleFrame[]> m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioBusHandle* m_audioBusHandle;
