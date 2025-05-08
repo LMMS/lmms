@@ -41,8 +41,7 @@ namespace lmms
 SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying) :
 	Clip(_track),
 	m_sample(std::move(sample)),
-	m_isPlaying(false),
-	m_exportedSampleName("")
+	m_isPlaying(false)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -383,7 +382,6 @@ gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 
 void SampleClip::exportSampleBuffer(const QString& fileName)
 {
-	m_exportedSampleName = fileName;
 	Engine::exportManager()->startExporting(fileName, m_sample.buffer());
 }
 

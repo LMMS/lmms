@@ -103,9 +103,6 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
-	//! used when a sample is exported and before it is reinported
-	QString m_exportedSampleName;
-
 	friend class gui::SampleClipView;
 
 
