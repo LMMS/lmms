@@ -76,45 +76,53 @@ class PinConnector;
  * A non-owning span of std::span<const SampleFrame>.
  *
  * Access like this:
- *   bus[channel pair index][frame index]
+ *   myAudioBus[channel pair index][frame index]
  *
  * where
- *   0 <= channel pair index < channelPairs
- *   0 <= frame index < frames
+ *   0 <= channel pair index < channelPairs()
+ *   0 <= frame index < frames()
  *
  * TODO C++23: Use std::mdspan
  */
 template<typename T>
-struct AudioBus
+class AudioBus
 {
+public:
 	static_assert(std::is_same_v<std::remove_const_t<T>, SampleFrame>);
 
 	AudioBus() = default;
 	AudioBus(const AudioBus&) = default;
 
 	AudioBus(T* const* bus, track_ch_t channelPairs, f_cnt_t frames)
-		: bus{bus}
-		, channelPairs{channelPairs}
-		, frames{frames}
+		: m_bus{bus}
+		, m_channelPairs{channelPairs}
+		, m_frames{frames}
 	{
 	}
 
 	template<typename U = T> requires (std::is_const_v<U>)
 	AudioBus(const AudioBus<std::remove_const_t<U>>& other)
-		: bus{other.bus}
-		, channelPairs{other.channelPairs}
-		, frames{other.frames}
+		: m_bus{other.bus()}
+		, m_channelPairs{other.channelPairs()}
+		, m_frames{other.frames()}
 	{
 	}
 
 	auto trackChannelPair(track_ch_t pairIndex) const -> std::span<T>
 	{
-		return {bus[pairIndex], frames};
+		return {m_bus[pairIndex], m_frames};
 	}
 
-	T* const* bus = nullptr; //!< [channel pair index][frame index]
-	track_ch_t channelPairs = 0;
-	f_cnt_t frames = 0;
+	auto operator[](track_ch_t channelPairIndex) const -> T* { return m_bus[channelPairIndex]; }
+
+	auto bus() const -> T* const* { return m_bus; }
+	auto channelPairs() const -> track_ch_t { return m_channelPairs; }
+	auto frames() const -> f_cnt_t { return m_frames; }
+
+private:
+	T* const* m_bus = nullptr; //!< [channel pair index][frame index]
+	track_ch_t m_channelPairs = 0;
+	f_cnt_t m_frames = 0;
 };
 
 
@@ -470,7 +478,7 @@ inline void AudioPortsModel::Router<config, kind, false>::send(
 
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
-	assert(inSizeConstrained <= in.channelPairs);
+	assert(inSizeConstrained <= in.channelPairs());
 
 	// Zero the output buffer - TODO: std::memcpy?
 	{
@@ -486,7 +494,7 @@ inline void AudioPortsModel::Router<config, kind, false>::send(
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 		{
-			const SampleFrame* inPtr = in.bus[inChannelPairIdx]; // L/R track channel pair
+			const SampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
 
 			const std::uint8_t inChannel = inChannelPairIdx * 2;
 			const std::uint8_t enabledPins =
@@ -498,7 +506,7 @@ inline void AudioPortsModel::Router<config, kind, false>::send(
 				case 0b00: break;
 				case 0b01: // R channel only
 				{
-					for (f_cnt_t frame = 0; frame < in.frames; ++frame)
+					for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 					{
 						outPtr[frame] += convertSample<SampleT>(inPtr[frame].right());
 					}
@@ -506,7 +514,7 @@ inline void AudioPortsModel::Router<config, kind, false>::send(
 				}
 				case 0b10: // L channel only
 				{
-					for (f_cnt_t frame = 0; frame < in.frames; ++frame)
+					for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 					{
 						outPtr[frame] += convertSample<SampleT>(inPtr[frame].left());
 					}
@@ -514,7 +522,7 @@ inline void AudioPortsModel::Router<config, kind, false>::send(
 				}
 				case 0b11: // Both channels
 				{
-					for (f_cnt_t frame = 0; frame < in.frames; ++frame)
+					for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 					{
 						outPtr[frame] += convertSample<SampleT>(inPtr[frame].left() + inPtr[frame].right());
 					}
@@ -539,7 +547,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
-	assert(inOutSizeConstrained <= inOut.channelPairs);
+	assert(inOutSizeConstrained <= inOut.channelPairs());
 
 	/*
 	 * Routes processor audio to track channel pair and normalizes the result. For track channels
@@ -562,11 +570,11 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 		if constexpr (rc == 0b11)
 		{
 			// TODO: std::memcpy?
-			std::fill_n(outPtr, inOut.frames, SampleFrame{});
+			std::fill_n(outPtr, inOut.frames(), SampleFrame{});
 		}
 		else
 		{
-			for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
+			for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
 			{
 				if constexpr ((rc & 0b10) != 0)
 				{
@@ -590,7 +598,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 				{
 					if (m_ap->m_out.enabled(outChannel + 1, inChannel))
 					{
-						for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
+						for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
 						{
 							outPtr[frame].leftRef() += inPtr[frame];
 							outPtr[frame].rightRef() += inPtr[frame];
@@ -598,7 +606,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 					}
 					else
 					{
-						for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
+						for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
 						{
 							outPtr[frame].leftRef() += inPtr[frame];
 						}
@@ -606,7 +614,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 				}
 				else if (m_ap->m_out.enabled(outChannel + 1, inChannel))
 				{
-					for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
+					for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
 					{
 						outPtr[frame].rightRef() += inPtr[frame];
 					}
@@ -617,7 +625,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 				// This input channel may or may not be routed to the left output channel
 				if (!m_ap->m_out.enabled(outChannel, inChannel)) { continue; }
 
-				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
+				for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
 				{
 					outPtr[frame].leftRef() += inPtr[frame];
 				}
@@ -627,7 +635,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 				// This input channel may or may not be routed to the right output channel
 				if (!m_ap->m_out.enabled(outChannel + 1, inChannel)) { continue; }
 
-				for (f_cnt_t frame = 0; frame < inOut.frames; ++frame)
+				for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
 				{
 					outPtr[frame].rightRef() += inPtr[frame];
 				}
@@ -638,7 +646,7 @@ inline void AudioPortsModel::Router<config, kind, false>::receive(
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
-		SampleFrame* outPtr = inOut.bus[outChannelPairIdx]; // L/R track channel pair
+		SampleFrame* outPtr = inOut[outChannelPairIdx]; // L/R track channel pair
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 
 		const std::uint8_t routedChannels =
@@ -680,7 +688,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::s
 
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
-	assert(inSizeConstrained <= in.channelPairs);
+	assert(inSizeConstrained <= in.channelPairs());
 	assert(out.data() != nullptr);
 
 	// Zero the output buffer - TODO: std::memcpy?
@@ -692,7 +700,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::s
 	 * output `SampleFrame*`. The purpose is to eliminate all branching within
 	 * the inner for-loop in hopes of better performance.
 	 */
-	auto route2x2 = [samples = in.frames * 2, outPtr = out.data()->data()](const sample_t* inPtr, auto enabledPins) {
+	auto route2x2 = [samples = in.frames() * 2, outPtr = out.data()->data()](const sample_t* inPtr, auto enabledPins) {
 		constexpr auto epL =  static_cast<std::uint8_t>(enabledPins() >> 2); // for L out channel
 		constexpr auto epR = static_cast<std::uint8_t>(enabledPins() & 0b0011); // for R out channel
 
@@ -725,7 +733,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::s
 
 	for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 	{
-		const sample_t* inPtr = in.bus[inChannelPairIdx]->data(); // L/R track channel pair
+		const sample_t* inPtr = in[inChannelPairIdx]->data(); // L/R track channel pair
 
 		const std::uint8_t inChannel = inChannelPairIdx * 2;
 		const std::uint8_t enabledPins =
@@ -771,7 +779,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::r
 
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
-	assert(inOutSizeConstrained <= inOut.channelPairs);
+	assert(inOutSizeConstrained <= inOut.channelPairs());
 	assert(in.data() != nullptr);
 
 	/*
@@ -780,7 +788,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::r
 	 * output `SampleFrame*`. The purpose is to eliminate all branching within
 	 * the inner for-loop in hopes of better performance.
 	 */
-	auto route2x2 = [samples = inOut.frames * 2, inPtr = in.data()->data()](sample_t* outPtr, auto enabledPins) {
+	auto route2x2 = [samples = inOut.frames() * 2, inPtr = in.data()->data()](sample_t* outPtr, auto enabledPins) {
 		constexpr auto epL =  static_cast<std::uint8_t>(enabledPins() >> 2); // for L out channel
 		constexpr auto epR = static_cast<std::uint8_t>(enabledPins() & 0b0011); // for R out channel
 
@@ -824,7 +832,7 @@ inline void AudioPortsModel::Router<config, AudioDataKind::SampleFrame, true>::r
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
-		sample_t* outPtr = inOut.bus[outChannelPairIdx]->data(); // L/R track channel pair
+		sample_t* outPtr = inOut[outChannelPairIdx]->data(); // L/R track channel pair
 		assert(outPtr != nullptr);
 
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);

@@ -61,24 +61,24 @@ void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
 
 void zeroBuffer(AudioBus<SampleFrame> bus)
 {
-	for (track_ch_t channelPair = 0; channelPair < bus.channelPairs; ++channelPair)
+	for (track_ch_t channelPair = 0; channelPair < bus.channelPairs(); ++channelPair)
 	{
-		SampleFrame* buffer = bus.bus[channelPair];
-		zeroSampleFrames(buffer, bus.frames);
+		SampleFrame* buffer = bus[channelPair];
+		zeroSampleFrames(buffer, bus.frames());
 	}
 }
 
 template<class F>
 void transformBuffer(AudioBus<const SampleFrame> in, AudioBus<SampleFrame> out, const F& func)
 {
-	assert(in.channelPairs == out.channelPairs);
-	assert(in.frames == out.frames);
-	for (track_ch_t channelPair = 0; channelPair < in.channelPairs; ++channelPair)
+	assert(in.channelPairs() == out.channelPairs());
+	assert(in.frames() == out.frames());
+	for (track_ch_t channelPair = 0; channelPair < in.channelPairs(); ++channelPair)
 	{
-		for (std::size_t frame = 0; frame < in.frames; ++frame)
+		for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 		{
-			out.bus[channelPair][frame].leftRef() = func(in.bus[channelPair][frame].left());
-			out.bus[channelPair][frame].rightRef() = func(in.bus[channelPair][frame].right());
+			out[channelPair][frame].leftRef() = func(in[channelPair][frame].left());
+			out[channelPair][frame].rightRef() = func(in[channelPair][frame].right());
 		}
 	}
 }
@@ -107,14 +107,14 @@ void transformBuffer(SplitAudioData<SampleT, extent> in, SplitAudioData<SampleT,
 
 void compareBuffers(AudioBus<const SampleFrame> actual, AudioBus<const SampleFrame> expected)
 {
-	QCOMPARE(actual.channelPairs, expected.channelPairs);
-	QCOMPARE(actual.frames, expected.frames);
-	for (track_ch_t channelPair = 0; channelPair < actual.channelPairs; ++channelPair)
+	QCOMPARE(actual.channelPairs(), expected.channelPairs());
+	QCOMPARE(actual.frames(), expected.frames());
+	for (track_ch_t channelPair = 0; channelPair < actual.channelPairs(); ++channelPair)
 	{
-		for (std::size_t frame = 0; frame < actual.frames; ++frame)
+		for (f_cnt_t frame = 0; frame < actual.frames(); ++frame)
 		{
-			QCOMPARE(actual.bus[channelPair][frame].left(), expected.bus[channelPair][frame].left());
-			QCOMPARE(actual.bus[channelPair][frame].right(), expected.bus[channelPair][frame].right());
+			QCOMPARE(actual[channelPair][frame].left(), expected[channelPair][frame].left());
+			QCOMPARE(actual[channelPair][frame].right(), expected[channelPair][frame].right());
 		}
 	}
 }
@@ -471,7 +471,7 @@ private slots:
 		//       processor input, following what REAPER does by default.
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -499,20 +499,20 @@ private slots:
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
 		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
-		coreBusExpected.bus[0][0] = SampleFrame{123.f * 2, 123.f * 2};
-		coreBusExpected.bus[0][1] = SampleFrame{456.f * 2, 456.f * 2};
-		coreBusExpected.bus[0][33] = SampleFrame{789.f * 2, 789.f * 2};
+		coreBusExpected[0][0] = SampleFrame{123.f * 2, 123.f * 2};
+		coreBusExpected[0][1] = SampleFrame{456.f * 2, 456.f * 2};
+		coreBusExpected[0][33] = SampleFrame{789.f * 2, 789.f * 2};
 
 		// Route from processor back to Core
 		router.receive(outs, coreBus);
 
 		// Check that result is the original left track channel with doubled amplitude
-		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus.bus[0][0].right(), 123.f * 2);
-		QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus.bus[0][1].right(), 456.f * 2);
-		QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus.bus[0][33].right(), 789.f * 2);
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 123.f * 2);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 456.f * 2);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 789.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -531,7 +531,7 @@ private slots:
 		auto coreBus = getCoreBus();
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -579,12 +579,12 @@ private slots:
 		router.receive(outs, coreBus);
 
 		// Should be double the original
-		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus.bus[0][0].right(), 321.f * 2);
-		QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus.bus[0][1].right(), 654.f * 2);
-		QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus.bus[0][33].right(), 987.f * 2);
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f * 2);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f * 2);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -619,7 +619,7 @@ private slots:
 		apm.out().setPin(1, 1, false);
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -650,11 +650,11 @@ private slots:
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
 		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
-		for (f_cnt_t frame = 0; frame < coreBus.frames; ++frame)
+		for (f_cnt_t frame = 0; frame < coreBus.frames(); ++frame)
 		{
-			SampleFrame& sf = coreBusExpected.bus[0][frame];
-			sf.leftRef() = coreBus.bus[0][frame].left() * 2; // left channel:  doubled output from processor
-			sf.rightRef() = coreBus.bus[0][frame].right();   // right channel: bypassed
+			SampleFrame& sf = coreBusExpected[0][frame];
+			sf.leftRef() = coreBus[0][frame].left() * 2; // left channel:  doubled output from processor
+			sf.rightRef() = coreBus[0][frame].right();   // right channel: bypassed
 		}
 
 		// Route from processor back to Core
@@ -662,12 +662,12 @@ private slots:
 
 		// Right track channel should pass through, but left track channel
 		// should be overwritten with processor's left output channel
-		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus.bus[0][0].right(), 321.f);
-		QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus.bus[0][1].right(), 654.f);
-		QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus.bus[0][33].right(), 987.f);
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -688,7 +688,7 @@ private slots:
 		auto coreBus = getCoreBus();
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -727,12 +727,12 @@ private slots:
 		router.receive(inOut, coreBus);
 
 		// Should be double the original
-		QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus.bus[0][0].right(), 321.f * 2);
-		QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus.bus[0][1].right(), 654.f * 2);
-		QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus.bus[0][33].right(), 987.f * 2);
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f * 2);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f * 2);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -766,7 +766,7 @@ private slots:
 		apm.out().setPin(1, 1, false);
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
 		trackChannels[0].setLeft(123.f);
 		trackChannels[0].setRight(321.f);
 		trackChannels[1].setLeft(456.f);
@@ -796,20 +796,20 @@ private slots:
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
 		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
-		coreBusExpected.bus[0][0] = SampleFrame{(123.f + 321.f) * 2, 321.f};
-		coreBusExpected.bus[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
-		coreBusExpected.bus[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};
+		coreBusExpected[0][0] = SampleFrame{(123.f + 321.f) * 2, 321.f};
+		coreBusExpected[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
+		coreBusExpected[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};
 
 		// Route from processor back to Core
 		router.receive(outs, coreBus);
 
 		// Check that result is the two original track channels added together then doubled
-		QCOMPARE(coreBus.bus[0][0].left(), (123.f + 321.f) * 2);
-		QCOMPARE(coreBus.bus[0][0].right(), 321.f);
-		QCOMPARE(coreBus.bus[0][1].left(), (456.f + 654.f) * 2);
-		QCOMPARE(coreBus.bus[0][1].right(), 654.f);
-		QCOMPARE(coreBus.bus[0][33].left(), (789.f + 987.f) * 2);
-		QCOMPARE(coreBus.bus[0][33].right(), 987.f);
+		QCOMPARE(coreBus[0][0].left(), (123.f + 321.f) * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f);
+		QCOMPARE(coreBus[0][1].left(), (456.f + 654.f) * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f);
+		QCOMPARE(coreBus[0][33].left(), (789.f + 987.f) * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -828,7 +828,7 @@ private slots:
 
 			// Data on frames 0, 1, and 33
 			auto coreBus = getCoreBus();
-			SampleFrame* trackChannels = coreBus.bus[0]; // channels 0/1
+			SampleFrame* trackChannels = coreBus[0]; // channels 0/1
 			trackChannels[0].setLeft(123.f);
 			trackChannels[0].setRight(321.f);
 			trackChannels[1].setLeft(456.f);
@@ -888,12 +888,12 @@ private slots:
 			router.process(coreBus, *ap.buffers(), Process{ap});
 
 			// Should be double the original
-			QCOMPARE(coreBus.bus[0][0].left(), 123.f * 2);
-			QCOMPARE(coreBus.bus[0][0].right(), 321.f * 2);
-			QCOMPARE(coreBus.bus[0][1].left(), 456.f * 2);
-			QCOMPARE(coreBus.bus[0][1].right(), 654.f * 2);
-			QCOMPARE(coreBus.bus[0][33].left(), 789.f * 2);
-			QCOMPARE(coreBus.bus[0][33].right(), 987.f * 2);
+			QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+			QCOMPARE(coreBus[0][0].right(), 321.f * 2);
+			QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+			QCOMPARE(coreBus[0][1].right(), 654.f * 2);
+			QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+			QCOMPARE(coreBus[0][33].right(), 987.f * 2);
 
 			// Test the rest of the buffer
 			compareBuffers(coreBus, coreBusExpected);
