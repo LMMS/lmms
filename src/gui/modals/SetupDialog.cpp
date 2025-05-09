@@ -275,7 +275,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_autoScrollStateComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), "continuous");
 	m_autoScrollStateComboBox->setCurrentIndex(m_autoScrollStateComboBox->findData(m_autoScrollState));
 	connect(m_autoScrollStateComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
-		this, &SetupDialog::autoScrollStateChanged);
+		this, [](){ m_autoScrollState = m_autoScrollStateComboBox->currentData().toString(); });
 
 	guiGroupLayout->addWidget(new QLabel{tr("Default Autoscroll Mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_autoScrollStateComboBox);
@@ -1136,11 +1136,6 @@ void SetupDialog::toggleOpenLastProject(bool enabled)
 void SetupDialog::loopMarkerModeChanged()
 {
 	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
-}
-
-void SetupDialog::autoScrollStateChanged()
-{
-	m_autoScrollState = m_autoScrollStateComboBox->currentData().toString();
 }
 
 void SetupDialog::setLanguage(int lang)

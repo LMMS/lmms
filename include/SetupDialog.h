@@ -86,7 +86,6 @@ private slots:
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
 	void loopMarkerModeChanged();
-	void autoScrollStateChanged();
 	void setLanguage(int lang);
 
 	// Performance settings widget.
