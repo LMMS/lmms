@@ -532,12 +532,6 @@ void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* m
 void AutomatableModel::unlinkAllModels()
 {
 	unlinkModel();
-	/*
-	for( AutomatableModel* model : m_linkedModels )
-	{
-		unlinkModels( this, model );
-	}
-	*/
 }
 
 

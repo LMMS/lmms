@@ -78,8 +78,6 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	using AutoModelVector = std::vector<AutomatableModel*>;
-
 	enum class ScaleType
 	{
 		Linear,
@@ -405,7 +403,7 @@ private:
 	bool m_hasStrictStepSize;
 
 	//! an `AutomatableModel` can be linked together with others in a linked list
-	//! the list had no end, the last model is connected to the first forming a ring
+	//! the list has no end, the last model is connected to the first forming a ring
 	AutomatableModel* m_nextLink;
 
 
