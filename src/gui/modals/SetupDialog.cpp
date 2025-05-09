@@ -42,6 +42,7 @@
 #include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
+#include "TimeLineWidget.h"
 
 
 // Platform-specific audio-interface classes.
@@ -270,9 +271,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
 
 	m_autoScrollStateComboBox = new QComboBox{guiGroupBox};
-	m_autoScrollStateComboBox->addItem(tr("Disabled"), "disabled");
-	m_autoScrollStateComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), "stepped");
-	m_autoScrollStateComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), "continuous");
+	m_autoScrollStateComboBox->addItem(tr("Disabled"), AUTOSCROLL_DISABLED_STRING);
+	m_autoScrollStateComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), AUTOSCROLL_STEPPED_STRING);
+	m_autoScrollStateComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), AUTOSCROLL_CONTINUOUS_STRING);
 	m_autoScrollStateComboBox->setCurrentIndex(m_autoScrollStateComboBox->findData(m_autoScrollState));
 	connect(m_autoScrollStateComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
 		this, [this](){ m_autoScrollState = m_autoScrollStateComboBox->currentData().toString(); });
@@ -1137,6 +1138,7 @@ void SetupDialog::loopMarkerModeChanged()
 {
 	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
 }
+
 
 void SetupDialog::setLanguage(int lang)
 {

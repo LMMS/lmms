@@ -52,6 +52,11 @@ class TextFloat;
 class SongEditor;
 
 
+constexpr const char* AUTOSCROLL_DISABLED_STRING = "disabled";
+constexpr const char* AUTOSCROLL_STEPPED_STRING = "stepped";
+constexpr const char* AUTOSCROLL_CONTINUOUS_STRING = "continuous";
+
+
 class TimeLineWidget : public QWidget
 {
 	Q_OBJECT

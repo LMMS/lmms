@@ -70,9 +70,9 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 					this, SLOT(update()));
 
 	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
-	if (autoScrollState == "stepped") { m_autoScroll = AutoScrollState::Stepped; }
-	else if (autoScrollState == "continuous") { m_autoScroll = AutoScrollState::Continuous; }
-	else if (autoScrollState == "disabled") { m_autoScroll = AutoScrollState::Disabled; }
+	if (autoScrollState == AUTOSCROLL_STEPPED_STRING) { m_autoScroll = AutoScrollState::Stepped; }
+	else if (autoScrollState == AUTOSCROLL_CONTINUOUS_STRING) { m_autoScroll = AutoScrollState::Continuous; }
+	else if (autoScrollState == AUTOSCROLL_DISABLED_STRING) { m_autoScroll = AutoScrollState::Disabled; }
 	else { m_autoScroll = AutoScrollState::Stepped; }
 }
 
