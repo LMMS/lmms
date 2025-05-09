@@ -459,7 +459,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			{
 				SampleFrame convertBuf[frames];
 				sample.m_resampler.setSource(&sampleData[0][0], samples);
-				used = sample.m_resampler.resample(&convertBuf[0][0], frames, freq_factor).inputFramesUsed;
+				sample.m_resampler.resample(&convertBuf[0][0], frames, freq_factor);
 
 				for (f_cnt_t i = 0; i < frames; ++i)
 				{

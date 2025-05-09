@@ -44,13 +44,6 @@ public:
 	//! The callback should return the number of frames written into @p dst.
 	using WriteCallback = std::function<std::size_t(float* dst, std::size_t frames, int channels)>;
 
-	//! Stores the number of input frames used and the output frames generated after resampling.
-	struct ResampleResult
-	{
-		long inputFramesUsed = 0;
-		long outputFramesGenerated = 0;
-	};
-
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
 	AudioResampler(int mode, int channels = DEFAULT_CHANNELS);
@@ -77,7 +70,7 @@ public:
 	void setSource(const float* src, std::size_t frames);
 
 	//! Resamples audio into @p dst with at the given @p ratio.
-	ResampleResult resample(float* dst, std::size_t frames, double ratio);
+	void resample(float* dst, std::size_t frames, double ratio);
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
