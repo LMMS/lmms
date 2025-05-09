@@ -283,6 +283,8 @@ PianoRoll::PianoRoll() :
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this);
 
+	connect(Engine::getSong(), SIGNAL(playbackStateChanged()), m_positionLine, SLOT(update()));
+
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
@@ -4348,6 +4350,7 @@ void PianoRoll::horScrolled(int new_pos )
 {
 	m_currentPosition = new_pos;
 	m_stepRecorderWidget.setCurrentPosition(m_currentPosition);
+	updatePositionLinePos();
 	emit positionChanged( m_currentPosition );
 	update();
 }
@@ -4697,6 +4700,11 @@ void PianoRoll::updatePosition()
 	{
 		autoScroll(t);
 	}
+	updatePositionLinePos();
+}
+
+void PianoRoll::updatePositionLinePos()
+{
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
@@ -4763,6 +4771,7 @@ void PianoRoll::zoomingChanged()
 	m_timeLine->setPixelsPerBar( m_ppb );
 	m_stepRecorderWidget.setPixelsPerBar( m_ppb );
 	m_positionLine->zoomChange(m_zoomLevels[m_zoomingModel.value()]);
+	updatePositionLinePos();
 
 	update();
 }

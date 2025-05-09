@@ -332,6 +332,7 @@ private:
 	void cancelStrumAction();
 
 	void updateScrollbars();
+	void updatePositionLinePos();
 	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
