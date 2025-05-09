@@ -171,6 +171,7 @@ public:
 	}
 
 	float controllerValue( int frameOffset ) const;
+	float controllerValueInternal(int frameOffset) const;
 
 	//! @brief Function that returns sample-exact data as a ValueBuffer
 	//! @return pointer to model's valueBuffer when s.ex.data exists, NULL otherwise
@@ -276,9 +277,9 @@ public:
 
 	virtual QString displayValue( const float val ) const = 0;
 
-	bool hasLinkedModels() const
+	constexpr bool hasLinkedModels() const
 	{
-		return m_nextLink != nullptr || m_firstLink != nullptr;
+		return m_nextLink != nullptr;
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -370,12 +371,12 @@ private:
 
 	void linkModel(AutomatableModel* model);
 	void unlinkModel();
-	AutomatableModel* getBaseLink();
-	const AutomatableModel* getBaseLink() const;
-	//! links an other model link chain to this
-	//! can rearrange the current chain if `this` is passed in
-	void rebaseLinkToThis(AutomatableModel* model);
-	void rebaseLinkThis();
+	//! linking is stored in a linked list ring
+	//! @return the model that's `m_nextLink` is `this`
+	AutomatableModel* getLastLinkedModel() const;
+	//! @return true if the `model` is in the linked list
+	bool isModelLinked(AutomatableModel* model) const;
+	size_t countLinks() const;
 	
 	
 	//! @brief Scales @value from linear to logarithmic.
@@ -397,16 +398,15 @@ private:
 	float m_centerValue;
 
 	bool m_valueChanged;
+	float m_oldValue; //!< used for interpolation
 
 	// used to determine if step size should be applied strictly (ie. always)
 	// or only when value set from gui (default)
 	bool m_hasStrictStepSize;
 
-	//! an `AutomatableModel` either has a linked parent or a array of linked models
-	//AutoModelVector m_linkedModels;
-	//! linked `AutomatableModels` will act as a linked list
+	//! an `AutomatableModel` can be linked together with others in a linked list
+	//! the list had no end, the last model is connected to the first forming a ring
 	AutomatableModel* m_nextLink;
-	AutomatableModel* m_firstLink;
 
 
 	//! NULL if not appended to controller, otherwise connection info

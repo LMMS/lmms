@@ -51,9 +51,9 @@ AutomatableModel::AutomatableModel(
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
 	m_valueChanged( false ),
+	m_oldValue(val),
 	m_hasStrictStepSize( false ),
 	m_nextLink(nullptr),
-	m_firstLink(nullptr),
 	m_controllerConnection( nullptr ),
 	m_valueBuffer( static_cast<int>( Engine::audioEngine()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
@@ -71,14 +71,7 @@ AutomatableModel::AutomatableModel(
 AutomatableModel::~AutomatableModel()
 {
 	// unlink this from anything else
-	unlinkAllModels();
-	/* TODO remove code
-	while (m_linkedModels.empty() == false)
-	{
-		m_linkedModels.back()->unlinkModel(this);
-		m_linkedModels.erase( m_linkedModels.end() - 1 );
-	}
-	*/
+	unlinkModel();
 
 	if( m_controllerConnection )
 	{
@@ -302,28 +295,23 @@ void AutomatableModel::setValue(float value, bool isAutomated)
 	float newValue = fittedValue(value);
 	if (newValue == m_value) { emit dataUnchanged(); return; }
 
-	if (getBaseLink() != this)
-	{
-		// if this is not the first model in the link chain
-		// move to the first model
-		getBaseLink()->setValue(value);
-		return;
-	}
-
-	// if this is the first model in the link chain
 	if (isAutomated == false) { addJournalCheckPoint(); }
-	AutomatableModel* next = this;
-	while (true)
+	// set value for this and the other linked widgets
+	if (hasLinkedModels())
 	{
-		next->setValueInternal(value, isAutomated);
-		next = next->m_nextLink;
-		if (next == nullptr) { break; }
+		AutomatableModel* next = this;
+		while (true)
+		{
+			next->setValueInternal(value, isAutomated);
+			next = next->m_nextLink;
+			if (next == this) { break; }
+		}
 	}
+	else { setValueInternal(value, isAutomated); }
 }
 
 void AutomatableModel::setValueInternal(float value, bool isAutomated)
 {
-	qDebug("setValue: to id: %d, %f, %f", id(), value, fittedValue(value));
 	float oldValue = m_value;
 	if (isAutomated) { m_value = fittedValue(scaledValue(value)); }
 	else { m_value = fittedValue(value); }
@@ -447,21 +435,19 @@ float AutomatableModel::fittedValue( float value ) const
 
 void AutomatableModel::linkModel(AutomatableModel* model)
 {
-	qDebug("linkModel: in id: %d", id());
-	assert(m_firstLink != this);
-	if (model == nullptr || model->m_firstLink == this) { return; }
-	qDebug("linkModel: to id: %d", model->id());
+	if (model == nullptr || model == this || isModelLinked(model)) { return; }
 	
-	if (m_firstLink != nullptr)
+	AutomatableModel* otherEnd = model->getLastLinkedModel();
+	if (otherEnd == nullptr)
 	{
-		// if this is not the first model in the link chain
-		// move to the first model
-		m_firstLink->linkModel(model);
-		return;
+		model->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
+		m_nextLink = model;
 	}
-
-	// if this is the first model in the link chain
-	rebaseLinkToThis(model);
+	else
+	{
+		otherEnd->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
+		m_nextLink = model;
+	}
 
 	QObject::connect(this, SIGNAL(dataChanged()),
 			model, SIGNAL(dataChanged()), Qt::DirectConnection);
@@ -469,132 +455,52 @@ void AutomatableModel::linkModel(AutomatableModel* model)
 
 void AutomatableModel::unlinkModel()
 {
-	qDebug("unlinkModel: in id: %d", id());
-
 	if (hasLinkedModels() == false) { return; }
-	if (this == getBaseLink())
-	{
-	qDebug("unlinkModel 0");
-		// if this is a base, rebase on the next link, so this can be removed
-		if (m_nextLink != nullptr) { m_nextLink->rebaseLinkThis(); }
-		else { return; }
-	}
-	qDebug("unlinkModel 1");
 
-	AutomatableModel* next = m_firstLink;
-	while (true)
-	{
-		if (next->m_nextLink == nullptr) { break; }
-		if (next->m_nextLink == this)
-		{
-			// step over this model
-			next->m_nextLink = m_nextLink;
-			// unlink
-			m_firstLink = nullptr;
-			m_nextLink = nullptr;
-			break;
-		}
-		next = next->m_nextLink;
-	}
-	qDebug("unlinkModel 2");
-
-	qDebug("After unlink");
-	next = next->getBaseLink();
-	size_t counter = 0;
-	while (true)
-	{
-		qDebug("unlinkModel: after [%ld] id: %d", counter, next->id());
-		if (next->m_nextLink == nullptr) { break; }
-		next = next->m_nextLink;
-		counter++;
-	}
-	qDebug("unlinkModel 3");
+	AutomatableModel* end = getLastLinkedModel();
+	assert(end != nullptr);
+	end->m_nextLink = end == m_nextLink ? nullptr : m_nextLink;
+	m_nextLink = nullptr;
 }
 
-AutomatableModel* AutomatableModel::getBaseLink()
+AutomatableModel* AutomatableModel::getLastLinkedModel() const
 {
-	return m_firstLink == nullptr ? this : m_firstLink;
+	if (hasLinkedModels() == false) { return nullptr; }
+	AutomatableModel* output = m_nextLink;
+	while (true)
+	{
+		if (output->m_nextLink == this) { break; }
+		output = output->m_nextLink;
+	}
+	return output;
 }
 
-const AutomatableModel* AutomatableModel::getBaseLink() const
+bool AutomatableModel::isModelLinked(AutomatableModel* model) const
 {
-	return m_firstLink == nullptr ? this : m_firstLink;
+	if (hasLinkedModels() == false || model == nullptr || model == this) { return false; }
+	bool output = false;
+	AutomatableModel* next = m_nextLink;
+	while (true)
+	{
+		if (next->m_nextLink == this) { break; }
+		if (next->m_nextLink == model) { output = true; break; }
+		next = next->m_nextLink;
+	}
+	return output;
 }
 
-void AutomatableModel::rebaseLinkToThis(AutomatableModel* model)
+size_t AutomatableModel::countLinks() const
 {
-	if (model == nullptr) { return; }
-
-	qDebug("rebaseLinkToThis 1");
-	AutomatableModel* otherBase = model->getBaseLink();
-	AutomatableModel* thisBase = getBaseLink();
-	if (otherBase == thisBase) { return; }
-	qDebug("rebaseLinkToThis 2");
-
-	AutomatableModel* next = otherBase;
+	if (hasLinkedModels() == false) { return 0; }
+	size_t output = 2;
+	AutomatableModel* next = m_nextLink;
 	while (true)
 	{
-		// rebase other link chain
-		next->m_firstLink = thisBase;
-		if (next->m_nextLink == nullptr) { break; }
+		if (next->m_nextLink == this) { break; }
 		next = next->m_nextLink;
+		output++;
 	}
-	qDebug("rebaseLinkToThis 3");
-	// attach the end points
-	next->m_nextLink = thisBase->m_nextLink;
-	thisBase->m_nextLink = otherBase;
-	// Before: this_base - this_next - this_next AND other_base - other_next - other_next
-	// After: this_base - other_base - other_next - other_next - this_next - this_next
-	qDebug("After rebase to this");
-	next = thisBase;
-	size_t counter = 0;
-	while (true)
-	{
-		qDebug("rebaseLinkToThis: after [%ld] id: %d", counter, next->id());
-		if (next->m_nextLink == nullptr) { break; }
-		next = next->m_nextLink;
-		counter++;
-	}
-	qDebug("rebaseLinkToThis 4");
-}
-
-void AutomatableModel::rebaseLinkThis()
-{
-	AutomatableModel* thisBase = getBaseLink();
-	if (this == thisBase) { return; }
-	qDebug("rebaseLinkThis 0");
-
-	AutomatableModel* next = thisBase;
-	while (true)
-	{
-		// rebase other models
-		next->m_firstLink = this;
-		if (next->m_nextLink == nullptr) { break; }
-		if (next->m_nextLink == this)
-		{
-			// step over this model
-			next->m_nextLink = m_nextLink;
-			if (next->m_nextLink == nullptr) { break; }
-		}
-		next = next->m_nextLink;
-	}
-	next->m_nextLink = nullptr; // just in case
-	m_nextLink = thisBase;
-	m_firstLink = nullptr;
-	// Before: this_base - this_next - this_model - this_next
-	// After: this_model - this_base - this_next - this_next
-
-	qDebug("rebaseLinkThis 1");
-	next = this;
-	size_t counter = 0;
-	while (true)
-	{
-		qDebug("rebaseLinkThis: after [%ld] id: %d", counter, next->id());
-		if (next->m_nextLink == nullptr) { break; }
-		next = next->m_nextLink;
-		counter++;
-	}
-	qDebug("rebaseLinkThis 2");
+	return output;
 }
 
 
@@ -604,18 +510,15 @@ void AutomatableModel::rebaseLinkThis()
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
 	// copy data
-	qDebug("linkModels copying...");
-	model1->m_value = model2->m_value;
+	model1->setValue(model2->m_value);
 	if (model1->valueBuffer() && model2->valueBuffer())
 	{
 		std::copy_n(model2->valueBuffer()->data(),
 			model1->valueBuffer()->length(),
 			model1->valueBuffer()->data());
+		emit model1->dataChanged();
 	}
-	// send dataChanged() before linking (because linking will
-	// connect the two dataChanged() signals)
-	emit model1->dataChanged();
-	// finally: link the models
+	// link the models
 	model1->linkModel(model2);
 }
 
@@ -625,9 +528,9 @@ void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* m
 
 
 
+
 void AutomatableModel::unlinkAllModels()
 {
-	qDebug("unlinkAllModels unlinking...");
 	unlinkModel();
 	/*
 	for( AutomatableModel* model : m_linkedModels )
@@ -658,11 +561,35 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 
 float AutomatableModel::controllerValue( int frameOffset ) const
 {
-	if( m_controllerConnection )
+	float output = m_value;
+	if (hasLinkedModels())
 	{
-		float v = 0;
-		switch(m_scaleType)
+		const AutomatableModel* next = this;
+		while (true)
 		{
+			if (next->controllerConnection() != nullptr && next->useControllerValue())
+			{
+				output = next->fittedValue(controllerValueInternal(frameOffset));
+				break;
+			}
+			next = next->m_nextLink;
+			if (next == this) { break; }
+		}
+	}
+	else
+	{
+		output = fittedValue(controllerValueInternal(frameOffset));
+	}
+	return output;
+}
+
+float AutomatableModel::controllerValueInternal(int frameOffset) const
+{
+	if (m_controllerConnection == nullptr) { return m_value; }
+
+	float v = 0;
+	switch(m_scaleType)
+	{
 		case ScaleType::Linear:
 			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 			break;
@@ -674,24 +601,13 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 			qFatal("AutomatableModel::controllerValue(int)"
 				"lacks implementation for a scale type");
 			break;
-		}
-		if (approximatelyEqual(m_step, 1) && m_hasStrictStepSize)
-		{
-			return std::round(v);
-		}
-		return v;
 	}
-
-	const AutomatableModel* lm = getBaseLink();
-	if (lm == this) { return m_value; }
-	if (lm->controllerConnection() && lm->useControllerValue())
+	if (approximatelyEqual(m_step, 1) && m_hasStrictStepSize)
 	{
-		return fittedValue(lm->controllerValue(frameOffset));
+		return std::round(v);
 	}
-
-	return fittedValue(lm->m_value);
+	return v;
 }
-
 
 ValueBuffer * AutomatableModel::valueBuffer()
 {
@@ -740,29 +656,32 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	if (!m_controllerConnection)
 	{
-		AutomatableModel* lm = nullptr;
 		if (hasLinkedModels())
 		{
-			lm = m_firstLink; // TODO
-		}
-		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
-				lm->controllerConnection()->getController()->isSampleExact())
-		{
-			auto vb = lm->valueBuffer();
-			float * values = vb->values();
-			float * nvalues = m_valueBuffer.values();
-			for (int i = 0; i < vb->length(); i++)
+			AutomatableModel* next = this;
+			while (true)
 			{
-				nvalues[i] = fittedValue(values[i]);
+				if (next->controllerConnection() && next->useControllerValue() &&
+						next->controllerConnection()->getController()->isSampleExact())
+				{
+					auto vb = next->valueBuffer();
+					float * values = vb->values();
+					float * nvalues = m_valueBuffer.values();
+					for (int i = 0; i < vb->length(); i++)
+					{
+						nvalues[i] = fittedValue(values[i]);
+					}
+					m_lastUpdatedPeriod = s_periodCounter;
+					m_hasSampleExactData = true;
+					return &m_valueBuffer;
+				}
+				next = next->m_nextLink;
+				if (next == this) { break; }
 			}
-			m_lastUpdatedPeriod = s_periodCounter;
-			m_hasSampleExactData = true;
-			return &m_valueBuffer;
 		}
 	}
 
-	/* TODO
-	if( m_oldValue != val )
+	if (m_oldValue != val)
 	{
 		m_valueBuffer.interpolate( m_oldValue, val );
 		m_oldValue = val;
@@ -770,7 +689,6 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		m_hasSampleExactData = true;
 		return &m_valueBuffer;
 	}
-	*/
 
 	// if we have no sample-exact source for a ValueBuffer, return NULL to signify that no data is available at the moment
 	// in which case the recipient knows to use the static value() instead
@@ -798,7 +716,7 @@ void AutomatableModel::setInitValue( const float value )
 	m_initValue = fittedValue( value );
 	bool journalling = testAndSetJournalling( false );
 	setValue( value );
-	//m_oldValue = m_value; TODO
+	m_oldValue = m_value;
 	setJournalling( journalling );
 	emit initValueChanged( value );
 }
