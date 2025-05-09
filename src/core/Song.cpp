@@ -419,7 +419,8 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	{
 		if (! recordedModels.contains(it.key()))
 		{
-			it.key()->setAutomatedValue(it.value());
+			//it.key()->setAutomatedValue(it.value());
+			it.key()->setValue(it.value(), true);
 		}
 		else if (!it.key()->useControllerValue())
 		{
