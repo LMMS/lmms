@@ -68,6 +68,12 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(update()));
+
+	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
+	if (autoScrollState == "stepped") { m_autoScroll = AutoScrollState::Stepped; }
+	else if (autoScrollState == "continuous") { m_autoScroll = AutoScrollState::Continuous; }
+	else if (autoScrollState == "disabled") { m_autoScroll = AutoScrollState::Disabled; }
+	else { m_autoScroll = AutoScrollState::Stepped; }
 }
 
 
@@ -92,14 +98,9 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	autoScroll->addState(embed::getIconPixmap("autoscroll_stepped_on"), tr("Stepped auto scrolling"));
 	autoScroll->addState(embed::getIconPixmap("autoscroll_continuous_on"), tr("Continuous auto scrolling"));
 	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
+	autoScroll->changeState(static_cast<int>(m_autoScroll));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
-	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
-	if (autoScrollState == "stepped") { autoScroll->changeState(static_cast<int>(AutoScrollState::Stepped)); }
-	else if (autoScrollState == "continuous") { autoScroll->changeState(static_cast<int>(AutoScrollState::Continuous)); }
-	else if (autoScrollState == "disabled") { autoScroll->changeState(static_cast<int>(AutoScrollState::Disabled)); }
-	else { autoScroll->changeState(static_cast<int>(AutoScrollState::Stepped)); }
-
 
 	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
