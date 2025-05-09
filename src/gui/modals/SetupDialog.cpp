@@ -120,7 +120,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
-	m_autoScrollState(ConfigManager::inst()->value("ui", "autoscroll", "stepped")),
+	m_autoScroll(ConfigManager::inst()->value("ui", "autoscroll", "stepped")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -270,16 +270,16 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
 
-	m_autoScrollStateComboBox = new QComboBox{guiGroupBox};
-	m_autoScrollStateComboBox->addItem(tr("Disabled"), AUTOSCROLL_DISABLED_STRING);
-	m_autoScrollStateComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), AUTOSCROLL_STEPPED_STRING);
-	m_autoScrollStateComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), AUTOSCROLL_CONTINUOUS_STRING);
-	m_autoScrollStateComboBox->setCurrentIndex(m_autoScrollStateComboBox->findData(m_autoScrollState));
-	connect(m_autoScrollStateComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
-		this, [this](){ m_autoScrollState = m_autoScrollStateComboBox->currentData().toString(); });
+	m_autoScrollComboBox = new QComboBox{guiGroupBox};
+	m_autoScrollComboBox->addItem(tr("Disabled"), AUTOSCROLL_DISABLED_STRING);
+	m_autoScrollComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), AUTOSCROLL_STEPPED_STRING);
+	m_autoScrollComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), AUTOSCROLL_CONTINUOUS_STRING);
+	m_autoScrollComboBox->setCurrentIndex(m_autoScrollComboBox->findData(m_autoScroll));
+	connect(m_autoScrollComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, [this](){ m_autoScroll = m_autoScrollComboBox->currentData().toString(); });
 
 	guiGroupLayout->addWidget(new QLabel{tr("Default Autoscroll Mode"), guiGroupBox});
-	guiGroupLayout->addWidget(m_autoScrollStateComboBox);
+	guiGroupLayout->addWidget(m_autoScrollComboBox);
 
 	generalControlsLayout->addWidget(guiGroupBox);
 
@@ -996,7 +996,7 @@ void SetupDialog::accept()
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
-	ConfigManager::inst()->setValue("ui", "autoscroll", m_autoScrollState);
+	ConfigManager::inst()->setValue("ui", "autoscroll", m_autoScroll);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
 	ConfigManager::inst()->setValue("ui", "enableautosave",
