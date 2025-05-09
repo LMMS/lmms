@@ -275,7 +275,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_autoScrollStateComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), "continuous");
 	m_autoScrollStateComboBox->setCurrentIndex(m_autoScrollStateComboBox->findData(m_autoScrollState));
 	connect(m_autoScrollStateComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
-		this, [](){ m_autoScrollState = m_autoScrollStateComboBox->currentData().toString(); });
+		this, [this](){ m_autoScrollState = m_autoScrollStateComboBox->currentData().toString(); });
 
 	guiGroupLayout->addWidget(new QLabel{tr("Default Autoscroll Mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_autoScrollStateComboBox);
