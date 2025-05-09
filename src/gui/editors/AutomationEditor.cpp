@@ -130,7 +130,7 @@ AutomationEditor::AutomationEditor() :
 	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
 		Engine::getSong()->getPlayPos(Song::PlayMode::AutomationClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
-		m_currentPosition, Song::PlayMode::AutomationClip, this
+		m_currentPosition, Song::PlayMode::AutomationClip, TimeLineWidget::getDefaultAutoScrollState(), this
 	);
 	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
