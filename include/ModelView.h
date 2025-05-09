@@ -26,7 +26,6 @@
 #define LMMS_GUI_MODEL_VIEW_H
 
 #include <QPointer>
-
 #include "Model.h"
 
 namespace lmms::gui
@@ -43,33 +42,24 @@ public:
 
 	Model* model()
 	{
-		assertModel<Model>();
 		return m_model;
 	}
 
 	const Model* model() const
 	{
-		assertModel<Model>();
 		return m_model;
 	}
 
 	template<class T>
 	T* castModel()
 	{
-		assertModel<T>();
-		return dynamic_cast<T*>(m_model.data());
+		return dynamic_cast<T*>( model() );
 	}
 
 	template<class T>
 	const T* castModel() const
 	{
-		assertModel<T>();
-		return dynamic_cast<const T*>(m_model.data());
-	}
-	
-	bool isModelValid() const
-	{
-		return m_model != nullptr;
+		return dynamic_cast<const T*>( model() );
 	}
 
 
@@ -88,18 +78,6 @@ protected:
 
 
 private:
-	template<class T>
-	void assertModel() const
-	{
-		if (m_model.data()) { return; }
-
-		QString type = typeid(T).name();
-		execAssertFailedDialog(type);
-		Q_ASSERT(false);
-	}
-	void execAssertFailedDialog(const QString& type) const;
-
-
 	QWidget* m_widget;
 	QPointer<Model> m_model;
 
