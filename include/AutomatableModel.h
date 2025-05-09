@@ -149,22 +149,12 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if (m_controllerConnection)
+		if (m_controllerConnection && m_useControllerValue)
 		{
-			if (!m_useControllerValue)
-			{
-				return castValue<T>(m_value);
-			}
-			else
-			{
-				return castValue<T>(controllerValue(frameOffset));
-			}
+			// workaround to update linked models
+			AutomatableModel* thisModel = const_cast<AutomatableModel*>(this);
+			thisModel->setValue(controllerValue(frameOffset));
 		}
-		else if (hasLinkedModels())
-		{
-			return castValue<T>( controllerValue( frameOffset ) );
-		}
-
 		return castValue<T>( m_value );
 	}
 
@@ -250,8 +240,9 @@ public:
 
 	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
-
 	void unlinkAllModels();
+	//! @return 0 if not connected, never 1, 2 if connected to 1 model
+	size_t countLinks() const;
 
 	/**
 	 * @brief Saves settings (value, automation links and controller connections) of AutomatableModel into
@@ -338,7 +329,6 @@ protected:
 
 private:
 	void setValueInternal(float value, bool isAutomated);
-	float controllerValueInternal(int frameOffset) const;
 	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
@@ -374,8 +364,6 @@ private:
 	AutomatableModel* getLastLinkedModel() const;
 	//! @return true if the `model` is in the linked list
 	bool isModelLinked(AutomatableModel* model) const;
-	size_t countLinks() const;
-	
 	
 	//! @brief Scales @value from linear to logarithmic.
 	//! Value should be within [0,1]

@@ -321,11 +321,6 @@ void AutomatableModel::setValueInternal(float value, bool isAutomated)
 		m_valueChanged = true;
 		emit dataChanged();
 	}
-	else if (isAutomated == false)
-	{
-		// emit only if not automated and not changed
-		emit dataUnchanged();
-	}
 }
 
 
@@ -436,7 +431,7 @@ float AutomatableModel::fittedValue( float value ) const
 void AutomatableModel::linkModel(AutomatableModel* model)
 {
 	if (model == nullptr || model == this || isModelLinked(model)) { return; }
-	
+
 	AutomatableModel* otherEnd = model->getLastLinkedModel();
 	if (otherEnd == nullptr)
 	{
@@ -448,9 +443,6 @@ void AutomatableModel::linkModel(AutomatableModel* model)
 		otherEnd->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
 		m_nextLink = model;
 	}
-
-	QObject::connect(this, SIGNAL(dataChanged()),
-			model, SIGNAL(dataChanged()), Qt::DirectConnection);
 }
 
 void AutomatableModel::unlinkModel()
@@ -554,30 +546,6 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 
 
 float AutomatableModel::controllerValue( int frameOffset ) const
-{
-	float output = m_value;
-	if (hasLinkedModels())
-	{
-		const AutomatableModel* next = this;
-		while (true)
-		{
-			if (next->controllerConnection() != nullptr && next->useControllerValue())
-			{
-				output = next->fittedValue(controllerValueInternal(frameOffset));
-				break;
-			}
-			next = next->m_nextLink;
-			if (next == this) { break; }
-		}
-	}
-	else
-	{
-		output = fittedValue(controllerValueInternal(frameOffset));
-	}
-	return output;
-}
-
-float AutomatableModel::controllerValueInternal(int frameOffset) const
 {
 	if (m_controllerConnection == nullptr) { return m_value; }
 
