@@ -212,8 +212,8 @@ public:
 
 	void setInitValue( const float value );
 
-	void setAutomatedValue( const float value );
-	void setValue( const float value );
+	void setAutomatedValue(float value);
+	void setValue(float value, bool isAutomated = false);
 
 	void incValue( int steps )
 	{
@@ -252,7 +252,6 @@ public:
 
 	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
-	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
 	void unlinkAllModels();
 
@@ -279,7 +278,7 @@ public:
 
 	bool hasLinkedModels() const
 	{
-		return !m_linkedModels.empty();
+		return m_nextLink != nullptr || m_firstLink != nullptr;
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -312,7 +311,7 @@ public:
 		s_periodCounter = 0;
 	}
 
-	bool useControllerValue()
+	bool useControllerValue() const
 	{
 		return m_useControllerValue;
 	}
@@ -340,6 +339,7 @@ protected:
 
 
 private:
+	void setValueInternal(float value, bool isAutomated);
 	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
@@ -368,9 +368,16 @@ private:
 		loadSettings( element, "value" );
 	}
 
-	void linkModel( AutomatableModel* model );
-	void unlinkModel( AutomatableModel* model );
-
+	void linkModel(AutomatableModel* model);
+	void unlinkModel();
+	AutomatableModel* getBaseLink();
+	const AutomatableModel* getBaseLink() const;
+	//! links an other model link chain to this
+	//! can rearrange the current chain if `this` is passed in
+	void rebaseLinkToThis(AutomatableModel* model);
+	void rebaseLinkThis();
+	
+	
 	//! @brief Scales @value from linear to logarithmic.
 	//! Value should be within [0,1]
 	template<class T> T logToLinearScale( T value ) const;
@@ -391,15 +398,15 @@ private:
 
 	bool m_valueChanged;
 
-	// currently unused?
-	float m_oldValue;
-	int m_setValueDepth;
-
 	// used to determine if step size should be applied strictly (ie. always)
 	// or only when value set from gui (default)
 	bool m_hasStrictStepSize;
 
-	AutoModelVector m_linkedModels;
+	//! an `AutomatableModel` either has a linked parent or a array of linked models
+	//AutoModelVector m_linkedModels;
+	//! linked `AutomatableModels` will act as a linked list
+	AutomatableModel* m_nextLink;
+	AutomatableModel* m_firstLink;
 
 
 	//! NULL if not appended to controller, otherwise connection info
