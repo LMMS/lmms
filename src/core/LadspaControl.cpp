@@ -342,16 +342,18 @@ void LadspaControl::unlinkControls( LadspaControl * _control )
 	switch( m_port->data_type )
 	{
 		case BufferDataType::Toggled:
-			BoolModel::unlinkModels( &m_toggledModel, _control->toggledModel() );
+			m_toggledModel.unlinkAllModels();
+			_control->toggledModel()->unlinkAllModels();
 			break;
 		case BufferDataType::Integer:
 		case BufferDataType::Enum:
 		case BufferDataType::Floating:
-			FloatModel::unlinkModels( &m_knobModel, _control->knobModel() );
+			m_knobModel.unlinkAllModels();
+			_control->knobModel()->unlinkAllModels();
 			break;
 		case BufferDataType::Time:
-			TempoSyncKnobModel::unlinkModels( &m_tempoSyncKnobModel,
-					_control->tempoSyncKnobModel() );
+			m_tempoSyncKnobModel.unlinkAllModels();
+			_control->tempoSyncKnobModel()->unlinkAllModels();
 			break;
 		default:
 			break;
