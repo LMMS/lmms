@@ -119,7 +119,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
-	m_autoScrollState(ConfigManager::inst()->value("ui", "autoscrollstate", "stepped")),
+	m_autoScrollState(ConfigManager::inst()->value("ui", "autoscroll", "stepped")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -995,7 +995,7 @@ void SetupDialog::accept()
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
-	ConfigManager::inst()->setValue("ui", "autoscrollstate", m_autoScrollState);
+	ConfigManager::inst()->setValue("ui", "autoscroll", m_autoScrollState);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
 	ConfigManager::inst()->setValue("ui", "enableautosave",

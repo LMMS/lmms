@@ -94,7 +94,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
-	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscrollstate");
+	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
 	if (autoScrollState == "stepped") { autoScroll->changeState(static_cast<int>(AutoScrollState::Stepped)); }
 	else if (autoScrollState == "continuous") { autoScroll->changeState(static_cast<int>(AutoScrollState::Continuous)); }
 	else if (autoScrollState == "disabled") { autoScroll->changeState(static_cast<int>(AutoScrollState::Disabled)); }
