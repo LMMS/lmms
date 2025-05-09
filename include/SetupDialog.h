@@ -86,6 +86,7 @@ private slots:
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
 	void loopMarkerModeChanged();
+	void autoScrollStateChanged();
 	void setLanguage(int lang);
 
 	// Performance settings widget.
@@ -149,6 +150,8 @@ private:
 	bool m_openLastProject;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
+	QString m_autoScrollState;
+	QComboBox* m_autoScrollStateComboBox;
 	QString m_lang;
 	QStringList m_languages;
 

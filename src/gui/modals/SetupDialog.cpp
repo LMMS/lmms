@@ -119,6 +119,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
+	m_autoScrollState(ConfigManager::inst()->value("ui", "autoscrollstate", "stepped")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -267,6 +268,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
+
+	m_autoScrollStateComboBox = new QComboBox{guiGroupBox};
+	m_autoScrollStateComboBox->addItem(tr("Disabled"), "disabled");
+	m_autoScrollStateComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), "stepped");
+	m_autoScrollStateComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), "continuous");
+	m_autoScrollStateComboBox->setCurrentIndex(m_autoScrollStateComboBox->findData(m_autoScrollState));
+	connect(m_autoScrollStateComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::autoScrollStateChanged);
+
+	guiGroupLayout->addWidget(new QLabel{tr("Default Autoscroll Mode"), guiGroupBox});
+	guiGroupLayout->addWidget(m_autoScrollStateComboBox);
 
 	generalControlsLayout->addWidget(guiGroupBox);
 
@@ -983,6 +995,7 @@ void SetupDialog::accept()
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
+	ConfigManager::inst()->setValue("ui", "autoscrollstate", m_autoScrollState);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
 	ConfigManager::inst()->setValue("ui", "enableautosave",
@@ -1125,6 +1138,10 @@ void SetupDialog::loopMarkerModeChanged()
 	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
 }
 
+void SetupDialog::autoScrollStateChanged()
+{
+	m_autoScrollState = m_autoScrollStateComboBox->currentData().toString();
+}
 
 void SetupDialog::setLanguage(int lang)
 {
