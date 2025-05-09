@@ -54,7 +54,7 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
+AudioResampler::ResampleResult AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 {
 	m_data.data_out = dst;
 	m_data.output_frames = static_cast<long>(frames);
@@ -62,6 +62,7 @@ void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 	m_data.src_ratio = ratio;
 	m_data.end_of_input = 0;
 
+	auto result = ResampleResult{};
 	while (m_data.output_frames > 0)
 	{
 		if (m_data.input_frames == 0)
@@ -78,7 +79,7 @@ void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 			{
 				// Silence unfilled output
 				std::fill(dst + (frames - m_data.output_frames) * m_channels, dst + frames * m_channels, 0.f);
-				return;
+				return result;
 			}
 		}
 
@@ -89,7 +90,12 @@ void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 
 		m_data.input_frames -= m_data.input_frames_used;
 		m_data.output_frames -= m_data.output_frames_gen;
+
+		result.inputFramesUsed += m_data.input_frames_used;
+		result.outputFramesGenerated += m_data.output_frames_gen;
 	}
+
+	return result;
 }
 
 void AudioResampler::setSource(WriteCallback callback)
