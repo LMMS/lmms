@@ -78,7 +78,7 @@ private slots: // tests
 	{
 		using namespace lmms;
 
-		BoolModel m1(false), m2(false);
+		BoolModel m1(true), m2(false);
 
 		QObject::connect(&m1, SIGNAL(dataChanged()),
 			this, SLOT(onM1Changed()));
@@ -89,11 +89,13 @@ private slots: // tests
 		AutomatableModel::linkModels(&m1, &m1);
 		QVERIFY(!m1Changed); // cannot link to itself
 		QVERIFY(!m2Changed);
+		QVERIFY(m1.countLinks() == 0);
 
 		resetChanged();
 		AutomatableModel::linkModels(&m1, &m2);
-		QVERIFY(m1Changed); // since m1 takes the value of m2
+		QVERIFY(m1.value() == m2.value()); // since m1 takes the value of m2
 		QVERIFY(!m2Changed); // the second model is the source
+		QVERIFY(m1.countLinks() == 2);
 
 		resetChanged();
 		AutomatableModel::linkModels(&m1, &m2);
@@ -102,17 +104,17 @@ private slots: // tests
 
 		resetChanged();
 		BoolModel m3(false);
-		m1.setValue(1.f);
-		m2.setValue(1.f);
+		m1.setValue(1.f); // true
+		m2.setValue(1.f); // true
 		AutomatableModel::linkModels(&m1, &m2);
 		QVERIFY(m1.value());
 		QVERIFY(m2.value());
 		QVERIFY(!m3.value());
 		AutomatableModel::linkModels(&m2, &m3); // drag m3, drop on m2
 		// m2 should take m3's (0) value
-		// due to a bug(?), this does not happen
-		QVERIFY(m2.value());
+		QVERIFY(m2.value() == m3.value());
 		QVERIFY(!m3.value());
+		QVERIFY(m1.countLinks() == 3);
 	}
 };
 
