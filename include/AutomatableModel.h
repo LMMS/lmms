@@ -171,7 +171,6 @@ public:
 	}
 
 	float controllerValue( int frameOffset ) const;
-	float controllerValueInternal(int frameOffset) const;
 
 	//! @brief Function that returns sample-exact data as a ValueBuffer
 	//! @return pointer to model's valueBuffer when s.ex.data exists, NULL otherwise
@@ -341,6 +340,7 @@ protected:
 
 private:
 	void setValueInternal(float value, bool isAutomated);
+	float controllerValueInternal(int frameOffset) const;
 	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
