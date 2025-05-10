@@ -73,7 +73,6 @@ private:
 
 	static sample_rate_t maxSamplerate( const QString & _name );
 
-	AudioResampler m_resampler;
 	QMutex m_pluginMutex;
 	LadspaControls * m_controls;
 
