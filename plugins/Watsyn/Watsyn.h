@@ -190,7 +190,17 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		resampler.setSource(_src, GRAPHLEN);
+		static auto index = std::size_t{0};
+		resampler.setSource([&_src](float* dst, std::size_t frames, long channels) {
+			for (auto i = std::size_t{0}; i < frames * channels; ++i)
+			{
+				dst[i] = _src[index];
+				index = (index + 1) % GRAPHLEN;
+			}
+
+			return frames;
+		});
+
 		resampler.resample(_dst, WAVELEN, WAVERATIO);
 	}
 
