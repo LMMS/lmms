@@ -431,8 +431,6 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			// TODO: We should be able to use a Sample player object here,
-			// but it may need some larger refactoring elsewhere
 			sample.m_resampler.setSource([this, &sample](float* dst, std::size_t frames, long channels) {
 				assert(channels == DEFAULT_CHANNELS);
 				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
