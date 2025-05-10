@@ -61,7 +61,6 @@ AudioBusHandle::~AudioBusHandle()
 {
 	setExtOutputEnabled(false);
 	Engine::audioEngine()->removeAudioBusHandle(this);
-	BufferManager::release(m_buffer.data());
 }
 
 

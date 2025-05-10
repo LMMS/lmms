@@ -42,7 +42,6 @@
 #include <QDir>
 #include <QUuid>
 
-#include "BufferManager.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Model.h"

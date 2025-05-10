@@ -25,6 +25,7 @@
 #ifndef LMMS_PLAY_HANDLE_H
 #define LMMS_PLAY_HANDLE_H
 
+#include <vector>
 #include <QList>
 #include <QMutex>
 
@@ -153,7 +154,7 @@ private:
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	std::span<SampleFrame> m_playHandleBuffer; //!< owning view
+	std::vector<SampleFrame> m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioBusHandle* m_audioBusHandle;

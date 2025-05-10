@@ -27,6 +27,7 @@
 #define LMMS_AUDIO_BUS_HANDLE_H
 
 #include <memory>
+#include <vector>
 #include <QString>
 #include <QMutex>
 
@@ -86,7 +87,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	std::span<SampleFrame> m_buffer; //!< owning view
+	std::vector<SampleFrame> m_buffer;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;

@@ -47,7 +47,6 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 
 PlayHandle::~PlayHandle()
 {
-	BufferManager::release(m_playHandleBuffer.data());
 }
 
 
