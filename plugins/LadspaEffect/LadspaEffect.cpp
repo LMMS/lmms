@@ -26,6 +26,7 @@
 
 #include <QVarLengthArray>
 #include <QMessageBox>
+#include <iostream>
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
@@ -137,20 +138,11 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 		return ProcessStatus::Sleep;
 	}
 
-	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
-	const auto resampleRatio = static_cast<double>(m_maxSampleRate) / Engine::audioEngine()->outputSampleRate();
-
-	auto outFrames = frames;
-	SampleFrame* outBuf = nullptr;
-	QVarLengthArray<SampleFrame> sBuf(frames);
-
-	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
+	if (m_maxSampleRate < Engine::audioEngine()->outputSampleRate())
 	{
-		outBuf = buf;
-		buf = sBuf.data();
-
-		m_resampler.setSource(&outBuf[0][0], frames);
-		m_resampler.resample(&buf[0][0], frames, resampleRatio);
+		std::cerr << "Engine sample rate " << "(" << Engine::audioEngine()->outputSampleRate()
+				  << " hz) greater than the max sample rate allowed for this LADSPA effect (" << m_maxSampleRate
+				  << " hz)\n";
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
@@ -164,7 +156,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 			switch( pp->rate )
 			{
 				case BufferRate::ChannelIn:
-					for (fpp_t frame = 0; frame < outFrames; ++frame)
+					for (fpp_t frame = 0; frame < frames; ++frame)
 					{
 						pp->buffer[frame] = buf[frame][channel];
 					}
@@ -175,7 +167,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 					ValueBuffer * vb = pp->control->valueBuffer();
 					if( vb )
 					{
-						memcpy(pp->buffer, vb->values(), outFrames * sizeof(float));
+						memcpy(pp->buffer, vb->values(), frames * sizeof(float));
 					}
 					else
 					{
@@ -184,7 +176,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 						// This only supports control rate ports, so the audio rates are
 						// treated as though they were control rate by setting the
 						// port buffer to all the same value.
-						for (fpp_t frame = 0; frame < outFrames; ++frame)
+						for (fpp_t frame = 0; frame < frames; ++frame)
 						{
 							pp->buffer[frame] = pp->value;
 						}
@@ -215,7 +207,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 	// Process the buffers.
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
 	{
-		(m_descriptor->run)(m_handles[proc], outFrames);
+		(m_descriptor->run)(m_handles[proc], frames);
 	}
 
 	// Copy the LADSPA output buffers to the LMMS buffer.
@@ -234,7 +226,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 				case BufferRate::ControlRateInput:
 					break;
 				case BufferRate::ChannelOut:
-					for (fpp_t frame = 0; frame < outFrames; ++frame)
+					for (fpp_t frame = 0; frame < frames; ++frame)
 					{
 						buf[frame][channel] = d * buf[frame][channel] + w * pp->buffer[frame];
 					}
@@ -247,12 +239,6 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 					break;
 			}
 		}
-	}
-
-	if (outBuf != nullptr)
-	{
-		m_resampler.setSource(&buf[0][0], framesPerPeriod);
-		m_resampler.resample(&outBuf[0][0], framesPerPeriod, 1.0 / resampleRatio);
 	}
 
 	m_pluginMutex.unlock();

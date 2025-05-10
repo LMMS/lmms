@@ -54,7 +54,7 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
+void AudioResampler::resample(float* dst, std::size_t frames, double ratio, WriteCallback callback)
 {
 	m_data.data_out = dst;
 	m_data.output_frames = static_cast<long>(frames);
@@ -66,7 +66,7 @@ void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 	{
 		if (m_data.input_frames == 0)
 		{
-			const auto framesWritten = m_callback(m_buffer.data(), m_buffer.size() / m_channels, m_channels);
+			const auto framesWritten = callback(m_buffer.data(), m_buffer.size() / m_channels, m_channels);
 			m_data.data_in = m_buffer.data();
 			m_data.input_frames = static_cast<long>(framesWritten);
 		}
@@ -79,17 +79,6 @@ void AudioResampler::resample(float* dst, std::size_t frames, double ratio)
 		m_data.input_frames -= m_data.input_frames_used;
 		m_data.output_frames -= m_data.output_frames_gen;
 	}
-}
-
-void AudioResampler::setSource(WriteCallback callback)
-{
-	m_callback = callback;
-}
-
-void AudioResampler::setSource(const float* src, std::size_t frames)
-{
-	m_data.data_in = src;
-	m_data.input_frames = static_cast<long>(frames);
 }
 
 } // namespace lmms

@@ -63,14 +63,9 @@ public:
 	//! Moves the internal state from one resampler to another.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
-	//! Fetch source data from a callback when resampling next.
-	void setSource(WriteCallback callback);
-
-	//! Retrieve source data from @p src when resampling next.
-	void setSource(const float* src, std::size_t frames);
-
 	//! Resamples audio into @p dst with at the given @p ratio.
-	void resample(float* dst, std::size_t frames, double ratio);
+	//! Uses @p callback to fetch input data as necessary.
+	void resample(float* dst, std::size_t frames, double ratio, WriteCallback callback);
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
@@ -84,7 +79,6 @@ public:
 private:
 	std::array<float, 256> m_buffer{};
 	SRC_DATA m_data = SRC_DATA{};
-	WriteCallback m_callback;
 	SRC_STATE* m_state = nullptr;
 	int m_channels = 0;
 	int m_mode = 0;

@@ -868,14 +868,13 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
-
-	m_resampler.setSource([this](float* dst, std::size_t frames, int channels) {
+	const auto resampleCallback = [this](float* dst, std::size_t frames, int channels) {
 		fluid_synth_write_float(m_synth, static_cast<int>(frames), dst, 0, 2, dst, 1, 2);
 		return frames;
-	});
+	};
 
-	m_resampler.resample(&buf[0][0], frames, ratio);
+	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
+	m_resampler.resample(&buf[0][0], frames, ratio, resampleCallback);
 
 	m_synthMutex.unlock();
 }

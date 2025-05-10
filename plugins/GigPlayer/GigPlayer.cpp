@@ -431,7 +431,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			sample.m_resampler.setSource([this, &sample](float* dst, std::size_t frames, long channels) {
+			const auto resampleCallback = [this, &sample](float* dst, std::size_t frames, long channels) {
 				assert(channels == DEFAULT_CHANNELS);
 				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
 
@@ -449,9 +449,9 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				sample.pos += frames;
 				sample.adsr.inc(frames);
 				return frames;
-			});
+			};
 
-			sample.m_resampler.resample(&_working_buffer[0][0], frames, freq_factor);
+			sample.m_resampler.resample(&_working_buffer[0][0], frames, freq_factor, resampleCallback);
 		}
 	}
 
