@@ -24,25 +24,25 @@
 
 #include "TrackContainerView.h"
 
-
+#include <Clipboard.h>
 #include <QLayout>
+#include <QMessageBox>
 #include <QScrollBar>
-#include <QWheelEvent>
 
-#include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "DataFile.h"
-#include "MainWindow.h"
 #include "FileBrowser.h"
+#include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "MainWindow.h"
 #include "PatternTrack.h"
+#include "PluginFactory.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainer.h"
 #include "TrackView.h"
-#include "GuiApplication.h"
-#include "PluginFactory.h"
 
 namespace lmms
 {
@@ -372,9 +372,9 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 	StringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
-				"track_%1,track_%2" ).
-						arg( static_cast<int>(Track::Type::Instrument) ).
-						arg( static_cast<int>(Track::Type::Sample) ) );
+				"track_%1,track_%2")
+			.arg(static_cast<int>(Track::Type::Instrument))
+			.arg(static_cast<int>(Track::Type::Sample)));
 }
 
 
@@ -391,46 +391,61 @@ void TrackContainerView::stopRubberBand()
 
 void TrackContainerView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "instrument" )
+	auto data = Clipboard::decodeMimeData(_de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
+
+	if (type == "instrument")
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		auto ilt = new InstrumentLoaderThread(this, it, value);
+		auto ilt = new InstrumentLoaderThread(this, it, value); // TODO: this is a memory leak (according to CLion)
 		ilt->start();
-		//it->toggledInstrumentTrackButton( true );
+		// it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile"
+	else if(
+		type == "samplefile" || type == "pluginpresetfile"
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
+
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "presetfile" )
+	else if(type == "presetfile")
 	{
-		DataFile dataFile( value );
+		QString ext = QFileInfo(value).suffix().toLower();
+
+		DataFile dataFile(value);
+		if (!dataFile.validate(ext))
+		{
+			QMessageBox::warning(0, tr ("Error"),
+				tr("%1 does not appear to be a valid %2 file")
+				.arg(value, ext),
+				QMessageBox::Ok, QMessageBox::NoButton);
+			return;
+		}
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		it->loadPreset(dataFile.content().toElement());
 
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "importedproject" )
+	else if (type == "importedproject")
 	{
 		ImportFilter::import( value, m_tc );
 		_de->accept();
 	}
 
-	else if( type == "projectfile")
+	else if (type == "projectfile")
 	{
-		if( getGUI()->mainWindow()->mayChangeProject(true) )
+		if (getGUI()->mainWindow()->mayChangeProject(true))
 		{
 			Engine::getSong()->loadProject( value );
 		}
