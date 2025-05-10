@@ -65,9 +65,9 @@ void ThreadedExportManager::stopExporting()
 }
 
 
-void ThreadedExportManager::threadedExportMethod(ThreadedExportManager* thisExporter, std::atomic<bool>* abortExport)
+void ThreadedExportManager::threadedExportMethod(ThreadedExportManager* thisExporter, std::atomic<bool>* shouldRun)
 {
-	while (*abortExport == false)
+	while (*shouldRun == true)
 	{
 		std::tuple<QString, std::shared_ptr<const SampleBuffer>, callbackFn, void*> curBuffer = std::make_tuple(QString(""), nullptr, nullptr, nullptr);
 		thisExporter->m_readMutex.lock();

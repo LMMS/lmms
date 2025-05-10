@@ -54,7 +54,7 @@ public:
 	void stopExporting();
 
 private:
-	static void threadedExportMethod(ThreadedExportManager* thisExporter, std::atomic<bool>* abortExport);
+	static void threadedExportMethod(ThreadedExportManager* thisExporter, std::atomic<bool>* shouldRun);
 
 	std::vector<std::tuple<QString, std::shared_ptr<const SampleBuffer>, callbackFn, void*>> m_buffers;
 
