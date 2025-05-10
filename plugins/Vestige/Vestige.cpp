@@ -831,43 +831,28 @@ void VestigeInstrumentView::noteOffAll( void )
 
 
 
-void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
+void VestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "vstplugin" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
+	StringPairDrag::processDragEnterEvent(_dee, "vstpluginfile");
 }
 
 
 
 
-void VestigeInstrumentView::dropEvent( QDropEvent * _de )
+void VestigeInstrumentView::dropEvent(QDropEvent* _de)
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "vstplugin" )
+	auto data = Clipboard::decodeMimeData(_de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
+
+	if (type == "vstpluginfile")
 	{
-		m_vi->loadFile( value );
+		m_vi->loadFile(value);
 		_de->accept();
 		return;
 	}
+
 	_de->ignore();
 }
 

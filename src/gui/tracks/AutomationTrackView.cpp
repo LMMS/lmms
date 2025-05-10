@@ -22,16 +22,19 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "AutomationTrackView.h"
+
+#include <Clipboard.h>
+
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
-#include "embed.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -57,11 +60,13 @@ void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
+	auto data = Clipboard::decodeMimeData(_de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
 	if( type == "automatable_model" )
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
 		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->
@@ -80,6 +85,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			Clip * clip = getTrack()->createClip( pos );
 			auto autoClip = dynamic_cast<AutomationClip*>(clip);
 			autoClip->addObject( mod );
+			_de->accept();
 		}
 	}
 

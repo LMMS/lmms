@@ -23,23 +23,22 @@
  */
 #include "AutomationClipView.h"
 
+#include <Clipboard.h>
 #include <QApplication>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
-#include <QMenu>
 
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "ProjectJournal.h"
 #include "RenameDialog.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "Track.h"
-
-#include "Engine.h"
-
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -411,11 +410,13 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
+	auto data = Clipboard::decodeMimeData(_de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
 	if( type == "automatable_model" )
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
 		if( mod != nullptr )
 		{
 			bool added = m_clip->addObject( mod );

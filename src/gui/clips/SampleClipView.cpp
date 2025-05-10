@@ -21,16 +21,16 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
+#include <Clipboard.h>
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -38,6 +38,7 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackView.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -104,38 +105,50 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 
 
-
-void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
+void SampleClipView::dragEnterEvent(QDragEnterEvent* event)
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	const QMimeData* mime = event->mimeData();
+
+	if (mime->hasUrls())
 	{
-		ClipView::dragEnterEvent( _dee );
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString path = urls.first().toLocalFile();
+			QString ext = QFileInfo(path).suffix().toLower();
+
+			if (Clipboard::audioExtensions.contains(ext))
+			{
+				event->acceptProposedAction();
+				return;
+			}
+		}
 	}
+	event->ignore();
 }
 
-
-
-
-
-
-void SampleClipView::dropEvent( QDropEvent * _de )
+void SampleClipView::dropEvent(QDropEvent* _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	auto data = Clipboard::decodeMimeData(_de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
+
+	if (type == "samplefile")
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
+		m_clip->setSampleFile(value);
 		_de->accept();
 	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
+	else if (type == "sampledata")
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
 		m_clip->updateLength();
 		update();
 		_de->accept();
 	}
 	else
 	{
-		ClipView::dropEvent( _de );
+		ClipView::dropEvent(_de);
 	}
 }
 

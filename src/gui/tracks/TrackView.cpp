@@ -22,9 +22,9 @@
  *
  */
 
-
 #include "TrackView.h"
 
+#include <Clipboard.h>
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
@@ -32,8 +32,8 @@
 #include <QStyleOption>
 #include <QtGlobal>
 
-
 #include "AudioEngine.h"
+#include "ClipView.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
@@ -41,10 +41,8 @@
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "Track.h"
-#include "TrackGrip.h"
 #include "TrackContainerView.h"
-#include "ClipView.h"
-
+#include "TrackGrip.h"
 
 namespace lmms::gui
 {
@@ -226,10 +224,12 @@ void TrackView::dragEnterEvent( QDragEnterEvent * dee )
  *
  *  \param de the DropEvent to handle.
  */
-void TrackView::dropEvent( QDropEvent * de )
+void TrackView::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
+	auto data = Clipboard::decodeMimeData(de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
 	if( type == ( "track_" + QString::number( static_cast<int>(m_track->type()) ) ) )
 	{
 		// value contains our XML-data so simply create a

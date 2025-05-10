@@ -109,7 +109,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_plugin( nullptr ),
 	m_remotePlugin( nullptr ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
-	m_filterFreqModel( 127, 0, 127, 1, this, tr( "Filter frequency" ) ),
+	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
 	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM gain" ) ),
@@ -143,11 +143,6 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
-
-	// ZynAddSubFX's internal value that LMMS's FREQ knob controls
-	// isn't set properly when the instrument is first loaded in,
-	// and doesn't update until the FREQ knob is moved
-	updateFilterFreq();
 }
 
 
@@ -572,28 +567,9 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 
 
-void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
+void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
+	StringPairDrag::processDragEnterEvent(_dee, "pluginpresetfile,presetfile");
 }
 
 
@@ -601,14 +577,18 @@ void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 {
-	const QString type = StringPairDrag::decodeKey( _de );
-	const QString value = StringPairDrag::decodeValue( _de );
-	if( type == "pluginpresetfile" )
+	auto data = Clipboard::decodeMimeData(_de->mimeData());
+
+	QString type = data.first;
+	QString value = data.second;
+
+	if (type == "pluginpresetfile")
 	{
-		castModel<ZynAddSubFxInstrument>()->loadFile( value );
+		castModel<ZynAddSubFxInstrument>()->loadFile(value);
 		_de->accept();
 		return;
 	}
+
 	_de->ignore();
 }
 

@@ -80,29 +80,24 @@ StringPairDrag::~StringPairDrag()
 
 
 
-bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys )
+bool StringPairDrag::processDragEnterEvent(QDragEnterEvent * _dee,
+						const QString & _allowed_keys)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
+	auto data = Clipboard::decodeMimeData(_dee->mimeData());
 
-	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		return( false );
-	}
-	QString txt = _dee->mimeData()->data( mimeType( MimeType::StringPair ) );
-	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
+	QString type = data.first;
+	QString value = data.second;
+
+	if(_allowed_keys.split( ',' ).contains(type))
 	{
 		_dee->acceptProposedAction();
-		return( true );
+		return true;
 	}
 	_dee->ignore();
-	return( false );
+	return false;
 }
 
-
-
-
+//! use QString Clipboard::decodeKey(QMimeData) instead
 QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
 	return Clipboard::decodeKey( _de->mimeData() );
@@ -110,7 +105,7 @@ QString StringPairDrag::decodeKey( QDropEvent * _de )
 
 
 
-
+//! use QString Clipboard::decodeValue(QMimeData) instead
 QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
 	return Clipboard::decodeValue( _de->mimeData() );
