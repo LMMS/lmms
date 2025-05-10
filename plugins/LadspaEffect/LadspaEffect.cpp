@@ -138,13 +138,6 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 		return ProcessStatus::Sleep;
 	}
 
-	if (m_maxSampleRate < Engine::audioEngine()->outputSampleRate())
-	{
-		std::cerr << "Engine sample rate " << "(" << Engine::audioEngine()->outputSampleRate()
-				  << " hz) greater than the max sample rate allowed for this LADSPA effect (" << m_maxSampleRate
-				  << " hz)\n";
-	}
-
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
 	// the control ports.
 	ch_cnt_t channel = 0;
@@ -553,6 +546,7 @@ static QMap<QString, sample_rate_t> __buggy_plugins;
 
 sample_rate_t LadspaEffect::maxSamplerate( const QString & _name )
 {
+	// TODO: Add disclaimer that using certain sample rates may cause problems with some plugins
 	if( __buggy_plugins.isEmpty() )
 	{
 		__buggy_plugins["C* AmpVTS"] = 88200;
