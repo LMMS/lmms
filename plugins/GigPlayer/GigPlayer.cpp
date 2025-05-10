@@ -417,68 +417,43 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 		{
 			if (sample.sample == nullptr || sample.region == nullptr) { continue; }
 
-			// Will change if resampling
-			bool resample = false;
-			f_cnt_t samples = frames; // How many to grab
-			f_cnt_t used = frames; // How many we used
-			float freq_factor = 1.0; // How to resample
+			float freq_factor = 1.0; // How much to resample
 
 			// Resample to be the correct pitch when the sample provided isn't
 			// solely for this one note (e.g. one or two samples per octave) or
 			// we are processing at a different sample rate
 			if (sample.region->PitchTrack == true || rate != sample.sample->SamplesPerSecond)
 			{
-				resample = true;
-
 				// Factor just for resampling
 				freq_factor = 1.0 * rate / sample.sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
-
-				samples = frames / freq_factor;
 			}
 
-			// Load this note's data
-			SampleFrame sampleData[samples];
-			loadSample(sample, sampleData, samples);
+			// TODO: We should be able to use a Sample player object here,
+			// but it may need some larger refactoring elsewhere
+			sample.m_resampler.setSource([this, &sample](float* dst, std::size_t frames, long channels) {
+				assert(channels == DEFAULT_CHANNELS);
+				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
 
-			// Apply ADSR using a copy so if we don't use these samples when
-			// resampling, the ADSR doesn't get messed up
-			ADSR copy = sample.adsr;
-
-			for( f_cnt_t i = 0; i < samples; ++i )
-			{
-				float amplitude = copy.value();
-				sampleData[i][0] *= amplitude;
-				sampleData[i][1] *= amplitude;
-			}
-
-			// Output the data resampling if needed
-			if( resample == true )
-			{
-				SampleFrame convertBuf[frames];
-				sample.m_resampler.setSource(&sampleData[0][0], samples);
-				used = sample.m_resampler.resample(&convertBuf[0][0], frames, freq_factor).inputFramesUsed;
+				// Apply ADSR using a copy so if we don't use these samples when
+				// resampling, the ADSR doesn't get messed up
+				ADSR copy = sample.adsr;
 
 				for (f_cnt_t i = 0; i < frames; ++i)
 				{
-					_working_buffer[i][0] += convertBuf[i][0];
-					_working_buffer[i][1] += convertBuf[i][1];
+					const auto amplitude = copy.value();
+					dst[i * channels] *= amplitude;
+					dst[i * channels + 1] *= amplitude;
 				}
-			}
-			else
-			{
-				for( f_cnt_t i = 0; i < frames; ++i )
-				{
-					_working_buffer[i][0] += sampleData[i][0];
-					_working_buffer[i][1] += sampleData[i][1];
-				}
-			}
 
-			// Update note position with how many samples we actually used
-			sample.pos += used;
-			sample.adsr.inc(used);
+				sample.pos += frames;
+				sample.adsr.inc(frames);
+				return frames;
+			});
+
+			sample.m_resampler.resample(&_working_buffer[0][0], frames, freq_factor);
 		}
 	}
 
@@ -1092,11 +1067,6 @@ GigSample::GigSample(
 {
 	if( sample != nullptr && region != nullptr )
 	{
-		// Note: we don't create the libsamplerate object here since we always
-		// also call the copy constructor when appending to the end of the
-		// QList. We'll create it only in the copy constructor so we only have
-		// to create it once.
-
 		// Calculate note pitch and frequency factor only if we're actually
 		// going to be changing the pitch of the notes
 		if( region->PitchTrack == true )
