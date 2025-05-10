@@ -121,8 +121,8 @@ public:
 
 private:
 	T* const* m_bus = nullptr; //!< [channel pair index][frame index]
-	track_ch_t m_channelPairs = 0;
-	f_cnt_t m_frames = 0;
+	const track_ch_t m_channelPairs = 0;
+	const f_cnt_t m_frames = 0;
 };
 
 
