@@ -59,7 +59,7 @@ public:
 		BoolModel* mutedModel = nullptr);
 	virtual ~AudioBusHandle();
 
-	std::span<SampleFrame> buffer() { return {m_buffer.get(), m_bufferSize}; }
+	std::span<SampleFrame> buffer() { return m_buffer; }
 
 	// indicate whether JACK & Co should provide output-buffer at ext. port
 	bool extOutputEnabled() const { return m_extOutputEnabled; }
@@ -86,8 +86,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	f_cnt_t m_bufferSize;
-	std::unique_ptr<SampleFrame[]> m_buffer;
+	std::span<SampleFrame> m_buffer; //!< owning view
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;

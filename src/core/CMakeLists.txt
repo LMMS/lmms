@@ -12,6 +12,7 @@ set(LMMS_SRCS
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
+	core/BufferManager.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
 	core/ConfigManager.cpp

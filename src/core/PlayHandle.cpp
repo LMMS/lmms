@@ -24,6 +24,7 @@
  
 #include "PlayHandle.h"
 #include "AudioEngine.h"
+#include "BufferManager.h"
 #include "Engine.h"
 #include "SampleFrame.h"
 
@@ -37,11 +38,16 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
 		m_offset(offset),
 		m_affinity(QThread::currentThread()),
-		m_playHandleBufferSize(Engine::audioEngine()->framesPerPeriod()),
-		m_playHandleBuffer(std::make_unique<SampleFrame[]>(m_playHandleBufferSize)),
+		m_playHandleBuffer(BufferManager::acquire()),
 		m_bufferReleased(true),
 		m_usesBuffer(true)
 {
+}
+
+
+PlayHandle::~PlayHandle()
+{
+	BufferManager::release(m_playHandleBuffer.data());
 }
 
 
@@ -51,8 +57,8 @@ void PlayHandle::doProcessing()
 	{
 		m_bufferReleased = false;
 
-		zeroSampleFrames(m_playHandleBuffer.get(), m_playHandleBufferSize);
-		play({m_playHandleBuffer.get(), m_playHandleBufferSize});
+		zeroSampleFrames(m_playHandleBuffer.data(), m_playHandleBuffer.size());
+		play(m_playHandleBuffer);
 	}
 	else
 	{
@@ -68,9 +74,7 @@ void PlayHandle::releaseBuffer()
 
 std::span<SampleFrame> PlayHandle::buffer()
 {
-	return m_bufferReleased
-		? std::span<SampleFrame>{}
-		: std::span<SampleFrame>{m_playHandleBuffer.get(), m_playHandleBufferSize};
+	return m_bufferReleased ? std::span<SampleFrame>{} : m_playHandleBuffer;
 };
 
 } // namespace lmms
