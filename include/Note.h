@@ -110,6 +110,9 @@ public:
 
 	Note& operator=(const Note& note);
 
+	//! Deep copies the note, including making a new detuning automation clip
+	Note* clone() const;
+
 	// Note types
 	enum class Type
 	{
@@ -237,10 +240,8 @@ public:
 
 	static TimePos quantized( const TimePos & m, const int qGrid );
 
-	DetuningHelper * detuning() const
-	{
-		return m_detuning.get();
-	}
+	DetuningHelper * detuning() const { return m_detuning; }
+
 	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
 
@@ -265,7 +266,7 @@ private:
 	panning_t m_panning;
 	TimePos m_length;
 	TimePos m_pos;
-	std::unique_ptr<DetuningHelper> m_detuning;
+	DetuningHelper* m_detuning;
 
 	Type m_type = Type::Regular;
 };
