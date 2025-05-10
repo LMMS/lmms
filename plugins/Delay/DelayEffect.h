@@ -25,7 +25,7 @@
 #ifndef DELAYEFFECT_H
 #define DELAYEFFECT_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "DelayControls.h"
 
 namespace lmms
@@ -34,13 +34,13 @@ namespace lmms
 class Lfo;
 class StereoDelay;
 
-class DelayEffect : public Effect
+class DelayEffect : public DefaultEffect
 {
 public:
 	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
 	~DelayEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	EffectControls* controls() override
 	{
