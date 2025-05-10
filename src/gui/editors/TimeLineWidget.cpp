@@ -50,14 +50,15 @@ namespace
 }
 
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
-		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
+		const TimePos& begin, Song::PlayMode mode, AutoScrollState autoScroll, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
 	m_ppb{ppb},
 	m_pos{pos},
 	m_timeline{&timeline},
 	m_begin{begin},
-	m_mode{mode}
+	m_mode{mode},
+	m_autoScroll{autoScroll}
 {
 	move( 0, yoff );
 
@@ -92,6 +93,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	autoScroll->addState(embed::getIconPixmap("autoscroll_stepped_on"), tr("Stepped auto scrolling"));
 	autoScroll->addState(embed::getIconPixmap("autoscroll_continuous_on"), tr("Continuous auto scrolling"));
 	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
+	autoScroll->changeState(static_cast<int>(m_autoScroll));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
 
@@ -454,5 +456,16 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 
 	menu.exec(event->globalPos());
 }
+
+
+TimeLineWidget::AutoScrollState TimeLineWidget::getDefaultAutoScrollState()
+{
+	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
+	if (autoScrollState == AUTOSCROLL_STEPPED_STRING) { return AutoScrollState::Stepped; }
+	else if (autoScrollState == AUTOSCROLL_CONTINUOUS_STRING) { return AutoScrollState::Continuous; }
+	else if (autoScrollState == AUTOSCROLL_DISABLED_STRING) { return AutoScrollState::Disabled; }
+	else { return AutoScrollState::Stepped; }
+}
+
 
 } // namespace lmms::gui
