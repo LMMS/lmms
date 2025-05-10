@@ -229,7 +229,7 @@ private:
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
 	const Song::PlayMode m_mode;
-	
+
 	AutoScrollState m_autoScroll = AutoScrollState::Stepped;
 
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
