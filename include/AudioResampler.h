@@ -1,7 +1,7 @@
 /*
- * AudioResampler.h - wrapper around libsamplerate
+ * AudioResampler.h
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,40 +25,64 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
+#include <array>
+#include <functional>
 #include <samplerate.h>
 
+#include "lmms_constants.h"
 #include "lmms_export.h"
 
 namespace lmms {
 
+//! An audio resampler.
+//! This can be used to convert sample rates, transpose a signal in pitch, etc.
+//! Only works with interleaved audio (i.e, [LRLRLR...])
 class LMMS_EXPORT AudioResampler
 {
 public:
-	struct ProcessResult
-	{
-		int error;
-		long inputFramesUsed;
-		long outputFramesGenerated;
-	};
+	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
+	//! The callback should return the number of frames written into @p dst.
+	using WriteCallback = std::function<std::size_t(float* dst, std::size_t frames, int channels)>;
 
-	AudioResampler(int interpolationMode, int channels);
-	AudioResampler(const AudioResampler&) = delete;
-	AudioResampler(AudioResampler&&) = delete;
+	//! Create a resampler with the given interpolation mode and number of channels.
+	//! The constructor assumes stereo audio by default.
+	AudioResampler(int mode, int channels = DEFAULT_CHANNELS);
+
+	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
 
-	AudioResampler& operator=(const AudioResampler&) = delete;
-	AudioResampler& operator=(AudioResampler&&) = delete;
+	//! Resamplers cannot be copied.
+	AudioResampler(const AudioResampler&) = delete;
 
-	auto resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio) -> ProcessResult;
-	auto interpolationMode() const -> int { return m_interpolationMode; }
+	//! Resamplers cannot be copied.
+	AudioResampler& operator=(const AudioResampler&) = delete;
+
+	//! Moves the internal state from one resampler to another.
+	AudioResampler(AudioResampler&&) noexcept;
+
+	//! Moves the internal state from one resampler to another.
+	AudioResampler& operator=(AudioResampler&&) noexcept;
+
+	//! Resamples audio into @p dst with at the given @p ratio.
+	//! Uses @p callback to fetch input data as necessary.
+	void resample(float* dst, std::size_t frames, double ratio, WriteCallback callback);
+
+	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
-	void setRatio(double ratio);
+
+	//! Returns the interpolation mode used by this resampler.
+	auto mode() const -> int { return m_mode; }
+
+	//! Returns an error description for errors returned by \ref resample.
+	static auto errorDescription(int error) -> const char* { return src_strerror(error); }
 
 private:
-	int m_interpolationMode = -1;
-	int m_channels = 0;
-	int m_error = 0;
+	std::array<float, 256> m_buffer{};
+	SRC_DATA m_data = SRC_DATA{};
 	SRC_STATE* m_state = nullptr;
+	int m_channels = 0;
+	int m_mode = 0;
+	int m_error = 0;
 };
 } // namespace lmms
 

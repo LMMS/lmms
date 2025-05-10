@@ -32,12 +32,12 @@
 #include <QMutexLocker>
 #include <samplerate.h>
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "PixmapButton.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckBox.h"
 #include "gig.h"
 
 
@@ -149,16 +149,11 @@ class GigSample
 public:
 	GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 			float attenuation, int interpolation, float desiredFreq );
-	~GigSample();
+	~GigSample() = default;
 
 	// Needed when initially creating in QList
 	GigSample( const GigSample& g );
 	GigSample& operator=( const GigSample& g );
-
-	// Needed since libsamplerate stores data internally between calls
-	void updateSampleRate();
-	bool convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
-		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
 	gig::DimensionRegion * region;
@@ -174,8 +169,7 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	int interpolation;
-	SRC_STATE * srcState;
+	AudioResampler m_resampler;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
