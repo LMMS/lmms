@@ -25,6 +25,8 @@
 #ifndef LMMS_GUI_PIN_CONNECTOR_H
 #define LMMS_GUI_PIN_CONNECTOR_H
 
+#include <optional>
+#include <utility>
 #include <QWidget>
 
 #include "embed.h"
@@ -68,7 +70,7 @@ protected:
 private:
 	class MatrixView;
 
-	void updateGeometry();
+	void updateProperties();
 
 	SubWindow* m_subWindow = nullptr;
 	//QScrollArea* m_scrollArea = nullptr;
@@ -89,7 +91,7 @@ class PinConnector::MatrixView : public QWidget
 	Q_PROPERTY(QColor disabledColor MEMBER m_disabledColor)
 
 public:
-	MatrixView(PinConnector* view, AudioPortsModel::Matrix& matrix, bool isIn);
+	MatrixView(const PinConnector* view, AudioPortsModel::Matrix& matrix);
 	~MatrixView() override = default;
 
 	auto sizeHint() const -> QSize override;
@@ -97,7 +99,6 @@ public:
 	void paintEvent(QPaintEvent*) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 	void mousePressEvent(QMouseEvent* me) override;
-	void updateSize();
 
 	//! Side length of square cells
 	static constexpr auto cellSize() -> int
@@ -107,8 +108,11 @@ public:
 
 	static constexpr int BorderWidth = 1;
 
+public slots:
+	void updateProperties(const PinConnector* view);
+
 private:
-	auto getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool;
+	auto getPin(const QPoint& mousePos) -> std::optional<std::pair<track_ch_t, proc_ch_t>>;
 	auto getColor(track_ch_t trackChannel, proc_ch_t processorChannel) -> QColor;
 	auto calculateSize() const -> QSize;
 

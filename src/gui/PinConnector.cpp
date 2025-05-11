@@ -56,11 +56,11 @@ constexpr auto DefaultMaxWindowSize = QSize{400, 256};
 PinConnector::PinConnector(AudioPortsModel* model)
 	: QWidget{}
 	, ModelView{model, this}
-	, m_inView{new MatrixView{this, model->in(), true}}
-	, m_outView{new MatrixView{this, model->out(), false}}
+	, m_inView{new MatrixView{this, model->in()}}
+	, m_outView{new MatrixView{this, model->out()}}
 {
 	assert(model != nullptr);
-	connect(model, &AudioPortsModel::propertiesChanged, this, &PinConnector::updateGeometry);
+	connect(model, &AudioPortsModel::propertiesChanged, this, &PinConnector::updateProperties);
 
 	const Model* parentModel = model->parentModel();
 	assert(parentModel != nullptr);
@@ -107,7 +107,7 @@ PinConnector::PinConnector(AudioPortsModel* model)
 		m_subWindow->setSizePolicy(sp);
 	}
 
-	updateGeometry();
+	updateProperties();
 	show();
 }
 
@@ -145,7 +145,7 @@ void PinConnector::toggleVisibility()
 	}
 	else
 	{
-		updateGeometry();
+		updateProperties();
 		show();
 		//m_scrollArea->show();
 		m_subWindow->show();
@@ -246,10 +246,10 @@ void PinConnector::paintEvent(QPaintEvent*)
 	p.restore();
 }
 
-void PinConnector::updateGeometry()
+void PinConnector::updateProperties()
 {
-	m_inView->updateSize();
-	m_outView->updateSize();
+	m_inView->updateProperties(this);
+	m_outView->updateProperties(this);
 
 	m_subWindow->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_subWindow->setMinimumSize(minimumSizeHint());
@@ -259,24 +259,16 @@ void PinConnector::updateGeometry()
 
 //////////////////////////////////////////////
 
-PinConnector::MatrixView::MatrixView(PinConnector* view,
-	AudioPortsModel::Matrix& matrix, bool isIn)
-	: QWidget{nullptr}
+PinConnector::MatrixView::MatrixView(const PinConnector* view, AudioPortsModel::Matrix& matrix)
+	: QWidget{}
 	, m_matrix{&matrix}
 {
 	auto model = view->castModel<AudioPortsModel>();
 	assert(model != nullptr);
 	connect(model, &AudioPortsModel::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
 
-	const Model* parentModel = model->parentModel();
-	assert(parentModel != nullptr);
-
-	const char* formatText = isIn ? "LMMS to %1 input(s)" : "%1 output(s) to LMMS";
-	setToolTip(QString{formatText}.arg(parentModel->fullDisplayName()));
-
 	setMouseTracking(true);
-
-	updateSize();
+	updateProperties(view);
 }
 
 auto PinConnector::MatrixView::sizeHint() const -> QSize
@@ -343,9 +335,7 @@ void PinConnector::MatrixView::mouseMoveEvent(QMouseEvent* me)
 		return;
 	}
 
-	int xIdx = 0;
-	int yIdx = 0;
-	if (!getCell(me->pos(), xIdx, yIdx))
+	if (!getPin(me->pos()))
 	{
 		unsetCursor();
 		return;
@@ -356,32 +346,34 @@ void PinConnector::MatrixView::mouseMoveEvent(QMouseEvent* me)
 
 void PinConnector::MatrixView::mousePressEvent(QMouseEvent* me)
 {
-	int xIdx = 0;
-	int yIdx = 0;
-	if (!getCell(me->pos(), xIdx, yIdx))
+	auto pin = getPin(me->pos());
+	if (!pin)
 	{
 		me->ignore();
 		return;
 	}
 
+	const auto [tc, pc] = *pin;
+
 #if PIN_CONNECTOR_AUTOMATABLE_PINS
 	if (me->modifiers() & Qt::ControlModifier)
 	{
 		// Taken from AutomatableModelView::mousePressEvent
-		BoolModel* model = m_matrix->pins().at(yIdx).at(xIdx);
+		BoolModel* model = m_matrix->pins().at(tc).at(pc);
 		new gui::StringPairDrag{"automatable_model", QString::number(model->id()), QPixmap{}, this};
 	}
 	else
 #endif
 	{
-		m_matrix->setPin(yIdx, xIdx, !m_matrix->enabled(yIdx, xIdx));
+		m_matrix->setPin(tc, pc, !m_matrix->enabled(tc, pc));
 	}
 
 	me->accept();
 }
 
-void PinConnector::MatrixView::updateSize()
+void PinConnector::MatrixView::updateProperties(const PinConnector* view)
 {
+	// Update size
 	const auto newSize = calculateSize();
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -395,26 +387,38 @@ void PinConnector::MatrixView::updateSize()
 	{
 		show();
 	}
+
+	// Update tooltip
+	auto model = view->castModel<AudioPortsModel>();
+	assert(model != nullptr);
+
+	const Model* parentModel = model->parentModel();
+	assert(parentModel != nullptr);
+
+	const auto formatText = m_matrix->isOutput() ? tr("%1 output(s) to LMMS") : tr("LMMS to %1 input(s)");
+	setToolTip(formatText.arg(parentModel->fullDisplayName()));
 }
 
-auto PinConnector::MatrixView::getCell(const QPoint& mousePos, int& xIdx, int& yIdx) -> bool
+auto PinConnector::MatrixView::getPin(const QPoint& mousePos) -> std::optional<std::pair<track_ch_t, proc_ch_t>>
 {
 	if (!rect().adjusted(BorderWidth, BorderWidth, -BorderWidth, -BorderWidth)
-		.contains(mousePos, true)) { return false; }
+		.contains(mousePos, true)) { return std::nullopt; }
 
 	const auto mousePosAdj = mousePos - QPoint{BorderWidth + s_lineThickness, BorderWidth + s_lineThickness};
 
-	xIdx = mousePosAdj.x() / cellSize();
-	yIdx = mousePosAdj.y() / cellSize();
+	int xIdx = mousePosAdj.x() / cellSize();
+	int yIdx = mousePosAdj.y() / cellSize();
 
 	// Check if within margin
 	int relPos = mousePosAdj.x() - xIdx * cellSize();
-	if (relPos > (cellSize() - s_lineThickness) || relPos < 0) { return false; }
+	if (relPos > (cellSize() - s_lineThickness) || relPos < 0) { return std::nullopt; }
 
 	relPos = mousePosAdj.y() - yIdx * cellSize();
-	if (relPos > (cellSize() - s_lineThickness) || relPos < 0) { return false; } // NOLINT
+	if (relPos > (cellSize() - s_lineThickness) || relPos < 0) { return std::nullopt; } // NOLINT
 
-	return true;
+	assert(xIdx >= 0);
+	assert(yIdx >= 0);
+	return std::pair{static_cast<track_ch_t>(yIdx), static_cast<proc_ch_t>(xIdx)};
 }
 
 auto PinConnector::MatrixView::getColor(track_ch_t trackChannel, proc_ch_t processorChannel) -> QColor
