@@ -418,7 +418,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if(type == "presetfile")
+	else if (type == "presetfile")
 	{
 		QString ext = QFileInfo(value).suffix().toLower();
 
