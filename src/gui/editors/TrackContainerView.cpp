@@ -401,7 +401,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		auto ilt = new InstrumentLoaderThread(this, it, value); // TODO: this is a memory leak (according to CLion)
 		ilt->start();
-		// it->toggledInstrumentTrackButton( true );
+		// it->toggledInstrumentTrackButton(true);
 		_de->accept();
 	}
 	else if(
