@@ -25,7 +25,6 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <array>
 #include <functional>
 #include <samplerate.h>
 
@@ -74,7 +73,8 @@ public:
 	auto mode() const -> int { return m_mode; }
 
 private:
-	std::array<float, 256> m_buffer{};
+	static constexpr auto BufferFrameSize = 64;
+	std::vector<float> m_buffer;
 	SRC_DATA m_data = SRC_DATA{};
 	SRC_STATE* m_state = nullptr;
 	int m_channels = 0;
