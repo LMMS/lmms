@@ -100,7 +100,7 @@ namespace lmms::Clipboard
 		QString type;
 		QString value;
 
-		if (hasFormat( MimeType::StringPair ))
+		if (hasFormat(MimeType::StringPair))
 		{
 			QString type = decodeKey(mimeData);
 			QString value = decodeValue(mimeData);
