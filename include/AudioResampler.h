@@ -73,9 +73,6 @@ public:
 	//! Returns the interpolation mode used by this resampler.
 	auto mode() const -> int { return m_mode; }
 
-	//! Returns an error description for errors returned by \ref resample.
-	static auto errorDescription(int error) -> const char* { return src_strerror(error); }
-
 private:
 	std::array<float, 256> m_buffer{};
 	SRC_DATA m_data = SRC_DATA{};
