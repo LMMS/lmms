@@ -95,7 +95,7 @@ enum class MimeType
 	 * @brief Extracts and classifies drag-and-drop data from a QDropEvent.
 	 *
 	 * This function inspects a drop event to determine the type of file or action being dropped
-	 * and retrieves the associated value (typically a file path). If the event contains URLs,
+	 * and retrieves the associated value (typically a file path or an ID). If the event contains URLs,
 	 * it uses the first URL to determine the file extension and classifies the type accordingly,
 	 * such as "samplefile", "presetfile", "vstpluginfile", etc.
 	 *
