@@ -22,10 +22,13 @@
  *
  */
 
+#include <algorithm>
+#include <iostream>
 #include <QDir>
+#include <QDomDocument>
+#include <QDomElement>
 #include <QObject>
 #include <QtTest/QtTest>
-#include <algorithm>
 #include <qtestcase.h>
 
 #define LMMS_TESTING
@@ -36,8 +39,6 @@
 #include "AudioPorts.h"
 #include "AudioPortsModel.h"
 #include "SampleFrame.h"
-
-// TODO: Add a save/load test
 
 namespace lmms {
 
@@ -919,6 +920,91 @@ private slots:
 
 		// TODO: If/when SampleFrame-based audio processors support dynamically in-place
 		//       processing, add those tests here
+	}
+
+	//! Verifies correct saving and loading of model
+	void SaveLoad()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto model = Model{nullptr};
+		auto apm = AudioPortsModel{2, 4, false, &model};
+
+		/*
+		// For debugging
+		auto print = [](const AudioPortsModel& m) {
+			for (track_ch_t tc = 0; tc < m.trackChannelCount(); ++tc) {
+				for (proc_ch_t pc = 0; pc < m.in().channelCount(); ++pc) {
+					std::cout << (m.in().enabled(tc, pc) ? 'X' : 'O');
+				}
+				std::cout << "    ";
+				for (proc_ch_t pc = 0; pc < m.out().channelCount(); ++pc) {
+					std::cout << (m.out().enabled(tc, pc) ? 'X' : 'O');
+				}
+				std::cout << '\n';
+			}
+		};
+		*/
+
+		// In    Out
+		//  ___   _______
+		// | |X| | |X| | |
+		// |X| | |X| |X|X|
+		//  ---   -------
+
+		apm.in().setPin(0, 0, false);
+		apm.in().setPin(1, 1, false);
+		apm.in().setPin(0, 1, true);
+		apm.in().setPin(1, 0, true);
+
+		apm.out().setPin(0, 0, false);
+		apm.out().setPin(1, 1, false);
+		apm.out().setPin(0, 1, true);
+		apm.out().setPin(1, 0, true);
+		apm.out().setPin(0, 2, false);
+		apm.out().setPin(1, 3, false);
+		apm.out().setPin(0, 3, true);
+		apm.out().setPin(1, 2, true);
+
+		// Save model
+		auto doc = QDomDocument{"test-document"};
+		auto elem = doc.createElement("test-element");
+		apm.saveSettings(doc, elem);
+
+		// New model with wrong channel counts and wrong pin connections
+		auto apm2 = AudioPortsModel{1, 1, false, &model};
+
+		int dataChangedCount = 0;
+		int propertiesChangedCount = 0;
+		connect(&apm2, &AudioPortsModel::dataChanged, [&]() { ++dataChangedCount; });
+		connect(&apm2, &AudioPortsModel::propertiesChanged, [&]() { ++propertiesChangedCount; });
+
+		// Load old model's settings into new model
+		apm2.loadSettings(elem);
+
+		Q_ASSERT(apm2.in().channelCount() == 2);
+		Q_ASSERT(apm2.out().channelCount() == 4);
+
+		Q_ASSERT(apm2.in().enabled(0, 0) == false);
+		Q_ASSERT(apm2.in().enabled(1, 1) == false);
+		Q_ASSERT(apm2.in().enabled(0, 1) == true);
+		Q_ASSERT(apm2.in().enabled(1, 0) == true);
+
+		Q_ASSERT(apm2.out().enabled(0, 0) == false);
+		Q_ASSERT(apm2.out().enabled(1, 1) == false);
+		Q_ASSERT(apm2.out().enabled(0, 1) == true);
+		Q_ASSERT(apm2.out().enabled(1, 0) == true);
+		Q_ASSERT(apm2.out().enabled(0, 2) == false);
+		Q_ASSERT(apm2.out().enabled(1, 3) == false);
+		Q_ASSERT(apm2.out().enabled(0, 3) == true);
+		Q_ASSERT(apm2.out().enabled(1, 2) == true);
+
+		// The `dataChanged` signal should only be emitted once
+		Q_ASSERT(dataChangedCount == 1);
+
+		// The `propertiesChanged` signal should only be emitted once
+		Q_ASSERT(propertiesChangedCount == 1);
 	}
 };
 

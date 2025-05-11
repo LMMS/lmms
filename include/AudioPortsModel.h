@@ -52,8 +52,10 @@ class AudioPortsModelTest;
 /**
  * NOTE: The automatable pin functionality is currently disabled out of an abundance
  * of caution (support cannot really be removed once users start using it) and also
- * due to potential performance issues when loading/saving projects (each pin triggers
- * the routed channels and direct routing caches to update).
+ * due to potential performance issues and journalling issues when loading/saving projects
+ * (each pin triggers the routed channels and direct routing caches to update).
+ *
+ * Need a way to update the models of every pin as a single "batch".
  *
  * Set this macro to 1 to enable automatable pin connector pins.
  */
