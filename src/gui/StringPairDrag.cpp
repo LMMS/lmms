@@ -88,7 +88,7 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent * _dee,
 	QString type = data.first;
 	QString value = data.second;
 
-	if(_allowed_keys.split( ',' ).contains(type))
+	if (_allowed_keys.split(',').contains(type))
 	{
 		_dee->acceptProposedAction();
 		return true;
