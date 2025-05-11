@@ -249,7 +249,6 @@ public:
 		PinMap m_pins;
 		proc_ch_t m_channelCount = 0;
 		const bool m_isOutput = false;
-		std::vector<QString> m_channelNames; //!< optional
 		AudioPortsModel* m_parent = nullptr;
 	};
 
@@ -422,6 +421,12 @@ protected:
 	 * NOTE: Virtual method, do not call in constructor.
 	 */
 	virtual void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) {}
+
+	/**
+	 * Audio port implementations can override this to provide custom channel names,
+	 * otherwise the default channel names are used.
+	 */
+	virtual auto channelName(proc_ch_t channel, bool isOutput) const -> QString;
 
 private:
 	void setChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount);

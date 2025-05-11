@@ -37,11 +37,26 @@ namespace lmms
 
 class VstPlugin;
 
+template<AudioPortsConfig config>
+class VstEffectAudioPorts final : public RemotePluginAudioPorts<config>
+{
+public:
+	using RemotePluginAudioPorts<config>::RemotePluginAudioPorts;
+
+	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
+	{
+		// TODO: Support custom channel names here
+		return isOutput
+			? this->tr("VST Out %1").arg(channel + 1)
+			: this->tr("VST In %1").arg(channel + 1);
+	}
+};
+
 class VstEffect
 	: public AudioPlugin<Effect, AudioPortsConfig {
 			.kind = AudioDataKind::F32,
 			.interleaved = false
-		}, RemotePluginAudioPorts>
+		}, VstEffectAudioPorts>
 {
 public:
 	VstEffect( Model * _parent,

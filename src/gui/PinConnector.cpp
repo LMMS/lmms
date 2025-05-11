@@ -184,11 +184,12 @@ void PinConnector::paintEvent(QPaintEvent*)
 	if (model->in().channelCount() != 0)
 	{
 		const auto width = inMatrixRect.left() - 4;
-		int yPos = inMatrixRect.y() + MatrixView::BorderWidth;
+		int yPos = inMatrixRect.y() + MatrixView::BorderWidth - 2;
 		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
 		{
+			const auto name = trackChannelName(*model, idx);
 			p.drawText(0, yPos, width, cellSize, Qt::AlignRight,
-				QString::fromUtf16(u"%1 \U0001F82E").arg(idx + 1));
+				QString::fromUtf16(u"%1 \U0001F82E").arg(name));
 
 			yPos += cellSize;
 		}
@@ -198,12 +199,13 @@ void PinConnector::paintEvent(QPaintEvent*)
 	if (model->out().channelCount() != 0)
 	{
 		const int xPos = outMatrixRect.right() + 4;
-		int yPos = outMatrixRect.y() + MatrixView::BorderWidth;
+		int yPos = outMatrixRect.y() + MatrixView::BorderWidth - 2;
 		const int width = this->width() - outMatrixRect.right() - 4;
 		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
 		{
+			const auto name = trackChannelName(*model, idx);
 			p.drawText(xPos, yPos, width, cellSize, Qt::AlignLeft,
-				QString::fromUtf16(u"\U0001F82E %1").arg(idx + 1));
+				QString::fromUtf16(u"\U0001F82E %1").arg(name));
 
 			yPos += cellSize;
 		}
@@ -215,7 +217,7 @@ void PinConnector::paintEvent(QPaintEvent*)
 
 	// Draw processor channel text (in)
 	int yPos = inMatrixRect.top() - 4;
-	int xPos = inMatrixRect.x() + MatrixView::BorderWidth;
+	int xPos = inMatrixRect.x() + MatrixView::BorderWidth - 2;
 	for (int idx = 0; idx < model->in().channelCount(); ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
@@ -230,7 +232,7 @@ void PinConnector::paintEvent(QPaintEvent*)
 
 	// Draw processor channel text (out)
 	yPos = outMatrixRect.top() - 4;
-	xPos = outMatrixRect.x() + MatrixView::BorderWidth;
+	xPos = outMatrixRect.x() + MatrixView::BorderWidth - 2;
 	for (int idx = 0; idx < model->out().channelCount(); ++idx)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
@@ -244,6 +246,12 @@ void PinConnector::paintEvent(QPaintEvent*)
 	}
 
 	p.restore();
+}
+
+auto PinConnector::trackChannelName(const AudioPortsModel& model, track_ch_t channel) const -> QString
+{
+	// TODO: Custom track channel names?
+	return QString{"%1"}.arg(channel + 1);
 }
 
 void PinConnector::updateProperties()

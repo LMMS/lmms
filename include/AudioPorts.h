@@ -130,6 +130,22 @@ private:
 		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
 	}
+
+	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
+	{
+		if (isOutput && this->out().channelCount() == 2)
+		{
+			assert(channel < 2);
+			return channel == 0 ? this->tr("Output L") : this->tr("Output R");
+		}
+		else if (!isOutput && this->in().channelCount() == 2)
+		{
+			assert(channel < 2);
+			return channel == 0 ? this->tr("Input L") : this->tr("Input R");
+		}
+
+		return AudioPortsModel::channelName(channel, isOutput);
+	}
 };
 
 } // namespace detail

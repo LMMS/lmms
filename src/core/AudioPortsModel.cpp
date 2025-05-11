@@ -296,32 +296,16 @@ auto AudioPortsModel::getChannelCountText() const -> QString
 	return QString{tr("%1 in %2 out")}.arg(inText).arg(outText);
 }
 
+auto AudioPortsModel::channelName(proc_ch_t channel, bool isOutput) const -> QString
+{
+	return isOutput
+		? tr("Output %1").arg(channel + 1)
+		: tr("Input %1").arg(channel + 1);
+}
+
 auto AudioPortsModel::Matrix::channelName(proc_ch_t channel) const -> QString
 {
-	// Custom name (if supported)
-	assert(channel != DynamicChannelCount);
-	if (channel < m_channelNames.size())
-	{
-		return m_channelNames[channel];
-	}
-
-	// A-Z
-	if (channel < 26)
-	{
-		return QChar::fromLatin1('A' + channel);
-	}
-
-	// AA-ZZ
-	channel -= 26;
-	if (channel < 26 * 26)
-	{
-		auto ret = QString{"AA"};
-		ret[0] = QChar::fromLatin1('A' + channel / 26);
-		ret[1] = QChar::fromLatin1('A' + channel % 26);
-		return ret;
-	}
-
-	throw std::invalid_argument{"Too many channels"};
+	return m_parent->channelName(channel, isOutput());
 }
 
 void AudioPortsModel::Matrix::setPin(track_ch_t trackChannel, proc_ch_t processorChannel, bool value)

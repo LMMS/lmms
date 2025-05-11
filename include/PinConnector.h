@@ -70,6 +70,7 @@ protected:
 private:
 	class MatrixView;
 
+	auto trackChannelName(const AudioPortsModel& model, track_ch_t channel) const -> QString;
 	void updateProperties();
 
 	SubWindow* m_subWindow = nullptr;

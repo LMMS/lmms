@@ -55,11 +55,26 @@ class VestigeInstrumentView;
 } // namespace gui
 
 
+template<AudioPortsConfig config>
+class VestigeAudioPorts final : public RemotePluginAudioPorts<config>
+{
+public:
+	using RemotePluginAudioPorts<config>::RemotePluginAudioPorts;
+
+	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
+	{
+		// TODO: Support custom channel names here
+		return isOutput
+			? this->tr("VST Out %1").arg(channel + 1)
+			: this->tr("VST In %1").arg(channel + 1);
+	}
+};
+
 class VestigeInstrument
 	: public AudioPlugin<Instrument, AudioPortsConfig {
 			.kind = AudioDataKind::F32,
 			.interleaved = false
-		}, RemotePluginAudioPorts>
+		}, VestigeAudioPorts>
 {
 	Q_OBJECT
 public:
