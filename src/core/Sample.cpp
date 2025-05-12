@@ -119,8 +119,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 	if (loop == Loop::Off && state->frameIndex >= m_endFrame) { return false; }
 
-	const auto resampleCallback = [this, state, loop](float* dst, std::size_t frames, int channels) {
-		assert(channels == DEFAULT_CHANNELS);
+	const auto resampleCallback = [this, state, loop](float* dst, std::size_t frames) {
 		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
 	};
 

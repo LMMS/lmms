@@ -41,7 +41,7 @@ class LMMS_EXPORT AudioResampler
 public:
 	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
 	//! The callback should return the number of frames written into @p dst.
-	using WriteCallback = std::function<std::size_t(float* dst, std::size_t frames, int channels)>;
+	using WriteCallback = std::function<std::size_t(float* dst, std::size_t frames)>;
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.

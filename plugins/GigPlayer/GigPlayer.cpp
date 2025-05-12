@@ -431,8 +431,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			const auto resampleCallback = [this, &sample](float* dst, std::size_t frames, long channels) {
-				assert(channels == DEFAULT_CHANNELS);
+			const auto resampleCallback = [this, &sample](float* dst, std::size_t frames) {
 				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
 
 				// Apply ADSR using a copy so if we don't use these samples when
@@ -442,8 +441,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				for (f_cnt_t i = 0; i < frames; ++i)
 				{
 					const auto amplitude = copy.value();
-					dst[i * channels] *= amplitude;
-					dst[i * channels + 1] *= amplitude;
+					dst[i * DEFAULT_CHANNELS] *= amplitude;
+					dst[i * DEFAULT_CHANNELS + 1] *= amplitude;
 				}
 
 				sample.pos += frames;

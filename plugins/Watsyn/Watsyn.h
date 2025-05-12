@@ -190,9 +190,9 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		const auto resampleCallback = ([&_src](float* dst, std::size_t frames, long channels) {
+		const auto resampleCallback = ([&_src](float* dst, std::size_t frames) {
 			static auto index = std::size_t{0};
-			for (auto i = std::size_t{0}; i < frames * channels; ++i)
+			for (auto i = std::size_t{0}; i < frames; ++i)
 			{
 				dst[i] = _src[index];
 				index = (index + 1) % GRAPHLEN;

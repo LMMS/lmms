@@ -67,7 +67,7 @@ void AudioResampler::resample(float* dst, std::size_t frames, double ratio, Writ
 	{
 		if (m_data.input_frames == 0)
 		{
-			const auto framesWritten = callback(m_buffer.data(), BufferFrameSize, m_channels);
+			const auto framesWritten = callback(m_buffer.data(), BufferFrameSize);
 			if (framesWritten == 0)
 			{
 				std::fill_n(m_data.data_out, m_data.output_frames * m_channels, 0.f);

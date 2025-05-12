@@ -868,7 +868,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	const auto resampleCallback = [this](float* dst, std::size_t frames, int channels) {
+	const auto resampleCallback = [this](float* dst, std::size_t frames) {
 		fluid_synth_write_float(m_synth, static_cast<int>(frames), dst, 0, 2, dst, 1, 2);
 		return frames;
 	};
