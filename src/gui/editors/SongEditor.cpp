@@ -959,7 +959,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 

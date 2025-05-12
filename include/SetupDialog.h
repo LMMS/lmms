@@ -182,6 +182,8 @@ private:
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
 	bool m_silenceInvalidMixerOutput;
+	int m_sampleRate;
+	QSlider* m_sampleRateSlider;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
