@@ -141,8 +141,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "disableautoquit", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
-	m_silenceInvalidMixerOutput(ConfigManager::inst()->value(
-			"audioengine", "silenceinvalidmixeroutput", "0").toInt()),
+	m_sanitizeEffectOutput(ConfigManager::inst()->value(
+			"audioengine", "sanitizeffectoutput", "1").toInt()),
 	m_sampleRate(ConfigManager::inst()->value(
 			"audioengine", "samplerate").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
@@ -631,13 +631,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
 	const auto otherBoxLayout = new QVBoxLayout{otherBox};
 
-	const auto silenceInvalidMixerOutputCheckbox = new QCheckBox{};
-	silenceInvalidMixerOutputCheckbox->setText(tr("Silence invalid mixer output"));
-	silenceInvalidMixerOutputCheckbox->setChecked(m_silenceInvalidMixerOutput);
-	otherBoxLayout->addWidget(silenceInvalidMixerOutputCheckbox);
+	const auto sanitizeEffectOutputCheckbox = new QCheckBox{};
+	sanitizeEffectOutputCheckbox->setText(tr("Sanitize effect output"));
+	sanitizeEffectOutputCheckbox->setChecked(m_sanitizeEffectOutput);
+	otherBoxLayout->addWidget(sanitizeEffectOutputCheckbox);
 
-	connect(silenceInvalidMixerOutputCheckbox, &QCheckBox::stateChanged, [silenceInvalidMixerOutputCheckbox, this] {
-		m_silenceInvalidMixerOutput = silenceInvalidMixerOutputCheckbox->isChecked();
+	connect(sanitizeEffectOutputCheckbox, &QCheckBox::stateChanged, [sanitizeEffectOutputCheckbox, this] {
+		m_sanitizeEffectOutput = sanitizeEffectOutputCheckbox->isChecked();
 		showRestartWarning();
 	});
 
@@ -1013,7 +1013,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue(
-		"audioengine", "silenceinvalidmixeroutput", QString::number(m_silenceInvalidMixerOutput));
+		"audioengine", "sanitizeeffectoutput", QString::number(m_sanitizeEffectOutput));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",

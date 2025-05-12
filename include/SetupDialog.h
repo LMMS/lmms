@@ -181,7 +181,7 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
-	bool m_silenceInvalidMixerOutput;
+	bool m_sanitizeEffectOutput;
 	int m_sampleRate;
 	QSlider* m_sampleRateSlider;
 

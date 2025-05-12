@@ -90,19 +90,10 @@ class MixerChannel : public ThreadableJob
 		void incrementDeps();
 		void processed();
 
-		auto silenced() -> bool { return m_silenced.load(std::memory_order_relaxed); }
-
-		static auto silenceInvalidOutput() -> bool
-		{
-			static auto s_value = ConfigManager::inst()->value("audioengine", "silenceinvalidmixeroutput", "0").toInt();
-			return s_value;
-		}
-
 	private:
 		void doProcessing() override;
 		int m_channelIndex;
 		std::optional<QColor> m_color;
-		std::atomic<bool> m_silenced = false;
 };
 
 class MixerRoute : public QObject

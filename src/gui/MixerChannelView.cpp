@@ -148,23 +148,6 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	mainLayout->addWidget(m_peakIndicator);
 	mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
-	if (MixerChannel::silenceInvalidOutput())
-	{
-		const auto silenceUpdateTimer = new QTimer{this};
-		connect(silenceUpdateTimer, &QTimer::timeout, [this]
-		{
-			const auto channel = m_mixerView->getMixer()->mixerChannel(m_channelIndex);
-			if (channel->silenced())
-			{
-				m_peakIndicator->resetPeakToMinusInf();
-				std::cerr << "Mixer channel " << m_channelIndex << " has been silenced, invalid output detected (inf, nan, etc)\n";
-			}
-		});
-
-		constexpr auto updateIntervalMs = 5000;
-		silenceUpdateTimer->start(updateIntervalMs);
-	}
-
 	connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
 
 	setFocusPolicy(Qt::StrongFocus);

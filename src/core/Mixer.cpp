@@ -221,17 +221,6 @@ void MixerChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		if (silenceInvalidOutput())
-		{
-			const auto begin = m_buffer->data();
-			const auto end = begin + fpp * DEFAULT_CHANNELS;
-			const auto fn = [](const auto& sample) { return !std::isfinite(sample); };
-			const auto hasInvalidOutput = std::any_of(begin, end, fn);
-
-			m_silenced.store(hasInvalidOutput, std::memory_order_relaxed);
-			if (hasInvalidOutput) { std::fill(begin, end, 0.f); }
-		}
-
 		SampleFrame peakSamples = getAbsPeakValues(m_buffer, fpp);
 		m_peakLeft = std::max(m_peakLeft, peakSamples[0] * v);
 		m_peakRight = std::max(m_peakRight, peakSamples[1] * v);
