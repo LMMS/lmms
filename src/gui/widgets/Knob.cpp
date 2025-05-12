@@ -201,7 +201,7 @@ void Knob::updateFixedSize()
 		if (m_knobPixmap)
 		{
 			// In legacy mode only the width of the label is taken into account while the height is not
-			const int labelWidth = horizontalAdvance(QFontMetrics(font()), m_label);
+			const int labelWidth = horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label);
 			const int width = std::max(m_knobPixmap->width(), labelWidth);
 
 			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
@@ -514,6 +514,10 @@ void Knob::drawLabel(QPainter& p)
 	{
 		if (!m_isHtmlLabel)
 		{
+			if (legacyMode())
+			{
+				p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
+			}
 			auto fm = p.fontMetrics();
 			const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
 			const auto descent = legacyMode() ? 2 : fm.descent();
