@@ -26,9 +26,11 @@
 
 #ifdef LMMS_HAVE_JACK
 
+#include <QComboBox>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QStringList>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -128,6 +130,19 @@ AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 }
 
 
+void AudioJack::handleRegistrationEvent(jack_port_id_t port, int reg)
+{
+	auto jackPort = jack_port_by_id(m_client, port);
+
+	auto name = jack_port_name(jackPort);
+	auto type = jack_port_type(jackPort);
+	auto flags = jack_port_flags(jackPort);
+	
+	const bool isAudioPort = strcmp(type, JACK_DEFAULT_AUDIO_TYPE) == 0;
+	const bool isInputDevice = flags & JackPortIsOutput;
+
+	printf("Reg code %d for name %s and type %s, audio: %d, input: %d\n", reg, name, type, isAudioPort, isInputDevice);
+}
 
 
 bool AudioJack::initJackClient()
@@ -166,6 +181,13 @@ bool AudioJack::initJackClient()
 
 	// set shutdown-callback
 	jack_on_shutdown(m_client, shutdownCallback, this);
+
+	jack_set_port_registration_callback(m_client,
+		[](jack_port_id_t port, int reg, void *arg) {
+			auto audioJack = static_cast<AudioJack*>(arg);
+			audioJack->handleRegistrationEvent(port, reg);
+		},
+		this);
 
 	if (jack_get_sample_rate(m_client) != sampleRate()) { setSampleRate(jack_get_sample_rate(m_client)); }
 
@@ -411,6 +433,10 @@ void AudioJack::shutdownCallback(void* udata)
 AudioJack::setupWidget::setupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioJack::name(), parent)
 {
+	const char* serverName = nullptr;
+	jack_status_t status;
+	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
+
 	QFormLayout * form = new QFormLayout(this);
 
 	QString cn = ConfigManager::inst()->value("audiojack", "clientname");
@@ -418,6 +444,25 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	m_clientName = new QLineEdit(cn, this);
 
 	form->addRow(tr("Client name"), m_clientName);
+
+	const auto audioInputNames = getAudioInputNames();
+
+	m_inputDevice1 = new QComboBox(this);
+
+	populateComboBox(m_inputDevice1, audioInputNames);
+
+	form->addRow(tr("Input 1"), m_inputDevice1);
+
+	m_inputDevice2 = new QComboBox(this);
+
+	populateComboBox(m_inputDevice2, audioInputNames);
+
+	form->addRow(tr("Input 2"), m_inputDevice2);
+	if (m_client != nullptr)
+	{
+		jack_deactivate(m_client);
+		jack_client_close(m_client);
+	}
 }
 
 
@@ -426,6 +471,45 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
+	ConfigManager::inst()->setValue("audiojack", "input1", m_inputDevice1->currentText());
+	ConfigManager::inst()->setValue("audiojack", "input2", m_inputDevice2->currentText());
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
+{
+	std::vector<std::string> audioInputs;
+
+	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput);
+	if (inputAudioPorts)
+	{
+		for (int i = 0; inputAudioPorts[i] != nullptr; ++i)
+		{
+			auto currentPortName = inputAudioPorts[i];
+			printf("Port %d: %s\n", i, currentPortName);
+
+			audioInputs.push_back(currentPortName);
+		}
+		jack_free(inputAudioPorts); // Remember to free after use
+	}
+
+	return audioInputs;
+}
+
+void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames)
+{
+	QStringList playbackDevices;
+	for (const auto & inputName : inputNames)
+	{
+		playbackDevices.append(QString::fromStdString(inputName));
+	}
+
+	//playbackDevices.sort();
+
+	comboBox->addItems(playbackDevices);
+
+	// TODO Select device from configuration
+	// const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL);
+	// m_playbackDeviceComboBox->setCurrentText(playbackDevice.isEmpty() ? s_systemDefaultDevice : playbackDevice);
 }
 
 

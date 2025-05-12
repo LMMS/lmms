@@ -47,6 +47,7 @@
 #endif
 
 class QLineEdit;
+class QComboBox;
 
 namespace lmms
 {
@@ -68,6 +69,8 @@ public:
 	void removeMidiClient() { m_midiClient = nullptr; }
 	jack_client_t* jackClient() { return m_client; };
 
+	void handleRegistrationEvent(jack_port_id_t port, int reg);
+
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "JACK (JACK Audio Connection Kit)");
@@ -80,7 +83,16 @@ public:
 		void saveSettings() override;
 
 	private:
+		std::vector<std::string> getAudioInputNames() const;
+		void populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames);
+
+	private:
 		QLineEdit* m_clientName;
+		// Because we do not have access to a JackAudio driver instance we have to be our own client to display inputs and outputs...
+		jack_client_t* m_client;
+
+		QComboBox* m_inputDevice1 = nullptr;
+		QComboBox* m_inputDevice2 = nullptr;
 	};
 
 private slots:
