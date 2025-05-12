@@ -34,12 +34,10 @@
 #include "AudioPortsModel.h"
 #include "ModelView.h"
 
-class QPixmap;
+class QScrollArea;
 
 namespace lmms
 {
-
-class BoolModel;
 
 namespace gui
 {
@@ -55,7 +53,7 @@ class LMMS_EXPORT PinConnector
 	Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor)
 
 public:
-	PinConnector(AudioPortsModel* model);
+	explicit PinConnector(AudioPortsModel* model);
 	~PinConnector() override;
 
 	auto sizeHint() const -> QSize override;
@@ -71,10 +69,13 @@ private:
 	class MatrixView;
 
 	auto trackChannelName(const AudioPortsModel& model, track_ch_t channel) const -> QString;
+	auto getSpacerWidth() const -> int;
+	auto getMaximumWindowSize() const -> QSize;
 	void updateProperties();
 
 	SubWindow* m_subWindow = nullptr;
-	//QScrollArea* m_scrollArea = nullptr;
+	QScrollArea* m_scrollArea = nullptr;
+	QWidget* m_spacer = nullptr;
 
 	MatrixView* m_inView = nullptr;
 	MatrixView* m_outView = nullptr;
@@ -115,7 +116,6 @@ public slots:
 private:
 	auto getPin(const QPoint& mousePos) -> std::optional<std::pair<track_ch_t, proc_ch_t>>;
 	auto getColor(track_ch_t trackChannel, proc_ch_t processorChannel) -> QColor;
-	auto calculateSize() const -> QSize;
 
 	AudioPortsModel::Matrix* m_matrix = nullptr;
 
