@@ -22,6 +22,8 @@
  *
  */
 
+#include "Mixer.h"
+
 #include <QDomElement>
 
 #include "AudioEngine.h"
@@ -31,8 +33,10 @@
 #include "Song.h"
 
 #include "InstrumentTrack.h"
+#include "MixHelpers.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
+#include "Song.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 namespace lmms
@@ -186,21 +190,21 @@ void MixerChannel::doProcessing()
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * sendModel->value();
-					MixHelpers::addSanitizedMultiplied( m_buffer, ch_buf, v, fpp );
+					MixHelpers::addMultiplied(m_buffer, ch_buf, v, fpp);
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					MixHelpers::addSanitizedMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp );
+					MixHelpers::addMultipliedByBuffers(m_buffer, ch_buf, volBuf, sendBuf, fpp);
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp );
+					MixHelpers::addMultipliedByBuffer(m_buffer, ch_buf, v, volBuf, fpp);
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
+					MixHelpers::addMultipliedByBuffer(m_buffer, ch_buf, v, sendBuf, fpp);
 				}
 				m_hasInput = true;
 			}
@@ -724,7 +728,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 	const float v = volBuf
 		? 1.0f
 		: m_mixerChannels[0]->m_volumeModel.value();
-	MixHelpers::addSanitizedMultiplied( _buf, m_mixerChannels[0]->m_buffer, v, fpp );
+	MixHelpers::addMultiplied(_buf, m_mixerChannels[0]->m_buffer, v, fpp);
 
 	// clear all channel buffers and
 	// reset channel process state
