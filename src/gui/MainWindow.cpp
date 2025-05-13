@@ -897,7 +897,8 @@ tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 		}
 		delete optionsDialog;
 		return false;
-	} else
+	}
+	else
 	{
 		if( this->guiSaveProjectAs( fileName ) )
 		{
