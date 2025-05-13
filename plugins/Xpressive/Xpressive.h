@@ -67,9 +67,7 @@ class Xpressive : public Instrument
 public:
 	Xpressive(InstrumentTrack* instrument_track );
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
-
 
 	void saveSettings( QDomDocument& _doc,
 							QDomElement& _this ) override;
@@ -114,6 +112,8 @@ protected slots:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	graphModel  m_graphO1;
 	graphModel  m_graphO2;
 	graphModel  m_graphW1;

@@ -41,8 +41,6 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~WaveShaperEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls * controls() override
 	{
 		return( &m_wsControls );
@@ -50,6 +48,7 @@ public:
 
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	WaveShaperControls m_wsControls;
 

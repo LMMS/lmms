@@ -101,9 +101,7 @@ public:
 	SidInstrument( InstrumentTrack * _instrument_track );
 	~SidInstrument() override = default;
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -120,6 +118,8 @@ public:
 	void updateKnobToolTip();*/
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	// voices
 	VoiceObject * m_voice[3];
 

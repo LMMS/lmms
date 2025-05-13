@@ -74,7 +74,6 @@ public:
 	BitInvader(InstrumentTrack * _instrument_track );
 	~BitInvader() override = default;
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -99,6 +98,8 @@ protected slots:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	FloatModel  m_sampleLength;
 	graphModel  m_graph;
 	

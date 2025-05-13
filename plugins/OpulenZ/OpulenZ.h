@@ -65,7 +65,6 @@ public:
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override;
-	void playImpl(std::span<SampleFrame> out) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -117,11 +116,13 @@ public:
 
 
 private slots:
-        void updatePatch();
+	void updatePatch();
 	void reloadEmulator();
 	void loadGMPatch();
 
 private:
+	void playImpl(std::span<SampleFrame> out) override;
+
 	Copl *theEmulator;
 	QString storedname;
 	fpp_t frameCount;

@@ -81,8 +81,6 @@ public:
 	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
 	~ZynAddSubFxInstrument() override;
 
-	void processImpl() override;
-
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -110,6 +108,8 @@ private slots:
 
 
 private:
+	void processImpl() override;
+
 	void initPlugin();
 	void sendControlChange( MidiControllers midiCtl, float value );
 

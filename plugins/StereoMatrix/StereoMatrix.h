@@ -40,15 +40,14 @@ public:
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoMatrixEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return( &m_smControls );
 	}
 
-
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	StereoMatrixControls m_smControls;
 
 	friend class StereoMatrixControls;

@@ -42,14 +42,14 @@ public:
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override { return &m_controls; }
 
 	Lv2FxControls* lv2Controls() { return &m_controls; }
 	const Lv2FxControls* lv2Controls() const { return &m_controls; }
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	Lv2FxControls m_controls;
 	std::vector<SampleFrame> m_tmpOutputSmps;
 };

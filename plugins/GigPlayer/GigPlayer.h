@@ -242,10 +242,7 @@ public:
 	GigInstrument( InstrumentTrack * _instrument_track );
 	~GigInstrument() override;
 
-	void playImpl(std::span<SampleFrame> out) override;
-	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -271,6 +268,9 @@ public slots:
 
 
 private:
+	void playImpl(std::span<SampleFrame> out) override;
+	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
+
 	// The GIG file and instrument we're using
 	GigInstance * m_instance;
 	gig::Instrument * m_instrument;

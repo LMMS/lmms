@@ -55,7 +55,6 @@ public:
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
 	~FreeBoyInstrument() override = default;
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData(NotePlayHandle* nph) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -73,6 +72,8 @@ public:
 	void updateKnobToolTip();*/
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	FloatModel m_ch1SweepTimeModel;
 	BoolModel m_ch1SweepDirModel;
 	FloatModel m_ch1SweepRtShiftModel;

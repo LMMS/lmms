@@ -38,14 +38,14 @@ public:
 	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~AmplifierEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_ampControls;
 	}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	AmplifierControls m_ampControls;
 
 	friend class AmplifierControls;

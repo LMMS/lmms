@@ -41,8 +41,6 @@ public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~DualFilterEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_dfControls;
@@ -52,6 +50,8 @@ protected:
 	void onEnabledChanged() override;
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	DualFilterControls m_dfControls;
 
 	BasicFilters<2> * m_filter1;

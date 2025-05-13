@@ -42,14 +42,14 @@ public:
 	BitcrushEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~BitcrushEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	void sampleRateChanged();
 	float depthCrush( float in );
 	float noise( float amt );

@@ -81,8 +81,6 @@ public:
 	VestigeInstrument( InstrumentTrack * _instrument_track );
 	~VestigeInstrument() override;
 
-	void processImpl() override;
-
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
@@ -100,6 +98,8 @@ protected slots:
 	void reloadPlugin();
 
 private:
+	void processImpl() override;
+
 	void closePlugin();
 
 	VstPlugin * m_plugin;

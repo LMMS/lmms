@@ -179,7 +179,6 @@ public:
 	SfxrInstrument(InstrumentTrack * _instrument_track );
 	~SfxrInstrument() override = default;
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings( QDomDocument & _doc,
@@ -194,6 +193,8 @@ public:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	SfxrZeroToOneFloatModel m_attModel;
 	SfxrZeroToOneFloatModel m_holdModel;
 	SfxrZeroToOneFloatModel m_susModel;

@@ -46,8 +46,6 @@ public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~ReverbSCEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_reverbSCControls;
@@ -56,6 +54,8 @@ public:
 	void changeSampleRate();
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	ReverbSCControls m_reverbSCControls;
 	sp_data *sp;
 	sp_revsc *revsc;

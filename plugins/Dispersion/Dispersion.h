@@ -42,8 +42,6 @@ public:
 	DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~DispersionEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_dispersionControls;
@@ -52,6 +50,8 @@ public:
 	void runDispersionAP(const int filtNum, const float apCoeff1, const float apCoeff2, std::array<sample_t, 2> &put);
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	DispersionControls m_dispersionControls;
 	
 	float m_sampleRate;

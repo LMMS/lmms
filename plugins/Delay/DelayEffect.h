@@ -40,8 +40,6 @@ public:
 	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
 	~DelayEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_delayControls;
@@ -49,6 +47,8 @@ public:
 	void changeSampleRate();
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	DelayControls m_delayControls;
 	StereoDelay* m_delay;
 	Lfo* m_lfo;

@@ -63,8 +63,6 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~VstEffect() override = default;
 
-	auto processImpl() -> ProcessStatus override;
-
 	EffectControls * controls() override
 	{
 		return &m_vstControls;
@@ -72,6 +70,8 @@ public:
 
 
 private:
+	auto processImpl() -> ProcessStatus override;
+
 	//! Returns true if plugin was loaded (m_plugin != nullptr)
 	bool openPlugin(const QString& plugin);
 	void closePlugin();

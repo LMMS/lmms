@@ -41,8 +41,6 @@ public:
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoEnhancerEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls * controls() override
 	{
 		return( &m_bbControls );
@@ -52,6 +50,8 @@ public:
 
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	DspEffectLibrary::StereoEnhancer m_seFX;
 	
 	SampleFrame* m_delayBuffer;

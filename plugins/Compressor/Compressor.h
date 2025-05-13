@@ -42,7 +42,6 @@ public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~CompressorEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 	void processBypassedImpl() override;
 
 	EffectControls* controls() override
@@ -71,13 +70,15 @@ private slots:
 	void redrawKnee();
 
 private:
-	CompressorControls m_compressorControls;
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
 
 	float msToCoeff(float ms);
 
 	inline void calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum);
 
 	enum class StereoLinkMode { Unlinked, Maximum, Average, Minimum, Blend };
+
+	CompressorControls m_compressorControls;
 
 	std::array<std::vector<float>, 2> m_inLookBuf;
 	std::array<std::vector<float>, 2> m_scLookBuf;

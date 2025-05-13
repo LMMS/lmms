@@ -57,7 +57,6 @@ public:
 	Vibed(InstrumentTrack* instrumentTrack);
 	~Vibed() override = default;
 
-	void playNoteImpl(NotePlayHandle* n, std::span<SampleFrame> out) override;
 	void deleteNotePluginData(NotePlayHandle* n) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
@@ -68,6 +67,8 @@ public:
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
 private:
+	void playNoteImpl(NotePlayHandle* n, std::span<SampleFrame> out) override;
+
 	class StringContainer;
 
 	static constexpr int s_sampleLength = 128;

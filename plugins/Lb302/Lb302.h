@@ -152,10 +152,7 @@ public:
 	Lb302Synth( InstrumentTrack * _instrument_track );
 	~Lb302Synth() override;
 
-	void playImpl(std::span<SampleFrame> out) override;
-	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -165,6 +162,9 @@ public:
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 private:
+	void playImpl(std::span<SampleFrame> out) override;
+	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
+
 	void processNote( NotePlayHandle * n );
 
 	void initNote(Lb302Note *Note);

@@ -124,9 +124,7 @@ public:
 	OrganicInstrument( InstrumentTrack * _instrument_track );
 	~OrganicInstrument() override;
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
@@ -142,6 +140,8 @@ public slots:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	float inline waveshape(float in, float amount);
 
 

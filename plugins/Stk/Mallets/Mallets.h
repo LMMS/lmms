@@ -188,9 +188,7 @@ public:
 	MalletsInstrument( InstrumentTrack * _instrument_track );
 	~MalletsInstrument() override = default;
 
-	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -201,6 +199,8 @@ public:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	FloatModel m_hardnessModel;
 	FloatModel m_positionModel;
 	FloatModel m_vibratoGainModel;

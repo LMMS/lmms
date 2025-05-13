@@ -42,8 +42,6 @@ public:
 	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
 	~FlangerEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_flangerControls;
@@ -52,6 +50,8 @@ public:
 	void restartLFO();
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	FlangerControls m_flangerControls;
 	MonoDelay* m_lDelay;
 	MonoDelay* m_rDelay;

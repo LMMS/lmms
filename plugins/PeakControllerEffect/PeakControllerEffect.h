@@ -42,8 +42,6 @@ public:
 						const Descriptor::SubPluginFeatures::Key * _key );
 	~PeakControllerEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls * controls() override
 	{
 		return &m_peakControls;
@@ -72,6 +70,8 @@ public:
 	int m_effectId;
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;

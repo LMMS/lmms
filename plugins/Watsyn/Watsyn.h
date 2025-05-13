@@ -139,9 +139,7 @@ public:
 	WatsynInstrument( InstrumentTrack * _instrument_track );
 	~WatsynInstrument() override = default;
 
-	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc,
 							QDomElement & _this ) override;
@@ -175,6 +173,8 @@ protected:
 	float m_rfreq [NUM_OSCS];
 
 private:
+	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
+
 	inline float leftCh( float _vol, float _pan )
 	{
 		return ( _pan <= 0 ? 1.0 : 1.0 - ( _pan / 100.0 ) ) * _vol / 100.0;

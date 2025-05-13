@@ -39,8 +39,6 @@ public:
 	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~BassBoosterEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_bbControls;
@@ -55,6 +53,8 @@ protected:
 	bool m_frequencyChangeNeeded;
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	DspEffectLibrary::MonoToStereoAdaptor<DspEffectLibrary::FastBassBoost> m_bbFX;
 
 	BassBoosterControls m_bbControls;

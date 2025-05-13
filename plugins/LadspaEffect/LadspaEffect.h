@@ -47,8 +47,6 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~LadspaEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	void setControl( int _control, LADSPA_Data _data );
 
 	EffectControls * controls() override
@@ -67,6 +65,8 @@ private slots:
 
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	void pluginInstantiation();
 	void pluginDestruction();
 

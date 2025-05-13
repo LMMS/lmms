@@ -43,16 +43,15 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~DynProcEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-	void processBypassedImpl() override;
-
 	EffectControls * controls() override
 	{
 		return( &m_dpControls );
 	}
 
-
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	void processBypassedImpl() override;
+
 	void calcAttack();
 	void calcRelease();
 

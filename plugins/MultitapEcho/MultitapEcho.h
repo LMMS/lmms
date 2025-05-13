@@ -41,14 +41,14 @@ public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~MultitapEchoEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	void updateFilters( int begin, int end );
 	void runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames );
 

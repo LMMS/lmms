@@ -39,12 +39,12 @@ public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Vectorscope() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls *controls() override {return &m_controls;}
 	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	VecControls m_controls;
 
 	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)

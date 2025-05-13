@@ -45,8 +45,6 @@ public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_lommControls;
@@ -61,6 +59,8 @@ private slots:
 	void changeSampleRate();
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	LOMMControls m_lommControls;
 	
 	float m_sampleRate;

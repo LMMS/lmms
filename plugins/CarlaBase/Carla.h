@@ -189,7 +189,6 @@ public:
     QString nodeName() const override;
     void saveSettings(QDomDocument& doc, QDomElement& parent) override;
     void loadSettings(const QDomElement& elem) override;
-    void playImpl(std::span<SampleFrame> out) override;
     bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
     gui::PluginView* instantiateView(QWidget* parent) override;
 
@@ -205,6 +204,8 @@ private slots:
     void updateParamModel(uint32_t index);
 
 private:
+	void playImpl(std::span<SampleFrame> out) override;
+
     const bool kIsPatchbay;
 
     NativePluginHandle fHandle;
@@ -290,7 +291,7 @@ private:
 
 class CarlaInstrumentView : public InstrumentViewFixedSize
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
     CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent);

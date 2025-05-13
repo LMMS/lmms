@@ -41,8 +41,6 @@ public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls * controls() override
 	{
 		return &m_eqControls;
@@ -65,6 +63,8 @@ public:
 	}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	EqControls m_eqControls;
 
 	EqHp12Filter m_hp12;

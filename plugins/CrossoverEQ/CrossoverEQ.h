@@ -41,8 +41,6 @@ public:
 	CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~CrossoverEQEffect() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls* controls() override
 	{
 		return &m_controls;
@@ -51,6 +49,8 @@ public:
 	void clearFilterHistories();
 	
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	CrossoverEQControls m_controls;
 
 	void sampleRateChanged();

@@ -45,13 +45,13 @@ public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Analyzer() override;
 
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
-
 	EffectControls *controls() override {return &m_controls;}
 
 	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	SaProcessor m_processor;
 	SaControls m_controls;
 
