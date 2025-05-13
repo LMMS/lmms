@@ -1,5 +1,5 @@
 /*
- * AudioPortsModelTest.cpp
+ * AudioPortsTest.cpp
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -32,13 +32,7 @@
 #include <qtestcase.h>
 
 #define LMMS_TESTING
-#include "AudioData.h"
-#include "AudioEngine.h"
-#include "AudioBuffer.h"
-#include "Model.h"
-#include "AudioPorts.h"
-#include "AudioPortsModel.h"
-#include "SampleFrame.h"
+#include "PluginAudioPorts.h"
 
 namespace lmms {
 
@@ -151,7 +145,7 @@ void compareBuffers(SplitAudioData<SampleT, extent> actual, SplitAudioData<Sampl
 } // namespace lmms
 
 
-class AudioPortsModelTest : public QObject
+class AudioPortsTest : public QObject
 {
 	Q_OBJECT
 
@@ -455,7 +449,7 @@ private slots:
 		// Setup
 		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 1};
 		auto model = Model{nullptr};
-		auto ap = DefaultAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -527,7 +521,7 @@ private slots:
 		// Setup
 		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto ap = DefaultAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -599,7 +593,7 @@ private slots:
 		// Setup
 		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto ap = DefaultAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -684,7 +678,7 @@ private slots:
 			AudioDataKind::SampleFrame, true, 2, 2, true
 		};
 		auto model = Model{nullptr};
-		auto ap = DefaultAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -747,7 +741,7 @@ private slots:
 		// Setup
 		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 2};
 		auto model = Model{nullptr};
-		auto ap = DefaultAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<config>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -824,7 +818,7 @@ private slots:
 		auto model = Model{nullptr};
 
 		// Helper for running this test with different configurations
-		auto testWithConfig = [&]<AudioPortsConfig config>(DefaultAudioPorts<config>& ap) {
+		auto testWithConfig = [&]<AudioPortsConfig config>(PluginAudioPorts<config>& ap) {
 			ap.init();
 
 			// Data on frames 0, 1, and 33
@@ -846,7 +840,7 @@ private slots:
 			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsConfig.
 			struct Process
 			{
-				DefaultAudioPorts<config>& ap;
+				PluginAudioPorts<config>& ap;
 
 				// Statically in-place config
 				void operator()(std::span<SampleFrame> inOut)
@@ -905,7 +899,7 @@ private slots:
 			constexpr auto config = AudioPortsConfig {
 				AudioDataKind::SampleFrame, true, 2, 2, true, false
 			};
-			auto ap = DefaultAudioPorts<config>{false, &model};
+			auto ap = PluginAudioPorts<config>{false, &model};
 			testWithConfig(ap);
 		}
 
@@ -914,7 +908,7 @@ private slots:
 			constexpr auto config = AudioPortsConfig {
 				AudioDataKind::SampleFrame, true, 2, 2, true, true
 			};
-			auto ap = DefaultAudioPorts<config>{false, &model};
+			auto ap = PluginAudioPorts<config>{false, &model};
 			testWithConfig(ap);
 		}
 
@@ -1008,5 +1002,5 @@ private slots:
 	}
 };
 
-QTEST_GUILESS_MAIN(AudioPortsModelTest)
-#include "AudioPortsModelTest.moc"
+QTEST_GUILESS_MAIN(AudioPortsTest)
+#include "AudioPortsTest.moc"

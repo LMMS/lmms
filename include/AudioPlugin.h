@@ -28,12 +28,10 @@
 
 #include <type_traits>
 
-#include "AudioData.h"
-#include "AudioPorts.h"
-#include "AudioPortsConfig.h"
 #include "Effect.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "PluginAudioPorts.h"
 
 namespace lmms
 {
@@ -209,8 +207,8 @@ protected:
 		/**
 		 * NOTE: Only MIDI-based instruments are currently supported by AudioPlugin.
 		 * NotePlayHandle-based instruments use buffers from their play handles, and more work
-		 * would be needed to integrate that system with the AudioBuffer system
-		 * used by AudioPlugin. AudioBuffer is also not thread-safe.
+		 * would be needed to integrate that system with the AudioPorts::Buffer system
+		 * used by AudioPlugin. AudioPorts::Buffer is also not thread-safe.
 		 *
 		 * The `Instrument::playNote()` method is still called for MIDI-based instruments when
 		 * notes are played, so this method is a no-op.
@@ -328,7 +326,7 @@ private:
  * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
  */
 template<class ParentT, AudioPortsConfig config,
-	template<AudioPortsConfig> class AudioPortsT = DefaultAudioPorts>
+	template<AudioPortsConfig> class AudioPortsT = PluginAudioPorts>
 class AudioPlugin
 	: public detail::AudioPlugin<ParentT, config, AudioPortsT<config>>
 {

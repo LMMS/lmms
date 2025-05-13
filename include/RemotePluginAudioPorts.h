@@ -27,7 +27,7 @@
 
 #include <optional>
 
-#include "AudioPorts.h"
+#include "PluginAudioPorts.h"
 #include "RemotePlugin.h"
 #include "lmms_export.h"
 
@@ -38,7 +38,7 @@ namespace lmms {
  *       RemotePlugin from the plugin implementation rather than
  *       RemotePluginAudioPortsController, and RemotePlugin would be a class
  *       template with an `AudioPortsConfig` template parameter.
- *       There would also be RemotePluginAudioBuffer, a custom buffer implementation
+ *       There would also be RemotePluginAudioPortsBuffer, a custom buffer implementation
  *       for remote plugins and remote plugin clients which RemotePlugin would
  *       derive from. However, this design requires C++20's class type NTTP on the
  *       remote plugin's client side but we're compiling that with C++17 due to a
@@ -119,13 +119,13 @@ public:
 	 */
 
 	//! Only returns the buffer interface if audio port is active
-	auto buffers() -> AudioBuffer<config>* override
+	auto buffers() -> AudioPorts<config>::Buffer* override
 	{
 		return remoteActive() ? this : nullptr;
 	}
 
 	/*
-	 * `AudioBuffer` implementation
+	 * `AudioPorts::Buffer` implementation
 	 */
 
 	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> override
@@ -234,7 +234,7 @@ public:
 		m_localActive = true;
 	}
 
-	auto buffers() -> AudioBuffer<config>* override
+	auto buffers() -> AudioPorts<config>::Buffer* override
 	{
 		if (isRemote()) { return RemotePluginAudioPorts<config>::buffers(); }
 		return localActive() ? &m_localBuffer.value() : nullptr;
@@ -292,7 +292,7 @@ private:
 
 
 template<AudioPortsConfig config>
-using DefaultConfigurableAudioPorts = ConfigurableAudioPorts<config, DefaultAudioBuffer>;
+using DefaultConfigurableAudioPorts = ConfigurableAudioPorts<config, PluginAudioPortsBuffer>;
 
 
 } // namespace lmms

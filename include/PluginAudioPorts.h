@@ -1,5 +1,6 @@
 /*
- * AudioBuffer.h - Customizable audio buffer
+ * PluginAudioPorts.h - Default `AudioPorts` implementation for
+ *                      audio plugins
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,92 +23,15 @@
  *
  */
 
-#ifndef LMMS_AUDIO_BUFFER_H
-#define LMMS_AUDIO_BUFFER_H
+#ifndef LMMS_PLUGIN_AUDIO_PORTS_H
+#define LMMS_PLUGIN_AUDIO_PORTS_H
 
-#include <type_traits>
-#include <vector>
-
-#include "AudioData.h"
-#include "AudioPortsConfig.h"
-#include "LmmsTypes.h"
-#include "SampleFrame.h"
+#include "AudioPorts.h"
 
 namespace lmms
 {
 
-
 namespace detail {
-
-/**
- * Metafunction to select the appropriate non-owning audio buffer view
- * given the layout, sample type, and channel count
- */
-template<AudioDataKind kind, bool interleaved, proc_ch_t channels, bool isConst>
-struct AudioDataViewTypeHelper
-{
-	static_assert(always_false_v<AudioDataViewTypeHelper<kind, interleaved, channels, isConst>>,
-		"Unsupported audio data type");
-};
-
-//! Non-interleaved specialization
-template<AudioDataKind kind, proc_ch_t channels, bool isConst>
-struct AudioDataViewTypeHelper<kind, false, channels, isConst>
-{
-	using type = SplitAudioData<
-		std::conditional_t<isConst, const GetAudioDataType<kind>, GetAudioDataType<kind>>,
-		channels>;
-};
-
-//! SampleFrame specialization
-template<proc_ch_t channels, bool isConst>
-struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
-{
-	static_assert(channels == 0 || channels == 2,
-		"Plugins using SampleFrame buffers must have exactly 0 or 2 inputs or outputs");
-	using type = std::conditional_t<isConst, std::span<const SampleFrame>, std::span<SampleFrame>>;
-};
-
-} // namespace detail
-
-
-//! Metafunction to select the appropriate non-owning audio buffer view
-template<AudioPortsConfig config, bool isOutput, bool isConst>
-using AudioDataViewType = typename detail::AudioDataViewTypeHelper<
-	config.kind, config.interleaved, (isOutput ? config.outputs : config.inputs), isConst>::type;
-
-
-namespace detail {
-
-//! Interface for accessing input/output audio buffers
-template<AudioPortsConfig config, bool inplace = config.inplace>
-class AudioBuffer;
-
-//! Dynamically in-place specialization
-template<AudioPortsConfig config>
-class AudioBuffer<config, false>
-{
-public:
-	virtual ~AudioBuffer() = default;
-
-	virtual auto inputBuffer() -> AudioDataViewType<config, false, false> = 0;
-	virtual auto outputBuffer() -> AudioDataViewType<config, true, false> = 0;
-	virtual auto frames() const -> fpp_t = 0;
-	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
-};
-
-//! Statically in-place specialization
-template<AudioPortsConfig config>
-class AudioBuffer<config, true>
-{
-public:
-	virtual ~AudioBuffer() = default;
-
-	virtual auto inputOutputBuffer() -> AudioDataViewType<config, false, false> = 0;
-	virtual auto frames() const -> fpp_t = 0;
-	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
-};
-
 
 //! Optimization - Choose std::array or std::vector based on whether size is known at compile time
 template<AudioPortsConfig config>
@@ -117,21 +41,21 @@ using AccessBufferType = std::conditional_t<
 	std::vector<GetAudioDataType<config.kind>*>>;
 
 
-//! Default implementation of `AudioBuffer`
+//! Default implementation of `AudioPorts::Buffer` for audio plugins
 template<AudioPortsConfig config,
 	AudioDataKind kind = config.kind, bool interleaved = config.interleaved, bool inplace = config.inplace>
-class DefaultAudioBuffer;
+class PluginAudioPortsBuffer;
 
 //! Specialization for dynamically in-place, non-interleaved buffers
 template<AudioPortsConfig config, AudioDataKind kind>
-class DefaultAudioBuffer<config, kind, false, false>
-	: public AudioBuffer<config>
+class PluginAudioPortsBuffer<config, kind, false, false>
+	: public AudioPorts<config>::Buffer
 {
 	using SampleT = GetAudioDataType<kind>;
 
 public:
-	DefaultAudioBuffer() = default;
-	~DefaultAudioBuffer() override = default;
+	PluginAudioPortsBuffer() = default;
+	~PluginAudioPortsBuffer() override = default;
 
 	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> final
 	{
@@ -194,8 +118,8 @@ private:
 
 //! Specialization for statically in-place, non-interleaved buffers
 template<AudioPortsConfig config, AudioDataKind kind>
-class DefaultAudioBuffer<config, kind, false, true>
-	: public AudioBuffer<config>
+class PluginAudioPortsBuffer<config, kind, false, true>
+	: public AudioPorts<config>::Buffer
 {
 	static_assert(config.inputs == config.outputs || config.inputs == 0 || config.outputs == 0,
 		"in-place buffers must have same number of input channels and output channels, "
@@ -204,8 +128,8 @@ class DefaultAudioBuffer<config, kind, false, true>
 	using SampleT = GetAudioDataType<kind>;
 
 public:
-	DefaultAudioBuffer() = default;
-	~DefaultAudioBuffer() override = default;
+	PluginAudioPortsBuffer() = default;
+	~PluginAudioPortsBuffer() override = default;
 
 	auto inputOutputBuffer() -> SplitAudioData<SampleT, config.outputs> final
 	{
@@ -262,12 +186,12 @@ private:
 
 //! Specialization for 2-channel SampleFrame buffers
 template<AudioPortsConfig config>
-class DefaultAudioBuffer<config, AudioDataKind::SampleFrame, true, true>
-	: public AudioBuffer<config>
+class PluginAudioPortsBuffer<config, AudioDataKind::SampleFrame, true, true>
+	: public AudioPorts<config>::Buffer
 {
 public:
-	DefaultAudioBuffer() = default;
-	~DefaultAudioBuffer() override = default;
+	PluginAudioPortsBuffer() = default;
+	~PluginAudioPortsBuffer() override = default;
 
 	auto inputOutputBuffer() -> std::span<SampleFrame> final
 	{
@@ -290,19 +214,76 @@ private:
 	std::vector<SampleFrame> m_buffer;
 };
 
+
+/**
+ * The default audio port for audio plugins that do not provide their own.
+ * Contains an audio port model and audio buffers.
+ *
+ * This audio port still has *some* ability for customization by using a custom `BufferT`,
+ * but for full control, you'll need to provide your own audio port implementation.
+ */
+template<AudioPortsConfig config, template<AudioPortsConfig> class BufferT>
+class PluginAudioPorts
+	: public AudioPorts<config>
+	, public BufferT<config>
+{
+	static_assert(std::is_base_of_v<typename AudioPorts<config>::Buffer, BufferT<config>>,
+		"BufferT must derive from AudioPorts::Buffer");
+
+public:
+	using AudioPorts<config>::AudioPorts;
+
+	auto buffers() -> BufferT<config>* final { return static_cast<BufferT<config>*>(this); }
+
+private:
+	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
+	{
+		// Connects the audio port model to the buffers
+		this->updateBuffers(inChannels, outChannels, frames);
+	}
+
+	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
+	{
+		if (isOutput)
+		{
+			switch (this->out().channelCount())
+			{
+				case 1:
+					return this->tr("Plugin Out");
+				case 2:
+					assert(channel < 2);
+					return channel == 0 ? this->tr("Plugin Out L") : this->tr("Plugin Out R");
+				default:
+					return this->tr("Plugin Out %1").arg(channel + 1);
+			}
+		}
+		else
+		{
+			switch (this->in().channelCount())
+			{
+				case 1:
+					return this->tr("Plugin In");
+				case 2:
+					assert(channel < 2);
+					return channel == 0 ? this->tr("Plugin In L") : this->tr("Plugin In R");
+				default:
+					return this->tr("Plugin In %1").arg(channel + 1);
+			}
+		}
+	}
+};
+
 } // namespace detail
 
 
-//! Interface for accessing input/output audio buffers
+//! Default implementation of `AudioPorts::Buffer` for audio plugins
 template<AudioPortsConfig config>
-using AudioBuffer = detail::AudioBuffer<config>;
+using PluginAudioPortsBuffer = detail::PluginAudioPortsBuffer<config>;
 
-
-//! Default implementation of `AudioBuffer`
+//! Default implementation of `AudioPorts` for audio plugins
 template<AudioPortsConfig config>
-using DefaultAudioBuffer = detail::DefaultAudioBuffer<config>;
-
+using PluginAudioPorts = detail::PluginAudioPorts<config, PluginAudioPortsBuffer>;
 
 } // namespace lmms
 
-#endif // LMMS_AUDIO_BUFFER_H
+#endif // LMMS_PLUGIN_AUDIO_PORTS_H
