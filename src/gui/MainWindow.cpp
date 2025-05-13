@@ -900,7 +900,7 @@ tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 	}
 	else
 	{
-		if( this->guiSaveProjectAs( fileName ) )
+		if (this->guiSaveProjectAs(fileName))
 		{
 			if( getSession() == SessionState::Recover )
 			{
