@@ -804,7 +804,7 @@ bool MainWindow::saveProjectAs()
 	{
 		sfd = new FileDialog( this, tr( "Save Project" ), "",
 		tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
-			tr( "LMMS Project Template" ) + " (*.mpt)" );
+			tr("LMMS Project Template") + " (*.mpt)");
 	} else
 	{
 		sfd = new VersionedSaveDialog( this, optionsWidget, tr( "Save Project" ), "",
