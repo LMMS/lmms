@@ -828,7 +828,7 @@ tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 							"nommpz" ).toInt() == 0
 						? "mmpz"
 						: "mmp" ;
-	sfd->setDefaultSuffix( suffix );
+	sfd->setDefaultSuffix(suffix);
 
 	QString fileName;
 
