@@ -47,8 +47,8 @@ namespace
 
 constexpr auto CenterMargin = QSize{32, 0};
 constexpr auto WindowMarginTop = QSize{0, 112};
-constexpr auto WindowMarginBottom = QSize{0, 24};
-constexpr auto WindowMarginSide = QSize{48, 0};
+constexpr auto WindowMarginBottom = QSize{0, 16};
+constexpr auto WindowMarginSide = QSize{32, 0};
 constexpr auto WindowMarginTotal = WindowMarginTop + WindowMarginBottom + WindowMarginSide + WindowMarginSide;
 constexpr auto MinimumAllowedWindowSize = QSize{112, 112};
 
@@ -241,7 +241,7 @@ void PinConnector::paintEvent(QPaintEvent*)
 		p.setTransform(transform);
 
 		const auto name = model->in().channelName(idx);
-		p.drawText(0, 0, yPos, cellSize, Qt::AlignLeft,
+		p.drawText(0, 0, yPos, cellSize * 2, Qt::AlignLeft,
 			QString::fromUtf16(u"\U0001F82E %1").arg(name));
 
 		xPos += cellSize;
@@ -256,7 +256,7 @@ void PinConnector::paintEvent(QPaintEvent*)
 		p.setTransform(transform);
 
 		const auto name = model->out().channelName(idx);
-		p.drawText(0, 0, yPos, cellSize, Qt::AlignLeft,
+		p.drawText(0, 0, yPos, cellSize * 2, Qt::AlignLeft,
 			QString::fromUtf16(u"\U0001F82C %1").arg(name));
 
 		xPos += cellSize;
