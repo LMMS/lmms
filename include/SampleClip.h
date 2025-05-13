@@ -91,6 +91,7 @@ public slots:
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackClips();
+	void tempoChanged(bpm_t bpm);
 
 protected:
 	SampleClip( const SampleClip& orig );
@@ -99,6 +100,7 @@ private:
 	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+	bpm_t m_tempo;
 
 	friend class gui::SampleClipView;
 
