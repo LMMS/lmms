@@ -109,7 +109,7 @@ namespace lmms::Clipboard
 		if (isAudioFile(value))			 { type = "samplefile"; }
 		else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
 		else if (isPresetFile(value))    { type = "presetfile"; }
-		else if (isMidiFile(value))      { type = "midifile"; }
+		else if (isMidiFile(value))      { type = "importedproject"; }
 		else if (isProjectFile(value))   { type = "projectfile"; }
 		else if (isPatchFile(value))     { type = "patchfile"; }
 		else if (isSoundFontFile(value)) { type = "soundfontfile"; }
