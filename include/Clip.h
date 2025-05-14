@@ -149,7 +149,7 @@ public:
 	static bool comparePosition(const Clip* a, const Clip* b);
 
 	TimePos startTimeOffset() const;
-	void setStartTimeOffset( const TimePos &startTimeOffset );
+	virtual void setStartTimeOffset(const TimePos &startTimeOffset);
 
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );

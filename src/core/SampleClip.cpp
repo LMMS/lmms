@@ -41,7 +41,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
 	Clip(_track),
 	m_sample(std::move(sample)),
 	m_isPlaying(false),
-	m_tempo(Engine::getSong()->getTempo())
+	m_startFrameOffset(0)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -91,7 +91,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
 	m_sample(std::move(orig.m_sample)),
 	m_isPlaying(orig.m_isPlaying),
-	m_tempo(Engine::getSong()->getTempo())
+	m_startFrameOffset(orig.m_startFrameOffset)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -267,14 +267,18 @@ void SampleClip::updateLength()
 }
 
 
-void SampleClip::tempoChanged(bpm_t tempo)
+void SampleClip::tempoChanged()
 {
-	setStartTimeOffset(startTimeOffset() * tempo / m_tempo);
-	m_tempo = tempo;
+	Clip::setStartTimeOffset(std::round(1.0f * m_startFrameOffset / Engine::framesPerTick()));
 	emit sampleChanged();
 	Engine::getSong()->setModified();
 }
 
+void SampleClip::setStartTimeOffset(const TimePos &startTimeOffset)
+{
+	m_startFrameOffset = startTimeOffset * Engine::framesPerTick();
+	Clip::setStartTimeOffset(startTimeOffset);
+}
 
 
 TimePos SampleClip::sampleLength() const
@@ -316,6 +320,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 	_this.setAttribute("autoresize", QString::number(getAutoResize()));
+	_this.setAttribute("startframeoffset", QString::number(m_startFrameOffset));
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -365,6 +370,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
+	m_startFrameOffset = _this.attribute("startframeoffset", QString::number(startTimeOffset() * Engine::framesPerTick())).toInt();
 
 	if (_this.hasAttribute("color"))
 	{
