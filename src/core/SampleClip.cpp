@@ -320,7 +320,6 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 	_this.setAttribute("autoresize", QString::number(getAutoResize()));
-	_this.setAttribute("startframeoffset", QString::number(m_startFrameOffset));
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -370,7 +369,6 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
-	m_startFrameOffset = _this.attribute("startframeoffset", QString::number(startTimeOffset() * Engine::framesPerTick())).toInt();
 
 	if (_this.hasAttribute("color"))
 	{
