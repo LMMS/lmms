@@ -40,6 +40,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VersionedSaveDialog.h"
 
 namespace lmms::gui
 {
@@ -385,7 +386,7 @@ void SampleClipView::setAutomationGhost()
 
 void SampleClipView::exportSampleBuffer()
 {
-	const auto outputFilename = FileDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+	const auto outputFilename = VersionedSaveDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
 
 	if (!outputFilename.isEmpty())
 	{
