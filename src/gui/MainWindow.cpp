@@ -820,7 +820,7 @@ tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 	}
 	else
 	{
-		sfd->setDirectory( ConfigManager::inst()->userProjectsDir() );
+		sfd->setDirectory(ConfigManager::inst()->userProjectsDir());
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
