@@ -843,7 +843,7 @@ tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 	}
 	else
 	{
-		if(sfd->exec() != FileDialog::Accepted || sfd->selectedFiles().isEmpty() || sfd->selectedFiles()[0] == "" )
+		if (sfd->exec() != FileDialog::Accepted || sfd->selectedFiles().isEmpty() || sfd->selectedFiles()[0] == "")
 		{
 			delete sfd;
 			return false;
