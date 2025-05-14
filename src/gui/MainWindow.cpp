@@ -855,8 +855,8 @@ tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 	if( sfd->selectedNameFilter().contains( "(*.mpt)" ) )
 	{
 		// Remove the default suffix
-		fileName.remove( "." + suffix );
-		if( !sfd->selectedFiles()[0].endsWith( ".mpt" ) )
+		fileName.remove("." + suffix);
+		if (!sfd->selectedFiles()[0].endsWith( ".mpt" ))
 		{
 			if( VersionedSaveDialog::fileExistsQuery( fileName + ".mpt",
 					tr( "Save project template" ) ) )
