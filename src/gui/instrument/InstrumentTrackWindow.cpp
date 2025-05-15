@@ -144,19 +144,17 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
 	soloMuteLayout->setSpacing(2);
 
-	m_muteBtn = new PixmapButton(this, tr("Mute"));
+	m_muteBtn = new AutomatableButton(this, tr("Mute"));
 	m_muteBtn->setModel(&m_track->m_mutedModel);
-	m_muteBtn->setActiveGraphic(embed::getIconPixmap("mute_active"));
-	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("mute_inactive"));
 	m_muteBtn->setCheckable(true);
+	m_muteBtn->setObjectName("btn-mute");
 	m_muteBtn->setToolTip(tr("Mute this instrument"));
 	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
 
-	m_soloBtn = new PixmapButton(this, tr("Solo"));
+	m_soloBtn = new AutomatableButton(this, tr("Solo"));
 	m_soloBtn->setModel(&m_track->m_soloModel);
-	m_soloBtn->setActiveGraphic(embed::getIconPixmap("solo_active"));
-	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("solo_inactive"));
 	m_soloBtn->setCheckable(true);
+	m_soloBtn->setObjectName("btn-solo");
 	m_soloBtn->setToolTip(tr("Solo this instrument"));
 	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
 
@@ -541,8 +539,8 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	m_itv->m_tlb->setFocus();
-	m_itv->m_tlb->setChecked( false );
+	m_itv->setFocus();
+	m_itv->m_tlb->setChecked(false);
 }
 
 
