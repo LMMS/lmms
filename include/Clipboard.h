@@ -48,7 +48,10 @@ namespace Clipboard
 	
 	enum DataType
 	{
-		None, //!< only use for error handling
+		Error, //!< only use for error handling
+		All, //!< use if all kinds of data is accepted (used by actions)
+		Any, //!< use if the data type is ignored when parsing (used by actions)
+	
 		FloatValue,
 		AutomatableModelLink,
 		Instrument,
@@ -88,8 +91,8 @@ namespace Clipboard
 
 	// Helper methods for String Pair data
 	QString getStringPairKeyName(DataType type);
-	void copyStringPair(DataType key, const QString& value, bool shouldHighlightWidgets = true);
-	DataType LMMS_EXPORT decodeKey(const QMimeData* mimeData);
+	void copyStringPair(DataType key, const QString& value);
+	DataType decodeKey(const QMimeData* mimeData);
 	QString decodeValue( const QMimeData * mimeData );
 
 	QString encodeFloatValue(float value);

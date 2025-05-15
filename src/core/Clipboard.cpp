@@ -29,7 +29,6 @@
 #include "Clipboard.h"
 
 #include "AutomatableModel.h"
-#include "InteractiveModelView.h"
 
 
 namespace lmms::Clipboard
@@ -72,6 +71,10 @@ namespace lmms::Clipboard
 	{
 		switch (type)
 		{
+			case DataType::All:
+				return QString("All");
+			case DataType::Any:
+				return QString("Any");
 			case DataType::FloatValue:
 				return QString("FloatValue");
 			case DataType::AutomatableModelLink:
@@ -117,29 +120,26 @@ namespace lmms::Clipboard
 			default:
 				break;
 		};
-		return QString("None_error");
+		return QString("Error");
 	}
 
 
-	void copyStringPair(DataType key, const QString& value, bool shouldHighlightWidgets)
+	void copyStringPair(DataType key, const QString& value)
 	{
 		QString finalString = getStringPairKeyName(key) + ":" + value;
 
 		auto content = new QMimeData;
-		content->setData(mimeType(MimeType::StringPair), finalString.toUtf8());
-		QApplication::clipboard()->setMimeData(content, QClipboard::Clipboard);
-
-		if (shouldHighlightWidgets)
-		{
-			lmms::gui::InteractiveModelView::startHighlighting(key);
-		}
+		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
+		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
 	}
 
 
 
 
-	Clipboard::DataType decodeKey(const QMimeData* mimeData)
+	DataType decodeKey(const QMimeData* mimeData)
 	{
+		if (Clipboard::hasFormat(Clipboard::MimeType::StringPair) == false) { return DataType::Error; }
+
 		QString keyString = QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 0, 0);
 		for (size_t i = 0; i < static_cast<size_t>(DataType::Count); i++)
 		{
@@ -148,7 +148,7 @@ namespace lmms::Clipboard
 				return static_cast<DataType>(i);
 			}
 		}
-		return DataType::None;
+		return DataType::Error;
 	}
 
 
