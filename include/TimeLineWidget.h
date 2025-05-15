@@ -84,7 +84,7 @@ public:
 	};
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
-				const TimePos& begin, Song::PlayMode mode, AutoScrollState autoScroll, QWidget* parent);
+				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -141,10 +141,8 @@ public:
 		return( m_pos );
 	}
 
-	AutoScrollState autoScroll() const
-	{
-		return m_autoScroll;
-	}
+	AutoScrollState autoScroll() const { return m_autoScroll; }
+	void setAutoScroll(AutoScrollState state) { m_autoScroll = state; }
 
 	inline void setPixelsPerBar( float ppb )
 	{

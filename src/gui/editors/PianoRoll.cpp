@@ -276,8 +276,9 @@ PianoRoll::PianoRoll() :
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
 		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
-		m_currentPosition, Song::PlayMode::MidiClip, TimeLineWidget::getDefaultAutoScrollState(), this
+		m_currentPosition, Song::PlayMode::MidiClip, this
 	);
+	m_timeLine->setAutoScroll(TimeLineWidget::getDefaultAutoScrollState());
 	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );

@@ -50,7 +50,7 @@ namespace
 }
 
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
-		const TimePos& begin, Song::PlayMode mode, AutoScrollState autoScroll, QWidget* parent) :
+		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
 	m_ppb{ppb},
@@ -58,7 +58,7 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_timeline{&timeline},
 	m_begin{begin},
 	m_mode{mode},
-	m_autoScroll{autoScroll}
+	m_autoScroll{AutoScrollState::Stepped}
 {
 	move( 0, yoff );
 
