@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.h - Implements shortcut and action system for widgets
+ * InteractiveModelView.h - Implements action system for widgets
  *
  * Copyright (c) 2024 -2025 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -48,7 +48,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-struct ActionStruct
+struct CommandData
 {
 	/*
 	* id: should be unique, used to refer to this action
@@ -57,21 +57,18 @@ struct ActionStruct
 	* isTypeSpecific: if the action can not be performed with other kinds of widgets (example for false: delete action)
 	* acceptedType: what kind of datatype does this action accept, use `Clipboard::DataType::Ignore` if datatype doesn't matter, use `Clipboard::DataType::Error` to later define the datatype
 	*/
-	ActionStruct(size_t id, QAction& doFnIn, QAction* undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType);
-	ActionStruct() { resetShortcut(); }
-	~ActionStruct();
+	CommandData(QString& name, CommandFnPtr& doFnIn, CommandFnPtr& undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType);
+	~CommandData();
 	//! sets the shortcut and isShortcut will be true
 	void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop);
 	//! use this to add more datatypes to an action `Clipboard::DataType::Error` will not be added
 	void addAcceptedDataType(Clipboard::DataType type);
 	//! display name
-	//QString actionName = "";
-	size_t actionId = 0;
+	QString actionName = "";
 
-	//! `QActions` needed for `GuiAction`
-	QAction* doFn = nullptr;
-	QAction* undoFn = nullptr;
-	GuiActionIO data;
+	//! Function pointers needed to construct `GuiAction`
+	CommandFnPtr doFn;
+	CommandFnPtr undoFn;
 
 	//! if the action can not be performed with other kinds of widgets (example for false: delete action)
 	bool isTypeSpecific = true;
@@ -83,8 +80,6 @@ struct ActionStruct
 	// shortcut logic
 	Qt::Key key = Qt::Key_F35;
 	Qt::KeyboardModifier modifier = Qt::NoModifier;
-	//! how many times do the keys need to be pressed to activate this shortcut
-	size_t times = 0;
 	//! should it loop back if m_times is reached
 	bool isLoop = false;
 
@@ -92,16 +87,14 @@ struct ActionStruct
 	void resetShortcut();
 	
 	bool doesShortcutMatch(QKeyEvent* event) const;
-	bool doesShortcutMatch(const ActionStruct& otherShortcut) const;
-	bool doesFullShortcutMatch(const ActionStruct& otherShortcut) const;
-	void copyShortcut(const ActionStruct& otherShortcut);
+	bool doesShortcutMatch(const CommandData& otherShortcut) const;
+	bool doesFullShortcutMatch(const CommandData& otherShortcut) const;
+	void copyShortcut(const CommandData& otherShortcut);
 	//! true if `type` is in `acceptedType`, isn't true if `acceptedType` has `Clipboard::DataType::Any`
 	bool doesTypeMatch(Clipboard::DataType type) const;
 	//! true if `type` is in `acceptedType`, true if `acceptedType` has `Clipboard::DataType::Any`
 	bool isTypeAccepted(Clipboard::DataType type) const;
-	const QString getText() const;
-	GuiActionIO* getData();
-	void setData(const GuiActionIO& newData);
+	const QString& getText() const;
 };
 
 
@@ -124,63 +117,68 @@ public:
 	static QColor getHighlightColor();
 	static void setHighlightColor(QColor& color);
 
-	//! highlights this widgets specifically
-	//! duration: highlight time in milliseconds
-	//! shouldStopHighlightingOrhers: calls `stopHighlighting()`,
+	//! @param highlights this widgets specifically
+	//! @param duration: highlight time in milliseconds
+	//! @param shouldStopHighlightingOrhers: calls `stopHighlighting()`,
 	//! should be false if multiple widgets are highlighted and `this` is not the first one
-	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);
-
-	//! returns true if successful
-	//! checks if QKeyEvent maches with a known shortcut and calls `processShortcutPressed()`
-	bool HandleKeyPress(QKeyEvent* event);
+	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);s
 
 	//! do a specified action on this widget
-	//! actionId: what action to do from the `getActions()` array
-	//! shouldLinkBack: should the Action before this be undone as well?
+	//! @param functionPointer: what action to do from the `getActions()` array
+	//! @param shouldLinkBack: should the Action before this be undone as well?
 	//! NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
 	//! actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
-	void doAction(size_t actionId, bool shouldLinkBack = false);
-	//static void doActions(size_t actionId, const std::vector<InteractiveModelView*> widgets, const std::vector<ActionStruct>& actions);
-	void doAction(size_t actionId, GuiActionIO data, bool shouldLinkBack = false);
+	void doAction(void* functionPointer, bool shouldLinkBack = false);
 	void doActionAt(size_t actionIndex, bool shouldLinkBack = false);
-	void doActionAt(size_t actionIndex, GuiActionIO data, bool shouldLinkBack = false);
+
+	template<typename DataType>
+	void doAction(void* functionPointer, DataType doData, bool shouldLinkBack = false)
+		{ doActionAt(getIndexFromFn(functionPointer), doData, nullptr, shouldLinkBack); }
+	void doAction(void* functionPointer, DataType doData, DataType undoData, bool shouldLinkBack = false)
+		{ doActionAt(getIndexFromFn(functionPointer), doData, &undoData, shouldLinkBack); }
+	template<typename DataType>
+	void doActionAt(size_t actionIndex, DataType doData, DataType* undoData = nullptr, bool shouldLinkBack = false)
+	{
+		const std::vector<CommandData>& actions = getActions();
+		if (actionIndex > actions.size()) { return; }
+		// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
+		qDebug("doActionAt typed before type return");
+		if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
+		qDebug("doActionAt typed after type return");
+
+		qDebug("doAction typed, %ld, %s", actionIndex, actions[actionIndex].getText().toStdString().c_str());
+		GuiActionTyped<DataType> action(actions[actionIndex].getText(), this, actions[actionIndex].doFn, actions[actionIndex].undoFn, doData, undoData, shouldLinkBack);
+		action.redo();
+	}
 
 	//! should return a unique id for different widget classes
 	template<typename BaseType>
 	static constexpr size_t getTypeId() { return typeid(BaseType).hash_code(); };
 	size_t getStoredTypeId();
 protected:
-	void keyPressEvent(QKeyEvent* event) override;
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
-
 	//! returns the avalible shortcuts for the widget
-	const std::vector<ActionStruct>& getActions() { return m_actionArray; };
-	std::vector<ActionStruct>& getActionsNotConst() { return m_actionArray; };
-	//! called when a shortcut message needs to be displayed
-	//! shortcut messages can be generated with `buildShortcutMessage()` (but it can be unoptimized to return `buildShortcutMessage()`)
-	virtual const QString& getShortcutMessage() = 0;
+	const std::vector<CommandData>& getActions() { return m_actionArray; };
 	//! override this if the widget requires custom updating code
 	//! shouldOverrideUpdate: should `update()` widget if `isHighlighted` didn't changed but for example color changed
 	virtual void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
-	//! place here the `QAction` and `ActionStruct` code and call it in constructor
-	virtual void addActions(std::vector<ActionStruct>& targetList) = 0;
+	//! place here the `QAction` and `CommandData` code and call it in constructor
+	virtual void addActions(std::vector<CommandData>& targetList) = 0;
 
 	//! draws the highlight automatically for the widget if highlighted
 	void drawAutoHighlight(QPainter* painter);
 	//! builds a string from a provided action array
-	static QString buildShortcutMessage(const std::vector<ActionStruct>& actions);
+	static QString buildShortcutMessage(const std::vector<CommandData>& actions);
 
 	bool getIsHighlighted() const;
 	//! shouldOverrideUpdate: should update if visible, ignore optimizations
 	//! shouldOverrideUpdate could be needed if the color was changed
 	void setIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
 
-	//! returns an index of an action from a given id, returns `getActions().size()` if not found
-	size_t getIndexFromId(size_t id);
+	//! returns an index of an action from a given id, assert fails if not found
+	size_t getIndexFromFn(void* functionPointer);
 
 	//! construct in derived constructor
-	std::vector<ActionStruct> m_actionArray;
+	std::vector<CommandData> m_actionArray;
 private slots:
 	inline static void timerStopHighlighting()
 	{
@@ -189,9 +187,6 @@ private slots:
 private:
 	bool m_isHighlighted;
 	
-	ActionStruct m_lastShortcut;
-	//! how many times was the last shortcut pressed
-	size_t m_lastShortcutCounter;
 	//! stores the widget's type id that created this object
 	const size_t m_interactiveModelViewTypeId;
 
@@ -201,6 +196,28 @@ private:
 	static SimpleTextFloat* s_simpleTextFloat;
 	static std::list<InteractiveModelView*> s_interactiveWidgets;
 };
+
+/*
+template<typename BaseType>
+class LMMS_EXPORT InteractiveModelViewTyped : public InteractiveModelView
+{
+public:
+	InteractiveModelViewTyped(QWidget* widget) :
+		InteractiveModelView(widget, getTypeId<BaseType>())
+	{}
+	InteractiveModelViewTyped(QWidget* widget, size_t typeId) :
+		InteractiveModelView(widget, typeId)
+	{}
+protected:
+	//! use Template Specialization to add customized actions
+	static std::vector<CommandData> addActions() { return std::vector<CommandData>(); }
+	virtual const std::vector<CommandData>& getActions() override { return s_actionArray; }
+	static std::vector<CommandData> s_actionArray;
+};
+
+inline template<typename BaseType>
+std::vector<CommandData> InteractiveModelViewTyped<BaseType>::s_actionArray(InteractiveModelViewTyped<BaseType>::addActions());
+*/
 
 } // namespace lmms::gui
 
