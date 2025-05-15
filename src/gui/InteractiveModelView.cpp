@@ -1,7 +1,7 @@
 /*
- * InteractiveModelView.cpp - Implements StringPair system and highlighting for widgets
+ * InteractiveModelView.cpp - Implements shortcut and action system for widgets
  *
- * Copyright (c) 2024 szeli1 <TODO/at/gmail/dot/com>
+ * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,16 +25,18 @@
 #include "InteractiveModelView.h"
 
 #include <algorithm>
+#include <cassert>
 
 #include <QKeyEvent>
 #include <QKeySequence> // displaying qt key names
-#include <QMimeData> // processPaste()
 #include <QPainter> // drawAutoHighlight()
 #include <QPainterPath> // drawAutoHighlight()
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "SimpleTextFloat.h"
+
+#include <iostream> // DEBUG REMOVE TODO
 
 namespace lmms::gui
 {
@@ -46,11 +48,16 @@ QTimer* InteractiveModelView::s_highlightTimer = nullptr;
 SimpleTextFloat* InteractiveModelView::s_simpleTextFloat = nullptr;
 std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
 
-InteractiveModelView::InteractiveModelView(QWidget* widget) :
+InteractiveModelView::InteractiveModelView(QWidget* widget, size_t typeId) :
 	QWidget(widget),
-	m_isHighlighted(false)
+	m_actionArray(),
+	m_isHighlighted(false),
+	m_lastShortcutCounter(0),
+	m_interactiveModelViewTypeId(typeId)
 {
 	s_interactiveWidgets.push_back(this);
+
+	m_lastShortcut.resetShortcut();
 }
 
 InteractiveModelView::~InteractiveModelView()
@@ -73,9 +80,18 @@ void InteractiveModelView::startHighlighting(Clipboard::DataType dataType)
 
 	bool shouldOverrideUpdate = *s_usedHighlightColor != *s_highlightColor;
 	if (shouldOverrideUpdate) { s_usedHighlightColor = std::make_unique<QColor>(*s_highlightColor); }
+
+	// highlighting the widgets that accept the data type
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
-		(*it)->overrideSetIsHighlighted((*it)->canAcceptClipboardData(dataType), shouldOverrideUpdate);
+		bool found = false;
+		const std::vector<ActionStruct>& actions = (*it)->getActions();
+		// this could be optimized by logging `getStoredTypeId()`s and comparing it's Id to the already accepted Ids
+		for (auto& curAction : actions)
+		{
+			if (curAction.doesTypeMatch(dataType)) { found = true; break; }
+		}
+		(*it)->overrideSetIsHighlighted(found, shouldOverrideUpdate);
 	}
 	s_highlightTimer->start(10000);
 }
@@ -141,23 +157,160 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 	s_highlightTimer->start(duration);
 }
 
-bool InteractiveModelView::processPaste(const QMimeData* mimeData)
+bool InteractiveModelView::HandleKeyPress(QKeyEvent* event)
 {
-	if (mimeData->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)) == false) { return false; }
+	qDebug("HandleKeyPress 1");
+	std::cout << "InteractiveModelView::HandleKeyPress this:" << this << "\n";
+	const std::vector<ActionStruct>& actions = getActions();
+	qDebug("HandleKeyPress 2");
+	
+	size_t foundIndex = 0;
+	size_t minMaxTimes = 0;
+	bool found = false;
 
-	Clipboard::DataType type = Clipboard::decodeKey(mimeData);
-	QString value = Clipboard::decodeValue(mimeData);
-	bool shouldAccept = processPasteImplementation(type, value);
-	if (shouldAccept)
+	// if the last shortcut's keys match the current keys
+	if (m_lastShortcut.doesShortcutMatch(event))
 	{
-		InteractiveModelView::stopHighlighting();
+		// find the highest `ActionStruct::times`
+		// or the shortcut that's `ActionStruct::times` == m_lastShortcutCounter
+		// by default `m_lastShortcutCounter == actions[i].times` shortcut will be the output, 
+		// but if this doesn't exist, the shortcut with the highest `times` will be the output
+		for (size_t i = 0; i < actions.size(); i++)
+		{
+			qDebug("HandleKeyPress 3");
+			if (actions[i].doesShortcutMatch(event))
+			{
+				// finding the shortcut with the largest m_times
+				if (found == false || minMaxTimes < actions[i].times)
+				{
+					foundIndex = i;
+					minMaxTimes = actions[i].times;
+				}
+				found = true;
+			
+				// or finding the shortcut where m_lastShortcutCounter == actions[i].times 
+				if (m_lastShortcutCounter == actions[i].times)
+				{
+					m_lastShortcutCounter = actions[i].isLoop ? 0 : m_lastShortcutCounter + 1;
+					foundIndex = i;
+					break;
+				}
+			}
+		}
 	}
-	return shouldAccept;
+	else
+	{
+		qDebug("HandleKeyPress 5");
+		// when a new shortcut is pressed (not the last)
+		// find it with the lowest `ActionStruct::times`
+		for (size_t i = 0; i < actions.size(); i++)
+		{
+			qDebug("HandleKeyPress 6");
+			if (actions[i].doesShortcutMatch(event))
+			{
+				qDebug("HandleKeyPress 7");
+				// selecting the shortcut with the lowest `ActionStruct::times`
+				if (found == false || minMaxTimes > actions[i].times)
+				{
+					foundIndex = i;
+					minMaxTimes = actions[i].times;
+					qDebug("HandleKeyPress 8");
+				}
+				m_lastShortcut.copyShortcut(actions[i]);
+				m_lastShortcutCounter = 1;
+				found = true;
+			}
+		}
+	}
+	if (found)
+	{
+		qDebug("HandleKeyPress 9");
+		QString message = actions[foundIndex].getText();
+		qDebug("HandleKeyPress 10");
+		showMessage(message);
+		qDebug("HandleKeyPress 11");
+		doActionAt(foundIndex);
+		qDebug("HandleKeyPress 12");
+
+		event->accept();
+	}
+	else
+	{
+		// reset focus
+		if (event->key() != Qt::Key_Control
+			&& event->key() != Qt::Key_Shift
+			&& event->key() != Qt::Key_Alt
+			&& event->key() != Qt::Key_AltGr)
+		{
+			getGUI()->mainWindow()->setFocusedInteractiveModel(nullptr);
+		}
+	}
+	return found;
+}
+
+void InteractiveModelView::keyPressEvent(QKeyEvent* event)
+{
+	// this will run `HandleKeyPress()` for the widget that is focused inside MainWindow
+	getGUI()->mainWindow()->focusedInteractiveModelHandleKeyPress(event);
+}
+
+void InteractiveModelView::enterEvent(QEvent* event)
+{
+	m_lastShortcutCounter = 0;
+	m_lastShortcut.resetShortcut();
+
+	QString message = getShortcutMessage();
+	showMessage(message);
+
+	if (isVisible())
+	{
+		// focus on this widget so keyPressEvent works
+		getGUI()->mainWindow()->setFocusedInteractiveModel(this);
+	}
+}
+
+void InteractiveModelView::leaveEvent(QEvent* event)
+{
+	hideMessage();
+}
+
+void InteractiveModelView::doAction(size_t actionId, bool shouldLinkBack)
+{
+	InteractiveModelView::doActionAt(getIndexFromId(actionId), GuiActionIO(), shouldLinkBack);
+}
+void InteractiveModelView::doAction(size_t actionId, GuiActionIO data, bool shouldLinkBack)
+{
+	InteractiveModelView::doActionAt(getIndexFromId(actionId), data, shouldLinkBack);
+}
+void InteractiveModelView::doActionAt(size_t actionIndex, bool shouldLinkBack)
+{
+	InteractiveModelView::doActionAt(actionIndex, GuiActionIO(), shouldLinkBack);
+}
+void InteractiveModelView::doActionAt(size_t actionIndex, GuiActionIO data, bool shouldLinkBack)
+{
+	std::vector<ActionStruct>& actions = getActionsNotConst();
+	if (actionIndex > actions.size()) { return; }
+	// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
+	qDebug("doActionAt before type return");
+	if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
+	qDebug("doActionAt after type return");
+
+	// if this assert fails, you will need to call the typed `doAction()`
+	assert(actions[actionIndex].doFn != nullptr);
+
+	qDebug("doAction, %ld", actionIndex);
+	GuiAction action(actions[actionIndex], data, 1, shouldLinkBack);
+	action.redo();
 }
 
 void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
 {
 	setIsHighlighted(isHighlighted, shouldOverrideUpdate);
+}
+
+size_t InteractiveModelView::getStoredTypeId()
+{
+	return m_interactiveModelViewTypeId;
 }
 
 void InteractiveModelView::drawAutoHighlight(QPainter* painter)
@@ -176,6 +329,29 @@ void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 	}
 }
 
+QString InteractiveModelView::buildShortcutMessage(const std::vector<ActionStruct>& actions)
+{
+	QString message = "";
+	for (size_t i = 0; i < actions.size(); i++)
+	{
+		if (actions[i].isShortcut == true)
+		{
+			message = message + QString("\"") + QKeySequence(actions[i].modifier).toString()
+				+ QKeySequence(actions[i].key).toString();
+			if (actions[i].times > 0)
+			{
+				message = message + QString(" (x") + QString::number(actions[i].times + 1) + QString(")");
+			}
+			message = message + QString("\": ") + actions[i].getText();
+			if (i + 1 < actions.size())
+			{
+				message = message + QString(", ");
+			}
+		}
+	}
+	return message;
+}
+
 bool InteractiveModelView::getIsHighlighted() const
 {
 	return m_isHighlighted;
@@ -192,5 +368,119 @@ void InteractiveModelView::setIsHighlighted(bool isHighlighted, bool shouldOverr
 		}
 	}
 }
+
+size_t InteractiveModelView::getIndexFromId(size_t id)
+{
+	const std::vector<ActionStruct>& actions = getActions();
+	for (size_t i = 0; i < actions.size(); i++)
+	{
+		if (actions[i].actionId == id)
+		{
+			return i;
+		}
+	}
+	return actions.size();
+}
+
+
+ActionStruct::ActionStruct(size_t id, QAction& doFnIn, QAction* undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
+	actionId(id),
+	//actionName(actionName),
+	doFn(&doFnIn),
+	undoFn(undoFnIn),
+	isTypeSpecific(isTypeSpecific),
+	isShortcut(false)
+{
+	addAcceptedDataType(acceptedType);
+}
+
+ActionStruct::~ActionStruct()
+{
+	// TODO delete from history
+}
+
+void ActionStruct::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop)
+{
+	isShortcut = true;
+	key = shortcutKey;
+	modifier = shortcutModifier;
+	times = shortcutTimes;
+	isLoop = isShortcutLoop;
+}
+
+void ActionStruct::addAcceptedDataType(Clipboard::DataType type)
+{
+	if (type == Clipboard::DataType::Error) { return; }
+	acceptedType.push_back(type);
+}
+
+void ActionStruct::resetShortcut()
+{
+	isShortcut = false;
+	key = Qt::Key_F35;
+	modifier = Qt::NoModifier;
+	times = 0;
+	isLoop = false;
+}
+
+bool ActionStruct::doesShortcutMatch(QKeyEvent* event) const
+{
+	// if shortcut key == event key and the shortcut modifier can be found inside event modifiers or there is no modifier
+	return isShortcut && key == event->key() && ((event->modifiers() & modifier)
+		|| (event->nativeModifiers() <= 0 && modifier == Qt::NoModifier));
+}
+
+bool ActionStruct::doesShortcutMatch(const ActionStruct& otherShortcut) const
+{
+	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier) && times == otherShortcut.times;
+}
+
+bool ActionStruct::doesFullShortcutMatch(const ActionStruct& otherShortcut) const
+{
+	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier) && times == otherShortcut.times && isLoop == otherShortcut.isLoop;
+}
+
+void ActionStruct::copyShortcut(const ActionStruct& otherShortcut)
+{
+	isShortcut = otherShortcut.isShortcut;
+	key = otherShortcut.key;
+	modifier = otherShortcut.modifier;
+	times = otherShortcut.times;
+	isLoop = otherShortcut.isLoop;
+}
+
+bool ActionStruct::doesTypeMatch(Clipboard::DataType type) const
+{
+	for (Clipboard::DataType curType : acceptedType)
+	{
+		if (curType == type) { return true; }
+	}
+	return false;
+}
+
+bool ActionStruct::isTypeAccepted(Clipboard::DataType type) const
+{
+	for (Clipboard::DataType curType : acceptedType)
+	{
+		if (curType == Clipboard::DataType::Any || curType == type) { return true; }
+	}
+	return false;
+}
+
+const QString ActionStruct::getText() const
+{
+	return doFn->text();
+}
+
+GuiActionIO* ActionStruct::getData()
+{
+	return &data;
+}
+
+void ActionStruct::setData(const GuiActionIO& newData)
+{
+	data = newData;
+}
+
 
 } // namespace lmms::gui
