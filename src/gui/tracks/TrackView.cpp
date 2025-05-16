@@ -198,7 +198,7 @@ Clipboard::DataType TrackView::getTrackStringPairType(Track* track)
 		default:
 			break;
 	}
-	return Clipboard::DataType::None;
+	return Clipboard::DataType::Error;
 }
 
 
