@@ -181,7 +181,7 @@ protected:
 	
 	// InteractiveModelView methods
 	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
-	void addActions(std::vector<CommandData>& targetList) override {}
+	void addCommands(std::vector<CommandData>& targetList) override {}
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos(TimePos);
