@@ -911,42 +911,39 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-		// Length in ticks of one snap increment
-		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
+
+		TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 
 		if( m_action == Action::Resize )
 		{
 			// The clip's new length
-			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
+			TimePos mouseOffset = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
+			TimePos newLength;
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-			if ( unquantizedModHeld(me) )
-			{	// We want to preserve this adjusted offset,
+			if (unquantizedModHeld(me))
+			{
+				// We want to preserve this adjusted offset,
 				// even if the user switches to snapping later
 				setInitialPos( m_initialMousePos );
 				// Don't resize to less than 1 tick
-				m_clip->changeLength( qMax<int>( 1, l ) );
-				m_clip->setAutoResize(false);
-			}
-			else if ( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's end position
-				TimePos end = TimePos( m_initialClipPos + l ).quantize( snapSize );
-				// The end position has to be after the clip's start
-				TimePos min = m_initialClipPos.quantize( snapSize );
-				if ( min <= m_initialClipPos ) min += snapLength;
-				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
-				m_clip->setAutoResize(false);
+				newLength = std::max(TimePos(1), mouseOffset);
 			}
 			else
-			{	// Otherwise, resize in fixed increments
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
-				// Don't resize to less than 1 tick
-				auto min = TimePos(initialLength % snapLength);
-				if (min < 1) min += snapLength;
-				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
-				m_clip->setAutoResize(false);
+			{
+				// Quantize length
+				TimePos lengthQ = std::max(TimePos(1), TimePos(mouseOffset).quantize(snapSize));
+				// Quantize global end position
+				TimePos endQ = std::max(TimePos(1), static_cast<TimePos>(TimePos(m_initialClipPos + mouseOffset).quantize(snapSize) - m_initialClipPos));
+				// Quantize length increment
+				TimePos deltaQ = std::max(TimePos(1), static_cast<TimePos>(initialLength + TimePos(mouseOffset - initialLength).quantize(snapSize)));
+				// Pick the one closest to the mouse position
+				if (std::abs(lengthQ - mouseOffset) <= std::abs(endQ - mouseOffset) && std::abs(lengthQ - mouseOffset) <= std::abs(deltaQ - mouseOffset)) { newLength = lengthQ; }
+				else if (std::abs(endQ - mouseOffset) <= std::abs(lengthQ - mouseOffset) && std::abs(endQ - mouseOffset) <= std::abs(deltaQ - mouseOffset)) { newLength = endQ; }
+				else { newLength = deltaQ; }
 			}
+			m_clip->changeLength(newLength);
+			m_clip->setAutoResize(false);
 		}
 		else
 		{
@@ -954,43 +951,40 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 
 			const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
-			TimePos t = qMax( 0, (int)
-								m_trackView->trackContainerView()->currentPosition() +
-								static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
-
-			if (!isResizableBeforeStart())
-			{
-				t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
-			}
+			TimePos mousePos = std::max(0, m_trackView->trackContainerView()->currentPosition() +
+								static_cast<int>(x * TimePos::ticksPerBar() / ppb));
+			TimePos newStart;
 
 			if( unquantizedModHeld(me) )
 			{	// We want to preserve this adjusted offset,
 				// even if the user switches to snapping later
-				setInitialPos( m_initialMousePos );
-				//Don't resize to less than 1 tick
-				t = qMin<int>( m_initialClipEnd - 1, t);
-			}
-			else if( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's start position
-				// Don't let the start position move past the end position
-				TimePos max = m_initialClipEnd.quantize( snapSize );
-				if ( max >= m_initialClipEnd ) max -= snapLength;
-				t = qMin<int>( max, t.quantize( snapSize ) );
+				setInitialPos(m_initialMousePos);
+				// Don't resize to less than 1 tick
+				newStart = std::min(mousePos, TimePos(m_initialClipEnd - 1));
 			}
 			else
-			{	// Otherwise, resize in fixed increments
-				// Don't resize to less than 1 tick
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				auto minLength = TimePos(initialLength % snapLength);
-				if (minLength < 1) minLength += snapLength;
-				TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
-				t = qMin<int>( m_initialClipEnd - minLength, m_initialClipPos + offset );
+			{
+				// Quantize length
+				TimePos lengthQ = std::min(m_initialClipEnd - TimePos(m_initialClipEnd - mousePos).quantize(snapSize), m_initialClipEnd - 1);
+				// Quantize global start position
+				TimePos startQ = std::min(mousePos.quantize(snapSize), TimePos(m_initialClipEnd - 1));
+				// Quantize length increment
+				TimePos deltaQ = std::min(m_initialClipPos - TimePos(m_initialClipPos - mousePos).quantize(snapSize), m_initialClipEnd - 1);
+				// Pick the one closest to the mouse position
+				if (std::abs(lengthQ - mousePos) <= std::abs(startQ - mousePos) && std::abs(lengthQ - mousePos) <= std::abs(deltaQ - mousePos)) { newStart = lengthQ; }
+				else if (std::abs(startQ - mousePos) <= std::abs(lengthQ - mousePos) && std::abs(startQ - mousePos) <= std::abs(deltaQ - mousePos)) { newStart = startQ; }
+				else { newStart = deltaQ; }
 			}
 
-			TimePos positionOffset = m_clip->startPosition() - t;
+			if (!isResizableBeforeStart())
+			{
+				newStart = std::max(newStart, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
+			}
+
+			TimePos positionOffset = m_clip->startPosition() - newStart;
 			if (m_clip->length() + positionOffset >= 1)
 			{
-				m_clip->movePosition(t);
+				m_clip->movePosition(newStart);
 				m_clip->changeLength(m_clip->length() + positionOffset);
 				if (pClip)
 				{
