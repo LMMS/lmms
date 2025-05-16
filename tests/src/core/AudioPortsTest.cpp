@@ -1,0 +1,1006 @@
+/*
+ * AudioPortsTest.cpp
+ *
+ * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include <algorithm>
+#include <iostream>
+#include <QDir>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QObject>
+#include <QtTest/QtTest>
+#include <qtestcase.h>
+
+#define LMMS_TESTING
+#include "PluginAudioPorts.h"
+
+namespace lmms {
+
+namespace {
+
+/*
+void zeroBuffer(std::span<SampleFrame> buffer)
+{
+	zeroSampleFrames(buffer.data(), buffer.size());
+}*/
+
+template<typename SampleT, proc_ch_t extent>
+void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
+{
+	for (proc_ch_t idx = 0; idx < buffer.channels(); ++idx)
+	{
+		auto ptr = buffer.buffer(idx);
+		std::fill_n(ptr, buffer.frames(), 0);
+	}
+}
+
+void zeroBuffer(AudioBus<SampleFrame> bus)
+{
+	for (track_ch_t channelPair = 0; channelPair < bus.channelPairs(); ++channelPair)
+	{
+		SampleFrame* buffer = bus[channelPair];
+		zeroSampleFrames(buffer, bus.frames());
+	}
+}
+
+template<class F>
+void transformBuffer(AudioBus<const SampleFrame> in, AudioBus<SampleFrame> out, const F& func)
+{
+	assert(in.channelPairs() == out.channelPairs());
+	assert(in.frames() == out.frames());
+	for (track_ch_t channelPair = 0; channelPair < in.channelPairs(); ++channelPair)
+	{
+		for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
+		{
+			out[channelPair][frame].leftRef() = func(in[channelPair][frame].left());
+			out[channelPair][frame].rightRef() = func(in[channelPair][frame].right());
+		}
+	}
+}
+
+template<class F>
+void transformBuffer(std::span<SampleFrame> inOut, const F& func)
+{
+	for (SampleFrame& sf : inOut)
+	{
+		sf = func(sf);
+	}
+}
+
+template<typename SampleT, proc_ch_t extent, class F>
+void transformBuffer(SplitAudioData<SampleT, extent> in, SplitAudioData<SampleT, extent> out, const F& func)
+{
+	assert(in.channels() == out.channels());
+	assert(in.frames() == out.frames());
+	for (proc_ch_t idx = 0; idx < in.channels(); ++idx)
+	{
+		auto inPtr = in.buffer(idx);
+		auto outPtr = out.buffer(idx);
+		std::transform(inPtr, inPtr + in.frames(), outPtr, func);
+	}
+}
+
+void compareBuffers(AudioBus<const SampleFrame> actual, AudioBus<const SampleFrame> expected)
+{
+	QCOMPARE(actual.channelPairs(), expected.channelPairs());
+	QCOMPARE(actual.frames(), expected.frames());
+	for (track_ch_t channelPair = 0; channelPair < actual.channelPairs(); ++channelPair)
+	{
+		for (f_cnt_t frame = 0; frame < actual.frames(); ++frame)
+		{
+			QCOMPARE(actual[channelPair][frame].left(), expected[channelPair][frame].left());
+			QCOMPARE(actual[channelPair][frame].right(), expected[channelPair][frame].right());
+		}
+	}
+}
+
+/*
+void compareBuffers(std::span<const SampleFrame> actual, std::span<const SampleFrame> expected)
+{
+	QCOMPARE(actual.size(), expected.size());
+	for (std::size_t frame = 0; frame < actual.size(); ++frame)
+	{
+		QCOMPARE(actual[frame].left(), expected[frame].left());
+		QCOMPARE(actual[frame].right(), expected[frame].right());
+	}
+}*/
+
+template<typename SampleT, proc_ch_t extent>
+void compareBuffers(SplitAudioData<SampleT, extent> actual, SplitAudioData<SampleT, extent> expected)
+{
+	QCOMPARE(actual.channels(), expected.channels());
+	QCOMPARE(actual.frames(), expected.frames());
+	for (proc_ch_t idx = 0; idx < actual.channels(); ++idx)
+	{
+		auto actualPtr = actual.buffer(idx);
+		auto expectedPtr = expected.buffer(idx);
+		for (f_cnt_t frame = 0; frame < actual.frames(); ++frame)
+		{
+			QCOMPARE(actualPtr[frame], expectedPtr[frame]);
+		}
+	}
+}
+
+} // namespace
+} // namespace lmms
+
+
+class AudioPortsTest : public QObject
+{
+	Q_OBJECT
+
+public:
+	static constexpr lmms::f_cnt_t MaxFrames = lmms::DEFAULT_BUFFER_SIZE;
+
+private:
+	std::vector<lmms::SampleFrame> m_coreBuffer;
+	lmms::SampleFrame* m_coreBufferPtr = nullptr;
+
+	auto getCoreBus() -> lmms::AudioBus<lmms::SampleFrame>
+	{
+		m_coreBuffer.resize(MaxFrames);
+		m_coreBufferPtr = m_coreBuffer.data();
+
+		std::fill_n(m_coreBuffer.data(), m_coreBuffer.size(), lmms::SampleFrame{});
+
+		return lmms::AudioBus<lmms::SampleFrame>{&m_coreBufferPtr, 1, MaxFrames};
+	}
+
+private slots:
+	void initTestCase()
+	{
+		using namespace lmms;
+		Engine::init(true);
+	}
+
+	void cleanupTestCase()
+	{
+		using namespace lmms;
+		Engine::destroy();
+	}
+
+	//! Verifies correct channel counts
+	void ChannelCounts()
+	{
+		using namespace lmms;
+
+		auto model = Model{nullptr};
+
+		// Channel counts should stay zero until known
+		auto apmNxN = AudioPortsModel{DynamicChannelCount, DynamicChannelCount, false, &model};
+		QCOMPARE(apmNxN.in().channelCount(), 0);
+		QCOMPARE(apmNxN.out().channelCount(), 0);
+
+		apmNxN.setChannelCountIn(4);
+		QCOMPARE(apmNxN.in().channelCount(), 4);
+		QCOMPARE(apmNxN.out().channelCount(), 0);
+
+		apmNxN.setChannelCountOut(8);
+		QCOMPARE(apmNxN.in().channelCount(), 4);
+		QCOMPARE(apmNxN.out().channelCount(), 8);
+
+		// The track channel count is 2 by default
+		QCOMPARE(apmNxN.trackChannelCount(), 2);
+
+		apmNxN.setTrackChannelCount(4);
+		QCOMPARE(apmNxN.trackChannelCount(), 4);
+
+		// stereo/stereo effect
+		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
+		QCOMPARE(apm2x2.in().channelCount(), 2);
+		QCOMPARE(apm2x2.out().channelCount(), 2);
+
+		// stereo instrument
+		auto apm0x2 = AudioPortsModel{0, 2, true, &model};
+		QCOMPARE(apm0x2.in().channelCount(), 0);
+		QCOMPARE(apm0x2.out().channelCount(), 2);
+	}
+
+	//! Verifies that the correct default connections are used for different channel counts
+	void DefaultConnections()
+	{
+		using namespace lmms;
+
+		auto model = Model{nullptr};
+
+		// 2 inputs, 2 outputs (stereo/stereo effect)
+		//
+		// In    Out
+		//  ___   ___
+		// |X| | |X| |
+		// | |X| | |X|
+		//  ---   ---
+
+		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
+		QCOMPARE(apm2x2.in().enabled(0, 0), true);
+		QCOMPARE(apm2x2.in().enabled(0, 1), false);
+		QCOMPARE(apm2x2.in().enabled(1, 0), false);
+		QCOMPARE(apm2x2.in().enabled(1, 1), true);
+
+		QCOMPARE(apm2x2.out().enabled(0, 0), true);
+		QCOMPARE(apm2x2.out().enabled(0, 1), false);
+		QCOMPARE(apm2x2.out().enabled(1, 0), false);
+		QCOMPARE(apm2x2.out().enabled(1, 1), true);
+
+		// 1 input, 1 output (mono/mono effect)
+		//
+		// In    Out
+		//  _     _
+		// |X|   |X|
+		// | |   |X|
+		//  -     -
+
+		auto apm1x1 = AudioPortsModel{1, 1, false, &model};
+		QCOMPARE(apm1x1.in().enabled(0, 0), true);
+		QCOMPARE(apm1x1.in().enabled(1, 0), false);
+
+		QCOMPARE(apm1x1.out().enabled(0, 0), true);
+		QCOMPARE(apm1x1.out().enabled(1, 0), true);
+
+		// 1 input, >2 outputs
+		//
+		// In    Out
+		//  _     _______
+		// |X|   |X| | | |
+		// | |   | |X| | |
+		//  -     -------
+
+		auto apm1x4 = AudioPortsModel{1, 4, false, &model};
+		QCOMPARE(apm1x4.in().enabled(0, 0), true);
+		QCOMPARE(apm1x4.in().enabled(1, 0), false);
+
+		QCOMPARE(apm1x4.out().enabled(0, 0), true);
+		QCOMPARE(apm1x4.out().enabled(0, 1), false);
+		QCOMPARE(apm1x4.out().enabled(0, 2), false);
+		QCOMPARE(apm1x4.out().enabled(0, 3), false);
+		QCOMPARE(apm1x4.out().enabled(1, 0), false);
+		QCOMPARE(apm1x4.out().enabled(1, 1), true);
+		QCOMPARE(apm1x4.out().enabled(1, 2), false);
+		QCOMPARE(apm1x4.out().enabled(1, 3), false);
+
+		// 2 inputs, 2 outputs (stereo instrument with stereo sidechain input)
+		//
+		// In    Out
+		//  ___   ___
+		// | | | |X| |
+		// | | | | |X|
+		//  ---   ---
+
+		auto apm2x2Inst = AudioPortsModel{2, 2, true, &model};
+		QCOMPARE(apm2x2Inst.in().enabled(0, 0), false);
+		QCOMPARE(apm2x2Inst.in().enabled(0, 1), false);
+		QCOMPARE(apm2x2Inst.in().enabled(1, 0), false);
+		QCOMPARE(apm2x2Inst.in().enabled(1, 1), false);
+
+		QCOMPARE(apm2x2Inst.out().enabled(0, 0), true);
+		QCOMPARE(apm2x2Inst.out().enabled(0, 1), false);
+		QCOMPARE(apm2x2Inst.out().enabled(1, 0), false);
+		QCOMPARE(apm2x2Inst.out().enabled(1, 1), true);
+	}
+
+	//! Verifies that the routed channels optimization works
+	void RoutedChannelsOptimization()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto model = Model{nullptr};
+		auto apm = AudioPortsModel{2, 2, false, &model};
+
+		// Out
+		//  ___
+		// |X| | 0
+		// | |X| 1
+		//  ---
+
+		// Track channels 0 and 1 should both have a processor output channel routed to them
+		QCOMPARE(apm.m_routedChannels[0], true);
+		QCOMPARE(apm.m_routedChannels[1], true);
+
+		// Out
+		//  ___
+		// | | | 0
+		// | |X| 1
+		//  ---
+
+		apm.out().setPin(0, 0, false);
+
+		// Now only track channel 1 should have a processor channel routed to it
+		QCOMPARE(apm.m_routedChannels[0], false);
+		QCOMPARE(apm.m_routedChannels[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// | |X| 1
+		//  ---
+
+		apm.out().setPin(0, 1, true);
+
+		QCOMPARE(apm.m_routedChannels[0], true);
+		QCOMPARE(apm.m_routedChannels[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// |X|X| 1
+		//  ---
+
+		apm.out().setPin(1, 0, true);
+
+		QCOMPARE(apm.m_routedChannels[0], true);
+		QCOMPARE(apm.m_routedChannels[1], true);
+	}
+
+	//! Verifies that the direct routing optimization works
+	void DirectRoutingOptimization()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto model = Model{nullptr};
+		auto apm = AudioPortsModel{2, 2, false, &model};
+
+		// In    Out
+		//  ___   ___
+		// |X| | |X| |
+		// | |X| | |X|
+		//  ---   ---
+
+		// The default pin connections for a 2x2 audio processor should allow direct routing
+		QCOMPARE(apm.m_directRouting.value_or(99), 0);
+
+		// Should still work after increasing the track channel count
+		apm.setTrackChannelCount(4);
+		QCOMPARE(apm.trackChannelCount(), 4);
+		QCOMPARE(apm.m_directRouting.value_or(99), 0);
+
+		// In    Out
+		//  ___   ___
+		// | | | |X| |
+		// | |X| | |X|
+		// | | | | | |
+		// | | | | | |
+		//  ---   ---
+
+		// Disabling a pin should prevent the optimization
+		apm.in().setPin(0, 0, false);
+		QCOMPARE(apm.m_directRouting.has_value(), false);
+
+		// In    Out
+		//  ___   ___
+		// | | | |X| |
+		// | | | | |X|
+		// |X| | | | |
+		// | |X| | | |
+		//  ---   ---
+
+		// The direct routing optimization requires the same track channel pairs on the input and output sides
+		apm.in().setPin(1, 1, false);
+		apm.in().setPin(2, 0, true);
+		apm.in().setPin(3, 1, true);
+		QCOMPARE(apm.m_directRouting.has_value(), false);
+
+		// In    Out
+		//  ___   ___
+		// | | | | | |
+		// | | | | | |
+		// |X| | |X| |
+		// | |X| | |X|
+		//  ---   ---
+
+		// But if the output side is also moved down, should be able to directly route the 2nd track channel pair
+		apm.out().setPin(0, 0, false);
+		apm.out().setPin(1, 1, false);
+		apm.out().setPin(2, 0, true);
+		apm.out().setPin(3, 1, true);
+		QCOMPARE(apm.m_directRouting.value_or(99), 1);
+
+		// Out
+		//  ___
+		// | | |
+		// | | |
+		// |X| |
+		// | |X|
+		//  ---
+
+		// If processor input channels are removed, the optimization should still apply
+		apm.setChannelCountIn(0);
+		QCOMPARE(apm.m_directRouting.value_or(99), 1);
+
+		// Out
+		//  _____
+		// | | | |
+		// | | | |
+		// |X| | |
+		// | |X| |
+		//  -----
+
+		// Adding a 3rd output channel should disable the optimization (only 0 or 2 channels allowed)
+		apm.setChannelCountOut(3);
+		QCOMPARE(apm.m_directRouting.has_value(), false);
+	}
+
+	//! Verifies correct default routing for 1x1 non-interleaved audio processor
+	void Routing_NonInterleaved1x1_Default()
+	{
+		using namespace lmms;
+
+		// Setup
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 1};
+		auto model = Model{nullptr};
+		auto ap = PluginAudioPorts<config>{false, &model};
+		ap.init();
+		auto coreBus = getCoreBus();
+
+		// Use left channel as processor input, upmix mono processor output to stereo
+		// In    Out
+		//  _     _
+		// |X|   |X|
+		// | |   |X|
+		//  -     -
+
+		// NOTE: If both channels were connected to the mono input, the signals would
+		//       be summed together and the amplitude would be doubled which is
+		//       undesirable, so the pin connector uses only the left channel as the
+		//       processor input, following what REAPER does by default.
+
+		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
+		trackChannels[0].setLeft(123.f);
+		trackChannels[0].setRight(321.f);
+		trackChannels[1].setLeft(456.f);
+		trackChannels[1].setRight(654.f);
+		trackChannels[33].setLeft(789.f);
+		trackChannels[33].setRight(987.f);
+
+		// Processor input and output buffers
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
+
+		// Route to processor
+		auto router = ap.getRouter();
+		router.send(coreBus, ins);
+
+		// Check that processor inputs have data on frames 0, 1, and 33 (should be left channel's data)
+		QCOMPARE(ins.buffer(0)[0], 123.f);
+		QCOMPARE(ins.buffer(0)[1], 456.f);
+		QCOMPARE(ins.buffer(0)[33], 789.f);
+
+		// Do work of processImpl - in this case it doubles the amplitude
+		transformBuffer(ins, outs, [](auto s) { return s * 2; });
+
+		// Construct buffer with the expected core bus result
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferPtrExpected = coreBufferExpected.data();
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		coreBusExpected[0][0] = SampleFrame{123.f * 2, 123.f * 2};
+		coreBusExpected[0][1] = SampleFrame{456.f * 2, 456.f * 2};
+		coreBusExpected[0][33] = SampleFrame{789.f * 2, 789.f * 2};
+
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
+
+		// Check that result is the original left track channel with doubled amplitude
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 123.f * 2);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 456.f * 2);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 789.f * 2);
+
+		// Test the rest of the buffer
+		compareBuffers(coreBus, coreBusExpected);
+	}
+
+	//! Verifies correct default routing for 2x2 non-interleaved audio processor
+	void Routing_NonInterleaved2x2_Default()
+	{
+		using namespace lmms;
+
+		// Setup
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
+		auto model = Model{nullptr};
+		auto ap = PluginAudioPorts<config>{false, &model};
+		ap.init();
+		auto coreBus = getCoreBus();
+
+		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
+		trackChannels[0].setLeft(123.f);
+		trackChannels[0].setRight(321.f);
+		trackChannels[1].setLeft(456.f);
+		trackChannels[1].setRight(654.f);
+		trackChannels[33].setLeft(789.f);
+		trackChannels[33].setRight(987.f);
+
+		// Processor input and output buffers
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
+
+		// Route to processor
+		auto router = ap.getRouter();
+		router.send(coreBus, ins);
+
+		// Check that processor inputs have data on frames 0, 1, and 33
+		QCOMPARE(ins.buffer(0)[0], 123.f);
+		QCOMPARE(ins.buffer(1)[0], 321.f);
+		QCOMPARE(ins.buffer(0)[1], 456.f);
+		QCOMPARE(ins.buffer(1)[1], 654.f);
+		QCOMPARE(ins.buffer(0)[33], 789.f);
+		QCOMPARE(ins.buffer(1)[33], 987.f);
+
+		// Do work of processImpl - in this case it doubles the amplitude
+		transformBuffer(ins, outs, [](auto s) { return s * 2; });
+
+		// Construct buffer with the expected core bus result
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferPtrExpected = coreBufferExpected.data();
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
+
+		// Sanity check for transformBuffer
+		QCOMPARE(outs.buffer(0)[0], 123.f * 2);
+		QCOMPARE(outs.buffer(1)[0], 321.f * 2);
+		QCOMPARE(outs.buffer(0)[1], 456.f * 2);
+		QCOMPARE(outs.buffer(1)[1], 654.f * 2);
+		QCOMPARE(outs.buffer(0)[33], 789.f * 2);
+		QCOMPARE(outs.buffer(1)[33], 987.f * 2);
+
+		// Zero core bus just to be sure what the processor output is
+		lmms::zeroBuffer(coreBus);
+
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
+
+		// Should be double the original
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f * 2);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f * 2);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f * 2);
+
+		// Test the rest of the buffer
+		compareBuffers(coreBus, coreBusExpected);
+	}
+
+	//! Verifies correct partially-bypassed routing for 2x2 non-interleaved audio processor
+	void Routing_NonInterleaved2x2_Bypass()
+	{
+		using namespace lmms;
+
+		// Setup
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
+		auto model = Model{nullptr};
+		auto ap = PluginAudioPorts<config>{false, &model};
+		ap.init();
+		auto coreBus = getCoreBus();
+
+		// Default input connections, disable right output channel
+		// In    Out
+		//  ___   ___
+		// |X| | |X| |
+		// | |X| | | |
+		//  ---   ---
+		auto& apm = ap.model();
+		apm.in().setPin(0, 0, true);
+		apm.in().setPin(0, 1, false);
+		apm.in().setPin(1, 0, false);
+		apm.in().setPin(1, 1, true);
+		apm.out().setPin(0, 0, true);
+		apm.out().setPin(0, 1, false);
+		apm.out().setPin(1, 0, false);
+		apm.out().setPin(1, 1, false);
+
+		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
+		trackChannels[0].setLeft(123.f);
+		trackChannels[0].setRight(321.f);
+		trackChannels[1].setLeft(456.f);
+		trackChannels[1].setRight(654.f);
+		trackChannels[33].setLeft(789.f);
+		trackChannels[33].setRight(987.f);
+
+		// Processor input and output buffers
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
+
+		// Route to processor
+		auto router = ap.getRouter();
+		router.send(coreBus, ins);
+
+		// Check that processor inputs have data on frames 0, 1, and 33
+		QCOMPARE(ins.buffer(0)[0], 123.f);
+		QCOMPARE(ins.buffer(1)[0], 321.f);
+		QCOMPARE(ins.buffer(0)[1], 456.f);
+		QCOMPARE(ins.buffer(1)[1], 654.f);
+		QCOMPARE(ins.buffer(0)[33], 789.f);
+		QCOMPARE(ins.buffer(1)[33], 987.f);
+
+		// Do work of processImpl - in this case it doubles the amplitude
+		transformBuffer(ins, outs, [](auto s) { return s * 2; });
+
+		// Construct buffer with the expected core bus result
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferPtrExpected = coreBufferExpected.data();
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		for (f_cnt_t frame = 0; frame < coreBus.frames(); ++frame)
+		{
+			SampleFrame& sf = coreBusExpected[0][frame];
+			sf.leftRef() = coreBus[0][frame].left() * 2; // left channel:  doubled output from processor
+			sf.rightRef() = coreBus[0][frame].right();   // right channel: bypassed
+		}
+
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
+
+		// Right track channel should pass through, but left track channel
+		// should be overwritten with processor's left output channel
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f);
+
+		// Test the rest of the buffer
+		compareBuffers(coreBus, coreBusExpected);
+	}
+
+	//! Verifies correct default routing for 2x2 SampleFrame-based audio processor
+	void Routing_SampleFrame2x2_Default()
+	{
+		using namespace lmms;
+
+		// Setup
+		constexpr auto config = AudioPortsConfig {
+			AudioDataKind::SampleFrame, true, 2, 2, true
+		};
+		auto model = Model{nullptr};
+		auto ap = PluginAudioPorts<config>{false, &model};
+		ap.init();
+		auto coreBus = getCoreBus();
+
+		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
+		trackChannels[0].setLeft(123.f);
+		trackChannels[0].setRight(321.f);
+		trackChannels[1].setLeft(456.f);
+		trackChannels[1].setRight(654.f);
+		trackChannels[33].setLeft(789.f);
+		trackChannels[33].setRight(987.f);
+
+		// Processor input/output buffer
+		auto inOut = ap.inputOutputBuffer();
+
+		// Route to processor
+		auto router = ap.getRouter();
+		router.send(coreBus, inOut);
+
+		// Check that processor inputs have data on frames 0, 1, and 33
+		QCOMPARE(inOut[0].left(), 123.f);
+		QCOMPARE(inOut[0].right(), 321.f);
+		QCOMPARE(inOut[1].left(), 456.f);
+		QCOMPARE(inOut[1].right(), 654.f);
+		QCOMPARE(inOut[33].left(), 789.f);
+		QCOMPARE(inOut[33].right(), 987.f);
+
+		// Do work of processImpl - in this case it doubles the amplitude
+		transformBuffer(inOut, [](auto s) { return s * 2; });
+
+		// Construct buffer with the expected core bus result
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferPtrExpected = coreBufferExpected.data();
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
+
+		// Zero core bus just to be sure what the processor output is
+		lmms::zeroBuffer(coreBus);
+
+		// Route from processor back to Core
+		router.receive(inOut, coreBus);
+
+		// Should be double the original
+		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f * 2);
+		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f * 2);
+		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f * 2);
+
+		// Test the rest of the buffer
+		compareBuffers(coreBus, coreBusExpected);
+	}
+
+	//! Verifies correct signal summing when routing a 1x2 non-interleaved audio processor
+	void Routing_NonInterleaved1x2_Sum()
+	{
+		using namespace lmms;
+
+		// Setup
+		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 2};
+		auto model = Model{nullptr};
+		auto ap = PluginAudioPorts<config>{false, &model};
+		ap.init();
+		auto coreBus = getCoreBus();
+
+		// Sum both track channels together for processor input, and sum the
+		//     two processor output channels together for the left track channel output
+		// In    Out
+		//  _     ___
+		// |X|   |X|X|
+		// |X|   | | |
+		//  -     ---
+		auto& apm = ap.model();
+		apm.in().setPin(0, 0, true);
+		apm.in().setPin(1, 0, true);
+		apm.out().setPin(0, 0, true);
+		apm.out().setPin(0, 1, true);
+		apm.out().setPin(1, 0, false);
+		apm.out().setPin(1, 1, false);
+
+		// Data on frames 0, 1, and 33
+		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
+		trackChannels[0].setLeft(123.f);
+		trackChannels[0].setRight(321.f);
+		trackChannels[1].setLeft(456.f);
+		trackChannels[1].setRight(654.f);
+		trackChannels[33].setLeft(789.f);
+		trackChannels[33].setRight(987.f);
+
+		// Processor input and output buffers
+		auto ins = ap.inputBuffer();
+		auto outs = ap.outputBuffer();
+
+		// Route to processor
+		auto router = ap.getRouter();
+		router.send(coreBus, ins);
+
+		// Check that processor inputs have data on frames 0, 1, and 33 (should be both track channels summed together)
+		QCOMPARE(ins.buffer(0)[0], 123.f + 321.f);
+		QCOMPARE(ins.buffer(0)[1], 456.f + 654.f);
+		QCOMPARE(ins.buffer(0)[33], 789.f + 987.f);
+
+		// Do work of processImpl - in this case it does nothing (passthrough)
+		const auto process = [](auto s) { return s; };
+		std::transform(ins.buffer(0), ins.buffer(0) + ins.frames(), outs.buffer(0), process);
+		std::transform(ins.buffer(0), ins.buffer(0) + ins.frames(), outs.buffer(1), process);
+
+		// Construct buffer with the expected core bus result
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferPtrExpected = coreBufferExpected.data();
+		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		coreBusExpected[0][0] = SampleFrame{(123.f + 321.f) * 2, 321.f};
+		coreBusExpected[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
+		coreBusExpected[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};
+
+		// Route from processor back to Core
+		router.receive(outs, coreBus);
+
+		// Check that result is the two original track channels added together then doubled
+		QCOMPARE(coreBus[0][0].left(), (123.f + 321.f) * 2);
+		QCOMPARE(coreBus[0][0].right(), 321.f);
+		QCOMPARE(coreBus[0][1].left(), (456.f + 654.f) * 2);
+		QCOMPARE(coreBus[0][1].right(), 654.f);
+		QCOMPARE(coreBus[0][33].left(), (789.f + 987.f) * 2);
+		QCOMPARE(coreBus[0][33].right(), 987.f);
+
+		// Test the rest of the buffer
+		compareBuffers(coreBus, coreBusExpected);
+	}
+
+	//! Verifies correct routing when the direct routing optimization is active
+	void Routing_SampleFrame2x2_DirectRouting()
+	{
+		using namespace lmms;
+
+		auto model = Model{nullptr};
+
+		// Helper for running this test with different configurations
+		auto testWithConfig = [&]<AudioPortsConfig config>(PluginAudioPorts<config>& ap) {
+			ap.init();
+
+			// Data on frames 0, 1, and 33
+			auto coreBus = getCoreBus();
+			SampleFrame* trackChannels = coreBus[0]; // channels 0/1
+			trackChannels[0].setLeft(123.f);
+			trackChannels[0].setRight(321.f);
+			trackChannels[1].setLeft(456.f);
+			trackChannels[1].setRight(654.f);
+			trackChannels[33].setLeft(789.f);
+			trackChannels[33].setRight(987.f);
+
+			// Construct buffer with the expected core bus result
+			auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+			auto coreBufferPtrExpected = coreBufferExpected.data();
+			auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+			transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
+
+			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsConfig.
+			struct Process
+			{
+				PluginAudioPorts<config>& ap;
+
+				// Statically in-place config
+				void operator()(std::span<SampleFrame> inOut)
+				{
+					for (auto& s : inOut) { s *= 2; }
+				}
+
+				// Dynamically in-place config
+				void operator()(std::span<const SampleFrame> in, std::span<SampleFrame> out)
+				{
+					for (std::size_t frame = 0; frame < in.size(); ++frame)
+					{
+						out[frame] = in[frame] * 2;
+					}
+				}
+
+				// Buffered config
+				void operator()()
+				{
+					if constexpr (config.inplace)
+					{
+						auto inOut = ap.inputOutputBuffer();
+						(*this)(inOut);
+					}
+					else
+					{
+						auto in = ap.inputBuffer();
+						auto out = ap.outputBuffer();
+						(*this)(in, out);
+					}
+				}
+			};
+
+			QCOMPARE(ap.m_directRouting.value_or(99), 0);
+
+			// Use the Router::process method which handles routing into and out of the audio processor,
+			// and calls the processor's process method we provide (in this case it doubles the amplitude).
+			// Also applies the "direct routing" optimization.
+			auto router = ap.getRouter();
+			router.process(coreBus, *ap.buffers(), Process{ap});
+
+			// Should be double the original
+			QCOMPARE(coreBus[0][0].left(), 123.f * 2);
+			QCOMPARE(coreBus[0][0].right(), 321.f * 2);
+			QCOMPARE(coreBus[0][1].left(), 456.f * 2);
+			QCOMPARE(coreBus[0][1].right(), 654.f * 2);
+			QCOMPARE(coreBus[0][33].left(), 789.f * 2);
+			QCOMPARE(coreBus[0][33].right(), 987.f * 2);
+
+			// Test the rest of the buffer
+			compareBuffers(coreBus, coreBusExpected);
+		};
+
+		// Test statically in-place, non-buffered
+		{
+			constexpr auto config = AudioPortsConfig {
+				AudioDataKind::SampleFrame, true, 2, 2, true, false
+			};
+			auto ap = PluginAudioPorts<config>{false, &model};
+			testWithConfig(ap);
+		}
+
+		// Test statically in-place, buffered
+		{
+			constexpr auto config = AudioPortsConfig {
+				AudioDataKind::SampleFrame, true, 2, 2, true, true
+			};
+			auto ap = PluginAudioPorts<config>{false, &model};
+			testWithConfig(ap);
+		}
+
+		// TODO: If/when SampleFrame-based audio processors support dynamically in-place
+		//       processing, add those tests here
+	}
+
+	//! Verifies correct saving and loading of model
+	void SaveLoad()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto model = Model{nullptr};
+		auto apm = AudioPortsModel{2, 4, false, &model};
+
+		/*
+		// For debugging
+		auto print = [](const AudioPortsModel& m) {
+			for (track_ch_t tc = 0; tc < m.trackChannelCount(); ++tc) {
+				for (proc_ch_t pc = 0; pc < m.in().channelCount(); ++pc) {
+					std::cout << (m.in().enabled(tc, pc) ? 'X' : 'O');
+				}
+				std::cout << "    ";
+				for (proc_ch_t pc = 0; pc < m.out().channelCount(); ++pc) {
+					std::cout << (m.out().enabled(tc, pc) ? 'X' : 'O');
+				}
+				std::cout << '\n';
+			}
+		};
+		*/
+
+		// In    Out
+		//  ___   _______
+		// | |X| | |X| | |
+		// |X| | |X| |X|X|
+		//  ---   -------
+
+		apm.in().setPin(0, 0, false);
+		apm.in().setPin(1, 1, false);
+		apm.in().setPin(0, 1, true);
+		apm.in().setPin(1, 0, true);
+
+		apm.out().setPin(0, 0, false);
+		apm.out().setPin(1, 1, false);
+		apm.out().setPin(0, 1, true);
+		apm.out().setPin(1, 0, true);
+		apm.out().setPin(0, 2, false);
+		apm.out().setPin(1, 3, false);
+		apm.out().setPin(0, 3, true);
+		apm.out().setPin(1, 2, true);
+
+		// Save model
+		auto doc = QDomDocument{"test-document"};
+		auto elem = doc.createElement("test-element");
+		apm.saveSettings(doc, elem);
+
+		// New model with wrong channel counts and wrong pin connections
+		auto apm2 = AudioPortsModel{1, 1, false, &model};
+
+		int dataChangedCount = 0;
+		int propertiesChangedCount = 0;
+		connect(&apm2, &AudioPortsModel::dataChanged, [&]() { ++dataChangedCount; });
+		connect(&apm2, &AudioPortsModel::propertiesChanged, [&]() { ++propertiesChangedCount; });
+
+		// Load old model's settings into new model
+		apm2.loadSettings(elem);
+
+		Q_ASSERT(apm2.in().channelCount() == 2);
+		Q_ASSERT(apm2.out().channelCount() == 4);
+
+		Q_ASSERT(apm2.in().enabled(0, 0) == false);
+		Q_ASSERT(apm2.in().enabled(1, 1) == false);
+		Q_ASSERT(apm2.in().enabled(0, 1) == true);
+		Q_ASSERT(apm2.in().enabled(1, 0) == true);
+
+		Q_ASSERT(apm2.out().enabled(0, 0) == false);
+		Q_ASSERT(apm2.out().enabled(1, 1) == false);
+		Q_ASSERT(apm2.out().enabled(0, 1) == true);
+		Q_ASSERT(apm2.out().enabled(1, 0) == true);
+		Q_ASSERT(apm2.out().enabled(0, 2) == false);
+		Q_ASSERT(apm2.out().enabled(1, 3) == false);
+		Q_ASSERT(apm2.out().enabled(0, 3) == true);
+		Q_ASSERT(apm2.out().enabled(1, 2) == true);
+
+		// The `dataChanged` signal should only be emitted once
+		Q_ASSERT(dataChangedCount == 1);
+
+		// The `propertiesChanged` signal should only be emitted once
+		Q_ASSERT(propertiesChangedCount == 1);
+	}
+};
+
+QTEST_GUILESS_MAIN(AudioPortsTest)
+#include "AudioPortsTest.moc"

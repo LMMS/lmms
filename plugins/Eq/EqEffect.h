@@ -24,7 +24,7 @@
 #ifndef EQEFFECT_H
 #define EQEFFECT_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "EqControls.h"
 #include "EqFilter.h"
 
@@ -35,13 +35,11 @@ namespace lmms
 {
 
 
-class EqEffect : public Effect
+class EqEffect : public DefaultEffect
 {
 public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{
@@ -65,6 +63,8 @@ public:
 	}
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	EqControls m_eqControls;
 
 	EqHp12Filter m_hp12;

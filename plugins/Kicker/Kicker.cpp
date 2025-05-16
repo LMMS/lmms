@@ -64,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 
 
 KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &kicker_plugin_descriptor, nullptr, Flag::IsNotBendable),
+	Instrument(&kicker_plugin_descriptor, _instrument_track, nullptr, Flag::IsNotBendable),
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 440.0f, 5.0f, 5000.0f, 1.0f, 5000.0f, this, tr( "Length" ) ),
@@ -155,21 +155,20 @@ QString KickerInstrument::nodeName() const
 using DistFX = DspEffectLibrary::Distortion;
 using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
-void KickerInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void KickerInstrument::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 	const float decfr = m_decayModel.value() * Engine::audioEngine()->outputSampleRate() / 1000.0f;
-	const f_cnt_t tfp = _n->totalFramesPlayed();
+	const f_cnt_t tfp = nph->totalFramesPlayed();
 
-	if (!_n->m_pluginData)
+	if (!nph->m_pluginData)
 	{
-		_n->m_pluginData = new SweepOsc(
+		nph->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),
 							m_gainModel.value() ),
-					m_startNoteModel.value() ? _n->frequency() : m_startFreqModel.value(),
-					m_endNoteModel.value() ? _n->frequency() : m_endFreqModel.value(),
+					m_startNoteModel.value() ? nph->frequency() : m_startFreqModel.value(),
+					m_endNoteModel.value() ? nph->frequency() : m_endFreqModel.value(),
 					m_noiseModel.value() * m_noiseModel.value(),
 					m_clickModel.value() * 0.25f,
 					m_slopeModel.value(),
@@ -178,32 +177,32 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 					m_distEndModel.value(),
 					decfr );
 	}
-	else if( tfp > decfr && !_n->isReleased() )
+	else if (tfp > decfr && !nph->isReleased())
 	{
-		_n->noteOff();
+		nph->noteOff();
 	}
 
-	auto so = static_cast<SweepOsc*>(_n->m_pluginData);
-	so->update( _working_buffer + offset, frames, Engine::audioEngine()->outputSampleRate() );
+	auto so = static_cast<SweepOsc*>(nph->m_pluginData);
+	so->update(out.data() + offset, frames, Engine::audioEngine()->outputSampleRate());
 
-	if( _n->isReleased() )
+	if (nph->isReleased())
 	{
 		// We need this to check if the release has ended
 		const float desired = desiredReleaseFrames();
 
 		// This can be considered the current release frame in the "global" context of the release.
 		// We need it with the desired number of release frames to compute the linear decay.
-		fpp_t currentReleaseFrame = _n->releaseFramesDone();
+		fpp_t currentReleaseFrame = nph->releaseFramesDone();
 
 		// Start applying the release at the correct frame
-		const float framesBeforeRelease = _n->framesBeforeRelease();
+		const float framesBeforeRelease = nph->framesBeforeRelease();
 		for (fpp_t f = framesBeforeRelease; f < frames; ++f, ++currentReleaseFrame)
 		{
 			const bool releaseStillActive = currentReleaseFrame < desired;
 			const float attenuation = releaseStillActive ? (1.0f - (currentReleaseFrame / desired)) : 0.f;
 
-			_working_buffer[f + offset][0] *= attenuation;
-			_working_buffer[f + offset][1] *= attenuation;
+			out[f + offset][0] *= attenuation;
+			out[f + offset][1] *= attenuation;
 		}
 	}
 }

@@ -711,6 +711,18 @@ lmms--gui--PianoView {
 	background-color: #14171a;
 }
 
+/* pin connector */
+
+lmms--gui--PinConnector {
+	qproperty-backgroundColor: rgb(80, 80, 80);
+}
+
+lmms--gui--PinConnector--MatrixView {
+	qproperty-lineColor: rgb(192, 192, 192);
+	qproperty-enabledColor: rgb(124, 207, 98);
+	qproperty-disabledColor: rgb(80, 80, 80);
+}
+
 /* font sizes for text buttons */
 
 lmms--gui--MixerView QPushButton,
