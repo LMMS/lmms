@@ -50,12 +50,9 @@ InteractiveModelView::InteractiveModelView(QWidget* widget, size_t typeId) :
 	QWidget(widget),
 	m_actionArray(),
 	m_isHighlighted(false),
-	m_lastShortcutCounter(0),
 	m_interactiveModelViewTypeId(typeId)
 {
 	s_interactiveWidgets.push_back(this);
-
-	m_lastShortcut.resetShortcut();
 }
 
 InteractiveModelView::~InteractiveModelView()
@@ -155,9 +152,9 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 	s_highlightTimer->start(duration);
 }
 
-void InteractiveModelView::doAction(size_t actionId, bool shouldLinkBack)
+void InteractiveModelView::doAction(void* functionPointer, bool shouldLinkBack)
 {
-	InteractiveModelView::doActionAt(getIndexFromId(actionId), shouldLinkBack);
+	InteractiveModelView::doActionAt(getIndexFromFn(functionPointer), shouldLinkBack);
 }
 void InteractiveModelView::doActionAt(size_t actionIndex, bool shouldLinkBack)
 {
@@ -169,8 +166,8 @@ void InteractiveModelView::doActionAt(size_t actionIndex, bool shouldLinkBack)
 	qDebug("doActionAt after type return");
 
 	qDebug("doAction typed, %ld, %s", actionIndex, actions[actionIndex].getText().toStdString().c_str());
-	GuiAction action(actions[actionIndex].getText(), this, actions[actionIndex].doFn, actions[actionIndex].undoFn, 1, shouldLinkBack);
-	action.redo();
+	GuiCommand command(actions[actionIndex].getText(), this, *actions[actionIndex].doFn, *actions[actionIndex].undoFn, 1, shouldLinkBack);
+	command.redo();
 }
 
 void InteractiveModelView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
@@ -221,7 +218,7 @@ size_t InteractiveModelView::getIndexFromFn(void* functionPointer)
 	const std::vector<CommandData>& actions = getActions();
 	for (size_t i = 0; i < actions.size(); i++)
 	{
-		if (actions[i].doFn.isMatch(functionPointer))
+		if (actions[i].doFn->isMatch(functionPointer))
 		{
 			return i;
 		}
@@ -232,9 +229,9 @@ size_t InteractiveModelView::getIndexFromFn(void* functionPointer)
 
 
 CommandData::CommandData(QString& name, CommandFnPtr& doFnIn, CommandFnPtr& undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
-	actionName(actionName),
+	commandName(name),
 	doFn(&doFnIn),
-	undoFn(undoFnIn),
+	undoFn(&undoFnIn),
 	isTypeSpecific(isTypeSpecific),
 	isShortcut(false)
 {
@@ -313,7 +310,7 @@ bool CommandData::isTypeAccepted(Clipboard::DataType type) const
 
 const QString& CommandData::getText() const
 {
-	return m_name;
+	return commandName;
 }
 
 } // namespace lmms::gui

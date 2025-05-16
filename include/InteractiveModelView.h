@@ -35,7 +35,7 @@
 #include <QColor>
 
 #include "Clipboard.h"
-#include "GuiAction.h"
+#include "GuiCommand.h"
 #include "lmms_export.h"
 
 class QColor;
@@ -64,11 +64,11 @@ struct CommandData
 	//! use this to add more datatypes to an action `Clipboard::DataType::Error` will not be added
 	void addAcceptedDataType(Clipboard::DataType type);
 	//! display name
-	QString actionName = "";
+	QString commandName = "";
 
-	//! Function pointers needed to construct `GuiAction`
-	CommandFnPtr doFn;
-	CommandFnPtr undoFn;
+	//! Function pointers needed to construct `GuiCommand`
+	std::unique_ptr<CommandFnPtr> doFn;
+	std::unique_ptr<CommandFnPtr> undoFn;
 
 	//! if the action can not be performed with other kinds of widgets (example for false: delete action)
 	bool isTypeSpecific = true;
@@ -121,7 +121,7 @@ public:
 	//! @param duration: highlight time in milliseconds
 	//! @param shouldStopHighlightingOrhers: calls `stopHighlighting()`,
 	//! should be false if multiple widgets are highlighted and `this` is not the first one
-	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);s
+	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);
 
 	//! do a specified action on this widget
 	//! @param functionPointer: what action to do from the `getActions()` array
@@ -134,6 +134,7 @@ public:
 	template<typename DataType>
 	void doAction(void* functionPointer, DataType doData, bool shouldLinkBack = false)
 		{ doActionAt(getIndexFromFn(functionPointer), doData, nullptr, shouldLinkBack); }
+	template<typename DataType>
 	void doAction(void* functionPointer, DataType doData, DataType undoData, bool shouldLinkBack = false)
 		{ doActionAt(getIndexFromFn(functionPointer), doData, &undoData, shouldLinkBack); }
 	template<typename DataType>
@@ -147,7 +148,7 @@ public:
 		qDebug("doActionAt typed after type return");
 
 		qDebug("doAction typed, %ld, %s", actionIndex, actions[actionIndex].getText().toStdString().c_str());
-		GuiActionTyped<DataType> action(actions[actionIndex].getText(), this, actions[actionIndex].doFn, actions[actionIndex].undoFn, doData, undoData, shouldLinkBack);
+		GuiActionTyped<DataType> action(actions[actionIndex].getText(), this, *actions[actionIndex].doFn, *actions[actionIndex].undoFn, doData, undoData, shouldLinkBack);
 		action.redo();
 	}
 
