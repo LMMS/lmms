@@ -1174,13 +1174,13 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	{
 		for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
 		{
-			int cur_ticks = POS(it);
-			int cur_x = _x + cur_ticks * m_ppb / TimePos::ticksPerBar();
-			const float cur_level = INVAL(it);
-			int cur_y = middle_y - cur_level * m_keyLineHeight;
+			int curTicks = POS(it);
+			int curX = _x + curTicks * m_ppb / TimePos::ticksPerBar();
+			const float curLevel = INVAL(it);
+			int curY = middle_y - curLevel * m_keyLineHeight;
 			_p.drawEllipse(
-				cur_x - DETUNING_HANDLE_RADIUS,
-				cur_y - DETUNING_HANDLE_RADIUS,
+				curX - DETUNING_HANDLE_RADIUS,
+				curY - DETUNING_HANDLE_RADIUS,
 				2 * DETUNING_HANDLE_RADIUS,
 				2 * DETUNING_HANDLE_RADIUS);
 		}
@@ -2891,13 +2891,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	if (!m_parameterEditClickedNote) { return; }
 
 	// Calculate the key and time of the mouse cursor in the piano roll
-	int key_num = getKey( me->y() );
-	int pos_ticks = (me->x() - m_whiteKeyWidth) *
+	int keyNum = getKey(me->y());
+	int posTicks = (me->x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// Calculate the relative position of the mouse with respect to the note.
-	TimePos relativePos = pos_ticks - m_parameterEditClickedNote->pos();
-	int relativeKey = key_num - m_parameterEditClickedNote->key();
+	TimePos relativePos = posTicks - m_parameterEditClickedNote->pos();
+	int relativeKey = keyNum - m_parameterEditClickedNote->key();
 
 	// Set the quantization of the automation editor to match the piano roll. This is not an ideal system, but it works.
 	AutomationClip::setQuantization(quantization());
@@ -2927,7 +2927,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			}
 		}
 	}
-	m_lastParameterEditTick = pos_ticks;
+	m_lastParameterEditTick = posTicks;
 }
 
 void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
@@ -3787,14 +3787,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			int pos_ticks = note->pos();
 
-			int detuning_length = note->detuning()->automationClip()->getTimeMap().lastKey() * m_ppb / TimePos::ticksPerBar();
+			int detuningLength = note->detuning()->automationClip()->getTimeMap().lastKey() * m_ppb / TimePos::ticksPerBar();
 
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 			const int x = ( pos_ticks - m_currentPosition ) *
 					m_ppb / TimePos::ticksPerBar();
 			// Skip this note if not in visible area at all
 			// But still draw the note if the detuning curve extends past the end of it.
-			if (!(x + std::max(note_width, detuning_length) >= 0 && x <= width() - m_whiteKeyWidth))
+			if (!(x + std::max(note_width, detuningLength) >= 0 && x <= width() - m_whiteKeyWidth))
 			{
 				continue;
 			}
