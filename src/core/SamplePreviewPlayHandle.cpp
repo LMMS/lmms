@@ -42,7 +42,7 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 
 	if (!m_sndfile)
 	{
-		throw std::runtime_error{"Failed to create sample preview stream: " + std::string{sf_strerror()}};
+		throw std::runtime_error{"Failed to create sample preview stream: " + std::string{sf_strerror(nullptr)}};
 	}
 
 	if (m_sfinfo.channels == 0 || m_sfinfo.frames == 0)
