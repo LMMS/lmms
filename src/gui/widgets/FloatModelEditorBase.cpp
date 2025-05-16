@@ -67,9 +67,144 @@ void FloatModelEditorBase::initUi(const QString & name)
 
 	setWindowTitle(name);
 
+	addCommands(m_commandArray);
+
 	setFocusPolicy(Qt::ClickFocus);
 
 	doConnections();
+}
+
+void FloatModelEditorBase::addCommands(std::vector<CommandData>& targetList)
+{
+	auto unlinkCommand = TypedCommandFnPtr<FloatModelEditorBase, int>(&FloatModelEditorBase::unlinkCommand);
+	targetList =
+	{
+		CommandData(1, "Copy value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::copyValueCommand), nullptr, true),
+		CommandData(2, "Paste value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::pasteNoReturnCommand), nullptr, true),
+		CommandData(3, "Paste value", TypedCommandFnPtr<FloatModelEditorBase, bool*>(&FloatModelEditorBase::pasteCommand), nullptr, true),
+		CommandData(4, "Link widget", TypedCommandFnPtr<FloatModelEditorBase, int>(&FloatModelEditorBase::linkCommand),
+			&unlinkCommand, true),
+		CommandData(5, "Copy link", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::getLinkCommand), nullptr, true),
+		CommandData(6, "Unlink from all", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::unlinkAllCommand), nullptr, true),
+		CommandData(7, "Increase value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::increaseValueCommand), nullptr, true),
+		CommandData(8, "Decrease value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::decreaseValueCommand), nullptr, true),
+		CommandData(9, "Set value", TypedCommandFnPtr<FloatModelEditorBase, float>(&FloatModelEditorBase::setValueCommand), nullptr, true),
+		CommandData(11, "Edit value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::openInputDialogCommand), nullptr, true),
+		CommandData(12, "Toggle scale", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::toggleScaleCommand), nullptr, true),
+		CommandData(13, "Set scale logarithmic", TypedCommandFnPtr<FloatModelEditorBase, bool>(&FloatModelEditorBase::setScaleLogarithmicCommand), nullptr, true)
+	};
+}
+
+void FloatModelEditorBase::copyValueCommand()
+{
+	Clipboard::copyStringPair(Clipboard::DataType::FloatValue, Clipboard::encodeFloatValue(model()->value() * getConversionFactor()));
+	InteractiveModelView::startHighlighting(Clipboard::DataType::FloatValue);
+}
+void FloatModelEditorBase::pasteNoReturnCommand()
+{
+	FloatModelEditorBase::pasteCommand(nullptr);
+}
+void FloatModelEditorBase::pasteCommand(bool* isSuccessful)
+{
+	Clipboard::DataType type = Clipboard::decodeKey(Clipboard::getMimeData());
+	QString value = Clipboard::decodeValue(Clipboard::getMimeData());
+
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::FloatValue)
+	{
+		doCommand<float>(9, LocaleHelper::toFloat(value), model()->value(), true); // setValueCommand
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::DataType::AutomatableModelLink)
+	{
+		doCommand<int>(4, value.toInt(), true); // linkCommand
+		shouldAccept = true;
+	}
+	if (shouldAccept)
+	{
+		if (isSuccessful != nullptr) { *isSuccessful = true; }
+		InteractiveModelView::stopHighlighting();
+	}
+}
+void FloatModelEditorBase::linkCommand(int id)
+{
+	auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(id));
+	if (mod != nullptr)
+	{
+		AutomatableModel::linkModels(model(), mod);
+		mod->setValue(model()->value());
+	}
+}
+void FloatModelEditorBase::unlinkCommand(int id)
+{
+	auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(id));
+	if (mod != nullptr)
+	{
+		AutomatableModel::unlinkModels(model(), mod);
+	}
+}
+void FloatModelEditorBase::getLinkCommand()
+{
+	Clipboard::copyStringPair(Clipboard::DataType::AutomatableModelLink, Clipboard::encodeAutomatableModelLink(*model()));
+	InteractiveModelView::startHighlighting(Clipboard::DataType::AutomatableModelLink);
+}
+void FloatModelEditorBase::unlinkAllCommand()
+{
+	model()->unlinkAllModels();
+}
+void FloatModelEditorBase::increaseValueCommand()
+{
+	doCommand<float>(9, model()->value() + model()->range() / 20.0f, model()->value(), true); // setValueCommand
+}
+void FloatModelEditorBase::decreaseValueCommand()
+{
+	doCommand<float>(9, model()->value() - model()->range() / 20.0f, model()->value(), true); // setValueCommand
+}
+void FloatModelEditorBase::setValueCommand(float floatValue)
+{
+	model()->setValue(floatValue);
+}
+void FloatModelEditorBase::openInputDialogCommand()
+{
+	bool ok = false;
+	float newValue = 0;
+
+	if (isVolumeKnob())
+	{
+		auto const initalValue = model()->getRoundedValue() / 100.0;
+		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+		newValue = QInputDialog::getDouble(
+			this, tr("Set value"),
+			tr("Please enter a new value between -96.0 dBFS and 6.0 dBFS:"),
+			initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
+
+		if (newValue <= -96.0) { newValue = 0.0f; }
+		else { newValue = dbfsToAmp(newValue) * 100.0; }
+	}
+	else
+	{
+		newValue = QInputDialog::getDouble(
+			this, tr("Set value"),
+			tr("Please enter a new value between %1 and %2:")
+			.arg(model()->minValue()).arg(model()->maxValue()),
+			model()->getRoundedValue(),
+			model()->minValue(), model()->maxValue(),
+			model()->getDigitCount(), &ok);
+	}
+
+	if (ok)
+	{
+		doCommand<float>(9, newValue, model()->value(), true); // setValueCommand
+	}
+}
+void FloatModelEditorBase::toggleScaleCommand()
+{
+	doCommand<bool>(13, !model()->isScaleLogarithmic(), model()->isScaleLogarithmic(), true); // setScaleLogarithmicCommand
+}
+void FloatModelEditorBase::setScaleLogarithmicCommand(bool isLogarithmic)
+{
+	model()->setScaleLogarithmic(true);
 }
 
 
@@ -112,18 +247,10 @@ void FloatModelEditorBase::contextMenuEvent(QContextMenuEvent *)
 	addDefaultActions(&contextMenu);
 	contextMenu.addAction(QPixmap(),
 		model()->isScaleLogarithmic() ? tr("Set linear") : tr("Set logarithmic"),
-		this, SLOT(toggleScale()));
+		this, [this]{ this->doCommand(12); });
 	contextMenu.addSeparator();
 	contextMenu.exec(QCursor::pos());
 }
-
-
-void FloatModelEditorBase::toggleScale()
-{
-	model()->setScaleLogarithmic(! model()->isScaleLogarithmic());
-	update();
-}
-
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
@@ -137,8 +264,8 @@ void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	/*
-	bool canAccept = processPaste(de->mimeData()); TODO
+	bool canAccept = false;
+	doCommand<bool*>(3, &canAccept);
 	if (canAccept == true)
 	{
 		de->accept();
@@ -147,7 +274,6 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 	{
 		de->ignore();
 	}
-	*/
 }
 
 
@@ -252,7 +378,7 @@ void FloatModelEditorBase::focusOutEvent(QFocusEvent * fe)
 
 void FloatModelEditorBase::mouseDoubleClickEvent(QMouseEvent *)
 {
-	enterValue();
+	doCommand(11);
 }
 
 
@@ -277,29 +403,6 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
 	drawAutoHighlight(&p);
 }
-
-/*
-bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, QString& value)
-{
-	bool shouldAccept = false;
-	if (type == Clipboard::DataType::FloatValue)
-	{
-		model()->setValue(LocaleHelper::toFloat(value));
-		shouldAccept = true;
-	}
-	else if (type == Clipboard::DataType::AutomatableModelLink)
-	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
-		if (mod != nullptr)
-		{
-			AutomatableModel::linkModels(model(), mod);
-			mod->setValue(model()->value());
-			shouldAccept = true;
-		}
-	}
-	return shouldAccept;
-}
-*/
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
@@ -390,51 +493,6 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 		{
 			m_leftOver = valueOffset;
 		}
-	}
-}
-
-
-void FloatModelEditorBase::enterValue()
-{
-	bool ok;
-	float new_val;
-
-	if (isVolumeKnob())
-	{
-		auto const initalValue = model()->getRoundedValue() / 100.0;
-		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
-
-		new_val = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:"),
-				initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
-
-		if (new_val <= -96.0)
-		{
-			new_val = 0.0f;
-		}
-		else
-		{
-			new_val = dbfsToAmp(new_val) * 100.0;
-		}
-	}
-	else
-	{
-		new_val = QInputDialog::getDouble(
-				this, tr("Set value"),
-				tr("Please enter a new value between "
-						"%1 and %2:").
-						arg(model()->minValue()).
-						arg(model()->maxValue()),
-					model()->getRoundedValue(),
-					model()->minValue(),
-					model()->maxValue(), model()->getDigitCount(), &ok);
-	}
-
-	if (ok)
-	{
-		model()->setValue(new_val);
 	}
 }
 

@@ -64,6 +64,20 @@ public:
 		setUnit(txt_after);
 	}
 
+	void copyValueCommand();
+	void pasteNoReturnCommand();
+	void pasteCommand(bool* isSuccessful);
+	void linkCommand(int id);
+	void unlinkCommand(int id);
+	void getLinkCommand();
+	void unlinkAllCommand();
+	void increaseValueCommand();
+	void decreaseValueCommand();
+	void setValueCommand(float floatValue);
+	void openInputDialogCommand();
+	void toggleScaleCommand();
+	void setScaleLogarithmicCommand(bool isLogarithmic);
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
@@ -86,14 +100,12 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	// InteractiveModelView methods
-	void addActions(std::vector<CommandData>& targetList) override {}
+	void addCommands(std::vector<CommandData>& targetList) override;
 
 	virtual float getValue(const QPoint & p);
 
 private slots:
-	virtual void enterValue();
 	void friendlyUpdate();
-	void toggleScale();
 
 private:
 	virtual QString displayValue() const;
