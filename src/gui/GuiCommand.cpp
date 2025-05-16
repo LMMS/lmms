@@ -57,15 +57,14 @@ bool AbstractGuiCommand::clearObjectIfMatch(InteractiveModelView* object)
 	return false;
 }
 
-GuiCommand::GuiCommand(const QString& name, InteractiveModelView* object, CommandFnPtr& doFn, CommandFnPtr& undoFn, size_t runAmount, bool linkBack) :
+GuiCommand::GuiCommand(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, size_t runAmount, bool linkBack) :
 	AbstractGuiCommand(name, object, linkBack),
-	m_runAmount(&runAmount),
-	m_doFn(&doFn),
+	m_runAmount(runAmount),
+	m_doFn(doFn),
 	m_undoFn(undoFn)
 {}
 void GuiCommand::undo()
 {
-	gae
 	if (m_target == nullptr || m_undoFn == nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
