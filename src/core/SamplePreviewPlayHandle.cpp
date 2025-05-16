@@ -40,9 +40,15 @@ SamplePreviewPlayHandle::SamplePreviewPlayHandle(const std::filesystem::path& pa
 	m_sndfile = sf_open(path.c_str(), SFM_READ, &m_sfinfo);
 #endif
 
-	if (m_sndfile == nullptr || m_sfinfo.channels == 0 || m_sfinfo.frames == 0)
+	if (!m_sndfile)
 	{
-		throw std::runtime_error{"Failed to create sample preview stream"};
+		throw std::runtime_error{"Failed to create sample preview stream: " + std::string{sf_strerror()}};
+	}
+
+	if (m_sfinfo.channels == 0 || m_sfinfo.frames == 0)
+	{
+		sf_close(m_sndfile);
+		throw std::runtime_error{"Failed to create sample preview stream: Invalid SF_INFO"};
 	}
 
 	const auto initialFrameCount = std::min(static_cast<sf_count_t>(m_sfinfo.samplerate), m_sfinfo.frames);
