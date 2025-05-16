@@ -51,8 +51,9 @@ AutomatableModel::AutomatableModel(
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
 	m_valueChanged( false ),
-	m_setValueDepth( 0 ),
+	m_oldValue(val),
 	m_hasStrictStepSize( false ),
+	m_nextLink(nullptr),
 	m_controllerConnection( nullptr ),
 	m_valueBuffer( static_cast<int>( Engine::audioEngine()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
@@ -69,11 +70,8 @@ AutomatableModel::AutomatableModel(
 
 AutomatableModel::~AutomatableModel()
 {
-	while( m_linkedModels.empty() == false )
-	{
-		m_linkedModels.back()->unlinkModel(this);
-		m_linkedModels.erase( m_linkedModels.end() - 1 );
-	}
+	// unlink this from anything else
+	unlinkModel();
 
 	if( m_controllerConnection )
 	{
@@ -292,38 +290,38 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 
 
 
-void AutomatableModel::setValue( const float value )
+void AutomatableModel::setValue(float value, bool isAutomated)
 {
-	m_oldValue = m_value;
-	++m_setValueDepth;
-	const float old_val = m_value;
+	float newValue = fittedValue(value);
+	if (newValue == m_value) { emit dataUnchanged(); return; }
 
-	m_value = fittedValue( value );
-	if( old_val != m_value )
+	if (isAutomated == false) { addJournalCheckPoint(); }
+	// set value for this and the other linked widgets
+	if (hasLinkedModels())
 	{
-		// add changes to history so user can undo it
-		addJournalCheckPoint();
-
-		// notify linked models
-		for (const auto& linkedModel : m_linkedModels)
+		AutomatableModel* next = this;
+		while (true)
 		{
-			if (linkedModel->m_setValueDepth < 1 && linkedModel->fittedValue(value) != linkedModel->m_value)
-			{
-				bool journalling = linkedModel->testAndSetJournalling(isJournalling());
-				linkedModel->setValue(value);
-				linkedModel->setJournalling(journalling);
-			}
+			next->setValueInternal(value, isAutomated);
+			next = next->m_nextLink;
+			if (next == this) { break; }
 		}
+	}
+	else { setValueInternal(value, isAutomated); }
+}
+
+void AutomatableModel::setValueInternal(float value, bool isAutomated)
+{
+	float oldValue = m_value;
+	if (isAutomated) { m_value = fittedValue(scaledValue(value)); }
+	else { m_value = fittedValue(value); }
+
+	if (oldValue != m_value)
+	{
 		m_valueChanged = true;
 		emit dataChanged();
 	}
-	else
-	{
-		emit dataUnchanged();
-	}
-	--m_setValueDepth;
 }
-
 
 
 
@@ -360,34 +358,6 @@ void AutomatableModel::roundAt( T& value, const T& where ) const
 
 
 
-void AutomatableModel::setAutomatedValue( const float value )
-{
-	setUseControllerValue(false);
-
-	m_oldValue = m_value;
-	++m_setValueDepth;
-	const float oldValue = m_value;
-
-	const float scaled_value = scaledValue( value );
-
-	m_value = fittedValue( scaled_value );
-
-	if( oldValue != m_value )
-	{
-		// notify linked models
-		for (const auto& linkedModel : m_linkedModels)
-		{
-			if (!(linkedModel->controllerConnection()) && linkedModel->m_setValueDepth < 1 &&
-					linkedModel->fittedValue(m_value) != linkedModel->m_value)
-			{
-				linkedModel->setAutomatedValue(value);
-			}
-		}
-		m_valueChanged = true;
-		emit dataChanged();
-	}
-	--m_setValueDepth;
-}
 
 
 
@@ -458,33 +428,72 @@ float AutomatableModel::fittedValue( float value ) const
 
 
 
-void AutomatableModel::linkModel( AutomatableModel* model )
+void AutomatableModel::linkModel(AutomatableModel* model)
 {
-	auto containsModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model) != m_linkedModels.end();
-	if (!containsModel && model != this)
-	{
-		m_linkedModels.push_back( model );
+	if (model == nullptr || model == this || isModelLinked(model)) { return; }
 
-		if( !model->hasLinkedModels() )
-		{
-			QObject::connect( this, SIGNAL(dataChanged()),
-					model, SIGNAL(dataChanged()), Qt::DirectConnection );
-		}
+	AutomatableModel* otherEnd = model->getLastLinkedModel();
+	if (otherEnd == nullptr)
+	{
+		model->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
+		m_nextLink = model;
+	}
+	else
+	{
+		otherEnd->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
+		m_nextLink = model;
 	}
 }
 
-
-
-
-void AutomatableModel::unlinkModel( AutomatableModel* model )
+void AutomatableModel::unlinkModel()
 {
-	auto it = std::find(m_linkedModels.begin(), m_linkedModels.end(), model);
-	if( it != m_linkedModels.end() )
-	{
-		m_linkedModels.erase( it );
-	}
+	if (hasLinkedModels() == false) { return; }
+
+	AutomatableModel* end = getLastLinkedModel();
+	assert(end != nullptr);
+	end->m_nextLink = end == m_nextLink ? nullptr : m_nextLink;
+	m_nextLink = nullptr;
 }
 
+AutomatableModel* AutomatableModel::getLastLinkedModel() const
+{
+	if (hasLinkedModels() == false) { return nullptr; }
+	AutomatableModel* output = m_nextLink;
+	while (true)
+	{
+		if (output->m_nextLink == this) { break; }
+		output = output->m_nextLink;
+	}
+	return output;
+}
+
+bool AutomatableModel::isModelLinked(AutomatableModel* model) const
+{
+	if (hasLinkedModels() == false || model == nullptr || model == this) { return false; }
+	bool output = false;
+	AutomatableModel* next = m_nextLink;
+	while (true)
+	{
+		if (next->m_nextLink == this) { break; }
+		if (next->m_nextLink == model) { output = true; break; }
+		next = next->m_nextLink;
+	}
+	return output;
+}
+
+size_t AutomatableModel::countLinks() const
+{
+	if (hasLinkedModels() == false) { return 0; }
+	size_t output = 2;
+	AutomatableModel* next = m_nextLink;
+	while (true)
+	{
+		if (next->m_nextLink == this) { break; }
+		next = next->m_nextLink;
+		output++;
+	}
+	return output;
+}
 
 
 
@@ -492,44 +501,29 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	auto model1ContainsModel2 = std::find(model1->m_linkedModels.begin(), model1->m_linkedModels.end(), model2) != model1->m_linkedModels.end();
-	if (!model1ContainsModel2 && model1 != model2)
+	// copy data
+	model1->setValue(model2->m_value);
+	if (model1->valueBuffer() && model2->valueBuffer())
 	{
-		// copy data
-		model1->m_value = model2->m_value;
-		if (model1->valueBuffer() && model2->valueBuffer())
-		{
-			std::copy_n(model2->valueBuffer()->data(),
-				model1->valueBuffer()->length(),
-				model1->valueBuffer()->data());
-		}
-		// send dataChanged() before linking (because linking will
-		// connect the two dataChanged() signals)
+		std::copy_n(model2->valueBuffer()->data(),
+			model1->valueBuffer()->length(),
+			model1->valueBuffer()->data());
 		emit model1->dataChanged();
-		// finally: link the models
-		model1->linkModel( model2 );
-		model2->linkModel( model1 );
 	}
+	// link the models
+	model1->linkModel(model2);
 }
 
 
 
 
-void AutomatableModel::unlinkModels( AutomatableModel* model1, AutomatableModel* model2 )
-{
-	model1->unlinkModel( model2 );
-	model2->unlinkModel( model1 );
-}
 
 
 
 
 void AutomatableModel::unlinkAllModels()
 {
-	for( AutomatableModel* model : m_linkedModels )
-	{
-		unlinkModels( this, model );
-	}
+	unlinkModel();
 }
 
 
@@ -553,11 +547,11 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 
 float AutomatableModel::controllerValue( int frameOffset ) const
 {
-	if( m_controllerConnection )
+	if (m_controllerConnection == nullptr) { return m_value; }
+
+	float v = 0;
+	switch(m_scaleType)
 	{
-		float v = 0;
-		switch(m_scaleType)
-		{
 		case ScaleType::Linear:
 			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 			break;
@@ -569,23 +563,13 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 			qFatal("AutomatableModel::controllerValue(int)"
 				"lacks implementation for a scale type");
 			break;
-		}
-		if (approximatelyEqual(m_step, 1) && m_hasStrictStepSize)
-		{
-			return std::round(v);
-		}
-		return v;
 	}
-
-	AutomatableModel* lm = m_linkedModels.front();
-	if (lm->controllerConnection() && lm->useControllerValue())
+	if (approximatelyEqual(m_step, 1) && m_hasStrictStepSize)
 	{
-		return fittedValue( lm->controllerValue( frameOffset ) );
+		return std::round(v);
 	}
-
-	return fittedValue( lm->m_value );
+	return v;
 }
-
 
 ValueBuffer * AutomatableModel::valueBuffer()
 {
@@ -634,28 +618,32 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	if (!m_controllerConnection)
 	{
-		AutomatableModel* lm = nullptr;
 		if (hasLinkedModels())
 		{
-			lm = m_linkedModels.front();
-		}
-		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
-				lm->controllerConnection()->getController()->isSampleExact())
-		{
-			auto vb = lm->valueBuffer();
-			float * values = vb->values();
-			float * nvalues = m_valueBuffer.values();
-			for (int i = 0; i < vb->length(); i++)
+			AutomatableModel* next = this;
+			while (true)
 			{
-				nvalues[i] = fittedValue(values[i]);
+				if (next->controllerConnection() && next->useControllerValue() &&
+						next->controllerConnection()->getController()->isSampleExact())
+				{
+					auto vb = next->valueBuffer();
+					float * values = vb->values();
+					float * nvalues = m_valueBuffer.values();
+					for (int i = 0; i < vb->length(); i++)
+					{
+						nvalues[i] = fittedValue(values[i]);
+					}
+					m_lastUpdatedPeriod = s_periodCounter;
+					m_hasSampleExactData = true;
+					return &m_valueBuffer;
+				}
+				next = next->m_nextLink;
+				if (next == this) { break; }
 			}
-			m_lastUpdatedPeriod = s_periodCounter;
-			m_hasSampleExactData = true;
-			return &m_valueBuffer;
 		}
 	}
 
-	if( m_oldValue != val )
+	if (m_oldValue != val)
 	{
 		m_valueBuffer.interpolate( m_oldValue, val );
 		m_oldValue = val;
