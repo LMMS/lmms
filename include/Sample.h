@@ -1,7 +1,7 @@
 /*
- * Sample.h - State for container-class SampleBuffer
+ * Sample.h
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -37,12 +37,6 @@ namespace lmms {
 class LMMS_EXPORT Sample
 {
 public:
-	// values for buffer margins, used for various libsamplerate interpolation modes
-	// the array positions correspond to the converter_type parameter values in libsamplerate
-	// if there appears problems with playback on some interpolation mode, then the value for that mode
-	// may need to be higher - conversely, to optimize, some may work with lower values
-	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
-
 	enum class Loop
 	{
 		Off,
@@ -50,45 +44,35 @@ public:
 		PingPong
 	};
 
-	class LMMS_EXPORT PlaybackState
+	struct LMMS_EXPORT PlaybackState
 	{
-	public:
-		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
-			: m_resampler(interpolationMode, DEFAULT_CHANNELS)
-			, m_varyingPitch(varyingPitch)
+		PlaybackState(int interpolationMode = SRC_LINEAR, int frameIndex = 0)
+			: resampler(interpolationMode)
+			, frameIndex(frameIndex)
 		{
 		}
 
-		auto resampler() -> AudioResampler& { return m_resampler; }
-		auto frameIndex() const -> int { return m_frameIndex; }
-		auto varyingPitch() const -> bool { return m_varyingPitch; }
-		auto backwards() const -> bool { return m_backwards; }
-
-		void setFrameIndex(int frameIndex) { m_frameIndex = frameIndex; }
-		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
-		void setBackwards(bool backwards) { m_backwards = backwards; }
-
-	private:
-		AudioResampler m_resampler;
-		int m_frameIndex = 0;
-		bool m_varyingPitch = false;
-		bool m_backwards = false;
+		AudioResampler resampler;
+		int frameIndex = 0;
+		bool backwards = false;
 		friend class Sample;
 	};
 
 	Sample() = default;
+	~Sample() = default;
+
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
-	Sample(Sample&& other);
+	Sample(Sample&& other) noexcept;
 	explicit Sample(const QString& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
-	auto operator=(Sample&&) -> Sample&;
+	auto operator=(Sample&&) noexcept -> Sample&;
 
-	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
-		Loop loopMode = Loop::Off) const -> bool;
+	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loopMode = Loop::Off,
+		double ratio = 1.0) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
@@ -117,10 +101,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	void playRaw(SampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
-	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
-
-private:
+	std::size_t render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;

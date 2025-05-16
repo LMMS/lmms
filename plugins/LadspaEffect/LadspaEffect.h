@@ -28,6 +28,7 @@
 
 #include <QMutex>
 
+#include "AudioResampler.h"
 #include "Effect.h"
 #include "ladspa.h"
 #include "LadspaControls.h"
@@ -71,7 +72,6 @@ private:
 	void pluginDestruction();
 
 	static sample_rate_t maxSamplerate( const QString & _name );
-
 
 	QMutex m_pluginMutex;
 	LadspaControls * m_controls;
