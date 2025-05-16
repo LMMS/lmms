@@ -47,7 +47,7 @@ namespace lmms::gui
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
-	InteractiveModelView(parent),
+	InteractiveModelView(parent, getTypeId<FloatModelEditorBase>()),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
 	m_volumeKnob(false),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
@@ -137,7 +137,8 @@ void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	bool canAccept = processPaste(de->mimeData());
+	/*
+	bool canAccept = processPaste(de->mimeData()); TODO
 	if (canAccept == true)
 	{
 		de->accept();
@@ -146,6 +147,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 	{
 		de->ignore();
 	}
+	*/
 }
 
 
@@ -276,12 +278,7 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	drawAutoHighlight(&p);
 }
 
-bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::DataType dataType)
-{
-	return dataType == Clipboard::DataType::FloatValue
-		|| dataType == Clipboard::DataType::AutomatableModelLink;
-}
-
+/*
 bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	bool shouldAccept = false;
@@ -302,6 +299,7 @@ bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, 
 	}
 	return shouldAccept;
 }
+*/
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {

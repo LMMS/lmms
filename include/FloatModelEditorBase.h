@@ -86,8 +86,7 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	// InteractiveModelView methods
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
-	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
+	void addActions(std::vector<CommandData>& targetList) override {}
 
 	virtual float getValue(const QPoint & p);
 
