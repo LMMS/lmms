@@ -1,5 +1,5 @@
 /*
- * GuiAction.h - implements Commands, a layer between the user and widgets
+ * GuiCommand.h - implements Commands, a layer between the user and widgets
  *
  * Copyright (c) 2025 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -44,15 +44,16 @@ public:
 	template<typename DataType>
 	void callFn(InteractiveModelView* object, DataType data)
 	{
-		callFnInternal(object, baseTypeId, static_cast<void*>(&data), typeid(DataType).hash_code())
+		callFnInternal(object, static_cast<void*>(&data), typeid(DataType).hash_code());
 	}
 	void callFnTypeless(InteractiveModelView* object)
 	{
-		callFnInternal(object, baseTypeId, nullptr, 0)
+		callFnInternal(object, nullptr, 0);
 	}
+	size_t getTypeIdFromInteractiveModelView(InteractiveModelView* object);
 	
-	bool isValid() const = 0;
-	bool isMatch(void* functionPtr) const = 0;
+	virtual bool isValid() const = 0;
+	virtual bool isMatch(void* functionPtr) const = 0;
 private:
 	virtual void callFnInternal(InteractiveModelView* object, void* data, size_t dataTypeId) = 0;
 };
@@ -70,8 +71,8 @@ public:
 		m_functionPtr(nullptr)
 	{}
 
-	bool isValid() const override { return m_functionPtr != nullptr; };
-	bool isMatch(void* functionPtr) const override { return static_cast<void*>(m_functionPtr) == functionPtr};
+	bool isValid() const override { return m_functionPtr != nullptr; }
+	bool isMatch(void* functionPtr) const override { return static_cast<void*>(m_functionPtr) == functionPtr; }
 private:
 	void callFnInternal(InteractiveModelView* object, void* data, size_t dataTypeId) override
 	{
@@ -79,7 +80,7 @@ private:
 		if (m_functionPtr == nullptr || object == nullptr) { return; }
 		assert(data != nullptr);
 		// if this assert fails, `InteractiveModelView::getStoredTypeId()` is wrong type
-		assert(typeid(BaseType).hash_code() == baseTypeId);
+		assert(typeid(BaseType).hash_code() == getTypeIdFromInteractiveModelView(object));
 		// if this assert fails, you need to change your `DataType` template to the one this class was constructed with
 		assert(typeid(DataType).hash_code() == dataTypeId);
 		// calling the function ptr
@@ -101,15 +102,15 @@ public:
 		m_functionPtr(nullptr)
 	{}
 
-	bool isValid() const override { return m_functionPtr != nullptr; };
-	bool isMatch(void* functionPtr) const override { return static_cast<void*>(m_functionPtr) == functionPtr};
+	bool isValid() const override { return m_functionPtr != nullptr; }
+	bool isMatch(void* functionPtr) const override { return static_cast<void*>(m_functionPtr) == functionPtr; }
 private:
 	void callFnInternal(InteractiveModelView* object, void* data, size_t dataTypeId) override
 	{
-		qDebug("type assert debug: %ld, %ld, %s", baseTypeId, typeid(BaseType).hash_code(), typeid(BaseType).name());
+		qDebug("type assert debug: %ld, %ld, %s", getTypeIdFromInteractiveModelView(object), typeid(BaseType).hash_code(), typeid(BaseType).name());
 		if (m_functionPtr == nullptr || object == nullptr) { return; }
 		// if this assert fails, `InteractiveModelView::getStoredTypeId()` is wrong type (function isn't member to type)
-		assert(typeid(BaseType).hash_code() == object->getStoredTypeId());
+		assert(typeid(BaseType).hash_code() == getTypeIdFromInteractiveModelView(object));
 		// calling the function ptr
 		(static_cast<BaseType>(object)->*m_functionPtr)();
 	}
@@ -117,11 +118,11 @@ private:
 };
 
 
-class AbstractGuiAction// : public QUndoCommand
+class AbstractGuiCommand// : public QUndoCommand
 {
 public:
-	AbstractGuiAction(const QString& name, InteractiveModelView* object, bool linkBack);
-	~AbstractGuiAction() {}
+	AbstractGuiCommand(const QString& name, InteractiveModelView* object, bool linkBack);
+	~AbstractGuiCommand() {}
 	//! should be undone along with the action before this
 	bool getShouldLinkBack();
 	//! returns true if cleared, use this to delete pointers to destructing objects
@@ -132,26 +133,26 @@ protected:
 	bool m_isLinkedBack; //! if this is undone, undo the one before this
 };
 
-class GuiAction : public AbstractGuiAction
+class GuiCommand : public AbstractGuiCommand
 {
 public:
-	GuiAction(const QString& name, InteractiveModelView* object, CommandFnPtr doFn, CommandFnPtr undoFn, size_t runAmount, bool linkBack);
+	GuiCommand(const QString& name, InteractiveModelView* object, CommandFnPtr& doFn, CommandFnPtr& undoFn, size_t runAmount, bool linkBack);
 	void undo();// override
 	void redo();// override
 private:
 	size_t m_runAmount;
-	CommandFnPtr m_doFn;
-	CommandFnPtr m_undoFn;
+	std::unique_ptr<CommandFnPtr> m_doFn;
+	std::unique_ptr<CommandFnPtr> m_undoFn;
 };
 
 
 
 template<typename DataType>
-class GuiActionTyped : public AbstractGuiAction
+class GuiCommandTyped : public AbstractGuiCommand
 {
 public:
-	GuiActionTyped(const QString& name, InteractiveModelView* object, CommandFnPtr doFn, CommandFnPtr undoFn, DataType doData, DataType* undoData bool linkBack) :
-		AbstractGuiAction(name, object, linkBack),
+	GuiCommandTyped(const QString& name, InteractiveModelView* object, CommandFnPtr& doFn, CommandFnPtr& undoFn, DataType doData, DataType* undoData, bool linkBack) :
+		AbstractGuiCommand(name, object, linkBack),
 		m_doData(nullptr),
 		m_undoData(nullptr),
 		m_doFn(doFn),
@@ -163,32 +164,32 @@ public:
 	void undo()// override
 	{
 		if (m_target == nullptr) { return; }
-		if (m_undoFn.isValid())
+		if (m_undoFn->isValid())
 		{
 			if (m_undoData.get() != nullptr)
 			{
-				m_undoFn.callFn<DataType>(m_target, *m_undoData.get());
+				m_undoFn->callFn<DataType>(m_target, *m_undoData.get());
 			}
 			else
 			{
-				m_undoFn.callFn<DataType>(m_target, *m_doData.get());
+				m_undoFn->callFn<DataType>(m_target, *m_doData.get());
 			}
 		}
-		else if (m_doFn.isValid() && m_undoData.get() != nullptr)
+		else if (m_doFn->isValid() && m_undoData.get() != nullptr)
 		{
-			m_doFn.callFn<BDataType>(m_target, *m_undoData.get());
+			m_doFn->callFn<DataType>(m_target, *m_undoData.get());
 		}
 	}
 	void redo()// override
 	{
-		if (m_target == nullptr || m_doFn.isValid() == false) { return; }
-		m_doFn.callFn<DataType>(m_target, *m_doData.get());
+		if (m_target == nullptr || m_doFn->isValid() == false) { return; }
+		m_doFn->callFn<DataType>(m_target, *m_doData.get());
 	}
 private:
 	std::unique_ptr<DataType> m_doData;
 	std::unique_ptr<DataType> m_undoData;
-	CommandFnPtr m_doFn;
-	CommandFnPtr m_undoFn;
+	std::unique_ptr<CommandFnPtr> m_doFn;
+	std::unique_ptr<CommandFnPtr> m_undoFn;
 };
 
 } // namespace lmms::gui

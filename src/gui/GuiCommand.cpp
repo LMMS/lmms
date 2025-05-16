@@ -1,5 +1,5 @@
 /*
- * GuiAction.h - implements Actions, a layer between the user and widgets
+ * GuiCommand.h - implements Actions, a layer between the user and widgets
  *
  * Copyright (c) 2025 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -24,23 +24,29 @@
 
 #include <cassert>
 
-#include "GuiAction.h"
+#include "GuiCommand.h"
+#include "InteractiveModelView.h"
 
 namespace lmms::gui
 {
 
-AbstractGuiAction::AbstractGuiAction(const QString& name, InteractiveModelView* object, bool linkBack) :
+size_t CommandFnPtr::getTypeIdFromInteractiveModelView(InteractiveModelView* object)
+{
+	return object->getStoredTypeId();
+}
+
+AbstractGuiCommand::AbstractGuiCommand(const QString& name, InteractiveModelView* object, bool linkBack) :
 	m_name(name),
 	m_target(object),
 	m_isLinkedBack(linkBack)
 {
 	assert(m_target != nullptr);
 }
-bool AbstractGuiAction::getShouldLinkBack()
+bool AbstractGuiCommand::getShouldLinkBack()
 {
 	return m_isLinkedBack;
 }
-bool AbstractGuiAction::clearObjectIfMatch(InteractiveModelView* object)
+bool AbstractGuiCommand::clearObjectIfMatch(InteractiveModelView* object)
 {
 	if (m_target == nullptr) { return false; }
 	if (object == m_target)
@@ -50,27 +56,29 @@ bool AbstractGuiAction::clearObjectIfMatch(InteractiveModelView* object)
 	}
 	return false;
 }
-GuiAction::GuiAction(const QString& name, InteractiveModelView* object, CommandFnPtr doFn, CommandFnPtr undoFn, size_t runAmount, bool linkBack) :
-	AbstractGuiAction(name, object, linkBack),
-	m_runAmount(runAmount),
-	m_doFn(doFn),
+
+GuiCommand::GuiCommand(const QString& name, InteractiveModelView* object, CommandFnPtr& doFn, CommandFnPtr& undoFn, size_t runAmount, bool linkBack) :
+	AbstractGuiCommand(name, object, linkBack),
+	m_runAmount(&runAmount),
+	m_doFn(&doFn),
 	m_undoFn(undoFn)
 {}
-void GuiAction::undo()
+void GuiCommand::undo()
 {
+	gae
 	if (m_target == nullptr || m_undoFn == nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
-		m_undoFn.callFnTypeless(m_target);
+		m_undoFn->callFnTypeless(m_target);
 	}
 }
-void GuiAction::redo()
+void GuiCommand::redo()
 {
 	if (m_target == nullptr || m_doFn == nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
-		m_doFn.callFnTypeless(m_target);
+		m_doFn->callFnTypeless(m_target);
 	}
 }
 
-} // template<typename DataType>
+} // namespace lmms::gui
