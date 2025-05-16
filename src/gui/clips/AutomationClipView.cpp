@@ -48,9 +48,8 @@
 namespace lmms::gui
 {
 
-AutomationClipView::AutomationClipView( AutomationClip * _clip,
-						TrackView * _parent ) :
-	ClipView( _clip, _parent ),
+AutomationClipView::AutomationClipView(AutomationClip* _clip, TrackView* _parent) :
+	ClipView(_clip, _parent, getTypeId<AutomationClipView>()),
 	m_clip( _clip ),
 	m_paintPixmap()
 {
@@ -207,11 +206,8 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	}
 }
 
-bool AutomationClipView::canAcceptClipboardData(Clipboard::DataType dataType)
-{
-	return dataType == Clipboard::DataType::AutomatableModelLink || ClipView::canAcceptClipboardData(dataType);
-}
 
+/*
 bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	bool shouldAccept = false;
@@ -245,6 +241,7 @@ bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QS
 	}
 	return shouldAccept;
 }
+*/
 
 
 
@@ -464,12 +461,14 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	bool shouldAccept = processPaste(_de->mimeData());
+	/*
+	bool shouldAccept = processPaste(_de->mimeData()); TODO
 
 	if (shouldAccept)
 	{
 		_de->accept();
 	}
+	*/
 }
 
 

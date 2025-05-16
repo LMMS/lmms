@@ -52,8 +52,8 @@ namespace lmms::gui
 
 constexpr int BeatStepButtonOffset = 4;
 
-MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
-	ClipView( clip, parent ),
+MidiClipView::MidiClipView(MidiClip* clip, TrackView* parent) :
+	ClipView(clip, parent, getTypeId<MidiClipView>()),
 	m_clip( clip ),
 	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),

@@ -73,7 +73,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	ClipView(Clip * clip, TrackView * tv, size_t typeId);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -180,9 +180,8 @@ protected:
 	}
 	
 	// InteractiveModelView methods
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
-	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
+	void addActions(std::vector<CommandData>& targetList) override {}
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos(TimePos);

@@ -42,7 +42,7 @@ namespace lmms::gui
 
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
-	ClipView( _clip, _tv ),
+	ClipView(_clip, _tv, getTypeId<PatternClipView>()),
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap()
 {

@@ -45,7 +45,7 @@ namespace lmms::gui
 
 
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
-	ClipView( _clip, _tv ),
+	ClipView(_clip, _tv, getTypeId<SampleClipView>()),
 	m_clip( _clip ),
 	m_paintPixmap(),
 	m_paintPixmapXPosition(0)
@@ -125,12 +125,14 @@ void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleClipView::dropEvent( QDropEvent * _de )
 {
+	/*
 	bool shouldAccept = processPaste(_de->mimeData());
 
 	if (shouldAccept)
 	{
 		_de->accept();
 	}
+	*/
 }
 
 
@@ -347,13 +349,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
 
-bool SampleClipView::canAcceptClipboardData(Clipboard::DataType dataType)
-{
-	return dataType == Clipboard::DataType::SampleFile
-		|| dataType == Clipboard::DataType::SampleData
-		|| ClipView::canAcceptClipboardData(dataType);
-}
-
+/*
 bool SampleClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
 	bool shouldAccept = false;
@@ -376,6 +372,7 @@ bool SampleClipView::processPasteImplementation(Clipboard::DataType type, QStrin
 	}
 	return shouldAccept;
 }
+*/
 
 
 void SampleClipView::reverseSample()

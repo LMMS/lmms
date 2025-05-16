@@ -81,9 +81,8 @@ TextFloat * ClipView::s_textFloat = nullptr;
  * \param _clip The clip to be displayed
  * \param _tv  The track view that will contain the new object
  */
-ClipView::ClipView( Clip * clip,
-							TrackView * tv ) :
-	selectableObject( tv->getTrackContentWidget() ),
+ClipView::ClipView(Clip * clip, TrackView * tv, size_t typeId) :
+	selectableObject(tv->getTrackContentWidget(), typeId),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
 	m_initialClipPos( TimePos(0) ),
@@ -452,12 +451,14 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
  */
 void ClipView::dropEvent( QDropEvent * de )
 {
-	bool shouldAccept = processPaste(de->mimeData());
+	/*
+	bool shouldAccept = processPaste(de->mimeData()); TODO
 
 	if (shouldAccept)
 	{
 		de->accept();
 	}
+	*/
 }
 
 
@@ -1137,10 +1138,12 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 	}
 }
 
+/*
 bool ClipView::canAcceptClipboardData(Clipboard::DataType dataType)
 {
 	return dataType == getClipStringPairType(m_clip->getTrack());;
 }
+
 
 bool ClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
 {
@@ -1159,6 +1162,7 @@ bool ClipView::processPasteImplementation(Clipboard::DataType type, QString& val
 	}
 	return shouldAccept;
 }
+*/
 
 void ClipView::overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate)
 {
@@ -1219,7 +1223,7 @@ void ClipView::cut( QVector<ClipView *> clipvs )
 
 void ClipView::paste()
 {
-	processPaste(Clipboard::getMimeData());
+	//processPaste(Clipboard::getMimeData()); TODO
 
 	/*
 	// If possible, paste the selection on the TimePos of the selected Track and remove it
@@ -1484,7 +1488,7 @@ Clipboard::DataType ClipView::getClipStringPairType(Track* track)
 		default:
 			break;
 	}
-	return Clipboard::DataType::None;
+	return Clipboard::DataType::Error;
 }
 
 } // namespace lmms::gui

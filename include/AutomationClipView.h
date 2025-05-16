@@ -68,9 +68,6 @@ protected:
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
-	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-
 private:
 	AutomationClip * m_clip;
 	QPixmap m_paintPixmap;

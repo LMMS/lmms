@@ -62,9 +62,6 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
 
-	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
-	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
-
 private:
 	SampleClip * m_clip;
 	SampleThumbnail m_sampleThumbnail;
