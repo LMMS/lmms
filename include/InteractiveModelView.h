@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.h - Implements action system for widgets
+ * InteractiveModelView.h - Implements command system for widgets
  *
  * Copyright (c) 2024 -2025 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -51,30 +51,33 @@ class SimpleTextFloat;
 struct CommandData
 {
 	/*
-	* id: should be unique, used to refer to this action
-	* doFnIn: what function should run if this action is triggered
-	* undoFnIn: what function should run if this action is undone
-	* isTypeSpecific: if the action can not be performed with other kinds of widgets (example for false: delete action)
-	* acceptedType: what kind of datatype does this action accept, use `Clipboard::DataType::Ignore` if datatype doesn't matter, use `Clipboard::DataType::Error` to later define the datatype
+	* @param id: a unique identifier for the command, used to make handling commands easy
+	* @param name: a name that describes what this command does
+	* @param doFnIn: what function should run if this command is triggered
+	* @param undoFnIn: what function should run if this command is undone
+	* @param isTypeSpecific: if the command can not be performed with other kinds of widgets (example for false: delete command)
+	* @param acceptedType: what kind of datatype does this command accept, use `Clipboard::DataType::Ignore` if datatype doesn't matter, use `Clipboard::DataType::Error` to later define the datatype
 	*/
-	CommandData(QString& name, CommandFnPtr& doFnIn, CommandFnPtr& undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType);
-	~CommandData();
+	CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr* undoFnIn, bool isTypeSpecific);
+	~CommandData(); // TODO
 	//! sets the shortcut and isShortcut will be true
-	void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop);
-	//! use this to add more datatypes to an action `Clipboard::DataType::Error` will not be added
+	void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, bool isShortcutLoop);
+	//! use this to add more datatypes to a command `Clipboard::DataType::Error` will not be added
 	void addAcceptedDataType(Clipboard::DataType type);
+
+	size_t commandId = 0;
 	//! display name
 	QString commandName = "";
 
 	//! Function pointers needed to construct `GuiCommand`
-	std::unique_ptr<CommandFnPtr> doFn;
-	std::unique_ptr<CommandFnPtr> undoFn;
+	std::shared_ptr<CommandFnPtr> doFn;
+	std::shared_ptr<CommandFnPtr> undoFn;
 
-	//! if the action can not be performed with other kinds of widgets (example for false: delete action)
+	//! if the command can not be performed with other kinds of widgets (example for false: delete command)
 	bool isTypeSpecific = true;
 	bool isShortcut = false;
 
-	//! what kind of data does this action accept
+	//! what kind of data does this command accept
 	std::vector<Clipboard::DataType> acceptedType = {Clipboard::DataType::Any};
 
 	// shortcut logic
@@ -123,33 +126,34 @@ public:
 	//! should be false if multiple widgets are highlighted and `this` is not the first one
 	void HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers = true);
 
-	//! do a specified action on this widget
-	//! @param functionPointer: what action to do from the `getActions()` array
-	//! @param shouldLinkBack: should the Action before this be undone as well?
-	//! NOTE: ONLY USE `doAction()` IN QT FUNCTIONS OR ACTION FUNCTIONS
-	//! actions are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
-	void doAction(void* functionPointer, bool shouldLinkBack = false);
-	void doActionAt(size_t actionIndex, bool shouldLinkBack = false);
+	//! do a specified command on this widget
+	//! @param functionPointer: what command to do from the `getCommands()` array
+	//! @param shouldLinkBack: should the command before this be undone as well?
+	//! NOTE: ONLY USE `doCommand()` IN QT FUNCTIONS OR COMMAND FUNCTIONS
+	//! commands are meant to be triggered by users, triggering them from an internal function could lead to bad journalling
+	void doCommand(size_t commandId, bool shouldLinkBack = false);
+	void doCommandAt(size_t commandIndex, bool shouldLinkBack = false);
 
 	template<typename DataType>
-	void doAction(void* functionPointer, DataType doData, bool shouldLinkBack = false)
-		{ doActionAt(getIndexFromFn(functionPointer), doData, nullptr, shouldLinkBack); }
+	void doCommand(size_t commandId, DataType doData, bool shouldLinkBack = false)
+		{ doCommandAt<DataType>(getIndexFromId(commandId), doData, nullptr, shouldLinkBack); }
 	template<typename DataType>
-	void doAction(void* functionPointer, DataType doData, DataType undoData, bool shouldLinkBack = false)
-		{ doActionAt(getIndexFromFn(functionPointer), doData, &undoData, shouldLinkBack); }
+	void doCommand(size_t commandId, DataType doData, DataType undoData, bool shouldLinkBack = false)
+		{ doCommandAt<DataType>(getIndexFromId(commandId), doData, &undoData, shouldLinkBack); }
 	template<typename DataType>
-	void doActionAt(size_t actionIndex, DataType doData, DataType* undoData = nullptr, bool shouldLinkBack = false)
+	void doCommandAt(size_t commandIndex, DataType doData, DataType* undoData = nullptr, bool shouldLinkBack = false)
 	{
-		const std::vector<CommandData>& actions = getActions();
-		if (actionIndex > actions.size()) { return; }
-		// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
-		qDebug("doActionAt typed before type return");
-		if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
-		qDebug("doActionAt typed after type return");
+		const std::vector<CommandData>& commands = getCommands();
+		if (commandIndex > commands.size()) { return; }
+		// if the command accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
+		qDebug("doCommandAt typed before type return");
+		if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
+		qDebug("doCommandAt typed after type return");
 
-		qDebug("doAction typed, %ld, %s", actionIndex, actions[actionIndex].getText().toStdString().c_str());
-		GuiActionTyped<DataType> action(actions[actionIndex].getText(), this, *actions[actionIndex].doFn, *actions[actionIndex].undoFn, doData, undoData, shouldLinkBack);
-		action.redo();
+		assert(commands[commandIndex].doFn.get() != nullptr);
+		qDebug("doCommand typed, %ld, %s", commandIndex, commands[commandIndex].getText().toStdString().c_str());
+		GuiCommandTyped<DataType> command(commands[commandIndex].getText(), this, commands[commandIndex].doFn, commands[commandIndex].undoFn, doData, undoData, shouldLinkBack);
+		command.redo();
 	}
 
 	//! should return a unique id for different widget classes
@@ -157,29 +161,28 @@ public:
 	static constexpr size_t getTypeId() { return typeid(BaseType).hash_code(); };
 	size_t getStoredTypeId();
 protected:
-	//! returns the avalible shortcuts for the widget
-	const std::vector<CommandData>& getActions() { return m_actionArray; };
+	//! returns the avalible commands for the widget
+	const std::vector<CommandData>& getCommands() { return m_commandArray; };
 	//! override this if the widget requires custom updating code
 	//! shouldOverrideUpdate: should `update()` widget if `isHighlighted` didn't changed but for example color changed
 	virtual void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
-	//! place here the `QAction` and `CommandData` code and call it in constructor
-	virtual void addActions(std::vector<CommandData>& targetList) = 0;
+	//! place here the `CommandData` code and call it in constructor
+	virtual void addCommands(std::vector<CommandData>& targetList) = 0;
 
 	//! draws the highlight automatically for the widget if highlighted
 	void drawAutoHighlight(QPainter* painter);
-	//! builds a string from a provided action array
-	static QString buildShortcutMessage(const std::vector<CommandData>& actions);
 
 	bool getIsHighlighted() const;
 	//! shouldOverrideUpdate: should update if visible, ignore optimizations
 	//! shouldOverrideUpdate could be needed if the color was changed
 	void setIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
 
-	//! returns an index of an action from a given id, assert fails if not found
+	//! returns an index of a command from a given ID / funcion ptr, reutrns getCommands().size() if not found
+	size_t getIndexFromId(size_t id);
 	size_t getIndexFromFn(void* functionPointer);
 
 	//! construct in derived constructor
-	std::vector<CommandData> m_actionArray;
+	std::vector<CommandData> m_commandArray;
 private slots:
 	inline static void timerStopHighlighting()
 	{
@@ -191,34 +194,12 @@ private:
 	//! stores the widget's type id that created this object
 	const size_t m_interactiveModelViewTypeId;
 
-	static std::unique_ptr<QColor> s_highlightColor;
-	static std::unique_ptr<QColor> s_usedHighlightColor;
+	static QColor s_highlightColor;
+	static QColor s_usedHighlightColor;
 	static QTimer* s_highlightTimer;
 	static SimpleTextFloat* s_simpleTextFloat;
 	static std::list<InteractiveModelView*> s_interactiveWidgets;
 };
-
-/*
-template<typename BaseType>
-class LMMS_EXPORT InteractiveModelViewTyped : public InteractiveModelView
-{
-public:
-	InteractiveModelViewTyped(QWidget* widget) :
-		InteractiveModelView(widget, getTypeId<BaseType>())
-	{}
-	InteractiveModelViewTyped(QWidget* widget, size_t typeId) :
-		InteractiveModelView(widget, typeId)
-	{}
-protected:
-	//! use Template Specialization to add customized actions
-	static std::vector<CommandData> addActions() { return std::vector<CommandData>(); }
-	virtual const std::vector<CommandData>& getActions() override { return s_actionArray; }
-	static std::vector<CommandData> s_actionArray;
-};
-
-inline template<typename BaseType>
-std::vector<CommandData> InteractiveModelViewTyped<BaseType>::s_actionArray(InteractiveModelViewTyped<BaseType>::addActions());
-*/
 
 } // namespace lmms::gui
 

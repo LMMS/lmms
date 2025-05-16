@@ -1,5 +1,5 @@
 /*
- * InteractiveModelView.cpp - Implements action system for widgets
+ * InteractiveModelView.cpp - Implements command system for widgets
  *
  * Copyright (c) 2024 - 2025 szeli1 <TODO/at/gmail/dot/com>
  *
@@ -39,8 +39,8 @@
 namespace lmms::gui
 {
 
-std::unique_ptr<QColor> InteractiveModelView::s_highlightColor = std::make_unique<QColor>();
-std::unique_ptr<QColor> InteractiveModelView::s_usedHighlightColor = std::make_unique<QColor>();
+QColor InteractiveModelView::s_highlightColor;
+QColor InteractiveModelView::s_usedHighlightColor;
 QTimer* InteractiveModelView::s_highlightTimer = nullptr;
 
 SimpleTextFloat* InteractiveModelView::s_simpleTextFloat = nullptr;
@@ -48,7 +48,7 @@ std::list<InteractiveModelView*> InteractiveModelView::s_interactiveWidgets;
 
 InteractiveModelView::InteractiveModelView(QWidget* widget, size_t typeId) :
 	QWidget(widget),
-	m_actionArray(),
+	m_commandArray(),
 	m_isHighlighted(false),
 	m_interactiveModelViewTypeId(typeId)
 {
@@ -73,18 +73,18 @@ void InteractiveModelView::startHighlighting(Clipboard::DataType dataType)
 		QObject::connect(s_highlightTimer, &QTimer::timeout, timerStopHighlighting);
 	}
 
-	bool shouldOverrideUpdate = *s_usedHighlightColor != *s_highlightColor;
-	if (shouldOverrideUpdate) { s_usedHighlightColor = std::make_unique<QColor>(*s_highlightColor); }
+	bool shouldOverrideUpdate = s_usedHighlightColor != s_highlightColor;
+	if (shouldOverrideUpdate) { s_usedHighlightColor = s_highlightColor; }
 
 	// highlighting the widgets that accept the data type
 	for (auto it = s_interactiveWidgets.begin(); it != s_interactiveWidgets.end(); ++it)
 	{
 		bool found = false;
-		const std::vector<CommandData>& actions = (*it)->getActions();
+		const std::vector<CommandData>& commands = (*it)->getCommands();
 		// this could be optimized by logging `getStoredTypeId()`s and comparing it's Id to the already accepted Ids
-		for (auto& curAction : actions)
+		for (auto& curCommand : commands)
 		{
-			if (curAction.doesTypeMatch(dataType)) { found = true; break; }
+			if (curCommand.doesTypeMatch(dataType)) { found = true; break; }
 		}
 		(*it)->overrideSetIsHighlighted(found, shouldOverrideUpdate);
 	}
@@ -123,12 +123,12 @@ void InteractiveModelView::hideMessage()
 
 QColor InteractiveModelView::getHighlightColor()
 {
-	return *s_highlightColor;
+	return s_highlightColor;
 }
 
 void InteractiveModelView::setHighlightColor(QColor& color)
 {
-	s_highlightColor = std::make_unique<QColor>(color);
+	s_highlightColor = color;
 }
 
 void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t duration, bool shouldStopHighlightingOrhers)
@@ -146,27 +146,28 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 		stopHighlighting();
 	}
 	
-	bool shouldOverrideUpdate = *s_usedHighlightColor != color;
-	if (shouldOverrideUpdate) { s_usedHighlightColor = std::make_unique<QColor>(color); }
+	bool shouldOverrideUpdate = s_usedHighlightColor != color;
+	if (shouldOverrideUpdate) { s_usedHighlightColor = color; }
 	overrideSetIsHighlighted(true, shouldOverrideUpdate);
 	s_highlightTimer->start(duration);
 }
 
-void InteractiveModelView::doAction(void* functionPointer, bool shouldLinkBack)
+void InteractiveModelView::doCommand(size_t commandId, bool shouldLinkBack)
 {
-	InteractiveModelView::doActionAt(getIndexFromFn(functionPointer), shouldLinkBack);
+	InteractiveModelView::doCommandAt(getIndexFromId(commandId), shouldLinkBack);
 }
-void InteractiveModelView::doActionAt(size_t actionIndex, bool shouldLinkBack)
+void InteractiveModelView::doCommandAt(size_t commandIndex, bool shouldLinkBack)
 {
-	const std::vector<CommandData>& actions = getActions();
-	if (actionIndex > actions.size()) { return; }
-	// if the action accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
-	qDebug("doActionAt before type return");
-	if (actions[actionIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
-	qDebug("doActionAt after type return");
+	const std::vector<CommandData>& commands = getCommands();
+	if (commandIndex > commands.size()) { return; }
+	// if the command accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
+	qDebug("doCommandAt before type return");
+	if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
+	qDebug("doCommandAt after type return");
 
-	qDebug("doAction typed, %ld, %s", actionIndex, actions[actionIndex].getText().toStdString().c_str());
-	GuiCommand command(actions[actionIndex].getText(), this, *actions[actionIndex].doFn, *actions[actionIndex].undoFn, 1, shouldLinkBack);
+	assert(commands[commandIndex].doFn.get() != nullptr);
+	qDebug("doCommand typed, %ld, %s", commandIndex, commands[commandIndex].getText().toStdString().c_str());
+	GuiCommand command(commands[commandIndex].getText(), this, commands[commandIndex].doFn, commands[commandIndex].undoFn, 1, shouldLinkBack);
 	command.redo();
 }
 
@@ -184,11 +185,11 @@ void InteractiveModelView::drawAutoHighlight(QPainter* painter)
 {
 	if (getIsHighlighted())
 	{
-		QColor fillColor = *s_usedHighlightColor;
+		QColor fillColor = s_usedHighlightColor;
 		fillColor.setAlpha(70);
 		painter->fillRect(QRect(1, 1, width() - 2, height() - 2), fillColor);
 
-		painter->setPen(QPen(*s_usedHighlightColor, 2));
+		painter->setPen(QPen(s_usedHighlightColor, 2));
 		painter->drawLine(1, 1, 5, 1);
 		painter->drawLine(1, 1, 1, 5);
 		painter->drawLine(width() - 2, height() - 2, width() - 6, height() - 2);
@@ -213,29 +214,36 @@ void InteractiveModelView::setIsHighlighted(bool isHighlighted, bool shouldOverr
 	}
 }
 
+size_t InteractiveModelView::getIndexFromId(size_t id)
+{
+	const std::vector<CommandData>& commands = getCommands();
+	for (size_t i = 0; i < commands.size(); i++)
+	{
+		if (commands[i].commandId == id) { return i; }
+	}
+	return commands.size();
+}
+
 size_t InteractiveModelView::getIndexFromFn(void* functionPointer)
 {
-	const std::vector<CommandData>& actions = getActions();
-	for (size_t i = 0; i < actions.size(); i++)
+	const std::vector<CommandData>& commands = getCommands();
+	for (size_t i = 0; i < commands.size(); i++)
 	{
-		if (actions[i].doFn->isMatch(functionPointer))
-		{
-			return i;
-		}
+		if (commands[i].doFn->isMatch(functionPointer)) { return i; }
 	}
-	assert(false);
-	return actions.size();
+	return commands.size();
 }
 
 
-CommandData::CommandData(QString& name, CommandFnPtr& doFnIn, CommandFnPtr& undoFnIn, bool isTypeSpecific, Clipboard::DataType acceptedType) :
+CommandData::CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr* undoFnIn, bool isTypeSpecific) :
+	commandId(id),
 	commandName(name),
-	doFn(&doFnIn),
-	undoFn(&undoFnIn),
+	doFn(doFnIn.clone()),
+	undoFn(undoFnIn != nullptr ? undoFnIn->clone() : nullptr),
 	isTypeSpecific(isTypeSpecific),
 	isShortcut(false)
 {
-	addAcceptedDataType(acceptedType);
+	addAcceptedDataType(Clipboard::DataType::Any);
 }
 
 CommandData::~CommandData()
@@ -243,7 +251,7 @@ CommandData::~CommandData()
 	// TODO delete from history
 }
 
-void CommandData::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, size_t shortcutTimes, bool isShortcutLoop)
+void CommandData::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, bool isShortcutLoop)
 {
 	isShortcut = true;
 	key = shortcutKey;
@@ -254,6 +262,7 @@ void CommandData::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcut
 void CommandData::addAcceptedDataType(Clipboard::DataType type)
 {
 	if (type == Clipboard::DataType::Error) { return; }
+	if (acceptedType.size() > 0 && acceptedType[0] == Clipboard::DataType::Any) { acceptedType.clear(); }
 	acceptedType.push_back(type);
 }
 
