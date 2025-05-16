@@ -36,8 +36,10 @@ class PositionLine : public QWidget
 	Q_OBJECT
 	Q_PROPERTY(bool tailGradient MEMBER m_hasTailGradient)
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+	Q_PROPERTY(QColor recordingColor MEMBER m_recordingColor)
 public:
 	PositionLine(QWidget* parent);
+	bool isRecording = false;
 
 public slots:
 	void zoomChange(float zoom);
@@ -47,6 +49,7 @@ private:
 
 	bool m_hasTailGradient;
 	QColor m_lineColor;
+	QColor m_recordingColor;
 };
 
 } // namespace lmms::gui
