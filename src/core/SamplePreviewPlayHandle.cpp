@@ -106,12 +106,12 @@ void SamplePreviewPlayHandle::play(SampleFrame* dst)
 			const auto nextSrcSample = static_cast<double>(nextSrcFrame[channel]);
 			const auto interpolatedSample = std::lerp(prevSrcSample, nextSrcSample, interpolatedSrcFramePos);
 
-			if (channelsToRead == 1)
-			{
-				dst[dstFrameIndex][0] = static_cast<float>(interpolatedSample);
-				dst[dstFrameIndex][1] = static_cast<float>(interpolatedSample);
-			}
-			else { dst[dstFrameIndex][channel] = static_cast<float>(interpolatedSample); }
+			dst[dstFrameIndex][channel] = static_cast<float>(interpolatedSample);
+		}
+
+		if (channelsToRead == 1)
+		{
+			dst[dstFrameIndex][1] = dst[dstFrameIndex][0];
 		}
 	}
 
