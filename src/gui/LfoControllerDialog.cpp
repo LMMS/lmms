@@ -67,7 +67,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base:" ), "" );
 
-	m_speedKnob = TempoSyncKnob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("FREQ"), this);
+	m_speedKnob = new TempoSyncKnob(KnobType::Bright26, tr("FREQ"), SMALL_FONT_SIZE, this);
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO frequency:" ), "" );
 

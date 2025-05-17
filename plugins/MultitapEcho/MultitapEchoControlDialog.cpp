@@ -79,7 +79,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	
 	// knobs
 
-	auto stepLength = TempoSyncKnob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("Length"), this);
+	auto stepLength = new TempoSyncKnob(KnobType::Bright26, tr("Length"), SMALL_FONT_SIZE,  this);
 	stepLength->move( 100, 245 );
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setHintText( tr( "Step length:" ) , " ms" );
