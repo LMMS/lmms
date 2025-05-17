@@ -29,18 +29,12 @@ namespace lmms::gui
 {
 
 
-CustomTextKnob::CustomTextKnob( KnobType _knob_num, QWidget * _parent, const QString & _name, const QString & _value_text ) :
+CustomTextKnob::CustomTextKnob( KnobType _knob_num, const QString& label, QWidget * _parent, const QString & _name, const QString & _value_text ) :
 	Knob( _knob_num, _parent, _name ),
-	m_value_text( _value_text ) {}
-
-CustomTextKnob* CustomTextKnob::buildKnobWithSmallPixelFont(KnobType knobNum, QWidget* parent, const QString& description, const QString& label)
+	m_value_text( _value_text )
 {
-	auto result = new CustomTextKnob(knobNum, parent, description);
-
-	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
-	result->setLabel(label);
-
-	return result;
+	setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
+	setLabel(label);
 }
 
 QString CustomTextKnob::displayValue() const
