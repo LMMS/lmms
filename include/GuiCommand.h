@@ -54,7 +54,6 @@ public:
 	
 	virtual CommandFnPtr* clone() const = 0;
 	virtual bool isValid() const = 0;
-	virtual bool isMatch(void* functionPtr) const = 0;
 private:
 	virtual void callFnInternal(InteractiveModelView* object, void* data, size_t dataTypeId) = 0;
 };
@@ -77,11 +76,9 @@ public:
 		return new TypedCommandFnPtr<BaseType, DataType>(m_functionPtr);
 	}
 	bool isValid() const override { return m_functionPtr != nullptr; }
-	bool isMatch(void* functionPtr) const override { return reinterpret_cast<void*>(m_functionPtr) == functionPtr; }
 private:
 	void callFnInternal(InteractiveModelView* object, void* data, size_t dataTypeId) override
 	{
-		qDebug("type assert debug: %ld, %ld, %s", dataTypeId, typeid(DataType).hash_code(), typeid(DataType).name());
 		if (m_functionPtr == nullptr || object == nullptr) { return; }
 		assert(data != nullptr);
 		// if this assert fails, `InteractiveModelView::getStoredTypeId()` is wrong type
@@ -112,11 +109,9 @@ public:
 		return new BasicCommandFnPtr<BaseType>(m_functionPtr);
 	}
 	bool isValid() const override { return m_functionPtr != nullptr; }
-	bool isMatch(void* functionPtr) const override { return reinterpret_cast<void*>(m_functionPtr) == functionPtr; }
 private:
 	void callFnInternal(InteractiveModelView* object, void* data, size_t dataTypeId) override
 	{
-		qDebug("type assert debug: %ld, %ld, %s", getTypeIdFromInteractiveModelView(object), typeid(BaseType).hash_code(), typeid(BaseType).name());
 		if (m_functionPtr == nullptr || object == nullptr) { return; }
 		// if this assert fails, `InteractiveModelView::getStoredTypeId()` is wrong type (function isn't member to type)
 		assert(typeid(BaseType).hash_code() == getTypeIdFromInteractiveModelView(object));
