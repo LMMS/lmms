@@ -77,6 +77,11 @@ class LMMS_EXPORT Knob : public FloatModelEditorBase
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
+	enum class Mode
+	{
+		NonLegacy, Legacy
+	};
+
 	/**
 	 * @brief Construct a Knob with the given style and no label.
 	 * 
@@ -92,9 +97,10 @@ public:
 	 * @param knobNum Style of the knob
 	 * @param labelText Text for the label
 	 * @param parent Parent widget
+	 * @param mode Builds a knob with legacy behavior (font size always 12 pixels) if set to Legacy. Default is NonLegacy.
 	 * @param name Object name of the widget
 	 */
-	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, const QString& name = QString());
+	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, Mode mode = Mode::NonLegacy, const QString& name = QString());
 
 	/**
 	 * @brief Constructs a knob with a label font in the pixel size.
@@ -110,20 +116,6 @@ public:
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	
 	Knob( const Knob& other ) = delete;
-
-	/**
-	 * @brief Builds a knob with legacy behavior, i.e. it does not use the widget font
-	 * when rendering the label and also uses the old rendering code.
-	 * 
-	 * @param knobNum 
-	 * @param label 
-	 * @param parent 
-	 * @param name 
-	 * @return Knob* 
-	 * 
-	 * @deprecated Legacy knobs should be considered deprecated. Please do not use them in new code!
-	 */
-	static Knob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
 
 	void setHtmlLabel( const QString &htmltxt );
 

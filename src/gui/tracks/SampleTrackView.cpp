@@ -63,13 +63,13 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = Knob::buildLegacyKnob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), tr("Track volume"));
+	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::Mode::Legacy, tr("Track volume"));
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
 	m_volumeKnob->show();
 
-	m_panningKnob = Knob::buildLegacyKnob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), tr("Panning"));
+	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::Mode::Legacy, tr("Panning"));
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
 	m_panningKnob->show();

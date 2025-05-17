@@ -44,7 +44,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("RANGE"), this))
+	m_chordRangeKnob(new Knob(KnobType::Bright26, tr("RANGE"), this, Knob::Mode::Legacy))
 {
 	auto topLayout = new QHBoxLayout(this);
 	topLayout->setContentsMargins(0, 0, 0, 0);
@@ -97,13 +97,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_a( arp ),
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
-	m_arpRangeKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("RANGE"), this)),
-	m_arpRepeatsKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("REP"), this)),
-	m_arpCycleKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("CYCLE"), this)),
-	m_arpSkipKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("SKIP"), this)),
-	m_arpMissKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("MISS"), this)),
+	m_arpRangeKnob(new Knob(KnobType::Bright26, tr("RANGE"), this, Knob::Mode::Legacy)),
+	m_arpRepeatsKnob(new Knob(KnobType::Bright26, tr("REP"), this, Knob::Mode::Legacy)),
+	m_arpCycleKnob(new Knob(KnobType::Bright26, tr("CYCLE"), this, Knob::Mode::Legacy)),
+	m_arpSkipKnob(new Knob(KnobType::Bright26, tr("SKIP"), this, Knob::Mode::Legacy)),
+	m_arpMissKnob(new Knob(KnobType::Bright26, tr("MISS"), this, Knob::Mode::Legacy)),
 	m_arpTimeKnob(TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("TIME"), this)),
-	m_arpGateKnob(Knob::buildLegacyKnob(KnobType::Bright26, tr("GATE"), this)),
+	m_arpGateKnob(new Knob(KnobType::Bright26, tr("GATE"), this, Knob::Mode::Legacy)),
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {

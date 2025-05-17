@@ -81,7 +81,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		case BufferDataType::Integer:
 		case BufferDataType::Enum:
 		case BufferDataType::Floating:
-			knb = new Knob( KnobType::Bright26, m_ctl->port()->name, this, m_ctl->port()->name );
+			knb = new Knob( KnobType::Bright26, m_ctl->port()->name, this, Knob::Mode::NonLegacy, m_ctl->port()->name );
 			break;
 
 		case BufferDataType::Time:

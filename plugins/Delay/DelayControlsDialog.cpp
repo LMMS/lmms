@@ -50,7 +50,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
 	sampleDelayKnob->setHintText( tr( "Delay time" ) + " ", " s" );
 
-	auto feedbackKnob = Knob::buildLegacyKnob(KnobType::Bright26, tr("FDBK"), this);
+	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FDBK"), this, Knob::Mode::Legacy);
 	feedbackKnob->move( 11, 58 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel);

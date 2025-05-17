@@ -57,7 +57,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	// Helper lambdas for consistent repeated buiding of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
-		auto knob = Knob::buildLegacyKnob(KnobType::Bright26, label, this);
+		auto knob = new Knob(KnobType::Bright26, label, this, Knob::Mode::Legacy);
 		knob->setHintText(hintText, "");
 		
 		return knob;

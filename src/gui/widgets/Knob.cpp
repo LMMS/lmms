@@ -51,10 +51,15 @@ Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	initUi( _name );
 }
 
-Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, const QString& name) :
+Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, Mode mode, const QString& name) :
 	Knob(knobNum, parent, name)
 {
 	setLabel(labelText);
+
+	if (mode == Mode::Legacy)
+	{
+		setLegacyMode(true);
+	}
 }
 
 Knob::Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name) :
@@ -67,15 +72,6 @@ Knob::Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidg
 Knob::Knob( QWidget * _parent, const QString & _name ) :
 	Knob( KnobType::Bright26, _parent, _name )
 {
-}
-
-Knob* Knob::buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name)
-{
-	auto result = new Knob(knobNum, label, parent, name);
-	result->setLegacyMode(true);
-	result->setFont(adjustedToPixelSize(result->font(), SMALL_FONT_SIZE));
-
-	return result;
 }
 
 

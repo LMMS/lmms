@@ -63,7 +63,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_bypass->setToolTip(tr("On/Off"));
 
-	m_wetDry = Knob::buildLegacyKnob(KnobType::Bright26, tr("W/D"), this);
+	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::Mode::Legacy);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
@@ -75,7 +75,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
-	m_gate = Knob::buildLegacyKnob(KnobType::Bright26, tr("GATE"), this);
+	m_gate = new Knob(KnobType::Bright26, tr("GATE"), this, Knob::Mode::Legacy);
 	m_gate->move( 116 - m_gate->width() / 2, 5 );
 	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
