@@ -105,18 +105,6 @@ public:
 	 */
 	static Knob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
 
-	/**
-	 * @brief Convenience function to build a knob with a font that uses a fixed pixel size.
-	 * 
-	 * @param knobNum Knob type
-	 * @param label Label that is displayed by the knob
-	 * @param pixelSize Pixel size of the font that is used to render the knob label
-	 * @param parent Parent widget of the knob
-	 * @param name Internal Qt name of the knob (optional)
-	 * @return Knob* The constructed knob.
-	 */
-	static Knob* buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name = QString());
-
 	void setLabel(const QString& txt);
 	void setHtmlLabel( const QString &htmltxt );
 

@@ -73,11 +73,6 @@ Knob* Knob::buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* par
 	return result;
 }
 
-Knob* Knob::buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name)
-{
-	return new Knob(knobNum, label, pixelSize, parent, name);
-}
-
 
 
 void Knob::initUi( const QString & _name )
