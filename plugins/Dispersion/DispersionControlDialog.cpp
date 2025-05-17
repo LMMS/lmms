@@ -53,19 +53,16 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	m_amountBox->setLabel(tr("AMOUNT"));
 	m_amountBox->setToolTip(tr("Number of all-pass filters"));
 	
-	Knob * freqKnob = new Knob(KnobType::Bright26, this);
+	Knob * freqKnob = new Knob(KnobType::Bright26, tr("FREQ"), this);
 	freqKnob->setModel(&controls->m_freqModel);
-	freqKnob->setLabel(tr("FREQ"));
 	freqKnob->setHintText(tr("Frequency:") , " Hz");
 	
-	Knob * resoKnob = new Knob(KnobType::Bright26, this);
+	Knob * resoKnob = new Knob(KnobType::Bright26, tr("RESO"), this);
 	resoKnob->setModel(&controls->m_resoModel);
-	resoKnob->setLabel(tr("RESO"));
 	resoKnob->setHintText(tr("Resonance:") , " octaves");
 	
-	Knob * feedbackKnob = new Knob(KnobType::Bright26, this);
+	Knob * feedbackKnob = new Knob(KnobType::Bright26, tr("FEED"), this);
 	feedbackKnob->setModel(&controls->m_feedbackModel);
-	feedbackKnob->setLabel(tr("FEED"));
 	feedbackKnob->setHintText(tr("Feedback:") , "");
 	
 	PixmapButton * dcButton = new PixmapButton(this, tr("DC Offset Removal"));

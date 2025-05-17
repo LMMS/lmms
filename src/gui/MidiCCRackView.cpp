@@ -90,8 +90,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	// Adds the controller knobs and sets their models
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		auto knob = new Knob(KnobType::Bright26, this);
-		knob->setLabel(tr("CC %1").arg(i));
+		auto knob = new Knob(KnobType::Bright26, tr("CC %1").arg(i), this);
 		knob->setModel(m_track->m_midiCCModel[i].get());
 		knobsAreaLayout->addWidget(knob, i/4, i%4, Qt::AlignHCenter);
 

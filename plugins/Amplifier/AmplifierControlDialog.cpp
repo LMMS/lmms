@@ -46,9 +46,8 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	
 	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
 	{
-		Knob* newKnob = new Knob(KnobType::Bright26, this);
+		Knob* newKnob = new Knob(KnobType::Bright26, label, this);
 		newKnob->setModel(model);
-		newKnob->setLabel(label);
 		newKnob->setHintText(hintText, unit);
 		newKnob->setVolumeKnob(isVolume);
 		return newKnob;

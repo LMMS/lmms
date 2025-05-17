@@ -47,40 +47,34 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	auto knobLayout = new QHBoxLayout();
 	mainLayout->addLayout(knobLayout);
 
-	auto delayKnob = new Knob(KnobType::Bright26, this);
+	auto delayKnob = new Knob(KnobType::Bright26, tr("DELAY"), this);
 	delayKnob->setVolumeKnob( false );
 	delayKnob->setModel( &controls->m_delayTimeModel );
-	delayKnob->setLabel( tr( "DELAY" ) );
 	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
 
-	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, this);
+	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this);
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
-	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr( "Period:" ) , " Sec" );
 
-	auto lfoAmtKnob = new Knob(KnobType::Bright26, this);
+	auto lfoAmtKnob = new Knob(KnobType::Bright26, tr("AMNT"), this);
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
-	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr( "Amount:" ) , "" );
 
-	auto lfoPhaseKnob = new Knob(KnobType::Bright26, this);
+	auto lfoPhaseKnob = new Knob(KnobType::Bright26, tr("PHASE"), this);
 	lfoPhaseKnob->setVolumeKnob( false );
 	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
-	lfoPhaseKnob->setLabel( tr( "PHASE" ) );
 	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
-	auto feedbackKnob = new Knob(KnobType::Bright26, this);
+	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FDBK"), this);
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel );
-	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
-	auto whiteNoiseKnob = new Knob(KnobType::Bright26, this);
+	auto whiteNoiseKnob = new Knob(KnobType::Bright26, tr("NOISE"), this);
 	whiteNoiseKnob->setVolumeKnob( true) ;
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
-	whiteNoiseKnob->setLabel( tr( "NOISE" ) );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 
 	knobLayout->addWidget(delayKnob);

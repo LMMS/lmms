@@ -40,7 +40,8 @@ namespace lmms::gui
 
 void KnobControl::setText(const QString& text)
 {
-	m_knob->setLabel(text);
+	// For KnobControls the text is set in the constructor
+	// so we do nothing here
 }
 
 QWidget *KnobControl::topWidget() { return m_knob; }
@@ -54,8 +55,8 @@ FloatModel *KnobControl::model() { return m_knob->model(); }
 
 AutomatableModelView* KnobControl::modelView() { return m_knob; }
 
-KnobControl::KnobControl(QWidget *parent) :
-	m_knob(new Knob(parent)) {}
+KnobControl::KnobControl(const QString& text, QWidget *parent) :
+	m_knob(new Knob(KnobType::Bright26, text, parent)) {}
 
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }

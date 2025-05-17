@@ -77,7 +77,25 @@ class LMMS_EXPORT Knob : public FloatModelEditorBase
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
+	/**
+	 * @brief Construct a Knob with the given style and no label.
+	 * 
+	 * @param _knob_num Style of the knob
+	 * @param _parent Parent widget
+	 * @param _name Object name of the widget
+	 */
 	Knob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+
+	/**
+	 * @brief Construct a Knob with the given style and label text.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param parent Parent widget
+	 * @param name Object name of the widget
+	 */
+	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, const QString& name = QString());
+
 	/**
 	 * @brief Constructs a knob with a label font in the pixel size.
 	 * 
@@ -88,7 +106,9 @@ public:
 	 * @param name Object name of the widget
 	 */
 	Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name = QString());
+
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
+	
 	Knob( const Knob& other ) = delete;
 
 	/**
@@ -105,7 +125,6 @@ public:
 	 */
 	static Knob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
 
-	void setLabel(const QString& txt);
 	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
@@ -137,6 +156,8 @@ public:
 
 
 protected:
+	void setLabel(const QString& txt);
+	
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;

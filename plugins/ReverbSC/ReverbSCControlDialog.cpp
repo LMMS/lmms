@@ -45,24 +45,20 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 
 	auto knobLayout = new QHBoxLayout(this);
 
-	auto inputGainKnob = new Knob(KnobType::Bright26, this);
+	auto inputGainKnob = new Knob(KnobType::Bright26, tr("Input"), this);
 	inputGainKnob->setModel( &controls->m_inputGainModel );
-	inputGainKnob->setLabel(tr("Input"));
 	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
 
-	auto sizeKnob = new Knob(KnobType::Bright26, this);
+	auto sizeKnob = new Knob(KnobType::Bright26, tr("Size"), this);
 	sizeKnob->setModel( &controls->m_sizeModel );
-	sizeKnob->setLabel(tr("Size"));
 	sizeKnob->setHintText( tr( "Size:" ) , "" );
 
-	auto colorKnob = new Knob(KnobType::Bright26, this);
+	auto colorKnob = new Knob(KnobType::Bright26, tr("Color"), this);
 	colorKnob->setModel( &controls->m_colorModel );
-	colorKnob->setLabel(tr("Color"));
 	colorKnob->setHintText( tr( "Color:" ) , "" );
 
-	auto outputGainKnob = new Knob(KnobType::Bright26, this);
+	auto outputGainKnob = new Knob(KnobType::Bright26, tr("Output"), this);
 	outputGainKnob->setModel( &controls->m_outputGainModel );
-	outputGainKnob->setLabel(tr("Output"));
 	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
 
 	knobLayout->addWidget(inputGainKnob);
