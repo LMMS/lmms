@@ -142,7 +142,7 @@ void InteractiveModelView::HighlightThisWidget(const QColor& color, size_t durat
 
 	if (shouldStopHighlightingOrhers)
 	{
-		// since only 1 `s_highlightTimer` exists, every other widget needs to stop using it
+		// since only one `s_highlightTimer` exists, every other widget needs to stop using it
 		stopHighlighting();
 	}
 	
@@ -163,8 +163,8 @@ void InteractiveModelView::doCommandAt(size_t commandIndex, bool shouldLinkBack)
 	// if the command accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
 	if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
 
-	assert(commands[commandIndex].doFn.get() != nullptr);
-	GuiCommand command(commands[commandIndex].getText(), this, commands[commandIndex].doFn, commands[commandIndex].undoFn, 1, shouldLinkBack);
+	assert(commands[commandIndex].getDoFn().get() != nullptr);
+	GuiCommand command(commands[commandIndex].getText(), this, commands[commandIndex].getDoFn(), commands[commandIndex].getUndoFn(), 1, shouldLinkBack);
 	command.redo();
 }
 
@@ -216,18 +216,29 @@ size_t InteractiveModelView::getIndexFromId(size_t id)
 	const std::vector<CommandData>& commands = getCommands();
 	for (size_t i = 0; i < commands.size(); i++)
 	{
-		if (commands[i].commandId == id) { return i; }
+		if (commands[i].getId() == id) { return i; }
 	}
 	return commands.size();
 }
 
-CommandData::CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr* undoFnIn, bool isTypeSpecific) :
-	commandId(id),
-	commandName(name),
-	doFn(doFnIn.clone()),
-	undoFn(undoFnIn != nullptr ? undoFnIn->clone() : nullptr),
-	isTypeSpecific(isTypeSpecific),
-	isShortcut(false)
+CommandData::CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr& undoFnIn, bool isTypeSpecific) :
+	m_commandId(id),
+	m_commandName(name),
+	m_doFn(doFnIn.clone()),
+	m_undoFn(undoFnIn.clone()),
+	m_isTypeSpecific(isTypeSpecific),
+	m_isShortcut(false)
+{
+	addAcceptedDataType(Clipboard::DataType::Any);
+}
+
+CommandData::CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, bool isTypeSpecific) :
+	m_commandId(id),
+	m_commandName(name),
+	m_doFn(doFnIn.clone()),
+	m_undoFn(nullptr),
+	m_isTypeSpecific(isTypeSpecific),
+	m_isShortcut(false)
 {
 	addAcceptedDataType(Clipboard::DataType::Any);
 }
@@ -239,55 +250,40 @@ CommandData::~CommandData()
 
 void CommandData::setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, bool isShortcutLoop)
 {
-	isShortcut = true;
-	key = shortcutKey;
-	modifier = shortcutModifier;
-	isLoop = isShortcutLoop;
+	m_isShortcut = true;
+	m_key = shortcutKey;
+	m_modifier = shortcutModifier;
 }
 
 void CommandData::addAcceptedDataType(Clipboard::DataType type)
 {
 	if (type == Clipboard::DataType::Error) { return; }
-	if (acceptedType.size() > 0 && acceptedType[0] == Clipboard::DataType::Any) { acceptedType.clear(); }
-	acceptedType.push_back(type);
-}
-
-void CommandData::resetShortcut()
-{
-	isShortcut = false;
-	key = Qt::Key_F35;
-	modifier = Qt::NoModifier;
-	isLoop = false;
+	if (m_acceptedType.size() > 0 && m_acceptedType[0] == Clipboard::DataType::Any) { m_acceptedType.clear(); }
+	m_acceptedType.push_back(type);
 }
 
 bool CommandData::doesShortcutMatch(QKeyEvent* event) const
 {
 	// if shortcut key == event key and the shortcut modifier can be found inside event modifiers or there is no modifier
-	return isShortcut && key == event->key() && ((event->modifiers() & modifier)
-		|| (event->nativeModifiers() <= 0 && modifier == Qt::NoModifier));
+	return m_isShortcut && m_key == event->key() && ((event->modifiers() & m_modifier)
+		|| (event->nativeModifiers() <= 0 && m_modifier == Qt::NoModifier));
 }
 
 bool CommandData::doesShortcutMatch(const CommandData& otherShortcut) const
 {
-	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier);
-}
-
-bool CommandData::doesFullShortcutMatch(const CommandData& otherShortcut) const
-{
-	return isShortcut && key == otherShortcut.key && (modifier & otherShortcut.modifier) && isLoop == otherShortcut.isLoop;
+	return m_isShortcut && m_key == otherShortcut.m_key && (m_modifier & otherShortcut.m_modifier);
 }
 
 void CommandData::copyShortcut(const CommandData& otherShortcut)
 {
-	isShortcut = otherShortcut.isShortcut;
-	key = otherShortcut.key;
-	modifier = otherShortcut.modifier;
-	isLoop = otherShortcut.isLoop;
+	m_isShortcut = otherShortcut.m_isShortcut;
+	m_key = otherShortcut.m_key;
+	m_modifier = otherShortcut.m_modifier;
 }
 
 bool CommandData::doesTypeMatch(Clipboard::DataType type) const
 {
-	for (Clipboard::DataType curType : acceptedType)
+	for (Clipboard::DataType curType : m_acceptedType)
 	{
 		if (curType == type) { return true; }
 	}
@@ -296,7 +292,7 @@ bool CommandData::doesTypeMatch(Clipboard::DataType type) const
 
 bool CommandData::isTypeAccepted(Clipboard::DataType type) const
 {
-	for (Clipboard::DataType curType : acceptedType)
+	for (Clipboard::DataType curType : m_acceptedType)
 	{
 		if (curType == Clipboard::DataType::Any || curType == type) { return true; }
 	}
@@ -305,7 +301,23 @@ bool CommandData::isTypeAccepted(Clipboard::DataType type) const
 
 const QString& CommandData::getText() const
 {
-	return commandName;
+	return m_commandName;
 }
+
+size_t CommandData::getId() const
+{
+	return m_commandId;
+}
+
+std::shared_ptr<CommandFnPtr> CommandData::getDoFn() const
+{
+	return m_doFn;
+}
+
+std::shared_ptr<CommandFnPtr> CommandData::getUndoFn() const
+{
+	return m_undoFn;
+}
+
 
 } // namespace lmms::gui

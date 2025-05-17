@@ -48,8 +48,9 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-struct CommandData
+class CommandData
 {
+public:
 	/*
 	* @param id: a unique identifier for the command, used to make handling commands easy
 	* @param name: a name that describes what this command does
@@ -58,46 +59,45 @@ struct CommandData
 	* @param isTypeSpecific: if the command can not be performed with other kinds of widgets (example for false: delete command)
 	* @param acceptedType: what kind of datatype does this command accept, use `Clipboard::DataType::Ignore` if datatype doesn't matter, use `Clipboard::DataType::Error` to later define the datatype
 	*/
-	CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr* undoFnIn, bool isTypeSpecific);
+	CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr& undoFnIn, bool isTypeSpecific);
+	CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, bool isTypeSpecific);
 	~CommandData(); // TODO
 	//! sets the shortcut and isShortcut will be true
 	void setShortcut(Qt::Key shortcutKey, Qt::KeyboardModifier shortcutModifier, bool isShortcutLoop);
 	//! use this to add more datatypes to a command `Clipboard::DataType::Error` will not be added
 	void addAcceptedDataType(Clipboard::DataType type);
 
-	size_t commandId = 0;
-	//! display name
-	QString commandName = "";
-
-	//! Function pointers needed to construct `GuiCommand`
-	std::shared_ptr<CommandFnPtr> doFn;
-	std::shared_ptr<CommandFnPtr> undoFn;
-
-	//! if the command can not be performed with other kinds of widgets (example for false: delete command)
-	bool isTypeSpecific = true;
-	bool isShortcut = false;
-
-	//! what kind of data does this command accept
-	std::vector<Clipboard::DataType> acceptedType = {Clipboard::DataType::Any};
-
-	// shortcut logic
-	Qt::Key key = Qt::Key_F35;
-	Qt::KeyboardModifier modifier = Qt::NoModifier;
-	//! should it loop back if m_times is reached
-	bool isLoop = false;
-
-	//! resets the shortcut and isShortcut will be false
-	void resetShortcut();
-	
 	bool doesShortcutMatch(QKeyEvent* event) const;
 	bool doesShortcutMatch(const CommandData& otherShortcut) const;
-	bool doesFullShortcutMatch(const CommandData& otherShortcut) const;
 	void copyShortcut(const CommandData& otherShortcut);
 	//! true if `type` is in `acceptedType`, isn't true if `acceptedType` has `Clipboard::DataType::Any`
 	bool doesTypeMatch(Clipboard::DataType type) const;
 	//! true if `type` is in `acceptedType`, true if `acceptedType` has `Clipboard::DataType::Any`
 	bool isTypeAccepted(Clipboard::DataType type) const;
 	const QString& getText() const;
+
+	size_t getId() const;
+	std::shared_ptr<CommandFnPtr> getDoFn() const;
+	std::shared_ptr<CommandFnPtr> getUndoFn() const;
+private:
+	size_t m_commandId = 0;
+	//! display name
+	QString m_commandName = "";
+
+	//! Function pointers needed to construct `GuiCommand`
+	std::shared_ptr<CommandFnPtr> m_doFn;
+	std::shared_ptr<CommandFnPtr> m_undoFn;
+
+	//! if the command can not be performed with other kinds of widgets (example for false: delete command)
+	bool m_isTypeSpecific = true;
+	bool m_isShortcut = false;
+
+	//! what kind of data does this command accept
+	std::vector<Clipboard::DataType> m_acceptedType = {Clipboard::DataType::Any};
+
+	// shortcut logic
+	Qt::Key m_key = Qt::Key_F35;
+	Qt::KeyboardModifier m_modifier = Qt::NoModifier;
 };
 
 
@@ -148,8 +148,8 @@ public:
 		// if the command accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
 		if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
 
-		assert(commands[commandIndex].doFn.get() != nullptr);
-		GuiCommandTyped<DataType> command(commands[commandIndex].getText(), this, commands[commandIndex].doFn, commands[commandIndex].undoFn, doData, undoData, shouldLinkBack);
+		assert(commands[commandIndex].getDoFn().get() != nullptr);
+		GuiCommandTyped<DataType> command(commands[commandIndex].getText(), this, commands[commandIndex].getDoFn(), commands[commandIndex].getUndoFn(), doData, undoData, shouldLinkBack);
 		command.redo();
 	}
 
