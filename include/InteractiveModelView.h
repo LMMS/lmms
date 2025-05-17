@@ -84,7 +84,7 @@ private:
 	//! display name
 	QString m_commandName = "";
 
-	//! Function pointers needed to construct `GuiCommand`
+	//! Function pointers needed to construct commands
 	std::shared_ptr<CommandFnPtr> m_doFn;
 	std::shared_ptr<CommandFnPtr> m_undoFn;
 
@@ -149,7 +149,7 @@ public:
 		if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
 
 		assert(commands[commandIndex].getDoFn().get() != nullptr);
-		GuiCommandTyped<DataType> command(commands[commandIndex].getText(), this, commands[commandIndex].getDoFn(), commands[commandIndex].getUndoFn(), doData, undoData, shouldLinkBack);
+		TypedCommand<DataType> command(commands[commandIndex].getText(), this, commands[commandIndex].getDoFn(), commands[commandIndex].getUndoFn(), doData, undoData, shouldLinkBack);
 		command.redo();
 	}
 

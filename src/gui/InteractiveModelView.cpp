@@ -164,7 +164,7 @@ void InteractiveModelView::doCommandAt(size_t commandIndex, bool shouldLinkBack)
 	if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
 
 	assert(commands[commandIndex].getDoFn().get() != nullptr);
-	GuiCommand command(commands[commandIndex].getText(), this, commands[commandIndex].getDoFn(), commands[commandIndex].getUndoFn(), 1, shouldLinkBack);
+	BasicCommand command(commands[commandIndex].getText(), this, commands[commandIndex].getDoFn(), commands[commandIndex].getUndoFn(), 1, shouldLinkBack);
 	command.redo();
 }
 
