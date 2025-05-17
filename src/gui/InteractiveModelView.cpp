@@ -161,12 +161,9 @@ void InteractiveModelView::doCommandAt(size_t commandIndex, bool shouldLinkBack)
 	const std::vector<CommandData>& commands = getCommands();
 	if (commandIndex > commands.size()) { return; }
 	// if the command accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
-	qDebug("doCommandAt before type return");
 	if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
-	qDebug("doCommandAt after type return");
 
 	assert(commands[commandIndex].doFn.get() != nullptr);
-	qDebug("doCommand typed, %ld, %s", commandIndex, commands[commandIndex].getText().toStdString().c_str());
 	GuiCommand command(commands[commandIndex].getText(), this, commands[commandIndex].doFn, commands[commandIndex].undoFn, 1, shouldLinkBack);
 	command.redo();
 }
@@ -223,17 +220,6 @@ size_t InteractiveModelView::getIndexFromId(size_t id)
 	}
 	return commands.size();
 }
-
-size_t InteractiveModelView::getIndexFromFn(void* functionPointer)
-{
-	const std::vector<CommandData>& commands = getCommands();
-	for (size_t i = 0; i < commands.size(); i++)
-	{
-		if (commands[i].doFn->isMatch(functionPointer)) { return i; }
-	}
-	return commands.size();
-}
-
 
 CommandData::CommandData(size_t id, const QString&& name, const CommandFnPtr& doFnIn, const CommandFnPtr* undoFnIn, bool isTypeSpecific) :
 	commandId(id),

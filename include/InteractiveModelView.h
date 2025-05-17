@@ -146,12 +146,9 @@ public:
 		const std::vector<CommandData>& commands = getCommands();
 		if (commandIndex > commands.size()) { return; }
 		// if the command accepts the current clipboard data, `Clipboard::DataType::Any` will accept anything
-		qDebug("doCommandAt typed before type return");
 		if (commands[commandIndex].isTypeAccepted(Clipboard::decodeKey(Clipboard::getMimeData())) == false) { return; }
-		qDebug("doCommandAt typed after type return");
 
 		assert(commands[commandIndex].doFn.get() != nullptr);
-		qDebug("doCommand typed, %ld, %s", commandIndex, commands[commandIndex].getText().toStdString().c_str());
 		GuiCommandTyped<DataType> command(commands[commandIndex].getText(), this, commands[commandIndex].doFn, commands[commandIndex].undoFn, doData, undoData, shouldLinkBack);
 		command.redo();
 	}
@@ -177,9 +174,8 @@ protected:
 	//! shouldOverrideUpdate could be needed if the color was changed
 	void setIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate);
 
-	//! returns an index of a command from a given ID / funcion ptr, reutrns getCommands().size() if not found
+	//! @return: an index of a command from a given ID, reutrns getCommands().size() if not found
 	size_t getIndexFromId(size_t id);
-	size_t getIndexFromFn(void* functionPointer);
 
 	//! construct in derived constructor
 	std::vector<CommandData> m_commandArray;
