@@ -91,7 +91,8 @@ void FloatModelEditorBase::addCommands(std::vector<CommandData>& targetList)
 		CommandData(9, "Set value", TypedCommandFnPtr<FloatModelEditorBase, float>(&FloatModelEditorBase::setValueCommand), nullptr, true),
 		CommandData(11, "Edit value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::openInputDialogCommand), nullptr, true),
 		CommandData(12, "Toggle scale", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::toggleScaleCommand), nullptr, true),
-		CommandData(13, "Set scale logarithmic", TypedCommandFnPtr<FloatModelEditorBase, bool>(&FloatModelEditorBase::setScaleLogarithmicCommand), nullptr, true)
+		CommandData(13, "Set scale logarithmic", TypedCommandFnPtr<FloatModelEditorBase, bool>(&FloatModelEditorBase::setScaleLogarithmicCommand), nullptr, true),
+		CommandData(14, "Set position", TypedCommandFnPtr<FloatModelEditorBase, QPoint>(&FloatModelEditorBase::setPositionCommand), nullptr, true)
 	};
 }
 
@@ -131,8 +132,8 @@ void FloatModelEditorBase::linkCommand(int id)
 	auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(id));
 	if (mod != nullptr)
 	{
+		doCommand<float>(9, mod->value<float>(), model()->value(), true); // setValueCommand
 		AutomatableModel::linkModels(model(), mod);
-		mod->setValue(model()->value());
 	}
 }
 void FloatModelEditorBase::unlinkCommand(int id)
@@ -206,6 +207,31 @@ void FloatModelEditorBase::setScaleLogarithmicCommand(bool isLogarithmic)
 {
 	model()->setScaleLogarithmic(true);
 }
+void FloatModelEditorBase::setPositionCommand(QPoint p)
+{
+	const float valueOffset = getValue(p) + m_leftOver;
+	const float currentValue = model()->value();
+	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
+	const auto step = model()->step<float>();
+	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
+
+	if (!approximatelyEqual(roundedValue, currentValue))
+	{
+		doCommand<float>(9, roundedValue, model()->value(), true); // setValueCommand
+		m_leftOver = 0.0f;
+	}
+	else
+	{
+		if (valueOffset > 0 && approximatelyEqual(currentValue, model()->minValue()))
+		{
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = valueOffset;
+		}
+	}
+}
 
 
 void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
@@ -247,7 +273,7 @@ void FloatModelEditorBase::contextMenuEvent(QContextMenuEvent *)
 	addDefaultActions(&contextMenu);
 	contextMenu.addAction(QPixmap(),
 		model()->isScaleLogarithmic() ? tr("Set linear") : tr("Set logarithmic"),
-		this, [this]{ this->doCommand(12); });
+		this, [this]{ this->doCommand(12); /* toggleScaleCommand */ });
 	contextMenu.addSeparator();
 	contextMenu.exec(QCursor::pos());
 }
@@ -323,7 +349,7 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 	if (m_buttonPressed && me->pos() != m_lastMousePos)
 	{
 		// knob position is changed depending on last mouse position
-		setPosition(me->pos() - m_lastMousePos);
+		doCommand<QPoint>(14, me->pos() - m_lastMousePos, me->pos());
 		emit sliderMoved(model()->value());
 		// original position for next time is current position
 		m_lastMousePos = me->pos();
@@ -378,7 +404,7 @@ void FloatModelEditorBase::focusOutEvent(QFocusEvent * fe)
 
 void FloatModelEditorBase::mouseDoubleClickEvent(QMouseEvent *)
 {
-	doCommand(11);
+	doCommand(11); // openInputDialogCommand
 }
 
 
@@ -460,7 +486,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const float scaledValueOffset = model()->scaledValue(model()->inverseScaledValue(currentValue) + valueOffset) - currentValue;
 	const float stepMult = std::max(scaledValueOffset / step, 1.f);
 	const int inc = direction * stepMult;
-	model()->incValue(inc);
+	doCommand<float>(9, model()->value() + inc, model()->value()); // setValueCommand
 
 	s_textFloat->setText(displayValue());
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
@@ -470,31 +496,6 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 }
 
 
-void FloatModelEditorBase::setPosition(const QPoint & p)
-{
-	const float valueOffset = getValue(p) + m_leftOver;
-	const float currentValue = model()->value();
-	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
-	const auto step = model()->step<float>();
-	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
-
-	if (!approximatelyEqual(roundedValue, currentValue))
-	{
-		model()->setValue(roundedValue);
-		m_leftOver = 0.0f;
-	}
-	else
-	{
-		if (valueOffset > 0 && approximatelyEqual(currentValue, model()->minValue()))
-		{
-			m_leftOver = 0.0f;
-		}
-		else
-		{
-			m_leftOver = valueOffset;
-		}
-	}
-}
 
 
 void FloatModelEditorBase::friendlyUpdate()

@@ -77,6 +77,7 @@ public:
 	void openInputDialogCommand();
 	void toggleScaleCommand();
 	void setScaleLogarithmicCommand(bool isLogarithmic);
+	void setPositionCommand(QPoint p);
 
 signals:
 	void sliderPressed();
@@ -113,7 +114,6 @@ private:
 	void doConnections() override;
 
 	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
-	void setPosition(const QPoint & p);
 
 	inline float pageSize() const
 	{
