@@ -76,23 +76,22 @@ void FloatModelEditorBase::initUi(const QString & name)
 
 void FloatModelEditorBase::addCommands(std::vector<CommandData>& targetList)
 {
-	auto unlinkCommand = TypedCommandFnPtr<FloatModelEditorBase, int>(&FloatModelEditorBase::unlinkCommand);
 	targetList =
 	{
-		CommandData(1, "Copy value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::copyValueCommand), nullptr, true),
-		CommandData(2, "Paste value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::pasteNoReturnCommand), nullptr, true),
-		CommandData(3, "Paste value", TypedCommandFnPtr<FloatModelEditorBase, bool*>(&FloatModelEditorBase::pasteCommand), nullptr, true),
+		CommandData(1, "Copy value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::copyValueCommand), true),
+		CommandData(2, "Paste value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::pasteNoReturnCommand), true),
+		CommandData(3, "Paste value", TypedCommandFnPtr<FloatModelEditorBase, bool*>(&FloatModelEditorBase::pasteCommand), true),
 		CommandData(4, "Link widget", TypedCommandFnPtr<FloatModelEditorBase, int>(&FloatModelEditorBase::linkCommand),
-			&unlinkCommand, true),
-		CommandData(5, "Copy link", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::getLinkCommand), nullptr, true),
-		CommandData(6, "Unlink from all", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::unlinkAllCommand), nullptr, true),
-		CommandData(7, "Increase value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::increaseValueCommand), nullptr, true),
-		CommandData(8, "Decrease value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::decreaseValueCommand), nullptr, true),
-		CommandData(9, "Set value", TypedCommandFnPtr<FloatModelEditorBase, float>(&FloatModelEditorBase::setValueCommand), nullptr, true),
-		CommandData(11, "Edit value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::openInputDialogCommand), nullptr, true),
-		CommandData(12, "Toggle scale", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::toggleScaleCommand), nullptr, true),
-		CommandData(13, "Set scale logarithmic", TypedCommandFnPtr<FloatModelEditorBase, bool>(&FloatModelEditorBase::setScaleLogarithmicCommand), nullptr, true),
-		CommandData(14, "Set position", TypedCommandFnPtr<FloatModelEditorBase, QPoint>(&FloatModelEditorBase::setPositionCommand), nullptr, true)
+			TypedCommandFnPtr<FloatModelEditorBase, int>(&FloatModelEditorBase::unlinkCommand), true),
+		CommandData(5, "Copy link", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::getLinkCommand), true),
+		CommandData(6, "Unlink from all", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::unlinkAllCommand), true),
+		CommandData(7, "Increase value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::increaseValueCommand), true),
+		CommandData(8, "Decrease value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::decreaseValueCommand), true),
+		CommandData(9, "Set value", TypedCommandFnPtr<FloatModelEditorBase, float>(&FloatModelEditorBase::setValueCommand), true),
+		CommandData(11, "Edit value", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::openInputDialogCommand), true),
+		CommandData(12, "Toggle scale", BasicCommandFnPtr<FloatModelEditorBase>(&FloatModelEditorBase::toggleScaleCommand), true),
+		CommandData(13, "Set scale logarithmic", TypedCommandFnPtr<FloatModelEditorBase, bool>(&FloatModelEditorBase::setScaleLogarithmicCommand), true),
+		CommandData(14, "Set position", TypedCommandFnPtr<FloatModelEditorBase, QPoint>(&FloatModelEditorBase::setPositionCommand), true)
 	};
 }
 
@@ -291,6 +290,7 @@ void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
 	bool canAccept = false;
+	// TODO this checks the wrong mime data when pasting leading to commands returning
 	doCommand<bool*>(3, &canAccept);
 	if (canAccept == true)
 	{

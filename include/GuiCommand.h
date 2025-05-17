@@ -168,7 +168,7 @@ public:
 	void undo()// override
 	{
 		if (m_target == nullptr) { return; }
-		if (m_undoFn->isValid())
+		if (m_undoFn.get() != nullptr && m_undoFn->isValid())
 		{
 			if (m_undoData.get() != nullptr)
 			{

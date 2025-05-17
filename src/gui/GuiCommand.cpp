@@ -65,7 +65,7 @@ GuiCommand::GuiCommand(const QString& name, InteractiveModelView* object, std::s
 {}
 void GuiCommand::undo()
 {
-	if (m_target == nullptr || m_undoFn == nullptr) { return; }
+	if (m_target == nullptr || m_undoFn.get() == nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
 		m_undoFn->callFnTypeless(m_target);
@@ -73,7 +73,7 @@ void GuiCommand::undo()
 }
 void GuiCommand::redo()
 {
-	if (m_target == nullptr || m_doFn == nullptr) { return; }
+	if (m_target == nullptr || m_doFn.get()== nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)
 	{
 		m_doFn->callFnTypeless(m_target);
