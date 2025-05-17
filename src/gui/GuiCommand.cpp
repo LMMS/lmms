@@ -35,18 +35,18 @@ size_t CommandFnPtr::getTypeIdFromInteractiveModelView(InteractiveModelView* obj
 	return object->getStoredTypeId();
 }
 
-AbstractGuiCommand::AbstractGuiCommand(const QString& name, InteractiveModelView* object, bool linkBack) :
+AbstractCommand::AbstractCommand(const QString& name, InteractiveModelView* object, bool linkBack) :
 	m_name(name),
 	m_target(object),
 	m_isLinkedBack(linkBack)
 {
 	assert(m_target != nullptr);
 }
-bool AbstractGuiCommand::getShouldLinkBack()
+bool AbstractCommand::getShouldLinkBack()
 {
 	return m_isLinkedBack;
 }
-bool AbstractGuiCommand::clearObjectIfMatch(InteractiveModelView* object)
+bool AbstractCommand::clearObjectIfMatch(InteractiveModelView* object)
 {
 	if (m_target == nullptr) { return false; }
 	if (object == m_target)
@@ -57,13 +57,13 @@ bool AbstractGuiCommand::clearObjectIfMatch(InteractiveModelView* object)
 	return false;
 }
 
-GuiCommand::GuiCommand(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, size_t runAmount, bool linkBack) :
-	AbstractGuiCommand(name, object, linkBack),
+BasicCommand::BasicCommand(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, size_t runAmount, bool linkBack) :
+	AbstractCommand(name, object, linkBack),
 	m_runAmount(runAmount),
 	m_doFn(doFn),
 	m_undoFn(undoFn)
 {}
-void GuiCommand::undo()
+void BasicCommand::undo()
 {
 	if (m_target == nullptr || m_undoFn.get() == nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)
@@ -71,7 +71,7 @@ void GuiCommand::undo()
 		m_undoFn->callFnTypeless(m_target);
 	}
 }
-void GuiCommand::redo()
+void BasicCommand::redo()
 {
 	if (m_target == nullptr || m_doFn.get()== nullptr) { return; }
 	for (size_t i = 0; i < m_runAmount; i++)

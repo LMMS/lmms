@@ -122,11 +122,11 @@ private:
 };
 
 
-class AbstractGuiCommand// : public QUndoCommand
+class AbstractCommand// : public QUndoCommand
 {
 public:
-	AbstractGuiCommand(const QString& name, InteractiveModelView* object, bool linkBack);
-	~AbstractGuiCommand() {}
+	AbstractCommand(const QString& name, InteractiveModelView* object, bool linkBack);
+	~AbstractCommand() {}
 	//! should be undone along with the action before this
 	bool getShouldLinkBack();
 	//! returns true if cleared, use this to delete pointers to destructing objects
@@ -137,10 +137,10 @@ protected:
 	bool m_isLinkedBack; //! if this is undone, undo the one before this
 };
 
-class GuiCommand : public AbstractGuiCommand
+class BasicCommand : public AbstractCommand
 {
 public:
-	GuiCommand(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, size_t runAmount, bool linkBack);
+	BasicCommand(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, size_t runAmount, bool linkBack);
 	void undo();// override
 	void redo();// override
 private:
@@ -152,11 +152,11 @@ private:
 
 
 template<typename DataType>
-class GuiCommandTyped : public AbstractGuiCommand
+class TypedCommand : public AbstractCommand
 {
 public:
-	GuiCommandTyped(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, DataType doData, DataType* undoData, bool linkBack) :
-		AbstractGuiCommand(name, object, linkBack),
+	TypedCommand(const QString& name, InteractiveModelView* object, std::shared_ptr<CommandFnPtr> doFn, std::shared_ptr<CommandFnPtr> undoFn, DataType doData, DataType* undoData, bool linkBack) :
+		AbstractCommand(name, object, linkBack),
 		m_doData(nullptr),
 		m_undoData(nullptr),
 		m_doFn(doFn),
