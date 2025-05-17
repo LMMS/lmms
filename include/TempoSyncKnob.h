@@ -42,10 +42,21 @@ class LMMS_EXPORT TempoSyncKnob : public Knob
 	Q_OBJECT
 public:
 	TempoSyncKnob( KnobType knobNum, QWidget* parent = nullptr, const QString& name = QString() );
+
+	/**
+	 * @brief Constructs a tempo sync knob with a label font in the pixel size.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param labelPixelSize Pixel size for the label
+	 * @param parent Parent widget
+	 * @param name Object name of the widget
+	 */
+	TempoSyncKnob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name = QString());
+
 	~TempoSyncKnob() override;
 
 	static TempoSyncKnob* buildLegacyKnob(KnobType knobNum, const QString& label, QWidget* parent);
-	static TempoSyncKnob* buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name = QString());
 	static TempoSyncKnob* buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent);
 
 	const QString & syncDescription();

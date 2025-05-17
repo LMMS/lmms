@@ -53,6 +53,13 @@ TempoSyncKnob::TempoSyncKnob( KnobType _knob_num, QWidget * _parent,
 }
 
 
+TempoSyncKnob::TempoSyncKnob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name) :
+	TempoSyncKnob(knobNum, parent, name)
+{
+	setFont(adjustedToPixelSize(font(), labelPixelSize));
+	setLabel(labelText);
+}
+
 
 
 TempoSyncKnob::~TempoSyncKnob()
@@ -75,19 +82,9 @@ TempoSyncKnob* TempoSyncKnob::buildLegacyKnob(KnobType knobNum, const QString& l
 	return result;
 }
 
-TempoSyncKnob* TempoSyncKnob::buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name)
-{
-	auto result = new TempoSyncKnob(knobNum, parent, name);
-
-	result->setFont(adjustedToPixelSize(result->font(), pixelSize));
-	result->setLabel(label);
-
-	return result;
-}
-
 TempoSyncKnob* TempoSyncKnob::buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent)
 {
-	return buildKnobWithFixedPixelFont(knobNum, label, SMALL_FONT_SIZE, parent);
+	return new TempoSyncKnob(knobNum, label, SMALL_FONT_SIZE, parent);
 }
 
 
