@@ -102,7 +102,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpCycleKnob(new Knob(KnobType::Bright26, tr("CYCLE"), this, Knob::Mode::Legacy)),
 	m_arpSkipKnob(new Knob(KnobType::Bright26, tr("SKIP"), this, Knob::Mode::Legacy)),
 	m_arpMissKnob(new Knob(KnobType::Bright26, tr("MISS"), this, Knob::Mode::Legacy)),
-	m_arpTimeKnob(TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("TIME"), this)),
+	m_arpTimeKnob(new TempoSyncKnob(KnobType::Bright26, tr("TIME"), this, Knob::Mode::Legacy)),
 	m_arpGateKnob(new Knob(KnobType::Bright26, tr("GATE"), this, Knob::Mode::Legacy)),
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )

@@ -69,7 +69,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
-	m_autoQuit = TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("DECAY"), this);
+	m_autoQuit = new TempoSyncKnob(KnobType::Bright26, tr("DECAY"), this, Knob::Mode::Legacy);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
 	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );

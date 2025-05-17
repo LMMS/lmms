@@ -44,7 +44,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	setPalette( pal );
 	setFixedSize( 300, 208 );
 
-	auto sampleDelayKnob = TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("DELAY"), this);
+	auto sampleDelayKnob = new TempoSyncKnob(KnobType::Bright26, tr("DELAY"), this, Knob::Mode::Legacy);
 	sampleDelayKnob->move( 10,14 );
 	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
@@ -56,13 +56,13 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	feedbackKnob->setModel( &controls->m_feedbackModel);
 	feedbackKnob->setHintText( tr ( "Feedback amount" ) + " " , "" );
 
-	auto lfoFreqKnob = TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("RATE"), this);
+	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this, Knob::Mode::Legacy);
 	lfoFreqKnob->move( 11, 119 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
 	lfoFreqKnob->setHintText( tr ( "LFO frequency") + " ", " s" );
 
-	auto lfoAmtKnob = TempoSyncKnob::buildLegacyKnob(KnobType::Bright26, tr("AMNT"), this);
+	auto lfoAmtKnob = new TempoSyncKnob(KnobType::Bright26, tr("AMNT"), this, Knob::Mode::Legacy);
 	lfoAmtKnob->move( 11, 159 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
