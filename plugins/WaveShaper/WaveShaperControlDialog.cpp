@@ -28,6 +28,7 @@
 #include "WaveShaperControlDialog.h"
 #include "WaveShaperControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "Graph.h"
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -59,14 +60,14 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
-	auto inputKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("INPUT"), this);
+	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	auto outputKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("OUTPUT"), this);
+	auto outputKnob = new Knob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 225 );

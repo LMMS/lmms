@@ -507,25 +507,25 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->setVerticalSpacing( 16 );
 	l->setHorizontalSpacing( 10 );
 
-	m_portamento = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("PORT"), this);
+	m_portamento = new Knob(KnobType::Bright26, tr("PORT"), SMALL_FONT_SIZE, this);
 	m_portamento->setHintText( tr( "Portamento:" ), "" );
 
-	m_filterFreq = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("FREQ"), this);
+	m_filterFreq = new Knob(KnobType::Bright26, tr("FREQ"), SMALL_FONT_SIZE, this);
 	m_filterFreq->setHintText( tr( "Filter frequency:" ), "" );
 
-	m_filterQ = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("RES"), this);
+	m_filterQ = new Knob(KnobType::Bright26, tr("RES"), SMALL_FONT_SIZE, this);
 	m_filterQ->setHintText( tr( "Filter resonance:" ), "" );
 
-	m_bandwidth = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("BW"), this);
+	m_bandwidth = new Knob(KnobType::Bright26, tr("BW"), SMALL_FONT_SIZE, this);
 	m_bandwidth->setHintText( tr( "Bandwidth:" ), "" );
 
-	m_fmGain = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("FM GAIN"), this);
+	m_fmGain = new Knob(KnobType::Bright26, tr("FM GAIN"), SMALL_FONT_SIZE, this);
 	m_fmGain->setHintText( tr( "FM gain:" ), "" );
 
-	m_resCenterFreq = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("RES CF"), this);
+	m_resCenterFreq = new Knob(KnobType::Bright26, tr("RES CF"), SMALL_FONT_SIZE, this);
 	m_resCenterFreq->setHintText( tr( "Resonance center frequency:" ), "" );
 
-	m_resBandwidth = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("RES BW"), this);
+	m_resBandwidth = new Knob(KnobType::Bright26, tr("RES BW"), SMALL_FONT_SIZE, this);
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ), "" );
 
 	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI control changes" ), this );

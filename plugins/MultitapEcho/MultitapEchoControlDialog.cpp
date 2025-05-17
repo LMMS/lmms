@@ -27,6 +27,7 @@
 #include "MultitapEchoControlDialog.h"
 #include "MultitapEchoControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "Graph.h"
 #include "LedCheckBox.h"
 #include "Knob.h"
@@ -83,12 +84,12 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setHintText( tr( "Step length:" ) , " ms" );
 
-	auto dryGain = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("Dry"), this);
+	auto dryGain = new Knob(KnobType::Bright26, tr("Dry"), SMALL_FONT_SIZE, this);
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setHintText( tr( "Dry gain:" ) , " dBFS" );
 
-	auto stages = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("Stages"), this);
+	auto stages = new Knob(KnobType::Bright26, tr("Stages"), SMALL_FONT_SIZE, this);
 	stages->move( 200, 245 );
 	stages->setModel( & controls->m_stages );
 	stages->setHintText( tr( "Low-pass stages:" ) , "x" );

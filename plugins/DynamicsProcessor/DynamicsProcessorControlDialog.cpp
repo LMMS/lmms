@@ -28,6 +28,7 @@
 #include "DynamicsProcessorControlDialog.h"
 #include "DynamicsProcessorControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "Graph.h"
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -58,26 +59,26 @@ DynProcControlDialog::DynProcControlDialog(
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
-	auto inputKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("INPUT"), this);
+	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 223 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	auto outputKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("OUTPUT"), this);
+	auto outputKnob = new Knob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 223 );
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setHintText( tr( "Output gain:" ) , "" );
 
-	auto attackKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("ATTACK"), this);
+	auto attackKnob = new Knob(KnobType::Bright26, tr("ATTACK"), SMALL_FONT_SIZE, this);
 	attackKnob -> move( 24, 268 );
 	attackKnob->setModel( &_controls->m_attackModel );
 	attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
 
-	auto releaseKnob = Knob::buildKnobWithSmallPixelFont(KnobType::Bright26, tr("RELEASE"), this);
+	auto releaseKnob = new Knob(KnobType::Bright26, tr("RELEASE"), SMALL_FONT_SIZE, this);
 	releaseKnob -> move( 74, 268 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
 	releaseKnob->setHintText( tr( "Peak release time:" ) , "ms" );

@@ -78,6 +78,16 @@ class LMMS_EXPORT Knob : public FloatModelEditorBase
 
 public:
 	Knob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	/**
+	 * @brief Constructs a knob with a label font in the pixel size.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param labelPixelSize Pixel size for the label
+	 * @param parent Parent widget
+	 * @param name Object name of the widget
+	 */
+	Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name = QString());
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
@@ -106,19 +116,6 @@ public:
 	 * @return Knob* The constructed knob.
 	 */
 	static Knob* buildKnobWithFixedPixelFont(KnobType knobNum, const QString& label, int pixelSize, QWidget* parent, const QString& name = QString());
-
-	/**
-	 * @brief Convenience method to create a knob with a pixel font with a size of SMALL_FONT_SIZE.
-	 * 
-	 * This method exists because this type of knob is created in many places in LMMS.
-	 * 
-	 * @param knobNum Knob type
-	 * @param label Label that is displayed by the knob
-	 * @param parent Parent widget of the knob
-	 * @param name Internal Qt name of the knob (optional)
-	 * @return Knob* The constructed knob.
-	 */
-	static Knob* buildKnobWithSmallPixelFont(KnobType knobNum, const QString& label, QWidget* parent, const QString& name = QString());
 
 	void setLabel(const QString& txt);
 	void setHtmlLabel( const QString &htmltxt );
