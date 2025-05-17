@@ -40,9 +40,8 @@ StereoEnhancerControlDialog::StereoEnhancerControlDialog(
 {
 	auto l = new QHBoxLayout(this);
 
-	auto widthKnob = new Knob(KnobType::Bright26, this);
+	auto widthKnob = new Knob(KnobType::Bright26, tr("WIDTH"), this);
 	widthKnob->setModel( &_controls->m_widthModel );
-	widthKnob->setLabel( tr( "WIDTH" ) );
 	widthKnob->setHintText( tr( "Width:" ) , " samples" );
 
 	l->addWidget( widthKnob );

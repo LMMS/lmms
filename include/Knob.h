@@ -77,11 +77,46 @@ class LMMS_EXPORT Knob : public FloatModelEditorBase
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
+	enum class Mode
+	{
+		NonLegacy, Legacy
+	};
+
+	/**
+	 * @brief Construct a Knob with the given style and no label.
+	 * 
+	 * @param _knob_num Style of the knob
+	 * @param _parent Parent widget
+	 * @param _name Object name of the widget
+	 */
 	Knob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+
+	/**
+	 * @brief Construct a Knob with the given style and label text.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param parent Parent widget
+	 * @param mode Builds a knob with legacy behavior (font size always 12 pixels) if set to Legacy. Default is NonLegacy.
+	 * @param name Object name of the widget
+	 */
+	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, Mode mode = Mode::NonLegacy, const QString& name = QString());
+
+	/**
+	 * @brief Constructs a knob with a label font in the pixel size.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param labelPixelSize Pixel size for the label
+	 * @param parent Parent widget
+	 * @param name Object name of the widget
+	 */
+	Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name = QString());
+
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
+	
 	Knob( const Knob& other ) = delete;
 
-	void setLabel( const QString & txt );
 	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
@@ -113,15 +148,40 @@ public:
 
 
 protected:
-	void paintEvent( QPaintEvent * _me ) override;
+	void setLabel(const QString& txt);
+	
+	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
+
+	/*!
+	 * Legacy mode affects how the label of the knob is rendered.
+	 *
+	 * In non-legacy mode (the default) the height of the label text is taken into account when a new fixed
+	 * size is computed for the Knob. When the label text is painted the descent of the font is used to
+	 * compute the base line.
+	 * 
+	 * Enabling legacy mode leads to the following behavior:
+	 * * The height of the label is not taken into account when the new fixed height of the Knob is computed.
+	 *   Instead a fixed size of 10 is added for the label.
+	 * * When the knob is painted the baseline of the font is always set to 2 pixels away from the lower side
+	 *   of the Knob's rectangle.
+	 */
+	bool legacyMode() const { return m_legacyMode; }
+
+	/*!
+	 * Set the button to legacy mode (true) or non-legacy mode (false).
+	 *
+	 * @see legacyMode().
+	 */
+	void setLegacyMode(bool legacyMode);
 
 private:
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
+	void drawLabel(QPainter& p);
 	bool updateAngle();
 
 	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
@@ -129,7 +189,10 @@ private:
 		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
 	}
 
+	void updateFixedSize();
+
 	QString m_label;
+	bool m_legacyMode = false;
 	bool m_isHtmlLabel;
 	QTextDocument* m_tdRenderer;
 

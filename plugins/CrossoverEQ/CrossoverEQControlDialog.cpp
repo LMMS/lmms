@@ -28,6 +28,7 @@
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "LedCheckBox.h"
 #include "Knob.h"
 #include "Fader.h"
@@ -60,9 +61,8 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 		const QString& label,
 		const QString& txt_before
 	) {
-		auto k = new Knob(KnobType::Bright26, this);
+		auto k = new Knob(KnobType::Bright26, label, SMALL_FONT_SIZE, this);
 		k->setModel(model);
-		k->setLabel(label);
 		k->setHintText(txt_before, "Hz");
 		knobsLayout->addWidget(k, 0, Qt::AlignHCenter);
 	};
