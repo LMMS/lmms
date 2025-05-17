@@ -38,8 +38,6 @@ protected:
 public:
 	CustomTextKnob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString(), const QString & _value_text = QString() );
 
-	CustomTextKnob( QWidget * _parent = nullptr, const QString & _name = QString(), const QString & _value_text = QString() ); //!< default ctor
-
 	CustomTextKnob( const Knob& other ) = delete;
 
 	static CustomTextKnob* buildKnobWithSmallPixelFont(KnobType knobNum, QWidget* parent, const QString& description, const QString& label);
