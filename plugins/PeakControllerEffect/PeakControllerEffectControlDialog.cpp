@@ -80,7 +80,6 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 	auto mainLayout = new QVBoxLayout();
 	auto knobLayout = new QHBoxLayout();
-	knobLayout->setSpacing(10);
 	auto ledLayout = new QHBoxLayout();
 
 	knobLayout->addWidget( m_baseKnob );
@@ -93,7 +92,6 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	ledLayout->addWidget( m_muteLed );
 	ledLayout->addWidget( m_absLed );
 
-	mainLayout->setContentsMargins( 3, 10, 0, 0 );
 	mainLayout->addLayout( knobLayout );
 	mainLayout->addLayout( ledLayout );
 
