@@ -1100,12 +1100,6 @@ void SongEditorWindow::play()
 }
 
 
-/* rmr void SongEditorWindow::record()
-{
-	m_editor->m_song->record();
-}*/
-
-
 
 
 void SongEditorWindow::recordAccompany()
