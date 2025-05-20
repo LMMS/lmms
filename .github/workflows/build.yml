@@ -355,7 +355,7 @@ jobs:
         with:
           key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-msvc-x86_64-
+            vcpkg-msvc-x86_64-FORCE_UPDATE
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
@@ -364,8 +364,8 @@ jobs:
           key: "ccache-${{ github.job }}-x64-${{ github.ref }}\
             -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-x64-${{ github.ref }}-
-            ccache-${{ github.job }}-x64-
+            ccache-${{ github.job }}-x64-FORCE_UPDATE-${{ github.ref }}-
+            ccache-${{ github.job }}-x64-FORCE_UPDATE
           path: ~\AppData\Local\ccache
           # yamllint enable rule:line-length
       - name: Install tools
