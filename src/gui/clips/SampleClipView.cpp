@@ -200,10 +200,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 			m_clip->setSampleBuffer(sampleBuffer);
 		}
 	}
-	if (m_clip->getAutoResize())
-	{
-		m_clip->changeLengthToSampleLength();
-	}
+	m_clip->updateLength();
 }
 
 
