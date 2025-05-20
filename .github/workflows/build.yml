@@ -339,7 +339,7 @@ jobs:
           CCACHE_MAXSIZE: 500M
   msvc:
     name: msvc-x64
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
