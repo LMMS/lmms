@@ -381,7 +381,6 @@ public:
 
 public slots:
 	void playSong();
-	void record();
 	void playAndRecord();
 	void playPattern();
 	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );

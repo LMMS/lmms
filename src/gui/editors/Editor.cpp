@@ -89,7 +89,7 @@ void Editor::toggleMaximize()
 	isMaximized() ? showNormal() : showMaximized();
 }
 
-Editor::Editor(bool record, bool stepRecord) :
+Editor::Editor(bool record, bool stepRecord, bool onlyRecordAccompany) :
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -108,13 +108,19 @@ Editor::Editor(bool record, bool stepRecord) :
 	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
 	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
 
-	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
+	if (onlyRecordAccompany)
+	{
+		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
+	}
 	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
 	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
+	if (onlyRecordAccompany)
+	{
+		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
+	}
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
@@ -125,7 +131,10 @@ Editor::Editor(bool record, bool stepRecord) :
 	addButton(m_playAction, "playButton");
 	if (record)
 	{
-		addButton(m_recordAction, "recordButton");
+		if (onlyRecordAccompany)
+		{
+			addButton(m_recordAction, "recordButton");
+		}	
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
 	}
 	if(stepRecord)

@@ -507,14 +507,6 @@ void Song::playSong()
 
 
 
-void Song::record()
-{
-	m_recording = true;
-	// TODO: Implement
-}
-
-
-
 
 void Song::playAndRecord()
 {

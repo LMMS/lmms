@@ -4941,7 +4941,7 @@ void PianoRoll::changeSnapMode()
 }
 
 PianoRollWindow::PianoRollWindow() :
-	Editor(true, true),
+	Editor(true, true, true),
 	m_editor(new PianoRoll())
 {
 	setCentralWidget( m_editor );
