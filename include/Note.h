@@ -240,7 +240,7 @@ public:
 
 	static TimePos quantized( const TimePos & m, const int qGrid );
 
-	std::shared_ptr<DetuningHelper> detuning() const { return m_detuning; }
+	const std::shared_ptr<DetuningHelper>& detuning() const { return m_detuning; }
 
 	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
