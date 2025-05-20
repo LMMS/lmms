@@ -34,6 +34,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "ThreadedExportManager.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
 
@@ -46,6 +47,7 @@ Mixer * Engine::s_mixer = nullptr;
 PatternStore * Engine::s_patternStore = nullptr;
 Song * Engine::s_song = nullptr;
 ProjectJournal * Engine::s_projectJournal = nullptr;
+ThreadedExportManager* Engine::s_exportManager = nullptr;
 #ifdef LMMS_HAVE_LV2
 Lv2Manager * Engine::s_lv2Manager = nullptr;
 #endif
@@ -71,6 +73,7 @@ void Engine::init( bool renderOnly )
 	s_song = new Song;
 	s_mixer = new Mixer;
 	s_patternStore = new PatternStore;
+	s_exportManager = new ThreadedExportManager;
 
 #ifdef LMMS_HAVE_LV2
 	s_lv2Manager = new Lv2Manager;
@@ -115,6 +118,8 @@ void Engine::destroy()
 	deleteHelper( &s_projectJournal );
 
 	deleteHelper( &s_song );
+
+	deleteHelper(&s_exportManager);
 
 	delete ConfigManager::inst();
 

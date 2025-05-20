@@ -40,6 +40,7 @@ class Mixer;
 class PatternStore;
 class ProjectJournal;
 class Song;
+class ThreadedExportManager;
 class Ladspa2LMMS;
 
 namespace gui
@@ -79,6 +80,11 @@ public:
 	static ProjectJournal * projectJournal()
 	{
 		return s_projectJournal;
+	}
+	
+	static ThreadedExportManager* exportManager()
+	{
+		return s_exportManager;
 	}
 
 #ifdef LMMS_HAVE_LV2
@@ -137,6 +143,7 @@ private:
 	static Song * s_song;
 	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;
+	static ThreadedExportManager* s_exportManager;
 
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager* s_lv2Manager;
