@@ -192,17 +192,17 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
-	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
-	{
-		m_clip->changeLengthToSampleLength();
-	}
-	else
+	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
 		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
 		}
+	}
+	if (m_clip->getAutoResize())
+	{
+		m_clip->changeLengthToSampleLength();
 	}
 }
 
