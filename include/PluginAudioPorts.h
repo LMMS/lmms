@@ -34,25 +34,25 @@ namespace lmms
 namespace detail {
 
 //! Optimization - Choose std::array or std::vector based on whether size is known at compile time
-template<AudioPortsConfig config>
+template<AudioPortsSettings settings>
 using AccessBufferType = std::conditional_t<
-	config.staticChannelCount(),
-	std::array<GetAudioDataType<config.kind>*, config.inputs + config.outputs>,
-	std::vector<GetAudioDataType<config.kind>*>>;
+	settings.staticChannelCount(),
+	std::array<GetAudioDataType<settings.kind>*, settings.inputs + settings.outputs>,
+	std::vector<GetAudioDataType<settings.kind>*>>;
 
 
 //! Default implementation of `AudioPorts::Buffer` for audio plugins
-template<AudioPortsConfig config,
-	AudioDataKind kind = config.kind, bool interleaved = config.interleaved, bool inplace = config.inplace>
+template<AudioPortsSettings settings,
+	AudioDataKind kind = settings.kind, bool interleaved = settings.interleaved, bool inplace = settings.inplace>
 class PluginAudioPortsBuffer
 {
-	static_assert(always_false_v<PluginAudioPortsBuffer<config>>, "Unsupported audio port configuration");
+	static_assert(always_false_v<PluginAudioPortsBuffer<settings>>, "Unsupported audio port settings");
 };
 
 //! Specialization for dynamically in-place, non-interleaved buffers
-template<AudioPortsConfig config, AudioDataKind kind>
-class PluginAudioPortsBuffer<config, kind, false, false>
-	: public AudioPorts<config>::Buffer
+template<AudioPortsSettings settings, AudioDataKind kind>
+class PluginAudioPortsBuffer<settings, kind, false, false>
+	: public AudioPorts<settings>::Buffer
 {
 	using SampleT = GetAudioDataType<kind>;
 
@@ -60,12 +60,12 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputBuffer() -> SplitAudioData<SampleT, config.inputs> final
+	auto inputBuffer() -> SplitAudioData<SampleT, settings.inputs> final
 	{
 		return {m_accessBuffer.data(), m_channelsIn, m_frames};
 	}
 
-	auto outputBuffer() -> SplitAudioData<SampleT, config.outputs> final
+	auto outputBuffer() -> SplitAudioData<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data() + m_channelsIn, m_channelsOut, m_frames};
 	}
@@ -82,15 +82,15 @@ public:
 		const auto channels = static_cast<std::size_t>(channelsIn + channelsOut);
 
 		m_sourceBuffer.resize(channels * frames);
-		if constexpr (!config.staticChannelCount())
+		if constexpr (!settings.staticChannelCount())
 		{
 			m_accessBuffer.resize(channels);
 		}
 		else
 		{
 			// If channel counts are known at compile time, they should never change
-			assert(channelsIn == config.inputs);
-			assert(channelsOut == config.outputs);
+			assert(channelsIn == settings.inputs);
+			assert(channelsOut == settings.outputs);
 		}
 
 		m_frames = frames;
@@ -111,20 +111,20 @@ private:
 	std::vector<SampleT> m_sourceBuffer;
 
 	//! Provides [channel][frame] view into `m_sourceBuffer`
-	AccessBufferType<config> m_accessBuffer;
+	AccessBufferType<settings> m_accessBuffer;
 
-	proc_ch_t m_channelsIn = config.inputs;
-	proc_ch_t m_channelsOut = config.outputs;
+	proc_ch_t m_channelsIn = settings.inputs;
+	proc_ch_t m_channelsOut = settings.outputs;
 	f_cnt_t m_frames = 0;
 };
 
 
 //! Specialization for statically in-place, non-interleaved buffers
-template<AudioPortsConfig config, AudioDataKind kind>
-class PluginAudioPortsBuffer<config, kind, false, true>
-	: public AudioPorts<config>::Buffer
+template<AudioPortsSettings settings, AudioDataKind kind>
+class PluginAudioPortsBuffer<settings, kind, false, true>
+	: public AudioPorts<settings>::Buffer
 {
-	static_assert(config.inputs == config.outputs || config.inputs == 0 || config.outputs == 0,
+	static_assert(settings.inputs == settings.outputs || settings.inputs == 0 || settings.outputs == 0,
 		"in-place buffers must have same number of input channels and output channels, "
 		"or one of the channel counts must be fixed at zero");
 
@@ -134,7 +134,7 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputOutputBuffer() -> SplitAudioData<SampleT, config.outputs> final
+	auto inputOutputBuffer() -> SplitAudioData<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data(), m_channels, m_frames};
 	}
@@ -152,15 +152,15 @@ public:
 		const auto channels = std::max(channelsIn, channelsOut);
 
 		m_sourceBuffer.resize(channels * frames);
-		if constexpr (!config.staticChannelCount())
+		if constexpr (!settings.staticChannelCount())
 		{
 			m_accessBuffer.resize(channels);
 		}
 		else
 		{
 			// If channel counts are known at compile time, they should never change
-			assert(channelsIn == config.inputs);
-			assert(channelsOut == config.outputs);
+			assert(channelsIn == settings.inputs);
+			assert(channelsOut == settings.outputs);
 		}
 
 		m_frames = frames;
@@ -180,17 +180,17 @@ private:
 	std::vector<SampleT> m_sourceBuffer;
 
 	//! Provides [channel][frame] view into `m_sourceBuffer`
-	AccessBufferType<config> m_accessBuffer;
+	AccessBufferType<settings> m_accessBuffer;
 
-	proc_ch_t m_channels = config.outputs;
+	proc_ch_t m_channels = settings.outputs;
 	f_cnt_t m_frames = 0;
 };
 
 
 //! Specialization for 2-channel SampleFrame buffers
-template<AudioPortsConfig config>
-class PluginAudioPortsBuffer<config, AudioDataKind::SampleFrame, true, true>
-	: public AudioPorts<config>::Buffer
+template<AudioPortsSettings settings>
+class PluginAudioPortsBuffer<settings, AudioDataKind::SampleFrame, true, true>
+	: public AudioPorts<settings>::Buffer
 {
 public:
 	PluginAudioPortsBuffer() = default;
@@ -225,20 +225,20 @@ private:
  * This audio port still has *some* ability for customization by using a custom `BufferT`,
  * but for full control, you'll need to provide your own audio port implementation.
  */
-template<AudioPortsConfig config, template<AudioPortsConfig> class BufferT>
+template<AudioPortsSettings settings, template<AudioPortsSettings> class BufferT>
 class PluginAudioPorts
-	: public AudioPorts<config>
-	, public BufferT<config>
+	: public AudioPorts<settings>
+	, public BufferT<settings>
 {
-	static_assert(std::is_base_of_v<typename AudioPorts<config>::Buffer, BufferT<config>>,
+	static_assert(std::is_base_of_v<typename AudioPorts<settings>::Buffer, BufferT<settings>>,
 		"BufferT must derive from AudioPorts::Buffer");
 
 public:
-	using AudioPorts<config>::AudioPorts;
+	using AudioPorts<settings>::AudioPorts;
 
-	using Buffer = BufferT<config>;
+	using Buffer = BufferT<settings>;
 
-	auto buffers() -> BufferT<config>* override { return static_cast<BufferT<config>*>(this); }
+	auto buffers() -> Buffer* override { return static_cast<Buffer*>(this); }
 
 	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
 	{
@@ -282,12 +282,12 @@ private:
 
 
 //! Default implementation of `AudioPorts::Buffer` for audio plugins
-template<AudioPortsConfig config>
-using PluginAudioPortsBuffer = detail::PluginAudioPortsBuffer<config>;
+template<AudioPortsSettings settings>
+using PluginAudioPortsBuffer = detail::PluginAudioPortsBuffer<settings>;
 
 //! Default implementation of `AudioPorts` for audio plugins
-template<AudioPortsConfig config>
-using PluginAudioPorts = detail::PluginAudioPorts<config, PluginAudioPortsBuffer>;
+template<AudioPortsSettings settings>
+using PluginAudioPorts = detail::PluginAudioPorts<settings, PluginAudioPortsBuffer>;
 
 } // namespace lmms
 

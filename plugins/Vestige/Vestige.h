@@ -55,16 +55,16 @@ class VestigeInstrumentView;
 } // namespace gui
 
 
-inline constexpr auto VestigeConfig = AudioPortsConfig {
+inline constexpr auto VestigeSettings = AudioPortsSettings {
 	.kind = AudioDataKind::F32,
 	.interleaved = false
 };
 
 class VestigeAudioPorts final
-	: public RemotePluginAudioPorts<VestigeConfig>
+	: public RemotePluginAudioPorts<VestigeSettings>
 {
 public:
-	using RemotePluginAudioPorts<VestigeConfig>::RemotePluginAudioPorts;
+	using RemotePluginAudioPorts<VestigeSettings>::RemotePluginAudioPorts;
 
 	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
 	{
@@ -76,7 +76,7 @@ public:
 };
 
 class VestigeInstrument
-	: public AudioPlugin<Instrument, VestigeConfig, VestigeAudioPorts>
+	: public AudioPlugin<Instrument, VestigeSettings, VestigeAudioPorts>
 {
 	Q_OBJECT
 public:

@@ -36,7 +36,6 @@
 #include <vector>
 
 #include "AudioData.h"
-#include "AudioPortsConfig.h"
 #include "AutomatableModel.h"
 #include "LmmsPolyfill.h"
 #include "LmmsTypes.h"

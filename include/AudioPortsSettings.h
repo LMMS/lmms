@@ -1,5 +1,5 @@
 /*
- * AudioPortsConfig.h - Audio ports configuration
+ * AudioPortsSettings.h - Audio ports compile-time settings
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef LMMS_AUDIO_PORTS_CONFIG_H
-#define LMMS_AUDIO_PORTS_CONFIG_H
+#ifndef LMMS_AUDIO_PORTS_SETTINGS_H
+#define LMMS_AUDIO_PORTS_SETTINGS_H
 
 #include "AudioData.h"
 
 namespace lmms {
 
-//! Compile time customizations for audio ports
-struct AudioPortsConfig
+//! Compile-time customizations for audio ports
+struct AudioPortsSettings
 {
 	//! The audio data type used by the processor
 	AudioDataKind kind;
@@ -89,9 +89,9 @@ struct AudioPortsConfig
 		return inputs != DynamicChannelCount && outputs != DynamicChannelCount;
 	}
 
-	constexpr auto operator==(const AudioPortsConfig& rhs) const -> bool = default;
+	constexpr auto operator==(const AudioPortsSettings& rhs) const -> bool = default;
 };
 
 } // namespace lmms
 
-#endif // LMMS_AUDIO_PORTS_CONFIG_H
+#endif // LMMS_AUDIO_PORTS_SETTINGS_H

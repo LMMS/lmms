@@ -447,9 +447,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 1};
+		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 1, 1};
 		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -519,9 +519,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
+		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -591,9 +591,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 2, 2};
+		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 2, 2};
 		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -674,11 +674,11 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPortsConfig {
+		constexpr auto settings = AudioPortsSettings {
 			AudioDataKind::SampleFrame, true, 2, 2, true
 		};
 		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -739,9 +739,9 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		constexpr auto config = AudioPortsConfig{AudioDataKind::F32, false, 1, 2};
+		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 1, 2};
 		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<config>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false, &model};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -817,8 +817,8 @@ private slots:
 
 		auto model = Model{nullptr};
 
-		// Helper for running this test with different configurations
-		auto testWithConfig = [&]<AudioPortsConfig config>(PluginAudioPorts<config>& ap) {
+		// Helper for running this test with different settings
+		auto testWithSettings = [&]<AudioPortsSettings settings>(PluginAudioPorts<settings>& ap) {
 			ap.init();
 
 			// Data on frames 0, 1, and 33
@@ -837,18 +837,18 @@ private slots:
 			auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
 			transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
-			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsConfig.
+			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsSettings.
 			struct Process
 			{
-				PluginAudioPorts<config>& ap;
+				PluginAudioPorts<settings>& ap;
 
-				// Statically in-place config
+				// Statically in-place settings
 				void operator()(std::span<SampleFrame> inOut)
 				{
 					for (auto& s : inOut) { s *= 2; }
 				}
 
-				// Dynamically in-place config
+				// Dynamically in-place settings
 				void operator()(std::span<const SampleFrame> in, std::span<SampleFrame> out)
 				{
 					for (std::size_t frame = 0; frame < in.size(); ++frame)
@@ -857,10 +857,10 @@ private slots:
 					}
 				}
 
-				// Buffered config
+				// Buffered settings
 				void operator()()
 				{
-					if constexpr (config.inplace)
+					if constexpr (settings.inplace)
 					{
 						auto inOut = ap.inputOutputBuffer();
 						(*this)(inOut);
@@ -896,20 +896,20 @@ private slots:
 
 		// Test statically in-place, non-buffered
 		{
-			constexpr auto config = AudioPortsConfig {
+			constexpr auto settings = AudioPortsSettings {
 				AudioDataKind::SampleFrame, true, 2, 2, true, false
 			};
-			auto ap = PluginAudioPorts<config>{false, &model};
-			testWithConfig(ap);
+			auto ap = PluginAudioPorts<settings>{false, &model};
+			testWithSettings(ap);
 		}
 
 		// Test statically in-place, buffered
 		{
-			constexpr auto config = AudioPortsConfig {
+			constexpr auto settings = AudioPortsSettings {
 				AudioDataKind::SampleFrame, true, 2, 2, true, true
 			};
-			auto ap = PluginAudioPorts<config>{false, &model};
-			testWithConfig(ap);
+			auto ap = PluginAudioPorts<settings>{false, &model};
+			testWithSettings(ap);
 		}
 
 		// TODO: If/when SampleFrame-based audio processors support dynamically in-place

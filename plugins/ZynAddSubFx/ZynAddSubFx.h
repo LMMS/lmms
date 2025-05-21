@@ -69,7 +69,7 @@ signals:
 
 
 class ZynAddSubFxInstrument
-	: public AudioPluginExt<Instrument, AudioPortsConfig {
+	: public AudioPluginExt<Instrument, AudioPortsSettings {
 			.kind = AudioDataKind::F32,
 			.interleaved = false,
 			.inputs = 0,

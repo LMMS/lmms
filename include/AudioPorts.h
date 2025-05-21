@@ -26,7 +26,7 @@
 #define LMMS_AUDIO_PORTS_H
 
 #include "AudioEngine.h"
-#include "AudioPortsConfig.h"
+#include "AudioPortsSettings.h"
 #include "AudioPortsModel.h"
 #include "Engine.h"
 
@@ -122,12 +122,12 @@ struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isCon
 
 
 //! Metafunction to select the appropriate non-owning audio buffer view
-template<AudioPortsConfig config, bool isOutput, bool isConst>
+template<AudioPortsSettings settings, bool isOutput, bool isConst>
 using AudioDataViewType = typename detail::AudioDataViewTypeHelper<
-	config.kind, config.interleaved, (isOutput ? config.outputs : config.inputs), isConst>::type;
+	settings.kind, settings.interleaved, (isOutput ? settings.outputs : settings.inputs), isConst>::type;
 
 // Forward declaration
-template<AudioPortsConfig config>
+template<AudioPortsSettings settings>
 class AudioPorts;
 
 namespace detail {
@@ -135,55 +135,55 @@ namespace detail {
 struct AudioPortsTag {};
 
 //! Interface for accessing input/output audio buffers
-template<AudioPortsConfig config, bool inplace = config.inplace>
+template<AudioPortsSettings settings, bool inplace = settings.inplace>
 class AudioPortsBuffer;
 
 //! Dynamically in-place specialization
-template<AudioPortsConfig config>
-class AudioPortsBuffer<config, false>
+template<AudioPortsSettings settings>
+class AudioPortsBuffer<settings, false>
 {
 public:
 	virtual ~AudioPortsBuffer() = default;
 
-	virtual auto inputBuffer() -> AudioDataViewType<config, false, false> = 0;
-	virtual auto outputBuffer() -> AudioDataViewType<config, true, false> = 0;
+	virtual auto inputBuffer() -> AudioDataViewType<settings, false, false> = 0;
+	virtual auto outputBuffer() -> AudioDataViewType<settings, true, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
 	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
 
 //! Statically in-place specialization
-template<AudioPortsConfig config>
-class AudioPortsBuffer<config, true>
+template<AudioPortsSettings settings>
+class AudioPortsBuffer<settings, true>
 {
 public:
 	virtual ~AudioPortsBuffer() = default;
 
-	virtual auto inputOutputBuffer() -> AudioDataViewType<config, false, false> = 0;
+	virtual auto inputOutputBuffer() -> AudioDataViewType<settings, false, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
 	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
 
 
 //! Performs pin connector routing. See `AudioPorts::Router`
-template<AudioPortsConfig config, AudioDataKind kind = config.kind, bool interleaved = config.interleaved>
+template<AudioPortsSettings settings, AudioDataKind kind = settings.kind, bool interleaved = settings.interleaved>
 class AudioPortsRouter
 {
-	static_assert(always_false_v<AudioPortsRouter<config, kind, interleaved>>,
-		"A router for the requested configuration is not implemented yet");
+	static_assert(always_false_v<AudioPortsRouter<settings, kind, interleaved>>,
+		"A router for the requested settings is not implemented yet");
 };
 
-template<AudioPortsConfig config, class F>
-inline void processHelper(AudioPortsRouter<config>& router, AudioBus<SampleFrame> coreInOut,
-	AudioPortsBuffer<config>& processorBuffers, F&& processFunc)
+template<AudioPortsSettings settings, class F>
+inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<SampleFrame> coreInOut,
+	AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 {
-	if constexpr (config.inplace)
+	if constexpr (settings.inplace)
 	{
 		// Write core to processor input buffer
 		const auto processorInOut = processorBuffers.inputOutputBuffer();
 		router.send(coreInOut, processorInOut);
 
 		// Process
-		if constexpr (!config.buffered) { processFunc(processorInOut); }
+		if constexpr (!settings.buffered) { processFunc(processorInOut); }
 		else { processFunc(); }
 
 		// Write processor output buffer to core
@@ -197,7 +197,7 @@ inline void processHelper(AudioPortsRouter<config>& router, AudioBus<SampleFrame
 		router.send(coreInOut, processorIn);
 
 		// Process
-		if constexpr (!config.buffered) { processFunc(processorIn, processorOut); }
+		if constexpr (!settings.buffered) { processFunc(processorIn, processorOut); }
 		else { processFunc(); }
 
 		// Write processor output buffer to core
@@ -206,40 +206,40 @@ inline void processHelper(AudioPortsRouter<config>& router, AudioBus<SampleFrame
 }
 
 //! Non-SampleFrame specialization
-template<AudioPortsConfig config, AudioDataKind kind>
-class AudioPortsRouter<config, kind, false>
+template<AudioPortsSettings settings, AudioDataKind kind>
+class AudioPortsRouter<settings, kind, false>
 {
 	using SampleT = GetAudioDataType<kind>;
 
 public:
-	explicit AudioPortsRouter(const AudioPorts<config>& parent) : m_ap{&parent} {}
+	explicit AudioPortsRouter(const AudioPorts<settings>& parent) : m_ap{&parent} {}
 
 	template<class F>
-	void process(AudioBus<SampleFrame> inOut, AudioPortsBuffer<config>& processorBuffers, F&& processFunc)
+	void process(AudioBus<SampleFrame> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 	{
-		processHelper<config>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
+		processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
 	}
 
-	void send(AudioBus<const SampleFrame> in, SplitAudioData<SampleT, config.inputs> out) const;
-	void receive(SplitAudioData<const SampleT, config.outputs> in, AudioBus<SampleFrame> inOut) const;
+	void send(AudioBus<const SampleFrame> in, SplitAudioData<SampleT, settings.inputs> out) const;
+	void receive(SplitAudioData<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const;
 
 private:
-	const AudioPorts<config>* const m_ap;
+	const AudioPorts<settings>* const m_ap;
 };
 
 //! SampleFrame specialization
-template<AudioPortsConfig config>
-class AudioPortsRouter<config, AudioDataKind::SampleFrame, true>
+template<AudioPortsSettings settings>
+class AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>
 {
 public:
-	explicit AudioPortsRouter(const AudioPorts<config>& parent) : m_ap{&parent} {}
+	explicit AudioPortsRouter(const AudioPorts<settings>& parent) : m_ap{&parent} {}
 
 	/**
 	 * Routes core audio to audio processor inputs, calls `processFunc`, then routes audio from
 	 * processor outputs back to the core.
 	 */
 	template<class F>
-	void process(AudioBus<SampleFrame> inOut, AudioPortsBuffer<config>& processorBuffers, F&& processFunc)
+	void process(AudioBus<SampleFrame> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 	{
 		if (const auto dr = m_ap->m_directRouting)
 		{
@@ -249,7 +249,7 @@ public:
 		else
 		{
 			// Route normally without "direct routing" optimization
-			processHelper<config>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
+			processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
 		}
 	}
 
@@ -263,9 +263,9 @@ private:
 	 */
 	template<class F>
 	void processDirectRouting(std::span<SampleFrame> inOut,
-		AudioPortsBuffer<config>& processorBuffers, F&& processFunc);
+		AudioPortsBuffer<settings>& processorBuffers, F&& processFunc);
 
-	const AudioPorts<config>* const m_ap;
+	const AudioPorts<settings>* const m_ap;
 };
 
 } // namespace detail
@@ -278,14 +278,14 @@ private:
  * Used by `AudioPlugin` to handle all the customizable aspects of the plugin's
  * audio ports.
  */
-template<AudioPortsConfig config>
+template<AudioPortsSettings settings>
 class AudioPorts
 	: public AudioPortsModel
 	, public detail::AudioPortsTag
 {
 public:
 	AudioPorts(bool isInstrument, Model* parent)
-		: AudioPortsModel{config.inputs, config.outputs, isInstrument, parent}
+		: AudioPortsModel{settings.inputs, settings.outputs, isInstrument, parent}
 	{
 	}
 
@@ -293,7 +293,7 @@ public:
 	 * Interface for accessing input/output audio buffers.
 	 * Implement this for custom audio port buffers.
 	 */
-	using Buffer = detail::AudioPortsBuffer<config>;
+	using Buffer = detail::AudioPortsBuffer<settings>;
 
 	/**
 	 * Audio port router
@@ -306,7 +306,7 @@ public:
 	 *     `processorBuffers` : the processor's AudioPorts::Buffer
 	 *     `processFunc`      : the processor's process method - a callable object with the signature
 	 *                          `void(buffers...)` where `buffers` is the expected audio buffer(s) (if any)
-	 *                          for the given `config`.
+	 *                          for the given `settings`.
 	 *
 	 * `send`
 	 *     Routes audio from LMMS track channels to processor inputs according to the pin connections.
@@ -328,9 +328,9 @@ public:
 	 *     `inOut`   : track channels from/to LMMS core (currently just the main track channel pair)
 	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
-	using Router = detail::AudioPortsRouter<config>;
+	using Router = detail::AudioPortsRouter<settings>;
 
-	template<AudioPortsConfig, AudioDataKind, bool>
+	template<AudioPortsSettings, AudioDataKind, bool>
 	friend class detail::AudioPortsRouter;
 
 	/**
@@ -370,7 +370,7 @@ public:
 	 */
 	virtual auto active() const -> bool { return true; }
 
-	static constexpr auto configuration() -> AudioPortsConfig { return config; }
+	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
 };
 
 
@@ -378,13 +378,13 @@ public:
  * Custom audio port.
  * AudioPorts::Buffer must be implemented in child class.
  */
-template<AudioPortsConfig config>
+template<AudioPortsSettings settings>
 class CustomAudioPorts
-	: public AudioPorts<config>
-	, public AudioPorts<config>::Buffer
+	: public AudioPorts<settings>
+	, public AudioPorts<settings>::Buffer
 {
 public:
-	using AudioPorts<config>::AudioPorts;
+	using AudioPorts<settings>::AudioPorts;
 
 private:
 	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
@@ -399,11 +399,11 @@ namespace detail {
 
 // Non-SampleFrame AudioPortsRouter out-of-class definitions
 
-template<AudioPortsConfig config, AudioDataKind kind>
-inline void AudioPortsRouter<config, kind, false>::send(
-	AudioBus<const SampleFrame> in, SplitAudioData<SampleT, config.inputs> out) const
+template<AudioPortsSettings settings, AudioDataKind kind>
+inline void AudioPortsRouter<settings, kind, false>::send(
+	AudioBus<const SampleFrame> in, SplitAudioData<SampleT, settings.inputs> out) const
 {
-	if constexpr (config.inputs == 0) { return; }
+	if constexpr (settings.inputs == 0) { return; }
 
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
@@ -468,11 +468,11 @@ inline void AudioPortsRouter<config, kind, false>::send(
 	}
 }
 
-template<AudioPortsConfig config, AudioDataKind kind>
-inline void AudioPortsRouter<config, kind, false>::receive(
-	SplitAudioData<const SampleT, config.outputs> in, AudioBus<SampleFrame> inOut) const
+template<AudioPortsSettings settings, AudioDataKind kind>
+inline void AudioPortsRouter<settings, kind, false>::receive(
+	SplitAudioData<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const
 {
-	if constexpr (config.outputs == 0) { return; }
+	if constexpr (settings.outputs == 0) { return; }
 
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
@@ -609,11 +609,11 @@ inline void AudioPortsRouter<config, kind, false>::receive(
 
 // SampleFrame AudioPortsRouter out-of-class definitions
 
-template<AudioPortsConfig config>
-inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::send(
+template<AudioPortsSettings settings>
+inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::send(
 	AudioBus<const SampleFrame> in, std::span<SampleFrame> out) const
 {
-	if constexpr (config.inputs == 0) { return; }
+	if constexpr (settings.inputs == 0) { return; }
 
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
@@ -700,11 +700,11 @@ inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::send(
 	}
 }
 
-template<AudioPortsConfig config>
-inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::receive(
+template<AudioPortsSettings settings>
+inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::receive(
 	std::span<const SampleFrame> in, AudioBus<SampleFrame> inOut) const
 {
-	if constexpr (config.outputs == 0) { return; }
+	if constexpr (settings.outputs == 0) { return; }
 
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
@@ -800,20 +800,20 @@ inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::receive(
 	}
 }
 
-template<AudioPortsConfig config>
+template<AudioPortsSettings settings>
 template<class F>
-inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::processDirectRouting(
-	std::span<SampleFrame> coreBuffer, AudioPortsBuffer<config>& processorBuffers, F&& processFunc)
+inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::processDirectRouting(
+	std::span<SampleFrame> coreBuffer, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 {
-	if constexpr (config.inplace)
+	if constexpr (settings.inplace)
 	{
-		if constexpr (config.buffered)
+		if constexpr (settings.buffered)
 		{
 			// Can avoid calling routing methods, but must write to and read from processor's buffers
 
 			// Write core to processor input buffer (if it has one)
 			const auto processorInOut = processorBuffers.inputOutputBuffer();
-			if constexpr (config.inputs != 0)
+			if constexpr (settings.inputs != 0)
 			{
 				if (m_ap->in().channelCount() != 0)
 				{
@@ -826,7 +826,7 @@ inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::processD
 			processFunc();
 
 			// Write processor output buffer (if it has one) to core
-			if constexpr (config.outputs != 0)
+			if constexpr (settings.outputs != 0)
 			{
 				if (m_ap->out().channelCount() != 0)
 				{
@@ -843,13 +843,13 @@ inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::processD
 	}
 	else
 	{
-		if constexpr (config.buffered)
+		if constexpr (settings.buffered)
 		{
 			// Can avoid calling routing methods, but must write to and read from processor's buffers
 
 			// Write core to processor input buffer (if it has one)
 			const auto processorIn = processorBuffers.inputBuffer();
-			if constexpr (config.inputs != 0)
+			if constexpr (settings.inputs != 0)
 			{
 				if (m_ap->in().channelCount() != 0)
 				{
@@ -863,7 +863,7 @@ inline void AudioPortsRouter<config, AudioDataKind::SampleFrame, true>::processD
 
 			// Write processor output buffer (if it has one) to core
 			const auto processorOut = processorBuffers.outputBuffer();
-			if constexpr (config.outputs != 0)
+			if constexpr (settings.outputs != 0)
 			{
 				if (m_ap->out().channelCount() != 0)
 				{

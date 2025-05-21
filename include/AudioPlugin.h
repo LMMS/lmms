@@ -54,15 +54,16 @@ namespace detail
 {
 
 //! Provides the correct `processImpl` interface for instruments or effects to implement
-template<class ParentT, AudioPortsConfig config, bool inplace = config.inplace, bool buffered = config.buffered>
+template<class ParentT, AudioPortsSettings settings,
+	bool inplace = settings.inplace, bool buffered = settings.buffered>
 class AudioProcessingMethod;
 
 //! Instrument specialization
-template<AudioPortsConfig config>
-class AudioProcessingMethod<Instrument, config, false, false>
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Instrument, settings, false, false>
 {
-	using InBufferT = AudioDataViewType<config, false, true>;
-	using OutBufferT = AudioDataViewType<config, true, false>;
+	using InBufferT = AudioDataViewType<settings, false, true>;
+	using OutBufferT = AudioDataViewType<settings, true, false>;
 
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
@@ -74,10 +75,10 @@ protected:
 };
 
 //! Instrument specialization (in-place)
-template<AudioPortsConfig config>
-class AudioProcessingMethod<Instrument, config, true, false>
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Instrument, settings, true, false>
 {
-	using InOutBufferT = AudioDataViewType<config, false, false>;
+	using InOutBufferT = AudioDataViewType<settings, false, false>;
 
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
@@ -89,8 +90,8 @@ protected:
 };
 
 //! Instrument specialization (buffered)
-template<AudioPortsConfig config, bool inplace>
-class AudioProcessingMethod<Instrument, config, inplace, true>
+template<AudioPortsSettings settings, bool inplace>
+class AudioProcessingMethod<Instrument, settings, inplace, true>
 {
 protected:
 	/**
@@ -108,11 +109,11 @@ protected:
 };
 
 //! Effect specialization
-template<AudioPortsConfig config>
-class AudioProcessingMethod<Effect, config, false, false>
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Effect, settings, false, false>
 {
-	using InBufferT = AudioDataViewType<config, false, true>;
-	using OutBufferT = AudioDataViewType<config, true, false>;
+	using InBufferT = AudioDataViewType<settings, false, true>;
+	using OutBufferT = AudioDataViewType<settings, true, false>;
 
 protected:
 	/**
@@ -123,10 +124,10 @@ protected:
 };
 
 //! Effect specialization (in-place)
-template<AudioPortsConfig config>
-class AudioProcessingMethod<Effect, config, true, false>
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Effect, settings, true, false>
 {
-	using InOutBufferT = AudioDataViewType<config, false, false>;
+	using InOutBufferT = AudioDataViewType<settings, false, false>;
 
 protected:
 	/**
@@ -137,8 +138,8 @@ protected:
 };
 
 //! Effect specialization (buffered)
-template<AudioPortsConfig config, bool inplace>
-class AudioProcessingMethod<Effect, config, inplace, true>
+template<AudioPortsSettings settings, bool inplace>
+class AudioProcessingMethod<Effect, settings, inplace, true>
 {
 protected:
 	/**
@@ -150,17 +151,17 @@ protected:
 };
 
 //! Connects the core audio channels to the instrument or effect using the audio ports
-template<class ParentT, AudioPortsConfig config, class AudioPortsT>
+template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin
 {
 	static_assert(always_false_v<ParentT>, "ParentT must be either Instrument or Effect");
 };
 
 //! Instrument specialization
-template<AudioPortsConfig config, class AudioPortsT>
-class AudioPlugin<Instrument, config, AudioPortsT>
+template<AudioPortsSettings settings, class AudioPortsT>
+class AudioPlugin<Instrument, settings, AudioPortsT>
 	: public Instrument
-	, public AudioProcessingMethod<Instrument, config>
+	, public AudioProcessingMethod<Instrument, settings>
 {
 public:
 	template<typename... AudioPortsArgsT>
@@ -221,10 +222,10 @@ private:
 };
 
 //! Effect specialization
-template<AudioPortsConfig config, class AudioPortsT>
-class AudioPlugin<Effect, config, AudioPortsT>
+template<AudioPortsSettings settings, class AudioPortsT>
+class AudioPlugin<Effect, settings, AudioPortsT>
 	: public Effect
-	, public AudioProcessingMethod<Effect, config>
+	, public AudioProcessingMethod<Effect, settings>
 {
 public:
 	template<typename... AudioPortsArgsT>
@@ -324,29 +325,29 @@ private:
  * A `processImpl` interface method is provided which must be implemented by the plugin implementation.
  *
  * @tparam ParentT Either `Instrument` or `Effect`
- * @tparam config Compile time configuration to customize `AudioPlugin`
+ * @tparam settings Compile-time settings to customize `AudioPlugin`
  * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
  */
-template<class ParentT, AudioPortsConfig config, class AudioPortsT>
+template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin
-	: public detail::AudioPlugin<ParentT, config, AudioPortsT>
+	: public detail::AudioPlugin<ParentT, settings, AudioPortsT>
 {
-	static_assert(config == AudioPortsT::configuration());
+	static_assert(settings == AudioPortsT::audioPortsSettings());
 
-	static_assert(config.kind != AudioDataKind::SampleFrame
-		|| ((config.inputs == 0 || config.inputs == 2) && (config.outputs == 0 || config.outputs == 2)),
+	static_assert(settings.kind != AudioDataKind::SampleFrame
+		|| ((settings.inputs == 0 || settings.inputs == 2) && (settings.outputs == 0 || settings.outputs == 2)),
 		"Don't use SampleFrame if more than 2 processor channels are needed");
 
 	static_assert(std::is_base_of_v<detail::AudioPortsTag, AudioPortsT>,
 		"AudioPortT must implement `AudioPorts`");
 
-	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortsT>;
+	using Base = typename detail::AudioPlugin<ParentT, settings, AudioPortsT>;
 
 public:
 	//! The last parameter(s) are variadic template parameters passed to the audio port constructor
 	using Base::Base;
 
-	static constexpr auto configuration() -> AudioPortsConfig { return config; }
+	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
 
 private:
 	/**
@@ -385,16 +386,16 @@ private:
  * Same as `AudioPlugin` but the audio port is passed as a template template parameter.
  *
  * @tparam ParentT Either `Instrument` or `Effect`
- * @tparam config Compile time configuration to customize `AudioPlugin`
+ * @tparam settings Compile-time settings to customize `AudioPlugin`
  * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
  */
-template<class ParentT, AudioPortsConfig config,
-	template<AudioPortsConfig> class AudioPortsT = PluginAudioPorts>
-using AudioPluginExt = AudioPlugin<ParentT, config, AudioPortsT<config>>;
+template<class ParentT, AudioPortsSettings settings,
+	template<AudioPortsSettings> class AudioPortsT = PluginAudioPorts>
+using AudioPluginExt = AudioPlugin<ParentT, settings, AudioPortsT<settings>>;
 
 
 // NOTE: NotePlayHandle-based instruments are not supported yet
-using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsConfig {
+using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsSettings {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 0,
@@ -402,7 +403,7 @@ using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsConfig {
 	.inplace = true,
 	.buffered = false }>;
 
-using DefaultEffect = AudioPluginExt<Effect, AudioPortsConfig {
+using DefaultEffect = AudioPluginExt<Effect, AudioPortsSettings {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 2,
