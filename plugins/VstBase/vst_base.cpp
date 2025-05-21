@@ -24,6 +24,7 @@
  */
 
 
+#include "LmmsCommonMacros.h"
 #include "Plugin.h"
 #include "vstbase_export.h"
 

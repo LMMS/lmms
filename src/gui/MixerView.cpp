@@ -22,6 +22,7 @@
  *
  */
 
+#include "MixerView.h"
 
 #include <QLayout>
 #include <QPushButton>
@@ -29,10 +30,7 @@
 #include <QStyle>
 #include <QKeyEvent>
 
-#include "lmms_math.h"
-
 #include "MixerChannelView.h"
-#include "MixerView.h"
 #include "Knob.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
@@ -376,6 +374,7 @@ void MixerView::updateMixerChannel(int index)
 	}
 
 	thisLine->m_sendButton->updateLightStatus();
+	thisLine->m_renameLineEdit->setText(thisLine->elideName(thisLine->mixerChannel()->m_name));
 	thisLine->update();
 }
 
@@ -537,15 +536,8 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_F2:
 			renameChannel(m_currentMixerChannel->channelIndex());
 			break;
-		case Qt::Key_Space:
-			{
-				auto* mixerChannel = currentMixerChannel();
-
-				if (mixerChannel)
-				{
-					mixerChannel->fader()->adjustByDialog();
-				}
-			}
+		default:
+			e->ignore();
 			break;
 	}
 }
