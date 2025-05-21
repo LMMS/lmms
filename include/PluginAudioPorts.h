@@ -44,7 +44,10 @@ using AccessBufferType = std::conditional_t<
 //! Default implementation of `AudioPorts::Buffer` for audio plugins
 template<AudioPortsConfig config,
 	AudioDataKind kind = config.kind, bool interleaved = config.interleaved, bool inplace = config.inplace>
-class PluginAudioPortsBuffer;
+class PluginAudioPortsBuffer
+{
+	static_assert(always_false_v<PluginAudioPortsBuffer<config>>, "Unsupported audio port configuration");
+};
 
 //! Specialization for dynamically in-place, non-interleaved buffers
 template<AudioPortsConfig config, AudioDataKind kind>
@@ -233,14 +236,9 @@ class PluginAudioPorts
 public:
 	using AudioPorts<config>::AudioPorts;
 
-	auto buffers() -> BufferT<config>* final { return static_cast<BufferT<config>*>(this); }
+	using Buffer = BufferT<config>;
 
-private:
-	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
-	{
-		// Connects the audio port model to the buffers
-		this->updateBuffers(inChannels, outChannels, frames);
-	}
+	auto buffers() -> BufferT<config>* override { return static_cast<BufferT<config>*>(this); }
 
 	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
 	{
@@ -270,6 +268,13 @@ private:
 					return this->tr("Plugin In %1").arg(channel + 1);
 			}
 		}
+	}
+
+private:
+	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
+	{
+		// Connects the audio port model to the buffers
+		this->updateBuffers(inChannels, outChannels, frames);
 	}
 };
 
