@@ -37,11 +37,16 @@ namespace lmms
 
 class VstPlugin;
 
-template<AudioPortsConfig config>
-class VstEffectAudioPorts final : public RemotePluginAudioPorts<config>
+inline constexpr auto VstEffectConfig = AudioPortsConfig {
+	.kind = AudioDataKind::F32,
+	.interleaved = false
+};
+
+class VstEffectAudioPorts final
+	: public RemotePluginAudioPorts<VstEffectConfig>
 {
 public:
-	using RemotePluginAudioPorts<config>::RemotePluginAudioPorts;
+	using RemotePluginAudioPorts<VstEffectConfig>::RemotePluginAudioPorts;
 
 	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
 	{
@@ -53,10 +58,7 @@ public:
 };
 
 class VstEffect
-	: public AudioPlugin<Effect, AudioPortsConfig {
-			.kind = AudioDataKind::F32,
-			.interleaved = false
-		}, VstEffectAudioPorts>
+	: public AudioPlugin<Effect, VstEffectConfig, VstEffectAudioPorts>
 {
 public:
 	VstEffect( Model * _parent,

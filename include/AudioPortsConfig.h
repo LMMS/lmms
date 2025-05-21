@@ -88,6 +88,8 @@ struct AudioPortsConfig
 	{
 		return inputs != DynamicChannelCount && outputs != DynamicChannelCount;
 	}
+
+	constexpr auto operator==(const AudioPortsConfig& rhs) const -> bool = default;
 };
 
 } // namespace lmms

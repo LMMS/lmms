@@ -325,19 +325,20 @@ private:
  * @tparam config Compile time configuration to customize `AudioPlugin`
  * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
  */
-template<class ParentT, AudioPortsConfig config,
-	template<AudioPortsConfig> class AudioPortsT = PluginAudioPorts>
+template<class ParentT, AudioPortsConfig config, class AudioPortsT>
 class AudioPlugin
-	: public detail::AudioPlugin<ParentT, config, AudioPortsT<config>>
+	: public detail::AudioPlugin<ParentT, config, AudioPortsT>
 {
+	static_assert(config == AudioPortsT::configuration());
+
 	static_assert(config.kind != AudioDataKind::SampleFrame
 		|| ((config.inputs == 0 || config.inputs == 2) && (config.outputs == 0 || config.outputs == 2)),
 		"Don't use SampleFrame if more than 2 processor channels are needed");
 
-	static_assert(std::is_base_of_v<detail::AudioPortsTag, AudioPortsT<config>>,
-		"AudioPortT must be `AudioPorts` or inherit from it");
+	static_assert(std::is_base_of_v<detail::AudioPortsTag, AudioPortsT>,
+		"AudioPortT must implement `AudioPorts`");
 
-	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortsT<config>>;
+	using Base = typename detail::AudioPlugin<ParentT, config, AudioPortsT>;
 
 public:
 	//! The last parameter(s) are variadic template parameters passed to the audio port constructor
@@ -378,8 +379,20 @@ private:
 };
 
 
+/**
+ * Same as `AudioPlugin` but the audio port is passed as a template template parameter.
+ *
+ * @tparam ParentT Either `Instrument` or `Effect`
+ * @tparam config Compile time configuration to customize `AudioPlugin`
+ * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
+ */
+template<class ParentT, AudioPortsConfig config,
+	template<AudioPortsConfig> class AudioPortsT = PluginAudioPorts>
+using AudioPluginExt = AudioPlugin<ParentT, config, AudioPortsT<config>>;
+
+
 // NOTE: NotePlayHandle-based instruments are not supported yet
-using DefaultMidiInstrument = AudioPlugin<Instrument, AudioPortsConfig {
+using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsConfig {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 0,
@@ -387,7 +400,7 @@ using DefaultMidiInstrument = AudioPlugin<Instrument, AudioPortsConfig {
 	.inplace = true,
 	.buffered = false }>;
 
-using DefaultEffect = AudioPlugin<Effect, AudioPortsConfig {
+using DefaultEffect = AudioPluginExt<Effect, AudioPortsConfig {
 	.kind = AudioDataKind::SampleFrame,
 	.interleaved = true,
 	.inputs = 2,
