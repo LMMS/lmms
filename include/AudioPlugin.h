@@ -176,6 +176,7 @@ public:
 
 protected:
 	auto audioPorts() -> AudioPortsT& { return m_audioPorts; }
+	auto audioPorts() const -> const AudioPortsT& { return m_audioPorts; }
 
 	auto audioPortsModel() const -> const AudioPortsModel* final
 	{
@@ -238,6 +239,7 @@ public:
 
 protected:
 	auto audioPorts() -> AudioPortsT& { return m_audioPorts; }
+	auto audioPorts() const -> const AudioPortsT& { return m_audioPorts; }
 
 	auto audioPortsModel() const -> const AudioPortsModel* final
 	{
