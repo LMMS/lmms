@@ -1108,12 +1108,21 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	bool oldEndState = m_mouseOverEndCrossfadeHandle;
 
 	m_mouseOverStartCrossfadeHandle =
+		// Is the x coordinate within the radius of the handle?
 		(std::abs(me->x() - m_clip->startCrossfadeLength() * ppb / TimePos::ticksPerBar()) <= CROSSFADE_GRIP_ACTIVE_RADIUS
-		|| me->x() < CROSSFADE_GRIP_ACTIVE_RADIUS * 2)
+		// Or, if there is no current fade, is the x coordinate close to the clip start?
+		|| (m_clip->startCrossfadeLength() == 0
+			&& me->x() < CROSSFADE_GRIP_ACTIVE_RADIUS * 2))
+		// And, is the y coordinate up by the top of the clip?
 		&& me->y() <= CROSSFADE_GRIP_ACTIVE_RADIUS * 2;
+
 	m_mouseOverEndCrossfadeHandle =
+	// Is the x coordinate within the radius of the handle?
 		(std::abs(me->x() - (m_clip->length() - m_clip->endCrossfadeLength()) * ppb / TimePos::ticksPerBar()) <= CROSSFADE_GRIP_ACTIVE_RADIUS
-		|| m_clip->length() * ppb / TimePos::ticksPerBar() - me->x() < CROSSFADE_GRIP_ACTIVE_RADIUS * 2)
+		// Or, if there is no current fade, is the x coordinate close to the clip end?
+		|| (m_clip->endCrossfadeLength() == 0
+			&& m_clip->length() * ppb / TimePos::ticksPerBar() - me->x() < CROSSFADE_GRIP_ACTIVE_RADIUS * 2))
+		// And, is the y coordinate up by the top of the clip?
 		&& me->y() <= CROSSFADE_GRIP_ACTIVE_RADIUS * 2;
 
 	if (oldStartState != m_mouseOverStartCrossfadeHandle || oldEndState != m_mouseOverEndCrossfadeHandle)
