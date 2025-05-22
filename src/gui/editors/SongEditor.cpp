@@ -1032,10 +1032,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// disable the record buttons.
 	if (!Engine::audioEngine()->captureDeviceAvailable())
 	{
-		for (auto &recordAction : {m_recordAccompanyAction})
-		{
-			recordAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
-		}
+		m_recordAccompanyAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
 	}
 }
 
