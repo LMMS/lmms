@@ -726,7 +726,20 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			if( isSelected() )
 			{
-				m_action = Action::MoveSelection;
+				if (m_mouseOverStartCrossfadeHandle && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditStartCrossfade;
+					setCursor(Qt::SizeHorCursor);
+				}
+				else if (m_mouseOverEndCrossfadeHandle && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditEndCrossfade;
+					setCursor(Qt::SizeHorCursor);
+				}
+				else
+				{
+					m_action = Action::MoveSelection;
+				}
 			}
 			else
 			{
@@ -1083,17 +1096,36 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
-	else if (m_action == Action::EditStartCrossfade)
+	else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
 	{
 		TimePos pos = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
-		m_clip->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(m_clip->length())));
+
+		if (m_action == Action::EditStartCrossfade)
+		{
+			m_clip->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(m_clip->length())));
+		}
+		else if (m_action == Action::EditEndCrossfade)
+		{
+			m_clip->setEndCrossfadeLength(std::clamp(static_cast<int>(m_clip->length() - pos), 0, static_cast<int>(m_clip->length())));
+		}
 		update();
-	}
-	else if (m_action == Action::EditEndCrossfade)
-	{
-		TimePos pos = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
-		m_clip->setEndCrossfadeLength(std::clamp(static_cast<int>(m_clip->length() - pos), 0, static_cast<int>(m_clip->length())));
-		update();
+
+		// If multiple clips are selected, also set their crossfades
+		for (auto clipv: getClickedClips())
+		{
+			if (clipv && clipv->getClip()->isCrossfadeable())
+			{
+				if (m_action == Action::EditStartCrossfade)
+				{
+					clipv->getClip()->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(m_clip->length())));
+				}
+				else if (m_action == Action::EditEndCrossfade)
+				{
+					clipv->getClip()->setEndCrossfadeLength(std::clamp(static_cast<int>(m_clip->length() - pos), 0, static_cast<int>(m_clip->length())));
+				}
+				clipv->update();
+			}
+		}
 	}
 	else if( m_action == Action::Split )
 	{
