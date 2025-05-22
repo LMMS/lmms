@@ -139,6 +139,8 @@ void Clip::movePosition( const TimePos & pos )
 void Clip::changeLength( const TimePos & length )
 {
 	m_length = length;
+	m_startCrossfadeLength = std::min(m_startCrossfadeLength, m_length);
+	m_endCrossfadeLength = std::min(m_endCrossfadeLength, m_length);
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }

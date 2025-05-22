@@ -812,6 +812,22 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 							arg( m_clip->endPosition().getTicks() %
 									TimePos::ticksPerBar() ) );
 				}
+				else if (m_action == Action::EditStartCrossfade)
+				{
+					s_textFloat->setTitle(tr("Fade length"));
+					s_textFloat->setText(QString("%1:%2").
+						arg(m_clip->startCrossfadeLength().getBar() + 1).
+						arg(m_clip->startCrossfadeLength().getTicks() %
+								TimePos::ticksPerBar()));
+				}
+				else if (m_action == Action::EditEndCrossfade)
+				{
+					s_textFloat->setTitle(tr("Fade length"));
+					s_textFloat->setText(QString("%1:%2").
+						arg(m_clip->endCrossfadeLength().getBar() + 1).
+						arg(m_clip->endCrossfadeLength().getTicks() %
+								TimePos::ticksPerBar()));
+				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
@@ -830,9 +846,13 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
 					: tr("Press <%1> or <Alt> for unquantized splitting.");
 			}
-			else
+			else if (m_action == Action::Resize || m_action == Action::ResizeLeft)
 			{
 				hint = tr("Press <%1> or <Alt> for unquantized resizing.");
+			}
+			else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
+			{
+				hint = tr("Press <%1> or <Alt> for quantized fading.");
 			}
 			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_COPY_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
@@ -1094,15 +1114,34 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
 	{
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+
 		TimePos pos = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
+		TimePos length;
 
 		if (m_action == Action::EditStartCrossfade)
 		{
-			m_clip->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(m_clip->length())));
+			// If alt or ctrl is held, quantize the length
+			length = unquantizedModHeld(me)
+				? pos.quantize(snapSize)
+				: pos;
+			m_clip->setStartCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(m_clip->length())));
+			s_textFloat->setText(QString("%1:%2").
+				arg(m_clip->startCrossfadeLength().getBar() + 1).
+				arg(m_clip->startCrossfadeLength().getTicks() %
+						TimePos::ticksPerBar()));
 		}
 		else if (m_action == Action::EditEndCrossfade)
 		{
-			m_clip->setEndCrossfadeLength(std::clamp(static_cast<int>(m_clip->length() - pos), 0, static_cast<int>(m_clip->length())));
+			// If alt or ctrl is held, quantize the length
+			length = unquantizedModHeld(me)
+				? TimePos(m_clip->length() - pos).quantize(snapSize)
+				: TimePos(m_clip->length() - pos);
+			m_clip->setEndCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(m_clip->length())));
+			s_textFloat->setText(QString("%1:%2").
+				arg(m_clip->endCrossfadeLength().getBar() + 1).
+				arg(m_clip->endCrossfadeLength().getTicks() %
+						TimePos::ticksPerBar()));
 		}
 		update();
 
@@ -1113,11 +1152,11 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			{
 				if (m_action == Action::EditStartCrossfade)
 				{
-					clipv->getClip()->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(clipv->getClip()->length())));
+					clipv->getClip()->setStartCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(clipv->getClip()->length())));
 				}
 				else if (m_action == Action::EditEndCrossfade)
 				{
-					clipv->getClip()->setEndCrossfadeLength(std::clamp(static_cast<int>(clipv->getClip()->length() - pos), 0, static_cast<int>(clipv->getClip()->length())));
+					clipv->getClip()->setEndCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(clipv->getClip()->length())));
 				}
 				clipv->update();
 			}
