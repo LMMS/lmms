@@ -124,31 +124,34 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 			zeroSampleFrames(workingBuffer, frames);
 		}
 
-		// Apply crossfade
-		const int framesPerTick = Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
-		const int startCrossfadeFrames = m_clip->startCrossfadeLength() * framesPerTick;
-		const int endCrossfadeFrames = m_clip->endCrossfadeLength() * framesPerTick;
-		const int startOffsetFrames = m_clip->startTimeOffset() * framesPerTick;
-		const int lengthFrames = m_clip->length() * framesPerTick;
-		for (f_cnt_t f = 0; f < frames; ++f)
+		// Apply crossfade if this play handle is for a clip
+		if (m_clip && (m_clip->startCrossfadeLength() != 0 || m_clip->endCrossfadeLength() != 0))
 		{
-			const f_cnt_t frameIndex = initialFrameIndex + f;
-			const int framesRelativeToClipStart = frameIndex + startOffsetFrames;
-			const int framesRelativeToClipEnd = lengthFrames - framesRelativeToClipStart;
-			if (framesRelativeToClipStart < 0 || framesRelativeToClipEnd < 0) { workingBuffer[f] = SampleFrame(); continue; }
+			const int framesPerTick = Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
+			const int startCrossfadeFrames = m_clip->startCrossfadeLength() * framesPerTick;
+			const int endCrossfadeFrames = m_clip->endCrossfadeLength() * framesPerTick;
+			const int startOffsetFrames = m_clip->startTimeOffset() * framesPerTick;
+			const int lengthFrames = m_clip->length() * framesPerTick;
+			for (f_cnt_t f = 0; f < frames; ++f)
+			{
+				const f_cnt_t frameIndex = initialFrameIndex + f;
+				const int framesRelativeToClipStart = frameIndex + startOffsetFrames;
+				const int framesRelativeToClipEnd = lengthFrames - framesRelativeToClipStart;
+				if (framesRelativeToClipStart < 0 || framesRelativeToClipEnd < 0) { workingBuffer[f] = SampleFrame(); continue; }
 
-			if (framesRelativeToClipStart < startCrossfadeFrames && framesRelativeToClipEnd < endCrossfadeFrames)
-			{
-				workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames))
-						* std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
-			}
-			else if (framesRelativeToClipStart < startCrossfadeFrames)
-			{
-				workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames));
-			}
-			else if (framesRelativeToClipEnd < endCrossfadeFrames)
-			{
-				workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+				if (framesRelativeToClipStart < startCrossfadeFrames && framesRelativeToClipEnd < endCrossfadeFrames)
+				{
+					workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames))
+							* std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+				}
+				else if (framesRelativeToClipStart < startCrossfadeFrames)
+				{
+					workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames));
+				}
+				else if (framesRelativeToClipEnd < endCrossfadeFrames)
+				{
+					workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+				}
 			}
 		}
 	}
