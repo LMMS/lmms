@@ -26,6 +26,7 @@
 #include "AudioEngine.h"
 #include "AudioBusHandle.h"
 #include "Engine.h"
+#include "lmms_math.h"
 #include "MixHelpers.h"
 #include "Note.h"
 #include "PatternTrack.h"
@@ -132,6 +133,9 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 			const int endCrossfadeFrames = m_clip->endCrossfadeLength() * framesPerTick;
 			const int startOffsetFrames = m_clip->startTimeOffset() * framesPerTick;
 			const int lengthFrames = m_clip->length() * framesPerTick;
+			const float startPower = std::log(1.0f - m_clip->startCrossfadeTension()) / -std::numbers::ln2;
+			const float endPower = std::log(1.0f - m_clip->endCrossfadeTension()) / -std::numbers::ln2;
+
 			for (f_cnt_t f = 0; f < frames; ++f)
 			{
 				const f_cnt_t frameIndex = initialFrameIndex + f;
@@ -141,16 +145,17 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 
 				if (framesRelativeToClipStart < startCrossfadeFrames && framesRelativeToClipEnd < endCrossfadeFrames)
 				{
-					workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames))
-							* std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+					workingBuffer[f] *=
+							fastPow(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames), startPower)
+							* fastPow(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames), endPower);
 				}
 				else if (framesRelativeToClipStart < startCrossfadeFrames)
 				{
-					workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames));
+					workingBuffer[f] *= fastPow(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames), startPower);
 				}
 				else if (framesRelativeToClipEnd < endCrossfadeFrames)
 				{
-					workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+					workingBuffer[f] *= fastPow(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames), endPower);
 				}
 			}
 		}

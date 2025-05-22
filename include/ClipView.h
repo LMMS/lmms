@@ -204,6 +204,8 @@ private:
 		ResizeLeft,
 		EditStartCrossfade,
 		EditEndCrossfade,
+		EditStartCrossfadeTension,
+		EditEndCrossfadeTension,
 		Split,
 		CopySelection,
 		ToggleSelected
@@ -234,8 +236,11 @@ private:
 	QCursor m_cursorHand;
 	QCursor m_cursorKnife;
 	bool m_cursorSetYet;
+
 	bool m_mouseOverStartCrossfadeHandle;
+	bool m_mouseOverStartCrossfadeTensionHandle;
 	bool m_mouseOverEndCrossfadeHandle;
+	bool m_mouseOverEndCrossfadeTensionHandle;
 
 	bool m_needsUpdate;
 	inline void setInitialPos( QPoint pos )
