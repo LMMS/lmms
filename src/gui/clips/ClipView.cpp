@@ -748,12 +748,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
 
-				// Action::Split action doesn't disable Clip journalling
-				if (m_action != Action::Split)
-				{
-					m_clip->setJournalling(false);
-				}
-
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
@@ -1119,11 +1113,11 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			{
 				if (m_action == Action::EditStartCrossfade)
 				{
-					clipv->getClip()->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(m_clip->length())));
+					clipv->getClip()->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(clipv->getClip()->length())));
 				}
 				else if (m_action == Action::EditEndCrossfade)
 				{
-					clipv->getClip()->setEndCrossfadeLength(std::clamp(static_cast<int>(m_clip->length() - pos), 0, static_cast<int>(m_clip->length())));
+					clipv->getClip()->setEndCrossfadeLength(std::clamp(static_cast<int>(clipv->getClip()->length() - pos), 0, static_cast<int>(clipv->getClip()->length())));
 				}
 				clipv->update();
 			}
@@ -1185,11 +1179,6 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	    ( m_action == Action::ToggleSelected && mouseMovedDistance( me, 2 ) == false ) )
 	{
 		setSelected( !isSelected() );
-	}
-	else if (m_action != Action::Split)
-	{
-		// TODO: Fix m_clip->setJournalling() consistency
-		m_clip->setJournalling( true );
 	}
 
 	if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
