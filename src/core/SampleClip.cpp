@@ -26,6 +26,7 @@
 
 #include <QDomElement>
 #include <QFileInfo>
+#include <numbers>
 
 #include "PathUtil.h"
 #include "SampleBuffer.h"
