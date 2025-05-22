@@ -89,7 +89,7 @@ void Editor::toggleMaximize()
 	isMaximized() ? showNormal() : showMaximized();
 }
 
-Editor::Editor(bool record, bool stepRecord, bool recordAccompany) :
+Editor::Editor(bool record, bool recordAccompany, bool stepRecord) :
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -104,44 +104,43 @@ Editor::Editor(bool record, bool stepRecord, bool recordAccompany) :
 		m_toolBar->widgetForAction(action)->setObjectName(objectName);
 	};
 
-	// Set up play and record actions
+	// Play action setup
 	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
-
-	if (recordAccompany)
-	{
-		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
-	}
-	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
-	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
-
-	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	if (recordAccompany)
-	{
-		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
-	}
-	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
-	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
-	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
-
-	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
+
+	// Record action setup
 	if (record)
 	{
-		if (recordAccompany)
-		{
-			addButton(m_recordAction, "recordButton");
-		}	
+		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
+		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
+		addButton(m_recordAction, "recordButton");
+	}
+
+	// RecordAccompany action setup
+	if (recordAccompany)
+	{
+		m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
+		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
 	}
-	if(stepRecord)
+
+	// StepRecord action setup
+	if (stepRecord)
 	{
+		m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
+		connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
+
+	// Stop action setup
+	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
+	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	addButton(m_stopAction, "stopButton");
+
+	// Set up shortcuts for actions
+	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
+	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
 }
 
 QAction *Editor::playAction() const

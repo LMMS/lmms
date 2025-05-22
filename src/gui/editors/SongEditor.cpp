@@ -914,7 +914,7 @@ ComboBoxModel *SongEditor::snappingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(true, false, false),
+	Editor(false, true, false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( nullptr ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
