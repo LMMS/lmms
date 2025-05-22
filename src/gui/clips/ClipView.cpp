@@ -36,6 +36,7 @@
 #include "ColorChooser.h"
 #include "ComboBoxModel.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -501,9 +502,11 @@ void ClipView::dropEvent( QDropEvent * de )
  */
 void ClipView::updateCursor(QMouseEvent * me)
 {
+	const auto posX = position(me).x();
+
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && m_clip->getResizable() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH)))
+		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -625,6 +628,8 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
  */
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
+	const auto posX = position(me).x();
+
 	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
 	// to avoid the overhead of calling getClickedClips when it's not used
 	auto active = me->button() == Qt::LeftButton
@@ -674,12 +679,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
 				}
-				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
+				else if (posX >= width() - RESIZE_GRIP_WIDTH)
 				{
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (me->x() < RESIZE_GRIP_WIDTH)
+				else if (posX < RESIZE_GRIP_WIDTH)
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -894,7 +899,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		if( m_action == Action::Resize )
 		{
 			// The clip's new length
-			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
+			TimePos l = static_cast<int>( position(me).x() * TimePos::ticksPerBar() / ppb );
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 			if ( unquantizedModHeld(me) )
