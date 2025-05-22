@@ -169,6 +169,7 @@ protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void leaveEvent(QEvent * e) override;
 	void resizeEvent( QResizeEvent * re ) override
 	{
 		m_needsUpdate = true;

@@ -308,6 +308,8 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 	_this.setAttribute("autoresize", QString::number(getAutoResize()));
+	_this.setAttribute("startfadelength", QString::number(startCrossfadeLength()));
+	_this.setAttribute("endfadelength", QString::number(endCrossfadeLength()));
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -357,6 +359,8 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
+	setStartCrossfadeLength(_this.attribute("startfadelength").toInt());
+	setEndCrossfadeLength(_this.attribute("endfadelength").toInt());
 
 	if (_this.hasAttribute("color"))
 	{

@@ -28,7 +28,6 @@
 #include <cassert>
 
 #include <QMenu>
-#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -142,7 +141,6 @@ ClipView::ClipView( Clip * clip,
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
 	setModel( m_clip );
 	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
-	connect(m_clip, SIGNAL(crossfadesChanged()), this, SLOT(update()));
 
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
@@ -637,10 +635,6 @@ void ClipView::drawCrossfade(QPainter& painter, QRect rect)
 			float nextValue = std::sqrt(static_cast<float>(i) / static_cast<float>(startCrossfadeLength));
 			startPath.lineTo(QPoint(i + 1, (1.0f - nextValue) * rect.height()));
 			painter.drawLine(i, (1.0f - lastValue) * rect.height(), i + 1, (1.0f - nextValue) * rect.height());
-			if (m_clip->leftCrossfadeClip())
-			{
-				painter.drawLine(startCrossfadeLength - i, (1.0f - lastValue) * rect.height(), startCrossfadeLength - i - 1, (1.0f - nextValue) * rect.height());
-			}
 			lastValue = nextValue;
 		}
 		startPath.lineTo(QPoint(startCrossfadeLength, 0));
@@ -666,10 +660,6 @@ void ClipView::drawCrossfade(QPainter& painter, QRect rect)
 			float nextValue = std::sqrt(static_cast<float>(i) / static_cast<float>(endCrossfadeLength));
 			endPath.lineTo(QPoint(rect.width() - i - 1, (1.0f - nextValue) * rect.height()));
 			painter.drawLine(rect.width() - i, (1.0f - lastValue) * rect.height(), rect.width() - i - 1, (1.0f - nextValue) * rect.height());
-			if (m_clip->rightCrossfadeClip())
-			{
-				painter.drawLine(rect.width() - endCrossfadeLength + i, (1.0f - lastValue) * rect.height(), rect.width() - endCrossfadeLength + i + 1, (1.0f - nextValue) * rect.height());
-			}
 			lastValue = nextValue;
 		}
 		endPath.lineTo(QPoint(rect.width() - endCrossfadeLength, 0));
@@ -683,6 +673,13 @@ void ClipView::drawCrossfade(QPainter& painter, QRect rect)
 	{
 		painter.drawEllipse(std::min(rect.width() - CROSSFADE_GRIP_RADIUS * 2, rect.width() - endCrossfadeLength - CROSSFADE_GRIP_RADIUS), 0, CROSSFADE_GRIP_RADIUS*2, CROSSFADE_GRIP_RADIUS*2);
 	}
+}
+
+void ClipView::leaveEvent(QEvent* e)
+{
+	m_mouseOverStartCrossfadeHandle = false;
+	m_mouseOverEndCrossfadeHandle = false;
+	update();
 }
 
 /*! \brief Handle a mouse press on this ClipView.
@@ -736,9 +733,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
 
-				// Action::Move, Action::Resize, Action::ResizeLeft, Action::EditStartCrossfade, and Action::EditEndCrossfade
 				// Action::Split action doesn't disable Clip journalling
-				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft || m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
+				if (m_action != Action::Split)
 				{
 					m_clip->setJournalling(false);
 				}
@@ -749,20 +745,16 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				if (!m_clip->getResizable() && !knifeMode)
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
-					setCursor(Qt::SizeAllCursor);
+					setCursor( Qt::SizeAllCursor );
 				}
 				else if (m_mouseOverStartCrossfadeHandle)
 				{
 					m_action = Action::EditStartCrossfade;
-					m_clip->setAutoCrossfade(false);
-					m_clip->deleteCrossfades();
 					setCursor(Qt::SizeHorCursor);
 				}
 				else if (m_mouseOverEndCrossfadeHandle)
 				{
 					m_action = Action::EditEndCrossfade;
-					m_clip->setAutoCrossfade(false);
-					m_clip->deleteCrossfades();
 					setCursor(Qt::SizeHorCursor);
 				}
 				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
@@ -1156,7 +1148,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if(m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
+	else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
 	{
 		update();
 	}

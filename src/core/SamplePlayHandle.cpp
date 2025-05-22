@@ -32,8 +32,6 @@
 #include "SampleClip.h"
 #include "SampleTrack.h"
 
-#include <QDebug>
-
 namespace lmms
 {
 
@@ -111,27 +109,7 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 		frames -= offset();
 	}
 
-	float crossfadeAmount = 1.0f;
-	bool inCrossfade = false;
-	if (m_clip)
-	{
-	 	const f_cnt_t startCrossfadeFrames = m_clip->startCrossfadeLength() * Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
-		const f_cnt_t endCrossfadeFrames = m_clip->endCrossfadeLength() * Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
-		const f_cnt_t framesPerTick = Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
-		const int framesRelativeToClipStart = m_state.frameIndex() + m_clip->startTimeOffset() * framesPerTick;
-		const int framesRelativeToClipEnd = m_clip->length() * framesPerTick - framesRelativeToClipStart;
-	
-		if (framesRelativeToClipStart < static_cast<int>(startCrossfadeFrames))
-		{
-			crossfadeAmount *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames));
-			inCrossfade = true;
-		}
-		if (framesRelativeToClipEnd < static_cast<int>(endCrossfadeFrames))
-		{
-			crossfadeAmount *= std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
-			inCrossfade = true;
-		}
-	}
+	const f_cnt_t initialFrameIndex = m_state.frameIndex();
 
 	if( !( m_track && m_track->isMuted() )
 				&& !(m_patternTrack && m_patternTrack->isMuted()))
@@ -145,9 +123,33 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 		{
 			zeroSampleFrames(workingBuffer, frames);
 		}
-		if (inCrossfade)
+
+		// Apply crossfade
+		const int framesPerTick = Engine::framesPerTick(Engine::audioEngine()->outputSampleRate());
+		const int startCrossfadeFrames = m_clip->startCrossfadeLength() * framesPerTick;
+		const int endCrossfadeFrames = m_clip->endCrossfadeLength() * framesPerTick;
+		const int startOffsetFrames = m_clip->startTimeOffset() * framesPerTick;
+		const int lengthFrames = m_clip->length() * framesPerTick;
+		for (f_cnt_t f = 0; f < frames; ++f)
 		{
-			MixHelpers::multiply(workingBuffer, crossfadeAmount, frames);
+			const f_cnt_t frameIndex = initialFrameIndex + f;
+			const int framesRelativeToClipStart = frameIndex + startOffsetFrames;
+			const int framesRelativeToClipEnd = lengthFrames - framesRelativeToClipStart;
+			if (framesRelativeToClipStart < 0 || framesRelativeToClipEnd < 0) { workingBuffer[f] = SampleFrame(); continue; }
+
+			if (framesRelativeToClipStart < startCrossfadeFrames && framesRelativeToClipEnd < endCrossfadeFrames)
+			{
+				workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames))
+						* std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+			}
+			else if (framesRelativeToClipStart < startCrossfadeFrames)
+			{
+				workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipStart) / static_cast<float>(startCrossfadeFrames));
+			}
+			else if (framesRelativeToClipEnd < endCrossfadeFrames)
+			{
+				workingBuffer[f] *= std::sqrt(static_cast<float>(framesRelativeToClipEnd) / static_cast<float>(endCrossfadeFrames));
+			}
 		}
 	}
 
