@@ -47,6 +47,7 @@ namespace gui
 {
 
 class FileBrowser;
+class InteractiveModelView;
 class PluginView;
 class SubWindow;
 class ToolButton;
@@ -149,6 +150,8 @@ public:
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
+	void setFocusedInteractiveModel(InteractiveModelView* model);
+	bool focusedInteractiveModelHandleKeyPress(QKeyEvent* event);
 public slots:
 	void resetWindowTitle();
 
@@ -242,6 +245,8 @@ private:
 	QAction * m_undoAction;
 	QAction * m_redoAction;
 	QList<PluginView *> m_tools;
+	//! used to handle widget shotrcuts
+	InteractiveModelView* m_focusedInteractiveModel;
 
 	QBasicTimer m_updateTimer;
 	QTimer m_autoSaveTimer;
