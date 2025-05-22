@@ -629,6 +629,17 @@ void ClipView::drawCrossfade(QPainter& painter, QRect rect)
 	float startCrossfadeTension = m_clip->startCrossfadeTension();
 	float endCrossfadeTension = m_clip->endCrossfadeTension();
 
+	auto drawHandle = [&](int x, int y, int radius)
+	{
+		painter.drawEllipse(
+			std::clamp(x - radius, 0, rect.width() - radius * 2),
+			std::clamp(y - radius, 0, rect.height() - radius * 2),
+			radius * 2,
+			radius * 2
+		);
+	};
+
+	// Draw fade in curve
 	if (m_clip->startCrossfadeLength() > 0)
 	{
 		QPainterPath startPath;
@@ -644,25 +655,9 @@ void ClipView::drawCrossfade(QPainter& painter, QRect rect)
 		}
 		startPath.lineTo(QPoint(startCrossfadeLength, 0));
 		painter.fillPath(startPath, QColor(0,0,0,200));
-	}
-	if (m_mouseOverStartCrossfadeHandle || m_action == Action::EditStartCrossfade)
-	{
-		painter.drawEllipse(std::max(0, startCrossfadeLength - CROSSFADE_GRIP_ACTIVE_RADIUS), 0, CROSSFADE_GRIP_ACTIVE_RADIUS*2, CROSSFADE_GRIP_ACTIVE_RADIUS*2);
-	}
-	else if (m_clip->startCrossfadeLength() > 0)
-	{
-		painter.drawEllipse(std::max(0, startCrossfadeLength - CROSSFADE_GRIP_RADIUS), 0, CROSSFADE_GRIP_RADIUS*2, CROSSFADE_GRIP_RADIUS*2);
-	}
+	};
 
-	if ((m_mouseOverStartCrossfadeTensionHandle || m_action == Action::EditStartCrossfadeTension) && m_clip->startCrossfadeLength() > 0)
-	{
-		painter.drawEllipse(std::max(0, startCrossfadeLength / 2 - CROSSFADE_GRIP_ACTIVE_RADIUS), startCrossfadeTension * rect.height() - CROSSFADE_GRIP_ACTIVE_RADIUS, CROSSFADE_GRIP_ACTIVE_RADIUS*2, CROSSFADE_GRIP_ACTIVE_RADIUS*2);
-	}
-	else if (m_clip->startCrossfadeLength() > 0)
-	{
-		painter.drawEllipse(std::max(0, startCrossfadeLength / 2 - CROSSFADE_GRIP_RADIUS), startCrossfadeTension * rect.height() - CROSSFADE_GRIP_RADIUS, CROSSFADE_GRIP_RADIUS*2, CROSSFADE_GRIP_RADIUS*2);
-	}
-
+	// Draw fade out curve
 	if (m_clip->endCrossfadeLength() > 0)
 	{
 		QPainterPath endPath;
@@ -680,22 +675,41 @@ void ClipView::drawCrossfade(QPainter& painter, QRect rect)
 		painter.fillPath(endPath, QColor(0,0,0,200));
 	}
 
+	// Draw handles
+	if (m_mouseOverStartCrossfadeHandle || m_action == Action::EditStartCrossfade)
+	{
+		drawHandle(startCrossfadeLength, 0, CROSSFADE_GRIP_ACTIVE_RADIUS);
+	}
+	else if (m_clip->startCrossfadeLength() > 0)
+	{
+		drawHandle(startCrossfadeLength, 0, CROSSFADE_GRIP_RADIUS);
+	}
+
 	if (m_mouseOverEndCrossfadeHandle || m_action == Action::EditEndCrossfade)
 	{
-		painter.drawEllipse(std::min(rect.width() - CROSSFADE_GRIP_ACTIVE_RADIUS * 2, rect.width() - endCrossfadeLength - CROSSFADE_GRIP_ACTIVE_RADIUS), 0, CROSSFADE_GRIP_ACTIVE_RADIUS*2, CROSSFADE_GRIP_ACTIVE_RADIUS*2);
+		drawHandle(rect.width() - endCrossfadeLength, 0, CROSSFADE_GRIP_ACTIVE_RADIUS);
 	}
 	else if (m_clip->endCrossfadeLength() > 0)
 	{
-		painter.drawEllipse(std::min(rect.width() - CROSSFADE_GRIP_RADIUS * 2, rect.width() - endCrossfadeLength - CROSSFADE_GRIP_RADIUS), 0, CROSSFADE_GRIP_RADIUS*2, CROSSFADE_GRIP_RADIUS*2);
+		drawHandle(rect.width() - endCrossfadeLength, 0, CROSSFADE_GRIP_RADIUS);
+	}
+
+	if ((m_mouseOverStartCrossfadeTensionHandle || m_action == Action::EditStartCrossfadeTension) && m_clip->startCrossfadeLength() > 0)
+	{
+		drawHandle(startCrossfadeLength / 2, startCrossfadeTension * rect.height(), CROSSFADE_GRIP_ACTIVE_RADIUS);
+	}
+	else if (m_clip->startCrossfadeLength() > 0)
+	{
+		drawHandle(startCrossfadeLength / 2, startCrossfadeTension * rect.height(), CROSSFADE_GRIP_RADIUS);
 	}
 
 	if ((m_mouseOverEndCrossfadeTensionHandle || m_action == Action::EditEndCrossfadeTension) && m_clip->endCrossfadeLength() > 0)
 	{
-		painter.drawEllipse(std::min(rect.width() - CROSSFADE_GRIP_ACTIVE_RADIUS * 2, rect.width() - endCrossfadeLength / 2 - CROSSFADE_GRIP_ACTIVE_RADIUS), endCrossfadeTension * rect.height() - CROSSFADE_GRIP_ACTIVE_RADIUS, CROSSFADE_GRIP_ACTIVE_RADIUS*2, CROSSFADE_GRIP_ACTIVE_RADIUS*2);
+		drawHandle(rect.width() - endCrossfadeLength / 2, endCrossfadeTension * rect.height(), CROSSFADE_GRIP_ACTIVE_RADIUS);
 	}
 	else if (m_clip->endCrossfadeLength() > 0)
 	{
-		painter.drawEllipse(std::min(rect.width() - CROSSFADE_GRIP_RADIUS * 2, rect.width() - endCrossfadeLength / 2 - CROSSFADE_GRIP_RADIUS), endCrossfadeTension * rect.height() - CROSSFADE_GRIP_RADIUS, CROSSFADE_GRIP_RADIUS*2, CROSSFADE_GRIP_RADIUS*2);
+		drawHandle(rect.width() - endCrossfadeLength / 2, endCrossfadeTension * rect.height(), CROSSFADE_GRIP_RADIUS);
 	}
 }
 
