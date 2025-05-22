@@ -37,8 +37,6 @@
 namespace lmms
 {
 
-extern const float SECS_PER_LFO_OSCILLATION;
-
 namespace gui
 {
 
@@ -85,8 +83,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	int graphBaseX = 2;
 	int graphBaseY = margin + lfoGraphHeight / 2;
 
-	const float framesForGraph =
-		SECS_PER_LFO_OSCILLATION * Engine::audioEngine()->baseSampleRate() / 10;
+	const float framesForGraph = 2.0f * Engine::audioEngine()->baseSampleRate();
 
 	float oscFrames = oscillationFrames * (x100 ? 100. : 1.);
 
@@ -161,7 +158,7 @@ void LfoGraph::drawInfoText(const EnvelopeAndLfoParameters& params)
 	const float lfoSpeed = params.getLfoSpeedModel().value();
 	const bool x100 = params.getX100Model().value();
 
-	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed) * (x100 ? 100. : 1.);
+	const float hertz = 1. / (lfoSpeed) * (x100 ? 100. : 1.);
 	const auto infoText = tr("%1 Hz").arg(hertz, 0, 'f', 3);
 
 	// First configure the font so that we get correct results for the font metrics used below

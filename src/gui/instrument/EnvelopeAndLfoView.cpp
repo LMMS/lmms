@@ -57,9 +57,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	// Helper lambdas for consistent repeated buiding of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
-		auto knob = new Knob(KnobType::Bright26, this);
+		auto knob = new TempoSyncKnob(KnobType::Bright26, this);
 		knob->setLabel(label);
-		knob->setHintText(hintText, "");
+		knob->setHintText(hintText, "s");
 		
 		return knob;
 	};
@@ -88,7 +88,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	graphAndAmountLayout->addWidget(m_envelopeGraph);
 	m_envelopeGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	m_amountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
+	m_amountKnob = new Knob(KnobType::Bright26, this);
+	m_amountKnob->setLabel(tr("AMT"));
+	m_amountKnob->setHintText(tr("Modulation amount:"), "");
 	graphAndAmountLayout->addWidget(m_amountKnob, 0, Qt::AlignCenter);
 
 	QHBoxLayout* envKnobsLayout = new QHBoxLayout();
@@ -106,7 +108,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_decayKnob = buildKnob(tr("DEC"), tr("Decay:"));
 	envKnobsLayout->addWidget(m_decayKnob);
 
-	m_sustainKnob = buildKnob(tr("SUST"), tr("Sustain:"));
+	m_sustainKnob = new Knob(KnobType::Bright26, this);
+	m_sustainKnob->setLabel(tr("SUST"));
+	m_sustainKnob->setHintText(tr("Sustain:"), "");
 	envKnobsLayout->addWidget(m_sustainKnob);
 
 	m_releaseKnob = buildKnob(tr("REL"), tr("Release:"));
@@ -170,12 +174,12 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_lfoAttackKnob = buildKnob(tr("ATT"), tr("Attack:"));
 	lfoKnobsLayout->addWidget(m_lfoAttackKnob);
 
-	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, this);
-	m_lfoSpeedKnob->setLabel(tr("SPD"));
-	m_lfoSpeedKnob->setHintText(tr("Frequency:"), "");
+	m_lfoSpeedKnob = buildKnob(tr("SPD"), tr("Period:"));
 	lfoKnobsLayout->addWidget(m_lfoSpeedKnob);
 
-	m_lfoAmountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
+	m_lfoAmountKnob = new Knob(KnobType::Bright26, this);
+	m_lfoAmountKnob->setLabel(tr("AMT"));
+	m_lfoAmountKnob->setHintText(tr("Modulation amount:"), "");
 	lfoKnobsLayout->addWidget(m_lfoAmountKnob);
 
 	QVBoxLayout* checkBoxesLayout = new QVBoxLayout();
