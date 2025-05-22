@@ -747,12 +747,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
 				}
-				else if (m_mouseOverStartCrossfadeHandle)
+				else if (m_mouseOverStartCrossfadeHandle && m_clip->isCrossfadeable())
 				{
 					m_action = Action::EditStartCrossfade;
 					setCursor(Qt::SizeHorCursor);
 				}
-				else if (m_mouseOverEndCrossfadeHandle)
+				else if (m_mouseOverEndCrossfadeHandle && m_clip->isCrossfadeable())
 				{
 					m_action = Action::EditEndCrossfade;
 					setCursor(Qt::SizeHorCursor);
@@ -1085,14 +1085,14 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if (m_action == Action::EditStartCrossfade)
 	{
-		TimePos pos = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
-		m_clip->setStartCrossfadeLength(std::max(0, static_cast<int>(pos)));
+		TimePos pos = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
+		m_clip->setStartCrossfadeLength(std::clamp(static_cast<int>(pos), 0, static_cast<int>(m_clip->length())));
 		update();
 	}
 	else if (m_action == Action::EditEndCrossfade)
 	{
-		TimePos pos = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
-		m_clip->setEndCrossfadeLength(std::max(0, static_cast<int>(m_clip->length() - pos)));
+		TimePos pos = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
+		m_clip->setEndCrossfadeLength(std::clamp(static_cast<int>(m_clip->length() - pos), 0, static_cast<int>(m_clip->length())));
 		update();
 	}
 	else if( m_action == Action::Split )
@@ -1143,12 +1143,13 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if (m_action != Action::Split)
 	{
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
+
+	if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
 	{
 		update();
 	}

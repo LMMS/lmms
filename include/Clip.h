@@ -168,6 +168,7 @@ public:
 	{
 		m_endCrossfadeLength = std::max(TimePos{0}, endCrossfadeLength);
 	}
+	virtual bool isCrossfadeable() const { return false; }
 
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
