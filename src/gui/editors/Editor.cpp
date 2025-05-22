@@ -89,7 +89,7 @@ void Editor::toggleMaximize()
 	isMaximized() ? showNormal() : showMaximized();
 }
 
-Editor::Editor(bool record, bool stepRecord, bool onlyRecordAccompany) :
+Editor::Editor(bool record, bool stepRecord, bool recordAccompany) :
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -108,7 +108,7 @@ Editor::Editor(bool record, bool stepRecord, bool onlyRecordAccompany) :
 	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
 	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
 
-	if (onlyRecordAccompany)
+	if (recordAccompany)
 	{
 		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
 	}
@@ -117,7 +117,7 @@ Editor::Editor(bool record, bool stepRecord, bool onlyRecordAccompany) :
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	if (onlyRecordAccompany)
+	if (recordAccompany)
 	{
 		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
 	}
@@ -131,7 +131,7 @@ Editor::Editor(bool record, bool stepRecord, bool onlyRecordAccompany) :
 	addButton(m_playAction, "playButton");
 	if (record)
 	{
-		if (onlyRecordAccompany)
+		if (recordAccompany)
 		{
 			addButton(m_recordAction, "recordButton");
 		}	
