@@ -49,8 +49,8 @@ Clip::Clip( Track * track ) :
 	m_length(),
 	m_startCrossfadeLength(0),
 	m_endCrossfadeLength(0),
-	m_startCrossfadeTension(1.0f - std::numbers::sqrt2 / 2),
-	m_endCrossfadeTension(1.0f - std::numbers::sqrt2 / 2),
+	m_startCrossfadeTension(1.0f - std::sqrt(2) / 2),
+	m_endCrossfadeTension(1.0f - std::sqrt(2) / 2),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
