@@ -96,8 +96,6 @@ Effect::ProcessStatus PredictionDistortEffect::processImpl(SampleFrame* buf, con
 			for (fpp_t j = processDecayCount - 1; j-- > 0;) //! < thx Lost Robot
 			{
 				fpp_t index = i + j;
-				//buf[i][0] = std::clamp(predictNext(m_inputData[index][0], m_inputData[index + decayRangeMid][0], m_inputData[index + decayRangeEnd][0], j + 3), -1.0f, 1.0f) * mixVal + buf[i][0] * invMix;
-				//buf[i][1] = std::clamp(predictNext(m_inputData[index][1], m_inputData[index + decayRangeMid][1], m_inputData[index + decayRangeEnd][1], j + 3), -1.0f, 1.0f) * mixVal + buf[i][1] * invMix;
 				buf[i][0] = std::clamp(predictNext(m_inputData[index][0], m_inputData[index + decayRangeMid][0], m_inputData[index + decayRangeEnd][0], 3), -1.0f, 1.0f) * mixVal + buf[i][0] * invMix;
 				buf[i][1] = std::clamp(predictNext(m_inputData[index][1], m_inputData[index + decayRangeMid][1], m_inputData[index + decayRangeEnd][1], 3), -1.0f, 1.0f) * mixVal + buf[i][1] * invMix;
 			}
