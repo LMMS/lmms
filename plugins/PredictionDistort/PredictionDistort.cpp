@@ -37,7 +37,7 @@ Plugin::Descriptor PLUGIN_EXPORT PredictionDistort_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Prediction Distortion",
-	QT_TRANSLATE_NOOP("PluginBrowser", "This effect tries to predict the next sample using second degree polynomals"),
+	QT_TRANSLATE_NOOP("PluginBrowser", "This effect tries to predict the next sample using second degree polynomials"),
 	"szeli1",
 	0x0100,
 	Plugin::Type::Effect,
@@ -108,7 +108,7 @@ Effect::ProcessStatus PredictionDistortEffect::processImpl(SampleFrame* buf, con
 
 float PredictionDistortEffect::predictNext(float y1, float y2, float y3, float predictX)
 {
-	// calculating second degree polynomal with 3 input points
+	// calculating second degree polynomial with 3 input points
 	// y = ax^2 + bx + c
 	// x1 = 0, x2 = 1, x3 = 2, output: x4 = `predictX`
 	float c = y1;
