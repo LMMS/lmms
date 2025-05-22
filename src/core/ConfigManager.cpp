@@ -22,19 +22,19 @@
  *
  */
 
+#include "ConfigManager.h"
 
-#include <QDomElement>
-#include <QDir>
-#include <QMessageBox>
+#include <PathUtil.h>
 #include <QApplication>
+#include <QDir>
+#include <QDomElement>
+#include <QMessageBox>
 #include <QStandardPaths>
 #include <QTextStream>
 
-#include "ConfigManager.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
-#include "GuiApplication.h"
-
 #include "lmmsversion.h"
 
 namespace lmms
@@ -299,9 +299,6 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 	m_backgroundPicFile = backgroundPicFile;
 }
 
-
-
-
 void ConfigManager::createWorkingDir()
 {
 	QDir().mkpath(m_workingDir);
@@ -335,8 +332,27 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 	}
 }
 
+void ConfigManager::addFavoriteItem(const QString& item)
+{
+	m_favoriteItems.push_back(item);
+	saveConfigFile();
+	emit favoritesChanged();
+}
 
+void ConfigManager::removeFavoriteItem(const QString& item)
+{
+	m_favoriteItems.removeAll(item);
+	saveConfigFile();
+	emit favoritesChanged();
+}
 
+bool ConfigManager::isFavoriteItem(const QString& item)
+{
+	const auto& items = favoriteItems();
+	const auto it = std::find_if(items.begin(), items.end(),
+		[&](const auto& favoriteItem) { return QFileInfo{item} == QFileInfo{favoriteItem}; });
+	return it != items.end();
+}
 
 QString ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
 {
@@ -466,8 +482,20 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 					{
 						if(n.isElement() && n.toElement().hasAttributes())
 						{
-							m_recentlyOpenedProjects <<
-									n.toElement().attribute("path");
+							m_recentlyOpenedProjects << n.toElement().attribute("path");
+						}
+						n = n.nextSibling();
+					}
+				}
+				else if (node.nodeName() == "favoriteitems")
+				{
+					m_favoriteItems.clear();
+					QDomNode n = node.firstChild();
+					while (!n.isNull())
+					{
+						if (n.isElement() && n.toElement().hasAttributes())
+						{
+							m_favoriteItems << n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
 					}
@@ -571,6 +599,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	{
 		createWorkingDir();
 	}
+
+	for (auto& file : m_recentlyOpenedProjects)
+	{
+		file = PathUtil::toAbsolute(file);
+	}
+
+	for (auto& file : m_favoriteItems)
+	{
+		file = PathUtil::toAbsolute(file);
+	}
 }
 
 
@@ -614,10 +652,21 @@ void ConfigManager::saveConfigFile()
 	for (const auto& recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
-		n.setAttribute("path", recentlyOpenedProject);
+		n.setAttribute("path", PathUtil::toShortestRelative(recentlyOpenedProject));
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);
+
+	QDomElement favorite_items = doc.createElement("favoriteitems");
+
+	for (const auto& favoriteItem : m_favoriteItems)
+	{
+		QDomElement n = doc.createElement("item");
+		n.setAttribute("path", PathUtil::toShortestRelative(favoriteItem));
+		favorite_items.appendChild(n);
+	}
+
+	lmms_config.appendChild(favorite_items);
 
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
 

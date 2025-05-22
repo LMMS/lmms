@@ -211,6 +211,7 @@ PianoRoll::PianoRoll() :
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
 	m_backgroundShade( 0, 0, 0 ),
+	m_outOfBoundsShade(0, 0, 0, 128),
 	m_whiteKeyWidth(WHITE_KEY_WIDTH),
 	m_blackKeyWidth(BLACK_KEY_WIDTH)
 {
@@ -786,6 +787,20 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::reverseNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	m_midiClip->reverseNotes(notes);
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -854,7 +869,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		return;
 	}
 
-	m_leftRightScroll->setValue( 0 );
+	// Scroll horizontally to the start of the clip, minus a bar for aesthetics.
+	m_leftRightScroll->setValue(std::max(0, -m_midiClip->startTimeOffset() - TimePos::ticksPerBar()));
 
 	// determine the central key so that we can scroll to it
 	int central_key = 0;
@@ -874,6 +890,13 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		m_startKey = qBound(0, central_key, NumKeys);
 	}
 
+	// Make sure the playhead position isn't out of the clip bounds.
+	Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).setTicks(std::clamp(
+		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).getTicks(),
+		std::max(0, -m_midiClip->startTimeOffset()),
+		m_midiClip->length() - m_midiClip->startTimeOffset()
+	));
+
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of start-notes and so on...)
 	resizeEvent( nullptr );
@@ -891,6 +914,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	connect(m_midiClip->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));
+	connect(m_midiClip, &MidiClip::lengthChanged, this, qOverload<>(&QWidget::update));
 
 	update();
 	emit currentMidiClipChanged();
@@ -1494,6 +1518,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			}
 			break;
 		default:
+			ke->ignore();
 			break;
 	}
 
@@ -3205,6 +3230,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// G-1 is one of the widest; plus one pixel margin for the shadow
 	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
 
+	auto xCoordOfTick = [this](int tick) {
+		return m_whiteKeyWidth + (
+			(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
+		);
+	};
+
 	// Order of drawing
 	// - vertical quantization lines
 	// - piano roll + horizontal key lines
@@ -3279,11 +3310,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6) { q = 6; }
 		}
-		auto xCoordOfTick = [this](int tick) {
-			return m_whiteKeyWidth + (
-				(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
-			);
-		};
+    
 		p.setPen(m_lineColor);
 		for (tick = m_currentPosition - m_currentPosition % q,
 			x = xCoordOfTick(tick);
@@ -3713,13 +3740,25 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
+		// draw clip bounds
+		p.fillRect(
+			xCoordOfTick(m_midiClip->length() - m_midiClip->startTimeOffset()),
+			PR_TOP_MARGIN,
+			width() - 10,
+			noteEditBottom(),
+			m_outOfBoundsShade
+		);
+		p.fillRect(
+			0,
+			PR_TOP_MARGIN,
+			xCoordOfTick(-m_midiClip->startTimeOffset()),
+			noteEditBottom(),
+			m_outOfBoundsShade
+		);
+
 		// -- Knife tool (draw cut line)
 		if (m_action == Action::Knife && m_knifeDown)
 		{
-			auto xCoordOfTick = [this](int tick) {
-				return m_whiteKeyWidth + (
-					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
-			};
 			int x1 = xCoordOfTick(m_knifeStartTickPos);
 			int y1 = y_base - (m_knifeStartKey - m_startKey + 1) * m_keyLineHeight;
 			int x2 = xCoordOfTick(m_knifeEndTickPos);
@@ -3798,7 +3837,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.drawRect(x + m_whiteKeyWidth, y, w, h);
 
 	// TODO: Get this out of paint event
-	int l = ( hasValidMidiClip() )? (int) m_midiClip->length() : 0;
+	int l = ( hasValidMidiClip() )? (int) m_midiClip->length() - m_midiClip->startTimeOffset() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
@@ -5046,6 +5085,10 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
+	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
+	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
+	reverseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_R));
+
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
@@ -5053,6 +5096,7 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
+	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 

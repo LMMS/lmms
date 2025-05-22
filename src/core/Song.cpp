@@ -290,7 +290,7 @@ void Song::processNextBuffer()
 			}
 			else if (m_playMode == PlayMode::MidiClip && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_midiClipToPlay->length());
+				enforceLoop(-m_midiClipToPlay->startTimeOffset(), m_midiClipToPlay->length() - m_midiClipToPlay->startTimeOffset());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -366,7 +366,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		break;
 	case PlayMode::Pattern:
 	{
-		Q_ASSERT(tracklist.size() == 1);
+		if (tracklist.empty()) { return; }
 		Q_ASSERT(tracklist.at(0)->type() == Track::Type::Pattern);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
 		container = Engine::patternStore();
@@ -493,6 +493,7 @@ void Song::playSong()
 	}
 
 	m_playMode = PlayMode::Song;
+	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -532,6 +533,7 @@ void Song::playPattern()
 	}
 
 	m_playMode = PlayMode::Pattern;
+	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -558,6 +560,7 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 	if( m_midiClipToPlay != nullptr )
 	{
 		m_playMode = PlayMode::MidiClip;
+		m_lastPlayMode = m_playMode;
 		m_playing = true;
 		m_paused = false;
 	}
@@ -660,7 +663,14 @@ void Song::stop()
 	switch (timeline.stopBehaviour())
 	{
 		case Timeline::StopBehaviour::BackToZero:
-			getPlayPos().setTicks(0);
+			if (m_playMode == PlayMode::MidiClip)
+			{
+				getPlayPos().setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
+			}
+			else
+			{
+				getPlayPos().setTicks(0);
+			}
 			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
 			break;
 

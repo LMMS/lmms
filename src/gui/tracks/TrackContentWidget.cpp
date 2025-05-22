@@ -605,8 +605,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const TimePos timePos = getPosition( pos.x() ).getBar() *
-						TimePos::ticksPerBar();
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+		const TimePos timePos = TimePos(getPosition(pos.x())).quantize(snapSize, true);
 		getTrack()->createClip(timePos);
 	}
 }

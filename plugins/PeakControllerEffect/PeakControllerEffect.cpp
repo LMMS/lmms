@@ -132,18 +132,8 @@ Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const 
 	float curRMS = sqrt_neg(sum / frames);
 	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
-	const float attack = 1.0f - c.m_attackModel.value();
-	const float decay = 1.0f - c.m_decayModel.value();
-
 	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;
-	float target = c.m_baseModel.value() + amount * curRMS;
-	// Use decay when the volume is decreasing, attack otherwise.
-	// Since direction can change as often as every sampleBuffer, it's difficult
-	// to witness attack/decay working in isolation unless using large buffer sizes.
-	const float t = target < m_lastSample ? decay : attack;
-	// Set m_lastSample to the interpolation between itself and target.
-	// When t is 1.0, m_lastSample snaps to target. When t is 0.0, m_lastSample shouldn't change.
-	m_lastSample = std::clamp(m_lastSample + t * (target - m_lastSample), 0.0f, 1.0f);
+	m_lastSample = qBound( 0.0f, c.m_baseModel.value() + amount * curRMS, 1.0f );
 
 	return ProcessStatus::Continue;
 }
