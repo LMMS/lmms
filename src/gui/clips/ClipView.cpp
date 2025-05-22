@@ -726,6 +726,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			if( isSelected() )
 			{
+				for (auto clipv: getClickedClips()) { clipv->getClip()->addJournalCheckPoint(); }
+
 				if (m_mouseOverStartCrossfadeHandle && m_clip->isCrossfadeable())
 				{
 					m_action = Action::EditStartCrossfade;
