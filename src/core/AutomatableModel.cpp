@@ -433,16 +433,20 @@ void AutomatableModel::linkModel(AutomatableModel* model)
 	if (model == nullptr || model == this || isModelLinked(model)) { return; }
 
 	AutomatableModel* otherEnd = model->getLastLinkedModel();
+	AutomatableModel* next = m_nextLink == nullptr ? this : m_nextLink;
 	if (otherEnd == nullptr)
 	{
-		model->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
-		m_nextLink = model;
+		// linking other start to our next
+		model->m_nextLink = next;
 	}
 	else
 	{
-		otherEnd->m_nextLink = m_nextLink == nullptr ? this : m_nextLink;
-		m_nextLink = model;
+		// linking other end to our next
+		otherEnd->m_nextLink = next;
 	}
+	// linking this to other start
+	m_nextLink = model;
+	assert(m_nextLink != this); // if you change the code, be careful to not link to this
 }
 
 void AutomatableModel::unlinkModel()
