@@ -30,6 +30,7 @@
 #include <QPoint>
 
 #include "AutomatableModelView.h"
+#include "InteractiveModelView.h"
 
 
 namespace lmms::gui
@@ -37,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView
 {
 	Q_OBJECT
 
@@ -63,6 +64,21 @@ public:
 		setUnit(txt_after);
 	}
 
+	void copyValueCommand();
+	void pasteNoReturnCommand();
+	void pasteCommand(bool* isSuccessful);
+	void linkCommand(int id);
+	void unlinkCommand(int id);
+	void getLinkCommand();
+	void unlinkAllCommand();
+	void increaseValueCommand();
+	void decreaseValueCommand();
+	void setValueCommand(float floatValue);
+	void openInputDialogCommand();
+	void toggleScaleCommand();
+	void setScaleLogarithmicCommand(bool isLogarithmic);
+	void setPositionCommand(QPoint p);
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
@@ -84,12 +100,13 @@ protected:
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 
+	// InteractiveModelView methods
+	void addCommands(std::vector<CommandData>& targetList) override;
+
 	virtual float getValue(const QPoint & p);
 
 private slots:
-	virtual void enterValue();
 	void friendlyUpdate();
-	void toggleScale();
 
 private:
 	virtual QString displayValue() const;
@@ -97,7 +114,6 @@ private:
 	void doConnections() override;
 
 	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
-	void setPosition(const QPoint & p);
 
 	inline float pageSize() const
 	{
