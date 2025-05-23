@@ -795,6 +795,11 @@ lmms--gui--AutomationClipView {
 /* pattern clip */
 lmms--gui--PatternClipView {
 	background-color: rgb( 128, 182, 175 ); /* default colour for pattern tracks */
+	qproperty-emptyTrackHeightRatio: 0.5; /* height of empty tracks versus non-empty tracks */
+	qproperty-verticalPadding: 0.15; /* padding above and below the beat preview on the clip, fraction of the total clip height */
+	qproperty-noteVerticalSpacing: 0.2; /* spacing above and below each note, fraction of the note height */
+	qproperty-noteHorizontalSpacing: 0.2; /* spacing left/right of each note, fraction of the note width */
+	qproperty-noteColor: #ffffff; /* colour of the beat/note rectangles on the clip */
 }
 
 /* Subwindows in MDI-Area */
