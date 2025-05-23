@@ -60,6 +60,8 @@
 
 #include "BufferManager.h"
 
+#include "LocklessRingBuffer.h"
+
 namespace lmms
 {
 
@@ -85,7 +87,12 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
+	m_audioDevName(""),
 	m_audioDevStartFailed( false ),
+	m_midiClient( nullptr ),
+	m_midiClientName(""),
+	m_fifo(nullptr),
+	m_fifoWriter(nullptr),
 	m_profiler(),
 	m_clearSignal(false)
 {
@@ -147,6 +154,10 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		}
 		m_workers.push_back( wt );
 	}
+
+	m_inputAudioRingBuffer = std::make_unique<LocklessRingBuffer<SampleFrame>>(DEFAULT_BUFFER_SIZE * 100);
+	m_inputAudioRingBufferReader = std::make_unique<LocklessRingBufferReader<SampleFrame>>(*m_inputAudioRingBuffer);
+	// m_inputAudioRingBuffer->mlock(); //Still unsure about this
 }
 
 
@@ -154,6 +165,17 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 AudioEngine::~AudioEngine()
 {
+	if (m_audioDev && m_audioDev->isProcessing())
+	{
+		stopProcessing();
+	} else if (m_fifoWriter)
+	{ 
+		m_fifoWriter->finish();
+		m_fifoWriter->wait();
+		delete m_fifoWriter;
+		m_fifoWriter = nullptr;
+	}
+
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
@@ -161,24 +183,43 @@ AudioEngine::~AudioEngine()
 
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
-	for( int w = 0; w < m_numWorkers; ++w )
+	for(int w = 0; w < m_numWorkers; ++w)
 	{
-		m_workers[w]->wait( 500 );
+		if (m_workers[w]) {
+			bool finished = m_workers[w]->wait( 500 );
+			if (!finished) {
+				m_workers[w]->terminate();
+				m_workers[w]->wait();
+			}
+			delete m_workers[w];
+		}
 	}
 
-	while( m_fifo->available() )
-	{
-		delete[] m_fifo->read();
+	if (std::cmp_less(m_numWorkers, m_workers.size()) && m_workers[m_numWorkers]) {
+		delete m_workers[m_numWorkers];
 	}
-	delete m_fifo;
+	m_workers.clear();
 
-	delete m_midiClient;
-	delete m_audioDev;
+	if(m_fifo) {
+		while( m_fifo->available() ) {
+			SampleFrame* buf_to_delete = m_fifo->read();
+			if (buf_to_delete) delete[] buf_to_delete;
+		}
+		delete m_fifo;
+		m_fifo = nullptr;
+	}
 
+	delete m_midiClient; m_midiClient = nullptr;
+	delete m_audioDev; m_audioDev = nullptr;
 
-	for (const auto& input : m_inputBuffer)
-	{
-		delete[] input;
+	if (m_oldAudioDev) {
+		delete m_oldAudioDev;
+	}
+	m_oldAudioDev = nullptr;
+
+	for (int i = 0; i < 2; ++i) {
+		delete[] m_inputBuffer[i];
+		m_inputBuffer[i] = nullptr;
 	}
 }
 
@@ -251,29 +292,82 @@ bool AudioEngine::criticalXRuns() const
 
 void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 {
-	requestChangeInModel();
+	if (m_inputAudioRingBuffer)
+   {
+		std::size_t frames_written = m_inputAudioRingBuffer->write(_ab, _frames, false);
 
-	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
-	auto size = m_inputBufferSize[m_inputBufferWrite];
-	SampleFrame* buf = m_inputBuffer[ m_inputBufferWrite ];
+		if (frames_written < _frames)
+		{
+			fprintf(stderr, "AudioEngine: Input ring buffer overflow, %zu of %zu frames dropped.\n", _frames - frames_written, _frames);
+		}
+   }
+}
 
-	if( frames + _frames > size )
-	{
-		size = std::max(size * 2, frames + _frames);
-		auto ab = new SampleFrame[size];
-		memcpy( ab, buf, frames * sizeof( SampleFrame ) );
-		delete [] buf;
 
-		m_inputBufferSize[ m_inputBufferWrite ] = size;
-		m_inputBuffer[ m_inputBufferWrite ] = ab;
 
-		buf = ab;
+void AudioEngine::processBufferedInputFrames()
+{
+	if (!m_inputAudioRingBufferReader || !m_inputAudioRingBuffer) return;
+
+	std::size_t available_in_ring = m_inputAudioRingBufferReader->read_space();
+	if (available_in_ring == 0) {
+		return;
 	}
 
-	memcpy( &buf[ frames ], _ab, _frames * sizeof( SampleFrame ) );
-	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
+	ringbuffer_reader_t<SampleFrame>::read_sequence_t sequence =
+		m_inputAudioRingBufferReader->read_max(available_in_ring);
 
-	doneChangeInModel();
+	std::size_t frames_in_sequence = sequence.size();
+
+	if (frames_in_sequence > 0) {
+		std::vector<SampleFrame> temp_consolidated_buffer(frames_in_sequence);
+		std::size_t frames_copied_to_temp = 0;
+
+		std::size_t len1 = sequence.first_half_size();
+		if (len1 > 0) {
+			const SampleFrame* ptr1 = sequence.first_half_ptr();
+			memcpy(temp_consolidated_buffer.data() + frames_copied_to_temp,
+				   ptr1,
+				   len1 * sizeof(SampleFrame));
+			frames_copied_to_temp += len1;
+		}
+
+		std::size_t len2 = sequence.second_half_size();
+		if (len2 > 0) {
+			const SampleFrame* ptr2 = sequence.second_half_ptr();
+			memcpy(temp_consolidated_buffer.data() + frames_copied_to_temp,
+				   ptr2,
+				   len2 * sizeof(SampleFrame));
+			frames_copied_to_temp += len2;
+		}
+
+		assert(frames_copied_to_temp == frames_in_sequence);
+
+		requestChangeInModel();
+
+		SampleFrame* current_write_buf_ptr = m_inputBuffer[m_inputBufferWrite];
+		f_cnt_t current_write_buf_size = m_inputBufferSize[m_inputBufferWrite];
+		f_cnt_t current_frames_in_write_buf = m_inputBufferFrames[m_inputBufferWrite];
+
+		if (current_frames_in_write_buf + frames_copied_to_temp > current_write_buf_size) {
+			current_write_buf_size = std::max(current_write_buf_size * 2,
+											 current_frames_in_write_buf + static_cast<f_cnt_t>(frames_copied_to_temp));
+			auto new_ab = new SampleFrame[current_write_buf_size];
+			memcpy(new_ab, current_write_buf_ptr, current_frames_in_write_buf * sizeof(SampleFrame));
+			delete[] current_write_buf_ptr;
+
+			m_inputBufferSize[m_inputBufferWrite] = current_write_buf_size;
+			m_inputBuffer[m_inputBufferWrite] = new_ab;
+			current_write_buf_ptr = new_ab;
+		}
+
+		memcpy(&current_write_buf_ptr[current_frames_in_write_buf],
+			   temp_consolidated_buffer.data(),
+			   frames_copied_to_temp * sizeof(SampleFrame));
+		m_inputBufferFrames[m_inputBufferWrite] += static_cast<f_cnt_t>(frames_copied_to_temp);
+
+		doneChangeInModel();
+	}
 }
 
 
@@ -281,6 +375,8 @@ void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
 void AudioEngine::renderStageNoteSetup()
 {
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::NoteSetup);
+
+	processBufferedInputFrames();
 
 	if( m_clearSignal )
 	{
@@ -309,6 +405,8 @@ void AudioEngine::renderStageNoteSetup()
 
 		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
+
+	m_playHandlesToRemove.clear();
 
 	swapBuffers();
 

@@ -41,6 +41,8 @@
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
 
+#include "LocklessRingBuffer.h"
+
 
 namespace lmms
 {
@@ -286,6 +288,8 @@ public:
 
 	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
 
+	void processBufferedInputFrames();
+
 	inline const SampleFrame* inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
@@ -419,6 +423,9 @@ private:
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
+
+	std::unique_ptr<LocklessRingBuffer<SampleFrame>> m_inputAudioRingBuffer;
+	std::unique_ptr<LocklessRingBufferReader<SampleFrame>> m_inputAudioRingBufferReader;
 } ;
 
 } // namespace lmms
