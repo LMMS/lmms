@@ -41,6 +41,7 @@ class InteractiveModelView;
 class CommandFnPtr
 {
 public:
+	virtual ~CommandFnPtr() {};
 	template<typename DataType>
 	void callFn(InteractiveModelView* object, DataType data)
 	{
@@ -63,13 +64,14 @@ class TypedCommandFnPtr : public CommandFnPtr
 {
 public:
 	typedef void (BaseType::*InternalFnPtr)(DataType);
-	
+
 	TypedCommandFnPtr(InternalFnPtr fnPtr) :
 		m_functionPtr(fnPtr)
 	{}
 	TypedCommandFnPtr() :
 		m_functionPtr(nullptr)
 	{}
+	~TypedCommandFnPtr() { qDebug("typed destructed"); };
 
 	CommandFnPtr* clone() const override
 	{
@@ -103,6 +105,7 @@ public:
 	BasicCommandFnPtr() :
 		m_functionPtr(nullptr)
 	{}
+	~BasicCommandFnPtr() {};
 
 	CommandFnPtr* clone() const override
 	{
