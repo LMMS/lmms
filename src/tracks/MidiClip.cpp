@@ -326,6 +326,8 @@ void MidiClip::setStep( int step, bool enabled )
 
 void MidiClip::reverseNotes(const NoteVector& notes)
 {
+	if (notes.empty()) { return; }
+
 	addJournalCheckPoint();
 
 	// Find the very first start position and the very last end position of all the notes.
@@ -532,7 +534,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		changeLength(len);
 	}
 	
-	setAutoResize(_this.attribute("autoresize").toInt());
+	setAutoResize(_this.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
 
 	emit dataChanged();

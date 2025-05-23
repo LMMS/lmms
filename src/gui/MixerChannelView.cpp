@@ -235,6 +235,10 @@ void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 	{
 		m_fader->adjustByDialog();
 	}
+	else
+	{
+		ke->ignore();
+	}
 }
 
 void MixerChannelView::setChannelIndex(int index)
