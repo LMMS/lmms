@@ -163,8 +163,7 @@ private slots:
 		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
 
-		DetuningHelper* dh = note->detuning();
-		auto clip = dh->automationClip();
+		auto clip = note->detuning()->automationClip();
 		clip->setProgressionType( AutomationClip::ProgressionType::Linear );
 		clip->putValue(TimePos(0, 0), 0.0);
 		clip->putValue(TimePos(4, 0), 1.0);

@@ -68,7 +68,7 @@ MidiClip::MidiClip( const MidiClip& other ) :
 {
 	for (const auto& note : other.m_notes)
 	{
-		m_notes.push_back(new Note(*note));
+		m_notes.push_back(note->clone());
 	}
 
 	init();
@@ -197,7 +197,7 @@ TimePos MidiClip::beatClipLength() const
 
 Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	auto new_note = new Note(_new_note);
+	auto new_note = _new_note.clone();
 	if (_quant_pos && gui::getGUI()->pianoRoll())
 	{
 		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
