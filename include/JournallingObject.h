@@ -58,7 +58,7 @@ public:
 		}
 	}
 
-	void addJournalCheckPoint();
+	void addJournalCheckPoint(QString reason = "Unknown");
 
 	QDomElement saveState( QDomDocument & _doc,
 									QDomElement & _parent ) override;
@@ -86,6 +86,8 @@ public:
 	{
 		return m_journallingStateStack.isEmpty();
 	}
+
+	constexpr static auto JO_NODE_NAME = "journallingObject";
 
 protected:
 	void changeID( jo_id_t _id );
