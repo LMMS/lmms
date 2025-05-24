@@ -165,7 +165,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 		: 0;
 
 	int verticalNoteSpacing = trackHeight * m_noteVerticalSpacing;
-	int horizontalNoteSpacing = pixelsPerBar() / 16 * m_noteHorizontalSpacing;
+	int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
 
 	float lastY = height() * m_verticalPadding;
 	for (const auto& track : Engine::patternStore()->tracks())
@@ -186,7 +186,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 			QRect noteRect = QRect(
 				note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + horizontalNoteSpacing / 2,
 				lastY + verticalNoteSpacing / 2,
-				pixelsPerBar() / 16 - horizontalNoteSpacing,
+				pixelsPerBar() / TimePos::stepsPerBar() - horizontalNoteSpacing,
 				trackHeight - verticalNoteSpacing
 			);
 			// Loop through all the possible bars this pattern could affect. Starting at -1 for the possibility of start offset
