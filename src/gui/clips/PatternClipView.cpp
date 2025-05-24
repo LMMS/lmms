@@ -49,10 +49,10 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap(),
-	m_emptyTrackHeightRatio(0.5),
-	m_verticalPadding(0.15),
-	m_noteVerticalSpacing(0.2),
-	m_noteHorizontalSpacing(0.2),
+	m_emptyTrackHeightRatio(0.5f),
+	m_verticalPadding(0.15f),
+	m_noteVerticalSpacing(0.2f),
+	m_noteHorizontalSpacing(0.2f),
 	m_noteColor(255, 255, 255)
 {
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
