@@ -57,7 +57,7 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 {
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
 			this, SLOT(update()));
-	connect(_clip->getTrack()->trackContainer(), &TrackContainer::trackAdded, 
+	connect(_clip->getTrack()->trackContainer(), &TrackContainer::trackAdded,
 			this, &PatternClipView::update);
 
 	setStyle( QApplication::style() );
