@@ -533,11 +533,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 
 			Engine::getSong()->setModified();
 			update();
-			Engine::patternStore()->updatePatternTrack(m_clip);
-			if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
-			{
-				getGUI()->pianoRoll()->update();
-			}
+			m_clip->updatePatternTrack();
 		}
 		we->accept();
 	}
