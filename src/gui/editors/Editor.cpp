@@ -89,7 +89,7 @@ void Editor::toggleMaximize()
 	isMaximized() ? showNormal() : showMaximized();
 }
 
-Editor::Editor(bool record, bool recordAccompany, bool stepRecord) :
+Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -125,8 +125,8 @@ Editor::Editor(bool record, bool recordAccompany, bool stepRecord) :
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
 	}
 
-	// StepRecord action setup
-	if (stepRecord)
+	// RecordStep action setup
+	if (recordStep)
 	{
 		m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
 		connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
@@ -138,7 +138,7 @@ Editor::Editor(bool record, bool recordAccompany, bool stepRecord) :
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	addButton(m_stopAction, "stopButton");
 
-	// Set up shortcuts for actions
+	// Setup shortcuts for actions
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
 }
