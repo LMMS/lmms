@@ -191,15 +191,19 @@ bool EffectChain::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bo
 		return false;
 	}
 
-	MixHelpers::sanitize( _buf, _frames );
-
 	bool moreEffects = false;
 	for (const auto& effect : m_effects)
 	{
 		if (hasInputNoise || effect->isRunning())
 		{
 			moreEffects |= effect->processAudioBuffer(_buf, _frames);
-			MixHelpers::sanitize(_buf, _frames);
+
+			if (sanitizeEffectOutput())
+			{
+				std::replace_if(
+					&_buf[0][0], &_buf[0][0] + _frames * DEFAULT_CHANNELS, [](auto x) { return !std::isfinite(x); },
+					0.f);
+			}
 		}
 	}
 
@@ -243,5 +247,10 @@ void EffectChain::clear()
 	m_enabledModel.setValue( false );
 }
 
+bool EffectChain::sanitizeEffectOutput()
+{
+	static auto value = ConfigManager::inst()->value("audioengine", "sanitizeeffectoutput", "1").toInt();
+	return value;
+}
 
 } // namespace lmms

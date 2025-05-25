@@ -31,7 +31,9 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
+#include <QTimer>
 #include <cassert>
+#include <iostream>
 
 #include "CaptionMenu.h"
 #include "ColorChooser.h"
