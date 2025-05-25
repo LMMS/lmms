@@ -47,7 +47,7 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
 	m_pos(pos),
-	m_detuning(detuning)
+	m_detuning(std::move(detuning))
 {
 	if (!detuning)
 	{

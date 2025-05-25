@@ -110,7 +110,7 @@ public:
 
 	Note& operator=(const Note& note);
 
-	//! Deep copies the note, including making a new detuning automation clip
+	//! Performs a deep copy and returns an owning raw pointer
 	Note* clone() const;
 
 	// Note types
