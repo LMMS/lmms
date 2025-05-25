@@ -290,8 +290,6 @@ public:
 
 	void processBufferedInputFrames();
 
-	void initializeRecordingBuffers();
-
 	inline const SampleFrame* inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];

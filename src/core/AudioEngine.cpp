@@ -331,10 +331,7 @@ void AudioEngine::processBufferedInputFrames()
 	if (!m_inputAudioRingBufferReader || !m_inputAudioRingBuffer) return;
 
 	std::size_t availableInRing = m_inputAudioRingBufferReader->read_space();
-	if (availableInRing == 0)
-	{
-		return;
-	}
+	if (availableInRing == 0) return;
 
 	const std::size_t maxFramesPerCall = DEFAULT_BUFFER_SIZE * 2;
     std::size_t framesToProcess = std::min(availableInRing, maxFramesPerCall);
@@ -346,7 +343,7 @@ void AudioEngine::processBufferedInputFrames()
 
 	if (m_tempInputProcessingBuffer.capacity() < framesInSequence)
 	{
-        m_tempInputProcessingBuffer.reserve(framesInSequence * 2);
+        m_tempInputProcessingBuffer.reserve(framesInSequence);
     }
     m_tempInputProcessingBuffer.resize(framesInSequence);
 
@@ -365,60 +362,29 @@ void AudioEngine::processBufferedInputFrames()
 	requestChangeInModel();
 
 	SampleFrame* currentWriteBufPtr = m_inputBuffer[m_inputBufferWrite];
-    f_cnt_t currentWriteBufSize = m_inputBufferSize[m_inputBufferWrite];
+    f_cnt_t currentWriteBufCapacity = m_inputBufferSize[m_inputBufferWrite];
     f_cnt_t currentFramesInWriteBuf = m_inputBufferFrames[m_inputBufferWrite];
 
-	f_cnt_t requiredSize = currentFramesInWriteBuf + static_cast<f_cnt_t>(framesInSequence);
+	f_cnt_t framesToCopyFromTemp = static_cast<f_cnt_t>(framesInSequence);
 
-	if (requiredSize > currentWriteBufSize)
+	if (currentFramesInWriteBuf + framesToCopyFromTemp > currentWriteBufCapacity)
 	{
-        f_cnt_t newSize = std::max(currentWriteBufSize * 2, requiredSize + DEFAULT_BUFFER_SIZE);
-        
-        auto newBuffer = new SampleFrame[newSize];
-        
-        if (currentFramesInWriteBuf > 0)
+		fprintf(stderr, "AudioEngine: CRITICAL m_inputBuffer overflow. Had %zu, got %zu, capacity %zu. Dropping new frames.\n", currentFramesInWriteBuf, framesToCopyFromTemp, currentWriteBufCapacity);
+		f_cnt_t spaceLeft = currentWriteBufCapacity - currentFramesInWriteBuf;
+		if (spaceLeft < framesToCopyFromTemp)
 		{
-            memcpy(newBuffer, currentWriteBufPtr, currentFramesInWriteBuf * sizeof(SampleFrame));
-        }
-        
-        zeroSampleFrames(newBuffer + currentFramesInWriteBuf, newSize - currentFramesInWriteBuf);
-        
-        delete[] currentWriteBufPtr;
-        
-        m_inputBufferSize[m_inputBufferWrite] = newSize;
-        m_inputBuffer[m_inputBufferWrite] = newBuffer;
-        currentWriteBufPtr = newBuffer;
-    }
+			fprintf(stderr, "AudioEngine: m_inputBuffer overflow. Truncating input from %zu to %zu frames.\n", framesToCopyFromTemp, spaceLeft);
+			framesToCopyFromTemp = spaceLeft;
+		}
+	}
 
-	memcpy(&currentWriteBufPtr[currentFramesInWriteBuf], m_tempInputProcessingBuffer.data(), framesInSequence * sizeof(SampleFrame));
-
-	m_inputBufferFrames[m_inputBufferWrite] += static_cast<f_cnt_t>(framesInSequence);
+	if (framesToCopyFromTemp > 0)
+	{
+		memcpy(&currentWriteBufPtr[currentFramesInWriteBuf], m_tempInputProcessingBuffer.data(), framesToCopyFromTemp * sizeof(SampleFrame));
+		m_inputBufferFrames[m_inputBufferWrite] += framesToCopyFromTemp;
+	}
 
     doneChangeInModel();
-}
-
-
-
-void AudioEngine::initializeRecordingBuffers()
-{
-    const f_cnt_t initialBufferSize = DEFAULT_BUFFER_SIZE * 8;
-    
-    for (int i = 0; i < 2; ++i)
-	{
-        m_inputBufferFrames[i] = 0;
-        m_inputBufferSize[i] = initialBufferSize;
-        
-        delete[] m_inputBuffer[i];
-        m_inputBuffer[i] = new SampleFrame[initialBufferSize];
-        zeroSampleFrames(m_inputBuffer[i], initialBufferSize);
-    }
-    
-    m_tempInputProcessingBuffer.reserve(DEFAULT_BUFFER_SIZE * 4);
-    
-    if (m_inputAudioRingBuffer)
-	{
-        m_inputAudioRingBuffer->mlock();
-    }
 }
 
 
