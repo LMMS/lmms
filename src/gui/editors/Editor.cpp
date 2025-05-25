@@ -105,40 +105,40 @@ Editor::Editor(bool record, bool recordAccompany, bool stepRecord) :
 	};
 
 	// Play action setup
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this); //setup play action
-	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play())); // Set up connection for play action
+	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this); // Setup play action
+	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play())); // Setup connection for play action
 	addButton(m_playAction, "playButton"); // Add actions to toolbar for play action
 
 	// Record action setup
 	if (record)
 	{
-		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this); //setup record action
-		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record())); // Set up connection for record action
+		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this); // Setup record action
+		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record())); // Setup connection for record action
 		addButton(m_recordAction, "recordButton"); // Add actions to toolbar for record action
 	}
 
 	// RecordAccompany action setup
 	if (recordAccompany)
 	{
-		m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this); //setup recordAccompany action
-		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany())); // Set up connection for recordAccompany action
+		m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this); // Setup recordAccompany action
+		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany())); // Setup connection for recordAccompany action
 		addButton(m_recordAccompanyAction, "recordAccompanyButton"); // Add actions to toolbar for recordAccompany action
 	}
 
 	// StepRecord action setup
 	if (stepRecord)
 	{
-		m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this); //setup stepRecord action
-		connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording())); // Set up connection for stepRecord action
+		m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this); // Setup stepRecord action
+		connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording())); // Setup connection for stepRecord action
 		addButton(m_toggleStepRecordingAction, "stepRecordButton"); // Add actions to toolbar for stepRecord action
 	}
 
 	// Stop action setup
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this); //setup stop action
-	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop())); // Set up connection for stop action
+	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this); // Setup stop action
+	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop())); // Setup connection for stop action
 	addButton(m_stopAction, "stopButton"); // Add actions to toolbar for stop action
 
-	// Set up shortcuts for actions
+	// Setup shortcuts for actions
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
