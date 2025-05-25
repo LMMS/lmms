@@ -157,7 +157,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	m_inputAudioRingBuffer = std::make_unique<LocklessRingBuffer<SampleFrame>>(DEFAULT_BUFFER_SIZE * 100);
 	m_inputAudioRingBufferReader = std::make_unique<LocklessRingBufferReader<SampleFrame>>(*m_inputAudioRingBuffer);
-	// m_inputAudioRingBuffer->mlock(); //Still unsure about this
+	//m_inputAudioRingBuffer->mlock(); //Still unsure about this
+	m_tempInputProcessingBuffer.reserve(DEFAULT_BUFFER_SIZE * 4);
 }
 
 
@@ -185,7 +186,8 @@ AudioEngine::~AudioEngine()
 
 	for(int w = 0; w < m_numWorkers; ++w)
 	{
-		if (m_workers[w]) {
+		if (m_workers[w])
+		{
 			bool finished = m_workers[w]->wait( 500 );
 			if (!finished) {
 				m_workers[w]->terminate();
@@ -195,13 +197,16 @@ AudioEngine::~AudioEngine()
 		}
 	}
 
-	if (std::cmp_less(m_numWorkers, m_workers.size()) && m_workers[m_numWorkers]) {
+	if (std::cmp_less(m_numWorkers, m_workers.size()) && m_workers[m_numWorkers])
+	{
 		delete m_workers[m_numWorkers];
 	}
 	m_workers.clear();
 
-	if(m_fifo) {
-		while( m_fifo->available() ) {
+	if(m_fifo)
+	{
+		while( m_fifo->available() )
+		{
 			SampleFrame* buf_to_delete = m_fifo->read();
 			if (buf_to_delete) delete[] buf_to_delete;
 		}
@@ -212,12 +217,14 @@ AudioEngine::~AudioEngine()
 	delete m_midiClient; m_midiClient = nullptr;
 	delete m_audioDev; m_audioDev = nullptr;
 
-	if (m_oldAudioDev) {
+	if (m_oldAudioDev)
+	{
 		delete m_oldAudioDev;
 	}
 	m_oldAudioDev = nullptr;
 
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < 2; ++i)
+	{
 		delete[] m_inputBuffer[i];
 		m_inputBuffer[i] = nullptr;
 	}
@@ -290,17 +297,31 @@ bool AudioEngine::criticalXRuns() const
 
 
 
-void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
+void AudioEngine::pushInputFrames(SampleFrame* _ab, const f_cnt_t _frames)
 {
-	if (m_inputAudioRingBuffer)
-   {
-		std::size_t frames_written = m_inputAudioRingBuffer->write(_ab, _frames, false);
-
-		if (frames_written < _frames)
+    if (!m_inputAudioRingBuffer || _frames == 0) return;
+    
+    std::size_t availableSpace = m_inputAudioRingBuffer->free();
+    
+    if (availableSpace == 0)
+	{
+        fprintf(stderr, "AudioEngine: Critical input ring buffer overflow, %zu frames dropped.\n", _frames);
+        return;
+    }
+    
+    if (availableSpace < _frames)
+	{
+        std::size_t framesToWrite = availableSpace;
+        std::size_t framesWritten = m_inputAudioRingBuffer->write(_ab, framesToWrite, false);
+        fprintf(stderr, "AudioEngine: Partial input ring buffer overflow, %zu of %zu frames written, %zu frames dropped.\n", framesWritten, _frames, _frames - framesWritten);
+    } else
+	{
+        std::size_t framesWritten = m_inputAudioRingBuffer->write(_ab, _frames, false);
+        if (framesWritten < _frames)
 		{
-			fprintf(stderr, "AudioEngine: Input ring buffer overflow, %zu of %zu frames dropped.\n", _frames - frames_written, _frames);
-		}
-   }
+            fprintf(stderr, "AudioEngine: Unexpected ring buffer write failure, %zu of %zu frames written.\n", framesWritten, _frames);
+        }
+    }
 }
 
 
@@ -309,65 +330,95 @@ void AudioEngine::processBufferedInputFrames()
 {
 	if (!m_inputAudioRingBufferReader || !m_inputAudioRingBuffer) return;
 
-	std::size_t available_in_ring = m_inputAudioRingBufferReader->read_space();
-	if (available_in_ring == 0) {
+	std::size_t availableInRing = m_inputAudioRingBufferReader->read_space();
+	if (availableInRing == 0)
+	{
 		return;
 	}
 
-	ringbuffer_reader_t<SampleFrame>::read_sequence_t sequence =
-		m_inputAudioRingBufferReader->read_max(available_in_ring);
+	const std::size_t maxFramesPerCall = DEFAULT_BUFFER_SIZE * 2;
+    std::size_t framesToProcess = std::min(availableInRing, maxFramesPerCall);
 
-	std::size_t frames_in_sequence = sequence.size();
+	ringbuffer_reader_t<SampleFrame>::read_sequence_t sequence = m_inputAudioRingBufferReader->read_max(framesToProcess);
 
-	if (frames_in_sequence > 0) {
-		std::vector<SampleFrame> temp_consolidated_buffer(frames_in_sequence);
-		std::size_t frames_copied_to_temp = 0;
+	std::size_t framesInSequence = sequence.size();
+	if (framesInSequence == 0) return;
 
-		std::size_t len1 = sequence.first_half_size();
-		if (len1 > 0) {
-			const SampleFrame* ptr1 = sequence.first_half_ptr();
-			memcpy(temp_consolidated_buffer.data() + frames_copied_to_temp,
-				   ptr1,
-				   len1 * sizeof(SampleFrame));
-			frames_copied_to_temp += len1;
-		}
+	if (m_tempInputProcessingBuffer.capacity() < framesInSequence)
+	{
+        m_tempInputProcessingBuffer.reserve(framesInSequence * 2);
+    }
+    m_tempInputProcessingBuffer.resize(framesInSequence);
 
-		std::size_t len2 = sequence.second_half_size();
-		if (len2 > 0) {
-			const SampleFrame* ptr2 = sequence.second_half_ptr();
-			memcpy(temp_consolidated_buffer.data() + frames_copied_to_temp,
-				   ptr2,
-				   len2 * sizeof(SampleFrame));
-			frames_copied_to_temp += len2;
-		}
+	std::size_t len1 = sequence.first_half_size();
+    std::size_t len2 = sequence.second_half_size();
 
-		assert(frames_copied_to_temp == frames_in_sequence);
+	if (len2 == 0)
+	{
+        memcpy(m_tempInputProcessingBuffer.data(), sequence.first_half_ptr(), len1 * sizeof(SampleFrame));
+    } else
+	{
+        memcpy(m_tempInputProcessingBuffer.data(), sequence.first_half_ptr(), len1 * sizeof(SampleFrame));
+        memcpy(m_tempInputProcessingBuffer.data() + len1, sequence.second_half_ptr(), len2 * sizeof(SampleFrame));
+    }
 
-		requestChangeInModel();
+	requestChangeInModel();
 
-		SampleFrame* current_write_buf_ptr = m_inputBuffer[m_inputBufferWrite];
-		f_cnt_t current_write_buf_size = m_inputBufferSize[m_inputBufferWrite];
-		f_cnt_t current_frames_in_write_buf = m_inputBufferFrames[m_inputBufferWrite];
+	SampleFrame* currentWriteBufPtr = m_inputBuffer[m_inputBufferWrite];
+    f_cnt_t currentWriteBufSize = m_inputBufferSize[m_inputBufferWrite];
+    f_cnt_t currentFramesInWriteBuf = m_inputBufferFrames[m_inputBufferWrite];
 
-		if (current_frames_in_write_buf + frames_copied_to_temp > current_write_buf_size) {
-			current_write_buf_size = std::max(current_write_buf_size * 2,
-											 current_frames_in_write_buf + static_cast<f_cnt_t>(frames_copied_to_temp));
-			auto new_ab = new SampleFrame[current_write_buf_size];
-			memcpy(new_ab, current_write_buf_ptr, current_frames_in_write_buf * sizeof(SampleFrame));
-			delete[] current_write_buf_ptr;
+	f_cnt_t requiredSize = currentFramesInWriteBuf + static_cast<f_cnt_t>(framesInSequence);
 
-			m_inputBufferSize[m_inputBufferWrite] = current_write_buf_size;
-			m_inputBuffer[m_inputBufferWrite] = new_ab;
-			current_write_buf_ptr = new_ab;
-		}
+	if (requiredSize > currentWriteBufSize)
+	{
+        f_cnt_t newSize = std::max(currentWriteBufSize * 2, requiredSize + DEFAULT_BUFFER_SIZE);
+        
+        auto newBuffer = new SampleFrame[newSize];
+        
+        if (currentFramesInWriteBuf > 0)
+		{
+            memcpy(newBuffer, currentWriteBufPtr, currentFramesInWriteBuf * sizeof(SampleFrame));
+        }
+        
+        zeroSampleFrames(newBuffer + currentFramesInWriteBuf, newSize - currentFramesInWriteBuf);
+        
+        delete[] currentWriteBufPtr;
+        
+        m_inputBufferSize[m_inputBufferWrite] = newSize;
+        m_inputBuffer[m_inputBufferWrite] = newBuffer;
+        currentWriteBufPtr = newBuffer;
+    }
 
-		memcpy(&current_write_buf_ptr[current_frames_in_write_buf],
-			   temp_consolidated_buffer.data(),
-			   frames_copied_to_temp * sizeof(SampleFrame));
-		m_inputBufferFrames[m_inputBufferWrite] += static_cast<f_cnt_t>(frames_copied_to_temp);
+	memcpy(&currentWriteBufPtr[currentFramesInWriteBuf], m_tempInputProcessingBuffer.data(), framesInSequence * sizeof(SampleFrame));
 
-		doneChangeInModel();
-	}
+	m_inputBufferFrames[m_inputBufferWrite] += static_cast<f_cnt_t>(framesInSequence);
+
+    doneChangeInModel();
+}
+
+
+
+void AudioEngine::initializeRecordingBuffers()
+{
+    const f_cnt_t initialBufferSize = DEFAULT_BUFFER_SIZE * 8;
+    
+    for (int i = 0; i < 2; ++i)
+	{
+        m_inputBufferFrames[i] = 0;
+        m_inputBufferSize[i] = initialBufferSize;
+        
+        delete[] m_inputBuffer[i];
+        m_inputBuffer[i] = new SampleFrame[initialBufferSize];
+        zeroSampleFrames(m_inputBuffer[i], initialBufferSize);
+    }
+    
+    m_tempInputProcessingBuffer.reserve(DEFAULT_BUFFER_SIZE * 4);
+    
+    if (m_inputAudioRingBuffer)
+	{
+        m_inputAudioRingBuffer->mlock();
+    }
 }
 
 

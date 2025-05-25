@@ -290,6 +290,8 @@ public:
 
 	void processBufferedInputFrames();
 
+	void initializeRecordingBuffers();
+
 	inline const SampleFrame* inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
@@ -426,6 +428,7 @@ private:
 
 	std::unique_ptr<LocklessRingBuffer<SampleFrame>> m_inputAudioRingBuffer;
 	std::unique_ptr<LocklessRingBufferReader<SampleFrame>> m_inputAudioRingBufferReader;
+	std::vector<SampleFrame> m_tempInputProcessingBuffer;
 } ;
 
 } // namespace lmms
