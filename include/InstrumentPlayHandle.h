@@ -41,7 +41,7 @@ public:
 
 	~InstrumentPlayHandle() override = default;
 
-	void play(SampleFrame* working_buffer) override;
+	void play(std::span<SampleFrame> buffer) override;
 
 	bool isFinished() const override
 	{

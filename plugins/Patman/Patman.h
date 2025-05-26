@@ -59,10 +59,7 @@ public:
 	PatmanInstrument( InstrumentTrack * _track );
 	~PatmanInstrument() override;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -84,6 +81,8 @@ public slots:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	struct handle_data
 	{
 		Sample::PlaybackState* state;

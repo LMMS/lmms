@@ -133,7 +133,7 @@ sample_t BSynth::nextStringSample( float sample_length )
 
 
 BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
+	Instrument(&bitinvader_plugin_descriptor, _instrument_track),
 	m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length")),
 	m_graph(-1.0f, 1.0f, wavetableSize, this),
 	m_interpolation(false, this, tr("Interpolation")),
@@ -254,29 +254,28 @@ QString BitInvader::nodeName() const
 
 
 
-void BitInvader::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void BitInvader::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
-	if (!_n->m_pluginData)
+	if (!nph->m_pluginData)
 	{
 		float factor = !m_normalize.value() ? defaultNormalizationFactor : m_normalizeFactor;
-		_n->m_pluginData = new BSynth(
+		nph->m_pluginData = new BSynth(
 					const_cast<float*>( m_graph.samples() ),
-					_n,
+					nph,
 					m_interpolation.value(), factor,
 				Engine::audioEngine()->outputSampleRate() );
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 
-	auto ps = static_cast<BSynth*>(_n->m_pluginData);
+	auto ps = static_cast<BSynth*>(nph->m_pluginData);
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()));
+		out[frame] = SampleFrame(ps->nextStringSample(m_graph.length()));
 	}
 
-	applyRelease( _working_buffer, _n );
+	applyRelease(out.data(), nph);
 }
 
 

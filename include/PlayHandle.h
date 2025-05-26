@@ -25,14 +25,15 @@
 #ifndef LMMS_PLAY_HANDLE_H
 #define LMMS_PLAY_HANDLE_H
 
+#include <vector>
 #include <QList>
 #include <QMutex>
 
-#include "lmms_export.h"
-
 #include "Flags.h"
-#include "ThreadableJob.h"
 #include "LmmsTypes.h"
+#include "SampleFrame.h"
+#include "ThreadableJob.h"
+#include "lmms_export.h"
 
 class QThread;
 
@@ -106,7 +107,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play( SampleFrame* buffer ) = 0;
+	virtual void play(std::span<SampleFrame> buffer) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -146,14 +147,14 @@ public:
 	
 	void releaseBuffer();
 	
-	SampleFrame* buffer();
+	std::span<SampleFrame> buffer();
 
 private:
 	Type m_type;
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	SampleFrame* m_playHandleBuffer;
+	std::vector<SampleFrame> m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioBusHandle* m_audioBusHandle;
