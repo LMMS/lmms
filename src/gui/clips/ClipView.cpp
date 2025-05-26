@@ -1228,6 +1228,13 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	else if (m_action == Action::EditStartCrossfadeTension || m_action == Action::EditEndCrossfadeTension)
 	{
 		float tension = static_cast<float>(me->y()) / height();
+		// If alt or ctrl is held, snap to 0.5 or 1-sqrt(2)/2
+		if (unquantizedModHeld(me))
+		{
+			if (std::abs(tension - 0.5) <= std::abs(tension - (1.0f - std::numbers::sqrt2 / 2))) { tension = 0.5; }
+			else { tension = 1.0f - std::numbers::sqrt2 / 2; }
+		}
+
 		if (m_action == Action::EditStartCrossfadeTension) { m_clip->setStartCrossfadeTension(tension); }
 		if (m_action == Action::EditEndCrossfadeTension) { m_clip->setEndCrossfadeTension(tension); }
 		update();
