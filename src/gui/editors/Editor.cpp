@@ -104,6 +104,21 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 		m_toolBar->widgetForAction(action)->setObjectName(objectName);
 	};
 
+	auto createConditionalButton = [this, &addButton](
+		bool condition,
+		QAction*& targetAction,
+		const char* iconName,
+		const QString& text,
+		const char* slot,
+		const QString& objectName
+	) {
+		if (condition) {
+			targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
+			connect(targetAction, SIGNAL(triggered()), this, slot);
+			addButton(targetAction, objectName);
+		}
+	};
+
 	// Play action setup
 	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
