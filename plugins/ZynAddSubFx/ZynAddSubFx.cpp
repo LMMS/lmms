@@ -336,7 +336,7 @@ void ZynAddSubFxInstrument::processImpl()
 	}
 	else
 	{
-		m_localPlugin->process(audioPorts().outputBuffer());
+		m_localPlugin->process(audioPorts().buffers()->output());
 	}
 	m_pluginMutex.unlock();
 }

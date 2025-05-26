@@ -60,12 +60,12 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputBuffer() -> SplitAudioData<SampleT, settings.inputs> final
+	auto input() -> SplitAudioData<SampleT, settings.inputs> final
 	{
 		return {m_accessBuffer.data(), m_channelsIn, m_frames};
 	}
 
-	auto outputBuffer() -> SplitAudioData<SampleT, settings.outputs> final
+	auto output() -> SplitAudioData<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data() + m_channelsIn, m_channelsOut, m_frames};
 	}
@@ -134,7 +134,7 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputOutputBuffer() -> SplitAudioData<SampleT, settings.outputs> final
+	auto inputOutput() -> SplitAudioData<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data(), m_channels, m_frames};
 	}
@@ -196,7 +196,7 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputOutputBuffer() -> std::span<SampleFrame> final
+	auto inputOutput() -> std::span<SampleFrame> final
 	{
 		return m_buffer;
 	}
@@ -228,7 +228,7 @@ private:
 template<AudioPortsSettings settings, template<AudioPortsSettings> class BufferT>
 class PluginAudioPorts
 	: public AudioPorts<settings>
-	, public BufferT<settings>
+	, private BufferT<settings>
 {
 	static_assert(std::is_base_of_v<typename AudioPorts<settings>::Buffer, BufferT<settings>>,
 		"BufferT must derive from AudioPorts::Buffer");

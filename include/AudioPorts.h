@@ -145,8 +145,8 @@ class AudioPortsBuffer<settings, false>
 public:
 	virtual ~AudioPortsBuffer() = default;
 
-	virtual auto inputBuffer() -> AudioDataViewType<settings, false, false> = 0;
-	virtual auto outputBuffer() -> AudioDataViewType<settings, true, false> = 0;
+	virtual auto input() -> AudioDataViewType<settings, false, false> = 0;
+	virtual auto output() -> AudioDataViewType<settings, true, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
 	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
@@ -158,7 +158,7 @@ class AudioPortsBuffer<settings, true>
 public:
 	virtual ~AudioPortsBuffer() = default;
 
-	virtual auto inputOutputBuffer() -> AudioDataViewType<settings, false, false> = 0;
+	virtual auto inputOutput() -> AudioDataViewType<settings, false, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
 	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
@@ -179,7 +179,7 @@ inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<SampleFra
 	if constexpr (settings.inplace)
 	{
 		// Write core to processor input buffer
-		const auto processorInOut = processorBuffers.inputOutputBuffer();
+		const auto processorInOut = processorBuffers.inputOutput();
 		router.send(coreInOut, processorInOut);
 
 		// Process
@@ -192,8 +192,8 @@ inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<SampleFra
 	else
 	{
 		// Write core to processor input buffer
-		const auto processorIn = processorBuffers.inputBuffer();
-		const auto processorOut = processorBuffers.outputBuffer();
+		const auto processorIn = processorBuffers.input();
+		const auto processorOut = processorBuffers.output();
 		router.send(coreInOut, processorIn);
 
 		// Process
@@ -348,6 +348,23 @@ public:
 		}
 	}
 
+	/**
+	 * Returns true if the audio port can be used.
+	 * Active implies `buffers()` is non-null.
+	 * Custom audio ports with an unusable state (i.e. a "plugin not loaded" state) must override this.
+	 */
+	virtual auto active() const -> bool { return true; }
+
+	//! Never nullptr when `active()` is true
+	virtual auto buffers() -> Buffer* = 0;
+
+	//! Never nullptr when `active()` is true
+	auto constBuffers() const -> const Buffer*
+	{
+		// const cast to avoid duplicate code - should be safe since buffers() doesn't modify
+		return const_cast<AudioPorts*>(this)->buffers();
+	}
+
 	auto model() const -> const AudioPortsModel&
 	{
 		return *static_cast<const AudioPortsModel*>(this);
@@ -358,17 +375,7 @@ public:
 		return *static_cast<AudioPortsModel*>(this);
 	}
 
-	//! Returns an audio port router
 	auto getRouter() const -> Router { return Router{*this}; }
-
-	//! Returns nullptr if the port is unavailable (i.e. Vestige with no plugin loaded)
-	virtual auto buffers() -> Buffer* = 0;
-
-	/**
-	 * Returns true if the audio port can be used.
-	 * Custom audio ports with an unusable state (i.e. a "plugin not loaded" state) should override this.
-	 */
-	virtual auto active() const -> bool { return true; }
 
 	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
 };
@@ -812,7 +819,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 			// Can avoid calling routing methods, but must write to and read from processor's buffers
 
 			// Write core to processor input buffer (if it has one)
-			const auto processorInOut = processorBuffers.inputOutputBuffer();
+			const auto processorInOut = processorBuffers.inputOutput();
 			if constexpr (settings.inputs != 0)
 			{
 				if (m_ap->in().channelCount() != 0)
@@ -848,7 +855,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 			// Can avoid calling routing methods, but must write to and read from processor's buffers
 
 			// Write core to processor input buffer (if it has one)
-			const auto processorIn = processorBuffers.inputBuffer();
+			const auto processorIn = processorBuffers.input();
 			if constexpr (settings.inputs != 0)
 			{
 				if (m_ap->in().channelCount() != 0)
@@ -862,7 +869,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 			processFunc();
 
 			// Write processor output buffer (if it has one) to core
-			const auto processorOut = processorBuffers.outputBuffer();
+			const auto processorOut = processorBuffers.output();
 			if constexpr (settings.outputs != 0)
 			{
 				if (m_ap->out().channelCount() != 0)
@@ -876,8 +883,8 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 		{
 			// Can avoid calling routing methods, but a buffer copy may be needed
 
-			const auto processorIn = processorBuffers.inputBuffer();
-			const auto processorOut = processorBuffers.outputBuffer();
+			const auto processorIn = processorBuffers.input();
+			const auto processorOut = processorBuffers.output();
 
 			// Check if processor is dynamically using in-place processing
 			if (processorIn.data() != processorOut.data() || processorIn.size() != processorOut.size())

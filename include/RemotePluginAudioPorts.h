@@ -118,24 +118,27 @@ public:
 	 * `AudioPorts` implementation
 	 */
 
-	//! Only returns the buffer interface if audio port is active
+	auto active() const -> bool override { return remoteActive(); }
+
+	//! Only returns the buffer interface if it's available
 	auto buffers() -> AudioPorts<settings>::Buffer* override
 	{
 		return remoteActive() ? this : nullptr;
 	}
 
+protected:
 	/*
 	 * `AudioPorts::Buffer` implementation
 	 */
 
-	auto inputBuffer() -> SplitAudioData<SampleT, settings.inputs> override
+	auto input() -> SplitAudioData<SampleT, settings.inputs> override
 	{
 		if (!remoteActive()) { return {}; }
 
 		return {m_insOuts, this->in().channelCount(), m_frames};
 	}
 
-	auto outputBuffer() -> SplitAudioData<SampleT, settings.outputs> override
+	auto output() -> SplitAudioData<SampleT, settings.outputs> override
 	{
 		if (!remoteActive()) { return {}; }
 
@@ -183,8 +186,6 @@ public:
 
 		m_insOuts = m_accessBuffer.data();
 	}
-
-	auto active() const -> bool override { return remoteActive(); }
 
 private:
 	auto remoteActive() const -> bool { return m_buffers != nullptr && m_remoteActive; }
@@ -234,25 +235,41 @@ public:
 		m_localActive = true;
 	}
 
+	/*
+	 * `AudioPorts` implementation
+	 */
+
+	auto active() const -> bool override
+	{
+		return isRemote()
+			? RemotePluginAudioPorts<settings>::active()
+			: localActive();
+	}
+
 	auto buffers() -> AudioPorts<settings>::Buffer* override
 	{
 		if (isRemote()) { return RemotePluginAudioPorts<settings>::buffers(); }
 		return localActive() ? &m_localBuffer.value() : nullptr;
 	}
 
-	auto inputBuffer() -> SplitAudioData<SampleT, settings.inputs> override
+protected:
+	/*
+	 * `AudioPorts::Buffer` implementation
+	 */
+
+	auto input() -> SplitAudioData<SampleT, settings.inputs> override
 	{
-		if (isRemote()) { return RemotePluginAudioPorts<settings>::inputBuffer(); }
+		if (isRemote()) { return RemotePluginAudioPorts<settings>::input(); }
 		return localActive()
-			? m_localBuffer->inputBuffer()
+			? m_localBuffer->input()
 			: SplitAudioData<SampleT, settings.inputs>{};
 	}
 
-	auto outputBuffer() -> SplitAudioData<SampleT, settings.outputs> override
+	auto output() -> SplitAudioData<SampleT, settings.outputs> override
 	{
-		if (isRemote()) { return RemotePluginAudioPorts<settings>::outputBuffer(); }
+		if (isRemote()) { return RemotePluginAudioPorts<settings>::output(); }
 		return localActive()
-			? m_localBuffer->outputBuffer()
+			? m_localBuffer->output()
 			: SplitAudioData<SampleT, settings.outputs>{};
 	}
 
@@ -273,13 +290,6 @@ public:
 			if (!m_localBuffer) { m_localBuffer.emplace(); }
 			m_localBuffer->updateBuffers(channelsIn, channelsOut, frames);
 		}
-	}
-
-	auto active() const -> bool override
-	{
-		return isRemote()
-			? RemotePluginAudioPorts<settings>::active()
-			: localActive();
 	}
 
 private:

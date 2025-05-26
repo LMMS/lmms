@@ -188,12 +188,14 @@ protected:
 
 	void playImpl(std::span<SampleFrame> inOut) final
 	{
-		auto buffers = m_audioPorts.buffers();
-		if (!buffers)
+		if (!m_audioPorts.active())
 		{
 			// Plugin is not running
 			return;
 		}
+
+		auto buffers = m_audioPorts.buffers();
+		assert(buffers != nullptr);
 
 		SampleFrame* temp = inOut.data();
 		const auto bus = AudioBus<SampleFrame>{&temp, 1, inOut.size()};
@@ -251,7 +253,7 @@ protected:
 
 	auto processAudioBufferImpl(std::span<SampleFrame> inOut) -> bool final
 	{
-		if (isSleeping())
+		if (isSleeping() || !m_audioPorts.active())
 		{
 			this->processBypassedImpl();
 			return false;

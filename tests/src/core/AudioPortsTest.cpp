@@ -475,8 +475,8 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Processor input and output buffers
-		auto ins = ap.inputBuffer();
-		auto outs = ap.outputBuffer();
+		auto ins = ap.buffers()->input();
+		auto outs = ap.buffers()->output();
 
 		// Route to processor
 		auto router = ap.getRouter();
@@ -535,8 +535,8 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Processor input and output buffers
-		auto ins = ap.inputBuffer();
-		auto outs = ap.outputBuffer();
+		auto ins = ap.buffers()->input();
+		auto outs = ap.buffers()->output();
 
 		// Route to processor
 		auto router = ap.getRouter();
@@ -623,8 +623,8 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Processor input and output buffers
-		auto ins = ap.inputBuffer();
-		auto outs = ap.outputBuffer();
+		auto ins = ap.buffers()->input();
+		auto outs = ap.buffers()->output();
 
 		// Route to processor
 		auto router = ap.getRouter();
@@ -692,7 +692,7 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Processor input/output buffer
-		auto inOut = ap.inputOutputBuffer();
+		auto inOut = ap.buffers()->inputOutput();
 
 		// Route to processor
 		auto router = ap.getRouter();
@@ -770,8 +770,8 @@ private slots:
 		trackChannels[33].setRight(987.f);
 
 		// Processor input and output buffers
-		auto ins = ap.inputBuffer();
-		auto outs = ap.outputBuffer();
+		auto ins = ap.buffers()->input();
+		auto outs = ap.buffers()->output();
 
 		// Route to processor
 		auto router = ap.getRouter();
@@ -862,13 +862,13 @@ private slots:
 				{
 					if constexpr (settings.inplace)
 					{
-						auto inOut = ap.inputOutputBuffer();
+						auto inOut = ap.buffers()->inputOutput();
 						(*this)(inOut);
 					}
 					else
 					{
-						auto in = ap.inputBuffer();
-						auto out = ap.outputBuffer();
+						auto in = ap.buffers()->input();
+						auto out = ap.buffers()->output();
 						(*this)(in, out);
 					}
 				}
