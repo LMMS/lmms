@@ -336,12 +336,10 @@ class AudioPlugin
 {
 	static_assert(settings == AudioPortsT::audioPortsSettings());
 
-	static_assert(settings.kind != AudioDataKind::SampleFrame
-		|| ((settings.inputs == 0 || settings.inputs == 2) && (settings.outputs == 0 || settings.outputs == 2)),
-		"Don't use SampleFrame if more than 2 processor channels are needed");
-
 	static_assert(std::is_base_of_v<detail::AudioPortsTag, AudioPortsT>,
 		"AudioPortT must implement `AudioPorts`");
+
+	static_assert(validate<settings>());
 
 	using Base = typename detail::AudioPlugin<ParentT, settings, AudioPortsT>;
 

@@ -114,7 +114,7 @@ template<proc_ch_t channels, bool isConst>
 struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
 {
 	static_assert(channels == 0 || channels == 2,
-		"Plugins using SampleFrame buffers must have exactly 0 or 2 inputs or outputs");
+		"SampleFrame buffers must have exactly 0 or 2 inputs and outputs");
 	using type = std::conditional_t<isConst, std::span<const SampleFrame>, std::span<SampleFrame>>;
 };
 
@@ -283,6 +283,8 @@ class AudioPorts
 	: public AudioPortsModel
 	, public detail::AudioPortsTag
 {
+	static_assert(validate<settings>());
+
 public:
 	AudioPorts(bool isInstrument, Model* parent)
 		: AudioPortsModel{settings.inputs, settings.outputs, isInstrument, parent}
@@ -419,12 +421,11 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs());
 
-	// Zero the output buffer - TODO: std::memcpy?
+	// Zero the output buffer
 	{
 		auto source = out.sourceBuffer();
 		assert(source.data() != nullptr);
 		std::fill_n(source.data(), source.size(), SampleT{});
-		//std::memset(source.data(), 0, source.size_bytes());
 	}
 
 	for (std::uint32_t outChannel = 0; outChannel < out.channels(); ++outChannel)
@@ -508,7 +509,6 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 
 		if constexpr (rc == 0b11)
 		{
-			// TODO: std::memcpy?
 			std::fill_n(outPtr, inOut.frames(), SampleFrame{});
 		}
 		else
@@ -631,7 +631,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::send(
 	assert(inSizeConstrained <= in.channelPairs());
 	assert(out.data() != nullptr);
 
-	// Zero the output buffer - TODO: std::memcpy?
+	// Zero the output buffer
 	std::fill(out.begin(), out.end(), SampleFrame{});
 
 	/*

@@ -92,6 +92,20 @@ struct AudioPortsSettings
 	constexpr auto operator==(const AudioPortsSettings& rhs) const -> bool = default;
 };
 
+//! For use in static_assert()
+template<AudioPortsSettings settings>
+constexpr auto validate() -> bool
+{
+	static_assert(settings.kind != AudioDataKind::SampleFrame
+		|| ((settings.inputs == 0 || settings.inputs == 2) && (settings.outputs == 0 || settings.outputs == 2)),
+		"AudioPortsSettings: When using SampleFrame, there must be exactly 0 or 2 input and output channels");
+
+	static_assert(settings.kind != AudioDataKind::SampleFrame || settings.interleaved,
+		"AudioPortsSettings: SampleFrame can only be interleaved");
+
+	return true;
+}
+
 } // namespace lmms
 
 #endif // LMMS_AUDIO_PORTS_SETTINGS_H
