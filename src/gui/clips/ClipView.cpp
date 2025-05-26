@@ -888,6 +888,16 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 						arg(m_clip->endCrossfadeLength().getTicks() %
 								TimePos::ticksPerBar()));
 				}
+				else if (m_action == Action::EditStartCrossfadeTension)
+				{
+					s_textFloat->setTitle(tr("Tension"));
+					s_textFloat->setText(QString("%1").arg(m_clip->startCrossfadeTension()));
+				}
+				else if (m_action == Action::EditEndCrossfadeTension)
+				{
+					s_textFloat->setTitle(tr("Tension"));
+					s_textFloat->setText(QString("%1").arg(m_clip->endCrossfadeTension()));
+				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
@@ -913,6 +923,10 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
 			{
 				hint = tr("Press <%1> or <Alt> for quantized fading.");
+			}
+			else if (m_action == Action::EditStartCrossfadeTension || m_action == Action::EditEndCrossfadeTension)
+			{
+				hint = tr("Press <%1> or <Alt> to snap tension.");
 			}
 			if (hint != "")
 			{
@@ -1231,8 +1245,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		// If alt or ctrl is held, snap to 0.5 or 1-sqrt(2)/2
 		if (unquantizedModHeld(me))
 		{
-			if (std::abs(tension - 0.5) <= std::abs(tension - (1.0f - std::numbers::sqrt2 / 2))) { tension = 0.5; }
-			else { tension = 1.0f - std::numbers::sqrt2 / 2; }
+			if (std::abs(tension - 0.5f) <= std::abs(tension - (1.0f - 0.5f * std::numbers::sqrt2))) { tension = 0.5f; }
+			else { tension = 1.0f - 0.5f * std::numbers::sqrt2; }
 		}
 
 		if (m_action == Action::EditStartCrossfadeTension) { m_clip->setStartCrossfadeTension(tension); }
