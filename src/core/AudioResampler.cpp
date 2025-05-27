@@ -68,17 +68,17 @@ auto AudioResampler::resample(float* dst, std::size_t frames, double ratio, Writ
 		if (m_data.input_frames == 0)
 		{
 			const auto framesWritten = callback(m_buffer.data(), BufferFrameSize);
-			if (framesWritten == 0)
-			{
-				std::fill_n(m_data.data_out, m_data.output_frames * m_channels, 0.f);
-				return false;
-			}
-
 			m_data.data_in = m_buffer.data();
 			m_data.input_frames = static_cast<long>(framesWritten);
 		}
 
 		if ((m_error = src_process(m_state, &m_data))) { throw std::runtime_error{src_strerror(m_error)}; }
+
+		if (m_data.input_frames == 0 && m_data.output_frames_gen == 0)
+		{
+			std::fill_n(m_data.data_out, m_data.output_frames * m_channels, 0.f);
+			return false;
+		}
 
 		m_data.data_in += m_data.input_frames_used * m_channels;
 		m_data.data_out += m_data.output_frames_gen * m_channels;
