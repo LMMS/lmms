@@ -190,7 +190,7 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		const auto resampleCallback = ([&_src](float* dst, std::size_t frames) {
+		const auto inputCallback = ([&_src](float* dst, std::size_t frames) {
 			static auto index = std::size_t{0};
 			for (auto i = std::size_t{0}; i < frames; ++i)
 			{
@@ -201,7 +201,7 @@ private:
 			return frames;
 		});
 
-		resampler.resample(_dst, WAVELEN, WAVERATIO, resampleCallback);
+		resampler.resample(_dst, WAVELEN, WAVERATIO, inputCallback);
 	}
 
 	// memcpy utilizing cubic interpolation

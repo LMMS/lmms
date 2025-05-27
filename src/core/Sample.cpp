@@ -119,12 +119,12 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 	if (loop == Loop::Off && state->frameIndex >= m_endFrame) { return false; }
 
-	const auto resampleCallback = [this, state, loop](float* dst, std::size_t frames) {
+	const auto inputCallback = [this, state, loop](float* dst, std::size_t frames) {
 		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
 	};
 
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	state->resampler.resample(&dst[0][0], numFrames, ratio, resampleCallback);
+	state->resampler.resample(&dst[0][0], numFrames, ratio, inputCallback);
 
 	return true;
 }
