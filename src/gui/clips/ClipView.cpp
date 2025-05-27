@@ -1245,8 +1245,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		// If alt or ctrl is held, snap to 0.5 or 1-sqrt(2)/2
 		if (unquantizedModHeld(me))
 		{
-			if (std::abs(tension - 0.5f) <= std::abs(tension - (1.0f - 0.5f * std::numbers::sqrt2))) { tension = 0.5f; }
-			else { tension = 1.0f - 0.5f * std::numbers::sqrt2; }
+			if (std::abs(tension - 0.5f) <= std::abs(tension - (1.0f - 0.5f * static_cast<float>(std::numbers::sqrt2)))) { tension = 0.5f; }
+			else { tension = 1.0f - 0.5f * static_cast<float>(std::numbers::sqrt2); }
 		}
 
 		if (m_action == Action::EditStartCrossfadeTension) { m_clip->setStartCrossfadeTension(tension); }
