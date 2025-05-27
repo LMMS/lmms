@@ -64,7 +64,8 @@ public:
 
 	//! Resamples audio into @p dst with at the given @p ratio.
 	//! Uses @p callback to fetch input data as necessary.
-	void resample(float* dst, std::size_t frames, double ratio, WriteCallback callback);
+	//! @return `true` if @p dst is completely filled with resampled data.
+	auto resample(float* dst, std::size_t frames, double ratio, WriteCallback callback) -> bool;
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
