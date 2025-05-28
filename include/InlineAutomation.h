@@ -27,7 +27,6 @@
 
 #include "AutomationNode.h"
 #include "AutomationClip.h"
-#include "shared_object.h"
 
 namespace lmms
 {

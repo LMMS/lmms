@@ -36,7 +36,7 @@ namespace lmms
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
-						DetuningHelper * detuning ) :
+						std::shared_ptr<DetuningHelper> detuning ) :
 	m_selected( false ),
 	m_oldKey(std::clamp(key, 0, NumKeys)),
 	m_oldPos( pos ),
@@ -46,13 +46,10 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_volume(std::clamp(volume, MinVolume, MaxVolume)),
 	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
-	m_pos( pos )
+	m_pos(pos),
+	m_detuning(std::move(detuning))
 {
-	if (detuning)
-	{
-		m_detuning = std::make_unique<DetuningHelper>(*detuning);
-	}
-	else
+	if (!detuning)
 	{
 		createDetuning();
 	}
@@ -73,12 +70,9 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
+	m_detuning(note.m_detuning),
 	m_type(note.m_type)
 {
-	if (note.m_detuning)
-	{
-		m_detuning = std::make_unique<DetuningHelper>(*note.m_detuning);
-	}
 }
 
 Note& Note::operator=(const Note& note)
@@ -94,15 +88,18 @@ Note& Note::operator=(const Note& note)
 	m_length = note.m_length;
 	m_pos = note.m_pos;
 	m_type = note.m_type;
-
-	if (note.m_detuning)
-	{
-		m_detuning = std::make_unique<DetuningHelper>(*note.m_detuning);
-	}
+	m_detuning = note.m_detuning;
 
 	return *this;
 }
 
+
+Note* Note::clone() const
+{
+	Note* newNote = new Note(*this);
+	newNote->m_detuning = std::make_shared<DetuningHelper>(*newNote->m_detuning);
+	return newNote;
+}
 
 
 
@@ -234,7 +231,7 @@ void Note::createDetuning()
 {
 	if( m_detuning == nullptr )
 	{
-		m_detuning = std::make_unique<DetuningHelper>();
+		m_detuning = std::make_shared<DetuningHelper>();
 		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
 		m_detuning->automationClip()->setProgressionType( AutomationClip::ProgressionType::Linear );
