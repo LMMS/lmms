@@ -470,6 +470,9 @@ void Knob::paintEvent( QPaintEvent * _me )
 			m_tdRenderer->drawContents(&p);
 		}
 	}
+	
+	// draw `InteractiveModelView` highlight
+	drawAutoHighlight(&p);
 }
 
 void Knob::changeEvent(QEvent * ev)
