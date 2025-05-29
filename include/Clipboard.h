@@ -43,47 +43,13 @@ class QMimeData;
 namespace lmms::Clipboard
 {
 
-const QStringList projectExtensions{"mmp", "mpt", "mmpz"};
-const QStringList presetExtensions{"xpf", "xml", "xiz", "lv2"};
-const QStringList soundFontExtensions{"sf2", "sf3"};
-const QStringList patchExtensions{"pat"};
-const QStringList midiExtensions{"mid", "midi", "rmi"};
-#ifdef LMMS_BUILD_WINDOWS
-const QStringList vstPluginExtensions{"dll"};
-#else
-const QStringList vstPluginExtensions{"dll", "so"};
-#endif
-inline QStringList audioExtensions{};
-
-inline QString getExtension(const QString& file)
-{
-	const QStringList parts = file.split('.');
-	return parts.isEmpty() ? file.toLower() : parts.last().toLower();
-}
-
-void updateExtensionLists()
-{
-	for (const SampleDecoder::AudioType& at : SampleDecoder::supportedAudioTypes())
-	{
-		audioExtensions += QString::fromStdString(at.extension);
-	}
-}
-
-inline bool isAudioFile(const QString& ext)
-{
-	if (audioExtensions.isEmpty())
-	{
-		updateExtensionLists();
-	}
-
-	return audioExtensions.contains(getExtension(ext));
-}
-inline bool isProjectFile(const QString& ext)   { return projectExtensions.contains(getExtension(ext)); }
-inline bool isPresetFile(const QString& ext)    { return presetExtensions.contains(getExtension(ext)); }
-inline bool isSoundFontFile(const QString& ext) { return soundFontExtensions.contains(getExtension(ext)); }
-inline bool isPatchFile(const QString& ext)     { return patchExtensions.contains(getExtension(ext)); }
-inline bool isMidiFile(const QString& ext)      { return midiExtensions.contains(getExtension(ext)); }
-inline bool isVstPluginFile(const QString& ext) { return vstPluginExtensions.contains(getExtension(ext)); }
+bool isAudioFile(const QString& ext);
+bool isProjectFile(const QString& ext);
+bool isPresetFile(const QString& ext);
+bool isSoundFontFile(const QString& ext);
+bool isPatchFile(const QString& ext);
+bool isMidiFile(const QString& ext);
+bool isVstPluginFile(const QString& ext);
 
 
 enum class MimeType
