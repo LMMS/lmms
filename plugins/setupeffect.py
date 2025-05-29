@@ -13,6 +13,7 @@ templateNameUppercase = "TEMPLATE_EFFECT"
 templateHumanName = "TemplateHumanName"
 templateDescription = "TemplateDescription"
 templateAuthor = "TemplateAuthor"
+templateNumKnobs = "TEMPLATE_NUM_KNOBS"
 
 with open(os.path.join(templateFolderPath, "TemplateEffect.cpp"), "r") as file:
 	templateMainCpp = file.read()
@@ -56,6 +57,7 @@ print(f"Lowercase version: {effectNameLowercase}, Uppercase version: {effectName
 effectHumanName = input("Effect Name (Human readable, spaces allowed): ")
 effectDescription = input("Effect Description: ")
 effectAuthor = input("Effect Author: ")
+effectKnobs = int(input("Number of knobs: "))
 
 
 #
@@ -70,13 +72,33 @@ os.makedirs(effectFolderPath)
 
 
 def replaceTemplateKeywords(text):
-	return text\
+	# Replace keywords
+	text = text\
 		.replace(templateName, effectName)\
 		.replace(templateNameLowercase, effectNameLowercase)\
 		.replace(templateNameUppercase, templateNameUppercase)\
 		.replace(templateHumanName, effectHumanName)\
 		.replace(templateDescription, effectDescription)\
-		.replace(templateAuthor, effectAuthor)
+		.replace(templateAuthor, effectAuthor)\
+		.replace(templateNumKnobs, str(effectKnobs))
+	# Replace/repeat knob creation code
+	textLines = text.split("\n")
+	newTextLines = []
+	tmp = []
+	inLoop = False
+	for i, line in enumerate(textLines):
+		if "TEMPLATE_KNOB_LOOP_START" in line:
+			inLoop = True
+		elif "TEMPLATE_KNOB_LOOP_END" in line:
+			inLoop = False
+			for knob in range(effectKnobs):
+				newTextLines.append("\n".join(tmp).replace("TEMPLATE_KNOB_NUMBER", str(knob)))
+			tmp = []
+		elif inLoop:
+			tmp.append(line)
+		else:
+			newTextLines.append(line)
+	return "\n".join(newTextLines)
 
 
 with open(os.path.join(effectFolderPath, f"{effectName}.cpp"), "w") as file:

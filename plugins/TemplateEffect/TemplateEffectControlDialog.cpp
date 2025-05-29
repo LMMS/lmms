@@ -49,47 +49,16 @@ TemplateEffectControlDialog::TemplateEffectControlDialog(TemplateEffectControls*
 
 	QHBoxLayout* mainLayout = new QHBoxLayout(this);
 	mainLayout->setContentsMargins(20,20,20,20);
-	//mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-	// Example knob
-	Knob* decayKnob = new Knob(KnobType::Bright26, this);
-	decayKnob->setModel(&controls->m_decayModel);
-	decayKnob->setLabel(tr("Decay"));
-	decayKnob->setHintText(tr("Decay per frame:"), "");
-	mainLayout->addWidget(decayKnob);
+	TEMPLATE_KNOB_LOOP_START
+	Knob* knobTEMPLATE_KNOB_NUMBER = new Knob(KnobType::Bright26, this);
+	knobTEMPLATE_KNOB_NUMBER->setModel(&controls->m_modelTEMPLATE_KNOB_NUMBER);
+	knobTEMPLATE_KNOB_NUMBER->setLabel(tr("Knob TEMPLATE_KNOB_NUMBER"));
+	knobTEMPLATE_KNOB_NUMBER->setHintText(tr("Value description:"), " units");
+	mainLayout->addWidget(knobTEMPLATE_KNOB_NUMBER);
 
-	// In this demo, only the decay knob actually does anything.
-	// The rest are to showcase the different types of gui elements.
+	TEMPLATE_KNOB_LOOP_END
 
-	// Example volume knob
-	Knob* volumeKnob = new Knob(KnobType::Bright26, this);
-	volumeKnob->setModel(&controls->m_volumeModel);
-	volumeKnob->setLabel(tr("Volume"));
-	volumeKnob->setHintText(tr("Volume:"), "%");
-	volumeKnob->setVolumeKnob(true);
-	mainLayout->addWidget(volumeKnob);
-
-	// Example check box
-	LedCheckBox* invertDecay = new LedCheckBox(tr("Toggle"), this);
-	invertDecay->setModel(&controls->m_invertModel);
-	invertDecay->setToolTip(tr("Explanation of check box"));
-	invertDecay->setCheckable(true);
-	mainLayout->addWidget(invertDecay);
-
-	// Example Number LCD
-	LcdSpinBox * amountBox = new LcdSpinBox(3, this);
-	amountBox->setModel(&controls->m_numberModel);
-	amountBox->setLabel(tr("Number"));
-	amountBox->setToolTip(tr("Number"));
-	mainLayout->addWidget(amountBox);
-
-	// Example Fader
-	Fader* exampleFader = new Fader(&controls->m_faderModel, "Example Fader", this, false);
-	exampleFader->setHintText("Example Fader", "dBFS");
-	exampleFader->setDisplayConversion(false);
-	exampleFader->setRenderUnityLine(false);
-	exampleFader->setFixedSize(20, 100);
-	mainLayout->addWidget(exampleFader);
 }
 
 } // namespace lmms::gui

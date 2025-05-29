@@ -33,33 +33,27 @@ namespace lmms
 
 TemplateEffectControls::TemplateEffectControls(TemplateEffectEffect* effect) :
 	EffectControls(effect),
-	m_effect(effect),
-	m_volumeModel(100.0f, 0.0f, 200.0f, 0.001f, this, tr("Volume")),
-	m_decayModel(1.0f, 0.0f, 1.0f, 0.001f, this, tr("Decay")),
-	m_invertModel(false, this, tr("Invert")),
-	m_numberModel(1, 1, 10, this, tr("Number")),
-	m_faderModel(0.0f, -10.0f, 10.0f, 0.001f, this, tr("Fader"))
+	TEMPLATE_KNOB_LOOP_START
+	m_modelTEMPLATE_KNOB_NUMBER(0.5f, 0.0f, 1.0f, 0.00001f, this, tr("Knob TEMPLATE_KNOB_NUMBER")),
+	TEMPLATE_KNOB_LOOP_END
+	m_effect(effect)
 {
 }
 
 
 void TemplateEffectControls::loadSettings(const QDomElement& parent)
 {
-	m_volumeModel.loadSettings(parent, "volume");
-	m_decayModel.loadSettings(parent, "decay");
-	m_invertModel.loadSettings(parent, "invert");
-	m_numberModel.loadSettings(parent, "num");
-	m_faderModel.loadSettings(parent, "fader");
+	TEMPLATE_KNOB_LOOP_START
+	m_modelTEMPLATE_KNOB_NUMBER.loadSettings(parent, "modelTEMPLATE_KNOB_NUMBER");
+	TEMPLATE_KNOB_LOOP_END
 }
 
 
 void TemplateEffectControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
-	m_volumeModel.saveSettings(doc, parent, "volume");
-	m_decayModel.saveSettings(doc, parent, "volume");
-	m_invertModel.saveSettings(doc, parent, "invert");
-	m_numberModel.saveSettings(doc, parent, "num");
-	m_faderModel.saveSettings(doc, parent, "fader");
+	TEMPLATE_KNOB_LOOP_START
+	m_modelTEMPLATE_KNOB_NUMBER.saveSettings(doc, parent, "modelTEMPLATE_KNOB_NUMBER");
+	TEMPLATE_KNOB_LOOP_END
 }
 
 

@@ -48,8 +48,6 @@ public:
 private:
 	TemplateEffectControls m_controls;
 
-	SampleFrame m_smoothedValue;
-
 	friend class TemplateEffectControls;
 };
 

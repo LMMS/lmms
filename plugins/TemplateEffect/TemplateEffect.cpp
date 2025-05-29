@@ -52,33 +52,14 @@ Plugin::Descriptor PLUGIN_EXPORT templateeffect_plugin_descriptor =
 
 TemplateEffectEffect::TemplateEffectEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&templateeffect_plugin_descriptor, parent, key),
-	m_controls(this),
-	m_smoothedValue(0.0f, 0.0f)
+	m_controls(this)
 {
 }
 
 
 Effect::ProcessStatus TemplateEffectEffect::processImpl(SampleFrame* buffer, const fpp_t frames)
 {
-	// Here is where you put all of your audio processing code
-
-	// In this demo, the effect performs a smoothing decaying interpolation based on the input frames, kind
-	// of like a simple lowpass filter.
-
-	// Setup variables before the loop
-	float decayMutliplier = m_controls.m_decayModel.value();
-	
-	// Loop over all input samples in this buffer
-	// f_cnt_t is an arbitrary data type for storing a frame count. You can also use ints if you want.
-	for (f_cnt_t f = 0; f < frames; ++f)
-	{
-		SampleFrame currentFrame = buffer[f];
-		// Now do the processing for this frame.
-		// This demo effect simply interpolates m_smoothedValue with the input, and outputs the current smoothed value.
-		m_smoothedValue = currentFrame * decayMutliplier + m_smoothedValue * (1 - decayMutliplier);
-		// Update the value in the buffer
-		buffer[f] = m_smoothedValue;
-	}
+	// Put your audio processing code here
 
 	return ProcessStatus::ContinueIfNotQuiet;
 }

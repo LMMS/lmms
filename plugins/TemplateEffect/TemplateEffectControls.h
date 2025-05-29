@@ -56,21 +56,14 @@ public:
 	{
 		return new gui::TemplateEffectControlDialog(this);
 	}
-	int controlCount() override { return 5; }
+	int controlCount() override { return TEMPLATE_NUM_KNOBS; }
 
 private:
+	TEMPLATE_KNOB_LOOP_START
+	FloatModel m_modelTEMPLATE_KNOB_NUMBER;
+	TEMPLATE_KNOB_LOOP_END
+
 	TemplateEffectEffect* m_effect;
-	
-	//! Example volume knob model
-	FloatModel m_volumeModel;
-	//! Example normal knob model
-	FloatModel m_decayModel;
-	//! Example toggleable on/off model
-	BoolModel m_invertModel;
-	//! Example integer model
-	IntModel m_numberModel;
-	//! Example model for fader
-	FloatModel m_faderModel;
 
 	friend class gui::TemplateEffectControlDialog;
 	friend class TemplateEffectEffect;
