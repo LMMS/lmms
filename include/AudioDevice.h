@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 class QThread;
 

@@ -27,11 +27,9 @@
 
 #include <algorithm>
 #include "lmms_math.h"
-#ifdef SA_DEBUG
-	#include <chrono>
-#endif
 #include <cmath>
 #ifdef SA_DEBUG
+	#include <chrono>
 	#include <iomanip>
 	#include <iostream>
 #endif

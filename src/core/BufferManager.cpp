@@ -28,8 +28,6 @@
 
 #include "SampleFrame.h"
 
-#include <cstring>
-
 
 namespace lmms
 {

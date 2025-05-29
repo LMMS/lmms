@@ -111,30 +111,27 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userProjectsDir() + "*" +
-				confMgr->factoryProjectsDir(),
-					"*.mmp *.mmpz *.xml *.mid *.mpt",
-							tr( "My Projects" ),
-					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false,
-				confMgr->userProjectsDir(),
-				confMgr->factoryProjectsDir()));
-	sideBar->appendTab(
-		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
-			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
-			confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userPresetsDir() + "*" +
-				confMgr->factoryPresetsDir(),
-					"*.xpf *.cs.xml *.xiz *.lv2",
-					tr( "My Presets" ),
-					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false,
-				confMgr->userPresetsDir(),
-				confMgr->factoryPresetsDir()));
-	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
-		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
+
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Favorites, ConfigManager::inst()->favoriteItems().join("*"), FileItem::defaultFilters(), "My Favorites",
+		embed::getIconPixmap("star").transformed(QTransform().rotate(90)), splitter, false, "", ""));
+
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
+		confMgr->userProjectsDir() + "*" + confMgr->factoryProjectsDir(), "*.mmp *.mmpz *.xml *.mid *.mpt",
+		tr("My Projects"), embed::getIconPixmap("project_file").transformed(QTransform().rotate(90)), splitter, false,
+		confMgr->userProjectsDir(), confMgr->factoryProjectsDir()));
+
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
+		confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(), tr("My Samples"),
+		embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
+		confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
+
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
+		confMgr->userPresetsDir() + "*" + confMgr->factoryPresetsDir(), "*.xpf *.cs.xml *.xiz *.lv2", tr("My Presets"),
+		embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)), splitter, false,
+		confMgr->userPresetsDir(), confMgr->factoryPresetsDir()));
+
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, QDir::homePath(), FileItem::defaultFilters(),
+		tr("My Home"), embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
 	QString title = tr("Root Directory");
@@ -156,7 +153,7 @@ MainWindow::MainWindow() :
 	}
 #endif
 
-	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new MovableQMdiArea(splitter);
@@ -1287,6 +1284,31 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
 		case Qt::Key_Shift: m_keyMods.m_shift = true; break;
 		case Qt::Key_Alt: m_keyMods.m_alt = true; break;
+		case Qt::Key_Space:
+		{
+			Editor* lastEditor = nullptr;
+			switch (Engine::getSong()->lastPlayMode())
+			{
+			case Song::PlayMode::Song:
+				lastEditor = getGUI()->songEditor();
+				break;
+			case Song::PlayMode::MidiClip:
+				lastEditor = getGUI()->pianoRoll();
+				break;
+			case Song::PlayMode::Pattern:
+				lastEditor = getGUI()->patternEditor();
+				break;
+			case Song::PlayMode::AutomationClip:
+				lastEditor = getGUI()->automationEditor();
+				break;
+			default:
+				lastEditor = getGUI()->songEditor();
+				break;
+			}
+			if (m_keyMods.m_shift) { lastEditor->togglePause(); }
+			else { lastEditor->togglePlayStop(); }
+			break;
+		}
 		default:
 		{
 			InstrumentTrackWindow * w =

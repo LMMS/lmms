@@ -26,6 +26,7 @@
 #define LMMS_GUI_GUI_APPLICATION_H
 
 #include <QObject>
+#include <QSocketNotifier>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"
@@ -53,9 +54,12 @@ public:
 	~GuiApplication() override;
 
 	static GuiApplication* instance();
+	static void sigintHandler(int);
 #ifdef LMMS_BUILD_WIN32
 	static QFont getWin32SystemFont();
 #endif
+
+	void createSocketNotifier();
 
 	MainWindow* mainWindow() { return m_mainWindow; }
 	MixerView* mixerView() { return m_mixerView; }
@@ -67,11 +71,15 @@ public:
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
+	//! File descriptors for unix socketpair, used to receive SIGINT
+	static inline int s_sigintFd[2];
+
 public slots:
 	void displayInitProgress(const QString &msg);
 
 private slots:
 	void childDestroyed(QObject *obj);
+	void sigintOccurred();
 
 private:
 	static GuiApplication* s_instance;
@@ -86,6 +94,7 @@ private:
 	MicrotunerConfig* m_microtunerConfig;
 	ControllerRackView* m_controllerRackView;
 	QLabel* m_loadingProgressLabel;
+	QSocketNotifier* m_sigintNotifier;
 };
 
 // Short-hand function

@@ -29,6 +29,7 @@
 
 #include "CaptionMenu.h"
 #include "StringPairDrag.h"
+#include "KeyboardShortcuts.h"
 
 
 namespace lmms::gui
@@ -111,7 +112,7 @@ void AutomatableButton::contextMenuEvent( QContextMenuEvent * _me )
 void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			! ( _me->modifiers() & Qt::ControlModifier ) )
+			! ( _me->modifiers() & KBD_COPY_MODIFIER ) )
 	{
         // User simply clicked, toggle if needed
 		if( isCheckable() )

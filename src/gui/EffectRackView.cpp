@@ -65,6 +65,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	auto addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
+	addButton->setFocusPolicy(Qt::NoFocus);
 
 	effectsLayout->addWidget( addButton );
 

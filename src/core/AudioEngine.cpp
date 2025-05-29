@@ -35,7 +35,6 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
-#include "SamplePlayHandle.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
