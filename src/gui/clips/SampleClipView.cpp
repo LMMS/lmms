@@ -24,12 +24,12 @@
 
 #include "SampleClipView.h"
 
-#include <Clipboard.h>
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
 #include "AutomationEditor.h"
+#include "Clipboard.h"
 #include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"

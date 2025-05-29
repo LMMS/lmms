@@ -22,15 +22,16 @@
  *
  */
 
-#include "Clipboard.h"
+#include "FileBrowser.h"
 
-#include <FileBrowser.h>
 #include <QApplication>
 #include <QClipboard>
 #include <QDrag>
 #include <QMimeData>
 #include <QUrl>
-#include <StringPairDrag.h>
+
+#include "Clipboard.h"
+#include "StringPairDrag.h"
 
 namespace lmms::Clipboard
 {

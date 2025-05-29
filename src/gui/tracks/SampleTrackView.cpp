@@ -24,11 +24,11 @@
 
 #include "SampleTrackView.h"
 
-#include <Clipboard.h>
 #include <QApplication>
 #include <QFileInfo>
 #include <QMenu>
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"

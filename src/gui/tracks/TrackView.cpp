@@ -24,7 +24,6 @@
 
 #include "TrackView.h"
 
-#include <Clipboard.h>
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
@@ -33,6 +32,7 @@
 #include <QtGlobal>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "ClipView.h"
 #include "ConfigManager.h"
 #include "DataFile.h"

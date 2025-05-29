@@ -24,12 +24,12 @@
 
 #include "TrackContainerView.h"
 
-#include <Clipboard.h>
 #include <QLayout>
 #include <QMessageBox>
 #include <QScrollBar>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "DataFile.h"
 #include "FileBrowser.h"
 #include "GuiApplication.h"

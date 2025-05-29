@@ -25,10 +25,9 @@
 
 #include "AutomationTrackView.h"
 
-#include <Clipboard.h>
-
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
+#include "Clipboard.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
 #include "StringPairDrag.h"
