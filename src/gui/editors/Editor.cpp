@@ -97,32 +97,30 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 	m_toggleStepRecordingAction(nullptr),
 	m_stopAction(nullptr)
 {
-	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
+    m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
-	auto addButton = [this](QAction* action, QString objectName) {
-		m_toolBar->addAction(action);
-		m_toolBar->widgetForAction(action)->setObjectName(objectName);
-	};
+    auto addButton = [this](QAction* action, QString objectName) {
+        m_toolBar->addAction(action);
+        m_toolBar->widgetForAction(action)->setObjectName(objectName);
+    };
 
-	auto createConditionalButton = [this, &addButton](
-		bool condition,
-		QAction*& targetAction,
-		const char* iconName,
-		const QString& text,
-		const char* slot,
-		const QString& objectName
-	) {
-		if (condition) {
-			targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
-			connect(targetAction, SIGNAL(triggered()), this, slot);
-			addButton(targetAction, objectName);
-		}
-	};
+    auto createButton = [this, &addButton](
+        QAction*& targetAction,
+        const char* iconName,
+        const QString& text,
+        const char* slot,
+        const QString& objectName,
+        bool condition = true
+    ) {
+        if (condition) {
+            targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
+            connect(targetAction, SIGNAL(triggered()), this, slot);
+            addButton(targetAction, objectName);
+        }
+    };
 
-	// Play action setup
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	addButton(m_playAction, "playButton");
+    // Play action setup
+    createButton(m_playAction, "play", tr("Play (Space)"), SLOT(play()), "playButton");
 
 	// Record action setup
 	if (record)
@@ -148,10 +146,8 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
 
-	// Stop action setup
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
-	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	addButton(m_stopAction, "stopButton");
+    // Stop action setup
+    createButton(m_stopAction, "stop", tr("Stop (Space)"), SLOT(stop()), "stopButton");
 
 	// Setup shortcuts for actions
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
