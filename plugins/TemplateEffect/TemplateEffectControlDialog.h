@@ -1,5 +1,5 @@
 /*
- * ExampleEffectControlDialog.h - Example effect gui boilerplate code
+ * TemplateEffectControlDialog.h - Example effect gui boilerplate code
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,15 +23,15 @@
  *
  */
 
-#ifndef LMMS_GUI_EXAMPLE_EFFECT_CONTROL_DIALOG_H
-#define LMMS_GUI_EXAMPLE_EFFECT_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_TEMPLATE_EFFECT_CONTROL_DIALOG_H
+#define LMMS_GUI_TEMPLATE_EFFECT_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 
 namespace lmms
 {
 
-class ExampleEffectControls;
+class TemplateEffectControls;
 class FloatModel;
 
 namespace gui
@@ -39,12 +39,12 @@ namespace gui
 
 class Knob;
 
-class ExampleEffectControlDialog : public EffectControlDialog
+class TemplateEffectControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	ExampleEffectControlDialog(ExampleEffectControls* controls);
-	~ExampleEffectControlDialog() override = default;
+	TemplateEffectControlDialog(TemplateEffectControls* controls);
+	~TemplateEffectControlDialog() override = default;
 
 	bool isResizable() const override { return true; }
 };
@@ -53,4 +53,4 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_GUI_EXAMPLE_EFFECT_CONTROL_DIALOG_H
+#endif // LMMS_GUI_TEMPLATE_EFFECT_CONTROL_DIALOG_H

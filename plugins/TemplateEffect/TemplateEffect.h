@@ -1,5 +1,5 @@
 /*
- * ExampleEffect.h - Example effect boilerplate code
+ * TemplateEffect.h - Example effect boilerplate code
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,20 +23,20 @@
  *
  */
 
-#ifndef LMMS_EXAMPLE_EFFECT_H
-#define LMMS_EXAMPLE_EFFECT_H
+#ifndef LMMS_TEMPLATE_EFFECT_H
+#define LMMS_TEMPLATE_EFFECT_H
 
 #include "Effect.h"
-#include "ExampleEffectControls.h"
+#include "TemplateEffectControls.h"
 
 namespace lmms
 {
 
-class ExampleEffectEffect : public Effect
+class TemplateEffectEffect : public Effect
 {
 public:
-	ExampleEffectEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~ExampleEffectEffect() override = default;
+	TemplateEffectEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
+	~TemplateEffectEffect() override = default;
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
@@ -46,13 +46,13 @@ public:
 	}
 
 private:
-	ExampleEffectControls m_controls;
+	TemplateEffectControls m_controls;
 
 	SampleFrame m_smoothedValue;
 
-	friend class ExampleEffectControls;
+	friend class TemplateEffectControls;
 };
 
 } // namespace lmms
 
-#endif // LMMS_EXAMPLE_EFFECT_H
+#endif // LMMS_TEMPLATE_EFFECT_H

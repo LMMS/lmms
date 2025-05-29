@@ -1,5 +1,5 @@
 /*
- * ExampleEffectControls.cpp - Example effect control boilerplate code
+ * TemplateEffectControls.cpp - Example effect control boilerplate code
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -25,13 +25,13 @@
 
 #include <QDomElement>
 
-#include "ExampleEffectControls.h"
-#include "ExampleEffect.h"
+#include "TemplateEffectControls.h"
+#include "TemplateEffect.h"
 
 namespace lmms
 {
 
-ExampleEffectControls::ExampleEffectControls(ExampleEffectEffect* effect) :
+TemplateEffectControls::TemplateEffectControls(TemplateEffectEffect* effect) :
 	EffectControls(effect),
 	m_effect(effect),
 	m_volumeModel(100.0f, 0.0f, 200.0f, 0.001f, this, tr("Volume")),
@@ -43,7 +43,7 @@ ExampleEffectControls::ExampleEffectControls(ExampleEffectEffect* effect) :
 }
 
 
-void ExampleEffectControls::loadSettings(const QDomElement& parent)
+void TemplateEffectControls::loadSettings(const QDomElement& parent)
 {
 	m_volumeModel.loadSettings(parent, "volume");
 	m_decayModel.loadSettings(parent, "decay");
@@ -53,7 +53,7 @@ void ExampleEffectControls::loadSettings(const QDomElement& parent)
 }
 
 
-void ExampleEffectControls::saveSettings(QDomDocument& doc, QDomElement& parent)
+void TemplateEffectControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 	m_volumeModel.saveSettings(doc, parent, "volume");
 	m_decayModel.saveSettings(doc, parent, "volume");

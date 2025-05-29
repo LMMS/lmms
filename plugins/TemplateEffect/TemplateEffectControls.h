@@ -1,5 +1,5 @@
 /*
- * ExampleEffectControls.h - Example effect control boilerplate code
+ * TemplateEffectControls.h - Example effect control boilerplate code
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,43 +23,43 @@
  *
  */
 
-#ifndef LMMS_EXAMPLE_EFFECT_CONTROLS_H
-#define LMMS_EXAMPLE_EFFECT_CONTROLS_H
+#ifndef LMMS_TEMPLATE_EFFECT_CONTROLS_H
+#define LMMS_TEMPLATE_EFFECT_CONTROLS_H
 
 #include "EffectControls.h"
-#include "ExampleEffectControlDialog.h"
+#include "TemplateEffectControlDialog.h"
 
 namespace lmms
 {
 
-class ExampleEffectEffect;
+class TemplateEffectEffect;
 
 namespace gui
 {
-class ExampleEffectControlDialog;
+class TemplateEffectControlDialog;
 }
 
-class ExampleEffectControls : public EffectControls
+class TemplateEffectControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	ExampleEffectControls(ExampleEffectEffect* effect);
-	~ExampleEffectControls() override = default;
+	TemplateEffectControls(TemplateEffectEffect* effect);
+	~TemplateEffectControls() override = default;
 
 	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
 	void loadSettings(const QDomElement& parent) override;
 	inline QString nodeName() const override
 	{
-		return "ExampleEffectControls";
+		return "TemplateEffectControls";
 	}
 	gui::EffectControlDialog* createView() override
 	{
-		return new gui::ExampleEffectControlDialog(this);
+		return new gui::TemplateEffectControlDialog(this);
 	}
 	int controlCount() override { return 5; }
 
 private:
-	ExampleEffectEffect* m_effect;
+	TemplateEffectEffect* m_effect;
 	
 	//! Example volume knob model
 	FloatModel m_volumeModel;
@@ -72,10 +72,10 @@ private:
 	//! Example model for fader
 	FloatModel m_faderModel;
 
-	friend class gui::ExampleEffectControlDialog;
-	friend class ExampleEffectEffect;
+	friend class gui::TemplateEffectControlDialog;
+	friend class TemplateEffectEffect;
 };
 
 } // namespace lmms
 
-#endif // LMMS_EXAMPLE_EFFECT_CONTROLS_H
+#endif // LMMS_TEMPLATE_EFFECT_CONTROLS_H

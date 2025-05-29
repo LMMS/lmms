@@ -1,5 +1,5 @@
 /*
- * ExampleEffect.cpp - Example effect boilerplate code
+ * TemplateEffect.cpp - Example effect boilerplate code
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,7 +23,7 @@
  *
  */
 
-#include "ExampleEffect.h"
+#include "TemplateEffect.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -34,12 +34,12 @@ namespace lmms
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT exampleeffect_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT templateeffect_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
-	"Example Effect",
-	QT_TRANSLATE_NOOP("PluginBrowser", "Example effect"),
-	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
+	"TemplateHumanName",
+	QT_TRANSLATE_NOOP("PluginBrowser", "TemplateDescription"),
+	"TemplateAuthor",
 	0x0100,
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
@@ -50,15 +50,15 @@ Plugin::Descriptor PLUGIN_EXPORT exampleeffect_plugin_descriptor =
 }
 
 
-ExampleEffectEffect::ExampleEffectEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&exampleeffect_plugin_descriptor, parent, key),
+TemplateEffectEffect::TemplateEffectEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
+	Effect(&templateeffect_plugin_descriptor, parent, key),
 	m_controls(this),
 	m_smoothedValue(0.0f, 0.0f)
 {
 }
 
 
-Effect::ProcessStatus ExampleEffectEffect::processImpl(SampleFrame* buffer, const fpp_t frames)
+Effect::ProcessStatus TemplateEffectEffect::processImpl(SampleFrame* buffer, const fpp_t frames)
 {
 	// Here is where you put all of your audio processing code
 
@@ -90,7 +90,7 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
-	return new ExampleEffectEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+	return new TemplateEffectEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
 
 }

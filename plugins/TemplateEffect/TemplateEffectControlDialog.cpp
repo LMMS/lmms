@@ -1,5 +1,5 @@
 /*
- * ExampleEffectControlDialog.cpp - Example effect gui boilerplate code
+ * TemplateEffectControlDialog.cpp - Example effect gui boilerplate code
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,8 +23,8 @@
  *
  */
 
-#include "ExampleEffectControlDialog.h"
-#include "ExampleEffectControls.h"
+#include "TemplateEffectControlDialog.h"
+#include "TemplateEffectControls.h"
 #include "embed.h"
 #include "Knob.h"
 #include "Fader.h"
@@ -36,7 +36,7 @@
 namespace lmms::gui
 {
 
-ExampleEffectControlDialog::ExampleEffectControlDialog(ExampleEffectControls* controls) :
+TemplateEffectControlDialog::TemplateEffectControlDialog(TemplateEffectControls* controls) :
 	EffectControlDialog(controls)
 {
 	setAutoFillBackground(true);
