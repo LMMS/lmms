@@ -158,8 +158,8 @@ with open(os.path.join(os.path.dirname(__file__), f"../cmake/modules/PluginList.
 		# Find where the list starts
 		if line == "SET(LMMS_PLUGIN_LIST\n":
 			foundList = True
-		# Then go through the list until the effect with a name after in alphabetical order is found
-		if foundList:
+		elif foundList:
+			# Then go through the list until the effect with a name after in alphabetical order is found
 			if line.lstrip() > effectName:
 				contents.insert(i, f"	{effectName}\n")
 				insertedEffectName = True
