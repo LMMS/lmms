@@ -97,7 +97,6 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent * _dee,
 	return false;
 }
 
-//! use QString Clipboard::decodeKey(QMimeData) instead
 QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
 	return Clipboard::decodeKey( _de->mimeData() );
@@ -105,7 +104,6 @@ QString StringPairDrag::decodeKey( QDropEvent * _de )
 
 
 
-//! use QString Clipboard::decodeValue(QMimeData) instead
 QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
 	return Clipboard::decodeValue( _de->mimeData() );

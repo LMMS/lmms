@@ -22,15 +22,13 @@
  *
  */
 
-#include "FileBrowser.h"
+#include "Clipboard.h"
 
 #include <QApplication>
 #include <QClipboard>
-#include <QDrag>
-#include <QMimeData>
-#include <QUrl>
 
-#include "Clipboard.h"
+#include "FileBrowser.h"
+#include "SampleDecoder.h"
 #include "StringPairDrag.h"
 
 namespace lmms::Clipboard
@@ -48,12 +46,16 @@ namespace lmms::Clipboard
 	#endif
 	QStringList audioExtensions{};
 
+	//! gets the extension of a file, or returns the string back if no extension is found
 	inline QString getExtension(const QString& file)
 	{
 		const QStringList parts = file.split('.');
 		return parts.isEmpty() ? file.toLower() : parts.last().toLower();
 	}
 
+	//
+	/* @brief updates the lists of extensions. TODO: currently, this only applies for audioExtensions, but all the lists should be made
+	 */
 	void updateExtensionLists()
 	{
 		for (const SampleDecoder::AudioType& at : SampleDecoder::supportedAudioTypes())

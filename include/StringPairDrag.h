@@ -48,8 +48,10 @@ public:
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
-	static QString decodeKey( QDropEvent * _de );
-	static QString decodeValue( QDropEvent * _de );
+	//! use QString Clipboard::decodeKey(QMimeData) instead
+	static QString decodeKey(QDropEvent* _de);
+	//! use QString Clipboard::decodeValue(QMimeData) instead
+	static QString decodeValue(QDropEvent* _de);
 } ;
 
 

@@ -27,13 +27,9 @@
 
 #include <QDomElement>
 #include <QDropEvent>
-#include <QMap>
-#include <QObject>
-#include <lmmsconfig.h>
 
 #include "lmms_export.h"
 
-#include "SampleDecoder.h"
 
 namespace lmms::gui {
 class FileItem;
