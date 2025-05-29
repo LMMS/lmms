@@ -1009,7 +1009,7 @@ void CarlaParamsView::refreshKnobs()
 		bool enabled = currentParamModel->enabled();
 		const QString name = currentParamModel->displayName();
 
-		auto currentKnob = new Knob(KnobType::Dark28, name, m_inputScrollAreaWidgetContent, Knob::Mode::Legacy);
+		auto currentKnob = new Knob(KnobType::Dark28, name, m_inputScrollAreaWidgetContent, Knob::LabelRendering::LegacyFixedFontSize);
 		currentKnob->setHintText(name, "");
 		currentKnob->setObjectName(name); // this is being used for filtering the knobs.
 

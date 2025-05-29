@@ -52,12 +52,12 @@ TempoSyncKnob::TempoSyncKnob( KnobType _knob_num, QWidget * _parent,
 {
 }
 
-TempoSyncKnob::TempoSyncKnob(KnobType knobNum, const QString& labelText, QWidget* parent, Mode mode, const QString& name) :
+TempoSyncKnob::TempoSyncKnob(KnobType knobNum, const QString& labelText, QWidget* parent, LabelRendering labelRendering, const QString& name) :
 	TempoSyncKnob(knobNum, parent, name)
 {
 	setLabel(labelText);
 
-	if (mode == Knob::Mode::Legacy)
+	if (labelRendering == Knob::LabelRendering::LegacyFixedFontSize)
 	{
 		setLegacyMode(true);
 	}

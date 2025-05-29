@@ -78,13 +78,13 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::Mode::Legacy, tr("VOL"));
+	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::Mode::Legacy, tr("Panning"));
+	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText(tr("Panning:"), "%");
 	m_panningKnob->show();

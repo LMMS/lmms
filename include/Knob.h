@@ -77,9 +77,28 @@ class LMMS_EXPORT Knob : public FloatModelEditorBase
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	enum class Mode
+	/**
+	 * @brief Determines how the label of the knob is rendered.
+	 * 
+	 * Labels can be rendered using the font that is set for the knob or using a
+	 * font with a fixed size which is determined by SMALL_FONT_SIZE.
+	 */
+	enum class LabelRendering
 	{
-		NonLegacy, Legacy
+		/**
+		 * @brief Renders the label using the font that is set for the widget.
+		 * 
+		 * The space that's needed for the label is determined using the font metrics of the knob's font.
+		 */
+		WidgetFont,
+
+		/**
+		 * @brief Renders the labels in legacy mode. This uses a fixed font size and does not adhere
+		 * to the font size that's set for the widget's font.
+		 * 
+		 * @deprecated Do not use this mode in new code as it is considered deprecated and might be removed in the future.
+		 */
+		LegacyFixedFontSize
 	};
 
 	/**
@@ -97,10 +116,10 @@ public:
 	 * @param knobNum Style of the knob
 	 * @param labelText Text for the label
 	 * @param parent Parent widget
-	 * @param mode Builds a knob with legacy behavior (font size always 12 pixels) if set to Legacy. Default is NonLegacy.
+	 * @param labelRendering Determines if the label uses the widget font or a font with a fixed size of 12 pixels (LegacyFixedFontSize). The default is to use the widget font.
 	 * @param name Object name of the widget
 	 */
-	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, Mode mode = Mode::NonLegacy, const QString& name = QString());
+	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, LabelRendering labelRendering = LabelRendering::WidgetFont, const QString& name = QString());
 
 	/**
 	 * @brief Constructs a knob with a label font in the pixel size.

@@ -51,12 +51,12 @@ Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	initUi( _name );
 }
 
-Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, Mode mode, const QString& name) :
+Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, LabelRendering labelRendering, const QString& name) :
 	Knob(knobNum, parent, name)
 {
 	setLabel(labelText);
 
-	if (mode == Mode::Legacy)
+	if (labelRendering == LabelRendering::LegacyFixedFontSize)
 	{
 		setLegacyMode(true);
 	}

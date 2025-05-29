@@ -44,7 +44,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob(new Knob(KnobType::Bright26, tr("RANGE"), this, Knob::Mode::Legacy))
+	m_chordRangeKnob(new Knob(KnobType::Bright26, tr("RANGE"), this, Knob::LabelRendering::LegacyFixedFontSize))
 {
 	auto topLayout = new QHBoxLayout(this);
 	topLayout->setContentsMargins(0, 0, 0, 0);
@@ -97,13 +97,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_a( arp ),
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
-	m_arpRangeKnob(new Knob(KnobType::Bright26, tr("RANGE"), this, Knob::Mode::Legacy)),
-	m_arpRepeatsKnob(new Knob(KnobType::Bright26, tr("REP"), this, Knob::Mode::Legacy)),
-	m_arpCycleKnob(new Knob(KnobType::Bright26, tr("CYCLE"), this, Knob::Mode::Legacy)),
-	m_arpSkipKnob(new Knob(KnobType::Bright26, tr("SKIP"), this, Knob::Mode::Legacy)),
-	m_arpMissKnob(new Knob(KnobType::Bright26, tr("MISS"), this, Knob::Mode::Legacy)),
-	m_arpTimeKnob(new TempoSyncKnob(KnobType::Bright26, tr("TIME"), this, Knob::Mode::Legacy)),
-	m_arpGateKnob(new Knob(KnobType::Bright26, tr("GATE"), this, Knob::Mode::Legacy)),
+	m_arpRangeKnob(new Knob(KnobType::Bright26, tr("RANGE"), this, Knob::LabelRendering::LegacyFixedFontSize)),
+	m_arpRepeatsKnob(new Knob(KnobType::Bright26, tr("REP"), this, Knob::LabelRendering::LegacyFixedFontSize)),
+	m_arpCycleKnob(new Knob(KnobType::Bright26, tr("CYCLE"), this, Knob::LabelRendering::LegacyFixedFontSize)),
+	m_arpSkipKnob(new Knob(KnobType::Bright26, tr("SKIP"), this, Knob::LabelRendering::LegacyFixedFontSize)),
+	m_arpMissKnob(new Knob(KnobType::Bright26, tr("MISS"), this, Knob::LabelRendering::LegacyFixedFontSize)),
+	m_arpTimeKnob(new TempoSyncKnob(KnobType::Bright26, tr("TIME"), this, Knob::LabelRendering::LegacyFixedFontSize)),
+	m_arpGateKnob(new Knob(KnobType::Bright26, tr("GATE"), this, Knob::LabelRendering::LegacyFixedFontSize)),
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {
