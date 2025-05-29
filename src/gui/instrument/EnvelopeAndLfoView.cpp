@@ -228,9 +228,11 @@ void EnvelopeAndLfoView::modelChanged()
 
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee,
-					QString( "samplefile,clip_%1" ).arg(
-							static_cast<int>(Track::Type::Sample) ) );
+	static std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::SampleFile,
+		Clipboard::DataType::SampleClip
+	};
+	StringPairDrag::processDragEnterEvent(_dee, &acceptedKeys);
 }
 
 
@@ -238,9 +240,9 @@ void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
+	Clipboard::DataType type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
+	if (type == Clipboard::DataType::SampleFile)
 	{
 		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
 		m_userLfoBtn->model()->setValue( true );
@@ -248,7 +250,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		_de->accept();
 		update();
 	}
-	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
+	else if (type == Clipboard::DataType::SampleClip)
 	{
 		DataFile dataFile( value.toUtf8() );
 		auto file = dataFile.content().

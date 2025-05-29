@@ -48,9 +48,8 @@
 namespace lmms::gui
 {
 
-AutomationClipView::AutomationClipView( AutomationClip * _clip,
-						TrackView * _parent ) :
-	ClipView( _clip, _parent ),
+AutomationClipView::AutomationClipView(AutomationClip* _clip, TrackView* _parent) :
+	ClipView(_clip, _parent, getTypeId<AutomationClipView>()),
 	m_clip( _clip ),
 	m_paintPixmap()
 {
@@ -206,6 +205,43 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 		_cm->addMenu( m );
 	}
 }
+
+
+/*
+bool AutomationClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
+{
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::AutomatableModelLink)
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
+		if (mod != nullptr)
+		{
+			bool added = m_clip->addObject(mod);
+			shouldAccept = added;
+			if (!added)
+			{
+				TextFloat::displayMessage(mod->displayName(),
+					tr("Model is already connected to this clip."),
+					embed::getIconPixmap("automation"), 2000);
+			}
+		}
+
+		update();
+
+		if (getGUI()->automationEditor()
+			&& getGUI()->automationEditor()->currentClip() == m_clip)
+		{
+			getGUI()->automationEditor()->setCurrentClip(m_clip);
+		}
+	}
+	
+	if (shouldAccept == false)
+	{
+		shouldAccept = ClipView::processPasteImplementation(type, value);
+	}
+	return shouldAccept;
+}
+*/
 
 
 
@@ -402,8 +438,9 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 
+	drawAutoHighlight(&p);
 	p.end();
-
+	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
@@ -412,7 +449,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent(_dee, Clipboard::DataType::AutomatableModelLink);
 	if( !_dee->isAccepted() )
 	{
 		ClipView::dragEnterEvent( _dee );
@@ -424,35 +461,14 @@ void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationClipView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "automatable_model" )
-	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if( mod != nullptr )
-		{
-			bool added = m_clip->addObject( mod );
-			if ( !added )
-			{
-				TextFloat::displayMessage( mod->displayName(),
-							   tr( "Model is already connected "
-							   "to this clip." ),
-							   embed::getIconPixmap( "automation" ),
-							   2000 );
-			}
-		}
-		update();
+	/*
+	bool shouldAccept = processPaste(_de->mimeData()); TODO
 
-		if( getGUI()->automationEditor() &&
-			getGUI()->automationEditor()->currentClip() == m_clip )
-		{
-			getGUI()->automationEditor()->setCurrentClip( m_clip );
-		}
-	}
-	else
+	if (shouldAccept)
 	{
-		ClipView::dropEvent( _de );
+		_de->accept();
 	}
+	*/
 }
 
 

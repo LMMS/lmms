@@ -62,7 +62,6 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
 
-
 private:
 	SampleClip * m_clip;
 	SampleThumbnail m_sampleThumbnail;
