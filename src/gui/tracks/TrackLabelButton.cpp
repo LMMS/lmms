@@ -27,6 +27,7 @@
 #include "TrackLabelButton.h"
 
 #include <QMouseEvent>
+#include <QSizePolicy>
 
 #include "ConfigManager.h"
 #include "embed.h"
@@ -54,17 +55,11 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	m_renameLineEdit = new TrackRenameLineEdit( this );
 	m_renameLineEdit->hide();
 	
-	if (isInCompactMode())
-	{
-		setFixedSize( 32, 29 );
-	}
-	else
-	{
-		setFixedSize( 160, 29 );
-		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
-	}
+	setFixedHeight(29);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	
 	setIconSize( QSize( 24, 24 ) );
+	connect(m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	connect( m_trackView->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect( m_trackView->getTrack(), SIGNAL(nameChanged()), this, SLOT(nameChanged()));
 }
@@ -243,7 +238,9 @@ QString TrackLabelButton::elideName( const QString &name )
 
 bool TrackLabelButton::isInCompactMode() const
 {
-	return ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const int spacing = 16;
+	const int maxTextWidth = width() - spacing - iconSize().width();
+	return maxTextWidth < 1;
 }
 
 } // namespace lmms::gui

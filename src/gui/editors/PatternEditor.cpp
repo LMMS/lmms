@@ -25,6 +25,7 @@
 #include "PatternEditor.h"
 
 #include <QAction>
+#include <QDomElement>
 
 #include "ClipView.h"
 #include "ComboBox.h"
@@ -115,11 +116,13 @@ void PatternEditor::removeViewsForPattern(int pattern)
 void PatternEditor::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
+	element.setAttribute("trackheadwidth", getTrackHeadWidth());
 }
 
 void PatternEditor::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+	setTrackHeadWidth(element.attribute("trackheadwidth", QString::number(getTrackHeadWidth())).toInt());
 }
 
 
@@ -238,11 +241,11 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	// TODO: Use style sheet
 	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
-		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 384);
+		setMinimumWidth(COMPACT_TRACK_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
 	}
 	else
 	{
-		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
+		setMinimumWidth(DEFAULT_TRACK_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
 	}
 
 	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
