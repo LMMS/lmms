@@ -174,26 +174,30 @@ protected:
 	void changeEvent(QEvent * ev) override;
 
 	/*!
-	 * Legacy mode affects how the label of the knob is rendered.
+	 * Affects how the label of the knob is rendered.
 	 *
-	 * In non-legacy mode (the default) the height of the label text is taken into account when a new fixed
+	 * The default mode returns false. The height of the label text is taken into account when a new fixed
 	 * size is computed for the Knob. When the label text is painted the descent of the font is used to
-	 * compute the base line.
+	 * compute the base line. The default mode returns false.
 	 * 
-	 * Enabling legacy mode leads to the following behavior:
+	 * Enabling fixed font size rendering mode leads to the following behavior:
 	 * * The height of the label is not taken into account when the new fixed height of the Knob is computed.
 	 *   Instead a fixed size of 10 is added for the label.
 	 * * When the knob is painted the baseline of the font is always set to 2 pixels away from the lower side
 	 *   of the Knob's rectangle.
+	 * * The label is always rendered with a size of SMALL_FONT_SIZE.
 	 */
-	bool legacyMode() const { return m_legacyMode; }
+	bool fixedFontSizeLabelRendering() const { return m_fixedFontSizeLabelRendering; }
 
 	/*!
-	 * Set the button to legacy mode (true) or non-legacy mode (false).
+	 * Set the button to legacy rendering mode which uses a fixed font size and that does not take the size
+	 * of the widget's font into account.
+	 * 
+	 * This can be thought of as a legacy mode which reinstates the old behavior of the knob.
 	 *
-	 * @see legacyMode().
+	 * @see fixedFontSizeLabelRendering().
 	 */
-	void setLegacyMode(bool legacyMode);
+	void setFixedFontSizeLabelRendering();
 
 private:
 	QLineF calculateLine( const QPointF & _mid, float _radius,
@@ -211,7 +215,7 @@ private:
 	void updateFixedSize();
 
 	QString m_label;
-	bool m_legacyMode = false;
+	bool m_fixedFontSizeLabelRendering = false;
 	bool m_isHtmlLabel;
 	QTextDocument* m_tdRenderer;
 

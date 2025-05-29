@@ -59,7 +59,7 @@ TempoSyncKnob::TempoSyncKnob(KnobType knobNum, const QString& labelText, QWidget
 
 	if (labelRendering == Knob::LabelRendering::LegacyFixedFontSize)
 	{
-		setLegacyMode(true);
+		setFixedFontSizeLabelRendering();
 	}
 }
 

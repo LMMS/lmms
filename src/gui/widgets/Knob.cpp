@@ -58,7 +58,7 @@ Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, LabelRen
 
 	if (labelRendering == LabelRendering::LegacyFixedFontSize)
 	{
-		setLegacyMode(true);
+		setFixedFontSizeLabelRendering();
 	}
 }
 
@@ -180,9 +180,9 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 	update();
 }
 
-void Knob::setLegacyMode(bool legacyMode)
+void Knob::setFixedFontSizeLabelRendering()
 {
-	m_legacyMode = legacyMode;
+	m_fixedFontSizeLabelRendering = true;
 
 	updateFixedSize();
 
@@ -191,7 +191,7 @@ void Knob::setLegacyMode(bool legacyMode)
 
 void Knob::updateFixedSize()
 {
-	if (legacyMode())
+	if (fixedFontSizeLabelRendering())
 	{
 		if (m_knobPixmap)
 		{
@@ -509,13 +509,13 @@ void Knob::drawLabel(QPainter& p)
 	{
 		if (!m_isHtmlLabel)
 		{
-			if (legacyMode())
+			if (fixedFontSizeLabelRendering())
 			{
 				p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			}
 			auto fm = p.fontMetrics();
 			const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
-			const auto descent = legacyMode() ? 2 : fm.descent();
+			const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
 			const auto y = height() - descent; 
 
 			p.setPen(textColor());
