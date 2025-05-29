@@ -31,6 +31,8 @@
 #include "LcdSpinBox.h"
 #include "PixmapButton.h"
 
+#include <QHBoxLayout>
+
 
 namespace lmms::gui
 {
@@ -43,39 +45,38 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
-	setFixedSize(207, 50);
+
+	auto layout = new QHBoxLayout(this);
 
 	LcdSpinBox * m_amountBox = new LcdSpinBox(3, this, "Amount");
 	m_amountBox->setModel(&controls->m_amountModel);
-	m_amountBox->move(5, 10);
 	m_amountBox->setLabel(tr("AMOUNT"));
 	m_amountBox->setToolTip(tr("Number of all-pass filters"));
 	
-	Knob * freqKnob = new Knob(KnobType::Bright26, this);
-	freqKnob->move(59, 8);
+	Knob * freqKnob = new Knob(KnobType::Bright26, tr("FREQ"), this);
 	freqKnob->setModel(&controls->m_freqModel);
-	freqKnob->setLabel(tr("FREQ"));
 	freqKnob->setHintText(tr("Frequency:") , " Hz");
 	
-	Knob * resoKnob = new Knob(KnobType::Bright26, this);
-	resoKnob->move(99, 8);
+	Knob * resoKnob = new Knob(KnobType::Bright26, tr("RESO"), this);
 	resoKnob->setModel(&controls->m_resoModel);
-	resoKnob->setLabel(tr("RESO"));
 	resoKnob->setHintText(tr("Resonance:") , " octaves");
 	
-	Knob * feedbackKnob = new Knob(KnobType::Bright26, this);
-	feedbackKnob->move(139, 8);
+	Knob * feedbackKnob = new Knob(KnobType::Bright26, tr("FEED"), this);
 	feedbackKnob->setModel(&controls->m_feedbackModel);
-	feedbackKnob->setLabel(tr("FEED"));
 	feedbackKnob->setHintText(tr("Feedback:") , "");
 	
 	PixmapButton * dcButton = new PixmapButton(this, tr("DC Offset Removal"));
-	dcButton->move(176, 16);
 	dcButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("dc_active"));
 	dcButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("dc_inactive"));
 	dcButton->setCheckable(true);
 	dcButton->setModel(&controls->m_dcModel);
 	dcButton->setToolTip(tr("Remove DC Offset"));
+
+	layout->addWidget(m_amountBox);
+	layout->addWidget(freqKnob);
+	layout->addWidget(resoKnob);
+	layout->addWidget(feedbackKnob);
+	layout->addWidget(dcButton);
 }
 
 
