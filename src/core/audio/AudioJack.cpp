@@ -56,7 +56,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_outBuf(new SampleFrame[framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
@@ -182,6 +182,8 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
@@ -226,6 +228,8 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_stopped = true;
 }
 
@@ -290,7 +294,6 @@ void AudioJack::renamePort(AudioBusHandle* port)
 
 int AudioJack::processCallback(jack_nframes_t nframes)
 {
-
 	// do midi processing first so that midi input can
 	// add to the following sound processing
 	if (m_midiClient && nframes > 0)
@@ -321,38 +324,11 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 #endif
 
-	jack_nframes_t done = 0;
-	while (done < nframes && !m_stopped)
+	if (!nextBuffer(m_tempOutBufs, nframes, channels(), false))
 	{
-		jack_nframes_t todo = std::min<jack_nframes_t>(nframes - done, m_framesToDoInCurBuf - m_framesDoneInCurBuf);
-		for (int c = 0; c < channels(); ++c)
+		for (int channel = 0; channel < channels(); ++channel)
 		{
-			jack_default_audio_sample_t* o = m_tempOutBufs[c];
-			for (jack_nframes_t frame = 0; frame < todo; ++frame)
-			{
-				o[done + frame] = m_outBuf[m_framesDoneInCurBuf + frame][c];
-			}
-		}
-		done += todo;
-		m_framesDoneInCurBuf += todo;
-		if (m_framesDoneInCurBuf == m_framesToDoInCurBuf)
-		{
-			m_framesToDoInCurBuf = getNextBuffer(m_outBuf);
-			m_framesDoneInCurBuf = 0;
-			if (!m_framesToDoInCurBuf)
-			{
-				m_stopped = true;
-				break;
-			}
-		}
-	}
-
-	if (nframes != done)
-	{
-		for (int c = 0; c < channels(); ++c)
-		{
-			jack_default_audio_sample_t* b = m_tempOutBufs[c] + done;
-			memset(b, 0, sizeof(*b) * (nframes - done));
+			std::fill_n(m_tempOutBufs[channel], nframes * channels(), 0.f);
 		}
 	}
 

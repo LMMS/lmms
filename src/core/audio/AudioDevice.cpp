@@ -31,12 +31,16 @@
 namespace lmms
 {
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
-	m_supportsCapture( false ),
-	m_sampleRate( _audioEngine->outputSampleRate() ),
-	m_channels( _channels ),
-	m_audioEngine( _audioEngine ),
-	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
+AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
+	: m_supportsCapture(false)
+	, m_framesPerPeriod(
+		  std::clamp<fpp_t>(ConfigManager::inst()
+								->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
+								.toULong(),
+			  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
+	, m_sampleRate(_audioEngine->outputSampleRate())
+	, m_channels(_channels)
+	, m_audioEngine(_audioEngine)
 {
 }
 
@@ -45,53 +49,76 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 
 AudioDevice::~AudioDevice()
 {
-	delete[] m_buffer;
 	m_devMutex.tryLock();
 	unlock();
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
+bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t dstChannelCount, bool interleaved)
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if (frames) { writeBuffer(m_buffer, frames); }
-	else
+	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
-		m_inProcess = false;
+		m_running.clear(std::memory_order_release);
+		return false;
 	}
-}
 
-fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
-{
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->nextBuffer();
-
-	if (!b) { return 0; }
-
-	memcpy(_ab, b, frames * sizeof(SampleFrame));
-
-	if (audioEngine()->hasFifoWriter()) { delete[] b; }
-	return frames;
-}
-
-
-
-
-void AudioDevice::stopProcessing()
-{
-	if( audioEngine()->hasFifoWriter() )
+	if (!dst)
 	{
-		while( m_inProcess )
+		m_audioEngine->renderNextBuffer();
+		return true;
+	}
+
+	for (auto dstFrameIndex = std::size_t{0}; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
+	{
+		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
+
+		const auto srcFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
+
+		if (interleaved)
 		{
-			processNextBuffer();
+			const auto dstBuffer = static_cast<float*>(dst);
+			
+			if (dstChannelCount == 1)
+			{
+				dstBuffer[dstFrameIndex] = srcFrame.average();
+			}
+			else
+			{
+				dstBuffer[dstFrameIndex * dstChannelCount] = srcFrame.left(); 
+				dstBuffer[dstFrameIndex * dstChannelCount + 1] = srcFrame.right();
+
+				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
+				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
+				{
+					std::fill_n(dstBuffer + (dstFrameIndex + 2) * dstChannelCount, dstChannelCount - 2, 0.f);
+				}
+			}
 		}
+		else
+		{
+			const auto dstBuffer = static_cast<float**>(dst);
+
+			if (dstChannelCount == 1)
+			{
+				dstBuffer[0][dstFrameIndex] = srcFrame.average();
+			}
+			else
+			{
+				dstBuffer[0][dstFrameIndex] = srcFrame.left();
+				dstBuffer[1][dstFrameIndex] = srcFrame.right();
+
+				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
+				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
+				{
+					std::fill_n(dstBuffer[channel], dstFrameCount, 0.f);
+				}
+			}
+		}
+
+		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
 	}
+
+	return true;
 }
-
-
-
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
