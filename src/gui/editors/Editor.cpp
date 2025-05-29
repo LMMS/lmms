@@ -89,55 +89,51 @@ void Editor::toggleMaximize()
 	isMaximized() ? showNormal() : showMaximized();
 }
 
-Editor::Editor(bool record, bool recordAccompany, bool stepRecord) :
-	m_toolBar(new DropToolBar(this)),
-	m_playAction(nullptr),
-	m_recordAction(nullptr),
-	m_recordAccompanyAction(nullptr),
-	m_toggleStepRecordingAction(nullptr),
-	m_stopAction(nullptr)
+Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
+    m_toolBar(new DropToolBar(this)),
+    m_playAction(nullptr),
+    m_recordAction(nullptr),
+    m_recordAccompanyAction(nullptr),
+    m_toggleStepRecordingAction(nullptr),
+    m_stopAction(nullptr)
 {
-	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
+    m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
-	auto addButton = [this](QAction* action, QString objectName) {
-		m_toolBar->addAction(action);
-		m_toolBar->widgetForAction(action)->setObjectName(objectName);
-	};
+    auto addButton = [this](QAction* action, QString objectName) {
+        m_toolBar->addAction(action);
+        m_toolBar->widgetForAction(action)->setObjectName(objectName);
+    };
 
-	auto createConditionalButton = [this, &addButton](
-		bool condition,
-		QAction*& targetAction,
-		const char* iconName,
-		const QString& text,
-		const char* slot,
-		const QString& objectName
-	) {
-		if (condition) {
-			targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
-			connect(targetAction, SIGNAL(triggered()), this, slot);
-			addButton(targetAction, objectName);
-		}
-	};
+    auto createButton = [this, &addButton](
+        QAction*& targetAction,
+        const char* iconName,
+        const QString& text,
+        const char* slot,
+        const QString& objectName,
+        bool condition = true
+    ) {
+        if (condition) {
+            targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
+            connect(targetAction, SIGNAL(triggered()), this, slot);
+            addButton(targetAction, objectName);
+        }
+    };
 
-	// Play action setup
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	addButton(m_playAction, "playButton");
+    // Play action setup
+    createButton(m_playAction, "play", tr("Play (Space)"), SLOT(play()), "playButton");
 
-	// Conditional record, recordAccompany and stepRecord setup
-	createConditionalButton(record, m_recordAction, "record", tr("Record"), SLOT(record()), "recordButton");
-	createConditionalButton(recordAccompany, m_recordAccompanyAction, "record_accompany", tr("Record while playing"), SLOT(recordAccompany()), "recordAccompanyButton");
-	createConditionalButton(stepRecord, m_toggleStepRecordingAction, "record_step_off", tr("Toggle Step Recording"), SLOT(toggleStepRecording()), "stepRecordButton");
+    // Conditional buttons setup
+    createButton(m_recordAction, "record", tr("Record"), SLOT(record()), "recordButton", record);
+    createButton(m_recordAccompanyAction, "record_accompany", tr("Record while playing"), SLOT(recordAccompany()), "recordAccompanyButton", recordAccompany);
+    createButton(m_toggleStepRecordingAction, "record_step_off", tr("Toggle Step Recording"), SLOT(toggleStepRecording()), "stepRecordButton", recordStep);
 
-	// Stop action setup
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
-	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	addButton(m_stopAction, "stopButton");
+    // Stop action setup
+    createButton(m_stopAction, "stop", tr("Stop (Space)"), SLOT(stop()), "stopButton");
 
-	// Shortcuts for actions setup
-	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
+    // Shortcuts setup
+    new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
+    new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
+    new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
 }
 
 QAction *Editor::playAction() const
