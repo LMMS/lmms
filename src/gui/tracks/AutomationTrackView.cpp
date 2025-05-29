@@ -59,10 +59,8 @@ void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
-	auto data = Clipboard::decodeMimeData(_de->mimeData());
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
 
-	QString type = data.first;
-	QString value = data.second;
 	if( type == "automatable_model" )
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));

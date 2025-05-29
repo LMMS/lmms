@@ -226,10 +226,8 @@ void TrackView::dragEnterEvent( QDragEnterEvent * dee )
  */
 void TrackView::dropEvent(QDropEvent* de)
 {
-	auto data = Clipboard::decodeMimeData(de->mimeData());
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
-	QString type = data.first;
-	QString value = data.second;
 	if( type == ( "track_" + QString::number( static_cast<int>(m_track->type()) ) ) )
 	{
 		// value contains our XML-data so simply create a

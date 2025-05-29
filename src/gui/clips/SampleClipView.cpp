@@ -129,10 +129,7 @@ void SampleClipView::dragEnterEvent(QDragEnterEvent* event)
 
 void SampleClipView::dropEvent(QDropEvent* _de )
 {
-	auto data = Clipboard::decodeMimeData(_de->mimeData());
-
-	QString type = data.first;
-	QString value = data.second;
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
 
 	if (type == "samplefile")
 	{
