@@ -117,7 +117,7 @@ void SampleClipView::dragEnterEvent(QDragEnterEvent* event)
 			QString path = urls.first().toLocalFile();
 			QString ext = QFileInfo(path).suffix().toLower();
 
-			if (Clipboard::audioExtensions.contains(ext))
+			if (Clipboard::isAudioFile(ext))
 			{
 				event->acceptProposedAction();
 				return;

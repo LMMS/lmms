@@ -33,6 +33,8 @@
 
 #include "lmms_export.h"
 
+#include "SampleDecoder.h"
+
 namespace lmms::gui {
 class FileItem;
 }
@@ -51,19 +53,31 @@ const QStringList vstPluginExtensions{"dll"};
 #else
 const QStringList vstPluginExtensions{"dll", "so"};
 #endif
-
-#ifdef LMMS_HAVE_SNDFILE_MP3
-const QStringList audioExtensions{"wav", "ogg", "ds", "flac", "spx", "voc", "aif", "aiff", "au", "raw", "mp3"};
-#else
-const QStringList audioExtensions{"wav", "ogg", "ds", "flac", "spx", "voc", "aif", "aiff", "au", "raw"};
-#endif
+inline QStringList audioExtensions{};
 
 inline QString getExtension(const QString& file)
 {
 	const QStringList parts = file.split('.');
 	return parts.isEmpty() ? file.toLower() : parts.last().toLower();
 }
-inline bool isAudioFile(const QString& ext)     { return audioExtensions.contains(getExtension(ext)); }
+
+void updateExtensionLists()
+{
+	for (const SampleDecoder::AudioType& at : SampleDecoder::supportedAudioTypes())
+	{
+		audioExtensions += QString::fromStdString(at.extension);
+	}
+}
+
+inline bool isAudioFile(const QString& ext)
+{
+	if (audioExtensions.isEmpty())
+	{
+		updateExtensionLists();
+	}
+
+	return audioExtensions.contains(getExtension(ext));
+}
 inline bool isProjectFile(const QString& ext)   { return projectExtensions.contains(getExtension(ext)); }
 inline bool isPresetFile(const QString& ext)    { return presetExtensions.contains(getExtension(ext)); }
 inline bool isSoundFontFile(const QString& ext) { return soundFontExtensions.contains(getExtension(ext)); }
