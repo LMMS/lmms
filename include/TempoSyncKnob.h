@@ -43,6 +43,15 @@ class LMMS_EXPORT TempoSyncKnob : public Knob
 public:
 	TempoSyncKnob( KnobType knobNum, QWidget* parent = nullptr, const QString& name = QString() );
 
+	/**
+	 * @brief Construct a TempoSyncKnob with the given style and label text.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param parent Parent widget
+	 * @param labelRendering Determines if the label uses the widget font or a font with a fixed size of 12 pixels (LegacyFixedFontSize). The default is to use the widget font.
+	 * @param name Object name of the widget
+	 */
 	TempoSyncKnob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, LabelRendering labelRendering = LabelRendering::WidgetFont, const QString& name = QString());
 
 	/**
