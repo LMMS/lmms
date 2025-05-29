@@ -76,7 +76,6 @@ SET(LMMS_PLUGIN_LIST
 	Vibed
 	Xpressive
 	ZynAddSubFx
-	ExampleEffect
 )
 
 IF("${PLUGIN_LIST}" STREQUAL "")
