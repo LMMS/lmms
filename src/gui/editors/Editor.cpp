@@ -97,30 +97,31 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 	m_toggleStepRecordingAction(nullptr),
 	m_stopAction(nullptr)
 {
-    m_toolBar = addDropToolBarToTop(tr("Transport controls"));
+	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
-    auto addButton = [this](QAction* action, QString objectName) {
-        m_toolBar->addAction(action);
-        m_toolBar->widgetForAction(action)->setObjectName(objectName);
-    };
+	auto createButton = [this](
+		QAction*& targetAction,
+		const char* iconName,
+		const QString& text,
+		const char* slot,
+		const QString& objectName,
+		bool condition = true
+	) {
+		if (condition) {
+			targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
+			connect(targetAction, SIGNAL(triggered()), this, slot);
+			m_toolBar->addAction(targetAction);
+			m_toolBar->widgetForAction(targetAction)->setObjectName(objectName);
+		}
+	};
 
-    auto createButton = [this, &addButton](
-        QAction*& targetAction,
-        const char* iconName,
-        const QString& text,
-        const char* slot,
-        const QString& objectName,
-        bool condition = true
-    ) {
-        if (condition) {
-            targetAction = new QAction(embed::getIconPixmap(iconName), text, this);
-            connect(targetAction, SIGNAL(triggered()), this, slot);
-            addButton(targetAction, objectName);
-        }
-    };
+	// Play action setup
+	createButton(m_playAction, "play", tr("Play (Space)"), SLOT(play()), "playButton");
 
-    // Play action setup
-    createButton(m_playAction, "play", tr("Play (Space)"), SLOT(play()), "playButton");
+	// Conditional buttons setup
+	createButton(m_recordAction, "record", tr("Record"), SLOT(record()), "recordButton", record);
+	createButton(m_recordAccompanyAction, "record_accompany", tr("Record while playing"), SLOT(recordAccompany()), "recordAccompanyButton", recordAccompany);
+	createButton(m_toggleStepRecordingAction, "record_step_off", tr("Toggle Step Recording"), SLOT(toggleStepRecording()), "stepRecordButton", recordStep);
 
 	// Record action setup
 	if (record)
