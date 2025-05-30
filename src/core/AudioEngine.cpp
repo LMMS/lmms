@@ -74,7 +74,7 @@ namespace lmms
 using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread = false;
-static const f_cnt_t FIXED_INPUT_BUFFER_CAPACITY = DEFAULT_BUFFER_SIZE * 64;
+static const f_cnt_t FIXED_INPUT_BUFFER_CAPACITY = DEFAULT_BUFFER_SIZE * 100;
 
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
