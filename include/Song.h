@@ -33,6 +33,7 @@
 
 #include "AudioEngine.h"
 #include "Controller.h"
+#include "ExternalSync.h"
 #include "Metronome.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
@@ -414,7 +415,9 @@ private slots:
 
 	void updateFramesPerTick();
 
-
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	void onPlaybackStateChanged();
+#endif
 
 private:
 	Song();

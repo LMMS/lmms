@@ -38,6 +38,7 @@
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "EnvelopeAndLfoParameters.h"
+#include "ExternalSync.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -110,6 +111,10 @@ Song::Song() :
 
 	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
 						SLOT(updateFramesPerTick()));
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	connect( this, SIGNAL( playbackStateChanged() ), this, SLOT( onPlaybackStateChanged() ) );
+#endif
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
@@ -245,6 +250,10 @@ void Song::processNextBuffer()
 			setToTime(begin);
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
+#ifdef LMMS_HAVE_EXTERNALSYNC
+			//Invoked LMMS change plaing position in loop mode
+			SyncHook::jump();
+#endif
 			return true;
 		}
 		return false;
@@ -658,6 +667,13 @@ void Song::stop()
 	auto& timeline = getTimeline();
 	m_paused = false;
 	m_recording = true;
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	if (m_playMode < Song::PlayMode::Pattern) 
+	{ 
+		//Invoke on stop event, but only plaing song. 
+		SyncHook::jump();	// exSyncSendPosition(); 
+	}
+#endif
 	m_playing = false;
 
 	switch (timeline.stopBehaviour())
@@ -1422,6 +1438,16 @@ void Song::updateFramesPerTick()
 }
 
 
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+void Song::onPlaybackStateChanged()
+{
+	if (m_playMode < Song::PlayMode::Pattern) 
+	{
+		if (m_playing) { SyncHook::start(); } else { SyncHook::stop(); }
+	}
+}
+#endif
 
 
 void Song::setModified()

@@ -30,6 +30,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
+#include <QPushButton> 
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
@@ -44,6 +45,7 @@
 #include "CPULoadWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
+#include "ExternalSync.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -56,6 +58,7 @@
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "TrackView.h"
+
 
 namespace lmms::gui
 {
@@ -71,6 +74,7 @@ constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f}
 constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
 
 }
+
 
 
 
@@ -102,6 +106,11 @@ SongEditor::SongEditor( Song * song ) :
 		m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, Song::PlayMode::Song, this
 	);
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	m_timeLine->syncSetShouldSend(); // Mark TimeLineWidget for ExternalSync 
+#endif
+
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
@@ -227,6 +236,22 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->addStretch();
 
 	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+	// ExSync toggle On/Off button:
+	m_syncButton = new QPushButton(tr("ExSync") , tb);
+	m_syncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
+	m_syncButton->setStyleSheet("background-color:black");
+	m_syncButton->setFocusPolicy(Qt::NoFocus);
+	connect(m_syncButton, SIGNAL(clicked()), this, SLOT(toggleSync()));
+	int syncBoxCol = getGUI()->mainWindow()->addWidgetToToolBar(m_syncButton, 0);
+	// ExSync toggle mode button:
+	m_syncModeButton = new QPushButton(syncGetModeString(SyncCtl::getMode()) , tb);
+	m_syncModeButton->setToolTip(tr("toggle [Leader] , [Follower] , [Duplex]"));
+	m_syncModeButton->setFocusPolicy(Qt::NoFocus);
+	connect(m_syncModeButton, SIGNAL(clicked()), this, SLOT(toggleSyncMode()));
+	getGUI()->mainWindow()->addWidgetToToolBar(m_syncModeButton, 1, syncBoxCol);
+#endif
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -711,6 +736,51 @@ void SongEditor::hideMasterPitchFloat( void )
 {
 	m_mpsStatus->hide();
 }
+
+
+
+
+#ifdef LMMS_HAVE_EXTERNALSYNC
+
+
+const char * SongEditor::syncGetModeString(enum SyncCtl::SyncMode mode)
+{
+	static const char * syncModeStrings[SyncCtl::Last]
+										= {"Leader", "Follower", "Duplex"};
+	const char *result = "";
+	if (mode < SyncCtl::Last) 
+	{ 
+		result = syncModeStrings[mode]; 
+	}
+	return result;
+}
+
+
+
+
+void SongEditor::toggleSync()
+{
+	bool on = SyncCtl::toggleOnOff();
+	if (on)
+	{
+		m_syncButton->setStyleSheet("background-color:green;");
+		m_syncModeButton->setText( syncGetModeString(SyncCtl::getMode()) );
+	} else {
+		m_syncButton->setStyleSheet("background-color:black");
+	}
+	if (!SyncCtl::have()) { m_syncModeButton->setText(""); }
+}
+
+
+
+
+void SongEditor::toggleSyncMode()
+{
+	enum SyncCtl::SyncMode mode = SyncCtl::toggleMode();
+	m_syncModeButton->setText(syncGetModeString(mode));
+}
+
+#endif // LMMS_HAVE_EXTERNALSYNC
 
 
 
