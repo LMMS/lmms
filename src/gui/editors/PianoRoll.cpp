@@ -1537,6 +1537,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			// if a chord is set, simulate click release on all chord notes
 			pauseChordNotes(key_num);
 			ke->accept();
+			return;
 		}
 	}
 
