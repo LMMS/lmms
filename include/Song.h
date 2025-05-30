@@ -238,7 +238,7 @@ public:
 			m_loopRenderCount = count;
 		m_loopRenderRemaining = m_loopRenderCount;
 	}
-    
+		
 	inline int getLoopRenderCount() const
 	{
 		return m_loopRenderCount;
@@ -502,7 +502,7 @@ private:
 	bar_t m_elapsedBars;
 
 	VstSyncController m_vstSyncController;
-    
+	
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
 	TimePos m_exportSongBegin;
