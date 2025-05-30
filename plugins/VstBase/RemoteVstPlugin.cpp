@@ -946,7 +946,7 @@ void RemoteVstPlugin::destroyEditor()
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
 #ifndef NATIVE_LINUX_VST
-	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == nullptr )
+	if ((m_libInst = LoadLibraryW(toWString(_plugin_file).get())) == nullptr)
 	{
 		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );

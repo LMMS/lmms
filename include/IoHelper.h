@@ -28,6 +28,10 @@
 #include "lmmsconfig.h"
 
 #include <cstdio>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+#include <string>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -47,17 +51,37 @@ namespace lmms
 
 #ifdef _WIN32
 
-inline std::wstring toWString(const std::string& s)
+// NOTE: Not using std::wstring because it does not work correctly when building with wineg++
+inline std::unique_ptr<wchar_t[]> toWString(const std::string& utf8)
 {
-	std::wstring ret;
-	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
-			s.length(), nullptr, 0);
-	if (len == 0)
+	std::unique_ptr<wchar_t[]> ret;
+	if (utf8.empty())
 	{
+		ret = std::make_unique<wchar_t[]>(1);
 		return ret;
 	}
-	ret.resize(len);
-	MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s.length(), &ret[0], len);
+
+	if (utf8.length() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+	{
+		throw std::overflow_error{"toWString: input string is too long"};
+	}
+	const auto utf8Len = static_cast<int>(utf8.length());
+
+	int result = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.data(), utf8Len, nullptr, 0);
+	if (result <= 0)
+	{
+		const DWORD error = ::GetLastError();
+		throw std::invalid_argument{"toWString: failed to get size of result string. error code: " + std::to_string(error)};
+	}
+
+	ret = std::make_unique<wchar_t[]>(result);
+	result = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.data(), utf8Len, ret.get(), result);
+	if (result <= 0)
+	{
+		const DWORD error = ::GetLastError();
+		throw std::invalid_argument{"toWString: failed to convert. error code: " + std::to_string(error)};
+	}
+
 	return ret;
 }
 
@@ -66,7 +90,7 @@ inline std::wstring toWString(const std::string& s)
 
 inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
 #ifdef LMMS_BUILD_WIN32
-	return _wfopen(toWString(fname).data(), toWString(mode).data());
+	return _wfopen(toWString(fname).get(), toWString(mode).get());
 #else
 	return fopen(fname.data(), mode);
 #endif
