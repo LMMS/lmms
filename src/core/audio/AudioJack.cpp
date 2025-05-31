@@ -218,7 +218,38 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 	m_inputFrameBuffer.resize(nframes);
 }
 
+void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
+{
+	printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
+	if (!jack_connect(m_client, source_port, destination_port))
+	{
+		printf(" - Success!\n");
+	}
+	else
+	{
+		printf(" - Failure\n");
+	}
+}
 
+void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
+{
+	if (outputIndex > m_outputPorts.size()) return;
+
+	auto outputName = jack_port_name(m_outputPorts[outputIndex]);
+	auto targetName = targetPort.toLatin1().constData();
+
+	attemptToConnect(outputIndex, "output", outputName, targetName);
+}
+
+void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
+{
+	if (inputIndex > m_inputPorts.size()) return;
+
+	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
+	auto sourceName = sourcePort.toLatin1().constData();
+
+	attemptToConnect(inputIndex, "input", sourceName, inputName);
+}
 
 
 void AudioJack::startProcessing()
@@ -240,26 +271,15 @@ void AudioJack::startProcessing()
 	// try to sync JACK's and LMMS's buffer-size
 	//	jack_set_buffer_size( m_client, audioEngine()->framesPerPeriod() );
 
-	const char** ports = jack_get_ports(m_client, nullptr, nullptr, JackPortIsPhysical | JackPortIsInput);
-	if (ports == nullptr)
-	{
-		printf("no physical playback ports. you'll have to do "
-			   "connections at your own!\n");
-	}
-	else
-	{
-		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
-		{
-			if (jack_connect(m_client, jack_port_name(m_outputPorts[ch]), ports[ch]))
-			{
-				printf("cannot connect output ports. you'll "
-					   "have to do connections at your own!\n");
-			}
-		}
-	}
+	const auto cm = ConfigManager::inst();
+
+	attemptToReconnectOutput(0, cm->value("audiojack", "output1"));
+	attemptToReconnectOutput(1, cm->value("audiojack", "output2"));
+
+	attemptToReconnectInput(0, cm->value("audiojack", "input1"));
+	attemptToReconnectInput(1, cm->value("audiojack", "input2"));
 
 	m_stopped = false;
-	jack_free(ports);
 }
 
 
