@@ -26,9 +26,12 @@
 
 #ifdef LMMS_HAVE_JACK
 
+#include <QComboBox>
 #include <QFormLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QStringList>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -36,6 +39,17 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
+
+
+namespace
+{
+static const QString audioJackClass("audiojack");
+static const QString clientNameKey("clientname");
+static const QString output1Key("output1");
+static const QString output2Key("output2");
+static const QString input1Key("input1");
+static const QString input2Key("input2");
+}
 
 namespace lmms
 {
@@ -128,11 +142,9 @@ AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 }
 
 
-
-
 bool AudioJack::initJackClient()
 {
-	QString clientName = ConfigManager::inst()->value("audiojack", "clientname");
+	QString clientName = ConfigManager::inst()->value(audioJackClass, clientNameKey);
 	if (clientName.isEmpty()) { clientName = "lmms"; }
 
 	const char* serverName = nullptr;
@@ -196,7 +208,38 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 	m_inputFrameBuffer.resize(nframes);
 }
 
+void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
+{
+	printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
+	if (!jack_connect(m_client, source_port, destination_port))
+	{
+		printf(" - Success!\n");
+	}
+	else
+	{
+		printf(" - Failure\n");
+	}
+}
 
+void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
+{
+	if (outputIndex > m_outputPorts.size()) return;
+
+	auto outputName = jack_port_name(m_outputPorts[outputIndex]);
+	auto targetName = targetPort.toLatin1().constData();
+
+	attemptToConnect(outputIndex, "output", outputName, targetName);
+}
+
+void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
+{
+	if (inputIndex > m_inputPorts.size()) return;
+
+	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
+	auto sourceName = sourcePort.toLatin1().constData();
+
+	attemptToConnect(inputIndex, "input", sourceName, inputName);
+}
 
 
 void AudioJack::startProcessing()
@@ -218,26 +261,15 @@ void AudioJack::startProcessing()
 	// try to sync JACK's and LMMS's buffer-size
 	//	jack_set_buffer_size( m_client, audioEngine()->framesPerPeriod() );
 
-	const char** ports = jack_get_ports(m_client, nullptr, nullptr, JackPortIsPhysical | JackPortIsInput);
-	if (ports == nullptr)
-	{
-		printf("no physical playback ports. you'll have to do "
-			   "connections at your own!\n");
-	}
-	else
-	{
-		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
-		{
-			if (jack_connect(m_client, jack_port_name(m_outputPorts[ch]), ports[ch]))
-			{
-				printf("cannot connect output ports. you'll "
-					   "have to do connections at your own!\n");
-			}
-		}
-	}
+	const auto cm = ConfigManager::inst();
+
+	attemptToReconnectOutput(0, cm->value(audioJackClass, output1Key));
+	attemptToReconnectOutput(1, cm->value(audioJackClass, output2Key));
+
+	attemptToReconnectInput(0, cm->value(audioJackClass, input1Key));
+	attemptToReconnectInput(1, cm->value(audioJackClass, input2Key));
 
 	m_stopped = false;
-	jack_free(ports);
 }
 
 
@@ -411,13 +443,62 @@ void AudioJack::shutdownCallback(void* udata)
 AudioJack::setupWidget::setupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioJack::name(), parent)
 {
-	QFormLayout * form = new QFormLayout(this);
+	const char* serverName = nullptr;
+	jack_status_t status;
+	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
 
-	QString cn = ConfigManager::inst()->value("audiojack", "clientname");
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	QFormLayout * form = new QFormLayout(this);
+	mainLayout->addLayout(form);
+
+	const auto cm = ConfigManager::inst();
+	QString cn = cm->value(audioJackClass, clientNameKey);
 	if (cn.isEmpty()) { cn = "lmms"; }
 	m_clientName = new QLineEdit(cn, this);
 
 	form->addRow(tr("Client name"), m_clientName);
+
+	// This variable stores if all ports from the configuration
+	// could be found in the current system, i.e. that no device
+	// has been disconnected during invocations of LMMS.
+	bool allPortsFound = true;
+
+	// Outputs
+	const auto audioOutputNames = getAudioOutputNames();
+
+	m_outputDevice1 = new QComboBox(this);
+	const auto output1 = cm->value(audioJackClass, output1Key);
+	allPortsFound &= populateComboBox(m_outputDevice1, audioOutputNames, output1);
+	form->addRow(tr("Output 1"), m_outputDevice1);
+
+	m_outputDevice2 = new QComboBox(this);
+	const auto output2 = cm->value(audioJackClass, output2Key);
+	allPortsFound &= populateComboBox(m_outputDevice2, audioOutputNames, output2);
+	form->addRow(tr("Output 2"), m_outputDevice2);
+
+	// Inputs
+	const auto audioInputNames = getAudioInputNames();
+
+	m_inputDevice1 = new QComboBox(this);
+	const auto input1 = cm->value(audioJackClass, input1Key);
+	allPortsFound &= populateComboBox(m_inputDevice1, audioInputNames, input1);
+	form->addRow(tr("Input 1"), m_inputDevice1);
+
+	m_inputDevice2 = new QComboBox(this);
+	const auto input2 = cm->value(audioJackClass, input2Key);
+	allPortsFound &= populateComboBox(m_inputDevice2, audioInputNames, input2);
+	form->addRow(tr("Input 2"), m_inputDevice2);
+
+	if (!allPortsFound)
+	{
+		mainLayout->addWidget(new QLabel(tr("Some inputs/outputs could not be found and have been reset!"), this));
+	}
+
+	if (m_client != nullptr)
+	{
+		jack_deactivate(m_client);
+		jack_client_close(m_client);
+	}
 }
 
 
@@ -425,7 +506,56 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 void AudioJack::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
+	ConfigManager::inst()->setValue(audioJackClass, clientNameKey, m_clientName->text());
+	ConfigManager::inst()->setValue(audioJackClass, output1Key, m_outputDevice1->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, output2Key, m_outputDevice2->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, input1Key, m_inputDevice1->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, input2Key, m_inputDevice2->currentText());
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
+{
+	std::vector<std::string> audioPorts;
+
+	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, portFlags);
+	if (inputAudioPorts)
+	{
+		for (int i = 0; inputAudioPorts[i] != nullptr; ++i)
+		{
+			auto currentPortName = inputAudioPorts[i];
+			printf("Port %d: %s\n", i, currentPortName);
+
+			audioPorts.push_back(currentPortName);
+		}
+		jack_free(inputAudioPorts); // Remember to free after use
+	}
+
+	return audioPorts;
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioOutputNames() const
+{
+	return getAudioPortNames(JackPortIsInput);
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
+{
+	return getAudioPortNames(JackPortIsOutput);
+}
+
+bool AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry)
+{
+	QStringList playbackDevices;
+	for (const auto & inputName : inputNames)
+	{
+		playbackDevices.append(QString::fromStdString(inputName));
+	}
+
+	comboBox->addItems(playbackDevices);
+
+	comboBox->setCurrentText(selectedEntry);
+
+	return comboBox->findText(selectedEntry) >= 0;
 }
 
 
