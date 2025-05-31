@@ -292,7 +292,7 @@ public:
 
 	inline const SampleFrame* inputBuffer()
 	{
-		return m_inputBuffer[ m_inputBufferRead ];
+		return m_inputBuffer[m_inputBufferRead];
 	}
 
 	inline f_cnt_t inputBufferFrames() const
