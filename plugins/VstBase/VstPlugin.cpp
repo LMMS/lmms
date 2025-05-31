@@ -47,8 +47,6 @@
 #	include <QLayout>
 #endif
 
-#include <QGuiApplication>
-
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
@@ -406,7 +404,7 @@ bool VstPlugin::processMessage( const message & _m )
 	{
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if (m_embedMethod == "none" && !QGuiApplication::platformName().toLower().contains("wayland")
+		if (m_embedMethod == "none" && !gui::GuiApplication::isWayland()
 			&& ConfigManager::inst()->value("ui", "vstalwaysontop").toInt())
 		{
 #ifdef LMMS_BUILD_WIN32
