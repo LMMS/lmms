@@ -1287,7 +1287,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		const int len = pluginDispatch(effGetChunk, 0, 0, &chunk);
 		if( len > 0 )
 		{
-			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			FILE* fp = fopenUtf8(_file, "wb");
 			if (!fp)
 			{
 				fprintf( stderr,
@@ -1469,7 +1469,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	bank.numPrograms = endian_swap(uIntToFile);
 
-	FILE * stream = F_OPEN_UTF8( _file, "wb" );
+	FILE* stream = fopenUtf8(_file, "wb");
 	if (!stream)
 	{
 		fprintf( stderr,
@@ -1533,7 +1533,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int pLen = 0;
 	unsigned int len = 0;
 	auto bank = Bank{};
-	FILE * stream = F_OPEN_UTF8( _file, "rb" );
+	FILE* stream = fopenUtf8(_file, "rb");
 	if (!stream)
 	{
 		fprintf( stderr,
@@ -1656,7 +1656,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 void RemoteVstPlugin::loadChunkFromFile(const std::string& _file, std::size_t _len)
 {
-	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	FILE* fp = fopenUtf8(_file, "rb");
 	if (!fp)
 	{
 		fprintf( stderr,

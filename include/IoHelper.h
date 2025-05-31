@@ -88,11 +88,12 @@ inline std::unique_ptr<wchar_t[]> toWString(const std::string& utf8)
 #endif
 
 
-inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
+inline FILE* fopenUtf8(const std::string& utf8Filename, const char* mode)
+{
 #ifdef LMMS_BUILD_WIN32
-	return _wfopen(toWString(fname).get(), toWString(mode).get());
+	return _wfopen(toWString(utf8Filename).get(), toWString(mode).get());
 #else
-	return fopen(fname.data(), mode);
+	return fopen(utf8Filename.data(), mode);
 #endif
 }
 
