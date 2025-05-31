@@ -434,13 +434,14 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			const auto inputCallback = [&](float* dst, long frames, int channels) {
 				assert(channels == DEFAULT_CHANNELS);
 				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
+				sample.pos += frames;
+				sample.adsr.inc(frames);
 				return frames;
 			};
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
-			const auto amplitude = copy.value();
 
 			constexpr auto mixBufSize = 64;
 			auto mixBuf = std::array<SampleFrame, mixBufSize>{};
@@ -449,15 +450,15 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			while (numFramesMixed < frames)
 			{
 				const auto result = sample.m_resampler.process(&mixBuf[0][0], mixBuf.size(), freq_factor, inputCallback);
-				sample.pos += result.inputFramesUsed;
-				sample.adsr.inc(result.inputFramesUsed);
 
-				for (auto i = std::size_t{0}; i < result.outputFramesGenerated; ++i)
+				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, result.outputFramesGenerated);
+				for (auto i = std::size_t{0}; i < framesToMix; ++i)
 				{
+					const auto amplitude = copy.value();
 					_working_buffer[numFramesMixed + i] += mixBuf[i] * amplitude;
 				}
 
-				numFramesMixed += result.outputFramesGenerated;
+				numFramesMixed += framesToMix;
 			}
 		}
 	}

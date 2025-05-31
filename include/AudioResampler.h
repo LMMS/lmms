@@ -49,11 +49,13 @@ public:
 
 	//! Writes data into @p dst.
 	//! @p dst is of size `channels() * frames`.
+	//! Clients are expected to advance their data streams as necessary.
 	//! @return The number of frames written into @p dst.
 	using InputCallback = std::function<long(float* dst, long frames, int channels)>;
 
 	//! Reads all data from @p src.
 	//! Must acknowledge reading all data given to it.
+	//! Clients are expected to advance their data streams as necessary.
 	//! @p src is of size `channels() * frames`.
 	using OutputCallback = std::function<void(const float* src, long frames, int channels)>;
 
