@@ -57,7 +57,7 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::process(float* dst, long frames, double ratio, InputCallback callback) -> Result
+auto AudioResampler::process(float* dst, long frames, double ratio, InputCallback callback) -> long
 {
 	auto data = SRC_DATA{.data_in = m_inputBufferWindow.data(),
 		.data_out = dst,
@@ -66,7 +66,8 @@ auto AudioResampler::process(float* dst, long frames, double ratio, InputCallbac
 		.end_of_input = 0,
 		.src_ratio = ratio};
 
-	auto result = Result{};
+	auto outputFramesGenerated = long{0};
+
 	while (data.output_frames > 0)
 	{
 		if (data.input_frames == 0)
@@ -85,15 +86,14 @@ auto AudioResampler::process(float* dst, long frames, double ratio, InputCallbac
 		data.input_frames -= data.input_frames_used;
 		data.output_frames -= data.output_frames_gen;
 
-		result.inputFramesUsed += data.input_frames_used;
-		result.outputFramesGenerated += data.output_frames_gen;
+		outputFramesGenerated += data.output_frames_gen;
 	}
 
 	m_inputBufferWindow = {data.data_in, static_cast<std::size_t>(data.input_frames * m_channels)};
-	return result;
+	return outputFramesGenerated;
 }
 
-auto AudioResampler::process(const float* src, long frames, double ratio, OutputCallback callback) -> Result
+auto AudioResampler::process(const float* src, long frames, double ratio, OutputCallback callback) -> long
 {
 	auto data = SRC_DATA{.data_in = src,
 		.data_out = m_outputBuffer.data(),
@@ -102,7 +102,8 @@ auto AudioResampler::process(const float* src, long frames, double ratio, Output
 		.end_of_input = 0,
 		.src_ratio = ratio};
 
-	auto result = Result{};
+	auto inputFramesUsed = long{0};
+
 	while (data.input_frames > 0)
 	{
 		if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
@@ -110,16 +111,15 @@ auto AudioResampler::process(const float* src, long frames, double ratio, Output
 		data.data_in += data.input_frames_used * m_channels;
 		data.input_frames -= data.input_frames_used;
 
-		result.inputFramesUsed += data.input_frames_used;
-		result.outputFramesGenerated += data.output_frames_gen;
-
+		inputFramesUsed += data.input_frames_used;
 		callback(data.data_out, data.output_frames_gen, m_channels);
 	}
 
-	return result;
+	return inputFramesUsed;
 }
 
-auto AudioResampler::process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio) -> Result
+auto AudioResampler::process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio)
+	-> std::pair<long, long>
 {
 	auto data = SRC_DATA{.data_in = src,
 		.data_out = dst,
@@ -128,7 +128,9 @@ auto AudioResampler::process(const float* src, float* dst, long srcFrames, long 
 		.end_of_input = 0,
 		.src_ratio = ratio};
 
-	auto result = Result{};
+	auto inputFramesUsed = long{0};
+	auto outputFramesGenerated = long{0};
+
 	while (data.input_frames > 0 && data.output_frames > 0)
 	{
 		if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
@@ -139,11 +141,11 @@ auto AudioResampler::process(const float* src, float* dst, long srcFrames, long 
 		data.data_out += data.output_frames_gen * m_channels;
 		data.output_frames -= data.output_frames_gen;
 
-		result.inputFramesUsed += data.input_frames_used;
-		result.outputFramesGenerated += data.output_frames_gen;
+		inputFramesUsed += data.input_frames_used;
+		outputFramesGenerated += data.output_frames_gen;
 	}
 
-	return result;
+	return {inputFramesUsed, outputFramesGenerated};
 }
 
 } // namespace lmms

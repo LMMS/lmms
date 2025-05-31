@@ -449,9 +449,10 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			while (numFramesMixed < frames)
 			{
-				const auto result = sample.m_resampler.process(&mixBuf[0][0], mixBuf.size(), freq_factor, inputCallback);
+				const auto outputFramesGenerated
+					= sample.m_resampler.process(&mixBuf[0][0], mixBuf.size(), freq_factor, inputCallback);
 
-				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, result.outputFramesGenerated);
+				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, outputFramesGenerated);
 				for (auto i = std::size_t{0}; i < framesToMix; ++i)
 				{
 					const auto amplitude = copy.value();

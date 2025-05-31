@@ -198,13 +198,14 @@ private:
 
 		while (dstFrames > 0)
 		{
-			const auto result = resampler.process(_src + srcIndex, _dst + dstIndex, srcFrames, dstFrames, WAVERATIO);
+			const auto [inputFramesUsed, outputFramesGenerated]
+				= resampler.process(_src + srcIndex, _dst + dstIndex, srcFrames, dstFrames, WAVERATIO);
 
-			srcIndex += result.inputFramesUsed;
-			srcFrames -= result.inputFramesUsed;
+			srcIndex += inputFramesUsed;
+			srcFrames -= inputFramesUsed;
 
-			dstIndex += result.outputFramesGenerated;
-			dstFrames -= result.outputFramesGenerated;
+			dstIndex += outputFramesGenerated;
+			dstFrames -= outputFramesGenerated;
 
 			if (srcIndex == GRAPHLEN && srcFrames == 0)
 			{

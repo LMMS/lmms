@@ -122,12 +122,13 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	};
 
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	const auto result = state->resampler.process(&dst[0][0], static_cast<long>(numFrames), ratio, inputCallback);
+	const auto outputFramesGenerated
+		= state->resampler.process(&dst[0][0], static_cast<long>(numFrames), ratio, inputCallback);
 
-	if (result.outputFramesGenerated < numFrames)
+	if (outputFramesGenerated < numFrames)
 	{
-		if (result.outputFramesGenerated == 0) { return false; }
-		std::fill(dst + result.outputFramesGenerated, dst + numFrames, SampleFrame{});
+		if (outputFramesGenerated == 0) { return false; }
+		std::fill(dst + outputFramesGenerated, dst + numFrames, SampleFrame{});
 	}
 
 	return true;

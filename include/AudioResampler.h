@@ -40,13 +40,6 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
-	//! The resampling results returned after calls are made to @ref process.
-	struct Result
-	{
-		long inputFramesUsed;		//! The number of input frames used.
-		long outputFramesGenerated; //! The number of output frames generated.
-	};
-
 	//! Writes data into @p dst.
 	//! @p dst is of size `channels() * frames`.
 	//! Clients are expected to advance their data streams as necessary.
@@ -81,19 +74,21 @@ public:
 	//! Resamples audio into @p dst at the given @p ratio.
 	//! Stops when @p dst is full, or @p callback stops writing input.
 	//! Uses @p callback to fetch input data as necessary.
-	//! @return The resampling results. See @ref Result.
-	[[nodiscard]] auto process(float* dst, long frames, double ratio, InputCallback callback) -> Result;
+	//! @return The number of output frames generated.
+	[[nodiscard]] auto process(float* dst, long frames, double ratio, InputCallback callback) -> long;
 
 	//! Resamples audio from @p src at the given @p ratio.
 	//! Stops when @p src is empty, or @p callback stops reading output.
 	//! Uses @p callback to send resampled output data as necessary.
-	//! @return The resampling results. See @ref Result.
-	[[nodiscard]] auto process(const float* src, long frames, double ratio, OutputCallback callback) -> Result;
+	//! @return The number of input frames used.
+	[[nodiscard]] auto process(const float* src, long frames, double ratio, OutputCallback callback) -> long;
 
 	//! Resamples audio from @p src into @p dst at the given @p ratio.
 	//! Stops when @p dst is full, or @p src is empty.
-	//! @return The resampling results. See @ref Result.
-	[[nodiscard]] auto process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio) -> Result;
+	//! @return A pair containing the number of input frames used as the first member, and the number of output frames
+	//! generated in the second member.
+	[[nodiscard]] auto process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio)
+		-> std::pair<long, long>;
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
