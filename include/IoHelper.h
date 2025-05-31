@@ -31,7 +31,7 @@
 #include <limits>
 #include <memory>
 #include <stdexcept>
-#include <string>
+#include <string_view>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -51,8 +51,11 @@ namespace lmms
 
 #ifdef _WIN32
 
-// NOTE: Not using std::wstring because it does not work correctly when building with wineg++
-inline std::unique_ptr<wchar_t[]> toWString(const std::string& utf8)
+/**
+ * UTF-8 to wide char conversion
+ * NOTE: Avoids using std::wstring because it does not work correctly with wineg++
+ */
+inline std::unique_ptr<wchar_t[]> toWString(std::string_view utf8)
 {
 	std::unique_ptr<wchar_t[]> ret;
 	if (utf8.empty())
@@ -85,30 +88,30 @@ inline std::unique_ptr<wchar_t[]> toWString(const std::string& utf8)
 	return ret;
 }
 
-#endif
+#endif // _WIN32
 
-
-inline FILE* fopenUtf8(const std::string& utf8Filename, const char* mode)
+//! std::fopen wrapper that expects UTF-8 encoded `filename` and `mode`
+inline std::FILE* fopenUtf8(const std::string& filename, const char* mode)
 {
 #ifdef LMMS_BUILD_WIN32
-	return _wfopen(toWString(utf8Filename).get(), toWString(mode).get());
+	return _wfopen(toWString(filename).get(), toWString(mode).get());
 #else
-	return fopen(utf8Filename.data(), mode);
+	return std::fopen(filename.c_str(), mode);
 #endif
 }
 
-
-inline int fileToDescriptor(FILE* f, bool closeFile = true)
+//! Returns the POSIX file descriptor of the given FILE
+inline int fileToDescriptor(std::FILE* file, bool closeFile = true)
 {
-	if (f == nullptr) {return -1;}
+	if (file == nullptr) { return -1; }
 
 #ifdef LMMS_BUILD_WIN32
-	int fh = _dup(_fileno(f));
+	int fh = _dup(_fileno(file));
 #else
-	int fh = dup(fileno(f));
+	int fh = dup(fileno(file));
 #endif
 
-	if (closeFile) {fclose(f);}
+	if (closeFile) { std::fclose(file); }
 	return fh;
 }
 
