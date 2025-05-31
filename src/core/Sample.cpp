@@ -116,6 +116,8 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
+	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
+
 	const auto inputCallback = [&](float* dst, long frames, int channels) {
 		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
 	};
