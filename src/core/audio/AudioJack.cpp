@@ -40,6 +40,17 @@
 #include "MainWindow.h"
 #include "MidiJack.h"
 
+
+namespace
+{
+static const QString audioJackClass("audiojack");
+static const QString clientNameKey("clientname");
+static const QString output1Key("output1");
+static const QString output2Key("output2");
+static const QString input1Key("input1");
+static const QString input2Key("input2");
+}
+
 namespace lmms
 {
 
@@ -133,7 +144,7 @@ AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 
 bool AudioJack::initJackClient()
 {
-	QString clientName = ConfigManager::inst()->value("audiojack", "clientname");
+	QString clientName = ConfigManager::inst()->value(audioJackClass, clientNameKey);
 	if (clientName.isEmpty()) { clientName = "lmms"; }
 
 	const char* serverName = nullptr;
@@ -252,11 +263,11 @@ void AudioJack::startProcessing()
 
 	const auto cm = ConfigManager::inst();
 
-	attemptToReconnectOutput(0, cm->value("audiojack", "output1"));
-	attemptToReconnectOutput(1, cm->value("audiojack", "output2"));
+	attemptToReconnectOutput(0, cm->value(audioJackClass, output1Key));
+	attemptToReconnectOutput(1, cm->value(audioJackClass, output2Key));
 
-	attemptToReconnectInput(0, cm->value("audiojack", "input1"));
-	attemptToReconnectInput(1, cm->value("audiojack", "input2"));
+	attemptToReconnectInput(0, cm->value(audioJackClass, input1Key));
+	attemptToReconnectInput(1, cm->value(audioJackClass, input2Key));
 
 	m_stopped = false;
 }
@@ -441,7 +452,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	mainLayout->addLayout(form);
 
 	const auto cm = ConfigManager::inst();
-	QString cn = cm->value("audiojack", "clientname");
+	QString cn = cm->value(audioJackClass, clientNameKey);
 	if (cn.isEmpty()) { cn = "lmms"; }
 	m_clientName = new QLineEdit(cn, this);
 
@@ -456,12 +467,12 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	const auto audioOutputNames = getAudioOutputNames();
 
 	m_outputDevice1 = new QComboBox(this);
-	const auto output1 = cm->value("audiojack", "output1");
+	const auto output1 = cm->value(audioJackClass, output1Key);
 	allPortsFound &= populateComboBox(m_outputDevice1, audioOutputNames, output1);
 	form->addRow(tr("Output 1"), m_outputDevice1);
 
 	m_outputDevice2 = new QComboBox(this);
-	const auto output2 = cm->value("audiojack", "output2");
+	const auto output2 = cm->value(audioJackClass, output2Key);
 	allPortsFound &= populateComboBox(m_outputDevice2, audioOutputNames, output2);
 	form->addRow(tr("Output 2"), m_outputDevice2);
 
@@ -469,12 +480,12 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	const auto audioInputNames = getAudioInputNames();
 
 	m_inputDevice1 = new QComboBox(this);
-	const auto input1 = cm->value("audiojack", "input1");
+	const auto input1 = cm->value(audioJackClass, input1Key);
 	allPortsFound &= populateComboBox(m_inputDevice1, audioInputNames, input1);
 	form->addRow(tr("Input 1"), m_inputDevice1);
 
 	m_inputDevice2 = new QComboBox(this);
-	const auto input2 = cm->value("audiojack", "input2");
+	const auto input2 = cm->value(audioJackClass, input2Key);
 	allPortsFound &= populateComboBox(m_inputDevice2, audioInputNames, input2);
 	form->addRow(tr("Input 2"), m_inputDevice2);
 
@@ -494,11 +505,11 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 void AudioJack::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
-	ConfigManager::inst()->setValue("audiojack", "output1", m_outputDevice1->currentText());
-	ConfigManager::inst()->setValue("audiojack", "output2", m_outputDevice2->currentText());
-	ConfigManager::inst()->setValue("audiojack", "input1", m_inputDevice1->currentText());
-	ConfigManager::inst()->setValue("audiojack", "input2", m_inputDevice2->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, clientNameKey, m_clientName->text());
+	ConfigManager::inst()->setValue(audioJackClass, output1Key, m_outputDevice1->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, output2Key, m_outputDevice2->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, input1Key, m_inputDevice1->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, input2Key, m_inputDevice2->currentText());
 }
 
 std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
