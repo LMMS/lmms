@@ -445,6 +445,22 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	form->addRow(tr("Client name"), m_clientName);
 
+	// Outputs
+	const auto audioOutputNames = getAudioOutputNames();
+
+	m_outputDevice1 = new QComboBox(this);
+
+	populateComboBox(m_outputDevice1, audioOutputNames);
+
+	form->addRow(tr("Output 1"), m_outputDevice1);
+
+	m_outputDevice2 = new QComboBox(this);
+
+	populateComboBox(m_outputDevice2, audioOutputNames);
+
+	form->addRow(tr("Output 2"), m_outputDevice2);
+
+	// Inputs
 	const auto audioInputNames = getAudioInputNames();
 
 	m_inputDevice1 = new QComboBox(this);
@@ -471,15 +487,17 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
+	ConfigManager::inst()->setValue("audiojack", "output1", m_outputDevice1->currentText());
+	ConfigManager::inst()->setValue("audiojack", "output2", m_outputDevice2->currentText());
 	ConfigManager::inst()->setValue("audiojack", "input1", m_inputDevice1->currentText());
 	ConfigManager::inst()->setValue("audiojack", "input2", m_inputDevice2->currentText());
 }
 
-std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
+std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
 {
-	std::vector<std::string> audioInputs;
+	std::vector<std::string> audioPorts;
 
-	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput);
+	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, portFlags);
 	if (inputAudioPorts)
 	{
 		for (int i = 0; inputAudioPorts[i] != nullptr; ++i)
@@ -487,12 +505,22 @@ std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
 			auto currentPortName = inputAudioPorts[i];
 			printf("Port %d: %s\n", i, currentPortName);
 
-			audioInputs.push_back(currentPortName);
+			audioPorts.push_back(currentPortName);
 		}
 		jack_free(inputAudioPorts); // Remember to free after use
 	}
 
-	return audioInputs;
+	return audioPorts;
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioOutputNames() const
+{
+	return getAudioPortNames(JackPortIsInput);
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
+{
+	return getAudioPortNames(JackPortIsOutput);
 }
 
 void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames)

@@ -83,13 +83,18 @@ public:
 		void saveSettings() override;
 
 	private:
+		std::vector<std::string> getAudioPortNames(JackPortFlags portFlags) const;
 		std::vector<std::string> getAudioInputNames() const;
+		std::vector<std::string> getAudioOutputNames() const;
 		void populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames);
 
 	private:
 		QLineEdit* m_clientName;
 		// Because we do not have access to a JackAudio driver instance we have to be our own client to display inputs and outputs...
 		jack_client_t* m_client;
+
+		QComboBox* m_outputDevice1 = nullptr;
+		QComboBox* m_outputDevice2 = nullptr;
 
 		QComboBox* m_inputDevice1 = nullptr;
 		QComboBox* m_inputDevice2 = nullptr;
