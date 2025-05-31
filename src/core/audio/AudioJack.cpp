@@ -131,21 +131,6 @@ AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 }
 
 
-void AudioJack::handleRegistrationEvent(jack_port_id_t port, int reg)
-{
-	auto jackPort = jack_port_by_id(m_client, port);
-
-	auto name = jack_port_name(jackPort);
-	auto type = jack_port_type(jackPort);
-	auto flags = jack_port_flags(jackPort);
-	
-	const bool isAudioPort = strcmp(type, JACK_DEFAULT_AUDIO_TYPE) == 0;
-	const bool isInputDevice = flags & JackPortIsOutput;
-
-	printf("Reg code %d for name %s and type %s, audio: %d, input: %d\n", reg, name, type, isAudioPort, isInputDevice);
-}
-
-
 bool AudioJack::initJackClient()
 {
 	QString clientName = ConfigManager::inst()->value("audiojack", "clientname");
@@ -182,13 +167,6 @@ bool AudioJack::initJackClient()
 
 	// set shutdown-callback
 	jack_on_shutdown(m_client, shutdownCallback, this);
-
-	jack_set_port_registration_callback(m_client,
-		[](jack_port_id_t port, int reg, void *arg) {
-			auto audioJack = static_cast<AudioJack*>(arg);
-			audioJack->handleRegistrationEvent(port, reg);
-		},
-		this);
 
 	if (jack_get_sample_rate(m_client) != sampleRate()) { setSampleRate(jack_get_sample_rate(m_client)); }
 

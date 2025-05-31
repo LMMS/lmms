@@ -69,8 +69,6 @@ public:
 	void removeMidiClient() { m_midiClient = nullptr; }
 	jack_client_t* jackClient() { return m_client; };
 
-	void handleRegistrationEvent(jack_port_id_t port, int reg);
-
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "JACK (JACK Audio Connection Kit)");
