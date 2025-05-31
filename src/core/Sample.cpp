@@ -124,7 +124,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	const auto dstSpan = std::span{&dst[0][0], numFrames * DEFAULT_CHANNELS};
 	const auto outputFramesGenerated = state->resampler.process(dstSpan, ratio, inputCallback);
 
-	if (outputFramesGenerated < numFrames)
+	if (outputFramesGenerated < static_cast<long>(numFrames))
 	{
 		if (outputFramesGenerated == 0) { return false; }
 		std::fill(dst + outputFramesGenerated, dst + numFrames, SampleFrame{});
