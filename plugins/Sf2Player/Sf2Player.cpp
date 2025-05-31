@@ -870,17 +870,13 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	const auto inputCallback = [&](float* dst, long frames, int channels) {
 		assert(channels == DEFAULT_CHANNELS);
-		fluid_synth_write_float(m_synth, static_cast<int>(frames), dst, 0, channels, dst, 1, channels);
-		return frames;
+		const auto err = fluid_synth_write_float(m_synth, static_cast<int>(frames), dst, 0, channels, dst, 1, channels);
+		return err == FLUID_OK ? frames : 0;
 	};
 
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
 	const auto result = m_resampler.process(&buf[0][0], static_cast<long>(frames), ratio, inputCallback);
-
-	if (result.outputFramesGenerated < frames)
-	{
-		std::fill(buf + result.outputFramesGenerated, buf + frames, SampleFrame{});
-	}
+	assert(result.outputFramesGenerated == frames);
 
 	m_synthMutex.unlock();
 }
