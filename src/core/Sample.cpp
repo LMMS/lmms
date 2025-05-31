@@ -119,7 +119,8 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
 	const auto inputCallback = [&](float* dst, long frames, int channels) {
-		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
+		const auto rendered = render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
+		return static_cast<long>(rendered);
 	};
 
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
