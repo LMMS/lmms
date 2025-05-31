@@ -82,6 +82,7 @@ public:
 
 	private:
 		std::vector<std::string> getAudioPortNames(JackPortFlags portFlags) const;
+		std::vector<std::string> getAudioInputNames() const;
 		std::vector<std::string> getAudioOutputNames() const;
 		bool populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry);
 
@@ -92,6 +93,9 @@ public:
 
 		QComboBox* m_outputDevice1 = nullptr;
 		QComboBox* m_outputDevice2 = nullptr;
+
+		QComboBox* m_inputDevice1 = nullptr;
+		QComboBox* m_inputDevice2 = nullptr;
 	};
 
 private slots:
@@ -103,6 +107,7 @@ private:
 
 	void attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port);
 	void attemptToReconnectOutput(size_t outputIndex, const QString& targetPort);
+	void attemptToReconnectInput(size_t inputIndex, const QString& sourcePort);
 
 	void startProcessing() override;
 	void stopProcessing() override;
