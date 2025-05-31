@@ -1300,6 +1300,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			//  if a chord is set, play all chord notes (simulate click on all):
 			playChordNotes(key_num);
 			ke->accept();
+			return;
 		}
 	}
 
@@ -1536,6 +1537,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			// if a chord is set, simulate click release on all chord notes
 			pauseChordNotes(key_num);
 			ke->accept();
+			return;
 		}
 	}
 
@@ -1560,6 +1562,8 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 				update();
 			}
 			break;
+		default:
+			ke->ignore();
 	}
 
 	update();
