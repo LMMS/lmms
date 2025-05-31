@@ -27,6 +27,7 @@
 
 #include <functional>
 #include <samplerate.h>
+#include <span>
 
 #include "lmms_constants.h"
 #include "lmms_export.h"
@@ -39,9 +40,22 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
-	//! The callback that writes input data to @p dst of the given size to the resampler when necessary.
-	//! The callback should return the number of frames written into @p dst.
-	using WriteCallback = std::function<std::size_t(float* dst, std::size_t frames)>;
+	//! The resampling results returned after calls are made to @ref process.
+	struct Result
+	{
+		long inputFramesUsed;		//! The number of input frames used.
+		long outputFramesGenerated; //! The number of output frames generated.
+	};
+
+	//! Writes data into @p dst.
+	//! @p dst is of size `channels() * frames`.
+	//! @return The number of frames written into @p dst.
+	using InputCallback = std::function<long(float* dst, long frames, int channels)>;
+
+	//! Reads all data from @p src.
+	//! Must acknowledge reading all data given to it.
+	//! @p src is of size `channels() * frames`.
+	using OutputCallback = std::function<void(const float* src, long frames, int channels)>;
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
@@ -62,10 +76,22 @@ public:
 	//! Moves the internal state from one resampler to another.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
-	//! Resamples audio into @p dst with at the given @p ratio.
+	//! Resamples audio into @p dst at the given @p ratio.
+	//! Stops when @p dst is full, or @p callback stops writing input.
 	//! Uses @p callback to fetch input data as necessary.
-	//! @return `true` if @p dst is completely filled with resampled data.
-	auto resample(float* dst, std::size_t frames, double ratio, WriteCallback callback) -> bool;
+	//! @return The resampling results. See @ref Result.
+	[[nodiscard]] auto process(float* dst, long frames, double ratio, InputCallback callback) -> Result;
+
+	//! Resamples audio from @p src at the given @p ratio.
+	//! Stops when @p src is empty, or @p callback stops reading output.
+	//! Uses @p callback to send resampled output data as necessary.
+	//! @return The resampling results. See @ref Result.
+	[[nodiscard]] auto process(const float* src, long frames, double ratio, OutputCallback callback) -> Result;
+
+	//! Resamples audio from @p src into @p dst at the given @p ratio.
+	//! Stops when @p dst is full, or @p src is empty.
+	//! @return The resampling results. See @ref Result.
+	[[nodiscard]] auto process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio) -> Result;
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }
@@ -75,8 +101,9 @@ public:
 
 private:
 	static constexpr auto BufferFrameSize = 64;
-	std::vector<float> m_buffer;
-	SRC_DATA m_data = SRC_DATA{};
+	std::vector<float> m_inputBuffer;
+	std::vector<float> m_outputBuffer;
+	std::span<const float> m_inputBufferWindow;
 	SRC_STATE* m_state = nullptr;
 	int m_channels = 0;
 	int m_mode = 0;

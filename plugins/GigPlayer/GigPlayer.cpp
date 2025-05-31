@@ -431,26 +431,34 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			const auto inputCallback = [this, &sample](float* dst, std::size_t frames) {
+			const auto inputCallback = [&](float* dst, long frames, int channels) {
+				assert(channels == DEFAULT_CHANNELS);
 				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
-
-				// Apply ADSR using a copy so if we don't use these samples when
-				// resampling, the ADSR doesn't get messed up
-				ADSR copy = sample.adsr;
-
-				for (f_cnt_t i = 0; i < frames; ++i)
-				{
-					const auto amplitude = copy.value();
-					dst[i * DEFAULT_CHANNELS] *= amplitude;
-					dst[i * DEFAULT_CHANNELS + 1] *= amplitude;
-				}
-
-				sample.pos += frames;
-				sample.adsr.inc(frames);
 				return frames;
 			};
 
-			sample.m_resampler.resample(&_working_buffer[0][0], frames, freq_factor, inputCallback);
+			// Apply ADSR using a copy so if we don't use these samples when
+			// resampling, the ADSR doesn't get messed up
+			ADSR copy = sample.adsr;
+			const auto amplitude = copy.value();
+
+			constexpr auto mixBufSize = 64;
+			auto mixBuf = std::array<SampleFrame, mixBufSize>{};
+			auto numFramesMixed = std::size_t{0};
+
+			while (numFramesMixed < frames)
+			{
+				const auto result = sample.m_resampler.process(&mixBuf[0][0], mixBuf.size(), freq_factor, inputCallback);
+				sample.pos += result.inputFramesUsed;
+				sample.adsr.inc(result.inputFramesUsed);
+
+				for (auto i = std::size_t{0}; i < result.outputFramesGenerated; ++i)
+				{
+					_working_buffer[numFramesMixed + i] += mixBuf[i] * amplitude;
+				}
+
+				numFramesMixed += result.outputFramesGenerated;
+			}
 		}
 	}
 

@@ -31,7 +31,9 @@
 namespace lmms {
 
 AudioResampler::AudioResampler(int mode, int channels)
-	: m_buffer(BufferFrameSize * channels)
+	: m_inputBuffer(BufferFrameSize * channels)
+	, m_outputBuffer(BufferFrameSize * channels)
+	, m_inputBufferWindow(m_inputBuffer.data(), 0)
 	, m_state(src_new(mode, channels, &m_error))
 	, m_channels(channels)
 	, m_mode(mode)
@@ -55,39 +57,93 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::resample(float* dst, std::size_t frames, double ratio, WriteCallback callback) -> bool
+auto AudioResampler::process(float* dst, long frames, double ratio, InputCallback callback) -> Result
 {
-	m_data.data_out = dst;
-	m_data.output_frames = static_cast<long>(frames);
+	auto data = SRC_DATA{.data_in = m_inputBufferWindow.data(),
+		.data_out = dst,
+		.input_frames = static_cast<long>(m_inputBufferWindow.size()) / m_channels,
+		.output_frames = frames,
+		.end_of_input = 0,
+		.src_ratio = ratio};
 
-	m_data.src_ratio = ratio;
-	m_data.end_of_input = 0;
-
-	while (m_data.output_frames > 0)
+	auto result = Result{};
+	while (data.output_frames > 0)
 	{
-		if (m_data.input_frames == 0)
+		if (data.input_frames == 0)
 		{
-			const auto framesWritten = callback(m_buffer.data(), BufferFrameSize);
-			m_data.data_in = m_buffer.data();
-			m_data.input_frames = static_cast<long>(framesWritten);
+			const auto inputFramesWritten = callback(m_inputBuffer.data(), BufferFrameSize, m_channels);
+			data.data_in = m_inputBuffer.data();
+			data.input_frames = static_cast<long>(inputFramesWritten);
 		}
 
-		if ((m_error = src_process(m_state, &m_data))) { throw std::runtime_error{src_strerror(m_error)}; }
+		if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+		if (data.input_frames == 0 && data.output_frames_gen == 0) { break; }
 
-		if (m_data.input_frames == 0 && m_data.output_frames_gen == 0)
-		{
-			std::fill_n(m_data.data_out, m_data.output_frames * m_channels, 0.f);
-			return false;
-		}
+		data.data_in += data.input_frames_used * m_channels;
+		data.data_out += data.output_frames_gen * m_channels;
 
-		m_data.data_in += m_data.input_frames_used * m_channels;
-		m_data.data_out += m_data.output_frames_gen * m_channels;
+		data.input_frames -= data.input_frames_used;
+		data.output_frames -= data.output_frames_gen;
 
-		m_data.input_frames -= m_data.input_frames_used;
-		m_data.output_frames -= m_data.output_frames_gen;
+		result.inputFramesUsed += data.input_frames_used;
+		result.outputFramesGenerated += data.output_frames_gen;
 	}
 
-	return true;
+	m_inputBufferWindow = {data.data_in, static_cast<std::size_t>(data.input_frames * m_channels)};
+	return result;
+}
+
+auto AudioResampler::process(const float* src, long frames, double ratio, OutputCallback callback) -> Result
+{
+	auto data = SRC_DATA{.data_in = src,
+		.data_out = m_outputBuffer.data(),
+		.input_frames = frames,
+		.output_frames = static_cast<long>(m_outputBuffer.size()) / m_channels,
+		.end_of_input = 0,
+		.src_ratio = ratio};
+
+	auto result = Result{};
+	while (data.input_frames > 0)
+	{
+		if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+
+		data.data_in += data.input_frames_used * m_channels;
+		data.input_frames -= data.input_frames_used;
+
+		result.inputFramesUsed += data.input_frames_used;
+		result.outputFramesGenerated += data.output_frames_gen;
+
+		callback(data.data_out, data.output_frames_gen, m_channels);
+	}
+
+	return result;
+}
+
+auto AudioResampler::process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio) -> Result
+{
+	auto data = SRC_DATA{.data_in = src,
+		.data_out = dst,
+		.input_frames = srcFrames,
+		.output_frames = dstFrames,
+		.end_of_input = 0,
+		.src_ratio = ratio};
+
+	auto result = Result{};
+	while (data.input_frames > 0 && data.output_frames > 0)
+	{
+		if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+
+		data.data_in += data.input_frames_used * m_channels;
+		data.input_frames -= data.input_frames_used;
+
+		data.data_out += data.output_frames_gen * m_channels;
+		data.output_frames -= data.output_frames_gen;
+
+		result.inputFramesUsed += data.input_frames_used;
+		result.outputFramesGenerated += data.output_frames_gen;
+	}
+
+	return result;
 }
 
 } // namespace lmms

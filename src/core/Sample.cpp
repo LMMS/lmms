@@ -116,12 +116,21 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
-	const auto inputCallback = [this, state, loop](float* dst, std::size_t frames) {
+	const auto inputCallback = [&](float* dst, long frames, int channels) {
+		assert(channels == DEFAULT_CHANNELS);
 		return render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
 	};
 
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	return state->resampler.resample(&dst[0][0], numFrames, ratio, inputCallback);
+	const auto result = state->resampler.process(&dst[0][0], static_cast<long>(numFrames), ratio, inputCallback);
+
+	if (result.outputFramesGenerated < numFrames)
+	{
+		if (result.outputFramesGenerated == 0) { return false; }
+		std::fill(dst + result.outputFramesGenerated, dst + numFrames, SampleFrame{});
+	}
+
+	return true;
 }
 
 std::size_t Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
