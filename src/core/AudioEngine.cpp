@@ -93,7 +93,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
-	m_clearSignal( false )
+	m_clearSignal(false)
 {
 	for( int i = 0; i < 2; ++i )
 	{
