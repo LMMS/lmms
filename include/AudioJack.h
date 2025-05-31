@@ -86,7 +86,7 @@ public:
 		std::vector<std::string> getAudioPortNames(JackPortFlags portFlags) const;
 		std::vector<std::string> getAudioInputNames() const;
 		std::vector<std::string> getAudioOutputNames() const;
-		void populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames);
+		void populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry);
 
 	private:
 		QLineEdit* m_clientName;

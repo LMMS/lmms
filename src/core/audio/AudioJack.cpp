@@ -459,7 +459,8 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	QFormLayout * form = new QFormLayout(this);
 
-	QString cn = ConfigManager::inst()->value("audiojack", "clientname");
+	const auto cm = ConfigManager::inst();
+	QString cn = cm->value("audiojack", "clientname");
 	if (cn.isEmpty()) { cn = "lmms"; }
 	m_clientName = new QLineEdit(cn, this);
 
@@ -469,30 +470,26 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	const auto audioOutputNames = getAudioOutputNames();
 
 	m_outputDevice1 = new QComboBox(this);
-
-	populateComboBox(m_outputDevice1, audioOutputNames);
-
+	const auto output1 = cm->value("audiojack", "output1");
+	populateComboBox(m_outputDevice1, audioOutputNames, output1);
 	form->addRow(tr("Output 1"), m_outputDevice1);
 
 	m_outputDevice2 = new QComboBox(this);
-
-	populateComboBox(m_outputDevice2, audioOutputNames);
-
+	const auto output2 = cm->value("audiojack", "output2");
+	populateComboBox(m_outputDevice2, audioOutputNames, output2);
 	form->addRow(tr("Output 2"), m_outputDevice2);
 
 	// Inputs
 	const auto audioInputNames = getAudioInputNames();
 
 	m_inputDevice1 = new QComboBox(this);
-
-	populateComboBox(m_inputDevice1, audioInputNames);
-
+	const auto input1 = cm->value("audiojack", "input1");
+	populateComboBox(m_inputDevice1, audioInputNames, input1);
 	form->addRow(tr("Input 1"), m_inputDevice1);
 
 	m_inputDevice2 = new QComboBox(this);
-
-	populateComboBox(m_inputDevice2, audioInputNames);
-
+	const auto input2 = cm->value("audiojack", "input2");
+	populateComboBox(m_inputDevice2, audioInputNames, input2);
 	form->addRow(tr("Input 2"), m_inputDevice2);
 	if (m_client != nullptr)
 	{
@@ -543,7 +540,7 @@ std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
 	return getAudioPortNames(JackPortIsOutput);
 }
 
-void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames)
+void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry)
 {
 	QStringList playbackDevices;
 	for (const auto & inputName : inputNames)
@@ -551,13 +548,9 @@ void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::ve
 		playbackDevices.append(QString::fromStdString(inputName));
 	}
 
-	//playbackDevices.sort();
-
 	comboBox->addItems(playbackDevices);
 
-	// TODO Select device from configuration
-	// const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL);
-	// m_playbackDeviceComboBox->setCurrentText(playbackDevice.isEmpty() ? s_systemDefaultDevice : playbackDevice);
+	comboBox->setCurrentText(selectedEntry);
 }
 
 
