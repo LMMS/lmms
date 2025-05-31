@@ -493,6 +493,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	{
 		mainLayout->addWidget(new QLabel(tr("Some inputs/outputs could not be found and have been reset!"), this));
 	}
+
 	if (m_client != nullptr)
 	{
 		jack_deactivate(m_client);
