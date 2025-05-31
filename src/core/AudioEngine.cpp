@@ -360,10 +360,8 @@ void AudioEngine::processBufferedInputFrames()
 	if (spaceLeftInMainBuffer < 0) spaceLeftInMainBuffer = 0;
 
 	f_cnt_t framesWeCanActuallyCopy = static_cast<f_cnt_t>(framesInSequence);
-	if (framesWeCanActuallyCopy > spaceLeftInMainBuffer)
-	{
-		framesWeCanActuallyCopy = spaceLeftInMainBuffer;
-	}
+	framesWeCanActuallyCopy = framesWeCanActuallyCopy > spaceLeftInMainBuffer ?
+		spaceLeftInMainBuffer : framesWeCanActuallyCopy;
 
 	if (len1 > 0 && totalFramesSuccessfullyCopiedToMain < framesWeCanActuallyCopy)
 	{
