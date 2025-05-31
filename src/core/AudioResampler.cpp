@@ -38,6 +38,7 @@ AudioResampler::AudioResampler(int mode, int channels)
 	, m_channels(channels)
 	, m_mode(mode)
 {
+	if (channels <= 0) { throw std::logic_error{"Invalid channel count"}; }
 	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
 }
 
@@ -57,12 +58,17 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::process(float* dst, long frames, double ratio, InputCallback callback) -> long
+auto AudioResampler::process(std::span<float> dst, double ratio, InputCallback callback) -> long
 {
+	if (dst.size() % m_channels != 0)
+	{
+		throw std::logic_error{"Invalid channel count"};
+	}
+
 	auto data = SRC_DATA{.data_in = m_inputBufferWindow.data(),
-		.data_out = dst,
+		.data_out = dst.data(),
 		.input_frames = static_cast<long>(m_inputBufferWindow.size()) / m_channels,
-		.output_frames = frames,
+		.output_frames = static_cast<long>(dst.size()) / m_channels,
 		.end_of_input = 0,
 		.src_ratio = ratio};
 
@@ -93,11 +99,16 @@ auto AudioResampler::process(float* dst, long frames, double ratio, InputCallbac
 	return outputFramesGenerated;
 }
 
-auto AudioResampler::process(const float* src, long frames, double ratio, OutputCallback callback) -> long
+auto AudioResampler::process(std::span<const float> src, double ratio, OutputCallback callback) -> long
 {
-	auto data = SRC_DATA{.data_in = src,
+	if (src.size() % m_channels != 0)
+	{
+		throw std::logic_error{"Invalid channel count"};
+	}
+
+	auto data = SRC_DATA{.data_in = src.data(),
 		.data_out = m_outputBuffer.data(),
-		.input_frames = frames,
+		.input_frames = static_cast<long>(src.size()) / m_channels,
 		.output_frames = static_cast<long>(m_outputBuffer.size()) / m_channels,
 		.end_of_input = 0,
 		.src_ratio = ratio};
@@ -118,13 +129,17 @@ auto AudioResampler::process(const float* src, long frames, double ratio, Output
 	return inputFramesUsed;
 }
 
-auto AudioResampler::process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio)
-	-> std::pair<long, long>
+auto AudioResampler::process(std::span<const float> src, std::span<float> dst, double ratio) -> std::pair<long, long>
 {
-	auto data = SRC_DATA{.data_in = src,
-		.data_out = dst,
-		.input_frames = srcFrames,
-		.output_frames = dstFrames,
+	if (src.size() % m_channels != 0 || dst.size() % m_channels != 0)
+	{
+		throw std::logic_error{"Invalid channel count"};
+	}
+
+	auto data = SRC_DATA{.data_in = src.data(),
+		.data_out = dst.data(),
+		.input_frames = static_cast<long>(src.size() / m_channels),
+		.output_frames = static_cast<long>(dst.size() / m_channels),
 		.end_of_input = 0,
 		.src_ratio = ratio};
 

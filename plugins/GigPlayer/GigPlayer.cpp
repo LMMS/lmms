@@ -449,8 +449,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			while (numFramesMixed < frames)
 			{
-				const auto outputFramesGenerated
-					= sample.m_resampler.process(&mixBuf[0][0], mixBuf.size(), freq_factor, inputCallback);
+				const auto dst = std::span{&mixBuf[0][0], mixBuf.size() * DEFAULT_CHANNELS};
+				const auto outputFramesGenerated = sample.m_resampler.process(dst, freq_factor, inputCallback);
 
 				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, outputFramesGenerated);
 				for (auto i = std::size_t{0}; i < framesToMix; ++i)

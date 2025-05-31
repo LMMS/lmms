@@ -75,20 +75,19 @@ public:
 	//! Stops when @p dst is full, or @p callback stops writing input.
 	//! Uses @p callback to fetch input data as necessary.
 	//! @return The number of output frames generated.
-	[[nodiscard]] auto process(float* dst, long frames, double ratio, InputCallback callback) -> long;
+	[[nodiscard]] auto process(std::span<float> dst, double ratio, InputCallback callback) -> long;
 
 	//! Resamples audio from @p src at the given @p ratio.
 	//! Stops when @p src is empty, or @p callback stops reading output.
 	//! Uses @p callback to send resampled output data as necessary.
 	//! @return The number of input frames used.
-	[[nodiscard]] auto process(const float* src, long frames, double ratio, OutputCallback callback) -> long;
+	[[nodiscard]] auto process(std::span<const float> src, double ratio, OutputCallback callback) -> long;
 
 	//! Resamples audio from @p src into @p dst at the given @p ratio.
 	//! Stops when @p dst is full, or @p src is empty.
 	//! @return A pair containing the number of input frames used as the first member, and the number of output frames
 	//! generated in the second member.
-	[[nodiscard]] auto process(const float* src, float* dst, long srcFrames, long dstFrames, double ratio)
-		-> std::pair<long, long>;
+	[[nodiscard]] auto process(std::span<const float> src, std::span<float> dst, double ratio) -> std::pair<long, long>;
 
 	//! Returns the number of channels expected by the resampler.
 	auto channels() const -> int { return m_channels; }

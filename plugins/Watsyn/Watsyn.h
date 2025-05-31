@@ -198,8 +198,9 @@ private:
 
 		while (dstFrames > 0)
 		{
-			const auto [inputFramesUsed, outputFramesGenerated]
-				= resampler.process(_src + srcIndex, _dst + dstIndex, srcFrames, dstFrames, WAVERATIO);
+			const auto src = std::span{_src + srcIndex, static_cast<std::size_t>(srcFrames)};
+			const auto dst = std::span{_dst + dstIndex, static_cast<std::size_t>(dstFrames)};
+			const auto [inputFramesUsed, outputFramesGenerated] = resampler.process(src, dst, WAVERATIO);
 
 			srcIndex += inputFramesUsed;
 			srcFrames -= inputFramesUsed;
