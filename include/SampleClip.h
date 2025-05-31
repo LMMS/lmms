@@ -80,6 +80,8 @@ public:
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
+	bool isCrossfadeable() const override { return true; }
+
 	SampleClip* clone() override
 	{
 		return new SampleClip(*this);
@@ -87,7 +89,7 @@ public:
 
 public slots:
 	void setSampleFile(const QString& sf);
-	void updateLength();
+	void updateLength() override;
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackClips();

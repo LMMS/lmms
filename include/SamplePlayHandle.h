@@ -93,6 +93,7 @@ private:
 	FloatModel m_defaultVolumeModel;
 	FloatModel * m_volumeModel;
 	Track * m_track;
+	SampleClip * m_clip;
 
 	PatternTrack* m_patternTrack;
 
