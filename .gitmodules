@@ -3,7 +3,7 @@
 	url = https://github.com/Lukas-W/qt5-x11embed.git
 [submodule "plugins/ZynAddSubFx/zynaddsubfx"]
 	path = plugins/ZynAddSubFx/zynaddsubfx
-	url = https://github.com/lmms/zynaddsubfx.git
+	url = https://github.com/messmerd/zynaddsubfx
 [submodule "plugins/FreeBoy/game-music-emu"]
 	path = plugins/FreeBoy/game-music-emu
 	url = https://github.com/libgme/game-music-emu.git
