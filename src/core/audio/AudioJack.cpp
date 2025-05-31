@@ -47,8 +47,6 @@ static const QString audioJackClass("audiojack");
 static const QString clientNameKey("clientname");
 static const QString output1Key("output1");
 static const QString output2Key("output2");
-static const QString input1Key("input1");
-static const QString input2Key("input2");
 }
 
 namespace lmms
@@ -231,17 +229,6 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 	attemptToConnect(outputIndex, "output", outputName, targetName);
 }
 
-void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
-{
-	if (inputIndex > m_inputPorts.size()) return;
-
-	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
-	auto sourceName = sourcePort.toLatin1().constData();
-
-	attemptToConnect(inputIndex, "input", sourceName, inputName);
-}
-
-
 void AudioJack::startProcessing()
 {
 	if (m_active || m_client == nullptr)
@@ -265,9 +252,6 @@ void AudioJack::startProcessing()
 
 	attemptToReconnectOutput(0, cm->value(audioJackClass, output1Key));
 	attemptToReconnectOutput(1, cm->value(audioJackClass, output2Key));
-
-	attemptToReconnectInput(0, cm->value(audioJackClass, input1Key));
-	attemptToReconnectInput(1, cm->value(audioJackClass, input2Key));
 
 	m_stopped = false;
 }
@@ -476,19 +460,6 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	allPortsFound &= populateComboBox(m_outputDevice2, audioOutputNames, output2);
 	form->addRow(tr("Output 2"), m_outputDevice2);
 
-	// Inputs
-	const auto audioInputNames = getAudioInputNames();
-
-	m_inputDevice1 = new QComboBox(this);
-	const auto input1 = cm->value(audioJackClass, input1Key);
-	allPortsFound &= populateComboBox(m_inputDevice1, audioInputNames, input1);
-	form->addRow(tr("Input 1"), m_inputDevice1);
-
-	m_inputDevice2 = new QComboBox(this);
-	const auto input2 = cm->value(audioJackClass, input2Key);
-	allPortsFound &= populateComboBox(m_inputDevice2, audioInputNames, input2);
-	form->addRow(tr("Input 2"), m_inputDevice2);
-
 	if (!allPortsFound)
 	{
 		mainLayout->addWidget(new QLabel(tr("Some inputs/outputs could not be found and have been reset!"), this));
@@ -509,8 +480,6 @@ void AudioJack::setupWidget::saveSettings()
 	ConfigManager::inst()->setValue(audioJackClass, clientNameKey, m_clientName->text());
 	ConfigManager::inst()->setValue(audioJackClass, output1Key, m_outputDevice1->currentText());
 	ConfigManager::inst()->setValue(audioJackClass, output2Key, m_outputDevice2->currentText());
-	ConfigManager::inst()->setValue(audioJackClass, input1Key, m_inputDevice1->currentText());
-	ConfigManager::inst()->setValue(audioJackClass, input2Key, m_inputDevice2->currentText());
 }
 
 std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
@@ -536,11 +505,6 @@ std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags
 std::vector<std::string> AudioJack::setupWidget::getAudioOutputNames() const
 {
 	return getAudioPortNames(JackPortIsInput);
-}
-
-std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
-{
-	return getAudioPortNames(JackPortIsOutput);
 }
 
 bool AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry)
