@@ -34,7 +34,6 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
 
@@ -44,19 +43,14 @@ namespace lmms
 
 AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	: AudioDevice(
-		// clang-format off
-		std::clamp<int>(
-			ConfigManager::inst()->value("audiojack", "channels").toInt(),
-			DEFAULT_CHANNELS,
-			DEFAULT_CHANNELS
-		),
-		// clang-format on
+		DEFAULT_CHANNELS,
 		audioEngineParam)
 	, m_client(nullptr)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
 	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+	, m_inBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
@@ -66,6 +60,8 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	if (successful) {
 		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
 	}
+
+	m_supportsCapture = true;
 }
 
 
@@ -90,6 +86,7 @@ AudioJack::~AudioJack()
 	delete[] m_tempOutBufs;
 
 	delete[] m_outBuf;
+	delete[] m_inBuf;
 }
 
 
@@ -154,6 +151,16 @@ bool AudioJack::initJackClient()
 				clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
 
+	resizeInputBuffer(jack_get_buffer_size(m_client));
+
+	// set buffer-size callback
+	jack_set_buffer_size_callback(m_client,
+		[](jack_nframes_t nframes, void* udata) -> int {
+			static_cast<AudioJack*>(udata)->resizeInputBuffer(nframes);
+			return 0;
+		},
+		this);
+
 	// set process-callback
 	jack_set_process_callback(m_client, staticProcessCallback, this);
 
@@ -167,6 +174,10 @@ bool AudioJack::initJackClient()
 		QString name = QString("master out ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
 		m_outputPorts.push_back(
 			jack_port_register(m_client, name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
+
+		QString input_name = QString("master in ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
+		m_inputPorts.push_back(jack_port_register(m_client, input_name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0));
+
 		if (m_outputPorts.back() == nullptr)
 		{
 			printf("no more JACK-ports available!\n");
@@ -175,6 +186,14 @@ bool AudioJack::initJackClient()
 	}
 
 	return true;
+}
+
+
+
+
+void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
+{
+	m_inputFrameBuffer.resize(nframes);
 }
 
 
@@ -290,7 +309,6 @@ void AudioJack::renamePort(AudioBusHandle* port)
 
 int AudioJack::processCallback(jack_nframes_t nframes)
 {
-
 	// do midi processing first so that midi input can
 	// add to the following sound processing
 	if (m_midiClient && nframes > 0)
@@ -356,6 +374,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		}
 	}
 
+	for (int c = 0; c < channels(); ++c)
+	{
+		jack_default_audio_sample_t* jack_input_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(m_inputPorts[c], nframes);
+
+		for (jack_nframes_t frame = 0; frame < nframes; frame++)
+		{
+			m_inputFrameBuffer[frame][c] = static_cast<sample_t>(jack_input_buffer[frame]);
+		}
+	}
+	audioEngine()->pushInputFrames (m_inputFrameBuffer.data(), nframes);
 	return 0;
 }
 
@@ -390,24 +418,6 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	m_clientName = new QLineEdit(cn, this);
 
 	form->addRow(tr("Client name"), m_clientName);
-
-	auto m = new gui::LcdSpinBoxModel(/* this */);
-	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audiojack", "channels").toInt());
-
-	m_channels = new gui::LcdSpinBox(1, this);
-	m_channels->setModel(m);
-
-	form->addRow(tr("Channels"), m_channels);
-}
-
-
-
-
-AudioJack::setupWidget::~setupWidget()
-{
-	delete m_channels->model();
 }
 
 
@@ -416,7 +426,6 @@ AudioJack::setupWidget::~setupWidget()
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
-	ConfigManager::inst()->setValue("audiojack", "channels", QString::number(m_channels->value<int>()));
 }
 
 
