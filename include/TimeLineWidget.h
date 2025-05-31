@@ -157,6 +157,8 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+	bool isRecoridng = false;
+
 signals:
 	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
@@ -193,6 +195,7 @@ private:
 	auto actionCursor(Action action) const -> QCursor;
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
+	QPixmap m_recordingPosMarkerPixmap = embed::getIconPixmap("recording_playpos_marker");
 
 	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
 	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};
