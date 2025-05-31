@@ -877,7 +877,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
 	const auto dst = std::span{&buf[0][0], frames * DEFAULT_CHANNELS};
 	const auto outputFramesGenerated = m_resampler.process(dst, ratio, inputCallback);
-	assert(outputFramesGenerated == frames);
+	if (outputFramesGenerated < frames) { std::fill(buf + outputFramesGenerated, buf + frames, SampleFrame{}); }
 
 	m_synthMutex.unlock();
 }
