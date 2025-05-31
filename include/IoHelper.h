@@ -25,8 +25,6 @@
 #ifndef LMMS_IO_HELPER_H
 #define LMMS_IO_HELPER_H
 
-#include "lmmsconfig.h"
-
 #include <cstdio>
 #include <limits>
 #include <memory>
@@ -35,16 +33,17 @@
 #include <string_view>
 
 #ifdef _WIN32
-#include <windows.h>
+#	ifndef NOMINMAX
+#		define NOMINMAX
+#	endif
+#	include <windows.h>
 #endif
 
-#ifdef LMMS_BUILD_WIN32
-#include <io.h>
-#else
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
+#if defined(_WIN32) && !defined(__WINE__)
+#	include <io.h>
+#elif __has_include(<unistd.h>)
+#	include <unistd.h>
 #endif
-#endif // LMMS_BUILD_WIN32
 
 namespace lmms
 {
