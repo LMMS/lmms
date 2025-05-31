@@ -28,6 +28,7 @@
 
 #include <QComboBox>
 #include <QFormLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QStringList>
@@ -457,7 +458,9 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	jack_status_t status;
 	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
 
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	QFormLayout * form = new QFormLayout(this);
+	mainLayout->addLayout(form);
 
 	const auto cm = ConfigManager::inst();
 	QString cn = cm->value("audiojack", "clientname");
@@ -466,17 +469,22 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	form->addRow(tr("Client name"), m_clientName);
 
+	// This variable stores if all ports from the configuration
+	// could be found in the current system, i.e. that no device
+	// has been disconnected during invocations of LMMS.
+	bool allPortsFound = true;
+
 	// Outputs
 	const auto audioOutputNames = getAudioOutputNames();
 
 	m_outputDevice1 = new QComboBox(this);
 	const auto output1 = cm->value("audiojack", "output1");
-	populateComboBox(m_outputDevice1, audioOutputNames, output1);
+	allPortsFound &= populateComboBox(m_outputDevice1, audioOutputNames, output1);
 	form->addRow(tr("Output 1"), m_outputDevice1);
 
 	m_outputDevice2 = new QComboBox(this);
 	const auto output2 = cm->value("audiojack", "output2");
-	populateComboBox(m_outputDevice2, audioOutputNames, output2);
+	allPortsFound &= populateComboBox(m_outputDevice2, audioOutputNames, output2);
 	form->addRow(tr("Output 2"), m_outputDevice2);
 
 	// Inputs
@@ -484,13 +492,18 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	m_inputDevice1 = new QComboBox(this);
 	const auto input1 = cm->value("audiojack", "input1");
-	populateComboBox(m_inputDevice1, audioInputNames, input1);
+	allPortsFound &= populateComboBox(m_inputDevice1, audioInputNames, input1);
 	form->addRow(tr("Input 1"), m_inputDevice1);
 
 	m_inputDevice2 = new QComboBox(this);
 	const auto input2 = cm->value("audiojack", "input2");
-	populateComboBox(m_inputDevice2, audioInputNames, input2);
+	allPortsFound &= populateComboBox(m_inputDevice2, audioInputNames, input2);
 	form->addRow(tr("Input 2"), m_inputDevice2);
+
+	if (!allPortsFound)
+	{
+		mainLayout->addWidget(new QLabel(tr("Some inputs/outputs could not be found and have been reset!"), this));
+	}
 	if (m_client != nullptr)
 	{
 		jack_deactivate(m_client);
@@ -540,7 +553,7 @@ std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
 	return getAudioPortNames(JackPortIsOutput);
 }
 
-void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry)
+bool AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry)
 {
 	QStringList playbackDevices;
 	for (const auto & inputName : inputNames)
@@ -551,6 +564,8 @@ void AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::ve
 	comboBox->addItems(playbackDevices);
 
 	comboBox->setCurrentText(selectedEntry);
+
+	return comboBox->findText(selectedEntry) >= 0;
 }
 
 
