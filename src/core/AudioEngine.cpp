@@ -99,7 +99,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	{
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = FIXED_INPUT_BUFFER_CAPACITY;
-		m_inputBuffer[i] = new SampleFrame[ FIXED_INPUT_BUFFER_CAPACITY ];
+		m_inputBuffer[i] = new SampleFrame[FIXED_INPUT_BUFFER_CAPACITY];
 		zeroSampleFrames(m_inputBuffer[i], FIXED_INPUT_BUFFER_CAPACITY);
 	}
 
