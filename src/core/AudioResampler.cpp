@@ -33,7 +33,8 @@ namespace lmms {
 AudioResampler::AudioResampler(int mode, int channels)
 	: m_inputBuffer(BufferFrameSize * channels)
 	, m_outputBuffer(BufferFrameSize * channels)
-	, m_inputBufferWindow(m_inputBuffer.data(), 0)
+	, m_inputBufferWindow(
+		  InterleavedAudioBufferView<const float>{.data = m_inputBuffer.data(), .frames = 0, .channels = channels})
 	, m_state(src_new(mode, channels, &m_error))
 	, m_channels(channels)
 	, m_mode(mode)
@@ -48,7 +49,8 @@ AudioResampler::~AudioResampler()
 }
 
 AudioResampler::AudioResampler(AudioResampler&& other) noexcept
-	: m_state(std::exchange(other.m_state, nullptr))
+	: m_inputBufferWindow(std::exchange(m_inputBufferWindow, InterleavedAudioBufferView<const float>{}))
+	, m_state(std::exchange(other.m_state, nullptr))
 {
 }
 
@@ -58,17 +60,14 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::process(std::span<float> dst, double ratio, InputCallback callback) -> long
+auto AudioResampler::process(InterleavedAudioBufferView<float> dst, double ratio, InputCallback callback) -> std::size_t
 {
-	if (dst.size() % m_channels != 0)
-	{
-		throw std::logic_error{"Invalid channel count"};
-	}
+	if (dst.channels != m_channels) { throw std::logic_error{"Invalid channel count"}; }
 
-	auto data = SRC_DATA{.data_in = m_inputBufferWindow.data(),
-		.data_out = dst.data(),
-		.input_frames = static_cast<long>(m_inputBufferWindow.size()) / m_channels,
-		.output_frames = static_cast<long>(dst.size()) / m_channels,
+	auto data = SRC_DATA{.data_in = m_inputBufferWindow.data,
+		.data_out = dst.data,
+		.input_frames = static_cast<long>(m_inputBufferWindow.frames),
+		.output_frames = static_cast<long>(dst.frames),
 		.end_of_input = 0,
 		.src_ratio = ratio};
 
@@ -78,7 +77,9 @@ auto AudioResampler::process(std::span<float> dst, double ratio, InputCallback c
 	{
 		if (data.input_frames == 0)
 		{
-			const auto inputFramesWritten = callback(m_inputBuffer.data(), BufferFrameSize, m_channels);
+			const auto inputView = InterleavedAudioBufferView<float>{
+				.data = m_inputBuffer.data(), .frames = m_inputBuffer.size() / m_channels, .channels = m_channels};
+			const auto inputFramesWritten = callback(inputView);
 			data.data_in = m_inputBuffer.data();
 			data.input_frames = static_cast<long>(inputFramesWritten);
 		}
@@ -95,20 +96,19 @@ auto AudioResampler::process(std::span<float> dst, double ratio, InputCallback c
 		outputFramesGenerated += data.output_frames_gen;
 	}
 
-	m_inputBufferWindow = {data.data_in, static_cast<std::size_t>(data.input_frames * m_channels)};
+	m_inputBufferWindow
+		= {.data = data.data_in, .frames = static_cast<std::size_t>(data.input_frames), .channels = m_channels};
 	return outputFramesGenerated;
 }
 
-auto AudioResampler::process(std::span<const float> src, double ratio, OutputCallback callback) -> long
+auto AudioResampler::process(InterleavedAudioBufferView<const float> src, double ratio, OutputCallback callback)
+	-> std::size_t
 {
-	if (src.size() % m_channels != 0)
-	{
-		throw std::logic_error{"Invalid channel count"};
-	}
+	if (src.channels != m_channels) { throw std::logic_error{"Invalid channel count"}; }
 
-	auto data = SRC_DATA{.data_in = src.data(),
+	auto data = SRC_DATA{.data_in = src.data,
 		.data_out = m_outputBuffer.data(),
-		.input_frames = static_cast<long>(src.size()) / m_channels,
+		.input_frames = static_cast<long>(src.frames),
 		.output_frames = static_cast<long>(m_outputBuffer.size()) / m_channels,
 		.end_of_input = 0,
 		.src_ratio = ratio};
@@ -123,23 +123,24 @@ auto AudioResampler::process(std::span<const float> src, double ratio, OutputCal
 		data.input_frames -= data.input_frames_used;
 
 		inputFramesUsed += data.input_frames_used;
-		callback(data.data_out, data.output_frames_gen, m_channels);
+
+		const auto outputView = InterleavedAudioBufferView<const float>{
+			.data = data.data_out, .frames = static_cast<std::size_t>(data.output_frames_gen), .channels = m_channels};
+		callback(outputView);
 	}
 
 	return inputFramesUsed;
 }
 
-auto AudioResampler::process(std::span<const float> src, std::span<float> dst, double ratio) -> std::pair<long, long>
+auto AudioResampler::process(InterleavedAudioBufferView<const float> src, InterleavedAudioBufferView<float> dst,
+	double ratio) -> std::pair<std::size_t, std::size_t>
 {
-	if (src.size() % m_channels != 0 || dst.size() % m_channels != 0)
-	{
-		throw std::logic_error{"Invalid channel count"};
-	}
+	if (src.channels != m_channels || dst.channels != m_channels) { throw std::logic_error{"Invalid channel count"}; }
 
-	auto data = SRC_DATA{.data_in = src.data(),
-		.data_out = dst.data(),
-		.input_frames = static_cast<long>(src.size() / m_channels),
-		.output_frames = static_cast<long>(dst.size() / m_channels),
+	auto data = SRC_DATA{.data_in = src.data,
+		.data_out = dst.data,
+		.input_frames = static_cast<long>(src.frames),
+		.output_frames = static_cast<long>(dst.frames),
 		.end_of_input = 0,
 		.src_ratio = ratio};
 

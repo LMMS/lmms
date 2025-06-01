@@ -431,9 +431,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			const auto inputCallback = [&](float* dst, long frames, int channels) {
-				assert(channels == DEFAULT_CHANNELS);
-				loadSample(sample, reinterpret_cast<SampleFrame*>(dst), frames);
+			const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
+				loadSample(sample, reinterpret_cast<SampleFrame*>(input.data), frames);
 				sample.pos += frames;
 				sample.adsr.inc(frames);
 				return frames;
@@ -449,7 +448,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			while (numFramesMixed < frames)
 			{
-				const auto dst = std::span{&mixBuf[0][0], mixBuf.size() * DEFAULT_CHANNELS};
+				const auto dst = InterleavedAudioBufferView<float>{
+					.data = &mixBuf[0][0], .frames = mixBuf.size(), .channels = DEFAULT_CHANNELS};
 				const auto outputFramesGenerated = sample.m_resampler.process(dst, freq_factor, inputCallback);
 
 				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, outputFramesGenerated);

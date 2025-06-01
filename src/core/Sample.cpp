@@ -118,16 +118,16 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 {
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
-	const auto inputCallback = [&](float* dst, long frames, int channels) {
-		const auto rendered = render(reinterpret_cast<SampleFrame*>(dst), frames, state, loop);
+	const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
+		const auto rendered = render(reinterpret_cast<SampleFrame*>(input.data), input.frames, state, loop);
 		return static_cast<long>(rendered);
 	};
 
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	const auto dstSpan = std::span{&dst[0][0], numFrames * DEFAULT_CHANNELS};
-	const auto outputFramesGenerated = state->resampler.process(dstSpan, ratio, inputCallback);
+	const auto dstView = InterleavedAudioBufferView<float>{&dst[0][0], numFrames, DEFAULT_CHANNELS};
+	const auto outputFramesGenerated = state->resampler.process(dstView, ratio, inputCallback);
 
-	if (outputFramesGenerated < static_cast<long>(numFrames))
+	if (outputFramesGenerated < numFrames)
 	{
 		if (outputFramesGenerated == 0) { return false; }
 		std::fill(dst + outputFramesGenerated, dst + numFrames, SampleFrame{});
