@@ -93,7 +93,7 @@ inline std::unique_ptr<wchar_t[]> toWString(std::string_view utf8)
 //! std::fopen wrapper that expects UTF-8 encoded `filename` and `mode`
 inline std::FILE* fopenUtf8(const std::string& filename, const char* mode)
 {
-#ifdef LMMS_BUILD_WIN32
+#if defined(_WIN32) && !defined(__WINE__)
 	return _wfopen(toWString(filename).get(), toWString(mode).get());
 #else
 	return std::fopen(filename.c_str(), mode);
@@ -105,7 +105,7 @@ inline int fileToDescriptor(std::FILE* file, bool closeFile = true)
 {
 	if (file == nullptr) { return -1; }
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(_WIN32) && !defined(__WINE__)
 	int fh = _dup(_fileno(file));
 #else
 	int fh = dup(fileno(file));
