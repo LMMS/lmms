@@ -423,10 +423,7 @@ void AudioEngine::renderStageNoteSetup()
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
-			else
-			{
-				delete *it;
-			}
+			else { delete *it; }
 			it = m_playHandles.erase(it);
 			removedFromPlayHandles = true;
 		}
