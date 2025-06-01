@@ -205,7 +205,7 @@ AudioEngine::~AudioEngine()
 	}
 	m_workers.clear();
 
-	if(m_fifo)
+	if (m_fifo)
 	{
 		while( m_fifo->available() )
 		{
