@@ -79,6 +79,11 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
+bool GuiApplication::isWayland()
+{
+	return QGuiApplication::platformName().contains("wayland");
+}
+
 
 
 GuiApplication::GuiApplication()

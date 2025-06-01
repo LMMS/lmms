@@ -73,7 +73,6 @@ public:
 			m_waveView(0),
 			m_relatedKnob(0)
 		{
-			setFixedSize(37, 47);
 		}
 
 		void setWaveView(const AudioFileProcessorWaveView* wv)
