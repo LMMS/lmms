@@ -83,9 +83,9 @@ void FileSearch::runSearch(Task task)
 		while (dirIt.hasNext() && !m_stop.test(std::memory_order_relaxed))
 		{
 			const auto fileInfo = QFileInfo{dirIt.next()};
-			const auto baseName = fileInfo.completeBaseName();
+			const auto fileName = fileInfo.fileName();
 			const auto containsToken = std::all_of(tokens.begin(), tokens.end(),
-				[&](const auto& token) { return baseName.contains(token, Qt::CaseInsensitive); });
+				[&](const auto& token) { return fileName.contains(token, Qt::CaseInsensitive); });
 
 			const auto validDir = fileInfo.isDir() && containsToken;
 			const auto validFile = fileInfo.isFile() && containsToken
