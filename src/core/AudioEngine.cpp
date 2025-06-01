@@ -357,7 +357,7 @@ void AudioEngine::processBufferedInputFrames()
 	std::size_t len2 = sequence.second_half_size();
 
 	f_cnt_t spaceLeftInMainBuffer = currentWriteBufCapacity - currentFramesInWriteBuf;
-	if (spaceLeftInMainBuffer < 0) spaceLeftInMainBuffer = 0;
+	if (spaceLeftInMainBuffer < 0) { spaceLeftInMainBuffer = 0; }
 
 	f_cnt_t framesWeCanActuallyCopy = static_cast<f_cnt_t>(framesInSequence);
 	framesWeCanActuallyCopy = framesWeCanActuallyCopy > spaceLeftInMainBuffer ?
