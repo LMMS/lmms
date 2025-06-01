@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_FILE_REVEALER_H
-#define LMMS_FILE_REVEALER_H
+#ifndef LMMS_GUI_FILE_REVEALER_H
+#define LMMS_GUI_FILE_REVEALER_H
 
 #include <QFileInfo>
 
@@ -74,4 +74,4 @@ protected:
 };
 
 } // namespace lmms::gui
-#endif // LMMS_FILE_REVEALER_H
+#endif // LMMS_GUI_FILE_REVEALER_H
