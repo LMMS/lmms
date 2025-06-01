@@ -29,6 +29,7 @@
 #include <QPushButton>
 
 #include "embed.h"
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -49,7 +50,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_closeBtn->resize(m_buttonSize);
 	m_closeBtn->setToolTip(tr("Close"));
 	connect(m_closeBtn, &QPushButton::clicked,
-		[=]() { this->closeButtonClicked(); });
+		[this]() { this->closeButtonClicked(); });
 }
 
 
@@ -63,8 +64,7 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 	QFont f = p.font();
 	f.setBold( true );
 	f.setUnderline(false);
-	f.setPointSize( f.pointSize() + 2 );
-	p.setFont( f );
+	p.setFont(adjustedToPixelSize(f, LARGE_FONT_SIZE));
 
 	p.setPen( palette().highlightedText().color() );
 

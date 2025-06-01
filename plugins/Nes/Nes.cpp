@@ -29,11 +29,11 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "interpolation.h"
 #include "Knob.h"
 #include "Oscillator.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -392,16 +392,16 @@ void NesObject::renderOutput( SampleFrame* buf, fpp_t frames )
 		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin1 = pin1 / 30.0f;
 		
-		pin1 = signedPow( pin1, NES_DIST );
+		pin1 = signedPowf(pin1, NES_DIST);
 		
 		pin1 = pin1 * 2.0f - 1.0f;
 		
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		pin1 = linearInterpolate( pin1, m_12Last, m_nsf );
+		pin1 = std::lerp(pin1, m_12Last, m_nsf);
 		m_12Last = pin1;
 
 		// compensate DC offset
-		pin1 += 1.0f - signedPow( static_cast<float>( ch1Level + ch2Level ) / 30.0f, NES_DIST );
+		pin1 += 1.0f - signedPowf(static_cast<float>(ch1Level + ch2Level) / 30.0f, NES_DIST);
 		
 		pin1 *= NES_MIXING_12;
 
@@ -410,16 +410,16 @@ void NesObject::renderOutput( SampleFrame* buf, fpp_t frames )
 		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin2 = pin2 / 30.0f;
 		
-		pin2 = signedPow( pin2, NES_DIST );
+		pin2 = signedPowf(pin2, NES_DIST);
 		
 		pin2 = pin2 * 2.0f - 1.0f;
 
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		pin2 = linearInterpolate( pin2, m_34Last, m_nsf );
+		pin2 = std::lerp(pin2, m_34Last, m_nsf);
 		m_34Last = pin2;
 		
 		// compensate DC offset
-		pin2 += 1.0f - signedPow( static_cast<float>( ch3Level + ch4Level ) / 30.0f, NES_DIST );
+		pin2 += 1.0f - signedPowf(static_cast<float>(ch3Level + ch4Level) / 30.0f, NES_DIST);
 		
 		pin2 *= NES_MIXING_34;
 		
@@ -699,19 +699,19 @@ gui::PluginView* NesInstrument::instantiateView( QWidget * parent )
 
 void NesInstrument::updateFreq1()
 {
-	m_freq1 = powf( 2, m_ch1Crs.value() / 12.0f );
+	m_freq1 = std::exp2(m_ch1Crs.value() / 12.0f);
 }
 
 
 void NesInstrument::updateFreq2()
 {
-	m_freq2 = powf( 2, m_ch2Crs.value() / 12.0f );
+	m_freq2 = std::exp2(m_ch2Crs.value() / 12.0f);
 }
 
 
 void NesInstrument::updateFreq3()
 {
-	m_freq3 = powf( 2, m_ch3Crs.value() / 12.0f );
+	m_freq3 = std::exp2(m_ch3Crs.value() / 12.0f);
 }
 
 

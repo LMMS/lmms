@@ -24,9 +24,8 @@
 #include "ReverbSC.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
-
-#define DB2LIN(X) pow(10, X / 20.0f);
 
 namespace lmms
 {
@@ -75,14 +74,8 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -98,10 +91,10 @@ bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
-		const auto inGain
-			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
-		const auto outGain
-			= (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()));
+		const auto inGain = static_cast<SPFLOAT>(fastPow10f(
+			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f));
+		const auto outGain = static_cast<SPFLOAT>(fastPow10f(
+			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
@@ -119,14 +112,9 @@ bool ReverbSCEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		sp_dcblock_compute(sp, dcblk[1], &tmpR, &dcblkR);
 		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
 		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
-
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 
-
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void ReverbSCEffect::changeSampleRate()

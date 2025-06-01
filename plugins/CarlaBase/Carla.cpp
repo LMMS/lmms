@@ -32,7 +32,7 @@
 #include "Knob.h"
 #include "MidiEventToByteSeq.h"
 #include "MainWindow.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Song.h"
 
 #include <QApplication>
@@ -627,7 +627,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
     m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-    m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
+    m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), SMALL_FONT_SIZE));
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
     m_toggleUIButton->setToolTip(
@@ -637,7 +637,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
     m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
     m_toggleParamsWindowButton->setCheckable(true);
-    m_toggleParamsWindowButton->setFont(adjustedToPixelSize(m_toggleParamsWindowButton->font(), 8));
+    m_toggleParamsWindowButton->setFont(adjustedToPixelSize(m_toggleParamsWindowButton->font(), SMALL_FONT_SIZE));
 #if CARLA_VERSION_HEX < CARLA_MIN_PARAM_VERSION
     m_toggleParamsWindowButton->setEnabled(false);
     m_toggleParamsWindowButton->setToolTip(tr("Available from Carla version 2.1 and up."));
@@ -1004,34 +1004,32 @@ void CarlaParamsView::refreshKnobs()
 	QStringList groupNameList;
 	groupNameList.reserve(m_carlaInstrument->m_paramGroupCount);
 
-	for (uint32_t i = 0; i < m_carlaInstrument->m_paramModels.size(); ++i)
+	for (const auto currentParamModel : m_carlaInstrument->m_paramModels)
 	{
-		bool enabled = m_carlaInstrument->m_paramModels[i]->enabled();
-		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
-		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
-		m_knobs[i]->setHintText(name, "");
-		m_knobs[i]->setLabel(name);
-		m_knobs[i]->setObjectName(name); // this is being used for filtering the knobs.
+		bool enabled = currentParamModel->enabled();
+		const QString name = currentParamModel->displayName();
+
+		auto currentKnob = new Knob(KnobType::Dark28, name, m_inputScrollAreaWidgetContent, Knob::LabelRendering::LegacyFixedFontSize);
+		currentKnob->setHintText(name, "");
+		currentKnob->setObjectName(name); // this is being used for filtering the knobs.
 
 		// Set the newly created model to the knob.
-		m_knobs[i]->setModel(m_carlaInstrument->m_paramModels[i]);
-		m_knobs[i]->setEnabled(enabled);
+		currentKnob->setModel(currentParamModel);
+		currentKnob->setEnabled(enabled);
+
+		m_knobs.push_back(currentKnob);
 
 		if (enabled)
 		{
 			// Collect group names
-			if (!groupNameList.contains(m_carlaInstrument->m_paramModels[i]->groupName()))
+			if (!groupNameList.contains(currentParamModel->groupName()))
 			{
-				groupNameList.append(m_carlaInstrument->m_paramModels[i]->groupName());
+				groupNameList.append(currentParamModel->groupName());
 			}
 
-			// Store biggest knob width per group (so we can calc how many
-			// knobs we can horizontaly fit)
-			uint8_t groupId = m_carlaInstrument->m_paramModels[i]->groupId();
-			if (m_maxKnobWidthPerGroup[groupId] < m_knobs[i]->width())
-			{
-				m_maxKnobWidthPerGroup[groupId] = m_knobs[i]->width();
-			}
+			// Store biggest knob width per group (so we can calc how many knobs we can fit horizontally)
+			auto & maxGroupWidth = m_maxKnobWidthPerGroup[currentParamModel->groupId()];
+			maxGroupWidth = std::max(maxGroupWidth, static_cast<uint16_t>(currentKnob->width()));
 		}
 	}
 

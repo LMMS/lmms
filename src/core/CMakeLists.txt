@@ -1,6 +1,7 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
+	core/AudioBusHandle.cpp
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
@@ -40,6 +41,7 @@ set(LMMS_SRCS
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MeterModel.cpp
+	core/Metronome.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
 	core/MixHelpers.cpp
@@ -99,7 +101,6 @@ set(LMMS_SRCS
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp
-	core/audio/AudioPort.cpp
 	core/audio/AudioPortAudio.cpp
 	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp

@@ -129,26 +129,25 @@ void LadspaEffect::changeSampleRate()
 
 
 
-bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	m_pluginMutex.lock();
-	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
+	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
 	{
 		m_pluginMutex.unlock();
-		return( false );
+		return ProcessStatus::Sleep;
 	}
 
-	auto frames = _frames;
-	SampleFrame* o_buf = nullptr;
-	QVarLengthArray<SampleFrame> sBuf(_frames);
+	auto outFrames = frames;
+	SampleFrame* outBuf = nullptr;
+	QVarLengthArray<SampleFrame> sBuf(frames);
 
 	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
-		o_buf = _buf;
-		_buf = sBuf.data();
-		sampleDown( o_buf, _buf, m_maxSampleRate );
-		frames = _frames * m_maxSampleRate /
+		outBuf = buf;
+		buf = sBuf.data();
+		sampleDown(outBuf, buf, m_maxSampleRate);
+		outFrames = frames * m_maxSampleRate /
 				Engine::audioEngine()->outputSampleRate();
 	}
 
@@ -163,11 +162,9 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 			switch( pp->rate )
 			{
 				case BufferRate::ChannelIn:
-					for( fpp_t frame = 0;
-						frame < frames; ++frame )
+					for (fpp_t frame = 0; frame < outFrames; ++frame)
 					{
-						pp->buffer[frame] =
-							_buf[frame][channel];
+						pp->buffer[frame] = buf[frame][channel];
 					}
 					++channel;
 					break;
@@ -176,7 +173,7 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 					ValueBuffer * vb = pp->control->valueBuffer();
 					if( vb )
 					{
-						memcpy( pp->buffer, vb->values(), frames * sizeof(float) );
+						memcpy(pp->buffer, vb->values(), outFrames * sizeof(float));
 					}
 					else
 					{
@@ -185,11 +182,9 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 						// This only supports control rate ports, so the audio rates are
 						// treated as though they were control rate by setting the
 						// port buffer to all the same value.
-						for( fpp_t frame = 0;
-							frame < frames; ++frame )
+						for (fpp_t frame = 0; frame < outFrames; ++frame)
 						{
-							pp->buffer[frame] =
-								pp->value;
+							pp->buffer[frame] = pp->value;
 						}
 					}
 					break;
@@ -218,11 +213,10 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 	// Process the buffers.
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
 	{
-		(m_descriptor->run)( m_handles[proc], frames );
+		(m_descriptor->run)(m_handles[proc], outFrames);
 	}
 
 	// Copy the LADSPA output buffers to the LMMS buffer.
-	double out_sum = 0.0;
 	channel = 0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -238,11 +232,9 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 				case BufferRate::ControlRateInput:
 					break;
 				case BufferRate::ChannelOut:
-					for( fpp_t frame = 0;
-						frame < frames; ++frame )
+					for (fpp_t frame = 0; frame < outFrames; ++frame)
 					{
-						_buf[frame][channel] = d * _buf[frame][channel] + w * pp->buffer[frame];
-						out_sum += _buf[frame][channel] * _buf[frame][channel];
+						buf[frame][channel] = d * buf[frame][channel] + w * pp->buffer[frame];
 					}
 					++channel;
 					break;
@@ -255,17 +247,14 @@ bool LadspaEffect::processAudioBuffer( SampleFrame* _buf,
 		}
 	}
 
-	if( o_buf != nullptr )
+	if (outBuf != nullptr)
 	{
-		sampleBack( _buf, o_buf, m_maxSampleRate );
+		sampleBack(buf, outBuf, m_maxSampleRate);
 	}
 
-	checkGate( out_sum / frames );
-
-
-	bool is_running = isRunning();
 	m_pluginMutex.unlock();
-	return( is_running );
+
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 
@@ -290,9 +279,8 @@ void LadspaEffect::pluginInstantiation()
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
-	const ch_cnt_t lmms_chnls = Engine::audioEngine()->audioDev()->channels();
 	int effect_channels = manager->getDescription( m_key )->inputChannels;
-	setProcessorCount( lmms_chnls / effect_channels );
+	setProcessorCount(DEFAULT_CHANNELS / effect_channels);
 
 	// get inPlaceBroken property
 	m_inPlaceBroken = manager->isInplaceBroken( m_key );

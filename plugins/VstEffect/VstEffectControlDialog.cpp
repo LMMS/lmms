@@ -33,7 +33,7 @@
 #include "PixmapButton.h"
 #include "embed.h"
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include <QToolBar>
 #include <QLabel>
 
@@ -246,7 +246,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		tb->addWidget(space1);
 
 		tbLabel = new QLabel( tr( "Effect by: " ), this );
-		tbLabel->setFont(adjustedToPixelSize(f, 7));
+		tbLabel->setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 		tbLabel->setTextFormat(Qt::RichText);
 		tbLabel->setAlignment( Qt::AlignTop | Qt::AlignLeft );
 		tb->addWidget( tbLabel );
