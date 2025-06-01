@@ -206,7 +206,7 @@ AudioEngine::~AudioEngine()
 
 	if (m_fifo)
 	{
-		while( m_fifo->available() )
+		while (m_fifo->available())
 		{
 			SampleFrame* bufToDelete = m_fifo->read();
 			if (bufToDelete) delete[] bufToDelete;
