@@ -29,8 +29,8 @@
 #include <QDir>
 #include <QMutex>
 #include <QProgressBar>
-#include <future>
 
+#include "FileSearch.h"
 #include "embed.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -88,32 +88,6 @@ private slots:
 	void giveFocusToFilter();
 
 private:
-	class SearchManager
-	{
-	public:
-		~SearchManager() { cancel(); }
-
-		void cancel()
-		{
-			if (m_currentSearchTask.valid())
-			{
-				m_cancel = true;
-				m_currentSearchTask.get();
-				m_cancel = false;
-			}
-		}
-
-		bool cancelled() { return m_cancel; }
-
-		void setCurrentSearchTask(std::future<void> task) { m_currentSearchTask = std::move(task); }
-
-		std::future<void>& currentSearchTask() { return m_currentSearchTask; }
-
-	private:
-		std::future<void> m_currentSearchTask;
-		std::atomic<bool> m_cancel;
-	};
-
 	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems(const QString & path);
@@ -122,6 +96,8 @@ private:
 	void restoreDirectoriesStates();
 
 	void onSearch(const QString& filter);
+	void onSearchMatch(const QString& path);
+	void onSearchComplete();
 
 	void addContentCheckBox();
 
@@ -131,8 +107,8 @@ private:
 	QLineEdit * m_filterEdit;
 	Type m_type;
 
-	SearchManager m_searchManager;
 	QProgressBar* m_searchIndicator = nullptr;
+	FileSearch m_search;
 
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()

@@ -105,6 +105,8 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
+	connect(&m_search, &FileSearch::foundMatch, this, &FileBrowser::onSearchMatch, Qt::QueuedConnection);
+	connect(&m_search, &FileSearch::finished, this, &FileBrowser::onSearchComplete, Qt::QueuedConnection);
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -205,8 +207,6 @@ void FileBrowser::restoreDirectoriesStates()
 
 void FileBrowser::onSearch(const QString& filter)
 {
-	m_searchManager.cancel();
-
 	if (filter.isEmpty())
 	{
 		m_searchTreeWidget->hide();
@@ -222,46 +222,32 @@ void FileBrowser::onSearch(const QString& filter)
 	auto directoryFilters = QDir::AllEntries | QDir::NoDotAndDotDot;
 	if (m_showHiddenContent) { directoryFilters |= QDir::Hidden; }
 
-	const auto keywords = filter.split(" ");
+	const auto searchTask = FileSearch::Task{.filter = filter,
+		.paths = directories,
+		.extensions = FileItem::defaultFilters().split(" "),
+		.dirFilters = directoryFilters};
 
-	m_fileBrowserTreeWidget->hide();
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
+	m_fileBrowserTreeWidget->hide();
+	m_searchIndicator->setRange(0, 0);
 
-	m_searchManager.setCurrentSearchTask(
-		ThreadPool::instance().enqueue([this, directories, directoryFilters, keywords] {
-			QMetaObject::invokeMethod(m_searchIndicator, [this] { m_searchIndicator->setRange(0, 0); });
+	m_search.search(searchTask);
+}
 
-			for (const auto& path : directories)
-			{
-				const auto extensionFilters = FileItem::defaultFilters().split(" ");
-				auto dirIt = QDirIterator{path, directoryFilters,
-					QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
+void FileBrowser::onSearchMatch(const QString& path)
+{
+	const auto fileInfo = QFileInfo{path};
+	auto item = static_cast<QTreeWidgetItem*>(nullptr);
+	if (fileInfo.isDir()) { item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter); }
+	else if (fileInfo.isFile()) { item = new FileItem(fileInfo.fileName(), fileInfo.dir().path()); }
 
-				while (dirIt.hasNext() && !m_searchManager.cancelled())
-				{
-					const auto fileInfo = QFileInfo{dirIt.next()};
-					const auto fileName = fileInfo.fileName();
+	m_searchTreeWidget->addTopLevelItem(item);
+}
 
-					const auto containsAllKeywords = std::all_of(keywords.begin(), keywords.end(),
-						[&](const auto& keyword) { return fileName.contains(keyword, Qt::CaseInsensitive); });
-
-					const auto validDir = fileInfo.isDir() && containsAllKeywords;
-					const auto validFile = fileInfo.isFile() && containsAllKeywords
-						&& extensionFilters.contains(QString{"*.%1"}.arg(fileInfo.completeSuffix()));
-
-					auto item = static_cast<QTreeWidgetItem*>(nullptr);
-					if (validDir) { item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter); }
-					else if (validFile) { item = new FileItem(fileInfo.fileName(), fileInfo.dir().path()); }
-					else { continue; }
-
-					QMetaObject::invokeMethod(
-						m_searchTreeWidget, [this, item] { m_searchTreeWidget->addTopLevelItem(item); });
-				}
-			}
-
-			QMetaObject::invokeMethod(m_searchIndicator, [this] { m_searchIndicator->setRange(0, 1); });
-		}));
+void FileBrowser::onSearchComplete()
+{
+	m_searchIndicator->setRange(0, 100);
 }
 
 void FileBrowser::reloadTree()
