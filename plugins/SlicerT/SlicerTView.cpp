@@ -145,7 +145,7 @@ void SlicerTView::openFiles()
 // all the drag stuff is copied from AudioFileProcessor
 void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, QString("samplefile,clip_%1").arg(static_cast<int>(Track::Type::Sample)));
+	StringPairDrag::processDragEnterEvent(dee, {"samplefile", QString("clip_%1").arg(static_cast<int>(Track::Type::Sample))});
 }
 
 void SlicerTView::dropEvent(QDropEvent* de)

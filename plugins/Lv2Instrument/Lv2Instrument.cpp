@@ -256,7 +256,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
-	StringPairDrag::processDragEnterEvent(_dee, "presetfile");
+	StringPairDrag::processDragEnterEvent(_dee, {"presetfile"});
 }
 
 

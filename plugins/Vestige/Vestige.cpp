@@ -833,7 +833,7 @@ void VestigeInstrumentView::noteOffAll( void )
 
 void VestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	StringPairDrag::processDragEnterEvent(_dee, "vstpluginfile");
+	StringPairDrag::processDragEnterEvent(_dee, {"vstpluginfile"});
 }
 
 

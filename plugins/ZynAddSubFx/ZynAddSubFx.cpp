@@ -569,7 +569,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	StringPairDrag::processDragEnterEvent(_dee, "pluginpresetfile,presetfile");
+	StringPairDrag::processDragEnterEvent(_dee, {"pluginpresetfile", "presetfile"});
 }
 
 

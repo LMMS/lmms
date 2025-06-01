@@ -569,7 +569,7 @@ void PatmanView::updateFilename()
 
 void PatmanView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	StringPairDrag::processDragEnterEvent(_dee, "samplefile");
+	StringPairDrag::processDragEnterEvent(_dee, {"samplefile"});
 }
 
 

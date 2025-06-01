@@ -328,8 +328,9 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-						QString::number( static_cast<int>(getTrack()->type()) ) );
+		StringPairDrag::processDragEnterEvent( dee, {"clip_" ,
+						QString::number( static_cast<int>(getTrack()->type()) )
+	});
 	}
 }
 

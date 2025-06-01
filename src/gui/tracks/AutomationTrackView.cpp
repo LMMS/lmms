@@ -51,7 +51,8 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent( _dee, {"automatable_model"
+} );
 }
 
 
