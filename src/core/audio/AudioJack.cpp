@@ -341,7 +341,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 #endif
 
-	if (!nextBuffer(m_tempOutBufs, nframes, channels(), false))
+	if (!nextBuffer(m_tempOutBufs, nframes, channels()))
 	{
 		for (int channel = 0; channel < channels(); ++channel)
 		{

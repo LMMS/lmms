@@ -53,7 +53,7 @@ AudioDevice::~AudioDevice()
 	unlock();
 }
 
-bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t dstChannelCount, bool interleaved)
+bool AudioDevice::nextBuffer(float* dst, const std::size_t frames, const int channels)
 {
 	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
@@ -61,57 +61,50 @@ bool AudioDevice::nextBuffer(void* dst, std::size_t dstFrameCount, std::size_t d
 		return false;
 	}
 
-	if (!dst)
-	{
-		m_audioEngine->renderNextBuffer();
-		return true;
-	}
-
-	for (auto dstFrameIndex = std::size_t{0}; dstFrameIndex < dstFrameCount; ++dstFrameIndex)
+	for (auto frame = std::size_t{0}; frame < frames; ++frame)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
+		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
 
-		const auto srcFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
-
-		if (interleaved)
+		for (auto channel = 0; channel < channels; ++channel)
 		{
-			const auto dstBuffer = static_cast<float*>(dst);
-			
-			if (dstChannelCount == 1)
+			if (channels == 1)
 			{
-				dstBuffer[dstFrameIndex] = srcFrame.average();
+				dst[frame] = audioEngineFrame.average();
+				continue;
 			}
-			else
-			{
-				dstBuffer[dstFrameIndex * dstChannelCount] = srcFrame.left(); 
-				dstBuffer[dstFrameIndex * dstChannelCount + 1] = srcFrame.right();
 
-				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
-				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
-				{
-					std::fill_n(dstBuffer + (dstFrameIndex + 2) * dstChannelCount, dstChannelCount - 2, 0.f);
-				}
-			}
+			dst[frame * channels + channel] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
 		}
-		else
+
+		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
+	}
+
+	return true;
+}
+
+bool AudioDevice::nextBuffer(float** dst, const std::size_t frames, const int channels)
+{
+	if (!m_running.test_and_set(std::memory_order_acquire))
+	{
+		m_running.clear(std::memory_order_release);
+		return false;
+	}
+
+	for (auto frame = std::size_t{0}; frame < frames; ++frame)
+	{
+		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
+		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
+
+		for (auto channel = 0; channel < channels; ++channel)
 		{
-			const auto dstBuffer = static_cast<float**>(dst);
-
-			if (dstChannelCount == 1)
+			if (channels == 1)
 			{
-				dstBuffer[0][dstFrameIndex] = srcFrame.average();
+				dst[channel][frame] = audioEngineFrame.average();
+				continue;
 			}
-			else
-			{
-				dstBuffer[0][dstFrameIndex] = srcFrame.left();
-				dstBuffer[1][dstFrameIndex] = srcFrame.right();
 
-				// If dst has more than 2 channels (stereo), silence them. LMMS only outputs stereo audio.
-				for (auto channel = std::size_t{2}; channel < dstChannelCount; ++channel)
-				{
-					std::fill_n(dstBuffer[channel], dstFrameCount, 0.f);
-				}
-			}
+			dst[channel][frame] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
 		}
 
 		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();

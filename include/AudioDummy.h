@@ -93,8 +93,9 @@ private:
 	void run() override
 	{
 		MicroTimer timer;
-		while (nextBuffer(nullptr, 0, 0))
+		while (true)
 		{
+			audioEngine()->renderNextBuffer();
 			timer.reset();
 
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
