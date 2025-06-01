@@ -32,36 +32,41 @@
 
 namespace lmms::gui {
 //! The `FileSearch` class allows for searching for files on the filesystem.
-//! Users provide a filter string, which is then parsed and tokenized.
-//! Each token is then made into a clause that dictates what it will consider a match.
-//! All of the clauses are then combined into a final clause, which is checked against
-//! each file as necessary.
 //! Searching occurs on a background thread, and results are emitted as a Qt slot back to the user.
 class FileSearch : public QObject
 {
 	Q_OBJECT
 public:
+	//! Represents a search task to be carried out by the search object.
 	struct Task
 	{
-		QString filter;
-		QStringList paths;
-		QStringList extensions;
-		QFlags<QDir::Filter> dirFilters;
+		QString filter;					 //! The filter to be tokenized.
+		QStringList paths;				 //! The list of paths to search recursively through.
+		QStringList extensions;			 //! The list of allowed extensions.
+		QFlags<QDir::Filter> dirFilters; //! The directory filter flag.
 	};
 
+	//! Create a search objec with the given @p parent (if any).
 	FileSearch(QObject* parent = nullptr);
+
+	//! Stop processing and destroys the object.
 	~FileSearch();
 
+	//! Cannot be copied.
 	FileSearch(const FileSearch&) = delete;
+
+	//! Cannot be moved.
 	FileSearch(FileSearch&&) = delete;
+
+	//! Cannot be copied.
 	FileSearch& operator=(const FileSearch&) = delete;
+
+	//! Cannot be moved.
 	FileSearch& operator=(FileSearch&&) = delete;
 
-	//! Search recurisvely within the given @p paths using the specified @p filter.
-	//! @p extensions filters out file names that do not have one of the extensions listed.
-	//! Any previous searches are overriden as new search requests come in.
-	//! Callers can connect to the signals of the search object to respond to the results
-	//! as the search is running.
+	//! Commit to searching with the given @p task.
+	//! Cancels any previous search.
+	//! Callers can connect to the provided signals to interact with the search and its progress.
 	void search(Task task);
 
 signals:
