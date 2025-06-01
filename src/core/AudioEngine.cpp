@@ -145,7 +145,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	if (m_numWorkers < 0) { m_numWorkers = 0; }
 
-	for( int i = 0; i < m_numWorkers + 1; ++i )
+	for (int i = 0; i < m_numWorkers + 1; ++i)
 	{
 		auto workerThread = new AudioEngineWorkerThread(this);
 		if( i < m_numWorkers )
