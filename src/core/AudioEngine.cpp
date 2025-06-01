@@ -432,7 +432,8 @@ void AudioEngine::renderStageNoteSetup()
 		if(removedFromPlayHandles)
 		{
 			it_rem = m_playHandlesToRemove.erase(it_rem); 
-		} else
+		}
+		else
 		{
 			++it_rem;
 		}
