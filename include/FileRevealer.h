@@ -74,4 +74,5 @@ protected:
 };
 
 } // namespace lmms::gui
+
 #endif // LMMS_GUI_FILE_REVEALER_H
