@@ -170,10 +170,7 @@ void AudioFileProcessorView::newWaveView()
 
 void AudioFileProcessorView::dropEvent(QDropEvent* de)
 {
-	auto data = Clipboard::decodeMimeData(de->mimeData());
-
-	QString type = data.first;
-	QString value = data.second;
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
 	if (type == "samplefile")
 	{
