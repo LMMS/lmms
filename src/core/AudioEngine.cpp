@@ -189,7 +189,7 @@ AudioEngine::~AudioEngine()
 	{
 		if (m_workers[w])
 		{
-			if (!m_workers[w]->wait( 500 ))
+			if (!m_workers[w]->wait(500))
 			{
 				fprintf(stderr, "AudioEngine: Worker thread %d did not finish gracefully after quit() and wait().\n", w);
 			}
