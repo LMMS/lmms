@@ -113,7 +113,6 @@ private:
 	jack_default_audio_sample_t** m_tempOutBufs;
 	std::vector<SampleFrame> m_inputFrameBuffer;
 	SampleFrame* m_outBuf;
-	SampleFrame* m_inBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
