@@ -50,7 +50,6 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
 	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
-	, m_inBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
@@ -86,7 +85,6 @@ AudioJack::~AudioJack()
 	delete[] m_tempOutBufs;
 
 	delete[] m_outBuf;
-	delete[] m_inBuf;
 }
 
 
