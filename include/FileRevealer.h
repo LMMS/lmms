@@ -27,7 +27,7 @@
 
 #include <QFileInfo>
 
-namespace lmms {
+namespace lmms::gui {
 
 /**
  * @class FileRevealer

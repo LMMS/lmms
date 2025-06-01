@@ -35,7 +35,7 @@
 
 #include "lmmsconfig.h"
 
-namespace lmms {
+namespace lmms::gui {
 bool FileRevealer::s_canSelect = false;
 
 const QString& FileRevealer::getDefaultFileManager()
