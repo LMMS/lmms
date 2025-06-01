@@ -70,7 +70,7 @@ public:
 	TimePos( const bar_t bar, const tick_t ticks );
 	TimePos( const tick_t ticks = 0 );
 
-	TimePos quantize(float) const;
+	TimePos quantize(float bars, bool forceRoundDown = false) const;
 	TimePos toAbsoluteBar() const { return getBar() * s_ticksPerBar; }
 
 	TimePos& operator+=(const TimePos& time)

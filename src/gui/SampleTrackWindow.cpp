@@ -267,7 +267,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 		hide();
 	}
 
-	m_stv->m_tlb->setFocus();
+	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 
