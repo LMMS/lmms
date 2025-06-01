@@ -296,7 +296,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 			buffers[i] = reinterpret_cast<float*>(areas[i].ptr);
 		}
 
-		if (!nextBuffer(buffers.data(), frameCount, layout->channel_count, false))
+		if (!nextBuffer(buffers.data(), frameCount, layout->channel_count))
 		{
 			for (auto i = 0; i < layout->channel_count; ++i)
 			{

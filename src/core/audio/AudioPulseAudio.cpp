@@ -235,7 +235,12 @@ void AudioPulseAudio::run()
 	{
 		const fpp_t fpp = framesPerPeriod();
 		auto temp = new SampleFrame[fpp];
-		while (nextBuffer(nullptr, 0, 0)) {}
+
+		while (true)
+		{
+			audioEngine()->renderNextBuffer();
+		}
+
 		delete[] temp;
 	}
 
@@ -256,7 +261,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 	const auto numSamples = maxBufSizeInBytes / sizeof(float);
 	const auto numFrames = numSamples / channels();
 
-	if (!nextBuffer(buf, numFrames, channels()))
+	if (!nextBuffer(reinterpret_cast<float*>(buf), numFrames, channels()))
 	{
 		std::fill_n(static_cast<float*>(buf), numSamples, 0.f);
 	}

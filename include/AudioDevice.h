@@ -81,21 +81,15 @@ public:
 	virtual void stopProcessing() { m_running.clear(std::memory_order_release); }
 
 protected:
-	/*
-		Copy `frames` frames, with each frame having `channels` channels from the audio engine into `dst`.
+	//! Render the next audio playback buffer into @p dst.
+	//! @p dst is expected to represent interleaved floating-point audio.
+	//! @return `true` if playback was rendered into @p dst.
+	bool nextBuffer(float* dst, std::size_t frames, int channels);
 
-		If `interleaved == true`, `dst` points to interleaved floating-point audio (i.e., `float*`, LRLR...).
-		Otherwise, `dst` points to non-interleaved floating-point audio (i.e., `float**`, LLRR...).
-		`dst` is treated as being interleaved by default.
-
-		Returns `false` if no audio could be copied into `dst`.
-
-		Returns `true` if audio could be copied into `dst`, or if `dst == nullptr`, which simply invokes the audio
-		engine to render the next buffer.
-
-		Returns `false` in all cases if the audio device is not running.
-	*/
-	bool nextBuffer(void* dst, std::size_t frames, std::size_t channels, bool interleaved = true);
+	//! Render the next audio playback buffer into @p dst.
+	//! @p dst is expected to represent planar floating-point audio.
+	//! @return `true` if playback was rendered into @p dst.
+	bool nextBuffer(float** dst, std::size_t frames, int channels);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
