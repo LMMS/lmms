@@ -184,7 +184,7 @@ AudioEngine::~AudioEngine()
 
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
-	for(int w = 0; w < m_numWorkers; ++w)
+	for (int w = 0; w < m_numWorkers; ++w)
 	{
 		if (m_workers[w])
 		{
