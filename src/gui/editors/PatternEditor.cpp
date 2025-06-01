@@ -66,6 +66,9 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 
 	connect(m_ps, &PatternStore::trackUpdated,
 		this, &PatternEditor::updateMaxSteps);
+
+	setFocusPolicy(Qt::StrongFocus);
+	setFocus();
 }
 
 

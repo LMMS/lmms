@@ -27,6 +27,7 @@
 #include "embed.h"
 
 
+#include "FontHelper.h"
 #include "LfoController.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
@@ -62,23 +63,19 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 240, 58 );
 	
-	m_baseKnob = new Knob( KnobType::Bright26, this );
-	m_baseKnob->setLabel( tr( "BASE" ) );
+	m_baseKnob = new Knob(KnobType::Bright26, tr("BASE"), SMALL_FONT_SIZE, this);
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base:" ), "" );
 
-	m_speedKnob = new TempoSyncKnob( KnobType::Bright26, this );
-	m_speedKnob->setLabel( tr( "FREQ" ) );
+	m_speedKnob = new TempoSyncKnob(KnobType::Bright26, tr("FREQ"), SMALL_FONT_SIZE, this);
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO frequency:" ), "" );
 
-	m_amountKnob = new Knob( KnobType::Bright26, this );
-	m_amountKnob->setLabel( tr( "AMNT" ) );
+	m_amountKnob = new Knob(KnobType::Bright26, tr("AMNT"), SMALL_FONT_SIZE, this);
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 
-	m_phaseKnob = new Knob( KnobType::Bright26, this );
-	m_phaseKnob->setLabel( tr( "PHS" ) );
+	m_phaseKnob = new Knob(KnobType::Bright26, tr("PHS"), SMALL_FONT_SIZE, this);
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( " degrees" ) );
 
