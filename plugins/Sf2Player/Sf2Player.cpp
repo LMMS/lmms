@@ -871,7 +871,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
 		const auto err = fluid_synth_write_float(
 			m_synth, static_cast<int>(input.frames), input.data, 0, input.channels, input.data, 1, input.channels);
-		return err == FLUID_OK ? frames : 0;
+		return err == FLUID_OK ? input.frames : 0;
 	};
 
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
