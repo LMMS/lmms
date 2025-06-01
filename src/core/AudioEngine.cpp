@@ -209,7 +209,7 @@ AudioEngine::~AudioEngine()
 		while (m_fifo->available())
 		{
 			SampleFrame* bufToDelete = m_fifo->read();
-			if (bufToDelete) delete[] bufToDelete;
+			if (bufToDelete) { delete[] bufToDelete; }
 		}
 		delete m_fifo;
 		m_fifo = nullptr;
