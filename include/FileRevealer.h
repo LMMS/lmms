@@ -73,5 +73,5 @@ protected:
 	static bool supportsArg(const QString& command, const QString& arg);
 };
 
-} // namespace lmms
+} // namespace lmms::gui
 #endif // LMMS_FILE_REVEALER_H

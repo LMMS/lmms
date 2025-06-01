@@ -180,4 +180,4 @@ bool FileRevealer::supportsArg(const QString& command, const QString& arg)
 	return output.contains(arg);
 }
 
-} // namespace lmms
+} // namespace lmms::gui
