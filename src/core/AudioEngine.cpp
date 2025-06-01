@@ -152,7 +152,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		{
 			workerThread->start(QThread::TimeCriticalPriority);
 		}
-		m_workers.push_back( workerThread );
+		m_workers.push_back(workerThread);
 	}
 
 	m_inputAudioRingBuffer = std::make_unique<LocklessRingBuffer<SampleFrame>>(FIXED_INPUT_BUFFER_CAPACITY);
