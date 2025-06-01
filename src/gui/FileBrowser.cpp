@@ -105,8 +105,9 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
+	connect(&m_search, &FileSearch::started, this, &FileBrowser::onSearchStarted, Qt::QueuedConnection);
+	connect(&m_search, &FileSearch::finished, this, &FileBrowser::onSearchFinished, Qt::QueuedConnection);
 	connect(&m_search, &FileSearch::foundMatch, this, &FileBrowser::onSearchMatch, Qt::QueuedConnection);
-	connect(&m_search, &FileSearch::finished, this, &FileBrowser::onSearchComplete, Qt::QueuedConnection);
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -230,8 +231,6 @@ void FileBrowser::onSearch(const QString& filter)
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
 	m_fileBrowserTreeWidget->hide();
-	m_searchIndicator->setRange(0, 0);
-
 	m_search.search(searchTask);
 }
 
@@ -245,9 +244,14 @@ void FileBrowser::onSearchMatch(const QString& path)
 	m_searchTreeWidget->addTopLevelItem(item);
 }
 
-void FileBrowser::onSearchComplete()
+void FileBrowser::onSearchStarted()
 {
-	m_searchIndicator->setRange(0, 100);
+	m_searchIndicator->setRange(0, 0);
+}
+
+void FileBrowser::onSearchFinished()
+{
+	m_searchIndicator->setRange(0, 1);
 }
 
 void FileBrowser::reloadTree()

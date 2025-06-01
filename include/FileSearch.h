@@ -68,6 +68,9 @@ signals:
 	//! Emitted when the search object has found a matching path.
 	void foundMatch(const QString& path);
 
+	//! Emitted when the search object has started searching.
+	void started();
+
 	//! Emitted when the search object has finished searching.
 	void finished();
 

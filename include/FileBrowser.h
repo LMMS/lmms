@@ -97,7 +97,8 @@ private:
 
 	void onSearch(const QString& filter);
 	void onSearchMatch(const QString& path);
-	void onSearchComplete();
+	void onSearchStarted();
+	void onSearchFinished();
 
 	void addContentCheckBox();
 

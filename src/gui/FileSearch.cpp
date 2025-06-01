@@ -75,6 +75,8 @@ void FileSearch::runSearch(Task task)
 		if (!quotedToken.isNull()) { tokens.push_back(quotedToken); }
 	}
 
+	emit started();
+
 	for (const auto& path : task.paths)
 	{
 		auto dirIt = QDirIterator{path, task.dirFilters,
