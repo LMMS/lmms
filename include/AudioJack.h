@@ -47,7 +47,8 @@
 #endif
 
 class QLineEdit;
-class QComboBox;
+class QMenu;
+class QToolButton;
 
 namespace lmms
 {
@@ -84,18 +85,18 @@ public:
 		std::vector<std::string> getAudioPortNames(JackPortFlags portFlags) const;
 		std::vector<std::string> getAudioInputNames() const;
 		std::vector<std::string> getAudioOutputNames() const;
-		bool populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry);
+		QMenu* buildMenu(QToolButton* toolButton, const std::vector<std::string>& names, const QString& filteredLMMSClientName);
 
 	private:
 		QLineEdit* m_clientName;
 		// Because we do not have access to a JackAudio driver instance we have to be our own client to display inputs and outputs...
 		jack_client_t* m_client;
 
-		QComboBox* m_outputDevice1 = nullptr;
-		QComboBox* m_outputDevice2 = nullptr;
+		QToolButton* m_outputDevice1 = nullptr;
+		QToolButton* m_outputDevice2 = nullptr;
 
-		QComboBox* m_inputDevice1 = nullptr;
-		QComboBox* m_inputDevice2 = nullptr;
+		QToolButton* m_inputDevice1 = nullptr;
+		QToolButton* m_inputDevice2 = nullptr;
 	};
 
 private slots:

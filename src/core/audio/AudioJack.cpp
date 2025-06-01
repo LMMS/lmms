@@ -26,11 +26,12 @@
 
 #ifdef LMMS_HAVE_JACK
 
-#include <QComboBox>
 #include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMessageBox>
+#include <QToolButton>
 #include <QStringList>
 
 #include "AudioEngine.h"
@@ -447,9 +448,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	jack_status_t status;
 	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
 
-	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	QFormLayout * form = new QFormLayout(this);
-	mainLayout->addLayout(form);
 
 	const auto cm = ConfigManager::inst();
 	QString cn = cm->value(audioJackClass, clientNameKey);
@@ -458,41 +457,38 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	form->addRow(tr("Client name"), m_clientName);
 
-	// This variable stores if all ports from the configuration
-	// could be found in the current system, i.e. that no device
-	// has been disconnected during invocations of LMMS.
-	bool allPortsFound = true;
+	auto buildToolButton = [this](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
+	{
+		auto toolButton = new QToolButton(parent);
+		toolButton->setPopupMode(QToolButton::MenuButtonPopup);
+		toolButton->setText(currentSelection);
+		auto menu = this->buildMenu(toolButton, names, filteredLMMSClientName);
+		toolButton->setMenu(menu);
+
+		return toolButton;
+	};
 
 	// Outputs
 	const auto audioOutputNames = getAudioOutputNames();
 
-	m_outputDevice1 = new QComboBox(this);
 	const auto output1 = cm->value(audioJackClass, output1Key);
-	allPortsFound &= populateComboBox(m_outputDevice1, audioOutputNames, output1);
+	m_outputDevice1 = buildToolButton(this, output1, audioOutputNames, cn);
 	form->addRow(tr("Output 1"), m_outputDevice1);
 
-	m_outputDevice2 = new QComboBox(this);
 	const auto output2 = cm->value(audioJackClass, output2Key);
-	allPortsFound &= populateComboBox(m_outputDevice2, audioOutputNames, output2);
+	m_outputDevice2 = buildToolButton(this, output2, audioOutputNames, cn);
 	form->addRow(tr("Output 2"), m_outputDevice2);
 
 	// Inputs
 	const auto audioInputNames = getAudioInputNames();
 
-	m_inputDevice1 = new QComboBox(this);
 	const auto input1 = cm->value(audioJackClass, input1Key);
-	allPortsFound &= populateComboBox(m_inputDevice1, audioInputNames, input1);
+	m_inputDevice1 = buildToolButton(this, input1, audioInputNames, cn);
 	form->addRow(tr("Input 1"), m_inputDevice1);
 
-	m_inputDevice2 = new QComboBox(this);
 	const auto input2 = cm->value(audioJackClass, input2Key);
-	allPortsFound &= populateComboBox(m_inputDevice2, audioInputNames, input2);
+	m_inputDevice2 = buildToolButton(this, input2, audioInputNames, cn);
 	form->addRow(tr("Input 2"), m_inputDevice2);
-
-	if (!allPortsFound)
-	{
-		mainLayout->addWidget(new QLabel(tr("Some inputs/outputs could not be found and have been reset!"), this));
-	}
 
 	if (m_client != nullptr)
 	{
@@ -502,15 +498,13 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 }
 
 
-
-
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue(audioJackClass, clientNameKey, m_clientName->text());
-	ConfigManager::inst()->setValue(audioJackClass, output1Key, m_outputDevice1->currentText());
-	ConfigManager::inst()->setValue(audioJackClass, output2Key, m_outputDevice2->currentText());
-	ConfigManager::inst()->setValue(audioJackClass, input1Key, m_inputDevice1->currentText());
-	ConfigManager::inst()->setValue(audioJackClass, input2Key, m_inputDevice2->currentText());
+	ConfigManager::inst()->setValue(audioJackClass, output1Key, m_outputDevice1->text());
+	ConfigManager::inst()->setValue(audioJackClass, output2Key, m_outputDevice2->text());
+	ConfigManager::inst()->setValue(audioJackClass, input1Key, m_inputDevice1->text());
+	ConfigManager::inst()->setValue(audioJackClass, input2Key, m_inputDevice2->text());
 }
 
 std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
@@ -543,19 +537,73 @@ std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
 	return getAudioPortNames(JackPortIsOutput);
 }
 
-bool AudioJack::setupWidget::populateComboBox(QComboBox* comboBox, const std::vector<std::string>& inputNames, const QString& selectedEntry)
+QMenu* AudioJack::setupWidget::buildMenu(QToolButton* toolButton, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
 {
-	QStringList playbackDevices;
-	for (const auto & inputName : inputNames)
+	auto menu = new QMenu(toolButton);
+	QMap<QString, QMenu*> clientNameToSubMenuMap;
+	QList<QAction*> topLevelActions;
+	for (const auto& currentName : names)
 	{
-		playbackDevices.append(QString::fromStdString(inputName));
+		const auto clientNameWithPortName = QString::fromStdString(currentName);
+
+		auto actionLambda = [toolButton, clientNameWithPortName](bool checked)
+		{
+			toolButton->setText(clientNameWithPortName);
+		};
+
+		// Split into individual client name and port name
+		const auto list = clientNameWithPortName.split(":");
+		if (list.size() == 2)
+		{
+			const auto& clientName = list[0];
+			const auto& portName = list[1];
+
+			if (clientName == filteredLMMSClientName)
+			{
+				// Prevent loops by not adding port of the LMMS client to the menu
+				continue;
+			}
+
+			QMenu* clientSubMenu = nullptr;
+
+			auto it = clientNameToSubMenuMap.find(clientName);
+			if (it == clientNameToSubMenuMap.end())
+			{
+				clientSubMenu = new QMenu(menu);
+				clientSubMenu->setTitle(clientName);
+				clientNameToSubMenuMap.insert(clientName, clientSubMenu);
+			}
+			else
+			{
+				clientSubMenu = *it;
+			}
+
+			auto action = new QAction(portName, clientSubMenu);
+			connect(action, &QAction::triggered, actionLambda);
+			clientSubMenu->addAction(action);
+		}
+		else
+		{
+			// We cannot split into client and port name. Add the whole thing to the top level menu
+			auto action = new QAction(QString::fromStdString(currentName), menu);
+			connect(action, &QAction::triggered, actionLambda);
+			topLevelActions.append(action);
+		}
+		
 	}
 
-	comboBox->addItems(playbackDevices);
+	// First add the sub menus. By iterating the map they will be sorted automatically
+	for (auto it = clientNameToSubMenuMap.begin(); it != clientNameToSubMenuMap.end(); ++it)
+	{
+		menu->addMenu(it.value());
+	}
 
-	comboBox->setCurrentText(selectedEntry);
+	// Now add potential top level actions, i.e. the entries which cannot be split at exactly one ":"
+	// They must be sorted explicitly
+	std::sort(topLevelActions.begin(), topLevelActions.end(), [](QAction* a, QAction* b) { return a->text() < b->text(); });
+	menu->addActions(topLevelActions);
 
-	return comboBox->findText(selectedEntry) >= 0;
+	return menu;
 }
 
 
