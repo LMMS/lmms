@@ -30,19 +30,21 @@
 
 #include "Clipboard.h"
 #include "ConfigManager.h"
+#include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "GuiApplication.h"
-#include "Knob.h"
+#include "FontHelper.h"
 #include "Mixer.h"
 #include "MixerView.h"
+#include "GuiApplication.h"
+#include "Knob.h"
 #include "SampleClip.h"
 #include "SampleTrackWindow.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
-#include "embed.h"
+
 
 namespace lmms::gui
 {
@@ -63,20 +65,15 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
-						    tr( "Track volume" ) );
+	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Track volume"));
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
-
-	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
-							tr( "Panning" ) );
+	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
 	m_activityIndicator = new FadeButton(
@@ -192,24 +189,7 @@ void SampleTrackView::modelChanged()
 
 void SampleTrackView::dragEnterEvent(QDragEnterEvent* event)
 {
-	const QMimeData* mime = event->mimeData();
-
-	if (mime->hasUrls())
-	{
-		const QList<QUrl> urls = mime->urls();
-		if (!urls.isEmpty())
-		{
-			QString path = urls.first().toLocalFile();
-			QString ext = QFileInfo(path).suffix().toLower();
-
-			if (Clipboard::isAudioFile(ext))
-			{
-				event->acceptProposedAction();
-				return;
-			}
-		}
-	}
-	event->ignore();
+	StringPairDrag::processDragEnterEvent(event, {"samplefile"});
 }
 
 
