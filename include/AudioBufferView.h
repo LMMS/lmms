@@ -30,6 +30,7 @@
 
 namespace lmms {
 
+//! A struct representing a view into an interleaved audio buffer.
 template <typename T> struct InterleavedAudioBufferView
 {
 	static_assert(std::disjunction_v<std::is_same<T, const float>, std::is_same<T, float>,
