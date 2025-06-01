@@ -432,10 +432,10 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			}
 
 			const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
-				loadSample(sample, reinterpret_cast<SampleFrame*>(input.data), frames);
-				sample.pos += frames;
-				sample.adsr.inc(frames);
-				return frames;
+				loadSample(sample, reinterpret_cast<SampleFrame*>(input.data), input.frames);
+				sample.pos += input.frames;
+				sample.adsr.inc(input.frames);
+				return input.frames;
 			};
 
 			// Apply ADSR using a copy so if we don't use these samples when
