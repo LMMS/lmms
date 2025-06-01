@@ -615,9 +615,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=] { FileRevealer::reveal(file->fullName()); });
-
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
 			contextMenu.addAction(
@@ -632,8 +629,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		if (file->isTrack())
 		{
 			contextMenu.addSeparator();
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+			contextMenu.addAction(tr("Send to active instrument-track"), [&] { sendToActiveInstrumentTrack(file); });
 		}
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
