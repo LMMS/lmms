@@ -310,7 +310,7 @@ void AudioEngine::pushInputFrames(SampleFrame* inputAudioBlock, const f_cnt_t fr
 		return;
 	}
 
-	std::size_t framesToWrite = frameCount;
+	size_t framesToWrite = frameCount;
 	if (availableSpace < frameCount)
 	{
 		framesToWrite = availableSpace;
