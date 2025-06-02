@@ -34,17 +34,13 @@
 namespace lmms::Clipboard
 {
 
-	const QStringList projectExtensions{"mmp", "mpt", "mmpz"};
-	const QStringList presetExtensions{"xpf", "xml", "xiz", "lv2"};
-	const QStringList soundFontExtensions{"sf2", "sf3"};
-	const QStringList patchExtensions{"pat"};
-	const QStringList midiExtensions{"mid", "midi", "rmi"};
-	#ifdef LMMS_BUILD_WINDOWS
-	const QStringList vstPluginExtensions{"dll"};
-	#else
-	const QStringList vstPluginExtensions{"dll", "so"};
-	#endif
-	QStringList audioExtensions{};
+	static const QStringList projectExtensions{"mmp", "mpt", "mmpz"};
+	static const QStringList presetExtensions{"xpf", "xml", "xiz", "lv2"};
+	static const QStringList soundFontExtensions{"sf2", "sf3"};
+	static const QStringList patchExtensions{"pat"};
+	static const QStringList midiExtensions{"mid", "midi", "rmi"};
+	static QStringList vstPluginExtensions{};
+	static QStringList audioExtensions{};
 
 	//! gets the extension of a file, or returns the string back if no extension is found
 	inline QString getExtension(const QString& file)
@@ -54,10 +50,22 @@ namespace lmms::Clipboard
 	}
 
 	//
-	/* @brief updates the lists of extensions. TODO: currently, this only applies for audioExtensions, but all the lists should be made
+	/* @brief updates the lists of extensions.
+	 * TODO: currently, this only applies for audioExtensions and vstPluginExtensions, but all the lists should be filled dynamically
 	 */
 	void updateExtensionLists()
 	{
+		#if defined(LMMS_BUILD_WIN32)
+			vstPluginExtensions = QStringList{"dll"}
+		#elif defined(LMMS_BUILD_LINUX)
+			#if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+				vstPluginExtensions = QStringList{"so", "dll"};
+			#else
+				vstPluginExtensions = QStringList{"so"};
+			#endif
+		#endif
+
+		audioExtensions.clear();
 		for (const SampleDecoder::AudioType& at : SampleDecoder::supportedAudioTypes())
 		{
 			audioExtensions += QString::fromStdString(at.extension);
