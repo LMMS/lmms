@@ -723,7 +723,6 @@ void Song::startExport()
 	else
 	{
 		m_exportSongEnd = TimePos(m_length, 0);
-		
 		// Handle potentially ridiculous loop points gracefully.
 		if (m_loopRenderCount > 1 && timeline.loopEnd() > m_exportSongEnd) 
 		{
