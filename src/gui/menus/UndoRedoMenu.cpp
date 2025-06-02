@@ -99,13 +99,13 @@ void UndoRedoTreeWidget::contextMenuEvent(QContextMenuEvent * e)
 
 	QMenu contextMenu(this);
 
-	contextMenu.addAction(QIcon(embed::getIconPixmap("edit_undo")), tr(entry->m_isUndo ? "Undo" : "Redo"), [this, entry]{ applyUndoRedoEntry(entry, 0); });
+	contextMenu.addAction(QIcon(embed::getIconPixmap("edit_undo")), entry->m_isUndo ? tr("Undo") : tr("Redo"), [this, entry]{ applyUndoRedoEntry(entry, 0); });
 	contextMenu.addAction(tr("View changes"),
 		[entry] {
 			QString saveState;
 			QTextStream stream(&saveState);
 			entry->m_checkpoint->data.save(stream, 2);
-			auto saveStateWindow = new UndoRedoMenuDetailsWindow(QString("%1").arg(saveState));
+			auto saveStateWindow = new UndoRedoMenuDetailsWindow(saveState);
 			saveStateWindow->show();
 			saveStateWindow->parentWidget()->update();
 		}
@@ -147,7 +147,7 @@ UndoRedoMenuDetailsWindow::UndoRedoMenuDetailsWindow(QString text):
 	// Bug workaround: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 	using ::operator|;
 #endif
-	setWindowTitle("Undo Checkpoint");
+	setWindowTitle(tr("Undo Checkpoint"));
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	getGUI()->mainWindow()->addWindowedWidget(this);
 	parentWidget()->setWindowIcon(embed::getIconPixmap("edit_undo"));
