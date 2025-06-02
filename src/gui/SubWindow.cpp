@@ -246,6 +246,10 @@ int SubWindow::frameWidth() const
 }
 
 
+void SubWindow::updateTitleBar()
+{
+	adjustTitleBar();
+}
 
 
 /**

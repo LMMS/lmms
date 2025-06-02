@@ -61,7 +61,7 @@ public:
 	void contextMenuEvent(QContextMenuEvent*) override;
 	void mousePressEvent(QMouseEvent*) override;
 	void mouseDoubleClickEvent(QMouseEvent*) override;
-	bool eventFilter(QObject* dist, QEvent* event) override;
+	void keyPressEvent(QKeyEvent* ke) override;
 
 	void reset();
 	int channelIndex() const { return m_channelIndex; }
@@ -81,6 +81,8 @@ public:
 
 	QColor strokeInnerInactive() const { return m_strokeInnerInactive; }
 	void setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
+
+	Fader* fader() const { return m_fader; }
 
 public slots:
 	void renameChannel();
@@ -113,8 +115,8 @@ private:
 	QLineEdit* m_renameLineEdit;
 	QGraphicsView* m_renameLineEditView;
 	QLabel* m_sendArrow;
-	PixmapButton* m_muteButton;
-	PixmapButton* m_soloButton;
+	AutomatableButton* m_muteButton;
+	AutomatableButton* m_soloButton;
 	PeakIndicator* m_peakIndicator = nullptr;
 	Fader* m_fader;
 	EffectRackView* m_effectRackView;
