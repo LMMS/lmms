@@ -711,10 +711,6 @@ int main( int argc, char * * argv )
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
-	// Hidden settings
-	MixHelpers::setNaNHandler( ConfigManager::inst()->value( "app",
-						"nanhandler", "1" ).toInt() );
-
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
 	if( pos.isEmpty() )
