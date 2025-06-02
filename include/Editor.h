@@ -51,9 +51,9 @@ class Editor : public QMainWindow
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
 	QAction *playAction() const;
-	static Editor* s_lastPlayedEditor = nullptr;
 	static void togglePlayStopLastEditor();
 	static void togglePauseLastEditor();
+	static Editor* s_lastPlayedEditor;
 protected:
 	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);

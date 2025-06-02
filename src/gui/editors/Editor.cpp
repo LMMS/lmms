@@ -39,6 +39,8 @@
 namespace lmms::gui
 {
 
+Editor* Editor::s_lastPlayedEditor = nullptr;
+
 
 void Editor::setPauseIcon(bool displayPauseIcon)
 {

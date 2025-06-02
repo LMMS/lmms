@@ -231,10 +231,6 @@ void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 			renameFinished();
 		}
 	}
-	else if (ke->key() == Qt::Key_Space)
-	{
-		m_fader->adjustByDialog();
-	}
 	else
 	{
 		ke->ignore();
