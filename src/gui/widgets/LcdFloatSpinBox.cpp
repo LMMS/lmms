@@ -45,6 +45,7 @@
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "lmms_math.h"
+#include "Scroll.h"
 
 namespace lmms::gui
 {
@@ -188,12 +189,17 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
+	auto scroll = Scroll(event);
+	if (!scroll.isVertical()) { return; }
+
+	event->accept();
+
 	// switch between integer and fractional step based on cursor position
 	if (position(event).x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
-	event->accept();
-	model()->setValue(model()->value() + ((event->angleDelta().y() > 0) ? 1 : -1) * getStep());
+	const int steps = scroll.getSteps(Scroll::Flag::DisableNaturalScrolling);
+	model()->setValue(model()->value() + steps * getStep());
 	emit manualChange();
 }
 

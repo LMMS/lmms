@@ -698,6 +698,15 @@ void PianoView::resizeEvent(QResizeEvent* event)
 
 
 
+void PianoView::wheelEvent(QWheelEvent* event)
+{
+	// Send event to scroll bar
+	QApplication::sendEvent(m_pianoScroll, event);
+	// Never let it propagate to parent
+	event->accept();
+}
+
+
 
 /*! \brief Convert a key number to an X coordinate in the piano display view
  *

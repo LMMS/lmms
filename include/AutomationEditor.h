@@ -243,8 +243,6 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	void adjustLeftRightScoll(int value);
-
 	TimePos m_currentPosition;
 
 	Action m_action;
@@ -254,8 +252,11 @@ private:
 	float m_drawLastLevel;
 	tick_t m_drawLastTick;
 
+	//! Pixels per bar
 	int m_ppb;
+	//! Pixels per step on the Y axis (when Y zoom is not Auto)
 	int m_y_delta;
+	//! True if Y zoom is Auto
 	bool m_y_auto;
 
 	// Time position (key) of automation node whose outValue is being dragged

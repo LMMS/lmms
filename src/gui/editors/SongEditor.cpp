@@ -51,6 +51,7 @@
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
 #include "PositionLine.h"
+#include "Scroll.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
@@ -516,26 +517,21 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 
 
-void SongEditor::adjustLeftRightScoll(int value)
-{
-	m_leftRightScroll->setValue(m_leftRightScroll->value()
-						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
-}
-
-
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
+	auto scroll = Scroll(we);
+	we->accept();
+
 	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
 	{
 		int x = position(we).x() - m_trackHeadWidth;
 		// tick based on the mouse x-position where the scroll wheel was used
 		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 
-		// move zoom slider (pixelsPerBar will change automatically)
-		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
-		// when Alt is pressed, wheelEvent returns delta for x coordinate (mimics horizontal mouse wheel)
-		int direction = (we->angleDelta().y() + we->angleDelta().x()) > 0 ? 1 : -1;
-		m_zoomingModel->incValue(step * direction);
+		// Holding shift will zoom 5x slower
+		float scrollSpeed = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
+
+		m_zoomingModel->incValue(scroll.getSteps(scrollSpeed));
 
 		// scroll to zooming around cursor's tick
 		int newTick = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
@@ -546,22 +542,24 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		adjustLeftRightScoll(we->angleDelta().x());
-	}
-	else if (we->modifiers() & Qt::ShiftModifier)
-	{
-		adjustLeftRightScoll(we->angleDelta().y());
-	}
 	else
 	{
+		// How much the scroll wheel moves the screen depends on zoom level
+		const float speed = 120 * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
+		const int steps = scroll.getSteps(speed, Scroll::Flag::SwapOrientationWithAlt|Scroll::Flag::Horizontal);
+
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - steps);
+
+		// Ignore to event to let TrackContainerView::scrollArea::wheelEvent handle vertical scrolling
 		we->ignore();
-		return;
+
+#ifdef LMMS_BUILD_APPLE
+		// If we scrolled left/right by pressing Alt (Option) on macOS we can't let the event be passed on.
+		// This is because Qt on macOS does not swap scroll orientation when pressing Option (like it does
+		// on Windows when pressing Alt) and that would cause the song editor to scroll up/down.
+		if (we->modifiers() & Qt::AltModifier) { we->accept(); }
+#endif
 	}
-	we->accept();
 }
 
 

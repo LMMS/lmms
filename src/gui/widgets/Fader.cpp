@@ -56,6 +56,7 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "KeyboardShortcuts.h"
+#include "Scroll.h"
 #include "SimpleTextFloat.h"
 
 namespace
@@ -266,11 +267,13 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 
 void Fader::wheelEvent (QWheelEvent* ev)
 {
-	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
+	auto scroll = Scroll(ev);
+	if (!scroll.isVertical()) { return; }
 
-	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
+	const int scrollDelta = scroll.getDelta(Scroll::Flag::DisableNaturalScrolling);
+	const float adjustmentDelta = determineAdjustmentDelta(ev->modifiers());
 
-	adjustByDecibelDelta(increment);
+	adjustByDecibelDelta(scrollDelta * adjustmentDelta);
 
 	ev->accept();
 }
@@ -287,11 +290,6 @@ float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) c
 	{
 		// The control key gives more control, i.e. it enables more fine-grained adjustments
 		return 0.1f;
-	}
-	else if (modifiers & Qt::AltModifier)
-	{
-		// Work around a Qt bug in conjunction with the scroll wheel and the Alt key
-		return 0.f;
 	}
 
 	return 1.f;

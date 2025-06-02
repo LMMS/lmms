@@ -39,6 +39,7 @@
 #include "Engine.h"
 #include "FadeButton.h"
 #include "PixmapButton.h"
+#include "Scroll.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "TrackGrip.h"
@@ -382,17 +383,18 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 
 void TrackView::wheelEvent(QWheelEvent* we)
 {
-	// Note: we add the values because one of them will be 0. If the alt modifier
-	// is pressed x is non-zero and otherwise y.
-	const int deltaY = we->angleDelta().x() + we->angleDelta().y();
-	int const direction = deltaY < 0 ? -1 : 1;
+	auto scroll = Scroll(we);
+	if (!scroll.isVertical()) { return; }
 
 	auto const modKeys = we->modifiers();
-	int stepSize = modKeys == (Qt::ControlModifier | Qt::AltModifier) ? 1 : modKeys == (Qt::ShiftModifier | Qt::AltModifier) ? 5 : 0;
 
-	if (stepSize != 0)
+	// If Ctrl+Alt or Shift+Alt is pressed
+	if (modKeys & (Qt::ControlModifier | Qt::ShiftModifier) && modKeys & Qt::AltModifier)
 	{
-		resizeToHeight(height() + stepSize * direction);
+		// Pressing shift will resize 5x faster
+		float scrollSpeed = modKeys & Qt::ShiftModifier ? 5 : 1;
+
+		resizeToHeight(height() + scroll.getSteps(scrollSpeed));
 		we->accept();
 	}
 }
