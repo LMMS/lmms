@@ -199,7 +199,8 @@ void SampleTrackView::dropEvent(QDropEvent* de)
 {
 	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
-	if (type == "samplefile") {
+	if (type == "samplefile")
+	{
 		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
