@@ -28,6 +28,7 @@
 #include <QClipboard>
 
 #include "FileBrowser.h"
+#include "PluginFactory.h"
 #include "SampleDecoder.h"
 #include "StringPairDrag.h"
 
@@ -55,17 +56,8 @@ namespace lmms::Clipboard
 	 */
 	void updateExtensionLists()
 	{
-		#if defined(LMMS_HAVE_VST)
-			#if defined(LMMS_BUILD_WIN32)
-				vstPluginExtensions = QStringList{"dll"}
-			#elif defined(LMMS_BUILD_LINUX)
-				#if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
-					vstPluginExtensions = QStringList{"so", "dll"};
-				#else
-					vstPluginExtensions = QStringList{"so"};
-				#endif
-			#endif
-		#endif
+		vstPluginExtensions = QString(PluginFactory::instance()->pluginInfo("vestige").descriptor->supportedFileTypes).split(',');
+
 		audioExtensions.clear();
 		for (const SampleDecoder::AudioType& at : SampleDecoder::supportedAudioTypes())
 		{

@@ -80,16 +80,16 @@ StringPairDrag::~StringPairDrag()
 
 
 
-bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee, const std::initializer_list<QString>& _allowed_keys)
+bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* dee, const std::initializer_list<QString> allowed_keys)
 {
-	auto [type, value] = Clipboard::decodeMimeData(_dee->mimeData());
+	auto [type, value] = Clipboard::decodeMimeData(dee->mimeData());
 
-	if (std::ranges::find(_allowed_keys, type) != _allowed_keys.end())
+	if (std::ranges::find(allowed_keys, type) != allowed_keys.end())
 	{
-		_dee->acceptProposedAction();
+		dee->acceptProposedAction();
 		return true;
 	}
-	_dee->ignore();
+	dee->ignore();
 	return false;
 }
 
