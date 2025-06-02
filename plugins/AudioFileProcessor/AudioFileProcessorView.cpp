@@ -149,8 +149,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 
 void AudioFileProcessorView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, {"samplefile"
-});
+	StringPairDrag::processDragEnterEvent(dee, {"samplefile"});
 }
 
 void AudioFileProcessorView::newWaveView()
