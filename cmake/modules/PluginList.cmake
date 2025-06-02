@@ -54,6 +54,7 @@ SET(LMMS_PLUGIN_LIST
 	OpulenZ
 	Organic
 	FreeBoy
+	Oscilloscope
 	Patman
 	PeakControllerEffect
 	GigPlayer

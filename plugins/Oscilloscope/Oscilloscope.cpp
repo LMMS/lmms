@@ -1,0 +1,111 @@
+/*
+ * Oscilloscope.cpp - Example effect boilerplate code
+ *
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include "Oscilloscope.h"
+
+#include "embed.h"
+#include "plugin_export.h"
+
+#include <QDebug>
+
+namespace lmms
+{
+
+extern "C"
+{
+
+Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
+{
+	LMMS_STRINGIFY(PLUGIN_NAME),
+	"Oscilloscope",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Displays the incoming waveform"),
+	"Keratin",
+	0x0100,
+	Plugin::Type::Effect,
+	new PluginPixmapLoader("logo"),
+	nullptr,
+	nullptr,
+} ;
+
+}
+
+
+OscilloscopeEffect::OscilloscopeEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
+	Effect(&oscilloscope_plugin_descriptor, parent, key),
+	m_controls(this),
+	m_maxBufferSize(2048),
+	m_ringBufferIndex(0),
+	m_elapsedFrames(0),
+	m_framesSinceCrossing(0),
+	m_estimatedPeriod(0),
+	m_periodDecay(0.9),
+	m_paused(false)
+{
+	m_ringBuffer = new SampleFrame[m_maxBufferSize];
+}
+
+OscilloscopeEffect::~OscilloscopeEffect()
+{
+	delete[] m_ringBuffer;
+}
+
+
+Effect::ProcessStatus OscilloscopeEffect::processImpl(SampleFrame* buffer, const fpp_t frames)
+{
+	if (m_controls.m_pauseModel.value()) { return ProcessStatus::ContinueIfNotQuiet; }
+
+	float lastFrame = buffer[0].average();
+
+	for (f_cnt_t f = 0; f < frames; ++f)
+	{
+		m_ringBuffer[m_ringBufferIndex] = buffer[f];
+		m_ringBufferIndex = (m_ringBufferIndex + 1) % m_maxBufferSize;
+
+		if ((buffer[f].average() > 0 && lastFrame < 0) || (buffer[f].average() < 0 && lastFrame > 0))
+		{
+			m_estimatedPeriod = m_periodDecay * m_estimatedPeriod + (1 - m_periodDecay) * 2 * m_framesSinceCrossing;
+			m_framesSinceCrossing = 0;
+		}
+		m_framesSinceCrossing++;
+		lastFrame = buffer[f].average();
+	}
+	m_elapsedFrames += frames;
+
+	return ProcessStatus::ContinueIfNotQuiet;
+}
+
+
+extern "C"
+{
+
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
+{
+	return new OscilloscopeEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+}
+
+}
+
+} // namespace lmms
