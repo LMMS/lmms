@@ -50,7 +50,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -72,7 +72,7 @@ const int PW_WHITE_KEY_WIDTH = 10;  /*!< The width of a white key */
 const int PW_BLACK_KEY_WIDTH = 8;   /*!< The width of a black key */
 const int PW_WHITE_KEY_HEIGHT = 57; /*!< The height of a white key */
 const int PW_BLACK_KEY_HEIGHT = 38; /*!< The height of a black key */
-const int LABEL_TEXT_SIZE = 7;      /*!< The height of the key label text */
+const int LABEL_TEXT_SIZE = 8;      /*!< The height of the key label text */
 
 
 
@@ -90,7 +90,6 @@ PianoView::PianoView(QWidget *parent) :
 	m_lastKey(-1),                   /*!< The last key displayed? */
 	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
-	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
 
 	// Black keys are drawn halfway between successive white keys, so they do not
@@ -777,12 +776,12 @@ IntModel* PianoView::getNearestMarker(int key, QString* title)
 	const int first = m_piano->instrumentTrack()->firstKey();
 	const int last = m_piano->instrumentTrack()->lastKey();
 
-	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
+	if (std::abs(key - base) < std::abs(key - first) && std::abs(key - base) < std::abs(key - last))
 	{
 		if (title) {*title = tr("Base note");}
 		return m_piano->instrumentTrack()->baseNoteModel();
 	}
-	else if (abs(key - first) < abs(key - last))
+	else if (std::abs(key - first) < std::abs(key - last))
 	{
 		if (title) {*title = tr("First note");}
 		return m_piano->instrumentTrack()->firstKeyModel();

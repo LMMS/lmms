@@ -81,13 +81,8 @@ DelayEffect::~DelayEffect()
 
 
 
-bool DelayEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-	double outSum = 0.0;
 	const float sr = Engine::audioEngine()->outputSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -135,19 +130,17 @@ bool DelayEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 
 		// Dry/wet mix
 		currentFrame = dryS * d + currentFrame * w;
-		
-		outSum += currentFrame.sumOfSquaredAmplitudes();
 
 		lengthPtr += lengthInc;
 		amplitudePtr += amplitudeInc;
 		lfoTimePtr += lfoTimeInc;
 		feedbackPtr += feedbackInc;
 	}
-	checkGate( outSum / frames );
+
 	m_delayControls.m_outPeakL = peak.left();
 	m_delayControls.m_outPeakR = peak.right();
 
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void DelayEffect::changeSampleRate()

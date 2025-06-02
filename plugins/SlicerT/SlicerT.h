@@ -36,7 +36,7 @@
 #include "Sample.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms {
 
@@ -83,6 +83,8 @@ public:
 
 	void findSlices();
 	void findBPM();
+
+	QString getSampleName() { return m_originalSample.sampleFile(); }
 
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;

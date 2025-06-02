@@ -35,6 +35,7 @@
 #include <QWidget>
 
 #include "Engine.h"
+#include "FontHelper.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
 #include "TapTempo.h"
@@ -47,11 +48,10 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	auto font = QFont();
-	font.setPointSize(24);
 
 	m_tapButton = new QPushButton();
 	m_tapButton->setFixedSize(200, 200);
-	m_tapButton->setFont(font);
+	m_tapButton->setFont(adjustedToPixelSize(font, 32));
 	m_tapButton->setText(tr("0"));
 
 	auto precisionCheckBox = new QCheckBox(tr("Precision"));

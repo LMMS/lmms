@@ -34,7 +34,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
@@ -63,23 +63,19 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_bypass->setToolTip(tr("On/Off"));
 
-
-	m_wetDry = new Knob( KnobType::Bright26, this );
-	m_wetDry->setLabel( tr( "W/D" ) );
+	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
-	m_autoQuit = new TempoSyncKnob( KnobType::Bright26, this );
-	m_autoQuit->setLabel( tr( "DECAY" ) );
+	m_autoQuit = new TempoSyncKnob(KnobType::Bright26, tr("DECAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
 	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
-	m_gate = new Knob( KnobType::Bright26, this );
-	m_gate->setLabel( tr( "GATE" ) );
+	m_gate = new Knob(KnobType::Bright26, tr("GATE"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_gate->move( 116 - m_gate->width() / 2, 5 );
 	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
@@ -91,8 +87,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont(adjustedToPixelSize(f, 10));
+		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		ctls_btn->setFocusPolicy(Qt::NoFocus);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
@@ -258,7 +255,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_bg );
 
-	QFont f = adjustedToPixelSize(font(), 10);
+	QFont f = adjustedToPixelSize(font(), DEFAULT_FONT_SIZE);
 	f.setBold( true );
 	p.setFont( f );
 

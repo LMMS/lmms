@@ -94,7 +94,7 @@ void StepRecorderWidget::setEndPosition(TimePos pos)
 
 void StepRecorderWidget::showHint()
 {
-	TextFloat::displayMessage(tr( "Hint" ), tr("Move recording curser using <Left/Right> arrows"),
+	TextFloat::displayMessage(tr( "Hint" ), tr("Move recording cursor using <Left/Right> arrows"),
 		embed::getIconPixmap("hint"));
 }
 

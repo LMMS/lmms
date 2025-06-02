@@ -46,7 +46,6 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	m_changed( true ),
 	m_updateTimer()
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedSize( m_background.width(), m_background.height() );
 
 	m_temp = QPixmap( width(), height() );

@@ -41,7 +41,8 @@ class DispersionEffect : public Effect
 public:
 	DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~DispersionEffect() override = default;
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

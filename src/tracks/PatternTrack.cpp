@@ -154,7 +154,7 @@ Clip* PatternTrack::createClip(const TimePos & pos)
 
 
 
-void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this)
+void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==

@@ -33,6 +33,7 @@
 
 #include "AudioEngine.h"
 #include "Controller.h"
+#include "Metronome.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Timeline.h"
@@ -256,6 +257,7 @@ public:
 		return m_playMode;
 	}
 
+	PlayMode lastPlayMode() const { return m_lastPlayMode; }
 	inline PlayPos & getPlayPos( PlayMode pm )
 	{
 		return m_playPos[static_cast<std::size_t>(pm)];
@@ -375,6 +377,8 @@ public:
 
 	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
 
+	Metronome& metronome() { return m_metronome; }
+
 public slots:
 	void playSong();
 	void record();
@@ -448,6 +452,7 @@ private:
 	void restoreKeymapStates(const QDomElement &element);
 
 	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
+	void processMetronome(size_t bufferOffset);
 
 	void setModified(bool value);
 
@@ -488,6 +493,7 @@ private:
 	std::array<Timeline, PlayModeCount> m_timelines;
 
 	PlayMode m_playMode;
+	PlayMode m_lastPlayMode;
 	PlayPos m_playPos[PlayModeCount];
 	bar_t m_length;
 
@@ -512,6 +518,8 @@ private:
 	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
 
 	AutomatedValueMap m_oldAutomatedValues;
+
+	Metronome m_metronome;
 
 	friend class Engine;
 	friend class gui::SongEditor;

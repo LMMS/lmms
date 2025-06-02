@@ -28,7 +28,7 @@
 
 #include <limits>
 
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
@@ -133,8 +133,7 @@ public:
 
 
 	// called by track
-	void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
+	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	using Track::setJournalling;
@@ -145,9 +144,9 @@ public:
 				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 				bool keyFromDnd = false);
 
-	AudioPort * audioPort()
+	AudioBusHandle* audioBusHandle()
 	{
-		return &m_audioPort;
+		return &m_audioBusHandle;
 	}
 
 	MidiPort * midiPort()
@@ -294,7 +293,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 
-	AudioPort m_audioPort;
+	AudioBusHandle m_audioBusHandle;
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
