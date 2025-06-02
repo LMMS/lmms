@@ -160,7 +160,7 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-	static AutoScrollState getDefaultAutoScrollState();
+	static AutoScrollState defaultAutoScrollState();
 
 signals:
 	void positionChanged(const lmms::TimePos& postion);
@@ -228,7 +228,7 @@ private:
 	const TimePos & m_begin;
 	const Song::PlayMode m_mode;
 
-	AutoScrollState m_autoScroll = AutoScrollState::Stepped;
+	AutoScrollState m_autoScroll = defaultAutoScrollState();
 
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
 	// position allows for unquantized drag but fails when toggling quantization.

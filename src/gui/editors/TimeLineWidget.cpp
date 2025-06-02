@@ -57,8 +57,7 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_pos{pos},
 	m_timeline{&timeline},
 	m_begin{begin},
-	m_mode{mode},
-	m_autoScroll{AutoScrollState::Stepped}
+	m_mode{mode}
 {
 	move( 0, yoff );
 
@@ -458,7 +457,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 }
 
 
-TimeLineWidget::AutoScrollState TimeLineWidget::getDefaultAutoScrollState()
+TimeLineWidget::AutoScrollState TimeLineWidget::defaultAutoScrollState()
 {
 	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
 	if (autoScrollState == AUTOSCROLL_STEPPED_STRING) { return AutoScrollState::Stepped; }
