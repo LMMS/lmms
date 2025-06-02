@@ -1564,6 +1564,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			break;
 		default:
 			ke->ignore();
+			break;
 	}
 
 	update();
