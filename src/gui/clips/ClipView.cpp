@@ -426,8 +426,9 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, {"clip_",
-					QString::number( static_cast<int>(m_clip->getTrack()->type()) )} );
+		StringPairDrag::processDragEnterEvent(dee, {
+			QString("clip_%1").arg(static_cast<int>(m_clip->getTrack()->type()))
+		});
 	}
 }
 
