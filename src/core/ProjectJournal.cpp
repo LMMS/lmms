@@ -122,7 +122,7 @@ bool ProjectJournal::canRedo() const
 
 
 
-void ProjectJournal::addJournalCheckPoint(JournallingObject *jo, QString reason)
+void ProjectJournal::addJournalCheckPoint(JournallingObject* jo, QString reason)
 {
 	if( isJournalling() )
 	{
@@ -131,7 +131,7 @@ void ProjectJournal::addJournalCheckPoint(JournallingObject *jo, QString reason)
 		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
-		m_undoCheckPoints.push(CheckPoint(jo->id(), dataFile, reason));
+		m_undoCheckPoints.push(CheckPoint(jo->id(), dataFile, std::move(reason)));
 		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
 		{
 			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );

@@ -41,7 +41,7 @@ class UndoRedoMenu : public SideBarWidget
 {
 	Q_OBJECT
 public:
-	UndoRedoMenu(QWidget *parent = nullptr);
+	UndoRedoMenu(QWidget* parent = nullptr);
 private slots:
 	void reloadTree();
 private:
@@ -52,12 +52,12 @@ class UndoRedoTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
 public:
-	UndoRedoTreeWidget(QWidget * parent);
+	UndoRedoTreeWidget(QWidget* parent);
 	~UndoRedoTreeWidget() override = default;
 protected:
-	void contextMenuEvent(QContextMenuEvent * e) override;
+	void contextMenuEvent(QContextMenuEvent* e) override;
 private:
-	void applyUndoRedoEntry(QTreeWidgetItem * item, int column);
+	void applyUndoRedoEntry(QTreeWidgetItem* item, int column);
 };
 
 class UndoRedoTreeWidgetItem : public QTreeWidgetItem

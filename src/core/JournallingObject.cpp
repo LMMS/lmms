@@ -59,7 +59,7 @@ void JournallingObject::addJournalCheckPoint(QString reason)
 {
 	if( isJournalling() )
 	{
-		Engine::projectJournal()->addJournalCheckPoint(this, reason);
+		Engine::projectJournal()->addJournalCheckPoint(this, std::move(reason));
 	}
 }
 

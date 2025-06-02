@@ -43,7 +43,7 @@ namespace lmms::gui
 {
 
 
-UndoRedoMenu::UndoRedoMenu(QWidget *parent) :
+UndoRedoMenu::UndoRedoMenu(QWidget* parent) :
 	SideBarWidget(tr("Project History"), embed::getIconPixmap("edit_undo").transformed(QTransform().rotate(90)), parent)
 {
 	m_undoRedoTree = new UndoRedoTreeWidget(contentParent());
@@ -113,10 +113,10 @@ void UndoRedoTreeWidget::contextMenuEvent(QContextMenuEvent * e)
 	contextMenu.exec(e->globalPos());
 }
 
-void UndoRedoTreeWidget::applyUndoRedoEntry(QTreeWidgetItem * item, int column)
+void UndoRedoTreeWidget::applyUndoRedoEntry(QTreeWidgetItem* item, int column)
 {
 	auto entry = dynamic_cast<UndoRedoTreeWidgetItem*>(item);
-	if(entry == nullptr) { return; }
+	if (entry == nullptr) { return; }
 
 	bool isUndo = entry->m_isUndo;
 	int numUndoRedos = entry->m_index + 1;
@@ -152,7 +152,7 @@ UndoRedoMenuDetailsWindow::UndoRedoMenuDetailsWindow(QString text):
 	getGUI()->mainWindow()->addWindowedWidget(this);
 	parentWidget()->setWindowIcon(embed::getIconPixmap("edit_undo"));
 	setPlainText(text);
-	setMinimumSize(600,400);
+	setMinimumSize(600, 400);
 }
 
 

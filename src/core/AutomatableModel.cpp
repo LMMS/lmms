@@ -297,7 +297,7 @@ void AutomatableModel::setValue( const float value )
 	m_oldValue = m_value;
 	++m_setValueDepth;
 
-	if( m_value != value )
+	if (m_value != value)
 	{
 		// add changes to history so user can undo it
 		addJournalCheckPoint(tr("Set %1 to %2").arg(fullDisplayName(), QString::number(value)));

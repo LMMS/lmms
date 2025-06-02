@@ -56,7 +56,7 @@ public:
 	bool canUndo() const;
 	bool canRedo() const;
 
-	void addJournalCheckPoint(JournallingObject *jo, QString reason);
+	void addJournalCheckPoint(JournallingObject* jo, QString reason);
 
 	bool isJournalling() const
 	{
@@ -105,7 +105,7 @@ public:
 		CheckPoint(jo_id_t initID = 0, const DataFile& initData = DataFile(DataFile::Type::JournalData), QString description = "") :
 			joID(initID),
 			data(initData),
-			description(description)
+			description(std::move(description))
 		{
 		}
 		jo_id_t joID;
