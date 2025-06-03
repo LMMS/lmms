@@ -1,6 +1,7 @@
 /*
- * Oscilloscope.cpp - Example effect boilerplate code
+ * Oscilloscope.cpp - Oscilloscope effect to preview the incoming waveform
  *
+ * Copyright (c) 2025 Keratin
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
