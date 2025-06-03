@@ -34,7 +34,8 @@ namespace lmms
 OscilloscopeControls::OscilloscopeControls(OscilloscopeEffect* effect) :
 	EffectControls(effect),
 	m_ampModel(100.0f, 0.0f, 1000.0f, 0.00001f, this, tr("Amplitude")),
-	m_lengthModel(2048.0f, 1.0f, 2048.0f, 1.0f, this, tr("Length")),
+	m_lengthModel(OscilloscopeEffect::BUFFER_SIZE, 10.0f, OscilloscopeEffect::BUFFER_SIZE, 1.0f, this, tr("Length")),
+	m_phaseModel(0.0f, 0.0f, 1.0f, 0.00001f, this, tr("Phase")),
 	m_pauseModel(false, this, tr("Pause")),
 	m_effect(effect)
 {
@@ -45,6 +46,7 @@ void OscilloscopeControls::loadSettings(const QDomElement& parent)
 {
 	m_ampModel.loadSettings(parent, "amp");
 	m_lengthModel.loadSettings(parent, "length");
+	m_phaseModel.loadSettings(parent, "phase");
 	m_pauseModel.loadSettings(parent, "pause");
 }
 
@@ -53,6 +55,7 @@ void OscilloscopeControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 	m_ampModel.saveSettings(doc, parent, "amp");
 	m_lengthModel.saveSettings(doc, parent, "length");
+	m_phaseModel.saveSettings(doc, parent, "phase");
 	m_pauseModel.saveSettings(doc, parent, "pause");
 }
 

@@ -69,14 +69,16 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 	pauseButton->setModel(&controls->m_pauseModel);
 	controlsLayout->addWidget(pauseButton);
 
-	Knob* lengthknob = new Knob(KnobType::Bright26, this);
-	lengthknob->setModel(&controls->m_lengthModel);
-	lengthknob->setLabel(tr("Length"));
-	controlsLayout->addWidget(lengthknob);
+	Knob* lengthKnob = new Knob(KnobType::Bright26, tr("Window Size"), this);
+	lengthKnob->setModel(&controls->m_lengthModel);
+	controlsLayout->addWidget(lengthKnob);
 
-	Knob* ampknob = new Knob(KnobType::Bright26, this);
+	Knob* phaseKnob = new Knob(KnobType::Bright26, tr("Offset"), this);
+	phaseKnob->setModel(&controls->m_phaseModel);
+	controlsLayout->addWidget(phaseKnob);
+
+	Knob* ampknob = new Knob(KnobType::Bright26, tr("Scale"), this);
 	ampknob->setModel(&controls->m_ampModel);
-	ampknob->setLabel(tr("Scale"));
 	ampknob->setVolumeKnob(true);
 	controlsLayout->addWidget(ampknob);
 }

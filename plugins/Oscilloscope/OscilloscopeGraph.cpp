@@ -32,6 +32,7 @@
 
 #include <QPainter>
 #include <QSizePolicy>
+#include <QWheelEvent>
 
 namespace lmms::gui
 {
@@ -42,7 +43,7 @@ OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* cont
 {
 	setAutoFillBackground(true);
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
-	setMinimumSize(200, 100);
+	setMinimumSize(400, 200);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
@@ -57,34 +58,67 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	OscilloscopeEffect* effect = static_cast<OscilloscopeEffect*>(m_controls->effect());
 
 	float amp = m_controls->amplitude();
-	int period = std::max(1, static_cast<int>(effect->estimatedPeriod()));
+	float phase = m_controls->phase();
+	int windowSize = m_controls->length();
+	int framesPerPixel = std::max(1, windowSize / width());
 
-	int bufferSize = effect->bufferSize();
-	int visibleBufferSize = m_controls->length();
+
 	SampleFrame* buffer = effect->buffer();
-
+	int bufferSize = OscilloscopeEffect::BUFFER_SIZE;
 	int bufferIndex = effect->bufferIndex();
-	int elapsedFrames = effect->elapsedFrames();
-	int bufferIndexStartOfPeriod = (bufferIndex - elapsedFrames % period - visibleBufferSize) % bufferSize;
+	int windowStartIndex = bufferIndex + phase * bufferSize;
 
 	p.setPen(QColor(100, 100, 100));
 	p.drawLine(0, height() / 2, width(), height() / 2);
+
 	p.setPen(QColor(100, 0, 0));
+	p.drawLine(0, height() / 2 * (1 - amp), width(), height() / 2 * (1 - amp));
+	p.drawLine(0, height() / 2 * (1 + amp), width(), height() / 2 * (1 + amp));
 
 	p.setPen(QColor(255, 255, 255));
-	for (int f = 1; f < visibleBufferSize; ++f)
+	for (int f = 0; f < windowSize; ++f)
 	{
-		// Adding bufferSize to prevent negative modulus
-		int currentIndex = (bufferIndexStartOfPeriod + f + bufferSize) % bufferSize;
-		int previousIndex = (bufferIndexStartOfPeriod + f - 1 + bufferSize) % bufferSize;
+		int currentIndex = (windowStartIndex + f) % bufferSize;
+		int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
 		p.drawLine(
-			width() * (f - 1) / visibleBufferSize,
-			height() * (1 + buffer[previousIndex].average() * amp) / 2,
-			width() * f / visibleBufferSize,
-			height() * (1 + buffer[currentIndex].average() * amp) / 2
+			width() * (f) / windowSize,
+			height() * (1 + buffer[currentIndex].average() * amp) / 2,
+			width() * (f + framesPerPixel) / windowSize,
+			height() * (1 + buffer[nextIndex].average() * amp) / 2
 		);
 	}
 }
 
+void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
+{
+	int windowSize = m_controls->length();
+	float phase = m_controls->phase();
+	float mouseOffset = (we->position().x() / width()) * windowSize / OscilloscopeEffect::BUFFER_SIZE;
+	float zoomAmount = std::exp2(-we->angleDelta().y() / 240.0f);
+
+	int newWindowSize = windowSize * zoomAmount;
+	float newPhase = phase + mouseOffset * (1.0f - zoomAmount);
+	m_controls->setLength(newWindowSize);
+	m_controls->setPhase(newPhase - std::floor(newPhase));
+}
+
+void OscilloscopeGraph::mousePressEvent(QMouseEvent* me)
+{
+	m_mousePressed = true;
+	m_mousePos = me->x();
+}
+void OscilloscopeGraph::mouseReleaseEvent(QMouseEvent* me)
+{
+	m_mousePressed = false;
+}
+
+void OscilloscopeGraph::mouseMoveEvent(QMouseEvent* me)
+{
+	float phase = m_controls->phase();
+	int windowSize = m_controls->length();
+	float newPhase = phase + 1.0f * (m_mousePos - me->x()) / width() * windowSize / OscilloscopeEffect::BUFFER_SIZE;
+	m_controls->setPhase(newPhase - std::floor(newPhase));
+	m_mousePos = me->x();
+}
 
 } // namespace lmms::gui

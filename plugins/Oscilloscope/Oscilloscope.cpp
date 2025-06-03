@@ -54,16 +54,9 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 
 OscilloscopeEffect::OscilloscopeEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&oscilloscope_plugin_descriptor, parent, key),
-	m_controls(this),
-	m_maxBufferSize(2048),
-	m_ringBufferIndex(0),
-	m_elapsedFrames(0),
-	m_framesSinceCrossing(0),
-	m_estimatedPeriod(0),
-	m_periodDecay(0.9),
-	m_paused(false)
+	m_controls(this)
 {
-	m_ringBuffer = new SampleFrame[m_maxBufferSize];
+	m_ringBuffer = new SampleFrame[BUFFER_SIZE];
 }
 
 OscilloscopeEffect::~OscilloscopeEffect()
@@ -74,25 +67,14 @@ OscilloscopeEffect::~OscilloscopeEffect()
 
 Effect::ProcessStatus OscilloscopeEffect::processImpl(SampleFrame* buffer, const fpp_t frames)
 {
-	if (m_controls.m_pauseModel.value()) { return ProcessStatus::ContinueIfNotQuiet; }
-
-	float lastFrame = buffer[0].average();
-
-	for (f_cnt_t f = 0; f < frames; ++f)
+	if (!m_controls.m_pauseModel.value())
 	{
-		m_ringBuffer[m_ringBufferIndex] = buffer[f];
-		m_ringBufferIndex = (m_ringBufferIndex + 1) % m_maxBufferSize;
-
-		if ((buffer[f].average() > 0 && lastFrame < 0) || (buffer[f].average() < 0 && lastFrame > 0))
+		for (f_cnt_t f = 0; f < frames; ++f)
 		{
-			m_estimatedPeriod = m_periodDecay * m_estimatedPeriod + (1 - m_periodDecay) * 2 * m_framesSinceCrossing;
-			m_framesSinceCrossing = 0;
+			m_ringBuffer[m_ringBufferIndex] = buffer[f];
+			m_ringBufferIndex = (m_ringBufferIndex + 1) % BUFFER_SIZE;
 		}
-		m_framesSinceCrossing++;
-		lastFrame = buffer[f].average();
 	}
-	m_elapsedFrames += frames;
-
 	return ProcessStatus::ContinueIfNotQuiet;
 }
 

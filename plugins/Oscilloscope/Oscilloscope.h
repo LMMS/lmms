@@ -47,21 +47,14 @@ public:
 
 	SampleFrame* buffer() const { return m_ringBuffer; }
 	int bufferIndex() const { return m_ringBufferIndex; }
-	int bufferSize() const { return m_maxBufferSize; }
-	float estimatedPeriod() const { return m_estimatedPeriod; }
-	int elapsedFrames() const { return m_elapsedFrames; }
+
+	static const int BUFFER_SIZE = 8192;
 
 private:
 	OscilloscopeControls m_controls;
 
-	int m_maxBufferSize;
-	int m_ringBufferIndex;
-	int m_elapsedFrames;
-	int m_framesSinceCrossing;
-	float m_estimatedPeriod;
-	float m_periodDecay;
-	bool m_paused;
 	SampleFrame* m_ringBuffer;
+	int m_ringBufferIndex = 0;
 
 	friend class OscilloscopeControls;
 };
