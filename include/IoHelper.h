@@ -22,6 +22,9 @@
  *
  */
 
+// NOTE: The LMMS/zynaddsubfx repo contains a copy of this header.
+//       If you modify this file, consider modifying it there as well.
+
 #ifndef LMMS_IO_HELPER_H
 #define LMMS_IO_HELPER_H
 
@@ -52,7 +55,7 @@ namespace lmms
 #ifdef _WIN32
 
 /**
- * UTF-8 to wide char conversion
+ * UTF-8 to wide string conversion
  * NOTE: Avoids using std::wstring because it does not work correctly with wineg++
  */
 inline std::unique_ptr<wchar_t[]> toWString(std::string_view utf8)
