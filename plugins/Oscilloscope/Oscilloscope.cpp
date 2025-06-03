@@ -40,8 +40,8 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Oscilloscope",
-	QT_TRANSLATE_NOOP("PluginBrowser", "Displays the incoming waveform"),
-	"Keratin",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Oscilloscope plugin to display the incoming audio waveform"),
+	"Keratin <3",
 	0x0100,
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
@@ -52,20 +52,20 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 }
 
 
-OscilloscopeEffect::OscilloscopeEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
+Oscilloscope::Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&oscilloscope_plugin_descriptor, parent, key),
 	m_controls(this)
 {
 	m_ringBuffer = new SampleFrame[BUFFER_SIZE];
 }
 
-OscilloscopeEffect::~OscilloscopeEffect()
+Oscilloscope::~Oscilloscope()
 {
 	delete[] m_ringBuffer;
 }
 
 
-Effect::ProcessStatus OscilloscopeEffect::processImpl(SampleFrame* buffer, const fpp_t frames)
+Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t frames)
 {
 	if (!m_controls.m_pauseModel.value())
 	{
@@ -85,7 +85,7 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
-	return new OscilloscopeEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+	return new Oscilloscope(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
 
 }

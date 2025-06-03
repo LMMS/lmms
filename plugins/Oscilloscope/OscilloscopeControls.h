@@ -32,7 +32,7 @@
 namespace lmms
 {
 
-class OscilloscopeEffect;
+class Oscilloscope;
 
 namespace gui
 {
@@ -43,7 +43,7 @@ class OscilloscopeControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	OscilloscopeControls(OscilloscopeEffect* effect);
+	OscilloscopeControls(Oscilloscope* effect);
 	~OscilloscopeControls() override = default;
 
 	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
@@ -65,7 +65,7 @@ public:
 	void setLength(int length) { m_lengthModel.setAutomatedValue(length); }
 	void setPhase(float phase) { m_phaseModel.setAutomatedValue(phase); }
 
-	OscilloscopeEffect* getEffect() const { return m_effect; }
+	Oscilloscope* getEffect() const { return m_effect; }
 
 private:
 	FloatModel m_ampModel;
@@ -74,10 +74,10 @@ private:
 	BoolModel m_pauseModel;
 	BoolModel m_stereoModel;
 
-	OscilloscopeEffect* m_effect;
+	Oscilloscope* m_effect;
 
 	friend class gui::OscilloscopeControlDialog;
-	friend class OscilloscopeEffect;
+	friend class Oscilloscope;
 };
 
 } // namespace lmms

@@ -52,10 +52,9 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	if (!isVisible()) { return; }
 
 	QPainter p(this);
-	p.fillRect(0, 0, width(), height(), QColor(0,0,0));
-	p.setPen(QColor(255, 255, 255));
+	p.fillRect(0, 0, width(), height(), m_backgroundColor);
 
-	OscilloscopeEffect* effect = static_cast<OscilloscopeEffect*>(m_controls->effect());
+	Oscilloscope* effect = static_cast<Oscilloscope*>(m_controls->effect());
 
 	float amp = m_controls->amplitude();
 	float phase = m_controls->phase();
@@ -64,14 +63,14 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 
 
 	SampleFrame* buffer = effect->buffer();
-	int bufferSize = OscilloscopeEffect::BUFFER_SIZE;
+	int bufferSize = Oscilloscope::BUFFER_SIZE;
 	int bufferIndex = effect->bufferIndex();
 	int windowStartIndex = bufferIndex + phase * bufferSize;
 
-	p.setPen(QColor(100, 100, 100));
+	p.setPen(m_minorLineColor);
 	p.drawLine(0, height() / 2, width(), height() / 2);
 
-	p.setPen(QColor(100, 0, 0));
+	p.setPen(m_clippingLineColor);
 	p.drawLine(0, height() / 2 * (1 - amp), width(), height() / 2 * (1 - amp));
 	p.drawLine(0, height() / 2 * (1 + amp), width(), height() / 2 * (1 + amp));
 
@@ -124,10 +123,10 @@ void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
 {
 	int windowSize = m_controls->length();
 	float phase = m_controls->phase();
-	float mouseOffset = (we->position().x() / width()) * windowSize / OscilloscopeEffect::BUFFER_SIZE;
+	float mouseOffset = (we->position().x() / width()) * windowSize / Oscilloscope::BUFFER_SIZE;
 	float zoomAmount = std::exp2(-we->angleDelta().y() / 240.0f);
 
-	if ((zoomAmount > 1.0f && windowSize >= OscilloscopeEffect::BUFFER_SIZE) || (zoomAmount < 1.0f && windowSize <= 10)) { return; }
+	if ((zoomAmount > 1.0f && windowSize >= Oscilloscope::BUFFER_SIZE) || (zoomAmount < 1.0f && windowSize <= 10)) { return; }
 
 	int newWindowSize = windowSize * zoomAmount;
 	float newPhase = phase + mouseOffset * (1.0f - zoomAmount);
@@ -149,7 +148,7 @@ void OscilloscopeGraph::mouseMoveEvent(QMouseEvent* me)
 {
 	float phase = m_controls->phase();
 	int windowSize = m_controls->length();
-	float newPhase = phase + 1.0f * (m_mousePos - me->x()) / width() * windowSize / OscilloscopeEffect::BUFFER_SIZE;
+	float newPhase = phase + 1.0f * (m_mousePos - me->x()) / width() * windowSize / Oscilloscope::BUFFER_SIZE;
 	m_controls->setPhase(newPhase - std::floor(newPhase));
 	m_mousePos = me->x();
 }

@@ -31,10 +31,10 @@
 namespace lmms
 {
 
-OscilloscopeControls::OscilloscopeControls(OscilloscopeEffect* effect) :
+OscilloscopeControls::OscilloscopeControls(Oscilloscope* effect) :
 	EffectControls(effect),
 	m_ampModel(100.0f, 0.0f, 1000.0f, 0.00001f, this, tr("Amplitude")),
-	m_lengthModel(OscilloscopeEffect::BUFFER_SIZE, 10.0f, OscilloscopeEffect::BUFFER_SIZE, 1.0f, this, tr("Length")),
+	m_lengthModel(Oscilloscope::BUFFER_SIZE, 10.0f, Oscilloscope::BUFFER_SIZE, 1.0f, this, tr("Length")),
 	m_phaseModel(0.0f, 0.0f, 1.0f, 0.00001f, this, tr("Phase")),
 	m_pauseModel(false, this, tr("Pause")),
 	m_stereoModel(false, this, tr("Stereo")),

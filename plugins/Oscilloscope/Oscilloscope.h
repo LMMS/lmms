@@ -32,11 +32,11 @@
 namespace lmms
 {
 
-class OscilloscopeEffect : public Effect
+class Oscilloscope : public Effect
 {
 public:
-	OscilloscopeEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~OscilloscopeEffect() override;
+	Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
+	~Oscilloscope() override;
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 

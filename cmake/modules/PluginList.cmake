@@ -53,8 +53,8 @@ SET(LMMS_PLUGIN_LIST
 	Nes
 	OpulenZ
 	Organic
-	FreeBoy
 	Oscilloscope
+	FreeBoy
 	Patman
 	PeakControllerEffect
 	GigPlayer
