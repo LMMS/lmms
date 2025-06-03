@@ -75,17 +75,48 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, height() / 2 * (1 - amp), width(), height() / 2 * (1 - amp));
 	p.drawLine(0, height() / 2 * (1 + amp), width(), height() / 2 * (1 + amp));
 
-	p.setPen(QColor(255, 255, 255));
-	for (int f = 0; f < windowSize; ++f)
+	bool stereo = m_controls->stereo();
+	if (!stereo)
 	{
-		int currentIndex = (windowStartIndex + f) % bufferSize;
-		int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-		p.drawLine(
-			width() * (f) / windowSize,
-			height() * (1 + buffer[currentIndex].average() * amp) / 2,
-			width() * (f + framesPerPixel) / windowSize,
-			height() * (1 + buffer[nextIndex].average() * amp) / 2
-		);
+		p.setPen(m_monoColor);
+		for (int f = 0; f < windowSize; ++f)
+		{
+			int currentIndex = (windowStartIndex + f) % bufferSize;
+			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			p.drawLine(
+				width() * (f) / windowSize,
+				height() * (1 + buffer[currentIndex].average() * amp) / 2,
+				width() * (f + framesPerPixel) / windowSize,
+				height() * (1 + buffer[nextIndex].average() * amp) / 2
+			);
+		}
+	}
+	else
+	{
+		p.setPen(m_leftColor);
+		for (int f = 0; f < windowSize; ++f)
+		{
+			int currentIndex = (windowStartIndex + f) % bufferSize;
+			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			p.drawLine(
+				width() * (f) / windowSize,
+				height() * (1 + buffer[currentIndex].left() * amp) / 2,
+				width() * (f + framesPerPixel) / windowSize,
+				height() * (1 + buffer[nextIndex].left() * amp) / 2
+			);
+		}
+		p.setPen(m_rightColor);
+		for (int f = 0; f < windowSize; ++f)
+		{
+			int currentIndex = (windowStartIndex + f) % bufferSize;
+			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			p.drawLine(
+				width() * (f) / windowSize,
+				height() * (1 + buffer[currentIndex].right() * amp) / 2,
+				width() * (f + framesPerPixel) / windowSize,
+				height() * (1 + buffer[nextIndex].right() * amp) / 2
+			);
+		}
 	}
 }
 
@@ -95,6 +126,8 @@ void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
 	float phase = m_controls->phase();
 	float mouseOffset = (we->position().x() / width()) * windowSize / OscilloscopeEffect::BUFFER_SIZE;
 	float zoomAmount = std::exp2(-we->angleDelta().y() / 240.0f);
+
+	if ((zoomAmount > 1.0f && windowSize >= OscilloscopeEffect::BUFFER_SIZE) || (zoomAmount < 1.0f && windowSize <= 10)) { return; }
 
 	int newWindowSize = windowSize * zoomAmount;
 	float newPhase = phase + mouseOffset * (1.0f - zoomAmount);

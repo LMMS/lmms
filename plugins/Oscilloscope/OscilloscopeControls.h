@@ -60,8 +60,9 @@ public:
 
 	float amplitude() const { return m_ampModel.value() * 0.01f; }
 	int length() const { return m_lengthModel.value(); }
-	void setLength(int length) { m_lengthModel.setAutomatedValue(length); }
 	float phase() const { return m_phaseModel.value(); }
+	bool stereo() const { return m_stereoModel.value(); }
+	void setLength(int length) { m_lengthModel.setAutomatedValue(length); }
 	void setPhase(float phase) { m_phaseModel.setAutomatedValue(phase); }
 
 	OscilloscopeEffect* getEffect() const { return m_effect; }
@@ -71,6 +72,7 @@ private:
 	FloatModel m_lengthModel;
 	FloatModel m_phaseModel;
 	BoolModel m_pauseModel;
+	BoolModel m_stereoModel;
 
 	OscilloscopeEffect* m_effect;
 

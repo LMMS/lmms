@@ -69,6 +69,10 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 	pauseButton->setModel(&controls->m_pauseModel);
 	controlsLayout->addWidget(pauseButton);
 
+	LedCheckBox* stereoCheck = new LedCheckBox("Stereo", this, tr("Stereo"), LedCheckBox::LedColor::Green);
+	stereoCheck->setModel(&controls->m_stereoModel);
+	controlsLayout->addWidget(stereoCheck);
+
 	Knob* lengthKnob = new Knob(KnobType::Bright26, tr("Window Size"), this);
 	lengthKnob->setModel(&controls->m_lengthModel);
 	controlsLayout->addWidget(lengthKnob);
