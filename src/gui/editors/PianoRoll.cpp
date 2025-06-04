@@ -283,7 +283,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// white position line follows timeline marker
-	m_positionLine = new PositionLine(this);
+	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
 
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
