@@ -200,7 +200,6 @@ public:
 
 	void setInitValue( const float value );
 
-	void setAutomatedValue(float value);
 	void setValue(float value, bool isAutomated = false);
 
 	void incValue( int steps )
