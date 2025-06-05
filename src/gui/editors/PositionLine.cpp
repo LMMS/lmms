@@ -36,7 +36,7 @@ PositionLine::PositionLine(QWidget* parent) :
 	QWidget(parent),
 	m_hasTailGradient(false),
 	m_lineColor(0, 0, 0, 0),
-	m_recordingColor(255, 0, 0)
+	m_recordingColor(255, 71, 87)
 {
 	resize(8, height());
 
