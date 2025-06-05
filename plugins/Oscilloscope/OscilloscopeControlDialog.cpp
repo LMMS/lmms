@@ -35,7 +35,6 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include <QDebug>
 
 namespace lmms::gui
 {
@@ -44,12 +43,6 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 	EffectControlDialog(controls)
 {
 	setAutoFillBackground(true);
-	/* Uncomment this if you want to use a background image
-	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
-	setPalette(pal);
-	setFixedSize(100, 110);
-	*/
 
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);

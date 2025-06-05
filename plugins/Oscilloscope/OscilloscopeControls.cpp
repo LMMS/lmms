@@ -26,8 +26,8 @@
 
 #include <QDomElement>
 
-#include "OscilloscopeControls.h"
 #include "Oscilloscope.h"
+#include "OscilloscopeControls.h"
 
 namespace lmms
 {
