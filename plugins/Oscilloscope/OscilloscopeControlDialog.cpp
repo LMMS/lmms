@@ -53,13 +53,14 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
+	mainLayout->setSpacing(0);
 	OscilloscopeGraph* graph = new OscilloscopeGraph(this, controls);
 	mainLayout->addWidget(graph);
 
 	QGroupBox* controlsWidget = new QGroupBox(this);
-	mainLayout->addWidget(controlsWidget);
+	mainLayout->addWidget(controlsWidget, 0, Qt::AlignTop);
 	QHBoxLayout* controlsLayout = new QHBoxLayout(controlsWidget);
-	controlsLayout->setContentsMargins(5, 5, 5, 5);
+	controlsLayout->setContentsMargins(5, 5, 0, 0);
 
 
 	PixmapButton* pauseButton = new PixmapButton(this, tr("Pause"));

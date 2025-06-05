@@ -45,7 +45,7 @@ OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* cont
 	setAutoFillBackground(true);
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
 	setMinimumSize(400, 200);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
