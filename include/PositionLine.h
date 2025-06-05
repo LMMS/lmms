@@ -28,6 +28,8 @@
 
 #include <QWidget>
 
+#include "Song.h"
+
 namespace lmms::gui
 {
 
@@ -38,7 +40,7 @@ class PositionLine : public QWidget
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
 	Q_PROPERTY(QColor recordingColor MEMBER m_recordingColor)
 public:
-	PositionLine(QWidget* parent);
+	PositionLine(QWidget* parent, Song::PlayMode playMode);
 	bool isRecording = false;
 
 public slots:
@@ -46,6 +48,8 @@ public slots:
 
 private:
 	void paintEvent(QPaintEvent* pe) override;
+
+	Song::PlayMode m_playMode;
 
 	bool m_hasTailGradient;
 	QColor m_lineColor;
