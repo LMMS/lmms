@@ -229,7 +229,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
-		p.setOpacity(0.6);
+		p.setOpacity(isPlayheadVisible ? 0.6 : 0);
 		p.drawPixmap(markerX(m_pos) - (marker.width() / 2),
 			height() - marker.height(), marker);
 	}

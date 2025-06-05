@@ -158,6 +158,7 @@ public:
 	}
 
 	bool isRecoridng = false;
+	bool isPlayheadVisible = true;
 
 signals:
 	void positionChanged(const lmms::TimePos& postion);
