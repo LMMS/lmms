@@ -105,7 +105,7 @@ namespace lmms::PathUtil
 
 	QString cleanName(const QString& path)
 	{
-		return stripPrefix(QFileInfo(path).fileName());
+		return stripPrefix(QFileInfo(path).completeBaseName());
 	}
 
 
