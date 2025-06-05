@@ -50,7 +50,6 @@ namespace lmms::Clipboard
 		return parts.isEmpty() ? file.toLower() : parts.last().toLower();
 	}
 
-	//
 	/* @brief updates the lists of extensions.
 	 * TODO: currently, this only applies for audioExtensions and vstPluginExtensions, but all the lists should be filled dynamically
 	 */
