@@ -312,7 +312,7 @@ void MainWindow::finalize()
 					SLOT(onExportProject()),
 					combine(Qt::CTRL, Qt::Key_E));
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
-					tr( "Export &Tracks..." ),
+					tr("Export &Tracks..."),
 					this,
 					SLOT(onExportProjectTracks()),
 					combine(Qt::CTRL, Qt::SHIFT, Qt::Key_E));
