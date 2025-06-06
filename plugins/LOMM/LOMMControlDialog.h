@@ -62,10 +62,10 @@ class LOMMControlDialog : public EffectControlDialog
 public:
 	LOMMControlDialog(LOMMControls* controls);
 	~LOMMControlDialog() override = default;
-	
+
 	int dbfsToX(float dbfs);
 	float xToDbfs(int x);
-	
+
 	Knob* createKnob(KnobType knobType, QWidget* parent, int x, int y, FloatModel* model, const QString& hintText, const QString& unit, const QString& toolTip)
 	{
 		Knob* knob = new Knob(knobType, parent);
@@ -75,7 +75,7 @@ public:
 		knob->setToolTip(toolTip);
 		return knob;
 	}
-	
+
 	LcdFloatSpinBox* createLcdFloatSpinBox(int integerDigits, int decimalDigits, const QString& color, const QString& unit, QWidget* parent, int x, int y, FloatModel* model, const QString& toolTip)
 	{
 		LcdFloatSpinBox* spinBox = new LcdFloatSpinBox(integerDigits, decimalDigits, color, unit, parent);
@@ -85,7 +85,7 @@ public:
 		spinBox->setToolTip(toolTip);
 		return spinBox;
 	}
-	
+
 	PixmapButton* createPixmapButton(const QString& text, QWidget* parent, int x, int y, BoolModel* model,
 		std::string_view activeIcon, std::string_view inactiveIcon, const QString& tooltip)
 	{
@@ -107,12 +107,12 @@ protected:
 
 private:
 	LOMMControls* m_controls;
-	
+
 	QPoint m_lastMousePos;
 	bool m_buttonPressed = false;
 	int m_bandDrag = 0;
 	int m_dragType = -1;
-	
+
 	PixmapButton* m_feedbackButton;
 	PixmapButton* m_lowSideUpwardSuppressButton;
 
