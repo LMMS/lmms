@@ -23,8 +23,8 @@
 */
 
 
-#ifndef SIMPLE_TEXT_FLOAT_H
-#define SIMPLE_TEXT_FLOAT_H
+#ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
+#define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
 
@@ -64,4 +64,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SIMPLE_TEXT_FLOAT_H
