@@ -383,8 +383,6 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	void adjustLeftRightScoll(int value);
-
 	TimePos m_currentPosition;
 	bool m_recording;
 	bool m_doAutoQuantization{false};
