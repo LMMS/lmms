@@ -31,6 +31,7 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "FileDialog.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -39,6 +40,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VersionedSaveDialog.h"
 
 namespace lmms::gui
 {
@@ -86,6 +88,13 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_clip, SLOT(toggleRecord()));*/
+
+	cm->addAction(
+		embed::getIconPixmap("project_export"),
+		tr("Export sample buffer"),
+		this,
+		SLOT(exportSampleBuffer())
+	);
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -370,6 +379,16 @@ void SampleClipView::setAutomationGhost()
 	aEditor->parentWidget()->show();
 	aEditor->show();
 	aEditor->setFocus();
+}
+
+void SampleClipView::exportSampleBuffer()
+{
+	const auto outputFilename = VersionedSaveDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+
+	if (!outputFilename.isEmpty())
+	{
+		m_clip->exportSampleBuffer(outputFilename);
+	}
 }
 
 } // namespace lmms::gui
