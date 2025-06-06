@@ -34,7 +34,6 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QGroupBox>
 
 namespace lmms::gui
 {
@@ -46,14 +45,15 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
-	mainLayout->setSpacing(0);
+	mainLayout->setSpacing(5);
 	OscilloscopeGraph* graph = new OscilloscopeGraph(this, controls);
 	mainLayout->addWidget(graph);
 
-	QGroupBox* controlsWidget = new QGroupBox(this);
-	mainLayout->addWidget(controlsWidget, 0, Qt::AlignTop);
+	QWidget* controlsWidget = new QWidget(this);
+	mainLayout->addWidget(controlsWidget);
 	QHBoxLayout* controlsLayout = new QHBoxLayout(controlsWidget);
-	controlsLayout->setContentsMargins(5, 5, 0, 0);
+	controlsLayout->setContentsMargins(5, 0, 5, 0);
+	controlsLayout->setSpacing(10);
 
 
 	PixmapButton* pauseButton = new PixmapButton(this, tr("Pause"));
