@@ -55,7 +55,7 @@
 #include <sys/prctl.h>
 #endif
 
-#include <csignal>  // To register the signal handler
+#include <csignal>
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
@@ -76,12 +76,12 @@
 #include <fenv.h> // For feenableexcept
 #include <execinfo.h> // For backtrace and backtrace_symbols_fd
 #include <unistd.h> // For STDERR_FILENO
+#include <csignal> // To register the signal handler
 #endif
 
 
 #ifdef LMMS_DEBUG_FPE
-void sigfpeHandler(int signum)
-{
+void signalHandler( int signum ) {
 
 	// Get a back trace
 	void *array[10];
@@ -315,9 +315,8 @@ int main( int argc, char * * argv )
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
-	signal(SIGFPE, sigfpeHandler);
+	signal(SIGFPE, signalHandler);
 #endif
-	signal(SIGINT, gui::GuiApplication::sigintHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
