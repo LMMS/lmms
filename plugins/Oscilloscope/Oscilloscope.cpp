@@ -34,7 +34,6 @@ namespace lmms
 
 extern "C"
 {
-
 Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
@@ -46,8 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
-} ;
-
+};
 }
 
 
@@ -80,13 +78,11 @@ Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
 	return new Oscilloscope(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
-
 }
 
 } // namespace lmms
