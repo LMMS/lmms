@@ -164,7 +164,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = static_cast<double>(framesPerPeriod()) / currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -208,9 +208,11 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
+	AudioDevice::startProcessing();
+
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
-	m_outBufSize = audioEngine()->framesPerPeriod();
+	m_outBufSize = framesPerPeriod();
 
 	m_outBuf = new SampleFrame[m_outBufSize];
 
@@ -239,6 +241,8 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
+	AudioDevice::stopProcessing();
+
 	m_stopped = true;
 	if (m_outstream)
 	{
@@ -269,55 +273,37 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped) {return;}
-	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea* areas;
-	int bytesPerSample = m_outstream->bytes_per_sample;
-	int framesLeft = frameCountMax;
+	const auto layout = static_cast<SoundIoChannelLayout*>(&m_outstream->layout);
+	auto areas = static_cast<SoundIoChannelArea*>(nullptr);
+	auto framesLeft = frameCountMax;
 
 	while (framesLeft > 0)
 	{
-		int frameCount = framesLeft;
-		if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
+		auto frameCount = framesLeft;
+		if (int error = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
 		{
-			errorCallback(err);
+			errorCallback(error);
 			return;
 		}
 
-		if (!frameCount)
-			break;
+		if (!frameCount) { break; }
 
-		
-		if (m_stopped)
+		auto buffers = std::array<float*, SOUNDIO_MAX_CHANNELS>{};
+		buffers.fill(nullptr);
+
+		for (auto i = 0; i < layout->channel_count; ++i)
 		{
-			for (int channel = 0; channel < layout->channel_count; ++channel)
-			{
-				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
-				areas[channel].ptr += areas[channel].step * frameCount;
-			}
-			continue;
+			buffers[i] = reinterpret_cast<float*>(areas[i].ptr);
 		}
 
-		for (int frame = 0; frame < frameCount; frame += 1)
+		if (!nextBuffer(buffers.data(), frameCount, layout->channel_count))
 		{
-			if (m_outBufFrameIndex >= m_outBufFramesTotal)
+			for (auto i = 0; i < layout->channel_count; ++i)
 			{
-				m_outBufFramesTotal = getNextBuffer(m_outBuf);
-				if (m_outBufFramesTotal == 0)
-				{
-					m_stopped = true;
-					break;
-				}
-				m_outBufFrameIndex = 0;
+				std::fill_n(buffers[i], frameCount * layout->channel_count, 0.f);
 			}
 
-			for (int channel = 0; channel < layout->channel_count; channel += 1)
-			{
-				float sample = m_outBuf[m_outBufFrameIndex][channel];
-				memcpy(areas[channel].ptr, &sample, bytesPerSample);
-				areas[channel].ptr += areas[channel].step;
-			}
-			m_outBufFrameIndex += 1;
+			break;
 		}
 
 		if (int err = soundio_outstream_end_write(m_outstream))
