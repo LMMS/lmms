@@ -98,6 +98,10 @@ bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
 	return RemotePlugin::processMessage( _m );
 }
 
+void ZynAddSubFxRemotePlugin::setKeyDetuning(int key, float detuning)
+{
+	//LocalZynAddSubFx::setKeyDetuning(key, detuning)
+}
 
 
 
@@ -341,6 +345,31 @@ void ZynAddSubFxInstrument::play( SampleFrame* _buf )
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
+}
+
+
+
+
+void ZynAddSubFxInstrument::playNote(NotePlayHandle * _n, SampleFrame* _working_buffer)
+{
+	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
+	{
+		return;
+	}
+
+	int masterPitch = instrumentTrack()->useMasterPitchModel()->value() ? Engine::getSong()->masterPitch() : 0;
+	int baseNote = instrumentTrack()->baseNoteModel()->value();
+	int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
+	const auto detuning = _n->currentDetuning();
+
+	if (m_remotePlugin)
+	{
+		m_remotePlugin->setKeyDetuning(midiNote, detuning);
+	}
+	else
+	{
+		m_plugin->setKeyDetuning(midiNote, detuning);
+	}
 }
 
 

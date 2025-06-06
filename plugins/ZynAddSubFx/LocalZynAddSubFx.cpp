@@ -222,6 +222,11 @@ void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 }
 
 
+void LocalZynAddSubFx::setKeyDetuning(int key, float detuning)
+{
+	m_master->setKeyDetuning(key, detuning);
+}
+
 
 void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 {
