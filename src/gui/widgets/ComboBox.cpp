@@ -33,6 +33,7 @@
 
 #include "CaptionMenu.h"
 #include "FontHelper.h"
+#include "Scroll.h"
 
 #define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 #if !QT_SUPPORTS_WIDGET_SCREEN
@@ -218,12 +219,15 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 void ComboBox::wheelEvent( QWheelEvent* event )
 {
+	auto scroll = Scroll(event);
+	if (!scroll.isVertical()) { return; }
+
+	event->accept();
+
 	if( model() )
 	{
-		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
-		model()->setInitValue(model()->value() + direction);
+		model()->setInitValue(model()->value() - scroll.getSteps());
 		update();
-		event->accept();
 	}
 }
 
