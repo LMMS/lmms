@@ -38,6 +38,7 @@ class Oscilloscope;
 namespace gui
 {
 class OscilloscopeControlDialog;
+class OscilloscopeGraph;
 }
 
 class OscilloscopeControls : public EffectControls
@@ -57,16 +58,7 @@ public:
 	{
 		return new gui::OscilloscopeControlDialog(this);
 	}
-	int controlCount() override { return 4; }
-
-	float amplitude() const { return m_ampModel.value() * 0.01f; }
-	int length() const { return m_lengthModel.value(); }
-	float phase() const { return m_phaseModel.value(); }
-	bool stereo() const { return m_stereoModel.value(); }
-	void setLength(int length) { m_lengthModel.setAutomatedValue(length); }
-	void setPhase(float phase) { m_phaseModel.setAutomatedValue(phase); }
-
-	Oscilloscope* getEffect() const { return m_effect; }
+	int controlCount() override { return 5; }
 
 private:
 	FloatModel m_ampModel;
@@ -78,6 +70,7 @@ private:
 	Oscilloscope* m_effect;
 
 	friend class gui::OscilloscopeControlDialog;
+	friend class gui::OscilloscopeGraph;
 	friend class Oscilloscope;
 };
 
