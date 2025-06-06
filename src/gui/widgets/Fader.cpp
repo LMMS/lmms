@@ -56,6 +56,7 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "KeyboardShortcuts.h"
+#include "DeprecationHelper.h"
 #include "SimpleTextFloat.h"
 
 namespace
@@ -187,6 +188,8 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
+	const auto pos = position(mouseEvent);
+
 	if (mouseEvent->button() == Qt::LeftButton &&
 			!(mouseEvent->modifiers() & KBD_COPY_MODIFIER))
 	{
@@ -197,7 +200,7 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			thisModel->saveJournallingState(false);
 		}
 
-		const int localY = mouseEvent->y();
+		const int localY = pos.y();
 		const auto knobLowerPosY = calculateKnobPosYFromModel();
 		const auto knobUpperPosY = knobLowerPosY - m_knobSize.height();
 
