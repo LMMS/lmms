@@ -53,6 +53,11 @@ public:
 	{
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
+	
+	inline void moveToGlobal(const QPoint& offset)
+	{
+		move(offset);
+	}
 
 	void hide();
 
