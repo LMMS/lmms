@@ -114,10 +114,13 @@ AutomationEditor::AutomationEditor() :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
+	// Set up tension model
 	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
+	m_tensionModel->setJournalling(false);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
+	// Set up quantization model
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
