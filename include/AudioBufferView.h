@@ -140,7 +140,7 @@ public:
 		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
 	}
 
-	//! Returns the frame at the given index
+	//! @return the frame at the given index
 	constexpr auto frame(f_cnt_t index) const noexcept
 	{
 		if constexpr (channelCount == DynamicChannelCount)
@@ -153,7 +153,7 @@ public:
 		}
 	}
 
-	//! Returns the frame at the given index
+	//! @return the frame at the given index
 	constexpr auto framePtr(f_cnt_t index) const noexcept -> SampleT*
 	{
 		assert(index < this->m_frames);
@@ -209,13 +209,13 @@ public:
 		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
 	}
 
-	//! Returns the buffer of a given channel
+	//! @return the buffer of a given channel
 	constexpr auto buffer(proc_ch_t channel) const noexcept -> std::span<SampleT>
 	{
 		return {bufferPtr(channel), this->m_frames};
 	}
 
-	//! Returns the buffer of a given channel
+	//! @return the buffer of a given channel
 	template<proc_ch_t channel> requires (channelCount != DynamicChannelCount)
 	constexpr auto buffer() const noexcept -> std::span<SampleT>
 	{
@@ -223,7 +223,7 @@ public:
 	}
 
 	/**
-	 * Returns pointer to the buffer of a given channel.
+	 * @return pointer to the buffer of a given channel.
 	 * The size of the buffer is `frames()`.
 	 */
 	constexpr auto bufferPtr(proc_ch_t channel) const noexcept -> SampleT*
@@ -234,7 +234,7 @@ public:
 	}
 
 	/**
-	 * Returns pointer to the buffer of a given channel.
+	 * @return pointer to the buffer of a given channel.
 	 * The size of the buffer is `frames()`.
 	 */
 	template<proc_ch_t channel> requires (channelCount != DynamicChannelCount)
