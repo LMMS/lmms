@@ -66,7 +66,7 @@ public:
 	constexpr auto channels() const -> proc_ch_t { return channelCount; }
 	constexpr auto frames() const -> f_cnt_t { return m_frames; }
 
-private:
+protected:
 	SampleT* m_data = nullptr;
 	f_cnt_t m_frames = 0;
 };
@@ -91,7 +91,7 @@ public:
 	constexpr auto channels() const -> proc_ch_t { return m_channels; }
 	constexpr auto frames() const -> f_cnt_t { return m_frames; }
 
-private:
+protected:
 	SampleT* m_data = nullptr;
 	proc_ch_t m_channels = 0;
 	f_cnt_t m_frames = 0;
@@ -135,19 +135,26 @@ public:
 	{
 	}
 
-	constexpr auto empty() const -> bool { return !data() || channels() == 0 || frames() == 0; }
+	constexpr auto empty() const -> bool { return !this->m_data || this->channels() == 0 || this->m_frames == 0; }
 
 	//! Returns the frame at the given index
-	constexpr auto frame(f_cnt_t index) const -> std::span<SampleT, channelCount>
+	constexpr auto frame(f_cnt_t index) const
 	{
-		return {framePtr(index), channels()};
+		if constexpr (channelCount == DynamicChannelCount)
+		{
+			return std::span<SampleT>{framePtr(index), this->channels()};
+		}
+		else
+		{
+			return std::span<SampleT, channelCount>{framePtr(index), this->channels()};
+		}
 	}
 
 	//! Returns the frame at the given index
 	constexpr auto framePtr(f_cnt_t index) const -> SampleT*
 	{
-		assert(index < frames());
-		return this->m_data + index * channels();
+		assert(index < this->m_frames);
+		return this->m_data + index * this->channels();
 	}
 };
 
@@ -195,19 +202,19 @@ public:
 	{
 	}
 
-	constexpr auto empty() const -> bool { return !data() || channels() == 0 || frames() == 0; }
+	constexpr auto empty() const -> bool { return !this->m_data || this->channels() == 0 || this->m_frames == 0; }
 
 	//! Returns the buffer of a given channel
 	constexpr auto buffer(proc_ch_t channel) const -> std::span<SampleT>
 	{
-		return {bufferPtr(channel), frames()};
+		return {bufferPtr(channel), this->m_frames};
 	}
 
 	//! Returns the buffer of a given channel
 	template<proc_ch_t channel>
 	constexpr auto buffer() const -> std::span<SampleT>
 	{
-		return {bufferPtr<channel>(), frames()};
+		return {bufferPtr<channel>(), this->m_frames};
 	}
 
 	/**
@@ -216,9 +223,9 @@ public:
 	 */
 	constexpr auto bufferPtr(proc_ch_t channel) const -> SampleT*
 	{
-		assert(channel < channels());
-		assert(data() != nullptr);
-		return data()[channel];
+		assert(channel < this->channels());
+		assert(this->m_data != nullptr);
+		return this->m_data[channel];
 	}
 
 	/**
@@ -230,8 +237,8 @@ public:
 	{
 		static_assert(channel != DynamicChannelCount);
 		static_assert(channel < channelCount);
-		assert(data() != nullptr);
-		return data()[channel];
+		assert(this->m_data != nullptr);
+		return this->m_data[channel];
 	}
 };
 
