@@ -177,8 +177,7 @@ static_assert(sizeof(InterleavedBufferView<float, 2>) == sizeof(void*) + sizeof(
 template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
 class PlanarBufferView : public detail::BufferViewData<SampleT* const, channelCount>
 {
-	using SamplePtrT = SampleT* const;
-	using Base = detail::BufferViewData<SamplePtrT, channelCount>;
+	using Base = detail::BufferViewData<SampleT* const, channelCount>;
 
 public:
 	using Base::Base;
