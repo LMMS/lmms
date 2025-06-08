@@ -153,11 +153,23 @@ public:
 		}
 	}
 
-	//! @return the frame at the given index
+	/**
+	 * @return pointer to the frame at the given index.
+	 * The size of the frame is `channels()`.
+	 */
 	constexpr auto framePtr(f_cnt_t index) const noexcept -> SampleT*
 	{
 		assert(index < this->m_frames);
 		return this->m_data + index * this->channels();
+	}
+
+	/**
+	 * @return pointer to the frame at the given index.
+	 * The size of the frame is `channels()`.
+	 */
+	constexpr auto operator[](f_cnt_t index) const noexcept -> SampleT*
+	{
+		return framePtr(index);
 	}
 };
 
@@ -209,13 +221,13 @@ public:
 		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
 	}
 
-	//! @return the buffer of a given channel
+	//! @return the buffer of the given channel
 	constexpr auto buffer(proc_ch_t channel) const noexcept -> std::span<SampleT>
 	{
 		return {bufferPtr(channel), this->m_frames};
 	}
 
-	//! @return the buffer of a given channel
+	//! @return the buffer of the given channel
 	template<proc_ch_t channel> requires (channelCount != DynamicChannelCount)
 	constexpr auto buffer() const noexcept -> std::span<SampleT>
 	{
@@ -223,7 +235,7 @@ public:
 	}
 
 	/**
-	 * @return pointer to the buffer of a given channel.
+	 * @return pointer to the buffer of the given channel.
 	 * The size of the buffer is `frames()`.
 	 */
 	constexpr auto bufferPtr(proc_ch_t channel) const noexcept -> SampleT*
@@ -234,7 +246,7 @@ public:
 	}
 
 	/**
-	 * @return pointer to the buffer of a given channel.
+	 * @return pointer to the buffer of the given channel.
 	 * The size of the buffer is `frames()`.
 	 */
 	template<proc_ch_t channel> requires (channelCount != DynamicChannelCount)
@@ -243,6 +255,15 @@ public:
 		static_assert(channel < channelCount);
 		assert(this->m_data != nullptr);
 		return this->m_data[channel];
+	}
+
+	/**
+	 * @return pointer to the buffer of a given channel.
+	 * The size of the buffer is `frames()`.
+	 */
+	constexpr auto operator[](proc_ch_t channel) const noexcept -> SampleT*
+	{
+		return bufferPtr(channel);
 	}
 };
 
