@@ -135,7 +135,10 @@ public:
 	{
 	}
 
-	constexpr auto empty() const -> bool { return !this->m_data || this->channels() == 0 || this->m_frames == 0; }
+	constexpr auto empty() const -> bool
+	{
+		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
+	}
 
 	//! Returns the frame at the given index
 	constexpr auto frame(f_cnt_t index) const
@@ -166,15 +169,15 @@ static_assert(sizeof(InterleavedBufferView<float, 2>) == sizeof(void*) + sizeof(
 /**
  * Non-owning view for multi-channel non-interleaved audio data
  *
- * The data type is `SampleT**` which is a 2D array accessed as data[channel][frame index]
+ * The data type is `SampleT* const*` which is a 2D array accessed as data[channel][frame index]
  * where each channel's buffer contains `frames()` frames.
  *
  * TODO C++23: Use std::mdspan?
  */
 template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
-class PlanarBufferView : public detail::BufferViewData<std::add_pointer_t<SampleT>, channelCount>
+class PlanarBufferView : public detail::BufferViewData<SampleT* const, channelCount>
 {
-	using SamplePtrT = std::add_pointer_t<SampleT>;
+	using SamplePtrT = SampleT* const;
 	using Base = detail::BufferViewData<SamplePtrT, channelCount>;
 
 public:
@@ -182,14 +185,14 @@ public:
 
 	//! Contruct const from mutable (static channel count)
 	template<typename T = SampleT> requires (std::is_const_v<T> && channelCount != DynamicChannelCount)
-	constexpr PlanarBufferView(PlanarBufferView<std::add_pointer_t<std::remove_const_t<T>>, channelCount> other)
+	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<T>, channelCount> other)
 		: Base{other.data(), other.frames()}
 	{
 	}
 
 	//! Contruct const from mutable (dynamic channel count)
 	template<typename T = SampleT> requires (std::is_const_v<T> && channelCount == DynamicChannelCount)
-	constexpr PlanarBufferView(PlanarBufferView<std::add_pointer_t<std::remove_const_t<T>>, channelCount> other)
+	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<T>, channelCount> other)
 		: Base{other.data(), other.channels(), other.frames()}
 	{
 	}
@@ -197,12 +200,15 @@ public:
 	//! Construct dynamic channel count from static
 	template<proc_ch_t otherChannels>
 		requires (channelCount == DynamicChannelCount && otherChannels != DynamicChannelCount)
-	constexpr PlanarBufferView(PlanarBufferView<SamplePtrT, otherChannels> other)
+	constexpr PlanarBufferView(PlanarBufferView<SampleT, otherChannels> other)
 		: Base{other.data(), otherChannels, other.frames()}
 	{
 	}
 
-	constexpr auto empty() const -> bool { return !this->m_data || this->channels() == 0 || this->m_frames == 0; }
+	constexpr auto empty() const -> bool
+	{
+		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
+	}
 
 	//! Returns the buffer of a given channel
 	constexpr auto buffer(proc_ch_t channel) const -> std::span<SampleT>
