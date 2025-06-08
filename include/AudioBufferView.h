@@ -49,22 +49,22 @@ public:
 	constexpr BufferViewData() = default;
 	constexpr BufferViewData(const BufferViewData&) = default;
 
-	constexpr BufferViewData(SampleT* data, proc_ch_t channels, f_cnt_t frames)
+	constexpr BufferViewData(SampleT* data, proc_ch_t channels, f_cnt_t frames) noexcept
 		: m_data{data}
 		, m_frames{frames}
 	{
 		assert(channels == channelCount);
 	}
 
-	constexpr BufferViewData(SampleT* data, f_cnt_t frames)
+	constexpr BufferViewData(SampleT* data, f_cnt_t frames) noexcept
 		: m_data{data}
 		, m_frames{frames}
 	{
 	}
 
-	constexpr auto data() const -> SampleT* { return m_data; }
-	constexpr auto channels() const -> proc_ch_t { return channelCount; }
-	constexpr auto frames() const -> f_cnt_t { return m_frames; }
+	constexpr auto data() const noexcept -> SampleT* { return m_data; }
+	constexpr auto channels() const noexcept -> proc_ch_t { return channelCount; }
+	constexpr auto frames() const noexcept -> f_cnt_t { return m_frames; }
 
 protected:
 	SampleT* m_data = nullptr;
@@ -79,7 +79,7 @@ public:
 	constexpr BufferViewData() = default;
 	constexpr BufferViewData(const BufferViewData&) = default;
 
-	constexpr BufferViewData(SampleT* data, proc_ch_t channels, f_cnt_t frames)
+	constexpr BufferViewData(SampleT* data, proc_ch_t channels, f_cnt_t frames) noexcept
 		: m_data{data}
 		, m_channels{channels}
 		, m_frames{frames}
@@ -87,9 +87,9 @@ public:
 		assert(channels != DynamicChannelCount);
 	}
 
-	constexpr auto data() const -> SampleT* { return m_data; }
-	constexpr auto channels() const -> proc_ch_t { return m_channels; }
-	constexpr auto frames() const -> f_cnt_t { return m_frames; }
+	constexpr auto data() const noexcept -> SampleT* { return m_data; }
+	constexpr auto channels() const noexcept -> proc_ch_t { return m_channels; }
+	constexpr auto frames() const noexcept -> f_cnt_t { return m_frames; }
 
 protected:
 	SampleT* m_data = nullptr;
@@ -115,14 +115,14 @@ public:
 
 	//! Contruct const from mutable (static channel count)
 	template<typename T = SampleT> requires (std::is_const_v<T> && channelCount != DynamicChannelCount)
-	constexpr InterleavedBufferView(InterleavedBufferView<std::remove_const_t<T>, channelCount> other)
+	constexpr InterleavedBufferView(InterleavedBufferView<std::remove_const_t<T>, channelCount> other) noexcept
 		: Base{other.data(), other.frames()}
 	{
 	}
 
 	//! Contruct const from mutable (dynamic channel count)
 	template<typename T = SampleT> requires (std::is_const_v<T> && channelCount == DynamicChannelCount)
-	constexpr InterleavedBufferView(InterleavedBufferView<std::remove_const_t<T>, channelCount> other)
+	constexpr InterleavedBufferView(InterleavedBufferView<std::remove_const_t<T>, channelCount> other) noexcept
 		: Base{other.data(), other.channels(), other.frames()}
 	{
 	}
@@ -130,18 +130,18 @@ public:
 	//! Construct dynamic channel count from static
 	template<proc_ch_t otherChannels>
 		requires (channelCount == DynamicChannelCount && otherChannels != DynamicChannelCount)
-	constexpr InterleavedBufferView(InterleavedBufferView<SampleT, otherChannels> other)
+	constexpr InterleavedBufferView(InterleavedBufferView<SampleT, otherChannels> other) noexcept
 		: Base{other.data(), otherChannels, other.frames()}
 	{
 	}
 
-	constexpr auto empty() const -> bool
+	constexpr auto empty() const noexcept -> bool
 	{
 		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
 	}
 
 	//! Returns the frame at the given index
-	constexpr auto frame(f_cnt_t index) const
+	constexpr auto frame(f_cnt_t index) const noexcept
 	{
 		if constexpr (channelCount == DynamicChannelCount)
 		{
@@ -154,7 +154,7 @@ public:
 	}
 
 	//! Returns the frame at the given index
-	constexpr auto framePtr(f_cnt_t index) const -> SampleT*
+	constexpr auto framePtr(f_cnt_t index) const noexcept -> SampleT*
 	{
 		assert(index < this->m_frames);
 		return this->m_data + index * this->channels();
@@ -185,14 +185,14 @@ public:
 
 	//! Contruct const from mutable (static channel count)
 	template<typename T = SampleT> requires (std::is_const_v<T> && channelCount != DynamicChannelCount)
-	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<T>, channelCount> other)
+	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<T>, channelCount> other) noexcept
 		: Base{other.data(), other.frames()}
 	{
 	}
 
 	//! Contruct const from mutable (dynamic channel count)
 	template<typename T = SampleT> requires (std::is_const_v<T> && channelCount == DynamicChannelCount)
-	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<T>, channelCount> other)
+	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<T>, channelCount> other) noexcept
 		: Base{other.data(), other.channels(), other.frames()}
 	{
 	}
@@ -200,25 +200,25 @@ public:
 	//! Construct dynamic channel count from static
 	template<proc_ch_t otherChannels>
 		requires (channelCount == DynamicChannelCount && otherChannels != DynamicChannelCount)
-	constexpr PlanarBufferView(PlanarBufferView<SampleT, otherChannels> other)
+	constexpr PlanarBufferView(PlanarBufferView<SampleT, otherChannels> other) noexcept
 		: Base{other.data(), otherChannels, other.frames()}
 	{
 	}
 
-	constexpr auto empty() const -> bool
+	constexpr auto empty() const noexcept -> bool
 	{
 		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
 	}
 
 	//! Returns the buffer of a given channel
-	constexpr auto buffer(proc_ch_t channel) const -> std::span<SampleT>
+	constexpr auto buffer(proc_ch_t channel) const noexcept -> std::span<SampleT>
 	{
 		return {bufferPtr(channel), this->m_frames};
 	}
 
 	//! Returns the buffer of a given channel
 	template<proc_ch_t channel>
-	constexpr auto buffer() const -> std::span<SampleT>
+	constexpr auto buffer() const noexcept -> std::span<SampleT>
 	{
 		return {bufferPtr<channel>(), this->m_frames};
 	}
@@ -227,7 +227,7 @@ public:
 	 * Returns pointer to the buffer of a given channel.
 	 * The size of the buffer is `frames()`.
 	 */
-	constexpr auto bufferPtr(proc_ch_t channel) const -> SampleT*
+	constexpr auto bufferPtr(proc_ch_t channel) const noexcept -> SampleT*
 	{
 		assert(channel < this->channels());
 		assert(this->m_data != nullptr);
@@ -239,7 +239,7 @@ public:
 	 * The size of the buffer is `frames()`.
 	 */
 	template<proc_ch_t channel>
-	constexpr auto bufferPtr() const -> SampleT*
+	constexpr auto bufferPtr() const noexcept -> SampleT*
 	{
 		static_assert(channel != DynamicChannelCount);
 		static_assert(channel < channelCount);
