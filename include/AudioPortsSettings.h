@@ -96,6 +96,9 @@ struct AudioPortsSettings
 	 *
 	 * NOTE: Regardless of whether `inplace` is true or false, if `buffered` is true, the process method
 	 *   will have no buffer parameters.
+	 *
+	 * TODO: Once `RemotePluginAudioPorts` supports statically in-place processing, replace this setting with
+	 *       `forceInplace` and use statically in-place processing when `forceInplace || inputs == 0 || outputs == 0`.
 	 */
 	bool inplace = false;
 

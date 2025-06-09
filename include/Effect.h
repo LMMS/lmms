@@ -26,6 +26,8 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
+#include <span>
+
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "Engine.h"

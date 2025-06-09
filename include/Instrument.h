@@ -28,6 +28,7 @@
 
 #include <QString>
 #include <cmath>
+#include <span>
 
 #include "Flags.h"
 #include "SampleFrame.h"

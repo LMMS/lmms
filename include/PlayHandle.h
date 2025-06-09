@@ -25,9 +25,10 @@
 #ifndef LMMS_PLAY_HANDLE_H
 #define LMMS_PLAY_HANDLE_H
 
-#include <vector>
 #include <QList>
 #include <QMutex>
+#include <span>
+#include <vector>
 
 #include "Flags.h"
 #include "LmmsTypes.h"
