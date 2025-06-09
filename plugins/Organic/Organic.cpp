@@ -340,12 +340,12 @@ float inline OrganicInstrument::waveshape(float in, float amount)
 
 void OrganicInstrument::randomiseSettings()
 {
-	for (auto& osc : m_osc)
+	for (auto i = 0; i < m_numOscillators; ++i)
 	{
-		osc->m_volModel.setValue(fastRand<100>());
-		osc->m_detuneModel.setValue(fastRand<-5, +5>());
-		osc->m_panModel.setValue(0);
-		osc->m_oscModel.setValue(fastRand<5>());
+		m_osc[i]->m_volModel.setValue(fastRand<100>());
+		m_osc[i]->m_detuneModel.setValue(fastRand<-5, +5>());
+		m_osc[i]->m_panModel.setValue(0);
+		m_osc[i]->m_oscModel.setValue(fastRand<5>());
 	}
 }
 

@@ -42,6 +42,8 @@
 
 namespace lmms
 {
+using namespace std::numbers;
+using std::integral, std::floating_point;
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
@@ -59,7 +61,7 @@ inline bool approximatelyEqual(float x, float y) noexcept
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-inline auto fraction(std::floating_point auto x) noexcept
+inline auto fraction(floating_point auto x) noexcept
 {
 	return x - std::trunc(x);
 }
@@ -76,24 +78,34 @@ inline auto fraction(std::floating_point auto x) noexcept
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-inline auto absFraction(std::floating_point auto x) noexcept
+inline auto absFraction(floating_point auto x) noexcept
 {
 	return x - std::floor(x);
 }
 
+
 inline auto fastRand() noexcept
 {
-	static unsigned long next = 1;
-	next = next * 1103515245 + 12345;
-	return next / 65536 % 32768;
+	thread_local unsigned long s_next = 1;
+	s_next = s_next * 1103515245 + 12345;
+	return s_next / 65536 % 32768;
 }
 
-template<std::floating_point T>
+
+template<floating_point T>
 inline auto fastRand(T range) noexcept
 {
 	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / FAST_RAND_MAX);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
+
+
+inline auto fastRand(integral auto range) noexcept
+{
+	constexpr auto FAST_RAND_RATIO = static_cast<float>(1.0 / FAST_RAND_MAX);
+	return fastRand() * range * FAST_RAND_RATIO;
+}
+
 
 template<auto range>
 inline auto fastRand() noexcept
@@ -102,11 +114,12 @@ inline auto fastRand() noexcept
 	return fastRand() * FAST_RAND_RATIO;
 }
 
-template<std::floating_point T>
-inline auto fastRand(T from, T to) noexcept
+
+inline auto fastRand(auto from, auto to) noexcept
 {
 	return from + fastRand(to - from);
 }
+
 
 template<auto to, auto from>
 inline auto fastRand() noexcept
@@ -115,7 +128,8 @@ inline auto fastRand() noexcept
 	return from + fastRand() * FAST_RAND_RATIO;
 }
 
-inline bool oneIn(std::unsigned_integral auto chance) noexcept
+
+inline bool oneIn(unsigned chance) noexcept
 {
 	return !(fastRand() % chance);
 }
@@ -186,7 +200,7 @@ inline float logToLinearScale(float min, float max, float value)
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
 inline float linearToLogScale(float min, float max, float value)
 {
-	constexpr auto inv_e = static_cast<float>(1.0 / std::numbers::e);
+	constexpr auto inv_e = static_cast<float>(1.0 / e);
 	const float valueLimited = std::clamp(value, min, max);
 	const float val = (valueLimited - min) / (max - min);
 	if (min < 0)
@@ -200,22 +214,22 @@ inline float linearToLogScale(float min, float max, float value)
 }
 
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-template<std::floating_point T>
+template<floating_point T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(std::numbers::ln10_v<T> * x);
+	return std::exp(ln10_v<T> * x);
 }
 
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-inline auto fastPow10f(std::integral auto x)
+inline auto fastPow10f(integral auto x)
 {
-	return std::exp(std::numbers::ln10_v<float> * x);
+	return std::exp(ln10_v<float> * x);
 }
 
 // TODO C++26: Make constexpr since std::log() will be constexpr
 inline auto fastLog10f(float x)
 {
-	constexpr auto inv_ln10 = static_cast<float>(1.0 / std::numbers::ln10);
+	constexpr auto inv_ln10 = static_cast<float>(1.0 / ln10);
 	return std::log(x) * inv_ln10;
 }
 
