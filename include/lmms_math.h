@@ -43,7 +43,7 @@
 namespace lmms
 {
 using namespace std::numbers;
-using std::integral, std::floating_point;
+using std::integral, std::floating_point, std::is_arithmetic_v, std::conditional_t, std::is_floating_point_v;
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
@@ -83,7 +83,7 @@ inline auto absFraction(floating_point auto x) noexcept
 	return x - std::floor(x);
 }
 
-//! @brief Returns a psuedorandom integer between 0 and FAST_RAND_MAX, inclusive.
+//! @brief Returns a psuedorandom integer between 0 and 32767, inclusive.
 inline integral auto fastRand() noexcept
 {
 	thread_local unsigned long s_next = 1;
@@ -93,18 +93,10 @@ inline integral auto fastRand() noexcept
 
 
 //! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
-template<floating_point T>
+template<typename T> requires is_arithmetic_v<T>
 inline auto fastRand(T range) noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / FAST_RAND_MAX);
-	return fastRand() * range * FAST_RAND_RATIO;
-}
-
-
-//! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
-inline auto fastRand(integral auto range) noexcept
-{
-	constexpr auto FAST_RAND_RATIO = static_cast<float>(1.0 / FAST_RAND_MAX);
+	constexpr auto FAST_RAND_RATIO = static_cast<conditional_t<is_floating_point_v<T>, T, float>>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
