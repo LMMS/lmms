@@ -49,7 +49,7 @@ public:
 	SampleFrame* buffer() const { return m_ringBuffer; }
 	int bufferIndex() const { return m_ringBufferIndex; }
 
-	static const int BUFFER_SIZE = 441000;
+	static const int BUFFER_SIZE = 44100*3;
 
 private:
 	OscilloscopeControls m_controls;
