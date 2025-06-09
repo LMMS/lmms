@@ -73,7 +73,7 @@ AutomatableModel::~AutomatableModel()
 	// unlink this from anything else
 	unlinkModel();
 
-	if( m_controllerConnection )
+	if (m_controllerConnection)
 	{
 		delete m_controllerConnection;
 	}
@@ -554,7 +554,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 	if (m_controllerConnection == nullptr) { return m_value; }
 
 	float v = 0;
-	switch(m_scaleType)
+	switch (m_scaleType)
 	{
 		case ScaleType::Linear:
 			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
@@ -649,7 +649,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	if (m_oldValue != val)
 	{
-		m_valueBuffer.interpolate( m_oldValue, val );
+		m_valueBuffer.interpolate(m_oldValue, val);
 		m_oldValue = val;
 		m_lastUpdatedPeriod = s_periodCounter;
 		m_hasSampleExactData = true;
