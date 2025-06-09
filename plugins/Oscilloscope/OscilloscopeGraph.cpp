@@ -60,8 +60,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	float amp = m_controls->m_ampModel.value() * 0.01f;
 	float phase = m_controls->m_phaseModel.value();
 	int windowSize = m_controls->m_lengthModel.value();
-	// Conservative frames per pixel, using a smaller number to improve drawing
-	int framesPerPixel = std::max(1, windowSize / width() / 10);
+	int framesPerPixel = std::max(1, windowSize / width());
 
 
 	SampleFrame* buffer = effect->buffer();
@@ -84,12 +83,31 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 		{
 			int currentIndex = (windowStartIndex + f) % bufferSize;
 			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			p.drawLine(
-				width() - width() * f / (windowSize - framesPerPixel),
-				height() * (1 + buffer[currentIndex].average() * amp) / 2,
-				width() - width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
-				height() * (1 + buffer[nextIndex].average() * amp) / 2
-			);
+			if (framesPerPixel > 1)
+			{
+				float maxValue = buffer[currentIndex].average();
+				float minValue = maxValue;
+				for (int i = currentIndex + 1; i <= nextIndex; ++i)
+				{
+					maxValue = std::max(maxValue, buffer[i].average());
+					minValue = std::min(minValue, buffer[i].average());
+				}
+				p.drawLine(
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + minValue * amp) / 2,
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + maxValue * amp) / 2
+				);
+			}
+			else
+			{
+				p.drawLine(
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + buffer[currentIndex].average() * amp) / 2,
+					width() - width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
+					height() * (1 + buffer[nextIndex].average() * amp) / 2
+				);
+			}
 		}
 	}
 	else
@@ -99,24 +117,62 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 		{
 			int currentIndex = (windowStartIndex + f) % bufferSize;
 			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			p.drawLine(
-				width() - width() * f / (windowSize - framesPerPixel),
-				height() * (1 + buffer[currentIndex].left() * amp) / 2,
-				width() - width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
-				height() * (1 + buffer[nextIndex].left() * amp) / 2
-			);
+			if (framesPerPixel > 1)
+			{
+				float maxValue = buffer[currentIndex].left();
+				float minValue = maxValue;
+				for (int i = currentIndex + 1; i <= nextIndex; ++i)
+				{
+					maxValue = std::max(maxValue, buffer[i].left());
+					minValue = std::min(minValue, buffer[i].left());
+				}
+				p.drawLine(
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + minValue * amp) / 2,
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + maxValue * amp) / 2
+				);
+			}
+			else
+			{
+				p.drawLine(
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + buffer[currentIndex].left() * amp) / 2,
+					width() - width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
+					height() * (1 + buffer[nextIndex].left() * amp) / 2
+				);
+			}
 		}
 		p.setPen(m_rightColor);
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
 			int currentIndex = (windowStartIndex + f) % bufferSize;
 			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			p.drawLine(
-				width() - width() * f / (windowSize - framesPerPixel),
-				height() * (1 + buffer[currentIndex].right() * amp) / 2,
-				width() - width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
-				height() * (1 + buffer[nextIndex].right() * amp) / 2
-			);
+			if (framesPerPixel > 1)
+			{
+				float maxValue = buffer[currentIndex].right();
+				float minValue = maxValue;
+				for (int i = currentIndex + 1; i <= nextIndex; ++i)
+				{
+					maxValue = std::max(maxValue, buffer[i].right());
+					minValue = std::min(minValue, buffer[i].right());
+				}
+				p.drawLine(
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + minValue * amp) / 2,
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + maxValue * amp) / 2
+				);
+			}
+			else
+			{
+				p.drawLine(
+					width() - width() * f / (windowSize - framesPerPixel),
+					height() * (1 + buffer[currentIndex].right() * amp) / 2,
+					width() - width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
+					height() * (1 + buffer[nextIndex].right() * amp) / 2
+				);
+			}
 		}
 	}
 }
