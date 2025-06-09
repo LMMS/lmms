@@ -190,8 +190,8 @@ void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
 
 	int newWindowSize = windowSize * zoomAmount;
 	float newPhase = phase - mouseOffset * (1.0f - zoomAmount);
-	m_controls->m_lengthModel.setAutomatedValue(newWindowSize);
-	m_controls->m_phaseModel.setAutomatedValue(newPhase - std::floor(newPhase));
+	m_controls->m_lengthModel.setValue(newWindowSize);
+	m_controls->m_phaseModel.setValue(newPhase - std::floor(newPhase));
 }
 
 void OscilloscopeGraph::mousePressEvent(QMouseEvent* me)
@@ -209,7 +209,7 @@ void OscilloscopeGraph::mouseMoveEvent(QMouseEvent* me)
 	float phase = m_controls->m_phaseModel.value();
 	int windowSize = m_controls->m_lengthModel.value();
 	float newPhase = phase + 1.0f * (m_mousePos - me->x()) / width() * windowSize / Oscilloscope::BUFFER_SIZE;
-	m_controls->m_phaseModel.setAutomatedValue(newPhase - std::floor(newPhase));
+	m_controls->m_phaseModel.setValue(newPhase - std::floor(newPhase));
 	m_mousePos = me->x();
 }
 

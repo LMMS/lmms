@@ -41,6 +41,7 @@ OscilloscopeControls::OscilloscopeControls(Oscilloscope* effect) :
 	m_stereoModel(false, this, tr("Stereo")),
 	m_effect(effect)
 {
+	m_lengthModel.setScaleLogarithmic(true);
 }
 
 
