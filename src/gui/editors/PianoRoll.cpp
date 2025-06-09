@@ -117,6 +117,9 @@ const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
 
+// how much each scroll wheel step moves the screen
+const int PIXELS_PER_SCROLL = 36;
+
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
 static std::array<QString, 12> s_noteStrings {
@@ -4040,14 +4043,16 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	}
 	else
 	{
-		// How much the scroll wheel moves the screen depends on zoom level
-		const float xSpeed = 36 / m_zoomLevels[m_zoomingModel.value()];
-		const float ySpeed = 4 / m_zoomYLevels[m_zoomingYModel.value()];
-		const int xScroll = scroll.getSteps(xSpeed, Scroll::Flag::SwapOrientationWithAlt|Scroll::Flag::Horizontal);
-		const int yScroll = scroll.getSteps(ySpeed, Scroll::Flag::SwapOrientationWithAlt);
+		// Calculate number of TimePos-ticks to move the horizontal scroll bar
+		const float ticksPerPixel = TimePos::ticksPerBar() / static_cast<float>(m_ppb);
+		const float ticksPerScroll = roundf(PIXELS_PER_SCROLL * ticksPerPixel);
+		const int ticks = scroll.getSteps(ticksPerScroll, Scroll::Flag::SwapWithShiftOrAlt|Scroll::Flag::Horizontal);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
 
-		m_leftRightScroll->setValue(m_leftRightScroll->value() - xScroll);
-		m_topBottomScroll->setValue(m_topBottomScroll->value() - yScroll);
+		// Calculate number of keys to move the vertical scroll bar
+		const float keysPerScroll = roundf(PIXELS_PER_SCROLL / static_cast<float>(m_keyLineHeight));
+		const int keys = scroll.getSteps(keysPerScroll, Scroll::Flag::SwapWithShiftOrAlt);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - keys);
 	}
 }
 

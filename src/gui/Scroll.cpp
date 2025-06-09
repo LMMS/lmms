@@ -52,14 +52,23 @@ int Scroll::getDelta(const Flags flags)
 {
 	bool useHorizontal = flags.testFlag(Scroll::Flag::Horizontal);
 
+#ifdef LMMS_BUILD_APPLE
+	const auto swapModifiers = Qt::ShiftModifier;
+#else
+	const auto swapModifiers = Qt::ShiftModifier|Qt::AltModifier;
+#endif
+
+	// Swap x/y when shift (or alt) is pressed
+	if (m_event->modifiers() & swapModifiers && flags & Scroll::Flag::SwapWithShiftOrAlt)
+	{
+		useHorizontal = !useHorizontal;
+	}
+
+	// Compensate for Qt swapping x/y when Alt is pressed on Windows and Linux
 	if (m_event->modifiers() & Qt::AltModifier)
 	{
-#ifdef LMMS_BUILD_APPLE
-		// Enable scroll orientation swapping when pression Option on macOS
-		if (flags & ScrollFlag::SwapOrientationWithAlt) { useHorizontal = !useHorizontal; }
-#else
-		// Compensate for Qt swapping scroll orientation when pressing Alt on Windows and Linux
-		if (!flags.testFlag(Scroll::Flag::SwapOrientationWithAlt)) { useHorizontal = !useHorizontal; }
+#ifndef LMMS_BUILD_APPLE
+		useHorizontal = !useHorizontal;
 #endif
 	}
 

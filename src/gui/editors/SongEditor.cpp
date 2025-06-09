@@ -67,6 +67,7 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
+constexpr int PIXELS_PER_SCROLL = 60;
 
 constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f};
 constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
@@ -544,21 +545,30 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	}
 	else
 	{
-		// How much the scroll wheel moves the screen depends on zoom level
-		const float speed = 120 * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		const int steps = scroll.getSteps(speed, Scroll::Flag::SwapOrientationWithAlt|Scroll::Flag::Horizontal);
+		// Calculate number of TimePos-ticks to move the horizontal scroll bar
+		const float ticksPerPixel = TimePos::ticksPerBar() / pixelsPerBar();
+		const float ticksPerScroll = PIXELS_PER_SCROLL * ticksPerPixel;
+		const int ticks = scroll.getSteps(ticksPerScroll, Scroll::Flag::SwapWithShiftOrAlt|Scroll::Flag::Horizontal);
 
-		m_leftRightScroll->setValue(m_leftRightScroll->value() - steps);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
 
-		// Ignore to event to let TrackContainerView::scrollArea::wheelEvent handle vertical scrolling
-		we->ignore();
-
-#ifdef LMMS_BUILD_APPLE
-		// If we scrolled left/right by pressing Alt (Option) on macOS we can't let the event be passed on.
-		// This is because Qt on macOS does not swap scroll orientation when pressing Option (like it does
-		// on Windows when pressing Alt) and that would cause the song editor to scroll up/down.
-		if (we->modifiers() & Qt::AltModifier) { we->accept(); }
-#endif
+		/* ┌─────────────── SongEditor ───────────────┐
+		 * │ Timeline                                 │
+		 * │ ┌─── TrackContainerView::scrollArea ───┐ │
+		 * │ │ TrackView                   Vertical │ │
+		 * │ │ TrackView                     scroll │ │
+		 * │ │ TrackView                        bar │ │
+		 * │ └──────────────────────────────────────┘ │
+		 * │ Horizontal scroll bar                    │
+		 * └──────────────────────────────────────────┘
+		 *
+		 * When scrolling in the Song Editor the QWheelEvent is first passed to the scrollArea. It will call this
+		 * function to see if we will use the event for zooming. If we ignore() the event, the scrollArea can
+		 * use it to scroll up/down. If we changed the orientation here we must accept() the event, because the scrollArea
+		 * wouldn't know that, and it would scroll the other direction.
+		 */
+		const bool changedOrientation = we->modifiers() & (Qt::ShiftModifier|Qt::AltModifier);
+		if (!changedOrientation) { we->ignore(); }
 	}
 }
 

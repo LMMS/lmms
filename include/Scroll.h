@@ -53,10 +53,11 @@ public:
 		//! This is useful for widgets like faders, where you want up to be up.
 		//! Some operating systems does not support this.
 		DisableNaturalScrolling = 0x2,
-		//! Swap x/y scroll orientation when pressing Alt.
-		//! On some platforms Qt does this by default,
-		//! but Scroll() will also compensate for that by default.
-		SwapOrientationWithAlt = 0x4,
+		//! Swap x/y scroll orientation when pressing Shift.
+		//! On Windows and Linux this flag will also let you use Alt to swap,
+		//! because that is the default behavior of Qt on those platforms,
+		//! so it will match QScrollBar and other built-in widgets.
+		SwapWithShiftOrAlt = 0x4,
 	};
 
 	using Flags = lmms::Flags<Flag>;

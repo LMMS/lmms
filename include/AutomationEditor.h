@@ -196,6 +196,7 @@ private:
 	static const int DEFAULT_Y_DELTA = 6;
 	static const int DEFAULT_STEPS_PER_BAR = 16;
 	static const int DEFAULT_PPB = 12 * DEFAULT_STEPS_PER_BAR;
+	static const int PIXELS_PER_SCROLL = 36;
 
 	static const int VALUES_WIDTH = 64;
 

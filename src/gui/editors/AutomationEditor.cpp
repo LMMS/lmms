@@ -1616,19 +1616,19 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 	else
 	{
-		// How much the scroll wheel moves the screen depends on zoom level
-		const float xScrollSpeed = 36 / m_zoomXLevels[m_zoomingXModel.value()];
+		// Calculate number of TimePos-ticks to move the horizontal scroll bar
+		const float ticksPerPixel = TimePos::ticksPerBar() / static_cast<float>(m_ppb);
+		const float ticksPerScroll = PIXELS_PER_SCROLL * ticksPerPixel;
+		const int ticks = scroll.getSteps(ticksPerScroll, Scroll::Flag::SwapWithShiftOrAlt|Scroll::Flag::Horizontal);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
 
-		// Ignore calculating the speed for the first value of Y zoom because it's "Auto"
-		const float yScrollSpeed = m_zoomingYModel.value() == 0
-			? 1
-			: 4 / zoomYLevels[m_zoomingYModel.value() - 1];
-
-		const int xSteps = scroll.getSteps(xScrollSpeed, Scroll::Flag::SwapOrientationWithAlt|Scroll::Flag::Horizontal);
-		const int ySteps = scroll.getSteps(yScrollSpeed, Scroll::Flag::SwapOrientationWithAlt);
-
-		m_leftRightScroll->setValue(m_leftRightScroll->value() - xSteps);
-		m_topBottomScroll->setValue(m_topBottomScroll->value() - ySteps);
+		// Calculate number of model-steps to move the vertical scroll bar
+		if (!m_y_auto)
+		{
+			const float modelStepsPerScroll = PIXELS_PER_SCROLL / m_y_delta;
+			const int modelSteps = scroll.getSteps(modelStepsPerScroll, Scroll::Flag::SwapWithShiftOrAlt);
+			m_topBottomScroll->setValue(m_topBottomScroll->value() - modelSteps);
+		}
 	}
 }
 
