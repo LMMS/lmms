@@ -67,8 +67,8 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	int bufferSize = Oscilloscope::BUFFER_SIZE;
 	int bufferIndex = effect->bufferIndex();
 	int windowStartIndex = bufferIndex + (bufferSize - windowSize) + (phase) * bufferSize;
-	// Quantize start index to prevent flickering. Round up to avoid touching the previous buffer.
-	windowStartIndex += framesPerPixel - windowStartIndex % framesPerPixel;
+	// Quantize start index to prevent flickering
+	windowStartIndex -= windowStartIndex % framesPerPixel;
 
 	p.setPen(m_minorLineColor);
 	p.drawLine(0, height() / 2, width(), height() / 2);
