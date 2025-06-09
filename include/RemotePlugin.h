@@ -25,7 +25,8 @@
 #ifndef LMMS_REMOTE_PLUGIN_H
 #define LMMS_REMOTE_PLUGIN_H
 
-#include "AudioData.h"
+#include <span>
+
 #include "LmmsTypes.h"
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
@@ -149,9 +150,9 @@ public:
 		m_commMutex.unlock();
 	}
 
-	auto audioPorts() -> RemotePluginAudioPortsController*
+	auto audioPorts() -> RemotePluginAudioPortsController&
 	{
-		return m_audioPorts;
+		return *m_audioPorts;
 	}
 
 public slots:

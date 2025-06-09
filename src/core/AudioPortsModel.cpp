@@ -30,6 +30,7 @@
 #include <QDebug>
 #include <stdexcept>
 
+#include "AudioBufferView.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "PinConnector.h"

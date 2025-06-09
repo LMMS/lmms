@@ -27,7 +27,7 @@
 
 #include <array>
 
-#include "AudioData.h"
+#include "AudioBufferView.h"
 #include "Note.h"
 
 class Master;
@@ -63,7 +63,7 @@ public:
 
 	void processMidiEvent( const MidiEvent& event );
 
-	void process(SplitAudioData<float, 2> out);
+	void process(PlanarBufferView<float, 2> out);
 
 	inline Master * master()
 	{

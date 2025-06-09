@@ -60,12 +60,12 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto input() -> SplitAudioData<SampleT, settings.inputs> final
+	auto input() -> PlanarBufferView<SampleT, settings.inputs> final
 	{
 		return {m_accessBuffer.data(), m_channelsIn, m_frames};
 	}
 
-	auto output() -> SplitAudioData<SampleT, settings.outputs> final
+	auto output() -> PlanarBufferView<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data() + m_channelsIn, m_channelsOut, m_frames};
 	}
@@ -134,7 +134,7 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputOutput() -> SplitAudioData<SampleT, settings.outputs> final
+	auto inputOutput() -> PlanarBufferView<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data(), m_channels, m_frames};
 	}

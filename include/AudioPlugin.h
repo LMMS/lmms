@@ -62,8 +62,8 @@ class AudioProcessingMethod;
 template<AudioPortsSettings settings>
 class AudioProcessingMethod<Instrument, settings, false, false>
 {
-	using InBufferT = AudioDataViewType<settings, false, true>;
-	using OutBufferT = AudioDataViewType<settings, true, false>;
+	using InBufferT = GetAudioBufferViewType<settings, false, true>;
+	using OutBufferT = GetAudioBufferViewType<settings, true, false>;
 
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
@@ -78,7 +78,7 @@ protected:
 template<AudioPortsSettings settings>
 class AudioProcessingMethod<Instrument, settings, true, false>
 {
-	using InOutBufferT = AudioDataViewType<settings, false, false>;
+	using InOutBufferT = GetAudioBufferViewType<settings, false, false>;
 
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
@@ -112,8 +112,8 @@ protected:
 template<AudioPortsSettings settings>
 class AudioProcessingMethod<Effect, settings, false, false>
 {
-	using InBufferT = AudioDataViewType<settings, false, true>;
-	using OutBufferT = AudioDataViewType<settings, true, false>;
+	using InBufferT = GetAudioBufferViewType<settings, false, true>;
+	using OutBufferT = GetAudioBufferViewType<settings, true, false>;
 
 protected:
 	/**
@@ -127,7 +127,7 @@ protected:
 template<AudioPortsSettings settings>
 class AudioProcessingMethod<Effect, settings, true, false>
 {
-	using InOutBufferT = AudioDataViewType<settings, false, false>;
+	using InOutBufferT = GetAudioBufferViewType<settings, false, false>;
 
 protected:
 	/**

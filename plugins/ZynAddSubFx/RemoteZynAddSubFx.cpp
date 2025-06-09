@@ -144,9 +144,8 @@ public:
 	void process(const float* in, float* out) override
 	{
 		(void)in;
-		auto accessBuffer = std::array{out, out + bufferSize()};
-		auto output = SplitAudioData<float, 2>{accessBuffer.data(), 2, bufferSize()};
-		LocalZynAddSubFx::process(output);
+		const auto accessBuffer = std::array{out, out + bufferSize()};
+		LocalZynAddSubFx::process({accessBuffer.data(), bufferSize()});
 	}
 
 	void guiLoop();

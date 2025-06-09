@@ -45,11 +45,11 @@ void zeroBuffer(std::span<SampleFrame> buffer)
 }*/
 
 template<typename SampleT, proc_ch_t extent>
-void zeroBuffer(SplitAudioData<SampleT, extent> buffer)
+void zeroBuffer(PlanarBufferView<SampleT, extent> buffer)
 {
 	for (proc_ch_t idx = 0; idx < buffer.channels(); ++idx)
 	{
-		auto ptr = buffer.buffer(idx);
+		auto ptr = buffer.bufferPtr(idx);
 		std::fill_n(ptr, buffer.frames(), 0);
 	}
 }
@@ -88,14 +88,14 @@ void transformBuffer(std::span<SampleFrame> inOut, const F& func)
 }
 
 template<typename SampleT, proc_ch_t extent, class F>
-void transformBuffer(SplitAudioData<SampleT, extent> in, SplitAudioData<SampleT, extent> out, const F& func)
+void transformBuffer(PlanarBufferView<SampleT, extent> in, PlanarBufferView<SampleT, extent> out, const F& func)
 {
 	assert(in.channels() == out.channels());
 	assert(in.frames() == out.frames());
 	for (proc_ch_t idx = 0; idx < in.channels(); ++idx)
 	{
-		auto inPtr = in.buffer(idx);
-		auto outPtr = out.buffer(idx);
+		auto inPtr = in.bufferPtr(idx);
+		auto outPtr = out.bufferPtr(idx);
 		std::transform(inPtr, inPtr + in.frames(), outPtr, func);
 	}
 }
@@ -126,14 +126,14 @@ void compareBuffers(std::span<const SampleFrame> actual, std::span<const SampleF
 }*/
 
 template<typename SampleT, proc_ch_t extent>
-void compareBuffers(SplitAudioData<SampleT, extent> actual, SplitAudioData<SampleT, extent> expected)
+void compareBuffers(PlanarBufferView<SampleT, extent> actual, PlanarBufferView<SampleT, extent> expected)
 {
 	QCOMPARE(actual.channels(), expected.channels());
 	QCOMPARE(actual.frames(), expected.frames());
 	for (proc_ch_t idx = 0; idx < actual.channels(); ++idx)
 	{
-		auto actualPtr = actual.buffer(idx);
-		auto expectedPtr = expected.buffer(idx);
+		auto actualPtr = actual.bufferPtr(idx);
+		auto expectedPtr = expected.bufferPtr(idx);
 		for (f_cnt_t frame = 0; frame < actual.frames(); ++frame)
 		{
 			QCOMPARE(actualPtr[frame], expectedPtr[frame]);
@@ -784,8 +784,8 @@ private slots:
 
 		// Do work of processImpl - in this case it does nothing (passthrough)
 		const auto process = [](auto s) { return s; };
-		std::transform(ins.buffer(0), ins.buffer(0) + ins.frames(), outs.buffer(0), process);
-		std::transform(ins.buffer(0), ins.buffer(0) + ins.frames(), outs.buffer(1), process);
+		std::transform(ins.bufferPtr(0), ins.bufferPtr(0) + ins.frames(), outs.bufferPtr(0), process);
+		std::transform(ins.bufferPtr(0), ins.bufferPtr(0) + ins.frames(), outs.bufferPtr(1), process);
 
 		// Construct buffer with the expected core bus result
 		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);

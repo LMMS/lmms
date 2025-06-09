@@ -25,9 +25,44 @@
 #ifndef LMMS_AUDIO_PORTS_SETTINGS_H
 #define LMMS_AUDIO_PORTS_SETTINGS_H
 
-#include "AudioData.h"
+#include "LmmsPolyfill.h"
+#include "LmmsTypes.h"
 
 namespace lmms {
+
+//! Types of audio data supported by audio ports
+enum class AudioDataKind : std::uint8_t
+{
+	SampleFrame,
+	F32,
+	// F64,
+	// I16,
+	// etc.
+};
+
+
+namespace detail {
+
+//! Specialize this struct to enable the use of an audio data kind
+template<AudioDataKind kind>
+struct GetAudioDataTypeHelper
+{
+	static_assert(always_false_v<GetAudioDataTypeHelper<kind>>, "Unsupported audio data kind");
+};
+
+template<>
+struct GetAudioDataTypeHelper<AudioDataKind::F32> { using type = float; };
+
+template<>
+struct GetAudioDataTypeHelper<AudioDataKind::SampleFrame> { using type = SampleFrame; };
+
+} // namespace detail
+
+
+//! Metafunction to convert `AudioDataKind` to its type
+template<AudioDataKind kind>
+using GetAudioDataType = typename detail::GetAudioDataTypeHelper<kind>::type;
+
 
 //! Compile-time customizations for audio ports
 struct AudioPortsSettings

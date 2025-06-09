@@ -35,12 +35,10 @@
 #include <type_traits>
 #include <vector>
 
-#include "AudioData.h"
 #include "AutomatableModel.h"
-#include "LmmsPolyfill.h"
 #include "LmmsTypes.h"
-#include "SampleFrame.h"
 #include "SerializingObject.h"
+#include "lmms_constants.h"
 #include "lmms_export.h"
 
 #ifdef LMMS_TESTING

@@ -265,7 +265,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 		setParameterDump( dump );
 	}
 
-	audioPorts()->audioPortsModel().loadSettings(_this);
+	audioPorts().audioPortsModel().loadSettings(_this);
 }
 
 
@@ -309,7 +309,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "program", currentProgram() );
-	audioPorts()->audioPortsModel().saveSettings(_doc, _this);
+	audioPorts().audioPortsModel().saveSettings(_doc, _this);
 }
 
 void VstPlugin::toggleUI()

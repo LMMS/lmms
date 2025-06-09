@@ -25,10 +25,13 @@
 #ifndef LMMS_AUDIO_PORTS_H
 #define LMMS_AUDIO_PORTS_H
 
+#include "AudioBufferView.h"
 #include "AudioEngine.h"
 #include "AudioPortsSettings.h"
 #include "AudioPortsModel.h"
 #include "Engine.h"
+#include "LmmsPolyfill.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -94,24 +97,26 @@ namespace detail {
  * given the layout, sample type, and channel count
  */
 template<AudioDataKind kind, bool interleaved, proc_ch_t channels, bool isConst>
-struct AudioDataViewTypeHelper
+struct GetAudioBufferViewTypeHelper
 {
-	static_assert(always_false_v<AudioDataViewTypeHelper<kind, interleaved, channels, isConst>>,
+	static_assert(always_false_v<GetAudioBufferViewTypeHelper<kind, interleaved, channels, isConst>>,
 		"Unsupported audio data type");
 };
 
 //! Non-interleaved specialization
 template<AudioDataKind kind, proc_ch_t channels, bool isConst>
-struct AudioDataViewTypeHelper<kind, false, channels, isConst>
+struct GetAudioBufferViewTypeHelper<kind, false, channels, isConst>
 {
-	using type = SplitAudioData<
-		std::conditional_t<isConst, const GetAudioDataType<kind>, GetAudioDataType<kind>>,
-		channels>;
+	using type = PlanarBufferView<
+		std::conditional_t<isConst,
+			const GetAudioDataType<kind>,
+			GetAudioDataType<kind>
+		>, channels>;
 };
 
 //! SampleFrame specialization
 template<proc_ch_t channels, bool isConst>
-struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
+struct GetAudioBufferViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
 {
 	static_assert(channels == 0 || channels == 2,
 		"SampleFrame buffers must have exactly 0 or 2 inputs and outputs");
@@ -123,8 +128,9 @@ struct AudioDataViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isCon
 
 //! Metafunction to select the appropriate non-owning audio buffer view
 template<AudioPortsSettings settings, bool isOutput, bool isConst>
-using AudioDataViewType = typename detail::AudioDataViewTypeHelper<
+using GetAudioBufferViewType = typename detail::GetAudioBufferViewTypeHelper<
 	settings.kind, settings.interleaved, (isOutput ? settings.outputs : settings.inputs), isConst>::type;
+
 
 // Forward declaration
 template<AudioPortsSettings settings>
@@ -145,8 +151,8 @@ class AudioPortsBuffer<settings, false>
 public:
 	virtual ~AudioPortsBuffer() = default;
 
-	virtual auto input() -> AudioDataViewType<settings, false, false> = 0;
-	virtual auto output() -> AudioDataViewType<settings, true, false> = 0;
+	virtual auto input() -> GetAudioBufferViewType<settings, false, false> = 0;
+	virtual auto output() -> GetAudioBufferViewType<settings, true, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
 	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
@@ -158,7 +164,7 @@ class AudioPortsBuffer<settings, true>
 public:
 	virtual ~AudioPortsBuffer() = default;
 
-	virtual auto inputOutput() -> AudioDataViewType<settings, false, false> = 0;
+	virtual auto inputOutput() -> GetAudioBufferViewType<settings, false, false> = 0;
 	virtual auto frames() const -> fpp_t = 0;
 	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
@@ -220,8 +226,8 @@ public:
 		processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
 	}
 
-	void send(AudioBus<const SampleFrame> in, SplitAudioData<SampleT, settings.inputs> out) const;
-	void receive(SplitAudioData<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const;
+	void send(AudioBus<const SampleFrame> in, PlanarBufferView<SampleT, settings.inputs> out) const;
+	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const;
 
 private:
 	const AudioPorts<settings>* const m_ap;
@@ -406,11 +412,25 @@ private:
 
 namespace detail {
 
+//! Converts between sample types
+template<typename Out, typename In>
+inline auto convertSample(const In sample) -> Out
+{
+	if constexpr (std::is_floating_point_v<In> && std::is_floating_point_v<Out>)
+	{
+		return static_cast<Out>(sample);
+	}
+	else
+	{
+		static_assert(always_false_v<In, Out>, "only implemented for floating point samples");
+	}
+}
+
 // Non-SampleFrame AudioPortsRouter out-of-class definitions
 
 template<AudioPortsSettings settings, AudioDataKind kind>
 inline void AudioPortsRouter<settings, kind, false>::send(
-	AudioBus<const SampleFrame> in, SplitAudioData<SampleT, settings.inputs> out) const
+	AudioBus<const SampleFrame> in, PlanarBufferView<SampleT, settings.inputs> out) const
 {
 	if constexpr (settings.inputs == 0) { return; }
 
@@ -421,16 +441,12 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
 	assert(inSizeConstrained <= in.channelPairs());
 
-	// Zero the output buffer
+	for (proc_ch_t outChannel = 0; outChannel < out.channels(); ++outChannel)
 	{
-		auto source = out.sourceBuffer();
-		assert(source.data() != nullptr);
-		std::fill_n(source.data(), source.size(), SampleT{});
-	}
+		SampleT* outPtr = out.bufferPtr(outChannel);
 
-	for (std::uint32_t outChannel = 0; outChannel < out.channels(); ++outChannel)
-	{
-		SampleT* outPtr = out.buffer(outChannel);
+		// Zero the output buffer
+		std::fill_n(outPtr, out.frames(), SampleT{});
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 		{
@@ -478,7 +494,7 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 
 template<AudioPortsSettings settings, AudioDataKind kind>
 inline void AudioPortsRouter<settings, kind, false>::receive(
-	SplitAudioData<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const
+	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const
 {
 	if constexpr (settings.outputs == 0) { return; }
 
@@ -528,7 +544,7 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 
 		for (proc_ch_t inChannel = 0; inChannel < in.channels(); ++inChannel)
 		{
-			const SampleT* inPtr = in.buffer(inChannel);
+			const SampleT* inPtr = in.bufferPtr(inChannel);
 
 			if constexpr (rc == 0b11)
 			{

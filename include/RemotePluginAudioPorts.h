@@ -131,14 +131,14 @@ protected:
 	 * `AudioPorts::Buffer` implementation
 	 */
 
-	auto input() -> SplitAudioData<SampleT, settings.inputs> override
+	auto input() -> PlanarBufferView<SampleT, settings.inputs> override
 	{
 		if (!remoteActive()) { return {}; }
 
 		return {m_insOuts, this->in().channelCount(), m_frames};
 	}
 
-	auto output() -> SplitAudioData<SampleT, settings.outputs> override
+	auto output() -> PlanarBufferView<SampleT, settings.outputs> override
 	{
 		if (!remoteActive()) { return {}; }
 
@@ -257,20 +257,20 @@ protected:
 	 * `AudioPorts::Buffer` implementation
 	 */
 
-	auto input() -> SplitAudioData<SampleT, settings.inputs> override
+	auto input() -> PlanarBufferView<SampleT, settings.inputs> override
 	{
 		if (isRemote()) { return RemotePluginAudioPorts<settings>::input(); }
 		return localActive()
 			? m_localBuffer->input()
-			: SplitAudioData<SampleT, settings.inputs>{};
+			: PlanarBufferView<SampleT, settings.inputs>{};
 	}
 
-	auto output() -> SplitAudioData<SampleT, settings.outputs> override
+	auto output() -> PlanarBufferView<SampleT, settings.outputs> override
 	{
 		if (isRemote()) { return RemotePluginAudioPorts<settings>::output(); }
 		return localActive()
 			? m_localBuffer->output()
-			: SplitAudioData<SampleT, settings.outputs>{};
+			: PlanarBufferView<SampleT, settings.outputs>{};
 	}
 
 	auto frames() const -> fpp_t override

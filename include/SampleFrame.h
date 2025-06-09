@@ -26,7 +26,6 @@
 #ifndef LMMS_SAMPLEFRAME_H
 #define LMMS_SAMPLEFRAME_H
 
-#include "AudioData.h"
 #include "LmmsTypes.h"
 #include "lmms_constants.h"
 
