@@ -91,7 +91,7 @@ inline auto fastRand() noexcept
 template<std::floating_point T>
 inline auto fastRand(T range) noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767.0);
+	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / FAST_RAND_MAX);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
@@ -99,7 +99,7 @@ template<std::floating_point T, typename R, R range>
 requires std::is_arithmetic_v<R>
 inline auto fastRand() noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(range / 32767.0);
+	constexpr T FAST_RAND_RATIO = static_cast<T>(range / FAST_RAND_MAX);
 	return fastRand() * FAST_RAND_RATIO;
 }
 
@@ -113,7 +113,7 @@ template<std::floating_point T, typename R, R from, R to>
 requires std::is_arithmetic_v<R>
 inline auto fastRand() noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>((to - from) / 32767.0);
+	constexpr T FAST_RAND_RATIO = static_cast<T>((to - from) / FAST_RAND_MAX);
 	return from + fastRand() * FAST_RAND_RATIO;
 }
 
