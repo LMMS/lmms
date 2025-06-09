@@ -91,14 +91,35 @@ inline auto fastRand() noexcept
 template<std::floating_point T>
 inline auto fastRand(T range) noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
+	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767.0);
 	return fastRand() * range * FAST_RAND_RATIO;
+}
+
+template<std::floating_point T, typename R, R range>
+requires std::is_arithmetic_v<R>
+inline auto fastRand() noexcept
+{
+	constexpr T FAST_RAND_RATIO = static_cast<T>(range / 32767.0);
+	return fastRand() * FAST_RAND_RATIO;
 }
 
 template<std::floating_point T>
 inline auto fastRand(T from, T to) noexcept
 {
 	return from + fastRand(to - from);
+}
+
+template<std::floating_point T, typename R, R from, R to>
+requires std::is_arithmetic_v<R>
+inline auto fastRand() noexcept
+{
+	constexpr T FAST_RAND_RATIO = static_cast<T>((to - from) / 32767.0);
+	return from + fastRand() * FAST_RAND_RATIO;
+}
+
+inline bool oneIn(std::unsigned_integral auto chance) noexcept
+{
+	return !(fastRand() % chance);
 }
 
 //! Round `value` to `where` depending on step size

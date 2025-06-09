@@ -23,12 +23,11 @@
  *
  */
 
+#include <sid.h>
 
 
 #include <cmath>
 #include <cstdio>
-
-#include <sid.h>
 
 #include "SidInstrument.h"
 #include "AudioEngine.h"
@@ -37,7 +36,7 @@
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-
+#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -238,54 +237,43 @@ float SidInstrument::desiredReleaseTimeMs() const
 
 static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
-  int total = 0;
-//  customly added
-  int residdelay = 0;
+	int total = 0, badline = fastRand<NUMSIDREGS - 1>();
+	int residdelay = 0; // customly added
 
-  int badline = rand() % NUMSIDREGS;
+	for (int c = 0; c < NUMSIDREGS; c++)
+	{
+		unsigned char o = sidorder[c];
 
-  for (int c = 0; c < NUMSIDREGS; c++)
-  {
-    unsigned char o = sidorder[c];
+		// Extra delay for loading the waveform (and mt_chngate,x)
+		if (o == 4 || o == 11 || o == 18)
+		{
+			const int result = sid->clock(SIDWAVEDELAY, ptr, samples);
+			total += result;
+			ptr += result;
+			samples -= result;
+			tdelta -= SIDWAVEDELAY;
+		}
 
-  	// Extra delay for loading the waveform (and mt_chngate,x)
-  	if ((o == 4) || (o == 11) || (o == 18))
-  	{
-  	  int tdelta2 = SIDWAVEDELAY;
-      int result = sid->clock(tdelta2, ptr, samples);
-      total += result;
-      ptr += result;
-      samples -= result;
-      tdelta -= SIDWAVEDELAY;
-    }
+		// Possible random badline delay once per writing
+		if (badline == c && residdelay)
+		{
+			const int result = sid->clock(residdelay, ptr, samples);
+			total += result;
+			ptr += result;
+			samples -= result;
+			tdelta -= residdelay;
+		}
 
-    // Possible random badline delay once per writing
-    if ((badline == c) && (residdelay))
-  	{
-      int tdelta2 = residdelay;
-      int result = sid->clock(tdelta2, ptr, samples);
-      total += result;
-      ptr += result;
-      samples -= result;
-      tdelta -= residdelay;
-    }
+		sid->write(o, sidreg[o]);
 
-    sid->write(o, sidreg[o]);
-
-    int tdelta2 = SIDWRITEDELAY;
-    int result = sid->clock(tdelta2, ptr, samples);
-    total += result;
-    ptr += result;
-    samples -= result;
-    tdelta -= SIDWRITEDELAY;
-  }
-  int result = sid->clock(tdelta, ptr, samples);
-  total += result;
-
-  return total;
+		const int result = sid->clock(SIDWRITEDELAY, ptr, samples);
+		total += result;
+		ptr += result;
+		samples -= result;
+		tdelta -= SIDWRITEDELAY;
+	}
+	return total + sid->clock(tdelta, ptr, samples);
 }
-
-
 
 
 void SidInstrument::playNote( NotePlayHandle * _n,

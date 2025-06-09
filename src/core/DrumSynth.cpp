@@ -294,8 +294,6 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	long Length, tpos = 0, tplus, totmp, t, i, j;
 	float x[3] = {0.f, 0.f, 0.f};
 	float MasterTune;
-	constexpr float randmax = 1.f / static_cast<float>(RAND_MAX);
-	constexpr float randmax2 = 2.f / static_cast<float>(RAND_MAX);
 	int MainFilter, HighPass;
 
 	long NON, NT, TON, DiON, TDroop = 0, DStep;
@@ -398,9 +396,6 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 		c = std::abs(static_cast<float>(NT)) / 100.f;
 		g = NL;
 	}
-
-	// if(GetPrivateProfileInt(sec,"FixedSeq",0,dsfile)!=0)
-	// srand(1); //fixed random sequence
 
 	// read tone parameters
 	std::strcpy(sec, "Tone");
@@ -596,7 +591,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				x[2] = x[1];
 				x[1] = x[0];
-				x[0] = (randmax2 * static_cast<float>(rand())) - 1.f;
+				x[0] = fastRand<-1.f, +1.f>()
 				TT = a * x[0] + b * x[1] + c * x[2] + d * TT;
 				DF[t - tpos] = TT * g * envData[2][ENV];
 			}
@@ -671,7 +666,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				if ((t % BFStep) == 0)
 				{
-					BdF = randmax * static_cast<float>(rand()) - 0.5f;
+					BdF = fastRand<-0.5f, +0.5f>();
 				}
 				BPhi = BPhi + BF + BQ * BdF;
 				botmp = t - tpos;
@@ -697,7 +692,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				if ((t % BFStep2) == 0)
 				{
-					BdF2 = randmax * static_cast<float>(rand()) - 0.5f;
+					BdF2 = fastRand<-0.5f, +0.5f>();
 				}
 				BPhi2 = BPhi2 + BF2 + BQ2 * BdF2;
 				botmp = t - tpos;

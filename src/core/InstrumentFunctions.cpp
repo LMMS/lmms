@@ -28,6 +28,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "lmms_math.h"
 #include "PresetPreviewPlayHandle.h"
 
 #include <vector>
@@ -416,7 +417,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpSkipModel.value())
+			if (fastRand<100>() < m_arpSkipModel.value())
 			{
 				// update counters
 				frames_processed += arp_frames;
@@ -432,7 +433,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		if( m_arpMissModel.value() )
 		{
-			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpMissModel.value())
+			if (fastRand<100>() < m_arpMissModel.value())
 			{
 				dir = ArpDirection::Random;
 			}
@@ -461,7 +462,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		else if( dir == ArpDirection::Random )
 		{
 			// just pick a random chord-index
-			cur_arp_idx = static_cast<int>(range * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+			cur_arp_idx = fastRand(range);
 		}
 
 		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
