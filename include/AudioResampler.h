@@ -40,7 +40,7 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
-	enum class Mode
+	enum class LMMS_EXPORT Mode
 	{
 		ZOH,		 //!< Zero order hold mode.
 		Linear,		 //!< Linear mode.
