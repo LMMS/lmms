@@ -47,7 +47,7 @@ public:
 
 	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
 
-	inline void showWithTimeout(int msec)
+	void showWithTimeout(int msec)
 	{
 		showWithDelay(0, msec);
 	}
