@@ -875,13 +875,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					}
 
 					// Calculate new tangent
-					float pixelsPerLevel = (height() - SCROLLBAR_SIZE - 1 - TOP_MARGIN) / (m_maxLevel - m_minLevel);
 					float y = m_draggedOutTangent
 						? yCoordOfLevel(OUTVAL(it))
 						: yCoordOfLevel(INVAL(it));
 					float dy = m_draggedOutTangent
-						? (y - mouseEvent->y()) / pixelsPerLevel
-						: (mouseEvent->y() - y) / pixelsPerLevel;
+						? (y - mouseEvent->y()) / m_y_delta
+						: (mouseEvent->y() - y) / m_y_delta;
 					float dx = std::abs(posTicks - POS(it));
 					float newTangent = dy / std::max(dx, 1.0f);
 
@@ -1578,6 +1577,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 	m_timeLine->setFixedWidth(width());
 
 	updateTopBottomLevels();
+	updateYDelta();
 	update();
 }
 
@@ -1868,6 +1868,12 @@ void AutomationEditor::zoomingXChanged()
 
 void AutomationEditor::zoomingYChanged()
 {
+	updateYDelta();
+	resizeEvent(nullptr);
+}
+
+void AutomationEditor::updateYDelta()
+{
 	const QString & zfac = m_zoomingYModel.currentText();
 	m_y_auto = zfac == "Auto";
 	if( !m_y_auto )
@@ -1875,10 +1881,11 @@ void AutomationEditor::zoomingYChanged()
 		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
 							* DEFAULT_Y_DELTA / 100;
 	}
-#ifdef LMMS_DEBUG
-	assert( m_y_delta > 0 );
-#endif
-	resizeEvent(nullptr);
+	else
+	{
+		int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+		m_y_delta = (grid_bottom - TOP_MARGIN) / (m_maxLevel - m_minLevel);
+	}
 }
 
 
