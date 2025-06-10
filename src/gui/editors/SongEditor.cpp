@@ -94,7 +94,7 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
-	// Set up time line
+	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
 		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),

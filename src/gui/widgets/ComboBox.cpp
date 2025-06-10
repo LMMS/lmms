@@ -69,7 +69,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 void ComboBox::selectNext()
 {
-	model()->setValue( model()->value() + 1 );
+	model()->setValue(model()->value() + 1);
 }
 
 
@@ -77,7 +77,7 @@ void ComboBox::selectNext()
 
 void ComboBox::selectPrevious()
 {
-	model()->setValue( model()->value() - 1 );
+	model()->setValue(model()->value() - 1);
 }
 
 
@@ -234,7 +234,7 @@ void ComboBox::setItem( QAction* item )
 {
 	if( model() )
 	{
-		model()->setValue( item->data().toInt() );
+		model()->setValue(item->data().toInt());
 	}
 }
 
