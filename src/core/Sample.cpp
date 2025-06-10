@@ -118,13 +118,13 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 {
 	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
 
-	const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
-		const auto rendered = render(reinterpret_cast<SampleFrame*>(input.data), input.frames, state, loop);
+	const auto inputCallback = [&](InterleavedBufferView<float> input) {
+		const auto rendered = render(reinterpret_cast<SampleFrame*>(input.data()), input.frames(), state, loop);
 		return static_cast<long>(rendered);
 	};
 
 	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	const auto dstView = InterleavedAudioBufferView<float>{&dst[0][0], numFrames, DEFAULT_CHANNELS};
+	const auto dstView = InterleavedBufferView<float>(&dst[0][0], DEFAULT_CHANNELS, numFrames);
 	const auto outputFramesGenerated = state->resampler.process(dstView, ratio, inputCallback);
 
 	if (outputFramesGenerated < numFrames)

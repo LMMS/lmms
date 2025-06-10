@@ -53,13 +53,13 @@ public:
 	//! @p dst is of size `channels * frames`.
 	//! Clients are expected to advance their data streams as necessary.
 	//! @return The number of frames written into @p dst.
-	using InputCallback = std::function<std::size_t(InterleavedAudioBufferView<float> dst)>;
+	using InputCallback = std::function<std::size_t(InterleavedBufferView<float> dst)>;
 
 	//! Reads all data from @p src.
 	//! @p src is of size `channels * frames`.
 	//! Clients are expected to advance their data streams as necessary.
 	//! Must acknowledge reading all data given to it.
-	using OutputCallback = std::function<void(InterleavedAudioBufferView<const float> src)>;
+	using OutputCallback = std::function<void(InterleavedBufferView<const float> src)>;
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
@@ -84,21 +84,21 @@ public:
 	//! Stops when @p dst is full, or @p callback stops writing input.
 	//! Uses @p callback to fetch input data as necessary.
 	//! @return The number of output frames generated.
-	[[nodiscard]] auto process(InterleavedAudioBufferView<float> dst, double ratio, InputCallback callback)
+	[[nodiscard]] auto process(InterleavedBufferView<float> dst, double ratio, InputCallback callback)
 		-> std::size_t;
 
 	//! Resamples audio from @p src at the given @p ratio.
 	//! Stops when @p src is empty, or @p callback stops reading output.
 	//! Uses @p callback to send resampled output data as necessary.
 	//! @return The number of input frames used.
-	[[nodiscard]] auto process(InterleavedAudioBufferView<const float> src, double ratio, OutputCallback callback)
+	[[nodiscard]] auto process(InterleavedBufferView<const float> src, double ratio, OutputCallback callback)
 		-> std::size_t;
 
 	//! Resamples audio from @p src into @p dst at the given @p ratio.
 	//! Stops when @p dst is full, or @p src is empty.
 	//! @return A pair containing the number of input frames used as the first member, and the number of output frames
 	//! generated in the second member.
-	[[nodiscard]] auto process(InterleavedAudioBufferView<const float> src, InterleavedAudioBufferView<float> dst,
+	[[nodiscard]] auto process(InterleavedBufferView<const float> src, InterleavedBufferView<float> dst,
 		double ratio) -> std::pair<std::size_t, std::size_t>;
 
 	//! Returns the number of channels expected by the resampler.
@@ -112,7 +112,7 @@ private:
 	static auto converterType(Mode mode) -> int;
 	std::vector<float> m_inputBuffer;
 	std::vector<float> m_outputBuffer;
-	InterleavedAudioBufferView<const float> m_inputBufferWindow;
+	InterleavedBufferView<const float> m_inputBufferWindow;
 	SRC_STATE* m_state = nullptr;
 	Mode m_mode;
 	int m_channels = 0;

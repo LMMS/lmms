@@ -867,15 +867,14 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
-		const auto err = fluid_synth_write_float(
-			m_synth, static_cast<int>(input.frames), input.data, 0, input.channels, input.data, 1, input.channels);
-		return err == FLUID_OK ? input.frames : 0;
+	const auto inputCallback = [&](InterleavedBufferView<float> input) {
+		const auto err = fluid_synth_write_float(m_synth, static_cast<int>(input.frames()), input.data(), 0,
+			input.channels(), input.data(), 1, input.channels());
+		return err == FLUID_OK ? input.frames() : 0;
 	};
 
 	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
-	const auto dst
-		= InterleavedAudioBufferView<float>{.data = &buf[0][0], .frames = frames, .channels = DEFAULT_CHANNELS};
+	const auto dst = InterleavedBufferView<float>(&buf[0][0], DEFAULT_CHANNELS, frames);
 	const auto outputFramesGenerated = m_resampler.process(dst, ratio, inputCallback);
 	if (outputFramesGenerated < frames) { std::fill(buf + outputFramesGenerated, buf + frames, SampleFrame{}); }
 

@@ -428,11 +428,11 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			const auto inputCallback = [&](InterleavedAudioBufferView<float> input) {
-				loadSample(sample, reinterpret_cast<SampleFrame*>(input.data), input.frames);
-				sample.pos += input.frames;
-				sample.adsr.inc(input.frames);
-				return input.frames;
+			const auto inputCallback = [&](InterleavedBufferView<float> input) {
+				loadSample(sample, reinterpret_cast<SampleFrame*>(input.data()), input.frames());
+				sample.pos += input.frames();
+				sample.adsr.inc(input.frames());
+				return input.frames();
 			};
 
 			// Apply ADSR using a copy so if we don't use these samples when
@@ -445,11 +445,10 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			while (numFramesMixed < frames)
 			{
-				const auto dst = InterleavedAudioBufferView<float>{
-					.data = &mixBuf[0][0], .frames = mixBuf.size(), .channels = DEFAULT_CHANNELS};
+				const auto dst = InterleavedBufferView<float>(&mixBuf[0][0], DEFAULT_CHANNELS, mixBuf.size());
 				const auto outputFramesGenerated = sample.m_resampler.process(dst, freq_factor, inputCallback);
-
 				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, outputFramesGenerated);
+
 				for (auto i = std::size_t{0}; i < framesToMix; ++i)
 				{
 					const auto amplitude = copy.value();

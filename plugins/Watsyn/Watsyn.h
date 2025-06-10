@@ -197,10 +197,8 @@ private:
 
 		while (dstFrames > 0)
 		{
-			const auto src = InterleavedAudioBufferView<const float>{
-				.data = _src + srcIndex, .frames = static_cast<std::size_t>(srcFrames), .channels = 1};
-			const auto dst = InterleavedAudioBufferView<float>{
-				.data = _dst + dstIndex, .frames = static_cast<std::size_t>(dstFrames), .channels = 1};
+			const auto src = InterleavedBufferView<const float>(_src + srcIndex, 1, static_cast<std::size_t>(srcFrames));
+			const auto dst = InterleavedBufferView<float>(_dst + dstIndex, 1, static_cast<std::size_t>(dstFrames));
 			const auto [inputFramesUsed, outputFramesGenerated] = resampler.process(src, dst, WAVERATIO);
 
 			srcIndex += inputFramesUsed;
