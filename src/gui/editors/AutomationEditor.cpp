@@ -875,12 +875,13 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					}
 
 					// Calculate new tangent
+					float pixelsPerLevel = (height() - SCROLLBAR_SIZE - 1 - TOP_MARGIN) / (m_maxLevel - m_minLevel);
 					float y = m_draggedOutTangent
 						? yCoordOfLevel(OUTVAL(it))
 						: yCoordOfLevel(INVAL(it));
 					float dy = m_draggedOutTangent
-						? y - mouseEvent->y()
-						: mouseEvent->y() - y;
+						? (y - mouseEvent->y()) / pixelsPerLevel
+						: (mouseEvent->y() - y) / pixelsPerLevel;
 					float dx = std::abs(posTicks - POS(it));
 					float newTangent = dy / std::max(dx, 1.0f);
 
