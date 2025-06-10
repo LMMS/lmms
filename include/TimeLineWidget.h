@@ -52,6 +52,11 @@ class TextFloat;
 class SongEditor;
 
 
+constexpr const char* AUTOSCROLL_DISABLED_STRING = "disabled";
+constexpr const char* AUTOSCROLL_STEPPED_STRING = "stepped";
+constexpr const char* AUTOSCROLL_CONTINUOUS_STRING = "continuous";
+
+
 class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
@@ -136,10 +141,8 @@ public:
 		return( m_pos );
 	}
 
-	AutoScrollState autoScroll() const
-	{
-		return m_autoScroll;
-	}
+	AutoScrollState autoScroll() const { return m_autoScroll; }
+	void setAutoScroll(AutoScrollState state) { m_autoScroll = state; }
 
 	inline void setPixelsPerBar( float ppb )
 	{
@@ -156,6 +159,8 @@ public:
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
 					m_ppb / TimePos::ticksPerBar() );
 	}
+
+	static AutoScrollState defaultAutoScrollState();
 
 signals:
 	void positionChanged(const lmms::TimePos& postion);
@@ -213,8 +218,6 @@ private:
 	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
-	AutoScrollState m_autoScroll = AutoScrollState::Stepped;
-
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;
 	float m_ppb;
@@ -224,6 +227,9 @@ private:
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
 	const Song::PlayMode m_mode;
+
+	AutoScrollState m_autoScroll = defaultAutoScrollState();
+
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
 	// position allows for unquantized drag but fails when toggling quantization.
 	std::array<TimePos, 2> m_oldLoopPos;
