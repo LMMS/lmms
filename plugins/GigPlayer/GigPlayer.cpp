@@ -77,20 +77,17 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 }
 
-
-
-
-GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
-	m_instance( nullptr ),
-	m_instrument( nullptr ),
-	m_filename( "" ),
-	m_bankNum( 0, 0, 999, this, tr( "Bank" ) ),
-	m_patchNum( 0, 0, 127, this, tr( "Patch" ) ),
-	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
-	m_interpolation( SRC_LINEAR ),
-	m_RandomSeed( 0 ),
-	m_currentKeyDimension( 0 )
+GigInstrument::GigInstrument(InstrumentTrack* _instrument_track)
+	: Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable)
+	, m_instance(nullptr)
+	, m_instrument(nullptr)
+	, m_filename("")
+	, m_bankNum(0, 0, 999, this, tr("Bank"))
+	, m_patchNum(0, 0, 127, this, tr("Patch"))
+	, m_gain(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Gain"))
+	, m_interpolation(AudioResampler::Mode::Linear)
+	, m_RandomSeed(0)
+	, m_currentKeyDimension(0)
 {
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -1062,8 +1059,8 @@ void GigInstrumentView::showPatchDialog()
 
 
 // Store information related to playing a sample from the GIG file
-GigSample::GigSample(
-	gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation, int interpolation, float desiredFreq)
+GigSample::GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
+	AudioResampler::Mode interpolation, float desiredFreq)
 	: sample(pSample)
 	, region(pDimRegion)
 	, attenuation(attenuation)

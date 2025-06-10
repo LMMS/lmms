@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "AudioDevice.h"
+#include "AudioResampler.h"
 #include "LmmsTypes.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
@@ -108,37 +109,8 @@ public:
 
 	struct qualitySettings
 	{
-		enum class Interpolation
-		{
-			Linear,
-			SincFastest,
-			SincMedium,
-			SincBest
-		} ;
-
-		Interpolation interpolation;
-
-		qualitySettings(Interpolation i) :
-			interpolation(i)
-		{
-		}
-
-		int libsrcInterpolation() const
-		{
-			switch( interpolation )
-			{
-				case Interpolation::Linear:
-					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation::SincFastest:
-					return SRC_SINC_FASTEST;
-				case Interpolation::SincMedium:
-					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation::SincBest:
-					return SRC_SINC_BEST_QUALITY;
-			}
-			return SRC_LINEAR;
-		}
-	} ;
+		AudioResampler::Mode interpolation;
+	};
 
 	void initDevices();
 	void clear();

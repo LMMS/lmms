@@ -46,7 +46,7 @@ public:
 
 	struct LMMS_EXPORT PlaybackState
 	{
-		PlaybackState(int interpolationMode = SRC_LINEAR, int frameIndex = 0)
+		PlaybackState(AudioResampler::Mode interpolationMode = AudioResampler::Mode::Linear, int frameIndex = 0)
 			: resampler(interpolationMode)
 			, frameIndex(frameIndex)
 		{

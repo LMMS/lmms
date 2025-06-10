@@ -163,7 +163,7 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 void ExportProjectDialog::startExport()
 {
 	auto qs = AudioEngine::qualitySettings(
-		static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()));
+		static_cast<AudioResampler::Mode>(interpolationCB->currentIndex()));
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
 	OutputSettings os = OutputSettings(samplerateCB->currentData().toInt(), bitrates[bitrateCB->currentIndex()],

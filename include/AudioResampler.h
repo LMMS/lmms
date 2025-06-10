@@ -40,6 +40,15 @@ namespace lmms {
 class LMMS_EXPORT AudioResampler
 {
 public:
+	enum class Mode
+	{
+		ZOH,		 //!< Zero order hold mode.
+		Linear,		 //!< Linear mode.
+		SincFastest, //!< Fastest sinc mode.
+		SincMedium,	 //!< Medium sinc quality mode.
+		SincBest	 //!< Best sinc quality mode.
+	};
+
 	//! Writes data into @p dst.
 	//! @p dst is of size `channels * frames`.
 	//! Clients are expected to advance their data streams as necessary.
@@ -54,7 +63,7 @@ public:
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
-	AudioResampler(int mode, int channels = DEFAULT_CHANNELS);
+	AudioResampler(Mode mode, int channels = DEFAULT_CHANNELS);
 
 	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
@@ -75,7 +84,8 @@ public:
 	//! Stops when @p dst is full, or @p callback stops writing input.
 	//! Uses @p callback to fetch input data as necessary.
 	//! @return The number of output frames generated.
-	[[nodiscard]] auto process(InterleavedAudioBufferView<float> dst, double ratio, InputCallback callback) -> std::size_t;
+	[[nodiscard]] auto process(InterleavedAudioBufferView<float> dst, double ratio, InputCallback callback)
+		-> std::size_t;
 
 	//! Resamples audio from @p src at the given @p ratio.
 	//! Stops when @p src is empty, or @p callback stops reading output.
@@ -95,16 +105,17 @@ public:
 	auto channels() const -> int { return m_channels; }
 
 	//! Returns the interpolation mode used by this resampler.
-	auto mode() const -> int { return m_mode; }
+	auto mode() const -> Mode { return m_mode; }
 
 private:
 	static constexpr auto BufferFrameSize = 64;
+	static auto converterType(Mode mode) -> int;
 	std::vector<float> m_inputBuffer;
 	std::vector<float> m_outputBuffer;
 	InterleavedAudioBufferView<const float> m_inputBufferWindow;
 	SRC_STATE* m_state = nullptr;
+	Mode m_mode;
 	int m_channels = 0;
-	int m_mode = 0;
 	int m_error = 0;
 };
 } // namespace lmms

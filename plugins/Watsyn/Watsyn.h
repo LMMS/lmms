@@ -248,7 +248,7 @@ private:
 		}
 	}*/
 
-	AudioResampler resampler = AudioResampler{SRC_SINC_FASTEST, 1};
+	AudioResampler resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1};
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;

@@ -147,8 +147,8 @@ public:
 class GigSample
 {
 public:
-	GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
-			float attenuation, int interpolation, float desiredFreq );
+	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
+		AudioResampler::Mode interpolation, float desiredFreq);
 	~GigSample() = default;
 
 	// Needed when initially creating in QList
@@ -285,7 +285,7 @@ private:
 	QMutex m_notesMutex;
 
 	// Used for resampling
-	int m_interpolation;
+	AudioResampler::Mode m_interpolation;
 
 	// List of all the currently playing notes
 	QList<GigNote> m_notes;

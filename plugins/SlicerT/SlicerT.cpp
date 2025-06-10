@@ -108,7 +108,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	}
 
 	const auto startFrame = static_cast<int>(sliceStart * m_originalSample.sampleSize());
-	if (!handle->m_pluginData) { handle->m_pluginData = new Sample::PlaybackState(SRC_LINEAR, startFrame); }
+	if (!handle->m_pluginData) { handle->m_pluginData = new Sample::PlaybackState(AudioResampler::Mode::Linear, startFrame); }
 
 	auto playbackState = static_cast<Sample::PlaybackState*>(handle->m_pluginData);
 	const auto endFrame = sliceEnd * m_originalSample.sampleSize();

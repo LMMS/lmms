@@ -30,14 +30,14 @@
 
 namespace lmms {
 
-AudioResampler::AudioResampler(int mode, int channels)
+AudioResampler::AudioResampler(Mode mode, int channels)
 	: m_inputBuffer(BufferFrameSize * channels)
 	, m_outputBuffer(BufferFrameSize * channels)
 	, m_inputBufferWindow(
 		  InterleavedAudioBufferView<const float>{.data = m_inputBuffer.data(), .frames = 0, .channels = channels})
-	, m_state(src_new(mode, channels, &m_error))
-	, m_channels(channels)
+	, m_state(src_new(converterType(mode), channels, &m_error))
 	, m_mode(mode)
+	, m_channels(channels)
 {
 	if (channels <= 0) { throw std::logic_error{"Invalid channel count"}; }
 	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
@@ -162,6 +162,25 @@ auto AudioResampler::process(InterleavedAudioBufferView<const float> src, Interl
 	}
 
 	return {inputFramesUsed, outputFramesGenerated};
+}
+
+auto AudioResampler::converterType(Mode mode) -> int
+{
+	switch (mode)
+	{
+	case Mode::ZOH:
+		return SRC_ZERO_ORDER_HOLD;
+	case Mode::Linear:
+		return SRC_LINEAR;
+	case Mode::SincFastest:
+		return SRC_SINC_FASTEST;
+	case Mode::SincMedium:
+		return SRC_SINC_MEDIUM_QUALITY;
+	case Mode::SincBest:
+		return SRC_SINC_BEST_QUALITY;
+	default:
+		throw std::invalid_argument{"Invalid interpolation mode"};
+	}
 }
 
 } // namespace lmms
