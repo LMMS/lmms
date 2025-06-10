@@ -30,7 +30,7 @@
 
 namespace lmms {
 
-AudioResampler::AudioResampler(Mode mode, int channels)
+AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
 	: m_inputBuffer(BufferFrameSize * channels)
 	, m_outputBuffer(BufferFrameSize * channels)
 	, m_inputBufferWindow(m_inputBuffer.data(), channels, 0)
@@ -59,7 +59,7 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::process(InterleavedBufferView<float> dst, double ratio, InputCallback callback) -> std::size_t
+auto AudioResampler::process(InterleavedBufferView<float> dst, double ratio, InputCallback callback) -> f_cnt_t
 {
 	if (dst.channels() != m_channels) { throw std::logic_error{"Invalid channel count"}; }
 
@@ -99,8 +99,7 @@ auto AudioResampler::process(InterleavedBufferView<float> dst, double ratio, Inp
 	return outputFramesGenerated;
 }
 
-auto AudioResampler::process(InterleavedBufferView<const float> src, double ratio, OutputCallback callback)
-	-> std::size_t
+auto AudioResampler::process(InterleavedBufferView<const float> src, double ratio, OutputCallback callback) -> f_cnt_t
 {
 	if (src.channels() != m_channels) { throw std::logic_error{"Invalid channel count"}; }
 
@@ -130,7 +129,7 @@ auto AudioResampler::process(InterleavedBufferView<const float> src, double rati
 }
 
 auto AudioResampler::process(InterleavedBufferView<const float> src, InterleavedBufferView<float> dst, double ratio)
-	-> std::pair<std::size_t, std::size_t>
+	-> std::pair<f_cnt_t, f_cnt_t>
 {
 	if (src.channels() != m_channels || dst.channels() != m_channels)
 	{

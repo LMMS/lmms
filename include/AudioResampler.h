@@ -53,7 +53,7 @@ public:
 	//! @p dst is of size `channels * frames`.
 	//! Clients are expected to advance their data streams as necessary.
 	//! @return The number of frames written into @p dst.
-	using InputCallback = std::function<std::size_t(InterleavedBufferView<float> dst)>;
+	using InputCallback = std::function<f_cnt_t(InterleavedBufferView<float> dst)>;
 
 	//! Reads all data from @p src.
 	//! @p src is of size `channels * frames`.
@@ -63,7 +63,7 @@ public:
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
-	AudioResampler(Mode mode, int channels = DEFAULT_CHANNELS);
+	AudioResampler(Mode mode, ch_cnt_t channels = DEFAULT_CHANNELS);
 
 	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
@@ -84,25 +84,24 @@ public:
 	//! Stops when @p dst is full, or @p callback stops writing input.
 	//! Uses @p callback to fetch input data as necessary.
 	//! @return The number of output frames generated.
-	[[nodiscard]] auto process(InterleavedBufferView<float> dst, double ratio, InputCallback callback)
-		-> std::size_t;
+	[[nodiscard]] auto process(InterleavedBufferView<float> dst, double ratio, InputCallback callback) -> f_cnt_t;
 
 	//! Resamples audio from @p src at the given @p ratio.
 	//! Stops when @p src is empty, or @p callback stops reading output.
 	//! Uses @p callback to send resampled output data as necessary.
 	//! @return The number of input frames used.
 	[[nodiscard]] auto process(InterleavedBufferView<const float> src, double ratio, OutputCallback callback)
-		-> std::size_t;
+		-> f_cnt_t;
 
 	//! Resamples audio from @p src into @p dst at the given @p ratio.
 	//! Stops when @p dst is full, or @p src is empty.
 	//! @return A pair containing the number of input frames used as the first member, and the number of output frames
 	//! generated in the second member.
-	[[nodiscard]] auto process(InterleavedBufferView<const float> src, InterleavedBufferView<float> dst,
-		double ratio) -> std::pair<std::size_t, std::size_t>;
+	[[nodiscard]] auto process(InterleavedBufferView<const float> src, InterleavedBufferView<float> dst, double ratio)
+		-> std::pair<f_cnt_t, f_cnt_t>;
 
 	//! Returns the number of channels expected by the resampler.
-	auto channels() const -> int { return m_channels; }
+	auto channels() const -> ch_cnt_t { return m_channels; }
 
 	//! Returns the interpolation mode used by this resampler.
 	auto mode() const -> Mode { return m_mode; }
@@ -115,7 +114,7 @@ private:
 	InterleavedBufferView<const float> m_inputBufferWindow;
 	SRC_STATE* m_state = nullptr;
 	Mode m_mode;
-	int m_channels = 0;
+	ch_cnt_t m_channels = 0;
 	int m_error = 0;
 };
 } // namespace lmms

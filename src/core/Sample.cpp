@@ -136,9 +136,9 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	return true;
 }
 
-std::size_t Sample::render(SampleFrame* dst, std::size_t size, PlaybackState* state, Loop loop) const
+f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const
 {
-	for (std::size_t frame = 0; frame < size; ++frame)
+	for (f_cnt_t frame = 0; frame < size; ++frame)
 	{
 		switch (loop)
 		{

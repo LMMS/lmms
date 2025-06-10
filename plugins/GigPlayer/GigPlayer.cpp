@@ -441,15 +441,15 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			constexpr auto mixBufSize = 64;
 			auto mixBuf = std::array<SampleFrame, mixBufSize>{};
-			auto numFramesMixed = std::size_t{0};
+			auto numFramesMixed = f_cnt_t{0};
 
 			while (numFramesMixed < frames)
 			{
 				const auto dst = InterleavedBufferView<float>(&mixBuf[0][0], DEFAULT_CHANNELS, mixBuf.size());
 				const auto outputFramesGenerated = sample.m_resampler.process(dst, freq_factor, inputCallback);
-				const auto framesToMix = std::min<std::size_t>(frames - numFramesMixed, outputFramesGenerated);
+				const auto framesToMix = std::min<f_cnt_t>(frames - numFramesMixed, outputFramesGenerated);
 
-				for (auto i = std::size_t{0}; i < framesToMix; ++i)
+				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
 					const auto amplitude = copy.value();
 					_working_buffer[numFramesMixed + i] += mixBuf[i] * amplitude;

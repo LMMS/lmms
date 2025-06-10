@@ -190,15 +190,15 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		auto srcIndex = std::size_t{0};
-		auto dstIndex = std::size_t{0};
-		auto srcFrames = std::size_t{GRAPHLEN};
-		auto dstFrames = std::size_t{WAVELEN};
+		auto srcIndex = f_cnt_t{0};
+		auto dstIndex = f_cnt_t{0};
+		auto srcFrames = f_cnt_t{GRAPHLEN};
+		auto dstFrames = f_cnt_t{WAVELEN};
 
 		while (dstFrames > 0)
 		{
-			const auto src = InterleavedBufferView<const float>(_src + srcIndex, 1, static_cast<std::size_t>(srcFrames));
-			const auto dst = InterleavedBufferView<float>(_dst + dstIndex, 1, static_cast<std::size_t>(dstFrames));
+			const auto src = InterleavedBufferView<const float>(_src + srcIndex, 1, static_cast<f_cnt_t>(srcFrames));
+			const auto dst = InterleavedBufferView<float>(_dst + dstIndex, 1, static_cast<f_cnt_t>(dstFrames));
 			const auto [inputFramesUsed, outputFramesGenerated] = resampler.process(src, dst, WAVERATIO);
 
 			srcIndex += inputFramesUsed;
