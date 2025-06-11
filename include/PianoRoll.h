@@ -296,6 +296,14 @@ private:
 	//	Free
 	};
 
+	enum SelectionMode
+	{
+		SelectionReplace,
+		SelectionAdd,
+		SelectionSubtract,
+		SelectionInvert
+	};
+
 	PositionLine * m_positionLine;
 
 	std::vector<QString> m_nemStr; // gui names of each edit mode
@@ -459,7 +467,7 @@ private:
 	Note * noteUnderMouse();
 
 	// turn a selection rectangle into selected notes
-	void computeSelectedNotes( bool shift );
+	void computeSelectedNotes(SelectionMode mode=SelectionReplace);
 	void clearSelectedNotes();
 
 	// did we start a mouseclick with shift pressed
