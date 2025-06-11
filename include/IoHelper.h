@@ -80,7 +80,7 @@ inline std::unique_ptr<wchar_t[]> toWString(std::string_view utf8)
 		throw std::invalid_argument{"toWString: failed to get size of result string. error code: " + std::to_string(error)};
 	}
 
-	ret = std::make_unique<wchar_t[]>(result);
+	ret = std::make_unique<wchar_t[]>(result + 1); // includes null terminator
 	result = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.data(), utf8Len, ret.get(), result);
 	if (result <= 0)
 	{
