@@ -43,10 +43,7 @@
 namespace lmms
 {
 using namespace std::numbers;
-using std::integral, std::floating_point, std::is_arithmetic_v;
-
-template<typename T> requires is_arithmetic_v<T>
-concept floating_point_or_float = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+using std::integral, std::floating_point, std::is_arithmetic_v, std::is_floating_point_v, std::conditional_t;
 
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
@@ -100,23 +97,17 @@ inline integral auto fastRand() noexcept
 template<typename T> requires is_arithmetic_v<T>
 inline auto fastRand(T range) noexcept
 {
-	constexpr auto FAST_RAND_RATIO = static_cast<floating_point_or_float<T>>(1.0 / 32767);
+	constexpr auto FAST_RAND_RATIO = static_cast<conditional_t<is_floating_point_v<T>, T, float>>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
 
 //! @brief Returns a psuedorandom number between @p from and @p to, inclusive.
-inline auto fastRand(auto from, auto to) noexcept
-{
-	return from + fastRand(to - from);
-}
+inline auto fastRand(auto from, auto to) noexcept {	return from + fastRand(to - from); }
 
 
 //! @brief Returns true one in @p chance times at random.
-inline bool oneIn(unsigned chance) noexcept
-{
-	return 0 == (fastRand() % chance);
-}
+inline bool oneIn(unsigned chance) noexcept { return 0 == (fastRand() % chance); }
 
 
 //! Round `value` to `where` depending on step size
@@ -203,7 +194,7 @@ inline float linearToLogScale(float min, float max, float value)
 template<typename T> requires is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(ln10_v<floating_point_or_float<T>> * x);
+	return std::exp(ln10_v<conditional_t<is_floating_point_v<T>, T, float>> * x);
 }
 
 
@@ -211,7 +202,7 @@ inline auto fastPow10f(T x)
 template<typename T> requires is_arithmetic_v<T>
 inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<floating_point_or_float<T>>(1.0 / ln10);
+	constexpr auto inv_ln10 = static_cast<conditional_t<is_floating_point_v<T>, T, float>>(1.0 / ln10);
 	return std::log(x) * inv_ln10;
 }
 
