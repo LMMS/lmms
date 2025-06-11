@@ -29,6 +29,7 @@
 #include <cstdlib>
 
 #include "LmmsTypes.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
