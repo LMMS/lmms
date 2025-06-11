@@ -43,7 +43,11 @@
 namespace lmms
 {
 using namespace std::numbers;
-using std::integral, std::floating_point, std::is_arithmetic_v, std::conditional_t, std::is_floating_point_v;
+using std::integral, std::floating_point, std::is_arithmetic_v;
+
+template<typename T> requires is_arithmetic_v<T>
+concept floating_point_or_float = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
@@ -96,7 +100,7 @@ inline integral auto fastRand() noexcept
 template<typename T> requires is_arithmetic_v<T>
 inline auto fastRand(T range) noexcept
 {
-	constexpr auto FAST_RAND_RATIO = static_cast<conditional_t<is_floating_point_v<T>, T, float>>(1.0 / 32767);
+	constexpr auto FAST_RAND_RATIO = static_cast<floating_point_or_float<T>>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
@@ -194,25 +198,23 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan(result) ? 0 : result;
 }
 
+
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-template<floating_point T>
+template<typename T> requires is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(ln10_v<T> * x);
+	return std::exp(ln10_v<floating_point_or_float<T>> * x);
 }
 
-// TODO C++26: Make constexpr since std::exp() will be constexpr
-inline auto fastPow10f(integral auto x)
-{
-	return std::exp(ln10_v<float> * x);
-}
 
 // TODO C++26: Make constexpr since std::log() will be constexpr
-inline auto fastLog10f(float x)
+template<typename T> requires is_arithmetic_v<T>
+inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<float>(1.0 / ln10);
+	constexpr auto inv_ln10 = static_cast<floating_point_or_float<T>>(1.0 / ln10);
 	return std::log(x) * inv_ln10;
 }
+
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
