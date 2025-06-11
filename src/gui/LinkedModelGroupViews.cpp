@@ -25,6 +25,7 @@
 #include "LinkedModelGroupViews.h"
 
 #include <QPushButton>
+#include <QVBoxLayout>
 #include "Controls.h"
 #include "ControlLayout.h"
 #include "LinkedModelGroups.h"
@@ -43,8 +44,11 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	QWidget(parent),
 	m_model(model),
 	m_colNum(colNum),
-	m_layout(new ControlLayout(this))
+	m_vbox(new QVBoxLayout(this))
 {
+	auto layoutWidget = new QWidget();
+	m_vbox->addWidget(layoutWidget, 0);
+	m_layout = new ControlLayout(layoutWidget);
 	// This is required to remove the focus of the line edit
 	// when e.g. another spin box is being clicked.
 	// Removing the focus is wanted because in many cases, the user wants to
@@ -87,7 +91,7 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 	if (ctrl)
 	{
 		auto box = new QWidget(this);
-		auto boxLayout = new QHBoxLayout(box);
+		auto boxLayout = new QHBoxLayout();
 		boxLayout->addWidget(ctrl->topWidget());
 
 		if (removable)
@@ -109,6 +113,7 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 
 		// required, so the Layout knows how to sort/filter widgets by string
 		box->setObjectName(QString::fromStdString(display));
+		box->setLayout(boxLayout);
 		m_layout->addWidget(box);
 
 		// take ownership of control and add it
