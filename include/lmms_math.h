@@ -103,7 +103,7 @@ inline auto fastRand(T range) noexcept
 
 
 //! @brief Returns a psuedorandom number between @p from and @p to, inclusive.
-inline auto fastRand(auto from, auto to) noexcept {	return from + fastRand(to - from); }
+inline auto fastRand(auto from, auto to) noexcept { return from + fastRand(to - from); }
 
 
 //! @brief Returns true one in @p chance times at random.
