@@ -181,14 +181,14 @@ void SampleClip::setSampleFile(const QString& sf)
 {
 	if (!sf.isEmpty())
 	{
-		//Otherwise set it to the sample's length
 		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
+		// Remove any prior offset in the clip
 		setStartTimeOffset(0);
 		updateLength();
 	}
 	else
 	{
-		//If there is no sample, make the clip a bar long
+		// If there is no sample, make the clip a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		changeLength(DefaultTicksPerBar * (nom / den));
