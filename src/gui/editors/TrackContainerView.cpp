@@ -370,7 +370,7 @@ void TrackContainerView::clearAllTracks()
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee, {"presetfile", "pluginpresetfile", "samplefile", "instrument",
-				"importedproject", "soundfontfile","patchfile","vstpluginfile","projectfile",
+				"midifile", "soundfontfile","patchfile","vstpluginfile","projectfile",
 				QString("track_%1").arg(static_cast<int>(Track::Type::Instrument)), QString("track_%1").arg(static_cast<int>(Track::Type::Sample))});
 }
 
@@ -431,7 +431,7 @@ void TrackContainerView::dropEvent(QDropEvent* _de)
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if (type == "importedproject")
+	else if (type == "midifile")
 	{
 		ImportFilter::import( value, m_tc );
 		_de->accept();

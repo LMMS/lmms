@@ -39,6 +39,7 @@ class QMimeData;
 namespace lmms::Clipboard
 {
 
+bool isType(const QString& ext, const QString& mimetype);
 bool isAudioFile(const QString& ext);
 bool isProjectFile(const QString& ext);
 bool isPresetFile(const QString& ext);

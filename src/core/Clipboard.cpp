@@ -26,6 +26,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 
 #include "FileBrowser.h"
 #include "PluginFactory.h"
@@ -35,52 +36,56 @@
 namespace lmms::Clipboard
 {
 
-	static const QStringList projectExtensions{"mmp", "mpt", "mmpz"};
-	static const QStringList presetExtensions{"xpf", "xml", "xiz", "lv2"};
-	static const QStringList soundFontExtensions{"sf2", "sf3"};
-	static const QStringList patchExtensions{"pat"};
-	static const QStringList midiExtensions{"mid", "midi", "rmi"};
-	static QStringList vstPluginExtensions{};
-	static QStringList audioExtensions{};
+static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile", {}}, {"vstpluginfile", {}},
+	{"presetfile", {"xpf", "xml", "xiz", "lv2"}}, {"midifile", {"mid", "midi", "rmi"}},
+	{"projectfile", {"mmp", "mpt", "mmpz"}}, {"patchfile", {"pat"}}, {"soundfontfile", {"sf2", "sf3"}}};
 
-	//! gets the extension of a file, or returns the string back if no extension is found
+//! gets the extension of a file, or returns the string back if no extension is found
 	inline QString getExtension(const QString& file)
 	{
 		const QStringList parts = file.split('.');
 		return parts.isEmpty() ? file.toLower() : parts.last().toLower();
 	}
 
-	/* @brief updates the lists of extensions.
-	 * TODO: currently, this only applies for audioExtensions and vstPluginExtensions, but all the lists should be filled dynamically
+	/* @brief updates the extension map.
 	 */
-	void updateExtensionLists()
+	void updateExtensionMap()
 	{
-		vstPluginExtensions = QString(PluginFactory::instance()->pluginInfo("vestige").descriptor->supportedFileTypes).split(',');
-
-		audioExtensions.clear();
-		for (const SampleDecoder::AudioType& at : SampleDecoder::supportedAudioTypes())
+		for (auto& pluginInfo : PluginFactory::instance()->pluginInfos())
 		{
-			audioExtensions += QString::fromStdString(at.extension);
+			const char* mimetype = pluginInfo.descriptor->supportedMimetype;
+
+			if (mimetype == nullptr || mimetype[0] == '\0') { continue; }
+
+			std::vector<std::string> fileTypes = {};
+
+			for (auto& fileType : QString(pluginInfo.descriptor->supportedFileTypes).split(","))
+			{
+				fileTypes.push_back(fileType.toStdString());
+				qDebug() << fileType;
+			}
+
+			mimetypes.insert_or_assign(mimetype, fileTypes);
 		}
 	}
 
-	bool isAudioFile(const QString& ext)
+	bool isType(const QString& ext, const QString& mimetype)
 	{
-		if (audioExtensions.isEmpty())
-		{
-			updateExtensionLists();
-		}
+		auto& fileTypes = mimetypes.find(mimetype.toStdString())->second;
+		if (fileTypes.empty()) { updateExtensionMap(); }
 
-		return audioExtensions.contains(getExtension(ext));
+		return std::ranges::find(fileTypes, getExtension(ext).toStdString()) != fileTypes.end();
 	}
-	bool isProjectFile(const QString& ext)   { return projectExtensions.contains(getExtension(ext)); }
-	bool isPresetFile(const QString& ext)    { return presetExtensions.contains(getExtension(ext)); }
-	bool isSoundFontFile(const QString& ext) { return soundFontExtensions.contains(getExtension(ext)); }
-	bool isPatchFile(const QString& ext)     { return patchExtensions.contains(getExtension(ext)); }
-	bool isMidiFile(const QString& ext)      { return midiExtensions.contains(getExtension(ext)); }
-	bool isVstPluginFile(const QString& ext) { return vstPluginExtensions.contains(getExtension(ext)); }
 
-	const QMimeData * getMimeData()
+	bool isAudioFile(const QString& ext)	 { return isType(ext, "samplefile"); }
+	bool isProjectFile(const QString& ext)   { return isType(ext, "midifile"); }
+	bool isPresetFile(const QString& ext)    { return isType(ext, "presetfile"); }
+	bool isSoundFontFile(const QString& ext) { return isType(ext, "soundfontfile"); }
+	bool isPatchFile(const QString& ext)     { return isType(ext, "patchfile"); }
+	bool isMidiFile(const QString& ext)      { return isType(ext, "midifile"); }
+	bool isVstPluginFile(const QString& ext) { return isType(ext, "vstpluginfile"); }
+
+	const QMimeData* getMimeData()
 	{
 		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
 	}
@@ -154,7 +159,7 @@ namespace lmms::Clipboard
 		if (isAudioFile(value))			 { type = "samplefile"; }
 		else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
 		else if (isPresetFile(value))    { type = "presetfile"; }
-		else if (isMidiFile(value))      { type = "importedproject"; }
+		else if (isMidiFile(value)) { type = "midifile"; }
 		else if (isProjectFile(value))   { type = "projectfile"; }
 		else if (isPatchFile(value))     { type = "patchfile"; }
 		else if (isSoundFontFile(value)) { type = "soundfontfile"; }
@@ -195,7 +200,7 @@ namespace lmms::Clipboard
 			iconName = "vst_plugin_file";
 			break;
 		case gui::FileItem::FileType::Midi:
-			internalType = "importedproject";
+			internalType = "midifile";
 			iconName = "midi_file";
 			break;
 		case gui::FileItem::FileType::Project:

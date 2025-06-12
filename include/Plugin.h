@@ -90,14 +90,15 @@ public:
 	//! the plugin-loader is able to access information about the plugin
 	struct Descriptor
 	{
-		const char * name;
-		const char * displayName;
-		const char * description;
-		const char * author;
+		const char* name;
+		const char* displayName;
+		const char* description;
+		const char* author;
 		int version;
 		Type type;
-		const PixmapLoader * logo;
-		const char * supportedFileTypes; //!< csv list of extensions
+		const PixmapLoader* logo;
+		const char* supportedFileTypes; //!< csv list of extensions
+		const char* supportedMimetype; //!< mimetype supported by the plugin. Should be null if no filetypes are supported
 
 		inline bool supportsFileType( const QString& extension ) const
 		{
@@ -124,7 +125,7 @@ public:
 				its sub plugin (using the attributes).
 				When keys are saved, those attributes are
 				written to XML in order to find the right sub
-				plugin when realoading.
+				plugin when reloading.
 
 				@note Any data that is not required to reference
 					the right Plugin or sub plugin should
