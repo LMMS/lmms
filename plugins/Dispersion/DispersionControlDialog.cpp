@@ -71,6 +71,7 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	dcButton->setText("DC");
 	dcButton->setModel(&controls->m_dcModel);
 	dcButton->setToolTip(tr("Remove DC Offset"));
+	dcButton->setObjectName("btn");
 	layout->addWidget(dcButton);
 }
 
