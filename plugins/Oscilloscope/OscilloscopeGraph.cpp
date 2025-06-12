@@ -77,39 +77,30 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, height() / 2 * (1 - amp), width(), height() / 2 * (1 - amp));
 	p.drawLine(0, height() / 2 * (1 + amp), width(), height() / 2 * (1 + amp));
 
-	bool stereo = m_controls->m_stereoModel.value();
+	const bool hq = framesPerPixel > 1;
+	const int xoffset = !hq * framesPerPixel;
+	const float xscale = 1.f / (windowSize - framesPerPixel);
+	const bool stereo = m_controls->m_stereoModel.value();
 	if (!stereo)
 	{
 		p.setPen(m_monoColor);
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
-			int currentIndex = (windowStartIndex + f) % bufferSize;
-			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			if (framesPerPixel > 1)
+			const int currentIndex = (windowStartIndex + f) % bufferSize;
+			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			float maxValue = buffer[hq ? currentIndex : nextIndex].average();
+			float minValue = buffer[currentIndex].average();
+			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
 			{
-				float maxValue = buffer[currentIndex].average();
-				float minValue = maxValue;
-				for (int i = currentIndex + 1; i <= nextIndex; ++i)
-				{
-					maxValue = std::max(maxValue, buffer[i].average());
-					minValue = std::min(minValue, buffer[i].average());
-				}
-				p.drawLine(
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - minValue * amp) / 2,
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - maxValue * amp) / 2
-				);
+				maxValue = std::max(maxValue, buffer[i].average());
+				minValue = std::min(minValue, buffer[i].average());
 			}
-			else
-			{
-				p.drawLine(
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - buffer[currentIndex].average() * amp) / 2,
-					width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
-					height() * (1 - buffer[nextIndex].average() * amp) / 2
-				);
-			}
+			p.drawLine(
+				width() * f * xscale,
+				height() * (1 - minValue * amp) / 2,
+				width() * (f + xoffset) * xscale,
+				height() * (1 - maxValue * amp) / 2
+			);
 		}
 	}
 	else
@@ -117,64 +108,40 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 		p.setPen(m_leftColor);
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
-			int currentIndex = (windowStartIndex + f) % bufferSize;
-			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			if (framesPerPixel > 1)
+			const int currentIndex = (windowStartIndex + f) % bufferSize;
+			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			float maxValue = buffer[hq ? currentIndex : nextIndex].left();
+			float minValue = buffer[currentIndex].left();
+			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
 			{
-				float maxValue = buffer[currentIndex].left();
-				float minValue = maxValue;
-				for (int i = currentIndex + 1; i <= nextIndex; ++i)
-				{
-					maxValue = std::max(maxValue, buffer[i].left());
-					minValue = std::min(minValue, buffer[i].left());
-				}
-				p.drawLine(
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - minValue * amp) / 2,
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - maxValue * amp) / 2
-				);
+				maxValue = std::max(maxValue, buffer[i].left());
+				minValue = std::min(minValue, buffer[i].left());
 			}
-			else
-			{
-				p.drawLine(
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - buffer[currentIndex].left() * amp) / 2,
-					width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
-					height() * (1 - buffer[nextIndex].left() * amp) / 2
-				);
-			}
+			p.drawLine(
+				width() * f * xscale,
+				height() * (1 - minValue * amp) / 2,
+				width() * (f + xoffset) * xscale,
+				height() * (1 - maxValue * amp) / 2
+			);
 		}
 		p.setPen(m_rightColor);
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
-			int currentIndex = (windowStartIndex + f) % bufferSize;
-			int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			if (framesPerPixel > 1)
+			const int currentIndex = (windowStartIndex + f) % bufferSize;
+			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			float maxValue = buffer[hq ? currentIndex : nextIndex].right();
+			float minValue = buffer[currentIndex].right();
+			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
 			{
-				float maxValue = buffer[currentIndex].right();
-				float minValue = maxValue;
-				for (int i = currentIndex + 1; i <= nextIndex; ++i)
-				{
-					maxValue = std::max(maxValue, buffer[i].right());
-					minValue = std::min(minValue, buffer[i].right());
-				}
-				p.drawLine(
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - minValue * amp) / 2,
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - maxValue * amp) / 2
-				);
+				maxValue = std::max(maxValue, buffer[i].right());
+				minValue = std::min(minValue, buffer[i].right());
 			}
-			else
-			{
-				p.drawLine(
-					width() * f / (windowSize - framesPerPixel),
-					height() * (1 - buffer[currentIndex].right() * amp) / 2,
-					width() * (f + framesPerPixel) / (windowSize - framesPerPixel),
-					height() * (1 - buffer[nextIndex].right() * amp) / 2
-				);
-			}
+			p.drawLine(
+				width() * f * xscale,
+				height() * (1 - minValue * amp) / 2,
+				width() * (f + xoffset) * xscale,
+				height() * (1 - maxValue * amp) / 2
+			);
 		}
 	}
 }
