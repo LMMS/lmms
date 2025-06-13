@@ -428,13 +428,13 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			sample.m_resampler.setRatio(freq_factor);
-
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
 			auto numFramesMixed = 0;
+			sample.m_resampler.setRatio(freq_factor);
+
 			while (numFramesMixed < frames)
 			{
 				if (sample.m_resampler.input().empty())
@@ -448,6 +448,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				{
 					sample.m_resampler.setOutput(
 						{&sample.m_outputBuffer[0][0], DEFAULT_CHANNELS, sample.m_outputBuffer.size()});
+					sample.m_outputIndex = 0;
 				}
 
 				const auto result = sample.m_resampler.process();
@@ -456,15 +457,16 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
 					const auto amplitude = copy.value();
-					_working_buffer[numFramesMixed + i] += sample.m_outputBuffer[i] * amplitude; 
+					_working_buffer[numFramesMixed + i] += sample.m_outputBuffer[sample.m_outputIndex + i] * amplitude;
 				}
 
 				sample.m_resampler.advanceInput(result.inputFramesUsed);
-				sample.m_resampler.advanceOutput(framesToMix);
-
-				numFramesMixed += framesToMix;
 				sample.pos += result.inputFramesUsed;
 				sample.adsr.inc(result.inputFramesUsed);
+
+				sample.m_resampler.advanceOutput(result.outputFramesGenerated);
+				sample.m_outputIndex += framesToMix;
+				numFramesMixed += framesToMix;
 			}
 		}
 	}

@@ -173,6 +173,7 @@ public:
 	AudioResampler m_resampler;
 	std::array<SampleFrame, 64> m_inputBuffer;
 	std::array<SampleFrame, 64> m_outputBuffer;
+	std::size_t m_outputIndex = 0;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
