@@ -432,7 +432,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
-			auto numFramesMixed = 0;
+			auto numFramesMixed = f_cnt_t{0};
 			sample.m_resampler.setRatio(freq_factor);
 
 			while (numFramesMixed < frames)
