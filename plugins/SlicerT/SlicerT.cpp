@@ -112,7 +112,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 
 	auto playbackState = static_cast<Sample::PlaybackState*>(handle->m_pluginData);
 	const auto endFrame = sliceEnd * m_originalSample.sampleSize();
-	const auto framesLeft = endFrame - playbackState->frameIndex;
+	const auto framesLeft = endFrame - playbackState->frameIndex();
 
 	if (framesLeft > 0
 		&& m_originalSample.play(workingBuffer + offset, playbackState, frames, Sample::Loop::Off, speedRatio))
@@ -129,7 +129,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 			workingBuffer[i + offset][1] *= fadeValue;
 		}
 
-		const auto currentNote = static_cast<float>(playbackState->frameIndex) / m_originalSample.sampleSize();
+		const auto currentNote = static_cast<float>(playbackState->frameIndex()) / m_originalSample.sampleSize();
 		emit isPlaying(currentNote, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }

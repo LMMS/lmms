@@ -25,7 +25,6 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <functional>
 #include <samplerate.h>
 
 #include "AudioBufferView.h"
@@ -49,17 +48,12 @@ public:
 		SincBest	 //!< Best sinc quality mode.
 	};
 
-	//! Writes data into @p dst.
-	//! @p dst is of size `channels * frames`.
-	//! Clients are expected to advance their data streams as necessary.
-	//! @return The number of frames written into @p dst.
-	using InputCallback = std::function<f_cnt_t(InterleavedBufferView<float> dst)>;
-
-	//! Reads all data from @p src.
-	//! @p src is of size `channels * frames`.
-	//! Clients are expected to advance their data streams as necessary.
-	//! Must acknowledge reading all data given to it.
-	using OutputCallback = std::function<void(InterleavedBufferView<const float> src)>;
+	//! The resampling results returned by @ref process.
+	struct Result
+	{
+		f_cnt_t inputFramesUsed;	   //!< The number of input frames used.
+		f_cnt_t outputFramesGenerated; //!< The number of output frames generated.
+	};
 
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
@@ -68,11 +62,11 @@ public:
 	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
 
-	//! Resamplers cannot be copied.
-	AudioResampler(const AudioResampler&) = delete;
+	//! Copy resampler state from one to another.
+	AudioResampler(const AudioResampler&);
 
-	//! Resamplers cannot be copied.
-	AudioResampler& operator=(const AudioResampler&) = delete;
+	//! Copy resampler state from one to another.
+	AudioResampler& operator=(const AudioResampler&);
 
 	//! Moves the internal state from one resampler to another.
 	AudioResampler(AudioResampler&&) noexcept;
@@ -80,39 +74,59 @@ public:
 	//! Moves the internal state from one resampler to another.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
-	//! Resamples audio into @p dst at the given @p ratio.
-	//! Stops when @p dst is full, or @p callback stops writing input.
-	//! Uses @p callback to fetch input data as necessary.
-	//! @return The number of output frames generated.
-	[[nodiscard]] auto process(InterleavedBufferView<float> dst, double ratio, InputCallback callback) -> f_cnt_t;
+	//! Resample audio from the input to the output.
+	//! The input and output buffers are shrinked and advaced based on how many input frames were generated and how many
+	//! output frames were used respectively.
+	//! @return The resampling results. See @ref Result.
+	[[nodiscard]] auto process() -> Result;
 
-	//! Resamples audio from @p src at the given @p ratio.
-	//! Stops when @p src is empty, or @p callback stops reading output.
-	//! Uses @p callback to send resampled output data as necessary.
-	//! @return The number of input frames used.
-	[[nodiscard]] auto process(InterleavedBufferView<const float> src, double ratio, OutputCallback callback)
-		-> f_cnt_t;
+	//! Advance and shrink the input buffer by @p frames frames.
+	void advanceInput(std::size_t frames);
 
-	//! Resamples audio from @p src into @p dst at the given @p ratio.
-	//! Stops when @p dst is full, or @p src is empty.
-	//! @return A pair containing the number of input frames used as the first member, and the number of output frames
-	//! generated in the second member.
-	[[nodiscard]] auto process(InterleavedBufferView<const float> src, InterleavedBufferView<float> dst, double ratio)
-		-> std::pair<f_cnt_t, f_cnt_t>;
+	//! Advance and shrink the output buffer by @p frames frames.
+	void advanceOutput(std::size_t frames);
 
-	//! Returns the number of channels expected by the resampler.
+	//! Set the input buffer view to @p input .
+	void setInput(InterleavedBufferView<const float> input);
+
+	//! Set the output buffer view to @p output .
+	void setOutput(InterleavedBufferView<float> output);
+
+	//! Set the resampling ratio to @p ratio .
+	//! @p ratio is equal to the output sample rate divided by the input sample rate.
+	void setRatio(double ratio) { m_data.src_ratio = ratio; }
+
+	//! Set the end of input flag.
+	void setEndOfInput(bool endOfInput) { m_data.end_of_input = endOfInput; }
+
+	//! @return The input buffer.
+	auto input() -> InterleavedBufferView<const float>
+	{
+		return {m_data.data_in, m_channels, static_cast<f_cnt_t>(m_data.input_frames)};
+	}
+
+	//! @return The output buffer.
+	auto output() -> InterleavedBufferView<float>
+	{
+		return {m_data.data_out, m_channels, static_cast<f_cnt_t>(m_data.output_frames)};
+	}
+
+	//! @return The resampling ratio.
+	auto ratio() const -> double { return m_data.src_ratio; }
+
+	//! @return End of input flag. `true` if no more input data is available.
+	auto endOfInput() const -> bool { return m_data.end_of_input; }
+
+	//! @return The number of channels expected by the resampler.
 	auto channels() const -> ch_cnt_t { return m_channels; }
 
-	//! Returns the interpolation mode used by this resampler.
+	//! @return The interpolation mode used by this resampler.
 	auto mode() const -> Mode { return m_mode; }
 
 private:
-	static constexpr auto BufferFrameSize = 64;
 	static auto converterType(Mode mode) -> int;
-	std::vector<float> m_inputBuffer;
-	std::vector<float> m_outputBuffer;
-	InterleavedBufferView<const float> m_inputBufferWindow;
 	SRC_STATE* m_state = nullptr;
+	SRC_DATA m_data{};
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;
 	int m_error = 0;

@@ -116,21 +116,28 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
-	state->frameIndex = std::max<int>(m_startFrame, state->frameIndex);
+	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
+	state->m_resampler.setOutput({&dst[0][0], DEFAULT_CHANNELS, numFrames});
+	state->m_resampler.setRatio(ratio);
 
-	const auto inputCallback = [&](InterleavedBufferView<float> input) {
-		const auto rendered = render(reinterpret_cast<SampleFrame*>(input.data()), input.frames(), state, loop);
-		return static_cast<long>(rendered);
-	};
-
-	ratio *= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
-	const auto dstView = InterleavedBufferView<float>(&dst[0][0], DEFAULT_CHANNELS, numFrames);
-	const auto outputFramesGenerated = state->resampler.process(dstView, ratio, inputCallback);
-
-	if (outputFramesGenerated < numFrames)
+	while (!state->m_resampler.output().empty())
 	{
-		if (outputFramesGenerated == 0) { return false; }
-		std::fill(dst + outputFramesGenerated, dst + numFrames, SampleFrame{});
+		if (state->m_resampler.input().empty())
+		{
+			const auto rendered = render(state->m_inputBuffer.data(), state->m_inputBuffer.size(), state, loop);
+			state->m_resampler.setInput({&state->m_inputBuffer[0][0], DEFAULT_CHANNELS, rendered});
+		}
+
+		const auto result = state->m_resampler.process();
+		state->m_resampler.advanceInput(result.inputFramesUsed);
+		state->m_resampler.advanceOutput(result.outputFramesGenerated);
+
+		if (state->m_resampler.input().empty() && result.outputFramesGenerated == 0)
+		{
+			std::fill_n(state->m_resampler.output().data(),
+				state->m_resampler.output().frames() * state->m_resampler.channels(), 0.f);
+			return state->m_resampler.output().frames() < numFrames;
+		}
 	}
 
 	return true;
@@ -143,31 +150,31 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 		switch (loop)
 		{
 		case Loop::Off:
-			if (state->frameIndex < 0 || state->frameIndex >= m_endFrame) { return frame; }
+			if (state->m_frameIndex < 0 || state->m_frameIndex >= m_endFrame) { return frame; }
 			break;
 		case Loop::On:
-			if (state->frameIndex < m_loopStartFrame && state->backwards) { state->frameIndex = m_loopEndFrame - 1; }
-			else if (state->frameIndex >= m_loopEndFrame) { state->frameIndex = m_loopStartFrame; }
+			if (state->m_frameIndex < m_loopStartFrame && state->m_backwards) { state->m_frameIndex = m_loopEndFrame - 1; }
+			else if (state->m_frameIndex >= m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
 			break;
 		case Loop::PingPong:
-			if (state->frameIndex < m_loopStartFrame && state->backwards)
+			if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 			{
-				state->frameIndex = m_loopStartFrame;
-				state->backwards = false;
+				state->m_frameIndex = m_loopStartFrame;
+				state->m_backwards = false;
 			}
-			else if (state->frameIndex >= m_loopEndFrame)
+			else if (state->m_frameIndex >= m_loopEndFrame)
 			{
-				state->frameIndex = m_loopEndFrame - 1;
-				state->backwards = true;
+				state->m_frameIndex = m_loopEndFrame - 1;
+				state->m_backwards = true;
 			}
 			break;
 		default:
 			break;
 		}
 
-		const auto value = m_buffer->data()[m_reversed ? m_buffer->size() - state->frameIndex - 1 : state->frameIndex];
+		const auto value = m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex];
 		dst[frame] = value * m_amplification;
-		state->backwards ? --state->frameIndex : ++state->frameIndex;
+		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
 	}
 
 	return size;

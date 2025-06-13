@@ -422,40 +422,49 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			if (sample.region->PitchTrack == true || rate != sample.sample->SamplesPerSecond)
 			{
 				// Factor just for resampling
-				freq_factor = 1.0 * rate / sample.sample->SamplesPerSecond;
+				1.0 * rate / sample.sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 			}
 
-			const auto inputCallback = [&](InterleavedBufferView<float> input) {
-				loadSample(sample, reinterpret_cast<SampleFrame*>(input.data()), input.frames());
-				sample.pos += input.frames();
-				sample.adsr.inc(input.frames());
-				return input.frames();
-			};
+			sample.m_resampler.setRatio(freq_factor);
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
-			constexpr auto mixBufSize = 64;
-			auto mixBuf = std::array<SampleFrame, mixBufSize>{};
-			auto numFramesMixed = f_cnt_t{0};
-
+			auto numFramesMixed = 0;
 			while (numFramesMixed < frames)
 			{
-				const auto dst = InterleavedBufferView<float>(&mixBuf[0][0], DEFAULT_CHANNELS, mixBuf.size());
-				const auto outputFramesGenerated = sample.m_resampler.process(dst, freq_factor, inputCallback);
-				const auto framesToMix = std::min<f_cnt_t>(frames - numFramesMixed, outputFramesGenerated);
+				if (sample.m_resampler.input().empty())
+				{
+					loadSample(sample, sample.m_inputBuffer.data(), sample.m_inputBuffer.size());
+					sample.m_resampler.setInput(
+						{&sample.m_inputBuffer[0][0], DEFAULT_CHANNELS, sample.m_inputBuffer.size()});
+				}
+
+				if (sample.m_resampler.output().empty())
+				{
+					sample.m_resampler.setOutput(
+						{&sample.m_outputBuffer[0][0], DEFAULT_CHANNELS, sample.m_outputBuffer.size()});
+				}
+
+				const auto result = sample.m_resampler.process();
+				const auto framesToMix = std::min(frames - numFramesMixed, result.outputFramesGenerated);
 
 				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
 					const auto amplitude = copy.value();
-					_working_buffer[numFramesMixed + i] += mixBuf[i] * amplitude;
+					_working_buffer[numFramesMixed + i] += sample.m_outputBuffer[i] * amplitude; 
 				}
 
+				sample.m_resampler.advanceInput(result.inputFramesUsed);
+				sample.m_resampler.advanceOutput(framesToMix);
+
 				numFramesMixed += framesToMix;
+				sample.pos += result.inputFramesUsed;
+				sample.adsr.inc(result.inputFramesUsed);
 			}
 		}
 	}

@@ -867,16 +867,28 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	const auto inputCallback = [&](InterleavedBufferView<float> input) {
-		const auto err = fluid_synth_write_float(m_synth, static_cast<int>(input.frames()), input.data(), 0,
-			input.channels(), input.data(), 1, input.channels());
-		return err == FLUID_OK ? input.frames() : 0;
-	};
+	m_resampler.setOutput({&buf[0][0], DEFAULT_CHANNELS, frames});
+	m_resampler.setRatio(Engine::audioEngine()->outputSampleRate() / m_internalSampleRate);
 
-	const auto ratio = Engine::audioEngine()->outputSampleRate() / m_internalSampleRate;
-	const auto dst = InterleavedBufferView<float>(&buf[0][0], DEFAULT_CHANNELS, frames);
-	const auto outputFramesGenerated = m_resampler.process(dst, ratio, inputCallback);
-	if (outputFramesGenerated < frames) { std::fill(buf + outputFramesGenerated, buf + frames, SampleFrame{}); }
+	while (!m_resampler.output().empty())
+	{
+		if (m_resampler.input().empty())
+		{
+			fluid_synth_write_float(m_synth, m_inputBuffer.size(), m_inputBuffer.data(), 0, DEFAULT_CHANNELS,
+				m_inputBuffer.data(), 1, DEFAULT_CHANNELS);
+			m_resampler.setInput({&m_inputBuffer[0][0], DEFAULT_CHANNELS, m_inputBuffer.size()});
+		}
+
+		const auto result = m_resampler.process();
+		m_resampler.advanceInput(result.inputFramesUsed);
+		m_resampler.advanceOutput(result.outputFramesGenerated);
+
+		if (m_resampler.input().empty() && result.outputFramesGenerated == 0)
+		{
+			std::fill_n(m_resampler.output().data(), m_resampler.output().frames() * m_resampler.channels(), 0.f);
+			break;
+		}
+	}
 
 	m_synthMutex.unlock();
 }

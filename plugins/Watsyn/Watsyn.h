@@ -190,28 +190,16 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		auto srcIndex = f_cnt_t{0};
-		auto dstIndex = f_cnt_t{0};
-		auto srcFrames = f_cnt_t{GRAPHLEN};
-		auto dstFrames = f_cnt_t{WAVELEN};
+		resampler.setInput({_src, 1, GRAPHLEN});
+		resampler.setOutput({_dst, 1, WAVELEN});
+		resampler.setRatio(WAVERATIO);
 
-		while (dstFrames > 0)
+		while (!resampler.output().empty())
 		{
-			const auto src = InterleavedBufferView<const float>(_src + srcIndex, 1, static_cast<f_cnt_t>(srcFrames));
-			const auto dst = InterleavedBufferView<float>(_dst + dstIndex, 1, static_cast<f_cnt_t>(dstFrames));
-			const auto [inputFramesUsed, outputFramesGenerated] = resampler.process(src, dst, WAVERATIO);
-
-			srcIndex += inputFramesUsed;
-			srcFrames -= inputFramesUsed;
-
-			dstIndex += outputFramesGenerated;
-			dstFrames -= outputFramesGenerated;
-
-			if (srcIndex == GRAPHLEN && srcFrames == 0)
-			{
-				srcIndex = 0;
-				srcFrames = GRAPHLEN;
-			}
+			const auto result = resampler.process();
+			resampler.advanceInput(result.inputFramesUsed);
+			resampler.advanceOutput(result.outputFramesGenerated);
+			if (resampler.input().empty()) { resampler.setInput({_src, 1, GRAPHLEN}); }
 		}
 	}
 

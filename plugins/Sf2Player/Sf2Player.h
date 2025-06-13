@@ -36,6 +36,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
+#include "SampleFrame.h"
 
 class QLabel;
 
@@ -106,6 +107,7 @@ public slots:
 
 private:
 	AudioResampler m_resampler;
+	std::array<SampleFrame, 64> m_inputBuffer;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;

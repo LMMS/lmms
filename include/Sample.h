@@ -43,17 +43,26 @@ public:
 		PingPong
 	};
 
-	struct LMMS_EXPORT PlaybackState
+	class LMMS_EXPORT PlaybackState
 	{
+	public:
 		PlaybackState(AudioResampler::Mode interpolationMode = AudioResampler::Mode::Linear, int frameIndex = 0)
-			: resampler(interpolationMode)
-			, frameIndex(frameIndex)
+			: m_resampler(interpolationMode)
+			, m_frameIndex(frameIndex)
 		{
 		}
 
-		AudioResampler resampler;
-		int frameIndex = 0;
-		bool backwards = false;
+		auto frameIndex() const -> int { return m_frameIndex; }
+		auto backwards() const -> bool { return m_backwards; }
+
+		void setFrameIndex(int index) { m_frameIndex = index; }
+		void setBackwards(bool backwards) { m_backwards = backwards; }
+
+	private:
+		AudioResampler m_resampler;
+		std::array<SampleFrame, 64> m_inputBuffer;
+		int m_frameIndex = 0;
+		bool m_backwards = false;
 		friend class Sample;
 	};
 
