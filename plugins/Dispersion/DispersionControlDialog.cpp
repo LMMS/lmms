@@ -44,6 +44,7 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 {
 	setAutoFillBackground(true);
 	auto layout = new QHBoxLayout(this);
+	layout->setSpacing(5);
 
 	auto amountBox = new LcdSpinBox(3, this, "Amount");
 	amountBox->setModel(&controls->m_amountModel);
