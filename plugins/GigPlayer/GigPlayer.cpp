@@ -422,7 +422,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			if (sample.region->PitchTrack == true || rate != sample.sample->SamplesPerSecond)
 			{
 				// Factor just for resampling
-				1.0 * rate / sample.sample->SamplesPerSecond;
+				freq_factor = 1.0 * rate / sample.sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
