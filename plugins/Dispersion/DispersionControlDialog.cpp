@@ -26,7 +26,6 @@
 #include "DispersionControlDialog.h"
 
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 
 #include "AutomatableButton.h"
 #include "DispersionControls.h"
