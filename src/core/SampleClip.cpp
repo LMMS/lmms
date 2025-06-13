@@ -179,11 +179,11 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 
 void SampleClip::setSampleFile(const QString& sf)
 {
+	// Remove any prior offset in the clip
+	setStartTimeOffset(0);
 	if (!sf.isEmpty())
 	{
 		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
-		// Remove any prior offset in the clip
-		setStartTimeOffset(0);
 		updateLength();
 	}
 	else
@@ -192,7 +192,6 @@ void SampleClip::setSampleFile(const QString& sf)
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		changeLength(DefaultTicksPerBar * (nom / den));
-		setStartTimeOffset(0);
 	}
 
 	emit sampleChanged();
