@@ -75,8 +75,6 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Resample audio from the input to the output.
-	//! The input and output buffers are shrinked and advaced based on how many input frames were generated and how many
-	//! output frames were used respectively.
 	//! @return The resampling results. See @ref Result.
 	[[nodiscard]] auto process() -> Result;
 
