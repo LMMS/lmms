@@ -81,7 +81,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings(AudioResampler::Mode::Linear),
+	m_qualitySettings({AudioResampler::Mode::Linear}),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
