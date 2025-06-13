@@ -53,12 +53,12 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	
 	auto freqKnob = new Knob(KnobType::Bright26, tr("FREQ"), this);
 	freqKnob->setModel(&controls->m_freqModel);
-	freqKnob->setHintText(tr("Frequency:") , "Hz");
+	freqKnob->setHintText(tr("Frequency:") , tr("Hz"));
 	layout->addWidget(freqKnob);
 	
 	auto resoKnob = new Knob(KnobType::Bright26, tr("RESO"), this);
 	resoKnob->setModel(&controls->m_resoModel);
-	resoKnob->setHintText(tr("Resonance:") , "octaves");
+	resoKnob->setHintText(tr("Resonance:") , tr("octaves"));
 	layout->addWidget(resoKnob);
 	
 	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FEED"), this);
@@ -68,7 +68,7 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	
 	auto dcButton = new AutomatableButton(this, tr("DC Offset Removal"));
 	dcButton->setCheckable(true);
-	dcButton->setText("DC");
+	dcButton->setText(tr("DC"));
 	dcButton->setModel(&controls->m_dcModel);
 	dcButton->setToolTip(tr("Remove DC Offset"));
 	dcButton->setObjectName("btn");
