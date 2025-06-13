@@ -98,7 +98,7 @@ private:
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	QPushButton* m_pinConnectorButton = nullptr;
-	std::unique_ptr<PinConnector> m_pinConnectorView;
+	PinConnector* m_pinConnectorView = nullptr;
 
 	bool m_dragging;
 	QGraphicsOpacityEffect* m_opacityEffect;

@@ -30,7 +30,6 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
-#include <memory>
 #include <optional>
 #include <type_traits>
 #include <vector>
@@ -187,7 +186,7 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 	auto nodeName() const -> QString override { return "pins"; }
 
-	virtual auto instantiateView() const -> std::unique_ptr<gui::PinConnector>;
+	virtual auto instantiateView() const -> gui::PinConnector*;
 
 	auto getChannelCountText() const -> QString;
 

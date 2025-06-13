@@ -148,7 +148,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-	m_pinConnectorView.reset();
+	if (m_pinConnectorView) { m_pinConnectorView->closeWindow(); }
 	delete m_subWindow;
 }
 
@@ -184,9 +184,6 @@ void EffectView::togglePinConnector()
 	if (!m_pinConnectorView)
 	{
 		m_pinConnectorView = ap->instantiateView();
-		connect(ap, &AudioPortsModel::destroyed, [this]() {
-			m_pinConnectorView.reset();
-		});
 	}
 	else
 	{

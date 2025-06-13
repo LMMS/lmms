@@ -115,7 +115,7 @@ private:
 	QAction * m_midiOutputAction;
 
 	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
-	std::unique_ptr<PinConnector> m_pinConnectorView;
+	PinConnector* m_pinConnectorView = nullptr;
 
 	QPoint m_lastPos;
 

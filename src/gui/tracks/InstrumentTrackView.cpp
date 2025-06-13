@@ -171,6 +171,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 InstrumentTrackView::~InstrumentTrackView()
 {
+	if (m_pinConnectorView) { m_pinConnectorView->closeWindow(); }
+
 	delete m_window;
 	m_window = nullptr;
 
@@ -218,9 +220,6 @@ void InstrumentTrackView::togglePinConnector()
 	if (!m_pinConnectorView)
 	{
 		m_pinConnectorView = ap->instantiateView();
-		connect(ap, &AudioPortsModel::destroyed, [this]() {
-			m_pinConnectorView.reset();
-		});
 	}
 	else
 	{
