@@ -348,12 +348,12 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( m_action == Action::ResizeVertical )
+	else if (m_action == Action::ResizeVertical)
 	{
 		resizeToHeight(me->y());
 		setCursor(Qt::SizeVerCursor);
 	}
-	else if( m_action == Action::ResizeHorizontal )
+	else if (m_action == Action::ResizeHorizontal)
 	{
 		m_trackContainerView->setTrackHeadWidth(me->x());
 		setCursor(Qt::SizeHorCursor);
