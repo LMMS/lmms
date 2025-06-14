@@ -165,6 +165,8 @@ protected slots:
 	void zoomingXChanged();
 	void zoomingYChanged();
 
+	void updateYDelta();
+
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
