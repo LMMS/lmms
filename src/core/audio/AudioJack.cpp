@@ -55,6 +55,20 @@ static const QString input2Key("input2");
 namespace lmms
 {
 
+static QString buildChannelSuffix(ch_cnt_t ch)
+{
+	return (ch % 2 ? "R" : "L") + QString::number(ch / 2 + 1);
+}
+
+static QString buildOutputName(ch_cnt_t ch)
+{
+	return QString("master out ") + buildChannelSuffix(ch);
+}
+
+static QString buildInputName(ch_cnt_t ch)
+{
+	return QString("master in ") + buildChannelSuffix(ch);
+}
 
 AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	: AudioDevice(
@@ -184,11 +198,11 @@ bool AudioJack::initJackClient()
 
 	for (ch_cnt_t ch = 0; ch < channels(); ++ch)
 	{
-		QString name = QString("master out ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
+		const QString name = buildOutputName(ch);
 		m_outputPorts.push_back(
 			jack_port_register(m_client, name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
 
-		QString input_name = QString("master in ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
+		const QString input_name = buildInputName(ch);
 		m_inputPorts.push_back(jack_port_register(m_client, input_name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0));
 
 		if (m_outputPorts.back() == nullptr)
@@ -478,22 +492,22 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	const auto output1 = cm->value(audioJackClass, output1Key);
 	m_outputDevice1 = buildToolButton(this, output1, audioOutputNames, cn);
-	form->addRow(tr("Output 1"), m_outputDevice1);
+	form->addRow(buildOutputName(0) + ":", m_outputDevice1);
 
 	const auto output2 = cm->value(audioJackClass, output2Key);
 	m_outputDevice2 = buildToolButton(this, output2, audioOutputNames, cn);
-	form->addRow(tr("Output 2"), m_outputDevice2);
+	form->addRow(buildOutputName(1) + ":", m_outputDevice2);
 
 	// Inputs
 	const auto audioInputNames = getAudioInputNames();
 
 	const auto input1 = cm->value(audioJackClass, input1Key);
 	m_inputDevice1 = buildToolButton(this, input1, audioInputNames, cn);
-	form->addRow(tr("Input 1"), m_inputDevice1);
+	form->addRow(buildInputName(0) + ":", m_inputDevice1);
 
 	const auto input2 = cm->value(audioJackClass, input2Key);
 	m_inputDevice2 = buildToolButton(this, input2, audioInputNames, cn);
-	form->addRow(tr("Input 2"), m_inputDevice2);
+	form->addRow(buildInputName(1) + ":", m_inputDevice2);
 
 	if (m_client != nullptr)
 	{
