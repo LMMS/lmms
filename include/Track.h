@@ -84,7 +84,7 @@ public:
 		Count
 	} ;
 
-	Track( Type type, TrackContainer * tc );
+	Track(Type type);
 	~Track() override;
 
 	static Track * create( Type tt, TrackContainer * tc );
@@ -149,6 +149,8 @@ public:
 	{
 		return m_trackContainer;
 	}
+
+	void setTrackContainer(TrackContainer* trackContainer) { m_trackContainer = trackContainer; }
 
 	// name-stuff
 	virtual const QString & name() const
