@@ -183,13 +183,13 @@ void TrackContainer::addTrack( Track * _track )
 		m_tracksMutex.lockForWrite();
 		m_tracks.push_back( _track );
 
-		_track->setTrackContainer(this);
-
 		m_tracksMutex.unlock();
 		_track->unlock();
 
 		emit trackAdded( _track );
 	}
+
+	_track->setTrackContainer(this);
 }
 
 
