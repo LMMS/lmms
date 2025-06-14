@@ -45,6 +45,17 @@ PatternStore::PatternStore() :
 	connect(&m_patternComboBoxModel, SIGNAL(dataUnchanged()),
 			this, SLOT(currentPatternChanged()));
 	setType(Type::Pattern);
+
+	connect(Engine::getSong(), &TrackContainer::trackAdded, [](Track* track) {
+		const auto patternTrack = dynamic_cast<PatternTrack*>(track);
+		if (!patternTrack) { return; }
+
+		Engine::patternStore()->createClipsForPattern(patternTrack->patternIndex());
+		Engine::patternStore()->setCurrentPattern(patternTrack->patternIndex());
+		Engine::patternStore()->updateComboBox();
+
+		connect(patternTrack, &Track::nameChanged, Engine::patternStore(), &PatternStore::updateComboBox);
+	});
 }
 
 

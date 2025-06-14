@@ -176,20 +176,16 @@ int TrackContainer::countTracks( Track::Type _tt ) const
 
 void TrackContainer::addTrack( Track * _track )
 {
-	if( _track->type() != Track::Type::HiddenAutomation )
-	{
-		_track->lock();
+	_track->lock();
+	m_tracksMutex.lockForWrite();
 
-		m_tracksMutex.lockForWrite();
-		m_tracks.push_back( _track );
-
-		m_tracksMutex.unlock();
-		_track->unlock();
-
-		emit trackAdded( _track );
-	}
-
+	m_tracks.push_back(_track);
 	_track->setTrackContainer(this);
+
+	m_tracksMutex.unlock();
+	_track->unlock();
+
+	emit trackAdded(_track);
 }
 
 
