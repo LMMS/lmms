@@ -369,12 +369,21 @@ void TrackContainerView::clearAllTracks()
 
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
-				"track_%1,track_%2" ).
-						arg( static_cast<int>(Track::Type::Instrument) ).
-						arg( static_cast<int>(Track::Type::Sample) ) );
+	static std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::PresetFile,
+		Clipboard::DataType::PluginPresetFile,
+		Clipboard::DataType::SampleFile,
+		Clipboard::DataType::Instrument,
+		Clipboard::DataType::SoundFontFile,
+		Clipboard::DataType::PatchFile,
+		Clipboard::DataType::VstPluginFile,
+		Clipboard::DataType::ImportedProject,
+		Clipboard::DataType::ProjectFile,
+		Clipboard::DataType::InstrumentTrack,
+		Clipboard::DataType::SampleTrack
+	};
+
+	StringPairDrag::processDragEnterEvent(_dee, &acceptedKeys);
 }
 
 
@@ -391,9 +400,9 @@ void TrackContainerView::stopRubberBand()
 
 void TrackContainerView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
+	Clipboard::DataType type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "instrument" )
+	if (type == Clipboard::DataType::Instrument)
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		auto ilt = new InstrumentLoaderThread(this, it, value);
@@ -401,9 +410,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile"
-		|| type == "soundfontfile" || type == "vstpluginfile"
-		|| type == "patchfile" )
+	else if (type == Clipboard::DataType::SampleFile || type == Clipboard::DataType::PluginPresetFile
+		|| type == Clipboard::DataType::SoundFontFile || type == Clipboard::DataType::PatchFile
+		|| type == Clipboard::DataType::VstPluginFile)
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		PluginFactory::PluginInfoAndKey piakn =
@@ -413,7 +422,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "presetfile" )
+	else if (type == Clipboard::DataType::PresetFile)
 	{
 		DataFile dataFile( value );
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
@@ -422,13 +431,13 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "importedproject" )
+	else if (type == Clipboard::DataType::ImportedProject)
 	{
 		ImportFilter::import( value, m_tc );
 		_de->accept();
 	}
 
-	else if( type == "projectfile")
+	else if (type == Clipboard::DataType::ProjectFile)
 	{
 		if( getGUI()->mainWindow()->mayChangeProject(true) )
 		{
@@ -437,7 +446,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		_de->accept();
 	}
 
-	else if( type.left( 6 ) == "track_" )
+	else if (type == Clipboard::DataType::InstrumentTrack || type == Clipboard::DataType::SampleTrack)
 	{
 		DataFile dataFile( value.toUtf8() );
 		Track::create( dataFile.content().firstChild().toElement(), m_tc );
