@@ -560,28 +560,9 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 
 
-void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
+void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
+	StringPairDrag::processDragEnterEvent(_dee, {"pluginpresetfile", "presetfile"});
 }
 
 
@@ -589,14 +570,15 @@ void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 {
-	const QString type = StringPairDrag::decodeKey( _de );
-	const QString value = StringPairDrag::decodeValue( _de );
-	if( type == "pluginpresetfile" )
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
+
+	if (type == "pluginpresetfile")
 	{
-		castModel<ZynAddSubFxInstrument>()->loadFile( value );
+		castModel<ZynAddSubFxInstrument>()->loadFile(value);
 		_de->accept();
 		return;
 	}
+
 	_de->ignore();
 }
 
