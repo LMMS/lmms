@@ -804,8 +804,10 @@ void PianoRoll::duplicateNotes(bool quanitized)
 	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
 	// Find the very first start position and the very last end position of all the notes.
-	TimePos firstPos = (*std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); }))->pos();
-	TimePos lastPos = (*std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); }))->endPos();
+	Note* firstNote = *std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); });
+	Note* lastNode = *std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); });
+	TimePos firstPos = firstNote->pos();
+	TimePos lastPos = lastNode->endPos();
 
 	TimePos unquantizedLength = lastPos - firstPos;
 	// If the length should be inferred from the note positions, it's just rounded up to the nearest power of 2 bar length.
