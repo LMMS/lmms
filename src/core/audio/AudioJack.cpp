@@ -522,7 +522,6 @@ std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags
 		for (int i = 0; inputAudioPorts[i] != nullptr; ++i)
 		{
 			auto currentPortName = inputAudioPorts[i];
-			printf("Port %d: %s\n", i, currentPortName);
 
 			audioPorts.push_back(currentPortName);
 		}
