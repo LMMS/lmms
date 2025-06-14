@@ -42,7 +42,7 @@ namespace lmms::gui
 
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
-	ClipView( _clip, _tv ),
+	ClipView(_clip, _tv, getTypeId<PatternClipView>()),
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap()
 {
@@ -165,6 +165,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	
+	drawAutoHighlight(&p);
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
