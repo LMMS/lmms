@@ -54,6 +54,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
+#include "RemotePluginAudioPorts.h"
 #include "Song.h"
 
 #ifdef LMMS_BUILD_LINUX
@@ -121,17 +122,16 @@ enum class ExecutableType
 	Unknown, Win32, Win64, Linux64,
 };
 
-VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( PathUtil::toAbsolute(_plugin) ),
-	m_pluginWindowID( 0 ),
-	m_embedMethod( (gui::getGUI() != nullptr)
-			? ConfigManager::inst()->vstEmbedMethod()
-			: "headless" ),
-	m_version( 0 ),
-	m_currentProgram()
+VstPlugin::VstPlugin(const QString& plugin, RemotePluginAudioPortsController& audioPorts)
+	: RemotePlugin{audioPorts}
+	, m_plugin{PathUtil::toAbsolute(plugin)}
+	, m_pluginWindowID{0}
+	, m_embedMethod{(gui::getGUI() != nullptr)
+		? ConfigManager::inst()->vstEmbedMethod()
+		: "headless"}
+	, m_version{0}
+	, m_currentProgram{-1}
 {
-	setSplittedChannels( true );
-
 	auto pluginType = ExecutableType::Unknown;
 #ifdef LMMS_BUILD_LINUX
 	QFileInfo fi(m_plugin);
@@ -264,6 +264,8 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 		}
 		setParameterDump( dump );
 	}
+
+	audioPorts().audioPortsModel().loadSettings(_this);
 }
 
 
@@ -307,6 +309,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "program", currentProgram() );
+	audioPorts().audioPortsModel().saveSettings(_doc, _this);
 }
 
 void VstPlugin::toggleUI()

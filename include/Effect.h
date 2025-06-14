@@ -26,15 +26,18 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include "Plugin.h"
-#include "Engine.h"
+#include <span>
+
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
+#include "Engine.h"
+#include "Plugin.h"
 #include "TempoSyncKnobModel.h"
 
 namespace lmms
 {
 
+class AudioPortsModel;
 class EffectChain;
 class EffectControls;
 
@@ -55,6 +58,12 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~Effect() override;
 
+	//! Returns true if audio was processed and should continue being processed
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+	{
+		return processAudioBufferImpl({buf, frames});
+	}
+
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
@@ -62,9 +71,6 @@ public:
 	{
 		return "effect";
 	}
-
-	//! Returns true if audio was processed and should continue being processed
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
 
 	inline ch_cnt_t processorCount() const
 	{
@@ -154,7 +160,18 @@ public:
 	{
 		m_noRun = _state;
 	}
-	
+
+	bool isSleeping() const
+	{
+		return !isOkay() || dontRun() || !isEnabled() || !isRunning();
+	}
+
+	//! Returns nullptr if the effect does not have audio ports
+	virtual auto audioPortsModel() const -> const AudioPortsModel*
+	{
+		return nullptr;
+	}
+
 	inline TempoSyncKnobModel* autoQuitModel()
 	{
 		return &m_autoQuitModel;
@@ -173,29 +190,7 @@ public:
 
 
 protected:
-	enum class ProcessStatus
-	{
-		//! Unconditionally continue processing
-		Continue,
-
-		//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
-		ContinueIfNotQuiet,
-
-		//! Do not continue processing
-		Sleep
-	};
-
-	/**
-	 * The main audio processing method that runs when plugin is not asleep
-	 */
-	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
-
-	/**
-	 * Optional method that runs when plugin is sleeping (not enabled,
-	 * not running, not in the Okay state, or in the Don't Run state)
-	 */
-	virtual void processBypassedImpl() {}
-
+	virtual bool processAudioBufferImpl(std::span<SampleFrame> inOut) = 0;
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
@@ -224,8 +219,6 @@ protected:
 
 	virtual void onEnabledChanged() {}
 
-
-private:
 	/**
 		If the setting "Keep effects running even without input" is disabled,
 		after "decay" ms of a signal below "gate", the effect is turned off
@@ -233,7 +226,7 @@ private:
 	*/
 	void checkGate(double outSum);
 
-
+private:
 	EffectChain * m_parent;
 	void resample( int _i, const SampleFrame* _src_buf,
 					sample_rate_t _src_sr,

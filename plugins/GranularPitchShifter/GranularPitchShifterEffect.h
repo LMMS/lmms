@@ -27,10 +27,9 @@
 
 #include <numbers>
 
-#include "Effect.h"
-#include "GranularPitchShifterControls.h"
-
+#include "AudioPlugin.h"
 #include "BasicFilters.h"
+#include "GranularPitchShifterControls.h"
 #include "interpolation.h"
 
 namespace lmms
@@ -45,13 +44,11 @@ constexpr float SatuSafeVol = 16.f;
 constexpr float SatuStrength = 0.001f;
 
 
-class GranularPitchShifterEffect : public Effect
+class GranularPitchShifterEffect : public DefaultEffect
 {
 public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~GranularPitchShifterEffect() override = default;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -71,7 +68,7 @@ public:
 		
 		v1 = m_ringBuf[index_floor][ch];
 		
-		if(index_floor >= m_ringBuf.size() - 2)
+		if (index_floor >= m_ringBuf.size() - 2)
 		{
 			v2 = m_ringBuf[(index_floor + 1) % m_ringBuf.size()][ch];
 			v3 = m_ringBuf[(index_floor + 2) % m_ringBuf.size()][ch];
@@ -113,6 +110,8 @@ public:
 	void changeSampleRate();
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	struct PrefilterLowpass
 	{
 		float m_v0z = 0.f, m_v1 = 0.f, m_v2 = 0.f;
@@ -131,12 +130,12 @@ private:
 
 		float process(float input)
 		{
-		    const float v1z = m_v1;
-		    const float v3 = input + m_v0z - 2.f * m_v2;
-		    m_v1 += m_g1 * v3 - m_g2 * v1z;
-		    m_v2 += m_g3 * v3 + m_g4 * v1z;
-		    m_v0z = input;
-		    return m_v2;
+			const float v1z = m_v1;
+			const float v3 = input + m_v0z - 2.f * m_v2;
+			m_v1 += m_g1 * v3 - m_g2 * v1z;
+			m_v2 += m_g3 * v3 + m_g4 * v1z;
+			m_v0z = input;
+			return m_v2;
 		}
 	};
 
