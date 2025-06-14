@@ -38,12 +38,6 @@ namespace lmms {
 
 namespace {
 
-/*
-void zeroBuffer(std::span<SampleFrame> buffer)
-{
-	zeroSampleFrames(buffer.data(), buffer.size());
-}*/
-
 template<typename SampleT, proc_ch_t extent>
 void zeroBuffer(PlanarBufferView<SampleT, extent> buffer)
 {
@@ -113,17 +107,6 @@ void compareBuffers(AudioBus<const SampleFrame> actual, AudioBus<const SampleFra
 		}
 	}
 }
-
-/*
-void compareBuffers(std::span<const SampleFrame> actual, std::span<const SampleFrame> expected)
-{
-	QCOMPARE(actual.size(), expected.size());
-	for (std::size_t frame = 0; frame < actual.size(); ++frame)
-	{
-		QCOMPARE(actual[frame].left(), expected[frame].left());
-		QCOMPARE(actual[frame].right(), expected[frame].right());
-	}
-}*/
 
 template<typename SampleT, proc_ch_t extent>
 void compareBuffers(PlanarBufferView<SampleT, extent> actual, PlanarBufferView<SampleT, extent> expected)

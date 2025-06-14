@@ -224,9 +224,10 @@ protected:
 
 	/**
 	 * Caches whether any output channels are routed to a given track channel (meaning the
-	 * track channel is not "bypassed"), which eliminates need for O(N) checking in `receive`.
+	 * track channel is not "bypassed"), which eliminates need for O(N) checking in `AudioPorts::Router::receive()`.
 	 *
-	 * This means m_routedChannels[i] == true iif m_out.enabled(i, x) == true for any audio processor channel x.
+	 * This means m_routedChannels[i] == true if and only if m_out.enabled(i, x) == true
+	 * for any audio processor channel x.
 	 */
 	std::vector<bool> m_routedChannels;
 
