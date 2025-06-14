@@ -481,7 +481,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 		toolButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		toolButton->setPopupMode(QToolButton::InstantPopup);
 		toolButton->setText(currentSelection);
-		auto menu = this->buildMenu(toolButton, names, filteredLMMSClientName);
+		auto menu = AudioJack::setupWidget::buildMenu(toolButton, names, filteredLMMSClientName);
 		toolButton->setMenu(menu);
 
 		return toolButton;
