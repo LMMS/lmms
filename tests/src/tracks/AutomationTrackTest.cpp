@@ -155,10 +155,9 @@ private slots:
 		using namespace lmms;
 
 		auto song = Engine::getSong();
+		auto instrumentTrack = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, song));
 
-		InstrumentTrack instrumentTrack(song);
-
-		MidiClip midiClip(&instrumentTrack);
+		MidiClip midiClip(instrumentTrack);
 		midiClip.changeLength(TimePos(4, 0));
 		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
@@ -179,13 +178,14 @@ private slots:
 		using namespace lmms;
 
 		auto song = Engine::getSong();
-		auto patternStore = Engine::patternStore();
-		PatternTrack patternTrack(song);
-		AutomationTrack automationTrack(patternStore);
-		automationTrack.createClipsForPattern(patternStore->numOfPatterns() - 1);
+		auto patternStore = Engine::patternStore();	
+		auto patternTrack = dynamic_cast<PatternTrack*>(Track::create(Track::Type::Pattern, song));
+		auto automationTrack = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, patternStore));
 
-		QVERIFY(automationTrack.numOfClips());
-		auto c1 = dynamic_cast<AutomationClip*>(automationTrack.getClip(0));
+		automationTrack->createClipsForPattern(patternStore->numOfPatterns() - 1);
+
+		QVERIFY(automationTrack->numOfClips());
+		auto c1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
 		QVERIFY(c1);
 
 		FloatModel model;
@@ -195,17 +195,16 @@ private slots:
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
 
-		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
-		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.patternIndex())[&model], 0.5f);
-		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.patternIndex())[&model], 1.0f);
-		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack->patternIndex())[&model], 0.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack->patternIndex())[&model], 0.5f);
+		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack->patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack->patternIndex())[&model], 1.0f);
 
-		PatternTrack patternTrack2(song);
+		auto patternTrack2 = dynamic_cast<PatternTrack*>(Track::create(Track::Type::Pattern, song));
+		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack->patternIndex())[&model], 0.5f);
+		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2->patternIndex()).size());
 
-		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.patternIndex())[&model], 0.5f);
-		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.patternIndex()).size());
-
-		PatternClip clip(&patternTrack);
+		PatternClip clip(patternTrack);
 		clip.changeLength(TimePos::ticksPerBar() * 2);
 		clip.movePosition(0);
 
