@@ -54,9 +54,6 @@ const int DEFAULT_TRACK_WIDTH = 338;
 const int COMPACT_TRACK_WIDTH = 214;
 const int MINIMUM_TRACK_WIDTH = 168;
 
-/*! The width of the resize grip in pixels */
-const int RESIZE_GRIP_WIDTH = 6;
-
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
 {
@@ -105,6 +102,9 @@ public:
 	// Create a menu for assigning/creating channels for this track
 	// Currently instrument track and sample track supports it
 	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
+
+	/*! The width of the resize grip in pixels */
+	static constexpr int ResizeGripWidth = 6;
 
 
 public slots:
