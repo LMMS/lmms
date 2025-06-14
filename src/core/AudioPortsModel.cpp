@@ -353,8 +353,10 @@ void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count, const QStri
 	}
 	else if (oldSize < count)
 	{
-		[[maybe_unused]] auto parentModel = m_parent->parentModel();
+#if PIN_CONNECTOR_AUTOMATABLE_PINS
+		auto parentModel = m_parent->parentModel();
 		assert(parentModel != nullptr);
+#endif
 
 		m_pins.resize(count);
 		for (auto tcIdx = oldSize; tcIdx < count; ++tcIdx)
@@ -381,8 +383,10 @@ void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count, const QStri
 
 void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count, const QString& nameFormat)
 {
-	[[maybe_unused]] auto parentModel = m_parent->parentModel();
+#if PIN_CONNECTOR_AUTOMATABLE_PINS
+	auto parentModel = m_parent->parentModel();
 	assert(parentModel != nullptr);
+#endif
 
 	const bool initialSetup = m_channelCount == 0;
 

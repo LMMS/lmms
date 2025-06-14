@@ -155,8 +155,8 @@ public:
 		AudioPortsModel* m_parent = nullptr;
 	};
 
-	AudioPortsModel(bool isInstrument, Model* parent);
-	AudioPortsModel(proc_ch_t channelCountIn, proc_ch_t channelCountOut, bool isInstrument, Model* parent);
+	AudioPortsModel(bool isInstrument, Model* parent = nullptr);
+	AudioPortsModel(proc_ch_t channelCountIn, proc_ch_t channelCountOut, bool isInstrument, Model* parent = nullptr);
 
 	/**
 	 * Getters

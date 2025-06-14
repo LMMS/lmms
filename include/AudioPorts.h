@@ -292,7 +292,7 @@ class AudioPorts
 	static_assert(validate<settings>());
 
 public:
-	AudioPorts(bool isInstrument, Model* parent)
+	AudioPorts(bool isInstrument, Model* parent = nullptr)
 		: AudioPortsModel{settings.inputs, settings.outputs, isInstrument, parent}
 	{
 	}

@@ -66,12 +66,17 @@ PinConnector::PinConnector(AudioPortsModel* model)
 	assert(model != nullptr);
 	connect(model, &AudioPortsModel::propertiesChanged, this, &PinConnector::updateProperties);
 
-	const Model* parentModel = model->parentModel();
-	assert(parentModel != nullptr);
-
 	m_scrollArea = new QScrollArea{};
 	m_scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	m_scrollArea->setWindowTitle(tr("%1 Pin Connector").arg(parentModel->fullDisplayName()));
+
+	if (const Model* parentModel = model->parentModel())
+	{
+		m_scrollArea->setWindowTitle(tr("%1 Pin Connector").arg(parentModel->fullDisplayName()));
+	}
+	else
+	{
+		m_scrollArea->setWindowTitle(tr("Pin Connector"));
+	}
 
 	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_scrollArea);
 	m_subWindow->setAttribute(Qt::WA_DeleteOnClose, false);
@@ -317,8 +322,6 @@ void PinConnector::updateProperties()
 	update();
 }
 
-//////////////////////////////////////////////
-
 PinConnector::MatrixView::MatrixView(const PinConnector* view, AudioPortsModel::Matrix& matrix)
 	: QWidget{}
 	, m_matrix{&matrix}
@@ -458,14 +461,10 @@ void PinConnector::MatrixView::updateProperties(const PinConnector* view)
 	}
 
 	// Update tooltip
-	auto model = view->castModel<AudioPortsModel>();
-	assert(model != nullptr);
-
-	const Model* parentModel = model->parentModel();
-	assert(parentModel != nullptr);
-
+	const Model* parentModel = view->model() ? view->model()->parentModel() : nullptr;
 	const auto formatText = m_matrix->isOutput() ? tr("%1 output(s) to LMMS") : tr("LMMS to %1 input(s)");
-	setToolTip(formatText.arg(parentModel->fullDisplayName()));
+	const auto processorName = parentModel ? parentModel->fullDisplayName() : tr("processor");
+	setToolTip(formatText.arg(processorName));
 }
 
 auto PinConnector::MatrixView::getPin(const QPoint& mousePos) -> std::optional<std::pair<track_ch_t, proc_ch_t>>

@@ -167,10 +167,8 @@ private slots:
 	{
 		using namespace lmms;
 
-		auto model = Model{nullptr};
-
 		// Channel counts should stay zero until known
-		auto apmNxN = AudioPortsModel{DynamicChannelCount, DynamicChannelCount, false, &model};
+		auto apmNxN = AudioPortsModel{DynamicChannelCount, DynamicChannelCount, false};
 		QCOMPARE(apmNxN.in().channelCount(), 0);
 		QCOMPARE(apmNxN.out().channelCount(), 0);
 
@@ -189,12 +187,12 @@ private slots:
 		QCOMPARE(apmNxN.trackChannelCount(), 4);
 
 		// stereo/stereo effect
-		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
+		auto apm2x2 = AudioPortsModel{2, 2, false};
 		QCOMPARE(apm2x2.in().channelCount(), 2);
 		QCOMPARE(apm2x2.out().channelCount(), 2);
 
 		// stereo instrument
-		auto apm0x2 = AudioPortsModel{0, 2, true, &model};
+		auto apm0x2 = AudioPortsModel{0, 2, true};
 		QCOMPARE(apm0x2.in().channelCount(), 0);
 		QCOMPARE(apm0x2.out().channelCount(), 2);
 	}
@@ -204,8 +202,6 @@ private slots:
 	{
 		using namespace lmms;
 
-		auto model = Model{nullptr};
-
 		// 2 inputs, 2 outputs (stereo/stereo effect)
 		//
 		// In    Out
@@ -214,7 +210,7 @@ private slots:
 		// | |X| | |X|
 		//  ---   ---
 
-		auto apm2x2 = AudioPortsModel{2, 2, false, &model};
+		auto apm2x2 = AudioPortsModel{2, 2, false};
 		QCOMPARE(apm2x2.in().enabled(0, 0), true);
 		QCOMPARE(apm2x2.in().enabled(0, 1), false);
 		QCOMPARE(apm2x2.in().enabled(1, 0), false);
@@ -233,7 +229,7 @@ private slots:
 		// | |   |X|
 		//  -     -
 
-		auto apm1x1 = AudioPortsModel{1, 1, false, &model};
+		auto apm1x1 = AudioPortsModel{1, 1, false};
 		QCOMPARE(apm1x1.in().enabled(0, 0), true);
 		QCOMPARE(apm1x1.in().enabled(1, 0), false);
 
@@ -248,7 +244,7 @@ private slots:
 		// | |   | |X| | |
 		//  -     -------
 
-		auto apm1x4 = AudioPortsModel{1, 4, false, &model};
+		auto apm1x4 = AudioPortsModel{1, 4, false};
 		QCOMPARE(apm1x4.in().enabled(0, 0), true);
 		QCOMPARE(apm1x4.in().enabled(1, 0), false);
 
@@ -269,7 +265,7 @@ private slots:
 		// | | | | |X|
 		//  ---   ---
 
-		auto apm2x2Inst = AudioPortsModel{2, 2, true, &model};
+		auto apm2x2Inst = AudioPortsModel{2, 2, true};
 		QCOMPARE(apm2x2Inst.in().enabled(0, 0), false);
 		QCOMPARE(apm2x2Inst.in().enabled(0, 1), false);
 		QCOMPARE(apm2x2Inst.in().enabled(1, 0), false);
@@ -287,8 +283,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto model = Model{nullptr};
-		auto apm = AudioPortsModel{2, 2, false, &model};
+		auto apm = AudioPortsModel{2, 2, false};
 
 		// Out
 		//  ___
@@ -341,8 +336,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto model = Model{nullptr};
-		auto apm = AudioPortsModel{2, 2, false, &model};
+		auto apm = AudioPortsModel{2, 2, false};
 
 		// In    Out
 		//  ___   ___
@@ -431,8 +425,7 @@ private slots:
 
 		// Setup
 		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 1, 1};
-		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<settings>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -503,8 +496,7 @@ private slots:
 
 		// Setup
 		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 2, 2};
-		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<settings>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -575,8 +567,7 @@ private slots:
 
 		// Setup
 		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 2, 2};
-		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<settings>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -660,8 +651,7 @@ private slots:
 		constexpr auto settings = AudioPortsSettings {
 			AudioDataKind::SampleFrame, true, 2, 2, true
 		};
-		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<settings>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -723,8 +713,7 @@ private slots:
 
 		// Setup
 		constexpr auto settings = AudioPortsSettings{AudioDataKind::F32, false, 1, 2};
-		auto model = Model{nullptr};
-		auto ap = PluginAudioPorts<settings>{false, &model};
+		auto ap = PluginAudioPorts<settings>{false};
 		ap.init();
 		auto coreBus = getCoreBus();
 
@@ -797,8 +786,6 @@ private slots:
 	void Routing_SampleFrame2x2_DirectRouting()
 	{
 		using namespace lmms;
-
-		auto model = Model{nullptr};
 
 		// Helper for running this test with different settings
 		auto testWithSettings = [&]<AudioPortsSettings settings>(PluginAudioPorts<settings>& ap) {
@@ -882,7 +869,7 @@ private slots:
 			constexpr auto settings = AudioPortsSettings {
 				AudioDataKind::SampleFrame, true, 2, 2, true, false
 			};
-			auto ap = PluginAudioPorts<settings>{false, &model};
+			auto ap = PluginAudioPorts<settings>{false};
 			testWithSettings(ap);
 		}
 
@@ -891,7 +878,7 @@ private slots:
 			constexpr auto settings = AudioPortsSettings {
 				AudioDataKind::SampleFrame, true, 2, 2, true, true
 			};
-			auto ap = PluginAudioPorts<settings>{false, &model};
+			auto ap = PluginAudioPorts<settings>{false};
 			testWithSettings(ap);
 		}
 
@@ -905,8 +892,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto model = Model{nullptr};
-		auto apm = AudioPortsModel{2, 4, false, &model};
+		auto apm = AudioPortsModel{2, 4, false};
 
 		/*
 		// For debugging
@@ -950,7 +936,7 @@ private slots:
 		apm.saveSettings(doc, elem);
 
 		// New model with wrong channel counts and wrong pin connections
-		auto apm2 = AudioPortsModel{1, 1, false, &model};
+		auto apm2 = AudioPortsModel{1, 1, false};
 
 		int dataChangedCount = 0;
 		int propertiesChangedCount = 0;
