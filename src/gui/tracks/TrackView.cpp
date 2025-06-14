@@ -49,9 +49,6 @@
 
 namespace lmms::gui
 {
-/*! The width of the resize grip in pixels
-	*/
-const int RESIZE_GRIP_WIDTH = 6;
 
 /*! \brief Create a new track View.
  *

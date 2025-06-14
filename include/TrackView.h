@@ -54,6 +54,9 @@ const int DEFAULT_TRACK_WIDTH = 338;
 const int COMPACT_TRACK_WIDTH = 214;
 const int MINIMUM_TRACK_WIDTH = 168;
 
+/*! The width of the resize grip in pixels */
+const int RESIZE_GRIP_WIDTH = 6;
+
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
 {
