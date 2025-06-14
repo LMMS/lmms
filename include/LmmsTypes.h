@@ -32,24 +32,25 @@
 namespace lmms
 {
 
-using bar_t = int32_t;
-using tick_t = int32_t;
-using volume_t = uint8_t;
-using panning_t = int8_t;
+using bar_t         = std::int32_t;
+using tick_t        = std::int32_t;
+using volume_t      = std::uint8_t;
+using panning_t     = std::int8_t;
 
-using sample_t = float;		  // standard sample-type
-using int_sample_t = int16_t; // 16-bit-int-sample
+using sample_t      = float;         // standard sample-type
+using int_sample_t  = std::int16_t;  // 16-bit-int-sample
 
-using sample_rate_t = uint32_t; // sample-rate
-using fpp_t = size_t;			// frames per period (0-16384)
-using f_cnt_t = size_t;			// standard frame-count
-using ch_cnt_t = uint8_t;		// channel-count (0-DEFAULT_CHANNELS)
-using bpm_t = uint16_t;			// tempo (MIN_BPM to MAX_BPM)
-using bitrate_t = uint16_t;		// bitrate in kbps
-using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
+using sample_rate_t = std::uint32_t; // sample-rate
+using fpp_t         = std::size_t;   // frames per period (0-16384)
+using f_cnt_t       = std::size_t;   // standard frame-count
+using ch_cnt_t      = std::uint8_t;  // channel-count (0-DEFAULT_CHANNELS)
+using bpm_t         = std::uint16_t; // tempo (MIN_BPM to MAX_BPM)
+using bitrate_t     = std::uint16_t; // bitrate in kbps
+using mix_ch_t      = std::uint16_t; // Mixer-channel (0 to MAX_CHANNEL)
+using track_ch_t    = std::uint16_t; // track channel index/count (0-256)
+using proc_ch_t     = std::uint16_t; // audio processor channel index/count
 
-using jo_id_t = uint32_t; // (unique) ID of a journalling object
-
+using jo_id_t       = std::uint32_t; // (unique) ID of a journalling object
 
 } // namespace lmms
 

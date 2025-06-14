@@ -152,12 +152,6 @@ void SampleClip::changeLength( const TimePos & _length )
 	Clip::changeLength(std::max(static_cast<int>(_length), 1));
 }
 
-void SampleClip::changeLengthToSampleLength()
-{
-	int length = m_sample.sampleSize() / Engine::framesPerTick();
-	changeLength(length);
-}
-
 
 
 const QString& SampleClip::sampleFile() const
@@ -261,6 +255,14 @@ void SampleClip::setIsPlaying(bool isPlaying)
 
 void SampleClip::updateLength()
 {
+	// If the clip has already been manually resized, don't automatically resize it.
+	// Unless we are in a pattern, where you can't resize stuff manually
+	if (getAutoResize() || !getResizable())
+	{
+		changeLength(sampleLength());
+		setStartTimeOffset(0);
+	}
+
 	emit sampleChanged();
 
 	Engine::getSong()->setModified();
@@ -356,7 +358,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-	setAutoResize(_this.attribute("autoresize").toInt());
+	setAutoResize(_this.attribute("autoresize", "1").toInt());
 
 	if (_this.hasAttribute("color"))
 	{
