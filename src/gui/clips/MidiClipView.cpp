@@ -42,6 +42,7 @@
 #include "InstrumentTrackView.h"
 #include "MidiClip.h"
 #include "PianoRoll.h"
+#include "PatternStore.h"
 #include "RenameDialog.h"
 #include "SongEditor.h"
 #include "TrackContainerView.h"
@@ -532,10 +533,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 
 			Engine::getSong()->setModified();
 			update();
-			if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
-			{
-				getGUI()->pianoRoll()->update();
-			}
+			m_clip->updatePatternTrack();
 		}
 		we->accept();
 	}
