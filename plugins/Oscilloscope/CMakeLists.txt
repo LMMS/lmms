@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(oscilloscope Oscilloscope.cpp OscilloscopeControls.cpp OscilloscopeControlDialog.cpp OscilloscopeGraph.cpp MOCFILES OscilloscopeControls.h OscilloscopeControlDialog.h OscilloscopeGraph.h EMBEDDED_RESOURCES logo.svg)
