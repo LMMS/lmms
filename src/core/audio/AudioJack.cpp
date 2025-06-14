@@ -479,7 +479,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 		auto toolButton = new QToolButton(parent);
 		// Make sure that the tool button will fill out the available space in the form layout
 		toolButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		toolButton->setPopupMode(QToolButton::MenuButtonPopup);
+		toolButton->setPopupMode(QToolButton::InstantPopup);
 		toolButton->setText(currentSelection);
 		auto menu = this->buildMenu(toolButton, names, filteredLMMSClientName);
 		toolButton->setMenu(menu);
