@@ -607,7 +607,6 @@ QMenu* AudioJack::setupWidget::buildMenu(QToolButton* toolButton, const std::vec
 			connect(action, &QAction::triggered, actionLambda);
 			topLevelActions.append(action);
 		}
-		
 	}
 
 	// First add the sub menus. By iterating the map they will be sorted automatically
