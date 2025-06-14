@@ -450,6 +450,9 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	QFormLayout * form = new QFormLayout(this);
 
+	// Set the field growth policy to allow fields to expand horizontally
+	form->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+
 	const auto cm = ConfigManager::inst();
 	QString cn = cm->value(audioJackClass, clientNameKey);
 	if (cn.isEmpty()) { cn = "lmms"; }
@@ -460,6 +463,8 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	auto buildToolButton = [this](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
 	{
 		auto toolButton = new QToolButton(parent);
+		// Make sure that the tool button will fill out the available space in the form layout
+		toolButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		toolButton->setPopupMode(QToolButton::MenuButtonPopup);
 		toolButton->setText(currentSelection);
 		auto menu = this->buildMenu(toolButton, names, filteredLMMSClientName);
