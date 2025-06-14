@@ -52,7 +52,7 @@ VstSyncController::VstSyncController()
 	}
 
 	m_syncData->isPlaying = false;
-	m_syncData->m_bufferSize = Engine::audioEngine()->framesPerPeriod();
+	m_syncData->bufferSize = Engine::audioEngine()->framesPerPeriod();
 	m_syncData->timeSigNumer = 4;
 	m_syncData->timeSigDenom = 4;
 
@@ -67,9 +67,9 @@ void VstSyncController::setAbsolutePosition(double ticks)
 	if (!m_syncData) { return; }
 
 #ifdef VST_SNC_LATENCY
-	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 ) - m_syncData->m_latency;
+	m_syncData->ppqPos = ((ticks + 0) / 48.0) - m_syncData->latency;
 #else
-	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 );
+	m_syncData->ppqPos = ((ticks + 0) / 48.0);
 #endif
 }
 
@@ -88,10 +88,10 @@ void VstSyncController::setTempo(int newTempo)
 {
 	if (!m_syncData) { return; }
 
-	m_syncData->m_bpm = newTempo;
+	m_syncData->bpm = newTempo;
 
 #ifdef VST_SNC_LATENCY
-	m_syncData->m_latency = m_syncData->m_bufferSize * newTempo / ( (float) m_syncData->m_sampleRate * 60 );
+	m_syncData->latency = m_syncData->bufferSize * newTempo / (static_cast<float>(m_syncData->sampleRate) * 60);
 #endif
 
 }
@@ -132,7 +132,7 @@ void VstSyncController::setPlaybackJumped(bool jumped)
 {
 	if (!m_syncData) { return; }
 
-	m_syncData->m_playbackJumped = jumped;
+	m_syncData->playbackJumped = jumped;
 }
 
 
@@ -141,10 +141,10 @@ void VstSyncController::update()
 {
 	if (!m_syncData) { return; }
 
-	m_syncData->m_bufferSize = Engine::audioEngine()->framesPerPeriod();
+	m_syncData->bufferSize = Engine::audioEngine()->framesPerPeriod();
 
 #ifdef VST_SNC_LATENCY
-	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );
+	m_syncData->latency = m_syncData->bufferSize * m_syncData->bpm / (static_cast<float>(m_syncData->sampleRate) * 60);
 #endif
 }
 
@@ -154,10 +154,10 @@ void VstSyncController::updateSampleRate()
 {
 	if (!m_syncData) { return; }
 
-	m_syncData->m_sampleRate = Engine::audioEngine()->outputSampleRate();
+	m_syncData->sampleRate = Engine::audioEngine()->outputSampleRate();
 
 #ifdef VST_SNC_LATENCY
-	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );
+	m_syncData->latency = m_syncData->bufferSize * m_syncData->bpm / (static_cast<float>(m_syncData->sampleRate) * 60);
 #endif
 }
 
