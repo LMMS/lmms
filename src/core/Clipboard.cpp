@@ -40,7 +40,7 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 	{"presetfile", {"xpf", "xml", "xiz", "lv2"}}, {"midifile", {"mid", "midi", "rmi"}},
 	{"projectfile", {"mmp", "mpt", "mmpz"}}, {"patchfile", {"pat"}}, {"soundfontfile", {"sf2", "sf3"}}};
 
-//! gets the extension of a file, or returns the string back if no extension is found
+	//! gets the extension of a file, or returns the string back if no extension is found
 	inline QString getExtension(const QString& file)
 	{
 		const QStringList parts = file.split('.');
