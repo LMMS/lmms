@@ -159,7 +159,6 @@ private:
 	int m_rubberBandStartTrackview;
 	TimePos m_rubberbandStartTimePos;
 	int m_rubberbandPixelsPerBar; //!< pixels per bar when selection starts
-	int m_trackHeadWidth;
 	bool m_selectRegion;
 
 	friend class SongEditorWindow;
