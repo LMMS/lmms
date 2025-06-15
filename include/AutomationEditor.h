@@ -196,6 +196,7 @@ private:
 	static const int DEFAULT_Y_DELTA = 6;
 	static const int DEFAULT_STEPS_PER_BAR = 16;
 	static const int DEFAULT_PPB = 12 * DEFAULT_STEPS_PER_BAR;
+	static const int PIXELS_PER_SCROLL = 36;
 
 	static const int VALUES_WIDTH = 64;
 
@@ -243,8 +244,6 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	void adjustLeftRightScoll(int value);
-
 	TimePos m_currentPosition;
 
 	Action m_action;
@@ -254,8 +253,11 @@ private:
 	float m_drawLastLevel;
 	tick_t m_drawLastTick;
 
+	//! Pixels per bar
 	int m_ppb;
+	//! Pixels per step on the Y axis (when Y zoom is not Auto)
 	int m_y_delta;
+	//! True if Y zoom is Auto
 	bool m_y_auto;
 
 	// Time position (key) of automation node whose outValue is being dragged

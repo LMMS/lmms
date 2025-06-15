@@ -34,6 +34,7 @@
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "Scroll.h"
 
 namespace lmms::gui
 {
@@ -298,13 +299,19 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent(QWheelEvent* we)
 {
+	auto scroll = Scroll(we);
+
 	if (position(we).y() > m_tabheight)
 	{
 		return;
 	}
 
 	we->accept();
-	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
+
+	int steps = 0 - scroll.getSteps() - scroll.getSteps(Scroll::Flag::Horizontal);
+	if (steps == 0) { return; }
+
+	int dir = std::clamp(steps, -1, 1);
 	int tab = m_activeTab;
 	while(tab > -1 && static_cast<int>(tab) < m_widgets.count())
 	{
