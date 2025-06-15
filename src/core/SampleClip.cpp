@@ -26,6 +26,7 @@
 
 #include <QDomElement>
 #include <QFileInfo>
+#include <numbers>
 
 #include "PathUtil.h"
 #include "SampleBuffer.h"
@@ -305,6 +306,10 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 	_this.setAttribute("autoresize", QString::number(getAutoResize()));
+	_this.setAttribute("startfadelength", QString::number(startCrossfadeLength()));
+	_this.setAttribute("endfadelength", QString::number(endCrossfadeLength()));
+	_this.setAttribute("startfadetension", QString::number(startCrossfadeTension()));
+	_this.setAttribute("endfadetension", QString::number(endCrossfadeTension()));
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -354,6 +359,10 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
+	setStartCrossfadeLength(_this.attribute("startfadelength").toInt());
+	setEndCrossfadeLength(_this.attribute("endfadelength").toInt());
+	setStartCrossfadeTension(_this.attribute("startfadetension", QString::number(1.0f - std::numbers::sqrt2 / 2)).toFloat());
+	setEndCrossfadeTension(_this.attribute("endfadetension", QString::number(1.0f - std::numbers::sqrt2 / 2)).toFloat());
 
 	if (_this.hasAttribute("color"))
 	{
