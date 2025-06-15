@@ -801,7 +801,7 @@ void PianoRoll::duplicateNotes(bool quanitized)
 	m_midiClip->addJournalCheckPoint();
 
 	const NoteVector selectedNotes = getSelectedNotes();
-	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+	const NoteVector notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
 	// Find the very first start position and the very last end position of all the notes.
 	Note* firstNote = *std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); });
