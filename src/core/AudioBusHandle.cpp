@@ -61,7 +61,6 @@ AudioBusHandle::~AudioBusHandle()
 {
 	setExtOutputEnabled(false);
 	Engine::audioEngine()->removeAudioBusHandle(this);
-	BufferManager::release(m_buffer);
 }
 
 
@@ -99,7 +98,7 @@ bool AudioBusHandle::processEffects()
 {
 	if (m_effects)
 	{
-		bool more = m_effects->processAudioBuffer(m_buffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage);
+		bool more = m_effects->processAudioBuffer(m_buffer.data(), m_buffer.size(), m_bufferUsage);
 		return more;
 	}
 	return false;
@@ -113,22 +112,23 @@ void AudioBusHandle::doProcessing()
 		return;
 	}
 
-	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+	const fpp_t fpp = m_buffer.size();
 
 	// clear the buffer
-	zeroSampleFrames(m_buffer, fpp);
+	zeroSampleFrames(m_buffer.data(), fpp);
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
 	{
-		if (ph->buffer())
+		if (auto phBuffer = ph->buffer(); phBuffer.data() != nullptr)
 		{
+			assert(phBuffer.size() == fpp);
 			if (ph->usesBuffer()
 				&& (ph->type() == PlayHandle::Type::NotePlayHandle
-					|| !MixHelpers::isSilent(ph->buffer(), fpp)))
+					|| !MixHelpers::isSilent(phBuffer.data(), phBuffer.size())))
 			{
 				m_bufferUsage = true;
-				MixHelpers::add(m_buffer, ph->buffer(), fpp);
+				MixHelpers::add(m_buffer.data(), phBuffer.data(), fpp);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -227,7 +227,7 @@ void AudioBusHandle::doProcessing()
 	const bool anyOutputAfterEffects = processEffects();
 	if (anyOutputAfterEffects || m_bufferUsage)
 	{
-		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel);	// send output to mixer
+		Engine::mixer()->mixToChannel(m_buffer.data(), m_nextMixerChannel);	// send output to mixer
 																		// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}

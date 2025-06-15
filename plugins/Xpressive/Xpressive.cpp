@@ -78,7 +78,7 @@ O2 -> trianglew(2t*f)*(0.5+0.5sinew(12*A1*t))+sinew(t*f)*(0.5+0.5sinew(12*A1*t+0
 #define GRAPH_LENGTH 4096
 
 Xpressive::Xpressive(InstrumentTrack* instrument_track) :
-	Instrument(instrument_track, &xpressive_plugin_descriptor),
+	Instrument(&xpressive_plugin_descriptor, instrument_track),
 	m_graphO1(-1.0f, 1.0f, 360, this),
 	m_graphO2(-1.0f, 1.0f, 360, this),
 	m_graphW1(-1.0f, 1.0f, GRAPH_LENGTH, this),
@@ -194,7 +194,7 @@ QString Xpressive::nodeName() const {
 	return (xpressive_plugin_descriptor.name);
 }
 
-void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
+void Xpressive::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) {
 	m_A1=m_parameterA1.value();
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
@@ -230,7 +230,7 @@ void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
-	ps->renderOutput(frames, working_buffer + offset);
+	ps->renderOutput(frames, out.data() + offset);
 }
 
 void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {

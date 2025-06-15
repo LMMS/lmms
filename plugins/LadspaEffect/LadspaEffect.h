@@ -28,7 +28,7 @@
 
 #include <QMutex>
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "ladspa.h"
 #include "LadspaControls.h"
 #include "LadspaManager.h"
@@ -39,15 +39,13 @@ namespace lmms
 struct port_desc_t;
 using multi_proc_t = QVector<port_desc_t*>;
 
-class LadspaEffect : public Effect
+class LadspaEffect : public DefaultEffect
 {
 	Q_OBJECT
 public:
 	LadspaEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~LadspaEffect() override;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	void setControl( int _control, LADSPA_Data _data );
 
@@ -67,6 +65,8 @@ private slots:
 
 
 private:
+	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+
 	void pluginInstantiation();
 	void pluginDestruction();
 
