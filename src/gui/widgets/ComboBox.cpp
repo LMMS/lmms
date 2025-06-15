@@ -70,7 +70,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 void ComboBox::selectNext()
 {
-	model()->setInitValue( model()->value() + 1 );
+	model()->setValue(model()->value() + 1);
 }
 
 
@@ -78,7 +78,7 @@ void ComboBox::selectNext()
 
 void ComboBox::selectPrevious()
 {
-	model()->setInitValue( model()->value() - 1 );
+	model()->setValue(model()->value() - 1);
 }
 
 
@@ -226,7 +226,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 
 	if( model() )
 	{
-		model()->setInitValue(model()->value() - scroll.getSteps());
+		model()->setValue(model()->value() - scroll.getSteps());
 		update();
 	}
 }
@@ -238,7 +238,7 @@ void ComboBox::setItem( QAction* item )
 {
 	if( model() )
 	{
-		model()->setInitValue( item->data().toInt() );
+		model()->setValue(item->data().toInt());
 	}
 }
 

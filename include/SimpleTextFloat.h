@@ -47,7 +47,10 @@ public:
 
 	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
 
-	void setVisibilityTimeOut(int msecs);
+	void showWithTimeout(int msec)
+	{
+		showWithDelay(0, msec);
+	}
 
 	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
