@@ -369,7 +369,7 @@ void TrackContainerView::clearAllTracks()
 
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, {"presetfile", "pluginpresetfile", "samplefile", "instrument",
+	StringPairDrag::processDragEnterEvent(_dee, {"presetfile", "pluginpresetfile", "samplefile", "instrument",
 				"midifile", "soundfontfile","patchfile","vstpluginfile","projectfile",
 				QString("track_%1").arg(static_cast<int>(Track::Type::Instrument)), QString("track_%1").arg(static_cast<int>(Track::Type::Sample))});
 }
