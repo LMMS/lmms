@@ -108,8 +108,11 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	static std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::SampleFile,
+		Clipboard::DataType::SampleData
+	};
+	if (StringPairDrag::processDragEnterEvent(_dee, &acceptedKeys) == false)
 	{
 		ClipView::dragEnterEvent( _dee );
 	}
@@ -122,21 +125,11 @@ void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleClipView::dropEvent( QDropEvent * _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	bool shouldAccept = processPaste(_de->mimeData());
+
+	if (shouldAccept)
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
-	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
-	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
-		m_clip->updateLength();
-		update();
-		_de->accept();
-	}
-	else
-	{
-		ClipView::dropEvent( _de );
 	}
 }
 
@@ -345,12 +338,41 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
 
+	drawAutoHighlight(&p);
 	p.end();
 
 	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
 
+bool SampleClipView::canAcceptClipboardData(Clipboard::DataType dataType)
+{
+	return dataType == Clipboard::DataType::SampleFile
+		|| dataType == Clipboard::DataType::SampleData
+		|| ClipView::canAcceptClipboardData(dataType);
+}
 
+bool SampleClipView::processPasteImplementation(Clipboard::DataType type, QString& value)
+{
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::SampleFile)
+	{
+		m_clip->setSampleFile(value);
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::DataType::SampleData)
+	{
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
+		m_clip->updateLength();
+		update();
+		shouldAccept = true;
+	}
+
+	if (shouldAccept == false)
+	{
+		shouldAccept = ClipView::processPasteImplementation(type, value);
+	}
+	return shouldAccept;
+}
 
 
 void SampleClipView::reverseSample()
