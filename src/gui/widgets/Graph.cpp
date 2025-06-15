@@ -424,7 +424,7 @@ void Graph::dropEvent( QDropEvent * _de )
 void Graph::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( StringPairDrag::processDragEnterEvent( _dee,
-		{"samplefile"})  == false )
+		{"samplefile"}) == false)
 	{
 		_dee->ignore();
 	}
