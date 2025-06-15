@@ -60,6 +60,8 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( TimePos( 1, 0 ) );
+	_auto_track->addClip(this);
+
 	if( getTrack() )
 	{
 		switch( getTrack()->trackContainer()->type() )

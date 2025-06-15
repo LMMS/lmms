@@ -111,6 +111,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
 
 	autoAssignMidiDevice(true);
+	tc->addTrack(this);
 }
 
 

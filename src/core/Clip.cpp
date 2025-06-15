@@ -80,10 +80,6 @@ Clip::Clip(const Clip& other):
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
 	m_color(other.m_color)
 {
-	if (getTrack())
-	{
-		getTrack()->addClip(this);
-	}
 }
 
 /*! \brief Destroy a Clip
