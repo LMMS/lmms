@@ -38,6 +38,8 @@ namespace lmms {
 class LMMS_EXPORT Scroll
 {
 public:
+	static constexpr float ANGLE_DELTA_PER_TICK = 120;
+
 	/*! \brief Scroll delta
 	 *
 	 *  This class measures scroll delta in "wheel ticks",
@@ -61,17 +63,6 @@ public:
 	};
 
 	using Flags = lmms::Flags<Flag>;
-
-
-	/*! \brief Return angleDelta
-	 *
-	 *  The value is positive when the wheel is rotated away from the hand.
-	 *
-	 *  If you intend to divide this value and round it or store it as an
-	 *  integer, you should probably use getSteps() instead to avoid rounding
-	 *  issues with smooth scrolling trackpads and mice.
-	 */
-	int getDelta(const Flags flags = Flag::NoFlag);
 
 
 	/*! \brief Return number of completely scrolled steps of some size
@@ -103,6 +94,19 @@ public:
 	}
 
 
+	/*! \brief Return number of scrolled "wheel ticks"
+	 *
+	 *  The value is positive when the wheel is rotated away from the hand.
+	 *
+	 *  If you intend to use this in a calculation where the end result is an integer,
+	 *  you should probably use getSteps() instead to avoid rounding issues with
+	 *  smooth scrolling trackpads and mice.
+	 */
+	inline float getStepsFloat(const Flags flags)
+	{
+		return getAngleDelta(flags) / ANGLE_DELTA_PER_TICK;
+	}
+
 	//! \brief True when scrolling vertically
 	bool isVertical();
 
@@ -110,6 +114,7 @@ public:
 	bool isHorizontal();
 
 private:
+	int getAngleDelta(const Flags flags = Flag::NoFlag);
 	int calculateSteps(const int angleDelta, const float stepsPerTick, const bool horizontal);
 
 	QWheelEvent* m_event;

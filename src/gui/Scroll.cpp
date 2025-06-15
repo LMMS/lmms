@@ -31,9 +31,6 @@
 namespace lmms {
 
 
-static const float ANGLE_DELTA_PER_TICK = 120.f;
-
-
 float Scroll::s_partialStepX = 0;
 float Scroll::s_partialStepY = 0;
 
@@ -48,7 +45,7 @@ Scroll::Scroll(QWheelEvent* event) :
 
 
 
-int Scroll::getDelta(const Flags flags)
+int Scroll::getAngleDelta(const Flags flags)
 {
 	bool useHorizontal = flags.testFlag(Scroll::Flag::Horizontal);
 
@@ -87,21 +84,21 @@ int Scroll::getDelta(const Flags flags)
 
 int Scroll::getSteps(const float stepsPerWheelTick, const Flags flags)
 {
-	return calculateSteps(getDelta(flags), stepsPerWheelTick, flags.testFlag(Flag::Horizontal));
+	return calculateSteps(getAngleDelta(flags), stepsPerWheelTick, flags.testFlag(Flag::Horizontal));
 }
 
 
 
 bool Scroll::isVertical()
 {
-	return getDelta() != 0;
+	return getAngleDelta() != 0;
 }
 
 
 
 bool Scroll::isHorizontal()
 {
-	return getDelta(Flag::Horizontal) != 0;
+	return getAngleDelta(Flag::Horizontal) != 0;
 }
 
 

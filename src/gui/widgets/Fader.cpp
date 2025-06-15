@@ -270,10 +270,10 @@ void Fader::wheelEvent (QWheelEvent* ev)
 	auto scroll = Scroll(ev);
 	if (!scroll.isVertical()) { return; }
 
-	const int scrollDelta = scroll.getDelta(Scroll::Flag::DisableNaturalScrolling);
+	const float steps = scroll.getStepsFloat(Scroll::Flag::DisableNaturalScrolling);
 	const float adjustmentDelta = determineAdjustmentDelta(ev->modifiers());
 
-	adjustByDecibelDelta(scrollDelta * adjustmentDelta);
+	adjustByDecibelDelta(steps * adjustmentDelta);
 
 	ev->accept();
 }
