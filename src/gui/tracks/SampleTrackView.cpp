@@ -25,8 +25,10 @@
 #include "SampleTrackView.h"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QMenu>
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
@@ -185,18 +187,34 @@ void SampleTrackView::modelChanged()
 
 
 
-void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
+void SampleTrackView::dragEnterEvent(QDragEnterEvent* event)
 {
-	StringPairDrag::processDragEnterEvent(dee, QString("samplefile"));
+	const QMimeData* mime = event->mimeData();
+
+	if (mime->hasUrls())
+	{
+		const QList<QUrl> urls = mime->urls();
+		if (!urls.isEmpty())
+		{
+			QString path = urls.first().toLocalFile();
+			QString ext = QFileInfo(path).suffix().toLower();
+
+			if (Clipboard::isAudioFile(ext))
+			{
+				event->acceptProposedAction();
+				return;
+			}
+		}
+	}
+	event->ignore();
 }
 
 
 
 
-void SampleTrackView::dropEvent(QDropEvent *de)
+void SampleTrackView::dropEvent(QDropEvent* de)
 {
-	QString type  = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue(de);
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
 	if (type == "samplefile")
 	{

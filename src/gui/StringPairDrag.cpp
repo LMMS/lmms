@@ -80,34 +80,23 @@ StringPairDrag::~StringPairDrag()
 
 
 
-bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys )
+bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* dee, const std::initializer_list<QString> allowed_keys)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
+	auto [type, value] = Clipboard::decodeMimeData(dee->mimeData());
 
-	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
+	if (std::ranges::find(allowed_keys, type) != allowed_keys.end())
 	{
-		return( false );
+		dee->acceptProposedAction();
+		return true;
 	}
-	QString txt = _dee->mimeData()->data( mimeType( MimeType::StringPair ) );
-	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
-	{
-		_dee->acceptProposedAction();
-		return( true );
-	}
-	_dee->ignore();
-	return( false );
+	dee->ignore();
+	return false;
 }
-
-
-
 
 QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
 	return Clipboard::decodeKey( _de->mimeData() );
 }
-
 
 
 
