@@ -398,8 +398,7 @@ void TrackContainerView::dropEvent(QDropEvent* _de)
 		// it->toggledInstrumentTrackButton(true);
 		_de->accept();
 	}
-	else if (
-		type == "samplefile" || type == "pluginpresetfile"
+	else if (type == "samplefile" || type == "pluginpresetfile"
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
