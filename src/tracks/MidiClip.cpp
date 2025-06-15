@@ -45,6 +45,8 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
+	_instrument_track->addClip(this);
+
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();

@@ -26,8 +26,9 @@
 
 #include "AutomationTrack.h"
 
-#include "AutomationTrackView.h"
 #include "AutomationClip.h"
+#include "AutomationTrackView.h"
+#include "TrackContainer.h"
 
 namespace lmms
 {
@@ -37,6 +38,7 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? Type::HiddenAutomation : Type::Automation, tc )
 {
 	setName( tr( "Automation track" ) );
+	tc->addTrack(this);
 }
 
 bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,

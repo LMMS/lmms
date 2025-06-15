@@ -38,6 +38,7 @@ namespace lmms
 PatternClip::PatternClip(Track* track) :
 	Clip(track)
 {
+	track->addClip(this);
 	bar_t t = Engine::patternStore()->lengthOfPattern(patternIndex());
 	if( t > 0 )
 	{

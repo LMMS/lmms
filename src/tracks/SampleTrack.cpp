@@ -57,6 +57,8 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
 
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()));
+
+	tc->addTrack(this);
 }
 
 

@@ -45,6 +45,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	saveJournallingState( false );
 	setSampleFile( "" );
 	restoreJournallingState();
+	_track->addClip(this);
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
