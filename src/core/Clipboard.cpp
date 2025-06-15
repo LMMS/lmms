@@ -149,12 +149,7 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 		const QList<QUrl> urls = mimeData->urls();
 
 		QString type = decodeKey(mimeData);
-		QString value = decodeValue(mimeData);
-
-		if (!urls.isEmpty())
-		{
-			value = urls.first().toLocalFile();
-		}
+		QString value = !urls.isEmpty() ? urls.first().toLocalFile() : decodeValue(mimeData);
 
 		if (isAudioFile(value)) { type = "samplefile"; }
 		else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
