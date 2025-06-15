@@ -76,7 +76,7 @@ public:
 	~ZynAddSubFxInstrument() override;
 
 	void play( SampleFrame* _working_buffer ) override;
-	void playNote( NotePlayHandle * _n, SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle * _n, SampleFrame* _working_buffer) override;
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
