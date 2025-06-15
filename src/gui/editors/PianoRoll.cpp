@@ -811,7 +811,19 @@ void PianoRoll::duplicateNotes(bool quanitized)
 
 	TimePos unquantizedLength = lastPos - firstPos;
 	// If the length should be inferred from the note positions, it's just rounded up to the nearest power of 2 bar length.
-	TimePos quantizedLength = TimePos::ticksPerBar() * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / TimePos::ticksPerBar())));
+	// Except when the time signature numerator is not a power of 2. In that case, the final length is quantized
+	// to the next beat length if the length between 1/2 beat and 1 bar. Else just use power of 2 as normal.
+	int numerator = Engine::getSong()->getTimeSigModel().getNumerator();
+	int ticksPerBeat = TimePos::ticksPerBar() / numerator;
+	TimePos quantizedLength;
+	if (unquantizedLength > ticksPerBeat / 2 && unquantizedLength <= TimePos::ticksPerBar() / 2)
+	{
+		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerBeat) * ticksPerBeat;
+	}
+	else
+	{
+		quantizedLength = TimePos::ticksPerBar() * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / TimePos::ticksPerBar())));
+	}
 
 	for (auto note : notes)
 	{
