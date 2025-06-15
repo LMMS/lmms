@@ -87,7 +87,7 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 
 	const QMimeData* getMimeData()
 	{
-		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+		return QApplication::clipboard()->mimeData(QClipboard::Clipboard);
 	}
 
 
