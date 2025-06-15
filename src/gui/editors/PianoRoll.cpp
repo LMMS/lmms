@@ -810,12 +810,13 @@ void PianoRoll::duplicateNotes(bool quanitized)
 	TimePos lastPos = lastNode->endPos();
 
 	TimePos unquantizedLength = lastPos - firstPos;
-	// If the length should be inferred from the note positions, it's just rounded up to the nearest power of 2 bar length.
+	// If the length should be inferred from the note positions, it's generally rounded up to the nearest power of 2 bar length.
 	// Except when the time signature numerator is not a power of 2. In that case, the final length is quantized
 	// to the next beat length if the length between 1/2 beat and 1 bar. Else just use power of 2 as normal.
 	// If the length is less than half of a beat, the same sort of power of 2 rounding happens, but relative to the beat length.
-	int numerator = Engine::getSong()->getTimeSigModel().getNumerator();
-	int ticksPerBeat = TimePos::ticksPerBar() / numerator;
+	// If the length on the scale of the snap size, it's done relative to the snap size.
+	int ticksPerBeat = TimePos::ticksPerBar() / Engine::getSong()->getTimeSigModel().getNumerator();
+	int ticksPerSnap = quantization();
 	TimePos quantizedLength;
 	if (unquantizedLength > TimePos::ticksPerBar() / 2)
 	{
@@ -825,9 +826,13 @@ void PianoRoll::duplicateNotes(bool quanitized)
 	{
 		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerBeat) * ticksPerBeat;
 	}
-	else
+	else if (unquantizedLength >= ticksPerSnap * 2)
 	{
 		quantizedLength = ticksPerBeat * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / ticksPerBeat)));
+	}
+	else
+	{
+		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerSnap) * ticksPerSnap;
 	}
 
 	for (auto note : notes)
