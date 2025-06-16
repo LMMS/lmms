@@ -27,6 +27,7 @@
 
 #include <QMap>
 
+#include "PatternClip.h"
 #include "Track.h"
 
 namespace lmms
@@ -55,7 +56,7 @@ public:
 
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
-	Clip* createClip(const TimePos & pos) override;
+	PatternClip* createClip(const TimePos& pos = 0) override;
 
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;

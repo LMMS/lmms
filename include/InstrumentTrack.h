@@ -33,6 +33,7 @@
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
 #include "Midi.h"
+#include "MidiClip.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -129,8 +130,7 @@ public:
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
 
 	// create new track-content-object = clip
-	Clip* createClip(const TimePos & pos) override;
-
+	MidiClip* createClip(const TimePos& pos = 0) override;
 
 	// called by track
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;

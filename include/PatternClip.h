@@ -26,6 +26,7 @@
 #define LMMS_PATTERN_CLIP_H
 
 #include "Clip.h"
+#include "Track.h"
 
 namespace lmms
 {
@@ -53,7 +54,9 @@ public:
 
 	PatternClip* clone() override
 	{
-		return new PatternClip(*this);
+		auto clip = new PatternClip(*this);
+		if (getTrack()) { getTrack()->addClip(clip); }
+		return clip;
 	}
 
 private:

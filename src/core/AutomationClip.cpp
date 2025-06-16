@@ -1043,7 +1043,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		}
 	}
 
-	auto a = new AutomationClip(t);
+	auto a = t->createClip();
 	a->addObject( _m, false );
 	return a;
 }

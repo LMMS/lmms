@@ -376,7 +376,7 @@ void MidiClipView::clearNotesOutOfBounds()
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
+	auto newClip = dynamic_cast<InstrumentTrack*>(m_clip->getTrack())->createClip();
 	newClip->setAutoResize(m_clip->getAutoResize());
 	newClip->movePosition(m_clip->startPosition());
 
