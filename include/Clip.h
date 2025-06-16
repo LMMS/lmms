@@ -94,21 +94,6 @@ public:
 		return m_length;
 	}
 
-	/*! \brief Specify whether or not a TCO automatically resizes.
-	 *
-	 *  If a TCO does automatically resize, it cannot be manually
-	 *  resized by clicking and dragging its edge.
-	 *
-	 */
-	inline void setResizable( const bool r )
-	{
-		m_resizable = r;
-	}
-
-	inline const bool getResizable() const
-	{
-		return m_resizable;
-	}
 
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
@@ -183,7 +168,6 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_resizable = true;
 	bool m_autoResize = true;
 
 	bool m_selectViewOnCreate;

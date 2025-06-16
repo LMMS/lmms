@@ -502,7 +502,7 @@ void ClipView::dropEvent( QDropEvent * de )
 void ClipView::updateCursor(QMouseEvent * me)
 {
 	// If we are at the edges, use the resize cursor
-	if (!me->buttons() && m_clip->getResizable() && !isSelected()
+	if (!me->buttons() && m_clip->getTrack()->trackContainer()->type() != TrackContainer::Type::Pattern && !isSelected()
 		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
@@ -669,7 +669,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
-				if (!m_clip->getResizable() && !knifeMode)
+				if (m_clip->getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern && !knifeMode)
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );

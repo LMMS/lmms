@@ -48,11 +48,6 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
-		setResizable(false);
-	}
-	else
-	{
-		setResizable(true);
 	}
 	init();
 }
@@ -72,18 +67,6 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	}
 
 	init();
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setResizable(false);
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setResizable(true);
-			break;
-	}
 }
 
 
@@ -151,7 +134,7 @@ void MidiClip::updateLength()
 
 	// If the clip has already been manually resized, don't automatically resize it.
 	// Unless we are in a pattern, where you can't resize stuff manually
-	if (getAutoResize() || !getResizable())
+	if (getAutoResize() || getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern)
 	{
 		tick_t max_length = TimePos::ticksPerBar();
 
