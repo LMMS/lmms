@@ -65,7 +65,6 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_clips()        /*!< The clips (segments) */
 {	
-	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
 
@@ -122,6 +121,7 @@ Track * Track::create( Type tt, TrackContainer * tc )
 		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
 	}
 
+	tc->addTrack(t);
 	tc->updateAfterTrackAdd();
 
 	Engine::audioEngine()->doneChangeInModel();
