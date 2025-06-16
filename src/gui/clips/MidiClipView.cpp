@@ -641,6 +641,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
+		QPixmap stephighlight;
 		const int steps = std::max(1, m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
@@ -653,6 +654,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		stepoffl = m_stepBtnOffLight.scaled(
 			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		stephighlight = m_stepBtnHighlight.scaled(
+			w / steps, m_stepBtnHighlight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
@@ -661,6 +664,9 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			// figure out x and y coordinates for step graphic
 			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
 			const int y = BeatStepButtonOffset;
+
+			const bool isAtPlayPos = Engine::getSong()->getPlayPos(Song::PlayMode::Pattern) * TimePos::stepsPerBar() / TimePos::ticksPerBar() == it
+				&& Engine::getSong()->playMode() == Song::PlayMode::Pattern;
 
 			if (n)
 			{
@@ -678,6 +684,10 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			else
 			{
 				p.drawPixmap(x, y, stepoff);
+			}
+			if (isAtPlayPos)
+			{
+				p.drawPixmap(x, y, stephighlight);
 			}
 		} // end for loop
 
