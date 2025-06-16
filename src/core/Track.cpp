@@ -116,13 +116,13 @@ Track * Track::create( Type tt, TrackContainer * tc )
 		default: break;
 	}
 
+	tc->addTrack(t);
+	tc->updateAfterTrackAdd();
+
 	if (tc == Engine::patternStore() && t)
 	{
 		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
 	}
-
-	tc->addTrack(t);
-	tc->updateAfterTrackAdd();
 
 	Engine::audioEngine()->doneChangeInModel();
 
