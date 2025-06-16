@@ -38,6 +38,7 @@
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "SimpleTextFloat.h"
+#include "Scroll.h"
 #include "StringPairDrag.h"
 
 
@@ -280,15 +281,14 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
+	auto scroll = Scroll(we);
+	if (!scroll.isVertical()) { return; }
+
 	we->accept();
-	const int deltaY = we->angleDelta().y();
-	float direction = deltaY > 0 ? 1 : -1;
 
 	auto * m = model();
-	float const step = m->step<float>();
-	float const range = m->range();
 
-	// This is the default number of steps or mouse wheel events that it takes to sweep
+	// This is the default number of mouse wheel ticks that it takes to sweep
 	// from the lowest value to the highest value.
 	// It might be modified if the user presses modifier keys. See below.
 	float numberOfStepsForFullSweep = 100.;
@@ -309,32 +309,18 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	{
 		// The alt key enables even finer adjustments
 		numberOfStepsForFullSweep = 2000;
-
-		// It seems that on some systems pressing Alt with mess with the directions,
-		// i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
-		// left and right. Account for this quirk.
-		if (deltaY == 0)
-		{
-			int const deltaX = we->angleDelta().x();
-			if (deltaX != 0)
-			{
-				direction = deltaX > 0 ? 1 : -1;
-			}
-		}
 	}
 
-	// Handle "natural" scrolling, which is common on trackpads and touch devices
-	if (we->inverted()) {
-		direction = -direction;
-	}
+	// Compute the number of steps to increase by
+	const float valueNow = m->value();
+	const float valuePerWheelTick = m->range() / numberOfStepsForFullSweep;
+	const float scaledValuePerTick = m->scaledValue(m->inverseScaledValue(valueNow) + valuePerWheelTick) - valueNow;
+	const float modelStepSize = m->step<float>();
+	const float modelStepsPerWheelTick = scaledValuePerTick / modelStepSize;
+	// scroll.getSteps() will return at least 1 for every wheel tick
+	const int steps = scroll.getSteps(modelStepsPerWheelTick, Scroll::Flag::DisableNaturalScrolling);
 
-	// Compute the number of steps but make sure that we always do at least one step
-	const float currentValue = model()->value();
-	const float valueOffset = range / numberOfStepsForFullSweep;
-	const float scaledValueOffset = model()->scaledValue(model()->inverseScaledValue(currentValue) + valueOffset) - currentValue;
-	const float stepMult = std::max(scaledValueOffset / step, 1.f);
-	const int inc = direction * stepMult;
-	model()->incValue(inc);
+	model()->incValue(steps);
 
 	s_textFloat->setText(displayValue());
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));

@@ -63,6 +63,7 @@
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
+#include "Scroll.h"
 #include "SimpleTextFloat.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
@@ -115,6 +116,9 @@ const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 // number of each note to provide in quantization and note lengths
 const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
+
+// how much each scroll wheel step moves the screen
+const int PIXELS_PER_SCROLL = 36;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
@@ -3935,22 +3939,20 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 }
 
 
-void PianoRoll::adjustLeftRightScoll(int value)
-{
-	m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							value * 0.3f / m_zoomLevels[m_zoomingModel.value()]);
-}
-
-
 
 void PianoRoll::wheelEvent(QWheelEvent * we )
 {
+	auto scroll = Scroll(we);
 	we->accept();
+
+	const bool inNoteEditArea = position(we).x() > noteEditLeft()
+							&& position(we).x() < noteEditRight()
+							&& position(we).y() > noteEditTop()
+							&& position(we).y() < noteEditBottom();
+
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if(position(we).x() > noteEditLeft() && position(we).x() < noteEditRight()
-	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom())
+	if (inNoteEditArea && scroll.isVertical() && hasValidMidiClip())
 	{
-		if (!hasValidMidiClip()) {return;}
 		// get values for going through notes
 		int pixel_range = 8;
 		int x = position(we).x() - m_whiteKeyWidth;
@@ -3972,14 +3974,14 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+			const int step = scroll.getSteps(Scroll::Flag::DisableNaturalScrolling);
 
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{
 				for ( Note * n : nv )
 				{
-					volume_t vol = qBound<int>( MinVolume, n->getVolume() + step, MaxVolume );
-					n->setVolume( vol );
+					// Don't pass negative volume as it would fold over
+					n->setVolume(static_cast<volume_t>(std::max(0, n->getVolume() + step)));
 				}
 				bool allVolumesEqual = std::all_of( nv.begin(), nv.end(),
 					[nv](const Note *note)
@@ -3997,8 +3999,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			{
 				for ( Note * n : nv )
 				{
-					panning_t pan = qBound<int>( PanningLeft, n->getPanning() + step, PanningRight );
-					n->setPanning( pan );
+					n->setPanning(n->getPanning() + step);
 				}
 				bool allPansEqual = std::all_of( nv.begin(), nv.end(),
 					[nv](const Note *note)
@@ -4020,69 +4021,36 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		int q = m_quantizeModel.value();
-		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q--;
-		}
-		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q++;
-		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
+		m_quantizeModel.setValue(m_quantizeModel.value() - scroll.getSteps());
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		int l = m_noteLenModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			l--;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			l++;
-		}
-		l = qBound( 0, l, m_noteLenModel.size() - 1 );
-		m_noteLenModel.setValue( l );
+		m_noteLenModel.setValue(m_noteLenModel.value() - scroll.getSteps());
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
-		int z = m_zoomingModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			z++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			z--;
-		}
-		z = qBound( 0, z, m_zoomingModel.size() - 1 );
-
 		int x = (position(we).x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
-		// what would be the ticks in the new zoom level on the very same mouse x
-		int newTicks = x / (DEFAULT_PR_PPB * m_zoomLevels[z]);
+		// update combobox with zooming-factor
+		m_zoomingModel.setValue(m_zoomingModel.value() + scroll.getSteps());
+		// ticks in the new zoom level
+		int newTicks = x / m_ppb;
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
-		// update combobox with zooming-factor
-		m_zoomingModel.setValue( z );
-	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		adjustLeftRightScoll(we->angleDelta().x());
-	}
-	else if(we->modifiers() & Qt::ShiftModifier)
-	{
-		adjustLeftRightScoll(we->angleDelta().y());
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-							we->angleDelta().y() / 30);
+		// Calculate number of TimePos-ticks to move the horizontal scroll bar
+		const float ticksPerPixel = TimePos::ticksPerBar() / static_cast<float>(m_ppb);
+		const float ticksPerScroll = roundf(PIXELS_PER_SCROLL * ticksPerPixel);
+		const int ticks = scroll.getSteps(ticksPerScroll, Scroll::Flag::SwapWithShiftOrAlt|Scroll::Flag::Horizontal);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
+
+		// Calculate number of keys to move the vertical scroll bar
+		const float keysPerScroll = roundf(PIXELS_PER_SCROLL / static_cast<float>(m_keyLineHeight));
+		const int keys = scroll.getSteps(keysPerScroll, Scroll::Flag::SwapWithShiftOrAlt);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - keys);
 	}
 }
 

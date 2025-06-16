@@ -30,6 +30,7 @@
 #include "LcdSpinBox.h"
 #include "KeyboardShortcuts.h"
 #include "CaptionMenu.h"
+#include "Scroll.h"
 
 
 namespace lmms::gui
@@ -141,10 +142,13 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
-	we->accept();
-	const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+	auto scroll = Scroll(we);
+	if (!scroll.isVertical()) { return; }
 
-	model()->setValue(model()->value() + direction * model()->step<int>());
+	we->accept();
+
+	const int steps = scroll.getSteps(Scroll::Flag::DisableNaturalScrolling);
+	model()->setValue(model()->value() + steps * model()->step<int>());
 	emit manualChange();
 }
 
