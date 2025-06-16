@@ -78,8 +78,6 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	using AutoModelVector = std::vector<AutomatableModel*>;
-
 	enum class ScaleType
 	{
 		Linear,
@@ -151,22 +149,12 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if (m_controllerConnection)
+		if (m_controllerConnection && m_useControllerValue)
 		{
-			if (!m_useControllerValue)
-			{
-				return castValue<T>(m_value);
-			}
-			else
-			{
-				return castValue<T>(controllerValue(frameOffset));
-			}
+			// workaround to update linked models
+			AutomatableModel* thisModel = const_cast<AutomatableModel*>(this);
+			thisModel->setValue(controllerValue(frameOffset));
 		}
-		else if (hasLinkedModels())
-		{
-			return castValue<T>( controllerValue( frameOffset ) );
-		}
-
 		return castValue<T>( m_value );
 	}
 
@@ -212,8 +200,7 @@ public:
 
 	void setInitValue( const float value );
 
-	void setAutomatedValue( const float value );
-	void setValue( const float value );
+	void setValue(float value, bool isAutomated = false);
 
 	void incValue( int steps )
 	{
@@ -252,9 +239,9 @@ public:
 
 	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
-	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
-
 	void unlinkAllModels();
+	//! @return 0 if not connected, never 1, 2 if connected to 1 model
+	size_t countLinks() const;
 
 	/**
 	 * @brief Saves settings (value, automation links and controller connections) of AutomatableModel into
@@ -277,9 +264,9 @@ public:
 
 	virtual QString displayValue( const float val ) const = 0;
 
-	bool hasLinkedModels() const
+	constexpr bool hasLinkedModels() const
 	{
-		return !m_linkedModels.empty();
+		return m_nextLink != nullptr;
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -312,7 +299,7 @@ public:
 		s_periodCounter = 0;
 	}
 
-	bool useControllerValue()
+	bool useControllerValue() const
 	{
 		return m_useControllerValue;
 	}
@@ -340,6 +327,7 @@ protected:
 
 
 private:
+	void setValueInternal(float value, bool isAutomated);
 	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
@@ -368,9 +356,14 @@ private:
 		loadSettings( element, "value" );
 	}
 
-	void linkModel( AutomatableModel* model );
-	void unlinkModel( AutomatableModel* model );
-
+	void linkModel(AutomatableModel* model);
+	void unlinkModel();
+	//! linking is stored in a linked list ring
+	//! @return the model that's `m_nextLink` is `this`
+	AutomatableModel* getLastLinkedModel() const;
+	//! @return true if the `model` is in the linked list
+	bool isModelLinked(AutomatableModel* model) const;
+	
 	//! @brief Scales @value from linear to logarithmic.
 	//! Value should be within [0,1]
 	template<class T> T logToLinearScale( T value ) const;
@@ -390,16 +383,15 @@ private:
 	float m_centerValue;
 
 	bool m_valueChanged;
-
-	// currently unused?
-	float m_oldValue;
-	int m_setValueDepth;
+	float m_oldValue; //!< used for interpolation
 
 	// used to determine if step size should be applied strictly (ie. always)
 	// or only when value set from gui (default)
 	bool m_hasStrictStepSize;
 
-	AutoModelVector m_linkedModels;
+	//! an `AutomatableModel` can be linked together with others in a linked list
+	//! the list has no end, the last model is connected to the first forming a ring
+	AutomatableModel* m_nextLink;
 
 
 	//! NULL if not appended to controller, otherwise connection info
