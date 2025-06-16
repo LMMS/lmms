@@ -28,6 +28,7 @@
 
 #include "Clip.h"
 #include "Note.h"
+#include "Track.h"
 
 
 namespace lmms
@@ -118,7 +119,9 @@ public:
 
 	MidiClip* clone() override
 	{
-		return new MidiClip(*this);
+		auto clip = new MidiClip(*this);
+		if (getTrack()) { getTrack()->addClip(clip); }
+		return clip;
 	}
 
 

@@ -29,6 +29,7 @@
 
 #include <QMap>
 #include <QPointer>
+#include "Track.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
@@ -197,7 +198,9 @@ public:
 
 	AutomationClip* clone() override
 	{
-		return new AutomationClip(*this);
+		auto clip = new AutomationClip(*this);
+		if (getTrack()) { getTrack()->addClip(clip); }
+		return clip;
 	}
 
 	void clearObjects() { m_objects.clear(); }
