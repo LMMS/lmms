@@ -105,7 +105,7 @@ public:
 
 
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
-	virtual Clip * createClip( const TimePos & pos ) = 0;
+	virtual Clip* createClip(const TimePos& pos = 0) = 0;
 
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;

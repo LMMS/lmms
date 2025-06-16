@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_TRACK_H
 
 #include "AudioBusHandle.h"
+#include "SampleClip.h"
 #include "Track.h"
 
 
@@ -51,8 +52,7 @@ public:
 	bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
-	Clip* createClip(const TimePos & pos) override;
-
+	SampleClip* createClip(const TimePos& pos = 0) override;
 
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
