@@ -310,6 +310,9 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 	patternSelectionToolBar->addWidget(m_patternComboBox);
 
+	// Loop and stop behavior
+	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
 	// Track actions
 	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));

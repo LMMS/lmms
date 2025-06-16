@@ -77,6 +77,8 @@ private:
 	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
+
+	friend class PatternEditorWindow;
 };
 
 
