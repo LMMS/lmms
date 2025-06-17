@@ -139,7 +139,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
-	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
+	m_effectRack = new EffectRackView(tv->model()->audioBusHandle()->effects());
 	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);

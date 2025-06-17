@@ -591,7 +591,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 
 						// make multiples of 0.01 (or 0.1 for larger values)
 						float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
-						stepSize -= fmodf(stepSize, minStep);
+						stepSize -= std::fmod(stepSize, minStep);
 						stepSize = std::max(stepSize, minStep);
 
 						ctrl->m_connectedModel.reset(

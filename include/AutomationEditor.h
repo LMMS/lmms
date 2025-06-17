@@ -38,6 +38,7 @@
 #include "SampleClip.h"
 #include "TimePos.h"
 #include "lmms_basics.h"
+#include "SampleThumbnail.h"
 
 class QPainter;
 class QPixmap;
@@ -290,6 +291,8 @@ private:
 	QColor m_ghostNoteColor;
 	QColor m_detuningNoteColor;
 	QColor m_ghostSampleColor;
+	
+	SampleThumbnail m_sampleThumbnail;
 
 	friend class AutomationEditorWindow;
 
