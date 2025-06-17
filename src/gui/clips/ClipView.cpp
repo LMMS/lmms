@@ -669,7 +669,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
-				if (m_clip->getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern && !knifeMode)
+				if (m_clip->isInPattern() && !knifeMode)
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );

@@ -95,6 +95,9 @@ public:
 	}
 
 
+	bool isInPattern() const;
+
+
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
 	 *  If a clip has been resized previously, it will not automatically 

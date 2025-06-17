@@ -31,6 +31,8 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Song.h"
+#include "Track.h"
+#include "TrackContainer.h"
 
 
 namespace lmms
@@ -172,6 +174,13 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 	}
 }
 
+
+bool Clip::isInPattern() const
+{
+	return getTrack() != nullptr
+		&& getTrack()->trackContainer() != nullptr
+		&& getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern;
+}
 
 
 

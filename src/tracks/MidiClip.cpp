@@ -134,7 +134,7 @@ void MidiClip::updateLength()
 
 	// If the clip has already been manually resized, don't automatically resize it.
 	// Unless we are in a pattern, where you can't resize stuff manually
-	if (getAutoResize() || getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern)
+	if (getAutoResize() || isInPattern())
 	{
 		tick_t max_length = TimePos::ticksPerBar();
 
