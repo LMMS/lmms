@@ -25,13 +25,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Clone fltk
-        uses: actions/checkout@v4
-        with:
-          repository: fltk/fltk
-          path: fltk
-          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
-          fetch-depth: 1
       - name: Configure winehq
         run: |
           sudo dpkg --add-architecture i386
@@ -44,10 +37,8 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+          $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
           sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
-          sudo apt-get install -y --install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -56,14 +47,6 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
-      - name: Configure fltk
-        run: |
-          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
-      - name: Install fltk
-        run: |
-          cmake --build fltk/build
-          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
           ccache --zero-stats
@@ -115,20 +98,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Clone fltk
-        uses: actions/checkout@v4
-        with:
-          repository: fltk/fltk
-          path: fltk
-          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
-          fetch-depth: 1
       - name: Install system packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -137,19 +111,13 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
-      - name: Configure fltk
-        run: |
-          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
-      - name: Install fltk
-        run: |
-          cmake --build fltk/build
-          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
           ccache --zero-stats
           cmake -S . \
                 -B build \
+                -DWANT_VST_32=OFF \
+                -DWANT_VST_64=OFF \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build

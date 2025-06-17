@@ -30,6 +30,7 @@
 #include "Effect.h"
 
 #include "BasicFilters.h"
+#include "lmms_math.h"
 
 namespace lmms
 {

@@ -82,8 +82,6 @@ public:
 	QColor strokeInnerInactive() const { return m_strokeInnerInactive; }
 	void setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
 
-	Fader* fader() const { return m_fader; }
-
 public slots:
 	void renameChannel();
 	void resetColor();

@@ -25,7 +25,6 @@
 #include "Lfo.h"
 
 #include <cmath>
-#include <numbers>
 
 namespace lmms
 {
@@ -34,7 +33,7 @@ namespace lmms
 Lfo::Lfo( int samplerate )
 {
 	m_samplerate = samplerate;
-	m_twoPiOverSr = 2 * std::numbers::pi_v<float> / samplerate;
+	m_twoPiOverSr = numbers::tau_v<float> / samplerate;
 }
 
 

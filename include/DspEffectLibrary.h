@@ -25,9 +25,8 @@
 #ifndef LMMS_DSPEFFECTLIBRARY_H
 #define LMMS_DSPEFFECTLIBRARY_H
 
-#include <numbers>
-
 #include "lmms_math.h"
+#include "lmms_constants.h"
 #include "lmms_basics.h"
 #include "SampleFrame.h"
 
@@ -329,7 +328,7 @@ namespace lmms::DspEffectLibrary
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
 		{
-			constexpr float toRad = std::numbers::pi_v<float> / 180.f;
+			const float toRad = numbers::pi_v<float> / 180;
 			const sample_t tmp = inLeft;
 			inLeft += inRight * std::sin(m_wideCoeff * toRad * .5f);
 			inRight -= tmp * std::sin(m_wideCoeff * toRad * .5f);

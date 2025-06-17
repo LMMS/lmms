@@ -47,7 +47,7 @@ namespace lmms
 
 class AudioDevice;
 class MidiClient;
-class AudioBusHandle;
+class AudioPort;
 class AudioEngineWorkerThread;
 
 
@@ -172,15 +172,15 @@ public:
 	}
 
 
-	// audio-bus-handle-stuff
-	inline void addAudioBusHandle(AudioBusHandle* busHandle)
+	// audio-port-stuff
+	inline void addAudioPort(AudioPort * port)
 	{
 		requestChangeInModel();
-		m_audioBusHandles.push_back(busHandle);
+		m_audioPorts.push_back(port);
 		doneChangeInModel();
 	}
 
-	void removeAudioBusHandle(AudioBusHandle* busHandle);
+	void removeAudioPort(AudioPort * port);
 
 
 	// MIDI-client-stuff
@@ -366,7 +366,7 @@ private:
 
 	bool m_renderOnly;
 
-	std::vector<AudioBusHandle*> m_audioBusHandles;
+	std::vector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 

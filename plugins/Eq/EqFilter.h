@@ -25,13 +25,12 @@
 #ifndef EQFILTER_H
 #define EQFILTER_H
 
-#include <numbers>
-
 #include "BasicFilters.h"
 #include "lmms_math.h"
 
 namespace lmms
 {
+
 
 ///
 /// \brief The EqFilter class.
@@ -186,7 +185,7 @@ public :
 	{
 
 		// calc intermediate
-		float w0 = 2 * std::numbers::pi_v<float> * m_freq / m_sampleRate;
+		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
 		float alpha = s / ( 2 * m_res );
@@ -229,7 +228,7 @@ public :
 	{
 
 		// calc intermediate
-		float w0 = 2 * std::numbers::pi_v<float> * m_freq / m_sampleRate;
+		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
 		float alpha = s / ( 2 * m_res );
@@ -269,13 +268,12 @@ public:
 
 	void calcCoefficents() override
 	{
-		using namespace std::numbers;
 		// calc intermediate
-		float w0 = 2 * pi_v<float> * m_freq / m_sampleRate;
+		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
 		float A = fastPow10f(m_gain * 0.025);
-		float alpha = s * std::sinh(ln2 / 2 * m_bw * w0 / std::sin(w0));
+		float alpha = s * std::sinh(std::log(2.f) / 2 * m_bw * w0 / std::sin(w0));
 
 		//calc coefficents
 		float b0 = 1 + alpha * A;
@@ -334,7 +332,7 @@ public :
 	{
 
 		// calc intermediate
-		float w0 = 2 * std::numbers::pi_v<float> * m_freq / m_sampleRate;
+		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
 		float A = fastPow10f(m_gain * 0.025);
@@ -371,7 +369,7 @@ public :
 	{
 
 		// calc intermediate
-		float w0 = 2 * std::numbers::pi_v<float> * m_freq / m_sampleRate;
+		float w0 = numbers::tau_v<float> * m_freq / m_sampleRate;
 		float c = std::cos(w0);
 		float s = std::sin(w0);
 		float A = fastPow10f(m_gain * 0.025);

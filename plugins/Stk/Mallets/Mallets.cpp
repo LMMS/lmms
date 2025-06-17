@@ -41,7 +41,6 @@
 #include "InstrumentTrack.h"
 
 #include "embed.h"
-#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -306,26 +305,26 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 		if (p < 9)
 		{
-			hardness += random * fastRand(-64.f, +64.f);
+			hardness += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			hardness = std::clamp(hardness, 0.0f, 128.0f);
 
-			position += random * fastRand(-32.f, +32.f);
+			position += random * (static_cast<float>(fast_rand() % 64) - 32.0);
 			position = std::clamp(position, 0.0f, 64.0f);
 		}
 		else if (p == 9)
 		{
-			modulator += random * fastRand(-64.f, +64.f);
+			modulator += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			modulator = std::clamp(modulator, 0.0f, 128.0f);
 
-			crossfade += random * fastRand(-64.f, +64.f);
+			crossfade += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
 		}
 		else
 		{
-			pressure += random * fastRand(-64.f, +64.f);
+			pressure += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			pressure = std::clamp(pressure, 0.0f, 128.0f);
 
-			speed += random * fastRand(-64.f, +64.f);
+			speed += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			speed = std::clamp(speed, 0.0f, 128.0f);
 		}
 

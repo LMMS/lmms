@@ -481,16 +481,6 @@ void MixerView::renameChannel(int index)
 
 void MixerView::keyPressEvent(QKeyEvent * e)
 {
-	auto adjustCurrentFader = [this](const Qt::KeyboardModifiers& modifiers, Fader::AdjustmentDirection direction)
-	{
-		auto* mixerChannel = currentMixerChannel();
-
-		if (mixerChannel)
-		{
-			mixerChannel->fader()->adjust(modifiers, direction);
-		}
-	};
-
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
@@ -518,14 +508,6 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() + 1);
 			}
 			break;
-		case Qt::Key_Up:
-		case Qt::Key_Plus:
-			adjustCurrentFader(e->modifiers(), Fader::AdjustmentDirection::Up);
-			break;
-		case Qt::Key_Down:
-		case Qt::Key_Minus:
-			adjustCurrentFader(e->modifiers(), Fader::AdjustmentDirection::Down);
-			break;
 		case Qt::Key_Insert:
 			if (e->modifiers() & Qt::ShiftModifier)
 			{
@@ -536,16 +518,6 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_Return:
 		case Qt::Key_F2:
 			renameChannel(m_currentMixerChannel->channelIndex());
-			break;
-		case Qt::Key_Space:
-			{
-				auto* mixerChannel = currentMixerChannel();
-
-				if (mixerChannel)
-				{
-					mixerChannel->fader()->adjustByDialog();
-				}
-			}
 			break;
 	}
 }

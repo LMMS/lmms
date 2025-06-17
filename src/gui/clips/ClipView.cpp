@@ -114,6 +114,7 @@ ClipView::ClipView( Clip * clip,
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
 	setCursor( m_cursorHand );
