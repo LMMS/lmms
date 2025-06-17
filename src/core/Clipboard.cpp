@@ -26,7 +26,6 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
 
 #include "FileBrowser.h"
 #include "PluginFactory.h"
@@ -62,7 +61,6 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 			for (auto& fileType : QString(pluginInfo.descriptor->supportedFileTypes).split(","))
 			{
 				fileTypes.push_back(fileType.toStdString());
-				qDebug() << fileType;
 			}
 
 			mimetypes.insert_or_assign(mimetype, fileTypes);
