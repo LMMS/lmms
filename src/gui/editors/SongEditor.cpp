@@ -113,7 +113,7 @@ SongEditor::SongEditor( Song * song ) :
 	// when tracks realign, adjust height of position line
 	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
 
-	m_positionLine = new PositionLine(this);
+	m_positionLine = new PositionLine(this, Song::PlayMode::Song);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 	connect( m_song, SIGNAL(playbackStateChanged()),
