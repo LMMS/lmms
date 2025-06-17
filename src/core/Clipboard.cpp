@@ -42,8 +42,9 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 	//! gets the extension of a file, or returns the string back if no extension is found
 	inline QString getExtension(const QString& file)
 	{
-		const QStringList parts = file.split('.');
-		return parts.isEmpty() ? file.toLower() : parts.last().toLower();
+		QFileInfo fi(file);
+		const QString ext = fi.suffix().toLower();
+		return ext.isEmpty() ? file.toLower() : ext;
 	}
 
 	/* @brief updates the extension map.
