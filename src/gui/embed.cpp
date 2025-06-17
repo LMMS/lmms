@@ -110,7 +110,7 @@ auto getIconPixmap(std::string_view name, int width, int height, const char* con
 
 	const auto pixmapName = QString::fromUtf8(name.data(), name.size());
 	const auto cacheName = (width > 0 && height > 0)
-		? QStringLiteral("%1_%2_%3").arg(pixmapName, width, height)
+		? QStringLiteral("%1_%2_%3").arg(pixmapName).arg(width).arg(height)
 		: pixmapName;
 
 	// Return cached pixmap if it exists
