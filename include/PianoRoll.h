@@ -74,6 +74,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor noteModeColor MEMBER m_noteModeColor)
 	Q_PROPERTY(QColor noteColor MEMBER m_noteColor)
 	Q_PROPERTY(QColor stepNoteColor MEMBER m_stepNoteColor)
+	Q_PROPERTY(QColor currentStepNoteColor MEMBER m_currentStepNoteColor)
 	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
 	Q_PROPERTY(QColor noteTextColor MEMBER m_noteTextColor)
 	Q_PROPERTY(QColor ghostNoteTextColor MEMBER m_ghostNoteTextColor)
@@ -374,6 +375,8 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
+	void adjustLeftRightScoll(int value);
+
 	TimePos m_currentPosition;
 	bool m_recording;
 	bool m_doAutoQuantization{false};
@@ -469,6 +472,7 @@ private:
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_stepNoteColor;
+	QColor m_currentStepNoteColor;
 	QColor m_noteTextColor;
 	QColor m_ghostNoteColor;
 	QColor m_ghostNoteTextColor;

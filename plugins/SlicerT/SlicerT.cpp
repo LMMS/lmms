@@ -214,7 +214,7 @@ void SlicerT::findSlices()
 			float magnitude = std::sqrt(real * real + imag * imag);
 
 			// using L2-norm (euclidean distance)
-			float diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
+			float diff = std::abs(magnitude - prevMags[j]);
 			spectralFlux += diff;
 
 			prevMags[j] = magnitude;

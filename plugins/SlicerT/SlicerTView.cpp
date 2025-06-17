@@ -55,7 +55,6 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 
 	setMaximumSize(QSize(10000, 10000));
 	setMinimumSize(QSize(516, 400));
-	setResizable(true);
 
 	m_wf = new SlicerTWaveform(248, 128, instrument, this);
 	m_wf->move(0, s_topBarHeight);

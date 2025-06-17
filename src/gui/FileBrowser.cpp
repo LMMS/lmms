@@ -635,7 +635,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 
 		contextMenu.addAction(
 			tr( "Send to active instrument-track" ),
-			[=]{ sendToActiveInstrumentTrack(file); }
+			[=, this]{ sendToActiveInstrumentTrack(file); }
 		);
 
 		contextMenu.addSeparator();
@@ -643,7 +643,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		contextMenu.addAction(
 			QIcon(embed::getIconPixmap("folder")),
 			tr("Open containing folder"),
-			[=]{ openContainingFolder(file); }
+			[=, this]{ openContainingFolder(file); }
 		);
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
@@ -676,14 +676,14 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
 	connect(toInstrument, &QAction::triggered,
-		[=]{ openInNewInstrumentTrack(file, songEditor); });
+		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
 	if (songEditor && fileIsSample)
 	{
 		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"), nullptr);
 		connect(toSampleTrack, &QAction::triggered,
-			[=]{ openInNewSampleTrack(file); });
+			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
 	}
 

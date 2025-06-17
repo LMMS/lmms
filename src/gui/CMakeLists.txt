@@ -94,6 +94,7 @@ SET(LMMS_SRCS
 	gui/tracks/TrackLabelButton.cpp
 	gui/tracks/TrackOperationsWidget.cpp
 	gui/tracks/TrackRenameLineEdit.cpp
+	gui/tracks/TrackGrip.cpp
 	gui/tracks/TrackView.cpp
 
 	gui/widgets/AutomatableButton.cpp

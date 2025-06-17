@@ -858,7 +858,7 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 {
 	if( m_parent->m_slope[slope] == 1.0f ) return s;
 	if( s == 0.0f ) return s;
-	return std::pow(s, m_parent->m_slope[slope]);
+	return fastPow(s, m_parent->m_slope[slope]);
 }
 
 
@@ -1462,14 +1462,14 @@ void MonstroInstrument::updateSamplerate()
 void MonstroInstrument::updateSlope1()
 {
 	const float slope = m_env1Slope.value();
-	m_slope[0] = std::pow(10.f, slope * -1.0f );
+	m_slope[0] = fastPow10f(-slope);
 }
 
 
 void MonstroInstrument::updateSlope2()
 {
 	const float slope = m_env2Slope.value();
-	m_slope[1] = std::pow(10.f, slope * -1.0f );
+	m_slope[1] = fastPow10f(-slope);
 }
 
 

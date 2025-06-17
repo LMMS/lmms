@@ -1,7 +1,7 @@
 /*
- * PluginView.h - declaration of class PluginView
+ * TrackGrip.h - Grip that can be used to move tracks
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,28 +22,47 @@
  *
  */
 
-#ifndef LMMS_GUI_PLUGIN_VIEW_H
-#define LMMS_GUI_PLUGIN_VIEW_H
+#ifndef LMMS_GUI_TRACK_GRIP_H
+#define LMMS_GUI_TRACK_GRIP_H
 
 #include <QWidget>
 
-#include "ModelView.h"
-#include "Plugin.h"
 
-namespace lmms::gui {
+class QPixmap;
 
-class LMMS_EXPORT PluginView : public QWidget, public ModelView
+namespace lmms
 {
-public:
-	PluginView(Plugin* _plugin, QWidget* _parent)
-		: QWidget(_parent)
-		, ModelView(_plugin, this)
-	{
-	}
 
-	virtual bool isResizable() const { return false; }
+class Track;
+
+namespace gui
+{
+
+class TrackGrip : public QWidget
+{
+	Q_OBJECT
+public:
+	TrackGrip(Track* track, QWidget* parent = 0);
+	~TrackGrip() override = default;
+
+signals:
+	void grabbed();
+	void released();
+
+protected:
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void paintEvent(QPaintEvent*) override;
+
+private:
+	Track* m_track = nullptr;
+	bool m_isGrabbed = false;
+	static QPixmap* s_grabbedPixmap;
+	static QPixmap* s_releasedPixmap;
 };
 
-} // namespace lmms::gui
+} // namespace gui
 
-#endif // LMMS_GUI_PLUGIN_VIEW_H
+} // namespace lmms
+
+#endif // LMMS_GUI_TRACK_GRIP_H

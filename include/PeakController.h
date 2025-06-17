@@ -78,8 +78,7 @@ private:
 	static int m_loadCount;
 	static bool m_buggedFile;
 	
-	float m_attackCoeff;
-	float m_decayCoeff;
+	float m_coeff;
 	bool m_coeffNeedsUpdate;
 } ;
 

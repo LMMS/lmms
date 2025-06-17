@@ -33,6 +33,7 @@
 #include <memory>
 #include <vector>
 
+#include "AudioDevice.h"
 #include "lmms_basics.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
@@ -235,9 +236,20 @@ public:
 	}
 
 
-	sample_rate_t baseSampleRate() const;
-	sample_rate_t outputSampleRate() const;
-	sample_rate_t inputSampleRate() const;
+	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
+
+
+	sample_rate_t outputSampleRate() const
+	{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+	
+
+	sample_rate_t inputSampleRate() const	
+	{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+
 
 	inline float masterGain() const
 	{
@@ -361,6 +373,7 @@ private:
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
+	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 

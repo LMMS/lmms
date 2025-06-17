@@ -66,11 +66,6 @@ class StepRecorder : public QObject
 		return m_isRecording;
 	}
 
-	QColor curStepNoteColor() const
-	{
-		return QColor(245,3,139); // radiant pink
-	}
-
 	private slots:
 	void removeNotesReleasedForTooLong();
 

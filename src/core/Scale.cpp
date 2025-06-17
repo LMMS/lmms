@@ -116,7 +116,7 @@ void Scale::loadSettings(const QDomElement &element)
 	QDomNode node = element.firstChild();
 	m_intervals.clear();
 
-	for (int i = 0; !node.isNull(); i++)
+	while (!node.isNull())
 	{
 		Interval temp;
 		temp.restoreState(node.toElement());
