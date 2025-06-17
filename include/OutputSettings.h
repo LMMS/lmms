@@ -26,7 +26,7 @@
 #ifndef LMMS_OUTPUT_SETTINGS_H
 #define LMMS_OUTPUT_SETTINGS_H
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -49,50 +49,26 @@ public:
 		Mono
 	};
 
-	class BitRateSettings
-	{
-	public:
-		BitRateSettings(bitrate_t bitRate, bool isVariableBitRate) :
-			m_bitRate(bitRate),
-			m_isVariableBitRate(isVariableBitRate)
-		{}
-
-		bool isVariableBitRate() const { return m_isVariableBitRate; }
-		void setVariableBitrate(bool variableBitRate = true) { m_isVariableBitRate = variableBitRate; }
-
-		bitrate_t getBitRate() const { return m_bitRate; }
-		void setBitRate(bitrate_t bitRate) { m_bitRate = bitRate; }
-
-	private:
-		bitrate_t m_bitRate;
-		bool m_isVariableBitRate;
-	};
-
 public:
-	OutputSettings( sample_rate_t sampleRate,
-			BitRateSettings const & bitRateSettings,
-			BitDepth bitDepth,
-			StereoMode stereoMode ) :
-		m_sampleRate(sampleRate),
-		m_bitRateSettings(bitRateSettings),
-		m_bitDepth(bitDepth),
-		m_stereoMode(stereoMode),
-		m_compressionLevel(0.625) // 5/8
+	OutputSettings(sample_rate_t sampleRate, bitrate_t bitRate, BitDepth bitDepth, StereoMode stereoMode)
+		: m_sampleRate(sampleRate)
+		, m_bitRate(bitRate)
+		, m_bitDepth(bitDepth)
+		, m_stereoMode(stereoMode)
+		, m_compressionLevel(0.625) // 5/8
 	{
 	}
 
-	OutputSettings( sample_rate_t sampleRate,
-			BitRateSettings const & bitRateSettings,
-			BitDepth bitDepth ) :
-		OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode::Stereo )
+	OutputSettings(sample_rate_t sampleRate, bitrate_t bitRate, BitDepth bitDepth)
+		: OutputSettings(sampleRate, bitRate, bitDepth, StereoMode::Stereo)
 	{
 	}
 
 	sample_rate_t getSampleRate() const { return m_sampleRate; }
 	void setSampleRate(sample_rate_t sampleRate) { m_sampleRate = sampleRate; }
 
-	BitRateSettings const & getBitRateSettings() const { return m_bitRateSettings; }
-	void setBitRateSettings(BitRateSettings const & bitRateSettings) { m_bitRateSettings = bitRateSettings; }
+	bitrate_t bitrate() const { return m_bitRate; }
+	void setBitrate(bitrate_t bitrate) { m_bitRate = bitrate; }
 
 	BitDepth getBitDepth() const { return m_bitDepth; }
 	void setBitDepth(BitDepth bitDepth) { m_bitDepth = bitDepth; }
@@ -109,7 +85,7 @@ public:
 
 private:
 	sample_rate_t m_sampleRate;
-	BitRateSettings m_bitRateSettings;
+	bitrate_t m_bitRate;
 	BitDepth m_bitDepth;
 	StereoMode m_stereoMode;
 	double m_compressionLevel;

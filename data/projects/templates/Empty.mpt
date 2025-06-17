@@ -4,19 +4,6 @@
   <head timesig_denominator="4" bpm="140" masterpitch="0" mastervol="100" timesig_numerator="4"/>
   <song>
     <trackcontainer visible="1" width="600" height="300" type="song" x="6" y="5" maximized="0" minimized="0"/>
-    <track type="6" muted="0" name="Automation track" solo="0">
-      <automationtrack/>
-      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
-    </track>
     <mixer visible="1" width="561" height="332" x="5" y="310" maximized="0" minimized="0">
       <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
