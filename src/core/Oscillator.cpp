@@ -142,8 +142,8 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 	{
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
-			table[i] += (n & 2 ? -1.0f : 1.0f) / (n * n) *
-				std::sin(numbers::tau_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (numbers::pi_sqr_v<float> / 8.0f);
+			table[i] += (n & 2 ? -1.0f : 1.0f) / powf(n, 2.0f) *
+				std::sin(numbers::tau_v<float> * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (numbers::pi_sqr_v<float> / 8);
 		}
 	}
 }

@@ -152,7 +152,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 			break;
 		}
 		if (closestSupportedSampleRate == -1 ||
-			std::abs(range->max - currentSampleRate) < std::abs(closestSupportedSampleRate - currentSampleRate))
+			abs(range->max - currentSampleRate) < abs(closestSupportedSampleRate - currentSampleRate))
 		{
 			closestSupportedSampleRate = range->max;
 		}

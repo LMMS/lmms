@@ -1,7 +1,7 @@
 /*
- * lfo.cpp - defination of Lfo class.
+ * SampleWaveform.h
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,30 +22,28 @@
  *
  */
 
-#include "Lfo.h"
+#ifndef LMMS_GUI_SAMPLE_WAVEFORM_H
+#define LMMS_GUI_SAMPLE_WAVEFORM_H
 
-#include <cmath>
+#include <QPainter>
 
-namespace lmms
+#include "Sample.h"
+#include "lmms_export.h"
+
+namespace lmms::gui {
+class LMMS_EXPORT SampleWaveform
 {
+public:
+	struct Parameters
+	{
+		const SampleFrame* buffer;
+		size_t size;
+		float amplification;
+		bool reversed;
+	};
 
+	static void visualize(Parameters parameters, QPainter& painter, const QRect& rect);
+};
+} // namespace lmms::gui
 
-Lfo::Lfo( int samplerate )
-{
-	m_samplerate = samplerate;
-	m_twoPiOverSr = numbers::tau_v<float> / samplerate;
-}
-
-
-
-
-float Lfo::tick()
-{
-	float output = sinf( m_phase );
-	m_phase += m_increment;
-
-	return output;
-}
-
-
-} // namespace lmms
+#endif // LMMS_GUI_SAMPLE_WAVEFORM_H

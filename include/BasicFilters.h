@@ -806,8 +806,8 @@ public:
 		// other filters
 		_freq = std::clamp(_freq, minFreq(), 20000.0f);
 		const float omega = numbers::tau_v<float> * _freq * m_sampleRatio;
-		const float tsin = std::sin(omega) * 0.5f;
-		const float tcos = std::cos(omega);
+		const float tsin = sinf( omega ) * 0.5f;
+		const float tcos = cosf( omega );
 
 		const float alpha = tsin / _q;
 

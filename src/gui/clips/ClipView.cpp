@@ -41,7 +41,6 @@
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
-#include "KeyboardShortcuts.h"
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
@@ -634,7 +633,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		auto pClip = dynamic_cast<PatternClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if (me->modifiers() & KBD_COPY_MODIFIER && !(sClip && knifeMode))
+		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
 		{
 			if( isSelected() )
 			{
@@ -727,7 +726,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_COPY_KEY),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -825,7 +824,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
-	if (me->modifiers() & KBD_COPY_MODIFIER)
+	if( me->modifiers() & Qt::ControlModifier )
 	{
 		delete m_hint;
 		m_hint = nullptr;
@@ -1415,7 +1414,7 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 		endQ = endQ - m_clip->length();
 
 		// Select the position closest to actual position
-		if (std::abs(newPos - startQ) < std::abs(newPos - endQ)) { newPos = startQ; }
+		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
 		else newPos = endQ;
 	}
 	else
@@ -1458,7 +1457,7 @@ TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 		const TimePos rightOff = m_clip->length() - midiPos;
 		const TimePos rightPos = m_clip->length() - rightOff.quantize( snapSize );
 		//...whichever gives a position closer to the cursor
-		if (std::abs(leftPos - midiPos) < std::abs(rightPos - midiPos)) { return leftPos; }
+		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
 		else { return rightPos; }
 	}
 	else

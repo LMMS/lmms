@@ -120,7 +120,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 		if( mod##_e2 != 0.0f ) modtmp += m_env[1][f] * mod##_e2; \
 		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0][f] * mod##_l1; \
 		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1][f] * mod##_l2; \
-		(car) = qBound( MIN_FREQ, (car) * std::exp2(modtmp), MAX_FREQ);
+		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
@@ -1361,25 +1361,25 @@ void MonstroInstrument::updateVolume3()
 
 void MonstroInstrument::updateFreq1()
 {
-	m_osc1l_freq = std::exp2(m_osc1Crs.value() / 12.0f)
-		* std::exp2(m_osc1Ftl.value() / 1200.0f);
-	m_osc1r_freq = std::exp2(m_osc1Crs.value() / 12.0f)
-		* std::exp2(m_osc1Ftr.value() / 1200.0f);
+	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
+					powf( 2.0f, m_osc1Ftl.value() / 1200.0f );
+	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
+					powf( 2.0f, m_osc1Ftr.value() / 1200.0f );
 }
 
 
 void MonstroInstrument::updateFreq2()
 {
-	m_osc2l_freq = std::exp2(m_osc2Crs.value() / 12.0f)
-		* std::exp2(m_osc2Ftl.value() / 1200.0f);
-	m_osc2r_freq = std::exp2(m_osc2Crs.value() / 12.0f)
-		* std::exp2(m_osc2Ftr.value() / 1200.0f);
+	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
+					powf( 2.0f, m_osc2Ftl.value() / 1200.0f );
+	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
+					powf( 2.0f, m_osc2Ftr.value() / 1200.0f );
 }
 
 
 void MonstroInstrument::updateFreq3()
 {
-	m_osc3_freq = std::exp2(m_osc3Crs.value() / 12.0f);
+	m_osc3_freq = powf( 2.0f, m_osc3Crs.value() / 12.0f );
 }
 
 

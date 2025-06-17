@@ -52,7 +52,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
-#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"

@@ -511,7 +511,7 @@ struct harmonic_cent
 {
 	static inline float process(float x)
 	{
-		return std::exp2(x / 1200);
+		return powf(2, x / 1200);
 	}
 };
 static freefunc1<float,harmonic_cent,true> harmonic_cent_func;
@@ -519,7 +519,7 @@ struct harmonic_semitone
 {
 	static inline float process(float x)
 	{
-		return std::exp2(x / 12);
+		return powf(2, x / 12);
 	}
 };
 static freefunc1<float,harmonic_semitone,true> harmonic_semitone_func;

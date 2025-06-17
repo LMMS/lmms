@@ -33,7 +33,6 @@
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "GuiApplication.h"
-#include "KeyboardShortcuts.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
@@ -156,7 +155,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
 	if (me->button() == Qt::LeftButton &&
-			! (me->modifiers() & KBD_COPY_MODIFIER) &&
+			! (me->modifiers() & Qt::ControlModifier) &&
 			! (me->modifiers() & Qt::ShiftModifier))
 	{
 		AutomatableModel *thisModel = model();

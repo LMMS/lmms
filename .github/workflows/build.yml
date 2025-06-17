@@ -206,6 +206,7 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
@@ -317,13 +318,19 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Update vcpkg (TEMPORARY)
+        run: |
+          cd $env:VCPKG_INSTALLATION_ROOT
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-msvc-x86_64-
+            vcpkg-x64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3

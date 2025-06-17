@@ -82,7 +82,7 @@ void LOMMEffect::changeSampleRate()
 	m_coeffPrecalc = -2.2f / (m_sampleRate * 0.001f);
 	m_needsUpdate = true;
 	
-	m_crestTimeConst = std::exp(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 	
 	m_lookBufLength = std::ceil((LOMM_MAX_LOOKAHEAD / 1000.f) * m_sampleRate) + 2;
 	for (int i = 0; i < 2; ++i)
@@ -171,7 +171,7 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 	float rel[3] = {relH, relM, relL};
 	float relCoef[3] = {relCoefH, relCoefM, relCoefL};
 	const float rmsTime = m_lommControls.m_rmsTimeModel.value();
-	const float rmsTimeConst = (rmsTime == 0) ? 0 : std::exp(-1.f / (rmsTime * 0.001f * m_sampleRate));
+	const float rmsTimeConst = (rmsTime == 0) ? 0 : exp(-1.f / (rmsTime * 0.001f * m_sampleRate));
 	const float knee = m_lommControls.m_kneeModel.value() * 0.5f;
 	const float range = m_lommControls.m_rangeModel.value();
 	const float rangeAmp = dbfsToAmp(range);

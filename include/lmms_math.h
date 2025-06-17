@@ -119,7 +119,7 @@ inline float sign(float val)
 }
 
 
-//! if val >= 0.0f, returns sqrt(val), else: -sqrt(-val)
+//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
 inline float sqrt_neg(float val) 
 {
 	return std::sqrt(std::abs(val)) * sign(val);

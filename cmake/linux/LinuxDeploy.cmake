@@ -160,8 +160,6 @@ foreach(_lib IN LISTS LIBS)
 	endif()
 endforeach()
 
-list(APPEND SKIP_LIBRARIES "--exclude-library=*libgallium*")
-
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
@@ -169,7 +167,6 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--desktop-file "${DESKTOP_FILE}"
 	--plugin qt
 	${LIBRARIES}
-	${SKIP_LIBRARIES}
 	--verbosity ${VERBOSITY}
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
@@ -178,7 +175,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 # Remove svg ambitiously placed by linuxdeploy
 file(REMOVE "${APP}/${lmms}.svg")
 
-# Remove libraries that are normally system-provided
+# Remove libraries that are normally sytem-provided
 file(GLOB EXCLUDE_LIBS
 	"${APP}/usr/lib/libwine*"
 	"${APP}/usr/lib/libcarla_native*"
@@ -219,58 +216,32 @@ endforeach()
 
 file(REMOVE_RECURSE "${SUIL_MODULES_TARGET}" "${APP}/usr/lib/${lmms}/ladspa/")
 
-# Copy "exclude-list" lib(s) into specified location
-macro(copy_excluded ldd_target name_match destination relocated_lib)
-	execute_process(COMMAND ldd
-		"${ldd_target}"
-		OUTPUT_VARIABLE ldd_output
-		OUTPUT_STRIP_TRAILING_WHITESPACE
-		COMMAND_ECHO ${COMMAND_ECHO}
-		COMMAND_ERROR_IS_FATAL ANY)
-
-	# escape periods to avoid double-escaping
-	string(REPLACE "." "\\." name_match "${name_match}")
-
-	# cli output --> list
-	string(REPLACE "\n" ";" ldd_list "${ldd_output}")
-
-	foreach(line ${ldd_list})
-		if(line MATCHES "${name_match}")
-			# Assumes format "libname.so.0 => /lib/location/libname.so.0 (0x00007f48d0b0e000)"
-			string(REPLACE " " ";" parts "${line}")
-			list(LENGTH parts len)
-			math(EXPR index "${len}-2")
-			list(GET parts ${index} lib)
-			# Resolve any possible symlinks
-			file(REAL_PATH "${lib}" libreal)
-			get_filename_component(symname "${lib}" NAME)
-			get_filename_component(realname "${libreal}" NAME)
-			file(MAKE_DIRECTORY "${destination}")
-			# Copy, but with original symlink name
-			file(COPY "${libreal}" DESTINATION "${destination}")
-			file(RENAME "${destination}/${realname}" "${destination}/${symname}")
-			set("${relocated_lib}" "${destination}/${symname}")
-			break()
-		endif()
-	endforeach()
-endmacro()
-
-# copy libjack
-copy_excluded("${APP}/usr/bin/${lmms}" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
-if(relocated_jack)
-	# libdb's not excluded however we'll re-use the macro as a convenient path calculation
-	# See https://github.com/LMMS/lmms/issues/7689s
-	copy_excluded("${relocated_jack}" "libdb-" "${APP}/usr/lib/jack" relocated_libdb)
-	get_filename_component(libdb_name "${relocated_libdb}" NAME)
-	if(relocated_libdb AND EXISTS "${APP}/usr/lib/${libdb_name}")
-		# assume a copy already resides in usr/lib and symlink
-		file(REMOVE "${relocated_libdb}")
-		create_symlink("${APP}/usr/lib/${libdb_name}" "${relocated_libdb}")
+# Bundle jack to avoid crash for systems without it
+# See https://github.com/LMMS/lmms/pull/4186
+execute_process(COMMAND ldd "${APP}/usr/bin/${lmms}"
+	OUTPUT_VARIABLE LDD_OUTPUT
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	COMMAND_ECHO ${COMMAND_ECHO}
+	COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
+foreach(line ${LDD_LIST})
+	if(line MATCHES "libjack\\.so")
+		# Assume format "libjack.so.0 => /lib/x86_64-linux-gnu/libjack.so.0 (0x00007f48d0b0e000)"
+		string(REPLACE " " ";" parts "${line}")
+		list(LENGTH parts len)
+		math(EXPR index "${len}-2")
+		list(GET parts ${index} lib)
+		# Get symlink target
+		file(REAL_PATH "${lib}" libreal)
+		get_filename_component(symname "${lib}" NAME)
+		get_filename_component(realname "${libreal}" NAME)
+		file(MAKE_DIRECTORY "${APP}/usr/lib/${lmms}/optional/")
+		# Copy, but with original symlink name
+		file(COPY "${libreal}" DESTINATION "${APP}/usr/lib/${lmms}/optional/")
+		file(RENAME "${APP}/usr/lib/${lmms}/optional/${realname}" "${APP}/usr/lib/${lmms}/optional/${symname}")
+		continue()
 	endif()
-endif()
-
-# cleanup empty directories
-file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/optional/")
+endforeach()
 
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)

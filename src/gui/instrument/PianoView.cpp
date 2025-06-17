@@ -777,12 +777,12 @@ IntModel* PianoView::getNearestMarker(int key, QString* title)
 	const int first = m_piano->instrumentTrack()->firstKey();
 	const int last = m_piano->instrumentTrack()->lastKey();
 
-	if (std::abs(key - base) < std::abs(key - first) && std::abs(key - base) < std::abs(key - last))
+	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
 	{
 		if (title) {*title = tr("Base note");}
 		return m_piano->instrumentTrack()->baseNoteModel();
 	}
-	else if (std::abs(key - first) < std::abs(key - last))
+	else if (abs(key - first) < abs(key - last))
 	{
 		if (title) {*title = tr("First note");}
 		return m_piano->instrumentTrack()->firstKeyModel();

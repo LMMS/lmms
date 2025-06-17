@@ -313,8 +313,8 @@ void Knob::setTextColor( const QColor & c )
 QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
 	const float rarc = m_angle * numbers::pi_v<float> / 180.0;
-	const float ca = std::cos(rarc);
-	const float sa = -std::sin(rarc);
+	const float ca = cos( rarc );
+	const float sa = -sin( rarc );
 
 	return QLineF( _mid.x() - sa*_innerRadius, _mid.y() - ca*_innerRadius,
 					_mid.x() - sa*_radius, _mid.y() - ca*_radius );

@@ -193,7 +193,7 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
-	const float totalLength = std::log10(20000);
+	float totalLength = log10( 20000 );
 	m_pixelsPerUnitWidth = width() / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
@@ -233,7 +233,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	const float fallOff = 1.07f;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
-		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * std::log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
+		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
 
 		if( peak < 0 )
 		{

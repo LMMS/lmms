@@ -700,19 +700,19 @@ gui::PluginView* NesInstrument::instantiateView( QWidget * parent )
 
 void NesInstrument::updateFreq1()
 {
-	m_freq1 = std::exp2(m_ch1Crs.value() / 12.0f);
+	m_freq1 = powf( 2, m_ch1Crs.value() / 12.0f );
 }
 
 
 void NesInstrument::updateFreq2()
 {
-	m_freq2 = std::exp2(m_ch2Crs.value() / 12.0f);
+	m_freq2 = powf( 2, m_ch2Crs.value() / 12.0f );
 }
 
 
 void NesInstrument::updateFreq3()
 {
-	m_freq3 = std::exp2(m_ch3Crs.value() / 12.0f);
+	m_freq3 = powf( 2, m_ch3Crs.value() / 12.0f );
 }
 
 
