@@ -1,8 +1,7 @@
-#include "HydrogenImport.h"
-
 #include <QDomDocument>
 
 #include "LocalFileMng.h"
+#include "HydrogenImport.h"
 #include "Song.h"
 #include "Engine.h"
 #include "Instrument.h"

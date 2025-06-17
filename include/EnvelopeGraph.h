@@ -41,12 +41,6 @@ namespace gui
 
 class EnvelopeGraph : public QWidget, public ModelView
 {
-	Q_OBJECT
-	Q_PROPERTY(QColor noAmountColor MEMBER m_noAmountColor)
-	Q_PROPERTY(QColor fullAmountColor MEMBER m_fullAmountColor)
-	Q_PROPERTY(QColor markerFillColor MEMBER m_markerFillColor)
-	Q_PROPERTY(QColor markerOutlineColor MEMBER m_markerOutlineColor)
-
 public:
 	enum class ScalingMode
 	{
@@ -74,11 +68,6 @@ private:
 	EnvelopeAndLfoParameters* m_params = nullptr;
 
 	ScalingMode m_scaling = ScalingMode::Dynamic;
-
-	QColor m_noAmountColor;
-	QColor m_fullAmountColor;
-	QColor m_markerFillColor;
-	QColor m_markerOutlineColor;
 };
 
 } // namespace gui

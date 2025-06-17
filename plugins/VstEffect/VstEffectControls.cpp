@@ -87,7 +87,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			sprintf(paramStr.data(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
@@ -137,7 +137,7 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+					sprintf(paramStr.data(), "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 			}
@@ -386,18 +386,16 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+		sprintf(paramStr.data(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		const auto & description = s_dumpValues.at(1);
-
-		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), widget, description);
-		knob->setDescription(description + ":");
-		vstKnobs[i] = knob;
+		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, widget, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
+		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{
-			std::snprintf(paramStr.data(), paramStr.size(), "%d", i);
+			sprintf(paramStr.data(), "%d", i);
 			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
 					0.0f, 1.0f, 0.01f, _eff, paramStr.data());
 		}
@@ -462,7 +460,7 @@ void ManageVSTEffectView::syncPlugin()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			sprintf(paramStr.data(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );

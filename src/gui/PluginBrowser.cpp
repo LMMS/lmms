@@ -297,7 +297,7 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 	QMenu contextMenu(this);
 	contextMenu.addAction(
 		tr("Send to new instrument track"),
-		[=, this]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+		[=]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
 	);
 	contextMenu.exec(e->globalPos());
 }

@@ -59,6 +59,7 @@
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
+#include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -139,88 +140,74 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
-	
-	auto soloMuteLayout = new QVBoxLayout();
-	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
-	soloMuteLayout->setSpacing(2);
-
-	m_muteBtn = new AutomatableButton(this, tr("Mute"));
-	m_muteBtn->setModel(&m_track->m_mutedModel);
-	m_muteBtn->setCheckable(true);
-	m_muteBtn->setObjectName("btn-mute");
-	m_muteBtn->setToolTip(tr("Mute this instrument"));
-	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
-
-	m_soloBtn = new AutomatableButton(this, tr("Solo"));
-	m_soloBtn->setModel(&m_track->m_soloModel);
-	m_soloBtn->setCheckable(true);
-	m_soloBtn->setObjectName("btn-solo");
-	m_soloBtn->setToolTip(tr("Solo this instrument"));
-	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
-
-	basicControlsLayout->addLayout(soloMuteLayout, 0, 0, 2, 1, widgetAlignment);
 
 	// set up volume knob
 	m_volumeKnob = new Knob( KnobType::Bright26, nullptr, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 
-	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
+	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
 
 	auto label = new QLabel(tr("VOL"), this);
-	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 1);
-	basicControlsLayout->setAlignment(label, labelAlignment);
+	label->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( label, 1, 0);
+	basicControlsLayout->setAlignment( label, labelAlignment );
+
 
 	// set up panning knob
 	m_panningKnob = new Knob( KnobType::Bright26, nullptr, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ), "" );
 
-	basicControlsLayout->addWidget(m_panningKnob, 0, 2);
+	basicControlsLayout->addWidget( m_panningKnob, 0, 1 );
 	basicControlsLayout->setAlignment( m_panningKnob, widgetAlignment );
 
 	label = new QLabel( tr( "PAN" ), this );
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget(label, 1, 2);
+	basicControlsLayout->addWidget( label, 1, 1);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
-	basicControlsLayout->setColumnStretch(3, 1);
+
+	basicControlsLayout->setColumnStretch(2, 1);
+
 
 	// set up pitch knob
 	m_pitchKnob = new Knob( KnobType::Bright26, nullptr, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ), " " + tr( "cents" ) );
 
-	basicControlsLayout->addWidget(m_pitchKnob, 0, 4);
+	basicControlsLayout->addWidget( m_pitchKnob, 0, 3 );
 	basicControlsLayout->setAlignment( m_pitchKnob, widgetAlignment );
 
 	m_pitchLabel = new QLabel( tr( "PITCH" ), this );
 	m_pitchLabel->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget(m_pitchLabel, 1, 4);
+	basicControlsLayout->addWidget( m_pitchLabel, 1, 3);
 	basicControlsLayout->setAlignment( m_pitchLabel, labelAlignment );
+
 
 	// set up pitch range knob
 	m_pitchRangeSpinBox= new LcdSpinBox( 2, nullptr, tr( "Pitch range (semitones)" ) );
 
-	basicControlsLayout->addWidget(m_pitchRangeSpinBox, 0, 5);
+	basicControlsLayout->addWidget( m_pitchRangeSpinBox, 0, 4 );
 	basicControlsLayout->setAlignment( m_pitchRangeSpinBox, widgetAlignment );
 
 	m_pitchRangeLabel = new QLabel( tr( "RANGE" ), this );
 	m_pitchRangeLabel->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget(m_pitchRangeLabel, 1, 5);
+	basicControlsLayout->addWidget( m_pitchRangeLabel, 1, 4);
 	basicControlsLayout->setAlignment( m_pitchRangeLabel, labelAlignment );
 
-	basicControlsLayout->setColumnStretch(6, 1);
+
+	basicControlsLayout->setColumnStretch(5, 1);
+
 
 	// setup spinbox for selecting Mixer-channel
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_itv);
 
-	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 7);
+	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );
 
-	label = new QLabel(tr("CHAN"), this);
+	label = new QLabel( tr( "CHANNEL" ), this );
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget(label, 1, 7);
+	basicControlsLayout->addWidget( label, 1, 6);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
 	auto saveSettingsBtn = new QPushButton(embed::getIconPixmap("project_save"), QString());
@@ -230,11 +217,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	saveSettingsBtn->setToolTip(tr("Save current instrument track settings in a preset file"));
 
-	basicControlsLayout->addWidget(saveSettingsBtn, 0, 8);
+	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
 
 	label = new QLabel( tr( "SAVE" ), this );
 	label->setStyleSheet( labelStyleSheet );
-	basicControlsLayout->addWidget(label, 1, 8);
+	basicControlsLayout->addWidget( label, 1, 7);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
 	generalSettingsLayout->addLayout( basicControlsLayout );
@@ -265,7 +252,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_midiView = new InstrumentMidiIOView(m_tabWidget);
 
 	// FX tab
-	m_effectView = new EffectRackView(m_track->m_audioBusHandle.effects(), m_tabWidget);
+	m_effectView = new EffectRackView(m_track->m_audioPort.effects(), m_tabWidget);
 
 	// Tuning tab
 	m_tuningView = new InstrumentTuningView(m_track, m_tabWidget);
@@ -297,12 +284,25 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	updateInstrumentView();
 
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+	Qt::WindowFlags flags = subWin->windowFlags();
+	if (!m_instrumentView->isResizable()) {
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		// any better way than this?
+	} else {
+		subWin->setMaximumSize(m_instrumentView->maximumHeight() + 12, m_instrumentView->maximumWidth() + 208);
+		subWin->setMinimumSize( m_instrumentView->minimumWidth() + 12, m_instrumentView->minimumHeight() + 208);
+	}
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	subWin->setWindowFlags( flags );
 
-	// The previous call should have given us a sub window parent. Therefore
-	// we can reuse this method.
-	updateSubWindow();
 
-	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
+	// Hide the Size and Maximize options from the system menu
+	// since the dialog size is fixed.
+	QMenu * systemMenu = subWin->systemMenu();
+	systemMenu->actions().at( 2 )->setVisible( false ); // Size
+	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
+
+	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
 	subWin->hide();
 }
 
@@ -395,19 +395,17 @@ void InstrumentTrackWindow::modelChanged()
 		m_tuningView->microtunerGroupBox()->show();
 	}
 
-	m_ssView->setModel(&m_track->m_soundShaping);
-	m_noteStackingView->setModel(&m_track->m_noteStacking);
-	m_arpeggioView->setModel(&m_track->m_arpeggio);
-	m_midiView->setModel(&m_track->m_midiPort);
-	m_effectView->setModel(m_track->m_audioBusHandle.effects());
+	m_ssView->setModel( &m_track->m_soundShaping );
+	m_noteStackingView->setModel( &m_track->m_noteStacking );
+	m_arpeggioView->setModel( &m_track->m_arpeggio );
+	m_midiView->setModel( &m_track->m_midiPort );
+	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_tuningView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
 	m_tuningView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
 	m_tuningView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
 	m_tuningView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
 	m_tuningView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
-
-	updateSubWindow();
 }
 
 
@@ -539,8 +537,8 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	m_itv->setFocus();
-	m_itv->m_tlb->setChecked(false);
+	m_itv->m_tlb->setFocus();
+	m_itv->m_tlb->setChecked( false );
 }
 
 
@@ -712,75 +710,5 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	w->update();
 }
 
-QMdiSubWindow* InstrumentTrackWindow::findSubWindowInParents()
-{
-	// TODO Move to helper? Does not seem to be provided by Qt.
-	auto p = parentWidget();
-
-	while (p != nullptr)
-	{
-		auto mdiSubWindow = dynamic_cast<QMdiSubWindow*>(p);
-		if (mdiSubWindow)
-		{
-			return mdiSubWindow;
-		}
-		else
-		{
-			p = p->parentWidget();
-		}
-	}
-
-	return nullptr;
-}
-
-void InstrumentTrackWindow::updateSubWindow()
-{
-	auto subWindow = findSubWindowInParents();
-	if (subWindow && m_instrumentView)
-	{
-		Qt::WindowFlags flags = subWindow->windowFlags();
-
-		const auto instrumentViewResizable = m_instrumentView->isResizable();
-
-		if (instrumentViewResizable)
-		{
-			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
-			const auto extraSpace = QSize(12, 208);
-			subWindow->setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
-			subWindow->setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
-
-			flags &= ~Qt::MSWindowsFixedSizeDialogHint;
-			flags |= Qt::WindowMaximizeButtonHint;
-		}
-		else
-		{
-			flags |= Qt::MSWindowsFixedSizeDialogHint;
-			flags &= ~Qt::WindowMaximizeButtonHint;
-
-			// The sub window might be reused from an instrument that was maximized. Show the sub window
-			// as normal, i.e. not maximized, if the instrument view is not resizable.
-			if (subWindow->isMaximized())
-			{
-				subWindow->showNormal();
-			}
-		}
-
-		subWindow->setWindowFlags(flags);
-
-		// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
-		QMenu * systemMenu = subWindow->systemMenu();
-		systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
-		systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
-		
-		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
-		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
-		// missing some implementation details that QMdiSubWindow has.
-		auto subWin = dynamic_cast<SubWindow*>(subWindow);
-		if (subWin)
-		{
-			subWin->updateTitleBar();
-		}
-	}
-}
 
 } // namespace lmms::gui

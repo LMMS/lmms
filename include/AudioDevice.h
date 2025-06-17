@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 class QThread;
 
@@ -36,7 +36,7 @@ namespace lmms
 {
 
 class AudioEngine;
-class AudioBusHandle;
+class AudioPort;
 class SampleFrame;
 
 
@@ -57,13 +57,14 @@ public:
 	}
 
 
-	// if audio-driver supports ports, classes inherting AudioBusHandle
+	// if audio-driver supports ports, classes inherting AudioPort
 	// (e.g. channel-tracks) can register themselves for making
 	// audio-driver able to collect their individual output and provide
 	// them at a specific port - currently only supported by JACK
-	virtual void registerPort(AudioBusHandle* port);
-	virtual void unregisterPort(AudioBusHandle* port);
-	virtual void renamePort(AudioBusHandle* port);
+	virtual void registerPort( AudioPort * _port );
+	virtual void unregisterPort( AudioPort * _port );
+	virtual void renamePort( AudioPort * _port );
+
 
 	inline bool supportsCapture() const
 	{
@@ -73,6 +74,11 @@ public:
 	inline sample_rate_t sampleRate() const
 	{
 		return m_sampleRate;
+	}
+
+	ch_cnt_t channels() const
+	{
+		return m_channels;
 	}
 
 	void processNextBuffer();
@@ -102,11 +108,6 @@ protected:
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,
 							const fpp_t _frames );
-
-	ch_cnt_t channels() const
-	{
-		return m_channels;
-	}
 
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{

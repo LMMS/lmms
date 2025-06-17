@@ -140,7 +140,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw coarse grid
 	pmp.setPen( QPen( coarseGridColor(), coarseGridWidth() ) );
-	for (float x = 0; x <= w * 2; x += ppb * coarseGridResolution)
+	for (float x = 0; x < w * 2; x += ppb * coarseGridResolution)
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
@@ -598,8 +598,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-		const TimePos pos = TimePos(getPosition(me->x())).quantize(snapSize, true);
+		const TimePos pos = getPosition( me->x() ).getBar() *
+						TimePos::ticksPerBar();
 		getTrack()->createClip(pos);
 	}
 }

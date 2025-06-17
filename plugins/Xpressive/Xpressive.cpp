@@ -40,6 +40,8 @@
 #include "Song.h"
 
 #include "base64.h"
+#include "lmms_constants.h"
+
 #include "embed.h"
 
 #include "ExprSynth.h"
@@ -250,15 +252,14 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		const int guass_size = (int)(smoothness * 5) | 1;
 		const int guass_center = guass_size/2;
 		const float delta = smoothness;
-		constexpr float inv_sqrt2pi = std::numbers::inv_sqrtpi_v<float> / std::numbers::sqrt2_v<float>;
-		const float a = inv_sqrt2pi / delta;
+		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;
 		for (int i = 0; i < guass_size; i++)
 		{
 			temp = (i - guass_center) / delta;
-			sum += guassian[i] = a * std::exp(-0.5f * temp * temp);
+			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
 		}
 		for (int i = 0; i < guass_size; i++)
 		{
@@ -552,7 +553,7 @@ void XpressiveView::expressionChanged() {
 		ExprFront expr(text.constData(),sample_rate);
 		float t=0;
 		const float f=10,key=5,v=0.5;
-		unsigned int frame_counter = 0;
+		unsigned int i;
 		expr.add_variable("t", t);
 
 		if (m_output_expr)
@@ -571,24 +572,20 @@ void XpressiveView::expressionChanged() {
 			expr.add_cyclic_vector("W2",e->graphW2().samples(),e->graphW2().length());
 			expr.add_cyclic_vector("W3",e->graphW3().samples(),e->graphW3().length());
 		}
-		expr.setIntegrate(&frame_counter,sample_rate);
+		expr.setIntegrate(&i,sample_rate);
 		expr.add_constant("srate",sample_rate);
 
 		const bool parse_ok=expr.compile();
 
 		if (parse_ok) {
 			e->exprValid().setValue(0);
-			const unsigned int length = static_cast<unsigned int>(m_raw_graph->length());
+			const auto length = static_cast<std::size_t>(m_raw_graph->length());
 			auto const samples = new float[length];
-			// frame_counter's reference is used in the integrate function.
-			for (frame_counter = 0; frame_counter < length; ++frame_counter)
-			{
-				t = frame_counter / (float) length;
-				samples[frame_counter] = expr.evaluate();
-				if (std::isinf(samples[frame_counter]) != 0 || std::isnan(samples[frame_counter]) != 0)
-				{
-					samples[frame_counter] = 0;
-				}
+			for (auto i = std::size_t{0}; i < length; i++) {
+				t = i / (float) length;
+				samples[i] = expr.evaluate();
+				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0)
+					samples[i] = 0;
 			}
 			m_raw_graph->setSamples(samples);
 			delete[] samples;

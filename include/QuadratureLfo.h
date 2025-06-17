@@ -25,8 +25,7 @@
 #ifndef LMMS_QUADRATURE_LFO_H
 #define LMMS_QUADRATURE_LFO_H
 
-#include <numbers>
-#include <cmath>
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -38,7 +37,7 @@ public:
 	QuadratureLfo( int sampleRate ) :
 		m_frequency(0),
 		m_phase(0),
-		m_offset(std::numbers::pi * 0.5)
+		m_offset(D_PI / 2)
 	{
 		setSampleRate(sampleRate);
 	}
@@ -65,7 +64,7 @@ public:
 	inline void setSampleRate ( int samplerate )
 	{
 		m_samplerate = samplerate;
-		m_twoPiOverSr = 2 * std::numbers::pi_v<float> / samplerate;
+		m_twoPiOverSr = F_2PI / samplerate;
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 
@@ -78,10 +77,14 @@ public:
 
 	void tick( float *l, float *r )
 	{
-		*l = std::sin(m_phase);
-		*r = std::sin(m_phase + m_offset);
+		*l = sinf( m_phase );
+		*r = sinf( m_phase + m_offset );
 		m_phase += m_increment;
-		m_phase = std::fmod(m_phase, 2 * std::numbers::pi);
+
+		while (m_phase >= D_2PI)
+		{
+			m_phase -= D_2PI;
+		}
 	}
 
 private:

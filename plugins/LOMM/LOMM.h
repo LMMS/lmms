@@ -30,6 +30,7 @@
 #include "Effect.h"
 
 #include "BasicFilters.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -54,7 +55,7 @@ public:
 	
 	inline float msToCoeff(float ms)
 	{
-		return (ms == 0) ? 0 : std::exp(m_coeffPrecalc / ms);
+		return (ms == 0) ? 0 : exp(m_coeffPrecalc / ms);
 	}
 
 private slots:

@@ -30,6 +30,7 @@
 #include <QLineEdit>
 
 #include "Engine.h"
+#include "debug.h"
 #include "ConfigManager.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
@@ -151,7 +152,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 			break;
 		}
 		if (closestSupportedSampleRate == -1 ||
-			std::abs(range->max - currentSampleRate) < std::abs(closestSupportedSampleRate - currentSampleRate))
+			abs(range->max - currentSampleRate) < abs(closestSupportedSampleRate - currentSampleRate))
 		{
 			closestSupportedSampleRate = range->max;
 		}
@@ -466,8 +467,7 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 	reconnectSoundIo();
 
-	[[maybe_unused]] bool ok = connect(&m_backendModel, &ComboBoxModel::dataChanged,
-		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
+	bool ok = connect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
 	assert(ok);
 
 	m_backend->setModel( &m_backendModel );
@@ -476,8 +476,7 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioSoundIo::setupWidget::~setupWidget()
 {
-	[[maybe_unused]] bool ok = disconnect(&m_backendModel, &ComboBoxModel::dataChanged,
-		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
+	bool ok = disconnect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
 	assert(ok);
 	if (m_soundio)
 	{

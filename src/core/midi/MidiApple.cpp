@@ -159,7 +159,7 @@ void MidiApple::removePort( MidiPort* port )
 
 QString MidiApple::sourcePortName( const MidiEvent& event ) const
 {
-	qDebug("sourcePortName");
+	qDebug("sourcePortName return '%s'?\n", event.sourcePort());
 	/*
 	if( event.sourcePort() )
 	{
@@ -501,7 +501,7 @@ void MidiApple::openDevices()
 void MidiApple::openMidiReference( MIDIEndpointRef reference, QString refName, bool isIn )
 {
 	char * registeredName = (char*) malloc(refName.length()+1);
-	std::snprintf(registeredName, refName.length() + 1, "%s",refName.toLatin1().constData());
+	sprintf(registeredName, "%s",refName.toLatin1().constData());
 	qDebug("openMidiReference refName '%s'",refName.toLatin1().constData());
 	
 	MIDIClientRef mClient = getMidiClientRef();
@@ -623,7 +623,7 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 	size_t deviceNameLen = deviceName == nullptr ? 0 : strlen(deviceName);
 	size_t endPointNameLen = endPointName == nullptr ? 0 : strlen(endPointName);
 	char * fullName = (char *)malloc(deviceNameLen + endPointNameLen + 2);
-	std::snprintf(fullName, deviceNameLen + endPointNameLen + 2, "%s:%s", deviceName,endPointName);
+	sprintf(fullName, "%s:%s", deviceName,endPointName);
 	if (deviceName != nullptr) { free(deviceName); }
 	if (endPointName != nullptr) { free(endPointName); }
 	return fullName;

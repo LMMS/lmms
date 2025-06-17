@@ -41,7 +41,11 @@ public:
 	{
 	}
 
-	virtual bool isResizable() const { return false; }
+	void setResizable(bool resizable) { m_isResizable = resizable; }
+	bool isResizable() { return m_isResizable; }
+
+private:
+	bool m_isResizable = false;
 };
 
 } // namespace lmms::gui

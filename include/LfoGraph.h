@@ -41,10 +41,6 @@ namespace gui
 
 class LfoGraph : public QWidget, public ModelView
 {
-	Q_OBJECT
-	Q_PROPERTY(QColor noAmountColor MEMBER m_noAmountColor)
-	Q_PROPERTY(QColor fullAmountColor MEMBER m_fullAmountColor)
-
 public:
 	LfoGraph(QWidget* parent);
 
@@ -60,8 +56,6 @@ private:
 	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
 
 	float m_randomGraph {0.};
-	QColor m_noAmountColor;
-	QColor m_fullAmountColor;
 };
 
 } // namespace gui

@@ -50,7 +50,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_closeBtn->resize(m_buttonSize);
 	m_closeBtn->setToolTip(tr("Close"));
 	connect(m_closeBtn, &QPushButton::clicked,
-		[this]() { this->closeButtonClicked(); });
+		[=]() { this->closeButtonClicked(); });
 }
 
 

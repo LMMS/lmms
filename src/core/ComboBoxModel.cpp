@@ -29,17 +29,20 @@
 namespace lmms
 {
 
-void ComboBoxModel::addItem(QString item, std::unique_ptr<PixmapLoader> loader)
+using std::unique_ptr;
+using std::move;
+
+void ComboBoxModel::addItem( QString item, unique_ptr<PixmapLoader> loader )
 {
-	m_items.emplace_back(std::move(item), std::move(loader));
+	m_items.emplace_back( move(item), move(loader) );
 	setRange( 0, m_items.size() - 1 );
 }
 
 
-void ComboBoxModel::replaceItem(std::size_t index, QString item, std::unique_ptr<PixmapLoader> loader)
+void ComboBoxModel::replaceItem(std::size_t index, QString item, unique_ptr<PixmapLoader> loader)
 {
 	assert(index < m_items.size());
-	m_items[index] = Item(std::move(item), std::move(loader));
+	m_items[index] = Item(move(item), move(loader));
 	emit propertiesChanged();
 }
 

@@ -25,9 +25,14 @@
 #include <QMouseEvent>
 #include <QPainter>
 
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+
 #include "GroupBox.h"
 #include "embed.h"
 #include "FontHelper.h"
+
 
 namespace lmms::gui
 {

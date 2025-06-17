@@ -26,10 +26,8 @@
 #ifndef LMMS_TIME_POS_H
 #define LMMS_TIME_POS_H
 
-#include <algorithm>
-#include <cassert>
 #include "lmms_export.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {
@@ -53,8 +51,8 @@ class LMMS_EXPORT TimeSig
 public:
 	TimeSig( int num, int denom );
 	TimeSig( const MeterModel &model );
-	int numerator() const { return m_num; }
-	int denominator() const { return m_denom; }
+	int numerator() const;
+	int denominator() const;
 private:
 	int m_num;
 	int m_denom;
@@ -70,73 +68,43 @@ public:
 	TimePos( const bar_t bar, const tick_t ticks );
 	TimePos( const tick_t ticks = 0 );
 
-	TimePos quantize(float bars, bool forceRoundDown = false) const;
-	TimePos toAbsoluteBar() const { return getBar() * s_ticksPerBar; }
+	TimePos quantize(float) const;
+	TimePos toAbsoluteBar() const;
 
-	TimePos& operator+=(const TimePos& time)
-	{
-		m_ticks += time.m_ticks;
-		return *this;
-	}
-
-	TimePos& operator-=(const TimePos& time)
-	{
-		m_ticks -= time.m_ticks;
-		return *this;
-	}
+	TimePos& operator+=( const TimePos& time );
+	TimePos& operator-=( const TimePos& time );
 
 	// return the bar, rounded down and 0-based
-	bar_t getBar() const { return m_ticks / s_ticksPerBar; }
-
+	bar_t getBar() const;
 	// return the bar, rounded up and 0-based
-	bar_t nextFullBar() const { return (m_ticks + (s_ticksPerBar - 1)) / s_ticksPerBar; }
+	bar_t nextFullBar() const;
 
-	void setTicks(tick_t ticks) { m_ticks = ticks; }
-	tick_t getTicks() const { return m_ticks; }
+	void setTicks( tick_t ticks );
+	tick_t getTicks() const;
 
-	operator int() const { return m_ticks; }
+	operator int() const;
 
-	tick_t ticksPerBeat(const TimeSig& sig) const { return ticksPerBar(sig) / sig.numerator(); }
-
+	tick_t ticksPerBeat( const TimeSig &sig ) const;
 	// Remainder ticks after bar is removed
-	tick_t getTickWithinBar(const TimeSig& sig) const { return m_ticks % ticksPerBar(sig); }
-
+	tick_t getTickWithinBar( const TimeSig &sig ) const;
 	// Returns the beat position inside the bar, 0-based
-	tick_t getBeatWithinBar(const TimeSig& sig) const { return getTickWithinBar(sig) / ticksPerBeat(sig); }
-
+	tick_t getBeatWithinBar( const TimeSig &sig ) const;
 	// Remainder ticks after bar and beat are removed
-	tick_t getTickWithinBeat(const TimeSig& sig) const { return getTickWithinBar(sig) % ticksPerBeat(sig); }
+	tick_t getTickWithinBeat( const TimeSig &sig ) const;
 
 	// calculate number of frame that are needed this time
-	f_cnt_t frames(const float framesPerTick) const
-	{
-		// Before, step notes used to have negative length. This
-		// assert is a safeguard against negative length being
-		// introduced again (now using Note Types instead #5902)
-		assert(m_ticks >= 0);
-		return static_cast<f_cnt_t>(m_ticks * framesPerTick);
-	}
+	f_cnt_t frames( const float framesPerTick ) const;
 
-	double getTimeInMilliseconds(bpm_t beatsPerMinute) const { return ticksToMilliseconds(getTicks(), beatsPerMinute); }
+	double getTimeInMilliseconds( bpm_t beatsPerMinute ) const;
 
-	static TimePos fromFrames(const f_cnt_t frames, const float framesPerTick)
-	{
-		return TimePos(static_cast<int>(frames / framesPerTick));
-	}
-
-	static tick_t ticksPerBar() { return s_ticksPerBar; }
-	static tick_t ticksPerBar(const TimeSig& sig) { return DefaultTicksPerBar * sig.numerator() / sig.denominator(); }
-
-	static int stepsPerBar() { return std::max(1, ticksPerBar() / DefaultBeatsPerBar); }
-	static void setTicksPerBar(tick_t ticks) { s_ticksPerBar = ticks; }
-	static TimePos stepPosition(int step) { return step * ticksPerBar() / stepsPerBar(); }
-
-	static double ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
-	{
-		return ticksToMilliseconds(static_cast<double>(ticks), beatsPerMinute);
-	}
-
-	static double ticksToMilliseconds(double ticks, bpm_t beatsPerMinute) { return (ticks * 1250) / beatsPerMinute; }
+	static TimePos fromFrames( const f_cnt_t frames, const float framesPerTick );
+	static tick_t ticksPerBar();
+	static tick_t ticksPerBar( const TimeSig &sig );
+	static int stepsPerBar();
+	static void setTicksPerBar( tick_t tpt );
+	static TimePos stepPosition( int step );
+	static double ticksToMilliseconds( tick_t ticks, bpm_t beatsPerMinute );
+	static double ticksToMilliseconds( double ticks, bpm_t beatsPerMinute );
 
 private:
 	tick_t m_ticks;

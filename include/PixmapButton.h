@@ -45,7 +45,6 @@ public:
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
 
 	QSize sizeHint() const override;
-	QSize minimumSizeHint() const override;
 
 signals:
 	void doubleClicked();

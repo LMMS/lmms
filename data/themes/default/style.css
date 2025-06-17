@@ -179,7 +179,6 @@ lmms--gui--PianoRoll {
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
 	qproperty-stepNoteColor: #9b1313;
-	qproperty-currentStepNoteColor: rgb(245, 3, 139);
 	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
@@ -387,24 +386,6 @@ lmms--gui--TrackView > QWidget {
 }
 
 
-QPushButton#btn {
-	color: #d1d8e4;
-	padding: 2 4;
-	border: 1 solid #000;
-	border-radius: 3;
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 20%), stop:0.1 rgba(255, 255, 255, 4%), stop:0.9 rgba(0, 0, 0, 4%), stop:1 rgba(0, 0, 0, 40%));
-}
-
-QPushButton#btn:hover {
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 25%), stop:0.1 rgba(255, 255, 255, 7%), stop:0.9 rgba(255, 255, 255, 4%), stop:1 rgba(0, 0, 0, 35%));
-}
-
-QPushButton#btn:pressed,
-QPushButton#btn:checked {
-	color: #02ee89;
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 25%), stop:0.1 transparent, stop:0.9 rgba(0, 0, 0, 15%), stop:1 rgba(0, 0, 0, 35%));
-}
-
 /* autoscroll, loop, stop behaviour toggle buttons */
 
 /* track background config */
@@ -430,63 +411,29 @@ lmms--gui--TrackContentWidget {
 
 /* gear button in tracks */
 
-
-/* 20px = 1px border + 2px padding + 14px icon + 2px padding + 1px border */
-QPushButton#btn-mute,
-QPushButton#btn-mute-inv:checked,
-QPushButton#btn-solo,
-lmms--gui--TrackOperationsWidget QPushButton {
-	min-height: 14;
-	max-height: 14;
-	min-width: 14;
-	max-width: 14;
-	padding: 2;
-	border: 1 solid #0f1621;
-	border-top: 1 solid #18202b;
-	border-bottom: 1 solid #02060f;
-	border-radius: 2;
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 20%), stop:0.1 rgba(255, 255, 255, 2%), stop:0.9 rgba(0, 0, 0, 2%), stop:1 rgba(0, 0, 0, 40%));
+lmms--gui--TrackOperationsWidget > QPushButton {
+	max-height: 26px;
+	max-width: 26px;
+	min-height: 26px;
+	min-width: 26px;
+	background: none;
+	border: none;
 }
 
-lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
-	image: none;
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
+	image: url("resources:trackop.png");
+	subcontrol-origin: padding;
+	subcontrol-position: center;
+	position: relative;
+	top: 1px;
 }
 
-lmms--gui--TrackOperationsWidget QPushButton {
-	image: url("resources:gear.svg");
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:pressed,
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:checked {
+	image: url("resources:trackop.png");
+	position: relative;
+	top: 2px;
 }
-
-QPushButton#btn-mute,
-QPushButton#btn-mute-inv:checked {
-	image: url("resources:speaker.svg");
-}
-
-QPushButton#btn-solo {
-	image: url("resources:headphones.svg");
-}
-
-QPushButton#btn-mute:hover,
-QPushButton#btn-solo:hover,
-lmms--gui--TrackOperationsWidget QPushButton:hover {
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 25%), stop:0.1 rgba(255, 255, 255, 7%), stop:0.9 transparent, stop:1 rgba(0, 0, 0, 35%));
-}
-
-lmms--gui--TrackOperationsWidget QPushButton:pressed {
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 25%), stop:0.1 transparent, stop:0.8 rgba(0, 0, 0, 15%), stop:1 rgba(0, 0, 0, 35%));
-}
-
-QPushButton#btn-mute-inv,
-QPushButton#btn-mute:checked {
-	image: url("resources:speaker_slash.svg");
-	border: 1 solid #890120;
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e2515b, stop:0.1 #d40237, stop:0.9 #d40237, stop:1 #900122);
-}
-
-QPushButton#btn-solo:checked {
-	border: 1 solid #055f89;
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5aa8d9, stop:0.1 #2696d1, stop:0.9 #2696d1, stop:1 #16638c);
-}
-
 
 /* font sizes */
 
@@ -654,11 +601,17 @@ lmms--gui--TrackLabelButton:hover {
 	background: #3B424A;
 	border: 1px solid #515B66;
 	border-radius: none;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:pressed {
 	background: #262B30;
 	border-radius: none;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:checked {
@@ -666,12 +619,17 @@ lmms--gui--TrackLabelButton:checked {
 	background: #1C1F24;
 	background-image: url("resources:track_shadow_p.png");
 	border-radius: none;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 1px;
 }
 
 lmms--gui--TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
 	background-image: url("resources:track_shadow_p.png");
+	font-size: 11px;
+	padding: 2px 1px;
 	font-weight: solid;
 }
 
@@ -822,7 +780,6 @@ lmms--gui--ClipView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgba(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
-	qproperty-markerColor: rgb(0, 0, 0);
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 7px 2px;
 	qproperty-mouseHotspotKnife: 0px 0px;
@@ -889,21 +846,6 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-radius: 2px;
 }
 
-/* Instrument */
-
-/* Envelope graph */
-lmms--gui--EnvelopeGraph {
-	qproperty-noAmountColor: rgb(96, 91, 96);
-	qproperty-fullAmountColor: rgb(0, 255, 128);
-	qproperty-markerFillColor: rgb(153, 175, 255);
-	qproperty-markerOutlineColor: rgb(0, 0, 0);
-}
-
-/* LFO graph */
-lmms--gui--LfoGraph {
-	qproperty-noAmountColor: rgb(96, 91, 96);
-	qproperty-fullAmountColor: rgb(0, 255, 128);
-}
 
 /* Plugins */
 
@@ -1128,12 +1070,6 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
-}
-
-lmms--gui--VectorView {
-	qproperty-colorTrace: rgba(60, 255, 130, 255);
-	qproperty-colorGrid: rgba(76, 80, 84, 128);
-	qproperty-colorLabels: rgba(76, 80, 84, 255);
 }
 
 lmms--gui--BarModelEditor {

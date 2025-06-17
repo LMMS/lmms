@@ -102,11 +102,15 @@ void PixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
 }
 
 
-void PixmapButton::setActiveGraphic(const QPixmap &pm)
+
+
+void PixmapButton::setActiveGraphic( const QPixmap & _pm )
 {
-	m_activePixmap = pm;
-	resize(embed::logicalSize(m_activePixmap));
+	m_activePixmap = _pm;
+	resize( m_activePixmap.width(), m_activePixmap.height() );
 }
+
+
 
 
 void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
@@ -120,14 +124,16 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 QSize PixmapButton::sizeHint() const
 {
-	return minimumSizeHint();
+	if (isActive())
+	{
+		return m_activePixmap.size();
+	}
+	else 
+	{
+		return m_inactivePixmap.size();
+	}
 }
 
-QSize PixmapButton::minimumSizeHint() const
-{
-	return embed::logicalSize(m_activePixmap)
-		.expandedTo(embed::logicalSize(m_inactivePixmap));
-}
 
 bool PixmapButton::isActive() const
 {

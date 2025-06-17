@@ -159,6 +159,17 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
+#if 0
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
+#ifdef LMMS_HAVE_SCHED_H
+	cpu_set_t mask;
+	CPU_ZERO( &mask );
+	CPU_SET( 0, &mask );
+	sched_setaffinity( 0, sizeof( mask ), &mask );
+#endif
+#endif
+#endif
+
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
@@ -210,7 +221,7 @@ void ProjectRenderer::abortProcessing()
 
 void ProjectRenderer::updateConsoleProgress()
 {
-	constexpr int cols = 50;
+	const int cols = 50;
 	static int rot = 0;
 	auto buf = std::array<char, 80>{};
 	auto prog = std::array<char, cols + 1>{};
@@ -221,9 +232,9 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const auto activity = "|/-\\";
+	const auto activity = (const char*)"|/-\\";
 	std::fill(buf.begin(), buf.end(), 0);
-	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
+	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 

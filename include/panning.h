@@ -26,7 +26,8 @@
 #ifndef LMMS_PANNING_H
 #define LMMS_PANNING_H
 
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
+#include "panning_constants.h"
 #include "Midi.h"
 #include "volume.h"
 
@@ -35,10 +36,6 @@
 namespace lmms
 {
 
-inline constexpr panning_t PanningRight = 100;
-inline constexpr panning_t PanningLeft = -PanningRight;
-inline constexpr panning_t PanningCenter = 0;
-inline constexpr panning_t DefaultPanning = PanningCenter;
 
 inline StereoVolumeVector panningToVolumeVector( panning_t _p,
 							float _scale = 1.0f )

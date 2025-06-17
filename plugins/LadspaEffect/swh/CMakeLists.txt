@@ -13,7 +13,7 @@ ENDIF()
 # Additional compile flags
 if(NOT MSVC)
 	set(COMPILE_FLAGS ${COMPILE_FLAGS} -O3 -c
-		-funroll-loops -ffast-math -fno-strict-aliasing
+		-fomit-frame-pointer -funroll-loops -ffast-math -fno-strict-aliasing
 		${PIC_FLAGS}
 	)
 endif()

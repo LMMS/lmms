@@ -44,9 +44,7 @@ namespace gui
 
 LfoGraph::LfoGraph(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this),
-	m_noAmountColor(96, 91, 96),
-	m_fullAmountColor(0, 255, 128)
+	ModelView(nullptr, this)
 {
 	setMinimumSize(m_lfoGraph.size());
 }
@@ -145,7 +143,9 @@ void LfoGraph::paintEvent(QPaintEvent*)
 
 	// Compute the color of the lines based on the amount of the LFO
 	const float absAmount = std::abs(amount);
-	const QColor lineColor{ColorHelper::interpolateInRgb(m_noAmountColor, m_fullAmountColor, absAmount)};
+	const QColor noAmountColor{96, 91, 96};
+	const QColor fullAmountColor{0, 255, 128};
+	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
 
 	p.setPen(QPen(lineColor, 1.5));
 

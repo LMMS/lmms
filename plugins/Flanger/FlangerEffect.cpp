@@ -23,9 +23,6 @@
  */
 
 #include "FlangerEffect.h"
-
-#include <numbers>
-
 #include "Engine.h"
 #include "MonoDelay.h"
 #include "QuadratureLfo.h"
@@ -97,7 +94,7 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t f
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::audioEngine()->outputSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
-	m_lfo->setOffset(m_flangerControls.m_lfoPhaseModel.value() / 180 * std::numbers::pi);
+	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
@@ -106,8 +103,8 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t f
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += fastRand(-1.f, +1.f) * noise;
-		buf[f][1] += fastRand(-1.f, +1.f) * noise;
+		buf[f][0] += (fastRandf(2.0f) - 1.0f) * noise;
+		buf[f][1] += (fastRandf(2.0f) - 1.0f) * noise;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);

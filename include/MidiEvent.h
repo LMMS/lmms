@@ -27,7 +27,7 @@
 
 #include <cstdlib>
 #include "Midi.h"
-#include "panning.h"
+#include "panning_constants.h"
 #include "volume.h"
 
 namespace lmms

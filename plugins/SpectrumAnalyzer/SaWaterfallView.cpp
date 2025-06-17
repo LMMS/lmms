@@ -54,7 +54,6 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
-	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, this, &SaWaterfallView::updateVisibility);
 
 	m_displayTop = 1;
 	m_displayBottom = height() -2;

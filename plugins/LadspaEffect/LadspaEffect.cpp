@@ -279,8 +279,9 @@ void LadspaEffect::pluginInstantiation()
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
+	const ch_cnt_t lmms_chnls = Engine::audioEngine()->audioDev()->channels();
 	int effect_channels = manager->getDescription( m_key )->inputChannels;
-	setProcessorCount(DEFAULT_CHANNELS / effect_channels);
+	setProcessorCount( lmms_chnls / effect_channels );
 
 	// get inPlaceBroken property
 	m_inPlaceBroken = manager->isInplaceBroken( m_key );

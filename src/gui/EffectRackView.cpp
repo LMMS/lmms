@@ -23,15 +23,13 @@
  *
  */
 
-#include "EffectRackView.h"
-
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "DeprecationHelper.h"
+#include "EffectRackView.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "GroupBox.h"
@@ -65,7 +63,6 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	auto addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
-	addButton->setFocusPolicy(Qt::NoFocus);
 
 	effectsLayout->addWidget( addButton );
 
@@ -179,13 +176,13 @@ void EffectRackView::update()
 			connect(view, &EffectView::deletedPlugin, this, &EffectRackView::deletePlugin, Qt::QueuedConnection);
 
 			QAction* moveUpAction = new QAction(view);
-			moveUpAction->setShortcut(combine(Qt::Key_Up, Qt::AltModifier));
+			moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
 			moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 			connect(moveUpAction, &QAction::triggered, view, &EffectView::moveUp);
 			view->addAction(moveUpAction);
 
 			QAction* moveDownAction = new QAction(view);
-			moveDownAction->setShortcut(combine(Qt::Key_Down, Qt::AltModifier));
+			moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
 			moveDownAction->setShortcutContext(Qt::WidgetShortcut);
 			connect(moveDownAction, &QAction::triggered, view, &EffectView::moveDown);
 			view->addAction(moveDownAction);

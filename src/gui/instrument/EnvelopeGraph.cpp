@@ -30,6 +30,7 @@
 #include <QMenu>
 
 #include "EnvelopeAndLfoParameters.h"
+#include "lmms_math.h"
 #include "ColorHelper.h"
 
 #include <cmath>
@@ -43,11 +44,7 @@ namespace gui
 
 EnvelopeGraph::EnvelopeGraph(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this),
-	m_noAmountColor(96, 91, 96),
-	m_fullAmountColor(0, 255, 128),
-	m_markerFillColor(153, 175, 255),
-	m_markerOutlineColor(0, 0, 0)
+	ModelView(nullptr, this)
 {
 	setMinimumSize(m_envGraph.size());
 }
@@ -209,7 +206,9 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 
 	// Compute the color of the lines based on the amount of the envelope
 	const float absAmount = std::abs(amount);
-	const QColor lineColor{ColorHelper::interpolateInRgb(m_noAmountColor, m_fullAmountColor, absAmount)};
+	const QColor noAmountColor{96, 91, 96};
+	const QColor fullAmountColor{0, 255, 128};
+	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
 
 	// Determine the line width so that it scales with the widget
 	// Use the minimum value of the current width and height to compute it.
@@ -222,11 +221,14 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	p.drawPolyline(linePoly);
 
 	// Now draw all marker on top of the lines
+	const QColor markerFillColor{153, 175, 255};
+	const QColor markerOutlineColor{0, 0, 0};
+
 	QPen pen;
 	pen.setWidthF(lineWidth * 0.75);
-	pen.setBrush(m_markerOutlineColor);
+	pen.setBrush(markerOutlineColor);
 	p.setPen(pen);
-	p.setBrush(m_markerFillColor);
+	p.setBrush(markerFillColor);
 
 	// Compute the size of the circle we will draw based on the line width
 	const qreal baseRectSize = lineWidth * 3;

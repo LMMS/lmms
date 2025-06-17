@@ -94,7 +94,9 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
-	// Set up timeline
+	m_zoomingModel->setParent(this);
+	m_snappingModel->setParent(this);
+
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
 		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),
@@ -111,7 +113,7 @@ SongEditor::SongEditor( Song * song ) :
 	// when tracks realign, adjust height of position line
 	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
 
-	m_positionLine = new PositionLine(this, Song::PlayMode::Song);
+	m_positionLine = new PositionLine(this);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 	connect( m_song, SIGNAL(playbackStateChanged()),
@@ -242,15 +244,10 @@ SongEditor::SongEditor( Song * song ) :
 	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
-
-	// Set up zooming model
-	m_zoomingModel->setParent(this);
-	m_zoomingModel->setJournalling(false);
+	//zoom connects
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
-
 	// Set up snapping model
-	m_snappingModel->setParent(this);
 	for (float bars : SNAP_SIZES)
 	{
 		if (bars > 1.0f)
@@ -519,12 +516,6 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 
 
-void SongEditor::adjustLeftRightScoll(int value)
-{
-	m_leftRightScroll->setValue(m_leftRightScroll->value()
-						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
-}
-
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
@@ -553,11 +544,13 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		adjustLeftRightScoll(we->angleDelta().x());
+		m_leftRightScroll->setValue(m_leftRightScroll->value()
+							- we->angleDelta().x());
 	}
 	else if (we->modifiers() & Qt::ShiftModifier)
 	{
-		adjustLeftRightScoll(we->angleDelta().y());
+		m_leftRightScroll->setValue(m_leftRightScroll->value()
+							- we->angleDelta().y());
 	}
 	else
 	{
@@ -962,7 +955,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split clips)"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 

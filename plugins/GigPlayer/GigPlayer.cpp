@@ -1101,7 +1101,9 @@ GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 		if( region->PitchTrack == true )
 		{
 			// Calculate what frequency the provided sample is
-			sampleFreq = 440.0f * std::exp2((region->UnityNote - 69 - region->FineTune * 0.01) / 12.0f);
+			sampleFreq = 440.0 * powf( 2, 1.0 / 12 * (
+						1.0 * region->UnityNote - 69 -
+						0.01 * region->FineTune ) );
 			freqFactor = sampleFreq / desiredFreq;
 		}
 
@@ -1340,7 +1342,7 @@ float ADSR::value()
 	{
 		// Maybe not the best way of doing this, but it appears to be about right
 		// Satisfies f(0) = sustain and f(releaseLength) = very small
-		amplitude = (sustain + 1e-3) * std::exp(-5.0f / releaseLength * releasePosition) - 1e-3;
+		amplitude = ( sustain + 1e-3 ) * expf( -5.0 / releaseLength * releasePosition ) - 1e-3;
 
 		// Don't have an infinite exponential decay
 		if( amplitude <= 0 || releasePosition >= releaseLength )

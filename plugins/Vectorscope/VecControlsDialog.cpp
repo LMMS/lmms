@@ -44,31 +44,45 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	m_controls(controls)
 {
 	auto master_layout = new QVBoxLayout;
-	master_layout->setContentsMargins(0, 0, 0, 0);
+	master_layout->setContentsMargins(0, 2, 0, 0);
 	setLayout(master_layout);
 
 	// Visualizer widget
-	auto display = new VectorView(controls, m_controls->m_effect->getBuffer(), this);
+	// The size of 768 pixels seems to offer a good balance of speed, accuracy and trace thickness.
+	auto display = new VectorView(controls, m_controls->m_effect->getBuffer(), 768, this);
 	master_layout->addWidget(display);
 
-	auto controlLayout = new QHBoxLayout();
-	master_layout->addLayout(controlLayout);
+	// Config area located inside visualizer
+	auto internal_layout = new QVBoxLayout(display);
+	auto config_layout = new QHBoxLayout();
+	auto switch_layout = new QVBoxLayout();
+	internal_layout->addStretch();
+	internal_layout->addLayout(config_layout);
+	config_layout->addLayout(switch_layout);
+
+	// High-quality switch
+	auto highQualityButton = new LedCheckBox(tr("HQ"), this);
+	highQualityButton->setToolTip(tr("Double the resolution and simulate continuous analog-like trace."));
+	highQualityButton->setCheckable(true);
+	highQualityButton->setModel(&controls->m_highQualityModel);
+	switch_layout->addWidget(highQualityButton);
 
 	// Log. scale switch
 	auto logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
 	logarithmicButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values."));
 	logarithmicButton->setCheckable(true);
 	logarithmicButton->setModel(&controls->m_logarithmicModel);
-	controlLayout->addWidget(logarithmicButton);
+	switch_layout->addWidget(logarithmicButton);
 
-	controlLayout->addStretch();
+	config_layout->addStretch();
 
-	// Switch between lines mode and point mode
-	auto linesMode = new LedCheckBox(tr("Lines"), this);
-	linesMode->setToolTip(tr("Render with lines."));
-	linesMode->setCheckable(true);
-	linesMode->setModel(&controls->m_linesModeModel);
-	controlLayout->addWidget(linesMode);
+	// Persistence knob
+	auto persistenceKnob = new Knob(KnobType::Small17, this);
+	persistenceKnob->setModel(&controls->m_persistenceModel);
+	persistenceKnob->setLabel(tr("Persist."));
+	persistenceKnob->setToolTip(tr("Trace persistence: higher amount means the trace will stay bright for longer time."));
+	persistenceKnob->setHintText(tr("Trace persistence"), "");
+	config_layout->addWidget(persistenceKnob);
 }
 
 
@@ -77,5 +91,6 @@ QSize VecControlsDialog::sizeHint() const
 {
 	return QSize(275, 300);
 }
+
 
 } // namespace lmms::gui
