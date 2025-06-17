@@ -55,6 +55,8 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	connect( getGUI()->automationEditor(), SIGNAL(currentClipChanged()),
 			this, SLOT(update()));
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
+
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
 	update();

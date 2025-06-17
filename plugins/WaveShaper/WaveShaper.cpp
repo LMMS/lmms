@@ -27,6 +27,7 @@
 #include "WaveShaper.h"
 #include "lmms_math.h"
 #include "embed.h"
+#include "interpolation.h"
 
 #include "plugin_export.h"
 
@@ -115,7 +116,9 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 			}
 			else if( lookup < 200 )
 			{
-				s[i] = std::lerp(samples[lookup - 1], samples[lookup], frac) * posneg;
+				s[i] = linearInterpolate( samples[ lookup - 1 ],
+						samples[ lookup ], frac )
+						* posneg;
 			}
 			else
 			{

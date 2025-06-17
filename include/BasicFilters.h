@@ -31,14 +31,16 @@
 #ifndef LMMS_BASIC_FILTERS_H
 #define LMMS_BASIC_FILTERS_H
 
-#include <algorithm>
-#include <array>
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+
 #include <cmath>
-#include <numbers>
+#include <array>
 
+#include "lmms_basics.h"
 #include "lmms_constants.h"
-#include "LmmsTypes.h"
-
+#include "interpolation.h"
 
 namespace lmms
 {
@@ -71,20 +73,20 @@ public:
 
 	inline void setCoeffs( float freq )
 	{
-		using namespace std::numbers;
 		// wc
-		const double wc = 2 * pi * freq;
+		const double wc = D_2PI * freq;
 		const double wc2 = wc * wc;
 		const double wc3 = wc2 * wc;
 		m_wc4 = wc2 * wc2;
 
 		// k
-		const double k = wc / std::tan(pi * freq / m_sampleRate);
+		const double k = wc / tan( D_PI * freq / m_sampleRate );
 		const double k2 = k * k;
 		const double k3 = k2 * k;
 		m_k4 = k2 * k2;
 
 		// a
+		static const double sqrt2 = sqrt( 2.0 );
 		const double sq_tmp1 = sqrt2 * wc3 * k;
 		const double sq_tmp2 = sqrt2 * wc * k3;
 
@@ -209,7 +211,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if (std::abs(s) < F_EPSILON && std::abs(m_z1[ch]) < F_EPSILON) { return 0.0f; }
+		if (std::abs(s) < 1.0e-10f && std::abs(m_z1[ch]) < 1.0e-10f) return 0.0f;
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -378,7 +380,7 @@ public:
 				for( int i = 0; i < 4; ++i )
 				{
 					ip += 0.25f;
-					sample_t x = std::lerp(m_last[_chnl], _in0, ip) - m_r * m_y3[_chnl];
+					sample_t x = linearInterpolate( m_last[_chnl], _in0, ip ) - m_r * m_y3[_chnl];
 					
 					m_y1[_chnl] = std::clamp((x + m_oldx[_chnl]) * m_p
 							- m_k * m_y1[_chnl], -10.0f,
@@ -595,7 +597,7 @@ public:
 			case FilterType::Formantfilter:
 			case FilterType::FastFormant:
 			{
-				if (std::abs(_in0) < F_EPSILON && std::abs(m_vflast[0][_chnl]) < F_EPSILON) { return 0.0f; } // performance hack - skip processing when the numbers get too small
+				if (std::abs(_in0) < 1.0e-10f && std::abs(m_vflast[0][_chnl]) < 1.0e-10f) { return 0.0f; } // performance hack - skip processing when the numbers get too small
 
 				const int os = m_type == FilterType::FastFormant ? 1 : 4; // no oversampling for fast formant
 				for( int o = 0; o < os; ++o )
@@ -704,7 +706,6 @@ public:
 
 	inline void calcFilterCoeffs( float _freq, float _q )
 	{
-		using namespace std::numbers;
 		// temp coef vars
 		_q = std::max(_q, minQ());
 
@@ -717,7 +718,7 @@ public:
 		{
 			_freq = std::clamp(_freq, 50.0f, 20000.0f);
 			const float sr = m_sampleRatio * 0.25f;
-			const float f = 1.0f / (_freq * 2 * pi_v<float>);
+			const float f = 1.0f / ( _freq * F_2PI );
 			
 			m_rca = 1.0f - sr / ( f + sr );
 			m_rcb = 1.0f - m_rca;
@@ -750,8 +751,8 @@ public:
 			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = 1.f / (std::lerp(_f[vowel+0][0], _f[vowel+1][0], fract) * 2 * pi_v<float>);
-			const float f1 = 1.f / (std::lerp(_f[vowel+0][1], _f[vowel+1][1], fract) * 2 * pi_v<float>);
+			const float f0 = 1.0f / ( linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * F_2PI );
+			const float f1 = 1.0f / ( linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * F_2PI );
 
 			// samplerate coeff: depends on oversampling
 			const float sr = m_type == FilterType::FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;
@@ -773,7 +774,7 @@ public:
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
-			m_r = _q * std::exp((1 - m_p) * 1.386249f);
+			m_r = _q * powf( F_E, ( 1 - m_p ) * 1.386249f );
 
 			if( m_doubleFilter )
 			{
@@ -790,7 +791,7 @@ public:
 			
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1.0f;
-			m_r = _q * 0.1f * std::exp((1 - m_p) * 1.386249f);
+			m_r = _q * 0.1f * powf( F_E, ( 1 - m_p ) * 1.386249f );
 			
 			return;
 		}
@@ -800,7 +801,7 @@ public:
 			m_type == FilterType::Highpass_SV ||
 			m_type == FilterType::Notch_SV )
 		{
-			const float f = std::sin(std::max(minFreq(), _freq) * m_sampleRatio * pi_v<float>);
+			const float f = sinf(std::max(minFreq(), _freq) * m_sampleRatio * F_PI);
 			m_svf1 = std::min(f, 0.825f);
 			m_svf2 = std::min(f * 2.0f, 0.825f);
 			m_svq = std::max(0.0001f, 2.0f - (_q * 0.1995f));
@@ -809,9 +810,9 @@ public:
 
 		// other filters
 		_freq = std::clamp(_freq, minFreq(), 20000.0f);
-		const float omega = 2 * pi_v<float> * _freq * m_sampleRatio;
-		const float tsin = std::sin(omega) * 0.5f;
-		const float tcos = std::cos(omega);
+		const float omega = F_2PI * _freq * m_sampleRatio;
+		const float tsin = sinf( omega ) * 0.5f;
+		const float tcos = cosf( omega );
 
 		const float alpha = tsin / _q;
 

@@ -26,10 +26,11 @@
 #include "SaProcessor.h"
 
 #include <algorithm>
-#include "lmms_math.h"
-#include <cmath>
 #ifdef SA_DEBUG
 	#include <chrono>
+#endif
+#include <cmath>
+#ifdef SA_DEBUG
 	#include <iomanip>
 	#include <iostream>
 #endif
@@ -330,15 +331,15 @@ QRgb SaProcessor::makePixel(float left, float right) const
 	const float gamma_correction = m_controls->m_waterfallGammaModel.value();
 	if (m_controls->m_stereoModel.value())
 	{
-		float ampL = std::pow(left, gamma_correction);
-		float ampR = std::pow(right, gamma_correction);
+		float ampL = pow(left, gamma_correction);
+		float ampR = pow(right, gamma_correction);
 		return qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
 					m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
 					m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
 	}
 	else
 	{
-		float ampL = std::pow(left, gamma_correction);
+		float ampL = pow(left, gamma_correction);
 		// make mono color brighter to compensate for the fact it is not summed
 		return qRgb(m_controls->m_colorMonoW.red() * ampL,
 					m_controls->m_colorMonoW.green() * ampL,
@@ -575,9 +576,9 @@ float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 	if (m_controls->m_logXModel.value())
 	{
 		if (freq <= 1) {return 0;}
-		float min = std::log10(getFreqRangeMin());
-		float range = std::log10(getFreqRangeMax()) - min;
-		return (std::log10(freq) - min) / range * width;
+		float min = log10(getFreqRangeMin());
+		float range = log10(getFreqRangeMax()) - min;
+		return (log10(freq) - min) / range * width;
 	}
 	else
 	{
@@ -593,10 +594,10 @@ float SaProcessor::xPixelToFreq(float x, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
-		float min = std::log10(getFreqRangeMin());
-		float max = std::log10(getFreqRangeMax());
+		float min = log10(getFreqRangeMin());
+		float max = log10(getFreqRangeMax());
 		float range = max - min;
-		return fastPow10f(min + x / width * range);
+		return pow(10, min + x / width * range);
 	}
 	else
 	{
@@ -661,8 +662,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	else
 	{
 		// linear scale: convert returned ranges from dB to linear scale
-		float max = fastPow10f(getAmpRangeMax() / 10);
-		float range = fastPow10f(getAmpRangeMin() / 10) - max;
+		float max = pow(10, getAmpRangeMax() / 10);
+		float range = pow(10, getAmpRangeMin() / 10) - max;
 		return (amplitude - max) / range * height;
 	}
 }
@@ -682,8 +683,8 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	else
 	{
 		// linear scale: convert returned ranges from dB to linear scale
-		float max = fastPow10f(getAmpRangeMax() / 10);
-		float range = fastPow10f(getAmpRangeMin() / 10) - max;
+		float max = pow(10, getAmpRangeMax() / 10);
+		float range = pow(10, getAmpRangeMin() / 10) - max;
 		return max + range * (y / height);
 	}
 }

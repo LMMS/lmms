@@ -32,7 +32,7 @@
 
 #include "Instrument.h"
 #include "Sample.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 
 namespace lmms

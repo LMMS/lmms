@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <cassert>
 #include "lmms_export.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {

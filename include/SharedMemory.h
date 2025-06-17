@@ -44,7 +44,6 @@ public:
 	SharedMemoryData() noexcept;
 	SharedMemoryData(std::string&& key, bool readOnly);
 	SharedMemoryData(std::string&& key, std::size_t size, bool readOnly);
-	SharedMemoryData(std::size_t size, bool readOnly);
 	~SharedMemoryData();
 
 	SharedMemoryData(SharedMemoryData&& other) noexcept;
@@ -65,7 +64,6 @@ public:
 
 	const std::string& key() const noexcept { return m_key; }
 	void* get() const noexcept { return m_ptr; }
-	std::size_t size_bytes() const noexcept;
 
 private:
 	std::string m_key;
@@ -97,11 +95,6 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>};
 	}
 
-	void create()
-	{
-		m_data = detail::SharedMemoryData{sizeof(T), std::is_const_v<T>};
-	}
-
 	void detach() noexcept
 	{
 		m_data = detail::SharedMemoryData{};
@@ -109,9 +102,6 @@ public:
 
 	const std::string& key() const noexcept { return m_data.key(); }
 	T* get() const noexcept { return static_cast<T*>(m_data.get()); }
-
-	std::size_t size() const noexcept { return get() ? 1 : 0; }
-	std::size_t size_bytes() const noexcept { return get() ? sizeof(T) : 0; }
 
 	T* operator->() const noexcept { return get(); }
 	T& operator*() const noexcept { return *get(); }
@@ -142,11 +132,6 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), size * sizeof(T), std::is_const_v<T>};
 	}
 
-	void create(std::size_t size)
-	{
-		m_data = detail::SharedMemoryData{size * sizeof(T), std::is_const_v<T>};
-	}
-
 	void detach() noexcept
 	{
 		m_data = detail::SharedMemoryData{};
@@ -154,9 +139,6 @@ public:
 
 	const std::string& key() const noexcept { return m_data.key(); }
 	T* get() const noexcept { return static_cast<T*>(m_data.get()); }
-
-	std::size_t size() const noexcept { return m_data.size_bytes() / sizeof(T); }
-	std::size_t size_bytes() const noexcept { return m_data.size_bytes(); }
 
 	T& operator[](std::size_t index) const noexcept { return get()[index]; }
 	explicit operator bool() const noexcept { return get() != nullptr; }

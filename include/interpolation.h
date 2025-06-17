@@ -25,8 +25,13 @@
 #ifndef LMMS_INTERPOLATION_H
 #define LMMS_INTERPOLATION_H
 
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+
 #include <cmath>
-#include <numbers>
+#include "lmms_constants.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -77,8 +82,14 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
-	const float f = (1.0f - std::cos(x * std::numbers::pi_v<float>)) * 0.5f;
+	const float f = ( 1.0f - cosf( x * F_PI ) ) * 0.5f;
 	return f * (v1 - v0) + v0;
+}
+
+
+inline float linearInterpolate( float v0, float v1, float x )
+{
+	return x * (v1 - v0) + v0;
 }
 
 

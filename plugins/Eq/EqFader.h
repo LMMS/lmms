@@ -43,7 +43,7 @@ public:
 	Q_OBJECT
 public:
 	EqFader( FloatModel * model, const QString & name, QWidget * parent,  float* lPeak, float* rPeak ) :
-		Fader(model, name, parent, false)
+		Fader( model, name, parent )
 	{
 		setMinimumSize( 23, 116 );
 		setMaximumSize( 23, 116 );

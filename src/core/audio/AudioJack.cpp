@@ -74,7 +74,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 AudioJack::~AudioJack()
 {
 	AudioJack::stopProcessing();
-#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#ifdef AUDIO_PORT_SUPPORT
 	while (m_portMap.size())
 	{
 		unregisterPort(m_portMap.begin().key());
@@ -229,9 +229,9 @@ void AudioJack::stopProcessing()
 	m_stopped = true;
 }
 
-void AudioJack::registerPort(AudioBusHandle* port)
+void AudioJack::registerPort(AudioPort* port)
 {
-#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#ifdef AUDIO_PORT_SUPPORT
 	// make sure, port is not already registered
 	unregisterPort(port);
 	const QString name[2] = {port->name() + " L", port->name() + " R"};
@@ -249,9 +249,9 @@ void AudioJack::registerPort(AudioBusHandle* port)
 
 
 
-void AudioJack::unregisterPort(AudioBusHandle* port)
+void AudioJack::unregisterPort(AudioPort* port)
 {
-#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#ifdef AUDIO_PORT_SUPPORT
 	if (m_portMap.contains(port))
 	{
 		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
@@ -265,9 +265,9 @@ void AudioJack::unregisterPort(AudioBusHandle* port)
 #endif
 }
 
-void AudioJack::renamePort(AudioBusHandle* port)
+void AudioJack::renamePort(AudioPort* port)
 {
-#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#ifdef AUDIO_PORT_SUPPORT
 	if (m_portMap.contains(port))
 	{
 		const QString name[2] = {port->name() + " L", port->name() + " R"};
@@ -282,7 +282,7 @@ void AudioJack::renamePort(AudioBusHandle* port)
 	}
 #else
 	(void)port;
-#endif // AUDIO_BUS_HANDLE_SUPPORT
+#endif // AUDIO_PORT_SUPPORT
 }
 
 
@@ -304,7 +304,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		m_tempOutBufs[c] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_outputPorts[c], nframes);
 	}
 
-#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#ifdef AUDIO_PORT_SUPPORT
 	const int frames = std::min<int>(nframes, audioEngine()->framesPerPeriod());
 	for (JackPortMap::iterator it = m_portMap.begin(); it != m_portMap.end(); ++it)
 	{

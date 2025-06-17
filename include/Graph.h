@@ -32,7 +32,7 @@
 
 #include "Model.h"
 #include "ModelView.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {
@@ -182,7 +182,7 @@ public:
 
 public slots:
 	//! Set range of y values
-	void setRange(float ymin, float ymax);
+	void setRange( float _min, float _max );
 
 	void setLength( int _size );
 	//! Update one sample

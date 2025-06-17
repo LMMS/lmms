@@ -1,5 +1,4 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
-SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
@@ -105,8 +104,6 @@ option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
-option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
-option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -241,28 +238,29 @@ if(LMMS_BUILD_APPLE)
 endif()
 find_package(Perl)
 
-if(WANT_LV2)
-	if(PKG_CONFIG_FOUND)
-		pkg_check_modules(LV2 lv2)
-	endif()
-
-	find_package(Lilv)
-	if(Lilv_FOUND)
-		set(LILV_LIBRARIES Lilv::lilv)
-	endif()
-
-	# Ensure both dependencies are found
-	if(NOT LV2_FOUND)
-		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
-	elseif(NOT Lilv_FOUND)
-		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
-	else()
-		set(LMMS_HAVE_LV2 TRUE)
-		set(STATUS_LV2 "OK")
-	endif()
-else()
-	set(STATUS_LV2 "not built as requested")
-endif()
+IF(WANT_LV2)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(LV2 lv2)
+		PKG_CHECK_MODULES(LILV lilv-0)
+	ENDIF()
+	IF(NOT LV2_FOUND AND NOT LILV_FOUND)
+		UNSET(LV2_FOUND CACHE)
+		UNSET(LILV_FOUND CACHE)
+		FIND_PACKAGE(LV2 CONFIG)
+		FIND_PACKAGE(LILV CONFIG)
+		IF(LILV_FOUND)
+			SET(LILV_LIBRARIES "lilv::lilv")
+		ENDIF()
+	ENDIF()
+	IF(LV2_FOUND AND LILV_FOUND)
+		SET(LMMS_HAVE_LV2 TRUE)
+		SET(STATUS_LV2 "OK")
+	ELSE()
+		SET(STATUS_LV2 "not found, install it or set PKG_CONFIG_PATH appropriately")
+	ENDIF()
+ELSE(WANT_LV2)
+	SET(STATUS_LV2 "not built as requested")
+ENDIF(WANT_LV2)
 
 IF(WANT_SUIL)
 	IF(PKG_CONFIG_FOUND)
@@ -270,7 +268,6 @@ IF(WANT_SUIL)
 		IF(SUIL_FOUND)
 			SET(LMMS_HAVE_SUIL TRUE)
 			SET(STATUS_SUIL "OK")
-			find_package(SuilModules)
 		ELSE()
 			SET(STATUS_SUIL "not found, install it or set PKG_CONFIG_PATH appropriately")
 		ENDIF()
@@ -609,17 +606,6 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
-if(WANT_DEBUG_CPACK)
-	if((LMMS_BUILD_WIN32 AND CMAKE_VERSION VERSION_LESS "3.19") OR WANT_CPACK_TARBALL)
-		set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
-	else()
-		set(CPACK_DEBUG TRUE)
-		set(STATUS_DEBUG_CPACK "Enabled")
-	endif()
-else()
-	set(STATUS_DEBUG_CPACK "Disabled")
-endif()
-
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
@@ -634,20 +620,11 @@ ENDIF()
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(NDEBUG)
-	SET(STATUS_ASSERTIONS "Disabled")
-else()
-    remove_definitions(-DNDEBUG)
-	SET(STATUS_ASSERTIONS "Enabled")
-endif()
-
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
 else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
-
 if(STRIP)
 	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
 	# multiple configurations, combine the OR into a single CONFIG expression.
@@ -702,7 +679,7 @@ if(WANT_DEBUG_GPROF)
 	add_link_options(-pg)
 	set(STATUS_GPROF "OK")
 else()
-	set(STATUS_GPROF "Disabled ${STATUS_GPROF}")
+	set(STATUS_GPROF "DISABLED ${STATUS_GPROF}")
 endif()
 
 # add enabled sanitizers
@@ -768,7 +745,7 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
-		DESTINATION "include/lmms/")
+		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
 ENDIF(LMMS_BUILD_LINUX)
 
 #
@@ -872,9 +849,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
-"* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
 )
 
 MESSAGE(

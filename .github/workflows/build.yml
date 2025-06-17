@@ -5,15 +5,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  linux-x86_64:
-    name: linux-x86_64
-    runs-on: ubuntu-22.04
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+    container: ghcr.io/lmms/linux.gcc:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-        -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -25,29 +25,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Clone fltk
-        uses: actions/checkout@v4
-        with:
-          repository: fltk/fltk
-          path: fltk
-          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
-          fetch-depth: 1
-      - name: Configure winehq
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo mkdir -pm755 /etc/apt/keyrings
-          wget -O - https://dl.winehq.org/wine-builds/winehq.key | \
-          sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
-          sudo wget -NP /etc/apt/sources.list.d/ \
-          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
-      - name: Install packages
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
-          sudo apt-get install -y --install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -56,20 +33,13 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
-      - name: Configure fltk
-        run: |
-          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
-      - name: Install fltk
-        run: |
-          cmake --build fltk/build
-          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
+                -DCMAKE_INSTALL_PREFIX=./install \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -79,91 +49,12 @@ jobs:
           ctest --output-on-failure -j2
       - name: Package
         run: |
-          cmake --build build --target package
+          cmake --build build --target install
+          cmake --build build --target appimage
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux
-          path: build/lmms-*.AppImage
-      - name: Trim ccache and print statistics
-        run: |
-          ccache --cleanup
-          echo "[ccache config]"
-          ccache --show-config
-          echo "[ccache stats]"
-          ccache --show-stats
-        env:
-          CCACHE_MAXSIZE: 500M
-  linux-arm64:
-    name: linux-arm64
-    runs-on: ubuntu-24.04-arm
-    env:
-      CMAKE_OPTS: >-
-        -DUSE_WERROR=ON
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DUSE_COMPILE_CACHE=ON
-        -DWANT_DEBUG_CPACK=ON
-      CCACHE_MAXSIZE: 0
-      CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j2
-      DEBIAN_FRONTEND: noninteractive
-    steps:
-      - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - name: Check out
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Clone fltk
-        uses: actions/checkout@v4
-        with:
-          repository: fltk/fltk
-          path: fltk
-          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
-          fetch-depth: 1
-      - name: Install system packages
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
-      - name: Cache ccache data
-        uses: actions/cache@v3
-        with:
-          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-${{ github.job }}-${{ github.ref }}-
-            ccache-${{ github.job }}-
-          path: ~/.ccache
-      - name: Configure fltk
-        run: |
-          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
-      - name: Install fltk
-        run: |
-          cmake --build fltk/build
-          sudo cmake --install fltk/build --prefix /usr
-      - name: Configure
-        run: |
-          ccache --zero-stats
-          cmake -S . \
-                -B build \
-                $CMAKE_OPTS
-      - name: Build
-        run: cmake --build build
-      - name: Run tests
-        run: |
-          cd build/tests
-          ctest --output-on-failure -j2
-      - name: Package
-        run: |
-          cmake --build build --target package
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-arm64
           path: build/lmms-*.AppImage
       - name: Trim ccache and print statistics
         run: |
@@ -238,6 +129,8 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
+                -DCMAKE_INSTALL_PREFIX="../target" \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
@@ -249,7 +142,8 @@ jobs:
           ctest --output-on-failure -j3
       - name: Package
         run: |
-          cmake --build build --target package
+          cmake --build build --target install
+          cmake --build build --target dmg
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -276,6 +170,7 @@ jobs:
   mingw:
     name: mingw64
     runs-on: ubuntu-latest
+    container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
         -Werror=dev
@@ -286,12 +181,12 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Configure apt
+      - name: Enable POSIX MinGW
         run: |
-          sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
-          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
-          sudo apt-get update -y
+          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -308,15 +203,12 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
-      - name: Install dependencies
-        run: |
-          sudo apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
           ccache --zero-stats
           cmake -S . \
                 -B build \
+                -DCMAKE_INSTALL_PREFIX=./install \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 $CMAKE_OPTS
       - name: Build
@@ -349,13 +241,19 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Update vcpkg (TEMPORARY)
+        run: |
+          cd $env:VCPKG_INSTALLATION_ROOT
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-msvc-x86_64-
+            vcpkg-x64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
