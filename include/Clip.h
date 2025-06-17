@@ -95,6 +95,8 @@ public:
 	}
 
 
+	bool hasTrackContainer() const;
+
 	bool isInPattern() const;
 
 

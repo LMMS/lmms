@@ -174,11 +174,14 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 	}
 }
 
+bool Clip::hasTrackContainer() const
+{
+	return getTrack() != nullptr && getTrack()->trackContainer() != nullptr;
+}
 
 bool Clip::isInPattern() const
 {
-	return getTrack() != nullptr
-		&& getTrack()->trackContainer() != nullptr
+	return hasTrackContainer()
 		&& getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern;
 }
 
