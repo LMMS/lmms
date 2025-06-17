@@ -83,6 +83,7 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 	bool isMidiFile(const QString& ext)      { return isType(ext, "midifile"); }
 	bool isVstPluginFile(const QString& ext) { return isType(ext, "vstpluginfile"); }
 
+	//! Gets the clipboard mimedata. NOT the drag mimedata
 	const QMimeData* getMimeData()
 	{
 		return QApplication::clipboard()->mimeData(QClipboard::Clipboard);
