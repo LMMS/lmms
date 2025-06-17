@@ -105,26 +105,9 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 
 
-void SampleClipView::dragEnterEvent(QDragEnterEvent* event)
+void SampleClipView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	const QMimeData* mime = event->mimeData();
-
-	if (mime->hasUrls())
-	{
-		const QList<QUrl> urls = mime->urls();
-		if (!urls.isEmpty())
-		{
-			QString path = urls.first().toLocalFile();
-			QString ext = QFileInfo(path).suffix().toLower();
-
-			if (Clipboard::isAudioFile(ext))
-			{
-				event->acceptProposedAction();
-				return;
-			}
-		}
-	}
-	event->ignore();
+	StringPairDrag::processDragEnterEvent(_dee, {"samplefile", "sampledata"});
 }
 
 void SampleClipView::dropEvent(QDropEvent* _de )
