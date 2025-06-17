@@ -502,7 +502,7 @@ void ClipView::dropEvent( QDropEvent * de )
 void ClipView::updateCursor(QMouseEvent * me)
 {
 	// If we are at the edges, use the resize cursor
-	if (!me->buttons() && m_clip->getTrack()->trackContainer()->type() != TrackContainer::Type::Pattern && !isSelected()
+	if (!me->buttons() && !m_clip->isInPattern() && !isSelected()
 		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
