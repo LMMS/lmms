@@ -32,9 +32,6 @@ endif()
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
-if(DEFINED ENV{CPACK_DEBUG})
-	set(CPACK_DEBUG "$ENV{CPACK_DEBUG}")
-endif()
 if(NOT CPACK_DEBUG)
 	set(VERBOSITY 1)
 	set(APPIMAGETOOL_VERBOSITY "")
@@ -123,10 +120,6 @@ set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 # Patch desktop file
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
 
-# Custom scripts to run immediately before lmms is executed
-file(COPY "${CPACK_SOURCE_DIR}/cmake/linux/apprun-hooks" DESTINATION "${APP}")
-file(REMOVE "${APP}/apprun-hooks/README.md")
-
 # Prefer a hard-copy of .DirIcon over appimagetool's symlinking
 # 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
@@ -165,6 +158,7 @@ message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... librarie
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--desktop-file "${DESKTOP_FILE}"
+	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
 	${LIBRARIES}
 	--verbosity ${VERBOSITY}

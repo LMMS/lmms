@@ -485,7 +485,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
 	try
 	{
-		m_audioBuffer.create(s);
+		m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
 	}
 	catch (const std::runtime_error& error)
 	{

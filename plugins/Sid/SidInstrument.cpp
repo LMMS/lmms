@@ -128,10 +128,6 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
 	m_chipModel( static_cast<int>(ChipModel::MOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
-    // A Filter object needs to be created only once to do some initialization, avoiding
-	// dropouts down the line when we have to play a note for the first time.
-	[[maybe_unused]] static auto s_filter = reSID::Filter{};
-
 	for( int i = 0; i < 3; ++i )
 	{
 		m_voice[i] = new VoiceObject( this, i );
