@@ -25,6 +25,7 @@
  */
 
 #include "PianoRoll.h"
+#include "MelodyEditor.h"
 
 #include <QtMath>
 #include <QApplication>
@@ -5008,12 +5009,15 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto exportAction = new QAction(embed::getIconPixmap("project_export"), tr("Export clip"), m_fileToolsButton);
 
+	auto editMelodyAction = new QAction(embed::getIconPixmap("project_import"), tr("&Melody editor"), m_fileToolsButton);
+
 	m_fileToolsButton->addAction(importAction);
 	m_fileToolsButton->addAction(exportAction);
 	fileActionsToolBar->addWidget(m_fileToolsButton);
 
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importMidiClip()));
 	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportMidiClip()));
+	connect(editMelodyAction, SIGNAL(triggered()), this, SLOT(editMelody()));
 	// -- End File actions
 
 	// Copy + paste actions
@@ -5547,6 +5551,12 @@ void PianoRollWindow::importMidiClip()
 }
 
 
+void PianoRollWindow::editMelody()
+{
+	QWidget *w = (new MelodyEditor())->startEditing(this->m_editor->m_midiClip);
+	connect(this->m_editor->m_midiClip, &MidiClip::destroyedMidiClip, w, &QWidget::close);
+	w->show();
+}
 
 
 void PianoRollWindow::focusInEvent( QFocusEvent * event )
