@@ -6,6 +6,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   linux-x86_64:
+    if: false
     name: linux-x86_64
     runs-on: ubuntu-22.04
     env:
@@ -78,6 +79,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   linux-arm64:
+    if: false
     name: linux-arm64
     runs-on: ubuntu-24.04-arm
     env:
@@ -143,6 +145,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   macos:
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -245,7 +248,6 @@ jobs:
   mingw:
     name: mingw64
     runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.mingw:20.04
     env:
       CMAKE_OPTS: >-
         -Werror=dev
@@ -256,12 +258,12 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Enable POSIX MinGW
+      - name: Configure apt
         run: |
-          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
-          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
-          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
+          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
+          sudo apt-get update -y
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -278,6 +280,10 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
           ccache --zero-stats
@@ -287,6 +293,10 @@ jobs:
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
+      - name: Show compile_commands.json
+        run: |
+          pwd
+          cat compile_commands.json
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
@@ -304,6 +314,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
+    if: false
     name: msvc-x64
     runs-on: windows-2019
     env:
@@ -315,13 +326,19 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Update vcpkg (TEMPORARY)
+        run: |
+          cd $env:VCPKG_INSTALLATION_ROOT
+          git pull
+          .\bootstrap-vcpkg.bat
+        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-msvc-x86_64-
+            vcpkg-x64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
