@@ -586,6 +586,7 @@ private slots:
 	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
+	void editMelody();
 
 private:
 	void clipRenamed();
