@@ -42,7 +42,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		DEFAULT_CHANNELS), _audioEngine),
 	m_handle( nullptr ),
 	m_hwParams( nullptr ),
-	m_swParams( nullptr )
+	m_swParams(nullptr)
 {
 	_success_ful = false;
 
