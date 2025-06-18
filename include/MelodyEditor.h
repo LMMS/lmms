@@ -11,6 +11,9 @@
  * @see https://github.com/LMMS/lmms/discussions/7950
 */
 
+#ifndef LMMS_GUI_MELODYEDITOR_H
+#define LMMS_GUI_MELODYEDITOR_H
+
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -25,9 +28,6 @@
 
 #include "DataFile.h"
 #include "MidiClip.h"
-
-#ifndef LMMS_GUI_MELODYEDITOR_H
-#define LMMS_GUI_MELODYEDITOR_H
 
 namespace lmms::gui
 {
