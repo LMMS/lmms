@@ -31,6 +31,7 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
@@ -171,7 +172,7 @@ void AutomatableModelView::unsetModel()
 
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
-	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
+	if (event->button() == Qt::LeftButton && event->modifiers() & KBD_COPY_MODIFIER)
 	{
 		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();

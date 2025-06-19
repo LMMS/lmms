@@ -26,6 +26,13 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Clone fltk
+        uses: actions/checkout@v4
+        with:
+          repository: fltk/fltk
+          path: fltk
+          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
+          fetch-depth: 1
       - name: Configure winehq
         run: |
           sudo dpkg --add-architecture i386
@@ -38,8 +45,10 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
           sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
+          sudo apt-get install -y --install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -48,6 +57,14 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
+      - name: Configure fltk
+        run: |
+          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
+      - name: Install fltk
+        run: |
+          cmake --build fltk/build
+          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
           ccache --zero-stats
@@ -100,11 +117,20 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Clone fltk
+        uses: actions/checkout@v4
+        with:
+          repository: fltk/fltk
+          path: fltk
+          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
+          fetch-depth: 1
       - name: Install system packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+          sudo apt-get install -y --install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -113,13 +139,19 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
+      - name: Configure fltk
+        run: |
+          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
+      - name: Install fltk
+        run: |
+          cmake --build fltk/build
+          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DWANT_VST_32=OFF \
-                -DWANT_VST_64=OFF \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -209,7 +241,6 @@ jobs:
           mkdir build
           cmake -S . \
                 -B build \
-                -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
@@ -246,6 +277,7 @@ jobs:
           key: "homebrew-${{ matrix.arch }}\
             -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
+    if: false
     name: mingw64
     runs-on: ubuntu-latest
     env:
@@ -290,15 +322,9 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
-      - name: Show compile_commands.json
-        run: |
-          pwd
-          find .. -iname compile_commands.json | wc -l
-          find .. -iname compile_commands.json | xargs cat || true
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
@@ -316,9 +342,8 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
-    if: false
     name: msvc-x64
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
@@ -328,19 +353,13 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Update vcpkg (TEMPORARY)
-        run: |
-          cd $env:VCPKG_INSTALLATION_ROOT
-          git pull
-          .\bootstrap-vcpkg.bat
-        shell: pwsh
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-x64-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-x64-
+            vcpkg-msvc-x86_64-
           path: build\vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
@@ -380,12 +399,20 @@ jobs:
             -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="x64-windows" `
             -DVCPKG_HOST_TRIPLET="x64-windows" `
-            -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
+            -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" `
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=1
         env:
           should_install_manifest:
             ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
+      - name: Show compile_commands.json
+        run: |
+          pwd
+          find .. -iname compile_commands.json || true
+          find .. -iname compile_commands.json | wc -l
+          find .. -iname compile_commands.json | xargs cat || true
+        shell: bash
       - name: Run tests
         run: |
           cd build/tests
@@ -404,5 +431,71 @@ jobs:
           ccache --show-config
           echo "[ccache stats]"
           ccache --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB
+  msys2:
+    if: false
+    name: windows-arm64
+    runs-on: windows-11-arm
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      CMAKE_OPTS: >-
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+        -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j2
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache msys2 dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: windows-arm64-${{ hashFiles('.github/workflows/deps-msys2-clangarm64.txt') }}
+          restore-keys: |
+            windows-arm64-
+          path: \msys64\var\cache\pacman\pkg
+      - name: Install msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANGARM64
+          update: true
+      - name: Install dependencies
+        run: pacman --needed --noconfirm -S - < .github/workflows/deps-msys2-clangarm64.txt
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~\AppData\Local\ccache
+      - name: Configure
+        run: |
+          /clang64/bin/ccache.exe --zero-stats
+          cmake -B build $CMAKE_OPTS
+      - name: Build
+        run: cmake --build build
+      - name: Package
+        run: cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-arm64
+          path: build\lmms-*.exe
+      - name: Trim ccache and print statistics
+        run: |
+          /clang64/bin/ccache.exe --cleanup
+          echo "[ccache config]"
+          /clang64/bin/ccache.exe --show-config
+          echo "[ccache stats]"
+          /clang64/bin/ccache.exe --show-stats --verbose
         env:
           CCACHE_MAXSIZE: 500MB
