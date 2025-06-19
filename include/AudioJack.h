@@ -92,11 +92,8 @@ public:
 		// Because we do not have access to a JackAudio driver instance we have to be our own client to display inputs and outputs...
 		jack_client_t* m_client;
 
-		QToolButton* m_outputDevice1 = nullptr;
-		QToolButton* m_outputDevice2 = nullptr;
-
-		QToolButton* m_inputDevice1 = nullptr;
-		QToolButton* m_inputDevice2 = nullptr;
+		std::vector<QToolButton*> m_outputDevices;
+		std::vector<QToolButton*> m_inputDevices;
 	};
 
 private slots:

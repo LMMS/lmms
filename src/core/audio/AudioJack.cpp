@@ -46,10 +46,17 @@ namespace
 {
 static const QString audioJackClass("audiojack");
 static const QString clientNameKey("clientname");
-static const QString output1Key("output1");
-static const QString output2Key("output2");
-static const QString input1Key("input1");
-static const QString input2Key("input2");
+
+QString getOutputKeyByChannel(size_t channel)
+{
+	return "output" + QString::number(channel + 1);
+}
+
+QString getInputKeyByChannel(size_t channel)
+{
+	return "input" + QString::number(channel + 1);
+}
+
 }
 
 namespace lmms
@@ -278,11 +285,16 @@ void AudioJack::startProcessing()
 
 	const auto cm = ConfigManager::inst();
 
-	attemptToReconnectOutput(0, cm->value(audioJackClass, output1Key));
-	attemptToReconnectOutput(1, cm->value(audioJackClass, output2Key));
+	const auto numberOfChannels = channels();
+	for (size_t i = 0; i < numberOfChannels; ++i)
+	{
+		attemptToReconnectOutput(i, cm->value(audioJackClass, getOutputKeyByChannel(i)));
+	}
 
-	attemptToReconnectInput(0, cm->value(audioJackClass, input1Key));
-	attemptToReconnectInput(1, cm->value(audioJackClass, input2Key));
+	for (size_t i = 0; i < numberOfChannels; ++i)
+	{
+		attemptToReconnectInput(i, cm->value(audioJackClass, getInputKeyByChannel(i)));
+	}
 
 	m_stopped = false;
 }
@@ -490,24 +502,28 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	// Outputs
 	const auto audioOutputNames = getAudioOutputNames();
 
-	const auto output1 = cm->value(audioJackClass, output1Key);
-	m_outputDevice1 = buildToolButton(this, output1, audioOutputNames, cn);
-	form->addRow(buildOutputName(0) + ":", m_outputDevice1);
-
-	const auto output2 = cm->value(audioJackClass, output2Key);
-	m_outputDevice2 = buildToolButton(this, output2, audioOutputNames, cn);
-	form->addRow(buildOutputName(1) + ":", m_outputDevice2);
+	constexpr size_t numberOfOutputChannels = 2;
+	for (size_t i = 0; i < numberOfOutputChannels; ++i)
+	{
+		const auto outputKey = getOutputKeyByChannel(i);
+		const auto outputValue = cm->value(audioJackClass, outputKey);
+		auto outputDevice = buildToolButton(this, outputValue, audioOutputNames, cn);
+		form->addRow(buildOutputName(i) + ":", outputDevice);
+		m_outputDevices.push_back(outputDevice);
+	}
 
 	// Inputs
 	const auto audioInputNames = getAudioInputNames();
 
-	const auto input1 = cm->value(audioJackClass, input1Key);
-	m_inputDevice1 = buildToolButton(this, input1, audioInputNames, cn);
-	form->addRow(buildInputName(0) + ":", m_inputDevice1);
-
-	const auto input2 = cm->value(audioJackClass, input2Key);
-	m_inputDevice2 = buildToolButton(this, input2, audioInputNames, cn);
-	form->addRow(buildInputName(1) + ":", m_inputDevice2);
+	constexpr size_t numberOfInputChannels = 2;
+	for (size_t i = 0; i < numberOfInputChannels; ++i)
+	{
+		const auto inputKey = getInputKeyByChannel(i);
+		const auto inputValue = cm->value(audioJackClass, inputKey);
+		auto inputDevice = buildToolButton(this, inputValue, audioInputNames, cn);
+		form->addRow(buildInputName(i) + ":", inputDevice);
+		m_inputDevices.push_back(inputDevice);
+	}
 
 	if (m_client != nullptr)
 	{
@@ -520,10 +536,16 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue(audioJackClass, clientNameKey, m_clientName->text());
-	ConfigManager::inst()->setValue(audioJackClass, output1Key, m_outputDevice1->text());
-	ConfigManager::inst()->setValue(audioJackClass, output2Key, m_outputDevice2->text());
-	ConfigManager::inst()->setValue(audioJackClass, input1Key, m_inputDevice1->text());
-	ConfigManager::inst()->setValue(audioJackClass, input2Key, m_inputDevice2->text());
+
+	for (size_t i = 0; i < m_outputDevices.size(); ++i)
+	{
+		ConfigManager::inst()->setValue(audioJackClass, getOutputKeyByChannel(i), m_outputDevices[i]->text());	
+	}
+
+	for (size_t i = 0; i < m_inputDevices.size(); ++i)
+	{
+		ConfigManager::inst()->setValue(audioJackClass, getInputKeyByChannel(i), m_inputDevices[i]->text());	
+	}
 }
 
 std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
