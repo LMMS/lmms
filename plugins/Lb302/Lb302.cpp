@@ -109,20 +109,20 @@ Lb302Filter::Lb302Filter(Lb302FilterKnobState* p_fs) :
 
 void Lb302Filter::recalc()
 {
-	vcf_e1 = std::exp(6.109f + 1.5876f * fs->envmod + 2.1553f * fs->cutoff - 1.2f * (1.0f - fs->reso));
-	vcf_e0 = std::exp(5.613f - 0.8f * fs->envmod + 2.1553f * fs->cutoff - 0.7696f * (1.0f - fs->reso));
+	vcf_e1 = exp(6.109 + 1.5876*(fs->envmod) + 2.1553*(fs->cutoff) - 1.2*(1.0-(fs->reso)));
+	vcf_e0 = exp(5.613 - 0.8*(fs->envmod) + 2.1553*(fs->cutoff) - 0.7696*(1.0-(fs->reso)));
 	vcf_e0*=M_PI/Engine::audioEngine()->outputSampleRate();
 	vcf_e1*=M_PI/Engine::audioEngine()->outputSampleRate();
 	vcf_e1 -= vcf_e0;
 
-	vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso);
+	vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
 };
 
 
 void Lb302Filter::envRecalc()
 {
 	vcf_c0 *= fs->envdecay;       // Filter Decay. vcf_decay is adjusted for Hz and ENVINC
-	// vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso); moved above
+	// vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso)); moved above
 };
 
 
@@ -169,9 +169,9 @@ void Lb302FilterIIR2::envRecalc()
 	Lb302Filter::envRecalc();
 
 	float w = vcf_e0 + vcf_c0;          // e0 is adjusted for Hz and doesn't need ENVINC
-	float k = std::exp(-w / vcf_rescoeff); // Does this mean c0 is inheritantly?
+	float k = exp(-w/vcf_rescoeff);     // Does this mean c0 is inheritantly?
 
-	vcf_a = 2.0 * std::cos(2.0 * w) * k;
+	vcf_a = 2.0*cos(2.0*w) * k;
 	vcf_b = -k*k;
 	vcf_c = 1.0 - vcf_a - vcf_b;
 }
@@ -241,7 +241,7 @@ void Lb302Filter3Pole::envRecalc()
 	kp1  = kp+1.0;
 	kp1h = 0.5*kp1;
 #ifdef LB_24_RES_TRICK
-	k = std::exp(-w / vcf_rescoeff);
+	k = exp(-w/vcf_rescoeff);
 	kres = (((k))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
 #else
 	kres = (((fs->reso))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
@@ -415,7 +415,7 @@ void Lb302Synth::filterChanged()
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
 	d *= Engine::audioEngine()->outputSampleRate(); // d *= smpl rate
-	fs.envdecay = std::pow(0.1f, 1.0f / d * ENVINC); // decay is 0.1 to the 1/d * ENVINC
+	fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
 	                                           // vcf_envdecay is now adjusted for both
 	                                           // sampling rate and ENVINC
 	recalcFilter();
@@ -563,7 +563,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 				break;
 
 			case VcoShape::RoundSquare: // p0: width of round
-				vco_k = (vco_c < 0.f) ? (std::sqrt(1.f - (vco_c * vco_c * 4.f)) - 0.5f) : -0.5f;
+				vco_k = (vco_c<0)?(sqrtf(1-(vco_c*vco_c*4))-0.5):-0.5;
 				break;
 
 			case VcoShape::Moog: // Maybe the fall should be exponential/sinsoidal instead of quadric.
@@ -574,7 +574,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 				}
 				else if (vco_k>0.5) {
 					float w = 2.0 * (vco_k - 0.5) - 1.0;
-					vco_k = 0.5 - std::sqrt(1.0 - (w * w));
+					vco_k = 0.5 - sqrtf(1.0-(w*w));
 				}
 				vco_k *= 2.0;  // MOOG wave gets filtered away
 				break;
@@ -831,18 +831,22 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_vcfCutKnob = new Knob( KnobType::Bright26, this );
 	m_vcfCutKnob->move( 75, 130 );
 	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ), "" );
+	m_vcfCutKnob->setLabel( "" );
 
 	m_vcfResKnob = new Knob( KnobType::Bright26, this );
 	m_vcfResKnob->move( 120, 130 );
 	m_vcfResKnob->setHintText( tr( "Resonance:" ), "" );
+	m_vcfResKnob->setLabel( "" );
 
 	m_vcfModKnob = new Knob( KnobType::Bright26, this );
 	m_vcfModKnob->move( 165, 130 );
 	m_vcfModKnob->setHintText( tr( "Env Mod:" ), "" );
+	m_vcfModKnob->setLabel( "" );
 
 	m_vcfDecKnob = new Knob( KnobType::Bright26, this );
 	m_vcfDecKnob->move( 210, 130 );
 	m_vcfDecKnob->setHintText( tr( "Decay:" ), "" );
+	m_vcfDecKnob->setLabel( "" );
 
 	m_slideToggle = new LedCheckBox( "", this );
 	m_slideToggle->move( 10, 180 );
@@ -863,10 +867,12 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_slideDecKnob = new Knob( KnobType::Bright26, this );
 	m_slideDecKnob->move( 210, 75 );
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ), "" );
+	m_slideDecKnob->setLabel( "");
 
 	m_distKnob = new Knob( KnobType::Bright26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ), "" );
+	m_distKnob->setLabel( tr( ""));
 
 
 	// Shapes

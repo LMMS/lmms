@@ -35,7 +35,6 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "FontHelper.h"
 #include "Knob.h"
 #include "MidiCCRackView.h"
 #include "Mixer.h"
@@ -78,15 +77,19 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
+	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
+							tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
+	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
+	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
+							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText(tr("Panning:"), "%");
+	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
@@ -382,8 +385,8 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 
 		if ( currentChannel != mixerChannel )
 		{
-			auto index = currentChannel->index();
-			QString label = tr( "%1: %2" ).arg(index).arg(currentChannel->m_name);
+			auto index = currentChannel->m_channelIndex;
+			QString label = tr( "%1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
 			mixerMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
 			});

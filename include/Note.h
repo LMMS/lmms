@@ -26,7 +26,6 @@
 #ifndef LMMS_NOTE_H
 #define LMMS_NOTE_H
 
-#include <memory>
 #include <optional>
 #include <vector>
 
@@ -104,14 +103,9 @@ public:
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
-		std::shared_ptr<DetuningHelper> detuning = nullptr);
+		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
 	~Note() override;
-
-	Note& operator=(const Note& note);
-
-	//! Performs a deep copy and returns an owning raw pointer
-	Note* clone() const;
 
 	// Note types
 	enum class Type
@@ -240,8 +234,10 @@ public:
 
 	static TimePos quantized( const TimePos & m, const int qGrid );
 
-	const std::shared_ptr<DetuningHelper>& detuning() const { return m_detuning; }
-
+	DetuningHelper * detuning() const
+	{
+		return m_detuning;
+	}
 	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
 
@@ -266,7 +262,7 @@ private:
 	panning_t m_panning;
 	TimePos m_length;
 	TimePos m_pos;
-	std::shared_ptr<DetuningHelper> m_detuning;
+	DetuningHelper * m_detuning;
 
 	Type m_type = Type::Regular;
 };

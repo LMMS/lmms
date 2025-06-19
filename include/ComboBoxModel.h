@@ -45,7 +45,6 @@ public:
 					bool isDefaultConstructed = false ) :
 		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
 	{
-		setJournalling(false);
 	}
 
 	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );

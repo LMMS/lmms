@@ -7,8 +7,6 @@ endif()
 project(RemoteVstPlugin 
 	LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
-string(REPLACE "/O2" "/Od" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-string(REPLACE "/Ob1" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 include(CheckCXXPreprocessor)
 include(CheckCXXSourceCompiles)
@@ -72,8 +70,6 @@ target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 # Workaround for missing WinMain
 if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
-	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-#	target_compile_options(${EXE_NAME} PRIVATE "/Od")
 endif()
 
 if(IS_MINGW)

@@ -22,7 +22,7 @@
  *
  */
 
-#include <cmath>
+
 #include <QDomElement>
 
 #include "BitInvader.h"
@@ -36,9 +36,10 @@
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "lmms_math.h"
+#include "interpolation.h"
 
 #include "embed.h"
+
 #include "plugin_export.h"
 
 namespace lmms
@@ -85,7 +86,7 @@ BSynth::BSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 		i.e., the absolute value of all samples is <= 1.0 if _factor
 		is different to the default normalization factor. If there is
 		a value > 1.0, clip the sample to 1.0 to limit the range. */
-		if ((_factor != defaultNormalizationFactor) && (std::abs(buf) > 1.0f))
+		if ((_factor != defaultNormalizationFactor) && (fabsf(buf) > 1.0f))
 		{
 			buf = (buf < 0) ? -1.0f : 1.0f;
 		}
@@ -120,7 +121,7 @@ sample_t BSynth::nextStringSample( float sample_length )
 	}
 
 	const auto nextIndex = currentIndex < sample_length - 1 ? currentIndex + 1 : 0;
-	return std::lerp(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
+	return linearInterpolate(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
 }	
 
 /***********************************************************************
@@ -237,7 +238,7 @@ void BitInvader::normalize()
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{
-		const float f = std::abs(samples[i]);
+		const float f = fabsf( samples[i] );
 		if (f > max) { max = f; }
 	}
 	m_normalizeFactor = 1.0 / max;
