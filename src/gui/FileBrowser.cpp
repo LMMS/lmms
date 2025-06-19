@@ -25,7 +25,7 @@
 
 #include "FileBrowser.h"
 
-#include <PathUtil.h>
+
 #include <QApplication>
 #include <QDirIterator>
 #include <QHBoxLayout>
@@ -42,6 +42,7 @@
 #include <queue>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
@@ -54,6 +55,7 @@
 #include "InstrumentTrackWindow.h"
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
+#include "PathUtil.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
@@ -869,61 +871,17 @@ void FileBrowserTreeWidget::stopPreview()
 
 
 
-void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
+void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent* me)
 {
-	if( m_mousePressed == true &&
-		( m_pressPos - me->pos() ).manhattanLength() >
-					QApplication::startDragDistance() )
+	if (m_mousePressed && (m_pressPos - me->pos()).manhattanLength() > QApplication::startDragDistance())
 	{
 		// make sure any playback is stopped
-		mouseReleaseEvent( nullptr );
+		mouseReleaseEvent(nullptr);
 
 		auto f = dynamic_cast<FileItem*>(itemAt(m_pressPos));
-		if( f != nullptr )
-		{
-			switch( f->type() )
-			{
-				case FileItem::FileType::Preset:
-					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsPreset ?
-							"presetfile" : "pluginpresetfile",
-							f->fullName(),
-							embed::getIconPixmap( "preset_file" ), this );
-					break;
-
-				case FileItem::FileType::Sample:
-					new StringPairDrag( "samplefile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::FileType::SoundFont:
-					new StringPairDrag( "soundfontfile", f->fullName(),
-							embed::getIconPixmap( "soundfont_file" ), this );
-					break;
-				case FileItem::FileType::Patch:
-					new StringPairDrag( "patchfile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::FileType::VstPlugin:
-					new StringPairDrag( "vstpluginfile", f->fullName(),
-							embed::getIconPixmap( "vst_plugin_file" ), this );
-					break;
-				case FileItem::FileType::Midi:
-					new StringPairDrag( "importedproject", f->fullName(),
-							embed::getIconPixmap( "midi_file" ), this );
-					break;
-				case FileItem::FileType::Project:
-					new StringPairDrag( "projectfile", f->fullName(),
-							embed::getIconPixmap( "project_file" ), this );
-					break;
-
-				default:
-					break;
-			}
-		}
+		Clipboard::startFileDrag(f, this);
 	}
 }
-
-
-
 
 void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
