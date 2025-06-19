@@ -290,13 +290,14 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Show compile_commands.json
         run: |
           pwd
-          find .. -iname compile_commands.json || true
+          find .. -iname compile_commands.json | wc -l
           find .. -iname compile_commands.json | xargs cat || true
       - name: Package
         run: cmake --build build --target package
