@@ -148,16 +148,24 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 	{
 		const QList<QUrl> urls = mimeData->urls();
 
-		QString type = decodeKey(mimeData);
-		QString value = !urls.isEmpty() ? urls.first().toLocalFile() : decodeValue(mimeData);
-
-		if (isAudioFile(value)) { type = "samplefile"; }
-		else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
-		else if (isPresetFile(value)) { type = "presetfile"; }
-		else if (isMidiFile(value)) { type = "midifile"; }
-		else if (isProjectFile(value)) { type = "projectfile"; }
-		else if (isPatchFile(value)) { type = "patchfile"; }
-		else if (isSoundFontFile(value)) { type = "soundfontfile"; }
+		QString type("missing_type");
+		QString value("");
+		if (!urls.isEmpty())
+		{
+			value = urls.first().toLocalFile()
+			if (isAudioFile(value)) { type = "samplefile"; }
+			else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
+			else if (isPresetFile(value)) { type = "presetfile"; }
+			else if (isMidiFile(value)) { type = "midifile"; }
+			else if (isProjectFile(value)) { type = "projectfile"; }
+			else if (isPatchFile(value)) { type = "patchfile"; }
+			else if (isSoundFontFile(value)) { type = "soundfontfile"; }
+		}
+		else if (mimeData->hasFormat(mimeType(MimeType::StringPair)))
+		{
+			type = decodeKey(mimeData);
+			value = decodeValue(mimeData);
+		}
 
 		return {type, value};
 	}
