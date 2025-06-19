@@ -296,7 +296,8 @@ jobs:
       - name: Show compile_commands.json
         run: |
           pwd
-          cat compile_commands.json
+          find .. -iname compile_commands.json || true
+          find .. -iname compile_commands.json | xargs cat || true
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
