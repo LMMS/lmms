@@ -259,6 +259,13 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
+      - name: Install configuration dependencies
+        run: |
+          apt-get update && apt-get install -y \
+            --no-install-recommends            \
+              dirmngr                          \
+              gnupg                            \
+          && rm -rf /var/lib/apt/lists/*
       - name: Configure apt
         run: |
           sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
