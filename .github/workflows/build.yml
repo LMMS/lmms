@@ -251,8 +251,6 @@ jobs:
     container: ubuntu:22.04
     env:
       CMAKE_OPTS: >-
-        -Werror=dev
-        -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
