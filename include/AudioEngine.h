@@ -167,10 +167,8 @@ public:
 				bool startNow );
 	void storeAudioDevice();
 	void restoreAudioDevice();
-	inline AudioDevice * audioDev()
-	{
-		return m_audioDev;
-	}
+	inline AudioDevice * audioDev() { return m_audioDev; }
+	inline const AudioDevice* audioDev() const { return m_audioDev; }
 
 	bool captureDeviceAvailable() const;
 
@@ -355,11 +353,6 @@ private:
 
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
-
-	const AudioDevice* audioDev() const
-	{
-		return m_audioDev;
-	}
 
 	void renderStageNoteSetup();
 	void renderStageInstruments();
