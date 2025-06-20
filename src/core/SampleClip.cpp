@@ -265,6 +265,7 @@ void SampleClip::updateLength()
 void SampleClip::tempoChanged()
 {
 	Clip::setStartTimeOffset(std::round(1.0f * m_startFrameOffset / Engine::framesPerTick()));
+	updateLength();
 	emit sampleChanged();
 }
 
