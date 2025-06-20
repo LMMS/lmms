@@ -23,6 +23,7 @@
 
 #include "SharedMemory.h"
 
+#include <random>
 #include <system_error>
 #include <utility>
 
@@ -75,7 +76,7 @@ class SharedMemoryImpl
 {
 public:
 	SharedMemoryImpl(const std::string& key, bool readOnly) :
-		m_key{"/" + key}
+		m_key{'/' + key}
 	{
 		const auto openFlags = readOnly ? O_RDONLY : O_RDWR;
 		const auto fd = FileDescriptor{
@@ -93,7 +94,7 @@ public:
 	}
 
 	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly) :
-		m_key{"/" + key},
+		m_key{'/' + key},
 		m_size{size}
 	{
 		const auto fd = FileDescriptor{
@@ -120,11 +121,12 @@ public:
 	}
 
 	auto get() const noexcept -> void* { return m_mapping; }
+	auto size_bytes() const noexcept -> std::size_t { return m_size; }
 
 private:
 	std::string m_key;
-	std::size_t m_size;
-	void* m_mapping;
+	std::size_t m_size = 0;
+	void* m_mapping = nullptr;
 	ShmObject m_object;
 };
 
@@ -163,9 +165,18 @@ public:
 
 		m_view.reset(MapViewOfFile(m_mapping.get(), access, 0, 0, 0));
 		if (!m_view) { throwLastError("SharedMemoryImpl: MapViewOfFile() failed"); }
+
+		MEMORY_BASIC_INFORMATION mbi;
+		if (VirtualQuery(m_view.get(), &mbi, sizeof(mbi)) == 0)
+		{
+			throwLastError("SharedMemoryImpl: VirtualQuery() failed");
+		}
+
+		m_size = static_cast<std::size_t>(mbi.RegionSize);
 	}
 
-	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly)
+	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly) :
+		m_size{size}
 	{
 		const auto [high, low] = sizeToHighAndLow(size);
 		m_mapping.reset(CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, high, low, key.c_str()));
@@ -186,13 +197,38 @@ public:
 	auto operator=(const SharedMemoryImpl&) -> SharedMemoryImpl& = delete;
 
 	auto get() const noexcept -> void* { return m_view.get(); }
+	auto size_bytes() const noexcept -> std::size_t { return m_size; }
 
 private:
 	UniqueHandle m_mapping;
 	FileView m_view;
+	std::size_t m_size = 0;
 };
 
 #endif
+
+namespace {
+
+auto createKey() -> std::string
+{
+	// Max length (minus prepended '/') on macOS (PSHMNAMLEN=31)
+	constexpr int length = 30;
+
+	std::string key;
+	std::random_device rd;
+	auto gen = std::mt19937{rd()}; // mersenne twister, seeded
+	auto distrib = std::uniform_int_distribution{0, 15}; // hex range (0-15)
+
+	key.reserve(length + 1);
+	for (int i = 0; i < length; ++i)
+	{
+		key += "0123456789ABCDEF"[distrib(gen)];
+	}
+
+	return key;
+}
+
+} // namespace
 
 SharedMemoryData::SharedMemoryData() noexcept = default;
 
@@ -208,6 +244,10 @@ SharedMemoryData::SharedMemoryData(std::string&& key, std::size_t size, bool rea
 	m_ptr{m_impl->get()}
 { }
 
+SharedMemoryData::SharedMemoryData(std::size_t size, bool readOnly) :
+	SharedMemoryData{createKey(), size, readOnly}
+{ }
+
 SharedMemoryData::~SharedMemoryData() = default;
 
 SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
@@ -215,5 +255,10 @@ SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_impl{std::move(other.m_impl)},
 	m_ptr{std::exchange(other.m_ptr, nullptr)}
 { }
+
+auto SharedMemoryData::size_bytes() const noexcept -> std::size_t
+{
+	return m_impl ? m_impl->size_bytes() : 0;
+}
 
 } // namespace lmms::detail

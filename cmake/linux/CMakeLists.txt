@@ -8,8 +8,6 @@ if(WANT_CPACK_TARBALL)
 	return()
 endif()
 
-install(FILES launch_lmms.sh DESTINATION bin)
-
 # Standard CPack options
 set(CPACK_GENERATOR "External" PARENT_SCOPE)
 set(CPACK_EXTERNAL_ENABLE_STAGING true PARENT_SCOPE)
