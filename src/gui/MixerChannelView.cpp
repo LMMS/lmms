@@ -107,21 +107,23 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	renameLineEditProxy->setRotation(-90);
 	m_renameLineEditView->setFixedSize(m_renameLineEdit->height() + 5, m_renameLineEdit->width() + 5);
 
-	m_muteButton = new AutomatableButton(this, tr("Mute"));
+	m_muteButton = new PixmapButton(this, tr("Mute"));
 	m_muteButton->setModel(&mixerChannel->m_muteModel);
+	m_muteButton->setActiveGraphic(embed::getIconPixmap("led_off"));
+	m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
 	m_muteButton->setCheckable(true);
-	m_muteButton->setObjectName("btn-mute");
 	m_muteButton->setToolTip(tr("Mute this channel"));
 
-	m_soloButton = new AutomatableButton(this, tr("Solo"));
+	m_soloButton = new PixmapButton(this, tr("Solo"));
 	m_soloButton->setModel(&mixerChannel->m_soloModel);
+	m_soloButton->setActiveGraphic(embed::getIconPixmap("led_red"));
+	m_soloButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
 	m_soloButton->setCheckable(true);
-	m_soloButton->setObjectName("btn-solo");
 	m_soloButton->setToolTip(tr("Solo this channel"));
 
 	auto soloMuteLayout = new QVBoxLayout();
-	soloMuteLayout->setContentsMargins(0, 2, 0, 2);
-	soloMuteLayout->setSpacing(2);
+	soloMuteLayout->setContentsMargins(0, 0, 0, 0);
+	soloMuteLayout->setSpacing(0);
 	soloMuteLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
 	soloMuteLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
 
@@ -147,8 +149,6 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
 	connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
-
-	setFocusPolicy(Qt::StrongFocus);
 }
 
 void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -222,23 +222,23 @@ void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
 	renameChannel();
 }
 
-void MixerChannelView::keyPressEvent(QKeyEvent* ke)
+bool MixerChannelView::eventFilter(QObject*, QEvent* event)
 {
-	if (ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return)
+	// If we are in a rename, capture the enter/return events and handle them
+	if (event->type() == QEvent::KeyPress)
 	{
-		if (m_inRename)
+		auto keyEvent = static_cast<QKeyEvent*>(event);
+		if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
 		{
-			renameFinished();
+			if (m_inRename)
+			{
+				renameFinished();
+				event->accept(); // Stop the event from propagating
+				return true;
+			}
 		}
 	}
-	else if (ke->key() == Qt::Key_Space)
-	{
-		m_fader->adjustByDialog();
-	}
-	else
-	{
-		ke->ignore();
-	}
+	return false;
 }
 
 void MixerChannelView::setChannelIndex(int index)

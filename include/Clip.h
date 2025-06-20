@@ -100,28 +100,12 @@ public:
 	 *  resized by clicking and dragging its edge.
 	 *
 	 */
-	inline void setResizable( const bool r )
-	{
-		m_resizable = r;
-	}
-
-	inline const bool getResizable() const
-	{
-		return m_resizable;
-	}
-
-	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
-	 *
-	 *  If a clip has been resized previously, it will not automatically 
-	 *  resize when editing it.
-	 *
-	 */
-	void setAutoResize(const bool r)
+	inline void setAutoResize( const bool r )
 	{
 		m_autoResize = r;
 	}
 
-	bool getAutoResize() const
+	inline const bool getAutoResize() const
 	{
 		return m_autoResize;
 	}
@@ -131,7 +115,6 @@ public:
 
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
-	virtual void updateLength() {};
 
 	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 
@@ -154,12 +137,6 @@ public:
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
 
-	/**
-	* Creates a copy of this clip
-	* @return pointer to the new clip object
-	*/
-	virtual Clip* clone() = 0;
-
 public slots:
 	void toggleMute();
 
@@ -170,8 +147,6 @@ signals:
 	void destroyedClip();
 	void colorChanged();
 
-protected:
-	Clip(const Clip& other);
 
 private:
 	Track * m_track;
@@ -183,8 +158,7 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_resizable = true;
-	bool m_autoResize = true;
+	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
 

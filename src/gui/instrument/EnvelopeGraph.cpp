@@ -30,6 +30,7 @@
 #include <QMenu>
 
 #include "EnvelopeAndLfoParameters.h"
+#include "lmms_math.h"
 #include "ColorHelper.h"
 
 #include <cmath>

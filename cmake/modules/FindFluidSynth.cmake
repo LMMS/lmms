@@ -22,7 +22,7 @@ find_path(FluidSynth_INCLUDE_DIR
 )
 
 find_library(FluidSynth_LIBRARY
-	NAMES "fluidsynth" "fluidsynth-3" "fluidsynth-2" "fluidsynth-1"
+	NAMES "fluidsynth"
 	HINTS ${FLUIDSYNTH_PKG_LIBRARY_DIRS}
 )
 

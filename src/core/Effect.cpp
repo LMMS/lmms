@@ -32,7 +32,7 @@
 
 #include "ConfigManager.h"
 #include "SampleFrame.h"
-#include "lmms_math.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -190,7 +190,7 @@ void Effect::checkGate(double outSum)
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if (approximatelyEqual(outSum, gate()))
+	if (outSum - gate() <= F_EPSILON)
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
