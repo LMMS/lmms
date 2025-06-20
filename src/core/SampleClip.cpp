@@ -271,7 +271,6 @@ void SampleClip::tempoChanged()
 {
 	Clip::setStartTimeOffset(std::round(1.0f * m_startFrameOffset / Engine::framesPerTick()));
 	emit sampleChanged();
-	Engine::getSong()->setModified();
 }
 
 void SampleClip::setStartTimeOffset(const TimePos &startTimeOffset)
