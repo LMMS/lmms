@@ -262,8 +262,6 @@ void SampleClip::setIsPlaying(bool isPlaying)
 void SampleClip::updateLength()
 {
 	emit sampleChanged();
-
-	Engine::getSong()->setModified();
 }
 
 
