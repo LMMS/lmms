@@ -259,12 +259,30 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Install configuration dependencies
+      - name: Install basic dependencies
         run: |
           apt-get update && apt-get install -y \
             --no-install-recommends            \
               dirmngr                          \
               gnupg                            \
+              binutils                         \
+              ca-certificates                  \
+              ccache                           \
+              git                              \
+              gpg                              \
+              libc6-dev                        \
+              liblist-moreutils-perl           \
+              libxml2-utils                    \
+              libxml-perl                      \
+              lsb-release                      \
+              make                             \
+              perl                             \
+              software-properties-common       \
+              ssh-client                       \
+              wget                             \
+              qt5-qmake                        \
+              qtbase5-dev                      \
+              qttools5-dev-tools               \
           && rm -rf /var/lib/apt/lists/*
       - name: Configure apt
         run: |
@@ -288,7 +306,7 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
-      - name: Install dependencies
+      - name: Install building dependencies
         run: |
           apt-get install -y --no-install-recommends \
           $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
