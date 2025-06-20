@@ -5129,11 +5129,11 @@ PianoRollWindow::PianoRollWindow() :
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
 
-	auto duplicateQuantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate Notes (Quantized)"), noteToolsButton);
+	auto duplicateQuantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate"), noteToolsButton);
 	connect(duplicateQuantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(true); });
 	duplicateQuantizedAction->setShortcut(combine(Qt::CTRL, Qt::Key_D));
 
-	auto duplicateUnquantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate Notes (Unquantized)"), noteToolsButton);
+	auto duplicateUnquantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate (Unquantized)"), noteToolsButton);
 	connect(duplicateUnquantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(false); });
 	duplicateUnquantizedAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_D));
 
