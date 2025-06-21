@@ -269,7 +269,7 @@ void SampleClip::tempoChanged()
 	emit sampleChanged();
 }
 
-void SampleClip::setStartTimeOffset(const TimePos &startTimeOffset)
+void SampleClip::setStartTimeOffset(const TimePos& startTimeOffset)
 {
 	m_startFrameOffset = startTimeOffset * Engine::framesPerTick();
 	Clip::setStartTimeOffset(startTimeOffset);
