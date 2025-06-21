@@ -280,7 +280,18 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 			auto label = new QLabel(m_descriptionWidget);
 			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
 			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate("PluginBrowser", descriptor.description) + "</p>";
-			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
+			
+			QString authorString = QString::fromUtf8(descriptor.author).toHtmlEscaped();
+
+			if (authorString.contains("/dot/")){
+				authorString.replace("/dot/", ".");
+			}
+			
+			if (authorString.contains("/at/")){
+				authorString.replace("/at/", "@");
+			}
+
+			labelText += "<p><b>" + tr("Author") + ":</b> " + authorString + "</p>";
 
 			label->setText(labelText);
 			label->setWordWrap(true);
