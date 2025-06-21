@@ -288,6 +288,7 @@ void MidiClip::clearNotes()
 	instrumentTrack()->unlock();
 
 	checkType();
+	updateLength();
 	emit dataChanged();
 }
 
