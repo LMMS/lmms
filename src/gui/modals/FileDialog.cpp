@@ -23,6 +23,7 @@
  */
 
 #include <QList>
+#include <QMap>
 #include <QUrl>
 #include <QListView>
 #include <QStandardPaths>
@@ -38,14 +39,15 @@
 namespace lmms::gui
 {
 
-std::vector<QString> FileDialog::OperationPaths = std::vector<QString>();
+QMap<FileDialog::Operation, QString> FileDialog::OperationPaths = {};
 bool FileDialog::OperationPathsReady = false;
 
 FileDialog::FileDialog(QWidget *parent, const QString &caption,
 					   const QString &directory, const QString &filter,
 					   const Operation operation) :
-	QFileDialog( parent, caption, getOperationPath(operation, directory), filter),
-	operation(operation)
+	QFileDialog(parent, caption, getOperationPath(operation, directory), filter),
+	operation(operation),
+	m_status(QDialog::Rejected)
 {
 #if QT_VERSION > 0x050200
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
@@ -53,44 +55,19 @@ FileDialog::FileDialog(QWidget *parent, const QString &caption,
 	setOption( QFileDialog::DontUseNativeDialog );
 }
 
+int FileDialog::exec()
+{
+	m_status = this->QFileDialog::exec();
+	return m_status;
+}
+
 FileDialog::~FileDialog()
 {
-	setOperationPath(operation, directory().absolutePath());
-}
-
-QString FileDialog::getExistingDirectory(QWidget *parent,
-										const QString &caption,
-										const QString &directory,
-										QFileDialog::Options options,
-										const Operation operation)
-{
-	FileDialog dialog(parent, caption, directory, QString(), operation);
-	dialog.setFileMode(QFileDialog::Directory);
-	dialog.setOptions(dialog.options() | options);
-	if (dialog.exec() == QDialog::Accepted) {
-		return dialog.selectedFiles().value(0);
+	if (m_status == QDialog::Accepted)
+	{
+		setOperationPath(operation, directory().absolutePath());
 	}
-	return QString();
 }
-
-QString FileDialog::getOpenFileName(QWidget *parent,
-									const QString &caption,
-									const QString &directory,
-									const QString &filter,
-									QString *selectedFilter,
-									const Operation operation)
-{
-	FileDialog dialog(parent, caption, directory, QString(), operation);
-	if (selectedFilter && !selectedFilter->isEmpty())
-		dialog.selectNameFilter(*selectedFilter);
-	if (dialog.exec() == QDialog::Accepted) {
-		if (selectedFilter)
-			*selectedFilter = dialog.selectedNameFilter();
-		return dialog.selectedFiles().value(0);
-	}
-	return QString();
-}
-
 
 void FileDialog::clearSelection()
 {
@@ -108,15 +85,14 @@ void FileDialog::prepareOperationPaths()
 
 	auto* config = ConfigManager::inst();
 
-	OperationPaths = {
-		config->workingDir(),
-		config->userProjectsDir(),
-		config->workingDir(),
-		config->userPresetsDir(),
-		config->userVstDir(),
-		config->userSamplesDir(),
-		config->workingDir()
-	};
+	OperationPaths[Operation::Generic]		= config->workingDir();
+	OperationPaths[Operation::Project]  	= config->userProjectsDir();
+	OperationPaths[Operation::Midi]  		= config->workingDir();
+	OperationPaths[Operation::Preset]		= config->userPresetsDir();
+	OperationPaths[Operation::Plugin]		= config->userVstDir();
+	OperationPaths[Operation::Sample]		= config->userSamplesDir();
+	OperationPaths[Operation::Soundfont]	= config->userSf2Dir();
+	OperationPaths[Operation::Song]  		= config->workingDir();
 
 	OperationPathsReady = true;
 }
@@ -130,22 +106,12 @@ QString FileDialog::getOperationPath(const FileDialog::Operation op, const QStri
 
 	prepareOperationPaths();
 
-	if (op != Operation::End)
-	{
-		return OperationPaths[static_cast<size_t>(op)];
-	}
-
-	return OperationPaths[static_cast<size_t>(Operation::Generic)];
+	return OperationPaths[op];
 }
 
 void FileDialog::setOperationPath(const FileDialog::Operation op, const QString& path)
 {
-	prepareOperationPaths();
-
-	if (op != Operation::End)
-	{
-		OperationPaths[static_cast<size_t>(op)] = path;
-	}
+	OperationPaths[op] = path;
 }
 
 } // namespace lmms::gui
