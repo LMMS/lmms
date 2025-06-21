@@ -89,7 +89,7 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus CrossoverEQEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
@@ -134,10 +134,10 @@ ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
 	
 	m_needsUpdate = false;
 	
-	zeroSampleFrames(m_work, inOut.size());
+	zeroSampleFrames(m_work, inOut.frames());
 	
 	// run temp bands
-	for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 	{
 		m_tmp1[f][0] = m_lp2.update(inOut[f][0], 0);
 		m_tmp1[f][1] = m_lp2.update(inOut[f][1], 1);
@@ -148,7 +148,7 @@ ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
 	// run band 1
 	if( mute1 )
 	{
-		for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			m_work[f][0] += m_lp1.update( m_tmp1[f][0], 0 ) * m_gain1;
 			m_work[f][1] += m_lp1.update( m_tmp1[f][1], 1 ) * m_gain1;
@@ -158,7 +158,7 @@ ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
 	// run band 2
 	if( mute2 )
 	{
-		for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			m_work[f][0] += m_hp2.update( m_tmp1[f][0], 0 ) * m_gain2;
 			m_work[f][1] += m_hp2.update( m_tmp1[f][1], 1 ) * m_gain2;
@@ -168,7 +168,7 @@ ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
 	// run band 3
 	if( mute3 )
 	{
-		for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			m_work[f][0] += m_lp3.update( m_tmp2[f][0], 0 ) * m_gain3;
 			m_work[f][1] += m_lp3.update( m_tmp2[f][1], 1 ) * m_gain3;
@@ -178,7 +178,7 @@ ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
 	// run band 4
 	if( mute4 )
 	{
-		for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			m_work[f][0] += m_hp4.update( m_tmp2[f][0], 0 ) * m_gain4;
 			m_work[f][1] += m_hp4.update( m_tmp2[f][1], 1 ) * m_gain4;
@@ -188,7 +188,7 @@ ProcessStatus CrossoverEQEffect::processImpl(std::span<SampleFrame> inOut)
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 	{
 		inOut[f][0] = d * inOut[f][0] + w * m_work[f][0];
 		inOut[f][1] = d * inOut[f][1] + w * m_work[f][1];

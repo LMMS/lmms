@@ -50,7 +50,7 @@ public:
 	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	SaProcessor m_processor;
 	SaControls m_controls;

@@ -82,12 +82,12 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-ProcessStatus StereoEnhancerEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus StereoEnhancerEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 
 		// copy samples into the delay buffer

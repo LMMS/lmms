@@ -58,7 +58,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-ProcessStatus DispersionEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus DispersionEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -96,7 +96,7 @@ ProcessStatus DispersionEffect::processImpl(std::span<SampleFrame> inOut)
 		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 		std::array<sample_t, 2> s = { frame[0] + m_feedbackVal[0], frame[1] + m_feedbackVal[1] };
 		

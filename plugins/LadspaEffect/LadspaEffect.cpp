@@ -129,7 +129,7 @@ void LadspaEffect::changeSampleRate()
 
 
 
-ProcessStatus LadspaEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus LadspaEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	m_pluginMutex.lock();
 	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
@@ -138,16 +138,17 @@ ProcessStatus LadspaEffect::processImpl(std::span<SampleFrame> inOut)
 		return ProcessStatus::Sleep;
 	}
 
-	const auto frames = inOut.size();
+	auto inOutSF = inOut.toSampleFrames();
+	const auto frames = inOutSF.size();
 	auto outFrames = frames;
 	SampleFrame* outBuf = nullptr;
 	QVarLengthArray<SampleFrame> sBuf(frames);
 
 	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
-		outBuf = inOut.data();
-		inOut = std::span{sBuf.data(), static_cast<std::size_t>(sBuf.size())};
-		sampleDown(outBuf, inOut.data(), m_maxSampleRate);
+		outBuf = inOutSF.data();
+		inOutSF = std::span{sBuf.data(), static_cast<std::size_t>(sBuf.size())};
+		sampleDown(outBuf, inOutSF.data(), m_maxSampleRate);
 		outFrames = frames * m_maxSampleRate /
 				Engine::audioEngine()->outputSampleRate();
 	}
@@ -250,7 +251,7 @@ ProcessStatus LadspaEffect::processImpl(std::span<SampleFrame> inOut)
 
 	if (outBuf != nullptr)
 	{
-		sampleBack(inOut.data(), outBuf, m_maxSampleRate);
+		sampleBack(inOutSF.data(), outBuf, m_maxSampleRate);
 	}
 
 	m_pluginMutex.unlock();

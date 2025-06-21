@@ -380,7 +380,7 @@ public:
 		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
 	}
 
-	//! View over the frames, iterating in chunks of `channels()`
+	//! View over the frames, iterating in chunks the size of `channels()`
 	constexpr auto framesView() const noexcept -> std::ranges::subrange<ConstFrameIter, const SampleT*>
 	{
 		const SampleT* end = this->m_data + Base::channels() * this->m_frames;
@@ -394,7 +394,7 @@ public:
 		}
 	}
 
-	//! View over the frames, iterating in chunks of `channels()`
+	//! View over the frames, iterating in chunks the size of `channels()`
 	constexpr auto framesView() noexcept -> std::ranges::subrange<FrameIter, SampleT*>
 	{
 		SampleT* end = this->m_data + Base::channels() * this->m_frames;

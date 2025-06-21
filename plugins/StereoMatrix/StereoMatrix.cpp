@@ -64,25 +64,26 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-ProcessStatus StereoMatrixEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus StereoMatrixEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
-	for (fpp_t f = 0; f < inOut.size(); ++f)
-	{	
-		const float d = dryLevel();
-		const float w = wetLevel();
-		
-		sample_t l = inOut[f][0];
-		sample_t r = inOut[f][1];
+	const float d = dryLevel();
+	const float w = wetLevel();
+
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
+	{
+		float* frame = inOut.framePtr(f);
+		sample_t l = frame[0];
+		sample_t r = frame[1];
 
 		// Init with dry-mix
-		inOut[f][0] = l * d;
-		inOut[f][1] = r * d;
+		frame[0] = l * d;
+		frame[1] = r * d;
 
 		// Add it wet
-		inOut[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
+		frame[0] += ( m_smControls.m_llModel.value( f ) * l  +
 					m_smControls.m_rlModel.value( f ) * r ) * w;
 
-		inOut[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
+		frame[1] += ( m_smControls.m_lrModel.value( f ) * l  +
 					m_smControls.m_rrModel.value( f ) * r ) * w;
 	}
 

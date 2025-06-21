@@ -53,7 +53,7 @@ protected:
 	bool m_frequencyChangeNeeded;
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	DspEffectLibrary::MonoToStereoAdaptor<DspEffectLibrary::FastBassBoost> m_bbFX;
 

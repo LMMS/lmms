@@ -65,7 +65,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-ProcessStatus WaveShaperEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus WaveShaperEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 // variables for effect
 	int i = 0;
@@ -86,7 +86,7 @@ ProcessStatus WaveShaperEffect::processImpl(std::span<SampleFrame> inOut)
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 		auto s = std::array{frame[0], frame[1]};
 

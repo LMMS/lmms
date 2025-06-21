@@ -57,7 +57,7 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-ProcessStatus AmplifierEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus AmplifierEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -67,7 +67,7 @@ ProcessStatus AmplifierEffect::processImpl(std::span<SampleFrame> inOut)
 	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
 	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
-	for (fpp_t f = 0; f < inOut.size(); ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
 		const float volume = (volumeBuf ? volumeBuf->value(f) : m_ampControls.m_volumeModel.value()) * 0.01f;
 		const float pan = (panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value()) * 0.01f;
@@ -77,7 +77,7 @@ ProcessStatus AmplifierEffect::processImpl(std::span<SampleFrame> inOut)
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
 
-		auto& currentFrame = inOut[f];
+		auto& currentFrame = inOut.sampleFrameAt(f);
 
 		const auto s = currentFrame * SampleFrame(left * panLeft, right * panRight) * volume;
 

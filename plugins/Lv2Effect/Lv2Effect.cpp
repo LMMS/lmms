@@ -68,24 +68,24 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-ProcessStatus Lv2Effect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus Lv2Effect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
-	Q_ASSERT(inOut.size() <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
+	Q_ASSERT(inOut.frames() <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
-	m_controls.copyBuffersFromLmms(inOut.data(), inOut.size());
+	m_controls.copyBuffersFromLmms(reinterpret_cast<SampleFrame*>(inOut.data()), inOut.frames());
 	m_controls.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
-	m_controls.run(inOut.size());
+	m_controls.run(inOut.frames());
 //	m_pluginMutex.unlock();
 
 	m_controls.copyModelsToLmms();
-	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), inOut.size());
+	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), inOut.frames());
 
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1 : dryLevel();
 	const float w = corrupt ? 0 : wetLevel();
-	for (fpp_t f = 0; f < inOut.size(); ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
 		inOut[f][0] = d * inOut[f][0] + w * m_tmpOutputSmps[f][0];
 		inOut[f][1] = d * inOut[f][1] + w * m_tmpOutputSmps[f][1];

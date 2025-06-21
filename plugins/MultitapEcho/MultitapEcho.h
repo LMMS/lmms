@@ -47,7 +47,7 @@ public:
 	}
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	void updateFilters( int begin, int end );
 	void runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames );

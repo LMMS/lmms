@@ -33,7 +33,6 @@ namespace lmms {
 //! Types of audio data supported by audio ports
 enum class AudioDataKind : std::uint8_t
 {
-	SampleFrame,
 	F32,
 	// F64,
 	// I16,
@@ -52,9 +51,6 @@ struct GetAudioDataTypeHelper
 
 template<>
 struct GetAudioDataTypeHelper<AudioDataKind::F32> { using type = float; };
-
-template<>
-struct GetAudioDataTypeHelper<AudioDataKind::SampleFrame> { using type = SampleFrame; };
 
 } // namespace detail
 
@@ -127,6 +123,18 @@ struct AudioPortsSettings
 		return inputs != DynamicChannelCount && outputs != DynamicChannelCount;
 	}
 
+	/**
+	 * Whether the audio port buffers can be converted to/from
+	 * `std::span<SampleFrame>` or `InterleavedBufferView<float, 2>`
+	 */
+	constexpr auto sampleFrameCompatible() const -> bool
+	{
+		return kind == AudioDataKind::F32
+			&& interleaved && inplace
+			&& (inputs == 0 || inputs == 2)
+			&& (outputs == 0 || outputs == 2);
+	}
+
 	constexpr auto operator==(const AudioPortsSettings& rhs) const -> bool = default;
 };
 
@@ -134,12 +142,15 @@ struct AudioPortsSettings
 template<AudioPortsSettings settings>
 constexpr auto validate() -> bool
 {
-	static_assert(settings.kind != AudioDataKind::SampleFrame
+	static_assert(!settings.interleaved
 		|| ((settings.inputs == 0 || settings.inputs == 2) && (settings.outputs == 0 || settings.outputs == 2)),
-		"AudioPortsSettings: When using SampleFrame, there must be exactly 0 or 2 input and output channels");
+		"AudioPortsSettings: When using interleaved samples, there must be exactly 0 or 2 input and output channels");
 
-	static_assert(settings.kind != AudioDataKind::SampleFrame || settings.interleaved,
-		"AudioPortsSettings: SampleFrame can only be interleaved");
+	static_assert(!settings.interleaved || settings.kind == AudioDataKind::F32,
+		"AudioPortsSettings: Interleaved samples must be float");
+
+	static_assert(!settings.interleaved || settings.inplace,
+		"AudioPortsSettings: Interleaved samples must use in-place processing");
 
 	return true;
 }

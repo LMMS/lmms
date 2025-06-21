@@ -88,7 +88,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-ProcessStatus FlangerEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus FlangerEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -101,7 +101,7 @@ ProcessStatus FlangerEffect::processImpl(std::span<SampleFrame> inOut)
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 		float leftLfo;
 		float rightLfo;

@@ -93,7 +93,7 @@ inline void DynProcEffect::calcRelease()
 }
 
 
-ProcessStatus DynProcEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus DynProcEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
@@ -134,7 +134,7 @@ ProcessStatus DynProcEffect::processImpl(std::span<SampleFrame> inOut)
 		}
 	}
 
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 		auto s = std::array{frame[0], frame[1]};
 

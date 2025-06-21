@@ -101,7 +101,7 @@ inline float BitcrushEffect::noise( float amt )
 	return fastRand(-amt, +amt);
 }
 
-ProcessStatus BitcrushEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus BitcrushEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
@@ -149,7 +149,7 @@ ProcessStatus BitcrushEffect::processImpl(std::span<SampleFrame> inOut)
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
 	{
-		for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -176,7 +176,7 @@ ProcessStatus BitcrushEffect::processImpl(std::span<SampleFrame> inOut)
 	}
 	else // rate crushing disabled: simply oversample with zero-order hold
 	{
-		for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -192,7 +192,7 @@ ProcessStatus BitcrushEffect::processImpl(std::span<SampleFrame> inOut)
 
 	// the oversampled buffer is now written, so filter it to reduce aliasing
 
-	for (auto f = std::size_t{0}; f < inOut.size() * OS_RATE; ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames() * OS_RATE; ++f)
 	{
 		if( qMax( qAbs( m_buffer[f][0] ), qAbs( m_buffer[f][1] ) ) >= 1.0e-10f )
 		{
@@ -220,7 +220,7 @@ ProcessStatus BitcrushEffect::processImpl(std::span<SampleFrame> inOut)
 
 	const float d = dryLevel();
 	const float w = wetLevel();
-	for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 	{
 		float lsum = 0.0f;
 		float rsum = 0.0f;

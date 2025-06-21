@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-ProcessStatus Analyzer::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus Analyzer::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
@@ -96,7 +96,7 @@ ProcessStatus Analyzer::processImpl(std::span<SampleFrame> inOut)
 	{
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(inOut.data(), inOut.size(), true);
+		m_inputBuffer.write(reinterpret_cast<SampleFrame*>(inOut.data()), inOut.frames(), true);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;

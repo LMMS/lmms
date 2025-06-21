@@ -50,7 +50,7 @@ public:
 	void runDispersionAP(const int filtNum, const float apCoeff1, const float apCoeff2, std::array<sample_t, 2> &put);
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	DispersionControls m_dispersionControls;
 	

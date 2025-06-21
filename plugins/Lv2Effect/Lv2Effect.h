@@ -48,7 +48,7 @@ public:
 	const Lv2FxControls* lv2Controls() const { return &m_controls; }
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	Lv2FxControls m_controls;
 	std::vector<SampleFrame> m_tmpOutputSmps;

@@ -81,7 +81,7 @@ DelayEffect::~DelayEffect()
 
 
 
-ProcessStatus DelayEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus DelayEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float sr = Engine::audioEngine()->outputSampleRate();
 	const float d = dryLevel();
@@ -110,8 +110,9 @@ ProcessStatus DelayEffect::processImpl(std::span<SampleFrame> inOut)
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 
-	for (SampleFrame& currentFrame : inOut)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
+		auto& currentFrame = inOut.sampleFrameAt(f);
 		const auto dryS = currentFrame;
 
 		// Prepare delay for current sample

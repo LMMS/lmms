@@ -48,34 +48,34 @@ void zeroBuffer(PlanarBufferView<SampleT, extent> buffer)
 	}
 }
 
-void zeroBuffer(AudioBus<SampleFrame> bus)
+void zeroBuffer(AudioBus<float> bus)
 {
 	for (track_ch_t channelPair = 0; channelPair < bus.channelPairs(); ++channelPair)
 	{
-		SampleFrame* buffer = bus[channelPair];
-		zeroSampleFrames(buffer, bus.frames());
+		auto buffer = bus.trackChannelPair(channelPair);
+		std::ranges::fill(buffer.dataView(), 0.f);
 	}
 }
 
 template<class F>
-void transformBuffer(AudioBus<const SampleFrame> in, AudioBus<SampleFrame> out, const F& func)
+void transformBuffer(AudioBus<const float> in, AudioBus<float> out, const F& func)
 {
 	assert(in.channelPairs() == out.channelPairs());
 	assert(in.frames() == out.frames());
 	for (track_ch_t channelPair = 0; channelPair < in.channelPairs(); ++channelPair)
 	{
-		for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
+		for (f_cnt_t sampleIdx = 0; sampleIdx < in.frames() * 2; sampleIdx += 2)
 		{
-			out[channelPair][frame].leftRef() = func(in[channelPair][frame].left());
-			out[channelPair][frame].rightRef() = func(in[channelPair][frame].right());
+			out[channelPair][sampleIdx]     = func(in[channelPair][sampleIdx]);
+			out[channelPair][sampleIdx + 1] = func(in[channelPair][sampleIdx + 1]);
 		}
 	}
 }
 
 template<class F>
-void transformBuffer(std::span<SampleFrame> inOut, const F& func)
+void transformBuffer(InterleavedBufferView<float, 2> inOut, const F& func)
 {
-	for (SampleFrame& sf : inOut)
+	for (SampleFrame& sf : inOut.toSampleFrames())
 	{
 		sf = func(sf);
 	}
@@ -94,16 +94,16 @@ void transformBuffer(PlanarBufferView<SampleT, extent> in, PlanarBufferView<Samp
 	}
 }
 
-void compareBuffers(AudioBus<const SampleFrame> actual, AudioBus<const SampleFrame> expected)
+void compareBuffers(AudioBus<const float> actual, AudioBus<const float> expected)
 {
 	QCOMPARE(actual.channelPairs(), expected.channelPairs());
 	QCOMPARE(actual.frames(), expected.frames());
 	for (track_ch_t channelPair = 0; channelPair < actual.channelPairs(); ++channelPair)
 	{
-		for (f_cnt_t frame = 0; frame < actual.frames(); ++frame)
+		for (f_cnt_t sampleIdx = 0; sampleIdx < actual.frames() * 2; sampleIdx += 2)
 		{
-			QCOMPARE(actual[channelPair][frame].left(), expected[channelPair][frame].left());
-			QCOMPARE(actual[channelPair][frame].right(), expected[channelPair][frame].right());
+			QCOMPARE(actual[channelPair][sampleIdx],     expected[channelPair][sampleIdx]);
+			QCOMPARE(actual[channelPair][sampleIdx + 1], expected[channelPair][sampleIdx + 1]);
 		}
 	}
 }
@@ -136,17 +136,17 @@ public:
 	static constexpr lmms::f_cnt_t MaxFrames = lmms::DEFAULT_BUFFER_SIZE;
 
 private:
-	std::vector<lmms::SampleFrame> m_coreBuffer;
-	lmms::SampleFrame* m_coreBufferPtr = nullptr;
+	std::vector<float> m_coreBuffer;
+	float* m_coreBufferPtr = nullptr;
 
-	auto getCoreBus() -> lmms::AudioBus<lmms::SampleFrame>
+	auto getCoreBus() -> lmms::AudioBus<float>
 	{
-		m_coreBuffer.resize(MaxFrames);
+		m_coreBuffer.resize(MaxFrames * 2);
 		m_coreBufferPtr = m_coreBuffer.data();
 
-		std::fill_n(m_coreBuffer.data(), m_coreBuffer.size(), lmms::SampleFrame{});
+		std::fill_n(m_coreBuffer.data(), m_coreBuffer.size(), 0.f);
 
-		return lmms::AudioBus<lmms::SampleFrame>{&m_coreBufferPtr, 1, MaxFrames};
+		return lmms::AudioBus<float>{&m_coreBufferPtr, 1, MaxFrames};
 	}
 
 private slots:
@@ -442,13 +442,13 @@ private slots:
 		//       processor input, following what REAPER does by default.
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
-		trackChannels[0].setLeft(123.f);
-		trackChannels[0].setRight(321.f);
-		trackChannels[1].setLeft(456.f);
-		trackChannels[1].setRight(654.f);
-		trackChannels[33].setLeft(789.f);
-		trackChannels[33].setRight(987.f);
+		auto trackChannels = coreBus.trackChannelPair(0); // channels 0/1
+		trackChannels.sampleFrameAt(0).setLeft(123.f);
+		trackChannels.sampleFrameAt(0).setRight(321.f);
+		trackChannels.sampleFrameAt(1).setLeft(456.f);
+		trackChannels.sampleFrameAt(1).setRight(654.f);
+		trackChannels.sampleFrameAt(33).setLeft(789.f);
+		trackChannels.sampleFrameAt(33).setRight(987.f);
 
 		// Processor input and output buffers
 		auto ins = ap.buffers()->input();
@@ -467,23 +467,23 @@ private slots:
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
-		coreBusExpected[0][0] = SampleFrame{123.f * 2, 123.f * 2};
-		coreBusExpected[0][1] = SampleFrame{456.f * 2, 456.f * 2};
-		coreBusExpected[0][33] = SampleFrame{789.f * 2, 789.f * 2};
+		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		coreBusExpected.trackChannelPair(0).sampleFrameAt(0) = SampleFrame{123.f * 2, 123.f * 2};
+		coreBusExpected.trackChannelPair(0).sampleFrameAt(1) = SampleFrame{456.f * 2, 456.f * 2};
+		coreBusExpected.trackChannelPair(0).sampleFrameAt(33) = SampleFrame{789.f * 2, 789.f * 2};
 
 		// Route from processor back to Core
 		router.receive(outs, coreBus);
 
 		// Check that result is the original left track channel with doubled amplitude
-		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus[0][0].right(), 123.f * 2);
-		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus[0][1].right(), 456.f * 2);
-		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus[0][33].right(), 789.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], 123.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[1], 123.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[0], 456.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[1], 456.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[0], 789.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[1], 789.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -501,13 +501,13 @@ private slots:
 		auto coreBus = getCoreBus();
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
-		trackChannels[0].setLeft(123.f);
-		trackChannels[0].setRight(321.f);
-		trackChannels[1].setLeft(456.f);
-		trackChannels[1].setRight(654.f);
-		trackChannels[33].setLeft(789.f);
-		trackChannels[33].setRight(987.f);
+		auto trackChannels = coreBus.trackChannelPair(0); // channels 0/1
+		trackChannels.sampleFrameAt(0).setLeft(123.f);
+		trackChannels.sampleFrameAt(0).setRight(321.f);
+		trackChannels.sampleFrameAt(1).setLeft(456.f);
+		trackChannels.sampleFrameAt(1).setRight(654.f);
+		trackChannels.sampleFrameAt(33).setLeft(789.f);
+		trackChannels.sampleFrameAt(33).setRight(987.f);
 
 		// Processor input and output buffers
 		auto ins = ap.buffers()->input();
@@ -529,9 +529,9 @@ private slots:
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 		// Sanity check for transformBuffer
@@ -549,12 +549,12 @@ private slots:
 		router.receive(outs, coreBus);
 
 		// Should be double the original
-		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus[0][0].right(), 321.f * 2);
-		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus[0][1].right(), 654.f * 2);
-		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus[0][33].right(), 987.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], 123.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[1], 321.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[0], 456.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[1], 654.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[0], 789.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[1], 987.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -588,13 +588,13 @@ private slots:
 		apm.out().setPin(1, 1, false);
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
-		trackChannels[0].setLeft(123.f);
-		trackChannels[0].setRight(321.f);
-		trackChannels[1].setLeft(456.f);
-		trackChannels[1].setRight(654.f);
-		trackChannels[33].setLeft(789.f);
-		trackChannels[33].setRight(987.f);
+		auto trackChannels = coreBus.trackChannelPair(0); // channels 0/1
+		trackChannels.sampleFrameAt(0).setLeft(123.f);
+		trackChannels.sampleFrameAt(0).setRight(321.f);
+		trackChannels.sampleFrameAt(1).setLeft(456.f);
+		trackChannels.sampleFrameAt(1).setRight(654.f);
+		trackChannels.sampleFrameAt(33).setLeft(789.f);
+		trackChannels.sampleFrameAt(33).setRight(987.f);
 
 		// Processor input and output buffers
 		auto ins = ap.buffers()->input();
@@ -616,14 +616,16 @@ private slots:
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
-		for (f_cnt_t frame = 0; frame < coreBus.frames(); ++frame)
+		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		for (f_cnt_t sampleIdx = 0; sampleIdx < coreBus.frames() * 2; sampleIdx += 2)
 		{
-			SampleFrame& sf = coreBusExpected[0][frame];
-			sf.leftRef() = coreBus[0][frame].left() * 2; // left channel:  doubled output from processor
-			sf.rightRef() = coreBus[0][frame].right();   // right channel: bypassed
+			float& sampleL = coreBusExpected[0][sampleIdx];
+			sampleL = coreBus[0][sampleIdx] * 2; // left channel:  doubled output from processor
+
+			float& sampleR = coreBusExpected[0][sampleIdx + 1];
+			sampleR = coreBus[0][sampleIdx + 1]; // right channel: bypassed
 		}
 
 		// Route from processor back to Core
@@ -631,12 +633,12 @@ private slots:
 
 		// Right track channel should pass through, but left track channel
 		// should be overwritten with processor's left output channel
-		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus[0][0].right(), 321.f);
-		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus[0][1].right(), 654.f);
-		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus[0][33].right(), 987.f);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], 123.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[1], 321.f);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[0], 456.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[1], 654.f);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[0], 789.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[1], 987.f);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -649,20 +651,20 @@ private slots:
 
 		// Setup
 		constexpr auto settings = AudioPortsSettings {
-			AudioDataKind::SampleFrame, true, 2, 2, true
+			AudioDataKind::F32, true, 2, 2, true
 		};
 		auto ap = PluginAudioPorts<settings>{false};
 		ap.init();
 		auto coreBus = getCoreBus();
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
-		trackChannels[0].setLeft(123.f);
-		trackChannels[0].setRight(321.f);
-		trackChannels[1].setLeft(456.f);
-		trackChannels[1].setRight(654.f);
-		trackChannels[33].setLeft(789.f);
-		trackChannels[33].setRight(987.f);
+		auto trackChannels = coreBus.trackChannelPair(0); // channels 0/1
+		trackChannels.sampleFrameAt(0).setLeft(123.f);
+		trackChannels.sampleFrameAt(0).setRight(321.f);
+		trackChannels.sampleFrameAt(1).setLeft(456.f);
+		trackChannels.sampleFrameAt(1).setRight(654.f);
+		trackChannels.sampleFrameAt(33).setLeft(789.f);
+		trackChannels.sampleFrameAt(33).setRight(987.f);
 
 		// Processor input/output buffer
 		auto inOut = ap.buffers()->inputOutput();
@@ -672,35 +674,35 @@ private slots:
 		router.send(coreBus, inOut);
 
 		// Check that processor inputs have data on frames 0, 1, and 33
-		QCOMPARE(inOut[0].left(), 123.f);
-		QCOMPARE(inOut[0].right(), 321.f);
-		QCOMPARE(inOut[1].left(), 456.f);
-		QCOMPARE(inOut[1].right(), 654.f);
-		QCOMPARE(inOut[33].left(), 789.f);
-		QCOMPARE(inOut[33].right(), 987.f);
+		QCOMPARE(inOut[0][0], 123.f);
+		QCOMPARE(inOut[0][1], 321.f);
+		QCOMPARE(inOut[1][0], 456.f);
+		QCOMPARE(inOut[1][1], 654.f);
+		QCOMPARE(inOut[33][0], 789.f);
+		QCOMPARE(inOut[33][1], 987.f);
 
 		// Do work of processImpl - in this case it doubles the amplitude
 		transformBuffer(inOut, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 		// Zero core bus just to be sure what the processor output is
-		lmms::zeroBuffer(coreBus);
+		zeroBuffer(coreBus);
 
 		// Route from processor back to Core
 		router.receive(inOut, coreBus);
 
 		// Should be double the original
-		QCOMPARE(coreBus[0][0].left(), 123.f * 2);
-		QCOMPARE(coreBus[0][0].right(), 321.f * 2);
-		QCOMPARE(coreBus[0][1].left(), 456.f * 2);
-		QCOMPARE(coreBus[0][1].right(), 654.f * 2);
-		QCOMPARE(coreBus[0][33].left(), 789.f * 2);
-		QCOMPARE(coreBus[0][33].right(), 987.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], 123.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[1], 321.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[0], 456.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[1], 654.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[0], 789.f * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[1], 987.f * 2);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -733,13 +735,13 @@ private slots:
 		apm.out().setPin(1, 1, false);
 
 		// Data on frames 0, 1, and 33
-		SampleFrame* trackChannels = coreBus[0]; // channels 0/1
-		trackChannels[0].setLeft(123.f);
-		trackChannels[0].setRight(321.f);
-		trackChannels[1].setLeft(456.f);
-		trackChannels[1].setRight(654.f);
-		trackChannels[33].setLeft(789.f);
-		trackChannels[33].setRight(987.f);
+		auto trackChannels = coreBus.trackChannelPair(0); // channels 0/1
+		trackChannels.sampleFrameAt(0).setLeft(123.f);
+		trackChannels.sampleFrameAt(0).setRight(321.f);
+		trackChannels.sampleFrameAt(1).setLeft(456.f);
+		trackChannels.sampleFrameAt(1).setRight(654.f);
+		trackChannels.sampleFrameAt(33).setLeft(789.f);
+		trackChannels.sampleFrameAt(33).setRight(987.f);
 
 		// Processor input and output buffers
 		auto ins = ap.buffers()->input();
@@ -760,23 +762,23 @@ private slots:
 		std::transform(ins.bufferPtr(0), ins.bufferPtr(0) + ins.frames(), outs.bufferPtr(1), process);
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
-		coreBusExpected[0][0] = SampleFrame{(123.f + 321.f) * 2, 321.f};
-		coreBusExpected[0][1] = SampleFrame{(456.f + 654.f) * 2, 654.f};
-		coreBusExpected[0][33] = SampleFrame{(789.f + 987.f) * 2, 987.f};
+		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		coreBusExpected.trackChannelPair(0).sampleFrameAt(0) = SampleFrame{(123.f + 321.f) * 2, 321.f};
+		coreBusExpected.trackChannelPair(0).sampleFrameAt(1) = SampleFrame{(456.f + 654.f) * 2, 654.f};
+		coreBusExpected.trackChannelPair(0).sampleFrameAt(33) = SampleFrame{(789.f + 987.f) * 2, 987.f};
 
 		// Route from processor back to Core
 		router.receive(outs, coreBus);
 
 		// Check that result is the two original track channels added together then doubled
-		QCOMPARE(coreBus[0][0].left(), (123.f + 321.f) * 2);
-		QCOMPARE(coreBus[0][0].right(), 321.f);
-		QCOMPARE(coreBus[0][1].left(), (456.f + 654.f) * 2);
-		QCOMPARE(coreBus[0][1].right(), 654.f);
-		QCOMPARE(coreBus[0][33].left(), (789.f + 987.f) * 2);
-		QCOMPARE(coreBus[0][33].right(), 987.f);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], (123.f + 321.f) * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(0)[1], 321.f);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[0], (456.f + 654.f) * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(1)[1], 654.f);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[0], (789.f + 987.f) * 2);
+		QCOMPARE(coreBus.trackChannelPair(0).frame(33)[1], 987.f);
 
 		// Test the rest of the buffer
 		compareBuffers(coreBus, coreBusExpected);
@@ -793,18 +795,18 @@ private slots:
 
 			// Data on frames 0, 1, and 33
 			auto coreBus = getCoreBus();
-			SampleFrame* trackChannels = coreBus[0]; // channels 0/1
-			trackChannels[0].setLeft(123.f);
-			trackChannels[0].setRight(321.f);
-			trackChannels[1].setLeft(456.f);
-			trackChannels[1].setRight(654.f);
-			trackChannels[33].setLeft(789.f);
-			trackChannels[33].setRight(987.f);
+			auto trackChannels = coreBus.trackChannelPair(0); // channels 0/1
+			trackChannels.sampleFrameAt(0).setLeft(123.f);
+			trackChannels.sampleFrameAt(0).setRight(321.f);
+			trackChannels.sampleFrameAt(1).setLeft(456.f);
+			trackChannels.sampleFrameAt(1).setRight(654.f);
+			trackChannels.sampleFrameAt(33).setLeft(789.f);
+			trackChannels.sampleFrameAt(33).setRight(987.f);
 
 			// Construct buffer with the expected core bus result
-			auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
+			auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
 			auto coreBufferPtrExpected = coreBufferExpected.data();
-			auto coreBusExpected = AudioBus<SampleFrame>{&coreBufferPtrExpected, 1, MaxFrames};
+			auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
 			transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsSettings.
@@ -813,17 +815,18 @@ private slots:
 				PluginAudioPorts<settings>& ap;
 
 				// Statically in-place settings
-				void operator()(std::span<SampleFrame> inOut)
+				void operator()(InterleavedBufferView<float, 2> inOut)
 				{
-					for (auto& s : inOut) { s *= 2; }
+					for (auto& s : inOut.toSampleFrames()) { s *= 2; }
 				}
 
 				// Dynamically in-place settings
-				void operator()(std::span<const SampleFrame> in, std::span<SampleFrame> out)
+				void operator()(InterleavedBufferView<const float, 2> in, InterleavedBufferView<float, 2> out)
 				{
-					for (std::size_t frame = 0; frame < in.size(); ++frame)
+					for (std::size_t frame = 0; frame < in.frames(); ++frame)
 					{
-						out[frame] = in[frame] * 2;
+						out[frame][0] = in[frame][0] * 2;
+						out[frame][1] = in[frame][1] * 2;
 					}
 				}
 
@@ -853,12 +856,12 @@ private slots:
 			router.process(coreBus, *ap.buffers(), Process{ap});
 
 			// Should be double the original
-			QCOMPARE(coreBus[0][0].left(), 123.f * 2);
-			QCOMPARE(coreBus[0][0].right(), 321.f * 2);
-			QCOMPARE(coreBus[0][1].left(), 456.f * 2);
-			QCOMPARE(coreBus[0][1].right(), 654.f * 2);
-			QCOMPARE(coreBus[0][33].left(), 789.f * 2);
-			QCOMPARE(coreBus[0][33].right(), 987.f * 2);
+			QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], 123.f * 2);
+			QCOMPARE(coreBus.trackChannelPair(0).frame(0)[1], 321.f * 2);
+			QCOMPARE(coreBus.trackChannelPair(0).frame(1)[0], 456.f * 2);
+			QCOMPARE(coreBus.trackChannelPair(0).frame(1)[1], 654.f * 2);
+			QCOMPARE(coreBus.trackChannelPair(0).frame(33)[0], 789.f * 2);
+			QCOMPARE(coreBus.trackChannelPair(0).frame(33)[1], 987.f * 2);
 
 			// Test the rest of the buffer
 			compareBuffers(coreBus, coreBusExpected);
@@ -867,7 +870,7 @@ private slots:
 		// Test statically in-place, non-buffered
 		{
 			constexpr auto settings = AudioPortsSettings {
-				AudioDataKind::SampleFrame, true, 2, 2, true, false
+				AudioDataKind::F32, true, 2, 2, true, false
 			};
 			auto ap = PluginAudioPorts<settings>{false};
 			testWithSettings(ap);
@@ -876,7 +879,7 @@ private slots:
 		// Test statically in-place, buffered
 		{
 			constexpr auto settings = AudioPortsSettings {
-				AudioDataKind::SampleFrame, true, 2, 2, true, true
+				AudioDataKind::F32, true, 2, 2, true, true
 			};
 			auto ap = PluginAudioPorts<settings>{false};
 			testWithSettings(ap);

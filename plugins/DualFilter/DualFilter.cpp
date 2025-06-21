@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-ProcessStatus DualFilterEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus DualFilterEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -132,7 +132,7 @@ ProcessStatus DualFilterEffect::processImpl(std::span<SampleFrame> inOut)
 
 
 	// buffer processing loop
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 		// get mix amounts for wet signals of both filters
 		const float mix2 = ( ( *mixPtr + 1.0f ) * 0.5f );

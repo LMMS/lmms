@@ -31,20 +31,19 @@
 #include "AudioPortsModel.h"
 #include "Engine.h"
 #include "LmmsPolyfill.h"
-#include "SampleFrame.h"
 
 namespace lmms
 {
 
 /**
- * A non-owning span of std::span<const SampleFrame>.
+ * A non-owning span of InterleavedBufferView<const float, 2>.
  *
  * Access like this:
- *   myAudioBus[channel pair index][frame index]
+ *   myAudioBus[channel pair index][sample index]
  *
  * where
  *   0 <= channel pair index < channelPairs()
- *   0 <= frame index < frames()
+ *   0 <= sample index < frames() * 2
  *
  * TODO C++23: Use std::mdspan
  */
@@ -52,7 +51,7 @@ template<typename T>
 class AudioBus
 {
 public:
-	static_assert(std::is_same_v<std::remove_const_t<T>, SampleFrame>);
+	static_assert(std::is_same_v<std::remove_const_t<T>, float>);
 
 	AudioBus() = default;
 	AudioBus(const AudioBus&) = default;
@@ -72,11 +71,12 @@ public:
 	{
 	}
 
-	auto trackChannelPair(track_ch_t pairIndex) const -> std::span<T>
+	auto trackChannelPair(track_ch_t pairIndex) const -> InterleavedBufferView<T, 2>
 	{
 		return {m_bus[pairIndex], m_frames};
 	}
 
+	//! @return 2-channel interleaved buffer for the given track channel pair
 	auto operator[](track_ch_t channelPairIndex) const -> T* { return m_bus[channelPairIndex]; }
 
 	auto bus() const -> T* const* { return m_bus; }
@@ -84,7 +84,7 @@ public:
 	auto frames() const -> f_cnt_t { return m_frames; }
 
 private:
-	T* const* m_bus = nullptr; //!< [channel pair index][frame index]
+	T* const* m_bus = nullptr; //!< [channel pair index][sample index]
 	const track_ch_t m_channelPairs = 0;
 	const f_cnt_t m_frames = 0;
 };
@@ -114,13 +114,15 @@ struct GetAudioBufferViewTypeHelper<kind, false, channels, isConst>
 		>, channels>;
 };
 
-//! SampleFrame specialization
-template<proc_ch_t channels, bool isConst>
-struct GetAudioBufferViewTypeHelper<AudioDataKind::SampleFrame, true, channels, isConst>
+//! Interleaved specialization
+template<AudioDataKind kind, proc_ch_t channels, bool isConst>
+struct GetAudioBufferViewTypeHelper<kind, true, channels, isConst>
 {
-	static_assert(channels == 0 || channels == 2,
-		"SampleFrame buffers must have exactly 0 or 2 inputs and outputs");
-	using type = std::conditional_t<isConst, std::span<const SampleFrame>, std::span<SampleFrame>>;
+	using type = InterleavedBufferView<
+		std::conditional_t<isConst,
+			const GetAudioDataType<kind>,
+			GetAudioDataType<kind>
+		>, channels>;
 };
 
 } // namespace detail
@@ -171,15 +173,15 @@ public:
 
 
 //! Performs pin connector routing. See `AudioPorts::Router`
-template<AudioPortsSettings settings, AudioDataKind kind = settings.kind, bool interleaved = settings.interleaved>
+template<AudioPortsSettings settings, bool interleaved = settings.interleaved>
 class AudioPortsRouter
 {
-	static_assert(always_false_v<AudioPortsRouter<settings, kind, interleaved>>,
+	static_assert(always_false_v<AudioPortsRouter<settings, interleaved>>,
 		"A router for the requested settings is not implemented yet");
 };
 
 template<AudioPortsSettings settings, class F>
-inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<SampleFrame> coreInOut,
+inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<float> coreInOut,
 	AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 {
 	if constexpr (settings.inplace)
@@ -211,32 +213,37 @@ inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<SampleFra
 	}
 }
 
-//! Non-SampleFrame specialization
-template<AudioPortsSettings settings, AudioDataKind kind>
-class AudioPortsRouter<settings, kind, false>
+//! Non-interleaved specialization
+template<AudioPortsSettings settings>
+class AudioPortsRouter<settings, false>
 {
-	using SampleT = GetAudioDataType<kind>;
+	using SampleT = GetAudioDataType<settings.kind>;
 
 public:
 	explicit AudioPortsRouter(const AudioPorts<settings>& parent) : m_ap{&parent} {}
 
 	template<class F>
-	void process(AudioBus<SampleFrame> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+	void process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 	{
 		processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
 	}
 
-	void send(AudioBus<const SampleFrame> in, PlanarBufferView<SampleT, settings.inputs> out) const;
-	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const;
+	void send(AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const;
+	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const;
 
 private:
 	const AudioPorts<settings>* const m_ap;
 };
 
-//! SampleFrame specialization
+//! Interleaved specialization
 template<AudioPortsSettings settings>
-class AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>
+class AudioPortsRouter<settings, true>
 {
+	using SampleT = GetAudioDataType<settings.kind>;
+
+	static_assert(settings.sampleFrameCompatible(),
+		"Interleaved audio port routers are currently limited to SampleFrame-compatible buffers only");
+
 public:
 	explicit AudioPortsRouter(const AudioPorts<settings>& parent) : m_ap{&parent} {}
 
@@ -245,22 +252,29 @@ public:
 	 * processor outputs back to the core.
 	 */
 	template<class F>
-	void process(AudioBus<SampleFrame> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+	void process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 	{
-		if (const auto dr = m_ap->m_directRouting)
+		if constexpr (settings.sampleFrameCompatible())
 		{
-			// The "direct routing" optimization can be applied
-			processDirectRouting(inOut.trackChannelPair(*dr), processorBuffers, std::forward<F>(processFunc));
+			if (const auto dr = m_ap->m_directRouting)
+			{
+				// The "direct routing" optimization can be applied
+				processDirectRouting(inOut.trackChannelPair(*dr), processorBuffers, std::forward<F>(processFunc));
+			}
+			else
+			{
+				// Route normally without "direct routing" optimization
+				processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
+			}
 		}
 		else
 		{
-			// Route normally without "direct routing" optimization
 			processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
 		}
 	}
 
-	void send(AudioBus<const SampleFrame> in, std::span<SampleFrame> out) const;
-	void receive(std::span<const SampleFrame> in, AudioBus<SampleFrame> inOut) const;
+	void send(AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const;
+	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const;
 
 private:
 	/**
@@ -268,7 +282,7 @@ private:
 	 * Does not use `send` or `receive` at all.
 	 */
 	template<class F>
-	void processDirectRouting(std::span<SampleFrame> inOut,
+	void processDirectRouting(InterleavedBufferView<float, 2> coreBuffer,
 		AudioPortsBuffer<settings>& processorBuffers, F&& processFunc);
 
 	const AudioPorts<settings>* const m_ap;
@@ -426,11 +440,11 @@ inline auto convertSample(const In sample) -> Out
 	}
 }
 
-// Non-SampleFrame AudioPortsRouter out-of-class definitions
+// Non-interleaved AudioPortsRouter out-of-class definitions
 
-template<AudioPortsSettings settings, AudioDataKind kind>
-inline void AudioPortsRouter<settings, kind, false>::send(
-	AudioBus<const SampleFrame> in, PlanarBufferView<SampleT, settings.inputs> out) const
+template<AudioPortsSettings settings>
+inline void AudioPortsRouter<settings, false>::send(
+	AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
 {
 	if constexpr (settings.inputs == 0) { return; }
 
@@ -450,7 +464,7 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 
 		for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 		{
-			const SampleFrame* inPtr = in[inChannelPairIdx]; // L/R track channel pair
+			const float* inPtr = in[inChannelPairIdx]; // track channel pair - 2-channel interleaved
 
 			const std::uint8_t inChannel = inChannelPairIdx * 2;
 			const std::uint8_t enabledPins =
@@ -464,7 +478,7 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 				{
 					for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 					{
-						outPtr[frame] += convertSample<SampleT>(inPtr[frame].right());
+						outPtr[frame] += convertSample<SampleT>(inPtr[frame * 2 + 1]);
 					}
 					break;
 				}
@@ -472,7 +486,7 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 				{
 					for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 					{
-						outPtr[frame] += convertSample<SampleT>(inPtr[frame].left());
+						outPtr[frame] += convertSample<SampleT>(inPtr[frame * 2]);
 					}
 					break;
 				}
@@ -480,7 +494,7 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 				{
 					for (f_cnt_t frame = 0; frame < in.frames(); ++frame)
 					{
-						outPtr[frame] += convertSample<SampleT>(inPtr[frame].left() + inPtr[frame].right());
+						outPtr[frame] += convertSample<SampleT>(inPtr[frame * 2] + inPtr[frame * 2 + 1]);
 					}
 					break;
 				}
@@ -492,9 +506,9 @@ inline void AudioPortsRouter<settings, kind, false>::send(
 	}
 }
 
-template<AudioPortsSettings settings, AudioDataKind kind>
-inline void AudioPortsRouter<settings, kind, false>::receive(
-	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<SampleFrame> inOut) const
+template<AudioPortsSettings settings>
+inline void AudioPortsRouter<settings, false>::receive(
+	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
 {
 	if constexpr (settings.outputs == 0) { return; }
 
@@ -510,7 +524,7 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 	 * without any processor audio routed to it, the track channel is unmodified for "bypass"
 	 * behavior.
 	 */
-	const auto routeNx2 = [&](SampleFrame* outPtr, track_ch_t outChannel, auto routedChannels) {
+	const auto routeNx2 = [&](float* outPtr, track_ch_t outChannel, auto routedChannels) {
 		constexpr std::uint8_t rc = routedChannels();
 
 		if constexpr (rc == 0b00)
@@ -519,25 +533,27 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 			return;
 		}
 
+		const auto samples = inOut.frames() * 2;
+
 		// We know at this point that we are writing to at least one of the output channels
 		// rather than bypassing, so it is safe to set the output buffer of those channels
 		// to zero prior to accumulation
 
 		if constexpr (rc == 0b11)
 		{
-			std::fill_n(outPtr, inOut.frames(), SampleFrame{});
+			std::fill_n(outPtr, samples, 0.f);
 		}
 		else
 		{
-			for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
+			for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 			{
 				if constexpr ((rc & 0b10) != 0)
 				{
-					outPtr[frame].leftRef() = 0.f;
+					outPtr[sampleIdx] = 0.f;
 				}
 				if constexpr ((rc & 0b01) != 0)
 				{
-					outPtr[frame].rightRef() = 0.f;
+					outPtr[sampleIdx + 1] = 0.f;
 				}
 			}
 		}
@@ -553,25 +569,25 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 				{
 					if (m_ap->out().enabled(outChannel + 1, inChannel))
 					{
-						for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
+						for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 						{
-							outPtr[frame].leftRef() += inPtr[frame];
-							outPtr[frame].rightRef() += inPtr[frame];
+							outPtr[sampleIdx]     += inPtr[sampleIdx / 2];
+							outPtr[sampleIdx + 1] += inPtr[sampleIdx / 2];
 						}
 					}
 					else
 					{
-						for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
+						for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 						{
-							outPtr[frame].leftRef() += inPtr[frame];
+							outPtr[sampleIdx] += inPtr[sampleIdx / 2];
 						}
 					}
 				}
 				else if (m_ap->out().enabled(outChannel + 1, inChannel))
 				{
-					for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
+					for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 					{
-						outPtr[frame].rightRef() += inPtr[frame];
+						outPtr[sampleIdx + 1] += inPtr[sampleIdx / 2];
 					}
 				}
 			}
@@ -580,9 +596,9 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 				// This input channel may or may not be routed to the left output channel
 				if (!m_ap->out().enabled(outChannel, inChannel)) { continue; }
 
-				for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
+				for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 				{
-					outPtr[frame].leftRef() += inPtr[frame];
+					outPtr[sampleIdx] += inPtr[sampleIdx / 2];
 				}
 			}
 			else if constexpr (rc == 0b01)
@@ -590,9 +606,9 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 				// This input channel may or may not be routed to the right output channel
 				if (!m_ap->out().enabled(outChannel + 1, inChannel)) { continue; }
 
-				for (f_cnt_t frame = 0; frame < inOut.frames(); ++frame)
+				for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 				{
-					outPtr[frame].rightRef() += inPtr[frame];
+					outPtr[sampleIdx + 1] += inPtr[sampleIdx / 2];
 				}
 			}
 		}
@@ -601,7 +617,7 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
-		SampleFrame* outPtr = inOut[outChannelPairIdx]; // L/R track channel pair
+		float* outPtr = inOut[outChannelPairIdx]; // track channel pair - 2-channel interleaved
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 
 		const std::uint8_t routedChannels =
@@ -630,17 +646,17 @@ inline void AudioPortsRouter<settings, kind, false>::receive(
 }
 
 
-// SampleFrame AudioPortsRouter out-of-class definitions
+// Interleaved AudioPortsRouter out-of-class definitions
 
 template<AudioPortsSettings settings>
-inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::send(
-	AudioBus<const SampleFrame> in, std::span<SampleFrame> out) const
+inline void AudioPortsRouter<settings, true>::send(
+	AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const
 {
 	if constexpr (settings.inputs == 0) { return; }
 
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
-	assert(m_ap->in().channelCount() == 2); // SampleFrame routing only allows exactly 0 or 2 channels
+	assert(m_ap->in().channelCount() == 2); // Interleaved routing only allows exactly 0 or 2 channels
 
 	// Ignore all unused track channels for better performance
 	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
@@ -648,15 +664,15 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::send(
 	assert(out.data() != nullptr);
 
 	// Zero the output buffer
-	std::fill(out.begin(), out.end(), SampleFrame{});
+	std::fill_n(out.data(), out.frames() * 2, 0.f);
 
 	/*
 	 * This is essentially a function template with specializations for each
-	 * of the 16 total routing combinations of an input `SampleFrame*` to an
-	 * output `SampleFrame*`. The purpose is to eliminate all branching within
+	 * of the 16 total routing combinations of an input 2-channel interleaved buffer to an
+	 * output 2-channel interleaved buffer. The purpose is to eliminate all branching within
 	 * the inner for-loop in hopes of better performance.
 	 */
-	auto route2x2 = [samples = in.frames() * 2, outPtr = out.data()->data()](const sample_t* inPtr, auto enabledPins) {
+	auto route2x2 = [samples = in.frames() * 2, outPtr = out.data()](const float* inPtr, auto enabledPins) {
 		constexpr auto epL =  static_cast<std::uint8_t>(enabledPins() >> 2); // for L out channel
 		constexpr auto epR = static_cast<std::uint8_t>(enabledPins() & 0b0011); // for R out channel
 
@@ -689,7 +705,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::send(
 
 	for (std::uint8_t inChannelPairIdx = 0; inChannelPairIdx < inSizeConstrained; ++inChannelPairIdx)
 	{
-		const sample_t* inPtr = in[inChannelPairIdx]->data(); // L/R track channel pair
+		const float* inPtr = in[inChannelPairIdx]; // track channel pair - 2-channel interleaved
 
 		const std::uint8_t inChannel = inChannelPairIdx * 2;
 		const std::uint8_t enabledPins =
@@ -724,14 +740,14 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::send(
 }
 
 template<AudioPortsSettings settings>
-inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::receive(
-	std::span<const SampleFrame> in, AudioBus<SampleFrame> inOut) const
+inline void AudioPortsRouter<settings, true>::receive(
+	InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
 {
 	if constexpr (settings.outputs == 0) { return; }
 
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
-	assert(m_ap->out().channelCount() == 2); // SampleFrame routing only allows exactly 0 or 2 channels
+	assert(m_ap->out().channelCount() == 2); // Interleaved routing only allows exactly 0 or 2 channels
 
 	// Ignore all unused track channels for better performance
 	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
@@ -740,11 +756,11 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::receiv
 
 	/*
 	 * This is essentially a function template with specializations for each
-	 * of the 16 total routing combinations of an input `SampleFrame*` to an
-	 * output `SampleFrame*`. The purpose is to eliminate all branching within
+	 * of the 16 total routing combinations of an input 2-channel interleaved buffer to an
+	 * output 2-channel interleaved buffer. The purpose is to eliminate all branching within
 	 * the inner for-loop in hopes of better performance.
 	 */
-	auto route2x2 = [samples = inOut.frames() * 2, inPtr = in.data()->data()](sample_t* outPtr, auto enabledPins) {
+	auto route2x2 = [samples = inOut.frames() * 2, inPtr = in.data()](float* outPtr, auto enabledPins) {
 		constexpr auto epL =  static_cast<std::uint8_t>(enabledPins() >> 2); // for L out channel
 		constexpr auto epR = static_cast<std::uint8_t>(enabledPins() & 0b0011); // for R out channel
 
@@ -788,7 +804,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::receiv
 
 	for (std::uint8_t outChannelPairIdx = 0; outChannelPairIdx < inOutSizeConstrained; ++outChannelPairIdx)
 	{
-		sample_t* outPtr = inOut[outChannelPairIdx]->data(); // L/R track channel pair
+		float* outPtr = inOut[outChannelPairIdx]; // track channel pair - 2-channel interleaved
 		assert(outPtr != nullptr);
 
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
@@ -825,8 +841,8 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::receiv
 
 template<AudioPortsSettings settings>
 template<class F>
-inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::processDirectRouting(
-	std::span<SampleFrame> coreBuffer, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+inline void AudioPortsRouter<settings, true>::processDirectRouting(
+	InterleavedBufferView<float, 2> coreBuffer, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 {
 	if constexpr (settings.inplace)
 	{
@@ -841,7 +857,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 				if (m_ap->in().channelCount() != 0)
 				{
 					assert(processorInOut.data() != nullptr);
-					std::memcpy(processorInOut.data(), coreBuffer.data(), coreBuffer.size_bytes());
+					std::memcpy(processorInOut.data(), coreBuffer.data(), coreBuffer.dataSizeBytes());
 				}
 			}
 
@@ -854,7 +870,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 				if (m_ap->out().channelCount() != 0)
 				{
 					assert(processorInOut.data() != nullptr);
-					std::memcpy(coreBuffer.data(), processorInOut.data(), coreBuffer.size_bytes());
+					std::memcpy(coreBuffer.data(), processorInOut.data(), coreBuffer.dataSizeBytes());
 				}
 			}
 		}
@@ -877,7 +893,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 				if (m_ap->in().channelCount() != 0)
 				{
 					assert(processorIn.data() != nullptr);
-					std::memcpy(processorIn.data(), coreBuffer.data(), coreBuffer.size_bytes());
+					std::memcpy(processorIn.data(), coreBuffer.data(), coreBuffer.dataSizeBytes());
 				}
 			}
 
@@ -891,7 +907,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 				if (m_ap->out().channelCount() != 0)
 				{
 					assert(processorOut.data() != nullptr);
-					std::memcpy(coreBuffer.data(), processorOut.data(), coreBuffer.size_bytes());
+					std::memcpy(coreBuffer.data(), processorOut.data(), coreBuffer.dataSizeBytes());
 				}
 			}
 		}
@@ -905,7 +921,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 			// Check if processor is dynamically using in-place processing
 			if (processorIn.data() != processorOut.data() || processorIn.size() != processorOut.size())
 			{
-				// Not using in-place processing - the processor implementation may be written under the
+				// Probably not using in-place processing - the processor implementation may be written under the
 				// assumption that the input and output buffers are two different buffers, so we can't break
 				// that assumption here. If the processor has both inputs and outputs, a buffer copy is needed.
 
@@ -922,7 +938,7 @@ inline void AudioPortsRouter<settings, AudioDataKind::SampleFrame, true>::proces
 						processFunc(coreBuffer, processorOut);
 
 						// Write processor output buffer to core
-						std::memcpy(coreBuffer.data(), processorOut.data(), coreBuffer.size_bytes());
+						std::memcpy(coreBuffer.data(), processorOut.data(), coreBuffer.dataSizeBytes());
 					}
 					else
 					{

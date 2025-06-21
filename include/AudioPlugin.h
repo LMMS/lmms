@@ -197,8 +197,8 @@ protected:
 		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
-		SampleFrame* temp = inOut.data();
-		const auto bus = AudioBus<SampleFrame>{&temp, 1, inOut.size()};
+		float* temp = inOut.data()->data();
+		const auto bus = AudioBus<float>{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
 		router.process(bus, *buffers, [this](auto... buffers) {
@@ -262,8 +262,8 @@ protected:
 		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
-		SampleFrame* temp = inOut.data();
-		const auto bus = AudioBus<SampleFrame>{&temp, 1, inOut.size()};
+		float* temp = inOut.data()->data();
+		const auto bus = AudioBus<float>{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
 		ProcessStatus status;
@@ -277,6 +277,7 @@ protected:
 				break;
 			case ProcessStatus::ContinueIfNotQuiet:
 			{
+				// TODO: Should probably use the plugin's output buffer instead
 				double outSum = 0.0;
 				for (const SampleFrame& frame : inOut)
 				{
@@ -396,7 +397,7 @@ using AudioPluginExt = AudioPlugin<ParentT, settings, AudioPortsT<settings>>;
 
 // NOTE: NotePlayHandle-based instruments are not supported yet
 using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsSettings {
-	.kind = AudioDataKind::SampleFrame,
+	.kind = AudioDataKind::F32,
 	.interleaved = true,
 	.inputs = 0,
 	.outputs = 2,
@@ -404,7 +405,7 @@ using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsSettings {
 	.buffered = false }>;
 
 using DefaultEffect = AudioPluginExt<Effect, AudioPortsSettings {
-	.kind = AudioDataKind::SampleFrame,
+	.kind = AudioDataKind::F32,
 	.interleaved = true,
 	.inputs = 2,
 	.outputs = 2,

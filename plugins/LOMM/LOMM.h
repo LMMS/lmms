@@ -59,7 +59,7 @@ private slots:
 	void changeSampleRate();
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	LOMMControls m_lommControls;
 	

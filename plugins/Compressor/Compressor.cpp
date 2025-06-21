@@ -236,7 +236,7 @@ void CompressorEffect::calcMix()
 
 
 
-ProcessStatus CompressorEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus CompressorEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	m_cleanedBuffers = false;
 
@@ -261,7 +261,7 @@ ProcessStatus CompressorEffect::processImpl(std::span<SampleFrame> inOut)
 	const bool feedback = m_compressorControls.m_feedbackModel.value();
 	const bool lookahead = m_compressorControls.m_lookaheadModel.value();
 
-	for (SampleFrame& frame : inOut)
+	for (float* frame : inOut.framesView())
 	{
 		auto drySignal = std::array{frame[0], frame[1]};
 		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};

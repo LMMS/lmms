@@ -61,7 +61,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-ProcessStatus GranularPitchShifterEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus GranularPitchShifterEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -93,8 +93,10 @@ ProcessStatus GranularPitchShifterEffect::processImpl(std::span<SampleFrame> inO
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
 
-	for (fpp_t f = 0; f < inOut.size(); ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
+		float* frame = inOut.framePtr(f);
+
 		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
 		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
 		
@@ -150,7 +152,7 @@ ProcessStatus GranularPitchShifterEffect::processImpl(std::span<SampleFrame> inO
 		}
 		
 		std::array<float, 2> s = {0, 0};
-		std::array<float, 2> filtered = {inOut[f][0], inOut[f][1]};
+		std::array<float, 2> filtered = {frame[0], frame[1]};
 		
 		// spawn a new grain if it's time
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
@@ -231,8 +233,8 @@ ProcessStatus GranularPitchShifterEffect::processImpl(std::span<SampleFrame> inO
 		m_ringBuf[m_writePoint][0] = filtered[0] + s[0] * feedback;
 		m_ringBuf[m_writePoint][1] = filtered[1] + s[1] * feedback;
 			
-		inOut[f][0] = d * inOut[f][0] + w * s[0];
-		inOut[f][1] = d * inOut[f][1] + w * s[1];
+		frame[0] = d * frame[0] + w * s[0];
+		frame[1] = d * frame[1] + w * s[1];
 	}
 	
 	if (m_sampleRateNeedsUpdate)

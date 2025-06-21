@@ -43,18 +43,18 @@ using AccessBufferType = std::conditional_t<
 
 //! Default implementation of `AudioPorts::Buffer` for audio plugins
 template<AudioPortsSettings settings,
-	AudioDataKind kind = settings.kind, bool interleaved = settings.interleaved, bool inplace = settings.inplace>
+	bool interleaved = settings.interleaved, bool inplace = settings.inplace>
 class PluginAudioPortsBuffer
 {
 	static_assert(always_false_v<PluginAudioPortsBuffer<settings>>, "Unsupported audio port settings");
 };
 
 //! Specialization for dynamically in-place, non-interleaved buffers
-template<AudioPortsSettings settings, AudioDataKind kind>
-class PluginAudioPortsBuffer<settings, kind, false, false>
+template<AudioPortsSettings settings>
+class PluginAudioPortsBuffer<settings, false, false>
 	: public AudioPorts<settings>::Buffer
 {
-	using SampleT = GetAudioDataType<kind>;
+	using SampleT = GetAudioDataType<settings.kind>;
 
 public:
 	PluginAudioPortsBuffer() = default;
@@ -120,15 +120,15 @@ private:
 
 
 //! Specialization for statically in-place, non-interleaved buffers
-template<AudioPortsSettings settings, AudioDataKind kind>
-class PluginAudioPortsBuffer<settings, kind, false, true>
+template<AudioPortsSettings settings>
+class PluginAudioPortsBuffer<settings, false, true>
 	: public AudioPorts<settings>::Buffer
 {
 	static_assert(settings.inputs == settings.outputs || settings.inputs == 0 || settings.outputs == 0,
 		"in-place buffers must have same number of input channels and output channels, "
 		"or one of the channel counts must be fixed at zero");
 
-	using SampleT = GetAudioDataType<kind>;
+	using SampleT = GetAudioDataType<settings.kind>;
 
 public:
 	PluginAudioPortsBuffer() = default;
@@ -187,34 +187,50 @@ private:
 };
 
 
-//! Specialization for 2-channel SampleFrame buffers
+//! Specialization for statically in-place, interleaved buffers
 template<AudioPortsSettings settings>
-class PluginAudioPortsBuffer<settings, AudioDataKind::SampleFrame, true, true>
+class PluginAudioPortsBuffer<settings, true, true>
 	: public AudioPorts<settings>::Buffer
 {
+	static_assert(settings.inputs == settings.outputs || settings.inputs == 0 || settings.outputs == 0,
+		"in-place buffers must have same number of input channels and output channels, "
+		"or one of the channel counts must be fixed at zero");
+
+	using SampleT = GetAudioDataType<settings.kind>;
+
+	static constexpr auto s_channels = std::max(settings.inputs, settings.outputs);
+
 public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
-	auto inputOutput() -> std::span<SampleFrame> final
+	auto inputOutput() -> InterleavedBufferView<SampleT, s_channels> final
 	{
-		return m_buffer;
+		return InterleavedBufferView<SampleT, s_channels> {
+			m_buffer.data(), m_channels, m_frames
+		};
 	}
 
 	auto frames() const -> fpp_t final
 	{
-		return m_buffer.size();
+		return m_frames;
 	}
 
 	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) final
 	{
-		(void)channelsIn;
-		(void)channelsOut;
-		m_buffer.resize(frames);
+		assert(channelsIn == channelsOut || channelsIn == 0 || channelsOut == 0);
+		if (channelsIn == DynamicChannelCount || channelsOut == DynamicChannelCount) { return; }
+
+		m_channels = std::max(channelsIn, channelsOut);
+		m_frames = frames;
+
+		m_buffer.resize(frames * m_channels);
 	}
 
 private:
-	std::vector<SampleFrame> m_buffer;
+	std::vector<SampleT> m_buffer;
+	proc_ch_t m_channels = settings.outputs;
+	f_cnt_t m_frames = 0;
 };
 
 

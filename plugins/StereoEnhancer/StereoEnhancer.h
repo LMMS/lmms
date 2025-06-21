@@ -50,7 +50,7 @@ public:
 
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	DspEffectLibrary::StereoEnhancer m_seFX;
 	

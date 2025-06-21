@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-ProcessStatus PeakControllerEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus PeakControllerEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 
@@ -102,7 +102,7 @@ ProcessStatus PeakControllerEffect::processImpl(std::span<SampleFrame> inOut)
 
 	if( c.m_absModel.value() )
 	{
-		for (SampleFrame& frame : inOut)
+		for (SampleFrame& frame : inOut.toSampleFrames())
 		{
 			// absolute value is achieved because the squares are > 0
 			sum += frame.sumOfSquaredAmplitudes();
@@ -110,7 +110,7 @@ ProcessStatus PeakControllerEffect::processImpl(std::span<SampleFrame> inOut)
 	}
 	else
 	{
-		for (SampleFrame& frame : inOut)
+		for (float* frame : inOut.framesView())
 		{
 			// the value is absolute because of squaring,
 			// so we need to correct it
@@ -123,13 +123,13 @@ ProcessStatus PeakControllerEffect::processImpl(std::span<SampleFrame> inOut)
 	// this will mute the output after the values were measured
 	if( c.m_muteModel.value() )
 	{
-		for (SampleFrame& frame : inOut)
+		for (float* frame : inOut.framesView())
 		{
 			frame[0] = frame[1] = 0.0f;
 		}
 	}
 
-	float curRMS = sqrt_neg(sum / inOut.size());
+	float curRMS = sqrt_neg(sum / inOut.frames());
 	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
 	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;

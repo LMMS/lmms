@@ -95,7 +95,7 @@ void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOn
 }
 
 
-ProcessStatus MultitapEchoEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus MultitapEchoEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -114,7 +114,7 @@ ProcessStatus MultitapEchoEffect::processImpl(std::span<SampleFrame> inOut)
 	}
 	
 	// add dry buffer - never swap inputs for dry
-	m_buffer.writeAddingMultiplied(inOut.data(), f_cnt_t{0}, inOut.size(), dryGain);
+	m_buffer.writeAddingMultiplied(reinterpret_cast<SampleFrame*>(inOut.data()), f_cnt_t{0}, inOut.frames(), dryGain);
 
 	// swapped inputs?
 	if( swapInputs )
@@ -124,9 +124,9 @@ ProcessStatus MultitapEchoEffect::processImpl(std::span<SampleFrame> inOut)
 		{
 			for( int s = 0; s < m_stages; ++s )
 			{
-				runFilter(m_work, inOut.data(), m_filter[i][s], inOut.size());
+				runFilter(m_work, reinterpret_cast<SampleFrame*>(inOut.data()), m_filter[i][s], inOut.frames());
 			}
-			m_buffer.writeSwappedAddingMultiplied(m_work, offset, inOut.size(), m_amp[i]);
+			m_buffer.writeSwappedAddingMultiplied(m_work, offset, inOut.frames(), m_amp[i]);
 			offset += stepLength;
 		}
 	}
@@ -137,9 +137,9 @@ ProcessStatus MultitapEchoEffect::processImpl(std::span<SampleFrame> inOut)
 		{
 			for( int s = 0; s < m_stages; ++s )
 			{
-				runFilter(m_work, inOut.data(), m_filter[i][s], inOut.size());
+				runFilter(m_work, reinterpret_cast<SampleFrame*>(inOut.data()), m_filter[i][s], inOut.frames());
 			}
-			m_buffer.writeAddingMultiplied(m_work, offset, inOut.size(), m_amp[i]);
+			m_buffer.writeAddingMultiplied(m_work, offset, inOut.frames(), m_amp[i]);
 			offset += stepLength;
 		}
 	}
@@ -147,7 +147,7 @@ ProcessStatus MultitapEchoEffect::processImpl(std::span<SampleFrame> inOut)
 	// pop the buffer and mix it into output
 	m_buffer.pop( m_work );
 
-	for (auto f = std::size_t{0}; f < inOut.size(); ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 	{
 		inOut[f][0] = d * inOut[f][0] + w * m_work[f][0];
 		inOut[f][1] = d * inOut[f][1] + w * m_work[f][1];

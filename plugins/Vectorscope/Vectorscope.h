@@ -43,7 +43,7 @@ public:
 	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	VecControls m_controls;
 

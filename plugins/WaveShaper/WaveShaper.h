@@ -48,7 +48,7 @@ public:
 
 
 private:
-	ProcessStatus processImpl(std::span<SampleFrame> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
 	WaveShaperControls m_wsControls;
 

@@ -232,7 +232,7 @@ protected:
 	std::vector<bool> m_routedChannels;
 
 	/**
-	 * Any SampleFrame-based audio processor (2-channel interleaved) connected to the track channels in the default
+	 * Any processor with 2-channel interleaved buffers connected to the track channels in the default
 	 * pin configuration (L --> L, R --> R) can be connected directly without the need for the audio port
 	 * buffers or the audio port router, which allows a significant performance optimization.
 	 *

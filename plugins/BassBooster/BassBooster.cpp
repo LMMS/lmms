@@ -69,7 +69,7 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-ProcessStatus BassBoosterEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus BassBoosterEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	// check out changed controls
 	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
@@ -86,9 +86,9 @@ ProcessStatus BassBoosterEffect::processImpl(std::span<SampleFrame> inOut)
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (fpp_t f = 0; f < inOut.size(); ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
-		auto& currentFrame = inOut[f];
+		auto& currentFrame = inOut.sampleFrameAt(f);
 
 		// Process copy of current sample frame
 		m_bbFX.setGain(gainBuffer ? gainBuffer->value(f) : const_gain);

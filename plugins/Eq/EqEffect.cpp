@@ -64,7 +64,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-ProcessStatus EqEffect::processImpl(std::span<SampleFrame> inOut)
+ProcessStatus EqEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -144,7 +144,7 @@ ProcessStatus EqEffect::processImpl(std::span<SampleFrame> inOut)
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
 
-	for (SampleFrame& frame : inOut)
+	for (const SampleFrame& frame : inOut.toSampleFrames())
 	{
 		outSum += frame.sumOfSquaredAmplitudes();
 	}
@@ -154,22 +154,22 @@ ProcessStatus EqEffect::processImpl(std::span<SampleFrame> inOut)
 
 	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 && m_eqControls.isViewVisible()  )
 	{
-		m_eqControls.m_inFftBands.analyze(inOut.data(), inOut.size());
+		m_eqControls.m_inFftBands.analyze(inOut);
 	}
 	else
 	{
 		m_eqControls.m_inFftBands.clear();
 	}
 
-	gain(inOut.data(), inOut.size(), m_inGain, &m_inPeak);
+	gain(inOut, m_inGain, &m_inPeak);
 	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < m_inPeak[0] ? m_inPeak[0] : m_eqControls.m_inPeakL;
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
 	float periodProgress = 0.0f; // percentage of period processed
-	for (fpp_t f = 0; f < inOut.size(); ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
-		SampleFrame& frame = inOut[f];
-		periodProgress = static_cast<float>(f) / (inOut.size() - 1);
+		auto frame = inOut.frame(f);
+		periodProgress = static_cast<float>(f) / (inOut.frames() - 1);
 		//wet dry buffer
 		dryS[0] = frame[0];
 		dryS[1] = frame[1];
@@ -258,13 +258,13 @@ ProcessStatus EqEffect::processImpl(std::span<SampleFrame> inOut)
 	}
 
 	SampleFrame outPeak = { 0, 0 };
-	gain(inOut.data(), inOut.size(), outGain, &outPeak );
+	gain(inOut, outGain, &outPeak);
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
 
 	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
-		m_eqControls.m_outFftBands.analyze(inOut.data(), inOut.size());
+		m_eqControls.m_outFftBands.analyze(inOut);
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate ) );
 	}
 	else
