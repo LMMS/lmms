@@ -99,6 +99,7 @@ public:
 
 	bool isInPattern() const;
 
+	bool manuallyResizable() const;
 
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *

@@ -185,6 +185,11 @@ bool Clip::isInPattern() const
 		&& getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern;
 }
 
+bool Clip::manuallyResizable() const
+{
+	return !isInPattern();
+}
+
 
 
 /*! \brief Mutes this Clip
