@@ -49,12 +49,12 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "FileDialog.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "Song.h"
-#include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
 #	include <X11/Xlib.h>
@@ -404,9 +404,8 @@ bool VstPlugin::processMessage( const message & _m )
 	{
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if( m_embedMethod == "none"
-			&& ConfigManager::inst()->value(
-				"ui", "vstalwaysontop" ).toInt() )
+		if (m_embedMethod == "none" && !gui::GuiApplication::isWayland()
+			&& ConfigManager::inst()->value("ui", "vstalwaysontop").toInt())
 		{
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,
