@@ -490,7 +490,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 void PatmanView::openFile()
 {
-	FileDialog ofd( nullptr, tr( "Open patch file" ), "", "", FileDialog::Operation::OpSample);
+	FileDialog ofd( nullptr, tr( "Open patch file" ), "", "", FileDialog::Operation::Sample);
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;

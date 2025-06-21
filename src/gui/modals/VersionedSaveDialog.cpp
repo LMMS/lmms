@@ -44,7 +44,7 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 										  const QString &caption,
 										  const QString &directory,
 										  const QString &filter ) :
-	FileDialog(parent, caption, directory, filter, FileDialog::Operation::OpProject)
+	FileDialog(parent, caption, directory, filter, FileDialog::Operation::Project)
 {
 	setAcceptMode( QFileDialog::AcceptSave );
 	setFileMode( QFileDialog::AnyFile );

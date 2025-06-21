@@ -38,7 +38,7 @@
 namespace lmms::gui
 {
 
-std::vector<QString> FileDialog::OperationPaths = std::vector<QString>(Operation::OpEnd, "");
+std::vector<QString> FileDialog::OperationPaths = std::vector<QString>();
 bool FileDialog::OperationPathsReady = false;
 
 FileDialog::FileDialog(QWidget *parent, const QString &caption,
@@ -108,13 +108,15 @@ void FileDialog::prepareOperationPaths()
 
 	auto* config = ConfigManager::inst();
 
-	OperationPaths[OpGeneric] 	= config->workingDir();
-	OperationPaths[OpProject] 	= config->userProjectsDir();
-	OperationPaths[OpMidi] 		= config->workingDir();
-	OperationPaths[OpPreset] 	= config->userPresetsDir();
-	OperationPaths[OpPlugin] 	= config->userVstDir();
-	OperationPaths[OpSample] 	= config->userSamplesDir();
-	OperationPaths[OpSong] 		= config->workingDir();
+	OperationPaths = {
+		config->workingDir(),
+		config->userProjectsDir(),
+		config->workingDir(),
+		config->userPresetsDir(),
+		config->userVstDir(),
+		config->userSamplesDir(),
+		config->workingDir()
+	};
 
 	OperationPathsReady = true;
 }
@@ -128,26 +130,21 @@ QString FileDialog::getOperationPath(const FileDialog::Operation op, const QStri
 
 	prepareOperationPaths();
 
-	for (int i = OpBegin; i != OpEnd; i++)
+	if (op != Operation::End)
 	{
-		if (i == op)
-		{
-			return OperationPaths[i];
-		}
+		return OperationPaths[static_cast<size_t>(op)];
 	}
 
-	return OperationPaths[OpGeneric];
+	return OperationPaths[static_cast<size_t>(Operation::Generic)];
 }
 
 void FileDialog::setOperationPath(const FileDialog::Operation op, const QString& path)
 {
-	for (int i = OpBegin; i != OpEnd; i++)
+	prepareOperationPaths();
+
+	if (op != Operation::End)
 	{
-		if (i == op)
-		{
-			OperationPaths[i] = path;
-			return;
-		}
+		OperationPaths[static_cast<size_t>(op)] = path;
 	}
 }
 

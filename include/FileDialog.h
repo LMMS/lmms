@@ -36,22 +36,22 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
-	enum Operation {
-		OpBegin = 0, // This variant is purely for looping conveviences.
-		OpGeneric = OpBegin,
-		OpProject,
-		OpMidi,
-		OpPreset,
-		OpPlugin,
-		OpSample,
-		OpSong,
-		OpEnd, // This variant is purely for looping conveviences
+	enum class Operation {
+		Begin = 0, // Use in iteration
+		Generic = Begin,
+		Project,
+		Midi,
+		Preset,
+		Plugin,
+		Sample,
+		Song,
+		End, // Use in iteration
 	};
 
 	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
 						const QString &directory = QString(),
 						const QString &filter = QString(),
-						const Operation operation = OpGeneric);
+						const Operation operation = Operation::Generic);
 
 	~FileDialog() override;
 
@@ -59,13 +59,13 @@ public:
 										const QString &caption,
 										const QString &directory,
 										QFileDialog::Options options = QFileDialog::ShowDirsOnly,
-										const Operation operation = OpGeneric);
+										const Operation operation = Operation::Generic);
     static QString getOpenFileName(QWidget *parent = 0,
 									const QString &caption = QString(),
 									const QString &directory = QString(),
 									const QString &filter = QString(),
 									QString *selectedFilter = 0,
-									const Operation operation = OpGeneric);
+									const Operation operation = Operation::Generic);
 	void clearSelection();
 
 private:

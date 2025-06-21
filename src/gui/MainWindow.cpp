@@ -753,7 +753,7 @@ void MainWindow::openProject()
 {
 	if( mayChangeProject(false) )
 	{
-		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ), FileDialog::Operation::OpProject );
+		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ), FileDialog::Operation::Project );
 
 		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
@@ -1406,7 +1406,7 @@ void MainWindow::autoSave()
 
 void MainWindow::onExportProjectMidi()
 {
-	FileDialog efd( this, "Export Project", "", "", FileDialog::Operation::OpMidi);
+	FileDialog efd( this, "Export Project", "", "", FileDialog::Operation::Midi);
 
 	efd.setFileMode( FileDialog::AnyFile );
 
@@ -1446,7 +1446,7 @@ void MainWindow::exportProject(bool multiExport)
 {
 	QString const & projectFileName = Engine::getSong()->projectFileName();
 
-	FileDialog efd( getGUI()->mainWindow(), "", "", "", FileDialog::Operation::OpSong);
+	FileDialog efd( getGUI()->mainWindow(), "", "", "", FileDialog::Operation::Song);
 
 	if ( multiExport )
 	{
@@ -1578,7 +1578,7 @@ void MainWindow::onImportProject()
 				" (*.h2song);;" +
 				tr("All file types") +
 				" (*.*)",
-				FileDialog::Operation::OpProject
+				FileDialog::Operation::Project
 		);
 
 		ofd.setFileMode( FileDialog::ExistingFiles );
