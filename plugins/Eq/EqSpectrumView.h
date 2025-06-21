@@ -26,6 +26,7 @@
 #include <QPainterPath>
 #include <QWidget>
 
+#include "AudioBufferView.h"
 #include "fft_helpers.h"
 #include "LmmsTypes.h"
 
@@ -45,7 +46,7 @@ public:
 	bool getInProgress();
 	void clear();
 
-	void analyze( SampleFrame* buf, const fpp_t frames );
+	void analyze(InterleavedBufferView<const float, 2> buf);
 
 	float getEnergy() const;
 	int getSampleRate() const;

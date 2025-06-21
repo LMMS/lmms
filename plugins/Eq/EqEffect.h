@@ -24,7 +24,7 @@
 #ifndef EQEFFECT_H
 #define EQEFFECT_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "EqControls.h"
 #include "EqFilter.h"
 
@@ -35,36 +35,35 @@ namespace lmms
 {
 
 
-class EqEffect : public Effect
+class EqEffect : public DefaultEffect
 {
 public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
-
 	EffectControls * controls() override
 	{
 		return &m_eqControls;
 	}
-	inline void gain( SampleFrame* buf, const fpp_t frames, float scale, SampleFrame* peak )
+
+	inline void gain(InterleavedBufferView<float, 2> buf, float scale, SampleFrame* peak)
 	{
 		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
-		for( fpp_t f = 0; f < frames; ++f )
+		for (float* frame : buf.framesView())
 		{
-			auto & sf = buf[f];
-
 			// Apply gain to sample frame
-			sf[0] *= scale;
-			sf[1] *= scale;
+			frame[0] *= scale;
+			frame[1] *= scale;
 
 			// Update peaks
-			peak[0][0] = std::max(peak[0][0], (float)fabs(sf[0]));
-			peak[0][1] = std::max(peak[0][1], (float)fabs(sf[1]));
+			peak[0][0] = std::max(peak[0][0], (float)fabs(frame[0]));
+			peak[0][1] = std::max(peak[0][1], (float)fabs(frame[1]));
 		}
 	}
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+
 	EqControls m_eqControls;
 
 	EqHp12Filter m_hp12;
