@@ -139,6 +139,8 @@ private:
 			return SFM_WRITE;
 		case Mode::ReadWrite:
 			return SFM_RDWR;
+		default:
+			throw std::invalid_argument{"Invalid mode"};
 		}
 	}
 
@@ -152,6 +154,8 @@ private:
 			return SF_SEEK_CUR;
 		case Whence::End:
 			return SF_SEEK_END;
+		default:
+			throw std::invalid_argument{"Invalid whence"};
 		}
 	}
 
